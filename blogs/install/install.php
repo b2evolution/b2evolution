@@ -423,6 +423,8 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'jahreswagen-portal.net')";
 	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'conzendo.de')";
+	mysql_query($query) or mysql_oops( $query );
 	/*
 	These sites try to set cookies with the name "url" and content being the
 	site you are refering from, when you go there.
