@@ -18,7 +18,7 @@ case "update":
 	}
 
 	// Determine the edit folder:
-	$edit_folder = get_path().'/skins/custom';
+	$edit_folder = get_path('skins').'/custom';
 
 	param( 'newcontent', 'html' );
 	$f = fopen( $edit_folder.'/'.$file , "w+" );
@@ -40,7 +40,7 @@ default:
 	}
 
 	// Determine the edit folder:
-	$edit_folder = get_path().'/skins/custom';
+	$edit_folder = get_path('skins').'/custom';
 
 	$file = trim($file);
 	if( !empty($file)) 
@@ -100,7 +100,7 @@ default:
 	<ul>
 <?php
 	// Determine the edit folder:
-	if( empty($edit_folder) ) $edit_folder = get_path().'/skins/custom';
+	if( empty($edit_folder) ) $edit_folder = get_path('skins').'/custom';
 	//lists all files in edit directory
 	$this_dir = dir( $edit_folder );
 	while ($this_file = $this_dir->read()) 

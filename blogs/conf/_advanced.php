@@ -247,6 +247,9 @@ $htsrv_url = $baseurl.'/'.$htsrv_subdir;		// You should not need to change this
 $xmlsrv_subdir = 'xmlsrv'; 									// Subdirectory relative to base
 $xmlsrv_dirout = '..';											// Relative path to go back to base
 $xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;	// You should not need to change this
+# Location of the skins folder:
+$skins_subdir = 'skins'; 										// Subdirectory relative to base
+$skins_dirout = '..';												// Relative path to go back to base
 # Location of the core (the "includes") files:
 $core_subdir = 'b2evocore'; 								// Subdirectory relative to base
 $core_dirout = '..';												// Relative path to go back to base

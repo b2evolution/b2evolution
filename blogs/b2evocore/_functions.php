@@ -1138,7 +1138,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
  */
 function get_path( $which='' )
 {
-	global $core_subdir;
+	global $core_subdir, $skins_subdir;
 
 	// Determine the edit folder:
 	$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
@@ -1152,7 +1152,7 @@ function get_path( $which='' )
 	switch( $which )
 	{
 		case 'skins':
-			return $basepath.'/skins';
+			return $basepath.'/'.$skins_subdir;
 
 	}
 

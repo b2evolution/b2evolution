@@ -916,14 +916,7 @@ function bloggergettemplate($m)
 		global $xmlsrv_subdir;
 
 		// Determine the edit folder:
-		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
-		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $xmlsrv_subdir, $last_pos ) )
-		{	// make sure we use the last occurrence
-			$edit_folder = substr( $current_folder, 0, $pos-1 );
-			$last_pos = $pos+1;
-		}
-		$edit_folder .= '/skins/custom';
+		$edit_folder = get_path('skins').'/custom';
 
 		if ($templateType == "main")
 		{
@@ -993,14 +986,7 @@ function bloggersettemplate($m) {
 	{
 		global $xmlsrv_subdir;
 		// Determine the edit folder:
-		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
-		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $xmlsrv_subdir, $last_pos ) )
-		{	// make sure we use the last occurrence
-			$edit_folder = substr( $current_folder, 0, $pos-1 );
-			$last_pos = $pos+1;
-		}
-		$edit_folder .= '/skins/custom';
+		$edit_folder = get_path('skins').'/custom';
 
 		if ($templateType == "main")
 		{

@@ -7,7 +7,7 @@
  *
  * This file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
  */
-require_once (dirname(__FILE__)."/$core_dirout/conf/_stats.php");
+require_once (dirname(__FILE__)."/$core_dirout/$conf_subdir/_stats.php");
 
 //get most linked to pages on site
 //select count(visitURL) as count, visitURL from b2hitlog group by visitURL order by count desc
