@@ -140,12 +140,9 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 
 		case 'formvalue':
-			// use as a form value: escapes quotes and < > but leaves code alone
-			$content = htmlspecialchars( $content );
-			$content = str_replace('"', '&quot;', $content );
-			$content = str_replace("'", '&#039;', $content );
-			$content = str_replace('<', '&lt;', $content );
-			$content = str_replace(">", '&gt;', $content );
+			// use as a form value: escapes &, quotes and < > but leaves code alone
+			$content = htmlspecialchars( $content );           // Handles &, ", < and >
+			$content = str_replace("'", '&#039;', $content );  // Handles '
 			break;
 
 		case 'xml':
@@ -1641,6 +1638,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.15  2004/12/14 18:32:15  fplanque
+ * quick optimizations
+ *
  * Revision 1.14  2004/11/26 19:38:35  fplanque
  * no message
  *

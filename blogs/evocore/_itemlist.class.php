@@ -644,21 +644,21 @@ class ItemList extends DataObjectList
 
 		return "SELECT
 										0 AS ID,
-										$preview_userid AS ".$dbprefix."creator_user_ID,
-										'$post_date' AS ".$dbprefix."datestart,
-										'$post_date' AS ".$dbprefix."datemodified,
-										'".$DB->escape($post_status)."' AS ".$dbprefix."status,
-										'".$DB->escape($post_locale)."' AS ".$dbprefix."locale,
-										'".$DB->escape($content)."' AS ".$dbprefix."content,
-										'".$DB->escape($post_title)."' AS ".$dbprefix."title,
-										NULL AS ".$dbprefix."urltitle,
-										'".$DB->escape($post_url)."' AS ".$dbprefix."url,
-										$post_category AS ".$dbprefix."main_cat_ID,
-										$post_views AS ".$dbprefix."views,
-										'' AS ".$dbprefix."flags,
-										".bpost_count_words( $content )." AS ".$dbprefix."wordcount,
-										'open' AS ".$dbprefix."comments,
-										'".$DB->escape( $post_renderers )."' AS ".$dbprefix."renderers";
+										$preview_userid AS ".$this->dbprefix."creator_user_ID,
+										'$post_date' AS ".$this->dbprefix."datestart,
+										'$post_date' AS ".$this->dbprefix."datemodified,
+										'".$DB->escape($post_status)."' AS ".$this->dbprefix."status,
+										'".$DB->escape($post_locale)."' AS ".$this->dbprefix."locale,
+										'".$DB->escape($content)."' AS ".$this->dbprefix."content,
+										'".$DB->escape($post_title)."' AS ".$this->dbprefix."title,
+										NULL AS ".$this->dbprefix."urltitle,
+										'".$DB->escape($post_url)."' AS ".$this->dbprefix."url,
+										$post_category AS ".$this->dbprefix."main_cat_ID,
+										$post_views AS ".$this->dbprefix."views,
+										'' AS ".$this->dbprefix."flags,
+										".bpost_count_words( $content )." AS ".$this->dbprefix."wordcount,
+										'open' AS ".$this->dbprefix."comments,
+										'".$DB->escape( $post_renderers )."' AS ".$this->dbprefix."renderers";
 	}
 
 
@@ -967,6 +967,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/14 18:32:15  fplanque
+ * quick optimizations
+ *
  * Revision 1.6  2004/12/13 21:29:58  fplanque
  * refactoring
  *

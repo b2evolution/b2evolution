@@ -81,7 +81,7 @@ if( isset($Blog) )
 
 		<span class="line">
 		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
+		<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'formvalue') ?>" id="post_title" tabindex="1" />
 		</span>
 
 		<span class="line">
@@ -92,7 +92,7 @@ if( isset($Blog) )
 		<?php if( $use_post_url ) { ?>
 		<span class="line">
 		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-		<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'htmlattr' ) ?>" id="post_url" tabindex="3" />
+		<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'formvalue' ) ?>" id="post_url" tabindex="3" />
 		</span>
 		<?php } else { ?>
 		<input type="hidden" name="post_url" size="40" value="" id="post_url" />
@@ -231,7 +231,7 @@ if( isset($Blog) )
 		<div>
 			<span class="line">
 			<label for="post_urltitle"><strong><?php echo T_('URL Title') ?>:</strong></label>
-			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'htmlattr' ); ?>" size="40" maxlength="50" tabindex="20" />
+			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'formvalue' ); ?>" size="40" maxlength="50" tabindex="20" />
 			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
 			</span>
 		</div>
@@ -273,7 +273,7 @@ if( isset($Blog) )
 		{	// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div>
-			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'htmlattr' ); ?>" />
+			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'formvalue' ); ?>" />
 		</div>
 		<?php
 		}
