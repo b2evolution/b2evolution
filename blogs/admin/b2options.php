@@ -279,7 +279,7 @@ elseif( $action == 'extract' && $tab == 'regional' )
 		fwrite( $fp, " * Global lang file\n" );
 		fwrite( $fp, " * This file was generated automatically from messages.po\n" );
 		fwrite( $fp, " */\n" );
-		fwrite( $fp, "\n\$trans['$locale'] = array(" );
+		fwrite( $fp, "\n\$trans['".$locales[$locale]['messages']."'] = array(" );
 		// echo '<pre>';
 		foreach( $trans as $line )
 		{
