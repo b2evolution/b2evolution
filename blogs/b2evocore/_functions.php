@@ -1217,12 +1217,14 @@ function autoquote( & $string )
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
+	global $debug;
+	
 	if( empty($url) )
 	{	// Empty URL, no problem
 		return false;
 	}
 
-	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):/', $url, $matches) )
+	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):[0-9]*/', $url, $matches) )
 	{	// Cannot find URI scheme
 		return T_('Invalid URL');
 	}
@@ -1234,8 +1236,9 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// Search for blocked URLs:
-	if( antispam_url($url) )
+	if( $block = antispam_url($url) )
 	{
+		if( $debug ) return 'Url contains blaclisted word: ['.$block.']';
 		return T_('URL not allowed');
 	}
 

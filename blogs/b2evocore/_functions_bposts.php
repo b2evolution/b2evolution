@@ -1349,7 +1349,7 @@ function permalink_anchor( $mode = 'id' )
  *
  * TODO: archives modes in clean mode
  *
- * @deprecated
+ * @deprecated deprecated by {@link Item::gen_permalink(-)}
  */
 function gen_permalink(
 	$file, 											// base URL of the blog

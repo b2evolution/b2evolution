@@ -76,7 +76,7 @@ function antispam_delete( $string_ID )
  */
 function antispam_url( $url )
 {
-	global $tableantispam, $querycount, $cache_antispam;
+	global $tableantispam, $querycount, $cache_antispam, $debug;
 
 	if( !isset($cache_antispam)) 
 	{	// Cache not loaded, load now:
@@ -95,7 +95,9 @@ function antispam_url( $url )
 	{
 		if( strpos($url, $block) !== false)
 		{
-			return true;	// SPAM detected!
+			if( $debug )
+				debug_log( 'Spam block: '.$block );
+			return $block;	// SPAM detected!
 		}
 	}
 

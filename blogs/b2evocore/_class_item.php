@@ -434,11 +434,6 @@ class Item extends DataObject
 			$dispmore = $more;
 		}
 	
-		if ($more_file != '') 
-			$file = $more_file;
-		else
-			$file = get_bloginfo('blogurl');
-
 		$content = $this->content;
 		$numpages = 1;
 		
@@ -460,34 +455,34 @@ class Item extends DataObject
 			$content = $pages[$disppage-1];
 		}
 		
-		$content = explode('<!--more-->', $content);
+		$content_parts = explode('<!--more-->', $content);
 	
-		if( count($content)>1 ) 
+		if( count($content_parts)>1 ) 
 		{	// This is an extended post (has a more section):
 			if( $dispmore )   
 			{	// Viewer has already asked for more
 				if( $stripteaser || preg_match('/<!--noteaser-->/', $content ) )
 				{	// We want to strip the teaser:
-					$content[0] = '';
+					$content_parts[0] = '';
 				}
-				$output = $content[0];
+				$output = $content_parts[0];
 				if( !empty($more_anchor) ) $output .= $before_more;
-				$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
+				$output .= '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'.$more_anchor;
 				if( !empty($more_anchor) ) $output .= $after_more;
-				$output .= $content[1];
+				$output .= $content_parts[1];
 			} 
 			else 
 			{ // We are offering to read more
-				$more_link = gen_permalink( $file, $this->ID, 'id', 'single', 1 );
-				$output = $content[0];
-				$output .= $before_more;
-				$output .= '<a href="'.$more_link.'#more'.$this->ID.'">'.$more_link_text.'</a>';
-				$output .= $after_more;
+				$output = $content_parts[0];
+				$output .= $before_more .
+										'<a href="'.$this->gen_permalink( 'pid', $more_file ).'#more'.$this->ID.'">'.
+										$more_link_text.'</a>' .
+										$after_more;
 			}
 		}
 		else
 		{ // Regular post
-			$output = $content[0];
+			$output = $content_parts[0];
 		}
 
 		if( $use_textile ) $output = textile( $output );

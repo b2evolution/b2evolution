@@ -232,16 +232,17 @@ function b2_getPostURL($m)
 {
 	global $xmlrpcerruser;
 	global $siteurl;
+	global $ItemCache;
 
 	dbconnect();
 
 	$blog_ID = $m->getParam(0);
 	$blog_ID = $blog_ID->scalarval();
 
-	$username=$m->getParam(2);
+	$username = $m->getParam(2);
 	$username = $username->scalarval();
 
-	$password=$m->getParam(3);
+	$password = $m->getParam(3);
 	$password = $password->scalarval();
 
 	$post_ID = $m->getParam(4);
@@ -250,6 +251,12 @@ function b2_getPostURL($m)
 	$userdata = get_userdatabylogin($username);
 	$current_User = & new User( $userdata );
 
+	if( ! user_pass_ok($username,$password))
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
+           'Wrong username/password combination '.$username.' / '.starify($password));
+	}
+
 	// Check permission:
 	if( ! $current_User->is_blog_member( $blog_ID ) )
 	{
@@ -257,60 +264,13 @@ function b2_getPostURL($m)
 				 "Permission denied.");
 	}
 
-	if (user_pass_ok($username,$password))
-	{
-
-		// Getting current blog info (fplanque: added)
-		$blogparams = get_blogparams_by_ID( $blog_ID );
-		$blog_URL = get_bloginfo('blogurl');
-
-		$postdata = get_postdata($post_ID);
-
-		if (!($postdata===false))
-		{
-			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
-
-			// this code is blatantly derived from DEPRECTAED gen_permalink()
-			$archive_mode = get_settings('archive_mode');
-			switch($archive_mode)
-			{
-				case 'daily':
-					$post_URL = $blog_URL.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$title;
-					break;
-				case 'monthly':
-					$post_URL = $blog_URL.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$title;
-					break;
-				case 'weekly':
-					if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) {
-						$sql = "SELECT WEEK('".$postdata['Date']."')";
-						$result = mysql_query($sql);
-						$row = mysql_fetch_row($result);
-						$cacheweekly[$postdata['Date']] = $row[0];
-					}
-					$post_URL = $blog_URL.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$title;
-					break;
-				case 'postbypost':
-					$post_URL = $blog_URL.'?p='.$post_ID;
-					break;
-			}
-		} else {
-			$err = 'This post ID ('.$post_ID.') does not correspond to any post here.';
-		}
-
-		if ($err)
-		{
-			return new xmlrpcresp(0, $xmlrpcerruser, $err);
-		} else {
-			return new xmlrpcresp(new xmlrpcval($post_URL));;
-		}
-
-	}
-	else
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+	if( ( $Item = $ItemCache->get_by_ID( $post_ID ) ) === false )
+	{ // Post does not exist
+		return new xmlrpcresp(0, $xmlrpcerruser, 
+						'This post ID ('.$post_ID.') does not correspond to any post here.' );
 	}
 
+	return new xmlrpcresp( new xmlrpcval( $Item->gen_permalink() ) );
 }
 
 
@@ -1314,21 +1274,19 @@ function pingback_ping($m)
 	{
 		// let's find which post is linked to
 		$urltest = parse_url($pagelinkedto);
-		if (preg_match('#/p[0-9]{1,}#', $urltest['path'], $match)) 
-		{
-			// the path defines the post_ID (yyyy/mm/dd/pXXXX)
-			$blah = explode('p', $match[0]);
-			$post_ID = $blah[1];
-			$way = 'from the path';
+		if( preg_match('#/p([0-9]+)#', $urltest['path'], $match) ) 
+		{	// the path defines the post_ID (yyyy/mm/dd/pXXXX)
+			$post_ID = $match[1];
+			$way = 'from the path (1)';
 		}
-		elseif (preg_match('#p/[0-9]{1,}#', $urltest['path'], $match))
+		elseif (preg_match('#p/[0-9]+#', $urltest['path'], $match) )
 		{
 			// the path defines the post_ID (archives/p/XXXX)
 			$blah = explode('/', $match[0]);
 			$post_ID = $blah[1];
-			$way = 'from the path';
+			$way = 'from the path (2)';
 		} 
-		elseif (preg_match('#p=[0-9]{1,}#', $urltest['query'], $match))
+		elseif (preg_match('#p=[0-9]+#', $urltest['query'], $match)  )
 		{
 			// the querystring defines the post_ID (?p=XXXX)
 			$blah = explode('=', $match[0]);
@@ -1338,12 +1296,13 @@ function pingback_ping($m)
 		elseif (isset($urltest['fragment'])) 
 		{
 			// an #anchor is there, it's either...
-			if (intval($urltest['fragment'])) {
-				// ...an integer #XXXX (simpliest case)
+			if (intval($urltest['fragment'])) 
+			{	// ...an integer #XXXX (simpliest case)
 				$post_ID = $urltest['fragment'];
 				$way = 'from the fragment (numeric)';
-			} elseif (is_string($urltest['fragment'])) {
-				// ...or a string #title, a little more complicated
+			} 
+			elseif (is_string($urltest['fragment'])) 
+			{	// ...or a string #title, a little more complicated
 				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
 				$sql = "SELECT ID FROM $tableposts WHERE post_title RLIKE '$title'";
 				$result = mysql_query($sql) or die("Query: $sql\n\nError: ".mysql_error());

@@ -47,8 +47,11 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
  * sending Trackback to single URL:
  * TODO: add autodiscovery
  */
-function trackback($trackback_url, $title, $excerpt, 
-					$ID) // post ID 
+function trackback(
+	$trackback_url, 
+	$title, 
+	$excerpt,
+	$ID) // post ID 
 {	
 	echo "<p>", T_('Sending trackback to:'), " $trackback_url ...\n";
 

@@ -9,13 +9,23 @@
  */
 
 
-/*
- * pingback(-)
+/**
+ * Sending pingback
+ *
+ * original code by Mort (http://mort.mine.nu:8080)
+ *
+ * {@internal pingback(-)}}
  */
-function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, & $blogparams, $display = true) 
-{	// Sending pingback
-	// original code by Mort (http://mort.mine.nu:8080)
-	global $b2_version;
+function pingback( 
+	$post_pingback, 
+	$content, 
+	$post_title, 
+	$post_url, 
+	$post_ID, 
+	& $blogparams, 
+	$display = true) 
+{
+	global $b2_version, $debug;
 
 	if( $display )
 	{
@@ -214,7 +224,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 				debug_fwrite($log, T_('Page Linked From:').' '.$pagelinkedfrom."\n");
 
 				$client = new xmlrpc_client( $parsed_url['path'], $parsed_url['host'], $port);
-				// $client->setDebug(true);		// fplanque :))
+				$client->setDebug( $debug );
 				$message = new xmlrpcmsg($method, array(new xmlrpcval($pagelinkedfrom), new xmlrpcval($pagelinkedto)));
 				printf( T_('Pinging %s...')."<br />\n", $host );
 				$result = $client->send($message);

@@ -30,6 +30,7 @@ switch($action)
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
 		$blog = get_catblog($cat); 
+		$Blog = Blog_get_by_ID( $blog );
 	
 		$title = T_('Editing post');
 		require (dirname(__FILE__). '/_menutop.php');

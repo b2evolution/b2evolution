@@ -8,13 +8,6 @@
 ?>
 </div>
 
-<?php
-if ($debug=="1") 
-{
-	printf( T_('<p>%d queries - %01.3f seconds</p>'), $querycount, timer_stop() );
-}
-?>
-
 <p class="footer">
 <strong><span style="color:#333333">b</span><span style="color:#ff9900">2</span><span style="color:#333333">e</span><span style="color:#554433">v</span><span style="color:#775522">o</span><span style="color:#996622">l</span><span style="color:#bb7722">u</span><span style="color:#cc8811">t</span><span style="color:#dd9911">i</span><span style="color:#ee9900">o</span><span style="color:#ff9900">n</span></strong> <?php echo $b2_version, ' '; ?>
 -
@@ -35,6 +28,8 @@ if ($debug=="1")
 <input name="opener" type="hidden" value="">
 <input name="formaction" type="hidden" value="">
 </div></form>
+
+<?php debug_info(); ?>
 
 </body>
 </html>

@@ -145,8 +145,9 @@ class DataObjectCache
 	 * {@internal DataObjectCache::get_by_ID(-) }}
 	 *
 	 * @param integer ID of object to load
+	 * @param boolean false if you want to return false on error
 	 */
-	function get_by_ID( $req_ID ) 
+	function get_by_ID( $req_ID, $halt_on_error = true ) 
 	{
 		global $querycount;
 
@@ -177,7 +178,10 @@ class DataObjectCache
 		}
 	
 		if( empty( $this->cache[ $req_ID ] ) ) 
-			die( "Requested $this->objtype does not exist!" );
+		{	// Requested object does not exist
+			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+			return false;
+		}
 	
 		return $this->cache[ $req_ID ];
 	}
