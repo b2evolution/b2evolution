@@ -241,25 +241,34 @@ function locale_from_httpaccept()
 	global $locales, $default_locale;
 	if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) )
 	{
-		#pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
+		// echo $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		// pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
+		$text = array();
 		// look for each language in turn in the preferences, which we saved in $langs
-		foreach( $locales as $localekey => $v ) 
+		foreach( $locales as $localekey => $locale ) 
 		{
-			#echo 'checking '. $localekey;
+			if( ! $locale['enabled'] )
+			{	// We only want to use activated locales
+				continue;
+			}
+			// echo '<br />checking ', $localekey, ' for HTTP_ACCEPT_LANGUAGE ';
 			$checklang = substr($localekey, 0, 2);
 			$pos = strpos( $_SERVER['HTTP_ACCEPT_LANGUAGE'], $checklang );
 			if( $pos !== false )
 			{
+				// echo '*';
 				$text[] = str_pad( $pos, 3, '0', STR_PAD_LEFT ). '-'. $checklang. '-'. $localekey;
 			}
 		}
 		if( sizeof($text) != 0 )
 		{
 			sort( $text );
-		
+			// pre_dump( $text );
 			// the preferred locale/language should be in $text[0]
 			if( preg_match('/\d\d\d\-([a-z]{2})\-(.*)/', $text[0], $matches) )
+			{
 				return $matches[2];
+			}
 		}
 	}
 	return $default_locale;

@@ -19,9 +19,6 @@ if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
 	// Choose domain: (name of the .mo files)
 	textdomain( 'messages' );
 }
-// Choose lang and set default locale:
-locale_activate( $default_locale );
-
 
 // on which page are we ?
 $PHP_SELF = $_SERVER['PHP_SELF'];

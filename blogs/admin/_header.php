@@ -13,9 +13,6 @@
 require_once( dirname(__FILE__) . '/../conf/_config.php' );
 require_once( dirname(__FILE__) . '/../conf/_admin.php' );
 
-// set default locale by autodetect
-$default_locale = locale_from_httpaccept();
-
 // Do the MAIN initializations:
 $login_required = true;
 require_once( dirname(__FILE__) . "/$admin_dirout/$core_subdir/_main.php" );

@@ -39,7 +39,6 @@ require_once( dirname(__FILE__). '/_functions_forms.php');
 require_once( dirname(__FILE__). '/_class_renderer.php');
 require_once( dirname(__FILE__). '/_class_toolbars.php');
 
-
 if( !function_exists( 'gzencode' ) )
 { // when there is no function to gzip, we won't do it
 	$use_gzipcompression = false;
@@ -60,13 +59,20 @@ if( $use_gzipcompression && extension_loaded('zlib') )
 dbconnect();
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 
-locale_overwritefromDB();
-
-debug_log('default_locale from _main.php: '.$default_locale);
-
-
 $servertimenow = time();
 $localtimenow = $servertimenow + (get_settings('time_difference') * 3600);
+
+debug_log('default_locale from conf: '.$default_locale);
+locale_overwritefromDB();
+debug_log('default_locale from DB: '.$default_locale);
+// set default locale by autodetect
+$default_locale = locale_from_httpaccept();
+debug_log('default_locale from HTTP_ACCEPT: '.$default_locale);
+
+
+// Activate default locale:
+locale_activate( $default_locale );
+
 
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
