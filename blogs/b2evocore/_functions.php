@@ -926,6 +926,29 @@ function balanceTags($text)
 
 
 /*
+ * remove_magic_quotes(-)
+ */
+function remove_magic_quotes( $mixed ) 
+{
+	if( get_magic_quotes_gpc() )
+	{
+		if( is_array($mixed) ) 
+		{
+			foreach($mixed as $k => $v) 
+			{
+				$mixed[$k] = remove_magic_quotes( $v );
+			}
+		}
+		else
+		{
+			$mixed = stripslashes( $mixed );
+		}
+	}
+	return $mixed;
+} 
+
+
+/*
  * param(-)
  *
  * Sets a parameter with values from the request or default
@@ -951,17 +974,17 @@ function param(
 	{
 		if( isset($_POST[$var]))
 		{
-			$$var = get_magic_quotes_gpc() ? stripslashes($_POST[$var]) : $_POST[$var];
+			$$var = remove_magic_quotes($_POST[$var]);
 			// echo "$var=".$$var." set by POST!<br/>";
 		}
 		elseif( isset($_GET["$var"]))
 		{
-			$$var = get_magic_quotes_gpc() ? stripslashes($_GET[$var]) : $_GET[$var];
+			$$var = remove_magic_quotes($_GET[$var]);
 			// echo "$var=".$$var." set by GET!<br/>";
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
-			$$var = get_magic_quotes_gpc() ? stripslashes($_COOKIE[$var]) : $_COOKIE[$var];
+			$$var = remove_magic_quotes($_COOKIE[$var]);
 			// echo "$var=".$$var." set by COOKIE!<br/>";
 		}
 		elseif( $default === true )
@@ -974,10 +997,17 @@ function param(
 			// echo "$var=".$$var." set to default<br/>";
 		}
 	}
-	elseif( get_magic_quotes_gpc() )
+	else
 	{	// Variable was already set but we need to remove the auto quotes
-		$$var =stripslashes($$var);
-		// echo "$var=".$$var." was already set!<br/>";
+		$$var = remove_magic_quotes($$var);
+		/*	if($var == 'post_extracats' )
+			{ echo "$var=".$$var." was already set! count = ", count($$var),"<br/>";
+				foreach( $$var as $tes )
+				{
+					echo '<br>value=', $tes;
+				
+				}
+			} */
 	}
 
 	// type will be forced even if it was set before and not overriden

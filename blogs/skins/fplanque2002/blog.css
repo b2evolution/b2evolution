@@ -122,6 +122,16 @@ textarea.bComment
 	width: 98%;
 	margin: 0ex;
 }
+select.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 100%;
+	margin: 0ex;
+}
 fieldset .notes
 {
 	/* display: block; */

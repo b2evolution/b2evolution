@@ -48,7 +48,7 @@ case "edit":
 		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_status = $postdata["Status"];
-		$extracats = postcats_get_byID( $post );
+		$post_extracats = postcats_get_byID( $post );
 		$edit_date = 0;
 		$aa = mysql2date('Y', $postdata['Date']);
 		$mm = mysql2date('m', $postdata['Date']);
@@ -170,7 +170,7 @@ default:
 		param( 'post_url', 'string', $popupurl );
 		$post_url = format_to_edit( $post_url );
 		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
-		param( 'extracats','array', array() );
+		param( 'post_extracats', 'array', array() );
 		param( 'post_lang', 'string', $default_language );
 
 		param( 'edit_date', 'integer', 0 );

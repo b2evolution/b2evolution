@@ -75,13 +75,13 @@ function stats_blog_select()
 {
 	global $blog, $show;
 	echo '<p>', T_('Filter'), ': ';
-	if( empty($blog) ) 
+	if( $blog == 0 ) 
 	{ // This is the blog being displayed on this page 
-		echo '<strong>[<a href="b2stats.php?show=', $show, '">', T_('None'), '</a>]</strong>';
+		echo '<strong>[<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>]</strong>';
 	}
 	else
 	{ // This is another blog
-		echo '<a href="b2stats.php?show=', $show, '">', T_('None'), '</a>';
+		echo '<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>';
 	} 
 	for( $curr_blog_ID=blog_list_start('stub'); 
 				$curr_blog_ID!=false; 
@@ -113,8 +113,8 @@ switch( $show )
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td>
-				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers" title="<?php echo T_('Delete this hit!') ?>"><?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?></a>]
-				[<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers" title="<?php echo T_('Log as a search instead') ?>"><?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?></a>]
+				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?></a>]
+				[<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Log as a search instead') ?>"><?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?></a>]
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a>
 			</td>
 			<td><?php stats_blog_name() ?></td>

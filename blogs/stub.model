@@ -20,7 +20,7 @@
 	
 	# This setting retricts posts to those published, thus hiding drafts.
 	# You should not have to change this.
-	$show_statuses = "'published'";
+	$show_statuses = array();
 	
 	# This is the blog to be used as a blogroll (set to 0 if you don't want to use this feature)
 	$blogroll_blog = 4;

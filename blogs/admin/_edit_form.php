@@ -207,14 +207,14 @@ if( $action != 'editcomment' )
 	
 	function cat_select_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		global $current_blog_ID, $blog, $cat, $postdata, $extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
+		global $current_blog_ID, $blog, $cat, $postdata, $post_extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
 		$this_cat = get_the_category_by_ID( $cat_ID );
 		echo '<li>';
 		
 		if( $allow_cross_posting )
 		{ // We allow cross posting, display checkbox:
-			echo'<input type="checkbox" name="extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
-			if (($cat_ID == $postdata["Category"]) or (in_array($cat_ID,$extracats)))
+			echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
+			if (($cat_ID == $postdata["Category"]) or (in_array( $cat_ID, $post_extracats )))
 				echo ' checked="checked"';
 			echo '>';
 		}

@@ -4,25 +4,17 @@ require_once( dirname(__FILE__).'/_header.php' );
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
 
-	param( 'edit_date', 'integer', 0 );
-	if (($user_level > 4) && $edit_date) 
-	{	// We use user date
-		param( 'aa', 'integer', 2000 );
-		param( 'mm', 'integer', 1 );
-		param( 'jj', 'integer', 1 );
-		param( 'hh', 'integer', 20 );
-		param( 'mn', 'integer', 30 );
-		param( 'ss', 'integer', 0 );
-		$jj = ($jj > 31) ? 31 : $jj;
-		$hh = ($hh > 23) ? $hh - 24 : $hh;
-		$mn = ($mn > 59) ? $mn - 60 : $mn;
-		$ss = ($ss > 59) ? $ss - 60 : $ss;
-		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
-	}
-	else
-	{	// We use current time
-		$post_date = date('Y-m-d H:i:s', $localtimenow);
-	}
+param( 'edit_date', 'integer', 0 );
+param( 'aa', 'integer', 2000 );
+param( 'mm', 'integer', 1 );
+param( 'jj', 'integer', 1 );
+param( 'hh', 'integer', 20 );
+param( 'mn', 'integer', 30 );
+param( 'ss', 'integer', 0 );
+$jj = ($jj > 31) ? 31 : $jj;
+$hh = ($hh > 23) ? $hh - 24 : $hh;
+$mn = ($mn > 59) ? $mn - 60 : $mn;
+$ss = ($ss > 59) ? $ss - 60 : $ss;
 
 // All statuses are allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -50,9 +42,17 @@ case 'post':
 	param( 'post_title', 'html' );
 	param( 'post_url', 'string' );
 	param( 'post_status', 'string', 'published' );
-	param( 'extracats', array() );
-	$post_extracats = & $extracats;
+	param( 'post_extracats', 'array', array() );
 	param( 'post_lang', 'string', $default_language );
+
+	if(($user_level > 4) && $edit_date) 
+	{	// We use user date
+		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
+	}
+	else
+	{	// We use current time
+		$post_date = date('Y-m-d H:i:s', $localtimenow);
+	}
 
 	if ($user_level == 0)	die (T_('Cheatin\' uh ?'));
 
@@ -152,10 +152,18 @@ case "editpost":
 	param( 'post_title', 'html' );
 	param( 'post_url', 'string' );
 	param( 'post_status', 'string', 'published' );
-	param( 'extracats', 'array' );
-	$post_extracats = & $extracats;
+	param( 'post_extracats', 'array', array() );
 	param( 'post_lang', 'string', $default_language );
 
+	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
+	if(($user_level > 4) && $edit_date) 
+	{	// We use user date
+		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
+	}
+	else
+	{	// We use current time
+		$post_date = $postdata['Date'];
+	}
 
 	// CHECK and FORMAT content	
 	$post_title = format_to_post($post_title,0,0);
@@ -175,7 +183,6 @@ case "editpost":
 	echo "<h3>Updating post...</h3>\n";
 
 	// We need to check the previous flags...
-	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 	$post_flags = $postdata['Flags'];
 	if( in_array( 'pingsdone', $post_flags ) )
 	{	// pings have been done before
@@ -324,7 +331,7 @@ case "editedcomment":
 
 	if (($user_level > 4) && $edit_date) 
 	{
-		$datemodif = ", comment_date=\"$postdate\"";
+		$datemodif = ", comment_date='". date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) )."' ";
 	} else {
 		$datemodif = "";
 	}
