@@ -47,6 +47,14 @@ require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 class UserCache extends DataObjectCache
 {
 	/**
+	 * Cache for login -> ID
+	 * @access private
+	 * @var array
+	 */
+	var $cache_login = array();
+
+
+	/**
 	 * Constructor
 	 *
 	 * {@internal UserCache::UserCache(-) }}
@@ -65,6 +73,31 @@ class UserCache extends DataObjectCache
 	}
 	*/
 
+
+	/**
+	 * Get a user object by login.
+	 *
+	 * Does not halt on error.
+	 *
+	 * @return false|object reference to the user object or NULL if not found
+	 */
+	function & get_by_login( $login )
+	{
+		if( !isset( $this->cache_login[$login] ) )
+		{
+			global $DB;
+			$this->cache_login[$login] = $DB->get_var( 'SELECT ID FROM T_users
+																									WHERE user_login = "'.$login.'"' );
+		}
+
+		if( is_null($this->cache_login[$login]) )
+		{
+			return false;
+		}
+
+		return $this->get_by_ID( $this->cache_login[$login], false );
+	}
+
 	/**
 	 * Load members of a given blog
 	 *
@@ -78,7 +111,7 @@ class UserCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
 
-		$rows = $DB->get_results( 'SELECT * 
+		$rows = $DB->get_results( 'SELECT *
 																 FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
 																WHERE bloguser_blog_ID = '.$blog_ID.'
 																	AND bloguser_ismember <> 0' );
@@ -143,6 +176,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/29 03:15:38  blueyed
+ * added get_by_login()
+ *
  * Revision 1.2  2004/12/23 21:19:41  fplanque
  * no message
  *
