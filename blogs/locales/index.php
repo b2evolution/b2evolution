@@ -8,6 +8,7 @@
  * This file is based on code from the GALLERY project.
  */
 include( dirname(__FILE__).'/../conf/b2evo_config.php' );
+include( dirname(__FILE__).'/../b2evocore/_vars.php' );
 include( dirname(__FILE__).'/../b2evocore/_functions.php' );
 
 $handle=opendir(dirname(__FILE__));
@@ -160,5 +161,9 @@ if ($i%2==0) {
 }
 ?>
 </table>
+
+<?php
+	// echo 'test: ', T_('New comment on your post #%d "%s"', $default_locale);
+?>
 </body>
 </html>
