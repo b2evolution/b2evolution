@@ -396,7 +396,7 @@ class Form
 	 * @param a boolean indicating if the checkbox must be checked by default
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_value, $field_label, $field_note = '', 
+	function checkbox( $field_name, $field_value, $field_label, $field_note = '',
 											$field_class = '', $field_checked = 0 )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
@@ -951,16 +951,15 @@ class Form
 		$field_lines = false,
 		$field_notes = '' )
 	{
-		$r = '';
-		$r .= '<fieldset class="setting">'."\n";
-		$r .= '  <div class="label">'.format_to_output($field_label).":</div>\n";
-		$r .= '  <div class="input"><fieldset class="input">'."\n";
+		$r = $this->begin_field( $field_name, $field_label );
+
 		foreach( $field_options as $loop_field_option )
 		{
 			if( $field_lines ) $r .= "<div>\n";
+
 			$r .= '<label class="radiooption"><input type="radio" class="radio" name="'.$field_name.'" value="'.format_to_output( $loop_field_option[0], 'formvalue' ).'"';
 			if( $field_value == $loop_field_option[0] )
-			{
+			{	// Current selection:
 				$r .= ' checked="checked"';
 			}
 			if( !empty( $loop_field_option[4] ) )
@@ -974,14 +973,14 @@ class Form
 			{ // optional text for radio option (like additional fieldsets or input boxes)
 				$r .= $loop_field_option[3];
 			}
+
 			if( $field_lines ) $r .= "</div>\n";
 		}
 		if( !empty( $field_notes ) )
 		{
 			$r .= '<div><span class="notes">'.$field_notes.'</span></div>';
 		}
-		$r .= '  </fieldset></div>';
-		$r .= "</fieldset>\n\n";
+		$r .= $this->end_field();
 		
 		if( $this->output )
 		{
@@ -1013,25 +1012,23 @@ class Form
 		$field_label,
 		$field_note = '',
 		$allow_none = false,
-		$field_class = '' )
+		$field_class = '',
+		$field_object_callback = 'option_list_return' )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
 					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
-		/*$r = "\n";
-		$r .= '<fieldset>';
-		$r .= '  <div class="label"><label for="'.$field_name.'">'.$field_label.':</label></div>';
-		$r.= '  <div class="input"><select name="'.$field_name.'" id="'.$field_name.'"';*/
+
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
 		$r .= '>';
-		$r .= $field_object->option_list_return( $field_value, $allow_none )
+		$r .= $field_object->$field_object_callback( $field_value, $allow_none )
 			 		."</select>\n"
 					.'<span class="notes">'.$field_note.'</span>';
 					
 		$r .= $this->end_field();
-					
+
 		if( $this->output )
 		{
 			echo $r;
@@ -1040,10 +1037,53 @@ class Form
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
-	
+
+
+	/**
+	 * Display a select field and populate it with a cache object.
+	 *
+	 * @param string field name
+	 * @param string string containing options
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param boolean allow to select [none] in list
+	 * @param string CSS class for select
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_options(
+		$field_name,
+		& $field_options,
+		$field_label,
+		$field_note = '',
+		$field_class = '' )
+	{
+		$r = $this->begin_field( $field_name, $field_label )
+					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+
+		if( !empty($field_class) )
+		{
+			$r .= ' class="'.$field_class.'"';
+		}
+		$r .= '>'
+					.$field_options
+			 		."</select>\n"
+					.'<span class="notes">'.$field_note.'</span>';
+
+		$r .= $this->end_field();
+
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
 	
 }
 
