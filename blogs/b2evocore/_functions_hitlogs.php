@@ -165,6 +165,7 @@ function log_hit()
 	global $DB, $localtimenow, $blog;
 	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
 	global $HTTP_USER_AGENT, $hit_type, $Debuglog;
+	global $stats_autoprune;
 
 	/**
 	 * Make sure we want to log this hit, see {@link $hit_type}
@@ -232,7 +233,21 @@ function log_hit()
 									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog,
 									'".$DB->escape($_SERVER['REMOTE_ADDR'])."', '".$DB->escape($HTTP_USER_AGENT)."')";
 
-	return $DB->query( $sql );
+	$DB->query( $sql );
+
+	/*
+	 * Auto pruning of old stats
+	 */
+	if( isset($stats_autoprune) && ($stats_autoprune > 0) )
+	{	// Autopruning is requested
+		$sql = "DELETE FROM T_hitlog
+						 WHERE visitTime < '".date( 'Y-m-d', $localtimenow - ($stats_autoprune * 86400) )."'";
+																														// 1 day = 86400 seconds
+		$rows_affected = $DB->query( $sql );
+		$Debuglog->add( 'log_hit: autopruned '.$rows_affected.' rows.', 'hit' );
+	}
+
+	return true;
 }
 
 

@@ -148,13 +148,14 @@ switch( $show )
 		<h2><?php echo T_('Summary') ?>:</h2>
 		<?php
 		$sql = 'SELECT COUNT(*) AS hits, hit_ignore, YEAR(visitTime) AS year,
-										MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day FROM T_hitlog ';
+										MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day 
+							FROM T_hitlog ';
 		if( $blog > 0 )
 		{
 			$sql .= ' WHERE hit_blog_ID = '.$blog;
 		}
-		$sql .= ' GROUP BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime), hit_ignore
-							ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
+		$sql .= 'GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore
+						 ORDER BY YEAR(visitTime) DESC, MONTH(visitTime) DESC, DAYOFMONTH(visitTime) DESC';
 		$res_hits = $DB->get_results( $sql, ARRAY_A );
 
 		$hits = array();
