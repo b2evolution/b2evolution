@@ -23,7 +23,7 @@
 	</head>
 <body>
 	<div style="background-color:#fee; border: 1px solid red; text-align:center; ">
-		<p>This is b2evolution version <?php global $b2_version; echo $b2_version ?>.</p>
+		<p>This is b2evolution version <?php global $app_version; echo $app_version ?>.</p>
 		<p><strong>You cannot use the application before you finish configuration and installation.</strong></p>
 		<?php echo $error_message; ?>
 		<p>Please use the installer to finish your configuration/installation now.</p>

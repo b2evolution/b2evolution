@@ -1321,7 +1321,7 @@ function url_add_tail( $url, $tail )
  */
 function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 {
-	global $b2_version, $current_locale, $locales, $Debuglog;
+	global $app_name, $app_version, $current_locale, $locales, $Debuglog;
 
 	if( !is_array( $headers ) )
 	{ // make sure $headers is an array
@@ -1330,7 +1330,7 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 
 	// Specify charset and content-type of email
 	$headers[] = 'Content-Type: text/plain; charset='.$locales[ $current_locale ]['charset'];
-	$headers[] = 'X-Mailer: b2evolution '.$b2_version.' - PHP/'.phpversion();
+	$headers[] = 'X-Mailer: '.$app_name.' '.$app_version.' - PHP/'.phpversion();
 
 	// -- build headers ----
 	if( !empty($from) )

@@ -354,7 +354,7 @@ if( empty($mode) )
 	{ // don't display changing time when we want to test obhandler
 	?>
 	<div id="headinfo">
-		b2evo v <strong><?php echo $b2_version ?></strong>
+		b2evo v <strong><?php echo $app_version ?></strong>
 		&middot; <?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
 		&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
 		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>

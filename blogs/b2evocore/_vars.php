@@ -11,7 +11,8 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-$b2_version = '0.9.2-CVS';
+$app_name = 'b2evolution';
+$app_version = '0.9.2-CVS';
 $new_db_version = 8070;				// next time: 8080
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/

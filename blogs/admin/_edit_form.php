@@ -433,10 +433,10 @@ if( $action != 'editcomment' )
 		?>
 		</div>
 	</fieldset>
-<?
-	if ($Blog->allowcomments == 'post_by_post')
-	{
-?>
+	<?php
+		if( $Blog->allowcomments == 'post_by_post' )
+		{
+	?>
 	<fieldset>
 		<legend><?php echo T_('Comments') ?></legend>
 
@@ -450,9 +450,9 @@ if( $action != 'editcomment' )
 		<?php echo T_('Disabled') ?></label><br />
 
 	</fieldset>
-<?
-	}
-?>
+	<?php
+		}
+	?>
 	<fieldset>
 		<legend><?php echo T_('Renderers') ?></legend>
 		<?php

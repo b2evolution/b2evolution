@@ -28,7 +28,7 @@ function pingback(
 	& $blogparams,
 	$display = true)
 {
-	global $b2_version, $debug, $ItemCache;
+	global $app_name, $app_version, $debug, $ItemCache;
 
 	if( $display )
 	{
@@ -137,7 +137,7 @@ function pingback(
 			echo "<br />\n";
 
 			// Send the GET request
-			$request = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: b2evolution/$b2_version PHP/" . phpversion() . "\r\n\r\n";
+			$request = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: $app_name/$app_version PHP/" . phpversion() . "\r\n\r\n";
 			ob_end_flush();
 			fputs($fp, $request);
 
