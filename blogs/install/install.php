@@ -18,7 +18,17 @@
 </div>
 <!-- InstanceBeginEditable name="Main" -->
 <h2>Database tables installation</h2>
-<?php require_once (dirname(__FILE__)."/../conf/b2evo_config.php"); ?>
+<p>PHP version: <?php echo phpversion(); ?></p>
+<?php
+	list( $version_main, $version_minor ) = explode( '.', phpversion() );
+	if( ($version_main*100+$version_minor) < 401 )
+	{
+		die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
+	}
+
+	require_once (dirname(__FILE__)."/../conf/b2evo_config.php"); 
+ 
+ ?>
 
 <p>These are your settings from the config file: (If you don't see correct settings here, STOP before going any further, and check your configuration.)</p>
 <pre>
