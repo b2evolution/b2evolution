@@ -166,67 +166,162 @@ $maxlength_urlname_stub = 30;
 
 
 /**
- * Map of filenames for icons in the folder admin/img/
+ * Map of filenames for icons and their respective alt tag.
  *
- * @global array $map_iconfiles
+ * @global array icon name => array( 'file', 'alt' )
  */
 $map_iconfiles = array(
 	'folder' => array(        // icon for folders
-		'file' => 'folder.png',
+		'file' => $admin_subdir.'img/fileicons/folder.png',
 		'alt' => T_('folder'),
 	),
-	'folder_parent' => array( // go to parent directory
-		'file' => 'up.png',
-		'alt' => T_('Parent folder'),
-	),
-	'folder_home' => array(   // home folder
-		'file' => 'folder_home2.png',
-		'alt' => T_('Home folder'),
-	),
-
-
 	'file_unknown' => array(  // icon for unknown files
-		'file' => 'default.png',
+		'file' => $admin_subdir.'img/fileicons/default.png',
 		'alt' => T_('Unknown file'),
 	),
 	'file_empty' => array(    // empty file
-		'file' => 'empty.png',
+		'file' => $admin_subdir.'img/fileicons/empty.png',
 		'alt' => T_('Empty file'),
 	),
+
+	'folder_parent' => array( // go to parent directory
+		'file' => $admin_subdir.'img/up.png',
+		'alt' => T_('Parent folder'),
+	),
+	'folder_home' => array(   // home folder
+		'file' => $admin_subdir.'img/folder_home2.png',
+		'alt' => T_('Home folder'),
+	),
+
 	'file_edit' => array(     // edit a file
-		'file' => 'edit.png',
+		'file' => $admin_subdir.'img/edit.png',
 		'alt' => T_('Edit'),
 	),
 	'file_copy' => array(     // copy a file/folder
-		'file' => 'filecopy.png',
+		'file' => $admin_subdir.'img/filecopy.png',
 		'alt' => T_('Copy'),
 	),
 	'file_move' => array(     // move a file/folder
-		'file' => 'filemove.png',
+		'file' => $admin_subdir.'img/filemove.png',
 		'alt' => T_('Move'),
 	),
 	'file_rename' => array(   // rename a file/folder
-		'file' => 'filerename.png',
+		'file' => $admin_subdir.'img/filerename.png',
 		'alt' => T_('Rename'),
 	),
 	'file_delete' => array(   // delete a file/folder
-		'file' => 'filedelete.png',
+		'file' => $admin_subdir.'img/filedelete.png',
 		'alt' => T_('Delete'),
 	),
 
 
-	'window_new' => array(    // open in a new window
-		'file' => 'window_new.png',
-		'alt' => T_('New window'),
-	),
 	'ascending' => array(     // sort ascending
-		'file' => 'ascending.png',
+		'file' => $admin_subdir.'img/ascending.png',
 		'alt' => T_('ascending'),
 	),
 	'descending' => array(    // sort descending
-		'file' => 'descending.png',
+		'file' => $admin_subdir.'img/descending.png',
 		'alt' => T_('descending'),
 	),
+	'window_new' => array(    // open in a new window
+		'file' => $admin_subdir.'img/window_new.png',
+		'alt' => T_('New window'),
+	),
+
+
+	'file_word' => array(
+		'ext' => '\.(s[txd]w|doc|rtf)',
+		'file' => $admin_subdir.'img/fileicons/wordprocessing.png',
+		'alt' => '',
+	),
+	'file_image' => array(
+		'ext' => '\.(gif|png|jpe?g)',
+		'file' => $admin_subdir.'img/fileicons/image2.png',
+		'alt' => '',
+	),
+	'file_www' => array(
+		'ext' => '\.html?',
+		'file' => $admin_subdir.'img/fileicons/www.png',
+		'alt' => '',
+	),
+	'file_log' => array(
+		'ext' => '\.log',
+		'file' => $admin_subdir.'img/fileicons/log.png',
+		'alt' => '',
+	),
+	'file_sound' => array(
+		'ext' => '\.(mp3|ogg|wav)',
+		'file' => $admin_subdir.'img/fileicons/sound.png',
+		'alt' => '',
+	),
+	'file_video' => array(
+		'ext' => '\.(mpe?g|avi)',
+		'file' => $admin_subdir.'img/fileicons/video.png',
+		'alt' => '',
+	),
+	'file_message' => array(
+		'ext' => '\.msg',
+		'file' => $admin_subdir.'img/fileicons/message.png',
+		'alt' => '',
+	),
+	'file_document' => array(
+		'ext' => '\.pdf',
+		'file' => $admin_subdir.'img/fileicons/pdf-document.png',
+		'alt' => '',
+	),
+	'file_php' => array(
+		'ext' => '\.php[34]?',
+		'file' => $admin_subdir.'img/fileicons/php.png',
+		'alt' => '',
+	),
+	'file_encrypted' => array(
+		'ext' => '\.(pgp|gpg)',
+		'file' => $admin_subdir.'img/fileicons/encrypted.png',
+		'alt' => '',
+	),
+	'file_tar' => array(
+		'ext' => '\.tar',
+		'file' => $admin_subdir.'img/fileicons/tar.png',
+		'alt' => '',
+	),
+	'file_tgz' => array(
+		'ext' => '\.tgz',
+		'file' => $admin_subdir.'img/fileicons/tgz.png',
+		'alt' => '',
+	),
+	'file_document' => array(
+		'ext' => '\.te?xt',
+		'file' => $admin_subdir.'img/fileicons/document.png',
+		'alt' => '',
+	),
+	'file_pk' => array(
+		'ext' => '\.(zip|rar)',
+		'file' => $admin_subdir.'img/fileicons/pk.png',
+		'alt' => '',
+	),
+
+);
+
+
+/**
+ * Image sizes of icon files.
+ *
+ * @global array filename relative to {@link $basepath} => width, height
+ */
+$map_iconsizes = array(
+	$admin_subdir.'img/fileicons/folder.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/default.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/empty.png' => array( 16, 16 ),
+	$admin_subdir.'img/up.png' => array( 24, 24 ),
+	$admin_subdir.'img/folder_home2.png' => array( 22, 22 ),
+	$admin_subdir.'img/edit.png' => array( 16, 16 ),
+	$admin_subdir.'img/filecopy.png' => array( 16, 16 ),
+	$admin_subdir.'img/filemove.png' => array( 16, 16 ),
+	$admin_subdir.'img/filerename.png' => array( 16, 16 ),
+	$admin_subdir.'img/filedelete.png' => array( 16, 16 ),
+	$admin_subdir.'img/ascending.png' => array( 16, 16 ),
+	$admin_subdir.'img/descending.png' => array( 16, 16 ),
+	$admin_subdir.'img/window_new.png' => array( 15, 13 ),
 );
 
 
