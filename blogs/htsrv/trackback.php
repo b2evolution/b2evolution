@@ -53,7 +53,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 
 	$original_comment = $comment;
 
-	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'];
+	$user_ip = getIpList( true );
 	$user_domain = gethostbyaddr($user_ip);
 	$now = date('Y-m-d H:i:s', $localtimenow );
 

@@ -60,13 +60,13 @@ function online_user_update()
 	// recreated below (REPLACE won't work properly when a column is NULL)
 	$DB->query( 'DELETE FROM T_sessions
 								WHERE sess_time < '.( $servertimenow - $online_session_timeout ).'
-									OR ( sess_ipaddress = "'.$_SERVER['REMOTE_ADDR'].'"
+									OR ( sess_ipaddress = "'.getIpList( true ).'"
 												AND sess_user_ID is NULL )' );
 
 	// Record current session info
 	$DB->query( 'REPLACE INTO T_sessions( sess_time, sess_ipaddress, sess_user_ID )
 								VALUES( "'.$servertimenow.'",
-												"'.$_SERVER['REMOTE_ADDR'].'",
+												"'.getIpList( true ).'",
 												'.( $current_User ? 'NULL' : '"'.$current_User->ID.'"' ).')' );
 }
 
@@ -118,6 +118,9 @@ function online_user_display( $before = '', $after = '' )
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/09 21:43:32  blueyed
+ * introduced getIpList()
+ *
  * Revision 1.5  2005/02/08 23:57:20  blueyed
  * moved Debugmessage, ..
  *

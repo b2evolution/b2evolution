@@ -82,7 +82,7 @@ function filter_hit()
  	global $Debuglog, $ReqURI, $ReqPath, $DB, $Settings, $localtimenow, $comments_allowed_uri_scheme;
  	global $blackList, $search_engines, $user_agents, $HTTP_REFERER, $HTTP_USER_AGENT;
 
-	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.$_SERVER['REMOTE_ADDR'], 'hit' );
+	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.getIpList( true ), 'hit' );
 	$Debuglog->add( 'filter_hit: HTTP_REFERER: '.$HTTP_REFERER, 'hit' );
 	// $Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'], 'hit' );
 	$Debuglog->add( 'filter_hit: HTTP_USER_AGENT: '.$HTTP_USER_AGENT, 'hit' );
@@ -112,7 +112,7 @@ function filter_hit()
 				'SELECT visitID FROM T_hitlog
 					WHERE	visitURL = '.$DB->quote($ReqURI).'
 						AND UNIX_TIMESTAMP(visitTime)-'.$localtimenow.' < '.$Settings->get('reloadpage_timeout').'
-						AND hit_remote_addr = '.$DB->quote($_SERVER['REMOTE_ADDR']).'
+						AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
 						AND hit_user_agent = '.$DB->quote($HTTP_USER_AGENT) ) )
 	{
 	 	$Debuglog->add( 'filter_hit: URI-reload!', 'hit' );
@@ -267,7 +267,7 @@ function log_hit()
 																		hit_blog_ID, hit_remote_addr, hit_user_agent )
 					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$hit_type',
 									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog,
-									'".$DB->escape($_SERVER['REMOTE_ADDR'])."', '".$DB->escape($HTTP_USER_AGENT)."')";
+									'".$DB->escape( getIpList( true ) )."', '".$DB->escape($HTTP_USER_AGENT)."')";
 
 	$DB->query( $sql );
 
@@ -653,6 +653,9 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/09 21:43:32  blueyed
+ * introduced getIpList()
+ *
  * Revision 1.4  2004/11/15 18:57:05  fplanque
  * cosmetics
  *

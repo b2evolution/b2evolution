@@ -1711,10 +1711,47 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 	return $date.(empty($time) ? '' : ' '.$time );
 }
 
+
+/**
+ * Get list of IP addresses of the client (HTTP_X_FORWARDED_FOR,
+ * REMOTE_ADDR), in this order.
+ * '' is used for REMOTE_ADDR, if it is not set (should not happen).
+ *
+ * @param boolean True, to get only the first (best matching) IP
+ * @return array|string Depends on first param.
+ */
+function getIpList( $firstOnly = false )
+{
+	$r = array();
+
+	if( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== 'unknown' )
+	{ // Proxy
+		foreach( explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ) as $lIP )
+		{
+			if( $lIP != 'unknown' )
+			{
+				$r[] = $lIP;
+			}
+		}
+	}
+
+	if( isset( $_SERVER['REMOTE_ADDR'] ) )
+	{
+		$r[] = $_SERVER['REMOTE_ADDR'];
+	}
+	elseif( !isset( $r[0] ) )
+	{ // No other IP set yet.
+		$r[] = '';
+	}
+
+	return $firstOnly ? $r[0] : $r;
+}
+
+
 /*
  * $Log$
- * Revision 1.37  2005/02/09 00:32:41  blueyed
- * no message
+ * Revision 1.38  2005/02/09 21:43:32  blueyed
+ * introduced getIpList()
  *
  * Revision 1.36  2005/02/02 01:10:08  blueyed
  * added @ to mail() again

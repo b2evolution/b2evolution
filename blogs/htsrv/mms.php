@@ -666,7 +666,7 @@ class Part
 $md = new MMSDecoder( $HTTP_RAW_POST_DATA );
 $md->parse();
 
-// $from_ip = $_SERVER['REMOTE_ADDR'];
+// $from_ip = getIpList( true );
 // $recipient = $md->to;
 
 $post_title = $md->subject;

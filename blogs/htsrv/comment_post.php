@@ -70,7 +70,7 @@ else
 	}
 }
 
-$user_ip = $_SERVER['REMOTE_ADDR'];
+$user_ip = getIpList( true );
 $now = date("Y-m-d H:i:s", $localtimenow );
 
 // CHECK and FORMAT content
@@ -98,7 +98,7 @@ if( $then = $DB->get_var( $query ) )
 if( !$ok )
 {
 	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ) );
-}	
+}
 /* end flood-protection */
 
 if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
