@@ -181,9 +181,12 @@ switch( $action )
 
 					<?php if( $report_abuse ) 
 					{ ?>
-						<p><strong><input type="checkbox" name="report" value="1" checked="checked" />
+						<p>
+						<strong><input type="checkbox" name="report" value="1" checked="checked" />
 						<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
-						</strong></p>					
+						</strong>
+						[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+						</p>					
 					<?php
 					}
 				}
@@ -241,22 +244,17 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { ?>
 	<div class="panelblock">
 		<form action="b2antispam.php" method="GET" class="fform">
-		<fieldset>
-		<legend><?php echo T_('Add a banned keyword') ?></legend>
-			<?php
-			form_text( 'keyword', $keyword, 30, T_('Keyword'), '', 80, '' )
-			?>
 			<input type="hidden" name="action" value="ban" />
 			<input type="hidden" name="type" value="keyword" />
-			<div class="input">
-				<input type="submit" value="<?php echo T_('Check &amp; ban...') ?>" class="search" />
-			</div>
+			<label for="keyword"><strong><?php echo T_('Add a banned keyword') ?>:</strong></label>
+			<input type="text" name="keyword" id="keyword" size="30" maxlength="80" value="<?php echo format_to_output( $keyword, 'formvalue')?>" />
+			<input type="submit" value="<?php echo T_('Check &amp; ban...') ?>" class="search" />
 		</form>
-		</fieldset>
 	</div>
 <?php
 }
 ?>
+
 <div class="panelblock">
 	<h2><?php echo T_('Banned domains blacklist') ?></h2>
 	<p class="center"><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
@@ -268,7 +266,10 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	<?php list_antiSpam() ?>
 	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 	{ ?>
-		<p class="center">[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
+		<p class="center">
+			[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
+			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+		</p>
 	<?php } ?>
 	<table class='thin'>
 		<?php if( count($res_stats) ) foreach( $res_stats as $row_stats )

@@ -24,7 +24,7 @@
 	<fieldset>
 		<legend><?php echo T_('After each new post...') ?></legend>
 		<?php
-			form_checkbox( 'blog_pingb2evonet', $blog_pingb2evonet, T_('Ping b2evolution.net'), T_("to get listed on the 'recently updated' list. PLEASE NOTE: If you removed the b2evolution button and the link to b2evolution from your blog, don't even bother enabling this. You will *not* be approved and your blog will be blacklisted. Also, the Full Name of your blog must be written in ISO 8859-1 (Latin-1) charset, otherwise we cannot display it on b2evolution.net. You can use HTML entities (e-g &amp;Kappa;) for non latin chars.") );
+			form_checkbox( 'blog_pingb2evonet', $blog_pingb2evonet, T_('Ping b2evolution.net'), T_('to get listed on the "recently updated" list on b2evolution.net').' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
 			form_checkbox( 'blog_pingtechnorati', $blog_pingtechnorati, T_('Ping technorati.com'), T_('to give notice of new post.') );
 			form_checkbox( 'blog_pingweblogs', $blog_pingweblogs, T_('Ping weblogs.com'), T_('to give notice of new post.') );
 			form_checkbox( 'blog_pingblodotgs', $blog_pingblodotgs, T_('Ping blo.gs'), T_('to give notice of new post.') );

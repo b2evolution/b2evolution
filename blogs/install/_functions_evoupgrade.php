@@ -311,6 +311,7 @@ function upgrade_b2evo_tables()
 		$query = "ALTER TABLE $tableblogs
 							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-EU',
 							MODIFY COLUMN blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
+							DROP COLUMN blog_filename,
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php AFTER blog_locale',
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin";
 		$DB->query( $query );
