@@ -17,7 +17,7 @@
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
 	<tagline><?php $Blog->disp( 'shortdesc', 'xml' ) ?></tagline>
 	<generator url="http://b2evolution.net/" version="<?php echo $b2_version ?>">b2evolution</generator>
-	<modified><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></modified>
+	<modified><?php $MainList->mod_date( 'isoZ', true ) ?></modified>
 	<?php while( $Item = $MainList->get_item() ) {  ?>
 	<entry>
 		<title type="text/plain" mode="xml"><?php $Item->title( '', '', false, 'xml' ) ?></title>

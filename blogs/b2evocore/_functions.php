@@ -488,32 +488,15 @@ function phpcurlme( & $string, $language = 'en')
  *
  * with enhanced format string
  */
-function mysql2date($dateformatstring, $mysqlstring, $useGM = false)
+function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 {
-	global $month, $weekday;
-	global $time_difference;
 	$m = $mysqlstring;
-	if (empty($m))
-	{
-		return false;
-	}
-	// Get a timestamp:
-	$i = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
+	if( empty($m) )	return false;
 
-	if( $useGM )
-	{ // We want a Greenwich Meridian time:
-		if( $dateformatstring == 'isoZ' )
-		{ // full ISO 8601 format
-			$dateformatstring = 'Y-m-d\TH:i:s\Z';
-		}
-		$j = gmdate($dateformatstring, $i - ($time_difference * 3600));
-	}
-	else
-	{	// We want default timezone time:
-		$j = date_i18n($dateformatstring, $i);
-	}
-	#		echo $i." ".$mysqlstring;
-	return $j;
+	// Get a timestamp:
+	$unixtimestamp = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
+
+	return date_i18n( $dateformatstring, $unixtimestamp, $useGM );
 }
 
 
@@ -522,9 +505,10 @@ function mysql2date($dateformatstring, $mysqlstring, $useGM = false)
  *
  * date internationalization: same as date() formatting but with i18n support
  */
-function date_i18n( $dateformatstring, $unixtimestamp )
+function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
 	global $month, $month_abbrev, $weekday, $weekday_abbrev;
+	global $time_difference;
 
 	$datemonth = date('m', $unixtimestamp);
 	$dateweekday = date('w', $unixtimestamp);
@@ -534,34 +518,41 @@ function date_i18n( $dateformatstring, $unixtimestamp )
 		$dateformatstring = 'Y-m-d\TH:i:s\Z';
 	}
 
-	$dateformatstring = ' '.$dateformatstring; // will be removed later
-
-	// echo $dateformatstring, '<br />';
-
-	// weekday:
-	$dateformatstring = preg_replace("/([^\\\])l/", '\\1@@@\\l@@@', $dateformatstring);
-	// weekday abbrev:
-	$dateformatstring = preg_replace("/([^\\\])D/", '\\1@@@\\D@@@', $dateformatstring);
-	// month:
-	$dateformatstring = preg_replace("/([^\\\])F/", '\\1@@@\\F@@@', $dateformatstring);
-	// month abbrev:
-	$dateformatstring = preg_replace("/([^\\\])M/", '\\1@@@\\M@@@', $dateformatstring);
-
-	$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
-
-	// echo $dateformatstring, '<br />';
-
-	$j = date($dateformatstring, $unixtimestamp);
-
-	// weekday:
-	$j = str_replace( '@@@l@@@', T_($weekday[$dateweekday]), $j);
-	// weekday abbrev:
-	$j = str_replace( '@@@D@@@', T_($weekday_abbrev[$dateweekday]), $j);
-	// month:
-	$j = str_replace( '@@@F@@@', T_($month[$datemonth]), $j);
-	// month abbrev:
-	$j = str_replace( '@@@M@@@', T_($month_abbrev[$datemonth]), $j);
-
+	if( $useGM )
+	{ // We want a Greenwich Meridian time:
+		$j = gmdate($dateformatstring, $unixtimestamp - ($time_difference * 3600));
+	}
+	else
+	{	// We want default timezone time:
+		$dateformatstring = ' '.$dateformatstring; // will be removed later
+	
+		// echo $dateformatstring, '<br />';
+	
+		// weekday:
+		$dateformatstring = preg_replace("/([^\\\])l/", '\\1@@@\\l@@@', $dateformatstring);
+		// weekday abbrev:
+		$dateformatstring = preg_replace("/([^\\\])D/", '\\1@@@\\D@@@', $dateformatstring);
+		// month:
+		$dateformatstring = preg_replace("/([^\\\])F/", '\\1@@@\\F@@@', $dateformatstring);
+		// month abbrev:
+		$dateformatstring = preg_replace("/([^\\\])M/", '\\1@@@\\M@@@', $dateformatstring);
+	
+		$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
+	
+		// echo $dateformatstring, '<br />';
+	
+		$j = date($dateformatstring, $unixtimestamp);
+	
+		// weekday:
+		$j = str_replace( '@@@l@@@', T_($weekday[$dateweekday]), $j);
+		// weekday abbrev:
+		$j = str_replace( '@@@D@@@', T_($weekday_abbrev[$dateweekday]), $j);
+		// month:
+		$j = str_replace( '@@@F@@@', T_($month[$datemonth]), $j);
+		// month abbrev:
+		$j = str_replace( '@@@M@@@', T_($month_abbrev[$datemonth]), $j);
+	}
+	
 	return $j;
 }
 

@@ -508,6 +508,32 @@ class ItemList extends DataObjectList
 	}
 
 
+	/** 
+	 * Template function: display last mod date (datetime) of Item
+	 *
+	 * {@internal ItemList::mod_date(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function mod_date( $format = '', $useGM = false )
+	{
+		$mod_date_timestamp = 0;
+		foreach( $this->result_rows as $loop_row )
+		{	// Go through whole list
+			$m = $loop_row->post_mod_date;
+			$loop_mod_date = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
+			if( $loop_mod_date > $mod_date_timestamp )
+				$mod_date_timestamp = $loop_mod_date;
+		}
+
+		if( empty($format) ) 
+			echo date_i18n( locale_datefmt(), $mod_date_timestamp, $useGM );
+		else
+			echo date_i18n( $format, $mod_date_timestamp, $useGM );
+	}
+
+
 	/*
 	 * ItemList->get_total_num_posts(-)
 	 *
