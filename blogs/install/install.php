@@ -254,26 +254,31 @@ switch( $action )
 		<h2>What do you want to install?</h2>
 		<form action="install.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+
 			<p><?php echo T_('The database tables installation can be done in different ways. Choose one:')?></p>
-			<p><input type="radio" name="action" value="newdb" checked="checked" />
-				<?php echo T_('<strong>New Install</strong>: Install b2evolution database tables with sample data.')?></p>
-			<p><input type="radio" name="action" value="evoupgrade" />
-				<?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!')?></p>
-			<p><input type="radio" name="action" value="cafelogupgrade" />
-				<?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></p>
+
+			<p><input type="radio" name="action" id="newdb" value="newdb" checked="checked" />
+				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables with sample data.')?></label></p>
+
+			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade" />
+				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!')?></label></p>
+
+			<p><input type="radio" name="action" id="cafelogupgrade" value="cafelogupgrade" />
+				<label for="cafelogupgrade"><?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></label></p>
 
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
-			?>
-			<p><input type="radio" name="action" value="deletedb" /> <strong><?php echo T_('Delete b2evolution tables')?></strong>:
-			<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the
-			b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution
-			tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have
-			some, will not be touched in any way.')?></p>
-			<?php
+					?>
+					<p><input type="radio" name="action" id="deletedb" value="deletedb" /> <strong><?php echo T_('Delete b2evolution tables')?></strong>:
+					<label for="deletedb"><?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the
+					b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution
+					tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have
+					some, will not be touched in any way.')?></label></p>
+					<?php
 				}
 			?>
+			
 			<p><input type="submit" value="<?php echo T_('Install Database Tables Now !')?>" /></p>
 		</form>
 		<?php
