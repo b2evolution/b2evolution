@@ -95,7 +95,7 @@ class Item extends DataObject
 			$this->comments = $db_row->post_comments;			// Comments status
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->post_renderers );
-			$this->views = $db_row->post_views; 
+			$this->views = $db_row->post_views;
 			$this->url = $db_row->post_url;				// Should move
 			$this->autobr = $db_row->post_autobr;					// Should move
 			// Derived vars
@@ -431,6 +431,9 @@ class Item extends DataObject
 	/**
 	 * Template function: display content of item
 	 *
+	 * Calling this with "MORE" (i-e displaying full content) will increase
+	 * the view counter, except on reloads or blacklists, see {@link $log_this_hit}
+	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
 	 *
 	 * {@internal Item::content(-) }}
@@ -460,7 +463,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Renderer, $uri_reloaded, $more, $preview;
+		global $Renderer, $log_this_hit, $more, $preview;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -484,13 +487,10 @@ class Item extends DataObject
 			$dispmore = $more;
 		}
 		
-		if( $dispmore && !$preview )
-		{ // increment view counter
-			if( !$uri_reloaded )
-			{
-				$this->set_param( 'views', 'number', ($this->views + 1) );
-				$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
-			}
+		if( $dispmore && !$preview && $log_this_hit )
+		{ // Increment view counter
+			$this->set_param( 'views', 'number', $this->views+1 );
+			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
 		}
 		
 		$content = $this->content;
@@ -1130,7 +1130,11 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: Display the number of views to the item
+	 * Template function: Display the number of times the Item has been viewed
+	 *
+	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
+	 * (i-e full content), see {@link Item::content()}
+	 * Viewcount is NOT incremented on page reloads or blacklisted referers, see {@link $log_this_hit}
 	 *
 	 * {@internal Item::views(-) }}
 	 */

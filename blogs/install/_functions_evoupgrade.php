@@ -189,7 +189,7 @@ function upgrade_b2evo_tables()
 	{
 		echo 'Deleting unecessary logs... ';
 		$query = "DELETE FROM T_hitlog
-							WHERE hit_ignore IN ('badchar', 'blacklist')";
+							WHERE hit_ignore = 'badchar'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -522,7 +522,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE T_posts
-							ADD post_views INT(4) NOT NULL DEFAULT '0' AFTER post_flags,
+							ADD post_views INT NOT NULL DEFAULT '0' AFTER post_flags,
 							ADD post_commentsexpire DATETIME DEFAULT NULL AFTER post_comments";
 		$DB->query( $query );
 		echo "OK.<br />\n";

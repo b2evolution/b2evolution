@@ -137,7 +137,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					$Item->Author->login();
 					echo ', ', T_('level:');
 					$Item->Author->level();
-					echo ')';
+					echo '), ';
+					$Item->views();
+					echo ' '.T_('views');
 
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo '<br />'.T_('Categories').': ';

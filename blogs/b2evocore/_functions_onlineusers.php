@@ -18,19 +18,19 @@
  */
 function online_user_update()
 {
-	global $DB, $user_ID, $online_session_timeout;
+	global $DB, $user_ID, $servertimenow, $online_session_timeout;
 
 	// Delete deprecated session info:
 	// Note: we also delete any anonymous user from the current IP address since it will be
 	// recreated below (REPLACE won't work properly when a column is NULL)
 	$DB->query( "DELETE FROM T_sessions
-             		WHERE sess_time < ".( time() - $online_session_timeout )."
+             		WHERE sess_time < ".( $servertimenow - $online_session_timeout )."
 									 OR (	sess_ipaddress='$_SERVER[REMOTE_ADDR]'
 												AND sess_user_ID is NULL )" );
 
 	// Record current sesssion info
 	$DB->query("REPLACE INTO T_sessions( sess_time, sess_ipaddress, sess_user_ID )
-							VALUES( '".time()."',
+							VALUES( '".$servertimenow."',
 											'$_SERVER[REMOTE_ADDR]',
 											".( empty($user_ID) ? "NULL" : "'$user_ID'" ).")" );
 }
@@ -52,11 +52,7 @@ function online_user_display( $before = '', $after = '' )
 	$users = array( 'guests' => 0,
 									'registered' => 0 );
 
-	$sql = 'SELECT sess_user_ID
-						FROM T_sessions
-					 WHERE T_sessions.sess_time > "'.( time() - $online_session_timeout ).'"';
-
-	$rows = $DB->get_results( $sql, ARRAY_A );
+	$rows = $DB->get_results( 'SELECT sess_user_ID	FROM T_sessions', ARRAY_A );
 	if( count( $rows ) ) foreach( $rows as $row )
 	{	// Loop through active sessions
 		if( !empty( $row['sess_user_ID'] ) )

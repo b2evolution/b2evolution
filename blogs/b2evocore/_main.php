@@ -19,20 +19,92 @@ if( isset( $main_init ) )
 }
 $main_init = true;
 
+
+/**
+ * Load base + advanced configuration:
+ */
+require_once( dirname(__FILE__).'/../conf/_config.php' );
+if( !$config_is_done )
+{ // base config is not done!
+	$error_message = 'Base configuration is not done.';
+	require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
+}
+/*
+ * Check conf...
+ */
+if( !function_exists( 'gzencode' ) )
+{ // when there is no function to gzip, we won't do it
+	$use_gzipcompression = false;
+}
+
+
+/**
+ * Load logging class
+ */
+require_once( dirname(__FILE__).'/_class_log.php' );
+/**
+ * Debug message log for debugging only (initialized here)
+ * @global Log $Debuglog
+ */
+$Debuglog = new Log( 'note' );
+/**
+ * Info & error message log for end user (initialized here)
+ * @global Log $Debuglog
+ */
+$Messages = new Log( 'error' );
+
+
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/_class_log.php' );
-$Debuglog = new Log( 'note' );
-$Messages = new Log( 'error' );
-
 require_once( dirname(__FILE__).'/_functions.php' );
+
 timer_start();
+
 require_once( dirname(__FILE__).'/_vars.php' );                  // sets various arrays and vars for use in b2
-require_once( dirname(__FILE__).'/_class_generalsettings.php' ); // interface to general settings
-require_once( dirname(__FILE__).'/_class_usersettings.php' );    // interface to user settings
-require_once( dirname(__FILE__).'/_class_db.php' );              // DB handling class
+
+
+/**
+ * Database connection (connection opened here)
+ *
+ * @global DB $DB
+ */
+require_once( dirname(__FILE__).'/_class_db.php' );
+$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
+
+
+/**
+ * Interface to general settings
+ *
+ * @global GeneralSettings $Settings
+ */
+require_once( dirname(__FILE__).'/_class_generalsettings.php' );
+$Settings = & new GeneralSettings();
+
+/**
+ * Absolute Unix timestamp for server
+ * @global int $servertimenow
+ */
+$servertimenow = time();
+/**
+ * Corrected Unix timestamp to match server timezone
+ * @global int $localtimenow
+ */
+$localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
+
+
+/**
+ * Interface to user settings
+ *
+ * @global UserSettings $UserSettings
+ */
+require_once( dirname(__FILE__).'/_class_usersettings.php' );
+$UserSettings = & new UserSettings();
+
+
+/**
+ * Includes:
+ */
 require_once( dirname(__FILE__).'/_functions_template.php' );    // function to be called from templates
 require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );
 require_once( dirname(__FILE__).'/_functions_xmlrpcs.php' );
@@ -41,42 +113,36 @@ require_once( dirname(__FILE__).'/_class_itemlist.php' );
 require_once( dirname(__FILE__).'/_class_itemcache.php' );
 require_once( dirname(__FILE__).'/_class_commentlist.php' );
 require_once( dirname(__FILE__).'/_class_archivelist.php' );
+
 require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
+// Object caches init:
+$GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
+$BlogCache = & new BlogCache();
+$ItemCache = & new ItemCache();
+
 require_once( dirname(__FILE__).'/_class_calendar.php' );
 require_once( dirname(__FILE__).'/_functions_hitlogs.php' );     // referer logging
 require_once( dirname(__FILE__).'/_functions_forms.php' );
+
+// Plug-ins init:
 require_once( dirname(__FILE__).'/_class_renderer.php' );
+$Renderer = & new Renderer();
 require_once( dirname(__FILE__).'/_class_toolbars.php' );
+$Toolbars = & new Toolbars();
 
 
-if( !$config_is_done )
-{ // base config is not done.
-	$error_message = 'Base configuration is not done.';
-	require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
-}
-
-// FP: Daniel, why do you want to move this further up?
-if( !function_exists( 'gzencode' ) )
-{ // when there is no function to gzip, we won't do it
-	$use_gzipcompression = false;
-}
-
+/**
+ * Output buffering?
+ */
 if( $use_obhandler )
 { // register output buffer handler
 	ob_start( 'obhandler' );
 }
 
 
-// Connecting to the db:
-$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
-
-$UserSettings = & new UserSettings();
-$Settings = & new GeneralSettings();
-
-$servertimenow = time();
-$localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
-
-
+/**
+ * Locale selection:
+ */
 $Debuglog->add('default_locale from conf: '.$default_locale);
 
 locale_overwritefromDB();
@@ -89,24 +155,23 @@ $Debuglog->add('default_locale from HTTP_ACCEPT: '.$default_locale);
 locale_activate( $default_locale );
 
 
-// Object caches init:
-$GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
-$BlogCache = & new BlogCache();
-$ItemCache = & new ItemCache();
-
-
-// Plug-ins init:
-$Renderer = & new Renderer();
-$Toolbars = & new Toolbars();
-
-
-// Login procedure:
+/**
+ * Login procedure:
+ */
 if( !isset($login_required) ) $login_required = false;
 if( $error = veriflog( $login_required ) )
 { // Login failed:
 	require( dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php' );
 }
 
+// Update the active session for the current user:
+$Debuglog->add('Updating the active session for the current user');
+online_user_update();
+
+
+/**
+ * User locale selection:
+ */
 if( is_logged_in() && $current_User->get('locale') != $default_locale )
 { // change locale to users preference
 	$default_locale = $current_User->get('locale');
@@ -115,30 +180,19 @@ if( is_logged_in() && $current_User->get('locale') != $default_locale )
 }
 
 
-// Update the active session for the current user:
-$Debuglog->add('Updating the active session for the current user');
-online_user_update();
+
+/**
+ * If nothing special happens, this hit can be logged
+ *
+ * The hit won't be logged if the URI is reloaded for example...
+ *
+ * @global boolean $log_this_hit
+ */
+$log_this_hit = filter_hit();
 
 
 /**
- * Check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
- *
- * This is useful in order not to increase the viewcount too often
- * TODO: check what happens if the hit is dropped because of blacklist or something, thus not in
- * the hitlog table.
+ * Load hacks file if it exists
  */
-$uri_reloaded = (bool)$DB->get_var("SELECT visitID FROM T_hitlog
-									WHERE	visitURL = ".$DB->quote($ReqURI)."
-												AND UNIX_TIMESTAMP( visitTime ) - $localtimenow < ".
-															(int)$Settings->get('reloadpage_timeout')."
-												AND hit_remote_addr = ".$DB->quote($_SERVER['REMOTE_ADDR'])."
-												AND hit_user_agent = ".$DB->quote($HTTP_USER_AGENT) );
-if( $uri_reloaded )
-{
- 	$Debuglog->add( 'URI-reload!' );
-}
-
-
-// Load hacks file if it exists
 @include_once( dirname(__FILE__) . '/../conf/hacks.php' );
 ?>

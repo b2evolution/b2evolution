@@ -27,86 +27,142 @@ if ($topRefererList)
 }
 */
 
-
 /**
- * Log a hit on a blog page / rss feed
+ * Detetect when a hit should be discarded
  *
+ * There are several situations in which a hit can be discarded:
+ * - it's a reload of the same page
+ * - it's a spam
+ * - it's blacklisted...
+ *
+ * TODO: we might want to kill the connection on some occasions here... (?)
+ *
+ * @return boolean true if hit is loggable...
  */
-function log_hit()
+function filter_hit()
 {
-	global $DB, $localtimenow, $blog, $blackList, $search_engines, $user_agents;
-	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
-	global $HTTP_USER_AGENT;
-	global $uri_reloaded, $Debuglog;
+ 	global $Debuglog, $ReqURI, $DB, $Settings, $localtimenow, $comments_allowed_uri_scheme;
+ 	global $HTTP_REFERER, $HTTP_USER_AGENT;
 
-	# TODO: check for already logged?
+	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.$_SERVER['REMOTE_ADDR'] );
+	$Debuglog->add( 'filter_hit: HTTP_REFERER: '.$HTTP_REFERER );
+	// $Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'] );
+	$Debuglog->add( 'filter_hit: HTTP_USER_AGENT: '.$HTTP_USER_AGENT );
 
-	$Debuglog->add( 'Hit Log: '. "ReqURI: ".$ReqURI );
-	$Debuglog->add( 'Hit Log: '. "Remote Addr: ".$_SERVER['REMOTE_ADDR'] );
-	$Debuglog->add( 'Hit Log: '. "referer: ".$HTTP_REFERER );
-	#$Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'] );
-	$Debuglog->add( 'Hit Log: '. "User Agent: ".$HTTP_USER_AGENT );
-
-	// $Debuglog->add( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-
-	if( $uri_reloaded )
-	{ // the Request is considered as reload
-		return false;
-	}
-
-	$ignore = 'no';  // So far so good
-
+	/*
+	 * Check if the referer is clean:
+	 */
 	if( $HTTP_REFERER != strip_tags($HTTP_REFERER) )
 	{ // then they have tried something funny,
 		// putting HTML or PHP into the HTTP_REFERER
 		// $ignore = 'badchar';
-		$Debuglog->add( 'Hit Log: bad char in referer');
-		return;		// Hazardous
+		$Debuglog->add( 'filter_hit: bad char in referer');
+		return false;		// Hazardous
 	}
 	elseif( $error = validate_url( $HTTP_REFERER, $comments_allowed_uri_scheme ) )
 	{	// if they are trying to inject javascript or a blocked (spam) URL
-		$Debuglog->add( 'Hit Log: '. $error);
-		return;		// Hazardous
+		$Debuglog->add( 'filter_hit: '. $error);
+		return false;		// Hazardous
 	}
 
-	// SEARCH BLACKLIST
+
+	/*
+	 * Check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
+	 */
+	if( $DB->get_var(
+				'SELECT visitID FROM T_hitlog
+					WHERE	visitURL = '.$DB->quote($ReqURI).'
+						AND UNIX_TIMESTAMP(visitTime)-'.$localtimenow.' < '.$Settings->get('reloadpage_timeout').'
+						AND hit_remote_addr = '.$DB->quote($_SERVER['REMOTE_ADDR']).'
+						AND hit_user_agent = '.$DB->quote($HTTP_USER_AGENT) ) )
+	{
+	 	$Debuglog->add( 'filter_hit: URI-reload!' );
+	 	return false; // We don't want to log this hit
+	}
+
+
+
+ 	/*
+ 	 * Everything okay...
+ 	 */
+ 	return true;
+}
+
+
+/**
+ * Log a hit on a blog page / rss feed
+ *
+ * This function should be called at the end of the page, otherwise if the page
+ * is displaying previous hits, it may display the current one too.
+ * The hit will not be logged if it is a page reload or on blaclisted referers,
+ * see {@link $log_this_hit}
+ */
+function log_hit()
+{
+	global $DB, $localtimenow, $blog, $blackList, $search_engines, $user_agents;
+	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
+	global $HTTP_USER_AGENT;
+	global $log_this_hit, $Debuglog;
+
+	if( ! $log_this_hit )
+	{	// We don't want to log this hit... may be a reload, or a design choice...
+  	$Debuglog->add( 'log_hit: Hit NOT Logged (maybe it is already?).' );
+		return false;
+	}
+	$log_this_hit = false;	// We won't want to log again later
+
+
+	$ignore = 'no';  // So far so good
+
+
+	/*
+	 * Check blacklist - which includes the referers we don't want to log, although they are not spam
+	 * this includes the current site and maybe webmails or stat services...
+	 */
 	foreach( $blackList as $site )
 	{
 		if( strpos( $HTTP_REFERER, $site ) !== false )
 		{
-			// $ignore = 'blacklist';
+			$ignore = 'blacklist';
 			$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');
-			return;
+			// fplanque: we log these again, because if we didn't
+			// we woudln't detect reloads on these... and that would be a problem!
 		}
 	}
 
-	if( stristr($ReqPath, 'rss')
+	/*
+	 * Check for XML feeds
+	 */
+	if( ($ignore == 'no') &&
+			( stristr($ReqPath, 'rss')
 			|| stristr($ReqPath, 'rdf')
-			|| stristr($ReqPath, 'atom')  )
+			|| stristr($ReqPath, 'atom') ) )
 	{
 		$ignore = 'rss';
-		// don't mess up the XML!! $Debuglog->add( 'Hit Log: referer ignored (RSS));
+		$Debuglog->add( 'Hit Log: referer ignored (RSS)' );
 	}
-	else
-	{	// Lookup robots
+
+
+	/*
+	 * Lookup robots
+	 */
+	if( $ignore == 'no' )
+	{
 		foreach ($user_agents as $user_agent)
 		{
 			if( ($user_agent[0] == 'robot') && (strstr($HTTP_USER_AGENT, $user_agent[1])) )
 			{
-				$ignore = "robot";
+				$ignore = 'robot';
 				$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('robot'). ')');
 				break;
 			}
 		}
 	}
 
-	if( $ignore == 'no' )
-	{
-		if( strlen($HTTP_REFERER) < 13 )
-		{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
-			$ignore = 'invalid';
-			$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
-		}
+	if( ($ignore == 'no') && (strlen($HTTP_REFERER) < 13) )
+	{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
+		$ignore = 'invalid';
+		$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
 	}
 
 	if( $ignore == 'no' )

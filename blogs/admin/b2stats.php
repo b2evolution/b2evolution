@@ -147,19 +147,21 @@ switch( $show )
 		?>
 		<h2><?php echo T_('Summary') ?>:</h2>
 		<?php
-		$sql = 'SELECT COUNT(*) AS hits, hit_ignore, YEAR(visitTime) AS year, MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day FROM T_hitlog ';
+		$sql = 'SELECT COUNT(*) AS hits, hit_ignore, YEAR(visitTime) AS year,
+										MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day FROM T_hitlog ';
 		if( $blog > 0 )
 		{
 			$sql .= ' WHERE hit_blog_ID = '.$blog;
 		}
-		$sql .= ' GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
+		$sql .= ' GROUP BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime), hit_ignore
+							ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
 		$res_hits = $DB->get_results( $sql, ARRAY_A );
 
 		$hits = array();
 		$hits['no'] = 0;
 		$hits['invalid'] = 0;
 		// $hits['badchar'] = 0;			// Not used any longer
-		// $hits['blacklist'] = 0;			// Not used any longer
+		$hits['blacklist'] = 0;
 		$hits['rss'] = 0;
 		$hits['robot'] = 0;
 		$hits['search'] = 0;
@@ -174,6 +176,7 @@ switch( $show )
   		<th><?php echo T_('Indexing Robots') ?></th>
   		<th><?php echo T_('Syndication') ?></th>
   		<th><?php echo T_('Direct Accesses') ?></th>
+  		<th><?php echo T_('Blacklisted') ?></th>
   		<th><?php echo T_('Total') ?></th>
     </tr>
 		<?php
@@ -198,11 +201,13 @@ switch( $show )
 					<td class="right"><?php echo $hits['robot'] ?></td>
 					<td class="right"><?php echo $hits['rss'] ?></td>
 					<td class="right"><?php echo $hits['invalid'] ?></td>
+					<td class="right"><?php echo $hits['blacklist'] ?></td>
 					<td class="right"><?php echo array_sum($hits) ?></td>
 				</tr>
 				<?php
 					$hits['no'] = 0;
 					$hits['invalid'] = 0;
+					$hits['blacklist'] = 0;
 					$hits['rss'] = 0;
 					$hits['robot'] = 0;
 					$hits['search'] = 0;
@@ -228,6 +233,7 @@ switch( $show )
 				<td class="right"><?php echo $hits['robot'] ?></td>
 				<td class="right"><?php echo $hits['rss'] ?></td>
 				<td class="right"><?php echo $hits['invalid'] ?></td>
+				<td class="right"><?php echo $hits['blacklist'] ?></td>
 				<td class="right"><?php echo array_sum($hits) ?></td>
 			</tr>
 		<?php } ?>
