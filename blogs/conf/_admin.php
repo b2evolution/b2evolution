@@ -13,7 +13,13 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-// EXPERMIENTAL:
+/**
+ * The admin skin to use.
+ * EXPERMIENTAL!
+ *
+ * @todo Move this to $UserSettings
+ * @var string
+ */
 $admin_skin = 'evo';
 $admin_skin = 'legacy';
 
