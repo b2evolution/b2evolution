@@ -134,9 +134,9 @@ function trackback(
 	}
 	else
 	{
-		$result_message = T_('No valid trackback response. Maybe the given url is not a Trackback url.') . ' "' . $result . '"';
+		$result_message = T_('No valid trackback response. Maybe the given url is not a Trackback url.') . ' &quot;' . $result . '&quot;';
 	}
-	echo '<br />', T_('Response:'), ' ', htmlspecialchars($result_message), "</p>\n";
+	echo '<br />', T_('Response:'), ' ', strip_tags($result_message), "</p>\n";
 	return $result;
 }
 
