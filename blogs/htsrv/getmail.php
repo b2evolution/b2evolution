@@ -215,70 +215,72 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 
 	$userdata = get_userdatabylogin($user_login);
-	$user_level = $userdata['user_level'];
+	$loop_User = new User( $userdata );
 	$post_author = $userdata['ID'];
 
-	if ($user_level > 0) 
+	$post_title = xmlrpc_getposttitle($content);
+	if ($post_title == '')
 	{
+		$post_title = $subject;
+	}
 
-		$post_title = xmlrpc_getposttitle($content);
-		$post_category = xmlrpc_getpostcategory($content);
+	$post_category = xmlrpc_getpostcategory($content);
+	if ($post_category == '') 
+	{
+		$post_category = $default_category;
+	}
+	echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
+	
+	$blog_ID = get_catblog($post_category); 
+	echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 
-		if ($post_title == '') {
-			$post_title = $subject;
-		}
-		if ($post_category == '') {
-			$post_category = $default_category;
-		}
-		echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
+	// Check permission:
+	if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+	{
+		echo "\n", T_('Permission denied.'), '<br />';
+		continue;	
+	}
 
-		if (!$thisisforfunonly) 
+	if (!$thisisforfunonly) 
+	{
+		// CHECK and FORMAT content	
+		$post_title = format_to_post(trim($post_title),0,0);
+		$content = format_to_post(trim($content),$autobr,0);
+	
+		if( errors_display( T_('Cannot post, please correct these errors:'), '' ) )
 		{
-			// CHECK and FORMAT content	
-			$post_title = format_to_post(trim($post_title),0,0);
-			$content = format_to_post(trim($content),$autobr,0);
-		
-			if( errors_display( T_('Cannot post, please correct these errors:'), '' ) )
-			{
-				continue;
-			}
-
-			// INSERT NEW POST INTO DB:
-			$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', 'en', '',	$autobr, true ) or mysql_oops($query);
-
-			if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
-			{
-				sleep($sleep_after_edit);
-			}
-
-			$blog_ID = get_catblog($post_category); 
-			echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
-			$blogparams = get_blogparams_by_ID( $blog_ID );
-			pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
-			pingb2evonet( $blogparams, $post_ID, $post_title);
-			pingWeblogs($blogparams);
-			pingBlogs($blogparams);
-			pingTechnorati($blogparams);
+			continue;
 		}
-		echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
-		echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
 
-		if(!$pop3->delete($iCount)) 
+		// INSERT NEW POST INTO DB:
+		$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', 'en', '',	$autobr, true ) or mysql_oops($query);
+
+		if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
 		{
-			echo '<p>', $pop3->ERROR, '</p></div>';
-			$pop3->reset();
-			exit;
-		}
-		else 
-		{
-			echo '<p>', T_('Mission complete, message deleted.'), '</p>';
+			sleep($sleep_after_edit);
 		}
 
-	} 
+		$blogparams = get_blogparams_by_ID( $blog_ID );
+		pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
+		pingb2evonet( $blogparams, $post_ID, $post_title);
+		pingWeblogs($blogparams);
+		pingBlogs($blogparams);
+		pingTechnorati($blogparams);
+	}
+	echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
+	echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
+
+	if(!$pop3->delete($iCount)) 
+	{
+		echo '<p>', $pop3->ERROR, '</p></div>';
+		$pop3->reset();
+		exit;
+	}
 	else 
 	{
-		echo '<p><strong>', T_('Level 0 users can\'t post.'), '</strong></p>';
+		echo '<p>', T_('Mission complete, message deleted.'), '</p>';
 	}
+
 	echo '</div>';
 	if ($output_debugging_info) 
 	{
