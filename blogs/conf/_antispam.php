@@ -32,6 +32,7 @@ $block_urls = array(
 	'sexgine.com',
 	'zdenka.accepted.cc',
 	'unbeatablemobiles',
+	'hornyhamster.com ',
 // Light spammers:
 	'pcfamily.ch',
 	'nositeyet.com',
