@@ -82,7 +82,7 @@ else switch ($action)
 			$edited_User->set_datecreated( $localtimenow );
 		}
 		else
-		{
+		{	// we edit an existing user:
 			$edited_User = & new User( get_userdata( $edited_user_ID ) );
 		}
 
@@ -130,7 +130,10 @@ else switch ($action)
 		}
 
 		// check if new login already exists for another user_ID
-		$query = "SELECT ID FROM T_users WHERE user_login = '$edited_user_login' AND ID != $edited_user_ID";
+		$query = "SELECT ID
+								FROM T_users
+							 WHERE user_login = '$edited_user_login'
+							   AND ID != $edited_user_ID";
 		$q = $DB->get_var( $query );
 
 		if( $q !== NULL )
@@ -138,60 +141,56 @@ else switch ($action)
 			$Messages->add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ));
 		}
 
-		$edited_User->set( 'login', $edited_user_login );
 		param( 'edited_user_firstname', 'string', true );
-		$edited_User->set( 'firstname', $edited_user_firstname );
 		param( 'edited_user_lastname', 'string', true );
-		$edited_User->set( 'lastname', $edited_user_lastname );
 		param( 'edited_user_nickname', 'string', true );
-		$edited_User->set( 'nickname', $edited_user_nickname );
 		param( 'edited_user_idmode', 'string', true );
-		$edited_User->set( 'idmode', $edited_user_idmode );
 		param( 'edited_user_locale', 'string', true );
-		$edited_User->set( 'locale', $edited_user_locale );
 		param( 'edited_user_email', 'string', true );
-		$edited_User->set( 'email', $edited_user_email );
 		param( 'edited_user_url', 'string', true );
-		$edited_User->set( 'url', $edited_user_url );
 		param( 'edited_user_icq', 'string', true );
-		$edited_User->set( 'icq', $edited_user_icq );
 		param( 'edited_user_aim', 'string', true );
-		$edited_User->set( 'aim', $edited_user_aim );
 		param( 'edited_user_msn', 'string', true );
-		$edited_User->set( 'msn', $edited_user_msn );
 		param( 'edited_user_yim', 'string', true );
-		$edited_User->set( 'yim', $edited_user_yim );
 		param( 'edited_user_notify', 'integer', 0 );
-		$edited_User->set( 'notify', $edited_user_notify );
 		param( 'edited_user_showonline', 'integer', 0 );
-		$edited_User->set( 'showonline', $edited_user_showonline );
 		#param( 'edited_user_upload_ufolder', 'integer', 0 );
 		#$edited_User->set( 'upload_ufolder', $edited_user_upload_ufolder );
-
 		param( 'edited_user_pass1', 'string', true );
 		param( 'edited_user_pass2', 'string', true );
-		if( $edited_user_pass1 != '' || $edited_user_pass2 != '' || $edited_user_ID == 0 )
-		{ // update password, explicit for new users
-			if( $edited_user_pass1 != $edited_user_pass2 )
-			{
-				$Messages->add( T_('You typed two different passwords.') );
-			}
-			else
-			{
-				if( strlen($edited_user_pass2) < $Settings->get('user_minpwdlen') )
-				{
-					$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
-				}
-				else
-				{
-					$new_pass = md5( $edited_user_pass2 );
-					$edited_User->set( 'pass', $new_pass ); // set password
-				}
-			}
+
+		// Perfom check on parameters:
+    profile_check_params( $edited_user_nickname, $edited_user_icq, $edited_user_email, $edited_user_url,
+																$edited_user_pass1, $edited_user_pass2 );
+
+		$edited_User->set( 'login', $edited_user_login );
+		$edited_User->set( 'firstname', $edited_user_firstname );
+		$edited_User->set( 'lastname', $edited_user_lastname );
+		$edited_User->set( 'nickname', $edited_user_nickname );
+		$edited_User->set( 'idmode', $edited_user_idmode );
+		$edited_User->set( 'locale', $edited_user_locale );
+		$edited_User->set( 'email', $edited_user_email );
+		$edited_User->set( 'url', $edited_user_url );
+		$edited_User->set( 'icq', $edited_user_icq );
+		$edited_User->set( 'aim', $edited_user_aim );
+		$edited_User->set( 'msn', $edited_user_msn );
+		$edited_User->set( 'yim', $edited_user_yim );
+		$edited_User->set( 'notify', $edited_user_notify );
+		$edited_User->set( 'showonline', $edited_user_showonline );
+
+		if( $edited_user_ID == 0 && empty($edited_user_pass1) && empty($edited_user_pass2) )
+		{ // Require passwords for new users:
+			$Messages->add( T_('Please enter a password.') );
 		}
 
 		if( !$Messages->count() )
-		{ // ---- NO UPDATE ON ERRORS
+		{ // OK, no error.
+
+			if( !empty($edited_user_pass2) )
+			{	// Password provided, we must encode it
+				$new_pass = md5( $edited_user_pass2 );
+				$edited_User->set( 'pass', $new_pass ); // set password
+			}
 
 			if( $edited_User->get('ID') != 0 )
 			{	// Commit update to the DB:

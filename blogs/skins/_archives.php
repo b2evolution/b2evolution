@@ -40,7 +40,8 @@
 		$archive_week_end_date_format   = $dateformat;
 	}
 		
-	$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min, $timestamp_max, $archive_limit );
+	$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,
+																		$timestamp_min, $timestamp_max, $archive_limit );
 	
 	while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 	{
@@ -64,19 +65,15 @@
 				echo mysql2date($archive_day_date_format, $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
 				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
 				break;
-	
+
 			case 'weekly':
 				// --------------------------------- WEEKLY ARCHIVES ---------------------------------------
-				$arc_ymd = $arc_year.'-'.zeroise($arc_month,2).'-' .zeroise($arc_dayofmonth,2);
-				$arc_week = get_weekstartend($arc_ymd, $start_of_week);
-				$arc_week_start = date_i18n($archive_week_start_date_format, $arc_week['start']);
-				$arc_week_end = date_i18n($archive_week_end_date_format, $arc_week['end']);
 				echo '<a href="';
 				archive_link( $arc_year, '', '', $arc_w );
 				echo '">';
-				echo $arc_week_start.$archive_week_separator.$arc_week_end;
-				echo '</a>';
-			break;
+				echo $arc_year.', '.T_('week').' '.$arc_w;
+				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
+				break;
 	
 			case 'postbypost':
 			default:

@@ -174,12 +174,12 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 	}
 
 	if( $use_balanceTags )
-	{ // Auto close open tags:
+	{	// Auto close open tags:
 		$content = balanceTags($content, $is_comment);
 	}
 
 	if( $use_html_checker )
-	{ // Check the code:
+	{	// Check the code:
 		if( ! $is_comment )
 		{
 			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attribues,
@@ -274,7 +274,7 @@ function convert_chars( $content, $flag='html' )
 
 	// Convert highbyte non ASCII/UTF-8 chars to urefs:
 	if( (locale_charset(false) != 'utf-8') && (locale_charset(false) != 'gb2312') )
-	{ // This is a single byte charset
+	{	// This is a single byte charset
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
 			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
@@ -291,7 +291,7 @@ function convert_chars( $content, $flag='html' )
 		$content = preg_replace('/&(?![#A-Za-z0-9]{2,20};)/', '&amp;', $content);
 	}
 	else
-	{ // unicode, xml...
+	{	// unicode, xml...
 		// Convert & chars that are not used in an entity
 		$content = preg_replace('/&(?![#A-Za-z0-9]{2,20};)/', '&#38;', $content);
 
@@ -370,7 +370,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		$j = gmdate($dateformatstring, $unixtimestamp - ($Settings->get('time_difference') * 3600));
 	}
 	else
-	{ // We want default timezone time:
+	{	// We want default timezone time:
 		$dateformatstring = ' '.$dateformatstring; // will be removed later
 
 		// echo $dateformatstring, '<br />';
@@ -407,7 +407,13 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 	return $j;
 }
 
-
+/**
+ * Get start and end day of a week, based on week number and start-of-week
+ *
+ * Used by Calendar
+ *
+ * {@internal get_weekstartend(-)}}
+ */
 function get_weekstartend($mysqlstring, $start_of_week)
 {
 	$my = substr($mysqlstring, 0, 4);
@@ -594,7 +600,7 @@ function xmlrpc_displayresult( $result, $log = '', $display = true )
 		return false;
 	}
 	elseif( $result->faultCode() )
-	{ // We got a remote error:
+	{	// We got a remote error:
 		if( $display ) echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
 		debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
 		return false;
@@ -779,7 +785,7 @@ function balanceTags($text)
 function remove_magic_quotes( $mixed )
 {
 	if( get_magic_quotes_gpc() )
-	{ // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
+	{	// That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
 		if( is_array( $mixed ) )
 		{
 			foreach($mixed as $k => $v)

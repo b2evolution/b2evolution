@@ -502,5 +502,77 @@ function profile_title( $prefix = ' ', $display = 'htmlbody' )
 	}
 }
 
+/**
+ * Check profile parameters
+ *
+ * @param string nickname (mandatory)
+ * @param string ICQ UIN (must be a number)
+ * @param string email address (mandatory, must be well formed)
+ * @param string url (must be well formed, in allowed scheme, not blacklisted)
+ * @param string password 1
+ * @param string password 2
+ */
+function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, $newuser_url,
+																$pass1, $pass2 )
+{
+	global $Messages, $Settings;
 
+	// checking the nickname has been typed
+	if(empty($newuser_nickname))
+	{
+		$Messages->add( T_('Please enter a nickname (can be the same as your login).') );
+	}
+
+	// if the ICQ UIN has been entered, check to see if it has only numbers
+	if(!empty($newuser_icq))
+	{
+		if(!ereg("^[0-9]+$", $newuser_icq))
+		{
+			$Messages->add( T_('The ICQ UIN can only be a number, no letters allowed.') );
+		}
+	}
+
+	// checking e-mail address
+	if( empty($newuser_email) )
+	{
+		$Messages->add( T_('Please enter an e-mail address.') );
+	}
+	elseif( !is_email($newuser_email) )
+	{
+		$Messages->add( T_('The email address is invalid.') );
+	}
+
+	// Checking URL:
+	if( $error = validate_url( $newuser_url, $comments_allowed_uri_scheme ) )
+	{
+		$Messages->add( T_('Supplied URL is invalid: ') . $error );
+	}
+
+	// Check passwords:
+	if( empty($pass1) )
+	{
+		if( !empty($pass2) )
+		{
+			$Messages->add( T_('Please enter the new password twice.') );
+		}
+		$updatepassword = '';
+	}
+	else
+	{
+		if( empty($pass2) )
+		{
+			$Messages->add( T_('Please enter the new password twice.') );
+		}
+		elseif($pass1 != $pass2)
+		{
+			$Messages->add( T_('You typed two different passwords.') );
+		}
+		elseif( strlen($pass1) < $Settings->get('user_minpwdlen') )
+		{
+			$Messages->add( sprintf( T_('The mimimum password length is %d characters.'),
+																$Settings->get('user_minpwdlen')) );
+		}
+	}
+
+}
 ?>

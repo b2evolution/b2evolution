@@ -250,11 +250,16 @@ $locales = array(
 # We get this one from the default locale above
 #$default_language = substr( $default_locale, 0, 2 );
 
-# day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
+/**
+ * day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
+ *
+ * This is used when displaying the calendar only.
+ * Weekly archives are grouped the way mySQL groups days by weeks; see mySQL documentation.
+ */
 $start_of_week = 1;
 
 # Set this to 1 if you are a translator and wish to extract strings from your .po file
-# Warning: do *not* extract .PO files you have not edited yourself.
+# Warning: do *not* extract .PO files you have not edited yourself. 
 # Shipped .PO files contain automatic translations that have *not* been reviewed.
 $allow_po_extraction = 0;
 

@@ -106,11 +106,11 @@
 				switch( $Comment->get( 'type' ) )
 				{
 					case 'comment': // Display a comment:
-						echo T_('Comment from:') ?>
-						<?php $Comment->author() ?>
-						<a href="<?php echo msgform_url($Comment->author_User->ID,$Comment->Item->ID,$Comment->ID) ?>" title="<?php echo T_('E-mail the author of the comment') ?>"><img src="<?php imgbase() ?>envelope.gif" height="10" width="13" border="0" class="middle" alt="<?php echo T_('EMail') ?>" /></a>
-						<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
-						<?php break;
+						echo T_('Comment from:');
+						$Comment->author();
+						$Comment->msgform_link( $Blog->get('msgformurl') );
+						$Comment->author_url( '', ' &middot; ', '' );
+						break;
 
 					case 'trackback': // Display a trackback:
 						echo T_('Trackback from:') ?>

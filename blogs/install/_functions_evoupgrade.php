@@ -195,14 +195,14 @@ function upgrade_b2evo_tables()
 
 		echo 'Updating blog urls... ';
 		$query = "SELECT blog_ID, blog_siteurl FROM T_blogs";
-		$q = $DB->query( $query );
+		$q = $DB->get_results( $query, ARRAY_A );
 		if( count( $q ) ) foreach( $q as $row )
 		{
 			$blog_ID = $row['blog_ID'];
 			$blog_siteurl = $row['blog_siteurl'];
-			// echo $blog_siteurl;
+			// echo $blog_ID.':'.$blog_siteurl;
 			if( strpos( $blog_siteurl.'/', $baseurl ) !== 0 )
-			{ // If not found at position 0
+			{	// If not found at position 0
 				echo ' <strong>WARNING: please check blog #', $blog_ID, ' manually.</strong><br /> ';
 				continue;
 			}
@@ -211,16 +211,15 @@ function upgrade_b2evo_tables()
 			// echo ' -> ', $blog_siteurl,'<br />';
 
 			$query_update_blog = "UPDATE T_blogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
-			// echo $query_update_blog, '<br>';
+			// echo $query_update_blog, '<br />';
 			$DB->query( $query_update_blog );
 		}
-		echo "OK. (".count($rows_updated)." rows updated)</p>\n";
-
+		echo "OK. (".count($q)." rows updated)<br />\n";
 	}
 
 
 	if( $old_db_version < 8040 )
-	{ // upgarde to 0.8.7
+	{ // upgrade to 0.8.7
 		create_antispam();
 
 		echo 'Upgrading Settings table... ';

@@ -59,7 +59,7 @@ function online_user_update()
  */
 function online_user_display( $before = '', $after = '' )
 {
-	global $DB, $online_session_timeout;
+	global $DB, $online_session_timeout, $Blog;
 	$users = array();
 
 	$sql = 'SELECT sess_user_ID
@@ -73,12 +73,12 @@ function online_user_display( $before = '', $after = '' )
 	if( count( $rows ) ) foreach( $rows as $row )
 	{
 		$user = get_userdata( $row['sess_user_ID'] );
-		$user = new User($user);
+		$User = new User($user);
 		if( $user->showonline )
 		{
 			echo $before;
-			echo $user->get('preferedname');
-			echo ' <a href="', msgform_url($row['sess_user_ID']) , '"><img src="' , imgbase() , 'envelope.gif" height="10" width="13" alt="'.T_('EMail').'" /></a>';
+			echo $User->get('preferedname');
+			$User->msgform_link( $Blog->get('msgformurl') );
 			echo $after;
 			$users['registered']++;
 		}

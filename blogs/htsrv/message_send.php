@@ -38,6 +38,7 @@
 	}
 	elseif( !empty( $comment_id ) )
 	{ // Get the email address for the recipient if a visiting commenter.
+		// TODO: use object
 		$sql = 'SELECT comment_author, comment_author_email
 						FROM T_comments
 						WHERE comment_ID =' . $comment_id;

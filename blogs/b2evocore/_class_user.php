@@ -517,6 +517,40 @@ class User extends DataObject
 		$this->disp( 'login', $format );
 	}
 
+	/**
+	 * Provide link to message form for this user
+	 *
+	 * {@internal User::msgform_link(-)}}
+	 *
+	 * @param string url of the message form
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 */
+	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	{
+		global $img_url;
+
+		if( empty($this->email) )
+		{	// We have no email for this User :(
+			return false;
+		}
+
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID );
+
+		if( $text == '#' ) $text = '<img src="'.$img_url.'envelope.gif" height="10" width="13" class="middle" alt="'.T_('EMail').'" />';
+		if( $title == '#' ) $title = T_('Send email to user');
+
+		echo $before;
+		echo '<a href="'.$form_url.'" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
+		echo $after;
+
+		return true;
+	}
 
 	/**
 	 * Template function: display user's prefered name

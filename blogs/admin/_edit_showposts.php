@@ -436,13 +436,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 						case 'weekly':
 							// --------------------------------- WEEKLY ARCHIVES ---------------------------------
-							$arc_ymd = $arc_year. '-'. zeroise($arc_month,2). '-'. zeroise($arc_dayofmonth,2);
-							$arc_week = get_weekstartend($arc_ymd, $start_of_week);
-							$arc_week_start = date_i18n($archive_week_start_date_format, $arc_week['start']);
-							$arc_week_end = date_i18n($archive_week_end_date_format, $arc_week['end']);
 							echo '<a href="'. $arc_link_start. 'm='. $arc_year. '&amp;w='. $arc_w. '">';
-							echo $arc_week_start. $archive_week_separator. $arc_week_end;
-							echo '</a>';
+							echo $arc_year.', '.T_('week').' '.$arc_w;
+							echo "</a> ($arc_count)";
 						break;
 
 						case 'postbypost':

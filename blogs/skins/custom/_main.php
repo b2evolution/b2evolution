@@ -93,9 +93,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			$Item->issue_time();
 			echo ', by ';
 			$Item->Author->prefered_name();
-		?>
-		<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" class="middle" alt="<?php echo T_('EMail') ?>" /></a>
-		<?php
+			$Item->msgform_link( $Blog->get('msgformurl') );
 			echo ', ';
 			$Item->wordcount();
 			echo ' ', T_('words');

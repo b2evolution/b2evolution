@@ -32,6 +32,9 @@ param( 'newuser_showonline', 'integer', 0 );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 
+/**
+ * Basic security checks:
+ */
 if( ! is_logged_in() )
 {	// must be logged in!
 	die( T_('You are not logged in.') );
@@ -39,7 +42,7 @@ if( ! is_logged_in() )
 
 if( $checkuser_id != $user_ID )
 {	// Can only edit your own profile
-	die( T_('You are not logged in under the same account you are trying to modify.') );
+	die( 'You are not logged in under the same account you are trying to modify.' );
 }
 
 if( $demo_mode && ($user_login == 'demouser'))
@@ -48,72 +51,32 @@ if( $demo_mode && ($user_login == 'demouser'))
 				. T_('Back to profile') . '</a>]' );
 }
 
-// checking the nickname has been typed
-if (empty($newuser_nickname))
-{
-	die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('please enter your nickname (can be the same as your login)')
-				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	return false;
+/**
+ * Additional checks:
+ */
+profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, $newuser_url,
+											$pass1, $pass2 );	// can die.
+
+
+if( $Messages->count() )
+{ // we have errors/notes
+	?>
+	<div class="panelinfo">
+	<?php
+		$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
+			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
+	?>
+	</div>
+	<?php
+	die();
 }
 
-// if the ICQ UIN has been entered, check to see if it has only numbers
-if (!empty($newuser_icq))
-{
-	if (!ereg("^[0-9]+$", $newuser_icq))
-	{
-		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('your ICQ UIN can only be a number, no letters allowed')
-					. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-		return false;
-	}
-}
 
-// checking e-mail address
-if (empty($newuser_email))
-{
-	die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('please type your e-mail address')
-				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	return false;
-}
-elseif (!is_email($newuser_email))
-{
-	die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('the email address is invalid')
-				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	return false;
-}
+// Do the update:
 
-if( $error = validate_url( $newuser_url, $comments_allowed_uri_scheme ) )
+$updatepassword = '';
+if( !empty($pass1) )
 {
-	die( '<strong>' . T_('ERROR') . '</strong>: ' . T_('Supplied URL is invalid: ') . $error );
-	return false;
-}
-
-if ($pass1 == '')
-{
-	if ($pass2 != '')
-	{
-		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed your new password only once. Go back to type it twice.'));
-	}
-	$updatepassword = '';
-}
-else
-{
-	if ($pass2 == '')
-	{
-		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed your new password only once. Go back to type it twice.')
-				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	}
-	if ($pass1 != $pass2)
-	{
-		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed two different passwords. Go back to correct that.')
-				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	}
-
-	if( strlen($pass1) < $Settings->get('user_minpwdlen') )
-	{
-		die( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen'))
-				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	}
-
 	$newuser_pass = md5($pass1);
 	$updatepassword = "user_pass = '$newuser_pass', ";
 	if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
@@ -122,23 +85,22 @@ else
 	}
 }
 
-
 $DB->query( "UPDATE T_users
-								SET $updatepassword
-										user_firstname= '".$DB->escape($newuser_firstname)."',
-										user_lastname= '".$DB->escape($newuser_lastname)."',
-										user_nickname= '".$DB->escape($newuser_nickname)."',
-										user_icq= '".$DB->escape($newuser_icq)."',
-										user_email= '".$DB->escape($newuser_email)."',
-										user_url= '".$DB->escape($newuser_url)."',
-										user_aim= '".$DB->escape($newuser_aim)."',
-										user_msn= '".$DB->escape($newuser_msn)."',
-										user_yim= '".$DB->escape($newuser_yim)."',
-										user_idmode= '".$DB->escape($newuser_idmode)."',
-										user_locale= '".$DB->escape($newuser_locale)."',
-										user_notify= $newuser_notify,
-										user_showonline= $newuser_showonline
-							WHERE ID = $user_ID" );
+						SET $updatepassword
+								user_firstname= '".$DB->escape($newuser_firstname)."',
+								user_lastname= '".$DB->escape($newuser_lastname)."',
+								user_nickname= '".$DB->escape($newuser_nickname)."',
+								user_icq= '".$DB->escape($newuser_icq)."',
+								user_email= '".$DB->escape($newuser_email)."',
+								user_url= '".$DB->escape($newuser_url)."',
+								user_aim= '".$DB->escape($newuser_aim)."',
+								user_msn= '".$DB->escape($newuser_msn)."',
+								user_yim= '".$DB->escape($newuser_yim)."',
+								user_idmode= '".$DB->escape($newuser_idmode)."',
+								user_locale= '".$DB->escape($newuser_locale)."',
+								user_notify= $newuser_notify,
+								user_showonline= $newuser_showonline
+					WHERE ID = $user_ID" );
 
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');

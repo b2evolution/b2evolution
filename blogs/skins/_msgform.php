@@ -1,5 +1,5 @@
 <?php
-	/*
+	/**
 	 * This is the template that displays the message user form
 	 *
 	 * This file is not meant to be called directly.
@@ -42,25 +42,30 @@
 	if(!empty($recipient_id))
 	{ // If the email is to a registerd user get the email address from the users table
 		$user = get_userdata( $recipient_id );
-		$user = new User($user);
-		$recipient_name = $user->get('preferedname');
+		$User = new User($user);
+		$recipient_name = $User->get('preferedname');
+ 		$recipient_address = $User->get('email');
 	}
 	elseif(!empty($comment_id))
 	{ // If the email is to a non user comment poster get the email address from the comments table
+		// TODO: use object
 		$sql = 'SELECT comment_author, comment_author_email
 						FROM T_comments
 						WHERE comment_ID = '.$comment_id;
 		$row = $DB->get_row( $sql );
 		$recipient_name = $row->comment_author;
+		$recipient_address = $row->comment_author_email;
 	}
-	else
-	{ // Error Gracefully
+
+	if( empty($recipient_address) )
+	{	// We should never have called this in the first place!
+		// Could be that commenter did not provide an email, etc...
 		echo 'No recipient specified!';
-		exit;
+		return;
 	}
 
 	// Get the subject of the email
-	if( !empty($comment_id) || !empty($post_id))
+	if( !empty($comment_id) || !empty($post_id) )
 	{
 		$sql = "SELECT post_title
 						FROM T_posts
@@ -69,7 +74,6 @@
 		$subject = T_('Re:').' '.$row->post_title;
 	}
 ?>
-	<h2><?php echo T_('Send an email message') ?>:</h2>
 
 	<!-- form to send email -->
 	<form action="<?php echo $htsrv_url ?>message_send.php" method="post" class="bComment">

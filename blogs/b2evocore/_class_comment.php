@@ -327,7 +327,55 @@ class Comment extends DataObject
 	}
 
 
-	/** 
+	/**
+	 * Provide link to message form for this comment's author
+	 *
+	 * {@internal Comment::msgform_link(-)}}
+	 *
+	 * @param string url of the message form
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 */
+	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	{
+		global $img_url;
+
+		if( $this->author_User !== NULL )
+		{	// This comment is from a registered user:
+			if( empty($this->author_User->email) )
+			{	// We have no email for this Author :(
+				return false;
+			}
+			$form_url = url_add_param( $form_url, 'recipient_id='.$this->author_User->ID );
+		}
+		else
+		{	// This comment is from a visitor:
+			if( empty($this->author_email) )
+			{	// We have no email for this comment :(
+				return false;
+			}
+		}
+
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID );
+		$form_url = url_add_param( $form_url, 'post_id='.$this->Item->ID );
+
+		if( $text == '#' ) $text = '<img src="'.$img_url.'envelope.gif" height="10" width="13" class="middle" alt="'.T_('EMail').'" />';
+		if( $title == '#' ) $title = T_('Send email to comment author');
+
+		echo $before;
+		echo '<a href="'.$form_url.'" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
+		echo $after;
+
+		return true;
+	}
+
+
+	/**
 	 * Template function: display permalink to this comment
 	 *
 	 * {@internal Comment::permalink(-) }}
