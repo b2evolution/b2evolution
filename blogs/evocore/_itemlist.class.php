@@ -564,7 +564,7 @@ class ItemList extends DataObjectList
 		// Also make arrays...
 		$this->postIDlist = "";
 		$this->postIDarray = array();
-		if( count( $this->rows ) ) foreach( $this->rows as $myrow )
+		foreach( $this->rows as $myrow )
 		{
 			array_unshift( $this->postIDarray, $myrow->$dbIDname );	// new row at beginning
 		}
@@ -577,9 +577,6 @@ class ItemList extends DataObjectList
 		// Initialize loop stuff:
 		$this->restart();
 	}
-
-
-
 
 
 	/**
@@ -954,6 +951,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.15  2005/01/06 19:40:13  fplanque
  * SQL injection fix
  *

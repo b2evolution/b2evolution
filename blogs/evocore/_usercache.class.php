@@ -115,11 +115,10 @@ class UserCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
 
-		$rows = $DB->get_results( 'SELECT *
+		foreach( $DB->get_results( 'SELECT *
 																 FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
 																WHERE bloguser_blog_ID = '.$blog_ID.'
-																	AND bloguser_ismember <> 0' );
-		if( count($rows) ) foreach( $rows as $row )
+																	AND bloguser_ismember <> 0' ) as $row )
 		{
 			$this->cache[ $row->ID ] = new User( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -187,6 +186,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.6  2005/02/08 04:07:47  blueyed
  * fixed results from DB::get_var()
  *

@@ -154,7 +154,7 @@ switch( $tab )
 		/*
 		 * Chart
 		 */
-		if( count($res_hits) )
+		if( $DB->num_rows )
 	  {
 			$last_date = 0;
 

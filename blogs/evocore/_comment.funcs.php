@@ -77,8 +77,8 @@ function generic_ctp_number($post_id, $mode = 'comments')
 							FROM T_comments
 							WHERE comment_post_ID IN ($postIDlist)
 							GROUP BY comment_post_ID, comment_type";
-		$rows = $DB->get_results( $query );
-		if( count( $rows ) ) foreach( $rows as $row )
+
+		foreach( $DB->get_results( $query ) as $row )
 		{
 			switch( $row->comment_type )
 			{
@@ -109,8 +109,8 @@ function generic_ctp_number($post_id, $mode = 'comments')
 							FROM T_comments
 							WHERE comment_post_ID = $post_id
 							GROUP BY comment_post_ID, comment_type";
-		$rows = $DB->get_results( $query );
-		if( count( $rows ) ) foreach( $rows as $row )
+
+		foreach( $DB->get_results( $query ) as $row )
 		{
 			switch( $row->comment_type )
 			{
@@ -555,6 +555,9 @@ function comment_blog_name( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.4  2004/12/17 20:41:13  fplanque
  * cleanup
  *

@@ -104,15 +104,16 @@ function upgrade_miniblog_tables()
 
 	echo 'Generating wordcounts... ';
 	$query = 'SELECT ID, post_content FROM T_posts';
-	$q = $DB->get_results( $query, ARRAY_A );
-	if( count( $q ) ) foreach( $q as $row )
+	$i = 0;
+	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 	{
 		$query_update_wordcount = "UPDATE T_posts
 															SET post_wordcount = " . bpost_count_words($row['post_content']) . "
 															WHERE ID = " . $row['ID'];
 		$DB->query($query_update_wordcount);
+		$i++;
 	}
-	echo "OK. (".count($q)." rows updated)<br />\n";
+	echo "OK. ($i rows updated)<br />\n";
 
 	echo 'Generating postcats... ';
 	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID )
@@ -124,8 +125,7 @@ function upgrade_miniblog_tables()
 	$query = "SELECT id, parentId, created, content
 						FROM miniblog
 						WHERE parentId > 1";
-	$rows = $DB->get_results( $query );
-	foreach( $rows as $row )
+	foreach( $DB->get_results( $query ) as $row )
 	{
 		$matches = array();
 

@@ -526,9 +526,8 @@ function locale_overwritefromDB()
 						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name,
 						loc_messages, loc_priority, loc_enabled
 						FROM T_locales ORDER BY loc_priority';
-	$rows = $DB->get_results( $query, ARRAY_A );
 
-	if( count( $rows ) ) foreach( $rows as $row )
+	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 	{ // Loop through loaded locales:
 
 		if( $row['loc_priority'] == $priocounter )
@@ -557,7 +556,7 @@ function locale_overwritefromDB()
 
 	// set default priorities, if nothing was set in DB.
 	// Missing "priority gaps" will get filled here.
-	if( count($rows) != count($locales) )
+	if( $DB->num_rows != count($locales) )
 	{ // we have locales from conf file that need a priority
 		$priocounter = 1;
 		foreach( $locales as $lkey => $lval )
@@ -655,6 +654,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.5  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

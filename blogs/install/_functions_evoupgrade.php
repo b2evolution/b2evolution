@@ -66,9 +66,8 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
 
 	// query given languages in $table
 	$query = "SELECT $columnID, $columnlang FROM $table";
-	$rows = $DB->get_results( $query, ARRAY_A );
 	$languagestoconvert = array();
-	if( count( $rows ) ) foreach( $rows as $row )
+	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 	{
 		// remember the ID for that locale
 		$languagestoconvert[ $row[ $columnlang ] ][] = $row[ $columnID ];
@@ -173,15 +172,16 @@ function upgrade_b2evo_tables()
 
 		echo 'Generating wordcounts... ';
 		$query = "SELECT ID, post_content FROM T_posts WHERE post_wordcount IS NULL";
-		$q = $DB->get_results( $query, ARRAY_A );
-		if( count( $q ) ) foreach( $q as $row )
+		$i = 0;
+		foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 		{
 			$query_update_wordcount = "UPDATE T_posts
 																SET post_wordcount = " . bpost_count_words($row['post_content']) . "
 																WHERE ID = " . $row['ID'];
 			$DB->query($query_update_wordcount);
+			$i++;
 		}
-		echo "OK. (".count($q)." rows updated)<br />\n";
+		echo "OK. ($i rows updated)<br />\n";
 	}
 
 
@@ -205,14 +205,14 @@ function upgrade_b2evo_tables()
 
 		echo 'Updating blog urls... ';
 		$query = "SELECT blog_ID, blog_siteurl FROM T_blogs";
-		$q = $DB->get_results( $query, ARRAY_A );
-		if( count( $q ) ) foreach( $q as $row )
+		$i = 0;
+		foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 		{
 			$blog_ID = $row['blog_ID'];
 			$blog_siteurl = $row['blog_siteurl'];
 			// echo $blog_ID.':'.$blog_siteurl;
 			if( strpos( $blog_siteurl.'/', $baseurl ) !== 0 )
-			{	// If not found at position 0
+			{ // If not found at position 0
 				echo ' <strong>WARNING: please check blog #', $blog_ID, ' manually.</strong><br /> ';
 				continue;
 			}
@@ -223,8 +223,9 @@ function upgrade_b2evo_tables()
 			$query_update_blog = "UPDATE T_blogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
 			// echo $query_update_blog, '<br />';
 			$DB->query( $query_update_blog );
+			$i++;
 		}
-		echo "OK. (".count($q)." rows updated)<br />\n";
+		echo "OK. ($i rows updated)<br />\n";
 	}
 
 

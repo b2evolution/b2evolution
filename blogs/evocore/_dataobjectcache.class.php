@@ -96,10 +96,9 @@ class DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename";
-		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		if( count($rows) ) foreach( $rows as $row )
+		foreach( $DB->get_results( $sql ) as $row )
 		{
 			if( $objtype == 'Element' )
 			{ // Instanciate a dataobject with its params:
@@ -138,10 +137,9 @@ class DataObjectCache
 		}
 
 		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
-		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		if( count($rows) ) foreach( $rows as $row )
+		foreach( $DB->get_results( $sql ) as $row )
 		{
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -258,7 +256,8 @@ class DataObjectCache
 			echo '</option>'."\n";
 		}
 	}
-	
+
+
 	/**
 	 * Returns form option list with cache contents
 	 *
@@ -300,6 +299,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.9  2005/01/20 18:46:26  fplanque
  * debug
  *

@@ -130,10 +130,9 @@ class ItemCache extends DataObjectCache
 		$req_list = "'".implode( "','", $req_array)."'";
 		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename WHERE post_urltitle IN ( $req_list )";
-		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		if( count($rows) ) foreach( $rows as $row )
+		foreach( $DB->get_results( $sql ) as $row )
 		{
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -160,6 +159,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.6  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

@@ -100,15 +100,16 @@ function upgrade_cafelog_tables()
 
 	echo 'Generating wordcounts... ';
 	$query = 'SELECT ID, post_content FROM T_posts';
-	$q = $DB->get_results( $query, ARRAY_A );
-	if( count( $q ) ) foreach( $q as $row )
+	$i = 0;
+	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 	{
-		$query_update_wordcount = "UPDATE T_posts
-															SET post_wordcount = " . bpost_count_words($row['post_content']) . "
-															WHERE ID = " . $row['ID'];
+		$query_update_wordcount = 'UPDATE T_posts'
+															.' SET post_wordcount = '.bpost_count_words($row['post_content'])
+															.' WHERE ID = '.$row['ID'];
 		$DB->query($query_update_wordcount);
+		$i++;
 	}
-	echo "OK. (".count($q)." rows updated)<br />\n";
+	echo "OK. ($i rows updated)<br />\n";
 
 	echo 'Generating postcats... ';
 	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_main_cat_ID FROM T_posts";

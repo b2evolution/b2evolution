@@ -95,10 +95,9 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 					WHERE '.$dbprefix."urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'";
 	if( $post_ID )
 		$sql .= " AND $dbIDname <> $post_ID";
-	$rows = $DB->get_results( $sql, ARRAY_A );
 	$exact_match = false;
 	$highest_number = 0;
-	if( count( $rows ) ) foreach( $rows as $row )
+	foreach( $DB->get_results( $sql, ARRAY_A ) as $row )
 	{
 		$existing_urltitle = $row[$dbprefix.'urltitle'];
 		// echo "existing = $existing_urltitle <br />";
@@ -1531,6 +1530,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.11  2005/02/08 00:59:16  blueyed
  * added @todo
  *

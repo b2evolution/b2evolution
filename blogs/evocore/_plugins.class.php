@@ -111,14 +111,12 @@ class Plugins
 		if( ! $this->initialized )
 		{
 			$Debuglog->add( 'Loading plugins...' );
-			$rows = $DB->get_results( 'SELECT *
-																	 FROM T_plugins
-																	ORDER BY plug_priority', ARRAY_A );
-			if( count($rows) ) foreach( $rows as $row )
-			{	// Loop through installed plugins:
+			foreach( $DB->get_results( 'SELECT * FROM T_plugins
+																	ORDER BY plug_priority', ARRAY_A ) as $row )
+			{ // Loop through installed plugins:
 				$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $row['plug_classname'] ).'.php';
 				if( ! is_file( $filename ) )
-				{	// Plugin not found!
+				{ // Plugin not found!
 					$Debuglog->add( 'Plugin not found: '.$filename );
 					continue;
 				}
@@ -578,6 +576,9 @@ function sort_Plugin( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.3  2004/12/17 20:41:14  fplanque
  * cleanup
  *

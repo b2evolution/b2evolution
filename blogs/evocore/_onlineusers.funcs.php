@@ -85,12 +85,10 @@ function online_user_display( $before = '', $after = '' )
 	$users = array( 'guests' => 0,
 									'registered' => 0 );
 
-	$rows = $DB->get_results( 'SELECT sess_user_ID
-															 FROM T_sessions', ARRAY_A );
-	if( count( $rows ) ) foreach( $rows as $row )
-	{	// Loop through active sessions
+	foreach( $DB->get_results( 'SELECT sess_user_ID FROM T_sessions', ARRAY_A ) as $row )
+	{ // Loop through active sessions
 		if( !empty( $row['sess_user_ID'] ) )
-		{	// This session is logged in:
+		{ // This session is logged in:
 			$User = & $UserCache->get_by_ID( $row['sess_user_ID'] );
 			if( $User->showonline )
 			{
@@ -101,13 +99,13 @@ function online_user_display( $before = '', $after = '' )
 				$users['registered']++;
 			}
 			else
-			{	// Wants to remain anonymous
+			{ // Wants to remain anonymous
 				// echo 'anonymous user!';
 				$users['guests']++;
 			}
 		}
 		else
-		{	// Not logged in:
+		{ // Not logged in:
 			$users['guests']++;
 		}
 	}
@@ -118,6 +116,9 @@ function online_user_display( $before = '', $after = '' )
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

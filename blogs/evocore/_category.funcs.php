@@ -337,8 +337,8 @@ function cat_load_cache( $cat_load_postcounts = false )
 		$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
 						FROM T_categories
 						ORDER BY cat_name";
-		$rows = $DB->get_results( $sql, ARRAY_A );
-		if( count( $rows ) ) foreach( $rows as $myrow )
+
+		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
 		{
 			$this_cat['cat_name'] = $myrow['cat_name'];
 			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
@@ -361,7 +361,7 @@ function cat_load_cache( $cat_load_postcounts = false )
 				if( $cat_parent_ID )
 				{
 					if( isset( $cache_categories[$cat_parent_ID] ) )
-					{	// If the parent exists!
+					{ // If the parent exists!
 						$cache_categories[$cat_parent_ID]['cat_children'][] = $icat_ID;
 					}
 					else
@@ -425,8 +425,8 @@ function cat_load_postcounts()
 						FROM T_postcats INNER JOIN T_posts ON postcat_post_ID = ID
 						$where
 						GROUP BY cat_ID";
-		$rows = $DB->get_results( $sql, ARRAY_A );
-		if( count( $rows ) ) foreach( $rows as $myrow )
+
+		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
 		{
 			$cat_ID = $myrow['cat_ID'];
 			if( !isset($cache_categories[$cat_ID]) )
@@ -476,8 +476,8 @@ function cat_load_postcats_cache()
 						FROM T_postcats
 						WHERE postcat_post_ID IN ($postIDlist)
 						ORDER BY postcat_post_ID, postcat_cat_ID";
-		$rows = $DB->get_results( $sql, ARRAY_A );
-		if( count( $rows ) ) foreach( $rows as $myrow )
+
+		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
 		{
 			$postcat_post_ID = $myrow["postcat_post_ID"];
 			if( ! isset( $cache_postcats[$postcat_post_ID] ) )
@@ -861,6 +861,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.9  2005/02/08 04:07:46  blueyed
  * fixed results from DB::get_var()
  *

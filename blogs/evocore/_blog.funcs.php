@@ -395,9 +395,8 @@ function blog_load_cache()
 	if( empty($cache_blogs) )
 	{
 		$cache_blogs = array();
-		$query = "SELECT * FROM T_blogs ORDER BY blog_ID";
-		$result = $DB->get_results( $query );
-		if( count( $result ) ) foreach( $result as $this_blog )
+
+		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID" ) as $this_blog )
 		{
 			$cache_blogs[$this_blog->blog_ID] = $this_blog;
 			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
@@ -506,6 +505,9 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/08 04:45:02  blueyed
+ * improved $DB get_results() handling
+ *
  * Revision 1.5  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *

@@ -23,25 +23,20 @@ function list_users( $layout, $query )
 {{{
 	global $DB;
 
-	$rows = $DB->get_results( $query, ARRAY_A );
-
 	$displayed = array();
 
-	if( !count($rows) )
-	{
-		return $displayed;
-	}
 
-
-	foreach( $rows as $lrow )
+	foreach( $DB->get_results( $query, ARRAY_A ) as $lKey => $lrow )
 	{ // Go through users:
 		$displayed[] = $lrow['ID'];
 		switch( $layout )
 		{
 			case 'wide':
-				$perm_post = isset($lrow['bloguser_perm_poststatuses']) ? explode( ',', $lrow['bloguser_perm_poststatuses'] ) : array();
+				$perm_post = isset($lrow['bloguser_perm_poststatuses'])
+											? explode( ',', $lrow['bloguser_perm_poststatuses'] )
+											: array();
 				?>
-				<tr<?php if( count($displayed)%2 == 1 ) echo ' class="odd"'; ?>>
+				<tr<?php if( $lKey % 2 ) echo ' class="odd"'; ?>>
 					<td><?php echo format_to_output( $lrow['user_login'], 'htmlbody' ); ?></td>
 					<td class="center">
 						<input id="checkallspan_state_<?php echo $lrow['ID'] ?>" type="checkbox" name="blog_ismember_<?php echo $lrow['ID'] ?>"
@@ -137,7 +132,7 @@ function list_users( $layout, $query )
 
 
 			default: ?>
-				<tr<?php if( count($displayed)%2 == 1 ) echo ' class="odd"'; ?>>
+				<tr<?php if( $lKey % 2 ) echo ' class="odd"'; ?>>
 					<td><?php echo format_to_output( $lrow['user_login'], 'htmlbody' ); ?></td>
 					<td>
 						<?php
@@ -157,7 +152,8 @@ function list_users( $layout, $query )
 								echo ' checked="checked"';
 							}
 							?> onclick="merge_from_easy( this, <?php echo $lrow['ID'] ?> )" />
-							<label for="blog_perm_easy_<?php echo $lrow['ID'].'_'.$lkey.'">'.$easy_group[1].'</label>';
+							<label for="blog_perm_easy_<?php echo $lrow['ID'].'_'.$lkey ?>"><?php echo $easy_group[1] ?></label>
+							<?php
 						}
 						?>
 					</td>
@@ -169,8 +165,9 @@ function list_users( $layout, $query )
 	return $displayed;
 }}}
 
+
 $Form = & new Form( 'blogs.php', 'FormPerm' );
-	
+
 $Form->begin_form( 'fform' );
 
 $Form->hidden( 'action', 'update' );
@@ -180,125 +177,126 @@ $Form->hidden( 'action', $layout );
 
 $Form->fieldset( T_('User permissions') );
 ?>
-		<div style="float:right">
-			<?php echo T_('Layout').':';
+<div style="float:right">
+	<?php echo T_('Layout').':';
 
-			foreach( array( 'default' => T_('Default'), 'wide' => T_('wide'), 'all' => 'Complete (JS-debug)' ) as $lkey => $lname )
-			{
-				echo '<a href="?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout='.$lkey.'"'
-							.' onclick="switch_layout(\''.$lkey.'\'); return false;">['.$lname.']</a>';
-			}
+	foreach( array( 'default' => T_('Default'), 'wide' => T_('wide'), 'all' => 'Complete (JS-debug)' ) as $lkey => $lname )
+	{
+		echo '<a href="?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout='.$lkey.'"'
+					.' onclick="switch_layout(\''.$lkey.'\'); return false;">['.$lname.']</a>';
+	}
 
-			?>
-		</div>
-
-
-		<div id="userlist_wide" style="<?php
-			echo 'display:'.( ($layout == 'wide' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
-			<table class="grouped">
-				<thead>
-					<tr>
-						<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
-						<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Is<br />member') ?></th>
-						<th colspan="5" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Can post/edit with following statuses:') ?></th>
-						<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Delete<br />posts') ?></th>
-						<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
-						<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
-						<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
-						<th colspan="3" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Media directory') ?></th>
-						<th rowspan="2" class="checkright">&nbsp;</th>
-					</tr>
-					<tr>
-						<th class="checkright"><?php echo T_('Published') ?></th>
-						<th class="checkright"><?php echo T_('Protected') ?></th>
-						<th class="checkright"><?php echo T_('Private') ?></th>
-						<th class="checkright"><?php echo T_('Draft') ?></th>
-						<th class="checkright"><?php echo T_('Deprecated') ?></th>
-						<th class="checkright"><?php echo T_('Upload') ?></th>
-						<th class="checkright"><?php echo T_('Read') ?></th>
-						<th class="checkright"><?php echo T_('Write') ?></th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr class="group">
-						<td colspan="15">
-							<strong><?php echo T_('Members') ?></strong>
-						</td>
-					</tr>
-
-					<?php
-					$members = list_users( 'wide', 'SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
-															bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
-															bloguser_perm_properties, bloguser_perm_media_upload,
-															bloguser_perm_media_browse, bloguser_perm_media_change
-											FROM T_users INNER JOIN T_blogusers
-															ON ID = bloguser_user_ID
-											WHERE bloguser_blog_ID = '.$blog.'
-											ORDER BY user_login' );
-					?>
-
-					<tr class="group">
-						<td colspan="15">
-							<strong><?php echo T_('Non members') ?></strong>
-						</td>
-					</tr>
-
-					<?php
-					list_users( 'wide', 'SELECT ID, user_login
-												FROM T_users'
-											.( count( $members ) ? ' WHERE ID NOT IN ('.implode( ',', $members ) .') ' : '' )
-											.' ORDER BY user_login' );
-					?>
-				</tbody>
-			</table>
-		</div>
-
-
-		<div id="userlist_default" style="<?php
-			echo 'display:'.( ($layout == 'default' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
-			<table class="grouped">
-				<tr class="group">
-					<td colspan="2">
-						<strong><?php echo T_('Members') ?></strong>
-					</td>
-				</tr>
-
-				<?php
-
-				$members = list_users( 'default', 'SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
-														bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
-														bloguser_perm_properties, bloguser_perm_media_upload,
-														bloguser_perm_media_browse, bloguser_perm_media_change
-										FROM T_users INNER JOIN T_blogusers
-														ON ID = bloguser_user_ID
-										WHERE bloguser_blog_ID = '.$blog.'
-										ORDER BY user_login' );
-
-				?>
-
-				<tr class="group">
-					<td colspan="2">
-						<strong><?php echo T_('Non members') ?></strong>
-					</td>
-				</tr>
-
-				<?php
-				list_users( 'default', 'SELECT ID, user_login
-											FROM T_users'
-										.( count( $members ) ? ' WHERE ID NOT IN ('.implode( ',', $members ) .') ' : '' )
-										.' ORDER BY user_login' );
-
-				?>
-			</table>
-			<br />
-		</div>
-
-	<?php
-	
-		$Form->fieldset_end();
-		// warning if a user withdraws own permission to edit the blog's properties
-		form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"' : '' )
 	?>
+</div>
+
+
+<div id="userlist_wide" style="<?php
+	echo 'display:'.( ($layout == 'wide' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
+	<table class="grouped">
+		<thead>
+			<tr>
+				<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Is<br />member') ?></th>
+				<th colspan="5" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Can post/edit with following statuses:') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Delete<br />posts') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
+				<th colspan="3" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Media directory') ?></th>
+				<th rowspan="2" class="checkright">&nbsp;</th>
+			</tr>
+			<tr>
+				<th class="checkright"><?php echo T_('Published') ?></th>
+				<th class="checkright"><?php echo T_('Protected') ?></th>
+				<th class="checkright"><?php echo T_('Private') ?></th>
+				<th class="checkright"><?php echo T_('Draft') ?></th>
+				<th class="checkright"><?php echo T_('Deprecated') ?></th>
+				<th class="checkright"><?php echo T_('Upload') ?></th>
+				<th class="checkright"><?php echo T_('Read') ?></th>
+				<th class="checkright"><?php echo T_('Write') ?></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr class="group">
+				<td colspan="15">
+					<strong><?php echo T_('Members') ?></strong>
+				</td>
+			</tr>
+
+			<?php
+			$members = list_users( 'wide', 'SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
+													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
+													bloguser_perm_properties, bloguser_perm_media_upload,
+													bloguser_perm_media_browse, bloguser_perm_media_change
+									FROM T_users INNER JOIN T_blogusers
+													ON ID = bloguser_user_ID
+									WHERE bloguser_blog_ID = '.$blog.'
+									ORDER BY user_login' );
+			?>
+
+			<tr class="group">
+				<td colspan="15">
+					<strong><?php echo T_('Non members') ?></strong>
+				</td>
+			</tr>
+
+			<?php
+			list_users( 'wide', 'SELECT ID, user_login
+										FROM T_users'
+									.( count( $members ) ? ' WHERE ID NOT IN ('.implode( ',', $members ) .') ' : '' )
+									.' ORDER BY user_login' );
+			?>
+		</tbody>
+	</table>
+</div>
+
+
+<div id="userlist_default" style="<?php
+	echo 'display:'.( ($layout == 'default' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
+	<table class="grouped">
+		<tr class="group">
+			<td colspan="2">
+				<strong><?php echo T_('Members') ?></strong>
+			</td>
+		</tr>
+
+		<?php
+
+		$members = list_users( 'default', 'SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
+												bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
+												bloguser_perm_properties, bloguser_perm_media_upload,
+												bloguser_perm_media_browse, bloguser_perm_media_change
+								FROM T_users INNER JOIN T_blogusers
+												ON ID = bloguser_user_ID
+								WHERE bloguser_blog_ID = '.$blog.'
+								ORDER BY user_login' );
+
+		?>
+
+		<tr class="group">
+			<td colspan="2">
+				<strong><?php echo T_('Non members') ?></strong>
+			</td>
+		</tr>
+
+		<?php
+		list_users( 'default', 'SELECT ID, user_login
+									FROM T_users'
+								.( count( $members ) ? ' WHERE ID NOT IN ('.implode( ',', $members ) .') ' : '' )
+								.' ORDER BY user_login' );
+
+		?>
+	</table>
+	<br />
+</div>
+
+
+<?php
+$Form->fieldset_end();
+// warning if a user withdraws own permission to edit the blog's properties
+form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"' : '' )
+?>
+
 
 </form>
