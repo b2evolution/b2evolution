@@ -29,6 +29,12 @@ function db_delete()
 	echo "Dropping Categories-to-Posts relationships...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_postcats' );
 
+ 	echo "Dropping Links...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_links' );
+
+ 	echo "Dropping Files...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_files' );
+
 	echo "Dropping Posts...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_posts' );
 

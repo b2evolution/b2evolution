@@ -108,13 +108,17 @@ switch( $action )
 		$new_User->setGroup( $new_user_Group );
 		$new_User->dbinsert();
 
+		// TODO: Optionally auto create a blog
+
+		// TODO: Optionally auto assign rights
+
 		// TODO: END TRANSACTION !!
 
 		// switch to admins locale
 		$admin_data = get_userdata(1);
 		locale_temp_switch( $admin_data['user_locale'] );
 
-		$message  = T_('new user registration on your blog'). ":\n\n";
+		$message  = T_('New user registration on your blog'). ":\n\n";
 		$message .= T_('Login:'). " $login\n\n". T_('Email'). ": $email\n\n";
 		$message .= T_('Manage users').': '.$admin_url."b2users.php\n\n";
 

@@ -163,6 +163,8 @@ $db_aliases = array(
 		'T_posttypes'    => $tableprefix.'posttypes',
 		'T_poststatuses' => $tableprefix.'poststatuses',
 		'T_plugins'      => $tableprefix.'plugins',
+		'T_files'        => $tableprefix.'files',
+		'T_links'        => $tableprefix.'links',
 	);
 
 

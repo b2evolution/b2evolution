@@ -975,15 +975,35 @@ function create_b2evo_tables_091()
 	echo "OK.<br />\n";
 
 
+	echo 'Creating table for File Meta Data... ';
+	$DB->query( "CREATE TABLE T_files (
+									file_ID         int(11) unsigned NOT NULL auto_increment,
+									file_root_type  enum('user','group','collection') NOT NULL default 'user',
+									file_root_ID    int(11) unsigned NOT NULL default '0',
+									file_path       varchar(255) NOT NULL default '',
+									file_caption    varchar(255) NOT NULL default '',
+									PRIMARY KEY (file_ID),
+									UNIQUE KEY file (file_root_type, file_root_ID, file_path)
+								)" );
+	echo "OK.<br />\n";
+
+
+ 	echo 'Creating table for Post Links... ';
+	$DB->query( "CREATE TABLE T_links (
+									link_item_ID    		int(11) unsigned NOT NULL,
+									link_dest_item_ID		int(11) unsigned NULL,
+									link_file_ID				int(11) unsigned NULL,
+									link_ltype_ID				int(11) unsigned NOT NULL default 1,
+									link_external_url   VARCHAR(255) NULL,
+									link_title          TEXT NULL,
+									INDEX link_item_ID( link_item_ID ),
+								  INDEX link_dest_item_ID (link_dest_item_ID),
+								  INDEX link_file_ID (link_file_ID)
+								)" );
+	echo "OK.<br />\n";
+
+
 	/*
-
-			evo_links table: (NO PK)
-			-link_source_post_ID    INT     NOT NULL     INDEX
-			-link_dest_post_ID    INT     NULL     INDEX
-			-link_ltype_ID     INT     NOT NULL
-			-link_external_url    VARCHAR(255)     NULL
-			-link_title    TEXT   NULL
-
 			evo_linktypes tables:
 			-ltype_ID    INT     PK
 			-ltype_desc    VARCHAR(50)
@@ -1053,7 +1073,12 @@ function create_b2evo_relations()
 											references T_users (ID)
 											on delete restrict
 											on update restrict,
-								add constraint FK_post_creator_user_ID
+								add constraint FK_post_lastedit_user_ID
+											foreign key (post_lastedit_user_ID)
+      								references T_users (ID)
+      								on delete restrict
+      								on update restrict,
+      					add constraint FK_post_creator_user_ID
 											foreign key (post_creator_user_ID)
 											references T_users (ID)
 											on delete restrict
@@ -1078,8 +1103,25 @@ function create_b2evo_relations()
 											references T_posttypes (ptyp_ID)
 											on delete restrict
 											on update restrict' );
-	
-	$DB->query( 'alter table T_users 
+
+	$DB->query( 'alter table T_links
+								add constraint FK_link_dest_item_ID
+											foreign key (link_dest_item_ID)
+      								references T_posts (ID)
+      								on delete restrict
+      								on update restrict,
+							 	add constraint FK_link_file_ID
+							 				foreign key (link_file_ID)
+								      references T_files (file_ID)
+								      on delete restrict
+								      on update restrict,
+							 	add constraint FK_link_item_ID
+							 				foreign key (link_item_ID)
+								      references T_posts (ID)
+								      on delete restrict
+								      on update restrict' );
+
+	$DB->query( 'alter table T_users
 								add constraint FK_user_grp_ID
 											foreign key (user_grp_ID)
 											references T_groups (grp_ID)
