@@ -15,6 +15,7 @@
  * This is typically an abstract class, useful only when derived.
  *
  * @version beta
+ * @abstract
  */
 class DataObject
 {
@@ -54,26 +55,31 @@ class DataObject
 	}	
 	
 	/** 
-	 * DataObject::get(-)
+	 * Get a member param by its name
 	 *
-	 * Get a param
+	 * {@internal DataObject::get(-) }
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
 	 */
 	function get( $parname )
 	{
 		return $this->$parname;
 	}
 
-	/* 
-	 * DataObject::disp(-)
+	/** 
+	 * Display a member param by its name
 	 *
-	 * Display a param
+	 * {@internal DataObject::disp(-) }
+	 *
+	 * @param mixed Name of parameter
+	 * @param mixed Output format, see {@link format_to_output()}
 	 */
 	function disp( $parname, $format = 'htmlbody' )
 	{
 		// Note: we call get again because of derived objects specific handlers !
 		echo format_to_output( $this->get($parname), $format );
 	}
-
 
 	/* 
 	 * User::set_param(-)

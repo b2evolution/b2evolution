@@ -57,12 +57,23 @@ function mysql_oops($sql_query)
 /***** Formatting functions *****/
 
 
-/*
- * format_to_output(-)
- *
+/** 
  * Format the content for being output
  *
- * fplanque : created
+ * {@internal format_to_output(-) }
+ *
+ * @author fplanque
+ * @param string raw text
+ * @param string format, can be one of the following
+ * - raw: does nothing
+ * - formvalue
+ * - htmlbody
+ * - htmlhead,
+ * - htmlattr
+ * - xml
+ * - xmlattr
+ * - entityencoded,
+ * @return string formatted text 
  */
 function format_to_output( $content, $format = 'htmlbody' )
 {

@@ -1,9 +1,9 @@
 <?php 
  /*
-	* mail_fetch/setup.php
+	* @package pop3
 	*
+	* @copyright
 	* Copyright (c) 1999-2002 The SquirrelMail Project Team
-	*
 	* Copyright (c) 1999 CDI (cdi@thewebmasters.net) All Rights Reserved
 	* Modified by Philippe Mingo 2001 mingo@rotedic.com
 	* An RFC 1939 compliant wrapper class for the POP3 protocol.
