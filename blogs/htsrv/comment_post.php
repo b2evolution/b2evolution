@@ -9,7 +9,7 @@
  */
 
 // Initialize everything:
-require_once (dirname(__FILE__).'/../b2evocore/_main.php');
+require_once( dirname(__FILE__) . '/../b2evocore/_main.php' );
 
 // statuses allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private' );
@@ -28,28 +28,28 @@ param( 'email', 'string' );
 param( 'url', 'string' );
 param( 'comment' , 'html', true );	// mandatory
 $original_comment = $comment;
-param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
+param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
 param( 'comment_cookies', 'integer', 0 );
 
-if ($require_name_email && (empty($author)) )
-{ 
-	errors_add( T_('Please fill in the name field') );
+if ($require_name_email)
+{ // Blog wants Name and EMail with comments
+	if( empty($author) ) errors_add( T_('Please fill in the name field') );
+	if( empty($email) ) errors_add( T_('Please fill in the email field') );
 }
-if ($require_name_email && (empty($email)) )
-{ 
-	errors_add( T_('Please fill in the email field') );
-}
+
 if( (!empty($email)) && (!is_email($email)) )
 {
 	errors_add( T_('Supplied email address is invalid') );
 }
-$url = ((!stristr($url, '://')) && ($url != '')) ? 'http://'.$url : $url;
-if (strlen($url) < 7) {
+
+// add 'http://' if no protocol defined for URL
+$url = ((!stristr($url, '://')) && ($url != '')) ? 'http://' . $url : $url;
+if( strlen($url) < 7 ){
 	$url = '';
 }
 if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 {
-	errors_add( T_('Supplied URL is invalid: ').$error );	
+	errors_add( T_('Supplied URL is invalid: ') . $error );	
 }
 
 $user_ip = $_SERVER['REMOTE_ADDR'];
@@ -61,26 +61,31 @@ $now = date("Y-m-d H:i:s", $localtimenow );
 $comment = strip_tags($comment, $comment_allowed_tags);
 $comment = format_to_post($comment, $comment_autobr, 1);
 
+if( empty($comment) )
+{ // comment should not be empty!
+	errors_add( T_('Please do not post empty comment') );
+}
+
 /* flood-protection */
 $query = "SELECT max(comment_date) as maxdate FROM $tablecomments WHERE comment_author_IP='$user_ip'";
 $result = mysql_query($query);
-$ok=1;
-if(mysql_num_rows($result)) 
+$ok = 1;
+if( mysql_num_rows($result) )
 {
 	$row = mysql_fetch_object($result);
-	$then=$row->maxdate;
-	$time_lastcomment=mysql2date("U",$then);
-	$time_newcomment=mysql2date("U",$now);
-	if (($time_newcomment - $time_lastcomment) < 30)
+	$then = $row->maxdate;
+	$time_lastcomment = mysql2date("U",$then);
+	$time_newcomment = mysql2date("U",$now);
+	if( ($time_newcomment - $time_lastcomment) < 30)
 		$ok=0;
 }
-if( ! $ok ) 
+if( !$ok )
 {
 	errors_add( T_('You can only post a new comment every 30 seconds.') );
 }
 
 if( errors_display( T_('Cannot post comment, please correct these errors:'), 
-	'[<a href="javascript:history.go(-1)">'.T_('Back to comment editing').'</a>]' ) )
+	'[<a href="javascript:history.go(-1)">' . T_('Back to comment editing') . '</a>]' ) )
 {
 	exit();
 }
@@ -119,7 +124,7 @@ if( get_user_info( 'notify', $authordata ) )
 	else
 		$mail_from = "\"$author\" <$email>";
 	
-	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/" . phpversion());
 }
 
 
@@ -128,14 +133,11 @@ if( get_user_info( 'notify', $authordata ) )
  */
 if( $comment_cookies )
 {	// Set cookies:
-	if ($email == "") 
-	{
-		$email = " "; // this to make sure a cookie is set for 'no email'
-	}
-	if ($url == "") 
-	{
-		$url = " "; // this to make sure a cookie is set for 'no url'
-	}
+	if ($email == '')	
+		$email = ' '; // this to make sure a cookie is set for 'no email'
+	if ($url == '')	
+		$url = ' '; // this to make sure a cookie is set for 'no url'
+	
 	// fplanque: made cookies available for whole site
 	setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain);
 	setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain);
@@ -146,30 +148,30 @@ else
 	if( !empty($_COOKIE[$cookie_name]) ) 
 	{	
 		// echo "del1<br />";
-		setcookie("comment_author","", $cookie_expired, '/');
-		setcookie("comment_author","", $cookie_expired, $cookie_path, $cookie_domain);
+		setcookie('comment_author', '', $cookie_expired, '/');
+		setcookie('comment_author', '', $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 	if( !empty($_COOKIE['comment_author_email']) )
 	{	
 		// echo "del2<br />";
-		setcookie("comment_author_email","", $cookie_expired, '/');
-		setcookie("comment_author_email","", $cookie_expired, $cookie_path, $cookie_domain);
+		setcookie('comment_author_email', '', $cookie_expired, '/');
+		setcookie('comment_author_email', '', $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 	if( !empty($_COOKIE['comment_author_url']) )
 	{	
 		// echo "del3<br />";
-		setcookie("comment_author_url","", $cookie_expired, '/');
-		setcookie("comment_author_url","", $cookie_expired, $cookie_path, $cookie_domain);
+		setcookie('comment_author_url', '', $cookie_expired, '/');
+		setcookie('comment_author_url', '', $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 }
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-cache, must-revalidate");
-header("Pragma: no-cache");
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+header('Cache-Control: no-cache, must-revalidate');
+header('Pragma: no-cache');
 
 param( 'redirect_to', 'string' );
 $location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
