@@ -335,9 +335,32 @@ class DataObject
 	{
 		echo $this->ID;
 	}
+}
+
+
+/*
+ * {@internal object_history(-)}}
+ */
+function object_history( $pos_lastedit_user_ID, $pos_datemodified )
+{
+	global $UserCache;
+	if( !empty( $pos_lastedit_user_ID ) )
+	{
+		$User = & $UserCache->get_by_ID( $pos_lastedit_user_ID );
+
+		$modified = T_('Last modified on ').mysql2localedate( $pos_datemodified ).T_(' by ').$User->dget('preferedname');
+
+		return '<img src="img/clock.png" width="16" height="16" class="middle" alt="'.$modified.
+														'" title="'.$modified.'" /> ';
+	}
+}
+
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/22 17:48:20  fplanque
+ * skin cosmetics
+ *
  * Revision 1.3  2004/11/15 18:57:05  fplanque
  * cosmetics
  *
@@ -351,5 +374,4 @@ class DataObject
  * Edited code documentation.
  *
  */
-}
 ?>

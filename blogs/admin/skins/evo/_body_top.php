@@ -5,7 +5,7 @@
 // GLOBAL HEADER - APP TITLE, LOGOUT, ETC. :
 ?>
 <div id="header">
-	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
+	<?php echo $app_admin_logo; ?>
 
 	<div id="headinfo">
 

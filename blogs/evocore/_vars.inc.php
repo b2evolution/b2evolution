@@ -49,6 +49,10 @@ $app_shortname = 'b2evo';
 $app_version = '0.9.2-CVS';
 $new_db_version = 8070;				// next time: 8080
 $admin_path_seprator = ' :: ';
+$app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
+									'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
+									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
+
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
 // $debug = true;
@@ -272,6 +276,9 @@ $aspm_sources = array (
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/22 17:48:20  fplanque
+ * skin cosmetics
+ *
  * Revision 1.4  2004/11/17 16:18:04  fplanque
  * backoffice skinning experiment
  *

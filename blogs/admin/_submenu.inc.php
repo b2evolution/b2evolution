@@ -74,22 +74,16 @@ switch( $admin_tab )
 		echo '<div class="panelblock">';
 		return;
 }
-?>
-<div class="pt" >
-	<ul class="hack">
-		<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>
-	</ul>
-	<div class="panelblocktabs">
-		<ul class="tabs">
-		<?php
-			foreach( $submenu as $loop_tab => $loop_details )
-			{
-				echo (($loop_tab == $tab) ? '<li class="current">' : '<li>');
-				echo '<a href="'.$loop_details[1].'">'.$loop_details[0].'</a></li>';
-			}
-		?>
-		</ul>
-	</div>
-</div>
 
-<div class="tabbedpanelblock">
+// Include submenu display
+require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_submenu.php';
+
+echo '<div class="tabbedpanelblock">';
+
+/*
+ * $Log$
+ * Revision 1.5  2004/11/22 17:48:05  fplanque
+ * skin cosmetics
+ *
+ */
+?>

@@ -968,8 +968,8 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 		{ // Init list if necessary:
 			$global_param_list = array();
 		}
-		// echo "Memorize(".count($global_param_list).") 'var' => $var, 'type' => $type, 'default' => $default <br>";
-		$global_param_list[$var] = array( 'type' => $type, 'default' => $default );
+		$Debuglog->add( "Memorize(".count($global_param_list).") 'var' => $var, 'type' => $type, 'default' => $default <br>", 'params');
+		$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 	}
 
 	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
@@ -1012,6 +1012,10 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		{ // we don't want to include that one
 			$Debuglog->add( 'regenerate_url(): ignoring '.$var, 'params' );
 			continue;
+		}
+		else
+		{
+			$Debuglog->add( 'regenerate_url(): recycling '.$var, 'params' );
 		}
 
 		// Special cases:
@@ -1075,7 +1079,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
 	}
-
+	$Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
 }
 
@@ -1636,6 +1640,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.13  2004/11/22 17:48:20  fplanque
+ * skin cosmetics
+ *
  * Revision 1.12  2004/11/15 18:57:05  fplanque
  * cosmetics
  *

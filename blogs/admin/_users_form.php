@@ -195,7 +195,10 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		<legend><?php echo T_('User information') ?></legend>
 		<?php
 			form_info( T_('ID'), $edited_User->dget('ID') );
-			form_info( T_('Posts'), ( $action != 'newtemplate' ) ? get_usernumposts($edited_User->get('ID')) : '-' );
+			if( $app_shortname == 'b2evo' )
+			{	// TODO: move this out of the core?
+				form_info( T_('Posts'), ( $action != 'newtemplate' ) ? get_usernumposts($edited_User->get('ID')) : '-' );
+			}
 			form_info( T_('Created on'), $edited_User->dget('datecreated') );
 			form_info( T_('From IP'), $edited_User->dget('ip') );
 			form_info( T_('From Domain'), $edited_User->dget('domain') );
