@@ -73,7 +73,7 @@ class Blog extends DataObject
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->staticfilename = $db_row->blog_staticfilename;
 			$this->stub = $db_row->blog_stub;
-			$this->links_blog_ID = $db_row->blog_linkblog;
+			$this->links_blog_ID = $db_row->blog_links_blog_ID;
 			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;

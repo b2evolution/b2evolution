@@ -11,7 +11,8 @@
  * and semicolums (;) at the end of the lines. Otherwise you'll get some 
  * "unexpected T_STRING" parse errors!
  *
- * Contributors: you should override this file by creating a file named _config_TEST.php (see end of this file)
+ * Contributors: you should override this file by creating a file named _config_TEST.php 
+ * (see end of this file)
  */
 
 
@@ -60,6 +61,7 @@ $config_is_done = 0;
 
 # DO NOT EDIT THE FOLLOWING!
 @include_once dirname(__FILE__).'/_config_TEST.php';    // Put testing conf in there
+// For testing, you can also set $install_password
 require_once  dirname(__FILE__).'/_advanced.php';
 require_once  dirname(__FILE__).'/_locales.php';
 require_once  dirname(__FILE__).'/_formatting.php';

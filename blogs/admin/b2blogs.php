@@ -73,7 +73,7 @@ switch($action)
 
 		// DB INSERT
 		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl,
-									$blog_stub, '', '', '', '', $blog_locale, '', '', '', 0 );
+									$blog_stub, '', '', '', '', $blog_locale );
 
 		// Set default user permissions for this blog
 		// Proceed insertions:

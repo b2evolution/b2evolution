@@ -368,14 +368,14 @@ to
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
-			create_b2evo_tables();
-			populate_main_tables();
+		create_b2evo_tables();
+		populate_main_tables();
 		?>
 		<p><?php echo T_('Installation successful!')?></p>
-		<?php printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
-		<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="../admin/b2edit.php"', $random_password) ?>
-		<?php
-		break;
+		<?php 
+		printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
+	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="../admin/b2edit.php"', $random_password ); 
+ 		break;
 
 
 	case 'evoupgrade':

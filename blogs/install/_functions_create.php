@@ -95,7 +95,7 @@ function create_b2evo_tables()
 		blog_force_skin TINYINT(1) NOT NULL default 0,
 		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-		blog_linkblog INT(4) NOT NULL DEFAULT 0,
+		blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	 (blog_ID)
 	)";
@@ -438,20 +438,20 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>".T_("Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin.")."</strong>";
 	$blog_ID = 1;
-	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 4 );
 
 	$blog_shortname = $blog_a_short;
 	$blog_stub = 'a';
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
 	$blog_ID = 2;
 	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
-(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 4 );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_b.php');
 	$blog_ID = 3;
-	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 4 );
 
 	$blog_shortname = 'Linkblog';
 	$blog_stub = 'links';
@@ -459,7 +459,7 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_ID = 4;
-	$blog_linkblog_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_linkblog_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 0 /* no Link blog */ );
 
 	echo "OK.<br />\n";
 
@@ -613,7 +613,7 @@ function populate_main_tables()
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 	global $DB;
-	global $default_locale;
+	global $default_locale, $install_password;
 
 	create_default_blogs();
 
@@ -666,7 +666,14 @@ function populate_main_tables()
 	// USERS !
 	$User_Admin = & new User();
 	$User_Admin->set( 'login', 'admin' );
-	$random_password = substr(md5(uniqid(microtime())),0,6);
+	if( !isset( $install_password ) )
+	{
+		$random_password = substr(md5(uniqid(microtime())),0,6);
+	}
+	else
+	{
+		$random_password = $install_password;
+	}
 	$User_Admin->set( 'pass', md5($random_password) );	// random
 	$User_Admin->set( 'nickname', 'admin' );
 	$User_Admin->set( 'email', $admin_email );
