@@ -29,20 +29,20 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 
 			foreach( $userlist as $fuser )
 			{ // find prev/next id
-				if( $fuser['ID'] < $user )
+				if( $fuser->ID < $user )
 				{
-					if( $fuser['ID'] > $prevuserid )
+					if( $fuser->ID > $prevuserid )
 					{
-						$prevuserid = $fuser['ID'];
-						$prevuserlogin = $fuser['user_login'];
+						$prevuserid = $fuser->ID;
+						$prevuserlogin = $fuser->user_login;
 					}
 				}
-				elseif( $fuser['ID'] > $user )
+				elseif( $fuser->ID > $user )
 				{
-					if( $fuser['ID'] < $nextuserid || $nextuserid == 0 )
+					if( $fuser->ID < $nextuserid || $nextuserid == 0 )
 					{
-						$nextuserid = $fuser['ID'];
-						$nextuserlogin = $fuser['user_login'];
+						$nextuserid = $fuser->ID;
+						$nextuserlogin = $fuser->user_login;
 					}
 				}
 			}
