@@ -387,15 +387,17 @@ span.line
 #header li 
 {
   float:left;
-  background:url("img/left.gif") no-repeat left top;
+  background:url("img/left_both.gif") no-repeat left top;
   margin:0;
   padding:0 0 0 9px;
+	border-bottom:1px solid #765;
 }
 #header li a 
 {
   float:left;
   display:block;
-  background: url("img/right.gif") no-repeat right top;
+  white-space:nowrap;
+	background: url("img/right_both.gif") no-repeat right top;
   padding:4px 11px 3px 2px;
   text-decoration:none;
   /* font-weight:bold; */
@@ -405,19 +407,37 @@ span.line
    hides rule from IE5-Mac \*/
 #header li a {float:none;}
 /* End IE5-Mac hack */
-#header li a:hover 
-{
-	text-decoration: underline;
+
+#header li a:hover {
+  color:#333;
+	text-decoration: underline;		/* for IE */
 }
+
+#header li:hover {			/* Won't work in IE */
+  background-position:0% -150px;
+  color:#333;
+  }
+#header li:hover a {			/* Won't work in IE */
+  background-position:100% -150px;
+  color:#333;
+	text-decoration: none;
+  }
+
 #header li.current 
 {
-  background-image:url("img/left_on.gif");
+  background-position:0% -150px;
+  border-width:0;
 }
 #header li.current a 
 {
-  background-image:url("img/right_on.gif");
+  background-position:100% -150px;
   color:#333;
   padding-bottom:4px;
+}
+
+#header li.current a:hover
+{
+	text-decoration: underline;
 }
 
 div.menutoptitle 
