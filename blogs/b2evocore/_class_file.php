@@ -43,120 +43,134 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 /**
+ * These are the filetypes. The extension is a regular expression that must match the end of the file.
+ */
+$fm_filetypes = array( // {{{
+	'.ai' => T_('Adobe illustrator'),
+	'.bmp' => T_('Bmp image'),
+	'.bz'  => T_('Bz Archive'),
+	'.c' => T_('Source C '),
+	'.cgi' => T_('CGI file'),
+	'.conf' => T_('Config file'),
+	'.cpp' => T_('Source C++'),
+	'.css' => T_('Stylesheet'),
+	'.exe' => T_('Executable'),
+	'.gif' => T_('Gif image'),
+	'.gz'  => T_('Gz Archive'),
+	'.h' => T_('Header file'),
+	'.hlp' => T_('Help file'),
+	'.htaccess' => T_('Apache file'),
+	'.htm' => T_('Hyper text'),
+	'.html' => T_('Hyper text'),
+	'.htt' => T_('Windows access'),
+	'.inc' => T_('Include file'),
+	'.inf' => T_('Config File'),
+	'.ini' => T_('Setting file'),
+	'.jpe?g' => T_('Jpeg Image'),
+	'.js'  => T_('JavaScript'),
+	'.log' => T_('Log file'),
+	'.mdb' => T_('Access DB'),
+	'.midi' => T_('Media file'),
+	'.php' => T_('PHP script'),
+	'.phtml' => T_('php file'),
+	'.pl' => T_('Perl script'),
+	'.png' => T_('Png image'),
+	'.ppt' => T_('MS Power point'),
+	'.psd' => T_('Photoshop Image'),
+	'.ra' => T_('Real file'),
+	'.ram' => T_('Real file'),
+	'.rar' => T_('Rar Archive'),
+	'.sql' => T_('SQL file'),
+	'.te?xt' => T_('Text document'),
+	'.tgz' => T_('Tar gz archive'),
+	'.vbs' => T_('MS Vb script'),
+	'.wri' => T_('Document'),
+	'.xml' => T_('XML file'),
+	'.zip' => T_('Zip Archive'),
+); // }}}
+
+
+// load file icons
+require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
+
+
+/**
  * represents a file/dir
  */
 class File
 {
-	var $path;
-	var $name;
-
-
 	/**
 	 * Constructor
 	 */
 	function File( $name, $path = NULL )
 	{
-		$this->name = $name;
-		$this->path = trailing_slash( $path === NULL ? getcwd() : $path );
+		$this->setName( $name );
+		$this->_path = trailing_slash( $path === NULL ? getcwd() : $path );
 
 		if( is_dir( $path.$name ) )
 		{
-			$this->set_type( 'dir' );
-			$this->set_size( NULL );
+			$this->_isDir = true;
+			$this->_size = NULL;
 		}
 		else
 		{
-			$this->set_type( 'file' );
-			$this->set_size( @filesize( $this->path.$name ) );
+			$this->_isDir = false;
+			$this->_size = @filesize( $this->_path.$this->_name );
 		}
 
 		// for files and dirs
-		$this->set_lastm( @filemtime( $this->path.$name ) );
-		$this->set_perms( @fileperms( $this->path.$name ) );
-
+		$this->_lastm = @filemtime( $this->_path.$this->_name );
+		$this->_perms = @fileperms( $this->_path.$this->_name );
 	}
 
 
 	/**
 	 * Is the File a directory?
 	 */
-	function is_dir()
+	function isDir()
 	{
-		return ($this->type == 'dir');
-	}
-
-
-	function set_type( $type )
-	{
-		if( in_array( $type, array( 'file', 'dir' ) ) )
-		{
-			$this->type = $type;
-			return true;
-		}
-		return false;
-	}
-
-
-	/**
-	 * Set size
-	 *
-	 * @param mixed either size as integer or NULL for directories, when no full dir size requested
-	 * @return boolean false if param $size is invalid, true on success
-	 */
-	function set_size( $size )
-	{
-		if( is_numeric( $size ) || $size === NULL )
-		{
-			$this->size = $size;
-			return true;
-		}
-		$this->size = false;
-		return false;
-	}
-
-
-	function set_lastm( $timestamp )
-	{
-		$this->lastm = $timestamp;
-		return true;
-	}
-
-
-	function set_perms( $perms )
-	{
-		$this->perms = $perms;
-		return true;
+		return $this->_isDir;
 	}
 
 
 	/**
 	 * get the entries name
 	 */
-	function get_name()
+	function getName()
 	{
-		return $this->name;
+		return $this->_name;
 	}
 
 
-	/**
-	 * get the entries type
-	 * @return string either 'dir' or 'file'
-	 */
-	function get_type()
+	function getType()
 	{
-		return $this->type;
+		if( $this->isDir() )
+		{
+			return T_('directory');
+		}
+		global $fm_filetypes;
+
+		$filename = $this->getName();
+		foreach( $fm_filetypes as $type => $desc )
+		{
+			if( preg_match('/'.$type.'$/i', $filename) )
+			{
+				return $desc;
+			}
+		}
+		return T_('unknown');
 	}
 
 
-	function get_size()
+	function getSize()
 	{
-		return $this->size;
+		return $this->_size;
 	}
 
 
 	function get_lastmod()
 	{
-		return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->lastm );
+		return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->_lastm );
 	}
 
 
@@ -165,20 +179,20 @@ class File
 		switch( $type )
 		{
 			case 'raw':
-				return $this->perms;
+				return $this->_perms;
 			case 'lsl':
-				return translatePerm( $this->perms );
+				return translatePerm( $this->_perms );
 			case NULL:
 				if( is_windows() )
 				{
-					if( $this->perms & 0x0080 )
+					if( $this->_perms & 0x0080 )
 					{
 						return 'r+w';
 					}
 					else return 'r';
 				}
 			case 'octal':
-				return substr( sprintf('%o', $this->perms), -3 );
+				return substr( sprintf('%o', $this->_perms), -3 );
 		}
 
 		return false;
@@ -192,7 +206,7 @@ class File
 	 */
 	function get_imgsize( $param = 'widthxheight' )
 	{
-		return imgsize( $this->get_path( true ), $param );
+		return imgsize( $this->getPath( true ), $param );
 	}
 
 
@@ -200,9 +214,9 @@ class File
 	 * get path
 	 * @param boolean full path with name?
 	 */
-	function get_path( $withname = false )
+	function getPath( $withname = false )
 	{
-		return $withname ? $this->path.$this->name : $this->path;
+		return $withname ? $this->_path.$this->_name : $this->_path;
 	}
 
 
@@ -211,9 +225,9 @@ class File
 	 *
 	 * @return string the extension
 	 */
-	function get_ext()
+	function getExt()
 	{
-		if( preg_match('/\.([^.]+)$/', $this->name, $match) )
+		if( preg_match('/\.([^.]+)$/', $this->_name, $match) )
 		{
 			return $match[1];
 		}
@@ -229,16 +243,22 @@ class File
 	 *
 	 * @return string size as b/kb/mb/gd; or '&lt;dir&gt;'
 	 */
-	function get_nicesize()
+	function getSizeNice()
 	{
-		if( $this->size === NULL )
+		if( $this->_size === NULL )
 		{
 			return /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 		}
 		else
 		{
-			return bytesreadable( $this->size );
+			return bytesreadable( $this->_size );
 		}
+	}
+
+
+	function setName( $name )
+	{
+		$this->_name = $name;
 	}
 
 
@@ -250,9 +270,9 @@ class File
 	 */
 	function rename( $newname )
 	{
-		if( @rename( $this->get_path( true ), $this->get_path().$newname ) )
+		if( @rename( $this->getPath( true ), $this->getPath().$newname ) )
 		{
-			$this->name = $newname;
+			$this->setName( $newname );
 			return true;
 		}
 		else
@@ -271,11 +291,11 @@ class File
 	function chmod( $chmod )
 	{
 		$chmod = octdec( $chmod );
-		if( chmod( $this->get_path(true), $chmod) )
+		if( chmod( $this->getPath(true), $chmod) )
 		{
 			clearstatcache();
 			// update current entry
-			$this->set_perms( fileperms( $this->get_path(true) ) );
+			$this->set_perms( fileperms( $this->getPath(true) ) );
 			return $this->get_perms();
 		}
 		else

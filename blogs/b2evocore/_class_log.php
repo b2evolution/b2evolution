@@ -135,35 +135,24 @@ class Log
 		}
 
 		if( $style == NULL )
-		{
-			if( count($messages) == 1 )
-			{ // switch to <br>-style
-				$style = '<br>';
-			}
-			else
-			{ // open list
-				$disp .= '<ul>';
-			}
+		{ // '<br>' for a single message, '<ul>' for more
+			$style = count($messages) == 1 ? '<br>' : '<ul>';
 		}
 
 		// implode messages
 		if( $style == '<ul>' )
 		{
-			$disp .= '<li>'.implode( '</li><li>', $messages ).'</li>';
+			$disp .= '<ul><li>'.implode( "</li>\n<li>", $messages ).'</li></ul>';
 		}
 		elseif( $style == '<p>' )
 		{
-			$disp .= '<p>'.implode( '</p><p>', $messages ).'</p>';
+			$disp .= '<p>'.implode( "</p>\n<p>", $messages ).'</p>';
 		}
 		else
 		{
 			$disp .= implode( '<br />', $messages );
 		}
 
-		if( $style == '<ul>' )
-		{ // close list
-			$disp .= '</ul>';
-		}
 
 		if( !empty($foot) )
 		{

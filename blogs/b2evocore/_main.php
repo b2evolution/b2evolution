@@ -27,7 +27,7 @@
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * In addition, as a special exception, the copyright holders gives permission to link
+ * In addition, as a special exception, the copyright holders give permission to link
  * the code of this program with the PHP/SWF Charts library by maani.us (or with
  * modified versions of this library that use the same license as PHP/SWF Charts library
  * by maani.us), and distribute linked combinations including the two. You must obey the

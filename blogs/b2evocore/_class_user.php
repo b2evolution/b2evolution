@@ -160,7 +160,7 @@ class User extends DataObject
 	 * @param Log a Log object, where Messages get appended (uses levels 'note' and 'error')
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
-	function get_mediadir( &$Log )
+	function getMediaDir( &$Log )
 	{
 		global $basepath, $media_subdir;
 
@@ -189,7 +189,7 @@ class User extends DataObject
 	 *
 	 * @return string the URL
 	 */
-	function get_mediaurl()
+	function getMediaUrl()
 	{
 		global $baseurl, $media_subdir;
 
@@ -197,10 +197,9 @@ class User extends DataObject
 	}
 
 
-	/*
-	 * User::set(-)
-	 *
+	/**
 	 * Set param value
+	 *
 	 */
 	function set( $parname, $parvalue )
 	{

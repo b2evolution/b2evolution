@@ -25,7 +25,7 @@ class ArchiveList extends DataObjectList
 	var $blog;
 	var $archive_mode;
 	var $arc_w_last;
-	
+
 	/**
 	 * Constructor
    *
@@ -42,10 +42,10 @@ class ArchiveList extends DataObjectList
    * @param mixed
    * @param integer
 	 */
-	function ArchiveList( 
-		$blog = 1, 
+	function ArchiveList(
+		$blog = 1,
 		$archive_mode = 'monthly',
-		$show_statuses = array(),					
+		$show_statuses = array(),
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$limit = '' )
@@ -64,31 +64,31 @@ class ArchiveList extends DataObjectList
 		 */
 		$where = ' WHERE '.statuses_where_clause( $show_statuses );
 		$where_link = ' AND ';
-		
+
 
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
-		if( !empty($timestamp_min) ) 
+		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
-		if( !empty($timestamp_max) ) 
+		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
-	
+
 		// Do we need to restrict categories:
-		if( $blog > 1 ) 
+		if( $blog > 1 )
 		{	// Blog #1 aggregates all
 			$where .= $where_link.' cat_blog_ID = '.$blog;
 			$where_link = ' AND ';
 		}
-		
+
 		if( !empty($limit) )
 		{
 			$limit = ' LIMIT 0,'.$limit;
@@ -148,10 +148,10 @@ class ArchiveList extends DataObjectList
 		// echo $this->request.'<br/>';
 
 		$this->result = $DB->get_results( $this->request, ARRAY_A );;
-	
+
 		$this->result_num_rows = $DB->num_rows;
 		// echo 'rows='.$this->result_num_rows.'<br/>';
-		
+
 		$this->arc_w_last = '';
 	}
 

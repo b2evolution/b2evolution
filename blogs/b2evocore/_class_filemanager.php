@@ -143,9 +143,9 @@ class FileManager extends Filelist
 	 * @param string order files by what? (NULL means 'name')
 	 * @param boolean order ascending or descending? NULL means ascending for 'name', descending for other
 	 */
-	function FileManager( &$cUser, $url, $root, $path = '', $filter = NULL, $filter_regexp = NULL, $order = NULL, $asc = NULL )
+	function FileManager( &$cUser, $url, $root, $path = '', $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $asc = NULL )
 	{
-		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
+		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $BlogCache;
 
 		$this->User =& $cUser;
@@ -169,8 +169,8 @@ class FileManager extends Filelist
 
 				case 'user':
 					$tUser = new User( get_userdata($root_A[1]) );
-					$this->root_dir = $tUser->get_mediadir( $this->Messages );
-					$this->root_url = $tUser->get_mediaurl();
+					$this->root_dir = $tUser->getMediaDir( $this->Messages );
+					$this->root_url = $tUser->getMediaUrl();
 					break;
 			}
 		}
@@ -178,8 +178,8 @@ class FileManager extends Filelist
 		{
 			case NULL:
 			case 'user':
-				$this->root_dir = $this->User->get_mediadir( $this->Messages );
-				$this->root_url = $this->User->get_mediaurl();
+				$this->root_dir = $this->User->getMediaDir( $this->Messages );
+				$this->root_url = $this->User->getMediaUrl();
 				break;
 		}
 
@@ -232,13 +232,13 @@ class FileManager extends Filelist
 
 		$this->url = $url; // base URL, used for created links
 
-		$this->filter = $filter;
-		$this->filter_regexp = $filter_regexp;
+		$this->filterString = $filterString;
+		$this->filterIsRegexp = $filterIsRegexp;
 
-		if( $this->filter_regexp && !is_regexp( $this->filter ) )
+		if( $this->filterIsRegexp && !is_regexp( $this->filterString ) )
 		{
-			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filter ) );
-			$this->filter = '.*';
+			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filterString ) );
+			$this->filterString = '.*';
 		}
 		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastm', 'perms' ) ) ? $order : NULL );
 		$this->orderasc = ( $asc === NULL  ? NULL : (bool)$asc );
@@ -258,59 +258,8 @@ class FileManager extends Filelist
 		$this->debug( $this->path, 'path' );
 
 
-		// load file icons
-		require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
-
-		/**
-		 * These are the filetypes. The extension is a regular expression that must match the end of the file.
-		 */
-		$this->filetypes = array( // {{{
-			'.ai' => T_('Adobe illustrator'),
-			'.bmp' => T_('Bmp image'),
-			'.bz'  => T_('Bz Archive'),
-			'.c' => T_('Source C '),
-			'.cgi' => T_('CGI file'),
-			'.conf' => T_('Config file'),
-			'.cpp' => T_('Source C++'),
-			'.css' => T_('Stylesheet'),
-			'.exe' => T_('Executable'),
-			'.gif' => T_('Gif image'),
-			'.gz'  => T_('Gz Archive'),
-			'.h' => T_('Header file'),
-			'.hlp' => T_('Help file'),
-			'.htaccess' => T_('Apache file'),
-			'.htm' => T_('Hyper text'),
-			'.html' => T_('Hyper text'),
-			'.htt' => T_('Windows access'),
-			'.inc' => T_('Include file'),
-			'.inf' => T_('Config File'),
-			'.ini' => T_('Setting file'),
-			'.jpe?g' => T_('Jpeg Image'),
-			'.js'  => T_('JavaScript'),
-			'.log' => T_('Log file'),
-			'.mdb' => T_('Access DB'),
-			'.midi' => T_('Media file'),
-			'.php' => T_('PHP script'),
-			'.phtml' => T_('php file'),
-			'.pl' => T_('Perl script'),
-			'.png' => T_('Png image'),
-			'.ppt' => T_('MS Power point'),
-			'.psd' => T_('Photoshop Image'),
-			'.ra' => T_('Real file'),
-			'.ram' => T_('Real file'),
-			'.rar' => T_('Rar Archive'),
-			'.sql' => T_('SQL file'),
-			'.te?xt' => T_('Text document'),
-			'.tgz' => T_('Tar gz archive'),
-			'.vbs' => T_('MS Vb script'),
-			'.wri' => T_('Document'),
-			'.xml' => T_('XML file'),
-			'.zip' => T_('Zip Archive'),
-		); // }}}
-
-
 		// the directory entries
-		parent::Filelist( $this->cwd, $this->filter, $this->filter_regexp, $this->showhidden );
+		parent::Filelist( $this->cwd );
 		parent::load();
 		parent::restart();
 
@@ -338,11 +287,11 @@ class FileManager extends Filelist
 	 * @param string override order
 	 * @param integer override asc
 	 */
-	function curl( $root = NULL, $path = NULL, $filter = NULL, $filter_regexp = NULL, $order = NULL, $orderasc = NULL )
+	function curl( $root = NULL, $path = NULL, $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $orderasc = NULL )
 	{
 		$r = $this->url;
 
-		foreach( array('root', 'path', 'filter', 'filter_regexp', 'order', 'orderasc') as $check )
+		foreach( array('root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc') as $check )
 		{
 			if( $$check === false )
 			{ // don't include
@@ -365,10 +314,10 @@ class FileManager extends Filelist
 	/**
 	 * generates hidden input fields for forms, based on {@link curl()}}
 	 */
-	function form_hiddeninputs( $root = NULL, $path = NULL, $filter = NULL, $filter_regexp = NULL, $order = NULL, $asc = NULL )
+	function form_hiddeninputs( $root = NULL, $path = NULL, $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $asc = NULL )
 	{
 		// get curl(), remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $filter, $filter_regexp, $order, $asc ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $filterString, $filterIsRegexp, $order, $asc ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -388,7 +337,7 @@ class FileManager extends Filelist
 	 *
 	 * @return array of arrays for each root: array( type [blog/user], id, name )
 	 */
-	function get_roots()
+	function getRootList()
 	{
 		global $BlogCache;
 
@@ -412,31 +361,34 @@ class FileManager extends Filelist
 	}
 
 
-	function link_sort( $type, $atext )
+	/**
+	 *
+	 */
+	function getLinkSort( $type, $atext )
 	{
 		$r = '<a href="'
 					.$this->curl( NULL, NULL, NULL, NULL, $type, false );
 
 		if( $this->order == $type )
 		{ // change asc
-			$r .= '&amp;asc='.(1 - $this->is_sortingasc());
+			$r .= '&amp;asc='.(1 - $this->isSortingAsc());
 		}
 
 		$r .= '" title="'
-					.( ($this->order == $type && !$this->is_sortingasc($type))
-						|| ( $this->order != $type && $this->is_sortingasc($type) )
+					.( ($this->order == $type && !$this->isSortingAsc($type))
+						|| ( $this->order != $type && $this->isSortingAsc($type) )
 							? T_('sort ascending by this column') : T_('sort descending by this column')
-					).'">'.$atext.'</a>';
+					).'">'.$atext;
 
 		if( $this->order == $type )
 		{ // add asc/desc image
-			if( $this->is_sortingasc() )
-				$r .= ' '.$this->get_icon( 'ascending', 'imgtag' );
+			if( $this->isSortingAsc() )
+				$r .= ' '.$this->getIcon( 'ascending', 'imgtag' );
 			else
-				$r .= ' '.$this->get_icon( 'descending', 'imgtag' );
+				$r .= ' '.$this->getIcon( 'descending', 'imgtag' );
 		}
 
-		return $r;
+		return $r.'</a>';
 	}
 
 
@@ -446,15 +398,15 @@ class FileManager extends Filelist
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object on success, false on end of list
 	 */
-	function get_File_next( $type = '' )
+	function getNextFile( $type = '' )
 	{
-		$this->cur_File = parent::get_File_next( $type );
+		$this->cur_File = parent::getNextFile( $type );
 
 		return $this->cur_File;
 	}
 
 
-	function get_File_type( $File = NULL )
+	function getFileType( $File = NULL )
 	{
 		if( $File === NULL )
 		{
@@ -486,22 +438,7 @@ class FileManager extends Filelist
 			return false;
 		}}}
 
-		if( $File->get_type() == 'dir' )
-		{
-			return T_('directory');
-		}
-		else
-		{
-			$filename = $File->get_name();
-			foreach( $this->filetypes as $type => $desc )
-			{
-				if( preg_match('/'.$type.'$/i', $filename) )
-				{
-					return $desc;
-				}
-			}
-			return T_('unknown');
-		}
+		return $File->getType();
 	}
 
 
@@ -510,11 +447,11 @@ class FileManager extends Filelist
 	 *
 	 * @param File the File object
 	 */
-	function get_File_url( $File )
+	function getFileUrl( $File )
 	{
-		if( method_exists( $File, 'get_name' ) )
+		if( method_exists( $File, 'getName' ) )
 		{
-			return $this->root_url.$this->path.$File->get_name();
+			return $this->root_url.$this->path.$File->getName();
 		}
 		else
 		{
@@ -523,42 +460,42 @@ class FileManager extends Filelist
 	}
 
 
-	function get_link_curfile( $param = '' )
+	function getLinkCurfile( $param = '' )
 	{
-		if( $this->cur_File->get_type() == 'dir' && $param != 'forcefile' )
+		if( $this->cur_File->isDir() && $param != 'forcefile' )
 		{
-			return $this->curl( NULL, $this->path.$this->cur_File->get_name() );
+			return $this->curl( NULL, $this->path.$this->cur_File->getName() );
 		}
 		else
 		{
-			return $this->curl( NULL, $this->path ).'&amp;file='.urlencode( $this->cur_File->get_name() );
+			return $this->curl( NULL, $this->path ).'&amp;file='.urlencode( $this->cur_File->getName() );
 		}
 	}
 
 
-	function get_link_curfile_editperm()
+	function getLinkCurfile_editperm()
 	{
-		return $this->get_link_curfile('forcefile').'&amp;action=editperm';
+		return $this->getLinkCurfile('forcefile').'&amp;action=editperm';
 	}
 
 
-	function get_link_curfile_edit()
+	function getLinkCurfile_edit()
 	{
-		if( $this->cur_File->get_type() == 'dir' )
+		if( $this->cur_File->isDir() )
 		{
 			return false;
 		}
-		return $this->get_link_curfile().'&amp;action=edit';
+		return $this->getLinkCurfile().'&amp;action=edit';
 	}
 
 
-	function get_link_curfile_copymove()
+	function getLinkCurfile_copymove()
 	{
-		if( $this->cur_File->get_type() == 'dir' )
+		if( $this->cur_File->isDir() )
 		{
 			return false;
 		}
-		return $this->get_link_curfile().'&amp;action=copymove';
+		return $this->getLinkCurfile().'&amp;action=copymove';
 	}
 
 
@@ -566,9 +503,9 @@ class FileManager extends Filelist
 	 * get link to delete current file
 	 * @return string the URL
 	 */
-	function get_link_curfile_rename()
+	function getLinkCurfile_rename()
 	{
-		return $this->get_link_curfile('forcefile').'&amp;action=rename';
+		return $this->getLinkCurfile('forcefile').'&amp;action=rename';
 	}
 
 
@@ -576,17 +513,18 @@ class FileManager extends Filelist
 	 * get link to delete current file
 	 * @return string the URL
 	 */
-	function get_link_curfile_delete()
+	function getLinkCurfile_delete()
 	{
-		return $this->get_link_curfile('forcefile').'&amp;action=delete';
+		return $this->getLinkCurfile('forcefile').'&amp;action=delete';
 	}
 
 
 	/**
-	 * get the link to the parent folder
-	 * @return mixed URL or false if
+	 * Get the link to the parent folder
+	 *
+	 * @return mixed URL or false if in root
 	 */
-	function get_link_parent()
+	function getLinkParent()
 	{
 		if( empty($this->path) )
 		{ // cannot go higher
@@ -597,53 +535,11 @@ class FileManager extends Filelist
 
 
 	/**
-	 * get the link to current's root's home directory
+	 * Get the link to current root's home directory
 	 */
-	function get_link_home()
+	function getLinkHome()
 	{
 		return $this->curl( 'user', false );
-	}
-
-
-	/**
-	 * Get an attribute of the current entry,
-	 *
-	 * @param string property
-	 * @param string optional parameter
-	 * @param string gets through sprintf where %s gets replaced with the result
-	 */
-	function depr_cget( $what, $param = '', $displayiftrue = '' )
-	{
-		echo '<p class="error">bad cget: ['.$what.']</p>';
-		return;
-		switch( $what )
-		{
-			case 'type':
-				$r = $this->type( 'cfile' );
-				break;
-
-			case 'iconfile':
-				$r = $this->get_icon( 'cfile', 'file' );
-				break;
-
-			case 'iconurl':
-				$r = $this->get_icon( 'cfile', 'url' );
-				break;
-
-			case 'iconsize':
-				$r = $this->get_icon( 'cfile', 'size', $param );
-				break;
-
-			default:
-				$r = ( isset( $this->current_entry[ $what ] ) ) ? $this->current_entry[ $what ] : false;
-				break;
-		}
-		if( $r && !empty($displayiftrue) )
-		{
-			return sprintf( $displayiftrue, $r );
-		}
-		else
-			return $r;
 	}
 
 
@@ -654,23 +550,25 @@ class FileManager extends Filelist
 	 * @param string what to return for that icon (file, url, size {@link see imgsize()}})
 	 * @param string additional parameter (for size)
 	 */
-	function get_icon( $for, $what = 'imgtag', $param = '' )
+	function getIcon( $for, $what = 'imgtag', $param = '' )
 	{
-		if( $for == 'cfile' )
+		global $fm_fileicons, $fm_fileicons_special;
+
+		if( is_a( $for, 'file' ) )
 		{
 			if( !$this->cur_File )
 			{
 				$iconfile = false;
 			}
-			elseif( $this->cur_File->get_type() == 'dir' )
+			elseif( $this->cur_File->isDir() )
 			{
-				$iconfile = $this->fileicons_special['folder'];
+				$iconfile = $fm_fileicons_special['folder'];
 			}
 			else
 			{
-				$iconfile = $this->fileicons_special['unknown'];
-				$filename = $this->cur_File->get_name();
-				foreach( $this->fileicons as $ext => $imgfile )
+				$iconfile = $fm_fileicons_special['unknown'];
+				$filename = $this->cur_File->getName();
+				foreach( $fm_fileicons as $ext => $imgfile )
 				{
 					if( preg_match( '/'.$ext.'$/i', $filename, $match ) )
 					{
@@ -680,11 +578,14 @@ class FileManager extends Filelist
 				}
 			}
 		}
-		elseif( isset( $this->fileicons_special[$for] ) )
+		elseif( isset( $fm_fileicons_special[$for] ) )
 		{
-			$iconfile = $this->fileicons_special[$for];
+			$iconfile = $fm_fileicons_special[$for];
 		}
-		else $iconfile = false;
+		else
+		{
+			$iconfile = false;
+		}
 
 		if( !$iconfile || !file_exists( $this->imgpath.$iconfile ) )
 		{
@@ -707,19 +608,18 @@ class FileManager extends Filelist
 				break;
 
 			case 'imgtag':
-				$r = '<img class="middle" src="'.$this->get_icon( $for, 'url' ).'" '.$this->get_icon( $for, 'size', 'string' )
+				$r = '<img class="middle" src="'.$this->getIcon( $for, 'url' ).'" '.$this->getIcon( $for, 'size', 'string' )
 				.' alt="';
 
 				if( $for == 'cfile' )
 				{ // extension as alt-tag for cfile-icons
-					$r .= $this->cur_File->get_ext();
+					$r .= $this->cur_File->getExt();
 				}
 
-				$r .= '" title="'.$this->get_File_type( $for );
+				$r .= '" title="'.$this->getFileType( $for );
 
 				$r .= '" />';
 				break;
-
 
 			default:
 				echo 'unknown what: '.$what;
@@ -736,7 +636,7 @@ class FileManager extends Filelist
 	 * @param string the action (chmod)
 	 * @param string parameter for action
 	 */
-	function cdo_file( $filename, $what, $param = '' )
+	function obsolete__cdo_file( $filename, $what, $param = '' )
 	{
 		if( $this->loadc( $filename ) )
 		{
@@ -873,7 +773,7 @@ class FileManager extends Filelist
 		{
 			$Debuglog->add( 'Realname for dir ['.$suggested_name.']: ['.$realname.']', 'fileman' );
 		}
-		if( $this->createdir( $realname, $path, $chmod ) )
+		if( $this->createDir( $realname, $path, $chmod ) )
 		{
 			return $path.'/'.$realname;
 		}
@@ -891,7 +791,7 @@ class FileManager extends Filelist
 	 * @param integer permissions for the new directory (octal format)
 	 * @return boolean true on success, false on failure
 	 */
-	function createdir( $dirname, $path = NULL, $chmod = NULL )
+	function createDir( $dirname, $path = NULL, $chmod = NULL )
 	{
 		if( $path == NULL )
 		{
@@ -910,8 +810,9 @@ class FileManager extends Filelist
 			$this->Messages->add( T_('Cannot create empty directory.') );
 			return false;
 		}
-		elseif( !mkdir( $path.$dirname, $chmod ) )
+		elseif( !@mkdir( $path.$dirname, $chmod ) )
 		{
+			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $path ) );
 			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $path ) );
 			return false;
 		}
@@ -926,7 +827,7 @@ class FileManager extends Filelist
 	 * @param string filename
 	 * @param integer permissions for the new file (octal format)
 	 */
-	function createfile( $filename, $chmod = NULL )
+	function createFile( $filename, $chmod = NULL )
 	{
 		$path = $this->cwd.'/'.$filename;
 
@@ -960,16 +861,6 @@ class FileManager extends Filelist
 	}
 
 
-	/**
-	 * Reloads the page where Filemanager was called for, useful when a file or dir has been created.
-	 */
-	function reloadpage()
-	{
-		header( 'Location: '.$this->curl() );
-		exit;
-	}
-
-
 	function debug( $what, $desc, $forceoutput = 0 )
 	{
 		global $Debuglog;
@@ -992,7 +883,7 @@ class FileManager extends Filelist
 	 * returns cwd, where the accessible directories (below root)  are clickable
 	 * @return string cwd as clickable html
 	 */
-	function cwd_clickable()
+	function getCwdClickable()
 	{
 		if( !$this->cwd )
 		{

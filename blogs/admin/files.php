@@ -87,7 +87,7 @@ $Fileman = new FileManager( $current_User, 'files.php', $root, $path, $filter, $
 
 if( !empty($file) )
 { // a file is given as parameter
-	$curFile =& $Fileman->get_File_by_filename( $file );
+	$curFile =& $Fileman->getFileByFilename( $file );
 
 	if( !$curFile )
 	{
@@ -118,11 +118,11 @@ if( $action == '' && $file != '' && $curFile )
 		<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
 
 		<?php
-			if( is_image( $file ) )
+			if( isImage( $file ) )
 			{ // display image file
 				?>
 				<div class="center">
-					<img class="framed" src="<?php echo $Fileman->get_File_url( $curFile ) ?>" <?php echo $curFile->get_imgsize( 'string' ) ?> />
+					<img class="framed" src="<?php echo $Fileman->getFileUrl( $curFile ) ?>" <?php echo $curFile->get_imgsize( 'string' ) ?> />
 				</div>
 				<?php
 			}
@@ -242,7 +242,7 @@ if( $selaction != '' )
 		$curFiles = array();
 		foreach( $selectedfiles as $file )
 		{
-			$selectedFiles[] = $Fileman->get_File_by_filename( $file );
+			$selectedFiles[] = $Fileman->getFileByFilename( $file );
 		}
 
 		switch( $selaction )
@@ -263,7 +263,7 @@ if( $selaction != '' )
 
 					foreach( $selectedFiles as $lFile )
 					{
-						if( $lFile->get_type() == 'dir' )
+						if( $lFile->isDir() )
 						{
 							$msg_action .= sprintf('<li>'.T_('Directory [%s]'."</li>\n"), $file);
 						}
@@ -306,7 +306,7 @@ if( $selaction != '' )
 					$arraylist = array();
 					foreach( $selectedFiles as $File )
 					{
-						$arraylist[] = $File->get_name();
+						$arraylist[] = $File->getName();
 					}
 					$zipfile->add_files( $arraylist );
 
@@ -344,33 +344,34 @@ switch( $action ) // {{{ (we catched empty action before)
 
 		if( $createnew == 'dir' )
 		{
-			if( $Fileman->createdir( $createname ) )
-			{
-				$Fileman->reloadpage();
-			}
-			break;
+			$Fileman->createDir( $createname );
 		}
 		elseif( $createnew == 'file' )
 		{
-			param( 'createname', 'string', '' );
-			if( $Fileman->createfile( $createname ) )
-			{
-				$Fileman->reloadpage();
-			}
-			break;
+			$Fileman->createFile( $createname );
 		}
 		break;
 
 	case 'delete':
+		if( !$curFile )
+		{
+			break;
+		}
 		// TODO: checkperm!
-		$filename = $curFile->get_name();
+		$filename = $curFile->getName();
 		if( !$Fileman->unlink( $curFile ) )
 		{
-			$Fileman->Messages->add( sprintf( T_('Could not delete [%s].'), $filename ) );
+			$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
+																						T_('Could not delete directory [%s] (not empty?).') :
+																						T_('Could not delete [%s].') ),
+																						$filename ) );
 		}
 		else
 		{
-			$Fileman->Messages->add( sprintf( T_('Deleted file [%s].'), $filename ), 'note' );
+			$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
+																						T_('Deleted directory [%s].') :
+																						T_('Deleted file [%s].') ),
+																						$filename ), 'note' );
 		}
 		break;
 
@@ -385,12 +386,12 @@ switch( $action ) // {{{ (we catched empty action before)
 
 		if( !empty($newname) )
 		{ // rename the file
-			if( !is_filename($newname) )
+			if( !isFilename($newname) )
 			{
 				$Fileman->Messages->add( sprintf( T_('[%s] is not a valid filename.'), $newname ) );
 				$dontrename = true;
 			}
-			elseif( file_exists( $curFile->get_path().$newname ) )
+			elseif( $existingFile = $Fileman->getFileByFilename( $newname ) )
 			{ // target filename already given to another file
 				if( !$overwrite )
 				{
@@ -408,7 +409,7 @@ switch( $action ) // {{{ (we catched empty action before)
 				}
 				else
 				{ // unlink existing file
-					if( !$curFile->unlink() )
+					if( !$Fileman->unlink( $existingFile ) )
 					{
 						$Fileman->Messages->add( sprintf( T_('Could not delete [%s].'), $newname ) );
 						$dontrename = true;
@@ -439,14 +440,16 @@ switch( $action ) // {{{ (we catched empty action before)
 			$msg_action = '';
 		}
 		$msg_action .= '
-		<form action="">
+		<form name="form_rename" action="">
 		'.$Fileman->form_hiddeninputs().'
 		<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 		<input type="hidden" name="action" value="rename" />
 		<label for="form_newname">'.sprintf( T_('New name for [%s]:'), $file ).'</label>
-		<input type="text" id="form_newname" name="newname" value="'.format_to_output( $newname, 'formvalue' ).'" maxlength="255" size="30" />
+		<input type="text" id="form_newname" name="newname" value="'
+		.format_to_output( empty($newname) ? $file : $newname, 'formvalue' ).'" maxlength="255" size="30" />
 		<input type="submit" value="'.format_to_output( T_('Rename it'), 'formvalue' ).'" />
 		</form>';
+		$js_focus = 'document.form_rename.form_newname';
 
 		break;
 
@@ -463,15 +466,15 @@ switch( $action ) // {{{ (we catched empty action before)
 			$newperms = $curFile->chmod( $chmod );
 			if( $newperms === false )
 			{
-				$Fileman->Messages->add( sprintf( T_('Failed to set permissions on [%s] to [%s].'), $curFile->get_name(), $chmod ) );
+				$Fileman->Messages->add( sprintf( T_('Failed to set permissions on [%s] to [%s].'), $curFile->getName(), $chmod ) );
 			}
 			elseif( $newperms === $oldperms )
 			{
-				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $curFile->get_name() ), 'note' );
+				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $curFile->getName() ), 'note' );
 			}
 			else
 			{
-				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $curFile->get_name(), $curFile->get_perms() ), 'note' );
+				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $curFile->getName(), $curFile->get_perms() ), 'note' );
 			}
 			#pre_dump( $Fileman->cdo_file( $file, 'chmod', $chmod ), 'chmod!');
 		}
@@ -495,18 +498,14 @@ switch( $action ) // {{{ (we catched empty action before)
 			else
 			{
 				$msg_action .= '<input type="text" name="chmod" value="'.$curFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
+				$js_focus = 'document.form_chmod.chmod';
 			}
 			$msg_action .= '
 			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
 			</form>
-			<script type="text/javascript">
-				<!--
-				document.form_chmod.chmod.focus();
-				// -->
-			</script>
 			';
-		}
 
+		}
 		break;
 
 	case 'upload':
@@ -597,6 +596,16 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 		if( isset($msg_action) )
 		{
 			echo $msg_action;
+			if( isset( $js_focus ) )
+			{
+				echo '
+				<script type="text/javascript">
+					<!--
+					'.$js_focus.'.focus();
+					// -->
+				</script>';
+
+			}
 		}
 		?>
 	</div>
@@ -606,10 +615,10 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 ?>
 <div class="panelblock">
 	<?php
-	$rootlist = $Fileman->get_roots();
+	$rootlist = $Fileman->getRootList();
 
 	// link to user home
-	echo '<a class="toolbaritem" href="'.$Fileman->get_link_home().'">'.$Fileman->get_icon( 'home', 'imgtag' ).'</a>';
+	echo '<a class="toolbaritem" href="'.$Fileman->getLinkHome().'">'.$Fileman->getIcon( 'home', 'imgtag' ).'</a>';
 
 	if( count($rootlist) > 1 )
 	{ // provide list of roots
@@ -646,7 +655,7 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 
 	<div class="toolbaritem_group">
 		<?php
-		if( $Fileman->is_filtering() )
+		if( $Fileman->isFiltering() )
 		{ // "reset filter" form
 		?>
 		<form action="files.php" name="unfilter" class="toolbaritem">
@@ -659,7 +668,7 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 
 		<form action="files.php" name="filter" class="toolbaritem">
 			<?php echo $Fileman->form_hiddeninputs( NULL, NULL, false, false ) ?>
-			<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>" size="20" />
+			<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
 			<input type="checkbox" name="filter_regexp" title="<?php echo format_to_output( T_('Filter is regular expression'), 'formvalue' ) ?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> />
 			<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 		</form>
@@ -674,10 +683,10 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 <table class="grouped">
 <caption>
 <?php
-echo T_('Current directory').': '.$Fileman->cwd_clickable();
-if( $Fileman->is_filtering() )
+echo T_('Current directory').': '.$Fileman->getCwdClickable();
+if( $Fileman->isFiltering() )
 {
-	echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';
+	echo '<br />'.T_('Filter').': ['.$Fileman->getFilter().']';
 }
 ?>
 </caption>
@@ -685,14 +694,14 @@ if( $Fileman->is_filtering() )
 <tr>
 	<th colspan="2">
 		<?php
-		disp_cond( $Fileman->get_link_parent(), '&nbsp;<a href="%s">'.$Fileman->get_icon( 'parent', 'imgtag' ).'</a>' );
+		disp_cond( $Fileman->getLinkParent(), '&nbsp;<a href="%s">'.$Fileman->getIcon( 'parent', 'imgtag' ).'</a>' );
 		?>
 	</th>
-	<th><?php echo $Fileman->link_sort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
-	<th><?php echo $Fileman->link_sort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
-	<th><?php echo $Fileman->link_sort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
-	<th><?php echo $Fileman->link_sort( 'lastm', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
-	<th><?php echo $Fileman->link_sort( 'perms', /* TRANS: file's permissions */ T_('Perms') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'lastm', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions */ T_('Perms') ) ?></th>
 	<th><?php echo /* TRANS: file action, (html) view */ T_('Action') ?></th>
 </tr>
 </thead>
@@ -704,47 +713,54 @@ param( 'checkall', 'integer', NULL );  // Non-Javascript-CheckAll
 $i = 0;
 $Fileman->sort();
 
-while( $lFile = $Fileman->get_File_next() )
+while( $lFile = $Fileman->getNextFile() )
 { // loop through all Files
 	?>
-	<tr<?php if( $i%2 ) echo ' class="odd"' ?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();">
+
+	<tr<?php
+		if( $i%2 ) echo ' class="odd"';
+		?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->get_name(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
-		<td class="icon" onclick="window.location.href = '<?php echo $Fileman->get_link_curfile() ?>'">
-			<?php echo $Fileman->get_icon( 'cfile', 'imgtag' ) ?>
+		<td class="icon" onclick="window.location.href = '<?php echo $Fileman->getLinkCurfile() ?>'">
+			<?php echo $Fileman->getIcon( $lFile, 'imgtag' ) ?>
 		</td>
 		<td class="filename">
-			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click(); window.open('<?php echo $Fileman->get_link_curfile().( $lFile->is_dir() ? '&amp;mode=browseonly' : '' ) ?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php echo $i ?>'), 'toolbar=0,resizable=yes,<?php
-			if( $r = $lFile->get_imgsize( 'widthheight' ) )
-			{ // make the popup 42px wider/higher than the image
-				echo 'width='.($r[0]+42).',height='.($r[1]+42);
-			}
-			else
-			{ // default popup-size: 800x600
-				echo 'width=800,height=600';
-			}
-			?>');" id="button_new_<?php echo $i ?>" title="Open in new window">
-			<?php echo $Fileman->get_icon( 'window_new', 'imgtag' ) ?>
-			</button>
-			<a onclick="clickedonlink = 1;" href="<?php echo $Fileman->get_link_curfile() ?>">
+			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php
+				echo $i ?>].click(); window.open('<?php
+				echo $Fileman->getLinkCurfile().( $lFile->isDir() ? '&amp;mode=browseonly' : '' );
+				?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php
+				echo $i ?>'), 'toolbar=0,resizable=yes,<?php
+				if( $r = $lFile->get_imgsize( 'widthheight' ) )
+				{ // make the popup 42px wider/higher than the image
+					echo 'width='.($r[0]+42).',height='.($r[1]+42);
+				}
+				else
+				{ // default popup-size: 800x600
+					echo 'width=800,height=600';
+				}
+				?>');" id="button_new_<?php echo $i ?>" title="Open in new window">
+				<?php echo $Fileman->getIcon( 'window_new', 'imgtag' )
+			?></button>
+			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkCurfile() ?>">
 			<?php
-			echo $lFile->get_name();
+			echo $lFile->getName();
 			disp_cond( $lFile->get_imgsize(), ' (%s)' )
 			?>
 			</a>
 		</td>
-		<td class="type"><?php echo $Fileman->get_File_type() ?></td>
-		<td class="size"><?php echo $lFile->get_nicesize() ?></td>
+		<td class="type"><?php echo $lFile->getType() ?></td>
+		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
 		<td class="timestamp"><?php echo $lFile->get_lastmod() ?></td>
 		<td class="perms"><?php
-			disp_cond( $Fileman->get_link_curfile_editperm(),
+			disp_cond( $Fileman->getLinkCurfile_editperm(),
 									'<a href="%s">'.$lFile->get_perms( $Fileman->permlikelsl ? 'lsl' : '' ).'</a>' ) ?></td>
 		<td class="actions"><?php
-			disp_cond( $Fileman->get_link_curfile_edit(), '<a href="%s">'.$Fileman->get_icon( 'edit', 'imgtag' ).'</a>' );
-			disp_cond( $Fileman->get_link_curfile_copymove(), '<a href="%s">'.$Fileman->get_icon( 'copymove', 'imgtag' ).'</a>' );
-			disp_cond( $Fileman->get_link_curfile_rename(), '<a href="%s">'.$Fileman->get_icon( 'rename', 'imgtag' ).'</a>' );
-			disp_cond( $Fileman->get_link_curfile_delete(), '<a href="%s">'.$Fileman->get_icon( 'delete', 'imgtag' ).'</a>' );
+			disp_cond( $Fileman->getLinkCurfile_edit(), '<a href="%s">'.$Fileman->getIcon( 'edit', 'imgtag' ).'</a>' );
+			disp_cond( $Fileman->getLinkCurfile_copymove(), '<a href="%s">'.$Fileman->getIcon( 'copymove', 'imgtag' ).'</a>' );
+			disp_cond( $Fileman->getLinkCurfile_rename(), '<a href="%s">'.$Fileman->getIcon( 'rename', 'imgtag' ).'</a>' );
+			disp_cond( $Fileman->getLinkCurfile_delete(), '<a href="%s">'.$Fileman->getIcon( 'delete', 'imgtag' ).'</a>' );
 			?></td>
 	</tr>
 	<?php
@@ -759,7 +775,7 @@ if( $i == 0 )
 	if( !$Fileman->Messages->count( 'fl_error' ) )
 	{ // no Filelist errors, the directory must be empty
 		$Fileman->Messages->add( T_('The directory is empty.')
-			.( $Fileman->is_filtering() ? '<br />'.T_('Filter').': ['.$Fileman->get_filter().']' : '' ), 'fl_error' );
+			.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': ['.$Fileman->getFilter().']' : '' ), 'fl_error' );
 	}
 	$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
 
@@ -815,10 +831,10 @@ function openselectedfiles()
 	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
 	<input type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
 	&mdash; <?php
-	disp_cond( $Fileman->get_countdirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 	echo ', ';
-	disp_cond( $Fileman->get_countfiles(), T_('One file'), T_('%d files'), T_('No files' ) );
-	echo ', '.bytesreadable( $Fileman->get_countbytes() );
+	disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
+	echo ', '.bytesreadable( $Fileman->countBytes() );
 	?>
 </td></tr>
 <?php
@@ -903,7 +919,7 @@ function openselectedfiles()
 	</form>
 </div>
 </div>
-
+<br class="clear" />
 </div>
 <?php
 require( dirname(__FILE__). '/_footer.php' );

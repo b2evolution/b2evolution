@@ -11,7 +11,7 @@
  */
 
 #filemanmain {
-	/*border: 1px solid red;*/
+	margin-bottom:1em;
 }
 
 #filemanmain div.panelblock {
@@ -22,6 +22,9 @@
 /**
  * Files table {{{
  */
+#filemanmain table.grouped {
+	width:100%;
+}
 #filemanmain table.grouped caption {
 	text-align:left;
 }

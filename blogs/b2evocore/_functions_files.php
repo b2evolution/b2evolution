@@ -255,7 +255,7 @@ function str2path( $path )
  * @param string the filename to check
  * @return boolean true if the filename indicates an image, false otherwise
  */
-function is_image( $filename )
+function isImage( $filename )
 {
 	global $regexp_images;
 
@@ -268,7 +268,7 @@ function is_image( $filename )
  *
  * @param string filename to test
  */
-function is_filename( $filename )
+function isFilename( $filename )
 {
 	global $regexp_filename;
 

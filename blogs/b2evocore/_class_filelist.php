@@ -57,8 +57,9 @@ require_once dirname(__FILE__).'/_functions_files.php';
 class Filelist
 {
 	var $listpath = '';
-	var $filter = NULL;
-	var $filter_regexp = NULL;
+
+	var $filterString = NULL;
+	var $filterIsRegexp = NULL;
 
 
 	/* -- PRIVATE -- */
@@ -128,7 +129,7 @@ class Filelist
 	 *
 	 * @param string the path for the files
 	 */
-	function Filelist( $path, $filter = NULL, $filter_regexp = NULL, $showhidden = false )
+	function Filelist( $path, $filterString = NULL, $filterIsRegexp = NULL, $showhidden = false )
 	{
 		$this->listpath = trailing_slash( $path );
 		$this->showhidden = (bool)$showhidden;
@@ -145,81 +146,84 @@ class Filelist
 	 *
 	 * @param boolean get recursive size for directories?
 	 */
-	function load( $recursivedirsize = NULL )
+	function load()
 	{
 		if( !$this->listpath )
 		{
 			return false;
 		}
-		if( $recursivedirsize === NULL )
-		{
-			$recursivedirsize = $this->recursivedirsize;
-		}
 
 		$this->entries = array();
 		$this->count_bytes = $this->count_files = $this->count_dirs = 0;
 
-		if( $this->filter === NULL || $this->filter_regexp )
-		{
+
+		if( $this->filterString === NULL || $this->filterIsRegexp )
+		{ // use dir() to access the directory
 			$dir = @dir( $this->listpath );
 		}
 		else
-		{
+		{ // use glob() to access the directory
 			$oldcwd = getcwd();
 			$dir = @chdir( $this->listpath );
 			if( $dir )
 			{
-				$dir = glob( $this->listpath.$this->filter, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
+				$dir = glob( $this->listpath.$this->filterString, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
 			}
 			chdir( $oldcwd );
 		}
 
 		if( $dir === false )
 		{
-			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->listpath ) );
+			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->listpath ), 'fl_error' );
 			return false;
 		}
 		else
 		{ // read the directory
-			if( $dir === false )
-			{ // glob-$dir is empty/false
-				return false;
-			}
-			$i = -1;
-			while( ( ($this->filter === NULL || $this->filter_regexp) && ($entry = $dir->read()) )
-						|| ($this->filter !== NULL && !$this->filter_regexp && ( $entry = each( $dir ) ) && ( $entry = str_replace( array( '/', '\\' ), '', $entry[1] ) ) ) )
+			while( ( ($this->filterString === NULL || $this->filterIsRegexp) && ($entry = $dir->read()) )
+						|| ($this->filterString !== NULL && !$this->filterIsRegexp && ( $entry = each( $dir ) ) && ( $entry = str_replace( $this->listpath, '', $entry[1] ) ) ) )
 			{
 				if( $entry == '.' || $entry == '..'
 						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
-						|| ( $this->filter !== NULL && $this->filter_regexp && !preg_match( '#'.str_replace( '#', '\#', $this->filter ).'#', $entry ) ) // does not match the regexp filter
+						|| ( $this->filterString !== NULL && $this->filterIsRegexp && !preg_match( '#'.str_replace( '#', '\#', $this->filterString ).'#', $entry ) ) // does not match the regexp filter
 					)
 				{ // don't use these
 					continue;
 				}
 
-				$this->entries[ ++$i ] = new File( $entry, $this->listpath );
-
-				if( $recursivedirsize && is_dir( $this->listpath.$entry ) )
-				{
-					$this->entries[ $i ]->set_size( get_dirsize_recursive( $this->listpath.$entry ) );
-				}
-
-				if( $this->entries[$i]->is_dir() )
-				{
-					$this->count_dirs++;
-				}
-				else
-				{
-					$this->count_files++;
-				}
-				$this->count_bytes += $this->entries[$i]->get_size();
+				$this->addFile( $entry );
 			}
 
-			if( $this->filter === NULL || $this->filter_regexp )
+			if( $this->filterString === NULL || $this->filterIsRegexp )
 			{ // close the handle
 				$dir->close();
 			}
 		}
+	}
+
+
+	/**
+	 * Add a file to the list
+	 */
+	function addFile( $name )
+	{
+		$entry = new File( $name, $this->listpath );
+
+		if( $this->recursivedirsize && $entry->isDir( $this->listpath.$name ) )
+		{
+			$entry->set_size( get_dirsize_recursive( $this->listpath.$name ) );
+		}
+
+		if( $entry->isDir() )
+		{
+			$this->count_dirs++;
+		}
+		else
+		{
+			$this->count_files++;
+		}
+		$this->count_bytes += $entry->getSize();
+
+		$this->entries[] = $entry;
 	}
 
 
@@ -230,45 +234,53 @@ class Filelist
 	 * @param boolean ascending (true) or descending
 	 * @param boolean sort directories at top?
 	 */
-	function sort( $order, $asc, $dirsattop )
+	function sort( $order = NULL, $orderasc = NULL, $dirsattop = NULL )
 	{
 		if( !count($this->entries) )
 		{
 			return false;
 		}
+		if( $order === NULL )
+		{
+			$order = $this->order;
+		}
+		if( $orderasc === NULL )
+		{
+			$orderasc = $this->orderasc;
+		}
+		if( $dirsattop === NULL )
+		{
+			$dirsattop = $this->dirsattop;
+		}
 
-		if( $this->order == 'size' )
+		if( $order == 'size' )
 		{
 			if( $this->recursivedirsize )
 			{
-				$sortfunction = '$r = ( $a->get_size() - $b->get_size() );';
+				$sortfunction = '$r = ( $a->getSize() - $b->getSize() );';
 			}
 			else
 			{
-				$sortfunction = '$r = ($a->get_type().$b->get_type() == \'dirdir\') ?
-															strcasecmp( $a->get_name(), $b->get_name() )
-															: ( $a->get_size() - $b->get_size() );';
+				$sortfunction = '$r = ($a->isDir() && $b->isDir()) ?
+															strcasecmp( $a->getName(), $b->getName() ) :
+															( $a->getSize() - $b->getSize() );';
 			}
 		}
-		elseif( $this->order == 'type' )
-		{ // stupid dirty hack: copy the whole Filemanager into global array to access filetypes // TODO: optimize
-			global $typetemp;
-			$typetemp = $this;
-			$sortfunction = 'global $typetemp; $r = strcasecmp( $typetemp->cget_file($a[\'name\'], \'type\'), $typetemp->cget_file($b[\'name\'], \'type\') );';
-		}
 		else
-			$sortfunction = '$r = strcasecmp( $a->get_'.$order.'(), $b->get_'.$order.'() );';
+		{
+			$sortfunction = '$r = strcasecmp( $a->get'.$order.'(), $b->get'.$order.'() );';
+		}
 
-		if( !$asc )
+		if( !$orderasc )
 		{ // switch order
 			$sortfunction .= '$r = -$r;';
 		}
 
-		if( $this->dirsattop )
+		if( $dirsattop )
 		{
-			$sortfunction .= 'if( $a->get_type() == \'dir\' && $b->get_type() != \'dir\' )
+			$sortfunction .= 'if( $a->isDir() && !$b->isDir() )
 													$r = -1;
-												elseif( $b->get_type() == \'dir\' && $a->get_type() != \'dir\' )
+												elseif( $b->isDir() && !$a->isDir() )
 													$r = 1;';
 		}
 		$sortfunction .= 'return $r;';
@@ -293,7 +305,7 @@ class Filelist
 	/**
 	 * @return integer 1 for ascending sorting, 0 for descending
 	 */
-	function is_sortingasc( $type = '' )
+	function isSortingAsc( $type = '' )
 	{
 		if( empty($type) )
 		{
@@ -315,28 +327,28 @@ class Filelist
 	 * Is a filter active?
 	 * @return boolean
 	 */
-	function is_filtering()
+	function isFiltering()
 	{
-		return $this->filter !== NULL;
+		return $this->filterString !== NULL;
 	}
 
 
 	/**
-	 * return the current filter
+	 * Return the current filter
 	 *
 	 * @param boolean add a note when it's a regexp?
 	 * @return string the filter
 	 */
-	function get_filter( $note = true )
+	function getFilter( $note = true )
 	{
-		if( $this->filter === NULL )
+		if( $this->filterString === NULL )
 		{
 			return T_('no filter');
 		}
 		else
 		{
-			$r = $this->filter;
-			if( $note && $this->filter_regexp )
+			$r = $this->filterString;
+			if( $note && $this->filterIsRegexp )
 			{
 				$r .= ' ('.T_('regular expression').')';
 			}
@@ -345,31 +357,31 @@ class Filelist
 	}
 
 
-	function get_countdirs()
+	function countDirs()
 	{
 		return $this->count_dirs;
 	}
 
 
-	function get_countfiles()
+	function countFiles()
 	{
 		return $this->count_files;
 	}
 
 
-	function get_countbytes()
+	function countBytes()
 	{
 		return $this->count_bytes;
 	}
 
 
 	/**
-	 * go to next entry
+	 * Get the next entry and increment internal counter.
 	 *
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object (by reference) on success, false on end of list
 	 */
-	function &get_File_next( $type = '' )
+	function &getNextFile( $type = '' )
 	{
 		$this->current_file_idx++;
 		if( !count($this->entries) || $this->current_file_idx >= count( $this->entries ) )
@@ -379,12 +391,12 @@ class Filelist
 
 		if( $type != '' )
 		{
-			if( $type == 'dir' && $this->entries[ $this->current_file_idx ]->get_type() != 'dir' )
+			if( $type == 'dir' && !$this->entries[ $this->current_file_idx ]->isDir() )
 			{ // we want a dir
 				return $this->get_next( 'dir' );
 			}
-			elseif( $this->entries[ $this->current_file_idx ]->get_type() != 'file' )
-			{
+			elseif( $this->entries[ $this->current_file_idx ]->isDir() )
+			{ // we want a file
 				return $this->get_next( 'file' );
 			}
 		}
@@ -403,7 +415,7 @@ class Filelist
 	 * @param string the filename (in cwd)
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function &get_File_by_filename( $filename )
+	function &getFileByFilename( $filename )
 	{
 		$this->save_idx[] = $this->current_file_idx;
 
@@ -477,7 +489,7 @@ class Filelist
 	{
 		foreach( $this->entries as $key => $File )
 		{
-			if( $File->get_name() == $find )
+			if( $File->getName() == $find )
 			{
 				return $key;
 			}
@@ -498,7 +510,10 @@ class Filelist
 		{
 			if( $lentry == $File )
 			{
-				$unlinked = @unlink( $lentry->get_path(true) );
+				$unlinked = $File->isDir() ?
+										@rmdir( $File->getPath(true) ) :
+										@unlink( $lentry->getPath(true) );
+
 				if( !$unlinked )
 				{
 					return false;
@@ -510,8 +525,6 @@ class Filelist
 		}
 		return false;
 	}
-
-
 }
 
 ?>
