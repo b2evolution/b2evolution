@@ -91,10 +91,6 @@ function set_edited_Blog_from_params( $for )
 				{
 					$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an relative URL (without <code>http://</code> or <code>https://</code>)!') );
 				}
-				if( !empty($blog_siteurl) && substr( $blog_siteurl, 0, 1 ) != '/' )
-				{ // add leading slash
-					$blog_siteurl = '/'.$blog_siteurl;
-				}
 			}
 			$edited_Blog->set( 'siteurl', $blog_siteurl );
 

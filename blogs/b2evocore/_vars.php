@@ -132,8 +132,8 @@ $is_IE = (($is_macIE) || ($is_winIE));
 
 
 // server detection
-$is_Apache	= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
-$is_IIS		= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false ? 1 : 0;
+$is_Apache = strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
+$is_IIS    = strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false ? 1 : 0;
 
 
 // the weekdays and the months..

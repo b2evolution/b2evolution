@@ -96,7 +96,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 }
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
-{	// Connect to DB:
+{ // Connect to DB:
 	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases, false );
 	if( $DB->error )
 	{ // restart conf
@@ -231,7 +231,7 @@ switch( $action )
 				fclose($f);
 
 				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
-				
+
 				$tableprefix = $conf_db_tableprefix;
 				$baseurl = $conf_baseurl;
 				$admin_email = $conf_admin_email;
@@ -266,7 +266,7 @@ switch( $action )
 
 			?>
 			<h1><?php echo T_('Base configuration') ?></h1>
-			
+
 			<p><?php echo T_('Your base config file has not been edited yet. You can do this by filling in the form below.') ?></p>
 
 			<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
@@ -376,12 +376,12 @@ to
 
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 
-		<?php 
+		<?php
 		if( !isset($conf_db_user) ) $conf_db_user = DB_USER;
 		if( !isset($conf_db_password) ) $conf_db_password = DB_PASSWORD;
 		if( !isset($conf_db_name) ) $conf_db_name = DB_NAME;
 		if( !isset($conf_db_host) ) $conf_db_host = DB_HOST;
-		
+
 		echo '<pre>',
 		T_('mySQL Username').': '.$conf_db_user."\n".
 		T_('mySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".

@@ -14,12 +14,12 @@ $count = 0;
 for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = blog_list_next() )
 {
 	if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )
-	{	// Current user is not allowed to edit properties...
+	{ // Current user is not allowed to edit properties...
 		continue;
 	}
 	if( !isset( $atleastoneshown ) )
-	{	// Display headers the first time we find an viewable blog
-		// TODO 0.9.1 : prewalk th elist, this will also allow to know if at least one blog can be deleted
+	{ // Display headers the first time we find an viewable blog
+		// TODO 0.9.1 : prewalk the list, this will also allow to know if at least one blog can be deleted
 		$atleastoneshown = true;
 		?>
 		<div class="panelblock">

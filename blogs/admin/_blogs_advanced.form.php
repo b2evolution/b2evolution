@@ -18,14 +18,14 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<fieldset>
 		<legend><?php echo T_('Static file generation') ?></legend>
 		<?php
-			form_text( 'blog_staticfilename', $edited_Blog->dget( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
+			form_text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 		?>
 	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Media library') ?></legend>
 		<?php
-			form_radio( 'blog_media_location', $edited_Blog->dget( 'media_location' ),
+			form_radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 									array(
 										array( 'default',
 														T_('Default'),
@@ -49,18 +49,18 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<fieldset>
 		<legend><?php echo T_('After each new post...') ?></legend>
 		<?php
-			form_checkbox( 'blog_pingb2evonet', $edited_Blog->dget( 'pingb2evonet' ), T_('Ping b2evolution.net'), T_('to get listed on the "recently updated" list on b2evolution.net').' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
-			form_checkbox( 'blog_pingtechnorati', $edited_Blog->dget( 'pingtechnorati' ), T_('Ping technorati.com'), T_('to give notice of new post.') );
-			form_checkbox( 'blog_pingweblogs', $edited_Blog->dget( 'pingweblogs' ), T_('Ping weblogs.com'), T_('to give notice of new post.') );
-			form_checkbox( 'blog_pingblodotgs', $edited_Blog->dget( 'pingblodotgs' ), T_('Ping blo.gs'), T_('to give notice of new post.') );
+			form_checkbox( 'blog_pingb2evonet', $edited_Blog->get( 'pingb2evonet' ), T_('Ping b2evolution.net'), T_('to get listed on the "recently updated" list on b2evolution.net').' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
+			form_checkbox( 'blog_pingtechnorati', $edited_Blog->get( 'pingtechnorati' ), T_('Ping technorati.com'), T_('to give notice of new post.') );
+			form_checkbox( 'blog_pingweblogs', $edited_Blog->get( 'pingweblogs' ), T_('Ping weblogs.com'), T_('to give notice of new post.') );
+			form_checkbox( 'blog_pingblodotgs', $edited_Blog->get( 'pingblodotgs' ), T_('Ping blo.gs'), T_('to give notice of new post.') );
 		?>
 	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Advanced options') ?></legend>
 		<?php
-			form_checkbox( 'blog_allowtrackbacks', $edited_Blog->dget( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
-			form_checkbox( 'blog_allowpingbacks', $edited_Blog->dget( 'allowpingbacks' ), T_('Allow pingbacks'), T_("Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs.") );
+			form_checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
+			form_checkbox( 'blog_allowpingbacks', $edited_Blog->get( 'allowpingbacks' ), T_('Allow pingbacks'), T_("Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs.") );
 		?>
 	</fieldset>
 
