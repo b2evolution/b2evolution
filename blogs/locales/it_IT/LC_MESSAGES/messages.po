@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 04:00+0200\n"
+"POT-Creation-Date: 2004-05-11 16:35+0200\n"
 "PO-Revision-Date: 2004-04-11 22:15+0100\n"
 "Last-Translator: Matteo Lenardon <freshprz@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -496,9 +496,9 @@ msgid "Cannot update, please correct these errors:"
 msgstr "Impossibile aggiornare, correggi questi errori:"
 
 #: ..\..\..\admin\b2blogs.php:352
-#, php-format
-msgid "Delete Blog [%s]?"
-msgstr ""
+#, fuzzy, php-format
+msgid "Delete blog [%s]?"
+msgstr "Cancella questa hit!"
 
 #: ..\..\..\admin\b2blogs.php:354
 msgid ""
@@ -1196,12 +1196,14 @@ msgid "You cannot change the demouser profile in demo mode!"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:106
-msgid "You are only allowed to update yourself!"
-msgstr ""
+#, fuzzy
+msgid "You are only allowed to update your own profile!"
+msgstr "Non sei loggato."
 
 #: ..\..\..\admin\b2users.php:119
-msgid "You must provide an unique Login!"
-msgstr ""
+#, fuzzy
+msgid "You must provide an unique login!"
+msgstr "Devi loggarti prima!"
 
 #: ..\..\..\admin\b2users.php:127
 #, php-format
@@ -2336,7 +2338,7 @@ msgstr "Pingback da:"
 #: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
 #, fuzzy
-msgid "Permamnent link to this comment"
+msgid "Permanent link to this comment"
 msgstr "Permanent link di questo post"
 
 #: ..\..\..\admin\_edit_showposts.php:256
@@ -2636,14 +2638,17 @@ msgid "Toolbar plug-ins"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:303
 #, fuzzy
-msgid "Create new Locale"
+msgid "Create new locale"
 msgstr "Crea nuovo blog!"
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:154
+#: ..\..\..\admin\_set_regional.form.php:199
 #, fuzzy
-msgid "Edit Locale"
-msgstr "Lingua di default"
+msgid "Edit locale"
+msgstr "Modifica il tuo profilo"
 
 #: ..\..\..\admin\_set_regional.form.php:46
 #, php-format
@@ -2808,12 +2813,6 @@ msgstr ""
 msgid "Extract"
 msgstr ""
 
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
-#, fuzzy
-msgid "Edit locale"
-msgstr "Modifica il tuo profilo"
-
 #: ..\..\..\admin\_set_regional.form.php:181
 msgid "up"
 msgstr ""
@@ -2846,11 +2845,6 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract .po file into b2evo-format"
 msgstr ""
-
-#: ..\..\..\admin\_set_regional.form.php:303
-#, fuzzy
-msgid "Create new locale"
-msgstr "Crea nuovo blog!"
 
 #: ..\..\..\admin\_set_regional.form.php:306
 #, fuzzy
@@ -5580,6 +5574,14 @@ msgstr "Continua..."
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nuovo pingback al tuo post #%d \"%s\""
+
+#, fuzzy
+#~ msgid "Create new Locale"
+#~ msgstr "Crea nuovo blog!"
+
+#, fuzzy
+#~ msgid "Edit Locale"
+#~ msgstr "Lingua di default"
 
 #, fuzzy
 #~ msgid "Destination Static Filename"

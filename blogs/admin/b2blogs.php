@@ -349,7 +349,7 @@ switch($action)
 		{	// Not confirmed
 			?>
 			<div class="panelinfo">
-				<h3><?php printf( T_('Delete Blog [%s]?'), $deleted_Blog->dget( 'name' ) )?></h3>
+				<h3><?php printf( T_('Delete blog [%s]?'), $deleted_Blog->dget( 'name' ) )?></h3>
 
 				<p><?php echo T_('Deleting this blog will also delete all its categories, posts and comments!') ?></p>
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.6\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 04:00+0200\n"
+"POT-Creation-Date: 2004-05-11 16:35+0200\n"
 "PO-Revision-Date: 2004-03-08 19:15+0100\n"
 "Last-Translator: Vegar Berg Guldal <mail@funky-m.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -503,9 +503,9 @@ msgid "Cannot update, please correct these errors:"
 msgstr "Kan ikke oppdatere, vennligst korriger disse feilene:"
 
 #: ..\..\..\admin\b2blogs.php:352
-#, php-format
-msgid "Delete Blog [%s]?"
-msgstr ""
+#, fuzzy, php-format
+msgid "Delete blog [%s]?"
+msgstr "Slett dette treffet!"
 
 #: ..\..\..\admin\b2blogs.php:354
 msgid ""
@@ -1208,12 +1208,13 @@ msgstr ""
 
 #: ..\..\..\admin\b2users.php:106
 #, fuzzy
-msgid "You are only allowed to update yourself!"
+msgid "You are only allowed to update your own profile!"
 msgstr "Kunne ikke slette bruker nr. %d."
 
 #: ..\..\..\admin\b2users.php:119
-msgid "You must provide an unique Login!"
-msgstr ""
+#, fuzzy
+msgid "You must provide an unique login!"
+msgstr "Du må logge inn!"
 
 #: ..\..\..\admin\b2users.php:127
 #, php-format
@@ -2348,7 +2349,7 @@ msgstr "Pingback fra:"
 #: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
 #, fuzzy
-msgid "Permamnent link to this comment"
+msgid "Permanent link to this comment"
 msgstr "Permanent lenke til denne posten"
 
 #: ..\..\..\admin\_edit_showposts.php:256
@@ -2649,14 +2650,17 @@ msgid "Toolbar plug-ins"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:303
 #, fuzzy
-msgid "Create new Locale"
+msgid "Create new locale"
 msgstr "Lag ny blog!"
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:154
+#: ..\..\..\admin\_set_regional.form.php:199
 #, fuzzy
-msgid "Edit Locale"
-msgstr "Hovedspråk"
+msgid "Edit locale"
+msgstr "Rediger din profil"
 
 #: ..\..\..\admin\_set_regional.form.php:46
 #, php-format
@@ -2822,12 +2826,6 @@ msgstr ""
 msgid "Extract"
 msgstr ""
 
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
-#, fuzzy
-msgid "Edit locale"
-msgstr "Rediger din profil"
-
 #: ..\..\..\admin\_set_regional.form.php:181
 msgid "up"
 msgstr ""
@@ -2859,11 +2857,6 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract .po file into b2evo-format"
 msgstr ""
-
-#: ..\..\..\admin\_set_regional.form.php:303
-#, fuzzy
-msgid "Create new locale"
-msgstr "Lag ny blog!"
 
 #: ..\..\..\admin\_set_regional.form.php:306
 #, fuzzy
@@ -5505,6 +5498,14 @@ msgstr "[...] Les mer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nytt pingback på din post nr. %d \"%s\""
+
+#, fuzzy
+#~ msgid "Create new Locale"
+#~ msgstr "Lag ny blog!"
+
+#, fuzzy
+#~ msgid "Edit Locale"
+#~ msgstr "Hovedspråk"
 
 #, fuzzy
 #~ msgid "Destination Static Filename"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 04:00+0200\n"
+"POT-Creation-Date: 2004-05-11 16:35+0200\n"
 "PO-Revision-Date: 2004-05-09 22:08+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -487,8 +487,8 @@ msgid "Cannot update, please correct these errors:"
 msgstr "Kann nicht aktualisieren, bitte berichtige diese Fehler:"
 
 #: ..\..\..\admin\b2blogs.php:352
-#, php-format
-msgid "Delete Blog [%s]?"
+#, fuzzy, php-format
+msgid "Delete blog [%s]?"
 msgstr "Lösche Blog [%s]?"
 
 #: ..\..\..\admin\b2blogs.php:354
@@ -1188,11 +1188,12 @@ msgstr ""
 
 #: ..\..\..\admin\b2users.php:106
 #, fuzzy
-msgid "You are only allowed to update yourself!"
+msgid "You are only allowed to update your own profile!"
 msgstr "Du kannst dich nicht selbst löschen!"
 
 #: ..\..\..\admin\b2users.php:119
-msgid "You must provide an unique Login!"
+#, fuzzy
+msgid "You must provide an unique login!"
 msgstr "Du musst ein eindeutiges Login angeben!"
 
 #: ..\..\..\admin\b2users.php:127
@@ -2316,7 +2317,8 @@ msgstr "Pingback von:"
 
 #: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
-msgid "Permamnent link to this comment"
+#, fuzzy
+msgid "Permanent link to this comment"
 msgstr "Permanenter Link zu diesem Kommentar"
 
 #: ..\..\..\admin\_edit_showposts.php:256
@@ -2611,12 +2613,15 @@ msgid "Toolbar plug-ins"
 msgstr "Toolbar Plugins"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-msgid "Create new Locale"
+#: ..\..\..\admin\_set_regional.form.php:303
+msgid "Create new locale"
 msgstr "Erstelle neue Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-msgid "Edit Locale"
-msgstr "Ändere Locale"
+#: ..\..\..\admin\_set_regional.form.php:154
+#: ..\..\..\admin\_set_regional.form.php:199
+msgid "Edit locale"
+msgstr "Editiere Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:46
 #, php-format
@@ -2791,11 +2796,6 @@ msgstr "Übersetzt"
 msgid "Extract"
 msgstr "Extrahieren"
 
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
-msgid "Edit locale"
-msgstr "Editiere Locale"
-
 #: ..\..\..\admin\_set_regional.form.php:181
 msgid "up"
 msgstr "hoch"
@@ -2827,10 +2827,6 @@ msgstr "Keine Sprachdatei..."
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract .po file into b2evo-format"
 msgstr "Extrahiere .po-Datei ins b2evo-Format"
-
-#: ..\..\..\admin\_set_regional.form.php:303
-msgid "Create new locale"
-msgstr "Erstelle neue Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:306
 msgid "Are you sure you want to reset?"
@@ -5549,6 +5545,12 @@ msgstr "[...] Lies mehr!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
+#~ msgid "Create new Locale"
+#~ msgstr "Erstelle neue Locale"
+
+#~ msgid "Edit Locale"
+#~ msgstr "Ändere Locale"
 
 #~ msgid "Destination Static Filename"
 #~ msgstr "Entstehender statischer Dateiname"

@@ -19,7 +19,7 @@ if( !empty($locale) && $action != 'extract' )
 		<input type="hidden" name="notransext" value="<?php echo $notransext;?>" />
 		<input type="hidden" name="action" value="<?php echo ( ($locale == '_new_') ? 'createlocale' : 'updatelocale' ) ?>" />
 		<fieldset id="createnew">
-		<legend><?php echo ( ($locale == '_new_') ? T_('Create new Locale') : T_('Edit Locale') ) ?></legend>
+		<legend><?php echo ( ($locale == '_new_') ? T_('Create new locale') : T_('Edit locale') ) ?></legend>
 
 		<?php
 		// read template

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 04:00+0200\n"
+"POT-Creation-Date: 2004-05-11 16:35+0200\n"
 "PO-Revision-Date: 2003-09-12 00:51+0100\n"
 "Last-Translator: Héctor Delcourt <flikarmonth_NOQUIEROSPAM_@iespana.es>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -477,9 +477,9 @@ msgid "Cannot update, please correct these errors:"
 msgstr "No se puede actualizar, por favor corrige estos errores:"
 
 #: ..\..\..\admin\b2blogs.php:352
-#, php-format
-msgid "Delete Blog [%s]?"
-msgstr ""
+#, fuzzy, php-format
+msgid "Delete blog [%s]?"
+msgstr "Sindicar esta bit&aacute;cora"
 
 #: ..\..\..\admin\b2blogs.php:354
 msgid ""
@@ -1147,11 +1147,12 @@ msgid "You cannot change the demouser profile in demo mode!"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:106
-msgid "You are only allowed to update yourself!"
-msgstr ""
+#, fuzzy
+msgid "You are only allowed to update your own profile!"
+msgstr "Nota: Tu ya estas actualmente logeado!"
 
 #: ..\..\..\admin\b2users.php:119
-msgid "You must provide an unique Login!"
+msgid "You must provide an unique login!"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:127
@@ -2262,7 +2263,7 @@ msgstr ""
 #: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
 #, fuzzy
-msgid "Permamnent link to this comment"
+msgid "Permanent link to this comment"
 msgstr "Enlace permanente"
 
 #: ..\..\..\admin\_edit_showposts.php:256
@@ -2558,13 +2559,16 @@ msgid "Toolbar plug-ins"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:303
 #, fuzzy
-msgid "Create new Locale"
+msgid "Create new locale"
 msgstr "Crear nueva bitacora!"
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:154
+#: ..\..\..\admin\_set_regional.form.php:199
 #, fuzzy
-msgid "Edit Locale"
+msgid "Edit locale"
 msgstr "Editar mi perfil"
 
 #: ..\..\..\admin\_set_regional.form.php:46
@@ -2728,12 +2732,6 @@ msgstr ""
 msgid "Extract"
 msgstr ""
 
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
-#, fuzzy
-msgid "Edit locale"
-msgstr "Editar mi perfil"
-
 #: ..\..\..\admin\_set_regional.form.php:181
 msgid "up"
 msgstr ""
@@ -2765,11 +2763,6 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract .po file into b2evo-format"
 msgstr ""
-
-#: ..\..\..\admin\_set_regional.form.php:303
-#, fuzzy
-msgid "Create new locale"
-msgstr "Crear nueva bitacora!"
 
 #: ..\..\..\admin\_set_regional.form.php:306
 msgid "Are you sure you want to reset?"
@@ -5391,6 +5384,14 @@ msgstr "[...] Leer mas!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nuevo pingback en tu hilo #%d \"%s\""
+
+#, fuzzy
+#~ msgid "Create new Locale"
+#~ msgstr "Crear nueva bitacora!"
+
+#, fuzzy
+#~ msgid "Edit Locale"
+#~ msgstr "Editar mi perfil"
 
 #, fuzzy
 #~ msgid "Destination Static Filename"

@@ -37,25 +37,18 @@
 	
 <h1>Mettre à jour depuis Cafélog/b2 (la version originale de b2)</h1>
 
-<p>Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.</p>
+<p>Avant de commencer, merci de noter que certaines fonctionnalités distribuées de b2evolution nécessitent que vous approuvier nos <a href="http://b2evolution.net/about/terms.html">Conditions d'utilisation</a> (très simples).</p>
 
 <p>La procédure de mise à jour ci dessous a été testée exclusivement avec b2 versions 0.6.1 et 0.6.2. Cependant, nous pensons que les versions 0.5.x devraient également pouvoir être mises à jour sans problèmes. Dans tous les cas, si vous utilisez une version antérieure de b2, vous pouvez faire un essai de mise à jour sans risque. b2evolution n'abimera pas vos données, même s'il n'arrive pas à les comprendre. Le pire qui pourrait arriver est un message d'erreur.</p>
-<p><em>However, as always, it is wise to do a backup of your current website / blog / database
-(depending on what you already have) before starting to install something new.</em></p>
+<p><em>Cependant, comme toujours, il est prudent de faire une copie de sauvegarde de votre site web / blog / base de données courants (selon ce que vous avez déjà) avant de commencer l'installation de quelque chose de nouveau.</em></p>
 
 <p>Après avoit dézippé le fichier de distribution de b2evolution:</p>
 
 <ol class="expanded">
-<li>On your server, locate the mysql database you are already using for Cafelog/b2.
-	You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will
-	not alter your Cafelog/b2 tables and data in any way!<br />
+<li>Sur votre serveur, localisez la base de données mySQL que vous utilisez déjà pour Cafélog/b2. Vous devez utiliser la même base de données pour b2evolution afin de pouvoir upgrader. Soyez rassuré, b2evolution ne modifiera pas vos tables Cafélog/b2 en quelque manière que ce soit!<br />
 		<span class="small"><br />
-		<strong>Note 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with
-		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
-		b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 .
-		Your existing tables will not be affected in any way.<br />
-		<strong>Note 2:</strong> Why the same database? Because the SQL process we use to copy the data -- which is fast and
-		secure -- can only be done within a single database.</span>
+		<strong>Note 1: </strong>A moins que vous n'ayez changé la configuration, toutes les tables créées par b2evolution sont préfixées avec evo_ . A moins que vous n'ayez déjà une application utilisant le même préfixe, l'installation de b2evolution dans une base de données partagées avec d'autre applications est donc sûre. Par exemple, Cafélog/b2 utilisait des tables oréfixées avec b2 . Vos tables existantes ne seront affectées en aucune manière.<br />
+		<strong>Note 2:</strong> Pourquoi la même base de données? Parce que le processus SQL -- rapide et sûr -- que nous utilisons pour copier les données ne peut être effectué qu'à l'interieur d'une même base de données.</span>
 </li>
 
 <li>Téléchargez les fichiers de b2evolution sur votre serveur web.<br />

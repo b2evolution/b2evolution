@@ -103,7 +103,7 @@ else switch ($action)
 		
 		if( $user_profile_only && $edited_user_ID != $current_User->ID )
 		{ // user is only allowed to update him/herself
-			errors_add( T_('You are only allowed to update yourself!') );
+			errors_add( T_('You are only allowed to update your own profile!') );
 			
 			// display menu
 			require( dirname(__FILE__).'/_menutop.php' );
@@ -116,7 +116,7 @@ else switch ($action)
 		
 		if( empty($edited_user_login) )
 		{
-			errors_add( T_('You must provide an unique Login!') );
+			errors_add( T_('You must provide an unique login!') );
 		}
 		
 		if( !$user_profile_only )

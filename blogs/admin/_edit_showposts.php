@@ -246,7 +246,7 @@
 							<?php $Comment->content() ?>
 						</div>
 						<p>
-						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 						<?php
 						if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
 						{	// If User has permission to edit comments:

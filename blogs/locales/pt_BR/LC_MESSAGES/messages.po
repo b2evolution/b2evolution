@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 04:00+0200\n"
+"POT-Creation-Date: 2004-05-11 16:35+0200\n"
 "PO-Revision-Date: 2003-09-26 10:20+0300\n"
 "Last-Translator: Arthur H. S. Zapparoli <arthurzap@pop.com.br>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -489,9 +489,9 @@ msgid "Cannot update, please correct these errors:"
 msgstr "Não foi possível atualizar, por favos corrija estes erros:"
 
 #: ..\..\..\admin\b2blogs.php:352
-#, php-format
-msgid "Delete Blog [%s]?"
-msgstr ""
+#, fuzzy, php-format
+msgid "Delete blog [%s]?"
+msgstr "Delete este hit!"
 
 #: ..\..\..\admin\b2blogs.php:354
 msgid ""
@@ -1185,11 +1185,11 @@ msgstr ""
 
 #: ..\..\..\admin\b2users.php:106
 #, fuzzy
-msgid "You are only allowed to update yourself!"
+msgid "You are only allowed to update your own profile!"
 msgstr "Não foi possível deletar usuário #%d."
 
 #: ..\..\..\admin\b2users.php:119
-msgid "You must provide an unique Login!"
+msgid "You must provide an unique login!"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:127
@@ -2293,7 +2293,7 @@ msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
-msgid "Permamnent link to this comment"
+msgid "Permanent link to this comment"
 msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:256
@@ -2589,13 +2589,16 @@ msgid "Toolbar plug-ins"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:303
 #, fuzzy
-msgid "Create new Locale"
+msgid "Create new locale"
 msgstr "Meu Perfil"
 
 #: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:154
+#: ..\..\..\admin\_set_regional.form.php:199
 #, fuzzy
-msgid "Edit Locale"
+msgid "Edit locale"
 msgstr "Edite seu perfil"
 
 #: ..\..\..\admin\_set_regional.form.php:46
@@ -2760,12 +2763,6 @@ msgstr ""
 msgid "Extract"
 msgstr ""
 
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
-#, fuzzy
-msgid "Edit locale"
-msgstr "Edite seu perfil"
-
 #: ..\..\..\admin\_set_regional.form.php:181
 msgid "up"
 msgstr ""
@@ -2797,11 +2794,6 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract .po file into b2evo-format"
 msgstr ""
-
-#: ..\..\..\admin\_set_regional.form.php:303
-#, fuzzy
-msgid "Create new locale"
-msgstr "Meu Perfil"
 
 #: ..\..\..\admin\_set_regional.form.php:306
 msgid "Are you sure you want to reset?"
@@ -5388,6 +5380,14 @@ msgstr ""
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
+
+#, fuzzy
+#~ msgid "Create new Locale"
+#~ msgstr "Meu Perfil"
+
+#, fuzzy
+#~ msgid "Edit Locale"
+#~ msgstr "Edite seu perfil"
 
 #, fuzzy
 #~ msgid "Write Email"
