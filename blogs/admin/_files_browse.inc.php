@@ -45,16 +45,57 @@ require dirname(__FILE__).'/_submenu.inc.php';
 
 ?>
 
-
-
 <form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
-<?php echo $Fileman->getFormHiddenInputs() ?>
+<?php echo $Fileman->getFormHiddenInputs(); ?>
+
+<!-- FLAT MODE: -->
+<div id="fmbar_flatmode" class="toolbaritem">
+	<input name="actionArray[<?php echo $Fileman->flatmode ? 'noflatmode' : 'flatmode' ?>]"
+		class="ActionButton"
+		type="submit"
+		title="<?php
+			echo format_to_output( $Fileman->flatmode ?
+															T_('Normal mode') :
+															T_('All files and folders, including subdirectories'), 'formvalue' );
+			?>"
+		onclick="this.form.action='files.php#FM_anchor';"
+		value="<?php
+			echo format_to_output( $Fileman->flatmode ?
+															T_('Normal mode') :
+															T_('Flat mode'), 'formvalue' ); ?>" />
+</div>
 
 
-<table class="grouped" cellspacing="0">
+<!-- FILTER BOX: -->
+<div id="fmbar_filter" class="toolbaritem">
+	<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+	<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="5" />
+	<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
+		echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
+		?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
+		echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
+
+	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
+
+	<?php
+	if( $Fileman->isFiltering() )
+	{ // "reset filter" form
+	?>
+		<input title="<?php echo T_('Unset filter'); ?>"
+			type="image"
+			name="actionArray[filter_unset]"
+			class="ActionButton"
+			src="<?php echo getIcon( 'xross', 'url' ) ?>" />
+	<?php
+	}
+	?>
+</div>
+
+
+<table class="grouped clear" cellspacing="0">
 
 <?php
 /**
@@ -84,51 +125,6 @@ $filetable_cols = 8;
 
 		*/
 		?>
-
-		<!-- FLAT MODE: -->
-		<div id="fmbar_flatmode">
-			<input name="actionArray[<?php echo $Fileman->flatmode ? 'noflatmode' : 'flatmode' ?>]"
-				class="ActionButton"
-				type="submit"
-				title="<?php
-					echo format_to_output( $Fileman->flatmode ?
-																	T_('Normal mode') :
-																	T_('All files and folders, including subdirectories'), 'formvalue' );
-					?>"
-				onclick="this.form.action='files.php#FM_anchor';"
-				value="<?php
-					echo format_to_output( $Fileman->flatmode ?
-																	T_('Normal mode') :
-																	T_('Flat mode'), 'formvalue' ); ?>" />
-		</div>
-
-
-		<!-- FILTER BOX: -->
-		<div id="fmbar_filter">
-			<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="5" />
-			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
-				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
-				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
-				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
-
-			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
-
-			<?php
-			if( $Fileman->isFiltering() )
-			{ // "reset filter" form
-			?>
-				<input title="<?php echo T_('Unset filter'); ?>"
-					type="image"
-					name="actionArray[filter_unset]"
-					class="ActionButton"
-					src="<?php echo getIcon( 'xross', 'url' ) ?>" />
-			<?php
-			}
-			?>
-
-		</div>
-
 
 		<?php
 		$rootlist = $Fileman->getRootList();
@@ -656,11 +652,11 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.7  2005/01/27 20:07:51  blueyed
+ * rolled layout back somehow..
+ *
  * Revision 1.6  2005/01/27 13:34:56  fplanque
  * i18n tuning
- *
- * Revision 1.5  2005/01/26 23:44:40  blueyed
- * no message
  *
  * Revision 1.4  2005/01/26 17:55:23  blueyed
  * catching up..

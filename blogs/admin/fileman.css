@@ -14,6 +14,10 @@
 	margin-bottom:1em;
 }
 
+#FilesForm div.panelinfo {
+	margin:1ex 0;
+}
+
 /**
  * Files table {{{
  */
@@ -37,7 +41,16 @@
 	padding:2ex;
 	color:red;
 }
+#filemanmain table.grouped td.icon,
+#filemanmain table.grouped td.checkbox,
+#filemanmain table.grouped td.perms {
+	width:2%;
+}
+#filemanmain table.grouped td.type {
+	width:15%;
+}
 #filemanmain table.grouped td.filename {
+	width:45%;
 	text-align: left;
 }
 #filemanmain table.grouped td.filename div.path {
@@ -45,16 +58,18 @@
 	float:right;
 }
 #filemanmain table.grouped td.timestamp {
+	width:15%;
 }
 #filemanmain table.grouped td.timestamp span.time {
 	font-size:84%;
 }
-#filemanmain table.grouped td.size {
-	text-align: right;
+#filemanmain table.grouped td.size,
+#filemanmain table.grouped td.actions {
+	width:10%;
 	white-space: nowrap;
 }
-#filemanmain table.grouped td.actions {
-	white-space: nowrap;
+#filemanmain table.grouped td.size {
+	text-align: right;
 }
 #filemanmain table.grouped td.actions img {
 	margin:0 2px;
@@ -71,9 +86,7 @@
 
 .toolbaritem,
 #fmbar_roots,
-#fmbar_cwd,
-#fmbar_filter,
-#fmbar_flatmode {
+#fmbar_cwd {
 	margin:.5ex 0 .5ex 1ex;
 	vertical-align:bottom;
 	padding:.5ex;
@@ -92,11 +105,6 @@
 }
 #fmbar_cwd {
 	clear:both;
-}
-#fmbar_filter,
-#fmbar_flatmode {
-	float:right;
-	border: 1px solid #ddd; /* Temp color */
 }
 
 #filemanmain table.grouped thead td .toolbaritem {
