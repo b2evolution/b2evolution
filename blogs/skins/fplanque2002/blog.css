@@ -233,5 +233,8 @@ td.bCalendarEmptyCell
 }
 a.bCalendarLinkPost
 {
+}
+span.bCalendarToday
+{
 	font-weight: bold;
 }

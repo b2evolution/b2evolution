@@ -29,7 +29,6 @@
 	// $Calendar->set( headerdisplay, 1 );	// set this to 0 if you don't want to display "Mon Tue Wed..." 
 	// $Calendar->set( headercellstart, '<th class="bCalendarHeaderCell" abbr="[abbr]">' );	// please leave $abbr there !
 	// $Calendar->set( headercellend, '</th>' );
-	// $Calendar->set( headerabbrlenght, 3 );	// length of the shortened weekday
 	
 	// $Calendar->set( cellstart, '<td class="bCalendarCell">' );
 	// $Calendar->set( cellend, '</td>' );
