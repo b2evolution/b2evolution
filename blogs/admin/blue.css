@@ -368,6 +368,7 @@ div.panelblock {
 	border: 1px solid #e1ddce;
 	padding: 1ex;
 	margin: 1ex 1em;
+	clear:both;
 }
 .footer {
 	text-align: center;

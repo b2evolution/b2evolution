@@ -351,6 +351,7 @@ div.panelinfo p {
 	padding: 0;
 }
 div.panelblock {
+	clear:both;
 	border: 1px solid #e1ddce;
 	padding: 1ex;
 	margin: 1ex 1em;
