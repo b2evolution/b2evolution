@@ -28,7 +28,7 @@ if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
 {
 	$default_locale = $locale;
 }
-else		
+else
 { // detect language
 	$default_locale = locale_from_httpaccept();
 	#echo 'detected locale: ' . $default_locale. '<br />';
@@ -51,14 +51,14 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 	<h1 id="version"><?php echo T_('Installer for version '), $b2_version ?></h1>
 	<div id="quicklinks">
-		<?php echo T_('Current installation') ?>: 
-		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot; 
-		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a> &middot; 
-		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot; 
-		<a href="../admin/"><?php echo T_('Go to Admin') ?></a> &middot; 
-		<?php echo T_('Online') ?>: 
-		<a href="http://b2evolution.net/man/"><?php echo T_('Manual') ?></a> &middot; 
-		<a href="http://b2evolution.net/man/supportfaq.html"><?php echo T_('Support') ?></a> 
+		<?php echo T_('Current installation') ?>:
+		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
+		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a> &middot;
+		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot;
+		<a href="../admin/"><?php echo T_('Go to Admin') ?></a> &middot;
+		<?php echo T_('Online') ?>:
+		<a href="http://b2evolution.net/man/"><?php echo T_('Manual') ?></a> &middot;
+		<a href="http://b2evolution.net/man/supportfaq.html"><?php echo T_('Support') ?></a>
 	</div>
 </div>
 
@@ -69,7 +69,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'menu') )
 	<div class="installSideBar">
 	<h2><?php echo T_('Language/Locale')?></h2>
 	<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
-	
+
 	<ul style="margin-left: 2ex;list-style:none;" >
 
 	<?php
@@ -77,13 +77,13 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'menu') )
 	foreach( $locales as $lkey => $lvalue )
 	{
 		echo '<li>';
-		if( $default_locale == $lkey ) echo '<strong>';	
+		if( $default_locale == $lkey ) echo '<strong>';
 		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
 		locale_flag( $lkey );
 		echo T_( $lvalue['name'] );
 		echo '</a></li>';
-		
-		if( $default_locale == $lkey ) echo '</strong>';	
+
+		if( $default_locale == $lkey ) echo '</strong>';
 	}
 	?>
 	</ul>
@@ -95,7 +95,7 @@ else
 	// Connect to DB:
 	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, false );
 	if( $DB->error )
-	{	// restart conf
+	{ // restart conf
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
 		$action = 'start';
 	}
@@ -128,13 +128,13 @@ switch( $action )
 		// Connect to DB:
 		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, false );
 		if( $DB->error )
-		{	// restart conf
+		{ // restart conf
 			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';
 			$action = 'start';
 		}
 		else
-		{ 
-			$conf_filepath = $conf_path.'/_config.php';	
+		{
+			$conf_filepath = $conf_path.'/_config.php';
 			// Read original:
 			$conf = file( $conf_filepath );
 			if( empty( $conf ) )
@@ -142,10 +142,10 @@ switch( $action )
 				printf( '<p class="error">Could not load original conf file [%s]. Is it missing?</p>', $conf_filepath );
 				break;
 			}
-	
+
 			// File loaded...
 			// Update conf:
-			$conf = preg_replace( 
+			$conf = preg_replace(
 														array(
 																		"#(define\(\s*'DB_USER',\s*')(.*?)('\s*\);)#",
 																		"#(define\(\s*'DB_PASSWORD',\s*')(.*?)('\s*\);)#",
@@ -154,7 +154,7 @@ switch( $action )
 																		"#(baseurl\s*=\s*')(.*?)(';)#",
 																		"#(admin_email\s*=\s*')(.*?)(';)#",
 																		"#config_is_done\s*=.*?;#",
-																	), 
+																	),
 														array(
 																		'$1'.$conf_db_user.'$3',
 																		'$1'.$conf_db_password.'$3',
@@ -194,7 +194,7 @@ switch( $action )
 				</ul>
 				<p><?php echo T_('This is how your _config.php should look like:') ?></p>
 				<blockquote>
-				<pre><?php 
+				<pre><?php
 					foreach( $conf as $conf_line )
 					{
 						echo htmlspecialchars( $conf_line );
@@ -205,7 +205,7 @@ switch( $action )
 				break;
 			}
 			else
-			{	// Write new contents:
+			{ // Write new contents:
 				foreach( $conf as $conf_line )
 				{
 					fwrite( $f, $conf_line );
@@ -240,7 +240,7 @@ switch( $action )
 			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath );
 			param( 'conf_baseurl', 'string', $baseurl );
 			param( 'conf_admin_email', 'string', $admin_email );
-		 
+
 			?>
 			<h1><?php echo T_('Base configuration') ?></h1>
 			
@@ -251,7 +251,7 @@ switch( $action )
 			<form class="fform" name="form" action="index.php" method="post">
 				<input type="hidden" name="action" value="conf" />
 				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
-				
+
 				<fieldset>
 					<legend><?php echo T_('Database you want to install into (These settings should be provided by your host)') ?></legend>
 					<?php
@@ -270,7 +270,7 @@ switch( $action )
 						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' ) ), 80 );
 					?>
 				</fieldset>
-			
+
 				<fieldset>
 					<fieldset>
 						<div class="input">
@@ -279,14 +279,14 @@ switch( $action )
 						</div>
 					</fieldset>
 				</fieldset>
-			
+
 			</form>
 
 			<?php
 			break;
 		}
 		// if config was already done, move on to main menu:
-	
+
 	case 'menu':
 		/*
 		 * -----------------------------------------------------------------------------------
@@ -294,8 +294,8 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		?>
-	  <h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
-	  <form action="index.php" method="get">
+		<h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
+		<form action="index.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 
 			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
@@ -313,19 +313,19 @@ switch( $action )
 				if( $allow_evodb_reset == 1 )
 				{
 					?>
-					<p><input type="radio" name="action" id="deletedb" value="deletedb" /> 
+					<p><input type="radio" name="action" id="deletedb" value="deletedb" />
 					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables')?></strong>:
 					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.')?></label></p>
 					<?php
 				}
 			?>
-			
+
 			<p><input type="radio" name="action" id="start" value="start" />
 				<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
 
 			<p><input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;" /></p>
-		  </form>
-	  <?php
+			</form>
+		<?php
 		if( $allow_evodb_reset != 1 )
 		{
 			?>
@@ -340,12 +340,12 @@ to
 <p>Then reload this page and a reset option will appear.</p>');
 		}
 		?>
-		
-		<hr /> 
+
+		<hr />
 		<h2><?php echo T_('Base config recap...')?></h2>
-		
+
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
-	
+
 		<?php echo '<pre>',
 		T_('mySQL Username').': '.DB_USER."\n".
 		T_('mySQL Password').': '.((DB_PASSWORD != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
@@ -353,7 +353,7 @@ to
 		T_('mySQL Host').': '.DB_HOST."\n\n".
 		T_('Base URL').': '.$baseurl."\n\n".
 		T_('Admin email').': '.$admin_email.
-		'</pre>'; 
+		'</pre>';
 		break;
 
 
@@ -370,10 +370,10 @@ to
 		populate_main_tables();
 		?>
 		<p><?php echo T_('Installation successful!')?></p>
-		<?php 
+		<?php
 		printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
-	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="../admin/b2edit.php"', $random_password ); 
- 		break;
+	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$install_dirout.'/admin/"', $random_password );
+		break;
 
 
 	case 'evoupgrade':
@@ -386,11 +386,13 @@ to
 		?>
 		<h2><?php echo T_('Upgrading data in existing b2evolution database')?></h2>
 		<?php
-			upgrade_b2evo_tables();
+			if( upgrade_b2evo_tables() )
+			{
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="../admin/b2edit.php"', 'b2evolution')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$install_dirout.'/admin/"', 'b2evolution')?></p>
 		<?php
+			}
 		break;
 
 
@@ -408,7 +410,7 @@ to
 			upgrade_cafelog_tables();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="../admin/b2edit.php"', 'b2')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$install_dirout.'/admin/"', 'b2')?></p>
 		<?php
 		break;
 
@@ -435,16 +437,16 @@ to
 		}
 		db_delete();
 		?>
-	  <p><?php echo T_('Reset done!')?></p>
-	  <p><a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
-	  <?php
+		<p><?php echo T_('Reset done!')?></p>
+		<p><a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
+		<?php
 		break;
 }
 ?>
 
 <div id="rowfooter">
-	<a href="http://b2evolution.net/"><?php echo T_('official website') ?></a> &middot; 
-	<a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a> &middot; 
+	<a href="http://b2evolution.net/"><?php echo T_('official website') ?></a> &middot;
+	<a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a> &middot;
 	<a href="http://fplanque.net/About/index.html"><?php echo T_('contact') ?>: Fran&ccedil;ois PLANQUE</a>
 </div>
 

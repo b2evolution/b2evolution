@@ -67,7 +67,7 @@ switch($action)
 	
 		// check permissions:
 		$current_User->check_perm( 'blog_cats', '', true, $blog );
-	
+
 		echo "<div class=\"panelblock\">\n";
 	
 		if( !empty($parent_cat_ID) )
@@ -283,18 +283,15 @@ switch($action)
 		cats_display_blog_list();
 		require(dirname(__FILE__) . '/_menutop_end.php');
 
-		if( $blog == 0 )
+		if( $blog == 0 || ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 		{	// No blog could be selected
 			?>
 			<div class="panelblock">
-			<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.$admin_email.'?subject=b2-promotion"' ); ?>
+			<?php printf( T_('Sorry, you have no permission to edit/view any category\'s properties.' ) ); ?>
 			</div>
 			<?php
 			break;
 		}
-
-		// check permissions:
-		$current_User->check_perm( 'blog_cats', '', true, $blog );
 
 		// List the cats:
 		require( dirname(__FILE__).'/_cats_list.php' ); 

@@ -1120,12 +1120,16 @@ function debug_info( $force = false )
 	global $querycount;
 	global $debug_messages;
 	global $DB;
+	global $obhandler_debug;
 
 	if( $debug || $force )
 	{
 		echo '<hr class="clear" /><h2>Debug info</h2>';
 
-		echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
+		if( !$obhandler_debug )
+		{ // don't display changing time when we want to test obhandler
+			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
+		}
 
 		if( count( $debug_messages ) )
 		{
@@ -1177,8 +1181,7 @@ function obhandler( $output )
 	foreach ($output as $v)
 		$out .= trim($v) . "\n";
 
-
-	if( isset( $use_etags ) )
+	if( $use_etags )
 	{	// Generating ETAG
 
 		// prefix with PUB or AUT.
@@ -1186,17 +1189,16 @@ function obhandler( $output )
 			$ETag = '"AUT';    // A private page
 		else $ETag = '"PUB'; // and public one
 
-		$ETag .= md5( $out );
-		header( 'ETag: '. $ETag . '"' );
+		$ETag .= md5( $out ).'"';
+		header( 'ETag: '.$ETag );
 
 		// decide to send out or not
 		if( isset($_SERVER['HTTP_IF_NONE_MATCH'])
-				&& $_SERVER['HTTP_IF_NONE_MATCH'] === $ETag )
+				&& stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) === $ETag )
 		{ // check ETag
 			$sendout = false;
 		}
 	}
-
 
 	if( !$sendout )
 	{  // send 304 and die

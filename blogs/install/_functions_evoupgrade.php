@@ -24,14 +24,15 @@ function upgrade_b2evo_tables()
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
 	global $DB;
+	global $install_dirout;
 
 	// Check DB version:
 	check_db_version();
 	if( $old_db_version == $new_db_version )
 	{
-		echo '<p>The database schema is already up to date. There is nothing to do.</p>';
-		echo '<p>You can <a href="../admin/b2edit.php">log in</a> with your usual b2 username and password.</p>';
-		return;
+		echo '<p>'.T_('The database schema is already up to date. There is nothing to do.').'</p>';
+		printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$install_dirout.'/admin/"', 'b2evolution' );
+		return false;
 	}
 
 
@@ -440,6 +441,7 @@ function upgrade_b2evo_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
+	return true;
 }
 
 
