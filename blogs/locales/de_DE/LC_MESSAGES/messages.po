@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "POT-Creation-Date: 2004-04-05 22:37+0200\n"
-"PO-Revision-Date: 2004-04-13 18:12+0100\n"
+"PO-Revision-Date: 2004-04-13 18:26+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -4044,9 +4044,8 @@ msgid "In response to:"
 msgstr "Als Antwort auf:"
 
 #: ..\..\..\skins\_lastcomments.php:29
-#, fuzzy
 msgid "Original post on:"
-msgstr "Original Eintrag zu:"
+msgstr "Original Eintrag in:"
 
 #: ..\..\..\skins\_profile.php:53
 #: ..\..\..\skins\basic\_profile.php:55
