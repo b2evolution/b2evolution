@@ -26,37 +26,47 @@
 	
 	<fieldset>
 	<legend><?php echo T_('Available locales'); ?></legend>
-	<table class="thin" border="1"><tr>
-	<?php echo '<th>' . T_('locale') . '</th><th>' . T_('enabled')
-		. '</th><th>' . T_('name') . '</th><th>' . T_('charset')
-		. '</th><th>' . T_('date format') . '</th><th>' . T_('time<br /> format')
-		. '</th><th>' . T_('messages') . '</th>
-		</tr>';
+	<table class="thin" border="1">
+	<tr>
+		<th><?php echo  T_('Locale') ?></th>
+		<th><?php echo  T_('Enabled') ?></th>
+		<th><?php echo  T_('Name') ?></th>
+		<th><?php echo  T_('Charset') ?></th>
+		<th><?php echo  T_('Date fmt') ?></th>
+		<th><?php echo  T_('Time fmt') ?></th>
+		<th><?php echo  T_('Lang file') ?></th>
+	</tr>
+	<?php
 	$i = 0; // counter to distinguish POSTed locales later, array trick (name="loc_enabled[]") fails for unchecked boxes
 	foreach( $locales as $lkey => $lval )
 	{
 		$i++;
-		echo '<tr>
-		<td style="text-align:center"><input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />
-		<strong>'.$lkey.'</strong>
-		</td><td style="text-align:center">
-		<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
+		echo '<tr style="text-align:center">
+		<td style="text-align:left">
+			<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />
+			<strong>'.$lkey.'</strong>
+		</td>
+		<td>
+			<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
 		'#<input type="text" name="loc_'.$i.'_locale" value="'.$lkey.'" />
 		.'
-		</td><td>
-		<input type="text" name="loc_'.$i.'_name" value="'.$locales[$lkey]['name'].'" maxlength="40" />
-		</td><td>
-		<input type="text" name="loc_'.$i.'_charset" value="'.$locales[$lkey]['charset'].'" maxlength="15" />
-		</td><td>
-		<input type="text" name="loc_'.$i.'_datefmt" value="'.$locales[$lkey]['datefmt'].'" maxlength="10" size="10" />
-		</td><td>
-		<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="10" />
-		</td><td>
-		<input type="text" name="loc_'.$i.'_messages" value="'.$locales[$lkey]['messages'].'" maxlength="10" size="10" />
 		</td>
-		';
-		#form_text( 'loc_'.$key.'[]', $value, 20, $key, sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
-		echo '</td></tr>';
+		<td>
+			<input type="text" name="loc_'.$i.'_name" value="'.$locales[$lkey]['name'].'" maxlength="40" size="17" />
+		</td>
+		<td>
+			<input type="text" name="loc_'.$i.'_charset" value="'.$locales[$lkey]['charset'].'" maxlength="15" size="12" />
+		</td>
+		<td>
+			<input type="text" name="loc_'.$i.'_datefmt" value="'.$locales[$lkey]['datefmt'].'" maxlength="10" size="6" />
+		</td>
+		<td>
+			<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="6" />
+		</td>
+		<td>
+			<input type="text" name="loc_'.$i.'_messages" value="'.$locales[$lkey]['messages'].'" maxlength="10" size="6" />
+		</td>
+		</tr>';
 	}
 	echo '</table>
 	<br />

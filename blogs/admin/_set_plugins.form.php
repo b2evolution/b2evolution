@@ -21,7 +21,6 @@
 				<th><?php echo T_('Plug-in') ?></th>
 				<th><?php echo T_('Apply') ?></th>
 				<th><?php echo T_('Description') ?></th>
-				<th><?php echo T_('Code') ?></th>
 			</tr>
 			<?php
 			$Renderer->restart();	 // make sure iterator is at start position
@@ -32,7 +31,6 @@
 				<td><?php	$loop_RendererPlugin->name(); ?></td>
 				<td><?php	echo $loop_RendererPlugin->apply_when; ?></td>
 				<td><?php	$loop_RendererPlugin->short_desc(); ?></td>
-				<td><?php	$loop_RendererPlugin->code(); ?></td>
 			</tr>
 			<?php
 			}
@@ -46,7 +44,6 @@
 			<tr>
 				<th><?php echo T_('Plug-in') ?></th>
 				<th><?php echo T_('Description') ?></th>
-				<th><?php echo T_('Code') ?></th>
 			</tr>
 			<?php
 			$Toolbars->restart();	 // make sure iterator is at start position
@@ -56,7 +53,6 @@
 			<tr>
 				<td><?php	$loop_ToolbarPlugin->name(); ?></td>
 				<td><?php	$loop_ToolbarPlugin->short_desc(); ?></td>
-				<td><?php	$loop_ToolbarPlugin->code(); ?></td>
 			</tr>
 			<?php
 			}
