@@ -2635,7 +2635,7 @@ msgstr "Profil für:"
 #: ..\..\..\admin\_users_form.php:50
 #: ..\..\..\skins\_profile.php:58
 msgid "Login"
-msgstr "Login "
+msgstr "Login"
 
 #: ..\..\..\admin\_users_form.php:40
 #: ..\..\..\admin\_users_form.php:51

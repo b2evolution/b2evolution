@@ -114,8 +114,11 @@ $DB->query( $query );
  * New comment notification:
  */
 $item_author_User = & $commented_Item->Author;
-if( $item_author_User->notify )
-{	// Author wants to be notified:
+
+if( $item_author_User->notify 
+		&& $author_ID !== NULL
+		&& $author_ID != $item_author_User->ID )  // don't send if original author comments (is logged in)
+{	// Author wants to be notified and does not comment himself:
 	locale_temp_switch($item_author_User->locale);
 	$recipient = $item_author_User->email;
 	$subject = sprintf( T_('New comment on your post #%d "%s"'), $comment_post_ID, $commented_Item->get('title') );
@@ -148,8 +151,7 @@ if( $item_author_User->notify )
 	else
 		$mail_from = "\"$author\" <$email>";
 	
-	// DID YOU SEE ANYTHING BROKEN ??? ini_set('sendmail_from', $mail_from); // set Return-Path for Win32
-	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/" . phpversion(), "-f$mail_from");
+	send_mail( $recipient, $subject, $notify_message, $mail_from );
 	locale_restore_previous();
 }
 

@@ -25,10 +25,11 @@ require(dirname(__FILE__).'/_header.php');
 	</fieldset>
 
 	<fieldset>
-		<div class="label"><label for="pass1"><?php echo T_('Password:') ?><br /><?php echo T_('(twice)') ?></label></div> 
+		<div class="label"><label for="pass1"><?php echo T_('Password:') ?><br /><?php echo T_('(twice)').'<br />' ?></label></div>
 		<div class="input">
 		<input type="password" name="pass1" id="pass1" size="16" maxlength="20" value="" class="large" />
 		<input type="password" name="pass2" id="pass2" size="16" maxlength="20" value="" class="large" />
+		<span class="notes">[<?php printf( T_('min %d characters, please'), $Settings->get('user_minpwdlen') ) ?>]</span>
 		</div>
 	</fieldset>
 
@@ -37,6 +38,9 @@ require(dirname(__FILE__).'/_header.php');
 		<div class="input"><input type="text" name="email" id="email" size="16" maxlength="100" value="<?php echo format_to_output($email, 'formvalue'); ?>" class="large" /></div>
 	</fieldset>
 
+	<?php
+	form_select( 'locale', $locale, 'locale_options', T_('Locale') );
+	?>
 	<fieldset>
 		<div class="input">
 			<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search" />

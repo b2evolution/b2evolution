@@ -17,8 +17,11 @@ param( 'user', 'integer', 0 );
 param( 'group', 'integer', 0 );
 
 // show the top menu
-require( dirname(__FILE__).'/_menutop.php' );
-require( dirname(__FILE__).'/_menutop_end.php' );
+if( $action != 'userupdate' )
+{ // perhaps we'll have to set a cookie later
+	require( dirname(__FILE__).'/_menutop.php' );
+	require( dirname(__FILE__).'/_menutop_end.php' );
+}
 
 
 $errors = array();
@@ -26,7 +29,7 @@ $errors = array();
 // Check permission:
 if( !$current_User->check_perm( 'users', 'edit', false ) )
 {
-	errors_add( T_('You have no permission to edit!') );
+	errors_add( T_('You have no permission to edit users/groups!') );
 }
 else
 switch ($action)
@@ -140,7 +143,13 @@ switch ($action)
 				}
 				else
 				{ // set password
-					$edited_User->set( 'pass', md5( $edited_user_pass2 ) );
+					$new_pass = md5( $edited_user_pass2 );
+					$edited_User->set( 'pass', $new_pass );
+					
+					if( $edited_user_ID == $current_User->get('ID') )
+					{ // set cookie
+						setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
+					}
 				}
 			}
 		}
@@ -155,6 +164,10 @@ switch ($action)
 		$edited_User->setGroup( $edited_user_Group );
 		// echo 'new group = ';
 		// $edited_User->Group->disp('name');
+		
+		// display menu
+		require( dirname(__FILE__).'/_menutop.php' );
+		require( dirname(__FILE__).'/_menutop_end.php' );
 		
 		if( count($errors) )
 		{

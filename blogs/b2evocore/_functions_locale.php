@@ -133,7 +133,7 @@ function locale_activate( $locale )
 {
 	global $use_l10n, $locales, $current_locale, $current_messages, $current_charset, $weekday, $month;
 
-	if( $locale == $current_locale )
+	if( $locale == $current_locale || empty( $locale ) )
 	{
 		return false;
 	}

@@ -23,7 +23,7 @@ if( !empty($locale) && $action != 'extract' )
 
 		<?php
 		// read template
-		
+
 		if( isset($locales[$template]) )
 		{
 			$ltemplate = $locales[ $template ];
@@ -38,7 +38,7 @@ if( !empty($locale) && $action != 'extract' )
 		{
 			$newlocale = '';
 		}
-		
+
 		if( $locale != '_new_' )
 		{ // we need to remember this for updating locale
 			echo '<input type="hidden" name="oldloc_locale" value="'.$newlocale.'" />';
@@ -58,8 +58,8 @@ if( !empty($locale) && $action != 'extract' )
 			T_('the message file being used, from <code>locales</code> subdirectory'), 20 );
 		form_text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
 			T_('1 is highest. It\'s use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc.'), 5 );
-		
-		
+
+
 		// generate Javascript array of locales to warn in case of overwriting
 		$l_warnfor = "'".implode("', '", array_keys($locales))."'";
 		if( $locale != '_new_' )
@@ -68,7 +68,7 @@ if( !empty($locale) && $action != 'extract' )
 		}
 		echo '
 		<div class="input">
-		<input type="submit" name="submit" value="'.( ($locale == '_new_') ? T_('Create') : T_('Update') ).'" class="search" onClick="var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};" />	
+		<input type="submit" name="submit" value="'.( ($locale == '_new_') ? T_('Create') : T_('Update') ).'" class="search" onClick="var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};" />
 		<input type="reset" value="'.format_to_output(T_('Reset'), 'formvalue').'" class="search" />
 		</div>
 		<div class="panelinfo">
@@ -80,7 +80,7 @@ if( !empty($locale) && $action != 'extract' )
 }
 else
 { // show main form
-	if( !$locales[$default_locale]['enabled'] )
+	if( !$locales[$Settings->get('default_locale')]['enabled'] )
 	{ // default locale is not enabled
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
@@ -88,20 +88,20 @@ else
 	<form class="fform" name="form" action="b2options.php?tab=regional" method="post">
 		<input type="hidden" name="action" value="update" />
 		<input type="hidden" name="notransext" value="<?php echo $notransext;?>" />
-		
+
 		<fieldset>
 			<legend><?php echo T_('Regional settings') ?></legend>
-	
+
 			<?php
 			form_text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
 			form_select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), T_('Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or blog locale (in this order).'));
 			?>
-			
+
 		</fieldset>
-		
+
 		<fieldset>
 		<legend><?php echo T_('Available locales'); ?></legend>
-		
+
 		<p class="center"><?php
 		if( !$notransext )
 		{
@@ -114,7 +114,7 @@ else
 			$showtranslationpercentage = 0;
 		}
 		?></p>
-		
+
 		<table class="thin" border="1">
 		<tr>
 			<th><?php echo T_('Locale') ?></th>
@@ -132,7 +132,7 @@ else
 				if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
 				{ ?>
 					<th><?php echo T_('Extract') ?></th>
-					<?php			
+					<?php
 				}
 			} ?>
 		</tr>
@@ -162,7 +162,7 @@ else
 			<td>
 				<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="6" />
 			</td>';
-	
+
 			if( $current_User->check_perm( 'options', 'edit' ) )
 			{
 				echo '<td align="left">';
@@ -174,7 +174,7 @@ else
 				{
 					echo '<img src="img/blank.gif" width="14" border="0" />';
 				}
-		
+
 				if( $i < count($locales) )
 				{ // show "move prio down"
 					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" border="0" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
@@ -185,7 +185,7 @@ else
 				}
 				echo '
 				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale=_new_&amp;template='.$lkey.'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
-				
+
 				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale='.$lkey.'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
 				';
 				if( isset($lval[ 'fromdb' ]) )
@@ -215,10 +215,10 @@ else
 					$translated=0;
 					$status='-';
 					$matches = array();
-					foreach ($lines as $line) 
+					foreach ($lines as $line)
 					{
 						// echo 'LINE:', $line, '<br />';
-						if(trim($line) == '' )	
+						if(trim($line) == '' )
 						{	// Blank line, go back to base status:
 							if( $status == 't' )
 							{	// ** End of a translation ** :
@@ -241,27 +241,27 @@ else
 							}
 							$status = '-';
 						}
-						elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches)) 
+						elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
 						{	// Encountered an original text
 							$status = 'o';
 							$msgid = $matches[1];
 							// echo 'original: "', $msgid, '"<br />';
 							$all++;
 						}
-						elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches)) 
+						elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
 						{	// Encountered a translated text
 							$status = 't';
 							$msgstr = $matches[1];
 							// echo 'translated: "', $msgstr, '"<br />';
 						}
-						elseif( preg_match( '#^"(.*)"#', $line, $matches)) 
+						elseif( preg_match( '#^"(.*)"#', $line, $matches))
 						{	// Encountered a followup line
-							if ($status=='o') 
+							if ($status=='o')
 								$msgid .= $matches[1];
 							elseif ($status=='t')
 								$msgstr .= $matches[1];
 						}
-						elseif(strpos($line,'#, fuzzy') === 0) 
+						elseif(strpos($line,'#, fuzzy') === 0)
 						{
 							$this_fuzzy = true;
 							$fuzzy++;
@@ -282,7 +282,7 @@ else
 					}
 				}
 			} // show message file percentage/extraction
-			
+
 			echo '</tr>';
 		}
 		?>
@@ -294,8 +294,8 @@ else
 			<?php if( isset($l_atleastonefromdb) )
 			{ ?>
 				<p class="center"><a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
-				<?php 
-			} 
+				<?php
+			}
 		}
 		?>
 	</fieldset>

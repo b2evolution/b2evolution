@@ -16,6 +16,9 @@ require_once( dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php" );
 param( 'action', 'string', '' );
 param( 'login', 'string', '' );
 param( 'email', 'string', '' );
+param( 'locale', 'string', $Settings->get('default_locale') );
+
+locale_activate( $locale );
 
 if(!$Settings->get('newusers_canregister'))
 {
@@ -97,7 +100,7 @@ switch( $action )
 		$new_User->set( 'browser', isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' );
 		$new_User->set_datecreated( $localtimenow );
 		$new_User->set( 'level', $Settings->get('newusers_level') );
-		$new_User->set( 'locale', $default_locale );
+		$new_User->set( 'locale', $locale );
 		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
 		// echo $newusers_grp_ID;
 		$new_user_Group = $GroupCache->get_by_ID( $newusers_grp_ID );
@@ -107,13 +110,18 @@ switch( $action )
 
 		// TODO: END TRANSACTION !!
 
-		$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
-		$message .= T_('Login:', $default_locale). " $login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
-		$message .= T_('Manage users', $default_locale). ": $admin_url/b2users.php\n\n";
+		// switch to admins locale
+		$admin_data = get_userdata(1);
+		locale_temp_switch( $admin_data['user_locale'] );
+		
+		$message  = T_('new user registration on your blog'). ":\n\n";
+		$message .= T_('Login:'). " $login\n\n". T_('Email'). ": $email\n\n";
+		$message .= T_('Manage users'). ": $admin_url/b2users.php\n\n";
 
-		// DID YOU SEE ANYTING BROKEN ??? ini_set('sendmail_from', $notify_from); // set Return-Path for Win32
-		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion(), "-f$notify_from");
+		send_mail( $admin_email, T_('new user registration on your blog'), $message );
 
+		locale_restore_previous();
+		
 		// Display confirmation screen:
 		require( dirname(__FILE__).'/_reg_complete.php' );
 		exit();

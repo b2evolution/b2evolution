@@ -1370,4 +1370,71 @@ function obhandler( $output )
 		}}}*/
 }
 
+/**
+ * sends a mail, wraps PHP's mail() function
+ *
+ * @param string recipient
+ * @param string subject of the mail
+ * @param string the message
+ * @param string From address, being added to headers
+ * @param array additional headers
+ * @param mixed Return-Path. Default is to use From address, set to false to use PHP.INI setting
+ * @param string Content-Type. Default is text/plain.
+ * @param string Charset, if NULL $current_locale will be used
+ * @param boolean add standard headers (X-Mailer)
+ */
+function send_mail( $to, $subject, $message, $from = '', $headers = array(), $setreturnpath = true, $contenttype = 'text/plain', $charset = true, $addstandardheaders = true )
+{
+	global $b2_version, $current_locale, $locales;
+	
+	if( !is_array( $headers ) )
+	{ // make sure $headers is an array
+		$headers = array( $headers );
+	}
+	
+	// Specify charset and content-type of email
+	$headers[] = 'Content-Type: '.$contenttype.'; charset='
+		.( $charset === true ? $locales[ $current_locale ]['charset'] : $charset );
+	
+	if( $addstandardheaders )
+	{
+		$headers[] = 'X-Mailer: b2evolution '.$b2_version.' - PHP/'.phpversion();
+	}
+	
+	// -- build headers ----
+	if( !empty($from) )
+	{ // from has to go into headers
+		$headerstring = "From: $from\n";
+	}
+	else
+	{
+		$headerstring = '';
+	}
+	
+	if( count($headers) )
+	{ // add supplied headers
+		$headerstring .= implode( "\n", $headers );
+	}
+	
+	debug_log( "Sending mail from $from to $to - subject $subject." );
+	
+	if( $setreturnpath )
+	{ // we want to set the Return-Path
+		if( empty($returnpath) )
+		{ // use from-address for Return-Path
+			$returnpath = $from;
+		}
+		
+		// set Return-Path for Win32
+		@ini_set('sendmail_from', $returnpath);
+		
+		// -f should set Return-Path on sendmail systems
+		return @mail( $to, $subject, $message, $headerstring, "-f$returnpath" );
+	}
+	else
+	{
+		// mail without setting Return-Path
+		return @mail( $to, $subject, $message, $headerstring );
+	}
+}
 ?>

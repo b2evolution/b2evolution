@@ -1388,21 +1388,23 @@ function pingback_ping($m)
 						$authordata = get_userdata($postdata['Author_ID']);
 						if( get_user_info( 'notify', $authordata ) )
 						{ // Author wants to be notified:
+							locale_temp_switch( get_user_info('locale', $authordata) );
+							
 							$recipient = get_user_info( 'email', $authordata );
-							$subject = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] );
+							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
 							// fplanque added:
 							$comment_blogparams = get_blogparams_by_ID( $blog );
 
-							$notify_message	 = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] )."\n";
+							$notify_message	 = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$post_ID."&pb=1\n\n";
-							$notify_message .= T_('Website', $default_locale). ": $original_title\n";
-							$notify_message .= T_('Url', $default_locale). ": $original_pagelinkedfrom\n";
-							$notify_message .= T_('Excerpt', $default_locale). ": \n[...] $original_context [...]\n\n";
-							$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$post_ID."&c=1\n\n";
+							$notify_message .= T_('Website'). ": $original_title\n";
+							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
+							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";
+							$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$post_ID."&c=1\n\n";
 
-							ini_set('sendmail_from', $notify_from); // set Return-Path for Win32
-							@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion(), "-f$notify_from" );
-
+							send_mail( $recipient, $subject, $notify_message, $notify_from );
+							
+							locale_restore_previous();
 						}
 					}
 				}

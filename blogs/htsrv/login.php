@@ -62,7 +62,11 @@ switch($action)
 		// echo 'login: ', $log;
 		$user_data	= get_userdatabylogin($log);
 		$user_email	= $user_data['user_email'];
+		
+		locale_temp_switch( $user_data['user_locale'] );
+		
 		// echo 'email: ', $user_email;
+		// echo 'locale: '.$user_data['locale'];
 
 		if( empty($user_email) )
 		{	// pretend that the email is sent for avoiding guessing user_login
@@ -74,18 +78,12 @@ switch($action)
 
 			$message  = T_('Login:')." $log\r\n";
 			$message .= T_('New Password:')." $random_password\r\n";
+			$message .= "\r\n".T_('You can login here:')."\r\n".$htsrv_url."/login.php\r\n";
 
 			// DEBUG!
 			// echo $message.' (password not set yet, only when sending email does not fail);
 
-			// set Return-Path for Win32
-			ini_set('sendmail_from', $notify_from);
-			if( ! @mail($user_email,
-									T_('your weblog\'s login/password'),
-									$message,
-									"From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion(),
-									"-f$notify_from"  // set Return-Path for sendmail
-									) )
+			if( !send_mail( $user_email, T_('your weblog\'s login/password'), $message, $notify_from ) )
 			{
 				$notes = T_('The email could not be sent.')."<br />\n"
 								.T_('Possible reason: your host may have disabled the mail() function...');
@@ -99,6 +97,8 @@ switch($action)
 			}
 
 		}
+		
+		locale_restore_previous();
 
 
 	default:
@@ -110,6 +110,10 @@ switch($action)
 			$error = T_('Note: You are already logged in!');
 
 			param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
+			if( basename( $redirect_to ) == basename( $_SERVER['SCRIPT_NAME'] ) )
+			{ // avoid "endless loops"
+				$redirect_to = $admin_url.'/b2edit.php';
+			}
 			$error .= ' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>';
 		}
 
