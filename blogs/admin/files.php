@@ -35,12 +35,14 @@ if( $current_User->level < 10 )
 
 if( $action == 'update_settings' )
 {
-	param( 'option_dirsattop', 'integer', 0 );
-	$UserSettings->set( 'fm_dirsattop', $option_dirsattop );
+	
+	$UserSettings->set( 'fm_dirsattop',   param( 'option_dirsattop', 'integer', 0 ) );
+	$UserSettings->set( 'fm_permlikelsl', param( 'option_permlikelsl', 'integer', 0 ) );
+	$UserSettings->set( 'fm_fulldirsize', param( 'option_fulldirsize', 'integer', 0 ) );
 		
 	if( $UserSettings->updateDB() )
 	{
-		$Messages->add( T_('User preferences updated').'.', 'note' );
+		$Messages->add( T_('Your user settings have been updated.'), 'note' );
 	}
 }
 
@@ -506,7 +508,7 @@ while( $Fileman->next() )
 		<td class="type"><?php $Fileman->cdisp('type') ?></td>
 		<td class="size"><?php $Fileman->cdisp('nicesize') ?></td>
 		<td class="timestamp"><?php $Fileman->cdisp('lastmod') ?></td>
-		<td class="perms"><?php $Fileman->cdisp( 'link_editperm', '', '<a href="%s">'.$Fileman->cget('perms', 'octal').'</a>' ) ?></td>
+		<td class="perms"><?php $Fileman->cdisp( 'link_editperm', '', '<a href="%s">'.$Fileman->cget('perms').'</a>' ) ?></td>
 		<td class="actions"><?php
 			$Fileman->cdisp( 'link_edit', '', '<a href="%s">'.$Fileman->icon( 'edit', 'imgtag' ).'</a>' );
 			$Fileman->cdisp( 'link_copymove', '', '<a href="%s">'.$Fileman->icon( 'copymove', 'imgtag' ).'</a>' );
@@ -563,21 +565,58 @@ if( $i != 0 )
 </form>
 
 <div class="toolbar">
-	<form id="options" class="fm_options" action="files.php" method="post">
-		<div id="options_list">
-			<?php echo T_('sort directories at top') ?>
+	<?php
+	param( 'options_show', 'integer', 0 );
+	?>
+	<form class="toolbaritem" action="files.php" method="post">
+		<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
+			<?php echo T_('Sort directories at top') ?>
 			<input type="checkbox" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />
+			<br />
+			<?php echo T_('File permissions like &quot;ls -l&quot;') ?>
+			<input type="checkbox" name="option_permlikelsl" value="1"<?php if( $UserSettings->get('fm_permlikelsl') ) echo ' checked="checked"' ?> />
+			<br />
+			<?php echo T_('Recursive size of directories') ?>
+			<input type="checkbox" name="option_fulldirsize" value="1"<?php if( $UserSettings->get('fm_fulldirsize') ) echo ' checked="checked"' ?> />
 			<br />
 
 			<?php echo $Fileman->form_hiddeninputs() ?>
 			<input type="hidden" name="action" value="update_settings" />
+			<input type="hidden" name="options_show" value="1" />
 			<div class="input">
 			<input type="submit" value="<?php echo T_('Update !') ?>" />
 			</div>
 		</div>
+		
+		<noscript type="text/javascript">
+		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"><?php
+			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
+		</noscript>
+			
 		<script type="text/javascript">
 		<!--
-			document.write( '<a id="options_title" href="javascript:toggle_options()"><?php echo T_("show options") ?></a>' )
+			document.write( '<a id="options_toggle" href="javascript:toggle_options()"><?php echo T_("show options") ?></a>' )
+			
+			showoptions = <?php echo ($options_show) ? 'false' : 'true' ?>;
+			toggle_options();
+			
+			function toggle_options()
+			{
+				if( showoptions )
+				{
+					var replace = document.createTextNode('<?php echo /* Warning! This is a Javascript string! */ T_('show options') ?>');
+					var display_list = 'none';
+					showoptions = false;
+				}
+				else
+				{
+					var replace = document.createTextNode('<?php echo /* Warning! This is a Javascript string! */ T_('hide options') ?>');
+					var display_list = 'inline';
+					showoptions = true;
+				}
+				document.getElementById('options_list').style.display = display_list;
+				document.getElementById('options_toggle').replaceChild(replace, document.getElementById( 'options_toggle' ).firstChild);
+			}
 		// -->
 		</script>
 	</form>
@@ -594,38 +633,11 @@ if( $i != 0 )
 			<option value="dir"><?php echo T_('directory') ?></option>
 		</select>
 		<input type="text" name="createname" value="" size="20" />
+		<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
 		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="hidden" name="action" value="createnew" />
-		<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
 	</form>
 </div>
-
-<script type="text/javascript">
-<!--
-showoptions = true;
-toggle_options();
-function toggle_options()
-{
-	if( showoptions )
-	{
-		var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('show options') ?>');
-		var display_list = 'none';
-		var display_border = '0';
-		showoptions = false;
-	}
-	else
-	{
-		var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('hide options') ?>');
-		var display_list = 'inline';
-		var display_border = '1px solid #d91';
-		showoptions = true;
-	}
-	document.getElementById('options').style.border = display_border;
-	document.getElementById('options_list').style.display = display_list;
-	document.getElementById('options_title').replaceChild(replace, document.getElementById( 'options_title' ).firstChild);
-}
--->
-</script>
 
 </div>
 <?php

@@ -675,32 +675,19 @@ table.fileman th {
 }
 .toolbar {
 }
-.toolbaritem input,
-.toolbaritem select,
-form.fm_options input
-{
-	font-size:84%;
-}
 .toolbaritem {
 	text-align:right;
 	margin-bottom:0.5ex;
-	vertical-align:bottom;
 	padding-left: 3ex;
 	float:right;
 }
 
 div.fm_messages {
 	border:1px dashed #d91;
-	padding:1ex;
+	padding: 1ex 3ex;
 	margin-bottom:2ex;
 }
 div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;
-}
-form.fm_options {
-	text-align:right;
-	float:right;
-	border: 1px solid #d91;
-	padding:1ex;
 }

@@ -183,7 +183,6 @@ class FileManager
 				if( is_dir( $this->cwd.'/'.$entry ) )
 				{
 					$this->entries[ $i ]['type'] = 'dir';
-					#$this->entries[ $i ]['size'] = '&lt;DIR&gt;';
 					if( $this->fulldirsize )
 						$this->entries[ $i ]['size'] = $this->get_dirsize( $this->cwd.'/'.$entry );
 					else $this->entries[ $i ]['size'] = false;
@@ -399,7 +398,7 @@ class FileManager
 														strcasecmp( $a[\'name\'], $b[\'name\'] )
 														: ( $a[\'size\'] - $b[\'size\'] );';
 		elseif( $order == 'type' )
-		{ // dirty hack: copy the whole Filemanager into global array to access filetypes // TODO: optimize
+		{ // stupid dirty hack: copy the whole Filemanager into global array to access filetypes // TODO: optimize
 			global $typetemp;
 			$typetemp = $this;
 			$sortfunction = 'global $typetemp; $r = strcasecmp( $typetemp->cget_file($a[\'name\'], \'type\'), $typetemp->cget_file($b[\'name\'], \'type\') );';
@@ -457,6 +456,7 @@ class FileManager
 
 
 	/**
+	 * Displays file permissions like 'ls -l'
 	 *
 	 * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
 	 * @param string
@@ -550,8 +550,8 @@ class FileManager
 				break;
 
 			case 'nicesize':
-				if( $this->cisdir() )
-					$r = '&lt;dir&gt;';
+				if( $this->cisdir() && !$this->fulldirsize )
+					$r = /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 				elseif( ($r = $this->cget('size')) !== false )
 					$r = $this->bytesreadable( $r );
 				else
@@ -1243,7 +1243,7 @@ class FileManager
 		{
 			if( is_dir($path.'/'.$cur) )
 			{
-				$total += $this->GetDirSize($path.'/'.$cur);
+				$total += $this->get_dirsize($path.'/'.$cur);
 			}
 			else
 			{
@@ -1326,7 +1326,9 @@ class FileManager
 	{
 		global $UserSettings;
 		
-		$this->dirsattop = $UserSettings->get( 'fm_dirsattop', $this->user->ID );
+		$UserSettings->get_cond( $this->dirsattop,   'fm_dirsattop',   $this->user->ID );
+		$UserSettings->get_cond( $this->permlikelsl, 'fm_permlikelsl', $this->user->ID );
+		$UserSettings->get_cond( $this->fulldirsize, 'fm_fulldirsize', $this->user->ID );
 	}
 
 

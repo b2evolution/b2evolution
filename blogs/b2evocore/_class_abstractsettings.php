@@ -97,6 +97,7 @@ class AbstractSettings
 	 *
 	 * @params string the values for the column keys (depends on $this->colkeynames
 	 *                and must match its count and order)
+	 * @return mixed value on success, false if not found or error occurred
 	 */
 	function get()
 	{
@@ -142,6 +143,34 @@ class AbstractSettings
 
 		$Debuglog->add( 'AbstractSetting: queried setting ['.implode( '/', $args ).' not defined.' );
 		return false;
+	}
+
+
+	/**
+	 * Only set the first variable (passed by reference) if we could retrieve a setting
+	 *
+	 * @param mixed variable to eventually set (by reference)
+	 * @params string the values for the column keys (depends on $this->colkeynames
+	 *                and must match its count and order)
+	 * @return boolean true on success (variable was set), false if not
+	 */
+	function get_cond( &$toset )
+	{
+		$args = func_get_args();
+		
+		array_shift( $args );
+		
+		$result = call_user_func_array( array( &$this, 'get' ), $args );
+		
+		if( $result !== false )
+		{
+			$toset = $result;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 
