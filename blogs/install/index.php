@@ -294,11 +294,11 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		?>
-	  <h1><?php echo T_('What do you want to install?') ?></h1>
+	  <h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
 	  <form action="index.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 
-			<p><?php echo T_('The database tables installation can be done in different ways. Choose one:')?></p>
+			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
 
 			<p><input type="radio" name="action" id="newdb" value="newdb" checked="checked" />
 				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables with sample data.')?></label></p>
@@ -323,7 +323,10 @@ switch( $action )
 				}
 			?>
 			
-			<p><input type="submit" value="<?php echo T_('Install Database Tables Now !')?>" /></p>
+			<p><input type="radio" name="action" id="start" value="start" />
+				<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
+
+			<p><input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;" /></p>
 		  </form>
 	  <?php
 		if( $allow_evodb_reset != 1 )
@@ -343,7 +346,7 @@ to
 		<hr /> 
 		<h2><?php echo T_('Config file recap...')?></h2>
 		
-		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>redo your configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
+		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 	
 		<?php echo '<pre>',
 		T_('mySQL Username').': '.DB_USER."\n".
