@@ -215,6 +215,8 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8060 )
 	{	// upgrade to 0.8.9+CVS
+		
+		create_locales();
 
 		/**
 		 *
@@ -289,14 +291,6 @@ function upgrade_b2evo_tables()
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
-		/*
-		DH to FP: I got this here:
-		MySQL said:
-		You have an error in your SQL syntax. Check the manual that corresponds to your MySQL server version for the right syntax to use near 'DROP INDEX post_date, ADD INDEX post_issue_date( post_i (error 1064)
-		# so I used just this for testing:
-		# $query = "ALTER TABLE $tableposts 
-		CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US'";
-		*/
 		$DB->query( $query );
 		
 		$query = "UPDATE $tableposts
@@ -322,8 +316,6 @@ function upgrade_b2evo_tables()
 							ADD COLUMN pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-		
-		create_locales();
 
 	}
 
