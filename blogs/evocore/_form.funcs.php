@@ -188,11 +188,19 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
  * {@internal form_hidden(-)}}
  * @param string name
  * @param string value
+ * @return string
  */
-function form_hidden( $field_name, $field_value )
+function form_hidden( $field_name, $field_value, $display = true )
 {
-	echo '<input type="hidden" name="'.$field_name
-			.'" value="'.format_to_output($field_value, 'formvalue').'" />'."\n";
+	$r = '<input type="hidden" name="'.$field_name
+				.'" value="'.format_to_output($field_value, 'formvalue').'" />'."\n";
+	if( $display )
+	{
+		echo $r;
+		return true;
+	}
+
+	return $r;
 }
 
 
@@ -498,6 +506,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/10 02:14:28  blueyed
+ * form_hidden(): allow return-only
+ *
  * Revision 1.7  2004/12/21 21:22:46  fplanque
  * factoring/cleanup
  *
