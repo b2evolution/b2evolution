@@ -388,7 +388,7 @@ div.panelblock {
 	border: 1px solid #ddd;
 	background: #fff;
 	margin: .5ex;
-	padding: .5ex;
+	padding: 0;
 }
 #mainmenu li.current {
 	border: 1px solid #008;
@@ -399,6 +399,10 @@ div.panelblock {
 	border: 1px solid #00b;
 	background: #f0f0f0;
 	font-weight: bold;
+}
+#mainmenu li a{
+	display:block;
+	padding:.5ex;
 }
 ul.tabs {
 	margin:0;
