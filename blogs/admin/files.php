@@ -100,7 +100,7 @@ if( empty($action) )
 	$action = array_pop( array_keys( param( 'actionArray', 'array', array() ) ) );
 }
 
-if( $current_User->login != 'demouser' && $current_User->level < 10 )
+if( $current_User->level < 10 )
 { // allow demouser, but noone else below level 10
 	echo 'The filemanager is still beta. You need user level 10 to play with this.';
 	return;
@@ -1195,6 +1195,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.76  2005/02/23 04:06:16  blueyed
+ * minor
+ *
  * Revision 1.75  2005/02/12 00:58:13  blueyed
  * fixed preg_split() better ($allowedFileExtensions, $allowedMimeTypes)
  *

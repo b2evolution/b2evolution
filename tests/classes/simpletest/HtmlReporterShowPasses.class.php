@@ -16,14 +16,15 @@ class HtmlReporterShowPasses extends HtmlReporter
 		$this->HtmlReporter();
 	}
 
-	function paintPass($message) {
+	function paintPass($message)
+	{
 		parent::paintPass($message);
 
 		print "<span class=\"pass\">Pass</span>: ";
 		$breadcrumb = $this->getTestList();
 		array_shift($breadcrumb);
 		print implode(" -&gt; ", $breadcrumb);
-		print " -&gt; $message<br />\n";
+		print ' -&gt; '.htmlspecialchars($message)."<br />\n";
 	}
 
 	function _getCss() {

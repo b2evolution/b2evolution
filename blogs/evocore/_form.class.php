@@ -173,7 +173,7 @@ class Form extends Widget
 						.$this->labelend;
 		}
 		else
-		{	// Empty label:
+		{ // Empty label:
 			// $this->empty_label = false;	// Memorize this
 			$r .= $this->labelempty;
 		}
@@ -441,15 +441,15 @@ class Form extends Widget
 											$field_class = '', $field_value = 1 )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
-				.'<input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="'
-				.format_to_output($field_value,'formvalue').'"';
+				.'<input type="checkbox" class="checkbox"'
+				.' value="'.format_to_output($field_value,'formvalue').'"';
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
 		if( !empty($field_name) )
 		{
-			$r .= ' id="'.$field_name.'"';
+			$r .= 'name="'.$field_name.'" id="'.$field_name.'"';
 		}
 		if( $field_checked )
 		{
@@ -712,9 +712,110 @@ class Form extends Widget
 		{
 			$r.= ' class="'.$field_class.'"';
 		}
-		$r .= ">\n".$field_list_callback( $field_value )
-					."</select>\n"
+		$r .= ">\n"
+					.call_user_func( $field_list_callback, $field_value )
+					."</select>\n";
+
+		if( !empty($field_note) )
+		{
+			$r .= '<span class="notes">'.$field_note.'</span>';
+		}
+
+		$r .= $this->end_field();
+
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
+
+	/**
+	 * Display a select field and populate it with a cache object.
+	 *
+	 * @param string field name
+	 * @param string default field value
+	 * @param DataObjectCache Cache containing values for list
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param boolean allow to select [none] in list
+	 * @param string CSS class for select
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_object(
+		$field_name,
+		$field_value,
+		& $field_object,
+		$field_label,
+		$field_note = '',
+		$allow_none = false,
+		$field_class = '',
+		$field_object_callback = 'option_list_return' )
+	{
+		$r = $this->begin_field( $field_name, $field_label )
+					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+
+		if( !empty($field_class) )
+		{
+			$r .= ' class="'.$field_class.'"';
+		}
+		$r .= '>';
+		$r .= $field_object->$field_object_callback( $field_value, $allow_none )
+			 		."</select>\n"
 					.'<span class="notes">'.$field_note.'</span>';
+
+		$r .= $this->end_field();
+
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
+
+	/**
+	 * Display a select field and populate it with a cache object.
+	 *
+	 * @param string field name
+	 * @param string string containing options
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param boolean allow to select [none] in list
+	 * @param string CSS class for select
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_options(
+		$field_name,
+		& $field_options,
+		$field_label,
+		$field_note = NULL,
+		$field_class = NULL )
+	{
+		$r = $this->begin_field( $field_name, $field_label )
+					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+
+		if( !empty($field_class) )
+		{
+			$r .= ' class="'.$field_class.'"';
+		}
+		$r .= '>'
+					.$field_options
+					."</select>\n";
+
+		if( !empty( $field_note ) )
+		{
+			$r .= ' <span class="notes">'.$field_note.'</span>';
+		}
 
 		$r .= $this->end_field();
 
@@ -874,7 +975,7 @@ class Form extends Widget
 		}*/
 
 		if( ! $hidden )
-		{	// there are not only hidden buttons : additional tags
+		{ // there are not only hidden buttons : additional tags
 			$r = $this->buttonsstart.$r.$this->buttonsend;
 		}
 
@@ -1080,7 +1181,7 @@ class Form extends Widget
 
 			$r .= '<label class="radiooption"><input type="radio" class="radio" name="'.$field_name.'" value="'.format_to_output( $loop_field_option[0], 'formvalue' ).'"';
 			if( $field_value == $loop_field_option[0] )
-			{	// Current selection:
+			{ // Current selection:
 				$r .= ' checked="checked"';
 			}
 			if( !empty( $loop_field_option[4] ) )
@@ -1101,102 +1202,6 @@ class Form extends Widget
 		{
 			$r .= '<div><span class="notes">'.$field_notes.'</span></div>';
 		}
-		$r .= $this->end_field();
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
-	}
-
-
-	/**
-	 * Display a select field and populate it with a cache object.
-	 *
-	 * @param string field name
-	 * @param string default field value
-	 * @param DataObjectCache Cache containing values for list
-	 * @param string field label to be display before the field
-	 * @param string note to be displayed after the field
-	 * @param boolean allow to select [none] in list
-	 * @param string CSS class for select
-	 * @return mixed true (if output) or the generated HTML if not outputting
-	 */
-	function select_object(
-		$field_name,
-		$field_value,
-		& $field_object,
-		$field_label,
-		$field_note = '',
-		$allow_none = false,
-		$field_class = '',
-		$field_object_callback = 'option_list_return' )
-	{
-		$r = $this->begin_field( $field_name, $field_label )
-					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
-
-		if( !empty($field_class) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		$r .= '>';
-		$r .= $field_object->$field_object_callback( $field_value, $allow_none )
-			 		."</select>\n"
-					.'<span class="notes">'.$field_note.'</span>';
-
-		$r .= $this->end_field();
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
-	}
-
-
-	/**
-	 * Display a select field and populate it with a cache object.
-	 *
-	 * @param string field name
-	 * @param string string containing options
-	 * @param string field label to be display before the field
-	 * @param string note to be displayed after the field
-	 * @param boolean allow to select [none] in list
-	 * @param string CSS class for select
-	 * @return mixed true (if output) or the generated HTML if not outputting
-	 */
-	function select_options(
-		$field_name,
-		& $field_options,
-		$field_label,
-		$field_note = NULL,
-		$field_class = NULL )
-	{
-		$r = $this->begin_field( $field_name, $field_label )
-					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
-
-		if( !empty($field_class) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		$r .= '>'
-					.$field_options
-					."</select>\n";
-
-		if( !empty( $field_note ) )
-		{
-			$r .= ' <span class="notes">'.$field_note.'</span>';
-		}
-
 		$r .= $this->end_field();
 
 		if( $this->output )

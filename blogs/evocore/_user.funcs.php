@@ -338,7 +338,7 @@ function profile_check_params( $params )
 	// if the ICQ UIN has been entered, check to see if it has only numbers
 	if( !empty($params['icq']) )
 	{
-		if( !preg_match( '^[0-9]+$', $params['icq']) )
+		if( !preg_match( '#^[0-9]+$#', $params['icq']) )
 		{
 			$Messages->add( T_('The ICQ UIN can only be a number, no letters allowed.') );
 		}
@@ -396,6 +396,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.18  2005/02/23 04:06:16  blueyed
+ * minor
+ *
  * Revision 1.17  2005/02/22 02:42:21  blueyed
  * Login refactored (send password-change-request mail instead of new password)
  *

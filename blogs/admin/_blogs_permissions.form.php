@@ -190,7 +190,7 @@ $Form->fieldset( T_('User permissions') );
 </div>
 
 
-<div id="userlist_wide" style="<?php
+<div id="userlist_wide" class="clear" style="<?php
 	echo 'display:'.( ($layout == 'wide' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
 	<table class="grouped">
 		<thead>
@@ -252,7 +252,7 @@ $Form->fieldset( T_('User permissions') );
 </div>
 
 
-<div id="userlist_default" style="<?php
+<div id="userlist_default" class="clear" style="<?php
 	echo 'display:'.( ($layout == 'default' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
 	<table class="grouped">
 		<tr class="group">

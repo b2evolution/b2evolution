@@ -23,9 +23,7 @@ if( $current_User->check_perm( 'users', 'view' ) )
 		<?php
 		if( $user > 0 )
 		{ // Links to next/previous user
-
-			$prevuserid = 0;
-			$nextuserid = 0;
+			$prevuserid = $nextuserid = 0;
 
 			$query = 'SELECT MAX(ID), MIN(ID) FROM T_users';
 			$uminmax = $DB->get_row( $query, ARRAY_A );
@@ -80,6 +78,7 @@ $Form->hidden( 'action', 'userupdate' );
 $Form->hidden( 'edited_user_ID', $edited_User->dget('ID','formvalue') );
 $Form->hidden( 'edited_user_oldlogin', $edited_User->dget('login', 'formvalue') );
 
+
 $Form->fieldset( T_('User rights'), 'fieldset clear' );
 
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
@@ -103,6 +102,7 @@ else
 }
 
 $Form->fieldset_end();
+
 
 $Form->fieldset( T_('User') );
 
@@ -128,6 +128,7 @@ if( $edited_User->get('aim') != '' )
 	$aim_fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" class="middle" /></a>';
 else
 	$aim_fieldnote = '';
+
 
 if( $allowed_to_edit )
 { // We can edit the values:
@@ -184,18 +185,20 @@ else
 
 $Form->fieldset_end();
 
+
 if( $allowed_to_edit )
-{
+{ // Edit buttons
 	$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
 												 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
+
 $Form->fieldset( T_('User information') );
+
 $Form->info( T_('ID'), $edited_User->dget('ID') );
 
-
 if( $app_shortname == 'b2evo' )
-{	// TODO: move this out of the core?
+{ // TODO: move this out of the core
 	$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->getNumPosts() : '-' );
 }
 $Form->info( T_('Created on'), $edited_User->dget('datecreated') );

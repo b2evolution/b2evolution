@@ -17,7 +17,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $app_shortname.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
 
-	<base href="<?php echo $admin_url ?>" />
+	<?php
+	if( !empty( $Backoffice->headlines ) )
+	{
+		echo implode( "\n", $Backoffice->headlines );
+	}
+	?>
 
 	<script type="text/javascript">
 		imgpath_expand = '<?php echo getIcon( 'expand', 'url' ); ?>';
@@ -89,7 +94,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					 */
 					function switch_layout( layout )
 					{
-						if( layout == 'debug' )
+						if( layout == 'all' )
 						{
 							document.getElementById( 'userlist_default' ).style.display='block';
 							document.getElementById( 'userlist_wide' ).style.display='block';

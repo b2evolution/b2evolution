@@ -209,6 +209,8 @@ switch( $action )
 		$action = '';
 
 		$current_User =& $ForgetfulUser;
+
+		$Backoffice->headlines[] = '<base href="'.$admin_url.'" />';
 		require( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'b2users.php' );
 
 		#header( 'Location: '.$baseurl.$admin_subdir.'b2users.php' ); // does not allow to leave a Message and IIS is known to cause problems with setcookie() and redirect.
