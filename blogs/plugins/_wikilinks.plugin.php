@@ -19,11 +19,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class wikilinks_plugin extends Plugin
 {
-	var $code = 'b2evWcko';
+	var $code = 'b2evWiLi';
 	var $name = 'Wiki Links';
 	var $priority = 35;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the markup
 	var $short_desc;
 	var $long_desc;
@@ -63,7 +63,7 @@ class wikilinks_plugin extends Plugin
 		global $ItemCache, $admin_url, $blog;
 
 		// Regular links:
-		$search = array(	
+		$search = array(
 			// [[http://url]] :
 			'#\[\[((http|https|mailto)://([^, <>{}\n\r]+?))\]\]#i',
 			// [[http://url text]] :
@@ -71,17 +71,17 @@ class wikilinks_plugin extends Plugin
 			// ((http://url)) :
 			'#\(\(((http|https|mailto)://([^, <>{}\n\r]+?))\)\)#i',
 			// ((http://url text)) :
-			'#\(\(((http|https|mailto)://([^, <>{}\n\r]+?)) ([^\n\r]+?)\)\)#i'																
+			'#\(\(((http|https|mailto)://([^, <>{}\n\r]+?)) ([^\n\r]+?)\)\)#i'
 		);
-		$replace = array( 
+		$replace = array(
 			'<a href="$1">$1</a>',
 			'<a href="$1">$4</a>',
 			'<a href="$1">$1</a>',
 			'<a href="$1">$4</a>'
 		);
-		
+
 		$content = preg_replace( $search, $replace,	$content );
-		
+
 /*
 	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
 
@@ -90,13 +90,13 @@ class wikilinks_plugin extends Plugin
 	$ret = preg_replace("#([\n ])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,< \n\r]*)?)#i", "\\1<a href=\"http://www.\\2.\\3\\4\">www.\\2.\\3\\4</a>", $ret);
 
 	$ret = preg_replace("#([\n ])([a-z0-9\-_.]+?)@([^,< \n\r]+)#i", "\\1<a href=\"mailto:\\2@\\3\">\\2@\\3</a>", $ret); */
-	
-	
+
+
 		// WIKIWORDS:
-	
+
 		$search_wikiwords = array();
 		$replace_links = array();
-	
+
 		// STANDALONE WIKIWORDS:
 		$search = '/
 				(?<= \s | ^ )													# Lookbehind for whitespace
@@ -105,7 +105,7 @@ class wikilinks_plugin extends Plugin
 			/x';	// x = extended (spaces + comments allowed)
 
 		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
-		{ 
+		{
 			// Construct array of wikiwords to look up in post urltitles
 			$wikiwords = array();
 			foreach( $matches as $match )
@@ -127,33 +127,33 @@ class wikilinks_plugin extends Plugin
 				// WikiWord
 				$search_wikiwords[] = '/
 					(?<= \s | ^ ) 						# Lookbehind for whitespace or start
-					(?<! <span\ class="NonExistentWikiWord"> )		
+					(?<! <span\ class="NonExistentWikiWord"> )
 					'.$WikiWord.'							# Specific WikiWord to replace
 					(?= [\.,:;!\?] \s | \s | $ )							# Lookahead for whitespace or end of string
 					/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-	
-	
+
+
 				// Find matching Item:
 				if( ($Item = $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
 				{ // Item Found
 					$permalink = $Item->gen_permalink();
-		
+
 					// WikiWord
 					$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
-					
+
 				}
 				else
 				{	// Item not found
-	
+
 					$create_link = isset($blog) ? ('<a href="'.$admin_url.'b2edit.php?blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
-	
+
 					// WikiWord
 					$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
-				
+
 				}
 			}
 		}
-		
+
 		// BRACKETED WIKIWORDS:
 		$search = '/
 				(?<= \(\( | \[\[ )										# Lookbehind for (( or [[
@@ -162,7 +162,7 @@ class wikilinks_plugin extends Plugin
 			/x';	// x = extended (spaces + comments allowed)
 
 		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
-		{ 
+		{
 		// Construct array of wikiwords to look up in post urltitles
 		$wikiwords = array();
 		foreach( $matches as $match )
@@ -177,7 +177,7 @@ class wikilinks_plugin extends Plugin
 
 		// Lookup all urltitles at once in DB and preload cache:
 		$ItemCache->load_urltitle_array( $wikiwords );
-		
+
 		// Construct arrays for replacing wikiwords by links:
 		foreach( $wikiwords as $WikiWord => $wiki_word )
 		{
@@ -219,10 +219,10 @@ class wikilinks_plugin extends Plugin
 
 				// [[WikiWord text]]
 				$replace_links[] = '<a href="'.$permalink.'">$1</a>';
-	
+
 				// ((WikiWord text))
 				$replace_links[] = '<a href="'.$permalink.'">$1</a>';
-	
+
 				// [[Wikiword]]
 				$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
 
@@ -233,13 +233,13 @@ class wikilinks_plugin extends Plugin
 			{	// Item not found
 
 				$create_link = isset($blog) ? ('<a href="'.$admin_url.'b2edit.php?blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
-	
+
 				// [[WikiWord text]]
 				$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
-	
+
 				// ((WikiWord text))
 				$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
-	
+
 				// [[Wikiword]]
 				$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
 
