@@ -100,8 +100,8 @@ class FileManager extends Filelist
 	var $permlikelsl = true;
 
 	// --- going to user options ---
-	var $default_chmod_file = 0700;
-	var $default_chmod_dir = 0700;
+	var $default_chmod_file = 664;
+	var $default_chmod_dir = 664;
 
 
 	/* ----- PRIVATE ----- */
@@ -127,6 +127,13 @@ class FileManager extends Filelist
 	 * @access protected
 	 */
 	var $path = '';
+
+
+	/**#@+
+	 * "Constants"
+	 */
+	var $FM_EXISTS = 2;
+	/**#@-*/
 
 	// }}}
 
@@ -789,95 +796,104 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Create a directory.
-	 *
-	 * @param string the name of the directory
-	 * @param string path to create the directory in (default is cwd)
-	 * @param integer permissions for the new directory (octal format)
-	 * @return boolean true on success, false on failure
-	 *
-	 * @todo merge with createFile!
+	 * Meant to be called by {@link createDir()} or {@link createFile()}
 	 */
-	function createDir( $dirname, $path = NULL, $chmod = NULL )
+	function createDirOrFile( $type, $name, $path = NULL, $chmod = NULL )
 	{
+		if( $type != 'dir' && $type != 'file' )
+		{
+			return false;
+		}
 		if( $path == NULL )
 		{
 			$path = $this->cwd;
 		}
-		if( substr( $path, -1 ) != '/' )
-		{
-			$path .= '/';
-		}
+		$path = trailing_slash( $path );
 		if( $chmod == NULL )
 		{
-			$chmod = $this->default_chmod_dir;
+			$chmod = $type == 'dir' ?
+								$this->default_chmod_dir :
+								$this->default_chmod_file;
 		}
 
-		if( empty($dirname) )
+		if( empty($name) )
 		{
-			$this->Messages->add( T_('Cannot create empty directory.') );
+			$this->Messages->add( $type == 'dir' ?
+														T_('Cannot create empty directory.') :
+														T_('Cannot create empty file.') );
 			return false;
 		}
-		elseif( !isFilename($dirname) )
+		if( !isFilename($name) )
 		{
-			$this->Messages->add( sprintf(T_('[%s] is not a valid directory.'), $dirname) );
-			return false;
-		}
-		elseif( !@mkdir( $path.$dirname, $chmod ) )
-		{
-			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $path ) );
-			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $path ) );
+			$this->Messages->add( sprintf( ($type == 'dir' ?
+																			T_('[%s] is not a valid directory.') :
+																			T_('[%s] is not a valid filename.') ), $name) );
 			return false;
 		}
 
-		$this->Messages->add( sprintf( T_('Directory [%s] created.'), $dirname ), 'note' );
-		$this->addFile( $filename );
-		return true;
+
+		if( file_exists($path.$name) )
+		{
+			$this->Messages->add( sprintf( ($type == 'dir' ?
+																			T_('The directory [%s] already exists.') :
+																			T_('The file [%s] already exists.') ), $name) );
+			return $this->FM_EXISTS;
+		}
+
+		if( $type == 'file' )
+		{
+			if( !touch( $path.$name ) )
+			{
+				$this->Messages->add( sprintf( T_('Could not create file [%s] in [%s].'), $name, $path ) );
+				return false;
+			}
+			$this->Messages->add( sprintf( T_('File [%s] created.'), $name ), 'note' );
+		}
+		else
+		{ // dir
+			if( !@mkdir( $path.$name, $chmod ) )
+			{
+				$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $name, $path ) );
+				return false;
+			}
+			$this->Messages->add( sprintf( T_('Directory [%s] created.'), $name ), 'note' );
+		}
+
+		if( $newFile = $this->addFile( $path.$name ) )
+		{
+			$newFile->chmod( $chmod );
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Create a directory
+	 *
+	 * @param string the name of the directory
+	 * @param string path to create the directory in (default is cwd)
+	 * @param integer permissions for the new directory (octal format)
+	 * @return mixed true on success, false (or ->FM_EXISTS) on failure
+	 */
+	function createDir( $dirname, $path = NULL, $chmod = NULL )
+	{
+		return $this->createDirOrFile( 'dir', $dirname, $path, $chmod );
 	}
 
 
 	/**
 	 * Create a file
+	 *
 	 * @param string filename
+	 * @param string path to create the file in (default is cwd)
 	 * @param integer permissions for the new file (octal format)
+	 * @return mixed true on success, false (or ->FM_EXISTS) on failure
 	 */
-	function createFile( $filename, $chmod = NULL )
+	function createFile( $filename, $path = NULL, $chmod = NULL )
 	{
-		$path = $this->cwd.'/'.$filename;
-
-		if( $chmod == NULL )
-		{
-			$chmod = $this->default_chmod_file;
-		}
-
-		if( empty($filename) )
-		{
-			$this->Messages->add( T_('Cannot create empty file.') );
-			return false;
-		}
-		elseif( !isFilename($filename) )
-		{
-			$this->Messages->add( sprintf(T_('[%s] is not a valid filename.'), $filename) );
-			return false;
-		}
-		elseif( file_exists($path) )
-		{
-			// TODO: allow overwriting
-			$this->Messages->add( sprintf(T_('File [%s] already exists.'), $filename) );
-			return false;
-		}
-		elseif( !touch( $path ) )
-		{
-			$this->chmod( $filename, $chmod );
-			$this->Messages->add( sprintf( T_('Could not create file [%s] in [%s].'), $filename, $this->cwd ) );
-			return false;
-		}
-		else
-		{
-			$this->Messages->add( sprintf( T_('File [%s] created.'), $filename ), 'note' );
-			$this->addFile( $filename );
-			return true;
-		}
+		return $this->createDirOrFile( 'file', $filename, $path, $chmod );
 	}
 
 

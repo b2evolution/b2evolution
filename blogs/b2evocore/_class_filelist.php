@@ -214,12 +214,12 @@ class Filelist
 			}
 			else
 			{
-				$entry = new File( basename($name), dirname($name).'/' );
+				$entry =& new File( basename($name), dirname($name).'/' );
 			}
 		}
 		else
 		{
-			$entry = new File( $name, $this->listpath );
+			$entry =& new File( $name, $this->listpath );
 		}
 
 		if( $this->recursivedirsize && $entry->isDir( $this->listpath.$name ) )
@@ -238,6 +238,8 @@ class Filelist
 		$this->count_bytes += $entry->getSize();
 
 		$this->entries[] = $entry;
+
+		return $entry;
 	}
 
 
