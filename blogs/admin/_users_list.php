@@ -9,6 +9,12 @@
  * @package admin
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
+// get the userlist
+$request = "SELECT T_users.*, grp_ID, grp_name
+						FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+						ORDER BY grp_name, user_login";
+$userlist = $DB->get_results( $request );
 ?>
 <div class="panelblock">
 <h2><?php echo T_('Groups &amp; Users') ?></h2>

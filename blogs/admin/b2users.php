@@ -1,12 +1,37 @@
 <?php
 /**
- * This file implements the UI controller for Groups/Users management.
+ * This file implements the UI controller for settings management.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * @todo Group creation does not work!
  *
  * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE
+ *
+ * @version $Id$
  */
 
 /**
@@ -485,6 +510,10 @@ if( $Messages->count( 'all' ) )
 	<div class="panelinfo">
 	<?php
 
+	// TODO: there is a double display bug somewhere if we create a blank form user for example
+	// TODO: get rid of external HTML and use single display
+
+	// Below is an example of exactly what NOT TO DO unless you're aiming at source code obfuscation:
 	$Messages->display(
 		(isset( $edited_user_ID ) ?
 			(($edited_user_ID == 0) ? T_('The user was not created:') : T_('The user was not updated:'))
@@ -500,29 +529,17 @@ if( $Messages->count( 'all' ) )
 }
 
 
-if( $current_User->check_perm( 'users', 'view', false ) )
-{
-	// get the userlist
-	$request = "SELECT T_users.*, grp_ID, grp_name
-							FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-							ORDER BY grp_name, user_login";
-	$userlist = $DB->get_results( $request );
+/*
+ * Display payload:
+ */
 
-
-	if( ($group != 0) || in_array($action, array( 'newgroup', 'groupupdate' ))  )
-	{ // display group form
-		if( !isset($edited_Group) )
-		{
-			$edited_Group = $GroupCache->get_by_ID( $group );
-		}
-		require dirname(__FILE__).'/_users_groupform.php';
-	}
-}
-else
-{ // user is not allowed to view users
+if( ! $current_User->check_perm( 'users', 'view', false ) )
+{ // User is NOT allowed to view users
 	if( $user == 0 )
 	{ // display only current user's form
 		$user = $current_User->ID;
+		$edited_User = & $current_User;
+		require dirname(__FILE__).'/_users_form.php';
 	}
 	elseif( $user != $current_User->ID )
 	{ // another user requested -> error-note
@@ -530,26 +547,44 @@ else
 		$user = $current_User->ID;
 	}
 }
+else
+{ // User is allowed to view users:
 
+	// TODO: move this to a switch( $action )...
 
-// user form
-if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
-{ // Display user form
-	if( !isset($edited_User) )
-	{
-		$edited_User = & $UserCache->get_by_ID( $user );
+	if( ($group != 0) || ($action == 'newgroup')  )
+	{ // display group form
+		if( !isset($edited_Group) )
+		{
+			$edited_Group = $GroupCache->get_by_ID( $group );
+		}
+		require dirname(__FILE__).'/_users_groupform.php';
 	}
+	elseif( $user != 0 || ($action == 'newuser') )
+	{ // Display user form
+		if( !isset($edited_User) )
+		{
+			$edited_User = & $UserCache->get_by_ID( $user );
+		}
 
-	require dirname(__FILE__).'/_users_form.php';
+		require dirname(__FILE__).'/_users_form.php';
+	}
+	else
+	{	// users list
+		// fplanque>> note: we don't want this (potentially very long) list to be displayed again and again)
+		if( $current_User->check_perm( 'users', 'view', false ) )
+		{ // Display user list:
+			require dirname(__FILE__).'/_users_list.php';
+		}
+	}
 }
-
-
-// users list
-if( $current_User->check_perm( 'users', 'view', false ) )
-{ // Display user list:
-	require dirname(__FILE__).'/_users_list.php';
-}
-
 
 require dirname(__FILE__).'/_footer.php';
+/*
+ * $Log$
+ * Revision 1.82  2005/03/21 18:57:24  fplanque
+ * user management refactoring (towards new evocore coding guidelines)
+ * WARNING: some pre-existing bugs have not been fixed here
+ *
+ */
 ?>

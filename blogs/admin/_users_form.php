@@ -10,66 +10,31 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+
 $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 											|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
-?>
-<div class="panelblock">
 
-<?php
-if( $current_User->check_perm( 'users', 'view' ) )
-{
-	?>
-	<div style="float:right">
-		<?php
-		if( $user > 0 )
-		{ // Links to next/previous user
-			$prevuserid = $nextuserid = 0;
-
-			$query = 'SELECT MAX(ID), MIN(ID) FROM T_users';
-			$uminmax = $DB->get_row( $query, ARRAY_A );
-
-			foreach( $userlist as $fuser )
-			{ // find prev/next id
-				if( $fuser->ID < $user )
-				{
-					if( $fuser->ID > $prevuserid )
-					{
-						$prevuserid = $fuser->ID;
-						$prevuserlogin = $fuser->user_login;
-					}
-				}
-				elseif( $fuser->ID > $user )
-				{
-					if( $fuser->ID < $nextuserid || $nextuserid == 0 )
-					{
-						$nextuserid = $fuser->ID;
-						$nextuserlogin = $fuser->user_login;
-					}
-				}
-			}
-
-			echo ( $user != $uminmax['MIN(ID)'] ) ? '<a title="'.T_('first user').'" href="?user='.$uminmax['MIN(ID)'].'">[&lt;&lt;]</a>' : '[&lt;&lt;]';
-			echo ( $prevuserid ) ? '<a title="'.T_('previous user').' ('.$prevuserlogin.')" href="?user='.$prevuserid.'">[&lt;]</a>' : '[&lt;]';
-			echo ( $nextuserid ) ? '<a title="'.T_('next user').' ('.$nextuserlogin.')" href="?user='.$nextuserid.'">[&gt;]</a>' : '[&gt;]';
-			echo ( $user != $uminmax['MAX(ID)'] ) ? '<a title="'.T_('last user').'" href="?user='.$uminmax['MAX(ID)'].'">[&gt;&gt;]</a>' : '[&gt;&gt;]';
-		}
-		?>
-		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><?php
-			echo getIcon( 'close', 'imgtag', array( 'title' => T_('Close user profile') ) );
-			?></a>
-	</div>
-	<?php
-}
-
+/*
+ * fplanque>>blueyed: Daniel I am removing the user switch code because it doesn't fit in
+ * with the rest of the app (planned move to Widget/Results class), creates extra DB requests and
+ * most of all, assumes that users are sorted by ID which obviously won't be the case on
+ * large user bases. I hope you won't mind...
+ */
 
 $Form = & new Form( 'b2users.php', 'form' );
 
+$Form->global_icon( $allowed_to_edit ? T_('Cancel editing!') : T_('Close user profile!'), 'close', regenerate_url( 'user,action' ) );
+
 if( $edited_User->get('ID') == 0 )
-{
+{	// Creating new user:
+	$creating = true;
 	$Form->begin_form( 'fform', T_('Create new user profile') );
 }
 else
-{
+{	// Editing existing user:
+	$creating = false;
 	$Form->begin_form( 'fform', T_('Profile for:').' '.$edited_User->dget('firstname').' '.$edited_User->dget('lastname')
 				.' ['.$edited_User->dget('login').']' );
 }
@@ -91,9 +56,9 @@ else
 	$Form->text( 'edited_user_level', $edited_User->level, 2, T_('Level'), $field_note, 2 );
 }
 if( $edited_User->get('ID') != 1 && !$user_profile_only )
-{
+{	// This is not Admin and we're not restricted: we're allowed to change the user group:
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
-	form_select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
+	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 }
 else
 {
@@ -177,25 +142,34 @@ if( $allowed_to_edit )
 												 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
+if( ! $creating )
+{ // We're NOT creating a new user:
+	$Form->fieldset( T_('User information') );
 
-$Form->fieldset( T_('User information') );
+	$Form->info( T_('ID'), $edited_User->dget('ID') );
 
-$Form->info( T_('ID'), $edited_User->dget('ID') );
+	if( $app_shortname == 'b2evo' )
+	{ // TODO: move this out of the core
+		$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->getNumPosts() : '-' );
+	}
+	$Form->info( T_('Created on'), $edited_User->dget('datecreated') );
+	$Form->info( T_('From IP'), $edited_User->dget('ip') );
+	$Form->info( T_('From Domain'), $edited_User->dget('domain') );
+	$Form->info( T_('With Browser'), $edited_User->dget('browser') );
 
-if( $app_shortname == 'b2evo' )
-{ // TODO: move this out of the core
-	$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->getNumPosts() : '-' );
+	$Form->fieldset_end();
 }
-$Form->info( T_('Created on'), $edited_User->dget('datecreated') );
-$Form->info( T_('From IP'), $edited_User->dget('ip') );
-$Form->info( T_('From Domain'), $edited_User->dget('domain') );
-$Form->info( T_('With Browser'), $edited_User->dget('browser') );
 
-$Form->fieldset_end();
 $Form->end_form();
 
+// End payload block:
+$AdminUI->dispPayloadEnd();
+
+/*
+ * $Log$
+ * Revision 1.54  2005/03/21 18:57:22  fplanque
+ * user management refactoring (towards new evocore coding guidelines)
+ * WARNING: some pre-existing bugs have not been fixed here
+ *
+ */
 ?>
-
-<div class="clear"></div>
-
-</div>
