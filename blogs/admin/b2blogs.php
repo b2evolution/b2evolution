@@ -11,7 +11,8 @@
  * @package admin
  */
 require_once( dirname(__FILE__). '/_header.php' ); // this will actually load blog params for req blog
-$title = T_('Blogs');
+$admin_tab = 'blogs';
+$admin_pagetitle = T_('Blogs');
 param( 'action', 'string' );
 
 switch($action)

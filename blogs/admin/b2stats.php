@@ -7,7 +7,8 @@
  */
 require_once( dirname(__FILE__) . '/_header.php' );
 require_once( dirname(__FILE__) . '/' . $admin_dirout . '/' . $core_subdir . '/_functions_hitlogs.php' ); // referer logging
-$title = T_('View Stats for Blog:');
+$admin_tab = 'stats';
+$admin_pagetitle = T_('View Stats for Blog:');
 
 param( 'blog', 'integer', 0, true );
 param( 'action', 'string' );

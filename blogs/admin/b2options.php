@@ -8,11 +8,22 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 require( dirname(__FILE__). '/_header.php' );
-
+$admin_tab = 'options';
+$admin_pagetitle = T_('Options');
 param( 'action', 'string' );
-param( 'tab', 'string' );
-
-$title = T_('Options');
+param( 'tab', 'string', 'general' );
+switch( $tab )
+{
+	case 'general':
+		$admin_pagetitle .= ' :: '. T_('General');
+		break;
+	case 'locales':
+		$admin_pagetitle .= ' :: '. T_('Locales'); 
+		break;
+	case 'plugins':
+		$admin_pagetitle .= ' :: '. T_('Plug-ins'); 
+		break;
+}
 
 require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
@@ -57,11 +68,10 @@ if( $action == 'update' )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		switch( $tab ){
-			case 'locales':
-				break;
-			
-			case '':
+		switch( $tab )
+		{
+			case 'general':
+				// UPDATE general settings:
 				param( 'newposts_per_page', 'integer', true );
 				param( 'newwhat_to_show', 'string', true );
 				param( 'newarchive_mode', 'string', true );
@@ -95,6 +105,17 @@ if( $action == 'update' )
 				</div>
 				<?php
 				break;
+
+
+			case 'locales':
+				// UPDATE locales:
+				break;
+
+
+			case 'plugins':
+				// UPDATE plug-ins:
+				break;
+			
 		}
 }
 	
@@ -110,7 +131,7 @@ $current_User->check_perm( 'options', 'view', true );
 		<div class="panelblocktabs">
 			<ul class="tabs">
 			<?php
-				if( $tab == '' )
+				if( $tab == 'general' )
 					echo '<li class="current">';
 				else
 					echo '<li>';
@@ -141,7 +162,8 @@ $current_User->check_perm( 'options', 'view', true );
 		switch( $tab )
 		{
 			// GENERAL OPTIONS -----------------------------------------------------------
-			case '':?>
+			case 'general':
+			?>
 		<fieldset>
 			<legend><?php echo T_('Regional settings') ?></legend>
 

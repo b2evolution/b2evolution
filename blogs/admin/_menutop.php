@@ -12,7 +12,7 @@
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title>b2evo &gt; <?php echo $title; ?></title>
+	<title>b2evo :: <?php echo $admin_pagetitle; ?></title>
 	<link href="admin.css" rel="stylesheet" type="text/css" />
 	<?php if( $mode == 'sidebar' )
 	{ ?>
@@ -50,25 +50,25 @@ if( empty($mode) )
 	
 	<ul class="tabs">
 	<?php
-		if( ($title == T_('New post in blog:')) || ($title == T_('Adding new post...')) )
+		if( $admin_tab == 'new' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('New Post'), '</a></li>';
 
-		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) || ($title == T_('Updating post...')) || ($title == T_('Updating post status...')) || ($title == T_('Deleting post...'))  )
+		if( $admin_tab == 'edit'  )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Browse/Edit'), '</a></li>';
 
-		if( $title == T_('Categories for blog:') )
+		if( $admin_tab == 'cats' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2categories.php?blog=', $blog, '" >', T_('Cats'), '</a></li>';
 
-		if( $title == T_('Blogs') )
+		if( $admin_tab == 'blogs' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
@@ -76,7 +76,7 @@ if( empty($mode) )
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{
-			if( $title == T_('View Stats') )
+			if( $admin_tab == 'stats' )
 				echo '<li class="current">';
 			else
 				echo '<li>';
@@ -85,7 +85,7 @@ if( empty($mode) )
 
 		if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{
-			if( $title == T_('Antispam') )
+			if( $admin_tab == 'antispam' )
 				echo '<li class="current">';
 			else
 				echo '<li>';
@@ -94,7 +94,7 @@ if( empty($mode) )
 
 		if( $current_User->check_perm( 'templates', 'any' ) )
 		{
-			if( $title == T_('Custom skin template editing') )
+			if( $admin_tab == 'templates' )
 				echo '<li class="current">';
 			else
 				echo '<li>';
@@ -103,7 +103,7 @@ if( empty($mode) )
 
 		if( $current_User->check_perm( 'users', 'view' ) )
 		{
-			if( $title == T_('User management') )
+			if( $admin_tab == 'users' )
 				echo '<li class="current">';
 			else
 				echo '<li>';
@@ -112,14 +112,14 @@ if( empty($mode) )
 
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{
-			if( $title == T_('Options') )
+			if( $admin_tab == 'options' )
 				echo '<li class="current">';
 			else
 				echo '<li>';
 			echo '<a href="b2options.php" >', T_('Options'), '</a></li>';
 		}
 
-		if( $title == T_('My Profile') )
+		if( $admin_tab == 'profile' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
@@ -130,10 +130,10 @@ if( empty($mode) )
 	</ul>
 </div>
 
+<h1><strong>:: <?php echo $admin_pagetitle; ?></strong>
+
 <?php
 }	// not in special mode
 ?>
-
-<h1><strong>:: <?php echo $title; ?></strong>
 
 

@@ -11,7 +11,8 @@
  * @package admin
  */
 require_once( dirname(__FILE__) . '/_header.php' );
-$title = T_('Categories for blog:');
+$admin_tab = 'cats';
+$admin_pagetitle = T_('Categories for blog:');
 param( 'action', 'string' );
 
 /** 

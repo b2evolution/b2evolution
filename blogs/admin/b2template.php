@@ -8,7 +8,8 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 require_once(dirname(__FILE__). '/_header.php');
-$title = T_('Custom skin template editing');
+$admin_tab = 'templates';
+$admin_pagetitle = T_('Custom skin template editing');
 
 // Check permission:
 $current_User->check_perm( 'templates', '', true );

@@ -8,7 +8,7 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 require( dirname(__FILE__).'/_header.php');
-$title = T_('Spell Check');
+$admin_pagetitle = T_('Spell Check');
 ?>
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>

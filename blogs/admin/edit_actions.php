@@ -19,6 +19,7 @@
  * @package admin
  */
 require_once( dirname(__FILE__) . '/_header.php' );
+$admin_tab = 'edit';
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
@@ -48,7 +49,7 @@ switch($action)
 		param( 'post_category', 'integer', true );
 		$blog = get_catblog( $post_category ); 
 		$blogparams = get_blogparams_by_ID( $blog );
-		$title = T_('Adding new post...');
+		$admin_pagetitle = T_('Adding new post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
 
@@ -158,7 +159,7 @@ switch($action)
 		$blog = get_catblog($post_category); 
 		$blogparams = get_blogparams_by_ID( $blog );
 
-		$title = T_('Updating post...');
+		$admin_pagetitle = T_('Updating post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
 
@@ -286,7 +287,7 @@ switch($action)
 		$blog = get_catblog($post_cat); 
 		$blogparams = get_blogparams_by_ID( $blog );
 
-		$title = T_('Updating post status...');
+		$admin_pagetitle = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 
@@ -373,7 +374,7 @@ switch($action)
 		$blog = get_catblog( $postdata['Category'] );
 		$blogparams = get_blogparams_by_ID( $blog );
 
-		$title = T_('Deleting post...');
+		$admin_pagetitle = T_('Deleting post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
 

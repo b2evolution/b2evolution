@@ -11,7 +11,8 @@
  * @package admin
  */
 require_once( dirname(__FILE__). '/_header.php' );
-$title = T_('User management');
+$admin_tab = 'users';
+$admin_pagetitle = T_('User management');
 
 param( 'action', 'string' );
 param( 'user', 'integer', 0 );

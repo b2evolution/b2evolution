@@ -9,7 +9,7 @@
  * @package admin
  */
 require_once (dirname(__FILE__). '/_header.php');
-
+$admin_tab = 'edit';	// Exception to this below (new post)
 param( 'action', 'string' );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
@@ -30,7 +30,7 @@ switch($action)
 		$blog = get_catblog($cat);
 		$Blog = Blog_get_by_ID( $blog );
 
-		$title = T_('Editing post');
+		$admin_pagetitle = T_('Editing post');
 		require (dirname(__FILE__). '/_menutop.php');
 
 		printf( T_('#%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
@@ -72,7 +72,7 @@ switch($action)
 		param( 'comment', 'integer', true );
 		$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
 
-		$title = T_('Editing comment');
+		$admin_pagetitle = T_('Editing comment');
 		require (dirname(__FILE__).'/_menutop.php');
 		echo "#".$commentdata['comment_ID'];
 		require (dirname(__FILE__).'/_menutop_end.php');
@@ -105,7 +105,8 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * New post form  (can be a bookmarklet form if mode == bookmarklet )
 		 */
-		$title = T_('New post in blog:');
+		$admin_tab = 'new';
+		$admin_pagetitle = T_('New post in blog:');
 		require (dirname(__FILE__).'/_menutop.php');
 
 		if( ($blog == 0) && $current_User->check_perm( 'blog_post_statuses', 'any', false, $default_to_blog ) )

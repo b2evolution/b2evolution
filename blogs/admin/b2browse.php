@@ -9,15 +9,14 @@
  * @package admin
  */
 require_once (dirname(__FILE__). '/_header.php');
-
+$admin_tab = 'edit';
+$admin_pagetitle = T_('Browse blog:');
 param( 'blog', 'integer', true );
 
 if( ($blog == 0) && $current_User->is_blog_member( $default_to_blog ) )
 {	// Default blog is a valid choice
 	$blog = $default_to_blog;
 }
-
-$title = T_('Browse blog:');
 require (dirname(__FILE__). '/_menutop.php');
 
 // ---------------------------------- START OF BLOG LIST ----------------------------------
