@@ -486,51 +486,50 @@ class File extends DataObject
 
 
 	/**
-	 * Get the path of the respective icon file for this file (relative to
-	 * {@link $basepath}, looks at file's extension).
-	 * 'file_unknown' map entry is used if no match was found, or 'folder' if
-	 * the file is a directory.
+	 * Get the key of the respective icon file for this file (looks at file's extension).
+	 *
+	 *
 	 *
 	 * @uses $map_iconfiles
-	 * @return string Path to the iconfile (relative to {@link $baseurl})
+	 * @return string Key of the iconfile in {@link $map_iconfiles}.
+	 *                'file_unknown' if no match was found.
+	 *                'folder' if the file is a directory.
 	 */
-	function getIconPath()
+	function getIconKey()
 	{
 		global $map_iconfiles;
-		if( $this->_iconfilename !== NULL )
-		{ // Already cached:
-			return $this->_iconfilename;
-		}
 
-		if( $this->isDir() )
-		{	// Directory icon:
-			$iconfilename = $map_iconfiles['folder']['file'];
-		}
-		else
+		if( !isset($this->_iconKey) )
 		{
-			$iconfilename = $map_iconfiles['file_unknown']['file'];
-			// Loop through known file icons:
-			foreach( $map_iconfiles as $lIconfile )
+			if( $this->isDir() )
+			{ // Directory icon:
+				$this->_iconKey = 'folder';
+			}
+			else
 			{
-				if( isset( $lIconfile['ext'] )
-						&& preg_match( '/'.$lIconfile['ext'].'$/i', $this->_name, $match ) )
+				$this->_iconKey = 'file_unknown';
+
+				// Loop through known file icons:
+				foreach( $map_iconfiles as $lKey => $lIconfile )
 				{
-					$iconfilename = $lIconfile['file'];
-					break;
+					if( isset( $lIconfile['ext'] )
+							&& preg_match( '/'.$lIconfile['ext'].'$/i', $this->_name, $match ) )
+					{
+						$this->_iconKey = $lKey;
+						break;
+					}
 				}
 			}
 		}
 
-		$this->_iconfilename = $iconfilename;
-
-		return $this->_iconfilename;
+		return $this->_iconKey;
 	}
 
 
 	/**
-	 * get size of an image or false if not an image
+	 * Get size of an image or false if not an image
 	 *
-	 * @todo cache this data
+	 * @todo cache this data (NOTE: we have different params here! - imgsize() does already caching!)
 	 *
 	 * @param string {@link imgsize()}
 	 */
@@ -541,8 +540,9 @@ class File extends DataObject
 
 
 	/**
-	 * get nice size of the file
+	 * Get nice size of the file.
 	 *
+	 * @uses bytesreadable()
 	 * @return string size as b/kb/mb/gd; or '&lt;dir&gt;'
 	 */
 	function getSizeNice()
@@ -688,6 +688,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2005/01/15 20:20:51  blueyed
+ * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to getIcon())
+ *
  * Revision 1.14  2005/01/12 20:22:51  fplanque
  * started file/dataobject linking
  *

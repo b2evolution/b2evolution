@@ -1534,20 +1534,19 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
  * @uses $map_iconfiles
  * @param string|File icon for what (special purpose or File object)
  * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
- * @param string class name when getting 'imgtag'
+ * @param array additional params ( 'class' => class name when getting 'imgtag',
+																		'size' => param for 'size',
+																		'title' => title attribute for imgtag)
  */
-function getIcon( $for, $what = 'imgtag', $imgtag_class = 'middle' )
+function getIcon( $for, $what = 'imgtag', $params = NULL )
 {
-	global $map_iconfiles;
-	global $basepath, $admin_subdir, $baseurl;
+	global $map_iconfiles, $basepath, $admin_subdir, $baseurl, $Debuglog;
 
-	if( is_a( $for, 'file' ) )
+	$iconKey = is_a( $for, 'file' ) ? $for->getIconKey() : $for;
+
+	if( isset( $map_iconfiles[$iconKey] ) && isset( $map_iconfiles[$iconKey]['file'] ) )
 	{
-		$iconfile = $for->getIconPath();
-	}
-	elseif( isset( $map_iconfiles[$for] ) && isset( $map_iconfiles[$for]['file'] ) )
-	{
-		$iconfile = $map_iconfiles[$for]['file'];
+		$iconfile = $map_iconfiles[$iconKey]['file'];
 	}
 	else
 	{
@@ -1557,16 +1556,52 @@ function getIcon( $for, $what = 'imgtag', $imgtag_class = 'middle' )
 	/** @debug quite time consuming**/
 	if( $iconfile === false || !file_exists( $basepath.$iconfile ) )
 	{
-		return '<div class="error">[no image for '.var_export( $for, true ).'!]</div>';
+		return '<div class="error">[no image for '.var_export( $iconKey, true ).'!]</div>';
 		return false;
 	}
 
 	switch( $what )
 	{
 		case 'file':
-			return $iconfile;
+			return $basepath.$iconfile;
 
 		case 'imgtag':
+			$params['size'] = 'string';
+
+		case 'size':
+			if( !isset( $map_iconfiles[$iconKey]['size'] ) )
+			{
+				$Debuglog->add( 'No iconsize for ['.$iconKey.']', 'icons' );
+
+				$map_iconfiles[$iconKey]['size'] = imgsize( $iconfile );
+			}
+
+			switch( $params['size'] )
+			{
+				case 'width':
+					$size = $map_iconfiles[$iconKey]['size'][0];
+					break;
+				case 'height':
+					$size = $map_iconfiles[$iconKey]['size'][1];
+					break;
+				case 'widthxheight':
+					$size = $map_iconfiles[$iconKey]['size'][0].'x'.$map_iconfiles[$iconKey]['size'][1];
+					break;
+				case 'width':
+					$size = $map_iconfiles[$iconKey]['size'][0];
+					break;
+				case 'string':
+					$size = 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'"';
+					break;
+				default:
+					$size = $map_iconfiles[$iconKey]['size'];
+			}
+
+			if( $what == 'size' )
+			{
+				return $size;
+			}
+
 		case 'url':
 			$iconurl = $baseurl.$iconfile;
 			if( $what == 'url' )
@@ -1574,9 +1609,12 @@ function getIcon( $for, $what = 'imgtag', $imgtag_class = 'middle' )
 				return $iconurl;
 			}
 
-			$r = '<img class="'.$imgtag_class.'" src="'.$iconurl.'" '
-					.getIconSize( $iconfile, 'string' )
-					.' alt="';
+			$r = '<img '
+						.'class="'.( isset( $params['class'] ) ? $params['class'] : 'middle' ).'" '
+						.'src="'.$iconurl.'" '
+						.$size
+						.( isset( $params['title'] ) ? ' title="'.$params['title'].'"' : '' )
+						.' alt="';
 
 			if( is_a( $for, 'file' ) )
 			{ // extension as alt-tag for file icons
@@ -1586,13 +1624,13 @@ function getIcon( $for, $what = 'imgtag', $imgtag_class = 'middle' )
 				}
 				$r .= $for->getExt();
 			}
-			elseif( isset( $map_iconfiles[$for]['alt'] ) )
+			elseif( isset( $map_iconfiles[$iconKey]['alt'] ) )
 			{ // alt-tag from $map_iconfiles
-				$r .= $map_iconfiles[$for]['alt'];
+				$r .= $map_iconfiles[$iconKey]['alt'];
 			}
 			else
-			{ // $for as alt-tag
-				$r .= $for;
+			{ // $iconKey as alt-tag
+				$r .= $iconKey;
 			}
 
 			$r .= '" />';
@@ -1600,41 +1638,6 @@ function getIcon( $for, $what = 'imgtag', $imgtag_class = 'middle' )
 	}
 
 	return $r;
-}
-
-
-/**
- * Get image size for an icon.
- *
- * @uses $map_iconsizes
- * @param string Icon path relative to {@link $basepath}
- * @param string what property/format to get: 'width', 'height', 'widthxheight',
- *               'string' (as for img tags), else 'widthheight' (array)
- */
-function getIconSize( $iconpath, $param = 'widthheight' )
-{
-	global $basepath, $map_iconsizes, $Debuglog;
-
-	if( isset( $map_iconsizes[ $iconpath ] ) )
-	{
-		switch( $param )
-		{
-			case 'width': return $map_iconsizes[$iconpath][0];
-			case 'height': return $map_iconsizes[$iconpath][1];
-			case 'widthxheight': return $map_iconsizes[$iconpath][0].'x'.$map_iconsizes[$iconpath][1];
-			case 'width': return $map_iconsizes[$iconpath][0];
-			case 'string': return 'width="'.$map_iconsizes[$iconpath][0]
-														.'" height="'.$map_iconsizes[$iconpath][1].'"';
-			default: return $map_iconsizes[$iconpath];
-		}
-	}
-	else
-	{
-		$Debuglog->add( 'No iconsize for ['.$iconpath.']', 'icons' );
-
-		$map_iconsizes[ $iconpath ] = imgsize( $basepath.$iconpath );
-		return getIconSize( $iconpath, $param );
-	}
 }
 
 
@@ -1684,6 +1687,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.33  2005/01/15 20:20:51  blueyed
+ * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to getIcon())
+ *
  * Revision 1.32  2005/01/15 17:30:08  blueyed
  * regexp_fileman moved to $Settings
  *
