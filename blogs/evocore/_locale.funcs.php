@@ -38,6 +38,9 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
+ * @todo Make it a class / global object!
+ *        - Provide (static) functions to extract .po files / generate _global.php files (single quoted strings!)
+ *
  * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -78,15 +81,26 @@ elseif( $use_l10n == 2 )
 	 */
 	function T_( $string, $req_locale = '' )
 	{
-		global $trans, $current_locale, $locales, $Debuglog;
+		/**
+		 * The translations keyed by locale. They get loaded through include() of _global.php
+		 * @var array
+		 * @static
+		 */
+		static $trans = array();
 
-		// By default we use the current locale:
-		if( empty($req_locale) ) $req_locale = $current_locale;
+		global $current_locale, $locales, $Debuglog;
+
 
 		if( empty($req_locale) )
-		{
-			return $string;  // don't translate if we have no locale
+		{ // By default we use the current locale
+			if( empty( $current_locale ) )
+			{ // don't translate if we have no locale
+				return $string;
+			}
+
+			$req_locale = $current_locale;
 		}
+
 		if( !isset( $locales[$req_locale]['messages'] ) )
 		{
 			$Debuglog->add( 'No messages file path for locale. $locales["'
@@ -96,7 +110,7 @@ elseif( $use_l10n == 2 )
 
 		$messages = $locales[$req_locale]['messages'];
 
-		// replace special characters that to msgid-equivalents
+		// replace special characters to msgid-equivalents
 		$search = str_replace( array("\n", "\r", "\t"), array('\n', '', '\t'), $string );
 
 		// echo "Translating ", $search, " to $messages<br />";
@@ -104,9 +118,9 @@ elseif( $use_l10n == 2 )
 		if( !isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
-			@include_once dirname(__FILE__). '/../locales/'.$messages.'/_global.php';
+			@include_once( dirname(__FILE__). '/../locales/'.$messages.'/_global.php' );
 			if( !isset($trans[ $messages ] ) )
-			{ // Still not loaded... file doesn't exist, memorize that no translation are available
+			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
 				$trans[ $messages ] = array();
 
@@ -420,6 +434,7 @@ function locale_options( $default = '', $disp = true )
 	}
 }
 
+
 /**
  * [callback function] Returns an <option> set with default locale selected
  *
@@ -432,6 +447,7 @@ function locale_options_return( $default = '' )
 	$r = locale_options( $default, false );
 	return $r;
 }
+
 
 /**
  * Detect language from HTTP_ACCEPT_LANGUAGE
@@ -654,6 +670,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/11 00:29:57  blueyed
+ * added todo, small improvements
+ *
  * Revision 1.6  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *
