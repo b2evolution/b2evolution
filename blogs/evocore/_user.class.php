@@ -5,8 +5,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER.
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -101,7 +101,7 @@ class User extends DataObject
 	 */
 	function User( $db_row = NULL )
 	{
-		global $GroupCache, $default_locale;
+		global $GroupCache, $default_locale, $Settings, $localtimenow;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_' );
@@ -109,56 +109,57 @@ class User extends DataObject
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank user';
-			$this->login = 'login';
-			$this->pass = 'pass';
-			$this->firstname = '';
-			$this->lastname = T_('New user');
-			$this->nickname = '';
-			$this->idmode = 'login';
-			$this->locale = $default_locale;
-			$this->email = '';
-			$this->url = '';
-			$this->icq = 0;
-			$this->aim = '';
-			$this->msn = '';
-			$this->yim = '';
-			$this->ip = '';
-			$this->domain = '';
-			$this->browser = '';
-			$this->datecreated = date('Y-m-d H:i:s', time());	// We don't know local time here!
-			$this->level = 0;
-			$this->notify = 1;
-			$this->showonline = 1;
+			$this->set( 'login', 'login' );
+			$this->set( 'pass', md5('pass') );
+			$this->set( 'firstname', '' );
+			$this->set( 'lastname', T_('New user') );
+			$this->set( 'nickname', '' );
+			$this->set( 'idmode', 'login' );
+			$this->set( 'locale', $default_locale ); // QUESTION: use $Settings->get('default_locale') ?
+			$this->set( 'email', '' );
+			$this->set( 'url', '' );
+			$this->set( 'icq', 0 );
+			$this->set( 'aim', '' );
+			$this->set( 'msn', '' );
+			$this->set( 'yim', '' );
+			$this->set( 'ip', '' );
+			$this->set( 'domain', '' );
+			$this->set( 'browser', '' );
+			#$this->datecreated = date('Y-m-d H:i:s', time());	// We don't know local time here!
+			$this->set_datecreated( $localtimenow );
+			$this->set( 'level', 0 );
+			$this->set( 'notify', 1 );
+			$this->set( 'showonline', 1 );
 			// Group for this user:
-			$this->Group = NULL;
+			$this->setGroup( $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') ) );
 		}
 		else
 		{
 			// echo 'Instanciating existing user';
-			$this->ID          = $db_row->ID;
-			$this->login       = $db_row->user_login;
-			$this->pass        = $db_row->user_pass;
-			$this->firstname   = $db_row->user_firstname;
-			$this->lastname    = $db_row->user_lastname;
-			$this->nickname    = $db_row->user_nickname;
-			$this->idmode      = $db_row->user_idmode;
-			$this->locale      = $db_row->user_locale;
-			$this->email       = $db_row->user_email;
-			$this->url         = $db_row->user_url;
-			$this->icq         = $db_row->user_icq;
-			$this->aim         = $db_row->user_aim;
-			$this->msn         = $db_row->user_msn;
-			$this->yim         = $db_row->user_yim;
-			$this->ip          = $db_row->user_ip;
-			$this->domain      = $db_row->user_domain;
-			$this->browser     = $db_row->user_browser;
-			$this->datecreated = $db_row->dateYMDhour;
-			$this->level       = $db_row->user_level;
-			$this->notify      = $db_row->user_notify;
-			$this->showonline  = $db_row->user_showonline;
+			$this->ID = $db_row->ID;
+			$this->set( 'login', $db_row->user_login );
+			$this->set( 'pass', $db_row->user_pass );
+			$this->set( 'firstname', $db_row->user_firstname );
+			$this->set( 'lastname', $db_row->user_lastname );
+			$this->set( 'nickname', $db_row->user_nickname );
+			$this->set( 'idmode', $db_row->user_idmode );
+			$this->set( 'locale', $db_row->user_locale );
+			$this->set( 'email', $db_row->user_email );
+			$this->set( 'url', $db_row->user_url );
+			$this->set( 'icq', $db_row->user_icq );
+			$this->set( 'aim', $db_row->user_aim );
+			$this->set( 'msn', $db_row->user_msn );
+			$this->set( 'yim', $db_row->user_yim );
+			$this->set( 'ip', $db_row->user_ip );
+			$this->set( 'domain', $db_row->user_domain );
+			$this->set( 'browser', $db_row->user_browser );
+			$this->set_datecreated( $db_row->dateYMDhour, true );
+			$this->set( 'level', $db_row->user_level );
+			$this->set( 'notify', $db_row->user_notify );
+			$this->set( 'showonline', $db_row->user_showonline );
 
 			// Group for this user:
-			$this->Group = $GroupCache->get_by_ID( $db_row->user_grp_ID );
+			$this->setGroup( $GroupCache->get_by_ID( $db_row->user_grp_ID ) );
 		}
 	}
 
@@ -204,6 +205,8 @@ class User extends DataObject
 	 */
 	function getNumPosts()
 	{
+		global $DB;
+
 		if( is_null( $this->_numPosts ) )
 		{
 			$this->_numPosts = $DB->get_var( "SELECT count(*)
@@ -276,17 +279,21 @@ class User extends DataObject
 	}
 
 
-	/*
-	 * User::set_datecreated(-)
+	/**
+	 * Set date created.
 	 *
-	 * Set date created
+	 * @param integer seconds since Unix Epoche.
 	 */
-	function set_datecreated( $datecreated )
+	function set_datecreated( $datecreated, $isYMDhour = false )
 	{
+		if( !$isYMDhour )
+		{
+			$datecreated = date('Y-m-d H:i:s', $datecreated );
+		}
 		// Set value:
-		$this->datecreated = date('Y-m-d H:i:s', $datecreated );
+		$this->datecreated = $datecreated;
 		// Remmeber change for later db update:
-		$this->dbchange( 'dateYMDhour' , 'string', 'datecreated' );
+		$this->dbchange( 'dateYMDhour', 'string', 'datecreated' );
 	}
 
 
@@ -297,7 +304,7 @@ class User extends DataObject
 	 */
 	function setGroup( & $Group )
 	{
-		$this->Group = $Group;
+		$this->Group =& $Group;
 
 		$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
 	}
@@ -791,6 +798,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/20 22:41:13  blueyed
+ * use setters in constructor (dbchange()), fixed getNumPosts(), enhanced set_datecreated(), fixed setGroup()
+ *
  * Revision 1.10  2005/02/19 18:54:52  blueyed
  * doc
  *
