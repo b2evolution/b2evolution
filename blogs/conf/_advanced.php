@@ -169,7 +169,7 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
  */
 $cookie_user  = 'cookie'. $b2evo_name. 'user';
 $cookie_pass  = 'cookie'. $b2evo_name. 'pass';
-$cookie_state = 'cookie'. $b2evo_name. 'state';
+$cookie_skin 	= 'cookie'. $b2evo_name. 'state';
 $cookie_name  = 'cookie'. $b2evo_name. 'name';
 $cookie_email = 'cookie'. $b2evo_name. 'email';
 $cookie_url   = 'cookie'. $b2evo_name. 'url';

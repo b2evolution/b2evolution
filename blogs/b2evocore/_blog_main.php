@@ -187,16 +187,13 @@ if( !isset($display_blog_list) )
  */
 if( !isset($default_skin) ) // Check if this has been forced in stub
 {
-	//$Blog->set( 'default_skin', 'test_does_not_exist' );
-	if( !skin_exists( $Blog->get('default_skin') )
-			|| $Blog->get('default_skin') == '' )
-	{ // blog's default skin does not exist - set to first in list
-		skin_list_start();
-		$Blog->set( 'default_skin', skin_list_next() );
-		$Blog->dbupdate();
-		debug_log(sprintf('new default skin [%s] set for blog [%s]', $Blog->get('default_skin'), $Blog->shortname));
-	}
 	$default_skin = $Blog->get('default_skin');
+
+	if( !skin_exists( $default_skin )	|| empty( $default_skin ) )
+	{ // blog's default skin does not exist
+		printf( T_('The default skin [%s] for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or can be overriden in a stub file. Contact the <a %s>webmaster</a>...'), $Blog->get('default_skin'), $Blog->shortname, 'href="'.$admin_url.'/b2blogs.php?action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
+		die();
+	}
 }
 
 if( !isset($skin) ) // Check if this has been forced in stub
@@ -208,9 +205,9 @@ if( !isset($skin) ) // Check if this has been forced in stub
 	else
 	{
 		// Get the saved skin in cookie or default:
-		param( $cookie_state, 'string', $default_skin );
-		// Get skin by params or default to cookie or default
-		param( 'skin', 'string', $$cookie_state );
+		param( $cookie_skin, 'string', $default_skin );
+		// Get skin by params or default to cookie
+		param( 'skin', 'string', $cookie_skin );
 	}
 }
 
@@ -221,12 +218,13 @@ param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 {	// We want to display now:
+	
 	// Check that the default skin exists:
-	// Bacause a lot of bloggers will set themseleves a cookie and delete the default skin,
+	// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
 	// we have to make this fool proof extra checking!
 	if( !skin_exists( $default_skin ) )
 	{
-		printf( T_('The default skin [%s] does not exist. It must be properly set in the blog properties (blog admin) or blog stub file [%s]. Contact the <a %s>webmaster</a>...'), $default_skin, $pagenow, 'href="mailto:'.$admin_email.'"');
+		printf( T_('The default skin [%s] for blog [%s] does not exist. It has been overriden in the stub file [%s]. Contact the <a %s>webmaster</a>...'), $default_skin, $Blog->shortname, $pagenow, 'href="mailto:'.$admin_email.'"');
 		die();	
 	}
 	
@@ -234,7 +232,7 @@ if( !empty( $skin ) )
 	{	// We have just asked for the skin explicitely
 		// Set a cookie to remember it:
 		// Including config and functions files
-		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $cookie_path, $cookie_domain) )
+		if( ! setcookie( $cookie_skin, $skin, $cookie_expires, $cookie_path, $cookie_domain) )
 		{	// This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}
