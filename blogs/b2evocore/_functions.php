@@ -1050,15 +1050,15 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 {
 	global $global_param_list;
 
-	if( !is_array($ignore) )
-	{
+	if( $ignore == '' )
+		$ignore = array( );
+	elseif( !is_array($ignore) )
 		$ignore = array( $ignore );
-	}
 
-	if( !is_array($set) )
-	{
+	if( $set == '' )
+		$set = array( );
+	elseif( !is_array($set) )
 		$set = array( $set );
-	}
 
 	$params = array();
 	foreach( $global_param_list as $thisparam )

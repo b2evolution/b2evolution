@@ -13,7 +13,7 @@ require_once (dirname(__FILE__).'/_main.php');
 
 // Getting GET or POST parameters:
 param( 'blog', 'integer', $default_to_blog, true );
-param( 'p', 'integer' );							// Specific post number to display
+param( 'p', 'integer', '', true );							// Specific post number to display
 param( 'm', 'integer', '', true );							// YearMonth(Day) to display
 param( 'w', 'integer', '', true );							// Week number
 param( 'cat', 'string', '', true );							// List of cats to restrict to
@@ -31,13 +31,13 @@ param( 'sentence', 'string', 'AND', true );				// Search for sentence or for wor
 param( 'exact', 'integer', '', true );					// Require exact match of title or contents
 param( 'preview', 'integer', 0, true );				// Is this preview ?
 param( 'calendar', 'string', '', true );				// Display a specific month in the calendar
-param( 'c', 'string' );
+param( 'c', 'string', '', true );
 param( 'withcomments', 'integer' );						// DEPRECATED
-param( 'page', 'integer' );
-param( 'more', 'integer', 0 );
-param( 'tb', 'integer', 0 );
-param( 'pb', 'integer', 0 );
-param( 'disp', 'string' );
+param( 'page', 'integer', '', true );
+param( 'more', 'integer', 0, true );
+param( 'tb', 'integer', 0, true );
+param( 'pb', 'integer', 0, true );
+param( 'disp', 'string', '', true );
 param( 'stats', 'integer', 0 );					// deprecated
 if(!isset($timestamp_min)) $timestamp_min = '';
 if(!isset($timestamp_max)) $timestamp_max = '';
