@@ -312,6 +312,7 @@ function populate_antispam()
 	"('bushido-online.com'), ('synapseiowa.com'), ('acl02.org'), ".
 	"('savetheweb.org'), ('ascii-art.com'), ('leportailqc.com'), ".
 	"('drnapr.net'), ('gogreenpower.org'), ('an-nasr.com'), ".
+	"('opennetcoalition.org'), ('csir.org'), ('internationalcenternewhaven.org'), ".
 	/*
 	These may look innocent and human-made, but they are in fact clever tricks.
 	They all spammed my referer logs on the same day, in rapid succession.
