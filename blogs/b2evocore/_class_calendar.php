@@ -78,17 +78,18 @@ class Calendar
 			$this->specific = true;
 			$this->year = substr($m, 0, 4);
 			if (strlen($m) < 6)
-			{
+			{ // no month provided
 				$this->mode = 'year';
 				if( $this->year == date('Y') )
 				{ // we display current year, month gets current
 					$this->month = date('m');
 				}
 				else
-				{
-					$this->month = '01';
+				{ // highlight no month, when not current year
+					$this->month = '';
 				}
-			} else
+			}
+			else
 			{
 				$this->month = substr($m, 4, 2);
 				$this->mode = 'month';
@@ -395,7 +396,7 @@ class Calendar
 				}
 				elseif( $this->month == $i )
 				{ // current month
-					echo $this->todaycellstart.'hmm';
+					echo $this->todaycellstart;
 				}
 				else
 				{
