@@ -11,7 +11,7 @@
  */
 function skinbase()
 {
-	global $baseurl, $skins_subdir, $skin;
+	global $baseurl, $skins_subdir, $skin, $blog;
 	
 	if( !empty( $skin ) )
 	{
@@ -19,7 +19,14 @@ function skinbase()
 	}
 	else
 	{	// No skin used:
-		echo "$baseurl/";
+		if( isset( $blog ) && $blog > 0 )
+		{
+			bloginfo( 'baseurl', 'raw' );
+		}
+		else
+		{
+			echo "$baseurl/";
+		}
 	}
 }
 

@@ -260,6 +260,10 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 		case 'staticurl':
 			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_staticfilename;
 			break;
+
+		case 'baseurl':
+			$output = $baseurl.$this_blogparams->blog_siteurl.'/';
+			break;
 			
 		case 'blogstatsurl':
 			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
