@@ -120,7 +120,7 @@ class Comment extends DataObject
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean true for link, false if you want NO html link
 	 */
-	function author( $before = '', $after = '', $before_user = '', $after_user = '#', 
+	function author( $before = '', $after = '#', $before_user = '', $after_user = '#', 
 										$format = 'htmlbody', $makelink = false ) 
 	{
 		if( $this->author_User !== NULL )
@@ -133,6 +133,7 @@ class Comment extends DataObject
 		else
 		{	// Display info recorded at edit time:
 			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
+			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 			echo $before;
 			if( $makelink ) echo '<a href="'.$this->author_url.'">';
 			$this->disp( 'author', $format );
