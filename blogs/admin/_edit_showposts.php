@@ -16,9 +16,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	/**
 	 * Includes:
 	 */
-	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_itemlist.php' );
-	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_calendar.php' );
-	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_archivelist.php' );
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist.class.php' );
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_calendar.class.php' );
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_archivelist.class.php' );
 
 	param( 'safe_mode', 'integer', 0 );         // Blogger style
 	param( 'p', 'integer' );                    // Specific post number to display

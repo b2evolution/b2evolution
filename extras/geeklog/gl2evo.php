@@ -54,7 +54,7 @@ $category['computing'] = '17';
 
 /* **************************************************************** */
 /* **************************************************************** */
-require_once($evo_root."/b2evocore/_functions_bposts.php");
+require_once($evo_root."/evocore/_item.funcs.php");
 
 
 // Connect to the databases

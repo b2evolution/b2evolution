@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the template that displays the feedback for a post
 	 * (comments, trackbak, pingback...)

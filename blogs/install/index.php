@@ -17,15 +17,15 @@
  * include config and default functions:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_class_log.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_log.class.php';
 $Debuglog = new Log( 'note' );
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions.php'; // db funcs
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_vars.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_class_db.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions.php'; // db funcs
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_cats.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_bposts.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_forms.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_misc.funcs.php'; // db funcs
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_vars.inc.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_db.class.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_misc.funcs.php'; // db funcs
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_category.funcs.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.funcs.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php';
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 

@@ -1,0 +1,125 @@
+<?php
+/**
+ * This file implements the Download class.
+ *
+ * (and posibly uploads at a later date)
+ *
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author wmcroberts: Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ *
+ * @version $Id$
+ */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
+ //dirname(__FILE__).'/
+require_once( '_http.class.php');
+
+/**
+ * Class download
+ *
+ * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ */
+class download
+{
+
+ 	function saveToFile ($url, $type, $destination)
+	{
+    /*
+     *   $url = "http://www.wheely-bin.co.uk/facecake.php"
+     *   $type   =  get
+     *              post
+     *   $destination   = "/tmp/beecat.tar.gz"
+     */
+     $data = getToMemory($url, $type)
+     $fp = fopen($destination, "w");
+
+     fclose($fp);
+    }
+
+    function getToMemory   ($url, $type) {
+  /*
+   *   $url = "http://www.wheely-bin.co.uk/facecake.php"
+   *   $type   =  get
+   *              post
+   */
+   if (!is_null($url){
+    /*
+     parse_url("http://username:password@hostname:81/path?arg=value#anchor");
+     Array
+     (
+          [scheme] => http
+          [host] => hostname
+          [port] => 81
+          [user] => username
+          [pass] => password
+          [path] => /path
+          [query] => arg=value
+          [fragment] => anchor
+     )
+     */
+      $url_array = parse_url($url);
+      $hostname = $url_array["host"];
+      $path = $url_array["url"];
+      $vars = $url_array["query"];
+      $port = $url_array["port"];
+
+    }
+    else { die();};
+   if (!is_null($destination){
+    }
+    else { die();};
+    switch ($type)
+       {
+          case "socket_get":
+                  $result = http::socket_get($hostname, $port, $url, $vars);
+                  break;
+          case "socket_post":
+                  $result = http::socket_post($server, $port, $url, $vars);
+                  break;
+           case "curl_get":
+                  $result = http::curl_get($hostname, $port, $url, $vars);
+                  break;
+          case "curl_post":
+                  $result = http::curl_post($server, $port, $url, $vars);
+                  break;
+          default:
+                  http::socket_get($server, $port, $url, $vars);
+                  break;
+       };
+    }
+};
+
+/*
+ * $Log$
+ * Revision 1.1  2004/10/13 22:46:32  fplanque
+ * renamed [b2]evocore/*
+ *
+ * Revision 1.8  2004/10/12 10:27:18  fplanque
+ * Edited code documentation.
+ *
+ */
+?>

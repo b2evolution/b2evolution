@@ -125,7 +125,7 @@ if( (!isset($config_is_done) || !$config_is_done) )
 
 
 $use_obhandler = 0;  // no output buffering!
-require( '../b2evocore/_main.php' );
+require( '../evocore/_main.inc.php' );
 
 // Check if user is logged in and is in group #1 (admins)
 if( !is_logged_in() || $current_User->Group->ID != 1 )

@@ -12,7 +12,7 @@
 /**
  * Initialize everything:
  */
-require_once( dirname(__FILE__) . '/../b2evocore/_main.php' );
+require_once( dirname(__FILE__) . '/../evocore/_main.inc.php' );
 
 // Getting GET or POST parameters:
 param( 'checkuser_id', 'integer', '' );

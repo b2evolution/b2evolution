@@ -18,7 +18,7 @@
  * Initialize everything:
  */
 require_once(dirname(__FILE__).'/../conf/_config.php' );
-require_once(dirname(__FILE__).'/../'.$core_subdir.'_main.php' );
+require_once(dirname(__FILE__).'/../'.$core_subdir.'_main.inc.php' );
 
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
@@ -1047,7 +1047,7 @@ function bloggergettemplate($m)
 
 	if ($templateType == "main")
 	{
-		$file = $edit_folder.'_main.php';
+		$file = $edit_folder.'_main.inc.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
@@ -1131,7 +1131,7 @@ function bloggersettemplate( $m )
 
 	if( $templateType == 'main' )
 	{
-		$file = $edit_folder.'_main.php';
+		$file = $edit_folder.'_main.inc.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{

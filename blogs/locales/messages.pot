@@ -27,12 +27,12 @@ msgstr ""
 #: ..\..\..\admin\_edit_showposts.php:145
 #: ..\..\..\admin\_edit_showposts.php:466
 #: ..\..\..\admin\_menutop.php:375
-#: ..\..\..\b2evocore\_functions_cats.php:569
-#: ..\..\..\skins\basic\_main.php:122
-#: ..\..\..\skins\custom\_main.php:128
-#: ..\..\..\skins\custom\_main.php:241
-#: ..\..\..\skins\wpc_aubmach\_main.php:147
-#: ..\..\..\skins\wpc_default\_main.php:150
+#: ..\..\..\evocore\_category.funcs.php:569
+#: ..\..\..\skins\basic\_main.inc.php:122
+#: ..\..\..\skins\custom\_main.inc.php:128
+#: ..\..\..\skins\custom\_main.inc.php:241
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:147
+#: ..\..\..\skins\wpc_default\_main.inc.php:150
 msgid "Categories"
 msgstr ""
 
@@ -41,12 +41,12 @@ msgstr ""
 #: ..\..\..\summary.php:100
 #: ..\..\..\admin\_edit_showposts.php:161
 #: ..\..\..\skins\_linkblog.php:73
-#: ..\..\..\skins\basic\_main.php:112
-#: ..\..\..\skins\basic\_main.php:143
-#: ..\..\..\skins\custom\_main.php:114
-#: ..\..\..\skins\custom\_main.php:139
-#: ..\..\..\skins\wpc_aubmach\_main.php:100
-#: ..\..\..\skins\wpc_default\_main.php:100
+#: ..\..\..\skins\basic\_main.inc.php:112
+#: ..\..\..\skins\basic\_main.inc.php:143
+#: ..\..\..\skins\custom\_main.inc.php:114
+#: ..\..\..\skins\custom\_main.inc.php:139
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:100
+#: ..\..\..\skins\wpc_default\_main.inc.php:100
 msgid "Permanent link to full entry"
 msgstr ""
 
@@ -58,46 +58,46 @@ msgstr ""
 #: ..\..\..\skins\_feedback.php:134
 #: ..\..\..\skins\_lastcomments.php:44
 #: ..\..\..\skins\_linkblog.php:73
-#: ..\..\..\skins\basic\_main.php:143
-#: ..\..\..\skins\custom\_main.php:114
-#: ..\..\..\skins\custom\_main.php:139
+#: ..\..\..\skins\basic\_main.inc.php:143
+#: ..\..\..\skins\custom\_main.inc.php:114
+#: ..\..\..\skins\custom\_main.inc.php:139
 msgid "Permalink"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:227 ..\..\..\a_noskin.php:228
-#: ..\..\..\skins\bluesky\_main.php:173
-#: ..\..\..\skins\bluesky\_main.php:174
-#: ..\..\..\skins\custom\_main.php:217
-#: ..\..\..\skins\custom\_main.php:218
-#: ..\..\..\skins\guadeloupe\_main.php:174
-#: ..\..\..\skins\guadeloupe\_main.php:175
+#: ..\..\..\skins\bluesky\_main.inc.php:173
+#: ..\..\..\skins\bluesky\_main.inc.php:174
+#: ..\..\..\skins\custom\_main.inc.php:217
+#: ..\..\..\skins\custom\_main.inc.php:218
+#: ..\..\..\skins\guadeloupe\_main.inc.php:174
+#: ..\..\..\skins\guadeloupe\_main.inc.php:175
 msgid "Recently"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:227
-#: ..\..\..\skins\bluesky\_main.php:173
-#: ..\..\..\skins\custom\_main.php:217
-#: ..\..\..\skins\guadeloupe\_main.php:174
+#: ..\..\..\skins\bluesky\_main.inc.php:173
+#: ..\..\..\skins\custom\_main.inc.php:217
+#: ..\..\..\skins\guadeloupe\_main.inc.php:174
 msgid "(cached)"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:228
-#: ..\..\..\skins\bluesky\_main.php:174
-#: ..\..\..\skins\custom\_main.php:218
-#: ..\..\..\skins\guadeloupe\_main.php:175
+#: ..\..\..\skins\bluesky\_main.inc.php:174
+#: ..\..\..\skins\custom\_main.inc.php:218
+#: ..\..\..\skins\guadeloupe\_main.inc.php:175
 msgid "(no cache)"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:234
-#: ..\..\..\b2evocore\_functions_comments.php:189
-#: ..\..\..\skins\bluesky\_main.php:177
-#: ..\..\..\skins\custom\_main.php:224
-#: ..\..\..\skins\guadeloupe\_main.php:178
+#: ..\..\..\evocore\_comment.funcs.php:189
+#: ..\..\..\skins\bluesky\_main.inc.php:177
+#: ..\..\..\skins\custom\_main.inc.php:224
+#: ..\..\..\skins\guadeloupe\_main.inc.php:178
 msgid "Last comments"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:235
-#: ..\..\..\skins\custom\_main.php:225
+#: ..\..\..\skins\custom\_main.inc.php:225
 msgid "Some viewing statistics"
 msgstr ""
 
@@ -106,91 +106,91 @@ msgstr ""
 #: ..\..\..\admin\_edit_showposts.php:344
 #: ..\..\..\admin\_edit_showposts.php:345
 #: ..\..\..\admin\_edit_showposts.php:541
-#: ..\..\..\skins\custom\_main.php:230
-#: ..\..\..\skins\custom\_main.php:236
-#: ..\..\..\skins\originalb2\_main.php:207
-#: ..\..\..\skins\wpc_aubmach\_main.php:154
-#: ..\..\..\skins\wpc_aubmach\_main.php:158
-#: ..\..\..\skins\wpc_default\_main.php:157
-#: ..\..\..\skins\wpc_default\_main.php:161
+#: ..\..\..\skins\custom\_main.inc.php:230
+#: ..\..\..\skins\custom\_main.inc.php:236
+#: ..\..\..\skins\originalb2\_main.inc.php:207
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:154
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:158
+#: ..\..\..\skins\wpc_default\_main.inc.php:157
+#: ..\..\..\skins\wpc_default\_main.inc.php:161
 msgid "Search"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:243
-#: ..\..\..\skins\custom\_main.php:233
+#: ..\..\..\skins\custom\_main.inc.php:233
 msgid "All Words"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:244
-#: ..\..\..\skins\custom\_main.php:234
+#: ..\..\..\skins\custom\_main.inc.php:234
 msgid "Some Word"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:245
 #: ..\..\..\admin\_edit_showposts.php:390
-#: ..\..\..\skins\custom\_main.php:235
+#: ..\..\..\skins\custom\_main.inc.php:235
 msgid "Entire phrase"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:247 ..\..\..\a_noskin.php:259
-#: ..\..\..\skins\bluesky\_main.php:192
-#: ..\..\..\skins\guadeloupe\_main.php:194
+#: ..\..\..\skins\bluesky\_main.inc.php:192
+#: ..\..\..\skins\guadeloupe\_main.inc.php:194
 msgid "Reset form"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:258
-#: ..\..\..\skins\bluesky\_main.php:191
-#: ..\..\..\skins\custom\_main.php:247
-#: ..\..\..\skins\guadeloupe\_main.php:193
-#: ..\..\..\skins\originalb2\_main.php:199
+#: ..\..\..\skins\bluesky\_main.inc.php:191
+#: ..\..\..\skins\custom\_main.inc.php:247
+#: ..\..\..\skins\guadeloupe\_main.inc.php:193
+#: ..\..\..\skins\originalb2\_main.inc.php:199
 msgid "Get selection"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:264
 #: ..\..\..\admin\_edit_showposts.php:394
-#: ..\..\..\skins\basic\_main.php:183
-#: ..\..\..\skins\bluesky\_main.php:224
-#: ..\..\..\skins\custom\_main.php:252
-#: ..\..\..\skins\guadeloupe\_main.php:226
-#: ..\..\..\skins\wpc_aubmach\_main.php:163
-#: ..\..\..\skins\wpc_default\_main.php:166
+#: ..\..\..\skins\basic\_main.inc.php:183
+#: ..\..\..\skins\bluesky\_main.inc.php:224
+#: ..\..\..\skins\custom\_main.inc.php:252
+#: ..\..\..\skins\guadeloupe\_main.inc.php:226
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:163
+#: ..\..\..\skins\wpc_default\_main.inc.php:166
 msgid "Archives"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:269 ..\..\..\a_noskin.php:282
 #: ..\..\..\a_noskin.php:291
-#: ..\..\..\skins\bluesky\_main.php:238
-#: ..\..\..\skins\bluesky\_main.php:247
-#: ..\..\..\skins\custom\_main.php:281
-#: ..\..\..\skins\custom\_main.php:290
-#: ..\..\..\skins\guadeloupe\_main.php:240
-#: ..\..\..\skins\guadeloupe\_main.php:249
+#: ..\..\..\skins\bluesky\_main.inc.php:238
+#: ..\..\..\skins\bluesky\_main.inc.php:247
+#: ..\..\..\skins\custom\_main.inc.php:281
+#: ..\..\..\skins\custom\_main.inc.php:290
+#: ..\..\..\skins\guadeloupe\_main.inc.php:240
+#: ..\..\..\skins\guadeloupe\_main.inc.php:249
 msgid "more..."
 msgstr ""
 
 #: ..\..\..\a_noskin.php:276
-#: ..\..\..\skins\bluesky\_main.php:232
-#: ..\..\..\skins\custom\_main.php:275
-#: ..\..\..\skins\guadeloupe\_main.php:234
+#: ..\..\..\skins\bluesky\_main.inc.php:232
+#: ..\..\..\skins\custom\_main.inc.php:275
+#: ..\..\..\skins\guadeloupe\_main.inc.php:234
 msgid "Recent Referers"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:285
-#: ..\..\..\skins\bluesky\_main.php:241
-#: ..\..\..\skins\custom\_main.php:284
-#: ..\..\..\skins\guadeloupe\_main.php:243
+#: ..\..\..\skins\bluesky\_main.inc.php:241
+#: ..\..\..\skins\custom\_main.inc.php:284
+#: ..\..\..\skins\guadeloupe\_main.inc.php:243
 msgid "Top Referers"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:304 ..\..\..\multiblogs.php:276
-#: ..\..\..\skins\bluesky\_main.php:252
-#: ..\..\..\skins\custom\_main.php:303
-#: ..\..\..\skins\guadeloupe\_main.php:254
+#: ..\..\..\skins\bluesky\_main.inc.php:252
+#: ..\..\..\skins\custom\_main.inc.php:303
+#: ..\..\..\skins\guadeloupe\_main.inc.php:254
 msgid "Misc"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:318
-#: ..\..\..\skins\custom\_main.php:316
+#: ..\..\..\skins\custom\_main.inc.php:316
 msgid "Syndicate this blog"
 msgstr ""
 
@@ -515,8 +515,8 @@ msgid "Deleting category #%d : %s ..."
 msgstr ""
 
 #: ..\..\..\admin\b2categories.php:150
-#: ..\..\..\b2evocore\_functions_users.php:76
-#: ..\..\..\b2evocore\_functions_users.php:107
+#: ..\..\..\evocore\_user.funcs.php:76
+#: ..\..\..\evocore\_user.funcs.php:107
 #: ..\..\..\htsrv\register.php:43
 #: ..\..\..\htsrv\register.php:50
 #: ..\..\..\htsrv\register.php:57
@@ -625,7 +625,7 @@ msgid "b2evo"
 msgstr ""
 
 #: ..\..\..\admin\b2login.php:24
-#: ..\..\..\b2evocore\_functions_users.php:348
+#: ..\..\..\evocore\_user.funcs.php:348
 msgid "Login..."
 msgstr ""
 
@@ -718,7 +718,7 @@ msgstr ""
 
 #: ..\..\..\admin\b2stats.php:56
 #: ..\..\..\admin\b2stats.php:417
-#: ..\..\..\b2evocore\_class_dataobjectcache.php:212
+#: ..\..\..\evocore\_dataobjectcache.class.php:212
 msgid "None"
 msgstr ""
 
@@ -1272,13 +1272,13 @@ msgid "Blogs"
 msgstr ""
 
 #: ..\..\..\admin\blogs.php:48
-#: ..\..\..\b2evocore\_class_blog.php:86
+#: ..\..\..\evocore\_blog.class.php:86
 msgid "New weblog"
 msgstr ""
 
 #: ..\..\..\admin\blogs.php:49
 #: ..\..\..\admin\blogs.php:194
-#: ..\..\..\b2evocore\_class_blog.php:85
+#: ..\..\..\evocore\_blog.class.php:85
 msgid "New blog"
 msgstr ""
 
@@ -1410,12 +1410,12 @@ msgstr ""
 #: ..\..\..\admin\edit_actions.php:135
 #: ..\..\..\admin\edit_actions.php:252
 #: ..\..\..\admin\edit_actions.php:342
-#: ..\..\..\b2evocore\_functions_antispam.php:143
-#: ..\..\..\b2evocore\_functions_antispam.php:245
-#: ..\..\..\b2evocore\_functions_pings.php:51
-#: ..\..\..\b2evocore\_functions_pings.php:87
-#: ..\..\..\b2evocore\_functions_pings.php:164
-#: ..\..\..\b2evocore\_functions_pings.php:205
+#: ..\..\..\evocore\_antispam.funcs.php:143
+#: ..\..\..\evocore\_antispam.funcs.php:245
+#: ..\..\..\evocore\_ping.funcs.php:51
+#: ..\..\..\evocore\_ping.funcs.php:87
+#: ..\..\..\evocore\_ping.funcs.php:164
+#: ..\..\..\evocore\_ping.funcs.php:205
 msgid "Done."
 msgstr ""
 
@@ -1426,7 +1426,7 @@ msgstr ""
 #: ..\..\..\admin\edit_actions.php:104
 #: ..\..\..\admin\edit_actions.php:210
 #: ..\..\..\admin\edit_actions.php:449
-#: ..\..\..\b2evocore\_functions_users.php:551
+#: ..\..\..\evocore\_user.funcs.php:551
 #: ..\..\..\htsrv\comment_post.php:69
 #: ..\..\..\htsrv\trackback.php:63
 #: ..\..\..\xmlsrv\xmlrpc.php:1368
@@ -1498,17 +1498,17 @@ msgid "Deleting Done..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:415
-#: ..\..\..\b2evocore\_class_pop3.php:113
-#: ..\..\..\b2evocore\_class_pop3.php:125
-#: ..\..\..\b2evocore\_class_pop3.php:168
-#: ..\..\..\b2evocore\_class_pop3.php:303
-#: ..\..\..\b2evocore\_class_pop3.php:357
-#: ..\..\..\b2evocore\_class_pop3.php:368
-#: ..\..\..\b2evocore\_class_pop3.php:416
-#: ..\..\..\b2evocore\_class_pop3.php:449
-#: ..\..\..\b2evocore\_class_pop3.php:482
-#: ..\..\..\b2evocore\_class_pop3.php:581
-#: ..\..\..\b2evocore\_class_pop3.php:604
+#: ..\..\..\evocore\_pop3.class.php:113
+#: ..\..\..\evocore\_pop3.class.php:125
+#: ..\..\..\evocore\_pop3.class.php:168
+#: ..\..\..\evocore\_pop3.class.php:303
+#: ..\..\..\evocore\_pop3.class.php:357
+#: ..\..\..\evocore\_pop3.class.php:368
+#: ..\..\..\evocore\_pop3.class.php:416
+#: ..\..\..\evocore\_pop3.class.php:449
+#: ..\..\..\evocore\_pop3.class.php:482
+#: ..\..\..\evocore\_pop3.class.php:581
+#: ..\..\..\evocore\_pop3.class.php:604
 msgid "Error"
 msgstr ""
 
@@ -1632,9 +1632,9 @@ msgstr ""
 
 #: ..\..\..\admin\files.php:324
 #: ..\..\..\admin\files.php:891
-#: ..\..\..\b2evocore\_class_comment.php:299
-#: ..\..\..\b2evocore\_class_filemanager.php:434
-#: ..\..\..\b2evocore\_class_item.php:885
+#: ..\..\..\evocore\_comment.class.php:299
+#: ..\..\..\evocore\_filemanager.class.php:434
+#: ..\..\..\evocore\_item.class.php:885
 msgid "Delete"
 msgstr ""
 
@@ -1666,7 +1666,7 @@ msgid "Deleted file [%s]."
 msgstr ""
 
 #: ..\..\..\admin\files.php:391
-#: ..\..\..\b2evocore\_class_filemanager.php:860
+#: ..\..\..\evocore\_filemanager.class.php:860
 #, possible-php-format
 msgid "[%s] is not a valid filename."
 msgstr ""
@@ -1899,7 +1899,7 @@ msgstr ""
 
 #: ..\..\..\admin\files.php:975
 #: ..\..\..\admin\_blogs_advanced.form.php:43
-#: ..\..\..\b2evocore\_class_file.php:152
+#: ..\..\..\evocore\_file.class.php:152
 msgid "directory"
 msgstr ""
 
@@ -2453,7 +2453,7 @@ msgid "No Member"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:147
-#: ..\..\..\b2evocore\_class_comment.php:135
+#: ..\..\..\evocore\_comment.class.php:135
 msgid "Member"
 msgstr ""
 
@@ -2462,7 +2462,7 @@ msgid "Editor"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:149
-#: ..\..\..\b2evocore\_functions_users.php:448
+#: ..\..\..\evocore\_user.funcs.php:448
 msgid "Admin"
 msgstr ""
 
@@ -2525,27 +2525,27 @@ msgid "Media directory"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:210
-#: ..\..\..\b2evocore\_vars.php:224
+#: ..\..\..\evocore\_vars.inc.php:224
 msgid "Published"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:211
-#: ..\..\..\b2evocore\_vars.php:226
+#: ..\..\..\evocore\_vars.inc.php:226
 msgid "Protected"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:212
-#: ..\..\..\b2evocore\_vars.php:227
+#: ..\..\..\evocore\_vars.inc.php:227
 msgid "Private"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:213
-#: ..\..\..\b2evocore\_vars.php:228
+#: ..\..\..\evocore\_vars.inc.php:228
 msgid "Draft"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_permissions.form.php:214
-#: ..\..\..\b2evocore\_vars.php:225
+#: ..\..\..\evocore\_vars.inc.php:225
 msgid "Deprecated"
 msgstr ""
 
@@ -2599,7 +2599,7 @@ msgid "<strong>Note:</strong> Deleting a category does not delete posts from tha
 msgstr ""
 
 #: ..\..\..\admin\_edit_form.php:73
-#: ..\..\..\b2evocore\_functions_pingback.php:78
+#: ..\..\..\evocore\_pingback.funcs.php:78
 msgid "Post contents"
 msgstr ""
 
@@ -2755,10 +2755,10 @@ msgstr ""
 #: ..\..\..\admin\_edit_showposts.php:188
 #: ..\..\..\skins\_feedback.php:55
 #: ..\..\..\skins\basic\_feedback.php:56
-#: ..\..\..\skins\custom\_main.php:321
-#: ..\..\..\skins\custom\_main.php:326
-#: ..\..\..\skins\custom\_main.php:331
-#: ..\..\..\skins\custom\_main.php:336
+#: ..\..\..\skins\custom\_main.inc.php:321
+#: ..\..\..\skins\custom\_main.inc.php:326
+#: ..\..\..\skins\custom\_main.inc.php:331
+#: ..\..\..\skins\custom\_main.inc.php:336
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:56
 #: ..\..\..\skins\wpc_default\_feedback.php:56
 msgid "Comments"
@@ -2857,12 +2857,12 @@ msgid "level:"
 msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:142
-#: ..\..\..\skins\custom\_main.php:125
+#: ..\..\..\skins\custom\_main.inc.php:125
 msgid "views"
 msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:155
-#: ..\..\..\b2evocore\_functions_bposts.php:828
+#: ..\..\..\evocore\_item.funcs.php:828
 msgid "Pages:"
 msgstr ""
 
@@ -2872,14 +2872,14 @@ msgid "no comment"
 msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:175
-#: ..\..\..\b2evocore\_class_item.php:789
-#: ..\..\..\b2evocore\_functions_comments.php:211
+#: ..\..\..\evocore\_item.class.php:789
+#: ..\..\..\evocore\_comment.funcs.php:211
 msgid "1 comment"
 msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:175
-#: ..\..\..\b2evocore\_class_item.php:790
-#: ..\..\..\b2evocore\_functions_comments.php:212
+#: ..\..\..\evocore\_item.class.php:790
+#: ..\..\..\evocore\_comment.funcs.php:212
 #, possible-php-format
 msgid "%d comments"
 msgstr ""
@@ -2949,8 +2949,8 @@ msgid "Permanent link to this comment"
 msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:266
-#: ..\..\..\b2evocore\_class_item.php:788
-#: ..\..\..\b2evocore\_functions_comments.php:210
+#: ..\..\..\evocore\_item.class.php:788
+#: ..\..\..\evocore\_comment.funcs.php:210
 #: ..\..\..\skins\_feedback.php:148
 #: ..\..\..\skins\basic\_feedback.php:141
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:146
@@ -3052,7 +3052,7 @@ msgstr ""
 #: ..\..\..\admin\_set_files.form.php:39
 #: ..\..\..\admin\_set_regional.form.php:68
 #: ..\..\..\admin\_set_regional.form.php:246
-#: ..\..\..\b2evocore\_functions_forms.php:349
+#: ..\..\..\evocore\_form.funcs.php:349
 #: ..\..\..\install\index.php:306
 #: ..\..\..\skins\_profile.php:75
 msgid "Reset"
@@ -3099,9 +3099,9 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:165
 #: ..\..\..\admin\_set_regional.form.php:241
 #: ..\..\..\admin\_users_list.php:32
-#: ..\..\..\b2evocore\_class_comment.php:262
-#: ..\..\..\b2evocore\_class_filemanager.php:428
-#: ..\..\..\b2evocore\_class_item.php:940
+#: ..\..\..\evocore\_comment.class.php:262
+#: ..\..\..\evocore\_filemanager.class.php:428
+#: ..\..\..\evocore\_item.class.php:940
 msgid "Edit"
 msgstr ""
 
@@ -3871,10 +3871,10 @@ msgstr ""
 #: ..\..\..\admin\_users_form.php:198
 #: ..\..\..\skins\_profile.php:36
 #: ..\..\..\skins\basic\_profile.php:50
-#: ..\..\..\skins\custom\_main.php:320
-#: ..\..\..\skins\custom\_main.php:325
-#: ..\..\..\skins\custom\_main.php:330
-#: ..\..\..\skins\custom\_main.php:335
+#: ..\..\..\skins\custom\_main.inc.php:320
+#: ..\..\..\skins\custom\_main.inc.php:325
+#: ..\..\..\skins\custom\_main.inc.php:330
+#: ..\..\..\skins\custom\_main.inc.php:335
 msgid "Posts"
 msgstr ""
 
@@ -3958,7 +3958,7 @@ msgid "View only"
 msgstr ""
 
 #: ..\..\..\admin\_users_groupform.php:92
-#: ..\..\..\b2evocore\_functions_hitlogs.php:606
+#: ..\..\..\evocore\_hitlog.funcs.php:606
 msgid "Statistics"
 msgstr ""
 
@@ -4016,600 +4016,600 @@ msgstr ""
 msgid "New group..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_blog_main.php:243
+#: ..\..\..\evocore\_blog_main.inc.php:243
 #, possible-php-format
 msgid "The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_blog.php:470
-#: ..\..\..\b2evocore\_class_blog.php:484
+#: ..\..\..\evocore\_blog.class.php:470
+#: ..\..\..\evocore\_blog.class.php:484
 #, possible-php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:197
-#: ..\..\..\b2evocore\_class_calendar.php:202
+#: ..\..\..\evocore\_calendar.class.php:197
+#: ..\..\..\evocore\_calendar.class.php:202
 #, possible-php-format
 msgid "%d posts"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:198
-#: ..\..\..\b2evocore\_class_calendar.php:203
+#: ..\..\..\evocore\_calendar.class.php:198
+#: ..\..\..\evocore\_calendar.class.php:203
 msgid "1 post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:305
+#: ..\..\..\evocore\_calendar.class.php:305
 msgid "previous month"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:309
+#: ..\..\..\evocore\_calendar.class.php:309
 msgid "next month"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:336
+#: ..\..\..\evocore\_calendar.class.php:336
 msgid "previous year"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:339
+#: ..\..\..\evocore\_calendar.class.php:339
 msgid "next year"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_calendar.php:368
+#: ..\..\..\evocore\_calendar.class.php:368
 msgid "go to month's archive"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_comment.php:143
+#: ..\..\..\evocore\_comment.class.php:143
 msgid "Visitor"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_comment.php:263
+#: ..\..\..\evocore\_comment.class.php:263
 msgid "Edit this comment"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_comment.php:300
+#: ..\..\..\evocore\_comment.class.php:300
 msgid "Delete this comment"
 msgstr ""
 
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\b2evocore\_class_comment.php:310
-#: ..\..\..\b2evocore\_class_comment.php:319
+#: ..\..\..\evocore\_comment.class.php:310
+#: ..\..\..\evocore\_comment.class.php:319
 msgid "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to delete."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_comment.php:365
-#: ..\..\..\b2evocore\_class_item.php:684
-#: ..\..\..\b2evocore\_class_user.php:585
+#: ..\..\..\evocore\_comment.class.php:365
+#: ..\..\..\evocore\_item.class.php:684
+#: ..\..\..\evocore\_user.class.php:585
 msgid "EMail"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_comment.php:366
+#: ..\..\..\evocore\_comment.class.php:366
 msgid "Send email to comment author"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_commentlist.php:144
+#: ..\..\..\evocore\_commentlist.class.php:144
 #: ..\..\..\skins\_lastcomments.php:25
 msgid "No comment yet..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_dataobjectlist.php:120
+#: ..\..\..\evocore\_dataobjectlist.class.php:120
 msgid "Sorry, there is nothing to display..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_db.php:134
+#: ..\..\..\evocore\_db.class.php:134
 #, possible-php-format
 msgid "Error selecting database [%s]!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_db.php:191
+#: ..\..\..\evocore\_db.class.php:191
 msgid "MySQL error!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:49
+#: ..\..\..\evocore\_file.class.php:49
 msgid "Adobe illustrator"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:50
+#: ..\..\..\evocore\_file.class.php:50
 msgid "Bmp image"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:51
+#: ..\..\..\evocore\_file.class.php:51
 msgid "Bz Archive"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:52
+#: ..\..\..\evocore\_file.class.php:52
 msgid "Source C "
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:53
+#: ..\..\..\evocore\_file.class.php:53
 msgid "CGI file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:54
+#: ..\..\..\evocore\_file.class.php:54
 msgid "Config file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:55
+#: ..\..\..\evocore\_file.class.php:55
 msgid "Source C++"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:56
+#: ..\..\..\evocore\_file.class.php:56
 msgid "Stylesheet"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:57
+#: ..\..\..\evocore\_file.class.php:57
 msgid "MS Office"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:58
+#: ..\..\..\evocore\_file.class.php:58
 msgid "Executable"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:59
+#: ..\..\..\evocore\_file.class.php:59
 msgid "Gif image"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:60
+#: ..\..\..\evocore\_file.class.php:60
 msgid "Gz Archive"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:61
+#: ..\..\..\evocore\_file.class.php:61
 msgid "Header file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:62
+#: ..\..\..\evocore\_file.class.php:62
 msgid "Help file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:63
+#: ..\..\..\evocore\_file.class.php:63
 msgid "Apache file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:64
-#: ..\..\..\b2evocore\_class_file.php:65
+#: ..\..\..\evocore\_file.class.php:64
+#: ..\..\..\evocore\_file.class.php:65
 msgid "Hyper text"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:66
+#: ..\..\..\evocore\_file.class.php:66
 msgid "Windows access"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:67
+#: ..\..\..\evocore\_file.class.php:67
 msgid "Include file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:68
+#: ..\..\..\evocore\_file.class.php:68
 msgid "Config File"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:69
+#: ..\..\..\evocore\_file.class.php:69
 msgid "Setting file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:70
+#: ..\..\..\evocore\_file.class.php:70
 msgid "Jpeg Image"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:71
+#: ..\..\..\evocore\_file.class.php:71
 msgid "JavaScript"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:72
+#: ..\..\..\evocore\_file.class.php:72
 msgid "Log file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:73
+#: ..\..\..\evocore\_file.class.php:73
 msgid "Access DB"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:74
+#: ..\..\..\evocore\_file.class.php:74
 msgid "Media file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:75
+#: ..\..\..\evocore\_file.class.php:75
 msgid "PHP script"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:76
+#: ..\..\..\evocore\_file.class.php:76
 msgid "php file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:77
+#: ..\..\..\evocore\_file.class.php:77
 msgid "Perl script"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:78
+#: ..\..\..\evocore\_file.class.php:78
 msgid "Png image"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:79
+#: ..\..\..\evocore\_file.class.php:79
 msgid "MS Power point"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:80
+#: ..\..\..\evocore\_file.class.php:80
 msgid "Photoshop Image"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:81
-#: ..\..\..\b2evocore\_class_file.php:82
+#: ..\..\..\evocore\_file.class.php:81
+#: ..\..\..\evocore\_file.class.php:82
 msgid "Real file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:83
+#: ..\..\..\evocore\_file.class.php:83
 msgid "Rar Archive"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:84
+#: ..\..\..\evocore\_file.class.php:84
 msgid "Rich Text Format"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:85
+#: ..\..\..\evocore\_file.class.php:85
 msgid "SQL file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:86
+#: ..\..\..\evocore\_file.class.php:86
 msgid "OpenOffice file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:87
+#: ..\..\..\evocore\_file.class.php:87
 msgid "Text document"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:88
+#: ..\..\..\evocore\_file.class.php:88
 msgid "Tar gz archive"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:89
+#: ..\..\..\evocore\_file.class.php:89
 msgid "MS Vb script"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:90
+#: ..\..\..\evocore\_file.class.php:90
 msgid "Document"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:91
+#: ..\..\..\evocore\_file.class.php:91
 msgid "XML file"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:92
+#: ..\..\..\evocore\_file.class.php:92
 msgid "Zip Archive"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_file.php:164
+#: ..\..\..\evocore\_file.class.php:164
 msgid "unknown"
 msgstr ""
 
 #. TRANS: short for '<directory>'
-#: ..\..\..\b2evocore\_class_file.php:253
+#: ..\..\..\evocore\_file.class.php:253
 msgid "&lt;dir&gt;"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filelist.php:177
+#: ..\..\..\evocore\_filelist.class.php:177
 #, possible-php-format
 msgid "Cannot open directory [%s]!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filelist.php:360
+#: ..\..\..\evocore\_filelist.class.php:360
 msgid "no filter"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filelist.php:367
+#: ..\..\..\evocore\_filelist.class.php:367
 msgid "regular expression"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:191
+#: ..\..\..\evocore\_filemanager.class.php:191
 msgid "No access to root directory."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:196
+#: ..\..\..\evocore\_filemanager.class.php:196
 #, possible-php-format
 msgid "The root directory [%s] does not exist."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:210
+#: ..\..\..\evocore\_filemanager.class.php:210
 msgid "You are not allowed to go outside your root directory!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:217
+#: ..\..\..\evocore\_filemanager.class.php:217
 #, possible-php-format
 msgid "The directory [%s] does not exist."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:240
+#: ..\..\..\evocore\_filemanager.class.php:240
 #, possible-php-format
 msgid "The filter [%s] is not a regular expression."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:358
+#: ..\..\..\evocore\_filemanager.class.php:358
 msgid "user media folder"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:380
+#: ..\..\..\evocore\_filemanager.class.php:380
 msgid "sort ascending by this column"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:380
+#: ..\..\..\evocore\_filemanager.class.php:380
 msgid "sort descending by this column"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:420
+#: ..\..\..\evocore\_filemanager.class.php:420
 msgid "go to parent directory"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:422
+#: ..\..\..\evocore\_filemanager.class.php:422
 msgid "home directory"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:424
+#: ..\..\..\evocore\_filemanager.class.php:424
 msgid "descending"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:426
+#: ..\..\..\evocore\_filemanager.class.php:426
 msgid "ascending"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:430
+#: ..\..\..\evocore\_filemanager.class.php:430
 msgid "Copy/Move"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:432
+#: ..\..\..\evocore\_filemanager.class.php:432
 msgid "Rename"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:436
+#: ..\..\..\evocore\_filemanager.class.php:436
 msgid "Open in new window"
 msgstr ""
 
 #. TRANS short for directory
-#: ..\..\..\b2evocore\_class_filemanager.php:618
+#: ..\..\..\evocore\_filemanager.class.php:618
 msgid "[dir]"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:672
-#: ..\..\..\b2evocore\_class_filemanager.php:712
+#: ..\..\..\evocore\_filemanager.class.php:672
+#: ..\..\..\evocore\_filemanager.class.php:712
 #, possible-php-format
 msgid "File [%s] not found."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:723
+#: ..\..\..\evocore\_filemanager.class.php:723
 #, possible-php-format
 msgid "Directory [%s] and subdirectories deleted."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:728
+#: ..\..\..\evocore\_filemanager.class.php:728
 #, possible-php-format
 msgid "Directory [%s] could not be deleted."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:734
+#: ..\..\..\evocore\_filemanager.class.php:734
 #, possible-php-format
 msgid "Directory [%s] deleted."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:739
+#: ..\..\..\evocore\_filemanager.class.php:739
 #, possible-php-format
 msgid "Directory [%s] could not be deleted (probably not empty)."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:747
+#: ..\..\..\evocore\_filemanager.class.php:747
 #, possible-php-format
 msgid "File [%s] deleted."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:752
+#: ..\..\..\evocore\_filemanager.class.php:752
 #, possible-php-format
 msgid "File [%s] could not be deleted."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:818
+#: ..\..\..\evocore\_filemanager.class.php:818
 msgid "Cannot create empty directory."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:823
+#: ..\..\..\evocore\_filemanager.class.php:823
 #, possible-php-format
 msgid "[%s] is not a valid directory."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:828
-#: ..\..\..\b2evocore\_class_filemanager.php:829
+#: ..\..\..\evocore\_filemanager.class.php:828
+#: ..\..\..\evocore\_filemanager.class.php:829
 #, possible-php-format
 msgid "Could not create directory [%s] in [%s]."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:833
+#: ..\..\..\evocore\_filemanager.class.php:833
 #, possible-php-format
 msgid "Directory [%s] created."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:855
+#: ..\..\..\evocore\_filemanager.class.php:855
 msgid "Cannot create empty file."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:866
+#: ..\..\..\evocore\_filemanager.class.php:866
 #, possible-php-format
 msgid "File [%s] already exists."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:872
+#: ..\..\..\evocore\_filemanager.class.php:872
 #, possible-php-format
 msgid "Could not create file [%s] in [%s]."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:877
+#: ..\..\..\evocore\_filemanager.class.php:877
 #, possible-php-format
 msgid "File [%s] created."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_filemanager.php:910
+#: ..\..\..\evocore\_filemanager.class.php:910
 msgid "No directory."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_group.php:70
+#: ..\..\..\evocore\_group.class.php:70
 msgid "New group"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:109
+#: ..\..\..\evocore\_htmlchecker.class.php:109
 msgid "Parser error: "
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:126
+#: ..\..\..\evocore\_htmlchecker.class.php:126
 msgid "Tag <code>body</code> can only be used once!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:139
+#: ..\..\..\evocore\_htmlchecker.class.php:139
 msgid "Illegal tag"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:146
+#: ..\..\..\evocore\_htmlchecker.class.php:146
 #, possible-php-format
 msgid "Tag %s must occur inside another tag"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:148
+#: ..\..\..\evocore\_htmlchecker.class.php:148
 #, possible-php-format
 msgid "Tag %s is not allowed within tag %s"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:156
+#: ..\..\..\evocore\_htmlchecker.class.php:156
 #, possible-php-format
 msgid "Tag %s may not have attribute %s"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:164
+#: ..\..\..\evocore\_htmlchecker.class.php:164
 msgid "Found invalid URL: "
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:187
+#: ..\..\..\evocore\_htmlchecker.class.php:187
 #, possible-php-format
 msgid "Tag %s may not contain raw character data"
 msgstr ""
 
 #. TRANS: When the categories for a specific post are displayed, the user can click
 #. on these cats to browse them, this is the default href title displayed there
-#: ..\..\..\b2evocore\_class_item.php:305
-#: ..\..\..\b2evocore\_functions_cats.php:639
+#: ..\..\..\evocore\_item.class.php:305
+#: ..\..\..\evocore\_category.funcs.php:639
 msgid "Browse category"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:408
+#: ..\..\..\evocore\_item.class.php:408
 msgid "Comments are closed for this post."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:420
+#: ..\..\..\evocore\_item.class.php:420
 msgid "This post is not published. You cannot leave comments."
 msgstr ""
 
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_class_item.php:478
-#: ..\..\..\b2evocore\_functions_bposts.php:734
+#: ..\..\..\evocore\_item.class.php:478
+#: ..\..\..\evocore\_item.funcs.php:734
 msgid "Read more!"
 msgstr ""
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_class_item.php:483
-#: ..\..\..\b2evocore\_functions_bposts.php:739
+#: ..\..\..\evocore\_item.class.php:483
+#: ..\..\..\evocore\_item.funcs.php:739
 msgid "More:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:685
+#: ..\..\..\evocore\_item.class.php:685
 msgid "Send email to post author"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:771
+#: ..\..\..\evocore\_item.class.php:771
 msgid "Display feedback / Leave a comment"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:772
+#: ..\..\..\evocore\_item.class.php:772
 msgid "Send feedback"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:773
+#: ..\..\..\evocore\_item.class.php:773
 msgid "1 feedback"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:774
+#: ..\..\..\evocore\_item.class.php:774
 #, possible-php-format
 msgid "%d feedbacks"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:787
+#: ..\..\..\evocore\_item.class.php:787
 msgid "Display comments / Leave a comment"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:800
+#: ..\..\..\evocore\_item.class.php:800
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:801
-#: ..\..\..\b2evocore\_functions_trackback.php:172
+#: ..\..\..\evocore\_item.class.php:801
+#: ..\..\..\evocore\_trackback.funcs.php:172
 msgid "Trackback (0)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:802
-#: ..\..\..\b2evocore\_functions_trackback.php:173
+#: ..\..\..\evocore\_item.class.php:802
+#: ..\..\..\evocore\_trackback.funcs.php:173
 msgid "Trackback (1)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:803
-#: ..\..\..\b2evocore\_functions_trackback.php:174
+#: ..\..\..\evocore\_item.class.php:803
+#: ..\..\..\evocore\_trackback.funcs.php:174
 #, possible-php-format
 msgid "Trackbacks (%d)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:813
+#: ..\..\..\evocore\_item.class.php:813
 msgid "Display pingbacks"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:814
-#: ..\..\..\b2evocore\_functions_pingback.php:267
+#: ..\..\..\evocore\_item.class.php:814
+#: ..\..\..\evocore\_pingback.funcs.php:267
 msgid "Pingback (0)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:815
-#: ..\..\..\b2evocore\_functions_pingback.php:268
+#: ..\..\..\evocore\_item.class.php:815
+#: ..\..\..\evocore\_pingback.funcs.php:268
 msgid "Pingback (1)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:816
-#: ..\..\..\b2evocore\_functions_pingback.php:269
+#: ..\..\..\evocore\_item.class.php:816
+#: ..\..\..\evocore\_pingback.funcs.php:269
 #, possible-php-format
 msgid "Pingbacks (%d)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:886
+#: ..\..\..\evocore\_item.class.php:886
 msgid "Delete this post"
 msgstr ""
 
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\b2evocore\_class_item.php:896
-#: ..\..\..\b2evocore\_class_item.php:905
+#: ..\..\..\evocore\_item.class.php:896
+#: ..\..\..\evocore\_item.class.php:905
 msgid "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to delete."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:941
+#: ..\..\..\evocore\_item.class.php:941
 msgid "Edit this post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:981
+#: ..\..\..\evocore\_item.class.php:981
 msgid "Publish NOW!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_item.php:982
+#: ..\..\..\evocore\_item.class.php:982
 msgid "Publish now using current date and time."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_itemlist.php:567
+#: ..\..\..\evocore\_itemlist.class.php:567
 msgid "Invalid post, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_itemlist.php:869
+#: ..\..\..\evocore\_itemlist.class.php:869
 msgid "Sorry, there is no post to display..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_plugin.php:213
+#: ..\..\..\evocore\_plugin.class.php:213
 msgid "No desc available"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_plugin.php:214
+#: ..\..\..\evocore\_plugin.class.php:214
 #: ..\..\..\plugins\_autolinks.plugin.php:38
 #: ..\..\..\plugins\_auto_p.plugin.php:38
 #: ..\..\..\plugins\_bbcode.plugin.php:81
@@ -4618,818 +4618,818 @@ msgstr ""
 msgid "No description available"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_plugin.php:369
+#: ..\..\..\evocore\_plugin.class.php:369
 msgid "No such action!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:104
-#: ..\..\..\b2evocore\_class_pop3.php:113
-#: ..\..\..\b2evocore\_class_pop3.php:125
+#: ..\..\..\evocore\_pop3.class.php:104
+#: ..\..\..\evocore\_pop3.class.php:113
+#: ..\..\..\evocore\_pop3.class.php:125
 msgid "POP3 connect:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:104
+#: ..\..\..\evocore\_pop3.class.php:104
 msgid "No server specified"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:133
+#: ..\..\..\evocore\_pop3.class.php:133
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:145
+#: ..\..\..\evocore\_pop3.class.php:145
 msgid "POP3 noop:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:145
-#: ..\..\..\b2evocore\_class_pop3.php:213
-#: ..\..\..\b2evocore\_class_pop3.php:262
-#: ..\..\..\b2evocore\_class_pop3.php:287
-#: ..\..\..\b2evocore\_class_pop3.php:329
-#: ..\..\..\b2evocore\_class_pop3.php:403
-#: ..\..\..\b2evocore\_class_pop3.php:442
-#: ..\..\..\b2evocore\_class_pop3.php:472
-#: ..\..\..\b2evocore\_class_pop3.php:506
-#: ..\..\..\b2evocore\_class_pop3.php:569
-#: ..\..\..\b2evocore\_class_pop3.php:637
+#: ..\..\..\evocore\_pop3.class.php:145
+#: ..\..\..\evocore\_pop3.class.php:213
+#: ..\..\..\evocore\_pop3.class.php:262
+#: ..\..\..\evocore\_pop3.class.php:287
+#: ..\..\..\evocore\_pop3.class.php:329
+#: ..\..\..\evocore\_pop3.class.php:403
+#: ..\..\..\evocore\_pop3.class.php:442
+#: ..\..\..\evocore\_pop3.class.php:472
+#: ..\..\..\evocore\_pop3.class.php:506
+#: ..\..\..\evocore\_pop3.class.php:569
+#: ..\..\..\evocore\_pop3.class.php:637
 msgid "No connection to server"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:160
-#: ..\..\..\b2evocore\_class_pop3.php:163
-#: ..\..\..\b2evocore\_class_pop3.php:168
+#: ..\..\..\evocore\_pop3.class.php:160
+#: ..\..\..\evocore\_pop3.class.php:163
+#: ..\..\..\evocore\_pop3.class.php:168
 msgid "POP3 user:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:160
-#: ..\..\..\b2evocore\_class_pop3.php:219
+#: ..\..\..\evocore\_pop3.class.php:160
+#: ..\..\..\evocore\_pop3.class.php:219
 msgid "No login ID submitted"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:163
-#: ..\..\..\b2evocore\_class_pop3.php:183
+#: ..\..\..\evocore\_pop3.class.php:163
+#: ..\..\..\evocore\_pop3.class.php:183
 msgid "connection not established"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:180
-#: ..\..\..\b2evocore\_class_pop3.php:183
-#: ..\..\..\b2evocore\_class_pop3.php:188
-#: ..\..\..\b2evocore\_class_pop3.php:197
+#: ..\..\..\evocore\_pop3.class.php:180
+#: ..\..\..\evocore\_pop3.class.php:183
+#: ..\..\..\evocore\_pop3.class.php:188
+#: ..\..\..\evocore\_pop3.class.php:197
 msgid "POP3 pass:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:180
-#: ..\..\..\b2evocore\_class_pop3.php:222
+#: ..\..\..\evocore\_pop3.class.php:180
+#: ..\..\..\evocore\_pop3.class.php:222
 msgid "No password submitted"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:188
+#: ..\..\..\evocore\_pop3.class.php:188
 msgid "authentication failed "
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:197
-#: ..\..\..\b2evocore\_class_pop3.php:246
+#: ..\..\..\evocore\_pop3.class.php:197
+#: ..\..\..\evocore\_pop3.class.php:246
 msgid "NOOP failed. Server not RFC 1939 compliant"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:213
-#: ..\..\..\b2evocore\_class_pop3.php:219
-#: ..\..\..\b2evocore\_class_pop3.php:222
-#: ..\..\..\b2evocore\_class_pop3.php:227
-#: ..\..\..\b2evocore\_class_pop3.php:237
-#: ..\..\..\b2evocore\_class_pop3.php:246
+#: ..\..\..\evocore\_pop3.class.php:213
+#: ..\..\..\evocore\_pop3.class.php:219
+#: ..\..\..\evocore\_pop3.class.php:222
+#: ..\..\..\evocore\_pop3.class.php:227
+#: ..\..\..\evocore\_pop3.class.php:237
+#: ..\..\..\evocore\_pop3.class.php:246
 msgid "POP3 apop:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:227
+#: ..\..\..\evocore\_pop3.class.php:227
 msgid "No server banner"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:227
-#: ..\..\..\b2evocore\_class_pop3.php:237
+#: ..\..\..\evocore\_pop3.class.php:227
+#: ..\..\..\evocore\_pop3.class.php:237
 msgid "abort"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:237
+#: ..\..\..\evocore\_pop3.class.php:237
 msgid "apop authentication failed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:262
+#: ..\..\..\evocore\_pop3.class.php:262
 msgid "POP3 login:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:287
-#: ..\..\..\b2evocore\_class_pop3.php:303
+#: ..\..\..\evocore\_pop3.class.php:287
+#: ..\..\..\evocore\_pop3.class.php:303
 msgid "POP3 top:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:329
-#: ..\..\..\b2evocore\_class_pop3.php:357
-#: ..\..\..\b2evocore\_class_pop3.php:368
-#: ..\..\..\b2evocore\_class_pop3.php:380
+#: ..\..\..\evocore\_pop3.class.php:329
+#: ..\..\..\evocore\_pop3.class.php:357
+#: ..\..\..\evocore\_pop3.class.php:368
+#: ..\..\..\evocore\_pop3.class.php:380
 msgid "POP3 pop_list:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:380
+#: ..\..\..\evocore\_pop3.class.php:380
 msgid "Premature end of list"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:403
-#: ..\..\..\b2evocore\_class_pop3.php:416
+#: ..\..\..\evocore\_pop3.class.php:403
+#: ..\..\..\evocore\_pop3.class.php:416
 msgid "POP3 get:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:442
-#: ..\..\..\b2evocore\_class_pop3.php:449
+#: ..\..\..\evocore\_pop3.class.php:442
+#: ..\..\..\evocore\_pop3.class.php:449
 msgid "POP3 last:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:472
-#: ..\..\..\b2evocore\_class_pop3.php:482
+#: ..\..\..\evocore\_pop3.class.php:472
+#: ..\..\..\evocore\_pop3.class.php:482
 msgid "POP3 reset:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:506
-#: ..\..\..\b2evocore\_class_pop3.php:512
+#: ..\..\..\evocore\_pop3.class.php:506
+#: ..\..\..\evocore\_pop3.class.php:512
 msgid "POP3 send_cmd:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:512
+#: ..\..\..\evocore\_pop3.class.php:512
 msgid "Empty command string"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:532
+#: ..\..\..\evocore\_pop3.class.php:532
 msgid "POP3 quit:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:532
+#: ..\..\..\evocore\_pop3.class.php:532
 msgid "connection does not exist"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:569
-#: ..\..\..\b2evocore\_class_pop3.php:581
-#: ..\..\..\b2evocore\_class_pop3.php:604
+#: ..\..\..\evocore\_pop3.class.php:569
+#: ..\..\..\evocore\_pop3.class.php:581
+#: ..\..\..\evocore\_pop3.class.php:604
 msgid "POP3 uidl:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:637
-#: ..\..\..\b2evocore\_class_pop3.php:642
-#: ..\..\..\b2evocore\_class_pop3.php:648
+#: ..\..\..\evocore\_pop3.class.php:637
+#: ..\..\..\evocore\_pop3.class.php:642
+#: ..\..\..\evocore\_pop3.class.php:648
 msgid "POP3 delete:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:642
+#: ..\..\..\evocore\_pop3.class.php:642
 msgid "No msg number submitted"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:648
+#: ..\..\..\evocore\_pop3.class.php:648
 msgid "Command failed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_results.php:111
+#: ..\..\..\evocore\_results.class.php:111
 msgid "$prev$ page $page$/$total_pages$ $next$"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_results.php:113
+#: ..\..\..\evocore\_results.class.php:113
 msgid "No results."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_user.php:74
+#: ..\..\..\evocore\_user.class.php:74
 msgid "New user"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_user.php:175
+#: ..\..\..\evocore\_user.class.php:175
 #, possible-php-format
 msgid "The user's directory [%s] could not be created."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_user.php:181
+#: ..\..\..\evocore\_user.class.php:181
 #, possible-php-format
 msgid "The user's directory %s has been created with permissions %s."
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_user.php:322
+#: ..\..\..\evocore\_user.class.php:322
 msgid "Permission denied!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_user.php:586
+#: ..\..\..\evocore\_user.class.php:586
 msgid "Send email to user"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:44
+#: ..\..\..\evocore\_misc.funcs.php:44
 msgid "Oops, MySQL error!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:493
+#: ..\..\..\evocore\_misc.funcs.php:493
 msgid "go back"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:525
+#: ..\..\..\evocore\_misc.funcs.php:525
 msgid "Redirecting you to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:527
+#: ..\..\..\evocore\_misc.funcs.php:527
 #, possible-php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:606
+#: ..\..\..\evocore\_misc.funcs.php:606
 msgid "No response!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:611
+#: ..\..\..\evocore\_misc.funcs.php:611
 msgid "Remote error"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:626
-#: ..\..\..\b2evocore\_functions.php:631
+#: ..\..\..\evocore\_misc.funcs.php:626
+#: ..\..\..\evocore\_misc.funcs.php:631
 msgid "Response"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:867
+#: ..\..\..\evocore\_misc.funcs.php:867
 #, possible-php-format
 msgid "Parameter %s is required!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1078
+#: ..\..\..\evocore\_misc.funcs.php:1078
 msgid "Invalid URL"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1084
+#: ..\..\..\evocore\_misc.funcs.php:1084
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1091
+#: ..\..\..\evocore\_misc.funcs.php:1091
 msgid "URL not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:118
+#: ..\..\..\evocore\_antispam.funcs.php:118
 msgid "Reporting abuse to b2evolution.net..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:148
-#: ..\..\..\b2evocore\_functions_pings.php:56
-#: ..\..\..\b2evocore\_functions_pings.php:92
-#: ..\..\..\b2evocore\_functions_pings.php:169
-#: ..\..\..\b2evocore\_functions_pings.php:210
+#: ..\..\..\evocore\_antispam.funcs.php:148
+#: ..\..\..\evocore\_ping.funcs.php:56
+#: ..\..\..\evocore\_ping.funcs.php:92
+#: ..\..\..\evocore\_ping.funcs.php:169
+#: ..\..\..\evocore\_ping.funcs.php:210
 msgid "Aborted (Running on localhost)."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:166
+#: ..\..\..\evocore\_antispam.funcs.php:166
 msgid "Requesting abuse list from b2evolution.net..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:176
+#: ..\..\..\evocore\_antispam.funcs.php:176
 msgid "Latest update timestamp"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:201
+#: ..\..\..\evocore\_antispam.funcs.php:201
 msgid "Incomplete reponse."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:209
+#: ..\..\..\evocore\_antispam.funcs.php:209
 msgid "No new blacklisted strings are available."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:213
+#: ..\..\..\evocore\_antispam.funcs.php:213
 msgid "Adding strings to local blacklist"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:216
+#: ..\..\..\evocore\_antispam.funcs.php:216
 msgid "Adding:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:219
+#: ..\..\..\evocore\_antispam.funcs.php:219
 #: ..\..\..\htsrv\getmail.php:295
 msgid "OK."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:223
+#: ..\..\..\evocore\_antispam.funcs.php:223
 msgid "Not necessary! (Already handled)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:231
+#: ..\..\..\evocore\_antispam.funcs.php:231
 msgid "New latest update timestamp"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:240
+#: ..\..\..\evocore\_antispam.funcs.php:240
 msgid "Invalid reponse."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_blogs.php:325
-#: ..\..\..\b2evocore\_functions_blogs.php:350
+#: ..\..\..\evocore\_blog.funcs.php:325
+#: ..\..\..\evocore\_blog.funcs.php:350
 msgid "Requested blog does not exist!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:663
+#: ..\..\..\evocore\_item.funcs.php:663
 msgid "Post details"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:668
-#: ..\..\..\b2evocore\_functions_bposts.php:704
+#: ..\..\..\evocore\_item.funcs.php:668
+#: ..\..\..\evocore\_item.funcs.php:704
 msgid "PREVIEW"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:830
+#: ..\..\..\evocore\_item.funcs.php:830
 msgid "Next page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:831
+#: ..\..\..\evocore\_item.funcs.php:831
 msgid "Previous page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:876
+#: ..\..\..\evocore\_item.funcs.php:876
 msgid "Previous post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:933
+#: ..\..\..\evocore\_item.funcs.php:933
 msgid "Next post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:1045
+#: ..\..\..\evocore\_item.funcs.php:1045
 msgid "Next Page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:1073
+#: ..\..\..\evocore\_item.funcs.php:1073
 msgid "Previous Page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_cats.php:90
+#: ..\..\..\evocore\_category.funcs.php:90
 msgid "Cannot delete if there are sub-categories!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_cats.php:122
+#: ..\..\..\evocore\_category.funcs.php:122
 msgid "Cannot delete last category if there are posts inside!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_cats.php:217
+#: ..\..\..\evocore\_category.funcs.php:217
 #, possible-php-format
 msgid "Requested category %s does not exist!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_cats.php:570
+#: ..\..\..\evocore\_category.funcs.php:570
 msgid "Category"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_forms.php:348
+#: ..\..\..\evocore\_form.funcs.php:348
 msgid "Save !"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:528
+#: ..\..\..\evocore\_hitlog.funcs.php:528
 msgid "not a query - no params!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:553
+#: ..\..\..\evocore\_hitlog.funcs.php:553
 msgid "no query string found"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_locale.php:354
+#: ..\..\..\evocore\_locale.funcs.php:354
 #: ..\..\..\install\index.php:91
 msgid "name"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_message.php:29
+#: ..\..\..\evocore\_message.funcs.php:29
 msgid "Send an email message"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:36
+#: ..\..\..\evocore\_pingback.funcs.php:36
 msgid "Sending pingbacks..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:41
+#: ..\..\..\evocore\_pingback.funcs.php:41
 msgid "No pingback to be done."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:47
+#: ..\..\..\evocore\_pingback.funcs.php:47
 msgid "BEGIN"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:109
-#: ..\..\..\b2evocore\_functions_pingback.php:110
+#: ..\..\..\evocore\_pingback.funcs.php:109
+#: ..\..\..\evocore\_pingback.funcs.php:110
 msgid "Processing:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:114
-#: ..\..\..\b2evocore\_functions_pingback.php:115
+#: ..\..\..\evocore\_pingback.funcs.php:114
+#: ..\..\..\evocore\_pingback.funcs.php:115
 msgid "Couldn't find a hostname for:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:129
+#: ..\..\..\evocore\_pingback.funcs.php:129
 msgid "Connect to server at:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:133
-#: ..\..\..\b2evocore\_functions_pingback.php:134
+#: ..\..\..\evocore\_pingback.funcs.php:133
+#: ..\..\..\evocore\_pingback.funcs.php:134
 msgid "Couldn't open a connection to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:145
+#: ..\..\..\evocore\_pingback.funcs.php:145
 msgid "Start receiving headers and content"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:179
-#: ..\..\..\b2evocore\_functions_pingback.php:180
+#: ..\..\..\evocore\_pingback.funcs.php:179
+#: ..\..\..\evocore\_pingback.funcs.php:180
 msgid "Pingback server found from X-Pingback header:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:193
-#: ..\..\..\b2evocore\_functions_pingback.php:194
+#: ..\..\..\evocore\_pingback.funcs.php:193
+#: ..\..\..\evocore\_pingback.funcs.php:194
 msgid "Pingback server found from Pingback <link /> tag:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:202
-#: ..\..\..\b2evocore\_functions_pingback.php:203
+#: ..\..\..\evocore\_pingback.funcs.php:202
+#: ..\..\..\evocore\_pingback.funcs.php:203
 msgid "Pingback server not found in headers and content"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:208
-#: ..\..\..\b2evocore\_functions_pingback.php:209
+#: ..\..\..\evocore\_pingback.funcs.php:208
+#: ..\..\..\evocore\_pingback.funcs.php:209
 msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:214
+#: ..\..\..\evocore\_pingback.funcs.php:214
 msgid "Pingback server data"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:224
-#: ..\..\..\b2evocore\_functions_pingback.php:225
+#: ..\..\..\evocore\_pingback.funcs.php:224
+#: ..\..\..\evocore\_pingback.funcs.php:225
 msgid "Page Linked To:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:226
-#: ..\..\..\b2evocore\_functions_pingback.php:227
+#: ..\..\..\evocore\_pingback.funcs.php:226
+#: ..\..\..\evocore\_pingback.funcs.php:227
 msgid "Page Linked From:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:232
+#: ..\..\..\evocore\_pingback.funcs.php:232
 #, possible-php-format
 msgid "Pinging %s..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:242
+#: ..\..\..\evocore\_pingback.funcs.php:242
 msgid "END"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:244
+#: ..\..\..\evocore\_pingback.funcs.php:244
 msgid "Pingbacks done."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:32
+#: ..\..\..\evocore\_ping.funcs.php:32
 msgid "Pinging b2evolution.net..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:77
+#: ..\..\..\evocore\_ping.funcs.php:77
 msgid "Pinging Weblogs.com..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:139
+#: ..\..\..\evocore\_ping.funcs.php:139
 msgid "Pinging Blo.gs..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:194
+#: ..\..\..\evocore\_ping.funcs.php:194
 msgid "Pinging technorati.com..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_template.php:51
+#: ..\..\..\evocore\_template.funcs.php:51
 msgid "Archives for"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_template.php:100
+#: ..\..\..\evocore\_template.funcs.php:100
 msgid "Archive Directory"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:24
+#: ..\..\..\evocore\_trackback.funcs.php:24
 msgid "Sending trackbacks..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:27
+#: ..\..\..\evocore\_trackback.funcs.php:27
 msgid "No trackback to be sent."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:32
+#: ..\..\..\evocore\_trackback.funcs.php:32
 msgid "Excerpt to be sent:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:40
+#: ..\..\..\evocore\_trackback.funcs.php:40
 msgid "Trackbacks done."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:59
+#: ..\..\..\evocore\_trackback.funcs.php:59
 msgid "Sending trackback to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:117
+#: ..\..\..\evocore\_trackback.funcs.php:117
 msgid "Response:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:76
+#: ..\..\..\evocore\_user.funcs.php:76
 msgid "wrong login/password."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:82
-#: ..\..\..\b2evocore\_functions_users.php:84
+#: ..\..\..\evocore\_user.funcs.php:82
+#: ..\..\..\evocore\_user.funcs.php:84
 #: ..\..\..\htsrv\profile_update.php:84
 #, possible-php-format
 msgid "setcookie %s failed!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:107
+#: ..\..\..\evocore\_user.funcs.php:107
 msgid "login/password no longer valid."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:128
+#: ..\..\..\evocore\_user.funcs.php:128
 msgid "You must log in!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:349
+#: ..\..\..\evocore\_user.funcs.php:349
 msgid "Login if you have an account..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:386
+#: ..\..\..\evocore\_user.funcs.php:386
 msgid "Register..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:387
+#: ..\..\..\evocore\_user.funcs.php:387
 msgid "Register to open an account..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:421
+#: ..\..\..\evocore\_user.funcs.php:421
 #, possible-php-format
 msgid "Logout (%s)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:422
+#: ..\..\..\evocore\_user.funcs.php:422
 msgid "Logout from your account"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:449
+#: ..\..\..\evocore\_user.funcs.php:449
 msgid "Go to the back-office"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:472
+#: ..\..\..\evocore\_user.funcs.php:472
 #, possible-php-format
 msgid "Profile (%s)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:473
+#: ..\..\..\evocore\_user.funcs.php:473
 msgid "Edit your profile"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:499
+#: ..\..\..\evocore\_user.funcs.php:499
 msgid "User profile"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:526
+#: ..\..\..\evocore\_user.funcs.php:526
 msgid "Please enter a nickname (can be the same as your login)."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:534
+#: ..\..\..\evocore\_user.funcs.php:534
 msgid "The ICQ UIN can only be a number, no letters allowed."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:541
+#: ..\..\..\evocore\_user.funcs.php:541
 msgid "Please enter an e-mail address."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:545
+#: ..\..\..\evocore\_user.funcs.php:545
 msgid "The email address is invalid."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:559
-#: ..\..\..\b2evocore\_functions_users.php:567
+#: ..\..\..\evocore\_user.funcs.php:559
+#: ..\..\..\evocore\_user.funcs.php:567
 msgid "Please enter the new password twice."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:571
+#: ..\..\..\evocore\_user.funcs.php:571
 msgid "You typed two different passwords."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:575
+#: ..\..\..\evocore\_user.funcs.php:575
 #: ..\..\..\htsrv\register.php:64
 #, possible-php-format
 msgid "The mimimum password length is %d characters."
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:126
-#: ..\..\..\b2evocore\_vars.php:127
+#: ..\..\..\evocore\_vars.inc.php:126
+#: ..\..\..\evocore\_vars.inc.php:127
 msgid "bad char in User Agent"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:141
+#: ..\..\..\evocore\_vars.inc.php:141
 msgid "Sunday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:142
+#: ..\..\..\evocore\_vars.inc.php:142
 msgid "Monday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:143
+#: ..\..\..\evocore\_vars.inc.php:143
 msgid "Tuesday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:144
+#: ..\..\..\evocore\_vars.inc.php:144
 msgid "Wednesday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:145
+#: ..\..\..\evocore\_vars.inc.php:145
 msgid "Thursday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:146
+#: ..\..\..\evocore\_vars.inc.php:146
 msgid "Friday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:147
+#: ..\..\..\evocore\_vars.inc.php:147
 msgid "Saturday"
 msgstr ""
 
 #. TRANS: abbrev. for Sunday
-#: ..\..\..\b2evocore\_vars.php:151
+#: ..\..\..\evocore\_vars.inc.php:151
 msgid "Sun"
 msgstr ""
 
 #. TRANS: abbrev. for Monday
-#: ..\..\..\b2evocore\_vars.php:153
+#: ..\..\..\evocore\_vars.inc.php:153
 msgid "Mon"
 msgstr ""
 
 #. TRANS: abbrev. for Tuesday
-#: ..\..\..\b2evocore\_vars.php:155
+#: ..\..\..\evocore\_vars.inc.php:155
 msgid "Tue"
 msgstr ""
 
 #. TRANS: abbrev. for Wednesday
-#: ..\..\..\b2evocore\_vars.php:157
+#: ..\..\..\evocore\_vars.inc.php:157
 msgid "Wed"
 msgstr ""
 
 #. TRANS: abbrev. for Thursday
-#: ..\..\..\b2evocore\_vars.php:159
+#: ..\..\..\evocore\_vars.inc.php:159
 msgid "Thu"
 msgstr ""
 
 #. TRANS: abbrev. for Friday
-#: ..\..\..\b2evocore\_vars.php:161
+#: ..\..\..\evocore\_vars.inc.php:161
 msgid "Fri"
 msgstr ""
 
 #. TRANS: abbrev. for Saturday
-#: ..\..\..\b2evocore\_vars.php:163
+#: ..\..\..\evocore\_vars.inc.php:163
 msgid "Sat"
 msgstr ""
 
 #. TRANS: abbrev. for Sunday
-#: ..\..\..\b2evocore\_vars.php:167
+#: ..\..\..\evocore\_vars.inc.php:167
 msgid " S "
 msgstr ""
 
 #. TRANS: abbrev. for Monday
-#: ..\..\..\b2evocore\_vars.php:169
+#: ..\..\..\evocore\_vars.inc.php:169
 msgid " M "
 msgstr ""
 
 #. TRANS: abbrev. for Tuesday
-#: ..\..\..\b2evocore\_vars.php:171
+#: ..\..\..\evocore\_vars.inc.php:171
 msgid " T "
 msgstr ""
 
 #. TRANS: abbrev. for Wednesday
-#: ..\..\..\b2evocore\_vars.php:173
+#: ..\..\..\evocore\_vars.inc.php:173
 msgid " W "
 msgstr ""
 
 #. TRANS: abbrev. for Thursday
-#: ..\..\..\b2evocore\_vars.php:175
+#: ..\..\..\evocore\_vars.inc.php:175
 msgid " T  "
 msgstr ""
 
 #. TRANS: abbrev. for Friday
-#: ..\..\..\b2evocore\_vars.php:177
+#: ..\..\..\evocore\_vars.inc.php:177
 msgid " F "
 msgstr ""
 
 #. TRANS: abbrev. for Saturday
-#: ..\..\..\b2evocore\_vars.php:179
+#: ..\..\..\evocore\_vars.inc.php:179
 msgid " S  "
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:182
+#: ..\..\..\evocore\_vars.inc.php:182
 msgid "January"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:183
+#: ..\..\..\evocore\_vars.inc.php:183
 msgid "February"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:184
+#: ..\..\..\evocore\_vars.inc.php:184
 msgid "March"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:185
+#: ..\..\..\evocore\_vars.inc.php:185
 msgid "April"
 msgstr ""
 
 #. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-#: ..\..\..\b2evocore\_vars.php:187
+#: ..\..\..\evocore\_vars.inc.php:187
 msgid "May "
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:188
+#: ..\..\..\evocore\_vars.inc.php:188
 msgid "June"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:189
+#: ..\..\..\evocore\_vars.inc.php:189
 msgid "July"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:190
+#: ..\..\..\evocore\_vars.inc.php:190
 msgid "August"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:191
+#: ..\..\..\evocore\_vars.inc.php:191
 msgid "September"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:192
+#: ..\..\..\evocore\_vars.inc.php:192
 msgid "October"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:193
+#: ..\..\..\evocore\_vars.inc.php:193
 msgid "November"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:194
+#: ..\..\..\evocore\_vars.inc.php:194
 msgid "December"
 msgstr ""
 
 #. TRANS: abbrev. for January
-#: ..\..\..\b2evocore\_vars.php:198
+#: ..\..\..\evocore\_vars.inc.php:198
 msgid "Jan"
 msgstr ""
 
 #. TRANS: abbrev. for February
-#: ..\..\..\b2evocore\_vars.php:200
+#: ..\..\..\evocore\_vars.inc.php:200
 msgid "Feb"
 msgstr ""
 
 #. TRANS: abbrev. for March
-#: ..\..\..\b2evocore\_vars.php:202
+#: ..\..\..\evocore\_vars.inc.php:202
 msgid "Mar"
 msgstr ""
 
 #. TRANS: abbrev. for April
-#: ..\..\..\b2evocore\_vars.php:204
+#: ..\..\..\evocore\_vars.inc.php:204
 msgid "Apr"
 msgstr ""
 
 #. TRANS: abbrev. for May
-#: ..\..\..\b2evocore\_vars.php:206
+#: ..\..\..\evocore\_vars.inc.php:206
 msgid "May"
 msgstr ""
 
 #. TRANS: abbrev. for June
-#: ..\..\..\b2evocore\_vars.php:208
+#: ..\..\..\evocore\_vars.inc.php:208
 msgid "Jun"
 msgstr ""
 
 #. TRANS: abbrev. for July
-#: ..\..\..\b2evocore\_vars.php:210
+#: ..\..\..\evocore\_vars.inc.php:210
 msgid "Jul"
 msgstr ""
 
 #. TRANS: abbrev. for August
-#: ..\..\..\b2evocore\_vars.php:212
+#: ..\..\..\evocore\_vars.inc.php:212
 msgid "Aug"
 msgstr ""
 
 #. TRANS: abbrev. for September
-#: ..\..\..\b2evocore\_vars.php:214
+#: ..\..\..\evocore\_vars.inc.php:214
 msgid "Sep"
 msgstr ""
 
 #. TRANS: abbrev. for October
-#: ..\..\..\b2evocore\_vars.php:216
+#: ..\..\..\evocore\_vars.inc.php:216
 msgid "Oct"
 msgstr ""
 
 #. TRANS: abbrev. for November
-#: ..\..\..\b2evocore\_vars.php:218
+#: ..\..\..\evocore\_vars.inc.php:218
 msgid "Nov"
 msgstr ""
 
 #. TRANS: abbrev. for December
-#: ..\..\..\b2evocore\_vars.php:220
+#: ..\..\..\evocore\_vars.inc.php:220
 msgid "Dec"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:233
+#: ..\..\..\evocore\_vars.inc.php:233
 msgid "Local"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:234
+#: ..\..\..\evocore\_vars.inc.php:234
 msgid "Reported"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:235
+#: ..\..\..\evocore\_vars.inc.php:235
 msgid "Central"
 msgstr ""
 
@@ -6323,7 +6323,7 @@ msgid ""
 "\n"
 "Otherwise, you can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder.\n"
 "\n"
-"To start customizing a skin, open its '<code>_main.php</code>' file in an editor and read the comments in there. And, of course, read the manual on evoSkins!"
+"To start customizing a skin, open its '<code>_main.inc.php</code>' file in an editor and read the comments in there. And, of course, read the manual on evoSkins!"
 msgstr ""
 
 #: ..\..\..\install\_functions_create.php:601
@@ -6875,55 +6875,55 @@ msgstr ""
 msgid "Select blog:"
 msgstr ""
 
-#: ..\..\..\skins\basic\_main.php:74
+#: ..\..\..\skins\basic\_main.inc.php:74
 msgid "Select skin:"
 msgstr ""
 
-#: ..\..\..\skins\basic\_main.php:126
-#: ..\..\..\skins\custom\_main.php:122
+#: ..\..\..\skins\basic\_main.inc.php:126
+#: ..\..\..\skins\custom\_main.inc.php:122
 msgid "words"
 msgstr ""
 
-#: ..\..\..\skins\basic\_main.php:131
+#: ..\..\..\skins\basic\_main.inc.php:131
 msgid "Read more..."
 msgstr ""
 
-#: ..\..\..\skins\bluesky\_main.php:205
-#: ..\..\..\skins\guadeloupe\_main.php:207
+#: ..\..\..\skins\bluesky\_main.inc.php:205
+#: ..\..\..\skins\guadeloupe\_main.inc.php:207
 msgid "Choose a skin"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:213
+#: ..\..\..\skins\custom\_main.inc.php:213
 msgid "Previous"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:213
+#: ..\..\..\skins\custom\_main.inc.php:213
 msgid "Next"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:262
-#: ..\..\..\skins\wpc_aubmach\_main.php:182
-#: ..\..\..\skins\wpc_default\_main.php:185
+#: ..\..\..\skins\custom\_main.inc.php:262
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:182
+#: ..\..\..\skins\wpc_default\_main.inc.php:185
 msgid "Choose skin"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:339
+#: ..\..\..\skins\custom\_main.inc.php:339
 msgid "What is RSS?"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:344
+#: ..\..\..\skins\custom\_main.inc.php:344
 msgid "Who's Online?"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:347
+#: ..\..\..\skins\custom\_main.inc.php:347
 msgid "Guest Users:"
 msgstr ""
 
-#: ..\..\..\skins\originalb2\_main.php:102
+#: ..\..\..\skins\originalb2\_main.inc.php:102
 msgid "Browse all posts by this author"
 msgstr ""
 
-#: ..\..\..\skins\originalb2\_main.php:211
+#: ..\..\..\skins\originalb2\_main.inc.php:211
 msgid "archives"
 msgstr ""
 
@@ -6948,9 +6948,9 @@ msgid "Pingback from"
 msgstr ""
 
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:132
-#: ..\..\..\skins\wpc_aubmach\_main.php:102
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:102
 #: ..\..\..\skins\wpc_default\_feedback.php:132
-#: ..\..\..\skins\wpc_default\_main.php:102
+#: ..\..\..\skins\wpc_default\_main.inc.php:102
 msgid "Edit This"
 msgstr ""
 
@@ -6969,70 +6969,70 @@ msgstr ""
 msgid "Say It!"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:101
-#: ..\..\..\skins\wpc_default\_main.php:101
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:101
+#: ..\..\..\skins\wpc_default\_main.inc.php:101
 msgid "Filed under:"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:192
-#: ..\..\..\skins\wpc_default\_main.php:195
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:192
+#: ..\..\..\skins\wpc_default\_main.inc.php:195
 msgid "Other"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:204
-#: ..\..\..\skins\wpc_default\_main.php:207
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:204
+#: ..\..\..\skins\wpc_default\_main.inc.php:207
 msgid "Meta"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:206
-#: ..\..\..\skins\wpc_default\_main.php:209
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:206
+#: ..\..\..\skins\wpc_default\_main.inc.php:209
 msgid "Syndicate this site using RSS"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:206
-#: ..\..\..\skins\wpc_default\_main.php:209
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:206
+#: ..\..\..\skins\wpc_default\_main.inc.php:209
 msgid "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:207
-#: ..\..\..\skins\wpc_default\_main.php:210
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:207
+#: ..\..\..\skins\wpc_default\_main.inc.php:210
 msgid "The latest comments to all posts in RSS"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:207
-#: ..\..\..\skins\wpc_default\_main.php:210
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:207
+#: ..\..\..\skins\wpc_default\_main.inc.php:210
 msgid "Comments <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:208
-#: ..\..\..\skins\wpc_default\_main.php:211
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:208
+#: ..\..\..\skins\wpc_default\_main.inc.php:211
 msgid "This page validates as XHTML 1.0 Transitional"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:208
-#: ..\..\..\skins\wpc_default\_main.php:211
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:208
+#: ..\..\..\skins\wpc_default\_main.inc.php:211
 msgid "Valid <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:209
-#: ..\..\..\skins\wpc_aubmach\_main.php:219
-#: ..\..\..\skins\wpc_default\_main.php:212
-#: ..\..\..\skins\wpc_default\_main.php:222
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:209
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:219
+#: ..\..\..\skins\wpc_default\_main.inc.php:212
+#: ..\..\..\skins\wpc_default\_main.inc.php:222
 msgid "Powered by b2evolution; multilingual multiuser multi-blog engine."
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:220
-#: ..\..\..\skins\wpc_default\_main.php:223
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:220
+#: ..\..\..\skins\wpc_default\_main.inc.php:223
 msgid "This skin features a CSS file originally designed for WordPress (See design credits in style.css)."
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:221
-#: ..\..\..\skins\wpc_default\_main.php:224
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:221
+#: ..\..\..\skins\wpc_default\_main.inc.php:224
 msgid "Original design credits for this skin:"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:222
-#: ..\..\..\skins\wpc_default\_main.php:225
+#: ..\..\..\skins\wpc_aubmach\_main.inc.php:222
+#: ..\..\..\skins\wpc_default\_main.inc.php:225
 msgid "In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin."
 msgstr ""
 

@@ -17,7 +17,7 @@
 /**
  * First thing: Do the minimal initializations required for b2evo:
  */
-require_once dirname(__FILE__).'/b2evocore/_main.php';
+require_once dirname(__FILE__).'/evocore/_main.inc.php';
 
 // Check if a specific blog has been requested in the URL:
 param( 'blog', 'integer', '', true );
@@ -103,6 +103,6 @@ $timestamp_max = 'now';
 # $order = 'ASC'; // This for example would display the blog in chronological order...
 
 // That's it, now let b2evolution do the rest! :)
-require( dirname(__FILE__).'/'.$core_subdir.'_blog_main.php' );
+require( dirname(__FILE__).'/'.$core_subdir.'_blog_main.inc.php' );
 
 ?>

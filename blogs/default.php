@@ -15,10 +15,10 @@
  */
 
 /**
- * Check this: we are requiring _main.php INSTEAD of _blog_main.php because we are not
+ * Check this: we are requiring _main.inc.php INSTEAD of _blog_main.inc.php because we are not
  * trying to initialize any particular blog
  */
-require_once dirname(__FILE__).'/b2evocore/_main.php';
+require_once dirname(__FILE__).'/evocore/_main.inc.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">

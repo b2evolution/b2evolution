@@ -11,8 +11,8 @@
  */
 
 require( '../blogs/conf/_config.php' );
-require( '../blogs/b2evocore/_functions.php' );
-require( '../blogs/b2evocore/_functions_forms.php' );
+require( '../blogs/evocore/_misc.funcs.php' );
+require( '../blogs/evocore/_form.funcs.php' );
 
 
 $pofilepath = dirname(__FILE__).'/langfiles';

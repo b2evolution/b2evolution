@@ -45,7 +45,7 @@
  */
 
 require_once dirname(__FILE__).'/_header.php';
-require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_filemanager.php';
+require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
 
 $admin_tab = 'files';
 $admin_pagetitle = T_('Filemanager').' (beta)';
@@ -296,7 +296,7 @@ if( $selaction != '' )
 				}
 				else
 				{ // Downloading
-					require( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_zip.php' );
+					require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
 
 					$options = array (
 						'basedir' => $Fileman->cwd,

@@ -16,8 +16,8 @@ $output_debugging_info = 0;		# =1 if you want to output debugging info
  * Initialize:
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_class_pop3.php' );
+require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php' );
+require_once( dirname(__FILE__).'/'.$htsrv_dirout.$lib_subdir.'_pop3.class.php' );
 
 if( $use_phoneemail )
 { // if you're using phone email, the email will already be in your timezone

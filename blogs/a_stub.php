@@ -55,5 +55,5 @@ $timestamp_max = 'now';
 /**
  * That's it, now let b2evolution do the rest! :)
  */
-require(dirname(__FILE__)."/b2evocore/_blog_main.php");
+require(dirname(__FILE__)."/evocore/_blog_main.inc.php");
 ?>

@@ -28,7 +28,7 @@ $evo_dbhost	Host on which the database is running
 $evo_database	Name of the database
 
 $evo_locale	The default locale for the stories
-$evo_root	The location of the b2evocore directory
+$evo_root	The location of the evocore directory
 $evo_blog_id	The id of the blog (only needed for auto category creation)
 
 
@@ -68,6 +68,5 @@ IMAGES
 The script translates the path for any images used in geeklog posts.  And images 
 need to be copied to the new location.  Copy all files from your geeklog directory 
 public_html/images/articles to the b2evo directory blogs/media.
-
 
 

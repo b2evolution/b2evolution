@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the template that displays the user profile form
 	 *
@@ -102,4 +102,3 @@
 	</table>
 	
 	</form>
-

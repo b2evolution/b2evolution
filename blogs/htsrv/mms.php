@@ -18,7 +18,7 @@
 /**
  * Initalize:
  */
-require_once( dirname(__FILE__).'/../b2evocore/_main.php' );
+require_once( dirname(__FILE__).'/../evocore/_main.inc.php' );
 
 param( 'login', 'string', '', true );
 param( 'pass', 'string', '', true );

@@ -17,7 +17,7 @@
 	/**
 	 * Initialize everything:
 	 */
-	require dirname(__FILE__).'/../b2evocore/_blog_main.php' ;
+	require dirname(__FILE__).'/../evocore/_blog_main.inc.php' ;
 	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?".">";
 ?>

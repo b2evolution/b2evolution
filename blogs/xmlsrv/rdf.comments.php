@@ -16,7 +16,7 @@
 	/**
 	 * Initialize everything:
 	 */
-	require dirname(__FILE__).'/../b2evocore/_blog_main.php' ;
+	require dirname(__FILE__).'/../evocore/_blog_main.inc.php' ;
 	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
 	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?".">";

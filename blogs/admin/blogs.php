@@ -447,7 +447,7 @@ switch($action)
 				# Here you can set a limit after which posts will be ignored
 				$timestamp_max = 'now';
 				// That's it, now let b2evolution do the rest! :)
-				require $basepath.$core_subdir.'_blog_main.php';
+				require $basepath.$core_subdir.'_blog_main.inc.php';
 				break;
 
 			case 'stub':

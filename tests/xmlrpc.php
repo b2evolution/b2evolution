@@ -11,8 +11,8 @@
  * @package tests
  */
 require_once(dirname(__FILE__).'/../blogs/conf/_config.php');
-require_once(dirname(__FILE__).'/../blogs/'.$core_subdir.'_functions.php');
-require_once(dirname(__FILE__).'/../blogs/'.$core_subdir.'_functions_xmlrpc.php');
+require_once(dirname(__FILE__).'/../blogs/'.$core_subdir.'_misc.funcs.php');
+require_once(dirname(__FILE__).'/../blogs/'.$lib_subdir.'_xmlrpc.php');
 
 echo '<h1>XML-RPC tests</h1>';
 
