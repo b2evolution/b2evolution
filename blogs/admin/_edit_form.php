@@ -17,7 +17,6 @@
 	<!-- In case we send this to the blog for a preview : -->
 	<input type="hidden" name="preview" value="1" />
 	<input type="hidden" name="preview_userid" value="<?php echo $user_ID ?>" />
-	<input type="hidden" name="preview_date" value="<?php echo $post_date; ?>" />
 	
 	<?php 
 	
@@ -73,7 +72,7 @@
 
 	<?php // --------------------------- AUTOBR -------------------------------------- ?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-	if ($autobr) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"> <?php echo T_('Auto-BR (converts line-breaks into &lt;br /&gt; tags)') ?></label><br />
+	if ($autobr) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
 	
 	<?php
 	if( $action != "editcomment")
@@ -82,14 +81,14 @@
 		{ // --------------------------- PINGBACK --------------------------------------
 	?>
 	<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" <?php
-	if ($post_pingback) echo ' checked="checked"' ?> tabindex="7" /><label for="pingback"> <?php echo T_('Pingback the URLs in this post') ?></label><br />
+	if ($post_pingback) echo ' checked="checked"' ?> tabindex="7" /><label for="pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label><br />
 	<?php
 		}
 
 		if( $use_trackback )
 		{	// --------------------------- TRACKBACK --------------------------------------
 	?>
-	<label for="trackback"><?php echo T_('<strong>Trackback</strong> URLs (separate multiple URLs with space)') ?>:</label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="8" value="<?php echo format_to_edit( $post_trackbacks ); ?>" />
+	<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="8" value="<?php echo format_to_edit( $post_trackbacks ); ?>" />
 	<?php 
 		}
 	}
@@ -158,7 +157,7 @@ echo $admin_2col_nextcol;
 
 if( $action != 'editcomment' ) 
 { // ------------------------------- POST STATUS ---------------------------------- ?>
-	<div class="bSideItem">
+	<div class="bSideItem2">
 
 	<fieldset title="Status">
 		<legend><?php echo T_('Status') ?></legend>
@@ -180,7 +179,7 @@ if( $action != 'editcomment' )
 
 	<div class="extracats">
 
-	<p class="notes"><?php echo T_('Select main category in target blog and optionnaly check addtionnal categories') ?>:</p>
+	<p class="extracatnote"><?php echo T_('Select main category in target blog and optionnaly check addtionnal categories') ?>:</p>
 
 <?php 
 	// ----------------------------  CATEGORIES ------------------------------

@@ -1,8 +1,18 @@
 <?php
-$mode = 'sidebar';
-if( !isset($action) ) $action = 'new';
-require_once (dirname(__FILE__).'/_header.php');
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ */
 
+$mode = 'bookmarklet';
+$mode = 'sidebar';
+require_once(dirname(__FILE__).'/b2edit.php');
+
+
+exit();
 // just your usual browser thing because we're still too far from standards
 $is_gecko = preg_match("/Gecko/",$HTTP_USER_AGENT);
 $is_winIE = ((preg_match("/MSIE/",$HTTP_USER_AGENT)) && (preg_match("/Win/",$HTTP_USER_AGENT)));

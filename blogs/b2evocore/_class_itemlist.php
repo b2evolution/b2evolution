@@ -618,11 +618,11 @@ class ItemList
 		else
 		{	// We are in preview mode!
 			//	echo 'PREVIEW';
-			global $preview_userid, $preview_date, $post_status, $post_lang, $content, $post_title, $post_url, $post_category, $post_autobr;
+			// we need globals for the param function
+			global $preview_userid, $preview_date, $post_status, $post_lang, $content, $post_title, $post_url, $post_category, $post_autobr, $edit_date, $aa, $mm, $jj, $hh, $mn, $ss, $user_level, $localtimenow;
 	
 			$id = 0;
 			param( 'preview_userid', 'integer', true );
-			param( 'preview_date', 'string', true );
 			param( 'post_status', 'string', true );
 			param( 'post_lang', 'string', true );
 			param( 'content', 'html', true );
@@ -633,6 +633,27 @@ class ItemList
 	
 			$post_title = format_to_post( $post_title, 0 ); 
 			$content = format_to_post( $content, $post_autobr ); 
+
+			param( 'edit_date', 'integer', 0 );
+			if (($user_level > 4) && $edit_date) 
+			{	// We use user date
+				param( 'aa', 'integer', 2000 );
+				param( 'mm', 'integer', 1 );
+				param( 'jj', 'integer', 1 );
+				param( 'hh', 'integer', 20 );
+				param( 'mn', 'integer', 30 );
+				param( 'ss', 'integer', 0 );
+				$jj = ($jj > 31) ? 31 : $jj;
+				$hh = ($hh > 23) ? $hh - 24 : $hh;
+				$mn = ($mn > 59) ? $mn - 60 : $mn;
+				$ss = ($ss > 59) ? $ss - 60 : $ss;
+				$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
+			}
+			else
+			{	// We use current time
+				$post_date = date('Y-m-d H:i:s', $localtimenow);
+			}
+
 	
 			if( $errcontent = errors_display( 'Invalid post, please correct these errors:', '', false ) )
 			{
@@ -649,7 +670,7 @@ class ItemList
 			$postdata = array (
 				'ID' => 0, 
 				'Author_ID' => $preview_userid,
-				'Date' => $preview_date,
+				'Date' => $post_date,
 				'Status' => $post_status,
 				'Lang' =>  $post_lang,
 				'Content' => $content,

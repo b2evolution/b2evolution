@@ -4,6 +4,26 @@ require_once( dirname(__FILE__).'/_header.php' );
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
 
+	param( 'edit_date', 'integer', 0 );
+	if (($user_level > 4) && $edit_date) 
+	{	// We use user date
+		param( 'aa', 'integer', 2000 );
+		param( 'mm', 'integer', 1 );
+		param( 'jj', 'integer', 1 );
+		param( 'hh', 'integer', 20 );
+		param( 'mn', 'integer', 30 );
+		param( 'ss', 'integer', 0 );
+		$jj = ($jj > 31) ? 31 : $jj;
+		$hh = ($hh > 23) ? $hh - 24 : $hh;
+		$mn = ($mn > 59) ? $mn - 60 : $mn;
+		$ss = ($ss > 59) ? $ss - 60 : $ss;
+		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
+	}
+	else
+	{	// We use current time
+		$post_date = date('Y-m-d H:i:s', $localtimenow);
+	}
+
 // All statuses are allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
@@ -36,26 +56,6 @@ case 'post':
 
 	if ($user_level == 0)	die (T_('Cheatin\' uh ?'));
 
-	param( 'edit_date', 'integer' );
-	if (($user_level > 4) && $edit_date) 
-	{	// We use user date
-		param( 'aa', 'string' );
-		param( 'mm', 'string' );
-		param( 'jj', 'string' );
-		param( 'hh', 'string' );
-		param( 'mn', 'string' );
-		param( 'ss', 'string' );
-		$jj = ($jj > 31) ? 31 : $jj;
-		$hh = ($hh > 23) ? $hh - 24 : $hh;
-		$mn = ($mn > 59) ? $mn - 60 : $mn;
-		$ss = ($ss > 59) ? $ss - 60 : $ss;
-		$now = "$aa-$mm-$jj $hh:$mn:$ss";
-	}
-	else
-	{	// We use current time
-		$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
-	}
-
 	// CHECK and FORMAT content
 	$post_title = format_to_post($post_title,0,0);
 	if( !validate_url( $post_url, $allowed_uri_scheme ) )
@@ -75,7 +75,7 @@ case 'post':
 	$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 	// INSERT NEW POST INTO DB:
-	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category,	$post_extracats, $post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
+	$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	$post_extracats, $post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
 	{
@@ -154,25 +154,6 @@ case "editpost":
 	$post_extracats = & $extracats;
 	param( 'post_lang', 'string', $default_language );
 
-	param( 'edit_date', 'integer' );
-	if (($user_level > 4) && $edit_date) 
-	{
-		param( 'aa', 'string' );
-		param( 'mm', 'string' );
-		param( 'jj', 'string' );
-		param( 'hh', 'string' );
-		param( 'mn', 'string' );
-		param( 'ss', 'string' );
-		$jj = ($jj > 31) ? 31 : $jj;
-		$hh = ($hh > 23) ? $hh - 24 : $hh;
-		$mn = ($mn > 59) ? $mn - 60 : $mn;
-		$ss = ($ss > 59) ? $ss - 60 : $ss;
-		$datemodif = "$aa-$mm-$jj $hh:$mn:$ss";
-	}
-	else 
-	{
-		$datemodif = "";
-	}
 
 	// CHECK and FORMAT content	
 	$post_title = format_to_post($post_title,0,0);
@@ -206,7 +187,7 @@ case "editpost":
 	}
 
 	// UPDATE POST IN DB:
-	bpost_update( $post_ID, $post_title, $content, $datemodif, $post_category, $post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
+	bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
 	{
@@ -339,20 +320,9 @@ case "editedcomment":
 	param( 'content', 'html' );
 	param( "post_autobr", 'integer', ($comments_use_autobr == 'always')?1:0 );
 
-	param( 'edit_date', 'integer' );
 	if (($user_level > 4) && $edit_date) 
 	{
-		param( 'aa', 'string' );
-		param( 'mm', 'string' );
-		param( 'jj', 'string' );
-		param( 'hh', 'string' );
-		param( 'mn', 'string' );
-		param( 'ss', 'string' );
-		$jj = ($jj > 31) ? 31 : $jj;
-		$hh = ($hh > 23) ? $hh - 24 : $hh;
-		$mn = ($mn > 59) ? $mn - 60 : $mn;
-		$ss = ($ss > 59) ? $ss - 60 : $ss;
-		$datemodif = ", comment_date=\"$aa-$mm-$jj $hh:$mn:$ss\"";
+		$datemodif = ", comment_date=\"$postdate\"";
 	} else {
 		$datemodif = "";
 	}

@@ -5,6 +5,10 @@
 	<title>b2evo &gt; <?php echo $title; ?></title>
 	<link href="b2.css" rel="stylesheet" type="text/css" />
 	<link href="blog.css" rel="stylesheet" type="text/css" />
+	<?php if( $mode == 'sidebar' )
+	{ ?>
+	<link href="sidebar.css" rel="stylesheet" type="text/css" />
+	<?php } ?>
 	<script type="text/javascript" language="javascript">
 		<!--
 		function profile(userID) 

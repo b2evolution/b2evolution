@@ -27,7 +27,6 @@
 	// --- //
 	
 	$dateformat = locale_datefmt();
-	$time_difference=get_settings('time_difference');
 	
 	if (!$archive_date_format_over_ride) 
 	{

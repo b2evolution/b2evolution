@@ -17,11 +17,6 @@ if( ! isset($mode) ) $mode = '';
 $login_required = true;
 require_once(dirname(__FILE__)."/$b2inc/_main.php");
 
-// Getting (more) settings from db
-$posts_per_page = get_settings('posts_per_page');
-$time_difference = get_settings('time_difference');
-$autobr = get_settings('AutoBR');
-
 param( 'blog', 'integer', $default_to_blog, true );
 if( $blog != '' ) 
 	get_blogparams();

@@ -86,7 +86,9 @@ div.main {
 	margin-top: 0px;
 	margin-bottom: 8px;
 }
-.bSideItem ul {
+.bSideItem ul,
+.bSideItem2 ul 
+{
 	margin-left: 8px;
 	padding-left: 8px;
 	margin-top: .5ex;
@@ -172,13 +174,14 @@ select.bComment
 	width: 99%;
 	margin: 0ex;
 }
-fieldset .notes
+.notes
 {
 	/* display: block; */
 	font-size: 80%;
+	margin: 1em 0ex;
 	color: #999999;
+	/* border: 1px solid #f00; */
 }
-
 
 .field
 {
@@ -279,10 +282,11 @@ span.bCalendarToday
 	color: #FFFFFF;
 }
 
-.bSideItem fieldset
+.bSideItem fieldset,
+.bSideItem2 fieldset
 {
 	border: 1px solid #ddd;
-	margin: 1ex 0ex;
+	margin: 0ex 0ex 1ex;
 	padding: 1ex;
 }
 
@@ -298,10 +302,19 @@ fieldset.extracats
 }
 div.extracats
 {
+	/* border: 1px solid #f00; */
 	height: 50ex;
 	overflow: auto;
 	padding: 0ex 1ex;
 	margin: 0ex;
+}
+.extracatnote
+{
+	/* display: block; */
+	font-size: 80%;
+	margin: 0em 0ex 1em;
+	color: #999999;
+	/* border: 1px solid #f00; */
 }
 
 /* Calendar: */

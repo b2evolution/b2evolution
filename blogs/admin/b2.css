@@ -95,6 +95,12 @@ div.paneltopblock
 	margin: 3ex;
 	margin-left: 0ex;
 }
+.bSideItem2
+{
+	border: 1px solid #CCCCCC;
+	padding: 0ex 2ex 2ex;
+	margin: 3ex 3ex 3ex 0ex;
+}
 
 div.panelinfo{
 	width: 90%;

@@ -1,0 +1,33 @@
+/* Overrides for the sidebar */
+
+.bPosts,
+.bSideBar
+ {
+	vertical-align: top;
+	float: none;
+	width: 100%;
+	clear: none;
+	overflow: visible;
+	/* border:  1px solid #f00; */
+	margin: 0ex;
+	padding: 0ex;
+}
+.bPost,
+.bSideItem2
+{
+	border: none;
+	padding: 0ex;
+	margin: 1ex;
+}
+div.extracats
+{
+	height: auto;
+	overflow: visible;
+	padding: 0ex 1ex;
+	margin: 0ex;
+}
+.notes
+{
+	display: none;
+}
+

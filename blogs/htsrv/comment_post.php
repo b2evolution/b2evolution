@@ -74,7 +74,7 @@ if (!empty($result))
 	}
 	$time_lastcomment=mysql2date("U","$then");
 	$time_newcomment=mysql2date("U","$now");
-	if (($time_newcomment - $time_lastcomment) < 0)
+	if (($time_newcomment - $time_lastcomment) < 30)
 		$ok=0;
 }
 if( ! $ok ) 

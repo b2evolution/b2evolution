@@ -40,6 +40,10 @@ dbconnect();
 // Getting settings from db
 $archive_mode = get_settings('archive_mode');
 $time_difference = get_settings('time_difference');
+$posts_per_page = get_settings('posts_per_page');
+$what_to_show = get_settings('what_to_show');
+$autobr = get_settings('AutoBR');
+
 $localtimenow = time() + ($time_difference * 3600);
 
 // Login procedure:

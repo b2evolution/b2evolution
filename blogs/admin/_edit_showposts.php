@@ -41,10 +41,6 @@
 	// Getting current blog info:
 	get_blogparams();
 
-	// Getting settings from db
-	$archive_mode = get_settings('archive_mode');
-	$time_difference = get_settings('time_difference');
-
 	// Get the posts to display:
 	$MainList = new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
 	
@@ -343,7 +339,6 @@
 				$archive_week_separator = ' - ';
 					
 				$dateformat = locale_datefmt();
-				$time_difference=get_settings('time_difference');
 				$archive_day_date_format = $dateformat;
 				$archive_week_start_date_format = $dateformat;
 				$archive_week_end_date_format   = $dateformat;
