@@ -7,6 +7,7 @@
 # Enable localization?
 # set to 0 to disable localization
 # set to 1 to enable gettext localization if supported (not recommended)
+#		note: you will have to compile the .po files with msgfmt before this will work.
 # set to 2 to enable b2evo advanced localization (recommended)
 $use_l10n = 2;
 
@@ -14,32 +15,21 @@ $use_l10n = 2;
 $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 
 
-# Default locale used for backoffice (when we cannot autodetect), notification messages and fallback.
+# Default locale used for backoffice (when we cannot autodetect) and fallback.
 # This will be overwritten from database settings, if configured there.
 # These use an ISO 639 language code, a '-' and an ISO 3166 country code.
 # This MUST BE in the list below.
 $default_locale = 'en-EU';
 
 
-if( !function_exists('NT_') )
-{ // we want to be able to reload this file.
-	/*
-	 * NT_(-)
-	 *
-	 * No Translation
-	 * Nevertheless, the string will be extracted by the gettext tools
-	 */
-	function NT_( $string )
-	{
-		return $string;
-	}
-}
+// Load locale related functions: (we need NT_(-) here)
+require_once( dirname(__FILE__). "/$conf_dirout/$core_subdir/_functions_locale.php" );
 
 
 //{{{ defining the locales:
 # These are the default settings.
 # This array will be overwritten from DB if locales are set there,
-# that is when they get updated from the Backoffice
+# that is when they get updated from the Backoffice.
 # They are also used as fallback, if we have no access to the DB yet.
 # Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
 # IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
@@ -158,10 +148,6 @@ $locales = array(
 									),
 );
 //}}}
-
-
-// Load locale related functions: (ne need NT_() here)
-require_once( dirname(__FILE__). "/$conf_dirout/$core_subdir/_functions_locale.php" );
 
 
 /*{{{ How to format the dates and times:

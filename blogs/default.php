@@ -83,7 +83,7 @@ if( $Blog_all->get( 'stub' ) != '' )
 
 <h2><?php echo T_('Administration') ?>:</h2>
 <ul>
-	<li><strong><a href="<?php echo $admin_url ?>/">Go to admin!</a></strong></li>
+	<li><strong><a href="<?php echo $admin_url ?>/b2options.php"><?php echo T_('Go to backoffice!') ?></a></strong></li>
 </ul>
 
 
