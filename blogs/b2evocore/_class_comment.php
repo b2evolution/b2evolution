@@ -103,7 +103,7 @@ class Comment extends DataObject
 			$this->content = $db_row['comment_content'];
 			$this->karma = $db_row['comment_karma'];
 		}
-	}	
+	}
 	
 	/* 
 	 * Comment::set(-)
@@ -150,7 +150,7 @@ class Comment extends DataObject
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean true for link, false if you want NO html link
 	 */
-	function author( $before = '', $after = '#', $before_user = '', $after_user = '#', 
+	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
 										$format = 'htmlbody', $makelink = false ) 
 	{
 		if( $this->author_User !== NULL )
@@ -202,7 +202,7 @@ class Comment extends DataObject
 	 * @param string String to display after email, if email exists
 	 * @param boolean false if you want NO html link
 	 */
-	function author_email( $linktext='', $before='', $after='', $makelink = true ) 
+	function author_email( $linktext='', $before='', $after='', $makelink = true )
 	{
 		if( $this->author_User !== NULL )
 		{ // Author is a user
@@ -255,7 +255,7 @@ class Comment extends DataObject
 			echo $after;
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -451,7 +451,7 @@ class Comment extends DataObject
 	 */
 	function date( $format='', $useGM = false )
 	{
-		if( empty($format) ) 
+		if( empty($format) )
 			echo mysql2date( locale_datefmt(), $this->date, $useGM);
 		else
 			echo mysql2date( $format, $this->date, $useGM);
@@ -476,6 +476,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2004/10/11 19:13:14  fplanque
+ * Edited code documentation.
+ *
  * Revision 1.32  2004/10/11 19:02:04  fplanque
  * Edited code documentation.
  *
