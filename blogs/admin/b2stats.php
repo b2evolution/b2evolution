@@ -33,10 +33,17 @@
  * not wish to do so, delete this exception statement from your version.
  * }}
  *
+ * {@internal
+ * Vegar BERG GULDAL grants FranÃois PLANQUE the right to license
+ * Vegar BERG GULDAL's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author vegarg: Vegar BERG GULDAL
  *
  * @version $Id$
  */

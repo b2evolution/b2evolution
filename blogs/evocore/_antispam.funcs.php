@@ -7,6 +7,7 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -29,6 +30,9 @@
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * Vegar BERG GULDAL grants FranÃ§ois PLANQUE the right to licens
+ * Vegar BERG GULDAL's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/). 
  * }}
  *
  * @package evocore
@@ -280,6 +284,9 @@ function b2evonet_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/16 15:28:51  vegarg
+ * Added copyright notes to all files I can remember I have edited.
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *
