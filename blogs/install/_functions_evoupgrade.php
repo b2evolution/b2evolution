@@ -28,7 +28,7 @@ function upgrade_b2evo_tables()
 
 	// Check DB version:
 	check_db_version();
-	if( $old_db_version != $new_db_version )
+	if( $old_db_version == $new_db_version )
 	{
 		echo '<p>The database schema is already up to date. There is nothing to do.</p>';
 		echo '<p>You can <a href="../admin/b2edit.php">log in</a> with your usual b2 username and password.</p>';
