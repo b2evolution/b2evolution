@@ -237,25 +237,128 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
 }
 
 
-// TODO: check valid user, then activate only once the locale!
-
 /**
  * Activate default locale:
  */
 locale_activate( $default_locale );
 
 /**
- * Login procedure:
+ * Login procedure: {{{
  */
 if( !isset($login_required) )
 {
 	$login_required = false;
 }
 
-if( $error = veriflog( $login_required ) )
-{ // Login failed:
-	require( dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php' );
+
+// TODO: prevent brute force attacks! (timeout - based on coming Session or Hit object?)
+
+$login = $pass_md5 = '';
+
+if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
+{ // Trying to log in with a POST
+	$login = $_POST['login'];
+	$pass_md5 = $_POST['pwd'];
+	unset($_POST['pwd']); // password is hashed from now on
 }
+elseif( isset($_GET['login'] ) && isset($_GET['pwd'] ))
+{ // Trying to log in with a GET
+	$login = $_GET['login'];
+	$pass_md5 = $_GET['pwd'];
+	unset($_GET['pwd']); // password is hashed from now on
+}
+
+if( !empty($login) && !empty($pass_md5) )
+{ // User is trying to login right now
+	$login = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login)));
+	$pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($pass_md5) : $pass_md5)));
+
+	// echo 'Trying to log in right now...';
+
+	header_nocache();
+
+	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass_md5' => $pass_md5 ) );
+
+	// Check login and password
+	if( !user_pass_ok( $login, $pass_md5, true ) )
+	{ // Login failed
+		$login = '';
+
+		if( $login_required )
+		{
+			// echo 'login failed!!';
+			$Messages->add( T_('Wrong login/password.'), 'login_error' );
+		}
+	}
+	else
+	{ // Login succeeded, set cookies
+		//echo $login, $pass_is_md5, $user_pass,  $cookie_domain;
+		if( !setcookie( $cookie_user, $login, $cookie_expires, $cookie_path, $cookie_domain ) )
+		{
+			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
+		}
+		if( !setcookie( $cookie_pass, $pass_md5, $cookie_expires, $cookie_path, $cookie_domain) )
+		{
+			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
+		}
+	}
+}
+elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
+{ /*
+	 * ---------------------------------------------------------
+	 * User was not trying to log in, but he already was logged in: check validity
+	 * ---------------------------------------------------------
+	 */
+	// echo 'Was already logged in...';
+
+	$login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
+	$pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
+	// echo 'pass=', $pass_md5;
+
+	if( !user_pass_ok( $login, $pass_md5, true ) )
+	{ // login is NOT OK:
+		$login = '';
+
+		if( $login_required )
+		{
+			$Messages->add( T_('Login/password no longer valid.'), 'login_error' );
+		}
+	}
+}
+elseif( $login_required )
+{ /*
+	 * ---------------------------------------------------------
+	 * User was not logged in at all, but login is required
+	 * ---------------------------------------------------------
+	 */
+	// echo ' NOT logged in...';
+
+	$Messages->add( T_('You must log in!'), 'login_error' );
+}
+
+
+if( !empty($login) && !$Messages->count('login_error') )
+{
+	$current_User =& $UserCache->get_by_login($login);
+
+	if( !$current_User )
+	{
+		$Messages->add( 'Error while loading user data!', 'login_error' );
+	}
+}
+
+if( $Messages->count( 'login_error' ) )
+{
+	header_nocache();
+
+	require( dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php' );
+	exit();
+}
+
+
+#echo $current_User->disp('login');
+
+// Login procedure }}}
 
 
 // Update the active session for the current user:
@@ -314,6 +417,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.19  2005/02/22 02:42:21  blueyed
+ * Login refactored (send password-change-request mail instead of new password)
+ *
  * Revision 1.18  2005/02/21 00:34:34  blueyed
  * check for defined DB_USER!
  *

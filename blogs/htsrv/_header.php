@@ -15,7 +15,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
-	<base href="<?php echo $htsrv_url; ?>">
+	<base href="<?php echo $htsrv_url; ?>" />
 	<link href="<?php echo $admin_url ?>variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="<?php echo $admin_url ?>desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
 	<link href="<?php echo $admin_url ?>legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
@@ -41,12 +41,5 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <div class="clear"></div>
 
 <?php
-if( !empty($error) )
-{
-	echo '<div class="error"><p class="error">'.$error.'</p></div>';
-}
-if( !empty($notes) )
-{
-	echo '<p>'.$notes.'</p>';
-}
+$Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' => 'log_error' ) ) );
 ?>

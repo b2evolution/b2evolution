@@ -51,129 +51,6 @@ require_once dirname(__FILE__). '/_group.funcs.php';
 require_once dirname(__FILE__). '/_user.class.php';
 
 
-/**
- * veriflog(-)
- *
- * Verify if user is logged in
- * checking login & pass in the database
- */
-function veriflog( $login_required = false )
-{
-	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error;
-	global $UserCache, $current_User;
-
-	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
-	// Warning: unset() prevent from setting a new global value later in the func !!! :((
-	$user_login = '';
-	$user_pass_md5 = '';
-
-	// Check if user is trying to login right now:
-	if( isset($_POST['log'] ) && isset($_POST['pwd'] ))
-	{ // Trying to log in with a POST
-		$log = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['log']) : $_POST['log'])));
-		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['pwd']) : $_POST['pwd'])));
-		unset($_POST['pwd']); // password is hashed from now on
-	}
-	elseif( isset($_GET['log'] ) && isset($_GET['pwd'] ))
-	{ // Trying to log in with a GET
-		$log = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['log']) : $_GET['log'])));
-		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['pwd']) : $_GET['pwd'])));
-		unset($_GET['pwd']); // password is hashed from now on
-	}
-
-	if( isset($log) )
-	{ /*
-		 * ---------------------------------------------------------
-		 * User is trying to login right now
-		 * ---------------------------------------------------------
-		 */
-		// echo 'Trying to log in right now...';
-
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-		header("Cache-Control: no-cache, must-revalidate");
-		header("Pragma: no-cache");
-
-		// Check login and password
-		$user_login = $log;
-		if( !( $login_ok = user_pass_ok( $user_login, $user_pass_md5, true ) ) )
-		{
-			// echo 'login failed!!';
-			return '<strong>'. T_('ERROR'). ':</strong> '. T_('wrong login/password.');
-		}
-
-		// Login succeeded:
-		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
-		if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
-			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
-		if( !setcookie( $cookie_pass, $user_pass_md5, $cookie_expires, $cookie_path, $cookie_domain) )
-			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
-	}
-	elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
-	{ /*
-		 * ---------------------------------------------------------
-		 * User was not trying to log in, but he already was logged in: check validity
-		 * ---------------------------------------------------------
-		 */
-		// echo 'Was already logged in...';
-
-		$user_login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
-		$user_pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
-		// echo 'pass=', $user_pass_md5;
-
-		if( ! user_pass_ok( $user_login, $user_pass_md5, true ) )
-		{ // login is NOT OK:
-			if( $login_required )
-			{
-				header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-				header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-				header("Cache-Control: no-cache, must-revalidate");
-				header("Pragma: no-cache");
-
-				return '<strong>'. T_('ERROR'). ':</strong> '. T_('login/password no longer valid.');
-			}
-
-			return 0;	// Wrong login but we don't care.
-		}
-	}
-	else
-	{ /*
-		 * ---------------------------------------------------------
-		 * User was not logged in at all
-		 * ---------------------------------------------------------
-		 */
-		// echo ' NOT logged in...';
-
-		if( $login_required )
-		{
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-			header("Cache-Control: no-cache, must-revalidate");
-			header("Pragma: no-cache");
-
-			return T_('You must log in!');
-			exit();
-		}
-
-		return 0;	// Not logged in but we don't care
-	}
-
-	/*
-	 * Login info is OK, we set the global variables:
-	 */
-	// echo 'LOGGED IN';
-
-
-	if( $current_User = $UserCache->get_by_login( $user_login ) )
-	{
-		return 0; // OK
-	}
-	else
-	{
-		return 'Error while loading user data!';
-	}
-	#echo $current_User->disp('login');
-}
 
 
 /**
@@ -519,6 +396,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/22 02:42:21  blueyed
+ * Login refactored (send password-change-request mail instead of new password)
+ *
  * Revision 1.16  2005/02/20 23:21:20  blueyed
  * user pwd verifying fixed
  *

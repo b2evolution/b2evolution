@@ -4,17 +4,20 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $app_shortname.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
+
+	<base href="<?php echo $admin_url ?>" />
 
 	<script type="text/javascript">
 		imgpath_expand = '<?php echo getIcon( 'expand', 'url' ); ?>';
@@ -373,7 +376,6 @@ $menu = array(
 										'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
 										'href'=>'b2users.php' ),
 
-	// TODO: check filemanager permission
 	'files' => array( 'text'=>T_('Files'),
 										'href'=>'files.php' ),
 
@@ -386,6 +388,12 @@ $menu = array(
 										'href'=>'tools.php' ),
 
 	);
+
+if( $current_User->level < 10 )
+{ // TODO: check User/Group perm level
+	unset($menu['files']);
+}
+
 
 // Include title, menu, etc.
 require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_top.php';

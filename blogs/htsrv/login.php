@@ -1,12 +1,43 @@
 <?php
 /**
- * This is the login screen
+ * This is the login screen. It also handles actions related to loggin in and registering.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
  *
  * @package htsrv
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
+ * @author fplanque: François PLANQUE
+ *
+ * @version $Id$
  */
 
 /**
@@ -22,120 +53,190 @@ param( 'text', 'html', '' );
 param( 'popupurl', 'string', '' );
 param( 'popuptitle', 'string', '' );
 
-switch($action)
+param( 'login', 'string', '', false, true ); // override
+// echo 'login: ', $login;
+
+
+switch( $action )
 {
 	case 'logout':
-		/*
-		 * Logout:
-		 */
-		// Do the log out!
 		logout();
 
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-		header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
-		header("Pragma: no-cache");
+		header_nocache();
 
 		param( 'redirect_to', 'string', $_SERVER['HTTP_REFERER'] );
 		$location = empty($redirect_to) ? $baseurl : $redirect_to;
-		header('Refresh:0;url='.str_replace('&amp;', '&', $location));
+
+		$location = str_replace('&amp;', '&', $location);
+
+		if( strpos($location, $baseurl) === 0
+				&& preg_match( '#^(.*?)([?&])action=\w+&?(.*)$#', $location, $match ) )
+		{ // remove "action" get param to avoid unwanted actions
+			$location = $match[1];
+
+			if( !empty($match[3]) )
+			{
+				$location .= $match[2].$match[3];
+			}
+		}
+
+		header('Refresh:0;url='.$location);
+
 		exit();
-		break; // case 'logout'
 
 
-	case 'lostpassword':
-		/*
-		 * Lost password:
-		 */
+	case 'lostpassword': // Lost password:
 		param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
+
 		// Display retrieval form:
 		require( dirname(__FILE__).'/_lostpass_form.php' );
+
 		exit();
-		break; // case 'lostpassword'
 
 
-
-	case 'retrievepassword':
-		/*
-		 * Retrieve lost password:
-		 */
-		param( 'log', 'string', true );
+	case 'retrievepassword': // Send passwort change request by mail
 		param( 'redirect_to', 'string', $admin_url );
-		// echo 'login: ', $log;
 
-		if( $demo_mode && ($log == 'demouser' || $log == 'admin') )
+		if( $demo_mode && ($login == 'demouser' || $login == 'admin') )
 		{
-			$notes = T_('You cannot reset this account in demo mode.')."<br />\n";
+			$Messages->add( T_('You cannot reset this account in demo mode.') );
 		}
 		else
 		{
-			if( $ForgetfulUser =& $UserCache->get_by_login( $log ) )
+			if( $ForgetfulUser =& $UserCache->get_by_login( $login ) )
 			{ // User exists
 				// echo 'email: ', $ForgetfulUser->email;
 				// echo 'locale: '.$ForgetfulUser->locale;
 
 				locale_temp_switch( $ForgetfulUser->locale );
 
-				$random_password = substr(md5(uniqid(microtime())),0,6);
-
-				$message  = T_('Login:')." $log\r\n";
-				$message .= T_('New Password:')." $random_password\r\n";
-				$message .= "\r\n".T_('You can login here:')."\r\n".$admin_url."\r\n";
-
 				// DEBUG!
 				// echo $message.' (password not set yet, only when sending email does not fail);
 
 				if( empty( $ForgetfulUser->email ) )
 				{
-					$notes = T_('You have no email address with your profile, therefor we cannot reset your password.')
-									.T_('Please try contacting the admin.');
-				}
-				elseif( !send_mail( $ForgetfulUser->email, T_('your weblog\'s login/password'), $message, $notify_from ) )
-				{
-					$notes = T_('The email could not be sent.')."<br />\n"
-									.T_('Possible reason: your host may have disabled the mail() function...');
+					$Messages->add( T_('You have no email address with your profile, therefor we cannot reset your password.')
+													.' '.T_('Please try contacting the admin.') );
 				}
 				else
 				{
-					$DB->query( "UPDATE T_users
-											SET user_pass = '" . md5($random_password) . "'
-											WHERE user_login = '$log'" );
-					$notes = T_('An email with the new password was sent successfully to your email address.')."<br />\n";
+					$requestId = getRandomPassword(22);
+
+					$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
+										."\n\n"
+										.T_('Login:')." $login\n"
+										.T_('Link to change your password:')
+										."\n"
+										.$htsrv_url.'login.php?action=changepwd'
+											.'&login='.urlencode( $ForgetfulUser->login )
+											.'&reqId='.$requestId
+										."\n\n"
+										.T_('Please note:')
+										.' '.sprintf( T_('For security reasons the link is only valid for %d hours with the same IP address.'), 2 )
+										."\n\n"
+										.T_('If it was not you that requested this password change, simply ignore this mail.');
+
+					if( !send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
+					{
+						$Messages->add( T_('The email could not be sent.')
+														.'<br />'.T_('Possible reason: your host may have disabled the mail() function...') );
+					}
+					else
+					{
+						$UserSettings->set( 'password_change_request',
+																serialize( array( 'requestId' => $requestId,
+																									'IP' => md5(serialize(getIpList())),
+																									'time' => time() ) ),
+																$ForgetfulUser->ID );
+						$UserSettings->updateDB();
+
+						$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
+					}
+					#pre_dump( $message );
 				}
 
 				locale_restore_previous();
 			}
 			else
 			{ // pretend that the email is sent for avoiding guessing user_login
-				$notes = T_('An email with the new password was sent successfully to your email address.')."<br />\n";
+				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
 			}
 		}
+		break;
 
-	default:
-		/*
-		 * Default: login form:
-		 */
-		if( is_logged_in() )
-		{ // The user is already logged in...
-			// TODO: use $login_error to be clear
 
-			$error = is_string($error) ? $error.'<br />' : '';
-			$error .= T_('Note: You are already logged in!');
+	case 'changepwd': // Clicked "Change password request" link from a mail or submit changed pwd
+		param( 'reqId', 'string', '' );
 
-			// Note: if $redirect_to is already set, param() will not touch it.
-			param( 'redirect_to', 'string', $ReqURI );
-			if( preg_match( '/login.php([&?].*)?$/', $redirect_to ) )
-			{ // avoid "endless loops"
-				$redirect_to = $admin_url;
-			}
-			$error .= ' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>';
+		$ForgetfulUser =& $UserCache->get_by_login($login);
+
+
+		if( !$ForgetfulUser || empty($reqId) )
+		{ // This was not requested
+			$Messages->add( T_('Invalid password change request!') );
+			break;
 		}
 
-		// Display login form:
-		require( dirname(__FILE__).'/_login_form.php' );
-		debug_info();
+		$verifyData = $UserSettings->get( 'password_change_request', $ForgetfulUser->ID );
+		$UserSettings->delete( 'password_change_request', $ForgetfulUser->ID );
+
+		$UserSettings->updateDB();
+
+		if( !$verifyData
+				|| !($verifyData = unserialize($verifyData))
+				|| !is_array($verifyData)
+				|| !isset($verifyData['IP']) || $verifyData['IP'] != md5(serialize(getIpList()))
+				|| !isset($verifyData['time']) || $verifyData['time'] < ( time() - 7200 ) )
+		{
+			$Messages->add( sprintf( T_('Invalid password change request!')
+																.' '.T_('For security reasons the link is only valid for %d hours with the same IP address.'), 2 ) );
+			break;
+		}
+
+		// Log the user in:
+		if( !setcookie( $cookie_user, $ForgetfulUser->login, $cookie_expires, $cookie_path, $cookie_domain ) )
+		{
+			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
+		}
+		if( !setcookie( $cookie_pass, $ForgetfulUser->pass, $cookie_expires, $cookie_path, $cookie_domain) )
+		{
+			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
+		}
+		header_nocache();
+
+		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'note' );
+
+		$action = '';
+
+		$current_User =& $ForgetfulUser;
+		require( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'b2users.php' );
+
+		#header( 'Location: '.$baseurl.$admin_subdir.'b2users.php' ); // does not allow to leave a Message and IIS is known to cause problems with setcookie() and redirect.
 		exit();
 
+		break;
+
 } // switch
+
+
+// Default: login form
+if( is_logged_in() )
+{ // The user is already logged in...
+
+	// Note: if $redirect_to is already set, param() will not touch it.
+	param( 'redirect_to', 'string', $ReqURI );
+	if( preg_match( '#login.php([&?].*)?$#', $redirect_to ) )
+	{ // avoid "endless loops"
+		$redirect_to = $admin_url;
+	}
+
+	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $current_User->login )
+												.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
+}
+
+
+// Display login form:
+require( dirname(__FILE__).'/_login_form.php' );
+exit();
 
 ?>

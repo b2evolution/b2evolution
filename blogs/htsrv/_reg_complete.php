@@ -20,7 +20,7 @@ require(dirname(__FILE__).'/_header.php');
 
 
 $Form =& new Form( $htsrv_url.'login.php', 'login', 'post', 'fieldset' );
-$Form->hidden( 'log', $login );
+$Form->hidden( 'login', $login );
 $Form->hidden( 'redirect_to', $redirect_to );
 
 $Form->begin_form( 'fform' );
