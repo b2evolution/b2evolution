@@ -20,7 +20,7 @@
 ?>
 
 	<!-- form to add a comment -->
-	<form action="<?php echo $baseurl, '/', $pathhtsrv ?>/profile_update.php" method="post" class="bComment">
+	<form action="<?php echo $htsrv_url ?>/profile_update.php" method="post" class="bComment">
 
 		<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
 	

@@ -187,7 +187,7 @@ else
 {	// no skin specified !
 	if( $template == 'popup' )
 	{	// Do the popup display
-		require dirname(__FILE__).'/'.$pathcore_out.'/_popup.php';
+		require dirname(__FILE__).'/'.$core_dirout.'/_popup.php';
 		exit();
 	}
 }

@@ -6,8 +6,8 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
  */
-require_once(dirname(__FILE__).'/../conf/b2evo_config.php');
-require_once(dirname(__FILE__)."/$b2inc/_main.php");
+require_once(dirname(__FILE__).'/../conf/_config.php');
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
@@ -41,7 +41,7 @@ switch($action)
 		/*
 		 * Lost password:
 		 */
-		param( 'redirect_to', 'string', $htsrvurl.'/login.php' );
+		param( 'redirect_to', 'string', $htsrv_url.'/login.php' );
 		// Display retrieval form:
 		require( dirname(__FILE__).'/_lostpass_form.php' );
 		exit();
@@ -60,7 +60,7 @@ switch($action)
 		if (empty($user_email))
 		{	// pretend that the email is sent for avoiding guessing user_login
 			echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-			echo '<a href="', $htsrvurl, '/login.php">', T_('Click here to login !'), '</a></p>';
+			echo '<a href="', $htsrv_url, '/login.php">', T_('Click here to login !'), '</a></p>';
 			die();
 		}
 
@@ -82,7 +82,7 @@ switch($action)
 		}
 		
 		echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-		echo '<a href="', $htsrvurl, '/login.php">', T_('Click here to login !'), '</a></p>';
+		echo '<a href="', $htsrv_url, '/login.php">', T_('Click here to login !'), '</a></p>';
 
 		break; // case 'retrievepassword'
 

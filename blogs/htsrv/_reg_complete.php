@@ -21,7 +21,7 @@
 <tr><td align="right" colspan="2"><?php echo T_('Login') ?>: <strong><?php echo $login ?>&nbsp;</strong></td></tr>
 <tr><td align="right" colspan="2"><?php echo T_('Email') ?>: <strong><?php echo $email ?>&nbsp;</strong></td></tr>
 <tr><td width="90">&nbsp;</td>
-<td><form name="login" action="<?php echo $htsrvurl ?>/login.php" method="post">
+<td><form name="login" action="<?php echo $htsrv_url ?>/login.php" method="post">
 <input type="hidden" name="log" value="<?php echo $user_login ?>" />
 <input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 <input type="submit" class="search" value="Login" name="submit" /></form></td></tr>

@@ -85,7 +85,7 @@ switch($action)
 			// Determine the edit folder:
 			$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
 			$last_pos = 0;
-			while( $pos = strpos( $current_folder, $backoffice_subdir, $last_pos ) )
+			while( $pos = strpos( $current_folder, $admin_subdir, $last_pos ) )
 			{	// make sure we use the last occurrence
 				$edit_folder = substr( $current_folder, 0, $pos-1 );
 				$last_pos = $pos+1;
@@ -239,7 +239,7 @@ switch($action)
 		// Determine the edit folder:
 		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
 		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $backoffice_subdir, $last_pos ) )
+		while( $pos = strpos( $current_folder, $admin_subdir, $last_pos ) )
 		{	// make sure we use the last occurrence
 			$edit_folder = substr( $current_folder, 0, $pos-1 );
 			$last_pos = $pos+1;

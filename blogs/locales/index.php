@@ -7,7 +7,7 @@
  *
  * This file is based on code from the GALLERY project.
  */
-include( dirname(__FILE__).'/../conf/b2evo_config.php' );
+include( dirname(__FILE__).'/../conf/_config.php' );
 include( dirname(__FILE__).'/../b2evocore/_vars.php' );
 include( dirname(__FILE__).'/../b2evocore/_functions.php' );
 

@@ -22,9 +22,9 @@
 			document.SPELLDATA.messagebodyname.value=body
 			document.SPELLDATA.companyID.value="custom\\http://cafelog.com"
 			document.SPELLDATA.language.value=1033
-			document.SPELLDATA.opener.value="<?php echo $pathserver ?>/sproxy.pl"
+			document.SPELLDATA.opener.value="<?php echo $admin_url ?>/sproxy.pl"
 			document.SPELLDATA.formaction.value="http://www.spellchecker.com/spell/startspelling.asp "
-			window.open("<?php echo $pathserver ?>/b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
+			window.open("<?php echo $admin_url ?>/b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
 		}
 	<?php
 	}
@@ -140,7 +140,7 @@ if( empty($mode) )
 <td class="menutop" align="right" bgcolor="#FF9900">
 <a href="<?php echo $baseurl ?>" class="menutop"><?php echo T_('Exit to blogs') ?></a>
 |
-<a href="<?php echo $htsrvurl ?>/login.php?action=logout" class="menutop"><?php echo T_('Logout') ?></a>
+<a href="<?php echo $htsrv_url ?>/login.php?action=logout" class="menutop"><?php echo T_('Logout') ?></a>
 &nbsp;
 </td>
 

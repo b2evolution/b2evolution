@@ -16,7 +16,7 @@ registration</td>
 
 <tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
 
-<form method="post" action="<?php echo $htsrvurl ?>/register.php">
+<form method="post" action="<?php echo $htsrv_url ?>/register.php">
 <input type="hidden" name="action" value="register" />
 <input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 <table border="0" width="180" class="menutop" style="background-color: #ffffff">

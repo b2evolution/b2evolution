@@ -7,12 +7,12 @@
  *
  * This file initializes the backoffice!
  */
-require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
-require_once(dirname(__FILE__)."/../conf/b2evo_admin.php");
+require_once(dirname(__FILE__).'/../conf/_config.php');
+require_once(dirname(__FILE__).'/../conf/_admin.php');
 
 // Do the MAIN initializations:
 $login_required = true;
-require_once(dirname(__FILE__)."/$b2inc/_main.php");
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_main.php");
 
 param( 'blog', 'integer', $default_to_blog, true );
 if( $blog != '' ) 

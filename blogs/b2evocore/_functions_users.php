@@ -58,7 +58,7 @@ function user_delete( $post_id )
  */
 function veriflog( $login_required = false )
 {
-	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $pathcore_out, $pathhtsrv;
+	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $core_dirout;
 	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url;
 	
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
@@ -452,7 +452,7 @@ function user_info( $show='', $format = 'raw', $display = true )
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrvurl, $blog;
+	global $htsrv_url, $blog;
 
 	if( is_loggued_in() ) return false;
 
@@ -466,7 +466,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	}
 	
 	echo $before;
-	echo '<a href="', $htsrvurl, '/login.php', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/login.php', $redir, '" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -479,7 +479,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrvurl, $users_can_register, $blog;
+	global $htsrv_url, $users_can_register, $blog;
 
 	if( is_loggued_in() || !$users_can_register) 
 	{	// There's no need to provide this link if already loggued in or if we won't let him register
@@ -496,7 +496,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	}
 
 	echo $before;
-	echo '<a href="',  $htsrvurl, '/register.php', $redir, '" title="', $link_title, '">';
+	echo '<a href="',  $htsrv_url, '/register.php', $redir, '" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -510,7 +510,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  */
 function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrvurl, $user_login, $blog;
+	global $htsrv_url, $user_login, $blog;
 
 	if( ! is_loggued_in() ) return false;
 
@@ -524,7 +524,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	}
 
 	echo $before;
-	echo '<a href="', $htsrvurl, '/login.php?action=logout', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/login.php?action=logout', $redir, '" title="', $link_title, '">';
 	printf( $link_text, $user_login );
 	echo '</a>';
 	echo $after;
@@ -537,7 +537,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  */
 function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link_text = '', $link_title = '#' )
 {
-	global $pathserver, $user_level, $blog;
+	global $admin_url, $user_level, $blog;
 
 	if( ! is_loggued_in() ) return false;
 
@@ -550,7 +550,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
 
 	echo $before;
-	echo '<a href="', $pathserver, '/', $page, '" title="', $link_title, '">';
+	echo '<a href="', $admin_url, '/', $page, '" title="', $link_title, '">';
 	echo $link_text ;
 	echo '</a>';
 	echo $after;
@@ -564,7 +564,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
  */
 function user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $pathserver, $user_login, $pagenow;
+	global $user_login, $pagenow;
 
 	if( ! is_loggued_in() ) return false;
 

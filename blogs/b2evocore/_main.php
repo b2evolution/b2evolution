@@ -9,7 +9,7 @@
  * It is useful when you want to do very customized templates!
  * It is also called by more complete initializers.
  */
-require_once (dirname(__FILE__).'/../conf/b2evo_config.php');
+require_once (dirname(__FILE__).'/../conf/_config.php');
 require_once (dirname(__FILE__).'/_vars.php');					// sets various arrays and vars for use in b2
 require_once (dirname(__FILE__).'/_functions_template.php');	// function to be called from templates
 require_once (dirname(__FILE__).'/_functions.php');  
@@ -50,6 +50,6 @@ $localtimenow = time() + ($time_difference * 3600);
 if( !isset($login_required) ) $login_required = false;
 if( $error = veriflog( $login_required ) )
 {	// Login failed:
-	require(dirname(__FILE__)."/$pathcore_out/$pathhtsrv/login.php");
+	require(dirname(__FILE__)."/$core_dirout/$htsrv_subdir/login.php");
 }
 ?>

@@ -1,9 +1,9 @@
 <div class="bPosts">
 	<div class="bPost">
 	<?php
-	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_itemlist.php');
-	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_calendar.php');
-	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_archivelist.php');
+	require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_itemlist.php');
+	require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_calendar.php');
+	require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_archivelist.php');
 
 	param( 'safe_mode', 'integer', 0 );		// Blogger style
 
@@ -210,7 +210,7 @@
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
 				<!-- form to add a comment -->
-				<form action="<?php echo $baseurl, '/', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
+				<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 				
 					<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
 					<input type="hidden" name="redirect_to" value="<?php echo $_SERVER["REQUEST_URI"]; ?>" />

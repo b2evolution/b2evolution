@@ -132,8 +132,8 @@ function trackback_response($error = 0, $error_message = '')
  *****/
 
 function trackback_url($display = 1) {
-	global $baseurl, $pathhtsrv, $id;
-	$tb_url = "$baseurl/$pathhtsrv/trackback.php/$id";
+	global $htsrv_url, $id;
+	$tb_url = "$htsrv_url/trackback.php/$id";
 	if ($display) {
 		echo $tb_url;
 	} else {
@@ -207,7 +207,7 @@ function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 function trackback_rdf($timezone=0) 
 {	// This adds trackback autodiscovery information
-	global $pathserver, $id, $blogfilename;	// fplanque added: $blogfilename
+	global $id, $blogfilename;	// fplanque added: $blogfilename
 	// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
 	// fplanque WARNING: this isn't a very clean way to validate :/
 	// fplanque added: html comments (not perfect but better way of validating!)

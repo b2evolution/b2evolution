@@ -25,7 +25,7 @@
 		}
 ?>
 
-<form name="" action="<?php echo $htsrvurl ?>/login.php" method="post">
+<form name="" action="<?php echo $htsrv_url ?>/login.php" method="post">
 <input type="hidden" name="action" value="retrievepassword" />
 <table width="100" style="background-color: #ffffff">
 <tr><td align="right"><?php echo T_('Login') ?></td>

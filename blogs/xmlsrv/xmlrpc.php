@@ -8,12 +8,12 @@
 
 $debug = 0;
 
-require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpc.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions.php");
-require_once(dirname(__FILE__)."/$b2inc/_vars.php");
+require_once(dirname(__FILE__)."/../conf/_config.php");
+require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions_xmlrpc.php");
+require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions_xmlrpcs.php");
+require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions_template.php");
+require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions.php");
+require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_vars.php");
 
 $use_cache = 1;
 $post_autobr = 1;
@@ -913,12 +913,12 @@ function bloggergettemplate($m)
 
 	if (user_pass_ok($username,$password)) 
 	{
-		global $pathxmlsrv;
+		global $xmlsrv_subdir;
 
 		// Determine the edit folder:
 		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
 		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $pathxmlsrv, $last_pos ) )
+		while( $pos = strpos( $current_folder, $xmlsrv_subdir, $last_pos ) )
 		{	// make sure we use the last occurrence
 			$edit_folder = substr( $current_folder, 0, $pos-1 );
 			$last_pos = $pos+1;
@@ -991,11 +991,11 @@ function bloggersettemplate($m) {
 
 	if (user_pass_ok($username,$password)) 
 	{
-		global $pathxmlsrv;
+		global $xmlsrv_subdir;
 		// Determine the edit folder:
 		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
 		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $pathxmlsrv, $last_pos ) )
+		while( $pos = strpos( $current_folder, $xmlsrv_subdir, $last_pos ) )
 		{	// make sure we use the last occurrence
 			$edit_folder = substr( $current_folder, 0, $pos-1 );
 			$last_pos = $pos+1;

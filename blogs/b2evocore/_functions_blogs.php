@@ -130,7 +130,7 @@ function get_blogparams()
  */
 function get_bloginfo( $show='', $this_blogparams = '' )
 {
-	global $blog, $xmlsrvurl, $admin_email;
+	global $blog, $xmlsrv_url, $admin_email;
 
 	if( empty( $this_blogparams ) )
 	{	// We want the global blog on the page
@@ -207,19 +207,19 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			break;
 			
 		case 'rdf_url':
-			$output = $xmlsrvurl.'/rdf.php?blog='.$this_blogparams->blog_ID;
+			$output = $xmlsrv_url.'/rdf.php?blog='.$this_blogparams->blog_ID;
 			break;
 			
 		case 'rss_url':
-			$output = $xmlsrvurl.'/rss.php?blog='.$this_blogparams->blog_ID;
+			$output = $xmlsrv_url.'/rss.php?blog='.$this_blogparams->blog_ID;
 			break;
 			
 		case 'rss2_url':
-			$output = $xmlsrvurl.'/rss2.php?blog='.$this_blogparams->blog_ID;
+			$output = $xmlsrv_url.'/rss2.php?blog='.$this_blogparams->blog_ID;
 			break;
 			
 		case 'pingback_url':
-			$output = $xmlsrvurl.'/xmlrpc.php';
+			$output = $xmlsrv_url.'/xmlrpc.php';
 			break;
 			
 		case 'admin_email':

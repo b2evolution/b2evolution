@@ -8,7 +8,7 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-require_once dirname(__FILE__)."/$pathcore_out/$dir_conf/_antispam.php";
+require_once dirname(__FILE__)."/$core_dirout/$conf_subdir/_antispam.php";
 require_once (dirname(__FILE__)."/_functions_cats.php");
 require_once (dirname(__FILE__)."/_functions_blogs.php");
 require_once (dirname(__FILE__)."/_functions_bposts.php");
@@ -172,7 +172,6 @@ function format_to_edit($content)
 function format_to_post($content, $autobr=0, $is_comment=0)
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
-	global $b2inc;
 	global $allowed_tags, $allowed_attribues, $uri_attrs, $allowed_uri_scheme;
 	global $comments_allowed_tags, $comments_allowed_attribues, $comments_uri_attrs, $comments_allowed_uri_scheme;
 
@@ -1139,12 +1138,12 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
  */
 function get_path( $which='' )
 {
-	global $pathcore;
+	global $core_subdir;
 
 	// Determine the edit folder:
 	$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
 	$last_pos = 0;
-	while( $pos = strpos( $current_folder, $pathcore, $last_pos ) )
+	while( $pos = strpos( $current_folder, $core_subdir, $last_pos ) )
 	{	// make sure we use the last occurrence
 		$basepath = substr( $current_folder, 0, $pos-1 );
 		$last_pos = $pos+1;

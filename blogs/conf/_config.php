@@ -86,8 +86,8 @@ preg_match( '#http://([^:/]+)#', $baseurl, $matches );
 $basehost = $matches[1];
 //echo 'basehost=',$basehost;
 
-require_once (dirname(__FILE__)."/b2evo_advanced.php");
-require_once (dirname(__FILE__)."/b2evo_locale.php");
-require_once (dirname(__FILE__)."/b2evo_formatting.php");
+require_once (dirname(__FILE__)."/_advanced.php");
+require_once (dirname(__FILE__)."/_locales.php");
+require_once (dirname(__FILE__)."/_formatting.php");
 
 ?>

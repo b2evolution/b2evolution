@@ -6,7 +6,7 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
-include( dirname(__FILE__).'/../conf/b2evo_config.php' );
+include( dirname(__FILE__).'/../conf/_config.php' );
 include( dirname(__FILE__).'/../b2evocore/_functions.php' );
 
 if( ! $allow_po_extraction )

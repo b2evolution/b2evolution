@@ -5,13 +5,13 @@
  */
 $output_debugging_info = 0;		# =1 if you want to output debugging info
  
-require_once(dirname(__FILE__).'/../conf/b2evo_config.php');
-require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions.php");
-require_once(dirname(__FILE__)."/$b2inc/_vars.php");
-require_once(dirname(__FILE__)."/$b2inc/_class_pop3.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpc.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
+require_once(dirname(__FILE__).'/../conf/_config.php');
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions_template.php");
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions.php");
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_vars.php");
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_class_pop3.php");
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions_xmlrpc.php");
+require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions_xmlrpcs.php");
 
 dbconnect();
 timer_start();

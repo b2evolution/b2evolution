@@ -6,7 +6,7 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 require_once (dirname(__FILE__).'/_header.php');
-require_once (dirname(__FILE__).'/'.$b2inc.'/_functions_hitlogs.php');						// referer logging
+require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_hitlogs.php');						// referer logging
 $title = T_('View Stats');
 
 param( 'action', 'string' );
@@ -240,7 +240,7 @@ switch( $show )
 	<?php stats_blog_select(); ?>
 
 	<h3><?php echo T_('Last refering searches') ?>:</h3>
-	<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/b2evo_advanced.php)') ?></p>
+	<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',1,1,"'search'",'',$blog); ?>
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -268,7 +268,7 @@ switch( $show )
 	</table>
 	
 	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
-	<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)') ?></p>
+	<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -293,7 +293,7 @@ switch( $show )
 	<?php stats_blog_select(); ?>
 
 	<h3><?php echo T_('Top Aggregators') ?>:</h3>
-	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)') ?></p>
+	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(40,'global',0,0,"'rss'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>

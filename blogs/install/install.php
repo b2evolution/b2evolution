@@ -26,7 +26,7 @@
 		die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
 	}
 
-	require_once (dirname(__FILE__).'/../conf/b2evo_config.php'); 
+	require_once (dirname(__FILE__).'/../conf/_config.php'); 
  
  ?>
 
@@ -39,9 +39,9 @@ mySQL Password: <?php echo (($dbpassword!='demopass' ? "(Set, but not shown for 
 </pre>
 
 <?php
-require_once (dirname(__FILE__)."/../$pathcore/_functions.php" ); // db funcs
-require_once (dirname(__FILE__)."/../$pathcore/_functions_cats.php" );
-require_once (dirname(__FILE__)."/../$pathcore/_functions_bposts.php" );
+require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions.php" ); // db funcs
+require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_cats.php" );
+require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts.php" );
 
 $new_db_version = 8021;				// next time: 8030
 
@@ -363,7 +363,7 @@ switch( $action )
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
-		bpost_create( 1, "Clean Permalinks! :idea:", "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations. Nethertheless, if you feel comfortable, you should try activating clean permalinks in the /conf/b2evo_advanced.php file...</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+		bpost_create( 1, "Clean Permalinks! :idea:", "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations. Nethertheless, if you feel comfortable, you should try activating clean permalinks in the /conf/_advanced.php file...</p>", $now, $cat_b2evo ) or mysql_oops( $query );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -647,7 +647,7 @@ switch( $action )
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
-		bpost_create( 1, "Clean Permalinks! :idea:", "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations. Nethertheless, if you feel comfortable, you should try activating clean permalinks in the /conf/b2evo_advanced.php file...</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+		bpost_create( 1, "Clean Permalinks! :idea:", "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations. Nethertheless, if you feel comfortable, you should try activating clean permalinks in the /conf/_advanced.php file...</p>", $now, $cat_b2evo ) or mysql_oops( $query );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -705,7 +705,7 @@ switch( $action )
 		{
 			?>
 			<p>For security reasons, the reset feature is disabled by default.</p>
-			<p>To enable it, please go back the /conf/b2evo_config.php file and change:</p>
+			<p>To enable it, please go back the /conf/_config.php file and change:</p>
 			<pre>$allow_evodb_reset = 0;</pre>
 			to
 			<pre>$allow_evodb_reset = 1;</pre>

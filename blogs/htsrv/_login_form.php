@@ -16,8 +16,8 @@ param( 'log', 'string', '' );		// last typed login
 $location = $redirect_to;
 
 ?>
-<a href="<?php echo $htsrvurl ?>/register.php" class="b2menutop"><?php echo T_('register ?') ?></a><br />
-<a href="<?php echo $htsrvurl ?>/login.php?action=lostpassword" class="b2menutop"><?php echo T_('lost your password ?') ?></a>
+<a href="<?php echo $htsrv_url ?>/register.php" class="b2menutop"><?php echo T_('register ?') ?></a><br />
+<a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword" class="b2menutop"><?php echo T_('lost your password ?') ?></a>
 </td>
 </tr>
 

@@ -15,7 +15,7 @@ $use_l10n = 2;
 $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 
 // Load locale related functions: (ne need NT_() here)
-require_once (dirname(__FILE__)."/../$pathcore/_functions_locale.php"); 
+require_once (dirname(__FILE__)."/$conf_dirout/$core_subdir/_functions_locale.php"); 
 
 # Supported languages for posts:
 $languages = array(

@@ -6,8 +6,8 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
  */
-require_once(dirname(__FILE__).'/../conf/b2evo_config.php');
-require_once(dirname(__FILE__)."/$b2inc/_main.php");
+require_once(dirname(__FILE__).'/../conf/_config.php');
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
 
 param( 'action', 'string', '' );
 
@@ -22,7 +22,7 @@ switch($action)
 		/*
 		 * Do the registration:
 		 */
-		param( 'redirect_to', 'string', $pathserver.'/b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
 
 		param( 'login', 'string', '' );
 		param( 'pass1', 'string', '' );
@@ -89,7 +89,7 @@ switch($action)
 
 		$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
 		$message .= T_('Login', $default_locale). ": $user_login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
-		$message .= T_('Manage users', $default_locale). ": $pathserver/b2team.php\n\n";
+		$message .= T_('Manage users', $default_locale). ": $admin_url/b2team.php\n\n";
 
 		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 
@@ -112,7 +112,7 @@ switch($action)
 		/*
 		 * Default: registration form:
 		 */
-		param( 'redirect_to', 'string', $pathserver.'/b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
 		// Display reg form:
 		require( dirname(__FILE__).'/_reg_form.php' );
 		exit();

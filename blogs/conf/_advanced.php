@@ -225,32 +225,38 @@ $cookie_expires = time() + 31536000;		// Default: one year from now
 $cookie_expired = time() - 86400;				// Default: 24 hours ago
 
 
-/* Stop editing */
+# Location of the b2evolution subdirectories:
+# You should only move these around if you really need to.
+# You should keep everything as subdirectories of the base folder 
+# ($baseurl which is set in _config.php, default is the /blogs folder)
+# Remember you can set the baseurl to your website root.
+# NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
+# Example of a possible setting:
+# $admin_subdir = 'backoffice/b2evo';				// Subdirectory relative to base
+# $admin_dirout = '../..';									// Relative path to go back to base
 
-/* EXPERIMENTAL: Edit at your own risk! */
-
-# BELOW IS SUBDIRECTORY CONFIGURATION
-# THIS IS NOT FUNCTIONAL YET !!!
-# DO NOT ATTEMPT TO CHANGE THIS UNTIL A NEWER VERSION THAT CAN HANDLE THIS
-$backoffice_subdir = 'admin';
-# Relative path to go back to base:
-$pathadmin_out = '..';
-# You should NOT (NEVER!) touch this:
-$pathserver = $baseurl.'/'.$backoffice_subdir;
-# Other paths (you can change these if you know what you're doing)
-$pathxmlsrv = 'xmlsrv';
-$pathxmlsrv_out = '..';
-$xmlsrvurl = $baseurl.'/'.$pathxmlsrv;
-# this is the relative FILE path for accessing the includes
-$pathcore = 'b2evocore';
-$b2inc = $pathadmin_out.'/'.$pathcore;
-# Relative path to go back to base:
-$pathcore_out = '..';
-# The HTml SeRVices folder:
-$pathhtsrv = "htsrv";
-$htsrvurl = $baseurl.'/'.$pathhtsrv;
-$pathhtsrv_out = "..";
-$dir_conf = 'conf';
-# END OF SUBDIRECTORY CONFIGURATION
+# Location of the backoffice (admin) folder:
+$admin_subdir = 'admin';										// Subdirectory relative to base
+$admin_dirout = '..';												// Relative path to go back to base
+$admin_url = $baseurl.'/'.$admin_subdir;		// You should not need to change this
+# Location of the HTml SeRVices folder:
+$htsrv_subdir = 'htsrv';										// Subdirectory relative to base
+$htsrv_dirout = '..';												// Relative path to go back to base
+$htsrv_url = $baseurl.'/'.$htsrv_subdir;		// You should not need to change this
+# Location of the XML SeRVices folder:
+$xmlsrv_subdir = 'xmlsrv'; 									// Subdirectory relative to base
+$xmlsrv_dirout = '..';											// Relative path to go back to base
+$xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;	// You should not need to change this
+# Location of the core (the "includes") files:
+$core_subdir = 'b2evocore'; 								// Subdirectory relative to base
+$core_dirout = '..';												// Relative path to go back to base
+# Location of the locales folder:
+$locales_subdir = 'locales';								// Subdirectory relative to base
+$locales_dirout = '..';											// Relative path to go back to base
+# Location of the configuration files:
+$conf_subdir = 'conf';											// Subdirectory relative to base
+$conf_dirout = '..';												// Relative path to go back to base
+# Location of the install folder:
+$install_dirout = '..';											// Relative path to go back to base
 
 ?>
