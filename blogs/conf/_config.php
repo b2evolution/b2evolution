@@ -21,6 +21,8 @@
 # You will also receive notifications for new user registrations.
 $admin_email = 'postmaster@localhost';
 
+$admin_email = 'blog@fplanque.net';  // FOR testing
+
 
 # *** MySQL settings ***
 # fill with your database details (check carefully or nothing will work)

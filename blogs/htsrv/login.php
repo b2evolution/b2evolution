@@ -41,7 +41,7 @@ switch($action)
 		/*
 		 * Lost password:
 		 */
-		param( 'redirect_to', 'string', $htsrv_url.'/login.php' );
+		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
 		// Display retrieval form:
 		require( dirname(__FILE__).'/_lostpass_form.php' );
 		exit();
@@ -51,30 +51,33 @@ switch($action)
 
 	case 'retrievepassword':
 		/*
-		 * Retrieve password:
+		 * Retrieve lost password:
 		 */
-		param( 'user_login', 'string', true );
-		$user_data	= get_userdatabylogin($user_login);
+		param( 'log', 'string', true );
+		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
+		// echo 'login: ', $log;
+		$user_data	= get_userdatabylogin($log);
 		$user_email	= $user_data['user_email'];
+		// echo 'email: ', $user_email;
 
 		if (empty($user_email))
 		{	// pretend that the email is sent for avoiding guessing user_login
 			echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-			echo '<a href="', $htsrv_url, '/login.php">', T_('Click here to login !'), '</a></p>';
+			echo '<a href="', $htsrv_url, '/login.php?redirect_to='.urlencode($redirect_to).'">', T_('Click here to login !'), '</a></p>';
 			die();
 		}
 
 		$random_password = substr(md5(uniqid(microtime())),0,6);
-		$query = "UPDATE $tableusers SET user_pass = '" . md5($random_password) . "' WHERE user_login = '$user_login'";
+		$query = "UPDATE $tableusers SET user_pass = '" . md5($random_password) . "' WHERE user_login = '$log'";
 		$result = mysql_query($query) or mysql_oops( $query );
 
-		$message  = T_('Login:')." $user_login\r\n";
+		$message  = T_('Login:')." $log\r\n";
 		$message .= T_('New Password:')." $random_password\r\n";
 		
 		// DEBUG!
 		// echo $message;
 
-		if( ! mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion()))
+		if( ! @mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion()))
 		{
 			echo '<p>', T_('The email could not be sent.'), "<br />\n";
 			echo T_('Possible reason: your host may have disabled the mail() function...</p>');
@@ -82,7 +85,7 @@ switch($action)
 		}
 		
 		echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-		echo '<a href="', $htsrv_url, '/login.php">', T_('Click here to login !'), '</a></p>';
+		echo '<a href="', $htsrv_url, '/login.php?redirect_to='.urlencode($redirect_to).'">', T_('Click here to login !'), '</a></p>';
 
 		break; // case 'retrievepassword'
 

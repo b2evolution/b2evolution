@@ -14,11 +14,12 @@ require(dirname(__FILE__).'/_header.php');
 <p><?php echo T_('A new password will be generated and sent to you by email.') ?></p>
 
 <form action="<?php echo $htsrv_url ?>/login.php" method="post" class="fform">
-<input type="hidden" name="action" value="retrievepassword" />
+	<input type="hidden" name="action" value="retrievepassword" />
+	<input type="hidden" name="redirect_to" value="<?php echo format_to_output( $redirect_to, 'formvalue' ) ?>" />
 
 	<fieldset>
-		<div class="label"><label for="user_login"><?php echo T_('Login:') ?></label></div> 
-		<div class="input"><input type="text" name="user_login" id="user_login" size="16" maxlength="20" value="" class="large" /></div>
+		<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div> 
+		<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="" class="large" /></div>
 	</fieldset>
 
 	<fieldset>

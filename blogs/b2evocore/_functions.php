@@ -998,6 +998,7 @@ function param(
 	else
 	{	// Variable was already set but we need to remove the auto quotes
 		$$var = remove_magic_quotes($$var);
+		// echo $var, ' already set';
 		/*	if($var == 'post_extracats' )
 			{ echo "$var=".$$var." was already set! count = ", count($$var),"<br/>";
 				foreach( $$var as $tes )

@@ -54,7 +54,7 @@ $location = $redirect_to;
 <div style="text-align:right">
 <a href="<?php echo $htsrv_url ?>/register.php"><?php echo T_('Register ?') ?></a>
 &middot;
-<a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword"><?php echo T_('Lost your password ?') ?></a>
+<a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword&redirect_to=<?php echo urlencode( $redirect_to ) ?>"><?php echo T_('Lost your password ?') ?></a>
 </div>
 
 <?php 
