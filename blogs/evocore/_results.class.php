@@ -104,7 +104,7 @@ class Results
 	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL )
 	{
 		global $DB;
-		$this->DB = $DB;
+		$this->DB = & $DB;
  		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
@@ -920,6 +920,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/20 19:19:34  fplanque
+ * bugfix
+ *
  * Revision 1.9  2005/01/20 18:45:54  fplanque
  * cleanup
  *
