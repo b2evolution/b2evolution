@@ -103,24 +103,20 @@ else
 }
 
 
-$query = "UPDATE $tableusers SET $updatepassword"
-	. 'user_firstname = "' . $DB->escape($newuser_firstname) . '", '
-	. 'user_lastname="'    . $DB->escape($newuser_lastname) . '", '
-	. 'user_nickname="'    . $DB->escape($newuser_nickname) . '", '
-	. 'user_icq="'         . $DB->escape($newuser_icq) . '", '
-	. 'user_email="'       . $DB->escape($newuser_email) . '", '
-	. 'user_url="'         . $DB->escape($newuser_url) . '", '
-	. 'user_aim="'         . $DB->escape($newuser_aim) . '", '
-	. 'user_msn="'         . $DB->escape($newuser_msn) . '", '
-	. 'user_yim="'         . $DB->escape($newuser_yim) . '", '
-	. 'user_idmode="'      . $DB->escape($newuser_idmode) . '", '
-	. 'user_notify="'      . $newuser_notify . '" '
-	. 'WHERE ID = '        . $user_ID;
-$querycount++;
-$result = mysql_query($query) or mysql_oops( $query );
-
-//echo $query;
-//exit();
+$DB->query( "UPDATE $tableusers 
+								SET $updatepassword
+										user_firstname= '".$DB->escape($newuser_firstname)."',
+										user_lastname= '".$DB->escape($newuser_lastname)."',
+										user_nickname= '".$DB->escape($newuser_nickname)."',
+										user_icq= '".$DB->escape($newuser_icq)."',
+										user_email= '".$DB->escape($newuser_email)."',
+										user_url= '".$DB->escape($newuser_url)."',
+										user_aim= '".$DB->escape($newuser_aim)."',
+										user_msn= '".$DB->escape($newuser_msn)."',
+										user_yim= '".$DB->escape($newuser_yim)."',
+										user_idmode= '".$DB->escape($newuser_idmode)."',
+										user_notify= $newuser_notify
+							WHERE ID = $user_ID" );
 
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');

@@ -72,8 +72,9 @@ switch($action)
 		}
 
 		$random_password = substr(md5(uniqid(microtime())),0,6);
-		$query = "UPDATE $tableusers SET user_pass = '" . md5($random_password) . "' WHERE user_login = '$log'";
-		$result = mysql_query($query) or mysql_oops( $query );
+		$DB->query( "UPDATE $tableusers 
+										SET user_pass = '" . md5($random_password) . "' 
+									WHERE user_login = '$log'" );
 
 		$message  = T_('Login:')." $log\r\n";
 		$message .= T_('New Password:')." $random_password\r\n";
