@@ -32,8 +32,8 @@ function create_b2evo_tables()
 	$query = "CREATE TABLE $tablesettings ( 
 		ID tinyint DEFAULT 1 NOT NULL, 
 		posts_per_page int unsigned DEFAULT 7 NOT NULL, 
-		what_to_show varchar DEFAULT 'days' NOT NULL, 
-		archive_mode varchar DEFAULT 'weekly' NOT NULL, 
+		what_to_show varchar(10) DEFAULT 'days' NOT NULL, 
+		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL, 
 		time_difference tinyint DEFAULT 0 NOT NULL, 
 		AutoBR tinyint DEFAULT 1 NOT NULL, 
 		db_version INT DEFAULT $new_db_version NOT NULL, 
