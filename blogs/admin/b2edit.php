@@ -154,14 +154,33 @@ switch($action)
 		}
 		
 		get_blogparams();
-	
-		// Check permission:
-		$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
-	
+
 		if( ! blog_has_cats( $blog ) )
 		{
 			die( T_('Since this blog has no categories, you cannot post to it. You must create categories first.') );
 		}
+	
+		// Check permission:
+		$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
+
+		// Okay now we know we can use at least one status, 
+		// but we need to make sure the requested/default one is ok...
+		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
+		if( ! $current_User->check_perm( 'blog_post_statuses', $post_status, false, $blog ) )
+		{	// We need to find another one:
+			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
+				$post_status = 'published';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
+				$post_status = 'protected';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
+				$post_status = 'private';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
+				$post_status = 'draft';
+			else
+				$post_status = 'deprecated';
+		}
+
+	
 
 		$action='post';
 		
@@ -182,7 +201,6 @@ switch($action)
 		$edited_post_title = format_to_edit( $post_title, false );
 		param( 'post_url', 'string', $popupurl );
 		$post_url = format_to_edit( $post_url, false );
-		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_lang', 'string', $default_language );
