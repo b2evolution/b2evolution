@@ -59,12 +59,6 @@ require_once (dirname(__FILE__)."/_functions_create.php" );
 
 $new_db_version = 8050;				// next time: 8060
 
-echo T_("<p>This is the first post.</p>
-
-<p>It appears on both blog A and blog B.</p>");
-
-echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
-
 /*
  * check_db_version(-)
  *

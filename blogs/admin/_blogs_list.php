@@ -54,7 +54,7 @@
 				{
 				?>
 				<a href="<?php blog_list_iteminfo('staticurl') ?>"><?php echo $staticfilename ?></a>
-				<?php if( $current_User->check_perm( 'blog_genstatic', 'any', false, $blog ) ) 
+				<?php if( $current_User->check_perm( 'blog_genstatic', 'any', false, $curr_blog_ID ) ) 
 					{ // It is possible to generate a static page ?>
 						[<a href="b2blogs.php?action=GenStatic&blog=<?php blog_list_iteminfo('ID') ?>"><?php 
 							/* TRANS: abbrev. for "generate !" */ echo T_('Gen!') ?></a>]

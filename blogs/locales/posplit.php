@@ -69,7 +69,7 @@ foreach ($lines as $line)
 				// Save the string
 				// $trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
 				// $trans[] = "\n\t\"$msgid\" => \"$msgstr\",";
-				$trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"$msgstr\",";
+				$trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
 
 			}
 		}
