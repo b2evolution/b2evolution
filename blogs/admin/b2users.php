@@ -161,7 +161,8 @@ else switch ($action)
 																	'email' => $edited_user_email,
 																	'url' => $edited_user_url,
 																	'pass1' => $edited_user_pass1,
-																	'pass2' => $edited_user_pass2 ) );
+																	'pass2' => $edited_user_pass2,
+																	'pass_required' => ($edited_user_ID == 0) ) );
 
 		$edited_User->set( 'login', $edited_user_login );
 		$edited_User->set( 'firstname', $edited_user_firstname );
@@ -177,11 +178,6 @@ else switch ($action)
 		$edited_User->set( 'yim', $edited_user_yim );
 		$edited_User->set( 'notify', $edited_user_notify );
 		$edited_User->set( 'showonline', $edited_user_showonline );
-
-		if( $edited_user_ID == 0 && empty($edited_user_pass1) && empty($edited_user_pass2) )
-		{ // Require passwords for new users:
-			$Messages->add( T_('Please enter a password.') );
-		}
 
 		if( !$Messages->count( 'error' ) )
 		{ // OK, no error.

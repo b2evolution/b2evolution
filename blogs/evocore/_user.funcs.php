@@ -5,8 +5,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -433,6 +433,7 @@ function profile_title( $prefix = ' ', $display = 'htmlbody' )
  *              'email': mandatory, must be well formed
  *              'url': must be well formed, in allowed scheme, not blacklisted
  *              'pass1' / 'pass2': passwords (twice), must be the same
+ *              'pass_required': false/true (default is true)
  */
 function profile_check_params( $params )
 {
@@ -489,29 +490,38 @@ function profile_check_params( $params )
 	}
 
 	// Check passwords:
-	if( isset($params['pass1']) )
-	{
-		// checking the password has been typed twice
-		if( empty($params['pass1']) || empty($params['pass2']) )
-		{
-			$Messages->add( T_('Please enter your password twice.') );
-		}
 
-		// checking the password has been typed twice the same:
-		if( $params['pass1'] != $params['pass2'] )
-		{
-			$Messages->add( T_('You typed two different passwords.') );
-		}
-		elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
-						|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
-		{
-			$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
+	$pass_required = isset( $params['pass_required'] ) ? $params['pass_required'] : true;
+
+	if( isset($params['pass1']) && isset($params['pass2']) )
+	{
+		if( $pass_required || !empty($params['pass1']) || !empty($params['pass2']) )
+		{ // Password is required or was given
+			// checking the password has been typed twice
+			if( empty($params['pass1']) || empty($params['pass2']) )
+			{
+				$Messages->add( T_('Please enter your password twice.') );
+			}
+
+			// checking the password has been typed twice the same:
+			if( $params['pass1'] != $params['pass2'] )
+			{
+				$Messages->add( T_('You typed two different passwords.') );
+			}
+			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
+							|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
+			{
+				$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
+			}
 		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/20 23:21:20  blueyed
+ * user pwd verifying fixed
+ *
  * Revision 1.15  2005/02/20 23:03:24  blueyed
  * profile_check_params() enhanced
  *
