@@ -13,6 +13,11 @@ h1 {
 	color: #8ae;
 	font-size: 160%;
 }
+h1.logintitle {
+	color: #000;
+	font-size: 120%;
+}
+
 h2 {
 	margin-top: 0ex;
 	margin-bottom: 1ex;
@@ -72,6 +77,13 @@ div.panelblock
 	padding: 2ex;
 	margin: 3ex;
 }
+div.loginblock
+{
+	border: 1px solid #CCCCCC;
+	padding: 2ex;
+	margin: 3ex auto;
+	width: 30em;
+}
 
 div.paneltopblock
 {
@@ -116,6 +128,9 @@ div.error{
 	margin: 3ex auto;
 	border: 1px solid #fed;
 	background: #fff5ee;
+}
+div.loginblock div.error{
+	width: 95%;
 }
 
 ul.error{
@@ -231,8 +246,9 @@ form.fform fieldset
 div.label
 {
 	float: left;
-	width: 19%;
+	width: 24%;
 	text-align: right;
+	padding-top: .6ex;
 }
 div.label label
 {
@@ -241,7 +257,7 @@ div.label label
 div.input
 {
 	float: right;
-	width: 80%;
+	width: 75%;
 }
 
 

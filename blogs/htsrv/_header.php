@@ -17,13 +17,23 @@
 </head>
 <body>
 
-<a href="http://b2evolution.net/"><img src="../img/b2evolution_minilogo.png" width="231" height="50" border="0" /></a>
 
-<table width="100%" height="100%">
-<td align="center" valign="middle">
+<div class="loginblock">
 
-<table width="200" height="200" style="border: 1px solid #cccccc;" cellpadding="0" cellspacing="0">
+<div style="float:left"><a href="http://b2evolution.net/"><img src="../img/b2evolution_minilogo.png" width="231" height="50" border="0" /></a></div> 
 
-<tr height="50">
-<td></td>
-<td align="right" valign="top">
+<?php if( isset($page_icon) ) { ?>
+<img src="<?php echo $htsrv_url, '/img/', $page_icon ?>" width="24" height="24" class="rightmargin" />
+<?php } ?>
+<div style="float:right">
+<h1 class="logintitle"><?php echo $page_title ?></h1>
+</div>
+
+<div style="clear:both"></div>
+
+<?php
+if( !empty($error) )
+{
+	echo '<div class="error">', $error, '</div>';
+}
+?>

@@ -7,12 +7,8 @@
  *
  * This is the footer file for login/registering services
  */
-?></td>
-</tr>
-</table>
-</td>
-</tr>
-</table>
+?>
+</div>
 
 </body>
 </html>

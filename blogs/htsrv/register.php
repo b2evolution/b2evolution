@@ -10,6 +10,8 @@ require_once(dirname(__FILE__).'/../conf/_config.php');
 require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
 
 param( 'action', 'string', '' );
+param( 'login', 'string', '' );
+param( 'email', 'string', '' );
 
 if(!$users_can_register)
 {
@@ -23,39 +25,41 @@ switch($action)
 		 * Do the registration:
 		 */
 		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
-
-		param( 'login', 'string', '' );
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
-		param( 'email', 'string', '' );
 
 		// checking login has been typed:
 		if($login == '')
 		{
-			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login'));
+			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login');
+			break;
 		}
 
 		// checking the password has been typed twice
 		if($pass1 == '' || $pass2 == '')
 		{
-			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter your password twice'));
+			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please enter your password twice');
+			break;
 		}
 
 		// checking the password has been typed twice the same:
 		if($pass1 != $pass2)
 		{
-			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type the same password in the two password fields'));
+			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please type the same password in the two password fields');
+			break;
 		}
 		$user_nickname = $login;
 
 		// checking e-mail address:
 		if($email == '')
 		{
-			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type your e-mail address'));
+			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please type your e-mail address');
+			break;
 		}
 		elseif (!is_email($email))
 		{
-			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('the email address is invalid'));
+			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('the email address is invalid');
+			break;
 		}
 
 		// TODO: START TRANSACTION !!
@@ -69,7 +73,8 @@ switch($action)
 
 		if ($lines >= 1) 
 		{
-			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one'). "");
+			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one');
+			break;
 		}
 
 		$user_ip			= isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
@@ -104,15 +109,13 @@ switch($action)
 		break; // case 'disabled'
 
 
-	default:
-		/*
-		 * Default: registration form:
-		 */
-		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
-		// Display reg form:
-		require( dirname(__FILE__).'/_reg_form.php' );
-		exit();
-
 } // switch
+
+/*
+ * Default: registration form:
+ */
+param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
+// Display reg form:
+require( dirname(__FILE__).'/_reg_form.php' );
 
 ?>

@@ -8,6 +8,7 @@
  * This is the login form
  */
 $page_title = T_('Login form');
+$page_icon = 'icon_login.gif';
 require(dirname(__FILE__).'/_header.php'); 
 
 param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
@@ -16,21 +17,8 @@ param( 'log', 'string', '' );		// last typed login
 $location = $redirect_to;
 
 ?>
-<a href="<?php echo $htsrv_url ?>/register.php" class="b2menutop"><?php echo T_('register ?') ?></a><br />
-<a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword" class="b2menutop"><?php echo T_('lost your password ?') ?></a>
-</td>
-</tr>
 
-<tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
-
-<?php
-if ($error)
-{
-	echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0000\">$error</font><br />&nbsp;</div>";
-}
-?>
-
-<form name="" action="<?php echo $location  ?>" method="post">
+<form action="<?php echo $location  ?>" method="post" class="fform" >
 <?php 
 	if( !empty($mode) ) 
 	{	// We're in the process of bookmarkletting somethin, we don't want to loose it:
@@ -45,16 +33,29 @@ if ($error)
 	<?php 
 	} 
 ?>
-	<table width="100" style="background-color: #ffffff">
-	<tr><td align="right"><?php echo T_('Login:') ?></td>
-		<td><input type="text" name="log" value="<?php echo $log ?>" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
-	<tr><td align="right"><?php echo T_('Password:') ?></td>
-		<td><input type="password" name="pwd" value="" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
-	<tr><td>&nbsp;</td>
-		<td><input type="submit" name="Submit2" value="OK" class="search">&nbsp;&nbsp;&nbsp;</td></tr>
-	</table>
+	<fieldset>
+		<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div> 
+		<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="<?php echo format_to_output($log, 'formvalue'); ?>" class="large" /></div>
+	</fieldset>
+
+	<fieldset>
+		<div class="label"><label for="pwd"><?php echo T_('Password:') ?></label></div> 
+		<div class="input"><input type="password" name="pwd" id="pwd" size="16" maxlength="20" value="" class="large" /></div>
+	</fieldset>
+
+	<fieldset>
+		<div class="input">
+			<input type="submit" name="submit" value="<?php echo T_('Log in!') ?>" class="search">
+		</div>
+	</fieldset>
 
 </form>
+
+<div style="text-align:right">
+<a href="<?php echo $htsrv_url ?>/register.php"><?php echo T_('Register ?') ?></a>
+&middot;
+<a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword"><?php echo T_('Lost your password ?') ?></a>
+</div>
 
 <?php 
 	require(dirname(__FILE__).'/_footer.php'); 

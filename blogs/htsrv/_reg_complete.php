@@ -5,27 +5,21 @@
  * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
- * This is the registration form
+ * This is displayed when registration is complete
  */
-
-	$page_title = T_('Registration complete');
-	require(dirname(__FILE__).'/_header.php'); 
+$page_title = T_('Registration complete');
+$page_icon = 'icon_register.gif';
+require(dirname(__FILE__).'/_header.php'); 
 ?>
-<?php echo T_('Registration complete') ?>
-</td>
-</tr>
+<p><?php echo T_('Login:') ?> <strong><?php echo $login ?>&nbsp;</strong></p>
+<p><?php echo T_('Email') ?>: <strong><?php echo $email ?>&nbsp;</strong></p>
 
-<tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
-
-<table width="180">
-<tr><td align="right" colspan="2"><?php echo T_('Login') ?>: <strong><?php echo $login ?>&nbsp;</strong></td></tr>
-<tr><td align="right" colspan="2"><?php echo T_('Email') ?>: <strong><?php echo $email ?>&nbsp;</strong></td></tr>
-<tr><td width="90">&nbsp;</td>
-<td><form name="login" action="<?php echo $htsrv_url ?>/login.php" method="post">
-<input type="hidden" name="log" value="<?php echo $user_login ?>" />
+<form name="login" action="<?php echo $htsrv_url ?>/login.php" method="post">
+<input type="hidden" name="log" value="<?php echo $login ?>" />
 <input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
-<input type="submit" class="search" value="Login" name="submit" /></form></td></tr>
-</table>
+<input type="submit" class="search" value="<?php  echo T_('Log in!') ?>" name="submit" />
+</form>
+
 
 <?php 
 	require(dirname(__FILE__).'/_footer.php'); 
