@@ -57,7 +57,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @param integer ID of post
  * @return string validated url title
  */
-function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false, $dbprefix = 'post_', $dbIDname = 'ID' )
+function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
+															$dbprefix = 'post_', $dbIDname = 'ID', $dbtable = 'T_posts' )
 {
 	global $DB;
 
@@ -91,7 +92,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	// Find all occurrences of urltitle+number in the DB:
 	$sql = 'SELECT '.$dbprefix.'urltitle
-					FROM T_posts
+					FROM '.$dbtable.'
 					WHERE '.$dbprefix."urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'";
 	if( $post_ID )
 		$sql .= " AND $dbIDname <> $post_ID";
@@ -937,6 +938,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.20  2005/03/02 15:28:14  fplanque
+ * minor
+ *
  * Revision 1.19  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
