@@ -76,7 +76,7 @@ locale_activate( $default_locale );
 
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
-$BlogCache = & new DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
+$BlogCache = & new BlogCache();
 $ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
 
 

@@ -8,6 +8,7 @@
  *
  * @package b2evocore
  */
+require_once dirname(__FILE__).'/_class_blogcache.php';
 
 /*
  * blog_create(-)
@@ -144,130 +145,25 @@ function blog_update_user_perms( $blog )
 	}
 }
 
-/*
+/**
  * get_bloginfo(-)
+ *
+ * @deprecated deprecated by Blog::get() This is now a dirty stub
  */
 function get_bloginfo( $show = '', $this_blogparams = '' )
 {
-	global $blog, $xmlsrv_url, $admin_email, $baseurl;
+	global $Blog, $BlogCache;
 
 	if( empty( $this_blogparams ) )
 	{	// We want the global blog on the page
-		$this_blogparams = get_blogparams_by_ID( $blog );
+		$current_Blog = & $Blog;		
 	}
-
-	switch($show)
+	else
 	{
-		case 'subdir':
-			$output = $this_blogparams->blog_siteurl;
-			break;
-
-		case 'blogurl':
-		case 'link':			// RSS wording
-		case 'url':
-			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub;
-			break;
-
-		case 'dynurl':
-			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_filename;
-			break;
-
-		case 'staticurl':
-			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_staticfilename;
-			break;
-
-		case 'baseurl':
-			$output = $baseurl.$this_blogparams->blog_siteurl.'/';
-			break;
-
-		case 'blogstatsurl':
-			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
-								'?disp=stats';
-			break;
-
-		case 'lastcommentsurl':
-			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
-								'?disp=comments';
-			break;
-
-		case 'description':			// RSS wording
-		case 'shortdesc':
-			$output = $this_blogparams->blog_description;
-			break;
-
-		case 'blogroll':
-			$output = $this_blogparams->blog_roll;
-			break;
-
-		case 'ID':
-		case 'siteurl':
-		case 'filename':
-		case 'staticfilename':
-		case 'stub':
-		case 'tagline':
-		case 'keywords':
-		case 'longdesc':
-		case 'locale':
-		case 'shortname':
-		case 'default_skin':
-		case 'allowtrackbacks':
-		case 'allowpingbacks':
-		case 'pingb2evonet':
-		case 'pingtechnorati':
-		case 'pingweblogs':
-		case 'pingblodotgs':
-		case 'default_skin':
-		case 'disp_bloglist':
-			$paramname = 'blog_' . $show;
-			$output =  $this_blogparams->$paramname;
-			break;
-
-		case 'rdf_url':
-			$output = $xmlsrv_url.'/rdf.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'rss_url':
-			$output = $xmlsrv_url.'/rss.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'rss2_url':
-			$output = $xmlsrv_url.'/rss2.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'atom_url':
-			$output = $xmlsrv_url.'/atom.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'comments_rdf_url':
-			$output = $xmlsrv_url.'/rdf.comments.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'comments_rss_url':
-			$output = $xmlsrv_url.'/rss.comments.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'comments_rss2_url':
-			$output = $xmlsrv_url.'/rss2.comments.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'comments_atom_url':
-			$output = $xmlsrv_url.'/atom.comments.php?blog='.$this_blogparams->blog_ID;
-			break;
-
-		case 'pingback_url':
-			$output = $xmlsrv_url.'/xmlrpc.php';
-			break;
-
-		case 'admin_email':
-			$output = $admin_email;
-			break;
-
-		case 'name':
-		default:
-			$output =  $this_blogparams->blog_name;
-			break;
+		$current_Blog = $BlogCache->get_by_ID($this_blogparams->blog_ID);
 	}
-	return trim($output);
+	
+	return $current_Blog->get( $show );
 }
 
 

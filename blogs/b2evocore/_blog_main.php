@@ -78,16 +78,16 @@ if( ($pos = strpos( $path_string[0], $blog_baseurl )) !== false )
 	$path_elements = explode( '/', $path_string, 20 );						// slice it
 	$i=0;
 	// echo $path_elements[$i];
-	if( $path_elements[$i] == 'index.php' )
+	if( isset( $path_elements[$i] ) && $path_elements[$i] == 'index.php' )
 	{ // Ignore index.html
 		$i++;
 	}
-	elseif( $path_elements[$i] == $Blog->get( 'filename' ) )
+	elseif( isset( $path_elements[$i] ) && $path_elements[$i] == $Blog->get( 'filename' ) )
 	{ // Ignore stub file (complete form)
 		$i++;
 	}
 	
-	if( $path_elements[$i] == $Blog->get( 'stub' ) )
+	if( isset( $path_elements[$i] ) && $path_elements[$i] == $Blog->get( 'stub' ) )
 	{ // Ignore stub file (url form)
 		$i++;
 	}

@@ -17,10 +17,37 @@
 require_once dirname(__FILE__).'/b2evocore/_main.php';
 
 // Check if a specific blog has been requested in the URL:
-param( 'blog', 'integer', $Settings->get('default_blog_ID'), true );
+param( 'blog', 'integer', '', true );
 
 if( empty($blog) )
-{	// No blog requested, we are going to display the default page:
+{	// No blog requested, by URL param, let's check extrapath
+
+	$ReqURI = $_SERVER['REQUEST_URI'];
+	// echo "ReqURI:".$ReqURI."<br />";
+	// Remove params:
+	$path_string = explode( '?', $ReqURI, 2 );	
+	// Check and Remove current page url:
+	$index_url = substr( $baseurl, strlen( $baseurlroot ) ) . '/index.php';
+	if( ($pos = strpos( $path_string[0], $index_url )) !== false )
+	{ // note: $pos will typically be 0
+		$path_string = substr( $path_string[0], $pos+strlen( $index_url ) );
+		// echo "path=$path_string <br>";
+		$path_elements = explode( '/', $path_string, 20 );						// slice it
+		if( isset($path_elements[1]) && (($Blog = $BlogCache->get_by_stub( $path_elements[1], false )) !== false) )
+		{	// We found a matching blog:
+			$blog = $Blog->ID;
+		}
+	}
+}
+
+if( empty($blog) )
+{	// Still no blog requested,
+	$blog = $Settings->get('default_blog_ID');
+}
+
+if( empty($blog) )
+{	// No specific blog to be displayed:
+	// we are going to display the default page:
 	require dirname(__FILE__).'/default.php';
 	exit();
 }

@@ -23,7 +23,8 @@
 
 	<?php
 		form_radio( 'blog_access_type', $blog_access_type,
-				array(  array( 'index.php', T_('Through index.php'), $baseurl.$blog_siteurl.'/index.php?blog='.$blog ),
+				array(  array( 'index.php', T_('Through index.php'), 
+								$baseurl.$blog_siteurl.'/index.php'.( ($Settings->get('links_extrapath')) ? '/'.$blog_stub : '?blog='.$blog) ),
 								array( 'stub', T_('Through stub file'), $baseurl.$blog_siteurl.'/'.$blog_stub ),
 							), T_('Preferred access type'), true );
 	?>

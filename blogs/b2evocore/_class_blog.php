@@ -125,11 +125,15 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( )
 	{
-		global $baseurl;
+		global $baseurl, $Settings;
 		
 		switch( $this->access_type )
 		{
 			case 'index.php':
+				if( $Settings->get('links_extrapath') )
+				{
+					return $baseurl.$this->siteurl.'/index.php/'.$this->stub;
+				}
 				return $baseurl.$this->siteurl.'/index.php?blog='.$this->ID;
 			
 			case 'stub':

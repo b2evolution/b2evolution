@@ -17,11 +17,12 @@
 require_once dirname(__FILE__).'/b2evocore/_main.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title><?php echo T_('Default page for b2evolution') ?></title>
-<link href="rsc/b2evo.css" rel="stylesheet" type="text/css" />
- 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+<head>
+	<base href="<?php echo $baseurl ?>/" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title><?php echo T_('Default page for b2evolution') ?></title>
+	<link href="rsc/b2evo.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="rowheader2">
@@ -46,7 +47,7 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 		echo '<li><strong>';
 		printf( T_('Blog #%d'), $curr_blog_ID );
 		echo ': <a href="';
-		blog_list_iteminfo('blogurl', 'raw');
+		blog_list_iteminfo( 'blogurl', 'raw');
 		echo '" title="';
 		blog_list_iteminfo( 'shortdesc', 'htmlattr');
 		echo '">';
