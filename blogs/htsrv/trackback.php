@@ -2,17 +2,49 @@
 /**
  * This file handles trackback requests
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
  *
  * @package htsrv
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE
+ *
+ * @version $Id$
  */
+
 
 /**
  * Initialize everything:
  */
-require_once (dirname(__FILE__).'/../evocore/_main.inc.php');
+require_once( dirname(__FILE__).'/../evocore/_main.inc.php' );
 
 // statuses allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private' );
@@ -22,24 +54,29 @@ param( 'url', 'string' );
 param( 'title', 'string' );
 param( 'excerpt', 'html' );
 param( 'blog_name', 'string' );
-if(empty($tb_id))
-{	// No parameter for ID, get if from URL:
+
+
+if( empty($tb_id) )
+{ // No parameter for ID, get if from URL:
 	$path_elements = explode( '/', $ReqPath, 30 );
 	$tb_id = intval( $path_elements[count($path_elements)-1] );
 }
 
-if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)))
+if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 {
 	@header('Content-Type: text/xml');
 
 	$comment_post_ID = $tb_id;
 	$postdata = get_postdata($comment_post_ID);
 	$blog = $postdata['Blog'];
-	$blogparams = get_blogparams_by_ID( $blog );
-
-	if( !get_bloginfo('allowtrackbacks', $blogparams) )
+	if( !( $Blog =& $BlogCache->get_by_ID( $blog ) ) )
 	{
-		trackback_response(1, 'Sorry, this weblog does not allow you to trackback its posts.');
+		trackback_response( 1, 'Sorry, could not get the post\'s weblog.' );
+	}
+
+	if( !$Blog->get('allowtrackbacks') )
+	{
+		trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' );
 	}
 
 	$title = strip_tags($title);
@@ -97,25 +134,19 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		$recipient = $AuthorUser->get( 'email' );
 		$subject = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
 
-		// fplanque added:
-		$comment_blogparams = get_blogparams_by_ID( $blog );
-
-		$notify_message  = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
-		$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$comment_post_ID&tb=1\n\n", '&' );
-		$notify_message .= T_('Website').": $comment_author (IP: $user_ip , $user_domain)\n";
-		$notify_message .= T_('Url').": $comment_author_url\n";
-		$notify_message .= T_('Excerpt').": \n".$original_comment."\n\n";
-		$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
+		$notify_message = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
+											.url_add_param( $Blog->get('blogurl'), "p=$comment_post_ID&tb=1\n\n", '&' );
+											.T_('Website').": $comment_author (IP: $user_ip , $user_domain)\n";
+											.T_('Url').": $comment_author_url\n";
+											.T_('Excerpt').": \n".$original_comment."\n\n";
+											.T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
 		send_mail( $recipient, $subject, $notify_message, $notify_from );
-		locale_restore_previous();
 
+		locale_restore_previous();
 	}
 
-	trackback_response(0,'ok');
-
-
+	trackback_response( 0, 'ok' );
 }
-
 
 ?>

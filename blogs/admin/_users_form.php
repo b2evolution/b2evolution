@@ -196,7 +196,7 @@ $Form->info( T_('ID'), $edited_User->dget('ID') );
 
 if( $app_shortname == 'b2evo' )
 {	// TODO: move this out of the core?
-	$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? get_usernumposts($edited_User->get('ID')) : '-' );
+	$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->getNumPosts() : '-' );
 }
 $Form->info( T_('Created on'), $edited_User->dget('datecreated') );
 $Form->info( T_('From IP'), $edited_User->dget('ip') );

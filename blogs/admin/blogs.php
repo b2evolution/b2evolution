@@ -35,16 +35,16 @@ $admin_pagetitle = T_('Blogs');
 param( 'action', 'string', '' );
 param( 'tab', 'string', 'general' );
 param( 'blogtemplate', 'integer', -1 );
-		
+
 
 if( $action == 'edit' || $action == 'update' || $action == 'delete' || $action == 'GenStatic' )
 { // we need the blog param
 	param( 'blog', 'integer', true );
 	$edited_Blog = & $BlogCache->get_by_ID( $blog );
 }
-elseif ( $action == 'new' && $blogtemplate != -1)
+elseif( $action == 'new' && $blogtemplate != -1 )
 {
-		$edited_Blog = & $BlogCache->get_by_ID( $blogtemplate );
+	$edited_Blog = & $BlogCache->get_by_ID( $blogtemplate );
 }
 else
 {
@@ -237,7 +237,7 @@ switch($action)
 			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', 'new' ) );
 			param( 'blog_siteurl_type',     'string', 'relative' );
 		}
-		
+
 		echo '<div class="panelblock">';
 		echo '<h2>', T_('New blog'), ':</h2>';
 
@@ -284,15 +284,15 @@ switch($action)
 							'href="b2categories.php?action=newcat&amp;blog='.$edited_Blog->ID.'"' );
 				echo '</strong></p>';
 			}
-			else 
+			else
 			{
-				// copy the categories from $blogtemplateid to $blog	
+				// copy the categories from $blogtemplateid to $blog
 				blog_copy_cats($blogtemplate, $edited_Blog->ID);
 			}
 			echo '</div>';
 			break;
 		}
-	
+
 
 		echo '</div>';
 		// NOTE: no break here, we go on to next form if there was an error!
@@ -409,9 +409,9 @@ switch($action)
 				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 				<p>
-				
+
 				<?php
-				
+
 					$Form = &new Form( 'blogs.php', '', 'get', 'none' );
 
 					$Form->begin_form( 'inline' );
@@ -479,7 +479,7 @@ switch($action)
 		<?php
 		$current_User->check_perm( 'blog_genstatic', 'any', true, $blog );
 
-		$staticfilename = get_bloginfo('staticfilename');
+		$staticfilename = $edited_Blog->get('staticfilename');
 		if( empty( $staticfilename ) )
 		{
 			echo '<p class="error">', T_('You haven\'t set a static filename for this blog!'), "</p>\n</div>\n";
@@ -559,6 +559,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.24  2005/02/15 22:05:24  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.23  2005/01/27 13:34:57  fplanque
  * i18n tuning
  *

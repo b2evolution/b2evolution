@@ -241,8 +241,9 @@ else
 // Displaying of blog list on templates?
 if( !isset($display_blog_list) )
 { // If not already set in stub:
-	$display_blog_list = get_bloginfo('disp_bloglist');
+	$display_blog_list = $Blog->get('disp_bloglist');
 }
+
 
 /*
  * Now, we'll jump to displaying!
@@ -329,6 +330,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/15 22:05:03  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.4  2005/01/21 21:03:57  jwedgeco
  * Added some debug statements to log the decoding of the date from the request uri.
  *

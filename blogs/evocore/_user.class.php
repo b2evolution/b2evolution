@@ -73,6 +73,13 @@ class User extends DataObject
 	var $level;
 	var $notify;
 	var $showonline;
+	/**
+	 * Number of posts by this user.
+	 * Use get('num_posts') to access this.
+	 * @var integer|NULL
+	 * @access protected
+	 */
+	var $_numPosts;
 
 	var $Group; // Pointer to group
 
@@ -176,12 +183,30 @@ class User extends DataObject
 				}
 
 			case 'num_posts':
-				return get_usernumposts( $this->ID );
+				return $this->getNumPosts();
 
 			default:
 			// All other params:
 				return parent::get( $parname );
 		}
+	}
+
+
+	/**
+	 * Get the number of posts for the user.
+	 *
+	 * @return integer
+	 */
+	function getNumPosts()
+	{
+		if( is_null( $this->_numPosts ) )
+		{
+			$this->_numPosts = $DB->get_var( "SELECT count(*)
+																				FROM T_posts
+																				WHERE post_creator_user_ID = $this->ID" );
+		}
+
+		return $this->_numPosts;
 	}
 
 
@@ -381,7 +406,7 @@ class User extends DataObject
 					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
 					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br />";
 					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
-					{	// not already in list: add it:
+					{ // not already in list: add it:
 						$perm_target_blogs[] = $loop_cat_blog_ID;
 					}
 				}
@@ -389,7 +414,7 @@ class User extends DataObject
 				foreach( $perm_target_blogs as $loop_blog_ID )
 				{
 					if( ! $this->check_perm_blogusers( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
-					{	// If at least one blog is denied:
+					{ // If at least one blog is denied:
 						return false;	// permission denied
 					}
 				}
@@ -602,7 +627,7 @@ class User extends DataObject
 		global $img_url;
 
 		if( empty($this->email) )
-		{	// We have no email for this User :(
+		{ // We have no email for this User :(
 			return false;
 		}
 
@@ -639,9 +664,10 @@ class User extends DataObject
 			return $this->dget( 'preferedname', $format );
 		}
 	}
-	
+
+
 	/**
-	 * Template function: return user's prefered name
+	 * Return user's prefered name
 	 *
 	 * {@internal User::prefered_name(-) }}
 	 *
@@ -649,8 +675,7 @@ class User extends DataObject
 	 */
 	function prefered_name_return( $format = 'htmlbody' )
 	{
-		$r = $this->prefered_name( $format, false );
-		return $r;
+		return $this->prefered_name( $format, false );
 	}
 
 
@@ -672,10 +697,98 @@ class User extends DataObject
 			echo $after;
 		}
 	}
+
+
+	/**
+	 * Template function: display number of user's posts
+	 */
+	function numPosts( $format = 'htmlbody' )
+	{
+		echo format_to_output( $this->getNumPosts(), $format );
+	}
+
+
+	/**
+	 * Template function: display first name of the user
+	 */
+	function firstName( $format = 'htmlbody' )
+	{
+		$this->disp( 'firstname', $format );
+	}
+
+
+	/**
+	 * Template function: display last name of the user
+	 */
+	function lastName( $format = 'htmlbody' )
+	{
+		$this->disp( 'lastname', $format );
+	}
+
+
+	/**
+	 * Template function: display nickname of the user
+	 */
+	function nickName( $format = 'htmlbody' )
+	{
+		$this->disp( 'nickname', $format );
+	}
+
+
+	/**
+	 * Template function: display email of the user
+	 */
+	function email( $format = 'htmlbody' )
+	{
+		$this->disp( 'email', $format );
+	}
+
+
+	/**
+	 * Template function: display ICQ of the user
+	 */
+	function icq( $format = 'htmlbody' )
+	{
+		$this->disp( 'icq', $format );
+	}
+
+
+	/**
+	 * Template function: display AIM of the user.
+	 *
+	 * NOTE: Replaces spaces with '+' ?!?
+	 */
+	function aim( $format = 'htmlbody' )
+	{
+		echo format_to_output( str_replace(' ', '+', $this->get('aim') ), $format );
+	}
+
+
+	/**
+	 * Template function: display Yahoo IM of the user
+	 */
+	function yim( $format = 'htmlbody' )
+	{
+		$this->disp( 'yim', $format );
+	}
+
+
+	/**
+	 * Template function: display MSN of the user
+	 */
+	function msn( $format = 'htmlbody' )
+	{
+		$this->disp( 'msn', $format );
+	}
+
+
 }
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/15 22:05:10  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.8  2005/01/20 20:37:59  fplanque
  * bugfix
  *

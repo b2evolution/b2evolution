@@ -110,6 +110,11 @@ if( !function_exists( 'gzencode' ) )
 	$use_gzipcompression = false;
 }
 
+/**
+ * Include obsolete functions
+ */
+@include_once( dirname(__FILE__).'/_obsolete092.php' );
+
 
 /**
  * Includes:
@@ -309,6 +314,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/15 22:05:08  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.16  2005/02/15 20:05:51  fplanque
  * no message
  *

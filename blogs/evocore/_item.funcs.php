@@ -126,7 +126,8 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	return $urltitle;
 }
 
-/*
+
+/**
  * get_postdata(-)
  *
  * if global $postdata was not set it will be
@@ -188,175 +189,6 @@ function get_postdata($postid)
 }
 
 
-
-/**
- * get_the_title(-)
- *
- * @deprecated
- */
-function get_the_title()
-{
-	global $id,$postdata;
-	$output = trim( $postdata['Title'] );
-	return($output);
-}
-
-
-
-
-/*
- * TEMPLATE FUNCTIONS
- */
-
-
-/*****
- * Post tags
- *****/
-
-
-
-/*
- * the_ID(-)
- *
- *
- * @deprecated deprecated by {@link DataObject::ID()}
- *
- */
-function the_ID()
-{
-	global $id;
-	echo $id;
-}
-
-/*
- * the_status(-)
- *
- * Display post status
- *
- * @deprecated deprecated by {@link Item::status()}
- */
-function the_status( $raw = true )
-{
-	global $post_statuses, $postdata;
-	$status = $postdata['Status'];
-	if( $raw )
-		echo $status;
-	else
-		echo T_($post_statuses[$status]);
-}
-
-
-/*
- * the_lang(-)
- *
- * Display post language code
- *
- * @deprecated deprecated by {@link Item::lang()}
- */
-function the_lang()
-{
-	global $postdata;
-	echo $postdata['Locale'];
-}
-
-/*
- * the_language(-)
- *
- * Display post language name
- *
- * @deprecated deprecated by {@link Item::language()}
- */
-function the_language()
-{
-	global $postdata, $languages;
-	$post_lang = $postdata['Locale'];
-	echo $languages[ $post_lang ];
-}
-
-/*
- * the_wordcount(-)
- * Display the number of words in the post
- *
- *
- * @deprecated deprecated by {@link Item::wordcount()}
- */
-function the_wordcount()
-{
-	global $postdata;
-	echo $postdata['Wordcount'];
-}
-
-/*
- * the_title(-)
- *
- * Display post title
- * 03.10.10 - Updated function to allow for silent operations
- *
- * @deprecated deprecated by {@link Item::title()}
- */
-function the_title(
-	$before='',						// HTML/text to be displayed before title
-	$after='', 						// HTML/text to be displayed after title
-	$add_link = true, 		// Added link to this title?
-	$format = 'htmlbody',	// Format to use (example: "htmlbody" or "xml")
-	$disp = true )				// Display output?
-{
-	global $postdata;
-
-	$title = get_the_title();
-	$url = trim($postdata['Url']);
-
-	if( empty($title) && $add_link )
-	{
-		$title = $url;
-	}
-
-	if( empty($title) )
-		return;
-
-	if( $add_link && (!empty($url)) )
-	{
-		$title = $before.'<a href="'.$url.'">'.$title.'</a>'.$after;
-	}
-	else
-	{
-		$title = $before.$title.$after;
-	}
-
-	//	ADDED: 03.10.08 by Travis S. :Support for silent operation
-	$return_str = format_to_output( $title, $format );
-	if( $disp == true )
-		echo $return_str;
-	else
-		return $return_str;
-}
-
-
-/*
- * the_link(-)
- *
- * Display post link
- *
- * @deprecated deprecated by {@link Item::url_link()}
- */
-function the_link( $before='', $after='', $format = 'htmlbody' )
-{
-	global $postdata;
-
-	$url = trim($postdata['Url']);
-
-	if( empty($url) )
-	{
-		return false;
-	}
-
-	$link = $before.'<a href="'.$url.'">'.$url.'</a>'.$after;
-
-	echo format_to_output( $link, $format );
-}
-
-
-
 /**
  * {@internal single_post_title(-)}}
  *
@@ -404,133 +236,8 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	}
 }
 
-/**
- * {@internal preview_title(-)}}
- */
-function preview_title( $string = '#', $before = ' ', $after = '' )
-{
-	global $preview;
-
-	if( $preview )
-	{
-		echo $before;
-		echo ($string == '#') ? T_('PREVIEW') : $string;
-		echo $after;
-	}
-}
-
 
 /**
- * the_content(-)
- *
- * @deprecated deprecated by {@link Item::content()}
- */
-function the_content(
-	$more_link_text='#',
-	$stripteaser=0,
-	$more_file='',
-	$more_anchor='#',
-	$before_more_link = '#',
-	$after_more_link = '#',
-	$format = 'htmlbody',
-	$cut = 0,
-	$dispmore = '#',  // 1 to display 'more' text, # for url parameter
-	$disppage = '#' ) // page number to display specific page, # for url parameter
-{
-	global $id, $postdata, $pages, $multipage, $numpages;
-	global $preview;
-
-	// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
-
-	if( $more_link_text == '#' )
-	{ // TRANS: this is the default text for the extended post "more" link
-		$more_link_text = '=> '.T_('Read more!');
-	}
-
-	if( $more_anchor == '#' )
-	{ // TRANS: this is the default text displayed once the more link has been activated
-		$more_anchor = '['.T_('More:').']';
-	}
-
-	if( $before_more_link == '#' )
-		$before_more_link = '<p class="bMore">';
-
-	if( $after_more_link == '#' )
-		$after_more_link = '</p>';
-
-	if( $dispmore === '#' )
-	{
-		global $more;
-		$dispmore = $more;
-	}
-
-	if( $disppage === '#' )
-	{
-		global $page;
-		$disppage = $page;
-	}
-	if( $disppage > $numpages ) $disppage = $numpages;
-	// echo 'Using: dmore=', $dispmore, ' dpage=', $disppage;
-
-	$output = '';
-	if ($more_file != '')
-		$file = $more_file;
-	else
-		$file = get_bloginfo('blogurl');
-
-	$content = $pages[$disppage-1];
-	$content = explode('<!--more-->', $content);
-
-	if ((preg_match('/<!--noteaser-->/', $postdata['Content']) && ((!$multipage) || ($disppage==1))))
-		$stripteaser=1;
-	$teaser=$content[0];
-	if (($dispmore) && ($stripteaser))
-	{ // We don't want to repeat the teaser:
-		$teaser='';
-	}
-	$output .= $teaser;
-
-	if (count($content)>1)
-	{
-		if ($dispmore)
-		{ // Viewer has already asked for more
-			if( !empty($more_anchor) ) $output .= $before_more_link;
-			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
-			if( !empty($more_anchor) ) $output .= $after_more_link;
-			$output .= $content[1];
-		}
-		else
-		{ // We are offering to read more
-			$more_link = gen_permalink( $file, $id, 'id', 'single', 1 );
-			$output .= $before_more_link.'<a href="'.$more_link.'#more'.$id.'">'.$more_link_text.'</a>'.$after_more_link;
-		}
-	}
-	if ($preview)
-	{ // preview fix for javascript bug with foreign languages
-		$output = preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
-	}
-
-	$content = format_to_output( $output, $format );
-
-	if( ($format == 'xml') && $cut )
-	{ // Let's cut this down...
-		$blah = explode(' ', $content);
-		if (count($blah) > $cut)
-		{
-			for ($i=0; $i<$cut; $i++)
-			{
-				$excerpt .= $blah[$i].' ';
-			}
-			$content = $excerpt . '...';
-		}
-	}
-	echo $content;
-}
-
-
-
-
-/*
  * link_pages(-)
  * vegarg: small bug when using $more_file fixed
  */
@@ -579,7 +286,7 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 }
 
 
-/*
+/**
  * previous_post(-)
  *
  *
@@ -636,7 +343,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 }
 
 
-/*
+/**
  * next_post(-)
  *
  *
@@ -694,7 +401,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 }
 
 
-/*
+/**
  * next_posts(-)
  */
 function next_posts($max_page = 0, $page='' )
@@ -721,8 +428,7 @@ function next_posts($max_page = 0, $page='' )
 }
 
 
-
-/*
+/**
  * previous_posts(-)
  */
 function previous_posts( $page='' )
@@ -773,7 +479,6 @@ function next_posts_link($label='#', $max_page=0, $page='')
 }
 
 
-
 /**
  * previous_posts_link(-)
  *
@@ -793,7 +498,6 @@ function previous_posts_link($label='#', $page='')
 		echo '">'.htmlspecialchars($label).'</a>';
 	}
 }
-
 
 
 /**
@@ -820,69 +524,10 @@ function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 }
 
 /*****
- * // Post tags
- *****/
-
-
-
-
-/*****
  * Date/Time tags
  *****/
 
 /**
- * the_date(-)
- *
- * @deprecated deprecated by {@link ItemList::date_if_changed()}
- */
-function the_date($d='', $before='', $after='', $echo = 1)
-{
-	global $id, $postdata, $day, $previousday, $newday;
-	$the_date = '';
-	if ($day != $previousday)
-	{
-		$the_date .= $before;
-		if ($d=='') {
-			$the_date .= mysql2date( locale_datefmt(), $postdata['Date']);
-		} else {
-			$the_date .= mysql2date( $d, $postdata['Date']);
-		}
-		$the_date .= $after;
-		$previousday = $day;
-	}
-	if ($echo) {
-		echo $the_date;
-	} else {
-		return $the_date;
-	}
-}
-
-/**
- * the_time(-)
- *
- *
- * @deprecated deprecated by {@link Item::time()} / {@link Item::date()}
- *
- */
-function the_time($d='', $echo = 1, $useGM = 0)
-{
-	global $id,$postdata;
-	if ($d=='')
-	{
-		$the_time = mysql2date( locale_timefmt(), $postdata['Date'], $useGM);
-	} else {
-		$the_time = mysql2date( $d, $postdata['Date'], $useGM);
-	}
-
-	if ($echo)
-	{
-		echo $the_time;
-	} else {
-		return $the_time;
-	}
-}
-
-/*
  * the_weekday(-)
  *
  *
@@ -894,7 +539,8 @@ function the_weekday()
 	echo $the_weekday;
 }
 
-/*
+
+/**
  * the_weekday_date(-)
  *
  *
@@ -913,216 +559,6 @@ function the_weekday_date($before='',$after='')
 	echo $the_weekday_date;
 }
 
-/*****
- * // Date/Time tags
- *****/
-
-/*****
- * Author tags
- *****/
-
-/*
- * the_author(-)
- *
- * @deprecated deprecated by {@link User::prefered_name()}
- */
-function the_author( $format = 'htmlbody' )
-{
-	global $authordata;
-	switch( $authordata['user_idmode'] )
-	{
-		case 'nickname':
-			$author = $authordata['user_nickname'];
-			break;
-
-		case 'login':
-			$author = $authordata['user_login'];
-			break;
-
-		case 'firstname':
-			$author = $authordata['user_firstname'];
-			break;
-
-		case 'lastname':
-			$author = $authordata['user_lastname'];
-			break;
-
-		case 'namefl':
-			$author = $authordata['user_firstname'].' '.$authordata['user_lastname'];
-			break;
-
-		case 'namelf':
-			$author = $authordata['user_lastname'].' '.$authordata['user_firstname'];
-			break;
-
-		default:
-			$author = $authordata['user_nickname'];
-	}
-
-	echo format_to_output( $author, $format );
-}
-
-
-/*
- * the_author_level(-)
- *
- * @deprecated deprecated by {@link User::level()}
- */
-function the_author_level()
-{
-	global $authordata;
-	echo $authordata['user_level'];
-}
-
-/*
- * the_author_login(-)
- *
- * @deprecated deprecated by {@link User::level()}
- */
-function the_author_login( $format = 'htmlbody' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_login'], $format );
-}
-
-/*
- * the_author_firstname(-)
- */
-function the_author_firstname( $format = 'htmlbody' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_firstname'], $format );
-}
-
-/*
- * the_author_lastname(-)
- */
-function the_author_lastname( $format = 'htmlbody' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_lastname'], $format );
-}
-
-/*
- * the_author_nickname(-)
- */
-function the_author_nickname( $format = 'htmlbody' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_nickname'], $format );
-}
-
-/*
- * the_author_ID(-)
- *
- * @deprecated deprecated by {@link DataObject::ID()}
- */
-function the_author_ID()
-{
-	global $authordata;
-	echo $authordata['ID'];
-}
-
-/*
- * the_author_email(-)
- */
-function the_author_email( $format = 'raw' )
-{
-	global $authordata;
-	echo format_to_output( antispambot($authordata['user_email']), $format );
-}
-
-/*
- * the_author_url(-)
- *
- * @deprecated deprecated by {@link User::url()}
- */
-function the_author_url( $format = 'raw' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_url'], $format );
-}
-
-/*
- * the_author_icq(-)
- */
-function the_author_icq( $format = 'raw' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_icq'], $format );
-}
-
-/*
- * the_author_aim(-)
- */
-function the_author_aim( $format = 'raw' )
-{
-	global $authordata;
-	echo format_to_output( str_replace(' ', '+', $authordata['user_aim']), $format );
-}
-
-/*
- * the_author_yim(-)
- */
-function the_author_yim( $format = 'raw' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_yim'], $format );
-}
-
-/*
- * the_author_msn(-)
- */
-function the_author_msn( $format = 'raw' )
-{
-	global $authordata;
-	echo format_to_output( $authordata['user_msn'], $format );
-}
-
-/*
- * the_author_posts(-)
- */
-function the_author_posts()
-{
-	global $postdata;
-	$posts = get_usernumposts($postdata['Author_ID']);
-	echo $posts;
-}
-
-/*****
- * // Author tags
- *****/
-
-
-
-
-
-/***** Permalink tags *****/
-
-/**
- * permalink_anchor(-)
- *
- * generate anchor for permalinks to refer to
- *
- * TODO: archives modes in clean mode
- *
- * @deprecated deprecated by {@link Item::anchor()}
- */
-function permalink_anchor( $mode = 'id' )
-{
-	global $id, $postdata;
-	switch(strtolower($mode))
-	{
-		case 'title':
-			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
-			echo '<a name="'.$title.'"></a>';
-			break;
-		case 'id':
-		default:
-			echo '<a name="'.$id.'"></a>';
-			break;
-	}
-}
 
 /**
  * gen_permalink(-)
@@ -1230,7 +666,7 @@ function gen_permalink(
  *
  * Display permalink
  *
- * @deprecated deprecated by {@link (Item::permalink())} but still used by _archives.php
+ * @deprecated deprecated by {@link (Item::permalink())} but still used by _archives.plugin.php
  */
 function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
 {
@@ -1240,58 +676,17 @@ function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
 	echo gen_permalink( $file, $post_ID, $mode );
 }
 
-/**
- * permalink_single(-)
- *
- * Permalink forced to a single post
- *
- * @deprecated deprecated by {@link Item::permalink()}
- */
-function permalink_single($file='')
-{
-	global $id;
-	if (empty($file)) $file = get_bloginfo('blogurl');
-	echo gen_permalink( $file, $id, 'id', 'single' );
-}
-
-
-/**
- * {@internal the_permalink(-) }}
- *
- * @deprecated deprecated by {@link $Item::permalink()}
- */
-function the_permalink()
-{
-	global $Item;
-	$Item->permalink();
-}
-
-
-/***** // Permalink tags *****/
-
-
 
 // @@@ These aren't template tags, do not edit them
 
 
-/*
- * is_new_day(-)
- */
-function is_new_day()
-{
-	global $day, $previousday;
-	if ($day != $previousday) {
-		return(1);
-	} else {
-		return(0);
-	}
-}
-
-
-/*
- * bpost_count_words(-)
- *
+/**
  * Returns the number of the words in a string, sans HTML
+ *
+ * {@internal bpost_count_words(-)}}
+ *
+ * @param string
+ * @return integer
  */
 function bpost_count_words($string)
 {
@@ -1317,6 +712,7 @@ function bpost_count_words($string)
 
 	return $string;
 }
+
 
 /**
  * Construct the where clause to limit retrieved posts on their status
@@ -1446,7 +842,9 @@ function cat_select( $display_info = true )
 	return $r;
 }
 
-
+/**
+ * Header for {@link cat_select()}
+ */
 function cat_select_header()
 {
 	global $current_blog_ID, $blog, $allow_cross_posting;
@@ -1537,10 +935,11 @@ function cat_select_after_last( $parent_cat_ID, $level )
 }
 
 
-
-
 /*
  * $Log$
+ * Revision 1.16  2005/02/15 22:05:08  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.15  2005/02/15 20:05:49  fplanque
  * no message
  *

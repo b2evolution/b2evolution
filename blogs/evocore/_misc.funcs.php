@@ -1748,8 +1748,27 @@ function getIpList( $firstOnly = false )
 }
 
 
+/**
+ * Get the base domain (without "www.") of an URL.
+ *
+ * @param string URL
+ * @return string the base domain
+ */
+function getBaseDomain( $url )
+{
+	$baseDomain = preg_replace("/http:\/\//i", "", $url);
+	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
+	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
+
+	return $baseDomain;
+}
+
+
 /*
  * $Log$
+ * Revision 1.40  2005/02/15 22:05:09  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.39  2005/02/10 21:18:57  blueyed
  * getIpList() fixed
  *

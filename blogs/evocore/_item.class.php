@@ -94,7 +94,7 @@ class Item extends DataObject
 	 * @access public
 	 */
 	var $Author;
-	var $AssignedUser = NULL;
+	var $AssignedUser;
 	var $issue_date;
 	var $mod_date;
 	var $status;
@@ -143,7 +143,7 @@ class Item extends DataObject
 	 * @param string User ID field name
 	 */
 	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item',
- 												$datecreated_field = '', $datemodified_field = 'datemodified',
+												$datecreated_field = '', $datemodified_field = 'datemodified',
 												$creator_field = 'creator_user_ID', $lasteditor_field = '' )
 	{
 		global $UserCache, $object_def, $localtimenow;
@@ -169,7 +169,7 @@ class Item extends DataObject
 		else
 		{
 			$this->ID = $db_row->$dbIDname;
-			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] ); // NO COPY...(?)
+			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] );
 			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
 			$this->issue_date = $db_row->$db_cols['datestart'];
 			$this->mod_date =$db_row->$db_cols['datemodified'];
@@ -425,6 +425,7 @@ class Item extends DataObject
 						true );
 	}
 
+
 	/**
 	 * Template function: get list of assigned user options
 	 *
@@ -439,6 +440,7 @@ class Item extends DataObject
 							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
 							false );
 	}
+
 
 	/**
 	 * Template function: list all the category names
@@ -465,6 +467,7 @@ class Item extends DataObject
 		)
 	{
 		global $cache_postcats;
+		global $BlogCache;
 
 		if( $link_title == '#' )
 		{ /* TRANS: When the categories for a specific post are displayed, the user can click
@@ -483,8 +486,8 @@ class Item extends DataObject
 
 			if( $link_title )
 			{ // we want to display links
-				$curr_blogparams = get_blogparams_by_ID( $cat['cat_blog_ID'] );
-				$cat_name = '<a href="'.url_add_param( get_bloginfo('blogurl', $curr_blogparams), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
+				$lBlog =& $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
+				$cat_name = '<a href="'.url_add_param( $lBlog->get('blogurl'), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 			}
 
 			if( $cat_ID == $this->main_cat_ID )
@@ -960,7 +963,7 @@ class Item extends DataObject
 				break;
 
 			case 'trackbacks':
-				$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+				$current_Blog =& $BlogCache->get_by_ID( $this->blog_ID );
 				if( ! $current_Blog->get( 'allowtrackbacks' ) )
 				{ // Trackbacks not allowed on this blog:
 					return;
@@ -986,7 +989,7 @@ class Item extends DataObject
 				break;
 
 			default:
-				die( "Unkown feedback type [$type]" );
+				die( "Unknown feedback type [$type]" );
 		}
 
 		if( $use_popup == '#' )
@@ -1730,6 +1733,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2005/02/15 22:05:06  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.18  2005/01/25 15:07:22  fplanque
  * cleanup
  *

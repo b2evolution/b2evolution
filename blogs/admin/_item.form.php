@@ -151,7 +151,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '<div class="edit_actions">';
 
 	if( $use_preview )
-	{	// ---------- PREVIEW ----------
+	{ // ---------- PREVIEW ----------
 		$Form->button( array( 'button', '', T_('Preview'), '', 'open_preview(this.form);' ) );
 	}
 
@@ -160,7 +160,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ---------- DELETE ----------
   if( $next_action == 'update' )
-	{	// Editing post
+	{ // Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
@@ -185,11 +185,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->fieldset( T_('Advanced properties') );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
-	{	// ------------------------------------ TIME STAMP -------------------------------------
+	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
 	  if( $next_action == 'create' )
-	  {	// If not checked, create time will be used...
+	  { // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
 		}
 	}
@@ -221,11 +221,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
-	if( isset( $Blog ) && ((get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks'))) )
+	if( isset( $Blog ) && ( $Blog->get('allowpingbacks') || $Blog->get('allowtrackbacks') ) )
 	{
 		$Form->fieldset( T_('Additional actions') );
 
-		if( get_bloginfo('allowpingbacks') )
+		if( $Blog->get('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
 
 		?>
@@ -237,8 +237,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<?php
 		}
 
-		if( get_bloginfo('allowtrackbacks') )
-		{	// --------------------------- TRACKBACK --------------------------------------
+		if( $Blog->get('allowtrackbacks') )
+		{ // --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div>
 			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'formvalue' ); ?>" />
@@ -394,6 +394,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/15 22:05:11  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.13  2005/02/08 20:17:29  blueyed
  * removed obsolete $User_ID global
  *

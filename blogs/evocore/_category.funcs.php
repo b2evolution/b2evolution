@@ -145,7 +145,7 @@ function cat_delete( $cat_ID )
 	$IDarray = $DB->get_col( $sql );
 
 	if( ! $remap_cat_ID )
-	{	// No parent, find another cat in same blog
+	{ // No parent, find another cat in same blog
 		$sql = "SELECT cat_ID
 						FROM T_categories
 						WHERE cat_blog_ID = $cat_blog_ID
@@ -177,7 +177,7 @@ function cat_delete( $cat_ID )
 
 	// Now take care of the main cats (these need to be remapped, we cannot delete them!)
 	if( $remap_cat_ID )
-	{	// We are moving posts to parent or other category
+	{ // We are moving posts to parent or other category
 
 		// remap the posts to new category:
 		$sql = "UPDATE T_posts
@@ -393,7 +393,7 @@ function cat_load_postcounts()
 	global $Settings;
 
 	if( !isset($cat_postcounts_loaded) && $blog > 0 )
-	{	// Postcounts are not loaded and we have a blog for which to load the counts:
+	{ // Postcounts are not loaded and we have a blog for which to load the counts:
 
 		// CONSTRUCT THE WHERE CLAUSE:
 
@@ -408,14 +408,14 @@ function cat_load_postcounts()
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
 		if( !empty($timestamp_min) )
-		{	// Hide posts before
+		{ // Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' post_datestart >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
-		{	// Hide posts after
+		{ // Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' post_datestart <= \''.$date_max.'\'';
 			$where_link = ' AND ';
@@ -456,12 +456,12 @@ function cat_load_postcats_cache()
 	global $DB, $cache_postcats, $postIDlist, $preview;
 
 	if( isset($cache_postcats) )
-	{	// already done!
+	{ // already done!
 		return;
 	}
 
 	if( $preview )
-	{	// Preview mode
+	{ // Preview mode
 		global $extracats, $post_category;
 		param( 'extracats', 'array', array() );
 		if( !in_array( $post_category, $extracats ) )
@@ -535,7 +535,7 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 			if( $icat_ID && (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
 			{ // this cat is in the blog and is a child of the parent
 				if( $child_count++ == 0 )
-				{	// this is the first child
+				{ // this is the first child
 						$r .= $callback_before_first( $parent_ID, $level );
 				}
 				// was: if( $callback_before_each( $icat_ID, $level ) ) continue;
@@ -546,7 +546,7 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 			}
 		}
 		if( $child_count )
-		{	// There have been children
+		{ // There have been children
 			$r .= $callback_after_last( $parent_ID, $level );
 		}
 	}
@@ -628,7 +628,7 @@ function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 	}
 
 	if( !empty($cat_array) )
-	{	// We have requested specific categories...
+	{ // We have requested specific categories...
 		$cat_names = array();
 		foreach( $cat_array as $cat_ID )
 		{
@@ -689,9 +689,10 @@ function the_categories( $link_title = '#',				// false if you want no links
  )
 {
 	global $id, $postdata, $blog, $blogfilename, $cache_postcats, $preview;
+	global $BlogCache;
 
 	if( $link_title == '#' )
-	{	/* TRANS: When the categories for a specific post are displayed, the user can click
+	{ /* TRANS: When the categories for a specific post are displayed, the user can click
 				on these cats to browse them, this is the default href title displayed there */
 		$link_title = T_('Browse category');
 	}
@@ -702,7 +703,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 	$categoryIDs = $cache_postcats[$id];
 
 	if( !isset($categoryIDs) )
-	{	// Can happen in preview mode
+	{ // Can happen in preview mode
 		return;
 	}
 
@@ -713,15 +714,15 @@ function the_categories( $link_title = '#',				// false if you want no links
 		$cat_name = format_to_output( $cat["cat_name"], $format_each );
 
 		if( $link_title && !$preview)
-		{	// we want to display links
-			$curr_blogparams = get_blogparams_by_ID( $cat['cat_blog_ID'] );
-			$cat_name = '<a href="'.url_add_param( get_bloginfo('blogurl', $curr_blogparams), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
+		{ // we want to display links
+			$lBlog =& $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
+			$cat_name = '<a href="'.url_add_param( $lBlog->get('blogurl'), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 		}
 
 		if( $cat_ID == $main_cat_ID )
-		{	// We are displaying the main cat!
+		{ // We are displaying the main cat!
 			if( $before_main == 'hide' )
-			{	// ignore main cat !!!
+			{ // ignore main cat !!!
 				continue;
 			}
 			$cat_name = $before_main.$cat_name.$after_main;
@@ -729,15 +730,15 @@ function the_categories( $link_title = '#',				// false if you want no links
 		elseif( $cat['cat_blog_ID'] == $blog )
 		{ // We are displaying another cat in the same blog
 			if( $before_other == 'hide' )
-			{	// ignore main cat !!!
+			{ // ignore main cat !!!
 				continue;
 			}
 			$cat_name = $before_other.$cat_name.$after_other;
 		}
 		else
-		{	// We are displaying an external cat (in another blog)
+		{ // We are displaying an external cat (in another blog)
 			if( $before_external == 'hide' )
-			{	// ignore main cat !!!
+			{ // ignore main cat !!!
 				continue;
 			}
 			$cat_name = $before_external.$cat_name.$after_external;
@@ -778,7 +779,7 @@ function the_categories_IDs()
 	$categoryIDs = $cache_postcats[$id];
 
 	if( !isset($categoryIDs) )
-	{	// Can happen in preview mode
+	{ // Can happen in preview mode
 		return;
 	}
 
@@ -828,14 +829,14 @@ function blog_copy_cats($srcblog, $destblog)
  * callback to start sublist
  */
 function cat_copy_before_first( $parent_cat_ID, $level )
-{	// callback to start sublist
+{ // callback to start sublist
 }
 
 /**
  * callback to display sublist element
  */
 function cat_copy_before_each( $cat_ID, $level )
-{	// callback to display sublist element
+{ // callback to display sublist element
 	global $cat_parents, $edited_Blog;
 	$cat = get_the_category_by_ID( $cat_ID );
 	echo '<li>';
@@ -847,7 +848,7 @@ function cat_copy_before_each( $cat_ID, $level )
  * callback to display sublist element
  */
 function cat_copy_after_each( $cat_ID, $level )
-{	// callback to display sublist element
+{ // callback to display sublist element
 	echo "</li>\n";
 }
 
@@ -855,12 +856,15 @@ function cat_copy_after_each( $cat_ID, $level )
  * callback to end sublist
  */
 function cat_copy_after_last( $parent_cat_ID, $level )
-{	// callback to end sublist
+{ // callback to end sublist
 }
 
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/15 22:05:06  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.10  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *

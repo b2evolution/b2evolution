@@ -284,79 +284,6 @@ function get_userdata( $userid )
 
 
 /**
- * get_usernumposts(-)
- */
-function get_usernumposts( $userid )
-{
-	global $DB;
-	return $DB->get_var( "SELECT count(*)
-												FROM T_posts
-												WHERE post_creator_user_ID = $userid" );
-}
-
-
-/**
- * get_user_info(-)
- *
- * @deprecated by UserCache - not used in the core anymore
- */
-function get_user_info( $show = '', $this_userdata )
-{
-	switch( $show )
-	{
-		case 'ID':
-			$output = $this_userdata['ID'];
-			break;
-
-		case 'num_posts':
-			$output = get_usernumposts( $this_userdata['ID'] );
-			break;
-
-		case 'level':
-		case 'firstname':
-		case 'lastname':
-		case 'nickname':
-		case 'idmode':
-		case 'email':
-		case 'url':
-		case 'icq':
-		case 'aim':
-		case 'msn':
-		case 'yim':
-		case 'notify':
-		case 'showonline':
-		case 'locale':
-			$output = $this_userdata['user_'. $show];
-			break;
-
-		case 'login':
-		default:
-			$output = $this_userdata['user_login'];
-			break;
-	}
-	return trim($output);
-}
-
-
-/**
- * user_info(-)
- *
- * @deprecated by UserCache - not used in the core anymore
- */
-function user_info( $show = '', $format = 'raw', $display = true )
-{
-	global $current_User;
-
-	$content = $current_User->get( $show );
-	$content = format_to_output( $content, $format );
-	if( $display )
-		echo $content;
-	else
-		return $content;
-}
-
-
-/**
  * user_login_link(-)
  *
  * Template tag; Provide a link to login
@@ -626,6 +553,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/15 22:05:10  blueyed
+ * Started moving obsolete functions to _obsolete092.php..
+ *
  * Revision 1.12  2005/02/09 00:27:13  blueyed
  * Removed deprecated globals / userdata handling
  *

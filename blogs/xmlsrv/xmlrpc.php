@@ -1174,7 +1174,7 @@ function pingback_ping( $m )
 	global $DB, $notify_from, $xmlrpcerruser;
 	global $baseurl;
 	global $localtimenow, $Messages;
-	global $UserCache;
+	global $UserCache, $BlogCache;
 
 	$log = debug_fopen('./xmlrpc.log', 'w');
 
@@ -1261,8 +1261,8 @@ function pingback_ping( $m )
 		$blog = $postdata['Blog'];
 		xmlrpc_debugmsg( 'Blog='.$blog );
 
-		$blogparams = get_blogparams_by_ID( $blog );
-		if( !get_bloginfo('allowpingbacks', $blogparams) )
+		$tBlog =& $BlogCache->get_by_ID( $blog );
+		if( !$tBlog->get('allowpingbacks') )
 		{
 			return new xmlrpcresp(new xmlrpcval('Sorry, this weblog does not allow you to pingback its posts.'));
 		}
@@ -1374,11 +1374,11 @@ function pingback_ping( $m )
 
 							$recipient = $AuthorUser->get( 'email' );
 							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
-							// fplanque added:
-							$comment_blogparams = get_blogparams_by_ID( $blog );
+
+							$comment_Blog =& $BlogCache->get_by_ID( $blog );
 
 							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
-							$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$post_ID&pb=1\n\n", '&' );
+							$notify_message .= url_add_param( $comment_Blog->get('blogurl'), "p=$post_ID&pb=1\n\n", '&' );
 							$notify_message .= T_('Website'). ": $original_title\n";
 							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";

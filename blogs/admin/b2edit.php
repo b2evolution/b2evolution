@@ -39,7 +39,7 @@ switch($action)
 		$Blog = Blog_get_by_ID( $blog );
 
 		$admin_pagetitle = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
-		$admin_pagetitle_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
+		$admin_pagetitle_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 		require (dirname(__FILE__). '/_menutop.php');
 
 		$post_status = $edited_Item->get( 'status' );
