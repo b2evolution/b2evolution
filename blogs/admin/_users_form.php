@@ -161,6 +161,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_text( 'edited_user_yim', $edited_User->dget('yim', 'formvalue'), 50, T_('YahooIM'), '', 50 );
 
 				form_checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
+				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
 
 				form_text( 'edited_user_pass1', '', 20, T_('New password'), '', 50, T_('Leave empty if you don\'t want to change the password.'), 'password' );
 				form_text( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50, '', 'password' );
@@ -172,6 +173,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_info( T_('MSN IM'), $edited_User->dget('msn') );
 				form_info( T_('YahooIM'), $edited_User->dget('yim') );
 				form_info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
+				form_info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
 			}?>
 		</table>
 	</fieldset>

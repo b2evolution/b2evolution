@@ -158,6 +158,8 @@ else switch ($action)
 		$edited_User->set( 'yim', $edited_user_yim );
 		param( 'edited_user_notify', 'integer', 0 );
 		$edited_User->set( 'notify', $edited_user_notify );
+		param( 'edited_user_showonline', 'integer', 0 );
+		$edited_User->set( 'showonline', $edited_user_showonline );
 
 		param( 'edited_user_pass1', 'string', true );
 		param( 'edited_user_pass2', 'string', true );
