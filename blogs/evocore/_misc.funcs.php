@@ -1394,34 +1394,32 @@ function url_add_tail( $url, $tail )
 
 
 /**
- * sends a mail, wraps PHP's mail() function.
+ * Sends a mail, wrapping PHP's mail() function.
  *
- * $current_locale will be used to set the charset
+ * {@link $current_locale} will be used to set the charset.
  *
- * send_mail(-)
- *
- * @param string recipient
- * @param string subject of the mail
- * @param string the message
+ * @param string Recipient, either email only or in "Name <example@example.com>" format
+ * @param string Subject of the mail
+ * @param string The message text
  * @param string From address, being added to headers
- * @param array additional headers
+ * @param array Additional headers ( headername => value )
  */
 function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 {
 	global $app_name, $app_version, $current_locale, $locales, $Debuglog;
 
 	if( !is_array( $headers ) )
-	{ // make sure $headers is an array
+	{ // Make sure $headers is an array
 		$headers = array( $headers );
 	}
 
 	// Specify charset and content-type of email
-	$headers[] = 'Content-Type: text/plain; charset='.$locales[ $current_locale ]['charset'];
-	$headers[] = 'X-Mailer: '.$app_name.' '.$app_version.' - PHP/'.phpversion();
+	$headers['Content-Type'] = 'text/plain; charset='.$locales[ $current_locale ]['charset'];
+	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
 
-	// -- build headers ----
+	// -- Build headers ----
 	if( !empty($from) )
-	{ // from has to go into headers
+	{ // From has to go into headers
 		$headerstring = "From: $from\n";
 	}
 	else
@@ -1429,14 +1427,28 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 		$headerstring = '';
 	}
 
-	if( count($headers) )
-	{ // add supplied headers
-		$headerstring .= implode( "\n", $headers );
+	if( preg_match( '#^.*?\s*<(.*?)>$#', $to, $match ) )
+	{ // Handle "Name <example@example.com>" format
+		$to = $match[1]; // email address only!
+
+		if( !isset( $headers['To'] ) )
+		{ // Add it as To-header, if none given in headers array.
+			$headers['To'] = $match[0];
+		}
 	}
 
-	$Debuglog->add( "Sending mail from $from to $to - subject $subject." );
+	reset( $headers );
+	while( list( $lKey, $lValue ) = each( $headers ) )
+	{ // Add additional headers
+		$headerstring .= $lKey.': '.$lValue."\n";
+	}
 
-	return @mail( $to, $subject, $message, $headerstring );
+	$message = str_replace( array( "\r\n", "\r" ), "\n", $message );
+
+
+	$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo;." );
+
+	return mail( $to, $subject, $message, $headerstring );
 }
 
 
@@ -1551,7 +1563,7 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 		$iconfile = false;
 	}
 
-	/** 
+	/**
 	 * @debug quite time consuming
 	 * fplanque removed <div> tags because they make it even harder to debug :/
 	 */
@@ -1560,12 +1572,6 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 		return '[no image defined for '.var_export( $iconKey, true ).'!]';
 		return false;
 	}
-	/* Let's rely on the browser for this...
-	 elseif( !file_exists( $basepath.$iconfile ) )
-	{
-		return '<div class="error">[image '.$iconfile.' not found!]</div>';
-		return false;
-	} */
 
 	switch( $what )
 	{
@@ -1694,6 +1700,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.35  2005/02/02 00:55:53  blueyed
+ * send_mail() fixed/enhanced
+ *
  * Revision 1.34  2005/01/28 19:28:03  fplanque
  * enhanced UI widgets
  *
