@@ -551,11 +551,11 @@ class Hit
 		{
 			if( isset( $_SERVER['REMOTE_HOST'] ) )
 			{
-				$this->RemoteHost = $_SERVER['REMOTE_HOST'];
+				$this->_remoteHost = $_SERVER['REMOTE_HOST'];
 			}
 			else
 			{
-				$this->RemoteHost = @gethostbyaddr($this->IP);
+				$this->_remoteHost = @gethostbyaddr($this->IP);
 			}
 		}
 
