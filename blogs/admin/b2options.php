@@ -50,8 +50,6 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 	// Check permission:
 	$current_User->check_perm( 'options', 'edit', true );
 
-	$status_update = array();
-
 	// clear settings cache
 	$cache_settings = '';
 
@@ -87,7 +85,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 			if( $Settings->updateDB() )
 			{
-				$status_update[] = T_('General settings updated.');
+				$Messages->add( T_('General settings updated.'), 'note' );
 			}
 
 			break;
@@ -150,20 +148,14 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$Settings->set( 'time_difference', $newtime_difference );
 				$Settings->updateDB();
 
-				$status_update[] = T_('Regional settings updated.');
+				$Messages->add( T_('Regional settings updated.'), 'note' );
 				break;
 
 
 			// CREATE/EDIT locale
 			case 'updatelocale':
 			case 'createlocale':
-				param( 'newloc_locale', 'string', true);
-				if( empty($newloc_locale) )
-				{
-					$status_update[] = '<span class="error">'.T_('You must provide a locale code!').'</span>';
-					break;
-				}
-
+				param( 'newloc_locale', 'string', true );
 				param( 'newloc_enabled', 'integer', 0);
 				param( 'newloc_name', 'string', true);
 				param( 'newloc_charset', 'string', true);
@@ -176,50 +168,58 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					param( 'oldloc_locale', 'string', true);
 
 					$query = "SELECT loc_locale FROM T_locales WHERE loc_locale = '$oldloc_locale'";
-					if( !$DB->get_var( $query ) )
-					{ // old locale is not in DB yet. Insert and disable it.
+					if( $DB->get_var($query) )
+					{ // old locale exists in DB
+						if( $oldloc_locale != $newloc_locale )
+						{ // locale key was renamed, we delete the old locale in DB and remember to create the new one
+							$q = $DB->query( 'DELETE FROM T_locales
+																	WHERE loc_locale = "'.$oldloc_locale.'"' );
+							if( mysql_affected_rows() )
+							{
+								$Messages->add( sprintf(T_('Deleted settings for locale [%s] in database.'), $oldloc_locale), 'note' );
+							}
+						}
+					}
+					else
+					{ // old locale is not in DB yet. Insert it.
 						$query = "INSERT INTO T_locales
 											( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
 											VALUES ( '$oldloc_locale',
 											'{$locales[$oldloc_locale]['charset']}', '{$locales[$oldloc_locale]['datefmt']}',
 											'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['name']}',
-											'{$locales[$oldloc_locale]['messages']}', '{$locales[$oldloc_locale]['priority']}', 0)";
+											'{$locales[$oldloc_locale]['messages']}', '{$locales[$oldloc_locale]['priority']}',";
+						if( $oldlocale != $newlocale )
+						{ // disable old locale
+							$query .= ' 0)';
+							$Messages->add( sprintf(T_('Inserted (and disabled) locale [%s] into database.'), $oldloc_locale), 'note' );
+						}
+						else
+						{ // keep old state
+							$query .= ' '.$locales[$oldloc_locale]['enabled'].')';
+							$Messages->add( sprintf(T_('Inserted locale [%s] into database.'), $oldloc_locale), 'note' );
+						}
 						$q = $DB->query($query);
-						$status_update[] = sprintf(T_("Inserted locale '%s' into database."), $oldloc_locale);
-					}
-
-					if( $oldloc_locale != $newloc_locale )
-					{ // locale key was renamed, we remember to create the new one
-						$l_insertnew = 1;
-					}
-					else
-					{	// update database
-						$query = "UPDATE T_locales
-											SET loc_locale = '$newloc_locale', loc_charset = '$newloc_charset', loc_datefmt = '$newloc_datefmt',
-											loc_timefmt = '$newloc_timefmt', loc_name = '$newloc_name', loc_messages = '$newloc_messages',
-											loc_enabled = '$newloc_enabled'
-											WHERE loc_locale = '$oldloc_locale'";
-						$q = $DB->query($query);
-						$status_update[] = sprintf(T_("Updated locale '%s'."), $newloc_locale);
 					}
 				}
 
-				if( $action == 'createlocale' || isset( $l_insertnew ) )
-				{
-					$query = "REPLACE INTO T_locales
-										( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
-										VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
-										'$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
-					$q = $DB->query($query);
-					$status_update[] = sprintf(T_("Saved locale '%s'."), $newloc_locale);
-				}
+				$query = "REPLACE INTO T_locales
+									( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
+									VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
+									'$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
+				$q = $DB->query($query);
+				$Messages->add( sprintf(T_('Saved locale [%s].'), $newloc_locale), 'note' );
+
+				// reload locales: an existing one could have been renamed
+				unset( $locales );
+				include(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
+				@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
 				break;
 
 
 			// RESET locales in DB
 			case 'reset':
-				// reload locales
+				// reload locales from files
 				unset( $locales );
 				include(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
 				@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
@@ -232,7 +232,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$Settings->set( 'default_locale', $default_locale );
 				$Settings->updateDB();
 
-				$status_update[] = T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.');
+				$Messages->add( T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.'), 'note' );
 				break;
 
 
@@ -248,7 +248,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					echo '<p class="error">'.sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po').'</p>';
 				}
 				else
-				{	// File exists:
+				{ // File exists:
 					// Get PO file for that locale:
 					$lines = file( $po_file);
 					$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
@@ -265,9 +265,9 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					{
 						// echo 'LINE:', $line, '<br />';
 						if(trim($line) == '' )
-						{	// Blank line, go back to base status:
+						{ // Blank line, go back to base status:
 							if( $status == 't' )
-							{	// ** End of a translation **:
+							{ // ** End of a translation **:
 								if( $msgstr == '' )
 								{
 									$untranslated++;
@@ -299,27 +299,27 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 							$sources = array();
 						}
 						elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
-						{	// Encountered an original text
+						{ // Encountered an original text
 							$status = 'o';
 							$msgid = $matches[1];
 							// echo 'original: "', $msgid, '"<br />';
 							$all++;
 						}
 						elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
-						{	// Encountered a translated text
+						{ // Encountered a translated text
 							$status = 't';
 							$msgstr = $matches[1];
 							// echo 'translated: "', $msgstr, '"<br />';
 						}
 						elseif( preg_match( '#^"(.*)"#', $line, $matches))
-						{	// Encountered a followup line
+						{ // Encountered a followup line
 							if ($status=='o')
 								$msgid .= $matches[1];
 							elseif ($status=='t')
 								$msgstr .= $matches[1];
 						}
 						elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches))
-						{	// Encountered a source code location comment
+						{ // Encountered a source code location comment
 							// echo $matches[0],'<br />';
 							$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
 							// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
@@ -374,7 +374,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					require(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
 					@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
-					$status_update[] = sprintf(T_("Deleted locale '%s' from database."), $delete);
+					$Messages->add( sprintf(T_('Deleted locale [%s] from database.'), $delete) );
 				}
 
 				// --- SWITCH PRIORITIES -----------------
@@ -404,7 +404,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 						}
 					}
 					if( $i > -1 && $i < 256 )
-					{	// switch
+					{ // switch
 						#echo 'Switching prio '.$locales[ $lswitchwith ]['priority'].' with '.$locales[ $lswitch ]['priority'].'<br />';
 						$locales[ $lswitchwith ]['priority'] = $locales[ $lswitch ]['priority'];
 						$locales[ $lswitch ]['priority'] = $i;
@@ -414,7 +414,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 							( '$lswitchwith', '{$locales[ $lswitchwith ]['charset']}', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '{$locales[ $lswitchwith ]['enabled']}')";
 						$q = $DB->query( $query );
 
-						$status_update[] = T_('Switched priorities.');
+						$Messages->add( T_('Switched priorities.'), 'note' );
 					}
 
 				}
@@ -427,12 +427,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 	}
 
-	if( count($status_update) )
-	{
-		echo '<div class="panelinfo">';
-		foreach( $status_update as $stmsg ) echo '<p>'.$stmsg.'</p>';
-		echo '</div>';
-	}
+	if( $msg = $Messages->display( '', '', true, 'note', 'panelinfo', '<p>' ) );
 }
 
 // Check permission:
