@@ -25,11 +25,22 @@ switch( $action )
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
 		param( 'keyword', 'string', true );	// Required!
+		$keyword = substr( $keyword, 0, 80 );
 		$dbkeyword = addslashes( $keyword );
 		param( 'delhits', 'integer', 0 );
 		param( 'delcomments', 'integer', 0 );
 		param( 'blacklist', 'integer', 0 );
 		param( 'report', 'integer', 0 );
+
+		// Check if the string is too short, 
+		// it has to be a minimum of 5 characters to avoid being too generic
+		if( strlen($keyword) < 5 )
+		{
+			echo '<div class="panelinfo">';
+			printf( '<p>'.T_('The keyword [%s] is too short, it has to be a minimum of 5 characters!').'</p>', $keyword);
+			echo '</div>';
+			break;
+		}
 
 		if( $delhits && $deluxe_ban )
 		{	// Delete all banned hit-log entries
@@ -72,13 +83,13 @@ switch( $action )
 		{	// Nothing to do, ask user:
 			?>
 			<div class="panelblock">
-				<form action="b2antispam.php">
+				<form action="b2antispam.php" method="post">
 				<input type="hidden" name="confirm" value="confirm" />
 				<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
 				<input type="hidden" name="action" value="ban" />
 				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
 
-				<p><strong><?php echo T_('Keyword') ?>: </strong><input type="text" size="30" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" /></p>
+				<p><strong><?php echo T_('Keyword') ?>: </strong><input type="text" size="30" maxlength="80" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" /></p>
 
 				<?php
 				if( $deluxe_ban )
@@ -249,16 +260,18 @@ switch( $action )
 				{ ?>
 				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
 				<?php }
-				antiSpam_domain();
+				antiSpam_domain( 40 );
 				?>
 			</td>
-			<td>
-				<?php 
-					antispam_source();
-					if( (antispam_source(false,true) == 'local') && $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+			<td><?php antispam_source(); ?></td>
+			<td><?php
+					if( (antispam_source(false,true) == 'local') 
+						&& $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 					{
-					?> [<a href="b2antispam.php?action=report&keyword=<?php antiSpam_domain() ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>">Report</a>]
+					?>
+					[<a href="b2antispam.php?action=report&keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>"><?php echo T_('Report') ?></a>]
 				<?php } ?>
+				[<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Check hit-logs and comments for this keyword!') ?>"><?php echo T_('Re-check') ?></a>]
 			</td>
 		</tr>
 		<?php } // End stat loop ?>
@@ -275,7 +288,7 @@ switch( $action )
 	<h2><?php echo T_('Add a banned keyword') ?></h2>
 	<form action="b2antispam.php" method="GET">
 		<p>
-		<?php echo T_('Keyword') ?>: <input type="text" size="30" name="keyword" />
+		<?php echo T_('Keyword') ?>: <input type="text" size="30" maxlength="80" name="keyword" />
 		<input type="hidden" name="action" value="ban" />
 		<input type="hidden" name="type" value="keyword" />
 		<input type="submit" value="<?php echo T_('Ban this keyword!') ?>" class="search" />

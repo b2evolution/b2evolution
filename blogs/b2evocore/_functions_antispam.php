@@ -127,13 +127,21 @@ function antiSpam_ID()
 	echo $row_stats['aspm_ID'];
 }
 
-/*
- * antiSpam_domain(-)
+/**
+ * {@internal antiSpam_domain(-)}}
+ *
+ * @param mixed max length or false if we don't want to display
  */
-function antiSpam_domain()
+function antiSpam_domain( $dispmax = 80 )
 {
 	global $row_stats;
-	echo $row_stats['aspm_string'];
+	$domain = $row_stats['aspm_string'];
+	if( ! $dispmax )
+		return $domain;
+	elseif( strlen( $domain ) > $dispmax )
+		echo substr( $domain, 0, $dispmax ), '...';
+	else
+		echo $domain;
 }
 
 
@@ -286,11 +294,11 @@ function b2evonet_poll_abuse( $display = true )
 					{
 						echo '<li>', T_('Adding:'), ' [', $banned_string, '] : ';
 						if( antispam_create( $banned_string, 'central' ) )
-						{
+						{	// Creation successed
 							echo T_('OK.');
 						}
 						else
-						{
+						{ // Was already handled
 							echo T_('Not necessary! (Already handled)');
 							antispam_update_source( $banned_string, 'central' );
 						}

@@ -246,8 +246,7 @@ switch( $show )
 			</td>
 			<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 			{ ?>
-			<td><a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>
-</td>
+			<td><a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
 			<?php } ?>
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
@@ -261,6 +260,7 @@ switch( $show )
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 			<tr>
 				<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+				<td><a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
