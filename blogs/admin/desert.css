@@ -8,12 +8,13 @@
  * @package admin
  */
 
-@import url(../rsc/basic.css);	/* Import basic styles */
-@import url(../rsc/img.css);	/* Import standard image styles */
-@import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
-@import url(../rsc/forms.css);	/* Import default form styles */
-@import url(../rsc/comments.css);	/* Import default comment styles */
-@import url(fileman.css); /* Import filemanager styles */
+@import url(../rsc/basic.css);            /* Import basic styles */
+@import url(../rsc/img.css);              /* Import standard image styles */
+@import url(../rsc/blog_elements.css);    /* Import standard blog elements styles */
+@import url(../rsc/forms.css);            /* Import default form styles */
+@import url(../rsc/comments.css);         /* Import default comment styles */
+@import url(fileman.css);                 /* Import filemanager styles */
+@import url(../rsc/css/admin.global.css); /* Import basic admin styles */
 
 body {
 	margin: 0;
