@@ -426,10 +426,13 @@ function stats_referer( $before='', $after='', $disp_ref = true )
 /*
  * stats_basedomain(-)
  */
-function stats_basedomain()
+function stats_basedomain( $disp = true )
 {
 	global $row_stats;
-	echo htmlentities( stripslashes($row_stats['baseDomain']));
+	if( $disp )
+		echo htmlentities( stripslashes($row_stats['baseDomain']));
+	else
+		return stripslashes($row_stats['baseDomain']);
 }
 
 /*

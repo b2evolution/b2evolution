@@ -337,14 +337,17 @@ function comment_author_url($echo=true)
 /*
  * comment_author_url_basedomain(-)
  */
-function comment_author_url_basedomain()
+function comment_author_url_basedomain( $disp = true )
 {
 	global $commentdata;
 	$url = comment_author_url(false);
 	$baseDomain = preg_replace("/http:\/\//i", "", $url);
 	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
 	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
-	echo $baseDomain;
+	if( $disp )
+		echo $baseDomain;
+	else
+		return $baseDomain;
 }
 
 /*

@@ -162,7 +162,7 @@ function antispam_source( $disp = true, $raw = false )
  */
 function b2evonet_report_abuse( $abuse_string, $display = true ) 
 {
-	$test = 2;
+	$test = 0;
 
 	global $baseurl;
 	if( $display )
@@ -219,7 +219,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
  */
 function b2evonet_poll_abuse( $display = true ) 
 {
-	$test = 2;
+	$test = 0;
 
 	global $baseurl, $tablesettings, $querycount;
 	

@@ -212,7 +212,7 @@
 						by <strong><?php comment_author() ?> ( <?php comment_author_email_link() ?> / <?php comment_author_url_link();
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 						{ ?>
-						<a href="b2antispam.php?action=ban&keyword=<?php comment_author_url_basedomain() ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>
+						<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode(comment_author_url_basedomain(false)) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>
 						<?php } ?> )
 						</strong> (IP: <?php comment_author_IP() ?>)
 					</div>
