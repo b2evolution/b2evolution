@@ -138,25 +138,20 @@ if ($use_spellchecker)
 	?>
 
 	<div class="center">
-	<?php // --------------------------- QUICK TAGS ------------------------------------
+	<?php // --------------------------- TOOLBARS ------------------------------------
 		require( dirname(__FILE__). '/_quicktags.php');
+		$Toolbars->display();
 	?>
 	</div>
 
 	<?php // ---------------------------- TEXTAREA ------------------------------------- ?>
 	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" border="0" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
-  <?php
-    if( $use_quicktags )
-		{
-			?>
-			<script type="text/javascript" language="JavaScript">
-			<!--
-			b2evoCanvas = document.getElementById('content');
-			//-->
-			</script>
-			<?php
-    }
-  ?>
+	<script type="text/javascript" language="JavaScript">
+		<!--
+		// This is for toolbar plugins
+		b2evoCanvas = document.getElementById('content');
+		//-->
+	</script>
 
 	<?php // --------------------------- AUTOBR -------------------------------------- ?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php

@@ -197,16 +197,19 @@ $skins_subdir = 'skins';                     // Subdirectory relative to base
 $skins_dirout = '..';                        // Relative path to go back to base
 $skins_url = $baseurl. '/'. $skins_subdir;   // You should not need to change this
 # Location of the core (the "includes") files:
-$core_subdir = 'b2evocore';                 // Subdirectory relative to base
-$core_dirout = '..';                        // Relative path to go back to base
+$core_subdir = 'b2evocore';                  // Subdirectory relative to base
+$core_dirout = '..';                         // Relative path to go back to base
 # Location of the locales folder:
-$locales_subdir = 'locales';                // Subdirectory relative to base
-$locales_dirout = '..';                     // Relative path to go back to base
+$locales_subdir = 'locales';                 // Subdirectory relative to base
+$locales_dirout = '..';                      // Relative path to go back to base
 # Location of the configuration files:
-$conf_subdir = 'conf';                      // Subdirectory relative to base
-$conf_dirout = '..';                        // Relative path to go back to base
+$conf_subdir = 'conf';                       // Subdirectory relative to base
+$conf_dirout = '..';                         // Relative path to go back to base
+# Location of the plug-ins:
+$plugins_subdir = 'plugins';                 // Subdirectory relative to base
+$plugins_subdir_dirout = '..';               // Relative path to go back to base
 # Location of the install folder:
-$install_dirout = '..';                     // Relative path to go back to base
+$install_dirout = '..';                      // Relative path to go back to base
 
 
 # CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!

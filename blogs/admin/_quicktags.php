@@ -7,7 +7,7 @@
  * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
-if( ! $use_quicktags && ! $use_smilies )
+if( ! $use_quicktags )
 {	// We have nothing to do here
 	return;
 }
@@ -357,8 +357,4 @@ if( $use_quicktags )
 <?php
 }
 
-if( $use_smilies )
-{
-	b2evo_grins();
-}
 ?>

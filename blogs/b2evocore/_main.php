@@ -37,6 +37,7 @@ require_once( dirname(__FILE__). '/_functions_hitlogs.php'); // referer logging
 require_once( dirname(__FILE__). '/_functions_forms.php');
 require_once( dirname(__FILE__). '/_functions_forms.php');
 require_once( dirname(__FILE__). '/_class_renderer.php');
+require_once( dirname(__FILE__). '/_class_toolbars.php');
 
 
 if( !function_exists( 'gzencode' ) )
@@ -74,8 +75,9 @@ $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_I
 // $BlogCache = & new DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
 $ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
 
-// Renderer init:
+// Plug-ins init:
 $Renderer = & new Renderer();
+$Toolbars = & new Toolbars();
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;
