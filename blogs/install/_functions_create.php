@@ -599,11 +599,11 @@ Either way, make sure you go to the blogs admin and set the correct access metho
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."), 
-								T_("<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.</p>
+								T_("By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.
 
-<p>Some of these blogs have a special role. Read about it on the corresponding page.</p>
+Some of these blogs have a special role. Read about it on the corresponding page.
 
-<p>You can create additional blogs or delete unwanted blogs from the blogs admin.</p>"), $now, $cat_b2evo );
+You can create additional blogs or delete unwanted blogs from the blogs admin."), $now, $cat_b2evo );
 
 
 	// Create newbie posts:

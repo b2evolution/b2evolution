@@ -244,7 +244,7 @@ switch( $action )
 			?>
 			<h1><?php echo T_('Base configuration') ?></h1>
 			
-			<p><?php echo T_('Your config file has not been edited yet. You can do this by filling in the form below.') ?></p>
+			<p><?php echo T_('Your base config file has not been edited yet. You can do this by filling in the form below.') ?></p>
 
 			<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
 
@@ -315,10 +315,7 @@ switch( $action )
 					?>
 					<p><input type="radio" name="action" id="deletedb" value="deletedb" /> 
 					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables')?></strong>:
-					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the
-					b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution
-					tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have
-					some, will not be touched in any way.')?></label></p>
+					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.')?></label></p>
 					<?php
 				}
 			?>

@@ -54,10 +54,9 @@ if( !empty($locale) && $action != 'extract' )
 		form_text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'),
 			sprintf( T_('the time format, see <a %s>the specs</a>'), 'href="link"'), 10 );
 		form_text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
-			T_('the lang file being used, from <code>locales</code> subdirectory'), 20 );
+			T_('the lang file to use, from the <code>locales</code> subdirectory'), 20 );
 		form_text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
-			T_('1 is highest. It\'s use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc.'), 5 );
-
+			T_('1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc.'), 5 );
 
 		// generate Javascript array of locales to warn in case of overwriting
 		$l_warnfor = "'".implode("', '", array_keys($locales))."'";
@@ -71,7 +70,7 @@ if( !empty($locale) && $action != 'extract' )
 		<input type="reset" value="'.format_to_output(T_('Reset'), 'formvalue').'" class="search" />
 		</div>
 		<div class="panelinfo">
-			<p>'.sprintf(T_('We\'ll use the flag out of subdirectories from <code>%s</code>, where the filename is equal to the language part of the locale (characters 4-5; file extension is gif).'), '/'.$img_subdir.'/flags/').'</p>
+			<p>'.sprintf(T_('The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'/flags/').'</p>
 		</div>
 		</fieldset>
 	</form>
