@@ -77,10 +77,10 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 	<link title="Ciel bleu" media="screen" href="cielbleu.css" type="text/css" rel="stylesheet" />
-<?php
-$Blog->disp( 'blog_css', 'raw');
-$Blog->disp( 'user_css', 'raw');
-?>
+	<?php
+		$Blog->disp( 'blog_css', 'raw');
+		$Blog->disp( 'user_css', 'raw');
+	?>
 </head>
 <body id=standblog>
 

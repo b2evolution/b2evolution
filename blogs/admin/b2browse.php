@@ -22,8 +22,8 @@ $AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 
 $blog = autoselect_blog( param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
 
-if( $blog )
-{
+if( $blog != 0 )
+{ // We could select a blog:
 	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
 }
@@ -36,7 +36,7 @@ else
 // Generate available blogs list:
 $blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?blog=%d' );
 
-require( dirname(__FILE__).'/_menutop.php' );
+require dirname(__FILE__).'/_menutop.php';
 
 if( $blog )
 { // We could select a valid blog:

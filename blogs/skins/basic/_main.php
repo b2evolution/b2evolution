@@ -63,10 +63,10 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	</title>
 	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-<?php
-$Blog->disp( 'blog_css', 'raw');
-$Blog->disp( 'user_css', 'raw');
-?>
+	<?php
+		$Blog->disp( 'blog_css', 'raw');
+		$Blog->disp( 'user_css', 'raw');
+	?>
 </head>
 <body>
 

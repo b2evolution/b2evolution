@@ -21,7 +21,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @todo Move this to $UserSettings
  * @var string
  */
-$admin_skin = 'evo';
 $admin_skin = 'legacy';
 
 /**

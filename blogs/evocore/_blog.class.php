@@ -475,11 +475,11 @@ class Blog extends DataObject
 				return $admin_email;
 
 
-			/** Add the html for a blog-specified stylesheet
-			All stylesheets will be included if the blog settings allow it
-			and the file "style.css" exists. CSS rules say that the latter style sheets can
-			override earlier stylesheets.
-			*/
+			/* Add the html for a blog-specified stylesheet
+			 * All stylesheets will be included if the blog settings allow it
+			 * and the file "style.css" exists. CSS rules say that the latter style sheets can
+			 * override earlier stylesheets.
+			 */
 			case 'blog_css':
 				if ( $this->allowblogcss 
 					&& file_exists( $this->get('mediadir').'style.css' ) )
@@ -488,18 +488,18 @@ class Blog extends DataObject
 				} 
 				else
 				{
-				return '';
+					return '';
 				}
 
-			/** Add the html for a user blog-specified stylesheet
-			All stylesheets will be included if the blog settings allow it
-			and the file "style.css" exists. CSS rules say that the latter style sheets can
-			override earlier stylesheets. A user-specified stylesheet will
-			override a blog-specified stylesheet which will override a skin stylesheet.
-			*/
+			/* Add the html for a user-specified stylesheet
+			 * All stylesheets will be included if the blog settings allow it
+			 * and the file "style.css" exists. CSS rules say that the latter style sheets can
+			 * override earlier stylesheets. A user-specified stylesheet will
+			 * override a blog-specified stylesheet which will override a skin stylesheet.
+			 */
 			case 'user_css':
 				if( $this->allowusercss
-			                && isset( $current_User ) 
+		      && isset( $current_User ) 
 					&& file_exists( $current_User->getMediaDir().'style.css' ) )
 				{
 					return '<link rel="stylesheet" href="'.$current_User->getMediaUrl().'style.css" type="text/css" />';
@@ -656,6 +656,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2005/03/08 13:24:41  fplanque
+ * minor
+ *
  * Revision 1.14  2005/03/08 02:11:30  edgester
  * Refactored php code in custom skin into a skiin tag as per Francois Planque.
  * Added skin tag to all of the skins.

@@ -502,7 +502,9 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 
 /**
+ * fplanque>>Documentation would make sense
  *
+ * Will check permission, also on preselected blog.
  *
  * @return integer The selected blog (0 means failure).
  */
@@ -545,8 +547,11 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel )
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/08 13:24:42  fplanque
+ * minor
+ *
  * Revision 1.9  2005/03/07 00:06:18  blueyed
- * admin UI refactoring, part three
+ * added autoselect_blog
  *
  * Revision 1.8  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
