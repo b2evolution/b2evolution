@@ -104,20 +104,41 @@ $redirect_to_postblog = 1;
  *  If you want to have multiple b2evo installations in a single database you should
  *  change $tableprefix in _config.php)
  */
-$tableposts      = $tableprefix.'posts';
-$tableusers      = $tableprefix.'users';
-$tablesettings   = $tableprefix.'settings';
-$tablecategories = $tableprefix.'categories';
-$tablecomments   = $tableprefix.'comments';
-$tableblogs      = $tableprefix.'blogs';
-$tablepostcats   = $tableprefix.'postcats';
-$tablehitlog     = $tableprefix.'hitlog';
-$tableantispam   = $tableprefix.'antispam';
-$tablegroups     = $tableprefix.'groups';
-$tableblogusers  = $tableprefix.'blogusers';
-$tablelocales    = $tableprefix.'locales';
-$tablesessions   = $tableprefix.'sessions';
+$tableposts        = $tableprefix.'posts';
+$tableusers        = $tableprefix.'users';
+$tablesettings     = $tableprefix.'settings';
+$tablecategories   = $tableprefix.'categories';
+$tablecomments     = $tableprefix.'comments';
+$tableblogs        = $tableprefix.'blogs';
+$tablepostcats     = $tableprefix.'postcats';
+$tablehitlog       = $tableprefix.'hitlog';
+$tableantispam     = $tableprefix.'antispam';
+$tablegroups       = $tableprefix.'groups';
+$tableblogusers    = $tableprefix.'blogusers';
+$tablelocales      = $tableprefix.'locales';
+$tablesessions     = $tableprefix.'sessions';
+$tableusersettings = $tableprefix.'usersettings';
 /**#@-*/
+
+/**
+ * Aliases for class DB:
+ */
+$db_aliases = array(
+		'EVO_posts'        => $tableposts       ,
+		'EVO_users'        => $tableusers       ,
+		'EVO_settings'     => $tablesettings    ,
+		'EVO_categories'   => $tablecategories  ,
+		'EVO_comments'     => $tablecomments    ,
+		'EVO_blogs'        => $tableblogs       ,
+		'EVO_postcats'     => $tablepostcats    ,
+		'EVO_hitlog'       => $tablehitlog      ,
+		'EVO_antispam'     => $tableantispam    ,
+		'EVO_groups'       => $tablegroups      ,
+		'EVO_blogusers'    => $tableblogusers   ,
+		'EVO_locales'      => $tablelocales     ,
+		'EVO_sessions'     => $tablesessions    ,
+		'EVO_usersettings' => $tableusersettings,
+	);
 
 /**#@+
  * Old b2 tables used exclusively by the upgrade mode of the install script

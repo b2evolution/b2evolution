@@ -223,11 +223,11 @@ function create_b2evo_tables()
 
 
 	echo 'Creating user preferences table... ';
-	$DB->query( "CREATE TABLE $tableuserprefs (
-							upref_user_ID INT() NOT NULL ,
-							upref_name VARCHAR( 30 ) NOT NULL,
-							upref_value VARCHAR( 255 ) NULL,
-							PRIMARY KEY ( upref_user_ID, upref_name )
+	$DB->query( "CREATE TABLE $tableusersettings (
+							uset_user_ID INT() NOT NULL ,
+							uset_name VARCHAR( 30 ) NOT NULL,
+							uset_value VARCHAR( 255 ) NULL,
+							PRIMARY KEY ( uset_user_ID, uset_name )
 							)");
 	echo "OK.<br />\n";
 

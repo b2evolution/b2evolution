@@ -12,9 +12,12 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * Includes
+ */
+require_once( dirname(__FILE__).'/_class_abstractsettings.php' );
+
+/**
  * Class to handle the global settings
- *
- * @package evocore
  */
 class GeneralSettings extends AbstractSettings
 {

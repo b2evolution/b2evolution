@@ -42,7 +42,7 @@ form.fform div.label {
 	float: left;
 	width: 24%;
 	text-align: right;
-	padding-top: 3px;
+	padding-top: .6ex;
 	font-weight:bold;
 }
 form.fform div.input {

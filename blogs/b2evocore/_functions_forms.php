@@ -123,12 +123,12 @@ function form_radio(
 	foreach( $field_options as $loop_field_option )
 	{
 		if( $field_lines ) echo "<div>\n";
-		echo '<span class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
+		echo '<label class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
 		if( $field_value == $loop_field_option[0] )
 		{
 			echo ' checked="checked"';
 		}
-		echo ' /> ', $loop_field_option[1], '</span>';
+		echo ' /> ', $loop_field_option[1], '</label>';
 		if( isset( $loop_field_option[2] ) )
 			echo '<span class="notes">', $loop_field_option[2], '</span>';
 		if( $field_lines ) echo "</div>\n";

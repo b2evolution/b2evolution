@@ -30,7 +30,6 @@ $Messages = new Log( 'error' );
 require_once( dirname(__FILE__).'/_functions.php' );
 timer_start();
 require_once( dirname(__FILE__).'/_vars.php' );	// sets various arrays and vars for use in b2
-require_once( dirname(__FILE__).'/_class_abstractsettings.php' );
 require_once( dirname(__FILE__).'/_class_generalsettings.php' );
 require_once( dirname(__FILE__).'/_class_db.php' );
 require_once( dirname(__FILE__).'/_functions_template.php' );	// function to be called from templates

@@ -49,10 +49,10 @@ class User extends DataObject
 	// Blog posts statuses permissions:
 	var $blog_post_statuses = array();
 
-	/*
-	 * User::User(-)
-	 *
+	/**
 	 * Constructor
+	 *
+	 * {@internal User::User(-)}}
 	 *
 	 * @param array existing userdata {@link get_userdata()}}
 	 */

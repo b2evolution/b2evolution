@@ -14,37 +14,40 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Class to handle the global settings
  *
- * @package evocore
+ * @abstract
  */
 class AbstractSettings
 {
 	/**
 	 * the DB table which stores the settings
+	 * @var string
 	 */
 	var $dbtablename;
 
 	/**
 	 * array with DB cols key names
+	 * @var array of strings
 	 */
 	var $colkeynames = array();
 
 	/**
 	 * DB col name for the value
+	 * @var string
 	 */
 	var $colvaluename;
 
 
 	/**
 	 * Constructor, loads settings.
-	 *
-	 * @abstract
 	 */
 	function AbstractSettings()
 	{
 		global $DB;
 
-		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.$this->colvaluename.' FROM '.$this->dbtablename );
-		
+		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.
+																					$this->colvaluename.
+		                            ' FROM '.$this->dbtablename );
+
 		switch( count( $this->colkeynames ) )
 		{
 			case 1:
@@ -62,6 +65,7 @@ class AbstractSettings
 					$this->store[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->dbstatus = 'uptodate';
 				}
 				break;
+
 			case 3:
 				foreach( $result as $loop_row )
 				{
@@ -70,6 +74,8 @@ class AbstractSettings
 				}
 				break;
 
+			default:
+				die( 'Settings keycount not supported' )
 		}
 
 		#pre_dump( $this->store, 'store' );
@@ -79,8 +85,8 @@ class AbstractSettings
 	/**
 	 * get a setting from the DB settings table
 	 *
-	 * @abstract
-	 * @params string the values for the column keys (depends on $this->colkeynames and must match its count and order)
+	 * @params string the values for the column keys (depends on $this->colkeynames
+	 *                and must match its count and order)
 	 */
 	function get()
 	{
@@ -123,10 +129,10 @@ class AbstractSettings
 
 
 	/**
-	* temporarily sets a setting ({@link updateDB()}} writes it to DB)
+	 * temporarily sets a setting ({@link updateDB()}} writes it to DB)
 	 *
-	 * @abstract
-	 * @param array with values of table column names according to $this->colkeynames + $this->colvaluename
+	 * @param array with values of table column names
+	 *							according to $this->colkeynames + $this->colvaluename
 	 */
 	function set( $pleaseset )
 	{

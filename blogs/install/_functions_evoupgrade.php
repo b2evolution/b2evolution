@@ -11,6 +11,76 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * converts languages in a given table into according locales
+ *
+ * {@internal convert_lang_to_locale(-)}}
+ *
+ * @author blueyed
+ * @param string name of the table
+ * @param string name of the column where lang is stored
+ * @param string name of the table's ID column
+ */
+function convert_lang_to_locale( $table, $columnlang, $columnID )
+{
+	global $DB, $locales, $default_locale;
+
+	if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $default_locale) )
+	{ // we want a valid locale
+		$default_locale = 'en-EU';
+	}
+
+	echo 'Converting langs to locales for '. $table. '...<br />';
+
+	// query given languages in $table
+	$query = "SELECT $columnID, $columnlang FROM $table";
+	$rows = $DB->get_results( $query, ARRAY_A );
+	$languagestoconvert = array();
+	if( count( $rows ) ) foreach( $rows as $row )
+	{
+		// remember the ID for that locale
+		$languagestoconvert[ $row[ $columnlang ] ][] = $row[ $columnID ];
+	}
+
+	foreach( $languagestoconvert as $lkey => $lIDs)
+	{ // converting the languages we've found
+		$converted = false;
+		echo '&nbsp; Converting lang \''. $lkey. '\' '; // (with IDs: '. implode( ', ', $lIDs ). ').. ';
+
+		if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $lkey) )
+		{ // Already valid
+			echo 'nothing to update, already valid!<br />';
+			continue;
+		}
+
+		if( (strlen($lkey) == 2) && ( substr( $default_locale, 0, 2 ) != $lkey ) )
+		{ // we have an old two letter lang code to convert
+			// and it doesn't match the default locale
+			foreach( $locales as $newlkey => $v )
+			{  // loop given locales
+				if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
+				{  // if language matches, update
+					$converted = $DB->query( "UPDATE $table
+																		SET $columnlang = '$newlkey'
+																		WHERE $columnlang = '$lkey'" );
+					echo 'to locale \''. $newlkey. '\'<br />';
+					break;
+				}
+			}
+		}
+
+		if( !$converted )
+		{ // we have nothing converted yet, setting default:
+			$DB->query( "UPDATE $table
+											SET $columnlang = '$default_locale'
+										WHERE $columnlang = '$lkey'" );
+			echo 'forced to default locale \''. $default_locale. '\'<br />';
+		}
+	}
+	echo "\n";
+}  // convert_lang_to_locale(-)
+
+
+/**
  * upgrade_b2evo_tables(-)
  */
 function upgrade_b2evo_tables()
@@ -236,73 +306,6 @@ function upgrade_b2evo_tables()
 		// Create locales 
 		create_locales();
 
-		/**
-		 * converts languages in a given table into according locales
-		 *
-		 * @author blueyed
-		 * @param string name of the table
-		 * @param string name of the column where lang is stored
-		 * @param string name of the table's ID column
-		 */
-		function convert_lang_to_locale( $table, $columnlang, $columnID )
-		{
-			global $DB, $locales, $default_locale;
-			
-			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $default_locale) )
-			{ // we want a valid locale
-				$default_locale = 'en-EU';
-			}
-			
-			echo 'Converting langs to locales for '. $table. '...<br />';
-		
-			// query given languages in $table
-			$query = "SELECT $columnID, $columnlang FROM $table";
-			$rows = $DB->get_results( $query, ARRAY_A );
-			$languagestoconvert = array();
-			if( count( $rows ) ) foreach( $rows as $row )
-			{
-				// remember the ID for that locale
-				$languagestoconvert[ $row[ $columnlang ] ][] = $row[ $columnID ];
-			}
-			
-			foreach( $languagestoconvert as $lkey => $lIDs)
-			{ // converting the languages we've found
-				$converted = false;
-				echo '&nbsp; Converting lang \''. $lkey. '\' '; // (with IDs: '. implode( ', ', $lIDs ). ').. ';
-
-				if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $lkey) )
-				{ // Already valid
-					echo 'nothing to update, already valid!<br />';
-					continue;
-				}
-
-				if( (strlen($lkey) == 2) && ( substr( $default_locale, 0, 2 ) != $lkey ) )
-				{ // we have an old two letter lang code to convert
-					// and it doesn't match the default locale
-					foreach( $locales as $newlkey => $v )
-					{  // loop given locales
-						if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
-						{  // if language matches, update
-							$converted = $DB->query( "UPDATE $table 
-																				SET $columnlang = '$newlkey' 
-																				WHERE $columnlang = '$lkey'" );
-							echo 'to locale \''. $newlkey. '\'<br />';
-							break;
-						}
-					}
-				}
-				
-				if( !$converted )
-				{ // we have nothing converted yet, setting default:
-					$DB->query( "UPDATE $table 
-													SET $columnlang = '$default_locale' 
-												WHERE $columnlang = '$lkey'" );
-					echo 'forced to default locale \''. $default_locale. '\'<br />';
-				}
-			}
-			echo "\n";
-		}  // convert_lang_to_locale(-)
-		
 		echo 'Upgrading posts table... ';
 		$query = "UPDATE $tableposts
 							SET post_urltitle = NULL";
@@ -554,11 +557,11 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 		
 		echo 'Creating user preferences table... ';
-		$DB->query( "CREATE TABLE $tableuserprefs (
-								upref_user_ID INT() NOT NULL ,
-								upref_name VARCHAR( 30 ) NOT NULL,
-								upref_value VARCHAR( 255 ) NULL,
-								PRIMARY KEY ( upref_user_ID, upref_name )
+		$DB->query( "CREATE TABLE $tableusersettings (
+								uset_user_ID INT() NOT NULL ,
+								uset_name VARCHAR( 30 ) NOT NULL,
+								uset_value VARCHAR( 255 ) NULL,
+								PRIMARY KEY ( uset_user_ID, uset_name )
 								)");
 		echo "OK.<br />\n";
 

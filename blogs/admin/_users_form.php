@@ -77,7 +77,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 																					: $edited_User->dget('login', 'formvalue') )
 		?>" />
 		
-	<fieldset class="left70">
+	<fieldset>
 		<legend><?php echo T_('User') ?></legend>
 		<?php
 			if( $allowed_to_edit )
@@ -223,7 +223,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	<?php
 	if( $allowed_to_edit )
 	{ ?>
-	<fieldset class="submit">
+	<fieldset>
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
