@@ -416,9 +416,6 @@ class Plugins
 		}
 	}
 
-		}
-	}
-
 
 	/**
 	 * Validate renderer list
@@ -586,6 +583,7 @@ class Plugins
 		return true;
 	}
 
+
 	/**
 	 * Get a specific plugin by its name.
 	 *
@@ -630,6 +628,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/21 00:48:15  blueyed
+ * parse error fixed
+ *
  * Revision 1.5  2005/02/20 22:41:44  blueyed
  * sort(), use method_exists() for trigger_event, sort_Plugin_name() added, doc, whitespace
  *
