@@ -31,7 +31,7 @@ function cat_create(
 	}
 
 	$sql = "INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID)
-					VALUES ( $cat_parent_ID, '$cat_name', $cat_blog_ID )";
+					VALUES ( $cat_parent_ID, ".$DB->quote($cat_name).", $cat_blog_ID )";
 	if( ! $DB->query( $sql ) )
 		return 0;
 
