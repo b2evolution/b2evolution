@@ -244,28 +244,32 @@ function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 /*
  * comment_ID(-)
  */
-function comment_ID() {
+function comment_ID() 
+{
 	global $commentdata;	echo $commentdata['comment_ID'];
 }
 
 /*
  * comment_author(-)
  */
-function comment_author() {
+function comment_author() 
+{
 	global $commentdata;	echo stripslashes($commentdata['comment_author']);
 }
 
 /*
  * comment_author_email(-)
  */
-function comment_author_email() {
+function comment_author_email() 
+{
 	global $commentdata;	echo antispambot(stripslashes($commentdata['comment_author_email']));
 }
 
 /*
  * comment_author_url(-)
  */
-function comment_author_url() {
+function comment_author_url() 
+{
 	global $commentdata;
 	$url = trim(stripslashes($commentdata['comment_author_url']));
 	$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
@@ -279,7 +283,8 @@ function comment_author_url() {
 /*
  * comment_author_email_link(-)
  */
-function comment_author_email_link($linktext='', $before='', $after='') {
+function comment_author_email_link($linktext='', $before='', $after='') 
+{
 	global $commentdata;
 	$email=$commentdata['comment_author_email'];
 	if ((!empty($email)) && ($email != '@')) {

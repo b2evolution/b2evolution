@@ -86,17 +86,19 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		{
 			// echo 'notify';
 			$postdata = get_postdata($comment_post_ID);
-			$authordata = get_userdata($postdata["Author_ID"]);
-			$recipient = $authordata["user_email"];
+			$blog = $postdata['Blog'];
+			$authordata = get_userdata($postdata['Author_ID']);
+			$recipient = $authordata['user_email'];
 			$subject = sprintf( T_('New trackback on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
 			// fplanque added:
-			$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
+			$comment_blogparams = get_blogparams_by_ID( $blog );
 
 			$notify_message  = sprintf( T_('New trackback on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
 			$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$comment_post_ID."&tb=1\n\n";
 			$notify_message .= T_('Website', $default_locale).": $comment_author (IP: $user_ip , $user_domain)\n";
 			$notify_message .= T_('Url', $default_locale).": $comment_author_url\n";
-			$notify_message .= T_('Excerpt', $default_locale).": \n".stripslashes($original_comment)."\n";
+			$notify_message .= T_('Excerpt', $default_locale).": \n".stripslashes($original_comment)."\n\n";
+			$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
 			@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
 			

@@ -1183,7 +1183,7 @@ function pingback_ping($m) {
 
 				if (!empty($context))
 				{
-					global $comments_allowed_uri_scheme;
+					global $admin_url, $comments_allowed_uri_scheme;
 				
 					$pagelinkedfrom = preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom);
 					$title = (!strlen($matchtitle[1])) ? $pagelinkedfrom : $matchtitle[1];
@@ -1209,17 +1209,19 @@ function pingback_ping($m) {
 						if ($comments_notify)
 						{
 							$postdata = get_postdata($post_ID);
+							$blog = $postdata['Blog'];
 							$authordata = get_userdata($postdata['Author_ID']);
 							$recipient = $authordata['user_email'];
 							$subject = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] );
 							// fplanque added:
-							$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
+							$comment_blogparams = get_blogparams_by_ID( $blog );
 	
 							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$post_ID."&pb=1\n\n";
 							$notify_message .= T_('Website', $default_locale). ": $original_title\n";
 							$notify_message .= T_('Url', $default_locale). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt', $default_locale). ": \n[...] $original_context [...]\n\n";
+							$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 	
 							@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
 	

@@ -87,10 +87,11 @@ $result = mysql_query($query) or mysql_oops( $query );
 if ($comments_notify) 
 {	
 	$postdata = get_postdata($comment_post_ID);
-	$authordata = get_userdata($postdata["Author_ID"]);
-	$recipient = $authordata["user_email"];
+	$blog = $postdata['Blog'];
+	$authordata = get_userdata($postdata['Author_ID']);
+	$recipient = $authordata['user_email'];
 	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
-	$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
+	$comment_blogparams = get_blogparams_by_ID( $blog );
 
 	// Not translated because sent to someone else...
 	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
@@ -98,7 +99,9 @@ if ($comments_notify)
 	$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip , $user_domain)\n";
 	$notify_message .= T_('Email', $default_locale).": $email\n";
 	$notify_message .= T_('Url', $default_locale).": $url\n";
-	$notify_message .= T_('Comment', $default_locale).": \n".stripslashes($original_comment)."\n";
+	$notify_message .= T_('Comment', $default_locale).": \n".stripslashes($original_comment)."\n\n";
+	$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
+	
 
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
 
