@@ -1133,6 +1133,8 @@ function validate_url( $url, & $allowed_uri_scheme )
 /**
  * Wrap pre tag around var_dump() for better debugging
  *
+ * {@internal pre_dump(-) }}
+ *
  * @param mixed variable to dump
  * @param string title to display
  */
@@ -1218,6 +1220,8 @@ function debug_info( $force = false )
  * It will be set in /blogs/evocore/_main.inc.php and handle the output.
  * It strips every line and generates a md5-ETag, which is checked against the one eventually
  * being sent by the browser.
+ *
+ * {@internal obhandler(-) }}
  *
  * @param string output given by PHP
 */
@@ -1450,8 +1454,29 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
 	}
 }
 
+
+/**
+ * Create IMG tag for an action icon
+ *
+ * @param string IMG ALT text
+ * @param string TITLE text (IMG and A link)
+ * @param string IMG SRC
+ * @param string HREF url
+ * @param integer image width
+ * @param integer image height
+ */
+function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
+{
+	return '<a href="'.$url.'" title="'.$title.'"><img src="img/'.$img.'" width="'.$width.
+						'" height="'.$height.'" class="middle" alt="'.$alt.'" title="'.$title.'" /></a> ';
+}
+
+
 /*
  * $Log$
+ * Revision 1.3  2004/10/15 15:38:52  fplanque
+ * added action_icon()
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *
