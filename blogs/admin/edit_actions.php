@@ -71,6 +71,7 @@ switch($action)
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_locale', 'string', $default_locale );
+		param( 'renderers', 'array', array() );
 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
@@ -471,7 +472,7 @@ switch($action)
 
 
 	default:
-		die( 'Unkown action!' );
+		die( 'Unknown action!' );
 }
 
 if( errors() )

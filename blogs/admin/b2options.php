@@ -307,7 +307,7 @@ $current_User->check_perm( 'options', 'view', true );
 											array( 'postbypost', T_('post by post') )
 										), T_('Archive mode') );
 	
-					form_checkbox( 'newautobr', get_settings('AutoBR'), T_('Auto-BR'), sprintf( T_('Converts line-breaks into &lt;br /&gt; tags.' ) ) );
+					form_checkbox( 'newautobr', get_settings('AutoBR'), T_('Auto-BR'), T_('This option is deprecated, you should avoid using it.') );
 				?>
 			</fieldset>
 	
@@ -388,6 +388,7 @@ $current_User->check_perm( 'options', 'view', true );
 					<table class="thin">
 						<tr>
 							<th><?php echo T_('Plug-in') ?></th>
+							<th><?php echo T_('Apply') ?></th>
 							<th><?php echo T_('Description') ?></th>
 							<th><?php echo T_('Code') ?></th>
 						</tr>
@@ -398,8 +399,9 @@ $current_User->check_perm( 'options', 'view', true );
 						?>
 						<tr>
 							<td><?php	$loop_RendererPlugin->name(); ?></td>
+							<td><?php	echo $loop_RendererPlugin->apply; ?></td>
 							<td><?php	$loop_RendererPlugin->short_desc(); ?></td>
-							<td><?php	echo $loop_RendererPlugin->code; ?></td>
+							<td><?php	$loop_RendererPlugin->code(); ?></td>
 						</tr>
 						<?php
 						}
@@ -423,7 +425,7 @@ $current_User->check_perm( 'options', 'view', true );
 						<tr>
 							<td><?php	$loop_ToolbarPlugin->name(); ?></td>
 							<td><?php	$loop_ToolbarPlugin->short_desc(); ?></td>
-							<td><?php	echo $loop_ToolbarPlugin->code; ?></td>
+							<td><?php	$loop_ToolbarPlugin->code(); ?></td>
 						</tr>
 						<?php
 						}

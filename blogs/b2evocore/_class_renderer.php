@@ -33,34 +33,44 @@ class Renderer extends Plug
 	 * {@internal Renderer::render(-)}}
 	 *
 	 * @param string content to render
-	 * @param string mode 'content' or 'other'
+	 * @param array renderer codes
 	 * @return string rendered content
 	 */
-	function render( $content, $mode = 'content' )
+	function render( & $content, & $renderers )
 	{
 		$this->init();	// Init if not done yet.
 		
-		switch( $mode )
-		{
-			case 'content':
-				$this->index_Plugins['b2DATxtl']->render( $content );
-				$this->index_Plugins['b2WPAutP']->render( $content );
-				$this->index_Plugins['b2evGMco']->render( $content );
-				$this->index_Plugins['b2evBBco']->render( $content );
-				$this->index_Plugins['b2evALnk']->render( $content );
-				$this->index_Plugins['b2evSmil']->render( $content );
-				$this->index_Plugins['b2WPTxrz']->render( $content );
-				break;
-				
-			case 'other':
-				$this->index_Plugins['b2evGMco']->render( $content );
-				$this->index_Plugins['b2evSmil']->render( $content );
-				$this->index_Plugins['b2WPTxrz']->render( $content );
-				break;
+		$this->restart(); // Just in case.
+		
+		while( $loop_RendererPlugin = $this->get_next() )
+		{ // Go through whole list of renders
+			// echo ' ',$loop_RendererPlugin->code;
 
-			default:
-				die( 'Rendering mode ['.$mode.'] not supported.' );
+			switch( $loop_RendererPlugin->apply )
+			{
+				 case 'stealth':
+				 case 'always':
+					// echo 'FORCED';
+					$loop_RendererPlugin->render( $content );
+					break;
+				 
+				 case 'opt-out':
+				 case 'opt-in':
+				 case 'lazy':
+					if( in_array( $loop_RendererPlugin->code, $renderers ) )
+					{	// Option is activated
+						// echo 'OPT';
+						$loop_RendererPlugin->render( $content );
+					}
+					// echo 'NO';
+					break;
+									 
+				 case 'never':
+					// echo 'NEVER';
+					continue;	// STOP, don't render, go to next renderer
+			}		
 		}
+
 		return $content; 
 	}	
 	

@@ -200,6 +200,8 @@ class textile_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2DATxtl';
 	var $name = 'Textile';
+	var $priority = 20;
+	var $apply = 'lazy';
 	var $short_desc = 'Humane Web Text Generator';
 	var $long_desc = 'No description available';
 
@@ -265,7 +267,7 @@ class textile_Rendererplugin extends RendererPlugin
 			if (!$noimage) {
 				$text = $this->image($text);
 			}
-			$text = $this->code($text);
+			$text = $this->textilecode($text);
 			$text = $this->span($text);
 			$text = $this->superscript($text);
 			$text = $this->footnoteRef($text);
@@ -650,7 +652,7 @@ function refs($m)
     }
 
 // -------------------------------------------------------------
-    function code($text)
+    function textilecode($text)
     {
         return preg_replace_callback("/
             (?:^|(?<=[\s\(])|([[{]))        # before

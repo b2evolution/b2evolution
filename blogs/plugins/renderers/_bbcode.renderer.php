@@ -16,6 +16,8 @@ class bbcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
+	var $priority = 43;
+	var $apply = 'opt-in';
 	var $short_desc = 'BB formatting e-g [b]bold[/b]';
 	var $long_desc = 'No description available';
 

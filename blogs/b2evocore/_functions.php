@@ -97,19 +97,19 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlcontent':
 			// content displayed in HTML page body: apply renders and allow full HTML
-			$content = $Renderer->render( $content, 'content' );
+			// $content = $Renderer->render( $content, 'content' );
 			$content = convert_chars($content, 'html');
 			break;
 
 		case 'htmlrendered':
 			// content displayed in HTML page body: apply renders and allow full HTML
-			$content = $Renderer->render( $content, 'other' );
+			// $content = $Renderer->render( $content, 'other' );
 			$content = convert_chars($content, 'html');
 			break;
 
 		case 'entityencoded':
 			// Special mode for RSS 0.92: apply renders and allow full HTML but escape it
-			$content = $Renderer->render( $content, 'content' );
+			// $content = $Renderer->render( $content, 'content' );
 			$content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
 			break;

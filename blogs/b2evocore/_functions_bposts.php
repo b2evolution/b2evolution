@@ -403,7 +403,8 @@ function Item_get_by_ID( $post_ID )
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_trackbacks, post_category,
-									post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID
+									post_autobr, post_flags, post_wordcount, post_comments, 
+									'' AS post_renderers, cat_blog_ID
 					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:

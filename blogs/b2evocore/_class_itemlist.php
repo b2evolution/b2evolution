@@ -432,7 +432,7 @@ class ItemList extends DataObjectList
 																			post_status, post_locale, post_content, post_title,
 																			post_urltitle, post_trackbacks, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
-																			post_karma
+																			'' AS post_renderers, post_karma
 											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)
 														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 
@@ -483,7 +483,7 @@ class ItemList extends DataObjectList
 		// we need globals for the param function
 		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
 						$post_title, $post_url, $post_category, $post_autobr, $edit_date,
-						$aa, $mm, $jj, $hh, $mn, $ss;
+						$aa, $mm, $jj, $hh, $mn, $ss, $renderers;
 		global $DB, $localtimenow;
 
 		$id = 0;
@@ -495,9 +495,11 @@ class ItemList extends DataObjectList
 		param( 'post_url', 'string', true );
 		param( 'post_category', 'integer', true );
 		param( 'post_autobr', 'integer', 0 );
+		param( 'renderers', 'array', array() );
 
 		$post_title = format_to_post( $post_title, 0 );
 		$content = format_to_post( $content, $post_autobr );
+		$post_renderers = implode( '.', $renderers );
 
 		param( 'edit_date', 'integer', 0 );
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
@@ -548,6 +550,7 @@ class ItemList extends DataObjectList
 										'' AS post_flags, 
 										".bpost_count_words( $content )." AS post_wordcount, 
 										'open' AS post_comments,
+										'".$DB->escape( $post_renderers )."' AS post_renderers, 
 										0 AS post_karma";
 	}
 

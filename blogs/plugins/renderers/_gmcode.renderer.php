@@ -16,6 +16,8 @@ class gmcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
+	var $priority = 41;
+	var $apply = 'opt-out';
 	var $short_desc = 'GreyMatter style formatting';
 	var $long_desc = 'No description available';
 

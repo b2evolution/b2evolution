@@ -86,6 +86,9 @@ class Plug
 				}
 			}
 		
+			// Sort array by priority:
+			usort( $this->Plugins, 'sort_Plugin' );
+		
 			$this->initialized = true;
 		}
 	}
@@ -101,7 +104,7 @@ class Plug
 	 */
 	function register( & $Plugin )
 	{
-		$this->Plugins[]= & $Plugin;
+		$this->Plugins[] = & $Plugin;
 		$this->index_Plugins[ $Plugin->code ] = & $Plugin;
 	}
 	
@@ -135,5 +138,10 @@ class Plug
 		$this->current_idx = 0;
 	}
 	
+}
+
+function sort_Plugin( & $a, & $b )
+{
+	return $a->priority - $b->priority;
 }
 ?>

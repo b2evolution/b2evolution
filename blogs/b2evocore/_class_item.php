@@ -26,6 +26,7 @@ class Item extends DataObject
 	var $wordcount = 0;
 	var $main_cat_ID = 0;
 	var $flags;
+	var $renderers;
 	var $comments;			// Comments status
 	var $url;					// Should move
 	var $autobr = 0;		// Should move
@@ -50,6 +51,7 @@ class Item extends DataObject
 		{
 			$this->ID = 0;
 			$this->flags = array();
+			$this->renderers = array();
 		}
 		else
 		{
@@ -67,8 +69,9 @@ class Item extends DataObject
 			$this->main_cat_ID = $db_row->post_category;
 			$this->flags = $db_row->post_flags;
 			$this->comments = $db_row->post_comments;			// Comments status
-			$this->url = $db_row->post_trackbacks;					// Should move
-			$this->autobr = $db_row->post_autobr;				// Should move
+			$this->renderers = explode( '.', $db_row->post_renderers );
+			$this->url = $db_row->post_trackbacks;				// Should move
+			$this->autobr = $db_row->post_autobr;					// Should move
 			// Private vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
 		}
@@ -399,6 +402,7 @@ class Item extends DataObject
 		$more_file = ''
 		) 
 	{
+		global $Renderer;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 		
 		if( $more_link_text == '#' ) 
@@ -474,6 +478,10 @@ class Item extends DataObject
 			$output = $content_parts[0];
 		}
 
+		// Apply rendering
+		$output = $Renderer->render( $output, $this->renderers );
+
+		// Character conversions
 		$output = format_to_output( $output, $format );
 		
 		if( ($format == 'xml') && $cut )

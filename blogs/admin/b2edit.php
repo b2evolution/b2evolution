@@ -197,11 +197,6 @@ switch($action)
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		/*   // DH to FP: $editing not used anywhere else. remove it?
-		#param( 'editing', 'integer', 0 );
-		#pre_dump( $editing, 'autobr-b2edit-default' );
-		#param( 'post_autobr', 'integer', ($editing ? 0 : get_settings('AutoBR') ) );	// Use real default only if we weren't already editing
-		*/
 		param( 'post_autobr', 'integer', get_settings('AutoBR') );  // Use default if nothing provided
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );

@@ -12,6 +12,8 @@ class auto_p_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
+	var $priority = 30;
+	var $apply = 'opt-out';
 	var $short_desc = 'Automatic &lt;P&gt; and &lt;BR&gt; tags';
 	var $long_desc = 'No description available';
 

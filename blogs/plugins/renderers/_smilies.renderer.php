@@ -14,6 +14,8 @@ class smilies_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
+	var $priority = 80;
+	var $apply = 'always';
 	var $short_desc = 'Convert text smilies to icons';
 	var $long_desc = 'No description available';
 
@@ -69,20 +71,6 @@ class smilies_Rendererplugin extends RendererPlugin
 			$this->search = array();
 
 
-			/**
-			 * sorts the smilies' array by length
-			 * this is important if you want :)) to superseede :) for example
-			 */
-			function smiliescmp($a, $b)
-			{
-				if(($diff = strlen($b) - strlen($a)) == 0)
-				{
-					return strcmp($a, $b);
-				}
-				return $diff;
-			}
-
-
 			$tmpsmilies = $this->smilies;
 			uksort($tmpsmilies, 'smiliescmp');
 	
@@ -103,6 +91,21 @@ class smilies_Rendererplugin extends RendererPlugin
 		$content = str_replace( $this->search, $this->replace, $content );
 	}
 }
+
+/**
+ * sorts the smilies' array by length
+ * this is important if you want :)) to superseede :) for example
+ */
+function smiliescmp($a, $b)
+{
+	if(($diff = strlen($b) - strlen($a)) == 0)
+	{
+		return strcmp($a, $b);
+	}
+	return $diff;
+}
+
+
 
 // Register the plugin:
 $this->register( new smilies_Rendererplugin() );

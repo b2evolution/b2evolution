@@ -14,6 +14,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
+	var $priority = 70;
 	var $short_desc = 'One click smilies inserting';
 	var $long_desc = 'No description available';
 

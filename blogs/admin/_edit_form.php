@@ -155,7 +155,7 @@ if ($use_spellchecker)
 
 	<?php // --------------------------- AUTOBR -------------------------------------- 	?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-	if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
+	if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
 
 	<?php
 	if($use_preview && ($action != 'editcomment') )
@@ -184,7 +184,6 @@ if ($use_spellchecker)
 
 	<fieldset>
 		<legend><?php echo T_('Advanced properties') ?></legend>
-
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
@@ -228,7 +227,7 @@ if ($use_spellchecker)
 		?>
 		<div>
 			<label for="post_urltitle"><strong><?php echo T_('URL Title') ?>:</strong></label>
-			<input type="text" name="post_urltitle" id="post_urltitle" tabindex="22" value="<?php echo format_to_output( $post_urltitle, 'htmlattr' ); ?>" size="40" maxlength="50" />
+			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'htmlattr' ); ?>" size="40" maxlength="50" tabindex="20" />
 			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
 		</div>
 		<?php
@@ -248,7 +247,7 @@ if ($use_spellchecker)
 		?>
 		<div>
 			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" 
-				<?php	if ($post_pingback) { echo ' checked="checked"'; } ?> tabindex="20" />
+				<?php	if ($post_pingback) { echo ' checked="checked"'; } ?> />
 			<label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label>
 		</div>
 		<?php
@@ -258,7 +257,7 @@ if ($use_spellchecker)
 		{	// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div>
-			<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="21" value="<?php echo format_to_output( $post_trackbacks, 'htmlattr' ); ?>" />
+			<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'htmlattr' ); ?>" />
 		</div>
 		<?php
 		}
@@ -416,6 +415,30 @@ if( $action != 'editcomment' )
 
 	</fieldset>
 
+	<fieldset>
+		<legend><?php echo T_('Renderers') ?></legend>
+		<?php
+		$Renderer->restart();	 // make sure iterator is at start position
+		while( $loop_RendererPlugin = $Renderer->get_next() )
+		{
+			if( ! $loop_RendererPlugin-> can_apply() )
+				continue;
+		?>
+		<div>
+			<input type="checkbox" class="checkbox" name="renderers[]" 
+				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"  
+				<?php	
+					if( $loop_RendererPlugin->applies() ) { echo ' checked="checked"'; }
+					if( ! $loop_RendererPlugin->is_optional() ) { echo ' disabled="disabled"'; }
+				?>  
+				title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
+			<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name(); ?></strong></label>
+		</div>
+		<?php
+		}
+		?>
+	</fieldset>
+
 	</div>
 <?php
 }
@@ -429,6 +452,7 @@ if ($action == "editcomment")
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $commentdata["comment_status"]; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $commentdata["comment_author_IP"]; ?></p>
 	</div>
+
 <?php
 }
 /* elseif ($action == "edit")

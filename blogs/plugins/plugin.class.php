@@ -22,12 +22,23 @@ class Plugin
 	 * Should be overriden by derived class:
 	 */
 	var $code = '';
+	var $priority = 50;
 	var $name = 'Unnamed plug-in';
 	var $short_desc = 'No desc available';
 	var $long_desc = 'No description available';
 
 	/**#@-*/
 
+	/** 
+	 * Template function: display plugin code
+	 *
+	 * {@internal Plugin::code(-) }}
+	 */
+	function code() 
+	{
+		echo $this->code;
+	}
+	
 	/** 
 	 * Template function: display plugin name
 	 *
@@ -63,6 +74,21 @@ class Plugin
 	{
 		echo format_to_output( $this->long_desc, $format );
 	}
+
+	/**
+	 * Set param value
+	 *
+	 * {@internal Plugin::set_param(-) }}
+	 *
+	 * @param string Name of parameter
+	 * @param mixed Value of parameter
+	 */
+	function set_param( $parname, $parvalue )
+	{
+		// Set value:
+		$this->$parname = $parvalue;
+	}
+
 	
 }
 ?>

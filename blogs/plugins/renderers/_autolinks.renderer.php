@@ -14,6 +14,8 @@ class autolinks_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
+	var $priority = 60;
+	var $apply = 'opt-out';
 	var $short_desc = 'Make URLs clickable';
 	var $long_desc = 'No description available';
 
