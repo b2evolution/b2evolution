@@ -2,11 +2,11 @@
 /**
  * This file loads and initializes the blog to be displayed.
  *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/}.
- * Parts of this file are copyright (c)2004 by Jeff BEARER.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -28,14 +28,14 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
  * @author blueyed: Daniel HAHLER
+ * @author fplanque: François PLANQUE
  * @author jeffbearer: Jeff BEARER
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
- *            - t3dworld
  * 						- cafelog (team)
+ *            - t3dworld
  * }}
  *
  * @version $Id$
@@ -305,4 +305,13 @@ else
 	}
 	// If we end up here the blog file should be a full template, not just a stub...
 }
+
+/*
+ * $Log$
+ * Revision 1.66  2004/10/11 18:49:10  fplanque
+ * Edited code documentation.
+ *
+ * Revision 1.42  2004/5/28 17:18:58  jeffbearer
+ * added function to keep the active session fresh, part of the who's online feature
+ */
 ?>
