@@ -37,8 +37,8 @@
  * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
- * @todo: Permissions!
- * @todo: favorite folders/bookmarks
+ * @todo Permissions!
+ * @todo favorite folders/bookmarks
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -49,7 +49,9 @@ require_once dirname(__FILE__).'/_filelist.class.php';
 
 
 /**
- * TODO: docblock for class
+ * Extends {@link Filelist} and provides file management functionality.
+ *
+ * @package admin
  */
 class FileManager extends Filelist
 {
@@ -1088,6 +1090,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

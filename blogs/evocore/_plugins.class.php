@@ -59,7 +59,7 @@ class Plugins
 
 	/**
 	 * Indexes:
-	 * @todo: updates
+	 * @todo updates
 	 */
 	var $index_Plugins = array();
 	var $index_name_Plugins = array();
@@ -578,6 +578,9 @@ function sort_Plugin( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

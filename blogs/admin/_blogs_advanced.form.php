@@ -31,8 +31,6 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package admin
- *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author blueyed: Daniel HAHLER

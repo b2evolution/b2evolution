@@ -36,7 +36,8 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$
+ * @version $Id$ }}}
+ *
  */
 
 /**
@@ -45,10 +46,13 @@
  * Messages can be logged into different categories (aka levels)
  * Examples: 'note', 'error'. Note: 'all' is reserved to display all levels together.
  * Messages can later be displayed grouped by category/level.
+ *
+ * @package evocore
  */
 class Log
 {
-	var $messages;
+	var $messages = array();
+	var $defaultlevel = 'error';
 
 	/**
 	 * Constructor.
@@ -65,11 +69,11 @@ class Log
 
 
 	/**
-	 * Clears the Log.
+	 * Clears the Log
 	 *
 	 * @param string level, use 'all' to unset all levels
 	 */
-	function clear( $level = '#' )
+	function clear( $level = NULL )
 	{
 		if( $level == 'all' )
 		{
@@ -77,7 +81,7 @@ class Log
 		}
 		else
 		{
-			if( $level == '#' )
+			if( $level === NULL )
 			{
 				$level = $this->defaultlevel;
 			}
@@ -92,10 +96,10 @@ class Log
 	 * @param string the message
 	 * @param string the level, default is to use the object's default level
 	 */
-	function add( $message, $level = '#' )
+	function add( $message, $level = NULL )
 	{
-		if( $level == '#' )
-		{	// By default, we use the default level:
+		if( $level === NULL )
+		{ // By default, we use the default level:
 			$level = $this->defaultlevel;
 		}
 
@@ -104,9 +108,10 @@ class Log
 
 
 	/**
-	 * Get header/footer for a specific level, used by {@link display()}
+	 * Get head/foot for a specific level, designed for internal use of {@link display()}
 	 *
-	 * @todo Daniel, please describe what this is to be used for.
+	 * @static
+	 * @access private
 	 *
 	 * @param mixed head or foot (array [ level => head/foot or string [for container])
 	 * @param string the level (or container)
@@ -134,20 +139,35 @@ class Log
 	/**
 	 * Wrapper to display messages as simple paragraphs.
 	 *
-	 * @param mixed the level of messages {@link display()}
-	 * @param mixed the outer div {@link display()}
+	 * @param mixed the level of messages, see {@link display()}
+	 * @param mixed the outer div, see {@link display()}
 	 * @param mixed the css class for inner paragraphs
 	 */
-	function displayParagraphs( $level = NULL, $outerdiv = 'panelinfo', $cssclass = false )
+	function displayParagraphs( $level = NULL, $outerdivclass = 'panelinfo', $cssclass = false )
 	{
-		return $this->display( '', '', true, $level, $cssclass, 'p', $outerdiv );
+		return $this->display( '', '', true, $level, $cssclass, 'p', $outerdivclass );
 	}
 
 
 	/**
 	 * Display messages of the Log object.
 	 *
-	 * @todo Daniel, please describe the advanced features.
+	 * - You can either output/get the logs of a level (string),
+	 *   all levels ('all') or level groups (array of strings).
+	 * - Head/Foot will be displayed on top/bottom of the messages. You can pass
+	 *   an array as head/foot with the level as key and this will be displayed
+	 *   on top of the level's messages.
+	 * - You can choose from various styles for message groups ('ul', 'p', 'br')
+	 *   and set a css class for it (by default 'log_'.$level gets used).
+	 * - You can suppress the outer div or set a css class for it (defaults to
+	 *   'log_container').
+	 *
+	 * You can also call this function static (without creating an object), like:
+	 *   <code>
+	 *   Log::display( 'head', 'foot', 'message' );
+	 *   </code>
+	 *   Please note: when called static, it will always display, because $display
+	 *                equals true.
 	 *
 	 * @param string header/title (default: empty), might be array ( level => msg ),
 	 *               'container' is then top
@@ -159,29 +179,39 @@ class Log
 	 * @param string the style to use, 'ul', 'p', 'br'
 	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
-	 * @return boolean false, if no messages; else true (and outputs)
+	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
 	function display( $head = '', $foot = '', $display = true, $level = NULL,
-										$cssclass = NULL, $style = NULL, $outerdiv = 'log_container' )
+										$cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
 	{
 		if( $level === NULL )
 		{
-			$level = $this->defaultlevel;
+			$level = isset( $this->defaultlevel ) ?
+								$this->defaultlevel :
+								'error';
 		}
-		$disp = '';
+		if( !is_bool($display) )
+		{
+			$messages = array( $level => array($display) );
+		}
+		else
+		{
+			$messages =& $this->getMessages( $level );
+		}
 
-		$messages =& $this->getMessages( $level );
 		if( !count($messages) )
 		{
 			return false;
 		}
+		$disp = '';
 
-		if( $outerdiv )
+
+		if( $outerdivclass )
 		{
-			$disp .= "\n<div class=\"$outerdiv\">";
+			$disp .= "\n<div class=\"$outerdivclass\">";
 		}
 
-		$disp .= $this->getHeadFoot( $head, 'container', '<h2>%s</h2>' );
+		$disp .= Log::getHeadFoot( $head, 'container', '<h2>%s</h2>' );
 
 		foreach( $messages as $llevel => $lmessages )
 		{
@@ -193,7 +223,7 @@ class Log
 				$disp .= "\t<div class=\"$lcssclass\">";
 			}
 
-			$disp .= $this->getHeadFoot( $head, $llevel, '<h2>%s</h2>' );
+			$disp .= Log::getHeadFoot( $head, $llevel, '<h2>%s</h2>' );
 
 			if( $style == NULL )
 			{ // 'br' for a single message, 'ul' for more
@@ -215,16 +245,16 @@ class Log
 			{
 				$disp .= "\t".implode( "\n<br />\t", $lmessages );
 			}
-			$disp .= $this->getHeadFoot( $foot, $llevel, "\n<p>%s</p>" );
+			$disp .= Log::getHeadFoot( $foot, $llevel, "\n<p>%s</p>" );
 			if( $lcssclass )
 			{
 				$disp .= "\t</div>\n";
 			}
 		}
 
-		$disp .= $this->getHeadFoot( $foot, 'container', "\n<p>%s</p>" );
+		$disp .= Log::getHeadFoot( $foot, 'container', "\n<p>%s</p>" );
 
-		if( $outerdiv )
+		if( $outerdivclass )
 		{
 			$disp .= "</div>\n";
 		}
@@ -240,7 +270,7 @@ class Log
 
 
 	/**
-	 * Wrapper for {@link display}: use header/footer dependent on message count
+	 * Wrapper for {@link display()}: use header/footer dependent on message count
 	 * (one or more).
 	 *
 	 * @param string header/title for one message (default: empty), might be array
@@ -255,11 +285,11 @@ class Log
 	 * @param string the style to use, 'ul', 'p', 'br'
 	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
-	 * @return boolean false, if no messages; else true (and outputs)
+	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
 	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '',
 													$display = true, $level = NULL, $cssclass = NULL,
-													$style = NULL, $outerdiv = 'log_container' )
+													$style = NULL, $outerdivclass = 'log_container' )
 	{
 		switch( $this->count( $level ) )
 		{
@@ -365,6 +395,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.2  2004/10/14 16:28:41  fplanque
  * minor changes
  *

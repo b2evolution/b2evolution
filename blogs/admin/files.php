@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI controller for file management. {{{
+ * This file implements the UI controller for file management.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -36,15 +36,21 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$ }}}
+ * @version $Id$
  *
- * @todo: thumbnail view
- * @todo: PHPInfo (special permission)
- * @todo: directly run PHP-code (eval)
+ * @todo thumbnail view
+ * @todo PHPInfo (special permission)
+ * @todo directly run PHP-code (eval)
  *
  */
 
+/**
+ * Load config, init and get {@link $mode mode param}
+ */
 require_once dirname(__FILE__).'/_header.php';
+/**
+ * Load FileManager class
+ */
 require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
 
 $admin_tab = 'files';
@@ -82,7 +88,9 @@ if( $action == 'update_settings' )
 }
 
 
-// instanciate Filemanager object
+/**
+ * Filemanager object to work with
+ */
 $Fileman = new FileManager( $current_User, 'files.php', $root, $path, $filter, $filter_regexp, $order, $asc );
 
 if( !empty($file) )
@@ -653,44 +661,55 @@ switch( $action ) // {{{ (we catched empty action before)
 }
 
 
-// the top menu and header
+/**#@+
+ * The top menu
+ */
 require dirname(__FILE__).'/_menutop.php';
 require dirname(__FILE__).'/_menutop_end.php';
-
+/**#@-*/
 
 ?>
 <div id="filemanmain">
 <?php
 
 if( $mode == 'copymove' )
-{
+{{{
+	param( 'newname', 'string', basename($Fileman->source) );
 	?>
 
-	<div class="panelinfo">
-		<p>
-			<?php
-			printf( T_('You are moving or copying [%s].'), $Fileman->source );
-			?>
-		</p>
+	<div class="panelblock">
 		<form action="">
-			<input type="radio" name="action" id="fm_copy" value="copy" onclick="this.form.elements.submit.value='<?php
-			echo format_to_output( T_('Copy'), 'formvalue' );
-			?>';" />
-			<label for="fm_copy"><?php echo T_('Copy') ?></label>
-			<input type="radio" name="action" id="fm_move" value="move" onclick="this.form.elements.submit.value='<?php
-			echo format_to_output( T_('Move'), 'formvalue' );
-			?>';" />
-			<label for="fm_move"><?php echo T_('Move') ?></label>
-			<br />
-			<input type="submit" name="submit" value="<?php echo T_('Copy / Move!') ?>" />
+			<fieldset>
+				<legend><?php
+					printf( T_('You are moving or copying [%s].'), $Fileman->source );
+				?></legend>
+
+				<input type="radio" name="action" id="fm_copy" value="copy"
+					onclick="this.form.elements.submit.value=document.getElementById('fm_copy').value" />
+				<label for="fm_copy"><?php echo T_('Copy') ?></label>
+				<input type="radio" name="action" id="fm_move" value="move"
+					onclick="this.form.elements.submit.value=document.getElementById('fm_move').value" />
+				<label for="fm_move"><?php
+					echo dirname( $source ).'/' == $Fileman->cwd ?
+								T_('Rename') :
+								T_('Move'); ?></label>
+
+				<input type="text" name="newname" value="<?php echo $newname ?>" />
+				<input type="submit" name="submit" value="<?php
+					echo format_to_output(
+								( dirname( $source ).'/' == $Fileman->cwd ?
+										T_('Copy / Rename') :
+										T_('Copy / Move') ), 'formvalue' ) ?>" />
+			</fieldset>
 		</form>
 
 	</div>
 	<?php
 
-}
+}}}
 
-// output errors, notes and action messages
+
+// output errors, notes and action messages {{{
 if( isset( $msg_action )
 		|| $Fileman->Messages->count( array( 'error', 'note' ) )
 		|| $Messages->count( 'all' ) )
@@ -717,7 +736,8 @@ if( isset( $msg_action )
 		?>
 	</div>
 	<?php
-}
+} // }}}
+
 
 ?>
 <div class="panelblock">

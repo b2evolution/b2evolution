@@ -105,7 +105,7 @@ require_once( dirname(__FILE__).'/_log.class.php' );
 $Debuglog = new Log( 'note' );
 /**
  * Info & error message log for end user (initialized here)
- * @global Log $Debuglog
+ * @global Log $Messages
  */
 $Messages = new Log( 'error' );
 
@@ -123,24 +123,36 @@ timer_start();
 require_once( dirname(__FILE__).'/_vars.inc.php' );
 
 
+require_once( dirname(__FILE__).'/_db.class.php' );
 /**
  * Database connection (connection opened here)
  *
  * @global DB $DB
  */
-require_once( dirname(__FILE__).'/_db.class.php' );
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
 
 require_once( dirname(__FILE__).'/_results.class.php' );
 
 
+/**#@+
+ * Load setting class
+ */
+require_once( dirname(__FILE__).'/_generalsettings.class.php' );
+require_once( dirname(__FILE__).'/_usersettings.class.php' );
+/**#@-*/
 /**
  * Interface to general settings
  *
  * @global GeneralSettings $Settings
  */
-require_once( dirname(__FILE__).'/_generalsettings.class.php' );
 $Settings = & new GeneralSettings();
+/**
+ * Interface to user settings
+ *
+ * @global UserSettings $UserSettings
+ */
+$UserSettings = & new UserSettings();
+
 
 /**
  * Absolute Unix timestamp for server
@@ -152,15 +164,6 @@ $servertimenow = time();
  * @global int $localtimenow
  */
 $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
-
-
-/**
- * Interface to user settings
- *
- * @global UserSettings $UserSettings
- */
-require_once( dirname(__FILE__).'/_usersettings.class.php' );
-$UserSettings = & new UserSettings();
 
 
 /**
@@ -279,6 +282,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

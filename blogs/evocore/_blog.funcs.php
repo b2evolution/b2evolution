@@ -54,7 +54,7 @@ require_once dirname(__FILE__).'/_blogcache.class.php';
  * Create a new a blog
  * This funtion has to handle all needed DB dependencies!
  *
- * @todo: move this to Blog object
+ * @todo move this to Blog object
  */
 function blog_create(
 	$blog_name,
@@ -506,6 +506,9 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *

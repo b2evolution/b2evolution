@@ -95,7 +95,9 @@ require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
 
 
 /**
- * represents a file/dir
+ * Represents a file or directory.
+ *
+ * @package evocore
  */
 class File
 {
@@ -322,6 +324,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

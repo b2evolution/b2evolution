@@ -14,12 +14,19 @@
  * }}
  *
  * @package internal
- * @author blueyed
+ * @author blueyed: Daniel HAHLER
  */
 
+/**
+ * Load config
+ */
 require( '../blogs/conf/_config.php' );
+/**#@+
+ * Load required functions
+ */
 require( '../blogs/evocore/_misc.funcs.php' );
 require( '../blogs/evocore/_form.funcs.php' );
+/**#@-*/
 
 
 $pofilepath = dirname(__FILE__).'/langfiles';
@@ -146,7 +153,9 @@ function htmlmenu()
 };
 
 /**
- * a quick and dirty class for PO/POT files
+ * A quick and dirty class for PO/POT files
+ *
+ * @package internal
  */
 class POFile // {{{
 {
@@ -328,8 +337,11 @@ class POFile // {{{
 	}
 } // }}}
 
+
 /**
- * a class build upon class POFile to provide specific POT actions (write)
+ * A class build upon class POFile to provide specific POT actions (write)
+ *
+ * @package internal
  */
 class POTFile extends POFile  // {{{
 {
@@ -382,6 +394,7 @@ msgstr ""
 	}
 
 } // }}}
+
 
 /**
  * output, respects commandline mode

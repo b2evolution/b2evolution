@@ -44,19 +44,21 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Class to handle the global settings
  *
+ * @package evocore
  * @abstract
+ * @see UserSettings, GeneralSettings
  */
 class AbstractSettings
 {
 	/**
-	 * the DB table which stores the settings
+	 * The DB table which stores the settings
 	 * @var string
 	 * @access protected
 	 */
 	var $dbtablename;
 
 	/**
-	 * array with DB cols key names
+	 * Array with DB cols key names
 	 * @var array of strings
 	 * @access protected
 	 */
@@ -71,8 +73,10 @@ class AbstractSettings
 
 
 	/**
-	 * the internal cache
+	 * The internal cache
+	 *
 	 * @access protected
+	 * @var mixed Contains the loaded settings or false, if not settings available.
 	 */
 	var $cache = false;
 
@@ -125,10 +129,10 @@ class AbstractSettings
 
 
 	/**
-	 * get a setting from the DB settings table
+	 * Get a setting from the DB settings table.
 	 *
-	 * @params string the values for the column keys (depends on $this->colkeynames
-	 *                and must match its count and order)
+	 * @param string the values for the column keys (depends on $this->colkeynames
+	 *               and must match its count and order)
 	 * @return mixed value on success, false if not found or error occurred
 	 */
 	function get()
@@ -179,11 +183,12 @@ class AbstractSettings
 
 
 	/**
-	 * Only set the first variable (passed by reference) if we could retrieve a setting
+	 * Only set the first variable (passed by reference) if we could retrieve a
+	 * setting.
 	 *
 	 * @param mixed variable to eventually set (by reference)
-	 * @params string the values for the column keys (depends on $this->colkeynames
-	 *                and must match its count and order)
+	 * @param string the values for the column keys (depends on $this->colkeynames
+	 *               and must match its count and order)
 	 * @return boolean true on success (variable was set), false if not
 	 */
 	function get_cond( &$toset )
@@ -207,10 +212,10 @@ class AbstractSettings
 
 
 	/**
-	 * temporarily sets a setting ({@link updateDB()}} writes it to DB)
+	 * Temporarily sets a setting ({@link updateDB()} writes it to DB)
 	 *
-	 * @params string the values for the column keys (depends on $this->colkeynames + $this->colvaluename
-	 *                and must match order and count)
+	 * @param string the values for the column keys (depends on {@link $colkeynames}
+	 *               and {@link colvaluename} and must match order and count)
 	 */
 	function set()
 	{
@@ -257,7 +262,7 @@ class AbstractSettings
 
 
 	/**
-	 * commits changed settings to DB
+	 * Commit changed settings to DB.
 	 */
 	function updateDB()
 	{
@@ -326,6 +331,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

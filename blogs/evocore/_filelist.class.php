@@ -37,7 +37,7 @@
  * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
- * @todo: method add() to allow specific file (outside path)
+ * @todo method add() to allow specific file (outside path)
  *
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -50,7 +50,9 @@ require_once dirname(__FILE__).'/_file.class.php';
 
 
 /**
+ * Implements a list of files.
  *
+ * @package evocore
  */
 class Filelist
 {
@@ -543,6 +545,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

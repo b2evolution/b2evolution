@@ -37,6 +37,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * TEST Plugin
  *
  * This plugin responds to virtually all possible plugin events :P
+ *
+ * @package plugins
  */
 class test_plugin extends Plugin
 {

@@ -46,7 +46,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 require_once( dirname(__FILE__).'/_abstractsettings.class.php' );
 
 /**
- * Class to handle the global settings
+ * Class to handle the global settings.
+ *
+ * @package evocore
  */
 class GeneralSettings extends AbstractSettings
 {
@@ -76,6 +78,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:22  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

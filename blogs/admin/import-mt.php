@@ -2,11 +2,13 @@
 /**
  * This file implements importing of Movable Type entries into b2evolution.
  *
- * TODO:
+ * {@internal
+ * TODO: {{{
+ *  - Wrap this by an abstract import class!
  *  - list of all posts, editable (overkill?)
- *  - assign comment_author_ID to comments if user exist?!
+ *  - assign comment_author_ID to comments if user exist?! }}}
  *
- * CHANGES:
+ * CHANGES: {{{
  *  0.9.0.10:
  *   - bugfixes (regarding post parsing, author mapping)
  *   - "convert ugly html" puts quotes around href attributes, if missing
@@ -46,37 +48,78 @@
  *   - we preselect the b2evo default renderers now (especially Auto-P)
  *   - fixed user mapping from select box
  *  0.1:
- *   - first release
- *
- * Credits go to the WordPress team (http://wordpress.org), where I got the basic
- * import-mt.php script with most of the core functions. Thank you!
+ *   - first release }}}
+ * }}
  *
  * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS)
  * and Movable Type 2.64 and 2.661.
- * It should work quite alright with b2evo 0.9 though.
+ * It should work quite alright with b2evo 0.9 and later though.
  *
- * Feedback is very welcome (http://thequod.de/contact).
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
+ * import-mt.php script with most of the core functions. Thank you!
  *
- * @author blueyed - http://hahler.de/daniel
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * In addition, as a special exception, the copyright holders give permission to link
+ * the code of this program with the PHP/SWF Charts library by maani.us (or with
+ * modified versions of this library that use the same license as PHP/SWF Charts library
+ * by maani.us), and distribute linked combinations including the two. You must obey the
+ * GNU General Public License in all respects for all of the code used other than the
+ * PHP/SWF Charts library by maani.us. If you modify this file, you may extend this
+ * exception to your version of the file, but you are not obligated to do so. If you do
+ * not wish to do so, delete this exception statement from your version.
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE
+ * @author blueyed: Daniel HAHLER
+ *
+ * @version $Id$
  */
 
 /**
- * enter the relative path of the import.txt file containing the MT entries.
+ * Enter the relative path of the import.txt file containing the MT entries.
  * If the file is called import.txt and it is in /admin, then this line should be:
+ * <code>
  * define('MTEXPORT', 'import.txt');
- * NOTE: Leave blank for UI selection.
+ * </code>
+ *
+ * You only need this to force a specific file instead of using a dropdown list
+ * (UI selection)
  */
-define('MTEXPORT', ''); // you only need this to force a specific file instead of using a dropdown list
-                        // of the .txt files in the /admin folder
+define('MTEXPORT', '');
 
-
-$output_debug_dump = 0;  // set to true to get a lot of <pre>'d var_dumps
+/**
+ * Set to true to get a lot of var_dumps, wrapped in pre tags
+ */
+$output_debug_dump = 0;
 
 
 // ----------- don't change below if you don't know what you do ------------------------
@@ -1510,6 +1553,12 @@ function renderer_list()
 }
 
 
+/**
+ * Die with a message.
+ *
+ * @param string the message (wrapped in div and p tag of class error)
+ * @param string optional head
+ */
 function dieerror( $message, $before = '' )
 {
 	if( !empty($before) )

@@ -19,6 +19,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * Class Archive
  *
  * @author Devin Doucette
+ * @package evocore
  */
 class archive
 {
@@ -267,7 +268,7 @@ class archive
 			else if(@file_exists($current))
 			{
 				$files[] = array('name'=>$current,'name2'=>$this->options['prepend'] .
-					preg_replace("/(\.+\/+)+/","",($this->options['storepaths'] == 0 && strstr($current,"/"))? 
+					preg_replace("/(\.+\/+)+/","",($this->options['storepaths'] == 0 && strstr($current,"/"))?
 					substr($current,strrpos($current,"/") + 1) : $current),'type'=>0,
 					'ext'=>substr($current,strrpos($current,".")),'stat'=>stat($current));
 			}
@@ -286,8 +287,8 @@ class archive
 	{
 		if($this->options['storepaths'] == 1 && !preg_match("/^(\.+\/*)+$/",$dirname))
 		{
-			$files = array(array('name'=>$dirname,'name2'=>$this->options['prepend'] . 
-				preg_replace("/(\.+\/+)+/","",($this->options['storepaths'] == 0 && strstr($dirname,"/"))? 
+			$files = array(array('name'=>$dirname,'name2'=>$this->options['prepend'] .
+				preg_replace("/(\.+\/+)+/","",($this->options['storepaths'] == 0 && strstr($dirname,"/"))?
 				substr($dirname,strrpos($dirname,"/") + 1) : $dirname),'type'=>5,'stat'=>stat($dirname)));
 		}
 		else
@@ -316,8 +317,8 @@ class archive
 			}
 			else if(@file_exists($dirname."/".$file))
 			{
-				$files[] = array('name'=>$dirname."/".$file,'name2'=>$this->options['prepend'] . 
-					preg_replace("/(\.+\/+)+/","",($this->options['storepaths'] == 0 && strstr($dirname."/".$file,"/"))? 
+				$files[] = array('name'=>$dirname."/".$file,'name2'=>$this->options['prepend'] .
+					preg_replace("/(\.+\/+)+/","",($this->options['storepaths'] == 0 && strstr($dirname."/".$file,"/"))?
 					substr($dirname."/".$file,strrpos($dirname."/".$file,"/") + 1) : $dirname."/".$file),'type'=>0,
 					'ext'=>substr($file,strrpos($file,".")),'stat'=>stat($dirname."/".$file));
 			}
@@ -394,6 +395,7 @@ class archive
  * Class Tar file
  *
  * @author Devin Doucette
+ * @package evocore
  */
 class tar_file extends archive
 {
@@ -577,6 +579,7 @@ class tar_file extends archive
  * Class Gzip_file
  *
  * @author Devin Doucette
+ * @package evocore
  */
 class gzip_file extends tar_file
 {
@@ -627,6 +630,7 @@ class gzip_file extends tar_file
  * Class Bzip_file
  *
  * @author Devin Doucette
+ * @package evocore
  */
 class bzip_file extends tar_file
 {
@@ -677,6 +681,7 @@ class bzip_file extends tar_file
  * Class Zip_file
  *
  * @author Devin Doucette
+ * @package evocore
  */
 class zip_file extends archive
 {
@@ -729,7 +734,7 @@ class zip_file extends archive
 			$current['name2'] = strtr($current['name2'],$translate);
 
 			$timedate = explode(" ",date("Y n j G i s",$current['stat'][9]));
-			$timedate = ($timedate[0] - 1980 << 25) | ($timedate[1] << 21) | ($timedate[2] << 16) | 
+			$timedate = ($timedate[0] - 1980 << 25) | ($timedate[1] << 21) | ($timedate[2] << 16) |
 				($timedate[3] << 11) | ($timedate[4] << 5) | ($timedate[5]);
 
 			$block = pack("VvvvV",0x04034b50,0x000A,0x0000,(isset($current['method']) || $this->options['method'] == 0)? 0x0000 : 0x0008,$timedate);
@@ -809,6 +814,9 @@ class zip_file extends archive
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/16 01:31:24  blueyed
+ * documentation changes
+ *
  * Revision 1.1  2004/10/13 22:46:34  fplanque
  * renamed [b2]evocore/*
  *

@@ -153,7 +153,7 @@ $fileupload_allowedusers = '';
  *
  * (this gets checked when editing/creating blogs).
  *
- * @global int $maxlength_urlname_stub;
+ * @global int $maxlength_urlname_stub
  */
 $maxlength_urlname_stub = 30;
 
