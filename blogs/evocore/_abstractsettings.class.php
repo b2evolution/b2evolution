@@ -118,7 +118,12 @@ class AbstractSettings
 	 */
 	function AbstractSettings()
 	{
-		if( count( $this->colkeynames ) > 3 || count( $this->colkeynames ) < 1 )
+		/**
+		 * @var integer internal counter for the number of column keys
+		 */
+		$this->count_colkeynames = count( $this->colkeynames );
+
+		if( $this->count_colkeynames > 3 || $this->count_colkeynames < 1 )
 		{
 			die( 'Settings keycount not supported for class '.get_class() );
 		}
@@ -153,7 +158,7 @@ class AbstractSettings
 		/**
 		 * The where clause - gets filled when {@link $cacheByColKeys} is used.
 		 */
-		$where = array();
+		$whereList = array();
 
 		if( $this->cacheByColKeys && is_array($getArgs) )
 		{
@@ -161,7 +166,7 @@ class AbstractSettings
 
 			for( $i = 0; $i < $this->cacheByColKeys; $i++ )
 			{
-				$where[] = $this->colkeynames[$i].' = "'.$getArgs[$i].'"';
+				$whereList[] = $this->colkeynames[$i].' = "'.$getArgs[$i].'"';
 
 				if( !is_array( $testCache )
 						|| !isset( $testCache[$getArgs[$i]] )
@@ -185,11 +190,11 @@ class AbstractSettings
 		global $DB;
 		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
 																.' FROM '.$this->dbtablename
-																.( count( $where ) ?
-																		' WHERE '.implode( ' AND ', $where ) :
+																.( isset( $whereList[0] ) ?
+																		' WHERE '.implode( ' AND ', $whereList ) :
 																		'' ) );
 
-		switch( count( $this->colkeynames ) )
+		switch( $this->count_colkeynames )
 		{
 			case 1:
 				if( !$result )
@@ -247,7 +252,7 @@ class AbstractSettings
 		$args = func_get_args();
 		$this->load( $args );
 
-		if( count( $args ) != count( $this->colkeynames ) )
+		if( func_num_args() != $this->count_colkeynames )
 		{
 			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not '
 											.'match $colkeynames (class '.get_class($this).').', 'error' );
@@ -258,7 +263,7 @@ class AbstractSettings
 
 		$r = NULL;
 
-		switch( count( $this->colkeynames ) )
+		switch( $this->count_colkeynames )
 		{
 			case 1:
 				if( isset($this->cache[ $args[0] ]) )
@@ -334,22 +339,25 @@ class AbstractSettings
 	/**
 	 * Temporarily sets a setting ({@link updateDB()} writes it to DB).
 	 *
-	 * @param string the values for the column keys (depends on {@link $colkeynames}
-	 *               and {@link colvaluename} and must match order and count)
+	 * @param string $args,... the values for the {@link $colkeynames column keys}
+	 *                         and {@link $colvaluename column value}. Must match order and count!
 	 */
 	function set()
 	{
 		global $Debuglog;
 
 		$args = func_get_args();
+		$this->load( $args ); // the last Arg is not meant to go to load() but it does no harm AFAICS
 
-		if( count( $args ) != (count( $this->colkeynames ) + 1) )
+		$count_args = func_num_args();
+
+		if( $count_args != ( $this->count_colkeynames + 1) )
 		{
 			$Debuglog->add( 'Count of arguments for AbstractSettings::set() does not match $colkeyname + 1 (colkeyvalue).', 'error' );
 			return false;
 		}
 
-		switch( count($this->colkeynames) )
+		switch( $this->count_colkeynames )
 		{
 			case 1:
 				$atcache =& $this->cache[ $args[0] ];
@@ -366,7 +374,7 @@ class AbstractSettings
 
 		if( isset($atcache->value) )
 		{
-			if( $atcache->value == $args[ count($args)-1 ] )
+			if( $atcache->value == $args[ $count_args-1 ] )
 			{ // already set
 				$Debuglog->add( get_class($this).'::set: ['.implode(', ', $args ).']: '
 													.'was already set to the same value.', 'settings' );
@@ -374,7 +382,7 @@ class AbstractSettings
 			}
 		}
 
-		$atcache->value = $args[ count($args)-1 ];
+		$atcache->value = $args[ $count_args-1 ];
 		$atcache->dbuptodate = false;
 
 		$Debuglog->add( get_class($this).'::set: ['.implode(', ', $args ).']', 'settings' );
@@ -399,9 +407,8 @@ class AbstractSettings
 			return false;
 		}
 
-		#pre_dump( $this->cache, 'update' );
 
-		switch( count($this->colkeynames) )
+		switch( $this->count_colkeynames )
 		{
 			case 1:
 				foreach( $this->cache as $key => $value )
@@ -440,7 +447,7 @@ class AbstractSettings
 				return false;
 		}
 
-		if( count($query_insert) )
+		if( isset($query_insert[0]) )
 		{
 			$query = 'REPLACE INTO '.$this->dbtablename.' ('.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
 								.') VALUES '.implode(', ', $query_insert);
@@ -454,6 +461,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/03 06:23:47  blueyed
+ * minor refactoring
+ *
  * Revision 1.7  2004/12/30 14:29:42  fplanque
  * comments
  *
