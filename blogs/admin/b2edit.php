@@ -52,6 +52,7 @@ switch($action)
 		$post_extracats = postcats_get_byID( $post );
 		$edit_date = 0;
 		$post_issue_date = $edited_Item->get( 'issue_date' );
+		$renderers = $edited_Item->get( 'renderers' );
 		$aa = mysql2date('Y', $post_issue_date  );
 		$mm = mysql2date('m', $post_issue_date  );
 		$jj = mysql2date('d', $post_issue_date  );
@@ -210,6 +211,7 @@ switch($action)
 		param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_locale', 'string', $default_locale );
+		param( 'renderers', 'array', array( 'default' ) );
 
 		param( 'edit_date', 'integer', 0 );
 		param( 'aa', 'string', date( 'Y', $localtimenow) );

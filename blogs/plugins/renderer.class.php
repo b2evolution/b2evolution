@@ -28,34 +28,5 @@ class RendererPlugin extends Plugin
 	 */
 	var $apply = 'opt-out';
 
-	/** 
-	 * Does plugin apply?
-	 *
-	 * {@internal Plugin::applies(-) }}
-	 */
-	function applies() 
-	{
-		return (($this->apply == 'stealth') || ($this->apply == 'always') || ($this->apply == 'opt-out' ));
-	}
-
-	/** 
-	 * Can plugin apply?
-	 *
-	 * {@internal Plugin::can_apply(-) }}
-	 */
-	function can_apply() 
-	{
-		return ( ! ($this->apply == 'never') );
-	}
-
-	/** 
-	 * Is plugin optional?
-	 *
-	 * {@internal Plugin::is_optional(-) }}
-	 */
-	function is_optional() 
-	{
-		return (($this->apply == 'opt-in') || ($this->apply == 'opt-out' ));
-	}
 }
 ?>

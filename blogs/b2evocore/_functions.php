@@ -74,10 +74,8 @@ function mysql_oops($sql_query)
  * @param string raw text
  * @param string format, can be one of the following
  * - raw: do nothing
- * - htmlcontent: content displayed in HTML page body: apply renders and allow full HTML
- * - htmlrendered: idem but with limited renderers
- * - entityencoded: Special mode for RSS 0.92: apply renders and allow full HTML but escape it
  * - htmlbody: display in HTML page body: allow full HTML
+ * - entityencoded: Special mode for RSS 0.92: allow full HTML but escape it
  * - htmlhead: strips out HTML (mainly for use in Title)
  * - htmlattr: use as an attribute: strips tags and escapes quotes
  * - formvalue: use as a form value: escapes quotes and < > but leaves code alone
@@ -95,28 +93,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// do nothing!
 			break;
 
-		case 'htmlcontent':
-			// content displayed in HTML page body: apply renders and allow full HTML
-			// $content = $Renderer->render( $content, 'content' );
-			$content = convert_chars($content, 'html');
-			break;
-
-		case 'htmlrendered':
-			// content displayed in HTML page body: apply renders and allow full HTML
-			// $content = $Renderer->render( $content, 'other' );
+		case 'htmlbody':
+			// display in HTML page body: allow full HTML
 			$content = convert_chars($content, 'html');
 			break;
 
 		case 'entityencoded':
 			// Special mode for RSS 0.92: apply renders and allow full HTML but escape it
-			// $content = $Renderer->render( $content, 'content' );
 			$content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
-			break;
-
-		case 'htmlbody':
-			// display in HTML page body: allow full HTML
-			$content = convert_chars($content, 'html');
 			break;
 
 		case 'htmlhead':

@@ -432,7 +432,7 @@ class ItemList extends DataObjectList
 																			post_status, post_locale, post_content, post_title,
 																			post_urltitle, post_url, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
-																			'' AS post_renderers, post_karma
+																			post_renderers, post_karma
 											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)
 														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 

@@ -145,6 +145,7 @@ function create_b2evo_tables()
 		post_karma int(11) NOT NULL default '0',
 		post_wordcount int(11) default NULL,
 		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+		post_renderers VARCHAR(179) NOT NULL default 'default', 
 		PRIMARY KEY post_ID( ID ),
 		INDEX post_issue_date( post_issue_date ),
 		INDEX post_category( post_category ),

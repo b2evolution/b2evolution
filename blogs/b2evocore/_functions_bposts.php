@@ -30,7 +30,8 @@ function bpost_create(
 	$pingsdone = true,
 	$post_urltitle = '',
 	$post_url = '',
-	$post_comments = 'open' )
+	$post_comments = 'open',
+	$post_renderers = array() )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
 	global $localtimenow;
@@ -38,7 +39,6 @@ function bpost_create(
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
-	$post_flags[] = 'html';
 
 	// make sure main cat is in extracat list and there are no duplicates
 	$extra_cat_IDs[] = $main_cat_ID;
@@ -57,8 +57,9 @@ function bpost_create(
 										'".$DB->escape($post_content)."',	'".$DB->escape($post_timestamp)."',
 										'".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID,
 										'".$DB->escape($post_status)."', '".$DB->escape($post_locale)."',
-										'".$DB->escape($post_url)."', $autobr, '".implode(',',$post_flags)."',
-										".bpost_count_words($post_content).", '".$DB->escape($post_comments)."' )";
+										'".$DB->escape($post_url)."', $autobr, '".$DB->escape(implode(',',$post_flags))."',
+										".bpost_count_words($post_content).", '".$DB->escape($post_comments)."',
+										'".$DB->escape(implode('.',$post_renderers))."' )";
 	if( ! $DB->query( $query ) ) return 0;
 	$post_ID = $DB->insert_id;
 	//echo "post ID:".$post_ID;
@@ -101,7 +102,8 @@ function bpost_update(
 	$pingsdone = true,
 	$post_urltitle = '',
 	$post_url = '',
-	$post_comments = 'open' )
+	$post_comments = 'open',
+	$post_renderers = array() )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
 	global $localtimenow;
@@ -109,7 +111,6 @@ function bpost_update(
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
-	$post_flags[] = 'html';
 
 	// make sure main cat is in extracat list and there are no duplicates
 	$extra_cat_IDs[] = $main_cat_ID;
@@ -130,9 +131,10 @@ function bpost_update(
 								post_status = '".$DB->escape($post_status)."',
 								post_locale = '".$DB->escape($post_locale)."',
 								post_autobr = $autobr,
-								post_flags = '".implode(',',$post_flags)."',
+								post_flags = '".$DB->escape(implode(',',$post_flags))."',
 								post_wordcount = ".bpost_count_words($post_content).",
-								post_comments = '".$DB->escape($post_comments)."' ";
+								post_comments = '".$DB->escape($post_comments)."',
+								post_renderers = '".$DB->escape(implode('.',$post_renderers))."'";
 
 	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp' ";
 	$query .= "WHERE ID = $post_ID";
@@ -177,7 +179,6 @@ function bpost_update_status(
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
-	$post_flags[] = 'html';
 
 	$query = "UPDATE $tableposts SET ";
 	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
@@ -404,7 +405,7 @@ function Item_get_by_ID( $post_ID )
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
 									post_autobr, post_flags, post_wordcount, post_comments, 
-									'' AS post_renderers, cat_blog_ID
+									post_renderers, cat_blog_ID
 					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:
@@ -529,7 +530,7 @@ function the_title(
 	$before='',						// HTML/text to be displayed before title
 	$after='', 						// HTML/text to be displayed after title
 	$add_link = true, 		// Added link to this title?
-	$format = 'htmlrendered',	// Format to use (example: "htmlbody" or "xml")
+	$format = 'htmlbody',	// Format to use (example: "htmlbody" or "xml")
 	$disp = true )				// Display output?
 {
 	global $postdata;
@@ -638,7 +639,7 @@ function the_content(
 	$more_anchor='#',
 	$before_more_link = '#',
 	$after_more_link = '#',
-	$format = 'htmlcontent',
+	$format = 'htmlbody',
 	$cut = 0,
 	$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
 	$disppage = '#' ) // page number to display specific page, # for url parameter

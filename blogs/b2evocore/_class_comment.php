@@ -217,7 +217,7 @@ class Comment extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function content( $format = 'htmlcontent' ) 
+	function content( $format = 'htmlbody' ) 
 	{
 		$comment = $this->content;
 		$comment = str_replace('<trackback />', '', $comment);

@@ -420,16 +420,55 @@ if( $action != 'editcomment' )
 		<?php
 		$Renderer->restart();	 // make sure iterator is at start position
 		while( $loop_RendererPlugin = $Renderer->get_next() )
-		{
-			if( ! $loop_RendererPlugin-> can_apply() )
+		{ // Go through whole list of renders
+			// echo ' ',$loop_RendererPlugin->code;
+			if( $loop_RendererPlugin->apply == 'stealth'
+				|| $loop_RendererPlugin->apply == 'never' )
+			{	// This is not an option.
 				continue;
-		?>
-		<div>
-			<input type="checkbox" class="checkbox" name="renderers[]" 
-				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"  
-				<?php	
-					if( $loop_RendererPlugin->applies() ) { echo ' checked="checked"'; }
-					if( ! $loop_RendererPlugin->is_optional() ) { echo ' disabled="disabled"'; }
+			}
+			?>
+			<div>
+				<input type="checkbox" class="checkbox" name="renderers[]" 
+					value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"  
+					<?php	
+					switch( $loop_RendererPlugin->apply )
+					{
+						case 'always':
+							// echo 'FORCED';
+							echo ' checked="checked"';
+							echo ' disabled="disabled"';
+							break;
+						 
+						case 'opt-out':
+							if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
+								|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
+							{
+								// echo 'OPT';
+								echo ' checked="checked"';
+							}
+							// else echo 'NO';
+							break;
+		
+						case 'opt-in':
+							if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+							{
+								// echo 'OPT';
+								echo ' checked="checked"';
+							}
+							// else echo 'NO';
+							break;
+
+						case 'lazy':
+							// cannot select
+							if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+							{
+								// echo 'OPT';
+								echo ' checked="checked"';
+							}
+							echo ' disabled="disabled"';
+							break;
+					}		
 				?>  
 				title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
 			<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name(); ?></strong></label>

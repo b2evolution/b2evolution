@@ -14,7 +14,7 @@ class texturize_Rendererplugin extends RendererPlugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $apply = 'opt-out';
+	var $apply = 'opt-in';
 	var $short_desc = 'Smart quotes and more';
 	var $long_desc = 'No description available';
 

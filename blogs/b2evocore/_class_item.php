@@ -69,6 +69,7 @@ class Item extends DataObject
 			$this->main_cat_ID = $db_row->post_category;
 			$this->flags = $db_row->post_flags;
 			$this->comments = $db_row->post_comments;			// Comments status
+			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->post_renderers );
 			$this->url = $db_row->post_url;				// Should move
 			$this->autobr = $db_row->post_autobr;					// Should move
@@ -396,7 +397,7 @@ class Item extends DataObject
 		$more_anchor = '#', 
 		$before_more = '#', 
 		$after_more = '#', 
-		$format = 'htmlcontent', 
+		$format = 'htmlbody', 
 		$cut = 0,
 		$stripteaser = false, 
 		$more_file = ''
@@ -479,7 +480,8 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		$output = $Renderer->render( $output, $this->renderers );
+		$post_renderers = $Renderer->validate_list( $this->renderers );
+		$output = $Renderer->render( $output, $post_renderers );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -649,7 +651,7 @@ class Item extends DataObject
 		$before='',						// HTML/text to be displayed before title
 		$after='', 						// HTML/text to be displayed after title
 		$add_link = true, 		// Added link to this title?
-		$format = 'htmlrendered' ) 
+		$format = 'htmlbody' ) 
 	{
 		if( empty($this->title) && $add_link )
 			$title = $this->url;

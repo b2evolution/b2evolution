@@ -27,6 +27,65 @@ class Renderer extends Plug
 		parent::Plug( 'renderer' );
 	}	
 	
+	
+	/* 
+	 * Validate renderer list
+	 *
+	 * {@internal Renderer::validate_list(-)}}
+	 *
+	 * @param array renderer codes
+	 * @return array validated array
+	 */
+	function validate_list( $renderers = array('default') )
+	{
+		$this->init();	// Init if not done yet.
+		
+		$this->restart(); // Just in case.
+		
+		$validated_renderers = array();
+		
+		while( $loop_RendererPlugin = $this->get_next() )
+		{ // Go through whole list of renders
+			// echo ' ',$loop_RendererPlugin->code;
+
+			switch( $loop_RendererPlugin->apply )
+			{
+				case 'stealth':
+				case 'always':
+					// echo 'FORCED';
+					$validated_renderers[] = $loop_RendererPlugin->code;
+					break;
+				 
+				case 'opt-out':
+					if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
+						|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
+					{
+						// echo 'OPT';
+						$validated_renderers[] = $loop_RendererPlugin->code;
+					}
+					// else echo 'NO';
+					break;
+
+				case 'opt-in':
+				case 'lazy':
+					if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+					{
+						// echo 'OPT';
+						$validated_renderers[] = $loop_RendererPlugin->code;
+					}
+					// else echo 'NO';
+					break;
+									 
+				case 'never':
+					// echo 'NEVER';
+					continue;	// STOP, don't render, go to next renderer
+			}		
+		}
+		// echo count( $validated_renderers );
+		return $validated_renderers; 
+	}	
+
+
 	/* 
 	 * Render the content
 	 *

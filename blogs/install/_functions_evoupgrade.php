@@ -289,8 +289,9 @@ function upgrade_b2evo_tables()
 										AFTER post_issue_date,
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-US',
 							DROP COLUMN post_url,
-							CHANGE COLUMN post_trackbacks post_url varchar(250) NULL default NULL,
+							CHANGE COLUMN post_trackbacks post_url varchar(250) NOT NULL default NULL,
 							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported'),
+							ADD COLUMN post_renderers VARCHAR(179) NOT NULL default 'default',
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";

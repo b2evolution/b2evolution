@@ -107,9 +107,9 @@ function get_commentdata($comment_ID,$no_cache=0)
 
 	if ($no_cache)
 	{
-		$query="SELECT * 
-						FROM $tablecomments 
-						WHERE comment_ID = $comment_ID";
+		$query = "SELECT * 
+							FROM $tablecomments 
+							WHERE comment_ID = $comment_ID";
 		$myrow = $DB->get_row( $query, ARRAY_A );
 	}
 	else
@@ -420,7 +420,7 @@ function comment_text()
 	$comment = $commentdata['comment_content'];
 	$comment = str_replace('<trackback />', '', $comment);
 	$comment = str_replace('<pingback />', '', $comment);
-	$comment = format_to_output( $comment, 'htmlcontent' );
+	$comment = format_to_output( $comment, 'htmlbody' );
 	echo $comment;
 }
 
