@@ -129,15 +129,24 @@ function form_select_object(
 }
 
 
-/*
- * form_radio(-)
+/**
+ * Generate set of radio options.
+ *
+ * {@internal form_radio(-)}}
+ * @param string the name of the radio options
+ * @param string the checked option
+ * @param array of arrays (0: value, 1: label, 2: notes)
+ * @param string label
+ * @param boolean options on seperate lines (DIVs)
+ * @param string notes
  */
 function form_radio(
 	$field_name,
 	$field_value,
 	$field_options,
 	$field_label,
-	$field_lines = false )
+	$field_lines = false,
+	$field_notes = '' )
 {
 	echo '<fieldset>';
 	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
@@ -154,6 +163,10 @@ function form_radio(
 		if( isset( $loop_field_option[2] ) )
 			echo '<span class="notes">', $loop_field_option[2], '</span>';
 		if( $field_lines ) echo "</div>\n";
+	}
+	if( !empty( $field_notes ) )
+	{
+		echo '  <div class="notes">'.$field_notes.'</div>';
 	}
 	echo "</fieldset>\n\n";
 }

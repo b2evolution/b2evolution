@@ -44,7 +44,9 @@ switch($action)
 		param( 'blog_description', 'string', true );
 		param( 'blog_locale', 'string', true );
 		param( 'blog_access_type', 'string', true );
-		param( 'blog_siteurl', 'string', true );
+		param( 'blog_siteurl_type', 'string', true );
+		param( 'blog_siteurl_relative', 'string', true );
+		param( 'blog_siteurl_absolute', 'string', true );
 		param( 'blog_keywords', 'string', true );
 		param( 'blog_disp_bloglist', 'integer', 0 );
 		param( 'blog_in_bloglist', 'integer', 0 );
@@ -57,6 +59,30 @@ switch($action)
 		$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 		$blog_notes = format_to_post( $blog_notes, 0, 0 );
 
+		// check params:
+		if( $blog_siteurl_type == 'absolute' )
+		{
+			if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
+			{
+				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with http:// or https:// !') );
+			}
+			$blog_siteurl = $blog_siteurl_absolute;
+		}
+		if( $blog_siteurl_type == 'relative' )
+		{
+			if( preg_match( '#^https?://#', $blog_siteurl_relative )
+					|| (!empty( $blog_siteurl_relative ) && !preg_match( '#^/#', $blog_siteurl_relative ) )
+				)
+			{
+				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an relative URL (without http:// or https:// and starting with a / !') );
+			}
+			$blog_siteurl = $blog_siteurl_relative;
+		}
+		if( preg_match( '#/$#', $blog_siteurl ) )
+		{
+			$Messages->add( T_('Blog Folder URL').': '.T_('No trailing slash, please.') );
+		}
+		
 		if( empty($blog_stub) )
 		{	// Stub name is empty
 			$Messages->add( T_('You must provide an URL blog name / Stub name!') );
@@ -138,6 +164,8 @@ switch($action)
 			param( 'blog_locale', 'string', $default_locale );
 			param( 'blog_access_type', 'string', 'index.php' );
 			param( 'blog_siteurl', 'string', '' );
+			param( 'blog_siteurl_type', 'string', 'relative' );
+			param( 'blog_siteurl_relative', 'string', '' );
 			param( 'blog_stub', 'string', 'new' );
 			param( 'blog_default_skin', 'string', 'basic' );
 			param( 'blog_longdesc', 'html', '' );
@@ -203,7 +231,9 @@ switch($action)
 				param( 'blog_description', 'string', true );
 				param( 'blog_locale', 'string', true );
 				param( 'blog_access_type', 'string', true );
-				param( 'blog_siteurl', 'string', true );
+				param( 'blog_siteurl_absolute', 'string', true );
+				param( 'blog_siteurl_relative', 'string', true );
+				param( 'blog_siteurl_type', 'string', true );
 				param( 'blog_keywords', 'string', true );
 				param( 'blog_disp_bloglist', 'integer', 0 );
 				param( 'blog_in_bloglist', 'integer', 0 );
@@ -216,6 +246,30 @@ switch($action)
 				$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 				$blog_notes = format_to_post( $blog_notes, 0, 0 );
 
+				// check params:
+				if( $blog_siteurl_type == 'absolute' )
+				{
+					if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
+					{
+						$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with http:// or https:// !') );
+					}
+					$blog_siteurl = $blog_siteurl_absolute;
+				}
+				if( $blog_siteurl_type == 'relative' )
+				{
+					if( preg_match( '#^https?://#', $blog_siteurl_relative )
+							|| (!empty( $blog_siteurl_relative ) && !preg_match( '#^/#', $blog_siteurl_relative ) )
+						)
+					{
+						$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an relative URL (without http:// or https:// and starting with a / !') );
+					}
+					$blog_siteurl = $blog_siteurl_relative;
+				}
+				if( preg_match( '#/$#', $blog_siteurl ) )
+				{
+					$Messages->add( T_('Blog Folder URL').': '.T_('No trailing slash, please.') );
+				}
+				
 				if( empty($blog_stub) )
 				{	// Stub name is empty
 					$Messages->add( T_('You must provide an URL blog name / Stub name!') );
@@ -367,6 +421,16 @@ switch($action)
 					$blog_locale = get_bloginfo( 'locale' );
 					$blog_access_type = $edited_Blog->get( 'access_type' );
 					$blog_siteurl = get_bloginfo( 'subdir' );
+					if( preg_match('#https?://#', $blog_siteurl) )
+					{ // absolute
+						$blog_siteurl_type = 'absolute';
+						$blog_siteurl_absolute = $blog_siteurl;
+					}
+					else
+					{ // relative
+						$blog_siteurl_type = 'relative';
+						$blog_siteurl_relative = $blog_siteurl;
+					}
 					$blog_stub = get_bloginfo( 'stub' );
 					$blog_linkblog = get_bloginfo( 'links_blog_ID' );
 					$blog_notes = get_bloginfo( 'notes' );
@@ -429,15 +493,15 @@ switch($action)
 
 				<p>
 					<form action="b2blogs.php" method="get" class="inline">
-						<input type="hidden" name="action" value="delete" />
-						<input type="hidden" name="blog" value="<?php $deleted_Blog->ID() ?>" />
-						<input type="hidden" name="confirm" value="1" />
+						<input type="hidden" name="action" _="delete" />
+						<input type="hidden" name="blog" _="<?php $deleted_Blog->ID() ?>" />
+						<input type="hidden" name="confirm" _="1" />
 						
 						<?php 
 						if( is_file( $deleted_Blog->get('dynfilepath') ) )
 						{
 							?>
-							<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
+							<input type="checkbox" id="delete_stub_file" name="delete_stub_file" _="1" />
 							<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->dget('dynurl').'"', $deleted_Blog->dget('dynfilepath') ); ?></label><br />
 							<br />
 							<?php
@@ -445,17 +509,17 @@ switch($action)
 						if( is_file( $deleted_Blog->get('staticfilepath') ) )
 						{ 
 							?>
-							<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
+							<input type="checkbox" id="delete_static_file" name="delete_static_file" _="1" />
 							<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->dget('staticurl').'"', $deleted_Blog->dget('staticfilepath') ); ?></label><br />
 							<br />
 							<?php
 						}
 						?>						
 						
-						<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
+						<input type="submit" _="<?php echo T_('I am sure!') ?>" class="search" />
 					</form>
 					<form action="b2blogs.php" method="get" class="inline">
-						<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
+						<input type="submit" _="<?php echo T_('CANCEL') ?>" class="search" />
 					</form>
 				</p>
 
