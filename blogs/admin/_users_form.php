@@ -45,7 +45,7 @@
 			<td align="right"><strong><?php echo T_('Identity shown') ?>:</strong></td>
 			<td>
 				<?php $idmode = $edited_User->get( 'idmode' ); ?>
-				<select name="edited_user_idmode" class="bComment">
+				<select name="edited_user_idmode">
 					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php if( $edited_User->get('nickname') != '' ) $edited_User->disp('nickname', 'htmlhead' ); else echo '['.T_('Nickname').']'; ?></option>
 					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php if( $edited_User->get('login') != '' ) $edited_User->disp('login', 'htmlhead' ); else echo '['.T_('Login').']'; ?></option>
 					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php if( $edited_User->get('firstname') != '' ) $edited_User->disp('firstname', 'htmlhead' ); else echo '['.T_('First name').']'; ?></option>
@@ -58,7 +58,7 @@
 			<tr>
 			<td align="right"><strong><?php echo T_('Locale') ?>:</strong></td>
 			<td>
-				<select name="edited_user_locale" class="bComment"><?php
+				<select name="edited_user_locale"><?php
 					locale_options( $edited_User->get('locale') );?>
 				</select>
 			</td>
