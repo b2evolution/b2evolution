@@ -121,17 +121,24 @@ class Filelist
 
 
 	/**
-	 * default order
+	 * Order
 	 * @var string
 	 * @access protected
 	 */
 	var $order = NULL;
+
 	/**
-	 * are we sorting ascending (or descending). default is asc for 'name', desc for the rest
+	 * Are we sorting ascending (or descending). default is asc for 'name', desc for the rest
 	 * @var mixed
 	 * @access protected
 	 */
 	var $orderasc = NULL;
+
+	/**
+	 * Sort dirs not at top
+	 * @var boolean
+	 */
+	var $dirsnotattop = false;
 
 
 	/**
@@ -344,68 +351,88 @@ class Filelist
 			return false;
 		}
 
-		if( $order === NULL )
+		if( $order !== NULL )
 		{
-			$order = $this->order;
+			$this->order = $order;
 		}
-		if( $orderasc === NULL )
+		if( $orderasc !== NULL )
 		{
-			$orderasc = $this->orderasc;
+			$this->orderasc = $orderasc;
 		}
-		if( $dirsattop === NULL )
+		if( $dirsattop !== NULL )
 		{
-			$dirsattop = !$this->dirsnotattop;
+			$this->dirsnotattop = !$dirsattop;
 		}
 
-		// TODO: might be improved, but we cannot do "usort( x, array( $this, func ) )" with create_function()
-		$sortFunction = 'global $Fileman; $a =& $Fileman->getFileByIndex($a); $b =& $Fileman->getFileByIndex($b);';
-		$sortFunction .= "\n";
 
-		if( $order == 'size' )
-		{
-			if( $this->recursivedirsize )
-			{
-				$sortFunction .= '$r = ( $a->getSize() - $b->getSize() );';
-			}
-			else
-			{
-				$sortFunction .= '$r = ($a->isDir() && $b->isDir()) ?
-															strcasecmp( $a->getName(), $b->getName() ) :
-															( $a->getSize() - $b->getSize() );';
-			}
-		}
-		elseif( $order == 'path' )
-		{ // group by dir
-			$sortFunction .= '$r = strcasecmp( $a->getDir(), $b->getDir() );'
-											.'if( $r == 0 ) { $r = strcasecmp( $a->getName(), $b->getName() ); }';
-		}
-		elseif( $order == 'lastmod' )
-		{
-			$sortFunction .= '$r = $b->_lastMod - $a->_lastMod;';
-		}
-		else
-		{
-			$sortFunction .= '$r = strcasecmp( $a->get'.$order.'(), $b->get'.$order.'() );';
-		}
-
-		if( !$orderasc )
-		{ // switch order
-			$sortFunction .= '$r = -$r;';
-		}
-
-		if( $dirsattop )
-		{
-			$sortFunction .= 'if( $a->isDir() && !$b->isDir() )
-													$r = -1;
-												elseif( $b->isDir() && !$a->isDir() )
-													$r = 1;';
-		}
-		$sortFunction .= 'return $r;';
-
-		usort( $this->_indexOrder, create_function( '$a, $b', $sortFunction ) );
+		#usort( $this->_indexOrder, create_function( '$a, $b', $sortFunction ) );
+		usort( $this->_indexOrder, array( &$this, '_sort' ) );
 
 		// Restart the list
 		$this->restart();
+	}
+
+
+	/**
+	 * usort callback function for {@link sort()}, because we cannot eval() right there
+	 *
+	 * @access protected
+	 * @return integer
+	 */
+	function _sortCallback( $a, $b )
+	{
+		$a =& $this->getFileByIndex($a);
+		$b =& $this->getFileByIndex($b);
+
+
+		if( $this->order == 'size' )
+		{
+			if( $this->recursivedirsize )
+			{
+				$r = $a->getSize() - $b->getSize();
+			}
+			else
+			{
+				$r = $a->isDir() && $b->isDir() ?
+								strcasecmp( $a->getName(), $b->getName() ) :
+								( $a->getSize() - $b->getSize() );
+			}
+		}
+		elseif( $this->order == 'path' )
+		{ // group by dir
+			$r = strcasecmp( $a->getDir(), $b->getDir() );
+			if( $r == 0 )
+			{
+				$r = strcasecmp( $a->getName(), $b->getName() );
+			}
+		}
+		elseif( $this->order == 'lastmod' )
+		{
+			$r = $b->_lastMod - $a->_lastMod;
+		}
+		else
+		{
+			$r = eval( 'return strcasecmp( $a->get'.$this->order.'(), $b->get'.$this->order.'() );' );
+		}
+
+		if( !$this->orderasc )
+		{ // switch order
+			$r = -$r;
+		}
+
+		if( !$this->dirsnotattop )
+		{
+			if( $a->isDir() && !$b->isDir() )
+			{
+				$r = -1;
+			}
+			elseif( $b->isDir() && !$a->isDir() )
+			{
+				$r = 1;
+			}
+		}
+
+		return $r;
 	}
 
 
@@ -747,6 +774,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.16  2005/01/08 12:54:03  blueyed
+ * fixed/refactored sort()
+ *
  * Revision 1.15  2005/01/08 01:24:19  blueyed
  * filelist refactoring
  *
