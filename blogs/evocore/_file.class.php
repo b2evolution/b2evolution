@@ -106,17 +106,21 @@ function &getFile( $name, $path = NULL )
 													getcwd() :
 													$path );
 
+	$path = str_replace( '\\', '/', trailing_slash($path) );
+
 	$cacheindex = is_windows() ?
 								strtolower($path.$name) :
 								$path.$name;
 
+
 	if( isset( $cache_File[ $cacheindex ] ) )
 	{
-		#Log::display( '', '', 'File ['.$cacheindex.'] returned from cache!' );
+		#Log::display( '', '', 'File ['.$cacheindex.'] returned from cache.' );
 		return $cache_File[ $cacheindex ];
 	}
 	else
 	{
+		#Log::display( '', '', 'File ['.$cacheindex.'] not cached.' );
 		$File =& new File( $name, $path );
 		$cache_File[$cacheindex] =& $File;
 		return $File;
@@ -148,7 +152,7 @@ class File
 	function File( $name, $dir )
 	{
 		$this->setName( $name );
-		$this->_dir = $dir;
+		$this->setDir( $dir );
 		$this->_md5ID = md5( $this->_dir.$this->_name );
 
 		$this->refresh();
@@ -252,6 +256,24 @@ class File
 	function getName()
 	{
 		return $this->_name;
+	}
+
+
+	/**
+	 * Get the name either prefix with "Directory" or "File".
+	 *
+	 * @return string
+	 */
+	function getNameWithType()
+	{
+		if( $this->isDir() )
+		{
+			return sprintf( T_('Directory &laquo;%s&raquo;'), $this->_name );
+		}
+		else
+		{
+			return sprintf( T_('File &laquo;%s&raquo;'), $this->_name );
+		}
 	}
 
 	/**
@@ -456,6 +478,17 @@ class File
 	}
 
 
+	/**
+	 * Set the File's name.
+	 *
+	 * @param string
+	 */
+	function setDir( $dir )
+	{
+		$this->_dir = str_replace( '\\', '/', trailing_slash( $dir ) );
+	}
+
+
 	function setSize( $bytes )
 	{
 		$this->_size = $bytes;
@@ -529,6 +562,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.12  2005/01/08 01:24:18  blueyed
+ * filelist refactoring
+ *
  * Revision 1.11  2005/01/06 11:31:45  blueyed
  * bugfixes
  *

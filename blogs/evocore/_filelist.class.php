@@ -65,28 +65,55 @@ class Filelist
 	/* -- PRIVATE -- */
 
 	/**
-	 * the list of Files
+	 * The list of Files.
+	 *
 	 * @var array
+	 * @access protected
 	 */
-	var $entries = array();
+	var $_entries = array();
 
 	/**
-	 * Number of directories
+	 * @var array Index over File IDs (id => {@link $_entries} key).
+	 * @access protected
 	 */
-	var $count_dirs;
+	var $_indexID = array();
 
 	/**
-	 * Number of files
+	 * @var array Index over File Paths (path => {@link $_entries} key).
+	 * @access protected
 	 */
-	var $count_files;
+	var $_indexPath = array();
 
 	/**
-	 * Number of bytes
+	 * @var array Order (order => {@link $_entries} key).
+	 * @access protected
 	 */
-	var $count_bytes;
+	var $_indexOrder = array();
 
 	/**
-	 * the current index of the directory items (looping)
+	 * @var integer internal counter for the {@link $_entries} array
+	 */
+	var $count_entries = 0;
+
+	/**
+	 * @var integer Number of directories
+	 */
+	var $count_dirs = 0;
+
+	/**
+	 * @var integer Number of files
+	 */
+	var $count_files = 0;
+
+	/**
+	 * @var integer Number of bytes
+	 */
+	var $count_bytes = 0;
+
+	/**
+	 * The current index of the directory items (looping).
+	 * This is the key of {@link $_indexOrder}
+	 *
 	 * @var integer
 	 * @access protected
 	 */
@@ -143,19 +170,21 @@ class Filelist
 	 * Constructor
 	 *
 	 * @param string the default path for the files
+	 * @param string Allow all paths or just the default path (which must be non-empty then)?
 	 */
-	function Filelist( $path = '', $allowAllPaths = false )
+	function Filelist( $path = '', $allowAllPaths = true )
 	{
 		if( empty($path) )
 		{
 			$this->listpath = false;
+			$this->_allowAllPaths = true;
 		}
 		else
 		{
 			$this->listpath = trailing_slash( $path );
+			$this->_allowAllPaths = $allowAllPaths;
 		}
 
-		$this->_allowAllPaths = $allowAllPaths;
 	}
 
 
@@ -171,8 +200,9 @@ class Filelist
 			return false;
 		}
 
-		$this->entries = array();
-		$this->count_bytes = $this->count_files = $this->count_dirs = 0;
+		$this->count_entries = $this->count_bytes = $this->count_files = $this->count_dirs = 0;
+
+		$this->_entries = $this->_indexID = $this->_indexPath = $this->_indexOrder = array();
 
 
 		if( $flatmode )
@@ -223,38 +253,70 @@ class Filelist
 
 
 	/**
-	 * Add a File object to the list.
+	 * Add a File object to the list (by reference).
 	 *
+	 * @param File File object (by reference)
+	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure
 	 */
-	function addFile( $File )
+	function addFile( &$File, $mustExist = false )
 	{
 		if( !is_a( $File, 'file' ) )
 		{
 			return false;
 		}
 
-		return $this->addFileByPath( $File->getPath(), true );
+		if( $mustExist && !$File->exists() )
+		{
+			return false;
+		}
+
+
+		$this->_entries[$this->count_entries] =& $File;
+		$this->_indexID[$File->getID()] = $this->count_entries;
+		$this->_indexPath[$File->getPath()] = $this->count_entries;
+		// add file to the end:
+		$this->_indexOrder[$this->count_entries] = $this->count_entries;
+
+		$this->count_entries++;
+
+
+		if( $this->recursivedirsize && $File->isDir() )
+		{ // won't be done in the File constructor
+			$File->setSize( get_dirsize_recursive( $File->getPath() ) );
+		}
+
+		if( $File->isDir() )
+		{
+			$this->count_dirs++;
+		}
+		else
+		{
+			$this->count_files++;
+		}
+		$this->count_bytes += $File->getSize();
+
+		return true;
 	}
 
 
 	/**
 	 * Add a file to the list, by filename.
 	 *
+	 * This is a stub for {@link addFile()}.
+	 *
 	 * @param string|File file name / full path or {@link File} object
-	 * @param boolean allow other paths than the lists default path?
-	 *                (overrides {@link $_allowAllPaths})
+	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure (path not allowed,
 	 *                 file does not exist)
 	 * @todo optimize (blueyed)
 	 */
-	function addFileByPath( $path, $allPaths = NULL )
+	function addFileByPath( $path, $mustExist = false )
 	{
 		$basename = basename($path);
 		$dirname = dirname($path).'/';
 
-		if( $basename != $path
-				&& ( $allPaths === false || ( is_null( $allPaths ) && !$this->_allowAllPaths ) ) )
+		if( $basename != $path && !$this->_allowAllPaths )
 		{ // path attached and not all paths allowed
 			if( $dirname != $this->listpath )
 			{ // not this list's path
@@ -264,36 +326,12 @@ class Filelist
 
 		$NewFile =& getFile( $basename, $dirname );
 
-
-		if( !$NewFile->exists() )
-		{
-			return false;
-		}
-
-
-		$this->entries[] =& $NewFile;
-
-		if( $this->recursivedirsize && $NewFile->isDir() )
-		{ // won't be done in the File constructor
-			$NewFile->setSize( get_dirsize_recursive( $NewFile->getPath() ) );
-		}
-
-		if( $NewFile->isDir() )
-		{
-			$this->count_dirs++;
-		}
-		else
-		{
-			$this->count_files++;
-		}
-		$this->count_bytes += $NewFile->getSize();
-
-		return true;
+		return $this->addFile( $NewFile, $mustExist );
 	}
 
 
 	/**
-	 * Sorts the entries.
+	 * Sort the entries by sorting the {@link $_indexOrder} array.
 	 *
 	 * @param string the entries key
 	 * @param boolean ascending (true) or descending
@@ -301,10 +339,11 @@ class Filelist
 	 */
 	function sort( $order = NULL, $orderasc = NULL, $dirsattop = NULL )
 	{
-		if( !count($this->entries) )
+		if( !count($this->_entries) )
 		{
 			return false;
 		}
+
 		if( $order === NULL )
 		{
 			$order = $this->order;
@@ -318,49 +357,52 @@ class Filelist
 			$dirsattop = !$this->dirsnotattop;
 		}
 
+		// TODO: might be improved, but we cannot do "usort( x, array( $this, func ) )" with create_function()
+		$sortFunction = 'global $Fileman; $a =& $Fileman->getFileByIndex($a); $b =& $Fileman->getFileByIndex($b);';
+		$sortFunction .= "\n";
+
 		if( $order == 'size' )
 		{
 			if( $this->recursivedirsize )
 			{
-				$sortfunction = '$r = ( $a->getSize() - $b->getSize() );';
+				$sortFunction .= '$r = ( $a->getSize() - $b->getSize() );';
 			}
 			else
 			{
-				$sortfunction = '$r = ($a->isDir() && $b->isDir()) ?
+				$sortFunction .= '$r = ($a->isDir() && $b->isDir()) ?
 															strcasecmp( $a->getName(), $b->getName() ) :
 															( $a->getSize() - $b->getSize() );';
 			}
 		}
 		elseif( $order == 'path' )
 		{ // group by dir
-			$sortfunction = '$r = strcasecmp( $a->getDir(), $b->getDir() );'
+			$sortFunction .= '$r = strcasecmp( $a->getDir(), $b->getDir() );'
 											.'if( $r == 0 ) { $r = strcasecmp( $a->getName(), $b->getName() ); }';
 		}
 		elseif( $order == 'lastmod' )
 		{
-			$sortfunction = '$r = $b->_lastMod - $a->_lastMod;';
+			$sortFunction .= '$r = $b->_lastMod - $a->_lastMod;';
 		}
 		else
 		{
-			$sortfunction = '$r = strcasecmp( $a->get'.$order.'(), $b->get'.$order.'() );';
+			$sortFunction .= '$r = strcasecmp( $a->get'.$order.'(), $b->get'.$order.'() );';
 		}
 
 		if( !$orderasc )
 		{ // switch order
-			$sortfunction .= '$r = -$r;';
+			$sortFunction .= '$r = -$r;';
 		}
 
 		if( $dirsattop )
 		{
-			$sortfunction .= 'if( $a->isDir() && !$b->isDir() )
+			$sortFunction .= 'if( $a->isDir() && !$b->isDir() )
 													$r = -1;
 												elseif( $b->isDir() && !$a->isDir() )
 													$r = 1;';
 		}
-		$sortfunction .= 'return $r;';
+		$sortFunction .= 'return $r;';
 
-		#echo $sortfunction;
-		usort( $this->entries, create_function( '$a, $b', $sortfunction ) );
+		usort( $this->_indexOrder, create_function( '$a, $b', $sortFunction ) );
 
 		// Restart the list
 		$this->restart();
@@ -377,6 +419,9 @@ class Filelist
 
 
 	/**
+	 * Are we sorting ascending?
+	 *
+	 * @param string The type (empty for current order type)
 	 * @return integer 1 for ascending sorting, 0 for descending
 	 */
 	function isSortingAsc( $type = '' )
@@ -399,6 +444,7 @@ class Filelist
 
 	/**
 	 * Is a filter active?
+	 *
 	 * @return boolean
 	 */
 	function isFiltering()
@@ -415,14 +461,7 @@ class Filelist
 	 */
 	function holdsFile( $File )
 	{
-		foreach( $this->entries as $lFile )
-		{
-			if( $lFile == $File )
-			{
-				return true;
-			}
-		}
-		return false;
+		return isset( $this->_indexID[ $File->getID() ] );
 	}
 
 
@@ -463,16 +502,18 @@ class Filelist
 
 	/**
 	 * Get the number of entries.
+	 *
 	 * @return integer
 	 */
 	function count()
 	{
-		return $this->count_dirs + $this->count_files;
+		return $this->count_entries;
 	}
 
 
 	/**
 	 * Get the number of directories.
+	 *
 	 * @return integer
 	 */
 	function countDirs()
@@ -483,6 +524,7 @@ class Filelist
 
 	/**
 	 * Get the number of files.
+	 *
 	 * @return integer
 	 */
 	function countFiles()
@@ -491,6 +533,11 @@ class Filelist
 	}
 
 
+	/**
+	 * Get the number of bytes of all files.
+	 *
+	 * @return integer
+	 */
 	function countBytes()
 	{
 		return $this->count_bytes;
@@ -514,44 +561,48 @@ class Filelist
 			$debugMakeLonger = 9;
 		}
 		*/
-		$this->current_file_idx++;
 
-		if( !isset($this->entries[$this->current_file_idx]) )
+		if( !isset($this->_indexOrder[$this->current_file_idx + 1]) )
 		{
 			return false;
 		}
+		$this->current_file_idx++;
+
+		$index = $this->_indexOrder[$this->current_file_idx];
 
 		if( $type != '' )
 		{
-			if( $type == 'dir' && !$this->entries[ $this->current_file_idx ]->isDir() )
+			if( $type == 'dir' && !$this->_entries[ $index ]->isDir() )
 			{ // we want a dir
 				return $this->getNextFile( 'dir' );
 			}
-			elseif( $type == 'file' && $this->entries[ $this->current_file_idx ]->isDir() )
+			elseif( $type == 'file' && $this->_entries[ $index ]->isDir() )
 			{ // we want a file
 				return $this->getNextFile( 'file' );
 			}
 		}
 
-		return $this->entries[ $this->current_file_idx ];
+		return $this->_entries[ $index ];
 	}
 
 
 	/**
-	 * Get a file by it's name.
+	 * Get a file by it's full path.
 	 *
-	 * @param string the filename (in cwd)
+	 * @param string the full path
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function &getFileByFilename( $filename )
+	function &getFileByPath( $path )
 	{
-		if( ( $idx = $this->getKeyByName( $filename ) ) === false )
-		{ // file could not be found
-			return false;
+		$path = str_replace( '\\', '/', $path );
+
+		if( isset( $this->_indexPath[ $path ] ) )
+		{
+			return $this->_entries[ $this->_indexPath[ $path ] ];
 		}
 		else
 		{
-			return $this->entries[ $idx ];
+			return false;
 		}
 	}
 
@@ -564,13 +615,13 @@ class Filelist
 	 */
 	function &getFileByID( $md5id )
 	{
-		if( ( $idx = $this->getKeyByID( $md5id ) ) === false )
-		{ // file could not be found
-			return false;
+		if( isset( $this->_indexID[ $md5id ] ) )
+		{
+			return $this->_entries[ $this->_indexID[ $md5id ] ];
 		}
 		else
 		{
-			return $this->entries[ $idx ];
+			return false;
 		}
 	}
 
@@ -578,74 +629,19 @@ class Filelist
 	/**
 	 * Get a file by index.
 	 *
+	 * @param integer Index of the entries (starting with 0)
 	 * @return false|File
 	 */
 	function &getFileByIndex( $index )
 	{
-		return isset( $this->entries[$index] ) ?
-						$this->entries[$index] :
-						false;
-	}
-
-
-	/**
-	 * Get the key of the entries list by filename.
-	 *
-	 * @access protected
-	 * @param string needle
-	 * @return integer the key of the entries array
-	 */
-	function getKeyByName( $name )
-	{
-		foreach( $this->entries as $key => $File )
+		if( isset( $this->_indexOrder[ $index ] ) )
 		{
-			if( $File->getName() == $name )
-			{
-				return $key;
-			}
+			return $this->_entries[ $this->_indexOrder[ $index ] ];
 		}
-		return false;
-	}
-
-
-	/**
-	 * Get the key of the entries list by filename.
-	 *
-	 * @access protected
-	 * @param string needle
-	 * @return integer the key of the entries array
-	 */
-	function getKeyByID( $md5id )
-	{
-		foreach( $this->entries as $key => $File )
+		else
 		{
-			if( $File->getID() == $md5id )
-			{
-				return $key;
-			}
+			return false;
 		}
-		return false;
-	}
-
-
-	/**
-	 * Get the key of the entries list by its full path (dir and filename).
-	 *
-	 * @access protected
-	 * @param string needle
-	 * @param string second needle
-	 * @return integer the key of the entries array
-	 */
-	function getKeyByPath( $path )
-	{
-		foreach( $this->entries as $key => $File )
-		{
-			if( $File->getPath() == $path )
-			{
-				return $key;
-			}
-		}
-		return false;
 	}
 
 
@@ -684,12 +680,55 @@ class Filelist
 	 */
 	function removeFromList( &$File )
 	{
-		if( ($entryKey = $this->getKeyByID( $File->getID() )) !== false )
-		{
-			unset( $this->entries[$entryKey] );
+		if( isset( $this->_indexID[ $File->getID() ] ) )
+		{ // unset indexes and entry
+			$index = $this->_indexPath[ $File->getPath() ];
+			unset( $this->_indexPath[ $File->getPath() ] );
+
+			foreach( $this->_indexOrder as $lKey => $lValue )
+			{
+				if( $lValue == $index )
+				{
+					while( isset( $this->_indexOrder[++$lKey] ) )
+					{
+						$this->_indexOrder[ $lKey - 1 ] = $this->_indexOrder[ $lKey ];
+					}
+					unset( $this->_indexOrder[$lKey - 1] );
+				}
+			}
+			unset( $this->_entries[ $this->_indexID[ $File->getID() ] ] );
+			unset( $this->_indexID[ $File->getID() ] );
+
 			return true;
 		}
 		return false;
+	}
+
+
+	/**
+	 *
+	 * @param string Use this method on every File and put the result into the list.
+	 */
+	function getFilesArray( $method = NULL )
+	{
+		$r = array();
+
+		if( is_string($method) )
+		{
+			foreach( $this->_indexOrder as $index )
+			{
+				$r[] =& $this->_entries[ $index ]->$method();
+			}
+		}
+		else
+		{
+			foreach( $this->_indexOrder as $index )
+			{
+				$r[] =& $this->_entries[ $index ];
+			}
+		}
+
+		return $r;
 	}
 
 
@@ -701,13 +740,16 @@ class Filelist
 	 */
 	function toMD5()
 	{
-		return md5( serialize( $this->entries ) );
+		return md5( serialize( $this->_entries ) );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.15  2005/01/08 01:24:19  blueyed
+ * filelist refactoring
+ *
  * Revision 1.14  2005/01/06 15:45:35  blueyed
  * Fixes..
  *

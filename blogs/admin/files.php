@@ -85,7 +85,7 @@ if( $current_User->login != 'demouser' && $current_User->level < 10 )
 }
 
 if( $action == 'update_settings' )
-{ // updating user settings
+{ // Updating user settings from options list
 	$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
 	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
 	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
@@ -143,7 +143,7 @@ if( !empty($action) )
 			break;
 
 
-		case T_('Download'):
+		case 'download':
 			// TODO: provide optional zip formats
 			if( !$selectedFiles->count() )
 			{
@@ -157,49 +157,36 @@ if( !empty($action) )
 			if( empty($zipname) )
 			{
 				$msg_action = '
-				<p>
-				'.T_('You want to download:').'<ul>';
-
-				$atLeastOneDir = false;
-
-				$selectedFiles->restart();
-
-				while( $lFile =& $selectedFiles->getNextFile() )
-				{
-					if( $lFile->isDir() )
-					{
-						$msg_action .= sprintf('<li>'.T_('Directory &laquo;%s&raquo;')."</li>\n", $lFile->getName());
-						$atLeastOneDir = true;
-					}
-					else $msg_action .= sprintf('<li>'.T_('File &laquo;%s&raquo;')."</li>\n", $lFile->getName());
-				}
-
-				$msg_action .= '
-				</p>
-				</div>
-
 				<div class="panelblock">
-				<form action="files.php" class="fform" method="post">
-				<fieldset>
-					<legend>'.T_('Download options').'</legend>';
+				<h2>'.T_('Download').'</h2>
+				'
+				.T_('You want to download:').'<ul>';
 
-					foreach( $selectedFiles->entries as $lFile )
-					{
-						$msg_action .= '<input type="hidden" name="fm_selected[]" value="'
-														.$lFile->getID()."\" />\n";
-					}
+				$msg_action .=
+					'<li>'.implode( "</li>\n<li>", $selectedFiles->getFilesArray( 'getNameWithType' ) )."</li>\n"
+					.'</ul>
 
-					$msg_action .= $Fileman->getFormHiddenInputs()."\n"
-											.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
-											.( $atLeastOneDir ?
-													form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
-													'' )
-											.'
-											<div class="input"><input type="submit" name="selaction" value="'
-											.format_to_output( T_('Download'), 'formvalue' ).'" />
-											</div>
-				</fieldset>
-				</form>';
+					<form action="files.php" class="fform" method="post">
+					'
+					.$Fileman->getFormHiddenInputs()
+					.$Fileman->getFormHiddenSelectedFiles()
+					.form_hidden( 'action', 'download' )
+					.'
+					<fieldset>
+						<legend>'.T_('Download options').'</legend>
+						'
+						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
+						.( $selectedFiles->countDirs() ?
+								form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
+								'' )
+						.'
+						<div class="input">
+							<input class="ActionButton" type="submit" value="'
+						.format_to_output( T_('Download'), 'formvalue' ).'" />
+						</div>
+					</fieldset>
+					</form>
+					';
 			}
 			else
 			{ // Downloading
@@ -216,6 +203,7 @@ if( !empty($action) )
 
 				$arraylist = array();
 
+				// TODO: flatmode?!
 				foreach( $selectedFiles->entries as $File )
 				{
 					$arraylist[] = $File->getName();
@@ -427,15 +415,15 @@ if( !empty($action) )
 
 			<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
 
-			<?php
-				if( isImage( $selectedFile->getName() ) )
+				<?php
+				if( $imgSize = $selectedFile->getImageSize( 'string' ) ) // TODO: check
 				{ // display image file
 					?>
 					<div class="center">
 						<img alt="<?php echo T_('The selected image') ?>"
 							class="framed"
 							src="<?php echo $Fileman->getFileUrl( $selectedFile ) ?>"
-							<?php echo $selectedFile->getImageSize( 'string' ) ?> />
+							<?php echo $imgSize; ?> />
 					</div>
 					<?php
 				}
@@ -1139,8 +1127,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 
 
 // output errors, notes and action messages {{{
-if( isset( $msg_action )
-		|| $Fileman->Messages->count( array( 'error', 'note' ) )
+if( $Fileman->Messages->count( array( 'error', 'note' ) )
 		|| $Messages->count( 'all' ) )
 {
 	?>
@@ -1148,24 +1135,27 @@ if( isset( $msg_action )
 		<?php
 		$Messages->display( '', '', true, 'all' );
 		$Fileman->Messages->display( '', '', true, array( 'error', 'note' ) );
-
-		if( isset($msg_action) )
-		{
-			echo $msg_action;
-			if( isset( $js_focus ) )
-			{ // we want to auto-focus a field
-				echo '
-				<script type="text/javascript">
-					<!--
-					'.$js_focus.'.focus();
-					// -->
-				</script>';
-			}
-		}
 		?>
 	</div>
 	<?php
-} // }}}
+}
+
+if( isset($msg_action) )
+{
+	echo $msg_action;
+
+	if( isset( $js_focus ) )
+	{ // we want to auto-focus a field
+		echo '
+		<script type="text/javascript">
+			<!--
+			'.$js_focus.'.focus();
+			// -->
+		</script>';
+	}
+}
+
+// }}}
 
 
 if( !$Fileman->forceFM && $Fileman->getMode == 'file_upload' ) // TODO: generalize
@@ -1416,7 +1406,9 @@ while( $lFile =& $Fileman->getNextFile() )
 				{
 					echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
 				}
-				?>"><?php echo getIcon( $lFile ) ?></a>
+				?>"
+				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
+				echo getIcon( $lFile ) ?></a>
 		</td>
 
 		<td class="filename">
@@ -1451,7 +1443,8 @@ while( $lFile =& $Fileman->getNextFile() )
 			?>
 
 
-			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"><?php
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
+				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
 				if( $Fileman->flatmode && $Fileman->getOrder() == 'path' )
 				{
 					echo './'.$Fileman->getFileSubpath( $lFile );
@@ -1549,7 +1542,14 @@ else
 								}
 							}; return false;" />
 
-	<!-- Not implemented yet: input class="ActionButton" type="submit" name="action" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" / -->
+	<!-- Not implemented yet: input class="ActionButton"
+		title="<?php echo T_('Download the selected files') ?>"
+		name="actionArray[download]"
+		value="download"
+		type="image"
+		src="<?php echo getIcon( 'download', 'url' ) ?>"
+		onclick="return openselectedfiles(true);" / -->
+
 	<!-- Not implemented yet: input class="ActionButton" type="submit" name="action" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
 
 	<?php
@@ -1796,6 +1796,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.61  2005/01/08 01:24:19  blueyed
+ * filelist refactoring
+ *
  * Revision 1.60  2005/01/06 15:45:36  blueyed
  * Fixes..
  *

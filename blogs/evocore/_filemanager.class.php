@@ -292,7 +292,7 @@ class FileManager extends Filelist
 
 				foreach( $this->fm_sources as $lSource )
 				{
-					$this->SourceList->addFileByPath( urldecode($lSource), true );
+					$this->SourceList->addFileByPath( urldecode($lSource) );
 				}
 				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
@@ -367,7 +367,7 @@ class FileManager extends Filelist
 		parent::load( $this->flatmode );
 		parent::restart();
 
-		#debug: pre_dump( $this->entries );
+		#debug: pre_dump( $this->_entries );
 	}
 
 
@@ -675,7 +675,7 @@ class FileManager extends Filelist
 			 }
 
 	/**
-	 * Generate hidden input fields for the selected files
+	 * Generate hidden input fields for the selected files.
 	 *
 	 * @return string
 	 */
@@ -683,11 +683,11 @@ class FileManager extends Filelist
 	{
 		$r = '';
 
-		reset( $this->_selectedFiles->entries );
-		while( list($lKey, $lFile) = each($this->_selectedFiles->entries) )
+		reset( $this->_selectedFiles->_entries );
+		while( list($lKey, $lFile) = each($this->_selectedFiles->_entries) )
 		{
 			$r .= '<input type="hidden" name="fm_selected[]" value="'
-						.$this->_selectedFiles->entries[$lKey]->getID()."\" />\n";
+						.$this->_selectedFiles->_entries[$lKey]->getID()."\" />\n";
 		}
 
 		return $r;
@@ -1378,7 +1378,7 @@ class FileManager extends Filelist
 			if( $r = copy( $SourceFile->getPath(), $TargetFile->getPath() ) )
 			{
 				$TargetFile->refresh();
-				if( $this->getKeyByName( $TargetFile->getName() ) === false )
+				if( $this->holdsFile( $TargetFile ) === false )
 				{ // File not in filelist (expected)
 					$this->addFile( $TargetFile );
 				}
@@ -1391,6 +1391,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.17  2005/01/08 01:24:19  blueyed
+ * filelist refactoring
+ *
  * Revision 1.16  2005/01/06 15:45:35  blueyed
  * Fixes..
  *
