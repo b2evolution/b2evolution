@@ -53,12 +53,12 @@
 		the_category();
 		echo $blogroll_catname_after;
 		
-		while( $BlogRollList->get_item() )
+		while( $Item = $BlogRollList->get_item() )
 		{
 			echo $blogroll_item_before;
-			the_title(); 
+			$Item->title(); 
 			echo ' ';
-			the_content( T_('more'), 0, '', '', '[', ']', 'htmlbody', 0, 0, 1  );	// Description + more link 
+			$Item->content( 1, 0, T_('more'), '[', ']' );	// Description + more link 
 			?>
 			<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 			<?php

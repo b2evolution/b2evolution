@@ -60,7 +60,6 @@
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;
 	$request = & $MainList->request;
-	// $result = & $MainList->result;
 	$result_num_rows = $MainList->get_num_rows();
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
@@ -113,7 +112,7 @@
 	{
 		?>
   	<div class="bPost<?php $Item->scope( 'raw' ) ?>" lang="<?php $Item->lang() ?>">	
-			<?php permalink_anchor(); ?>
+			<?php $Item->anchor(); ?>
 			<div class="bSmallHead">
 				<?php 
 					echo '<strong>';

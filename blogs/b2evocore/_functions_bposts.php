@@ -325,10 +325,10 @@ function get_postdata($postid)
 
 
 
-/*
+/**
  * get_the_title(-)
  *
- *
+ * @deprecated
  */
 function get_the_title() 
 {
@@ -413,6 +413,8 @@ function the_language()
  * the_wordcount(-)
  * Display the number of words in the post
  *
+ *
+ * @deprecated deprecated by {@link Item::wordcount()}
  */
 function the_wordcount()
 {
@@ -514,7 +516,7 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
 }
 
 
-/*
+/**
  * the_content(-)
  *
  * @deprecated deprecated by {@link Item::content()}
@@ -903,8 +905,10 @@ function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
  * Date/Time tags 
  *****/
  
-/*
+/**
  * the_date(-)
+ *
+ * @deprecated deprecated by {@link ItemList::date_if_changed()}
  */
 function the_date($d='', $before='', $after='', $echo = 1) 
 {
@@ -928,10 +932,12 @@ function the_date($d='', $before='', $after='', $echo = 1)
 	}
 }
 
-/*
+/**
  * the_time(-)
  *
  *
+ * @deprecated deprecated by {@link Item::time()} / {@link Item::date()}
+ * 
  */
 function the_time($d='', $echo = 1, $useGM = 0)
 {
@@ -1166,14 +1172,16 @@ function the_author_posts()
 
 /***** Permalink tags *****/
 
-/*
+/**
  * permalink_anchor(-)
  *
  * generate anchor for permalinks to refer to
  *
  * TODO: archives modes in clean mode
+ *
+ * @deprecated deprecated by {@link Item::anchor()}
  */
-function permalink_anchor($mode = 'id') 
+function permalink_anchor( $mode = 'id' ) 
 {
 	global $id, $postdata;
 	switch(strtolower($mode))

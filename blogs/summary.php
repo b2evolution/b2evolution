@@ -83,13 +83,13 @@
 		<?php	// Get the 3 last posts for each blog:
 			$BlogBList = & new ItemList( $blog,  '', '', '', '', '', array(), '', 'DESC', '', '', '', '', '', '', '', '', '', '3', 'posts' );
 
-			while( $BlogBList->get_item() )
+			while( $Item = $BlogBList->get_item() )
 			{
 			?>
-			<li lang="<?php the_lang() ?>">
-				<?php the_time( 'd.m.y' ) ?>:
-				<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php the_title( '', '', false ); ?></a>
-				<span class="small">[<?php the_lang() ?>]</span>
+			<li lang="<?php $Item->lang() ?>">
+				<?php $Item->date() ?>:
+				<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php $Item->title( '', '', false ); ?></a>
+				<span class="small">[<?php $Item->lang() ?>]</span>
 			</li>
 			<?php
 			}

@@ -28,16 +28,16 @@
 	<!-- // b2 loop start -->
 	 
 	<?php	// ------------------------------------- START OF POSTS -------------------------------------
-		if( isset($MainList) ) while( $MainList->get_item() )
+		if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 	?>
-	<div class="date" align="right">	<?php the_date(); ?> </div><br />
-		<?php permalink_anchor(); ?>
-		<div class="title"><?php the_title(); ?></div>
-		<?php the_content(); ?>
+	<div class="date" align="right"><?php $MainList->date_if_changed( '', '' ) ?></div><br />
+		<?php $Item->anchor(); ?>
+		<div class="title"><?php $Item->title(); ?></div>
+		<?php $Item->content(); ?>
 		 <?php link_pages("<br />Pages: ","<br />","number") ?>
 	
-		 <div class="posted">by <?php the_author() ?> at <a href="<?php permalink_link() ?>"><?php the_time() ?></a><br />
+		 <div class="posted">by <?php the_author() ?> at <a href="<?php permalink_link() ?>"><?php $Item->time() ?></a><br />
 		<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
 	<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
 	<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |

@@ -57,21 +57,20 @@
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
 <?php	// ------------------------------------- START OF POSTS ------------------------------------
-	if( isset($MainList) ) while( $MainList->get_item() )
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 {
 ?>
 
-<div class="bPost" lang="<?php the_lang() ?>">
-<?php permalink_anchor(); ?>
-<h2><?php the_title(); ?></h2>
+<div class="bPost" lang="<?php $Item->lang() ?>">
+<?php $Item->anchor(); ?>
+<h2><?php $Item->title(); ?></h2>
 <div class=infos>
-<h3><?php the_date() ?> <a 
-href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&nbsp; 
-
-<h4><?php the_categories() ?></h4>
+<h3><a href="<?php permalink_link() ?>" title="Permalink"><?php $Item->date() ?> <?php $Item->time() ?></a></h3>
+&nbsp; 
+<h4><?php $Item->categories() ?></h4>
 </div>
 <div class=article>
-	<?php the_content(); ?>
+	<?php $Item->content(); ?>
 	<?php link_pages("<br />Pages: ","<br />","number") ?>
 </div>
 <div class=interaction><a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display feedback / Leave a comment') ?>"><?php comments_number() ?>, <?php trackback_number() ?>, <?php pingback_number() ?></a>

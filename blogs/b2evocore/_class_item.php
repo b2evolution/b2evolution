@@ -72,6 +72,33 @@ class Item extends DataObject
 		}
 	}	
 
+
+	/** 
+	 * Template function: display anchor for permalinks to refer to
+	 *
+	 * {@internal Item::anchor(-) }}
+	 *
+	 * @todo archives modes in clean mode
+	 *
+	 * @param string date/time format: leave empty to use locale default time format
+	 * @param boolean true if you want GMT
+	 */
+	function anchor( $mode = 'id' ) 
+	{
+		switch( $mode )
+		{
+			case 'title':
+				$title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
+				echo '<a name="'.$title.'"></a>';
+				break;
+				
+			default:
+				echo '<a name="'.$this->ID.'"></a>';
+				break;
+		}
+	}
+	
+
 	/** 
 	 * Template function: list all the category names
 	 *
@@ -153,31 +180,34 @@ class Item extends DataObject
 	/** 
 	 * Template function: display content of item
 	 *
+	 * WARNING: parameter order is different from deprecated the_content(...)
+	 *
 	 * {@internal Item::content(-) }}
 	 *
 	 * @todo Param order and cleanup
-	 * @param
-	 * @param
-	 * @param
-	 * @param
-	 * @param
-	 * @param
+	 * @param mixed page number to display specific page, # for url parameter
+	 * @param mixed true to display 'more' text, false not to display, # for url parameter
+	 * @param string text to display as the more link
+	 * @param string text to display as the more anchor (once the more link has been clicked)
+	 * @param string string to display before more link/anchor
+	 * @param string string to display after more link/anchor
 	 * @param string Output format, see {@link format_to_output()}
-	 * @param
-	 * @param
-	 * @param
+	 * @param integer max number of words 
+	 * @param boolean true if you don't want to repeat teaser after more link was pressed
+	 * @param string filename to use to display more
 	 */
 	function content( 
-		$more_link_text='#', 
-		$stripteaser=0, 
-		$more_file='', 
-		$more_anchor='#', 
-		$before_more_link = '#', 
-		$after_more_link = '#', 
+		$disppage = '#',
+		$dispmore = '#',
+		$more_link_text = '#', 
+		$more_anchor = '#', 
+		$before_more = '#', 
+		$after_more = '#', 
 		$format = 'htmlbody', 
 		$cut = 0,
-		$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
-		$disppage = '#' ) // page number to display specific page, # for url parameter
+		$stripteaser = false, 
+		$more_file = ''
+		) 
 	{
 		global $use_textile;
 		
@@ -193,11 +223,11 @@ class Item extends DataObject
 			$more_anchor = '['.T_('More:').']';
 		}
 	
-		if( $before_more_link == '#' ) 
-			$before_more_link = '<p class="bMore">';
+		if( $before_more == '#' ) 
+			$before_more = '<p class="bMore">';
 	
-		if( $after_more_link == '#' ) 
-			$after_more_link = '</p>';
+		if( $after_more == '#' ) 
+			$after_more = '</p>';
 		
 		if( $dispmore === '#' )
 		{ // We want to display more if requested by user:
@@ -242,18 +272,18 @@ class Item extends DataObject
 					$content[0] = '';
 				}
 				$output = $content[0];
-				if( !empty($more_anchor) ) $output .= $before_more_link;
+				if( !empty($more_anchor) ) $output .= $before_more;
 				$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
-				if( !empty($more_anchor) ) $output .= $after_more_link;
+				if( !empty($more_anchor) ) $output .= $after_more;
 				$output .= $content[1];
 			} 
 			else 
 			{ // We are offering to read more
 				$more_link = gen_permalink( $file, $this->ID, 'id', 'single', 1 );
 				$output = $content[0];
-				$output .= $before_more_link;
+				$output .= $before_more;
 				$output .= '<a href="'.$more_link.'#more'.$this->ID.'">'.$more_link_text.'</a>';
-				$output .= $after_more_link;
+				$output .= $after_more;
 			}
 		}
 		else
@@ -404,6 +434,16 @@ class Item extends DataObject
 		echo $before;
 		echo $title;
 		echo $after;
+	}
+
+	/** 
+	 * Template function: Display the number of words in the post
+	 *
+	 * {@internal Item::wordcount(-) }}
+	 */
+	function wordcount()
+	{
+		echo $this->wordcount;
 	}
 
 }

@@ -53,7 +53,16 @@ class ItemList extends DataObjectList
 	var	$row;									// Current row
 	var $main_cat;						// Current main category
 	var $previous_main_cat;		// Previous one		
-	
+	/**
+	 * @access private
+	 */
+	var $last_Item; 
+
+	/**
+	 * @access private
+	 */
+	var $last_displayed_date = ''; 
+	 	
 	/* 
 	 * ItemList::ItemList(-)
 	 *
@@ -595,7 +604,8 @@ class ItemList extends DataObjectList
 			return false;
 		}
 		
-		return new Item( $this->row );
+		$this->last_Item = new Item( $this->row ); // COPY !
+		return $this->last_Item;
 	}
 
 
@@ -735,6 +745,37 @@ class ItemList extends DataObjectList
 			$multipage=0;
 		}
 	}
-}
 
+
+	/** 
+	 * Template function: Display the date if it has changed since last call
+	 *
+	 * {@internal ItemList::date_if_changed(-) }}
+	 *
+	 * @param string string to display before the date (if changed)
+	 * @param string string to display after the date (if changed)
+	 * @param string date/time format: leave empty to use locale default time format
+	 */
+	function date_if_changed( $before='<h2>', $after='</h2>', $format='' ) 
+	{
+		$current_item_date = $this->last_Item->get( 'date' );
+		if($format=='') 
+		{
+			$current_item_date = mysql2date( locale_datefmt(), $current_item_date );
+		} 
+		else 
+		{
+			$current_item_date = mysql2date( $format, $current_item_date );
+		}
+
+		if( $current_item_date != $this->last_displayed_date )
+		{
+			$this->last_displayed_date = $current_item_date;
+		
+			echo $before;
+			echo $current_item_date;
+			echo $after;
+		}
+	}
+}
 ?>

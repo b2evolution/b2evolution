@@ -80,19 +80,19 @@
 <!-- =================================== START OF MAIN AREA =================================== -->
 
 <?php	// ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) while( $MainList->get_item() )
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
-		the_date( '', '<h2>', '</h2>' );
+		$MainList->date_if_changed();
 	?>
-	<div class="bPost" lang="<?php the_lang() ?>">
-		<?php permalink_anchor(); ?>
+	<div class="bPost" lang="<?php $Item->lang() ?>">
+		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
-		<?php the_time();  echo ', ', T_('Categories'), ': ';  the_categories() ?>
+		<?php $Item->time();  echo ', ', T_('Categories'), ': ';  $Item->categories() ?>
 		</div>
-		<h3 class="bTitle"><?php the_title(); ?></h3>
+		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
-		  <?php the_content(); ?>
+		  <?php $Item->content(); ?>
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">

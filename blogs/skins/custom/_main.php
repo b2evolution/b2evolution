@@ -60,26 +60,26 @@
 <!-- =================================== START OF MAIN AREA =================================== -->
 
 <?php	// ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) while( $MainList->get_item() )
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
-		the_date( '', '<h2>', '</h2>' );
+		$MainList->date_if_changed();
 	?>
-	<div class="bPost" lang="<?php the_lang() ?>">
-		<?php permalink_anchor(); ?>
+	<div class="bPost" lang="<?php $Item->lang() ?>">
+		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
 		<?php
-			the_time();
+			$Item->time();
 			echo ', ', T_('Categories'), ': ';
-			the_categories();
+			$Item->categories();
 			echo ', ';
-			the_wordcount();
+			$Item->wordcount();
 			echo ' ', T_('words');
 		?>
 		</div>
-		<h3 class="bTitle"><?php the_title(); ?></h3>
+		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
-		  <?php the_content(); ?>
+		  <?php $Item->content(); ?>
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
@@ -93,7 +93,7 @@
 		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
 		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
 		</div>
-		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
+		<?php	// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 		$disp_comments = 1;					// Display the comments if requested
 		$disp_comment_form = 1;			// Display the comments form if comments requested
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
@@ -101,7 +101,7 @@
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		require( dirname(__FILE__)."/_feedback.php");
-		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
+		// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ---------------- ?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
 

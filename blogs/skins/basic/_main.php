@@ -55,16 +55,16 @@
 	?></h2>
 
 	<?php	// ---------------------------------- START OF POSTS --------------------------------------
-	if( isset($MainList) ) while( $MainList->get_item() )
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
-		the_date( '', '<h2>', '</h2>' );
+		$MainList->date_if_changed();
 		?>
 
-		<?php permalink_anchor(); ?>
+		<?php $Item->anchor(); ?>
 		<h3 class="bTitle">
-			<?php the_time(); ?>
+			<?php $Item->time(); ?>
 			<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
-			<?php the_title(); ?>
+			<?php $Item->title(); ?>
 		</h3>
 
 		<blockquote>
@@ -72,15 +72,15 @@
 			<small>
 			<?php
 				echo T_('Categories'), ': ';
-				the_categories();
+				$Item->categories();
 				echo ', ';
-				the_wordcount();
+				$Item->wordcount();
 				echo ' ', T_('words');
 			?>
 			</small>
 		
 			<div>
-				<?php the_content( T_('Read more...') ); ?>
+				<?php $Item->content( '#', '#', T_('Read more...') ); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>
 			</div>
 

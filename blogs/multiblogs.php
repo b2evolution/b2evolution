@@ -125,19 +125,19 @@
 
 
 <?php	// ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) while( $MainList->get_item() )
-{
-the_date( '', '<h2>', '</h2>' );
-?>
-	<div class="bPost" lang="<?php the_lang() ?>">
-		<?php permalink_anchor(); ?>
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
+	{
+	$MainList->date_if_changed();
+	?>
+	<div class="bPost" lang="<?php $Item->lang() ?>">
+		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
-		<?php the_time();  echo ', ', T_('Categories'), ': ';  the_categories() ?>
+		<?php $Item->time();  echo ', ', T_('Categories'), ': ';  $Item->categories() ?>
 		</div>
-		<h3 class="bTitle"><?php the_title(); ?></h3>
+		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
-		  <?php the_content(); ?>
+		  <?php $Item->content(); ?>
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
@@ -210,15 +210,15 @@ the_date( '', '<h2>', '</h2>' );
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
 		$BlogBList = & new ItemList( $blog,  $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
 			
-		while( $BlogBList->get_item() )
+		while( $Item = $BlogBList->get_item() )
 		{ 
 		?>
-		<div class="bPostSide" lang="<?php the_lang() ?>">
-			<?php permalink_anchor(); ?>
+		<div class="bPostSide" lang="<?php $Item->lang() ?>">
+			<?php $Item->anchor(); ?>
 	
-			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
+			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
 			<div class="bText">
-				<?php the_content( '#', 0, '', '#', '', '', 'htmlbody', 0, 0, 1 ); ?>
+				<?php $Item->content( 1, false ); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>
 			</div>
 		</div>
@@ -245,15 +245,15 @@ the_date( '', '<h2>', '</h2>' );
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
 		$BlogRollList = & new ItemList( $blog,  $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
 		
-		while( $BlogRollList->get_item() )
+		while( $Item = $BlogRollList->get_item() )
 		{
 ?>
-		<div class="bPostSide" lang="<?php the_lang() ?>">
-			<?php permalink_anchor(); ?>
+		<div class="bPostSide" lang="<?php $Item->lang() ?>">
+			<?php $Item->anchor(); ?>
 	
-			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
+			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
 			<div class="bText">
-				<?php the_content( '#', 0, '', '#', '', '', 'htmlbody', 0, 0, 1 ); ?>
+				<?php $Item->content( 1, false ); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>
 			</div>
 		</div>

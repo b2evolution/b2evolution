@@ -17,20 +17,20 @@
 	<tagline><?php bloginfo( 'shortdesc', 'xml' ) ?></tagline>
 	<generator url="http://b2evolution.net/" version="<?php echo $b2_version ?>">b2evolution</generator>
 	<modified><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></modified>
-	<?php while( $MainList->get_item() ) {  ?>
+	<?php while( $Item = $MainList->get_item() ) {  ?>
 	<entry>
-		<title type="text/plain" mode="xml"><?php the_title( '', '', false, 'xml' ) ?></title>
+		<title type="text/plain" mode="xml"><?php $Item->title( '', '', false, 'xml' ) ?></title>
 		<link rel="alternate" type="text/html" href="<?php permalink_single() ?>" />
 		<author>
 			<name><?php the_author( 'xml' ) ?></name>
 			<url><?php the_author_url( 'xml' ) ?></url>
 		</author>
 		<id><?php permalink_single() ?></id>
-		<modified><?php the_time('Y-m-d\TH:i:s\Z',1,1); ?></modified>
-		<issued><?php the_time('Y-m-d\TH:i:s\Z',1,1); ?></issued>
+		<modified><?php $Item->date( 'isoZ', true ) ?></modified>
+		<issued><?php $Item->date( 'isoZ', true ) ?></issued>
 		<content type="text/html" mode="escaped"><![CDATA[<?php
 			the_link( '<p>', '</p>' );
-			the_content()
+			$Item->content()
 		?>]]></content>
 	</entry>
 	<?php } ?>

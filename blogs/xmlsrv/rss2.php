@@ -21,21 +21,21 @@
     <docs>http://backend.userland.com/rss</docs>
     <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
     <ttl>60</ttl>
-    <?php while( $MainList->get_item() ) {  ?>
+    <?php while( $Item = $MainList->get_item() ) {  ?>
     <item>
-      <title><?php the_title( '', '', false, 'xml' ) ?></title>
+      <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
       <link><?php permalink_single() ?></link>
-      <pubDate><?php the_time('r',1,1); ?></pubDate>
+      <pubDate><?php $Item->date( 'r', true ) ?></pubDate>
       <?php // Disabled because of spambots: <author><php the_author_email( 'xml' ) ></author>?>
-      <?php the_categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml', 'raw' ) ?>
+      <?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
       <guid isPermaLink="false"><?php the_ID() ?>@<?php echo $baseurl ?></guid>
       <description><?php
         the_link( '', ' ', 'xml' );
-        the_content(T_('[...] Read more!'), 0, '', '', '', '', 'xml', $rss_excerpt_length, 0, 1 );
+        $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
       ?></description>
       <content:encoded><![CDATA[<?php
         the_link( '<p>', '</p>' );
-        the_content()
+        $Item->content()
       ?>]]></content:encoded>
       <comments><?php comments_link( '', 1, 1 ) ?></comments>
     </item>

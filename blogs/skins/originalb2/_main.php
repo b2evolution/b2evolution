@@ -34,21 +34,21 @@
 <div id="content">
 
 
-<?php	// -------------------------------------- START OF POSTS ---------------------------------------
-if( isset($MainList) ) while( $MainList->get_item() )
+<?php	// ----------------------------------- START OF POSTS ------------------------------------
+if( isset($MainList) ) while( $Item = $MainList->get_item() )
 {
-	the_date( '', '<h2>', '</h2>' );
-	permalink_anchor(); 
+	$MainList->date_if_changed();
+	$Item->_anchor(); 
 ?>
-<div class="storyTitle"><?php the_title(); ?>
+<div class="storyTitle"><?php $Item->title(); ?>
 &nbsp;-&nbsp;
-Categories: <?php the_categories() ?>
+Categories: <?php $Item->categories() ?>
 &nbsp;-&nbsp;
-<span class="storyAuthor"><a href="<?php bloginfo('blogurl'); ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php the_time() ?></a>
+<span class="storyAuthor"><a href="<?php bloginfo('blogurl'); ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php $Item->time() ?></a>
 </div>
 
 <div class="storyContent">
-<?php the_content(); ?>
+<?php $Item->content(); ?>
 
 <div class="rightFlush">
 <?php link_pages("<br />Pages: ","<br />","number") ?> 

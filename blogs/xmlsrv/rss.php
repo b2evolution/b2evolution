@@ -19,12 +19,12 @@
     <description><?php bloginfo( 'description' ,'xml') ?></description>
     <language><?php bloginfo( 'lang', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss092</docs>
-    <?php while( $MainList->get_item() ) { ?>
+    <?php while( $Item = $MainList->get_item() ) { ?>
     <item>
-      <title><?php the_title( '', '', false, 'xml' ) ?></title>
+      <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
       <description><?php
         the_link( '', ' ', 'xml' );
-        the_content(T_('[...] Read more!'), 0, '', '', '', '', 'entityencoded', 0, 0, 1 );
+        $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
       ?></description>
       <link><?php permalink_single() ?></link>
     </item>

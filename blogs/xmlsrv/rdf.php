@@ -24,7 +24,7 @@
   <sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
   <items>
     <rdf:Seq>
-    <?php while( $MainList->get_item() ) { ?>
+    <?php while( $Item = $MainList->get_item() ) { ?>
       <rdf:li rdf:resource="<?php permalink_single() ?>"/>
     <?php } ?>
     </rdf:Seq>
@@ -32,21 +32,21 @@
 </channel>
 <?php 
 $MainList->restart(); 
-while( $MainList->get_item() ) 
+while( $Item = $MainList->get_item() ) 
 { ?>
 <item rdf:about="<?php permalink_single() ?>">
-  <title><?php the_title( '', '', false, 'xml' ) ?></title>
+  <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
   <link><?php permalink_single() ?></link>
-  <dc:date><?php the_time('isoZ',1,1); ?></dc:date>
+  <dc:date><?php $Item->date( 'isoZ', true ) ?></dc:date>
   <dc:creator><?php the_author( 'xml' ) ?></dc:creator>
   <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
   <description><?php
     the_link( '', ' ', 'xml' );
-    the_content(T_('[...] Read more!'), 0, '', '', '', '', 'xml', $rss_excerpt_length, 0, 1 );
+    $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
   ?></description>
   <content:encoded><![CDATA[<?php
     the_link( '<p>', '</p>' );
-    the_content()
+    $Item->content()
   ?>]]></content:encoded>
 </item>
 <?php } ?>
