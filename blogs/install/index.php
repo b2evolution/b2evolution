@@ -11,15 +11,15 @@
 
 // include config and default functions
 require_once( dirname(__FILE__). '/../conf/_config.php' );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
 require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_class_db.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_cats.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bposts.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_forms.php" );
-require_once (dirname(__FILE__). '/_functions_install.php' );
-require_once (dirname(__FILE__). '/_functions_create.php' );
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_class_db.php" );
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_cats.php" );
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bposts.php" );
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_forms.php" );
+require_once( dirname(__FILE__). '/_functions_install.php' );
+require_once( dirname(__FILE__). '/_functions_create.php' );
 
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
@@ -85,9 +85,8 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'menu') )
 		if( $default_locale == $lkey ) echo '<strong>';	
 		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
 		locale_flag( $lkey );
-		echo $lvalue['name'];
-		echo '</a>';
-		echo '</li>';
+		echo T_( $lvalue['name'] );
+		echo '</a></li>';
 		
 		if( $default_locale == $lkey ) echo '</strong>';	
 	}
