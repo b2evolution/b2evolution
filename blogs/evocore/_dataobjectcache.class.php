@@ -94,7 +94,7 @@ class DataObjectCache
 		if( $this->all_loaded )
 			return	false;	// Already loaded;
 
-		$Debuglog->add( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
+		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache' );
 		$sql = "SELECT * FROM $this->dbtablename";
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
@@ -105,7 +105,7 @@ class DataObjectCache
 				$this->cache[ $row->$dbIDname ] = new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ); // COPY!
 			}
 			else
-			{	// Instantiate a custom object
+			{ // Instantiate a custom object
 				$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			}
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -192,30 +192,38 @@ class DataObjectCache
 		global $DB, $Debuglog;
 
 		if( !empty( $this->cache[ $req_ID ] ) )
-		{	// Already in cache
+		{ // Already in cache
 			// $Debuglog->add( "Accessing $this->objtype($req_ID) from cache" );
 			return $this->cache[ $req_ID ];
 		}
 		elseif( !$this->all_loaded )
-		{	// Not in cache, but not everything is loaded yet
+		{ // Not in cache, but not everything is loaded yet
 			if( $this->load_all )
-			{	// It's ok to just load everything:
+			{ // It's ok to just load everything:
 				$this->load_all();
 			}
 			else
 			{ // Load just the requested object:
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
-				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
-				$row = $DB->get_row( $sql );
-				$dbIDname = $this->dbIDname;
-				$objtype = $this->objtype;
-				$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = '$req_ID'";
+
+				if( $row = $DB->get_row( $sql ) )
+				{
+					$this->cache[ $row->{$this->dbIDname} ] = new $this->objtype( $row ); // COPY!
+				}
+				else
+				{
+					$Debuglog->add( 'Could not get DataObject by ID. Query: '.$sql, 'error' );
+				}
 			}
 		}
 
 		if( empty( $this->cache[ $req_ID ] ) )
-		{	// Requested object does not exist
-			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+		{ // Requested object does not exist
+			if( $halt_on_error )
+			{
+				die( "Requested $this->objtype does not exist!" );
+			}
 			return false;
 		}
 
@@ -228,7 +236,7 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal DataObjectCache::get_by_ID(-) }}
+	 * {@internal DataObjectCache::option_list(-) }}
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
@@ -236,7 +244,7 @@ class DataObjectCache
 	function option_list( $default = 0, $allow_none = false, $method ='name' )
 	{
 		if( (! $this->all_loaded) && $this->load_all )
-		{	// We have not loaded all items so far, but we're allowed to... so let's go:
+		{ // We have not loaded all items so far, but we're allowed to... so let's go:
 			$this->load_all();
 		}
 
@@ -263,7 +271,7 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal DataObjectCache::get_by_ID(-) }}
+	 * {@internal DataObjectCache::option_list_return(-) }}
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
@@ -271,7 +279,7 @@ class DataObjectCache
 	function option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
 	{
 		if( (! $this->all_loaded) && $this->load_all )
-		{	// We have not loaded all items so far, but we're allowed to... so let's go:
+		{ // We have not loaded all items so far, but we're allowed to... so let's go:
 			$this->load_all();
 		}
 
@@ -299,6 +307,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/09 00:27:13  blueyed
+ * Removed deprecated globals / userdata handling
+ *
  * Revision 1.10  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *

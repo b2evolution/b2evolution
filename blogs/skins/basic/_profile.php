@@ -28,60 +28,60 @@
 	<!-- form to add a comment -->
 	<form action="<?php echo $htsrv_url ?>profile_update.php" method="post">
 
-	<input type="hidden" name="checkuser_id" value="<?php echo $current_User->ID ?>" />
+	<input type="hidden" name="checkuser_id" value="<?php echo $current_User->get('ID') ?>" />
 
 	<table align="center">
 
 		<tr>
 			<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
-			<td><?php user_info( 'login', 'htmlhead' ) ?>
+			<td><?php $current_User->disp( 'login', 'htmlhead' ) ?>
 				-
 				<strong><?php echo T_('ID') ?>:</strong>
-				<?php user_info( 'ID', 'raw' ) ?>
+				<?php $current_User->disp( 'ID', 'raw' ) ?>
 			</td>
 		</tr>
 
 		<tr>
 			<td align="right"><strong><?php echo T_('Level') ?>:</strong></td>
-			<td><?php echo user_info( 'level', 'raw' ) ?></td>
+			<td><?php echo $current_User->disp( 'level', 'raw' ) ?></td>
 		</tr>
 
 		<tr>
 			<td align="right"><strong><?php echo T_('Posts') ?>:</strong></td>
-			<td><?php echo user_info( 'num_posts', 'raw' ) ?></td>
+			<td><?php echo $current_User->disp( 'num_posts', 'raw' ) ?></td>
 		</tr>
 
 		<?php
-			form_text_tr( 'newuser_firstname', get_user_info( 'firstname' ), 40, T_('First name'), '', 50, 'bComment' );
-			form_text_tr( 'newuser_lastname', get_user_info( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
-			form_text_tr( 'newuser_nickname', get_user_info( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
+			form_text_tr( 'newuser_firstname', $current_User->get('firstname'), 40, T_('First name'), '', 50, 'bComment' );
+			form_text_tr( 'newuser_lastname', $current_User->get('lastname'), 40, T_('Last name'), '', 50, 'bComment' );
+			form_text_tr( 'newuser_nickname', $current_User->get('nickname'), 40, T_('Nickname'), '', 50, 'bComment' );
 		?>
 
 		<tr>
 			<td align="right"><strong><label for="newuser_idmode"><?php echo T_('Identity shown') ?>:</label></strong></td>
 			<td>
-				<?php $idmode = get_user_info( 'idmode' ); ?>
+				<?php $idmode = $current_User->get('idmode'); ?>
 				<select name="newuser_idmode">
-					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php user_info( 'nickname', 'htmlhead' ) ?></option>
-					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php user_info( 'login', 'htmlhead' ) ?></option>
-					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php user_info( 'firstname', 'htmlhead' ) ?></option>
-					<option value="lastname"<?php if ( $idmode == 'lastname' ) echo ' selected="selected"'; ?>><?php user_info( 'lastname', 'htmlhead' ) ?></option>
-					<option value="namefl"<?php if ( $idmode == 'namefl' ) echo ' selected="selected"'; ?>><?php user_info( 'firstname', 'htmlhead' ); echo ' '; user_info( 'lastname', 'htmlhead' ); ?></option>
-					<option value="namelf"<?php if ( $idmode == 'namelf' ) echo ' selected="selected"'; ?>><?php user_info( 'lastname', 'htmlhead' ); echo ' '; user_info( 'firstname', 'htmlhead' ); ?></option>
+					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php $current_User->disp( 'nickname', 'htmlhead' ) ?></option>
+					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php $current_User->disp( 'login', 'htmlhead' ) ?></option>
+					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php $current_User->disp( 'firstname', 'htmlhead' ) ?></option>
+					<option value="lastname"<?php if ( $idmode == 'lastname' ) echo ' selected="selected"'; ?>><?php $current_User->disp( 'lastname', 'htmlhead' ) ?></option>
+					<option value="namefl"<?php if ( $idmode == 'namefl' ) echo ' selected="selected"'; ?>><?php $current_User->disp( 'firstname', 'htmlhead' ); echo ' '; $current_User->disp( 'lastname', 'htmlhead' ); ?></option>
+					<option value="namelf"<?php if ( $idmode == 'namelf' ) echo ' selected="selected"'; ?>><?php $current_User->disp( 'lastname', 'htmlhead' ); echo ' '; $current_User->disp( 'firstname', 'htmlhead' ); ?></option>
 				</select>
 		</td>
 		</tr>
 
 
 		<?php
-			form_text_tr( 'newuser_email', get_user_info( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
-			form_text_tr( 'newuser_url', get_user_info( 'url' ), 40, T_('URL'), '', 100, 'bComment' );
-			form_text_tr( 'newuser_icq', get_user_info( 'icq' ), 40, T_('ICQ'), '', 40, 'bComment' );
-			form_text_tr( 'newuser_aim', get_user_info( 'aim' ), 40, T_('AOL I.M.'), '', 50, 'bComment' );
-			form_text_tr( 'newuser_msn', get_user_info( 'msn' ), 40, T_('MSN I.M.'), '', 100, 'bComment' );
-			form_text_tr( 'newuser_yim', get_user_info( 'yim' ), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
+			form_text_tr( 'newuser_email', $current_User->get('email'), 40, T_('Email'), '', 100, 'bComment' );
+			form_text_tr( 'newuser_url', $current_User->get('url'), 40, T_('URL'), '', 100, 'bComment' );
+			form_text_tr( 'newuser_icq', $current_User->get('icq'), 40, T_('ICQ'), '', 40, 'bComment' );
+			form_text_tr( 'newuser_aim', $current_User->get('aim'), 40, T_('AOL I.M.'), '', 50, 'bComment' );
+			form_text_tr( 'newuser_msn', $current_User->get('msn'), 40, T_('MSN I.M.'), '', 100, 'bComment' );
+			form_text_tr( 'newuser_yim', $current_User->get('yim'), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
 
-			form_checkbox_tr( 'newuser_notify', get_user_info( 'notify' ), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
+			form_checkbox_tr( 'newuser_notify', $current_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
 		?>
 
 		<tr>

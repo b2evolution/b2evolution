@@ -90,11 +90,11 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	/*
 	 * New trackback notification:
 	 */
-	$authordata = get_userdata($postdata['Author_ID']);
-	if( get_user_info( 'notify', $authordata ) )
-	{	// Author wants to be notified:
-		locale_temp_switch( get_user_info( 'locale', $authordata ) );
-		$recipient = get_user_info( 'email', $authordata );
+	$AuthorUser =& $UserCache->get_by_ID( $postdata['Author_ID'] );
+	if( $AuthorUser->notify )
+	{ // Author wants to be notified:
+		locale_temp_switch( $AuthorUser->get( 'locale' ) );
+		$recipient = $AuthorUser->get( 'email' );
 		$subject = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
 
 		// fplanque added:

@@ -915,10 +915,9 @@ param( 'mode', 'string', 'normal' );
 
 					case 'createnew':
 						// check if the user already exists
-						$user_data = get_userdatabylogin( $usersmapped[ $post_author ][1] );
-						if( $user_data )
+						if( $ExistingUser =& $UserCache->get_by_login( $usersmapped[ $post_author ][1] ) )
 						{
-							$post_author = $user_data['ID'];
+							$post_author = $ExistingUser->ID;
 						}
 						else
 						{
@@ -931,16 +930,15 @@ param( 'mode', 'string', 'normal' );
 							$new_user->setGroup( $new_user_Group );
 							$new_user->set_datecreated( time() + ($Settings->get('time_difference') * 3600) );
 
-							if( $simulate )
-							{
-								$cache_userdata[ $post_author ] = array( 'ID' => 'simulating' );
-							}
-							else
+							if( !$simulate )
 							{
 								$new_user->dbinsert();
 							}
 
-							$message .= '<li style="color:orange">user '.$usersmapped[ $post_author ][1].' created</li>';
+							// This is a bad hack, because add() would need an ID
+							$UserCache->cache_login[ $new_user->login ] = & $new_user;
+
+							$message .= '<li style="color:orange">user '.$new_user->login.' created</li>';
 							$count_userscreated++;
 
 							$post_author = $new_user->ID;
@@ -1489,7 +1487,7 @@ function renderer_list()
 		elseif( $loop_RendererPlugin->code == 'b2WPAutP' )
 		{ // special Auto-P plugin
 			?>
-			<div class="input">
+			<fieldset>
 				<label for="textile" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name() ?>:</strong></label>
 				<div style="margin-left:2ex" />
 				<input type="radio" name="autop" value="1" class="checkbox" checked="checked" /> yes (always)<br>
@@ -1498,7 +1496,7 @@ function renderer_list()
 				<span class="notes"> ..that means it will apply if convert breaks results to true (set to either 1, textile_2 or __DEFAULT__ (and &quot;Convert-breaks default&quot; checked above)</span>
 
 				</div>
-			</div>
+			</fieldset>
 			<?php
 			continue;
 		}

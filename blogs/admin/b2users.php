@@ -82,7 +82,7 @@ else switch ($action)
 			$edited_User->set_datecreated( $localtimenow );
 		}
 		else
-		{	// we edit an existing user:
+		{ // we edit an existing user:
 			$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
 		}
 
@@ -182,20 +182,16 @@ else switch ($action)
 		{ // OK, no error.
 
 			if( !empty($edited_user_pass2) )
-			{	// Password provided, we must encode it
+			{ // Password provided, we must encode it
 				$new_pass = md5( $edited_user_pass2 );
 				$edited_User->set( 'pass', $new_pass ); // set password
 			}
 
 			if( $edited_User->get('ID') != 0 )
-			{	// Commit update to the DB:
+			{ // Commit update to the DB:
 				$edited_User->dbupdate();
 
 				$Messages->add( T_('User updated.'), 'note' );
-
-				// Commit changes in cache:
-				// not ready: $UserCache->add( $edited_Group );
-				unset( $cache_userdata ); // until better
 			}
 			else
 			{ // Insert user into DB
@@ -230,8 +226,8 @@ else switch ($action)
 
 		$edited_user_ID = $id;
 
-		$user_data = get_userdata( $id );
-		$usertopromote_level = get_user_info( 'level', $user_data );
+		$UserToPromote =& $UserCache->get_by_ID( $id );
+		$usertopromote_level = $UserToPromote->get( 'level' );
 
 		if( ! in_array($prom, array('up', 'down'))
 				|| ($prom == 'up' && $usertopromote_level > 9)
@@ -250,16 +246,15 @@ else switch ($action)
 			{
 				$sql = "UPDATE T_users SET user_level=user_level-1 WHERE ID = $id";
 			}
-			$result = $DB->query( $sql );
 
-			if( $result )
+			if( $DB->query( $sql ) )
+			{
 				$Messages->add( T_('User level changed.'), 'note' );
+			}
 			else
-				$Messages->add( sprintf( 'Couldn\'t change %s\'s level.', $user_data['user_login'] ) );
-
-			// reset cache
-			$cache_userdata[ $id ] = '';
-
+			{
+				$Messages->add( sprintf( 'Couldn\'t change %s\'s level.', $UserToPromote->login ) );
+			}
 		}
 		break;
 
@@ -391,7 +386,7 @@ else switch ($action)
 		$edited_Group->set( 'perm_templates', $edited_grp_perm_templates );
 
 		if( $edited_grp_ID != 1 )
-		{	// Groups others than #1 can be prevented from editing users
+		{ // Groups others than #1 can be prevented from editing users
 			param( 'edited_grp_perm_users', 'string', true );
 			$edited_Group->set( 'perm_users', $edited_grp_perm_users );
 		}
@@ -523,7 +518,7 @@ else
 	}
 	elseif( $user != $current_User->ID )
 	{ // another user requested -> error-note
-		Log::display( '', '', T_('You are not allowed to view other users.'), true, 'error' );
+		Log::display( '', '', T_('You are not allowed to view other users.'), 'error' );
 		$user = $current_User->ID;
 	}
 }

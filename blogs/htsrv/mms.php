@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
- * This file built upon code from original Peffisaur - 
+ * This file built upon code from original Peffisaur -
  * Stefan Hellkvist - {@link http://hellkvist.org}
  *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
@@ -14,7 +14,7 @@
  * @package htsrv
  * @todo MOVE THIS FILE TO /htsrv
  */
- 
+
 /**
  * Initalize:
  */
@@ -26,10 +26,9 @@ param( 'cat', 'integer', $default_category, true );
 
 if( !user_pass_ok( $login, $pass, false ) || $_SERVER['CONTENT_TYPE'] != "application/vnd.wap.mms-message" || strlen( $HTTP_RAW_POST_DATA ) == 0 ) exit;
 
-$userdata = get_userdatabylogin($login);
-$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+$current_User = & $UserCache->get_by_login( $login );
 $post_category = $cat;
-$blog = get_catblog($post_category); 
+$blog = get_catblog($post_category);
 
 // Check permission:
 $current_User->check_perm( 'blog_post_statuses', 'published', true, $blog );
@@ -69,67 +68,67 @@ define( "MULTIPART_RELATED",  	0x33 );
 
 $content_types = array( "*/*", "text/*", "text/html", "text/plain",
 	 	 	"text/x-hdml", "text/x-ttml", "text/x-vCalendar",
-			"text/x-vCard", "text/vnd.wap.wml", 
+			"text/x-vCard", "text/vnd.wap.wml",
 			"text/vnd.wap.wmlscript", "text/vnd.wap.wta-event",
-			"multipart/*", "multipart/mixed", 
+			"multipart/*", "multipart/mixed",
 			"multipart/form-data", "multipart/byterantes",
 			"multipart/alternative", "application/*",
-			"application/java-vm", 
+			"application/java-vm",
 			"application/x-www-form-urlencoded",
 			"application/x-hdmlc", "application/vnd.wap.wmlc",
-			"application/vnd.wap.wmlscriptc", 
-			"application/vnd.wap.wta-eventc", 
-			"application/vnd.wap.uaprof", 
+			"application/vnd.wap.wmlscriptc",
+			"application/vnd.wap.wta-eventc",
+			"application/vnd.wap.uaprof",
 			"application/vnd.wap.wtls-ca-certificate",
 			"application/vnd.wap.wtls-user-certificate",
-			"application/x-x509-ca-cert", 
-			"application/x-x509-user-cert", 
+			"application/x-x509-ca-cert",
+			"application/x-x509-user-cert",
 			"image/*", "image/gif", "image/jpeg", "image/tiff",
-			"image/png", "image/vnd.wap.wbmp", 
-			"application/vnd.wap.multipart.*", 
-			"application/vnd.wap.multipart.mixed", 
-			"application/vnd.wap.multipart.form-data", 
-			"application/vnd.wap.multipart.byteranges", 
-			"application/vnd.wap.multipart.alternative", 
-			"application/xml", "text/xml", 
-			"application/vnd.wap.wbxml", 
-			"application/x-x968-cross-cert", 
-			"application/x-x968-ca-cert", 
-			"application/x-x968-user-cert", 
-			"text/vnd.wap.si", 
-			"application/vnd.wap.sic", 
-			"text/vnd.wap.sl", 
-			"application/vnd.wap.slc", 
-			"text/vnd.wap.co", 
-			"application/vnd.wap.coc", 
-			"application/vnd.wap.multipart.related", 
-			"application/vnd.wap.sia", 
-			"text/vnd.wap.connectivity-xml", 
-			"application/vnd.wap.connectivity-wbxml", 
-			"application/pkcs7-mime", 
-			"application/vnd.wap.hashed-certificate", 
-			"application/vnd.wap.signed-certificate", 
+			"image/png", "image/vnd.wap.wbmp",
+			"application/vnd.wap.multipart.*",
+			"application/vnd.wap.multipart.mixed",
+			"application/vnd.wap.multipart.form-data",
+			"application/vnd.wap.multipart.byteranges",
+			"application/vnd.wap.multipart.alternative",
+			"application/xml", "text/xml",
+			"application/vnd.wap.wbxml",
+			"application/x-x968-cross-cert",
+			"application/x-x968-ca-cert",
+			"application/x-x968-user-cert",
+			"text/vnd.wap.si",
+			"application/vnd.wap.sic",
+			"text/vnd.wap.sl",
+			"application/vnd.wap.slc",
+			"text/vnd.wap.co",
+			"application/vnd.wap.coc",
+			"application/vnd.wap.multipart.related",
+			"application/vnd.wap.sia",
+			"text/vnd.wap.connectivity-xml",
+			"application/vnd.wap.connectivity-wbxml",
+			"application/pkcs7-mime",
+			"application/vnd.wap.hashed-certificate",
+			"application/vnd.wap.signed-certificate",
 			"application/vnd.wap.cert-response",
 			"application/xhtml+xml",
 			"application/wml+xml",
-			"text/css", 
-			"application/vnd.wap.mms-message", 
-			"application/vnd.wap.rollover-certificate", 
-			"application/vnd.wap.locc+wbxml", 
-			"application/vnd.wap.loc+xml", 
-			"application/vnd.syncml.dm+wbxml", 
-			"application/vnd.syncml.dm+xml", 
-			"application/vnd.syncml.notification", 
-			"application/vnd.wap.xhtml+xml", 
-			"application/vnd.wv.csp.cir", 
-			"application/vnd.oma.dd+xml", 
-			"application/vnd.oma.drm.message", 
-			"application/vnd.oma.drm.content", 
+			"text/css",
+			"application/vnd.wap.mms-message",
+			"application/vnd.wap.rollover-certificate",
+			"application/vnd.wap.locc+wbxml",
+			"application/vnd.wap.loc+xml",
+			"application/vnd.syncml.dm+wbxml",
+			"application/vnd.syncml.dm+xml",
+			"application/vnd.syncml.notification",
+			"application/vnd.wap.xhtml+xml",
+			"application/vnd.wv.csp.cir",
+			"application/vnd.oma.dd+xml",
+			"application/vnd.oma.drm.message",
+			"application/vnd.oma.drm.content",
 			"application/vnd.oma.drm.rights+xml",
 			"application/vnd.oma.drm.rights+wbxml" );
 
 $typeToExtension = array( IMAGE_GIF =>		".gif",
-			  IMAGE_JPEG =>         ".jpg", 	
+			  IMAGE_JPEG =>         ".jpg",
 			  IMAGE_PNG =>          ".png",
 			  IMAGE_WBMP =>         ".wbmp",
 			  TEXT_PLAIN =>		".txt",
@@ -351,11 +350,11 @@ class MMSDecoder {
 		switch ( $this->data[$this->curp] )
 		{
 			case 128:
-				$this->curp++; 
-				MMSDecoder::parseDate( $this->expiryDate ); 
+				$this->curp++;
+				MMSDecoder::parseDate( $this->expiryDate );
 				break;
 			case 129:
-				$this->curp++; 
+				$this->curp++;
 				MMSDecoder::parseDeltaSeconds( $this->expiryDeltaSeconds );
 				break;
 			default:
@@ -548,7 +547,7 @@ class MMSDecoder {
 	function parseReadReply()
 	{
 		$this->readReply = $this->data[$this->curp++];
-	}	
+	}
 
 	function parseSenderVisibility()
 	{
@@ -608,7 +607,7 @@ class MMSDecoder {
 	}
 
 	function parseTransactionId()
-	{	
+	{
 		MMSDecoder::parseTextString( $this->transactionId );
 	}
 
@@ -692,7 +691,7 @@ for ( $i = 0; $i < sizeof( $parts ); $i++ )
 	{
 		$filename = 'mms' . mktime() . $ext;
 		$part->writeToFile ( $fileupload_realpath.'/'.$filename );
-		
+
 		$content .= '<img src="'.$fileupload_url.'/'.$filename.'"';
 		if( $img_dimensions = getimagesize( $fileupload_realpath.'/'.$filename ) )
 		{ // add 'width="xx" height="xx"'

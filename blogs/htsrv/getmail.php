@@ -211,8 +211,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 		continue;
 	}
 
-	$userdata = get_userdatabylogin($user_login);
-	$loop_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$loop_User = & $UserCache->get_by_login( $user_login );
 
 	// --- get infos from content -----------
 	$post_title = xmlrpc_getposttitle($content);

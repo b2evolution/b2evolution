@@ -764,7 +764,7 @@ $bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString,
  */
 function bloggergetuserinfo($m)
 {
-	global $xmlrpcerruser;
+	global $xmlrpcerruser, $UserCache;
 
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
@@ -772,19 +772,20 @@ function bloggergetuserinfo($m)
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
 
-	$userdata = get_userdatabylogin($username);
+	$User =& $UserCache->get_by_login( $username );
 
-	if (user_pass_ok($username,$password)) {
-		$struct = new xmlrpcval(array("nickname" => new xmlrpcval($userdata["user_nickname"]),
-										"userid" => new xmlrpcval($userdata["ID"]),
-										"url" => new xmlrpcval($userdata["user_url"]),
-										"email" => new xmlrpcval($userdata["user_email"]),
-										"lastname" => new xmlrpcval($userdata["user_lastname"]),
-										"firstname" => new xmlrpcval($userdata["user_firstname"])
-										),"struct");
+	if( user_pass_ok( $username, $password) )
+	{
+		$struct = new xmlrpcval( array(
+															'nickname' => new xmlrpcval( $User->get('nickname') ),
+															'userid' => new xmlrpcval( $User->get('ID') ),
+															'url' => new xmlrpcval( $User->get('url') ),
+															'email' => new xmlrpcval( $User->get('email') ),
+															'lastname' => new xmlrpcval( $User->get('lastname') ),
+															'firstname' => new xmlrpcval( $User->get('firstname') )
+															), 'struct' );
 		$resp = $struct;
 		return new xmlrpcresp($resp);
-
 	}
 	else
 	{
@@ -2305,9 +2306,6 @@ function metawebloggetrecentposts( $m )
 
 	logIO("O","In metawebloggetrecentposts, user and pass ok...");
 
-
-
-	logIO( 'O', 'In metawebloggetrecentposts, current userdata is ... '. $userdata );
 
 
 

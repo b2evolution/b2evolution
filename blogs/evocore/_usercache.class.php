@@ -82,25 +82,48 @@ class UserCache extends DataObjectCache
 	 * @todo Daniel, it would be much better if this was carried out the same way as get_by_ID() and if a reference to the
 	 * same User object was stored in the login cache. This would also require overloading the get_by_ID method, but in the
 	 * end this would save 1 query at first request, an dpossibly many more afterwards...
+	 * Francois, IMHO it's ok now. I don't see why I should overload get_by_ID()..
 	 *
-	 * @return false|object reference to the user object or NULL if not found
+	 * @return false|User Reference to the user object or false if not found
 	 */
 	function & get_by_login( $login )
 	{
+		$login = strtolower( $login );
 		if( !isset( $this->cache_login[$login] ) )
 		{
 			global $DB;
-			$this->cache_login[$login] = $DB->get_var( 'SELECT ID FROM T_users
-																									WHERE user_login = "'.$login.'"' );
+			if( $row = $DB->get_row( 'SELECT * FROM T_users WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
+			{
+				$this->cache[$row->ID] = new User( $row );
+				$this->cache_login[$login] = & $this->cache[$row->ID];
+			}
+			else
+			{
+				$this->cache_login[$login] = false;
+			}
 		}
 
-		if( !$this->cache_login[$login] )
-		{
-			return false;
-		}
-
-		return $this->get_by_ID( $this->cache_login[$login], false );
+		return $this->cache_login[$login];
 	}
+
+
+	/**
+	 * Overload parent's function to also maintain the login cache.
+	 *
+	 * {@internal UserCache::add(-) }}
+	 */
+	function add( & $Obj )
+	{
+		if( parent::add( $Obj ) )
+		{
+			$this->cache_login[$Obj->login] = & $Obj;
+
+			return true;
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Load members of a given blog
@@ -141,7 +164,7 @@ class UserCache extends DataObjectCache
 	function blog_member_list( $blog_ID, $default = 0, $allow_none = false, $always_load_default = false, $disp = true )
 	{
 		if( $blog_ID )
-		{	// Load requested blog members:
+		{ // Load requested blog members:
 			$this->load_blogmembers( $blog_ID );
 
 			// Make sure current user is in list:
@@ -152,7 +175,7 @@ class UserCache extends DataObjectCache
 			}
 		}
 		else
-		{	// No blog specified: load ALL members:
+		{ // No blog specified: load ALL members:
 			$this->load_all();
 		}
 
@@ -186,6 +209,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/09 00:27:13  blueyed
+ * Removed deprecated globals / userdata handling
+ *
  * Revision 1.7  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *

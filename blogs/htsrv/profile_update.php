@@ -45,7 +45,7 @@ if( $checkuser_id != $current_User->ID )
 	die( 'You are not logged in under the same account you are trying to modify.' );
 }
 
-if( $demo_mode && ($user_login == 'demouser'))
+if( $demo_mode && ($current_User->login == 'demouser') )
 {
 	die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">'
 				. T_('Back to profile') . '</a>]' );

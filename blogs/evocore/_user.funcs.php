@@ -60,17 +60,12 @@ require_once dirname(__FILE__). '/_user.class.php';
 function veriflog( $login_required = false )
 {
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error;
-	global $user_login, $user_pass_md5, $userdata, $user_email, $user_url;
-	global $current_User;
-	global $DB, $UserCache;
+	global $UserCache, $current_User;
 
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
 	// Warning: unset() prevent from setting a new global value later in the func !!! :((
 	$user_login = '';
 	$user_pass_md5 = '';
-	$userdata = '';
-	$user_email = '';
-	$user_url = '';
 
 	// Check if user is trying to login right now:
 	if( isset($_POST['log'] ) && isset($_POST['pwd'] ))
@@ -167,15 +162,17 @@ function veriflog( $login_required = false )
 	 * Login info is OK, we set the global variables:
 	 */
 	// echo 'LOGGED IN';
-	// TODO: $UserCache::get_by_login()!
-	$userdata = get_userdatabylogin($user_login);
-	$current_User = $UserCache->get_by_login( $user_login ); // COPY! we cannot set a global by reference!!
-	# echo $current_User->disp('login');
 
-	$user_email	= $userdata['user_email'];
-	$user_url	= $userdata['user_url'];
 
-	return 0;		// OK
+	if( $current_User = $UserCache->get_by_login( $user_login ) )
+	{
+		return 0; // OK
+	}
+	else
+	{
+		return 'Error while loading user data!';
+	}
+	#echo $current_User->disp('login');
 }
 
 
@@ -185,18 +182,11 @@ function veriflog( $login_required = false )
 function logout()
 {
 	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
-	global $user_login, $user_pass_md5, $userdata, $user_email, $user_url;
 	global $current_User;
 
 	// Reset all global variables
 	// Note: unset is bugguy on globals
 	$current_User = false;
-
-	$user_login = '';
-	$user_pass_md5 = '';
-	$userdata = '';
-	$user_email = '';
-	$user_url = '';
 
 	setcookie( 'cafeloguser' );		// OLD
 	setcookie( 'cafeloguser', '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
@@ -220,42 +210,47 @@ function is_logged_in()
 		return false;
 	}
 
-	return !empty( $current_User->ID );
+	return is_object( $current_User ) && !empty( $current_User->ID );
 }
 
 
 /*
  * user_pass_ok(-)
  */
-function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
+function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 {
-	$userdata = get_userdatabylogin($user_login);
-	// echo 'got data for: ', $userdata['user_login'];
+	global $UserCache;
 
-	if( !$pass_is_md5 ) $user_pass = md5( $user_pass );
-	// echo 'pass: ', $user_pass, '/', $userdata['user_pass'];
+	$User =& $UserCache->get_by_login( $login );
+	// echo 'got data for: ', $User->login;
 
-	return ($user_pass == $userdata['user_pass']);
+	if( !$pass_is_md5 )
+	{
+		$pass = md5( $pass );
+	}
+	// echo 'pass: ', $pass, '/', $User->pass;
+
+	return ( $pass == $User->pass );
 }
 
 
 /**
  * get_userdatabylogin(-)
  */
-function get_userdatabylogin( $user_login )
+function get_userdatabylogin( $login )
 {
 	global $DB, $cache_userdata;
-	if( empty($cache_userdata[$user_login]) )
+	if( empty($cache_userdata[$login]) )
 	{
 		$sql = "SELECT *
 						FROM T_users
-						WHERE user_login = '".$DB->escape($user_login)."'";
+						WHERE user_login = '".$DB->escape($login)."'";
 		$myrow = $DB->get_row( $sql, ARRAY_A );
-		$cache_userdata[$user_login] = $myrow;
+		$cache_userdata[$login] = $myrow;
 	}
 	else
 	{
-		$myrow = $cache_userdata[$user_login];
+		$myrow = $cache_userdata[$login];
 	}
 	return($myrow);
 }
@@ -303,17 +298,10 @@ function get_usernumposts( $userid )
 /**
  * get_user_info(-)
  *
- * @deprecated by UserCache
+ * @deprecated by UserCache - not used in the core anymore
  */
-function get_user_info( $show = '', $this_userdata = '' )
+function get_user_info( $show = '', $this_userdata )
 {
-	global $userdata;
-
-	if( empty( $this_userdata ) )
-	{ // We want the current user
-		$this_userdata = & $userdata;
-	}
-
 	switch( $show )
 	{
 		case 'ID':
@@ -353,11 +341,13 @@ function get_user_info( $show = '', $this_userdata = '' )
 /**
  * user_info(-)
  *
- * Template tag
+ * @deprecated by UserCache - not used in the core anymore
  */
 function user_info( $show = '', $format = 'raw', $display = true )
 {
-	$content = get_user_info( $show );
+	global $current_User;
+
+	$content = $current_User->get( $show );
 	$content = format_to_output( $content, $format );
 	if( $display )
 		echo $content;
@@ -446,16 +436,19 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  */
 function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $user_login, $blog;
+	global $htsrv_url, $current_User, $blog;
 
-	if( ! is_logged_in() ) return false;
+	if( ! is_logged_in() )
+	{
+		return false;
+	}
 
 	if( $link_text == '' ) $link_text = T_('Logout (%s)');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	echo $before;
 	echo '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.urlencode( regenerate_url() ).'" title="'.$link_title.'">';
-	printf( $link_text, $user_login );
+	printf( $link_text, $current_User->login );
 	echo '</a>';
 	echo $after;
 }
@@ -497,9 +490,12 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
  */
 function user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $user_login, $pagenow, $Blog;
+	global $current_User, $pagenow, $Blog;
 
-	if( ! is_logged_in() ) return false;
+	if( ! is_logged_in() )
+	{
+		return false;
+	}
 
 	if( $link_text == '' ) $link_text = T_('Profile (%s)');
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
@@ -507,7 +503,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	echo $before;
 	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.urlencode(regenerate_url()) )
 			.'" title="', $link_title, '">';
-	printf( $link_text, $user_login );
+	printf( $link_text, $current_User->login );
 	echo '</a>';
 	echo $after;
 }
@@ -630,6 +626,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/09 00:27:13  blueyed
+ * Removed deprecated globals / userdata handling
+ *
  * Revision 1.11  2005/02/08 20:17:57  blueyed
  * removed obsolete $User_ID global
  *

@@ -69,20 +69,13 @@ switch($action)
 		}
 		else
 		{
-			$user_data	= get_userdatabylogin($log);
-			$user_email	= $user_data['user_email'];
+			if( $ForgetfulUser =& $UserCache->get_by_login( $log ) )
+			{ // User exists
+				// echo 'email: ', $ForgetfulUser->email;
+				// echo 'locale: '.$ForgetfulUser->locale;
 
-			locale_temp_switch( $user_data['user_locale'] );
+				locale_temp_switch( $ForgetfulUser->locale );
 
-			// echo 'email: ', $user_email;
-			// echo 'locale: '.$user_data['locale'];
-
-			if( empty($user_email) )
-			{	// pretend that the email is sent for avoiding guessing user_login
-				$notes = T_('An email with the new password was sent successfully to your email address.')."<br />\n";
-			}
-			else
-			{
 				$random_password = substr(md5(uniqid(microtime())),0,6);
 
 				$message  = T_('Login:')." $log\r\n";
@@ -92,7 +85,12 @@ switch($action)
 				// DEBUG!
 				// echo $message.' (password not set yet, only when sending email does not fail);
 
-				if( !send_mail( $user_email, T_('your weblog\'s login/password'), $message, $notify_from ) )
+				if( empty( $ForgetfulUser->email ) )
+				{
+					$notes = T_('You have no email address with your profile, therefor we cannot reset your password.')
+									.T_('Please try contacting the admin.');
+				}
+				elseif( !send_mail( $ForgetfulUser->email, T_('your weblog\'s login/password'), $message, $notify_from ) )
 				{
 					$notes = T_('The email could not be sent.')."<br />\n"
 									.T_('Possible reason: your host may have disabled the mail() function...');
@@ -105,9 +103,12 @@ switch($action)
 					$notes = T_('An email with the new password was sent successfully to your email address.')."<br />\n";
 				}
 
+				locale_restore_previous();
 			}
-
-			locale_restore_previous();
+			else
+			{ // pretend that the email is sent for avoiding guessing user_login
+				$notes = T_('An email with the new password was sent successfully to your email address.')."<br />\n";
+			}
 		}
 
 	default:
@@ -115,9 +116,9 @@ switch($action)
 		 * Default: login form:
 		 */
 		if( is_logged_in() )
-		{	// The user is already logged in...
+		{ // The user is already logged in...
 			// TODO: use $login_error to be clear
-			
+
 			$error = is_string($error) ? $error.'<br />' : '';
 			$error .= T_('Note: You are already logged in!');
 
