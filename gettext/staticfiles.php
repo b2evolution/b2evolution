@@ -11,6 +11,7 @@
  */
 
 require( '../blogs/b2evocore/_functions.php' );
+require( '../blogs/b2evocore/_functions_forms.php' );
 require( '../blogs/conf/_config.php' );
 #require( '../blogs/conf/_locales.php' );
 #require( '../blogs/b2evocore/_functions_locale.php' );
@@ -25,7 +26,8 @@ define( 'CHDIR_TO_BLOGS', '..' );
 define( 'STATIC_POT', $pofilepath.'\static.POT' );
 define( 'DEFAULT_TARGET', 'en-EU' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
-define( 'HIGHLIGHT_UNTRANSLATED', '0' );
+
+param('highlight_untranslated', 'integer', 0 );
 
 
 // look what translations we have
@@ -77,11 +79,31 @@ merge: creates all static files for which there are .po files in the current dir
 }
 else
 {
-	echo('
-	<ul>
-	<li><a href="?action=extract">extract to '.STATIC_POT.'</a></li>
-	<li><a href="?action=merge">create static files from locales .po files</a> (which are: '.implode(', ', $targets).')</li>
-	</ul>');
+	echo '
+	<br />	
+	<form method="get" class="fform">
+	<fieldset style="width:50%">
+		<legend>extract</legend>
+		<input type="hidden" name="action" value="extract" />
+		';
+		form_info( 'static POT file', STATIC_POT );
+		echo '
+		<input type="submit" value="extract" class="search" />
+	</fieldset>
+	</form>
+	
+	<form method="get">
+	<fieldset style="width:50%">
+		<legend>merge</legend>
+		<input type="hidden" name="action" value="merge" />
+		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
+		highlight untranslated strings
+		<br /><br />(available locales/targets: '.implode(', ', $targets).')
+		<br /><br /><input type="submit" value="create static files from locales .po files" class="search" />
+	</fieldset>
+	</form>
+		
+';
 	log_('<hr>');
 	param( 'action', 'string', '' );
 	if( empty($action) )
@@ -361,7 +383,7 @@ function log_( $string )
 // HERE WE GO -------------------------------
 
 log_('<div class="panelinfo"><p>action: '.$action.'</p>'
-			.( ( HIGHLIGHT_UNTRANSLATED && $action == 'merge' ) ? 'note: untranslated strings will get highlighted!' : '' )
+			.( ( $highlight_untranslated && $action == 'merge' ) ? 'note: untranslated strings will get highlighted!' : '' )
 			.'</div>'
 );
 
@@ -493,12 +515,11 @@ switch( $action )
 
 
 				// emphasize links to start page (small-caps)
-				pre_dump('/index.([a-z]{2}-[A-Z]{2}(-.{1,14})?.)?html/', $newfilename );
-				if( preg_match( '/index.([a-z]{2}-[A-Z]{2}(-.{1,14})?.)?html/', $newfilename ) )
+				#pre_dump('/index.([a-z]{2}-[A-Z]{2}(-.{1,14})?.)?html/', $newfilename );
+				/*if( preg_match( '/index.([a-z]{2}-[A-Z]{2}(-.{1,14})?.)?html/', $newfilename ) )
 				{ // start page is current
-					echo 'hui';
 					$text = preg_replace( '/(<a .*?>)({{{Start page}}})(<\/a>)/s', '$1<span style="font-variant:small-caps">$2</span>$3', $text );
-				}
+				}*/
 
 				// emphasize current flag link (<strong>)
 				$text = preg_replace( '/(<a[^>]+href="(..\/)?'.basename($newfilename).'(\?.*?)?"[^>]*><img .*?>)(.+?)(<\/a>)/s',
@@ -518,7 +539,7 @@ switch( $action )
 
 
 				// handle left TRANSTAGs
-				if( HIGHLIGHT_UNTRANSLATED && !($target == DEFAULT_TARGET) )
+				if( $highlight_untranslated && !($target == DEFAULT_TARGET) )
 				{ // we want to highlight untranslated strings
 					$text = str_replace( array(TRANSTAG_OPEN, TRANSTAG_CLOSE), array('<span style="color:red" title="not translated">', '</span>'), $text );
 				}
