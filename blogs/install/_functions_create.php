@@ -209,33 +209,40 @@ function create_b2evo_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
-
-	echo 'Creating table for active sessions... ';
-	$query = "CREATE TABLE $tablesessions (
-		sess_time int(10) unsigned NOT NULL,
-		sess_ipaddress varchar(15) NOT NULL,
-		sess_userid mediumint(8) NOT NULL default '0',
-		KEY start_time (sess_time),
-		KEY remote_ip (sess_ipaddress)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating user preferences table... ';
-	$DB->query( "CREATE TABLE $tableusersettings (
-							uset_user_ID INT NOT NULL ,
-							uset_name VARCHAR( 30 ) NOT NULL,
-							uset_value VARCHAR( 255 ) NULL,
-							PRIMARY KEY ( uset_user_ID, uset_name )
-							)");
-	echo "OK.<br />\n";
-
-
+	// Additionnal tables:
 	create_antispam();
-
-
 	create_locales();
+	create_b2evo_tables_091();
+}
+
+
+/**
+ * Create new tables for version 0.9.1
+ */
+function create_b2evo_tables_091()
+{
+	global $DB;
+
+ 	echo 'Creating table for active sessions... ';
+	$DB->query( "CREATE TABLE EVO_sessions (
+									sess_time int(10) unsigned NOT NULL,
+									sess_ipaddress varchar(15) NOT NULL,
+									sess_userid mediumint(8) NOT NULL default '0',
+									KEY start_time (sess_time),
+									KEY remote_ip (sess_ipaddress)
+								)" );
+	echo "OK.<br />\n";
+
+
+	echo 'Creating user settings table... ';
+	$DB->query( "CREATE TABLE EVO_usersettings (
+									uset_user_ID INT(10) NOT NULL ,
+									uset_name VARCHAR( 30 ) NOT NULL,
+									uset_value VARCHAR( 255 ) NULL,
+									PRIMARY KEY ( uset_user_ID, uset_name )
+								)");
+	echo "OK.<br />\n";
+
 
 }
 

@@ -97,7 +97,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 {	// Connect to DB:
-	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, false );
+	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases, false );
 	if( $DB->error )
 	{ // restart conf
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
@@ -142,7 +142,7 @@ switch( $action )
 		param( 'conf_admin_email', 'string', true );
 
 		// Connect to DB:
-		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, false );
+		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_aliases, false );
 		if( $DB->error )
 		{ // restart conf
 			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';
@@ -518,6 +518,7 @@ to
 		<?php
 		break;
 }
+
 ?>
 
 <div id="rowfooter">
@@ -526,5 +527,9 @@ to
 	<a href="http://fplanque.net/About/index.html"><?php echo T_('contact') ?>: Fran&ccedil;ois PLANQUE</a>
 </div>
 
+<?php
+	debug_info(); // output debug info if requested
+?>
+?>
 </body>
 </html>

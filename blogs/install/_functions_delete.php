@@ -15,56 +15,49 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 function db_delete()
 {
-	global $DB, $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-				$tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers, $tablelocales;
+	global $DB;
 
 	echo "Dropping Antispam table...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tableantispam";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_antispam' );
 
 	echo "Dropping Hit-Logs...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablehitlog";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_hitlog' );
 
 	echo "Dropping Comments...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablecomments";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_comments' );
 
 	echo "Dropping Categories-to-Posts relationships...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablepostcats";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_postcats' );
 
 	echo "Dropping Categories...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablecategories";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_categories' );
 
 	echo "Dropping Posts...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tableposts";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_posts' );
+
+	echo "Dropping User Settings...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS EVO_usersettings' );
+
+ 	echo "Dropping User sessions...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS EVO_sessions' );
 
 	echo "Dropping Users...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tableusers";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_users' );
 
 	echo "Dropping Groups...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablegroups";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_groups' );
 
 	echo "Dropping Blogs...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tableblogs";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_blogs' );
 
 	echo "Dropping Blogusers...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tableblogusers";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_blogusers' );
 
 	echo "Dropping Settings...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablesettings";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_settings' );
 
 	echo "Dropping Locales...<br />\n";
-	$query = "DROP TABLE IF EXISTS $tablelocales";
-	$DB->query( $query );
+	$DB->query( 'DROP TABLE IF EXISTS EVO_locales' );
 }
 
 ?>

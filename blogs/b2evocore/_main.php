@@ -68,7 +68,7 @@ if( $use_obhandler )
 
 
 // Connecting to the db:
-$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
 
 $UserSettings = new UserSettings();
 $Settings = new GeneralSettings();

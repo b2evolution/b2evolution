@@ -531,45 +531,38 @@ function upgrade_b2evo_tables()
 		// --------------------------------------------
 		
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE $tableblogs
+		$query = "ALTER TABLE EVO_blogs
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
 		echo 'Upgrading posts table... ';
-		$query = "ALTER TABLE $tableposts
+		$query = "ALTER TABLE EVO_posts
 							ADD post_views INT(4) NOT NULL DEFAULT '0' AFTER post_flags,
 							ADD post_commentsexpire DATETIME DEFAULT NULL AFTER post_comments";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
 		echo 'Upgrading users table... ';
-		$query = "ALTER TABLE $tableusers
+		$query = "ALTER TABLE EVO_users
 							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify,
 							ADD COLUMN user_upload_ufolder tinyint(1) NOT NULL default 0 AFTER user_showonline";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
 		echo 'Setting new defaults... ';
-		$query = "INSERT INTO $tablesettings (set_name, set_value)
+		$query = "INSERT INTO EVO_settings (set_name, set_value)
 							VALUES ( 'reloadpage_timeout', '300' )";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
-		echo 'Creating user preferences table... ';
-		$DB->query( "CREATE TABLE $tableusersettings (
-								uset_user_ID INT NOT NULL ,
-								uset_name VARCHAR( 30 ) NOT NULL,
-								uset_value VARCHAR( 255 ) NULL,
-								PRIMARY KEY ( uset_user_ID, uset_name )
-								)");
+		echo 'Altering table for Blog-User permissions... ';
+		$DB->query( 'ALTER TABLE EVO_blogusers
+									ADD COLUMN bloguser_perm_upload tinyint NOT NULL default 0' );
 		echo "OK.<br />\n";
 
-		echo 'Altering table for Blog-User permissions... ';
-		$DB->query( "ALTER TABLE $tableblogusers
-								ADD COLUMN bloguser_perm_upload tinyint NOT NULL default 0" );
-		echo "OK.<br />\n";
-		
+		// New tables:
+		create_b2evo_tables_091();
 	}
 
 

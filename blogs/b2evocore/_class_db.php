@@ -19,10 +19,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * ezSQL Constants
  */
-define("EZSQL_VERSION","1.25");
-define("OBJECT","OBJECT",true);
-define("ARRAY_A","ARRAY_A",true);
-define("ARRAY_N","ARRAY_N",true);
+define( 'EZSQL_VERSION', '1.25' );
+define( 'OBJECT', 'OBJECT', true );
+define( 'ARRAY_A', 'ARRAY_A', true);
+define( 'ARRAY_N', 'ARRAY_N', true);
 
 if( ! function_exists( 'mysql_real_escape_string' ) )
 {	// Function only available since PHP 4.3.0
@@ -58,14 +58,24 @@ class DB
 	 * Log of queries:
 	 */
 	var $queries = array();
+	/**
+	 * Aliases that will be replaced in queries:
+	 */
+	var $dbaliases = array();
+	/**
+	 * Strings that will replace the aliases in queries:
+	 */
+	var $dbreplaces = array();
 	
 	/**
-	 * DB Constructor - connects to the server and selects a database
+	 * DB Constructor
+	 *
+	 * connects to the server and selects a database
 	 */
-	function db( $dbuser, $dbpassword, $dbname, $dbhost, $halt_on_error = true)
+	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $halt_on_error = true )
 	{
 		$this->halt_on_error = $halt_on_error;
-	
+
 		$this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword);
 
 		if( ! $this->dbh )
@@ -81,6 +91,15 @@ class DB
 		{
 			$this->select($dbname);
 		}
+
+		// Prepare aliases for replacements:
+		foreach( $dbaliases as $dbalias => $dbreplace )
+		{
+			$this->dbaliases[] = '#\b'.$dbalias.'\b#'; // \b = word boundary
+			$this->dbreplaces[] = $dbreplace;
+			// echo '<br />'.'#\b'.$dbalias.'\b#';
+		}
+		// echo count($this->dbaliases);
 	}
 
 	/**
@@ -187,8 +206,11 @@ class DB
 		$this->flush();
 
 		// Log how the function was called
-		$this->func_call = "\$db->query(\"$query\")";
+		$this->func_call = '$db->query("'.$query.'")';
 		// echo $this->func_call, '<br />';
+
+		// Replace aliases:
+		$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
 
 		// Keep track of the last query for debug..
 		$this->last_query = $query;
