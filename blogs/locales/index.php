@@ -66,7 +66,7 @@ while ($file = readdir($handle))
 				$fuzzy++;
 		}
 		// $all=$translated+$fuzzy+$untranslated;
-		$percent_done=round($translated/$all*100,2);
+		$percent_done=round(($translated-$fuzzy/2)/$all*100,2);
 		$rpd=round($percent_done,0);
 		// $report[$locale]=array ($percent_done,$translated,$fuzzy,$untranslated);
 		if($rpd <50) {
