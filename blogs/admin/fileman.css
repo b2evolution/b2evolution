@@ -24,9 +24,15 @@
  */
 #filemanmain table.grouped {
 	width:100%;
+	margin-top:0;
 }
 #filemanmain table.grouped caption {
 	text-align:left;
+	padding: .5ex;
+	/* Temporary colors, needs overriding */
+	background-color: #efede0;	
+	border: 1px solid #9e9286;
+	border-bottom: none;
 }
 #filemanmain table.grouped th {
 	white-space:nowrap;
@@ -73,11 +79,12 @@
 /* }}} */
 
 .toolbaritem {
-	margin:0.5ex 0;
+	margin: .5ex 0 .5ex 1ex;
 	vertical-align:bottom;
-	padding-left: 3ex;
+	padding: .1ex .5ex;
 	float:right;
 	white-space:nowrap;
+	background-color: #efede0;		/* Temp color */
 }
 
 
@@ -118,4 +125,16 @@ button.image {
 	padding:0;
 	margin:0;
 	background:transparent;
+}
+
+.filter {
+	color:#f00;
+}
+
+.iconlegend {
+	text-align: right;
+}
+
+.tooltitle {
+	font-weight:bold;
 }

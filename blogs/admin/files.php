@@ -35,6 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
  *
  * @version $Id$
  *
@@ -883,37 +884,55 @@ if( isset( $msg_action )
 
 <div class="panelblock">
 <?php
-	echo '<a title="'.T_('Go to your home directory').'" class="toolbaritem" href="'
-				.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a>';
+	// ---------------------------------------------------
+	// Display main user interface : file list & controls:
+	// ---------------------------------------------------
 
-	$rootlist = $Fileman->getRootList();
-	if( count($rootlist) > 1 )
-	{ // provide list of roots
-		echo '<form action="files.php" name="roots" class="toolbaritem">'
-					.$Fileman->getFormHiddenInputs( array( 'root' => false ) );
-		echo '<select name="root" onchange="this.form.submit()">';
+	/* Not implemented yet:
 
-		foreach( $rootlist as $lroot )
-		{
-			$lroot_value = $lroot['type'];
-			if( isset($lroot['id']) )
-			{
-				$lroot_value .= '_'.$lroot['id'];
-			}
-			echo '<option value="'.$lroot_value.'"';
+	<!-- SEARCH BOX: -->
 
-			if( $root == $lroot_value
-					|| $root === NULL && $lroot_value == 'user' )
-			{
-				echo ' selected="selected"';
-			}
+	<form action="files.php" name="search" class="toolbaritem">
+		<?php echo $Fileman->getFormHiddenInputs() ?>
+		<input type="hidden" name="action" value="search" />
+		<input type="text" name="searchfor" value="--todo--" size="20" />
+		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
+	</form>
 
-			echo '>'.format_to_output( $lroot['name'] ).'</option>';
-		}
-		echo '</select><input class="ActionButton" type="submit" value="'.T_('Change root').'" />'
-					."</form>\n";
-	}
+	*/
 	?>
+
+	<!-- FILTER BOX: -->
+
+	<div class="toolbaritem">
+		<form action="files.php" name="filter" class="inline">
+			<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
+			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
+			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
+				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
+				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
+				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
+
+			<input class="ActionButton" type="submit" value="<?php echo T_('Apply') ?>" />
+		</form>
+
+		<?php
+		if( $Fileman->isFiltering() )
+		{ // "reset filter" form
+		?>
+		<form action="files.php" name="unfilter" class="inline">
+			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
+			<input class="ActionButton" type="submit" value="<?php echo T_('Disable') ?>" />
+		</form>
+		<?php
+		}
+		?>
+
+	</div>
+
+
+	<!-- FLAT MODE: -->
 
 	<form action="files.php" name="flatmode" class="toolbaritem">
 		<?php echo $Fileman->getFormHiddenInputs( array( 'flatmode' => false ) ) ?>
@@ -928,56 +947,76 @@ if( isset( $msg_action )
 															T_('Flat mode'), 'formvalue' ); ?>" />
 	</form>
 
-	<form action="files.php" name="search" class="toolbaritem">
-		<?php echo $Fileman->getFormHiddenInputs() ?>
-		<input type="hidden" name="action" value="search" />
-		<input type="text" name="searchfor" value="--todo--" size="20" />
-		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
-	</form>
-
-	<div class="toolbaritem">
-		<form action="files.php" name="filter" class="inline">
-			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
-			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
-			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
-				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
-				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
-				echo ' <label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
-
-			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
-		</form>
-
-		<?php
-		if( $Fileman->isFiltering() )
-		{ // "reset filter" form
-		?>
-		<form action="files.php" name="unfilter" class="inline">
-			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
-			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
-		</form>
-		<?php
-		}
-		?>
-
-	</div>
 </div>
 
 <div class="clear"></div>
 
 
 <div class="panelblock">
-<form name="FilesForm" action="files.php" method="post">
-<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
-<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
-
 <table class="grouped">
 <caption>
 <?php
-echo T_('Current directory').': '.$Fileman->getCwdClickable();
+// -----------------------------------------------
+// Display tabel caption: directory location info:
+// -----------------------------------------------
+
+
+// Quick links to usual homes for user, group and maybe blog...:
+echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'
+			.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> ';
+// TODO: add group home...
+// TODO: add blog home?
+
+
+// Display available roots list:
+$rootlist = $Fileman->getRootList();
+if( count($rootlist) > 1 )
+{ // provide list of roots
+	echo '<form action="files.php" name="roots" class="toolbaritem">'
+				.$Fileman->getFormHiddenInputs( array( 'root' => false ) );
+	echo '<select name="root" onchange="this.form.submit()">';
+
+	foreach( $rootlist as $lroot )
+	{
+		$lroot_value = $lroot['type'];
+		if( isset($lroot['id']) )
+		{
+			$lroot_value .= '_'.$lroot['id'];
+		}
+		echo '<option value="'.$lroot_value.'"';
+
+		if( $root == $lroot_value
+				|| $root === NULL && $lroot_value == 'user' )
+		{
+			echo ' selected="selected"';
+		}
+
+		echo '>'.format_to_output( $lroot['name'] ).'</option>';
+	}
+	echo '</select><input class="ActionButton" type="submit" value="'.T_('Change root').'" />'
+				."</form>\n";
+}
+
+
+// Display current dir:
+echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
+
+
+// Display current filter:
 if( $Fileman->isFiltering() )
 {
-	echo '<br />'.T_('Filter').': ['.$Fileman->getFilter().']';
+	echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
+	// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
 }
+
+// Display filecounts:
+echo '<span class="small"> &nbsp; (';
+disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+echo ', ';
+disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
+echo ', '.bytesreadable( $Fileman->countBytes() );
+echo ')</span>';
+
 
 /**
  * @global integer Number of cols for the files table, 8 by default
@@ -985,6 +1024,13 @@ if( $Fileman->isFiltering() )
 $filetable_cols = 8;
 ?>
 </caption>
+
+
+<form name="FilesForm" action="files.php" method="post">
+<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
+<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
+
+
 <thead>
 <tr>
 	<th colspan="2"><?php $Fileman->dispButtonParent(); ?></th>
@@ -1014,7 +1060,7 @@ $Fileman->sort();
 
 $countFiles = 0;
 while( $lFile = $Fileman->getNextFile() )
-{ // loop through all Files
+{ // loop through all Files:
 	?>
 
 	<tr<?php
@@ -1070,7 +1116,9 @@ while( $lFile = $Fileman->getNextFile() )
 				echo empty( $path ) ?
 							' - ' :
 							$path;
-				?></div><?php
+				?>
+				</div>
+				<?php
 			}
 			?>
 		</td>
@@ -1080,7 +1128,7 @@ while( $lFile = $Fileman->getNextFile() )
 		<td class="timestamp"><?php echo $lFile->getLastMod() ?></td>
 		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
 		<td class="actions"><?php
-			$Fileman->dispButtonFileEdit();
+			// Not implemented yet: $Fileman->dispButtonFileEdit();
 			$Fileman->dispButtonFileRename();
 			$Fileman->dispButtonFileCopy();
 			$Fileman->dispButtonFileMove();
@@ -1112,9 +1160,12 @@ if( $countFiles == 0 )
 	<?php
 }
 else
-{{{ // Footer with "check all", "with selected: .."
+{ // -------------
+	// Footer with "check all", "with selected: ..":
+	// --------------
 ?>
-<tr class="group"><td colspan="<?php echo $filetable_cols ?>">
+<tr class="group">
+	<td colspan="<?php echo $filetable_cols ?>">
 	<a id="checkallspan_0" href="<?php
 		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
 		?>" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]'); return false;"><?php
@@ -1122,26 +1173,20 @@ else
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
 	<?php echo $Fileman->getFormHiddenInputs() ?>
-	<input class="DeleteButton" type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" />
-	<input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" />
-	<input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" />
+	<!-- Not implemented yet: input class="DeleteButton" type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" / -->
+	<!-- Not implemented yet: input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" / -->
+	<!-- Not implemented yet: input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
 	<input class="ActionButton" type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
-
-	<div class="small">
-	<?php
-	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
-	echo ', ';
-	disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
-	echo ', '.bytesreadable( $Fileman->countBytes() );
-	?>
-	</div>
-</td></tr>
+	</td>
+</tr>
 <?php
-}}}
+}
 ?>
 </tbody>
-</table>
+
 </form>
+
+</table>
 
 <?php
 if( $countFiles )
@@ -1182,9 +1227,74 @@ if( $countFiles )
 
 	<?php
 }
+?>
 
 
-// {{{ bottom toolbar
+<!-- CREATE: -->
+
+<form action="" class="toolbaritem">
+	<label class="tooltitle">New</label>
+	<select name="createnew">
+		<option value="file"><?php echo T_('file') ?></option>
+		<option value="dir"<?php
+			if( isset($createnew) && $createnew == 'dir' )
+			{
+				echo ' selected="selected"';
+			} ?>><?php echo T_('directory') ?></option>
+	</select>
+	:
+	<input type="text" name="createname" value="<?php
+		if( isset( $createname ) )
+		{
+			echo $createname;
+		} ?>" size="20" />
+	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+	<?php echo $Fileman->getFormHiddenInputs() ?>
+	<input type="hidden" name="action" value="createnew" />
+</form>
+
+
+<!-- UPLOAD: -->
+
+<form action="" class="toolbaritem">
+	<?php $Fileman->dispButtonUploadMode(); ?>
+</form>
+
+
+<div class="clear"></div>
+<div class="fform">
+	<fieldset class="iconlegend">
+		<legend><?php echo T_('Icon legend') ?></legend>
+		<span class="nobr"><?php echo getIcon( 'folder_home' ).' '.T_('Home dir'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'folder_parent' ).' '.T_('Up one level'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'window_new' ).' '.T_('Open in new window'); ?></span>
+		<!-- Not implemented yet: span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit file'); ?></span -->
+		<span class="nobr"><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></span>
+	</fieldset>
+</div>
+
+<div class="fform">
+	<fieldset>
+	<legend><?php echo T_('Information') ?></legend>
+
+	<ul>
+		<li><?php echo T_("Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
+		<li><?php echo T_("Clicking on a file's icon lets the browser handle the file."); ?></li>
+		<!-- This is redundant with icon legend: li><?php printf( T_('The new window icon (%s) opens the file in a popup window.'), getIcon( 'window_new' ) ); ?></li -->
+	</ul>
+	</fieldset>
+</div>
+
+<?php
+
+// ------------------
+// Display options:
+// Let's keep these at the end since they won't be accessed more than occasionaly
+// and only by advanced users
+// ------------------
 param( 'options_show', 'integer', 0 );
 ?>
 <form class="toolbaritem" action="files.php" method="post">
@@ -1244,60 +1354,9 @@ param( 'options_show', 'integer', 0 );
 </form>
 
 
-<form action="" class="toolbaritem">
-	<?php $Fileman->dispButtonUploadMode(); ?>
-</form>
-
-<form action="" class="toolbaritem">
-	<select name="createnew">
-		<option value="file"><?php echo T_('file') ?></option>
-		<option value="dir"<?php
-			if( isset($createnew) && $createnew == 'dir' )
-			{
-				echo ' selected="selected"';
-			} ?>><?php echo T_('directory') ?></option>
-	</select>
-	<input type="text" name="createname" value="<?php
-		if( isset( $createname ) )
-		{
-			echo $createname;
-		} ?>" size="20" />
-	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
-	<?php echo $Fileman->getFormHiddenInputs() ?>
-	<input type="hidden" name="action" value="createnew" />
-</form>
-<?php /* }}} */ ?>
-
-
-<br class="clear" />
-<div class="fform">
-	<fieldset>
-	<legend><?php echo T_('Icon legend') ?></legend>
-		<span class="nobr"><?php echo getIcon( 'folder_parent' ).' '.T_('Go to parent folder'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'folder_home' ).' '.T_('Go to your home directory'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'window_new' ).' '.T_('Open in a new window'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit the file'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></span>
-	</fieldset>
-</div>
-
-<div class="fform">
-	<fieldset>
-	<legend><?php echo T_('Information') ?></legend>
-
-	<ul>
-		<li><?php echo T_("Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
-		<li><?php echo T_("Clicking on a file's icon lets the browser handle the file."); ?></li>
-		<li><?php printf( T_('The new window icon (%s) opens the file in a popup window.'), getIcon( 'window_new' ) ); ?></li>
-	</ul>
-	</fieldset>
-</div>
 
 </div>
-<br class="clear" />
+<div class="clear"></div>
 </div>
 <?php
 require( dirname(__FILE__). '/_footer.php' );

@@ -35,6 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
  *
  * @version $Id$
  */
@@ -44,19 +45,20 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Converts bytes to readable bytes/kb/mb/gb, like "12.45mb"
  *
+ * @todo use <abbr>
  * @param integer bytes
  * @return string bytes made readable
  */
 function bytesreadable( $bytes )
 {
-	$type = array ( 'b', 'kb', 'mb', 'gb' );
+	$type = array ( T_('B.'), T_('KB'), T_('MB'), T_('GB'), T_('TB') );
 
 	for( $i = 0; $bytes > 1024; $i++ )
 	{
 		$bytes /= 1024;
 	}
 
-	return round($bytes, 2).$type[$i];
+	return round($bytes, 2).'&nbsp;'.$type[$i];
 }
 
 
@@ -318,6 +320,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/30 16:45:40  fplanque
+ * minor changes on file manager user interface
+ *
  * Revision 1.5  2004/12/29 02:25:55  blueyed
  * no message
  *

@@ -35,6 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
  *
  * @version $Id$
  *
@@ -414,7 +415,7 @@ class Filelist
 	{
 		if( $this->filterString === NULL )
 		{
-			return T_('No filter');
+			return ($note ? T_('No filter') : '');
 		}
 		else
 		{
@@ -625,6 +626,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.10  2004/12/30 16:45:40  fplanque
+ * minor changes on file manager user interface
+ *
  * Revision 1.9  2004/12/29 04:32:10  blueyed
  * no message
  *

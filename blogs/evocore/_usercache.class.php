@@ -79,6 +79,10 @@ class UserCache extends DataObjectCache
 	 *
 	 * Does not halt on error.
 	 *
+	 * @todo Daniel, it would be much better if this was carried out the same way as get_by_ID() and if a reference to the
+	 * same User object was stored in the login cache. This would also require overloading the get_by_ID method, but in the
+	 * end this would save 1 query at first request, an dpossibly many more afterwards...
+	 *
 	 * @return false|object reference to the user object or NULL if not found
 	 */
 	function & get_by_login( $login )
@@ -176,6 +180,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/30 16:45:40  fplanque
+ * minor changes on file manager user interface
+ *
  * Revision 1.3  2004/12/29 03:15:38  blueyed
  * added get_by_login()
  *
