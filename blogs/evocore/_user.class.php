@@ -112,7 +112,7 @@ class User extends DataObject
 			$this->set( 'login', 'login' );
 			$this->set( 'pass', md5('pass') );
 			$this->set( 'firstname', '' );
-			$this->set( 'lastname', T_('New user') );
+			$this->set( 'lastname', '' );
 			$this->set( 'nickname', '' );
 			$this->set( 'idmode', 'login' );
 			$this->set( 'locale', $default_locale ); // QUESTION: use $Settings->get('default_locale') ?
@@ -364,7 +364,7 @@ class User extends DataObject
 				break;
 
 			case 'blog_properties':
-				// Blog permission to edit its properties... (depending on user AND hits group)
+				// Blog permission to edit its properties... (depending on user AND its group)
 				// Forward request to group:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{ // If group says yes
@@ -681,13 +681,19 @@ class User extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 */
-	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	function msgform_link( $form_url = NULL, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
 		global $img_url;
 
 		if( empty($this->email) )
 		{ // We have no email for this User :(
 			return false;
+		}
+
+		if( is_null($form_url) )
+		{
+			global $Blog;
+			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
 		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID );
@@ -846,6 +852,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/27 20:24:48  blueyed
+ * minor
+ *
  * Revision 1.14  2005/02/23 21:43:30  blueyed
  * fix instantiating new User without existing $GroupCache (install)
  *
