@@ -5,11 +5,10 @@
  * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
-require_once dirname(__FILE__).'/_class_Object.php';
+require_once dirname(__FILE__).'/_class_dataobject.php';
 
-class User extends Object
+class User extends DataObject
 {
-	var	$ID;
 	var	$login;
 	var	$pass;
 	var	$firstname;
@@ -38,6 +37,13 @@ class User extends Object
 	 */
 	function User( & $userdata )
 	{
+		global $tableusers;
+		
+		// echo 'Instanciating ', $userdata['user_login'], '...<br />';
+		
+		// Call parent constructor:
+		parent::DataObject( $tableusers, 'user_' );
+			
 		$this->ID = $userdata['ID'];
 		$this->login = $userdata['user_login'];
 		$this->pass = $userdata['user_pass'];
@@ -81,7 +87,7 @@ class User extends Object
 					case 'namelf':
 						return parent::get('lastname').' '.parent::get('firstname');
 						
-					case 'default':
+					default:
 						return parent::get($this->idmode);
 				}
 			
@@ -89,6 +95,19 @@ class User extends Object
 			// All other params:
 				return parent::get( $parname );
 		}
+	}
+
+
+	/* 
+	 * User::setGroup(-)
+	 *
+	 * Set new Group
+	 */
+	function setGroup( & $Group )
+	{
+		$this->Group = $Group;
+		
+		$this->dbchange( 'user_grp_ID', 'int', 'Group->get(\'ID\')' );
 	}
 }
 ?>

@@ -269,8 +269,8 @@ function get_userdata($userid)
 {
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
 	if ((empty($cache_userdata[$userid])) OR (!$use_cache)) 
-	{
-		$sql = "SELECT * FROM $tableusers"; 
+	{	// We do a progressive cache load beacuse there can be many many users!
+		$sql = "SELECT * FROM $tableusers WHERE ID = $userid"; 
 		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++; 
 		while ($myrow = mysql_fetch_array($result)) 
@@ -285,27 +285,6 @@ function get_userdata($userid)
 	}
 	return($myrow);
 }
-
-
-/*
- * get_userdata2(-)
- *
- * for team-listing
- */
-function get_userdata2($userid) 
-{
-	global $tableusers,$row;
-	$user_data['ID'] = $userid;
-	$user_data['user_login'] = $row->user_login;
-	$user_data['user_firstname'] = $row->user_firstname;
-	$user_data['user_lastname'] = $row->user_lastname;
-	$user_data['user_nickname'] = $row->user_nickname;
-	$user_data['user_level'] = $row->user_level;
-	$user_data['user_email'] = $row->user_email;
-	$user_data['user_url'] = $row->user_url;
-	return($user_data);
-}
-
 
 
 

@@ -15,12 +15,11 @@ param( 'action', 'string' );
 switch ($action) 
 {
 case 'view':
-	/*
-	 * TODO: use escaped user functions
+	/* 
+	 * View user:
 	 */
-	param( 'user', 'integer' );
-	$profiledata = get_userdata($user);
-	$edited_User = new User( $profiledata );
+	param( 'user', 'integer', true );
+	$edited_User = new User( get_userdata($user) );
 
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
@@ -28,9 +27,9 @@ case 'view':
 	<div class="panelblock">
 	<h2><?php echo T_('Profile for:'), ' ', $edited_User->disp('nickname') ?></h2>
 
-<form class="fform" method="post">
+<form class="fform" method="post" action="b2users.php">
 	<input type="hidden" name="action" value="userupdate" />
-	<input type="hidden" name="user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
+	<input type="hidden" name="edited_user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
 	<table>
 	<tr>
 	<td>
@@ -108,7 +107,7 @@ case 'view':
 		<legend><?php echo T_('User rights') ?></legend>
 		<p><strong><?php echo T_('Level') ?>:</strong> <?php $edited_User->disp('level') ?></p>
 
-		<?php form_select( 'user_grp_id', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );?>
+		<?php form_select( 'edited_user_grp_ID', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );?>
 
 	</fieldset>
 
@@ -128,6 +127,28 @@ case 'view':
 	
 	break;
 	
+case 'userupdate':
+	/* 
+	 * Update user:
+	 */
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
+
+	param( 'edited_user_ID', 'integer' );
+	$edited_User = new User( get_userdata( $edited_user_ID ) );
+
+	param( 'edited_user_grp_ID', 'integer', true );
+	$edited_user_Group = Group_get_by_ID( $edited_user_grp_ID );
+	$edited_User->setGroup( $edited_user_Group );
+	// echo 'new group = ';
+	// $edited_User->Group->disp('name');
+	
+	// Peform update to the DB:
+	$edited_User->dbupdate();
+	
+	header("Location: b2users.php");
+	exit();
+
 	
 case "promote":
 	param( 'prom', 'string' );
@@ -158,7 +179,6 @@ case "promote":
 
 	header("Location: b2users.php");
 	exit();
-	break;
 
 case "delete":
 	param( 'id', 'integer' );
@@ -188,20 +208,9 @@ default:
 	require( dirname(__FILE__).'/_menutop.php');
 	require( dirname(__FILE__).'/_menutop_end.php');
 }
-?>
 
-<div class="panelblock">
-	<h2><?php echo T_('Users') ?></h2>
-	<?php
-	$request = "SELECT ID, user_login, user_nickname, user_firstname, user_lastname, user_level, user_email, user_url, grp_ID, grp_name FROM $tableusers INNER JOIN $tablegroups ON user_grp_ID = grp_ID ORDER BY grp_name, user_login";
-	$querycount++; 
-	$result = mysql_query($request);
-	require dirname(__FILE__).'/_user_list.php';	
-	?>
-</div>
-
-
-<?php 
+// Display user list:
+require dirname(__FILE__).'/_user_list.php';	
 if ($user_level >= 3) 
 { ?>
 	<div class="panelblock">

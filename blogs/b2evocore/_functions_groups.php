@@ -15,7 +15,7 @@ function groups_load_cache()
 {
 	global $tablegroups, $querycount, $cache_Groups, $use_cache;
 	
-	if( empty($cache_blogs) || !$use_cache )  
+	if( empty($cache_Groups) || !$use_cache )  
 	{
 		$cache_Groups = array();	
 		$sql = "SELECT * FROM $tablegroups ORDER BY grp_ID";
