@@ -42,7 +42,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Class to handle the global settings
+ * Class to handle the global settings.
  *
  * @package evocore
  * @abstract
@@ -51,21 +51,24 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 class AbstractSettings
 {
 	/**
-	 * The DB table which stores the settings
+	 * The DB table which stores the settings.
+	 *
 	 * @var string
 	 * @access protected
 	 */
 	var $dbtablename;
 
 	/**
-	 * Array with DB cols key names
+	 * Array with DB column key names.
+	 *
 	 * @var array of strings
 	 * @access protected
 	 */
 	var $colkeynames = array();
 
 	/**
-	 * DB col name for the value
+	 * DB column name for the value.
+	 *
 	 * @var string
 	 * @access protected
 	 */
@@ -82,7 +85,7 @@ class AbstractSettings
 
 
 	/**
-	 * The internal cache
+	 * The internal cache.
 	 *
 	 * @access protected
 	 * @var array|NULL|false Contains the loaded settings or false, if settings
@@ -100,7 +103,7 @@ class AbstractSettings
 
 
 	/**
-	 * Constructor, loads settings.
+	 * Constructor, does nothing.
 	 */
 	function AbstractSettings()
 	{
@@ -119,7 +122,10 @@ class AbstractSettings
 
 
 	/**
+	 * Loads the settings. Not meant to be called directly, but gets called
+	 * when needed.
 	 *
+	 * @param array|NULL list of key values, used for caching by keys.
 	 * @return boolean always true
 	 */
 	function load( $getArgs = NULL )
@@ -227,8 +233,6 @@ class AbstractSettings
 		global $Debuglog;
 
 		$args = func_get_args();
-		// echo 'get: ['.implode(', ', $args ).']<br />';
-
 		$this->load( $args );
 
 		if( count( $args ) != count( $this->colkeynames ) )
@@ -266,7 +270,7 @@ class AbstractSettings
 
 		if( $r === false )
 		{
-			$Debuglog->add( get_class($this).'::get(): queried setting ['.implode( ' / ', $args ).'] not defined.', 'settings' );
+			$Debuglog->add( get_class($this).'::get(): queried setting ['.implode( ', ', $args ).'] not defined.', 'settings' );
 			return NULL;
 		}
 		else
@@ -307,20 +311,19 @@ class AbstractSettings
 
 
 	/**
-	 * Temporarily sets a setting ({@link updateDB()} writes it to DB)
+	 * Temporarily sets a setting ({@link updateDB()} writes it to DB).
 	 *
 	 * @param string the values for the column keys (depends on {@link $colkeynames}
 	 *               and {@link colvaluename} and must match order and count)
 	 */
 	function set()
 	{
+		global $Debuglog;
+
 		$args = func_get_args();
-		// echo 'get: ['.implode(', ', $args ).']<br />';
 
 		if( count( $args ) != (count( $this->colkeynames ) + 1) )
 		{
-			global $Debuglog;
-
 			$Debuglog->add( 'Count of arguments for AbstractSettings::set() does not match $colkeyname + 1 (colkeyvalue).', 'error' );
 			return false;
 		}
@@ -344,6 +347,8 @@ class AbstractSettings
 		{
 			if( $atcache->value == $args[ count($args)-1 ] )
 			{ // already set
+				$Debuglog->add( get_class($this).'::set: ['.implode(', ', $args ).']: '
+													.'was already set to the same value.', 'settings' );
 				return false;
 			}
 		}
@@ -351,13 +356,16 @@ class AbstractSettings
 		$atcache->value = $args[ count($args)-1 ];
 		$atcache->dbuptodate = false;
 
-		// echo ' to '.$args[ count($args)-1 ].' <br />';
+		$Debuglog->add( get_class($this).'::set: ['.implode(', ', $args ).']', 'settings' );
+
 		return true;
 	}
 
 
 	/**
 	 * Commit changed settings to DB.
+	 *
+	 * @return boolean true, if settings have been updated; false otherwise
 	 */
 	function updateDB()
 	{
@@ -411,21 +419,23 @@ class AbstractSettings
 				return false;
 		}
 
-		$q = false;
 		if( count($query_insert) )
 		{
 			$query = 'REPLACE INTO '.$this->dbtablename.' ('.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
 								.') VALUES '.implode(', ', $query_insert);
-			$q = $DB->query( $query );
+			return (boolean)$DB->query( $query );
 		}
 
-		return $q;
+		return false;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/08 02:48:26  blueyed
+ * doc updated
+ *
  * Revision 1.4  2004/11/08 02:23:44  blueyed
  * allow caching by column keys (e.g. user ID)
  *
