@@ -7,6 +7,8 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
+ * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -29,6 +31,10 @@
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
  * @package evocore
@@ -37,6 +43,8 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE
  * @author jeffbearer: Jeff BEARER
+ * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
+ * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
@@ -116,32 +124,39 @@ $blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
 if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 { // note: $pos will typically be 0
 	$path_string = substr( $ReqPath, $pos+strlen( $blog_baseurl ) );
-	// echo "path=$path_string <br>";
+
+	$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
+		// echo "path=$path_string <br>";
 	$path_elements = explode( '/', $path_string, 20 );  // slice it
 	$i=0;
 	// echo $path_elements[$i];
 	if( isset( $path_elements[$i] ) && $path_elements[$i] == 'index.php' )
 	{ // Ignore index.html
 		$i++;
+		$Debuglog->add( 'Ignoring index.php in extra path info' , 'params' );
 	}
 
 	if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'(\.php)?$#', $path_elements[$i] )  )
 	{ // Ignore stub file
 		$i++;
+		$Debuglog->add( 'Ignoring stub file in extra path info' , 'params' );
 	}
 
 	// echo $path_elements[$i];
 	if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 	{ // We'll consider this to be the year
 		$m = $path_elements[$i++];
+		$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
 
 		if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 		{ // We'll consider this to be the month
 			$m .= $path_elements[$i++];
+			$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
 
 			if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 			{ // We'll consider this to be the day
 				$m .= $path_elements[$i++];
+				$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
 
 				if( isset( $path_elements[$i] ) && (!empty( $path_elements[$i] )) )
 				{ // We'll consider this to be a ref to a post
@@ -314,6 +329,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2005/01/21 21:03:57  jwedgeco
+ * Added some debug statements to log the decoding of the date from the request uri.
+ *
  * Revision 1.3  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *
