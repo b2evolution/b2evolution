@@ -20,6 +20,14 @@
 
 <fieldset>
 	<legend><?php echo T_('Access parameters') ?></legend>
+
+	<?php
+		form_radio( 'blog_access_type', $blog_access_type,
+				array(  array( 'index.php', T_('Through index.php'), $baseurl.$blog_siteurl.'/index.php?blog='.$blog ),
+								array( 'stub', T_('Through stub file'), $baseurl.$blog_siteurl.'/'.$blog_stub ),
+							), T_('Preferred access type'), true );
+	?>
+	
 	<fieldset>
 		<div class="label"><label for="blog_siteurl"><?php echo T_('Blog Folder URL') ?>: </label></div>
 		<div class="input"><code><?php echo $baseurl ?></code><input type="text" name="blog_siteurl" id="blog_siteurl" size="40" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>"/>
@@ -27,6 +35,6 @@
 	</fieldset>
 
 	<?php
-		form_text( 'blog_stub', $blog_stub, 30, T_('URL blog name'), T_('((This help note will be updated))') );
+		form_text( 'blog_stub', $blog_stub, 30, T_('URL blog name'), T_('Used for stub file access') );
 	?>
 </fieldset>

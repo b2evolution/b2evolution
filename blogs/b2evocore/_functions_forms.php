@@ -127,7 +127,9 @@ function form_radio(
 		{
 			echo ' checked="checked"';
 		}
-		echo '> ', $loop_field_option[1], '</label> ';
+		echo '> ', $loop_field_option[1], '</label>';
+		if( isset( $loop_field_option[2] ) )
+			echo '<span class="notes">', $loop_field_option[2], '</span>';
 		if( $field_lines ) echo "</div>\n";
 	}
 	echo "</fieldset>\n\n";

@@ -29,6 +29,7 @@ switch($action)
 		param( 'blog_shortname', 'string', 'new blog' );
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_locale', 'string', $default_locale );
+		param( 'blog_access_type', 'string', 'index.php' );
 		param( 'blog_siteurl', 'string', '' );
 		param( 'blog_stub', 'string', 'new_file.php' );
 		param( 'blog_default_skin', 'string', '' );
@@ -54,11 +55,12 @@ switch($action)
 
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
-		param( 'blog_tagline', 'html', '' );
-		param( 'blog_locale', 'string', $default_locale );
+		param( 'blog_tagline', 'html', true );
+		param( 'blog_locale', 'string', true );
+		param( 'blog_access_type', 'string', true );
 		param( 'blog_siteurl', 'string', true );
-		param( 'blog_stub', 'string', '' );
-		param( 'blog_default_skin', 'string', '' );
+		param( 'blog_stub', 'string', true );
+		param( 'blog_default_skin', 'string', true );
 
 		if ( errors_display( T_('Cannot create, please correct these errors:'),
 			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog form').'</a>]'))
@@ -209,25 +211,28 @@ switch($action)
 				param( 'blog_shortname', 'string', true );
 				$edited_Blog->set( 'shortname', $blog_shortname );
 
-				param( 'blog_description', 'string', '' );
+				param( 'blog_description', 'string', true );
 				$edited_Blog->set( 'description', $blog_description );
 
-				param( 'blog_locale', 'string', $default_locale );
+				param( 'blog_locale', 'string', true );
 				$edited_Blog->set( 'locale', $blog_locale );
+
+				param( 'blog_access_type', 'string', true );
+				$edited_Blog->set( 'access_type', $blog_access_type );
 
 				param( 'blog_siteurl', 'string', true );
 				$edited_Blog->set( 'siteurl', $blog_siteurl );
 
-				param( 'blog_stub', 'string', '' );
+				param( 'blog_stub', 'string', true );
 				$edited_Blog->set( 'stub', $blog_stub );
 
-				param( 'blog_keywords', 'string', '' );
+				param( 'blog_keywords', 'string', true );
 				$edited_Blog->set( 'keywords', $blog_keywords );
 
 				param( 'blog_disp_bloglist', 'integer', 0 );
 				$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
 
-				param( 'blog_default_skin', 'string', '' );
+				param( 'blog_default_skin', 'string', true );
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
 
 				param( 'blog_force_skin', 'integer', 0 );
@@ -273,15 +278,6 @@ switch($action)
 		
 		// Commit changes in cache:
 		$BlogCache->add( $edited_Blog );
-
-		// Update core blog params
-		/* blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
-									$blog_staticfilename,
-									$blog_tagline, $blog_description, $blog_longdesc,
-									$blog_locale, $blog_roll,
-									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
-									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
-									$blog_disp_bloglist ); */
 
 		?>
 			</div>
@@ -355,6 +351,7 @@ switch($action)
 				$blog_description = get_bloginfo( 'description' );
 				$blog_longdesc = get_bloginfo( 'longdesc' );
 				$blog_locale = get_bloginfo( 'locale' );
+				$blog_access_type = $edited_Blog->get( 'access_type' );
 				$blog_siteurl = get_bloginfo( 'subdir' );
 				$blog_stub = get_bloginfo( 'stub' );
 				$blog_roll = get_bloginfo( 'blogroll' );

@@ -23,6 +23,7 @@ class Blog extends DataObject
 	var $shortdesc;	// description
 	var $longdesc;
 	var $locale;
+	var $access_type = 'index.php';
 	var $siteurl;
 	var $filename;
 	var $staticfilename;
@@ -67,6 +68,7 @@ class Blog extends DataObject
 			$this->shortdesc = $db_row->blog_description;	// description
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
+			$this->access_type = $db_row->blog_access_type;
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->filename = $db_row->blog_filename;
 			$this->staticfilename = $db_row->blog_staticfilename;
@@ -117,9 +119,31 @@ class Blog extends DataObject
 	}
 
 	/** 
+	 * Generate blog URL
+	 *
+	 * {@internal Blog::gen_blogurl(-)}}
+	 */
+	function gen_blogurl( )
+	{
+		global $baseurl;
+		
+		switch( $this->access_type )
+		{
+			case 'index.php':
+				return $baseurl.$this->siteurl.'/index.php?blog='.$this->ID;
+			
+			case 'stub':
+				return $baseurl.$this->siteurl.'/'.$this->stub;
+		
+			default:
+				die( 'Unhandled Blog access type ['.$this->access_type.']' );
+		}
+	}
+
+	/** 
 	 * Get a param
 	 *
-	 * {@internal User::get(-)}}
+	 * {@internal Blog::get(-)}}
 	 */
 	function get( $parname )
 	{
@@ -133,7 +157,7 @@ class Blog extends DataObject
 			case 'blogurl':
 			case 'link':			// RSS wording
 			case 'url':
-				return $baseurl.$this->siteurl.'/'.$this->stub;
+				return $this->gen_blogurl();
 			
 			case 'dynurl':
 				return $baseurl.$this->siteurl.'/'.$this->filename;

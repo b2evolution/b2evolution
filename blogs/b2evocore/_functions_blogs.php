@@ -73,68 +73,6 @@ function blog_create(
 }
 
 
-/*
- * blog_update(-)
- *
- * Update a blog
- * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
- */
-function blog_update(
-	$blog_ID,
-	$blog_name,
-	$blog_shortname,
-	$blog_siteurl,
-	$blog_filename,
-	$blog_stub,
-	$blog_staticfilename = '',
-	$blog_tagline = '',
-	$blog_description = '',
-	$blog_longdesc = '',
-	$blog_locale = '#',
-	$blog_roll = '',
-	$blog_keywords = '',
-	$blog_UID = '',
-	$blog_allowtrackbacks = 1,
-	$blog_allowpingbacks = 1,
-	$blog_pingb2evonet = 0,
-	$blog_pingtechnorati = 0,
-	$blog_pingweblogs = 1,
-	$blog_pingblodotgs = 0,
-	$blog_disp_bloglist	= 1
-	)
-{
-	global $DB, $tableblogs, $query, $querycount, $default_locale;
-
-	if( $blog_locale == '#' ) $blog_locale = $default_locale;
-	
-	$query = "UPDATE $tableblogs SET ";
-	$query .= " blog_name = '".$DB->escape($blog_name)."', ";
-	$query .= " blog_shortname = '".$DB->escape($blog_shortname)."', ";
-	$query .= " blog_siteurl = '".$DB->escape($blog_siteurl)."', ";
-	$query .= " blog_filename = '".$DB->escape($blog_filename)."', ";
-	$query .= " blog_staticfilename = '".$DB->escape($blog_staticfilename)."', ";
-	$query .= " blog_stub = '".$DB->escape($blog_stub)."', ";
-	$query .= " blog_tagline = '".$DB->escape($blog_tagline)."', ";
-	$query .= " blog_description = '".$DB->escape($blog_description)."', ";
-	$query .= " blog_longdesc = '".$DB->escape($blog_longdesc)."', ";
-	$query .= " blog_locale = '".$DB->escape($blog_locale)."', ";
-	$query .= " blog_roll = '".$DB->escape($blog_roll)."', ";
-	$query .= " blog_keywords = '".$DB->escape($blog_keywords)."', ";
-	$query .= " blog_UID = '".$DB->escape($blog_UID)."', ";
-	$query .= " blog_allowtrackbacks = $blog_allowtrackbacks, ";
-	$query .= " blog_allowpingbacks = $blog_allowpingbacks, ";
-	$query .= " blog_pingb2evonet = $blog_pingb2evonet, ";
-	$query .= " blog_pingtechnorati = $blog_pingtechnorati, ";
-	$query .= " blog_pingweblogs = $blog_pingweblogs, ";
-	$query .= " blog_pingblodotgs = $blog_pingblodotgs, ";
-	$query .= " blog_disp_bloglist = $blog_disp_bloglist ";
-	$query .= "WHERE blog_ID= $blog_ID";
-	// echo $query;
-	return $DB->query( $query );
-}
-
 
 
 /**

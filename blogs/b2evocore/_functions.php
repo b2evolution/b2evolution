@@ -1371,6 +1371,40 @@ function obhandler( $output )
 }
 
 /**
+ * Add param(s) at the end of an URL, using either ? or &amp; depending on exiting url
+ *
+ * url_add_param(-)
+ *
+ * @param string existing url
+ * @param string params to add
+ */
+function url_add_param( $url, $param )
+{
+	if( strpos( $url, '?' ) !== false )
+	{	// There are already params in the URL
+		return $url.'&amp;'.$param;
+	}
+
+	// These are the first params
+	return $url.'?'.$param;
+}
+
+/**
+ * Add a tail (starting with /) at the end of an URL before any params (starting with ?)
+ *
+ * url_add_tail(-)
+ *
+ * @param string existing url
+ * @param string tail to add
+ */
+function url_add_tail( $url, $tail )
+{
+	$parts = explode( '?', $url );
+
+	return $parts[0].$tail.'?'.$parts[1];
+}
+ 
+/**
  * sends a mail, wraps PHP's mail() function
  *
  * @param string recipient

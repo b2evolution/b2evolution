@@ -91,7 +91,7 @@ class Item extends DataObject
 	 */
 	function gen_permalink( $mode = '', $blogurl = '', $force_single = false )
 	{
-		global $DB, $cacheweekly, $Settings;
+		global $DB, $BlogCache, $cacheweekly, $Settings;
 
 		if( empty( $mode ) )
 			$mode = $Settings->get( 'permalink_type' );
@@ -101,8 +101,11 @@ class Item extends DataObject
 			$mode = 'pid';
 		}
 
-		if( empty( $blogurl ) )
-			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
+		if( empty( $blogurl ) ) 
+		{
+			$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+			$blogurl = $current_Blog->gen_blogurl();
+		}
 
 		$post_date = $this->issue_date;
 
@@ -151,7 +154,7 @@ class Item extends DataObject
 			switch( $dest_type )
 			{
 				case 'monthly':
-					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).'#'.$anchor;
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2) ).'#'.$anchor;
 					break;
 
 				case 'weekly':
@@ -159,16 +162,16 @@ class Item extends DataObject
 					{
 						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
-					$permalink = $blogurl.'?m='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date].'#'.$anchor;
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date] ).'#'.$anchor;
 					break;
 
 				case 'daily':
-					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2).'#'.$anchor;
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2) ).'#'.$anchor;
 					break;
 
 				case 'postbypost':
 				default:
-					$permalink = $blogurl.'?'.$urlparam.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1';
+					$permalink = url_add_param( $blogurl, $urlparam.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
 					break;
 			}
 		}
@@ -177,7 +180,7 @@ class Item extends DataObject
 			switch( $dest_type )
 			{
 				case 'monthly':
-					$permalink = $blogurl.mysql2date("/Y/m", $post_date).'#'.$anchor;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m", $post_date) ).'#'.$anchor;
 					break;
 
 				case 'weekly':
@@ -185,17 +188,17 @@ class Item extends DataObject
 					{
 						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
-					$permalink = $blogurl.mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date].'#'.$anchor;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date] ).'#'.$anchor;
 					break;
 
 				case 'daily':
-					$permalink = $blogurl.mysql2date("/Y/m/d", $post_date).'#'.$anchor;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d", $post_date) ).'#'.$anchor;
 					break;
 
 				case 'postbypost':
 				default:
 					// This is THE CLEANEST available: RECOMMENDED!
-					$permalink = $blogurl.mysql2date("/Y/m/d/", $post_date).$urltail;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d/", $post_date).$urltail );
 					break;
 			}
 		}
