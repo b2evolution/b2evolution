@@ -59,11 +59,9 @@ $servertimenow = time();
 $localtimenow = $servertimenow + ($time_difference * 3600);
 
 // Object caches init:
-$GroupCache = & new DataObjectCache( 'Group', $tablegroups, 'grp_', 'grp_ID' );
-//			$obj = $GroupCache->get_by_ID( 2 );
-//			$obj->disp( 'name' );
-$BlogCache = & new DataObjectCache( 'Blog', $tableblogs, 'blog_', 'blog_ID' );
-$ItemCache = & new DataObjectCache( 'Item', $tableposts, 'post_', 'ID' );
+$GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
+// $BlogCache = & new DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
+$ItemCache = & new DataObjectCache( 'Item', true, $tableposts, 'post_', 'ID' );
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;

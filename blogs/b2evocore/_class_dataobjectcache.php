@@ -27,6 +27,7 @@ class DataObjectCache
 	var $dbprefix;
 	var $dbIDname;
 	var $cache = array();
+	var $load_add = false;
 	var $all_loaded = false;
 	/**#@-*/
 
@@ -35,13 +36,16 @@ class DataObjectCache
 	 *
 	 * {@internal DataObjectCache::DataObjectCache(-) }}
 	 *
+	 * @param string Name of DataObject class we are cacheing
+	 * @param boolean true if it's OK to just load all items!
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function DataObjectCache( $objtype, $tablename, $prefix = '', $dbIDname = 'ID' )
+	function DataObjectCache( $objtype, $load_add, $tablename, $prefix = '', $dbIDname = 'ID' )
 	{
 		$this->objtype = $objtype;
+		$this->load_all = $load_all;
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
@@ -57,7 +61,7 @@ class DataObjectCache
 	{
 		global $querycount;
 
-		if( !empty( $this->cache ) )
+		if( $this->all_loaded )
 			return	false;	// Already loaded;
 		
 		$sql = "SELECT * FROM $this->dbtablename";
@@ -75,6 +79,31 @@ class DataObjectCache
 		$this->all_loaded = true;
 
 		return true;
+	}
+
+
+	/** 
+	 * Load a list of objects into the cache 
+	 *
+	 * {@internal DataObjectCache::load_list(-) }}
+	 *
+	 * @param string list of IDs of objects to load
+	 */
+	function load_list( $req_list )
+	{
+		global $querycount;
+
+		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
+		$result = mysql_query($sql) or mysql_oops( $sql );
+		$querycount++;
+		$dbIDname = $this->dbIDname;
+		$objtype = $this->objtype;
+		while( $row = mysql_fetch_object($result) )
+		{
+			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+			// $obj = $this->cache[ $row->$dbIDname ];
+			// $obj->disp( 'name' );
+		}
 	}
 	
 
@@ -112,12 +141,31 @@ class DataObjectCache
 	 * Load the cache if necessary
 	 *
 	 * {@internal DataObjectCache::get_by_ID(-) }}
+	 *
+	 * @param integer ID of object to load
 	 */
 	function get_by_ID( $req_ID ) 
 	{
 
-		if( empty( $this->cache ) )
-			$this->load_all();
+		if( empty( $this->cache[ $req_ID ] ) && (! $this->all_loaded) )
+		{	// Not in cache, but not everything is loaded yet
+			if( $this->load-all )
+			{	// It's ok to just load everything:
+				$this->load_all();
+			}
+			else
+			{ // Load just the requested object:
+				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
+				$result = mysql_query($sql) or mysql_oops( $sql );
+				$querycount++;
+				$dbIDname = $this->dbIDname;
+				$objtype = $this->objtype;
+				while( $row = mysql_fetch_object($result) )
+				{
+					$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+				}
+			}
+		}
 	
 		if( empty( $this->cache[ $req_ID ] ) ) 
 			die( "Requested $this->objtype does not exist!" );

@@ -17,6 +17,11 @@ require_once dirname(__FILE__). '/_class_dataobject.php';
  */
 class Comment extends DataObject
 {
+	/**
+	 * @access private
+	 */
+	var $Item = NULL;
+	
 	var	$post_ID;
 	var	$type;
 	var	$status;

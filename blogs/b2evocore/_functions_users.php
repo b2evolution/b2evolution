@@ -186,8 +186,6 @@ function is_logged_in()
  */
 function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
 {
-	global $cache_userdata, $use_cache;
-
 	$userdata = get_userdatabylogin($user_login);
 	// echo 'got data for: ', $userdata['user_login'];
 

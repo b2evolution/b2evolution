@@ -69,7 +69,7 @@ $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata;
+	global $blog_ID;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -362,7 +362,7 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
 function bloggernewpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata;
+	global $blog_ID;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -495,7 +495,7 @@ function bloggereditpost($m)
 {
 
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata,$tableposts, $tablepostcats;
+	global $blog_ID,$tableposts, $tablepostcats;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -651,7 +651,7 @@ $bloggerdeletepost_doc='Deletes a post, blogger-api like';
 function bloggerdeletepost($m) 
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$tableposts,$cache_userdata;
+	global $blog_ID,$tableposts;
 	global $post_default_title,$post_default_category, $sleep_after_edit;
 	$err="";
 
