@@ -223,10 +223,15 @@ $map_iconfiles = array(
 	),
 
 
- 	'link' => array(
+	'link' => array(
 		'file' => $admin_subdir.'img/chain_link.gif',
 		'alt' => T_('Link'),
 		'size' => array( 14, 14 ),
+	),
+	'help' => array(
+	'file' => $img_subdir.'smilies/icon_question.gif',
+		'alt' => T_('Help'),
+		'size' => array( 15, 15 ),
 	),
 );
 
