@@ -142,7 +142,7 @@
 		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
-		<?php $Item->time();  echo ', ', T_('Categories'), ': ';  $Item->categories() ?>
+		<?php $Item->issue_time();  echo ', ', T_('Categories'), ': ';  $Item->categories() ?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">

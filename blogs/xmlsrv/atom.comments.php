@@ -26,8 +26,8 @@
 			<?php $Comment->author_url( '', '<url>', "</url>\n", false ) ?>
 		</author>
 		<id><?php $Comment->permalink() ?></id>
-		<modified><?php $Comment->date( 'isoZ', true ); ?></modified>
 		<issued><?php $Comment->date( 'isoZ', true ); ?></issued>
+		<modified><?php $Comment->date( 'isoZ', true ); ?></modified>
 		<content type="text/html" mode="escaped"><![CDATA[<?php $Comment->content() ?>]]></content>
 	</entry>
 	<?php }	// End of comment loop. ?>

@@ -389,14 +389,14 @@ function cat_load_cache()
 		if( !empty($timestamp_min) ) 
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
-			$where .= $where_link.' post_date >= \''.$date_min.'\'';
+			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) ) 
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
-			$where .= $where_link.' post_date <= \''.$date_max.'\'';
+			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 	

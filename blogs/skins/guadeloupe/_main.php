@@ -65,7 +65,7 @@
 <?php $Item->anchor(); ?>
 <h2><?php $Item->title(); ?></h2>
 <div class=infos>
-<h3><a href="<?php $Item->permalink() ?>" title="Permalink"><?php $Item->date() ?> <?php $Item->time() ?></a></h3>
+<h3><a href="<?php $Item->permalink() ?>" title="Permalink"><?php $Item->issue_date() ?> <?php $Item->issue_time() ?></a></h3>
 &nbsp;
 <h4><?php $Item->categories() ?></h4>
 </div>

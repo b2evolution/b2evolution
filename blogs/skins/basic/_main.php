@@ -62,7 +62,7 @@
 
 		<?php $Item->anchor(); ?>
 		<h3 class="bTitle">
-			<?php $Item->time(); ?>
+			<?php $Item->issue_time(); ?>
 			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
 			<?php $Item->title(); ?>
 		</h3>

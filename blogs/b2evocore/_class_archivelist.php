@@ -57,14 +57,14 @@ class ArchiveList extends DataObjectList
 		if( !empty($timestamp_min) ) 
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
-			$where .= $where_link.' post_date >= \''.$date_min.'\'';
+			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) ) 
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
-			$where .= $where_link.' post_date <= \''.$date_max.'\'';
+			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 	
@@ -85,7 +85,7 @@ class ArchiveList extends DataObjectList
 		{
 			case 'monthly':
 				// --------------------------------- MONTHLY ARCHIVES ---------------------------------------
-				$this->request="SELECT YEAR(post_date) AS year, MONTH(post_date) AS month, COUNT(DISTINCT postcat_post_ID) AS count ".
+				$this->request="SELECT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month, COUNT(DISTINCT postcat_post_ID) AS count ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
 						" GROUP BY year, month ".
@@ -95,7 +95,7 @@ class ArchiveList extends DataObjectList
 
 			case 'daily':
 				// --------------------------------- DAILY ARCHIVES ---------------------------------------
-				$this->request="SELECT YEAR(post_date) AS year, MONTH(post_date) AS month, DAYOFMONTH(post_date) AS day, COUNT(*) AS count ".
+				$this->request="SELECT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month, DAYOFMONTH(post_issue_date) AS day, COUNT(*) AS count ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
 						" GROUP BY year, month, day ".
@@ -105,7 +105,7 @@ class ArchiveList extends DataObjectList
 
 			case 'weekly':
 				// --------------------------------- WEEKLY ARCHIVES ---------------------------------------
-				$this->request="SELECT DISTINCT YEAR(post_date) AS year, MONTH(post_date) AS month, DAYOFMONTH(post_date) AS day, WEEK(post_date) AS week ".
+				$this->request="SELECT DISTINCT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month, DAYOFMONTH(post_issue_date) AS day, WEEK(post_issue_date) AS week ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
 						" ORDER BY year DESC, month DESC, day DESC, week DESC".
@@ -114,11 +114,11 @@ class ArchiveList extends DataObjectList
 
 			case 'postbypost':
 			default:
-				// --------------------------------- POSY BY POST ARCHIVES ---------------------------------------
-				$this->request="SELECT DISTINCT ID, post_date, post_title ".
+				// ------------------------------- POSY BY POST ARCHIVES ----------------------------------
+				$this->request="SELECT DISTINCT ID, post_issue_date, post_title ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
-						" ORDER BY post_date DESC".
+						" ORDER BY post_issue_date DESC".
 						$limit;
 		}
 

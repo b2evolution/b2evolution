@@ -122,7 +122,8 @@ function create_b2evo_tables()
 	$query = "CREATE TABLE $tableposts (   
 		ID int(10) unsigned NOT NULL auto_increment,
 		post_author int(4) NOT NULL default '0',
-		post_date datetime NOT NULL default '0000-00-00 00:00:00',
+		post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
+		post_mod_date datetime NOT NULL default '0000-00-00 00:00:00',
 		post_status enum('published','deprecated','protected','private','draft') 
 									NOT NULL default 'published',
 		post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
@@ -139,7 +140,7 @@ function create_b2evo_tables()
 		post_wordcount int(11) default NULL,
 		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 		PRIMARY KEY post_ID (ID),
-		KEY post_date (post_date),
+		KEY post_issue_date (post_issue_date),
 		KEY post_category (post_category),
 		KEY post_author (post_author),
 		KEY post_status (post_status)

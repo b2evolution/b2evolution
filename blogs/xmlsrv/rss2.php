@@ -25,7 +25,7 @@
     <item>
       <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
       <link><?php $Item->permalink( 'single' ) ?></link>
-      <pubDate><?php $Item->date( 'r', true ) ?></pubDate>
+      <pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
       <?php // Disabled because of spambots: <author><php the_author_email( 'xml' ) ></author>?>
       <?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
       <guid isPermaLink="false"><?php the_ID() ?>@<?php echo $baseurl ?></guid>

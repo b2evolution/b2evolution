@@ -18,7 +18,8 @@ require_once dirname(__FILE__).'/_class_dataobject.php';
 class Item extends DataObject
 {
 	var $Author;
-	var $date;
+	var $issue_date;
+	var $mod_date;
 	var $scope;
 	var $lang;
 	var $title;
@@ -56,7 +57,8 @@ class Item extends DataObject
 			$this->ID = $db_row->ID;
 			$authordata = get_userdata($db_row->post_author);
 			$this->Author = new User( $authordata ); // COPY!
-			$this->date = $db_row->post_date;
+			$this->issue_date = $db_row->post_issue_date;
+			$this->mod_date = $db_row->post_mod_date;
 			$this->scope = $db_row->post_status;
 			$this->lang = $db_row->post_lang;
 			$this->title = $db_row->post_title;
@@ -371,36 +373,37 @@ class Item extends DataObject
 
 	
 	/** 
-	 * Template function: display date (datetime) of Item
+	 * Template function: display issue date (datetime) of Item
 	 *
-	 * {@internal Item::date(-) }}
+	 * {@internal Item::issue_date(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
 	 */
-	function date( $format = '', $useGM = false )
+	function issue_date( $format = '', $useGM = false )
 	{
 		if( empty($format) ) 
-			echo mysql2date( locale_datefmt(), $this->date, $useGM);
+			echo mysql2date( locale_datefmt(), $this->issue_date, $useGM);
 		else
-			echo mysql2date( $format, $this->date, $useGM);
+			echo mysql2date( $format, $this->issue_date, $useGM);
 	}
 
 	/** 
-	 * Template function: display time (datetime) of Item
+	 * Template function: display issue time (datetime) of Item
 	 *
-	 * {@internal Item::time(-) }}
+	 * {@internal Item::issue_time(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
 	 */
-	function time( $format = '', $useGM = false )
+	function issue_time( $format = '', $useGM = false )
 	{
 		if( empty($format) ) 
-			echo mysql2date( locale_timefmt(), $this->date, $useGM );
+			echo mysql2date( locale_timefmt(), $this->issue_date, $useGM );
 		else
-			echo mysql2date( $format, $this->date, $useGM );
+			echo mysql2date( $format, $this->issue_date, $useGM );
 	}
+
 
 	/** 
 	 * Template function: display language code for item
@@ -424,6 +427,39 @@ class Item extends DataObject
 	{
 		global $languages;
 		echo format_to_output( $languages[ $this->lang ], $format );
+	}
+
+
+	/** 
+	 * Template function: display last mod date (datetime) of Item
+	 *
+	 * {@internal Item::mod_date(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function mod_date( $format = '', $useGM = false )
+	{
+		if( empty($format) ) 
+			echo mysql2date( locale_datefmt(), $this->mod_date, $useGM);
+		else
+			echo mysql2date( $format, $this->mod_date, $useGM);
+	}
+
+	/** 
+	 * Template function: display last mod time (datetime) of Item
+	 *
+	 * {@internal Item::mod_time(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default time format
+	 * @param boolean true if you want GMT
+	 */
+	function mod_time( $format = '', $useGM = false )
+	{
+		if( empty($format) ) 
+			echo mysql2date( locale_timefmt(), $this->mod_time, $useGM );
+		else
+			echo mysql2date( $format, $this->mod_time, $useGM );
 	}
 
 

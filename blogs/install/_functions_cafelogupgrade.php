@@ -119,8 +119,8 @@ function upgrade_cafelog_tables()
 
 	
 	echo "Copying Cafelog posts... ";
-	$query = "INSERT INTO $tableposts( ID, post_author, post_date, post_status, post_lang, post_content,post_title, post_category, post_autobr, post_flags, post_karma)  
-	SELECT ID, post_author, post_date, 'published', '$default_language', post_content, post_title, post_category, 1, 'pingsdone,html,imported', post_karma FROM $oldtableposts";
+	$query = "INSERT INTO $tableposts( ID, post_author, post_issue_date, post_mod_date, post_status, post_lang, post_content,post_title, post_category, post_autobr, post_flags, post_karma)  
+	SELECT ID, post_author, post_date, post_date, 'published', '$default_language', post_content, post_title, post_category, 1, 'pingsdone,html,imported', post_karma FROM $oldtableposts";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 

@@ -37,7 +37,7 @@ while( $Item = $MainList->get_item() )
 <item rdf:about="<?php $Item->permalink( 'single' ) ?>">
   <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
   <link><?php $Item->permalink( 'single' ) ?></link>
-  <dc:date><?php $Item->date( 'isoZ', true ) ?></dc:date>
+  <dc:date><?php $Item->issue_date( 'isoZ', true ) ?></dc:date>
   <dc:creator><?php $Item->Author->prefered_name( 'xml' ) ?></dc:creator>
   <dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
   <description><?php

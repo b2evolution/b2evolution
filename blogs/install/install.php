@@ -57,7 +57,7 @@ require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_cats.p
 require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts.php" );
 require_once (dirname(__FILE__)."/_functions_create.php" );
 
-$new_db_version = 8050;				// next time: 8060
+$new_db_version = 8060;				// next time: 8070
 
 /*
  * check_db_version(-)

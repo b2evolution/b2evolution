@@ -94,14 +94,14 @@ class Calendar
 		if( !empty($timestamp_min) ) 
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
-			$where .= $where_link.' post_date >= \''.$date_min.'\'';
+			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) ) 
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
-			$where .= $where_link.' post_date <= \''.$date_max.'\'';
+			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 	
@@ -174,11 +174,11 @@ class Calendar
 		$daysinmonthwithposts = '';
 		for( $i=0; $i < $this->searchframe; $i++ )
 		{
-			$arc_sql="SELECT DISTINCT YEAR(post_date), MONTH(post_date), DAYOFMONTH(post_date)".
+			$arc_sql="SELECT DISTINCT YEAR(post_issue_date), MONTH(post_issue_date), DAYOFMONTH(post_issue_date)".
 					"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) ".
 					"INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
-					"WHERE MONTH(post_date) = '$this->month' AND YEAR(post_date) = '$this->year' ".$this->where. 
-					" ORDER BY post_date DESC";
+					"WHERE MONTH(post_issue_date) = '$this->month' AND YEAR(post_issue_date) = '$this->year' ".$this->where. 
+					" ORDER BY post_issue_date DESC";
 
 			$querycount++;
 
@@ -188,7 +188,7 @@ class Calendar
 			{	// OK we have a month with posts!
 				$daysinmonthwithposts = '-';
 				while($arc_row = mysql_fetch_array($arc_result)) {
-					$daysinmonthwithposts .= $arc_row["DAYOFMONTH(post_date)"].'-';
+					$daysinmonthwithposts .= $arc_row["DAYOFMONTH(post_issue_date)"].'-';
 				}
 				break; // Don't search any further!
 			} 

@@ -69,7 +69,7 @@
 		<div class="bSmallHead">
 		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
 		<?php
-			$Item->time();
+			$Item->issue_time();
 			echo ', ', T_('Categories'), ': ';
 			$Item->categories();
 			echo ', ';

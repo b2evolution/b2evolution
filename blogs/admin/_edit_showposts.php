@@ -115,7 +115,7 @@
 			<div class="bSmallHead">
 				<?php
 					echo '<strong>';
-					$Item->date(); echo ' @ '; $Item->time();
+					$Item->issue_date(); echo ' @ '; $Item->issue_time();
 					echo '</strong>';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo ' ', T_('by'), ' ';

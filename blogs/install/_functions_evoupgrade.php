@@ -212,6 +212,22 @@ function upgrade_b2evo_tables()
 		
 	if( $old_db_version < 8060 )
 	{
+		echo "Upgrading posts table... ";
+		$query = "ALTER TABLE $tableposts 
+							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
+							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' AFTER post_issue_date,
+							DROP INDEX post_date,
+							ADD INDEX post_issue_date (post_issue_date)";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		$query = "UPDATE $tableposts 
+							SET post_mod_date = post_issue_date";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
+	}
+
+	if( $old_db_version < 8070 )
+	{
 		/* 
 		 * CONTRIBUTORS: If you need some more changes, put them here!
 		 * Then create a new extension block, and increase db version numbers

@@ -89,7 +89,7 @@
 			{
 			?>
 			<li lang="<?php $Item->lang() ?>">
-				<?php $Item->date() ?>:
+				<?php $Item->issue_date() ?>:
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php $Item->title( '', '', false ); ?></a>
 				<span class="small">[<?php $Item->lang() ?>]</span>
 			</li>

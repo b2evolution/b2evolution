@@ -37,7 +37,7 @@
 		<?php $Item->content(); ?>
 		<?php link_pages("<br />Pages: ","<br />","number") ?>
 		<div class="posted">by <?php $Item->Author->prefered_name() ?> 
-			at <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a><br />
+			at <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a><br />
 			<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
 			<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
 			<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |

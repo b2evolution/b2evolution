@@ -973,7 +973,7 @@ function bloggergetrecentposts($m)
 
 	if (user_pass_ok($username,$password)) 
 	{
-		$sql = "SELECT * FROM $tableposts WHERE post_category > 0 ORDER BY post_date DESC".$limit;
+		$sql = "SELECT * FROM $tableposts WHERE post_category > 0 ORDER BY post_mod_date DESC".$limit;
 		$result = mysql_query($sql);
 		if (!$result)
 			return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2

@@ -76,24 +76,24 @@ class BlogStats{
 		if ($m != '') 
 		{
 			$m = ''.intval($m);
-			$where .= ' AND YEAR(post_date)='.substr($m,0,4);
+			$where .= ' AND YEAR(post_issue_date)='.substr($m,0,4);
 			if (strlen($m)>5)
-				$where .= ' AND MONTH(post_date)='.substr($m,4,2);
+				$where .= ' AND MONTH(post_issue_date)='.substr($m,4,2);
 			if (strlen($m)>7)
-				$where .= ' AND DAYOFMONTH(post_date)='.substr($m,6,2);
+				$where .= ' AND DAYOFMONTH(post_issue_date)='.substr($m,6,2);
 			if (strlen($m)>9)
-				$where .= ' AND HOUR(post_date)='.substr($m,8,2);
+				$where .= ' AND HOUR(post_issue_date)='.substr($m,8,2);
 			if (strlen($m)>11)
-				$where .= ' AND MINUTE(post_date)='.substr($m,10,2);
+				$where .= ' AND MINUTE(post_issue_date)='.substr($m,10,2);
 			if (strlen($m)>13)
-				$where .= ' AND SECOND(post_date)='.substr($m,12,2);
+				$where .= ' AND SECOND(post_issue_date)='.substr($m,12,2);
 		}
 	
 		// If a week number is specified
 		if ($w != '') 
 		{
 			$w = ''.intval($w);
-			$where .= ' AND WEEK(post_date,1)='.$w;
+			$where .= ' AND WEEK(post_issue_date,1)='.$w;
 		}
 	
 		/*
@@ -264,7 +264,7 @@ class BlogStats{
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$startdate = date('Y-m-d H:i:s', ($lastpostdate - (($poststart -1) * 86400)));
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend -1) * 86400)));
-				$where .= ' AND post_date > \''.$otherdate.'\' AND post_date < \''.$startdate.'\'';
+				$where .= ' AND post_issue_date > \''.$otherdate.'\' AND post_issue_date < \''.$startdate.'\'';
 			}
 		}
 		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
@@ -293,7 +293,7 @@ class BlogStats{
 			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 			$lastpostdate = mysql2date('U',$lastpostdate);
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
-			$where .= ' AND post_date > \''.$otherdate.'\'';
+			$where .= ' AND post_issue_date > \''.$otherdate.'\'';
 		}
 	
 
@@ -318,7 +318,7 @@ class BlogStats{
 		{	// Hide posts before
 			// echo 'before';
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
-			$where .= ' AND post_date >= \''.$date_min.'\'';
+			$where .= ' AND post_issue_date >= \''.$date_min.'\'';
 		}
 
 		if( $timestamp_max == 'now' )
@@ -330,7 +330,7 @@ class BlogStats{
 		{	// Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
-			$where .= ' AND post_date <= \''.$date_max.'\'';
+			$where .= ' AND post_issue_date <= \''.$date_max.'\'';
 		}
 
 	

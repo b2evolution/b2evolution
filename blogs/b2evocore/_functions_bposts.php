@@ -34,6 +34,7 @@ function bpost_create(
 {
 	global $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
@@ -50,8 +51,8 @@ function bpost_create(
 
 	// TODO: START TRANSACTION
 
-	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount, post_comments ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
+	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_issue_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount, post_comments ) ";
+	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', '".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -101,6 +102,7 @@ function bpost_update(
 {
 	global $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
@@ -120,7 +122,8 @@ function bpost_update(
 	$query .= "post_title = '".addslashes($post_title)."', ";
 	$query .= "post_trackbacks = '".addslashes($post_url)."', ";		// temporay use of post_trackbacks
 	$query .= "post_content = '".addslashes($post_content)."', ";
-	if( !empty($post_timestamp) )	$query .= "post_date = '$post_timestamp', ";
+	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
+	$query .= "post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', ";
 	$query .= "post_category = $main_cat_ID, ";
 	$query .= "post_status = '$post_status', ";
 	$query .= "post_lang = '$post_lang', ";
@@ -176,6 +179,7 @@ function bpost_update_status(
 {
 	global $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
@@ -187,7 +191,8 @@ function bpost_update_status(
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
 	$query = "UPDATE $tableposts SET ";
-	if( !empty($post_timestamp) )	$query .= "post_date = '$post_timestamp', ";
+	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
+	$query .= "post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', ";
 	$query .= "post_status = '$post_status', ";
 	$query .= "post_flags = '".implode(',',$post_flags)."' ";
 	$query .= "WHERE ID = $post_ID";
@@ -284,7 +289,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
@@ -299,7 +304,7 @@ function get_postdata($postid)
 		$mypostdata = array (
 			'ID' => $myrow->ID, 
 			'Author_ID' => $myrow->post_author, 
-			'Date' => $myrow->post_date, 
+			'Date' => $myrow->post_issue_date, 
 			'Status' => $myrow->post_status, 
 			'Lang' =>  $myrow->post_lang, 
 			'Content' => $myrow->post_content, 
@@ -715,7 +720,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 		}
 
 		$limitprev--;
-		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_date < '$current_post_date' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_date DESC LIMIT $limitprev,1";
+		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_issue_date < '$current_post_date' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_issue_date DESC LIMIT $limitprev,1";
 
 		$query = @mysql_query($sql);
 		$querycount++;
@@ -769,7 +774,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		$now = date('Y-m-d H:i:s', $localtimenow );
 
 		$limitnext--;
-		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_date > '$current_post_date' AND post_date < '$now' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_date ASC LIMIT $limitnext,1";
+		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_issue_date > '$current_post_date' AND post_issue_date < '$now' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_issue_date ASC LIMIT $limitnext,1";
 
 		$query = @mysql_query($sql);
 		$querycount++;
