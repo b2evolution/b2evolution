@@ -205,10 +205,12 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
 }
 
 
-/*
+/**
  * get_userdatabylogin(-)
+ *
+ * $user_login gets set to the login in DB (case sensitive)
  */
-function get_userdatabylogin($user_login)
+function get_userdatabylogin( &$user_login )
 {
 	global $DB, $tableusers, $cache_userdata, $use_cache;
 	if( (empty($cache_userdata[$user_login])) OR (!$use_cache) )
@@ -217,6 +219,7 @@ function get_userdatabylogin($user_login)
 						FROM $tableusers 
 						WHERE user_login = '$user_login'";
 		$myrow = $DB->get_row( $sql, ARRAY_A );
+		$user_login = $myrow['user_login']; // set user_login case sensitive
 		$cache_userdata[$user_login] = $myrow;
 	}
 	else
