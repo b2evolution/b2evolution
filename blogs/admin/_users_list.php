@@ -65,10 +65,14 @@
 				echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
 			echo "</td>\n";
 			echo "<td>".$loop_User->get('level');
-			if( ($user_level > ($loop_User->get('level') + 1)) && $current_User->check_perm( 'users', 'edit' ) )
+			if( ($loop_User->get('level') < 10 ) &&$current_User->check_perm( 'users', 'edit' ) )
+			{
 				echo " <a href=\"b2users.php?action=promote&id=".$loop_User->get('ID')."&prom=up\">+</a> ";
-			if( ($user_level > $loop_User->get('level')) && ($loop_User->get('level') > 0) && $current_User->check_perm( 'users', 'edit' ))
+			}
+			if( ($loop_User->get('level') > 0) && $current_User->check_perm( 'users', 'edit' ))
+			{
 				echo " <a href=\"b2users.php?action=promote&id=".$loop_User->get('ID')."&prom=down\">-</a> ";
+			}
 			if( ($loop_User->get('level') == 0) && $current_User->check_perm( 'users', 'edit' ) )
 			{
 				?>

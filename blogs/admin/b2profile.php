@@ -32,10 +32,6 @@ require(dirname(__FILE__).'/_menutop_end.php');
 
 <div class="bSideBar">
 	<div class="bSideItem">
-	<?php
-	if( $user_level > 0 ) 
-	{ // If user is active:
-		?>	
 		<h2><?php echo T_('Bookmarklet') ?></h2>
 		
 		<?php
@@ -99,11 +95,8 @@ require(dirname(__FILE__).'/_menutop_end.php');
 		}
 		?>
 		</div>
-	<?php
-	} // /user is active
-?>
-</div>
-<div style="clear:both;"></div>
+	</div>
+	<div style="clear:both;"></div>
 <?php
 
 require( dirname(__FILE__).'/_footer.php' ); 

@@ -37,10 +37,6 @@ switch($action)
 		$post_status = $postdata['Status'];
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
-		// Check level:
-		$authordata = get_userdata($postdata['Author_ID']);
-		if ($user_level < $authordata['user_level'])
-			die("You don't have the right to edit <strong>".$authordata['user_login']."</strong>'s posts.");
 	
 		$edited_post_title = format_to_edit($postdata['Title']);
 		$post_url = format_to_edit( $postdata['Url'] );
@@ -158,57 +154,45 @@ switch($action)
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
 	
-		if ($user_level > 0) 
+		if( ! blog_has_cats( $blog ) )
 		{
-			if( ! blog_has_cats( $blog ) )
-			{
-				die( T_('Since this blog has no categories, you cannot post to it. You must create categories first.') );
-			}
-	
-			$action='post';
-			
-			// These are bookmarklet params:
-			param( 'popuptitle', 'string', '' );
-			param( 'popupurl', 'string', '' );
-			param( 'text', 'html', '' );
-	
-			param( 'editing', 'integer', 0 );
-			param( 'post_autobr', 'integer', ($editing ? 0 : $autobr ) );	// Use real default only if we weren't already editing
-			$autobr = $post_autobr;
-			param( 'post_pingback', 'integer', 0 );
-			param( 'trackback_url', 'string' );
-			$post_trackbacks = & $trackback_url;
-			param( 'content', 'html', $text );
-			$content = format_to_edit( $content, false );
-			param( 'post_title', 'html', $popuptitle );
-			$edited_post_title = format_to_edit( $post_title, false );
-			param( 'post_url', 'string', $popupurl );
-			$post_url = format_to_edit( $post_url, false );
-			param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
-			param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-			param( 'post_extracats', 'array', array() );
-			param( 'post_lang', 'string', $default_language );
-	
-			param( 'edit_date', 'integer', 0 );
-			param( 'aa', 'string', date( 'Y', $localtimenow) );
-			param( 'mm', 'string', date( 'm', $localtimenow) );
-			param( 'jj', 'string', date( 'd', $localtimenow) );
-			param( 'hh', 'string', date( 'H', $localtimenow) );
-			param( 'mn', 'string', date( 'i', $localtimenow) );
-			param( 'ss', 'string', date( 's', $localtimenow) );
-	
-			$form_action = 'post';
-			require(dirname(__FILE__).'/_edit_form.php');
-		} 
-		else
-		{
-			?>
-			<div class="panelblock">
-			<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion"' ); ?>
-			</div>
-			<?php
-		
+			die( T_('Since this blog has no categories, you cannot post to it. You must create categories first.') );
 		}
+
+		$action='post';
+		
+		// These are bookmarklet params:
+		param( 'popuptitle', 'string', '' );
+		param( 'popupurl', 'string', '' );
+		param( 'text', 'html', '' );
+
+		param( 'editing', 'integer', 0 );
+		param( 'post_autobr', 'integer', ($editing ? 0 : $autobr ) );	// Use real default only if we weren't already editing
+		$autobr = $post_autobr;
+		param( 'post_pingback', 'integer', 0 );
+		param( 'trackback_url', 'string' );
+		$post_trackbacks = & $trackback_url;
+		param( 'content', 'html', $text );
+		$content = format_to_edit( $content, false );
+		param( 'post_title', 'html', $popuptitle );
+		$edited_post_title = format_to_edit( $post_title, false );
+		param( 'post_url', 'string', $popupurl );
+		$post_url = format_to_edit( $post_url, false );
+		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
+		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
+		param( 'post_extracats', 'array', array() );
+		param( 'post_lang', 'string', $default_language );
+
+		param( 'edit_date', 'integer', 0 );
+		param( 'aa', 'string', date( 'Y', $localtimenow) );
+		param( 'mm', 'string', date( 'm', $localtimenow) );
+		param( 'jj', 'string', date( 'd', $localtimenow) );
+		param( 'hh', 'string', date( 'H', $localtimenow) );
+		param( 'mn', 'string', date( 'i', $localtimenow) );
+		param( 'ss', 'string', date( 's', $localtimenow) );
+
+		$form_action = 'post';
+		require(dirname(__FILE__).'/_edit_form.php');
 }
 
 require( dirname(__FILE__).'/_footer.php' ); 

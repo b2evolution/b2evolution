@@ -132,7 +132,6 @@ function veriflog( $login_required = false )
 	$current_User = new User( $userdata );
 
 	$user_level	= $userdata['user_level'];
-	// echo 'user level = ', $user_level;
 	$user_ID = $userdata['ID'];
 	$user_nickname = $userdata['user_nickname'];
 	$user_email	= $userdata['user_email'];
@@ -194,7 +193,6 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
 
 	$userdata = get_userdatabylogin($user_login);
 	// echo 'got data for: ', $userdata['user_login'];
-	// echo 'level: ', $userdata['user_level'];
 
 	if( !$pass_is_md5 ) $user_pass = md5( $user_pass );
 	// echo 'pass: ', $user_pass, '/', $userdata['user_pass'];

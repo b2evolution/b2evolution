@@ -152,10 +152,6 @@ case 'editpost':
 	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 
 	param( 'post_ID', 'integer', true );
-
-	if ($user_level == 0)	// TODO: this is not enough!
-	die ("Cheatin' uh ?");
-
 	param( "post_autobr", 'integer', 0 );
 	param( "post_pingback", 'integer', 0 );
 	param( 'trackback_url', 'string' );
@@ -279,9 +275,6 @@ case 'publish':
 	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 	$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
-	if ($user_level == 0)	// TODO: this is not enough!
-	die ("Cheatin' uh ?");
-
 	$post_date = date('Y-m-d H:i:s', $localtimenow);
 	$post_title = $postdata['Title'];
 	$post_url = $postdata['Url'];
@@ -366,10 +359,6 @@ case "delete":
 	// Check permission:
 	$current_User->check_perm( 'blog_del_post', '', true, $blog );
 
-	$authordata = get_userdata($postdata['Author_ID']);
-	if ($user_level < $authordata['user_level'])
-	die (sprintf( T_('You don\'t have the right to delete <strong>%s</strong>\'s posts.'), $authordata['user_login'] ));
-
 	echo "<div class=\"panelinfo\">\n";
 	echo '<h3>', T_('Deleting post...'), "</h3>\n";
 
@@ -400,10 +389,6 @@ case "deletecomment":
 	 * --------------------------------------------------------------------
 	 * DELETE comment from db:
 	 */
-
-	if ($user_level == 0)
-		die ("Cheatin' uh ?");
-
 	param( 'comment_ID', 'integer', true );
 	// echo $comment_ID;
 	$edited_Comment = Comment_get_by_ID( $comment_ID );
@@ -427,10 +412,6 @@ case "editedcomment":
 	 * --------------------------------------------------------------------
 	 * UPDATE comment in db:
 	 */
-
-	if ($user_level == 0)
-		die (T_("Cheatin' uh ?"));
-
 	param( 'comment_ID', 'integer', true );
 	// echo $comment_ID;
 	$edited_Comment = Comment_get_by_ID( $comment_ID );
@@ -467,8 +448,8 @@ case "editedcomment":
 	$edited_Comment->set( 'author_email', $newcomment_author_email );
 	$edited_Comment->set( 'author_url', $newcomment_author_url );
 
-	if (($user_level > 4) && $edit_date) 
-	{
+	if( $edit_date && $current_User->check_perm( 'edit_timestamp' )) 
+	{	// We use user date
 		$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );
 	}
 

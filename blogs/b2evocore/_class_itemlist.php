@@ -630,7 +630,9 @@ class ItemList
 		{	// We are in preview mode!
 			//	echo 'PREVIEW';
 			// we need globals for the param function
-			global $preview_userid, $preview_date, $post_status, $post_lang, $content, $post_title, $post_url, $post_category, $post_autobr, $edit_date, $aa, $mm, $jj, $hh, $mn, $ss, $user_level, $localtimenow;
+			global $preview_userid, $preview_date, $post_status, $post_lang, $content, 
+							$post_title, $post_url, $post_category, $post_autobr, $edit_date, 
+							$aa, $mm, $jj, $hh, $mn, $ss, $localtimenow;
 	
 			$id = 0;
 			param( 'preview_userid', 'integer', true );

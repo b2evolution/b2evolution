@@ -64,7 +64,7 @@ for( $curr_blog_ID=blog_list_start();
 	{	// We could select a blog:
 		get_blogparams();
 		
-		if( ($user_level == 0) || ! $current_User->is_blog_member( $blog ) )
+		if( ! $current_User->is_blog_member( $blog ) )
 		{	
 			die( 'Permission denied.');
 		}

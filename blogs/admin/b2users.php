@@ -68,11 +68,6 @@ switch ($action)
 		$user_data=get_userdata($id);
 		$usertopromote_level = get_user_info( 'level', $user_data );
 		
-		if ($user_level <= $usertopromote_level) 
-		{
-			die(T_('Can\'t change the level of an user whose level is higher than yours.'));
-		}
-	
 		if ($prom == "up") 
 		{
 			$sql="UPDATE $tableusers SET user_level=user_level+1 WHERE ID = $id";
@@ -93,18 +88,10 @@ switch ($action)
 		// Check permission:
 		$current_User->check_perm( 'users', 'edit', true );
 	
-		param( 'id', 'integer' );
-		if (!$id) 
-		{
-			header("Location: b2users.php");
-		}
+		param( 'id', 'integer', true );
 	
 		$user_data=get_userdata($id);
 		$edited_User = new User( $user_data );
-		$usertodelete_level=$user_data['level'];
-	
-		if ($user_level <= $usertodelete_level)
-		die(T_('Can\'t delete an user whose level is higher than yours.'));
 	
 		// Delete from DB:
 		$edited_User->dbdelete();
