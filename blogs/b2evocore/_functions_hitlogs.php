@@ -278,6 +278,24 @@ function antiSpam_domain()
 }
 
 /*
+ * get_domain_from_hit_ID(-)
+ *
+ * Gets the baseDomain for a certain hit ID. (duh)
+ */
+function get_domain_from_hit_ID( $hit_ID )
+{
+	global $tablehitlog, $querycount;
+
+	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = $hit_ID LIMIT 1";
+	$querycount++;
+	$q = mysql_query($sql) or mysql_oops( $sql );
+	while( list($domain) = mysql_fetch_row($q) )
+	{
+		return $domain;
+	}
+}
+
+/*
  * domain_ban(-)
  *
  * Ban a domain
@@ -286,13 +304,7 @@ function domain_ban( $hit_ID )
 {
 	global $tablehitlog, $tableantispam, $querycount, $deluxe_ban;
 
-	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = $hit_ID LIMIT 1";
-	$querycount++;
-	$q = mysql_query($sql) or mysql_oops( $sql );
-	while( list($tmp) = mysql_fetch_row($q) )
-	{
-		$domain = $tmp;
-	}
+	$domain = get_domain_from_hit_ID($hit_ID);
 	$sql ="INSERT INTO $tableantispam VALUES ('', '$domain')";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
@@ -330,28 +342,14 @@ function keyword_ban( $keyword )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-	#	$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$domain%'";	// This is quite drastic!
-	#	$querycount++;
-	#	mysql_query($sql) or mysql_oops( $sql );
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
 		
 		// Then comments
-	#	$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
-	#	$querycount++;
-	#	mysql_query($sql) or mysql_oops( $sql );
-	
-	/*	Deleting with LIKE doesn't work like that ^^ - I have to do something like listed on http://www.mysql.com/doc/en/DELETE.html
-			CREATE TEMPORARY TABLE tmptable
-		SELECT A.* FROM table1 AS A, table1 AS B
-		WHERE A.username LIKE '%2'
-		AND A.ID = B.ID
-		AND A.username <> B.username;
-
-		DELETE table1 FROM table1
-		INNER JOIN tmptable
-		ON table1.username = tmptable.username;
-		
-	*/
-
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
 	}
 }
 
@@ -372,11 +370,22 @@ function remove_ban( $hit_ID )
 /*
  * ban_affected_hits(-)
  */
-function ban_affected_hits($keyword)
+function ban_affected_hits($banned, $type)
 {
-	global 	$querycount, $tablehitlog, $res_affected_hits;
+	global  $querycount, $tablehitlog, $res_affected_hits;
 
-	$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%' ORDER BY baseDomain ASC";
+	switch( $type )
+	{
+		case "hit_ID":
+			$domain = get_domain_from_hit_ID($banned);
+			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain = $domain ORDER BY baseDomain ASC";
+			break;
+		case "keyword":
+		default:
+			// Assume it's a keyword
+			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
+			break;
+	}
 	$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
@@ -384,11 +393,22 @@ function ban_affected_hits($keyword)
 /*
  * ban_affected_comments(-)
  */
-function ban_affected_comments()
+function ban_affected_comments($banned, $type)
 {
-	global 	$querycount, $tablecomments, $res_affected_comments;
+	global  $querycount, $tablecomments, $res_affected_comments;
 
-	$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%' ORDER BY comment_date ASC";
+	switch( $type )
+	{
+		case "hit_ID":
+			$domain = get_domain_from_hit_ID($banned);
+			$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$domain%' ORDER BY comment_date ASC";
+			break;
+		case "keyword":
+		default:
+			// Assume it's a keyword
+			$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$banned%' ORDER BY comment_date ASC";
+			break;
+	}
 	$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
