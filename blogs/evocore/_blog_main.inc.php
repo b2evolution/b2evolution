@@ -54,8 +54,6 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
-
 
 /**
  * Initialize everything:
@@ -332,6 +330,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/24 00:20:03  blueyed
+ * DB_USER is not always defined (scripts from /xmlsrc)
+ *
  * Revision 1.6  2005/02/21 00:34:34  blueyed
  * check for defined DB_USER!
  *
