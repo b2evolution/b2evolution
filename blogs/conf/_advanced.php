@@ -163,6 +163,23 @@ $db_aliases = array(
 		'T_plugins'      => $tableprefix.'plugins',
 	);
 
+
+/**
+ * CREATE TABLE options.
+ *
+ * Edit those if you have control over you MySQL server and want a more professional
+ * database than what is commonly offered by popular hosting providers.
+ *
+ * @global $db_table_options
+ */
+// Low ranking MySQL hosting compatibility Default:
+$db_table_options = '';
+// Recommended settings:
+# $db_table_options = ' ENGINE=InnoDB ';
+// Development settings:
+# $db_table_options = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
+
+
 /**#@+
  * Old b2 tables used exclusively by the upgrade mode of the install script
  *

@@ -32,9 +32,31 @@ function upgrade_cafelog_tables()
 	// forcing paged mode because this works so much better !!!
 	// You can always change it back in the options if you don't like it.
 	$query = "SELECT archive_mode, time_difference, AutoBR FROM $oldtablesettings";
+// FP: I'm not sure the following is a good optimization! What if we want to rename the setting names and stop using the names from b2!?? I think you must pass an array of values where you manually set the setting names you want to use. You MUST NOT pass the direct query results.
+//	create_default_settings( $DB->get_row( $query, ARRAY_A ) );
 
-	create_default_settings( $DB->get_row( $query, ARRAY_A ) );
+	$q = $DB->get_row( $query, ARRAY_A );
 
+	$query = "INSERT INTO T_settings (set_name, set_value)
+						VALUES
+									('db_version', '$new_db_version'),
+									('default_locale', '$default_locale'),
+									('posts_per_page', '5'),
+									('what_to_show', 'paged'),
+									('archive_mode', '".$q['archive_mode']."'),
+									('time_difference', '".$q['time_difference']."'),
+									('AutoBR', '".$q['AutoBR']."'),
+									('antispam_last_update', '2000-01-01 00:00:00'),
+									('newusers_grp_ID', '".$Group_Users->get('ID')."' ),
+									('newusers_level', '1'),
+									('newusers_canregister', '0'),
+									('links_extrapath', '0'),
+									('permalink_type', 'urltitle'),
+									( 'user_minpwdlen', '5' )
+									";
+
+	$DB->query( $query );
+	echo "OK.<br />\n";
 
 	echo 'Copying Cafelog users... ';
 	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,

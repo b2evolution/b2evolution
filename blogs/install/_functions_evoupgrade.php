@@ -143,7 +143,7 @@ function upgrade_b2evo_tables()
 	create_b2evo_tables_091();
 
 	if( $old_db_version < 8010 )
-	{{{
+	{
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE T_users
 							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
@@ -185,21 +185,21 @@ function upgrade_b2evo_tables()
 			$DB->query($query_update_wordcount);
 		}
 		echo "OK. (".count($q)." rows updated)<br />\n";
-	}}}
+	}
 
 
 	if( $old_db_version < 8020 )
-	{{{
+	{
 		echo 'Encoding passwords... ';
 		$query = "UPDATE T_users
 							SET user_pass = MD5(user_pass)";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-	}}}
+	}
 
 
 	if( $old_db_version < 8030 )
-	{{{
+	{
 		echo 'Deleting unecessary logs... ';
 		$query = "DELETE FROM T_hitlog
 							WHERE hit_ignore = 'badchar'";
@@ -228,11 +228,11 @@ function upgrade_b2evo_tables()
 			$DB->query( $query_update_blog );
 		}
 		echo "OK. (".count($q)." rows updated)<br />\n";
-	}}}
+	}
 
 
 	if( $old_db_version < 8040 )
-	{{{ // upgrade to 0.8.7
+	{ // upgrade to 0.8.7
 		create_antispam();
 
 		echo 'Upgrading Settings table... ';
@@ -240,11 +240,11 @@ function upgrade_b2evo_tables()
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-	}}}
+	}
 
 
 	if( $old_db_version < 8050 )
-	{{{ // upgrade to 0.8.9
+	{ // upgrade to 0.8.9
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
@@ -320,7 +320,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8050' );
-	}}}
+	}
 
 
 	if( $old_db_version < 8060 )

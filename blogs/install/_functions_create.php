@@ -710,7 +710,7 @@ If you wish, you can delete these posts one by one after you have read them. You
  */
 function create_default_settings( $override = array() )
 {
-	global $Group_Users;
+	global $DB, $new_db_version, $default_locale, $Group_Users;
 
 	$defaults = array(
 								'db_version' => $new_db_version,

@@ -72,7 +72,7 @@ $main_init = true;
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
 if( !$config_is_done )
-{
+{ // base config is not done!
 	$error_message = 'Base configuration is not done! (see /conf/_config.php)';
 }
 elseif( !isset( $locales[$default_locale] ) )
@@ -129,7 +129,7 @@ require_once( dirname(__FILE__).'/_db.class.php' );
  *
  * @global DB $DB
  */
-$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
+$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases, $db_table_options );
 
 require_once( dirname(__FILE__).'/_results.class.php' );
 
@@ -282,6 +282,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.6  2004/10/28 11:11:09  fplanque
+ * MySQL table options handling
+ *
  * Revision 1.5  2004/10/21 00:14:44  blueyed
  * moved
  *

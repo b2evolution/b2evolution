@@ -112,11 +112,17 @@ class DB
 	var $dbreplaces = array();
 
 	/**
+	 * CREATE TABLE options.
+	 */
+	var $dbtableoptions;
+
+
+	/**
 	 * DB Constructor
 	 *
 	 * connects to the server and selects a database
 	 */
-	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $halt_on_error = true )
+	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $dbtableoptions = '', $halt_on_error = true )
 	{
 		$this->halt_on_error = $halt_on_error;
 
@@ -166,7 +172,11 @@ class DB
 			// echo '<br />'.'#\b'.$dbalias.'\b#';
 		}
 		// echo count($this->dbaliases);
+
+
+		$this->dbtableoptions = $dbtableoptions;
 	}
+
 
 	/**
 	 * Select a DB (if another one needs to be selected)
@@ -277,6 +287,11 @@ class DB
 
 		// Replace aliases:
 		$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
+
+		if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
+		{	// Query is a table creation, we add table options:
+			$query .= $this->dbtableoptions;
+		}
 
 		// Keep track of the last query for debug..
 		$this->last_query = $query;
@@ -659,6 +674,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/28 11:11:09  fplanque
+ * MySQL table options handling
+ *
  * Revision 1.2  2004/10/14 16:28:41  fplanque
  * minor changes
  *
