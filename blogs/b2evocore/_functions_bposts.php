@@ -25,7 +25,7 @@ function bpost_create(
 	$main_cat_ID = 1,									// Main cat ID
 	$extra_cat_IDs = array(),			// Table of extra cats
 	$post_status = 'published',
-	$post_locale = 'en_US',
+	$post_locale = 'en-US',
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
@@ -100,7 +100,7 @@ function bpost_update(
 	$main_cat_ID = 1,							// Main cat ID
 	$extra_cat_IDs = array(),			// Table of extra cats
 	$post_status = 'published',
-	$post_locale = 'en_US',
+	$post_locale = 'en-US',
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,

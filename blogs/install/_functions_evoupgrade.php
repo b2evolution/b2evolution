@@ -28,7 +28,7 @@ function upgrade_b2evo_tables()
 
 	// Check DB version:
 	check_db_version();
-	if( $old_db_version == $new_db_version )
+	if( $old_db_version != $new_db_version )
 	{
 		echo '<p>The database schema is already up to date. There is nothing to do.</p>';
 		echo '<p>You can <a href="../admin/b2edit.php">log in</a> with your usual b2 username and password.</p>';
@@ -129,7 +129,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8040 )
-	{
+	{ // upgarde to 0.8.7
 		create_antispam();
 
 		echo 'Upgrading Settings table...';
@@ -141,7 +141,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8050 )
-	{
+	{ // upgrade to 0.8.9
 		echo 'Upgrading blogs table...';
 		$query = "ALTER TABLE $tableblogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
@@ -217,19 +217,32 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8060 )
-	{
+	{	// upgrade to 0.8.9+CVS
+
+		create_locales();
+		
 		echo 'Upgrading posts table...';
 		$query = "ALTER TABLE $tableposts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
-							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' AFTER post_issue_date,
+							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
+										AFTER post_issue_date,
+							CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US'
 							DROP INDEX post_date,
-							ADD INDEX post_issue_date (post_issue_date)";
+							ADD INDEX post_issue_date( post_issue_date ),
+							ADD UNIQUE post_urltitle( post_urltitle )";
 		$q = mysql_query($query) or mysql_oops( $query );
 
 		$query = "UPDATE $tableposts
 							SET post_mod_date = post_issue_date";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
+
+		echo 'Upgrading blogs table...';
+		$query = "ALTER TABLE $tableblogs 
+							CHANGE blog_lang blog_locale varchar(10) NOT NULL default 'en-US'";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
+		
 	}
 
 
@@ -241,15 +254,8 @@ function upgrade_b2evo_tables()
 		 * everywhere where needed in this file.
 		 */
 		
-		create_locales();
-		
-		// change name of blog_lang to blog_locale
-		$query = "ALTER TABLE $tableblogs CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en_US'";
-		$q = mysql_query($query) or mysql_oops( $query );
-		
-		// change name of post_lang to post_locale
-		$query = "ALTER TABLE $tableposts CHANGE post_lang post_locale varchar(20) NOT NULL default 'en_US'";
-		$q = mysql_query($query) or mysql_oops( $query );
+		// FP to DH: some stuff already moved and merged with previous block
+		// Following needs rewrite
 		
 		// convert given languages to locales, for blogs and posts
 		foreach( array(

@@ -22,7 +22,7 @@ class Blog extends DataObject
 	var $tagline;
 	var $shortdesc;	// description
 	var $longdesc;
-	var $lang;
+	var $locale;
 	var $siteurl;
 	var $filename;
 	var $staticfilename;

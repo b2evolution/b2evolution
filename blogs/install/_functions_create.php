@@ -85,7 +85,7 @@ function create_b2evo_tables()
 		blog_tagline varchar(250) NULL default '',
 		blog_description varchar(250) NULL default '',
 		blog_longdesc TEXT NULL DEFAULT NULL,
-		blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
+		blog_locale VARCHAR(10) NOT NULL DEFAULT 'en-US',
 		blog_siteurl varchar(120) NOT NULL default '$baseurl',
 		blog_filename varchar(30) NULL default 'blog.php',
 		blog_staticfilename varchar(30) NULL default NULL,
@@ -132,7 +132,7 @@ function create_b2evo_tables()
 		post_mod_date datetime NOT NULL default '0000-00-00 00:00:00',
 		post_status enum('published','deprecated','protected','private','draft')
 									NOT NULL default 'published',
-		post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
+		post_locale VARCHAR(10) NOT NULL DEFAULT 'en-US',
 		post_content text NOT NULL,
 		post_title text NOT NULL,
 		post_urltitle VARCHAR(50) NULL DEFAULT NULL,
@@ -145,11 +145,12 @@ function create_b2evo_tables()
 		post_karma int(11) NOT NULL default '0',
 		post_wordcount int(11) default NULL,
 		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-		PRIMARY KEY post_ID (ID),
-		KEY post_issue_date (post_issue_date),
-		KEY post_category (post_category),
-		KEY post_author (post_author),
-		KEY post_status (post_status)
+		PRIMARY KEY post_ID( ID ),
+		INDEX post_issue_date( post_issue_date ),
+		INDEX post_category( post_category ),
+		INDEX post_author( post_author ),
+		INDEX post_status( post_status )
+		UNIQUE post_urltitle( post_urltitle )
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
@@ -268,7 +269,7 @@ function create_locales()
 		loc_lang varchar(30) NOT NULL default '',
 		loc_messages varchar(10) NOT NULL default '',
 		loc_enabled tinyint(4) NOT NULL default '1',
-		PRIMARY KEY  (loc_locale)
+		PRIMARY KEY loc_locale( loc_locale )
 	) COMMENT='saves available locales'";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
