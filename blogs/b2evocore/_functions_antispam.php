@@ -334,7 +334,7 @@ function b2evonet_poll_abuse( $display = true )
 		$response = $result->value();
 		if( $response->kindOf() == 'struct' )
 		{	// Decode struct:
-			$response = xmlrpc_decode($response);
+			$response = xmlrpc_decode_recurse($response);
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{	
 				echo T_('Incomplete reponse.')."\n";

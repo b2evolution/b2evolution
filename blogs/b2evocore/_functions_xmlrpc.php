@@ -1106,33 +1106,46 @@ function iso8601_decode($idate, $utc=0) {
 *                                                               *
 * author: Dan Libby (dan@libby.com)                             *
 ****************************************************************/
+/*
+ * We add xmlrpc_decode_recurse because the default PHP implemtaion of xmlrpc_decode
+ * won't recurse! Bleh!
+ */
+function xmlrpc_decode_recurse($xmlrpc_val) 
+{
+	 $kind = $xmlrpc_val->kindOf();
+
+	 if($kind == "scalar") {
+		return $xmlrpc_val->scalarval();
+	 }
+	 else if($kind == "array") {
+		$size = $xmlrpc_val->arraysize();
+		$arr = array();
+
+		for($i = 0; $i < $size; $i++) {
+		 $arr[]=xmlrpc_decode_recurse($xmlrpc_val->arraymem($i));
+		}
+		return $arr; 
+	 }
+	 else if($kind == "struct") {
+		$xmlrpc_val->structreset();
+		$arr = array();
+
+		while(list($key,$value)=$xmlrpc_val->structeach()) 
+		{
+			$arr[$key] = xmlrpc_decode_recurse($value);
+			// echo $key, '=>', $arr[$key], '<br />';
+		}
+		return $arr;
+	 }
+}
+
 if (!function_exists('xmlrpc_decode')) {
-	function xmlrpc_decode($xmlrpc_val) {
-	   $kind = $xmlrpc_val->kindOf();
-
-	   if($kind == "scalar") {
-		  return $xmlrpc_val->scalarval();
-	   }
-	   else if($kind == "array") {
-		  $size = $xmlrpc_val->arraysize();
-		  $arr = array();
-
-		  for($i = 0; $i < $size; $i++) {
-			 $arr[]=xmlrpc_decode($xmlrpc_val->arraymem($i));
-		  }
-		  return $arr; 
-	   }
-	   else if($kind == "struct") {
-		  $xmlrpc_val->structreset();
-		  $arr = array();
-
-		  while(list($key,$value)=$xmlrpc_val->structeach()) {
-			 $arr[$key] = xmlrpc_decode($value);
-		  }
-		  return $arr;
-	   }
+	function xmlrpc_decode($xmlrpc_val) 
+	{
+		return xmlrpc_decode_recurse( $xmlrpc_val ) ;
 	}
 }
+
 
 /****************************************************************
 * xmlrpc_encode takes native php types and encodes them into    *

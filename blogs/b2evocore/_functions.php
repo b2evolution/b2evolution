@@ -761,7 +761,8 @@ function xmlrpc_displayresult( $result, $log = '' )
 	}
 
 	// We'll display the response:
-	$value = xmlrpc_decode($result->value());
+	$val = $result->value();
+	$value = xmlrpc_decode_recurse($result->value());
 	if (is_array($value))
 	{
 		$value_arr = '';
