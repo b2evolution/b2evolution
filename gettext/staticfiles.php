@@ -28,6 +28,7 @@ define( 'DEFAULT_TARGET', 'en-EU' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
 
 param('highlight_untranslated', 'integer', 0 );
+param('action', 'string', '' );
 
 
 // look what translations we have
@@ -77,10 +78,28 @@ merge: creates all static files for which there are .po files in the current dir
 		exit;
 	}
 }
-else
+elseif( $action == '' )
 {
+	htmlmenu();
+}
+
+function htmlmenu()
+{
+	global $targets, $highlight_untranslated;
 	echo '
+	<hr>
 	<br />	
+	<form method="get" class="fform">
+	<fieldset style="width:50%">
+		<legend>merge</legend>
+		<input type="hidden" name="action" value="merge" />
+		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
+		highlight untranslated strings
+		<br /><br />(available locales/targets: '.implode(', ', $targets).')
+		<br /><br /><input type="submit" value="create static files from locales .po files" class="search" />
+	</fieldset>
+	</form>
+	
 	<form method="get" class="fform">
 	<fieldset style="width:50%">
 		<legend>extract</legend>
@@ -91,24 +110,11 @@ else
 		<input type="submit" value="extract" class="search" />
 	</fieldset>
 	</form>
-	
-	<form method="get">
-	<fieldset style="width:50%">
-		<legend>merge</legend>
-		<input type="hidden" name="action" value="merge" />
-		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
-		highlight untranslated strings
-		<br /><br />(available locales/targets: '.implode(', ', $targets).')
-		<br /><br /><input type="submit" value="create static files from locales .po files" class="search" />
-	</fieldset>
-	</form>
-		
-';
-	log_('<hr>');
-	param( 'action', 'string', '' );
+	<br /><br />
+	';
+
 	if( empty($action) )
 	{
-		echo('Please choose an action..<br />');
 		exit;
 	}
 };
@@ -568,8 +574,10 @@ switch( $action )
 
 log_('');
 log_('Finito.');
+
 if( !isset($argv) )
 {
+	htmlmenu();
 	echo '</body></html>';
 }
 
