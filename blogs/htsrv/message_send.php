@@ -13,6 +13,10 @@
 // Initialize everything:
 require_once dirname(__FILE__).'/../evocore/_main.inc.php';
 
+
+// TODO: Use Hit class to prevent mass mailings to members..
+
+
 // Getting GET or POST parameters:
 param( 'blog', 'integer', '' );
 param( 'recipient_id', 'integer', '' );
@@ -26,12 +30,13 @@ param( 'message', 'string', '' );
 // Getting current blog info:
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
+// Prevent register_globals injection!
+$recipient_address = '';
+
 if( !empty( $recipient_id ) )
 { // Get the email address for the recipient if a member.
 	$user = & $UserCache->get_by_ID( $recipient_id );
-	// fplanque: this fails on my mailserver:
-	// $recipient_address = trim($user->get('preferedname')) . ' <' . $user->get('email') . '>';
-	$recipient_address = $user->get('email');
+	$recipient_address = trim($user->get('preferedname')) . ' <' . $user->get('email') . '>';
 	// Change the locale so the email is in the recipients language
 	locale_temp_switch($user->locale);
 }
@@ -42,9 +47,7 @@ elseif( !empty( $comment_id ) )
 					FROM T_comments
 					WHERE comment_ID =' . $comment_id;
 	$row = $DB->get_row( $sql );
-	// fplanque: this fails on my mailserver:
-	// $recipient_address = trim($row->comment_author) . ' <' . $row->comment_author_email . '>';
-	$recipient_address = $row->comment_author_email;
+	$recipient_address = trim($row->comment_author) . ' <' . $row->comment_author_email . '>';
 }
 
 if( empty($recipient_address) )
