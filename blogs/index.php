@@ -11,7 +11,7 @@
 <body>
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-<div id="tagline"><?php echo T_('A blog tool like it oughta be!') ?></div>
+<div id="tagline"><?php echo T_('Multilingual multiuser multiblog engine!') ?></div>
 <div id="quicklinks"><?php echo T_('My blogs') ?>:
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	$display_blog_list = 1;			// Force display even if disabled in conf
