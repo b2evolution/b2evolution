@@ -34,7 +34,7 @@ else
 
 
 // Generate available blogs list:
-$blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?blog=%d' );
+$blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?tab='.$tab.'&amp;blog=%d' );
 
 require dirname(__FILE__).'/_menutop.php';
 
@@ -103,6 +103,10 @@ if( $blog )
 	echo '<div class="left_col">';
 		switch( $tab )
 		{
+			case 'postlist':
+				require dirname(__FILE__).'/_browse_posts_list.inc.php';
+				break;
+
 			case 'posts':
 				require dirname(__FILE__).'/_edit_showposts.php';
 				break;
