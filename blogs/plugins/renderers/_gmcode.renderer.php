@@ -24,7 +24,7 @@ class gmcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
-	var $priority = 40;
+	var $priority = 45;
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true; 
 	var $apply_to_xml = false; // Leave the GMcode markup
@@ -42,7 +42,12 @@ class gmcode_Rendererplugin extends RendererPlugin
 											'# (?<!:) \x2f\x2f (.+?) \x2f\x2f #x',		// //italics// (not preceded by : as in http://)
 											'# __ (.+?) __ #x',		// __underline__
 											'/ \#\# (.+?) \#\# /x',		// ##tt##
-											'/ %% (.+?) %% /sx'		// %codeblock%#
+											'/ %%								
+												( \s*? \n )? 				# Eat optional blank line after %%%
+												(.+?) 
+												( \n \s*? )? 				# Eat optional blank line before %%%
+												%%
+											/sx'		// %%codeblock%%
 											);
 	
 	/**
@@ -56,7 +61,7 @@ class gmcode_Rendererplugin extends RendererPlugin
 											'<em>$1</em>',
 											'<span style="text-decoration:underline">$1</span>',
 											'<tt>$1</tt>',
-											'<div class="codeblock"><pre><code>$1</code></pre></div>'
+											'<div class="codeblock"><pre><code>$2</code></pre></div>'
 											);
 
 

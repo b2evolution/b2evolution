@@ -273,7 +273,7 @@ function convert_chars( $content, $flag='html' )
 	global $b2_htmltrans, $b2_htmltranswinuni;
 
 	// Convert highbyte non ASCII/UTF-8 chars to urefs:
-	if (locale_charset(false) != 'utf-8')
+	if( (locale_charset(false) != 'utf-8') && (locale_charset(false) != 'gb2312') )
 	{	// This is a single byte charset
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',

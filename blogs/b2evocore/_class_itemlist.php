@@ -71,10 +71,36 @@ class ItemList extends DataObjectList
 	 */
 	var $last_displayed_date = '';
 
-	/*
-	 * ItemList::ItemList(-)
-	 *
+	/**
 	 * Constructor
+	 *
+	 * {@internal ItemList::ItemList(-)}}
+	 *
+	 * @param integer Blog ID
+	 * @param array show_statuses
+	 * @param mixed Specific post number to display
+	 * @param mixed YearMonth(Day) to display
+	 * @param mixed Week number
+	 * @param mixed List of cats to restrict to
+	 * @param array Array of cats to restrict to
+	 * @param mixed List of authors to restrict to
+	 * @param string sort order can be either ASC or DESC
+	 * @param string space separated list of fields to order by. Possible list elements are: 
+	 *               author issue_date mod_date status locale content title urltitle url ctageory
+	 *               wordcount comments
+	 * @param mixed # of posts to display on the page
+	 * @param mixed List page number in paged display
+	 * @param mixed Start results at this position
+	 * @param mixed End results at this position
+	 * @param string Search string
+	 * @param mixed Search for sentence or for words
+	 * @param mixed Require exact match of title or contents
+	 * @param boolean Is this preview
+	 * @param mixed 
+	 * @param mixed 
+	 * @param mixed Do not show posts before this timestamp, can be 'now'
+	 * @param mixed Do not show posts after this timestamp, can be 'now'
+	 * @param string urltitle of post to display
 	 */
 	function ItemList(
 		$blog = 1,

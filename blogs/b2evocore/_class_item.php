@@ -22,10 +22,21 @@ require_once dirname(__FILE__).'/_class_dataobject.php';
  */
 class Item extends DataObject
 {
+	/**
+	 * @var User
+	 * @access public
+	 */
 	var $Author;
 	var $issue_date;
 	var $mod_date;
 	var $status;
+	/**
+	 * locale code for the Item content
+	 *
+	 * examples: en-US, zh-CN-utf-8
+	 *
+	 * @var string
+	 */
 	var $locale;
 	var $title;
 	var $urltitle;
@@ -36,9 +47,16 @@ class Item extends DataObject
 	var $renderers;
 	var $comments;			// Comments status
 	var $url;					// Should move
+	/**
+	 * @var boolean
+	 * @deprecated
+	 */
 	var $autobr = 0;		// Should move
-	var $views = 0;
-	// Derived:
+	/**
+	 * Derived from $main_cat_ID
+   *
+	 * @var integer
+	 */
 	var $blog_ID;
 
 	/**
@@ -673,7 +691,7 @@ class Item extends DataObject
 	}
 
 
-	/*
+	/**
 	 * Template function: Displays link to feedback page (under some conditions)
 	 *
 	 * {@internal Item::feedback_link(-)}}
@@ -681,12 +699,11 @@ class Item extends DataObject
 	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
 	 * @param string String to display before the link (if comments are to be displayed)
 	 * @param string String to display after the link (if comments are to be displayed)
-	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
-	 * @param boolean true to hide if no feedback ('#' for default)
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
-	 * @param string Link text to display when there are >1 comments
-	 * @param string Link title
+	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
+	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
+	 * @param boolean true to hide if no feedback ('#' for default)
 	 * @param string 'pid' or 'title'
 	 * @param string url to use
 	 */
