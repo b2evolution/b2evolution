@@ -1,16 +1,47 @@
 <?php
 /**
- * This file implements the UI controller for file management.
+ * This file implements the UI controller for file management. {{{
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ *
+ * @version $Id$ }}}
  *
  * @todo: thumbnail view
  * @todo: PHPInfo (special permission)
  * @todo: directly run PHP-code (eval)
  *
- * @package admin
  */
 
 require_once dirname(__FILE__).'/_header.php';
@@ -29,7 +60,8 @@ param( 'filter_regexp', 'integer', NULL );
 param( 'order', 'string', NULL );
 param( 'asc', '', NULL );
 
-param( 'root', 'string', NULL );   // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+param( 'root', 'string', NULL );    // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+
 
 if( $current_User->login != 'demouser' && $current_User->level < 10 )
 { // allow demouser, but noone else below level 10
@@ -446,13 +478,33 @@ switch( $action ) // {{{ (we catched empty action before)
 		else
 		{
 			$msg_action = '
-			<form action="files.php">
+			<form name="form_chmod" action="files.php">
 			'.$Fileman->form_hiddeninputs().'
 			<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 			<input type="hidden" name="action" value="editperm" />
-			<input type="text" name="chmod" value="'.$curFile->get_perms( 'octal' ).'" maxlength="3" size="3" />
+			';
+			if( is_windows() )
+			{
+				$msg_action .= '<input id="chmod_readonly" name="chmod" type="radio" value="444" '
+				.( $curFile->get_perms( 'octal' ) == 444 ? 'checked="checked" ' : '' ).'/>
+				<label for="chmod_readonly">'.T_('Read-only').'</label><br />
+				<input id="chmod_readwrite" name="chmod" type="radio" value="666" '
+				.( $curFile->get_perms( 'octal' ) == 666 ? 'checked="checked" ' : '' ).'/>
+				<label for="chmod_readwrite">'.T_('Read and write').'</label><br />';
+			}
+			else
+			{
+				$msg_action .= '<input type="text" name="chmod" value="'.$curFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
+			}
+			$msg_action .= '
 			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
-			</form>';
+			</form>
+			<script type="text/javascript">
+				<!--
+				document.form_chmod.chmod.focus();
+				// -->
+			</script>
+			';
 		}
 
 		break;
@@ -524,11 +576,6 @@ switch( $action ) // {{{ (we catched empty action before)
 
 // the top menu and header
 require dirname(__FILE__).'/_menutop.php';
-echo '<br />'.T_('Current directory').': '.$Fileman->cwd_clickable();
-if( $Fileman->is_filtering() )
-{
-	echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';
-}
 require dirname(__FILE__).'/_menutop_end.php';
 
 
@@ -558,7 +605,6 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 
 ?>
 <div class="panelblock">
-<div class="toolbar">
 	<?php
 	$rootlist = $Fileman->get_roots();
 
@@ -622,8 +668,19 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 	<div class="clear"></div>
 </div>
 
+
+<div class="panelblock">
 <form name="FilesForm" action="files.php" method="post">
 <table class="grouped">
+<caption>
+<?php
+echo T_('Current directory').': '.$Fileman->cwd_clickable();
+if( $Fileman->is_filtering() )
+{
+	echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';
+}
+?>
+</caption>
 <thead>
 <tr>
 	<th colspan="2">
@@ -647,19 +704,19 @@ param( 'checkall', 'integer', NULL );  // Non-Javascript-CheckAll
 $i = 0;
 $Fileman->sort();
 
-while( $File = $Fileman->get_File_next() )
+while( $lFile = $Fileman->get_File_next() )
 { // loop through all Files
 	?>
 	<tr<?php if( $i%2 ) echo ' class="odd"' ?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $File->get_name(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->get_name(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
 		<td class="icon" onclick="window.location.href = '<?php echo $Fileman->get_link_curfile() ?>'">
 			<?php echo $Fileman->get_icon( 'cfile', 'imgtag' ) ?>
 		</td>
 		<td class="filename">
-			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click(); window.open('<?php echo $Fileman->get_link_curfile().( $File->is_dir() ? '&amp;mode=browseonly' : '' ) ?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php echo $i ?>'), 'toolbar=0,resizable=yes,<?php
-			if( $r = $File->get_imgsize( 'widthheight' ) )
+			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click(); window.open('<?php echo $Fileman->get_link_curfile().( $lFile->is_dir() ? '&amp;mode=browseonly' : '' ) ?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php echo $i ?>'), 'toolbar=0,resizable=yes,<?php
+			if( $r = $lFile->get_imgsize( 'widthheight' ) )
 			{ // make the popup 42px wider/higher than the image
 				echo 'width='.($r[0]+42).',height='.($r[1]+42);
 			}
@@ -672,15 +729,17 @@ while( $File = $Fileman->get_File_next() )
 			</button>
 			<a onclick="clickedonlink = 1;" href="<?php echo $Fileman->get_link_curfile() ?>">
 			<?php
-			echo $File->get_name();
-			disp_cond( $File->get_imgsize(), ' (%s)' )
+			echo $lFile->get_name();
+			disp_cond( $lFile->get_imgsize(), ' (%s)' )
 			?>
 			</a>
 		</td>
 		<td class="type"><?php echo $Fileman->get_File_type() ?></td>
-		<td class="size"><?php echo $File->get_nicesize() ?></td>
-		<td class="timestamp"><?php echo $File->get_lastmod() ?></td>
-		<td class="perms"><?php disp_cond( $Fileman->get_link_curfile_editperm(), '<a href="%s">'.$File->get_perms().'</a>' ) ?></td>
+		<td class="size"><?php echo $lFile->get_nicesize() ?></td>
+		<td class="timestamp"><?php echo $lFile->get_lastmod() ?></td>
+		<td class="perms"><?php
+			disp_cond( $Fileman->get_link_curfile_editperm(),
+									'<a href="%s">'.$lFile->get_perms( $Fileman->permlikelsl ? 'lsl' : '' ).'</a>' ) ?></td>
 		<td class="actions"><?php
 			disp_cond( $Fileman->get_link_curfile_edit(), '<a href="%s">'.$Fileman->get_icon( 'edit', 'imgtag' ).'</a>' );
 			disp_cond( $Fileman->get_link_curfile_copymove(), '<a href="%s">'.$Fileman->get_icon( 'copymove', 'imgtag' ).'</a>' );
@@ -737,7 +796,7 @@ function openselectedfiles()
 // -->
 </script>
 <tr class="group"><td colspan="8">
-	<a id="checkallspan_0" name="hui" href="<?php
+	<a id="checkallspan_0" href="<?php
 		echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
 		?>" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]'); return false;"><?php
 		if( !isset($checkall) )
@@ -755,6 +814,12 @@ function openselectedfiles()
 	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
 	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
 	<input type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
+	&mdash; <?php
+	disp_cond( $Fileman->get_countdirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+	echo ', ';
+	disp_cond( $Fileman->get_countfiles(), T_('One file'), T_('%d files'), T_('No files' ) );
+	echo ', '.bytesreadable( $Fileman->get_countbytes() );
+	?>
 </td></tr>
 <?php
 }}}
@@ -768,18 +833,22 @@ function openselectedfiles()
 	param( 'options_show', 'integer', 0 );
 	?>
 	<form class="toolbaritem" action="files.php" method="post">
+		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
+			onclick="return toggle_options();"><?php
+			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
+
 		<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
-			<?php echo T_('Sort directories at top') ?>
-			<input type="checkbox" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />
+			<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />
+			<label for="option_dirsattop"><?php echo T_('Sort directories at top') ?></label>
 			<br />
-			<?php echo T_('Show hidden files') ?>
-			<input type="checkbox" name="option_showhidden" value="1"<?php if( $UserSettings->get('fm_showhidden') ) echo ' checked="checked"' ?> />
+			<input type="checkbox" id="option_showhidden" name="option_showhidden" value="1"<?php if( $UserSettings->get('fm_showhidden') ) echo ' checked="checked"' ?> />
+			<label for="option_showhidden"><?php echo T_('Show hidden files') ?></label>
 			<br />
-			<?php echo T_('File permissions like &quot;ls -l&quot;') ?>
-			<input type="checkbox" name="option_permlikelsl" value="1"<?php if( $UserSettings->get('fm_permlikelsl') ) echo ' checked="checked"' ?> />
+			<input type="checkbox" id="option_permlikelsl" name="option_permlikelsl" value="1"<?php if( $UserSettings->get('fm_permlikelsl') ) echo ' checked="checked"' ?> />
+			<label for="option_permlikelsl"><?php echo T_('File permissions like &quot;ls -l&quot;') ?></label>
 			<br />
-			<?php echo T_('Recursive size of directories') ?>
-			<input type="checkbox" name="option_recursivedirsize" value="1"<?php if( $UserSettings->get('fm_recursivedirsize') ) echo ' checked="checked"' ?> />
+			<input type="checkbox" id="option_recursivedirsize" name="option_recursivedirsize" value="1"<?php if( $UserSettings->get('fm_recursivedirsize') ) echo ' checked="checked"' ?> />
+			<label for="option_recursivedirsize"><?php echo T_('Recursive size of directories') ?></label>
 			<br />
 
 			<?php echo $Fileman->form_hiddeninputs() ?>
@@ -790,14 +859,9 @@ function openselectedfiles()
 			</div>
 		</div>
 
-
-		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
-			onclick="javascript:toggle_options();"><?php
-			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
 		<script type="text/javascript">
 		<!--
-			showoptions = <?php echo ($options_show) ? 'false' : 'true' ?>;
-			toggle_options();
+			showoptions = <?php echo ($options_show) ? 'true' : 'false' ?>;
 
 			function toggle_options()
 			{
@@ -815,10 +879,10 @@ function openselectedfiles()
 				}
 				document.getElementById('options_list').style.display = display_list;
 				document.getElementById('options_toggle').replaceChild(replace, document.getElementById( 'options_toggle' ).firstChild);
+				return false;
 			}
 		// -->
 		</script>
-
 	</form>
 
 	<form action="files.php" name="filter" class="toolbaritem">
