@@ -2,7 +2,6 @@
 /**
  * This file implements the abstract DataObject base class.
  *
- *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -358,6 +357,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/14 21:01:06  fplanque
+ * minor fixes
+ *
  * Revision 1.5  2004/11/26 19:38:35  fplanque
  * no message
  *

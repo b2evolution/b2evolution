@@ -268,7 +268,7 @@ class ItemList extends DataObjectList
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
-			$where .= " AND '.$dbprefix.'urltitle = '$title'";
+			$where .= ' AND '.$dbprefix."urltitle = '$title'";
 		}
 
 		/*
@@ -658,7 +658,7 @@ class ItemList extends DataObjectList
 										'' AS ".$this->dbprefix."flags,
 										".bpost_count_words( $content )." AS ".$this->dbprefix."wordcount,
 										'open' AS ".$this->dbprefix."comments,
-										'".$DB->escape( $post_renderers )."' AS ".$this->dbprefix."renderers";
+										'".$DB->escape( $post_renderers )."' AS ".$this->dbprefix.'renderers';
 	}
 
 
@@ -967,6 +967,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.8  2004/12/14 21:01:06  fplanque
+ * minor fixes
+ *
  * Revision 1.7  2004/12/14 18:32:15  fplanque
  * quick optimizations
  *

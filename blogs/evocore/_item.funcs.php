@@ -468,7 +468,7 @@ function Item_get_by_title( $urltitle )
 									post_content, post_title, post_urltitle, post_url, post_main_cat_ID,
 									post_flags, post_wordcount, post_comments,
 									post_renderers, post_views, cat_blog_ID
-					FROM T_posts INNER JOIN T_categories ON post_category = cat_ID
+					FROM T_posts INNER JOIN T_categories ON post_main_cat_ID = cat_ID
 					WHERE post_urltitle = ".$DB->quote($urltitle);
 
 	if( ! ($row = $DB->get_row( $sql )) )
@@ -946,7 +946,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 			$blah = explode('and', $excluded_categories);
 			foreach($blah as $category) {
 				$category = intval($category);
-				$sql_exclude_cats .= " AND post_category != $category";
+				$sql_exclude_cats .= " AND post_main_cat_ID != $category";
 			}
 		}
 
@@ -1661,6 +1661,9 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/14 21:01:06  fplanque
+ * minor fixes
+ *
  * Revision 1.4  2004/12/13 21:29:58  fplanque
  * refactoring
  *
