@@ -49,7 +49,7 @@ elseif( $use_l10n == 2 )
 		if( !isset($trans[ $messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
-			include_once dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
+			@include_once dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
 			if( !isset($trans[ $messages ] ) )
 			{	// Still not loaded... file doesn't exist, memorize that no translation are available
 				// echo 'file not found!'; 
@@ -230,15 +230,16 @@ function locale_timefmt()
 
 
 /**
- * Display locale flag
+ * Template function: Display locale flag
  *
  * {@internal locale_flag(-)}}
  *
  * @param string locale to use, '' for current
  * @param string collection name (subdir of img/flags)
  * @param string name of class for IMG tag
+ * @param string deprecated HTML align attribute
  */
-function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag' )
+function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '' )
 {
 	global $locales, $current_locale, $core_dirout, $img_subdir, $img_url;
 	
@@ -253,6 +254,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag' )
 	}
 	echo '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" ';
 	if( !empty( $class ) ) echo ' class="', $class, '"';
+	if( !empty( $align ) ) echo ' align="', $align, '"';
 	echo '/> ';
 
 }
