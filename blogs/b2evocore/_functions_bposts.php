@@ -1238,13 +1238,27 @@ function is_new_day()
  */
 function bpost_count_words($string)
 {
+	$string = trim(strip_tags($string));
 	if( function_exists( 'str_word_count' ) )
 	{
-		return str_word_count(strip_tags($string));
+		return str_word_count($string);
 	}
-	
-	// TODO: alternative counting for PHP < 4.3
-	return 0;
+
+	/* In case str_word_count() doesn't exist (to accomodate PHP < 4.3).
+		(Code adapted from post by "brettNOSPAM at olwm dot NO_SPAM dot com" at
+		PHP documentation page for str_word_count(). A better implementation
+		probably exists.)
+	*/
+	if($string == '')
+	{
+		return 0;
+	}
+
+	$pattern = "/[^(\w|\d|\'|\"|\.|\!|\?|;|,|\\|\/|\-\-|:|\&|@)]+/";
+	$string = preg_replace($pattern, " ", $string);
+	$string = count(explode(" ", $string));
+
+	return $string;
 }
 
 ?>
