@@ -181,6 +181,8 @@ class Plugins
 	/**
 	 * Sort the list of {@link Plugins}.
 	 *
+	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
+	 *
 	 * @param string Order: 'priority' (default), 'name'
 	 */
 	function sort( $order = 'priority' )
@@ -628,7 +630,9 @@ function sort_Plugin_priority( & $a, & $b )
 }
 
 /**
- * Callback function to sort plugins by priority
+ * Callback function to sort plugins by name
+ *
+ * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
  */
 function sort_Plugin_name( & $a, & $b )
 {
@@ -637,6 +641,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.9  2005/03/02 18:44:27  fplanque
+ * comments
+ *
  * Revision 1.8  2005/03/02 17:07:34  blueyed
  * no message
  *
