@@ -50,6 +50,7 @@
 	width:2%;
 }
 #filemanmain table.grouped td.type {
+	white-space: nowrap;
 	width:15%;
 }
 #filemanmain table.grouped td.filename {

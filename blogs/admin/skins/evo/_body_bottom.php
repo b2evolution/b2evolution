@@ -32,6 +32,11 @@
  *
  * @version $Id$
  */
+if( empty($mode) )
+{ // We're not running in an special mode (bookmarklet, sidebar...)
+	?>
+	</div>
+	<?php
+	}
 ?>
-</div>
 </div>

@@ -895,18 +895,19 @@ function populate_main_tables()
 	// Admin for blog A:
 	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-							bloguser_perm_cats, bloguser_perm_properties)
+							bloguser_perm_cats, bloguser_perm_properties, 
+							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 						VALUES
-							( $blog_all_ID, ".$User_Admin->get('ID').", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_a_ID, ".$User_Admin->get('ID').", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_b_ID, ".$User_Admin->get('ID').", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_linkblog_ID, ".$User_Admin->get('ID').", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_a_ID, ".$User_Demo->get('ID').", 1,
-							'draft', 0, 0, 0, 0 )";
+							( $blog_all_ID, ".$User_Admin->ID.", 1,
+							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+							( $blog_a_ID, ".$User_Admin->ID.", 1,
+							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+							( $blog_b_ID, ".$User_Admin->ID.", 1,
+							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+							( $blog_linkblog_ID, ".$User_Admin->ID.", 1,
+							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+							( $blog_a_ID, ".$User_Demo->ID.", 1,
+							'draft', 0, 0, 0, 0, 0, 0, 0 )";
 	$DB->query( $query );
 
 	echo "OK.<br />\n";

@@ -629,7 +629,7 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
- * Revision 1.8  2005/01/03 15:17:52  fplanque
+ * Revision 1.9  2005/01/03 19:15:15  fplanque
  * no message
  *
  * Revision 1.7  2004/12/30 23:07:02  blueyed

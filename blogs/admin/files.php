@@ -963,16 +963,16 @@ if( isset( $msg_action )
 
 // Quick links to usual homes for user, group and maybe blog...:
 echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'
-			.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> ';
+			.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
 // TODO: add group home...
 // TODO: add blog home?
 
 
 // Display available roots list:
 $rootlist = $Fileman->getRootList();
-if( count($rootlist) > 1 )
+//if( count($rootlist) > 1 )
 { // provide list of roots
-	echo '<form action="files.php" name="roots" class="toolbaritem">'
+	echo '<form action="files.php" name="roots" class="inline">'
 				.$Fileman->getFormHiddenInputs( array( 'root' => false ) );
 	echo '<select name="root" onchange="this.form.submit()">';
 
@@ -997,10 +997,10 @@ if( count($rootlist) > 1 )
 				."</form>\n";
 }
 
+echo '<div>';
 
 // Display current dir:
 echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
-
 
 // Display current filter:
 if( $Fileman->isFiltering() )
@@ -1016,6 +1016,8 @@ echo ', ';
 disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
 echo ', '.bytesreadable( $Fileman->countBytes() );
 echo ')</span>';
+
+echo '</div>';
 
 
 /**
