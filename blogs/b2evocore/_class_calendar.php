@@ -173,15 +173,15 @@ class Calendar
 		 * - set to '' (empty) to disable
 		 * - %d gets replaced with the number of posts on that day/month
 		 */
-		$this->postcount_month_cell = '';                            // in table cell (behind day)
-		$this->postcount_month_cell_one = '';                        //  -- " -- [for single post]
-		$this->postcount_month_atitle = T_('%d posts on this day');  // in archive links title tag
-		$this->postcount_month_atitle_one = T_('one post on this day');  //  -- " -- [for single post]
-		#$this->postcount_year_cell = ' (%d)';                        // in table cell (behind abbr of month)
+		$this->postcount_month_cell = '';                           // in table cell (behind day)
+		$this->postcount_month_cell_one = '';                       //  -- " -- [for single post]
+		$this->postcount_month_atitle = T_('%d posts'); 						// in archive links title tag
+		$this->postcount_month_atitle_one = T_('1 post');  					//  -- " -- [for single post]
+		#$this->postcount_year_cell = ' (%d)';                      // in table cell (behind abbr of month)
 		$this->postcount_year_cell   = '';
 		$this->postcount_year_cell_one   = '';
-		$this->postcount_year_atitle = T_('%d posts in this month'); // in archive links title tag
-		$this->postcount_year_atitle_one = T_('one post in this month'); // in archive links title tag
+		$this->postcount_year_atitle = T_('%d posts'); 							// in archive links title tag
+		$this->postcount_year_atitle_one = T_('1 post'); 						// in archive links title tag
 		/**#@-*/
 	}
 

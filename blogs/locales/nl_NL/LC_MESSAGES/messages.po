@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 03:08+0200\n"
+"POT-Creation-Date: 2004-05-13 13:54+0200\n"
 "PO-Revision-Date: 2004-05-11 22:10+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: b2evolution <>\n"
@@ -2278,19 +2278,13 @@ msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
 "FOUT! Kon niet verwijderen! Je moet het bestand [%s] met de hand verwijderen."
 
-#, php-format
-msgid "%d posts on this day"
-msgstr "%d artikelen op deze dag"
+#, fuzzy, php-format
+msgid "%d posts"
+msgstr "artikelen"
 
-msgid "one post on this day"
-msgstr "één artikel op deze dag"
-
-#, php-format
-msgid "%d posts in this month"
-msgstr "%d artikelen in deze maand"
-
-msgid "one post in this month"
-msgstr "één artikel in deze maand"
+#, fuzzy
+msgid "1 post"
+msgstr "artikelen"
 
 msgid "previous month"
 msgstr "vorige maand"
@@ -3907,6 +3901,12 @@ msgstr ""
 msgid "GreyMatter style formatting"
 msgstr ""
 
+# C:\www\b2evolution\blogs\plugins\renderers\_gmcode.renderer.php:59
+msgid ""
+"**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with "
+"white space."
+msgstr ""
+
 msgid "Convert text smilies to icons"
 msgstr ""
 
@@ -4056,6 +4056,18 @@ msgstr "[...] Lees Meer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
+
+#~ msgid "%d posts on this day"
+#~ msgstr "%d artikelen op deze dag"
+
+#~ msgid "one post on this day"
+#~ msgstr "één artikel op deze dag"
+
+#~ msgid "%d posts in this month"
+#~ msgstr "%d artikelen in deze maand"
+
+#~ msgid "one post in this month"
+#~ msgstr "één artikel in deze maand"
 
 #~ msgid ""
 #~ "Database you want to install into (These settings should be provided by "

@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-13 03:08+0200\nPO-Revision-Date: 2004-05-13 03:09+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-13 13:54+0200\nPO-Revision-Date: 2004-05-13 14:00+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",
@@ -647,10 +647,8 @@ $trans['fr_FR'] = array(
 	'New group...' => "Nouveau groupe...",
 	'The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>...' => "L'habillage par défaut [%s] affecté au blog [%s] n'existe pas. Il doit être correctement configuré dans les <a %s>propriétés du blog</a> ou dans le fichier stub. Contactez le <a %s>webmaster</a>...",
 	'ERROR! Could not delete! You will have to delete the file [%s] by hand.' => "ERREUR! Impossible de supprimer! Vous devrez supprimer le fichier [%s] à la main.",
-	'%d posts on this day' => "%d articles postés ce jour",
-	'one post on this day' => "un article ce jour",
-	'%d posts in this month' => "%d article postés ce mois",
-	'one post in this month' => "un article ce mois",
+	'%d posts' => "%d articles",
+	'1 post' => "1 article",
 	'previous month' => "mois précédent",
 	'next month' => "mous suivant",
 	'previous year' => "année précédente",
@@ -1070,6 +1068,7 @@ $trans['fr_FR'] = array(
 	'Automatic &lt;P&gt; and &lt;BR&gt; tags' => "Tagsc &lt;P&gt; et &lt;BR&gt; automatiques",
 	'BB formatting e-g [b]bold[/b]' => "Formatage BB e-g [b]bold[/b]",
 	'GreyMatter style formatting' => "Formatage GreuMatter",
+	'**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with white space.' => "**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with white space.",
 	'Convert text smilies to icons' => "Convertit les smilies texte en icones",
 	'Humane Web Text Generator' => "Générateur de texte web humain",
 	'Easy HTML tags inserting' => "Insertion rapide de tags HTML",

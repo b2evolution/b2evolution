@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 03:08+0200\n"
+"POT-Creation-Date: 2004-05-13 13:54+0200\n"
 "PO-Revision-Date: 2004-04-11 22:15+0100\n"
 "Last-Translator: Matteo Lenardon <freshprz@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2333,21 +2333,13 @@ msgstr ""
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
 
-#, php-format
-msgid "%d posts on this day"
-msgstr ""
+#, fuzzy, php-format
+msgid "%d posts"
+msgstr "post"
 
 #, fuzzy
-msgid "one post on this day"
-msgstr "Elimina hits per questa data!"
-
-#, php-format
-msgid "%d posts in this month"
-msgstr ""
-
-#, fuzzy
-msgid "one post in this month"
-msgstr "Oops, nessun post con questo ID."
+msgid "1 post"
+msgstr "post"
 
 #, fuzzy
 msgid "previous month"
@@ -3983,6 +3975,12 @@ msgstr ""
 msgid "GreyMatter style formatting"
 msgstr ""
 
+# C:\www\b2evolution\blogs\plugins\renderers\_gmcode.renderer.php:59
+msgid ""
+"**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with "
+"white space."
+msgstr ""
+
 msgid "Convert text smilies to icons"
 msgstr ""
 
@@ -4133,6 +4131,14 @@ msgstr "Continua..."
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nuovo pingback al tuo post #%d \"%s\""
+
+#, fuzzy
+#~ msgid "one post on this day"
+#~ msgstr "Elimina hits per questa data!"
+
+#, fuzzy
+#~ msgid "one post in this month"
+#~ msgstr "Oops, nessun post con questo ID."
 
 #~ msgid "Error "
 #~ msgstr "Error "

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 03:08+0200\n"
+"POT-Creation-Date: 2004-05-13 13:54+0200\n"
 "PO-Revision-Date: 2004-05-13 00:01+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -2282,19 +2282,13 @@ msgstr ""
 "FEHLER! Löschen fehlgeschlagen! Du wirst die Datei [%s] von Hand löschen "
 "müssen."
 
-#, php-format
-msgid "%d posts on this day"
-msgstr "%d Einträge an diesem Tag"
+#, fuzzy, php-format
+msgid "%d posts"
+msgstr "Einträge"
 
-msgid "one post on this day"
-msgstr "ein Eintrag an diesem Tag"
-
-#, php-format
-msgid "%d posts in this month"
-msgstr "%d Einträge in diesem Monat"
-
-msgid "one post in this month"
-msgstr "ein Eintrag in diesem Monat"
+#, fuzzy
+msgid "1 post"
+msgstr "Einträge"
 
 msgid "previous month"
 msgstr "voriger Monat"
@@ -3995,6 +3989,12 @@ msgstr "BB-Formatierung zB [b]fett[/b]"
 msgid "GreyMatter style formatting"
 msgstr "GreyMatter Style Formatierung"
 
+# C:\www\b2evolution\blogs\plugins\renderers\_gmcode.renderer.php:59
+msgid ""
+"**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with "
+"white space."
+msgstr ""
+
 msgid "Convert text smilies to icons"
 msgstr "Konvertiere Textsmilies zu Icons"
 
@@ -4142,6 +4142,18 @@ msgstr "[...] Lies mehr!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
+#~ msgid "%d posts on this day"
+#~ msgstr "%d Einträge an diesem Tag"
+
+#~ msgid "one post on this day"
+#~ msgstr "ein Eintrag an diesem Tag"
+
+#~ msgid "%d posts in this month"
+#~ msgstr "%d Einträge in diesem Monat"
+
+#~ msgid "one post in this month"
+#~ msgstr "ein Eintrag in diesem Monat"
 
 #~ msgid ""
 #~ "Database you want to install into (These settings should be provided by "

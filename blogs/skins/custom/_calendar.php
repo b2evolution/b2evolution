@@ -45,9 +45,9 @@
 	// - %d gets replaced with the number of posts on that day/month
 	// - required spaces must be set
 	// $Calendar->set( 'postcount_month_cell', '' );                           // in table cell (behind day)
-	// $Calendar->set( 'postcount_month_atitle', T_('%d posts on this day');   // in archive links title tag
+	// $Calendar->set( 'postcount_month_atitle', T_('%d posts');   // in archive links title tag
 	// $Calendar->set( 'postcount_year_cell', ' (%d)';                         // in table cell (behind abbr of month)
-	// $Calendar->set( 'postcount_year_atitle', T_('%d posts in this month');  // in archive links title tag
+	// $Calendar->set( 'postcount_year_atitle', T_('%d posts');  // in archive links title tag
 
 
 	// DISPLAY NOW!

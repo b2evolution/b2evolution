@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 03:08+0200\n"
+"POT-Creation-Date: 2004-05-13 13:54+0200\n"
 "PO-Revision-Date: 2003-09-12 00:51+0100\n"
 "Last-Translator: Héctor Delcourt <flikarmonth_NOQUIEROSPAM_@iespana.es>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2237,20 +2237,13 @@ msgstr ""
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
 
-#, php-format
-msgid "%d posts on this day"
-msgstr ""
-
-msgid "one post on this day"
-msgstr ""
-
-#, php-format
-msgid "%d posts in this month"
-msgstr ""
+#, fuzzy, php-format
+msgid "%d posts"
+msgstr "hilos"
 
 #, fuzzy
-msgid "one post in this month"
-msgstr "Oops, no existe ningun hilo con este ID."
+msgid "1 post"
+msgstr "hilos"
 
 #, fuzzy
 msgid "previous month"
@@ -3786,6 +3779,12 @@ msgstr ""
 msgid "GreyMatter style formatting"
 msgstr ""
 
+# C:\www\b2evolution\blogs\plugins\renderers\_gmcode.renderer.php:59
+msgid ""
+"**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with "
+"white space."
+msgstr ""
+
 msgid "Convert text smilies to icons"
 msgstr ""
 
@@ -3938,6 +3937,10 @@ msgstr "[...] Leer mas!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nuevo pingback en tu hilo #%d \"%s\""
+
+#, fuzzy
+#~ msgid "one post in this month"
+#~ msgstr "Oops, no existe ningun hilo con este ID."
 
 #~ msgid "Error "
 #~ msgstr "Error"
