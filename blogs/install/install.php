@@ -218,14 +218,14 @@ switch( $action )
 			to
 			<pre>$allow_evodb_reset = 1;</pre>
 			<p>Then reload this page and resetting will take place.</p>
-			<p>Back to <a href="install.php<?php if( $default_locale != 'en-EU' ) echo '?locale='.$default_locale ?>">menu</a>.</p>
+			<p>Back to <a href="install.php?locale=<?php $default_locale ?>">menu</a>.</p>
 			<?php
 			break;
 		}
 		db_delete();
 		?>
 		<p>Reset done!</p>
-		<p>Back to <a href="install.php<?php if( $default_locale != 'en-EU' ) echo '?locale='.$default_locale ?>">menu</a>.</p>
+		<p>Back to <a href="install.php?locale=<?php $default_locale ?>">menu</a>.</p>
 		<?php
 		break;
 
@@ -239,7 +239,7 @@ switch( $action )
 		?>
 		<h2>What do you want to install?</h2>
 		<form action="install.php" method="get">
-			<?php if( $default_locale != 'en-EU' ) echo '<input type="hidden" name="locale" value="'.$default_locale.'" />' ?>
+			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 			<p>The database tables installation can be done in different ways. Choose one:</p>
 			<p><input type="radio" name="action" value="newdb" checked="checked"> <strong>New Install</strong>: Install b2evolution database tables with sample data.</p>
 			<p><input type="radio" name="action" value="evoupgrade"> <strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!</p>
