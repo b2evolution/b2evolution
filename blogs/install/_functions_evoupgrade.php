@@ -641,7 +641,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Altering Locales table... ';
 		$DB->query( 'ALTER TABLE T_locales
-									ADD loc_startofweek TINYINT UNSIGNED NOT NULL AFTER loc_timefmt' );
+									ADD loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER loc_timefmt' );
 		echo "OK.<br />\n";
 
 

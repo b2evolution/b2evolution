@@ -320,7 +320,7 @@ function create_locales()
 		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
 		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
 		loc_timefmt varchar(10) NOT NULL default 'H:i:s',
-		loc_startofweek TINYINT UNSIGNED NOT NULL,
+		loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
 		loc_name varchar(40) NOT NULL default '',
 		loc_messages varchar(20) NOT NULL default '',
 		loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
@@ -1016,7 +1016,7 @@ function create_b2evo_tables_092()
 								link_title          		TEXT              NULL,
 								PRIMARY KEY (link_ID),
 								INDEX link_item_ID( link_item_ID ),
-								INDEX link_dest_item_ID (link_dest_item_ ID),
+								INDEX link_dest_item_ID (link_dest_item_ID),
 								INDEX link_file_ID (link_file_ID)
 								)" );
 	echo "OK.<br />\n";
