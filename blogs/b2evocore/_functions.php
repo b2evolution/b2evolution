@@ -14,23 +14,19 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Includes:
  */
-require_once( dirname(__FILE__). '/_functions_cats.php' );
-require_once( dirname(__FILE__). '/_functions_blogs.php' );
-require_once( dirname(__FILE__). '/_functions_bposts.php' );
-require_once( dirname(__FILE__). '/_functions_users.php' );
-require_once( dirname(__FILE__). '/_functions_trackback.php' );
-require_once( dirname(__FILE__). '/_functions_pingback.php' );
-require_once( dirname(__FILE__). '/_functions_pings.php' );
-require_once( dirname(__FILE__). '/_functions_skins.php' );
-require_once( dirname(__FILE__). '/_functions_antispam.php' );
-require_once( dirname(__FILE__). '/_functions_onlineusers.php' );
-require_once( dirname(__FILE__). '/_functions_message.php' );
+require_once dirname(__FILE__).'/_functions_cats.php';
+require_once dirname(__FILE__).'/_functions_blogs.php';
+require_once dirname(__FILE__).'/_functions_bposts.php';
+require_once dirname(__FILE__).'/_functions_users.php';
+require_once dirname(__FILE__).'/_functions_trackback.php';
+require_once dirname(__FILE__).'/_functions_pingback.php';
+require_once dirname(__FILE__).'/_functions_pings.php';
+require_once dirname(__FILE__).'/_functions_skins.php';
+require_once dirname(__FILE__).'/_functions_antispam.php';
+require_once dirname(__FILE__).'/_functions_onlineusers.php';
+require_once dirname(__FILE__).'/_functions_message.php';
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
-if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.php' );
-
-
-/* functions... */
-
+if( $use_html_checker ) require_once dirname(__FILE__).'/_class_htmlchecker.php';
 
 
 /**
@@ -38,7 +34,7 @@ if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.ph
  *
  * {@internal mysql_oops(-) }}
  *
- * @deprecated use class DB instead
+ * @deprecated use class DB instead - not used in core anymore
  *
  * @param string The query which led to the error
  * @return boolean success?
@@ -256,7 +252,6 @@ function zeroise($number, $threshold)
 }
 
 
-
 /*
  * Convert all non ASCII chars (except if UTF-8) to &#nnnn; unicode references.
  * Also convert entities to &#nnnn; unicode references if output is not HTML (eg XML)
@@ -407,6 +402,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 	return $j;
 }
 
+
 /**
  * Get start and end day of a week, based on week number and start-of-week
  *
@@ -452,19 +448,30 @@ function antispambot($emailaddy, $mailto = 0) {
 }
 
 
-/*
- * is_email(-)
- *
+/**
  * Check that email address looks valid
  */
-function is_email($user_email) {
+function is_email($user_email)
+{
 	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
 	$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
-	if(strstr($user_email, '@') && strstr($user_email, '.')) {
+	if( strstr($user_email, '@') && strstr($user_email, '.') )
+	{
 		return (bool)(preg_match($chars, $user_email));
-	} else {
+	}
+	else
+	{
 		return false;
 	}
+}
+
+
+/**
+ * Are we running on a Windows server?
+ */
+function is_windows()
+{
+	return isset( $_SERVER['WINDIR'] );
 }
 
 
@@ -1170,6 +1177,7 @@ function debug_info( $force = false )
 	}
 }
 
+
 /**
  * Output Buffer handler.
  *
@@ -1194,28 +1202,26 @@ function obhandler( $output )
 		$lastmodified = time();
 	}
 
-
-	// strip each line
+	// trim each line
 	$output = explode("\n", $output);
 	$out = '';
 	foreach ($output as $v)
-		$out .= trim($v) . "\n";
+	{
+		$out .= trim($v)."\n";
+	}
 
 	if( $use_etags )
 	{ // Generating ETAG
 
-		// prefix with PUB or AUT.
-		if( is_logged_in() )
-			$ETag = '"AUT';    // A private page
-		else $ETag = '"PUB'; // and public one
-
+		// prefix with PUB (public page) or AUT (private page).
+		$ETag = is_logged_in() ? '"AUT' : '"PUB';
 		$ETag .= md5( $out ).'"';
 		header( 'ETag: '.$ETag );
 
 		// decide to send out or not
 		if( isset($_SERVER['HTTP_IF_NONE_MATCH'])
 				&& stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) === $ETag )
-		{ // check ETag
+		{ // client has this page already
 			$sendout = false;
 		}
 	}
@@ -1246,7 +1252,7 @@ function obhandler( $output )
 	}
 
 
-	header( 'Content-Length: '. strlen($out) );
+	header( 'Content-Length: '.strlen($out) );
 	return $out;
 }
 
@@ -1345,7 +1351,7 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 
 
 /**
- * checks if a given regular expression is valid.
+ * Checks if a given regular expression is valid.
  *
  * It changes the error_handler and restores it.
  *
@@ -1353,13 +1359,14 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
  * @param string the regular expression to test
  * @return boolean
  */
-Function isRegexp( $sREGEXP )
+function is_regexp( $sREGEXP )
 {
-	$sPREVIOUSHANDLER = Set_Error_Handler ("TrapError");
+	$sPREVIOUSHANDLER = Set_Error_Handler ("trapError");
 	preg_match( '#'.str_replace( '#', '\#', $sREGEXP ).'#', '' );
 	restore_error_handler( $sPREVIOUSHANDLER );
 	return !traperror();
 }
+
 
 /**
  * Meant to replace error handler.
@@ -1386,14 +1393,29 @@ function traperror( $reset = 1 )
 /**
  * if first parameter evaluates to true printf() gets called using the first parameter
  * as args and the second parameter as print-pattern
+ *
  * @param mixed variable to test and print eventually
  * @param string printf-pattern to use (including %s etc to refer to the first param
  */
-function disp_cond( $var, $disp )
+function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
 {
-	if( $var )
+	if( is_numeric($var) && $var > 1 )
 	{
-		printf( $disp, $var );
+		printf( ( $disp_more === NULL ? $disp_one : $disp_more ), $var );
+		return true;
+	}
+	elseif( $var )
+	{
+		printf( $disp_one, $var );
+		return true;
+	}
+	else
+	{
+		if( $disp_none !== NULL )
+		{
+			printf( $disp_none, $var );
+			return false;
+		}
 	}
 }
 ?>
