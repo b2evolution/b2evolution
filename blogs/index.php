@@ -11,7 +11,7 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package main
- * Note: we need at leats one file in the main package	
+ * Note: we need at least one file in the main package	
  */
 
 /**
