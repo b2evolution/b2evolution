@@ -1,18 +1,25 @@
 <?php
-/*--------------------------------------------------
- | TAR/GZIP/BZIP2/ZIP ARCHIVE CLASSES 2.0
- | By Devin Doucette
- | Copyright (c) 2004 Devin Doucette
- | Email: darksnoopy@shaw.ca
- +--------------------------------------------------
- | Email bugs/suggestions to darksnoopy@shaw.ca
- +--------------------------------------------------
- | This script has been created and released under
- | the GNU GPL and is free to use and redistribute
- | only if this copyright statement is not removed
- +--------------------------------------------------*/
+/**
+ * TAR/GZIP/BZIP2/ZIP ARCHIVE CLASSES 2.0
+ * By Devin Doucette
+ * Copyright (c) 2004 Devin Doucette
+ * Email bugs/suggestions to darksnoopy@shaw.ca
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @author Devin Doucette - darksnoopy@shaw.ca
+ *
+ * @package evocore
+ */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Class Archive
+ *
+ * @author Devin Doucette
+ */
 class archive
 {
 	function archive($name)
