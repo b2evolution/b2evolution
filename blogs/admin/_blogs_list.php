@@ -27,7 +27,7 @@
 	for( $curr_blog_ID=blog_list_start(); $curr_blog_ID!=false; $curr_blog_ID=blog_list_next() )
 	{
 		if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )
-		{	// Current user is not allowed to edit cats...
+		{	// Current user is not allowed to edit properties...
 			continue;
 		}
 		?>
@@ -66,7 +66,7 @@
 				<a href="<?php blog_list_iteminfo('staticurl') ?>"><?php echo $staticfilename ?></a>
 				<?php if( $current_User->check_perm( 'blog_genstatic', 'any', false, $curr_blog_ID ) )
 					{ // It is possible to generate a static page ?>
-						[<a href="b2blogs.php?action=GenStatic&blog=<?php blog_list_iteminfo('ID') ?>"><?php
+						[<a href="b2blogs.php?action=GenStatic&amp;blog=<?php blog_list_iteminfo('ID') ?>"><?php
 							/* TRANS: abbrev. for "generate !" */ echo T_('Gen!') ?></a>]
 						<?php
 					}
@@ -77,7 +77,10 @@
 			<?php if( $curr_blog_ID == 1 ) { echo '<td></td>'; }
 			elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 			{ ?>
-			<td class="center"><a href="b2blogs.php?action=delete&blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php printf( /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" /></a></td>
+			<td class="center">
+				<a href="b2blogs.php?action=delete&amp;blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" title="<?php echo T_('Delete this blog!') ?>" onClick="return confirm('<?php printf( /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" /></a>
+				<!--<a href="b2blogs.php?action=copy&amp;blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" title="<?php echo T_('Copy this blog!') ?>" ><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Copy */ T_('Copy') ?>" /></a>-->
+			</td>
 			<?php } ?>
 		</tr>
 		<?php

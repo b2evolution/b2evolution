@@ -24,7 +24,7 @@ switch($action)
 
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
-
+		
 		param( 'blog_name', 'string', 'new weblog' );
 		param( 'blog_shortname', 'string', 'new blog' );
 		param( 'blog_tagline', 'html', '' );
@@ -146,7 +146,7 @@ switch($action)
 		?>
 		<p><strong><?php 
 			printf( T_('You should <a %s>create categories</a> for this blog now!'), 
-			'href="b2categories.php?action=newcat&blog_ID='.$blog_ID.'"' );
+			'href="b2categories.php?action=newcat&amp;blog_ID='.$blog_ID.'"' );
 		?></strong></p>
 		</div>
 		<?php
