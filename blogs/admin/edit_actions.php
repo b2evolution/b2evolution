@@ -85,6 +85,9 @@ switch($action)
 		param( 'post_locale', 'string', $default_locale );
 		param( 'renderers', 'array', array() );
 
+		param( 'item_typ_ID', 'integer', true );
+		param( 'item_st_ID', 'integer', true );
+
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
 			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
@@ -123,7 +126,7 @@ switch($action)
 		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $post_date, $post_category,	
 															$post_extracats, $post_status, $post_locale, '', 0, 
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
-															$post_renderers );
+															$post_renderers, $item_typ_ID, $item_st_ID );
 
 		echo "</div>\n";
 
@@ -183,6 +186,9 @@ switch($action)
 		param( 'renderers', 'array', array() );
 		$post_renderers = $Plugins->validate_list( $renderers );
 
+		param( 'item_typ_ID', 'integer', true );
+		param( 'item_st_ID', 'integer', true );
+
 		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
@@ -231,7 +237,7 @@ switch($action)
 		// UPDATE POST IN DB:
 		$edited_Item->update( $post_title, $content, $post_date, $post_category, $post_extracats,
 													$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle, 
-													$post_url, $post_comments, $post_renderers );
+													$post_url, $post_comments, $post_renderers, $item_typ_ID, $item_st_ID );
 
 		echo '<p>'.T_('Done.').'</p></div>';
 

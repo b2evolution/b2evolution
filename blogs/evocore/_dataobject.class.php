@@ -315,14 +315,25 @@ class DataObject
 	 */
 	function set_param( $parname, $fieldtype, $parvalue, $make_null = false )
 	{
-		global $Debuglog;
+		global $Debuglog, $object_def;
+
+		// Dereference db name for this param:
+		// ATTENTION: the object defs are not yet available for all dataobjects
+		if( isset($object_def[$this->objtype]['db_cols'][$parname]) )
+		{
+			$dbfield = $object_def[$this->objtype]['db_cols'][$parname];
+		}
+		else
+		{	// definition not available: we assume that the fieldname is the same, with the dbprefix prepended:
+			$dbfield = $this->dbprefix.$parname;
+		}
 
 		// Set value:
 		$this->$parname = ($make_null && empty($parvalue)) ? NULL : $parvalue;
-		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.' to '.$this->$parname );
+		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname );
 
 		// Remember change for later db update:
-		$this->dbchange( $this->dbprefix. $parname , $fieldtype, $parname );
+		$this->dbchange( $dbfield, $fieldtype, $parname );
 	}
 
 	/**
@@ -357,6 +368,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.8  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.7  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

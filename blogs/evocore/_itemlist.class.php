@@ -182,7 +182,7 @@ class ItemList extends DataObjectList
 		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 	{
-		global $DB;
+		global $DB, $object_def;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 		global $Settings;
@@ -192,24 +192,6 @@ class ItemList extends DataObjectList
 
 		// Object type handled by this list
 		$this->objType = $objType;
-
-		// Columns to be selected:
-		$this->dbcols = array(
-											$dbprefix.'creator_user_ID',
-											$dbprefix.'datestart',
-											$dbprefix.'datemodified',
-											$dbprefix.'status',
-											$dbprefix.'locale',
-											$dbprefix.'content',
-											$dbprefix.'title',
-											$dbprefix.'urltitle',
-											$dbprefix.'url',
-											$dbprefix.'main_cat_ID',
-											$dbprefix.'flags',
-											$dbprefix.'wordcount',
-											$dbprefix.'comments',
-											$dbprefix.'views',
-											$dbprefix.'renderers' );
 
 		$this->preview = $preview;
 		$this->blog = $blog;
@@ -555,8 +537,7 @@ class ItemList extends DataObjectList
 			$where .= ' AND '.$dbprefix.'datestart <= \''. $date_max.'\'';
 		}
 
-		$this->request = "SELECT DISTINCT $this->dbIDname, "
-																			.implode( ', ', $this->dbcols )
+		$this->request = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType]['db_cols'] )
 										.' FROM ('.$dbtable.' INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
 														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
@@ -972,6 +953,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.11  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.10  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *

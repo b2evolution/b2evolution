@@ -23,7 +23,7 @@ if( !isset($minimum_comment_interval) ) $minimum_comment_interval = 30;
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 
-$commented_Item = Item_get_by_ID( $comment_post_ID );
+$commented_Item = $ItemCache->get_by_ID( $comment_post_ID );
 
 if( ! $commented_Item->can_comment( '', '', '', '' ) )
 {

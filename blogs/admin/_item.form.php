@@ -110,7 +110,7 @@ if( isset($Blog) )
 
  	<span class="line">
 		<label for="item_typ_ID"><strong><?php echo T_('Type') ?>:</strong></label>
-		<select name="item_typ_ID" id="item_typ_ID"><?php $itemTypeCache->option_list( 0, true ) ?></select>
+		<select name="item_typ_ID" id="item_typ_ID"><?php $itemTypeCache->option_list( $edited_Item->typ_ID, ! $edited_Item->typ_required ) ?></select>
 	</span>
 
 	<?php if( $use_post_url )
@@ -305,7 +305,7 @@ if( isset($Blog) )
 		// --------------- EXTRA STATUS --------------
 		?>
 		<label for="item_st_ID"><strong><?php echo T_('Extra status') ?>:</strong></label>
-		<select name="item_st_ID" id="item_st_ID"><?php $itemStatusCache->option_list( 0, true ) ?></select>
+		<select name="item_st_ID" id="item_st_ID"><?php $itemStatusCache->option_list( $edited_Item->st_ID, ! $edited_Item->st_required ) ?></select>
 
 	</fieldset>
 
@@ -514,6 +514,9 @@ if( isset($Blog) )
 <?php
 /*
  * $Log$
+ * Revision 1.4  2004/12/20 19:49:23  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.3  2004/12/17 20:38:51  fplanque
  * started extending item/post capabilities (extra status, type)
  *

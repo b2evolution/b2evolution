@@ -170,14 +170,13 @@ $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
  * Includes:
  */
 require_once dirname(__FILE__).'/_template.funcs.php';    // function to be called from templates
-require_once( dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_xmlrpc.php' );
-require_once( dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_xmlrpcs.php' );
+require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_xmlrpc.php';
+require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_xmlrpcs.php';
 require_once dirname(__FILE__).'/_blog.class.php';
 require_once dirname(__FILE__).'/_itemlist.class.php';
-require_once( dirname(__FILE__).'/_itemcache.class.php' );
-require_once( dirname(__FILE__).'/_commentlist.class.php' );
-require_once( dirname(__FILE__).'/_archivelist.class.php' );
-
+require_once dirname(__FILE__).'/_itemcache.class.php';
+require_once dirname(__FILE__).'/_commentlist.class.php';
+require_once dirname(__FILE__).'/_archivelist.class.php';
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 require_once dirname(__FILE__).'/_element.class.php';
 // Object caches init:
@@ -186,15 +185,15 @@ $UserCache = & new DataObjectCache( 'User', false, 'T_users', 'user_', 'ID' );
 $BlogCache = & new BlogCache();
 $ItemCache = & new ItemCache();
 
-require_once( dirname(__FILE__).'/_calendar.class.php' );
-require_once( dirname(__FILE__).'/_hitlog.funcs.php' );     // referer logging
-require_once( dirname(__FILE__).'/_form.funcs.php' );
+require_once dirname(__FILE__).'/_calendar.class.php';
+require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
+require_once dirname(__FILE__).'/_form.funcs.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_swfcharts.php';
 
 /**
  * Plug-ins init:
  */
-require_once( dirname(__FILE__).'/_plugins.class.php' );
+require_once dirname(__FILE__).'/_plugins.class.php';
 $Plugins = & new Plugins();
 
 
@@ -292,6 +291,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.9  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.8  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *

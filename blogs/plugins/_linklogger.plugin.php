@@ -168,7 +168,7 @@ class linklogger_plugin extends Plugin
 		#pre_dump( $linklogger_urltitle, 'url title' );
 
 		// look up if URL exists  TODO: check if it's in the Autolinkblog!
-		if( ($Item = Item_get_by_title( $linklogger_urltitle )) )
+		if( ($Item = $ItemCache->get_by_urltitle( $linklogger_urltitle, false )) )
 		{ // already there
 			if( $Item->url == $linklogger_redirurl )
 			{ // with exact our URL

@@ -34,7 +34,7 @@ switch($action)
 		 * Display post editing form
 		 */
 		param( 'post', 'integer', true );
-		$edited_Item = Item_get_by_ID( $post );
+		$edited_Item = $ItemCache->get_by_ID( $post );
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
 		$blog = get_catblog($cat);

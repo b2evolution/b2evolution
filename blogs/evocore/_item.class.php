@@ -48,6 +48,33 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 require_once dirname(__FILE__).'/_dataobject.class.php';
 
 /**
+ * Object definition:
+ */
+$object_def['Item'] = array( // definition of the object:
+			'db_cols' => array(	// maps properties to colums:
+										'ID'              => 'ID',
+										'creator_user_ID' => 'post_creator_user_ID',
+										'datestart'       => 'post_datestart',
+										'datemodified'    => 'post_datemodified',
+										'status'          => 'post_status',
+										'locale'          => 'post_locale',
+										'content'         => 'post_content',
+										'title'           => 'post_title',
+										'urltitle'        => 'post_urltitle',
+										'url'             => 'post_url',
+										'main_cat_ID'     => 'post_main_cat_ID',
+										'flags'           => 'post_flags',
+										'wordcount'       => 'post_wordcount',
+										'comments'        => 'post_comments',
+										'views'           => 'post_views',
+										'renderers'       => 'post_renderers',
+										'st_ID'           => 'post_pst_ID',
+										'typ_ID'          => 'post_ptyp_ID',
+									)
+		);
+
+
+/**
  * Item Class
  *
  * @package evocore
@@ -79,6 +106,8 @@ class Item extends DataObject
 	var $renderers;
 	var $comments;			// Comments status
 	var $url;					// Should move
+	var $typ_ID;
+	var $st_ID;
 
 	/**
 	 * Derived from $main_cat_ID
@@ -92,14 +121,22 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::Item(-)}}
 	 *
-	 * @param table Database row
+	 * @param object table Database row
+	 * @param string
+	 * @param string
+	 * @param string
+	 * @param string for derived classes
 	 */
-	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID' )
+	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item' )
 	{
-		global $UserCache;
+		global $UserCache, $object_def;
 
 		// Call parent constructor:
 		parent::DataObject( $dbtable, $dbprefix, $dbIDname );
+
+		$this->objtype = $objtype;
+ 		$this->typ_required = false;	// type NOT required
+ 		$this->st_required = false;	// extra status NOT required
 
 		if( $db_row == NULL )
 		{
@@ -109,40 +146,30 @@ class Item extends DataObject
 		}
 		else
 		{
+			// Dereference db cols definition for this object:
+			$db_cols =  & $object_def[$objtype]['db_cols'];
+
 			$this->ID = $db_row->$dbIDname;
-			$colname = $dbprefix.'creator_user_ID';
-			$this->Author = & $UserCache->get_by_ID( $db_row->$colname ); // NO COPY...(?)
-			$colname = $dbprefix.'datestart';
-			$this->issue_date = $db_row->$colname;
-			$colname = $dbprefix.'datemodified';
-			$this->mod_date = $db_row->$colname;
-			$colname = $dbprefix.'status';
-			$this->status = $db_row->$colname;
-			$colname = $dbprefix.'locale';
-			$this->locale = $db_row->$colname;
-			$colname = $dbprefix.'title';
-			$this->title = $db_row->$colname;
-			$colname = $dbprefix.'urltitle';
-			$this->urltitle = $db_row->$colname;
-			$colname = $dbprefix.'content';
-			$this->content = $db_row->$colname;
-			$colname = $dbprefix.'wordcount';
-			$this->wordcount = $db_row->$colname;
-			$colname = $dbprefix.'main_cat_ID';
-			$this->main_cat_ID = $db_row->$colname;
-			$colname = $dbprefix.'flags';
-			$this->flags = $db_row->$colname;
-			$colname = $dbprefix.'comments';
-			$this->comments = $db_row->$colname;			// Comments status
+			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] ); // NO COPY...(?)
+			$this->issue_date = $db_row->$db_cols['datestart'];
+			$this->mod_date =$db_row->$db_cols['datemodified'];
+			$this->status = $db_row->$db_cols['status'];
+			$this->locale = $db_row->$db_cols['locale'];
+			$this->title = $db_row->$db_cols['title'];
+			$this->urltitle = $db_row->$db_cols['urltitle'];
+			$this->content = $db_row->$db_cols['content'];
+			$this->wordcount = $db_row->$db_cols['wordcount'];
+			$this->main_cat_ID = $db_row->$db_cols['main_cat_ID'];
+			$this->flags = $db_row->$db_cols['flags'];
+			$this->comments = $db_row->$db_cols['comments'];			// Comments status
+			$this->typ_ID = $db_row->$db_cols['typ_ID'];
+			$this->st_ID = $db_row->$db_cols['st_ID'];
 
-			$colname = $dbprefix.'renderers';
 			// echo 'renderers=', $db_row->post_renderers;
-			$this->renderers = explode( '.', $db_row->$colname );
+			$this->renderers = explode( '.', $db_row->$db_cols['renderers'] );
 
-			$colname = $dbprefix.'views';
-			$this->views = $db_row->$colname;
-			$colname = $dbprefix.'url';
-			$this->url = $db_row->$colname;				// Should move
+			$this->views = $db_row->$db_cols['views'];
+			$this->url = $db_row->$db_cols['url'];			// Should move
 
 			// Derived vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
@@ -314,6 +341,21 @@ class Item extends DataObject
 			case 'urltitle': // permalink type where we need no ID
 			default:
 		}
+	}
+
+
+  /**
+	 * Template function: display asignee of item
+	 *
+	 * {@internal Item::assigned_to(-) }}
+	 *
+	 * @param string
+	 * @param string
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function assigned_to( $before = '', $after = '', $format = 'htmlbody' )
+	{
+		// echo $before.$after;
 	}
 
 
@@ -1066,6 +1108,66 @@ class Item extends DataObject
 	}
 
 
+  /**
+	 * Template function: display extra status of item
+	 *
+	 * {@internal Item::extra_status(-) }}
+	 *
+	 * @param string
+	 * @param string
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function extra_status( $before = '', $after = '', $format = 'htmlbody' )
+	{
+		global $itemStatusCache;
+
+		if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, false ) ) )
+		{	// No status:
+			return;
+		}
+
+		$extra_status = $Element->get('name');
+
+		if( $format == 'raw' )
+		{
+			$this->disp( $extra_status, 'raw' );
+		}
+		else
+		{
+			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
+		}
+	}
+
+  /**
+	 * Template function: display type of item
+	 *
+	 * {@internal Item::type(-) }}
+	 *
+	 * @param string
+	 * @param string
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function type( $before = '', $after = '', $format = 'htmlbody' )
+	{
+		global $itemTypeCache;
+
+		if( ! ($Element = $itemTypeCache->get_by_ID( $this->typ_ID, false) ) )
+		{	// No status:
+			return;
+		}
+
+		$extra_status = $Element->get('name');
+
+		if( $format == 'raw' )
+		{
+			$this->disp( $extra_status, 'raw' );
+		}
+		else
+		{
+			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
+		}
+	}
+
 	/**
 	 * Template function: display title for item and link to related URL
 	 *
@@ -1217,7 +1319,12 @@ class Item extends DataObject
 			case 'creator_user_ID':
 			case 'main_cat_ID':
 			case 'wordcount':
-				$this->set_param( $parname, 'number', $parvalue, $make_null );
+				$this->set_param( $parname, 'number', $parvalue, false );
+				break;
+
+			case 'typ_ID':
+			case 'st_ID':
+				$this->set_param( $parname, 'number', $parvalue, true );
 				break;
 
 			default:
@@ -1250,7 +1357,9 @@ class Item extends DataObject
 		$post_urltitle = '',
 		$post_url = '',
 		$post_comments = 'open',
-		$post_renderers = array('default') )
+		$post_renderers = array('default'),
+		$item_typ_ID = 0,
+		$item_st_ID = 0 )
 	{
 		global $DB, $query;
 		global $localtimenow, $default_locale;
@@ -1286,6 +1395,8 @@ class Item extends DataObject
 		$this->set( 'wordcount', bpost_count_words($post_content) );
 		$this->set( 'comments', $post_comments );
 		$this->set( 'renderers', implode('.',$post_renderers) );
+		$this->set( 'typ_ID', $item_typ_ID );
+		$this->set( 'st_ID', $item_st_ID );
 
 		$this->dbinsert();
 
@@ -1326,7 +1437,9 @@ class Item extends DataObject
 		$post_urltitle = '',
 		$post_url = '',
 		$post_comments = 'open',
-		$post_renderers = array() )
+		$post_renderers = array(),
+		$item_typ_ID = 0,
+		$item_st_ID = 0 )
 	{
 		global $DB, $query;
 		global $localtimenow, $default_locale;
@@ -1355,6 +1468,8 @@ class Item extends DataObject
 		$this->set( 'wordcount', bpost_count_words($post_content) );
 		$this->set( 'comments', $post_comments );
 		$this->set( 'renderers', implode('.',$post_renderers) );
+		$this->set( 'typ_ID', $item_typ_ID );
+		$this->set( 'st_ID', $item_st_ID );
 		if( $post_locale != '#' )
 		{ // only update if it was changed
 			$this->set( 'locale', $post_locale );
@@ -1413,6 +1528,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.7  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *

@@ -120,16 +120,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			$Item->anchor(); ?>
 			<div class="bSmallHead">
-				<div class="bSmallHeadRight">
-					<?php
-					locale_flag( $Item->locale, 'h10px' );
-
-					echo '<br />'.T_('Status').': <span class="Status">';
-					$Item->status();
-					echo '</span>';
-					?>
-				</div>
 				<?php
+
+ 					echo '<div class="bSmallHeadRight">';
+					locale_flag( $Item->locale, 'h10px' );
+					echo '</div>';
+
 					echo '<strong>';
 					$Item->issue_date(); echo ' @ '; $Item->issue_time();
 					echo '</strong>';
@@ -143,6 +139,21 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					echo '), ';
 					$Item->views();
 					echo ' '.T_('views');
+
+ 					echo '<div class="bSmallHeadRight">';
+					echo T_('Status').': ';
+					echo '<span class="Status">';
+					$Item->status();
+					echo '</span>';
+					echo '</div>';
+
+					echo '<br />';
+					$Item->type( T_('Type').': ' );
+					$Item->assigned_to( ', '.T_('Assigned to:').' ' );
+
+ 					echo '<div class="bSmallHeadRight">';
+					$Item->extra_status( T_('Extra').': ' );
+					echo '</div>';
 
 					echo '<br />'.T_('Categories').': ';
 					$Item->categories( false );

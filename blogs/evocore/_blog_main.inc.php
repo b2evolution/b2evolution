@@ -190,9 +190,9 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	if( $redirect_to_postblog && ( $disp == 'single' ) )
 	{ // Yes we need to check.
 		if( !empty($p) )
-			$Item = Item_get_by_ID( $p );	// TODO: use cache
+			$Item = $ItemCache->get_by_ID( $p, false );
 		else
-			$Item = Item_get_by_title( $title );	// TODO: use cache
+			$Item = $ItemCache->get_by_urltitle( $title, false );
 
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
@@ -314,6 +314,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *

@@ -82,7 +82,7 @@ class ItemCache extends DataObjectCache
 	 */
 	function get_by_urltitle( $req_urltitle, $halt_on_error = true )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
 		if( !isset( $this->urltitle_index[$req_urltitle] ) )
 		{ // not yet in cache:
@@ -160,6 +160,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.3  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *

@@ -189,70 +189,6 @@ function get_postdata($postid)
 }
 
 
-/**
- * Get an Item by its ID
- *
- * {@internal Item_get_by_ID(-) }}
- *
- * @todo cacheing?
- *
- * @param integer post ID
- * @return Item requested object or false
- */
-function Item_get_by_ID( $post_ID )
-{
-	global $DB, $postdata, $show_statuses;
-
-	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale,
-									post_content, post_title, post_urltitle, post_url, post_main_cat_ID,
-									post_flags, post_wordcount, post_comments,
-									post_renderers, post_views, cat_blog_ID
-					FROM T_posts INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					WHERE ID = $post_ID";
-	// Restrict to the statuses we want to show:
-	// echo $show_statuses;
-	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
-	// get a post before even knowning which blog it belongs to. We can think of putting a security check
-	// back into the Item class)
-	// $sql .= ' AND '.statuses_where_clause( $show_statuses );
-
-	// echo $sql;
-
-	if( ! ($row = $DB->get_row( $sql )) )
-		return false;
-
-	return new Item( $row );	// COPY !
-}
-
-/**
- * Get an Item by its urltitle
- *
- * {@internal Item_get_by_title(-) }}
- *
- * @todo cacheing?
- *
- * @param string url title of Item
- * @return Item requested object or false
- */
-function Item_get_by_title( $urltitle )
-{
-	global $DB, $postdata, $show_statuses;
-
-	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale,
-									post_content, post_title, post_urltitle, post_url, post_main_cat_ID,
-									post_flags, post_wordcount, post_comments,
-									post_renderers, post_views, cat_blog_ID
-					FROM T_posts INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					WHERE post_urltitle = ".$DB->quote($urltitle);
-
-	if( ! ($row = $DB->get_row( $sql )) )
-		return false;
-
-	return new Item( $row );	// COPY !
-}
-
 
 /**
  * get_the_title(-)
@@ -425,11 +361,12 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
 /**
  * {@internal single_post_title(-)}}
  *
- * @todo use cache
+ * @todo posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
+ * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
  */
 function single_post_title( $prefix = '#', $display = 'htmlhead' )
 {
-	global $p, $title, $preview;
+	global $p, $title, $preview, $ItemCache;
 
 	$disp_title = '';
 
@@ -442,13 +379,13 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	}
 	elseif( intval($p) )
 	{
-		$Item = Item_get_by_ID( $p );		// TODO: use cache
-		$disp_title = $Item->get('title');
+		if(	$Item = $ItemCache->get_by_ID( $p, false ) )
+			$disp_title = $Item->get('title');
 	}
 	elseif( !empty( $title ) )
 	{
-		$Item = Item_get_by_title( $title ); // TODO: use cache
-		$disp_title = $Item->get('title');
+		if(	$Item = $ItemCache->get_by_urltitle( $title, false ) )
+			$disp_title = $Item->get('title');
 	}
 
 	if( !empty( $disp_title ) )
@@ -1437,6 +1374,9 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/20 19:49:24  fplanque
+ * cleanup & factoring
+ *
  * Revision 1.6  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

@@ -132,12 +132,7 @@ require(dirname(__FILE__).'/evocore/_main.inc.php');
 	<?php } ?>
 	
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
-<?php
-	if ($debug==1)
-	{
-		echo "Debug: $querycount queries - ".number_format(timer_stop(),3)." seconds";
-	}
-?>
+
 <!-- InstanceEndEditable --></p>
 </body>
 <!-- InstanceEnd --></html>
