@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution localization & language config
- * Version of this file: 0.8.3
+ * Version of this file: 0.8.6
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -35,7 +35,7 @@ $default_locale = 'en_US';
 
 
 $default_locale = 'fr_FR';			// For testing :))
-// $default_locale = 'pt_BR';			// For testing :))
+$default_locale = 'pt_BR';			// For testing :))
 // $default_locale = 'ja_JP';			// For testing :))
 // $default_locale = 'nl_NL';			// For testing :))
 // $default_locale = 'sv_SE';			// For testing :))
@@ -67,6 +67,11 @@ $locales = array(
 	'nl_NL' => array( // Dutch
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd-m-y',
+									'timefmt' => 'H:i:s',	
+								),
+	'pt_BR' => array( // Portuguese / Brazil	
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
 								),
 	'sv_SE' => array( // Sweedish, SWEDEN	
