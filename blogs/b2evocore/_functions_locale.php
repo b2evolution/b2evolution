@@ -82,6 +82,8 @@ else
 /**
  * Temporarily switch to another locale
  *
+ * Calls can be nested.
+ *
  * {@internal locale_temp_switch(-)}}
  *
  * @param string locale to activate
@@ -178,9 +180,9 @@ function locale_by_lang( $lang )
 }
 
 /**
- * {@internal locale_lang(-)}}
+ * Displays/Returns the current locale. (for backward compatibility)
  *
- * Returns the current locale. (for backward compatibility)
+ * {@internal locale_lang(-)}}
  *
  * @param boolean true (default) if we want it to be outputted
  * @return string current locale, if $disp = false
@@ -195,8 +197,10 @@ function locale_lang( $disp = true )
 		return $current_locale;
 }
 
-/*
- * locale_charset(-)
+/**
+ * Returns the charset of the current locale
+ *
+ * {@internal locale_charset(-)}}
  */
 function locale_charset( $disp = true )
 {
@@ -208,8 +212,10 @@ function locale_charset( $disp = true )
 		return $current_charset;
 }
 
-/*
- * locale_datefmt(-)
+/**
+ * Returns the current locale's default date format 
+ *
+ * {@internal locale_datefmt(-)}}
  */
 function locale_datefmt()
 {
@@ -218,8 +224,10 @@ function locale_datefmt()
 	return $locales[$current_locale]['datefmt'];
 }
 
-/*
- * locale_timefmt(-)
+/**
+ * Returns the current locale's default time format 
+ *
+ * {@internal locale_timefmt(-)}}
  */
 function locale_timefmt()
 {
