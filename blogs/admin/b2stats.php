@@ -87,6 +87,23 @@ switch( $action )
 		</div>
 		<?php
 		break;
+
+	case 'prune':
+		// PRUNE hits from a certain date
+		if ($user_level < 9) 
+		{
+				die( '<p>'.T_('You have no right to delete a hit.').'</p>' );
+		}
+		param( 'date', 'integer', true );	// Required!
+		?>
+		<div class="panelinfo">
+			<p><?php printf( T_('Pruning hits from %s...'), date( locale_datefmt(), $date) ) ?></p>
+			<?php
+			hit_prune( $date );
+			?>
+		</div>
+		<?php
+		break;
 }
 
 function stats_blog_select()
@@ -145,6 +162,7 @@ switch( $show )
 		$last_date = 0;
 		?>
 	<table class="thincols">
+		<th><?php echo T_('Prune') ?></th>
 		<th><?php echo T_('Date') ?></th>
 		<th><?php echo T_('Referers') // 'no' ?></th>
 		<th><?php echo T_('Refering Searches') ?></th>
@@ -161,7 +179,7 @@ switch( $show )
 			{	// We just hit a new day, let's display the previous one:
 				?>
 				<tr>
-					<td><a href="b2stats.php?action=prune&date=<?php echo $this_date ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Prune') ?>" /></a></td>
+					<td><a href="b2stats.php?action=prune&date=<?php echo $this_date ?>&show=summary&blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>" /></a></td>
 					<td><?php echo date( locale_datefmt(), $last_date ) ?></td>
 					<td class="right"><?php echo $hits['no'] ?></td>
 					<td class="right"><?php echo $hits['search'] ?></td>
@@ -185,6 +203,7 @@ switch( $show )
 		{	// We had a day pending:
 			?>
 			<tr>
+				<td><a href="b2stats.php?action=prune&date=<?php echo $this_date ?>&show=summary&blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>" /></a></td>
 				<td><?php echo date( locale_datefmt(), $this_date ) ?></td>
 				<td class="right"><?php echo $hits['no'] ?></td>
 				<td class="right"><?php echo $hits['search'] ?></td>

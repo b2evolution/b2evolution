@@ -205,6 +205,22 @@ function hit_delete( $hit_ID )
 }
 
 /*
+ * hit_prune(-)
+ *
+ * Delete all hits from a certain date
+ */
+function hit_prune( $date )
+{
+	global $tablehitlog, $querycount;
+
+	$iso_date = date ('Y-m-d', $date);
+	$sql ="DELETE FROM $tablehitlog WHERE visitTime LIKE '$iso_date %'";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
+
+}
+
+/*
  * hit_change_type(-)
  *
  * Change type for a hit
