@@ -60,7 +60,7 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 <div class="FigZone">
 <?php
 	foreach( $locales as $localekey => $localevalue ){
-		$llang = substr( $localekey, 0, 2 );
+		$llang = substr( $localekey, strpos($localekey, '_') + 1, 2 );
 		if( $default_locale == $localekey )
 			echo '<span style="font-size:120%;font-weight:bold;">';	
 		echo ' <a href="?setlocale='. $localekey. '">';
@@ -90,7 +90,7 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 		die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
 	}
 
- ?>
+?>
 
 <p>These are your settings from the config file: (If you don't see correct settings here, STOP before going any further, and check your configuration.)</p>
 <pre>
@@ -128,7 +128,7 @@ function check_db_version()
 }
 
 
-dbconnect() or die( "<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>" );
+dbconnect() or die( '<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>' );
 
 param( 'action', 'string' );
 

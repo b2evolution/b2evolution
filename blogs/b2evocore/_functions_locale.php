@@ -219,7 +219,8 @@ function locale_options( $default = '' )
  * locale_from_httpaccept(-)
  *
  *	@return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
- *
+ *	
+ *	blueyed: created
  */
 function locale_from_httpaccept()
 {
