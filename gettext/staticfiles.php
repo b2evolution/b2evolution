@@ -36,6 +36,7 @@ foreach( $pofiles as $po )
 	$targets[] = basename( $po, '.static.po' );
 }
 
+
 if( !isset($argv) )
 { // html head
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -52,12 +53,9 @@ if( !isset($argv) )
 	';
 }
 
-
 log_('<hr>');
 log_('This script maintains the static html files of the b2evolution project.');
 log_('written by <a href="http://thequod.de">daniel hahler</a>, 2004');
-
-
 
 if( isset($argv) )
 { // commandline mode
@@ -128,7 +126,7 @@ class POFile
 		{
 			$this->msgids[ $msgid ] = '';
 		}
-		if( !empty($source) )
+		if( !empty($sourcefile) )
 		{
 			$this->msgids[ $msgid ]['source'][] = $sourcefile;
 		}
@@ -274,7 +272,6 @@ class POFile
 		
 		return( $this->msgids );
 	}
-	
 }
 	
 /**
@@ -322,7 +319,7 @@ msgstr ""
 			{ // write sources of string
 				foreach( $arr['source'] as $source )
 				{
-					fwrite( $fh, '#: '.$source."\n" );
+					fwrite( $fh, '#: ../../'.$source."\n" );
 				}
 			}
 			fwrite( $fh, 'msgid "'.$msgid.'"'."\nmsgstr ".'""'."\n\n" );
@@ -390,10 +387,19 @@ switch( $action )
 			log_( 'Extracting '.$srcfile.'..' );
 			
 			$text = implode( '', file( $srcfile ) );
-			preg_match_all('/{{{(.*?)}}}/s', $text, $matches);
-			foreach( $matches[1] as $match )
+			preg_match_all('/{{{(.*?)}}}/s', $text, $matches_msgids, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE);
+			preg_match_all('/\n/', $text, $matches_line, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE);
+			
+			$lm = 0;
+			foreach( $matches_msgids[1] as $match )
 			{
-				$POTFile->addmsgid( $match, $srcfile );
+				#echo $lm.': '.$match[1].' / '.($matches_line[0][$lm][1]).'<br>';
+				while( $match[1] > $matches_line[0][ $lm ][1] )
+				{ // assign line numbers
+					$lm++;
+				}
+				$POTFile->addmsgid( $match[0], $srcfile.':'.($lm + 1) );
+				#log_(' ['.$srcfile.':'.($lm + 1).']<br />');
 			}
 		}
 		
@@ -428,7 +434,7 @@ switch( $action )
 				}
 				else
 				{
-					log_('WARNING: no charset found. Will use '.DEFAULT_CHARSET.'.');
+					log_('<span style="color:red">WARNING: no charset found. Will use '.DEFAULT_CHARSET.'.</span>');
 					$charset = DEFAULT_CHARSET;
 				}
 			}
@@ -471,7 +477,7 @@ switch( $action )
 					
 					if( strpos( $text, TRANSTAG_OPEN ) !== false )
 					{ // there are still tags.
-						log_('WARNING: some strings have not been translated!');
+						log_('<span style="color:blue">WARNING: some strings have not been translated!</span>');
 					}
 				}
 				

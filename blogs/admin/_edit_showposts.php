@@ -163,7 +163,9 @@
 				{
 				?>
 				<form action="edit_actions.php" method="get" class="inline">
-					<input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
+					<input type="hidden" name="action" value="delete">
+					<input type="hidden" name="post" value="<?php $Item->ID() ?>">
+					<input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
 				</form>
 				<?php
 				}
@@ -173,7 +175,10 @@
 						&& $current_User->check_perm( 'edit_timestamp' ) )
 				{
 				?>
-				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />
+				<form action="edit_actions.php" method="get" class="inline">
+					<input type="hidden" name="action" value="publish">
+					<input type="hidden" name="post_ID" value="<?php $Item->ID() ?>">
+					<input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />
 				</form>
 				<?php
 				}

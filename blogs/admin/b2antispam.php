@@ -240,16 +240,19 @@ switch( $action )
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 { ?>
 	<div class="panelblock">
-		<h2><?php echo T_('Add a banned keyword') ?></h2>
-		<form action="b2antispam.php" method="GET">
-			<p>
-			<?php echo T_('Keyword') ?>:
-			<input type="text" size="30" maxlength="80" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" /></p>
+		<form action="b2antispam.php" method="GET" class="fform">
+		<fieldset>
+		<legend><?php echo T_('Add a banned keyword') ?></legend>
+			<?php
+			form_text( 'keyword', $keyword, 30, T_('Keyword'), '', 80, '' )
+			?>
 			<input type="hidden" name="action" value="ban" />
 			<input type="hidden" name="type" value="keyword" />
-			<input type="submit" value="<?php echo T_('Check &amp; ban...') ?>" class="search" />
-			</p>
+			<div class="input">
+				<input type="submit" value="<?php echo T_('Check &amp; ban...') ?>" class="search" />
+			</div>
 		</form>
+		</fieldset>
 	</div>
 <?php
 }
