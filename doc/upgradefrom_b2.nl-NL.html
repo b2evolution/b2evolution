@@ -4,7 +4,7 @@
 <head>
 	
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>b2evo pakket: Upgrading from Cafelog/b2</title>
+<title>b2evo pakket: Bijwerken vanaf Cafelog/B2</title>
 <link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
 	
 	 
@@ -28,26 +28,26 @@
 	<div class="installSideBar">
 		<p>Becschikbare vertalingen voor deze pagina:</p>
 			<ul style="margin-left: 2ex;list-style:none;">
-		<li><a href="upgradefrom_b2.html"><img src="../blogs/img/flags/w16px/eu.gif" alt="English (EU)" border="1"  class="flag"/> English (EU)</a></li>
-		<li><a href="upgradefrom_b2.de-DE.html"><img src="../blogs/img/flags/w16px/de.gif" alt="German (DE)" border="1"  class="flag"/> German (DE)</a></li>
-		<li><a href="upgradefrom_b2.fr-FR.html"><img src="../blogs/img/flags/w16px/fr.gif" alt="French (FR)" border="1"  class="flag"/> French (FR)</a></li>
+		<li><a href="upgradefrom_b2.html"><img src="../blogs/img/flags/w16px/eu.gif" alt="English (EU)" border="1"  class="flag"/> Engels (EU)</a></li>
+		<li><a href="upgradefrom_b2.de-DE.html"><img src="../blogs/img/flags/w16px/de.gif" alt="German (DE)" border="1"  class="flag"/> Duits (DE)</a></li>
+		<li><a href="upgradefrom_b2.fr-FR.html"><img src="../blogs/img/flags/w16px/fr.gif" alt="French (FR)" border="1"  class="flag"/> Frans (FR)</a></li>
 		<li><a href="upgradefrom_b2.nl-NL.html"><img src="../blogs/img/flags/w16px/nl.gif" alt="Dutch (NL)" border="1"  class="flag"/><strong> Dutch (NL)</strong></a></li>
 	</ul>
 	</div>
 	
-<h1>Upgrading from Cafelog/b2 (the original b2)</h1>
+<h1>Bijwerken vanaf Cafelog/B2 (de originele b2)</h1>
 
 <p>The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message.</p>
 
-<p><em>However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new.</em></p>
+<p><em>Maar, zoals altijd, is het verstandig een backup te maken van jouw huidige website / weblog / database (afhankelijk van wat je al hebt) voordat je iets nieuws installeert.</em></p>
 
-<p>Once you have unzipped the b2evolution distribution:</p>
+<p>Wanneer je de b2evolution distributie hebt uitgepakt:</p>
 
 <ol class="expanded">
-<li>On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!<br />
+<li>Op je server, vind uit wat de mysql database is die je nu al gebruikt voor Cafelog/b2. Je moet dezelfde database gebruiken om te kunnen bijwerken naar b2evolution. Maak je niet druk, b2evolution zal onder geen beding de tabellen en data van Cafelog/b2 aanpassen!<br />
 		<span class="small"><br />
-		<strong>Note 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way.<br />
-		<strong>Note 2:</strong> Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database.</span>
+		<strong>Opmerking 1: </strong>Behalve als je de configuratie hebt verandert, zullen alle tabellen die b2evolution aanmaakt worden voorzien van het voorschrift evo_. Behalve als je al een applicatie hebt draaien met hetzelfde voorschrift, maakt dit de installatie van b2evolution een stuk veiliger in een database die word gedeeld met andere applicaties. Bijvoorbeeld, Cafelog/b2 gebruikt het voorschrift b2. Jouw bestaande tabellen zullen zo op geen enkele manier worden aangepast.<br />
+		<strong>Opmerking 2:</strong> Waarom dezelfde database? Omdat het SQL proces dat we gebruiken om de data te kopieren -- die snel en veilig is -- alleen kan worden gedaan in een enkele database.</span>
 </li>
 
 <li>Upload the b2evolution files to your website.<br />
@@ -60,12 +60,12 @@ Let's assume you install the contents of the blogs folder to <code>http://yoursi
 <li>Check to make sure the new installation works.</li>
 <li>On production servers, it is recommended that you delete the <code>/install</code> subfolder.</li>
 <li>Check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading your existing b2 template to b2evolution.</li>
-<li>After basic install is done, there are a few <a %href>tricky things you may need to take care of</a> (online manual).</li>
+<li>Nadat de basis installatie is voltooid, zijn er nog wat <a href="http://b2evolution.net/man/install/trickystuff.html">tricky dingen waar je rekening mee moet houden</a> (online handboek)</li>
 </ol>
 
 	<div id="rowfooter">
-		<a href="http://b2evolution.net/">official website</a> &middot; 
-		<a href="http://b2evolution.net/about/license.html">GNU GPL license</a> &middot; 
+		<a href="http://b2evolution.net/">officiele website</a> &middot; 
+		<a href="http://b2evolution.net/about/license.html">GNU GPL licentie</a> &middot; 
 		<a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
 	</div>
 </body>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-07 21:35+0100\n"
+"PO-Revision-Date: 2004-05-07 22:09+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -240,7 +240,7 @@ msgstr "Mettre à jour depuis Cafélog/b2 (la version originale de b2)"
 
 #: ../../doc/upgradefrom_b2.src.html:34
 msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
-msgstr ""
+msgstr "La procédure de mise à jour ci dessous a été testée exclusivement avec b2 versions 0.6.1 et 0.6.2. Cependant, nous pensons que les versions 0.5.x devraient également pouvoir être mises à jour sans problèmes. Dans tous les cas, si vous utilisez une version antérieure de b2, vous pouvez faire un essai de mise à jour sans risque. b2evolution n'abimera pas vos données, même s'il n'arrive pas à les comprendre. Le pire qui pourrait arriver est un message d'erreur."
 
 #: ../../doc/upgradefrom_b2.src.html:39
 msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
