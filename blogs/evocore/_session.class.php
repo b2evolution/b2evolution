@@ -57,16 +57,22 @@ class Session
 	 */
 	var $ID;
 
+	/**
+	 * The session key (to be used in URLs).
+	 * @var string
+	 */
+	var $key;
+
 
 	/**
 	 * Keep the session active for the current user.
-	 * // QUESTION: what to use for ID? T_session.sess_ID is BIGINT()..
+	 * // QUESTION: what to use for ID? T_sessions.sess_ID is BIGINT()..
 	 */
 	function Session()
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow;
+		global $DB, $Debuglog, $current_User, $servertimenow;
 		global $Hit;
-		global $cookie_session;
+		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
 		/**
 		 * @todo move to $Settings - use only for display of online user, not to prune sessions!
@@ -74,34 +80,67 @@ class Session
 		global $online_session_timeout;
 
 		if( $sessionByCookie = param( $cookie_session, 'string', '' ) )
-		{ // session sent by cookie
+		{ // session ID sent by cookie
 			$this->ID = $sessionByCookie;
+
+			// TODO: validate key.
+
+			$Debuglog->add( 'ID (from cookie): '.$this->ID, 'session' );
+
+			if( $row = $DB->get_row( 'SELECT sess_data, sess_key FROM T_sessions
+																	WHERE sess_ID = "'.$this->ID.'"' ) )
+			{
+				$Debuglog->add( 'Session data loaded.', 'session' );
+				$this->key = $row->sess_key;
+				$this->data = $row->sess_data;
+			}
+			else
+			{ // No session data in the table
+				$this->key = false;
+
+				$Debuglog->add( 'ID not valid!', 'session' );
+			}
+		}
+
+
+		if( !$this->key )
+		{ // start new session
+			$this->key = md5( $Hit->IP.$Hit->getUseragent() );
+
+			$DB->query( 'INSERT INTO T_sessions
+										(sess_key, sess_lastseen, sess_ipaddress, sess_user_ID)
+										VALUES (
+											"'.$this->key.'",
+											"'.date( 'Y-m-d H:i:s', $servertimenow ).'",
+											"'.getIpList( true ).'",
+											'.( $current_User ? '"'.$current_User->ID.'"' : 'NULL' )
+										.')' );
+
+			$this->ID = $DB->insert_id;
+
+			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
 		}
 		else
-		{ // start new session
-			global $cookie_expires, $cookie_path, $cookie_domain;
-			$this->ID = md5( $Hit->IP.$Hit->getUseragent() );
-
-			setcookie( $cookie_session, $this->ID, $cookie_expires, $cookie_path, $cookie_domain );
+		{ // update "Last seen" info
+			$DB->query( 'UPDATE T_sessions
+										SET sess_lastseen = "'.date( 'Y-m-d H:i:s', $servertimenow ).'"
+										WHERE sess_ID = "'.$this->ID.'"' );
 		}
 
-		$Debuglog->add( 'Updating the active session for the current user.' );
+		// Send session ID cookie
+		setcookie( $cookie_session, $this->ID, $cookie_expires, $cookie_path, $cookie_domain );
+
+
+		/*
+		TODO: - use a new $Setting for this and delete not always (like hitlog autopruning).
+					- respect session timeout setting, instead of $online_session_timeout.
 
 		// Delete deprecated session info:
-		// Note: we also delete any anonymous user from the current IP address since it will be
-		// recreated below (REPLACE won't work properly when a column is NULL)
 		$DB->query( 'DELETE FROM T_sessions
-									WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($localtimenow - $online_session_timeout) ).'"
+									WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($servertimenow - $online_session_timeout) ).'"
 										OR ( sess_ipaddress = "'.getIpList( true ).'"
 													AND sess_user_ID is NULL )' );
-
-		// Record current session info
-		$DB->query( 'REPLACE INTO T_sessions( sess_ID, sess_lastseen, sess_ipaddress, sess_user_ID )
-									VALUES( "'.$this->ID.'",
-													"'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-													"'.getIpList( true ).'",
-													'.( $current_User ? '"'.$current_User->ID.'"' : 'NULL' ).')' );
-
+		*/
 	}
 
 
@@ -113,6 +152,17 @@ class Session
 	function getID()
 	{
 		return $this->ID;
+	}
+
+
+	/**
+	 * Is the session validated by a key?
+	 *
+	 * @return boolean
+	 */
+	function isValidByKey()
+	{
+		return !empty($this->key);
 	}
 }
 
