@@ -14,7 +14,7 @@
  */
 function antispam_create( $abuse_string, $aspm_source = 'local' )
 {
-	global $tableantispam, $querycount, $cache_antispam;
+	global $DB, $tableantispam, $querycount, $cache_antispam;
 	
 	// Cut the crap if the string is empty:
 	$abuse_string = trim( $abuse_string );
@@ -25,7 +25,7 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	
 	// Insert new string into DB:
 	$sql = "INSERT INTO $tableantispam( aspm_string, aspm_source ) 
-					VALUES( '".addslashes($abuse_string)."', '$aspm_source' )";
+					VALUES( '".$DB->escape($abuse_string)."', '$aspm_source' )";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 
@@ -44,11 +44,11 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
  */
 function antispam_update_source( $aspm_string, $aspm_source )
 {
-	global $tableantispam, $querycount;
+	global $DB, $tableantispam, $querycount;
 	
 	$sql = "UPDATE $tableantispam 
 					SET aspm_source = '$aspm_source' 
-					WHERE aspm_string = '".addslashes($aspm_string)."'";
+					WHERE aspm_string = '".$DB->escape($aspm_string)."'";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 }

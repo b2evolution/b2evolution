@@ -104,16 +104,16 @@ else
 
 
 $query = "UPDATE $tableusers SET $updatepassword"
-	. 'user_firstname = "' . addslashes($newuser_firstname) . '", '
-	. 'user_lastname="'    . addslashes($newuser_lastname) . '", '
-	. 'user_nickname="'    . addslashes($newuser_nickname) . '", '
-	. 'user_icq="'         . addslashes($newuser_icq) . '", '
-	. 'user_email="'       . addslashes($newuser_email) . '", '
-	. 'user_url="'         . addslashes($newuser_url) . '", '
-	. 'user_aim="'         . addslashes($newuser_aim) . '", '
-	. 'user_msn="'         . addslashes($newuser_msn) . '", '
-	. 'user_yim="'         . addslashes($newuser_yim) . '", '
-	. 'user_idmode="'      . addslashes($newuser_idmode) . '", '
+	. 'user_firstname = "' . $DB->escape($newuser_firstname) . '", '
+	. 'user_lastname="'    . $DB->escape($newuser_lastname) . '", '
+	. 'user_nickname="'    . $DB->escape($newuser_nickname) . '", '
+	. 'user_icq="'         . $DB->escape($newuser_icq) . '", '
+	. 'user_email="'       . $DB->escape($newuser_email) . '", '
+	. 'user_url="'         . $DB->escape($newuser_url) . '", '
+	. 'user_aim="'         . $DB->escape($newuser_aim) . '", '
+	. 'user_msn="'         . $DB->escape($newuser_msn) . '", '
+	. 'user_yim="'         . $DB->escape($newuser_yim) . '", '
+	. 'user_idmode="'      . $DB->escape($newuser_idmode) . '", '
 	. 'user_notify="'      . $newuser_notify . '" '
 	. 'WHERE ID = '        . $user_ID;
 $querycount++;

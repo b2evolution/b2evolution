@@ -171,7 +171,7 @@ class ArchiveList extends DataObjectList
 				case 'postbypost':
 				default:
 					$post_ID = $arc_row['ID'];
-					$post_title = stripslashes($arc_row['post_title']);
+					$post_title = $arc_row['post_title'];
 					return true;
 			}
 		}						

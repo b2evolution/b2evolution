@@ -678,10 +678,12 @@ function populate_main_tables()
 	echo 'Creating sample comments... ';
 
 	$now = date('Y-m-d H:i:s');
-	$query = "INSERT INTO $tablecomments (comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma)
-	VALUES (1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '$now',
-		'". addslashes(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "',
-		0)";
+	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author,
+																				comment_author_email, comment_author_url, comment_author_IP,
+																				comment_date, comment_content, comment_karma)
+						VALUES( 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
+									 '$now', '". 
+									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 0)";
 	$q = mysql_query($query) or mysql_oops( $query );
 
 	echo "OK.<br />\n";

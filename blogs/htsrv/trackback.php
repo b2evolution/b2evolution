@@ -42,7 +42,6 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		trackback_response(1, 'Sorry, this weblog does not allow you to trackback its posts.');
 	}
 
-	$url = addslashes($url);
 	$title = strip_tags($title);
 	$title = (strlen($title) > 255) ? substr($title, 0, 252).'...' : $title;
 	$excerpt = strip_tags($excerpt);
@@ -52,7 +51,6 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 
 	$comment = "<strong>$title</strong><br />$excerpt";
 
-	$author = addslashes($blog_name);
 	$email = '';
 	$original_comment = $comment;
 
@@ -77,7 +75,12 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$comment_author_email = $email;
 	$comment_author_url = $url;
 
-	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content) VALUES ( $comment_post_ID, 'trackback', '".addslashes($author)."', '".addslashes($email)."', '".addslashes($url)."', '$user_ip', '$now', '".addslashes($comment)."' )";
+	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, 
+																				comment_author_email, comment_author_url, comment_author_IP,
+																				comment_date, comment_content) 
+						VALUES( $comment_post_ID, 'trackback', '".$DB->escape($author)."', 
+										'".$DB->escape($email)."', '".$DB->escape($url)."', '".$DB->escape($user_ip)."',
+										'$now', '".$DB->escape($comment)."' )";
 	$result = mysql_query($query);
 	if (!$result) 
 	{
@@ -101,7 +104,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$comment_post_ID."&tb=1\n\n";
 		$notify_message .= T_('Website', $default_locale).": $comment_author (IP: $user_ip , $user_domain)\n";
 		$notify_message .= T_('Url', $default_locale).": $comment_author_url\n";
-		$notify_message .= T_('Excerpt', $default_locale).": \n".stripslashes($original_comment)."\n\n";
+		$notify_message .= T_('Excerpt', $default_locale).": \n".$original_comment."\n\n";
 		$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
 		@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );

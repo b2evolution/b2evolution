@@ -110,8 +110,6 @@ function textile($text)
 	### Basic global changes
 
 	// echo '<font color="#00FF00">TEXTILE [', $text, ']</font>';
-
-	// $text = stripslashes($text);
 		
 	# turn any incoming ampersands into a dummy character for now.
 	#  This uses a negative lookahead for alphanumerics followed by a semicolon,

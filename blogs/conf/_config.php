@@ -15,10 +15,10 @@
 $debug = true;		// FOR TESTING ONLY
 
 # MySQL settings. Fill in your database details (check carefully or nothing will work!)
-$dbhost = 'localhost' ;       // mySQL Server 
-$dbname = 'b2evolution';      // the name of the database
-$dbusername = 'demouser';     // your MySQL username
-$dbpassword = 'demopass';     // ...and password
+define( 'DB_USER', 'demouser' );				// your MySQL username
+define( 'DB_PASSWORD', 'demopass' );		// ...and password
+define( 'DB_NAME', 'b2evolution' );			// the name of the database
+define( 'DB_HOST', 'localhost' );				// mySQL Server (typically 'localhost')
 
 
 # If you want to be able to reset your existing b2evolution tables and start anew

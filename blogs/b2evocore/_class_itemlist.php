@@ -764,7 +764,7 @@ class ItemList extends DataObjectList
 			if ($page > 1)
 				$more=1;
 			$multipage=1;
-			$content=stripslashes($postdata['Content']);
+			$content = $postdata['Content'];
 			$content = str_replace("\n<!--nextpage-->\n", '<!--nextpage-->', $content);
 			$content = str_replace("\n<!--nextpage-->", '<!--nextpage-->', $content);
 			$content = str_replace("<!--nextpage-->\n", '<!--nextpage-->', $content);
@@ -773,8 +773,8 @@ class ItemList extends DataObjectList
 		}
 		else
 		{
-			$pages[0]=stripslashes($postdata['Content']);
-			$multipage=0;
+			$pages[0] = $postdata['Content'];
+			$multipage = 0;
 		}
 	}
 

@@ -81,7 +81,7 @@ class DataObject
 	 */
 	function dbupdate( )
 	{
-		global $querycount;
+		global $DB, $querycount;
 
 		if( $this->ID == 0 ) die( 'New object cannot be updated!' );
 
@@ -97,7 +97,7 @@ class DataObject
 			switch( $loop_dbchange['type'] )
 			{
 				case 'string':
-					$sql_changes[] = $loop_dbfieldname. " = '". addslashes( $loop_value ). "' ";
+					$sql_changes[] = $loop_dbfieldname. " = '". $DB->escape( $loop_value ). "' ";
 					break;
 
 				default:
@@ -126,7 +126,7 @@ class DataObject
 	 */
 	function dbinsert( )
 	{
-		global $querycount;
+		global $DB, $querycount;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -141,7 +141,7 @@ class DataObject
 			switch( $loop_dbchange['type'] )
 			{
 				case 'string':
-					$sql_values[] = "'". addslashes( $loop_value ). "' ";
+					$sql_values[] = "'". $DB->escape( $loop_value ). "' ";
 					break;
 
 				default:

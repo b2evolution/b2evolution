@@ -27,16 +27,18 @@ if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.ph
  * Connect to MySQL database
  *
  * {@internal dbconnect(-) }}
+ *
+ * @deprecated
  */
 function dbconnect()
 {
-	global $connexion, $dbhost, $dbusername, $dbpassword, $dbname;
+	global $connexion;
 
-	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword)
+	$connexion = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD )
 		or die( T_('Can\'t connect to the database server. MySQL said:'). '<br />'. mysql_error());
 
-	$connexionbase = mysql_select_db( $dbname )
-		or die( sprintf(T_('Can\'t connect to the database %s. MySQL said:'), $dbname). '<br />'. mysql_error());
+	$connexionbase = mysql_select_db( DB_NAME )
+		or die( sprintf(T_('Can\'t connect to the database %s. MySQL said:'), DB_NAME ). '<br />'. mysql_error());
 
 	return(($connexion && $connexionbase));
 }
@@ -164,7 +166,6 @@ function format_to_output( $content, $format = 'htmlbody' )
  */
 function format_to_edit( $content, $autobr = false )
 {
-	$content = stripslashes($content);
 	if( $autobr )
 	{
 		// echo 'unBR:',htmlspecialchars(str_replace( ' ', '*', $content) );
@@ -212,14 +213,14 @@ function format_to_post($content, $autobr=0, $is_comment=0)
 																			$comments_uri_attrs, $comments_allowed_uri_scheme );
 		}
 
-		$checker->check(stripslashes($content));
+		$checker->check( $content );
 	}
 
 	if( !isset( $use_security_checker ) ) $use_security_checker = 1;
 	if( $use_security_checker )
 	{
 		// Security checking:
-		$check = stripslashes($content);
+		$check = $content;
 		// Open comments or '<![CDATA[' are dangerous
 		$check = str_replace('<!', '<', $check);
 		// # # are delimiters
@@ -241,8 +242,6 @@ function format_to_post($content, $autobr=0, $is_comment=0)
 			errors_add( 'Unallowed CSS markup found: '.htmlspecialchars($matches[1]) );
 		}
 	}
-
-	// $content = addslashes($content);
 	return($content);
 }
 
@@ -937,14 +936,18 @@ function balanceTags($text)
 }
 
 
-/*
- * remove_magic_quotes(-)
+/**
+ * Clean up the mess PHP has created with its funky quoting everything!
+ *
+ * {@internal remove_magic_quotes(-)}}
+ *
+ * @param mixed string or array (function is recursive)
  */
 function remove_magic_quotes( $mixed )
 {
 	if( get_magic_quotes_gpc() )
-	{
-		if( is_array($mixed) )
+	{	// That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
+		if( is_array( $mixed ) )
 		{
 			foreach($mixed as $k => $v)
 			{

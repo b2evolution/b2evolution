@@ -12,11 +12,3 @@
 <IfModule mod_php4.c>
 	php_flag register_globals off
 </IfModule>
-
-
-
-# this is used to make b2 produce links like http://example.com/archives/m/200209
-# if you renamed the file 'archives' to another name, please change it here too
-<Files archives>
-	ForceType application/x-httpd-php
-</Files>

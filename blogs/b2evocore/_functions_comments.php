@@ -307,7 +307,7 @@ function comment_ID()
 function comment_author()
 {
 	global $commentdata;
-	echo stripslashes($commentdata['comment_author']);
+	echo $commentdata['comment_author'];
 }
 
 /**
@@ -317,7 +317,7 @@ function comment_author()
  */
 function comment_author_email()
 {
-	global $commentdata;	echo antispambot(stripslashes($commentdata['comment_author_email']));
+	global $commentdata;	echo antispambot( $commentdata['comment_author_email'] );
 }
 
 /**
@@ -328,7 +328,7 @@ function comment_author_email()
 function comment_author_url($echo=true)
 {
 	global $commentdata;
-	$url = trim(stripslashes($commentdata['comment_author_url']));
+	$url = trim($commentdata['comment_author_url']);
 	$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 	// convert & into &amp;
 	$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
@@ -369,9 +369,9 @@ function comment_author_email_link($linktext='', $before='', $after='')
 	global $commentdata;
 	$email=$commentdata['comment_author_email'];
 	if ((!empty($email)) && ($email != '@')) {
-		$display = ($linktext != '') ? $linktext : antispambot(stripslashes($email));
+		$display = ($linktext != '') ? $linktext : antispambot($email);
 		echo $before;
-		echo '<a href="mailto:'.antispambot(stripslashes($email)).'">'.$display.'</a>';
+		echo '<a href="mailto:'.antispambot($email).'">'.$display.'</a>';
 		echo $after;
 	}
 }
@@ -385,14 +385,14 @@ function comment_author_email_link($linktext='', $before='', $after='')
 function comment_author_url_link($linktext='', $before='', $after='')
 {
 	global $commentdata;
-	$url = trim(stripslashes($commentdata['comment_author_url']));
+	$url = trim($commentdata['comment_author_url']);
 	$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
 	$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 	if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url'))
 	{
-		$display = ($linktext != '') ? $linktext : stripslashes($url);
+		$display = ($linktext != '') ? $linktext : $url;
 		echo $before;
-		echo '<a href="'.stripslashes($url).'">'.$display.'</a>';
+		echo '<a href="'.$url.'">'.$display.'</a>';
 		echo $after;
 	}
 }
@@ -403,7 +403,7 @@ function comment_author_url_link($linktext='', $before='', $after='')
  * @deprecated deprecated by {@link Comment::author_ip()}
  */
 function comment_author_IP() {
-	global $commentdata;	echo stripslashes($commentdata['comment_author_IP']);
+	global $commentdata;	echo $commentdata['comment_author_IP'];
 }
 
 /**
@@ -488,7 +488,7 @@ function comment_post_link()
 function comment_blog_name( $disp = true )
 {
 	global $commentdata;
-	$blog_name = stripslashes($commentdata['blog_name']);
+	$blog_name = $commentdata['blog_name'];
 	if( !$disp )
 		return $blog_name;
 	echo $blog_name;

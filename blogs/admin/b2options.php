@@ -37,15 +37,15 @@ switch($action)
 
 		$query = "UPDATE $tablesettings
 							SET posts_per_page = $newposts_per_page,
-									what_to_show = '".addslashes($newwhat_to_show)."',
-									archive_mode = '".addslashes($newarchive_mode)."',
+									what_to_show = '".$DB->escape($newwhat_to_show)."',
+									archive_mode = '".$DB->escape($newarchive_mode)."',
 									time_difference = $newtime_difference,
 									AutoBR = $newautobr,
 									pref_newusers_canregister = $pref_newusers_canregister,
 									pref_newusers_level = $pref_newusers_level,
 									pref_newusers_grp_ID = $pref_newusers_grp_ID,
 									pref_links_extrapath = $pref_links_extrapath,
-									pref_permalink_type = '".addslashes($pref_permalink_type)."'";
+									pref_permalink_type = '".$DB->escape($pref_permalink_type)."'";
 		mysql_query($query) or mysql_oops( $query );
 		$querycount++;
 

@@ -91,7 +91,12 @@ if( errors_display( T_('Cannot post comment, please correct these errors:'),
 	exit();
 }
 
-$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content)  VALUES( $comment_post_ID, 'comment', '".addslashes($author)."','".addslashes($email)."','".addslashes($url)."','$user_ip','$now','".addslashes($comment)."' )";
+$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, 
+																			comment_author_email, comment_author_url, comment_author_IP,
+																			comment_date, comment_content)  
+					VALUES( $comment_post_ID, 'comment', '".$DB->escape($author)."','".$DB->escape($email)."',
+									'".$DB->escape($url)."','".$DB->escape($user_ip)."','$now',
+									'".$DB->escape($comment)."' )";
 $querycount++;
 $result = mysql_query($query) or mysql_oops( $query );
 
@@ -112,7 +117,7 @@ if( get_user_info( 'notify', $authordata ) )
 	$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip , $user_domain)\n";
 	$notify_message .= T_('Email', $default_locale).": $email\n";
 	$notify_message .= T_('Url', $default_locale).": $url\n";
-	$notify_message .= T_('Comment', $default_locale).": \n".stripslashes($original_comment)."\n\n";
+	$notify_message .= T_('Comment', $default_locale).": \n".$original_comment."\n\n";
 	$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 	
 	

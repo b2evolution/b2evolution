@@ -336,7 +336,7 @@ function cat_load_cache()
 		$querycount++; 
 		while( $myrow = mysql_fetch_array($result) ) 
 		{ 
-			$this_cat['cat_name'] = stripslashes($myrow['cat_name']);
+			$this_cat['cat_name'] = $myrow['cat_name'];
 			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
 			$this_cat['cat_parent_ID'] = $myrow['cat_parent_ID'];
 			$this_cat['cat_postcount'] = 0;					// Will be increased later
@@ -803,7 +803,7 @@ function dropdown_cats($optionall = 1, $all = 'All')
 		echo "\t<option value=\"".$row->cat_ID."\"";
 		if ($row->cat_ID == $cat)
 			echo ' selected="selected"';
-		echo '>'.stripslashes($row->cat_name)."</option>\n";
+		echo '>'.$row->cat_name."</option>\n";
 	}
 	echo "</select>\n";
 }

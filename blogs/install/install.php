@@ -13,6 +13,7 @@
 
 // include config and default functions
 require_once( dirname(__FILE__). '/../conf/_config.php' );
+require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_class_db.php" );
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_cats.php" );
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bposts.php" );
@@ -77,10 +78,10 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 STOP before going any further, <br />
 and check your configuration.)</p>
 <pre>
-mySQL Host: <?php echo $dbhost ?> &nbsp;
-mySQL Database: <?php echo $dbname ?> &nbsp;
-mySQL Username: <?php echo $dbusername ?> &nbsp;
-mySQL Password: <?php echo (($dbpassword!='demopass' ? "(Set, but not shown for security reasons)" : "demopass") )?> &nbsp;
+mySQL Host: <?php echo DB_HOST ?> &nbsp;
+mySQL Database: <?php echo DB_NAME ?> &nbsp;
+mySQL Username: <?php echo DB_USER ?> &nbsp;
+mySQL Password: <?php echo ((DB_PASSWORD!='demopass' ? "(Set, but not shown for security reasons)" : 'demopass') )?> &nbsp;
 </pre>
 	<?php
 	if( empty($action) )
@@ -149,6 +150,8 @@ function check_db_version()
 
 
 dbconnect() or die( '<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>' );
+$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 

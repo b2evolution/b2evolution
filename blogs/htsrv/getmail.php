@@ -11,20 +11,10 @@
 $output_debugging_info = 0;		# =1 if you want to output debugging info
  
 require_once(dirname(__FILE__).'/../conf/_config.php');
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions_template.php");
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions.php");
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_vars.php");
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_class_pop3.php");
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions_xmlrpc.php");
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions_xmlrpcs.php");
+require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
 
-dbconnect();
-timer_start();
-
-$autobr = get_settings('AutoBR');
-$time_difference = get_settings('time_difference');
-
-if ($use_phoneemail) {
+if ($use_phoneemail) 
+{
 	// if you're using phone email, the email will already be in your timezone
 	$time_difference = 0;
 }

@@ -74,8 +74,6 @@ function b2newpost($m)
 	global $cafelogID, $sleep_after_edit;
 	$err="";
 
-	dbconnect();
-
 	$username=$m->getParam(2);
 	$password=$m->getParam(3);
 	$content=$m->getParam(4);
@@ -166,8 +164,6 @@ function b2getcategories($m)
 {
 	global $xmlrpcerruser,$tablecategories;
 
-	dbconnect();
-
 	$blogid=$m->getParam(0);
 	$blogid = $blogid->scalarval();
 
@@ -233,8 +229,6 @@ function b2_getPostURL($m)
 	global $xmlrpcerruser;
 	global $siteurl;
 	global $ItemCache;
-
-	dbconnect();
 
 	$blog_ID = $m->getParam(0);
 	$blog_ID = $blog_ID->scalarval();
@@ -329,8 +323,6 @@ function bloggernewpost($m)
 
 	logIO('I','Called function: blogger.newPost');
 
-	dbconnect();
-
 	$username=$m->getParam(2);
 	$password=$m->getParam(3);
 	$content=$m->getParam(4);
@@ -366,9 +358,9 @@ function bloggernewpost($m)
 				 "Permission denied.");
 	}
 
-	$post_title = addslashes(xmlrpc_getposttitle($content));
+	$post_title = xmlrpc_getposttitle( $content );
 
-	$content = xmlrpc_removepostdata($content);
+	$content = xmlrpc_removepostdata( $content );
 
 	$time_difference = get_settings("time_difference");
 	$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
@@ -461,8 +453,6 @@ function bloggereditpost($m)
 	$err="";
 
 	logIO('I','Called function: blogger.editPost');
-
-	dbconnect();
 
 	$post_ID=$m->getParam(1);
 	$post_ID = $post_ID->scalarval();
@@ -614,8 +604,6 @@ function bloggerdeletepost($m)
 	global $blog_ID,$tableposts;
 	global $post_default_title,$post_default_category, $sleep_after_edit;
 	$err="";
-
-	dbconnect();
 
 	$post_ID=$m->getParam(1);
 	$username=$m->getParam(2);
@@ -780,8 +768,6 @@ function bloggergetuserinfo($m)
 {
 	global $xmlrpcerruser,$tableusers;
 
-	dbconnect();
-
 	$username=$m->getParam(1);
 	$username = $username->scalarval();
 
@@ -838,8 +824,6 @@ function bloggergetpost($m)
 {
 	global $xmlrpcerruser,$tableposts;
 
-	dbconnect();
-
 	$post_ID=$m->getParam(1);
 	$post_ID = $post_ID->scalarval();
 
@@ -858,9 +842,9 @@ function bloggergetpost($m)
 			$post_date = mysql2date("U", $postdata["Date"]);
 			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
 
-			$content  = "<title>".stripslashes($postdata["Title"])."</title>";
+			$content  = "<title>".$postdata["Title"]."</title>";
 			$content .= "<category>".$postdata["Category"]."</category>";
-			$content .= stripslashes($postdata["Content"]);
+			$content .= $postdata["Content"];
 
 			$struct = new xmlrpcval(array("userid" => new xmlrpcval($postdata["Author_ID"]),
 										  "dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
@@ -914,8 +898,6 @@ function bloggergetrecentposts($m)
 {
 	global $xmlrpcerruser,$tableposts;
 
-	dbconnect();
-
 	$blogid = 1;	// we don't need that yet
 
 	$numposts=$m->getParam(4);
@@ -957,9 +939,9 @@ function bloggergetrecentposts($m)
 			$post_date = mysql2date("U", $postdata["Date"]);
 			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
 
-			$content  = "<title>".stripslashes($postdata["Title"])."</title>";
+			$content  = "<title>".$postdata["Title"]."</title>";
 			$content .= "<category>".$postdata["Category"]."</category>";
-			$content .= stripslashes($postdata["Content"]);
+			$content .= $postdata["Content"];
 
 #			$content = convert_chars($content,"html");
 #			$content = $postdata["Title"];
@@ -1046,8 +1028,6 @@ $bloggergettemplate_doc='returns the default template file\'s code';
 function bloggergettemplate($m) 
 {
 	global $xmlrpcerruser,$tableusers;
-
-	dbconnect();
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1137,21 +1117,19 @@ function bloggersettemplate($m)
 {
 	global $xmlrpcerruser,$tableusers,$blogfilename;
 
-	dbconnect();
-
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
 
-	$username=$m->getParam(2);
+	$username = $m->getParam(2);
 	$username = $username->scalarval();
 
-	$password=$m->getParam(3);
+	$password = $m->getParam(3);
 	$password = $password->scalarval();
 
-	$template=$m->getParam(4);
+	$template = $m->getParam(4);
 	$template = $template->scalarval();
 
-	$templateType=$m->getParam(5);
+	$templateType = $m->getParam(5);
 	$templateType = $templateType->scalarval();
 
 	if( !user_pass_ok($username,$password)) 
@@ -1238,9 +1216,9 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
 function pingback_ping($m) 
 {
 
-	global $tableposts, $tablecomments, $notify_from;
+	global $DB, $tableposts, $tablecomments, $notify_from;
 	global $baseurl, $b2_version;
-	global $default_locale;
+	global $default_locale, $localtimenow;
 
 	$log = debug_fopen('./xmlrpc.log', 'w');
 
@@ -1338,7 +1316,10 @@ function pingback_ping($m)
 			debug_fwrite($log, 'Post exists'."\n");
 
 			// Let's check that the remote site didn't already pingback this entry
-			$sql = "SELECT * FROM $tablecomments WHERE comment_post_ID = $post_ID AND comment_author_url = '".addslashes(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."' AND comment_type = 'pingback'";
+			$sql = "SELECT * FROM $tablecomments 
+							WHERE comment_post_ID = $post_ID 
+								AND comment_author_url = '".$DB->escape(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."' 
+								AND comment_type = 'pingback'";
 			$result = mysql_query($sql);
 
 			xmlrpc_debugmsg( $sql.' Already found='.mysql_num_rows($result) );
@@ -1398,10 +1379,14 @@ function pingback_ping($m)
 					if( ! ($message = errors_string( 'Cannot insert pingback, please correct these errors:', '' )) )
 					{	// No validation error:
 						$original_pagelinkedfrom = $pagelinkedfrom;
-						$pagelinkedfrom = addslashes($pagelinkedfrom);
 						$original_title = $title;
-						$title = addslashes(strip_tags(trim($title)));
-						$sql = "INSERT INTO $tablecomments(comment_post_ID, comment_type, comment_author, comment_author_url, comment_date, comment_content) VALUES ($post_ID, 'pingback', '$title', '$pagelinkedfrom', NOW(), '".addslashes($context)."')";
+						$title = strip_tags(trim($title));
+						$now = date('Y-m-d H:i:s', $localtimenow );
+						$sql = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, 
+																								comment_author_url, comment_date, comment_content) 
+										VALUES( $post_ID, 'pingback', '".$DB->escape($title)."', 
+														'".$DB->escape($pagelinkedfrom)."', '$now', 
+														'".$DB->escape($context)."')";
 						$consulta = mysql_query($sql);
 	
 						/*

@@ -33,7 +33,7 @@ function bpost_create(
 	$post_url = '',
 	$post_comments = 'open' )
 {
-	global $tableposts, $tablepostcats, $query, $querycount;
+	global $DB, $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
@@ -58,8 +58,13 @@ function bpost_create(
 	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content,
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_trackbacks, post_autobr, post_flags, post_wordcount,
-														post_comments ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_urltitle)."', '".addslashes($post_content)."',	'$post_timestamp', '".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, '$post_status', '$post_locale', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
+														post_comments )
+						VALUES( $author_user_ID, '".$DB->escape($post_title)."', '".$DB->escape($post_urltitle)."',
+										'".$DB->escape($post_content)."',	'".$DB->escape($post_timestamp)."',
+										'".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, 
+										'".$DB->escape($post_status)."', '".$DB->escape($post_locale)."',
+										'".$DB->escape($post_url)."', $autobr, '".implode(',',$post_flags)."', 
+										".bpost_count_words($post_content).", '".$DB->escape($post_comments)."' )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -108,7 +113,7 @@ function bpost_update(
 	$post_url = '',
 	$post_comments = 'open' )
 {
-	global $tableposts, $tablepostcats, $query, $querycount;
+	global $DB, $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
@@ -130,21 +135,21 @@ function bpost_update(
 	// validate url title
 	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $post_ID );
 
-	$query = "UPDATE $tableposts SET ";
-	$query .= "post_title = '".addslashes($post_title)."', ";
-	$query .= "post_urltitle = '".addslashes($post_urltitle)."', ";
-	$query .= "post_trackbacks = '".addslashes($post_url)."', ";		// temporay use of post_trackbacks
-	$query .= "post_content = '".addslashes($post_content)."', ";
-	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
-	$query .= "post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', ";
-	$query .= "post_category = $main_cat_ID, ";
-	$query .= "post_status = '$post_status', ";
-	$query .= "post_locale = '$post_locale', ";
-	// $query .= "post_trackbacks = '$post_trackbacks', ";
-	$query .= "post_autobr = $autobr, ";
-	$query .= "post_flags = '".implode(',',$post_flags)."', ";
-	$query .= "post_wordcount = ".bpost_count_words($post_content).", ";
-	$query .= "post_comments = '".addslashes($post_comments)."' ";
+	$query = "UPDATE $tableposts 
+						SET post_title = '".$DB->escape($post_title)."', 
+								post_urltitle = '".$DB->escape($post_urltitle)."', 
+								post_trackbacks = '".$DB->escape($post_url)."', 
+								post_content = '".$DB->escape($post_content)."',
+								post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', 
+								post_category = $main_cat_ID, 
+								post_status = '".$DB->escape($post_status)."', 
+								post_locale = '".$DB->escape($post_locale)."', 
+								post_autobr = $autobr, 
+								post_flags = '".implode(',',$post_flags)."', 
+								post_wordcount = ".bpost_count_words($post_content).", 
+								post_comments = '".$DB->escape($post_comments)."' ";
+								
+	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp', ";
 	$query .= "WHERE ID = $post_ID";
 	// echo $query;
 	$querycount++;
@@ -473,7 +478,7 @@ function Item_get_by_ID( $post_ID )
 function get_the_title()
 {
 	global $id,$postdata;
-	$output = trim(stripslashes($postdata['Title']));
+	$output = trim( $postdata['Title'] );
 	return($output);
 }
 
@@ -646,7 +651,7 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
 	if( intval( $p ) || (!empty( $title )) )
 	{
 		$post_data = get_postdata($p);
-		$disp_title = stripslashes($post_data['Title']);
+		$disp_title = $post_data['Title'];
 		if ($display)
 		{
 			echo format_to_output( $prefix.$disp_title, $display );
@@ -866,7 +871,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 			$p_id = $p_info->ID;
 			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$previous;
 			if (!($title!='yes')) {
-				$string .= stripslashes($p_title);
+				$string .= $p_title;
 			}
 			$string .= '</a>';
 			$format = str_replace('%',$string,$format);
@@ -920,7 +925,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 			$p_id = $p_info->ID;
 			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$next;
 			if ($title=='yes') {
-				$string .= stripslashes($p_title);
+				$string .= $p_title;
 			}
 			$string .= '</a>';
 			$format = str_replace('%',$string,$format);

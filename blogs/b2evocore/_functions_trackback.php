@@ -27,14 +27,13 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 	else
 	{
 		$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
-		$excerpt = stripslashes($excerpt);
 		echo "<p>", T_('Excerpt to be sent:'), " $excerpt</p>\n";
 		$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 		foreach($trackback_urls as $tb_url) 
 		{	// trackback each url:
 			$tb_url = trim($tb_url);
 			if( empty( $tb_url ) ) continue;
-			trackback($tb_url, stripslashes($post_title), $excerpt, $post_ID);
+			trackback($tb_url, $post_title, $excerpt, $post_ID);
 		}
 		echo "<p>", T_('Trackbacks done.'), "</p>\n";
 	}
@@ -58,7 +57,7 @@ function trackback(
 	echo "<p>", T_('Sending trackback to:'), " $trackback_url ...\n";
 
 	$title = urlencode($title);
-	$excerpt = urlencode(stripslashes($excerpt));
+	$excerpt = urlencode($excerpt);
 	$blog_name = urlencode(get_bloginfo('name'));
 	$Item = $ItemCache->get_by_ID( $ID );
 	$url = $Item->gen_permalink();
@@ -247,7 +246,7 @@ function trackback_rdf($timezone=0)
 		echo '    dc:identifier="';
 		permalink_single();
 		echo '"'."\n";
-		echo '    dc:title="'.addslashes(str_replace("--","&#x2d;&#x2d;",format_to_output(get_the_title(),'xmlattr'))).'"'."\n";
+		echo '    dc:title="'.format_to_output(get_the_title(),'xmlattr').'"'."\n";
 		echo '    trackback:ping="'.trackback_url(0).'" />'."\n";
 		echo '</rdf:RDF>';
 		echo "-->\n";

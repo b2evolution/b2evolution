@@ -26,7 +26,7 @@ switch( $action )
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
 		$keyword = substr( $keyword, 0, 80 );
-		$dbkeyword = addslashes( $keyword );
+		$dbkeyword = $DB->escape( $keyword );
 		param( 'delhits', 'integer', 0 );
 		param( 'delcomments', 'integer', 0 );
 		param( 'blacklist', 'integer', 0 );
