@@ -31,9 +31,6 @@
 	background-color: #efede0;
 	border: 1px solid #9e9286;
 }
-#filemanmain table.grouped th {
-	padding:0 .5ex;
-}
 #filemanmain table.grouped td {
 	text-align:center;
 }
