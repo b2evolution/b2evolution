@@ -51,12 +51,13 @@ function cat_create(
 function cat_update( 
 	$cat_ID,
 	$cat_name, 
-	$cat_parent_ID = NULL )
+	$cat_parent_ID = 0 )
 {
 	global $tablecategories, $query, $querycount;
 
 	$query = "UPDATE $tablecategories SET cat_name='$cat_name'";
-	if( ! empty( $cat_parent_ID ) ) $query .= ", cat_parent_ID = $cat_parent_ID";
+	if( $cat_parent_ID == 0 ) $cat_parent_ID = 'NULL';
+	$query .= ", cat_parent_ID = $cat_parent_ID";
 	$query .= " WHERE cat_ID=$cat_ID";
 
 	$querycount++;

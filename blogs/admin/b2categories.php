@@ -172,7 +172,7 @@ case 'Edit':
 	}
 
 	?>
-	<input type="radio" id="cat_parent_none" name="cat_parent_ID" value="NULL" 
+	<input type="radio" id="cat_parent_none" name="cat_parent_ID" value="0" 
 		<?php 
 			if( ! $cat_parent_ID ) echo 'checked="checked"';
 		?>
@@ -204,11 +204,11 @@ case 'editedcat':
 	}
 	
 	param( 'cat_name', 'string' );
-	param( 'parent_cat_ID', 'integer' );
+	param( 'cat_parent_ID', 'integer' );
 	param( 'cat_ID', 'integer' );
 
 	cat_update( $cat_ID, $cat_name, $cat_parent_ID ) or mysql_oops( $query );
-		
+
 	header("Location: b2categories.php");
 
 break;
