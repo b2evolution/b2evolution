@@ -36,6 +36,10 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+		param( 'blog_pingb2evonet', 'integer', 0 );
+		param( 'blog_pingtechnorati', 'integer', 0 );
+		param( 'blog_pingweblogs', 'integer', 0 );
+		param( 'blog_pingblodotgs', 'integer', 0 );
 		$next_action = 'create';
 		require(dirname(__FILE__).'/_blogs_form.php');
 		echo '</div>';
@@ -63,6 +67,10 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+		param( 'blog_pingb2evonet', 'integer', 0 );
+		param( 'blog_pingtechnorati', 'integer', 0 );
+		param( 'blog_pingweblogs', 'integer', 0 );
+		param( 'blog_pingblodotgs', 'integer', 0 );
 
 		$blog_tagline = format_to_post($blog_tagline, 0, 0);
 		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
@@ -175,6 +183,10 @@ switch($action)
 		$blog_stub = get_bloginfo('stub');
 		$blog_roll = get_bloginfo('blogroll');
 		$blog_keywords = get_bloginfo('keywords');
+		$blog_pingb2evonet = get_bloginfo('pingb2evonet');
+		$blog_pingtechnorati = get_bloginfo('pingtechnorati');
+		$blog_pingweblogs = get_bloginfo('pingweblogs');
+		$blog_pingblodotgs = get_bloginfo('pingblodotgs');
 		$next_action = 'update';
 		require(dirname(__FILE__).'/_blogs_form.php');
 		echo '</div>';
@@ -200,6 +212,10 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+		param( 'blog_pingb2evonet', 'integer', 0 );
+		param( 'blog_pingtechnorati', 'integer', 0 );
+		param( 'blog_pingweblogs', 'integer', 0 );
+		param( 'blog_pingblodotgs', 'integer', 0 );
 
 		$blog_tagline = format_to_post($blog_tagline, 0, 0);
 		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
@@ -214,9 +230,11 @@ switch($action)
 		}
 	
 		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
-									 $blog_staticfilename, 
+									$blog_staticfilename, 
 									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll, 
-									$blog_keywords, $blog_UID ) or mysql_oops( $query );
+									$blog_keywords, $blog_UID,  
+									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs )
+								or mysql_oops( $query );
 		
 		header( 'Location: b2blogs.php' );
 		exit();

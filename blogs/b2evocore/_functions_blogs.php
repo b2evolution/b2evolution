@@ -79,7 +79,12 @@ function blog_update(
 	$blog_lang = 'en',
 	$blog_roll = '',
 	$blog_keywords = '',
-	$blog_UID = '' )
+	$blog_UID = '',
+	$blog_pingb2evonet = false,
+	$blog_pingtechnorati = false,
+	$blog_pingweblogs = false,
+	$blog_pingblodotgs = false
+	)
 {
 	global $tableblogs, $query, $querycount;
 
@@ -96,7 +101,11 @@ function blog_update(
 	$query .= " blog_lang = '$blog_lang', ";
 	$query .= " blog_roll = '".addslashes($blog_roll)."', ";
 	$query .= " blog_keywords = '".addslashes($blog_keywords)."', ";
-	$query .= " blog_UID = '$blog_UID' ";
+	$query .= " blog_UID = '$blog_UID', ";
+	$query .= " blog_pingb2evonet = $blog_pingb2evonet, ";
+	$query .= " blog_pingtechnorati = $blog_pingtechnorati, ";
+	$query .= " blog_pingweblogs = $blog_pingweblogs, ";
+	$query .= " blog_pingblodotgs = $blog_pingblodotgs ";
 	$query .= "WHERE blog_ID= $blog_ID";
 	$querycount++;
 	$result = mysql_query($query);
@@ -114,15 +123,9 @@ function blog_update(
  */
 function get_blogparams()
 {	
-	global $tableblogs, $blog, $blogparams, $querycount, $baseurl, $blogname, $blogdescription, $siteurl, $blogfilename, $blogstaticfilename;
+	global $blog, $blogparams;
 	if( !isset($blog) ) die("No blog set!");
 	$blogparams = get_blogparams_by_ID( $blog );
-	// override those deprecated default settings:
-	$blogname = $blogparams->blog_name;												// deprecated
-	$blogdescription = $blogparams->blog_description;					// deprecated
-	$siteurl = $baseurl.$blogparams->blog_siteurl;											// deprecated
-	$blogfilename = $blogparams->blog_filename;								// deprecated
-	$blogstaticfilename = $blogparams->blog_staticfilename;		// deprecated
 }
 
 /*
@@ -139,30 +142,10 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 
 	switch($show) 
 	{
-		case 'ID':
-			$output = $this_blogparams->blog_ID;
-			break;
-
 		case 'subdir':
 			$output = $this_blogparams->blog_siteurl;
 			break;
 
-		case 'siteurl':
-			$output = $baseurl.$this_blogparams->blog_siteurl;
-			break;
-			
-		case 'filename':
-			$output = $this_blogparams->blog_filename;
-			break;
-			
-		case 'staticfilename':
-			$output = $this_blogparams->blog_staticfilename;
-			break;
-			
-		case 'stub':
-			$output = $this_blogparams->blog_stub;
-			break;
-			
 		case 'blogurl':
 		case 'link':			// RSS wording
 		case 'url':
@@ -187,28 +170,32 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 								'?disp=comments';
 			break;
 			
-		case 'tagline':
-			$output = $this_blogparams->blog_tagline;
-			break;
-			
 		case 'description':			// RSS wording
 		case 'shortdesc':
 			$output = $this_blogparams->blog_description;
-			break;
-			
-		case 'keywords':
-			$output = $this_blogparams->blog_keywords;
-			break;
-		case 'longdesc':
-			$output = $this_blogparams->blog_longdesc;
 			break;
 			
 		case 'blogroll':
 			$output = $this_blogparams->blog_roll;
 			break;
 			
+		case 'ID':
+		case 'siteurl':
+		case 'filename':
+		case 'staticfilename':
+		case 'stub':
+		case 'tagline':
+		case 'keywords':
+		case 'longdesc':
 		case 'lang':
-			$output = $this_blogparams->blog_lang;
+		case 'shortname':
+		case 'default_skin':
+		case 'pingb2evonet':
+		case 'pingtechnorati':
+		case 'pingweblogs':
+		case 'pingblodotgs':
+			$paramname = 'blog_' . $show;
+			$output =  $this_blogparams->$paramname;
 			break;
 			
 		case 'rdf_url':
@@ -230,15 +217,7 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 		case 'admin_email':
 			$output = $admin_email;
 			break;
-			
-		case 'shortname':
-			$output =  $this_blogparams->blog_shortname;
-			break;
-			
-		case 'default_skin':
-			$output =  $this_blogparams->blog_default_skin;
-			break;
-			
+						
 		case 'name':
 		default:
 			$output =  $this_blogparams->blog_name;

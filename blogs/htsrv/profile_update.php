@@ -23,6 +23,7 @@ param( 'newuser_msn', 'string', '' );
 param( 'newuser_yim', 'string', '' );
 param( 'newuser_url', 'string', '' );
 param( 'newuser_email', 'string', '' );
+param( 'newuser_notify', 'integer', 0 );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 
@@ -108,7 +109,8 @@ $query = "UPDATE $tableusers ".
 	"user_aim='".addslashes($newuser_aim)."', ".
 	"user_msn='".addslashes($newuser_msn)."', ".
 	"user_yim='".addslashes($newuser_yim)."', ".
-	"user_idmode='".addslashes($newuser_idmode)."' ".
+	"user_idmode='".addslashes($newuser_idmode)."', ".
+	"user_notify=".$newuser_notify." ".
 	"WHERE ID = $user_ID";
 $querycount++;
 $result = mysql_query($query) or mysql_oops( $query );

@@ -18,8 +18,8 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 {
 	$test = 0;
 
-	global $baseurl, $use_b2evonetping;
-	if( ! $use_b2evonetping ) return false;
+	global $baseurl;
+	if( !get_bloginfo('pingb2evonet',$blogparams) ) return false;
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
@@ -69,8 +69,8 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
  */
 function pingWeblogs( & $blogparams, $display = true ) 
 {
-	global $baseurl, $use_weblogsping;
-	if( ! $use_weblogsping ) return false;
+	global $baseurl;
+	if( !get_bloginfo('pingweblogs',$blogparams) ) return false;
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
@@ -122,35 +122,6 @@ function pingWeblogs( & $blogparams, $display = true )
 }
 */
 
-/*
- * pingCafelog(-)
- *
- * pings CaféLog.com
- */
-function pingCafelog( $cafelogID, $title='', $p='') 
-{
-	global $use_cafelogping, $blogname, $baseurl, $blogfilename;
-	if( (! $use_cafelogping) || (empty($cafelogID)) ) return false;
-	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>", T_('Pinging Cafelog.com...'), "</h3>\n";
-	if ( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
-	{
-		flush();
-		$client = new xmlrpc_client("/", "cafelog.tidakada.com", 80);
-		$message = new xmlrpcmsg("b2.ping", array(
-										new xmlrpcval($cafelogID),
-										new xmlrpcval($title),
-										new xmlrpcval($p)));
-		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result );
-		echo "<p>", T_('Done.'), "</p>\n</div>\n";
-		return($ret);
-	} else {
-		echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
-		return(false);
-	}
-}
-
 
 /*
  * pingBlogs(-)
@@ -162,7 +133,7 @@ function pingCafelog( $cafelogID, $title='', $p='')
 function pingBlogs( & $blogparams ) 
 {
 	global $use_blodotgsping, $use_rss, $blogname, $baseurl, $blogfilename;
-	if( ! $use_blodotgsping ) return false;
+	if( !get_bloginfo('pingblodotgs', $blogparams) ) return false;
 	echo "<div class=\"panelinfo\">\n";
 	echo "<h3>", T_('Pinging Blo.gs...'), "</h3>\n";
 	if( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
@@ -210,9 +181,9 @@ function pingBlogs( & $blogparams )
 */
 function pingTechnorati(& $blogparams, $display = true ) 
 {
-   global $baseurl, $use_technoratiping, $blogfilename;
+   global $baseurl, $blogfilename;
 
-   if(!$use_technoratiping) return false;
+   if( !get_bloginfo('pingtechnorati', $blogparams) ) return false;
 
    if( $display ) 
 	 {

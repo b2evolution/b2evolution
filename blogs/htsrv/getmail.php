@@ -258,7 +258,6 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			pingb2evonet( $blogparams, $post_ID, $post_title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
-			pingCafelog($cafelogID, $post_title, $post_ID);
 			pingTechnorati($blogparams);
 		}
 		echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';

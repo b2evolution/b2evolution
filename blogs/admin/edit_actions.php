@@ -113,7 +113,6 @@ case 'post':
 		pingb2evonet($blogparams, $post_ID, $post_title);
 		pingWeblogs($blogparams);
 		pingBlogs($blogparams);		
-		pingCafelog($cafelogID, $post_title, $post_ID);
 		pingTechnorati($blogparams);
 	}
 
@@ -242,7 +241,6 @@ case 'editpost':
 			pingb2evonet( $blogparams, $post_ID, $post_title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);		
-			pingCafelog($cafelogID, $post_title, $post_ID);
 			pingTechnorati($blogparams);
 		}
 	}	
@@ -325,7 +323,6 @@ case 'publish':
 			pingb2evonet( $blogparams, $post_ID, $post_title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);		
-			pingCafelog($cafelogID, $post_title, $post_ID);
 			pingTechnorati($blogparams);
 		}
 	}	

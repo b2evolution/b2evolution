@@ -18,6 +18,7 @@ require(dirname(__FILE__).'/_header.php');
 <input type="hidden" name="action" value="register" />
 <input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 
+<fieldset>
 	<fieldset>
 		<div class="label"><label for="login"><?php echo T_('Login:') ?></label></div> 
 		<div class="input"><input type="text" name="login" id="login" size="16" maxlength="20" value="<?php echo format_to_output($login, 'formvalue'); ?>" class="large" /></div>
@@ -41,7 +42,7 @@ require(dirname(__FILE__).'/_header.php');
 			<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search">
 		</div>
 	</fieldset>
-
+</fieldset>
 </form>
 
 <?php 

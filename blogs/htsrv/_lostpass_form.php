@@ -18,14 +18,16 @@ require(dirname(__FILE__).'/_header.php');
 	<input type="hidden" name="redirect_to" value="<?php echo format_to_output( $redirect_to, 'formvalue' ) ?>" />
 
 	<fieldset>
-		<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div> 
-		<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="" class="large" /></div>
-	</fieldset>
-
-	<fieldset>
-		<div class="input">
-			<input type="submit" name="submit" value="<?php echo T_('Generate new password!') ?>" class="search">
-		</div>
+		<fieldset>
+			<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div> 
+			<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="" class="large" /></div>
+		</fieldset>
+	
+		<fieldset>
+			<div class="input">
+				<input type="submit" name="submit" value="<?php echo T_('Generate new password!') ?>" class="search">
+			</div>
+		</fieldset>
 	</fieldset>
 
 </form>

@@ -1038,6 +1038,9 @@ function param(
 		$thisparam = array( 'var' => $var, 'type' => $type, 'default' => $default );
 		$global_param_list[] = $thisparam;
 	}
+	
+	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
+	
 }
 
 

@@ -105,14 +105,10 @@ div.panelinfo {
 	background: #eef5ff;
 }
 div.error {
-	width: 90%;
 	padding: 2ex;
 	margin: 3ex auto;
 	border: 1px solid #fed;
 	background: #fff5ee;
-}
-div.loginblock div.error {
-	width: 95%;
 }
 
 ul.error {
@@ -160,6 +156,10 @@ form.inline {
 	display: inline;
 }
 form.fform fieldset {
+	border: 1px solid #ddd;
+	margin-bottom: 1ex;
+}
+form.fform fieldset fieldset {
 	clear: both;
 	border: none;
 	margin: 2ex;

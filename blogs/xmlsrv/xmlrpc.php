@@ -53,7 +53,7 @@ $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata, $use_weblogsping,$post_autobr;
+	global $blog_ID,$cache_userdata,$post_autobr;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -123,7 +123,6 @@ function b2newpost($m)
 		pingb2evonet( $blogparams, $post_ID, $post_title, false );
 		pingWeblogs($blogparams, false );
 		pingBlogs($blogparams);
-		pingCafelog($cafelogID, $post_title, $post_ID);
 		pingTechnorati($blogparams);
 
 		return new xmlrpcresp(new xmlrpcval("$post_ID"));
@@ -315,7 +314,7 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
 function bloggernewpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata, $use_weblogsping,$post_autobr;
+	global $blog_ID,$cache_userdata,$post_autobr;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -388,8 +387,6 @@ function bloggernewpost($m)
 			pingWeblogs( $blogparams, false );
 			logIO("O","Pinging Blo.gs...");
 			pingBlogs($blogparams);
-			logIO("O","Pinging Cafelog...");
-			pingCafelog($cafelogID, $post_title, $post_ID);
 			logIO("O","Pinging Technorati...");
 			pingTechnorati($blogparams);
 		}
@@ -420,7 +417,7 @@ function bloggereditpost($m)
 {
 
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata,$tableposts, $tablepostcats, $use_weblogsping,$post_autobr;
+	global $blog_ID,$cache_userdata,$tableposts, $tablepostcats,$post_autobr;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -537,8 +534,6 @@ function bloggereditpost($m)
 				pingWeblogs( $blogparams, false );
 				logIO("O","Pinging Blo.gs...");
 				pingBlogs($blogparams);
-				logIO("O","Pinging Cafelog...");
-				pingCafelog($cafelogID, $post_title, $post_ID);
 				logIO("O","Pinging Technorati...");
 				pingTechnorati($blogparams);
 			}
@@ -568,7 +563,7 @@ $bloggerdeletepost_doc='Deletes a post, blogger-api like';
 function bloggerdeletepost($m) {
 
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$tableposts,$cache_userdata, $use_weblogsping,$post_autobr;
+	global $blog_ID,$tableposts,$cache_userdata,$post_autobr;
 	global $post_default_title,$post_default_category, $sleep_after_edit;
 	$err="";
 
@@ -1071,7 +1066,7 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
 function pingback_ping($m) 
 {
 
-	global $tableposts, $tablecomments, $comments_notify, $notify_from;
+	global $tableposts, $tablecomments, $notify_from;
 	global $baseurl, $b2_version, $use_pingback;
 	global $default_locale;
 
@@ -1226,12 +1221,15 @@ function pingback_ping($m)
 						$sql = "INSERT INTO $tablecomments(comment_post_ID, comment_type, comment_author, comment_author_url, comment_date, comment_content) VALUES ($post_ID, 'pingback', '$title', '$pagelinkedfrom', NOW(), '".addslashes($context)."')";
 						$consulta = mysql_query($sql);
 	
-						if ($comments_notify)
-						{
-							$postdata = get_postdata($post_ID);
-							$blog = $postdata['Blog'];
-							$authordata = get_userdata($postdata['Author_ID']);
-							$recipient = $authordata['user_email'];
+						/*
+						 * New pingback notification:
+						 */
+						$postdata = get_postdata($post_ID);
+						$blog = $postdata['Blog'];
+						$authordata = get_userdata($postdata['Author_ID']);
+						if( get_user_info( 'notify', $authordata ) )
+						{	// Author wants to be notified:
+							$recipient = get_user_info( 'email', $authordata );
 							$subject = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] );
 							// fplanque added:
 							$comment_blogparams = get_blogparams_by_ID( $blog );

@@ -84,15 +84,18 @@ $query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_aut
 $querycount++;
 $result = mysql_query($query) or mysql_oops( $query );
 
-if ($comments_notify) 
-{	
-	$postdata = get_postdata($comment_post_ID);
-	$blog = $postdata['Blog'];
-	$authordata = get_userdata($postdata['Author_ID']);
-	$recipient = $authordata['user_email'];
+/*
+ * New comment notification:
+ */
+$postdata = get_postdata($comment_post_ID);
+$blog = $postdata['Blog'];
+$authordata = get_userdata($postdata['Author_ID']);
+if( get_user_info( 'notify', $authordata ) )
+{	// Author wants to be notified:
+	$recipient = get_user_info( 'email', $authordata );
 	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
 	$comment_blogparams = get_blogparams_by_ID( $blog );
-
+	
 	// Not translated because sent to someone else...
 	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
 	$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$comment_post_ID."&c=1\n\n";
@@ -102,14 +105,14 @@ if ($comments_notify)
 	$notify_message .= T_('Comment', $default_locale).": \n".stripslashes($original_comment)."\n\n";
 	$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 	
-
+	
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
-
+	
 	if( empty( $email ) )
 		$mail_from = $notify_from;
 	else
 		$mail_from = "\"$author\" <$email>";
-
+	
 	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 }
 

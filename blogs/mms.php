@@ -716,7 +716,6 @@ pingback( true, $content, $post_title, '', $post_ID, $blogparams, false );
 pingb2evonet( $blogparams, $post_ID, $post_title, false );
 pingWeblogs( $blogparams, false );
 pingBlogs( $blogparams );
-pingCafelog( $cafelogID, $post_title, $post_ID );
 pingTechnorati($blogparams);
 */
 

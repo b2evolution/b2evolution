@@ -368,57 +368,25 @@ function get_user_info( $show='', $this_userdata = '' )
 			$output = $this_userdata['ID'];
 			break;
 
-		case 'level':
-			$output = $this_userdata['user_level'];
-			break;
-
 		case 'num_posts':
 			$output = get_usernumposts( $this_userdata['ID'] );
 			break;
 
+		case 'level':
 		case 'firstname':
-			$output = $this_userdata['user_firstname'];
-			break;
-
 		case 'lastname':
-			$output = $this_userdata['user_lastname'];
-			break;
-
 		case 'nickname':
-			$output = $this_userdata['user_nickname'];
-			break;
-
 		case 'idmode':
-			$output = $this_userdata['user_idmode'];
-			break;
-
 		case 'email':
-			$output = $this_userdata['user_email'];
-			break;
-
 		case 'url':
-			$output = $this_userdata['user_url'];
-			break;
-
 		case 'icq':
-			$output = $this_userdata['user_icq'];
-			break;
-
 		case 'aim':
-			$output = $this_userdata['user_aim'];
-			break;
-
 		case 'msn':
-			$output = $this_userdata['user_msn'];
-			break;
-
 		case 'yim':
-			$output = $this_userdata['user_yim'];
+		case 'notify':
+			$output = $this_userdata['user_'.$show];
 			break;
 
-
-
-			
 		case 'login':
 		default:
 			$output = $this_userdata['user_login'];

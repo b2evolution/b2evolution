@@ -43,21 +43,12 @@
 			<div class="input"><?php echo user_info( 'num_posts', 'raw' ) ?></div>
 		</fieldset>
 
-		<fieldset>
-			<div class="label"><label for="newuser_firstname"><?php echo T_('First name') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_firstname" id="newuser_firstname" value="<?php user_info( 'firstname', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="newuser_lastname"><?php echo T_('Last name') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_lastname" id="newuser_lastname" value="<?php user_info( 'lastname', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="newuser_nickname"><?php echo T_('Nickname') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_nickname" id="newuser_nickname" value="<?php user_info( 'nickname', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
+		<?php
+			form_text( 'newuser_firstname', get_user_info( 'firstname' ), 40, T_('First name'), '', 50, 'bComment' );
+			form_text( 'newuser_lastname', get_user_info( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
+			form_text( 'newuser_nickname', get_user_info( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
+		?>
+		
 		<fieldset>
 			<div class="label"><label for="newuser_idmode"><?php echo T_('Identity shown') ?>:</label></div>
 			<div class="input">
@@ -74,50 +65,30 @@
 		</fieldset>
 
 
-		<fieldset>
-			<div class="label"><label for="newuser_email"><?php echo T_('Email') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_email" id="newuser_email" value="<?php user_info( 'email', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
+		<?php
+			form_text( 'newuser_email', get_user_info( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
+			form_text( 'newuser_url', get_user_info( 'url' ), 40, T_('URL'), '', 100, 'bComment' );
+			form_text( 'newuser_icq', get_user_info( 'icq' ), 40, T_('ICQ'), '', 40, 'bComment' );
+			form_text( 'newuser_aim', get_user_info( 'aim' ), 40, T_('AOL I.M.'), '', 50, 'bComment' );
+			form_text( 'newuser_msn', get_user_info( 'msn' ), 40, T_('MSN I.M.'), '', 100, 'bComment' );
+			form_text( 'newuser_yim', get_user_info( 'yim' ), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
 
-		<fieldset>
-			<div class="label"><label for="newuser_url"><?php echo T_('URL') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_url" id="newuser_url" value="<?php user_info( 'url', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="newuser_icq"><?php echo T_('ICQ') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_icq" id="newuser_icq" value="<?php user_info( 'icq', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="newuser_aim"><?php echo T_('AIM') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_aim" id="newuser_aim" value="<?php user_info( 'aim', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="newuser_msn"><?php echo T_('MSN I.M.') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_msn" id="newuser_msn" value="<?php user_info( 'msn', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="newuser_yim"><?php echo T_('Yahoo I.M.') ?>:</label></div>
-			<div class="input"><input type="text" name="newuser_yim" id="newuser_yim" value="<?php user_info( 'yim', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
+			form_checkbox( 'newuser_notify', get_user_info( 'notify' ), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
+		?>
 
 		<fieldset>
 			<div class="label"><label for="pass1"><?php echo T_('New password') ?>:</label></div>
-			<div class="input"><input type="password" name="pass1" id="pass1" value="" size="16" tabindex="1" class="bComment" /></div>
+			<div class="input"><input type="password" name="pass1" id="pass1" value="" size="16" class="bComment" /></div>
 		</fieldset>
 	
 		<fieldset>
 			<div class="label"><label for="pass2"><?php echo T_('Confirm new password') ?>:</label></div>
-			<div class="input"><input type="password" name="pass2" id="pass2" value="" size="16" tabindex="1" class="bComment" /></div>
+			<div class="input"><input type="password" name="pass2" id="pass2" value="" size="16" class="bComment" /></div>
 		</fieldset>		
 	
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" tabindex="8" class="search" />
+				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
 			</div>
 		</fieldset>
 	

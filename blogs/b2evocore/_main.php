@@ -28,6 +28,7 @@ require_once (dirname(__FILE__).'/_class_commentlist.php');
 require_once (dirname(__FILE__).'/_class_archivelist.php');
 require_once (dirname(__FILE__).'/_class_calendar.php');
 require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
+require_once (dirname(__FILE__).'/_functions_forms.php');
 
 
 timer_start();

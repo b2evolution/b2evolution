@@ -121,6 +121,10 @@ function create_b2evo_tables()
 		blog_stub VARCHAR(30) NULL DEFAULT 'blog.php',
 		blog_roll text,
 		blog_keywords tinytext,
+		blog_pingb2evonet tinyint(1) NOT NULL default 0,
+		blog_pingtechnorati tinyint(1) NOT NULL default 0,
+		blog_pingweblogs tinyint(1) NOT NULL default 0,
+		blog_pingblodotgs tinyint(1) NOT NULL default 0,
 		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'standard',
 		blog_UID VARCHAR(20),
 		PRIMARY KEY  (blog_ID) 
@@ -615,10 +619,27 @@ switch( $action )
 								ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
-
 		}	               
-			
+
 		if( $old_db_version < 8050 )
+		{
+			echo "<p>Upgrading blogs table... ";
+			$query = "ALTER TABLE $tableblogs
+								ADD COLUMN blog_pingb2evonet tinyint(1) NOT NULL default 0,
+								ADD COLUMN blog_pingtechnorati tinyint(1) NOT NULL default 0,
+								ADD COLUMN blog_pingweblogs tinyint(1) NOT NULL default 0,
+								ADD COLUMN blog_pingblodotgs tinyint(1) NOT NULL default 0";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
+			echo "<p>Upgrading users table... ";
+			$query = "ALTER TABLE $tableusers
+								ADD COLUMN user_notify tinyint(1) NOT NULL default 0";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+		}
+			
+		if( $old_db_version < 8060 )
 		{
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
@@ -666,24 +687,11 @@ switch( $action )
 		}
 		echo '</p>';
 
-		echo "Droping Antispam table...<br />\n";
-		$query = "DROP TABLE IF EXISTS $tableantispam";
-		$q = mysql_query($query) or mysql_oops( $query );
-
-		echo "<p>Creating Anti-Spam Ban List... ";
-		create_antispam();
-		echo "OK.<br />\n";
-		
-		echo "<p>Populating Anti-Spam table... ";
-		populate_antispam();
-		echo "OK.<br />\n";
-
-		echo "<p>Upgrading Settings table... ";
-		$query = "ALTER TABLE $tablesettings
-							DROP COLUMN last_antispam_update,
-							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
-		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />\n";
+			echo "<p>Upgrading users table... ";
+			$query = "ALTER TABLE $tableusers
+								ADD COLUMN user_notify tinyint(1) NOT NULL default 0";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
 
 		?>
 		<p>Redo completed successfully!</p>
@@ -832,9 +840,6 @@ switch( $action )
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Creating Anti-Spam Ban list...";
-		create_antispam();
-		echo "OK.<br />\n";
 		echo "Populating Anti-Spam table...";
 		populate_antispam();
 		echo "OK.<br />\n";
