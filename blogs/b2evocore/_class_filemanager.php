@@ -805,6 +805,7 @@ class FileManager extends Filelist
 		{
 			$chmod = $this->default_chmod_dir;
 		}
+
 		if( empty($dirname) )
 		{
 			$this->Messages->add( T_('Cannot create empty directory.') );
@@ -818,6 +819,7 @@ class FileManager extends Filelist
 		}
 
 		$this->Messages->add( sprintf( T_('Directory [%s] created.'), $dirname ), 'note' );
+		$this->addFile( $filename );
 		return true;
 	}
 
@@ -856,6 +858,7 @@ class FileManager extends Filelist
 		else
 		{
 			$this->Messages->add( sprintf( T_('File [%s] created.'), $filename ), 'note' );
+			$this->addFile( $filename );
 			return true;
 		}
 	}

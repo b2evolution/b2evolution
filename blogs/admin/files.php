@@ -727,6 +727,7 @@ while( $lFile = $Fileman->getNextFile() )
 			<?php echo $Fileman->getIcon( $lFile, 'imgtag' ) ?>
 		</td>
 		<td class="filename">
+			<a href="<?php echo $Fileman->getLinkCurfile() ?>" target="fileman_default" onclick="return false;">
 			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php
 				echo $i ?>].click(); window.open('<?php
 				echo $Fileman->getLinkCurfile().( $lFile->isDir() ? '&amp;mode=browseonly' : '' );
@@ -742,7 +743,7 @@ while( $lFile = $Fileman->getNextFile() )
 				}
 				?>');" id="button_new_<?php echo $i ?>" title="Open in new window">
 				<?php echo $Fileman->getIcon( 'window_new', 'imgtag' )
-			?></button>
+			?></button></a>
 			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkCurfile() ?>">
 			<?php
 			echo $lFile->getName();
