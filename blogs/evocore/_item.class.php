@@ -1239,7 +1239,7 @@ class Item extends DataObject
 
 			echo '<input type="checkbox" class="checkbox" name="renderers[]" value="';
 			$loop_RendererPlugin->code();
-			echo '" id="';
+			echo '" id="renderer_';
 			$loop_RendererPlugin->code();
 			echo '"';
 
@@ -1283,13 +1283,15 @@ class Item extends DataObject
 
 			echo ' title="';
 			$loop_RendererPlugin->short_desc();
-			echo '" />'.
-						'<label for="';
+			echo '" />'
+			.' <label for="renderer_';
 			$loop_RendererPlugin->code();
 			echo '" title="';
 			$loop_RendererPlugin->short_desc();
 			echo '">';
 			$loop_RendererPlugin->name();
+			$loop_RendererPlugin->help_link();
+
 			echo '</label>';
 			echo "</div>\n";
 		}
@@ -1750,6 +1752,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/20 22:34:10  blueyed
+ * item_help() for renderer_checkboxes()
+ *
  * Revision 1.20  2005/02/18 19:16:15  fplanque
  * started relation restriction/cascading handling
  *
