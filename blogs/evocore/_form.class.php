@@ -133,11 +133,18 @@ class Form
 	 */
 	function begin_field( $field_name, $field_label )
 	{
-		return $this->fieldstart
-					.$this->labelstart
-					.'<label for="'.$field_name.'">'.$field_label.':</label>'
-					.$this->labelend
-					.$this->inputstart;
+		$r = $this->fieldstart;
+
+		if( !empty($field_label) )
+		{
+			$r .= $this->labelstart
+						.'<label for="'.$field_name.'">'.$field_label.':</label>'
+						.$this->labelend;
+		}
+
+		$r .= $this->inputstart;
+
+		return $r;
 	}
 
 
@@ -657,18 +664,23 @@ class Form
 
 		$r = $this->begin_field( $field_name, $field_label );
 
-		$r .= '<fieldset class="input">'."\n";
 		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
 		$r .= '<textarea name="'.$field_name.'" id="'.$field_name.'" rows="'.$field_rows
-					.'"  cols="'.$field_cols.'"';
+					.'" cols="'.$field_cols.'"';
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
-		$r .= '>'.$field_value.'</textarea></fieldset>';
-		$r .= '  <span class="notes">'.$field_note.'</span></div>';
-		$r .= "</fieldset>\n\n";
-		
+		$r .= '>'.$field_value.'</textarea>';
+		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
+
+		if( !empty($field_note) )
+		{
+			$r .= '  <span class="notes">'.$field_note.'</span>';
+		}
+
+		$r .= $this->end_field();
+
 		if( $this->output )
 		{
 			echo $r;
@@ -1016,7 +1028,7 @@ class Form
 		$r .= '>';
 		$r .= $field_object->option_list_return( $field_value, $allow_none )
 			 		."</select>\n"
-					.'<span class="notes">'.$field_note.'</span></div>';
+					.'<span class="notes">'.$field_note.'</span>';
 					
 		$r .= $this->end_field();
 					

@@ -269,15 +269,40 @@ class DataObjectCache
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
 	 */
-	function option_list_return( $default = 0, $allow_none = false )
+	function option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
 	{
-		$r = $this->option_list( $default, $allow_none, 'name_return', false );
+		if( (! $this->all_loaded) && $this->load_all )
+		{	// We have not loaded all items so far, but we're allowed to... so let's go:
+			$this->load_all();
+		}
+
+		$r = '';
+
+		if( $allow_none )
+		{
+			$r .= '<option value="0"';
+			if( 0 == $default ) $r .= ' selected="selected"';
+			$r .= '>'.T_('None').'</option>'."\n";
+		}
+
+		foreach( $this->cache as $loop_Obj )
+		{
+			$r .=  '<option value="'.$loop_Obj->ID.'"';
+			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
+			$r .= '>';
+			$r .= $loop_Obj->$method();
+			$r .=  '</option>'."\n";
+		}
+
 		return $r;
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/20 18:46:26  fplanque
+ * debug
+ *
  * Revision 1.8  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *
