@@ -44,7 +44,7 @@ class User extends DataObject
 	 */
 	function User( $userdata = NULL )
 	{
-		global $GroupCache, $tableusers;
+		global $GroupCache, $tableusers, $default_locale;
 
 		// Call parent constructor:
 		parent::DataObject( $tableusers, 'user_' );
@@ -52,14 +52,13 @@ class User extends DataObject
 		if( $userdata == NULL )
 		{
 			// echo 'Creating blank user';
-			$this->name = T_('New user');  // NOTE: we don't need this really. better set firstname/lastname to some default?
 			$this->login = 'login';
 			$this->pass = 'pass';
 			$this->firstname = '';
-			$this->lastname = '';
+			$this->lastname = T_('New user');
 			$this->nickname = '';
 			$this->idmode = 'login';
-			$this->locale = 'en-EU';
+			$this->locale = $default_locale;
 			$this->email = '';
 			$this->url = '';
 			$this->icq = 0;
