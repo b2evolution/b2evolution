@@ -23,24 +23,16 @@ function upgrade_cafelog_tables()
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments,
 					$tableblogs, $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
 	global $baseurl, $old_db_version, $new_db_version;
-	global $stub_all, $stub_a, $stub_b, $stub_roll;
 	global $default_language;
 	global $oldtableposts, $oldtableusers, $oldtablesettings, $oldtablecategories, $oldtablecomments;
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
 
-	echo "Creating default blogs... ";
-	
-	$blog_all_ID = blog_create( 'All Blogs', 'All', '', $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the 'all blogs' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
+	// Create blogs:
+	create_default_blogs( 'Blog A (Upg)', 'Blog A (Cafelog Upgrade)', T_("This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"), false );	
 
-	$blog_upgraded_ID = 	blog_create( 'My Upgraded Blog', 'Upgraded', '', $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'Upgraded blog - no description yet', 'This is description for your upgraded blog. It has index #2 in the database.', $default_language, '', '', '' ) or mysql_oops( $query );
-	
-	$blog_b_ID =	blog_create( 'Demo Blog B', 'Blog B', '', $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
-
-	$blog_roll_ID =	blog_create( 'Demo Blogroll', 'Blogroll', '', $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
-
-	echo "OK.<br />\n";
-	
 
 	echo "Copying Cafelog settings... ";	
 	// forcing paged mode because this works so much better !!!
@@ -78,7 +70,7 @@ function upgrade_cafelog_tables()
 	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
 							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_upgraded_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
+						SELECT $blog_a_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
 						FROM $oldtableusers
 						WHERE user_level = 10";
 	$q = mysql_query($query) or mysql_oops( $query );
@@ -114,7 +106,7 @@ function upgrade_cafelog_tables()
 	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
 							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_upgraded_ID, ID, 'published,protected,private,draft', 0, 1, 0, 0
+						SELECT $blog_a_ID, ID, 'published,protected,private,draft', 0, 1, 0, 0
 						FROM $oldtableusers
 						WHERE user_level > 0 AND user_level < 10";
 	$q = mysql_query($query) or mysql_oops( $query );
@@ -125,20 +117,6 @@ function upgrade_cafelog_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
-	echo "Creating additionnal categories for Blog B... ";
-	$cat_ann_b = cat_create( "Announcements [B]", 'NULL', 3 )  or mysql_oops( $query );
-	$cat_fun = cat_create( "Fun", 'NULL', 3 )  or mysql_oops( $query );
-	$cat_life = cat_create( "In real life", $cat_fun, 3 )  or mysql_oops( $query );
-	$cat_web = cat_create( "On the web", $cat_fun, 3 )  or mysql_oops( $query );
-	$cat_sports = cat_create( "Sports", $cat_life, 3 )  or mysql_oops( $query );
-	$cat_movies = cat_create( "Movies", $cat_life, 3 )  or mysql_oops( $query );
-	$cat_music = cat_create( "Music", $cat_life, 3 )  or mysql_oops( $query );
-	$cat_b2evo = cat_create( "b2evolution", 'NULL', 3 )  or mysql_oops( $query );
-
-	// Create categories for blogroll
-	$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 )  or mysql_oops( $query );
-	$cat_blogroll_contrib = cat_create( "contributors", 'NULL', 4 )  or mysql_oops( $query );
-	echo "OK.<br />\n";
 	
 	echo "Copying Cafelog posts... ";
 	$query = "INSERT INTO $tableposts( ID, post_author, post_date, post_status, post_lang, post_content,post_title, post_category, post_autobr, post_flags, post_karma)  
@@ -166,43 +144,6 @@ function upgrade_cafelog_tables()
 	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_category FROM $tableposts";		
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
-
-	echo "Creating a few additionnal samples for Blog B... ";
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Sample post', '<p>This is a sample post.</p>
-	
-	<p>It appears on blog B only and in a single category.</p>', $now, $cat_fun ) or mysql_oops( $query );
-	
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "Matrix Reloaded", "<p>Wait until the end of the super long end credits!</p>
-	
-	<p>If you're patient enough, you'll a get preview of the next episode...</p>
-	
-	<p>Though... it's just the same anyway! :>></p>", $now, $cat_movies ) or mysql_oops( $query );
-			
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "Clean Permalinks! :idea:", 
-	"<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations. Nethertheless, if you feel comfortable, you should try activating clean permalinks in the /conf/_advanced.php file...</p>",
-	$now, $cat_b2evo ) or mysql_oops( $query );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "Clean Skin! :idea:",
-	"<p>By default, b2evolution blogs are displayed in the \'standard\' skin.</p>
-
-<p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>		
-
-<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also change the default skin or force a specific skin. <strong>Actually, you should change the default skin and delete the standard skin, as this one has navigation links at the top that are only good for the sake of the demo. These would be a nonsense on production servers!</strong> Read the manual on evoSkins!</p>", 
-	$now, $cat_b2evo ) or mysql_oops( $query );
-
-	// POPULATE THE BLOGROLL:
-	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
-
-	echo "OK.<br />\n";
 	
 	echo "Copying Cafelog comments... ";
 	$query = "INSERT INTO $tablecomments( comment_ID, comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma ) SELECT comment_ID, comment_post_ID, 'comment', comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma FROM $oldtablecomments";
@@ -218,6 +159,16 @@ function upgrade_cafelog_tables()
 	$query = "UPDATE $tablecomments SET comment_type = 'pingback' WHERE comment_content LIKE '<pingback />%'";		
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";	
+	
+	
+	create_default_categories( false /* not for A */ );
+
+	// POPULATE THE BLOGROLL:
+	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+
+	// Create other default contents:
+	create_default_contents( false /* not for A */ );
+
 }
 
 ?>

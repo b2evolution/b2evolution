@@ -325,6 +325,8 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 {
 	global $timestamp;
 
+	echo "Creating default blogroll entries... ";
+	
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://tin-men.net/' ) or mysql_oops( $query );
@@ -353,25 +355,35 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'This is a sample blogroll entry', "This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites).", $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://b2evolution.net/' ) or mysql_oops( $query );
 
+	echo "OK.<br />\n";
+
 }
 
-/*
- * populate_main_tables(-)
- *
- * This is called only for fresh installs
- */
-function populate_main_tables()
-{
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-        $tablepostcats, $tablehitlog, $tableantispam, $tableblogusers;
-	global $baseurl, $new_db_version;
-	global $random_password, $default_language, $query;
-	global $stub_all, $stub_a, $stub_b, $stub_roll;
-	global $timestamp, $admin_email;
-	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
-	global $default_blog_longdesc, $default_more_longdesc;
 
-	echo "Creating sample blogs... ";
+/** 
+ * Create default blogs
+ *
+ * This is called for fresh installs and cafelog upgrade
+ *
+ * {@internal create_default_blogs(-) }}
+ *
+ */
+function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = 'Demo Blog A', $blog_a_longdesc = '#' )
+{
+	global $default_language, $query, $timestamp;
+	global $stub_all, $stub_a, $stub_b, $stub_roll;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
+
+	$default_blog_longdesc = T_("This is a demo blog named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s");
+
+	$default_more_longdesc = T_("<br />
+<br />
+You can edit this file to change the default skin used for this blog. You can also rename this file to a better name; but make sure you update the new name in the blogs admin.<br />
+<br />
+If you don't want to use skins, use the provided '<code>%s</code>' file instead.");
+
+
+	echo "Creating default blogs... ";
 	
 	$blog_shortname = 'Blog All';
 	$blog_stub = $stub_all;
@@ -381,11 +393,12 @@ function populate_main_tables()
 	$blog_ID = 1;
 	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
 
-	$blog_shortname = 'Blog A';
+	$blog_shortname = $blog_a_short;
 	$blog_stub = $stub_a;
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
 	$blog_ID = 2;
-	$blog_a_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
+	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( 
+(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = $stub_b;
@@ -402,14 +415,32 @@ function populate_main_tables()
 	$blog_roll_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
 
 	echo "OK.<br />\n";
-	
+
+}
+
+/** 
+ * Create default categories
+ *
+ * This is called for fresh installs and cafelog upgrade
+ *
+ * {@internal create_default_categories(-) }}
+ *
+ */
+function create_default_categories( $populate_blog_a = true )
+{
+	global $default_language, $query, $timestamp;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+
 	echo 'Creating sample categories...';
 	
-	// Create categories for blog A
-	$cat_ann_a = cat_create( "Announcements [A]", 'NULL', 2 )  or mysql_oops( $query );
-	$cat_news = cat_create( "News", 'NULL', 2 )  or mysql_oops( $query );
-	$cat_bg = cat_create( "Background", 'NULL', 2 )  or mysql_oops( $query );
-	
+	if( $populate_blog_a )
+	{
+		// Create categories for blog A
+		$cat_ann_a = cat_create( "Announcements [A]", 'NULL', 2 )  or mysql_oops( $query );
+		$cat_news = cat_create( "News", 'NULL', 2 )  or mysql_oops( $query );
+		$cat_bg = cat_create( "Background", 'NULL', 2 )  or mysql_oops( $query );
+	}
+		
 	// Create categories for blog B
 	$cat_ann_b = cat_create( "Announcements [B]", 'NULL', 3 )  or mysql_oops( $query );
 	$cat_fun = cat_create( "Fun", 'NULL', 3 )  or mysql_oops( $query );
@@ -426,29 +457,24 @@ function populate_main_tables()
 	
 	echo "OK.<br />\n";
 
-	// POPULATE THE BLOGROLL:
-	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+}
 
-	echo 'Creating sample posts...';
 
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'First Post', '<p>This is the first post.</p>
-	
-<p>It appears on both blog A and blog B.</p>', $now, $cat_ann_a, array( $cat_ann_b ) ) or mysql_oops( $query );
-	
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Second post', '<p>This is the second post.</p>
-	
-<p>It appears on blog A only but in multiple categories.</p>', $now, $cat_news, array( $cat_ann_a, $cat_bg ) ) or mysql_oops( $query );
-	
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Third post', '<p>This is the third post.</p>
-	
-<p>It appears on blog B only and in a single category.</p>', $now, $cat_fun ) or mysql_oops( $query );
-	
+/** 
+ * Create default contents
+ *
+ * This is called for fresh installs and cafelog upgrade
+ *
+ * {@internal create_default_contents(-) }}
+ *
+ */
+function create_default_contents( $populate_blog_a = true )
+{
+	global $default_language, $query, $timestamp;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+
+	echo 'Creating sample posts... ';
+
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, "Matrix Reloaded", "<p>[This is yet another sample post to demonstrate sub categories]</p>
@@ -533,10 +559,60 @@ function populate_main_tables()
 	
 <p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)</p>
 
-<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>", $now, $cat_b2evo, array( $cat_ann_a, $cat_ann_b ) ) or mysql_oops( $query );
+<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>", $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_ann_a , $cat_ann_b ) : array ( $cat_ann_b ) ) ) or mysql_oops( $query );
+
+	echo "OK.<br />\n";
+
+}
+
+
+/*
+ * populate_main_tables(-)
+ *
+ * This is called only for fresh installs
+ */
+function populate_main_tables()
+{
+	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
+        $tablepostcats, $tablehitlog, $tableantispam, $tableblogusers;
+	global $baseurl, $new_db_version;
+	global $random_password, $default_language, $query;
+	global $timestamp, $admin_email;
+	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+
+	create_default_blogs();
+	
+	create_default_categories();
+		
+	echo 'Creating sample posts for blog A...';
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'First Post', '<p>This is the first post.</p>
+	
+<p>It appears on both blog A and blog B.</p>', $now, $cat_ann_a, array( $cat_ann_b ) ) or mysql_oops( $query );
+	
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Second post', '<p>This is the second post.</p>
+	
+<p>It appears on blog A only but in multiple categories.</p>', $now, $cat_news, array( $cat_ann_a, $cat_bg ) ) or mysql_oops( $query );
+	
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Third post', '<p>This is the third post.</p>
+	
+<p>It appears on blog B only and in a single category.</p>', $now, $cat_fun ) or mysql_oops( $query );
 	
 	echo "OK.<br />\n";
 	
+	// POPULATE THE BLOGROLL:
+	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+
+	create_default_contents();
+
 
 	echo 'Creating sample comments... ';
 
@@ -600,7 +676,7 @@ function populate_main_tables()
 
 	// SETTINGS!
 	$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update, pref_newusers_grp_ID ) 
-	VALUES ( 1, 3, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
+	VALUES ( 1, 5, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
 	$q = mysql_query($query) or mysql_oops( $query );
 
 	echo "OK.<br />\n";

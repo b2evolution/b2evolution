@@ -95,16 +95,6 @@ $stub_a = 'blog_a';
 $stub_b = 'blog_b';
 $stub_roll = 'blog_roll';
 
-$default_blog_longdesc = T_("This is a demo blog named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s");
-
-$default_more_longdesc = T_("<br />
-<br />
-You can edit this file to change the default skin used for this blog. You can also rename this file to a better name; but make sure you update the new name in the blogs admin.<br />
-<br />
-If you don't want to use skins, use the provided '<code>%s</code>' file instead.");
-
-
-
 switch( $action )
 {
 	case 'newdb':
