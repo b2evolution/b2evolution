@@ -20,7 +20,6 @@ require_once (dirname(__FILE__)."/_functions_skins.php");
 require_once (dirname(__FILE__).'/_functions_errors.php');
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
 if( $use_html_checker ) require_once (dirname(__FILE__).'/_class_htmlchecker.php');
-if( $use_textile ) require_once (dirname(__FILE__).'/_functions_textile.php');
 
 
 
@@ -68,9 +67,7 @@ function mysql_oops($sql_query)
  */
 function format_to_output( $content, $format = 'htmlbody' )
 {
-	global $use_textile;
-
-	// echo ' format [', $content, ']to: ', $format;
+	// echo '<font color=red>format [', $content, ']to: ', $format, '</font>';
 	switch( $format )
 	{
 		case 'raw':
@@ -80,7 +77,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'formvalue':
 			// convert_chars() do too much at this time,
 			// so temporally commented out.
-//			$content = convert_chars($content, 'html');
+			// $content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
 			break;
 
@@ -120,7 +117,6 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 			
 		case 'entityencoded':
-			if( $use_textile ) $content = textile( $content );
 			convert_bbcode($content);
 			convert_gmcode($content);
 			$content = make_clickable($content);
@@ -133,7 +129,6 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'htmlbody':
 		default:
 			// echo 'html';
-			if( $use_textile ) $content = textile( $content );
 			convert_bbcode($content);
 			convert_gmcode($content);
 			$content = make_clickable($content);

@@ -102,10 +102,14 @@
 	
 */
 
-
+/*
+ * textile(-)
+ */
 function textile($text) 
 {
 	### Basic global changes
+
+	// echo '<font color="#00FF00">TEXTILE [', $text, ']</font>';
 
 	// $text = stripslashes($text);
 		
@@ -365,6 +369,9 @@ function textile($text)
 	
 	# Newline linebreaks, just for markup tidiness
 	$text = str_replace("<br />","<br />\n",$text);
+
+
+	// echo '<font color="green">--&gt; [', $text, ']</font>';
 
 	return $text;
 

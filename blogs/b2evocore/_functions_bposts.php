@@ -7,6 +7,7 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
+if( $use_textile ) require_once (dirname(__FILE__).'/_functions_textile.php');
 
 /*
  * bpost_create(-)
@@ -511,7 +512,12 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
  */
 function the_content( $more_link_text='#', $stripteaser=0, $more_file='', $more_anchor='#', $before_more_link = '<p class="bMore">', $after_more_link = '</p>', $format = 'htmlbody', $cut = 0) 
 {
+	global $use_textile;
+
 	$content = get_the_content($more_link_text,$stripteaser,$more_file,$more_anchor,$before_more_link, $after_more_link);
+
+	if( $use_textile ) $content = textile( $content );
+
 	$content = format_to_output( $content, $format );
 	
 	if( ($format == 'xml') && $cut )

@@ -320,9 +320,13 @@ function comment_author_IP() {
 function comment_text() 
 {
 	global $commentdata;
+	global $use_textile;
+
 	$comment = $commentdata['comment_content'];
 	$comment = str_replace('<trackback />', '', $comment);
 	$comment = str_replace('<pingback />', '', $comment);
+
+	if( $use_textile ) $comment = textile( $comment );
 
 	$comment = format_to_output( $comment, 'htmlbody' );
 	echo $comment;
