@@ -269,10 +269,11 @@ table.grouped tr.odd .firstcol {
 #header {
 	font-size:85%;
 	background: url("img/bg_grey.gif") repeat-x bottom;
+	margin: 0;
 }
 #TitleArea {
 	/* clear: both; */
-	margin: 0 1em 1ex 1em;
+	margin: 1ex 1em 1ex 1em;
 	padding: .5ex;
 	background-color:#69f;
 	border: 1px solid #36c;	/* force moz to display float before */
@@ -285,8 +286,7 @@ table.grouped tr.odd .firstcol {
 	border: 0;
 }
 #headfunctions {
-	margin-top: .5ex;
-	text-align:right;
+	float:right;
 	margin-right: 1ex;
 	color: #b0b0b0;
 }
@@ -302,12 +302,18 @@ table.grouped tr.odd .firstcol {
 	text-decoration: none;
 }
 #headinfo {
+	margin-top: .5ex;
 	padding-left: 1em;
-	line-height: 150%;
 	color: #b0b0b0;
 	white-space: nowrap;
 }
+#header h1 {
+	margin: 0;
+	padding: .5ex;
+	font-size: 150%;
+}
 div#mainmenu {
+	clear:left;
 	float:left;
 	width:12em;
 	background-color:#69f;
@@ -329,7 +335,7 @@ div#mainmenu {
 	width: 65%;
 	/* clear: left; */
 	/* border:	1px solid #f00; */
-	margin: 0;
+	margin: 1ex 0 0 0;
 	padding: 0;
 	overflow: hidden;
 }
@@ -338,7 +344,7 @@ div#mainmenu {
 	width: 33%;
 	vertical-align: top;
 	float: right;
-	margin: 0;
+	margin: 1ex 0 0 0;
 	padding: 0;
 	overflow: hidden;
 }
@@ -374,7 +380,7 @@ div.panelblock {
 /* Main tabs: */
 #mainmenu ul{
 	list-style: none;
-	margin: 0;
+	margin: .5ex;
 	padding:0;
 }
 #mainmenu li{
