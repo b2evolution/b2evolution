@@ -12,9 +12,6 @@
 ?>
 <script type="text/javascript">
 <!--
-
-blogbaseurl = '<?php echo $edited_Blog->get('baseurl') ?>';
-
 function update_IDs( ids, text, notrailingslash )
 {
 	//replace = document.createTextNode( 'lala' );
@@ -35,9 +32,9 @@ function update_IDs( ids, text, notrailingslash )
 		i++;
 	};
 }
-
 //-->
 </script>
+
 <form action="b2blogs.php" class="fform" method="post">
 	<input type="hidden" name="action" value="<?php echo $next_action ?>" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />
@@ -76,7 +73,7 @@ function update_IDs( ids, text, notrailingslash )
 						),
 						array( 'stub',
 										T_('Other blog through stub file (Advanced)'),
-										'<span id="blogbaseurl2">'.$edited_Blog->get('baseurl').'</span><span id="blog_stub_js0">'.$blog_stub.'</span><br /><div style="margin-left:28px">('.T_('You MUST create a stub file for this to work.').')</div>',
+										'<span id="blogbaseurl2">'.$edited_Blog->get('baseurl').'</span><span id="blog_stub_js0">'.$blog_stub.'</span><br /><div style="margin-left:22px">'.T_("You MUST create a stub file for this to work or handle it accordingly on the Webserver (like Apache's mod_rewrite).").'</div>',
 										'<div class="label"><label for="blog_stub">'.T_('Stub name').':</label></div>'
 										.'<div class="input"><input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$blog_stub.'" onkeyup="update_IDs( \'blog_stub_js\', this.value, true )" onfocus="update_IDs( \'blog_stub_js\', this.value, true ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" />'
 										.'<span class="notes"></span></div>',
@@ -97,7 +94,7 @@ function update_IDs( ids, text, notrailingslash )
 						array( 'absolute',
 										T_('absolute URL').':',
 										'',
-										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'absolute' ? format_to_output($blog_siteurl_absolute, 'formvalue') : '' ).'" onkeyup="update_IDs( \'blogbaseurl\', this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_IDs( \'blogbaseurl\', this.value );" />',
+										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output($blog_siteurl_absolute, 'formvalue').'" onkeyup="update_IDs( \'blogbaseurl\', this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_IDs( \'blogbaseurl\', this.value );" />',
 										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
 						)
 					),
@@ -168,5 +165,6 @@ function update_IDs( ids, text, notrailingslash )
 		if( document.getElementsByName( 'blog_siteurl_type' )[i].checked )
 			document.getElementsByName( 'blog_siteurl_type' )[i].click();
 	}
+	document.getElementById( 'blog_name' ).focus();
 // -->
 </script>

@@ -196,7 +196,7 @@ class Blog extends DataObject
 			case 'default':
 				// Access through index.php as default blog
 				if( $Settings->get('default_blog_ID') == $this->ID )
-				{	// Safety check! We only do that kind of linking if this is really the default blog...
+				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					return $base.'/index.php';
 				}
 				// ... otherwise, we add the blog ID:
@@ -213,7 +213,7 @@ class Blog extends DataObject
 				// Access through stub file
 				$blogurl = $base.'/'.$this->stub;
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
-				{	// We want to force the dynamic page but the URL is not explicitely dynamic
+				{ // We want to force the dynamic page but the URL is not explicitely dynamic
 					$blogurl .= '.php';
 				}
 				return $blogurl;
@@ -222,6 +222,23 @@ class Blog extends DataObject
 				die( 'Unhandled Blog access type ['.$this->access_type.']' );
 		}
 	}
+
+
+	function gen_mediadir()
+	{
+		global $basepath;
+
+		switch( $this->media_location )
+		{
+			case 'default':
+				return $basepath.'/media/'.$this->urlname;
+			case 'subdir':
+				return $basepath.'/media/'.$this->media_subdir;
+			case 'custom':
+				return $this->media_fullpath;
+		}
+	}
+
 
 	/**
 	 * Get a param

@@ -64,15 +64,15 @@ switch($action)
 		// check params:
 		if( $blog_siteurl_type == 'absolute' )
 		{
-			$blog_siteurl = $blog_siteurl_absolute;
-			if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
+			$blog_siteurl =& $blog_siteurl_absolute;
+			if( !preg_match( '#^https?://.+#', $blog_siteurl_absolute ) )
 			{
 				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
 			}
 		}
 		if( $blog_siteurl_type == 'relative' )
 		{
-			$blog_siteurl = $blog_siteurl_relative;
+			$blog_siteurl =& $blog_siteurl_relative;
 			if( preg_match( '#^https?://#', $blog_siteurl_relative ) )
 			{
 				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an relative URL (without <code>http://</code> or <code>https://</code>)!') );
@@ -81,12 +81,6 @@ switch($action)
 			{
 				$blog_siteurl = '/'.$blog_siteurl;
 			}
-		}
-		if( preg_match( '#/$#', $blog_siteurl ) )
-		{
-			$blog_siteurl = preg_replace( '#/+$#', '', $blog_siteurl );
-
-			$Messages->add( T_('Blog Folder URL').': '.T_('Trailing slash(es) removed..') );
 		}
 
 		if( empty($blog_urlname) )
@@ -261,15 +255,15 @@ switch($action)
 				// check params:
 				if( $blog_siteurl_type == 'absolute' )
 				{
-					$blog_siteurl = $blog_siteurl_absolute;
-					if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
+					$blog_siteurl =& $blog_siteurl_absolute;
+					if( !preg_match( '#^https?://.+#', $blog_siteurl_absolute ) )
 					{
 						$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
 					}
 				}
 				if( $blog_siteurl_type == 'relative' )
 				{
-					$blog_siteurl = $blog_siteurl_relative;
+					$blog_siteurl =& $blog_siteurl_relative;
 					if( preg_match( '#^https?://#', $blog_siteurl_relative ) )
 					{
 						$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an relative URL (without <code>http://</code> or <code>https://</code>)!') );
@@ -278,12 +272,6 @@ switch($action)
 					{
 						$blog_siteurl = '/'.$blog_siteurl;
 					}
-				}
-				if( preg_match( '#/$#', $blog_siteurl ) )
-				{
-					$blog_siteurl = preg_replace( '#/+$#', '', $blog_siteurl );
-
-					$Messages->add( T_('Blog Folder URL').': '.T_('Trailing slash(es) removed..') );
 				}
 
 				if( empty($blog_urlname) )
@@ -386,6 +374,9 @@ switch($action)
 			$edited_Blog->dbupdate();
 		}
 
+		// display notes
+		$Messages->display( '', '', true, 'note' );
+
 		?>
 		</div>
 		<?php
@@ -471,6 +462,7 @@ switch($action)
 					{ // relative
 						$blog_siteurl_type = 'relative';
 						$blog_siteurl_relative = $blog_siteurl;
+						$blog_siteurl_absolute = 'http://';
 					}
 					$blog_stub = get_bloginfo( 'stub' );
 					$blog_urlname = get_bloginfo( 'urlname' );

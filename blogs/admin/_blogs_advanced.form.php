@@ -29,7 +29,7 @@
 									array(
 										array( 'default',
 														T_('Default'),
-														sprintf( T_('subdirectory of %s'), $basepath.'/'.$media_subdir ) ),
+														sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.'/'.$media_subdir ) ),
 										array( 'subdir',
 														T_('Subdirectory of media folder'),
 														'',
