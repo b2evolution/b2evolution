@@ -43,12 +43,12 @@ require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions.php" )
 require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_cats.php" );
 require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts.php" );
 
-$new_db_version = 8030;				// next time: 8030
+$new_db_version = 8040;				// next time: 8050
 
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-        $tablepostcats, $tablehitlog, $tablemailinglist, $tableantispam, $tablepluginsettings;
+        $tablepostcats, $tablehitlog, $tableantispam, $tablepluginsettings;
 	global $baseurl, $new_db_version;
 
 	echo "<p>Creating the necessary tables in the database...</p>";
@@ -212,20 +212,11 @@ function create_b2evo_tables()
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	 
-	 
-	echo "<p>Creating table for Mailing List...<br />\n";
-	$query = "CREATE TABLE $tablemailinglist ( 
-		ID int(4) NOT NULL auto_increment,
-		email_address text NOT NULL,
-		cat_subscribe text NOT NULL,
-		PRIMARY KEY (ID)
-	)";	// for ID to have auto_increment, it needs to be a key
-	$q = mysql_query($query) or mysql_oops( $query );
 	
 	echo "Creating table for Anti-Spam Ban List...</p>\n";
 	create_antispam();
 
-#	echo "Creating table for Plugin Settings...<br />\n";
+#	echo "Creating table for Plugin Settings...</p>\n";
 #	create_pluginsettings();
 
 	echo "<p>All tables created successfully.</p>\n";
@@ -563,11 +554,6 @@ switch( $action )
 		populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
 
 		echo "posts: OK<br />\n";
-
-		// Populate the anti-spam table:
-		populate_antispam();
-
-		echo "anti-spam: OK<br />\n";
 		
 
 			
@@ -577,6 +563,12 @@ switch( $action )
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "comments: OK<br />\n";
 		
+
+		// Populate the anti-spam table:
+		populate_antispam();
+
+		echo "anti-spam: OK<br />\n";
+
 		
 		// SETTINGS!
 		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', $new_db_version)";
@@ -671,18 +663,6 @@ switch( $action )
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 
-			echo "<p>Creating anti-spam table... ";
-			create_antispam();
-			echo "OK.<br />\n";
-
-			echo "<p>Populating anti-spam table... ";
-			populate_antispam();
-			echo "OK.<br />\n";
-
-		#	echo "<p>Creating plugin settings table... ";
-		#	create_pluginsettings();
-		#	echo "OK.<br />\n";
-
 			echo "<p>Generating wordcounts... ";
 			$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
 			$q = mysql_query($query) or mysql_oops( $query );
@@ -704,18 +684,6 @@ switch( $action )
 								SET user_pass = MD5(user_pass)";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
-
-			echo "<p>Creating anti-spam table... ";
-			create_antispam();
-			echo "OK.<br />\n";
-
-			echo "<p>Populating anti-spam table... ";
-			populate_antispam();
-			echo "OK.<br />\n";
-			
-		#	echo "<p>Creating plugin settings table... ";
-		#	create_pluginsettings();
-		#	echo "OK.<br />\n";
 		}
 
 		if( $old_db_version < 8030 )
@@ -751,39 +719,18 @@ switch( $action )
 			}
 			echo "OK. ($rows_updated rows updated)</p>\n";
 
-			echo "<p>Creating anti-spam table... ";
-			create_antispam();
-			echo "OK.<br />\n";
-
-			echo "<p>Populating anti-spam table... ";
-			populate_antispam();
-			echo "OK.<br />\n";
-
-		#	echo "<p>Creating plugin settings table... ";
-		#	create_pluginsettings();
-		#	echo "OK.<br />\n";
-
 		}
 	
 		if( $old_db_version < 8040 )
 		{
 			global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-                        $tablepostcats, $tablehitlog, $tablemailinglist, $tableantispam, $tablepluginsettings;
+                        $tablepostcats, $tablehitlog, $tableantispam, $tablepluginsettings;
 	                global $baseurl, $new_db_version;
-			
-			echo "Creating table for Mailing List...</p>\n";
-                	$query = "CREATE TABLE $tablemailinglist (
-                		ID int(4) NOT NULL auto_increment,
-                		email_address text NOT NULL,
-                		cat_subscribe text NOT NULL,
-                		PRIMARY KEY (ID)
-                	)";
-                	$q = mysql_query($query) or mysql_oops( $query );
 			
 			echo "<p>Creating Anti-Spam Ban List... ";
 			create_antispam();
 			echo "OK.<br />\n";
-
+			
 			echo "<p>Populating Anti-Spam table... ";
 			populate_antispam();
 			echo "OK.<br />\n";
@@ -791,7 +738,7 @@ switch( $action )
 		#	echo "<p>Creating plugin settings table... ";
 		#	create_pluginsettings();
 		#	echo "OK.<br />\n";
-			
+	               
 			
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
