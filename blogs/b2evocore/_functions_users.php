@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/_class_user.php';
 function veriflog( $login_required = false )
 {
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $core_dirout;
-	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url;
+	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
 	global $current_User;
 	
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
@@ -28,7 +28,6 @@ function veriflog( $login_required = false )
 	$user_login = '';
 	$user_pass_md5 = '';
 	$userdata = '';
-	$user_level = '';
 	$user_ID = '';
 	$user_nickname = '';
 	$user_email = '';
@@ -131,7 +130,6 @@ function veriflog( $login_required = false )
 	$userdata	= get_userdatabylogin($user_login);
 	$current_User = new User( $userdata );
 
-	$user_level	= $userdata['user_level'];
 	$user_ID = $userdata['ID'];
 	$user_nickname = $userdata['user_nickname'];
 	$user_email	= $userdata['user_email'];
@@ -149,14 +147,13 @@ function veriflog( $login_required = false )
 function logout()
 {
 	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
-	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url;
+	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
 	
 	// Reset all global variables 
 	// Note: unset is bugguy on globals
 	$user_login = '';
 	$user_pass_md5 = '';
 	$userdata = '';
-	$user_level = '';
 	$user_ID = '';
 	$user_nickname = '';
 	$user_email = '';
@@ -446,11 +443,11 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  */
 function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link_text = '', $link_title = '#' )
 {
-	global $admin_url, $user_level, $blog;
+	global $admin_url, $blog, $current_User;
 
 	if( ! is_logged_in() ) return false;
 
-	if( $user_level == 0 ) 
+	if( $current_User->get('level') == 0 ) 
 	{ // If user is NOT active:
 		return false;
 	}
