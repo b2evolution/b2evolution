@@ -1181,7 +1181,7 @@ function validate_url( $url, & $allowed_uri_scheme )
  */
 function pre_dump( $vars )
 {
-	echo '<pre>';
+	echo '<pre style="padding:1ex;border:1px solid #00f;">';
 	foreach( func_get_args() as $lvar )
 	{
 		echo htmlspecialchars( var_export( $lvar, true ) ).'<br />';
@@ -1683,6 +1683,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.29  2005/01/09 05:34:08  blueyed
+ * emphasize pre_dump()
+ *
  * Revision 1.28  2005/01/06 15:45:36  blueyed
  * Fixes..
  *
