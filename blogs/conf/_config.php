@@ -43,7 +43,7 @@ $allow_evodb_reset = 1;  // FOR TESTING
 # If you don't, login cookies will not hold. 
 $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
-$baseurl = 'http://localhost:8088/b2evolution/blogs';		// FOR TESTING
+$baseurl = 'http://b2test.local/blogs';		// FOR TESTING
 
 
 

@@ -10,14 +10,14 @@
 require( dirname(__FILE__). '/_header.php' );
 
 param( 'action', 'string' );
-param( 'cat', 'string' );
+param( 'tab', 'string' );
 
 $title = T_('Options');
 
 require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
-switch( $cat )
+switch( $tab )
 {
 	case 'locales':
 		$title .= ': '. T_('Locales'); break;
@@ -96,20 +96,20 @@ if( $action == 'update' )
 $current_User->check_perm( 'options', 'view', true );
 ?>
 
-	<div id="catheader">
+	<div id="tabheader">
 	<ul>
 	<?php
-		if( $cat == '' )
+		if( $tab == '' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2options.php">'. T_('General'). '</a></li>';
 		
-		if( $cat == 'locales' )
+		if( $tab == 'locales' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2options.php?cat=locales">'. T_('Locales'). '</a></li>';
+		echo '<a href="b2options.php?tab=locales">'. T_('Locales'). '</a></li>';
 
 	?>
 
@@ -119,10 +119,10 @@ $current_User->check_perm( 'options', 'view', true );
 
 		<form class="fform" name="form" action="b2options.php" method="post">
 		<input type="hidden" name="action" value="update" />
-		<input type="hidden" name="cat" value="<?php echo $cat; ?>" />
+		<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
 
 		<?php
-		switch( $cat )
+		switch( $tab )
 		{
 			// GENERAL OPTIONS -----------------------------------------------------------
 			case '':?>
