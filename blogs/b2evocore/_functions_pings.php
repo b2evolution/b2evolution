@@ -1,4 +1,4 @@
-y<?php
+<?php
 /*
  * b2evolution - http://b2evolution.net/
  *
