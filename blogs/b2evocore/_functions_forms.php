@@ -183,11 +183,13 @@ function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note 
 /*
  * form_info(-)
  */
-function form_info( $field_label, $field_info )
+function form_info( $field_label, $field_info, $field_note = '' )
 {
 	echo '<fieldset>';
 	echo '  <div class="label">', $field_label, ':</div>';
-	echo '  <div class="input" style="padding-top: .6ex;">', $field_info, '</div>';
+	echo '  <div class="input" style="padding-top: .6ex;">', $field_info;
+	if( !empty($field_note) )	echo '&nbsp; <small class="notes">', $field_note, '</small>';
+	echo '</div>';
 	echo "</fieldset>\n\n";
 }
 
@@ -201,7 +203,7 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 	echo '  <td align="right"><strong>', $field_label, ':</strong></td>';
 	echo '  <td>', $field_info;
 	
-	if( !empty($field_note) )	echo '<td class="small">', $field_note, '</td>';
+	if( !empty($field_note) )	echo ' <td class="small">', $field_note, '</td>';
 	
 	echo "</td></tr>\n\n";
 }
