@@ -1299,16 +1299,13 @@ function debug_info( $force = false )
 	
 	if( $debug || $force )
 	{
-		echo "Debug: ".number_format(timer_stop(),3)." seconds";
-
-		echo '<h2>DB</h2>';
+		echo '<h2>Debug info</h2>';
 		
-		echo 'DB queries: ', $DB->num_queries, '<br />';
-		echo 'Old style queries: ', $querycount, '<br />';
+		echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 
 		if( count( $debug_messages ) )
 		{
-			echo '<h2>Debug messages</h2><ul>';
+			echo '<h3>Debug messages</h3><ul>';
 			foreach( $debug_messages as $message )
 			{
 				echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';
@@ -1316,6 +1313,12 @@ function debug_info( $force = false )
 			echo '</ul>';
 		}
 
+		echo '<h3>DB</h3>';
+		
+		echo 'Old style queries: ', $querycount, '<br />';
+		echo 'DB queries: ', $DB->num_queries, '<br />';
+
+		$DB->dump_queries();
 	}
 }
 

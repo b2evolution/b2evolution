@@ -21,7 +21,7 @@ function cat_create(
 	$cat_parent_ID, 
 	$cat_blog_ID = NULL)
 {
-	global $tablecategories, $query, $querycount;
+	global $DB, $tablecategories;
 	
 	if( $cat_blog_ID == NULL )
 	{
@@ -30,14 +30,12 @@ function cat_create(
 		$cat_blog_ID = $parent_cat['cat_blog_ID']; 
 	}
 
-	$query="INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID) 
+	$sql = "INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID) 
 					VALUES ( $cat_parent_ID, '$cat_name', $cat_blog_ID )";
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-	$cat_ID = mysql_insert_id();
-
-	return $cat_ID;
+	if( ! $DB->query( $sql ) )
+		return 0;
+	
+	return $DB->insert_id;
 }
 
 
@@ -61,11 +59,7 @@ function cat_update(
 	$query .= ", cat_parent_ID = $cat_parent_ID";
 	$query .= " WHERE cat_ID=$cat_ID";
 
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-
-	return 1;	// success
+	return $DB->query( $query );
 }
 
 
@@ -80,81 +74,58 @@ function cat_update(
  */
 function cat_delete( $cat_ID )
 {
-	global $tablecategories, $tableposts, $tablepostcats, $query, $querycount, $cache_categories, $cache_postcats;
+	global $DB, $tablecategories, $tableposts, $tablepostcats, $query, $cache_categories, $cache_postcats;
 
 	// TODO: START TRANSACTION
 
-	// TODO: check there are no subcats
-	$query="SELECT COUNT(*) AS child_count FROM $tablecategories WHERE cat_parent_ID = $cat_ID";
-
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-	
-	$row = mysql_fetch_object( $result );
-	
-	$child_count = $row->child_count;
+	// check there are no subcats
+	$sql = "SELECT COUNT(*) 
+					FROM $tablecategories 
+					WHERE cat_parent_ID = $cat_ID";
+	$child_count = $DB->get_var( $sql );
 	if( $child_count != 0 ) return T_("Cannot delete if there are sub-categories!");
 	
-	// TODO: find parent
-	$query="SELECT cat_parent_ID, cat_blog_ID FROM $tablecategories WHERE cat_ID = $cat_ID";
-
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-	
-	$row = mysql_fetch_object( $result );
-	
-	if( empty( $row ) ) return 1; // Success: category already deleted!!
+	// find parent
+	$sql = "SELECT cat_parent_ID, cat_blog_ID
+					FROM $tablecategories 
+					WHERE cat_ID = $cat_ID";
+	if( ! ($row = $DB->get_row( $sql )) )
+		return 1; // Success: category already deleted!!
 	
 	$remap_cat_ID = $row->cat_parent_ID;
 	$cat_blog_ID = $row->cat_blog_ID;
 
-
 	// Get the list of posts in this category
-	$query = "SELECT ID FROM $tableposts WHERE post_category = $cat_ID";
-
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-
-	$IDarray = array();
-	while( $row = mysql_fetch_array($result) ) 
-	{
-		$IDarray[] = $row["ID"];
-	}
-
+	$sql = "SELECT ID 
+					FROM $tableposts 
+					WHERE post_category = $cat_ID";
+	$IDarray = $DB->get_col( $sql );
 
 	if( ! $remap_cat_ID )
 	{	// No parent, find another cat in same blog
-		$query="SELECT cat_ID FROM $tablecategories WHERE cat_blog_ID = $cat_blog_ID AND cat_ID != $cat_ID ORDER BY cat_ID";
-	
-		$querycount++;
-		$result = mysql_query($query);
-		if( !$result ) return 0;
-		
-		$row = mysql_fetch_object( $result );
-		if( !empty( $row ) )
-		{	// We found another cat, ok:
-			$remap_cat_ID = $row->cat_ID;
-		}
-		elseif( empty($IDarray) )
-		{ // this was the last cat
-			// But there are no posts inside
-			$remap_cat_ID = NULL;	// Okay we are deleting without remap!
-		}
-		else
+		$sql = "SELECT cat_ID 
+						FROM $tablecategories 
+						WHERE cat_blog_ID = $cat_blog_ID 
+							AND cat_ID != $cat_ID 
+						ORDER BY cat_ID
+						LIMIT 0, 1";
+		$remap_cat_ID = $DB->get_var( $sql );	
+		echo "remap to: $remap_cat_ID<br />";
+		// May be NULL if this was the last cat (But there are no posts inside)
+
+		if( ($remap_cat_ID == NULL) && (! empty($IDarray)) )
 		{
 			return T_("Cannot delete last category if there are posts inside!");
 		}		
-		
 	}
 
 	//  --------------- PROCEED WITH DELETING ------------
 
 	// First delete assoc to this cat when it's an extra cat
-	$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID ";
+	$sql = "DELETE FROM $tablepostcats 
+						WHERE postcat_cat_ID = $cat_ID ";
 
+	// TODO: check why this block is here:
 	if( !empty($IDarray) )
 	{	
 		$IDlist = " AND postcat_post_ID NOT IN (".implode( ',', $IDarray ).") ";
@@ -162,10 +133,7 @@ function cat_delete( $cat_ID )
 	else
 		$IDList = '';
  
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-
+	$DB->query( $sql );
 
 
 	// Now take care of the main cats (these need to be remapped, we cannot delete them!)
@@ -173,53 +141,40 @@ function cat_delete( $cat_ID )
 	{	// We are moving posts to parent or other category
 
 		// remap the posts to new category:
-		$query = "UPDATE $tableposts SET post_category = $remap_cat_ID WHERE post_category = $cat_ID";
+		$sql = "UPDATE $tableposts 
+							SET post_category = $remap_cat_ID 
+							WHERE post_category = $cat_ID";
+		$DB->query( $sql );
 
-		$querycount++;
-		$result = mysql_query($query);
-		if( !$result ) return 0;
-	
-	
 		// Before remapping the extracats we need to get rid of mappings that would become duplicates
 		// We remove every mapping to the old cat where a mapping to the new cat already exists
-		$query = "SELECT DISTINCT postcat_post_ID FROM $tablepostcats WHERE postcat_cat_ID = $remap_cat_ID";
-	
-		$querycount++;
-		$result = mysql_query($query);
-		if( !$result ) return 0;
-	
-		$IDarray = array();
-		while( $row = mysql_fetch_array($result) ) 
-		{
-			$IDarray[] = $row["postcat_post_ID"];
-		}
+		$sql = "SELECT DISTINCT postcat_post_ID 
+						FROM $tablepostcats 
+						WHERE postcat_cat_ID = $remap_cat_ID";
+		$IDarray = $DB->get_col( $sql );
+
 		if( !empty($IDarray) )
 		{
 			$IDlist = implode( ',', $IDarray );
 	
-			$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID AND postcat_post_ID IN ($IDlist)";
-		
-			$querycount++;
-			$result = mysql_query($query);
-			if( !$result ) return 0;
+			$sql = "DELETE FROM $tablepostcats 
+							WHERE postcat_cat_ID = $cat_ID 
+							AND postcat_post_ID IN ($IDlist)";
+			$DB->query( $sql );
 		}
 	
 	
 		// remap the remaining extracats
-		$query = "UPDATE $tablepostcats SET postcat_cat_ID = $remap_cat_ID WHERE postcat_cat_ID = $cat_ID";
-	
-		$querycount++;
-		$result = mysql_query($query);
-		if( !$result ) return 0;
-
+		$sql = "UPDATE $tablepostcats 
+						SET postcat_cat_ID = $remap_cat_ID 
+						WHERE postcat_cat_ID = $cat_ID";
+		$DB->query( $sql );
 	}
 	
 	// do the actual deletion of the cat
-	$query="DELETE FROM $tablecategories WHERE cat_ID = $cat_ID";
-
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
+	$sql = "DELETE FROM $tablecategories 
+					WHERE cat_ID = $cat_ID";
+	$DB->query( $sql );
 
 	// TODO: END TRANSACTION
 	
@@ -323,18 +278,17 @@ function get_catname($cat_ID)
  */
 function cat_load_cache()
 {
-	global $tablecategories, $tablepostcats, $tableposts, $querycount, $cache_categories;
+	global $DB, $tablecategories, $tablepostcats, $tableposts, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
 	global $time_difference;
 	if( !isset($cache_categories)) 
 	{
 		// echo "loading CAT cache";
-		$query="SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID ".
-				"FROM $tablecategories ".
-				"ORDER BY cat_name"; 
-		$result=mysql_query($query) or mysql_oops( $query ); 
-		$querycount++; 
-		while( $myrow = mysql_fetch_array($result) ) 
+		$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
+						FROM $tablecategories 
+						ORDER BY cat_name"; 
+		$rows = $DB->get_results( $sql, ARRAY_A );
+		if( count( $rows ) ) foreach( $rows as $myrow )
 		{ 
 			$this_cat['cat_name'] = $myrow['cat_name'];
 			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
@@ -400,13 +354,12 @@ function cat_load_cache()
 			$where_link = ' AND ';
 		}
 	
-		$query="SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount ".
-				"FROM $tablepostcats INNER JOIN $tableposts ON postcat_post_ID = ID ".
-				$where.
-				" GROUP BY cat_ID"; 
-		$result=mysql_query($query) or mysql_oops( $query ); 
-		$querycount++; 
-		while ( $myrow = mysql_fetch_array($result)) 
+		$sql = "SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount 
+						FROM $tablepostcats INNER JOIN $tableposts ON postcat_post_ID = ID
+						$where
+						GROUP BY cat_ID"; 
+		$rows = $DB->get_results( $sql, ARRAY_A );
+		if( count( $rows ) ) foreach( $rows as $myrow )
 		{ 
 			$cat_ID = $myrow['cat_ID'];
 			if( !isset($cache_categories[$cat_ID]) )
@@ -432,7 +385,7 @@ function cat_load_cache()
  */
 function cat_load_postcats_cache()
 {
-	global $tablepostcats, $querycount, $cache_postcats, $postIDlist, $preview;
+	global $DB, $tablepostcats, $cache_postcats, $postIDlist, $preview;
 
 	if( isset($cache_postcats) )
 	{	// already done!
@@ -451,10 +404,12 @@ function cat_load_postcats_cache()
 
 	if( !empty($postIDlist) ) 
 	{
-		$query = "SELECT postcat_post_ID, postcat_cat_ID FROM $tablepostcats WHERE postcat_post_ID IN ($postIDlist) ORDER BY postcat_post_ID, postcat_cat_ID"; 
-		$querycount++; 
-		$result = mysql_query($query) or mysql_oops( $query ); 
-		while( $myrow = mysql_fetch_array($result) ) 
+		$sql = "SELECT postcat_post_ID, postcat_cat_ID 
+						FROM $tablepostcats 
+						WHERE postcat_post_ID IN ($postIDlist) 
+						ORDER BY postcat_post_ID, postcat_cat_ID"; 
+		$rows = $DB->get_results( $sql, ARRAY_A );
+		if( count( $rows ) ) foreach( $rows as $myrow )
 		{ 
 			$postcat_post_ID = $myrow["postcat_post_ID"];
 			if( ! isset( $cache_postcats[$postcat_post_ID] ) )
@@ -477,20 +432,15 @@ function cat_load_postcats_cache()
  */
 function postcats_get_byID( $post_ID )
 {
-	global $tablepostcats, $querycount ;
+	global $DB, $tablepostcats;
 	
 	//echo "looking up cats for post $post_ID ";
 
-	$query = "SELECT postcat_cat_ID FROM $tablepostcats WHERE postcat_post_ID = $post_ID ORDER BY postcat_cat_ID"; 
-	$querycount++; 
-	$result = mysql_query($query) or mysql_oops( $query ); 
-	$catIDarray = array();
-	while( $myrow = mysql_fetch_array($result) ) 
-	{ 
-		//echo "cat: ". $myrow['postcat_cat_ID'];
-		$catIDarray[] = $myrow['postcat_cat_ID'];
-	} 
-	return $catIDarray;
+	$sql = "SELECT postcat_cat_ID 
+					FROM $tablepostcats 
+					WHERE postcat_post_ID = $post_ID 
+					ORDER BY postcat_cat_ID"; 
+	return $DB->get_col( $sql );
 }
 
 
@@ -776,112 +726,6 @@ function the_category_head($before='',$after='')
 		echo $after;
 		$previouscat = $currentcat;
 	}
-}
-
-/*
- * dropdown_cats(-)
- *
- * this is a special tag, meant to be used in the template, but outside of the b2 loop.
- * it will display a list of <option name="x">category-name</option>, 
- * where x is the number of the category and category-name is the name of it.
- *
- * TODO: this needs to be broken up
- */
-function dropdown_cats($optionall = 1, $all = 'All') 
-{
-	global $cat, $tablecategories, $querycount;
-	$query="SELECT * FROM $tablecategories";
-	$result=mysql_query($query);
-	$querycount++;
-	echo '<select name="cat" class="postform">';
-	if( $optionall ) 
-	{
-		echo "\t<option value=\"all\">$all</option>\n";
-	}
-	while($row = mysql_fetch_object($result)) 
-	{
-		echo "\t<option value=\"".$row->cat_ID."\"";
-		if ($row->cat_ID == $cat)
-			echo ' selected="selected"';
-		echo '>'.$row->cat_name."</option>\n";
-	}
-	echo "</select>\n";
-}
-
-
-/* 
- * list_cats(-)
- *
- * out of the b2 loop
- * category list
- * this is a special tag, meant to be used in the template, but outside of the b2 loop.
- * it will display a list of the categories, with links to them. 
- *
- * fplanque: maybe this should go out and work a little like b2archives.php?
- */
-function list_cats($optionall = 1, 	// Display a link to All cats
-	$all = 'All', $sort_column = 'ID', $sort_order = 'asc', $file = 'blah') 
-{
-	global $tablecategories,$querycount,$blogfilename, $blog; 
-
-	$file = ($file == 'blah') ? $blogfilename : $file;
-	$sort_column = 'cat_'.$sort_column;
-
-	if( $blog > 1 )	
-	{	// We need to restrict to valid catgories:
-		$where = "WHERE cat_blog_ID = $blog";
-	}
-	else 
-	{
-		$where = ""; 
-	} 
-
-	$query="SELECT * FROM $tablecategories $where ORDER BY $sort_column $sort_order";
-	$querycount++;
-	$result=mysql_query($query) or mysql_oops($query);
-
-	if (intval($optionall) == 1) 
-	{
-		echo "\t<li><a href=\"".$file.'?cat=all">'.$all."</a></li>\n";
-	}
-
-	while($row = mysql_fetch_object($result)) 
-	{
-		$cat_name = $row->cat_name;
-		echo "\t<li><a href=\"".$file.'?cat='.$row->cat_ID.'">';
-		echo format_to_output($cat_name,'htmlbody');
-		echo "</a></li>\n";
-	}
-}
-
-
-
-/*
- * dropdown_categories(-)
- */
-function dropdown_categories($blog_ID=1, $restrict=false) 
-{
-	global $postdata,$tablecategories,$mode,$querycount;
-	global $cat; // fplanque: added
-	$query="SELECT * FROM $tablecategories";
-	if( $blog_ID > 1  || $restrict )
-	{ // fplanque added 
-		$query .= " WHERE cat_blog_ID = $blog_ID";
-	}
-	$query .= " ORDER BY cat_name";	// fplanque added
-	$result=mysql_query($query) or mysql_oops( $query );
-	$querycount++;
-	$width = ($mode=="sidebar") ? "100%" : "170px";
-	echo '<select name="post_category" style="width:'.$width.';" tabindex="2" id="category">';
-	while($row = mysql_fetch_object($result)) 
-	{
-		echo "<option value=\"".$row->cat_ID."\"";
-		// fplanque: changed if ($row->cat_ID == $postdata["Category"])
-		if (($row->cat_ID == $cat) or ($row->cat_ID == $postdata["Category"]))
-			echo ' selected="selected"';
-		echo ">".$row->cat_name."</option>";
-	}
-	echo "</select>";
 }
 
 

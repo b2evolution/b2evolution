@@ -15,6 +15,10 @@
 //  and what your using it for!! Cheers. [ justin@visunet.ie ]
 //
 
+/*
+ * Additions:
+ * - query log
+ */
 
 // ==================================================================
 //	ezSQL Constants
@@ -49,6 +53,10 @@ class DB
 	var $insert_id = 0;
 	var $num_rows = 0;
 	var $rows_affected = 0;
+	/**
+	 * Log of queries:
+	 */
+	var $queries = array();
 	
 	// ==================================================================
 	//	DB Constructor - connects to the server and selects a database
@@ -141,9 +149,10 @@ class DB
 		$this->last_query = $query;
 
 		// Perform the query via std mysql_query function..
-		$this->result = @mysql_query($query,$this->dbh);
+		$this->queries[] = $query;
 		$this->num_queries++;
-
+		$this->result = @mysql_query($query,$this->dbh);
+			
 		// If there is an error then take note of it..
 		if ( mysql_error() )
 		{
@@ -275,6 +284,7 @@ class DB
 		}
 
 		// Extract the column values
+		$new_array = array();
 		for ( $i=0; $i < count($this->last_result); $i++ )
 		{
 			$new_array[$i] = $this->get_var(NULL,$x,$i);
@@ -466,6 +476,30 @@ class DB
 
 		$this->debug_called = true;
 	}
+
+	/** 
+	 * Displays all queries that have been exectuted
+	 *
+	 * {@internal DB::dump_queries(-) }}
+	 */
+	function dump_queries()
+	{
+		foreach( $this->queries as $sql )
+		{
+			echo '<p><strong>Query:</strong></p>';
+			echo '<code>';
+			$sql = str_replace( 'FROM', '<br />FROM', $sql );
+			$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
+			$sql = str_replace( 'GROUP BY', '<br />GROUP BY', $sql );
+			$sql = str_replace( 'ORDER BY', '<br />ORDER BY', $sql );
+			$sql = str_replace( 'LIMIT', '<br />LIMIT', $sql );
+			$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
+			$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
+			echo $sql;
+			echo '<br /></code>';
+		}
+	}
+
 
 	// b2evo will donate to JV..
 }
