@@ -1252,7 +1252,7 @@ msgstr "Neuen Eintrag hinzufügen..."
 #: ..\..\..\htsrv\trackback.php:63
 #: ..\..\..\xmlsrv\xmlrpc.php:1368
 msgid "Supplied URL is invalid: "
-msgstr "Angegebene URL ist ungültig:"
+msgstr "Angegebene URL ist ungültig: "
 
 #: ..\..\..\admin\edit_actions.php:107
 msgid "Cannot post, please correct these errors:"
@@ -3144,7 +3144,7 @@ msgstr "Neue Gruppe"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:98
 msgid "Parser error: "
-msgstr "Parser Fehler:"
+msgstr "Parser Fehler: "
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:115
 msgid "Tag <code>body</code> can only be used once!"
@@ -3171,7 +3171,7 @@ msgstr "Tag %s darf kein Attribut %s haben"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:153
 msgid "Found invalid URL: "
-msgstr "Ungültiger URL gefunden:"
+msgstr "Ungültiger URL gefunden: "
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:176
 #, php-format
@@ -4146,7 +4146,7 @@ msgstr "Verbinde zum POP-Server..."
 
 #: ..\..\..\htsrv\getmail.php:30
 msgid "Connection failed: "
-msgstr "Verbindung fehlgeschlagen:"
+msgstr "Verbindung fehlgeschlagen: "
 
 #: ..\..\..\htsrv\getmail.php:34
 msgid "Logging into pop server..."

@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-13 17:31+0200\nPO-Revision-Date: 2004-05-13 17:35+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-13 21:07+0200\nPO-Revision-Date: 2004-05-14 12:27+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",
@@ -28,7 +28,7 @@ $trans['fr_FR'] = array(
 	'Misc' => "Divers",
 	'Syndicate this blog' => "Syndiquez ce blog",
 	'Default page for b2evolution' => "Page par défaut de b2evoltution",
-	'Multilingual multiuser multi-blog engine.' => "Moteur Multi-blog multi-utilisateur multilingue.",
+	'Multilingual multiuser multi-blog engine.' => "Moteur Multi-blogs multi-utilisateurs multilingue.",
 	'Welcome to b2evolution' => "Bienvenue dans b2evoltution",
 	'This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.' => "Ceci est la page d'accueil par défaut pour b2evolution. Elle sera affichée tant que vous n'aurez oas sélectionné un blog par défaut dans les réglages généraux.",
 	'Individual blogs on this system' => "Blogs présents sur ce système",
@@ -82,6 +82,7 @@ $trans['fr_FR'] = array(
 	'Blogs' => "Blogs",
 	'New' => "Nouveau",
 	'Creating blog...' => "Création du blog...",
+	'You must provide an URL blog name / Stub name!' => "Vous devez entrer un 'Nom URL du blog / fichier stub' !",
 	'This URL blog name / Stub name is already in use by another blog. Choose another name.' => "Ce 'Nom URL du blog / fichier stub' est déjà utilisé par un autre blog, veuillez choisir un autre nom.",
 	'Cannot create, please correct these errors:' => "Impossible de créer, veuillez corriger ces erreurs:",
 	'You should <a %s>create categories</a> for this blog now!' => "Vous devriez maintenant <a %s>créer des catégories</a> pour ce blog!",
@@ -91,7 +92,6 @@ $trans['fr_FR'] = array(
 	'Permissions' => "Permissions",
 	'Advanced' => "Options avancées",
 	'Updating Blog [%s]...' => "Mise à jour du blog [%s]...",
-	'You must provide an URL blog name / Stub name!' => "Vous devez entrer un 'Nom URL du blog / fichier stub' !",
 	'Cannot update, please correct these errors:' => "Impossible de mettre à jour, veuillez corriger ces erreurs:",
 	'Delete blog [%s]?' => "Supprimer le blog [%s]?",
 	'Deleting this blog will also delete all its categories, posts and comments!' => "Supprimer ce blog supprimera également toutes ses catégories, articles et commentaires!",

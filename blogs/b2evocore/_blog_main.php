@@ -97,7 +97,7 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 			{	// We'll consider this to be the day
 				$m .= $path_elements[$i++];
 	
-				if( isset( $path_elements[$i] ) )
+				if( isset( $path_elements[$i] ) && (!empty( $path_elements[$i] )) )
 				{ // We'll consider this to be a ref to a post
 					// We are accessing a post by permalink
 					// Set a lot of defaults as if we had received a complex URL:
