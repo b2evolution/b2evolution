@@ -104,6 +104,7 @@ td.bCalendarCell {
 .bCalendarLinkPost {
 	font-weight: bold;
 }
+/* TODO: not very unique IDs! (prev/next) - used in Calendar at least*/
 td#prev,
 td#next {
 	font-weight: bold;
@@ -113,11 +114,11 @@ td#next {
 }
 td#prev a,
 td#next a {
-	padding: 0 .5ex;
+	padding: 0;
 }
 td#prev {
-	text-align: left;
+	text-align:left;
 }
 td#next {
-	text-align: right;
+	text-align:right;
 }
