@@ -77,7 +77,11 @@ class Form extends Widget
 	 */
 	var $_fieldsets = array();
 
+	/**
+	 * @var string
+	 */
 	var $label_suffix = ':';
+
 
 	/**
 	 * Constructor
@@ -309,6 +313,7 @@ class Form extends Widget
 		}
 	}
 
+
 	/**
 	 * Builds a password input field.
 	 *
@@ -513,8 +518,9 @@ class Form extends Widget
 		{
 			return $r;
 		}
-	} 
-	 
+	}
+
+
 	/**
 	 * Ends the form field
 	 *
@@ -535,7 +541,7 @@ class Form extends Widget
 		}
 		$r .= $this->formend
 					."\n</form>\n\n";
-		
+
 		if( $this->output )
 		{
 			echo $r;
@@ -546,6 +552,7 @@ class Form extends Widget
 			return $r;
 		}
 	}
+
 
 	/**
 	 * Builds the fieldset tag
@@ -702,9 +709,9 @@ class Form extends Widget
 		$r .= ">\n".$field_list_callback( $field_value )
 					."</select>\n"
 					.'<span class="notes">'.$field_note.'</span>';
-					
+
 		$r .= $this->end_field();
-					
+
 		if( $this->output )
 		{
 			echo $r;
@@ -713,10 +720,11 @@ class Form extends Widget
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
-	/** 
+
+
+	/**
 	 * Build a text area.
 	 *
 	 * @param string
@@ -759,9 +767,10 @@ class Form extends Widget
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
+
 	/**
 	 * Builds an info field.
 	 *
@@ -770,7 +779,7 @@ class Form extends Widget
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 * An info field is a fieldset containing a label div and an info div.
 	 */
-	function info( $field_label, $field_info )
+	function info( $field_label, $field_info, $field_note = NULL )
 	{
 		$r = $this->fieldstart;
 
@@ -781,7 +790,7 @@ class Form extends Widget
 						.$this->labelend;
 		}
 		else
-		{	// Empty label:
+		{ // Empty label:
 			$r = $this->labelempty;
 		}
 
@@ -789,7 +798,12 @@ class Form extends Widget
 
 		$r .= $field_info;
 
-    $r .= $this->inputend
+		if( !empty($field_note) )
+		{
+			$r .= ' <small class="notes">'.$field_note.'</small>';
+		}
+
+		$r .= $this->inputend
 				.$this->fieldend;
 
 		if( $this->output )
@@ -802,11 +816,12 @@ class Form extends Widget
 			return $r;
 		}
 	}
-	
+
+
 	/**
 	 * Builds a button list
 	 *
-	 * the two-dimension array must contain : 
+	 * the two-dimension array must contain :
 	 *  - the button type
 	 *  - the name (optional)
 	 *  - the value (optional)
@@ -847,7 +862,7 @@ class Form extends Widget
 		{	// there are not only hidden buttons : additional tags
 			$r = $this->buttonsstart.$r.$this->buttonsend;
 		}
-				
+
 		if( $this->output )
 		{
 			echo $r;
@@ -856,28 +871,29 @@ class Form extends Widget
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
+
 	/**
 	 * Builds a button
 	 *
-	 * the array must contain : 
+	 * the array must contain :
 	 *  - the button type
 	 *  - the name (optional)
 	 *  - the value (optional)
 	 *  - the class (optional)
-	 *  - the onclick attribute (optional) 
-	 *  - the style (optional) 
+	 *  - the onclick attribute (optional)
+	 *  - the style (optional)
 	 *
 	 * @param array a two-dimension array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function button( $options )
 	{
-		
+
 		$r = "\t\t\t".'<input type="';
-			
+
 		if( !empty($options[0]) )
 		{ //a type has been specified
 			$r .= $options[0].'" ';
@@ -886,33 +902,33 @@ class Form extends Widget
 		{ //set default type
 			$r .= 'submit" ';
 		}
-			
+
 		if( !empty($options[1]) )
-		{ //a name has been specified 
+		{ //a name has been specified
 			$r .= ' name="'.$options[1].'" ';
 		}
 		else
 		{
 			$r .= ' name="submit" ';
 		}
-			
+
 		if( !empty($options[2]) )
 		{ //a value has been specified
 			$r .= ' value="'.$options[2].'" ';
 		}
-			
+
 		if( !empty($options[3]) )
 		{ //a class has been specified
 			$r .= ' class="'.$options[3].'" ';
 		}
-			
+
 		if( !empty($options[4]) )
 		{ //an onclick action has been specified
 			$r .= ' onclick="'.$options[4].'" ';
 		}
-		
+
 		if( !empty($options[5]) )
-		{ //a name has been specified 
+		{ //a name has been specified
 			$r .= ' style="'.$options[5].'" ';
 		}
 		else
@@ -920,7 +936,7 @@ class Form extends Widget
 			$r .= ' name="submit" ';
 		}
 		$r .= " />\n";
-		
+
 		if( $this->output )
 		{
 			echo $r;
@@ -929,18 +945,19 @@ class Form extends Widget
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
+
 	/**
 	 * Builds an hidden input tag
-	 * 
-	 * the array must contain : 
+	 *
+	 * the array must contain :
 	 *  - the name (optional)
 	 *  - the value (optional)
 	 *  - the class (optional)
-	 *  - the onclick attribute (optional) 
-	 *  - the style (optional) 
+	 *  - the onclick attribute (optional)
+	 *  - the style (optional)
 	 *
 	 * @param array an array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -948,7 +965,7 @@ class Form extends Widget
 	function hidden( $field_name, $field_value )
 	{
 		$r = '<input type="hidden" name="'.$field_name.'" value="'.$field_value.'" />';
-		
+
 		if( $this->output )
 		{
 			echo $r;
@@ -959,16 +976,17 @@ class Form extends Widget
 			return $r;
 		}
 	}
-	
+
+
 	/**
 	 * Builds a submit input tag
-	 * 
-	 * the array must contain : 
+	 *
+	 * the array must contain :
 	 *  - the name (optional)
 	 *  - the value (optional)
 	 *  - the class (optional)
 	 *  - the onclick attribute (optional)
-	 *  - the style (optional) 
+	 *  - the style (optional)
 	 *
 	 * @param array an array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -978,20 +996,20 @@ class Form extends Widget
 		$hidden_fields = array();
 		$i = 1;
 		$r = '';
-		
+
 		$submit_fields[0] = '';
-		
+
 		foreach( $options as $option )
 		{// construction of the option array for the button method
 			$submit_fields[$i] = $option;
 			$i++;
 		}
-		
+
 		$output = $this->output;
 		$this->output = 0;
 		$r .= $this->button( $submit_fields ); //call to the button method to build input tags
 		$this->output = $output;
-		
+
 		if( $this->output )
 		{
 			echo $r;
@@ -1002,10 +1020,8 @@ class Form extends Widget
 			return $r;
 		}
 	}
-		
-		
-	 
-	
+
+
 	/**
 	 * Generate set of radio options.
 	 *
@@ -1056,7 +1072,7 @@ class Form extends Widget
 			$r .= '<div><span class="notes">'.$field_notes.'</span></div>';
 		}
 		$r .= $this->end_field();
-		
+
 		if( $this->output )
 		{
 			echo $r;
@@ -1065,9 +1081,10 @@ class Form extends Widget
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
+
 	/**
 	 * Display a select field and populate it with a cache object.
 	 *
@@ -1101,7 +1118,7 @@ class Form extends Widget
 		$r .= $field_object->$field_object_callback( $field_value, $allow_none )
 			 		."</select>\n"
 					.'<span class="notes">'.$field_note.'</span>';
-					
+
 		$r .= $this->end_field();
 
 		if( $this->output )
@@ -1159,7 +1176,7 @@ class Form extends Widget
 		}
 	}
 
-	
+
 }
 
 ?>
