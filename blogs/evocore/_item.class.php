@@ -1599,7 +1599,8 @@ class Item extends DataObject
 		// TODO: START TRANSACTION
 
 		// validate url title
-		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0, false, $this->dbprefix, $this->dbIDname );
+		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0,
+																				false, $this->dbprefix, $this->dbIDname, $this->dbtablename);
 
 		// echo 'INSERTING NEW POST ';
 
@@ -1678,7 +1679,8 @@ class Item extends DataObject
 		// TODO: START TRANSACTION
 
 		// validate url title
-		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $this->ID, false, $this->dbprefix, $this->dbIDname );
+		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $this->ID,
+																				false, $this->dbprefix, $this->dbIDname, $this->dbtablename );
 
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
@@ -1751,6 +1753,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2005/03/02 15:27:24  fplanque
+ * minor refactoring
+ *
  * Revision 1.23  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
