@@ -6,7 +6,6 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
- * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -33,11 +32,6 @@
  * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * The University of North Carolina at Charlotte grants François PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
  * @package install
@@ -46,8 +40,6 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
- * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
  */
@@ -922,15 +914,6 @@ function populate_main_tables()
 
 
 	create_default_settings();
-	
-	echo 'Creating initial post type... ';
-	// post type 1 is 'post'
-	$query="INSERT INTO T_posttypes ( ptyp_ID, ptyp_name )
-				VALUES
-					( 1, 'Post')";
-	$DB->query( $query );
-
-	echo "OK.<br />\n";
 
 }
 
@@ -989,6 +972,11 @@ function create_b2evo_tables_091()
 									primary key (ptyp_ID)
 								)";
 	$DB->query( $query );
+	echo "OK.<br />\n";
+	echo 'Creating default Post Types... ';
+	$DB->query( "INSERT INTO T_posttypes ( ptyp_ID, ptyp_name )
+										VALUES ( 1, 'Post' ),
+													 ( 2, 'Link' )" );
 	echo "OK.<br />\n";
 
 
