@@ -214,11 +214,12 @@ function create_b2evo_tables()
 	 
 	 
 	echo "<p>Creating table for Mailing List...<br />\n";
-	$query = "CREATE TABLE $tablesmailinglist ( 
+	$query = "CREATE TABLE $tablemailinglist ( 
 		ID int(4) NOT NULL auto_increment,
 		email_address text NOT NULL,
-		cat_subscribe text NOT NULL
-	)";
+		cat_subscribe text NOT NULL,
+		PRIMARY KEY (ID)
+	)";	// for ID to have auto_increment, it needs to be a key
 	$q = mysql_query($query) or mysql_oops( $query );
 	
 	echo "Creating table for Anti-Spam Ban List...</p>\n";
@@ -286,7 +287,6 @@ function populate_antispam()
 {
 	global $tableantispam;
 	
-	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'prescriptions.md')";
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'penis-enlargement')";
