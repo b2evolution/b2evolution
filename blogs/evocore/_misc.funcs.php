@@ -1853,7 +1853,9 @@ function getRandomPassword( $length = NULL )
 	{
 		global $Settings;
 
-		$length = $Settings->get( 'user_minpwdlen' );
+		$length = isset($Settings) // not set during install
+							? $Settings->get( 'user_minpwdlen' )
+							: 6;
 	}
 
 	return substr( md5( uniqid( rand(), true ) ), 0, $length );
@@ -1874,6 +1876,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.51  2005/02/24 17:02:23  blueyed
+ * fixed getRandomPassword() for installation
+ *
  * Revision 1.50  2005/02/23 23:11:54  blueyed
  * fixed autolinks for commata
  *
