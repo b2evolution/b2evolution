@@ -107,7 +107,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = strip_tags($content);
 
 			$content = convert_chars($content, 'xml');
-			$content = htmlspecialchars( $content );
+			$content = str_replace('"', '&quot;', $content );
 			break;
 
 		case 'htmlattr':
@@ -116,7 +116,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = strip_tags($content);
 
 			$content = convert_chars($content, 'html');
-			$content = htmlspecialchars( $content );
+			$content = str_replace('"', '&quot;', $content );
 			break;
 			
 		case 'entityencoded':
