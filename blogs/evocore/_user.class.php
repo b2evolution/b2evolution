@@ -175,18 +175,7 @@ class User extends DataObject
 		switch( $parname )
 		{
 			case 'preferedname':
-				// Prefered name to display
-				switch( $this->idmode )
-				{
-					case 'namefl':
-						return parent::get('firstname'). ' '. parent::get('lastname');
-
-					case 'namelf':
-						return parent::get('lastname'). ' '. parent::get('firstname');
-
-					default:
-						return parent::get($this->idmode);
-				}
+				return $this->getPreferedName();
 
 			case 'num_posts':
 				return $this->getNumPosts();
@@ -194,6 +183,27 @@ class User extends DataObject
 			default:
 			// All other params:
 				return parent::get( $parname );
+		}
+	}
+
+
+	/**
+	 * Get prefered name for the user.
+	 *
+	 * @return string
+	 */
+	function getPreferedName()
+	{
+		switch( $this->idmode )
+		{
+			case 'namefl':
+				return parent::get('firstname').' '.parent::get('lastname');
+
+			case 'namelf':
+				return parent::get('lastname').' '.parent::get('firstname');
+
+			default:
+				return parent::get($this->idmode);
 		}
 	}
 
@@ -598,6 +608,8 @@ class User extends DataObject
 	}
 
 
+	// Template functions {{{
+
 	/**
 	 * Template function: display user's level
 	 *
@@ -623,7 +635,7 @@ class User extends DataObject
 
 
 	/**
-	 * Provide link to message form for this user
+	 * Template function: display a link to a message form for this user
 	 *
 	 * {@internal User::msgform_link(-)}}
 	 *
@@ -793,11 +805,15 @@ class User extends DataObject
 		$this->disp( 'msn', $format );
 	}
 
+	// }}}
 
 }
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/22 02:53:33  blueyed
+ * getPreferedName()
+ *
  * Revision 1.11  2005/02/20 22:41:13  blueyed
  * use setters in constructor (dbchange()), fixed getNumPosts(), enhanced set_datecreated(), fixed setGroup()
  *
