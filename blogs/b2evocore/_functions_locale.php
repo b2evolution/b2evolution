@@ -228,9 +228,11 @@ function locale_options( $default = '' )
 /**
  * Detect language from HTTP_ACCEPT_LANGUAGE
  *
+ * {@internal locale_from_httpaccept(-)}}
+ *
  * @author dAniel
+ *
  * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
- *	
  */
 function locale_from_httpaccept()
 {
@@ -239,7 +241,8 @@ function locale_from_httpaccept()
 	{
 		#pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
 		// look for each language in turn in the preferences, which we saved in $langs
-		foreach( $locales as $localekey => $v ) {
+		foreach( $locales as $localekey => $v ) 
+		{
 			#echo 'checking '. $localekey;
 			$checklang = substr($localekey, 0, 2);
 			$pos = strpos( $_SERVER['HTTP_ACCEPT_LANGUAGE'], $checklang );

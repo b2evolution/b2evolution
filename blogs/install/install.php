@@ -23,15 +23,14 @@ param( 'action', 'string' );
 // explicit set locale
 param('locale', 'string');
 
-if( $locale == '' )
+if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $locale) )
+{
+	$default_locale = $locale;
+}
+else		
 { // detect language
 	$default_locale = locale_from_httpaccept();
 	#echo 'detected locale: ' . $default_locale. '<br />';
-}
-else
-{
-	if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $locale) )
-		$default_locale = $locale;
 }
 
 require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
