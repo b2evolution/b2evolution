@@ -26,9 +26,9 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>', _('Pinging b2evolution.net...'), "</h3>\n";
 	}
-	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test) 
+	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test ) 
 	{
-		if( $test)
+		if( $test )
 		{
 		 	$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
 			$client->debug = 1;
