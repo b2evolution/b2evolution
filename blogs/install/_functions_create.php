@@ -569,25 +569,18 @@ function create_default_contents( $populate_blog_a = true )
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."), T_("<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>
+	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."), 
+								T_("<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>
 
 <p>Some of these blogs have a special role. Read about it on the corresponding page.</p>
 
-<p>You can create additionnal blogs from the blogs admin.</p>
-
-<!--more-->
-
-<p>Some people have also asked for a feature to delete blogs. We're working on it, but we certainly do not recommend you go hacking your mySQL database by hand. It's the best way to leave a lot of junk in there. In the meantime, there are two things you can do with your old blogs:</p>
-
-<ul>
-	<li>Recycle them: delete the posts, change the name, also rename the access stub file if you wish. This is better with the database than deleting a blog and creating a new one.</li>
-	<li>Hide them: go to the blogs admin and clear the 'Stub URLname'. Your blog won't appear publicly no more. You can also remove all user permissions on that blog to hide it from backoffice users (except the admin). Finally, you can delete the stub file for this blog to make it complete ;)</li>
-</ul>"), $now, $cat_b2evo );
+<p>You can create additionnal blogs or delte unwanted blogs from the blogs admin.</p>"), $now, $cat_b2evo );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("File permissions!"), T_("<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>
+	bpost_create( 1, T_("File permissions!"), 
+								T_("<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>
 
 <ul>
 
@@ -689,7 +682,9 @@ function populate_main_tables()
 	$User_Admin->set( 'ip', '127.0.0.1' );
 	$User_Admin->set( 'domain', 'localhost' );
 	$User_Admin->set( 'level', 10 );
-	$User_Admin->set_datecreated( time() );
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$User_Admin->set_datecreated( $now );	
+	// Note: NEVER use database time (may be out of sync + no TZ control)
 	$User_Admin->setGroup( $Group_Admins );
 	$User_Admin->dbinsert();
 
@@ -701,7 +696,8 @@ function populate_main_tables()
 	$User_Demo->set( 'ip', '127.0.0.1' );
 	$User_Demo->set( 'domain', 'localhost' );
 	$User_Demo->set( 'level', 0 );
-	$User_Demo->set_datecreated( time() );
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$User_Demo->set_datecreated( $now );
 	$User_Demo->setGroup( $Group_Users );
 	$User_Demo->dbinsert();
 

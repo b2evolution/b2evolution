@@ -107,9 +107,15 @@ class Blog extends DataObject
 			case 'dynurl':
 				return $baseurl.$this->siteurl.'/'.$this->filename;
 			
+			case 'dynfilepath':
+				return get_path( 'base' ).$this->siteurl.'/'.$this->filename;
+
 			case 'staticurl':
 				return $baseurl.$this->siteurl.'/'.$this->staticfilename;
 
+			case 'staticfilepath':
+				return get_path( 'base' ).$this->siteurl.'/'.$this->staticfilename;
+			
 			case 'baseurl':
 				return $baseurl.$this->siteurl.'/';
 			
@@ -170,9 +176,11 @@ class Blog extends DataObject
 	 *
 	 * {@internal Blog::dbdelete(-) }}
 	 *
+	 * @param boolean true if you want to try to delete the stub file
+	 * @param boolean true if you want to try to delete the static file
 	 * @param boolean true if you want to echo progress
 	 */
-	function dbdelete( $echo = false )
+	function dbdelete( $delete_stub_file = false, $delete_static_file = false, $echo = false )
 	{
 		global $DB, $tablehitlog, $tablecategories, $tablecomments, $tableposts, 
 						$tablepostcats, $tableblogusers, $cache_blogs;
@@ -248,6 +256,35 @@ class Blog extends DataObject
 												WHERE hit_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 	
+		if( $delete_stub_file )
+		{ // Delete stub file
+			if( $echo ) echo '<br />Trying to delete stub file... ';
+			if( ! @unlink( $this->get('dynfilepath') ) )
+				if( $echo ) 
+				{
+					echo '<span class="error">';
+					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'), 
+									$this->get('dynfilepath') );
+					echo '</span>';
+				}
+			else
+				if( $echo ) echo 'OK.';
+		}
+		if( $delete_static_file )
+		{ // Delete static file
+			if( $echo ) echo '<br />Trying to delete static file... ';
+			if( ! @unlink( $this->get('staticfilepath') ) )
+				if( $echo ) 
+				{
+					echo '<span class="error">';
+					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'), 
+									$this->get('staticfilepath') );
+					echo '</span>';
+				}
+			else
+				if( $echo ) echo 'OK.';
+		}
+					
 		// Unset cache entry:
 		unset( $cache_blogs[$this->ID] );
 		

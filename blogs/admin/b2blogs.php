@@ -18,7 +18,7 @@ param( 'action', 'string' );
 switch($action)
 {
 	case 'new':
-		// New blog form:
+		// ---------- New blog form ----------
 		require( dirname(__FILE__). '/_menutop.php' );
 		require( dirname(__FILE__). '/_menutop_end.php' );
 
@@ -58,13 +58,15 @@ switch($action)
 
 
 	case 'create':
-		// Create blog in DB:
+		// ---------- Create blog in DB ----------
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
 
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
-
+		?>
+		<div class="panelinfo">
+		<?php
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
 		param( 'blog_tagline', 'html', '' );
@@ -91,7 +93,7 @@ switch($action)
 		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
 		$blog_roll = format_to_post($blog_roll, 0, 0);
 
-		if ( errors_display( T_('Cannot update, please correct these errors:'),
+		if ( errors_display( T_('Cannot create, please correct these errors:'),
 			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog form').'</a>]'))
 		{
 			require( dirname(__FILE__) . '/_footer.php' );
@@ -99,8 +101,7 @@ switch($action)
 			break;
 		}
 
-
-		echo '<p>' . T_('Creating blog...') . '</p>';
+		echo '<h3>' . T_('Creating blog...') . '</h3>';
 
 		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, $blog_filename,
 									$blog_stub,  $blog_staticfilename,
@@ -124,7 +125,7 @@ switch($action)
 			}
 
 			$stub_contents = file( $edit_folder.'/stub.model' );
-			echo '<p>', T_('Loading'), ': ', $stub_contents, '</p>';
+			echo '<p>', T_('Loading'), ': ', $edit_folder.'/stub.model', '</p>';
 
 			if( empty( $stub_contents ) )
 			{
@@ -133,11 +134,11 @@ switch($action)
 			else
 			{
 				$new_stub_file = $edit_folder . '/' . $blog_filename;
-				echo '<p>', T_('Creating'), ': ', $new_stub_file, '</p>';
-				$f = fopen( $new_stub_file , "w" );
+				echo '<p>', T_('Creating'), ': ', $new_stub_file, '...</p>';
+				$f = @fopen( $new_stub_file , "w" );
 				if( $f == false )
 				{
-					echo '<p class="error">Cannot create!</p>';
+					echo '<p class="error">', T_('Cannot create!'), '</p>';
 				}
 				else
 				{
@@ -175,6 +176,7 @@ switch($action)
 			printf( T_('You should <a href="%s">create categories</a> for this blog now!'), 
 			'b2categories.php?action=newcat&blog_ID=' . $blog_ID );
 		?></strong></p>
+		</div>
 		<?php
 		require( dirname(__FILE__) . '/_footer.php' );
 		exit();
@@ -182,7 +184,7 @@ switch($action)
 
 
 	case 'edit':
-		// Edit blog form:
+		// ---------- Edit blog form ----------
 		param( 'blog', 'integer', true );
 		require( dirname(__FILE__). '/_menutop.php' );
 		require( dirname(__FILE__). '/_menutop_end.php' );
@@ -220,7 +222,7 @@ switch($action)
 
 
 	case 'update':
-		// Update blog in DB:
+		// ---------- Update blog in DB ----------
 		param( 'blog', 'integer', true );
 
 		// Check permissions:
@@ -278,8 +280,9 @@ switch($action)
 
 
 	case 'delete':
-		// Delete a blog (Heavy deleting coming up...)
+		// ----------  Delete a blog from DB ----------
 		param( 'blog', 'integer', true );
+		param( 'confirm', 'integer', 0 );
 		require( dirname(__FILE__). '/_menutop.php' );
 		require( dirname(__FILE__). '/_menutop_end.php' );
 
@@ -291,24 +294,82 @@ switch($action)
 
 		$deleted_Blog = Blog_get_by_ID( $blog );
 
-		// Delete from DB:
-		echo '<div class="panelinfo">
-						<h3>Deleting Blog [';
-		$deleted_Blog->disp( 'name' );
-		echo ']...</h3>';
-		$deleted_Blog->dbdelete( true );
-		echo '</div>';
+		if( ! $confirm )
+		{	// Not confirmed
+			?>
+			<div class="panelinfo">
+				<h3>Delete Blog [<?php $deleted_Blog->disp( 'name' ) ?>]?</h3>
 
+				<p><?php echo T_('Deleting this blog will also delete all its categories, posts and comments!') ?></p>
+
+				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
+
+				<p>
+					<form action="b2blogs.php" method="get" class="inline">
+						<input type="hidden" name="action" value="delete" />
+						<input type="hidden" name="blog" value="<?php $deleted_Blog->ID() ?>" />
+						<input type="hidden" name="confirm" value="1" />
+						
+						<?php 
+						if( is_file( $deleted_Blog->get('dynfilepath') ) )
+						{
+							?>
+							<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
+							<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->get('dynurl').'"', $deleted_Blog->get('dynfilepath') ); ?></label><br />
+							<br />
+							<?php
+						}
+						if( is_file( $deleted_Blog->get('staticfilepath') ) )
+						{ 
+							?>
+							<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
+							<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->get('staticurl').'"', $deleted_Blog->get('staticfilepath') ); ?></label><br />
+							<br />
+							<?php
+						}
+						?>						
+						
+						<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
+					</form>
+					<form action="b2blogs.php" method="get" class="inline">
+						<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
+					</form>
+				</p>
+
+				</div>
+			<?php
+		}
+		else
+		{	// Confirmed: Delete from DB:
+			param( 'delete_stub_file', 'integer', 0 );
+			param( 'delete_static_file', 'integer', 0 );
+
+			echo '<div class="panelinfo">
+							<h3>Deleting Blog [';
+			$deleted_Blog->disp( 'name' );
+			echo ']...</h3>';
+			$deleted_Blog->dbdelete( $delete_stub_file, $delete_static_file, true );
+			echo '</div>';
+		}
 		break;
 
+
 	case 'GenStatic':
+		// ----------  Generate static homepage for blog ----------
 		param( 'blog', 'integer', true );
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
-	?>
-		<div class="panelinfo">
-			<p><?php echo T_('Blog'), ': ', get_bloginfo('name') ?></p>
-	<?php
+		$edited_Blog = Blog_get_by_ID( $blog );
+		?>
+			<div class="panelinfo">
+				<h3>
+				<?php 
+					echo T_('Generating static page for blog [');
+					$edited_Blog->disp('name');
+					echo ']'; 
+				?>
+				</h3>
+		<?php
 		$current_User->check_perm( 'blog_genstatic', 'any', true, $blog );
 
 		$staticfilename = get_bloginfo('staticfilename');
@@ -319,11 +380,10 @@ switch($action)
 		}
 
 		// Determine the edit folder:
-		$edit_folder = get_path( 'base' ) . get_bloginfo('subdir');
-		$filename = $edit_folder . '/' . get_bloginfo('filename');
-		$staticfilename = $edit_folder . '/' . $staticfilename;
+		$filename = $edited_Blog->get('dynfilepath');
+		$staticfilename = $edited_Blog->get('staticfilepath');
 
-		printf( T_('Generating page from <strong>%s</strong> to <strong>%s</strong>...'), $filename, $staticfilename );
+		printf( '<p>'.T_('Generating page from <strong>%s</strong> to <strong>%s</strong>...'), $filename, $staticfilename );
 		echo "<br />\n";
 		flush();
 
@@ -343,7 +403,7 @@ switch($action)
 
 		echo T_('Done.');
 	?>
-		<br />
+		</p>
 		</div>
 	<?php
 

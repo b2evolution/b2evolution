@@ -483,11 +483,9 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 
 
 /*
- * blog_has_cats(-)
+ * Does a given bog have categories?
  *
- * Does a given bog has categories?
- *
- * fplanque: created
+ * {@internal blog_has_cats(-)}}
  */
 function blog_has_cats( $blog_ID )
 {
@@ -495,7 +493,7 @@ function blog_has_cats( $blog_ID )
 
 	cat_load_cache();
 
-	foreach( $cache_categories as $icat_ID => $i_cat )
+	if( count($cache_categories) ) foreach( $cache_categories as $icat_ID => $i_cat )
 	{
 		if( $icat_ID && $i_cat['cat_blog_ID'] == $blog_ID )
 		{ // this cat is in the blog

@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-04-13 15:20+0200\nPO-Revision-Date: 2004-04-15 13:57+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-04-13 15:20+0200\nPO-Revision-Date: 2004-04-25 16:28+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'my b2evolution' => "mon b2evoltution",
 	'my blogs' => "mes blogs",
 	'Multilingual multiuser multiblog engine!' => "Multilingual multiuser multiblog engine!",
@@ -128,7 +128,7 @@ $trans['fr_FR'] = array(
 	'Oops, no comment with this ID!' => "Oups, aucun commentaire avec cet Idx!",
 	'Editing comment' => "Edition d'un commentaire",
 	'New post in blog:' => "Poster dans le blog:",
-	'Since this blog has no categories, you cannot post to it. You must create categories first.' => "Vous ne pouvez pas poster dans ce blog tant que vous n\\'y avez pas créé de catégorie.",
+	'Since this blog has no categories, you cannot post to it. You must create categories first.' => "Vous ne pouvez pas poster dans ce blog tant que vous n'y avez pas créé de catégorie.",
 	'Switch to this blog (keeping your input if Javascript is active)' => "Poster dans ce blog (en conservant vos saisies si Javascript est actif)",
 	'b2evo' => "b2evo",
 	'Login...' => "S'identifier...",
