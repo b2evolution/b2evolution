@@ -25,12 +25,18 @@ if( !isset($default_to_blog) ) $default_to_blog = 2;
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches );
-$baseurlroot = $matches[1];
-// echo "baseurlroot=$baseurlroot <br />";
-$basehost = $matches[2];
-// echo "basehost=$basehost <br />";
-
+if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
+{
+	$baseurlroot = $matches[1];
+	// echo "baseurlroot=$baseurlroot <br />";
+	$basehost = $matches[2];
+	// echo "basehost=$basehost <br />";
+}
+else
+{
+	echo 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix. Please correct that.';
+	exit;
+}
 
 # Short name of this system (will be used for cookies and notification emails)
 # Change this only if you install mutliple b2evolutions on the same website.

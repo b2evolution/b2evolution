@@ -706,7 +706,7 @@ class Item extends DataObject
 				if( $title == '#' ) $title = T_('Display pingbacks');
 				if( $zero == '#' ) $zero = T_('Pingback (0)');
 				if( $one == '#' ) $one = T_('Pingback (1)');
-				if( $more == '#' ) $more = T_('Pingback (%d)');
+				if( $more == '#' ) $more = T_('Pingbacks (%d)');
 				break;
 
 			default:

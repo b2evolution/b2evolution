@@ -256,7 +256,7 @@ switch( $action )
 					<legend><?php echo T_('Database you want to install into (These settings should be provided by your host)') ?></legend>
 					<?php
 						form_text( 'conf_db_user', $conf_db_user, 16, T_('mySQL Username'), sprintf( T_('Your username to access the database' ) ), 16 );
-						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16 );
+						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16, '', 'password' );
 						form_text( 'conf_db_name', $conf_db_name, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 16 );
 						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 16 );
 					?>

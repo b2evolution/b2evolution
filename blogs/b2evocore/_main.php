@@ -42,6 +42,19 @@ require_once( dirname(__FILE__). '/_functions_forms.php');
 require_once( dirname(__FILE__). '/_class_renderer.php');
 require_once( dirname(__FILE__). '/_class_toolbars.php');
 
+
+if( !$config_is_done )
+{
+	echo '<div style="text-align:center">
+				<img src="'.$img_url.'/b2evolution_logo_360.gif" />
+				<br />version '.$b2_version.'<br />
+				Welcome to b2evolution <br />
+				<p>You don\'t seem to have done the installation yet.. <a href="install/index.php">please go there</a></p>
+				</div>';
+	exit;
+}
+
+
 if( !function_exists( 'gzencode' ) )
 { // when there is no function to gzip, we won't do it
 	$use_gzipcompression = false;

@@ -12,14 +12,14 @@
 /*
  * form_text(-)
  */
-function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '' )
+function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '', $inputtype = 'text' )
 {
 	if( $field_maxlength == 0 )
 		$field_maxlength = $field_size;
 
 	echo '<fieldset>';
 	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><input type="text" name="', $field_name, '" id="', $field_name, '" size="', $field_size, '" maxlength="', $field_maxlength, '" value="', format_to_output($field_value, 'formvalue'),'"';
+	echo '  <div class="input"><input type="', $inputtype, '" name="', $field_name, '" id="', $field_name, '" size="', $field_size, '" maxlength="', $field_maxlength, '" value="', format_to_output($field_value, 'formvalue'),'"';
 	if( !empty($field_class) )
 	{
 		echo ' class="', $field_class,'"';

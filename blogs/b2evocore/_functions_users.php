@@ -181,7 +181,7 @@ function is_logged_in()
 	global $user_ID, $generating_static;
 
 	if( isset($generating_static) )
-	{	// When generating static page, we shoudl always consider we are not logged in.
+	{	// When generating static page, we should always consider we are not logged in.
 		return false;
 	}
 
