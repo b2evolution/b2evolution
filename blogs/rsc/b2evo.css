@@ -6,6 +6,12 @@
 	text-align: center;
 	margin-bottom: 1em;
 }
+#rowheader2 
+{	/* This one is use on the default home page */
+	text-align: center;
+	margin-bottom: 1em;
+	border-bottom: 1px solid #CCCCCC;
+}
 #rowfooter {
 	margin-top: 1em;
 	clear: both;

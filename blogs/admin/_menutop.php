@@ -121,11 +121,11 @@ if( empty($mode) )
 			echo '<a href="b2options.php" >', T_('Settings'), '</a></li>';
 		}
 
-		if( $admin_tab == 'profile' )
+		if( $admin_tab == 'tools' )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2profile.php" >', T_('My Profile'), '</a></li>';
+		echo '<a href="tools.php" >', T_('Tools'), '</a></li>';
 
 	?>
 
