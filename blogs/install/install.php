@@ -225,8 +225,8 @@ function create_b2evo_tables()
 	echo "Creating table for Anti-Spam Ban List...</p>\n";
 	create_antispam();
 
-	echo "Creating table for Plugin Settings...<br />\n"
-	create_pluginsettings();
+#	echo "Creating table for Plugin Settings...<br />\n";
+#	create_pluginsettings();
 
 	echo "<p>All tables created successfully.</p>\n";
 }
@@ -654,9 +654,9 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 
-			echo "<p>Creating plugin settings table... ";
-			create_pluginsettings();
-			echo "OK.<br />\n";
+		#	echo "<p>Creating plugin settings table... ";
+		#	create_pluginsettings();
+		#	echo "OK.<br />\n";
 
 			echo "<p>Generating wordcounts... ";
 			$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
@@ -688,9 +688,9 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 			
-			echo "<p>Creating plugin settings table... ";
-			create_pluginsettings();
-			echo "OK.<br />\n";
+		#	echo "<p>Creating plugin settings table... ";
+		#	create_pluginsettings();
+		#	echo "OK.<br />\n";
 		}
 
 		if( $old_db_version < 8030 )
@@ -734,9 +734,9 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 
-			echo "<p>Creating plugin settings table... ";
-			create_pluginsettings();
-			echo "OK.<br />\n";
+		#	echo "<p>Creating plugin settings table... ";
+		#	create_pluginsettings();
+		#	echo "OK.<br />\n";
 
 		}
 	
@@ -763,9 +763,9 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 
-			echo "<p>Creating plugin settings table... ";
-			create_pluginsettings();
-			echo "OK.<br />\n";
+		#	echo "<p>Creating plugin settings table... ";
+		#	create_pluginsettings();
+		#	echo "OK.<br />\n";
 			
 			
 			/* 
@@ -940,9 +940,9 @@ switch( $action )
 		echo "Populating Anti-Spam table...";
 		populate_antispam();
 		echo "OK.<br />\n";
-		echo "<p>Creating plugin settings table... ";
-		create_pluginsettings();
-		echo "OK.<br />\n";
+	#	echo "<p>Creating plugin settings table... ";
+	#	create_pluginsettings();
+	#	echo "OK.<br />\n";
 		
 
 		// end benchmarking
