@@ -169,7 +169,12 @@ switch($action)
 
 		if( ! blog_has_cats( $blog ) )
 		{
-			die( T_('Since this blog has no categories, you cannot post to it. You must create categories first.') );
+			?>
+			<div class="panelinfo"><p>
+			<?php echo T_('Since this blog has no categories, you cannot post to it. You must create categories first.') ?>
+			</p></div>
+			<?php
+			break;
 		}
 
 		// Check permission:

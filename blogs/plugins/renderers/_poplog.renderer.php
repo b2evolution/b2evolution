@@ -39,12 +39,6 @@ class poplog_Rendererplugin extends RendererPlugin
 		$this->long_desc = T_('Rewrites URLs so that we can count them');
 
 		/**
-		 * this is the format of the links to be generated. %d gets replaced by the ID for that link
-		 */
-		$CurBlog = Blog_get_by_ID( $blog );  // NOTE: we don't have global $Blog in edit_actions.php
-		$this->destformat = $CurBlog->get( 'baseurl' ).'htsrv/urlredir.php?dest=%s';
-
-		/**
 		 * the category to store the links into. Each link will become a post there.
 		 */
 		$this->poplog_cat_ID = 14;
@@ -79,6 +73,12 @@ class poplog_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
+
+		/**
+		 * this is the format of the links to be generated. %d gets replaced by the ID for that link
+		 */
+		$CurBlog = Blog_get_by_ID( $blog );  // NOTE: we don't have global $Blog in edit_actions.php
+		$this->destformat = $CurBlog->get( 'baseurl' ).'htsrv/urlredir.php?dest=%s';
 
 		// this will replace all a-tags with a callback function (below)
 		$content = preg_replace('#(<a .*?>)(.*?)</a>#ei', '$this->replace_callback(stripslashes("$1"), stripslashes("$2"))', $content);

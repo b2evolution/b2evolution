@@ -58,7 +58,8 @@ $location = $redirect_to;
 
 <div style="text-align:right">
 <?php user_register_link( '', ' &middot; ' )?>
-<a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword&redirect_to=<?php echo urlencode( $redirect_to ) ?>"><?php echo T_('Lost your password ?') ?></a>
+<a href="<?php echo $baseurl ?>"><?php echo T_('Go to Blogs') ?></a>
+&middot; <a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword&redirect_to=<?php echo urlencode( $redirect_to ) ?>"><?php echo T_('Lost your password ?') ?></a>
 </div>
 
 <?php
