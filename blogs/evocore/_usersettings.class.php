@@ -60,12 +60,7 @@ class UserSettings extends AbstractSettings
 	 */
 	function UserSettings()
 	{ // constructor
-		$this->dbtablename = 'T_usersettings';
-		$this->colkeynames = array( 'uset_user_ID', 'uset_name' );
-		$this->cacheByColKeys = 1;
-		$this->colvaluename = 'uset_value';
-
-		parent::AbstractSettings();
+		parent::AbstractSettings( 'T_usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
 	}
 
 
@@ -114,6 +109,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2005/01/06 05:20:14  blueyed
+ * refactored (constructor), getDefaults()
+ *
  * Revision 1.2  2004/11/08 02:23:44  blueyed
  * allow caching by column keys (e.g. user ID)
  *

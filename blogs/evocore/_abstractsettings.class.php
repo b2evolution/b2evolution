@@ -56,7 +56,7 @@ class AbstractSettings
 	 * @var string
 	 * @access protected
 	 */
-	var $dbtablename;
+	var $dbTableName;
 
 	/**
 	 * Array with DB column key names.
@@ -64,7 +64,7 @@ class AbstractSettings
 	 * @var array of strings
 	 * @access protected
 	 */
-	var $colkeynames = array();
+	var $colKeyNames = array();
 
 	/**
 	 * DB column name for the value.
@@ -72,16 +72,16 @@ class AbstractSettings
 	 * @var string
 	 * @access protected
 	 */
-	var $colvaluename;
+	var $colValueName;
 
 
 	/**
 	 * The number of column keys to cache by. This are the first x keys of
-	 * {@link $colkeynames}. 0 means 'load all'.
+	 * {@link $colKeyNames}. 0 means 'load all'.
 	 *
 	 * @var integer
 	 */
-	var $cacheByColKeys = 0;
+	var $cacheByColKeys;
 
 
 	/**
@@ -113,17 +113,25 @@ class AbstractSettings
 
 
 	/**
-	 * Constructor, does nothing.
-	 * @todo I think it would be clearer if the constructor initialized colkeynames before testing it... the derived classes can always call parent::AbstractSettings( ... )
+	 * Constructor.
+	 * @param string The name of the DB table with the settings stored.
+	 * @param array List of names for the DB columns keys that reference a value.
+	 * @param string The name of the DB column that holds the value.
 	 */
-	function AbstractSettings()
+	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
 	{
+		$this->dbTableName = $dbTableName;
+		$this->colKeyNames = $colKeyNames;
+		$this->colValueName = $colValueName;
+		$this->cacheByColKeys = $cacheByColKeys;
+
+
 		/**
 		 * @var integer internal counter for the number of column keys
 		 */
-		$this->count_colkeynames = count( $this->colkeynames );
+		$this->count_colKeyNames = count( $this->colKeyNames );
 
-		if( $this->count_colkeynames > 3 || $this->count_colkeynames < 1 )
+		if( $this->count_colKeyNames > 3 || $this->count_colKeyNames < 1 )
 		{
 			die( 'Settings keycount not supported for class '.get_class() );
 		}
@@ -166,7 +174,7 @@ class AbstractSettings
 
 			for( $i = 0; $i < $this->cacheByColKeys; $i++ )
 			{
-				$whereList[] = $this->colkeynames[$i].' = "'.$getArgs[$i].'"';
+				$whereList[] = $this->colKeyNames[$i].' = "'.$getArgs[$i].'"';
 
 				if( !is_array( $testCache )
 						|| !isset( $testCache[$getArgs[$i]] )
@@ -188,13 +196,13 @@ class AbstractSettings
 
 
 		global $DB;
-		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
-																.' FROM '.$this->dbtablename
+		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
+																.' FROM '.$this->dbTableName
 																.( isset( $whereList[0] ) ?
 																		' WHERE '.implode( ' AND ', $whereList ) :
 																		'' ) );
 
-		switch( $this->count_colkeynames )
+		switch( $this->count_colKeyNames )
 		{
 			case 1:
 				if( !$result )
@@ -203,8 +211,8 @@ class AbstractSettings
 				}
 				else foreach( $result as $loop_row )
 				{
-					$this->cache[$loop_row->{$this->colkeynames[0]}]->value = $loop_row->{$this->colvaluename};
-					$this->cache[$loop_row->{$this->colkeynames[0]}]->dbuptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}]->value = $loop_row->{$this->colValueName};
+					$this->cache[$loop_row->{$this->colKeyNames[0]}]->dbuptodate = true;
 				}
 				break;
 
@@ -215,8 +223,8 @@ class AbstractSettings
 				}
 				else foreach( $result as $loop_row )
 				{
-					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->value = $loop_row->{$this->colvaluename};
-					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->dbuptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->value = $loop_row->{$this->colValueName};
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->dbuptodate = true;
 				}
 				break;
 
@@ -227,8 +235,8 @@ class AbstractSettings
 				}
 				else foreach( $result as $loop_row )
 				{
-					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->value = $loop_row->{$this->colvaluename};
-					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->uptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->value = $loop_row->{$this->colValueName};
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->uptodate = true;
 				}
 				break;
 		}
@@ -240,8 +248,9 @@ class AbstractSettings
 	/**
 	 * Get a setting from the DB settings table.
 	 *
+	 * @uses {@link getDefault()}
 	 * @param string $args,... the values for the column keys (depends on
-	 *                         $this->colkeynames and must match its count and order)
+	 *                         $this->colKeyNames and must match its count and order)
 	 * @return string|false|NULL value as string on success;
 	 *                           NULL if not found; false in case of error
 	 */
@@ -252,10 +261,10 @@ class AbstractSettings
 		$args = func_get_args();
 		$this->load( $args );
 
-		if( func_num_args() != $this->count_colkeynames )
+		if( func_num_args() != $this->count_colKeyNames )
 		{
 			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not '
-											.'match $colkeynames (class '.get_class($this).').', 'error' );
+											.'match $colKeyNames (class '.get_class($this).').', 'error' );
 			return false;
 		}
 
@@ -263,17 +272,17 @@ class AbstractSettings
 
 		$r = NULL;
 
-		switch( $this->count_colkeynames )
+		switch( $this->count_colKeyNames )
 		{
 			case 1:
 				if( isset($this->cache[ $args[0] ]) )
 				{
 					$r = $this->cache[ $args[0] ]->value;
 				}
-				elseif( isset($this->_defaults[ $args[0] ]) )
+				elseif( NULL !== ($default = $this->getDefault( $args[0] )) )
 				{
-					$r = $this->_defaults[ $args[0] ];
-					$debugMsg .= '[default]: ';
+					$r = $default;
+					$debugMsg .= '[DEFAULT]: ';
 				}
 				break;
 
@@ -282,10 +291,10 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
-				elseif( isset($this->_defaults[ $args[1] ]) )
+				elseif( NULL !== ($default = $this->getDefault( $args[1] )) )
 				{
-					$r = $this->_defaults[ $args[1] ];
-					$debugMsg .= '[default]: ';
+					$r = $default;
+					$debugMsg .= '[DEFAULT]: ';
 				}
 				break;
 
@@ -294,10 +303,10 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
-				elseif( isset($this->_defaults[ $args[2] ]) )
+				elseif( NULL !== ($default = $this->getDefault( $args[2] )) )
 				{
-					$r = $this->_defaults[ $args[2] ];
-					$debugMsg .= '[default]: ';
+					$r = $default;
+					$debugMsg .= '[DEFAULT]: ';
 				}
 				break;
 		}
@@ -309,11 +318,28 @@ class AbstractSettings
 
 
 	/**
+	 * Get the default for the last key of {@link $colKeyNames}
+	 *
+	 * @param string The last column key
+	 * @return NULL|mixed NULL if no default is set, otherwise the value (should be string).
+	 */
+	function getDefault( $lastKey )
+	{
+		if( isset($this->_defaults[ $lastKey ]) )
+		{
+			return $this->_defaults[ $lastKey ];
+		}
+
+		return NULL;
+	}
+
+
+	/**
 	 * Only set the first variable (passed by reference) if we could retrieve a
 	 * setting.
 	 *
 	 * @param mixed variable to eventually set (by reference)
-	 * @param string the values for the column keys (depends on $this->colkeynames
+	 * @param string the values for the column keys (depends on $this->colKeyNames
 	 *               and must match its count and order)
 	 * @return boolean true on success (variable was set), false if not
 	 */
@@ -339,8 +365,8 @@ class AbstractSettings
 	/**
 	 * Temporarily sets a setting ({@link updateDB()} writes it to DB).
 	 *
-	 * @param string $args,... the values for the {@link $colkeynames column keys}
-	 *                         and {@link $colvaluename column value}. Must match order and count!
+	 * @param string $args,... the values for the {@link $colKeyNames column keys}
+	 *                         and {@link $colValueName column value}. Must match order and count!
 	 */
 	function set()
 	{
@@ -351,13 +377,13 @@ class AbstractSettings
 
 		$count_args = func_num_args();
 
-		if( $count_args != ( $this->count_colkeynames + 1) )
+		if( $count_args != ( $this->count_colKeyNames + 1) )
 		{
 			$Debuglog->add( 'Count of arguments for AbstractSettings::set() does not match $colkeyname + 1 (colkeyvalue).', 'error' );
 			return false;
 		}
 
-		switch( $this->count_colkeynames )
+		switch( $this->count_colKeyNames )
 		{
 			case 1:
 				$atcache =& $this->cache[ $args[0] ];
@@ -408,7 +434,7 @@ class AbstractSettings
 		}
 
 
-		switch( $this->count_colkeynames )
+		switch( $this->count_colKeyNames )
 		{
 			case 1:
 				foreach( $this->cache as $key => $value )
@@ -449,7 +475,7 @@ class AbstractSettings
 
 		if( isset($query_insert[0]) )
 		{
-			$query = 'REPLACE INTO '.$this->dbtablename.' ('.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
+			$query = 'REPLACE INTO '.$this->dbTableName.' ('.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
 								.') VALUES '.implode(', ', $query_insert);
 			return (boolean)$DB->query( $query );
 		}
@@ -461,6 +487,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/06 05:20:14  blueyed
+ * refactored (constructor), getDefaults()
+ *
  * Revision 1.8  2005/01/03 06:23:47  blueyed
  * minor refactoring
  *

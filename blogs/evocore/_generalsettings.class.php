@@ -52,22 +52,22 @@ require_once( dirname(__FILE__).'/_abstractsettings.class.php' );
  */
 class GeneralSettings extends AbstractSettings
 {
+	var $_defaults = array( 'upload_allowedext' => 'jpg gif png',
+													'upload_allowedmime' => 'image/jpeg image/gif image/png',
+												);
 	/**
 	 * Constructor
 	 *
 	 * loads settings, checks db_version
 	 */
 	function GeneralSettings()
-	{ // constructor
+	{
 		global $new_db_version;
 
-		$this->dbtablename = 'T_settings';
-		$this->colkeynames = array( 'set_name' );
-		$this->colvaluename = 'set_value';
+		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value' );
 
 
-		parent::AbstractSettings();
-
+		// check DB version:
 		if( $this->get( 'db_version' ) != $new_db_version )
 		{ // Database is not up to date:
 			$error_message = 'Database schema is not up to date!'
@@ -82,6 +82,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/06 05:20:14  blueyed
+ * refactored (constructor), getDefaults()
+ *
  * Revision 1.4  2004/12/30 22:54:38  blueyed
  * errormessage beautified
  *
