@@ -95,7 +95,7 @@ else
  *
  * @global string Default: 'b2evo'
  */
-$app_shortname = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
+$instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
 
 
 /**
@@ -106,11 +106,11 @@ $app_shortname = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
  * <code>$notify_from = 'b2evolution@your_server.com';</code>
  *
  * Alternatively you can use this automated address generation:
- * <code>$notify_from = $app_shortname.'@'.$basehost;</code>
+ * <code>$notify_from = $instance_name.'@'.$basehost;</code>
  *
- * @global string Default: $app_shortname.'@'.$basehost;
+ * @global string Default: $instance_name.'@'.$basehost;
  */
-$notify_from = $app_shortname.'@'.$basehost;
+$notify_from = $instance_name.'@'.$basehost;
 
 
 // ** Configuration for htsrv/getmail.php **
@@ -313,12 +313,12 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 /**#@+
  * Names for cookies.
  */
-$cookie_user  = 'cookie'.$app_shortname.'user';
-$cookie_pass  = 'cookie'.$app_shortname.'pass';
-$cookie_state = 'cookie'.$app_shortname.'state';
-$cookie_name  = 'cookie'.$app_shortname.'name';
-$cookie_email = 'cookie'.$app_shortname.'email';
-$cookie_url   = 'cookie'.$app_shortname.'url';
+$cookie_user  = 'cookie'.$instance_name.'user';
+$cookie_pass  = 'cookie'.$instance_name.'pass';
+$cookie_state = 'cookie'.$instance_name.'state';
+$cookie_name  = 'cookie'.$instance_name.'name';
+$cookie_email = 'cookie'.$instance_name.'email';
+$cookie_url   = 'cookie'.$instance_name.'url';
 /**#@-*/
 
 /**
