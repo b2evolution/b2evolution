@@ -219,7 +219,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 																			$uri_attrs, $comments_allowed_uri_scheme, $encoding );
 		}
 
-		$checker->check( $content );
+		$checker->check( format_to_output( $content, 'htmlbody' ) );
 	}
 
 	if( !isset( $use_security_checker ) ) $use_security_checker = 1;
@@ -1683,6 +1683,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.30  2005/01/09 23:41:54  blueyed
+ * fixed format_to_post()
+ *
  * Revision 1.29  2005/01/09 05:34:08  blueyed
  * emphasize pre_dump()
  *
