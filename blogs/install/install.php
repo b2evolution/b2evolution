@@ -264,7 +264,7 @@ switch( $action )
 
 		blog_create( 'Demo Blogroll', 'Blogroll', $baseurl, $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
 
-		echo "<p>blogs: OK<br />";
+		echo "<p>blogs: OK<br />\n";
 		
 		// Create categories for blog A
 		$cat_ann_a = cat_create( "Announcements [A]", 'NULL', 2 )  or mysql_oops( $query );
@@ -280,7 +280,7 @@ switch( $action )
 		$cat_movies = cat_create( "Movies", $cat_life, 3 )  or mysql_oops( $query );
 		$cat_music = cat_create( "Music", $cat_life, 3 )  or mysql_oops( $query );
 		$cat_b2evo = cat_create( "b2evolution", 'NULL', 3 )  or mysql_oops( $query );
-		echo "categories: OK<br />";
+		echo "categories: OK<br />\n";
 
 		// Create categories for blogroll
 		$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 )  or mysql_oops( $query );
@@ -328,7 +328,7 @@ switch( $action )
 		// POPULATE THE BLOGROLL:
 		populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
 
-		echo "posts: OK<br />";
+		echo "posts: OK<br />\n";
 		
 		
 			
@@ -337,13 +337,13 @@ switch( $action )
 		VALUES
 		(1, 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '$now', 'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.', 0)";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "comments: OK<br />";
+		echo "comments: OK<br />\n";
 		
 		
 		
 		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', 8000)";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "settings: OK<br />";
+		echo "settings: OK<br />\n";
 		
 		
 		
@@ -376,6 +376,10 @@ switch( $action )
 		?>
 		<h3>Installing b2evolution tables and copying existing b2 data</h3>
 		<?php
+		
+		// start benchmarking
+		$time_start = gettimeofday();
+		
 		create_b2evo_tables();
 
 		echo "<p>Creating default blogs...</p>\n";
@@ -388,7 +392,7 @@ switch( $action )
 
 		blog_create( 'Demo Blogroll', 'Blogroll', $baseurl, $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
 
-		echo "<p>blogs: OK<br />";
+		echo "<p>blogs: OK<br />\n";
 		
 
 		echo "<p>Copying data from original b2 tables...</p>\n";
@@ -398,17 +402,17 @@ switch( $action )
 		// You can always change it back in the options if you don't like it.
 		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, time_format, date_format, 8000 FROM $oldtablesettings";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 		
 		echo "Copying users... ";
 		$query = "INSERT INTO $tableusers SELECT * FROM $oldtableusers";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 		
 		echo "Copying categories... ";
 		$query = "INSERT INTO $tablecategories( cat_ID, cat_parent_ID, cat_name, cat_blog_ID ) SELECT cat_ID, NULL, cat_name, 2 FROM $oldtablecategories";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 
 		echo "Creating additionnal categories for Blog B... ";
 		$cat_ann_b = cat_create( "Announcements [B]", 'NULL', 3 )  or mysql_oops( $query );
@@ -423,21 +427,30 @@ switch( $action )
 		// Create categories for blogroll
 		$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 )  or mysql_oops( $query );
 		$cat_blogroll_contrib = cat_create( "contributors", 'NULL', 4 )  or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 		
 		echo "Copying posts... ";
 		$query = "INSERT INTO $tableposts( ID, post_author, post_date, post_status, post_lang, post_content,post_title, post_category, post_autobr, post_flags, post_karma)  SELECT ID, post_author, post_date, 'published', '$default_language', post_content, post_title, post_category, 1, 'pingsdone,html,imported', post_karma FROM $oldtableposts";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 
+		echo "Generating wordcounts... ";
+		$query = "SELECT ID, post_content FROM $tableposts";
+		$q = mysql_query($query) or mysql_oops( $query );
+		
+		while($row = mysql_fetch_assoc($q)) {
+			$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
+			$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
+		}
+		
+		echo "OK.<br />\n";
 
 		echo "Generating postcats... ";
  		$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_category FROM $tableposts";		
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 
-
-		echo "Creating a few additionnal samples for Blog B... ";		
+		echo "Creating a few additionnal samples for Blog B... ";
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		bpost_create( 1, 'Sample post', '<p>This is a sample post.</p>
@@ -468,13 +481,13 @@ switch( $action )
 		// POPULATE THE BLOGROLL:
 		populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
 
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 
 		
 		echo "Copying comments... ";
 		$query = "INSERT INTO $tablecomments( comment_ID, comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma ) SELECT comment_ID, comment_post_ID, 'comment', comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma FROM $oldtablecomments";
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />";
+		echo "OK.<br />\n";
 
 		echo "Qualifying comments... Trackback...";
  		$query = "UPDATE $tablecomments SET comment_type = 'trackback' WHERE comment_content LIKE '<trackback />%'";		
@@ -483,8 +496,13 @@ switch( $action )
  		$query = "UPDATE $tablecomments SET comment_type = 'pingback' WHERE comment_content LIKE '<pingback />%'";		
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.</p>";
+
+		// end benchmarking
+		$time_end = gettimeofday();
+		$time_total = (float)($time_end['sec'] - $time_start['sec']) + ((float)($time_end['usec'] - $time_start['usec'])/1000000);
+		$time_total = round($time_total, 3);
 ?>
-		<p>Upgrade completed successfully!</p>
+		<p>Upgrade completed successfully! (<?php echo $time_total; ?> seconds)</p>
 		
 		<p>Now you can <a href="../admin/b2login.php">log in</a> with your usual b2 username and password.</p>
 
