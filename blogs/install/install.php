@@ -28,7 +28,7 @@ if( $setlocale == '' )
 }
 else
 {
-	if( preg_match('/[a-z]{2}_[A-Z]{2}/', $setlocale) )
+	if( preg_match('/[a-z]{2}-[A-Z]{2}/', $setlocale) )
 		$default_locale = $setlocale;
 }
 
@@ -60,7 +60,7 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 <div class="FigZone">
 <?php
 	foreach( $locales as $localekey => $localevalue ){
-		$llang = substr( $localekey, strpos($localekey, '_') + 1, 2 );
+		$llang = substr( $localekey, strpos($localekey, '-') + 1, 2 );
 		if( $default_locale == $localekey )
 			echo '<span style="font-size:120%;font-weight:bold;">';	
 		echo ' <a href="?setlocale='. $localekey. '">';
@@ -102,7 +102,7 @@ mySQL Password: <?php echo (($dbpassword!='demopass' ? "(Set, but not shown for 
 
 <?php
 
-$new_db_version = 8070;				// next time: 8070
+$new_db_version = 8060;				// next time: 8070
 
 /*
  * check_db_version(-)

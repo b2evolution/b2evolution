@@ -37,7 +37,10 @@ function NT_($string)
 
 
 //{{{ defining the locales:
-# Add what you need and comment what you don't need
+#
+# These are default settings. They are used for creating the locales table
+# in the DB and remain as a fallback option afterwards.
+#
 $locales = array(
 	'cs-CZ' => array( // Czech, CZECH REPUBLIC
 									'charset' => 'utf-8',
@@ -148,7 +151,7 @@ $languages = array(
 
 
 // Load locale related functions: (ne need NT_() here)
-require_once (dirname(__FILE__)."/$conf_dirout/$core_subdir/_functions_locale.php"); 
+require_once( dirname(__FILE__). "/$conf_dirout/$core_subdir/_functions_locale.php" );
 
 
 /*{{{ How to format the dates and times:
