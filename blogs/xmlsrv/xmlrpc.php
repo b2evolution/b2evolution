@@ -163,8 +163,8 @@ function b2getcategories($m)
 	$userdata = get_userdatabylogin($username);
 
 
-	if (user_pass_ok($username,$password)) {
-
+	if (user_pass_ok($username,$password)) 
+	{
 		$sql = "SELECT * FROM $tablecategories ";
 		if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
 		$sql .= "ORDER BY cat_name ASC";

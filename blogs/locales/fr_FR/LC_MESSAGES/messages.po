@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2003-09-04 02:40+0200\n"
-"PO-Revision-Date: 2003-09-04 02:56+0100\n"
+"PO-Revision-Date: 2003-09-06 21:43+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -521,7 +521,7 @@ msgstr "Se rappeler de moi"
 
 #: ..\..\..\_feedback.php:189
 msgid "(Set cookies for name, email &amp; url)"
-msgstr "(Placer des coohies pour le nom, l'email &amp; l'url)"
+msgstr "(Placer des cookies pour le nom, l'email &amp; l'url)"
 
 #: ..\..\..\_profile.php:16
 #: ..\..\..\htsrv\profile_update.php:31

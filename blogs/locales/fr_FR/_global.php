@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-04 02:40+0200\nPO-Revision-Date: 2003-09-04 02:56+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-04 02:40+0200\nPO-Revision-Date: 2003-09-06 21:43+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -66,7 +66,7 @@ $trans['fr_FR'] = array(
 	'Auto-BR' => 'Auto-BR',
 	'Line breaks become &lt;br /&gt;' => 'Les retours à la ligne deviennent des  &lt;br /&gt;',
 	'Remember me' => 'Se rappeler de moi',
-	'(Set cookies for name, email &amp; url)' => '(Placer des coohies pour le nom, l\'email &amp; l\'url)',
+	'(Set cookies for name, email &amp; url)' => '(Placer des cookies pour le nom, l\'email &amp; l\'url)',
 	'You are not loggued in.' => 'Vous n\'êtes pas identifié!',
 	'Login:' => 'Identifiant:',
 	'ID' => 'Idx',

@@ -57,3 +57,51 @@ a:hover{background:#40B4C3;
            font-weight:bold;}
 .sidebody{padding-left:5px;
          border-bottom:1px solid #000000;}
+				 /* Styles for comment form */
+form.bComment fieldset
+{
+	clear: both;
+	border: none;
+	margin: 2ex 0ex;
+	padding: 0ex;
+	/* border: 1px solid #f00; */
+}
+div.label
+{
+	float: left;
+	width: 18%;
+	text-align: right;
+	font-weight: bold;
+	position: relative;
+	top: .5ex;
+	color: #40B4C3;
+	/* border: 1px solid #00f; */
+}
+form.bComment label
+{
+	font-weight: bold;
+}
+div.input
+{
+	float: right;
+	width: 80%;
+	/* border: 1px solid #00f; */
+}
+input.bComment, 
+textarea.bComment,
+select.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 98%;
+	margin: 0ex;
+}
+fieldset .notes
+{
+	/* display: block; */
+	font-size: 80%;
+	color: #999999;
+}

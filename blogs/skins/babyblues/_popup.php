@@ -5,13 +5,9 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title><?php echo $blogname ?> - feedback on '<?php the_title() ?>'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<meta http-equiv="reply-to" content="you@yourdomain.com" />
-	<meta http-equiv="imagetoolbar" content="no" />
-	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
- <!-- PAY ATTENTION to the following line: if set incorrectly, all your relative navigation links will fail! -->
-	<base href="<?php bloginfo('siteurl'); ?>">
+	<title><?php echo $blogname ?> - feedback on '<?php the_title() ?>'</title>
+	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<style type="text/css" media="screen">
 		@import url( 'style.css' );
 	</style>
