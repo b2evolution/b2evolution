@@ -458,19 +458,22 @@ function isImage( $filename )
 /**
  * Check for valid filename (no path allowed).
  *
- * @uses $regexp_filename
+ * @uses $Settings
  * @param string filename to test
  * @return boolean true if the filename is valid according to the regular expression, false if not
  */
 function isFilename( $filename )
 {
-	global $regexp_filename;
+	global $Settings;
 
-	return (boolean)preg_match( $regexp_filename, $filename );
+	return (boolean)preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_filename' ) ).':', $filename );
 }
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/15 17:30:08  blueyed
+ * regexp_fileman moved to $Settings
+ *
  * Revision 1.9  2005/01/13 20:27:07  blueyed
  * doc
  *

@@ -327,7 +327,7 @@ class FileManager extends Filelist
 														NULL;
 		$this->filterIsRegexp = $filterIsRegexp;
 
-		if( $this->filterIsRegexp && !is_regexp( $this->filterString ) )
+		if( $this->filterIsRegexp && !isRegexp( $this->filterString ) )
 		{
 			$this->Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $this->filterString ) );
 			$this->filterString = '.*';
@@ -1393,8 +1393,8 @@ class FileManager extends Filelist
 
 /*
  * $Log$
- * Revision 1.19  2005/01/10 02:17:39  blueyed
- * no message
+ * Revision 1.20  2005/01/15 17:30:08  blueyed
+ * regexp_fileman moved to $Settings
  *
  * Revision 1.18  2005/01/09 05:36:38  blueyed
  * fileupload

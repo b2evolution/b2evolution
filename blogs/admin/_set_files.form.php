@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @author blueyed: Daniel HAHLER 
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE / PROGIDISTRI
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
@@ -86,11 +86,21 @@ $FilesForm->text( 'upload_maxkb',
 									T_('Maximal allowed filesize'),
 									T_('KB'),
 									7 );
+$FilesForm->fieldset_end();
+
+
+$FilesForm->fieldset( T_('Advanced options') );
+$FilesForm->text( 'regexp_filename',
+									$Settings->get('regexp_filename'),
+									40,
+									T_('Valid filename'),
+									T_('Regular expression'),
+									255 );
+$FilesForm->fieldset_end();
+
 
 // TODO: check/transform $upload_url
 // TODO: check/transform $upload_realpath
-
-$FilesForm->fieldset_end();
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )

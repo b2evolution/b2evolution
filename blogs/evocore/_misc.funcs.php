@@ -1449,12 +1449,13 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
  * @param string the regular expression to test
  * @return boolean
  */
-function is_regexp( $sREGEXP )
+function isRegexp( $RegExp )
 {
-	$sPREVIOUSHANDLER = Set_Error_Handler ("trapError");
-	preg_match( '#'.str_replace( '#', '\#', $sREGEXP ).'#', '' );
+	$sPREVIOUSHANDLER = set_error_handler( '_trapError' );
+	preg_match( '#'.str_replace( '#', '\#', $RegExp ).'#', '' );
 	restore_error_handler( $sPREVIOUSHANDLER );
-	return !traperror();
+
+	return !_traperror();
 }
 
 
@@ -1463,7 +1464,7 @@ function is_regexp( $sREGEXP )
  *
  * @return integer number of errors
  */
-function traperror( $reset = 1 )
+function _trapError( $reset = 1 )
 {
 	static $iERRORES;
 
@@ -1683,6 +1684,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.32  2005/01/15 17:30:08  blueyed
+ * regexp_fileman moved to $Settings
+ *
  * Revision 1.31  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

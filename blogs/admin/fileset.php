@@ -62,7 +62,7 @@ switch( $action )
 
 		if( $submit == T_('Set defaults') )
 		{
-			$Settings->deleteArray( array( 'fm_enabled', 'fm_enable_roots_blog', 'fm_enable_roots_group', 'fm_enable_roots_user', 'fm_enable_create_dir', 'fm_enable_create_file', 'upload_enabled', 'upload_allowedext', 'upload_allowedmime', 'upload_maxkb' ) );
+			$Settings->deleteArray( array( 'fm_enabled', 'fm_enable_roots_blog', 'fm_enable_roots_group', 'fm_enable_roots_user', 'fm_enable_create_dir', 'fm_enable_create_file', 'upload_enabled', 'upload_allowedext', 'upload_allowedmime', 'upload_maxkb', 'regexp_filename' ) );
 		}
 		else
 		{
@@ -82,6 +82,17 @@ switch( $action )
 			$Settings->set( 'upload_allowedmime', trim($upload_allowedmime) );
 			$Settings->setByParam( 'upload_maxkb', 'upload_maxkb', 'integer', true );
 
+			// Advanced settings
+			param( 'regexp_filename', 'string', '' );
+			if( !isRegexp( $regexp_filename ) )
+			{
+				$Messages->add( sprintf( '&laquo;%s&raquo; is not a regular expression!', $regexp_filename ) );
+			}
+			else
+			{
+				$Settings->set( 'regexp_filename', $regexp_filename );
+			}
+
 			#param( 'upload_minlevel', 'integer', true );
 			#$Settings->set( 'upload_minlevel', $reloadpage_minlevel );
 		}
@@ -94,7 +105,7 @@ switch( $action )
 		break;
 }
 
-$Messages->displayParagraphs( 'note' );
+$Messages->displayParagraphs( 'all' );
 
 // Check permission to view:
 $current_User->check_perm( 'options', 'view', true );
