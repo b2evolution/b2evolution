@@ -17,7 +17,6 @@
 require_once dirname(__FILE__).'/b2evocore/_main.php';
 
 // Check if a specific blog has been requested in the URL:
-echo get_settings('default_blog_ID');
 param( 'blog', 'integer', get_settings('default_blog_ID'), true );
 
 if( empty($blog) )

@@ -908,6 +908,8 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 	global $$var;
 	global $global_param_list;
 
+	$was_already_set = false;
+
 	// Check if already set
 	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
 	if( !isset( $$var ) || $override )
@@ -944,6 +946,8 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 	else
 	{	// Variable was already set but we need to remove the auto quotes
 		$$var = remove_magic_quotes($$var);
+		$was_already_set = true;
+
 		// echo $var, ' already set';
 		/*	if($var == 'post_extracats' )
 			{ echo "$var=".$$var." was already set! count = ", count($$var),"<br/>";
@@ -975,9 +979,12 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		}
 	}
 
-	if( $memorize )
+	if( $memorize && (!$was_already_set) )
 	{	// Memorize this parameter
-		if( !isset($global_param_list) ) $global_param_list = array();
+		if( !isset($global_param_list) ) 
+		{ // Init list if necessary:
+			$global_param_list = array();
+		}
 		$thisparam = array( 'var' => $var, 'type' => $type, 'default' => $default );
 		$global_param_list[] = $thisparam;
 	}
@@ -1055,8 +1062,10 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 			{
 				global $$var;
 				$value = $$var;
+				// echo "var=$var, type=$type, defval=$defval, val=$value \n";
 				if( !empty($value) && ($value != $defval) )
 				{ // Value exists and is not set to default value:
+					// echo "adding $var \n";
 					$params[] = $var.'='.$value;
 				}
 			}
