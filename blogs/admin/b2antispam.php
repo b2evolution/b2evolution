@@ -362,21 +362,15 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 
 	<?php
 	// Create result set:
-	$Results = new Results( 'SELECT aspm_ID, aspm_string, aspm_source
+	$Results = & new Results( 'SELECT aspm_ID, aspm_string, aspm_source
 														FROM T_antispam
 														ORDER BY aspm_string ASC' );
 
-	// Set headers:
-	$Results->col_headers = array(
-															T_('Keyword'),
-															T_('Source'),
-														);
-
-	// Set sort orders:
-	$Results->col_orders = array(
-															'aspm_string',
-															'aspm_source'
-														);
+  $Results->cols[] = array(
+							'th' => T_('Keyword'),
+							'order' => 'aspm_string',
+							'td' => '$aspm_string$',
+						);
 
 	// Set columns:
 	function antispam_source2( & $row )
@@ -398,10 +392,11 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 
 		return $aspm_sources[$row->aspm_source];
 	}
-	$Results->cols = array(
-													'$aspm_string$',
-													'%antispam_source2($row)%'
-												);
+  $Results->cols[] = array(
+							'th' => T_('Source'),
+							'order' => 'aspm_source',
+							'td' => '%antispam_source2($row)%',
+						);
 
 	// Check if we need to display more:
 	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
@@ -418,14 +413,13 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		<?php
 
 		// Add CHECK to 1st column:
-		$Results->cols[0] = '<a href="b2antispam.php?action=remove&amp;hit_ID=$aspm_ID$" title="'.
+		$Results->cols[0]['td'] = '<a href="b2antispam.php?action=remove&amp;hit_ID=$aspm_ID$" title="'.
 												T_('Allow keyword back (Remove it from the blacklist)').
 												'"><img src="img/tick.gif" width="13" height="13" class="middle" alt="'.
 												T_('Allow Back').'" /></a> '.
-												$Results->cols[0];
+												$Results->cols[0]['td'];
 
 		// Add a column for actions:
-		$Results->col_headers[2] = T_('Actions');
 		function antispam_actions( & $row )
 		{
 			$output = '';
@@ -443,7 +437,10 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 										T_('Check hit-logs and comments for this keyword!').'">'.
 										T_('Re-check').'</a>]';
 		}
-		$Results->cols[2] = '%antispam_actions($row)%';
+    $Results->cols[] = array(
+								'th' => T_('Actions'),
+								'td' => '%antispam_actions($row)%',
+							);
 	}
 
 	// Display results:

@@ -169,37 +169,39 @@ $AdminUI->dispPayloadBegin();
 
 
 // Create result set:
-$Results = new Results(	"SELECT $edited_table_IDcol, $edited_table_namecol
-													 FROM $edited_table
-													ORDER BY $edited_table_orderby" );
+$Results = & new Results(	"SELECT $edited_table_IDcol, $edited_table_namecol
+														 FROM $edited_table
+														ORDER BY $edited_table_orderby" );
 
 if( isset( $list_title ) )
 {
 	$Results->title = $list_title;
 }
 
-$Results->col_headers = array(
-													T_('ID'),
-													T_('Name'),
-													T_('Actions')
-												 );
+$Results->cols[] = array(
+						'th' => T_('ID'),
+						'order' => $edited_table_IDcol,
+						'th_start' => '<tr><th class="firstcol shrinkwrap">',
+						'td_start' => '<td class="firstcol shrinkwrap">',
+						'td' => "\$$edited_table_IDcol\$",
+					);
 
-$Results->col_orders = array(
-													$edited_table_IDcol,
-													$edited_table_namecol
-												 );
+$Results->cols[] = array(
+						'th' => T_('Name'),
+						'order' => $edited_table_namecol,
+						'td' => '<strong><a href="?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
+            T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
+					);
 
-$Results->cols = array(
-					"\$$edited_table_IDcol\$",
-					'<strong><a href="?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
-						T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
-				action_icon( T_('Edit...'), 'edit',
-											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
-				action_icon( T_('Duplicate...'), 'copy',
-											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
-				action_icon( T_('Delete!'), 'delete',
-											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
-				);
+$Results->cols[] = array(
+						'th' => T_('Actions'),
+						'td' => action_icon( T_('Edit...'), 'edit',
+                      '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
+						        action_icon( T_('Duplicate...'), 'copy',
+                      '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
+						        action_icon( T_('Delete!'), 'delete',
+                      '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
+					);
 
 $Results->display();
 

@@ -59,30 +59,23 @@ class Results extends Widget
 	var $page;
 	var $total_pages;
 	var $rows = NULL;
-	var $cols = NULL;
 	/**
-	 * Array of headers for each column
-	 *
-	 * All defs are optional.
-	 */
-	var $col_headers = NULL;
-	/**
-	 * Array of fieldnames to sort on when clicking on each column header
- 	 *
-	 * All defs are optional. A column with no def will be displayed as NOT sortable.
-	 */
-	var $col_orders = NULL;
-	/**
-	 * Array of column start markup for each column.
-	 *
-	 * All defs are optional. A column with no def will de diaplyed using
+	 * Definitions for each columns:
+	 * -th
+	 * -td
+	 * -order
+	 * -td_start. A column with no def will de displayed using
 	 * the default defs from Results::params, that is to say, one of these:
 	 *   - $this->params['col_start_first'];
 	 *   - $this->params['col_start_last'];
 	 *   - $this->params['col_start'];
 	 */
-	var $col_starts = NULL;
-	var $col_headstarts = NULL;
+	var $cols = NULL;
+	/**
+	 * Array of headers for each column
+	 */
+	var $col_headers = true;
+
 	var $params = NULL;
 
 	/**
@@ -95,6 +88,13 @@ class Results extends Widget
 	 * Current object idx in array:
 	 */
 	var $current_idx = 0;
+
+	/**
+	 * URL param names
+	 */
+	var $page_param;
+	var $order_param;
+
 
 	/**
 	 * Constructor
@@ -114,7 +114,8 @@ class Results extends Widget
 		$this->DB = & $DB;
 		$this->sql = $sql;
 		$this->limit = $limit;
-		$this->param_prefix = $param_prefix;
+		$this->page_param = 'results_'.$param_prefix.'page';
+		$this->order_param = 'results_'.$param_prefix.'order';
 
 		// Count total rows:
 		$this->count_total_rows();
@@ -123,13 +124,13 @@ class Results extends Widget
 
 		if( is_null($page) )
 		{ //attribution of a page number
-			$page = param(  $param_prefix.'page', 'integer', 1, true );
+			$page = param( $this->page_param, 'integer', 1, true );
 		}
 		$this->page = min( $page, $this->total_pages ) ;
 
 		if( is_null($order) )
 		{ //attribution of an order type
-			$order = param( $param_prefix.'order', 'string', '', true );
+			$order = param( $this->order_param, 'string', '', true );
 		}
 		$this->order = $order;
 	}
@@ -162,22 +163,28 @@ class Results extends Widget
 			$this->asc = ' ASC ';
 
 			if( $this->order !== '' )
-			{ //$order is not an empty string
+			{ // $order is not an empty string:
 				$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
 			}
-			elseif( isset( $this->col_orders ) )
-			{
-				$pos = $this->first_defined_order( $this->col_orders );
-				for( $i = 0; $i < $pos; $i++)
+			else // if isset( $this->cols ) do we need this ??
+			{	// We'll have to find the first order:
+				foreach( $this->cols as $col )
 				{
-					$this->order .= '-';
+					if( isset( $col['order'] ) )
+					{ // We have found the first orderable column:
+						$this->order .= strstr( $this->asc, 'A' ) ? 'A' : 'D';
+						break;
+					}
+					else
+					{
+						$this->order .= '-';
+					}
 				}
-				$this->order .= strstr( $this->asc, 'A' ) ? 'A' : 'D';
 			}
 
 			if( strpos( $this->sql, 'ORDER BY') === false )
 			{ //there is no ORDER BY clause in the original SQL query
-				$this->sql.=$this->order($this->order, $this->asc);
+				$this->sql .= $this->order( $this->order, $this->asc );
 			}
 			else
 			{ //the chosen order must be inserted into an existing ORDER BY clause
@@ -296,8 +303,7 @@ class Results extends Widget
 			{
 			 	$col = $matches[1][$i];
 
-				$this->cols[] = '$'.$col.'$';
-				echo $col;
+				$this->cols[] = array( 'td' => '$'.$col.'$' );
 			}
 		}
 
@@ -324,8 +330,8 @@ class Results extends Widget
 		// -----------------------------
 		// COLUMN HEADERS:
 		// -----------------------------
-		if( !is_null( $this->col_headers ) )
-		{ // We have headers to display:
+		if( $this->col_headers )
+		{ // We want to display headers:
 			echo $this->params['head_start'];
 
 			if( isset($this->title) )
@@ -335,12 +341,12 @@ class Results extends Widget
 
 			$col_count = 0;
 			$col_names = array();
-			foreach( $this->col_headers as $col_header )
+			foreach( $this->cols as $col )
 			{ // For each column:
 
-				if( isset($this->col_headstarts[$col_count] ) )
+				if( isset( $col['th_start'] ) )
 				{ // We have a customized column start for this one:
-					echo $this->col_headstarts[$col_count];
+					echo $col['th_start'];
 				}
 				elseif( ($col_count==0) && isset($this->params['colhead_start_first']) )
 				{ // First column can get special formatting:
@@ -355,7 +361,7 @@ class Results extends Widget
 					echo $this->params['colhead_start'];
 				}
 
-				if( !empty( $this->col_orders[$col_count] ) && strcasecmp( $this->col_orders[$col_count], '' ) )
+				if( isset( $col['order'] ) )
 				{ //the column can be ordered
 
 					$order_asc = '';
@@ -365,7 +371,7 @@ class Results extends Widget
 
 					for( $i = 0, $icount = count($this->cols); $i < $icount; $i++)
 					{ //construction of the values which can be taken by $order
-						if( !empty( $this->default_col ) && !strcasecmp( $this->col_orders[$col_count], $this->default_col ) )
+						if( !empty( $this->default_col ) && !strcasecmp( $col['order'], $this->default_col ) )
 						{ // there is a default order
 							$order_asc.='A';
 							$order_desc.='D';
@@ -409,13 +415,13 @@ class Results extends Widget
 					if( $this->params['sort_type'] == 'single' )
 					{ // single sort mode:
 
-						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type)
+						echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type )
 									.'" '.$title.$class.' >'
-									.$col_header.'</a>'
-									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc)
+									.$col['th'].'</a>'
+									.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_asc )
 									.'" title="'.T_('Ascending order')
 									.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
-									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc)
+									.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_desc )
 									.'" title="'.T_('Descending order')
 									.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
 					}
@@ -435,14 +441,13 @@ class Results extends Widget
 							$sort_item = $this->params['basic_sort_desc'];
 						}
 
-						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type).'" title="'.T_('Change Order')
-									.'" '.$class.' >'.$sort_item.' '.$col_header.'</a>';
+						echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type ).'" title="'.T_('Change Order')
+									.'" '.$class.' >'.$sort_item.' '.$col['th'].'</a>';
 					}
 				}
-				elseif( empty( $this->col_orders[$col_count] ) )
-				{ // the column can't be ordered:
-
-					echo $col_header ;
+				elseif( isset($col['th']) )
+				{ // the column can't be ordered, but we still have a header defined:
+					echo $col['th'];
 				}
 				$col_count++;
 
@@ -486,9 +491,9 @@ class Results extends Widget
 			foreach( $this->cols as $col )
 			{ // For each column:
 
-				if( isset($this->col_starts[$col_count] ) )
+				if( isset( $col['td_start'] ) )
 				{ // We have a customized column start for this one:
-					$output = $this->col_starts[$col_count];
+					$output = $col['td_start'];
 				}
 				elseif( ($col_count==0) && isset($this->params['col_start_first']) )
 				{ // Display first column column start:
@@ -503,7 +508,7 @@ class Results extends Widget
 					$output = $this->params['col_start'];
 				}
 
-				$output .= $col;
+				$output .= $col['td'];
 
 				// Make variable substitution for STRINGS:
 				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $output );
@@ -537,42 +542,33 @@ class Results extends Widget
 
 
 	/**
-	 * Returns the way the list/table has to be ordered
+	 * Returns ORDER clause:
 	 */
-	function order($order, $asc)
+	function order( $order, $asc )
 	{
-		$sql_order = '';
+		$orders = array();
 
-		if ( !empty( $this->col_orders ) )
-		{ //the names of the DB columns are defined
-			$pos = max( strpos( $order, 'A' ), strpos( $order, 'D' ) );
-			if( !empty( $this->col_orders[$pos] ) )
-			{
-				$sql_order = ' ORDER BY '.$this->col_orders[$pos].' '.$asc;
-				$sql_order = str_replace( ',', $this->asc.', ', $sql_order );
+    for( $i = 0; $i <= strlen( $this->order ); $i++ )
+    {	// For each position in order string:
+			if( isset( $this->cols[$i]['order'] ) )
+			{	// if column is sortable:
+				switch( substr( $this->order, $i, 1 ) )
+				{
+					case 'A':
+						$orders[] = $this->cols[$i]['order'].' ASC';
+						break;
+
+					case 'D':
+						$orders[] = $this->cols[$i]['order'].' DESC';
+						break;
+				}
 			}
 		}
 
-		return $sql_order;
-	}
+		if( empty($orders) )
+			return '';
 
-
-	/**
-	 * Returns the position of the first defined element of an array
-	 */
-	function first_defined_order($array)
-	{
-		$i = 0;
-		$alert = 0;
-		while( $alert != 1 )
-		{ //verification of the array up to the first defined element
-			if( !empty( $array[$i] ) )
-			{ //the current element of the array is defined
-				$alert = 1;
-				return $i;
-			}
-			$i++;
-		}
+		return ' ORDER BY '.implode(',',$orders).' ';
 	}
 
 
@@ -629,12 +625,12 @@ class Results extends Widget
 
 				case 'prev' :
 					//inits the link to previous page
-					return ( $this->page>1 ) ? '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->page-1) ).'">'.
+					return ( $this->page>1 ) ? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1) ).'">'.
 																$this->params['prev_text'].'</a>' : $this->params['prev_text'];
 
 				case 'next' :
 					//inits the link to next page
-					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( $this->param_prefix.'page',  $this->param_prefix.'page='.($this->page+1) )
+					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1) )
 							.		'">  '.$this->params['next_text'].'</a>' : $this->params['next_text'];
 				case 'list' :
 					//inits the page list
@@ -713,7 +709,7 @@ class Results extends Widget
 	{
 		if( $this->first() > 1 )
 		{ //the list doesn't contain the first page
-			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page=1' ).'">1</a>';
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'=1' ).'">1</a>';
 		}
 		else
 		{ //the list already contains the first page
@@ -729,7 +725,7 @@ class Results extends Widget
 	{
 		if( $this->last() < $this->total_pages )
 		{ //the list doesn't contain the last page
-			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$this->total_pages ).'">'.$this->total_pages.'</a>';
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages ).'">'.$this->total_pages.'</a>';
 		}
 		else
 		{ //the list already contains the last page
@@ -745,7 +741,7 @@ class Results extends Widget
 	{
 		if( $this->display_first() != NULL )
 		{ //the list has to be displayed
-			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->first()-1) ).'">'
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->first()-1) ).'">'
 								.$this->params['list_prev_text'].'</a>';
 		}
 
@@ -759,7 +755,7 @@ class Results extends Widget
 	{
 		if( $this->display_last() != NULL )
 		{ //the list has to be displayed
-			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->last()+1) ).'">'
+			return '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.($this->last()+1) ).'">'
 								.$this->params['list_next_text'].'</a>';
 		}
 	}
@@ -781,7 +777,7 @@ class Results extends Widget
 			}
 			else
 			{ //a link for non-current pages
-				$list = $list.'<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$i).'">'.$i.'</a> ';
+				$list = $list.'<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$i).'">'.$i.'</a> ';
 			}
 		}
 		return $list;
@@ -812,8 +808,8 @@ class Results extends Widget
 			}
 
 		//initialization of the form
-		$scroll ='<form class="inline" method="post" action="'.regenerate_url( $this->param_prefix.'page' ).'">
-							<select name="'.$this->param_prefix.'page" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
+		$scroll ='<form class="inline" method="post" action="'.regenerate_url( $this->page_param ).'">
+							<select name="'.$this->page_param.'" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
 
 		while( $max <= $this->total_pages )
 		{ //construction loop
@@ -895,6 +891,10 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.18  2005/04/06 19:11:02  fplanque
+ * refactored Results class:
+ * all col params are now passed through a 2 dimensional table which allows easier parametering of large tables with optional columns
+ *
  * Revision 1.17  2005/03/21 17:38:01  fplanque
  * results/table layout refactoring
  *

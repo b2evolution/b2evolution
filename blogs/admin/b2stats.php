@@ -421,7 +421,7 @@ switch( $AdminUI->getPath(1) )
 			<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
 			<?php
 			// Create result set:
-			$Results = new Results( "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_referer,
+			$Results = & new Results( "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_referer,
 																			dom_name, hit_blog_ID, hit_uri
 																FROM T_hitlog, T_basedomains
 																WHERE hit_referer_type != 'blacklist' " // QUESTION: correct?
@@ -446,55 +446,66 @@ switch( $AdminUI->getPath(1) )
 			}
 
 			// datetime:
-			$Results->col_headers[] = T_('Date Time');
-			$Results->cols[] = '%date_i18n( locale_datefmt().\' \'.locale_timefmt(), \'$hit_datetime$\' )%';
+      $Results->cols[0] = array(
+									'th' => T_('Date Time'),
+									'order' => 'hit_datetime',
+									'td' => '%date_i18n( locale_datefmt().\' \'.locale_timefmt(), \'$hit_datetime$\' )%',
+								);
 
 			// Referer:
-			$Results->col_headers[] = T_('Referer');
+      $Results->cols[1] = array(
+									'th' => T_('Referer'),
+									'order' => 'dom_name',
+								);
 			if( $current_User->check_perm( 'stats', 'edit' ) )
 			{
-				$Results->cols[] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
-														T_('Delete this hit!').
-														'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
-														/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
-														'" title="'.T_('Delete this hit!').'" /></a> '.
+				$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
+																	T_('Delete this hit!').
+																	'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
+																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
+																	'" title="'.T_('Delete this hit!').'" /></a> '.
 
-														'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$visitID$\')%" title="'.
-														T_('Log as a search instead').
-														'"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="'.
-														/* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S').
-														'" title="'.T_('Log as a search instead').'" /></a> '.
+																	'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$visitID$\')%" title="'.
+																	T_('Log as a search instead').
+																	'"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="'.
+																	/* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S').
+																	'" title="'.T_('Log as a search instead').'" /></a> '.
 
-														'<a href="$hit_referer$">$dom_name$</a>';
+																	'<a href="$hit_referer$">$dom_name$</a>';
 			}
 			else
 			{
-				$Results->cols[] = '<a href="$hit_referer$">$dom_name$</a>';
+				$Results->cols[1]['td'] = '<a href="$hit_referer$">$dom_name$</a>';
 			}
 
 			// Antispam:
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{
-				$Results->col_headers[] = /* TRANS: Abbrev. for Spam */ T_('S');
-				$Results->cols[] = '<a href="b2antispam.php?action=ban&amp;keyword=%urlencode( \'$dom_name$\' )%" title="'.
-														T_('Ban this domain!').'"><img src="img/noicon.gif" class="middle" alt="'.
-														/* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>';
+        $Results->cols[] = array(
+										'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
+										'td' => '<a href="b2antispam.php?action=ban&amp;keyword=%urlencode( \'$dom_name$\' )%" title="'.
+                            T_('Ban this domain!').'"><img src="img/noicon.gif" class="middle" alt="'.
+                            /* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>',
+									);
 			}
 
 			// Target Blog:
 			if( empty($blog) )
 			{
-				$Results->col_headers[] = T_('Target Blog');
-				$Results->cols[] = '%stats_blog_name2( \'$hit_blog_ID$\' )%';
+        $Results->cols[] = array(
+										'th' => T_('Target Blog'),
+										'order' => 'hit_blog_ID',
+										'td' => '%stats_blog_name2( \'$hit_blog_ID$\' )%',
+									);
 			}
 
 			// Requested URI:
-			$Results->col_headers[] = T_('Requested URI');
-			$Results->cols[] = '<a href="$hit_uri$">$hit_uri$</a>';
+      $Results->cols[] = array(
+									'th' => T_('Requested URI'),
+									'order' => 'hit_uri',
+									'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+								);
 
-
-			if( isset($results_params) )
-				$Results->params = & $results_params;
 
 			// Display results:
 			$Results->display();

@@ -972,15 +972,37 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 
 	$params = array();
 	if( isset($global_param_list) ) foreach( $global_param_list as $var => $thisparam )
-	{
+	{	// For each saved param...
 		$type = $thisparam['type'];
 		$defval = $thisparam['default'];
 
-		if( in_array( $var, $ignore ) )
+		// Check if the param needs to be ignored:
+		$skip = false;
+		foreach( $ignore as $ignore_pattern )
+		{
+			if( $ignore_pattern[0] == '/' )
+			{ // regexp:
+				if( preg_match( $ignore_pattern, $var ) )
+				{	// Skip this param!
+					$skip = true;
+					break;
+				}
+			}
+			else
+			{
+				if( $var == $ignore_pattern )
+				{	// Skip this param!
+					$skip = true;
+					break;
+				}
+			}
+		}
+		if( $skip )
 		{ // we don't want to include that one
 			// $Debuglog->add( 'regenerate_url(): ignoring '.$var, 'params' );
 			continue;
 		}
+
 		// else
 		// {
 		//	$Debuglog->add( 'regenerate_url(): recycling '.$var, 'params' );
@@ -1859,6 +1881,10 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.62  2005/04/06 19:11:01  fplanque
+ * refactored Results class:
+ * all col params are now passed through a 2 dimensional table which allows easier parametering of large tables with optional columns
+ *
  * Revision 1.61  2005/04/06 13:33:29  fplanque
  * minor changes
  *
