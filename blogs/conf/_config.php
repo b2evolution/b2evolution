@@ -43,9 +43,11 @@ $allow_evodb_reset = 1;  // FOR TESTING
 # It should be set to the URL where you can find the blog stub files index.php, blog_b.php, etc.
 # Example: 
 # $baseurl = 'http://www.example.com/blogs';
-# IMPORTANT: IF YOU CHANGE THIS AFTER YOU ALREADY INSTALLED THE DATABASE, YOU MUST
-# EITHER RE-INSTALL THE DATABASE ANEW OR UPDATE IT BY HAND (evo_blogs table)
 # Note: No blog should be outside of there, or some tricky things may fail (e-g: pingback)
+# IMPORTANT: If you want to test b2evolution on your local machine, do NOT use that machine's
+# name in the $baseurl! For example, if you machine is called HOMER, do not use
+# http://homer/b2evolution/blogs ! Use localhost instead. And log in on localhost, not homer!
+# If you don't, login cookies will not hold. Example:
 $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
 $baseurl = 'http://localhost:8088/b2evolution/blogs';		// FOR TESTING

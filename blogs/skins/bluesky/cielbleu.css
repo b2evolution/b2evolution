@@ -1,5 +1,14 @@
 BODY {
-	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND-IMAGE: url(img/ciel3.jpg); PADDING-BOTTOM: 10px; MARGIN: 0px; COLOR: white; PADDING-TOP: 0px; BACKGROUND-REPEAT: no-repeat; FONT-FAMILY: verdana, arial, helvetica, sans-serif; BACKGROUND-COLOR: #4c69b9;
+	PADDING-RIGHT: 0px;
+	PADDING-LEFT: 0px; 
+	BACKGROUND-IMAGE: url(img/ciel3.jpg); 
+	PADDING-BOTTOM: 10px; 
+	MARGIN: 0px; 
+	COLOR: white; 
+	PADDING-TOP: 0px; 
+	BACKGROUND-REPEAT: no-repeat; 
+	FONT-FAMILY: verdana, arial, helvetica, sans-serif; 
+	BACKGROUND-COLOR: #4c69b9;
 	font-size: 84%;
 }
 
@@ -82,8 +91,6 @@ DIV.storyTitle {
 	POSITION: absolute;
 	TOP: 100px;
 	voice-family: inherit;
-	height: 1208px;
-
 }
 UNKNOWN {
 	WIDTH: 25ex;
@@ -146,6 +153,7 @@ img.logo
 {
 	border-top: 1px solid #FFFFFF;
 	margin: 2ex;
+	margin-right: 33ex;
 }
 /* Styles for comment form */
 form.bComment fieldset

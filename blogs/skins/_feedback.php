@@ -148,7 +148,7 @@
 	<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 	
 		<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
-		<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>">
+		<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>" />
 		
 		<fieldset>
 			<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>

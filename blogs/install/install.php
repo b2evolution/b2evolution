@@ -224,8 +224,8 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	bpost_create( 1, 'Candle', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.candles-weblog.us/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Sabrina', 'evoSkins.org, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://lifeisadiaper.com/' ) or mysql_oops( $query );
+	//	$now = date('Y-m-d H:i:s',$timestamp++);
+	//	bpost_create( 1, 'Sabrina', 'evoSkins.org, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://lifeisadiaper.com/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -256,8 +256,8 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'evoSkins.org', 'get more skins!', $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://www.evoskins.org/' ) or mysql_oops( $query );
+	//	$now = date('Y-m-d H:i:s',$timestamp++);
+	//	bpost_create( 1, 'evoSkins.org', 'get more skins!', $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://www.evoskins.org/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
