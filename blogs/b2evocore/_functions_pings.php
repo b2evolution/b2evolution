@@ -21,7 +21,11 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 	global $baseurl;
 
-	if( !get_bloginfo('pingb2evonet',$blogparams) ) return false;
+	if( !get_bloginfo('pingb2evonet',$blogparams) ) 
+	{	
+		return false;
+	}
+	// echo 'ping b2evo.net';
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
@@ -31,7 +35,7 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 	{	// Local install can only ping to local test server
 		// Construct XML-RPC client:
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
-		$client->debug = $debug;
+		$client->debug = ($debug && $display);
 		
 		$message = new xmlrpcmsg( 'b2evo.ping', array( 
 															new xmlrpcval('id') ,			// Reserved
@@ -43,7 +47,7 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 															new xmlrpcval(format_to_output( $post_title, 'xml' ))
 														)  );
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result );
+		$ret = xmlrpc_displayresult( $result, '', $display );
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} 
@@ -66,6 +70,7 @@ function pingWeblogs( & $blogparams, $display = true )
 {
 	global $baseurl;
 	if( !get_bloginfo('pingweblogs',$blogparams) ) return false;
+	// echo 'ping Weblogs.com';
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
@@ -78,7 +83,7 @@ function pingWeblogs( & $blogparams, $display = true )
 															new xmlrpcval(get_bloginfo('name', $blogparams)) , 
 															new xmlrpcval(get_bloginfo('blogurl', $blogparams)) )  );
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result );
+		$ret = xmlrpc_displayresult( $result, '', $display );
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} 
@@ -122,15 +127,17 @@ function pingWeblogs( & $blogparams, $display = true )
  * pingBlogs(-)
  *
  * pings Blo.gs
- *
- * fplanque removed useless $blodotgsping_url
  */
-function pingBlogs( & $blogparams ) 
+function pingBlogs( & $blogparams, $display = true ) 
 {
 	global $use_blodotgsping, $use_rss, $blogname, $baseurl, $blogfilename;
 	if( !get_bloginfo('pingblodotgs', $blogparams) ) return false;
+	// echo 'ping Blo.gs';
+	if( $display ) 
+	{
 	echo "<div class=\"panelinfo\">\n";
 	echo "<h3>", T_('Pinging Blo.gs...'), "</h3>\n";
+	}
 	if( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
 	{
 		flush();
@@ -153,13 +160,13 @@ function pingBlogs( & $blogparams )
 											));
 		}
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result );
-		echo "<p>", T_('Done.'), "</p>\n</div>\n";
+		$ret = xmlrpc_displayresult( $result, '', $display );
+		if( $display ) echo "<p>", T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} 
 	else 
 	{
-		echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
+		if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
 		return(false);
 	}
 }
@@ -179,6 +186,7 @@ function pingTechnorati(& $blogparams, $display = true )
    global $baseurl, $blogfilename;
 
    if( !get_bloginfo('pingtechnorati', $blogparams) ) return false;
+	// echo 'ping technorati';
 
    if( $display ) 
 	 {
@@ -193,7 +201,7 @@ function pingTechnorati(& $blogparams, $display = true )
 											array(new xmlrpcval(get_bloginfo('name', $blogparams)),
                       			new xmlrpcval(get_bloginfo('blogurl', $blogparams)) ));
       $result = $client->send($message);
-      $ret = xmlrpc_displayresult( $result );
+		$ret = xmlrpc_displayresult( $result, '', $display );
       if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
       return(true);
    } 

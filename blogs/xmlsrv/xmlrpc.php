@@ -69,22 +69,25 @@ function b2newpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $DB;
 	global $cafelogID, $sleep_after_edit;
-	global $Settings, $Messages;
-	
-	$username=$m->getParam(2);
-	$password=$m->getParam(3);
-	$content=$m->getParam(4);
-	$title=$m->getParam(6);
-	$category=$m->getParam(7);
-	$postdate=$m->getParam(8);
+	global $Settings;
 
+	$username = $m->getParam(2);
 	$username = $username->scalarval();
-	$password = $password->scalarval();
-	$content = $content->scalarval();
-	$title = $title->scalarval();
-	$category = $category->scalarval();
-	$postdate = $postdate->scalarval();
 
+	$password = $m->getParam(3);
+	$password = $password->scalarval();
+
+	$content = $m->getParam(4);
+	$content = $content->scalarval();
+
+	$title = $m->getParam(6);
+	$title = $title->scalarval();
+
+	$category = $m->getParam(7);
+	$category = $category->scalarval();
+
+	$postdate = $m->getParam(8);
+	$postdate = $postdate->scalarval();
 
 	if( ! user_pass_ok($username,$password) )
 	{
@@ -96,14 +99,19 @@ function b2newpost($m)
 	$user_ID = $userdata['ID'];
 	$current_User = & new User( $userdata );
 
+	// Check if category exists
+	if( get_the_category_by_ID( $category, false ) === false )
+	{ // Cat does not exist:
+		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
+	}
+
 	$blog_ID = get_catblog($category);
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-				'Permission denied.');
+		return new xmlrpcresp(0, $xmlrpcerruser+1, 'Permission denied.'); // user error 1
 	}
 
 	if( $postdate != '' )
@@ -136,11 +144,15 @@ function b2newpost($m)
 		sleep( $sleep_after_edit );
 	}
 
-	pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+	logIO("O","Pinging b2evolution.net...");
 	pingb2evonet( $blogparams, $post_ID, $post_title, false );
-	pingWeblogs($blogparams, false );
-	pingBlogs($blogparams);
-	pingTechnorati($blogparams);
+	logIO("O","Pinging Weblogs...");
+	pingWeblogs( $blogparams, false );
+	logIO("O","Pinging Blo.gs...");
+	pingBlogs( $blogparams, false );
+	logIO("O","Pinging Technorati...");
+	pingTechnorati( $blogparams, false );
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 
@@ -335,8 +347,14 @@ function bloggernewpost( $m )
 	$current_User = & new User( $userdata );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
-	{
+	{	// There was no category passed in the content:
 		$post_category = $default_category;
+	}
+
+	// Check if category exists
+	if( get_the_category_by_ID( $post_category, false ) === false )
+	{ // Cat does not exist:
+		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 	}
 
 	$blog_ID = get_catblog($post_category);
@@ -345,12 +363,13 @@ function bloggernewpost( $m )
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-				'Permission denied.');
+		return new xmlrpcresp(0, $xmlrpcerruser+1, 'Permission denied.'); // user error 1
 	}
 
+	// Extract <title> from content
 	$post_title = xmlrpc_getposttitle( $content );
 
+	// cleanup content from extra tags like <category> and <title>:
 	$content = xmlrpc_removepostdata( $content );
 
 	$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
@@ -381,16 +400,16 @@ function bloggernewpost( $m )
 
 	if( $publish )
 	{ // If post is publicly published:
-		logIO("O","Doing pingbacks...");
-		pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+		// logIO("O","Doing pingbacks...");
+		// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
 		logIO("O","Pinging b2evolution.net...");
 		pingb2evonet( $blogparams, $post_ID, $post_title, false );
 		logIO("O","Pinging Weblogs...");
 		pingWeblogs( $blogparams, false );
 		logIO("O","Pinging Blo.gs...");
-		pingBlogs($blogparams);
+		pingBlogs( $blogparams, false );
 		logIO("O","Pinging Technorati...");
-		pingTechnorati($blogparams);
+		pingTechnorati( $blogparams, false );
 	}
 
 	logIO("O","All done.");
@@ -490,6 +509,10 @@ function bloggereditpost($m)
 	{	// No category specified
 		$post_category = $edited_Item->main_cat_ID;
 	}
+	elseif( get_the_category_by_ID( $post_category, false ) === false )
+	{ // requested Cat does not exist:
+		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
+	}
 	// return new xmlrpcresp(0, $xmlrpcerruser+50, 'post_category='.$post_category );
 
 	$blog_ID = get_catblog($post_category);
@@ -556,16 +579,16 @@ function bloggereditpost($m)
 		{ // We'll ping now
 			// We have less control here as in the backoffice, so we'll actually
 			// only pingback once, at the same time we do the pings!
-			logIO("O","Doing pingbacks...");
-			pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+			// logIO("O","Doing pingbacks...");
+			// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
 			logIO("O","Pinging b2evolution.net...");
 			pingb2evonet( $blogparams, $post_ID, $post_title, false );
 			logIO("O","Pinging Weblogs...");
 			pingWeblogs( $blogparams, false );
 			logIO("O","Pinging Blo.gs...");
-			pingBlogs($blogparams);
+			pingBlogs( $blogparams, false );
 			logIO("O","Pinging Technorati...");
-			pingTechnorati($blogparams);
+			pingTechnorati( $blogparams, false );
 		}
 
 	}

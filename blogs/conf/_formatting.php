@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution formatting config
- * Version of this file: 0.9
+ * Version of this file: 0.9.0.6
  *
  * This sets how posts and comments are formatted
  */
@@ -44,118 +44,157 @@ $use_security_checker = 0;
  * HTML Checker params:
  *
  * The params are defined twice: once for the posts and once for the comments.
- * Typically you'll be mre restrictive on comments.
+ * Typically you'll be more restrictive on comments.
+ *
+ * Adapted from XHTML 1.0 Strict by fplanque
+ * http://www.w3.org/TR/2002/REC-xhtml1-20020801/dtds.html#a_dtd_XHTML-1.0-Strict
  */
 
 // DEFINITION of allowed XHTML code for POSTS (posted in the backoffice)
 
 // Allowed Entity classes
-define('E_SPECIAL_CONTENTS', 'br hr span bdo img');
-define('E_MISC_CONTENTS', 'ins del');
-define('E_PHRASE_CONTENTS', 'em strong i b dfn code q samp kbd var cite abbr acronym sub sup');
-define('E_PURE_INLINE_CONTENTS', E_SPECIAL_CONTENTS.' '.E_PHRASE_CONTENTS.' a #PCDATA');
-define('E_PURE_BLOCK_CONTENTS', 'div dl ul ol blockquote p table');
-define('E_TABLE_CONTENTS', 'tr');
-define('E_TR_CONTENTS', 'td');
-define('E_INLINE_CONTENTS', E_PURE_INLINE_CONTENTS.' '.E_MISC_CONTENTS);
-define('E_A_CONTENT_CONTENTS', E_SPECIAL_CONTENTS.' '.E_PHRASE_CONTENTS.' '.E_MISC_CONTENTS.' #PCDATA');
-define('E_BLOCK_CONTENTS', E_PURE_BLOCK_CONTENTS.' '.E_MISC_CONTENTS);
-define('E_FLOW_CONTENTS', E_PURE_BLOCK_CONTENTS.' '.E_PURE_INLINE_CONTENTS.' '.E_MISC_CONTENTS);
+define('E_special_pre', 'br span bdo');
+define('E_special', E_special_pre.' img');
+define('E_fontstyle', 'tt i b big small');
+define('E_phrase', 'em strong dfn code q samp kbd var cite abbr acronym sub sup');
+define('E_misc_inline', 'ins del');
+define('E_misc', E_misc_inline);
+define('E_inline', 'a '.E_special.' '.E_fontstyle.' '.E_phrase );
+define('E_Iinline', '#PCDATA '.E_inline.' '.E_misc_inline );
+define('E_heading', 'h1 h2 h3 h4 h5 h6');
+define('E_list', 'ul ol dl');
+define('E_blocktext', 'pre hr blockquote address');
+define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table');
+define('E_Bblock', E_block.' '.E_misc );
+define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc );
+define('E_a_content', '#PCDATA '.E_special.' '.E_fontstyle.' '.E_phrase.' '.E_misc_inline );
+define('E_pre_content', '#PCDATA a '.E_fontstyle.' '.E_phrase.' '.E_special_pre.' '.E_misc_inline );
 
 // Allowed Attribute classes
-define('A_CORE_ATTRS', 'title');
-define('A_I18N_ATTRS', 'xml:lang lang dir');
-define('A_ATTRS', A_CORE_ATTRS.' '.A_I18N_ATTRS.' class');
-define('A_IMG_ATTRS', A_ATTRS.' src alt longdesc height width border hspace vspace align'); 
-define('A_CITE_ATTRS', A_ATTRS.' cite');
-define('A_ANCHOR_ATTRS', A_ATTRS.' href hreflang target');
-define('A_LIST_ATTRS', A_ATTRS.' type');
-define('A_LISTITEM_ATTRS', A_LIST_ATTRS.' value');
-define('A_TABLE_ELEMENT_ATTRS', A_ATTRS.' align bgcolor bordercolor bordercolordark bordercolorlight');
-define('A_TABLE_ATTRS', A_TABLE_ELEMENT_ATTRS.' border cols rules summary cellpadding cellspacing');
+define('A_coreattrs', 'class title');
+define('A_i18n', 'lang xml:lang dir');
+define('A_attrs', A_coreattrs.' '.A_i18n);
+define('A_cellhalign', 'align char charoff');
+define('A_cellvalign', 'valign');
 
 // Array showing what tags are allowed and what their allowed subtags are.
 $allowed_tags = array
 (
-	'body' => E_FLOW_CONTENTS,
-	'div' => E_FLOW_CONTENTS,
-	'table' => E_TABLE_CONTENTS,
-	'tr' => E_TR_CONTENTS,
-	'td' => E_FLOW_CONTENTS,
-	'p' => E_INLINE_CONTENTS,
-	'blockquote' => E_FLOW_CONTENTS,		// fp ? E_BLOCK_CONTENTS,
-	'ins' => E_FLOW_CONTENTS,
-	'del' => E_FLOW_CONTENTS,
-	// Lists
+	'body' => E_Flow, // Remember this is not a true body, just a post body
+	'div' => E_Flow,
+	'p' => E_Iinline,
+	'h1' => E_Iinline,
+	'h2' => E_Iinline,
+	'h3' => E_Iinline,
+	'h4' => E_Iinline,
+	'h5' => E_Iinline,
+	'h6' => E_Iinline,
 	'ul' => 'li',
 	'ol' => 'li',
-	'li' => E_FLOW_CONTENTS,
+	'li' => E_Flow,
 	'dl' => 'dt dd',
-	'dt' => E_INLINE_CONTENTS,
-	'dd' => E_FLOW_CONTENTS,
-	// Inline elements
-	'br' => '',
+	'dt' => E_Iinline,
+	'dd' => E_Flow,
+	'address' => E_Iinline,
 	'hr' => '',
+	'pre' => E_pre_content,
+	'blockquote' => E_Bblock,
+	'ins' => E_Flow,
+	'del' => E_Flow,
+	'a' => E_a_content,
+	'span' => E_Iinline,
+	'bdo' => E_Iinline,
+	'br' => '',
+	'em' => E_Iinline,
+	'strong' => E_Iinline,
+	'dfn' => E_Iinline,
+	'code' => E_Iinline,
+	'samp' => E_Iinline,
+	'kbd' => E_Iinline,
+	'var' => E_Iinline,
+	'cite' => E_Iinline,
+	'abbr' => E_Iinline,
+	'acronym' => E_Iinline,
+	'q' => E_Iinline,
+	'sub' => E_Iinline,
+	'sup' => E_Iinline,
+	'tt' => E_Iinline,
+	'i' => E_Iinline,
+	'b' => E_Iinline,
+	'big' => E_Iinline,
+	'small' => E_Iinline,
 	'img' => '',
-	'em' => E_INLINE_CONTENTS,
-	'strong' => E_INLINE_CONTENTS,
-	'i' => E_INLINE_CONTENTS,
-	'b' => E_INLINE_CONTENTS,
-	'dfn' => E_INLINE_CONTENTS,
-	'code' => E_INLINE_CONTENTS,
-	'q' => E_INLINE_CONTENTS,
-	'samp' => E_INLINE_CONTENTS,
-	'kbd' => E_INLINE_CONTENTS,
-	'var' => E_INLINE_CONTENTS,
-	'cite' => E_INLINE_CONTENTS,
-	'abbr' => E_INLINE_CONTENTS,
-	'acronym' => E_INLINE_CONTENTS,
-	'sub' => E_INLINE_CONTENTS,
-	'sup' => E_INLINE_CONTENTS,
-	'a' => E_A_CONTENT_CONTENTS
+	'fieldset' => '#PCDATA legend '.E_block.' '.E_inline.' '.E_misc,
+	'legend' => E_Iinline,
+	'table' => 'caption col colgroup thead tfoot tbody tr',
+	'caption' => E_Iinline,
+	'thead' => 'tr',
+	'tfoot' => 'tr',
+	'tbody' => 'tr',
+	'colgroup' => 'col',
+	'tr' => 'th td',
+	'th' => E_Flow,
+	'td' => E_Flow,
 );
 
 // Array showing allowed attributes for tags
 $allowed_attribues = array
 (
-	'br' => A_CORE_ATTRS,
-	'hr' => A_CORE_ATTRS,
-	'img' => A_IMG_ATTRS,
-	'span' => A_ATTRS,
-	'bdo' => A_ATTRS,
-	'em' => A_ATTRS,
-	'strong' => A_ATTRS,
-	'i' => A_ATTRS,
-	'b' => A_ATTRS,
-	'dfn' => A_ATTRS,
-	'code' => A_ATTRS,
-	'q' => A_CITE_ATTRS,
-	'abbr' => A_ATTRS,
-	'acronym' => A_ATTRS,
-	'sub' => A_ATTRS,
-	'sup' => A_ATTRS,
-	'a' => A_ANCHOR_ATTRS,
-	'blockquote' => A_CITE_ATTRS,
-	'ul' => A_LIST_ATTRS,
-	'ol' => A_LIST_ATTRS,
-	'dl' => A_ATTRS,
-	'li' => A_LISTITEM_ATTRS,
-	'dt' => A_ATTRS,
-	'dd' => A_ATTRS,
-	'p' => A_ATTRS,
-	'table' => A_TABLE_ATTRS,
-	'tr' => A_TABLE_ELEMENT_ATTRS,
-	'td' => A_TABLE_ELEMENT_ATTRS,
-	'div' => A_ATTRS
-);
-
-// Array showing URI attributes
-$uri_attrs = array
-(
-	'href',
-	'src',
-	'cite',
-	'longdesc'
+	'div' => A_attrs,
+	'p' => A_attrs,
+	'h1' => A_attrs,
+	'h2' => A_attrs,
+	'h3' => A_attrs,
+	'h4' => A_attrs,
+	'h5' => A_attrs,
+	'h6' => A_attrs,
+	'ul' => A_attrs,
+	'ol' => A_attrs,
+	'li' => A_attrs,
+	'dl' => A_attrs,
+	'dt' => A_attrs,
+	'dd' => A_attrs,
+	'address' => A_attrs,
+	'hr' => A_attrs,
+	'pre' => A_attrs.' xml:space',
+	'blockquote' => A_attrs.' cite',
+	'ins' => A_attrs.' cite datetime',
+	'del' => A_attrs.' cite datetime',
+	'a' => A_attrs.' charset type href hreflang rel rev shape coords',
+	'span' => A_attrs,
+	'bdo' => A_coreattrs.' lang xml:lang dir',
+	'br' => A_coreattrs,
+	'em' => A_attrs,
+	'strong' => A_attrs,
+	'dfn' => A_attrs,
+	'code' => A_attrs,
+	'samp' => A_attrs,
+	'kbd' => A_attrs,
+	'var' => A_attrs,
+	'cite' => A_attrs,
+	'abbr' => A_attrs,
+	'acronym' => A_attrs,
+	'q' => A_attrs.' cite',
+	'sub' => A_attrs,
+	'sup' => A_attrs,
+	'tt' => A_attrs,
+	'i' => A_attrs,
+	'b' => A_attrs,
+	'big' => A_attrs,
+	'small' => A_attrs,
+	'img' => A_attrs.' src alt longdesc height width usemap ismap',
+	'fieldset' => A_attrs,
+	'legend' => A_attrs,
+	'table' => A_attrs.' summary width border frame rules cellspacing cellpadding',
+	'caption' => A_attrs,
+	'colgroup' => A_attrs.' span width cellhalign cellvalign',
+	'col' => A_attrs.' span width cellhalign cellvalign',
+	'thead' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
+	'tfoot' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
+	'tbody' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
+	'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
+	'th' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,
+	'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,
 );
 
 $allowed_uri_scheme = array
@@ -177,100 +216,109 @@ $allowed_uri_scheme = array
 
 # here is a list of the tags that are allowed in the comments.
 # all tags not in this list will be filtered out anyway before we do any checking
-$comment_allowed_tags = '<a><strong><em><b><i><del><ins><dfn><code><q><samp><kdb><var><cite><abbr><acronym><sub><sup><dl><ul><ol><li><p><br><bdo><dt><dd>';
+$comment_allowed_tags = '<p><ul><ol><li><dl><dt><dd><address><blockquote><ins><del><a><span><bdo><br><em><strong><dfn><code><samp><kdb><var><cite><abbr><acronym><q><sub><sup><tt><i><b><big><small>';
 
 // Allowed Entity classes
-define('COM_E_SPECIAL_CONTENTS', 'br bdo');
-define('COM_E_MISC_CONTENTS', 'ins del');
-define('COM_E_PHRASE_CONTENTS', 'em strong i b dfn code q samp kbd var cite abbr acronym sub sup');
-define('COM_E_PURE_INLINE_CONTENTS', COM_E_SPECIAL_CONTENTS.' '.COM_E_PHRASE_CONTENTS.' a #PCDATA');
-define('COM_E_PURE_BLOCK_CONTENTS', 'dl ul ol p');
-define('COM_E_INLINE_CONTENTS', COM_E_PURE_INLINE_CONTENTS.' '.COM_E_MISC_CONTENTS);
-define('COM_E_A_CONTENT_CONTENTS', COM_E_SPECIAL_CONTENTS.' '.COM_E_PHRASE_CONTENTS.' '.COM_E_MISC_CONTENTS.' #PCDATA');
-define('COM_E_BLOCK_CONTENTS', COM_E_PURE_BLOCK_CONTENTS.' '.COM_E_MISC_CONTENTS);
-define('COM_E_FLOW_CONTENTS', COM_E_PURE_BLOCK_CONTENTS.' '.COM_E_PURE_INLINE_CONTENTS.' '.COM_E_MISC_CONTENTS);
+define('C_E_special_pre', 'br span bdo');
+define('C_E_special', C_E_special_pre);
+define('C_E_fontstyle', 'tt i b big small');
+define('C_E_phrase', 'em strong dfn code q samp kbd var cite abbr acronym sub sup');
+define('C_E_misc_inline', 'ins del');
+define('C_E_misc', C_E_misc_inline);
+define('C_E_inline', 'a '.C_E_special.' '.C_E_fontstyle.' '.C_E_phrase );
+define('C_E_Iinline', '#PCDATA '.C_E_inline.' '.C_E_misc_inline );
+define('C_E_heading', '');
+define('C_E_list', 'ul ol dl');
+define('C_E_blocktext', 'hr blockquote address');
+define('C_E_block', 'p '.C_E_heading.' div '.C_E_list.' '.C_E_blocktext.' table');
+define('C_E_Bblock', C_E_block.' '.C_E_misc );
+define('C_E_Flow', '#PCDATA '.C_E_block.' '.C_E_inline.' '.C_E_misc );
+define('C_E_a_content', '#PCDATA '.C_E_special.' '.C_E_fontstyle.' '.C_E_phrase.' '.C_E_misc_inline );
+define('C_E_pre_content', '#PCDATA a '.C_E_fontstyle.' '.C_E_phrase.' '.C_E_special_pre.' '.C_E_misc_inline );
 
 // Allowed Attribute classes
-define('COM_A_CORE_ATTRS', 'title');
-define('COM_A_I18N_ATTRS', 'xml:lang lang dir');
-define('COM_A_ATTRS', COM_A_CORE_ATTRS.' '.COM_A_I18N_ATTRS);
-define('COM_A_CITE_ATTRS', COM_A_ATTRS.' cite');
-define('COM_A_ANCHOR_ATTRS', COM_A_ATTRS.' href hreflang');
-define('COM_A_LIST_ATTRS', COM_A_ATTRS.' type');
-define('COM_A_LISTITEM_ATTRS', COM_A_LIST_ATTRS.' value');
-define('COM_A_STYLE_ATTRS', 'class');
-# Beware of the STYLE attribute: untrusted bloggers could use something like this:
-# style="background-image:url(javascript:somethingevil())" ..
-# this cannot be checked even with the current XHTML validating checker.
+define('C_A_coreattrs', 'class title');
+define('C_A_i18n', 'lang xml:lang dir');
+define('C_A_attrs', C_A_coreattrs.' '.C_A_i18n);
+define('C_A_cellhalign', 'align char charoff');
+define('C_A_cellvalign', 'valign');
 
 // Array showing what tags are allowed and what their allowed subtags are.
 $comments_allowed_tags = array
 (
-	'body' => COM_E_FLOW_CONTENTS,
-	'div' => COM_E_FLOW_CONTENTS,
-	'p' => COM_E_INLINE_CONTENTS,
-	'ins' => COM_E_FLOW_CONTENTS,
-	'del' => COM_E_FLOW_CONTENTS,
-	// Lists
+	'body' => E_Flow, // Remember this is not a true body, just a comment body
+	'p' => C_E_Iinline,
 	'ul' => 'li',
 	'ol' => 'li',
-	'li' => COM_E_FLOW_CONTENTS,
+	'li' => C_E_Flow,
 	'dl' => 'dt dd',
-	'dt' => COM_E_INLINE_CONTENTS,
-	'dd' => COM_E_FLOW_CONTENTS,
-	// Inline elements
+	'dt' => C_E_Iinline,
+	'dd' => C_E_Flow,
+	'address' => C_E_Iinline,
+	'hr' => '',
+	'blockquote' => C_E_Bblock,
+	'ins' => C_E_Flow,
+	'del' => C_E_Flow,
+	'a' => C_E_a_content,
+	'span' => C_E_Iinline,
+	'bdo' => C_E_Iinline,
 	'br' => '',
-	'em' => COM_E_INLINE_CONTENTS,
-	'strong' => COM_E_INLINE_CONTENTS,
-	'i' => COM_E_INLINE_CONTENTS,
-	'b' => COM_E_INLINE_CONTENTS,
-	'dfn' => COM_E_INLINE_CONTENTS,
-	'code' => COM_E_INLINE_CONTENTS,
-	'q' => COM_E_INLINE_CONTENTS,
-	'samp' => COM_E_INLINE_CONTENTS,
-	'kbd' => COM_E_INLINE_CONTENTS,
-	'var' => COM_E_INLINE_CONTENTS,
-	'cite' => COM_E_INLINE_CONTENTS,
-	'abbr' => COM_E_INLINE_CONTENTS,
-	'acronym' => COM_E_INLINE_CONTENTS,
-	'sub' => COM_E_INLINE_CONTENTS,
-	'sup' => COM_E_INLINE_CONTENTS,
-	'a' => COM_E_A_CONTENT_CONTENTS
+	'em' => C_E_Iinline,
+	'strong' => C_E_Iinline,
+	'dfn' => C_E_Iinline,
+	'code' => C_E_Iinline,
+	'samp' => C_E_Iinline,
+	'kbd' => C_E_Iinline,
+	'var' => C_E_Iinline,
+	'cite' => C_E_Iinline,
+	'abbr' => C_E_Iinline,
+	'acronym' => C_E_Iinline,
+	'q' => C_E_Iinline,
+	'sub' => C_E_Iinline,
+	'sup' => C_E_Iinline,
+	'tt' => C_E_Iinline,
+	'i' => C_E_Iinline,
+	'b' => C_E_Iinline,
+	'big' => C_E_Iinline,
+	'small' => C_E_Iinline
 );
 
 // Array showing allowed attributes for tags
 $comments_allowed_attribues = array
 (
-	'br' => COM_A_CORE_ATTRS,
-	'bdo' => COM_A_ATTRS,
-	'em' => COM_A_ATTRS,
-	'strong' => COM_A_ATTRS,
-	'i' => COM_A_ATTRS,
-	'b' => COM_A_ATTRS,
-	'dfn' => COM_A_ATTRS,
-	'code' => COM_A_ATTRS,
-	'q' => COM_A_CITE_ATTRS,
-	'abbr' => COM_A_ATTRS,
-	'acronym' => COM_A_ATTRS,
-	'sub' => COM_A_ATTRS,
-	'sup' => COM_A_ATTRS,
-	'a' => COM_A_ANCHOR_ATTRS,
-	'ul' => COM_A_LIST_ATTRS,
-	'ol' => COM_A_LIST_ATTRS,
-	'dl' => COM_A_ATTRS,
-	'li' => COM_A_LISTITEM_ATTRS,
-	'dt' => COM_A_ATTRS,
-	'dd' => COM_A_ATTRS,
-	'p' => COM_A_ATTRS,
-);
-
-// Array showing URI attributes
-$comments_uri_attrs = array
-(
-	'href',
-	'src',
-	'cite',
-	'longdesc'
+	'p' => C_A_attrs,
+	'ul' => C_A_attrs,
+	'ol' => C_A_attrs,
+	'li' => C_A_attrs,
+	'dl' => C_A_attrs,
+	'dt' => C_A_attrs,
+	'dd' => C_A_attrs,
+	'address' => C_A_attrs,
+	'blockquote' => C_A_attrs.' cite',
+	'ins' => C_A_attrs.' cite datetime',
+	'del' => C_A_attrs.' cite datetime',
+	'a' => C_A_attrs.' charset type href hreflang rel rev shape coords',
+	'span' => C_A_attrs,
+	'bdo' => C_A_coreattrs.' lang xml:lang dir',
+	'br' => C_A_coreattrs,
+	'em' => C_A_attrs,
+	'strong' => C_A_attrs,
+	'dfn' => C_A_attrs,
+	'code' => C_A_attrs,
+	'samp' => C_A_attrs,
+	'kbd' => C_A_attrs,
+	'var' => C_A_attrs,
+	'cite' => C_A_attrs,
+	'abbr' => C_A_attrs,
+	'acronym' => C_A_attrs,
+	'q' => C_A_attrs.' cite',
+	'sub' => C_A_attrs,
+	'sup' => C_A_attrs,
+	'tt' => C_A_attrs,
+	'i' => C_A_attrs,
+	'b' => C_A_attrs,
+	'big' => C_A_attrs,
+	'small' => C_A_attrs,
 );
 
 $comments_allowed_uri_scheme = array
@@ -285,6 +333,24 @@ $comments_allowed_uri_scheme = array
 	'irc',
 	'aim',
 	'icq'
+);
+
+
+// Array showing URI attributes
+$uri_attrs = array
+(
+	'xmlns',
+	'profile',
+	'href',
+	'src',
+	'cite',
+	'classid',
+	'codebase',
+	'data',
+	'archive',
+	'usemap',
+	'longdesc',
+	'action'
 );
 
 

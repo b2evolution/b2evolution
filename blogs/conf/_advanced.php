@@ -124,6 +124,12 @@ $oldtablecategories = 'b2categories';
 $oldtablecomments   = 'b2comments';
 /**#@-*/
 
+/**
+ * WordPress table prefix used exclusively by the upgrade script
+ * You can ignore this if you're not planning to upgrade from a WordPress database.
+ */
+$wp_prefix = 'wp_';
+
 
 // ** Saving bandwidth **
 

@@ -17,10 +17,8 @@
 <title>Summary Demo</title>
 <!-- InstanceEndEditable --> 
 <!-- InstanceBeginEditable name="head" -->
-<link href="skins/fplanque2002/blog.css" rel="stylesheet" type="text/css" />
  <!-- InstanceEndEditable --> 
-<link rel="stylesheet" href="skins/fplanque2002/basic.css" type="text/css" />
-<link rel="stylesheet" href="skins/fplanque2002/fpnav.css" type="text/css" />
+<link rel="stylesheet" href="rsc/fp02.css" type="text/css" />
 </head>
 <body>
 <div class="pageHeader">

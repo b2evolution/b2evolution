@@ -58,10 +58,8 @@
 <link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 <link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
-<link href="skins/fplanque2002/blog.css" rel="stylesheet" type="text/css" />
  <!-- InstanceEndEditable -->
-<link rel="stylesheet" href="skins/fplanque2002/basic.css" type="text/css" />
-<link rel="stylesheet" href="skins/fplanque2002/fpnav.css" type="text/css" />
+<link rel="stylesheet" href="rsc/fp02.css" type="text/css" />
 </head>
 <body>
 <div class="pageHeader">

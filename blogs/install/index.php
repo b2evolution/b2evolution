@@ -161,14 +161,14 @@ switch( $action )
 			// Update conf:
 			$conf = preg_replace(
 														array(
-																		"#define\(\s*'DB_USER',\s*'.*?'\s*\);#i",
-																		"#define\(\s*'DB_PASSWORD',\s*'.*?'\s*\);#i",
-																		"#define\(\s*'DB_NAME',\s*'.*?'\s*\);#i",
-																		"#define\(\s*'DB_HOST',\s*'.*?'\s*\);#i",
-																		"#tableprefix\s*=\s*'.*?';#i",
-																		"#baseurl\s*=\s*'.*?';#i",
-																		"#admin_email\s*=\s*'.*?';#i",
-																		"#config_is_done\s*=.*?;#i",
+																		"#define\(\s*'DB_USER',\s*'.*?'\s*\);#",
+																		"#define\(\s*'DB_PASSWORD',\s*'.*?'\s*\);#",
+																		"#define\(\s*'DB_NAME',\s*'.*?'\s*\);#",
+																		"#define\(\s*'DB_HOST',\s*'.*?'\s*\);#",
+																		"#tableprefix\s*=\s*'.*?';#",
+																		"#baseurl\s*=\s*'.*?';#",
+																		"#admin_email\s*=\s*'.*?';#",
+																		"#config_is_done\s*=.*?;#",
 																	),
 														array(
 																		"define( 'DB_USER', '$conf_db_user' );",
@@ -331,6 +331,12 @@ switch( $action )
 			<p><input type="radio" name="action" id="cafelogupgrade" value="cafelogupgrade" />
 				<label for="cafelogupgrade"><?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></label></p>
 
+			<p><input type="radio" name="action" id="upfrom_miniblog" value="upfrom_miniblog" />
+				<label for="upfrom_miniblog"><?php echo T_('<strong>Upgrade from Manywhere Miniblog</strong>: Install b2evolution database tables and copy your existing Miniblog data into them.')?></label></p>
+
+			<!-- <p><input type="radio" name="action" id="upfrom_wordpress" value="upfrom_wordpress" />
+				<label for="upfrom_wordpress">EXPERIMENTAL: <?php echo T_('<strong>Upgrade from WordPress v 1.2</strong>: Install b2evolution database tables and copy your existing WordPress data into them.')?></label></p> -->
+
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
@@ -433,13 +439,52 @@ to
 		 */
 		require_once( dirname(__FILE__). '/_functions_cafelogupgrade.php' );
 		?>
-		<h2><?php echo T_('Installing b2evolution tables and copying existing b2 data')?></h2>
+		<h2><?php printf( T_('Installing b2evolution tables and copying existing %s data'), 'b2' ) ?></h2>
 		<?php
 			create_b2evo_tables();
 			upgrade_cafelog_tables();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'b2')?></p>
+		<?php
+		break;
+
+
+	case 'upfrom_miniblog':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * UPGRADE FROM MINIBLOG : Create a new db structure + copy content from miniblog
+		 * -----------------------------------------------------------------------------------
+		 */
+		require_once( dirname(__FILE__). '/_functions_miniblog.php' );
+		?>
+		<h2><?php printf( T_('Installing b2evolution tables and copying existing %s data'), 'Miniblog' ) ?></h2>
+		<?php
+			create_b2evo_tables();
+			upgrade_miniblog_tables();
+		?>
+		<p><?php echo T_('Upgrade completed successfully!')?></p>
+		<?php printf( T_('<p>Now you can <a %s>log in</a> with your usual Miniblog email login cropped at 20 chars. All passwords have been reset to "%s".</p>
+<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'/"', $random_password )?>
+		<?php
+		break;
+
+
+	case 'upfrom_wordpress':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * UPGRADE FROM WORDPRESS : Create a new db structure + copy content from wordpress
+		 * -----------------------------------------------------------------------------------
+		 */
+		require_once( dirname(__FILE__). '/_functions_wordpress.php' );
+		?>
+		<h2><?php printf( T_('Installing b2evolution tables and copying existing %s data'), 'WordPress' ) ?></h2>
+		<?php
+			create_b2evo_tables();
+			upgrade_cafelog_tables();
+		?>
+		<p><?php echo T_('Upgrade completed successfully!')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'WordPress')?></p>
 		<?php
 		break;
 

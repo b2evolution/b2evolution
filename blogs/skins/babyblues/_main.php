@@ -98,6 +98,8 @@
 			require( dirname(__FILE__).'/_bloglist.php' );
 			// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
+	<?php if( ! $Blog->get('force_skin') )
+	{	// Skin switching is allowed for this blog: ?>
 		<div class="sidetitle" align="center"><?php echo T_('skin the site') ?></div>
 		<div class="sidebody">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
@@ -105,6 +107,7 @@
 				<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a><br />
 		<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 		</div>
+	<?php } ?>
 
 		<div class="sidetitle" align="center"><?php echo T_('archives') ?></div>
 		<div class="sidebody">

@@ -208,6 +208,8 @@
 		</ul>
 	</div>
 
+	<?php if( ! $Blog->get('force_skin') )
+	{	// Skin switching is allowed for this blog: ?>
 	<div class="bSideItem">
 		<h3><?php echo T_('Choose skin') ?></h3>
 		<ul>
@@ -217,9 +219,10 @@
 			<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
 		</ul>
 	</div>
+	<?php } ?>
 
-	<?php if ($disp != 'stats') { ?>
-
+	<?php if ($disp != 'stats') 
+	{ ?>
 	<div class="bSideItem">
 		<h3><?php echo T_('Recent Referers') ?></h3>
 			<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>

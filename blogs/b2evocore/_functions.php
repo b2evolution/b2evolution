@@ -182,7 +182,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0 )
 		else
 		{
 			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attribues,
-																			$comments_uri_attrs, $comments_allowed_uri_scheme );
+																			$uri_attrs, $comments_allowed_uri_scheme );
 		}
 
 		$checker->check( $content );
@@ -587,12 +587,12 @@ function xmlrpc_displayresult( $result, $log = '' )
 {
 	if( ! $result )
 	{
-		echo T_('No response!'),"<br />\n";
+		if( $display ) echo T_('No response!'),"<br />\n";
 		return false;
 	}
 	elseif( $result->faultCode() )
 	{	// We got a remote error:
-		echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
+		if( $display ) echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
 		debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
 		return false;
 	}
@@ -607,12 +607,12 @@ function xmlrpc_displayresult( $result, $log = '' )
 		{
 			$value_arr .= ' ['.$blah.'] ';
 		}
-		echo T_('Response'), ': ', $value_arr, "<br />\n";
+		if( $display ) echo T_('Response'), ': ', $value_arr, "<br />\n";
 		debug_fwrite($log, $value_arr);
 	}
 	else
 	{
-		echo T_('Response'), ': ', $value ,"<br />\n";
+		if( $display ) echo T_('Response'), ': ', $value ,"<br />\n";
 		debug_fwrite($log, $value);
 	}
 

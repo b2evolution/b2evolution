@@ -162,6 +162,8 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <?php	require( dirname(__FILE__).'/_archives.php' ); ?>
 </ul>
 
+<?php if( ! $Blog->get('force_skin') )
+{	// Skin switching is allowed for this blog: ?>
 <h4>skins:</h4>
 <ul>
 	<?php // ---------------------------------- START OF SLIN LIST ----------------------------------
@@ -169,6 +171,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 		<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a></li>
 	<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 </ul>
+<?php } ?>
 
 <h4>other:</h4>
 <?php 
