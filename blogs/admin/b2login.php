@@ -271,6 +271,13 @@ case "retrievepassword":
 	$user_email = $user_data["user_email"];
 	$user_pass = $user_data["user_pass"];
 
+	if (empty($user_email)) {
+		// pretend that the email is sent for avoiding guessing user_login
+		echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
+		echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
+		die(); 
+	}
+
 	$message  = T_('Login:')." $user_login\r\n";
 	$message .= T_('Password:')." $user_pass\r\n";
 
