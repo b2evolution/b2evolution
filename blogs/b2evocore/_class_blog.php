@@ -235,6 +235,9 @@ class Blog extends DataObject
 			
 			case 'arcdirurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=arcdir' );
+
+			case 'msgformurl':
+				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=msgform' );
 			
 			case 'description':			// RSS wording
 			case 'shortdesc':
