@@ -223,6 +223,141 @@ function hit_change_type( $hit_ID, $type )
 }
 
 
+/*
+ * list_antiSpam(-)
+ *
+ * Extract anti-spam
+ */
+function list_antiSpam()
+{
+	global 	$querycount, $tableblacklist, $res_stats;
+
+	$sql = "SELECT * FROM $tableblacklist ORDER BY domain ASC";
+	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
+	$querycount++;
+}
+
+/*
+ * antiSpam_ID(-)
+ */
+function antiSpam_ID()
+{
+	global $row_stats;
+	echo $row_stats['ID'];
+}
+
+/*
+ * antiSpam_domain(-)
+ */
+function antiSpam_domain()
+{
+	global $row_stats;
+	echo $row_stats['domain'];
+}
+
+/*
+ * domain_ban(-)
+ *
+ * Ban a domain
+ */
+function domain_ban( $hit_ID )
+{
+	global $tablehitlog, $tableblacklist, $querycount, $deluxe_ban;
+
+	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = $hit_ID LIMIT 1";
+	$querycount++;
+	$q = mysql_query($sql) or mysql_oops( $sql );
+	while( list($tmp) = mysql_fetch_row($q) )
+	{
+		$domain = $tmp;
+	}
+	$sql ="INSERT INTO $tableblacklist VALUES ('', '$domain')";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
+	
+	if ( $deluxe_ban )
+	{
+		// Delete all banned comments and stats entries
+		// Stats entries first
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = $domain";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
+		
+		// Then comments
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
+	}
+
+}
+
+/*
+ * keyword_ban(-)
+ *
+ * Ban any URL containing a certain keyword
+ */
+function keyword_ban( $keyword )
+{
+	global $tableblacklist, $querycount, $deluxe_ban;
+
+	$sql ="INSERT INTO $tableblacklist VALUES ('', '$keyword')";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
+	
+	if ( $deluxe_ban )
+	{
+		// Delete all banned comments and stats entries
+		// Stats entries first
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$domain%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
+		
+		// Then comments
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
+	}
+}
+
+/*
+ * remove_ban(-)
+ *
+ * Remove a domain from the ban list
+ */
+function remove_ban( $hit_ID )
+{
+	global $tableblacklist, $querycount;
+
+	$sql ="DELETE FROM $tableblacklist WHERE ID = $hit_ID";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
+}
+
+/*
+ * ban_affected_hits(-)
+ */
+function ban_affected_hits($keyword)
+{
+	global 	$querycount, $tablehitlog, $res_stats;
+
+	$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%' ORDER BY baseDomain ASC";
+	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
+	$querycount++;
+}
+
+/*
+ * ban_affected_comments(-)
+ */
+function ban_affected_comments()
+{
+	global 	$querycount, $tablecomments, $res_stats;
+
+	$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%' ORDER BY comment_date ASC";
+	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
+	$querycount++;
+}
+
+
 
 /*
  * refererList(-)
