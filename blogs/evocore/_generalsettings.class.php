@@ -52,8 +52,11 @@ require_once( dirname(__FILE__).'/_abstractsettings.class.php' );
  */
 class GeneralSettings extends AbstractSettings
 {
-	var $_defaults = array( 'upload_allowedext' => 'jpg gif png',
+	var $_defaults = array( 'upload_enabled' => '1',
+													'upload_allowedext' => 'jpg gif png',
 													'upload_allowedmime' => 'image/jpeg image/gif image/png',
+													'upload_maxkb' => '100',
+
 													'fm_enabled' => '1',
 													'fm_enable_roots_blog' => '1',
 													'fm_enable_roots_group' => '1',
@@ -88,6 +91,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2005/01/14 17:38:13  blueyed
+ * defaults added
+ *
  * Revision 1.6  2005/01/10 02:14:02  blueyed
  * new settings
  *
