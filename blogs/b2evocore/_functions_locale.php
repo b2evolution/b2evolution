@@ -87,6 +87,9 @@ function locale_activate( $locale )
 	{	// Only if gettext is available ( if not, look into T_(-) ...)
 		# Activate the locale->language in gettext:
 		putenv( 'LC_ALL='.$locale ); 
+		// Note: default of safe_mode_allowed_env_vars is "PHP_ ", 
+		// so you need to add "LC_" by editing php.ini. 
+
 		
 		# Activate the charset for conversions in gettext:
 		if( function_exists( 'bind_textdomain_codeset' ) )
