@@ -83,7 +83,16 @@
 			<legend><?php echo T_('User rights') ?></legend>
 			<p><strong><?php echo T_('Level') ?>:</strong> <?php $edited_User->disp('level') ?></p>
 	
-			<?php form_select( 'edited_user_grp_ID', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );?>
+			<?php 
+				if(  $edited_User->get('ID') != 1 )
+				{
+					form_select( 'edited_user_grp_ID', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );
+				}
+				else
+				{
+					form_info(  T_('User group'), $edited_User->Group->get('name') );
+				}
+			?>
 	
 		</fieldset>
 	

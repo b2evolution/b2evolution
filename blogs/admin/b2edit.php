@@ -109,9 +109,9 @@ default:
 
 	// ---------------------------------- START OF BLOG LIST ----------------------------------
 	$sep = '';
-	for( $curr_blog_ID=blog_list_start('stub'); 
+	for( $curr_blog_ID=blog_list_start(); 
 				$curr_blog_ID!=false; 
-				 $curr_blog_ID=blog_list_next('stub') ) 
+				 $curr_blog_ID=blog_list_next() ) 
 	{ 
 		if( ! $current_User->check_perm_blogusers( 'blog_post_statuses', 'any', $curr_blog_ID ) )
 		{	// Current user is not a member of this blog...

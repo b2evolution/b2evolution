@@ -42,10 +42,12 @@ class Group extends DataObject
 	var	$perm_templates;
 	var	$perm_users;
 
-	/* 
-	 * Group::Group(-)
-	 *
+	/** 
 	 * Constructor
+	 *
+	 * {@internal Group::Group(-) }
+	 *
+	 * @param object DB row
 	 */
 	function Group( $db_row = NULL )
 	{
@@ -77,10 +79,13 @@ class Group extends DataObject
 		}
 	}	
 	
-	/* 
-	 * Group::set(-)
-	 *
+	/** 
 	 * Set param value
+	 *
+	 * {@internal Group::set(-) }
+	 *
+	 * @param string Parameter name
+	 * @return mixed Parameter value
 	 */
 	function set( $parname, $parvalue )
 	{
@@ -95,10 +100,18 @@ class Group extends DataObject
 		}
 	}
 
-	/*
-	 * Group::check_perm(-)
+	/** 
+	 * Check a permission for this group
 	 *
-	 * Check permission
+	 * {@internal Group::check_perm(-) }
+	 *
+	 * @param string Permission name:
+	 *									- templates
+	 *									- stats
+	 *									- spamblacklist
+	 *									- options
+	 *									- users
+	 * @return strind Permission value
 	 */
 	function check_perm( $permname, $permrequested )
 	{

@@ -97,4 +97,17 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";
 }
+
+/*
+ * form_info(-)
+ */
+function form_info( $field_label, $field_info )
+{
+	echo '<fieldset>';
+	echo '  <div class="label">', $field_label, ':</div>';
+	echo '  <div class="input">', $field_info, '</div>';
+	echo "</fieldset>\n\n";
+}
+
+
 ?>

@@ -282,11 +282,12 @@ function create_groups()
 
 
 	$query = "CREATE TABLE $tableblogusers (
-		bloguser_blog_ID int(11) NOT NULL default 0,
-		bloguser_user_ID int(11) NOT NULL default 0,
+		bloguser_blog_ID int NOT NULL default 0,
+		bloguser_user_ID int NOT NULL default 0,
 		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
-		bloguser_perm_delpost int(11) NOT NULL default 0,
-		bloguser_perm_comments int(11) NOT NULL default 0,
+		bloguser_perm_delpost tinyint NOT NULL default 0,
+		bloguser_perm_comments tinyint NOT NULL default 0,
+		bloguser_perm_cats tinyint NOT NULL default 0,
 		PRIMARY KEY (bloguser_blog_ID,bloguser_user_ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );

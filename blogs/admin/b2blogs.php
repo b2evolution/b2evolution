@@ -244,6 +244,7 @@ switch($action)
 			break;
 		}
 	
+		// Update core blog params
 		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
 									$blog_staticfilename, 
 									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll, 
@@ -252,74 +253,8 @@ switch($action)
 									$blog_disp_bloglist )
 								or mysql_oops( $query );
 		
-		/*
-		 * Update the user permissions for this blog:
-		 */
-		// Delete old perms for thos blog:
-		$query = "DELETE FROM $tableblogusers
-							WHERE bloguser_blog_ID = $blog";
-		// echo $query, '<br />';
-		$res_delete = mysql_query($query) or mysql_oops( $query ); 
-		$querycount++; 
-		
-		// Now we need a full user list:
-		$query = "SELECT ID FROM $tableusers";
-		$result = mysql_query($query) or mysql_oops( $query ); 
-		$querycount++; 
-		
-		$inserted_values = array();
-		while($loop_row = mysql_fetch_array($result) )
-		{	// Check new permissions for each user:
-			$loop_user_ID = $loop_row['ID'];
-		
-			$perm_post = array();
-			
-			$perm_name_published = 'blog_perm_published_'.$loop_user_ID;
-			param( $perm_name_published, 'string', '' );
-			if( !empty($$perm_name_published) ) $perm_post[] = $$perm_name_published;
-
-			$perm_name_protected = 'blog_perm_protected_'.$loop_user_ID;
-			param( $perm_name_protected, 'string', '' );
-			if( !empty($$perm_name_protected) ) $perm_post[] = $$perm_name_protected;
-
-			$perm_name_private = 'blog_perm_private_'.$loop_user_ID;
-			param( $perm_name_private, 'string', '' );
-			if( !empty($$perm_name_private) ) $perm_post[] = $$perm_name_private;
-
-			$perm_name_draft = 'blog_perm_draft_'.$loop_user_ID;
-			param( $perm_name_draft, 'string', '' );
-			if( !empty($$perm_name_draft) ) $perm_post[] = $$perm_name_draft;
-
-			$perm_name_deprecated = 'blog_perm_deprecated_'.$loop_user_ID;
-			param( $perm_name_deprecated, 'string', '' );
-			if( !empty($$perm_name_deprecated) ) $perm_post[] = $$perm_name_deprecated;
-
-			$perm_name_delpost = 'blog_perm_delpost_'.$loop_user_ID;
-			param( $perm_name_delpost, 'integer', 0 );
-			
-			$perm_name_comments = 'blog_perm_comments_'.$loop_user_ID;
-			param( $perm_name_comments, 'integer', 0 );
-			
-			// Update those permissions in DB:
-	
-			if( count($perm_post) || $$perm_name_delpost || $$perm_name_comments )
-			{	// There are some permissions for this user:
-				// insert new perms:
-				$inserted_values[] = " ( $blog, $loop_user_ID, '".implode(',',$perm_post)."', ".
-																	$$perm_name_delpost.", ".$$perm_name_comments." )";
-			}
-		}
-
-		// Proceed insertions:
-		if( count( $inserted_values ) )
-		{
-			$query_insert = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
-												bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments ) 
-											 VALUES ".implode( ',', $inserted_values );
-			// echo $query_insert, '<br />';
-			$res_update = mysql_query($query_insert) or mysql_oops( $query_insert ); 
-			$querycount++; 
-		}
+		// Update the user permissions for this blog
+		blog_update_user_perms( $blog );
 
 		header( 'Location: b2blogs.php' );
 		exit();

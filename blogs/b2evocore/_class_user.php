@@ -220,7 +220,7 @@ class User extends DataObject
 
 			// Load now:
 			// echo 'loading allowed statuses';
-			$query = "SELECT bloguser_perm_poststatuses, bloguser_perm_comments, bloguser_perm_delpost
+			$query = "SELECT *
 								FROM $tableblogusers 
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
@@ -237,11 +237,9 @@ class User extends DataObject
 			else
 				$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloguser_perm_post );
 
-			// echo $row['bloguser_perm_delpost'];
 			$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
-
-			// echo $row['bloguser_perm_comments'];
 			$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
+			$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
 		}
 	
 		// Check if permission is granted:
@@ -259,7 +257,7 @@ class User extends DataObject
 				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
 
 			default:
-				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname];
+				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname], ' ';
 				return $this->blog_post_statuses[$perm_target_blog][$permname];
 		}
 	}
@@ -279,6 +277,44 @@ class User extends DataObject
 		return ( $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID )
 					 || $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
 					 || $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) );
+	}
+	
+	
+	/** 
+	 * Delete user and dependencies from database
+	 *
+	 * Deleted dependencies:
+	 * - users's posts
+	 * - comments on this users' posts
+	 * - user/blog permissions
+	 *
+	 * {@internal User::dbdelete(-) }
+	 */
+	function dbdelete()
+	{
+		global $querycount, $tablecomments, $tableposts, $tableblogusers;
+
+		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
+
+		// Delete comments
+		$sql="DELETE FROM $tablecomments INNER JOIN $tableposts 
+												ON comment_post_ID = ID
+								 WHERE post_author = $this->ID";
+		$result=mysql_query($sql) or mysql_oops( $sql );
+		$querycount++;
+
+		// Delete posts
+		$sql="DELETE FROM $tableposts WHERE post_author = $this->ID";
+		$result=mysql_query($sql) or mysql_oops( $sql );
+		$querycount++;
+		
+		// Delete userblog permission
+		$sql="DELETE FROM $tableblogusers WHERE bloguser_user_ID = $this->ID";
+		$result=mysql_query($sql) or mysql_oops( $sql );
+		$querycount++;
+
+		// Delete main object:
+		return parent::dbdelete();
 	}
 }
 ?>

@@ -960,22 +960,34 @@ function remove_magic_quotes( $mixed )
 } 
 
 
-/*
- * param(-)
+/** 
+ * Sets a parameter with values from the request or to provided default,
+ * except if param is already set!
+ * 
+ * Also removes magic quotes if they are set automatically by PHP.
+ * Also forces type.
+ * Priority order: POST, GET, COOKIE, DEFAULT.
  *
- * Sets a parameter with values from the request or default
- * except if it's already set!
+ * {@internal param(-) }
  *
- * fplanque: created
- * removes magic quotes if they are set automatically by PHP
- * TODO: add option to override what's already set.
+ * @author fplanque
+ * @param string Variable to set
+ * @param string Force value type to one of:
+ * - boolean
+ * - integer
+ * - float
+ * - string
+ * - array
+ * - object
+ * - null
+ * - html (does nothing)
+ * @param mixed Default value or TRUE if user input required
+ * @param boolean Do we need to memorize this to regenerate the URL for this page?
+ * @return mixed Final value of Variable
+ *
+ * @todo add option to override what's already set.
  */
-function param(
-	$var, 					// Variable to set
-	$type='',				// Force to boolean"integer"float"string"array"object"null" (since PHP 4.2.0) html
-	$default='',  	// Default value or TRUE if user input required
-	$memorize=false	// Do we need to memorize this to regenerate the URL
-)
+function param(	$var, $type='',	$default='', $memorize=false )
 {
 	global $$var;
 	global $global_param_list;
@@ -1051,7 +1063,7 @@ function param(
 	}
 	
 	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
-	
+	return $$var;
 }
 
 

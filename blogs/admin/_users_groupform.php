@@ -49,6 +49,10 @@
 											array( 'edit', T_('Full Access') )
 										), T_('User/Group Management') );
 				}
+				else
+				{
+					form_info( T_('User/Group Management'), T_('Full Access') );
+				}
 			?>
 		</fieldset>
 	

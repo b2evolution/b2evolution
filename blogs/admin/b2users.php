@@ -97,17 +97,14 @@ case 'delete':
 	}
 
 	$user_data=get_userdata($id);
+	$edited_User = new User( $user_data );
 	$usertodelete_level=$user_data['level'];
 
 	if ($user_level <= $usertodelete_level)
 	die(T_('Can\'t delete an user whose level is higher than yours.'));
 
-	$sql="DELETE FROM $tableusers WHERE ID = $id";
-	$result=mysql_query($sql) or die(sprintf( T_('Couldn\'t delete user #%d.'), $id ));
-
-	// TODO: MORE DB STUFF:
-	$sql="DELETE FROM $tableposts WHERE post_author = $id";
-	$result=mysql_query($sql) or die( sprintf( T_('Couldn\'t delete user #%d\'s posts.'), $id ) );
+	// Delete from DB:
+	$edited_User->dbdelete();
 
 	header("Location: b2users.php");
 	exit();

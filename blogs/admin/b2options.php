@@ -80,66 +80,24 @@ switch($action)
 		
 		<fieldset>
 			<legend><?php echo T_('Post options') ?></legend>
-				<table cellpadding="5" cellspacing="0">
-				<tr height="40">
-					<td width="150" height="40"><?php echo T_('Show') ?>:</td>
-					<td width="350"><input type="text" name="newposts_per_page" value="<?php echo $posts_per_page; ?>" size="3">
-					<select name="newwhat_to_show">
-					<option value="days" <?php
-					$i = $what_to_show;
-					if ($i == "days")
-					echo ' selected="selected"';
-					?>><?php echo T_('days') ?></option>
-					<option value="posts" <?php
-					if ($i == "posts")
-					echo ' selected="selected"';
-					?>><?php echo T_('posts') ?></option>
-					<option value="paged" <?php
-					if ($i == "paged")
-					echo ' selected="selected"';
-					?>><?php echo T_('posts paged') ?></option>
-					</select>
-					</td>
-				</tr>
-				<tr height="40">
-					<td height="40"><?php echo T_('Archive mode') ?>:</td>
-					<td><select name="newarchive_mode">
-					<?php $i = $archive_mode; ?>
-					<option value="daily"<?php
-					if ($i == "daily")
-					echo " selected";
-					echo ' selected="selected"';
-					?>><?php echo T_('daily') ?></option>
-					<option value="weekly"<?php
-					if ($i == "weekly")
-					echo ' selected="selected"';
-					?>><?php echo T_('weekly') ?></option>
-					<option value="monthly"<?php
-					if ($i == "monthly")
-					echo ' selected="selected"';
-					?>><?php echo T_('monthly') ?></option>
-					<option value="postbypost"<?php
-					if ($i == "postbypost")
-					echo ' selected="selected"';
-					?>><?php echo T_('post by post') ?></option>
-					</select>
-				</tr>
-				<tr height="40">
-					<td height="40" width="150"><?php echo T_('Auto-BR') ?>:</td>
-					<td><select name="newautobr">
-					<option value="1" <?php
-					if ($autobr)
-					echo ' selected="selected"';
-					?>>on</option>
-					<option value="0" <?php
-					if (!$autobr)
-					echo ' selected="selected"';
-					?>>off</option>
-					</select>
-					<em><?php echo T_('converts line-breaks into &lt;br /&gt; tags') ?></em>
-					</td>
-				</tr>
-				</table>
+			<?php
+				form_radio( 'newwhat_to_show', $what_to_show,
+						array(  array( 'days', T_('days') ),
+										array( 'posts', T_('posts') ),
+										array( 'paged', T_('posts paged') )
+									), T_('Display mode') );
+
+				form_text( 'newposts_per_page', $posts_per_page, 4, T_('Posts/Days per page'), '', 4 );
+
+				form_radio( 'newarchive_mode', $archive_mode,
+						array(  array( 'daily', T_('daily') ),
+										array( 'weekly', T_('weekly') ),
+										array( 'monthly', T_('monthly') ),
+										array( 'postbypost', T_('post by post') )
+									), T_('Archive mode') );
+
+	 			form_checkbox( 'newautobr', $autobr, T_('Auto-BR'), sprintf( T_('Converts line-breaks into &lt;br /&gt; tags.' ) ) );
+			?>
 		</fieldset>
 	
 		<?php if( $current_User->check_perm( 'options', 'edit' ) ) 

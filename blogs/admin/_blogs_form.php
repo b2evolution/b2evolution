@@ -54,6 +54,7 @@ switch( $next_action )
 				<th colspan="5"><?php echo T_('Can post/edit with following statuses:') ?></th>
 				<th rowspan="2"><?php echo T_('Delete<br />posts') ?></th>
 				<th rowspan="2"><?php echo T_('Edit<br />comments') ?></th>
+				<th rowspan="2"><?php echo T_('Edit<br />categories') ?></th>
 			</tr>
 			<tr>
 				<th><?php echo T_('Published') ?></th>
@@ -63,13 +64,13 @@ switch( $next_action )
 				<th><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="8">
+				<td colspan="9">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
 			<?php
 				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, 
-													bloguser_perm_comments, bloguser_perm_delpost 
+													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats
 									FROM $tableusers INNER JOIN $tableblogusers 
 													ON ID = bloguser_user_ID 
 									WHERE bloguser_blog_ID = $blog 
@@ -133,12 +134,19 @@ switch( $next_action )
 										<?php } ?>
 										value="1" />
 						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_cats_<?php echo $loop_row['ID'] ?>"
+										<?php if( $loop_row['bloguser_perm_cats'] != 0  ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="1" />
+						</td>
 					</tr>
 					<?php
 				}
 				?>
 			<tr class="group">
-				<td colspan="8">
+				<td colspan="9">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
@@ -183,6 +191,9 @@ switch( $next_action )
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_comments_<?php echo $loop_row['ID'] ?>"
+										value="1" />
+						<td class="center">
+							<input type="checkbox" name="blog_perm_cats_<?php echo $loop_row['ID'] ?>"
 										value="1" />
 						</td>
 					</tr>
