@@ -36,7 +36,7 @@
 	function cat_edit_after_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		echo "<li><a href=\"?action=newcat&parent_cat_ID=".$cat_ID.'">';
-		echo '<img src="img/new.png" width="13" height="12" class="middle" alt="', T_('Create'), '" /> ';
+		echo '<img src="img/new.gif" width="13" height="13" class="middle" alt="" /> ';
 		echo T_('New sub-category here'), "</a></li>\n";
 		echo "</ul>\n";
 		echo "</li>\n";
@@ -52,7 +52,7 @@
 	echo "<ul>\n";
 	cat_children( $cache_categories, $blog, NULL, 'cat_edit_before_first', 'cat_edit_before_each', 'cat_edit_after_each', 'cat_edit_after_last', 0 );
 	echo "<li><a href=\"?action=newcat&blog=".$blog, '">';
-	echo '<img src="img/new.png" width="13" height="12" class="middle" alt="', T_('Create'), '" /> ';
+	echo '<img src="img/new.gif" width="13" height="13" class="middle" alt="" /> ';
 	echo T_('New category here'), "</a></li>\n";
 	echo "</ul>\n";
 	// ----------------- END RECURSIVE CAT LIST ----------------

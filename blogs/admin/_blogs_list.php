@@ -76,6 +76,6 @@
 </table>
 <?php if( $current_User->check_perm( 'blogs', 'create' ) )
 { ?>
-<p class="center"><a href="b2blogs.php?action=new"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> <?php echo T_('Create new blog !') ?></a></p>
+	<p class="center"><a href="b2blogs.php?action=new"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New blog...') ?></a></p>
 <?php } ?>
 </div>

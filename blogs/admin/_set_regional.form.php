@@ -296,19 +296,20 @@ else
 		<?php if( $current_User->check_perm( 'options', 'edit' ) )
 		{
 		?>
-		<div style="text-align:center;padding:1em;">
+		<p class="center">
 			<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
 			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+		</p>
 			
-			<div class="FigZone" align="center">
-			<?php if( isset($l_atleastonefromdb) ){ ?>
-			<a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" alt="X" title="<?php echo T_('Reset to defaults (delete database table)');?>" border="0" /></a>
-			<?php } ?>
-			<a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;locale=_new_"><img src="img/new.png" height="13" width="12" alt="new" title="<?php echo T_('Create new locale');?>" border="0" /></a>
-			</div>
-		</div>
-		</fieldset>
-	</form>
+		<p class="center"><a href="b2options.php?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;locale=_new_"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('Create new locale');?></a></p>
+		<?php if( isset($l_atleastonefromdb) )
+		{ ?>
+		<p class="center"><a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
+		<?php } ?>
+			
+	</div>
+	</fieldset>
+</form>
 	<?php
 	}
 }

@@ -180,35 +180,7 @@ xmp { /* Just in case */
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 10pt;
 }
-form {
-	margin: 0;
-	padding: 0;
-} /* thanks #mozilla */
-form.inline {
-	margin: 0px;
-	padding:0px;
-	display: inline;
-}
-form.fform fieldset {
-	border: 1px solid #ddd;
-	margin-bottom: 1ex;
-	background-color: #fff;
-}
-form.fform fieldset fieldset {
-	clear: both;
-	border: none;
-	margin: 2ex;
-}
-form.fform div.label {
-	float: left;
-	width: 24%;
-	text-align: right;
-	padding-top: .6ex;
-}
-div.input {
-	float: right;
-	width: 75%;
-}
+
 textarea,input,select {
 	background-color: #f0f0f0;
 	border-width: 1px;

@@ -4,7 +4,51 @@
  */
 
 
-/* Form layout */
+/* Shared */
+
+form {
+	margin: 0;
+	padding: 0;
+} /* thanks #mozilla */
+form.inline {
+	margin: 0px;
+	padding:0px;
+	display: inline;
+}
+
+fieldset span.notes {
+	/* display: block; */
+	font-size: 80%;
+	color: #999999;
+}
+form.bComment label {
+	font-weight: bold;
+}
+
+/* 24/75% forms - Fast Forms */
+form.fform fieldset {
+	border: 1px solid #ddd;
+	margin-bottom: 1ex;
+	background-color: #fff;
+}
+form.fform fieldset fieldset {
+	clear: both;
+	border: none;
+	margin: 2ex;
+}
+form.fform div.label {
+	float: left;
+	width: 24%;
+	text-align: right;
+	padding-top: .6ex;
+	font-weight:bold;
+}
+form.fform div.input {
+	float: right;
+	width: 75%;
+}
+
+
 
 /* 18/80% forms */
 form.bComment fieldset
@@ -37,13 +81,4 @@ form.bComment fieldset div.info
 	/* border: 1px solid #00f; */
 }
 
-/* All forms */
 
-fieldset label {
-	font-weight: bold;
-}
-fieldset span.notes {
-	/* display: block; */
-	font-size: 80%;
-	color: #999999;
-}

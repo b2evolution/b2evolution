@@ -63,18 +63,18 @@
 					</td>
 					<?php
 					if( $current_User->check_perm( 'users', 'edit', false ) )
-					{	// copy
-						echo '<td></td><td style="font-weight:normal">
-						<a href="?action=newgroup&amp;template='.$loop_grp_ID.'">[copy]</a>';
-						
+					{	// copy ?>
+						<td></td>
+						<td>
+							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a>
+						<?php 
 						if( ($loop_grp_ID != 1) && ($loop_grp_ID != get_settings('newusers_grp_ID'))
 								&& !in_array( $loop_grp_ID, $usedgroups ) )
 						{ // delete
-						?>
-						<a href="b2users.php?action=deletegroup&amp;id=<?php echo $loop_grp_ID ?>" style="color:red;font-weight:bold;">
-						<img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('delete group') ?>" />
-						</a>
-						<?php
+							?>
+							<a href="b2users.php?action=deletegroup&amp;id=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Delete group') ?>">
+							<img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete group') ?>" /></a>
+							<?php
 						}
 						echo '</td>';
 					}
@@ -134,13 +134,13 @@
 					
 					
 					// copy user
-					echo '<a href="?action=newuser&amp;template='.$loop_User->get('ID').'">[copy]</a>';
+					echo '<a href="?action=newuser&amp;template='.$loop_User->get('ID').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" /></a>';
 					
 					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
 					{ // delete
 						?>
-						<a href="b2users.php?action=deleteuser&id=<?php echo $loop_User->get('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')">
-						<img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('delete user') ?>" />
+						<a href="b2users.php?action=deleteuser&id=<?php echo $loop_User->get('ID') ?>" title="<?php echo T_('Delete user') ?>"  onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')">
+						<img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete user') ?>" />
 						</a>
 						<?php
 					}
@@ -155,13 +155,13 @@
 
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	#echo '<p><a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> ', T_('Register a new user...'), '</a></p>';
-	echo '
+	?>
 	<p class="center">
-		<a href="?action=newuser">'.T_('Create a new user').'</a>
+		<a href="?action=newuser"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New user...') ?></a>
 		&middot;
-		<a href="?action=newgroup">'.T_('Create a new group').'</a>
-	</p>';
+		<a href="?action=newgroup"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New group...') ?></a>
+	</p>
+	<?php
 }
 ?>
 </div>
