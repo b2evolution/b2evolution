@@ -32,13 +32,13 @@ param( 'exact', 'integer', '', true );					// Require exact match of title or co
 param( 'preview', 'integer', 0, true );				// Is this preview ?
 param( 'calendar', 'string', '', true );				// Display a specific month in the calendar
 param( 'c', 'string', '', true );
-param( 'withcomments', 'integer' );						// DEPRECATED
+
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
 param( 'tb', 'integer', 0, true );
 param( 'pb', 'integer', 0, true );
 param( 'disp', 'string', '', true );
-param( 'message', 'string', '', true);   //Get message for mailing list
+param( 'message', 'string', '' );   //Get message for mailing list
 param( 'stats', 'integer', 0 );					// deprecated
 if(!isset($timestamp_min)) $timestamp_min = '';
 if(!isset($timestamp_max)) $timestamp_max = '';
