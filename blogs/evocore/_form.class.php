@@ -479,7 +479,7 @@ class Form
 	/**
 	 * Builds the form field
 	 *
-	 $ @param strinf title to display on top of the form
+	 $ @param string title to display on top of the form
 	 * @param string the class to use for the form tag
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
@@ -592,7 +592,7 @@ class Form
 		{
 			return $r;
 		}
-}
+	}
 
 
 	/**

@@ -43,73 +43,11 @@
 // Display submenu:
 require dirname(__FILE__).'/_submenu.inc.php';
 
-	// ---------------------------------------------------
-	// Display main user interface : file list & controls:
-	// ---------------------------------------------------
-
-	/* Not implemented yet:
-
-	<!-- SEARCH BOX: -->
-
-	<form action="files.php#FM_anchor" name="search" class="toolbaritem">
-		<?php echo $Fileman->getFormHiddenInputs() ?>
-		<input type="hidden" name="action" value="search" />
-		<input type="text" name="searchfor" value="--todo--" size="20" />
-		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
-	</form>
-
-	*/
-	?>
-
-	<!-- FILTER BOX: -->
-
-	<div class="toolbaritem">
-		<form action="files.php#FM_anchor" name="filter" class="inline">
-			<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
-			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
-			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
-				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
-				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
-				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
-
-			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
-		</form>
-
-		<?php
-		if( $Fileman->isFiltering() )
-		{ // "reset filter" form
-		?>
-		<form action="files.php#FM_anchor" name="unfilter" class="inline">
-			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
-			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Disable'), 'formvalue' ) ?>" />
-		</form>
-		<?php
-		}
-		?>
-
-	</div>
+?>
 
 
-	<!-- FLAT MODE: -->
-
-	<form action="files.php#FM_anchor" name="flatmode" class="toolbaritem">
-		<?php echo $Fileman->getFormHiddenInputs( array( 'flatmode' => false ) ) ?>
-		<input type="hidden" name="flatmode" value="<?php echo $flatmode ? 0 : 1; ?>" />
-		<input class="ActionButton" type="submit" title="<?php
-			echo format_to_output( $flatmode ?
-															T_('Normal mode') :
-															T_('All files and folders, including subdirectories'), 'formvalue' );
-			?>" value="<?php
-			echo format_to_output( $flatmode ?
-															T_('Normal mode') :
-															T_('Flat mode'), 'formvalue' ); ?>" />
-	</form>
-
-<div class="clear"><!-- This is to prevent the preceding floats from going into the table --></div>
 
 <form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
-
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
@@ -130,85 +68,142 @@ $filetable_cols = 8;
 <tr>
 	<td colspan="<?php echo $filetable_cols ?>" class="firstcol lastcol">
 
-	<?php
-	$rootlist = $Fileman->getRootList();
-	if( count($rootlist) > 1 )
-	{ // provide list of roots
-	?>
-		<!-- ROOT LISTS -->
+		<?php
 
-		<div class="fm_roots">
+		/* Not implemented yet:
 
-			<select name="rootIDAndPath" class="fm_roots" onchange="this.form.submit()">
+		<!-- SEARCH BOX: -->
+
+		<div class="toolbaritem">
+			<input type="text" name="searchfor" value="--todo--" size="20" />
+			<input type="image"
+				class="ActionButton"
+				title="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>"
+				src="<glasses>" />
+		</div>
+
+		*/
+		?>
+
+		<!-- FLAT MODE: -->
+		<div id="fmbar_flatmode">
+			<input name="actionArray[<?php echo $Fileman->flatmode ? 'noflatmode' : 'flatmode' ?>]"
+				class="ActionButton"
+				type="submit"
+				title="<?php
+					echo format_to_output( $Fileman->flatmode ?
+																	T_('Normal mode') :
+																	T_('All files and folders, including subdirectories'), 'formvalue' );
+					?>"
+				onclick="this.form.action='files.php#FM_anchor';"
+				value="<?php
+					echo format_to_output( $Fileman->flatmode ?
+																	T_('Normal mode') :
+																	T_('Flat mode'), 'formvalue' ); ?>" />
+		</div>
+
+
+		<!-- FILTER BOX: -->
+		<div id="fmbar_filter">
+			<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="5" />
+			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
+				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
+				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
+				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
+
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
+
 			<?php
-			foreach( $rootlist as $lroot )
-			{
-				echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
+			if( $Fileman->isFiltering() )
+			{ // "reset filter" form
+			?>
+				<input title="<?php echo T_('Unset filter'); ?>"
+					type="image"
+					name="actionArray[filter_unset]"
+					class="ActionButton"
+					src="<?php echo getIcon( 'xross', 'url' ) ?>" />
+			<?php
+			}
+			?>
 
-				if( $root == $lroot['id']
-						|| $root === NULL && $lroot['id'] == 'user' )
+		</div>
+
+
+		<?php
+		$rootlist = $Fileman->getRootList();
+		if( count($rootlist) > 1 )
+		{ // provide list of roots
+			?>
+
+			<!-- ROOT LISTS -->
+			<div id="fmbar_roots">
+				<select name="rootIDAndPath" onchange="this.form.submit()">
+				<?php
+				foreach( $rootlist as $lroot )
 				{
-					echo ' selected="selected"';
-				}
+					echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
 
-				echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+					if( $root == $lroot['id'] || ($root === NULL && $lroot['id'] == 'user') )
+					{
+						echo ' selected="selected"';
+					}
+
+					echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+				}
+				?>
+
+				</select>
+
+				<input class="ActionButton" type="submit" value="<?php echo T_('Change root') ?>" />
+
+			</div>
+
+			<?php
+		}
+		?>
+
+
+		<div id="fmbar_cwd">
+			<?php
+			// -----------------------------------------------
+			// Display table header: directory location info:
+			// -----------------------------------------------
+
+			// Display current dir:
+			echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
+
+
+			// Display current filter:
+			if( $Fileman->isFiltering() )
+			{
+				echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
+				// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
 			}
 
-			echo '</select>
 
-			<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
+			// The hidden reload button
+			?>
+
+			<span style="display:none;" id="fm_reloadhint">
+				<a href="<?php echo $Fileman->getCurUrl() ?>"
+					title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
+					<?php echo getIcon( 'reload' ) ?>
+				</a>
+			</span>
+
+			<?php
+			// Display filecounts:
+			?>
+
+			<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
+			disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+			echo ', ';
+			disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
+			echo ', '.bytesreadable( $Fileman->countBytes() );
+			?>
+			)</span>
 		</div>
-		';
-	}
-	?>
-
-
-	<?php
-	// -----------------------------------------------
-	// Display table header: directory location info:
-	// -----------------------------------------------
-
-
-	// Quick links to usual homes for user, group and maybe blog...:
-	// echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
-	// TODO: add group home...
-	// TODO: add blog home?
-
-
-	// Display current dir:
-	echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
-
-
-	// Display current filter:
-	if( $Fileman->isFiltering() )
-	{
-		echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
-		// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
-	}
-
-
-	// The hidden reload button
-	?>
-
-	<span style="display:none;" id="fm_reloadhint">
-		<a href="<?php echo $Fileman->getCurUrl() ?>"
-			title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
-			<?php echo getIcon( 'reload' ) ?>
-		</a>
-	</span>
-
-
-	<?php
-	// Display filecounts:
-	?>
-
-	<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
-	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
-	echo ', ';
-	disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
-	echo ', '.bytesreadable( $Fileman->countBytes() );
-	?>
-	)</span>
 	</td>
 
 </tr>
@@ -222,7 +217,6 @@ $filetable_cols = 8;
 		{
 			echo ' &ndash; '.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') );
 		}
-
 	?></th>
 	<th><?php echo $Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
@@ -343,7 +337,10 @@ while( $lFile =& $Fileman->getNextFile() )
 
 		<td class="type"><?php echo $lFile->getType() ?></td>
 		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
-		<td class="timestamp"><?php echo $lFile->getLastMod() ?></td>
+		<td class="timestamp">
+			<span class="date"><?php echo $lFile->getLastMod( 'date' ) ?></span>
+			<span class="time"><?php echo $lFile->getLastMod( 'time' ) ?></span>
+		</td>
 		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
 		<td class="actions lastcol"><?php
 			// Not implemented yet: $Fileman->dispButtonFileEdit();
@@ -378,91 +375,89 @@ if( $countFiles == 0 )
 	<?php
 }
 else
-{ // -------------
+{
+	// -------------
 	// Footer with "check all", "with selected: ..":
 	// --------------
-?>
-<tr class="listfooter">
-	<td colspan="<?php echo $filetable_cols ?>">
-	<a id="checkallspan_0" href="<?php
-		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
-		?>" onclick="toggleCheckboxes('FilesForm', 'fm_selected[]'); return false;"><?php
-		echo ($checkall) ? T_('uncheck all') : T_('check all');
-		?></a>
-	&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
-
-	<input class="DeleteButton"
-		title="<?php echo T_('Delete the selected files') ?>"
-		name="actionArray[delete]"
-		value="delete"
-		type="image"
-		src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
-		onclick="if( r = openselectedfiles(true) )
-							{
-								if( confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') )
-								{
-									document.getElementById( 'FilesForm' ).confirmed.value = 1;
-									return true;
-								}
-							}; return false;" />
-
-	<!-- Not implemented yet: input class="ActionButton"
-		title="<?php echo T_('Download the selected files') ?>"
-		name="actionArray[download]"
-		value="download"
-		type="image"
-		src="<?php echo getIcon( 'download', 'url' ) ?>"
-		onclick="return openselectedfiles(true);" / -->
-
-	<!-- Not implemented yet: input class="ActionButton" type="submit" name="action" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
-
-	<?php
-
-	/*
-	TODO: "link these into current post" (that is to say the post that opened the popup window).
-				This would create <img> or <a href> tags depending on file types.
-	*/
-
 	?>
+	<tr class="listfooter">
+		<td colspan="<?php echo $filetable_cols ?>">
+		<a id="checkallspan_0" href="<?php
+			echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
+			?>" onclick="toggleCheckboxes('FilesForm', 'fm_selected[]'); return false;"><?php
+			echo ($checkall) ? T_('uncheck all') : T_('check all');
+			?></a>
+		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
-	<input class="ActionButton"
-		title="<?php echo T_('Open in new windows'); ?>"
-		name="actionArray[open_in_new_windows]"
-		value="open_in_new_windows"
-		type="image"
-		src="<?php echo getIcon( 'window_new', 'url' ) ?>"
-		onclick="openselectedfiles(); return false;" />
+		<input class="DeleteButton"
+			title="<?php echo T_('Delete the selected files') ?>"
+			name="actionArray[delete]"
+			value="delete"
+			type="image"
+			src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
+			onclick="if( r = openselectedfiles(true) )
+								{
+									if( confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') )
+									{
+										document.getElementById( 'FilesForm' ).confirmed.value = 1;
+										return true;
+									}
+								}; return false;" />
+
+		<!-- Not implemented yet: input class="ActionButton"
+			title="<?php echo T_('Download the selected files') ?>"
+			name="actionArray[download]"
+			value="download"
+			type="image"
+			src="<?php echo getIcon( 'download', 'url' ) ?>"
+			onclick="return openselectedfiles(true);" / -->
+
+		<!-- Not implemented yet: input class="ActionButton" type="submit"
+			name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
+
+		<?php
+
+		/*
+		TODO: "link these into current post" (that is to say the post that opened the popup window).
+					This would create <img> or <a href> tags depending on file types.
+		*/
+
+		?>
+
+		<input class="ActionButton"
+			title="<?php echo T_('Open in new windows'); ?>"
+			name="actionArray[open_in_new_windows]"
+			value="open_in_new_windows"
+			type="image"
+			src="<?php echo getIcon( 'window_new', 'url' ) ?>"
+			onclick="openselectedfiles(); return false;" />
 
 	<?php
 	/* Not fully functional
-	<input class="ActionButton" type="image" name="action"
-		title="<?php echo T_('Rename the selected files'); ?>"
-		value="file_cmr"
-		onclick="return openselectedfiles(true);"
-		src="<?php echo getIcon( 'file_rename', 'url' ); ?>" />
+		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+			title="<?php echo T_('Rename the selected files'); ?>"
+			onclick="return openselectedfiles(true);"
+			src="<?php echo getIcon( 'file_rename', 'url' ); ?>" />
 
-	<input class="ActionButton" type="image" name="action"
-		title="<?php echo T_('Copy the selected files'); ?>"
-		value="file_cmr"
-		onclick="return openselectedfiles(true);"
-		src="<?php echo getIcon( 'file_copy', 'url' ); ?>" />
+		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+			title="<?php echo T_('Copy the selected files'); ?>"
+			onclick="return openselectedfiles(true);"
+			src="<?php echo getIcon( 'file_copy', 'url' ); ?>" />
 
-	<input class="ActionButton" type="image" name="action"
-		title="<?php echo T_('Move the selected files'); ?>"
-		value="file_cmr"
-		onclick="return openselectedfiles(true);"
-		src="<?php echo getIcon( 'file_move', 'url' ); ?>" />
+		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+			title="<?php echo T_('Move the selected files'); ?>"
+			onclick="return openselectedfiles(true);"
+			src="<?php echo getIcon( 'file_move', 'url' ); ?>" />
 
-	<input class="ActionButton" type="image" name="action" value="editperm"
-		onclick="return openselectedfiles(true);"
-		title="<?php echo T_('Change permissions for the selected files'); ?>"
-		src="<?php echo getIcon( 'file_perms', 'url' ); ?>" />
-
+		<input class="ActionButton" type="image" name="actionArray[editperm]"
+			onclick="return openselectedfiles(true);"
+			title="<?php echo T_('Change permissions for the selected files'); ?>"
+			src="<?php echo getIcon( 'file_perms', 'url' ); ?>" />
 	*/ ?>
 
-	</td>
-</tr>
-<?php
+		</td>
+	</tr>
+	<?php
 }
 ?>
 </tbody>
@@ -518,14 +513,13 @@ if( $countFiles )
 
 <form action="files.php#FM_anchor" class="toolbaritem">
 	<?php echo $Fileman->getFormHiddenInputs(); ?>
-	<label class="tooltitle"><?php echo T_('New'); ?></label>
 	<select name="createnew">
-		<option value="file"><?php echo T_('file') ?></option>
+		<option value="file"><?php echo T_('New file') ?></option>
 		<option value="dir"<?php
-			if( isset($createnew) && $createnew == 'dir' )
+			if( !empty($createnew) && $createnew == 'dir' )
 			{
 				echo ' selected="selected"';
-			} ?>><?php echo T_('directory') ?></option>
+			} ?>><?php echo T_('New directory') ?></option>
 	</select>
 	:
 	<input type="text" name="createname" value="<?php
@@ -545,8 +539,8 @@ if( $countFiles )
 	<?php echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) ); ?>
 
 	<div>
-		<input class="ActionButton" name="uploadfile[]" type="file" size="10" />
-		<input class="ActionButton" type="submit" value="<?php echo T_('Upload a file/image'); ?>" />
+		<input name="uploadfile[]" type="file" size="10" />
+		<input class="ActionButton" type="submit" value="<?php echo T_('Upload..'); ?>" />
 	</div>
 </form>
 
@@ -618,11 +612,10 @@ param( 'options_show', 'integer', 0 );
 		<br />
 
 		<?php echo $Fileman->getFormHiddenInputs() ?>
-		<input type="hidden" name="action" value="update_settings" />
 		<input type="hidden" name="options_show" value="1" />
 
 		<div class="input">
-			<input type="submit" value="<?php echo T_('Update !') ?>" />
+			<input type="submit" name="actionArray[update_settings]" value="<?php echo T_('Update !') ?>" />
 		</div>
 	</div>
 	</fieldset>
@@ -665,6 +658,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.4  2005/01/26 17:55:23  blueyed
+ * catching up..
+ *
  * Revision 1.3  2005/01/25 18:07:42  fplanque
  * CSS/style cleanup
  *

@@ -196,6 +196,11 @@ $map_iconfiles = array(
 		'size' => array( 16, 16 ),
 	),
 
+	'xross' => array(
+		'file' => $admin_subdir.'img/xross.gif',
+		'alt' => T_('Cross'),
+		'size' => array( 13, 13 ),
+	),
 );
 
 ?>

@@ -179,7 +179,8 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Constructor
+	 * Constructor, checks permission and initializes everything,
+	 * use {@link load()} to load the files.
 	 *
 	 * @param User the current User {@link User}}
 	 * @param string the URL where the object is included (for generating links)
@@ -287,7 +288,7 @@ class FileManager extends Filelist
 		 */
 		$this->url = $url;
 		/**
-		 * Remember mode from passed global.
+		 * Remember mode from global.
 		 * @var string
 		 */
 		$this->mode = $mode;
@@ -303,9 +304,9 @@ class FileManager extends Filelist
 			if( $this->SourceList =& new Filelist() )
 			{ // TODO: should fail for non-existant sources, or sources where no read-perm
 
-				foreach( $this->fm_sources as $lSource )
+				foreach( $this->fm_sources as $lSourcePath )
 				{
-					$this->SourceList->addFileByPath( urldecode($lSource) );
+					$this->SourceList->addFileByPath( urldecode($lSourcePath) );
 				}
 				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
@@ -322,18 +323,10 @@ class FileManager extends Filelist
 		}
 
 
-		$this->filterString = !empty($filterString) ?
-														$filterString :
-														NULL;
-		$this->filterIsRegexp = $filterIsRegexp;
-
-		if( $this->filterIsRegexp && !isRegexp( $this->filterString ) )
-		{
-			$this->Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $this->filterString ) );
-			$this->filterString = '.*';
-		}
 		$this->order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
 		$this->orderasc = ( $orderasc === NULL  ? NULL : (bool)$orderasc );
+
+		$this->setFilter( $filterString, $filterIsRegexp );
 
 
 		$this->loadSettings();
@@ -366,8 +359,6 @@ class FileManager extends Filelist
 		{ // allow override per param
 			$this->forceFM = param( 'forceFM', 'integer', NULL );
 		}
-
-		$this->load();
 	}
 
 
@@ -381,6 +372,26 @@ class FileManager extends Filelist
 		parent::restart();
 
 		#debug: pre_dump( $this->_entries );
+	}
+
+
+	/**
+	 * Set the filter.
+	 *
+	 * @param string Filter string
+	 * @param boolean Is the filter a regular expression?
+	 */
+	function setFilter( $filterString, $filterIsRegexp = true )
+	{
+		$this->filterIsRegexp = $filterIsRegexp;
+
+		if( $this->filterIsRegexp && !isRegexp( $filterString ) )
+		{
+			$this->Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ) );
+			$filterString = '.*';
+		}
+
+		$this->filterString = empty($filterString) ? NULL : $filterString;
 	}
 
 
@@ -476,8 +487,9 @@ class FileManager extends Filelist
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
 		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->getPath() );
 
-		echo '<a href="'.$url.'" target="fileman_copymoverename" onclick="'
-					.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
+		echo '<a href="'.$url
+					#.'" target="fileman_copymoverename" onclick="'
+					#.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
 					.'" title="';
 
 		if( $linkTitle === NULL )
@@ -723,7 +735,7 @@ class FileManager extends Filelist
 		// the user's root
 		$r[] = array( 'type' => 'user',
 									'id' => 'user',
-									'name' => T_('My media folder'),
+									'name' => T_('My folder'),
 									'path' => $this->User->getMediaDir() );
 
 		return $r;
@@ -1394,6 +1406,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.22  2005/01/26 17:55:23  blueyed
+ * catching up..
+ *
  * Revision 1.21  2005/01/20 20:37:16  fplanque
  * removed static call to Form::button()
  *

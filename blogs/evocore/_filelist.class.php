@@ -346,7 +346,7 @@ class Filelist
 	 */
 	function sort( $order = NULL, $orderasc = NULL, $dirsattop = NULL )
 	{
-		if( !count($this->_entries) )
+		if( !$this->count_entries )
 		{
 			return false;
 		}
@@ -384,35 +384,48 @@ class Filelist
 		$FileB =& $this->_entries[$b];
 
 
-		if( $this->order == 'size' )
+		switch( $this->order )
 		{
-			if( $this->recursivedirsize )
-			{
-				$r = $FileA->getSize() - $FileB->getSize();
-			}
-			else
-			{
-				$r = $FileA->isDir() && $FileB->isDir() ?
-								strcasecmp( $FileA->getName(), $FileB->getName() ) :
-								( $FileA->getSize() - $FileB->getSize() );
-			}
-		}
-		elseif( $this->order == 'path' )
-		{ // group by dir
-			$r = strcasecmp( $FileA->getDir(), $FileB->getDir() );
-			if( $r == 0 )
-			{
+			case 'size':
+				if( $this->recursivedirsize )
+				{
+					$r = $FileA->getSize() - $FileB->getSize();
+				}
+				else
+				{
+					$r = $FileA->isDir() && $FileB->isDir() ?
+									strcasecmp( $FileA->getName(), $FileB->getName() ) :
+									( $FileA->getSize() - $FileB->getSize() );
+				}
+				break;
+
+			case 'path': // group by dir
+				$r = strcasecmp( $FileA->getDir(), $FileB->getDir() );
+				if( $r == 0 )
+				{
+					$r = strcasecmp( $FileA->getName(), $FileB->getName() );
+				}
+				break;
+
+			case 'lastmod':
+				$r = $FileB->getLastMod() - $FileA->getLastMod();
+				break;
+
+			case 'perms':
+				// This will use literal representation ( 'r', 'r+w' / octal )
+				$r = strcasecmp( $FileA->getPerms(), $FileB->getPerms() );
+				break;
+
+			default:
+			case 'name':
 				$r = strcasecmp( $FileA->getName(), $FileB->getName() );
-			}
+				if( $r == 0 )
+				{ // same name: look at path
+					$r = strcasecmp( $FileA->getDir(), $FileB->getDir() );
+				}
+				break;
 		}
-		elseif( $this->order == 'lastmod' )
-		{
-			$r = $FileB->_lastMod - $FileA->_lastMod;
-		}
-		else
-		{
-			$r = eval( 'return strcasecmp( $FileA->get'.$this->order.'(), $FileB->get'.$this->order.'() );' );
-		}
+
 
 		if( !$this->orderasc )
 		{ // switch order
@@ -778,8 +791,8 @@ class Filelist
 
 /*
  * $Log$
- * Revision 1.18  2005/01/10 02:17:39  blueyed
- * no message
+ * Revision 1.19  2005/01/26 17:55:23  blueyed
+ * catching up..
  *
  * Revision 1.17  2005/01/08 22:10:43  blueyed
  * really fixed filelist (hopefully)

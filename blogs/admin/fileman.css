@@ -28,7 +28,6 @@
 	border: 1px solid #9e9286;
 }
 #filemanmain table.grouped th {
-	white-space:nowrap;
 	padding:0 .5ex;
 }
 #filemanmain table.grouped td {
@@ -38,32 +37,24 @@
 	padding:2ex;
 	color:red;
 }
-#filemanmain table.grouped td.icon,
-#filemanmain table.grouped td.checkbox,
-#filemanmain table.grouped td.perms {
-	width:2%;
-}
-#filemanmain table.grouped td.type {
-	white-space: nowrap;
-	width:15%;
-}
 #filemanmain table.grouped td.filename {
 	text-align: left;
-	width: 45%;
 }
 #filemanmain table.grouped td.filename div.path {
 	clear:right;
 	float:right;
 }
 #filemanmain table.grouped td.timestamp {
-	white-space: nowrap;
-	width:15%;
 }
-#filemanmain table.grouped td.size,
-#filemanmain table.grouped td.actions {
+#filemanmain table.grouped td.timestamp span.time {
+	font-size:84%;
+}
+#filemanmain table.grouped td.size {
 	text-align: right;
 	white-space: nowrap;
-	width:10%;
+}
+#filemanmain table.grouped td.actions {
+	white-space: nowrap;
 }
 #filemanmain table.grouped td.actions img {
 	margin:0 2px;
@@ -78,23 +69,42 @@
 }
 /* }}} */
 
-.toolbaritem {
-	margin: .5ex 0 .5ex 1ex;
+.toolbaritem,
+#fmbar_roots,
+#fmbar_cwd,
+#fmbar_filter,
+#fmbar_flatmode {
+	margin:.5ex 0 .5ex 1ex;
 	vertical-align:bottom;
-	padding: .1ex .5ex;
+	padding:.5ex;
 	float:right;
 	white-space:nowrap;
-	background-color: #efede0;		/* Temp color */
+	background-color:#efede0; /* Temp color */
+}
+#fmbar_roots,
+#fmbar_cwd {
+	margin:.5ex 1ex .5ex 0;
+	float:left;
+	text-align:left;
+}
+#fmbar_blockleft {
+	float:left;
+}
+#fmbar_cwd {
+	clear:both;
+}
+#fmbar_filter,
+#fmbar_flatmode {
+	float:right;
+	border: 1px solid #ddd; /* Temp color */
 }
 
-span.fm_filecounts {
-	display:inline;
+#filemanmain table.grouped thead td .toolbaritem {
+	border:1px solid #ddd;
+}
+
+.fm_filecounts {
 	font-size:84%;
-	margin:0 1ex;
-}
-
-div.fm_roots {
-	padding:.5ex;
 }
 
 div.fm_query {
@@ -137,6 +147,7 @@ pre.rawcontent {
 
 .tooltitle {
 	font-weight:bold;
+	padding-left:1ex;
 }
 ul.iconlegend {
 	list-style:none;

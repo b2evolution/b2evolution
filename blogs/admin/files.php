@@ -121,11 +121,37 @@ if( $action == 'update_settings' )
  */
 $Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $orderasc,
 														$filterString, $filterIsRegexp, $flatmode );
+if( !empty($action) )
+{
+	$oldAction = $action;
+	$action = '';
+
+	switch( $oldAction )
+	{
+		case 'filter_unset':
+			$Fileman->setFilter( false, false );
+			break;
+
+		case 'noflatmode':
+			$Fileman->flatmode = false;
+			break;
+
+		case 'flatmode':
+			$Fileman->flatmode = true;
+			break;
+
+		default:
+			$action = $oldAction;
+	}
+}
+
+$Fileman->load();
+
 
 /**
  * @var Filelist the selected files
  */
-$selectedFiles = $Fileman->getFilelistSelected();
+$SelectedFiles =& $Fileman->getFilelistSelected();
 
 
 if( !empty($action) )
@@ -148,7 +174,7 @@ if( !empty($action) )
 
 		case T_('Send by mail'):
 			// TODO: implement
-			if( !$selectedFiles->count() )
+			if( !$SelectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
 				break;
@@ -162,7 +188,7 @@ if( !empty($action) )
 			// TODO: provide optional zip formats
 			$action_title = T_('Download');
 
-			if( !$selectedFiles->count() )
+			if( !$SelectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
 				break;
@@ -179,7 +205,7 @@ if( !empty($action) )
 					."\n"
 					.T_('You want to download:')
 					.'<ul>'
-					.'<li>'.implode( "</li>\n<li>", $selectedFiles->getFilesArray( 'getNameWithType' ) )."</li>\n"
+					.'<li>'.implode( "</li>\n<li>", $SelectedFiles->getFilesArray( 'getNameWithType' ) )."</li>\n"
 					.'</ul>
 
 					<form action="files.php" class="fform" method="post">
@@ -192,7 +218,7 @@ if( !empty($action) )
 						<legend>'.T_('Download options').'</legend>
 						'
 						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
-						.( $selectedFiles->countDirs() ?
+						.( $SelectedFiles->countDirs() ?
 								form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
 								'' )
 						.'
@@ -209,7 +235,7 @@ if( !empty($action) )
 			{ // Downloading
 				require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
 
-				$arraylist = $selectedFiles->getFilesArray( 'getname' );
+				$arraylist = $SelectedFiles->getFilesArray( 'getname' );
 
 				$options = array (
 					'basedir' => $Fileman->getCwd(),
@@ -230,7 +256,7 @@ if( !empty($action) )
 
 
 		case 'delete': // delete a file/dir, TODO: checkperm! {{{
-			if( !$selectedFiles->count() )
+			if( !$SelectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
 				break;
@@ -249,7 +275,7 @@ if( !empty($action) )
 						.$Fileman->getFormHiddenInputs()."\n";
 
 
-				$action_msg .= $selectedFiles->count() > 1 ?
+				$action_msg .= $SelectedFiles->count() > 1 ?
 												T_('Do you really want to delete the following files?') :
 												T_('Do you really want to delete the following file?');
 
@@ -257,7 +283,7 @@ if( !empty($action) )
 				<ul>
 				';
 
-				foreach( $selectedFiles->entries as $lFile )
+				foreach( $SelectedFiles->entries as $lFile )
 				{
 					$action_msg .= '<li>'.$lFile->getName();
 
@@ -291,8 +317,8 @@ if( !empty($action) )
 			}
 			else
 			{
-				$selectedFiles->restart();
-				while( $lFile =& $selectedFiles->getNextFile() )
+				$SelectedFiles->restart();
+				while( $lFile =& $SelectedFiles->getNextFile() )
 				{
 					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->getID()] ) ) ) // handles Messages
 					{
@@ -308,7 +334,7 @@ if( !empty($action) )
 		case 'editperm': // edit permissions {{{
 			$action_title = T_('Change permissions');
 
-			if( !$selectedFiles->count() )
+			if( !$SelectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
 				break;
@@ -318,8 +344,8 @@ if( !empty($action) )
 
 			if( count( $perms ) )
 			{ // Change perms
-				$selectedFiles->restart();
-				while( $lFile =& $selectedFiles->getNextFile() )
+				$SelectedFiles->restart();
+				while( $lFile =& $SelectedFiles->getNextFile() )
 				{
 					$chmod = $perms[ $lFile->getID() ];
 
@@ -354,11 +380,11 @@ if( !empty($action) )
 
 				if( is_windows() )
 				{
-					if( $selectedFiles->count() > 1 )
+					if( $SelectedFiles->count() > 1 )
 					{ // more than one file, provide default
 
 					}
-					foreach( $selectedFiles->getFilesArray() as $lFile )
+					foreach( $SelectedFiles->getFilesArray() as $lFile )
 					{
 						$action_msg .= "\n".$Fileman->getFileSubpath( $lFile ).':<br />
 						<input id="perms_readonly_'.$lFile->getID().'"
@@ -399,20 +425,24 @@ if( !empty($action) )
 			break;
 
 
+		case 'file_cmr': // copy/move/rename - we come here from the "with selected" toolbar {{{
+			#pre_dump( $SelectedFiles );
+
+			// }}}
+			break;
+
+
 		case 'default':
 			// ------------------------
 			// default action (view):
 			// ------------------------
-			if( !$selectedFiles->count() )
+			if( !$SelectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
-			$selectedFile = & $selectedFiles->getFileByIndex(0);
-
-			// Load Meta Data if available
-			$selectedFile->load_meta();
+			$selectedFile = & $SelectedFiles->getFileByIndex(0);
 
 			// TODO: check if available
 
@@ -758,86 +788,91 @@ switch( $Fileman->getMode() )
 		param( 'cmr_doit', 'integer', 0 );
 
 
+		$Fileman->SourceList->restart();
+
 		if( $cmr_doit )
 		{{{ // we want Action!
-			if( !isFilename($newname) )
+			while( $lSourceFile =& $Fileman->SourceList->getNextFile() )
 			{
-				$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
-			}
-			elseif( ($TargetFile =& getFile( $newname, $Fileman->getCwd() ))
-							&& $TargetFile->exists() )
-			{ // target filename already given to another file
-				if( $TargetFile === $SourceFile )
+				if( !isFilename($newname) )
 				{
-					$LogCmr->add( T_('Source- and target file are the same. Please choose another name or directory.') );
-					$overwrite = false;
+					$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
 				}
-				elseif( !$overwrite )
-				{
-					$LogCmr->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newname ) );
-					$overwrite = 'ask';
-				}
-				else
-				{ // unlink existing file
-					if( !$Fileman->unlink( $TargetFile ) )
+				elseif( ($TargetFile =& getFile( $newname, $Fileman->getCwd() ))
+								&& $TargetFile->exists() )
+				{ // target filename already given to another file
+					if( $TargetFile === $SourceFile )
 					{
-						$LogCmr->add( sprintf( T_('Could not delete &laquo;%s&raquo;.'), $newname ) );
+						$LogCmr->add( T_('Source- and target file are the same. Please choose another name or directory.') );
+						$overwrite = false;
+					}
+					elseif( !$overwrite )
+					{
+						$LogCmr->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newname ) );
+						$overwrite = 'ask';
 					}
 					else
-					{
-						$Fileman->Messages->add( sprintf( T_('Deleted file &laquo;%s&raquo;.'), $newname ), 'note' );
-					}
-				}
-			}
-
-			if( !$LogCmr->count( 'error' ) )
-			{ // no errors, safe for action
-				$oldpath = $SourceFile->getPath();
-
-				if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
-				{
-					if( !$cmr_keepsource )
-					{ // move/rename
-						if( $Fileman->unlink( $SourceFile ) )
+					{ // unlink existing file
+						if( !$Fileman->unlink( $TargetFile ) )
 						{
-							if( $SourceFile->getDir() == $Fileman->getCwd() )
-							{ // successfully renamed
-								$Fileman->Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																									basename($oldpath),
-																									$TargetFile->getName() ), 'note' );
-							}
-							else
-							{ // successfully moved
-								$Fileman->Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																									$oldpath,
-																									$TargetFile->getName() ), 'note' );
-
-							}
+							$LogCmr->add( sprintf( T_('Could not delete &laquo;%s&raquo;.'), $newname ) );
 						}
 						else
 						{
-							$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
-																		($SourceFile->getDir() == $Fileman->getCwd() ?
-																			basename($oldpath) :
-																			$oldpath ),
-																		$TargetFile->getName() ) );
+							$Fileman->Messages->add( sprintf( T_('Deleted file &laquo;%s&raquo;.'), $newname ), 'note' );
+						}
+					}
+				}
+
+				if( !$LogCmr->count( 'error' ) )
+				{ // no errors, safe for action
+					$oldpath = $SourceFile->getPath();
+
+					if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
+					{
+						if( !$cmr_keepsource )
+						{ // move/rename
+							if( $Fileman->unlink( $SourceFile ) )
+							{
+								if( $SourceFile->getDir() == $Fileman->getCwd() )
+								{ // successfully renamed
+									$Fileman->Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																										basename($oldpath),
+																										$TargetFile->getName() ), 'note' );
+								}
+								else
+								{ // successfully moved
+									$Fileman->Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																										$oldpath,
+																										$TargetFile->getName() ), 'note' );
+
+								}
+							}
+							else
+							{
+								$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
+																			($SourceFile->getDir() == $Fileman->getCwd() ?
+																				basename($oldpath) :
+																				$oldpath ),
+																			$TargetFile->getName() ) );
+							}
+						}
+						else
+						{ // copy only
+							$Fileman->Messages->add( sprintf(
+								T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+								( $SourceFile->getDir() == $Fileman->getCwd() ?
+										$SourceFile->getName() :
+										$SourceFile->getPath() ),
+								$TargetFile->getName() ), 'note' );
 						}
 					}
 					else
-					{ // copy only
-						$Fileman->Messages->add( sprintf(
-							T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-							( $SourceFile->getDir() == $Fileman->getCwd() ?
-									$SourceFile->getName() :
-									$SourceFile->getPath() ),
-							$TargetFile->getName() ), 'note' );
+					{
+						$LogCmr->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																		$SourceFile->getPath(),
+																		$TargetFile->getPath() ), 'error' );
 					}
-				}
-				else
-				{
-					$LogCmr->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																	$SourceFile->getPath(),
-																	$TargetFile->getPath() ), 'error' );
 				}
 			}
 		}}}
@@ -845,18 +880,6 @@ switch( $Fileman->getMode() )
 
 		if( !$cmr_doit || $LogCmr->count( 'all' ) )
 		{
-			$Fileman->SourceList->restart();
-			$SourceFile =& $Fileman->SourceList->getNextFile();
-
-			// text and value for JS dynamic fields, when referring to move/rename
-			if( $SourceFile->getDir() == $Fileman->getCwd() )
-			{
-				$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
-			}
-			else
-			{
-				$submitMoveOrRenameText = format_to_output( T_('Move'), 'formvalue' );
-			}
 			?>
 
 			<div class="panelblock">
@@ -878,19 +901,25 @@ switch( $Fileman->getMode() )
 
 						$LogCmr->display( '', '', true, 'all' );
 
-						while( $SourceFile =& $Fileman->SourceList->getNextFile() )
+						$sourcesInSameDir = true;
+
+						while( $lSourceFile =& $Fileman->SourceList->getNextFile() )
 						{
+							if( $sourcesInSameDir && $lSourceFile->getDir() != $Fileman->cwd )
+							{
+								$sourcesInSameDir = false;
+							}
 							?>
 
 							<fieldset>
-								<legend><?php echo T_('Source').': '.$SourceFile->getPath();
+								<legend><?php echo T_('Source').': '.$lSourceFile->getPath();
 								?></legend>
 
 								<?php
 
 
-								if( isset( $cmr_overwrite[$SourceFile->getID()] )
-										&& $cmr_overwrite[$SourceFile->getID()] === 'ask' )
+								if( isset( $cmr_overwrite[$lSourceFile->getID()] )
+										&& $cmr_overwrite[$lSourceFile->getID()] === 'ask' )
 								{
 									form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
 																	sprintf( T_('The existing file &laquo;%s&raquo; will be replaced with this file.'),
@@ -899,12 +928,12 @@ switch( $Fileman->getMode() )
 								?>
 
 								<div class="label">
-									<label for="cmr_keepsource_<?php $SourceFile->getID(); ?>"><?php echo T_('Keep source file') ?>:</label>
+									<label for="cmr_keepsource_<?php $lSourceFile->getID(); ?>"><?php echo T_('Keep source file') ?>:</label>
 								</div>
 								<div class="input">
 									<input class="checkbox" type="checkbox" value="1"
-										name="cmr_keepsource[<?php echo $SourceFile->getID(); ?>]"
-										id="cmr_keepsource_<?php $SourceFile->getID(); ?>"
+										name="cmr_keepsource[<?php echo $lSourceFile->getID(); ?>]"
+										id="cmr_keepsource_<?php $lSourceFile->getID(); ?>"
 										onclick="setCmrSubmitButtonValue( this.form );"<?php
 										if( $cmr_keepsource )
 										{
@@ -916,20 +945,31 @@ switch( $Fileman->getMode() )
 
 
 								<div class="label">
-									<label for="cmr_newname_<?php $SourceFile->getID(); ?>">New name:</label>
+									<label for="cmr_newname_<?php $lSourceFile->getID(); ?>">New name:</label>
 								</div>
 								<div class="input">
-									<input type="text" name="cmr_newname[<?php $SourceFile->getID(); ?>]"
-										id="cmr_newname_<?php $SourceFile->getID(); ?>" value="<?php
-										echo isset( $cmr_newname[$SourceFile->getID()] ) ?
-														$cmr_newname[$SourceFile->getID()] :
-														$SourceFile->getName() ?>" />
+									<input type="text" name="cmr_newname[<?php $lSourceFile->getID(); ?>]"
+										id="cmr_newname_<?php $lSourceFile->getID(); ?>" value="<?php
+										echo isset( $cmr_newname[$lSourceFile->getID()] ) ?
+														$cmr_newname[$lSourceFile->getID()] :
+														$lSourceFile->getName() ?>" />
 								</div>
 
 							</fieldset>
 
 						<?php
 						}
+
+						// text and value for JS dynamic fields, when referring to move/rename
+						if( $sourcesInSameDir )
+						{
+							$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
+						}
+						else
+						{
+							$submitMoveOrRenameText = format_to_output( T_('Move'), 'formvalue' );
+						}
+
 						?>
 
 						<fieldset>
@@ -995,9 +1035,9 @@ switch( $Fileman->getMode() )
 		)
 	{
 		opener.document.getElementById( 'fm_reloadhint' ).style.display =
-			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->toMD5(); ?>' ?
-				'none' :
-				'inline';
+			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->toMD5(); ?>'
+			? 'none'
+			: 'inline';
 	}
 	// -->
 </script>
@@ -1006,7 +1046,7 @@ switch( $Fileman->getMode() )
 <?php
 
 // "Display/hide Filemanager" and "Leave mode" buttons
-if( !empty($mode) )
+if( $Fileman->getMode() )
 {
 	?>
 
@@ -1099,6 +1139,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.69  2005/01/26 17:55:23  blueyed
+ * catching up..
+ *
  * Revision 1.68  2005/01/14 17:39:02  blueyed
  * layout
  *
