@@ -51,7 +51,9 @@
  */
 function online_user_update()
 {
-	global $DB, $current_User, $servertimenow, $online_session_timeout;
+	global $DB, $Debuglog, $current_User, $servertimenow, $online_session_timeout;
+
+	$Debuglog->add( 'Updating the active session for the current user' );
 
 	// Delete deprecated session info:
 	// Note: we also delete any anonymous user from the current IP address since it will be
@@ -61,7 +63,7 @@ function online_user_update()
 									OR ( sess_ipaddress = "'.$_SERVER['REMOTE_ADDR'].'"
 												AND sess_user_ID is NULL )' );
 
-	// Record current sesssion info
+	// Record current session info
 	$DB->query( 'REPLACE INTO T_sessions( sess_time, sess_ipaddress, sess_user_ID )
 								VALUES( "'.$servertimenow.'",
 												"'.$_SERVER['REMOTE_ADDR'].'",
@@ -116,6 +118,9 @@ function online_user_display( $before = '', $after = '' )
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/08 23:57:20  blueyed
+ * moved Debugmessage, ..
+ *
  * Revision 1.4  2005/02/08 20:17:57  blueyed
  * removed obsolete $User_ID global
  *

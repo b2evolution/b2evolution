@@ -219,7 +219,7 @@ $Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
-if( ($locale_from_get = param( 'locale', 'string', '', false, false, false ))
+if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
 		&& $locale_from_get != $default_locale
 		&& isset( $locales[$locale_from_get] ) )
 {
@@ -238,14 +238,18 @@ locale_activate( $default_locale );
 /**
  * Login procedure:
  */
-if( !isset($login_required) ) $login_required = false;
+if( !isset($login_required) )
+{
+	$login_required = false;
+}
+
 if( $error = veriflog( $login_required ) )
 { // Login failed:
 	require( dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php' );
 }
 
+
 // Update the active session for the current user:
-$Debuglog->add('Updating the active session for the current user');
 online_user_update();
 
 
@@ -301,6 +305,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/08 23:57:20  blueyed
+ * moved Debugmessage, ..
+ *
  * Revision 1.13  2005/01/03 06:21:35  blueyed
  * moved declaration of $map_iconsfiles, $map_iconsizes so that they can make use of T_()
  *
