@@ -25,19 +25,27 @@ if (!get_magic_quotes_gpc()) {
 	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
 }
 
-$b2varstoreset = array('action','mode','error','text','popupurl','popuptitle');
+$b2varstoreset = array('action', 'mode', 'error', 'text', 'popupurl', 'popuptitle');
 
-for ($i = 0; $i < count($b2varstoreset); $i = $i + 1) {
+for ($i = 0; $i < count($b2varstoreset); $i = $i + 1)
+{
 	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
+	if (!isset($$b2var))
+	{
+		if (empty($HTTP_POST_VARS[$b2var]))
+		{
+			if (empty($HTTP_GET_VARS[$b2var]))
+			{
 				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
 			}
-		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
+			else
+			{
+				$$b2var = $HTTP_GET_VARS[$b2var];
+			}
+		}
+		else
+		{
+			$$b2var = $HTTP_POST_VARS[$b2var];
 		}
 	}
 }
@@ -48,151 +56,137 @@ dbconnect();
 
 switch($action) 
 {
+	case 'logout':
 
-case "logout":
+		setcookie( "cafeloguser");		// OLD
+		setcookie( "cafeloguser", '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
+		setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
 
-	setcookie( "cafeloguser");		// OLD
-	setcookie( "cafeloguser", '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
-	setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
+		setcookie( "cafelogpass");			// OLD
+		setcookie( "cafelogpass", '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
+		setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
 
-	setcookie( "cafelogpass");			// OLD
-	setcookie( "cafelogpass", '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
-	setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
-
-	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-	header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
-	header("Pragma: no-cache");
-	//if ($is_IIS) {
-		header("Refresh:1;url=b2login.php");
-	//} else {
-	//	header("Location: b2login.php");
-	//}
-	exit();
-
-break;
-
-
-case "login":
-
-	$log = $_POST["log"];
-	$pwd = $_POST["pwd"];
-	$redirect_to = $_POST["redirect_to"];
-
-	function login() 
-	{
-		global $dbhost,$dbusername,$dbpassword,$dbname,$log,$pwd,$error,$user_ID;
-		global $tableusers, $pass_is_md5;
-		$user_login=$log;
-		$password=$pwd;
-		if (!$user_login) {
-			$error='<strong>'. T_('ERROR'). '</strong>: '. T_('The login field is empty');
-			return false;
-		}
-
-		if (!$password) {
-			$error='<strong>'. T_('ERROR'). '<\\1strong>: '. T_('the password field is empty');
-			return false;
-		}
-
-		if (substr($password,0,4)=="md5:") 
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
+		header("Pragma: no-cache");
+		if ($is_IIS)
 		{
-			$pass_is_md5 = 1;
-			$password = substr($password,4,strlen($password));
-			$query =  " SELECT ID, user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND MD5(user_pass) = '$password' ";
-		} else {
-			$pass_is_md5 = 0;
-			$query =  " SELECT ID, user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '$password' ";
+			header("Refresh:1;url=b2login.php");
 		}
-		$result = mysql_query($query) or mysql_oops( $query );
+		else
+		{
+		   header("Location: b2login.php");
+		}
+		exit();
 
-		$lines = mysql_num_rows($result);
-		if ($lines<1) {
-			$error='<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
-			$pwd='';
-			return false;
-		} else {
-		$res=mysql_fetch_row($result);
-		$user_ID=$res[0];
-		if (($pass_is_md5==0 && $res[1]==$user_login && $res[2]==$password) || ($pass_is_md5==1 && $res[1]==$user_login && md5($res[2])==$password)) 
+	break; // case 'logout'
+
+
+	case 'login':
+
+		$log = $_POST['log'];
+		$pwd = md5($_POST['pwd']);
+		unset($_POST['pwd']); // password is hashed from now on
+		$redirect_to = $_POST['redirect_to'];
+
+		function login()
+		{
+			global $dbhost, $dbusername, $dbpassword, $dbname, $log, $pwd, $error, $user_ID;
+			global $tableusers, $pass_is_md5;
+			$user_login = $log;
+			$password = $pwd;
+			if (!$user_login) {
+				$error='<strong>'. T_('ERROR'). '</strong>: '. T_('The login field is empty');
+				return false;
+			}
+
+			if (!$password) {
+				$error='<strong>'. T_('ERROR'). '<\\1strong>: '. T_('the password field is empty');
+				return false;
+			}
+
+			$query =  "SELECT ID, user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '" . $password . "'";
+			$result = mysql_query($query) or mysql_oops( $query );
+
+			$lines = mysql_num_rows($result);
+			if ($lines >= 1)
 			{
 				return true;
-			} 
-			else
-			{
-				$error='<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
-				$pwd="";
+			}
+			else {
+				$error = '<strong>' . T_('ERROR') . '</strong>: ' . T_('Wrong login or password');
+				$pwd = '';
 				return false;
 			}
 		}
-	}
 
-	if (!login()) 
-	{	// Login failed
-		//echo 'login failed!!';
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-		header("Cache-Control: no-cache, must-revalidate");
-		header("Pragma: no-cache");
-		if ($is_IIS) 
-		{
-			header('Refresh: 0;url=b2login.php?error='.urlencode( $error ) ); 
-		} else {
-			header('Location: b2login.php?error='.urlencode( $error ) );
+		if (!login())
+		{	// Login failed
+			// echo 'login failed!!';
+			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+			header("Cache-Control: no-cache, must-revalidate");
+			header("Pragma: no-cache");
+			if ($is_IIS)
+			{
+				header('Refresh: 0;url=b2login.php?error='.urlencode( $error ) );
+			} else {
+				header('Location: b2login.php?error='.urlencode( $error ) );
+			}
+			exit();
 		}
-		exit();
-	} 
-	else
-	{
-		//echo 'login OK!!';
-		$user_login=$log;
-		$user_pass=$pwd;
-		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
-		if( !setcookie( $cookie_user, $user_login, $cookie_expires, $cookie_path, $cookie_domain ) )
-			printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-		if ($pass_is_md5) 
-		{
-			if( !setcookie( $cookie_pass, $user_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-		} 
 		else
 		{
-			if( !setcookie( $cookie_pass, md5($user_pass), $cookie_expires, $cookie_path, $cookie_domain) )
+			// echo 'login OK!!';
+			$user_login	= $log;
+			$user_pass	= $pwd;
+			//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
+			if( !setcookie( $cookie_user, $user_login, $cookie_expires, $cookie_path, $cookie_domain ) )
 				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+			if ($pass_is_md5)
+			{
+				if( !setcookie( $cookie_pass, $user_pass, $cookie_expires, $cookie_path, $cookie_domain) )
+					printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+			}
+			else
+			{
+				if( !setcookie( $cookie_pass, $user_pass, $cookie_expires, $cookie_path, $cookie_domain) )
+					printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+			}
+
+			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+			header("Cache-Control: no-cache, must-revalidate");
+			header("Pragma: no-cache");
+
+			switch($mode)
+			{
+				case "bookmarklet":
+					$location = "b2bookmarklet.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
+					break;
+				case "sidebar":
+					$location = "sidebar.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
+					break;
+				case "profile":
+					$location = "profile.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
+					break;
+				default:
+					$location = $redirect_to;
+					break;
+			}
+
+			// if ($is_IIS) {
+				header("Refresh:1;url=$location");
+			// } else {
+			// 	header("Location: $location");
+			//}
 		}
 
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-		header("Cache-Control: no-cache, must-revalidate");
-		header("Pragma: no-cache");
-
-		switch($mode) 
-		{
-			case "bookmarklet":
-				$location="b2bookmarklet.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
-				break;
-			case "sidebar":
-				$location="sidebar.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
-				break;
-			case "profile":
-				$location="profile.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
-				break;
-			default:
-				$location=$redirect_to;
-				break;
-		}
-
-		// if ($is_IIS) {
-			header("Refresh:1;url=$location");
-		// } else {
-		// 	header("Location: $location");
-		//}
-	}
-
-break;
+	break; // case 'login'
 
 
-case "lostpassword":
+	case 'lostpassword':
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -202,7 +196,8 @@ case "lostpassword":
 <style type="text/css">
 <!--
 <?php
-if (!preg_match("/Nav/",$HTTP_USER_AGENT)) {
+		if(strpos($HTTP_USER_AGENT, 'Nav') === false) // if (!preg_match("/Nav/",$HTTP_USER_AGENT))
+		{
 ?>
 textarea,input,select {
 	background-color: #f0f0f0;
@@ -213,7 +208,7 @@ textarea,input,select {
 	margin: 1px;
 }
 <?php
-}
+		}
 ?>
 -->
 </style>
@@ -236,7 +231,10 @@ textarea,input,select {
 
 <p align="center" style="color: #b0b0b0"><?php echo T_('Type your login here and click OK. You will receive an email with your password.') ?></p>
 <?php
-if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0000\">$error</font><br />&nbsp;</div>";
+		if ($error)
+		{
+			echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0000\">$error</font><br />&nbsp;</div>";
+		}
 ?>
 
 <form name="" action="b2login.php" method="post">
@@ -261,77 +259,89 @@ if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0
 </html>
 	<?php
 
-break;
+	break; // case 'lostpassword'
+// "
 
+	case 'retrievepassword':
 
-case "retrievepassword":
+		$user_login	= $_POST['user_login'];
+		$user_data	= get_userdatabylogin($user_login);
+		$user_email	= $user_data['user_email'];
 
-	$user_login = $HTTP_POST_VARS["user_login"];
-	$user_data = get_userdatabylogin($user_login);
-	$user_email = $user_data["user_email"];
-	$user_pass = $user_data["user_pass"];
-
-	if (empty($user_email)) {
-		// pretend that the email is sent for avoiding guessing user_login
-		echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-		echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
-		die(); 
-	}
-
-	$message  = T_('Login:')." $user_login\r\n";
-	$message .= T_('Password:')." $user_pass\r\n";
-
-	$m = mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
-
-	if ($m == false) {
-		echo '<p>', T_('The email could not be sent.'), "<br />\n";
-		echo T_('Possible reason: your host may have disabled the mail() function...</p>');
-		die();
-	} else {
-		echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-		echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
-		die();
-	}
-
-break;
-
-
-default:
-
-	if((!empty($_COOKIE[$cookie_user])) && (!empty($_COOKIE[$cookie_pass]))) {
-		$user_login = $_COOKIE[$cookie_user];
-		$user_pass_md5 = $_COOKIE[$cookie_pass];
-	}
-
-	function checklogin()
-	{
-		global $dbhost,$dbusername,$dbpassword,$dbname;
-		global $user_login,$user_pass_md5,$user_ID;
-
-		$userdata = get_userdatabylogin($user_login);
-
-		if ($user_pass_md5 != md5($userdata["user_pass"])) 
+		if (empty($user_email))
 		{
-			return false;
-		} else {
-			return true;
+			// pretend that the email is sent for avoiding guessing user_login
+			echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
+			echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
+			die();
 		}
-	}
-
-	if ( !(checklogin()) ) 
-	{
-		if (!empty($_COOKIE[$cookie_user]))
+		else
 		{
-			$error='<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
+		   $random_password = substr(md5(uniqid(microtime())),0,6);
+			$query = "UPDATE $tableusers SET user_pass = '" . md5($random_password) . "' WHERE user_login = '$user_login'";
+			$result = mysql_query($query) or mysql_oops( $query );
+
+			$message  = T_('Login:')." $user_login\r\n";
+			$message .= T_('Password:')." $random_password\r\n";
+
+			// DEBUG!
+			echo $message;
+
+			if(mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion()))
+			{
+				echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
+				echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
+				die();
+			}
+			else
+			{
+				echo '<p>', T_('The email could not be sent.'), "<br />\n";
+				echo T_('Possible reason: your host may have disabled the mail() function...</p>');
+				die();
+			}
 		}
-	} else {
-		header("Expires: Wed, 5 Jun 1979 23:41:00 GMT"); /* private joke: this is Michel's birthdate - though officially it's on the 6th, since he's on GMT+1 :) */
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); /* different all the time */
-		header("Cache-Control: no-cache, must-revalidate"); /* to cope with HTTP/1.1 */
-		header("Pragma: no-cache");
-		header("Location: b2edit.php");
-		exit();
-	}
+
+	break; // case 'retrievepassword'
+
+
+	default:
+
+		if(!empty($_COOKIE[$cookie_user]) && !empty($_COOKIE[$cookie_pass]))
+		{
+			$user_login		= $_COOKIE[$cookie_user];
+			$user_pass_md5 = $_COOKIE[$cookie_pass];
+		}
+
+		function checklogin()
+		{
+			global $dbhost, $dbusername, $dbpassword, $dbname;
+			global $user_login, $user_pass_md5, $user_ID;
+
+			// echo $user_login; exit;
+			$userdata = get_userdatabylogin($user_login);
+
+			if ($user_pass_md5 != '' && ($user_pass_md5 == $userdata['user_pass']))
+			{
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		if (checklogin())
+		{
+			header("Expires: Wed, 5 Jun 1979 23:41:00 GMT"); /* private joke: this is Michel's birthdate - though officially it's on the 6th, since he's on GMT+1 :) */
+			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); /* different all the time */
+			header("Cache-Control: no-cache, must-revalidate"); /* to cope with HTTP/1.1 */
+			header("Pragma: no-cache");
+			header("Location: b2edit.php");
+			exit();
+		}
+		elseif (!empty($_COOKIE[$cookie_user]))
+		{
+			$error = '<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
+		}
+
 	?><html xml:lang="<?php echo locale_lang ?>" lang="<?php echo locale_lang ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
@@ -340,7 +350,8 @@ default:
 <style type="text/css">
 <!--
 <?php
-if (!preg_match("/Nav/",$HTTP_USER_AGENT)) {
+		if (!preg_match("/Nav/",$HTTP_USER_AGENT))
+		{
 ?>
 textarea,input,select {
 	background-color: #f0f0f0;
@@ -351,7 +362,7 @@ textarea,input,select {
 	margin: 1px;
 }
 <?php
-}
+		}
 ?>
 -->
 </style>
@@ -376,16 +387,24 @@ textarea,input,select {
 <tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
 
 <?php
-if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0000\">$error</font><br />&nbsp;</div>";
+		if ($error)
+		{
+			echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0000\">$error</font><br />&nbsp;</div>";
+		}
 ?>
 
 <form name="" action="b2login.php" method="post">
-<?php if ($mode=="bookmarklet") { ?>
+<?php
+		if ($mode=="bookmarklet")
+			{
+?>
 <input type="hidden" name="mode" value="<?php echo $mode ?>" />
 <input type="hidden" name="text" value="<?php echo $text ?>" />
 <input type="hidden" name="popupurl" value="<?php echo $popupurl ?>" />
 <input type="hidden" name="popuptitle" value="<?php echo $popuptitle ?>" />
-<?php } ?>
+<?php
+			}
+?>
 <input type="hidden" name="redirect_to" value="b2edit.php" />
 <input type="hidden" name="action" value="login" />
 <table width="100" style="background-color: #ffffff">
@@ -410,7 +429,7 @@ if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0
 </html>
 	<?php
 
-break;
-}
+	break; // case default
+} // switch
 
 ?>

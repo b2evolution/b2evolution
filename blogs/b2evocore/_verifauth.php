@@ -17,7 +17,7 @@ dbconnect();
 /* checking login & pass in the database */
 function veriflog()
 {
-	global $tableusers,$tablesettings,$tablecategories,$tablecomments, $cookie_user, $cookie_user, $cookie_pass;
+	global $tableusers, $tablesettings, $tablecategories, $tablecomments, $cookie_user, $cookie_user, $cookie_pass;
 	global $error;
 
 	if (!empty($_COOKIE[$cookie_user])) 
@@ -31,24 +31,28 @@ function veriflog()
 		return false;
 	}
 
-	if (!($user_login != ""))
+	if ($user_login == '')
+	{
 		return false;
-	if (!$user_pass_md5)
+	}
+	elseif($user_pass_md5 == '')
+	{
 		return false;
+	}
 
-	$query = " SELECT user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' ";
+	$query = "SELECT user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '" . $user_pass_md5 . "'";
 	$result = @mysql_query($query) or die("Query: $query<br /><br />Error: ".mysql_error());
 
 	$lines = mysql_num_rows($result);
-	if ($lines<1) 
+	if ($lines < 1)
 	{
 		$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login no longer exists');
 		return false;
 	} 
 	else
 	{
-		$res=mysql_fetch_row($result);
-		if ($res[0]==$user_login && md5($res[1])==$user_pass_md5) 
+		$res = mysql_fetch_assoc($result);
+		if ($res['user_login'] == $user_login && $res['user_pass'] == $user_pass_md5)
 		{
 			return true;
 		} else {
@@ -57,9 +61,11 @@ function veriflog()
 		}
 	}
 }
-#if ( $user_login!="" && $user_pass!="" && $id_session!="" && $adresse_ip==$REMOTE_ADDR) {
-#	if ( !(veriflog()) AND !(verifcookielog()) ) {
-	if (!(veriflog())) 
+/*
+if ( $user_login!="" && $user_pass!="" && $id_session!="" && $adresse_ip==$REMOTE_ADDR) {
+	if ( !(veriflog()) AND !(verifcookielog()) ) {
+*/
+	if(!veriflog())
 	{
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -68,5 +74,5 @@ function veriflog()
 		require(dirname(__FILE__).'/'.$pathcore_out.'/'.$backoffice_subdir."/b2login.php");
 		exit();
 	}
-#}
+/* } */
 ?>

@@ -155,16 +155,16 @@ function get_usernumposts($userid)
  */
 function get_currentuserinfo() 
 { // a bit like get_userdata(), on steroids
-	global $user_login,$userdata,$user_level,$user_ID,$user_nickname,$user_email,$user_url,$user_pass_md5, $cookie_user;
+	global $user_login, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url, $user_pass_md5, $cookie_user;
 	// *** retrieving user's data from cookies and db - no spoofing
-	$user_login = $_COOKIE[$cookie_user];
-	$userdata = get_userdatabylogin($user_login);
-	$user_level = $userdata['user_level'];
-	$user_ID=$userdata['ID'];
-	$user_nickname=$userdata["user_nickname"];
-	$user_email=$userdata["user_email"];
-	$user_url=$userdata["user_url"];
-	$user_pass_md5=md5($userdata["user_pass"]);
+	$user_login		= $_COOKIE[$cookie_user];
+	$userdata		= get_userdatabylogin($user_login);
+	$user_level		= $userdata['user_level'];
+	$user_ID			= $userdata['ID'];
+	$user_nickname = $userdata["user_nickname"];
+	$user_email		= $userdata["user_email"];
+	$user_url		= $userdata["user_url"];
+	$user_pass_md5	= $userdata["user_pass"];
 }
 
 

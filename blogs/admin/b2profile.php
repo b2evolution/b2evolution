@@ -2,35 +2,48 @@
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = T_('Profile');
 
-function add_magic_quotes($array) {
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
+function add_magic_quotes($array)
+{
+	foreach ($array as $k => $v)
+	{
+		if (is_array($v))
+		{
 			$array[$k] = add_magic_quotes($v);
-		} else {
+		}
+		else
+		{
 			$array[$k] = addslashes($v);
 		}
 	}
 	return $array;
 }
 
-if (!get_magic_quotes_gpc()) {
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
+if (!get_magic_quotes_gpc())
+{
+	$_GET    = add_magic_quotes($_GET);
+	$_POST   = add_magic_quotes($_POST);
 	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
 }
 
 $b2varstoreset = array('action','standalone','redirect','profile','user');
-for ($i=0; $i<count($b2varstoreset); $i += 1) {
+
+for ($i=0; $i<count($b2varstoreset); $i++)
+{
 	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
+	if (!isset($$b2var))
+	{
+		if (empty($_POST['$b2var']))
+		{
+			if (empty($_GET['$b2var']))
+			{
 				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
+			}
+			else
+			{
+				$$b2var = $_GET['$b2var'];
 			}
 		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
+			$$b2var = $_POST['$b2var'];
 		}
 	}
 }
@@ -38,67 +51,87 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 switch($action) 
 {
 	
-	case "update":
+	case 'update':
 	
 		get_currentuserinfo();
 		
-		if( !isset($demo_mode) ) $demo_mode = 0;
+		if( !isset($demo_mode) )
+		{
+			$demo_mode = 0;
+		}
 		if( $demo_mode && ($user_login == 'demouser'))
 		{
 			die( 'Demo mode: you can\'t edit the demouser profile!'.'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 		}
-	
+
 		/* checking the nickname has been typed */
-		if (empty($HTTP_POST_VARS['newuser_nickname'])) {
+		if (empty($_POST['newuser_nickname']))
+		{
 			die ('<strong>'.T_('ERROR').'</strong>: '.T_('please enter your nickname (can be the same as your login)').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
 	
 		/* if the ICQ UIN has been entered, check to see if it has only numbers */
-		if (!empty($HTTP_POST_VARS['newuser_icq'])) {
-			if ((ereg("^[0-9]+$",$HTTP_POST_VARS["newuser_icq"]))==false) {
+		if (!empty($_POST['newuser_icq']))
+		{
+			if (!ereg("^[0-9]+$", $_POST["newuser_icq"])) {
 				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('your ICQ UIN can only be a number, no letters allowed').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 				return false;
 			}
 		}
 	
 		/* checking e-mail address */
-		if (empty($HTTP_POST_VARS["newuser_email"])) {
+		if (empty($_POST["newuser_email"]))
+		{
 			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('please type your e-mail address').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
-		} else if (!is_email($_POST['newuser_email'])) {
+		}
+		elseif (!is_email($_POST['newuser_email']))
+		{
 			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('the email address isn\'t correct').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
 	
-		if ($HTTP_POST_VARS["pass1"] == "") {
-			if ($HTTP_POST_VARS["pass2"] != "")
+		if ($_POST['pass1'] == '')
+		{
+			if ($_VARS['pass2'] != '')
+			{
 				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.'));
-			$updatepassword = "";
-		} else {
-			if ($HTTP_POST_VARS["pass2"] == "")
-				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.') );
-			if ($HTTP_POST_VARS["pass1"] != $HTTP_POST_VARS["pass2"])
-				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed two different passwords. Go back to correct that.') );
-			$newuser_pass = $HTTP_POST_VARS["pass1"];
-			$updatepassword = "user_pass='$newuser_pass', ";
-			if( !setcookie( $cookie_pass, md5($newuser_pass), $cookie_expires, $cookie_path, $cookie_domain) )
-				printf( T_('setcookie %s failed!'), $cookie_pass ); 
-				echo '<br />';
+			}
+			$updatepassword = '';
 		}
-	
-		$newuser_firstname=addslashes($HTTP_POST_VARS["newuser_firstname"]);
-		$newuser_lastname=addslashes($HTTP_POST_VARS["newuser_lastname"]);
-		$newuser_nickname=addslashes($HTTP_POST_VARS["newuser_nickname"]);
-		$newuser_icq=addslashes($HTTP_POST_VARS["newuser_icq"]);
-		$newuser_aim=addslashes($HTTP_POST_VARS["newuser_aim"]);
-		$newuser_msn=addslashes($HTTP_POST_VARS["newuser_msn"]);
-		$newuser_yim=addslashes($HTTP_POST_VARS["newuser_yim"]);
-		$newuser_email=addslashes($HTTP_POST_VARS["newuser_email"]);
-		$newuser_url=addslashes($HTTP_POST_VARS["newuser_url"]);
-		$newuser_idmode=addslashes($HTTP_POST_VARS["newuser_idmode"]);
-	
-		$query = "UPDATE $tableusers SET user_firstname='$newuser_firstname', ".$updatepassword."user_lastname='$newuser_lastname', user_nickname='$newuser_nickname', user_icq='$newuser_icq', user_email='$newuser_email', user_url='$newuser_url', user_aim='$newuser_aim', user_msn='$newuser_msn', user_yim='$newuser_yim', user_idmode='$newuser_idmode' WHERE ID = $user_ID";
+		else
+		{
+			if ($_POST['pass2'] == '')
+			{
+				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.') );
+			}
+			if ($_POST['pass1'] != $_POST['pass2'])
+			{
+				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed two different passwords. Go back to correct that.') );
+			}
+			$newuser_pass = md5($_POST['pass1']);
+			$updatepassword = "user_pass = '$newuser_pass', ";
+			if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
+			{
+				printf( T_('setcookie %s failed!'), $cookie_pass );
+			}
+
+			echo '<br />';
+		}
+
+      $newuser_firstname = addslashes($_POST['newuser_firstname']);
+		$newuser_lastname  = addslashes($_POST['newuser_lastname']);
+		$newuser_nickname  = addslashes($_POST['newuser_nickname']);
+		$newuser_icq       = addslashes($_POST['newuser_icq']);
+		$newuser_aim       = addslashes($_POST['newuser_aim']);
+		$newuser_msn       = addslashes($_POST['newuser_msn']);
+		$newuser_yim       = addslashes($_POST['newuser_yim']);
+		$newuser_email     = addslashes($_POST['newuser_email']);
+		$newuser_url       = addslashes($_POST['newuser_url']);
+		$newuser_idmode    = addslashes($_POST['newuser_idmode']);
+
+		$query = "UPDATE $tableusers SET user_firstname = '$newuser_firstname', ".$updatepassword."user_lastname='$newuser_lastname', user_nickname='$newuser_nickname', user_icq='$newuser_icq', user_email='$newuser_email', user_url='$newuser_url', user_aim='$newuser_aim', user_msn='$newuser_msn', user_yim='$newuser_yim', user_idmode='$newuser_idmode' WHERE ID = $user_ID";
 		$result = mysql_query($query) or mysql_oops( $query );
 	
 		?>
@@ -110,7 +143,7 @@ switch($action)
 		</html>
 		<?php
 	
-		break;
+	break; // case 'update'
 	
 	
 	case "viewprofile":
@@ -234,7 +267,7 @@ switch($action)
 		</form>
 		<?php
 	
-		break;
+	break; // case 'viewprofile'
 	
 	
 	case 'IErightclick':
@@ -271,7 +304,7 @@ switch($action)
 		</table>
 		<?php
 	
-		break;
+	break; // case 'IErightclick'
 	
 	
 	default:
@@ -392,16 +425,18 @@ switch($action)
 		</td>
 		</tr>
 	<?php
-	if ($user_level > 0) {
+	if($user_level > 0) {
 	?>	<tr>
 	<td><br /><strong><?php echo T_('Bookmarklet') ?></strong><br />
 	<?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
 	<?php
-	if ($is_NS4 || $is_gecko) {
+	if($is_NS4 || $is_gecko) {
 	?>
 	<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2 bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo T_('b2 - bookmarklet') ?></a>
 	<?php
-	} else if ($is_winIE) {
+	}
+	elseif ($is_winIE)
+	{
 	?>
 	<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo T_('b2 - bookmarklet') ?></a>
 	
@@ -418,16 +453,23 @@ switch($action)
 	<a href="javascript:oneclickbookmarklet(0);"><?php echo T_('Click here') ?></a>
 	
 	<?php
-	} else if ($is_opera) {
+	}
+	elseif($is_opera)
+	{
 	?>
 	<a href="javascript:void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo T_('b2 - bookmarklet') ?></a>
 	<?php
-	} else if ($is_macIE) {
+		}
+		elseif($is_macIE)
+		{
 	?>
 	<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(document.getSelection())+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo T_('b2 - bookmarklet') ?></a> <?php
-	}
+		}
 	?>
-	<?php if ($is_gecko) { ?>
+<?php
+		if ($is_gecko)
+		{
+?>
 	<br /><br />
 	<script language="JavaScript">
 		function addPanel()
@@ -440,16 +482,22 @@ switch($action)
 	</script>
 	<strong><?php echo T_('SideBar') ?></strong><br />
 	<?php printf( T_('Add the <a %s>b2 Sidebar</a> !'), 'href="#" onClick="addPanel()"' ); ?>
-	<?php } elseif (($is_winIE) || ($is_macIE)) { ?>
+<?php
+			}
+			elseif($is_winIE || $is_macIE)
+			{
+?>
 	<br /><br />
 	<strong><?php echo T_('SideBar') ?></strong><br />
 	<?php echo T_('Add this link to your favorites:') ?><br /><a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?text='+escape(Q)+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'_search'))"><?php echo T_('b2 Sidebar') ?></a>.
-	<?php } ?>
+<?php
+		}
+?>
 		</td>
 		</tr>
-	<?php
-	}
-	?>	</table>
+<?php
+		}
+?>	</table>
 		</td></tr>
 	<tr>
 		<td colspan="2" align="center"><br /><input class="search" type="submit" value="Update" name="submit"><br /><?php echo T_('Note: closes the popup window.') ?></td>
@@ -459,8 +507,8 @@ switch($action)
 		</form>
 		<?php
 	
-		break;
-}
+	break; // case default
+} // switch($action)
 
 /* </Profile | My Profile> */
 require( dirname(__FILE__).'/_footer.php' ); 

@@ -387,9 +387,9 @@ switch( $action )
 		
 		
 		$random_password = substr(md5(uniqid(microtime())),0,6);
-		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '$random_password', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
+//		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '$random_password', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
 		// once md5 is active: 
-/*		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '".md5($random_password)."', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";*/
+		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '".md5($random_password)."', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "users: OK</p>";
 			
@@ -494,15 +494,11 @@ switch( $action )
 			 * CONTRIBUTORS: If you need some more changes, put them here!
 			 */
 
-/*
 			echo "<p>Encoding passwords... ";
 			$query = "UPDATE $tableusers 
 								SET user_pass = MD5(user_pass)";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
-*/
-
-		
 		}
 		
 		// $new_db_version = 8001; // FOR TESTING
@@ -562,10 +558,15 @@ switch( $action )
 		echo "OK.<br />\n";
 		
 		echo "Copying users... ";
-		$query = "INSERT INTO $tableusers SELECT * FROM $oldtableusers";
+		// $query = "INSERT INTO $tableusers SELECT * FROM $oldtableusers";
 		// after MD5 activation, replace with:
-/*		$query = "INSERT INTO $tableusers( ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, 		user_level,	user_aim, user_msn, user_yim, user_idmode )
-						 SELECT ID, user_login, MD5(user_pass), user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, 		user_level,	user_aim, user_msn, user_yim, user_idmode FROM $oldtableusers"; */
+		$query = "INSERT INTO $tableusers(" .
+						"ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, " .
+						"user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode" .
+					") SELECT " .
+						"ID, user_login, MD5(user_pass), user_firstname, user_lastname, user_nickname, user_icq, user_email, " .
+						"user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode " .
+						"FROM $oldtableusers";
 		
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";

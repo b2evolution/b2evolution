@@ -4,116 +4,143 @@
 require('../conf/b2evo_config.php');
 require( dirname(__FILE__).'/'.$b2inc.'/_functions.php' );
 
-function add_magic_quotes($array) {
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
+function add_magic_quotes($array)
+{
+	foreach ($array as $k => $v)
+	{
+		if (is_array($v))
+		{
 			$array[$k] = add_magic_quotes($v);
-		} else {
+		}
+		else
+		{
 			$array[$k] = addslashes($v);
 		}
 	}
 	return $array;
 }
 
-if (!get_magic_quotes_gpc()) {
+if (!get_magic_quotes_gpc())
+{
 	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
 	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
 	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
 }
 
 $b2varstoreset = array('action');
-for ($i=0; $i<count($b2varstoreset); $i += 1) {
+for ($i=0; $i<count($b2varstoreset); $i++)
+{
 	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
+	if (!isset($$b2var))
+	{
+		if (empty($_POST[$b2var]))
+		{
+			if (empty($_GET[$b2var]))
+			{
 				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
 			}
-		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
+			else
+			{
+				$$b2var = $_GET[$b2var];
+			}
+		}
+		else
+		{
+			$$b2var = $_POST[$b2var];
 		}
 	}
 }
 
-if (!$users_can_register) {
+if (!$users_can_register)
+{
 	$action = 'disabled';
 }
 
-switch($action) {
+switch($action)
+{
+	case 'register':
 
-case "register":
+		function filter($value)	{
+			return ereg("^[a-zA-Z0-9\_-\|]+$",$value);
+		}
 
-	function filter($value)	{
-		return ereg("^[a-zA-Z0-9\_-\|]+$",$value);
-	}
+		$user_login	= $HTTP_POST_VARS['user_login'];
+		$pass1		= $HTTP_POST_VARS['pass1'];
+		$pass2		= $HTTP_POST_VARS['pass2'];
+		$user_email = $HTTP_POST_VARS['user_email'];
+		$user_login = $HTTP_POST_VARS['user_login'];
 
-	$user_login = $HTTP_POST_VARS["user_login"];
-	$pass1 = $HTTP_POST_VARS["pass1"];
-	$pass2 = $HTTP_POST_VARS["pass2"];
-	$user_email = $HTTP_POST_VARS["user_email"];
-	$user_login = $HTTP_POST_VARS["user_login"];
+		/* declaring global fonctions */
+		// global $user_login,$pass1,$pass2,$user_firstname,$user_nickname,$user_icq,$user_email,$user_url;
 
-	/* declaring global fonctions */
-#	global $user_login,$pass1,$pass2,$user_firstname,$user_nickname,$user_icq,$user_email,$user_url;
+		/* checking login has been typed */
+		if($user_login == '')
+		{
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login'));
+		}
 
-	/* checking login has been typed */
-	if ($user_login=='') {
-		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login'));
-	}
+		/* checking the password has been typed twice */
+		if($pass1 == '' || $pass2 == '')
+		{
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter your password twice'));
+		}
 
-	/* checking the password has been typed twice */
-	if ($pass1=='' ||$pass2=='') {
-		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter your password twice'));
-	}
+		/* checking the password has been typed twice the same */
+		if($pass1 != $pass2)
+		{
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type the same password in the two password fields'));
+		}
+		$user_nickname = $user_login;
 
-	/* checking the password has been typed twice the same */
-	if ($pass1!=$pass2)	{
-		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type the same password in the two password fields'));
-	}
-	$user_nickname=$user_login;
+		/* checking e-mail address */
+		if($user_email == '')
+		{
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type your e-mail address'));
+		}
+		elseif (!is_email($user_email))
+		{
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('the email address is invalid'));
+		}
 
-	/* checking e-mail address */
-	if ($user_email=="") {
-		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type your e-mail address'));
-	} else if (!is_email($user_email)) {
-		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('the email address is invalid'));
-	}
+		// Connecting to the db:
+		dbconnect();
 
-	// Connecting to the db:
-	dbconnect();
+		/* checking the login isn't already used by another user */
+		$request =  "SELECT user_login FROM $tableusers WHERE user_login = '$user_login'";
+		$result = mysql_query($request) or mysql_oops( $request );
+		$lines = mysql_num_rows($result);
 
-	/* checking the login isn't already used by another user */
-	$request =  " SELECT user_login FROM $tableusers WHERE user_login = '$user_login'";
-	$result = mysql_query($request) or mysql_oops( $request );
-	$lines = mysql_num_rows($result);
-	mysql_free_result($result);
-	if ($lines>=1) {
-		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one'). "");
-	}
+		mysql_free_result($result);
 
-	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'] ;
-	$user_domain = gethostbyaddr($HTTP_SERVER_VARS['REMOTE_ADDR'] );
-	$user_browser = $HTTP_SERVER_VARS['HTTP_USER_AGENT'];
+		if ($lines >= 1) {
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one'). "");
+		}
 
-	$user_login=addslashes($user_login);
-	$pass1=addslashes($pass1);
-	$user_nickname=addslashes($user_nickname);
+		$user_ip			= $_SERVER['REMOTE_ADDR'];
+		$user_domain	= $_SERVER['REMOTE_HOST'];
+		$user_browser	= $_SERVER['HTTP_USER_AGENT'];
 
-	$query = "INSERT INTO $tableusers (user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) VALUES ('$user_login','$pass1','$user_nickname','$user_email','$user_ip','$user_domain','$user_browser',NOW(),'$new_users_can_blog','nickname')";
-	$result = mysql_query($query) or mysql_oops( $query );
+		$user_login		= addslashes($user_login);
+		$pass1			= addslashes($pass1);
+		$user_nickname	= addslashes($user_nickname);
 
-	$stars="";
-	for ($i = 0; $i < strlen($pass1); $i = $i + 1) {
-		$stars .= "*";
-	}
+		$query = "INSERT INTO $tableusers " .
+					"(user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) " .
+					"VALUES " .
+					"('$user_login', '" . md5($pass1) . "', '$user_nickname', '$user_email', '$user_ip', '$user_domain', '$user_browser', NOW(), '$new_users_can_blog', 'nickname')";
+		$result = mysql_query($query) or mysql_oops( $query );
 
-	$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
-	$message .= T_('Login', $default_locale). ": $user_login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
-	$message .= T_('Manage users', $default_locale). ": $pathserver/b2team.php\n\n";
+		$stars='';
+		for ($i = 0; $i < strlen($pass1); $i++)
+		{
+			$stars .= '*';
+		}
 
-	@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+		$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
+		$message .= T_('Login', $default_locale). ": $user_login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
+		$message .= T_('Manage users', $default_locale). ": $pathserver/b2team.php\n\n";
+
+		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -123,7 +150,8 @@ case "register":
 <style type="text/css">
 <!--
 <?php
-if (!preg_match("/Nav/",$HTTP_USER_AGENT)) {
+		if(strpos($HTTP_USER_AGENT, 'Nav') === false) // if(!preg_match("/Nav/",$HTTP_USER_AGENT))
+		{
 ?>
 textarea,input,select {
 	background-color: #f0f0f0;
@@ -134,7 +162,7 @@ textarea,input,select {
 	margin: 1px;
 }
 <?php
-}
+		}
 ?>
 -->
 </style>
@@ -178,10 +206,10 @@ textarea,input,select {
 </body>
 </html>
 
-	<?php
-break;
+<?php
+	break; // case 'register'
 
-case "disabled":
+	case 'disabled':
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -191,7 +219,8 @@ case "disabled":
 <style type="text/css">
 <!--
 <?php
-if (!preg_match("/Nav/",$HTTP_USER_AGENT)) {
+		if(strpos($HTTP_USER_AGENT, 'Nav') === false) // if(!preg_match("/Nav/",$HTTP_USER_AGENT))
+		{
 ?>
 textarea,input,select {
 	background-color: #f0f0f0;
@@ -202,7 +231,7 @@ textarea,input,select {
 	margin: 1px;
 }
 <?php
-}
+		}
 ?>
 -->
 </style>
@@ -241,10 +270,10 @@ registration disabled<br />
 </body>
 </html>
 
-	<?php
-break;
+<?php
+	break; // case 'disabled'
 
-default:
+	default:
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -254,7 +283,8 @@ default:
 <style type="text/css">
 <!--
 <?php
-if (!preg_match("/Nav/",$HTTP_USER_AGENT)) {
+		if(strpos($HTTP_USER_AGENT, 'Nav') === false) // if(!preg_match("/Nav/",$HTTP_USER_AGENT))
+		{
 ?>
 textarea,input,select {
 	background-color: #f0f0f0;
@@ -265,7 +295,7 @@ textarea,input,select {
 	margin: 1px;
 }
 <?php
-}
+		}
 ?>
 -->
 </style>
@@ -332,7 +362,7 @@ registration<br />
 </html>
 	<?php
 
-break;
-}
+	break; // case default
+} // switch
 
 ?>
