@@ -1,36 +1,40 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{{trans_locale}}}" lang="{{{trans_locale}}}">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="@@(lang)@@" lang="@@(lang)@@">
 <head>
-<!-- TemplateBeginEditable name="doctitle" -->
-<meta http-equiv="Content-Type" content="text/html; charset={{{trans_charset}}}" />
-<title>{{{my b2evolution:}}}</title>
-<!-- TemplateEndEditable --><link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
-
-<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
-<!-- TemplateParam name="lang" type="text" value="en" passthrough="true" -->
+	<!-- TemplateBeginEditable name="doctitle" -->
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>{{{b2evo package}}}:</title>
+	<!-- TemplateEndEditable --><link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
+	<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
+	<!-- TemplateParam name="lang" type="text" value="en-EU" passthrough="true" --> 
 </head>
 <body>
-<div id="rowheader" >
-<h1><a href="http://b2evolution.net/" title="b2evolution: {{{Project Site}}}"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-<div id="tagline">{{{Multilingual multiuser multi-blog engine.}}}</div>
-<h1 id="version">{{{Version}}}: 0.9-CVS</h1>
-<div id="quicklinks">
-	{{{Setup Links:}}} <a href="../index.src.html">{{{My b2evo}}}</a> 
-	&middot; <a href="http://b2evolution.net/man/">{{{Online Manual}}}</a>
-	&middot; <a href="../blogs/install/install.php?locale={{{trans_locale}}}">{{{My DB Install}}}</a>
-	&middot; <a href="../blogs/index.php">{{{My Blogs}}}</a>
-	&middot; <a href="../blogs/admin/b2edit.php">{{{My Back-Office}}}</a></div>
-</div>
-<div class="installSideBar">
-	<p>{{{Available translations for this page:}}}</p>
-	{{{trans_available}}}
-</div>
-<!-- TemplateBeginEditable name="Main" -->
-<h2>Main</h2>
-<!-- TemplateEndEditable -->
-<div id="rowfooter">
-<a href="http://b2evolution.net/">{{{official website}}}</a> &middot; <a href="http://b2evolution.net/about/license.html">{{{GNU GPL license}}}</a> &middot; <a href="http://fplanque.net/About/index.html">{{{contact:}}} Fran&ccedil;ois PLANQUE</a>
-</div>
-
+	<div id="rowheader" >
+		<h1><a href="http://b2evolution.net/" title="{{{b2evolution: official site}}}"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
+		<div id="tagline">{{{Multilingual multiuser multi-blog engine.}}}</div>
+		<h1 id="version">{{{Version}}}: 0.9</h1>
+		<div id="quicklinks">
+			{{{b2evo package}}}: 
+			<a href="../index.src.html">{{{Start page}}}</a> &middot; 
+			<a href="../blogs/install/index.php?locale=%7B%7B%7Btrans_locale%7D%7D%7D">{{{Install}}}</a> &middot; 
+			<a href="../blogs/index.php">{{{Blogs}}}</a> &middot; 
+			<a href="../blogs/admin/">{{{Admin}}}</a> &middot; 
+			{{{Online}}}: 
+			<a href="http://b2evolution.net/man/">{{{Manual}}}</a> &middot; 
+			<a href="http://b2evolution.net/man/supportfaq.html">{{{Support}}}</a> 
+		</div>
+	</div>
+	<div class="installSideBar">
+		<p>{{{Available translations for this page:}}}</p>
+		{{{trans_available}}}
+	</div>
+	<!-- TemplateBeginEditable name="Main" -->
+	<h1>Main</h1>
+	<!-- TemplateEndEditable -->
+	<div id="rowfooter">
+		<a href="http://b2evolution.net/">{{{official website}}}</a> &middot; 
+		<a href="http://b2evolution.net/about/license.html">{{{GNU GPL license}}}</a> &middot; 
+		<a href="http://fplanque.net/About/index.html">{{{contact}}}: Fran&ccedil;ois PLANQUE</a>
+	</div>
 </body>
 </html>
