@@ -15,7 +15,7 @@
 require_once (dirname(__FILE__). '/_main.php');
 
 // Getting GET or POST parameters:
-param( 'blog', 'integer', $default_to_blog, true );
+param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'm', 'integer', '', true );              // YearMonth(Day) to display
 param( 'w', 'integer', -1, true );              // Week number

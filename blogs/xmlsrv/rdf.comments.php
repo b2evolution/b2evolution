@@ -18,7 +18,7 @@
 	 */
 	require dirname(__FILE__).'/../b2evocore/_blog_main.php' ;
 	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
-	header("Content-type: text/xml");
+	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?".">";
 ?>
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->

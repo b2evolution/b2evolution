@@ -91,59 +91,59 @@
 	{	
 	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $id, '', 'ASC' );
 	
-	$CommentList->display_if_empty( 
+	if( ! $CommentList->display_if_empty( 
 								'<div class="bComment"><p>' . 
 								sprintf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */ 
 													T_('No %s for this post yet...'), implode( "/", $disp_title) ) . 
-								'</p></div>' );
-
-	echo '<ol id="commentlist">';
-
-	while( $Comment = $CommentList->get_next() )
-	{	// Loop through comments:	
-		?>
-		<!-- ========== START of a COMMENT/TB/PB ========== -->
-		<li>
-			<?php $Comment->anchor() ?>
-			<?php $Comment->content() ?>
-			<p><cite>
-			<?php
-				switch( $Comment->get( 'type' ) )
-				{
-					case 'comment': // Display a comment: 
-						echo T_('Comment by') ?> 
-						<?php $Comment->author() ?> 
-						<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
-						<?php break;
-
-					case 'trackback': // Display a trackback:
-						echo T_('Trackback from') ?> 
-						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
-						<?php break;
-
-					case 'pingback': // Display a pingback:
-						echo T_('Pingback from') ?> 
-						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
-						<?php break;
-				} 
-			?>
-			&#8212; 
-			<?php $Comment->date() ?> @ <a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><?php $Comment->time( 'H:i' ) ?></a>
-			<?php $Comment->edit_link( ' | ', '', T_('Edit This') ) // Link to backoffice for editing ?>
-			</cite></p>
-		</li>
-		<!-- ========== END of a COMMENT/TB/PB ========== -->
-		<?php
-	} 
-	echo '</ol>';
+								'</p></div>' ) )
+	{
+		echo '<ol id="commentlist">';
 	
+		while( $Comment = $CommentList->get_next() )
+		{	// Loop through comments:	
+			?>
+			<!-- ========== START of a COMMENT/TB/PB ========== -->
+			<li>
+				<?php $Comment->anchor() ?>
+				<?php $Comment->content() ?>
+				<p><cite>
+				<?php
+					switch( $Comment->get( 'type' ) )
+					{
+						case 'comment': // Display a comment: 
+							echo T_('Comment by') ?> 
+							<?php $Comment->author() ?> 
+							<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
+							<?php break;
+	
+						case 'trackback': // Display a trackback:
+							echo T_('Trackback from') ?> 
+							<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
+							<?php break;
+	
+						case 'pingback': // Display a pingback:
+							echo T_('Pingback from') ?> 
+							<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
+							<?php break;
+					} 
+				?>
+				&#8212; 
+				<?php $Comment->date() ?> @ <a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><?php $Comment->time( 'H:i' ) ?></a>
+				<?php $Comment->edit_link( ' | ', '', T_('Edit This') ) // Link to backoffice for editing ?>
+				</cite></p>
+			</li>
+			<!-- ========== END of a COMMENT/TB/PB ========== -->
+			<?php
+		} 
+		echo '</ol>';
+	}	
 	
 	if( $disp_comment_form ) 
 	{	// We want to display the comments form: 
 		if( $Item->can_comment() )
 		{ // User can leave a comment
 		?>
-		<h2 id="postcomment"><?php echo T_('Leave a comment') ?></h4>
+		<h2 id="postcomment"><?php echo T_('Leave a comment') ?></h2>
 
 		<p><?php echo T_('Allowed XHTML tags'), ': <code>', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></code><br />
 		<?php echo T_('URLs, email, AIM and ICQs will be converted automatically.') ?></p>

@@ -18,7 +18,7 @@
 	 * Initialize everything:
 	 */
 	require dirname(__FILE__).'/../b2evocore/_blog_main.php' ;
-	header("Content-type: text/xml");
+	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\"?".">";
 ?>
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->

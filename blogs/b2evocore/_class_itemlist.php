@@ -858,6 +858,7 @@ class ItemList extends DataObjectList
 	 * {@internal ItemList::display_if_empty(-) }}
 	 *
 	 * @param string String to display if list is empty
+   * @return true if empty
 	 */
 	function display_if_empty( $message = '' )
 	{
@@ -866,7 +867,7 @@ class ItemList extends DataObjectList
 			$message = T_('Sorry, there is no post to display...');
 		}
 
-		parent::display_if_empty( $message );
+		return parent::display_if_empty( $message );
 	}
 }
 ?>

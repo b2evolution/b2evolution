@@ -46,7 +46,7 @@
 			<div class="label"><label for="newuser_idmode"><?php echo T_('Identity shown') ?>:</label></div>
 			<div class="input">
 				<?php $idmode = get_user_info( 'idmode' ); ?>
-				<select name="newuser_idmode" class="bComment">
+				<select name="newuser_idmode" id="newuser_idmode" class="bComment">
 					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php if( user_info( 'nickname', 'raw', false ) != '' ) user_info( 'nickname', 'htmlhead' ); else echo '['.T_('Nickname').']' ?></option>
 					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php if( user_info( 'login', 'raw', false ) != '' ) user_info( 'login', 'htmlhead' ); else echo '['.T_('Login').']' ?></option>
 					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php if( user_info( 'firstname', 'raw', false ) != '' ) user_info( 'firstname', 'htmlhead' ); else echo '['.T_('First name').']' ?></option>
@@ -82,12 +82,11 @@
 
 		<fieldset>
 			<div class="input">
-				<input type="submit" class="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-				<input type="reset" class="reset" value="<?php echo T_('Reset') ?>" class="search" />
+				<input type="submit" class="submit" name="submit" value="<?php echo T_('Update') ?>" />
+				<input type="reset" class="reset" value="<?php echo T_('Reset') ?>" />
 			</div>
 		</fieldset>
 
 		<div class="clear"></div>
 
 	</form>
-

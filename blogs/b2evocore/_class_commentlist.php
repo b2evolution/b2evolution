@@ -135,15 +135,16 @@ class CommentList extends DataObjectList
 	 * {@internal Comment::display_if_empty(-) }}
 	 *
 	 * @param string String to display if list is empty
+   * @return true if empty
 	 */
 	function display_if_empty( $message = '' )
 	{
-		if( empty($message) ) 
+		if( empty($message) )
 		{	// Default message:
 			$message = T_('No comment yet...');
 		}
 
-		parent::display_if_empty( $message );
+		return parent::display_if_empty( $message );
 	}
 
 }

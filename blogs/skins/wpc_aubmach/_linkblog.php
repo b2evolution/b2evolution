@@ -31,8 +31,8 @@
 	if(!isset($linkblog_main_end)) $linkblog_main_end = '';
 	# Category delimiters:
 	if(!isset($linkblog_catname_before)) $linkblog_catname_before = '<li>';
-	if(!isset($linkblog_catname_after)) $linkblog_catname_after = '</li><ul>';
-	if(!isset($linkblog_catlist_end)) $linkblog_catlist_end = '</ul>';
+	if(!isset($linkblog_catname_after)) $linkblog_catname_after = '<ul>';
+	if(!isset($linkblog_catlist_end)) $linkblog_catlist_end = '</ul></li>';
 	# Item delimiters:
 	if(!isset($linkblog_item_before)) $linkblog_item_before = '<li>';
 	if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';

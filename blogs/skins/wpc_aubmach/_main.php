@@ -34,11 +34,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 <meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 <meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
-<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( '../custom/rdf_url', 'raw' ) ?>" />
-<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( '../custom/rss_url', 'raw' ) ?>" />
-<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( '../custom/rss2_url', 'raw' ) ?>" />
-<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( '../custom/atom_url', 'raw' ) ?>" />
-<link rel="pingback" href="<?php $Blog->disp( '../custom/pingback_url', 'raw' ) ?>" />
+<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
+<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
+<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
+<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
+<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 
 <style type="text/css">
 	@import url(../../rsc/img.css);	/* Import standard image styles */
