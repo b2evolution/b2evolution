@@ -13,7 +13,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-class linklogger_Rendererplugin extends Plugin
+class linklogger_plugin extends Plugin
 {
 	var $code = 'b2evLLog';
 	var $name = 'Linklogger';
@@ -29,9 +29,9 @@ class linklogger_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal linklogger_Rendererplugin::linklogger_Rendererplugin(-)}}
+	 * {@internal linklogger_plugin::linklogger_plugin(-)}}
 	 */
-	function linklogger_Rendererplugin()
+	function linklogger_plugin()
 	{
 		global $Settings;
 
@@ -57,7 +57,7 @@ class linklogger_Rendererplugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal linklogger_Rendererplugin::render(-)}}
+	 * {@internal linklogger_plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -194,8 +194,4 @@ class linklogger_Rendererplugin extends Plugin
 	}
 
 }
-
-// Register the plugin:
-$this->register( new linklogger_Rendererplugin() );
-
 ?>
