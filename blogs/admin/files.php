@@ -492,7 +492,15 @@ switch( $Fileman->getMode() )
 		}
 
 		$LogUpload = new Log( 'error' );
-		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ) );
+		
+		if ( trim( $Settings->get( 'upload_allowedext' ) ) == '') 
+		{
+		  // This is a kludge. For some reason on my setup, this is the only way to upload a file
+		  //   when the $Settings->get( 'upload_allowedext' ) is blank.
+		  $allowedFileExtensions = '';
+		} else {
+		  $allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ) );
+		}
 		$allowedMimeTypes = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedmime' ) ) );
 
 		/**
@@ -1187,6 +1195,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.73  2005/02/11 20:27:51  jwedgeco
+ * I added a kludge. For some reason on my setup, the empty() php funtion doesn't work on $allowedFileExtensions when $settings->get(upload_allowedext) is blank.
+ *
  * Revision 1.72  2005/02/08 01:06:52  blueyed
  * fileupload reworked, fixed "Display FM" / "Leave mode" buttons
  *
