@@ -58,12 +58,12 @@ default:
 	<fieldset>
 		<legend><?php echo T_('Regional settings') ?></legend>
 	
-		<?php form_text( 'newtime_difference', $time_difference, 3, T_('Time difference'), T_('If you\'re not on the timezone of your server.') );?>
+		<?php form_text( 'newtime_difference', $time_difference, 3, T_('Time difference'), sprintf( T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ) );?>
 
 	</fieldset>
 	
 	<fieldset>
-		<legend><?php echo T_('Deprecated options') ?></legend>
+		<legend><?php echo T_('Post options') ?></legend>
 			<table cellpadding="5" cellspacing="0">
 			<tr height="40">
 				<td width="150" height="40"><?php echo T_('Show') ?>:</td>
