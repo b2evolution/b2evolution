@@ -26,6 +26,7 @@ code {
 
 
 .nobr,
+.nowrap,
 .line
 {
 	white-space: nowrap;
