@@ -550,38 +550,51 @@ if( ! $current_User->check_perm( 'users', 'view', false ) )
 else
 { // User is allowed to view users:
 
-	// TODO: move this to a switch( $action )...
+	// TODO: move this upward in this file:
+	if( $group != 0 )
+		$action = 'edit_group';
+	elseif( $user != 0 )
+		$action = 'edit_user';
 
-	if( ($group != 0) || ($action == 'newgroup')  )
-	{ // display group form
-		if( !isset($edited_Group) )
-		{
-			$edited_Group = $GroupCache->get_by_ID( $group );
-		}
-		require dirname(__FILE__).'/_users_groupform.php';
-	}
-	elseif( $user != 0 || ($action == 'newuser') )
-	{ // Display user form
-		if( !isset($edited_User) )
-		{
-			$edited_User = & $UserCache->get_by_ID( $user );
-		}
+	// display appropriate payload:
+	switch( $action )
+	{
+		case 'newgroup':
+		case 'edit_group':
+			// Display group form:
+			if( !isset($edited_Group) )
+			{
+				$edited_Group = $GroupCache->get_by_ID( $group );
+			}
+			require dirname(__FILE__).'/_users_groupform.php';
+			break;
 
-		require dirname(__FILE__).'/_users_form.php';
-	}
-	else
-	{	// users list
-		// fplanque>> note: we don't want this (potentially very long) list to be displayed again and again)
-		if( $current_User->check_perm( 'users', 'view', false ) )
-		{ // Display user list:
-			require dirname(__FILE__).'/_users_list.php';
-		}
+		case 'newuser':
+		case 'edit_user':
+			// Display user form:
+			if( !isset($edited_User) )
+			{
+				$edited_User = & $UserCache->get_by_ID( $user );
+			}
+			require dirname(__FILE__).'/_users_form.php';
+			break;
+
+		default:
+			// Users list:
+			// fplanque>> note: we don't want this (potentially very long) list to be displayed again and again)
+			if( $current_User->check_perm( 'users', 'view', false ) )
+			{ // Display user list:
+				require dirname(__FILE__).'/_users_list.php';
+			}
 	}
 }
 
 require dirname(__FILE__).'/_footer.php';
 /*
  * $Log$
+ * Revision 1.83  2005/03/22 15:08:03  fplanque
+ * "standardized" to switch($action)
+ *
  * Revision 1.82  2005/03/21 18:57:24  fplanque
  * user management refactoring (towards new evocore coding guidelines)
  * WARNING: some pre-existing bugs have not been fixed here
