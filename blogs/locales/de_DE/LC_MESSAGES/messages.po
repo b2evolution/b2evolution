@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "POT-Creation-Date: 2004-05-07 02:06+0200\n"
-"PO-Revision-Date: 2004-05-07 21:06+0100\n"
+"PO-Revision-Date: 2004-05-08 00:17+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr "Willkommen zu b2evolution"
 
 #: ..\..\..\default.php:35
 msgid "This is the default homepage for b2evolution. It will be displayed as long as you don't select a default blog in the general settings."
-msgstr ""
+msgstr "Dies ist die Standard-Homepage für b2evolution. Sie wird solange angezeigt, bis du ein Standard-Blog in den generellen Einstellungen festlegst."
 
 #: ..\..\..\default.php:38
 msgid "Individual blogs on this system"
@@ -72,7 +72,7 @@ msgstr "Zusammenfassung der letzten Einträge aller Blogs"
 
 #: ..\..\..\default.php:80
 msgid "The page you're looking at"
-msgstr ""
+msgstr "Die Seite die du gerade betrachtest"
 
 #: ..\..\..\default.php:82
 msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
@@ -1669,9 +1669,8 @@ msgid "Default skin"
 msgstr "Standard-Skin"
 
 #: ..\..\..\admin\_blogs_form.php:21
-#, fuzzy
 msgid "This is the default skin that will be used to display this blog."
-msgstr "Das ist die Hauptvorlage. Sie zeigt das Blog an."
+msgstr "Das ist das Default-Skin, das benutzt wird um das Blog anzuzeigen."
 
 #: ..\..\..\admin\_blogs_form.php:23
 msgid "Allow skin switching"
@@ -1723,9 +1722,8 @@ msgid "This is displayed on the blog template."
 msgstr "Dies wird in der Blogvorlage angezeigt."
 
 #: ..\..\..\admin\_blogs_form.php:47
-#, fuzzy
 msgid "Blogroll text"
-msgstr "Blogroll"
+msgstr "Blogroll-Text"
 
 #: ..\..\..\admin\_blogs_list.php:16
 msgid "Blog"
@@ -1813,9 +1811,8 @@ msgid "General parameters"
 msgstr "Generelle Parameter"
 
 #: ..\..\..\admin\_blogs_main.subform.php:15
-#, fuzzy
 msgid "Will be displayed on top of the blog."
-msgstr "Dies wird in der Blogvorlage angezeigt."
+msgstr "Wird ganz oben im Blog angezeigt."
 
 #: ..\..\..\admin\_blogs_main.subform.php:16
 msgid "Short Name"
@@ -1831,7 +1828,7 @@ msgstr "Haupt-Locale"
 
 #: ..\..\..\admin\_blogs_main.subform.php:17
 msgid "Determines the language of the navigation links on the blog."
-msgstr ""
+msgstr "Legt die Sprache der Navigations-Links fürs Blog fest."
 
 #: ..\..\..\admin\_blogs_main.subform.php:22
 msgid "Access parameters"
@@ -1839,7 +1836,7 @@ msgstr "Zugangsparameter"
 
 #: ..\..\..\admin\_blogs_main.subform.php:26
 msgid "Default blog on index.php"
-msgstr ""
+msgstr "Standard-Blog auf index.php"
 
 #: ..\..\..\admin\_blogs_main.subform.php:27
 msgid "Other blog through index.php"
@@ -1851,7 +1848,7 @@ msgstr ""
 
 #: ..\..\..\admin\_blogs_main.subform.php:30
 msgid "Preferred access type"
-msgstr ""
+msgstr "Bevorzugter Zugriffstyp"
 
 #: ..\..\..\admin\_blogs_main.subform.php:34
 msgid "Blog Folder URL"
@@ -1859,11 +1856,11 @@ msgstr "Blog Ordner URL"
 
 #: ..\..\..\admin\_blogs_main.subform.php:36
 msgid "No trailing slash. (If you don't know, leave this field empty.)"
-msgstr ""
+msgstr "Kein anhängenden Slash am Ende. (Wenn du nicht weisst, lass dieses Feld leer.)"
 
 #: ..\..\..\admin\_blogs_main.subform.php:40
 msgid "URL blog name / Stub name"
-msgstr ""
+msgstr "URL Blog-Name / Stub-Name"
 
 #: ..\..\..\admin\_blogs_main.subform.php:40
 msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
@@ -2582,9 +2579,8 @@ msgid "Display options"
 msgstr "Anzeige-Optionen"
 
 #: ..\..\..\admin\_set_general.form.php:31
-#, fuzzy
 msgid "Default blog to display"
-msgstr "Standard Anzeigeoptionen"
+msgstr "Standard-Blog zum Anzeigen"
 
 #: ..\..\..\admin\_set_general.form.php:31
 msgid "This blog will be displayed on index.php ."
@@ -2640,7 +2636,7 @@ msgstr "Benutze Extra-Path Info"
 
 #: ..\..\..\admin\_set_general.form.php:55
 msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
-msgstr ""
+msgstr "Empfohlen, falls dein Webserver es unterstützt. Links werden wie 'stub/2003/05/20/beitrag_titel' aussehen, anstelle von 'stub?title=beitrag_title&c=1&tb=1&pb=1&more=1'."
 
 #: ..\..\..\admin\_set_general.form.php:58
 msgid "Post called up by its URL title (Recommended)"
@@ -2663,18 +2659,16 @@ msgid "Permalink type"
 msgstr "Permalink-Typ"
 
 #: ..\..\..\admin\_set_general.form.php:67
-#, fuzzy
 msgid "Security options"
-msgstr "Beschreibung"
+msgstr "Sicherheits-Optionen"
 
 #: ..\..\..\admin\_set_general.form.php:69
 msgid "Minimum password length"
-msgstr ""
+msgstr "Minimale Passwortlänge"
 
 #: ..\..\..\admin\_set_general.form.php:69
-#, fuzzy
 msgid "for users."
-msgstr "Gruppe für neue Benutzer"
+msgstr "für Benutzer."
 
 #: ..\..\..\admin\_set_general.form.php:78
 #: ..\..\..\admin\_set_plugins.form.php:68
@@ -2715,7 +2709,7 @@ msgstr "Ändere Locale"
 #: ..\..\..\admin\_set_regional.form.php:46
 #, php-format
 msgid "The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>."
-msgstr ""
+msgstr "Die ersten zwei Buchstaben sollten ein <a %s>ISO 639 Sprachcode</a> sein. Die letzten zwei Buchstaben sollten ein <a %s>ISO 3166 Ländercode</a> sein."
 
 #: ..\..\..\admin\_set_regional.form.php:47
 #: ..\..\..\admin\_set_regional.form.php:121
@@ -2724,7 +2718,7 @@ msgstr "Eingeschaltet"
 
 #: ..\..\..\admin\_set_regional.form.php:48
 msgid "should the locale be available?"
-msgstr ""
+msgstr "soll diese Locale verfügbar sein?"
 
 #: ..\..\..\admin\_set_regional.form.php:50
 msgid "name of the locale"
@@ -2738,7 +2732,7 @@ msgstr "Zeichensatz"
 #: ..\..\..\admin\_set_regional.form.php:52
 #, php-format
 msgid "the charset for this locale. see <a %s>the specs</a>"
-msgstr ""
+msgstr "der Zeichensatz für diese Locale, siehe <a %s>Format-Beschreibung</a>"
 
 #: ..\..\..\admin\_set_regional.form.php:53
 msgid "Date format"
@@ -2747,7 +2741,7 @@ msgstr "Datumsformat"
 #: ..\..\..\admin\_set_regional.form.php:54
 #, php-format
 msgid "the date format, see <a %s>the specs</a>"
-msgstr ""
+msgstr "das Datumsformat, siehe <a %s>Format-Beschreibung</a>"
 
 #: ..\..\..\admin\_set_regional.form.php:55
 msgid "Time format"
@@ -2756,7 +2750,7 @@ msgstr "Zeitformat"
 #: ..\..\..\admin\_set_regional.form.php:56
 #, php-format
 msgid "the time format, see <a %s>the specs</a>"
-msgstr ""
+msgstr "das Zeitformat, siehe <a %s>Format-Beschreibung</a>"
 
 #: ..\..\..\admin\_set_regional.form.php:57
 #: ..\..\..\admin\_set_regional.form.php:146
@@ -2887,9 +2881,8 @@ msgid "Edit locale"
 msgstr "Editiere Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:194
-#, fuzzy
 msgid "Reset custom settings"
-msgstr "Regionale Einstellungen"
+msgstr "verwerfe Anpassungen"
 
 #: ..\..\..\admin\_set_regional.form.php:205
 msgid "No language file..."
@@ -3254,9 +3247,8 @@ msgid "one post in this month"
 msgstr "ein Eintrag in diesem Monat"
 
 #: ..\..\..\b2evocore\_class_calendar.php:283
-#, fuzzy
 msgid "previoust month"
-msgstr "Voriger Eintrag"
+msgstr "voriger Monat"
 
 #: ..\..\..\b2evocore\_class_calendar.php:287
 msgid "next month"
@@ -3289,7 +3281,7 @@ msgstr "Noch kein Kommentar..."
 
 #: ..\..\..\b2evocore\_class_dataobjectlist.php:117
 msgid "Sorry, there is nothing to display..."
-msgstr ""
+msgstr "Sorry, es gibt nichts anzuzeigen..."
 
 #: ..\..\..\b2evocore\_class_db.php:125
 #: ..\..\..\b2evocore\_functions.php:60
@@ -3430,7 +3422,7 @@ msgstr "Ungültiger Eintrag, bitte korrigiere diese Fehler:"
 
 #: ..\..\..\b2evocore\_class_itemlist.php:817
 msgid "Sorry, there is no post to display..."
-msgstr ""
+msgstr "Sorry, es gibt keinen Beitrag anzuzeigen..."
 
 #: ..\..\..\b2evocore\_class_pop3.php:78
 #: ..\..\..\b2evocore\_class_pop3.php:86
@@ -3615,7 +3607,7 @@ msgstr "Befehl fehlgeschlagen"
 
 #: ..\..\..\b2evocore\_class_settings.php:38
 msgid "Sorry, your b2evolution database does not match the script version."
-msgstr ""
+msgstr "Sorry, deine b2evolution Datenbank passt nicht zur Version des Scripts."
 
 #: ..\..\..\b2evocore\_class_user.php:58
 msgid "New user"
@@ -4337,7 +4329,6 @@ msgid "Connecting to pop server..."
 msgstr "Verbinde zum POP-Server..."
 
 #: ..\..\..\htsrv\getmail.php:30
-#, fuzzy
 msgid "Connection failed: "
 msgstr "Verbindung fehlgeschlagen:"
 
@@ -4608,9 +4599,8 @@ msgid "Register!"
 msgstr "Anmelden!"
 
 #: ..\..\..\htsrv\_reg_form.php:53
-#, fuzzy
 msgid "Log into existing account..."
-msgstr "Melde dich an, wenn du einen Account hast..."
+msgstr "In vorhandenen Account einloggen..."
 
 #: ..\..\..\install\index.php:49
 msgid "b2evo installer"
@@ -4618,7 +4608,7 @@ msgstr "b2evo Installer"
 
 #: ..\..\..\install\index.php:56
 msgid "Installer for version "
-msgstr ""
+msgstr "Installer für Version"
 
 #: ..\..\..\install\index.php:65
 msgid "Language/Locale"
@@ -4626,7 +4616,7 @@ msgstr "Sprache/Locale"
 
 #: ..\..\..\install\index.php:66
 msgid "Choose a default language/locale for your b2evo installation."
-msgstr ""
+msgstr "Wähle eine Standard-Sprache/Locale für deine b2evo Installation."
 
 #: ..\..\..\install\index.php:95
 #, php-format
@@ -4636,7 +4626,7 @@ msgstr ""
 #: ..\..\..\install\index.php:100
 #, php-format
 msgid "Could not connect to database! Check you settings in <code>%s</code>!"
-msgstr ""
+msgstr "Konnte nicht zur Datenbank verbinden! Überprüfe deine Einstellungen in <code>%s</code>!"
 
 #: ..\..\..\install\index.php:113
 msgid "First time install"
@@ -4644,15 +4634,15 @@ msgstr "Erste Installation"
 
 #: ..\..\..\install\index.php:114
 msgid "PHP version"
-msgstr ""
+msgstr "PHP Version"
 
 #: ..\..\..\install\index.php:115
 msgid "These are your settings from the config file:"
-msgstr ""
+msgstr "Das sind deine Einstellungen aus der Config-Datei:"
 
 #: ..\..\..\install\index.php:117
 msgid "(If you don't see correct settings here, STOP before going any further, and check your configuration.)"
-msgstr ""
+msgstr "(Falls du hier keine korrekten Werte siehst, HÖR AUF weiterzumachen und überprüfe deine Konfiguration.)"
 
 #: ..\..\..\install\index.php:121
 msgid "Host"
@@ -4672,7 +4662,7 @@ msgstr "Passwort"
 
 #: ..\..\..\install\index.php:124
 msgid "(Set, but not shown for security reasons)"
-msgstr ""
+msgstr "(Gesetzt, aber aus Sicherheitsgründen nicht angezeigt)"
 
 #: ..\..\..\install\index.php:137
 msgid "What do you want to install?"
@@ -4684,20 +4674,19 @@ msgstr ""
 
 #: ..\..\..\install\index.php:144
 msgid "<strong>New Install</strong>: Install b2evolution database tables with sample data."
-msgstr ""
+msgstr "<strong>Neue Installation</strong>: Installiere b2evolution Datenbank-Tabellen mit Beispieldaten."
 
 #: ..\..\..\install\index.php:147
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!"
-msgstr ""
+msgstr "<strong>Upgrade von einer früheren b2evolution Version</strong>: Upgrade deine Datenbank-Tabellen um sie mit der jetzigen Version kompatibel zu machen!"
 
 #: ..\..\..\install\index.php:150
 msgid "<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them."
-msgstr ""
+msgstr "<strong>Upgrade von Cafelog/b2 v 0.6.x</strong>: Installiere b2evolution Datenbank-Tabellen und kopiere deine vorhandenen Cafelog/b2 Daten dort hinein."
 
 #: ..\..\..\install\index.php:156
-#, fuzzy
 msgid "Delete b2evolution tables"
-msgstr "mein b2evolution"
+msgstr "Lösche b2evolution Tabellen"
 
 #: ..\..\..\install\index.php:157
 msgid ""
@@ -4709,7 +4698,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:165
 msgid "Install Database Tables Now !"
-msgstr ""
+msgstr "Installiere jetzt die Datenbank-Tabellen !"
 
 #: ..\..\..\install\index.php:171
 msgid ""
@@ -4724,7 +4713,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:189
 msgid "Installing b2evolution tables with sample data"
-msgstr ""
+msgstr "Installiere b2evolution mit Beispieldaten"
 
 #: ..\..\..\install\index.php:194
 msgid "Installation successful!"
@@ -4772,9 +4761,8 @@ msgid "Back to menu"
 msgstr "Zurück zum Menu"
 
 #: ..\..\..\install\index.php:263
-#, fuzzy
 msgid "Reset done!"
-msgstr "zurücksetzen"
+msgstr ""
 
 #: ..\..\..\install\_functions_cafelogupgrade.php:33
 #, php-format
@@ -5011,19 +4999,19 @@ msgstr "Hi, dies ist ein Kommentar.<br />Um einen Kommentar zu löschen, log dich
 
 #: ..\..\..\install\_functions_install.php:26
 msgid "Checking DB schema version..."
-msgstr ""
+msgstr "Überprüfe DB-Schema Version..."
 
 #: ..\..\..\install\_functions_install.php:38
 msgid "NOT FOUND! This is not a b2evolution database."
-msgstr ""
+msgstr "NICHT GEFUNDEN! Dies ist keine b2evolution-Datenbank."
 
 #: ..\..\..\install\_functions_install.php:42
 msgid "This version is too old!"
-msgstr ""
+msgstr "Diese Version ist zu alt!"
 
 #: ..\..\..\install\_functions_install.php:43
 msgid "This version is too recent! We cannot downgrade to it!"
-msgstr ""
+msgstr "Diese Version ist zu neu! Wir können nicht dorthin downgraden!"
 
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:54
 msgid "INSerted [Alt-I]"

@@ -148,7 +148,17 @@ else
 				echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />';
 				locale_flag( $lkey );
 				echo'
-				<strong>'.$lkey.'</strong>
+				<strong>';
+				if( $current_User->check_perm( 'options', 'edit' ) )
+				{
+					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale='.$lkey.'" title="'.T_('Edit locale').'">';
+				}
+				echo $lkey;
+				if( $current_User->check_perm( 'options', 'edit' ) )
+				{
+					echo '</a>';
+				}
+				echo '</strong>
 			</td>
 			<td>
 				<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />

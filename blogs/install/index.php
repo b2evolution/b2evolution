@@ -438,7 +438,7 @@ to
 		db_delete();
 		?>
 	  <p><?php echo T_('Reset done!')?></p>
-	  <p><a href="install.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
+	  <p><a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
 	  <?php
 		break;
 }
