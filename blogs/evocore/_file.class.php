@@ -35,6 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
  *
  * @version $Id$
  *
@@ -98,7 +99,7 @@ $fm_filetypes = array( // {{{
  * @param string path of the file or directory
  * @return File an {@link File} object
  */
-function &getFile( $name, $path = NULL )
+function & getFile( $name, $path = NULL )
 {
 	global $cache_File;
 
@@ -133,8 +134,13 @@ function &getFile( $name, $path = NULL )
  *
  * @package evocore
  */
-class File
+class File extends DataObject
 {
+	/**
+	 * We haven't checked for meta data yet
+	 */
+	var	$meta = 'unknown';
+
 	/**
 	 * Cached iconfile name
 	 * @todo why do we use underscores for these??
@@ -150,16 +156,20 @@ class File
 	var $_perms;
 
 	/**
-	 * Constructor, not to be meant to called directly. Use {@link getFile()}
+	 * Constructor, not meant to be called directly. Use {@link getFile()}
 	 * instead, which provides caching and checks that only one object for
 	 * a unique file exists (references).
 	 *
 	 * @param string name of the file / directory
 	 * @param string path to the file / directory
+	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $name, $dir )
+	function File( $name, $dir, $meta = false )
 	{
+		// Call parent constructor
+		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
+
 		$this->setName( $name );
 		$this->setDir( $dir );
 
@@ -167,6 +177,40 @@ class File
 
 		// Get/Memorize detailed file info:
 		$this->refresh();
+
+		if( $meta )
+		{	// Try to load DB meta info:
+			$this->load_meta();
+		}
+
+	}
+
+
+	/**
+	 * Attempt to load meta data.
+	 *
+	 * Will attempt only once and cache the result.
+	 */
+	function load_meta()
+	{
+		global $DB, $Debuglog;
+
+		if( $this->meta == 'unknown' )
+		{	// We haven't tried loading yet:
+			if( $row = $DB->get_row( 'SELECT * FROM T_files WHERE file_path = '.$DB->quote($this->getPath()) ) )
+			{	// We found meta data
+				$Debuglog->add('Loaded metadata for '.$this->getPath());
+				$this->meta = 'loaded';
+				$this->ID = $row->file_ID;
+				$this->caption = $row->file_caption;
+			}
+			else
+			{
+				$this->meta = 'notfound';
+			}
+		}
+
+		return ($this->meta == 'loaded');
 	}
 
 
@@ -174,6 +218,7 @@ class File
 	 * Create the file/directory on disk, if it does not exist.
 	 *
 	 * Also sets file permissions.
+	 * Also inserts meta data into DB.
 	 *
 	 * @param string type ('dir'|'file')
 	 * @param string optional permissions (octal format)
@@ -201,6 +246,17 @@ class File
 		{	// Get/Memorize detailed file info:
 			$this->refresh();
 		}
+
+		// If there was meta data for this file in the DB:
+		// (maybe the file had existed before?)
+		// Let's recycle it! :
+		$this->load_meta();
+		// TODO: make path relative to a root.
+		$this->set( 'path', $this->getPath() );
+		$this->set( 'caption', 'dummy demo text' );
+		// Record to DB:
+		$this->dbsave();
+
 		return $r;
 	}
 
@@ -541,6 +597,8 @@ class File
 	/**
 	 * Rename the file in its current directoty on disk.
 	 *
+	 * Also update meta data in DB
+	 *
 	 * @access public
 	 * @param string new name (without path!)
 	 * @return boolean true on success, false on failure
@@ -550,6 +608,13 @@ class File
 		if( rename( $this->getPath(), $this->getDir().$newname ) )
 		{
 			$this->setName( $newname );
+
+			// Meta data...:
+			// TODO: make path relative to a root.
+			$this->set( 'path', $this->getPath() );
+			// Record to DB:
+			$this->dbupdate();
+
 			return true;
 		}
 		else
@@ -561,6 +626,8 @@ class File
 
 	/**
 	 * Unlink/Delete the file or folder from disk.
+	 *
+	 * Also removes meta data from DB.
 	 *
 	 * @access public
 	 * @return boolean true on success, false on failure
@@ -581,7 +648,14 @@ class File
 			return false;
 		}
 
-		$this->_exists = false;
+ 		$this->_exists = false;
+
+ 		// Check if there is meta data to be removed:
+ 		if( $this->load_meta() )
+		{ // remove meta data from DB:
+			$this->dbdelete();
+		}
+
 		return true;
 	}
 
@@ -614,6 +688,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.14  2005/01/12 20:22:51  fplanque
+ * started file/dataobject linking
+ *
  * Revision 1.13  2005/01/12 16:07:54  fplanque
  * documentation
  *

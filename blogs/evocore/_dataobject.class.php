@@ -93,10 +93,11 @@ class DataObject
 		$this->lasteditor_field   = $lasteditor_field;
 	}
 
+
 	/**
 	 * Records a change that will need to be updated in the db
 	 *
-	 * {@internal DataObject::dbchange(-) }}
+	 * {@internal DataObject::dbchange(-)}}
 	 *
 	 * @access protected
 	 * @param string Name of parameter
@@ -111,9 +112,9 @@ class DataObject
 
 
 	/**
-	 * DataObject::dbupdate(-)
-	 *
 	 * Update the DB based on previously recorded changes
+	 *
+	 * {@internal DataObject::dbupdate(-)}}
 	 */
 	function dbupdate( )
 	{
@@ -236,6 +237,22 @@ class DataObject
 
 
 	/**
+	 * Inserts or Updates depending on object state
+	 */
+	function dbsave()
+	{
+		if( $this->ID == 0 )
+		{	// Object not serialized yet, let's insert!
+			$this->dbinsert();
+		}
+		else
+		{	// Object already serialized, let's update!
+			$this->dbupdate();
+		}
+	}
+
+
+	/**
 	 * Delete object from DB
 	 *
 	 * {@internal DataObject::dbdelete(-)}}
@@ -297,6 +314,7 @@ class DataObject
 		echo format_to_output( $this->get($parname), $format );
 	}
 
+
 	/**
 	 * Set param value
 	 *
@@ -310,6 +328,7 @@ class DataObject
 	{
 		$this->set_param( $parname, 'string', $parvalue, $make_null );
 	}
+
 
 	/**
 	 * Set param value
@@ -344,6 +363,7 @@ class DataObject
 		$this->dbchange( $dbfield, $fieldtype, $parname );
 	}
 
+
 	/**
 	 * Template function: Displays object ID
 	 *
@@ -368,7 +388,7 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferedname') );
 
-		return '<img src="img/clock.png" width="16" height="16" class="middle" alt="'.$modified.
+		return '<img src="img/clock.png" width="17" height="17" class="middle" alt="'.$modified.
 														'" title="'.$modified.'" /> ';
 	}
 }
@@ -376,6 +396,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.11  2005/01/12 20:22:51  fplanque
+ * started file/dataobject linking
+ *
  * Revision 1.10  2005/01/03 15:17:52  fplanque
  * no message
  *
