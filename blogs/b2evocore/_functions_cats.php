@@ -337,7 +337,7 @@ function cat_load_cache()
 			$this_cat['cat_postcount'] = 0;					// Will be increased later
 			$this_cat['cat_children'] = array();
 			$cache_categories[$myrow['cat_ID']] = $this_cat;
-			// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'].'<br />';
+			// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'], ' parent:',$cache_categories[$myrow['cat_ID']]['cat_parent_ID'],'<br />';
 		} 
 
 		// Reveal children:
@@ -345,9 +345,18 @@ function cat_load_cache()
 		{
 			foreach( $cache_categories as $icat_ID => $i_cat )
 			{
-				if( $icat_ID )
+				// echo '<br>handling cat ', $icat_ID, ' ', $i_cat['cat_name'];
+				$cat_parent_ID = $i_cat['cat_parent_ID'];
+				if( $cat_parent_ID )
 				{
-					$cache_categories[$i_cat['cat_parent_ID']]['cat_children'][] = $icat_ID;
+					if( isset( $cache_categories[$cat_parent_ID] ) )
+					{	// If the parent exists!
+						$cache_categories[$cat_parent_ID]['cat_children'][] = $icat_ID;
+					}
+					else
+					{
+						echo( "Catgeory #$icat_ID is oprhan of non existant parent #$cat_parent_ID!<br />" );
+					}
 				}
 			}
 		}
