@@ -145,7 +145,18 @@ if ($use_spellchecker)
 	
 	<?php // ---------------------------- TEXTAREA ------------------------------------- ?>
 	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" border="0" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
-
+  <?php
+    if( $use_quicktags )   
+		{
+			?>
+			<script type="text/javascript" language="JavaScript">
+			<!--
+			b2evoCanvas = document.getElementById('content');
+			//-->
+			</script>
+			<?php
+    }
+  ?>
 
 	<?php // --------------------------- AUTOBR -------------------------------------- ?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php

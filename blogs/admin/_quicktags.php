@@ -7,222 +7,409 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-if( ! $use_quicktags && ! $use_smilies )   
+if( ! $use_quicktags && ! $use_smilies )
 {	// We have nothing to do here
 	return;
 }
 
 ?>
+
 <script language="JavaScript" type="text/javascript">
-	<!--
-	// b2 quick tags
-	// - authorized adaptation of the 'bbCode control code' by subBlue design ( www.subBlue.com )
-	
-	// Define the quick tags
-	bbcode = new Array();
-	bbtags = new Array('<strong>','</strong>','<em>','</em>','<ins>','</ins>','<del>','</del>','<blockquote>\n','</blockquote>\n','<p>','</p>\n','  <li>','</li>\n','<img src="" border="0" alt="" />','','<a href="">','</a>','<ul>\n','</ul>\n','<code>','</code>');
-	imageTag = false;
-	
-	// Replacement for arrayname.length property
-	function getarraysize(thearray) 
-	{
-		for (i = 0; i < thearray.length; i++) 
-		{
-			if ((thearray[i] == "undefined") || (thearray[i] == "") || (thearray[i] == null))
-				return i;
-		}
-		return thearray.length;
-	}
-	
-	// Replacement for arrayname.push(value) not implemented in IE until version 5.5
-	// Appends element to the array
-	function arraypush(thearray,value) 
-	{
-		thearray[ getarraysize(thearray) ] = value;
-	}
-	
-	// Replacement for arrayname.pop() not implemented in IE until version 5.5
-	// Removes and returns the last element of an array
-	function arraypop(thearray) 
-	{
-		thearraysize = getarraysize(thearray);
-		retval = thearray[thearraysize - 1];
-		delete thearray[thearraysize - 1];
-		return retval;
-	}
-	
-	
 
-	function bbstyle(formObj, bbnumber) 
-	{
-		donotinsert = false;
-		theSelection = false;
-		bblast = 0;
-	
-		if (bbnumber == -1) 
-		{ // Close all open tags & default button names
-			while (bbcode[0]) 
-			{
-				butnumber = arraypop(bbcode) - 1;
-				formObj.content.value += bbtags[butnumber + 1];
-				buttext = eval('formObj.addbbcode' + butnumber + '.value');
-				eval('formObj.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
-			}
-			formObj.content.focus();
-			return;
-		}
-	
-		if ((parseInt(navigator.appVersion) >= 4) && (navigator.appName == "Microsoft Internet Explorer"))
-			theSelection = document.selection.createRange().text; // Get text selection
-	
-		if (theSelection) 
-		{
-			// Add tags around selection
-			document.selection.createRange().text = bbtags[bbnumber] + theSelection + bbtags[bbnumber+1];
-			formObj.content.focus();
-			theSelection = '';
-			return;
-		}
-	
-		// Find last occurance of an open tag the same as the one just clicked
-		for (i = 0; i < bbcode.length; i++) 
-		{
-			if (bbcode[i] == bbnumber+1) 
-			{
-				bblast = i;
-				donotinsert = true;
-			}
-		}
-	
-		if (donotinsert) 
-		{		// Close all open tags up to the one just clicked & default button names
-			while (bbcode[bblast]) 
-			{
-				butnumber = arraypop(bbcode) - 1;
-				formObj.content.value += bbtags[butnumber + 1];
-				buttext = eval('formObj.addbbcode' + butnumber + '.value');
-				eval('formObj.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
-				imageTag = false;
-			}
-			formObj.content.focus();
-			return;
-		} 
-		else 
-		{ // Open tags
-	
-			if (imageTag && (bbnumber != 14)) 
-			{		// Close image tag before adding another
-				formObj.content.value += bbtags[15];
-				lastValue = arraypop(bbcode) - 1;	// Remove the close image tag from the list
-				formObj.addbbcode14.value = "image";	// Return button back to normal state
-				imageTag = false;
-			}
-	
-			// Open tag
-			formObj.content.value += bbtags[bbnumber];
-			if ((bbnumber == 14) && (imageTag == false)) imageTag = 1; // Check to stop additional tags after an unclosed image tag
-			arraypush(bbcode,bbnumber+1);
-			eval('formObj.addbbcode'+bbnumber+'.value += "*"');
-			formObj.content.focus();
-			return;
-		}
-	
+var b2evoButtons = new Array();
+var b2evoLinks = new Array();
+var b2evoOpenTags = new Array();
+
+function b2evoButton(id, display, tagStart, tagEnd, access, tit, open) {
+	this.id = id;				// used to name the toolbar button
+	this.display = display;		// label on button
+	this.tagStart = tagStart; 	// open tag
+	this.tagEnd = tagEnd;		// close tag
+	this.access = access;		// access key
+	this.tit = tit;				// title
+	this.open = open;			// set to -1 if tag does not need to be closed
+}
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ins'
+                                          ,'ins'
+                                          ,'<ins>'
+                                          ,'</ins>'
+                                          ,'i'
+										  ,'<?php echo T_('INSerted [Alt-I]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_del'
+                                          ,'del'
+                                          ,'<del>'
+                                          ,'</del>'
+                                          ,'d'
+										  ,'<?php echo T_('DELeted [Alt-D]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_strong'
+                                          ,'str'
+                                          ,'<strong>'
+                                          ,'</strong>'
+                                          ,'s'
+										  ,'<?php echo T_('STRong [Alt-S]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_em'
+                                          ,'em'
+                                          ,'<em>'
+                                          ,'</em>'
+                                          ,'e'
+                                          ,'<?php echo T_('EMphasis [Alt-E]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_code'
+                                          ,'code'
+                                          ,'<code>'
+                                          ,'</code>'
+                                          ,'c'
+										  ,'<?php echo T_('CODE [Alt-C]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_par'
+                                          ,'&lt;p&gt;'
+                                          ,'<p>'
+                                          ,'</p>'
+                                          ,'p'
+										  ,'<?php echo T_('Paragraph [Alt-P]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ul'
+                                          ,'&lt;ul&gt;'
+                                          ,'<ul>\n'
+                                          ,'</ul>\n\n'
+                                          ,'u'
+										  ,'<?php echo T_('Unordered List [Alt-U]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ol'
+                                          ,'ol'
+                                          ,'<ol>\n'
+                                          ,'</ol>\n\n'
+                                          ,'o'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_li'
+                                          ,'&lt;li&gt;'
+                                          ,'  <li>'
+                                          ,'</li>\n'
+                                          ,'l'
+										  ,'<?php echo T_('List Item [Alt-L]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_block'
+                                          ,'block'
+                                          ,'<blockquote>'
+                                          ,'</blockquote>'
+                                          ,'b'
+										  ,'<?php echo T_('BLOCKQUOTE [Alt-B]') ?>'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_img'
+                                          ,'img'
+                                          ,''
+                                          ,''
+                                          ,'g'
+										  ,'<?php echo T_('IMaGe [Alt-G]') ?>'
+                                          ,-1
+                                          ); // special case
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_link'
+                                          ,'link'
+                                          ,''
+                                          ,'</a>'
+                                          ,'a'
+										  ,'<?php echo T_('A href [Alt-A]') ?>'
+                                          ); // special case
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_pre'
+                                          ,'pre'
+                                          ,'<pre>'
+                                          ,'</pre>'
+										  ,'r'
+										  ,'[Alt-R]'
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_more'
+                                          ,'more'
+                                          ,'<!--more-->'
+                                          ,''
+                                          ,'m'
+										  ,'<?php echo T_('More [Alt-M]') ?>'
+                                          ,-1
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
+                                          ,'NT'
+                                          ,'<!--noteaser-->'
+                                          ,''
+                                          ,'t'
+										  ,'<?php echo T_('no teaser [Alt-T]') ?>'
+                                          ,-1
+                                          );
+
+b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
+                                          ,'page'
+                                          ,'<!--nextpage-->'
+                                          ,''
+                                          ,'q'
+										  ,'<?php echo T_('next page [Alt-Q]') ?>'
+                                          ,-1
+                                          );
+
+function b2evoLink() {
+	this.display = '';
+	this.URL = '';
+	this.newWin = 0;
+}
+
+function b2evoShowButton(button, i) {
+	if (button.id == 'b2evo_img') {
+		document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertImage(b2evoCanvas);" value="' + button.display + '" />');
 	}
-	
-	/*
-	 * bbinsert(-)
-	 *
-	 * fplanque: created
-	 */
-	function bbinsert(formObj, strIns, strInsClose ) 
-	{
-		theSelection = false;
-	
-		if (document.selection)
-		{
-			formObj.content.focus();
-			theSelection = document.selection.createRange().text; // Get text selection
-			// Add tags around selection:
-			document.selection.createRange().text = strIns + theSelection + strInsClose;
-			formObj.content.focus();
-			theSelection = false;
-			return;
-		}
-	
-		formObj.content.value += strIns + strInsClose;
-		formObj.content.focus();
-		return;
-	
+	else if (button.id == 'b2evo_link') {
+		document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertLink(b2evoCanvas, ' + i + ');" value="' + button.display + '" />');
 	}
-	
-	
-	
-	// swirlee's bblink hack, slightly corrected
-	// fplanque: modified
-	function bblink( formObj, bbtype ) 
-	{
-		current_url = prompt( "<?php echo T_('URL') ?>:","http://");
-		if(current_url == null) 
-		{
-			current_url = "";
-			return;
+	else {
+		document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertTag(b2evoCanvas, ' + i + ');" value="' + button.display + '"  />');
+	}
+}
+
+function b2evoAddTag(button) {
+	if (b2evoButtons[button].tagEnd != '') {
+		b2evoOpenTags[b2evoOpenTags.length] = button;
+		document.getElementById(b2evoButtons[button].id).value = '/' + document.getElementById(b2evoButtons[button].id).value;
+	}
+}
+
+function b2evoRemoveTag(button) {
+	for (i = 0; i < b2evoOpenTags.length; i++) {
+		if (b2evoOpenTags[i] == button) {
+			b2evoOpenTags.splice(i, 1);
+			document.getElementById(b2evoButtons[button].id).value = 		document.getElementById(b2evoButtons[button].id).value.replace('/', '');
 		}
-		var re = new RegExp ('http%3A//', 'gi') ;
-		var current_url = current_url.replace(re, 'http://') ;
-		if(current_url == "http://")
-		{
-			current_url = "";
-			return;
+	}
+}
+
+function b2evoCheckOpenTags(button) {
+	var tag = 0;
+	for (i = 0; i < b2evoOpenTags.length; i++) {
+		if (b2evoOpenTags[i] == button) {
+			tag++;
 		}
-	
-		if( bbtype == 'img' )
-		{	// IMAGE
-			current_alt = prompt("<?php echo T_('ALTernate text') ?>:","ALT");
-			if((current_alt == null) || (current_alt == "") || (current_alt == "ALT")) {
-				alttag = ' alt=""';
-			} else {
-				alttag = ' alt="' + current_alt + '"';
+	}
+	if (tag > 0) {
+		return true; // tag found
+	}
+	else {
+		return false; // tag not found
+	}
+}
+
+function b2evoCloseAllTags() {
+	var count = b2evoOpenTags.length;
+	for (o = 0; o < count; o++) {
+		b2evoInsertTag(b2evoCanvas, b2evoOpenTags[b2evoOpenTags.length - 1]);
+	}
+}
+
+function b2evoToolbar() {
+	document.write('<div>');
+	for (i = 0; i < b2evoButtons.length; i++) {
+		b2evoShowButton(b2evoButtons[i], i);
+	}
+	document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="X" />');
+	document.write('</div>');
+}
+
+// insertion code
+function b2evoInsertTag(myField, i) {
+	//IE support
+	if (document.selection) {
+		myField.focus();
+	    sel = document.selection.createRange();
+		if (sel.text.length > 0) {
+			sel.text = b2evoButtons[i].tagStart + sel.text + b2evoButtons[i].tagEnd;
+		}
+		else {
+			if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '') {
+				sel.text = b2evoButtons[i].tagStart;
+				b2evoAddTag(i);
+			}
+			else {
+				sel.text = b2evoButtons[i].tagEnd;
+				b2evoRemoveTag(i);
 			}
 		}
-	
-		current_title = prompt( "<?php echo T_('Title') ?>:", 
-				"<?php /* TRANS: Default title when inserting links into post */ echo T_('External - English') ?>");
-		if((current_title == null) || (current_title == "") ) 
-			title = '';
-		else
-			title = unescape(current_title);
-		
-		if( bbtype == 'a' )
-		{
-			final_link = '<a href="' + current_url + '" title="' + title + '">';
-			bbinsert( formObj, final_link, '</a>' );
+		myField.focus();
+	}
+	//MOZILLA/NETSCAPE support
+	else if (myField.selectionStart || myField.selectionStart == '0') {
+		var startPos = myField.selectionStart;
+		var endPos = myField.selectionEnd;
+		var cursorPos = endPos;
+		if (startPos != endPos) {
+			myField.value = myField.value.substring(0, startPos)
+			              + b2evoButtons[i].tagStart
+			              + myField.value.substring(startPos, endPos)
+			              + b2evoButtons[i].tagEnd
+			              + myField.value.substring(endPos, myField.value.length);
+			cursorPos += b2evoButtons[i].tagStart.length + edButtons[i].tagEnd.length;
 		}
-		else
-		{
-			final_img = '<img src="' + current_url + '"' + alttag + ' title="' + title + '" />';
-			bbinsert( formObj, '', final_img );
+		else {
+			if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '') {
+				myField.value = myField.value.substring(0, startPos)
+				              + b2evoButtons[i].tagStart
+				              + myField.value.substring(endPos, myField.value.length);
+				b2evoAddTag(i);
+				cursorPos = startPos + b2evoButtons[i].tagStart.length;
+			}
+			else {
+				myField.value = myField.value.substring(0, startPos)
+				              + b2evoButtons[i].tagEnd
+				              + myField.value.substring(endPos, myField.value.length);
+				b2evoRemoveTag(i);
+				cursorPos = startPos + b2evoButtons[i].tagEnd.length;
+			}
 		}
-		
-	}	
-	// -->
+		myField.focus();
+		myField.selectionStart = cursorPos;
+		myField.selectionEnd = cursorPos;
+	}
+	else {
+		if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '') {
+			myField.value += b2evoButtons[i].tagStart;
+			b2evoAddTag(i);
+		}
+		else {
+			myField.value += b2evoButtons[i].tagEnd;
+			b2evoRemoveTag(i);
+		}
+		myField.focus();
+	}
+}
+
+function b2evoInsertContent(myField, myValue) {
+	//IE support
+	if (document.selection) {
+		myField.focus();
+		sel = document.selection.createRange();
+		sel.text = myValue;
+		myField.focus();
+	}
+	//MOZILLA/NETSCAPE support
+	else if (myField.selectionStart || myField.selectionStart == '0') {
+		var startPos = myField.selectionStart;
+		var endPos = myField.selectionEnd;
+		myField.value = myField.value.substring(0, startPos)
+		              + myValue
+                      + myField.value.substring(endPos, myField.value.length);
+		myField.focus();
+		myField.selectionStart = startPos + myValue.length;
+		myField.selectionEnd = startPos + myValue.length;
+	} else {
+		myField.value += myValue;
+		myField.focus();
+	}
+}
+
+function b2evoInsertLink(myField, i, defaultValue) {
+	if (!defaultValue) {
+		defaultValue = 'http://';
+	}
+	if (!b2evoCheckOpenTags(i)) {
+		var URL = prompt('<?php echo T_('URL') ?>:' ,defaultValue);
+		if (URL) {
+			b2evoButtons[i].tagStart = '<a href="' + URL + '">';
+			b2evoInsertTag(myField, i);
+		}
+	}
+	else {
+		b2evoInsertTag(myField, i);
+	}
+}
+
+function b2evoInsertImage(myField) {
+	var myValue = prompt('<?php echo T_('URL') ?>:', 'http://');
+	if (myValue) {
+		myValue = '<img src="'
+				+ myValue
+				+ '" alt="' + prompt('<?php echo T_('ALTernate text') ?>:', '')
+				+ '" title="' + prompt('<?php echo T_('Title') ?>:', '')
+				+ '" />';
+		b2evoInsertContent(myField, myValue);
+	}
+}
 </script>
-
-<?php 
-if( $use_quicktags )   
-{	// We are using quicktags:	
+<?php
+if( $use_quicktags )
+{	// We are using quicktags:
 ?>
-<div><input type="button" class="quicktags" accesskey="i" title="<?php echo T_('INSerted [Alt-I]') ?>" name="addbbcode4" value="ins" style="text-decoration: underline;" onClick="bbstyle(this.form,4)" /><input type="button" class="quicktags" accesskey="d" title="<?php echo T_('DELeted [Alt-D]') ?>" name="addbbcode6" value="del" style="text-decoration: line-through;" onClick="bbstyle(this.form,6)" /><input type="button" class="quicktags" accesskey="s" title="<?php echo T_('STRong [Alt-S]') ?>" name="addbbcode0" value="str" style="font-weight:bold;" onClick="bbstyle(this.form,0)" /><input type="button" class="quicktags" accesskey="e" title="<?php echo T_('EMphasis [Alt-E]') ?>" name="addbbcode2" value="em" style="font-style:italic;" onClick="bbstyle(this.form,2)" /><input type="button" class="quicktags" accesskey="c" title="<?php echo T_('CODE [Alt-C]') ?>" name="addbbcode20" value="code" style="font-family: 'Courier New', Courier, mono;" onClick="bbstyle(this.form,20)" /><input type="button" class="quicktags" accesskey="p" title="<?php echo T_('Paragraph [Alt-P]') ?>" name="addbbcode10" value="&lt;p&gt;" style="" onClick="bbstyle(this.form,10)" /><input type="button" class="quicktags" accesskey="u" title="<?php echo T_('Unordered List [Alt-U]') ?>" name="addbbcode18" value="&lt;ul&gt;" style="" onClick="bbstyle(this.form,18)" /><input type="button" class="quicktags" accesskey="l" title="<?php echo T_('List Item [Alt-L]') ?>" name="addbbcode12" value="&lt;li&gt;" style="" onClick="bbstyle(this.form,12)" /><input type="button" class="quicktags" accesskey="b"  title="<?php echo T_('BLOCKQUOTE [Alt-B]') ?>" name="addbbcode8" value="block" style="" onClick="bbstyle(this.form,8)" /><input type="button" class="quicktags" accesskey="g" title="<?php echo T_('IMaGe [Alt-G]') ?>" name="addbbcode14" value="img" onClick="bblink(this.form,'img')" /><input type="button" class="quicktags" accesskey="a" title="<?php echo T_('A href [Alt-A]') ?>" name="addbbcode16" value="link" style="text-decoration: underline; width: 40px" onClick="bblink(this.form,'a')" /><input type="button" class="quicktags" accesskey="x" name="closetags" value="X" title="<?php echo T_('Close all tags') ?>" style="width: 30px; font-weigh: bolder;"  onClick="bbstyle(document.post,-1)" /><input type="button" class="quicktags" accesskey="m" title="<?php echo T_('More [Alt-M]') ?>" name="more" value="more" style="" onClick="bbinsert(document.post,'','<!--more-->')" /><input type="button" class="quicktags" accesskey="t" title="<?php echo T_('no teaser [Alt-T]') ?>" name="noteaser" value="NT" style="" onClick="bbinsert(document.post,'','<!--noteaser-->')" /><input type="button" class="quicktags" accesskey="q" title="<?php echo T_('next page [Alt-Q]') ?>" name="nextpage" value="page" style="" onClick="bbinsert(document.post,'','<!--nextpage-->')" /></div>
-<?php	
+<div><script language="JavaScript" type="text/javascript">b2evoToolbar();</script></div>
+<?php
 }
 
-if( $use_smilies )
-{	// We are using smilies
-	echo '<div>';
-	foreach($b2smilies as $smiley => $img) 
-	{
-		echo '<img src="'.$smilies_directory.'/'.$img.'" alt="'.$smiley.'" class="middle"  onClick="bbinsert(document.post,\'\', \''.str_replace("'","\'",$smiley).'\')" /> '; // TODO: escape ' 	
+function b2evo_grins() {
+	global $smilies_directory, $b2smilies;
+	$grins = '';
+	$smiled = array();
+    foreach ($b2smilies as $smiley => $grin) {
+		if (!in_array($grin, $smiled)) {
+			$smiled[] = $grin;
+			$smiley = str_replace(' ', '', $smiley);
+			$grins .= '<img src="'.$smilies_directory.'/'.$grin.'" alt="'.$smiley.'" onclick="grin(\''.$smiley.'\');"/> ';
+		}
 	}
-	echo '</div>';
+
+	print('<div>'.$grins.'</div>');
+	ob_start();
+?>
+<script type="text/javascript">
+function grin(tag) {
+	var myField;
+	if (document.getElementById('content') && document.getElementById('content').type == 'textarea') {
+		myField = document.getElementById('content');
+	}
+	else {
+		return false;
+	}
+	if (document.selection) {
+		myField.focus();
+		sel = document.selection.createRange();
+		sel.text = tag;
+		myField.focus();
+	}
+	else if (myField.selectionStart || myField.selectionStart == '0') {
+		var startPos = myField.selectionStart;
+		var endPos = myField.selectionEnd;
+		var cursorPos = endPos;
+		myField.value = myField.value.substring(0, startPos)
+					  + tag
+					  + myField.value.substring(endPos, myField.value.length);
+		cursorPos += tag.length;
+		myField.focus();
+		myField.selectionStart = cursorPos;
+		myField.selectionEnd = cursorPos;
+	}
+	else {
+		myField.value += tag;
+		myField.focus();
+	}
 }
 
+</script>
+<?php
+	$grins = ob_get_contents();
+	ob_end_clean();
+	print($grins);
+}
+?>
+
+<?php
+if( $use_smilies )
+b2evo_grins();
 ?>
