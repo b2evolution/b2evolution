@@ -48,7 +48,7 @@ if( empty($mode) )
 			&bull;
 			<?php echo $app_exit_links; ?>
 		</div>
-	
+
 		<?php
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
@@ -56,11 +56,11 @@ if( empty($mode) )
 		<div id="headinfo">
 			b2evo v <strong><?php echo $app_version ?></strong>
 			&middot; <?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
-			&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
+			&middot; <abbr title="<?php echo T_('Greenwich Mean Time '); ?>"><?php echo /* TRANS: short for Greenwich Mean Time */ T_('GMT:') ?></abbr> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
 			&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
 		</div>
 		<?php } ?>
-	
+
 		<ul class="tabs">
 		<?php 	// GLOBAL MENU :
 			foreach( $menu as $loop_tab => $loop_details )
@@ -70,17 +70,17 @@ if( empty($mode) )
 					|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
 					|| isset($loop_details['text_noperm']) )
 				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-	
+
 					echo (($loop_tab == $admin_tab) ? '<li class="current">' : '<li>');
-	
+
 					echo '<a href="'.$loop_details['href'].'"';
-	
+
 					if( isset($loop_details['style']) ) echo ' style="'.$loop_details['style'].'"';
-	
+
 					echo '>';
-	
+
 					echo ($perm ? $loop_details['text'] : $loop_details['text_noperm'] );
-	
+
 					echo '</a></li>';
 				}
 			}
