@@ -38,6 +38,15 @@ switch( $action )
 			echo '</div>';
 			break;
 		}
+		
+		// Check if the string is too short, it has to be a minimum of 3 characters to avoid being too generic
+		if( strlen($keyword) < 3 )
+		{
+			echo '<div class="panelinfo">';
+			printf( '<p>'.T_('The keyword %s is too short, it has to be a minimum of 3 characters!').'</p>', $keyword);
+			echo '</div>';
+			break;
+		}
 
 		if ( $deluxe_ban && ! $confirm )
 		{
