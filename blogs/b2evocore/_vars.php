@@ -128,7 +128,23 @@ $weekday[4]=N_('Thursday');
 $weekday[5]=N_('Friday');
 $weekday[6]=N_('Saturday');
 
-# the months, translate them if necessary - note: this isn't active everywhere yet
+# the weekdays short form (typically 3 letters)
+// TRANS: abbrev. for Sunday
+$weekday_abbrev[0]=N_('Sun');
+// TRANS: abbrev. for Monday
+$weekday_abbrev[1]=N_('Mon');
+// TRANS: abbrev. for Tuesday
+$weekday_abbrev[2]=N_('Tue');
+// TRANS: abbrev. for Wednesday
+$weekday_abbrev[3]=N_('Wed');
+// TRANS: abbrev. for Thursday
+$weekday_abbrev[4]=N_('Thu');
+// TRANS: abbrev. for Friday
+$weekday_abbrev[5]=N_('Fri');
+// TRANS: abbrev. for Saturday
+$weekday_abbrev[6]=N_('Sat');
+
+# the months
 $month['01']=N_('January');
 $month['02']=N_('February');
 $month['03']=N_('March');
@@ -141,6 +157,32 @@ $month['09']=N_('September');
 $month['10']=N_('October');
 $month['11']=N_('November');
 $month['12']=N_('December');
+
+# the months short form (typically 3 letters)
+// TRANS: abbrev. for January
+$month_abbrev['01']=N_('Jan');
+// TRANS: abbrev. for February
+$month_abbrev['02']=N_('Feb');
+// TRANS: abbrev. for March
+$month_abbrev['03']=N_('Mar');
+// TRANS: abbrev. for April
+$month_abbrev['04']=N_('Apr');
+// TRANS: abbrev. for May
+$month_abbrev['05']=N_('May');
+// TRANS: abbrev. for June
+$month_abbrev['06']=N_('Jun');
+// TRANS: abbrev. for July
+$month_abbrev['07']=N_('Jul');
+// TRANS: abbrev. for August
+$month_abbrev['08']=N_('Aug');
+// TRANS: abbrev. for September
+$month_abbrev['09']=N_('Sep');
+// TRANS: abbrev. for October
+$month_abbrev['10']=N_('Oct');
+// TRANS: abbrev. for November
+$month_abbrev['11']=N_('Nov');
+// TRANS: abbrev. for December
+$month_abbrev['12']=N_('Dec');
 
 
 ?>
