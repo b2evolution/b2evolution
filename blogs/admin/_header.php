@@ -31,7 +31,7 @@ while($row = mysql_fetch_object($result))
 if (($is_macIE) || ($is_lynx))
 	$use_quicktags=0;
 
-$b2varstoreset = array('blog', 'profile','standalone','redirect','redirect_url','a','popuptitle','popupurl','text', 'trackback', 'pingback');
+$b2varstoreset = array( 'profile','standalone','redirect','redirect_url','a','popuptitle','popupurl','text', 'trackback', 'pingback');
 for ($i=0; $i<count($b2varstoreset); $i += 1) {
 	$b2var = $b2varstoreset[$i];
 	if (!isset($$b2var)) {
@@ -47,15 +47,9 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 	}
 }
 
-if( ($blog=='') && isset($default_blog) )
-	$blog = $default_blog;
+set_param( 'blog', 'integer', $default_to_blog, true );
 
 if( $blog != '' ) 
 	get_blogparams();
 
-if ($standalone != 1) 
-{
-	require(dirname(__FILE__).'/_menutop.php');
-	require(dirname(__FILE__).'/_menutop_end.php');
-}
 ?>
