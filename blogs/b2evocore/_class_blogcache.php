@@ -34,26 +34,63 @@ class BlogCache extends DataObjectCache
 		parent::DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
 	}
 
+
+
 	/**
-	 * Get an object from cache by its stub
+	 * Get an object from cache by its url ("siteurl")
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal BlogCache::get_by_stub(-) }}
+	 * {@internal BlogCache::get_by_url(-) }}
 	 *
-	 * @param string stub of object to load
+	 * @param string URL of object to load
 	 * @param boolean false if you want to return false on error
 	 * @todo use cache
 	 */
-	function get_by_stub( $req_stub, $halt_on_error = true )
+	function get_by_url( $req_url, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;
 
 		// Load just the requested object:
-		$Debuglog->add( "Loading <strong>$this->objtype($req_stub)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache" );
 		$sql = "SELECT *
 						FROM $this->dbtablename
-						WHERE blog_stub = ".$DB->quote($req_stub);
+						WHERE blog_siteurl = ".$DB->quote($req_url);
+		$row = $DB->get_row( $sql );
+		if( empty( $row ) )
+		{	// Requested object does not exist
+			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+			return false;
+		}
+
+		$dbIDname = $this->dbIDname;
+		$objtype = $this->objtype;
+		$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+
+		return $this->cache[ $row->$dbIDname ];
+	}
+
+
+	/**
+	 * Get an object from cache by its URL name
+	 *
+	 * Load the cache if necessary
+	 *
+	 * {@internal BlogCache::get_by_urlname(-) }}
+	 *
+	 * @param string URL name of object to load
+	 * @param boolean false if you want to return false on error
+	 * @todo use cache
+	 */
+	function get_by_urlname( $req_urlname, $halt_on_error = true )
+	{
+		global $DB, $Debuglog;
+
+		// Load just the requested object:
+		$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache" );
+		$sql = "SELECT *
+						FROM $this->dbtablename
+						WHERE blog_urlname = ".$DB->quote($req_urlname);
 		$row = $DB->get_row( $sql );
 		if( empty( $row ) )
 		{	// Requested object does not exist

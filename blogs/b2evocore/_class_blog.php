@@ -150,12 +150,14 @@ class Blog extends DataObject
 				parent::set_param( $parname, 'number', $parvalue );
 				break;
 
+			/* fplanque: I'm removing this because it's no good when using absolute URL
 			case 'access_type':
 				if( $parvalue == 'default' )
 				{
 					$Settings->set('default_blog_ID', $this->ID);
 					$Settings->updateDB();
 				}
+			*/
 
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
@@ -194,9 +196,11 @@ class Blog extends DataObject
 		switch( $this->access_type )
 		{
 			case 'default':
-				// Access through index.php as default blog
-				if( $Settings->get('default_blog_ID') == $this->ID )
+				// Access through index.php: match absolute URL or call default blog
+				if( ( $Settings->get('default_blog_ID') == $this->ID )
+					|| preg_match( '#^https?://#', $this->siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
+					// or if we call by absolute URL
 					return $base.'index.php';
 				}
 				// ... otherwise, we add the blog ID:

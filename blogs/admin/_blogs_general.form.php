@@ -77,7 +77,7 @@ if( $action == 'edit' )
 			form_radio( 'blog_siteurl_type', $blog_siteurl_type,
 					array(
 						array( 'relative',
-										T_('relative to baseurl').':',
+										T_('Relative to baseurl').':',
 										'',
 										'<span class="nobr"><code>'.$baseurl.'</code>'.
 										'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="30" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.
@@ -85,7 +85,7 @@ if( $action == 'edit' )
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 						),
 						array( 'absolute',
-										T_('absolute URL').':',
+										T_('Absolute URL').':',
 										'',
 										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'.
 										'<span class="notes">'.T_('With trailing slash.').'</span>',
@@ -95,27 +95,31 @@ if( $action == 'edit' )
 					T_('Blog Folder URL'), true );
 
 
-			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $edited_Blog->ID) )
+			if( $default_blog_ID = $Settings->get('default_blog_ID') )
 			{
-				if( $default_Blog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'), false) )
+				$Debuglog->add('Default blog is set to: '.$default_blog_ID);
+				if( $default_Blog = $BlogCache->get_by_ID($default_blog_ID, false) )
 				{ // Default blog exists
 					$defblog = $default_Blog->dget('shortname');
 				}
 			}
 			form_radio( 'blog_access_type', $edited_Blog->get( 'access_type' ),
 					array(
-						array( 'default', T_('Default blog on index.php'),
-										( !isset($defblog) ? '' :'  ['. /* TRANS: current default blog */ T_('Current default is:').' '.$defblog.']' ),
+						array( 'default', T_('Automatic detection by index.php'),
+										T_('Match absolute URL or use default blog').
+											' ('.( !isset($defblog)
+												?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
+												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
+											')',
 										'',
 										'onclick="update_urlpreview( false, \'index.php\' );"'
 						),
-						array( 'index.php', T_('Other blog through index.php'),
+						array( 'index.php', T_('Explicit reference on index.php'),
 										T_('You might want to use extra-path info with this.'),
 										'',
 										'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') ? "/'+document.getElementById( 'blog_urlname' ).value" : '?blog='.$edited_Blog->ID."'" ).' )"'
 						),
-						array( 'stub',
-										T_('Other blog through stub file (Advanced)').':',
+						array( 'stub', T_('Explicit reference to stub file (Advanced)').':',
 										'',
 										'<label for="blog_stub">'.T_('Stub name').':</label>'.
 										'<input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$edited_Blog->dget( 'stub', 'formvalue' ).'" onkeyup="update_urlpreview( false, this.value );" onfocus="update_urlpreview( false, this.value ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" />'.

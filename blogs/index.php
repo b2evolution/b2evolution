@@ -23,34 +23,52 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 param( 'blog', 'integer', '', true );
 
 if( empty($blog) )
-{ // No blog requested, by URL param, let's check extrapath
-	# echo 'Checking extra path...<br />';
-	// Check and Remove current page url:
-	$index_url = substr( $baseurl, strlen( $baseurlroot ) ) . 'index.php';
-	# echo 'Seeking ['.$index_url.'] in ['.$ReqPath.']...<br />';
-	if( ($pos = strpos( $ReqPath, $index_url )) !== false )
-	{ // note: $pos will typically be 0
-		# echo 'Matched index.php path...<br />';
-		$path_string = substr( $ReqPath, $pos+strlen( $index_url ) );
-		// echo "path=$path_string <br>";
-		$path_elements = explode( '/', $path_string, 20 );						// slice it
-		if( isset($path_elements[1]) && (($Blog = $BlogCache->get_by_stub( $path_elements[1], false )) !== false) )
+{ // No blog requested by URL param, let's try to match something in the URL
+	$Debuglog->add( 'No blog param received, checking extra path...' );
+
+	// Construct full requested Host + Path:
+	$ReqHostPath = (isset($_SERVER['HTTPS'])?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
+	$Debuglog->add( 'full requested Host + Path: '.$ReqHostPath );
+
+	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHostPath, $matches ) )
+	{	// We have an URL blog name:
+		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2] );
+		if( (($Blog = $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
 		{	// We found a matching blog:
 			$blog = $Blog->ID;
 		}
 	}
-}
 
-if( empty($blog) )
-{	// Still no blog requested,
-	$blog = $Settings->get('default_blog_ID');
-}
+	if( empty($blog) )
+	{	// No blog identified by URL name, let's try to match the absolute URL
+		if( preg_match( '#^(.+?)index.php#', $ReqHostPath, $matches ) )
+		{	// Remove what's not part of the absolute URL
+			$ReqAbsUrl = $matches[1];
+		}
+		else
+		{
+			$ReqAbsUrl = $ReqHostPath;
+		}
+		$Debuglog->add('Looking up absolute url : '.$ReqAbsUrl);
 
-if( empty($blog) )
-{	// No specific blog to be displayed:
-	// we are going to display the default page:
-	require dirname(__FILE__).'/default.php';
-	exit();
+		if( (($Blog = $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
+		{	// We found a matching blog:
+			$blog = $Blog->ID;
+		}
+
+	}
+
+	if( empty($blog) )
+	{	// Still no blog requested, use default
+		$blog = $Settings->get('default_blog_ID');
+	}
+
+	if( empty($blog) )
+	{	// No specific blog to be displayed:
+		// we are going to display the default page:
+		require dirname(__FILE__).'/default.php';
+		exit();
+	}
 }
 
 // A blog has been requested... Let's set a few default params:

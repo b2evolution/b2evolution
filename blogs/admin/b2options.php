@@ -62,8 +62,6 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 			param( 'default_blog_ID', 'integer', true );
 			$Settings->set( 'default_blog_ID', $default_blog_ID );
-			param( 'default_blog_ID', 'integer', true );
-			$Settings->set( 'default_blog_ID', $default_blog_ID );
 			param( 'posts_per_page', 'integer', true );
 			$Settings->set( 'posts_per_page', $posts_per_page );
 			param( 'what_to_show', 'string', true );
