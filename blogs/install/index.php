@@ -350,12 +350,12 @@ switch( $action )
 					<p><input type="radio" name="action" id="deletedb" value="deletedb" />
 					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables')?></strong>:
 					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.')?></label></p>
+
+					<p><input type="radio" name="action" id="start" value="start" />
+					<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
 					<?php
 				}
 			?>
-
-			<p><input type="radio" name="action" id="start" value="start" />
-				<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
 
 			<p><input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;" /></p>
 			</form>
@@ -371,7 +371,8 @@ switch( $action )
 <pre>$allow_evodb_reset = 0;</pre>
 to
 <pre>$allow_evodb_reset = 1;</pre>
-<p>Then reload this page and a reset option will appear.</p>');
+<p>Then reload this page and a reset option will appear.</p>
+<p>This will also allow you to change your base configuration.</p>');
 		}
 		?>
 

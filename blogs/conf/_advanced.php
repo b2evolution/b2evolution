@@ -29,8 +29,11 @@ $require_name_email = 1;
 # 1 is also a popular choice, since it is a special blog aggregating all the others
 if( !isset($default_to_blog) ) $default_to_blog = 2;
 
-# Set the length of the online session time out. This is for the Who's Online block.
-$online_session_timeout = 300;  // TODO: into backoffice?
+/**
+ * Set the length of the online session time out (in seconds).
+ * This is for the Who's Online block.
+ */
+$online_session_timeout = 300; // 5 minutes
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing

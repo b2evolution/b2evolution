@@ -115,16 +115,28 @@ if( is_logged_in() && $current_User->get('locale') != $default_locale )
 }
 
 
+// Update the active session for the current user:
+$Debuglog->add('Updating the active session for the current user');
+online_user_update();
+
+
 /**
- * check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
+ * Check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
+ *
+ * This is useful in order not to increase the viewcount too often
+ * TODO: check what happens if the hit is dropped because of blacklist or something, thus not in
+ * the hitlog table.
  */
 $uri_reloaded = (bool)$DB->get_var("SELECT visitID FROM T_hitlog
 									WHERE	visitURL = ".$DB->quote($ReqURI)."
-												AND UNIX_TIMESTAMP( visitTime ) - $localtimenow < ".(int)$Settings->get('reloadpage_timeout')."
+												AND UNIX_TIMESTAMP( visitTime ) - $localtimenow < ".
+															(int)$Settings->get('reloadpage_timeout')."
 												AND hit_remote_addr = ".$DB->quote($_SERVER['REMOTE_ADDR'])."
 												AND hit_user_agent = ".$DB->quote($HTTP_USER_AGENT) );
 if( $uri_reloaded )
-	$Debuglog->add( 'URI-reload!' );
+{
+ 	$Debuglog->add( 'URI-reload!' );
+}
 
 
 // Load hacks file if it exists

@@ -279,15 +279,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 	<div class="bSideItem">
-		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online') ?></h3>
-		<?php
-			$count = online_user_display('', '<br />');
-			echo T_('Guest Users:').' '.$count['guests'];
-		?>
-	</div>
-
-
-	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>
 		<ul>
 			<?php
@@ -325,10 +316,20 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				</li>
 			</ul>
 			<a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English"><?php echo T_('What is RSS?') ?></a>
-
 	</div>
-<p class="center">powered by<br />
-<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
+
+
+  <div class="bSideItem">
+		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
+		<?php
+			$sessions = online_user_display( '', '<br />' );
+			echo T_('Guest Users:').' '.$sessions['guests'];
+		?>
+	</div>
+
+
+	<p class="center">powered by<br />
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
 <div id="pageFooter">

@@ -228,11 +228,10 @@ function create_b2evo_tables_091()
 
 	echo 'Creating table for active sessions... ';
 	$DB->query( "CREATE TABLE T_sessions (
-									sess_time int(10) unsigned NOT NULL,
-									sess_ipaddress varchar(15) NOT NULL,
-									sess_user_ID mediumint(8) unsigned NULL default NULL,
-									KEY start_time (sess_time),
-									KEY remote_ip (sess_ipaddress)
+								  sess_time int(10) unsigned NOT NULL default '0',
+								  sess_ipaddress varchar(15) NOT NULL default '',
+								  sess_user_ID int(10) default NULL,
+								  UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
 	echo "OK.<br />\n";
 
