@@ -80,6 +80,7 @@ class ArchiveList extends Results
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$limit = 100,
+		$dbtable = 'T_posts',
  		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 
@@ -87,13 +88,14 @@ class ArchiveList extends Results
 		global $DB, $Settings;
 
 		$this->blog = $blog;
+		$this->dbtable = $dbtable;
 		$this->dbprefix = $dbprefix;
 		$this->dbIDname = $dbIDname;
 		$this->archive_mode = $archive_mode;
 
 
 		// CONSTRUCT THE FROM CLAUSE:
-		$this->from = '	FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+		$this->from = '	FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 
@@ -292,6 +294,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.8  2005/03/07 17:36:10  fplanque
+ * made more generic
+ *
  * Revision 1.7  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

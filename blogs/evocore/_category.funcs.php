@@ -325,7 +325,8 @@ function get_catname($cat_ID)
  * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
  * This will prevent empty cats from displaying "(1)" as postcount.
  */
-function cat_load_cache( $cat_load_postcounts = false )
+function cat_load_cache( $cat_load_postcounts = false, $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
+													$dbIDname_items = 'ID' )
 {
 	global $DB, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
@@ -377,7 +378,7 @@ function cat_load_cache( $cat_load_postcounts = false )
 
 	if( $cat_load_postcounts )
 	{
-		cat_load_postcounts();
+		cat_load_postcounts( $dbtable_items, $dbprefix_items, $dbIDname_items );
 	}
 }
 
@@ -385,7 +386,8 @@ function cat_load_cache( $cat_load_postcounts = false )
 /**
  * Load the post counts
  */
-function cat_load_postcounts()
+function cat_load_postcounts( $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
+															$dbIDname_items = 'ID' )
 {
 	global $DB, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
@@ -402,7 +404,7 @@ function cat_load_postcounts()
 		 *  Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$where = ' WHERE '.statuses_where_clause( $show_statuses );
+		$where = ' WHERE '.statuses_where_clause( $show_statuses, $dbprefix_items );
 		$where_link = ' AND ';
 
 		// Restrict to timestamp limits:
@@ -410,19 +412,19 @@ function cat_load_postcounts()
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_datestart >= \''.$date_min.'\'';
+			$where .= $where_link.' '.$dbprefix_items.'datestart >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_datestart <= \''.$date_max.'\'';
+			$where .= $where_link.' '.$dbprefix_items.'datestart <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 
 		$sql = "SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount
-						FROM T_postcats INNER JOIN T_posts ON postcat_post_ID = ID
+						FROM T_postcats INNER JOIN $dbtable_items ON postcat_post_ID = $dbIDname_items
 						$where
 						GROUP BY cat_ID";
 
@@ -592,12 +594,13 @@ function blog_has_cats( $blog_ID )
  * Query for the cats
  *
  */
-function cat_query( $load_postcounts = false )
+function cat_query( $load_postcounts = false, $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
+										$dbIDname_items = 'ID' )
 {
 	// global $cache_categories; // $cache_blogs,
 	global $blog;
 	if( $blog != 0 ) blog_load_cache();
-	cat_load_cache( $load_postcounts );
+	cat_load_cache( $load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
 }
 
 
@@ -863,6 +866,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.14  2005/03/07 17:36:11  fplanque
+ * made more generic
+ *
  * Revision 1.13  2005/03/02 17:07:33  blueyed
  * no message
  *

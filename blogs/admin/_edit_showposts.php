@@ -378,7 +378,7 @@ $AdminUI->dispPayloadBegin();
 
 		// ---------- CALENDAR ----------
 		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '',
-																$timestamp_min, $timestamp_max, $dbprefix, $dbIDname );
+																$timestamp_min, $timestamp_max, $dbtable, $dbprefix, $dbIDname );
 		$Calendar->set( 'browseyears', 1 );  // allow browsing years in the calendar's caption
 		$Calendar->set( 'navigation', 'tfoot' );
 		$Calendar->display( $pagenow, 'blog='. $blog );
@@ -409,7 +409,7 @@ $AdminUI->dispPayloadBegin();
 
 	$Form->hidden( 'blog', $blog );
 
-	$Form->fieldset( 'Posts to show', ('Posts to show') );
+	$Form->fieldset( 'Posts to show' );
 	?>
 	<div>
 
@@ -482,7 +482,7 @@ $AdminUI->dispPayloadBegin();
 				$arc_link_start = $pagenow. '?blog='. $blog. '&amp;';
 
 				$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min,
-																					$timestamp_max, 36, $dbprefix, $dbIDname );
+																					$timestamp_max, 36, $dbtable, $dbprefix, $dbIDname );
 				while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 				{
 					echo $archive_line_start;
