@@ -957,7 +957,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				break;
 
 			case 'string':
-				// echo $var, '=', $$var, '<br>';
+				// echo $var, '=', $$var, '<br />';
 				$$var = trim( strip_tags($$var) );
 				break;
 
@@ -973,7 +973,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		{ // Init list if necessary:
 			$global_param_list = array();
 		}
-		$Debuglog->add( "Memorize(".count($global_param_list).") 'var' => $var, 'type' => $type, 'default' => $default <br>", 'params');
+		$Debuglog->add( "Memorize(".count($global_param_list).") 'var' => $var, 'type' => $type, 'default' => $default <br />", 'params');
 		$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 	}
 
@@ -1664,6 +1664,9 @@ function make_valid_date( $date, $time )
 
 /*
  * $Log$
+ * Revision 1.22  2004/12/30 23:58:41  blueyed
+ * <br> -> <br />
+ *
  * Revision 1.21  2004/12/30 22:56:58  blueyed
  * doc
  *
