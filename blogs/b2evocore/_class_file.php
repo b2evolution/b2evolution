@@ -298,8 +298,8 @@ class File
 		{
 			clearstatcache();
 			// update current entry
-			$this->set_perms( fileperms( $this->getPath(true) ) );
-			return $this->get_perms();
+			$this->_perms = fileperms( $this->getPath(true) );
+			return $this->_perms;
 		}
 		else
 		{
