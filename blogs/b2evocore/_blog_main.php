@@ -7,27 +7,9 @@
  *
  * This file loads the blog!
  */
-require_once (dirname(__FILE__).'/../conf/b2evo_config.php');
-require_once (dirname(__FILE__).'/_functions_locale.php');
-require_once (dirname(__FILE__).'/_vars.php');					// sets various arrays and vars for use in b2
-require_once (dirname(__FILE__).'/_functions_template.php');	// function to be called from templates
-require_once (dirname(__FILE__).'/_functions.php');  
-require_once (dirname(__FILE__).'/_functions_xmlrpc.php');	
-require_once (dirname(__FILE__).'/_functions_xmlrpcs.php');
-require_once (dirname(__FILE__).'/_class_itemlist.php');
-require_once (dirname(__FILE__).'/_class_commentlist.php');
-require_once (dirname(__FILE__).'/_class_archivelist.php');
-require_once (dirname(__FILE__).'/_class_calendar.php');
-require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
 
-
-timer_start();
-
-if( $use_gzipcompression && extension_loaded('zlib') )
-{	// gzipping the output of the script
-	ob_start( 'ob_gzhandler' );
-}
-
+// Initialize everything:
+require_once (dirname(__FILE__).'/_main.php');
 
 // Getting GET or POST parameters:
 if(!isset($default_to_blog)) $default_to_blog = 1;
@@ -72,9 +54,6 @@ if( empty($disp) )
 		$disp = 'stats';
 	}
 }
-
-// Connecting to the db:
-dbconnect();
 
 // Getting current blog info:
 get_blogparams();
@@ -133,10 +112,6 @@ if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 }
 // else echo "not numeric: ",  $path_elements[$i];
 
-
-// Getting settings from db
-$archive_mode = get_settings('archive_mode');
-$time_difference = get_settings('time_difference');
 
 
 if ( empty( $disp ) )
