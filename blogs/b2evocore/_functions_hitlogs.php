@@ -72,7 +72,7 @@ function log_hit()
 	// SEARCH BLACKLIST	
 	foreach( $blackList as $site )
 	{
-		if( stristr($HTTP_REFERER, $site) )
+		if( strpos( $HTTP_REFERER, $site ) !== false )
 		{
 			// $ignore = 'blacklist';
 			$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');

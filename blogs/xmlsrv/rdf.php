@@ -30,6 +30,7 @@
 		single_month_title( ' - ', 'xml' );
 		single_post_title( ' - ', 'xml' );
 	?></title>
+	<link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
 	<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
 	<dc:language><?php $Blog->disp( 'locale', 'xml' ) ?></dc:language>
 	<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
