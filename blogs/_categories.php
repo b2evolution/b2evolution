@@ -104,7 +104,7 @@
 			echo $cat_blog_end;
 	
 			// run recursively through the cats
-			cat_children( $cache_categories, $curr_blog_ID, NULL, cat_list_before_first, cat_list_before_each, cat_list_after_each, cat_list_after_last, 1 );
+			cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
 		}
 	}
 	
