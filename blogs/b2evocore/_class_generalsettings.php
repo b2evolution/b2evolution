@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the GeneralSettings class, which handles Name/Value pairs. {{{
+ * This file implements the GeneralSettings class, which handles Name/Value pairs.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -36,8 +36,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$ }}}
- *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -74,4 +73,11 @@ class GeneralSettings extends AbstractSettings
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.11  2004/10/12 10:27:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

@@ -61,7 +61,7 @@ class Group extends DataObject
 	{
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'grp_', 'grp_ID' );
-	
+
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank group';
@@ -171,4 +171,11 @@ class Group extends DataObject
 	}
 	
 }
+
+/*
+ * $Log$
+ * Revision 1.18  2004/10/12 10:27:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Filemanager class. {{{
+ * This file implements the Filemanager class.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -36,11 +36,9 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$ }}}
- *
+ * @version $Id$
  * @todo: Permissions!
  * @todo: favorite folders/bookmarks
- *
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -1037,4 +1035,11 @@ class FileManager extends Filelist
 
 
 }
+
+/*
+ * $Log$
+ * Revision 1.36  2004/10/12 10:27:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

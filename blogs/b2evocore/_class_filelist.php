@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Filelist class. {{{
+ * This file implements the Filelist class.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -36,8 +36,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$ }}}
- *
+ * @version $Id$
  * @todo: method add() to allow specific file (outside path)
  *
  */
@@ -542,4 +541,10 @@ class Filelist
 	}
 }
 
+/*
+ * $Log$
+ * Revision 1.12  2004/10/12 10:27:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

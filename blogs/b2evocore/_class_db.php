@@ -1,18 +1,60 @@
 <?php
 /**
- * ezSQL - Class to make it very easy to deal with mySQL database connections.
+ * This file implements the DB class.
  *
+ * Based on ezSQL - Class to make it very easy to deal with mySQL database connections.
  * b2evo Additions:
+ * - symbolic table names
  * - query log
  * - get_list
+ * - dynamic extension loading
+ * and more...
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * This file is based on the following package (excerpt from ezSQL's readme.txt):
+ * =======================================================================
+ * Author:  Justin Vincent (justin@visunet.ie)
+ * Web: 	 http://php.justinvincent.com
+ * Name: 	 ezSQL
+ * Desc: 	 Class to make it very easy to deal with database connections.
+ * License: FREE / Donation (LGPL - You may do what you like with ezSQL - no exceptions.)
+ * =======================================================================
+ * A $10 donation has been made to Justin VINCENT on behalf of the b2evolution team.
+ * The package has been relicensed as GPL based on
+ * "You may do what you like with ezSQL - no exceptions."
+ * }}
  *
  * @package evocore
- * @author Justin Vincent (justin@visunet.ie), {@link http://php.justinvincent.com}
- * @todo PLEASE NOTE: this class isn't exactly as reliable as I'd like to. I am doing some transformations. (fplanque)
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE
+ * @author Justin VINCENT
+ *
+ * @version $Id$
+ * @todo transaction support
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -611,9 +653,12 @@ class DB
 			echo 'Rows: ', $query['rows'];
 		}
 	}
-
-
-	// b2evo will donate to JV..
 }
 
+/*
+ * $Log$
+ * Revision 1.21  2004/10/12 10:27:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>
