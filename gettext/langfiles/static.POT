@@ -31,7 +31,7 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-msgid "Setup Links"
+msgid "Setup Links:"
 msgstr ""
 
 msgid "My b2evo"
@@ -49,10 +49,13 @@ msgstr ""
 msgid "My Back-Office"
 msgstr ""
 
+msgid "Available translations for this page:"
+msgstr ""
+
 msgid "Welcome!"
 msgstr ""
 
-msgid "b2evolution is a PHP multilingual multiuser multiblog engine. You will find complete information on the official\n\t<a href=\"http://b2evolution.net/\">b2evolution website</a>."
+msgid "b2evolution is a PHP multilingual multiuser multiblog engine. You will find complete information on the official <a %href>b2evolution website</a>."
 msgstr ""
 
 msgid "Quickstart instructions:"
@@ -70,13 +73,13 @@ msgstr ""
 msgid "Existing b2evolution users:"
 msgstr ""
 
-msgid "Upgrading from b2evolution 0.8.6 or later"
+msgid "Upgrading from b2evolution version 0.8.6 or later"
 msgstr ""
 
 msgid "prior to version 0.8.9"
 msgstr ""
 
-msgid "Upgrading from b2evolution 0.8.0 or later"
+msgid "Upgrading from b2evolution version 0.8.0 or later"
 msgstr ""
 
 msgid "prior to version 0.8.6"
@@ -85,7 +88,7 @@ msgstr ""
 msgid "Cafelog/b2 users:"
 msgstr ""
 
-msgid "upgrading from b2 0.6.x"
+msgid "upgrading from b2 version 0.6.x"
 msgstr ""
 
 msgid "official website"
@@ -97,7 +100,127 @@ msgstr ""
 msgid "contact:"
 msgstr ""
 
-msgid "Available translations for this page:"
+msgid "Installing instructions for new users"
+msgstr ""
+
+msgid "Installation instructions for new users"
+msgstr ""
+
+msgid "Once you have unzipped the b2evolution distribution:"
+msgstr ""
+
+msgid "On your server, create or locate a mysql database for b2evolution. (For example, you can call it &quot;b2evolution&quot;"
+msgstr ""
+
+msgid "On your computer, edit the file <strong>/blogs/conf/_config.php</strong> with a text editor and set theparameters according to your current configuration. There are basically 3 things to set:"
+msgstr ""
+
+msgid "Access information to the above-mentioned database (hostname, basename, login, password"
+msgstr ""
+
+msgid "The URL where you are going to run b2evolution."
+msgstr ""
+
+msgid "Note:"
+msgstr ""
+
+msgid "It is recommended that you do a first test installation by uploading the whole demo structure to your website, starting with the folder b2evolution. This way, your new blogs will have an URL of the form: http://www.yoursite.com/b2evolution/blogs/blog_a.php..."
+msgstr ""
+
+msgid "Of course you can change this later when you are comfortable with b2evolution. By then, you will probably want to upload just the contents of your &quot;blogs&quot; folder, so your blogs can be accessed directly through http://www.yoursite.com or http://www.yoursite.com/blog_a.php..."
+msgstr ""
+
+msgid "Your e-mail address (where you will receive notifications for new registrations, etc."
+msgstr ""
+
+msgid "Upload the b2evolution files to your website, according to the URL you have just configured."
+msgstr ""
+
+msgid "<strong>Come back to this page on your server</strong>, (should be something like http://www.yoursite.com/b2evolution/doc/install_new.html) and <a %href>run the database tables installation</a>. This will create tables for b2evo in the above-mentionned database. It will also create sample contents (please take due note of the admin password that will be given to you)."
+msgstr ""
+
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
+msgstr ""
+
+msgid "You are done! :)"
+msgstr ""
+
+msgid "You can now <a %href>read the blogs</a> or <a %href>log into the back-office</a> and start playing!"
+msgstr ""
+
+msgid "On production servers, it is recommended that you delete the /blogs/install/ subfolder."
+msgstr ""
+
+msgid "After basic install is done, there are a few <a %href>tricky things you may need to take care of</a> (online manual)."
+msgstr ""
+
+msgid "Upgrading from b2evolution 0.8.0 or later"
+msgstr ""
+
+msgid "Backup <strong>all b2evolution files</strong>, <strong>including /conf, skins, blog templatesand stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can."
+msgstr ""
+
+msgid "Replace <strong>all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles </strong> with the new ones; (This is important in order to activate all security fixes!) If you have customized your blog template/skin, please use the provided demo templates/skins until the end of the upgrade process. You'll find instructions on how to upgrade your customized templates/skins at the end of this procedure."
+msgstr ""
+
+msgid "Redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The otherconfig files can be used without modification (provided you use the <strong>new </strong>ones!), however you should have look inside for fine tuning once your new version is running;"
+msgstr ""
+
+msgid "Upload the files to your website, according to the URL you have just configured."
+msgstr ""
+
+msgid "Upload the new files to your server, and then <a %href>run the database tables upgrade</a> on your server!"
+msgstr ""
+
+msgid "(Just in case you did not do it before, you may want to check out <a %href>the tricky stuff</a>. (online manual"
+msgstr ""
+
+msgid "(If you had custom skins or templates, follow the online instructions about upgrading them <a %href>from version 0.8.0.x</a> or <a %href>from version 0.8.2.x</a>. (online manual"
+msgstr ""
+
+msgid "Upgrading from version 0.8.6 is easy:"
+msgstr ""
+
+msgid "You can keep your<strong> skins, blog templates and stubfiles for your blogs</strong>. However, now may be a good time to back them up ;) You should also backup your database if you can."
+msgstr ""
+
+msgid "Backup your <strong>/conf</strong> folder, copy the new conf files and redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other config files can be used without modification (provided you use the <strong>new </strong>ones!), however you should have look inside for fine tuning once your new version is running. Please note: there is no _antispam.php config file no longer. Antispam processing has been moved to the database."
+msgstr ""
+
+msgid "Replace the<strong> b2evolution core files</strong>. That means the following folders: /admin, /b2evocore, /htsrv, /locales, /xmlsrv. You also need to temporarily copy the <strong>/install</strong> folder to your site."
+msgstr ""
+
+msgid "Just in case you did not do it before, you may want to check out <a %href>the tricky stuff</a>. (online manual)"
+msgstr ""
+
+msgid "Upgrading from the original b2"
+msgstr ""
+
+msgid "Upgrading from Cafelog/b2 (the original b2)"
+msgstr ""
+
+msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, I think versions 0.5.x should also upgrade without problems. Anyway, if you run any old version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
+msgstr ""
+
+msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+msgstr ""
+
+msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
+msgstr ""
+
+msgid "Note 1:"
+msgstr ""
+
+msgid "Note 2:"
+msgstr ""
+
+msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
+msgstr ""
+
+msgid "On your computer, edit the file <strong>/blogs/conf/_config.php</strong> with a text editor and set the parameters according to your current configuration. There are basically 3 things to set:"
+msgstr ""
+
+msgid "Access information to the above-mentioned database (hostname, basename, login, password)"
 msgstr ""
 
 msgid "English (EU)"

@@ -1190,13 +1190,13 @@ function validate_url( $url, & $allowed_uri_scheme )
  */
 function pre_dump($dump, $title = '')
 {
-	echo '<pre>';
+	echo "\n".'<pre>';
 	if( $title != '' )
 	{
 		echo $title. ': <br />';
 	}
 	var_dump($dump);
-	echo '</pre>';
+	echo '</pre>'."\n";
 }
 
 

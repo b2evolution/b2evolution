@@ -25,6 +25,7 @@ define( 'CHDIR_TO_BLOGS', '..' );
 define( 'STATIC_POT', $pofilepath.'\static.POT' );
 define( 'DEFAULT_TARGET', 'en-EU' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
+define( 'HIGHLIGHT_UNTRANSLATED', '1' );
 
 
 // look what translations we have
@@ -54,7 +55,7 @@ if( !isset($argv) )
 
 log_('<hr>');
 log_('This script maintains the static html files of the b2evolution project.');
-log_('(c) daniel hahler, 2004, http://thequod.de');
+log_('written by <a href="http://thequod.de">daniel hahler</a>, 2004');
 
 
 
@@ -114,12 +115,17 @@ class POFile
 		{ // don't put those into POT file
 			return;
 		}
+		
+		// replace links
+		$msgid = preg_replace('/<a(\s+.*?)href=".*?"(.*?)>/', '<a$1%href$2>', $msgid);
+		
+		// we don't want tabs and returns in the msgid, but we must escape '"'
+		$search = array("\r", "\n", "\t", '"');
+		$replace = array('', ' ', '', '\"');
+		$msgid = str_replace($search, $replace, $msgid);
+		
 		if( !isset($this->msgids[ $msgid ]) )
 		{
-			$msgid = str_replace("\r\n", '\n', $msgid);
-			$msgid = str_replace("\n", '\n', $msgid);
-			$msgid = str_replace("\t", '\t', $msgid);
-			$msgid = str_replace('"', '\"', $msgid);
 			$this->msgids[ $msgid ] = '';
 		}
 		if( !empty($source) )
@@ -127,6 +133,42 @@ class POFile
 			$this->msgids[ $msgid ]['source'][] = $sourcefile;
 		}
 		$this->msgids[ $msgid ]['trans'][] = $trans;
+	}
+	
+	/**
+	 * translates msgid
+	 */
+	function translate( $msgid )
+	{
+		if( preg_match('/<a(.*?)(href=".*?")(,*?)>/', $msgid, $matches) )
+		{	// we have to replace links
+			// remember urls
+			$urls = $matches[2];
+			
+			// generate clean msgid
+			$msgid = preg_replace('/<a(.*?)href="(.*?)"(,*?)>/', '<a$1%href$3>', $msgid);
+		}
+		
+		// we don't have formatting in the .po files, but escaped '"'
+		$msgid = str_replace( array("\r", "\n", "\t", '"'), array('', ' ', '', '\"'), $msgid);
+		
+		#pre_dump($msgid);
+		
+		if( isset($this->msgids[ $msgid ]) )
+		{
+			$trans = $this->msgids[ $msgid ]['trans'];
+			
+			if( isset($urls) )
+			{
+				$trans = str_replace('%href', $urls, $trans);
+			}
+			
+			return $trans;
+		}
+		else
+		{
+			return TRANSTAG_OPEN.$msgid.TRANSTAG_CLOSE;
+		}
 	}
 	
 	/**
@@ -233,22 +275,6 @@ class POFile
 		return( $this->msgids );
 	}
 	
-	/**
-	 * translates msgid
-	 */
-	function translate( $msgid )
-	{
-		$msgid = str_replace( array("\n", "\t", "\r"), array('\n', '\t', ''), $msgid);
-		if( isset($this->msgids[ $msgid ]) )
-		{
-			return $this->msgids[ $msgid ]['trans'];
-		}
-		else
-		{
-			return $msgid;
-		}
-	}
-	
 }
 	
 /**
@@ -285,7 +311,6 @@ msgstr ""
 		$count = 0;
 		
 		// add strings used by this script that must also be translated
-		$this->addmsgid('Available translations for this page:', 'everywhere');
 		foreach( $targets as $target )
 		{ // the available locale names
 			$this->addmsgid( $locales[$target]['name'] );
@@ -338,6 +363,8 @@ function log_( $string )
 
 
 // HERE WE GO -------------------------------
+
+log_('<h1>action: '.$action.'</h1>');
 
 // change to /blogs folder
 chdir( CHDIR_TO_BLOGS );
@@ -413,35 +440,34 @@ switch( $action )
 				$POFile = new POFile('');
 			}
 			
-			// add standard replacements
-			$POFile->addmsgid('trans_locale', '', $target);
-			$POFile->addmsgid('trans_charset', '', $charset);
-			
 			foreach( $srcfiles as $srcfile )
 			{
 				$newfilename = str_replace('.src.', $replacesrc, $srcfile);
 				
-				log_( '-- Merging '.$srcfile.' into '.$newfilename.'.. ---------- ' );
+				log_( 'Merging '.$srcfile.' into '.$newfilename );
 				$text = implode( '', file( $srcfile ) );
 				
 				// build "available translations" list
-				$list_avail = '
-				<div class="installSideBar">
-				<p>'.$POFile->translate('Available translations for this page:').'</p>
-				<ul style="margin-left: 2ex;list-style:none;">
-				';
+				$list_avail = "\t".'<ul style="margin-left: 2ex;list-style:none;">'."\n";
+				
+				$flagspath = 'blogs/img/flags';
+				for($i = 1; $i < count(split('/', $srcfile)); $i++)
+				{
+					$flagspath = '../'.$flagspath;
+				}
+				
 				foreach( $targets as $ttarget )
 				{
-					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', $srcfile);
+					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
 					$list_avail .=
-					'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false).$POFile->translate( $locales[$ttarget]['name'] ).'</a></li>'."\n";
+					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $flagspath).$POFile->translate( $locales[$ttarget]['name'] ).'</a></li>'."\n";
 				}
-				$list_avail .= '</ul></div>';
+				$list_avail .= "\t</ul>";
 				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $list_avail, $text );
 				
 				if( $target != DEFAULT_TARGET )
 				{
-					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate(\'$1\')', $text );
+					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate(stripslashes(\'$1\'))', $text );
 					
 					if( strpos( $text, TRANSTAG_OPEN ) !== false )
 					{ // there are still tags.
@@ -449,24 +475,40 @@ switch( $action )
 					}
 				}
 				
-				// remove TRANSTAGs
-				$text = str_replace( array(TRANSTAG_OPEN, TRANSTAG_CLOSE), '', $text);
+				// standard replacements
+				$search = array(
+					// internal replacements
+					TRANSTAG_OPEN.'trans_locale'.TRANSTAG_CLOSE, TRANSTAG_OPEN.'trans_charset'.TRANSTAG_CLOSE,
+					'<html',                          // add note about generator
+				);
+				$replace = array(
+					$target, $charset,
+					'<!-- This file was generated automatically by /gettext/staticfiles.php - Do not edit this file manually -->'."\n".'<html'
+				);
+				// left TAGs
+				array_push( $search, TRANSTAG_OPEN, TRANSTAG_CLOSE );
+				if( HIGHLIGHT_UNTRANSLATED && !($target == DEFAULT_TARGET) )
+				{ // we want to highlight untranslated strings
+					array_push( $replace, '<span style="color:red" title="not translated">', '</span>' );
+				}
+				else
+				{ // just remove tags
+					array_push( $replace, '', '' );
+				}
+				$text = str_replace( $search, $replace, $text);
 				
 				// replace links
 				$text = preg_replace( '/\.src\.(html)/', $replacesrc."$1", $text );
 				
 				// emphasize links to the file itself
-				$text = preg_replace( '/(<a[^>]+href="'.$newfilename.'"[^>]*>)(.+?)(<\/a>)/s', '$1<strong>$2</strong>$3', $text);
+				$text = preg_replace( ':(<a[^>]+href="'.basename($newfilename).'"[^>]*>)(.+?)(<\/a>):s', '$1<strong>$2</strong>$3', $text);
+				
+				// remove DW tags
+				$text = preg_replace( '/<!-- Instance(Begin|End|Param).*? -->/', '', $text );
 				
 				$fh = fopen( $newfilename, 'w' );
 				fwrite( $fh, $text );
 				fclose( $fh );
-			
-				
-				/*if( !isset($argv) )
-				{
-					echo '<a href="'.$newfilename.'">view</a><br />';
-				}*/
 			}
 			log_('');
 		}

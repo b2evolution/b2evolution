@@ -281,8 +281,9 @@ function locale_timefmt()
  * @param string name of class for IMG tag
  * @param string deprecated HTML align attribute
  * @param boolean to echo or not
+ * @param mixed use absolute url (===true) or path to flags directory
  */
-function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '', $disp = true )
+function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
 {
 	global $locales, $current_locale, $core_dirout, $img_subdir, $img_url;
 
@@ -295,7 +296,17 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	{	// File does not exist
 		$country = 'default';
 	}
-	$r = '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" ';
+	
+	if( $absoluteurl !== true )
+	{
+		$iurl = $absoluteurl;
+	}
+	else
+	{
+		$iurl = $img_url.'/flags';
+	}
+	
+	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" ';
 	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
 	$r .= '/> ';
