@@ -438,6 +438,8 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'bushido-online.com')";
 	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'synapseiowa.com')";
+	mysql_query($query) or mysql_oops( $query );
 	
 	/*
 	These may look innocent and human-made, but they are in fact clever tricks.
