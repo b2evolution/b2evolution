@@ -12,6 +12,7 @@
  * "unexpected T_STRING" parse errors!
  */
 
+$debug = true;		// FOR TESTING ONLY
 
 # MySQL settings. Fill in your database details (check carefully or nothing will work!)
 $dbhost = 'localhost' ;       // mySQL Server 

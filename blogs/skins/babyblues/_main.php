@@ -125,7 +125,10 @@
 	
 	</div>
 	
-	<?php log_hit();	// log the hit on this page ?>
+	<?php 
+		log_hit();	// log the hit on this page
+		debug_info();	// output debug info if requested
+	?>
 	
 </body>
 </html>

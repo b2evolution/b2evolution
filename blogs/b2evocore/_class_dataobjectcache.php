@@ -42,7 +42,7 @@ class DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function DataObjectCache( $objtype, $load_add, $tablename, $prefix = '', $dbIDname = 'ID' )
+	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID' )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -149,7 +149,7 @@ class DataObjectCache
 
 		if( empty( $this->cache[ $req_ID ] ) && (! $this->all_loaded) )
 		{	// Not in cache, but not everything is loaded yet
-			if( $this->load-all )
+			if( $this->load_all )
 			{	// It's ok to just load everything:
 				$this->load_all();
 			}

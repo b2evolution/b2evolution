@@ -308,10 +308,7 @@
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php 
 	log_hit();	// log the hit on this page
-	if ($debug==1)
-	{
-		echo "Debug: $querycount queries - ".number_format(timer_stop(),3)." seconds";
-	}
+	debug_info();	// output debug info if requested
 ?>
 <!-- InstanceEndEditable --></p>
 </body>

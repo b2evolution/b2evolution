@@ -1255,13 +1255,33 @@ function validate_url( $url, & $allowed_uri_scheme )
  * blueyed: created 04-04-15
  *
  */
-function pre_dump($dump, $title = ''){
+function pre_dump($dump, $title = '')
+{
 	echo '<pre>';
-	if( $title != '' ){
+	if( $title != '' )
+	{
 		echo $title. ': <br />';
 	}
 	var_dump($dump);
 	echo '</pre>';
+}
+
+/** 
+ * Outputs debug info. (Typically at the end of the page)
+ *
+ * {@internal debug_info(-) }}
+ *
+ * @param boolean true to force output
+ */
+function debug_info( $force = false )
+{
+	global $debug;
+	global $querycount;
+	
+	if( $debug || $force )
+	{
+		echo "Debug: $querycount queries - ".number_format(timer_stop(),3)." seconds";
+	}
 }
 
 ?>

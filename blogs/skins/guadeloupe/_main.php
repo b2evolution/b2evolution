@@ -231,7 +231,10 @@ Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="
 
 <p class="baseline">
 This site works better with web standards! Original skin design courtesy of <a href="http://standblog.com/">Tristan NITOT</a>.
-<?php	log_hit();	// log the hit on this page ?>
+<?php 
+	log_hit();	// log the hit on this page
+	debug_info();	// output debug info if requested
+?>
 </p>
 </body>
 </html>
