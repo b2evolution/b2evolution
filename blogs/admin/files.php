@@ -14,7 +14,7 @@
  */
 
 require_once( dirname(__FILE__).'/_header.php' );
-require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_filemanager.php' );
+require( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_filemanager.php' );
 #ob_start();
 
 $admin_tab = 'files';
@@ -98,7 +98,7 @@ if( $action == '' && $file != '' )
 			$buffer = file( $Fileman->cget_file( $file, 'path' ) );
 
 			// TODO: check if new window was opened and provide close X in case
-			/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'/img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
+			/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
 
 			echo '<div class="fileheader">';
 			echo T_('file').': '.$file.'<br />';
@@ -252,7 +252,7 @@ if( $selaction != '' )
 			}
 			else
 			{ // Downloading
-				require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_zip.php' );
+				require( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_zip.php' );
 
 				$options = array (
 					'basedir' => $Fileman->cwd,
@@ -426,7 +426,7 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 		|| $Messages->count( 'all' ) )
 {
 	?>
-	<div class="fm_messages">
+	<div class="panelinfo">
 	<?php
 	$Messages->display( '', '', true, 'error' );
 	$Messages->display( '', '', true, 'note' );
@@ -442,6 +442,7 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 }
 
 ?>
+<div class="panelblock">
 <div class="toolbar">
 	<?php
 
@@ -484,10 +485,10 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 </div>
 
 <form name="FilesForm" action="files.php" method="post">
-<table class="fileman">
 
+<table class="grouped">
 <tr>
-	<th colspan="2" style="white-space:nowrap;">
+	<th colspan="2" class="nobr">
 		<a href="<?php $Fileman->cdisp('link', 'home') ?>"><?php echo $Fileman->icon( 'home', 'imgtag' ) ?></a>
 		&nbsp;
 		<a href="<?php $Fileman->cdisp('link', 'parent') ?>"><?php echo $Fileman->icon( 'parent', 'imgtag' ) ?></a>
@@ -517,7 +518,7 @@ while( $Fileman->next() )
 	$link_default_js = '';  // temp. disabled
 
 	?>
-	<tr style="background:<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>" onmouseout="this.style.background='<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>'" onmouseover="this.style.background='#ddd'" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
+	<tr<?php if( !($i%2) ) echo ' class="odd"' ?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
 		<td class="checkbox">
 			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $Fileman->cget('name'), 'formvalue' ) ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
@@ -565,7 +566,7 @@ if( $i == 0 )
 if( $i != 0 )
 {
 ?>
-<tr class="bottomrow"><td colspan="8">
+<tr class="group"><td colspan="8">
 	<script type="text/javascript">
 	<!--
 	document.write('<a href="#" onclick="toggleCheckboxes(\'FilesForm\', \'selectedfiles[]\');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>"><span id="checkallspan_0"><?php echo T_('(un)check all')?></span></a>');
@@ -666,6 +667,7 @@ if( $i != 0 )
 		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="hidden" name="action" value="createnew" />
 	</form>
+</div>
 </div>
 
 </div>

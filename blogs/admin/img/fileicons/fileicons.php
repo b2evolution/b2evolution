@@ -19,15 +19,15 @@ $this->fileicons_special = array(
 	'folder' => 'folder.png',    // icon for folders
 	'parent' => 'up.png',        // go to parent directory
 	'home' => 'folder_home2.png', // home folder
-	
+
 	'ascending' => 'ascending.png',
 	'descending' => 'descending.png',
-	
+
 	'edit' => 'edit.png',
 	'copymove' => 'editcopy.png',
 	'rename' => 'item_rename.png',
 	'delete' => 'editdelete.png',
-	
+
 	'window_new' => 'window_new.png',
 );
 
