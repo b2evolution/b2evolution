@@ -28,6 +28,10 @@ param( 'file', 'string', '' );       // selected file
 param( 'order', 'string', 'name' );
 param( 'asc', 'string', '#' );
 
+if( $current_User->login == 'demouser' )
+{
+}
+else
 if( $current_User->level < 10 )
 {
 	die( 'This is alpha. You need user level 10 to play with this.' );
@@ -39,7 +43,7 @@ if( $action == 'update_settings' )
 	$UserSettings->set( 'fm_permlikelsl', param( 'option_permlikelsl', 'integer', 0 ) );
 	$UserSettings->set( 'fm_fulldirsize', param( 'option_fulldirsize', 'integer', 0 ) );
 	$UserSettings->set( 'fm_showhidden', param( 'option_showhidden', 'integer', 0 ) );
-		
+
 	if( $UserSettings->updateDB() )
 	{
 		$Messages->add( T_('Your user settings have been updated.'), 'note' );
@@ -204,7 +208,7 @@ if( $selaction != '' )
 				<div class="panelinfo">
 				<p>
 				'.T_('You want to download:').'<ul>';
-				
+
 				foreach( $selectedfiles as $file )
 				{
 					if( $Fileman->cisdir( $file ) )
@@ -213,8 +217,8 @@ if( $selaction != '' )
 					}
 					else $message .= sprintf('<li>'.T_('File [%s]')."</li>\n", $file);
 				}
-				
-				$message .= '				
+
+				$message .= '
 				</p>
 				</div>
 				<form action="files.php" class="fform" method="post">
@@ -225,7 +229,7 @@ if( $selaction != '' )
 					{
 						$message .= '<input type="hidden" name="selectedfiles[]" value="'.format_to_output( $file, 'formvalue' )."\" />\n";
 					}
-					
+
 					$message .= $Fileman->form_hiddeninputs()."\n"
 											.form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.'), 80, '', 'text', false )."\n"
 											.form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n"
@@ -349,21 +353,21 @@ switch( $action ) // (we catched empty action before)
 				echo 'Uploaded';
 
 				pre_dump( $_FILES, 'uploaded' );
-				
+
 				/*if( isset( $_FILES[''] ) )
 				switch( $
 				UPLOAD_ERR_OK
 				Value: 0; There is no error, the file uploaded with success.
-				
+
 				UPLOAD_ERR_INI_SIZE
 				Value: 1; The uploaded file exceeds the upload_max_filesize directive in php.ini.
-				
+
 				UPLOAD_ERR_FORM_SIZE
 				Value: 2; The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
-				
+
 				UPLOAD_ERR_PARTIAL
 				Value: 3; The uploaded file was only partially uploaded.
-				
+
 				UPLOAD_ERR_NO_FILE
 				Value: 4; No file was uploaded.*/
 
@@ -371,22 +375,22 @@ switch( $action ) // (we catched empty action before)
 			else
 			{
 				$allowedftypes = preg_split( '/\s+/', trim( $fileupload_allowedtypes) );
-	
+
 				$message = '
 				<p><strong>'.T_('File upload').'</strong></p>
 				<p>'.T_('Allowed file types:').' '.implode(', ', $allowedftypes).'</p>
 				<p>'.sprintf( T_('Maximum allowed file size: %d KB'), $fileupload_maxk ).'</p>
-				
+
 				<form enctype="multipart/form-data" action="'.$Fileman->curl().'" method="post">
 					<input type="hidden" name="MAX_FILE_SIZE" value="'.($fileupload_maxk*1024).'" />
 					<input type="hidden" name="action" value="upload" />';
-					
+
 					for( $i = 0; $i < 3; $i++ )
 					{
 						$message .= '<input name="uploadfile['.$i.']" type="file" size="40" /><br />';
 						//'.T_('Description').':	<input type="text" name="imgdesc['.$i.']" size="50" /><br />';
 					}
-					
+
 					$message .= '
 					<input type="submit" value="'.T_('Upload !').'" class="search" />
 					</form>
@@ -519,37 +523,31 @@ if( $i == 0 )
 	<?php
 }
 
-?>
-<tr class="bottomrow">
-
-<td colspan="8">
-<?php
 if( $i != 0 )
 {
-	?>
-		<script type="text/javascript">
-		<!--
-		document.write('<a href="#" onclick="toggleCheckboxes(\'FilesForm\', \'selectedfiles[]\');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>"><span id="checkallspan_0"><?php echo T_('(un)check all')?></span></a>');
-		//-->
-		</script>
-		<noscript type="text/javascript">
-			<a href="<?php
-			echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
-			echo '">';
-			echo ($checkall) ? T_('uncheck all') : T_('check all');
-			?></a>
-		</noscript>
-		&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
-		<?php echo $Fileman->form_hiddeninputs() ?>
-		<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
-		<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
-		<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
+?>
+<tr class="bottomrow"><td colspan="8">
+	<script type="text/javascript">
+	<!--
+	document.write('<a href="#" onclick="toggleCheckboxes(\'FilesForm\', \'selectedfiles[]\');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>"><span id="checkallspan_0"><?php echo T_('(un)check all')?></span></a>');
+	//-->
+	</script>
+	<noscript type="text/javascript">
+		<a href="<?php
+		echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
+		echo '">';
+		echo ($checkall) ? T_('uncheck all') : T_('check all');
+		?></a>
+	</noscript>
+	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
+	<?php echo $Fileman->form_hiddeninputs() ?>
+	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
+	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
+	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
+</td></tr>
 <?php
 }
 ?>
-</td>
-
-</tr>
 </table>
 </form>
 
@@ -579,19 +577,19 @@ if( $i != 0 )
 			<input type="submit" value="<?php echo T_('Update !') ?>" />
 			</div>
 		</div>
-		
+
 		<noscript type="text/javascript">
 		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"><?php
 			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
 		</noscript>
-			
+
 		<script type="text/javascript">
 		<!--
 			document.write( '<a id="options_toggle" href="javascript:toggle_options()"><?php echo T_("show options") ?></a>' )
-			
+
 			showoptions = <?php echo ($options_show) ? 'false' : 'true' ?>;
 			toggle_options();
-			
+
 			function toggle_options()
 			{
 				if( showoptions )
