@@ -185,6 +185,9 @@ class User extends DataObject
 	{
 		switch( $parname )
 		{
+			case 'fullname':
+				return $this->firstname.' '.$this->lastname;
+
 			case 'preferedname':
 				return $this->getPreferedName();
 
@@ -865,6 +868,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2005/04/06 13:33:29  fplanque
+ * minor changes
+ *
  * Revision 1.22  2005/03/22 19:17:27  fplanque
  * cleaned up some nonsense...
  *

@@ -181,6 +181,7 @@ class Item extends DataObject
  				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
 				// progidistri only: (those won't hurt)
 				array( 'table'=>'T_tasks', 'fk'=>'tsk_parent_tsk_ID', 'msg'=>T_('%d links to child items') ),
+ 				array( 'table'=>'T_mission_assignments', 'fk'=>'ma_tsk_ID', 'msg'=>T_('%d mission assignment embodied by this task') ),
 			);
 
    	$this->delete_cascades = array(
@@ -1886,6 +1887,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2005/04/06 13:33:29  fplanque
+ * minor changes
+ *
  * Revision 1.32  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

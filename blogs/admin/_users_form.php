@@ -61,7 +61,7 @@ if( $edited_User->get('ID') == 0 )
 else
 {	// Editing existing user:
 	$creating = false;
-	$Form->begin_form( 'fform', T_('Profile for:').' '.$edited_User->dget('firstname').' '.$edited_User->dget('lastname')
+	$Form->begin_form( 'fform', T_('Profile for:').' '.$edited_User->dget('fullname')
 				.' ['.$edited_User->dget('login').']' );
 }
 
@@ -193,6 +193,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.56  2005/04/06 13:33:28  fplanque
+ * minor changes
+ *
  * Revision 1.55  2005/03/22 16:36:00  fplanque
  * refactoring, standardization
  * fixed group creation bug

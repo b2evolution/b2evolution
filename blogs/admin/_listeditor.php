@@ -201,9 +201,6 @@ $Results->cols = array(
 											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
 				);
 
-if( isset( $results_params ) )
-	$Results->params = & $results_params;
-
 $Results->display();
 
 // FORM:

@@ -1685,42 +1685,49 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 	return $date.(empty($time) ? '' : ' '.$time );
 }
 
+
 /**
- * function used during the call to the results to specify
- * whether the selection checkbox of the current item must be checked
+ * Display a checkbox allowing to add the item to a selection
+ *
+ * Only one checkbox will be displayed for each ID.
+ * IDs which are already in the selection will be pre-checked.
  *
  * @param integer item id
  * @param string item name
  * @return string the correct input tag
  */
-function result_input( $item_ID, $item_name )
+function selection_checkbox( $item_ID, $item_name )
 {
-	global $cols_check, $item_ID_array;
+	// List of checkboxes to pre-check:
+	global $cols_check;
+	// List of already displayed checkboxes (can be used outside to get a list of checkboxes which have been displayed)
+	global $item_ID_array;
 
-	$r = '';
-
-	if( !in_array( $item_ID, $item_ID_array ) )
-	{ //the current item id is not present in the item id array
-		$item_ID_array[] = $item_ID; //construction of the ID list
-
-		$r .= '<input type="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
-
-		if( in_array( $item_ID, $cols_check ) )
-		{
-			$r .= ' checked="checked" ';
-		}
-		else
-		{
-			$r .= '';
-		}
-
-		$r .= ' />';
+	if( in_array( $item_ID, $item_ID_array ) )
+	{	// We have already displayed a checkbox for this ID
+		return '';
 	}
+
+	$item_ID_array[] = $item_ID; //construction of the ID list
+
+	$r = '<input type="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
+
+	if( in_array( $item_ID, $cols_check ) )
+	{	// already in selection:
+		$r .= ' checked="checked" ';
+	}
+
+	$r .= ' />';
 
 	return $r;
 }
 
 
+/**
+ * Displays an empty or a full bullet based on boolean
+ *
+ * @param boolean true for full bullet, false for empty bullet
+ */
 function bullet( $bool )
 {
 	if( $bool )
@@ -1852,6 +1859,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.61  2005/04/06 13:33:29  fplanque
+ * minor changes
+ *
  * Revision 1.60  2005/03/21 18:54:27  fplanque
  * results/table/form layout refactoring
  *

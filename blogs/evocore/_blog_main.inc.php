@@ -327,6 +327,7 @@ else
 	// If we end up here the blog file should be a full template, not just a stub...
 }
 
+// TODO: fplanque>>jwedgeco: I think these should actually go into evocore/_main.php near the code that instanciates all those xxxCache objects.
 //global $use_memcached, $memcache, $memcache_expire;
 if ( $use_memcached ) 
 {
@@ -341,6 +342,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.12  2005/04/06 13:33:29  fplanque
+ * minor changes
+ *
  * Revision 1.11  2005/04/05 13:44:22  jwedgeco
  * Added experimental memcached support. Needs much more work. Use at your own risk.
  *

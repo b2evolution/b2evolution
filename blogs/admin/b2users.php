@@ -357,7 +357,7 @@ else
 			if( !$confirm )
 			{?>
 			<div class="panelinfo">
-				<h3><?php printf( T_('Delete User %s?'), $deleted_User->get( 'firstname' ).' '.$deleted_User->get( 'lastname' ).' ['.$deleted_User->get( 'login' ).']' )?></h3>
+				<h3><?php printf( T_('Delete User %s?'), $deleted_User->get( 'fullname' ).' ['.$deleted_User->get( 'login' ).']' )?></h3>
 
 				<p><?php echo T_('Warning').': '.T_('deleting an user also deletes all posts made by this user.') ?></p>
 
@@ -623,6 +623,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.86  2005/04/06 13:33:29  fplanque
+ * minor changes
+ *
  * Revision 1.85  2005/03/22 19:17:31  fplanque
  * cleaned up some nonsense...
  *

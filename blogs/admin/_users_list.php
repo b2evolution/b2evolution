@@ -35,8 +35,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 // get the userlist
 $request = "SELECT T_users.*, grp_ID, grp_name
-						FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-						ORDER BY grp_name, user_login";
+							FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+						 ORDER BY grp_name, user_login";
 $userlist = $DB->get_results( $request );
 ?>
 <h2><?php echo T_('Groups &amp; Users') ?></h2>
@@ -140,7 +140,7 @@ $userlist = $DB->get_results( $request );
 				$loop_User->disp('nickname');
 				echo '</td>';
 
-				echo '<td>', $loop_User->get('firstname').'&nbsp;'.$loop_User->get('lastname')."</td>\n";
+				echo '<td>', $loop_User->get('fullname')."</td>\n";
 				// Email:
 				echo '<td>&nbsp;';
 				$email = $loop_User->get('email');
@@ -216,6 +216,9 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 /*
  * $Log$
+ * Revision 1.39  2005/04/06 13:33:28  fplanque
+ * minor changes
+ *
  * Revision 1.38  2005/03/22 19:17:30  fplanque
  * cleaned up some nonsense...
  *

@@ -226,10 +226,12 @@ require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
 // Object caches init:
 
-$BlogCache = array();
+// fplanque>>jwedgeco: I cannot commit this: $BlogCache = array();
+$response = NULL;
 
 if ( $use_memcached ) 
 {
+	// TODO: fplanque>>jwedgeco: please document why you set a dummy here ;)
 	$response = $memcache->set( 'dummy' , 0);
 	$response = $memcache->get( 'BlogCache' );
 	$GroupCache =  $memcache->get( 'GroupCache' );
@@ -492,6 +494,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.29  2005/04/06 13:33:29  fplanque
+ * minor changes
+ *
  * Revision 1.28  2005/04/05 13:44:22  jwedgeco
  * Added experimental memcached support. Needs much more work. Use at your own risk.
  *

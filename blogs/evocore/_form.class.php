@@ -104,7 +104,7 @@ class Form extends Widget
 		switch( $this->layout )
 		{
 			case 'table':
-				$this->formstart = '<table cellspacing="0">'."\n";
+				$this->formstart = '<table cellspacing="0" class="fform">'."\n";
 				$this->title_fmt = '<thead><tr class="formtitle"><th colspan="2"><div class="results_title">'
 														.'<span style="float:right">$global_icons$</span>'
 														.'$title$</div></td></tr></thead>'."\n";
@@ -727,8 +727,7 @@ class Form extends Widget
 	 *  - a boolean indicating whether the box must be checked or not
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *
-	 * @param array a two-dimension array containinj the parameters of the input tag
-	 * @param boolean initial value
+	 * @param array a two-dimensional array containing the parameters of the input tag
 	 * @param string name
 	 * @param string label
 	 * @return mixed true (if output) or the generated HTML if not outputting
