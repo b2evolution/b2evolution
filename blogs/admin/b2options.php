@@ -14,7 +14,7 @@ param( 'action', 'string' );
 
 switch($action) {
 
-case "update":
+case 'update':
 	if ($user_level <= 3) 
 	{
 		die( T_('You have no right to edit the options for this blog.') );

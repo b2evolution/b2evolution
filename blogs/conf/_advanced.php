@@ -72,7 +72,7 @@ $use_preview = 1;
 
 
 # set this to 0 to disable the spell checker, or 1 to enable it
-$use_spellchecker = 0;
+$use_spellchecker = 1;
 
 
 
