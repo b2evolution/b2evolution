@@ -850,17 +850,17 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 		if( isset($_POST[$var]) )
 		{
 			$$var = remove_magic_quotes( $_POST[$var] );
-			// echo "$var=".$$var." set by POST!<br/>";
+			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by POST', 'params' );
 		}
 		elseif( isset($_GET["$var"]) )
 		{
 			$$var = remove_magic_quotes($_GET[$var]);
-			// echo "$var=".$$var." set by GET!<br/>";
+			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by GET', 'params' );
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
 			$$var = remove_magic_quotes($_COOKIE[$var]);
-			// echo "$var=".$$var." set by COOKIE!<br/>";
+			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by COOKIE', 'params' );
 		}
 		elseif( $default === true )
 		{
@@ -869,7 +869,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 		elseif( $forceset )
 		{
 			$$var = $default;
-			// echo "$var=".$$var." set to default<br/>";
+			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by default', 'params' );
 		}
 		else
 		{ // param not found! don't set the variable.
@@ -881,9 +881,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 	{ // Variable was already set but we need to remove the auto quotes
 		$$var = remove_magic_quotes($$var);
 
-		$Debuglog->add( 'param(-): '.$var.' already set! '.pre_dump($$var, '', false) );
-
-		// pre_dump( $$var, $var.' already set' );
+		$Debuglog->add( 'param(-): '.$var.' already set! '.pre_dump($$var, '', false), 'params' );
 	}
 
 	// type will be forced even if it was set before and not overriden
@@ -1168,10 +1166,17 @@ function debug_info( $force = false )
 
 		echo '<h3>DB</h3>';
 
-		echo 'Old style queries: ', $querycount, '<br />';
-		echo 'DB queries: ', $DB->num_queries, '<br />';
+		if( !isset($DB) )
+		{
+			echo 'No DB object.';
+		}
+		else
+		{
+			echo 'Old style queries: ', $querycount, '<br />';
+			echo 'DB queries: ', $DB->num_queries, '<br />';
 
-		$DB->dump_queries();
+			$DB->dump_queries();
+		}
 	}
 }
 

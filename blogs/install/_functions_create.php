@@ -85,7 +85,7 @@ function create_b2evo_tables()
 		blog_urlname VARCHAR(255) NOT NULL DEFAULT 'urlname',
 		blog_notes TEXT NULL,
 		blog_keywords tinytext,
-		blog_allowcomments VARCHAR(20) NOT NULL default 'always',
+		blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
 		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
 		blog_allowpingbacks TINYINT(1) NOT NULL default 1,
 		blog_pingb2evonet TINYINT(1) NOT NULL default 0,
@@ -848,12 +848,12 @@ function create_b2evo_tables_091()
 	echo "OK.<br />\n";
 
 	echo 'Creating plugins table... ';
-	$DB->query('"CREATE TABLE T_plugins (
+	$DB->query("CREATE TABLE T_plugins (
 							  plug_ID int NOT NULL auto_increment,
 							  plug_priority int NOT NULL default 50,
 							  plug_classname varchar(40) NOT NULL default '',
 							  PRIMARY KEY (plug_ID)
-								)');
+								)");
 	echo "OK.<br />\n";
 
 

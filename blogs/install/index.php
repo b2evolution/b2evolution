@@ -142,7 +142,7 @@ switch( $action )
 		param( 'conf_db_host', 'string', true );
 		param( 'conf_db_tableprefix', 'string', true );
 		param( 'conf_baseurl', 'string', true );
-		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ); // remove trailing slash
+		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ).'/'; // force trailing slash
 		param( 'conf_admin_email', 'string', true );
 
 		// Connect to DB:

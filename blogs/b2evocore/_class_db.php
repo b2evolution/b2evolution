@@ -76,11 +76,33 @@ class DB
 	{
 		$this->halt_on_error = $halt_on_error;
 
+		if( !extension_loaded('mysql') )
+		{	// The mysql extension is not loaded, try to dynamically load it:
+			if (strtoupper(substr(PHP_OS, 0, 3) == 'WIN'))
+			{
+				@dl('php_mysql.dll');
+			}
+			else
+			{
+				@dl('mysql.so');
+			}
+
+			if( !extension_loaded('mysql') )
+			{ // Still not loaded:
+				$this->print_error( '<p><strong>The PHP MySQL module could not be loaded.</strong></p>
+					<p>You must edit your php configuration (php.ini) and enable this module.</p>
+					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>' );
+				return;
+			}
+		}
+
+		// Connect to the Database:
 		$this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword);
 
 		if( ! $this->dbh )
 		{
-			$this->print_error( '<strong>Error establishing a database connection!</strong>
+			$this->print_error( '<p><strong>Error establishing a database connection!</strong></p>
+				<p>('.mysql_error().')</p>
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>

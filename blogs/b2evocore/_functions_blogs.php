@@ -37,7 +37,7 @@ function blog_create(
 	$blog_keywords = '',
 	$blog_links_blog_ID = 0,
 	$blog_UID = '',
-	$blog_allowcomments = 'always',
+	$blog_allowcomments = 'post_by_post',
 	$blog_allowtrackbacks = 1,
 	$blog_allowpingbacks = 1,
 	$blog_pingb2evonet = 0,

@@ -47,7 +47,7 @@ class Blog extends DataObject
 	var $links_blog_ID = 0;
 	var $notes;
 	var $keywords;
-	var $allowcomments = 'always';	
+	var $allowcomments = 'post_by_post';	
 	var $allowtrackbacks = 0;
 	var $allowpingbacks = 0;
 	var $pingb2evonet = 0;

@@ -547,6 +547,13 @@ function upgrade_b2evo_tables()
 									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );
 		echo "OK.<br />\n";
 
+		 
+		echo 'Upgrading blogs table... ';
+		$query = "ALTER TABLE T_blogs
+				ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post'";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
 		// New tables:
 		create_b2evo_tables_091();
 	}
@@ -560,15 +567,7 @@ function upgrade_b2evo_tables()
 		 * everywhere where needed in this file.
 		 */
 		 
-		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE T_blogs
-							ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'always'";
-		$DB->query( $query );
-		echo "OK.<br />\n";
-		 
 	}
-
-
 
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );
