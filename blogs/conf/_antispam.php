@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution anti spam config
- * Version of this file: 0.8.5
+ * Version of this file: 0.8.5.5
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -20,6 +20,7 @@ $block_urls = array(
 	'-adult-',
 // Light spammers:
 	'pcfamily.ch',
+	'nositeyet.com',
 	);
 
 ?>

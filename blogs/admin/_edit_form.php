@@ -6,6 +6,66 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 ?>
+<script type="text/javascript" language="javascript">
+	<!--
+<?php 
+if ($use_spellchecker) 
+{ // --------------------------- SPELL CHECKER -------------------------------
+	?>
+	function DoSpell(formname, subject, body)
+	{
+		document.SPELLDATA.formname.value=formname
+		document.SPELLDATA.subjectname.value=subject
+		document.SPELLDATA.messagebodyname.value=body
+		document.SPELLDATA.companyID.value="custom\\http://cafelog.com"
+		document.SPELLDATA.language.value=1033
+		document.SPELLDATA.opener.value="<?php echo $admin_url ?>/sproxy.pl"
+		document.SPELLDATA.formaction.value="http://www.spellchecker.com/spell/startspelling.asp "
+		window.open("<?php echo $admin_url ?>/b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
+	}
+<?php
+}
+
+ // --------------------------- PREVIEW -------------------------------
+?>
+	/*
+	 * open_preview()
+	 * fplanque: created
+	 */
+	function open_preview(form) 
+	{
+		// Stupid thing: having a field called action !
+		var saved_action =  form.attributes.getNamedItem('action').value;
+		form.attributes.getNamedItem('action').value = '<?php bloginfo('dynurl') ?>';
+		form.target = 'b2evo_preview';
+		form.submit();
+		preview_window = window.open( '', 'b2evo_preview' );
+		preview_window.focus();
+		form.attributes.getNamedItem('action').value = saved_action;
+		form.target = '_self';
+	}
+	/*
+	 * edit_reload()
+	 * fplanque: created
+	 */
+	function edit_reload( form, blog ) 
+	{
+		form.attributes.getNamedItem('action').value = '<?php echo $pagenow ?>';
+		form.blog.value = blog;
+		// form.action.value = 'reload';
+		// form.post_title.value = 'demo';
+		// alert( form.action.value + ' ' + form.post_title.value );
+		form.submit();
+		return false;
+	}
+
+	function launchupload() 
+	{
+		window.open ("b2upload.php", "b2upload", "width=380,height=360,location=0,menubar=0,resizable=1,scrollbars=yes,status=1,toolbar=0");
+	}
+	// End -->
+</script>
+
 <!-- ================================ START OF EDIT FORM ================================ -->
 
 <form name="post" id="post" action="edit_actions.php" target="_self" method="post">

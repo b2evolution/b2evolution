@@ -7,7 +7,8 @@
  */
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = T_('Blogs');
-param( 'action' );
+param( 'action', 'string' );
+param( 'blog', 'integer', $default_to_blog, true );
 
 
 switch($action) 

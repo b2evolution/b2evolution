@@ -9,6 +9,7 @@
 require_once (dirname(__FILE__).'/_header.php');
 
 param( 'blog', 'integer', $default_to_blog, true );
+if( $blog == 0 ) $blog = $default_to_blog;
 get_blogparams();
 
 param( 'action', 'string' );
