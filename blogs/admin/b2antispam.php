@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- ** Vegar BERG GULDAL grants FranÃ§ois PLANQUE the right to license
+ ** Vegar BERG GULDAL grants François PLANQUE the right to license
  ** Vegar BERG GULDAL's contributions to this file and the b2evolution project
  ** under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -34,7 +34,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: FranÃ§ois PLANQUE.
+ * @author fplanque: François PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
  * @version $Id$
@@ -54,7 +54,6 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string' );
 
 require(dirname(__FILE__).'/_menutop.php');
-require(dirname(__FILE__).'/_menutop_end.php');
 
 // Check permission:
 $current_User->check_perm( 'spamblacklist', 'view', true );

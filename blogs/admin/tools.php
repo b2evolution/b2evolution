@@ -17,7 +17,6 @@ require_once( dirname(__FILE__).'/_header.php' ); // this will actually load blo
 $admin_tab = 'tools';
 $admin_pagetitle = T_('Tools');
 require( dirname(__FILE__).'/_menutop.php' );
-require( dirname(__FILE__).'/_menutop_end.php' );
 
 // Loop through plugins:
 $Plugins->restart();

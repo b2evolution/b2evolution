@@ -65,7 +65,6 @@ switch($action)
 
 		$admin_pagetitle = T_('Adding new post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
 
 		param( 'post_status', 'string', 'published' );
 		param( 'post_extracats', 'array', array() );
@@ -169,7 +168,6 @@ switch($action)
 
 		$admin_pagetitle = T_('Updating post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
 
 		param( 'post_status', 'string', 'published' );
 		param( 'post_extracats', 'array', array() );
@@ -300,7 +298,6 @@ switch($action)
 
 		$admin_pagetitle = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
-		require(dirname(__FILE__).'/_menutop_end.php');
 
 		$post_status = 'published';
 		// Check permissions:
@@ -380,7 +377,6 @@ switch($action)
 		 */
 		$admin_pagetitle = T_('Deleting post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
 
 		param( 'post', 'integer' );
 		// echo $post;

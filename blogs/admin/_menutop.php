@@ -15,19 +15,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title>b2evo :: <?php echo preg_replace( '/:$/', '', $admin_pagetitle ); ?></title>
-	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
-	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
-	<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
-	<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
-	<?php } ?>
-	<script type="text/javascript" src="styleswitcher.js"></script>
-	<?php
-	if( $mode == 'sidebar' )
-	{ // Include CSS overrides for sidebar: ?>
-		<link href="sidebar.css" rel="stylesheet" type="text/css" />
-	<?php
-	}
+	<?php 
+	// Include links (to CSS...)
+	require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_head_links.php';
 
 	$Debuglog->add( 'Admin_tab='.$admin_tab );
 
@@ -331,126 +321,59 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <body>
 <?php
 
-param( 'blog', 'integer', 0, true ); // We need this for the urls
+param( 'blog', 'integer', 0, true ); // We may need this for the urls
 
-if( empty($mode) )
-{ // We're not running in an special mode (bookmarklet, sidebar...)
-?>
+$menu = array(
+	'new' => array( 'text'=>T_('Write'),
+									'href'=>'b2edit.php?blog='.$blog,
+									'style'=>'font-weight: bold;' ),
 
-<div id="header">
-	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
+	'edit' => array( 'text'=>T_('Edit'),
+										'href'=>'b2browse.php?blog='.$blog,
+										'style'=>'font-weight: bold;' ),
 
-	<div id="headfunctions">
-		<?php echo T_('Style:') ?>
-		<a href="#" onclick="setActiveStyleSheet('Variation'); return false;" title="Variation (Default)">V</a>&middot;<a href="#" onclick="setActiveStyleSheet('Desert'); return false;" title="Desert">D</a>&middot;<a href="#" onclick="setActiveStyleSheet('Legacy'); return false;" title="Legacy">L</a><?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>&middot;<a href="#" onclick="setActiveStyleSheet('Custom'); return false;" title="Custom">C</a><?php } ?>
-		&bull;
-		<a href="<?php echo $htsrv_url ?>login.php?action=logout"><?php echo T_('Logout') ?></a>
-		&bull;
-		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?> <img src="img/close.gif" width="14" height="14" class="top" alt="" title="<?php echo T_('Exit to blogs') ?>" /></a><br />
-	</div>
+	'cats' => array( 'text'=>T_('Categories'),
+										'href'=>'b2categories.php?blog='.$blog ),
 
-	<?php
-	if( !$obhandler_debug )
-	{ // don't display changing time when we want to test obhandler
-	?>
-	<div id="headinfo">
-		b2evo v <strong><?php echo $app_version ?></strong>
-		&middot; <?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
-		&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
-		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
-	</div>
-	<?php } ?>
+	'blogs' => array( 'text'=>T_('Blogs'),
+										'href'=>'blogs.php' ),
 
-	<ul class="tabs">
-	<?php
-		$menu = array(
-			'new' => array( 'text'=>T_('Write'),
-											'href'=>'b2edit.php?blog='.$blog,
-											'style'=>'font-weight: bold;' ),
+	'stats' => array( 'text'=>T_('Stats'),
+										'perm_name'=>'stats',
+										'perm_level'=>'view',
+										'href'=>'b2stats.php' ),
 
-			'edit' => array( 'text'=>T_('Edit'),
-												'href'=>'b2browse.php?blog='.$blog,
-												'style'=>'font-weight: bold;' ),
-
-			'cats' => array( 'text'=>T_('Categories'),
-												'href'=>'b2categories.php?blog='.$blog ),
-
-			'blogs' => array( 'text'=>T_('Blogs'),
-												'href'=>'blogs.php' ),
-
-			'stats' => array( 'text'=>T_('Stats'),
-												'perm_name'=>'stats',
+	'antispam' => array( 'text'=>T_('Antispam'),
+												'perm_name'=>'spamblacklist',
 												'perm_level'=>'view',
-												'href'=>'b2stats.php' ),
+												'href'=>'b2antispam.php' ),
 
-			'antispam' => array( 'text'=>T_('Antispam'),
-														'perm_name'=>'spamblacklist',
-														'perm_level'=>'view',
-														'href'=>'b2antispam.php' ),
+	'templates' => array( 'text'=>T_('Templates'),
+												'perm_name'=>'templates',
+												'perm_level'=>'any',
+												'href'=>'b2template.php' ),
 
-			'templates' => array( 'text'=>T_('Templates'),
-														'perm_name'=>'templates',
-														'perm_level'=>'any',
-														'href'=>'b2template.php' ),
+	'users' => array( 'text'=>T_('Users'),
+										'perm_name'=>'users',
+										'perm_level'=>'view',
+										'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
+										'href'=>'b2users.php' ),
 
-			'users' => array( 'text'=>T_('Users'),
-												'perm_name'=>'users',
-												'perm_level'=>'view',
-												'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
-												'href'=>'b2users.php' ),
+	// TODO: check filemanager permission
+	'files' => array( 'text'=>T_('Files'),
+										'href'=>'files.php' ),
 
-			// TODO: check filemanager permission
-			'files' => array( 'text'=>T_('Files'),
-												'href'=>'files.php' ),
+	'options' => array( 'text'=>T_('Settings'),
+											'perm_name'=>'options',
+											'perm_level'=>'view',
+											'href'=>'b2options.php' ),
 
-			'options' => array( 'text'=>T_('Settings'),
-													'perm_name'=>'options',
-													'perm_level'=>'view',
-													'href'=>'b2options.php' ),
+	'tools' => array( 'text'=>T_('Tools'),
+										'href'=>'tools.php' ),
 
-			'tools' => array( 'text'=>T_('Tools'),
-												'href'=>'tools.php' ),
+	);
 
-			);
+// Include title, menu, etc.
+require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_top.php';
 
-		foreach( $menu as $loop_tab => $loop_details )
-		{
-			$perm = true; // By default
-			if( (!isset($loop_details['perm_name']))
-				|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
-				|| isset($loop_details['text_noperm']) )
-			{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-
-				echo (($loop_tab == $admin_tab) ? '<li class="current">' : '<li>');
-
-				echo '<a href="'.$loop_details['href'].'"';
-
-				if( isset($loop_details['style']) ) echo ' style="'.$loop_details['style'].'"';
-
-				echo '>';
-
-				echo ($perm ? $loop_details['text'] : $loop_details['text_noperm'] );
-
-				echo '</a></li>';
-			}
-		}
-	?>
-
-	</ul>
-</div>
-
-<?php
-} // not in special mode
 ?>
-
-<div id="TitleArea">
-<h1><strong><?php echo $admin_path_seprator;
-if( isset( $admin_pagetitle_titlearea ) )
-{
-	echo $admin_pagetitle_titlearea;
-}
-else
-{
-	echo $admin_pagetitle;
-}
-?></strong>

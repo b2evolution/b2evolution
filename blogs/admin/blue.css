@@ -221,7 +221,7 @@ table.grouped
 	border: 1px solid #9e9286;
 	margin: 1ex auto;
 	border-collapse: collapse;
-	clear:both;
+	/* clear:both; */
 }
 
 table.grouped tr {
@@ -267,19 +267,15 @@ table.grouped tr.odd .firstcol {
 
 /* Page layout: */
 #header {
-	float:left;
-	width:100%;
-	background: url("img/bg.gif") repeat-x bottom;
 	font-size:85%;
-	line-height:normal;
-	padding:0;
-	margin:0;
+	background: url("img/bg_grey.gif") repeat-x bottom;
 }
 #TitleArea {
-	clear: both;
-	margin: 0 1em;
-	padding: 0;
-	border-top: 1px solid #fff;	/* force moz to display float before */
+	/* clear: both; */
+	margin: 0 1em 1ex 1em;
+	padding: .5ex;
+	background-color:#69f;
+	border: 1px solid #36c;	/* force moz to display float before */
 }
 #evologo {
 	float:left;
@@ -311,16 +307,27 @@ table.grouped tr.odd .firstcol {
 	color: #b0b0b0;
 	white-space: nowrap;
 }
+div#mainmenu {
+	float:left;
+	width:12em;
+	background-color:#69f;
+	/* border:	1px solid #f0f; */
+}
 .panelbody {
-	margin: 0;
+	margin: 0 0 0 12em;
 	padding: 0;
+	/* border:	1px solid #f00; */
+}
+#payload {
+	float:left;
+	width: 100%;
 	/* border:	1px solid #f00; */
 }
 .left_col {
 	vertical-align: top;
 	float: left;
 	width: 65%;
-	clear: left;
+	/* clear: left; */
 	/* border:	1px solid #f00; */
 	margin: 0;
 	padding: 0;
@@ -336,7 +343,7 @@ table.grouped tr.odd .firstcol {
 	overflow: hidden;
 }
 div.panelinfo {
-	clear: both;
+	/* clear: both; */
 	background-color: #efede0;
 	border: 1px solid #e1ddce;
 	padding: 0 1ex;
@@ -365,15 +372,25 @@ div.panelblock {
 }
 
 /* Main tabs: */
+#mainmenu ul{
+	list-style: none;
+	margin: 0;
+	padding:0;
+}
+#mainmenu li{
+	border: 1px solid #fff;
+	margin: 1px;
+	padding: .5ex;
+}
 ul.tabs {
 	margin:0;
-	clear: both;
+	/* clear: both; */
 	padding: 0.1ex 1em 0;
 	list-style: none;
 }
 ul.tabs li {
 	float:left;
-	background:url("img/left_both.gif") no-repeat left top;
+	background:url("img/tabs_left_grey.gif") no-repeat left top;
 	margin:0;
 	padding:0 0 0 9px;
 	border-bottom:1px solid #9e9286;
@@ -382,7 +399,7 @@ ul.tabs li a {
 	float:left;
 	display:block;
 	white-space:nowrap;
-	background: url("img/right_both.gif") no-repeat right top;
+	background: url("img/tabs_right_grey.gif") no-repeat right top;
 	padding:4px 11px 3px 2px;
 	text-decoration:none;
 	color:#765;
@@ -420,7 +437,7 @@ ul.tabs li.current a:hover {
 /* Sub-tabs */
 ul.hack {
 	margin:0;
-	clear: both;
+	/* clear: both; */
 	padding: 0.1ex 1em 0;
 	list-style: none;
 }
@@ -433,7 +450,7 @@ div.pt
 }
 div.panelblocktabs
 {
-	clear: both;
+	/* clear: both; */
 	margin-top: 1ex;
 	float:left;
 	width:100%;

@@ -45,7 +45,6 @@ case 'update':
 
 default:
 	require(dirname(__FILE__).'/_menutop.php');
-	require(dirname(__FILE__).'/_menutop_end.php');
 
 	// Determine the edit folder:
 	$edit_folder = get_path('skins').'custom/';

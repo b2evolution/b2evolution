@@ -34,8 +34,6 @@ switch( $tab )
 }
 
 require( dirname(__FILE__). '/_menutop.php' );
-require( dirname(__FILE__). '/_menutop_end.php' );
-
 
 if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract' ))
 		|| !empty($prioup) || !empty($priodown) || !empty($delete)

@@ -134,6 +134,7 @@ $head = <<<EOB
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="blue.css" rel="alternate stylesheet" type="text/css" title="Blue" />
 	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
 EOB;
 if( is_file( dirname(__FILE__).'/custom.css' ) )

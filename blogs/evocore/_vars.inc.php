@@ -45,6 +45,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 $app_name = 'b2evolution';
+$app_shortname = 'b2evo';
 $app_version = '0.9.2-CVS';
 $new_db_version = 8070;				// next time: 8080
 $admin_path_seprator = ' :: ';
@@ -271,6 +272,9 @@ $aspm_sources = array (
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/17 16:18:04  fplanque
+ * backoffice skinning experiment
+ *
  * Revision 1.3  2004/11/15 18:57:05  fplanque
  * cosmetics
  *

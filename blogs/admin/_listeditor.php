@@ -120,7 +120,6 @@ switch( $action )
  * Display page header:
  */
 require dirname(__FILE__).'/_menutop.php';
-require dirname(__FILE__).'/_menutop_end.php';
 
 // Display messages:
 if( $Messages->count( 'all' ) )

@@ -1,3 +1,5 @@
+/* This file is public domain */
+
 function setActiveStyleSheet(title)
 {
 	var i, a;

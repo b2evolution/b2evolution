@@ -364,6 +364,13 @@ $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_dirout = '../';                   // Relative path to go back to base
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 /**
+ * Location of the admin skins folder.
+ * @global string $adminskins_subdir
+ */
+$adminskins_subdir = 'skins/';             // Subdirectory relative to ADMIN
+$adminskins_dirout = '../';                // Relative path to go back to ADMIN
+$adminskins_url = $baseurl.$admin_subdir.$skins_subdir;  // You should not need to change this
+/**
  * Location of the core (the "includes") files.
  * @global string $core_subdir
  */

@@ -49,9 +49,8 @@ for( $curr_blog_ID = blog_list_start();
 		}
 	} // --------------------------------- END OF BLOG LIST ---------------------------------
 
+
 	require (dirname(__FILE__). '/_menutop.php');
-	echo $blogListButtons;
-	require (dirname(__FILE__). '/_menutop_end.php');
 
 	if( $blog == 0 )
 	{ // No blog could be selected

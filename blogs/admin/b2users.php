@@ -25,7 +25,6 @@ param( 'group', 'integer', 0 );
 if( $action != 'userupdate' )
 { // perhaps we'll have to set a cookie later
 	require( dirname(__FILE__).'/_menutop.php' );
-	require( dirname(__FILE__).'/_menutop_end.php' );
 }
 
 
@@ -53,7 +52,6 @@ if( $Messages->count() )
 	if( $action == 'userupdate' )
 	{ // display top menu that was suppressed before
 		require( dirname(__FILE__).'/_menutop.php' );
-		require( dirname(__FILE__).'/_menutop_end.php' );
 	}
 }
 else switch ($action)
@@ -94,7 +92,6 @@ else switch ($action)
 
 			// display menu
 			require( dirname(__FILE__).'/_menutop.php' );
-			require( dirname(__FILE__).'/_menutop_end.php' );
 			break;
 		}
 
@@ -225,7 +222,6 @@ else switch ($action)
 
 		// display menu
 		require( dirname(__FILE__).'/_menutop.php' );
-		require( dirname(__FILE__).'/_menutop_end.php' );
 
 		break;
 

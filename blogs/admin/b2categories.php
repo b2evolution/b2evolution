@@ -42,8 +42,6 @@ if( $action != 'addcat' && $action != 'editedcat' )
 	}
 
 	require(dirname(__FILE__) . '/_menutop.php');
-	echo $blogListButtons;
-	require(dirname(__FILE__) . '/_menutop_end.php');
 }
 
 

@@ -43,7 +43,6 @@ $admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Plug-ins');
 param( 'action', 'string' );
 
 require( dirname(__FILE__). '/_menutop.php' );
-require( dirname(__FILE__). '/_menutop_end.php' );
 
 
 // Check permission to display:

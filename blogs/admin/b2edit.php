@@ -34,13 +34,9 @@ switch($action)
 		$blog = get_catblog($cat);
 		$Blog = Blog_get_by_ID( $blog );
 
-		$admin_pagetitle = $admin_pagetitle_titlearea = T_('Editing post');
-		$admin_pagetitle .= ': '.$edited_Item->get( 'title' );
+		$admin_pagetitle = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
+		$admin_pagetitle_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
 		require (dirname(__FILE__). '/_menutop.php');
-
-		printf( T_('#%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
-
-		require (dirname(__FILE__). '/_menutop_end.php');
 
 		$post_status = $edited_Item->get( 'status' );
 		// Check permission:
@@ -82,7 +78,6 @@ switch($action)
 
 		$admin_pagetitle = T_('Editing comment').' #'.$commentdata['comment_ID'];
 		require (dirname(__FILE__).'/_menutop.php');
-		require (dirname(__FILE__).'/_menutop_end.php');
 
 		$comment_post_ID = $commentdata['comment_post_ID'];
 		$comment_postdata = get_postdata( $comment_post_ID );
@@ -170,8 +165,6 @@ switch($action)
 
 
 		require (dirname(__FILE__).'/_menutop.php');
-		echo $blogListButtons;
-		require (dirname(__FILE__).'/_menutop_end.php');
 
 		if( $blog == 0 )
 		{

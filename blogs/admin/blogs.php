@@ -178,7 +178,6 @@ switch( $action )
 
 
 require( dirname(__FILE__).'/_menutop.php' );
-require( dirname(__FILE__).'/_menutop_end.php' );
 
 
 switch($action)

@@ -13,6 +13,9 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+// EXPERMIENTAL:
+$admin_skin = 'evo';
+$admin_skin = 'legacy';
 
 /**
  * Cross posting

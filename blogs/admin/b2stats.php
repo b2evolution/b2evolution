@@ -57,20 +57,19 @@ $admin_pagetitle = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
 param( 'tab', 'string', 'summary', true );
+param( 'blog', 'integer', 0 );
 
-require(dirname(__FILE__) . '/_menutop.php');
-?>
-<a href="<?php echo regenerate_url( array('blog','page'), "blog=0" ) ?>" class="<?php echo ( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php echo T_('None') ?></a>
-<?php
+$blogListButtons = '<a href="'.regenerate_url( array('blog','page'), "blog=0" ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('None').'</a> ';
+
 for( $curr_blog_ID=blog_list_start('stub');
 			$curr_blog_ID!=false;
 			 $curr_blog_ID=blog_list_next('stub') )
 	{
-		?>
-		<a href="<?php echo regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ) ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
-	<?php
-}
-require( dirname(__FILE__) . '/_menutop_end.php' );
+		$blogListButtons .= '<a href="'.regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
+	}
+
+require(dirname(__FILE__) . '/_menutop.php');
+
 
 // Check permission:
 $current_User->check_perm( 'stats', 'view', true );
