@@ -97,7 +97,8 @@ function create_b2evo_tables()
 		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
 		blog_UID VARCHAR(20),
-		PRIMARY KEY	 (blog_ID)
+		PRIMARY KEY	blog_ID (blog_ID),
+	  UNIQUE KEY blog_stub (blog_stub)
 	)";
 	$DB->query( $query );
 	echo "OK.<br />\n";

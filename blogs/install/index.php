@@ -372,7 +372,7 @@ to
 		<p><?php echo T_('Installation successful!')?></p>
 		<?php
 		printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
-	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$install_dirout.'/admin/"', $random_password );
+	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'/"', $random_password );
 		break;
 
 
@@ -386,13 +386,13 @@ to
 		?>
 		<h2><?php echo T_('Upgrading data in existing b2evolution database')?></h2>
 		<?php
-			if( upgrade_b2evo_tables() )
-			{
+		if( upgrade_b2evo_tables() )
+		{
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$install_dirout.'/admin/"', 'b2evolution')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'b2evolution')?></p>
 		<?php
-			}
+		}
 		break;
 
 
@@ -410,7 +410,7 @@ to
 			upgrade_cafelog_tables();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$install_dirout.'/admin/"', 'b2')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'b2')?></p>
 		<?php
 		break;
 

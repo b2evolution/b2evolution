@@ -24,14 +24,14 @@ function upgrade_b2evo_tables()
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
 	global $DB;
-	global $install_dirout;
+	global $admin_url;
 
 	// Check DB version:
 	check_db_version();
 	if( $old_db_version == $new_db_version )
 	{
 		echo '<p>'.T_('The database schema is already up to date. There is nothing to do.').'</p>';
-		printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$install_dirout.'/admin/"', 'b2evolution' );
+		printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$admin_url.'/"', 'b2evolution' );
 		return false;
 	}
 
@@ -219,6 +219,18 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8060 )
 	{	// upgrade to 0.9
 		
+		// Important check:
+		$stub_list = $DB->get_list( "SELECT blog_stub
+																	FROM $tableblogs
+																	GROUP BY blog_stub
+																	HAVING COUNT(*) > 1" );
+		if( !empty($stub_list) )
+		{
+			echo "<div class=\"error\"><p class=\"error\">I thought this would never happen in real life, but I'm glad I checked! It appears that the following blog stub names [$stub_list] are used more than once. I can't upgrade until you make them unique. (DB field: $tableblogs.blog_stub)</p></div>";
+			return false;
+		}
+		
+		
 		create_locales();
 
 		/**
@@ -317,7 +329,8 @@ function upgrade_b2evo_tables()
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php' AFTER blog_locale,
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin,
 							ADD COLUMN blog_in_bloglist tinyint(1) NOT NULL DEFAULT 1 AFTER blog_disp_bloglist,
-							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0";
+							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
+							ADD UNIQUE KEY blog_stub (blog_stub)";
 		$DB->query( $query );
 
 		$query = "UPDATE $tableblogs
