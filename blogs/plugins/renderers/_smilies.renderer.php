@@ -119,6 +119,11 @@ class smilies_Rendererplugin extends RendererPlugin
 				}
 			}
 		}
+		else
+		{ // No code blocks, replace on the whole thing
+			$content = str_replace( $this->search, $this->replace, $content);
+		}
+	
 		return true;
 	}
 }
