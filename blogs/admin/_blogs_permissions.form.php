@@ -183,7 +183,7 @@ function list_users( $layout, $query )
 		<div style="float:right">
 			<?php echo T_('Layout').':';
 
-			foreach( array( 'default' => T_('Default'), 'wide' => T_('wide'), 'debug' => 'All (JS-debug)' ) as $lkey => $lname )
+			foreach( array( 'default' => T_('Default'), 'wide' => T_('wide'), 'all' => 'Complete (JS-debug)' ) as $lkey => $lname )
 			{
 				echo '<a href="?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout='.$lkey.'"'
 							.' onclick="switch_layout(\''.$lkey.'\'); return false;">['.$lname.']</a>';
@@ -193,7 +193,8 @@ function list_users( $layout, $query )
 		</div>
 
 
-		<div id="userlist_wide" style="<?php echo 'display:'.( $layout == 'wide' ? 'block' : 'none' ) ?>">
+		<div id="userlist_wide" style="<?php
+			echo 'display:'.( ($layout == 'wide' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
 			<table class="grouped">
 				<thead>
 					<tr>
@@ -254,7 +255,8 @@ function list_users( $layout, $query )
 		</div>
 
 
-		<div id="userlist_default" style="<?php echo 'display:'.( $layout == 'default' ? 'block' : 'none' ) ?>">
+		<div id="userlist_default" style="<?php
+			echo 'display:'.( ($layout == 'default' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
 			<table class="grouped">
 				<tr class="group">
 					<td colspan="2">
