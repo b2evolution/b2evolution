@@ -136,7 +136,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-  $Form->textarea( 'content', $content, 16, '', '', 40 , '' );
+	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
 	$Form->fieldstart = '<span class="line">';
 	$Form->fieldend = '</span>';
 	?>
@@ -159,7 +159,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->submit( array( '',/* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ T_('&nbsp; Save ! &nbsp;'), 'SaveButton' ) );
 
 	// ---------- DELETE ----------
-  if( $next_action == 'update' )
+	if( $next_action == 'update' )
 	{ // Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
@@ -188,8 +188,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
-	  if( $next_action == 'create' )
-	  { // If not checked, create time will be used...
+		if( $next_action == 'create' )
+		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
 		}
 	}
@@ -311,69 +311,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->fieldset( T_('Text Renderers') );
 
-	$Plugins->restart(); // make sure iterator is at start position
-	$atLeastOneRenderer = false;
-	while( $loop_RendererPlugin = $Plugins->get_next() )
-	{ // Go through whole list of renders
-		// echo ' ',$loop_RendererPlugin->code;
-		if( $loop_RendererPlugin->apply_when == 'stealth'
-			|| $loop_RendererPlugin->apply_when == 'never' )
-		{ // This is not an option.
-			continue;
-		}
-		$atLeastOneRenderer = true;
-		?>
-		<div>
-			<input type="checkbox" class="checkbox" name="renderers[]"
-				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
-				<?php
-				switch( $loop_RendererPlugin->apply_when )
-				{
-					case 'always':
-						// echo 'FORCED';
-						echo ' checked="checked"';
-						echo ' disabled="disabled"';
-						break;
-
-					case 'opt-out':
-						if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
-							|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
-						{
-							// echo 'OPT';
-							echo ' checked="checked"';
-						}
-						// else echo 'NO';
-						break;
-
-					case 'opt-in':
-						if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
-						{
-							// echo 'OPT';
-							echo ' checked="checked"';
-						}
-						// else echo 'NO';
-						break;
-
-					case 'lazy':
-						// cannot select
-						if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
-						{
-							// echo 'OPT';
-							echo ' checked="checked"';
-						}
-						echo ' disabled="disabled"';
-						break;
-				}
-			?>
-			title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
-		<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><?php echo $loop_RendererPlugin->name(); ?></label>
-	</div>
-	<?php
-	}
-	if( !$atLeastOneRenderer )
-	{
-		echo T_('No renderer plugins are installed.');
-	}
+	$edited_Item->renderer_checkboxes();
 
 	$Form->fieldset_end();
 
@@ -394,6 +332,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/20 22:48:47  blueyed
+ * use $edited_Item->renderer_checkboxes()
+ *
  * Revision 1.14  2005/02/15 22:05:11  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *
