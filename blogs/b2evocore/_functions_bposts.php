@@ -430,7 +430,7 @@ function the_wordcount()
  * the_title(-)
  *
  * Display post title
- * 03.10.10 - Updated function on CSV
+ * 03.10.10 - Updated function to allow for silent operations
  */
 function the_title( 
 	$before='#',		// HTML/text to be displayed before title
