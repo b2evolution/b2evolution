@@ -148,15 +148,16 @@ function list_users( $layout, $query )
 													array( 'editor', T_('Editor') ),
 													array( 'admin',  T_('Admin') ),
 													array( 'custom',  T_('Custom') )
-												) as $easy_group )
+												) as $lkey => $easy_group )
 						{
 							?>
-							<input type="radio" name="blog_perm_easy_<?php echo $lrow['ID'] ?>" value="<?php echo $easy_group[0] ?>"<?php
+							<input type="radio" id="blog_perm_easy_<?php echo $lrow['ID'].'_'.$lkey ?>" name="blog_perm_easy_<?php echo $lrow['ID'] ?>" value="<?php echo $easy_group[0] ?>"<?php
 							if( $easy_group[0] == $user_easy_group )
 							{
 								echo ' checked="checked"';
 							}
-							?> onclick="merge_from_easy( this, <?php echo $lrow['ID'] ?> )" /> <?php echo $easy_group[1];
+							?> onclick="merge_from_easy( this, <?php echo $lrow['ID'] ?> )" />
+							<label for="blog_perm_easy_<?php echo $lrow['ID'].'_'.$lkey.'">'.$easy_group[1].'</label>';
 						}
 						?>
 					</td>
