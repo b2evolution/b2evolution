@@ -27,7 +27,7 @@
 <meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
 <meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
 <link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
-<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss_url', 'raw'); ?>" />
 <link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php bloginfo('atom_url', 'raw'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url', 'raw'); ?>" />
