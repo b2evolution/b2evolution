@@ -476,5 +476,24 @@ class User extends DataObject
 		$this->disp( 'preferedname', $format );
 	}
 
+	/** 
+	 * Template function: display user's URL
+	 *
+	 * {@internal User::url(-) }}
+	 *
+	 * @param string string to display before the date (if changed)
+	 * @param string string to display after the date (if changed)
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function url( $before = '', $after = '', $format = 'htmlbody' ) 
+	{
+		if( !empty( $this->url ) )
+		{
+			echo $before;
+			$this->disp( 'url', $format );
+			echo $after;
+		}
+	}
+
 }
 ?>

@@ -38,7 +38,7 @@ while( $Item = $MainList->get_item() )
   <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
   <link><?php permalink_single() ?></link>
   <dc:date><?php $Item->date( 'isoZ', true ) ?></dc:date>
-  <dc:creator><?php the_author( 'xml' ) ?></dc:creator>
+  <dc:creator><?php $Item->Author->prefered_name( 'xml' ) ?></dc:creator>
   <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
   <description><?php
     the_link( '', ' ', 'xml' );

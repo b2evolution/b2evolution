@@ -1109,6 +1109,8 @@ function the_author_email( $format = 'raw' )
 
 /*
  * the_author_url(-)
+ *
+ * @deprecated deprecated by {@link User::url()}
  */
 function the_author_url( $format = 'raw' ) 
 {
