@@ -1,0 +1,5868 @@
+# b2evolution - Finnish language file
+# Copyright (C) 2004 Nikita Zhuk, Mika Hiltunen and Jyrki X
+# This file is distributed under the same license as the b2evolution package.
+# Nikita Zhuk <http://nikitazhuk.net/>, 2004.
+# Mika Hiltunen <http://www.saaste.net/>, 2004.
+# Jyrki X <http://xxx>, 2004
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: b2evolution 0.9.0.8\n"
+"POT-Creation-Date: 2004-05-30 02:15+0200\n"
+"PO-Revision-Date: 2004-07-26 23:46+0200\n"
+"Last-Translator: Mika Hiltunen <kyte@saaste.net>\n"
+"Language-Team: Koodaus.net <http://www.koodaus.net/blog/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ..\..\..\a_noskin.php:107
+#: ..\..\..\skins\fplanque2002\_bloglist.php:27
+msgid "Selected"
+msgstr "Valittu"
+
+#: ..\..\..\a_noskin.php:158
+#: ..\..\..\a_noskin.php:249
+#: ..\..\..\multiblogs.php:137
+#: ..\..\..\admin\_edit_form.php:328
+#: ..\..\..\admin\_edit_form.php:329
+#: ..\..\..\admin\_edit_showposts.php:473
+#: ..\..\..\admin\_menutop.php:71
+#: ..\..\..\skins\basic\_main.php:78
+#: ..\..\..\skins\custom\_main.php:78
+#: ..\..\..\skins\custom\_main.php:184
+#: ..\..\..\skins\fplanque2002\_main.php:97
+#: ..\..\..\skins\fplanque2002\_main.php:194
+#: ..\..\..\skins\wpc_aubmach\_main.php:109
+#: ..\..\..\skins\wpc_default\_main.php:109
+msgid "Categories"
+msgstr "Kategoriat"
+
+#: ..\..\..\a_noskin.php:172
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:219
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\summary.php:92
+#: ..\..\..\admin\_edit_showposts.php:152
+#: ..\..\..\skins\_linkblog.php:68
+#: ..\..\..\skins\basic\_main.php:68
+#: ..\..\..\skins\basic\_main.php:97
+#: ..\..\..\skins\custom\_main.php:75
+#: ..\..\..\skins\custom\_main.php:92
+#: ..\..\..\skins\fplanque2002\_main.php:94
+#: ..\..\..\skins\fplanque2002\_main.php:109
+#: ..\..\..\skins\wpc_aubmach\_main.php:63
+#: ..\..\..\skins\wpc_default\_main.php:63
+msgid "Permanent link to full entry"
+msgstr "Pysyvä linkki koko kirjoitukseen"
+
+#: ..\..\..\a_noskin.php:172
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:151
+#: ..\..\..\multiblogs.php:219
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\admin\_edit_showposts.php:152
+#: ..\..\..\admin\_edit_showposts.php:252
+#: ..\..\..\skins\_feedback.php:125
+#: ..\..\..\skins\_lastcomments.php:39
+#: ..\..\..\skins\_linkblog.php:68
+#: ..\..\..\skins\basic\_main.php:97
+#: ..\..\..\skins\custom\_main.php:92
+#: ..\..\..\skins\fplanque2002\_main.php:94
+#: ..\..\..\skins\fplanque2002\_main.php:109
+msgid "Permalink"
+msgstr "Pysyvä linkki"
+
+#: ..\..\..\a_noskin.php:224
+#: ..\..\..\a_noskin.php:225
+#: ..\..\..\skins\bluesky\_main.php:134
+#: ..\..\..\skins\bluesky\_main.php:135
+#: ..\..\..\skins\custom\_main.php:159
+#: ..\..\..\skins\custom\_main.php:160
+#: ..\..\..\skins\fplanque2002\_main.php:170
+#: ..\..\..\skins\fplanque2002\_main.php:171
+#: ..\..\..\skins\guadeloupe\_main.php:134
+#: ..\..\..\skins\guadeloupe\_main.php:135
+msgid "Recently"
+msgstr "Viimeisimmät"
+
+#: ..\..\..\a_noskin.php:224
+#: ..\..\..\skins\bluesky\_main.php:134
+#: ..\..\..\skins\custom\_main.php:159
+#: ..\..\..\skins\fplanque2002\_main.php:170
+#: ..\..\..\skins\guadeloupe\_main.php:134
+msgid "(cached)"
+msgstr "(välimuistissa)"
+
+#: ..\..\..\a_noskin.php:225
+#: ..\..\..\skins\bluesky\_main.php:135
+#: ..\..\..\skins\custom\_main.php:160
+#: ..\..\..\skins\fplanque2002\_main.php:171
+#: ..\..\..\skins\guadeloupe\_main.php:135
+msgid "(no cache)"
+msgstr "(ei välimuistissa)"
+
+#: ..\..\..\a_noskin.php:231
+#: ..\..\..\b2evocore\_functions_comments.php:184
+#: ..\..\..\skins\bluesky\_main.php:138
+#: ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\skins\fplanque2002\_main.php:177
+#: ..\..\..\skins\guadeloupe\_main.php:138
+msgid "Last comments"
+msgstr "Viimeisimmät kommentit"
+
+#: ..\..\..\a_noskin.php:232
+#: ..\..\..\skins\custom\_main.php:167
+#: ..\..\..\skins\fplanque2002\_main.php:178
+msgid "Some viewing statistics"
+msgstr "Kävijästatistiikkaa"
+
+#: ..\..\..\a_noskin.php:237
+#: ..\..\..\a_noskin.php:243
+#: ..\..\..\admin\_edit_showposts.php:348
+#: ..\..\..\admin\_edit_showposts.php:548
+#: ..\..\..\skins\custom\_main.php:172
+#: ..\..\..\skins\custom\_main.php:178
+#: ..\..\..\skins\fplanque2002\_main.php:183
+#: ..\..\..\skins\fplanque2002\_main.php:189
+#: ..\..\..\skins\originalb2\_main.php:155
+#: ..\..\..\skins\wpc_aubmach\_main.php:116
+#: ..\..\..\skins\wpc_aubmach\_main.php:120
+#: ..\..\..\skins\wpc_default\_main.php:116
+#: ..\..\..\skins\wpc_default\_main.php:120
+msgid "Search"
+msgstr "Haku"
+
+#: ..\..\..\a_noskin.php:240
+#: ..\..\..\skins\custom\_main.php:175
+#: ..\..\..\skins\fplanque2002\_main.php:186
+msgid "All Words"
+msgstr "Kaikki sanat"
+
+#: ..\..\..\a_noskin.php:241
+#: ..\..\..\skins\custom\_main.php:176
+#: ..\..\..\skins\fplanque2002\_main.php:187
+msgid "Some Word"
+msgstr "Ainakin yksi sana"
+
+#: ..\..\..\a_noskin.php:242
+#: ..\..\..\admin\_edit_showposts.php:393
+#: ..\..\..\skins\custom\_main.php:177
+#: ..\..\..\skins\fplanque2002\_main.php:188
+msgid "Entire phrase"
+msgstr "Koko lause"
+
+#: ..\..\..\a_noskin.php:244
+#: ..\..\..\a_noskin.php:256
+#: ..\..\..\skins\bluesky\_main.php:153
+#: ..\..\..\skins\custom\_main.php:179
+#: ..\..\..\skins\custom\_main.php:191
+#: ..\..\..\skins\guadeloupe\_main.php:154
+msgid "Reset form"
+msgstr "Tyhjennä lomake"
+
+#: ..\..\..\a_noskin.php:255
+#: ..\..\..\skins\bluesky\_main.php:152
+#: ..\..\..\skins\custom\_main.php:190
+#: ..\..\..\skins\fplanque2002\_main.php:200
+#: ..\..\..\skins\guadeloupe\_main.php:153
+#: ..\..\..\skins\originalb2\_main.php:147
+msgid "Get selection"
+msgstr "Hae valitut"
+
+#: ..\..\..\a_noskin.php:261
+#: ..\..\..\admin\_edit_showposts.php:397
+#: ..\..\..\skins\basic\_main.php:137
+#: ..\..\..\skins\bluesky\_main.php:185
+#: ..\..\..\skins\custom\_main.php:196
+#: ..\..\..\skins\fplanque2002\_main.php:205
+#: ..\..\..\skins\guadeloupe\_main.php:186
+#: ..\..\..\skins\wpc_aubmach\_main.php:125
+#: ..\..\..\skins\wpc_default\_main.php:125
+msgid "Archives"
+msgstr "Arkistot"
+
+#: ..\..\..\a_noskin.php:266
+#: ..\..\..\a_noskin.php:279
+#: ..\..\..\a_noskin.php:288
+#: ..\..\..\skins\bluesky\_main.php:198
+#: ..\..\..\skins\bluesky\_main.php:207
+#: ..\..\..\skins\custom\_main.php:201
+#: ..\..\..\skins\custom\_main.php:224
+#: ..\..\..\skins\custom\_main.php:233
+#: ..\..\..\skins\fplanque2002\_main.php:210
+#: ..\..\..\skins\fplanque2002\_main.php:232
+#: ..\..\..\skins\fplanque2002\_main.php:241
+#: ..\..\..\skins\guadeloupe\_main.php:199
+#: ..\..\..\skins\guadeloupe\_main.php:208
+msgid "more..."
+msgstr "lisää..."
+
+#: ..\..\..\a_noskin.php:273
+#: ..\..\..\skins\bluesky\_main.php:192
+#: ..\..\..\skins\custom\_main.php:218
+#: ..\..\..\skins\fplanque2002\_main.php:226
+#: ..\..\..\skins\guadeloupe\_main.php:193
+msgid "Recent Referers"
+msgstr "Viimeisimmät ohjaajat"
+
+#: ..\..\..\a_noskin.php:282
+#: ..\..\..\skins\bluesky\_main.php:201
+#: ..\..\..\skins\custom\_main.php:227
+#: ..\..\..\skins\fplanque2002\_main.php:235
+#: ..\..\..\skins\guadeloupe\_main.php:202
+msgid "Top Referers"
+msgstr "Aktiivisimmat ohjaajat"
+
+#: ..\..\..\a_noskin.php:301
+#: ..\..\..\multiblogs.php:273
+#: ..\..\..\skins\babyblues\_main.php:113
+#: ..\..\..\skins\bluesky\_main.php:212
+#: ..\..\..\skins\custom\_main.php:246
+#: ..\..\..\skins\fplanque2002\_main.php:254
+#: ..\..\..\skins\guadeloupe\_main.php:213
+msgid "Misc"
+msgstr "Muuta"
+
+#: ..\..\..\a_noskin.php:315
+#: ..\..\..\skins\custom\_main.php:259
+#: ..\..\..\skins\fplanque2002\_main.php:268
+msgid "Syndicate this blog"
+msgstr "Seuraa tätä blogia"
+
+#: ..\..\..\default.php:24
+msgid "Default page for b2evolution"
+msgstr "b2evolution-vakiosivu"
+
+#: ..\..\..\default.php:30
+#: ..\..\..\install\index.php:51
+msgid "Multilingual multiuser multi-blog engine."
+msgstr "Monikielinen monen käyttäjän moniblogijärjestelmä"
+
+#: ..\..\..\default.php:33
+msgid "Welcome to b2evolution"
+msgstr "Tervetuloa b2evolutioniin"
+
+#: ..\..\..\default.php:35
+msgid "This is the default homepage for b2evolution. It will be displayed as long as you don't select a default blog in the general settings."
+msgstr "Tämä on b2evolutionin vakiosivu, jota käytetään, jos käyttäjä ei ole valinnut mitään blogia yleisissä asetuksissa."
+
+#: ..\..\..\default.php:38
+msgid "Individual blogs on this system"
+msgstr "Järjestelmän yksittäiset blogit"
+
+#: ..\..\..\default.php:48
+#, php-format
+msgid "Blog #%d"
+msgstr "Blogi #%d"
+
+#: ..\..\..\default.php:70
+msgid "Blog #1"
+msgstr "Blogi #1"
+
+#: ..\..\..\default.php:70
+msgid "This is a special blog that aggregates all messages from all other blogs!"
+msgstr "Tämä on erikoisblogi, joka kerää kaikkien muiden blogien viestit yhteen!"
+
+#: ..\..\..\default.php:75
+msgid "Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office."
+msgstr "Huomio: ylläoleva lista (sekä valikko) generoidaan automaattisesti vain niistä blogeista, joissa on &quot;tyngän url-nimi&quot;. Tämän asetuksen "
+
+#: ..\..\..\default.php:76
+msgid "More demos"
+msgstr "Lisää demoja"
+
+#: ..\..\..\default.php:78
+#: ..\..\..\default.php:79
+#: ..\..\..\default.php:80
+msgid "Custom template"
+msgstr "Kustomoitu sivupohja"
+
+#: ..\..\..\default.php:78
+msgid "Multiple blogs displayed on the same page"
+msgstr "Monen blogin sisältö esitettynä samalla sivulla"
+
+#: ..\..\..\default.php:79
+msgid "Summary of last posts in all blogs"
+msgstr "Kaikkien blogien viimeisimpien kirjoitusten yhteenveto"
+
+#: ..\..\..\default.php:80
+msgid "The page you're looking at"
+msgstr "Nykyinen sivu"
+
+#: ..\..\..\default.php:82
+msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
+msgstr "Huomio: kyseiset demot eivät käytä evoSkinejä, vaikka ne laitettaisiinkin päälle asennuksen yhteydessä. Ainut tapa muuttaa niiden ulkonäköä on muokata niiden PHP-koodipohjaa. Kannattaa kuitenkin muistaa, että nämä ovat vain demoja, joiden tarkoitus on näyttää malliesimerkki omien koodipohjien luomiseksi ;)"
+
+#: ..\..\..\default.php:84
+msgid "Administration"
+msgstr "Ylläpito"
+
+#: ..\..\..\default.php:86
+msgid "Go to backoffice!"
+msgstr "Mene asetuspaneeliin!"
+
+#: ..\..\..\default.php:91
+msgid "Official website"
+msgstr "Virallinen web-sivusto"
+
+#: ..\..\..\default.php:91
+#: ..\..\..\install\index.php:469
+msgid "GNU GPL license"
+msgstr "GNU GPL-lisenssi"
+
+#: ..\..\..\multiblogs.php:96
+msgid "Multiblog demo"
+msgstr "Moniblogidemo"
+
+#: ..\..\..\multiblogs.php:106
+msgid "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
+msgstr "Tämä esimerkkisivupohja sisältää 3:n blogin kirjoituset (yhden vasemmalla ja kahden oikealla)"
+
+#: ..\..\..\summary.php:57
+msgid "Summary demo"
+msgstr "Yhteenvetodemo"
+
+#: ..\..\..\summary.php:67
+msgid "This demo template displays a summary of last posts in all blogs"
+msgstr "Tämä esimerkkisivupohja sisältää kaikkien blogien yhteenvedon kirjoitusten "
+
+#: ..\..\..\summary.php:98
+msgid "More posts..."
+msgstr "Lisää kirjoituksia"
+
+#: ..\..\..\admin\b2antispam.php:14
+#: ..\..\..\admin\_menutop.php:94
+#: ..\..\..\admin\_users_groupform.php:96
+msgid "Antispam"
+msgstr "Antispam"
+
+#: ..\..\..\admin\b2antispam.php:44
+#, php-format
+msgid "The keyword [%s] is too short, it has to be a minimum of 5 characters!"
+msgstr "Avainsana [%s] on liian lyhyt. Minimipituus on 5 merkkiä!"
+
+#: ..\..\..\admin\b2antispam.php:52
+#, php-format
+msgid "Deleting log-hits matching [%s]..."
+msgstr "Poistetaan logihaun tulokset hakutermillä [%s]..."
+
+#: ..\..\..\admin\b2antispam.php:63
+#, php-format
+msgid "Deleting comments matching [%s]..."
+msgstr "Poistetaan löydetyt kommentit hakutermillä [%s]..."
+
+#: ..\..\..\admin\b2antispam.php:73
+#, php-format
+msgid "Blacklisting the keyword [%s]..."
+msgstr "Lisätään avainsana [%s] mustalle listalle..."
+
+#: ..\..\..\admin\b2antispam.php:92
+msgid "Confirm ban &amp; delete"
+msgstr "Vahvista esto (ban) &amp; poista"
+
+#: ..\..\..\admin\b2antispam.php:106
+#, php-format
+msgid "No log-hits match the keyword [%s]."
+msgstr "Logihaku ei löytänyt yhtään hakutulosta hakutermillä [%s]."
+
+#: ..\..\..\admin\b2antispam.php:112
+#, php-format
+msgid "Delete the following %d referer hits:"
+msgstr "Poista seuraavat %d ohjaajat"
+
+#: ..\..\..\admin\b2antispam.php:136
+#, php-format
+msgid "No comments match the keyword [%s]."
+msgstr "Ei kommentteja hakusanalla [%s]."
+
+#: ..\..\..\admin\b2antispam.php:142
+#, php-format
+msgid "Delete the following %d comments:"
+msgstr "Poista seuraavat %d kommenttia:"
+
+#: ..\..\..\admin\b2antispam.php:173
+#, php-format
+msgid "The keyword [%s] is already handled by the blacklist."
+msgstr "Avainsana [%s] on jo mustalla listalla."
+
+#: ..\..\..\admin\b2antispam.php:179
+#, php-format
+msgid "Blacklist the keyword [%s] locally."
+msgstr "Lisää avainsana [%s] paikalliselle mustalle listalle."
+
+#: ..\..\..\admin\b2antispam.php:186
+#, php-format
+msgid "Report the keyword [%s] as abuse to b2evolution.net."
+msgstr "Tee häiriöilmoitus avainsanasta [%s] b2evolution.net:iin."
+
+#: ..\..\..\admin\b2antispam.php:188
+#: ..\..\..\admin\b2antispam.php:271
+#: ..\..\..\admin\_blogs_advanced.form.php:27
+msgid "Terms of service"
+msgstr "Palveluehdot"
+
+#: ..\..\..\admin\b2antispam.php:195
+msgid "Perform selected operations"
+msgstr "Suorita valitut toiminnot"
+
+#: ..\..\..\admin\b2antispam.php:212
+#, php-format
+msgid "Removing entry #%d from the ban list..."
+msgstr "Poistetaan kohde #%d estolistalta..."
+
+#: ..\..\..\admin\b2antispam.php:249
+msgid "Add a banned keyword"
+msgstr "Lisää estetty avainsana"
+
+#: ..\..\..\admin\b2antispam.php:251
+msgid "Check &amp; ban..."
+msgstr "Tarkista &amp; estä..."
+
+#: ..\..\..\admin\b2antispam.php:259
+msgid "Banned domains blacklist"
+msgstr "Estettyjen domainien musta lista"
+
+#: ..\..\..\admin\b2antispam.php:260
+msgid "Any URL containing one of the following keywords will be banned from posts, comments and logs."
+msgstr "Kaikki URL-osoitteet, jotka sisältävät seuraavat avainsanat, tullaan estämään kirjoituksista, kommenteista ja logeista."
+
+#: ..\..\..\admin\b2antispam.php:263
+msgid "If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword."
+msgstr "Jos avainsana estää luvallisia domaineja, klikkaa vihreää merkkiä poistaaksesi eston."
+
+#: ..\..\..\admin\b2antispam.php:270
+msgid "Request abuse update from centralized blacklist!"
+msgstr "Päivitä keskitettyä mustaa listaa."
+
+#: ..\..\..\admin\b2antispam.php:281
+msgid "Allow keyword back (Remove it from the blacklist)"
+msgstr "Salli avainsana uudestaan (poista se mustalta listalta)"
+
+#: ..\..\..\admin\b2antispam.php:281
+msgid "Allow Back"
+msgstr "Salli uudestaan"
+
+#: ..\..\..\admin\b2antispam.php:292
+msgid "Report abuse to centralized ban blacklist!"
+msgstr "Raportoi häiriöstä keskitetylle estojen mustalle listalle!"
+
+#: ..\..\..\admin\b2antispam.php:292
+msgid "Report"
+msgstr "Raportoi"
+
+#: ..\..\..\admin\b2antispam.php:294
+msgid "Check hit-logs and comments for this keyword!"
+msgstr "Tarkista osumalogit ja kommentit tälle avainsanalle!"
+
+#: ..\..\..\admin\b2antispam.php:294
+msgid "Re-check"
+msgstr "Tarkista uudestaan"
+
+#: ..\..\..\admin\b2blogs.php:13
+#: ..\..\..\admin\_blogs_list.php:23
+#: ..\..\..\admin\_menutop.php:77
+#: ..\..\..\admin\_users_groupform.php:86
+#: ..\..\..\skins\bluesky\_bloglist.php:17
+#: ..\..\..\skins\guadeloupe\_bloglist.php:17
+msgid "Blogs"
+msgstr "Blogit"
+
+#: ..\..\..\admin\b2blogs.php:21
+#: ..\..\..\admin\b2blogs.php:124
+msgid "New"
+msgstr "Uusi"
+
+#: ..\..\..\admin\b2blogs.php:30
+msgid "Creating blog..."
+msgstr "Luodaan blogia..."
+
+#: ..\..\..\admin\b2blogs.php:58
+#: ..\..\..\admin\b2blogs.php:217
+msgid "You must provide an URL blog name / Stub name!"
+msgstr "Sinun tulee syöttää blogin/tyngän URL-nimi!"
+
+#: ..\..\..\admin\b2blogs.php:64
+#: ..\..\..\admin\b2blogs.php:224
+msgid "This URL blog name / Stub name is already in use by another blog. Choose another name."
+msgstr "Tämä blogin/tyngän URL-nimi on jo käytössä, valitse toinen nimi."
+
+#: ..\..\..\admin\b2blogs.php:67
+msgid "Cannot create, please correct these errors:"
+msgstr "Ei voitu luoda, korjaa nämä virheet:"
+
+#: ..\..\..\admin\b2blogs.php:110
+#, php-format
+msgid "You should <a %s>create categories</a> for this blog now!"
+msgstr "Nyt voit <a %s>luoda kategorioita</a> tähän blogiin!"
+
+#: ..\..\..\admin\b2blogs.php:131
+#: ..\..\..\b2evocore\_class_blog.php:64
+msgid "New weblog"
+msgstr "Uusi web-logi"
+
+#: ..\..\..\admin\b2blogs.php:132
+#: ..\..\..\admin\b2blogs.php:151
+#: ..\..\..\b2evocore\_class_blog.php:63
+msgid "New blog"
+msgstr "Uusi blogi"
+
+#: ..\..\..\admin\b2blogs.php:168
+#: ..\..\..\admin\b2blogs.php:305
+#: ..\..\..\admin\b2blogs.php:332
+#: ..\..\..\admin\b2options.php:25
+#: ..\..\..\admin\b2options.php:429
+#: ..\..\..\admin\_users_groupform.php:72
+msgid "General"
+msgstr "Yleiset"
+
+#: ..\..\..\admin\b2blogs.php:171
+#: ..\..\..\admin\b2blogs.php:308
+#: ..\..\..\admin\b2blogs.php:338
+msgid "Permissions"
+msgstr "Oikeudet"
+
+#: ..\..\..\admin\b2blogs.php:174
+#: ..\..\..\admin\b2blogs.php:311
+#: ..\..\..\admin\b2blogs.php:344
+msgid "Advanced"
+msgstr "Lisäasetukset"
+
+#: ..\..\..\admin\b2blogs.php:186
+#, php-format
+msgid "Updating Blog [%s]..."
+msgstr "Päivitetään blogia [%s]..."
+
+#: ..\..\..\admin\b2blogs.php:227
+#: ..\..\..\admin\edit_actions.php:213
+msgid "Cannot update, please correct these errors:"
+msgstr "Ei voida päivittää, korjaa nämä virheet:"
+
+#: ..\..\..\admin\b2blogs.php:420
+#, php-format
+msgid "Delete blog [%s]?"
+msgstr "Poista blogi [%s]?"
+
+#: ..\..\..\admin\b2blogs.php:422
+msgid "Deleting this blog will also delete all its categories, posts and comments!"
+msgstr "Poistamalla tämän blogin poistat myös kaikki sen kategoriat, kirjoitukset ja kommentit!"
+
+#: ..\..\..\admin\b2blogs.php:424
+#: ..\..\..\admin\b2users.php:324
+#: ..\..\..\admin\b2users.php:381
+msgid "THIS CANNOT BE UNDONE!"
+msgstr "TÄTÄ TOIMINTOA EI VOIDA PERUA!"
+
+#: ..\..\..\admin\b2blogs.php:437
+#, php-format
+msgid "Also try to delete stub file [<strong><a %s>%s</a></strong>]"
+msgstr "Yritä poistaa myös tynkätiedosto [<strong><a %s>%s</a></strong>]"
+
+#: ..\..\..\admin\b2blogs.php:445
+#, php-format
+msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
+msgstr "Yritä poistaa myös staattinen tiedosto  [<strong><a %s>%s</a></strong>]"
+
+#: ..\..\..\admin\b2blogs.php:451
+#: ..\..\..\admin\b2users.php:332
+#: ..\..\..\admin\b2users.php:389
+msgid "I am sure!"
+msgstr "Olen varma!"
+
+#: ..\..\..\admin\b2blogs.php:454
+#: ..\..\..\admin\b2users.php:335
+#: ..\..\..\admin\b2users.php:392
+msgid "CANCEL"
+msgstr "PERUUTA"
+
+#: ..\..\..\admin\b2blogs.php:486
+#, php-format
+msgid "Generating static page for blog [%s]"
+msgstr "Generoidaan staattista sivua blogiin [%s]"
+
+#: ..\..\..\admin\b2blogs.php:495
+msgid "You haven't set a static filename for this blog!"
+msgstr "Et ole asettanut staattista tiedostonimeä tälle blogille!"
+
+#: ..\..\..\admin\b2blogs.php:542
+msgid "File cannot be written!"
+msgstr "Tiedostoa ei voida tallentaa!"
+
+#: ..\..\..\admin\b2blogs.php:543
+#, php-format
+msgid "You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>."
+msgstr "Tarkista käyttöoikeudet tiedostolle [%s]. Lue <a %s>manualista lisää tiedostojen käyttöoikeuksista</a>."
+
+#: ..\..\..\admin\b2blogs.php:549
+#, php-format
+msgid "Writing to file [%s]..."
+msgstr "Tallennetaan tiedostoa [%s]..."
+
+#: ..\..\..\admin\b2blogs.php:553
+#: ..\..\..\admin\edit_actions.php:131
+#: ..\..\..\admin\edit_actions.php:248
+#: ..\..\..\admin\edit_actions.php:338
+#: ..\..\..\b2evocore\_functions_antispam.php:200
+#: ..\..\..\b2evocore\_functions_antispam.php:302
+#: ..\..\..\b2evocore\_functions_pings.php:47
+#: ..\..\..\b2evocore\_functions_pings.php:82
+#: ..\..\..\b2evocore\_functions_pings.php:157
+#: ..\..\..\b2evocore\_functions_pings.php:197
+msgid "Done."
+msgstr "Valmis."
+
+#: ..\..\..\admin\b2browse.php:13
+msgid "Browse blog:"
+msgstr "Selaa blogia:"
+
+#: ..\..\..\admin\b2browse.php:56
+#: ..\..\..\admin\b2edit.php:162
+#, php-format
+msgid "Since you're a newcomer, you'll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
+msgstr "Koska olet uusi käyttäjä, sinun tulee odottaa, kunnes ylläpitäjä on antanut sinulle oikeudet kirjoitusten lähettämiseen. Voit myös <a %s>lähettää ylläpitäjälle sähköpostia</a> ja pyytää oikeuksia. Kun olet saanut oikeudet, lataa tämä sivu uudestaan ja voit lähettää kirjoituksiasi. :)"
+
+#: ..\..\..\admin\b2categories.php:13
+#: ..\..\..\admin\_cats_list.php:13
+msgid "Categories for blog:"
+msgstr "Blogin kategoriat:"
+
+#: ..\..\..\admin\b2categories.php:77
+#, php-format
+msgid "New sub-category in category: %s"
+msgstr "Uusi alakategoria kategoriassa: %s"
+
+#: ..\..\..\admin\b2categories.php:86
+#, php-format
+msgid "New category in blog: %s"
+msgstr "Uusi kategoria blogissa: %s"
+
+#: ..\..\..\admin\b2categories.php:93
+msgid "New category name"
+msgstr "Uusi kategorian nimi"
+
+#: ..\..\..\admin\b2categories.php:94
+msgid "Create category"
+msgstr "Luo kategoria"
+
+#: ..\..\..\admin\b2categories.php:150
+#, php-format
+msgid "Deleting category #%d : %s ..."
+msgstr "Poistetaan kategoria #%d : %s ..."
+
+#: ..\..\..\admin\b2categories.php:156
+#: ..\..\..\b2evocore\_functions_users.php:71
+#: ..\..\..\b2evocore\_functions_users.php:102
+#: ..\..\..\htsrv\profile_update.php:50
+#: ..\..\..\htsrv\profile_update.php:60
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\profile_update.php:75
+#: ..\..\..\htsrv\profile_update.php:84
+#: ..\..\..\htsrv\profile_update.php:92
+#: ..\..\..\htsrv\profile_update.php:97
+#: ..\..\..\htsrv\register.php:41
+#: ..\..\..\htsrv\register.php:48
+#: ..\..\..\htsrv\register.php:55
+#: ..\..\..\htsrv\register.php:71
+#: ..\..\..\htsrv\register.php:76
+#: ..\..\..\htsrv\register.php:87
+msgid "ERROR"
+msgstr "VIRHE"
+
+#: ..\..\..\admin\b2categories.php:160
+msgid "Category deleted."
+msgstr "Kategoria poistettu."
+
+#: ..\..\..\admin\b2categories.php:185
+msgid "Properties for category:"
+msgstr "Kategorian ominaisuudet:"
+
+#: ..\..\..\admin\b2categories.php:188
+#: ..\..\..\admin\b2upload.php:163
+#: ..\..\..\admin\_edit_form.php:128
+#: ..\..\..\admin\_set_regional.form.php:48
+#: ..\..\..\admin\_set_regional.form.php:159
+#: ..\..\..\admin\_users_groupform.php:75
+#: ..\..\..\admin\_users_list.php:19
+#: ..\..\..\skins\_feedback.php:169
+#: ..\..\..\skins\basic\_feedback.php:165
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:176
+#: ..\..\..\skins\wpc_default\_feedback.php:176
+msgid "Name"
+msgstr "Nimi"
+
+#: ..\..\..\admin\b2categories.php:192
+msgid "New parent category"
+msgstr "Uusi pääkategoria"
+
+#: ..\..\..\admin\b2categories.php:218
+#: ..\..\..\admin\b2categories.php:237
+msgid "Old Parent"
+msgstr "Vanha pääkategoria"
+
+#: ..\..\..\admin\b2categories.php:235
+msgid "Root (No parent)"
+msgstr "Juurikategoria (ei pääkategoriaa)"
+
+#: ..\..\..\admin\b2categories.php:246
+msgid "Edit category!"
+msgstr "Muokkaa kategoriaa!"
+
+#: ..\..\..\admin\b2categories.php:291
+msgid "Sorry, you have no permission to edit/view any category's properties."
+msgstr "Virhe. Sinulla ei ole oikeuksia muokata/katsoa kategorioiden ominaisuuksia."
+
+#: ..\..\..\admin\b2edit.php:26
+#: ..\..\..\admin\edit_actions.php:192
+#: ..\..\..\admin\edit_actions.php:291
+msgid "Oops, no post with this ID."
+msgstr "Hups, ei kirjoituksia tällä ID-numerolla."
+
+#: ..\..\..\admin\b2edit.php:33
+msgid "Editing post"
+msgstr "Muokataan kirjoitusta"
+
+#: ..\..\..\admin\b2edit.php:36
+#, php-format
+msgid "#%d in blog: %s"
+msgstr "#%d blogissa: %s"
+
+#: ..\..\..\admin\b2edit.php:75
+msgid "Oops, no comment with this ID!"
+msgstr "Hups, ei kommenttia tällä ID-numerolla!"
+
+#: ..\..\..\admin\b2edit.php:78
+msgid "Editing comment"
+msgstr "Muokataan kommenttia"
+
+#: ..\..\..\admin\b2edit.php:113
+msgid "New post in blog:"
+msgstr "Uusi kirjoitus blogissa:"
+
+#: ..\..\..\admin\b2edit.php:143
+#: ..\..\..\admin\b2edit.php:174
+msgid "Since this blog has no categories, you cannot post to it. You must create categories first."
+msgstr "Koska tällä blogilla ei ole yhtään kategoriaa, et voi lähettää siihen kirjoituksia. Luo ensin vähintään 1 kategoria."
+
+#: ..\..\..\admin\b2edit.php:147
+msgid "Switch to this blog (keeping your input if Javascript is active)"
+msgstr "Vaihda tähän blogiin (kirjoittamasi lomakkeen arvot säilyvät, jos selaimen Javascript-tuki on päällä)"
+
+#: ..\..\..\admin\b2login.php:19
+#: ..\..\..\admin\b2upload.php:20
+#: ..\..\..\htsrv\_header.php:14
+msgid "b2evo"
+msgstr "b2evo"
+
+#: ..\..\..\admin\b2login.php:19
+#: ..\..\..\b2evocore\_functions_users.php:343
+msgid "Login..."
+msgstr "Kirjaudu..."
+
+#: ..\..\..\admin\b2login.php:22
+msgid "In b2evolution, you do not need to point to the b2login.php page to log in."
+msgstr "Sinun ei tarvitse mennä b2login.php -sivulle kirjautuaksesi sisään b2evolutioniin."
+
+#: ..\..\..\admin\b2login.php:23
+#, php-format
+msgid "Simply point directly to the backoffice page you need, for example: %s or %s. b2evo will prompt you to log in if needed."
+msgstr "Kirjoita suoraan sen ylläpitosivun osoite, jonne haluat mennä, esimmerkiksi: %s tai %s. b2evo pyytää kirjautumaan, jos se on tarpeen."
+
+#: ..\..\..\admin\b2options.php:13
+#: ..\..\..\admin\_menutop.php:127
+msgid "Settings"
+msgstr "Asetukset"
+
+#: ..\..\..\admin\b2options.php:28
+#: ..\..\..\admin\b2options.php:437
+msgid "Regional"
+msgstr "Kieliasetukset"
+
+#: ..\..\..\admin\b2options.php:31
+#: ..\..\..\admin\b2options.php:443
+msgid "Plug-ins"
+msgstr "Pluginit"
+
+#: ..\..\..\admin\b2options.php:83
+#, php-format
+msgid "Parameter %s required!"
+msgstr "%s-parametri on pakollinen!"
+
+#: ..\..\..\admin\b2options.php:98
+msgid "General settings updated."
+msgstr "Yleisasetukset päivitetty."
+
+#: ..\..\..\admin\b2options.php:118
+msgid "Regional settings updated."
+msgstr "Kieliasetukset päivitetty."
+
+#: ..\..\..\admin\b2options.php:128
+msgid "You must provide a locale code!"
+msgstr "Syötä locale-paikalliskoodi!"
+
+#: ..\..\..\admin\b2options.php:153
+#, php-format
+msgid "Inserted locale '%s' into database."
+msgstr "Lisätty locale-paikalliskoodi '%s' tietokantaan."
+
+#: ..\..\..\admin\b2options.php:168
+#: ..\..\..\admin\b2options.php:185
+#, php-format
+msgid "Updated locale '%s'."
+msgstr "Päivitetty paikalliskoodi '%s'"
+
+#: ..\..\..\admin\b2options.php:181
+#, php-format
+msgid "Created locale '%s'."
+msgstr "Luotu paikalliskoodi '%s'"
+
+#: ..\..\..\admin\b2options.php:207
+msgid "Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded."
+msgstr "Paikalliskooditaulu poistettu, vakioarvot ladattu tiedostosta <code>/conf/_locales.php</code>."
+
+#: ..\..\..\admin\b2options.php:220
+#, php-format
+msgid "File <code>%s</code> not found."
+msgstr "Tiedostoa <code>%s</code> ei löydy."
+
+#: ..\..\..\admin\b2options.php:349
+#, php-format
+msgid "Deleted locale '%s' from database."
+msgstr "Paikalliskoodi '%s' poistettu tietokannasta."
+
+#: ..\..\..\admin\b2options.php:389
+msgid "Switched priorities."
+msgstr "Prioriteetti vaihdettu."
+
+#: ..\..\..\admin\b2spell.php:12
+msgid "Spell Check"
+msgstr "Oikolue"
+
+#: ..\..\..\admin\b2spell.php:76
+msgid "Loading Spell Checker. Please wait"
+msgstr "Oikolukijaa ladataan, odota hetki"
+
+#: ..\..\..\admin\b2stats.php:13
+msgid "View Stats for Blog:"
+msgstr "Blogin kävijästatistiikka:"
+
+#: ..\..\..\admin\b2stats.php:21
+#: ..\..\..\admin\b2stats.php:25
+#: ..\..\..\b2evocore\_class_dataobjectcache.php:204
+msgid "None"
+msgstr "Ei yhtään"
+
+#: ..\..\..\admin\b2stats.php:55
+#, php-format
+msgid "Changing hit #%d type to: %s"
+msgstr "Vaihdetaan osuman #%d tyyppi tyypiksi: %s"
+
+#: ..\..\..\admin\b2stats.php:72
+#, php-format
+msgid "Deleting hit #%d..."
+msgstr "Poistetaan osuma #%d..."
+
+#: ..\..\..\admin\b2stats.php:89
+#, php-format
+msgid "Pruning hits for %s..."
+msgstr "Tiivistetään %s:n osumia..."
+
+#: ..\..\..\admin\b2stats.php:110
+#: ..\..\..\admin\b2stats.php:152
+msgid "Summary"
+msgstr "Yhteenveto"
+
+#: ..\..\..\admin\b2stats.php:116
+#: ..\..\..\admin\b2stats.php:174
+msgid "Referers"
+msgstr "Ohjaajat"
+
+#: ..\..\..\admin\b2stats.php:122
+#: ..\..\..\admin\b2stats.php:175
+msgid "Refering Searches"
+msgstr "Ohjaavat haut"
+
+#: ..\..\..\admin\b2stats.php:128
+#: ..\..\..\admin\b2stats.php:177
+msgid "Syndication"
+msgstr "Seuranta"
+
+#: ..\..\..\admin\b2stats.php:134
+msgid "User Agents"
+msgstr "Asiakasohjelmat"
+
+#: ..\..\..\admin\b2stats.php:140
+#: ..\..\..\admin\b2stats.php:178
+msgid "Direct Accesses"
+msgstr "Suorat pääsyt"
+
+#: ..\..\..\admin\b2stats.php:173
+msgid "Date"
+msgstr "Pvm"
+
+#: ..\..\..\admin\b2stats.php:176
+msgid "Indexing Robots"
+msgstr "Indeksirobotit"
+
+#: ..\..\..\admin\b2stats.php:179
+msgid "Total"
+msgstr "Yhteensä"
+
+#: ..\..\..\admin\b2stats.php:191
+msgid "Prune this date!"
+msgstr "Tiivistä tämä pvm!"
+
+#. TRANS: Abbrev. for Prune (stats)
+#: ..\..\..\admin\b2stats.php:191
+#: ..\..\..\admin\b2stats.php:220
+msgid "Prune"
+msgstr "Tiivistä"
+
+#: ..\..\..\admin\b2stats.php:191
+#: ..\..\..\admin\b2stats.php:220
+msgid "Prune hits for this date!"
+msgstr "Tiivistä tämän päivämäärän osumat!"
+
+#: ..\..\..\admin\b2stats.php:240
+#: ..\..\..\skins\_stats.php:16
+msgid "Last referers"
+msgstr "Viimeisimmät ohjaajat"
+
+#: ..\..\..\admin\b2stats.php:241
+msgid "These are hits from external web pages refering to this blog"
+msgstr "Nämä osumat ovat tulleet ulkoisilta web-sivuilta, jotka linkittävät tähän blogiin"
+
+#: ..\..\..\admin\b2stats.php:250
+#: ..\..\..\admin\b2stats.php:297
+#: ..\..\..\admin\b2stats.php:367
+msgid "Delete this hit!"
+msgstr "Poista tämä osuma!"
+
+#  TRANS: Abbrev. for Delete (stats)
+#: ..\..\..\admin\b2stats.php:250
+#: ..\..\..\admin\b2stats.php:297
+#: ..\..\..\admin\b2stats.php:367
+#: ..\..\..\admin\_blogs_list.php:31
+#: ..\..\..\admin\_blogs_list.php:88
+#: ..\..\..\admin\_cats_list.php:31
+#: ..\..\..\admin\_users_list.php:77
+#: ..\..\..\admin\_users_list.php:146
+msgid "Del"
+msgstr "Poista"
+
+#: ..\..\..\admin\b2stats.php:251
+msgid "Log as a search instead"
+msgstr "Kirjaa hakuna"
+
+#  TRANS: Abbrev. for "move to searches" (stats)
+#: ..\..\..\admin\b2stats.php:251
+msgid "-&gt;S"
+msgstr "-&gt;S"
+
+#: ..\..\..\admin\b2stats.php:257
+#: ..\..\..\admin\b2stats.php:273
+#: ..\..\..\admin\_edit_showposts.php:222
+msgid "Ban this domain!"
+msgstr "Estä tämä domaini!"
+
+#. TRANS: Abbrev.
+#: ..\..\..\admin\b2stats.php:257
+#: ..\..\..\admin\b2stats.php:273
+#: ..\..\..\admin\_edit_showposts.php:222
+msgid "Ban"
+msgstr "Estä"
+
+#: ..\..\..\admin\b2stats.php:265
+#: ..\..\..\skins\_stats.php:26
+msgid "Top referers"
+msgstr "Aktiivisimmat ohjaajat"
+
+#: ..\..\..\admin\b2stats.php:280
+msgid "Total referers"
+msgstr "Kaikki ohjaajat"
+
+#: ..\..\..\admin\b2stats.php:287
+#: ..\..\..\skins\_stats.php:36
+msgid "Last refering searches"
+msgstr "Viimeisimmät ohjaavat haut"
+
+#: ..\..\..\admin\b2stats.php:288
+msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
+msgstr "Nämä osumat ovat tulleet blogijärjestelmään hakukoneen kautta (hakukoneiden tulee olla listattuna tiedostossa /conf/_stats.php)"
+
+#: ..\..\..\admin\b2stats.php:308
+msgid "Top refering search engines"
+msgstr "Aktiivisimmat ohjaajahakukoneet"
+
+#: ..\..\..\admin\b2stats.php:320
+#: ..\..\..\skins\_stats.php:60
+msgid "Top Indexing Robots"
+msgstr "Aktiivisimmat indeksointirobotit"
+
+#: ..\..\..\admin\b2stats.php:321
+msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/_stats.php)"
+msgstr "Nämä osumat ovat tulleet automaattisista roboteista, kuten hakukoneiden indeksointiroboteista. (Robottien pitää olla listattuna /conf/_stats.php -tiedostossa)"
+
+#: ..\..\..\admin\b2stats.php:338
+#: ..\..\..\skins\_stats.php:75
+msgid "Top Aggregators"
+msgstr "Aktiivisimmat seuraajat"
+
+#: ..\..\..\admin\b2stats.php:339
+msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)"
+msgstr "Nämä osumat tulevat RSS-seuraajista. (Seuraajien tulee olla listattuna /conf/_stats.php -tiedostossa"
+
+#: ..\..\..\admin\b2stats.php:350
+msgid "Total RSS hits"
+msgstr "Kaikki RSS-osumat"
+
+#: ..\..\..\admin\b2stats.php:357
+msgid "Last direct accesses"
+msgstr "Viimeisimmät suorat kävijät"
+
+#: ..\..\..\admin\b2stats.php:358
+msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
+msgstr "Nämä osumat ovat tulleet kävijöistä, jotka ovat tulleet blogijärjestelmään suoraan (joko kirjoitamalla URL-osoitteen suoraan tai käyttämälla selaimen suosikkeja. Väärät (liian lyhyet) ohjaajat ovat myös listattuna tässä.)"
+
+#: ..\..\..\admin\b2stats.php:381
+msgid "Top User Agents"
+msgstr "Eniten käytetyt asiakasohjelmat."
+
+#: ..\..\..\admin\b2template.php:14
+msgid "Custom skin template editing"
+msgstr "Kustomoidun teeman muokkaus"
+
+#: ..\..\..\admin\b2template.php:54
+msgid "Listing:"
+msgstr "Listaus:"
+
+#: ..\..\..\admin\b2template.php:58
+msgid "Invalid filename!"
+msgstr "Virheellinen tiedoston nimi!"
+
+#: ..\..\..\admin\b2template.php:62
+msgid "Oops, no such file !"
+msgstr "Hups, tiedostoa ei ole olemassa !"
+
+#: ..\..\..\admin\b2template.php:73
+msgid "File edited!"
+msgstr "Tiedostoa muokattu!"
+
+#: ..\..\..\admin\b2template.php:77
+msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
+msgstr "Ole varovainen muokatessasi tätä tiedostoa, virheelliset muutokset voivat rikkoa sivupohjasi! Älä muokkaa <code>&lt;?php</code> ja <code>?&gt;</code> -tagien välissä olevaa koodia, ellet tiedä varmasti, mitä olet tekemässä!"
+
+#: ..\..\..\admin\b2template.php:86
+msgid "update template !"
+msgstr "päivitä sivupohjaa !"
+
+#: ..\..\..\admin\b2template.php:90
+msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
+msgstr "(et voi päivittää tätä tiedostoa/sivupohjaa: tiedostoon tulee olla kirjoitusoikeudet, ts. chmod 766)"
+
+#: ..\..\..\admin\b2template.php:102
+msgid "This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom). "
+msgstr "Tällä sivulla voit muokata <strong>kustomoitua teemaa</strong> (joka sijaitsee /skins/custom -hakemistossa). "
+
+#: ..\..\..\admin\b2template.php:103
+msgid "You can edit any of the following files (provided it's writable by the server, e.g. CHMOD 766)"
+msgstr "Voit muokata mitä tahansa seuraavista tiedostoista (olettaen, että niihin voidaan kirjoittaa, ts. chmod 766)"
+
+#: ..\..\..\admin\b2template.php:110
+#, php-format
+msgid "Directory %s not found."
+msgstr "Hakemistoa %s ei löydy."
+
+#: ..\..\..\admin\b2template.php:126
+msgid "This is the template that displays the links to the archives for a blog"
+msgstr "Tämä sivupohja listaa kaikki linkit blogin arkistoihin."
+
+#: ..\..\..\admin\b2template.php:129
+msgid "This is the template that displays the (recursive) list of (sub)categories"
+msgstr "Tämä sivupohja näyttää (rekursiivisen) listan (ali)kategorioista."
+
+#: ..\..\..\admin\b2template.php:132
+msgid "This is the template that displays the feedback for a post"
+msgstr "Tämä sivupohja näyttää kirjoituksen palautteen"
+
+#: ..\..\..\admin\b2template.php:135
+msgid "This is the template that displays the last comments for a blog"
+msgstr "Tämä sivupohja näyttää viimeiset blogin kommentit"
+
+#: ..\..\..\admin\b2template.php:138
+msgid "This is the main template. It displays the blog."
+msgstr "Tämä on pääsivupohja, joka näyttää blogin"
+
+#: ..\..\..\admin\b2template.php:141
+msgid "This is the template that displays stats for a blog"
+msgstr "Tämä on sivupohja, joka näyttää blogin statistiikan"
+
+#: ..\..\..\admin\b2template.php:144
+msgid "This is the page displayed in the comment popup"
+msgstr "Tämä sivu näytetään kommentin popup-ikkunassa"
+
+#: ..\..\..\admin\b2template.php:147
+msgid "This is the page displayed in the pingback popup"
+msgstr "Tämä sivu näytetään päivitysilmoituksen popup-ikkunassa"
+
+#: ..\..\..\admin\b2template.php:150
+msgid "This is the page displayed in the trackback popup"
+msgstr "Tämä sivu näytetään viittauksen popup-ikkunassa"
+
+#: ..\..\..\admin\b2template.php:161
+msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
+msgstr "Huom: voit tietysti muokata tieodstoja/sivupohjia myös tekstieditorissasi, ja lähettää ne sitten serverille. Tämä online-editori on tarkoitettu käytettäväksi tilanteissa, joissa tekstieditoria ei voida käyttää..."
+
+#: ..\..\..\admin\b2upload.php:20
+msgid "upload images/files"
+msgstr "lähetä kuvia/tiedostoja"
+
+#: ..\..\..\admin\b2upload.php:43
+msgid "File upload"
+msgstr "Tiedoston lähetys"
+
+#: ..\..\..\admin\b2upload.php:44
+msgid "Allowed file types:"
+msgstr "Sallitut tiedostotyypit:"
+
+#: ..\..\..\admin\b2upload.php:45
+#, php-format
+msgid "Maximum allowed file size: %d KB"
+msgstr "Suurin sallittu tiedoston koko: %d KB"
+
+#: ..\..\..\admin\b2upload.php:50
+#: ..\..\..\admin\b2upload.php:124
+#: ..\..\..\admin\_blogs_general.form.php:73
+#: ..\..\..\admin\_set_plugins.form.php:23
+#: ..\..\..\admin\_set_plugins.form.php:46
+msgid "Description"
+msgstr "Kuvaus"
+
+#: ..\..\..\admin\b2upload.php:53
+msgid "Upload !"
+msgstr "Lähetä !"
+
+#: ..\..\..\admin\b2upload.php:79
+#, php-format
+msgid "File %s: type %s is not allowed."
+msgstr "Tiedosto %s: tyyppi %s ei ole sallittu."
+
+#: ..\..\..\admin\b2upload.php:108
+#: ..\..\..\admin\b2upload.php:136
+#: ..\..\..\admin\b2upload.php:139
+msgid "Couldn't upload your file to:"
+msgstr "Ei voitu lähettää tiedostoa hakemistoon:"
+
+#: ..\..\..\admin\b2upload.php:112
+msgid "Duplicate File?"
+msgstr "Tiedosto on jo olemassa?"
+
+#: ..\..\..\admin\b2upload.php:113
+#, php-format
+msgid "The filename \"%s\" already exists!"
+msgstr "Tiedostonimi \"%s\" on jo olemassa!"
+
+#: ..\..\..\admin\b2upload.php:114
+#, php-format
+msgid "Filename \"%s\" moved to \"%s\""
+msgstr "Tiedostonimi \"%s\" muutettu nimeksi \"%s\""
+
+#: ..\..\..\admin\b2upload.php:115
+msgid "Confirm or rename:"
+msgstr "Vahvista tai nimeä uudelleen:"
+
+#: ..\..\..\admin\b2upload.php:122
+msgid "Alternate name"
+msgstr "Vaihtoehtoinen nimi"
+
+#: ..\..\..\admin\b2upload.php:126
+msgid "Confirm !"
+msgstr "Vahvista !"
+
+#: ..\..\..\admin\b2upload.php:153
+msgid "File uploaded !"
+msgstr "Tiedosto lähetetty !"
+
+#: ..\..\..\admin\b2upload.php:154
+#, php-format
+msgid "Your file <strong>\"%s\"</strong> was uploaded successfully !"
+msgstr "Tiedosto <strong>\"%s\"</strong> lähetettiin onnistuneesti !"
+
+#: ..\..\..\admin\b2upload.php:155
+msgid "Here's the code to display it:"
+msgstr "Tässä on sen näyttämiseen tarvittava koodi:"
+
+#: ..\..\..\admin\b2upload.php:159
+msgid "Add the code to your post !"
+msgstr "Lisää koodi kirjoitukseesi !"
+
+#: ..\..\..\admin\b2upload.php:162
+msgid "Image Details"
+msgstr "Kuvan tiedot"
+
+#: ..\..\..\admin\b2upload.php:166
+msgid "Size"
+msgstr "Koko"
+
+#: ..\..\..\admin\b2upload.php:169
+#: ..\..\..\admin\_edit_form.php:504
+msgid "Type"
+msgstr "Tyyppi"
+
+#: ..\..\..\admin\b2upload.php:174
+msgid "Close this window"
+msgstr "Sulje tämä ikkuna"
+
+#: ..\..\..\admin\b2users.php:13
+msgid "User management"
+msgstr "Käyttäjien hallinta"
+
+#: ..\..\..\admin\b2users.php:45
+msgid "You cannot change the demouser profile in demo mode!"
+msgstr "Et voi vaihtaa demokäyttäjän profiilia demomoodissa!"
+
+#: ..\..\..\admin\b2users.php:106
+msgid "You are only allowed to update your own profile!"
+msgstr "Voit päivittää vain omaa profiiliasi!"
+
+#: ..\..\..\admin\b2users.php:120
+msgid "You must provide an unique login!"
+msgstr "Tarvitset yksilöllisen käyttäjätunnuksen!"
+
+#: ..\..\..\admin\b2users.php:128
+#, php-format
+msgid "User level must be between %d and %d."
+msgstr "Käyttäjän tason tulee olla %d:n ja %d.n välillä."
+
+#: ..\..\..\admin\b2users.php:153
+#, php-format
+msgid "This login already exists. Do you want to <a %s>edit the existing user</a>?"
+msgstr "Tämä käyttäjätunnus on jo olemassa. Haluatko muokata <a %s>olemassaolevaa käyttäjää?</a>?"
+
+#: ..\..\..\admin\b2users.php:188
+msgid "You typed two different passwords."
+msgstr "Kirjoitit kaksi eri salasanaa."
+
+#: ..\..\..\admin\b2users.php:194
+#: ..\..\..\htsrv\profile_update.php:103
+#: ..\..\..\htsrv\register.php:62
+#, php-format
+msgid "The mimimum password length is %d characters."
+msgstr "Salasanan minimipituus on %d merkkiä."
+
+#: ..\..\..\admin\b2users.php:211
+msgid "User updated."
+msgstr "Käyttäjä päivitetty."
+
+#: ..\..\..\admin\b2users.php:220
+msgid "New user created."
+msgstr "Uusi käyttäjä luotu"
+
+#: ..\..\..\admin\b2users.php:264
+msgid "Invalid promotion."
+msgstr "Virheellinen ylennys."
+
+#: ..\..\..\admin\b2users.php:280
+msgid "User level changed."
+msgstr "Käyttäjätaso muutettu."
+
+#: ..\..\..\admin\b2users.php:302
+msgid "You can't delete yourself!"
+msgstr "Et voi poistaa itseäsi!"
+
+#: ..\..\..\admin\b2users.php:306
+msgid "You can't delete User #1!"
+msgstr "Et voi poistaa käyttäjää #1!"
+
+#: ..\..\..\admin\b2users.php:320
+#, php-format
+msgid "Delete User %s?"
+msgstr "Poista käyttäjä %s?"
+
+#: ..\..\..\admin\b2users.php:322
+msgid "Warning"
+msgstr "Varoitus"
+
+#: ..\..\..\admin\b2users.php:322
+msgid "deleting an user also deletes all posts made by this user."
+msgstr "käyttäjän poistaminen poistaa myös kaikki sen lähettämän kirjoitukset."
+
+#: ..\..\..\admin\b2users.php:345
+msgid "Deleting User..."
+msgstr "Poistetaan käyttäjä..."
+
+#: ..\..\..\admin\b2users.php:362
+msgid "You can't delete Group #1!"
+msgstr "Et voi poistaa ryhmää #1!"
+
+#: ..\..\..\admin\b2users.php:366
+msgid "You can't delete the default group for new users!"
+msgstr "Et voi poistaa uusien käyttäjien perusryhmää!"
+
+#: ..\..\..\admin\b2users.php:379
+#, php-format
+msgid "Delete group [%s]?"
+msgstr "Poista ryhmä [%s]?"
+
+#: ..\..\..\admin\b2users.php:403
+msgid "Group deleted..."
+msgstr "Ryhmä poistettu..."
+
+#: ..\..\..\admin\b2users.php:420
+#, php-format
+msgid "This group name already exists! Do you want to <a %s>edit the existing group</a>?"
+msgstr "Tämä ryhmän nimi on jo olemassa! Haluatko <a %s>muokata olemassaolevaa ryhmää</a>?"
+
+#: ..\..\..\admin\b2users.php:474
+msgid "Group updated."
+msgstr "Ryhmä päivitetty."
+
+#: ..\..\..\admin\b2users.php:484
+msgid "The user was not created:"
+msgstr "Käyttäjää ei luotu:"
+
+#: ..\..\..\admin\b2users.php:484
+msgid "The user was not updated:"
+msgstr "Käyttäjää ei päivitetty:"
+
+#: ..\..\..\admin\b2users.php:486
+msgid "The group was not created:"
+msgstr "Ryhmää ei luotu:"
+
+#: ..\..\..\admin\b2users.php:486
+msgid "The group was not updated:"
+msgstr "Ryhmää ei päivitetty:"
+
+#: ..\..\..\admin\b2users.php:519
+msgid "You are not allowed to view other users."
+msgstr "Sinulla ei ole oikeuksia muiden käyttäjätietojen katseluun."
+
+#: ..\..\..\admin\edit_actions.php:62
+msgid "Adding new post..."
+msgstr "Lisätään uutta kirjoitusta..."
+
+#: ..\..\..\admin\edit_actions.php:100
+#: ..\..\..\admin\edit_actions.php:206
+#: ..\..\..\admin\edit_actions.php:445
+#: ..\..\..\htsrv\comment_post.php:63
+#: ..\..\..\htsrv\trackback.php:63
+#: ..\..\..\xmlsrv\xmlrpc.php:1368
+msgid "Supplied URL is invalid: "
+msgstr "Annettu URL on virheellinen: "
+
+#: ..\..\..\admin\edit_actions.php:107
+#: ..\..\..\htsrv\getmail.php:243
+msgid "Cannot post, please correct these errors:"
+msgstr "Ei voida lähettää kirjoitusta, korjaa nämä virheet:"
+
+#: ..\..\..\admin\edit_actions.php:108
+#: ..\..\..\admin\edit_actions.php:214
+#: ..\..\..\admin\edit_actions.php:450
+msgid "Back to post editing"
+msgstr "Takaisin kirjoituksen muokkaukseen"
+
+#: ..\..\..\admin\edit_actions.php:114
+msgid "Recording post..."
+msgstr "Tallennetaan kirjoitusta..."
+
+#: ..\..\..\admin\edit_actions.php:127
+#: ..\..\..\admin\edit_actions.php:244
+#: ..\..\..\admin\edit_actions.php:402
+msgid "Sleeping..."
+msgstr "Nukutaan..."
+
+#: ..\..\..\admin\edit_actions.php:137
+#: ..\..\..\admin\edit_actions.php:253
+#: ..\..\..\admin\edit_actions.php:344
+msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
+msgstr "Kirjoitus ei ole julkinen: ohitetaan viittaukset, päivitysilmoitukset ja blogi-ilmoitukset..."
+
+#: ..\..\..\admin\edit_actions.php:152
+msgid "Posting Done..."
+msgstr "Kirjoitus lähetetty..."
+
+#: ..\..\..\admin\edit_actions.php:166
+#: ..\..\..\admin\edit_actions.php:220
+msgid "Updating post..."
+msgstr "Päivitetään kirjoitusta..."
+
+#: ..\..\..\admin\edit_actions.php:269
+#: ..\..\..\admin\edit_actions.php:355
+msgid "Post had already pinged: skipping blog pings..."
+msgstr "Kirjoitus on jo lähettänyt ilmoituksen: ohitetaan blogi-ilmoitukset..."
+
+#: ..\..\..\admin\edit_actions.php:281
+#: ..\..\..\admin\edit_actions.php:367
+msgid "Updating done..."
+msgstr "Päivitys valmis..."
+
+#: ..\..\..\admin\edit_actions.php:297
+#: ..\..\..\admin\edit_actions.php:312
+msgid "Updating post status..."
+msgstr "Päivitetään kirjoituksen tilaa..."
+
+#: ..\..\..\admin\edit_actions.php:377
+#: ..\..\..\admin\edit_actions.php:396
+msgid "Deleting post..."
+msgstr "Poistetaan kirjoitus..."
+
+#: ..\..\..\admin\edit_actions.php:385
+msgid "Oops, no post with this ID!"
+msgstr "Hups, ei kirjoitusta tällä IDllä!"
+
+#: ..\..\..\admin\edit_actions.php:407
+msgid "Deleting Done..."
+msgstr "Poisti valmis..."
+
+#: ..\..\..\admin\edit_actions.php:411
+#: ..\..\..\b2evocore\_class_pop3.php:105
+#: ..\..\..\b2evocore\_class_pop3.php:117
+#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:295
+#: ..\..\..\b2evocore\_class_pop3.php:349
+#: ..\..\..\b2evocore\_class_pop3.php:360
+#: ..\..\..\b2evocore\_class_pop3.php:408
+#: ..\..\..\b2evocore\_class_pop3.php:441
+#: ..\..\..\b2evocore\_class_pop3.php:474
+#: ..\..\..\b2evocore\_class_pop3.php:573
+#: ..\..\..\b2evocore\_class_pop3.php:596
+msgid "Error"
+msgstr "Virhe"
+
+#: ..\..\..\admin\edit_actions.php:449
+msgid "Cannot update comment, please correct these errors:"
+msgstr "Ei voida päivittää kommenttia, korjaa nämä virheet:"
+
+#: ..\..\..\admin\edit_actions.php:507
+msgid "Back to posts!"
+msgstr "Takaisin kirjoituksiin"
+
+#: ..\..\..\admin\edit_actions.php:512
+msgid "You may also want to generate static pages or view your blogs..."
+msgstr "Voit halutessasi myös generoida stattiset sivut tai katsella blogeja..."
+
+#: ..\..\..\admin\edit_actions.php:520
+msgid "New post"
+msgstr "Uusi kirjoitus"
+
+#: ..\..\..\admin\import-mt.php:324
+#: ..\..\..\admin\_users_form.php:194
+#: ..\..\..\admin\_users_form.php:199
+msgid "User group"
+msgstr "Käyttäjäryhmä"
+
+#: ..\..\..\admin\import-mt.php:325
+#: ..\..\..\admin\_users_form.php:182
+#, php-format
+msgid "See <a %s>online manual</a> for details."
+msgstr "Katso <a %s>online-manuaalista</a> lisätietoja."
+
+#: ..\..\..\admin\import-mt.php:326
+#: ..\..\..\admin\_users_form.php:185
+#: ..\..\..\admin\_users_form.php:189
+#: ..\..\..\admin\_users_list.php:27
+#: ..\..\..\skins\_profile.php:39
+#: ..\..\..\skins\basic\_profile.php:39
+msgid "Level"
+msgstr "Taso"
+
+#: ..\..\..\admin\import-mt.php:365
+#: ..\..\..\admin\_set_regional.form.php:134
+msgid "Default locale"
+msgstr "Vakiokieliasetus"
+
+#: ..\..\..\admin\import-mt.php:1082
+#: ..\..\..\admin\_edit_form.php:333
+msgid "Select main category in target blog and optionally check additional categories"
+msgstr "Valitse pääkategoria kohdeblogissa. Voit vaihtoehtoisesti valita myös lisäkategorioita"
+
+#: ..\..\..\admin\import-mt.php:1104
+#: ..\..\..\admin\_edit_form.php:354
+msgid "Select as an additionnal category"
+msgstr "Valitse lisäkategoriana"
+
+#: ..\..\..\admin\import-mt.php:1115
+#: ..\..\..\admin\_edit_form.php:367
+msgid "Select as MAIN category"
+msgstr "Valitse pääkategoriana"
+
+#: ..\..\..\admin\tools.php:14
+#: ..\..\..\admin\_menutop.php:134
+msgid "Tools"
+msgstr "Työkalut"
+
+#: ..\..\..\admin\tools.php:20
+msgid "Bookmarklet"
+msgstr "Suosikki"
+
+#: ..\..\..\admin\tools.php:26
+#: ..\..\..\admin\tools.php:33
+#: ..\..\..\admin\tools.php:41
+#: ..\..\..\admin\tools.php:48
+msgid "Add this link to your Favorites/Bookmarks:"
+msgstr "Lisää tämä linkki suosikkehin:"
+
+#: ..\..\..\admin\tools.php:27
+#: ..\..\..\admin\tools.php:34
+#: ..\..\..\admin\tools.php:42
+#: ..\..\..\admin\tools.php:49
+msgid "b2evo bookmarklet"
+msgstr "b2evo-suosikki"
+
+#: ..\..\..\admin\tools.php:65
+msgid "Post to b2evolution"
+msgstr "Lähetä kirjoitus b2evolutioniin"
+
+#: ..\..\..\admin\tools.php:67
+msgid "No Sidebar found! You must use Mozilla 0.9.4 or later!"
+msgstr "Sivupalkkia ei löydy! Sinun tulee käyttää Mozilla 0.9.4:aa tai uudempaa!"
+
+#: ..\..\..\admin\tools.php:70
+#: ..\..\..\admin\tools.php:79
+msgid "SideBar"
+msgstr "Sivupalkki"
+
+#: ..\..\..\admin\tools.php:71
+#, php-format
+msgid "Add the <a %s>b2evo sidebar</a> !"
+msgstr "Lisää <a %s>b2evo-sivupalkki</a> !"
+
+#: ..\..\..\admin\tools.php:80
+msgid "Add this link to your favorites:"
+msgstr "Lisää tämä linkki suosikkeihin:"
+
+#: ..\..\..\admin\tools.php:81
+msgid "b2evo sidebar"
+msgstr "b2evo-sivupalkki"
+
+#: ..\..\..\admin\tools.php:88
+msgid "Movable Type Import"
+msgstr "Tuo Movable Typestä"
+
+#: ..\..\..\admin\tools.php:90
+msgid "Use MT's export functionnality to create a .TXT file containing your posts;"
+msgstr "Käytä MT:n export-toimintoa tallentaaksesi kirjoitukset .TXT-tiedostoon;"
+
+#: ..\..\..\admin\tools.php:91
+msgid "Place that file into the /admin folder on your server;"
+msgstr "Lähetä tietosto /admin-hakemistoon palvelimellasi;"
+
+#: ..\..\..\admin\tools.php:92
+#, php-format
+msgid "Follow the insctructions in the <a %s>MT migration utility</a>."
+msgstr "Seuraa <a %s>MT:n datasiirtotyökalun</a> ohjeita."
+
+#: ..\..\..\admin\_blogs_advanced.form.php:18
+msgid "Static file generation"
+msgstr "Staattisen tiedoston generointi"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:20
+msgid "Static filename"
+msgstr "Staattisen tiedoston nimi"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:20
+msgid "This is the .html file that will be created when you generate a static version of the blog homepage."
+msgstr "Tämä on .html-tiedosto, joka luodaan kun staattinen versio blogin etusivusta luodaan."
+
+#: ..\..\..\admin\_blogs_advanced.form.php:25
+msgid "After each new post..."
+msgstr "Jokaisen uuden kirjoituksen jälkeen..."
+
+#: ..\..\..\admin\_blogs_advanced.form.php:27
+msgid "Ping b2evolution.net"
+msgstr "Lähetä päivitysilmoitus b2evolution.netiin"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:27
+msgid "to get listed on the \"recently updated\" list on b2evolution.net"
+msgstr "jos haluat listautua b2evolution.net:in \"äsken päivitetyt\"-listalla"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:28
+msgid "Ping technorati.com"
+msgstr "Lähetä päivitysilmoitus technorati.com"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:28
+#: ..\..\..\admin\_blogs_advanced.form.php:29
+#: ..\..\..\admin\_blogs_advanced.form.php:30
+msgid "to give notice of new post."
+msgstr "tiedoittaaksesi uusista kirjoituksista."
+
+#: ..\..\..\admin\_blogs_advanced.form.php:29
+msgid "Ping weblogs.com"
+msgstr "Lähetä päivitysilmoitus weblogs.comiin"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:30
+msgid "Ping blo.gs"
+msgstr "Lähetä päivitysilmoitus blo.gs:aan"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:35
+msgid "Advanced options"
+msgstr "Lisäasetukset"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:37
+msgid "Allow trackbacks"
+msgstr "Salli viittaukset"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:37
+msgid "Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs."
+msgstr "Salli muiden blogien kirjoittajien lähettää viittauksia tähän blogiin, jolloin saat tietää,  milloin tähän blogiin viitataan. Tämä antaa myös sinulle mahdollisuuden lähettää viittauksia muihin blogeihin."
+
+#: ..\..\..\admin\_blogs_advanced.form.php:38
+msgid "Allow pingbacks"
+msgstr "Salli päivitysilmoitukset"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:38
+msgid "Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs."
+msgstr "Salli muiden blogien kirjoittajien lähettää päivitysilmoituksia tähän blogiin, jolloin saat tietää,  milloin tähän blogiin viitataan. Tämä antaa myös sinulle mahdollisuuden lähettää päivitysilmoituksia muihin blogeihin."
+
+#: ..\..\..\admin\_blogs_advanced.form.php:45
+#: ..\..\..\admin\_blogs_general.form.php:102
+#: ..\..\..\admin\_blogs_permissions.form.php:199
+msgid "Update blog!"
+msgstr "Päivitä blogia!"
+
+#: ..\..\..\admin\_blogs_advanced.form.php:46
+#: ..\..\..\admin\_blogs_general.form.php:103
+#: ..\..\..\admin\_blogs_permissions.form.php:205
+#: ..\..\..\admin\_edit_showposts.php:549
+#: ..\..\..\admin\_set_general.form.php:79
+#: ..\..\..\admin\_set_plugins.form.php:69
+#: ..\..\..\admin\_set_regional.form.php:67
+#: ..\..\..\admin\_set_regional.form.php:245
+#: ..\..\..\admin\_set_regional.form.php:360
+#: ..\..\..\admin\_users_form.php:211
+#: ..\..\..\admin\_users_groupform.php:126
+#: ..\..\..\install\index.php:292
+#: ..\..\..\skins\_profile.php:94
+msgid "Reset"
+msgstr "Tyhjennä"
+
+#: ..\..\..\admin\_blogs_general.form.php:17
+msgid "General parameters"
+msgstr "Yleiset parametrit"
+
+#: ..\..\..\admin\_blogs_general.form.php:19
+#: ..\..\..\admin\_blogs_list.php:27
+msgid "Full Name"
+msgstr "Koko nimi"
+
+#: ..\..\..\admin\_blogs_general.form.php:19
+msgid "Will be displayed on top of the blog."
+msgstr "Tullaan näyttämään blogin yläreunassa."
+
+#: ..\..\..\admin\_blogs_general.form.php:20
+msgid "Short Name"
+msgstr "Lyhyt nimi"
+
+#: ..\..\..\admin\_blogs_general.form.php:20
+msgid "Will be used in selection menus and throughout the admin interface."
+msgstr "Tullaan käyttämään valikoissa sekä ylläpidon käyttöliittymässä."
+
+#: ..\..\..\admin\_blogs_general.form.php:21
+msgid "Main Locale"
+msgstr "Pääkieliasetus"
+
+#: ..\..\..\admin\_blogs_general.form.php:21
+msgid "Determines the language of the navigation links on the blog."
+msgstr "Valitse blogin navigointilinkkien kielen."
+
+#: ..\..\..\admin\_blogs_general.form.php:26
+msgid "Access parameters"
+msgstr "Pääsyominaisuudet"
+
+#: ..\..\..\admin\_blogs_general.form.php:35
+#: ..\..\..\admin\_blogs_list.php:55
+msgid "Default blog on index.php"
+msgstr "index.php:n vakioblogi"
+
+#. TRANS: current default blog
+#: ..\..\..\admin\_blogs_general.form.php:37
+msgid "Current default is:"
+msgstr "Nykyinen vakioasetus on:"
+
+#: ..\..\..\admin\_blogs_general.form.php:38
+msgid "Other blog through index.php"
+msgstr "Muu blogi index.php:n kautta"
+
+#: ..\..\..\admin\_blogs_general.form.php:41
+msgid "Other blog through stub file (Advanced)"
+msgstr "Muu blogi tynkätiedoston kautta (Vaativa)"
+
+#: ..\..\..\admin\_blogs_general.form.php:41
+msgid "You MUST create a stub file for this to work."
+msgstr "Sinun TULEE luoda tynkätiedosto, jos haluat käyttää tätä vaihtoehtoa."
+
+#: ..\..\..\admin\_blogs_general.form.php:42
+msgid "Preferred access type"
+msgstr "Haluttu pääsytyyppi"
+
+#: ..\..\..\admin\_blogs_general.form.php:46
+msgid "Blog Folder URL"
+msgstr "Blogin kansio-URL"
+
+#: ..\..\..\admin\_blogs_general.form.php:48
+msgid "No trailing slash. (If you don't know, leave this field empty.)"
+msgstr "Ei kauttaviivaa loppuun. (Jos et tiedä tätä, jätä tämä kenttä tyhjäksi.)"
+
+#: ..\..\..\admin\_blogs_general.form.php:53
+msgid "URL blog name / Stub name"
+msgstr "Blogin/tyngän URL-nimi"
+
+#: ..\..\..\admin\_blogs_general.form.php:53
+msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
+msgstr "Käytetään osoitteissa blogin tunnistamiseen. Tämän tulee olla tyngän nimi, jos käytät tynkätiedostoa."
+
+#: ..\..\..\admin\_blogs_general.form.php:58
+msgid "Default display options"
+msgstr "Vakionäyttöasetukset"
+
+#: ..\..\..\admin\_blogs_general.form.php:60
+msgid "Default skin"
+msgstr "Vakioteema"
+
+#: ..\..\..\admin\_blogs_general.form.php:60
+msgid "This is the default skin that will be used to display this blog."
+msgstr "Tämä on vakioteema, jota käytetään blogin näyttämiseen."
+
+#: ..\..\..\admin\_blogs_general.form.php:62
+msgid "Allow skin switching"
+msgstr "Salli teeman vaihto"
+
+#: ..\..\..\admin\_blogs_general.form.php:62
+msgid "Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie)."
+msgstr "Käyttäjät voivat vaihtaa blogin teemaa (asetus tallentuu käyttäjän koneelle evästeeseen)."
+
+#: ..\..\..\admin\_blogs_general.form.php:64
+msgid "Display public blog list"
+msgstr "Näytä julkinen blogilista"
+
+#: ..\..\..\admin\_blogs_general.form.php:64
+msgid "Check this if you want to display the list of all blogs on your blog page (if your skin supports this)."
+msgstr "Valitse tämä, jos haluat näyttää listan kaikista blogeistasi (jos teemasi tukee tätä)."
+
+#: ..\..\..\admin\_blogs_general.form.php:66
+msgid "Include in public blog list"
+msgstr "Näytä julkisessa blogilistassa"
+
+#: ..\..\..\admin\_blogs_general.form.php:66
+msgid "Check this if you want to this blog to be displayed in the list of all public blogs."
+msgstr "Valitse tämä, jos haluat tämän blogin näkyvän julkisessa blogilistassa."
+
+#: ..\..\..\admin\_blogs_general.form.php:68
+msgid "Default linkblog"
+msgstr "Vakiolinkkiblogi"
+
+#: ..\..\..\admin\_blogs_general.form.php:68
+msgid "Will be displayed next to this blog (if your skin supports this)."
+msgstr "Tullaan näyttämään tämän blogin vieressä (jos teemasi tukee tätä)."
+
+#: ..\..\..\admin\_blogs_general.form.php:75
+msgid "Tagline"
+msgstr "Tunnuslause"
+
+#: ..\..\..\admin\_blogs_general.form.php:75
+msgid "This is diplayed under the blog name on the blog template."
+msgstr "Tullaan näyttämään blogin nimen alla blogin sivupohjassa."
+
+#: ..\..\..\admin\_blogs_general.form.php:79
+msgid "Long Description"
+msgstr "Pitkä kuvaus"
+
+#: ..\..\..\admin\_blogs_general.form.php:81
+msgid "This is displayed on the blog template."
+msgstr "Tullaan näyttämään blogin sivupohjassa."
+
+#: ..\..\..\admin\_blogs_general.form.php:85
+msgid "Short Description"
+msgstr "Lyhyt kuvaus"
+
+#: ..\..\..\admin\_blogs_general.form.php:85
+msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
+msgstr "Tätä käytetään description-metatagissa sekä RSS-datassa. EI HTML-koodia!"
+
+#: ..\..\..\admin\_blogs_general.form.php:87
+msgid "Keywords"
+msgstr "Avainsanat"
+
+#: ..\..\..\admin\_blogs_general.form.php:87
+msgid "This is is used in meta tag keywords. NO HTML!"
+msgstr "Tätä käytetään keywords-metatagissa. EI HTML-koodia!"
+
+#: ..\..\..\admin\_blogs_general.form.php:92
+msgid "Notes"
+msgstr "Lisätietoja"
+
+#: ..\..\..\admin\_blogs_general.form.php:94
+msgid "Additional info."
+msgstr "Lisätietoja, jotka jotkut teemat näyttävät."
+
+#: ..\..\..\admin\_blogs_general.form.php:102
+msgid "Create new blog!"
+msgstr "Luo uusi blogi!"
+
+#: ..\..\..\admin\_blogs_list.php:26
+msgid "Blog"
+msgstr "Blogi"
+
+#: ..\..\..\admin\_blogs_list.php:28
+msgid "Blog URL"
+msgstr "Blogin URL"
+
+#: ..\..\..\admin\_blogs_list.php:29
+msgid "Static File"
+msgstr "Staattinen tiedosto"
+
+#: ..\..\..\admin\_blogs_list.php:30
+#: ..\..\..\admin\_set_regional.form.php:46
+#: ..\..\..\admin\_set_regional.form.php:157
+#: ..\..\..\admin\_users_form.php:118
+#: ..\..\..\htsrv\_reg_form.php:42
+#: ..\..\..\skins\_profile.php:70
+msgid "Locale"
+msgstr "Kieliasetus"
+
+#: ..\..\..\admin\_blogs_list.php:44
+#: ..\..\..\admin\_cats_list.php:27
+#: ..\..\..\admin\_users_list.php:56
+#: ..\..\..\admin\_users_list.php:69
+#: ..\..\..\admin\_users_list.php:96
+#: ..\..\..\admin\_users_list.php:138
+msgid "Properties"
+msgstr "Ominaisuudet"
+
+#: ..\..\..\admin\_blogs_list.php:55
+msgid "Default"
+msgstr "Vakio"
+
+#. TRANS: abbrev. for "generate !"
+#: ..\..\..\admin\_blogs_list.php:72
+msgid "Gen!"
+msgstr "Luo!"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_blogs_list.php:88
+#, php-format
+msgid ""
+"Are you sure you want to delete blog #%d ?\\n"
+"\\n"
+"WARNING: This will delete ALL POST, COMMENTS,\\n"
+"CATEGORIES and other data related to that Blog!\\n"
+"\\n"
+"This CANNOT be undone!"
+msgstr ""
+"Oletko varma, että haluat poistaa blogin #%d ?\\n"
+"\\n"
+"VAROITUS: Tämä poistaa KAIKKI KIRJOITUKSET, KOMMENTIT, \\n"
+"KATEGORIAT sekä muut tiedot, jotka liittyy tähän blogiin!\\n"
+"\\n"
+"Tätä toimintia EI voi perua!"
+
+#: ..\..\..\admin\_blogs_list.php:88
+msgid "Delete this blog!"
+msgstr "Poista tämä blogi!"
+
+#: ..\..\..\admin\_blogs_list.php:89
+msgid "Copy this blog!"
+msgstr "Kopioi tämä blogi!"
+
+#. TRANS: Abbrev. for Copy
+#: ..\..\..\admin\_blogs_list.php:89
+#: ..\..\..\admin\_set_regional.form.php:238
+#: ..\..\..\admin\_users_list.php:71
+#: ..\..\..\admin\_users_list.php:141
+msgid "Copy"
+msgstr "Kopioi"
+
+#: ..\..\..\admin\_blogs_list.php:100
+msgid "Sorry, you have no permission to edit/view any blog's properties."
+msgstr "Valitan, sinulla ei ole oikeuksia katsella/muokata mitään blogin ominaisuuksia."
+
+#: ..\..\..\admin\_blogs_list.php:111
+msgid "New blog..."
+msgstr "Uusi blogi..."
+
+#: ..\..\..\admin\_blogs_permissions.form.php:18
+#: ..\..\..\admin\_users_groupform.php:83
+msgid "User permissions"
+msgstr "Käyttäjäoikeudet"
+
+#. TRANS: table header for user list
+#: ..\..\..\admin\_blogs_permissions.form.php:21
+#: ..\..\..\admin\_users_list.php:17
+msgid "Login "
+msgstr "Kirjaudu "
+
+#. TRANS: SHORT table header on TWO lines
+#: ..\..\..\admin\_blogs_permissions.form.php:22
+msgid "Is<br />member"
+msgstr "On<br />jäsen"
+
+#. TRANS: SHORT table header on TWO lines
+#: ..\..\..\admin\_blogs_permissions.form.php:23
+msgid "Can post/edit with following statuses:"
+msgstr "Voi kirjoittaa/muokata <br />kirjoituksia seuraavilla suojaustasoilla:"
+
+#  TRANS: SHORT table header on TWO lines
+#: ..\..\..\admin\_blogs_permissions.form.php:24
+msgid "Delete<br />posts"
+msgstr "Poistaa <br />kirjoituksia"
+
+#  TRANS: SHORT table header on TWO lines
+#: ..\..\..\admin\_blogs_permissions.form.php:25
+msgid "Edit<br />comts"
+msgstr "Muokkata <br />kommentteja"
+
+#  TRANS: SHORT table header on TWO lines
+#: ..\..\..\admin\_blogs_permissions.form.php:26
+msgid "Edit<br />cats"
+msgstr "Muokkata <br />kategorioita"
+
+#  TRANS: SHORT table header on TWO lines
+#: ..\..\..\admin\_blogs_permissions.form.php:27
+msgid "Edit<br />blog"
+msgstr "Muokkata <br />blogia"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:30
+#: ..\..\..\b2evocore\_vars.php:189
+msgid "Published"
+msgstr "Julkaistu"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:31
+#: ..\..\..\b2evocore\_vars.php:191
+msgid "Protected"
+msgstr "Suojattu"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:32
+#: ..\..\..\b2evocore\_vars.php:192
+msgid "Private"
+msgstr "Yksityinen"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:33
+#: ..\..\..\b2evocore\_vars.php:193
+msgid "Draft"
+msgstr "Luonnos"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:34
+#: ..\..\..\b2evocore\_vars.php:190
+msgid "Deprecated"
+msgstr "Vanhentunut"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:38
+msgid "Members"
+msgstr "Jäsenet"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:61
+#: ..\..\..\admin\_blogs_permissions.form.php:151
+msgid "Permission to read protected posts"
+msgstr "Oikeus lukea suojattuja kirjoituksia."
+
+#: ..\..\..\admin\_blogs_permissions.form.php:68
+#: ..\..\..\admin\_blogs_permissions.form.php:82
+#: ..\..\..\admin\_blogs_permissions.form.php:155
+#: ..\..\..\admin\_blogs_permissions.form.php:163
+msgid "Permission to post into this blog with private status"
+msgstr "Oikeus lähettää yksityisiä kirjoituksia"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:75
+#: ..\..\..\admin\_blogs_permissions.form.php:159
+msgid "Permission to post into this blog with protected status"
+msgstr "Oikeus lähettää suojattuja kirjoituksia"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:89
+#: ..\..\..\admin\_blogs_permissions.form.php:167
+msgid "Permission to post into this blog with draft status"
+msgstr "Oikeus lähettää luonnoksia"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:96
+#: ..\..\..\admin\_blogs_permissions.form.php:171
+msgid "Permission to post into this blog with deprecated status"
+msgstr "Oikeus lähettää vanhentuneita kirjoituksia"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:103
+#: ..\..\..\admin\_blogs_permissions.form.php:175
+msgid "Permission to delete posts in this blog"
+msgstr "Oikeus poistaa kirjoituksia blogista"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:110
+#: ..\..\..\admin\_blogs_permissions.form.php:179
+msgid "Permission to edit comments in this blog"
+msgstr "Oikeus muokata kommentteja blogissa"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:117
+#: ..\..\..\admin\_blogs_permissions.form.php:182
+msgid "Permission to edit categories for this blog"
+msgstr "Oikeus muokata kategorioita blogissa"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:124
+#: ..\..\..\admin\_blogs_permissions.form.php:186
+msgid "Permission to edit blog properties"
+msgstr "Oikeus muokata blogin ominaisuuksia"
+
+#: ..\..\..\admin\_blogs_permissions.form.php:132
+msgid "Non members"
+msgstr "Ei jäseniä"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_blogs_permissions.form.php:202
+msgid ""
+"Warning! You are about to remove your own permission to edit this blog!\\n"
+"You won\\'t have access to its properties any longer if you do that!"
+msgstr ""
+"Varoitus! Olet poistamassa omaa oikeuttasi tämän blogin muokkaamiseen!\\n"
+"Jos teet tämän, et voi enää myöhemmin palauttaa tätä oikeutta!"
+
+#: ..\..\..\admin\_cats_list.php:26
+msgid "Edit category properties"
+msgstr "Muokkaa kategorian ominaisuuksia"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_cats_list.php:30
+msgid "Are you sure you want to delete?"
+msgstr "Oletko varma, että haluat poistaa?"
+
+#: ..\..\..\admin\_cats_list.php:40
+msgid "New sub-category here"
+msgstr "Uusi alakategoria tähän"
+
+#: ..\..\..\admin\_cats_list.php:56
+msgid "New category here"
+msgstr "Uusi kategoria tähän"
+
+#: ..\..\..\admin\_cats_list.php:60
+msgid "<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number)."
+msgstr "<strong>Huomio:</strong> Kategorian poistaminen ei poista kirjoituksia tästä kategoriasta. Kirjoitukset siirretään pääkategorian alle. Kun juurikategoria poistetaan, kirjoitukset siirretään vanhimpaan kategoriaan samassa blogissa (siihen, jolla on pienen kategorianumero)."
+
+#: ..\..\..\admin\_edit_form.php:99
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:381
+msgid "Title"
+msgstr "Otsikko"
+
+#: ..\..\..\admin\_edit_form.php:104
+msgid "Language"
+msgstr "Kieli"
+
+#: ..\..\..\admin\_edit_form.php:110
+msgid "Link to url"
+msgstr "Linkki osoitteeseen"
+
+#: ..\..\..\admin\_edit_form.php:132
+#: ..\..\..\admin\_users_form.php:124
+#: ..\..\..\admin\_users_form.php:126
+#: ..\..\..\admin\_users_list.php:20
+#: ..\..\..\htsrv\comment_post.php:138
+#: ..\..\..\htsrv\register.php:118
+#: ..\..\..\htsrv\_reg_complete.php:15
+#: ..\..\..\htsrv\_reg_form.php:37
+#: ..\..\..\skins\_feedback.php:176
+#: ..\..\..\skins\_profile.php:71
+#: ..\..\..\skins\basic\_feedback.php:170
+#: ..\..\..\skins\basic\_profile.php:71
+msgid "Email"
+msgstr "Sähköposti"
+
+#: ..\..\..\admin\_edit_form.php:136
+#: ..\..\..\admin\_users_form.php:138
+#: ..\..\..\admin\_users_form.php:140
+#: ..\..\..\admin\_users_list.php:21
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:364
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:376
+#: ..\..\..\skins\_profile.php:72
+#: ..\..\..\skins\basic\_profile.php:72
+msgid "URL"
+msgstr "Osoite"
+
+#: ..\..\..\admin\_edit_form.php:161
+#: ..\..\..\admin\_edit_showposts.php:299
+#: ..\..\..\admin\_set_general.form.php:48
+#: ..\..\..\skins\_feedback.php:206
+#: ..\..\..\skins\basic\_feedback.php:199
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:203
+#: ..\..\..\skins\wpc_default\_feedback.php:203
+msgid "Auto-BR"
+msgstr "Autom. rivinvaihto"
+
+#: ..\..\..\admin\_edit_form.php:161
+#: ..\..\..\admin\_set_general.form.php:48
+msgid "This option is deprecated, you should avoid using it."
+msgstr "Tämä ominaisuus on vanhentunut, vältä sen käyttöä."
+
+#: ..\..\..\admin\_edit_form.php:166
+msgid "Preview"
+msgstr "Esikatsele"
+
+#: ..\..\..\admin\_edit_form.php:172
+msgid "Blog this !"
+msgstr "Lähetä"
+
+#: ..\..\..\admin\_edit_form.php:173
+msgid "Edit this !"
+msgstr "Muokkaa"
+
+#: ..\..\..\admin\_edit_form.php:178
+msgid "Spellcheck"
+msgstr "Tarkista oikeinkirjoitus"
+
+#: ..\..\..\admin\_edit_form.php:184
+msgid "Upload a file/image"
+msgstr "Lähetä tiedosto/kuvatiedosto"
+
+#: ..\..\..\admin\_edit_form.php:189
+msgid "Advanced properties"
+msgstr "Lisäasetukset"
+
+#: ..\..\..\admin\_edit_form.php:197
+msgid "Edit timestamp"
+msgstr "Muokkaa aikaleimaa"
+
+#: ..\..\..\admin\_edit_form.php:232
+msgid "URL Title"
+msgstr "URL-otsikko"
+
+#: ..\..\..\admin\_edit_form.php:234
+msgid "(to be used in permalinks)"
+msgstr "(käytetään pysyvissä linkeissä)"
+
+#: ..\..\..\admin\_edit_form.php:246
+msgid "Additional actions"
+msgstr "Lisätoiminnot"
+
+#: ..\..\..\admin\_edit_form.php:254
+msgid "Pingback"
+msgstr "Päivitysilmoitus"
+
+#: ..\..\..\admin\_edit_form.php:254
+msgid "(Send a pingback to all URLs in this post)"
+msgstr "(Lähetä päivitysilmoitus kaikkiin osoitteisiin tässä kirjoituksessa)"
+
+#: ..\..\..\admin\_edit_form.php:263
+msgid "Trackback URLs"
+msgstr "Viittausosoitteet"
+
+#: ..\..\..\admin\_edit_form.php:263
+msgid "(Separate by space)"
+msgstr "(Erottele välilyönnillä)"
+
+#: ..\..\..\admin\_edit_form.php:284
+#: ..\..\..\admin\_edit_form.php:505
+#: ..\..\..\admin\_edit_showposts.php:133
+msgid "Status"
+msgstr "Tila"
+
+#: ..\..\..\admin\_edit_form.php:290
+msgid "The post will be publicly published"
+msgstr "Kirjoitus julkaistaan julkisena"
+
+#: ..\..\..\admin\_edit_form.php:291
+#: ..\..\..\admin\_edit_showposts.php:364
+msgid "Published (Public)"
+msgstr "Julkaistu (näkyy kaikille)"
+
+#: ..\..\..\admin\_edit_form.php:297
+msgid "The post will be published but visible only by logged-in blog members"
+msgstr "Kirjoitus julkaistaan, mutta se tulee näkymään vain kirjautuneille jäsenille"
+
+#: ..\..\..\admin\_edit_form.php:298
+#: ..\..\..\admin\_edit_showposts.php:367
+msgid "Protected (Members only)"
+msgstr "Suojattu (vain jäsenille)"
+
+#: ..\..\..\admin\_edit_form.php:304
+msgid "The post will be published but visible only by yourself"
+msgstr "Kirjoitus julkaistaan, mutta se tulee näkymään vain itsellesi"
+
+#: ..\..\..\admin\_edit_form.php:305
+#: ..\..\..\admin\_edit_showposts.php:370
+msgid "Private (You only)"
+msgstr "Yksityinen (vain sinulle)"
+
+#: ..\..\..\admin\_edit_form.php:311
+#: ..\..\..\admin\_edit_form.php:318
+msgid "The post will appear only in the backoffice"
+msgstr "Kirjoitus tulee näkymään vain ylläpidossa"
+
+#: ..\..\..\admin\_edit_form.php:312
+#: ..\..\..\admin\_edit_showposts.php:373
+msgid "Draft (Not published!)"
+msgstr "Luonnos (ei julkaistu!)"
+
+#: ..\..\..\admin\_edit_form.php:319
+#: ..\..\..\admin\_edit_showposts.php:376
+msgid "Deprecated (Not published!)"
+msgstr "Vanhentunut (ei julkaistu!)"
+
+#: ..\..\..\admin\_edit_form.php:395
+msgid "Note: Cross posting among multiple blogs is enabled."
+msgstr "Huomio: Ristilähetys monien blogien kesken on päällä."
+
+#: ..\..\..\admin\_edit_form.php:406
+msgid "Note: Cross posting among multiple blogs is currently disabled."
+msgstr "Huomio: Ristilähetys monien blogien kesken on pois päältä."
+
+#: ..\..\..\admin\_edit_form.php:408
+msgid "Note: Cross posting among multiple categories is currently disabled."
+msgstr "Huomio: Ristilähetys monien kategorioiden kesken on pois päältä."
+
+#: ..\..\..\admin\_edit_form.php:418
+#: ..\..\..\admin\_edit_showposts.php:195
+#: ..\..\..\skins\_feedback.php:50
+#: ..\..\..\skins\basic\_feedback.php:50
+#: ..\..\..\skins\custom\_main.php:264
+#: ..\..\..\skins\custom\_main.php:269
+#: ..\..\..\skins\custom\_main.php:274
+#: ..\..\..\skins\custom\_main.php:279
+#: ..\..\..\skins\fplanque2002\_main.php:273
+#: ..\..\..\skins\fplanque2002\_main.php:278
+#: ..\..\..\skins\fplanque2002\_main.php:283
+#: ..\..\..\skins\fplanque2002\_main.php:288
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:50
+#: ..\..\..\skins\wpc_default\_feedback.php:50
+msgid "Comments"
+msgstr "Kommentit"
+
+#: ..\..\..\admin\_edit_form.php:420
+msgid "Visitors can leave comments on this post."
+msgstr "Kävijät voivat jättää kommentteja tähän kirjoitukseen."
+
+#: ..\..\..\admin\_edit_form.php:421
+msgid "Open"
+msgstr "Sallittu"
+
+#: ..\..\..\admin\_edit_form.php:423
+msgid "Visitors can NOT leave comments on this post."
+msgstr "Kävijät EIVÄT voi jättää kommentteja tähän kirjoitukseen."
+
+#: ..\..\..\admin\_edit_form.php:424
+msgid "Closed"
+msgstr "Suljettu"
+
+#: ..\..\..\admin\_edit_form.php:426
+msgid "Visitors cannot see nor leave comments on this post."
+msgstr "Kävijät eivät voi katsella eivätkä jättää kommentteja tähän kirjoitukseen."
+
+#: ..\..\..\admin\_edit_form.php:427
+msgid "Disabled"
+msgstr "Pois päältä"
+
+#: ..\..\..\admin\_edit_form.php:432
+msgid "Renderers"
+msgstr "Lisäominaisuudet"
+
+#: ..\..\..\admin\_edit_form.php:502
+msgid "Comment info"
+msgstr "Kommentin tiedot"
+
+#: ..\..\..\admin\_edit_form.php:503
+#: ..\..\..\htsrv\comment_post.php:131
+#: ..\..\..\htsrv\comment_post.php:137
+msgid "Author"
+msgstr "Kirjoittaja"
+
+#: ..\..\..\admin\_edit_form.php:506
+msgid "IP address"
+msgstr "IP-osoite"
+
+#: ..\..\..\admin\_edit_navbar.php:25
+#, php-format
+msgid "Next %d days"
+msgstr "Seuraavat %d päivää"
+
+#: ..\..\..\admin\_edit_navbar.php:26
+#, php-format
+msgid "Previous %d"
+msgstr "Edelliset %d"
+
+#: ..\..\..\admin\_edit_navbar.php:36
+#, php-format
+msgid "Previous %d days"
+msgstr "Edelliset %d päivää"
+
+#: ..\..\..\admin\_edit_navbar.php:37
+#, php-format
+msgid "Next %d"
+msgstr "Seuraavat %d"
+
+#. TRANS: x TO y OF z
+#: ..\..\..\admin\_edit_navbar.php:54
+#: ..\..\..\admin\_edit_navbar.php:60
+msgid " to "
+msgstr " (alkaen - päättyen) "
+
+#. TRANS: x TO y OF z
+#: ..\..\..\admin\_edit_navbar.php:62
+msgid " of "
+msgstr " (kaikista) "
+
+#: ..\..\..\admin\_edit_navbar.php:70
+msgid "from the end"
+msgstr "lopusta alkaen"
+
+#: ..\..\..\admin\_edit_navbar.php:74
+msgid "from the start"
+msgstr "alusta alkaen"
+
+#: ..\..\..\admin\_edit_navbar.php:76
+msgid "OK"
+msgstr "OK"
+
+#: ..\..\..\admin\_edit_showposts.php:67
+msgid " Date range: "
+msgstr " Pvm-jakso: "
+
+#. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+#: ..\..\..\admin\_edit_showposts.php:121
+msgid "by"
+msgstr "kirjoittaja"
+
+#: ..\..\..\admin\_edit_showposts.php:125
+msgid "level:"
+msgstr "taso:"
+
+#. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+#: ..\..\..\admin\_edit_showposts.php:129
+msgid "in"
+msgstr "kategoriassa"
+
+#: ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\b2evocore\_functions_bposts.php:798
+msgid "Pages:"
+msgstr "Sivut:"
+
+#. TRANS: Edit button text (&nbsp; for extra space)
+#: ..\..\..\admin\_edit_showposts.php:158
+#: ..\..\..\admin\_edit_showposts.php:258
+msgid "&nbsp; Edit &nbsp;"
+msgstr "&nbsp; Muokkaa &nbsp;"
+
+#: ..\..\..\admin\_edit_showposts.php:166
+#: ..\..\..\admin\_edit_showposts.php:259
+msgid "Delete"
+msgstr "Poista"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_edit_showposts.php:166
+msgid ""
+"You are about to delete this post!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
+msgstr ""
+"Olet poistamasas tätä kirjoitusta!\\n"
+"\\'Peru\\' peruaksesi, \\'Poista\\'  poistaaksesi."
+
+#: ..\..\..\admin\_edit_showposts.php:176
+msgid "Publish NOW!"
+msgstr "Julkaise!"
+
+#: ..\..\..\admin\_edit_showposts.php:176
+msgid "Publish now using current date and time."
+msgstr "Julkaise käyttäen tämänhetkistä päivämäärää ja aikaa."
+
+#. TRANS: Link to comments for current post
+#: ..\..\..\admin\_edit_showposts.php:182
+msgid "no comment"
+msgstr "ei kommentteja"
+
+#: ..\..\..\admin\_edit_showposts.php:182
+#: ..\..\..\b2evocore\_class_item.php:695
+#: ..\..\..\b2evocore\_functions_comments.php:206
+msgid "1 comment"
+msgstr "1 kommentti"
+
+#: ..\..\..\admin\_edit_showposts.php:182
+#: ..\..\..\b2evocore\_class_item.php:696
+#: ..\..\..\b2evocore\_functions_comments.php:207
+#, php-format
+msgid "%d comments"
+msgstr "%d kommenttia"
+
+#: ..\..\..\admin\_edit_showposts.php:183
+msgid "1 Trackback"
+msgstr "1 viittaus"
+
+#: ..\..\..\admin\_edit_showposts.php:183
+#, php-format
+msgid "%d Trackbacks"
+msgstr "%d viittausta"
+
+#: ..\..\..\admin\_edit_showposts.php:184
+msgid "1 Pingback"
+msgstr "1 päivitysilmoitus"
+
+#: ..\..\..\admin\_edit_showposts.php:184
+#, php-format
+msgid "%d Pingbacks"
+msgstr "%d päivitysilmoitusta"
+
+#: ..\..\..\admin\_edit_showposts.php:195
+#: ..\..\..\skins\_feedback.php:61
+#: ..\..\..\skins\basic\_feedback.php:61
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:61
+#: ..\..\..\skins\wpc_default\_feedback.php:61
+msgid "Trackbacks"
+msgstr "Viittaukset"
+
+#: ..\..\..\admin\_edit_showposts.php:195
+#: ..\..\..\skins\_feedback.php:66
+#: ..\..\..\skins\basic\_feedback.php:66
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:66
+#: ..\..\..\skins\wpc_default\_feedback.php:66
+msgid "Pingbacks"
+msgstr "Päivitysilmoitukset"
+
+#: ..\..\..\admin\_edit_showposts.php:202
+msgid "No feedback for this post yet..."
+msgstr "Ei palautetta tästä kirjoituksesta..."
+
+#: ..\..\..\admin\_edit_showposts.php:234
+#: ..\..\..\skins\_feedback.php:104
+#: ..\..\..\skins\basic\_feedback.php:103
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:108
+#: ..\..\..\skins\wpc_default\_feedback.php:108
+msgid "Comment from:"
+msgstr "Kirjoittaja:"
+
+#: ..\..\..\admin\_edit_showposts.php:238
+#: ..\..\..\skins\_feedback.php:110
+#: ..\..\..\skins\basic\_feedback.php:109
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:114
+#: ..\..\..\skins\wpc_default\_feedback.php:114
+msgid "Trackback from:"
+msgstr "Viittaus osoitteesta:"
+
+#: ..\..\..\admin\_edit_showposts.php:242
+#: ..\..\..\skins\_feedback.php:115
+#: ..\..\..\skins\basic\_feedback.php:114
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:119
+#: ..\..\..\skins\wpc_default\_feedback.php:119
+msgid "Pingback from:"
+msgstr "Päivitysilmoitus osoitteesta:"
+
+#: ..\..\..\admin\_edit_showposts.php:252
+#: ..\..\..\skins\_feedback.php:125
+#: ..\..\..\skins\_lastcomments.php:39
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:125
+#: ..\..\..\skins\wpc_default\_feedback.php:125
+msgid "Permanent link to this comment"
+msgstr "Pysyvä linkki tähän kommenttiin"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_edit_showposts.php:259
+msgid ""
+"You are about to delete this comment!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
+msgstr ""
+"Olet poistamasas tätä kommenttia!\\n"
+"\\'Peru\\' to peruaksesi, \\'Poista\\' poistaaksesi."
+
+#: ..\..\..\admin\_edit_showposts.php:274
+#: ..\..\..\b2evocore\_class_item.php:694
+#: ..\..\..\b2evocore\_functions_comments.php:205
+#: ..\..\..\skins\_feedback.php:138
+#: ..\..\..\skins\basic\_feedback.php:133
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:139
+#: ..\..\..\skins\wpc_default\_feedback.php:139
+msgid "Leave a comment"
+msgstr "Jätä kommentti"
+
+#: ..\..\..\admin\_edit_showposts.php:282
+#: ..\..\..\admin\_users_form.php:80
+#: ..\..\..\skins\_feedback.php:157
+#: ..\..\..\skins\basic\_feedback.php:153
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:163
+#: ..\..\..\skins\wpc_default\_feedback.php:163
+msgid "User"
+msgstr "Käyttäjä"
+
+#: ..\..\..\admin\_edit_showposts.php:285
+#: ..\..\..\skins\_feedback.php:160
+#: ..\..\..\skins\basic\_feedback.php:156
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:166
+#: ..\..\..\skins\wpc_default\_feedback.php:166
+msgid "Edit profile"
+msgstr "Muokkaa profiilia"
+
+#: ..\..\..\admin\_edit_showposts.php:290
+#: ..\..\..\skins\_feedback.php:194
+#: ..\..\..\skins\basic\_feedback.php:187
+msgid "Comment text"
+msgstr "Kommentti"
+
+#: ..\..\..\admin\_edit_showposts.php:292
+#: ..\..\..\skins\_feedback.php:196
+#: ..\..\..\skins\basic\_feedback.php:189
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:141
+#: ..\..\..\skins\wpc_default\_feedback.php:141
+msgid "Allowed XHTML tags"
+msgstr "Sallitut XHTML-tagit"
+
+#: ..\..\..\admin\_edit_showposts.php:292
+#: ..\..\..\skins\_feedback.php:197
+#: ..\..\..\skins\basic\_feedback.php:190
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:142
+#: ..\..\..\skins\wpc_default\_feedback.php:142
+msgid "URLs, email, AIM and ICQs will be converted automatically."
+msgstr "Web-, sähköposti-, AIM- ja ICQ-osoitteet konvertoidaan automaattisesti."
+
+#: ..\..\..\admin\_edit_showposts.php:298
+#: ..\..\..\skins\_feedback.php:202
+#: ..\..\..\skins\basic\_feedback.php:195
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:200
+#: ..\..\..\skins\wpc_default\_feedback.php:200
+msgid "Options"
+msgstr "Asetukset"
+
+#: ..\..\..\admin\_edit_showposts.php:299
+msgid "(Line breaks become &lt;br&gt;)"
+msgstr "(Rivinvaihdot korvataan &lt;br&gt; :lla)"
+
+#: ..\..\..\admin\_edit_showposts.php:306
+#: ..\..\..\skins\_feedback.php:219
+#: ..\..\..\skins\basic\_feedback.php:212
+msgid "Send comment"
+msgstr "Lähetä kommentti"
+
+#: ..\..\..\admin\_edit_showposts.php:353
+msgid "Posts to show"
+msgstr "Näytettävät kirjoitukset"
+
+#: ..\..\..\admin\_edit_showposts.php:356
+msgid "Past"
+msgstr "Menneet"
+
+#: ..\..\..\admin\_edit_showposts.php:359
+msgid "Future"
+msgstr "Tulevat"
+
+#: ..\..\..\admin\_edit_showposts.php:384
+msgid "Title / Text contains"
+msgstr "Otsikko / teksti sisältää"
+
+#: ..\..\..\admin\_edit_showposts.php:388
+msgid "Words"
+msgstr "Sanat"
+
+#: ..\..\..\admin\_edit_showposts.php:389
+msgid "AND"
+msgstr "JA"
+
+#: ..\..\..\admin\_edit_showposts.php:391
+msgid "OR"
+msgstr "TAI"
+
+#: ..\..\..\admin\_footer.php:17
+msgid "GPL License"
+msgstr "GPL-lisenssi"
+
+#: ..\..\..\admin\_menutop.php:33
+msgid "visit b2evolution's website"
+msgstr "käy b2evolutionin kotisivulla"
+
+#: ..\..\..\admin\_menutop.php:36
+msgid "Logout"
+msgstr "Kirjaudu ulos"
+
+#: ..\..\..\admin\_menutop.php:38
+msgid "Exit to blogs"
+msgstr "Siirry blogeihin"
+
+#: ..\..\..\admin\_menutop.php:47
+msgid "Blog time:"
+msgstr "Blogin aika:"
+
+#: ..\..\..\admin\_menutop.php:48
+msgid "GMT:"
+msgstr "GMT:"
+
+#: ..\..\..\admin\_menutop.php:49
+msgid "Logged in as:"
+msgstr "Kirjautuneena:"
+
+#: ..\..\..\admin\_menutop.php:59
+msgid "New Post"
+msgstr "Uusi kirjoitus"
+
+#: ..\..\..\admin\_menutop.php:65
+msgid "Browse/Edit"
+msgstr "Selaa/muokkaa"
+
+#: ..\..\..\admin\_menutop.php:85
+msgid "Stats"
+msgstr "Statistiikka"
+
+#: ..\..\..\admin\_menutop.php:103
+#: ..\..\..\admin\_users_groupform.php:102
+msgid "Templates"
+msgstr "Sivupohjat"
+
+#: ..\..\..\admin\_menutop.php:113
+msgid "Users"
+msgstr "Käyttäjät"
+
+#: ..\..\..\admin\_menutop.php:117
+msgid "User Profile"
+msgstr "Käyttäjäprofiili"
+
+#: ..\..\..\admin\_set_general.form.php:18
+msgid "Default user rights"
+msgstr "Käyttäjän vakio-oikeudet"
+
+#: ..\..\..\admin\_set_general.form.php:20
+msgid "New users can register"
+msgstr "Uudet käyttäjät voivat rekisteröityä"
+
+#: ..\..\..\admin\_set_general.form.php:20
+msgid "Check to allow new users to register themselves."
+msgstr "Valitse salliaksesi uusien käyttäjien itsensä rekisteröitymisen."
+
+#: ..\..\..\admin\_set_general.form.php:22
+msgid "Group for new users"
+msgstr "Ryhmä uusille jäsenille"
+
+#: ..\..\..\admin\_set_general.form.php:22
+msgid "Groups determine user roles and permissions."
+msgstr "Ryhmät määrittelevät käyttäjien rooleja ja oikeuksia."
+
+#: ..\..\..\admin\_set_general.form.php:24
+msgid "Level for new users"
+msgstr "Uusien käyttäjien taso"
+
+#: ..\..\..\admin\_set_general.form.php:24
+msgid "Levels determine hierarchy of users in blogs."
+msgstr "Tasot määrittelevät käyttäjien hierarkian blogeissa."
+
+#: ..\..\..\admin\_set_general.form.php:29
+msgid "Display options"
+msgstr "Näyttöasetukset"
+
+#: ..\..\..\admin\_set_general.form.php:31
+msgid "Default blog to display"
+msgstr "Näytettävä vakioblogi"
+
+#: ..\..\..\admin\_set_general.form.php:31
+msgid "This blog will be displayed on index.php ."
+msgstr "Tämä blogi näytetään sivulla index.php ."
+
+#: ..\..\..\admin\_set_general.form.php:34
+msgid "days"
+msgstr "päivää"
+
+#: ..\..\..\admin\_set_general.form.php:35
+msgid "posts"
+msgstr "kirjoitusta"
+
+#: ..\..\..\admin\_set_general.form.php:36
+msgid "posts paged"
+msgstr "kirjotusta sivutuksessa"
+
+#: ..\..\..\admin\_set_general.form.php:37
+msgid "Display mode"
+msgstr "Näyttötila"
+
+#: ..\..\..\admin\_set_general.form.php:39
+msgid "Posts/Days per page"
+msgstr "Kirjoitusta/Päivää per sivu"
+
+#: ..\..\..\admin\_set_general.form.php:42
+msgid "monthly"
+msgstr "kuukausittain"
+
+#: ..\..\..\admin\_set_general.form.php:43
+msgid "weekly"
+msgstr "viikottain"
+
+#: ..\..\..\admin\_set_general.form.php:44
+msgid "daily"
+msgstr "päivittäin"
+
+#: ..\..\..\admin\_set_general.form.php:45
+msgid "post by post"
+msgstr "kirjoitus kirjoitukselta"
+
+#: ..\..\..\admin\_set_general.form.php:46
+msgid "Archive mode"
+msgstr "Arkistotila"
+
+#: ..\..\..\admin\_set_general.form.php:53
+msgid "Link options"
+msgstr "Linkkiasetukset"
+
+#: ..\..\..\admin\_set_general.form.php:55
+msgid "Use extra-path info"
+msgstr "Käytä lisäpolun tietoja"
+
+#: ..\..\..\admin\_set_general.form.php:55
+msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
+msgstr "Suositellaan, jos web-palvelimesi tukee sitä. Linkit tullaan esittämään muodossa 'stub/2003/05/20/post_title' eikä muodossa 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
+
+#: ..\..\..\admin\_set_general.form.php:58
+msgid "Post called up by its URL title (Recommended)"
+msgstr "Kirjoitukseen viitataan sen URL-otsikolla (Suositeltu)"
+
+#: ..\..\..\admin\_set_general.form.php:58
+msgid "Fallback to ID when no URL title available."
+msgstr "Käytä ID-numeroa, kun URL-otsikkoa ei ole saatavilla."
+
+#: ..\..\..\admin\_set_general.form.php:59
+msgid "Post called up by its ID"
+msgstr "Kirjoitukseen viitataan sen ID-numerolla"
+
+#: ..\..\..\admin\_set_general.form.php:60
+msgid "Post on archive page, located by its ID"
+msgstr "Lähetä arkistosivulle, viitataan ID-numerolla"
+
+#: ..\..\..\admin\_set_general.form.php:61
+msgid "Post on archive page, located by its title (for Cafelog compatibility)"
+msgstr "Lähetä arkistosivulle, viitataan otsikolla (Cafelog-yhteensopivuus)"
+
+#: ..\..\..\admin\_set_general.form.php:62
+msgid "Permalink type"
+msgstr "Pysyvän linkin tyyppi"
+
+#: ..\..\..\admin\_set_general.form.php:67
+msgid "Security options"
+msgstr "Turvallisuusasetukset"
+
+#: ..\..\..\admin\_set_general.form.php:69
+msgid "Minimum password length"
+msgstr "Salasanan minimipituus"
+
+#: ..\..\..\admin\_set_general.form.php:69
+msgid "for users."
+msgstr "käyttäjille."
+
+#: ..\..\..\admin\_set_general.form.php:78
+#: ..\..\..\admin\_set_plugins.form.php:68
+#: ..\..\..\admin\_set_regional.form.php:66
+#: ..\..\..\admin\_set_regional.form.php:359
+#: ..\..\..\admin\_users_form.php:210
+#: ..\..\..\admin\_users_groupform.php:125
+#: ..\..\..\skins\_profile.php:93
+#: ..\..\..\skins\basic\_profile.php:93
+msgid "Update"
+msgstr "Päivitä"
+
+#: ..\..\..\admin\_set_plugins.form.php:18
+msgid "Rendering plug-ins"
+msgstr "Näyttöpluginit"
+
+#: ..\..\..\admin\_set_plugins.form.php:21
+#: ..\..\..\admin\_set_plugins.form.php:45
+msgid "Plug-in"
+msgstr "Plugin"
+
+#: ..\..\..\admin\_set_plugins.form.php:22
+msgid "Apply"
+msgstr "Käytä"
+
+#: ..\..\..\admin\_set_plugins.form.php:42
+msgid "Toolbar plug-ins"
+msgstr "Työkalupalkin pluginit"
+
+#: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:344
+msgid "Create new locale"
+msgstr "Luo uusi kieliasetus"
+
+#: ..\..\..\admin\_set_regional.form.php:22
+#: ..\..\..\admin\_set_regional.form.php:195
+#: ..\..\..\admin\_set_regional.form.php:240
+msgid "Edit locale"
+msgstr "Muokkaa kieliasetusta"
+
+#: ..\..\..\admin\_set_regional.form.php:46
+#, php-format
+msgid "The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>."
+msgstr "Ensimmäiset 2 kirjainta ovat <a %s>ISO 639-kielikoodi</a>. Toiset 2 kirjainta ovat <a %s>ISO 3166-maakoodi</a>."
+
+#: ..\..\..\admin\_set_regional.form.php:47
+#: ..\..\..\admin\_set_regional.form.php:158
+msgid "Enabled"
+msgstr "Päällä"
+
+#: ..\..\..\admin\_set_regional.form.php:47
+msgid "Should this locale be available to users?"
+msgstr "Pitäisikö tämän kielen olla käyttäjien käytössä?"
+
+#: ..\..\..\admin\_set_regional.form.php:49
+msgid "name of the locale"
+msgstr "Kielen nimi"
+
+#: ..\..\..\admin\_set_regional.form.php:50
+#: ..\..\..\admin\_set_regional.form.php:187
+msgid "Charset"
+msgstr "Merkistö"
+
+#: ..\..\..\admin\_set_regional.form.php:50
+msgid "Must match the lang file charset."
+msgstr "Täytyy vastata kielitiedoston merkistöön"
+
+#: ..\..\..\admin\_set_regional.form.php:51
+msgid "Date format"
+msgstr "Päivämäärän muoto"
+
+#: ..\..\..\admin\_set_regional.form.php:51
+#: ..\..\..\admin\_set_regional.form.php:52
+msgid "See below."
+msgstr "Katso alla"
+
+#: ..\..\..\admin\_set_regional.form.php:52
+msgid "Time format"
+msgstr "Kellonajan muoto"
+
+#: ..\..\..\admin\_set_regional.form.php:53
+#: ..\..\..\admin\_set_regional.form.php:187
+msgid "Lang file"
+msgstr "Kielitiedosto"
+
+#: ..\..\..\admin\_set_regional.form.php:54
+msgid "the lang file to use, from the <code>locales</code> subdirectory"
+msgstr "kielitiedosto, jota käytetään <code>locales</code>-hakemistosta"
+
+#: ..\..\..\admin\_set_regional.form.php:55
+#: ..\..\..\admin\_set_regional.form.php:187
+msgid "Priority"
+msgstr "Prioriteetti"
+
+#: ..\..\..\admin\_set_regional.form.php:56
+msgid "1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc."
+msgstr "1 on korkein. Prioriteetti on tärkeä kun valitaan kieli maatunnuksen perusteella ja useampi kieliasetus täsmää maatunnukseen; näin voi tapahtua kun valinta tapahtuu selaimen kielen perusteella. Prioriteetti vaikuttaa myös siihen missä järjestyksessä kielet listataan alasvetovalikoissa yms."
+
+#: ..\..\..\admin\_set_regional.form.php:66
+#: ..\..\..\admin\_users_form.php:210
+#: ..\..\..\admin\_users_groupform.php:125
+msgid "Create"
+msgstr "Uusi"
+
+#  TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_set_regional.form.php:66
+#, php-format
+msgid "This will replace locale \\'%s\\'. Ok?"
+msgstr "Tämä korvaa kieliasetukset \\'%s\\'. Hyväksy?"
+
+#: ..\..\..\admin\_set_regional.form.php:71
+msgid "Flags"
+msgstr "Liput"
+
+#: ..\..\..\admin\_set_regional.form.php:72
+#, php-format
+msgid "The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif ."
+msgstr "Liput tallennetaan <code>%s</code> alihakemistoihin. Tiedostonimien on oltava sama kuin maatunnus (4-5 merkkiä); tiedoston pääte on .gif."
+
+#: ..\..\..\admin\_set_regional.form.php:73
+msgid "Date/Time Formats"
+msgstr "Päivämäärän / kellonajan muoto"
+
+#: ..\..\..\admin\_set_regional.form.php:74
+msgid "The following characters are recognized in the format strings:"
+msgstr "Seuraavat merkit tunnistettiin merkkijonosta:"
+
+#: ..\..\..\admin\_set_regional.form.php:76
+msgid "a - \"am\" or \"pm\""
+msgstr "a - \"am\" tai \"pm\""
+
+#: ..\..\..\admin\_set_regional.form.php:77
+msgid "A - \"AM\" or \"PM\""
+msgstr "A - \"AM\" tai \"PM\""
+
+#: ..\..\..\admin\_set_regional.form.php:78
+msgid "B - Swatch Internet time"
+msgstr "B - Swatchin internetaika"
+
+#: ..\..\..\admin\_set_regional.form.php:79
+msgid "c - ISO 8601 date (Requires PHP 5); i.e. \"2004-02-12T15:19:21+00:00\""
+msgstr "c - ISO 8601 päiväys (Vaatii PHP 5:n); esim \"2004-02-12T15:19:21+00:00\""
+
+#: ..\..\..\admin\_set_regional.form.php:80
+msgid "d - day of the month, 2 digits with leading zeros; i.e. \"01\" to \"31\""
+msgstr "d - päivä, kaksi desimaalia, etunolla; esim \"01\" ja \"31\""
+
+#: ..\..\..\admin\_set_regional.form.php:81
+msgid "D - day of the week, textual, 3 letters; i.e. \"Fri\""
+msgstr "D - viikonpäivä kolmekirjaimisena tekstinä; esim. \"Fri\""
+
+#: ..\..\..\admin\_set_regional.form.php:82
+msgid "e - day of the week, 1 letter; i.e. \"F\""
+msgstr "e - viikonpäivä yhdellä kirjaimella; esim \"F\""
+
+#: ..\..\..\admin\_set_regional.form.php:83
+msgid "F - month, textual, long; i.e. \"January\""
+msgstr "F - kuukausi tekstinä; esim. \"January\""
+
+#: ..\..\..\admin\_set_regional.form.php:84
+msgid "g - hour, 12-hour format without leading zeros; i.e. \"1\" to \"12\""
+msgstr "g - tunnit, 12-tunnin muodossa ilman etunollaa; esim. \"1\" ja \"12\""
+
+#: ..\..\..\admin\_set_regional.form.php:85
+msgid "G - hour, 24-hour format without leading zeros; i.e. \"0\" to \"23\""
+msgstr "G - tunnit, 24-tunnin muodossa ilman etunollaa; esim. \"0\" ja \"23\""
+
+#: ..\..\..\admin\_set_regional.form.php:86
+msgid "h - hour, 12-hour format; i.e. \"01\" to \"12\""
+msgstr "h - tunnit, 12-tunnin muodossa; esim. \"01\" ja \"12\""
+
+#: ..\..\..\admin\_set_regional.form.php:87
+msgid "H - hour, 24-hour format; i.e. \"00\" to \"23\""
+msgstr "H - tunnit, 24-tunnin muodossa; esim. \"00\" ja \"23\""
+
+#: ..\..\..\admin\_set_regional.form.php:88
+msgid "i - minutes; i.e. \"00\" to \"59\""
+msgstr "i - minuutit; esim \"00\" ja \"59\""
+
+#: ..\..\..\admin\_set_regional.form.php:89
+msgid "I (capital i) - \"1\" if Daylight Savings Time, \"0\" otherwise."
+msgstr "I (iso i) - \"1\" ja kesäaika, muuten \"0\""
+
+#: ..\..\..\admin\_set_regional.form.php:90
+msgid "j - day of the month without leading zeros; i.e. \"1\" to \"31\""
+msgstr "j - päivä ilman etunollaa; esim. \"1\" ja \"31\""
+
+#: ..\..\..\admin\_set_regional.form.php:91
+msgid "l (lowercase \"L\") - day of the week, textual, long; i.e. \"Friday\""
+msgstr "l (pieni \"L\") - viikonpäivä tekstinä; esim. \"Perjantai\""
+
+#: ..\..\..\admin\_set_regional.form.php:92
+msgid "L - boolean for whether it is a leap year; i.e. \"0\" or \"1\""
+msgstr "L - karkausvuosi; esim \"0\" tai \"1\""
+
+#: ..\..\..\admin\_set_regional.form.php:93
+msgid "m - month; i.e. \"01\" to \"12\""
+msgstr "m - kuukausi; esim. \"01\" ja \"12\""
+
+#: ..\..\..\admin\_set_regional.form.php:94
+msgid "M - month, textual, 3 letters; i.e. \"Jan\""
+msgstr "M - kuukausi kolmikirjaimisena tekstinä; esim, \"Jan\""
+
+#: ..\..\..\admin\_set_regional.form.php:95
+msgid "n - month without leading zeros; i.e. \"1\" to \"12\""
+msgstr "n - kuukausi ilman etunollaa; esim. \"1\" ja \"12\""
+
+#: ..\..\..\admin\_set_regional.form.php:96
+msgid "O - Difference to Greenwich time (GMT) in hours; i.e. \"+0200\""
+msgstr "0 - Ero Greenwichin aikaan (GMT) tunteina; esim. \"+0200\""
+
+#: ..\..\..\admin\_set_regional.form.php:97
+msgid "r - RFC 822 formatted date; i.e. \"Thu, 21 Dec 2000 16:01:07 +0200\""
+msgstr "r - RFC 822 mukainen päivä; esim. \"Thu, 21 Dec 2000 16:01:07 +0200\""
+
+#: ..\..\..\admin\_set_regional.form.php:98
+msgid "s - seconds; i.e. \"00\" to \"59\""
+msgstr "s - sekunnit; esim. \"00\" ja \"59\""
+
+#: ..\..\..\admin\_set_regional.form.php:99
+msgid "S - English ordinal suffix, textual, 2 characters; i.e. \"th\", \"nd\""
+msgstr "S - Englantilainen järjestysnumeron pääte; esim. \"th\" ja \"nd\""
+
+#: ..\..\..\admin\_set_regional.form.php:100
+msgid "t - number of days in the given month; i.e. \"28\" to \"31\""
+msgstr "t - kuukaudessa olevien päivien määrä; esim. \"28\" ja \"31\""
+
+#: ..\..\..\admin\_set_regional.form.php:101
+msgid "T - Timezone setting of this machine; i.e. \"MDT\""
+msgstr "T - Palvelimen aikavyöhykeasetus; esim. \"MDT\""
+
+#: ..\..\..\admin\_set_regional.form.php:102
+msgid "U - seconds since the epoch"
+msgstr "U - sekunteja hetkestä 1.1.1970 00:00:00"
+
+#: ..\..\..\admin\_set_regional.form.php:103
+msgid "w - day of the week, numeric, i.e. \"0\" (Sunday) to \"6\" (Saturday)"
+msgstr "w - viikonpäivä numerona; esim. \"0\" (Sunnuntai) ja \"6\" (Lauantai)"
+
+#: ..\..\..\admin\_set_regional.form.php:104
+msgid "W - ISO-8601 week number of year, weeks starting on Monday; i.e. \"42\""
+msgstr "W - ISO-8601 viikonnumero, viikko alkaa maanantaista; esim \"42\""
+
+#: ..\..\..\admin\_set_regional.form.php:105
+msgid "Y - year, 4 digits; i.e. \"1999\""
+msgstr "Y - vuosi neljällä numerolla; esim \"1999\""
+
+#: ..\..\..\admin\_set_regional.form.php:106
+msgid "y - year, 2 digits; i.e. \"99\""
+msgstr "y - vuosi kahdella numerolla; esim. \"99\""
+
+#: ..\..\..\admin\_set_regional.form.php:107
+msgid "z - day of the year; i.e. \"0\" to \"365\""
+msgstr "z - vuoden päivä; esim. \"0\" ja \"365\""
+
+#: ..\..\..\admin\_set_regional.form.php:108
+msgid "Z - timezone offset in seconds (i.e. \"-43200\" to \"43200\"). The offset for timezones west of UTC is always negative, and for those east of UTC is always positive."
+msgstr "Z - aikavyöhykkeen korjaus sekunneissa (esim, \"-43200\" ja \"43200\"). Korjaus UTC:n länsipuolella on aina negatiivinen ja itäpuolella positiivinen"
+
+#: ..\..\..\admin\_set_regional.form.php:110
+msgid "isoZ - full ISO 8601 format, equivalent to Y-m-d\\TH:i:s\\Z"
+msgstr "isoZ - Täysi ISO 8601 muoto, sama kuin Y-m-d\\TH:i:s\\Z"
+
+#: ..\..\..\admin\_set_regional.form.php:111
+msgid ""
+"Unrecognized characters in the format string will be printed as-is.<br />\n"
+"\t\t\tYou can escape characters by preceding them with a \\ to print them as-is."
+msgstr ""
+"Tunnistamattomat merkit formaatti-merkkijonossa tulostetaan sellaisenaan.<br />\n"
+"\t\t\tVoit säilyttää erikoismerkit sellaisenaan lisäämällä niiden eteen \\"
+
+#: ..\..\..\admin\_set_regional.form.php:122
+msgid "Note: default locale is not enabled."
+msgstr "Huom: oletuskieliasetus ei ole valittuna"
+
+#: ..\..\..\admin\_set_regional.form.php:130
+msgid "Regional settings"
+msgstr "Alueelliset asetukset"
+
+#: ..\..\..\admin\_set_regional.form.php:133
+msgid "Time difference"
+msgstr "Aikaero"
+
+#: ..\..\..\admin\_set_regional.form.php:133
+msgid "in hours"
+msgstr "tunteina"
+
+#: ..\..\..\admin\_set_regional.form.php:133
+#, php-format
+msgid "If you're not on the timezone of your server. Current server time is: %s."
+msgstr "Jos et ole samalla aikavyöhykkeellä kuin palvelin. Palvelimen kellonaika on: %s."
+
+#: ..\..\..\admin\_set_regional.form.php:134
+msgid "Overriden by browser config, user locale or blog locale (in this order)."
+msgstr "Ylitetty selaimen asetusten, käyttäjän kieliasetusten tai blogin kieliasetusten takia (tässä järjestyksessä)"
+
+#: ..\..\..\admin\_set_regional.form.php:140
+msgid "Available locales"
+msgstr "Käytössä olevat kieliasetukset"
+
+#: ..\..\..\admin\_set_regional.form.php:145
+msgid "Hide translation info"
+msgstr "Piilota tiedot käännöstä"
+
+#: ..\..\..\admin\_set_regional.form.php:150
+msgid "Show translation info"
+msgstr "Näytä tiedot käännöstä"
+
+#: ..\..\..\admin\_set_regional.form.php:160
+msgid "Date fmt"
+msgstr "Pvm muoto"
+
+#: ..\..\..\admin\_set_regional.form.php:161
+msgid "Time fmt"
+msgstr "Ajan muoto"
+
+#: ..\..\..\admin\_set_regional.form.php:164
+#: ..\..\..\admin\_set_regional.form.php:240
+#: ..\..\..\admin\_users_list.php:31
+msgid "Edit"
+msgstr "Muokkaa"
+
+#: ..\..\..\admin\_set_regional.form.php:170
+msgid "Strings"
+msgstr "Merkkijonot"
+
+#: ..\..\..\admin\_set_regional.form.php:171
+msgid "Translated"
+msgstr "Käännetty"
+
+#: ..\..\..\admin\_set_regional.form.php:175
+#: ..\..\..\admin\_set_regional.form.php:332
+msgid "Extract"
+msgstr "Vie"
+
+#: ..\..\..\admin\_set_regional.form.php:222
+msgid "up"
+msgstr "ylös"
+
+#: ..\..\..\admin\_set_regional.form.php:222
+msgid "Move priority up"
+msgstr "Nosta prioriteettiä"
+
+#: ..\..\..\admin\_set_regional.form.php:231
+msgid "down"
+msgstr "alas"
+
+#: ..\..\..\admin\_set_regional.form.php:231
+msgid "Move priority down"
+msgstr "Laske prioriteettiä"
+
+#: ..\..\..\admin\_set_regional.form.php:238
+msgid "Copy locale"
+msgstr "Kopio kieliasetukset"
+
+#: ..\..\..\admin\_set_regional.form.php:245
+msgid "Reset custom settings"
+msgstr "Resetoi muokatut asetukset"
+
+#: ..\..\..\admin\_set_regional.form.php:256
+msgid "No language file..."
+msgstr "Ei kielitiedostoa..."
+
+#: ..\..\..\admin\_set_regional.form.php:332
+msgid "Extract .po file into b2evo-format"
+msgstr "Vie .po-tiedosto b2evo-formaatissa"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_set_regional.form.php:347
+msgid "Are you sure you want to reset?"
+msgstr "Oletko varma että haluat resetoida?"
+
+#: ..\..\..\admin\_set_regional.form.php:347
+msgid "Reset to defaults (delete database table)"
+msgstr "Resetoi oletusasetukset (poistaa taulun tietokannasta)"
+
+#: ..\..\..\admin\_users_form.php:49
+msgid "first user"
+msgstr "ensimmäinen käyttäjä"
+
+#: ..\..\..\admin\_users_form.php:50
+msgid "previous user"
+msgstr "edellinen käyttäjä"
+
+#: ..\..\..\admin\_users_form.php:51
+msgid "next user"
+msgstr "seuraava käyttäjä"
+
+#: ..\..\..\admin\_users_form.php:52
+msgid "last user"
+msgstr "viimeinen käyttäjä"
+
+#: ..\..\..\admin\_users_form.php:55
+msgid "Close user profile"
+msgstr "Sulje käyttäjäprofiili"
+
+#: ..\..\..\admin\_users_form.php:62
+msgid "Create new user profile"
+msgstr "´Tee uusi käyttäjäprofiili"
+
+#: ..\..\..\admin\_users_form.php:66
+msgid "Profile for:"
+msgstr "Profiili käyttäjälle:"
+
+#: ..\..\..\admin\_users_form.php:84
+#: ..\..\..\admin\_users_form.php:98
+#: ..\..\..\admin\_users_form.php:113
+#: ..\..\..\skins\_profile.php:60
+msgid "Login"
+msgstr "Kirjaudu"
+
+#: ..\..\..\admin\_users_form.php:85
+#: ..\..\..\admin\_users_form.php:99
+#: ..\..\..\admin\_users_form.php:101
+#: ..\..\..\admin\_users_form.php:102
+#: ..\..\..\admin\_users_form.php:114
+#: ..\..\..\skins\_profile.php:49
+#: ..\..\..\skins\_profile.php:61
+#: ..\..\..\skins\_profile.php:63
+#: ..\..\..\skins\_profile.php:64
+#: ..\..\..\skins\basic\_profile.php:49
+msgid "First name"
+msgstr "Etunimi"
+
+#: ..\..\..\admin\_users_form.php:86
+#: ..\..\..\admin\_users_form.php:100
+#: ..\..\..\admin\_users_form.php:101
+#: ..\..\..\admin\_users_form.php:102
+#: ..\..\..\admin\_users_form.php:115
+#: ..\..\..\skins\_profile.php:50
+#: ..\..\..\skins\_profile.php:62
+#: ..\..\..\skins\_profile.php:63
+#: ..\..\..\skins\_profile.php:64
+#: ..\..\..\skins\basic\_profile.php:50
+msgid "Last name"
+msgstr "Sukunimi"
+
+#: ..\..\..\admin\_users_form.php:87
+#: ..\..\..\admin\_users_form.php:97
+#: ..\..\..\admin\_users_form.php:116
+#: ..\..\..\admin\_users_list.php:18
+#: ..\..\..\skins\_profile.php:51
+#: ..\..\..\skins\_profile.php:59
+#: ..\..\..\skins\basic\_profile.php:51
+msgid "Nickname"
+msgstr "Nick"
+
+#: ..\..\..\admin\_users_form.php:92
+#: ..\..\..\admin\_users_form.php:117
+#: ..\..\..\skins\_profile.php:55
+#: ..\..\..\skins\basic\_profile.php:55
+msgid "Identity shown"
+msgstr "Nimi joka näytetään"
+
+#: ..\..\..\admin\_users_form.php:108
+msgid "Preferred locale"
+msgstr "Suositeltu kieliasetus"
+
+#: ..\..\..\admin\_users_form.php:108
+#: ..\..\..\admin\_users_form.php:118
+msgid "Preferred locale for admin interface, notifications, etc."
+msgstr "Suositeltu kieliasetus ylläpitoon, ilmoituksiin, yms."
+
+#: ..\..\..\admin\_users_form.php:121
+msgid "Send an email"
+msgstr "Lähetä sähköpostia"
+
+#: ..\..\..\admin\_users_form.php:134
+msgid "Visit the site"
+msgstr "Käy sivulla"
+
+#: ..\..\..\admin\_users_form.php:144
+msgid "Search on ICQ.com"
+msgstr "Etsi ICQ.comista"
+
+#: ..\..\..\admin\_users_form.php:148
+#: ..\..\..\admin\_users_form.php:150
+#: ..\..\..\skins\_profile.php:73
+#: ..\..\..\skins\basic\_profile.php:73
+msgid "ICQ"
+msgstr "ICQ"
+
+#: ..\..\..\admin\_users_form.php:154
+msgid "Instant Message to user"
+msgstr "Lähetä pikaviesti käyttäjälle"
+
+#: ..\..\..\admin\_users_form.php:159
+#: ..\..\..\admin\_users_form.php:171
+msgid "AIM"
+msgstr "AIM"
+
+#: ..\..\..\admin\_users_form.php:160
+#: ..\..\..\admin\_users_form.php:172
+msgid "MSN IM"
+msgstr "MSN IM"
+
+#: ..\..\..\admin\_users_form.php:161
+#: ..\..\..\admin\_users_form.php:173
+msgid "YahooIM"
+msgstr "YahooIM"
+
+#: ..\..\..\admin\_users_form.php:163
+#: ..\..\..\admin\_users_form.php:174
+#: ..\..\..\skins\_profile.php:78
+#: ..\..\..\skins\basic\_profile.php:78
+msgid "Notifications"
+msgstr "Huomautukset"
+
+#: ..\..\..\admin\_users_form.php:163
+#: ..\..\..\skins\_profile.php:78
+#: ..\..\..\skins\basic\_profile.php:78
+msgid "Check this to receive notification whenever one of your posts receives comments, trackbacks, etc."
+msgstr "Laita ruksi mikäli haluat ilmoituksen kun kirjoituksiasi kommentoidaan, seurataan, tms."
+
+#: ..\..\..\admin\_users_form.php:165
+#: ..\..\..\skins\_profile.php:82
+#: ..\..\..\skins\basic\_profile.php:82
+msgid "New password"
+msgstr "Uusi salasana"
+
+#: ..\..\..\admin\_users_form.php:165
+msgid "Leave empty if you don't want to change the password."
+msgstr "Jätä tyhjäksi mikäli et halua vaihtaa salasanaa"
+
+#: ..\..\..\admin\_users_form.php:166
+#: ..\..\..\skins\_profile.php:87
+#: ..\..\..\skins\basic\_profile.php:87
+msgid "Confirm new password"
+msgstr "Varmista uusi salasana"
+
+#: ..\..\..\admin\_users_form.php:174
+msgid "yes"
+msgstr "kyllä"
+
+#: ..\..\..\admin\_users_form.php:174
+msgid "no"
+msgstr "ei"
+
+#: ..\..\..\admin\_users_form.php:180
+msgid "User rights"
+msgstr "Käyttäjän oikeudet"
+
+#: ..\..\..\admin\_users_form.php:220
+msgid "User information"
+msgstr "Käyttäjän tiedot"
+
+#: ..\..\..\admin\_users_form.php:222
+#: ..\..\..\admin\_users_groupform.php:63
+#: ..\..\..\admin\_users_list.php:16
+#: ..\..\..\skins\_profile.php:33
+#: ..\..\..\skins\basic\_profile.php:33
+msgid "ID"
+msgstr "ID"
+
+#: ..\..\..\admin\_users_form.php:223
+#: ..\..\..\skins\_profile.php:44
+#: ..\..\..\skins\basic\_profile.php:44
+#: ..\..\..\skins\custom\_main.php:263
+#: ..\..\..\skins\custom\_main.php:268
+#: ..\..\..\skins\custom\_main.php:273
+#: ..\..\..\skins\custom\_main.php:278
+#: ..\..\..\skins\fplanque2002\_main.php:272
+#: ..\..\..\skins\fplanque2002\_main.php:277
+#: ..\..\..\skins\fplanque2002\_main.php:282
+#: ..\..\..\skins\fplanque2002\_main.php:287
+msgid "Posts"
+msgstr "Kirjoituksia"
+
+#: ..\..\..\admin\_users_form.php:224
+msgid "Created on"
+msgstr "Luotu"
+
+#: ..\..\..\admin\_users_form.php:225
+msgid "From IP"
+msgstr "IP:stä"
+
+#: ..\..\..\admin\_users_form.php:226
+msgid "From Domain"
+msgstr "Domainista"
+
+#: ..\..\..\admin\_users_form.php:227
+msgid "With Browser"
+msgstr "Selaimella"
+
+#: ..\..\..\admin\_users_groupform.php:47
+msgid "first group"
+msgstr "ensimmäinen ryhmä"
+
+#: ..\..\..\admin\_users_groupform.php:48
+msgid "previous group"
+msgstr "edellinen ryhmä"
+
+#: ..\..\..\admin\_users_groupform.php:49
+msgid "next group"
+msgstr "seuraava ryhmä"
+
+#: ..\..\..\admin\_users_groupform.php:50
+msgid "last group"
+msgstr "viimeinen ryhmä"
+
+#: ..\..\..\admin\_users_groupform.php:54
+msgid "Close group profile"
+msgstr "Sulje ryhmän profiili"
+
+#: ..\..\..\admin\_users_groupform.php:58
+msgid "Creating new group"
+msgstr "Luo uusi ryhmä"
+
+#: ..\..\..\admin\_users_groupform.php:62
+msgid "Editing group:"
+msgstr "Muokataan ryhmää: "
+
+#: ..\..\..\admin\_users_groupform.php:62
+msgid "Viewing group:"
+msgstr "Tarkastellaan ryhmää:"
+
+#: ..\..\..\admin\_users_groupform.php:80
+msgid "Permissons for members of this group"
+msgstr "Ryhmään kuuluvien käyttäjien oikeudet"
+
+#: ..\..\..\admin\_users_groupform.php:84
+msgid "View all"
+msgstr "Näytä kaikki"
+
+#: ..\..\..\admin\_users_groupform.php:85
+#: ..\..\..\admin\_users_groupform.php:90
+#: ..\..\..\admin\_users_groupform.php:95
+#: ..\..\..\admin\_users_groupform.php:100
+#: ..\..\..\admin\_users_groupform.php:109
+#: ..\..\..\admin\_users_groupform.php:114
+msgid "Full Access"
+msgstr "Täydet oikeudet"
+
+#: ..\..\..\admin\_users_groupform.php:88
+#: ..\..\..\admin\_users_groupform.php:93
+#: ..\..\..\admin\_users_groupform.php:98
+#: ..\..\..\admin\_users_groupform.php:107
+msgid "No Access"
+msgstr "Ei oikeutta"
+
+#: ..\..\..\admin\_users_groupform.php:89
+#: ..\..\..\admin\_users_groupform.php:94
+#: ..\..\..\admin\_users_groupform.php:99
+#: ..\..\..\admin\_users_groupform.php:108
+msgid "View only"
+msgstr "Vain luku"
+
+#: ..\..\..\admin\_users_groupform.php:91
+#: ..\..\..\b2evocore\_functions_hitlogs.php:527
+msgid "Statistics"
+msgstr "Statistiikat"
+
+#: ..\..\..\admin\_users_groupform.php:101
+msgid "Global options"
+msgstr "Yleiset asetukset"
+
+#: ..\..\..\admin\_users_groupform.php:102
+msgid "Check to allow template editing."
+msgstr "Raksi, mikäli ulkoasun muokkaaminen sallitaan"
+
+#: ..\..\..\admin\_users_groupform.php:110
+#: ..\..\..\admin\_users_groupform.php:114
+msgid "User/Group Management"
+msgstr "Käyttäjä/ryhmä-hallinta"
+
+#: ..\..\..\admin\_users_list.php:13
+msgid "Groups &amp; Users"
+msgstr "Ryhmät &amp; käyttäjät"
+
+#: ..\..\..\admin\_users_list.php:60
+msgid "default group for new users"
+msgstr "Oletusryhmä uusille käyttäjille"
+
+#: ..\..\..\admin\_users_list.php:71
+msgid "Copy group"
+msgstr "Kopioi ryhmä"
+
+#: ..\..\..\admin\_users_list.php:77
+msgid "Delete group"
+msgstr "Poista ryhmä"
+
+#: ..\..\..\admin\_users_list.php:127
+msgid "decrease user level"
+msgstr "Laske käyttäjätasoa"
+
+#: ..\..\..\admin\_users_list.php:132
+msgid "increase user level"
+msgstr "Nosta käyttäjätasoa"
+
+#: ..\..\..\admin\_users_list.php:146
+msgid "Delete user"
+msgstr "Poista käyttäjä"
+
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_users_list.php:146
+msgid ""
+"Are you sure you want to delete this user?\\n"
+"Warning: all his posts will be deleted too!"
+msgstr ""
+"Oletko varma että haluat poistaa tämän käyttäjän?\\n"
+"Varoitus: kaikki hänen viestinsä poistaan!"
+
+#: ..\..\..\admin\_users_list.php:162
+msgid "New user..."
+msgstr "Uusi käyttäjä..."
+
+#: ..\..\..\admin\_users_list.php:164
+msgid "New group..."
+msgstr "Uusi ryhmä..."
+
+#: ..\..\..\b2evocore\_blog_main.php:202
+#, php-format
+msgid "The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>..."
+msgstr "Oletusulkoasua [%s] blogille [%s] ei löydy. Se täytyy asettaa <a %s>blogin asetuksista</a> tai ylittää kantatiedostosta(?!).Ota yhteyttä <a %s>ylläpitoon</a>..."
+
+#: ..\..\..\b2evocore\_class_blog.php:375
+#: ..\..\..\b2evocore\_class_blog.php:389
+#, php-format
+msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
+msgstr "VIRHE! Ei voida poistaa. Sinun täytyy poistaa tiedosto [%s] käsin."
+
+#: ..\..\..\b2evocore\_class_calendar.php:186
+#: ..\..\..\b2evocore\_class_calendar.php:191
+#, php-format
+msgid "%d posts"
+msgstr "%d viestiä"
+
+#: ..\..\..\b2evocore\_class_calendar.php:187
+#: ..\..\..\b2evocore\_class_calendar.php:192
+msgid "1 post"
+msgstr "1 viesti"
+
+#: ..\..\..\b2evocore\_class_calendar.php:295
+msgid "previous month"
+msgstr "edellinen kuukausi"
+
+#: ..\..\..\b2evocore\_class_calendar.php:299
+msgid "next month"
+msgstr "seuraava kuukausi"
+
+#: ..\..\..\b2evocore\_class_calendar.php:326
+msgid "previous year"
+msgstr "edellinen vuosi"
+
+#: ..\..\..\b2evocore\_class_calendar.php:329
+msgid "next year"
+msgstr "seuraava vuosi"
+
+#: ..\..\..\b2evocore\_class_calendar.php:358
+msgid "go to month's archive"
+msgstr "siirry kuukausiarkistoon"
+
+#: ..\..\..\b2evocore\_class_comment.php:128
+msgid "Member"
+msgstr "Jäsen"
+
+#: ..\..\..\b2evocore\_class_comment.php:136
+msgid "Visitor"
+msgstr "Vieras"
+
+#: ..\..\..\b2evocore\_class_commentlist.php:136
+#: ..\..\..\skins\_lastcomments.php:20
+msgid "No comment yet..."
+msgstr "Ei kommentteja..."
+
+#: ..\..\..\b2evocore\_class_dataobjectlist.php:117
+msgid "Sorry, there is nothing to display..."
+msgstr "Valitan, täällä ei ole mitään näytettävää"
+
+#: ..\..\..\b2evocore\_class_db.php:86
+#, php-format
+msgid "Error selecting database [%s]!"
+msgstr "Virhe valittaessa tietokantaan [%s]!"
+
+#: ..\..\..\b2evocore\_class_db.php:141
+msgid "MySQL error!"
+msgstr "MySQL-virhe!"
+
+#: ..\..\..\b2evocore\_class_group.php:63
+msgid "New group"
+msgstr "Uusi ryhmä"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:98
+msgid "Parser error: "
+msgstr "Tulkin virhe: "
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:115
+msgid "Tag <code>body</code> can only be used once!"
+msgstr "<code>body</code>-tagia voidaan käyttää vain kerran!"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:128
+msgid "Illegal tag"
+msgstr "Virheellinen tagi"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:135
+#, php-format
+msgid "Tag %s must occur inside another tag"
+msgstr "%s-tagi täytyy olla toisen tagin sisällä"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:137
+#, php-format
+msgid "Tag %s is not allowed within tag %s"
+msgstr "%s-tagia ei sallita %s-tagin sisällä"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:145
+#, php-format
+msgid "Tag %s may not have attribute %s"
+msgstr "%s-tagilla ei voi olla atribuuttia %s"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:153
+msgid "Found invalid URL: "
+msgstr "Virheellinen URL: "
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:176
+#, php-format
+msgid "Tag %s may not contain raw character data"
+msgstr "%s-tagi ei voi sisältää raakaa tekstidataa"
+
+#. TRANS: When the categories for a specific post are displayed, the user can click
+#. on these cats to browse them, this is the default href title displayed there
+#: ..\..\..\b2evocore\_class_item.php:274
+#: ..\..\..\b2evocore\_functions_cats.php:631
+msgid "Browse category"
+msgstr "Selaa kategorioita"
+
+#: ..\..\..\b2evocore\_class_item.php:372
+msgid "This post is not published. You cannot leave comments."
+msgstr "Tätä viestiä ei ole julkaistu. Et voi jättää kommentteja."
+
+#: ..\..\..\b2evocore\_class_item.php:384
+msgid "Comments are closed for this post."
+msgstr "Kommentointi on estetty tässä viestissä"
+
+#. TRANS: this is the default text for the extended post "more" link
+#: ..\..\..\b2evocore\_class_item.php:434
+#: ..\..\..\b2evocore\_functions_bposts.php:704
+msgid "Read more!"
+msgstr "Lue lisää!"
+
+#  TRANS: this is the default text displayed once the more link has been activated
+#: ..\..\..\b2evocore\_class_item.php:439
+#: ..\..\..\b2evocore\_functions_bposts.php:709
+msgid "More:"
+msgstr "Lisää:"
+
+#: ..\..\..\b2evocore\_class_item.php:677
+msgid "Display feedback / Leave a comment"
+msgstr "Näytä palautteet / Jätä kommentti"
+
+#: ..\..\..\b2evocore\_class_item.php:678
+msgid "Send feedback"
+msgstr "Lähetä palautetta"
+
+#: ..\..\..\b2evocore\_class_item.php:679
+msgid "1 feedback"
+msgstr "1 palaute"
+
+#: ..\..\..\b2evocore\_class_item.php:680
+#, php-format
+msgid "%d feedbacks"
+msgstr "%d palautetta"
+
+#: ..\..\..\b2evocore\_class_item.php:693
+msgid "Display comments / Leave a comment"
+msgstr "Näytä kommentit / Jätä kommentti"
+
+#: ..\..\..\b2evocore\_class_item.php:706
+msgid "Display trackbacks / Get trackback address for this post"
+msgstr "Näytä"
+
+#: ..\..\..\b2evocore\_class_item.php:707
+#: ..\..\..\b2evocore\_functions_trackback.php:172
+msgid "Trackback (0)"
+msgstr "Viittaus (0)"
+
+#: ..\..\..\b2evocore\_class_item.php:708
+#: ..\..\..\b2evocore\_functions_trackback.php:173
+msgid "Trackback (1)"
+msgstr "Viittaus (1)"
+
+#: ..\..\..\b2evocore\_class_item.php:709
+#: ..\..\..\b2evocore\_functions_trackback.php:174
+#, php-format
+msgid "Trackbacks (%d)"
+msgstr "Viittaukset (%d)"
+
+#: ..\..\..\b2evocore\_class_item.php:719
+msgid "Display pingbacks"
+msgstr "Näytä päivitysilmoitukset"
+
+#: ..\..\..\b2evocore\_class_item.php:720
+#: ..\..\..\b2evocore\_functions_pingback.php:266
+msgid "Pingback (0)"
+msgstr "Päivitysilmoituksia (0)"
+
+#: ..\..\..\b2evocore\_class_item.php:721
+#: ..\..\..\b2evocore\_functions_pingback.php:267
+msgid "Pingback (1)"
+msgstr "Päivitysilmoituksia (1)"
+
+#: ..\..\..\b2evocore\_class_item.php:722
+#: ..\..\..\b2evocore\_functions_pingback.php:268
+#, php-format
+msgid "Pingbacks (%d)"
+msgstr "Päivitysilmoituksia (%d)"
+
+#: ..\..\..\b2evocore\_class_itemlist.php:523
+msgid "Invalid post, please correct these errors:"
+msgstr "Virheellinen viesti, korjaa seuraavat virheet:"
+
+#: ..\..\..\b2evocore\_class_itemlist.php:822
+msgid "Sorry, there is no post to display..."
+msgstr "Valitan, ei yhtään viestiä näytettävänä"
+
+#: ..\..\..\b2evocore\_class_pop3.php:96
+#: ..\..\..\b2evocore\_class_pop3.php:105
+#: ..\..\..\b2evocore\_class_pop3.php:117
+msgid "POP3 connect:"
+msgstr "POP3 yhdistetty:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:96
+msgid "No server specified"
+msgstr "Palvelinta ei ole määritelty"
+
+#: ..\..\..\b2evocore\_class_pop3.php:125
+msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
+msgstr "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
+
+#: ..\..\..\b2evocore\_class_pop3.php:137
+msgid "POP3 noop:"
+msgstr "POP3 noop:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:137
+#: ..\..\..\b2evocore\_class_pop3.php:205
+#: ..\..\..\b2evocore\_class_pop3.php:254
+#: ..\..\..\b2evocore\_class_pop3.php:279
+#: ..\..\..\b2evocore\_class_pop3.php:321
+#: ..\..\..\b2evocore\_class_pop3.php:395
+#: ..\..\..\b2evocore\_class_pop3.php:434
+#: ..\..\..\b2evocore\_class_pop3.php:464
+#: ..\..\..\b2evocore\_class_pop3.php:498
+#: ..\..\..\b2evocore\_class_pop3.php:561
+#: ..\..\..\b2evocore\_class_pop3.php:629
+msgid "No connection to server"
+msgstr "Palvelimeen ei saatu yhteyttä"
+
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:155
+#: ..\..\..\b2evocore\_class_pop3.php:160
+msgid "POP3 user:"
+msgstr "POP3 tunnus:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:211
+msgid "No login ID submitted"
+msgstr "Login-ID:tä ei lähetetty"
+
+#: ..\..\..\b2evocore\_class_pop3.php:155
+#: ..\..\..\b2evocore\_class_pop3.php:175
+msgid "connection not established"
+msgstr "yhteyttä ei ole muodostettu"
+
+#: ..\..\..\b2evocore\_class_pop3.php:172
+#: ..\..\..\b2evocore\_class_pop3.php:175
+#: ..\..\..\b2evocore\_class_pop3.php:180
+#: ..\..\..\b2evocore\_class_pop3.php:189
+msgid "POP3 pass:"
+msgstr "POP3 salasana:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:172
+#: ..\..\..\b2evocore\_class_pop3.php:214
+msgid "No password submitted"
+msgstr "Salasanaa ei lähetetty"
+
+#: ..\..\..\b2evocore\_class_pop3.php:180
+msgid "authentication failed "
+msgstr "kirjautuminen epäonnistui"
+
+#: ..\..\..\b2evocore\_class_pop3.php:189
+#: ..\..\..\b2evocore\_class_pop3.php:238
+msgid "NOOP failed. Server not RFC 1939 compliant"
+msgstr "NOOP epäonnistui. Palvelin ei ole RFC 1939:n mukainen"
+
+#: ..\..\..\b2evocore\_class_pop3.php:205
+#: ..\..\..\b2evocore\_class_pop3.php:211
+#: ..\..\..\b2evocore\_class_pop3.php:214
+#: ..\..\..\b2evocore\_class_pop3.php:219
+#: ..\..\..\b2evocore\_class_pop3.php:229
+#: ..\..\..\b2evocore\_class_pop3.php:238
+msgid "POP3 apop:"
+msgstr "POP3 apop:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:219
+msgid "No server banner"
+msgstr "Ei palvelimen tietoja saatavilla"
+
+#: ..\..\..\b2evocore\_class_pop3.php:219
+#: ..\..\..\b2evocore\_class_pop3.php:229
+msgid "abort"
+msgstr "keskeytä"
+
+#: ..\..\..\b2evocore\_class_pop3.php:229
+msgid "apop authentication failed"
+msgstr "apop autentikointi epäonnistui"
+
+#: ..\..\..\b2evocore\_class_pop3.php:254
+msgid "POP3 login:"
+msgstr "POP3 tunnus:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:279
+#: ..\..\..\b2evocore\_class_pop3.php:295
+msgid "POP3 top:"
+msgstr "POP3 top:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:321
+#: ..\..\..\b2evocore\_class_pop3.php:349
+#: ..\..\..\b2evocore\_class_pop3.php:360
+#: ..\..\..\b2evocore\_class_pop3.php:372
+msgid "POP3 pop_list:"
+msgstr "POP3 pop_list:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:372
+msgid "Premature end of list"
+msgstr "Ennenaikainen listan loppuminen"
+
+#: ..\..\..\b2evocore\_class_pop3.php:395
+#: ..\..\..\b2evocore\_class_pop3.php:408
+msgid "POP3 get:"
+msgstr "POP3 get:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:434
+#: ..\..\..\b2evocore\_class_pop3.php:441
+msgid "POP3 last:"
+msgstr "POP3 last:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:464
+#: ..\..\..\b2evocore\_class_pop3.php:474
+msgid "POP3 reset:"
+msgstr "POP3 reset:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:498
+#: ..\..\..\b2evocore\_class_pop3.php:504
+msgid "POP3 send_cmd:"
+msgstr "POP3 send_cmd:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:504
+msgid "Empty command string"
+msgstr "Tyhjä komento"
+
+#: ..\..\..\b2evocore\_class_pop3.php:524
+msgid "POP3 quit:"
+msgstr "POP3 quit:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:524
+msgid "connection does not exist"
+msgstr "yhteyttä ei ole muodostettu"
+
+#: ..\..\..\b2evocore\_class_pop3.php:561
+#: ..\..\..\b2evocore\_class_pop3.php:573
+#: ..\..\..\b2evocore\_class_pop3.php:596
+msgid "POP3 uidl:"
+msgstr "POP3 uidl:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:629
+#: ..\..\..\b2evocore\_class_pop3.php:634
+#: ..\..\..\b2evocore\_class_pop3.php:640
+msgid "POP3 delete:"
+msgstr "POP3 delete:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:634
+msgid "No msg number submitted"
+msgstr "Viestin numeroa ei ole lähetetty"
+
+#: ..\..\..\b2evocore\_class_pop3.php:640
+msgid "Command failed"
+msgstr "Komento epäonnistui"
+
+#: ..\..\..\b2evocore\_class_user.php:58
+msgid "New user"
+msgstr "Uusi käyttäjä"
+
+#: ..\..\..\b2evocore\_class_user.php:252
+msgid "Permission denied!"
+msgstr "Pääsy estetty!"
+
+#: ..\..\..\b2evocore\_functions.php:41
+msgid "Oops, MySQL error!"
+msgstr "Ups, MySQL-virhe!"
+
+#: ..\..\..\b2evocore\_functions.php:476
+msgid "go back"
+msgstr "palaa takaisin"
+
+#: ..\..\..\b2evocore\_functions.php:508
+msgid "Redirecting you to:"
+msgstr "Ohjataan sinut sivulle:"
+
+#: ..\..\..\b2evocore\_functions.php:510
+#, php-format
+msgid "If nothing happens, click <a %s>here</a>."
+msgstr "Mikäli mitään ei tapahdu, klikkaa <a %s>tästä</a>."
+
+#: ..\..\..\b2evocore\_functions.php:588
+msgid "No response!"
+msgstr "Ei vastausta!"
+
+#: ..\..\..\b2evocore\_functions.php:593
+msgid "Remote error"
+msgstr "Palvelimen virhe"
+
+#: ..\..\..\b2evocore\_functions.php:608
+#: ..\..\..\b2evocore\_functions.php:613
+msgid "Response"
+msgstr "Vastaus"
+
+#: ..\..\..\b2evocore\_functions.php:849
+#, php-format
+msgid "Parameter %s is required!"
+msgstr "Parametri %s on pakollinen!"
+
+#: ..\..\..\b2evocore\_functions.php:1061
+msgid "Invalid URL"
+msgstr "Virheellinen URL"
+
+#: ..\..\..\b2evocore\_functions.php:1067
+msgid "URI scheme not allowed"
+msgstr "Virheellinen URI-muoto"
+
+#: ..\..\..\b2evocore\_functions.php:1074
+msgid "URL not allowed"
+msgstr "URL ei ole sallittu"
+
+#: ..\..\..\b2evocore\_functions_antispam.php:175
+msgid "Reporting abuse to b2evolution.net..."
+msgstr "Lähetetään ilmoitus väärinkäytöstä b2evolution.netiin..."
+
+#: ..\..\..\b2evocore\_functions_antispam.php:205
+#: ..\..\..\b2evocore\_functions_pings.php:52
+#: ..\..\..\b2evocore\_functions_pings.php:87
+#: ..\..\..\b2evocore\_functions_pings.php:162
+#: ..\..\..\b2evocore\_functions_pings.php:202
+msgid "Aborted (Running on localhost)."
+msgstr "Keskeytetty (Ajetaan paikallisesti)"
+
+#: ..\..\..\b2evocore\_functions_antispam.php:223
+msgid "Requesting abuse list from b2evolution.net..."
+msgstr "Pyydetään väärinkäyttö-listaa b2evolution.netistä..."
+
+#: ..\..\..\b2evocore\_functions_antispam.php:233
+msgid "Latest update timestamp"
+msgstr "Viimeisen päivityksen aikaleima"
+
+#: ..\..\..\b2evocore\_functions_antispam.php:258
+msgid "Incomplete reponse."
+msgstr "Keskeneräinen vastaus."
+
+#: ..\..\..\b2evocore\_functions_antispam.php:266
+msgid "No new blacklisted strings are available."
+msgstr "Ei uusia merkkijonoja mustalla listalla."
+
+#: ..\..\..\b2evocore\_functions_antispam.php:270
+msgid "Adding strings to local blacklist"
+msgstr "Lisätään merkkijono paikalliseen mustaanlistaan."
+
+#: ..\..\..\b2evocore\_functions_antispam.php:273
+msgid "Adding:"
+msgstr "Lisätään:"
+
+#: ..\..\..\b2evocore\_functions_antispam.php:276
+#: ..\..\..\htsrv\getmail.php:290
+msgid "OK."
+msgstr "OK."
+
+#: ..\..\..\b2evocore\_functions_antispam.php:280
+msgid "Not necessary! (Already handled)"
+msgstr "Ei välttämätön! (Valmiiksi käsitelty)"
+
+#: ..\..\..\b2evocore\_functions_antispam.php:288
+msgid "New latest update timestamp"
+msgstr "Uusi päivityksen aikaleima"
+
+#: ..\..\..\b2evocore\_functions_antispam.php:297
+msgid "Invalid reponse."
+msgstr "Virheellinen vastaus."
+
+#: ..\..\..\b2evocore\_functions_blogs.php:194
+#: ..\..\..\b2evocore\_functions_blogs.php:217
+msgid "Requested blog does not exist!"
+msgstr "Pyydettyä bogia ei ole olemassa!"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:655
+msgid "Post details"
+msgstr "Viestin tiedot"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:663
+msgid "PREVIEW"
+msgstr "ESIKATSELU"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:800
+msgid "Next page"
+msgstr "Seuraava sivu"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:801
+msgid "Previous page"
+msgstr "Edellinen sivu"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:846
+msgid "Previous post"
+msgstr "Edellinen viesti"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:903
+msgid "Next post"
+msgstr "Seuraava viesti"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:1004
+msgid "Next Page"
+msgstr "Seuraava sivu"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:1032
+msgid "Previous Page"
+msgstr "Edellinen sivu"
+
+#: ..\..\..\b2evocore\_functions_cats.php:87
+msgid "Cannot delete if there are sub-categories!"
+msgstr "Ei voida poistaa mikäli alakategorioita on olemassa!"
+
+#: ..\..\..\b2evocore\_functions_cats.php:119
+msgid "Cannot delete last category if there are posts inside!"
+msgstr "Viimeistä kategoriaa ei voida poistaa, mikäli sen alla on viestejä!"
+
+#: ..\..\..\b2evocore\_functions_cats.php:214
+#, php-format
+msgid "Requested category %s does not exist!"
+msgstr "Pyydetty kategoriaa %s ei ole olemassa!"
+
+#: ..\..\..\b2evocore\_functions_cats.php:562
+msgid "Category"
+msgstr "Kategoria"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:57
+msgid "bad char in User Agent"
+msgstr "kielletty merkki User Agentissa"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:85
+#: ..\..\..\b2evocore\_functions_hitlogs.php:104
+#: ..\..\..\b2evocore\_functions_hitlogs.php:115
+#: ..\..\..\b2evocore\_functions_hitlogs.php:127
+msgid "referer ignored"
+msgstr "referer-tieto jätetty huomioimatta"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:85
+msgid "BlackList"
+msgstr "Mustalista"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:104
+msgid "robot"
+msgstr "robotti"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:115
+msgid "invalid"
+msgstr "virheellinen"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:127
+msgid "search engine"
+msgstr "hakukone"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:135
+msgid "loading referering page"
+msgstr "ladataan edellinen sivu"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:156
+msgid "found current url in page"
+msgstr "nykyinen url löydetty sivulta"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:449
+msgid "not a query - no params!"
+msgstr "ei haku - ei parametrejä!"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:474
+msgid "no query string found"
+msgstr "haku-merkkijonoa ei löydetty"
+
+#: ..\..\..\b2evocore\_functions_locale.php:347
+#: ..\..\..\install\index.php:83
+msgid "name"
+msgstr "nimi"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:35
+msgid "Sending pingbacks..."
+msgstr "Lähetetään päivitysilmoituksia..."
+
+#: ..\..\..\b2evocore\_functions_pingback.php:40
+msgid "No pingback to be done."
+msgstr "Ei päivitysilmoituksia tehtävänä"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:46
+msgid "BEGIN"
+msgstr "ALKU"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:77
+msgid "Post contents"
+msgstr "Viestin sisältö"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:108
+#: ..\..\..\b2evocore\_functions_pingback.php:109
+msgid "Processing:"
+msgstr "Käsitellään:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:113
+#: ..\..\..\b2evocore\_functions_pingback.php:114
+msgid "Couldn't find a hostname for:"
+msgstr "Hostnamea ei löydetty:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:128
+msgid "Connect to server at:"
+msgstr "Yhdistetään palvelimeen:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:132
+#: ..\..\..\b2evocore\_functions_pingback.php:133
+msgid "Couldn't open a connection to:"
+msgstr "Yhteyttä ei voitu avata:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:144
+msgid "Start receiving headers and content"
+msgstr "Aloitetaan otsikoiden ja sisällön vastaanottaminen"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:178
+#: ..\..\..\b2evocore\_functions_pingback.php:179
+msgid "Pingback server found from X-Pingback header:"
+msgstr "Päivitysilmoitus-palvelin löydetty X-Pingback-otsikosta:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:192
+#: ..\..\..\b2evocore\_functions_pingback.php:193
+msgid "Pingback server found from Pingback <link /> tag:"
+msgstr "Päivitysilmoitus-palvelin löydetty päivitysilmoituksen <link />-tagista:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:201
+#: ..\..\..\b2evocore\_functions_pingback.php:202
+msgid "Pingback server not found in headers and content"
+msgstr "Päivitysilmoitus-palvelinta ei löydetty otsikosta tai sisällöstä"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:207
+#: ..\..\..\b2evocore\_functions_pingback.php:208
+msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
+msgstr "Päivitysilmoitus-palvelimen URL on tyhjä (voi johtua sisäisestä PHP:n fgets-virheestä)"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:213
+msgid "Pingback server data"
+msgstr "Päivitysilmoitus-palvelimen tiedot"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:223
+#: ..\..\..\b2evocore\_functions_pingback.php:224
+msgid "Page Linked To:"
+msgstr "Sivu linkitetty osoitteeseen:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:225
+#: ..\..\..\b2evocore\_functions_pingback.php:226
+msgid "Page Linked From:"
+msgstr "Sivu linkitetty osoitteesta:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:231
+#, php-format
+msgid "Pinging %s..."
+msgstr "Pingataan %s..."
+
+#: ..\..\..\b2evocore\_functions_pingback.php:241
+msgid "END"
+msgstr "LOPPU"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:243
+msgid "Pingbacks done."
+msgstr "Päivitysilmoitukset lähetetty."
+
+#: ..\..\..\b2evocore\_functions_pings.php:28
+msgid "Pinging b2evolution.net..."
+msgstr "Pingataan b2evolution.net..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:72
+msgid "Pinging Weblogs.com..."
+msgstr "Pingataan Weblogs.com..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:133
+msgid "Pinging Blo.gs..."
+msgstr "Pingataan Blo.gs..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:186
+msgid "Pinging technorati.com..."
+msgstr "Pingataan technorati.com..."
+
+#: ..\..\..\b2evocore\_functions_template.php:47
+msgid "Archives for"
+msgstr "Arkistot"
+
+#: ..\..\..\b2evocore\_functions_template.php:96
+msgid "Archive Directory"
+msgstr "Arkistohakemisto"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:24
+msgid "Sending trackbacks..."
+msgstr "Lähetetään viittaukset..."
+
+#: ..\..\..\b2evocore\_functions_trackback.php:27
+msgid "No trackback to be sent."
+msgstr "Ei viittauksia lähetettävänä"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:32
+msgid "Excerpt to be sent:"
+msgstr "Lähetettävä lainaus:"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:40
+msgid "Trackbacks done."
+msgstr "Viittaus onnistui"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:59
+msgid "Sending trackback to:"
+msgstr "Lähetetään viittaus:"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:117
+msgid "Response:"
+msgstr "Vastaus:"
+
+#: ..\..\..\b2evocore\_functions_users.php:71
+msgid "wrong login/password."
+msgstr "virheellinen tunnus/salasana"
+
+#: ..\..\..\b2evocore\_functions_users.php:77
+#: ..\..\..\b2evocore\_functions_users.php:79
+#: ..\..\..\htsrv\profile_update.php:111
+#, php-format
+msgid "setcookie %s failed!"
+msgstr "setcookie %s epäonnistui!"
+
+#: ..\..\..\b2evocore\_functions_users.php:102
+msgid "login/password no longer valid."
+msgstr "tunnus/salasana ei ole enää voimassa"
+
+#: ..\..\..\b2evocore\_functions_users.php:123
+msgid "You must log in!"
+msgstr "Sinun täytyy kirjautua sisään!"
+
+#: ..\..\..\b2evocore\_functions_users.php:344
+msgid "Login if you have an account..."
+msgstr "Kirjaudu mikäli sinulla on tunnus..."
+
+#: ..\..\..\b2evocore\_functions_users.php:367
+msgid "Register..."
+msgstr "Rekisteröidy..."
+
+#: ..\..\..\b2evocore\_functions_users.php:368
+msgid "Register to open an account..."
+msgstr "Rekisteröidy avataksesi tunnuksen..."
+
+#: ..\..\..\b2evocore\_functions_users.php:389
+#, php-format
+msgid "Logout (%s)"
+msgstr "Kirjaudu ulos (%s)"
+
+#: ..\..\..\b2evocore\_functions_users.php:390
+msgid "Logout from your account"
+msgstr "Kirjaudu ulos tunnukselta"
+
+#: ..\..\..\b2evocore\_functions_users.php:415
+msgid "Admin"
+msgstr "Ylläpitäjä"
+
+#: ..\..\..\b2evocore\_functions_users.php:416
+msgid "Go to the back-office"
+msgstr "Mene asetuspaneeliin"
+
+#: ..\..\..\b2evocore\_functions_users.php:437
+#, php-format
+msgid "Profile (%s)"
+msgstr "Profiili (%s)"
+
+#: ..\..\..\b2evocore\_functions_users.php:438
+msgid "Edit your profile"
+msgstr "Muokkaa profiiliasi"
+
+#: ..\..\..\b2evocore\_functions_users.php:463
+msgid "User profile"
+msgstr "Käyttäjäprofiili"
+
+#: ..\..\..\b2evocore\_vars.php:106
+msgid "Sunday"
+msgstr "Sunnuntai"
+
+#: ..\..\..\b2evocore\_vars.php:107
+msgid "Monday"
+msgstr "Maanantai"
+
+#: ..\..\..\b2evocore\_vars.php:108
+msgid "Tuesday"
+msgstr "Tiistai"
+
+#: ..\..\..\b2evocore\_vars.php:109
+msgid "Wednesday"
+msgstr "Keskiviikko"
+
+#: ..\..\..\b2evocore\_vars.php:110
+msgid "Thursday"
+msgstr "Torstai"
+
+#: ..\..\..\b2evocore\_vars.php:111
+msgid "Friday"
+msgstr "Perjantai"
+
+#: ..\..\..\b2evocore\_vars.php:112
+msgid "Saturday"
+msgstr "Lauantai"
+
+#  TRANS: abbrev. for Sunday
+#: ..\..\..\b2evocore\_vars.php:116
+msgid "Sun"
+msgstr "Su"
+
+#  TRANS: abbrev. for Monday
+#: ..\..\..\b2evocore\_vars.php:118
+msgid "Mon"
+msgstr "Ma"
+
+#  TRANS: abbrev. for Tuesday
+#: ..\..\..\b2evocore\_vars.php:120
+msgid "Tue"
+msgstr "Ti"
+
+#  TRANS: abbrev. for Wednesday
+#: ..\..\..\b2evocore\_vars.php:122
+msgid "Wed"
+msgstr "Ke"
+
+#  TRANS: abbrev. for Thursday
+#: ..\..\..\b2evocore\_vars.php:124
+msgid "Thu"
+msgstr "To"
+
+#  TRANS: abbrev. for Friday
+#: ..\..\..\b2evocore\_vars.php:126
+msgid "Fri"
+msgstr "Pe"
+
+#  TRANS: abbrev. for Saturday
+#: ..\..\..\b2evocore\_vars.php:128
+msgid "Sat"
+msgstr "La"
+
+#  TRANS: abbrev. for Sunday
+#: ..\..\..\b2evocore\_vars.php:132
+msgid " S "
+msgstr "S"
+
+#  TRANS: abbrev. for Monday
+#: ..\..\..\b2evocore\_vars.php:134
+msgid " M "
+msgstr "M"
+
+#  TRANS: abbrev. for Tuesday
+#: ..\..\..\b2evocore\_vars.php:136
+msgid " T "
+msgstr "T"
+
+#  TRANS: abbrev. for Wednesday
+#: ..\..\..\b2evocore\_vars.php:138
+msgid " W "
+msgstr "W"
+
+#  TRANS: abbrev. for Thursday
+#: ..\..\..\b2evocore\_vars.php:140
+msgid " T  "
+msgstr "T"
+
+#  TRANS: abbrev. for Friday
+#: ..\..\..\b2evocore\_vars.php:142
+msgid " F "
+msgstr "F"
+
+#  TRANS: abbrev. for Saturday
+#: ..\..\..\b2evocore\_vars.php:144
+msgid " S  "
+msgstr "S"
+
+#: ..\..\..\b2evocore\_vars.php:147
+msgid "January"
+msgstr "Tammikuu"
+
+#: ..\..\..\b2evocore\_vars.php:148
+msgid "February"
+msgstr "Helmikuu"
+
+#: ..\..\..\b2evocore\_vars.php:149
+msgid "March"
+msgstr "Maaliskuu"
+
+#: ..\..\..\b2evocore\_vars.php:150
+msgid "April"
+msgstr "Huhtikuu"
+
+#  TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
+#: ..\..\..\b2evocore\_vars.php:152
+msgid "May "
+msgstr "Toukokuu"
+
+#: ..\..\..\b2evocore\_vars.php:153
+msgid "June"
+msgstr "Kesäkuu"
+
+#: ..\..\..\b2evocore\_vars.php:154
+msgid "July"
+msgstr "Heinäkuu"
+
+#: ..\..\..\b2evocore\_vars.php:155
+msgid "August"
+msgstr "Elokuu"
+
+#: ..\..\..\b2evocore\_vars.php:156
+msgid "September"
+msgstr "Syyskuu"
+
+#: ..\..\..\b2evocore\_vars.php:157
+msgid "October"
+msgstr "Lokakuu"
+
+#: ..\..\..\b2evocore\_vars.php:158
+msgid "November"
+msgstr "Marraskuu"
+
+#: ..\..\..\b2evocore\_vars.php:159
+msgid "December"
+msgstr "Joulukuu"
+
+#  TRANS: abbrev. for January
+#: ..\..\..\b2evocore\_vars.php:163
+msgid "Jan"
+msgstr "Tammi"
+
+#  TRANS: abbrev. for February
+#: ..\..\..\b2evocore\_vars.php:165
+msgid "Feb"
+msgstr "Helmi"
+
+#  TRANS: abbrev. for March
+#: ..\..\..\b2evocore\_vars.php:167
+msgid "Mar"
+msgstr "Maalis"
+
+#  TRANS: abbrev. for April
+#: ..\..\..\b2evocore\_vars.php:169
+msgid "Apr"
+msgstr "Huhti"
+
+#  TRANS: abbrev. for May
+#: ..\..\..\b2evocore\_vars.php:171
+msgid "May"
+msgstr "Touko"
+
+#  TRANS: abbrev. for June
+#: ..\..\..\b2evocore\_vars.php:173
+msgid "Jun"
+msgstr "Kesä"
+
+#  TRANS: abbrev. for July
+#: ..\..\..\b2evocore\_vars.php:175
+msgid "Jul"
+msgstr "Heinä"
+
+#  TRANS: abbrev. for August
+#: ..\..\..\b2evocore\_vars.php:177
+msgid "Aug"
+msgstr "Elo"
+
+#  TRANS: abbrev. for September
+#: ..\..\..\b2evocore\_vars.php:179
+msgid "Sep"
+msgstr "Syys"
+
+#  TRANS: abbrev. for October
+#: ..\..\..\b2evocore\_vars.php:181
+msgid "Oct"
+msgstr "Loka"
+
+#  TRANS: abbrev. for November
+#: ..\..\..\b2evocore\_vars.php:183
+msgid "Nov"
+msgstr "Marras"
+
+#  TRANS: abbrev. for December
+#: ..\..\..\b2evocore\_vars.php:185
+msgid "Dec"
+msgstr "Joulu"
+
+#: ..\..\..\b2evocore\_vars.php:198
+msgid "Local"
+msgstr "Paikallinen"
+
+#: ..\..\..\b2evocore\_vars.php:199
+msgid "Reported"
+msgstr "Raportoitu"
+
+#: ..\..\..\b2evocore\_vars.php:200
+msgid "Central"
+msgstr "Keskus"
+
+#: ..\..\..\conf\_locales.php:37
+msgid "Czech (CZ)"
+msgstr "Tsekki (CZ)"
+
+#: ..\..\..\conf\_locales.php:44
+msgid "German (DE)"
+msgstr "Saksa (DE)"
+
+#: ..\..\..\conf\_locales.php:51
+msgid "English (EU)"
+msgstr "Englanti (EU)"
+
+#: ..\..\..\conf\_locales.php:58
+msgid "English (UK)"
+msgstr "Englanti (UK)"
+
+#: ..\..\..\conf\_locales.php:65
+msgid "English (US)"
+msgstr "Englanti (US)"
+
+#: ..\..\..\conf\_locales.php:72
+msgid "English (CA)"
+msgstr "Englanti (CA)"
+
+#: ..\..\..\conf\_locales.php:79
+msgid "English (AU)"
+msgstr "Englanti (AU)"
+
+#: ..\..\..\conf\_locales.php:86
+msgid "Spanish (ES)"
+msgstr "Espanja (ES)"
+
+#: ..\..\..\conf\_locales.php:93
+msgid "French (FR)"
+msgstr "Ranska (FR)"
+
+#: ..\..\..\conf\_locales.php:100
+msgid "French (CA)"
+msgstr "Ranska (CA)"
+
+#: ..\..\..\conf\_locales.php:107
+msgid "French (BE)"
+msgstr "Ranska (BE)"
+
+#: ..\..\..\conf\_locales.php:114
+msgid "Italian (IT)"
+msgstr "Italia (IT)"
+
+#: ..\..\..\conf\_locales.php:121
+msgid "Japanese (JP)"
+msgstr "Japani (JP)"
+
+#: ..\..\..\conf\_locales.php:128
+msgid "Lithuanian (LT)"
+msgstr "Liettua (LT)"
+
+#: ..\..\..\conf\_locales.php:135
+msgid "Bokm&aring;l (NO)"
+msgstr "Norja (NO)"
+
+#: ..\..\..\conf\_locales.php:142
+msgid "Dutch (NL)"
+msgstr "Hollanti (NL)"
+
+#: ..\..\..\conf\_locales.php:149
+msgid "Dutch (BE)"
+msgstr "Hollanti (BE)"
+
+#: ..\..\..\conf\_locales.php:156
+msgid "Portuguese (BR)"
+msgstr "Portugali (BR)"
+
+#: ..\..\..\conf\_locales.php:163
+msgid "Swedish (SE)"
+msgstr "Ruotsi (SE)"
+
+#: ..\..\..\conf\_locales.php:170
+msgid "Simpl. Chinese (CN)"
+msgstr "Yksinkertainen kiina (CN)"
+
+#: ..\..\..\conf\_locales.php:177
+msgid "Trad. Chinese (TW)"
+msgstr "Perinteinen kiina (TW)"
+
+#: ..\..\..\htsrv\comment_post.php:24
+msgid "You cannot leave comments on this post!"
+msgstr "Tätä viesti ei voi kommentoida!"
+
+#: ..\..\..\htsrv\comment_post.php:47
+msgid "Please fill in the name field"
+msgstr "Täytä nimi-kenttä"
+
+#: ..\..\..\htsrv\comment_post.php:48
+msgid "Please fill in the email field"
+msgstr "Täytä sähköposti-kenttä"
+
+#: ..\..\..\htsrv\comment_post.php:53
+msgid "Supplied email address is invalid"
+msgstr "Annettu sähköpostiosoite on virheellinen"
+
+#: ..\..\..\htsrv\comment_post.php:77
+msgid "Please do not send empty comment"
+msgstr "Ole hyvä, äläkä lähetä tyhjää kommenttia"
+
+#: ..\..\..\htsrv\comment_post.php:94
+msgid "You can only post a new comment every 30 seconds."
+msgstr "Voit lähettää kommentteja 30 sekunnin välein"
+
+#: ..\..\..\htsrv\comment_post.php:98
+msgid "Cannot post comment, please correct these errors:"
+msgstr "Ei voida lähettää kommenttia, ole hyvä ja korjaa seuraavat virheet:"
+
+#: ..\..\..\htsrv\comment_post.php:99
+msgid "Back to comment editing"
+msgstr "Takaisin kommentin muokkaukseen"
+
+#: ..\..\..\htsrv\comment_post.php:124
+#: ..\..\..\htsrv\comment_post.php:127
+#, php-format
+msgid "New comment on your post #%d \"%s\""
+msgstr "Uusi kommentti viestillesi #%d \"%s\""
+
+#: ..\..\..\htsrv\comment_post.php:139
+#: ..\..\..\htsrv\trackback.php:106
+#: ..\..\..\xmlsrv\xmlrpc.php:1401
+msgid "Url"
+msgstr "Url"
+
+#: ..\..\..\htsrv\comment_post.php:141
+msgid "Comment"
+msgstr "Kommentti"
+
+#: ..\..\..\htsrv\comment_post.php:142
+#: ..\..\..\htsrv\trackback.php:108
+#: ..\..\..\xmlsrv\xmlrpc.php:1403
+msgid "Edit/Delete"
+msgstr "Muokkaa/Poista"
+
+#: ..\..\..\htsrv\getmail.php:27
+msgid "Connecting to pop server..."
+msgstr "Yhdistetään POP-palvelimeen..."
+
+#: ..\..\..\htsrv\getmail.php:30
+msgid "Connection failed: "
+msgstr "Yhdistäminen epäonnistui:"
+
+#: ..\..\..\htsrv\getmail.php:34
+msgid "Logging into pop server..."
+msgstr "Kirjaudutaan POP-palvelimeen..."
+
+#: ..\..\..\htsrv\getmail.php:38
+msgid "No mail or Login Failed:"
+msgstr "Ei sähköpostia tai kirjautuminen epäonnistui:"
+
+#: ..\..\..\htsrv\getmail.php:49
+#, php-format
+msgid "Getting message #%d..."
+msgstr "Haetaan viestit #%d..."
+
+#: ..\..\..\htsrv\getmail.php:58
+msgid "Processing..."
+msgstr "Käsitellään..."
+
+#: ..\..\..\htsrv\getmail.php:137
+msgid "Too old"
+msgstr "Liian vanha"
+
+#: ..\..\..\htsrv\getmail.php:143
+msgid "Subject prefix does not match"
+msgstr "Otsikon etuliite ei ole sopiva"
+
+#: ..\..\..\htsrv\getmail.php:163
+msgid "Raw content:"
+msgstr "Raakasisältö:"
+
+#: ..\..\..\htsrv\getmail.php:199
+#: ..\..\..\htsrv\login.php:79
+#: ..\..\..\htsrv\register.php:118
+#: ..\..\..\htsrv\_login_form.php:42
+#: ..\..\..\htsrv\_lostpass_form.php:22
+#: ..\..\..\htsrv\_reg_complete.php:14
+#: ..\..\..\htsrv\_reg_form.php:23
+#: ..\..\..\skins\_profile.php:30
+#: ..\..\..\skins\basic\_profile.php:30
+msgid "Login:"
+msgstr "Tunnus:"
+
+#: ..\..\..\htsrv\getmail.php:199
+msgid "Pass:"
+msgstr "Salasana:"
+
+#: ..\..\..\htsrv\getmail.php:203
+msgid "Wrong login or password."
+msgstr "Väärä tunnus tai salasana."
+
+#: ..\..\..\htsrv\getmail.php:223
+msgid "Category ID"
+msgstr "Kategorian ID"
+
+#: ..\..\..\htsrv\getmail.php:228
+msgid "Blog ID"
+msgstr "Blogin ID"
+
+#: ..\..\..\htsrv\getmail.php:233
+msgid "Permission denied."
+msgstr "Pääsy estetty."
+
+#: ..\..\..\htsrv\getmail.php:265
+msgid "Posted title"
+msgstr "Lähetetty otsikko"
+
+#: ..\..\..\htsrv\getmail.php:266
+msgid "Posted content"
+msgstr "Lähetetty sisältö"
+
+#: ..\..\..\htsrv\getmail.php:276
+msgid "Mission complete, message deleted."
+msgstr "Tehtävä suoritettu, viesti poistettu."
+
+#: ..\..\..\htsrv\login.php:73
+#: ..\..\..\htsrv\login.php:96
+msgid "An email with the new password was sent successfully to your email address."
+msgstr "Uusi salasana lähetettiin sähköpostiosoitteeseesi."
+
+#: ..\..\..\htsrv\login.php:80
+msgid "New Password:"
+msgstr "Uusi salasana:"
+
+#: ..\..\..\htsrv\login.php:81
+msgid "You can login here:"
+msgstr "Voit kirjautua täällä:"
+
+#: ..\..\..\htsrv\login.php:86
+msgid "your weblog's login/password"
+msgstr "blogisi tunnus/salasana"
+
+#: ..\..\..\htsrv\login.php:88
+msgid "The email could not be sent."
+msgstr "Sähköpostia ei voitu lähettää"
+
+#: ..\..\..\htsrv\login.php:89
+msgid "Possible reason: your host may have disabled the mail() function..."
+msgstr "Mahdollinen syy: ylläpito on ottanut mail()-funktion pois käytöstä..."
+
+#: ..\..\..\htsrv\login.php:110
+msgid "Note: You are already logged in!"
+msgstr "Huom: Olet jo kirjautunut sisään!"
+
+#: ..\..\..\htsrv\login.php:117
+msgid "Continue..."
+msgstr "Jatka..."
+
+#: ..\..\..\htsrv\profile_update.php:33
+#: ..\..\..\skins\_profile.php:16
+#: ..\..\..\skins\basic\_profile.php:16
+msgid "You are not logged in."
+msgstr "Et ole kirjautunut sisään."
+
+#: ..\..\..\htsrv\profile_update.php:38
+msgid "You are not logged in under the same account you are trying to modify."
+msgstr "Et ole kirjautunut sisään samalla tunnuksella, jota yrität muokata."
+
+#: ..\..\..\htsrv\profile_update.php:44
+#: ..\..\..\htsrv\profile_update.php:51
+#: ..\..\..\htsrv\profile_update.php:61
+#: ..\..\..\htsrv\profile_update.php:70
+#: ..\..\..\htsrv\profile_update.php:76
+#: ..\..\..\htsrv\profile_update.php:93
+#: ..\..\..\htsrv\profile_update.php:98
+#: ..\..\..\htsrv\profile_update.php:104
+msgid "Back to profile"
+msgstr "Takaisin profiiliin"
+
+#: ..\..\..\htsrv\profile_update.php:50
+msgid "please enter your nickname (can be the same as your login)"
+msgstr "anna kutsumanimi (voi olla sama kuin tunnus)"
+
+#: ..\..\..\htsrv\profile_update.php:60
+msgid "your ICQ UIN can only be a number, no letters allowed"
+msgstr "ICQ UIN voi sisältää ainoastaan numeroita"
+
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\register.php:71
+msgid "please type your e-mail address"
+msgstr "kirjoita sähköpostiosoitteesi"
+
+#: ..\..\..\htsrv\profile_update.php:75
+#: ..\..\..\htsrv\register.php:76
+msgid "the email address is invalid"
+msgstr "sähköpostiosoite on väärä"
+
+#: ..\..\..\htsrv\profile_update.php:84
+#: ..\..\..\htsrv\profile_update.php:92
+msgid "you typed your new password only once. Go back to type it twice."
+msgstr "kirjoitit salasanasi ainoastaan yhden kerran. Palaa takaisin ja kirjoita se kahdesti."
+
+#: ..\..\..\htsrv\profile_update.php:97
+msgid "you typed two different passwords. Go back to correct that."
+msgstr "kirjoitit kaksi erilaista salasanaa. Palaa takaisin ja korjaa virhe."
+
+#: ..\..\..\htsrv\register.php:41
+msgid "please enter a Login"
+msgstr "anna tunnuksesi"
+
+#: ..\..\..\htsrv\register.php:48
+msgid "please enter your password twice"
+msgstr "anna salasanasi kahdesti"
+
+#: ..\..\..\htsrv\register.php:55
+msgid "please type the same password in the two password fields"
+msgstr "kirjoita sama salasana kumpaankin salasanakenttään"
+
+#: ..\..\..\htsrv\register.php:87
+msgid "this login is already registered, please choose another one"
+msgstr "tunnus on jo olemassa, valitse toinen tunnus"
+
+#: ..\..\..\htsrv\register.php:117
+#: ..\..\..\htsrv\register.php:121
+msgid "new user registration on your blog"
+msgstr "uusien käyttäjien rekisteröinti blogiisi"
+
+#: ..\..\..\htsrv\register.php:119
+msgid "Manage users"
+msgstr "Hallitse käyttäjiä"
+
+#: ..\..\..\htsrv\trackback.php:98
+#: ..\..\..\htsrv\trackback.php:103
+#, php-format
+msgid "New trackback on your post #%d \"%s\""
+msgstr "Uusi viittaus kirjoitukseesi #%d \"%s\""
+
+#: ..\..\..\htsrv\trackback.php:105
+#: ..\..\..\xmlsrv\xmlrpc.php:1400
+msgid "Website"
+msgstr "Kotisivu"
+
+#: ..\..\..\htsrv\trackback.php:107
+#: ..\..\..\xmlsrv\xmlrpc.php:1402
+msgid "Excerpt"
+msgstr "Lainaus"
+
+#: ..\..\..\htsrv\_login_form.php:10
+msgid "Login form"
+msgstr "Kirjautumislomake"
+
+#: ..\..\..\htsrv\_login_form.php:39
+msgid "You will have to accept cookies in order to log in."
+msgstr "Sinun täytyy hyväksyä keksit kirjautuaksesi sisään"
+
+#: ..\..\..\htsrv\_login_form.php:47
+#: ..\..\..\htsrv\_reg_form.php:28
+msgid "Password:"
+msgstr "Salasana:"
+
+#: ..\..\..\htsrv\_login_form.php:53
+#: ..\..\..\htsrv\_reg_complete.php:20
+msgid "Log in!"
+msgstr "Kirjaudu sisään!"
+
+#: ..\..\..\htsrv\_login_form.php:61
+#: ..\..\..\install\index.php:57
+msgid "Go to Blogs"
+msgstr "Siirry blogeihin"
+
+#: ..\..\..\htsrv\_login_form.php:63
+msgid "Lost your password ?"
+msgstr "Hukkasitko salasanasi?"
+
+#: ..\..\..\htsrv\_lostpass_form.php:10
+msgid "Lost password ?"
+msgstr "Salasana hukassa?"
+
+#: ..\..\..\htsrv\_lostpass_form.php:14
+msgid "A new password will be generated and sent to you by email."
+msgstr "Uusi salasana tehdään ja lähetetään sinulla sähköpostitse."
+
+#: ..\..\..\htsrv\_lostpass_form.php:28
+msgid "Generate new password!"
+msgstr "Tee uusi salasana!"
+
+#: ..\..\..\htsrv\_reg_complete.php:10
+msgid "Registration complete"
+msgstr "Rekisteröinti valmis"
+
+#: ..\..\..\htsrv\_reg_disabled.php:11
+msgid "Registration Currently Disabled"
+msgstr "Rekisteröinti on tällä hetkellä poissa käytöstä"
+
+#: ..\..\..\htsrv\_reg_disabled.php:14
+msgid "User registration is currently not allowed."
+msgstr "Rekisteröinti on tällä hetkellä poissa käytöstä"
+
+#: ..\..\..\htsrv\_reg_disabled.php:15
+msgid "Home"
+msgstr "Etusivu"
+
+#: ..\..\..\htsrv\_reg_form.php:11
+msgid "Register form"
+msgstr "Rekisteröintilomake"
+
+#: ..\..\..\htsrv\_reg_form.php:28
+msgid "(twice)"
+msgstr "(kahdesti)"
+
+#: ..\..\..\htsrv\_reg_form.php:32
+#, php-format
+msgid "Minimum %d characters, please."
+msgstr "Vähintään %d merkkiä"
+
+#: ..\..\..\htsrv\_reg_form.php:42
+msgid "Preferred language"
+msgstr "Ensisijainen kieli"
+
+#: ..\..\..\htsrv\_reg_form.php:46
+msgid "Register!"
+msgstr "Rekisteröidy!"
+
+#: ..\..\..\htsrv\_reg_form.php:53
+msgid "Log into existing account..."
+msgstr "Kirjaudutaan sisään..."
+
+#: ..\..\..\install\index.php:45
+msgid "b2evo installer"
+msgstr "b2evo asennusohjelma"
+
+#: ..\..\..\install\index.php:52
+msgid "Installer for version "
+msgstr "Asennusohjelma versiolle"
+
+#: ..\..\..\install\index.php:54
+msgid "Current installation"
+msgstr "Asennettu versio"
+
+#: ..\..\..\install\index.php:55
+msgid "Install menu"
+msgstr "Asennusvalikko"
+
+#: ..\..\..\install\index.php:56
+msgid "PHP info"
+msgstr "Tietoja PHP:stä"
+
+#: ..\..\..\install\index.php:58
+msgid "Go to Admin"
+msgstr "Siirry ylläpitoon"
+
+#: ..\..\..\install\index.php:59
+msgid "Online"
+msgstr "Kirjautuneena"
+
+#: ..\..\..\install\index.php:60
+msgid "Manual"
+msgstr "Ohje"
+
+#: ..\..\..\install\index.php:61
+msgid "Support"
+msgstr "Tuki"
+
+#: ..\..\..\install\index.php:70
+msgid "Language/Locale"
+msgstr "Kieli/kieliasetukset"
+
+#: ..\..\..\install\index.php:71
+msgid "Choose a default language/locale for your b2evo installation."
+msgstr "Valitse oletuskieli b2evo asennukselle."
+
+#: ..\..\..\install\index.php:99
+msgid "Check your database config settings below and update them if necessary..."
+msgstr "Tarkista tietokannan asetukset alapuolelta ja korjaa niitä mikäli tarpeellista..."
+
+#: ..\..\..\install\index.php:111
+#: ..\..\..\install\index.php:120
+#, php-format
+msgid "The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!"
+msgstr "Versiovaatimus tälle b2evolutionin versiolle on %s versio %s, mutta sinä yrität käyttää versiota %s!"
+
+#: ..\..\..\install\index.php:143
+msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
+msgstr "Näyttäisi, että antamasi tietokannan asetukset eivät toimi. Ole hyvä, tarkista asetukset ja yritä sen jälkeen uudelleen..."
+
+#: ..\..\..\install\index.php:183
+msgid "Config file update"
+msgstr "Asetustiedoston päivitys."
+
+#: ..\..\..\install\index.php:184
+#, php-format
+msgid "We cannot automatically update your config file [%s]!"
+msgstr "Asetustiedostoa [%s] ei voida päivittää automaattisesti!"
+
+#: ..\..\..\install\index.php:185
+msgid "There are two ways to deal with this:"
+msgstr "Tämän voi tehdä kahdella tavalla:"
+
+#: ..\..\..\install\index.php:187
+msgid "You can allow the installer to update the config file by changing its permissions:"
+msgstr "Voit antaa asennusohjelman päivittää asetustiedoston antamalla tiedostoon oikeudet:"
+
+#: ..\..\..\install\index.php:189
+#, php-format
+msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
+msgstr "<code>chmod 666 %s</code>. Mikäli tarpeellista, katso <a %s>online-manuaalia oikeuksista</a>."
+
+#: ..\..\..\install\index.php:190
+msgid "Come back to this page and refresh/reload."
+msgstr "Palaa takaisin tälle sivulle ja päivitä se."
+
+#: ..\..\..\install\index.php:194
+msgid "Alternatively, you can update the config file manually:"
+msgstr "Vaihtoehtoisesti voit päivittää asetustiedoston manuaalisesti:"
+
+#: ..\..\..\install\index.php:196
+msgid "Open the _config.php file locally with a text editor."
+msgstr "Avaa _config.php-tiedosto tekstieditorissa."
+
+#: ..\..\..\install\index.php:197
+msgid "Delete all contents!"
+msgstr "Poista kaikki sisältö!"
+
+#: ..\..\..\install\index.php:198
+msgid "Copy the contents from the box below."
+msgstr "Kopioi alla olevan kentän sisältö."
+
+#: ..\..\..\install\index.php:199
+msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
+msgstr "Liitä ne tekstieditoriisi. <strong>HUOMIO: varmista, että tiedoston viimeisen <code>?&gt;</code> jälkeen EI OLE MITÄÄN</strong>. Välilyönti, tabi tai rivinvaihto voi estää keksien asettamisen seuraavalla kirjautumisella."
+
+#: ..\..\..\install\index.php:200
+msgid "Save the new _config.php file locally."
+msgstr "Tallenna uusi _config.php-tiedosto paikallisesti"
+
+#: ..\..\..\install\index.php:201
+msgid "Upload the file to your server, into the /_conf folder."
+msgstr "Lähetä tiedosto palvelimelle /_conf-hakemistoon."
+
+#: ..\..\..\install\index.php:202
+#, php-format
+msgid "<a %s>Call the installer from scratch</a>."
+msgstr "<a %s>Aloita asennus alusta</a>."
+
+#: ..\..\..\install\index.php:206
+msgid "This is how your _config.php should look like:"
+msgstr "Tältä sinun _config.php-tiedoston pitäisi näyttää:"
+
+#: ..\..\..\install\index.php:226
+#, php-format
+msgid "Your configuration file [%s] has been successfully updated."
+msgstr "Asetustiedostosi [%s] on päivitettiin onnistuneesti"
+
+#: ..\..\..\install\index.php:259
+msgid "Base configuration"
+msgstr "Perusasetukset"
+
+#: ..\..\..\install\index.php:261
+msgid "Your base config file has not been edited yet. You can do this by filling in the form below."
+msgstr "Asetustiedostoa ei ole vielä muokattu. Voit tehdä sen täyttämällä alapuolella olevan lomakkeen."
+
+#: ..\..\..\install\index.php:263
+msgid "This is the minimum info we need to set up b2evolution on this server:"
+msgstr "Nämä ovat vähimmäistiedot, jotka tarvitsemme b2evolutionin asetamiseen:"
+
+#: ..\..\..\install\index.php:270
+msgid "Database you want to install into"
+msgstr "Tietokanta, johon haluat asentaa"
+
+#: ..\..\..\install\index.php:272
+#: ..\..\..\install\index.php:370
+msgid "mySQL Username"
+msgstr "mySQL-tunnus"
+
+#: ..\..\..\install\index.php:272
+msgid "Your username to access the database"
+msgstr "Tietokannan käyttäjätunnus"
+
+#: ..\..\..\install\index.php:273
+#: ..\..\..\install\index.php:371
+msgid "mySQL Password"
+msgstr "mySQL-salasana"
+
+#: ..\..\..\install\index.php:273
+msgid "Your password to access the database"
+msgstr "Tietokannan salasana"
+
+#: ..\..\..\install\index.php:274
+#: ..\..\..\install\index.php:372
+msgid "mySQL Database"
+msgstr "mySQL-tietokanta"
+
+#: ..\..\..\install\index.php:274
+msgid "Name of the database you want to use"
+msgstr "Tietokanta, jota haluat käyttää"
+
+#: ..\..\..\install\index.php:275
+#: ..\..\..\install\index.php:373
+msgid "mySQL Host"
+msgstr "mySQL-osoite"
+
+#: ..\..\..\install\index.php:275
+msgid "You probably won't have to change this"
+msgstr "Sinun ei todennäköisesti tarvitse muuttaa tätä"
+
+#: ..\..\..\install\index.php:280
+msgid "Additional settings"
+msgstr "Lisäasetukset"
+
+#: ..\..\..\install\index.php:282
+#: ..\..\..\install\index.php:374
+msgid "Base URL"
+msgstr "Perus-URL"
+
+#: ..\..\..\install\index.php:282
+msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
+msgstr "Täällä b2evo ja blogisi sijaitsevat oletuksena. TARKASTA TÄMÄ HUOLELLISESTI tai juuri mikään ei toimi. Mikäli haluat testata b2evolutionia omalla koneellasi ja haluat, että kirjautumiskeksit toimivat, sinun TÄYTYY käyttää osoitetta http://<strong>localhost</strong>/hakemisto... ÄLÄ käytä tietokoneesi nimeä!"
+
+#: ..\..\..\install\index.php:284
+msgid "Your email"
+msgstr "Sähköpostiosoitteesi"
+
+#: ..\..\..\install\index.php:284
+msgid "Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations."
+msgstr "Tullaan käyttämään joissakin virheilmoituksissa, jotta käyttäjät voisivat ottaa sinuun yhteyttä. Saat myös ilmoituksen uusista rekisteröinneistä."
+
+#: ..\..\..\install\index.php:291
+msgid "Update config file"
+msgstr "Päivätä config-tiedosto"
+
+#: ..\..\..\install\index.php:311
+msgid "How do you want to install b2evolution?"
+msgstr "Kuinka haluat asentaa b2evolutionin?"
+
+#: ..\..\..\install\index.php:315
+msgid "The installation can be done in different ways. Choose one:"
+msgstr "Asennus voidaan tehdä eri tavoilla. Valitse yksi:"
+
+#: ..\..\..\install\index.php:318
+msgid "<strong>New Install</strong>: Install b2evolution database tables with sample data."
+msgstr "<strong>Uusi asennus</strong>. Asenna b2evolutionin tietokantataulut esimerkkisisällöllä."
+
+#: ..\..\..\install\index.php:321
+msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!"
+msgstr "<strong>Päivitä edellinen b2evolution-versio</strong>: Päivitä nykyiset b2evolution-tietokantataulut, jotta ne toimisivat uusimman version kanssa."
+
+#: ..\..\..\install\index.php:324
+msgid "<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them."
+msgstr "<strong>Päivitä Cafelog/b2 v 0.6.x</strong>: Asenna b2evolution tietokantataulut ja kopioi vanhat Cafelog/b2-sisällöt niihin."
+
+#: ..\..\..\install\index.php:331
+msgid "Delete b2evolution tables"
+msgstr "Poista b2evolution-taulut"
+
+#: ..\..\..\install\index.php:332
+msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way."
+msgstr "Mikäli olet asentanut b2evolution-taulut aikaisemmin ja haluat aloittaa alusta, sinun täytyy poistaa taulut ennen kuin voit aloittaa uuden asennuksen. <strong>VAROITUS: Kaikki b2evolution taulut ja sisältö menetetään!</strong> Mikäli sinulla on Cafelog/b2- tai muita tauluja, ne eivät katoa."
+
+#: ..\..\..\install\index.php:338
+msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
+msgstr "<strong>Muuta oletusasetuksia</strong>: Asetuksia tarvitsee muuttaa ainoastaan silloin, kun haluat siirtää b2evolutionin tiedostot tai tietokannan toiseen paikkaan..."
+
+#: ..\..\..\install\index.php:340
+msgid "GO!"
+msgstr "JATKA!"
+
+#: ..\..\..\install\index.php:347
+msgid "Need to start anew?"
+msgstr "Haluatko aloittaa alusta?"
+
+#: ..\..\..\install\index.php:348
+msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default."
+msgstr "Mikäli olet asentanut b2evolution taulut ja haluat aloittaa alusta, sinun täytyy poistaa vanhat taulut ennen kuin voit jatkaa. b2evolution osaa poistaa omat taulut, mutta tietoturvasyistä tämä ominaisuus on oletuksena poissa päältä."
+
+#: ..\..\..\install\index.php:359
+msgid "Base config recap..."
+msgstr "Oletusasetukset..."
+
+#: ..\..\..\install\index.php:361
+#, php-format
+msgid "If you don't see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>."
+msgstr "Mikäli et näe oikeita asetuksia, LOPETA ja <a %s>korjaa perusasetukset</a>."
+
+#: ..\..\..\install\index.php:371
+msgid "(Set, but not shown for security reasons)"
+msgstr "(Asetettu, mutta piilotetaan turvallisuussyistä)"
+
+#: ..\..\..\install\index.php:375
+msgid "Admin email"
+msgstr "Ylläpidon sähköpostiosoite"
+
+#: ..\..\..\install\index.php:387
+msgid "Installing b2evolution tables with sample data"
+msgstr "Asennetaan b2evolution-tauluja esimerkkitiedoilla"
+
+#: ..\..\..\install\index.php:392
+msgid "Installation successful!"
+msgstr "Asennus onnistui"
+
+#: ..\..\..\install\index.php:394
+#, php-format
+msgid ""
+"<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\".</p>\n"
+"\t<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>"
+msgstr ""
+"<p>Nyt voit <a %s>kirjautua</a> tunnuksella \"admin\" ja salasanalla \"%s\".</p>\n"
+"\t<p>Lue salasana tarkasti! Se on <em>sattumanvarainen</em> salasana, joka tehtiin b2evolutionin asennuksessa. Mikäli kadotat sen, sinun täytyy poistaa tietokantataulut ja asentaa ne uudelleen.</p>"
+
+#: ..\..\..\install\index.php:407
+msgid "Upgrading data in existing b2evolution database"
+msgstr "Päivitetään tietoja vanhaan b2evolution-tietokantaan"
+
+#: ..\..\..\install\index.php:412
+#: ..\..\..\install\index.php:432
+msgid "Upgrade completed successfully!"
+msgstr "Päivitys suoritettu onnistuneesti"
+
+#: ..\..\..\install\index.php:413
+#: ..\..\..\install\index.php:433
+#: ..\..\..\install\_functions_evoupgrade.php:34
+#, php-format
+msgid "Now you can <a %s>log in</a> with your usual %s username and password."
+msgstr "Nyt voi <a %s>kirjautu</a> sisään tavallisella %s tunnuksella ja salasanalla."
+
+#: ..\..\..\install\index.php:427
+msgid "Installing b2evolution tables and copying existing b2 data"
+msgstr "Asennetaan b2evolution-tauluja ja kopioidaan vanhat b2-tiedot"
+
+#: ..\..\..\install\index.php:446
+msgid "Deleting b2evolution tables from the datatase"
+msgstr "Poistetaan b2evolution-taulut tietokannasta"
+
+#: ..\..\..\install\index.php:450
+msgid "For security reasons, the reset feature is disabled by default."
+msgstr "Turvallisuussyistä resetointi-ominaisuus on oletuksena poistettu käytöstä."
+
+#: ..\..\..\install\index.php:460
+msgid "Reset done!"
+msgstr "Resetointi tehty!"
+
+#: ..\..\..\install\index.php:461
+msgid "Back to menu"
+msgstr "Takaisin valikkoon"
+
+#: ..\..\..\install\index.php:468
+msgid "official website"
+msgstr "virallinen kotisivu"
+
+#: ..\..\..\install\index.php:470
+msgid "contact"
+msgstr "ota yhteyttä"
+
+#: ..\..\..\install\_functions_cafelogupgrade.php:33
+#, php-format
+msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. %s"
+msgstr "Tämä blogi pitää sisällään kaikki kirjoituksesi, jotka siirrettiin Cafelogista. Blogi on nimeltään '%s'. %s"
+
+#: ..\..\..\install\_functions_create.php:405
+msgid "This is a sample linkblog entry"
+msgstr "Tämä on linkkiblogin esimerkkilinkki."
+
+#: ..\..\..\install\_functions_create.php:405
+msgid "This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."
+msgstr "Tämä esimerkkiteksti kuvailee linkkiblogin linkkiä. Useimmissa tapauksissa, haluat jättää tämän tyhjäksi, ja annat pelkästään otsikon ja URLin linkkiblogin linkeille (suosikit / aiheeseen liittyvät sivut)."
+
+#: ..\..\..\install\_functions_create.php:425
+#, php-format
+msgid "This is the long description for the blog named '%s'. %s"
+msgstr "Tämä on pitkä kuvausta blogille '%s'. %s"
+
+#: ..\..\..\install\_functions_create.php:433
+msgid "This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin."
+msgstr "Tämä blogi (blogi #1) on itse asiassa erikoinen blog! Se kerää automaattisesti kirjoitukset muista blogeista. Tämä mahdollistaa, että voit seurata helposti mitä järjestelmääsi kirjoitetaan. Voit piilottaa tämän blogin lukijoilta ottamalla ruksin pois kohdasta 'Näytä julkisessa blogilistassa' ylläpitosivun kautta."
+
+#: ..\..\..\install\_functions_create.php:435
+#: ..\..\..\install\_functions_create.php:449
+#: ..\..\..\install\_functions_create.php:469
+#: ..\..\..\install\_functions_create.php:488
+#, php-format
+msgid "%s Title"
+msgstr "%s otsikko"
+
+#: ..\..\..\install\_functions_create.php:440
+#: ..\..\..\install\_functions_create.php:457
+#: ..\..\..\install\_functions_create.php:474
+#: ..\..\..\install\_functions_create.php:493
+#, php-format
+msgid "Tagline for %s"
+msgstr "Lyhyt kuvaus kohteelle %s"
+
+#: ..\..\..\install\_functions_create.php:441
+#: ..\..\..\install\_functions_create.php:458
+#: ..\..\..\install\_functions_create.php:475
+#: ..\..\..\install\_functions_create.php:494
+#, php-format
+msgid "Short description for %s"
+msgstr "Lyhyt kuvauslinkille %s"
+
+#: ..\..\..\install\_functions_create.php:444
+#: ..\..\..\install\_functions_create.php:462
+#: ..\..\..\install\_functions_create.php:478
+#: ..\..\..\install\_functions_create.php:497
+#, php-format
+msgid "Notes for %s"
+msgstr "Muistiinpanot linkille %s"
+
+#: ..\..\..\install\_functions_create.php:445
+#: ..\..\..\install\_functions_create.php:463
+#: ..\..\..\install\_functions_create.php:479
+#: ..\..\..\install\_functions_create.php:498
+#, php-format
+msgid "Keywords for %s"
+msgstr "Avainsanat linkille %s"
+
+#: ..\..\..\install\_functions_create.php:486
+msgid "The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
+msgstr "Tämän blogin päätarkoitus on olla liitteenä muille blogeille ja näyttää sinun suosikkilinkkisi tai linkit, jotka liittyvät aiheisiin."
+
+#: ..\..\..\install\_functions_create.php:564
+msgid "Clean Permalinks!"
+msgstr "Selkeät suoralinkit"
+
+#: ..\..\..\install\_functions_create.php:564
+msgid ""
+"b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.\n"
+"\n"
+"Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Settings screen... (check 'Use extra-path info')"
+msgstr ""
+"b2evolution käyttää oletuksia vanhanaikaisia suora- ja palaute-linkkejä, jotta saavutettaisiin mahdollisimman hyvä yhteensopivuus erilaisten palvelinasetusten kanssa.\n"
+"\n"
+"Mikäli kuitenkin tunnet, että b2evolution toimii moitteettomasti, sinun kannattaa koettaa selkeiden suoralinkkien aktivoimista Asetukset-sivulta... (ruksi 'Käytä lisäpolun tietoja')"
+
+#: ..\..\..\install\_functions_create.php:570
+msgid "Apache optimization..."
+msgstr "Apachen optimointi..."
+
+#: ..\..\..\install\_functions_create.php:570
+msgid ""
+"In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].\n"
+"\n"
+"This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine."
+msgstr ""
+"Sekä <code>/blogs</code>-, että <code>/blogs/admin</code>-hakemistossa on [code]sample.htaccess</code>-tiedostot. Sinun kannattaa muuttaa niiden nimeksi <code>.htaccess</code>.\n"
+"\n"
+"Tämä toiminta optimoi palvelimen tapaa käsitellä b2evolutionia (mikäli käytät Apachea). Näitä tiedostoja ei käytetä oletuksena, koska jotkut palveluntarjoajat näyttävät virheilmoitukset heti kun yrität käyttää niitä. Mikäli näin tapahtuu, voit poistaa tiedostot ja virheilmoitus katoaa."
+
+#: ..\..\..\install\_functions_create.php:576
+msgid "About evoSkins..."
+msgstr "Lisätietoja evoSkinsistä..."
+
+#: ..\..\..\install\_functions_create.php:576
+msgid ""
+"By default, b2evolution blogs are displayed using a default skin.\n"
+"\n"
+"Readers can choose a new skin by using the skin switcher integrated in most skins.\n"
+"\n"
+"You can change the default skin used for any blog by editing the blog parameters in the admin interface. You can also force the use of the default skin for everyone.\n"
+"\n"
+"Otherwise, you can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder.\n"
+"\n"
+"To start customizing a skin, open its '<code>_main.php</code>' file in an editor and read the comments in there. And, of course, read the manual on evoSkins!"
+msgstr ""
+"Oletuksena b2evolution-blogit käyttävät oletusteemaa.\n"
+"\n"
+"Lukijat voivat valita uuden teeman käyttämällä teeman vaihtajaa, joka on liitetty moniin teemoihin.\n"
+"\n"
+"Voit vaihtaa oletusteemaa mille tahansa blogille muokkaamalla blogin asetuksia ylläpitosivulta. Voit myös pakottaa oletusteeman, jolloin kukaan ei voi vaihtaa sitä itse.\n"
+"\n"
+"Voit rajoittaa käytössä olevia teemoja poistamalla osan niistä /blogs/skins-hakemistosta. Voit myös tehdä uusia teemoja kopioimalla, uudelleennimeämällä ja muokkaamalla olemassa olevia teemahakemistoja.\n"
+"\n"
+"Teeman muokkaamisen voit aloittaa avaamalla sen '<code>_main.php</code>'-tiedoston editoriin ja lukemalla siellä olevat kommentit. Ja tietenkin lukemalla manuaalit evoSkinsistä!"
+
+#: ..\..\..\install\_functions_create.php:588
+msgid "Skins, Stubs and Templates..."
+msgstr "Teemat, tyngät ja sivupohjat"
+
+#: ..\..\..\install\_functions_create.php:588
+msgid ""
+"By default, all pre-installed blogs are displayed using a skin. (More on skins in another post.)\n"
+"\n"
+"That means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.\n"
+"\n"
+"Alternatively, if you don't want to use the default DB parameters and want to, say, force a skin, a category or a specific linkblog, you can create a stub file like the provided '<code>a_stub.php</code>' and call your blog through this stub instead of index.php .\n"
+"\n"
+"Finally, if you need to do some very specific customizations to your blog, you may use plain templates instead of skins. In this case, call your blog through a full template, like the provided '<code>a_noskin.php</code>'.\n"
+"\n"
+"You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.\n"
+"\n"
+"Either way, make sure you go to the blogs admin and set the correct access method for your blog. When using a stub or a template, you must also set its filename in the 'Stub name' field. Otherwise, the permalinks will not function properly."
+msgstr ""
+"Vakioasetuksilla, kaikki esiasennetut blogit näytetään teeman avulla. (Lisätietoja teemoista toisessa kirjoituksessa.)\n"
+" \n"
+"Tämä tarkoittaa, että blogiin pääsee polull a'<code>index.php</code>', joka lataa vakioparametrit tietokannasta ja sitten delegoi näyttämisen teemalle.\n"
+"\n"
+"Vaihtoehtoisesti, jos et halua käyttää vakiotietokantaparametreja ja haluat esimerkiksi pakottaa teeman, kategorian tai linkkiblogin käyttäytymään tietyllä tavalla, voit luoda tynkätiedoston (kuten esimerkkitiedosto '<code>a_stub.php</code>', ja kutsua blogiasti tämän tyngän kautta.\n"
+"\n"
+"Jos tämäkään ei riitä, voit käyttää täysin uusia sivupohjia teemojen sijasta. Tässä tapauksessa kutsut blogia niinkuin esimerkissä '<code>a_noskin.php</code>' on näytetty.\n"
+"\n"
+"Lisätietoja tynkä- ja sivupohjasivuista löytyy näistä esimerkkitiedostoista ja niiden kommenteista.\n"
+"\n"
+"Joka tapauksessa, varmista että asetat oikean pääsytavan blogiisi blogin ylläpitopaneelista (tyngän tai sivupohjan nimi 'Tyngän nimi' -kenttään), tai muuten pysyvät linkit eivät toimi oikein."
+
+#: ..\..\..\install\_functions_create.php:602
+msgid "Multiple Blogs, new blogs, old blogs..."
+msgstr "Useita blogeja, uusia blogeja, vanhoja blogeja..."
+
+#: ..\..\..\install\_functions_create.php:603
+msgid ""
+"By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.\n"
+"\n"
+"Some of these blogs have a special role. Read about it on the corresponding page.\n"
+"\n"
+"You can create additional blogs or delete unwanted blogs from the blogs admin."
+msgstr ""
+"b2evolutionin mukanatulee vakiona 4 blogia, jotka ovat nimetty 'Blog All', 'Blog A', 'Blog B' ja 'Linkblog'.\n"
+"\n"
+"Joillakin näistä blogeista on erityisrooli. Lisätietoja löytyy niihin liittyviltä sivuilta.\n"
+"\n"
+"Voit luoda uusia blogeja ja poistaa vanhoja ylläpitopaneelista."
+
+#: ..\..\..\install\_functions_create.php:612
+msgid "This is a multipage post"
+msgstr "Tämä on monisivuinen viesti"
+
+#: ..\..\..\install\_functions_create.php:612
+msgid ""
+"This is page 1 of a multipage post.\n"
+"\n"
+"You can see the other pages by cliking on the links below the text.\n"
+"\n"
+"<!--nextpage-->\n"
+"\n"
+"This is page 2.\n"
+"\n"
+"<!--nextpage-->\n"
+"\n"
+"This is page 3.\n"
+"\n"
+"<!--nextpage-->\n"
+"\n"
+"This is page 4.\n"
+"\n"
+"It is the last page."
+msgstr ""
+"Tämä on sivu 1 monisivuisessa kirjoituksessa.\n"
+"\n"
+"Voit nähdä muut sivut klikkaamalla alapuolella olevia linkkejä.\n"
+"\n"
+"<!--nextpage-->\n"
+"\n"
+"Tämä on sivu 2.\n"
+"\n"
+"<!--nextpage-->\n"
+"\n"
+"Tämä on sivu 3.\n"
+"\n"
+"<!--nextpage-->\n"
+"\n"
+"Tämä on sivu 4.\n"
+"\n"
+"Tämä on viimeinen sivu."
+
+#: ..\..\..\install\_functions_create.php:632
+msgid "Extended post with no teaser"
+msgstr "Laaja viesti ilman ingressiä"
+
+#: ..\..\..\install\_functions_create.php:632
+msgid ""
+"This is an extended post with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.\n"
+"\n"
+"<!--more--><!--noteaser-->\n"
+"\n"
+"This is the extended text. You only see it when you have clicked the \"more\" link."
+msgstr ""
+"Tämä on laaja kirjoitus ilman ingressiä. Tämä tarkoittaa sitä, ettet näe enää ingressiä, kun klikkaat \"Lisää\" -linkkiä.\n"
+"\n"
+"<!--more--><!--noteaser-->\n"
+"\n"
+"Tämä on laaja teksti, joka näkyy vasta \"Lisää\"-linkin klikkaamisen jälkeen."
+
+#: ..\..\..\install\_functions_create.php:640
+msgid "Extended post"
+msgstr "Laaja viesti"
+
+#: ..\..\..\install\_functions_create.php:640
+msgid ""
+"This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.\n"
+"\n"
+"<!--more-->\n"
+"\n"
+"This is the extended text. You only see it when you have clicked the \"more\" link."
+msgstr ""
+"Tämä on laaja kirjoitus. Tämä tarkoittaa sitä, että näet aluksi vain ingressin. Voit lukea koko kirjoitukset klikkaamalla alla olevaa linkkiä.\n"
+"\n"
+"<!--more-->\n"
+"\n"
+"Tämä on laaja teksti, joka näkyy vasta \"Lisää\"-linkin klikkaamisen jälkeen."
+
+#: ..\..\..\install\_functions_create.php:648
+msgid "Important information"
+msgstr "Tärkeää tietoa"
+
+#: ..\..\..\install\_functions_create.php:648
+msgid ""
+"Blog B contains a few posts in the 'b2evolution Tips' category.\n"
+"\n"
+"All these entries are designed to help you so, as EdB would say: \"<em>read them all before you start hacking away!</em>\" ;)\n"
+"\n"
+"If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read."
+msgstr ""
+"Blogi B sisältää muutamia kirjoituksia 'b2evolution Tips' -kategoriassa.\n"
+"\n"
+"Kaikki kirjoitukset ovat tehty dokumentaatioksi, joten ne kannattaa lukea ensin\n"
+"\n"
+"Voit halutessasi poistaa nämä viestit, tai muuttaa niiden statusta vanhentuneeksi, jolloin ne pysyvät poissa näkyvistä."
+
+#: ..\..\..\install\_functions_create.php:686
+msgid "First Post"
+msgstr "Ensimmäinen viesti"
+
+#: ..\..\..\install\_functions_create.php:686
+msgid ""
+"<p>This is the first post.</p>\n"
+"\n"
+"<p>It appears on both blog A and blog B.</p>"
+msgstr ""
+"<p>Tämä on ensimmäinen viesti.</p>\n"
+"\n"
+"<p>Se näkyy sekä blogissa A että blogissa B.</p>"
+
+#: ..\..\..\install\_functions_create.php:692
+msgid "Second post"
+msgstr "Toinen viesti"
+
+#: ..\..\..\install\_functions_create.php:692
+msgid ""
+"<p>This is the second post.</p>\n"
+"\n"
+"<p>It appears on blog A only but in multiple categories.</p>"
+msgstr ""
+"<p>Tämä on toinen viesti.</p>\n"
+"\n"
+"<p>Se näkyy ainoastaan blogissa A, mutta useassa kategoriassa.</p>"
+
+#: ..\..\..\install\_functions_create.php:698
+msgid "Third post"
+msgstr "Kolmas viesti"
+
+#: ..\..\..\install\_functions_create.php:698
+msgid ""
+"<p>This is the third post.</p>\n"
+"\n"
+"<p>It appears on blog B only and in a single category.</p>"
+msgstr ""
+"<p>Tämä on kolmas viesti.</p>\n"
+"\n"
+"<p>Se näkyy ainoastaan blogissa B ja vain yhdessä kategoriassa.</p>"
+
+#: ..\..\..\install\_functions_create.php:720
+msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
+msgstr "Hei, tämä on kommentti.<br />Poistaaksesi kommentin, kirjaudu sisään ja katso viestin kommentteja. Siellä sinulla on mahdollisuus muokata ja poistaa niitä."
+
+#: ..\..\..\install\_functions_evoupgrade.php:33
+msgid "The database schema is already up to date. There is nothing to do."
+msgstr "Tietokannan rakenne on ajan tasalla. Mitään ei tarvitse tehdä."
+
+#: ..\..\..\install\_functions_evoupgrade.php:232
+#, php-format
+msgid "It appears that the following blog stub names are used more than once: ['%s']"
+msgstr "Näyttää siltä, että näitä blogin tynkien nimiä käytetään useammin kuin yhden kerran: ['%s']"
+
+#: ..\..\..\install\_functions_evoupgrade.php:234
+#, php-format
+msgid "I can't upgrade until you make them unique. DB field: [%s]"
+msgstr "En voi päivittää ennen kuin teet niistä yksiselitteisiä. Tietokannan kenttä: [%s]"
+
+#: ..\..\..\install\_functions_install.php:26
+msgid "Checking DB schema version..."
+msgstr "Tarkistetaan tietokannan rakenteen versio..."
+
+#: ..\..\..\install\_functions_install.php:38
+msgid "NOT FOUND! This is not a b2evolution database."
+msgstr "EI LÖYTYNYT! Tämä ei ole b2evolution-tietokanta."
+
+#: ..\..\..\install\_functions_install.php:42
+msgid "This version is too old!"
+msgstr "Tämä versio on liian vanha!"
+
+#: ..\..\..\install\_functions_install.php:43
+msgid "This version is too recent! We cannot downgrade to it!"
+msgstr "Tämä versio on liian uusi. Sitä ei voi päivittää alaspäin."
+
+#: ..\..\..\plugins\plugin.class.php:39
+msgid "No desc available"
+msgstr "Ei selitystä saatavilla"
+
+#: ..\..\..\plugins\plugin.class.php:40
+#: ..\..\..\plugins\renderers\_autolinks.renderer.php:34
+#: ..\..\..\plugins\renderers\_auto_p.renderer.php:34
+#: ..\..\..\plugins\renderers\_bbcode.renderer.php:76
+#: ..\..\..\plugins\renderers\_smilies.renderer.php:61
+#: ..\..\..\plugins\renderers\_textile.renderer.php:230
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:34
+#: ..\..\..\plugins\toolbars\_smilies.toolbar.php:44
+msgid "No description available"
+msgstr "Ei selitystä saatavilla"
+
+#: ..\..\..\plugins\renderers\_autolinks.renderer.php:33
+msgid "Make URLs clickable"
+msgstr "Tee URLeista klikattavia"
+
+#: ..\..\..\plugins\renderers\_auto_p.renderer.php:33
+msgid "Automatic &lt;P&gt; and &lt;BR&gt; tags"
+msgstr "Automaattiset &lt;P&gt;- ja &lt;BR&gt;-tagit"
+
+#: ..\..\..\plugins\renderers\_bbcode.renderer.php:75
+msgid "BB formatting e-g [b]bold[/b]"
+msgstr "BB-formatointi, esim. [b]lihava[/b]"
+
+#: ..\..\..\plugins\renderers\_gmcode.renderer.php:58
+msgid "GreyMatter style formatting"
+msgstr "GreyMatter-tyylinen formatointi"
+
+#: ..\..\..\plugins\renderers\_gmcode.renderer.php:59
+msgid "**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with white space."
+msgstr "**lihava** \\kursivoitu\\ //kursivoitu// __alleviivattu__ Käytä välilyöntiä merkintöjen edessä."
+
+#: ..\..\..\plugins\renderers\_smilies.renderer.php:60
+msgid "Convert text smilies to icons"
+msgstr "Muuta tekstihymiöt kuviksi"
+
+#: ..\..\..\plugins\renderers\_textile.renderer.php:229
+msgid "Humane Web Text Generator"
+msgstr "Humane Web Text -generaattori"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:33
+msgid "Easy HTML tags inserting"
+msgstr "Helppo HTML-tagien lisääminen"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:73
+msgid "INSerted [Alt-I]"
+msgstr "Sijoitettu [Alt-I]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:81
+msgid "DELeted [Alt-D]"
+msgstr "Poistettu [Alt-D]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:89
+msgid "STRong [Alt-S]"
+msgstr "Vahva [Alt-S]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:97
+msgid "EMphasis [Alt-E]"
+msgstr "Painotettu [Alt-E]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:105
+msgid "CODE [Alt-C]"
+msgstr "KOODI [Alt-C]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:113
+msgid "Paragraph [Alt-P]"
+msgstr "Kappale [Alt-P]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:121
+msgid "Unordered List [Alt-U]"
+msgstr "Järjestelmätön lista [Alt-U]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:136
+msgid "List Item [Alt-L]"
+msgstr "Listan kohde [Alt-L]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:144
+msgid "BLOCKQUOTE [Alt-B]"
+msgstr "BLOKKILAINAUS [Alt-B]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:152
+msgid "IMaGe [Alt-G]"
+msgstr "Kuva [Alt-G]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:161
+msgid "A href [Alt-A]"
+msgstr "Web-linkki [Alt-A]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:177
+msgid "More [Alt-M]"
+msgstr "Lisää [Alt-M]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:186
+msgid "no teaser [Alt-T]"
+msgstr "Ei ingressiä [Alt-T]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:195
+msgid "next page [Alt-Q]"
+msgstr "seuraava sivu [Alt-Q]"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:264
+msgid "Close all tags"
+msgstr "Sulje kaikki tagit"
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:380
+msgid "ALTernate text"
+msgstr "Vaihtoehtoinen teksti"
+
+#: ..\..\..\plugins\toolbars\_smilies.toolbar.php:43
+msgid "One click smilies inserting"
+msgstr "Hymiöt lisätään klikkamalla"
+
+#: ..\..\..\skins\_feedback.php:72
+#: ..\..\..\skins\basic\_feedback.php:71
+msgid "Trackback address for this post:"
+msgstr "Viittausosoite tähän kirjoitukseen:"
+
+#  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
+#: ..\..\..\skins\_feedback.php:90
+#: ..\..\..\skins\basic\_feedback.php:90
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:91
+#: ..\..\..\skins\wpc_default\_feedback.php:91
+#, php-format
+msgid "No %s for this post yet..."
+msgstr "Ei %s tähän kirjoitukseen..."
+
+#: ..\..\..\skins\_feedback.php:178
+#: ..\..\..\skins\basic\_feedback.php:172
+msgid "Your email address will <strong>not</strong> be displayed on this site."
+msgstr "Sähköpostiosoitteesi <strong>ei</strong> tule sivuille näkyviin."
+
+#: ..\..\..\skins\_feedback.php:183
+#: ..\..\..\skins\basic\_feedback.php:177
+msgid "Site/Url"
+msgstr "Sivu/Url"
+
+#: ..\..\..\skins\_feedback.php:185
+#: ..\..\..\skins\basic\_feedback.php:179
+msgid "Your URL will be displayed."
+msgstr "Sivujesi URL tulee näkyviin"
+
+#: ..\..\..\skins\_feedback.php:206
+#: ..\..\..\skins\basic\_feedback.php:199
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:203
+#: ..\..\..\skins\wpc_default\_feedback.php:203
+msgid "Line breaks become &lt;br /&gt;"
+msgstr "Rivinvaihdot muutetaan &lt;br /&gt;-tageiksi"
+
+#: ..\..\..\skins\_feedback.php:211
+#: ..\..\..\skins\basic\_feedback.php:204
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:208
+#: ..\..\..\skins\wpc_default\_feedback.php:208
+msgid "Remember me"
+msgstr "Muista minut"
+
+#: ..\..\..\skins\_feedback.php:211
+#: ..\..\..\skins\basic\_feedback.php:204
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:208
+#: ..\..\..\skins\wpc_default\_feedback.php:208
+msgid "(Set cookies for name, email &amp; url)"
+msgstr "(Aseta evästeisiin nimi, sähköposti &amp; osoite)"
+
+#: ..\..\..\skins\_lastcomments.php:28
+#: ..\..\..\xmlsrv\atom.comments.php:22
+#: ..\..\..\xmlsrv\rdf.comments.php:38
+#: ..\..\..\xmlsrv\rss.comments.php:25
+#: ..\..\..\xmlsrv\rss2.comments.php:27
+msgid "In response to:"
+msgstr "Vastauksena:"
+
+#: ..\..\..\skins\_linkblog.php:26
+#: ..\..\..\skins\custom\_linkblog.php:15
+#: ..\..\..\skins\fplanque2002\_linkblog.php:15
+msgid "Linkblog"
+msgstr "Linkkiblogi"
+
+#: ..\..\..\skins\_linkblog.php:66
+#: ..\..\..\skins\wpc_aubmach\_linkblog.php:64
+#: ..\..\..\skins\wpc_default\_linkblog.php:64
+msgid "more"
+msgstr "lisää"
+
+#: ..\..\..\skins\_profile.php:74
+#: ..\..\..\skins\basic\_profile.php:74
+msgid "AOL I.M."
+msgstr "AOL P.V."
+
+#: ..\..\..\skins\_profile.php:75
+#: ..\..\..\skins\basic\_profile.php:75
+msgid "MSN I.M."
+msgstr "MSN P.V."
+
+#: ..\..\..\skins\_profile.php:76
+#: ..\..\..\skins\basic\_profile.php:76
+msgid "Yahoo I.M."
+msgstr "Yahoo P.V."
+
+#: ..\..\..\skins\_stats.php:46
+msgid "Top refering engines"
+msgstr "Aktiivisimmat ohjaavat hakukoneet"
+
+#: ..\..\..\skins\babyblues\_bloglist.php:17
+msgid "blogs"
+msgstr "blogit"
+
+#: ..\..\..\skins\babyblues\_main.php:98
+msgid "skin the site"
+msgstr "aseta teema"
+
+#: ..\..\..\skins\babyblues\_main.php:106
+#: ..\..\..\skins\originalb2\_main.php:158
+msgid "archives"
+msgstr "arkistot"
+
+#: ..\..\..\skins\basic\_bloglist.php:17
+msgid "Select blog:"
+msgstr "Valitse blogi:"
+
+#: ..\..\..\skins\basic\_main.php:33
+msgid "Select skin:"
+msgstr "Valitse ulkoasu:"
+
+#: ..\..\..\skins\basic\_main.php:82
+#: ..\..\..\skins\custom\_main.php:82
+msgid "words"
+msgstr "sanaa"
+
+#: ..\..\..\skins\basic\_main.php:87
+msgid "Read more..."
+msgstr "Lue lisää..."
+
+#: ..\..\..\skins\bluesky\_main.php:166
+#: ..\..\..\skins\guadeloupe\_main.php:167
+msgid "Choose a skin"
+msgstr "Valitse ulkoasu"
+
+#: ..\..\..\skins\custom\_main.php:206
+#: ..\..\..\skins\fplanque2002\_main.php:214
+#: ..\..\..\skins\wpc_aubmach\_main.php:140
+#: ..\..\..\skins\wpc_default\_main.php:140
+msgid "Choose skin"
+msgstr "Valitse ulkoasu"
+
+#: ..\..\..\skins\fplanque2002\_main.php:291
+msgid "What is RSS?"
+msgstr "Mikä on RSS?"
+
+#: ..\..\..\skins\originalb2\_main.php:52
+msgid "Browse all posts by this author"
+msgstr "Näytä kaikki tämän kirjoittajan viestit"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:80
+#: ..\..\..\skins\wpc_default\_feedback.php:80
+msgid "The <acronym title=\"Uniform Resource Identifier\">URI</acronym> to TrackBack this entry is:"
+msgstr "Tämän kirjoituksen <acronym title=\"Uniform Resource Identifier\">viittausosoite</acronym> on:"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:181
+#: ..\..\..\skins\wpc_default\_feedback.php:181
+msgid "E-mail"
+msgstr "Sähköposti"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:194
+#: ..\..\..\skins\wpc_default\_feedback.php:194
+msgid "Your Comment"
+msgstr "Kommenttisi"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:214
+#: ..\..\..\skins\wpc_default\_feedback.php:214
+msgid "Say It!"
+msgstr "Lähetä"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:64
+#: ..\..\..\skins\wpc_default\_main.php:64
+msgid "Filed under:"
+msgstr "Kategoriat:"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:149
+#: ..\..\..\skins\wpc_default\_main.php:149
+msgid "Other"
+msgstr "Muuta"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:161
+#: ..\..\..\skins\wpc_default\_main.php:161
+msgid "Meta"
+msgstr "Syötteet"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:163
+#: ..\..\..\skins\wpc_default\_main.php:163
+msgid "Syndicate this site using RSS"
+msgstr "Lue sivua käyttäen RSS:ää."
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:163
+#: ..\..\..\skins\wpc_default\_main.php:163
+msgid "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
+msgstr "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0-syöte"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:164
+#: ..\..\..\skins\wpc_default\_main.php:164
+msgid "The latest comments to all posts in RSS"
+msgstr "Viimeisimmät kommentit RSS-muodossa"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:164
+#: ..\..\..\skins\wpc_default\_main.php:164
+msgid "Comments <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
+msgstr "Kommentit <abrr title=\"Really Simple Syndication\">RSS</abbr> 2.0-syötteenä"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:165
+#: ..\..\..\skins\wpc_default\_main.php:165
+msgid "This page validates as XHTML 1.0 Transitional"
+msgstr "Tämä sivu on validia XHTML 1.0 Transitionalia"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:165
+#: ..\..\..\skins\wpc_default\_main.php:165
+msgid "Valid <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
+msgstr "Validia <abbr title=\"eXtensible HyperText Markup Language\">XHTMLlaa</abbr>"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:166
+#: ..\..\..\skins\wpc_aubmach\_main.php:176
+#: ..\..\..\skins\wpc_default\_main.php:166
+#: ..\..\..\skins\wpc_default\_main.php:176
+msgid "Powered by b2evolution; multilingual multiuser multi-blog engine."
+msgstr "Sivu käyttää b2evolutionia; monikielistä monen käyttäjän blogimoottiria."
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:177
+#: ..\..\..\skins\wpc_default\_main.php:177
+msgid "This skin features a CSS file originally designed for WordPress (See design credits in style.css)."
+msgstr "Tämä teema käyttää CSS-tiedostoa, joka on alunperin suunniteltu WordPressia varten (Tekijänoikeudet tiedostossa style.css)."
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:178
+#: ..\..\..\skins\wpc_default\_main.php:178
+msgid "Original design credits for this skin:"
+msgstr "Alkuperäisen ulkoasun tekijät:"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:179
+#: ..\..\..\skins\wpc_default\_main.php:179
+msgid "In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin."
+msgstr "Jotta saavutettaisiin makdollisimman hyvä yhteensopivuus WP CSS-tiedostojen kanssa, kaikki ne b2evo:n ominaisuudet, joita ei löyty WP:stä, ovat piilossa näiltä wpc_* -teemoilta."
+
+#: ..\..\..\xmlsrv\rdf.php:45
+#: ..\..\..\xmlsrv\rss.php:27
+#: ..\..\..\xmlsrv\rss2.php:34
+msgid "[...] Read more!"
+msgstr "[...] Lue lisää!"
+
+#: ..\..\..\xmlsrv\xmlrpc.php:1394
+#: ..\..\..\xmlsrv\xmlrpc.php:1398
+#, php-format
+msgid "New pingback on your post #%d \"%s\""
+msgstr "Uusi päivitysilmoitus kirjoitukseesi #%d\"%s\""
+
