@@ -18,6 +18,7 @@
 $blackList = Array(
 	$baseurl.'/',
 	'localhost',
+	'127.0.0.1',
 	// stat services
 	'sitemeter.com/',
 	// add your own...
