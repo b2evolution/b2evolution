@@ -206,6 +206,10 @@ function trackback_link($file='',$c=0,$pb=0)
 	echo '#trackbacks';		
 }
 
+/**
+ *
+ * @deprecated deprecated by {@link Item::feedback_link()}
+ */
 function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='') 
 {
 	global $blog, $id, $b2trackbackpopupfile, $b2commentsjavascript;

@@ -150,15 +150,13 @@
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
-		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
-		-
-		<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
-		<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-		-
-		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
-		-
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
-		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
+			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
+			<?php $Item->feedback_link( 'pingbacks', '', ' &bull; ' ) // Link to trackbacks ?>
+
+			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+	
+			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
 		</div>
 		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
 		$disp_comments = 1;					// Display the comments if requested
@@ -258,7 +256,7 @@
 
 	<?php if (! $stats) 
 	{ ?>
-<div class="bSideItem">
+	<div class="bSideItem">
 		<h3><?php echo T_('Recent Referers') ?></h3>
 			<?php refererList(5,'global'); ?>
 	  	<ul>
@@ -276,7 +274,7 @@
 				<?php } // End stat loop ?>
 				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 			</ul>
-</div>
+	</div>
 
 	<?php } ?>
 

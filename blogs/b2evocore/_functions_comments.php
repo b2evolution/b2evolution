@@ -244,36 +244,49 @@ function comments_link($file='', $tb=0, $pb=0 )
 }
 
 
-/*
- * comments_popup_script(-)
+/**
+ * This will include the javascript that is required to open comments, 
+ * trackback and pingback in popup windows.
  *
- * This will include the javascript that is required to open comments, trackback and pingback in popup windows.
-You should put this tag before the </head> tag in your template.
+ * You should put this tag before the </head> tag in your template.
  *
- * fplanque: added resizable !!!
- */
-function comments_popup_script($width=560, $height=400, $file='comment_popup.php', $trackbackfile='trackback_popup.php', $pingbackfile='pingback_popup.php')
+ * {@internal comments_popup_script(-)}}
+ *
+ * @param integer width of window or false
+ * @param integer height of window or false
+ * @param boolean do you want a scrollbar
+ * @param boolean do you want a status bar
+ * @param boolean do you want the windows to be resizable
+  */
+function comments_popup_script( $width = 600, $height = 450, 
+																$scrollbars = true, $status = true, $resizable = true )
 {
-	global $b2commentspopupfile, $b2trackbackpopupfile, $b2pingbackpopupfile, $b2commentsjavascript;
-	$b2commentspopupfile = $file;
-	$b2trackbackpopupfile = $trackbackfile;
-	$b2pingbackpopupfile = $pingbackfile;
-	$b2commentsjavascript = 1;
-?>
+	global $b2commentsjavascript;
+	$b2commentsjavascript = true;
+	$properties = array();
+	if( $width ) $properties[] = 'width='.$width;
+	if( $height ) $properties[] = 'height='.$height;
+	$properties[] = 'scrollbars='.intval( $scrollbars );
+	$properties[] = 'status='.intval( $status );
+	$properties[] = 'resizable='.intval( $resizable );
+	$properties = implode( ',', $properties );
+	?>
 	<script language="javascript" type="text/javascript">
 	<!--
 		function b2open( url )
 		{
-			window.open( url, '_blank', 'width=<?php echo $width; ?>,height=<?php echo $height; ?>,scrollbars,status,resizable');
+			window.open( url, '_blank', '<?php echo $properties; ?>');
 		}
 		//-->
-		</script>
-<?php }
+	</script>
+	<?php
+}
 
 
-/*
+/**
  * comments_popup_link(-)
  *
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 {

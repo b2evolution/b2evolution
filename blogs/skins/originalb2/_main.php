@@ -21,7 +21,7 @@
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
-	<?php comments_popup_script() // Included javascript to open pop up windows ?>
+	<?php comments_popup_script() // Include javascript to open pop up windows ?>
 </head>
 <body>
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
@@ -56,9 +56,10 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 
 <div class="rightFlush">
 <?php link_pages("<br />Pages: ","<br />","number") ?> 
-<?php comments_popup_link() ?> 
-<?php trackback_popup_link() ?> 
-<?php pingback_popup_link() ?>
+
+<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
+<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
 <?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 

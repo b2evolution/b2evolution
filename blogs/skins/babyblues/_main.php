@@ -19,7 +19,7 @@
 	?></title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<?php comments_popup_script(); ?>
+	<?php comments_popup_script() // Include javascript to open pop up windows ?>
 </head>
 <body>
 	<div id="wide">&nbsp;</div>
@@ -38,9 +38,9 @@
 		<?php link_pages("<br />Pages: ","<br />","number") ?>
 		<div class="posted">by <?php $Item->Author->prefered_name() ?> 
 			at <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a><br />
-			<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
-			<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
-			<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |
+			<?php $Item->feedback_link( 'comments', '', ' | ' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'trackbacks', '', ' | ' ) // Link to trackbacks ?>
+			<?php $Item->feedback_link( 'pingbacks', '', ' | ' ) // Link to trackbacks ?>
 			<a href="?cat=<?php the_category_ID() ?>" title="category: <?php $Item->main_category( 'htmlattr' ) ?>"><?php $Item->main_category() ?></a>
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>

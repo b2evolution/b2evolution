@@ -643,6 +643,7 @@ class Item extends DataObject
 	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
 	 * @param string String to display before the link (if comments are to be displayed)
 	 * @param string String to display after the link (if comments are to be displayed)
+	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
 	 * @param boolean true to hide if no feeback ('#' for default)
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
@@ -653,8 +654,11 @@ class Item extends DataObject
 	 */
 	function feedback_link( $type = 'feedbacks', $before = '', $after = '', 
 													$zero='#', $one='#', $more='#', $title='#', 
+													$use_popup = '#',
 													$hideifnone = '#', $mode = '', $blogurl='' )
 	{
+		global $b2commentsjavascript;
+
 		switch( $type )
 		{
 			case 'feedbacks':
@@ -670,7 +674,7 @@ class Item extends DataObject
 					return false;
 				if( $hideifnone == '#' ) 
 				{
-					if( $this->can_comment() )
+					if( $this->can_comment( '', '', '', '' ) )
 						$hideifnone = false;
 					else
 						$hideifnone = true;
@@ -701,6 +705,11 @@ class Item extends DataObject
 				die( "Unkown feedback type [$type]" );		
 		}
 
+		if( $use_popup == '#' )
+		{	// Use popups if javascript is included in page
+			$use_popup = $b2commentsjavascript;
+		}
+
 		if( empty( $mode ) )
 			$mode = get_settings( 'pref_permalink_type' );
 
@@ -714,10 +723,26 @@ class Item extends DataObject
 		if( ($number == 0) && $hideifnone )
 			return false;
 			
+		$url = $this->gen_permalink( $mode, $blogurl );
+		if( $use_popup )
+		{ // We need to tell b2evo to use the popup template
+			if( strpos( $url, '?' ) )
+			{	// We already have a ? in the destination URL
+				$url .= '&amp;template=popup';
+			}
+			else
+			{
+				$url .= '?template=popup';
+			}
+		}
+			
 		echo $before;
 
-		echo '<a href="', $this->gen_permalink( $mode, $blogurl ), '#', $type, '" ';
-		echo 'title="', $title, '">';
+		echo '<a href="', $url;
+		echo '#', $type, '" ';	// Position on feedback
+		echo 'title="', $title, '"';
+		if( $use_popup ) echo '" onclick="b2open(this.href); return false"';
+		echo '>';
 
 		if( $number == 0 ) 
 			echo $zero;

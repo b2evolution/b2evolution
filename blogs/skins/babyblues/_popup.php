@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $blogname ?> - feedback on '<?php $Item->title() ?>'</title>
+	<title><?php $Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title() ?>'</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<style type="text/css" media="screen">
 		@import url( 'style.css' );

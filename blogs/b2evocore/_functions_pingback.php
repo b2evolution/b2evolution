@@ -300,6 +300,10 @@ function pingback_link($file='',$c=0,$tb=0)
 	echo '&amp;pb=1#pingbacks';
 }
 
+/**
+ *
+ * @deprecated deprecated by {@link Item::feedback_link()}
+ */
 function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 {
 	global $blog, $id, $b2pingbackpopupfile, $b2commentsjavascript;

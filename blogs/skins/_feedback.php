@@ -123,7 +123,7 @@
 				<?php $Comment->content() ?>
 			</div>
 			<div class="bCommentSmallPrint">
-				<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+				<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment') ?>" class="permalink_right"><img src="<?php imgbase() ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			</div>
 		</div>

@@ -27,6 +27,9 @@ $pagenow = trim($pagenow[(sizeof($pagenow)-1)]);
 $pagenow = explode('?', $pagenow);
 $pagenow = $pagenow[0];
 
+// So far, we did not include the javascript for popupups
+$b2commentsjavascript = false;
+
 // browser detection
 $is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
 if (!isset($HTTP_USER_AGENT))

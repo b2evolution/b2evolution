@@ -6,8 +6,10 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
-/*
- * skinbase(-)
+/**
+ * Template function: output base URL to current skin 
+ *
+ * {@internal skinbase(-)}}
  */
 function skinbase()
 {

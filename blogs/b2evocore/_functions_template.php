@@ -16,63 +16,21 @@ require_once (dirname(__FILE__)."/_functions_trackback.php");
 require_once (dirname(__FILE__)."/_functions_pingback.php");
 
 
-/*
- * apply_filters(-)
- */
-function apply_filters($tag, $string)
-{
-	global $b2_filter;
-
-	if (isset($b2_filter['all']))
-	{	// We have filters defined to be applied for everything!
-		// Make sure it's an array:
-		// $b2_filter['all'] = (is_string($b2_filter['all'])) ? array($b2_filter['all']) : $b2_filter['all'];
-		// Merge with the filters for the specific tag:
-		$b2_filter[$tag] = array_merge($b2_filter['all'], $b2_filter[$tag]);
-		// Make sure we never filter twice:
-		$b2_filter[$tag] = array_unique($b2_filter[$tag]);
-	}
-
-	if (isset($b2_filter[$tag]))
-	{	// We have filters to be applied for this specific tag
-		// Make sure it's an array:
-		// $b2_filter[$tags] = (is_string($b2_filter[$tag])) ? array($b2_filter[$tag]) : $b2_filter[$tag];
-
-		// Apply the stuff:
-		$functions = $b2_filter[$tag];
-		foreach($functions as $function)
-		{
-			$string = $function($string);
-		}
-	}
-
-	return $string;
-}
-
-/*
- * add_filter(-)
- *
- * fplanque: simplied to the max
- */
-function add_filter($tag, $function_to_add)
-{
-	global $b2_filter;
-
-	if( !isset($b2_filter[$tag]) )
-		$b2_filter[$tag] = array();
-
-	if( !in_array( $function_to_add, $b2_filter[$tag] ) )
-	{
-		$b2_filter[$tag][] = $function_to_add;
-	}
-}
-
-
-
 
 /*
  * Functions to be called from the template
  */
+
+/**
+ * Template function: output base URL to b2evo's image folder
+ *
+ * {@internal imgbase(-)}}
+ */
+function imgbase()
+{
+	global $img_url;
+	echo $img_url, '/';
+}
 
 /**
  * single_month_title(-)

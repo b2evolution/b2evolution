@@ -16,7 +16,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $blogname ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
+	<title><?php	$Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
 	<base href="<?php echo $skins_url, '/'; // Base URL for this DIR. You need this to fix relative links! ?>" />
 	<style type="text/css" media="screen">
 		@import url( 'originalb2/layout2b.css' );
