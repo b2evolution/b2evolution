@@ -186,7 +186,7 @@ class Filelist
 
 		if( $toAdd === false )
 		{
-			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->listpath ), 'fl_error' );
+			$this->Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->listpath ), 'fl_error' );
 			return false;
 		}
 
@@ -218,52 +218,6 @@ class Filelist
 			}
 
 			$this->addFileByPath( $entry, true );
-		}
-	}
-
-
-	function obsolete_addFilesFromDir( $path )
-	{
-		if( $this->filterString === NULL || $this->filterIsRegexp )
-		{ // use dir() to access the directory
-			$dir = @dir( $path );
-		}
-		else
-		{ // use glob() to access the directory
-			$oldcwd = getcwd();
-			$dir = @chdir( $path );
-			if( $dir )
-			{
-				$dir = glob( $path.$this->filterString, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
-			}
-			chdir( $oldcwd );
-		}
-
-		if( $dir === false )
-		{
-			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $path ), 'fl_error' );
-			return false;
-		}
-		else
-		{ // read the directory
-			while( ( ($this->filterString === NULL || $this->filterIsRegexp) && ($entry = $dir->read()) )
-						|| ($this->filterString !== NULL && !$this->filterIsRegexp && ( $entry = each( $dir ) ) && ( $entry = str_replace( $path, '', $entry[1] ) ) ) )
-			{
-				if( $entry == '.' || $entry == '..'
-						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
-						|| ( $this->filterString !== NULL && $this->filterIsRegexp && !preg_match( '#'.str_replace( '#', '\#', $this->filterString ).'#', $entry ) ) // does not match the regexp filter
-					)
-				{ // don't use these
-					continue;
-				}
-
-				$this->addFileByPath( $path.$entry, true );
-			}
-
-			if( $this->filterString === NULL || $this->filterIsRegexp )
-			{ // close the handle
-				$dir->close();
-			}
 		}
 	}
 
@@ -384,7 +338,7 @@ class Filelist
 		}
 		elseif( $order == 'lastmod' )
 		{
-			$sortfunction = '$r = $a->_lastMod - $b->_lastMod;';
+			$sortfunction = '$r = $b->_lastMod - $a->_lastMod;';
 		}
 		else
 		{
@@ -754,6 +708,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.14  2005/01/06 15:45:35  blueyed
+ * Fixes..
+ *
  * Revision 1.13  2005/01/06 11:31:45  blueyed
  * bugfixes
  *

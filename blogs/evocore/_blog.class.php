@@ -359,7 +359,7 @@ class Blog extends DataObject
 			case 'mediaurl':
 				return ($this->media_location == 'custom')
 								? $this->media_url
-								: $media_url.'blogs/'.$this->getMediaDir( false ).'/';
+								: $media_url.'blogs/'.$this->getMediaDir( false );
 
 			case 'subdir':
 				return $this->siteurl;
@@ -599,6 +599,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/06 15:45:35  blueyed
+ * Fixes..
+ *
  * Revision 1.8  2005/01/06 10:15:45  blueyed
  * FM upload and refactoring
  *

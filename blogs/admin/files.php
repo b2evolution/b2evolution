@@ -53,9 +53,18 @@ require_once dirname(__FILE__).'/_header.php';
  */
 require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
 
-param( 'root', 'string', NULL );     // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-param( 'path', 'string', '/' );       // the path relative to the root dir
-param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
+
+if( param( 'rootIDAndPath', 'string', '' ) )
+{ // root and path together: decode and override
+	$rootIDAndPath = unserialize( $rootIDAndPath );
+	$root = $rootIDAndPath['id'];
+	$path = $rootIDAndPath['path'];
+}
+else
+{
+	param( 'root', 'string', NULL ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+	param( 'path', 'string', '/' );  // the path relative to the root dir
+}
 
 param( 'order', 'string', NULL );
 param( 'orderasc', '', NULL );
@@ -63,18 +72,16 @@ param( 'filterString', '', NULL );
 param( 'filterIsRegexp', 'integer', NULL );
 param( 'flatmode', '', NULL );
 
+param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
+if( !$action )
+{ // check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
+	$action = array_pop( array_keys( param( 'actionArray', 'array', array() ) ) );
+}
 
 if( $current_User->login != 'demouser' && $current_User->level < 10 )
 { // allow demouser, but noone else below level 10
 	echo 'The filemanager is still beta. You need user level 10 to play with this.';
 	return;
-}
-
-if( param( 'rootIDAndPath', 'string', '' ) )
-{ // root and path together: decode and override
-	$rootIDAndPath = unserialize( $rootIDAndPath );
-	$root = $rootIDAndPath['id'];
-	$path = $rootIDAndPath['path'];
 }
 
 if( $action == 'update_settings' )
@@ -240,7 +247,7 @@ if( !empty($action) )
 			if( !$confirmed )
 			{
 				$msg_action = '
-					<form action="" class="inline">
+					<form action="files.php" class="inline">
 						<input type="hidden" name="confirmed" value="1" />
 						<input type="hidden" name="action" value="delete" />
 						'.$Fileman->getFormHiddenSelectedFiles()
@@ -281,7 +288,7 @@ if( !empty($action) )
 				$msg_action .= '
 					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
 					</form>
-					<form action="" class="inline">
+					<form action="files.php" class="inline">
 						'.$Fileman->getFormHiddenInputs().'
 						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
 					</form>
@@ -552,6 +559,7 @@ if( !empty($action) )
 }
 
 
+// Page title
 $admin_tab = 'files';
 $admin_pagetitle = T_('Filemanager').' (beta)';
 
@@ -613,15 +621,15 @@ switch( $Fileman->getMode() )
 					{
 						case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
 							$LogUpload->add( sprintf( T_('The uploaded file &laquo;%s&raquo; exceeds the upload_max_filesize directive in php.ini.'), $lName ) );
-							continue;
+							continue 2;
 
 						case UPLOAD_ERR_PARTIAL:
 							$LogUpload->add( sprintf( T_('The uploaded file &laquo;%s&raquo; was only partially uploaded.'), $lName ) );
-							continue;
+							continue 2;
 
 						case UPLOAD_ERR_NO_FILE:
 							$LogUpload->add( sprintf( T_('No file was uploaded (%s).'), $lName ) );
-							continue;
+							continue 2;
 					}
 
 					$LogUpload->add( sprintf( T_('Unknown error with file &laquo;%s&raquo;.'), $lName ) );
@@ -649,7 +657,7 @@ switch( $Fileman->getMode() )
 				}
 
 
-				$newFile =& getFile( $lName, $Fileman->getCwd() );
+				$newFile =& getFile( $newName, $Fileman->getCwd() );
 
 				if( $newFile->exists() )
 				{
@@ -682,16 +690,17 @@ switch( $Fileman->getMode() )
 			 */
 			function appendLabelAndInputElements( appendTo, labelText, inputOrTextarea, inputName, inputSizeOrCols, inputMaxLengthOrRows, inputType )
 			{
-				var fileDivLabel = document.createElement("div");
-				fileDivLabel.className = "label";
+				/*var fileDivLabel = document.createElement("div");
+				fileDivLabel.className = "label";*/
 				var fileLabel = document.createElement("label");
 				var fileLabelText = document.createTextNode( labelText );
 				fileLabel.appendChild( fileLabelText );
-				fileDivLabel.appendChild( fileLabel );
-				appendTo.appendChild( fileDivLabel );
+				/*fileDivLabel.appendChild( fileLabel );*/
+				appendTo.appendChild( fileLabel );
+				appendTo.appendChild( document.createElement("br") );
 
-				var fileDivInput = document.createElement("div");
-				fileDivInput.className = "input";
+				/*var fileDivInput = document.createElement("div");
+				fileDivInput.className = "input";*/
 				var fileInput = document.createElement( inputOrTextarea );
 				fileInput.name = inputName;
 				if( inputOrTextarea == "input" )
@@ -710,8 +719,9 @@ switch( $Fileman->getMode() )
 					fileInput.cols = inputSizeOrCols;
 					fileInput.rows = inputMaxLengthOrRows;
 				}
-				fileDivInput.appendChild( fileInput );
-				appendTo.appendChild( fileDivInput );
+				/*fileDivInput.appendChild( fileInput );*/
+				appendTo.appendChild( fileInput );
+				appendTo.appendChild( document.createElement("br") );
 			}
 
 			/**
@@ -727,7 +737,11 @@ switch( $Fileman->getMode() )
 
 				uploadfiles.appendChild( newLI );
 
-				newLI.appendChild( document.createElement("hr") );
+				hr = document.createElement("hr");
+				hr.style.height = "0";
+				hr.style.border = "none";
+				hr.style.borderBottom = "1px solid #ddd";
+				newLI.appendChild( hr );
 
 				appendLabelAndInputElements( newLI, "<?php echo T_('Choose a file'); ?>:", "input", "uploadfile[]", "40", "0", "file" );
 				appendLabelAndInputElements( newLI, "<?php echo T_('Alternative text'); ?>:", "input", "uploadfile_alt[]", "40", "80", "text" );
@@ -740,77 +754,82 @@ switch( $Fileman->getMode() )
 		<div class="panelblock">
 			<form enctype="multipart/form-data" action="files.php" method="post" class="fform">
 				<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $Settings->get( 'upload_maxkb' )*1024 ?>" />
-				<?php echo $Fileman->getFormHiddenInputs() ?>
-				<fieldset>
-					<legend><?php echo T_('File upload')  ?></legend>
+				<?php
+				// we'll use $rootIDAndPath only
+				echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
+				form_hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
+				?>
 
-					<fieldset class="fm_upload_dirselect">
-						<legend><?php echo T_('Upload files into:'); ?></legend>
+				<h1><?php echo T_('File upload'); ?></h1> <?php /* We need a good (smaller) default h1! */ ?>
 
-						<?php
-						echo $Fileman->getDirectoryTreeRadio();
-						?>
-					</fieldset>
+				<p>
+					<?php
+					$restrictNotes = array();
 
-					<fieldset>
-						<p>
-							<?php
-							$restrictNotes = array();
+					if( $allowedFileExtensions )
+					{
+						$restrictNotes[] = T_('Allowed file extensions').': '.str_replace( ' ', ', ', $allowedFileExtensions );
+					}
+					if( $allowedMimeTypes )
+					{
+						$restrictNotes[] = T_('Allowed MIME types').': '.implode(', ', $allowedMimeTypes);
+					}
+					if( $Settings->get( 'upload_maxkb' ) )
+					{
+						$restrictNotes[] = sprintf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
+					}
 
-							if( $allowedFileExtensions )
-							{
-								$restrictNotes[] = T_('Allowed file extensions').': '.str_replace( ' ', ', ', $allowedFileExtensions );
-							}
-							if( $allowedMimeTypes )
-							{
-								$restrictNotes[] = T_('Allowed MIME types').': '.implode(', ', $allowedMimeTypes);
-							}
-							if( $Settings->get( 'upload_maxkb' ) )
-							{
-								$restrictNotes[] = sprintf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
-							}
+					if( $restrictNotes )
+					{
+						echo implode( '<br />', $restrictNotes ).'<br />';
+					}
 
-							if( $restrictNotes )
-							{
-								echo implode( '<br />', $restrictNotes ).'<br />';
-							}
+					?>
+				</p>
 
-							?>
-						</p>
-
-						<?php $LogUpload->display( '', '', true, 'all' ); ?>
+				<?php $LogUpload->display( '', '', true, 'all' ); ?>
 
 
-						<fieldset>
-							<legend><?php echo T_('Files to upload') ?></legend>
+				<fieldset style="float:left;width:60%;">
+					<legend><?php echo T_('Files to upload') ?></legend>
 
-							<ul id="uploadfileinputs" class="plain">
-								<li>
-									<div class="label"><label><?php echo T_('Choose a file'); ?>:</label></div>
-									<div class="input"><input name="uploadfile[]" type="file" size="40" /></div>
+					<ul id="uploadfileinputs">
+						<li>
+							<label><?php echo T_('Choose a file'); ?>:</label><br />
+							<input name="uploadfile[]" type="file" size="37" /><br />
 
-									<div class="label"><label><?php echo T_('Alternative text'); ?></label>:</div>
-									<div class="input"><input name="uploadfile_alt[]"  type="text" size="40" maxlength="80" /></div>
+							<label><?php echo T_('Alternative text'); ?></label>:<br />
+							<input name="uploadfile_alt[]" type="text" size="50" maxlength="80" /><br />
 
-									<div class="label"><label><?php echo T_('Description of the file'); /* TODO: maxlength */ ?></label>:</div>
-									<div class="input"><textarea name="uploadfile_desc[]" rows="3" cols="40"></textarea></div>
+							<label><?php echo T_('Description of the file'); /* TODO: maxlength */ ?></label>:<br />
+							<textarea name="uploadfile_desc[]" rows="3" cols="37"></textarea><br />
 
-									<div class="label"><label><?php echo T_('New filename (without path)'); ?></label>:</div>
-									<div class="input"><input name="uploadfile_name[]" type="text" size="40" maxlength="80" /></div>
-								</li></ul> <?php /* no text after </li> or JS will bite you! */ ?>
-						</fieldset>
+							<label><?php echo T_('New filename (without path)'); ?></label>:<br />
+							<input name="uploadfile_name[]" type="text" size="50" maxlength="80" /><br />
+						</li></ul> <?php /* no text after </li> or JS will bite you! */ ?>
 
-					</fieldset>
-
-					<fieldset class="submit">
-						<input class="ActionButton" type="button" value="<?php echo T_('Add another file') ?>" onclick="addAnotherFileInput();" />
-						<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
-					</fieldset>
 				</fieldset>
 
+				<fieldset>
+					<legend><?php echo T_('Upload files into:'); ?></legend>
+					<?php #echo T_('Choose the directory you want to upload the files into. la la la la la la la'); ?>
+
+					<?php
+					echo $Fileman->getDirectoryTreeRadio();
+					?>
+				</fieldset>
+
+				<div class="clear"></div>
+				<fieldset class="center">
+					<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
+					<input class="ActionButton" type="button" value="<?php echo T_('Add another file') ?>" onclick="addAnotherFileInput();" />
+				</fieldset>
 			</form>
 
 		</div>
+
+		<div class="clear"></div>
+
 
 		<?php
 		// }}}
@@ -822,9 +841,10 @@ switch( $Fileman->getMode() )
 	case 'file_cmr': // copy/move/rename a file {{{
 		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
-		if( !$Fileman->SourceList )
+		if( !$Fileman->SourceList->count() )
 		{
 			$Fileman->Messages->add( sprintf( T_('No source files!') ) );
+			$Fileman->mode = NULL;
 			break;
 		}
 
@@ -921,8 +941,8 @@ switch( $Fileman->getMode() )
 
 		if( !$cmr_doit || $LogCmr->count( 'all' ) )
 		{
-			$SourceFile =& $Fileman->SourceList->getNextFile();
 			$Fileman->SourceList->restart();
+			$SourceFile =& $Fileman->SourceList->getNextFile();
 
 			// text and value for JS dynamic fields, when referring to move/rename
 			if( $SourceFile->getDir() == $Fileman->getCwd() )
@@ -936,7 +956,7 @@ switch( $Fileman->getMode() )
 			?>
 
 			<div class="panelblock">
-				<form action="" class="fform" id="cmr_form">
+				<form action="files.php" class="fform" id="cmr_form">
 					<?php echo $Fileman->getFormHiddenInputs() ?>
 					<input type="hidden" name="cmr_doit" value="1" />
 					<fieldset>
@@ -1057,6 +1077,67 @@ switch( $Fileman->getMode() )
 } // }}}
 
 
+// Display reload-icon in the opener window if we're a popup in the same CWD and the
+// Filemanager content differs.
+?>
+
+<script type="text/javascript">
+	<!--
+	if( opener
+			&& opener.document.FilesForm
+			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
+			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
+			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->getCwd()); ?>'
+		)
+	{
+		opener.document.getElementById( 'fm_reloadhint' ).style.display =
+			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->toMD5(); ?>' ?
+				'none' :
+				'inline';
+	}
+	// -->
+</script>
+
+
+<?php
+
+// "Display/hide Filemanager" and "Leave mode" buttons
+if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
+{
+	?>
+
+	<div class="toggleModeAndFM" id="FM_anchor">
+
+		&mdash;
+
+		<?php
+
+		if( $UserSettings->get('fm_forceFM') != 1 )
+		{ // FM is not forced - link to hide/display
+			?>
+
+			<a class="ActionButton"
+				href="<?php echo $Fileman->getCurUrl( array( 'forceFM' => !$Fileman->forceFM ) ); ?>">
+				<?php echo $Fileman->forceFM ?
+										T_('Hide Filemanager') :
+										T_('Display Filemanager'); ?></a>
+
+			<?php
+		}
+
+		?>
+
+		<a class="ActionButton" href="<?php echo $Fileman->getCurUrl( array( 'mode' => 'browse' ) ) ?>">
+			<?php echo /* TRANS: Button to leave the upload mode */ T_('Leave upload mode'); ?></a>
+
+		&mdash;
+
+	</div>
+
+	<?php
+}
+
+
 // output errors, notes and action messages {{{
 if( isset( $msg_action )
 		|| $Fileman->Messages->count( array( 'error', 'note' ) )
@@ -1087,77 +1168,26 @@ if( isset( $msg_action )
 } // }}}
 
 
-// Display reload-icon in the opener window if we're a popup in the same CWD and the
-// Filemanager content differs.
-?>
-
-
-<script type="text/javascript">
-	<!--
-	if( opener
-			&& opener.document.FilesForm
-			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
-			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
-			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->getCwd()); ?>'
-		)
-	{
-		opener.document.getElementById( 'fm_reloadhint' ).style.display =
-			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->toMD5(); ?>' ?
-				'none' :
-				'inline';
-	}
-	// -->
-</script>
-
-
-<?php
-if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
-{
+if( !$Fileman->forceFM && $Fileman->getMode == 'file_upload' ) // TODO: generalize
+{ // what a pity..
 	?>
 
-	<p class="center">
-
-		<?php
-		if( $UserSettings->get('fm_forceFM') != 1 )
-		{ // FM is not forced anyway
-			?>
-
-			<a class="ActionButton"
-				href="<?php echo $Fileman->getCurUrl( array( 'forceFM' => !$Fileman->forceFM ) ); ?>">
-				<?php echo $Fileman->forceFM ?
-										T_('Hide Filemanager') :
-										T_('Display Filemanager'); ?></a>
-
-			&middot;
-
-			<?php
-		}
-
-		?>
-
-		<a class="ActionButton" href="<?php echo $Fileman->getCurUrl( array( 'mode' => false ) ) ?>">
-			<?php echo /* TRANS: Button to leave the upload mode */ T_('Leave upload mode'); ?></a>
-
-	</p>
+	</div>
 
 	<?php
 
-	if( !$Fileman->forceFM )
-	{ // what a pity.. ;)
-		?>
 
-		</div>
-
-		<?php
-		require( dirname(__FILE__). '/_footer.php' );
-		return;
-	}
+	require( dirname(__FILE__). '/_footer.php' );
+	return;
 }
 
 ?>
 
+
 <div class="panelblock">
-<?php
+
+
+	<?php
 	// ---------------------------------------------------
 	// Display main user interface : file list & controls:
 	// ---------------------------------------------------
@@ -1166,7 +1196,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 
 	<!-- SEARCH BOX: -->
 
-	<form action="files.php" name="search" class="toolbaritem">
+	<form action="files.php#FM_anchor" name="search" class="toolbaritem">
 		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="hidden" name="action" value="search" />
 		<input type="text" name="searchfor" value="--todo--" size="20" />
@@ -1179,7 +1209,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 	<!-- FILTER BOX: -->
 
 	<div class="toolbaritem">
-		<form action="files.php" name="filter" class="inline">
+		<form action="files.php#FM_anchor" name="filter" class="inline">
 			<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
 			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
 			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
@@ -1195,7 +1225,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 		if( $Fileman->isFiltering() )
 		{ // "reset filter" form
 		?>
-		<form action="files.php" name="unfilter" class="inline">
+		<form action="files.php#FM_anchor" name="unfilter" class="inline">
 			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
 			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Disable'), 'formvalue' ) ?>" />
 		</form>
@@ -1208,7 +1238,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 
 	<!-- FLAT MODE: -->
 
-	<form action="files.php" name="flatmode" class="toolbaritem">
+	<form action="files.php#FM_anchor" name="flatmode" class="toolbaritem">
 		<?php echo $Fileman->getFormHiddenInputs( array( 'flatmode' => false ) ) ?>
 		<input type="hidden" name="flatmode" value="<?php echo $flatmode ? 0 : 1; ?>" />
 		<input class="ActionButton" type="submit" title="<?php
@@ -1227,7 +1257,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 
 <div class="panelblock">
 
-<form name="FilesForm" id="FilesForm" action="files.php" method="get">
+<form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
@@ -1257,11 +1287,11 @@ $filetable_cols = 8;
 
 		<div class="fm_roots">
 
-			<select name="root" class="fm_roots" onchange="this.form.submit()">
+			<select name="rootIDAndPath" class="fm_roots" onchange="this.form.submit()">
 			<?php
 			foreach( $rootlist as $lroot )
 			{
-				echo '<option value="'.$lroot['id'].'"';
+				echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
 
 				if( $root == $lroot['id']
 						|| $root === NULL && $lroot['id'] == 'user' )
@@ -1504,10 +1534,11 @@ else
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
 
-	<input class="DeleteButton" type="image"
+	<input class="DeleteButton"
 		title="<?php echo T_('Delete the selected files') ?>"
-		name="action"
+		name="actionArray[delete]"
 		value="delete"
+		type="image"
 		src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
 		onclick="if( r = openselectedfiles(true) )
 							{
@@ -1530,9 +1561,11 @@ else
 
 	?>
 
-	<input class="ActionButton" type="image" name="action"
+	<input class="ActionButton"
 		title="<?php echo T_('Open in new windows'); ?>"
+		name="actionArray[open_in_new_windows]"
 		value="open_in_new_windows"
+		type="image"
 		src="<?php echo getIcon( 'window_new', 'url' ) ?>"
 		onclick="openselectedfiles(); return false;" />
 
@@ -1619,7 +1652,7 @@ if( $countFiles )
 
 <!-- CREATE: -->
 
-<form action="" class="toolbaritem">
+<form action="files.php#FM_anchor" class="toolbaritem">
 	<label class="tooltitle"><?php echo T_('New'); ?></label>
 	<select name="createnew">
 		<option value="file"><?php echo T_('file') ?></option>
@@ -1643,7 +1676,7 @@ if( $countFiles )
 
 <!-- UPLOAD: -->
 
-<form action="" class="toolbaritem">
+<form action="files.php" class="toolbaritem">
 	<?php $Fileman->dispButtonUploadMode(); ?>
 </form>
 
@@ -1683,7 +1716,7 @@ if( $countFiles )
 // ------------------
 param( 'options_show', 'integer', 0 );
 ?>
-<form id="options_form" action="files.php" method="post">
+<form action="files.php#FM_anchor" id="options_form" method="post">
 	<fieldset>
 	<legend><a id="options_toggle" href="<?php
 	echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
@@ -1694,7 +1727,7 @@ param( 'options_show', 'integer', 0 );
 				T_('Hide options') :
 				T_('Show options'); ?></a></legend>
 
-	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>
+	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 		<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( !$UserSettings->get('fm_dirsnotattop') ) echo ' checked="checked"' ?> />
 		<label for="option_dirsattop"><?php echo T_('Sort directories at top') ?></label>
 		<br />
@@ -1763,6 +1796,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.60  2005/01/06 15:45:36  blueyed
+ * Fixes..
+ *
  * Revision 1.59  2005/01/06 11:31:46  blueyed
  * bugfixes
  *

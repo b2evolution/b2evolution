@@ -237,7 +237,7 @@ class FileManager extends Filelist
 		}
 		elseif( !$real_root_dir_exists )
 		{
-			$this->Messages->add( sprintf( T_('The root directory [%s] does not exist.'), $this->root_dir ), 'error' );
+			$this->Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->root_dir ), 'error' );
 			$this->cwd = NULL;
 		}
 		else
@@ -257,7 +257,7 @@ class FileManager extends Filelist
 			{ // allowed
 				if( !$realpath_exists )
 				{ // does not exist
-					$this->Messages->add( sprintf( T_('The directory [%s] does not exist.'), $this->cwd ) );
+					$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->cwd ) );
 					$this->cwd = NULL;
 				}
 				else
@@ -316,7 +316,7 @@ class FileManager extends Filelist
 
 		if( $this->filterIsRegexp && !is_regexp( $this->filterString ) )
 		{
-			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filterString ) );
+			$this->Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $this->filterString ) );
 			$this->filterString = '.*';
 		}
 		$this->order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
@@ -349,7 +349,10 @@ class FileManager extends Filelist
 
 		$this->flatmode = $flatmode;
 
-		$this->forceFM = param( 'forceFM', 'integer', NULL );
+		if( !$this->forceFM )
+		{ // allow override per param
+			$this->forceFM = param( 'forceFM', 'integer', NULL );
+		}
 
 		$this->load();
 	}
@@ -537,7 +540,7 @@ class FileManager extends Filelist
 		if( $url = $this->getLinkFileDelete( $File ) )
 		{
 			echo '<a title="'.T_('Delete').'" href="'.$url.'" onclick="if( confirm(\''
-				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete [%s]?'),
+				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete &laquo;%s&raquo;?'),
 				format_to_output( $File->getName(), 'formvalue' ) ).'\') )
 				{
 					this.href += \'&amp;confirmed=1\';
@@ -995,7 +998,8 @@ class FileManager extends Filelist
 														/> ';
 
 		$label = '<label for="radio_'.$id_path.'">'
-							.'<a href="'.$this->getCurUrl( array( 'root' => $rootID, 'path' => $rootSubpath, 'forceFM' => 1 ) ).'">'
+							.'<a href="'.$this->getCurUrl( array( 'root' => $rootID, 'path' => $rootSubpath, 'forceFM' => 1 ) ).'"
+								title="'.T_('Open this directory in the Filemanager').'">'
 							.( is_string( $rootName ) ? $rootName : basename( $path ) )
 							.'</a>'
 							.'</label>';
@@ -1089,8 +1093,8 @@ class FileManager extends Filelist
 		elseif( !isFilename($name) )
 		{
 			$this->Messages->add( sprintf( ($type == 'dir' ?
-																			T_('[%s] is not a valid directory.') :
-																			T_('[%s] is not a valid filename.') ), $name) );
+																			T_('&laquo;%s&raquo; is not a valid directory.') :
+																			T_('&laquo;%s&raquo; is not a valid filename.') ), $name) );
 			return false;
 		}
 
@@ -1099,7 +1103,7 @@ class FileManager extends Filelist
 
 		if( $newFile->exists() )
 		{
-			$this->Messages->add( sprintf( T_('The file [%s] already exists.'), $name ) );
+			$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $name ) );
 			return false;
 		}
 
@@ -1107,11 +1111,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$this->Messages->add( sprintf( T_('File [%s] has been created.'), $name ), 'note' );
+				$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $name ), 'note' );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('Directory [%s] has been created.'), $name ), 'note' );
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $name ), 'note' );
 			}
 
 			$this->addFile( $newFile );
@@ -1120,11 +1124,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$this->Messages->add( sprintf( T_('Could not create file [%s] in [%s].'), $name, $path ) );
+				$this->Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $name, $path ) );
+				$this->Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
 			}
 		}
 
@@ -1218,6 +1222,7 @@ class FileManager extends Filelist
 		$UserSettings->get_cond( $this->getImageSizes,    'fm_getimagesizes',    $this->User->ID );
 		$UserSettings->get_cond( $this->recursivedirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
 		$UserSettings->get_cond( $this->showhidden,       'fm_showhidden',       $this->User->ID );
+		$UserSettings->get_cond( $this->forceFM,          'fm_forceFM',          $this->User->ID );
 	}
 
 
@@ -1386,6 +1391,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.16  2005/01/06 15:45:35  blueyed
+ * Fixes..
+ *
  * Revision 1.15  2005/01/06 11:31:45  blueyed
  * bugfixes
  *

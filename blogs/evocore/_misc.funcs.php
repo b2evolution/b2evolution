@@ -1234,7 +1234,7 @@ function debug_info( $force = false )
 																		'string' => '<h3>Debug messages</h3>',
 																		'template' => false ),
 																	'all' => array(
-																		'string' => '<h4>Level [%s]:</h4>',
+																		'string' => '<h4>Level &laquo;%s&raquo;:</h4>',
 																		'template' => false ) ),
 													'',
 													false,
@@ -1683,6 +1683,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.28  2005/01/06 15:45:36  blueyed
+ * Fixes..
+ *
  * Revision 1.27  2005/01/06 10:15:46  blueyed
  * FM upload and refactoring
  *

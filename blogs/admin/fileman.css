@@ -151,9 +151,26 @@ ul.iconlegend li {
 	margin-bottom:.5ex;
 }
 
+ul#uploadfileinputs {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+ul#uploadfileinputs li input,
+ul#uploadfileinputs li textarea {
+	width:99%;
+}
+ul#uploadfileinputs li input[type=file] {
+	width:auto;
+}
+ul#uploadfileinputs label {
+	font-weight:bold;
+}
 
-fieldset.fm_upload_dirselect {
-	float:right;
-	border:1px solid #ddd;
-	margin:100ex;
+div.toggleModeAndFM {
+	padding:2ex 0;
+	text-align:center;
+	clear:both;
+	border-top:1px solid #ddd;
+	border-bottom:1px solid #ddd;
 }
