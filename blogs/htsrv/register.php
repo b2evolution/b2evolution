@@ -77,14 +77,20 @@ switch($action)
 			break;
 		}
 
-		$user_ip			= isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
-		$user_domain	= isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '';
-		$user_browser	= isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-
-		$query = "INSERT INTO $tableusers " .
-					"(user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) " .
-					"VALUES ('".addslashes($login)."', '".md5($pass1)."', '".addslashes($user_nickname)."', '$email', '$user_ip', '".addslashes($user_domain)."', '".addslashes($user_browser)."', NOW(), '$new_users_can_blog', 'nickname')";
-		$result = mysql_query($query) or mysql_oops( $query );
+		$new_User = new User();
+		$new_User->set( 'login', $login );
+		$new_User->set( 'pass', md5($pass1) ); // encrypted
+		$new_User->set( 'nickname', $user_nickname );
+		$new_User->set( 'email', $email );
+		$new_User->set( 'ip', '127.0.0.1' );
+		$new_User->set( 'domain', 'localhost' );
+		$new_User->set( 'level', $new_users_can_blog );
+		$new_User->set( 'ip', isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '' );
+		$new_User->set( 'domain', isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '' );
+		$new_User->set( 'browser', isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' );
+		$new_User->set_datecreated( $localtimenow );
+		$new_User->setGroup( Group_get_by_ID( get_settings('pref_newusers_grp_ID') ) );
+		$new_User->dbinsert();
 
 		// TODO: END TRANSACTION !!
 

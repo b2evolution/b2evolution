@@ -10,47 +10,6 @@
 require_once dirname(__FILE__).'/_functions_groups.php';
 require_once dirname(__FILE__).'/_class_User.php';
 
-/*
- * user_create(-)
- *
- * Create a new user
- * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
- */
-function user_create()
-{
-}
-
-
-/*
- * user_update(-)
- *
- * Update a user
- * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
- */
-function user_update( $post_id )
-{
-
-}
-
-
-/*
- * user_delete(-)
- *
- * Delete a user
- * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
- */
-function user_delete( $post_id )
-{
-
-}
-
-
 
 /*
  * veriflog(-)

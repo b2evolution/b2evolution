@@ -200,18 +200,39 @@ switch( $action )
 		echo "anti-spam: OK<br />\n";
 
 		
+		
+		// USERS !
+		$User_Admin = new User();
+		$User_Admin->set( 'login', 'admin' );
+		$random_password = substr(md5(uniqid(microtime())),0,6);
+		$User_Admin->set( 'pass', md5($random_password) );	// random
+		$User_Admin->set( 'nickname', 'admin' );
+		$User_Admin->set( 'email', $admin_email );
+		$User_Admin->set( 'ip', '127.0.0.1' );
+		$User_Admin->set( 'domain', 'localhost' );
+		$User_Admin->set( 'level', 10 );
+		$User_Admin->setGroup( $Group_Admins );
+		$User_Admin->dbinsert();
+
+		$User_Demo = new User();
+		$User_Demo->set( 'login', 'demouser' );
+		$User_Demo->set( 'pass', md5($random_password) );	// random
+		$User_Demo->set( 'nickname', 'Mr. Demo' );
+		$User_Demo->set( 'email', $admin_email );
+		$User_Demo->set( 'ip', '127.0.0.1' );
+		$User_Demo->set( 'domain', 'localhost' );
+		$User_Demo->set( 'level', 0 );
+		$User_Demo->setGroup( $Group_Users );
+		$User_Demo->dbinsert();
+
+		echo "users: OK</p>";
+
+
 		// SETTINGS!
-		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00')";
+		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update, pref_newusers_grp_ID ) 
+		VALUES ( 1, 3, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "settings: OK<br />\n";
-		
-		
-		
-		
-		$random_password = substr(md5(uniqid(microtime())),0,6);
-		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '".md5($random_password)."', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
-		$q = mysql_query($query) or mysql_oops( $query );
-		echo "users: OK</p>";
 			
 		
 		?>
@@ -377,6 +398,7 @@ switch( $action )
 								DROP KEY ID,
 								ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 								ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
+								MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login', 
 								ADD KEY user_grp_ID (user_grp_ID)";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
@@ -384,7 +406,9 @@ switch( $action )
 			echo "<p>Upgrading settings table... ";
 			$query = "ALTER TABLE $tablesettings
 								DROP COLUMN time_format,
-								DROP COLUMN date_format";
+								DROP COLUMN date_format,
+								ALL COLUMN pref_newusers_grp_ID int(4) unsigned DEFAULT 1 NOT NULL,
+								DROP KEY ID";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 		}

@@ -32,8 +32,8 @@ function create_b2evo_tables()
 		AutoBR tinyint(1) DEFAULT '1' NOT NULL, 
 		db_version INT DEFAULT $new_db_version NOT NULL, 
   	last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00',
-		PRIMARY KEY (ID), 
-		KEY ID (ID) 
+		pref_newusers_grp_ID int(4) unsigned DEFAULT 1 NOT NULL,
+		PRIMARY KEY (ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	
@@ -61,7 +61,7 @@ function create_b2evo_tables()
 		user_aim varchar(50) NOT NULL, 
 		user_msn varchar(100) NOT NULL, 
 		user_yim varchar(50) NOT NULL, 
-		user_idmode varchar(20) NOT NULL, 
+		user_idmode varchar(20) NOT NULL DEFAULT 'login', 
 		user_notify tinyint(1) NOT NULL default 1,
 		user_grp_ID int(4) NOT NULL default 1,
 		PRIMARY KEY (ID), 
@@ -225,7 +225,7 @@ function create_antispam()
  */
 function create_groups()
 {
-	global $tablegroups;
+	global $tablegroups, $Group_Admins, $Group_Bloggers, $Group_Users;
 	
 	$query = "CREATE TABLE $tablegroups (
 		grp_ID int(11) NOT NULL auto_increment,

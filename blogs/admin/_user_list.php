@@ -49,7 +49,7 @@
 			echo "<td>", $loop_User->get('ID'), "</td>\n";
 			echo '<td><a href="b2users.php?action=view&amp;user=', $loop_User->get('ID'), '">', $loop_User->get('login'), "</a></td>\n";
 			?>
-			<td><?php $loop_User->disp('ID') ?></td>
+			<td><?php $loop_User->disp('nickname') ?></td>
 			<?php
 			echo "<td>", $loop_User->get('firstname')."&nbsp;".$loop_User->get('lastname')."</td>\n";
 			echo "<td>&nbsp;<a href=\"mailto:$email\" title=\"e-mail: $email\"><img src=\"img/email.gif\" border=\"0\" alt=\"e-mail: $email\" /></a>&nbsp;</td>";

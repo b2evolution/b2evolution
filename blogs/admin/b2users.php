@@ -79,27 +79,20 @@ case 'view':
 	</td>
 	<td valign="top">
 
-		<table cellpadding="5" cellspacing="0">
-		<tr>
-		<td>
-		<strong><?php echo T_('ID') ?>:</strong> <?php $edited_User->disp('ID')  ?></td>
-		</tr>
-		<td>
-		<strong><?php echo T_('Posts') ?>:</strong>
-		<?php
-		$posts=get_usernumposts($user);
-		echo $posts;
-		?>
-		</td>
-		</tr>
-		<tr>
-		<td>
-		<strong><?php echo T_('Identity') ?>:</strong>
-		<?php $edited_User->disp('preferedname'); ?>
-		</td>
-		</tr>
-		</table>
-	
+		<p><strong><?php echo T_('ID') ?>:</strong> <?php $edited_User->disp('ID')  ?></p>
+
+		<p><strong><?php echo T_('Posts') ?>:</strong>	<?php $posts=get_usernumposts($user); ?></p>
+
+		<p><strong><?php echo T_('Identity') ?>:</strong>	<?php $edited_User->disp('preferedname'); ?></p>
+
+		<p><strong><?php echo T_('Created on:') ?></strong>	<?php $edited_User->disp('datecreated'); ?></p>
+
+		<p><strong><?php echo T_('From IP:') ?></strong>	<?php $edited_User->disp('ip'); ?></p>
+
+		<p><strong><?php echo T_('From Domain:') ?></strong>	<?php $edited_User->disp('domain'); ?></p>
+
+		<p><strong><?php echo T_('With Browser:') ?></strong>	<?php $edited_User->disp('browser'); ?></p>
+
 	</td>
 	</table>
 

@@ -25,8 +25,9 @@ case 'update':
 	param( 'newarchive_mode', 'string', true );
 	param( 'newtime_difference', 'integer', true );
 	param( 'newautobr', 'integer', true );
+	param( 'pref_newusers_grp_ID', 'integer', true );
 	
-	$query = "UPDATE $tablesettings SET posts_per_page=$newposts_per_page, what_to_show='$newwhat_to_show', archive_mode='$newarchive_mode', time_difference=$newtime_difference, AutoBR=$newautobr WHERE ID = 1";
+	$query = "UPDATE $tablesettings SET posts_per_page=$newposts_per_page, what_to_show='$newwhat_to_show', archive_mode='$newarchive_mode', time_difference=$newtime_difference, AutoBR=$newautobr, pref_newusers_grp_ID = $pref_newusers_grp_ID";
 	mysql_query($query) or mysql_oops( $query );
 	
 	header ("Location: b2options.php");
@@ -44,9 +45,25 @@ default:
 	
 		<div class="panelblock">
 
-			<form name="form" action="b2options.php" method="post">
+			<form class="fform" name="form" action="b2options.php" method="post">
 			<input type="hidden" name="action" value="update" />
+
+	<fieldset>
+		<legend><?php echo T_('User rights') ?></legend>
 	
+		<?php form_select( 'pref_newusers_grp_ID', get_settings('pref_newusers_grp_ID'), 'groups_options', T_('New user\'s group'), T_('New users will be created in this group.') );?>
+
+	</fieldset>
+
+	<fieldset>
+		<legend><?php echo T_('Regional settings') ?></legend>
+	
+		<?php form_text( 'newtime_difference', $time_difference, 3, T_('Time difference'), T_('If you\'re not on the timezone of your server.') );?>
+
+	</fieldset>
+	
+	<fieldset>
+		<legend><?php echo T_('Deprecated options') ?></legend>
 			<table cellpadding="5" cellspacing="0">
 			<tr height="40">
 				<td width="150" height="40"><?php echo T_('Show') ?>:</td>
@@ -92,12 +109,6 @@ default:
 				</select>
 			</tr>
 			<tr height="40">
-				<td height="40"><?php echo T_('Time difference') ?>:</td>
-				<td><input type="text" name="newtime_difference" value="<?php echo $time_difference ?>" size="2">
-				<em> <?php echo T_('if you\'re not on the timezone of your server') ?></em>
-				</td>
-			</tr>
-			<tr height="40">
 				<td height="40" width="150"><?php echo T_('Auto-BR') ?>:</td>
 				<td><select name="newautobr">
 				<option value="1" <?php
@@ -112,13 +123,17 @@ default:
 				<em><?php echo T_('converts line-breaks into &lt;br /&gt; tags') ?></em>
 				</td>
 			</tr>
-			<tr height="40">
-				<td height="40">&nbsp;</td>
-				<td>
+			</table>
+	</fieldset>
+
+	<fieldset>
+		<fieldset>
+			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
-				</td>
-			</tr>
-		</table>
+				<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
+			</div>
+		</fieldset>
+	</fieldset>
 
 		</form>
 	</div>
