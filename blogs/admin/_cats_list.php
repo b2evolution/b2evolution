@@ -77,6 +77,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	echo T_('New category here'), "</a></li>\n";
 	echo "</ul>\n";
 	// ----------------- END RECURSIVE CAT LIST ----------------
-?>
-	<p class="note"><?php echo T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).') ?></p>
+
+	Log::display( '', '', T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).'), 'note' ); ?>
 </div>
