@@ -294,7 +294,7 @@ switch($action)
 		$current_User->check_perm( 'blog_cats', '', true, $blog );
 
 		// List the cats:
-		require( dirname(__FILE__).'/_blogs_list.php' ); 
+		require( dirname(__FILE__).'/_cats_list.php' ); 
 }
 
 require( dirname(__FILE__).'/_footer.php' ); 
