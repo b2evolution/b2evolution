@@ -25,13 +25,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
-  * {@internal
+ * {@internal
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
-* @package evocore
+ * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author cafelog (team)
@@ -276,6 +276,9 @@ $aspm_sources = array (
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/03 11:57:18  fplanque
+ * no message
+ *
  * Revision 1.5  2004/11/22 17:48:20  fplanque
  * skin cosmetics
  *

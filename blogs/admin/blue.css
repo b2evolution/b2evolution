@@ -270,7 +270,8 @@ table.grouped tr.odd .firstcol {
 /* Page layout: */
 #header {
 	font-size:85%;
-	background: url("img/bg_grey.gif") repeat-x bottom;
+	background: #fff url(img/bg_grey.gif) repeat-x bottom;
+	/* border: 1px solid #00f; */
 	margin: 0;
 }
 #TitleArea {
@@ -282,10 +283,9 @@ table.grouped tr.odd .firstcol {
 }
 #evologo {
 	float:left;
-	padding-left: 1em;
-	padding-right: 1em;
-	vertical-align: middle;
+	margin: 0 1ex;
 	border: 0;
+	/* border: 1px solid #00f; */
 }
 #headfunctions {
 	float:right;
@@ -368,7 +368,7 @@ div.panelblock {
 	border: 1px solid #e1ddce;
 	padding: 1ex;
 	margin: 1ex 1em;
-	clear:both;
+	clear:both; // blueyed
 }
 .footer {
 	text-align: center;
@@ -401,7 +401,7 @@ div.panelblock {
 	background: #f0f0f0;
 	font-weight: bold;
 }
-#mainmenu li a{
+#mainmenu li a{ // made mainmenu links clickable in whole li (at least with Mozilla)
 	display:block;
 	padding:.5ex;
 }
@@ -794,3 +794,10 @@ span.checkall,
 th.checkright {
 	font-size: 84%;
 }
+
+/*
+ * $Log$
+ * Revision 1.7  2004/12/03 11:57:17  fplanque
+ * no message
+ *
+ */

@@ -45,7 +45,7 @@ if( $admin_tab == 'files' || ($admin_tab == 'blogs' && $tab == 'perm') )
 }
 
 debug_info();
-?>
 
-</body>
-</html>
+// Close close body, html....
+require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_page_footer.php';
+?>
