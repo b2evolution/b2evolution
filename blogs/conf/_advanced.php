@@ -344,14 +344,14 @@ $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
  * Location of the core (the "includes") files.
  * @global string $core_subdir
  */
-$core_subdir = 'evocore/';             // Subdirectory relative to base
+$core_subdir = 'evocore/';               // Subdirectory relative to base
 $core_dirout = '../';                    // Relative path to go back to base
 /**
- * Location of the core (the "external includes") files.
- * @global string $core_subdir
+ * Location of the lib (the "external includes") files.
+ * @global string $lib_subdir
  */
-$lib_subdir = 'lib/';             // Subdirectory relative to base
-$lib_dirout = '../';                    // Relative path to go back to base
+$lib_subdir = 'lib/';                    // Subdirectory relative to base
+$lib_dirout = '../';                     // Relative path to go back to base
 /**
  * Location of the locales folder.
  * @global string $locales_subdir

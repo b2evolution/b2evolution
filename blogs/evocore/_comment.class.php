@@ -6,6 +6,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -22,6 +23,12 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
@@ -61,7 +68,7 @@ class Comment extends DataObject
 	var	$content;
 	var	$karma;
 
-	/* 
+	/**
 	 * Comment::Comment(-)
 	 *
 	 * Constructor
@@ -69,10 +76,10 @@ class Comment extends DataObject
 	function Comment( $db_row = NULL )
 	{
 		global $tablecomments, $ItemCache, $UserCache;
-		
+
 		// Call parent constructor:
 		parent::DataObject( $tablecomments, 'comment_', 'comment_ID' );
-	
+
 		if( $db_row == NULL )
 		{
 			echo 'null comment';
@@ -83,14 +90,14 @@ class Comment extends DataObject
 
 			// Get parent Item
 			$this->Item = $ItemCache->get_by_ID(  $db_row['comment_post_ID'] );
-			
+
 			// Get Author User
 			$author_ID = $db_row['comment_author_ID'];
 			if( !empty($author_ID) )
 			{
 				$this->author_User = & $UserCache->get_by_ID( $author_ID ); // NO COPY...(?)
 			}
-						
+
 			$this->type = $db_row['comment_type'];
 			$this->status = $db_row['comment_status'];
 			$this->author = $db_row['comment_author'];
@@ -104,8 +111,8 @@ class Comment extends DataObject
 			$this->karma = $db_row['comment_karma'];
 		}
 	}
-	
-	/* 
+
+	/**
 	 * Comment::set(-)
 	 *
 	 * Set param value
@@ -116,29 +123,29 @@ class Comment extends DataObject
 		{
 			case 'Item':
 				die ('coment->Post assignement not handled');
-	
+
 			case 'karma':
 				parent::set_param( $parname, 'number', $parvalue );
 			break;
-			
+
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
 
-	/** 
+	/**
 	 * Template function: display anchor for permalinks to refer to
 	 *
 	 * {@internal Comment::anchor(-) }}
 	 */
-	function anchor() 
+	function anchor()
 	{
 		echo '<a name="c'.$this->ID.'"></a>';
 	}
 
 
-	/** 
+	/**
 	 * Template function: display author of comment
 	 *
 	 * {@internal Comment::author(-) }}
@@ -151,7 +158,7 @@ class Comment extends DataObject
 	 * @param boolean true for link, false if you want NO html link
 	 */
 	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
-										$format = 'htmlbody', $makelink = false ) 
+										$format = 'htmlbody', $makelink = false )
 	{
 		if( $this->author_User !== NULL )
 		{ // Author is a user
@@ -173,15 +180,15 @@ class Comment extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display comment's author's IP
 	 *
 	 * {@internal Comment::author_ip(-) }}
-	 * 
+	 *
 	 * @param string String to display before IP, if IP exists
 	 * @param string String to display after IP, if IP exists
 	 */
-	function author_ip( $before='', $after='' ) 
+	function author_ip( $before='', $after='' )
 	{
 		if( !empty( $this->author_ip ) )
 		{
@@ -192,7 +199,7 @@ class Comment extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display link to comment author's provided email
 	 *
 	 * {@internal Comment::author_email(-) }}
@@ -212,7 +219,7 @@ class Comment extends DataObject
 		{
 			$email = $this->author_email;
 		}
-		
+
 		if( strlen( $email ) > 5 )
 		{	// If email exists:
 			echo $before;
@@ -224,7 +231,7 @@ class Comment extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display link to comment author's provided URL
 	 *
 	 * {@internal Comment::author_url(-) }}
@@ -235,7 +242,7 @@ class Comment extends DataObject
 	 * @param boolean false if you want NO html link
 	 * @return boolean true if URL has been displayed
 	 */
-	function author_url( $linktext='', $before='', $after='', $makelink = true ) 
+	function author_url( $linktext='', $before='', $after='', $makelink = true )
 	{
 		if( $this->author_User !== NULL )
 		{ // Author is a user
@@ -266,7 +273,7 @@ class Comment extends DataObject
 	 * {@internal Comment::edit_link(-)}}
 	 *
 	 * @param string to display before link
-	 * @param string to display after link 
+	 * @param string to display after link
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
@@ -274,24 +281,24 @@ class Comment extends DataObject
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
 		global $current_User, $admin_url;
-		
+
 		if( ! is_logged_in() ) return false;
-	
+
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
 		{	// If User has no permission to edit comments:
 			return false;
 		}
-	
+
 		if( $text == '#' ) $text = T_('Edit');
 		if( $title == '#' ) $title = T_('Edit this comment');
-		
+
 		echo $before;
 		echo '<a href="'.$admin_url.'b2edit.php?action=editcomment&amp;comment='.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
 		echo $after;
-	
+
 		return true;
 	}
 
@@ -402,14 +409,14 @@ class Comment extends DataObject
 	 * Template function: display permalink to this comment
 	 *
 	 * {@internal Comment::permalink(-) }}
-	 * 
+	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
 		global $Settings;
-		
+
 		if( empty( $mode ) )
 			$mode = $Settings->get( 'permalink_type' );
 
@@ -417,7 +424,7 @@ class Comment extends DataObject
 		switch( $mode )
 		{
 			case 'archive#id':
-			case 'archive#title':			
+			case 'archive#title':
 			  $mode = 'pid';
 		}
 
@@ -425,14 +432,14 @@ class Comment extends DataObject
 		echo $post_permalink.'#c'.$this->ID;
 	}
 
-	/** 
+	/**
 	 * Template function: display content of comment
 	 *
 	 * {@internal Comment::content(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function content( $format = 'htmlbody' ) 
+	function content( $format = 'htmlbody' )
 	{
 		$comment = $this->content;
 		$comment = str_replace('<trackback />', '', $comment);
@@ -441,7 +448,7 @@ class Comment extends DataObject
 		echo $comment;
 	}
 
-	/** 
+	/**
 	 * Template function: display date (datetime) of comment
 	 *
 	 * {@internal Comment::date(-) }}
@@ -457,7 +464,7 @@ class Comment extends DataObject
 			echo mysql2date( $format, $this->date, $useGM);
 	}
 
-	/** 
+	/**
 	 * Template function: display time (datetime) of comment
 	 *
 	 * {@internal Comment::time(-) }}
@@ -467,7 +474,7 @@ class Comment extends DataObject
 	 */
 	function time( $format='', $useGM = false )
 	{
-		if( empty($format) ) 
+		if( empty($format) )
 			echo mysql2date( locale_timefmt(), $this->date, $useGM );
 		else
 			echo mysql2date( $format, $this->date, $useGM );
@@ -476,6 +483,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 18:31:25  blueyed
+ * granting copyright
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

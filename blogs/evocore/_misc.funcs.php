@@ -6,6 +6,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -22,6 +23,12 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
@@ -1124,11 +1131,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 
 
 /**
- * wrap pre around var_dump(), better debuggin'
- *
- * {@internal pre_dump(-) }}
- *
- * @author blueyed
+ * Wrap pre tag around var_dump() for better debugging
  *
  * @param mixed variable to dump
  * @param string title to display
@@ -1215,9 +1218,6 @@ function debug_info( $force = false )
  * It will be set in /blogs/evocore/_main.inc.php and handle the output.
  * It strips every line and generates a md5-ETag, which is checked against the one eventually
  * being sent by the browser.
- *
- * @author blueyed
- * {@internal obhandler(-) }}
  *
  * @param string output given by PHP
 */
@@ -1452,6 +1452,9 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 18:31:25  blueyed
+ * granting copyright
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

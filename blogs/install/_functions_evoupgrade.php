@@ -6,6 +6,12 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package install
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -40,9 +46,8 @@ function set_upgrade_checkpoint( $version )
 }
 
 /**
- * converts languages in a given table into according locales
+ * Converts languages in a given table into according locales
  *
- * @author blueyed
  * @param string name of the table
  * @param string name of the column where lang is stored
  * @param string name of the table's ID column
@@ -547,7 +552,7 @@ function upgrade_b2evo_tables()
 									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );
 		echo "OK.<br />\n";
 
-		 
+
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 				ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post'";
@@ -566,7 +571,7 @@ function upgrade_b2evo_tables()
 		 * Then create a new extension block, and increase db version numbers
 		 * everywhere where needed in this file.
 		 */
-		 
+
 	}
 
 	// Update DB schema version to $new_db_version

@@ -6,6 +6,12 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package install
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -255,11 +261,9 @@ function create_antispam()
 }
 
 /**
- * create DB table for locales.
+ * Create DB table for locales.
  *
  * Used when creating full install and upgrading from earlier versions
- * @author blueyed
- *
  */
 function create_locales()
 {

@@ -25,6 +25,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -34,7 +40,7 @@
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
- * 						- cafelog (team)
+ *            - cafelog (team)
  *            - t3dworld
  * }}
  *
@@ -308,6 +314,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 18:31:24  blueyed
+ * granting copyright
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

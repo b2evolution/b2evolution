@@ -6,6 +6,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -22,6 +23,12 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
@@ -154,7 +161,7 @@ class Item extends DataObject
 			$mode = 'pid';
 		}
 
-		if( empty( $blogurl ) ) 
+		if( empty( $blogurl ) )
 		{
 			$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
 			$blogurl = $current_Blog->gen_blogurl();
@@ -517,7 +524,7 @@ class Item extends DataObject
 		{ // We want to display more if requested by user:
 			$dispmore = $more;
 		}
-		
+
 		/**
 		 * Check if we want to increment view count, see {@link $hit_type}
 		 */
@@ -527,7 +534,7 @@ class Item extends DataObject
 			$this->set_param( 'views', 'number', $this->views+1 );
 			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
 		}
-		
+
 		$content = $this->content;
 		$numpages = 1;
 
@@ -952,7 +959,7 @@ class Item extends DataObject
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
 		global $current_User, $admin_url;
-		
+
 		if( ! is_logged_in() ) return false;
 
 		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false,
@@ -1121,7 +1128,7 @@ class Item extends DataObject
 	function trackback_url()
 	{
 		global $htsrv_url, $Settings;
-		
+
 		if( $Settings->get('links_extrapath') )
 		{
 			echo $htsrv_url.'trackback.php/'.$this->ID;
@@ -1180,6 +1187,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 18:31:25  blueyed
+ * granting copyright
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *
@@ -1188,6 +1198,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 18:31:25  blueyed
+ * granting copyright
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *
