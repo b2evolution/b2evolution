@@ -35,6 +35,7 @@ $AdminUI->dispPayloadBegin();
 	param( 'author', 'integer', '', true );     // List of authors to restrict to
 	param( 'order', 'string', 'DESC', true );   // ASC or DESC
 	param( 'orderby', 'string', '', true );     // list of fields to order by
+	param( 'dstart', 'integer', '', true );     // YearMonth(Day) to start at
 	param( 'unit', 'string', '', true );    		// list unit: 'posts' or 'days'
 	param( 'posts', 'integer', 0, true );       // # of units to display on the page
 	param( 'paged', 'integer', '', true );      // List page number in paged display
@@ -65,8 +66,8 @@ $AdminUI->dispPayloadBegin();
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, $unit, $timestamp_min, $timestamp_max, '', $objType,
-															$dbtable, $dbprefix, $dbIDname );
+															$preview, $unit, $timestamp_min, $timestamp_max, '', $dstart,
+															$objType,	$dbtable, $dbprefix, $dbIDname );
 
 	$posts_per_page = $MainList->posts_per_page;
 	$result_num_rows = $MainList->get_num_rows();

@@ -70,6 +70,7 @@ param( 'catsel', 'array', array(), true );      // Array of cats to restrict to
 param( 'author', 'integer', '', true );         // List of authors to restrict to
 param( 'order', 'string', 'DESC', true );       // ASC or DESC
 param( 'orderby', 'string', '', true );         // list of fields to order by
+param( 'dstart', 'integer', '', true );         // YearMonth(Day) to start at
 param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
 param( 'posts', 'integer', 0, true );           // # of units to display on the page
 param( 'paged', 'integer', '', true );          // List page number in paged display
@@ -221,7 +222,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, $unit, $timestamp_min, $timestamp_max, $title );
+															$preview, $unit, $timestamp_min, $timestamp_max, $title, $dstart );
 
 	// $posts_per_page = $MainList->posts_per_page;
 	// $result = & $MainList->result;
@@ -328,6 +329,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/10 16:08:39  fplanque
+ * added dstart param
+ *
  * Revision 1.9  2005/03/09 20:29:39  fplanque
  * added 'unit' param to allow choice between displaying x days or x posts
  * deprecated 'paged' mode (ultimately, everything should be pageable)
