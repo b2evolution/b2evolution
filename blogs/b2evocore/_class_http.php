@@ -16,6 +16,10 @@
  *
  * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
  **/
+
+if( !defined('DB_USER') ) die( 'You have to many shoes you mentalist.' );
+
+
 class http {
 
   function socket_post($server, $port, $url, $vars) {
@@ -200,8 +204,7 @@ class http {
         curl_close($ch);
         // return the output
 	return $ret;
-
-  }
+     }
 };
 
 
