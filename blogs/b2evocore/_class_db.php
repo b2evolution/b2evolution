@@ -40,6 +40,7 @@ class DB
 	var $debug_all = false;  // same as $trace
 	var $show_errors = true;
 	var $halt_on_error = true;
+	var $error = false;		// no error yet
 	var $num_queries = 0;	
 	var $last_query;
 	var $col_info;
@@ -55,16 +56,25 @@ class DB
 	
 	// ==================================================================
 	//	DB Constructor - connects to the server and selects a database
-	function db($dbuser, $dbpassword, $dbname, $dbhost)
+	function db( $dbuser, $dbpassword, $dbname, $dbhost, $halt_on_error = true)
 	{
+		$this->halt_on_error = $halt_on_error;
+	
 		$this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword);
 
 		if ( ! $this->dbh )
 		{
-			$this->print_error("<ol><b>Error establishing a database connection!</b><li>Are you sure you have the correct user/password?<li>Are you sure that you have typed the correct hostname?<li>Are you sure that the database server is running?</ol>");
+			$this->print_error( '<strong>Error establishing a database connection!</strong>
+				<ol>
+					<li>Are you sure you have typed the correct user/password?</li>
+					<li>Are you sure that you have typed the correct hostname?</li>
+					<li>Are you sure that the database server is running?</li>
+				</ol>' );
 		}
-
-		$this->select($dbname);
+		else
+		{
+			$this->select($dbname);
+		}
 	}
 
 	// ==================================================================
@@ -73,7 +83,11 @@ class DB
 	{
 		if ( !@mysql_select_db($db,$this->dbh))
 		{
-			$this->print_error("<ol><b>Error selecting database <u>$db</u>!</b><li>Are you sure it exists?<li>Are you sure there is a valid database connection?</ol>");
+			$this->print_error( '<strong>'.sprintf( T_('Error selecting database [%s]!'), $db ).'</strong>
+				<ol>
+					<li>Are you sure the database exists?</li>
+					<li>Are you sure there is a valid database connection?</li>
+				</ol>' );
 		}
 	}
 
@@ -107,6 +121,8 @@ class DB
 		// All errors go to the global error array $EZSQL_ERROR..
 		global $EZSQL_ERROR;
 
+		$this->error = true;
+
 		// If no special error string then use mysql default..
 		if ( !$str ) $str = mysql_error().'(Errno='.mysql_errno().')';
 		
@@ -122,9 +138,9 @@ class DB
 		{
 			// If there is an error then take note of it
 			echo '<div class="error">';
-			echo '<p class="error">', T_('Oops, MySQL error!'), '</p>';
+			echo '<p class="error">', T_('MySQL error!'), '</p>';
 			echo '<p>', $str, '</p>';
-			echo '<p class="error">Your query:<br /><code>'. $this->last_query. '</code></p>';
+			if( !empty($this->last_query) ) echo '<p class="error">Your query:<br /><code>'. $this->last_query. '</code></p>';
 			echo '</div>';
 		}
 

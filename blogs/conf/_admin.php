@@ -1,7 +1,7 @@
 <?php
 /*
  * This is b2evolution's admin config file
- * Version of this file: 0.8.9+CVS
+ * Version of this file: 0.9
  *
  * This sets how the back-office works
  */
@@ -73,11 +73,6 @@ $fileupload_minlevel = '1';
 #   note: add a space before and after each login name
 #   example: $fileupload_allowedusers = ' barbara anne ';
 $fileupload_allowedusers = '';
-
-
-# New stub files:
-// $default_stub_mod = 0644;	// don't forget leading 0 !!!
-// $default_stub_owner = 'use_your_unix_username_here';
 
 
 # Do not edit the following unless you known what you're doing...

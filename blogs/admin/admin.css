@@ -139,20 +139,6 @@ div.loginblock {
 	padding: 0ex 2ex 2ex;
 	margin: 3ex 3ex 3ex 0ex;
 }
-div.error {
-	padding: 2ex;
-	margin: 3ex auto;
-	border: 1px solid #fed;
-	background: #fff5ee;
-}
-
-ul.error {
-	margin-bottom: 0ex;
-}
-.error {
-	font-weight: bold;
-	color: #FF0000;
-}
 legend {
 	font-weight: bold;
 }

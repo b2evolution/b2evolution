@@ -40,16 +40,16 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
 # For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs !
 # Use http://localhost/b2evolution/blogs instead. And log in on localhost too, not homer!
 # If you don't, login cookies will not hold. 
-$baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
+$baseurl = 'http://localhost:8088/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
 
 # Your email. Will be used in severe error messages so that users can contact you. 
 # You will also receive notifications for new user registrations.
-$admin_email = 'postmaster@localhost';
+$admin_email = 'blog@fplanque.net';
 
 
 # Once you have edited this file to your settings, set the following to 1 (one):
-$config_is_done = 0;
+$config_is_done = 1;
 
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder

@@ -122,24 +122,6 @@ switch($action)
 					}
 					fclose($f);
 				}
-
-				if( isset($default_stub_mod) )
-				{
-					printf( T_('<p>Changing mod to %o</p>'), $default_stub_mod );
-					if( ! chmod( $new_stub_file, $default_stub_mod ) )
-					{
-						echo '<p class="error">', T_('Warning'), ': ', T_('chmod failed!'), '</p>';
-					}
-				}
-
-				if( isset($default_stub_owner) )
-				{
-					printf( T_('<p>Changing owner to %s</p>'), $default_stub_owner );
-					if( ! chown( $new_stub_file, $default_stub_owner ) )
-					{
-						echo '<p class="error">', T_('Warning'), ': ', T_('chown failed!'), '</p>';
-					}
-				}
 			}
 		}
 

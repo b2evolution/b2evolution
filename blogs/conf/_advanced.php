@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.9+CVS
+ * Version of this file: 0.9
  *
  * This file includes advanced settings for b2evolution
  */
@@ -198,6 +198,15 @@ $cookie_expired = time() - 86400;				// Default: 24 hours ago
 		$admin_dirout = '../..';									// Relative path to go back to base
 */
 /**
+ * Location of the configuration files.
+ */
+$conf_subdir = 'conf';                       // Subdirectory relative to base
+$conf_dirout = '..';                         // Relative path to go back to base
+
+$conf_path = str_replace( '\\', '/', dirname(__FILE__) );
+$basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path );	// Remove his file's subpath
+
+/**
  * Location of the backoffice (admin) folder.
  */
 $admin_subdir = 'admin';                     // Subdirectory relative to base
@@ -236,11 +245,6 @@ $core_dirout = '..';                         // Relative path to go back to base
  */
 $locales_subdir = 'locales';                 // Subdirectory relative to base
 $locales_dirout = '..';                      // Relative path to go back to base
-/**
- * Location of the configuration files.
- */
-$conf_subdir = 'conf';                       // Subdirectory relative to base
-$conf_dirout = '..';                         // Relative path to go back to base
 /**
  * Location of the plug-ins.
  */

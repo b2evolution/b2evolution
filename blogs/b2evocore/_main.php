@@ -54,7 +54,6 @@ if( $use_obhandler )
 
 
 // Connecting to the db:
-dbconnect();
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 
 $Settings = & new Settings();

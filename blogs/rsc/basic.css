@@ -14,3 +14,20 @@
 .small {
 	font-size: 84%;
 }
+div.error {
+	padding: 0 2ex;
+	margin: 3ex auto;
+	border: 1px solid #fed;
+	background: #fff5ee;
+	color: #FF0000;
+}
+
+div.error ul,
+div.error ol {
+	margin-bottom: 0ex;
+}
+p.error,
+span.error {
+	color: #FF0000;
+	font-weight:bold;
+}

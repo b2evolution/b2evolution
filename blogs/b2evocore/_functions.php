@@ -25,25 +25,6 @@ if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.ph
 
 /* functions... */
 
-/**
- * Connect to MySQL database
- *
- * {@internal dbconnect(-) }}
- *
- * @deprecated
- */
-function dbconnect()
-{
-	global $connexion;
-
-	$connexion = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD )
-		or die( T_('Can\'t connect to the database server. MySQL said:'). '<br />'. mysql_error());
-
-	$connexionbase = mysql_select_db( DB_NAME )
-		or die( sprintf(T_('Can\'t connect to the database %s. MySQL said:'), DB_NAME ). '<br />'. mysql_error());
-
-	return(($connexion && $connexionbase));
-}
 
 
 /**
@@ -1017,23 +998,12 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 }
 
 
-/*
+/**
  * get_path(-)
  */
 function get_path( $which='' )
 {
 	global $core_subdir, $skins_subdir, $basepath;
-
-	if( !isset($basepath) )
-	{	// Determine the basepath:
-		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
-		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $core_subdir, $last_pos ) )
-		{	// make sure we use the last occurrence
-			$basepath = substr( $current_folder, 0, $pos-1 );
-			$last_pos = $pos+1;
-		}
-	}
 
 	switch( $which )
 	{

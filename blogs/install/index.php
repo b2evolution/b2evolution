@@ -21,7 +21,7 @@ require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_forms
 require_once (dirname(__FILE__). '/_functions_install.php' );
 require_once (dirname(__FILE__). '/_functions_create.php' );
 
-param( 'action', 'string', 'start' );
+param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
 
 if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
@@ -67,57 +67,184 @@ $stub_roll = 'blog_roll';
 </div>
 
 <?php
-	if( ($action == 'start') || ($action == 'menu') )
-	{
-		?>
-		<div class="installSideBar">
-		<h2><?php echo T_('Language/Locale')?></h2>
-		<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
-		
-		<ul style="margin-left: 2ex;list-style:none;" >
+if( ($action == 'start') || ($action == 'default') || ($action == 'menu') )
+{
+	?>
+	<div class="installSideBar">
+	<h2><?php echo T_('Language/Locale')?></h2>
+	<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
 	
-		<?php
-		// present available locales on first screen
-		foreach( $locales as $lkey => $lvalue )
-		{
-			echo '<li>';
-			if( $default_locale == $lkey ) echo '<strong>';	
-			echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
-			locale_flag( $lkey );
-			echo $lvalue['name'];
-			echo '</a>';
-			echo '</li>';
-			
-			if( $default_locale == $lkey ) echo '</strong>';	
-		}
-		?>
-		</ul>
-		</div>
-		<?php
-	}
+	<ul style="margin-left: 2ex;list-style:none;" >
 
+	<?php
+	// present available locales on first screen
+	foreach( $locales as $lkey => $lvalue )
+	{
+		echo '<li>';
+		if( $default_locale == $lkey ) echo '<strong>';	
+		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
+		locale_flag( $lkey );
+		echo $lvalue['name'];
+		echo '</a>';
+		echo '</li>';
+		
+		if( $default_locale == $lkey ) echo '</strong>';	
+	}
+	?>
+	</ul>
+	</div>
+	<?php
+}
+else
+{
+	// Connect to DB:
+	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, false );
+	if( $DB->error )
+	{	// restart conf
+		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
+		$action = 'start';
+	}
+}
+
+// Check PHP version
 list( $version_main, $version_minor ) = explode( '.', phpversion() );
 if( ($version_main * 100 + $version_minor) < 401 )
 {
 	die( '<p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is PHP version %s, but you have %s!'), '4.1.0', phpversion() ).'</strong></p>');
 }
 
-if( $action != 'start' )
-{
-	dbconnect() or die( '<p class="error">'.sprintf( T_('Could not connect to database! Check you settings in <code>%s</code>!'), '/conf/b2eco_config.php').'</p>' );
-	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
-}
-
 switch( $action )
 {
+	case 'conf':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * Write conf file:
+		 * -----------------------------------------------------------------------------------
+		 */
+		param( 'conf_db_user', 'string', true );
+		param( 'conf_db_password', 'string', true );
+		param( 'conf_db_name', 'string', true );
+		param( 'conf_db_host', 'string', true );
+		param( 'conf_baseurl', 'string', true );
+		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ); // remove trailing slash
+		param( 'conf_admin_email', 'string', true );
+
+		// Connect to DB:
+		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, false );
+		if( $DB->error )
+		{	// restart conf
+			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';
+			$action = 'start';
+		}
+		else
+		{ 
+			$conf_filepath = $conf_path.'/_config.php';	
+			// Read original:
+			$conf = file( $conf_filepath );
+			if( empty( $conf ) )
+			{	// This should actually never happen, just in case...
+				printf( '<p class="error">'.T_('Could not load original conf file [%s]. Is it missing?').'</p>', $conf_filepath );
+				break;
+			}
+	
+			// File loaded...
+			// Update conf:
+			$conf = preg_replace( 
+														array(
+																		"#(define\(\s*'DB_USER',\s*')(.*?)('\s*\);)#",
+																		"#(define\(\s*'DB_PASSWORD',\s*')(.*?)('\s*\);)#",
+																		"#(define\(\s*'DB_NAME',\s*')(.*?)('\s*\);)#",
+																		"#(define\(\s*'DB_HOST',\s*')(.*?)('\s*\);)#",
+																		"#(baseurl\s*=\s*')(.*?)(';)#",
+																		"#(admin_email\s*=\s*')(.*?)(';)#",
+																		"#config_is_done\s*=.*?;#",
+																	), 
+														array(
+																		'$1'.$conf_db_user.'$3',
+																		'$1'.$conf_db_password.'$3',
+																		'$1'.$conf_db_name.'$3',
+																		'$1'.$conf_db_host.'$3',
+																		'$1'.$conf_baseurl.'$3',
+																		'$1'.$conf_admin_email.'$3',
+																		'config_is_done = 1;',
+																	), $conf );
+
+			$f = @fopen( $conf_filepath , 'w' );
+			if( $f == false )
+			{
+				?>
+				<h1><?php echo T_('Config file update') ?></h1>
+				<p><strong><?php printf( T_('We cannot automatically update your config file [%s]!'), $conf_filepath ); ?></strong></p>
+				<p><?php echo T_('There are two ways to deal with this:') ?></p>
+				<ul>
+					<li><strong><?php echo T_('You can allow the installer to update the config file by changing its permissions:') ?></strong>
+						<ol>
+							<li><?php printf( '<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.', $conf_filepath, 'href="http://b2evolution.net/man/install/file_permissions.html" target="_blank"' ); ?></li>
+							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
+						</ol>
+						<br />
+					</li>
+					<li><strong><?php echo T_('Alternatively, you can update the config file manually:') ?></strong>
+						<ol>
+							<li><?php echo T_('Open the _config.php file locally with a text editor.') ?></li>
+							<li><?php echo T_('Delete all contents!') ?></li>
+							<li><?php echo T_('Copy the contents from the box below.') ?></li>
+							<li><?php echo T_('Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later.') ?></li>
+							<li><?php echo T_('Save the new _config.php file locally.') ?></li>
+							<li><?php echo T_('Upload the file to your server, into the /_conf folder.') ?></li>
+							<li><?php printf( T_('<a %s>Call the installer from scratch</a>.'), 'href="index.php?locale='.$default_locale.'"') ?></li>
+						</ol>
+					</li>
+				</ul>
+				<p><?php echo T_('This is how your _config.php should look like:') ?></p>
+				<blockquote>
+				<pre><?php 
+					foreach( $conf as $conf_line )
+					{
+						echo htmlspecialchars( $conf_line );
+					}
+				?></pre>
+				</blockquote>
+				<?php
+				break;
+			}
+			else
+			{	// Write new contents:
+				foreach( $conf as $conf_line )
+				{
+					fwrite( $f, $conf_line );
+				}
+				fclose($f);
+
+				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully upadted.').'</p>', $conf_filepath );
+				$config_is_done = 1;
+				$action = 'menu';
+			}
+		}
+		// ATTENTION: we continue here...
+
 	case 'start':
+	case 'default':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * Start of install procedure:
 		 * -----------------------------------------------------------------------------------
 		 */
-		if( ! $config_is_done )
+		if( ($action == 'start') || (!$config_is_done) )
 		{
+			// Set default params if not provided otherwise:
+			param( 'conf_db_user', 'string', DB_USER );
+			param( 'conf_db_password', 'string', DB_PASSWORD );
+			param( 'conf_db_name', 'string', DB_NAME );
+			param( 'conf_db_host', 'string', DB_HOST );
+			// Guess baseurl:
+			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
+			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
+				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
+			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath );
+			param( 'conf_baseurl', 'string', $baseurl );
+			param( 'conf_admin_email', 'string', $admin_email );
+		 
 			?>
 			<h1><?php echo T_('Base configuration') ?></h1>
 			
@@ -132,24 +259,19 @@ switch( $action )
 				<fieldset>
 					<legend><?php echo T_('Database you want to install into (These settings should be provided by your host)') ?></legend>
 					<?php
-						form_text( 'conf_db_user', DB_USER, 16, T_('mySQL Username'), sprintf( T_('Your username to access the database' ) ), 16 );
-						form_text( 'conf_db_password', DB_PASSWORD, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16 );
-						form_text( 'conf_db_name', DB_NAME, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 16 );
-						form_text( 'conf_db_host', DB_HOST, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 16 );
+						form_text( 'conf_db_user', $conf_db_user, 16, T_('mySQL Username'), sprintf( T_('Your username to access the database' ) ), 16 );
+						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16 );
+						form_text( 'conf_db_name', $conf_db_name, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 16 );
+						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 16 );
 					?>
 				</fieldset>
 
 				<fieldset>
 					<legend><?php echo T_('Additional settings') ?></legend>
 					<?php
-						$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
-						if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
-							$baseurl .= ':'.$_SERVER['SERVER_PORT'];
-						$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath );
-					
-						form_text( 'conf_baseurl', $baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
+						form_text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
 
-						form_text( 'conf_admin_email', $admin_email, 50, T_('Your email'), sprintf( T_('Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' ) ), 80 );
+						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' ) ), 80 );
 					?>
 				</fieldset>
 			
@@ -225,7 +347,7 @@ switch( $action )
 		<hr /> 
 		<h2><?php echo T_('Config file recap...')?></h2>
 		
-		<p><?php echo T_('If you don\'t see correct settings here, STOP before going any further, and check your configuration.')?></p>
+		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>redo your configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 	
 		<?php echo '<pre>',
 		T_('mySQL Username').': '.DB_USER."\n".
