@@ -225,8 +225,12 @@
 	<div class="bSideItem">
     <h3><?php echo T_('Misc') ?></h3>
 		<ul>  
+			<?php if( ! is_loggued_in() ) { ?>
 			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a></li>
 			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a></li>
+			<?php } else { ?>
+			<li><a href="<?php echo $pathserver?>/b2login.php?action=logout"><?php echo T_('Logout ('.$user_login.')') ?></a></li>
+			<?php } ?>
 		</ul>	
 	</div>
 

@@ -58,23 +58,20 @@ switch($action)
 {
 	case 'logout':
 
-		setcookie( "cafeloguser");		// OLD
-		setcookie( "cafeloguser", '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
+		setcookie( 'cafeloguser' );		// OLD
+		setcookie( 'cafeloguser', '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
 		setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
 
-		setcookie( "cafelogpass");			// OLD
-		setcookie( "cafelogpass", '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
+		setcookie( 'cafelogpass');			// OLD
+		setcookie( 'cafelogpass', '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
 		setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
 
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
 		header("Pragma: no-cache");
-	//if ($is_IIS) {
-			header("Refresh:1;url=b2login.php");
-	//} else {
-	//	header("Location: b2login.php");
-	//}
+
+		header("Refresh:0;url=b2login.php");
 		exit();
 
 	break; // case 'logout'
@@ -163,11 +160,7 @@ switch($action)
 					break;
 			}
 
-			// if ($is_IIS) {
-				header("Refresh:1;url=$location");
-			// } else {
-			// 	header("Location: $location");
-			//}
+			header("Refresh:0;url=$location");
 		}
 
 	break; // case 'login'
@@ -269,7 +262,8 @@ textarea,input,select {
 
 			$message  = T_('Login:')." $user_login\r\n";
 			$message .= T_('New Password:')." $random_password\r\n";
-
+		}
+		
 		// DEBUG!
 		// echo $message;
 

@@ -58,6 +58,18 @@ function user_delete( $post_id )
 function veriflog()
 {
 	global $tableusers, $cookie_user, $cookie_pass, $error;
+	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url, $cookie_user;
+	
+	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
+	// Warning: unset() prevent from setting a new global value later in the func !!! :((
+	$user_login = '';
+	$user_pass_md5 = '';
+	$userdata = '';
+	$user_level = '';
+	$user_ID = '';
+	$user_nickname = '';
+	$user_email = '';
+	$user_url = '';
 
 	if( !isset($_COOKIE[$cookie_user]) || !isset($_COOKIE[$cookie_pass]) )
 	{
@@ -75,51 +87,81 @@ function veriflog()
 		return false;
 	}
 	
-	$query = "SELECT user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '" . $user_pass_md5 . "'";
-	$result = @mysql_query($query) or die("Query: $query<br /><br />Error: ".mysql_error());
-
-	$lines = mysql_num_rows($result);
-	if ($lines < 1)
+	if( !user_pass_ok( $user_login, $user_pass_md5, true ) )
 	{
-		$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login no longer exists');
+		$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login/password no longer valid');
 		return false;
-	} 
-	else
-	{
-		$res = mysql_fetch_assoc($result);
-		if ($res['user_login'] == $user_login && $res['user_pass'] == $user_pass_md5)
-		{
-			return true;
-		} else {
-			$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login/password no longer valid');
-			return false;
-		}
 	}
+
+	// Login info is OK, we set the global variables:
+	$userdata	= get_userdatabylogin($user_login);
+	$user_level	= $userdata['user_level'];
+	// echo 'user level = ', $user_level;
+	$user_ID = $userdata['ID'];
+	$user_nickname = $userdata['user_nickname'];
+	$user_email	= $userdata['user_email'];
+	$user_url	= $userdata['user_url'];
+
+	return true;
 }
 
 
-function user_pass_ok($user_login,$user_pass) {
-	global $cache_userdata,$use_cache;
-	if ((empty($cache_userdata[$user_login])) OR (!$use_cache)) {
-		$userdata = get_userdatabylogin($user_login);
-	} else {
-		$userdata = $cache_userdata[$user_login];
-	}
+/*
+ * is_loggued_in(-)
+ */
+function is_loggued_in()
+{
+	global $user_ID;
+	
+	return ( ! empty($user_ID) );
+}
+
+
+
+/*
+ * user_pass_ok(-)
+ */
+function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false ) 
+{
+	global $cache_userdata, $use_cache;
+
+	$userdata = get_userdatabylogin($user_login);
+
+	if( !$pass_is_md5 ) $user_pass = md5( $user_pass );
+
 	return ($user_pass == $userdata['user_pass']);
 }
 
+
+/*
+ * get_userdatabylogin(-)
+ */
+function get_userdatabylogin($user_login) 
+{
+	global $tableusers,$querycount,$cache_userdata,$use_cache;
+	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) 
+	{
+		$sql = "SELECT * FROM $tableusers WHERE user_login = '$user_login'";
+		$result = mysql_query($sql) or mysql_oops( $sql );
+		$myrow = mysql_fetch_array($result);
+		$querycount++;
+		$cache_userdata[$user_login] = $myrow;
+	} 
+	else
+	{
+		$myrow = $cache_userdata[$user_login];
+	}
+	return($myrow);
+}
+
+/*
+ * get_userdata(-)
+ */
 function get_userdata($userid) 
 {
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata[$userid])) OR (!$use_cache)) {
-	/*	$sql = "SELECT * FROM $tableusers WHERE ID = '$userid'";
-		$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
-		$myrow = mysql_fetch_array($result);
-		$querycount++;
-		$cache_userdata[$userid] = $myrow;
-		*
-		* Optimized by: R. U. Serious
-		*/
+	if ((empty($cache_userdata[$userid])) OR (!$use_cache)) 
+	{
 		$sql = "SELECT * FROM $tableusers"; 
 		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++; 
@@ -128,14 +170,22 @@ function get_userdata($userid)
 			 $cache_userdata[$myrow['ID']] = $myrow; 
 		} 
 		$myrow = $cache_userdata[$userid]; 
-	} else {
+	}
+	else
+	{
 		$myrow = $cache_userdata[$userid];
 	}
 	return($myrow);
 }
 
+
+/*
+ * get_userdata2(-)
+ *
+ * for team-listing
+ */
 function get_userdata2($userid) 
-{ // for team-listing
+{
 	global $tableusers,$row;
 	$user_data['ID'] = $userid;
 	$user_data['user_login'] = $row->user_login;
@@ -148,25 +198,17 @@ function get_userdata2($userid)
 	return($user_data);
 }
 
-function get_userdatabylogin($user_login) 
+
+
+
+/*
+ * get_userid(-)
+ */
+function get_userid($user_login) 
 {
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
 	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) 
 	{
-		$sql = "SELECT * FROM $tableusers WHERE user_login = '$user_login'";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$myrow = mysql_fetch_array($result);
-		$querycount++;
-		$cache_userdata["$user_login"] = $myrow;
-	} else {
-		$myrow = $cache_userdata["$user_login"];
-	}
-	return($myrow);
-}
-
-function get_userid($user_login) {
-	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) {
 	/*	$sql = "SELECT ID FROM $tableusers WHERE user_login = '$user_login'";
 		$result = mysql_query($sql) or die("No user with the login <i>$user_login</i>");
 		$myrow = mysql_fetch_array($result);
@@ -187,35 +229,26 @@ function get_userid($user_login) {
 	return($myrow[0]);
 }
 
+
+/*
+ * get_usernumposts(-)
+ */
 function get_usernumposts($userid) 
 {
 	global $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments,$querycount;
-	$sql = "SELECT * FROM $tableposts WHERE post_author = $userid";
+	$sql = "SELECT count(*) AS count FROM $tableposts WHERE post_author = $userid";
 	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
-	return mysql_num_rows($result);
+	$myrow = mysql_fetch_array($result);
+	return $myrow['count'];
 }
+
 
 /*
- * get_currentuserinfo(-) 
+ * profile(-)
+ *
+ * outputs a link to user profile
  */
-function get_currentuserinfo() 
-{ // a bit like get_userdata(), on steroids
-	global $user_login, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url, $user_pass_md5, $cookie_user;
-	// *** retrieving user's data from cookies and db - no spoofing
-	$user_login		= $_COOKIE[$cookie_user];
-	$userdata		= get_userdatabylogin($user_login);
-	$user_level		= $userdata['user_level'];
-	$user_ID			= $userdata['ID'];
-	$user_nickname = $userdata["user_nickname"];
-	$user_email		= $userdata["user_email"];
-	$user_url		= $userdata["user_url"];
-	$user_pass_md5	= $userdata["user_pass"];
-}
-
-
-
-
 function profile($user_login) 
 {
 	global $user_data;

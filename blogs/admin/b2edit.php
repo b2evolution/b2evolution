@@ -140,8 +140,6 @@ case "editcomment":
 	echo '</span>';
 	require (dirname(__FILE__).'/_menutop_end.php');
 
-	get_currentuserinfo();
-
 	if ($user_level == 0) 
 	{
 		die(T_('Cheatin\' uh ?'));

@@ -53,8 +53,6 @@ switch($action)
 	
 	case 'update':
 	
-		get_currentuserinfo();
-		
 		if( !isset($demo_mode) )
 		{
 			$demo_mode = 0;
@@ -120,7 +118,7 @@ switch($action)
 			echo '<br />';
 		}
 
-      	$newuser_firstname = addslashes($_POST['newuser_firstname']);
+		$newuser_firstname = addslashes($_POST['newuser_firstname']);
 		$newuser_lastname  = addslashes($_POST['newuser_lastname']);
 		$newuser_nickname  = addslashes($_POST['newuser_nickname']);
 		$newuser_icq       = addslashes($_POST['newuser_icq']);

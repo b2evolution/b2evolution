@@ -4,9 +4,6 @@ require_once (dirname(__FILE__).'/_header.php');
 
 $mode = 'sidebar';
 
-
-get_currentuserinfo();
-
 // just your usual browser thing because we're still too far from standards
 $is_gecko = preg_match("/Gecko/",$HTTP_USER_AGENT);
 $is_winIE = ((preg_match("/MSIE/",$HTTP_USER_AGENT)) && (preg_match("/Win/",$HTTP_USER_AGENT)));
