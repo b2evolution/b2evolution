@@ -22,6 +22,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * Set to 1 to enable gettext localization if supported (not recommended).
  *    Note: you will have to compile the .po files with msgfmt before this will work.
  * Set to 2 to enable b2evo advanced localization (recommended).
+ *
+ * @global integer
  */
 $use_l10n = 2;
 
@@ -40,6 +42,8 @@ $dbcharset = 'iso-8859-1';
  * These use an ISO 639 language code, a '-' and an ISO 3166 country code.
  *
  * This MUST BE in the list below.
+ *
+ * @global string
  */
 $default_locale = 'en-EU';
 
@@ -275,6 +279,8 @@ $start_of_week = 1;
  * Set this to 1 if you are a translator and wish to extract strings from your .po file.
  * Warning: do *not* extract .PO files you have not edited yourself.
  * Shipped .PO files contain automatic translations that have *not* been reviewed.
+ *
+ * @param boolean
  */
 $allow_po_extraction = 0;
 

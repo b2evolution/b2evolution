@@ -132,9 +132,10 @@ else switch ($action)
 		}
 
 		// check if new login already exists for another user_ID
-		$query = "SELECT ID FROM T_users
-							WHERE user_login = '$edited_user_login'
-							AND ID != $edited_user_ID";
+		$query = "SELECT ID
+								FROM T_users
+							 WHERE user_login = '$edited_user_login'
+							   AND ID != $edited_user_ID";
 		$q = $DB->get_var( $query );
 
 		if( $q !== NULL )

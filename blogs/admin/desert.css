@@ -172,7 +172,7 @@ input.ResetButton,
 div.edit_actions input,
 div.PostActionsArea input {
 	padding: 2px;
-	margin: 0 1px;
+	margin: .5ex 1px;
 	color:#333;
 	background-image: url("../admin/img/desert-button.gif");
 	background-color: #e1ddce;
@@ -443,6 +443,9 @@ div.tabbedpanelblock fieldset {
 	margin: 0 0 1ex 0;
 	background-color: #fff;
 	padding: .5ex 1ex;
+}
+div.tabbedpanelblock fieldset fieldset {
+	border: none;
 }
 
 /* Login screen: */
