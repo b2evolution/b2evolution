@@ -520,13 +520,14 @@ function antispambot($emailaddy, $mailto = 0) {
 /**
  * Check that email address looks valid
  */
-function is_email($user_email)
+function is_email( $email )
 {
 	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
 	$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
-	if( strstr($user_email, '@') && strstr($user_email, '.') )
+
+	if( strpos( $email, '@' ) !== false && strpos( $email, '.' ) !== false )
 	{
-		return (bool)(preg_match($chars, $user_email));
+		return (bool)(preg_match($chars, $email));
 	}
 	else
 	{
@@ -1005,15 +1006,23 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
 	global $Debuglog, $global_param_list, $ReqPath, $basehost;
 
-	if( $ignore == '' )
-		$ignore = array( );
+	if( empty($ignore) )
+	{
+		$ignore = array();
+	}
 	elseif( !is_array($ignore) )
+	{
 		$ignore = explode( ',', $ignore );
+	}
 
-	if( $set == '' )
-		$set = array( );
+	if( empty($set) )
+	{
+		$set = array();
+	}
 	elseif( !is_array($set) )
+	{
 		$set = array( $set );
+	}
 
 	$params = array();
 	if( isset($global_param_list) ) foreach( $global_param_list as $var => $thisparam )
@@ -1075,7 +1084,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		}
 	}
 
-	if( ! empty( $set ) )
+	if( !empty( $set ) )
 	{
 		$params = array_merge( $params, $set );
 	}
@@ -1629,7 +1638,11 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 						.( isset( $params['title'] ) ? ' title="'.$params['title'].'"' : '' )
 						.' alt="';
 
-			if( is_a( $for, 'file' ) )
+			if( isset( $params['alt'] ) )
+			{
+				$r .= $params['alt'];
+			}
+			elseif( is_a( $for, 'file' ) )
 			{ // extension as alt-tag for file icons
 				if( $for->isDir() )
 				{
@@ -1700,6 +1713,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.37  2005/02/09 00:32:41  blueyed
+ * no message
+ *
  * Revision 1.36  2005/02/02 01:10:08  blueyed
  * added @ to mail() again
  *
