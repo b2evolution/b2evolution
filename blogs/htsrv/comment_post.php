@@ -17,49 +17,60 @@ $show_statuses = array( 'published', 'protected', 'private' );
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 
-$postdata = get_postdata($comment_post_ID);
-if( $postdata['comments'] != 'open' )
+$commented_Item = Item_get_by_ID( $comment_post_ID );
+
+if( ! $commented_Item->can_comment( '', '', '', '' ) )
 {
-	errors_add( T_('Sorry but comments are now closed for this post.') );
+	errors_add( T_('You cannot leave comments on this post!') );
 }
 
 param( 'author', 'string' );
 param( 'email', 'string' );
 param( 'url', 'string' );
-param( 'comment' , 'html', true );	// mandatory
-$original_comment = $comment;
+param( 'comment' , 'html' );
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
 param( 'comment_cookies', 'integer', 0 );
 
-if ($require_name_email)
-{ // Blog wants Name and EMail with comments
-	if( empty($author) ) errors_add( T_('Please fill in the name field') );
-	if( empty($email) ) errors_add( T_('Please fill in the email field') );
+if( is_logged_in() )
+{ // User is loggued in, we'll use his ID
+	$author_ID = $current_User->ID;
+	$author = NULL;
+	$email = NULL;
+	$url = NULL;
 }
+else
+{	// User is not logged in, we need some id info from him:
+	$author_ID = NULL;
 
-if( (!empty($email)) && (!is_email($email)) )
-{
-	errors_add( T_('Supplied email address is invalid') );
-}
-
-// add 'http://' if no protocol defined for URL
-$url = ((!stristr($url, '://')) && ($url != '')) ? 'http://' . $url : $url;
-if( strlen($url) < 7 ){
-	$url = '';
-}
-if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
-{
-	errors_add( T_('Supplied URL is invalid: ') . $error );	
+	if ($require_name_email)
+	{ // Blog wants Name and EMail with comments
+		if( empty($author) ) errors_add( T_('Please fill in the name field') );
+		if( empty($email) ) errors_add( T_('Please fill in the email field') );
+	}
+	
+	if( (!empty($email)) && (!is_email($email)) )
+	{
+		errors_add( T_('Supplied email address is invalid') );
+	}
+	
+	// add 'http://' if no protocol defined for URL
+	$url = ((!stristr($url, '://')) && ($url != '')) ? 'http://' . $url : $url;
+	if( strlen($url) < 7 ){
+		$url = '';
+	}
+	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
+	{
+		errors_add( T_('Supplied URL is invalid: ') . $error );	
+	}
 }
 
 $user_ip = $_SERVER['REMOTE_ADDR'];
-$user_domain = gethostbyaddr($user_ip);
 $now = date("Y-m-d H:i:s", $localtimenow );
 
 // CHECK and FORMAT content
 //echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);	
-$comment = strip_tags($comment, $comment_allowed_tags);
-$comment = format_to_post($comment, $comment_autobr, 1);
+$original_comment = strip_tags($comment, $comment_allowed_tags);
+$comment = format_to_post($original_comment, $comment_autobr, 1);
 
 if( empty($comment) )
 { // comment should not be empty!
@@ -90,38 +101,49 @@ if( errors_display( T_('Cannot post comment, please correct these errors:'),
 	exit();
 }
 
-$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, 
+$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author, 
 																			comment_author_email, comment_author_url, comment_author_IP,
 																			comment_date, comment_content)  
-					VALUES( $comment_post_ID, 'comment', '".$DB->escape($author)."','".$DB->escape($email)."',
-									'".$DB->escape($url)."','".$DB->escape($user_ip)."','$now',
+					VALUES( $comment_post_ID, 'comment', ".$DB->null($author_ID).",
+									".$DB->quote($author).", ".$DB->quote($email).",
+									".$DB->quote($url).",'".$DB->escape($user_ip)."','$now',
 									'".$DB->escape($comment)."' )";
 $DB->query( $query );
 
 /*
  * New comment notification:
  */
-$blog = $postdata['Blog'];
-$authordata = get_userdata($postdata['Author_ID']);
-if( get_user_info( 'notify', $authordata ) )
+$item_author_User = & $commented_Item->Author;
+if( $item_author_User->notify )
 {	// Author wants to be notified:
-	$recipient = get_user_info( 'email', $authordata );
-	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
-	$comment_blogparams = get_blogparams_by_ID( $blog );
+	$recipient = $item_author_User->email;
+	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID,$commented_Item->get('title') );
+	$Blog = Blog_get_by_ID( $commented_Item->blog_ID );
 	
 	// Not translated because sent to someone else...
-	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
-	$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$comment_post_ID."&c=1\n\n";
-	$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip , $user_domain)\n";
-	$notify_message .= T_('Email', $default_locale).": $email\n";
-	$notify_message .= T_('Url', $default_locale).": $url\n";
+	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $commented_Item->get('title') )."\n";
+	$notify_message .= $commented_Item->gen_permalink( 'pid' )."\n\n"; // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+	if( is_logged_in() )
+	{
+		$notify_message .= T_('Author', $default_locale).': '.$current_User->get('preferedname').
+												' ('.$current_User->get('login').")\n";
+	}
+	else
+	{
+		$user_domain = gethostbyaddr($user_ip);
+		$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip, $user_domain)\n";
+		$notify_message .= T_('Email', $default_locale).": $email\n";
+		$notify_message .= T_('Url', $default_locale).": $url\n";
+	}
 	$notify_message .= T_('Comment', $default_locale).": \n".$original_comment."\n\n";
-	$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
+	$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n";
 	
 	
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
 	
-	if( empty( $email ) )
+	if( is_logged_in() )
+		$mail_from = $current_User->get('email');
+	elseif( empty( $email ) )
 		$mail_from = $notify_from;
 	else
 		$mail_from = "\"$author\" <$email>";

@@ -1,4 +1,7 @@
-/* Standard Blog elements styles */
+/* 
+ * Default Blog elements styles 
+ * Feel free to override all these styles in your own skins
+ */
 
 a.permalink_right {
 	float: right;

@@ -283,27 +283,15 @@
 
 				<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 
-					<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
+					<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID(); ?>" />
 					<input type="hidden" name="redirect_to" value="<?php echo $_SERVER["REQUEST_URI"]; ?>" />
 
 					<fieldset>
-						<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
-						<div class="input"><input type="text" name="author" id="author" value="<?php echo $user_nickname ?>" size="40" class="bComment" /></div>
-					</fieldset>
-
-
-					<fieldset>
-						<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
-						<div class="input"><input type="text" name="email" id="email" value="<?php echo $user_email ?>" size="40" class="bComment" /><br />
-							<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
-						</div>
-					</fieldset>
-
-					<fieldset>
-						<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
-						<div class="input"><input type="text" name="url" id="url" value="<?php echo $user_url ?>" size="40" class="bComment" /><br />
-							<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
-						</div>
+						<div class="label"><?php echo T_('User') ?>:</div>
+						<div class="info">
+							<strong><?php $current_User->prefered_name()?></strong>
+							<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
+							</div>
 					</fieldset>
 
 					<fieldset>

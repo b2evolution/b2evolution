@@ -358,7 +358,10 @@ function get_postdata($postid)
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
-	$sql .= ' AND '.statuses_where_clause( $show_statuses );
+	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
+	// get a post before even knowning which blog it belongs to. We can think of putting a security check
+	// back into the Item class)
+	// $sql .= ' AND '.statuses_where_clause( $show_statuses );
 
 	// echo $sql;
 
@@ -414,7 +417,10 @@ function Item_get_by_ID( $post_ID )
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
-	$sql .= ' AND '.statuses_where_clause( $show_statuses );
+	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
+	// get a post before even knowning which blog it belongs to. We can think of putting a security check
+	// back into the Item class)
+	// $sql .= ' AND '.statuses_where_clause( $show_statuses );
 
 	// echo $sql;
 
@@ -1505,6 +1511,8 @@ function bpost_count_words($string)
  */
 function statuses_where_clause( $show_statuses = '' )
 {
+	global $current_User, $blog;
+
 	if( empty($show_statuses) )
 		$show_statuses = array( 'published', 'protected', 'private' );
 
@@ -1524,7 +1532,6 @@ function statuses_where_clause( $show_statuses = '' )
 
 	if( $key = array_search( 'protected', $show_statuses ) )
 	{	// Special handling for Protected status:
-		global $current_User, $blog;
 		if( (!is_logged_in()) || (!$current_User->check_perm( 'blog_ismember', 1, false, $blog )) )
 		{ // we are not allowed to see this if we are not a member of the current blog:
 			unset( $show_statuses[$key] );

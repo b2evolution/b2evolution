@@ -1,5 +1,8 @@
 /* Designed by François PLANQUE http://fplanque.net/ */
 
+@import url(../../rsc/forms.css);	/* Import default form styles */
+@import url(../../rsc/comments.css);	/* Import default comment styles */
+
 div.main {
 	margin-right: 0px;
 	margin-left: 0px;
@@ -57,7 +60,6 @@ h2 {
 	font-size: 110%;
 }
 .bSmallPrint,
-.bCommentSmallPrint
 {
 	clear: both;
 	font-family: Arial, Helvetica, sans-serif;
@@ -67,54 +69,11 @@ h2 {
 }
 
 /* Styles for comments */
-.bComment {
-	margin-right: 20px;
-	margin-left: 20px;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	border: 1px dotted #33CCCC;
-	padding-right: 8px;
-	padding-left: 8px;
-}
-.bCommentTitle {
-	margin-top: 8px;
-	margin-bottom: 8px;
-	font-weight: bold;
-}
-.bCommentText {
-	margin-top: 0px;
-	margin-bottom: 0px;
+div.bComment {
+	border-color: #33CCCC; /* override */
 }
 
 /* Styles for comment form */
-form.bComment fieldset
-{
-	clear: both;
-	border: none;
-	margin: 2ex 0ex;
-	padding: 0ex;
-	/* border: 1px solid #f00; */
-}
-div.label
-{
-	float: left;
-	width: 18%;
-	text-align: right;
-	font-weight: bold;
-	position: relative;
-	top: .5ex;
-	/* border: 1px solid #00f; */
-}
-form.bComment label
-{
-	font-weight: bold;
-}
-div.input
-{
-	float: right;
-	width: 80%;
-	/* border: 1px solid #00f; */
-}
 input.bComment, 
 textarea.bComment
 {
@@ -135,12 +94,6 @@ select.bComment
 	padding: .5ex;
 	width: 100%;
 	margin: 0ex;
-}
-fieldset .notes
-{
-	/* display: block; */
-	font-size: 80%;
-	color: #999999;
 }
 
 

@@ -118,23 +118,27 @@ if ($use_spellchecker)
 		}
 	}
 	else
-	{ // ------------------------------ COMMENT HEADER -----------------------
+	{	// -------------------------- COMMENT HEADER -----------------------
 		?>
 		<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
-
-		<span class="line">
-		<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata['comment_author']) ?>" id="name" tabindex="1" />
-		</span>
-
-		<span class="line">
-		<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata['comment_author_email']) ?>" id="email" tabindex="2" />
-		</span>
-
-		<span class="line">
-		<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata['comment_author_url']) ?>" id="URL" tabindex="3" />
-		</span>
-
+	
 		<?php
+		if( $edited_Comment->author_User === NULL )
+		{ // This is not a member comment
+			?>
+			<span class="line">
+			<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata['comment_author']) ?>" id="name" tabindex="1" />
+			</span>
+	
+			<span class="line">
+			<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata['comment_author_email']) ?>" id="email" tabindex="2" />
+			</span>
+	
+			<span class="line">
+			<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata['comment_author_url']) ?>" id="URL" tabindex="3" />
+			</span>
+		<?php
+		}
 	}
 	?>
 
@@ -489,6 +493,7 @@ if ($action == "editcomment")
 ?>
 	<div class="bSideItem">
 		<h3><?php echo T_('Comment info') ?></h3>
+		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $commentdata["comment_type"]; ?></p>
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $commentdata["comment_status"]; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $commentdata["comment_author_IP"]; ?></p>

@@ -56,7 +56,7 @@ class CommentList extends DataObjectList
 		elseif( !empty($default_posts_per_page) )
 			$this->posts_per_page = $default_posts_per_page;
 
-		$this->request = "SELECT DISTINCT comment_ID, comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma, comment_type, comment_status
+		$this->request = "SELECT DISTINCT $tablecomments.*
 											FROM (($tablecomments INNER JOIN $tableposts ON comment_post_ID = ID) ";
 				
 		if( !empty( $p ) )

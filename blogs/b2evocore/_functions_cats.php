@@ -276,6 +276,8 @@ function cat_load_cache()
 {
 	global $DB, $tablecategories, $tablepostcats, $tableposts, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
+	global $cat_postcounts_loaded, $blog;
+	
 	if( !isset($cache_categories))
 	{
 		// echo "loading CAT cache";
@@ -318,10 +320,13 @@ function cat_load_cache()
 		}
 
 		// echo 'Number of cats=', count($cache_categories);
-
-		// ------------------------------
-		// Add post counts:
-		// ------------------------------
+	}
+	
+	// ------------------------------
+	// Add post counts:
+	// ------------------------------
+	if( !isset($cat_postcounts_loaded) && $blog > 0 )
+	{	// Postcounts are not loaded and we have a blog for which to load the counts:
 
 		// CONSTRUCT THE WHERE CLAUSE:
 
@@ -364,7 +369,7 @@ function cat_load_cache()
 		}
 
 		// echo 'Number of cats=', count($cache_categories);
-
+		$cat_postcounts_loaded = true;
 	}
 }
 

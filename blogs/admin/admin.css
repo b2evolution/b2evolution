@@ -1,6 +1,9 @@
 
 @import url(../rsc/img.css);	/* Import standard image styles */
 @import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
+@import url(../rsc/forms.css);	/* Import default form styles */
+@import url(../rsc/comments.css);	/* Import default comment styles */
+
 
 body {
 	margin: 0 0 0 0;
@@ -187,14 +190,11 @@ form.fform fieldset fieldset {
 	border: none;
 	margin: 2ex;
 }
-div.label {
+form.fform div.label {
 	float: left;
 	width: 24%;
 	text-align: right;
 	padding-top: .6ex;
-}
-div.label label {
-	font-weight: bold;
 }
 div.input {
 	float: right;
@@ -425,24 +425,13 @@ ul.tabs li.current a:hover {
 	margin-top: 8px;
 	margin-bottom: 8px;
 }
-.bComment {
-	margin-right: 20px;
-	margin-left: 20px;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	border: 1px solid #8ae;
-	padding-right: 8px;
-	padding-left: 8px;
+
+div.bComment, /* Entire comment block */
+form.bComment /* New comment form */
+{
+	border: 1px solid #8ae; /* override */
 }
-.bCommentTitle {
-	margin-top: 8px;
-	margin-bottom: 8px;
-	font-weight: bold;
-}
-.bCommentText {
-	margin-top: 0px;
-	margin-bottom: 0px;
-}
+
 .bSmallHead {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;
@@ -494,16 +483,6 @@ div.statbloc h3 {
 }
 
 /* Styles for comment form */
-form.bComment fieldset {
-	clear: both;
-	border: none;
-	margin: 2ex 0ex;
-	padding: 0ex;
-	/* border: 1px solid #f00; */
-}
-form.bComment label {
-	font-weight: bold;
-}
 input.bComment,
 textarea.bComment {
 	background-color: #f0f0f0;

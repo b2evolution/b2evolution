@@ -73,6 +73,7 @@ switch($action)
 		 */
 		param( 'comment', 'integer', true );
 		$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
+		$edited_Comment = Comment_get_by_ID( $comment );
 
 		$admin_pagetitle = T_('Editing comment');
 		require (dirname(__FILE__).'/_menutop.php');

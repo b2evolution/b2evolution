@@ -136,11 +136,11 @@ class DataObject
 			switch( $loop_dbchange['type'] )
 			{
 				case 'string':
-					$sql_values[] = "'". $DB->escape( $loop_value ). "' ";
+					$sql_values[] = $DB->quote( $loop_value );
 					break;
 
 				default:
-					$sql_values[] = $loop_value;
+					$sql_values[] = $DB->null( $loop_value );
 			}
 		}
 

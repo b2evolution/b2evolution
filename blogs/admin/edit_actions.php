@@ -423,9 +423,12 @@ switch($action)
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', '', true, $blog );
 
-		param( 'newcomment_author', 'string', true );
-		param( 'newcomment_author_email', 'string' );
-		param( 'newcomment_author_url', 'string' );
+		if( $edited_Comment->author_User === NULL )
+		{ // If this is not a member comment
+			param( 'newcomment_author', 'string', true );
+			param( 'newcomment_author_email', 'string' );
+			param( 'newcomment_author_url', 'string' );
+		}
 		param( 'content', 'html' );
 		param( "post_autobr", 'integer', ($comments_use_autobr == 'always')?1:0 );
 
@@ -444,10 +447,14 @@ switch($action)
 		}
 
 		$edited_Comment->set( 'content', $content );
-		$edited_Comment->set( 'author', $newcomment_author );
-		$edited_Comment->set( 'author_email', $newcomment_author_email );
-		$edited_Comment->set( 'author_url', $newcomment_author_url );
 
+		if( $edited_Comment->author_User === NULL )
+		{ // If this is not a member comment
+			$edited_Comment->set( 'author', $newcomment_author );
+			$edited_Comment->set( 'author_email', $newcomment_author_email );
+			$edited_Comment->set( 'author_url', $newcomment_author_url );
+		}
+		
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
 			$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );

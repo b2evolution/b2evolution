@@ -19,7 +19,7 @@ class Comment extends DataObject
 	 * @access protected
 	 */
 	var $Item = NULL;
-	
+	var $author_User = NULL;
 	var	$type;
 	var	$status;
 	var	$author;
@@ -49,8 +49,18 @@ class Comment extends DataObject
 		else
 		{
 			$this->ID = $db_row['comment_ID'];
+
 			// Get parent Item
 			$this->Item = $ItemCache->get_by_ID(  $db_row['comment_post_ID'] );
+			
+			// Get Author User
+			$author_ID = $db_row['comment_author_ID'];
+			if( !empty($author_ID) )
+			{
+				$authordata = get_userdata( $author_ID );
+				$this->author_User = new User( $authordata ); // COPY!
+			}
+						
 			$this->type = $db_row['comment_type'];
 			$this->status = $db_row['comment_status'];
 			$this->author = $db_row['comment_author'];
@@ -103,16 +113,32 @@ class Comment extends DataObject
 	 *
 	 * {@internal Comment::author(-) }}
 	 *
+	 * @param string String to display before author name if not a user
+	 * @param string String to display after author name if not a user
+	 * @param string String to display before author name if he's a user
+	 * @param string String to display after author name if he's a user
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean true for link, false if you want NO html link
 	 */
-	function author( $format = 'htmlbody', $makelink = false ) 
+	function author( $before = '', $after = '', $before_user = '', $after_user = '#', 
+										$format = 'htmlbody', $makelink = false ) 
 	{
-		if( strlen( $this->author_url ) <= 10 ) $makelink = false;
-		
-		if( $makelink ) echo '<a href="'.$this->author_url.'">';
-		$this->disp( 'author', $format );
-		if( $makelink ) echo '</a>';
+		if( $this->author_User !== NULL )
+		{ // Author is a user
+			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
+			echo $before_user;
+			$this->author_User->prefered_name( $format );
+			echo $after_user;
+		}
+		else
+		{	// Display info recorded at edit time:
+			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
+			echo $before;
+			if( $makelink ) echo '<a href="'.$this->author_url.'">';
+			$this->disp( 'author', $format );
+			if( $makelink ) echo '</a>';
+			echo $after;
+		}
 	}
 
 
@@ -147,11 +173,20 @@ class Comment extends DataObject
 	 */
 	function author_email( $linktext='', $before='', $after='', $makelink = true ) 
 	{
-		if( strlen( $this->author_email ) > 5 )
+		if( $this->author_User !== NULL )
+		{ // Author is a user
+			$email = $this->author_User->get('email');
+		}
+		else
+		{
+			$email = $this->author_email;
+		}
+		
+		if( strlen( $email ) > 5 )
 		{	// If email exists:
 			echo $before;
-			if( $makelink ) echo '<a href="mailto:'.$this->author_email.'">';
-			echo ($linktext != '') ? $linktext : $this->author_email;
+			if( $makelink ) echo '<a href="mailto:'.$email.'">';
+			echo ($linktext != '') ? $linktext : $email;
 			if( $makelink ) echo '</a>';
 			echo $after;
 		}
@@ -171,11 +206,20 @@ class Comment extends DataObject
 	 */
 	function author_url( $linktext='', $before='', $after='', $makelink = true ) 
 	{
-		if( strlen( $this->author_url ) > 10 )
+		if( $this->author_User !== NULL )
+		{ // Author is a user
+			$url = $this->author_User->get('url');
+		}
+		else
+		{
+			$url = $this->author_url;
+		}
+
+		if( strlen( $url ) > 10 )
 		{	// If URL exists:
 			echo $before;
-			if( $makelink ) echo '<a href="'.$this->author_url.'">';
-			echo ($linktext != '') ? $linktext : $this->author_url;
+			if( $makelink ) echo '<a href="'.$url.'">';
+			echo ($linktext != '') ? $linktext : $url;
 			if( $makelink ) echo '</a>';
 			echo $after;
 			return true;

@@ -42,10 +42,10 @@ class Item extends DataObject
 	 */
 	function Item( $db_row = NULL )
 	{
-		global $tablecomments;
+		global $tableposts;
 		
 		// Call parent constructor:
-		parent::DataObject( $tablecomments, 'post_', 'ID' );
+		parent::DataObject( $tableposts, 'post_', 'ID' );
 	
 		if( $db_row == NULL )
 		{
@@ -89,13 +89,18 @@ class Item extends DataObject
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function gen_permalink( $mode = '', $blogurl = '' )
+	function gen_permalink( $mode = '', $blogurl = '', $force_single = false )
 	{
 		global $DB, $cacheweekly;
 
 		if( empty( $mode ) )
 			$mode = get_settings( 'pref_permalink_type' );
 	
+		if( $force_single && (strpos( $mode, 'archive' ) !== false) )
+		{	// Comments cannot be displayed in archive mode
+			$mode = 'pid';
+		}
+
 		if( empty( $blogurl ) ) 
 			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
 
@@ -710,20 +715,12 @@ class Item extends DataObject
 			$use_popup = $b2commentsjavascript;
 		}
 
-		if( empty( $mode ) )
-			$mode = get_settings( 'pref_permalink_type' );
-
-		if( strpos( $mode, 'archive' ) !== false )
-		{	// Comments cannot be displayed in archive mode
-			$mode = 'pid';
-		}
-
 		$number = generic_ctp_number($this->ID, $type);
 
 		if( ($number == 0) && $hideifnone )
 			return false;
 			
-		$url = $this->gen_permalink( $mode, $blogurl );
+		$url = $this->gen_permalink( $mode, $blogurl, true );
 		if( $use_popup )
 		{ // We need to tell b2evo to use the popup template
 			if( strpos( $url, '?' ) )
@@ -749,7 +746,7 @@ class Item extends DataObject
 		elseif( $number == 1 )
 			echo $one;
 	 	elseif( $number > 1 ) 
-			echo $more;
+			echo str_replace( '%', $number, $more );
 
 		echo '</a>';
 

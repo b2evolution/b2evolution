@@ -123,7 +123,7 @@ switch( $action )
 					}
 	
 					// Check for potentially affected comments:
-					$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content 
+					$sql = "SELECT * 
 									FROM $tablecomments 
 									WHERE comment_author_url LIKE '%$dbkeyword%' 
 									ORDER BY comment_date ASC";
@@ -140,7 +140,7 @@ switch( $action )
 						</strong></p>
 						<table class="thin">
 							<?php foreach( $res_affected_comments as $row_stats )
-							{ ?>
+							{ // TODO: new Comment( $row_stats ) ?>
 							<tr>
 								<td><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 								<td><?php echo $row_stats['comment_author'] ?></a></td>

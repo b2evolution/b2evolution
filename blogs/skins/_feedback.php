@@ -147,28 +147,49 @@
 		<!-- form to add a comment -->
 		<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 		
-			<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
+			<input type="hidden" name="comment_post_ID" value="<?php $Item->ID() ?>" />
 			<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>" />
-			
-			<fieldset>
-				<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
-				<div class="input"><input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" /></div>
-			</fieldset>
-	
-			
-			<fieldset>
-				<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
-				<div class="input"><input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" /><br />
-					<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
-				</div>
-			</fieldset>
-			
-			<fieldset>
-				<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
-				<div class="input"><input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" /><br />
-					<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
-				</div>
-			</fieldset>
+
+			<?php 
+			if( is_logged_in() ) 
+			{ // User is logged in: 
+				?>
+				<fieldset>
+					<div class="label"><?php echo T_('User') ?>:</div>
+					<div class="info">
+						<strong><?php $current_User->prefered_name()?></strong>
+						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
+						</div>
+				</fieldset>
+				<?php 
+			} 
+			else
+			{ // User is not loggued in: 
+				?>
+				<fieldset>
+					<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
+					<div class="input">
+							<input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" />
+					</div>
+				</fieldset>
+				
+				<fieldset>
+					<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
+					<div class="input"><input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" /><br />
+						<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
+					</div>
+				</fieldset>
+				
+				<fieldset>
+					<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
+					<div class="input"><input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" /><br />
+						<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
+					</div>
+				</fieldset>
+
+				<?php 
+				} 
+			?>
 					
 			<fieldset>
 				<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
@@ -184,9 +205,13 @@
 				
 				<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
 				<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes">(<?php echo T_('Line breaks become &lt;br /&gt;') ?>)</span><br />
-				<?php } ?>
-	
-				<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo T_('Remember me') ?></label> <span class="notes"><?php echo T_('(Set cookies for name, email &amp; url)') ?></span>
+				<?php } 
+				if( ! is_logged_in() ) 
+				{ // User is not logged in: 
+					?>
+					<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo T_('Remember me') ?></label> <span class="notes"><?php echo T_('(Set cookies for name, email &amp; url)') ?></span>
+					<?php 
+				} ?>
 				</div>
 			</fieldset>
 		

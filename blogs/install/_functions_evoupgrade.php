@@ -328,6 +328,16 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		echo 'Upgrading Comments table... ';
+		$query = "ALTER TABLE $tablecomments
+							ADD COLUMN comment_author_ID int unsigned NULL default NULL AFTER comment_status,
+							MODIFY COLUMN comment_author varchar(100) NULL,
+							MODIFY COLUMN comment_author_email varchar(100) NULL,
+							MODIFY COLUMN comment_author_url varchar(100) NULL,
+							MODIFY COLUMN comment_author_IP varchar(23) NOT NULL default ''";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
 	}
 
 

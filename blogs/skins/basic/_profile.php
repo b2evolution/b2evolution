@@ -20,7 +20,7 @@
 ?>
 
 	<!-- form to add a comment -->
-	<form action="<?php echo $htsrv_url ?>/profile_update.php" method="post" class="bComment">
+	<form action="<?php echo $htsrv_url ?>/profile_update.php" method="post">
 
 	<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
 	
@@ -55,7 +55,7 @@
 			<td align="right"><strong><label for="newuser_idmode"><?php echo T_('Identity shown') ?>:</label></strong></td>
 			<td>
 				<?php $idmode = get_user_info( 'idmode' ); ?>
-				<select name="newuser_idmode" class="bComment">
+				<select name="newuser_idmode">
 					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php user_info( 'nickname', 'htmlhead' ) ?></option>
 					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php user_info( 'login', 'htmlhead' ) ?></option>
 					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php user_info( 'firstname', 'htmlhead' ) ?></option>
@@ -80,17 +80,17 @@
 
 		<tr>
 			<td align="right"><strong><label for="pass1"><?php echo T_('New password') ?>:</label></strong></td>
-			<td><input type="password" name="pass1" id="pass1" value="" size="16" class="bComment" /></td>
+			<td><input type="password" name="pass1" id="pass1" value="" size="16" /></td>
 		</tr>
 	
 		<tr>
 			<td align="right"><strong><label for="pass2"><?php echo T_('Confirm new password') ?>:</label></strong></td>
-			<td><input type="password" name="pass2" id="pass2" value="" size="16" class="bComment" /></td>
+			<td><input type="password" name="pass2" id="pass2" value="" size="16" /></td>
 		</tr>		
 	
 		<tr>
 			<td align="center" colspan="2">
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" />
 			</td>
 		</tr>
 	</table>

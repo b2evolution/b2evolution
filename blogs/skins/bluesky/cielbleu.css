@@ -1,3 +1,6 @@
+
+@import url(../../rsc/forms.css);	/* Import default form styles */
+
 BODY {
 	PADDING-RIGHT: 0px;
 	PADDING-LEFT: 0px; 
@@ -156,28 +159,6 @@ img.logo
 	margin-right: 33ex;
 }
 /* Styles for comment form */
-form.bComment fieldset
-{
-	clear: both;
-	border: none;
-	margin: 2ex 0ex;
-	padding: 0ex;
-	/* border: 1px solid #f00; */
-}
-div.label
-{
-	float: left;
-	width: 18%;
-	text-align: right;
-	font-weight: bold;
-	position: relative;
-	top: .5ex;
-	/* border: 1px solid #00f; */
-}
-form.bComment label
-{
-	font-weight: bold;
-}
 div.input
 {
 	float: right;
@@ -203,9 +184,7 @@ select.bComment
 	width: 100%;
 	margin: 0ex;
 }
-fieldset .notes
-{
-	/* display: block; */
-	font-size: 80%;
-	color: #000;
+
+fieldset span.notes {
+	color: #000; /* override */
 }

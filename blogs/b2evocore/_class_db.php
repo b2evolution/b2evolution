@@ -89,6 +89,22 @@ class DB
 		return mysql_real_escape_string($str);				
 	}
 
+	function quote($str)
+	{
+		if( $str === NULL )
+			return 'NULL';
+		else
+			return "'".mysql_real_escape_string($str)."'";				
+	}
+
+	function null($val)
+	{
+		if( $val === NULL )
+			return 'NULL';
+		else
+			return $val;				
+	}
+
 	// ==================================================================
 	//	Print SQL/DB error.
 	function print_error($str = "")
