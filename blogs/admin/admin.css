@@ -367,30 +367,20 @@ span.line
 }
 #evologo
 {
-	float:left;
 	padding-left: 1em;
-	padding-right: 1em;
 	vertical-align: middle;
 	border: 0;
 }
 #headfunctions
 {
-	margin-top: .5ex;
+	float: right;
 	text-align:right;
-	margin-right: 1ex;
+	margin: 1ex;
 	color: #b0b0b0;
-}
-#headinfo
-{
-	padding-left: 1em;
-	line-height: 150%;
-	color: #b0b0b0;
-	white-space: nowrap;
 }
 #header ul 
 {
   margin:0;
-	clear: both;
   padding: 0.1ex 1em 0;
   list-style: none;
 }

@@ -60,7 +60,9 @@ switch( $action )
 					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>
 						<td><?php
-						echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date']);
+						preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
+						$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
+						echo date(locale_datefmt()." ".locale_timefmt(), $date);
 						?></td>
 						<td><?php echo $row_stats['comment_author'] ?></a></td>
 						<td><?php echo $row_stats['comment_author_url'] ?></td>

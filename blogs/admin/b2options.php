@@ -94,7 +94,7 @@ default:
 			<tr height="40">
 				<td height="40"><?php echo T_('Time difference') ?>:</td>
 				<td><input type="text" name="newtime_difference" value="<?php echo $time_difference ?>" size="2">
-				<em> <?php printf( T_('if you\'re not on the timezone of your server. Current server time is: %s'), date_i18n( locale_timefmt(), $servertimenow ) ) ?></em>
+				<em> <?php echo T_('if you\'re not on the timezone of your server') ?></em>
 				</td>
 			</tr>
 			<tr height="40">
