@@ -38,6 +38,7 @@ class Blog extends DataObject
 	var $default_skin;
 	var $force_skin = 0;
 	var $disp_bloglist = 0;
+	var $public = 1;
 	var $UID;
 
 	/** 
@@ -82,6 +83,7 @@ class Blog extends DataObject
 			$this->default_skin = $db_row->blog_default_skin;
 			$this->force_skin = $db_row->blog_force_skin;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
+			$this->public = $db_row->blog_public;
 			$this->UID = $db_row->blog_UID;
 		}
 	}	

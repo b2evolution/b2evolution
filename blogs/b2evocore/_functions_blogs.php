@@ -37,18 +37,20 @@ function blog_create(
 	$blog_pingtechnorati = 0,
 	$blog_pingweblogs = 1,
 	$blog_pingblodotgs = 0,
-	$blog_disp_bloglist	= 1
+	$blog_disp_bloglist	= 1,
+	$blog_public = 1
 )
 {
 	global $DB, $tableblogs, $query, $querycount, $default_locale;
 
 	if( $blog_locale == '#' ) $blog_locale = $default_locale;
 
-	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl, ".
-						"blog_stub, blog_staticfilename, ".
-						"blog_tagline, blog_description, blog_longdesc, blog_locale, blog_roll, blog_keywords,".
-						"blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
-						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist )
+	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl,
+						blog_stub, blog_staticfilename,
+						blog_tagline, blog_description, blog_longdesc, blog_locale, blog_roll, blog_keywords,
+						blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
+						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
+						blog_public )
 	VALUES ( ";
 	$query .= "'".$DB->escape($blog_name)."', ";
 	$query .= "'".$DB->escape($blog_shortname)."', ";
@@ -64,7 +66,7 @@ function blog_create(
 	$query .= "'".$DB->escape($blog_UID)."',
 	$blog_allowtrackbacks, $blog_allowpingbacks,
 	$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
-	$blog_disp_bloglist )	";
+	$blog_disp_bloglist, $blog_public )	";
 	if( ! ($DB->query( $query )) )
 		return 0;
 
@@ -270,7 +272,7 @@ function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams 
  *
  * fplanque: created
  */
-function blog_list_start( $need='' )
+function blog_list_start( $need = '' )
 {
 	global $cache_blogs, $curr_blogparams, $curr_blog_ID;
 

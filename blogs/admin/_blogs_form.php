@@ -20,9 +20,11 @@
 		<?php
 			form_select( 'blog_default_skin', $blog_default_skin, 'skin_options', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
 
-			form_checkbox( 'blog_force_skin', 1-$blog_force_skin, T_('Allow skin switching'), T_("Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).") );
+			form_checkbox( 'blog_force_skin', 1-$blog_force_skin, T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).') );
 
-			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display blog list'), T_("Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this).") );
+			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this).') );
+
+			form_checkbox( 'blog_public', $blog_public, T_('Include in public blog list'), T_('Check this if you want to get this blog displayed in the list of all blogs.') );
 		?>
 	</fieldset>
 

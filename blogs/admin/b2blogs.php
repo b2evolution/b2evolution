@@ -214,6 +214,9 @@ switch($action)
 				param( 'blog_disp_bloglist', 'integer', 0 );
 				$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
 
+				param( 'blog_public', 'integer', 0 );
+				$edited_Blog->set( 'public', $blog_public );
+
 				param( 'blog_default_skin', 'string', true );
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
 
@@ -336,6 +339,7 @@ switch($action)
 				$blog_roll = get_bloginfo( 'blogroll' );
 				$blog_keywords = get_bloginfo( 'keywords' );
 				$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
+				$blog_public = get_bloginfo( 'public' );
 				$blog_default_skin = get_bloginfo( 'default_skin' );
 				$blog_force_skin = $edited_Blog->get( 'force_skin' );
 				require( dirname(__FILE__) . '/_blogs_form.php' );
