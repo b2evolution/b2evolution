@@ -123,7 +123,8 @@ function deldir_recursive( $dir )
  * Get the size of an image file
  *
  * @param string absolute file path
- * @param string what property/format to get: 'width', 'height', 'widthxheight', 'type', 'string' (as for img tags), else 'widthheight' (array)
+ * @param string what property/format to get: 'width', 'height', 'widthxheight',
+ *               'type', 'string' (as for img tags), else 'widthheight' (array)
  * @return mixed false if no image, otherwise what was requested through $param
  */
 function imgsize( $path, $param )
@@ -310,6 +311,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.10  2004/10/12 22:33:40  blueyed
+ * minor doc formatation
+ *
  * Revision 1.9  2004/10/12 17:22:30  fplanque
  * Edited code documentation.
  *
