@@ -25,7 +25,6 @@ $current_User->check_perm( 'upload', 'any', true );
 	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('upload images/files') ?></title>
 	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="blue.css" rel="alternate stylesheet" type="text/css" title="Blue" />
 	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
 	<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
 	<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />

@@ -502,4 +502,11 @@ switch($action)
 // List the blogs:
 require( dirname(__FILE__).'/_blogs_list.php' );
 require( dirname(__FILE__).'/_footer.php' );
+
+/*
+ * $Log$
+ * Revision 1.18  2004/11/22 10:41:58  fplanque
+ * minor changes
+ *
+ */
 ?>
