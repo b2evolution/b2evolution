@@ -169,11 +169,11 @@ switch($action)
 			case 'general':
 				param( 'blog_tagline', 'html', '' );
 				param( 'blog_longdesc', 'html', '' );
-				param( 'blog_roll', 'html', '' );
+				param( 'blog_notes', 'html', '' );
 
 				$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
 				$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
-				$blog_roll = format_to_post( $blog_roll, 0, 0 );
+				$blog_notes = format_to_post( $blog_notes, 0, 0 );
 
 				if ( errors_display( T_('Cannot update, please correct these errors:' ), '') )
 				{
@@ -183,7 +183,7 @@ switch($action)
 
 				$edited_Blog->set( 'tagline', $blog_tagline );
 				$edited_Blog->set( 'longdesc', $blog_longdesc );
-				$edited_Blog->set( 'roll', $blog_roll );
+				$edited_Blog->set( 'notes', $blog_notes );
 
 				param( 'blog_name', 'string', true );
 				$edited_Blog->set( 'name', $blog_name );
@@ -214,6 +214,9 @@ switch($action)
 
 				param( 'blog_public', 'integer', 0 );
 				$edited_Blog->set( 'public', $blog_public );
+
+				param( 'blog_linkblog', 'integer', 0 );
+				$edited_Blog->set( 'linkblog', $blog_linkblog );
 
 				param( 'blog_default_skin', 'string', true );
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
@@ -336,7 +339,8 @@ switch($action)
 				$blog_access_type = $edited_Blog->get( 'access_type' );
 				$blog_siteurl = get_bloginfo( 'subdir' );
 				$blog_stub = get_bloginfo( 'stub' );
-				$blog_roll = get_bloginfo( 'blogroll' );
+				$blog_linkblog = get_bloginfo( 'linkblog' );
+				$blog_notes = get_bloginfo( 'notes' );
 				$blog_keywords = get_bloginfo( 'keywords' );
 				$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
 				$blog_public = get_bloginfo( 'public' );
@@ -479,12 +483,12 @@ switch($action)
 				$blog = $edited_Blog->ID;
 				# This setting retricts posts to those published, thus hiding drafts.
 				$show_statuses = array();
-				# This is the blog to be used as a blogroll (set to 0 if you don't want to use this feature)
-				$blogroll_blog = 4;
-				# This is the list of categories to restrict the blogroll to (cats will be displayed recursively)
-				$blogroll_cat = '';
-				# This is the array if categories to restrict the blogroll to (non recursive)
-				$blogroll_catsel = array( );
+				# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
+				$linkblog_blog = 4;
+				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+				$linkblog_cat = '';
+				# This is the array if categories to restrict the linkblog to (non recursive)
+				$linkblog_catsel = array( );
 				# Here you can set a limit before which posts will be ignored
 				$timestamp_min = '';
 				# Here you can set a limit after which posts will be ignored

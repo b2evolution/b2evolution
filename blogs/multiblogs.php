@@ -10,7 +10,7 @@
 	$blog = 2;		// 2 is for "demo blog A" or your upgraded blog (depends on your install)
 
 	# Tell b2evolution you don't want to use evoSkins
-	# (evoSkins are designed to display only one blog at once + optionnaly a blogroll)
+	# (evoSkins are designed to display only one blog at once + optionnaly a linkblog)
 	$skin = '';
 
 	# This setting retricts posts to those published, thus hiding drafts.
@@ -236,7 +236,7 @@
 	<?php
 		// Dirty trick until we get everything into objects:
 		$saved_blog = $blog;
-		$blog = 4;		// Blogroll now
+		$blog = 4;		// Linkblog now
 		$Blog_roll = Blog_get_by_ID( 4 ); // Blog roll
 	?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
@@ -244,9 +244,9 @@
 		// You can restrict to specific categories by listing them in the two params below: '', array()
 		// '', array(9,15) will restrict to cats 9 and 15
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
-		$BlogRollList = & new ItemList( $blog,	$show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
+		$LinkblogList = & new ItemList( $blog,	$show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
 
-		while( $Item = $BlogRollList->get_item() )
+		while( $Item = $LinkblogList->get_item() )
 		{
 ?>
 		<div class="bPostSide" lang="<?php $Item->lang() ?>">

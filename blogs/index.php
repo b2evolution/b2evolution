@@ -56,16 +56,16 @@ if( empty($blog) )
 # You should not have to change this.
 $show_statuses = array();
 
-# This is the blog to be used as a blogroll (set to 0 if you don't want to use this feature)
-$blogroll_blog = 4;
+# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
+$linkblog_blog = 4;
 
-# This is the list of categories to restrict the blogroll to (cats will be displayed recursively)
-# Example: $blogroll_cat = '4,6,7';
-$blogroll_cat = '';
+# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+# Example: $linkblog_cat = '4,6,7';
+$linkblog_cat = '';
 
-# This is the array if categories to restrict the blogroll to (non recursive)
-# Example: $blogroll_catsel = array( 4, 6, 7 );
-$blogroll_catsel = array( );
+# This is the array if categories to restrict the linkblog to (non recursive)
+# Example: $linkblog_catsel = array( 4, 6, 7 );
+$linkblog_catsel = array( );
 
 # Here you can set a limit before which posts will be ignored
 # You can use a unix timestamp value or 'now' which will hide all posts in the past

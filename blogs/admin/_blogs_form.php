@@ -25,6 +25,8 @@
 			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this).') );
 
 			form_checkbox( 'blog_public', $blog_public, T_('Include in public blog list'), T_('Check this if you want to get this blog displayed in the list of all blogs.') );
+		
+			form_select_object( 'blog_linkblog', $edited_Blog->get('linkblog'), $BlogCache, T_('Linkblog'), T_('The linkblog that should be displayed with this blog.'), true );
 		?>
 	</fieldset>
 
@@ -46,12 +48,13 @@
 		</fieldset>
 
 		<fieldset>
-			<div class="label"><label for="blog_roll" ><?php echo T_('Blogroll text') ?>:</label></div>
-			<div class="input"><textarea name="blog_roll" id="blog_roll" rows="5" cols="50" class="large"><?php echo $blog_roll ?></textarea>
-			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
+			<div class="label"><label for="blog_notes" ><?php echo T_('Notes') ?>:</label></div>
+			<div class="input"><textarea name="blog_notes" id="blog_notes" rows="5" cols="50" class="large"><?php echo $blog_notes ?></textarea>
+			<span class="notes"><?php echo T_('Additional info. [we need more description here]') ?></span></div>
 		</fieldset>
+	
 	</fieldset>
-
+	
 	<fieldset>
 		<fieldset>
 			<div class="input">

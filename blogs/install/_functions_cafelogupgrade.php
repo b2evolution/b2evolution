@@ -25,8 +25,8 @@ function upgrade_cafelog_tables()
 	global $oldtableposts, $oldtableusers, $oldtablesettings, $oldtablecategories, $oldtablecomments;
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 	global $DB;
 
 	// Create blogs:
@@ -161,8 +161,8 @@ function upgrade_cafelog_tables()
 	
 	create_default_categories( false /* not for A */ );
 
-	// POPULATE THE BLOGROLL:
-	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+	// POPULATE THE LINKBLOG:
+	populate_linkblog( $now, $cat_linkblog_b2evo, $cat_linkblog_contrib );
 
 	// Create other default contents:
 	create_default_contents( false /* not for A */ );

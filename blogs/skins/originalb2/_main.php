@@ -25,7 +25,7 @@
 </head>
 <body>
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require( dirname(__FILE__).'/_bloglist.php)' ); 
+	require( dirname(__FILE__).'/_bloglist.php' ); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id="header"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" title="<?php $Blog->disp( 'name', 'htmlattr' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></div>
@@ -76,7 +76,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 0;				// Display the pingbacks if requested
 		$disp_title = "Comments:";
-		require( dirname(__FILE__).'/_feedback.php)' );
+		require( dirname(__FILE__).'/_feedback.php' );
 
 		// this includes the trackbacks
 		$disp_comments = 0;					// Display the comments if requested
@@ -85,7 +85,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 0;				// Display the pingbacks if requested
 		$disp_title = "Trackbacks:";
-		require( dirname(__FILE__).'/_feedback.php)' );
+		require( dirname(__FILE__).'/_feedback.php' );
 
 		// this includes the pingbacks
 		$disp_comments = 0;					// Display the comments if requested
@@ -94,7 +94,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		$disp_title = "Pingbacks:";
-		require( dirname(__FILE__).'/_feedback.php)' );		
+		require( dirname(__FILE__).'/_feedback.php' );		
 ?>
 
 </div>
@@ -143,7 +143,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 
 <h4>categories:</h4>
 <form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
-<?php	require( dirname(__FILE__).'/_categories.php)' ); ?>
+<?php	require( dirname(__FILE__).'/_categories.php' ); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 </form>
 
@@ -157,7 +157,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 
 <h4><?php echo T_('archives') ?>:</h4>
 <ul class="compress">
-<?php	require( dirname(__FILE__).'/_archives.php)' ); ?>
+<?php	require( dirname(__FILE__).'/_archives.php' ); ?>
 </ul>
 
 <h4>skins:</h4>

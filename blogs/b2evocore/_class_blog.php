@@ -27,7 +27,8 @@ class Blog extends DataObject
 	var $siteurl;
 	var $staticfilename;
 	var $stub;
-	var $blogroll;
+	var $linkblog;
+	var $notes;
 	var $keywords;
 	var $allowtrackbacks = 0;
 	var $allowpingbacks = 0;
@@ -72,7 +73,8 @@ class Blog extends DataObject
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->staticfilename = $db_row->blog_staticfilename;
 			$this->stub = $db_row->blog_stub;
-			$this->blogroll = $db_row->blog_roll;
+			$this->linkblog = $db_row->blog_linkblog;
+			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowpingbacks = $db_row->blog_allowpingbacks;

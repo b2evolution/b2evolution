@@ -83,18 +83,19 @@ function create_b2evo_tables()
 		blog_siteurl varchar(120) NOT NULL default '',
 		blog_staticfilename varchar(30) NULL default NULL,
 		blog_stub VARCHAR(30) NULL DEFAULT 'blog.php',
-		blog_roll text,
+		blog_notes TEXT NULL,
 		blog_keywords tinytext,
-		blog_allowtrackbacks tinyint(1) NOT NULL default 1,
-		blog_allowpingbacks tinyint(1) NOT NULL default 1,
-		blog_pingb2evonet tinyint(1) NOT NULL default 0,
-		blog_pingtechnorati tinyint(1) NOT NULL default 0,
-		blog_pingweblogs tinyint(1) NOT NULL default 0,
-		blog_pingblodotgs tinyint(1) NOT NULL default 0,
+		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
+		blog_allowpingbacks TINYINT(1) NOT NULL default 1,
+		blog_pingb2evonet TINYINT(1) NOT NULL default 0,
+		blog_pingtechnorati TINYINT(1) NOT NULL default 0,
+		blog_pingweblogs TINYINT(1) NOT NULL default 0,
+		blog_pingblodotgs TINYINT(1) NOT NULL default 0,
 		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
-		blog_force_skin tinyint(1) NOT NULL default 0,
-		blog_disp_bloglist tinyint NOT NULL DEFAULT 1,
-		blog_public tinyint NOT NULL DEFAULT 1,
+		blog_force_skin TINYINT(1) NOT NULL default 0,
+		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
+		blog_linkblog INT(4) INT(4) NOT NULL DEFAUL 0,
+		blog_public TINYINT(1) NOT NULL DEFAULT 1,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	 (blog_ID)
 	)";
@@ -362,45 +363,45 @@ function create_groups()
 }
 
 /*
- * populate_blogroll(-)
+ * populate_linkblog(-)
  */
-function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
+function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 {
 	global $timestamp, $default_locale;
 
-	echo "Creating default blogroll entries... ";
+	echo "Creating default linkblog entries... ";
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/' );
+	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'nl-NL', '', 0, true, '', 'http://www.rononline.nl/' );
+	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_linkblog_contrib, array(), 'published',	'nl-NL', '', 0, true, '', 'http://www.rononline.nl/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
+	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/' );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/' );
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/' );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/' );
+	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/' );
 
-	// Insert a post into blogroll:
+	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/' );
+	bpost_create( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/' );
 
 	echo "OK.<br />\n";
 
@@ -418,8 +419,7 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = 'Demo Blog A', $blog_a_longdesc = '#' )
 {
 	global $default_locale, $query, $timestamp;
-	global $stub_all, $stub_a, $stub_b, $stub_roll;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 
 	$default_blog_longdesc = T_("This is a demo blog named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s");
 
@@ -459,7 +459,7 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_ID = 4;
-	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_listblog_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	echo "OK.<br />\n";
 
@@ -476,31 +476,31 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 function create_default_categories( $populate_blog_a = true )
 {
 	global $query, $timestamp;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 
 	echo 'Creating sample categories... ';
 
 	if( $populate_blog_a )
 	{
 		// Create categories for blog A
-		$cat_ann_a = cat_create( "Announcements [A]", 'NULL', 2 );
-		$cat_news = cat_create( "News", 'NULL', 2 );
-		$cat_bg = cat_create( "Background", 'NULL', 2 );
+		$cat_ann_a = cat_create( 'Announcements [A]', 'NULL', 2 );
+		$cat_news = cat_create( 'News', 'NULL', 2 );
+		$cat_bg = cat_create( 'Background', 'NULL', 2 );
 	}
 
 	// Create categories for blog B
-	$cat_ann_b = cat_create( "Announcements [B]", 'NULL', 3 );
-	$cat_fun = cat_create( "Fun", 'NULL', 3 );
-	$cat_life = cat_create( "In real life", $cat_fun, 3 );
-	$cat_web = cat_create( "On the web", $cat_fun, 3 );
-	$cat_sports = cat_create( "Sports", $cat_life, 3 );
-	$cat_movies = cat_create( "Movies", $cat_life, 3 );
-	$cat_music = cat_create( "Music", $cat_life, 3 );
-	$cat_b2evo = cat_create( "b2evolution Tips", 'NULL', 3 );
+	$cat_ann_b = cat_create( 'Announcements [B]', 'NULL', 3 );
+	$cat_fun = cat_create( 'Fun', 'NULL', 3 );
+	$cat_life = cat_create( 'In real life', $cat_fun, 3 );
+	$cat_web = cat_create( 'On the web', $cat_fun, 3 );
+	$cat_sports = cat_create( 'Sports', $cat_life, 3 );
+	$cat_movies = cat_create( 'Movies', $cat_life, 3 );
+	$cat_music = cat_create( 'Music', $cat_life, 3 );
+	$cat_b2evo = cat_create( 'b2evolution Tips', 'NULL', 3 );
 
-	// Create categories for blogroll
-	$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 );
-	$cat_blogroll_contrib = cat_create( "contributors", 'NULL', 4 );
+	// Create categories for linkblog
+	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', 4 );
+	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', 4 );
 
 	echo "OK.<br />\n";
 
@@ -518,7 +518,7 @@ function create_default_categories( $populate_blog_a = true )
 function create_default_contents( $populate_blog_a = true )
 {
 	global $query, $timestamp;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 
 	echo 'Creating sample posts... ';
 
@@ -561,7 +561,7 @@ function create_default_contents( $populate_blog_a = true )
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."), 
-								T_("<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>
+								T_("<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.</p>
 
 <p>Some of these blogs have a special role. Read about it on the corresponding page.</p>
 
@@ -610,8 +610,8 @@ function populate_main_tables()
 	global $random_password, $query;
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 	global $DB;
 	global $default_locale;
 
@@ -641,8 +641,8 @@ function populate_main_tables()
 
 	echo "OK.<br />\n";
 
-	// POPULATE THE BLOGROLL:
-	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+	// POPULATE THE LINKBLOG:
+	populate_linkblog( $now, $cat_linkblog_b2evo, $cat_linkblog_contrib );
 
 	create_default_contents();
 
@@ -707,7 +707,7 @@ function populate_main_tables()
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
 							( $blog_b_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_roll_ID, ".$User_Admin->get('ID').", 1,
+							( $blog_linkblog_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
 							( $blog_a_ID, ".$User_Demo->get('ID').", 1,
 							'draft', 0, 0, 0, 0 )";

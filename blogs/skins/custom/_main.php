@@ -233,10 +233,10 @@
 
 
 	<div class="bSideItem">
-		<h3><?php echo T_('Blogroll') ?></h3>
-		<?php // -------------------------- BLOGROLL INCLUDED HERE -----------------------------
-			require( dirname(__FILE__).'/_blogroll.php' );
-			// -------------------------------- END OF BLOGROLL ---------------------------------- ?>
+		<h3><?php echo T_('Linkblog') ?></h3>
+		<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
+			require( dirname(__FILE__).'/_linkblog.php' );
+			// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
 	</div>
 
 	<div class="bSideItem">
