@@ -65,10 +65,17 @@ a:hover {
 	padding: 0ex;
 	overflow: hidden;
 }
+div.panelinfo {
+	clear: both;
+	border: 1px solid #765;
+	background-color: #f4f3f0;
+	padding: 0.1ex 2ex 0.1ex 2ex; 
+	margin: 2ex 3ex;
+}
 div.panelblock {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
-	margin: 3ex;
+	margin: 2ex 3ex;
 }
 div.pt
 {
@@ -76,6 +83,7 @@ div.pt
 }
 div.panelblocktabs
 {
+	clear: both;
 	margin-top: 1ex;
 	float:left;
 	width:100%;
@@ -88,9 +96,8 @@ div.tabbedpanelblock {
 	border: 1px solid #765;
 	background-color: #fbfaf9;
 	border-top: none;
-	padding: 2ex;
-	margin: 3ex;
-	margin-top: 0;
+	padding: 1ex 2ex 2ex 2ex;
+	margin: 0 3ex 2ex 3ex;
 }
 div.loginblock {
 	border: 1px solid #CCCCCC;
@@ -114,13 +121,6 @@ div.loginblock {
 	border: 1px solid #CCCCCC;
 	padding: 0ex 2ex 2ex;
 	margin: 3ex 3ex 3ex 0ex;
-}
-div.panelinfo {
-	width: 90%;
-	padding: 2ex;
-	margin: 3ex auto;
-	border: 1px solid #def;
-	background: #eef5ff;
 }
 div.error {
 	padding: 2ex;

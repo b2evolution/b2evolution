@@ -7,40 +7,32 @@
  */
 require_once( dirname(__FILE__) . '/_header.php' );
 require_once( dirname(__FILE__) . '/' . $admin_dirout . '/' . $core_subdir . '/_functions_hitlogs.php' ); // referer logging
-$title = T_('View Stats');
+$title = T_('View Stats for Blog:');
 
 param( 'blog', 'integer', 0, true );
 param( 'action', 'string' );
 param( 'show', 'string', 'referers' );
 
 require(dirname(__FILE__) . '/_menutop.php');
-?>
-	:
-	<?php
-	if( $show == 'summary' ) echo '<strong>[';
-	echo '<a href="b2stats.php?show=summary&blog=', $blog, '">', T_('Summary'), '</a>';
-	if( $show == 'summary' ) echo ']</strong>';
-	echo ' | ';
-	if( $show == 'referers' ) echo '<strong>[';
-	echo '<a href="b2stats.php?show=referers&blog=', $blog, '">', T_('Referers'), '</a>';
-	if( $show == 'referers' ) echo ']</strong>';
-	echo ' | ';
-	if( $show == 'refsearches' ) echo '<strong>[';
-	echo '<a href="b2stats.php?show=refsearches&blog=', $blog, '">', T_('Refering Searches'), '</a>';
-	if( $show == 'refsearches' ) echo ']</strong>';
-	echo ' | ';
-	if( $show == 'syndication' ) echo '<strong>[';
-	echo '<a href="b2stats.php?show=syndication&blog=', $blog, '">', T_('Syndication'), '</a>';
-	if( $show == 'syndication' ) echo ']</strong>';
-	echo ' | ';
-	if( $show == 'useragents' ) echo '<strong>[';
-	echo '<a href="b2stats.php?show=useragents&blog=', $blog, '">', T_('User Agents'), '</a>';
-	if( $show == 'useragents' ) echo ']</strong>';
-	echo ' | ';
-	if( $show == 'other' ) echo '<strong>[';
-	echo '<a href="b2stats.php?show=other&blog=', $blog, '">', T_('Direct Accesses'), '</a>';
-	if( $show == 'other' ) echo ']</strong>';
-
+if( $blog == 0 )
+{ // This is the blog being displayed on this page
+	echo '<strong>[<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>]</strong>';
+}
+else
+{ // This is another blog
+	echo '<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>';
+}
+for( $curr_blog_ID=blog_list_start('stub');
+			$curr_blog_ID!=false;
+			 $curr_blog_ID=blog_list_next('stub') )
+	{
+	if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
+		| <strong>[<a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
+<?php } else { // This is another blog ?>
+		| <a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
+<?php
+	}
+}
 require( dirname(__FILE__) . '/_menutop_end.php' );
 
 // Check permission:
@@ -100,51 +92,69 @@ switch( $action )
 		<?php
 		break;
 }
+?>
 
-function stats_blog_select()
-{
-	global $blog, $show;
-	echo '<p>', T_('Filter'), ': ';
-	if( $blog == 0 )
-	{ // This is the blog being displayed on this page
-		echo '<strong>[<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>]</strong>';
-	}
-	else
-	{ // This is another blog
-		echo '<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>';
-	}
-	for( $curr_blog_ID=blog_list_start('stub');
-				$curr_blog_ID!=false;
-				 $curr_blog_ID=blog_list_next('stub') )
-		{
-		if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-			| <strong>[<a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
-	<?php } else { // This is another blog ?>
-			| <a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
-	<?php
-		}
-	}
-	echo '</p>';
-}
+<ul class="tabs">
+	<!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display -->
+</ul>
+<div class="pt">
+	<div class="panelblocktabs">
+		<ul class="tabs">
+		<?php
+		if( $show == 'summary' )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+		echo '<a href="b2stats.php?show=summary&blog=', $blog, '">', T_('Summary'), '</a></li>';
 
+		if( $show == 'referers' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2stats.php?show=referers&blog=', $blog, '">', T_('Referers'), '</a></li>';
+
+		if( $show == 'refsearches' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2stats.php?show=refsearches&blog=', $blog, '">', T_('Refering Searches'), '</a></li>';
+
+		if( $show == 'syndication' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2stats.php?show=syndication&blog=', $blog, '">', T_('Syndication'), '</a></li>';
+
+		if( $show == 'useragents' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2stats.php?show=useragents&blog=', $blog, '">', T_('User Agents'), '</a></li>';
+
+		if( $show == 'other' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2stats.php?show=other&blog=', $blog, '">', T_('Direct Accesses'), '</a></li>';
+
+		?>
+		</ul>
+	</div>
+</div>
+<div class="tabbedpanelblock">
+<?php
 switch( $show )
 {
 	case 'summary':
-?>
-<div class="panelblock">
-
-	<?php stats_blog_select(); ?>
-
-	<h3><?php echo T_('Summary') ?>:</h3>
-
-	<?php
+		?>
+		<h3><?php echo T_('Summary') ?>:</h3>
+		<?php
 		$sql = "SELECT COUNT(*)AS hits, hit_ignore, YEAR(visitTime) AS year, MONTH(visitTime) AS month,  DAYOFMONTH(visitTime) AS day FROM $tablehitlog ";
 		if( $blog > 0 )
 		{
 			$sql .= " WHERE hit_blog_ID = $blog ";
 		}
 		$sql .= ' GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
-		$querycount++;
 		$res_hits = $DB->get_results( $sql, ARRAY_A );
 		$hits = array();
 		$hits['no'] = 0;
@@ -218,17 +228,12 @@ switch( $show )
 			</tr>
 		<?php } ?>
 		</table>
-</div>
 
 <?php
 		break;
 
 		case 'referers':
-?>
-<div class="panelblock">
-
-	<?php stats_blog_select(); ?>
-
+		?>
 	<h3><?php echo T_('Last referers') ?>:</h3>
 	<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
 	<?php refererList(40,'global',1,1,'no','',$blog); ?>
@@ -268,18 +273,11 @@ switch( $show )
 	</table>
 	<p><?php echo T_('Total referers') ?>: <?php stats_total_hit_count() ?></p>
 
-</div>
-
 <?php
 		break;
 
 		case 'refsearches':
-?>
-
-<div class="panelblock">
-
-	<?php stats_blog_select(); ?>
-
+			?>
 	<h3><?php echo T_('Last refering searches') ?>:</h3>
 	<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',1,1,"'search'",'',$blog); ?>
@@ -326,18 +324,11 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 
-</div>
-
 <?php
 		break;
 
 		case 'syndication':
-?>
-
-<div class="panelblock">
-
-	<?php stats_blog_select(); ?>
-
+			?>
 	<h3><?php echo T_('Top Aggregators') ?>:</h3>
 	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(40, 'global', 0, 0, "'rss'", 'hit_user_agent', $blog, true, true); ?>
@@ -352,18 +343,11 @@ switch( $show )
 	</table>
 	<p><?php echo T_('Total RSS hits') ?>: <?php stats_total_hit_count() ?></p>
 
-</div>
-
 <?php
 		break;
 
 		case 'other':
-?>
-
-<div class="panelblock">
-
-	<?php stats_blog_select(); ?>
-
+		?>
 	<h3><?php echo T_('Last direct accesses') ?>:</h3>
 	<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 	<?php refererList(10,'global',1,1,"'invalid'",'',$blog); ?>
@@ -383,18 +367,11 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 
-</div>
-
 <?php
 		break;
 
 		case 'useragents':
-?>
-
-<div class="panelblock">
-
-	<?php stats_blog_select(); ?>
-
+			?>
 	<h3><?php echo T_('Top User Agents') ?>:</h3>
 	<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
@@ -407,11 +384,11 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 
-</div>
-
 <?php
 		break;
 }
-
+?>
+</div>
+<?php
 require( dirname(__FILE__).'/_footer.php' );
 ?>

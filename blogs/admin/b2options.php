@@ -89,6 +89,11 @@ if( $action == 'update' )
 				
 				// clear settings cache
 				$cache_settings = '';
+				?>
+				<div class="panelinfo">
+					<p><?php echo T_('Options updated.') ?></p>
+				</div>
+				<?php
 				break;
 		}
 }
@@ -99,10 +104,10 @@ $current_User->check_perm( 'options', 'view', true );
 
 
 	<div class="pt" >
+		<ul class="tabs">
+			<!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display -->
+		</ul>
 		<div class="panelblocktabs">
-			<ul class="tabs">
-				<!-- Yes, this empty UL is needed! It's a hack for correct CSS display on Mozilla -->
-			</ul>
 			<ul class="tabs">
 			<?php
 				if( $tab == '' )
