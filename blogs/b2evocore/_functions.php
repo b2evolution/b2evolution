@@ -930,6 +930,91 @@ function set_param(
 }
 
 
+
+/*
+ * param(-)
+ *
+ * Sets a parameter with values from the request or default
+ * except if it's already set!
+ * NEW version of set_param()
+ *
+ * fplanque: created
+ * removes magic quotes if they are set automatically by PHP
+ * TODO: add option to override what's already set.
+ */
+function param(
+	$var, 					// Variable to set
+	$type='',				// Force to boolean"integer"float"string"array"object"null" (since PHP 4.2.0) html
+	$default='',  	// Default value or TRUE if user input required
+	$memorize=false	// Do we need to memorize this to regenerate the URL
+)
+{
+	global $$var;
+	global $global_param_list;
+
+	// Check if already set
+	// WARNING: when PHP register globals is ON, COOKIES get priority og GET and POST with this!!!
+	if( !isset( $$var ) )
+	{
+		if( isset($_POST[$var]))
+		{
+			$$var = get_magic_quotes_gpc() ? stripslashes($_POST[$var]) : $_POST[$var];
+			// echo "$var=".$$var." set by POST!<br/>";
+		}
+		elseif( isset($_GET["$var"]))
+		{
+			$$var = get_magic_quotes_gpc() ? stripslashes($_GET[$var]) : $_GET[$var];
+			// echo "$var=".$$var." set by GET!<br/>";
+		}
+		elseif( isset($_COOKIE[$var]))
+		{
+			$$var = get_magic_quotes_gpc() ? stripslashes($_COOKIE[$var]) : $_COOKIE[$var];
+			// echo "$var=".$$var." set by COOKIE!<br/>";
+		}
+		elseif( $default === true )
+		{
+			die( sprintf( _('Parameter %s is required!'), $var ) );
+		}
+		else
+		{
+			$$var = $default;
+			// echo "$var=".$$var." set to default<br/>";
+		}
+	}
+	elseif( get_magic_quotes_gpc() )
+	{	// Variable was already set but we need to remove the auto quotes
+		$$var =stripslashes($$var);
+		// echo "$var=".$$var." was already set!<br/>";
+	}
+
+	// type will be forced even if it was set before and not overriden
+	if( !empty($type) )
+	{	// Force the type
+		// echo "forcing type!";
+		switch( $type )
+		{
+			case 'html':
+				// do nothing
+				break;
+
+			case 'string':
+				$$var = trim( strip_tags($$var) );
+				break;
+
+			default:
+				settype( $$var, $type );
+		}
+	}
+
+	if( $memorize )
+	{	// Memorize this parameter
+		if( !isset($global_param_list) ) $global_param_list = array();
+		$thisparam = array( 'var' => $var, 'type' => $type, 'default' => $default );
+		$global_param_list[] = $thisparam;
+	}
+}
+
+
 /*
  * regenerate_url(-)
  *
