@@ -10,8 +10,6 @@
  *
  * @package admin
  */
-// Enable this later when we have the page selection in the settings:
-// require_once (dirname(__FILE__). '/_header.php');
 
 # You can choose the page you want as the default below:
 require( dirname(__FILE__).'/b2edit.php' );

@@ -11,7 +11,7 @@
 require_once (dirname(__FILE__). '/_header.php');
 $admin_tab = 'edit';
 $admin_pagetitle = T_('Browse blog:');
-param( 'blog', 'integer', true );
+param( 'blog', 'integer', 0 );
 
 if( ($blog == 0) && $current_User->check_perm( 'blog_ismember', 1, false, $default_to_blog ) )
 {	// Default blog is a valid choice

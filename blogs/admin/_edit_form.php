@@ -41,9 +41,11 @@ if ($use_spellchecker)
 		var saved_action =  form.attributes.getNamedItem('action').value;
 		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
 		form.target = 'b2evo_preview';
+		// FP: Daniel please explain why you want to move this from here:
+		form.submit();
 		preview_window = window.open( '', 'b2evo_preview' );
 		preview_window.focus();
-		form.submit();
+		// to here: form.submit();
 		form.attributes.getNamedItem('action').value = saved_action;
 		form.target = '_self';
 	}
@@ -97,7 +99,7 @@ if ($use_spellchecker)
 
 		<span class="line">
 		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="50" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
+		<input type="text" name="post_title" size="49" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
 		</span>
 
 		<span class="line">
@@ -239,7 +241,7 @@ if ($use_spellchecker)
 	</fieldset>
 			
 	<?php
-	if( $action != 'editcomment' )
+	if( ($action != 'editcomment') && (get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks')) )
 	{ // this is for everything but comment editing
 		?>
 		<fieldset>

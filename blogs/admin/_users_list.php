@@ -102,7 +102,7 @@
 				echo '<td>&nbsp;';
 				if( !empty($email) )
 				{
-					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'"><img src="img/email.gif" border="0" alt="e-mail: '.$email.'" /></a>&nbsp;';
+					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'"><img src="img/email.gif"  alt="e-mail: '.$email.'" class="middle" /></a>&nbsp;';
 				}
 				echo '</td><td>&nbsp;';
 				if (($url != 'http://') and ($url != ''))
@@ -111,7 +111,7 @@
 					{
 						$url = 'http://'.$url;
 					}
-					echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
+					echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" alt=\"website: $url\" class=\"middle\" /></a>&nbsp;";
 				}
 				echo "</td>\n";
 				
