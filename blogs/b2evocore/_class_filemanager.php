@@ -44,7 +44,7 @@ class FileManager
 	 */
 	function FileManager( $current_User, $url, $dir = '#', $order = 'name', $asc = 1 )
 	{
-		global $basepath, $media_subdir, $core_dirout, $admin_subdir;
+		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir;
 
 		$this->Messages = new Log( 'error' );
 
@@ -60,6 +60,8 @@ class FileManager
 		// TODO: get user's/group's root
 		$this->root = $media_dir;
 		$this->debug( $this->root, 'root' );
+		$this->root_url = $baseurl.'/media';
+		$this->debug( $this->root_url, 'root_url' );
 		
 		if( $dir == '#' || empty($dir) )
 		{
@@ -116,6 +118,7 @@ class FileManager
 				{
 					$this->entries[ $i ]['type'] = 'dir';
 					$this->entries[ $i ]['size'] = '&lt;DIR&gt;';
+					$this->entries[ $i ]['size'] = $this->get_dirsize( $this->cwd.'/'.$entry );
 				}
 				else
 				{
@@ -355,99 +358,112 @@ class FileManager
 		switch( $what )
 		{
 			case 'path':
-				return $path;
+				$r = $path;
+				break;
+				
+			case 'url':
+				$r = $this->root_url.$this->subpath.$this->current_entry['name'];
+				break;
 			
 			case 'ext':  // the file extension, replaced in $displayiftrue
 				if( empty($param) && preg_match('/\.([^.])+$/', $this->current_entry['name'], $match) )
-				{
-					return sprintf( $displayiftrue, $match[1] );
-				}
+					$r = $match[1];
 				else
-				{
-					return false;
-				}
+					$r = false;
+				break;
 			
 			case 'perms':
 				if( $param != 'octal'
 						&& ($this->permlikelsl || $param == 'lsl') )
-					return $this->translatePerm( $this->current_entry['perms'] );
+					$r = $this->translatePerm( $this->current_entry['perms'] );
 				else
-					return substr( sprintf('%o', $this->current_entry['perms']), -3 );
+					$r = substr( sprintf('%o', $this->current_entry['perms']), -3 );
+				break;
 
 			case 'nicesize':
-				if( $this->current_entry['type'] == 'dir' )
-					return '';
-				else return $this->bytesreadable( $this->cget('size') );
+				if( ($r = $this->cget('size')) !== false )
+					$r = $this->bytesreadable( $r );
+				else
+					$r = '';
+				break;
 				
 			case 'imgsize':
 				if( !preg_match( '/\.(jpe?g|gif|png|swf)$/', $this->current_entry['name']) )
 				{
-					return false;
+					$r = false;
 				}
 				else
 				{
 					if( !($size = @getimagesize( $path )) )
-						return false;
-					elseif( $opt == 'width' )
-						return $size[0];
-					elseif( $opt == 'height' )
-						return $size[1];
-					elseif( $opt == 'type' )
+						$r = false;
+					elseif( $param == 'width' )
+						$r = $size[0];
+					elseif( $param == 'height' )
+						$r = $size[1];
+					elseif( $param == 'widthheight' )
+						$r = array( $size[0], $size[1] );
+					elseif( $param == 'type' )
 					{
 						switch( $size[1] )
 						{
-							case 1: return 'gif';
-							case 2: return 'jpg';
-							case 3: return 'png';
-							case 4: return 'swf';
-							default: return 'unknown';
+							case 1: $r = 'gif';
+							case 2: $r = 'jpg';
+							case 3: $r = 'png';
+							case 4: $r = 'swf';
+							default: $r = 'unknown';
 						}
 					}
-					elseif( $opt == 'string' )
-						return $size[3];
+					elseif( $param == 'string' )
+						$r = $size[3];
 					else
-						return $size[0].'x'.$size[1];
+						$r = $size[0].'x'.$size[1];
 				}
-
+				break;
 
 			case 'link':
 				if( $param == 'parent' ) // TODO: check if allowed
-					return url_add_param( $this->url, 'cd='.urlencode($this->subpath.'..') );
+					$r = url_add_param( $this->url, 'cd='.urlencode($this->subpath.'..') );
 				elseif( $param == 'home' )
 				{
 					// TODO: provide a dropdown list if various home dirs available to the user
-					return $this->url;
+					$r = $this->url;
 				}
 				
 				if( $this->current_entry['type'] == 'dir' && $param != 'forcefile' )
 				{
-					return url_add_param( $this->url, 'cd='.urlencode($this->subpath.$this->current_entry['name']) );
+					$r = url_add_param( $this->url, 'cd='.urlencode($this->subpath.$this->current_entry['name']) );
 				}
 				else
 				{
-					return url_add_param( $this->url, 'cd='.urlencode($this->subpath).'&amp;file='.urlencode($this->current_entry['name']) );
+					$r = url_add_param( $this->url, 'cd='.urlencode($this->subpath).'&amp;file='.urlencode($this->current_entry['name']) );
 				}
+				break;
 
 			case 'link_edit':
-				if( $this->current_entry['type'] == 'dir' ) return false;
-				return sprintf( $displayiftrue, $this->cget('link').'&amp;action=edit' );
+				if( $this->current_entry['type'] == 'dir' ) $r = false;
+				else $r = $this->cget('link').'&amp;action=edit';
+				break;
 
 			case 'link_copymove':
-				if( $this->current_entry['type'] == 'dir' ) return false;
-				return sprintf( $displayiftrue, $this->cget('link').'&amp;action=copymove' );
+				if( $this->current_entry['type'] == 'dir' ) $r = false;
+				else $r = $this->cget('link').'&amp;action=copymove';
+				break;
 
 			case 'link_rename':
-				#if( $this->current_entry['type'] == 'dir' ) return false;
-				return sprintf( $displayiftrue, $this->cget('link', 'forcefile').'&amp;action=rename' );
+				$r = $this->cget('link', 'forcefile').'&amp;action=rename';
+				break;
 
 			case 'link_delete':
-				return sprintf( $displayiftrue, $this->cget('link', 'forcefile').'&amp;action=delete' );
+				$r = $this->cget('link', 'forcefile').'&amp;action=delete';
+				break;
 
 			case 'link_editperm':
-				return sprintf( $displayiftrue, $this->cget('link', 'forcefile').'&amp;action=editperm' );
+				$r = $this->cget('link', 'forcefile').'&amp;action=editperm';
+				break;
 
 			case 'lastmod':
-				return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->current_entry['lastm'] );
+				$r = date_i18n( locale_datefmt().' '.locale_timefmt(), $this->current_entry['lastm'] );
+				break;
 
 			case 'sortlink':
 				return 1;
@@ -462,50 +478,46 @@ class FileManager
 				
 			case 'type':
 				if( $param == 'parent' )
-					return T_('go to parent directory');
+					$r = T_('go to parent directory');
 				elseif( $param == 'home' )
-					return T_('home directory');
+					$r = T_('home directory');
 				elseif( !isset($this->current_entry) )
-					return false;
+					$r = false;
 				elseif( $this->current_entry['type'] == 'dir' )
-					return T_('directory');
+					$r = T_('directory');
 				else
 				{
+					$r = T_('unknown');
 					foreach( $this->filetypes as $type => $desc )
 					{
 						if( preg_match('/'.$type.'$/i', $this->current_entry['name']) )
 						{
-							return $desc;
+							$r = $desc;
+							break;
 						}
 					}
-					return T_('Unknown');
 				}
+				break;
 
 			case 'iconfile':
 				if( $param == 'parent' )
-				{
-					return $this->fileicons_special['parent'];
-				}
+					$r = $this->fileicons_special['parent'];
 				elseif( $param == 'home' )
-				{
-					return $this->fileicons_special['home'];
-				}
+					$r = $this->fileicons_special['home'];
 				elseif( !isset($this->current_entry) )
-				{
-					return false;
-				}
+					$r = false;
 				elseif( $this->current_entry['type'] == 'dir' )
-				{
-					return $this->fileicons_special['folder'];
-				}
+					$r = $this->fileicons_special['folder'];
 				else foreach( $this->fileicons as $ext => $imgfile )
 				{
+					$r = $this->fileicons_special['unknown'];
 					if( preg_match( '/'.$ext.'$/i', $this->current_entry['name'], $match ) )
 					{
-						return $imgfile;
+						$r = $imgfile;
+						break;
 					}
 				}
-				return $this->fileicons_special['unknown'];
+				break;
 				
 			case 'iconimg':
 				$imgfile = $this->cget( 'iconfile', $param );
@@ -513,19 +525,24 @@ class FileManager
 
 				if( !is_file($imgpath) )
 				{
-					return false;
+					$r = false;
 				}
 				else
 				{
 					$imgsize = getimagesize( $imgpath );
 
-					return '<img src="'.$admin_url.'/img/fileicons/'.$imgfile.'" '.$imgsize[3].$this->cget('ext', $param, ' alt="%s"').' title="'.$this->cget('type', $param).'" '
-									.( empty($displayiftrue) ? '' : $displayiftrue ).' />';
+					$r = '<img src="'.$admin_url.'/img/fileicons/'.$imgfile.'" '.$imgsize[3].$this->cget('ext', $param, ' alt="%s"').' title="'.$this->cget('type', $param).'" />';
 				}
+				break;
 
 			default:
-				return ( isset( $this->current_entry[ $what ] ) ) ? $this->current_entry[ $what ] : false;
+				$r = ( isset( $this->current_entry[ $what ] ) ) ? $this->current_entry[ $what ] : false;
+				break;
 		}
+		if( $r && !empty($displayiftrue) )
+			return sprintf( $displayiftrue, $r );
+		else
+			return $r;
 	}
 
 	
@@ -536,16 +553,49 @@ class FileManager
 	 */
 	function cdisp( $what, $param = '', $displayiftrue = '' )
 	{
-		echo $this->cget( $what, $param, $displayiftrue );
+		if( ( $r = $this->cget( $what, $param, $displayiftrue ) ) !== false )
+		{
+			echo $r;
+			return true;
+		}
+		return $r;
+	}
+	
+	
+	/**
+	 * wrapper for cget_file() to display right away
+	 * @param string the file
+	 * @param string property of loop file
+	 * @param mixed optional parameter
+	 */
+	function cdisp_file( $file, $what, $param = '', $displayiftrue = '' )
+	{
+		if( ( $r = $this->cget_file( $file, $what, $param, $displayiftrue ) ) !== false )
+		{
+			echo $r;
+		}
+		return $r;
 	}
 	
 	
 	/**
 	 * is the current file a directory?
+	 *
+	 * @param string force a specific file
 	 * @return boolean true if yes, false if not
 	 */
-	function cisdir()
+	function cisdir( $file = '' )
 	{
+		if( $file != '' )
+		{
+			if( $this->loadc( $file ) )
+			{
+				$isdir = ($this->current_entry['type'] == 'dir');
+				$this->restorec();
+				return $isdir;
+			}
+			else return false;
+		}
 		return ($this->current_entry['type'] == 'dir');
 	}
 	
@@ -604,11 +654,11 @@ class FileManager
 	 * @param string what to get
 	 * @param mixed optional parameter
 	 */
-	function cget_file( $file, $what, $param = '' )
+	function cget_file( $file, $what, $param = '', $displayiftrue = '' )
 	{
 		if( $this->loadc( $file ) )
 		{
-			$r = $this->cget( $what, $param );
+			$r = $this->cget( $what, $param, $displayiftrue );
 		}
 		else
 		{
@@ -623,6 +673,7 @@ class FileManager
 	
 	/**
 	 * do actions to a file/dir
+	 *
 	 * @param string filename (in cwd)
 	 * @param string the action (chmod)
 	 * @param string parameter for action
@@ -660,6 +711,25 @@ class FileManager
 						}
 					}
 					break;
+					
+				case 'send':
+					if( is_dir($path) )
+					{ // we cannot send directories!
+						return false;
+					}
+					else
+					{
+						header('Content-type: application/octet-stream');
+						//force download dialog
+						header('Content-disposition: attachment; filename="' . $filename . '"');
+					
+						header('Content-transfer-encoding: binary');
+						header('Content-length: ' . filesize($path));
+					
+						//send file contents 
+						readfile($path);
+						exit;
+					}
 			}
 		}
 		else
@@ -688,10 +758,30 @@ class FileManager
 		$this->current_idx = -1;
 	}
 
-	function filelist()
-	{
 
+	/**
+	 * get an array list of a specific type
+	 *
+	 * @param string type ('dirs' or 'files')
+	 * @param return array
+	 */
+	function arraylist( $type )
+	{
+		$r = array();
+		foreach( $this->entries as $entry )
+		{
+			if( $type == 'files' && $entry['type'] != 'dir' )
+			{
+				$r[] = $entry['name'];
+			}
+			elseif( $type == 'dirs' && $entry['type'] == 'dir' )
+			{
+				$r[] = $entry['name'];
+			}
+		}
+		return $r;
 	}
+
 
 	/**
 	 * Remove a file or directory.
@@ -914,6 +1004,31 @@ class FileManager
 		closedir( $current_dir );
 		return rmdir( $dir );
 	}
+
+	
+	/**
+	 * get size of directory, including anything in there.
+	 *
+	 * @param string the dir's full path
+	 */
+	function get_dirsize( $path )
+	{
+		$dir = opendir( $path );
+		$total = 0;
+		while( $cur = readdir($dir) ) if( !in_array( $cur, array('.', '..')) )
+		{
+			if( is_dir($path.'/'.$cur) )
+			{
+				$total += $this->GetDirSize($path.'/'.$cur);
+			}
+			else
+			{
+				$total += filesize($path.'/'.$cur);
+			}
+		}
+	return $total;
+	}
+		
 
 
 }

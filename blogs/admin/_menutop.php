@@ -67,13 +67,13 @@
 			{
 				if( allchecked[0] ) allchecked[0] = false;
 				else allchecked[0] = true;
-				
+
 				var elems = document.forms[the_form].elements[the_elements];
 				var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
 				if (elems_cnt)
-			{
-					for (var i = 0; i < elems_cnt; i++)
 				{
+					for (var i = 0; i < elems_cnt; i++)
+					{
 						elems[i].checked = allchecked[0];
 					} // end for
 				}

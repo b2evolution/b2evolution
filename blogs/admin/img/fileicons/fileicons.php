@@ -27,6 +27,7 @@ $this->fileicons_special = array(
  */
 $this->fileicons = array(
 	'.html?' => 'www.png',
+	'.(gif|png|jpe?g)' => 'image2.png',
 	'.mp3' => 'sound.png',
 	'.tar' => 'tar.png',
 	'.tgz' => 'tgz.png',

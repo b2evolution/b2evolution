@@ -41,9 +41,9 @@ if ($use_spellchecker)
 		var saved_action =  form.attributes.getNamedItem('action').value;
 		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
 		form.target = 'b2evo_preview';
-		form.submit();
 		preview_window = window.open( '', 'b2evo_preview' );
 		preview_window.focus();
+		form.submit();
 		form.attributes.getNamedItem('action').value = saved_action;
 		form.target = '_self';
 	}

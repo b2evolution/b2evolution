@@ -196,9 +196,9 @@ if( !isset( $skin ) )
 	if(  ( !isset( $default_skin ) ) 					// No default skin forced in stub
 		|| ( !skin_exists( $default_skin ) ) )	// Or the forced default does not exist
 	{	// Use default from the datatabse
-	$default_skin = $Blog->get('default_skin');
+		$default_skin = $Blog->get('default_skin');
 	}
-
+	
 	if( !skin_exists( $default_skin )	|| empty( $default_skin ) )
 	{ // blog's default skin does not exist
 		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,

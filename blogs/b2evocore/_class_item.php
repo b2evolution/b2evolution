@@ -504,7 +504,11 @@ class Item extends DataObject
 					$output .= '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'.$more_anchor;
 					if( !empty($more_anchor) ) $output .= $after_more;
 				}
-				$output .= $content_parts[1];
+				if( count($content_parts) > 2 )
+				{ // we have additional <!--more--> tags somewhere
+					$output .= str_replace( array($content_parts[0], '<!--more-->'), '', $content );
+				}
+				else $output .= $content_parts[1];
 			}
 			else
 			{ // We are offering to read more

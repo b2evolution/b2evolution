@@ -21,8 +21,8 @@ if( !isset($_SERVER['REQUEST_URI']) )
 		$ReqPath = $_SERVER['URL'];
 	}
 	elseif( isset($_SERVER['PATH_INFO']) )
-	{ //CGI/FastCGI
-		$ReqPath = $_SERVER['PATH_INFO'];
+	{ //CGI/FastCGI 
+		$ReqPath = $_SERVER['PATH_INFO']; 
 	}
 	elseif( isset($_SERVER['SCRIPT_NAME']) )
 	{ //Some Odd Win2k Stuff
