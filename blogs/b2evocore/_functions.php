@@ -417,7 +417,7 @@ function phpcurlme( & $string, $language = 'en')
  *
  * with enhanced format string
  */
-function mysql2date($dateformatstring, $mysqlstring, $use_b2configmonthsdays = 1, $useGM = false)
+function mysql2date($dateformatstring, $mysqlstring, $useGM = false)
 {
 	global $month, $weekday;
 	global $time_difference;
@@ -435,18 +435,7 @@ function mysql2date($dateformatstring, $mysqlstring, $use_b2configmonthsdays = 1
 	}
 	else
 	{	// We want default timezone time:
-		if (!empty($month) && !empty($weekday) && $use_b2configmonthsdays)
-		{
-			$datemonth =_( $month[date('m', $i)]);
-			$dateweekday = _($weekday[date('w', $i)]);
-			$dateformatstring = ' '.$dateformatstring;
-			$dateformatstring = preg_replace("/([^\\\])D/", "\\1".backslashit(substr($dateweekday, 0, 3)), $dateformatstring);
-			$dateformatstring = preg_replace("/([^\\\])F/", "\\1".backslashit($datemonth), $dateformatstring);
-			$dateformatstring = preg_replace("/([^\\\])l/", "\\1".backslashit($dateweekday), $dateformatstring);
-			$dateformatstring = preg_replace("/([^\\\])M/", "\\1".backslashit(substr($datemonth, 0, 3)), $dateformatstring);
-			$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
-		}
-		$j = date($dateformatstring, $i);
+		$j = date_i18n($dateformatstring, $i);
 	}
 	#		echo $i." ".$mysqlstring;
 	return $j;
@@ -459,22 +448,48 @@ function addslashes_gpc($gpc) {
 	return($gpc);
 }
 
-function date_i18n($dateformatstring, $unixtimestamp) {
-	global $month, $weekday;
-	$i = $unixtimestamp;
-	if ((!empty($month)) && (!empty($weekday))) {
-		$datemonth = _($month[date('m', $i)]);
-		$dateweekday = _($weekday[date('w', $i)]);
-		$dateformatstring = ' '.$dateformatstring;
-		$dateformatstring = preg_replace("/([^\\\])D/", "\\1".backslashit(substr($dateweekday, 0, 3)), $dateformatstring);
-		$dateformatstring = preg_replace("/([^\\\])F/", "\\1".backslashit($datemonth), $dateformatstring);
-		$dateformatstring = preg_replace("/([^\\\])l/", "\\1".backslashit($dateweekday), $dateformatstring);
-		$dateformatstring = preg_replace("/([^\\\])M/", "\\1".backslashit(substr($datemonth, 0, 3)), $dateformatstring);
-		$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
-	}
-	$j = @date($dateformatstring, $i);
+/*
+ * date_i18n(-)
+ *
+ * date internationalization: same as date() formatting but with i18n support
+ */
+function date_i18n( $dateformatstring, $unixtimestamp ) 
+{
+	global $month, $month_abbrev, $weekday, $weekday_abbrev;
+
+	$datemonth = date('m', $unixtimestamp);
+	$dateweekday = date('w', $unixtimestamp);
+
+	$dateformatstring = ' '.$dateformatstring;
+
+	// echo $dateformatstring, '<br />';
+
+	// weekday:
+	$dateformatstring = preg_replace("/([^\\\])l/", '\\1@@@\\l@@@', $dateformatstring);
+	// weekday abbrev:
+	$dateformatstring = preg_replace("/([^\\\])D/", '\\1@@@\\D@@@', $dateformatstring);
+	// month:
+	$dateformatstring = preg_replace("/([^\\\])F/", '\\1@@@\\F@@@', $dateformatstring);
+	// month abbrev:
+	$dateformatstring = preg_replace("/([^\\\])M/", '\\1@@@\\M@@@', $dateformatstring);
+
+	$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
+
+	// echo $dateformatstring, '<br />';
+
+	$j = date($dateformatstring, $unixtimestamp);
+
+	// weekday:
+	$j = str_replace( '@@@l@@@', _($weekday[$dateweekday]), $j);
+	// weekday abbrev:
+	$j = str_replace( '@@@D@@@', _($weekday_abbrev[$dateweekday]), $j);
+	// month:
+	$j = str_replace( '@@@F@@@', _($month[$datemonth]), $j);
+	// month abbrev:
+	$j = str_replace( '@@@M@@@', _($month_abbrev[$datemonth]), $j);
+
 	return $j;
-	}
+}
 
 
 function get_weekstartend($mysqlstring, $start_of_week)

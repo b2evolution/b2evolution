@@ -32,7 +32,6 @@ class Calendar
 	var $headerdisplay;
 	var $headercellstart;
 	var $headercellend;
-	var $headerabbrlenght;
 
 	var $cellstart;
 	var $cellend;
@@ -126,9 +125,8 @@ class Calendar
 		$this->rowend = '</tr>';
 		
 		$this->headerdisplay = 1;	// set this to 0 if you don't want to display the "Mon Tue Wed..." header
-		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]">';	// please leave $abbr there !
+		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]">';	// please leave [abbr] there !
 		$this->headercellend = '</th>';
-		$this->headerabbrlenght = 3;	// lenght of the shortened weekday
 		
 		$this->cellstart = '<td class="bCalendarCell">';
 		$this->cellend = '</td>';
@@ -161,7 +159,7 @@ class Calendar
 	{
 		global $querycount;
 		global $tableposts, $tablepostcats, $tablecategories;
-		global $weekday;
+		global $weekday, $weekday_abbrev;
 		global $start_of_week, $time_difference;
 													
 		$end_of_week = (($start_of_week + 7) % 7);
@@ -266,7 +264,7 @@ class Calendar
 			for ($i = $start_of_week; $i<($start_of_week+7); $i = $i + 1) 
 			{
 				echo str_replace('[abbr]', _($weekday[($i % 7)]), $this->headercellstart);
-				echo ucwords(substr(_($weekday[($i % 7)]), 0, $this->headerabbrlenght));
+				echo _($weekday_abbrev[($i % 7)]);
 				echo $this->headercellend;
 			}
 		
@@ -314,7 +312,7 @@ class Calendar
 				}
 				if ($calendartoday) 
 				{
-					echo '<span class="b2calendartoday">';
+					echo '<span class="bCalendarToday">';
 				}
 				echo date('j',$i);
 				if ($calendartoday) 

@@ -149,7 +149,8 @@ $month['01']=N_('January');
 $month['02']=N_('February');
 $month['03']=N_('March');
 $month['04']=N_('April');
-$month['05']=N_('May');
+// TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
+$month['05']=N_('May ');
 $month['06']=N_('June');
 $month['07']=N_('July');
 $month['08']=N_('August');

@@ -824,9 +824,9 @@ function the_time($d='', $echo = 1, $useGM = 0)
 	global $id,$postdata;
 	if ($d=='') 
 	{
-		$the_time = mysql2date( locale_timefmt(), $postdata['Date'], 1, $useGM);
+		$the_time = mysql2date( locale_timefmt(), $postdata['Date'], $useGM);
 	} else {
-		$the_time = mysql2date( $d, $postdata['Date'], 1, $useGM);
+		$the_time = mysql2date( $d, $postdata['Date'], $useGM);
 	}
 
 	if ($echo) 
