@@ -260,7 +260,8 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	?></p>
 	<?php list_antiSpam() ?>
 	<table class='thin'>
-		<?php while( $row_stats = mysql_fetch_array($res_stats) ) {  ?>
+		<?php if( count($res_stats) ) foreach( $res_stats as $row_stats )
+		{  ?>
 		<tr>
 			<td>
 				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 

@@ -248,7 +248,7 @@ function create_antispam()
 	"('-adult-'), ('-tits-'), ('buy-phentermine'), ".
 	"('order-cheap-pills'), ('buy-xenadrine'),	('xxx'), ".
 	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
-	mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 }
 

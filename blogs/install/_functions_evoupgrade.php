@@ -103,9 +103,8 @@ function upgrade_b2evo_tables()
 
 		echo 'Updating blog urls... ';
 		$query = "SELECT blog_ID, blog_siteurl FROM $tableblogs";
-		$DB->query( $query );
-		$rows_updated = 0;
-		while($row = mysql_fetch_assoc($q))
+		$q = $DB->query( $query );
+		if( count( $q ) ) foreach( $q as $row )
 		{
 			$blog_ID = $row['blog_ID'];
 			$blog_siteurl = $row['blog_siteurl'];
@@ -121,10 +120,9 @@ function upgrade_b2evo_tables()
 
 			$query_update_blog = "UPDATE $tableblogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
 			// echo $query_update_blog, '<br>';
-			mysql_query($query_update_blog) or mysql_oops( $query_update_wordcount );
-			$rows_updated++;
+			$DB->query( $query_update_blog );
 		}
-		echo "OK. ($rows_updated rows updated)</p>\n";
+		echo "OK. (".count($rows_updated)." rows updated)</p>\n";
 
 	}
 
@@ -231,7 +229,7 @@ function upgrade_b2evo_tables()
 		 */
 		function convert_lang_to_locale( $table, $columnlang, $columnID )
 		{
-			global $locales, $default_locale;
+			global $DB, $locales, $default_locale;
 			
 			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $default_locale) )
 			{ // we want a valid locale
@@ -242,10 +240,9 @@ function upgrade_b2evo_tables()
 		
 			// query given languages in $table
 			$query = "SELECT $columnID, $columnlang FROM $table";
-			$result = mysql_query($query) or mysql_oops( $query );
-			
+			$rows = $DB->get_results( $query, ARRAY_A );
 			$languagestoconvert = array();
-			while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) )
+			if( count( $rows ) ) foreach( $rows as $row )
 			{
 				// remember the ID for that locale
 				$languagestoconvert[ $row[ $columnlang ] ][] = $row[ $columnID ];
@@ -273,8 +270,9 @@ function upgrade_b2evo_tables()
 				{ // we have nothing converted yet
 					if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $lkey) )
 					{ // no valid locale in DB, setting default.
-						$query = "UPDATE $table SET $columnlang = '$default_locale' WHERE $columnlang = '$lkey'";
-						$DB->query( $query );
+						$DB->query( "UPDATE $table 
+														SET $columnlang = '$default_locale' 
+													WHERE $columnlang = '$lkey'" );
 						echo 'forced to default locale \''. $default_locale. '\'<br />';
 						
 					} else echo 'nothing to update, already valid!<br />';

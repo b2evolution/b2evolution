@@ -322,7 +322,7 @@ class User extends DataObject
 	 */
 	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
 	{
-		global $tableblogusers, $querycount;
+		global $DB, $tableblogusers;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
 		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
@@ -339,22 +339,25 @@ class User extends DataObject
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
 			// echo $query, '<br />';
-			$result = mysql_query($query) or mysql_oops( $query );
-			$querycount++;
-			$row = mysql_fetch_array($result);
-
-			$this->blog_post_statuses[$perm_target_blog] = array();
-
-			$bloguser_perm_post = $row['bloguser_perm_poststatuses'];
-			if( empty($bloguser_perm_post ) )
-				$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = array();
+			if( ($row = $DB->get_row( $query, ARRAY_A )) == NULL )
+			{	// No rights set for this Blog/User
+				return false;	// Permission denied
+			}
 			else
-				$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloguser_perm_post );
-
-			$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
-			$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
-			$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
-			$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
+			{ // OK, rights found:
+				$this->blog_post_statuses[$perm_target_blog] = array();
+	
+				$bloguser_perm_post = $row['bloguser_perm_poststatuses'];
+				if( empty($bloguser_perm_post ) )
+					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = array();
+				else
+					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloguser_perm_post );
+	
+				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
+			}
 		}
 
 		// Check if permission is granted:
@@ -415,7 +418,7 @@ class User extends DataObject
 	 */
 	function dbdelete()
 	{
-		global $querycount, $tablecomments, $tableposts, $tableblogusers;
+		global $DB, $tablecomments, $tableposts, $tableblogusers;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
@@ -423,18 +426,15 @@ class User extends DataObject
 	/*	$sql="DELETE FROM $tablecomments INNER JOIN $tableposts
 												ON comment_post_ID = ID
 								 WHERE post_author = $this->ID";
-		$result=mysql_query($sql) or mysql_oops( $sql );
-		$querycount++; */
+		 */
 
 		// Delete posts
 		$sql = "DELETE FROM $tableposts WHERE post_author = $this->ID";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
+		$DB->query($sql);
 
 		// Delete userblog permission
 		$sql = "DELETE FROM $tableblogusers WHERE bloguser_user_ID = $this->ID";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
+		$DB->query($sql);
 
 		// Delete main object:
 		return parent::dbdelete();

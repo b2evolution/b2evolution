@@ -117,9 +117,9 @@ class DB
 	function flush()
 	{
 		// Get rid of these
-		$this->last_result = null;
-		$this->col_info = null;
-		$this->last_query = null;
+		$this->last_result = NULL;
+		$this->col_info = NULL;
+		$this->last_query = NULL;
 		$this->current_idx = 0;
 	}
 
@@ -196,7 +196,7 @@ class DB
 		}
 
 		// If debug ALL queries
-		$this->trace || $this->debug_all ? $this->debug() : null ;
+		$this->trace || $this->debug_all ? $this->debug() : NULL ;
 
 		return $return_val;
 
@@ -204,7 +204,7 @@ class DB
 
 	// ==================================================================
 	//	Get one variable from the DB - see docs for more detail
-	function get_var($query=null,$x=0,$y=0)
+	function get_var($query=NULL,$x=0,$y=0)
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_var(\"$query\",$x,$y)";
@@ -221,13 +221,13 @@ class DB
 			$values = array_values(get_object_vars($this->last_result[$y]));
 		}
 
-		// If there is a value return it else return null
-		return (isset($values[$x]) && $values[$x]!=='')?$values[$x]:null;
+		// If there is a value return it else return NULL
+		return (isset($values[$x]) && $values[$x]!=='')?$values[$x]:NULL;
 	}
 
 	// ==================================================================
 	//	Get one row from the DB - see docs for more detail
-	function get_row($query=null,$output=OBJECT,$y=0)
+	function get_row($query=NULL,$output=OBJECT,$y=0)
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_row(\"$query\",$output,$y)";
@@ -242,17 +242,17 @@ class DB
 		// If the output is an object then return object using the row offset..
 		if ( $output == OBJECT )
 		{
-			return $this->last_result[$y]?$this->last_result[$y]:null;
+			return $this->last_result[$y]?$this->last_result[$y]:NULL;
 		}
 		// If the output is an associative array then return row as such..
 		elseif ( $output == ARRAY_A )
 		{
-			return $this->last_result[$y]?get_object_vars($this->last_result[$y]):null;
+			return $this->last_result[$y]?get_object_vars($this->last_result[$y]):NULL;
 		}
 		// If the output is an numerical array then return row as such..
 		elseif ( $output == ARRAY_N )
 		{
-			return $this->last_result[$y]?array_values(get_object_vars($this->last_result[$y])):null;
+			return $this->last_result[$y]?array_values(get_object_vars($this->last_result[$y])):NULL;
 		}
 		// If invalid output type was specified..
 		else
@@ -265,7 +265,7 @@ class DB
 	// ==================================================================
 	//	Function to get 1 column from the cached result set based in X index
 	// se docs for usage and info
-	function get_col($query=null,$x=0)
+	function get_col( $query=NULL, $x=0 )
 	{
 
 		// If there is a query then perform it if not then use cached results..
@@ -277,7 +277,7 @@ class DB
 		// Extract the column values
 		for ( $i=0; $i < count($this->last_result); $i++ )
 		{
-			$new_array[$i] = $this->get_var(null,$x,$i);
+			$new_array[$i] = $this->get_var(NULL,$x,$i);
 		}
 
 		return $new_array;
@@ -285,7 +285,7 @@ class DB
 
 	// ==================================================================
 	// Return the the query as a result set - see docs for more details
-	function get_results( $query=null, $output = OBJECT)
+	function get_results( $query=NULL, $output = OBJECT)
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_results(\"$query\", $output)";
@@ -323,7 +323,7 @@ class DB
 			}
 			else
 			{
-				return null;
+				return NULL;
 			}
 		}
 	}
@@ -434,7 +434,7 @@ class DB
 		{
 
 			$i=0;
-			foreach( $this->get_results(null,ARRAY_N) as $one_row )
+			foreach( $this->get_results(NULL,ARRAY_N) as $one_row )
 			{
 				$i++;
 				echo "<tr bgcolor=ffffff><td bgcolor=eeeeee nowrap align=middle><font size=2 color=555599 face=arial>$i</font></td>";

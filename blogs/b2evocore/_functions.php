@@ -615,22 +615,18 @@ function is_email($user_email) {
 /*
  * get_settings(-)
  */
-function get_settings($setting)
+function get_settings( $setting )
 {
-	global $tablesettings,$querycount,$cache_settings,$use_cache;
-	if ((empty($cache_settings)) OR (!$use_cache))
+	global $DB, $tablesettings, $cache_settings;
+	
+	if( empty($cache_settings) )
 	{
-		$sql = "SELECT * FROM $tablesettings";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
-		$myrow = mysql_fetch_object($result);
-		$cache_settings = $myrow;
+		$sql = "SELECT * 
+						FROM $tablesettings";
+		$cache_settings = $DB->get_row( $sql );
 	}
-	else
-	{
-		$myrow = $cache_settings;
-	}
-	return($myrow->$setting);
+
+	return $cache_settings->$setting;
 }
 
 

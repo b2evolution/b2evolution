@@ -15,7 +15,7 @@ if( substr( basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
 
 function db_delete()
 {
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
+	global $DB, $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
 				$tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers, $tablelocales;
 
 	echo "Dropping Antispam table...<br />\n";

@@ -26,8 +26,7 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	// Insert new string into DB:
 	$sql = "INSERT INTO $tableantispam( aspm_string, aspm_source ) 
 					VALUES( '".$DB->escape($abuse_string)."', '$aspm_source' )";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
+	$DB->query( $sql );
 
 	// Insert into cache:
 	$cache_antispam[] = $abuse_string;
@@ -49,8 +48,7 @@ function antispam_update_source( $aspm_string, $aspm_source )
 	$sql = "UPDATE $tableantispam 
 					SET aspm_source = '$aspm_source' 
 					WHERE aspm_string = '".$DB->escape($aspm_string)."'";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
+	$DB->query( $sql );
 }
 
 /*
@@ -64,8 +62,7 @@ function antispam_delete( $string_ID )
 
 	$sql = "DELETE FROM $tableantispam 
 					WHERE aspm_ID = $string_ID";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
+	$DB->query( $sql );
 }
 
 
@@ -76,18 +73,11 @@ function antispam_delete( $string_ID )
  */
 function antispam_url( $url )
 {
-	global $tableantispam, $querycount, $cache_antispam, $debug;
+	global $DB, $tableantispam, $cache_antispam, $debug;
 
 	if( !isset($cache_antispam)) 
 	{	// Cache not loaded, load now:
-		$query = "SELECT aspm_string FROM $tableantispam";
-		$querycount++;
-		$q = mysql_query( $query ) or mysql_oops( $query );
-		$cache_antispam = array();
-		while( list($tmp) = mysql_fetch_row($q) )
-		{
-			$cache_antispam[] = $tmp;
-		}
+		$cache_antispam = $DB->get_col( "SELECT aspm_string FROM $tableantispam" );
 	}
 	
 	// Check URL for abuse:
@@ -113,11 +103,12 @@ function antispam_url( $url )
  */
 function list_antiSpam()
 {
-	global 	$querycount, $tableantispam, $res_stats;
+	global $DB, $querycount, $tableantispam, $res_stats;
 
-	$sql = "SELECT aspm_ID, aspm_string, aspm_source FROM $tableantispam ORDER BY aspm_string ASC";
-	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
-	$querycount++;
+	$sql = "SELECT aspm_ID, aspm_string, aspm_source 
+					FROM $tableantispam 
+					ORDER BY aspm_string ASC";
+	$res_stats = $DB->get_results( $sql, ARRAY_A );
 }
 
 /*
@@ -231,7 +222,7 @@ function b2evonet_poll_abuse( $display = true )
 {
 	$test = 0;
 
-	global $baseurl, $tablesettings, $querycount;
+	global $DB, $baseurl, $tablesettings;
 	
 	if( $display )
 	{	
@@ -311,9 +302,8 @@ function b2evonet_poll_abuse( $display = true )
 					$endedat = date('Y-m-d H:i:s', iso8601_decode($response['lasttimestamp']) );
 					echo '<p>', T_('New latest update timestamp'), ': ', $endedat, '</p>';
 					
-					$sql ="UPDATE $tablesettings SET last_antispam_update = '$endedat'";
-					$querycount++;
-					mysql_query($sql) or mysql_oops( $sql );
+					$DB->query( "UPDATE $tablesettings 
+													SET last_antispam_update = '$endedat'" );
 				}				
 			}
 		}
