@@ -500,16 +500,8 @@ switch( $Fileman->getMode() )
 		}
 
 		$LogUpload = new Log( 'error' );
-		
-		if ( trim( $Settings->get( 'upload_allowedext' ) ) == '') 
-		{
-		  // This is a kludge. For some reason on my setup, this is the only way to upload a file
-		  //   when the $Settings->get( 'upload_allowedext' ) is blank.
-		  $allowedFileExtensions = '';
-		} else {
-		  $allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ) );
-		}
-		$allowedMimeTypes = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedmime' ) ) );
+		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ), -1, PREG_SPLIT_NO_EMPTY );
+		$allowedMimeTypes = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedmime' ) ), -1, PREG_SPLIT_NO_EMPTY );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -1203,6 +1195,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.75  2005/02/12 00:58:13  blueyed
+ * fixed preg_split() better ($allowedFileExtensions, $allowedMimeTypes)
+ *
  * Revision 1.74  2005/02/11 20:30:20  jwedgeco
  * Added copyright and license info. I forgot to add it on the last commit.
  *
