@@ -1,11 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements deletion of DB tables
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
- * This file built upon code from original b2 - http://cafelog.com/
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package install
  */
 function db_delete()
 {

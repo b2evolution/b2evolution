@@ -1,9 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Bloghandling functions
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ *
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 
 /*
@@ -43,7 +48,7 @@ function blog_create(
 						"blog_stub, blog_staticfilename, ".
 						"blog_tagline, blog_description, blog_longdesc, blog_lang, blog_roll, blog_keywords,".
 						"blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet, 
-						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotg, blog_disp_bloglist ) 	
+						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist ) 	
 	VALUES ( ";
 	$query .= "'".addslashes($blog_name)."', ";
 	$query .= "'".addslashes($blog_shortname)."', ";
@@ -163,38 +168,38 @@ function blog_update_user_perms( $blog )
 	while($loop_row = mysql_fetch_array($result) )
 	{	// Check new permissions for each user:
 		$loop_user_ID = $loop_row['ID'];
+		// echo "getting perms for user : $loop_user_ID <br />";
 	
 		$perm_post = array();
 		
-		$perm_name_published = param( 'blog_perm_published_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_name_published) ) $perm_post[] = $perm_name_published;
+		$perm_published = param( 'blog_perm_published_'.$loop_user_ID, 'string', '' );
+		if( !empty($perm_published) ) $perm_post[] = $perm_published;
 
-		$perm_name_protected = param( 'blog_perm_protected_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_name_protected) ) $perm_post[] = $perm_name_protected;
+		$perm_protected = param( 'blog_perm_protected_'.$loop_user_ID, 'string', '' );
+		if( !empty($perm_protected) ) $perm_post[] = $perm_protected;
 
-		$perm_name_private = param( 'blog_perm_private_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_name_private) ) $perm_post[] = $perm_name_private;
+		$perm_private = param( 'blog_perm_private_'.$loop_user_ID, 'string', '' );
+		if( !empty($perm_private) ) $perm_post[] = $perm_private;
 
-		$perm_name_draft = param( 'blog_perm_draft_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_name_draft) ) $perm_post[] = $perm_name_draft;
+		$perm_draft = param( 'blog_perm_draft_'.$loop_user_ID, 'string', '' );
+		if( !empty($perm_draft) ) $perm_post[] = $perm_draft;
 
-		$perm_name_deprecated = param( 'blog_perm_deprecated_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_name_deprecated) ) $perm_post[] = $perm_name_deprecated;
+		$perm_deprecated = param( 'blog_perm_deprecated_'.$loop_user_ID, 'string', '' );
+		if( !empty($perm_deprecated) ) $perm_post[] = $perm_deprecated;
 
-		$perm_name_delpost = param( 'blog_perm_delpost_'.$loop_user_ID, 'integer', 0 );
-		
-		$perm_name_comments = param( 'blog_perm_comments_'.$loop_user_ID, 'integer', 0 );
-
-		$perm_name_cats = param( 'blog_perm_cats_'.$loop_user_ID, 'integer', 0 );
+		$perm_delpost = param( 'blog_perm_delpost_'.$loop_user_ID, 'integer', 0 );
+		$perm_comments = param( 'blog_perm_comments_'.$loop_user_ID, 'integer', 0 );
+		$perm_cats = param( 'blog_perm_cats_'.$loop_user_ID, 'integer', 0 );
+		$perm_properties = param( 'blog_perm_properties_'.$loop_user_ID, 'integer', 0 );
 		
 		// Update those permissions in DB:
 
-		if( count($perm_post) || $perm_name_delpost || $perm_name_comments || $perm_name_cats )
+		if( count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties )
 		{	// There are some permissions for this user:
 			// insert new perms:
 			$inserted_values[] = " ( $blog, $loop_user_ID, '".implode(',',$perm_post)."', ".
-																$perm_name_delpost.", ".$perm_name_comments.", ".
-																$perm_name_cats." )";
+																$perm_delpost.", ".$perm_comments.", ".
+																$perm_cats.', '.$perm_properties." )";
 		}
 	}
 
@@ -203,7 +208,7 @@ function blog_update_user_perms( $blog )
 	{
 		$query_insert = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-											bloguser_perm_cats ) 
+											bloguser_perm_cats, bloguser_perm_properties ) 
 										 VALUES ".implode( ',', $inserted_values );
 		// echo $query_insert, '<br />';
 		$res_update = mysql_query($query_insert) or mysql_oops( $query_insert ); 

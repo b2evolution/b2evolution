@@ -1,9 +1,14 @@
 <?php 
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Displays blog properties form
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ *
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 switch( $next_action )
 {
@@ -51,10 +56,11 @@ switch( $next_action )
 		<table class="thin">
 			<tr>
 				<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
-				<th colspan="5"><?php echo T_('Can post/edit with following statuses:') ?></th>
-				<th rowspan="2"><?php echo T_('Delete<br />posts') ?></th>
-				<th rowspan="2"><?php echo T_('Edit<br />comments') ?></th>
-				<th rowspan="2"><?php echo T_('Edit<br />categories') ?></th>
+				<th colspan="5"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Can post/edit with following statuses:') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Delete<br />posts') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
 			</tr>
 			<tr>
 				<th><?php echo T_('Published') ?></th>
@@ -64,13 +70,14 @@ switch( $next_action )
 				<th><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="9">
+				<td colspan="10">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
 			<?php
 				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, 
-													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats
+													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
+													bloguser_perm_properties
 									FROM $tableusers INNER JOIN $tableblogusers 
 													ON ID = bloguser_user_ID 
 									WHERE bloguser_blog_ID = $blog 
@@ -87,66 +94,73 @@ switch( $next_action )
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
-										<?php if( in_array( 'published', $perm_post ) ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="published" />
+								<?php if( in_array( 'published', $perm_post ) ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_protected_<?php echo $loop_row['ID'] ?>"
-										<?php if( in_array( 'protected', $perm_post ) ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="protected" />
+								<?php if( in_array( 'protected', $perm_post ) ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to post into this blog with protected status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_private_<?php echo $loop_row['ID'] ?>"
-										<?php if( in_array( 'private', $perm_post ) ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="private" />
+								<?php if( in_array( 'private', $perm_post ) ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_draft_<?php echo $loop_row['ID'] ?>"
-										<?php if( in_array( 'draft', $perm_post ) ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="draft" />
+								<?php if( in_array( 'draft', $perm_post ) ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to post into this blog with draft status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_deprecated_<?php echo $loop_row['ID'] ?>"
-										<?php if( in_array( 'deprecated', $perm_post ) ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="deprecated" />
+								<?php if( in_array( 'deprecated', $perm_post ) ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to post into this blog with deprecated status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_delpost_<?php echo $loop_row['ID'] ?>"
-										<?php if( $loop_row['bloguser_perm_delpost'] != 0  ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="1" />
+								<?php if( $loop_row['bloguser_perm_delpost'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to delete posts in this blog') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_comments_<?php echo $loop_row['ID'] ?>"
-										<?php if( $loop_row['bloguser_perm_comments'] != 0  ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="1" />
+								<?php if( $loop_row['bloguser_perm_comments'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to edit comments in this blog') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_cats_<?php echo $loop_row['ID'] ?>"
-										<?php if( $loop_row['bloguser_perm_cats'] != 0  ) { ?>
-										checked="checked"
-										<?php } ?>
-										value="1" />
+								<?php if( $loop_row['bloguser_perm_cats'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to edit categories for this blog') ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_properties_<?php echo $loop_row['ID'] ?>"
+								<?php if( $loop_row['bloguser_perm_properties'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 						</td>
 					</tr>
 					<?php
 				}
 				?>
 			<tr class="group">
-				<td colspan="9">
+				<td colspan="10">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
@@ -167,34 +181,38 @@ switch( $next_action )
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
-										value="published" />
+								value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_protected_<?php echo $loop_row['ID'] ?>"
-										value="protected" />
+								value="1" title="<?php echo T_('Permission to post into this blog with protected status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_private_<?php echo $loop_row['ID'] ?>"
-										value="private" />
+								value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_draft_<?php echo $loop_row['ID'] ?>"
-										value="draft" />
+								value="1" title="<?php echo T_('Permission to post into this blog with draft status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_deprecated_<?php echo $loop_row['ID'] ?>"
-										value="deprecated" />
+								value="1" title="<?php echo T_('Permission to post into this blog with deprecated status') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_delpost_<?php echo $loop_row['ID'] ?>"
-										value="1" />
+								value="1" title="<?php echo T_('Permission to delete posts in this blog') ?>" />
 						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_comments_<?php echo $loop_row['ID'] ?>"
-										value="1" />
+								value="1" title="<?php echo T_('Permission to edit comments in this blog') ?>" />
 						<td class="center">
 							<input type="checkbox" name="blog_perm_cats_<?php echo $loop_row['ID'] ?>"
-										value="1" />
+								value="1" title="<?php echo T_('Permission to edit categories for this blog') ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_properties_<?php echo $loop_row['ID'] ?>"
+								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 						</td>
 					</tr>
 					<?php

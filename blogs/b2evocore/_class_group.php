@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
@@ -39,6 +39,7 @@ class Group extends DataObject
 	 * @access protected
 	 */
 	var	$perm_stats;
+	var	$perm_blogs;
 	var	$perm_spamblacklist;
 	var	$perm_options;
 	var	$perm_templates;
@@ -62,6 +63,7 @@ class Group extends DataObject
 		{
 			// echo 'Creating blank group';
 			$this->name = T_('New group');
+			$this->perm_blogs = 'user';
 			$this->perm_stats = 'none';
 			$this->perm_spamblacklist = 'none';
 			$this->perm_options = 'none';
@@ -73,6 +75,7 @@ class Group extends DataObject
 			// echo 'Instanciating existing group';
 			$this->ID = $db_row->grp_ID;
 			$this->name = $db_row->grp_name;
+			$this->perm_blogs = $db_row->grp_perm_blogs;
 			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
 			$this->perm_options = $db_row->grp_perm_options;
@@ -113,6 +116,7 @@ class Group extends DataObject
 	 *									- spamblacklist
 	 *									- options
 	 *									- users
+	 *									- blogs
 	 * @param string Permission level
 	 * @return strind Permission value
 	 */
@@ -128,6 +132,20 @@ class Group extends DataObject
 					return true;	// Permission granted
 				break;
 				
+			case 'blogs':
+				switch( $permvalue )
+				{
+					case 'editall':
+						// All permissions granted
+						return true;	// Permission granted
+						
+					case 'viewall':
+						// User can only ask for view perm
+						if(( $permlevel == 'view' ) || ( $permlevel == 'any' ))
+							return true;	// Permission granted
+						break;	
+				}
+
 			case 'stats':
 			case 'spamblacklist':
 			case 'options':

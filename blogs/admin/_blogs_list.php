@@ -8,7 +8,7 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package admin
  */
 ?>
 <div class="panelblock">
@@ -25,9 +25,27 @@
 	<?php 
 	for( $curr_blog_ID=blog_list_start(); $curr_blog_ID!=false; $curr_blog_ID=blog_list_next() )
 	{
+		if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )
+		{	// Current user is not allowed to edit cats...
+			continue;
+		}
 		?>
 		<tr>
-			<td><strong><?php blog_list_iteminfo('ID') ?>&nbsp;<a href="b2blogs.php?action=edit&blog=<?php blog_list_iteminfo('ID') ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo  T_('Properties') ?>" />&nbsp;<?php blog_list_iteminfo('shortname') ?></strong></td>
+			<td><strong>
+				<?php 
+					blog_list_iteminfo('ID');
+					echo '&nbsp;';
+					if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+					{
+						?>
+					<a href="b2blogs.php?action=edit&blog=<?php blog_list_iteminfo('ID') ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo  T_('Properties') ?>" />&nbsp;<?php blog_list_iteminfo('shortname'); ?></a>
+						<?php 
+					}
+					else
+					{
+						blog_list_iteminfo('shortname');
+					} ?>
+					</strong></td>
 			<td><?php blog_list_iteminfo('name') ?></td>
 			<td><a href="<?php blog_list_iteminfo('dynurl') ?>"><?php blog_list_iteminfo('filename') ?></a></td>
 			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('stub') ?></a></td>
@@ -46,5 +64,8 @@
 	}
 	?>
 </table>
+<?php if( $current_User->check_perm( 'blogs', 'create' ) ) 
+{ ?>
 <p class="center"><a href="b2blogs.php?action=new"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> <?php echo T_('Create new blog !') ?></a></p>
+<?php } ?>
 </div>

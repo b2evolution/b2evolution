@@ -1,11 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements creation of DB tables
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
- * This file built upon code from original b2 - http://cafelog.com/
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package install
  */
 
 /*
@@ -233,6 +236,7 @@ function create_groups()
 	$query = "CREATE TABLE $tablegroups (
 		grp_ID int(11) NOT NULL auto_increment,
   	grp_name varchar(50) NOT NULL default '',
+  	grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
   	grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
   	grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
   	grp_perm_options enum('none','view','edit') NOT NULL default 'none',
@@ -246,6 +250,7 @@ function create_groups()
 
 	$Group_Admins = new Group();
 	$Group_Admins->set( 'name', 'Administrators' );
+	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
 	$Group_Admins->set( 'perm_options', 'edit' );
@@ -255,6 +260,7 @@ function create_groups()
 
 	$Group_Priviledged = new Group();
 	$Group_Priviledged->set( 'name', 'Priviledged Bloggers' );
+	$Group_Priviledged->set( 'perm_blogs', 'viewall' );
 	$Group_Priviledged->set( 'perm_stats', 'view' );
 	$Group_Priviledged->set( 'perm_spamblacklist', 'edit' );
 	$Group_Priviledged->set( 'perm_options', 'view' );
@@ -264,6 +270,7 @@ function create_groups()
 
 	$Group_Bloggers = new Group();
 	$Group_Bloggers->set( 'name', 'Bloggers' );
+	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
 	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
 	$Group_Bloggers->set( 'perm_options', 'none' );
@@ -272,6 +279,7 @@ function create_groups()
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group();
+	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'name', 'Basic Users' );
 	$Group_Users->set( 'perm_stats', 'none' );
 	$Group_Users->set( 'perm_spamblacklist', 'none' );
@@ -288,6 +296,7 @@ function create_groups()
 		bloguser_perm_delpost tinyint NOT NULL default 0,
 		bloguser_perm_comments tinyint NOT NULL default 0,
 		bloguser_perm_cats tinyint NOT NULL default 0,
+		bloguser_perm_properties tinyint NOT NULL default 0,
 		PRIMARY KEY (bloguser_blog_ID,bloguser_user_ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );

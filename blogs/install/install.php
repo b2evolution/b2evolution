@@ -1,4 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+/**
+ * This is the main install menu
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ *
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package install
+ */
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" --> 

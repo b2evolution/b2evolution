@@ -8,7 +8,7 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package admin
  */
 ?>
 <div class="panelblock">

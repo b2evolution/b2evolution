@@ -196,6 +196,16 @@ class User extends DataObject
 	
 		switch( $permname )
 		{
+			case 'blog_properties':
+				// Forward request to group:
+				if( $this->Group->check_perm( 'blogs', $permlevel ) )
+				{	// If group says yes
+					return true;
+				}
+				// Check user perm for this blog
+				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
+				break;
+
 			case 'blog_post_statuses':
 			case 'blog_del_post':
 			case 'blog_comments':
@@ -229,6 +239,7 @@ class User extends DataObject
 	 *									- blog_del_post
 	 *									- blog_comments
 	 *									- blog_cats
+	 *									- blog_properties
 	 * @param string Permission level
 	 * @param integer Permission target blog ID
 	 * @return boolean 0 if permission denied
@@ -266,6 +277,7 @@ class User extends DataObject
 			$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
 			$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
 			$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
+			$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
 		}
 	
 		// Check if permission is granted:

@@ -1,9 +1,15 @@
 <?php 
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Displays group properties form
+ * Called by {@link b2users.php}
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ *
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 ?>
 <div class="panelblock">
@@ -24,6 +30,11 @@
 		<fieldset>
 			<legend><?php echo T_('Permissons for members of this group') ?></legend>
 			<?php 
+				form_radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'), 
+						array(  array( 'user', T_('User permissions') ),
+										array( 'viewall', T_('View all') ),
+										array( 'editall', T_('Full Access') )
+									), T_('Blogs') );
 				form_radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'), 
 						array(  array( 'none', T_('No Access') ),
 										array( 'view', T_('View only') ),

@@ -1,9 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Editing the blogs
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ *
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = T_('Blogs');
@@ -12,15 +17,17 @@ param( 'action', 'string' );
 switch($action) 
 {
 	case 'new':
+		// New blog form:
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9) 
-		{
-			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
-		}
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
 		echo "<div class=\"panelblock\">\n";
 		echo '<h2>', T_('New blog'), ":</h2>\n";
 		// EDIT FORM:
+		$blog = 0;
 		param( 'blog_name', 'string', 'new weblog' );
 		param( 'blog_shortname', 'string', 'new blog' );
 		param( 'blog_tagline', 'html', '' );
@@ -50,12 +57,13 @@ switch($action)
 		
 		
 	case 'create':
+		// Create blog in DB:
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9) 
-		{
-			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
-		}
+	
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
 		param( 'blog_tagline', 'html', '' );
@@ -98,6 +106,8 @@ switch($action)
 									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll, 
 									$blog_keywords, $blog_UID, blog_disp_bloglist ) or mysql_oops( $query );
 		
+		// Set the user permissions for this blog
+		blog_update_user_perms( $blog_ID );
 	
 		// Quick hack to create a stub file:
 		if( $blog_siteurl == '' )
@@ -168,13 +178,14 @@ switch($action)
 	
 	
 	case 'edit':
+		// Edit blog form:
 		param( 'blog', 'integer', true );
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9) 
-		{
-			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
-		}
+		
+		// Check permissions:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
 		echo "<div class=\"panelblock\">\n";
 		echo '<h2>', T_('Blog params for:'), ' ', get_bloginfo('name'), "</h2>\n";
 		// EDIT FORM:
@@ -205,11 +216,12 @@ switch($action)
 		
 		
 	case 'update':
-		if ($user_level < 9) 
-		{
-			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
-		}
+		// Update blog in DB:
 		param( 'blog', 'integer', true );
+		
+		// Check permissions:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
 		param( 'blog_tagline', 'html', '' );
