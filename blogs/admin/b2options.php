@@ -17,8 +17,8 @@ switch( $tab )
 	case 'general':
 		$admin_pagetitle .= ' :: '. T_('General');
 		break;
-	case 'locales':
-		$admin_pagetitle .= ' :: '. T_('Locales'); 
+	case 'regional':
+		$admin_pagetitle .= ' :: '. T_('Regional'); 
 		break;
 	case 'plugins':
 		$admin_pagetitle .= ' :: '. T_('Plug-ins'); 
@@ -29,159 +29,130 @@ require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
 
-
-/* TODO: locales (default / enabling)
-	locales admin in the backoffice should READ **everything** from the
-	array and WRITE to the array+DB. That way new locales introduced in new
-	releases will be transparently added to the enabled locales.
-
-	echo 'Creating Locales... ';
-	if( isset($locales) && is_array($locales) )
-	{
-		$query = "INSERT INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled )";
-		foreach( $locales as $localekey => $lval )
-		{
-			if( !isset($lval['messages']) )
-			{ // if not explicit messages file is given we'll translate the locale
-				$lval['messages'] = strtr($localekey, '-', '_');
-			}
-			$query .= " VALUES (
-			'$localekey',
-			'{$lval['charset']}',
-			'{$lval['datefmt']}',
-			'{$lval['timefmt']}',
-			'{$lval['name']}',
-			'{$lval['messages']}',
-			'{$lval['enabled']}',
-			)";
-		}
-		$q = $DB->query($query);
-		echo 'OK.';
-	} else echo 'failed: array $locales not defined.';
-	echo "<br />\n";
-
-*/
-
-
 if( $action == 'update' )
 {
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
-
-		// clear settings cache
-		$cache_settings = '';
-		
-		switch( $tab ){
-			case 'general':
-				// UPDATE general settings:
-				param( 'newposts_per_page', 'integer', true );
-				param( 'newwhat_to_show', 'string', true );
-				param( 'newarchive_mode', 'string', true );
-				param( 'newtime_difference', 'integer', true );
-				param( 'newautobr', 'integer', 0 );
-				param( 'pref_newusers_canregister', 'integer', 0 );
-				param( 'pref_newusers_grp_ID', 'integer', true );
-				param( 'pref_newusers_level', 'integer', true );
-				param( 'pref_links_extrapath', 'integer', 0 );
-				param( 'pref_permalink_type', 'string', true );
-		
-				$query = "UPDATE $tablesettings
-									SET posts_per_page = $newposts_per_page,
-											what_to_show = '".$DB->escape($newwhat_to_show)."',
-											archive_mode = '".$DB->escape($newarchive_mode)."',
-											time_difference = $newtime_difference,
-											AutoBR = $newautobr,
-											pref_newusers_canregister = $pref_newusers_canregister,
-											pref_newusers_level = $pref_newusers_level,
-											pref_newusers_grp_ID = $pref_newusers_grp_ID,
-											pref_links_extrapath = $pref_links_extrapath,
-											pref_permalink_type = '".$DB->escape($pref_permalink_type)."'";
-				
-				$dbupdatesuccess = $DB->query( $query );
-				
-				?>
-				<div class="panelinfo">
-					<p><?php echo T_('Options updated.') ?></p>
-				</div>
-				<?php
-				break;
+	// Check permission:
+	$current_User->check_perm( 'options', 'edit', true );
+	
+	$status_update = array();
+	
+	// clear settings cache
+	$cache_settings = '';
+	
+	switch( $tab ){
+		case 'general':
+			// UPDATE general settings:
+			param( 'newposts_per_page', 'integer', true );
+			param( 'newwhat_to_show', 'string', true );
+			param( 'newarchive_mode', 'string', true );
+			param( 'newautobr', 'integer', 0 );
+			param( 'pref_newusers_canregister', 'integer', 0 );
+			param( 'pref_newusers_grp_ID', 'integer', true );
+			param( 'pref_newusers_level', 'integer', true );
+			param( 'pref_links_extrapath', 'integer', 0 );
+			param( 'pref_permalink_type', 'string', true );
+	
+			$query = "UPDATE $tablesettings
+								SET posts_per_page = $newposts_per_page,
+										what_to_show = '".$DB->escape($newwhat_to_show)."',
+										archive_mode = '".$DB->escape($newarchive_mode)."',
+										AutoBR = $newautobr,
+										pref_newusers_canregister = $pref_newusers_canregister,
+										pref_newusers_level = $pref_newusers_level,
+										pref_newusers_grp_ID = $pref_newusers_grp_ID,
+										pref_links_extrapath = $pref_links_extrapath,
+										pref_permalink_type = '".$DB->escape($pref_permalink_type)."'";
+			
+			$q = $DB->query( $query );
+			
+			$status_update[] = T_('General settings updated.<br />');
+			break;
 
 
-			case 'locales':
-				// UPDATE locales:
-				param( 'newdefault_locale', 'string', true);
-				#pre_dump( $_POST );
+		case 'regional':
+			// UPDATE regional settings
+			
+			param( 'newdefault_locale', 'string', true);
+			param( 'newtime_difference', 'integer', true );
+			
+			$templocales = $locales;
+			
+			$lnr = 0;
+			foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
+			{
+				$lfield = $matches[2];
 				
-				$templocales = $locales;
-				
-				$lnr = 0;
-				foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
-				{
-					$lfield = $matches[2];
+				if( $matches[1] != $lnr )
+				{ // we have a new locale
+					$lnr = $matches[1];
+					$plocale = $pval;
 					
-					if( $matches[1] != $lnr )
-					{ // we have a new locale
-						$lnr = $matches[1];
-						$plocale = $pval;
-						
-						// checkboxes default to 0
-						$templocales[ $plocale ]['enabled'] = 0;
-					}
-					elseif( $lnr != 0 )  // be sure to have catched a locale before
-					{
-						$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
-					}
-					
+					// checkboxes default to 0
+					$templocales[ $plocale ]['enabled'] = 0;
+				}
+				elseif( $lnr != 0 )  // be sure to have catched a locale before
+				{
+					$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
 				}
 				
-				if( $locales != $templocales )
-				{
-					#echo 'CHANGED!';
-					$locales = $templocales;
+			}
+			
+			if( $locales != $templocales )
+			{
+				#echo 'CHANGED!';
+				$locales = $templocales;
+			}
+			
+			$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled ) VALUES ";
+			foreach( $locales as $localekey => $lval )
+			{
+				if( !isset($lval['messages']) )
+				{ // if not explicit messages file is given we'll translate the locale
+					$lval['messages'] = strtr($localekey, '-', '_');
 				}
-				
-				$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled ) VALUES ";
-				foreach( $locales as $localekey => $lval )
-				{
-					if( !isset($lval['messages']) )
-					{ // if not explicit messages file is given we'll translate the locale
-						$lval['messages'] = strtr($localekey, '-', '_');
-					}
-					$query .= "(
-					'$localekey',
-					'{$lval['charset']}',
-					'{$lval['datefmt']}',
-					'{$lval['timefmt']}',
-					'{$lval['name']}',
-					'{$lval['messages']}',
-					'{$lval['enabled']}'
-					), ";
-				}
-				$query = substr($query, 0, -2);
+				$query .= "(
+				'$localekey',
+				'{$lval['charset']}',
+				'{$lval['datefmt']}',
+				'{$lval['timefmt']}',
+				'{$lval['name']}',
+				'{$lval['messages']}',
+				'{$lval['enabled']}'
+				), ";
+			}
+			$query = substr($query, 0, -2);
+			$q = $DB->query($query);
+			
+			if( !$locales[$newdefault_locale]['enabled'] )
+			{
+				$status_update[] = '<span class="error">' . T_('Default locale should be enabled.') . '</span>';
+			}
+			elseif( $newdefault_locale != $default_locale )
+			{
+				// set default locale
+				$query = "UPDATE $tablesettings	SET
+							default_locale = '$newdefault_locale',
+							time_difference = $newtime_difference";
 				$q = $DB->query($query);
-				
-				if( !$locales[$newdefault_locale]['enabled'] )
-				{
-					echo '<div class="panelinfo"><p class="error">' . T_('Default locale should be enabled.') . '</p></div>';
-				}
-				elseif( $newdefault_locale != $default_locale )
-				{
-					// set default locale
-					$query = "UPDATE $tablesettings	SET default_locale = '$newdefault_locale'";
-					$q = $DB->query($query);
-					echo '<div class="panelinfo"><p>'.T_('New default locale set.').'</p></div>';
-				}
-				
-				echo '<div class="panelinfo"><p>'.T_('Locales updated.').'</p></div>';
+				$status_update[] = T_('New default locale set.');
+			}
 			
-				break;
+			$status_update[] = T_('Regional settings updated.');
+		
+			break;
 
 
-			case 'plugins':
-				// UPDATE plug-ins:
-				break;
-			
-		}
+		case 'plugins':
+			// UPDATE plug-ins:
+			break;
+		
+	}
+	if( count($status_update) )
+	{
+		echo '<div class="panelinfo">';
+		foreach( $status_update as $stmsg ) echo '<p>'.$stmsg.'</p>';
+		echo '</div>';
+	}
 }
 elseif( $action == 'reset' && $tab == 'locales' )
 {
@@ -220,11 +191,11 @@ $current_User->check_perm( 'options', 'view', true );
 					echo '<li>';
 				echo '<a href="b2options.php">'. T_('General'). '</a></li>';
 				
-				if( $tab == 'locales' )
+				if( $tab == 'regional' )
 					echo '<li class="current">';
 				else
 					echo '<li>';
-				echo '<a href="b2options.php?tab=locales">'. T_('Locales'). '</a></li>';
+				echo '<a href="b2options.php?tab=regional">'. T_('Regional'). '</a></li>';
 		
 				if( $tab == 'plugins' )
 					echo '<li class="current">';
@@ -246,37 +217,6 @@ $current_User->check_perm( 'options', 'view', true );
 		{
 			// ---------- GENERAL OPTIONS ----------
 			case 'general':?>
-		<fieldset>
-			<legend><?php echo T_('Regional settings') ?></legend>
-
-			<?php form_text( 'newtime_difference', get_settings('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
-			
-			# alternative to locales menu, update only works for locales menu,
-			# so you probably want to simply remove this here:
-			# form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', T_('Default locale'), T_('Default locale used for backoffice and notification messages.'));
-			?>
-			
-		</fieldset>
-			
-		</fieldset>
-
-		<fieldset>
-			<legend><?php echo T_('Default user rights') ?></legend>
-			<?php
-
-			form_checkbox( 'pref_newusers_canregister', get_settings('pref_newusers_canregister'), T_('New users can register'), sprintf( T_('Check to allow new users to register themselves.' ) ) );
-
-			form_select_object( 'pref_newusers_grp_ID', get_settings('pref_newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
-
-			form_text( 'pref_newusers_level', get_settings('pref_newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
-			?>
-			<fieldset>
-				<legend><?php echo T_('Regional settings') ?></legend>
-	
-				<?php form_text( 'newtime_difference', get_settings('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );?>
-	
-			</fieldset>
-	
 			<fieldset>
 				<legend><?php echo T_('Default user rights') ?></legend>
 				<?php
@@ -328,13 +268,18 @@ $current_User->check_perm( 'options', 'view', true );
 				<?php
 				break;
 			
-			// ---------- LOCALE OPTIONS ----------
-			case 'locales':?>
+			// ---------- REGIONAL OPTIONS ----------
+			case 'regional':?>
 			
 			<fieldset>
-			<legend><?php echo T_('Default locale'); ?></legend>
-			<?php form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', '', T_('Default locale used for backoffice and notification messages.'));?>
-			</fieldset>			
+				<legend><?php echo T_('Regional settings') ?></legend>
+	
+				<?php
+				form_text( 'newtime_difference', get_settings('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
+				form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', T_('Default locale'), T_('Default locale used for backoffice and notification messages.'));
+				?>
+				
+			</fieldset>
 			
 			<fieldset>
 			<legend><?php echo T_('Available locales'); ?></legend>
@@ -374,7 +319,7 @@ $current_User->check_perm( 'options', 'view', true );
 			<br />
 			<div align="center">
 			<a href="?tab=locales&amp;action=reset"><img src="img/xross.gif" height="13" width="13" alt="'.T_('Reset to defaults').'" title="'.T_('Reset to defaults').'" border="0" /></a>
-			'.T_('Reset to defaults').'
+			<br />'.T_('Reset to defaults').'!
 			</div>';
 			
 			break;
@@ -440,8 +385,7 @@ $current_User->check_perm( 'options', 'view', true );
 		{ ?>
 		<fieldset>
 			<fieldset>
-				<?php if( $action == 'update' && $dbupdatesuccess ) echo T_('Updated.'); ?>
-				<div class="input">
+				<div <?php echo ( $tab == 'regional' ) ? 'style="text-align:center"' : 'class="input"'?>>
 					<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
 					<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
 				</div>

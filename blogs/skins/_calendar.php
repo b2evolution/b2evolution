@@ -13,7 +13,7 @@
 	# You can customize the following as you wish.
 	# Uncomment the lines you need
 
-	// $Calendar->set( 'monthdisplay', 1 ); // set this to 0 if you don't want to display the month name
+	// $Calendar->set( 'displaycaption', 1 ); // set this to 0 if you don't want to display the month name
 	// $Calendar->set( 'monthformat', 'F Y' );
 
 	// $Calendar->set( 'tablestart', '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">' );

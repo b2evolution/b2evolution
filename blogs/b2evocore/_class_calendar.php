@@ -22,7 +22,7 @@ class Calendar
 	var $result;			// Result set
 	var $result_num_rows;		// Number of rows in result set
 
-	var $monthdisplay;
+	var $displaycaption;
 	var $monthformat;
 	var $monthstart;
 	var $monthend;
@@ -124,7 +124,7 @@ class Calendar
 
 
 		// Default styling:
-		$this->monthdisplay = 1;	// set this to 0 if you don't want to display the month name
+		$this->displaycaption = 1;	// set this to 0 if you don't want to display the month name
 		$this->monthformat = 'F Y';
 		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
@@ -304,7 +304,7 @@ class Calendar
 
 		echo $this->tablestart;
 
-		if( $this->monthdisplay )
+		if( $this->displaycaption )
 		{	// caption:
 			echo $this->monthstart;
 			

@@ -15,7 +15,7 @@
 	
 	// $Calendar->set( 'searchframe', 12 );	// How many month will we search back for a post before we give up
 
-	// $Calendar->set( 'monthdisplay', 1 ); // set this to 0 if you don't want to display the month name
+	// $Calendar->set( 'displaycaption', 1 ); // set this to 0 if you don't want to display the month name
 	// $Calendar->set( 'monthformat', 'F Y' );
 	// $Calendar->set( 'monthstart', '<caption class="bCalendarMonth">' );
 	// $Calendar->set( 'monthend', '</caption>' );
