@@ -18,7 +18,7 @@
 		echo "<td>".$user_data["ID"]."</td>\n";
 		echo "<td>".$user_data["user_login"]."</td>\n";
 		?>
-		<td><strong><a href="b2team?action=view&amp;user=<?php echo $user_data['ID'] ?>"><?php echo $user_data["user_nickname"] ?></a></strong></td>
+		<td><strong><a href="b2team.php?action=view&amp;user=<?php echo $user_data['ID'] ?>"><?php echo $user_data["user_nickname"] ?></a></strong></td>
 		<?php
 		echo "<td>".$user_data["user_firstname"]."&nbsp;".$user_data["user_lastname"]."</td>\n";
 		echo "<td>&nbsp;<a href=\"mailto:$email\" title=\"e-mail: $email\"><img src=\"img/email.gif\" border=\"0\" alt=\"e-mail: $email\" /></a>&nbsp;</td>";
