@@ -228,6 +228,7 @@ switch( $action )
 
 				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
 				
+				$tableprefix = $conf_db_tableprefix;
 				$baseurl = $conf_baseurl;
 				$admin_email = $conf_admin_email;
 				$config_is_done = 1;

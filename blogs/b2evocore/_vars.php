@@ -38,8 +38,9 @@ else
 	$ReqPath = explode( '?', $ReqURI, 2 );
 	$ReqPath = $ReqPath[0];
 }
-$Debuglog->add( 'Request URI: '.$ReqURI );
-$Debuglog->add( 'Request Path: '.$ReqPath );
+// FP: seems like $Debuglog doesn exist yet!.?
+// $Debuglog->add( 'Request URI: '.$ReqURI );
+// $Debuglog->add( 'Request Path: '.$ReqPath );
 
 
 
