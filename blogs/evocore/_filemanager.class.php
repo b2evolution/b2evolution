@@ -914,7 +914,7 @@ class FileManager extends Filelist
 			}
 			else
 			{
-				$this->Messages->add( sprintf(T_('File [%s] not found.'), $file) );
+				$this->Messages->add( sprintf(T_('The file &laquo;%s&raquo; could not be found.'), $file) );
 				return false;
 			}
 		}
@@ -925,23 +925,23 @@ class FileManager extends Filelist
 			{
 				if( deldir_recursive( $this->cwd.'/'.$entry['name'] ) )
 				{
-					$this->Messages->add( sprintf( T_('Directory [%s] and subdirectories deleted.'), $entry['name'] ), 'note' );
+					$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), $entry['name'] ), 'note' );
 					return true;
 				}
 				else
 				{
-					$this->Messages->add( sprintf( T_('Directory [%s] could not be deleted.'), $entry['name'] ) );
+					$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted.'), $entry['name'] ) );
 					return false;
 				}
 			}
 			elseif( @rmdir( $this->cwd.$entry['name'] ) )
 			{
-				$this->Messages->add( sprintf( T_('Directory [%s] deleted.'), $entry['name'] ), 'note' );
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been deleted.'), $entry['name'] ), 'note' );
 				return true;
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('Directory [%s] could not be deleted (probably not empty).'), $entry['name'] ) );
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted (probably not empty).'), $entry['name'] ) );
 				return false;
 			}
 		}
@@ -949,12 +949,12 @@ class FileManager extends Filelist
 		{
 			if( unlink( $this->cwd.$entry['name'] ) )
 			{
-				$this->Messages->add( sprintf( T_('File [%s] deleted.'), $entry['name'] ), 'note' );
+				$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been deleted.'), $entry['name'] ), 'note' );
 				return true;
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('File [%s] could not be deleted.'), $entry['name'] ) );
+				$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; could not be deleted.'), $entry['name'] ) );
 				return false;
 			}
 		}
@@ -963,8 +963,6 @@ class FileManager extends Filelist
 
 	/**
 	 * Creates a directory or file.
-	 *
-	 * Meant to be called by {@link createDir()} or {@link createFile()}
 	 *
 	 * @param string type; 'dir' or 'file'
 	 * @param string name of the directory or file
@@ -1021,6 +1019,8 @@ class FileManager extends Filelist
 			{
 				$this->Messages->add( sprintf( T_('Directory [%s] has been created.'), $name ), 'note' );
 			}
+
+			$this->addFile( $newFile );
 		}
 		else
 		{
@@ -1223,7 +1223,7 @@ class FileManager extends Filelist
 
 /*
  * $Log$
- * Revision 1.11  2004/12/29 02:25:55  blueyed
+ * Revision 1.12  2004/12/29 04:32:10  blueyed
  * no message
  *
  * Revision 1.10  2004/11/10 22:44:26  blueyed

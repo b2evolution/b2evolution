@@ -249,7 +249,7 @@ class Filelist
 	 * @param string|File file name / full path or {@link File} object
 	 * @param boolean allow other paths than the lists default path?
 	 * @return boolean true on success, false on failure (path not allowed,
-	 *                 already in filelist, does not exist)
+	 *                 file does not exist)
 	 * @todo optimize (blueyed)
 	 */
 	function addFileByPath( $path, $allPaths = false )
@@ -276,29 +276,25 @@ class Filelist
 			return false;
 		}
 
-		if( $this->getKeyByName( $NewFile->getName() ) === false  )
-		{
-			$this->entries[] =& $NewFile;
 
-			if( $this->recursivedirsize && $NewFile->isDir() )
-			{ // won't be done in the File constructor
-				$NewFile->setSize( get_dirsize_recursive( $NewFile->getPath(true) ) );
-			}
+		$this->entries[] =& $NewFile;
 
-			if( $NewFile->isDir() )
-			{
-				$this->count_dirs++;
-			}
-			else
-			{
-				$this->count_files++;
-			}
-			$this->count_bytes += $NewFile->getSize();
-
-			return true;
+		if( $this->recursivedirsize && $NewFile->isDir() )
+		{ // won't be done in the File constructor
+			$NewFile->setSize( get_dirsize_recursive( $NewFile->getPath(true) ) );
 		}
 
-		return false;
+		if( $NewFile->isDir() )
+		{
+			$this->count_dirs++;
+		}
+		else
+		{
+			$this->count_files++;
+		}
+		$this->count_bytes += $NewFile->getSize();
+
+		return true;
 	}
 
 
@@ -629,7 +625,7 @@ class Filelist
 
 /*
  * $Log$
- * Revision 1.8  2004/12/29 02:25:55  blueyed
+ * Revision 1.9  2004/12/29 04:32:10  blueyed
  * no message
  *
  * Revision 1.7  2004/11/05 15:44:31  blueyed

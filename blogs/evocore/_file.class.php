@@ -232,12 +232,15 @@ class File
 
 
 	/**
-	 * Get the entries name
+	 * Get the File's name.
+	 *
+	 * @return string
 	 */
 	function getName()
 	{
 		return $this->_name;
 	}
+
 
 	/**
 	 * Get the path, optionally with name.
@@ -415,6 +418,11 @@ class File
 	}
 
 
+	/**
+	 * Set the File's name.
+	 *
+	 * @param string
+	 */
 	function setName( $name )
 	{
 		$this->_name = $name;
@@ -493,7 +501,7 @@ class File
 
 /*
  * $Log$
- * Revision 1.8  2004/12/29 02:25:55  blueyed
+ * Revision 1.9  2004/12/29 04:32:10  blueyed
  * no message
  *
  * Revision 1.7  2004/11/05 00:36:43  blueyed

@@ -268,6 +268,7 @@ if( $selaction != '' )
 				break;
 
 			case T_('Download'):
+				// TODO: provide optional zip formats
 				param( 'zipname', 'string', '' );
 				param( 'exclude_sd', 'integer', 0 );
 
@@ -277,13 +278,15 @@ if( $selaction != '' )
 					<p>
 					'.T_('You want to download:').'<ul>';
 
+					$atLeastOneDir = false;
 					foreach( $selectedFiles as $lFile )
 					{
 						if( $lFile->isDir() )
 						{
-							$msg_action .= sprintf('<li>'.T_('Directory [%s]')."</li>\n", $file);
+							$msg_action .= sprintf('<li>'.T_('Directory [%s]')."</li>\n", $lFile->getName());
+							$atLeastOneDir = true;
 						}
-						else $msg_action .= sprintf('<li>'.T_('File [%s]')."</li>\n", $file);
+						else $msg_action .= sprintf('<li>'.T_('File [%s]')."</li>\n", $lFile->getName());
 					}
 
 					$msg_action .= '
@@ -292,7 +295,7 @@ if( $selaction != '' )
 					<div class="panelblock">
 					<form action="files.php" class="fform" method="post">
 					<fieldset>
-						<legend>'.T_('Please give a filename and choose zip format:').'</legend>';
+						<legend>'.T_('Download options').'</legend>';
 
 						foreach( $selectedfiles as $file )
 						{
@@ -301,7 +304,9 @@ if( $selaction != '' )
 
 						$msg_action .= $Fileman->getFormHiddenInputs()."\n"
 												.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
-												.form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n"
+												.( $atLeastOneDir ?
+														form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
+														'' )
 												.'<div class="input"><input type="submit" name="selaction" value="'.T_('Download').'" /></div>
 					</fieldset>
 					</form>';
@@ -1061,7 +1066,7 @@ while( $lFile = $Fileman->getNextFile() )
 			if( $Fileman->flatmode )
 			{
 				?><div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-				$path = substr( $Fileman->getFileSubpath( $lFile, false ), 0, -1 );
+				$path = substr( $lFile->getPath( false ), strlen( $Fileman->cwd ), -1 );
 				echo empty( $path ) ?
 							' - ' :
 							$path;
