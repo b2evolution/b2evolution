@@ -22,7 +22,7 @@ switch($action)
 		param( 'blog_description', 'string', '' );
 		param( 'blog_longdesc', 'html', '' );
 		param( 'blog_lang', 'string', $default_language );
-		param( 'blog_siteurl', 'string', $baseurl );
+		param( 'blog_siteurl', 'string', '' );
 		param( 'blog_filename', 'string', 'new_file.php' );
 		param( 'blog_staticfilename', 'string', '' );
 		param( 'blog_stub', 'string', 'new_file.php' );
@@ -141,6 +141,8 @@ switch($action)
 		?>
 		<p><strong><?php printf( T_('You should <a href="%s">create categories</a> for this blog now!'), 'b2categories.php?action=newcat&blog_ID='.$blog_ID ); ?></strong></p>
 		<?php
+		require( dirname(__FILE__).'/_footer.php' ); 
+		exit();
 		break;
 	
 	
