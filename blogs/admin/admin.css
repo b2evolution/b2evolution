@@ -676,7 +676,9 @@ table.fileman th {
 .toolbar {
 }
 .toolbaritem input,
-.toolbaritem select {
+.toolbaritem select,
+form.fm_options input
+{
 	font-size:84%;
 }
 .toolbaritem {
@@ -696,7 +698,7 @@ div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;
 }
-div.fm_options {
+form.fm_options {
 	text-align:right;
 	float:right;
 	border: 1px solid #d91;

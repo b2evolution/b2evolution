@@ -47,7 +47,7 @@ class FileManager
 		$this->Messages = new Log( 'error' );
 
 		$this->user = $current_User;
-		
+
 		$this->order = $order;
 		$this->orderasc = $asc;
 
@@ -240,8 +240,8 @@ class FileManager
 
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * get the current url, with all relevant GET params (cd, order, asc)
 	 *
@@ -252,7 +252,7 @@ class FileManager
 	function curl( $cd = '#', $order = '#', $asc = '#' )
 	{
 		$r = $this->url;
-		
+
 		foreach( array('cd', 'order', 'asc') as $check )
 		{
 			if( isset( $_GET[ $check ] ) && $$check == '#' )
@@ -264,7 +264,28 @@ class FileManager
 				$r = url_add_param( $r, $check.'='.$$check );
 			}
 		}
-		
+
+		return $r;
+	}
+
+
+	/**
+	 * generates hidden input fields for forms, based on {@link curl()}}
+	 */
+	function form_hiddeninputs( $cd = '#', $order = '#', $asc = '#' )
+	{
+		// get curl(), remove leading URL and '?'
+		$params = preg_split( '/&amp;/', substr( $this->curl( $cd, $order, $asc ), strlen( $this->url )+1 ) );
+
+		$r = '';
+		foreach( $params as $lparam )
+		{
+			if( $pos = strpos($lparam, '=') )
+			{
+				$r .= '<input type="hidden" name="'.substr( $lparam, 0, $pos ).'" value="'.format_to_output( substr( $lparam, $pos+1 ), 'formvalue' ).'" />';
+			}
+		}
+
 		return $r;
 	}
 
@@ -550,7 +571,7 @@ class FileManager
 				break;
 
 			case 'iconimg':
-				$r = $this->icon( 'cfile', 'imgtag', $param );	
+				$r = $this->icon( 'cfile', 'imgtag', $param );
 				break;
 
 			default:
@@ -621,7 +642,7 @@ class FileManager
 
 
 	/**
-	 * get properties of a special icon 
+	 * get properties of a special icon
 	 *
 	 * @param string icon for what (special puposes or 'cfile' for current file/dir)
 	 * @param string what to return for that icon (file, url, size {@link see Fileman::imgsize()}})
@@ -673,26 +694,26 @@ class FileManager
 			case 'size':
 				$r = $this->imgsize( $this->imgpath.$iconfile, $param );
 				break;
-				
+
 			case 'imgtag':
 				$r = '<img src="'.$this->icon( $for, 'url' ).'" '.$this->icon( $for, 'size', 'string' )
 				.' alt="';
-				
+
 				if( $for == 'cfile' )
 				{ // extension as alt-tag for cfile-icons
 					$r .= $this->cget( 'ext' );
 				}
-				
+
 				$r .= '" title="'.$this->type( $for );
-				
+
 				$r .= '" />';
 				break;
 
-				
+
 			default:
 				echo 'unknown what: '.$what;
 		}
-		
+
 		return $r;
 	}
 
@@ -737,11 +758,11 @@ class FileManager
 		elseif( $param == 'delete' )
 			$r = T_('Delete');
 		else $r = false;
-		
+
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * loads a specific file as current file as saves current one (can be nested).
 	 *
@@ -1244,8 +1265,8 @@ class FileManager
 
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * check permissions
 	 *
@@ -1255,12 +1276,12 @@ class FileManager
 	function perm( $for )
 	{
 		global $Debuglog;
-		
+
 		switch( $for )
 		{
 			case 'upload':
 				return $this->user->check_perm( 'upload', 'any', false );
-			
+
 			default:  // return false if not defined
 				$Debuglog->add( 'Filemanager: permission check for ['.$for.'] not defined!' );
 				return false;

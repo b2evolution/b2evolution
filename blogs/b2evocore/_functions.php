@@ -1122,14 +1122,18 @@ function debug_info( $force = false )
 			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 		}
 
-		if( $Debuglog->count() )
+		if( $Debuglog->count( 'all' ) )
 		{
-			echo '<h3>Debug messages</h3><ul>';
-			foreach( $Debuglog->messages() as $message )
+			echo '<h3>Debug messages</h3>';
+			foreach( $Debuglog->messages( 'all' ) as $level => $messages )
 			{
-				echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';
+				echo '<h2>Level ['.$level.']</h2><ul>';
+				foreach( $messages as $message )
+				{
+					echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';
+				}
+				echo '</ul>';
 			}
-			echo '</ul>';
 		}
 
 		echo '<h3>DB</h3>';

@@ -558,7 +558,7 @@ function upgrade_b2evo_tables()
 		
 		echo 'Creating user preferences table... ';
 		$DB->query( "CREATE TABLE $tableusersettings (
-								uset_user_ID INT() NOT NULL ,
+								uset_user_ID INT NOT NULL ,
 								uset_name VARCHAR( 30 ) NOT NULL,
 								uset_value VARCHAR( 255 ) NULL,
 								PRIMARY KEY ( uset_user_ID, uset_name )

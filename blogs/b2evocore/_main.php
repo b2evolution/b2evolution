@@ -31,6 +31,7 @@ require_once( dirname(__FILE__).'/_functions.php' );
 timer_start();
 require_once( dirname(__FILE__).'/_vars.php' );	// sets various arrays and vars for use in b2
 require_once( dirname(__FILE__).'/_class_generalsettings.php' );
+require_once( dirname(__FILE__).'/_class_usersettings.php' );
 require_once( dirname(__FILE__).'/_class_db.php' );
 require_once( dirname(__FILE__).'/_functions_template.php' );	// function to be called from templates
 require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );	
@@ -69,7 +70,8 @@ if( $use_obhandler )
 // Connecting to the db:
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 
-$Settings = & new GeneralSettings();
+$UserSettings = new UserSettings();
+$Settings = new GeneralSettings();
 
 $servertimenow = time();
 $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);

@@ -218,10 +218,10 @@ if( $selaction != '' )
 					{?>
 					<input type="hidden" name="selectedfiles[]" value="<?php echo format_to_output( $file, 'formvalue' ) ?>" />
 					<?php
-					}?>
-
-					<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-					<?php
+					}
+					
+					$Fileman->form_hiddeninputs();
+					
 					form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.') );
 					form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.') );
 					?>
@@ -319,7 +319,7 @@ switch( $action ) // (we catched empty action before)
 		{
 			$message = '
 			<form action="files.php">
-			<input type="hidden" name="cd" value="'.format_to_output( $cd, 'formvalue' ).'" />
+			'.$Fileman->form_hiddeninputs().'
 			<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 			<input type="text" name="chmod" value="'.$Fileman->cget_file( $file, 'perms', 'octal' ).'" maxlength="3" size="3" />
 			<input type="submit" name="action" value="editperm" />
@@ -394,6 +394,16 @@ switch( $action ) // (we catched empty action before)
 		}
 
 		break;
+	
+	case 'update_options':
+		param( 'option_dirsattop', 'integer', 0 );
+		$UserSettings->set( 'fm_dirsattop', $option_dirsattop );
+		
+		if( $UserSettings->updateDB() )
+		{
+			$Fileman->Messages->add( T_('User preferences updated').'.', 'note' );
+		}
+		break;
 }
 
 
@@ -412,7 +422,9 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 	$Fileman->Messages->display( '', '', true, 'error' );
 	$Fileman->Messages->display( '', '', true, 'note' );
 	if( isset($message) )
+	{
 		echo $message;
+	}
 	?>
 	</div>
 	<?php
@@ -420,12 +432,12 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 ?>
 <div class="toolbar">
 	<form action="files.php" name="search" class="toolbaritem">
-		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="text" name="searchfor" value="--todo--" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
 	<form action="files.php" name="filter" class="toolbaritem">
-		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="text" name="filter" value="--todo--" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 	</form>
@@ -532,7 +544,7 @@ if( $i != 0 )
 			?></a>
 		</noscript>
 		&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
-		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
 		<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
 		<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
@@ -546,22 +558,27 @@ if( $i != 0 )
 </form>
 
 <div class="toolbar">
-	<div id="options" class="fm_options">
-		<a id="options_title" href="javascript:toggle_options()"><?php echo T_('show options') ?></a>
+	<form id="options" class="fm_options" action="files.php" method="post">
 		<div id="options_list">
+			<?php echo T_('sort directories at top') ?>
+			<input type="checkbox" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />
 			<br />
-			(not functional yet)
-			sort dirs at top <input type="checkbox" />
-			<br />
-			a <input type="checkbox" />
-			<br />
-			a <input type="checkbox" />
-			<br />
-			(storable in cookie/userprefs?)
+
+			<?php echo $Fileman->form_hiddeninputs() ?>
+			<input type="hidden" name="action" value="update_options" />
+			<div class="input">
+			<input type="submit" value="<?php echo T_('Update !') ?>" />
+			</div>
 		</div>
-	</div>
+		<script type="text/javascript">
+		<!--
+			document.write( '<a id="options_title" href="javascript:toggle_options()"><?php echo T_("show options") ?></a>' )
+		// -->
+		</script>
+	</form>
 
 	<form action="files.php" name="filter" class="toolbaritem">
+		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="hidden" name="action" value="upload" />
 		<input type="submit" value="<?php echo format_to_output( T_('Upload a file/image'), 'formvalue' ) ?>" />
 	</form>
@@ -572,6 +589,7 @@ if( $i != 0 )
 			<option value="dir"><?php echo T_('directory') ?></option>
 		</select>
 		<input type="text" name="createname" value="" size="20" />
+		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="hidden" name="action" value="createnew" />
 		<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
 	</form>

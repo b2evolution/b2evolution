@@ -77,7 +77,7 @@ class Log
 	 */
 	function display( $head, $foot, $display = true, $level = '#', $style = '<ul>' )
 	{
-		$messages = $this->messages( $level );
+		$messages = $this->messages( $level, true );
 		
 		if( !count($messages) )
 			return false;
@@ -146,7 +146,7 @@ class Log
 		$r = '';
 		if( '' != $head )
 			$r .= $head.' ';
-		$r .= implode(', ', $this->messages($level));
+		$r .= implode(', ', $this->messages( $level, true ));
 		if( '' != $foot )
 			$r .= ' '.$foot;
 		
@@ -162,7 +162,7 @@ class Log
 	 */
 	function count( $level = '#' )
 	{
-		return count( $this->messages($level) );
+		return count( $this->messages( $level, true ) );
 	}
 
 
@@ -170,19 +170,31 @@ class Log
 	 * returns array of messages of that level
 	 *
 	 * @param string the level
-	 * @return array of messages, one-dimensional for a specific level, two-dimensional for level 'all'
+	 * @param boolean force one dimension
+	 * @return array of messages, one-dimensional for a specific level, two-dimensional for level 'all' (depends on second param)
 	 */
-	function messages( $level = '#' )
+	function messages( $level = '#', $forceonedimension = false )
 	{
 		$messages = array();
 		
+		// sort by level ('error' above 'note')
+		$ksortedmessages = $this->messages;
+		ksort( $ksortedmessages );
+		
 		if( $level == 'all' )
 		{
-			foreach( $this->messages as $llevel => $lmsgs )
+			foreach( $ksortedmessages as $llevel => $lmsgs )
 			{
 				foreach( $lmsgs as $lmsg )
 				{
-					$messages[$llevel][] = $lmsg;
+					if( $forceonedimension )
+					{
+						$messages[] = $lmsg;
+					}
+					else
+					{
+						$messages[$llevel][] = $lmsg;
+					}
 				}
 			}
 		}

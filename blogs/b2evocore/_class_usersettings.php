@@ -1,6 +1,6 @@
 <?php
 /**
- * Class to handle the global settings
+ * Class to handle the user settings/preferences
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -18,39 +18,40 @@ require_once( dirname(__FILE__).'/_class_abstractsettings.php' );
 
 /**
  * Class to handle the global settings
+ *
+ * @package evocore
  */
-class GeneralSettings extends AbstractSettings
+class UserSettings extends AbstractSettings
 {
 	/**
 	 * Constructor
 	 *
 	 * loads settings, checks db_version
 	 */
-	function GeneralSettings()
+	function UserSettings()
 	{ // constructor
-		global $new_db_version, $tablesettings;
+		global $new_db_version, $tableuserprefs;
 
-		$this->dbtablename = $tablesettings;
-		$this->colkeynames = array( 'set_name' );
-		$this->colvaluename = 'set_value';
-
+		$this->dbtablename = $tableuserprefs;
+		$this->colkeynames = array( 'upref_user_ID', 'upref_name' );
+		$this->colvaluename = 'upref_value';
+		
 		parent::AbstractSettings();
-
-		if( $this->get( 'db_version' ) != $new_db_version )
-		{	// Database is not up to date:
-			$error_message = 'Database schema is not up to date. You have schema version '.$this->get( 'db_version' ).', but we would need '.$new_db_version.'.';
-			require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
-		}
 	}
 
 
 	/**
 	 * get a setting from the DB settings table
 	 * @param string name of setting
+	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function get( $setting )
+	function get( $setting, $user = '#' )
 	{
-		return parent::get( $setting );
+		global $current_User;
+		if( $user == '#' )
+			return parent::get( $current_User->ID, $setting );
+		else
+			return parent::get( $user, $setting );
 	}
 
 
@@ -59,10 +60,15 @@ class GeneralSettings extends AbstractSettings
 	 *
 	 * @param string name of setting
 	 * @param mixed new value
+	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function set( $setting, $value )
+	function set( $setting, $value, $user = '#' )
 	{
-		return parent::set( array( $setting, $value ) );
+		global $current_User;
+		if( $user == '#' )
+			return parent::set( array( $current_User->ID, $setting, $value ) );
+		else
+			return parent::set( array( $user, $setting, $value ) );
 	}
 
 

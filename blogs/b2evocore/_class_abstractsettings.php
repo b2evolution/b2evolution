@@ -38,6 +38,11 @@ class AbstractSettings
 
 
 	/**
+	 * the internal cache
+	 */
+	var $cache = false;
+
+	/**
 	 * Constructor, loads settings.
 	 */
 	function AbstractSettings()
@@ -48,37 +53,43 @@ class AbstractSettings
 																					$this->colvaluename.
 		                            ' FROM '.$this->dbtablename );
 
+		if( !$result )
+		{
+			return false;
+		}
+
 		switch( count( $this->colkeynames ) )
 		{
 			case 1:
 				foreach( $result as $loop_row )
 				{
-					$this->store[$loop_row->{$this->colkeynames[0]}]->value = $loop_row->{$this->colvaluename};
-					$this->store[$loop_row->{$this->colkeynames[0]}]->dbstatus = 'uptodate';
+					$this->cache[$loop_row->{$this->colkeynames[0]}]->value = $loop_row->{$this->colvaluename};
+					$this->cache[$loop_row->{$this->colkeynames[0]}]->dbuptodate = true;
 				}
 				break;
 
 			case 2:
 				foreach( $result as $loop_row )
 				{
-					$this->store[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->value = $loop_row->{$this->colvaluename};
-					$this->store[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->dbstatus = 'uptodate';
+					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->value = $loop_row->{$this->colvaluename};
+					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->dbuptodate = true;
 				}
 				break;
 
 			case 3:
 				foreach( $result as $loop_row )
 				{
-					$this->store[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->value = $loop_row->{$this->colvaluename};
-					$this->store[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->dbstatus = 'uptodate';
+					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->value = $loop_row->{$this->colvaluename};
+					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->uptodate = true;
 				}
 				break;
 
 			default:
 				die( 'Settings keycount not supported' )
+
 		}
 
-		#pre_dump( $this->store, 'store' );
+		#pre_dump( $this->cache, 'cache' );
 	}
 
 
@@ -91,36 +102,43 @@ class AbstractSettings
 	function get()
 	{
 		global $Debuglog;
-		// echo 'get: '.$setting.'<br />';
 
 		$args = func_get_args();
-		
-		if( count( $args ) != count( $this->colkeynames ) )
+		// echo 'get: ['.implode(', ', $args ).']<br />';
+
+		if( !$this->cache )
 		{
-			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not match $colkeyname.' );
 			return false;
 		}
-		
+
+		if( count( $args ) != count( $this->colkeynames ) )
+		{
+			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not match $colkeyname.', 'error' );
+			return false;
+		}
+
 		switch( count( $this->colkeynames ) )
 		{
 			case 1:
-				if( isset($this->store[ $args[0] ]) )
+				if( isset($this->cache[ $args[0] ]) )
 				{
-					return $this->store[ $args[0] ]->value;
+					return $this->cache[ $args[0] ]->value;
 				}
 				break;
 			case 2:
-				if( isset($this->store[ $args[0] ][ $args[1] ]) )
+				if( isset($this->cache[ $args[0] ][ $args[1] ]) )
 				{
-					return $this->store[ $args[0] ][ $args[1] ]->value;
+					return $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
 				break;
 			case 3:
-				if( isset($this->store[ $args[0] ][ $args[1] ][ $args[2] ]) )
+				if( isset($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]) )
 				{
-					return $this->store[ $args[0] ][ $args[1] ][ $args[2] ]->value;
+					return $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
 				break;
+			default:
+				return false;
 		}
 
 		$Debuglog->add( 'AbstractSetting: queried setting ['.implode( '/', $args ).' not defined.' );
@@ -131,60 +149,53 @@ class AbstractSettings
 	/**
 	 * temporarily sets a setting ({@link updateDB()}} writes it to DB)
 	 *
-	 * @param array with values of table column names
-	 *							according to $this->colkeynames + $this->colvaluename
+	 * @params string the values for the column keys (depends on $this->colkeynames + $this->colvaluename
+	 *                and must match order and count)
 	 */
-	function set( $pleaseset )
+	function set()
 	{
-		// pre_dump( $pleaseset, 'set_abstract' );
-		
+		$args = func_get_args();
+		// echo 'get: ['.implode(', ', $args ).']<br />';
+
+		if( count( $args ) != (count( $this->colkeynames ) + 1) )
+		{
+			$Debuglog->add( 'Count of arguments for AbstractSettings::set() does not match $colkeyname + 1 (colkeyvalue).', 'error' );
+			return false;
+		}
+
 		switch( count($this->colkeynames) )
 		{
 			case 1:
-				$atstore =& $this->store[ $pleaseset[0] ];
+				$atcache =& $this->cache[ $args[0] ];
 				break;
 			case 2:
-				$atstore =& $this->store[ $pleaseset[0] ][ $pleaseset[1] ];
+				$atcache =& $this->cache[ $args[0] ][ $args[1] ];
 				break;
 			case 3:
-				$atstore =& $this->store[ $pleaseset[0] ][ $pleaseset[1] ][ $pleaseset[2] ];
+				$atcache =& $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
 				break;
 			default:
 				return false;
-			
 		}
-		
-		if( isset($atstore->value) )
+
+		if( isset($atcache->value) )
 		{
-			if( $atstore->value == $pleaseset[ count($pleaseset)-1 ] )
+			if( $atcache->value == $args[ count($args)-1 ] )
 			{ // already set
 				return false;
 			}
-
-			if( $atstore->dbstatus == 'uptodate' )
-			{
-				$atstore->dbstatus = 'update';
-			}
-			else
-			{
-				$atstore->dbstatus = 'insert';
-			}
-		}
-		else
-		{
-			$atstore->dbstatus = 'insert';
 		}
 
-		$atstore->value = $pleaseset[ count($pleaseset)-1 ];
+		$atcache->value = $args[ count($args)-1 ];
+		$atcache->dbuptodate = false;
 
-		// echo ' to '.$value.' <br />';
+		// echo ' to '.$args[ count($args)-1 ].' <br />';
 		return true;
 	}
 
 
 	/**
 	 * commits changed settings to DB
-	 * @abstract
 	 */
 	function updateDB()
 	{
@@ -192,27 +203,25 @@ class AbstractSettings
 
 		$query_insert = array();
 
-		#pre_dump( $this->store, 'update' );
-		
+		#pre_dump( $this->cache, 'update' );
+
 		switch( count($this->colkeynames) )
 		{
 			case 1:
-				foreach( $this->store as $key => $value )
+				foreach( $this->cache as $key => $value )
 				{
-					if( $value->dbstatus != 'uptodate' )
+					if( !$value->dbuptodate )
 					{
-						// NOTE: we could split this to use UPDATE for dbstatus=='update'. Dunno what's better for performance.
-						
 						$query_insert[] = "('$key', '".$DB->escape( $value->value )."')";
 					}
 				}
 				break;
-			
+
 			case 2:
-				foreach( $this->store as $key => $value )
+				foreach( $this->cache as $key => $value )
 					foreach( $value as $key2 => $value2 )
 					{
-						if( $value2->dbstatus != 'uptodate' )
+						if( !$value2->dbuptodate )
 						{
 							$query_insert[] = "('$key', '$key2', '".$DB->escape( $value2->value )."')";
 						}
@@ -220,16 +229,19 @@ class AbstractSettings
 				break;
 
 			case 3:
-				foreach( $this->store as $key => $value )
+				foreach( $this->cache as $key => $value )
 					foreach( $value as $key2 => $value2 )
 						foreach( $value2 as $key3 => $value3 )
 						{
-							if( $value3->dbstatus != 'uptodate' )
+							if( !$value3->dbuptodate )
 							{
 								$query_insert[] = "('$key', '$key2', '$key3', '".$DB->escape( $value3->value )."')";
 							}
 						}
 				break;
+
+			default:
+				return false;
 		}
 
 		$q = false;
@@ -238,14 +250,10 @@ class AbstractSettings
 			$query = 'REPLACE INTO '.$this->dbtablename.' ('.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
 								.') VALUES '.implode(', ', $query_insert);
 			$q = $DB->query( $query );
-			
-			pre_dump( $query, 'update-query' );
 		}
-		
+
 		return $q;
 	}
 
 }
-
-
 ?>
