@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-05-11 19:24+0200\n"
-"PO-Revision-Date: 2004-05-11 19:31+0100\n"
+"PO-Revision-Date: 2004-05-11 19:50+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -785,7 +785,7 @@ msgstr "Locale '%s' créée."
 
 #: ..\..\..\admin\b2options.php:206
 msgid "Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded."
-msgstr ""
+msgstr "Table locales vidée, valeurs par défaut chargées depuis <code>/conf/_locales.php</code>."
 
 #: ..\..\..\admin\b2options.php:219
 #, php-format
@@ -1717,7 +1717,7 @@ msgstr "Locale Principale"
 
 #: ..\..\..\admin\_blogs_main.subform.php:17
 msgid "Determines the language of the navigation links on the blog."
-msgstr ""
+msgstr "Détermine la langue des liens de navigation sur le blog."
 
 #: ..\..\..\admin\_blogs_main.subform.php:22
 msgid "Access parameters"
@@ -2623,7 +2623,7 @@ msgstr "Activée"
 
 #: ..\..\..\admin\_set_regional.form.php:47
 msgid "Should this locale be available to users?"
-msgstr ""
+msgstr "Cette locale doit elle être disponible pour les utilisateurs?"
 
 #: ..\..\..\admin\_set_regional.form.php:49
 msgid "name of the locale"
@@ -2696,7 +2696,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:84
 msgid "Note: default locale is not enabled."
-msgstr ""
+msgstr "Note: la locale par défaut n'est pas activée."
 
 #: ..\..\..\admin\_set_regional.form.php:92
 msgid "Regional settings"
@@ -2899,7 +2899,7 @@ msgstr "Visiter le site"
 
 #: ..\..\..\admin\_users_form.php:144
 msgid "Search on ICQ.com"
-msgstr ""
+msgstr "Chercher sur icq.com"
 
 #: ..\..\..\admin\_users_form.php:148
 #: ..\..\..\admin\_users_form.php:150
@@ -2910,7 +2910,7 @@ msgstr "ICQ"
 
 #: ..\..\..\admin\_users_form.php:154
 msgid "Instant Message to user"
-msgstr ""
+msgstr "Message instantané à l'utilisateur"
 
 #: ..\..\..\admin\_users_form.php:159
 #: ..\..\..\admin\_users_form.php:171
@@ -2948,7 +2948,7 @@ msgstr "Nouveau mot de passe"
 
 #: ..\..\..\admin\_users_form.php:165
 msgid "Leave empty if you don't want to change the password."
-msgstr ""
+msgstr "Laissez vide si vous ne voulez pas modifier le mot de passe."
 
 #: ..\..\..\admin\_users_form.php:166
 #: ..\..\..\skins\_profile.php:85
@@ -2971,7 +2971,7 @@ msgstr "Droits utilisateur"
 #: ..\..\..\admin\_users_form.php:182
 #, php-format
 msgid "See <a %s>online manual</a> for details."
-msgstr ""
+msgstr "Consultez le <a %s>manuel en ligne</a> pour les détails."
 
 #: ..\..\..\admin\_users_form.php:185
 #: ..\..\..\admin\_users_form.php:189
@@ -4596,7 +4596,7 @@ msgstr "La version minimale de PHP requise pour cette version de b2evolution est
 
 #: ..\..\..\install\index.php:132
 msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
-msgstr ""
+msgstr "Il semble que les paramètres d'accès à la base de données que vous avez entrés ne fonctionnent pas. Merci de vérifier minutieusement et de réessayer..."
 
 #: ..\..\..\install\index.php:172
 msgid "Config file update"
@@ -4618,19 +4618,19 @@ msgstr "Vous pouvez autoriser l'installeur à mettre à jour votre fichier de conf
 #: ..\..\..\install\index.php:178
 #, php-format
 msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
-msgstr ""
+msgstr "Faites un <code>chmod 666 %s</code>. Si nécessaire, consultez le <a %s>manuel en ligne sur les permissions de fichiers</a>."
 
 #: ..\..\..\install\index.php:179
 msgid "Come back to this page and refresh/reload."
-msgstr ""
+msgstr "Revenez à cette page et rafraîchissez/rechargez."
 
 #: ..\..\..\install\index.php:183
 msgid "Alternatively, you can update the config file manually:"
-msgstr ""
+msgstr "Alternativement, vous pouvez mettre à jour votre fichier de config manuellement:"
 
 #: ..\..\..\install\index.php:185
 msgid "Open the _config.php file locally with a text editor."
-msgstr ""
+msgstr "Ouvrez le fichier _config.php localement avec un éditeur de texte."
 
 #: ..\..\..\install\index.php:186
 msgid "Delete all contents!"
@@ -4638,11 +4638,11 @@ msgstr "Supprimer tous les contenus!"
 
 #: ..\..\..\install\index.php:187
 msgid "Copy the contents from the box below."
-msgstr ""
+msgstr "Copiez le contenu de la boîte ci-dessous."
 
 #: ..\..\..\install\index.php:188
 msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
-msgstr ""
+msgstr "Collez ce contenu dans votre éditeur de fichiers local. <strong>ATTENTION: assurez vous qu'il n'y ait ABSOLUMENT AUCUN ESPACE après le <code>?&gt;</code> final dans le fichier.</strong> Un quelconque espace, tabulation, retour à la ligne ou ligne vide à la fin du fichier de config peut empêcher les cookies de fonctionner lorsque vous essayerez de vous connecter plus tard."
 
 #: ..\..\..\install\index.php:189
 msgid "Save the new _config.php file locally."
