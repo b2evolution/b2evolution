@@ -139,7 +139,7 @@
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
 			<?php $Item->content(); ?>
-			<?php link_pages("<br />Pages: ","<br />","number") ?>
+			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
 			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
@@ -219,7 +219,7 @@
 			<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
 			<div class="bText">
 				<?php $Item->content( 1, false ); ?>
-				<?php link_pages("<br />Pages: ","<br />","number") ?>
+				<?php link_pages() ?>
 			</div>
 		</div>
 		<?php
@@ -255,7 +255,7 @@
 			<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
 			<div class="bText">
 				<?php $Item->content( 1, false ); ?>
-				<?php link_pages("<br />Pages: ","<br />","number") ?>
+				<?php link_pages() ?>
 			</div>
 		</div>
 		<?php

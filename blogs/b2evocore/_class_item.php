@@ -456,7 +456,6 @@ class Item extends DataObject
 
 		if( preg_match('/<!--nextpage-->/', $content ) )
 		{	// This is a multipage post
-			if ($page > 1) $dispmore=1;
 			$content = str_replace("\n<!--nextpage-->\n", '<!--nextpage-->', $content);
 			$content = str_replace("\n<!--nextpage-->", '<!--nextpage-->', $content);
 			$content = str_replace("<!--nextpage-->\n", '<!--nextpage-->', $content);
@@ -470,6 +469,7 @@ class Item extends DataObject
 			if( $disppage > $numpages )
 				$disppage = $numpages;
 			$content = $pages[$disppage-1];
+			if($disppage > 1) $dispmore=1;
 		}
 
 		$content_parts = explode('<!--more-->', $content);
@@ -480,12 +480,15 @@ class Item extends DataObject
 			{	// Viewer has already asked for more
 				if( $stripteaser || preg_match('/<!--noteaser-->/', $content ) )
 				{	// We want to strip the teaser:
-					$content_parts[0] = '';
+					$output = '';
 				}
-				$output = $content_parts[0];
-				if( !empty($more_anchor) ) $output .= $before_more;
-				$output .= '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'.$more_anchor;
-				if( !empty($more_anchor) ) $output .= $after_more;
+				else
+				{ // We keep the teaser:
+					$output = $content_parts[0];
+					if( !empty($more_anchor) ) $output .= $before_more;
+					$output .= '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'.$more_anchor;
+					if( !empty($more_anchor) ) $output .= $after_more;
+				}
 				$output .= $content_parts[1];
 			}
 			else

@@ -57,7 +57,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <?php $Item->content(); ?>
 
 <div class="rightFlush">
-<?php link_pages("<br />Pages: ","<br />","number") ?> 
+<?php link_pages() ?> 
 
 <?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 <?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>

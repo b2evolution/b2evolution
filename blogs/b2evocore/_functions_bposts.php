@@ -33,7 +33,7 @@ function bpost_create(
 	$post_urltitle = '',
 	$post_url = '',
 	$post_comments = 'open',
-	$post_renderers = array() )
+	$post_renderers = array('default') )
 {
 	global $DB, $tableposts, $tablepostcats, $query;
 	global $localtimenow, $default_locale;
@@ -781,10 +781,12 @@ function the_content(
  * link_pages(-)
  * vegarg: small bug when using $more_file fixed
  */
-function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%d', $more_file='')
+function link_pages( $before='#', $after='#', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%d', $more_file='')
 {
 	global $id, $page, $numpages, $multipage, $more;
 
+	if( $before == '#' ) $before = '<p>'.T_('Pages:').' ';
+	if( $after == '#' ) $after = '</p>';
 	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
 	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
 

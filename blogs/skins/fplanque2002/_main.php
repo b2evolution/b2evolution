@@ -103,7 +103,7 @@
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
 			<?php $Item->content(); ?>
-			<?php link_pages("<br />Pages: ","<br />","number") ?>
+			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
 			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>

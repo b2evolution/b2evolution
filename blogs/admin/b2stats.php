@@ -13,7 +13,6 @@ require_once( dirname(__FILE__) . '/' . $admin_dirout . '/' . $core_subdir . '/_
 $admin_tab = 'stats';
 $admin_pagetitle = T_('View Stats for Blog:');
 
-param( 'blog', 'integer', 0, true );
 param( 'action', 'string' );
 param( 'show', 'string', 'referers' );
 

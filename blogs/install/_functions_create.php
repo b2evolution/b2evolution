@@ -373,35 +373,35 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/' );
+	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_linkblog_contrib, array(), 'published',	'nl-NL', '', 0, true, '', 'http://www.rononline.nl/' );
+	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_linkblog_contrib, array(), 'published',	'nl-NL', '', 0, true, '', 'http://www.rononline.nl/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
+	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/' );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/' );
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/' );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/' );
+	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/' );
+	bpost_create( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	echo "OK.<br />\n";
 
@@ -583,13 +583,49 @@ function create_default_contents( $populate_blog_a = true )
 
 </ul>"), $now, $cat_b2evo );
 
+	// Create newbie posts:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, T_('This is a multipage post'), T_('This is page 1 of a multipage post.
+
+You can see the other pages by cliking on the links below the text.
+
+<!--nextpage-->
+
+This is page 2.
+
+<!--nextpage-->
+
+This is page 3.
+
+<!--nextpage-->
+
+This is page 4.
+
+It is the last page.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+	
+
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, T_('Extended post with no teaser'), T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.
+
+<!--more--><!--noteaser-->
+
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+	
+
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, T_('Extended post'), T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.
+
+<!--more-->
+
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+	
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Important information :idea:"), T_("<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>
+	bpost_create( 1, T_("Important information :idea:"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
 
-<p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)</p>
+All these entries are designed to help you so, as EdB would say: \"<em>read them all before you start hacking away!</em>\" ;)
 
-<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>"), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_ann_a , $cat_ann_b ) : array ( $cat_ann_b ) ) );
+If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read."), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_ann_a , $cat_ann_b ) : array ( $cat_ann_b ) ) );
 
 	echo "OK.<br />\n";
 
@@ -641,9 +677,11 @@ function populate_main_tables()
 
 	echo "OK.<br />\n";
 
+
 	// POPULATE THE LINKBLOG:
 	populate_linkblog( $now, $cat_linkblog_b2evo, $cat_linkblog_contrib );
 
+	// Create blog B contents:
 	create_default_contents();
 
 

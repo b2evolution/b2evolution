@@ -15,7 +15,7 @@
 		<table cellpadding="0" cellspacing="0" border="0"><tr>
 		<?php	if($previousXend > 0) { ?>
 		<td>
-			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$previousXstart,'postend='.$previousXend), $pagenow); ?>">
+			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$previousXstart,'postend='.$previousXend), $pagenow ); ?>">
 				<input type="submit" name="submitprevious" class="search" value="< <?php printf( T_('Previous %d'), $posts ) ?>" />
 			</form>
 		</td>
@@ -23,7 +23,7 @@
 		if($nextXstart <= $MainList->get_total_num_posts()) { ?>
 		<td>
 
-			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$nextXstart,'postend='.$nextXend), $pagenow); ?>">
+			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$nextXstart,'postend='.$nextXend), $pagenow ); ?>">
 				<input type="submit" name="submitnext" class="search" value="<?php printf( T_('Next %d'), $posts ) ?> >" />
 			</form>
 		</td>

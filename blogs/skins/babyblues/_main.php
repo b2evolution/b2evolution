@@ -37,7 +37,7 @@
 		<?php $Item->anchor(); ?>
 		<div class="title"><?php $Item->title(); ?></div>
 		<?php $Item->content(); ?>
-		<?php link_pages("<br />Pages: ","<br />","number") ?>
+		<?php link_pages() ?>
 		<div class="posted">by <?php $Item->Author->prefered_name() ?>
 			at <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a><br />
 			<?php $Item->feedback_link( 'comments', '', ' | ' ) // Link to comments ?>

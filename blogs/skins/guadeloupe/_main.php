@@ -73,7 +73,7 @@
 </div>
 <div class=article>
 	<?php $Item->content(); ?>
-	<?php link_pages("<br />Pages: ","<br />","number") ?>
+	<?php link_pages() ?>
 </div>
 <div class=interaction>
 	<?php $Item->feedback_link( 'feedbacks' ) // Link to comments ?>

@@ -85,7 +85,7 @@
 		
 			<div>
 				<?php $Item->content( '#', '#', T_('Read more...') ); ?>
-				<?php link_pages("<br />Pages: ","<br />","number") ?>
+				<?php link_pages() ?>
 			</div>
 
 			<small>
