@@ -15,7 +15,8 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		continue;
 	}
 	if( !isset( $atleastoneshown ) )
-	{
+	{	// Display headers the first time we find an viewable blog
+		// TODO 0.9.1 : prewalk th elist, this will also allow to know if at least one blog can be deleted
 		$atleastoneshown = true;
 		?>
 		<div class="panelblock">
@@ -27,10 +28,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			<th><?php echo T_('Blog URL') ?></th>
 			<th><?php echo T_('Static File') ?></th>
 			<th><?php echo T_('Locale') ?></th>
-			<?php if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )  // this is not optimal, because when first displayed blog is not deletable by user 'Del' will be displayed anyway - but better this way as when user might delete one blog, but not all
-			{ ?>
 			<th><?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?></th>
-			<?php } ?>
 		</tr>
 		<?php
 	}
@@ -78,8 +76,8 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			?>
 		</td>
 		<td class="center"><?php blog_list_iteminfo('locale') ?></td>
-		<?php if( $curr_blog_ID == 1 && $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
-		{ // display empty cell for blog #1, but only when user has editing rights for it
+		<?php if( ($curr_blog_ID == 1) || (!$current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID )) )
+		{ // display empty cell for blog #1 and non deletable blogs
 			echo '<td></td>';
 		}
 		elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
