@@ -83,7 +83,7 @@ switch( $action )
 					<p>
 					<input type="hidden" name="confirm" value="confirm" />
 					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
-					<input type="hidden" name="action" value="ban" />
+					<input type="hidden" name="action" value="bankeyword" />
 					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
 					</p>
 				</form>
@@ -176,8 +176,8 @@ switch( $action )
 				<form action="b2antispam.php" method="get">
 					<p>
 					<input type="hidden" name="confirm" value="confirm" />
-					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
-					<input type="hidden" name="action" value="ban" />
+					<input type="hidden" name="hit_ID" value="<?php echo $hit_ID ?>" />
+					<input type="hidden" name="action" value="banhit" />
 					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
 					</p>
 				</form>

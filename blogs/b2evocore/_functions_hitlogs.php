@@ -313,12 +313,12 @@ function domain_ban( $hit_ID )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = '$domain'";	// This is quite drastic!
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = \"$domain\"";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 		
 		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE \"%$domain%\"";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 	}
@@ -342,12 +342,12 @@ function keyword_ban( $keyword )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%'";	// This is quite drastic!
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE \"%$keyword\"";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 		
 		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%'";	// This is quite drastic!
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE \"%$keyword%\"";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 	}
