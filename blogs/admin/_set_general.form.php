@@ -39,8 +39,7 @@ form_select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogC
 $Form->radio( 'what_to_show', $Settings->get('what_to_show'),
 							array(  array( 'days', T_('days') ),
 											array( 'posts', T_('posts') ),
-											array( 'paged', T_('posts paged') )
-										), T_('Display mode') );
+										), T_('Display unit') );
 
 $Form->text( 'posts_per_page', $Settings->get('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
 

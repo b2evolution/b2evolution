@@ -39,6 +39,7 @@ require_once dirname(__FILE__).'/_results.class.php';
  * Data Object List Base Class
  *
  * This is typically an abstract class, useful only when derived.
+ * Holds DataObjects in an array and allows walking through...
  *
  * @package evocore
  * @version beta
@@ -118,6 +119,10 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/09 20:29:39  fplanque
+ * added 'unit' param to allow choice between displaying x days or x posts
+ * deprecated 'paged' mode (ultimately, everything should be pageable)
+ *
  * Revision 1.5  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

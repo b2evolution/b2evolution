@@ -23,7 +23,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<td>
 			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend','tsk_ID'), array('poststart='.$previousXstart,'postend='.$previousXend) ); ?>">
 				<input type="submit" name="submitprevious" class="search" value="&lt; <?php
-				if( $MainList->what_to_show == 'days' )
+				if( $MainList->unit == 'days' )
 					printf( T_('Next %d days'), $posts );
 				else printf( T_('Previous %d'), $posts )
 				?>" />
@@ -34,7 +34,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<td>
 			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend','tsk_ID'), array('poststart='.$nextXstart,'postend='.$nextXend) ); ?>">
 				<input type="submit" name="submitnext" class="search" value="<?php
-					if( $MainList->what_to_show == 'days' )
+					if( $MainList->unit == 'days' )
 						printf( T_('Previous %d days'), $posts );
 					else printf( T_('Next %d'), $posts );
 					?> &gt;" />
@@ -50,7 +50,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				$Form = & new Form( $pagenow, 'showXfirstlastposts', 'get', 'none' );
 				$Form->begin_form( '' );
 				$Form->hidden( 'blog', $blog );
-				if( $what_to_show == 'days' )
+				if( $MainList->unit == 'days' )
 				{
 					// TODO: dropdown / Javascript calendar?
 					echo date_i18n( locale_datefmt(), $MainList->limitdate_end )

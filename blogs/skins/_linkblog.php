@@ -44,7 +44,7 @@
 
 	// Load the linkblog blog:
 	$LinkblogList = & new ItemList( $linkblog, array(), '', '', '', $linkblog_cat, $linkblog_catsel, '', 'ASC',
-																	'main_cat_ID title', '', '', '', '', '', '', '', '', $linkblog_limit,
+																	'main_cat_ID title', $linkblog_limit, '', '', '', '', '', '', '',
 																	'posts', $timestamp_min, $timestamp_max );
 
 

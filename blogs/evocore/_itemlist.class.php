@@ -82,7 +82,7 @@ class ItemList extends DataObjectList
 	var $preview;
 	var $blog;
 	var $p;
-	var $what_to_show;
+	var $unit;
 	var $result_num_rows;			// Number of rows in result set
 	var $postIDlist;
 	var $postIDarray;
@@ -120,11 +120,11 @@ class ItemList extends DataObjectList
 	 *
 	 * {@internal ItemList::ItemList(-)}}
 	 *
-	 * @param integer Blog ID
-	 * @param array show_statuses
+	 * @param integer Blog ID to query
+	 * @param array Restrict to these statuses
 	 * @param mixed Specific post number to display
 	 * @param mixed YearMonth(Day) to display
-	 * @param mixed Week number. Note: uses MySQL's week numbering and MySQL default if applicable.
+	 * @param mixed Number of Week to display. Note: uses MySQL's week numbering and MySQL default if applicable.
    * In MySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
    * Value range is 0 to 53; week 1 is the first week that starts in this year
 	 * @param mixed List of cats to restrict to
@@ -139,11 +139,10 @@ class ItemList extends DataObjectList
 	 * @param mixed Start results at this position
 	 * @param mixed End results at this position
 	 * @param string Search string
-	 * @param mixed Search for sentence or for words
+	 * @param mixed Search for entire phrase or for individual words
 	 * @param mixed Require exact match of title or contents
 	 * @param boolean Is this preview
-	 * @param mixed
-	 * @param mixed
+	 * @param string 'posts' or 'days'
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
@@ -153,29 +152,28 @@ class ItemList extends DataObjectList
 	 * @param string Name of the ID field (including prefix)
 	 */
 	function ItemList(
-		$blog = 1,
-		$show_statuses = array(),
-		$p = '',															// Specific post number to display
-		$m = '',															// YearMonth(Day) to display
-		$w = -1,															// Week number
-		$cat = '',														// List of cats to restrict to
-		$catsel = array(),										// Array of cats to restrict to
-		$author = '',													// List of authors to restrict to
-		$order = '',													// ASC or DESC
-		$orderby = '',												// list of fields to order by
-		$posts = '',													// # of posts to display on the page
-		$paged = '',													// List page number in paged display
-		$poststart = '',											// Start results at this position
-		$postend = '',												// End results at this position
-		$s = '',															// Search string
-		$sentence = '',												// Search for sentence or for words
-		$exact = '',													// Require exact match of title or contents
-		$preview = 0,													// Is this preview
-		$default_posts_per_page = '',
-		$init_what_to_show = '',
-		$timestamp_min = '',									// Do not show posts before this timestamp
-		$timestamp_max = 'now',								// Do not show posts after this timestamp
-		$title = '',													// urltitle of post to display
+		$blog = 1,                  // Blog to query
+		$show_statuses = array(),   // Restrict to these statuses
+		$p = '',                    // Specific post number to display
+		$m = '',                    // YearMonth(Day) to display
+		$w = -1,                    // Number of Week to display
+		$cat = '',                  // List of cats to restrict to
+		$catsel = array(),          // Array of cats to restrict to
+		$author = '',               // List of authors to restrict to
+		$order = '',                // ASC or DESC
+		$orderby = '',              // list of fields to order by
+		$posts_per_page = '',       // # of posts to display on the page
+		$page_number = '',          // List page number in paged display
+		$poststart = '',            // Start results at this position
+		$postend = '',              // End results at this position
+		$keywords = '',             // Keyword search string
+		$phrase = '',               // Search for entire phrase or for individual words
+		$exact = '',                // Require exact match of title or contents
+		$preview = 0,               // Is this preview?
+		$unit = '',                 // 'posts' or 'days'
+		$timestamp_min = '',        // Do not show posts before this timestamp
+		$timestamp_max = 'now',     // Do not show posts after this timestamp
+		$title = '',                // urltitle of post to display
 		$objType = 'Item',
 		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
@@ -199,16 +197,17 @@ class ItemList extends DataObjectList
 		$this->timestamp_min = $timestamp_min;
 		$this->timestamp_max = $timestamp_max;
 
-		if( !empty($posts) )
-			$posts_per_page = $posts;
-		elseif( !empty($default_posts_per_page) )
-			$posts_per_page = $default_posts_per_page;
-		else
+		if( empty($posts_per_page) )
+		{ // Nothing specified, use default number of posts per page:
 			$posts_per_page = $Settings->get('posts_per_page');
+		}
 		$this->posts_per_page = $posts_per_page;
 
-		$what_to_show = (empty($init_what_to_show)) ? $Settings->get('what_to_show') : $init_what_to_show;
-		$this->what_to_show = $what_to_show;
+		if( empty($unit) )
+		{ // Nothing specified, use default display type:
+			$unit = $Settings->get('what_to_show');
+		}
+		$this->unit = $unit;
 
 		// First let's clear some variables
 		$whichcat = '';
@@ -262,36 +261,36 @@ class ItemList extends DataObjectList
 		 * Search stuff:
 		 * ----------------------------------------------------
 		 */
-		if( !empty($s) )
+		if( !empty($keywords) )
 		{
 			$search = ' AND (';
 			if( $exact ) // We want exact match of title or contents
 				$n = '';
 			else // The words/sentence are/is to be included in in the title or the contents
 				$n = '%';
-			if( ($sentence == '1') or ($sentence == 'sentence') )
+			if( ($phrase == '1') or ($phrase == 'sentence') )
 			{ // Sentence search
-				$s = $DB->escape(trim($s));
-				$search .= '('.$dbprefix.'title LIKE \''. $n. $s. $n. '\') OR ('.$dbprefix.'content LIKE \''. $n. $s. $n.'\')';
+				$keywords = $DB->escape(trim($keywords));
+				$search .= '('.$dbprefix.'title LIKE \''. $n. $keywords. $n. '\') OR ('.$dbprefix.'content LIKE \''. $n. $keywords. $n.'\')';
 			}
 			else
 			{ // Word search
-				if( strtoupper( $sentence ) == 'OR' )
+				if( strtoupper( $phrase ) == 'OR' )
 					$swords = 'OR';
 				else
 					$swords = 'AND';
 
 				// puts spaces instead of commas
-				$s = preg_replace('/, +/', '', $s);
-				$s = str_replace(',', ' ', $s);
-				$s = str_replace('"', ' ', $s);
-				$s = trim($s);
-				$s_array = explode(' ',$s);
+				$keywords = preg_replace('/, +/', '', $keywords);
+				$keywords = str_replace(',', ' ', $keywords);
+				$keywords = str_replace('"', ' ', $keywords);
+				$keywords = trim($keywords);
+				$keyword_array = explode(' ',$keywords);
 				$join = '';
-				for ( $i = 0; $i < count($s_array); $i++)
+				for ( $i = 0; $i < count($keyword_array); $i++)
 				{
-					$search .= ' '. $join. ' ( ('.$dbprefix.'title LIKE \''. $n. $DB->escape($s_array[$i]). $n. '\')
-																	OR ('.$dbprefix.'content LIKE \''. $n. $DB->escape($s_array[$i]). $n.'\') ) ';
+					$search .= ' '. $join. ' ( ('.$dbprefix.'title LIKE \''. $n. $DB->escape($keyword_array[$i]). $n. '\')
+																	OR ('.$dbprefix.'content LIKE \''. $n. $DB->escape($keyword_array[$i]). $n.'\') ) ';
 					$join = $swords;
 				}
 			}
@@ -430,18 +429,19 @@ class ItemList extends DataObjectList
 		 * ----------------------------------------------------
 		 */
 		if( !empty($poststart) )
-		{ // When in backoffice: always paged
+		{ // When in backoffice...  (to be deprecated...)
 			// echo 'POSTSTART-POSTEND ';
 			if( $postend < $poststart )
 			{
 				$postend = $poststart + $posts_per_page - 1;
 			}
-			if ($what_to_show == 'posts' || $what_to_show == 'paged')
+
+			if( $unit == 'posts' )
 			{
 				$posts = $postend - $poststart + 1;
 				$limits = ' LIMIT '. ($poststart-1). ','. $posts;
 			}
-			elseif ($what_to_show == 'days')
+			elseif( $unit == 'days' )
 			{
 				$posts = $postend - $poststart + 1;
 				// echo 'days=',$posts;
@@ -461,25 +461,20 @@ class ItemList extends DataObjectList
 			// echo 'ARCHIVE - no limits';
 			$limits = '';
 		}
-		elseif ($what_to_show == 'posts')
+		elseif( $unit == 'posts' )
 		{
-			// echo 'LIMIT POSTS!';
-			$limits = ' LIMIT '. $posts_per_page;
-		}
-		elseif( $what_to_show == 'paged' )
-		{
-			// echo 'PAGED';
+			// echo 'LIMIT POSTS ';
 			$pgstrt = '';
-			if ($paged)
-			{
-				$pgstrt = (intval($paged) -1) * $posts_per_page. ', ';
+			if( $page_number )
+			{	// We have requested a specific page number
+				$pgstrt = (intval($page_number) -1) * $posts_per_page. ', ';
 			}
 			$limits = 'LIMIT '. $pgstrt.$posts_per_page;
 		}
-		elseif( $what_to_show == 'days' )
+		elseif( $unit == 'days' )
 		{
 			// echo 'LIMIT DAYS ';
-			if( !empty($p) || !empty($title) || !empty($s) || !empty($cat) || !empty($author) )
+			if( !empty($p) || !empty($title) || !empty($keywords) || !empty($cat) || !empty($author) )
 			{ // We are in DAYS mode but we can't restrict on these!
 				$limits = '';
 			}
@@ -488,14 +483,15 @@ class ItemList extends DataObjectList
 				$lastpostdate = $this->get_lastpostdate();
 				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 				$lastpostdate = mysql2date('U',$lastpostdate);
+				// go back x days
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
+
 				$where .= ' AND '.$dbprefix.'datestart > \''. $otherdate.'\'';
 			}
 		}
-		/* else
-		{
-			echo 'DEFAULT - NO LIMIT';
-		}*/
+		else
+			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
+			
 
 		/*
 		 * ----------------------------------------------------
@@ -675,7 +671,7 @@ class ItemList extends DataObjectList
 
 		// echo 'getting last post date';
 		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
-																		 '', 'DESC', 'datestart', 1, '','', '', '', '', '', '', 1, 'posts',
+																		 '', 'DESC', 'datestart', 1, '','', '', '', '', '', '', 'posts',
 																		 $this->timestamp_min, $this->timestamp_max, '', $this->objType,
 																		 $this->dbtablename, $this->dbprefix, $this->dbIDname );
 
@@ -966,6 +962,10 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.22  2005/03/09 20:29:40  fplanque
+ * added 'unit' param to allow choice between displaying x days or x posts
+ * deprecated 'paged' mode (ultimately, everything should be pageable)
+ *
  * Revision 1.21  2005/03/08 20:32:07  fplanque
  * small fixes; slightly enhanced WEEK() handling
  *

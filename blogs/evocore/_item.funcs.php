@@ -306,8 +306,6 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 /**
  * next_post(-)
- *
- *
  */
 function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='')
 {
@@ -363,13 +361,17 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 
 /**
- * next_posts(-)
+ * Display a link to next page of posts
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
  */
 function next_posts($max_page = 0, $page='' )
 {
 	global $p, $paged, $Settings, $edited_Blog, $generating_static;
 
-	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
+	if( empty($p) )
 	{
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
@@ -390,14 +392,18 @@ function next_posts($max_page = 0, $page='' )
 
 
 /**
- * previous_posts(-)
+ * Display a link to previous page of posts
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
  */
 function previous_posts( $page='' )
 {
 	global $p, $paged, $Settings, $edited_Blog, $generating_static;
 
-	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
-	{
+	if( empty($p) )
+	{ 
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
 		if( !isset($generating_static) )
@@ -414,45 +420,44 @@ function previous_posts( $page='' )
 
 
 /**
- * next_posts_link(-)
+ * Display a link to next page of posts
  *
+ * Note: remove this tag from skin template if you don't want this functionality
  *
+ * @todo move to ItemList
  */
 function next_posts_link($label='#', $max_page=0, $page='')
 {
-	global $p, $paged, $result, $request, $Settings;
+	global $p, $paged, $result, $Settings, $MainList;
 
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
-	if ($Settings->get('what_to_show') == 'paged')
+	if (!$max_page) $max_page = $MainList->get_max_paged();
+	if (!$paged) $paged = 1;
+	$nextpage = intval($paged) + 1;
+	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
-		global $MainList;
-		if (!$max_page) $max_page = $MainList->get_max_paged();
-		if (!$paged) $paged = 1;
-		$nextpage = intval($paged) + 1;
-		if (empty($p) && (empty($paged) || $nextpage <= $max_page))
-		{
-			echo '<a href="';
-			echo next_posts($max_page, $page);
-			echo '">'. htmlspecialchars($label) .'</a>';
-		}
+		echo '<a href="';
+		echo next_posts($max_page, $page);
+		echo '">'. htmlspecialchars($label) .'</a>';
 	}
 }
 
 
 /**
- * previous_posts_link(-)
+ * Display a link to previous page of posts
  *
+ * Note: remove this tag from skin template if you don't want this functionality
  *
+ * @todo move to ItemList
  */
 function previous_posts_link($label='#', $page='')
 {
-	global $Settings;
+	global $Settings, $p, $paged;
 
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
-	global $p, $paged;
-	if (empty($p) && ($paged > 1) && ($Settings->get('what_to_show') == 'paged'))
+	if( empty($p) && ($paged > 1) )
 	{
 		echo '<a href="';
 		echo previous_posts( $page );
@@ -464,14 +469,16 @@ function previous_posts_link($label='#', $page='')
 /**
  * Links to previous/next page
  *
- * posts_nav_link(-)
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
  */
 function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {
-	global $request, $p;
-	global $Settings;
+	global $p;
+	global $Settings, $MainList;
 
-	if( !empty( $request ) && empty($p) && ($Settings->get('what_to_show') == 'paged'))
+	if( !empty( $MainList->sql ) && empty($p) )
 	{
 		global $MainList;
 		$max_paged = $MainList->get_max_paged();
@@ -900,6 +907,10 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.23  2005/03/09 20:29:39  fplanque
+ * added 'unit' param to allow choice between displaying x days or x posts
+ * deprecated 'paged' mode (ultimately, everything should be pageable)
+ *
  * Revision 1.22  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

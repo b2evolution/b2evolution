@@ -68,15 +68,8 @@ class CommentList extends DataObjectList
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC
 		$orderby = '',												// list of fields to order by
-		$posts = '', 													// # of comments to display on the page
-		$paged = '',													// Not used yet
-		$poststart = '',											// Not used yet
-		$postend = '',												// Not used yet
-		$s = '',															// Not used yet
-		$sentence = '',												// Not used yet
-		$exact = '',													// Not used yet
-		$default_posts_per_page = '',
-		$init_what_to_show = ''  )
+		$posts = '' 													// # of comments to display on the page
+		)
 	{
 		global $DB;
 		global $cache_categories;
@@ -90,7 +83,6 @@ class CommentList extends DataObjectList
 
 		if( !empty($posts) )
 			$this->posts_per_page = $posts;
-		else $this->posts_per_page = $default_posts_per_page;
 
 		$this->request = "SELECT DISTINCT T_comments.*
 											FROM ((T_comments INNER JOIN T_posts ON comment_post_ID = ID) ";
@@ -181,6 +173,10 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.5  2005/03/09 20:29:39  fplanque
+ * added 'unit' param to allow choice between displaying x days or x posts
+ * deprecated 'paged' mode (ultimately, everything should be pageable)
+ *
  * Revision 1.4  2005/03/06 16:30:40  blueyed
  * deprecated global table names.
  *

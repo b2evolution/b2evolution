@@ -194,7 +194,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 		// You can restrict to specific categories by listing them in the two params below: '', array()
 		// '', array(9,15) will restrict to cats 9 and 15
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
-		$BlogBList = & new ItemList( $blog,	 $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
+		$BlogBList = & new ItemList( $blog,	 $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', $unit, $timestamp_min, $timestamp_max );
 
 		while( $Item = $BlogBList->get_item() )
 		{
@@ -230,7 +230,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 		// You can restrict to specific categories by listing them in the two params below: '', array()
 		// '', array(9,15) will restrict to cats 9 and 15
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
-		$LinkblogList = & new ItemList( $blog,	$show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
+		$LinkblogList = & new ItemList( $blog,	$show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', $unit, $timestamp_min, $timestamp_max );
 
 		while( $Item = $LinkblogList->get_item() )
 		{

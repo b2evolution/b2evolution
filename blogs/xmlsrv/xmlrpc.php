@@ -925,8 +925,9 @@ function bloggergetrecentposts( $m )
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Get the posts to display:
-	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts );
-
+	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
+															'', '', '', '', '', '', '', 'posts' );
+															
 	if( !empty($DB->last_error) )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
@@ -2343,19 +2344,13 @@ function metawebloggetrecentposts( $m )
 	logIO("O","In metawebloggetrecentposts,  current blog info...". $blogparams);
 
 
-
 	// Get the posts to display:
-
-	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts );
-
-
+	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
+															'', '', '', '', '', '', '', 'posts' );
 
 	if( !empty($DB->last_error) )
-
 	{ // DB error
-
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-
 	}
 
 

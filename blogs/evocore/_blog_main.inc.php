@@ -70,7 +70,8 @@ param( 'catsel', 'array', array(), true );      // Array of cats to restrict to
 param( 'author', 'integer', '', true );         // List of authors to restrict to
 param( 'order', 'string', 'DESC', true );       // ASC or DESC
 param( 'orderby', 'string', '', true );         // list of fields to order by
-param( 'posts', 'integer', '', true );          // # of posts to display on the page
+param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
+param( 'posts', 'integer', 0, true );           // # of units to display on the page
 param( 'paged', 'integer', '', true );          // List page number in paged display
 param( 'poststart', 'integer', '', true );      // Start results at this position
 param( 'postend', 'integer', '', true );        // End results at this position
@@ -86,7 +87,7 @@ param( 'more', 'integer', 0, true );
 param( 'title', 'string', '', true );						// urtitle of post to display
 param( 'tb', 'integer', 0, true );
 param( 'pb', 'integer', 0, true );
-param( 'disp', 'string', '', true );
+param( 'disp', 'string', 'posts', true );
 param( 'stats', 'integer', 0 );                 // deprecated
 if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
@@ -220,11 +221,9 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, '', '', $timestamp_min, $timestamp_max, $title );
+															$preview, $unit, $timestamp_min, $timestamp_max, $title );
 
-	$posts_per_page = $MainList->posts_per_page;
-	$what_to_show = $MainList->what_to_show;
-	$request = & $MainList->request;
+	// $posts_per_page = $MainList->posts_per_page;
 	// $result = & $MainList->result;
 	$result_num_rows = $MainList->get_num_rows();
 	$postIDlist = & $MainList->postIDlist;
@@ -329,6 +328,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2005/03/09 20:29:39  fplanque
+ * added 'unit' param to allow choice between displaying x days or x posts
+ * deprecated 'paged' mode (ultimately, everything should be pageable)
+ *
  * Revision 1.8  2005/02/28 01:32:32  blueyed
  * Hitlog refactoring, part uno.
  *
