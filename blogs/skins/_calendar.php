@@ -13,9 +13,9 @@
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	
-	if( ! isset( $calendar ) )
+	if( ! isset( $Calendar ) )
 	{
-	 	$Calendar = & new Calendar( $blog, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
+	 	$Calendar = & new Calendar( $blog, (empty($Calendar) ? $m : $Calendar), $show_statuses, $timestamp_min, $timestamp_max );
 	}
 
 	# You can customize the following as you wish.
