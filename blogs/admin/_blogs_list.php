@@ -50,11 +50,16 @@
 			<td><a href="<?php blog_list_iteminfo('dynurl') ?>"><?php blog_list_iteminfo('filename') ?></a></td>
 			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('stub') ?></a></td>
 			<td>
-				<?php if( $staticfilename=blog_list_iteminfo('staticfilename',false) ) 
-				{ 
+				<?php if( $staticfilename=blog_list_iteminfo('staticfilename',false) )
+				{
 				?>
-				<a href="<?php blog_list_iteminfo('staticurl') ?>"><?php echo $staticfilename ?></a>&nbsp;[<a href="b2blogs.php?action=GenStatic&blog=<?php blog_list_iteminfo('ID') ?>"><?php /* TRANS: abbrev. for "generate !" */ echo T_('Gen!') ?></a>]
-				<?php 
+				<a href="<?php blog_list_iteminfo('staticurl') ?>"><?php echo $staticfilename ?></a>
+				<?php if( $current_User->check_perm( 'blog_genstatic', 'any', false, $blog ) ) 
+					{ // It is possible to generate a static page ?>
+						[<a href="b2blogs.php?action=GenStatic&blog=<?php blog_list_iteminfo('ID') ?>"><?php 
+							/* TRANS: abbrev. for "generate !" */ echo T_('Gen!') ?></a>]
+						<?php 
+					}
 				}
 				?>
 			</td>

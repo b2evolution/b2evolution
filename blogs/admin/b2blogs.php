@@ -282,10 +282,7 @@ switch($action)
 		<div class="panelinfo">
 			<p><?php echo T_('Blog'), ': ', get_bloginfo('name') ?></p>
 	<?php
-		if ($user_level < 2) 
-		{
-			die( '<p>'.T_('You have no right to generate static pages.').'</p>' );
-		}
+		$current_User->check_perm( 'blog_genstatic', 'any', true, $blog );
 	
 		$staticfilename = get_bloginfo('staticfilename');
 		if( empty( $staticfilename ) )
@@ -328,11 +325,7 @@ switch($action)
 	default:
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9 && ! $demo_mode) 
-		{
-			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
-		}
-		
+	
 }
 
 // List the blogs:

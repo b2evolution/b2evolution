@@ -63,14 +63,11 @@ if( empty($mode) )
 			echo '<li>';
 		echo '<a href="b2categories.php?blog=', $blog, '" >', T_('Cats'), '</a></li>';
 	
-		if($user_level >= 9 || $demo_mode) 
-		{
-			if( $title == T_('Blogs') )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="b2blogs.php" >', T_('Blogs'), '</a></li>';
-		}
+		if( $title == T_('Blogs') )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2blogs.php" >', T_('Blogs'), '</a></li>';
 	
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{

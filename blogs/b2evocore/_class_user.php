@@ -223,6 +223,7 @@ class User extends DataObject
 			case 'blog_del_post':
 			case 'blog_comments':
 			case 'blog_cats':
+			case 'blog_genstatic':
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				break;
 			
@@ -253,6 +254,7 @@ class User extends DataObject
 	 *									- blog_comments
 	 *									- blog_cats
 	 *									- blog_properties
+	 *									- blog_genstatic
 	 * @param string Permission level
 	 * @param integer Permission target blog ID
 	 * @return boolean 0 if permission denied
@@ -297,6 +299,9 @@ class User extends DataObject
 		// Check if permission is granted:
 		switch( $permname )
 		{
+			case 'blog_genstatic':
+				return ($this->level >= 2);
+
 			case 'blog_post_statuses':
 				if( $permlevel == 'any' )
 				{ // Any prermission will do:
