@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2004-05-07 02:06+0200\n"
-"PO-Revision-Date: 2004-05-07 15:17+0100\n"
-"Last-Translator: Ron <hartman@dia.eur.nl>\n"
+"PO-Revision-Date: 2004-05-07 22:46+0100\n"
+"Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: b2evolution <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -25,11 +25,11 @@ msgstr "Meertalig voor meerdere gebruikers met meerdere weblogs."
 
 #: ..\..\..\default.php:33
 msgid "Welcome to b2evolution"
-msgstr "Welkom op b2evolution"
+msgstr "Welkom bij b2evolution"
 
 #: ..\..\..\default.php:35
 msgid "This is the default homepage for b2evolution. It will be displayed as long as you don't select a default blog in the general settings."
-msgstr "Dit is de standaard pagina voor b2evolution. Het zla getoond worden zolang je geen standaard weblog kiest in de Algemene Instellingen."
+msgstr "Dit is de standaard beginpagina voor b2evolution. Deze zal getoond worden zolang je geen standaard weblog kiest in de Algemene Instellingen."
 
 #: ..\..\..\default.php:38
 msgid "Individual blogs on this system"
@@ -72,7 +72,7 @@ msgstr "Samenvatting van de laatste artikelen in alle weblogs"
 
 #: ..\..\..\default.php:80
 msgid "The page you're looking at"
-msgstr "De pagina die je bekijkt"
+msgstr "De pagina die je nu bekijkt"
 
 #: ..\..\..\default.php:82
 msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
@@ -80,7 +80,7 @@ msgstr "Let op: deze demos maken geen gebruik van de evoSkins, zels niet als je 
 
 #: ..\..\..\default.php:84
 msgid "Administration"
-msgstr "Administrattie"
+msgstr "Administratie"
 
 #: ..\..\..\default.php:86
 msgid "Go to backoffice!"
@@ -1361,7 +1361,7 @@ msgstr "Gebruikers level is verandert."
 #: ..\..\..\admin\b2users.php:224
 #, php-format
 msgid "Couldn't change %s's level."
-msgstr "Kon %d's level niet veranderen."
+msgstr "Kon %s's level niet veranderen."
 
 #: ..\..\..\admin\b2users.php:243
 msgid "You can't delete yourself!"
@@ -2759,7 +2759,7 @@ msgstr "Prioriteit"
 
 #: ..\..\..\admin\_set_regional.form.php:60
 msgid "1 is highest. It's use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc."
-msgstr ""
+msgstr "1 is het hoogste. Het word gebruikt voor de automatische taal detectie (van HTTP_ACCEPT_LANGUAGE header), wanneer we meer vertalingen hebben met de gewenste taal. Het heeft ook invloed op de volgorde waarmee de vertalingen worden getoond in de dropdown lijstjes etc."
 
 #: ..\..\..\admin\_set_regional.form.php:71
 #: ..\..\..\admin\_users_form.php:206
@@ -4675,18 +4675,24 @@ msgid "Delete b2evolution tables"
 msgstr "Verwijder b2evolution tabellen"
 
 #: ..\..\..\install\index.php:157
+#, fuzzy
 msgid ""
 "If you have installed b2evolution tables before and wish to start anew, you must delete the\n"
 "\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n"
 "\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n"
 "\t\t\t\t\tsome, will not be touched in any way."
 msgstr ""
+"If you have installed b2evolution tables before and wish to start anew, you must delete the\n"
+"\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n"
+"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n"
+"\t\t\t\t\tsome, will not be touched in any way."
 
 #: ..\..\..\install\index.php:165
 msgid "Install Database Tables Now !"
 msgstr "Installeer nu de Database Tabellen !"
 
 #: ..\..\..\install\index.php:171
+#, fuzzy
 msgid ""
 "<h2>Need to start anew?</h2>\n"
 "\t\t\t<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>\n"
@@ -4696,6 +4702,13 @@ msgid ""
 "\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
 "\t\t\t<p>Then reload this page and a reset option will appear.</p>"
 msgstr ""
+"<h2>Need to start anew?</h2>\n"
+"\t\t\t<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>\n"
+"\t\t\t<p>To enable it, please go to the /conf/_config.php file and change:</p>\n"
+"\t\t\t<pre>$allow_evodb_reset = 0;</pre>\n"
+"\t\t\tto\n"
+"\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
+"\t\t\t<p>Then reload this page and a reset option will appear.</p>"
 
 #: ..\..\..\install\index.php:189
 msgid "Installing b2evolution tables with sample data"
@@ -4711,6 +4724,8 @@ msgid ""
 "<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\".</p>\n"
 "\t\t<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>"
 msgstr ""
+"<p>Je kan nu <a %s>inloggen</a> met de login \"admin\" en wachtwoord \"%s\".</p>\n"
+"\t\t<p>Let op het wachtwoord! Dit is een <em>willekeurig</em> gekozen wachtwoord dat je is gegeven wanneer je b2evolution installeerd. Als je het kwijtraakt, zal je alle database tabellen meten verwijderen en opnieuw installeren.</p>"
 
 #: ..\..\..\install\index.php:209
 msgid "Upgrading data in existing b2evolution database"
@@ -4740,6 +4755,12 @@ msgid ""
 "\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
 "\t\t\t<p>Then reload this page and resetting will take place.</p>"
 msgstr ""
+"<p>Voor beveiligings redenen is de reset mogelijkheid standaard uitgezet.</p>\n"
+"\t\t\t<p>Om het aan te zetten ga terug naar het  /conf/_config.php bestand en wijzig:</p>\n"
+"\t\t\t<pre>$allow_evodb_reset = 0;</pre>\n"
+"\t\t\tnaar\n"
+"\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
+"\t\t\t<p>Herlaad daarna deze pagina en het resetten zal dan plaatsvinden.</p>"
 
 #: ..\..\..\install\index.php:257
 #: ..\..\..\install\index.php:264
@@ -4876,7 +4897,6 @@ msgid "Multiple Blogs, new blogs, old blogs..."
 msgstr "Meerdere Weblogs, nieuwe weblogs, oude weblogs..."
 
 #: ..\..\..\install\_functions_create.php:564
-#, fuzzy
 msgid ""
 "<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>\n"
 "\n"
@@ -4884,20 +4904,12 @@ msgid ""
 "\n"
 "<p>You can create additional blogs or delete unwanted blogs from the blogs admin.</p>"
 msgstr ""
-"<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>\n"
+"<p>Standaard, b2evolution begint met  4 weblogs, genaamd 'Blog All', 'Blog A', 'Blog B' en 'Blogroll'.</p>\n"
 "\n"
-"<p>Some of these blogs have a special role. Read about it on the corresponding page.</p>\n"
+"<p>Sommige van deze weblogs hebben een speciale functie. Lees hierover op de corresponderende pagina.</p>\n"
 "\n"
-"<p>You can create additionnal blogs from the blogs admin.</p>\n"
+"<p>Je kan extra weblogs aanmaken vanuit de weblogs administratie.</p>\n"
 "\n"
-"<!--more-->\n"
-"\n"
-"<p>Some people have also asked for a feature to delete blogs. We're working on it, but we certainly do not recommend you go hacking your mySQL database by hand. It's the best way to leave a lot of junk in there. In the meantime, there are two things you can do with your old blogs:</p>\n"
-"\n"
-"<ul>\n"
-"  <li>Recycle them: delete the posts, change the name, also rename the access stub file if you wish. This is better with the database than deleting a blog and creating a new one.</li>\n"
-"  <li>Hide them: go to the blogs admin and clear the 'Stub URLname'. Your blog won't appear publicly no more. You can also remove all user permissions on that blog to hide it from backoffice users (except the admin). Finally, you can delete the stub file for this blog to make it complete ;)</li>\n"
-"</ul>"
 
 #: ..\..\..\install\_functions_create.php:573
 msgid "File permissions!"
