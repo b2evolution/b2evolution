@@ -45,7 +45,6 @@ $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH 
 # You will also receive notifications for new user registrations.
 $admin_email = 'postmaster@localhost';
 
-
 # IMPORTANT: you will find more parameters in the other files of the /conf folder
 # IT IS RECOMMENDED YOU DO NOT TOUCH THOSE SETTINGS 
 # UNTIL YOU ARE FAMILIAR WITH THE DEFAULT INSTALLATION
@@ -58,5 +57,4 @@ require_once (dirname(__FILE__)."/_advanced.php");
 require_once (dirname(__FILE__)."/_locales.php");
 require_once (dirname(__FILE__)."/_formatting.php");
 @include_once (dirname(__FILE__)."/_overrides_TEST.php"); // Override for testing in there
-
 ?>

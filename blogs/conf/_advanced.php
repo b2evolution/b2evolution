@@ -9,6 +9,7 @@
 # General params:
 # (these must be forced to prevent URL overrides).
 $debug = false;
+$obhandler_debug = false;
 $demo_mode = false;
 
 

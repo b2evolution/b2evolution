@@ -16,8 +16,6 @@
  * @package api
  */
 
-$debug = 0;
-
 require_once(dirname(__FILE__)."/../conf/_config.php");
 
 // We don't know who we're talking to, so all messages will be in english:

@@ -116,7 +116,6 @@ if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 	}
 }
 
-
 if ( empty( $disp ) )
 { // If we are going to display posts and not something special...
 
