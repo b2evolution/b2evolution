@@ -700,7 +700,7 @@ class FileManager
 	 * @param string what to return for that icon (file, url, size {@link see Fileman::imgsize()}})
 	 * @param string additional parameter (for size)
 	 */
-	function icon( $for, $what, $param = '' )
+	function icon( $for, $what = 'imgtag', $param = '' )
 	{
 		if( $for == 'cfile' )
 		{
@@ -748,7 +748,7 @@ class FileManager
 				break;
 
 			case 'imgtag':
-				$r = '<img src="'.$this->icon( $for, 'url' ).'" '.$this->icon( $for, 'size', 'string' )
+				$r = '<img class="middle" src="'.$this->icon( $for, 'url' ).'" '.$this->icon( $for, 'size', 'string' )
 				.' alt="';
 
 				if( $for == 'cfile' )
@@ -809,6 +809,8 @@ class FileManager
 			$r = T_('Rename');
 		elseif( $param == 'delete' )
 			$r = T_('Delete');
+		elseif( $param == 'window_new' )
+			$r = T_('Open in new window');
 		else $r = false;
 
 		return $r;

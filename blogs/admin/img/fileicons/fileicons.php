@@ -27,7 +27,9 @@ $this->fileicons_special = array(
 	'copymove' => 'editcopy.png',
 	'rename' => 'item_rename.png',
 	'delete' => 'editdelete.png',
-	);
+	
+	'window_new' => 'window_new.png',
+);
 
 
 /**

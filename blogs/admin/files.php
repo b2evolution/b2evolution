@@ -500,7 +500,8 @@ while( $Fileman->next() )
 			<?php
 			if( $Fileman->cisdir() )
 			{
-				echo '<a href="'.$Fileman->cget('link').'" title="'.T_('open in new window').'" target="_blank">[new]</a>';
+				echo '<a href="'.$Fileman->cget('link').'" title="'.T_('open in new window').'" target="_blank">'
+				.$Fileman->icon( 'window_new' ).'</a>';
 			}
 
 			?>
