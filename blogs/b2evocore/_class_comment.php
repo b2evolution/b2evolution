@@ -203,6 +203,7 @@ class Comment extends DataObject
 	 * @param string String to display before link, if link exists
 	 * @param string String to display after link, if link exists
 	 * @param boolean false if you want NO html link
+	 * @return boolean true if URL has been displayed
 	 */
 	function author_url( $linktext='', $before='', $after='', $makelink = true ) 
 	{
@@ -213,7 +214,10 @@ class Comment extends DataObject
 			echo ($linktext != '') ? $linktext : $this->author_url;
 			if( $makelink ) echo '</a>';
 			echo $after;
+			return true;
 		}
+		
+		return false;
 	}
 
 

@@ -289,16 +289,20 @@ function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 	echo '</a>';
 }
 
-/*
+/**
  * comment_ID(-)
+ *
+ * @deprecated deprecated by {@link DataObject::ID()}
  */
 function comment_ID() 
 {
 	global $commentdata;	echo $commentdata['comment_ID'];
 }
 
-/*
+/**
  * comment_author(-)
+ *
+ * @deprecated deprecated by {@link Comment::author()}
  */
 function comment_author() 
 {
@@ -306,16 +310,20 @@ function comment_author()
 	echo stripslashes($commentdata['comment_author']);
 }
 
-/*
+/**
  * comment_author_email(-)
+ *
+ * @deprecated deprecated by {@link Comment::author_email()}
  */
 function comment_author_email() 
 {
 	global $commentdata;	echo antispambot(stripslashes($commentdata['comment_author_email']));
 }
 
-/*
+/**
  * comment_author_url(-)
+ *
+ * @deprecated deprecated by {@link Comment::author_url()}
  */
 function comment_author_url($echo=true) 
 {
@@ -334,8 +342,10 @@ function comment_author_url($echo=true)
 	}
 }
 
-/*
+/**
  * comment_author_url_basedomain(-)
+ *
+ * @deprecated
  */
 function comment_author_url_basedomain( $disp = true )
 {
@@ -368,8 +378,10 @@ function comment_author_email_link($linktext='', $before='', $after='')
 }
 
 
-/*
+/**
  * comment_author_url_link(-)
+ *
+ * @deprecated deprecated by {@link $Comment->author_url()}
  */
 function comment_author_url_link($linktext='', $before='', $after='') 
 {
@@ -395,8 +407,10 @@ function comment_author_IP() {
 	global $commentdata;	echo stripslashes($commentdata['comment_author_IP']);
 }
 
-/*
+/**
  * comment_text(-)
+ *
+ * @deprecated deprecated by {@link $Comment::content()}
  */
 function comment_text() 
 {
@@ -413,8 +427,10 @@ function comment_text()
 	echo $comment;
 }
 
-/*
+/*$
  * comment_date(-)
+ *
+ * @deprecated deprecated by {@link $Comment::date()}
  */
 function comment_date($d='') {
 	global $commentdata;
@@ -425,8 +441,10 @@ function comment_date($d='') {
 	}
 }
 
-/*
+/**
  * comment_time(-)
+ *
+ * @deprecated deprecated by {@link $Comment::time()}
  */
 function comment_time($d='') {
 	global $commentdata;
@@ -437,9 +455,11 @@ function comment_time($d='') {
 	}
 }
 
-/*
+/**
  * comment_post_title(-)
  * fplanque added
+ *
+ * @deprecated deprecated by {@link $Comment::post_title()}
  */
 function comment_post_title() 
 {
@@ -448,9 +468,11 @@ function comment_post_title()
 	echo format_to_output( $title, 'htmlbody' );
 }
 
-/*
+/**
  * comment_post_link(-)
  * fplanque added
+ *
+ * @deprecated deprecated by {@link $Comment::post_link()}
  */
 function comment_post_link() 
 {
@@ -459,9 +481,11 @@ function comment_post_link()
 }
 
 
-/*
+/**
  * comment_blog_name(-)
  * fplanque added
+ *
+ * @deprecated 
  */
 function comment_blog_name( $disp = true ) 
 {

@@ -209,14 +209,23 @@
 					<!-- ---------- START of a COMMENT/TB/PB ---------- -->
 					<div class="bComment">
 						<div class="bSmallHead">
-							<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
-							<?php $Comment->author_url( '', ' &middot; Url: ', '' ) ?>
-							<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-							{ ?>
-							<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode(comment_author_url_basedomain(false)) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
-							<?php } ?>
-							<?php $Comment->author_email( '', ' &middot; Email: ' ) ?>
-							<?php $Comment->author_ip( ' &middot; IP: ' ) ?>
+							<?php
+							$Comment->date();
+							echo ' @ ';
+							$Comment->time( 'H:i' );
+							if( $Comment->author_url( '', ' &middot; Url: ', '' )
+									&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
+							{ // There is an URL and we have permission to ban...
+								$baseDomain = preg_replace("/http:\/\//i", "", $Comment->author_url);
+								$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
+								$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
+								?>
+								<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode($baseDomain) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
+								<?php 
+							} 
+							$Comment->author_email( '', ' &middot; Email: ' );
+							$Comment->author_ip( ' &middot; IP: ' );
+						 ?>
 						</div>
 						<div class="bCommentTitle">
 						<?php
