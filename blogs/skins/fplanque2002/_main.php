@@ -161,7 +161,7 @@
 	<div class="bSideItem">
     <h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
 		<form name="SearchForm" method="get" class="search" action="<?php bloginfo('blogurl') ?>">
-			<input type="text" name="s" size="30" value="<?php echo $s ?>" class="SearchField" /><br />
+			<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
 			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
 			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
 			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Sentence') ?></label>
