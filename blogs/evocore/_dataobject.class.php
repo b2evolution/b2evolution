@@ -145,11 +145,11 @@ class DataObject
 			{
 				case 'date':
 				case 'string':
-					$sql_changes[] = $loop_dbfieldname. " = '". $DB->escape( $loop_value ). "' ";
+					$sql_changes[] = $loop_dbfieldname." = '".$DB->escape( $loop_value )."' ";
 					break;
 
 				default:
-					$sql_changes[] = $loop_dbfieldname. " = $loop_value ";
+					$sql_changes[] = $loop_dbfieldname." = ".$DB->null($loop_value).' ';
 			}
 		}
 
@@ -297,10 +297,11 @@ class DataObject
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
-		$this->set_param( $parname, 'string', $parvalue );
+		$this->set_param( $parname, 'string', $parvalue, $make_null );
 	}
 
 	/**
@@ -311,11 +312,16 @@ class DataObject
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
 	 * @param mixed Value of parameter
+	 * @param boolean true to set to NULL if empty value
 	 */
-	function set_param( $parname, $fieldtype, $parvalue )
+	function set_param( $parname, $fieldtype, $parvalue, $make_null = false )
 	{
+		global $Debuglog;
+
 		// Set value:
-		$this->$parname = $parvalue;
+		$this->$parname = ($make_null && empty($parvalue)) ? NULL : $parvalue;
+		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.' to '.$this->$parname );
+
 		// Remember change for later db update:
 		$this->dbchange( $this->dbprefix. $parname , $fieldtype, $parname );
 	}
@@ -332,6 +338,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/21 18:33:39  fplanque
+ * NULL handling
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *
