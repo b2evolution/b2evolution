@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $page_title = T_('Lost password ?');
 $page_icon = 'icon_login.gif';
-require(dirname(__FILE__).'/_header.php');
+require dirname(__FILE__).'/_header.php';
 
 Log::display( '', '', T_('A link to change your password will be sent to you by email.'), 'note' );
 
@@ -43,5 +43,5 @@ echo $Form->fieldend;
 
 $Form->end_form();
 
-require(dirname(__FILE__).'/_footer.php');
+require dirname(__FILE__).'/_footer.php';
 ?>

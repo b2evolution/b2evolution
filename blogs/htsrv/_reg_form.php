@@ -16,7 +16,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $page_title = T_('Register form');
 $page_icon = 'icon_register.gif';
-require(dirname(__FILE__).'/_header.php');
+require dirname(__FILE__).'/_header.php';
 
 
 $Form = & new Form( $htsrv_url.'register.php', '', 'post', 'fieldset' );
@@ -59,5 +59,5 @@ $Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Pre
 </div>
 
 <?php
-	require(dirname(__FILE__).'/_footer.php');
+	require dirname(__FILE__).'/_footer.php';
 ?>

@@ -934,7 +934,7 @@ function create_b2evo_tables_092()
 	echo 'Creating table for active sessions... ';
 	$DB->query( "CREATE TABLE T_sessions (
 									sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-									sess_key       VARCHAR(32) NOT NULL,
+									sess_key       CHAR(32) NULL,
 									sess_lastseen  DATETIME NOT NULL,
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID   INT(10) DEFAULT NULL,

@@ -43,7 +43,7 @@
 /**
  * Includes:
  */
-require( dirname(__FILE__).'/_header.php' );
+require dirname(__FILE__).'/_header.php';
 $AdminUI->setPath( 'options', param( 'tab', 'string', 'general' ) );
 
 param( 'action', 'string' );
@@ -427,6 +427,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.90  2005/03/15 19:19:46  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.89  2005/03/07 00:06:16  blueyed
  * admin UI refactoring, part three
  *

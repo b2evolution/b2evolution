@@ -117,7 +117,7 @@ elseif( $use_l10n == 2 )
 
 		if( !isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
-			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
+			// echo 'LOADING', dirname(__FILE__).'/../locales/'. $messages. '/_global.php';
 			@include_once dirname(__FILE__).'/../locales/'.$messages.'/_global.php';
 			if( !isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
@@ -711,6 +711,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.11  2005/03/15 19:19:47  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.10  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

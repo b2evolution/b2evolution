@@ -16,7 +16,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
-require( dirname(__FILE__).'/_header.php' );
+require dirname(__FILE__).'/_header.php';
 
 param( 'redirect_to', 'string', $ReqURI );
 param( 'login', 'string', '' ); // last typed login
@@ -73,5 +73,5 @@ $Form->end_form();
 
 
 <?php
-require(dirname(__FILE__).'/_footer.php');
+require dirname(__FILE__).'/_footer.php';
 ?>

@@ -45,24 +45,6 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/_antispam.funcs.php';
-require_once dirname(__FILE__).'/_blog.funcs.php';
-require_once dirname(__FILE__).'/_item.funcs.php';
-require_once dirname(__FILE__).'/_category.funcs.php';
-require_once dirname(__FILE__).'/_file.funcs.php';
-require_once dirname(__FILE__).'/_message.funcs.php';
-require_once dirname(__FILE__).'/_pingback.funcs.php';
-require_once dirname(__FILE__).'/_ping.funcs.php';
-require_once dirname(__FILE__).'/_skin.funcs.php';
-require_once dirname(__FILE__).'/_trackback.funcs.php';
-require_once dirname(__FILE__).'/_user.funcs.php';
-if( !isset( $use_html_checker ) ) $use_html_checker = 1;
-if( $use_html_checker ) require_once dirname(__FILE__).'/_htmlchecker.class.php';
-
-
 /***** Formatting functions *****/
 
 /**
@@ -1525,11 +1507,17 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string icon code {@see $$map_iconfiles}
  * @param string icon code for {@see getIcon()}
  */
-function action_icon( $title, $icon, $url )
+function action_icon( $title, $icon, $url, $word = '' )
 {
-	return '<a href="'.$url.'" title="'.$title.'">'
-					.getIcon( $icon, 'imgtag', array( 'title'=>$title ) )
-					.'</a> ';
+	$r = '<a href="'.$url.'" title="'.$title.'">'
+				.getIcon( $icon, 'imgtag', array( 'title'=>$title ) );
+	if( !empty( $word) )
+	{
+		$r .= $word;
+	}
+	$r .= '</a> ';
+
+	return $r;
 }
 
 
@@ -1864,6 +1852,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.59  2005/03/15 19:19:48  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.58  2005/03/14 20:22:20  fplanque
  * refactoring, some cacheing optimization
  *

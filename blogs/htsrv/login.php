@@ -43,8 +43,8 @@
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php' );
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php';
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
@@ -70,7 +70,7 @@ switch( $action )
 		param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 
 		// Display retrieval form:
-		require( dirname(__FILE__).'/_lostpass_form.php' );
+		require dirname(__FILE__).'/_lostpass_form.php';
 
 		exit();
 
@@ -198,7 +198,7 @@ switch( $action )
 		/**
 		 * Init the backoffice.
 		 */
-		require_once( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'_header.php' );
+		require_once dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'_header.php';
 
 		$AdminUI->addHeadline( '<base href="'.$admin_url.'" />' );
 		require( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'b2users.php' );
@@ -228,7 +228,7 @@ if( is_logged_in() )
 
 
 // Display login form:
-require( dirname(__FILE__).'/_login_form.php' );
+require dirname(__FILE__).'/_login_form.php';
 exit();
 
 ?>

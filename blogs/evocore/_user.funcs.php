@@ -47,8 +47,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Includes:
  */
-require_once dirname(__FILE__). '/_group.funcs.php';
-require_once dirname(__FILE__). '/_user.class.php';
+require_once dirname(__FILE__).'/_group.funcs.php';
+require_once dirname(__FILE__).'/_user.class.php';
 
 
 
@@ -379,6 +379,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.21  2005/03/15 19:19:49  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.20  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

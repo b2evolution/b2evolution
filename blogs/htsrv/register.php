@@ -43,8 +43,8 @@
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php' );
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php';
 
 
 param( 'action', 'string', '' );

@@ -40,8 +40,8 @@ require_once dirname(__FILE__).'/_group.class.php';
 
 /*
  * $Log$
- * Revision 1.3  2005/03/15 16:57:01  fplanque
- * minor
+ * Revision 1.4  2005/03/15 19:19:47  fplanque
+ * minor, moved/centralized some includes
  *
  * Revision 1.2  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED

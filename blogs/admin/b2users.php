@@ -12,7 +12,7 @@
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/_header.php' );
+require_once dirname(__FILE__).'/_header.php';
 $AdminUI->setPath( 'users' );
 
 param( 'action', 'string', '' );
@@ -23,7 +23,7 @@ param( 'group', 'integer', 0 );
 // show the top menu
 if( $action != 'userupdate' )
 { // perhaps we'll have to set a cookie later
-	require( dirname(__FILE__).'/_menutop.php' );
+	require dirname(__FILE__).'/_menutop.php';
 }
 
 
@@ -50,7 +50,7 @@ if( $Messages->count() )
 {
 	if( $action == 'userupdate' )
 	{ // display top menu that was suppressed before
-		require( dirname(__FILE__).'/_menutop.php' );
+		require dirname(__FILE__).'/_menutop.php';
 	}
 }
 else switch ($action)
@@ -90,7 +90,7 @@ else switch ($action)
 			$Messages->add( T_('You are only allowed to update your own profile!') );
 
 			// display menu
-			require( dirname(__FILE__).'/_menutop.php' );
+			require dirname(__FILE__).'/_menutop.php';
 			break;
 		}
 
@@ -515,7 +515,7 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 		{
 			$edited_Group = $GroupCache->get_by_ID( $group );
 		}
-		require(dirname(__FILE__). '/_users_groupform.php');
+		require dirname(__FILE__).'/_users_groupform.php';
 	}
 }
 else
@@ -540,16 +540,16 @@ if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
 		$edited_User = & $UserCache->get_by_ID( $user );
 	}
 
-	require(dirname(__FILE__). '/_users_form.php');
+	require dirname(__FILE__).'/_users_form.php';
 }
 
 
 // users list
 if( $current_User->check_perm( 'users', 'view', false ) )
 { // Display user list:
-	require( dirname(__FILE__). '/_users_list.php' );
+	require dirname(__FILE__).'/_users_list.php';
 }
 
 
-require( dirname(__FILE__). '/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 ?>

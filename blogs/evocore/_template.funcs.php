@@ -42,16 +42,6 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once( dirname(__FILE__).'/_category.funcs.php' );
-require_once( dirname(__FILE__).'/_blog.funcs.php' );
-require_once( dirname(__FILE__).'/_item.funcs.php' );
-require_once( dirname(__FILE__).'/_comment.funcs.php' );
-require_once( dirname(__FILE__).'/_trackback.funcs.php' );
-require_once( dirname(__FILE__).'/_pingback.funcs.php' );
-
 
 /**
  * Template function: output base URL to b2evo's image folder
@@ -289,6 +279,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/15 19:19:48  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.5  2005/03/09 19:23:34  blueyed
  * doc
  *

@@ -23,7 +23,7 @@ param( 'mode', 'string', '' );  // Sidebar, bookmarklet
 /**
  * Load the AdminUI class for the skin.
  */
-require_once( dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.class.php' );
+require_once dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.class.php';
 /**
  * This is the Admin UI object which handles the UI for the backoffice.
  *

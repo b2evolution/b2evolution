@@ -15,7 +15,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Include page header:
  */
 $page_title = T_('Registration Currently Disabled');
-require( dirname(__FILE__).'/_header.php' );
+require dirname(__FILE__).'/_header.php';
 
 Log::display( '', '', T_('User registration is currently not allowed.'), 'error' );
 
@@ -25,5 +25,5 @@ Log::display( '', '', T_('User registration is currently not allowed.'), 'error'
 </p>
 
 <?php
-require( dirname(__FILE__).'/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 ?>

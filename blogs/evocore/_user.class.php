@@ -44,7 +44,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Includes:
  */
-require_once dirname(__FILE__). '/_dataobject.class.php';
+require_once dirname(__FILE__).'/_dataobject.class.php';
 
 /**
  * User Class
@@ -866,6 +866,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2005/03/15 19:19:48  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.20  2005/03/13 19:52:14  blueyed
  * use $servertimenow for creation of new blank user
  *

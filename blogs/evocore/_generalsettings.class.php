@@ -93,8 +93,8 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
- * Revision 1.10  2005/03/15 16:57:01  fplanque
- * minor
+ * Revision 1.11  2005/03/15 19:19:47  fplanque
+ * minor, moved/centralized some includes
  *
  * Revision 1.9  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED

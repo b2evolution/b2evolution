@@ -26,7 +26,7 @@ if( $action != 'addcat' && $action != 'editedcat' )
 	// Generate available blogs list:
 	$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
 
-	require(dirname(__FILE__) . '/_menutop.php');
+	require dirname(__FILE__).'/_menutop.php';
 }
 
 
@@ -71,7 +71,7 @@ switch($action)
 		</div>
 		<?php
 		// List the cats:
-		require( dirname(__FILE__).'/_cats_list.php' );
+		require dirname(__FILE__).'/_cats_list.php';
 		break;
 
 
@@ -132,7 +132,7 @@ switch($action)
 		}
 		echo "</div>\n";
 		// List the cats:
-		require( dirname(__FILE__).'/_cats_list.php' );
+		require dirname(__FILE__).'/_cats_list.php';
 
 		break;
 
@@ -247,7 +247,7 @@ switch($action)
 
 		<?php
 		// List the cats:
-		require( dirname(__FILE__).'/_cats_list.php' );
+		require dirname(__FILE__).'/_cats_list.php';
 		break;
 
 
@@ -307,9 +307,9 @@ switch($action)
 		}
 
 		// List the cats:
-		require( dirname(__FILE__).'/_cats_list.php' );
+		require dirname(__FILE__).'/_cats_list.php';
 }
 
-require( dirname(__FILE__).'/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 
 ?>

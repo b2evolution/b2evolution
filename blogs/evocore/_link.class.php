@@ -48,6 +48,7 @@ class Link extends DataObject
 	var $ltype_ID = 0;
 	var $Item = NULL;
 	var $Contact = NULL;
+	var $Firm = NULL;
 
 	/** 
 	 * Constructor
@@ -58,7 +59,7 @@ class Link extends DataObject
 	 */
 	function Link( $db_row = NULL )
 	{
-		global $TaskCache, $ContactCache, $EstablishmentCache;
+		global $TaskCache, $ContactCache, $EstablishmentCache, $FirmCache;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_links', 'link_', 'link_ID' );
@@ -72,8 +73,9 @@ class Link extends DataObject
 			$this->Item     = & $TaskCache->get_by_ID( $db_row->link_item_ID );
 
 			// Possible destinations:
-			$this->Contact  = & $ContactCache->get_by_ID( $db_row->link_cont_ID, true, false );
-			$this->Establishment  = & $EstablishmentCache->get_by_ID( $db_row->link_etab_ID, true, false );
+			$this->Contact       = & $ContactCache->get_by_ID( $db_row->link_cont_ID, true, false );
+			$this->Establishment = & $EstablishmentCache->get_by_ID( $db_row->link_etab_ID, true, false );
+			$this->Firm          = & $FirmCache->get_by_ID( $db_row->link_firm_ID, true, false );
 	 	}
 	 	else
 	 	{	// New object:
@@ -99,6 +101,11 @@ class Link extends DataObject
 			return 'establishment';
 		}
 
+ 		if( !is_null($this->Firm) )
+		{
+			return 'firm';
+		}
+
 		return 'unkown';
 	}
 
@@ -106,6 +113,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2005/03/15 19:19:47  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.1  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

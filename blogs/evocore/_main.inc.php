@@ -111,17 +111,34 @@ if( !function_exists( 'gzencode' ) )
 }
 
 /**
- * Include obsolete functions
- */
-@include_once dirname(__FILE__).'/_obsolete092.php';
-
-
-/**
  * Includes:
  */
 require_once dirname(__FILE__).'/_misc.funcs.php';
-
 timer_start();
+
+if( !isset( $use_html_checker ) ) $use_html_checker = 1;
+
+require_once dirname(__FILE__).'/_antispam.funcs.php';
+require_once dirname(__FILE__).'/_blog.funcs.php';
+require_once dirname(__FILE__).'/_item.funcs.php';
+require_once dirname(__FILE__).'/_category.funcs.php';
+require_once dirname(__FILE__).'/_comment.funcs.php';
+require_once dirname(__FILE__).'/_file.funcs.php';
+if( $use_html_checker ) require_once dirname(__FILE__).'/_htmlchecker.class.php';
+require_once dirname(__FILE__).'/_item.funcs.php';
+require_once dirname(__FILE__).'/_message.funcs.php';
+require_once dirname(__FILE__).'/_pingback.funcs.php';
+require_once dirname(__FILE__).'/_ping.funcs.php';
+require_once dirname(__FILE__).'/_skin.funcs.php';
+require_once dirname(__FILE__).'/_trackback.funcs.php';
+require_once dirname(__FILE__).'/_user.funcs.php';
+
+
+/**
+ * Optionnaly include obsolete functions
+ */
+@include_once dirname(__FILE__).'/_obsolete092.php';
+
 
 /**
  * Sets various arrays and vars
@@ -205,8 +222,8 @@ require_once dirname(__FILE__).'/_linkcache.class.php';
 $BlogCache = & new BlogCache();
 $GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 $ItemCache = & new ItemCache();
-$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_tasktypes', 'tsktyp_', 'tsktyp_ID' );
-$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_taskstatuses', 'tskst_', 'tskst_ID' );
+$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
+$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 $LinkCache = & new LinkCache();
 $UserCache = & new UserCache();
 
@@ -434,8 +451,8 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
- * Revision 1.26  2005/03/15 16:57:01  fplanque
- * minor
+ * Revision 1.27  2005/03/15 19:19:47  fplanque
+ * minor, moved/centralized some includes
  *
  * Revision 1.25  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization

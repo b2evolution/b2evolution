@@ -54,11 +54,12 @@ class Widget
 	 * @param string icon code {@see $$map_iconfiles}
 	 * @param string icon code for {@see getIcon()}
 	 */
-	function global_icon( $title, $icon, $url )
+	function global_icon( $title, $icon, $url, $word = '' )
 	{
 		$this->global_icons[] = array( 'title' => $title,
 																	 'icon'  => $icon,
-																	 'url'   => $url );
+																	 'url'   => $url,
+																	 'word'  => $word );
 	}
 
 
@@ -105,7 +106,7 @@ class Widget
 
 		foreach( $this->global_icons as $icon_params )
 		{
-			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'] );
+			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'] );
 		}
 
 		return $r;

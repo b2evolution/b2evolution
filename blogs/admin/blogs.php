@@ -195,7 +195,7 @@ switch( $action )
 													T_('List'), 'blogs.php' );
 }
 
-require( dirname(__FILE__).'/_menutop.php' );
+require dirname(__FILE__).'/_menutop.php';
 
 
 switch($action)
@@ -225,7 +225,7 @@ switch($action)
 		echo '<h2>'.T_('New blog').':</h2>';
 
 		$next_action = 'create';
-		require( dirname(__FILE__).'/_blogs_general.form.php' );
+		require dirname(__FILE__).'/_blogs_general.form.php';
 
 		echo '</div>';
 		break;
@@ -275,7 +275,7 @@ switch($action)
 			echo '</div>';
 
 			// List the blogs:
-			require( dirname(__FILE__).'/_blogs_list.php' );
+			require dirname(__FILE__).'/_blogs_list.php';
 
 			break;
 		}
@@ -361,15 +361,15 @@ switch($action)
 				}
 
 				$next_action = 'update';
-				require( dirname(__FILE__).'/_blogs_general.form.php' );
+				require dirname(__FILE__).'/_blogs_general.form.php';
 				break;
 
 			case 'perm':
-				require( dirname(__FILE__).'/_blogs_permissions.form.php' );
+				require dirname(__FILE__).'/_blogs_permissions.form.php';
 				break;
 
 			case 'advanced':
-				require( dirname(__FILE__).'/_blogs_advanced.form.php' );
+				require dirname(__FILE__).'/_blogs_advanced.form.php';
 				break;
 		}
 
@@ -543,16 +543,19 @@ switch($action)
 
 	default:
 		// List the blogs:
-		require( dirname(__FILE__).'/_blogs_list.php' );
+		require dirname(__FILE__).'/_blogs_list.php';
 
 }
 
 
-require( dirname(__FILE__).'/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 
 
 /*
  * $Log$
+ * Revision 1.34  2005/03/15 19:19:46  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.33  2005/03/07 00:06:16  blueyed
  * admin UI refactoring, part three
  *

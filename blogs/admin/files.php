@@ -240,7 +240,7 @@ if( !empty($action) )
 			}
 			else
 			{ // Downloading
-				require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
+				require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
 
 				$arraylist = $SelectedFiles->getFilesArray( 'getname' );
 
@@ -1171,21 +1171,24 @@ if( !$showFilemanager )
 	</div>
 	<?php
 
-	require( dirname(__FILE__). '/_footer.php' );
+	require dirname(__FILE__). '/_footer.php';
 	return;
 }
 
 // -------------------
 // Browsing interface:
 // -------------------
-require( dirname(__FILE__). '/_files_browse.inc.php' );
+require dirname(__FILE__).'/_files_browse.inc.php';
 
 
-require( dirname(__FILE__). '/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 
 
 /*
  * $Log$
+ * Revision 1.81  2005/03/15 19:19:46  fplanque
+ * minor, moved/centralized some includes
+ *
  * Revision 1.80  2005/03/08 15:23:52  fplanque
  * no message
  *
