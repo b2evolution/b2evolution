@@ -115,7 +115,9 @@ class User extends DataObject
 			$this->set( 'lastname', '' );
 			$this->set( 'nickname', '' );
 			$this->set( 'idmode', 'login' );
-			$this->set( 'locale', $default_locale ); // QUESTION: use $Settings->get('default_locale') ? fp: if u want
+			$this->set( 'locale', isset( $Settings )
+															? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
+															: $default_locale );
 			$this->set( 'email', '' );
 			$this->set( 'url', '' );
 			$this->set( 'icq', 0 );
@@ -857,6 +859,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2005/03/07 00:17:16  blueyed
+ * use $Settings instead of $default_locale
+ *
  * Revision 1.18  2005/03/02 18:30:56  fplanque
  * tedious merging... :/
  *
