@@ -583,7 +583,7 @@ function xmlrpc_removepostdata($content)
  *
  * fplanque: created
  */
-function xmlrpc_displayresult( $result, $log = '' )
+function xmlrpc_displayresult( $result, $log = '', $display = true )
 {
 	if( ! $result )
 	{
