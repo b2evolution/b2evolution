@@ -601,7 +601,7 @@ class ItemList
 	function get_postdata() 
 	{
 		global $id, $postdata, $authordata, $day, $page, $pages, $multipage, $more, $numpages;
-		global $pagenow;
+		global $pagenow, $current_User;
 
 		if(!$this->preview) 
 		{	// This is not preview:
@@ -646,7 +646,7 @@ class ItemList
 			$content = format_to_post( $content, $post_autobr ); 
 
 			param( 'edit_date', 'integer', 0 );
-			if (($user_level > 4) && $edit_date) 
+			if( $edit_date && $current_User->check_perm( 'edit_timestamp' )) 
 			{	// We use user date
 				param( 'aa', 'integer', 2000 );
 				param( 'mm', 'integer', 1 );

@@ -60,7 +60,7 @@ function create_b2evo_tables()
 		user_domain varchar(200) NOT NULL, 
 		user_browser varchar(200) NOT NULL, 
 		dateYMDhour datetime DEFAULT '0000-00-00 00:00:00' NOT NULL, 
-		user_level int(2) unsigned DEFAULT '0' NOT NULL, 
+		user_level int unsigned DEFAULT 0 NOT NULL, 
 		user_aim varchar(50) NOT NULL, 
 		user_msn varchar(100) NOT NULL, 
 		user_yim varchar(50) NOT NULL, 
