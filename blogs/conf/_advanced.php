@@ -25,6 +25,7 @@ $tablepostcats = 'evo_postcats';
 $tablehitlog = 'evo_hitlog';
 $tablemailinglist = 'evo_mailinglist';
 $tableantispam = 'evo_antispam';
+$tablepluginsettings = 'evo_pluginsettings';
 
 # old b2 tables used exclusively by the upgrade mode of the install script
 # you can delete or ignore those if you're not planning to upgrade from an original b2 database
