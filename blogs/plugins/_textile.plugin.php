@@ -15,11 +15,6 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/../renderer.class.php';
-
 
 /**
  * Example: get XHTML from a given Textile-markup string ($string)
@@ -204,7 +199,7 @@ Applying Attributes:
 /**
  * @package plugins
  */
-class textile_Rendererplugin extends RendererPlugin
+class textile_Rendererplugin extends Plugin
 {
 	var $code = 'b2DATxtl';
 	var $name = 'Textile (beta)';

@@ -96,7 +96,8 @@ if ($use_spellchecker)
 
 	if ($action != 'editcomment')
 	{ // ------------------------------ POST HEADER -----------------------
-	?>
+		$target_type = 'Item';
+		?>
 
 		<span class="line">
 		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
@@ -120,6 +121,7 @@ if ($use_spellchecker)
 	}
 	else
 	{	// -------------------------- COMMENT HEADER -----------------------
+		$target_type = 'Comment';
 		?>
 		<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
 
@@ -145,7 +147,7 @@ if ($use_spellchecker)
 
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
-		$Toolbars->display();
+		$Plug->call_plugins( 'DisplayToolbar', array( 'target_type' => $target_type ) );
 	?>
 	</div>
 
@@ -472,8 +474,8 @@ if( $action != 'editcomment' )
 	<fieldset>
 		<legend><?php echo T_('Renderers') ?></legend>
 		<?php
-		$Renderer->restart();	 // make sure iterator is at start position
-		while( $loop_RendererPlugin = $Renderer->get_next() )
+		$Plug->restart();	 // make sure iterator is at start position
+		while( $loop_RendererPlugin = $Plug->get_next() )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 			if( $loop_RendererPlugin->apply_when == 'stealth'

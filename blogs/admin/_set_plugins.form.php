@@ -16,7 +16,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
 	
 	<fieldset>
-		<legend><?php echo T_('Rendering plug-ins') ?></legend>
+		<legend><?php echo T_('Loaded plug-ins') ?></legend>
 		<table class="grouped" cellspacing="0">
 			<tr>
 				<th class="firstcol"><?php echo T_('Plug-in') ?></th>
@@ -24,8 +24,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<th><?php echo T_('Description') ?></th>
 			</tr>
 			<?php
-			$Renderer->restart();	 // make sure iterator is at start position
-			while( $loop_RendererPlugin = $Renderer->get_next() )
+			$Plug->restart();	 // make sure iterator is at start position
+			while( $loop_RendererPlugin = $Plug->get_next() )
 			{
 			?>
 			<tr>
@@ -39,32 +39,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</table>
 	</fieldset>
 
-	<fieldset>
-		<legend><?php echo T_('Toolbar plug-ins') ?></legend>
-		<table class="grouped" cellspacing="0">
-			<tr>
-				<th class="firstcol"><?php echo T_('Plug-in') ?></th>
-				<th><?php echo T_('Description') ?></th>
-			</tr>
-			<?php
-			$Toolbars->restart();	 // make sure iterator is at start position
-			while( $loop_ToolbarPlugin = $Toolbars->get_next() )
-			{
-			?>
-			<tr>
-				<td class="firstcol"><?php	$loop_ToolbarPlugin->name(); ?></td>
-				<td><?php	$loop_ToolbarPlugin->short_desc(); ?></td>
-			</tr>
-			<?php
-			}
-			?>
-		</table>
-	</fieldset>
-	
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ 
+	{
 		form_submit();
-	} 
+	}
 	?>
 
 </form>

@@ -10,15 +10,11 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/../renderer.class.php';
 
 /**
  * @package plugins
  */
-class smilies_Rendererplugin extends RendererPlugin
+class Smilies_Plugin extends Plugin
 {
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
@@ -28,6 +24,11 @@ class smilies_Rendererplugin extends RendererPlugin
 	var $apply_to_xml = false; // Leave the smilies alone
 	var $short_desc;
 	var $long_desc;
+
+	/**
+	 * Should be toolbar be displayed?
+	 */
+	var $display = true;
 
 	/**
 	 * Text similes search array
@@ -61,21 +62,112 @@ class smilies_Rendererplugin extends RendererPlugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal smilies_Rendererplugin::smilies_Rendererplugin(-)}} 
+	 * {@internal Smilies_Plugin::Smilies_Plugin(-)}}
 	 */
-	function smilies_Rendererplugin()
+	function Smilies_Plugin()
 	{
-		$this->short_desc = T_('Convert text smilies to icons');
-		$this->long_desc = T_('No description available');
+		$this->short_desc = T_('Graphical smileys');
+		$this->long_desc = T_('One click smilies inserting + Convert text smilies to icons');
 
-		require dirname(__FILE__). '/../_smilies.conf.php';
+		require dirname(__FILE__). '/_smilies.conf.php';
+	}
+
+
+  /**
+	 * Register event callbacks
+	 *
+	 * This method is called by b2evo to ask the plugin what events it would
+	 * like to receive notifications for.
+	 *
+	 * {@internal Plugin::RegisterEvents(-)}}
+	 *
+	 * @return array List of event names we wish to be called back for
+	 */
+/*	function RegisterEvents()
+	{
+		return array( 'DisplayToolbar' );
+	} */
+
+
+	/**
+	 * Display a toolbar
+	 *
+	 * {@internal Smilies_Plugin::DisplayToolbar(-)}}
+	 *
+   * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayToolbar( & $params )
+	{
+		if( !$this->display )
+		{	// We don't want to show this toolbar
+			return false;
+		}
+
+		$grins = '';
+		$smiled = array();
+		foreach( $this->smilies as $smiley => $grin )
+		{
+			if (!in_array($grin, $smiled))
+			{
+				$smiled[] = $grin;
+				$smiley = str_replace(' ', '', $smiley);
+				$grins .= '<img src="'. $this->smilies_path. '/'. $grin. '" title="'.$smiley.'" alt="'.$smiley
+									.'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');" /> ';
+			}
+		}
+
+		print('<div class="edit_toolbar">'. $grins. '</div>');
+		ob_start();
+		?>
+		<script type="text/javascript">
+		function grin(tag)
+		{
+			var myField;
+			if (document.getElementById('content') && document.getElementById('content').type == 'textarea') {
+				myField = document.getElementById('content');
+			}
+			else {
+				return false;
+			}
+			if (document.selection) {
+				myField.focus();
+				sel = document.selection.createRange();
+				sel.text = tag;
+				myField.focus();
+			}
+			else if (myField.selectionStart || myField.selectionStart == '0') {
+				var startPos = myField.selectionStart;
+				var endPos = myField.selectionEnd;
+				var cursorPos = endPos;
+				myField.value = myField.value.substring(0, startPos)
+								+ tag
+								+ myField.value.substring(endPos, myField.value.length);
+				cursorPos += tag.length;
+				myField.focus();
+				myField.selectionStart = cursorPos;
+				myField.selectionEnd = cursorPos;
+			}
+			else {
+				myField.value += tag;
+				myField.focus();
+			}
+		}
+
+		</script>
+		<?php
+		$grins = ob_get_contents();
+		ob_end_clean();
+		print($grins);
+
+		return true;
 	}
 
 
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal smilies_Rendererplugin::render(-)}} 
+	 * {@internal Smilies_Plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -155,6 +247,6 @@ function smiliescmp($a, $b)
 
 
 // Register the plugin:
-$this->register( new smilies_Rendererplugin() );
+$this->register( new Smilies_Plugin() );
 
 ?>

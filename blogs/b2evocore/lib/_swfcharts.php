@@ -18,7 +18,7 @@ function DrawChart($chart)
 	//defaults
 	if(!isset($chart[ 'canvas_bg' ]['width' ])){$chart[ 'canvas_bg' ]['width' ] =400;}
 	if(!isset($chart[ 'canvas_bg' ]['height' ])){$chart[ 'canvas_bg' ]['height' ] =250;}
-	if(!isset($chart[ 'canvas_bg' ]['color' ])){$chart[ 'canvas_bg' ]['color' ] ="666666";}
+	if(!isset($chart[ 'canvas_bg' ]['color' ])){$chart[ 'canvas_bg' ]['color' ] = "666666";}
 								
 	$params="";
 	$allKeys= array_keys($chart);

@@ -125,11 +125,11 @@ require_once( dirname(__FILE__).'/_functions_hitlogs.php' );     // referer logg
 require_once( dirname(__FILE__).'/_functions_forms.php' );
 require_once dirname(__FILE__).'/lib/_swfcharts.php';
 
-// Plug-ins init:
-require_once( dirname(__FILE__).'/_class_renderer.php' );
-$Renderer = & new Renderer();
-require_once( dirname(__FILE__).'/_class_toolbars.php' );
-$Toolbars = & new Toolbars();
+/**
+ * Plug-ins init:
+ */
+require_once( dirname(__FILE__).'/_class_plug.php' );
+$Plug = & new Plug();
 
 
 /**

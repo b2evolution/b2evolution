@@ -12,15 +12,11 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/../renderer.class.php';
 
 /**
  * @package plugins
  */
-class bbcode_Rendererplugin extends RendererPlugin
+class bbcode_Rendererplugin extends Plugin
 {
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
@@ -30,6 +26,7 @@ class bbcode_Rendererplugin extends RendererPlugin
 	var $apply_to_xml = true;  // strip the BBcode
 	var $short_desc;
 	var $long_desc;
+
 
 	/**
 	 * BBcode formatting search array
@@ -105,6 +102,7 @@ class bbcode_Rendererplugin extends RendererPlugin
 		
 		return true;
 	}
+
 }
 
 // Register the plugin:

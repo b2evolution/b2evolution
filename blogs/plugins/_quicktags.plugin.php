@@ -15,14 +15,9 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Includes:
- */
-require_once dirname(__FILE__).'/../toolbar.class.php';
-
-/**
  * @package plugins
  */
-class quicktags_Toolbarplugin extends ToolbarPlugin
+class Quicktags_Plugin extends Plugin
 {
 	/**
 	 * Should be toolbar be displayed?
@@ -39,21 +34,25 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal quicktags_Toolbarplugin::quicktags_Toolbarplugin(-)}}
+	 * {@internal Quicktags_Plugin::Quicktags_Plugin(-)}}
 	 */
-	function quicktags_Toolbarplugin()
+	function Quicktags_Plugin()
 	{
 		$this->short_desc = T_('Easy HTML tags inserting');
 		$this->long_desc = T_('No description available');
 	}
 
+
 	/**
-	 * Display the toolbar
+	 * Display a toolbar
 	 *
-	 * {@internal quicktags_Toolbarplugin::render(-)}} 
+	 * {@internal Quicktags_Plugin::DisplayToolbar(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
 	 */
-	function display()
-	{	
+	function DisplayToolbar( & $params )
+	{
 		global $is_lynx;
 
 		if( !$this->display )
@@ -63,7 +62,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 
 		if($is_lynx)	
 		{	// let's deactivate quicktags on Lynx, because they don't work there.
-			return;
+			return false;
 		}
 
 		?>
@@ -388,11 +387,12 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
     // -->
 		</script>
 		<div class="edit_toolbar"><script language="JavaScript" type="text/javascript">b2evoToolbar();</script></div>
-		<?php		
+		<?php
+		return true;
 	}
 }
 
 // Register the plugin:
-$this->register( new quicktags_Toolbarplugin() );
+$this->register( new Quicktags_Plugin() );
 
 ?>

@@ -610,7 +610,7 @@ param( 'mode', 'string', 'normal' );
 		}
 		else
 		{
-			$default_renderers = $Renderer->validate_list( array('default') );
+			$default_renderers = $Plug->validate_list( array('default') );
 			$autop = 1;
 		}
 
@@ -1430,11 +1430,11 @@ function import_data_extract_authors_cats()
 // outputs renderer list
 function renderer_list()
 {
-	global $Renderer, $renderers;
+	global $Plug, $renderers;
 
 	$renderers = array('default');
-	$Renderer->restart();	 // make sure iterator is at start position
-	while( $loop_RendererPlugin = $Renderer->get_next() )
+	$Plug->restart();	 // make sure iterator is at start position
+	while( $loop_RendererPlugin = $Plug->get_next() )
 	{ // Go through whole list of renders
 		// echo ' ',$loop_RendererPlugin->code;
 		if( $loop_RendererPlugin->apply_when == 'stealth'

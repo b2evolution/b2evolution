@@ -11,9 +11,9 @@
  * TODO: if $this->destformat changes all links would show up again.. :/ Prefix it?
  * NOTE: we could link to the original post in poplogs post's content.. :) 
  */
-require_once dirname(__FILE__).'/../renderer.class.php';
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-class poplog_Rendererplugin extends RendererPlugin
+class poplog_Rendererplugin extends Plugin
 {
 	var $code = 'b2evPopL';
 	var $name = 'Poplog';

@@ -8,15 +8,11 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/../renderer.class.php';
 
 /**
  * @package plugins
  */
-class auto_p_Rendererplugin extends RendererPlugin
+class auto_p_Rendererplugin extends Plugin
 {
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
