@@ -1,12 +1,14 @@
 <?php
 /**
- * This file implements the UI view for the blogs permission management.
+ * This file implements the UI view (+more :/) for the blogs permission management.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
+ *
+ * @todo move user rights queries to object (fplanque)
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
