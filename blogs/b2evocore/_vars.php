@@ -9,7 +9,7 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.8.6';
+$b2_version = '0.8.6.1';
 
 // Activate gettext:
 if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )

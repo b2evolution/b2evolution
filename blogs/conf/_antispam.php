@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution anti spam config
- * Version of this file: 0.8.5.5
+ * Version of this file: 0.8.6
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -21,6 +21,9 @@ $block_urls = array(
 // Light spammers:
 	'pcfamily.ch',
 	'nositeyet.com',
+	'mneuron.com',
+	'buy-phentermine',
+	'order-cheap-pills',
 	);
 
 ?>

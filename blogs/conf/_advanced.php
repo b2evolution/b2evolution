@@ -202,7 +202,7 @@ $sleep_after_edit = 0;			// let DB do its stuff...
 
 # This is the path that will be associated to cookies
 # That means cookies set by this b2evo install won't be seen outside of this path on the domain below
-$cookie_path = preg_replace('#http://[^/]+#', '', $baseurl ).'/';
+$cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl ).'/';
 
 # This is the cookie domain
 # That means cookies set by this b2evo install won't be seen outside of this domain
