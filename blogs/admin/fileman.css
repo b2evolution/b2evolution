@@ -14,17 +14,11 @@
 	margin-bottom:1em;
 }
 
-#filemanmain div.panelblock {
-	border:none;
-	padding:0;
-}
-
 /**
  * Files table {{{
  */
 #filemanmain table.grouped {
 	width:100%;
-	margin-top:0;
 }
 #filemanmain table.grouped thead td {
 	text-align:left;
@@ -74,8 +68,13 @@
 #filemanmain table.grouped td.actions img {
 	margin:0 2px;
 }
-#filemanmain table.grouped tr.group td {
+#filemanmain table.grouped tr.listfooter td {
+	font-weight: bold;
+	border-left: 0;
 	text-align:left;
+	/* Temporary colors, needs overriding */
+	background-color: #efede0;
+	border: 1px solid #9e9286;
 }
 /* }}} */
 
@@ -136,20 +135,19 @@ pre.rawcontent {
 	color:#f00;
 }
 
-fieldset.iconlegend {
-	float:right;
-}
-
 .tooltitle {
 	font-weight:bold;
 }
 ul.iconlegend {
-	list-style-type:none;
+	list-style:none;
 	margin:1ex;
 	padding:0;
 }
 ul.iconlegend li {
-	margin-bottom:.5ex;
+	display:inline;
+	margin: 1ex;
+	white-space:nowrap;
+	/* margin-bottom:.5ex; */
 }
 
 ul#uploadfileinputs {

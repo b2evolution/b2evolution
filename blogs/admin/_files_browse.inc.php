@@ -39,11 +39,10 @@
  *
  * @version $Id$
  */
-?>
 
-<div class="panelblock">
+// Display submenu:
+require dirname(__FILE__).'/_submenu.inc.php';
 
-<?php
 	// ---------------------------------------------------
 	// Display main user interface : file list & controls:
 	// ---------------------------------------------------
@@ -106,21 +105,18 @@
 															T_('Normal mode') :
 															T_('Flat mode'), 'formvalue' ); ?>" />
 	</form>
-</div>
 
-<div class="clear"></div>
-
-
-<div class="panelblock">
+<div class="clear"><!-- This is to prevent the preceding floats from going into the table --></div>
 
 <form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
+
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
 <?php echo $Fileman->getFormHiddenInputs() ?>
 
 
-<table class="grouped">
+<table class="grouped" cellspacing="0">
 
 <?php
 /**
@@ -132,7 +128,7 @@ $filetable_cols = 8;
 
 <thead>
 <tr>
-	<td colspan="<?php echo $filetable_cols ?>">
+	<td colspan="<?php echo $filetable_cols ?>" class="firstcol lastcol">
 
 	<?php
 	$rootlist = $Fileman->getRootList();
@@ -214,9 +210,11 @@ $filetable_cols = 8;
 	?>
 	)</span>
 	</td>
+
 </tr>
+
 <tr>
-	<th colspan="2"><?php $Fileman->dispButtonParent(); ?></th>
+	<th colspan="2" class="firstcol"><?php $Fileman->dispButtonParent(); ?></th>
 	<th><?php
 		echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
 
@@ -226,12 +224,11 @@ $filetable_cols = 8;
 		}
 
 	?></th>
-
 	<th><?php echo $Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ) ?></th>
-	<th><?php echo /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions') ?></th>
+	<th class="lastcol"><?php echo /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions') ?></th>
 </tr>
 </thead>
 
@@ -249,7 +246,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	<tr<?php
 		if( $countFiles%2 ) echo ' class="odd"';
 		?> onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();">
-		<td class="checkbox">
+		<td class="checkbox firstcol">
 			<input title="<?php echo T_('Select this file') ?>" type="checkbox"
 				name="fm_selected[]"
 				value="<?php echo $lFile->getID(); ?>"
@@ -348,7 +345,7 @@ while( $lFile =& $Fileman->getNextFile() )
 		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
 		<td class="timestamp"><?php echo $lFile->getLastMod() ?></td>
 		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
-		<td class="actions"><?php
+		<td class="actions lastcol"><?php
 			// Not implemented yet: $Fileman->dispButtonFileEdit();
 			$Fileman->dispButtonFileRename();
 			$Fileman->dispButtonFileCopy();
@@ -385,7 +382,7 @@ else
 	// Footer with "check all", "with selected: ..":
 	// --------------
 ?>
-<tr class="group">
+<tr class="listfooter">
 	<td colspan="<?php echo $filetable_cols ?>">
 	<a id="checkallspan_0" href="<?php
 		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
@@ -662,11 +659,15 @@ param( 'options_show', 'integer', 0 );
 
 <div class="clear"></div>
 
-</div>
-
 <?php
+// Display submenu:
+require dirname(__FILE__).'/_sub_end.inc.php';
+
 /*
  * $Log$
+ * Revision 1.3  2005/01/25 18:07:42  fplanque
+ * CSS/style cleanup
+ *
  * Revision 1.2  2005/01/15 20:32:14  blueyed
  * small fix, warning icon
  *

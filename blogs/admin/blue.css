@@ -526,6 +526,7 @@ div.tabbedpanelblock {
 	padding: 1ex 1em 1ex 1em;
 	margin: 0 1em 2ex 1em;
 }
+div.panelblock fieldset,
 div.tabbedpanelblock fieldset {
 	border: 1px solid #ddd;
 	margin: 0 0 1ex 0;
@@ -846,6 +847,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.13  2005/01/25 18:07:45  fplanque
+ * CSS/style cleanup
+ *
  * Revision 1.12  2005/01/20 14:00:42  fplanque
  * no message
  *
