@@ -64,7 +64,7 @@ $app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout'
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 {	// Warning: on some IIS installs it it set but empty!
 	// Besides, use of explode is not very efficient so other methods are preferred.
-	$Debuglog->add( 'vars: Getting ReqURI from REQUEST_URI', 'hit' );
+	$Debuglog->add( 'Getting ReqURI from REQUEST_URI', 'vars' );
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
 	$ReqPath = explode( '?', $ReqURI, 2 );
@@ -72,25 +72,25 @@ if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 }
 elseif( isset($_SERVER['URL']) )
 { // ISAPI
-	$Debuglog->add( 'vars: Getting ReqPath from URL', 'hit' );
+	$Debuglog->add( 'Getting ReqPath from URL', 'vars' );
 	$ReqPath = $_SERVER['URL'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
-	$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO', 'hit' );
+	$Debuglog->add( 'Getting ReqPath from PATH_INFO', 'vars' );
 	$ReqPath = $_SERVER['PATH_INFO'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['SCRIPT_NAME']) )
 { // Some Odd Win2k Stuff
-	$Debuglog->add( 'vars: Getting ReqPath from SCRIPT_NAME', 'hit' );
+	$Debuglog->add( 'Getting ReqPath from SCRIPT_NAME', 'vars' );
 	$ReqPath = $_SERVER['SCRIPT_NAME'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PHP_SELF']) )
 { // The Old Stand-By
-	$Debuglog->add( 'vars: Getting ReqPath from PHP_SELF', 'hit' );
+	$Debuglog->add( 'Getting ReqPath from PHP_SELF', 'vars' );
 	$ReqPath = $_SERVER['PHP_SELF'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
@@ -274,6 +274,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/21 23:49:32  blueyed
+ * created debuglog group 'vars'
+ *
  * Revision 1.8  2005/01/13 19:53:51  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *
