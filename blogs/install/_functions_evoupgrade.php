@@ -23,6 +23,7 @@ function upgrade_b2evo_tables()
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments,
 					$tableblogs, $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
 	global $baseurl, $old_db_version, $new_db_version;
+	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 
 	// Check DB version:
 	check_db_version();
@@ -148,7 +149,28 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
+		// Create User Groups
 		create_groups();
+
+		echo "Creating user blog permissions... ";
+		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
+								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
+								bloguser_perm_cats, bloguser_perm_properties)
+							SELECT blog_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
+							FROM $tableusers, $tableblogs
+							WHERE user_level = 10";
+		$q = mysql_query($query) or mysql_oops( $query );
+		
+		// Normal users: basic rights for all blogs (can't stop doing joins :P)
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
+								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
+								bloguser_perm_cats, bloguser_perm_properties)
+							SELECT blog_ID, ID, 'published,protected,private,draft', 0, 1, 0, 0
+							FROM $tableusers, $tableblogs
+							WHERE user_level > 0 AND user_level < 10";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
 
 		echo "Upgrading users table... ";
 		$query = "ALTER TABLE $tableusers
@@ -158,6 +180,24 @@ function upgrade_b2evo_tables()
 							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login', 
 							ADD KEY user_grp_ID (user_grp_ID)";
 		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
+
+		echo "Assigning user groups... ";
+
+		// Default is 1, so admins are already set.
+
+		// Basic Users:
+		$query = "UPDATE $tableusers 
+							SET user_grp_ID = $Group_Users->ID
+							WHERE user_level = 0";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		// Bloggers:
+		$query = "UPDATE $tableusers 
+							SET user_grp_ID = $Group_Bloggers->ID
+							WHERE user_level > 0 AND user_level < 10";
+		$q = mysql_query($query) or mysql_oops( $query );
+
 		echo "OK.<br />\n";
 
 		echo "Upgrading settings table... ";
