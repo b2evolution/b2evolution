@@ -317,21 +317,27 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 	$urltitle = preg_replace( '/_+$/', '', $urltitle ); 
 	// Uppercase the first character of each word in a string 
 	$urltitle = strtolower( $urltitle );
+
+	preg_match( '/^(.*?)(_[0-9]+)?$/', $urltitle, $matches );
+
+	$urlbase = substr( $matches[1], 0, 40 );
+	$urltitle = $urlbase;
+	if( isset( $matches[2] ) )
+	{
+		$urltitle = $urlbase . $matches[2];
+	}
 	
-	// Remove trailing number for search:
-	$urlsearch = preg_replace( '/_[0-9]+$/', '', $urltitle ); 
 
 	// Find all occurrences of urltitle+number in the DB:
 	$sql = "SELECT post_urltitle
 					FROM $tableposts
-					WHERE post_urltitle REGEXP '^".$urlsearch."(_[0-9]+)?$'
+					WHERE post_urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'
 					  AND ID <> $post_ID";
 	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
 	
 	$exact_match = false;
 	$highest_number = 0;
-	$matches = array();
 	while( $row = mysql_fetch_assoc( $result ) )
 	{
 		$existing_urltitle = $row['post_urltitle'];
@@ -353,7 +359,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 		
 	if( $exact_match )
 	{	// We got an exact match, we need to change the number:
-		$urltitle = $urlsearch.'_'.($highest_number + 1);
+		$urltitle = $urlbase.'_'.($highest_number + 1);
 	}
 		
 	// echo "using = $urltitle <br />";

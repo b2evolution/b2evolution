@@ -16,7 +16,7 @@ require_once(dirname(__FILE__)."/../blogs/$core_subdir/_main.php");
 $test = " :: çà c'est \"VRAIMENT\" tôa! ";
 echo '<p>[',$test,'] => [', urltitle_validate( '  ', $test ), ']</p>';
 
-$test = "Référencement des sites web_15";
+$test = "La subtile différence entre acronym et abbr..._452";
 echo '<p>[',$test,'] => [', urltitle_validate( '  ', $test ), ']</p>';
 
 
