@@ -103,25 +103,51 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 
 	/**
-	 *
+	 * Insert three files and sort them with different settings.
 	 */
 	function testSort()
 	{
-		$FileB = new File( 'b', TMPDIR );
-		$this->Filelist->addFile( $FileB );
 		$FileA = new File( 'a', TMPDIR );
 		$this->Filelist->addFile( $FileA );
+		$FileB = new File( 'b', TMPDIR );
+		$this->Filelist->addFile( $FileB );
+		$FileC = new File( 'c', TMPDIR );
+		$this->Filelist->addFile( $FileC );
 
-		$this->Filelist->sort( 'name', true );
+
+		// ascending, dirs not at top:
+		$this->Filelist->sort( 'name', true, false );
 
 		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'First file sorted ok.' );
 		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file sorted ok.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileC, 'Third file sorted ok.' );
 
-		// sort dirs at top:
-		$this->Filelist->_isDir = true;
-		$this->Filelist->sort( 'name', true, true );
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileB, 'Directory at top.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileA, 'File below directory.' );
+
+		// descending, dirs not at top:
+		$this->Filelist->sort( 'name', false, false );
+
+		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileC, 'First file sorted ok.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file sorted ok.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileA, 'Third file sorted ok.' );
+
+
+		// Make $FileA a directory
+		$FileA->_isDir = true;
+
+		// descending, dirs at top:
+		$this->Filelist->sort( 'name', false, true );
+
+		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'Directory at top.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileC, 'First File below directory.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileB, 'Second File below directory.' );
+
+
+		// ascending, dirs not at top:
+		$this->Filelist->sort( 'name', true, false );
+
+		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'First file sorted ok.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file sorted ok.' );
+		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileC, 'Third file sorted ok.' );
 	}
 
 }

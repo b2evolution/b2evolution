@@ -338,11 +338,11 @@ class Filelist
 
 
 	/**
-	 * Sort the entries by sorting the {@link $_indexOrder} array.
+	 * Sort the entries by sorting the internal {@link $_indexOrder} array.
 	 *
-	 * @param string the entries key
-	 * @param boolean ascending (true) or descending
-	 * @param boolean sort directories at top?
+	 * @param string The order to use ('name', 'type', 'lastmod', .. )
+	 * @param boolean Ascending (true) or descending
+	 * @param boolean Sort directories at top?
 	 */
 	function sort( $order = NULL, $orderasc = NULL, $dirsattop = NULL )
 	{
@@ -364,9 +364,8 @@ class Filelist
 			$this->dirsnotattop = !$dirsattop;
 		}
 
+		usort( $this->_indexOrder, array( $this, '_sortCallback' ) );
 
-		#usort( $this->_indexOrder, create_function( '$a, $b', $sortFunction ) );
-		usort( $this->_indexOrder, array( &$this, '_sort' ) );
 
 		// Restart the list
 		$this->restart();
@@ -381,38 +380,38 @@ class Filelist
 	 */
 	function _sortCallback( $a, $b )
 	{
-		$a =& $this->getFileByIndex($a);
-		$b =& $this->getFileByIndex($b);
+		$FileA =& $this->_entries[$a];
+		$FileB =& $this->_entries[$b];
 
 
 		if( $this->order == 'size' )
 		{
 			if( $this->recursivedirsize )
 			{
-				$r = $a->getSize() - $b->getSize();
+				$r = $FileA->getSize() - $FileB->getSize();
 			}
 			else
 			{
-				$r = $a->isDir() && $b->isDir() ?
-								strcasecmp( $a->getName(), $b->getName() ) :
-								( $a->getSize() - $b->getSize() );
+				$r = $FileA->isDir() && $FileB->isDir() ?
+								strcasecmp( $FileA->getName(), $FileB->getName() ) :
+								( $FileA->getSize() - $FileB->getSize() );
 			}
 		}
 		elseif( $this->order == 'path' )
 		{ // group by dir
-			$r = strcasecmp( $a->getDir(), $b->getDir() );
+			$r = strcasecmp( $FileA->getDir(), $FileB->getDir() );
 			if( $r == 0 )
 			{
-				$r = strcasecmp( $a->getName(), $b->getName() );
+				$r = strcasecmp( $FileA->getName(), $FileB->getName() );
 			}
 		}
 		elseif( $this->order == 'lastmod' )
 		{
-			$r = $b->_lastMod - $a->_lastMod;
+			$r = $FileB->_lastMod - $FileA->_lastMod;
 		}
 		else
 		{
-			$r = eval( 'return strcasecmp( $a->get'.$this->order.'(), $b->get'.$this->order.'() );' );
+			$r = eval( 'return strcasecmp( $FileA->get'.$this->order.'(), $FileB->get'.$this->order.'() );' );
 		}
 
 		if( !$this->orderasc )
@@ -422,11 +421,11 @@ class Filelist
 
 		if( !$this->dirsnotattop )
 		{
-			if( $a->isDir() && !$b->isDir() )
+			if( $FileA->isDir() && !$FileB->isDir() )
 			{
 				$r = -1;
 			}
-			elseif( $b->isDir() && !$a->isDir() )
+			elseif( $FileB->isDir() && !$FileA->isDir() )
 			{
 				$r = 1;
 			}
@@ -774,6 +773,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.17  2005/01/08 22:10:43  blueyed
+ * really fixed filelist (hopefully)
+ *
  * Revision 1.16  2005/01/08 12:54:03  blueyed
  * fixed/refactored sort()
  *
