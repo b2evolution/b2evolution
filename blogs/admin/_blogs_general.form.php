@@ -47,10 +47,10 @@ function update_IDs( ids, text, notrailingslash )
 			form_select( 'blog_locale', $blog_locale, 'locale_options', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 		?>
 	</fieldset>
-	
+
 	<fieldset>
 		<legend><?php echo T_('Access parameters') ?></legend>
-	
+
 		<?php
 			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $blog) )
 			{
@@ -125,7 +125,6 @@ function update_IDs( ids, text, notrailingslash )
 		<legend><?php echo T_('Description') ?></legend>
 		<?php
 			form_text( 'blog_tagline', $blog_tagline, 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
-		?>
 
 			form_textarea( 'blog_longdesc', $blog_longdesc, 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
 
@@ -134,11 +133,10 @@ function update_IDs( ids, text, notrailingslash )
 			form_text( 'blog_keywords', $blog_keywords, 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 
 			form_textarea( 'blog_notes', $blog_notes, 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
-
 		?>
 	</fieldset>
 
-	<?php form_submit(); ?>	
+	<?php form_submit(); ?>
 
 </form>
 
