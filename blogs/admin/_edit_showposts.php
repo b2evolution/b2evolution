@@ -214,7 +214,7 @@ require dirname(__FILE__).'/_submenu.inc.php';
 											'</p></div>' );
 
 				while( $Comment = $CommentList->get_next() )
-				{	// Loop through comments:
+				{ // Loop through comments:
 					?>
 					<!-- ========== START of a COMMENT/TB/PB ========== -->
 					<div class="bComment">
@@ -284,11 +284,11 @@ require dirname(__FILE__).'/_submenu.inc.php';
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
 				<?php
-				
+
 				$Form = & new Form( $htsrv_url.'comment_post.php', '' );
-	
+
 				$Form->begin_form( 'bComment' );
-				
+
 				$Form->hidden( 'comment_post_ID', $Item->ID );
 				$Form->hidden( 'redirect_to', htmlspecialchars($ReqURI) );
 				?>
@@ -302,28 +302,28 @@ require dirname(__FILE__).'/_submenu.inc.php';
 				<?php
 				$Form->textarea( 'comment', '', 12, T_('Comment text'), T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)).'<br />'.T_('URLs, email, AIM and ICQs will be converted automatically.'), 40, 'bComment' );
 
-				if(substr($comments_use_autobr,0,4) == 'opt-') 
-				{ 
+				if(substr($comments_use_autobr,0,4) == 'opt-')
+				{
 					echo $Form->fieldstart;
-					echo $Form->labelstart; 
+					echo $Form->labelstart;
 				?>
 				<label><?php echo T_('Options') ?>:</label>
-				
+
 				<?php
 					echo $Form->labelend;
 					echo $Form->inputstart;
-					$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' ); 
+					$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' );
 					echo $Form->inputend;
 					$Form->fieldset_end();
-					
-				} 
-				
+
+				}
+
 					echo $Form->fieldstart;
 					echo $Form->inputstart;
-					$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) ); 
+					$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) );
 					echo $Form->inputend;
 					$Form->fieldset_end();
-					
+
 				?>
 
 					<div class="clear"></div>
@@ -369,7 +369,7 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	<div class="bSideItem">
 		<?php
 		if( isset( $Blog ) )
-		{	// We might use this file outside of a blog...
+		{ // We might use this file outside of a blog...
 			echo '<h2>'.$Blog->dget( 'name', 'htmlbody' ).'</h2>';
 		}
 
@@ -380,8 +380,8 @@ require dirname(__FILE__).'/_submenu.inc.php';
 		$Calendar->set( 'navigation', 'tfoot' );
 		$Calendar->display( $pagenow, 'blog='. $blog );
 
-		if( isset( $Blog ) )
-		{	// We might use this file outside of a blog...
+		if( isset( $Blog ) && ( $Blog->get( 'notes' ) ) )
+		{ // We might use this file outside of a blog...
 			echo '<h3>'.T_('Notes').'</h3>';
 			$Blog->disp( 'notes', 'htmlbody' );
 		}
@@ -389,23 +389,23 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	</div>
 
 	<div class="bSideItem">
-	
-	<?php 
-	
-	$Form = & new Form( $pagenow, 'searchform', 'get', 'none' );
-	
-	$Form->begin_form( '' );
-	
-	$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
-	
-	?>
-	
-	<h3><?php echo T_('Search') ?></h3>
-	
+
 	<?php
-	
+
+	$Form = & new Form( $pagenow, 'searchform', 'get', 'none' );
+
+	$Form->begin_form( '' );
+
+	$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
+
+	?>
+
+	<h3><?php echo T_('Search') ?></h3>
+
+	<?php
+
 	$Form->hidden( 'blog', $blog );
-	
+
 	$Form->fieldset( 'Posts to show', ('Posts to show') );
 	?>
 	<div>
@@ -440,18 +440,18 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	<?php
 	$Form->fieldset_end();
 
-	
-	$Form->fieldset( T_('Title / Text contains'), 'Text' );			
+
+	$Form->fieldset( T_('Title / Text contains'), 'Text' );
 
 	echo $Form->inputstart;
-	
+
 	?>
 	<input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" />
 	<?php
 	echo $Form->inputend;
 	echo T_('Words').' : ';
 	?>
-	
+
 	<input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
 	<label for="sentAND"><?php echo T_('AND') ?></label>
 	<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
@@ -460,7 +460,7 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	<label for="sentence"><?php echo T_('Entire phrase') ?></label>
 	<?php
 	$Form->fieldset_end();
-	
+
 	$Form->fieldset( 'Archives', T_('Archives') );
 	?>
 				<ul>
@@ -552,45 +552,45 @@ require dirname(__FILE__).'/_submenu.inc.php';
 				cat_query( true );	// make sure the caches are loaded
 				if( ! isset( $cat_array ) ) $cat_array = array();
 				function cat_list_before_first( $parent_cat_ID, $level )
-				{	// callback to start sublist
+				{ // callback to start sublist
 					global $cat_group_start;
 					if( $level > 0 ) echo "\n",$cat_group_start,"\n";
 				}
 				function cat_list_before_each( $cat_ID, $level )
-				{	// callback to display sublist element
+				{ // callback to display sublist element
 					global $blog, $cat_array, $cat_line_start, $pagenow;
 					$cat = get_the_category_by_ID( $cat_ID );
 					echo $cat_line_start;
 					echo '<label><input type="checkbox" name="catsel[]" value="'. $cat_ID. '" class="checkbox"';
 					if( in_array( $cat_ID, $cat_array ) )
-					{	// This category is in the current selection
+					{ // This category is in the current selection
 						echo ' checked="checked"';
 					}
 					echo ' /> ';
 					echo '<a href="', $pagenow, '?blog=', $blog, '&amp;cat=', $cat_ID, '">', $cat['cat_name'], '</a> (', $cat['cat_postcount'] ,')';
 					if( in_array( $cat_ID, $cat_array ) )
-					{	// This category is in the current selection
+					{ // This category is in the current selection
 						echo "*";
 					}
 					echo '</label>';
 				}
 				function cat_list_after_each( $cat_ID, $level )
-				{	// callback to display sublist element
+				{ // callback to display sublist element
 					global $cat_line_end;
 					echo $cat_line_end,"\n";
 				}
 				function cat_list_after_last( $parent_cat_ID, $level )
-				{	// callback to end sublist
+				{ // callback to end sublist
 					global  $cat_group_end;
 					if( $level > 0 ) echo $cat_group_end,"\n";
 				}
 
 				if( $blog > 1 )
-				{	// We want to display cats for one blog
+				{ // We want to display cats for one blog
 					cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
 				}
 				else
-				{	// We want to display cats for all blogs
+				{ // We want to display cats for all blogs
 					for( $curr_blog_ID=blog_list_start('stub');
 								$curr_blog_ID!=false;
 								 $curr_blog_ID=blog_list_next('stub') )
@@ -614,7 +614,7 @@ require dirname(__FILE__).'/_submenu.inc.php';
 
 	$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 	$Form->button( array( 'button', '', T_('Reset'), 'search', 'document.location.href='.$pagenow.'?blog='.$blog.';' ) );
-	
+
 	$Form->end_form();
 
 ?>
