@@ -257,6 +257,7 @@ function backslashit($string) {
  * Convert special chars
  *
  * fplanque: simplified
+ * sakichan: pregs instead of loop
  */
 function convert_chars( $content, $flag='html' )
 {
@@ -269,39 +270,22 @@ function convert_chars( $content, $flag='html' )
 
 	$content = strtr($content, $b2_htmltrans);
 
-	for ($i=0; $i<strlen($content); $i=$i+1)
+	if (locale_charset(false) == 'iso-8859-1') 
 	{
-		$j = substr($content,$i,1);					// Get one char
-		$jnext = substr($content,$i+1,1);		// Get next char
-		$jord = ord($j);
-		switch($flag)
-		{
-			case "html":
-				if ($jord>=128)
-				{
-					$j = "&#".$jord.";"; // $j = htmlentities($j);
-				}
-				elseif (($j == "&") && ($jnext != "#"))
-				{
-					$j = "&amp;";
-				}
-				break;
-
-			case "unicode":
-			case "xml":
-				if ($jord>=128)
-				{
-					$j = "&#".$jord.";";
-				}
-				elseif (($j == "&") && ($jnext != "#"))
-				{
-					$j = "&#38;";
-				}
-				break;
-		}
-
-		$newcontent .= $j;
-	}
+ 		$content = preg_replace_callback(
+ 			'/[\x80-\xff]/',
+ 			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
+ 			$content);
+ 	}
+ 
+ 	if ($flag == "html") 
+	{
+ 		$newcontent = preg_replace('/&(?!#)/', '&amp;', $content);
+ 	}
+ 	else 
+	{	// unicode, xml...
+ 		$newcontent = preg_replace('/&(?!#)/', '&#38;', $content);
+ 	}
 
 	// now converting: Windows CP1252 => Unicode (valid HTML)
 	// (if you've ever pasted text from MSWord, you'll understand)
