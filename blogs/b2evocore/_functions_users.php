@@ -39,13 +39,13 @@ function veriflog( $login_required = false )
 	// Check if user is trying to login right now:
 	if( isset($_POST['log'] ) && isset($_POST['pwd'] ))
 	{	// Trying to log in with a POST
-		$log = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['log']) : $_POST['log']));
+		$log = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['log']) : $_POST['log'])));
 		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['pwd']) : $_POST['pwd'])));
 		unset($_POST['pwd']); // password is hashed from now on
 	}
 	elseif( isset($_GET['log'] ) && isset($_GET['pwd'] ))
 	{	// Trying to log in with a GET
-		$log = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['log']) : $_GET['log']));
+		$log = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['log']) : $_GET['log'])));
 		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['pwd']) : $_GET['pwd'])));
 		unset($_GET['pwd']); // password is hashed from now on
 	}
@@ -70,9 +70,6 @@ function veriflog( $login_required = false )
 			// echo 'login failed!!';
 			return '<strong>'. T_('ERROR'). ':</strong> '. T_('wrong login/password.');
 		}
-		
-		// get case sensitive user login
-		$user_login = $DB->get_var("SELECT user_login FROM $tableusers WHERE user_login = '".$DB->escape($user_login)."'");
 		
 		// Login succeeded:
 		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;

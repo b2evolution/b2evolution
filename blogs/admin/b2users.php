@@ -113,6 +113,7 @@ else switch ($action)
 		
 		param( 'edited_user_oldlogin', 'string', true );
 		param( 'edited_user_login', 'string', true );
+		$edited_user_login = strtolower( $edited_user_login );
 		
 		if( empty($edited_user_login) )
 		{
