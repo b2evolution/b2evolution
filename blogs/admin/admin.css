@@ -533,11 +533,13 @@ caption.bCalendarMonth {
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 	border-top: solid 1px #ccc;
+	font-weight: bold;
+	margin: auto;
 	white-space: nowrap;
 }
 table.bCalendarTable {
 	margin: auto;
-	font-size: 84%;
+	font-size: 77%;
 	border: solid 1px #ccc;
 }
 tr.bCalendarRow {
@@ -550,11 +552,13 @@ td.bCalendarCell {
 }
 td.bCalendarEmptyCell {
 }
-a.bCalendarLinkPost {
-}
-span.bCalendarToday {
+.bCalendarLinkPost {
 	font-weight: bold;
 }
+#bCalendarToday {
+	background-color: #DEF;
+}
+
 
 .FigZone {
 	text-align: center;
@@ -628,33 +632,6 @@ div.extracats {
 	/* border: 1px solid #f00; */
 }
 
-/* Calendar: */
-caption.bCalendarMonth {
-	border-left: solid 1px #ccc;
-	border-right: solid 1px #ccc;
-	border-top: solid 1px #ccc;
-	font-weight: bold;
-	margin: auto;
-}
-table.bCalendarTable {
-	margin: auto;
-	font-size: 77%;
-	border: solid 1px #ccc;
-}
-tr.bCalendarRow {
-	text-align: center;
-}
-th.bCalendarHeaderCell {
-	font-size: 84%;
-}
-td.bCalendarCell {
-}
-td.bCalendarEmptyCell {
-}
-a.bCalendarLinkPost {
-	font-weight: bold;
-}
-
 tr.group {
 	font-weight: bold;
 	background-color: #eee;
@@ -662,8 +639,4 @@ tr.group {
 label.radiooption {
 	white-space: nowrap;
 	margin-right: 1em;
-}
-td.bCalendarLinkPostToday
-{
-	font-weight: bold;
 }

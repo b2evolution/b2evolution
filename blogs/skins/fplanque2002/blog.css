@@ -199,15 +199,12 @@ td.bCalendarCell
 td.bCalendarEmptyCell
 {
 }
-a.bCalendarLinkPost
-{
-}
-span.bCalendarToday
+.bCalendarLinkPost
 {
 	font-weight: bold;
+}
+#bCalendarToday
+{
+	background-color: #DEF;
 }
 
-td.bCalendarLinkPostToday
-{
-	font-weight: bold;
-}

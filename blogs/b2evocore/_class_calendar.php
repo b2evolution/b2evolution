@@ -150,7 +150,8 @@ class Calendar
 
 		$this->linkpostcellstart = '<td class="bCalendarLinkPost">';
 		$this->linkposttodaycellstart = '<td class="bCalendarLinkPostToday">';
-		$this->todaycellstart = '<td class="bCalendarToday">';
+		$this->todaycellstart = '<td id="bCalendarToday">';
+		$this->todaycellstartpost = '<td id="bCalendarToday" class="bCalendarLinkPost">';
 
 		$this->searchframe = 12;	// How many month will we search back for a post before we give up
 
@@ -163,10 +164,14 @@ class Calendar
 		 * - %d gets replaced with the number of posts on that day/month
 		 */
 		$this->postcount_month_cell = '';                            // in table cell (behind day)
+		$this->postcount_month_cell_one = '';                        //  -- " -- [for single post]
 		$this->postcount_month_atitle = T_('%d posts on this day');  // in archive links title tag
+		$this->postcount_month_atitle_one = T_('one post on this day');  //  -- " -- [for single post]
 		#$this->postcount_year_cell = ' (%d)';                        // in table cell (behind abbr of month)
-		$this->postcount_year_cell = '';
+		$this->postcount_year_cell   = '';
+		$this->postcount_year_cell_one   = '';
 		$this->postcount_year_atitle = T_('%d posts in this month'); // in archive links title tag
+		$this->postcount_year_atitle_one = T_('one post in this month'); // in archive links title tag
 		/**#@-*/
 	}
 
@@ -360,7 +365,7 @@ class Calendar
 				{
 					if( $this->month == $i )
 					{
-						echo $this->linkposttodaycellstart;
+						echo $this->todaycellstartpost;
 					}
 					else
 					{
@@ -369,9 +374,13 @@ class Calendar
 					echo '<a href="';
 					archive_link( $this->year, $i, '', '', true, $file, $params );
 					echo '"';
-					if( !empty($this->postcount_year_atitle) )
+					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_atitle) )
 					{ // display postcount
 						echo ' title="'.sprintf($this->postcount_year_atitle, $monthswithposts[ $i ]).'"';
+					}
+					elseif( !empty($this->postcount_year_atitle_one) )
+					{ // display postcount for one post
+						echo ' title="'.sprintf($this->postcount_year_atitle_one, 1).'"';
 					}
 					echo '>';
 				}
@@ -387,9 +396,13 @@ class Calendar
 				
 				if( isset($monthswithposts[ $i ]) )
 				{ // close anchor and show how many posts we have for this month
-					if( !empty($this->postcount_year_cell) )
+					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_cell) )
 					{ // display postcount
 						printf($this->postcount_year_cell, $monthswithposts[ $i ]);
+					}
+					elseif( !empty($this->postcount_year_cell_one) )
+					{ // display postcount for one post
+						printf($this->postcount_year_cell_one, 1);
 					}
 					echo '</a>';
 				}
@@ -434,7 +447,7 @@ class Calendar
 					{
 						if( $calendartoday )
 						{
-							echo $this->linkposttodaycellstart;
+							echo $this->todaycellstartpost;
 						}
 						else
 						{
@@ -443,9 +456,13 @@ class Calendar
 						echo '<a href="';
 						archive_link( $this->year, $this->month, date('d',$i), '', true, $file, $params );
 						echo '"';
-						if( !empty($this->postcount_month_atitle) )
+						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_atitle) )
 						{ // display postcount
 							echo ' title="'.sprintf($this->postcount_month_atitle, $daysinmonthwithposts[ date('j', $i) ]).'"';
+						}
+						elseif( !empty($this->postcount_month_atitle_one) )
+						{ // display postcount for one post
+							echo ' title="'.sprintf($this->postcount_month_atitle_one, 1).'"';
 						}
 						echo '>';
 					}
@@ -460,9 +477,13 @@ class Calendar
 					echo date('j',$i);
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
 					{
-						if( !empty($this->postcount_month_cell) )
+						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_cell) )
 						{ // display postcount
 							printf($this->postcount_month_cell, $daysinmonthwithposts[ date('j', $i) ]);
+						}
+						elseif( !empty($this->postcount_month_cell_one) )
+						{ // display postcount for one post
+							printf($this->postcount_month_cell_one, 1);
 						}
 						echo '</a>';
 					}

@@ -392,11 +392,10 @@ td.bCalendarCell
 td.bCalendarEmptyCell
 {
 }
-a.bCalendarLinkPost
+.bCalendarLinkPost
 {
 	font-weight: bold;
 }
-td.bCalendarLinkPostToday
-{
-	font-weight: bold;
+#bCalendarToday {
+	background-color: #DEF;
 }
