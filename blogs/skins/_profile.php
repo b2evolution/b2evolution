@@ -78,45 +78,7 @@ $ProfileForm->text( 'newuser_lastname', $current_User->get( 'lastname' ), 40, T_
 $ProfileForm->text( 'newuser_nickname', $current_User->get( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
 
 
-$field_options = '';
-$idmode = $current_User->get( 'idmode' );
-
-foreach( array( 'nickname' => T_('Nickname'),
-								'login' => T_('Login'),
-								'firstname' => T_('First name'),
-								'lastname' => T_('Last name'),
-								'namefl' => array( 'firstname' => T_('First name'),
-																					'lastname' => T_('Last name') ) )
-					as $lValue => $lAlternate )
-{
-	$field_options .= '<option value="'.$lValue.'"';
-	if( $idmode == $lValue )
-	{
-		$field_options .= ' selected="selected"';
-	}
-	$field_options .= '>';
-
-	if( !is_array( $lAlternate ) )
-	{
-		$lAlternate = array( $lValue => $lAlternate );
-	}
-
-	foreach( $lAlternate as $lAValue => $lAAlternate )
-	{
-		if( ($disp = $current_User->get( $lAValue )) && !empty( $disp ) )
-		{
-			$field_options .= $disp;
-		}
-		else
-		{
-			$field_options .= '['.$lAAlternate.']';
-		}
-	}
-	$field_options .= '</option>';
-}
-
-
-$ProfileForm->select_options( 'newuser_idmode', $field_options, T_('Identity shown'), '', 'bComment' );
+$ProfileForm->select( 'newuser_idmode', $current_User->get('idmode'), array( &$current_User, 'callback_optionsForIdMode' ), T_('Identity shown'), '', 'bComment' );
 
 $ProfileForm->checkbox( 'newuser_showonline', $current_User->get( 'showonline' ), T_('Online'), T_('Check this to be displayed as online when visiting the site.') );
 $ProfileForm->select( 'newuser_locale', $current_User->get( 'locale' ), 'locale_options_return', T_('Locale'), '', 'bComment' );
@@ -127,8 +89,8 @@ $ProfileForm->text( 'newuser_icq', $current_User->get( 'icq' ), 40, T_('ICQ'), '
 $ProfileForm->text( 'newuser_aim', $current_User->get( 'aim' ), 40, T_('AOL I.M.'), '', 50, 'bComment' );
 $ProfileForm->text( 'newuser_msn', $current_User->get( 'msn' ), 40, T_('MSN I.M.'), '', 100, 'bComment' );
 $ProfileForm->text( 'newuser_yim', $current_User->get( 'yim' ), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
-$ProfileForm->text( 'pass1', '', 16, T_('New pass'), T_('Leave blank to leave the password unchanged.'), 40, 'bComment' );
-$ProfileForm->text( 'pass2', '', 16, T_('Confirm'), T_('Confirm new password by typing it again.'), 40, 'bComment' );
+$ProfileForm->password( 'pass1', '', 16, T_('New pass'), T_('Leave blank to leave the password unchanged.'), 40, 'bComment' );
+$ProfileForm->password( 'pass2', '', 16, T_('Confirm'), T_('Confirm new password by typing it again.'), 40, 'bComment' );
 
 $ProfileForm->buttons( array( array( '', '', T_('Update'), 'SaveButton' ),
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
