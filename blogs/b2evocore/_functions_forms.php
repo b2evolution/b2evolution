@@ -338,6 +338,7 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 	}
 }
 
+
 function form_submit( $submit_attribs = '' )
 {
 	?>

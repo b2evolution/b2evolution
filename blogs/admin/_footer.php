@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * backoffice page footer
  *
@@ -34,9 +34,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 </div></form>
 
 <?php
-if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
+if( $admin_tab == 'files' || ($admin_tab == 'blogs' && $tab == 'perm') )
 { // init checkall JS functions
-?>	
+?>
 <script type="text/javascript">
 	initcheckall();
 </script>

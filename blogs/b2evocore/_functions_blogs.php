@@ -172,7 +172,7 @@ function blog_update_user_perms( $blog )
 
 
 /**
- * translates an given array of permissions to an easy group.
+ * Translates an given array of permissions to an "easy group".
  *
  * - nomember
  * - member
@@ -193,7 +193,7 @@ function blogperms_get_easy( $perms )
 	$perms_post = explode( ',', $perms['bloguser_perm_poststatuses'] );
 	sort( $perms_post );
 
-	$perms_editor = (int)( $perms_post == array( 'deprecated', 'draft', 'private', 'protected', 'published' ) ) // permissions for all statuses
+	$perms_editor = (int)( count($perms_post) ) // permissions for all statuses
 									+ (int)$perms['bloguser_perm_delpost']
 									+ (int)$perms['bloguser_perm_comments']
 									+ (int)$perms['bloguser_perm_media_upload']
@@ -203,7 +203,7 @@ function blogperms_get_easy( $perms )
 	$perms_admin = (int)$perms['bloguser_perm_properties']
 									+ (int)$perms['bloguser_perm_cats'];
 
-	if( $perms_editor == 6 )
+	if( $perms_editor == 10 )
 	{ // has full editor rights
 		switch( $perms_admin )
 		{
@@ -227,15 +227,19 @@ function blogperms_get_easy( $perms )
 	{
 		return 'custom';
 	}
-
 }
 
 
+/**
+ *
+ * @param string "easy group": 'admin', 'editor', 'member'
+ * @return array indexed, as the result row from "SELECT * FROM T_blogusers"
+ */
 function blogperms_from_easy( $easy_group )
 {
 	$r = array(
 		'bloguser_ismember' => 0,
-		'bloguser_perm_poststatuses' => array(),
+		'bloguser_perm_poststatuses' => '',
 		'bloguser_perm_delpost' => 0,
 		'bloguser_perm_comments' => 0,
 		'bloguser_perm_media_upload' => 0,
@@ -245,36 +249,28 @@ function blogperms_from_easy( $easy_group )
 		'bloguser_perm_cats' => 0
 	);
 
-	if( $easy_group != 'member' && $easy_group != 'editor' && $easy_group != 'admin' )
+	switch( $easy_group )
 	{
-		return false;
+		case 'admin':
+			$r['bloguser_perm_properties'] = 1;
+			$r['bloguser_perm_cats'] = 1;
+
+		case 'editor':
+			$r['bloguser_perm_poststatuses'] = 'deprecated,draft,private,protected,published';
+			$r['bloguser_perm_delpost'] = 1;
+			$r['bloguser_perm_comments'] = 1;
+			$r['bloguser_perm_media_upload'] = 1;
+			$r['bloguser_perm_media_browse'] = 1;
+			$r['bloguser_perm_media_change'] = 1;
+
+		case 'member':
+			$r['bloguser_ismember'] = 1;
+			break;
+
+		default:
+			return false;
 	}
-
-
-	$r['bloguser_ismember'] = 1;
-	if( $easy_group == 'member' )
-	{
-		return $r;
-	}
-
-
-	$r['bloguser_perm_poststatuses'] = array( 'deprecated', 'draft', 'private', 'protected', 'published' );
-	$r['bloguser_perm_delpost'] = 1;
-	$r['bloguser_perm_comments'] = 1;
-	$r['bloguser_perm_media_upload'] = 1;
-	$r['bloguser_perm_media_browse'] = 1;
-	$r['bloguser_perm_media_change'] = 1;
-	if( $easy_group == 'editor' )
-	{
-		return $r;
-	}
-
-
-	$r['bloguser_perm_properties'] = 1;
-	$r['bloguser_perm_cats'] = 1;
-
 	return $r;
-
 }
 
 

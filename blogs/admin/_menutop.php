@@ -35,121 +35,133 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		?>
 		<script type="text/javascript">
 		<!--
-		<?php
-
-		switch( $admin_tab )
-		{
-			case 'blogs':
-			?>
-			function toggleall( the_form, id, i )
-			{
-				if( allchecked[i] )
-					allchecked[i] = false;
-				else
-					allchecked[i] = true;
-
-				the_form.elements['blog_ismember_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_published_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_protected_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_private_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_draft_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_deprecated_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_delpost_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_comments_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_cats_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_properties_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_media_upload_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_media_browse_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_media_change_'+String(id)].checked = allchecked[i];
-
-				setcheckallspan( i );
-			}
 			<?php
-			break;
-
-			case 'files':
-			/**
-			 * Toggles status of a bunch of checkboxes in a form
-			 *
-			 * @param string the form name
-			 * @param string the checkbox(es) element(s) name
-			 */ ?>
-			function toggleCheckboxes(the_form, the_elements)
+			switch( $admin_tab )
 			{
-				if( allchecked[0] ) allchecked[0] = false;
-				else allchecked[0] = true;
-
-				var elems = document.forms[the_form].elements[the_elements];
-				var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
-				if (elems_cnt)
+				case 'blogs':
+				?>
+				function toggleall_wide( the_form, id, set )
 				{
-					for (var i = 0; i < elems_cnt; i++)
+					if( typeof(set) != 'undefined' )
 					{
-						elems[i].checked = allchecked[0];
-					} // end for
+						allchecked[id] = Boolean(set);
+					}
+					else
+					{
+						allchecked[id] = allchecked[id] ? false : true;
+					}
+
+					the_form.elements['blog_ismember_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_published_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_protected_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_private_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_draft_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_deprecated_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_delpost_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_comments_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_media_upload_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_media_browse_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_media_change_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_cats_'+String(id)].checked = allchecked[id];
+					the_form.elements['blog_perm_properties_'+String(id)].checked = allchecked[id];
+				}
+				<?php
+				break;
+
+				case 'files':
+				/**
+				 * Toggles status of a bunch of checkboxes in a form
+				 *
+				 * @param string the form name
+				 * @param string the checkbox(es) element(s) name
+				 */ ?>
+				function toggleCheckboxes(the_form, the_elements)
+				{
+					if( allchecked[0] ) allchecked[0] = false;
+					else allchecked[0] = true;
+
+					var elems = document.forms[the_form].elements[the_elements];
+					var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
+					if (elems_cnt)
+					{
+						for (var i = 0; i < elems_cnt; i++)
+						{
+							elems[i].checked = allchecked[0];
+						} // end for
+					}
+					else
+					{
+						elems.checked = allchecked[0];
+					}
+					setcheckallspan(0);
+				}
+				<?php
+				break;
+			}
+
+			// --- general functions ----------------
+			/**
+			 * replaces the text of the [nr]th checkall-html-ID
+			 *
+			 * @param integer number of the checkall "set"
+			 * @param boolean force setting to true/false
+			 */ ?>
+			function setcheckallspan( nr, set )
+			{
+				if( typeof(allchecked[nr]) == 'undefined' || typeof(set) != 'undefined' )
+				{ // init
+					allchecked[nr] = set;
+				}
+
+				if( allchecked[nr] )
+				{
+					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('uncheck all') ?>');
 				}
 				else
 				{
-					elems.checked = allchecked[0];
+					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('check all') ?>');
 				}
-				setcheckallspan(0);
+
+				if( document.getElementById( idprefix+'_'+String(nr) ) )
+				{
+					document.getElementById( idprefix+'_'+String(nr) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(nr) ).firstChild);
+				}
+				//else alert('no element with id '+idprefix+'_'+String(nr));
 			}
+
 			<?php
-			break;
-		}
-
-		// --- general functions ----------------
-		/**
-		 * replaces the text of the [nr]th checkall-html-ID
-		 *
-		 * @param integer number of the checkall "set"
-		 * @param boolean force setting to true/false
-		 */ ?>
-		function setcheckallspan( nr, set )
-		{
-			if( typeof allchecked[nr] == 'undefined' || typeof set != 'undefined' )
-			{ // init
-				allchecked[ nr ] = set;
-			}
-
-			if( allchecked[nr] )
-				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('uncheck all') ?>');
-			else
-				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('check all') ?>');
-
-			if( document.getElementById( idprefix+'_'+String(nr) ) )
-				document.getElementById( idprefix+'_'+String(nr) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(nr) ).firstChild);
-			//else alert('no element with id '+idprefix+'_'+String(nr));
-		}
-
-		<?php
-		/**
-		 * inits the checkall functionality.
-		 *
-		 * @param string the prefix of the IDs where the '(un)check all' text should be set
-		 * @param boolean initial state of the text (if there is no checkbox with ID htmlid + '_state_' + nr)
-		 */ ?>
-		function initcheckall( htmlid, init )
-		{
-			// initialize array
-			allchecked = Array();
-			if( typeof htmlid == 'undefined' ) idprefix = 'checkallspan';
-			else idprefix = htmlid;
-
-			var i = 0;
-			//alert(document.getElementById("checkallspan"+String(i)));
-			while( id = document.getElementById( idprefix+'_'+String(i)) )
+			/**
+			 * inits the checkall functionality.
+			 *
+			 * @param string the prefix of the IDs where the '(un)check all' text should be set
+			 * @param boolean initial state of the text (if there is no checkbox with ID htmlid + '_state_' + nr)
+			 */ ?>
+			function initcheckall( htmlid, init )
 			{
-				//alert( document.getElementById(idprefix+'_state_'+String(i)) );
-				if( document.getElementById( idprefix+'_state_'+String(i)) )
-					setcheckallspan( i, document.getElementById( idprefix+'_state_'+String(i)).checked );
-				else setcheckallspan( i, init );
+				// initialize array
+				allchecked = Array();
+				idprefix = typeof(htmlid) == 'undefined' ? 'checkallspan' : htmlid;
 
-				i++;
+				for( lform = 0; lform < document.forms.length; lform++ )
+				{
+					for( lelem = 0; lelem < document.forms[lform].elements.length; lelem++ )
+					{
+						if( document.forms[lform].elements[lelem].id.indexOf( idprefix ) == 0 )
+						{
+							var index = document.forms[lform].elements[lelem].name.substring( idprefix.length+2, document.forms[lform].elements[lelem].name.length );
+							if( document.getElementById( idprefix+'_state_'+String(index)) )
+							{
+								setcheckallspan( index, document.getElementById( idprefix+'_state_'+String(index)).checked );
+							}
+							else
+							{
+								setcheckallspan( index, init );
+							}
+						}
+					}
+				}
 			}
-			//if( i == 0 ) alert('no elements with ID prefix '+idprefix+' found!');
-		}
-		//-->
+			//-->
 		</script>
 		<?php
 	}}}
@@ -160,7 +172,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <body>
 <?php
 
-param( 'blog', 'integer', 0, true );	// We need this for the urls
+param( 'blog', 'integer', 0, true ); // We need this for the urls
 
 if( empty($mode) )
 { // We're not running in an special mode (bookmarklet, sidebar...)
