@@ -148,8 +148,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					echo '</div>';
 
 					echo '<br />';
-					$Item->type( T_('Type').': ' );
-					$Item->assigned_to( ', '.T_('Assigned to:').' ' );
+					$Item->type( T_('Type').': ', ' &nbsp; ' );
+					$Item->assigned_to( T_('Assigned to:').' ' );
 
  					echo '<div class="bSmallHeadRight">';
 					$Item->extra_status( T_('Extra').': ' );

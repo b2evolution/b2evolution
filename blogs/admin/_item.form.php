@@ -178,13 +178,20 @@ if( isset($Blog) )
 	<fieldset>
 		<legend><?php echo T_('Advanced properties') ?></legend>
 
+		<div>
+			<label for="item_assigned_user_ID"><strong><?php echo T_('Assigned to') ?>:</strong></label>
+			<select name="item_assigned_user_ID" id="item_assigned_user_ID">
+				<?php $edited_Item->assigned_user_options() ?> 
+			</select>
+		</div>
+
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
 			?>
 			<div>
 			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" />
-			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
+			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?>:</strong></label>
 			<span class="nobr">
 			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" />
 			<select name="mm">
@@ -429,7 +436,6 @@ if( isset($Blog) )
 
 				<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
 				<?php echo T_('Disabled') ?></label><br />
-
 			</fieldset>
 			<?php
 		}
@@ -514,6 +520,9 @@ if( isset($Blog) )
 <?php
 /*
  * $Log$
+ * Revision 1.5  2004/12/21 21:18:37  fplanque
+ * Finished handling of assigning posts/items to users
+ *
  * Revision 1.4  2004/12/20 19:49:23  fplanque
  * cleanup & factoring
  *
@@ -528,12 +537,7 @@ if( isset($Blog) )
  * Revision 1.1  2004/12/14 20:27:11  fplanque
  * splited post/comment edit forms
  *
- * Revision : 1.64
-	Date : 2004/10/6 9:36:55
-	Author : 'gorgeb'
-	State : 'Exp'
-	Lines : +7 -2
-	Description :
-	Added allowcomments, a per blog setting taking three values : always, post_by_post, never.
+ * Revision : 1.64  2004/10/6 9:36:55  gorgeb
+ * Added allowcomments, a per blog setting taking three values : always, post_by_post, never.
  */
 ?>

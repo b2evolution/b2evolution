@@ -319,7 +319,7 @@ class DataObject
 
 		// Dereference db name for this param:
 		// ATTENTION: the object defs are not yet available for all dataobjects
-		if( isset($object_def[$this->objtype]['db_cols'][$parname]) )
+		if( isset($this->objtype) && isset($object_def[$this->objtype]['db_cols'][$parname]) )
 		{
 			$dbfield = $object_def[$this->objtype]['db_cols'][$parname];
 		}
@@ -368,6 +368,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.9  2004/12/21 21:18:38  fplanque
+ * Finished handling of assigning posts/items to users
+ *
  * Revision 1.8  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *

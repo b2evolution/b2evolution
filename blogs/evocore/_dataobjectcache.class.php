@@ -234,10 +234,12 @@ class DataObjectCache
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
 	 */
-	function option_list( $default = 0, $allow_none = false )
+	function option_list( $default = 0, $allow_none = false, $method ='name' )
 	{
-		if( ! $this->all_loaded )
+		if( (! $this->all_loaded) && $this->load_all )
+		{	// We have not loaded all items so far, but we're allowed to... so let's go:
 			$this->load_all();
+		}
 
 		if( $allow_none )
 		{
@@ -251,7 +253,7 @@ class DataObjectCache
 			echo '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) echo ' selected="selected"';
 			echo '>';
-			$loop_Obj->disp( 'name' );
+			$loop_Obj->$method();
 			echo '</option>'."\n";
 		}
 	}
@@ -259,6 +261,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/21 21:18:38  fplanque
+ * Finished handling of assigning posts/items to users
+ *
  * Revision 1.4  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *

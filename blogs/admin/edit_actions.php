@@ -74,6 +74,10 @@ switch($action)
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
+		$edited_Item = & new Item();
+
+ 		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
+
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
@@ -122,8 +126,7 @@ switch($action)
 		$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$edited_Item = & new Item();
-		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $post_date, $post_category,	
+		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $post_date, $post_category,
 															$post_extracats, $post_status, $post_locale, '', 0, 
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
 															$post_renderers, $item_typ_ID, $item_st_ID );
@@ -174,6 +177,11 @@ switch($action)
 		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
 		param( 'post_ID', 'integer', true );
+
+		$edited_Item = $ItemCache->get_by_ID( $post_ID );
+
+		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
+
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = $trackback_url;
@@ -189,7 +197,6 @@ switch($action)
 		param( 'item_typ_ID', 'integer', true );
 		param( 'item_st_ID', 'integer', true );
 
-		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
 			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );

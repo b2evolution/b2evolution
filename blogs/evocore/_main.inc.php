@@ -179,9 +179,10 @@ require_once dirname(__FILE__).'/_commentlist.class.php';
 require_once dirname(__FILE__).'/_archivelist.class.php';
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 require_once dirname(__FILE__).'/_element.class.php';
+require_once dirname(__FILE__).'/_usercache.class.php';
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
-$UserCache = & new DataObjectCache( 'User', false, 'T_users', 'user_', 'ID' );
+$UserCache = & new UserCache();
 $BlogCache = & new BlogCache();
 $ItemCache = & new ItemCache();
 
@@ -291,6 +292,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.10  2004/12/21 21:18:38  fplanque
+ * Finished handling of assigning posts/items to users
+ *
  * Revision 1.9  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *

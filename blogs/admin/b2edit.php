@@ -201,12 +201,16 @@ switch($action)
 				$post_status = 'deprecated';
 		}
 
+		$edited_Item = & new Item();
+		$edited_Item->blog_ID = $blog;
+
 		// These are bookmarklet params:
 		param( 'popuptitle', 'string', '' );
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		param( 'post_autobr', 'integer', 0 );
+		// Params used when switching pages:
+		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;

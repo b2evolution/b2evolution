@@ -54,6 +54,7 @@ $object_def['Item'] = array( // definition of the object:
 			'db_cols' => array(	// maps properties to colums:
 										'ID'              => 'ID',
 										'creator_user_ID' => 'post_creator_user_ID',
+										'assigned_user_ID'=> 'post_assigned_user_ID',
 										'datestart'       => 'post_datestart',
 										'datemodified'    => 'post_datemodified',
 										'status'          => 'post_status',
@@ -70,7 +71,10 @@ $object_def['Item'] = array( // definition of the object:
 										'renderers'       => 'post_renderers',
 										'st_ID'           => 'post_pst_ID',
 										'typ_ID'          => 'post_ptyp_ID',
-									)
+									),
+			'allow_null' => array( // specifies column nullability:
+										'assigned_user_ID'=> true,
+									),
 		);
 
 
@@ -86,6 +90,7 @@ class Item extends DataObject
 	 * @access public
 	 */
 	var $Author;
+	var $AssignedUser = NULL;
 	var $issue_date;
 	var $mod_date;
 	var $status;
@@ -151,6 +156,7 @@ class Item extends DataObject
 
 			$this->ID = $db_row->$dbIDname;
 			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] ); // NO COPY...(?)
+			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
 			$this->issue_date = $db_row->$db_cols['datestart'];
 			$this->mod_date =$db_row->$db_cols['datemodified'];
 			$this->status = $db_row->$db_cols['status'];
@@ -173,6 +179,30 @@ class Item extends DataObject
 
 			// Derived vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
+		}
+	}
+
+
+	/**
+	 * @todo use extended dbchange instead of set_param...
+	 */
+	function assign_to( $user_ID, $dbupdate = true )
+	{
+		global $UserCache;
+
+		// echo 'assigning user #'.$user_ID;
+		if( $user_ID )
+		{
+			$this->AssignedUser = $UserCache->get_by_ID( $user_ID );
+		}
+		else
+		{
+			$this->AssignedUser = NULL;
+		}
+
+ 		if( $dbupdate )
+ 		{ // Record ID for DB:
+			$this->set_param( 'assigned_user_ID', 'number', $this->AssignedUser->ID, true );
 		}
 	}
 
@@ -355,9 +385,29 @@ class Item extends DataObject
 	 */
 	function assigned_to( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		// echo $before.$after;
+		if( isset($this->AssignedUser) )
+		{
+			echo $before;
+			$this->AssignedUser->prefered_name( $format );
+			echo $after;
+		}
 	}
 
+
+ 	/**
+	 * Template function: display list of assigned user options
+	 *
+	 * {@internal Item::assigned_user_options(-)}}
+	 */
+	function assigned_user_options()
+	{
+		global $UserCache, $object_def;
+
+		// echo '<option>'.$this->ID;
+		$UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
+						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
+						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
+	}
 
 	/**
 	 * Template function: list all the category names
@@ -1528,6 +1578,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2004/12/21 21:18:38  fplanque
+ * Finished handling of assigning posts/items to users
+ *
  * Revision 1.8  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *
