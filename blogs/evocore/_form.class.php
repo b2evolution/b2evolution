@@ -592,20 +592,20 @@ class Form extends Widget
 	{
 		switch( $this->layout )
 		{
-			case 'table': // QUESTION: better use <th> instead of <tr>? fp: no i don't think so, i think TH is only for real table column headers (on the real top of the table)
+			case 'table':
 				$r = '<tr ';
 				if( $class != '' )
 				{ //there is a class option to display in the fieldset tag
 					$r .= 'class="'.$class.'" ';
 				}
-				$r .= '><td colspan="2">'."\n";
+				$r .= '><th colspan="2">'."\n";
 
 				if( $title != '' )
 				{ // there is a legend tag to display
 					$r .= $title;
 				}
 
-				$r .= "</td></tr>\n";
+				$r .= "</th></tr>\n";
 				break;
 
 			default:
