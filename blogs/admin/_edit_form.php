@@ -201,7 +201,7 @@ if( $action != 'editcomment' )
 
 	<div class="extracats">
 
-	<span class="notes"><?php echo _('Select main category in target blog and optionnaly check addtionnal categories') ?>:</span>
+	<p class="notes"><?php echo _('Select main category in target blog and optionnaly check addtionnal categories') ?>:</p>
 
 <?php 
 	// ----------------------------  CATEGORIES ------------------------------
@@ -217,7 +217,7 @@ if( $action != 'editcomment' )
 	
 	function cat_select_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		global $i_blog, $blog, $cat, $postdata, $extracats, $default_main_cat, $action, $tabindex;
+		global $current_blog_ID, $blog, $cat, $postdata, $extracats, $default_main_cat, $action, $tabindex;
 		$this_cat = get_the_category_by_ID( $cat_ID );
 
 		// Checkbox:
@@ -227,7 +227,7 @@ if( $action != 'editcomment' )
 		echo '>';
 
 		// Radio for main cat:
-		if( $i_blog->blog_ID == $blog )
+		if( $current_blog_ID == $blog )
 		{
 			if( ($default_main_cat == 0) && ($action == 'post') )
 			{	// Assign default cat for new post
@@ -248,11 +248,29 @@ if( $action != 'editcomment' )
 	{	// callback to end sublist
 		echo "</ul>\n";
 	}
-	foreach( $cache_blogs as $i_blog )
-	{ // run recursively through the cats
-		echo "<h4>".$i_blog->blog_name."</h4>\n";
-		cat_children( $cache_categories, $i_blog->blog_ID, NULL, 'cat_select_before_first', 
+
+	if( $allow_cross_posting )
+	{	// If cross posting is allowed, go through all blogs with cats:
+		foreach( $cache_blogs as $i_blog )
+		{ // run recursively through the cats
+			$current_blog_ID = $i_blog->blog_ID;
+			if( ! blog_has_cats( $current_blog_ID ) ) continue;
+			echo "<h4>".$i_blog->blog_name."</h4>\n";
+			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
+										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+		}
+		?>
+		<p class="notes"><?php echo _('Note: Cross posting among multiple blogs is enabled.') ?></p>
+		<?php
+	}
+	else
+	{	// Cross posting is not allowed. Current blog only:
+		$current_blog_ID = $blog;
+		cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+		?>
+		<p class="notes"><?php echo _('Note: Cross posting among multiple blogs is currently disabled.') ?></p>
+		<?php
 	}
 	// ----------------- END RECURSIVE CAT LIST ----------------
 	?>

@@ -510,6 +510,31 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 
 
 /*
+ * blog_has_cats(-)
+ *
+ * Does a given bog has categories?
+ *
+ * fplanque: created
+ */
+function blog_has_cats( $blog_ID )
+{
+	global $cache_categories;
+	
+	cat_load_cache();
+
+	foreach( $cache_categories as $icat_ID => $i_cat )
+	{
+		if( $icat_ID && $i_cat['cat_blog_ID'] == $blog_ID )
+		{ // this cat is in the blog 
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/*
  * Functions to be called from the template
  */
 
@@ -739,7 +764,7 @@ function dropdown_cats($optionall = 1, $all = 'All')
 	$query="SELECT * FROM $tablecategories";
 	$result=mysql_query($query);
 	$querycount++;
-	echo '<select name="cat" class="postform">', "\n";
+	echo '<select name="cat" class="postform"', ',',">\n";
 	if (intval($optionall) == 1) 
 	{
 		echo "\t<option value=\"all\">$all</option>\n";

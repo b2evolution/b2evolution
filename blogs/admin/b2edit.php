@@ -64,6 +64,11 @@ case 'new':
 
 	if ($user_level > 0) 
 	{
+		if( ! blog_has_cats( $blog ) )
+		{
+			die( 'Since this blog has no categories, you cannot post to it. You must create categories first.' );
+		}
+
 		$action='post';
 		$post_lang = $default_language;
 		$post_status = $default_post_status;		// 'published' or 'draft'
