@@ -331,8 +331,8 @@ class Form extends Widget
 	function password( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '' )
 	{
-		$this->text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0 , $field_class = '', 'password' );
+		$this->text( $field_name, $field_value, $field_size, $field_label, $field_note,
+											$field_maxlength, $field_class, 'password' );
 	}
 
 
