@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2004-05-08 02:04+0200\n"
-"PO-Revision-Date: 2004-05-07 22:46+0100\n"
+"PO-Revision-Date: 2004-05-09 16:37+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: b2evolution <>\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +18,8 @@ msgstr ""
 msgid "Default page for b2evolution"
 msgstr "Standaard pagina voor b2evolution"
 
-#: ..\..\..\default.php:30 ..\..\..\install\index.php:51
+#: ..\..\..\default.php:30
+#: ..\..\..\install\index.php:51
 msgid "Multilingual multiuser multi-blog engine."
 msgstr "Meertalig voor meerdere gebruikers met meerdere weblogs."
 
@@ -28,12 +28,8 @@ msgid "Welcome to b2evolution"
 msgstr "Welkom bij b2evolution"
 
 #: ..\..\..\default.php:35
-msgid ""
-"This is the default homepage for b2evolution. It will be displayed as long "
-"as you don't select a default blog in the general settings."
-msgstr ""
-"Dit is de standaard beginpagina voor b2evolution. Deze zal getoond worden "
-"zolang je geen standaard weblog kiest in de Algemene Instellingen."
+msgid "This is the default homepage for b2evolution. It will be displayed as long as you don't select a default blog in the general settings."
+msgstr "Dit is de standaard beginpagina voor b2evolution. Deze zal getoond worden zolang je geen standaard weblog kiest in de Algemene Instellingen."
 
 #: ..\..\..\default.php:38
 msgid "Individual blogs on this system"
@@ -49,26 +45,20 @@ msgid "Blog #1"
 msgstr "Weblog #1"
 
 #: ..\..\..\default.php:70
-msgid ""
-"This is a special blog that aggregates all messages from all other blogs!"
-msgstr ""
-"Dit is een speciaal weblog dat alle artikelen van alle weblogs laat zien!"
+msgid "This is a special blog that aggregates all messages from all other blogs!"
+msgstr "Dit is een speciaal weblog dat alle artikelen van alle weblogs laat zien!"
 
 #: ..\..\..\default.php:75
-msgid ""
-"Please note: the above list (as well as the menu) is automatically generated "
-"and includes only the blogs that have a &quot;stub url name&quot;. You can "
-"set this in the blog configuration in the back-office."
-msgstr ""
-"Let op: de bovenstaande lijst (ook het menu) is automatisch gegenereerd en "
-"bevat alleen de weblogs die een &quot;stub url naam&quot; hebben. Je kan dit "
-"in de weblog configuratie instellen in het Back-Office."
+msgid "Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office."
+msgstr "Let op: de bovenstaande lijst (ook het menu) is automatisch gegenereerd en bevat alleen de weblogs die een &quot;stub url naam&quot; hebben. Je kan dit in de weblog configuratie instellen in het Back-Office."
 
 #: ..\..\..\default.php:76
 msgid "More demos"
 msgstr "Meer demos"
 
-#: ..\..\..\default.php:78 ..\..\..\default.php:79 ..\..\..\default.php:80
+#: ..\..\..\default.php:78
+#: ..\..\..\default.php:79
+#: ..\..\..\default.php:80
 msgid "Custom template"
 msgstr "Aangepast skin sjabloon"
 
@@ -85,16 +75,8 @@ msgid "The page you're looking at"
 msgstr "De pagina die je nu bekijkt"
 
 #: ..\..\..\default.php:82
-msgid ""
-"Please note: those demos do not make use of evoSkins, even if you enabled "
-"them during install. The only way to change their look and feel is to edit "
-"their PHP template. But once, again, rememner these are just demos destined "
-"to inspire you for your own templates ;)"
-msgstr ""
-"Let op: deze demos maken geen gebruik van de evoSkins, zels niet als je deze "
-"toch inschakeld tijdens de installatie. De enige manier om de layout te "
-"veranderen is door het PHP template te wijzigen. Maar, onthou, dit is alleen "
-"een voorbeeld om je te inspireren voor je eigen sjabloon ;)"
+msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
+msgstr "Let op: deze demos maken geen gebruik van de evoSkins, zels niet als je deze toch inschakeld tijdens de installatie. De enige manier om de layout te veranderen is door het PHP template te wijzigen. Maar, onthou, dit is alleen een voorbeeld om je te inspireren voor je eigen sjabloon ;)"
 
 #: ..\..\..\default.php:84
 msgid "Administration"
@@ -108,7 +90,8 @@ msgstr "Ga naar het back-office"
 msgid "Official website"
 msgstr "Officiële website"
 
-#: ..\..\..\default.php:91 ..\..\..\install\index.php:445
+#: ..\..\..\default.php:91
+#: ..\..\..\install\index.php:445
 msgid "GNU GPL license"
 msgstr "GNU GPL Licentie"
 
@@ -117,71 +100,107 @@ msgid "Multiblog demo"
 msgstr "Meerdere weblogs demo"
 
 #: ..\..\..\multiblogs.php:106
-msgid ""
-"This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
+msgid "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
 msgstr "Dit demo sjabloon toont 3 weblogs in 1 keer (1 links, 2 rechts)"
 
-#: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:219
-#: ..\..\..\multiblogs.php:255 ..\..\..\noskin_a.php:160
-#: ..\..\..\noskin_all.php:146 ..\..\..\noskin_all.php:161
-#: ..\..\..\noskin_b.php:146 ..\..\..\noskin_b.php:161
-#: ..\..\..\noskin_roll.php:145 ..\..\..\noskin_roll.php:160
-#: ..\..\..\summary.php:92 ..\..\..\admin\_edit_showposts.php:149
-#: ..\..\..\skins\_blogroll.php:63 ..\..\..\skins\basic\_main.php:68
-#: ..\..\..\skins\basic\_main.php:97 ..\..\..\skins\custom\_main.php:75
-#: ..\..\..\skins\custom\_main.php:92 ..\..\..\skins\fplanque2002\_main.php:94
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:219
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\noskin_a.php:160
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:161
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:161
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:160
+#: ..\..\..\summary.php:92
+#: ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\skins\_blogroll.php:63
+#: ..\..\..\skins\basic\_main.php:68
+#: ..\..\..\skins\basic\_main.php:97
+#: ..\..\..\skins\custom\_main.php:75
+#: ..\..\..\skins\custom\_main.php:92
+#: ..\..\..\skins\fplanque2002\_main.php:94
 #: ..\..\..\skins\fplanque2002\_main.php:109
 msgid "Permanent link to full entry"
 msgstr "Permanente link naar het volledige artikel"
 
-#: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:151
-#: ..\..\..\multiblogs.php:219 ..\..\..\multiblogs.php:255
-#: ..\..\..\noskin_a.php:160 ..\..\..\noskin_all.php:146
-#: ..\..\..\noskin_all.php:161 ..\..\..\noskin_b.php:146
-#: ..\..\..\noskin_b.php:161 ..\..\..\noskin_roll.php:145
-#: ..\..\..\noskin_roll.php:160 ..\..\..\admin\_edit_showposts.php:149
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_blogroll.php:63
-#: ..\..\..\skins\_feedback.php:126 ..\..\..\skins\_lastcomments.php:39
-#: ..\..\..\skins\basic\_main.php:97 ..\..\..\skins\custom\_main.php:92
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:151
+#: ..\..\..\multiblogs.php:219
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\noskin_a.php:160
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:161
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:161
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:160
+#: ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\admin\_edit_showposts.php:249
+#: ..\..\..\skins\_blogroll.php:63
+#: ..\..\..\skins\_feedback.php:126
+#: ..\..\..\skins\_lastcomments.php:39
+#: ..\..\..\skins\basic\_main.php:97
+#: ..\..\..\skins\custom\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:94
 #: ..\..\..\skins\fplanque2002\_main.php:109
 msgid "Permalink"
 msgstr "Permalink"
 
-#: ..\..\..\multiblogs.php:137 ..\..\..\noskin_a.php:146
-#: ..\..\..\noskin_a.php:237 ..\..\..\noskin_all.php:147
-#: ..\..\..\noskin_all.php:239 ..\..\..\noskin_b.php:147
-#: ..\..\..\noskin_b.php:240 ..\..\..\noskin_roll.php:146
-#: ..\..\..\noskin_roll.php:238 ..\..\..\admin\_edit_form.php:323
-#: ..\..\..\admin\_edit_showposts.php:456 ..\..\..\admin\_menutop.php:71
-#: ..\..\..\skins\basic\_main.php:78 ..\..\..\skins\custom\_main.php:78
+#: ..\..\..\multiblogs.php:137
+#: ..\..\..\noskin_a.php:146
+#: ..\..\..\noskin_a.php:237
+#: ..\..\..\noskin_all.php:147
+#: ..\..\..\noskin_all.php:239
+#: ..\..\..\noskin_b.php:147
+#: ..\..\..\noskin_b.php:240
+#: ..\..\..\noskin_roll.php:146
+#: ..\..\..\noskin_roll.php:238
+#: ..\..\..\admin\_edit_form.php:323
+#: ..\..\..\admin\_edit_showposts.php:456
+#: ..\..\..\admin\_menutop.php:71
+#: ..\..\..\skins\basic\_main.php:78
+#: ..\..\..\skins\custom\_main.php:78
 #: ..\..\..\skins\custom\_main.php:178
 #: ..\..\..\skins\fplanque2002\_main.php:97
 #: ..\..\..\skins\fplanque2002\_main.php:195
 msgid "Categories"
 msgstr "Categoriën"
 
-#: ..\..\..\multiblogs.php:273 ..\..\..\noskin_a.php:291
-#: ..\..\..\noskin_all.php:293 ..\..\..\noskin_b.php:294
-#: ..\..\..\noskin_roll.php:292 ..\..\..\skins\babyblues\_main.php:110
-#: ..\..\..\skins\bluesky\_main.php:212 ..\..\..\skins\custom\_main.php:243
+#: ..\..\..\multiblogs.php:273
+#: ..\..\..\noskin_a.php:291
+#: ..\..\..\noskin_all.php:293
+#: ..\..\..\noskin_b.php:294
+#: ..\..\..\noskin_roll.php:292
+#: ..\..\..\skins\babyblues\_main.php:110
+#: ..\..\..\skins\bluesky\_main.php:212
+#: ..\..\..\skins\custom\_main.php:243
 #: ..\..\..\skins\fplanque2002\_main.php:259
 #: ..\..\..\skins\guadeloupe\_main.php:213
 msgid "Misc"
 msgstr "Allerlei"
 
-#: ..\..\..\noskin_a.php:95 ..\..\..\noskin_all.php:96
-#: ..\..\..\noskin_b.php:96 ..\..\..\noskin_roll.php:95
+#: ..\..\..\noskin_a.php:95
+#: ..\..\..\noskin_all.php:96
+#: ..\..\..\noskin_b.php:96
+#: ..\..\..\noskin_roll.php:95
 #: ..\..\..\skins\fplanque2002\_bloglist.php:27
 msgid "Selected"
 msgstr "Geselecteerd"
 
-#: ..\..\..\noskin_a.php:212 ..\..\..\noskin_a.php:213
-#: ..\..\..\noskin_all.php:214 ..\..\..\noskin_all.php:215
-#: ..\..\..\noskin_b.php:215 ..\..\..\noskin_b.php:216
-#: ..\..\..\noskin_roll.php:213 ..\..\..\noskin_roll.php:214
-#: ..\..\..\skins\bluesky\_main.php:132 ..\..\..\skins\bluesky\_main.php:133
-#: ..\..\..\skins\custom\_main.php:153 ..\..\..\skins\custom\_main.php:154
+#: ..\..\..\noskin_a.php:212
+#: ..\..\..\noskin_a.php:213
+#: ..\..\..\noskin_all.php:214
+#: ..\..\..\noskin_all.php:215
+#: ..\..\..\noskin_b.php:215
+#: ..\..\..\noskin_b.php:216
+#: ..\..\..\noskin_roll.php:213
+#: ..\..\..\noskin_roll.php:214
+#: ..\..\..\skins\bluesky\_main.php:132
+#: ..\..\..\skins\bluesky\_main.php:133
+#: ..\..\..\skins\custom\_main.php:153
+#: ..\..\..\skins\custom\_main.php:154
 #: ..\..\..\skins\fplanque2002\_main.php:170
 #: ..\..\..\skins\fplanque2002\_main.php:171
 #: ..\..\..\skins\guadeloupe\_main.php:132
@@ -189,44 +208,60 @@ msgstr "Geselecteerd"
 msgid "Recently"
 msgstr "Recentelijk"
 
-#: ..\..\..\noskin_a.php:212 ..\..\..\noskin_all.php:214
-#: ..\..\..\noskin_b.php:215 ..\..\..\noskin_roll.php:213
-#: ..\..\..\skins\bluesky\_main.php:132 ..\..\..\skins\custom\_main.php:153
+#: ..\..\..\noskin_a.php:212
+#: ..\..\..\noskin_all.php:214
+#: ..\..\..\noskin_b.php:215
+#: ..\..\..\noskin_roll.php:213
+#: ..\..\..\skins\bluesky\_main.php:132
+#: ..\..\..\skins\custom\_main.php:153
 #: ..\..\..\skins\fplanque2002\_main.php:170
 #: ..\..\..\skins\guadeloupe\_main.php:132
 msgid "(cached)"
 msgstr "(gecached)"
 
-#: ..\..\..\noskin_a.php:213 ..\..\..\noskin_all.php:215
-#: ..\..\..\noskin_b.php:216 ..\..\..\noskin_roll.php:214
-#: ..\..\..\skins\bluesky\_main.php:133 ..\..\..\skins\custom\_main.php:154
+#: ..\..\..\noskin_a.php:213
+#: ..\..\..\noskin_all.php:215
+#: ..\..\..\noskin_b.php:216
+#: ..\..\..\noskin_roll.php:214
+#: ..\..\..\skins\bluesky\_main.php:133
+#: ..\..\..\skins\custom\_main.php:154
 #: ..\..\..\skins\fplanque2002\_main.php:171
 #: ..\..\..\skins\guadeloupe\_main.php:133
 msgid "(no cache)"
 msgstr "(niet gecached)"
 
-#: ..\..\..\noskin_a.php:219 ..\..\..\noskin_all.php:221
-#: ..\..\..\noskin_b.php:222 ..\..\..\noskin_roll.php:220
+#: ..\..\..\noskin_a.php:219
+#: ..\..\..\noskin_all.php:221
+#: ..\..\..\noskin_b.php:222
+#: ..\..\..\noskin_roll.php:220
 #: ..\..\..\b2evocore\_functions_comments.php:184
-#: ..\..\..\skins\bluesky\_main.php:136 ..\..\..\skins\custom\_main.php:160
+#: ..\..\..\skins\bluesky\_main.php:136
+#: ..\..\..\skins\custom\_main.php:160
 #: ..\..\..\skins\fplanque2002\_main.php:177
 #: ..\..\..\skins\guadeloupe\_main.php:136
 msgid "Last comments"
 msgstr "Laatste Reacties"
 
-#: ..\..\..\noskin_a.php:220 ..\..\..\noskin_all.php:222
-#: ..\..\..\noskin_b.php:223 ..\..\..\noskin_roll.php:221
+#: ..\..\..\noskin_a.php:220
+#: ..\..\..\noskin_all.php:222
+#: ..\..\..\noskin_b.php:223
+#: ..\..\..\noskin_roll.php:221
 #: ..\..\..\skins\custom\_main.php:161
 #: ..\..\..\skins\fplanque2002\_main.php:178
 msgid "Some viewing statistics"
 msgstr "Enkele statistieken"
 
-#: ..\..\..\noskin_a.php:225 ..\..\..\noskin_a.php:231
-#: ..\..\..\noskin_all.php:227 ..\..\..\noskin_all.php:233
-#: ..\..\..\noskin_b.php:228 ..\..\..\noskin_b.php:234
-#: ..\..\..\noskin_roll.php:226 ..\..\..\noskin_roll.php:232
+#: ..\..\..\noskin_a.php:225
+#: ..\..\..\noskin_a.php:231
+#: ..\..\..\noskin_all.php:227
+#: ..\..\..\noskin_all.php:233
+#: ..\..\..\noskin_b.php:228
+#: ..\..\..\noskin_b.php:234
+#: ..\..\..\noskin_roll.php:226
+#: ..\..\..\noskin_roll.php:232
 #: ..\..\..\admin\_edit_showposts.php:341
-#: ..\..\..\admin\_edit_showposts.php:531 ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\admin\_edit_showposts.php:531
+#: ..\..\..\skins\custom\_main.php:166
 #: ..\..\..\skins\custom\_main.php:172
 #: ..\..\..\skins\fplanque2002\_main.php:183
 #: ..\..\..\skins\fplanque2002\_main.php:189
@@ -234,32 +269,44 @@ msgstr "Enkele statistieken"
 msgid "Search"
 msgstr "Zoeken"
 
-#: ..\..\..\noskin_a.php:228 ..\..\..\noskin_all.php:230
-#: ..\..\..\noskin_b.php:231 ..\..\..\noskin_roll.php:229
+#: ..\..\..\noskin_a.php:228
+#: ..\..\..\noskin_all.php:230
+#: ..\..\..\noskin_b.php:231
+#: ..\..\..\noskin_roll.php:229
 #: ..\..\..\skins\custom\_main.php:169
 #: ..\..\..\skins\fplanque2002\_main.php:186
 msgid "All Words"
 msgstr "Alle woorden"
 
-#: ..\..\..\noskin_a.php:229 ..\..\..\noskin_all.php:231
-#: ..\..\..\noskin_b.php:232 ..\..\..\noskin_roll.php:230
+#: ..\..\..\noskin_a.php:229
+#: ..\..\..\noskin_all.php:231
+#: ..\..\..\noskin_b.php:232
+#: ..\..\..\noskin_roll.php:230
 #: ..\..\..\skins\custom\_main.php:170
 #: ..\..\..\skins\fplanque2002\_main.php:187
 msgid "Some Word"
 msgstr "Enkele Woorden"
 
-#: ..\..\..\noskin_a.php:230 ..\..\..\noskin_all.php:232
-#: ..\..\..\noskin_b.php:233 ..\..\..\noskin_roll.php:231
-#: ..\..\..\admin\_edit_showposts.php:376 ..\..\..\skins\custom\_main.php:171
+#: ..\..\..\noskin_a.php:230
+#: ..\..\..\noskin_all.php:232
+#: ..\..\..\noskin_b.php:233
+#: ..\..\..\noskin_roll.php:231
+#: ..\..\..\admin\_edit_showposts.php:376
+#: ..\..\..\skins\custom\_main.php:171
 #: ..\..\..\skins\fplanque2002\_main.php:188
 msgid "Entire phrase"
 msgstr "Gehele zin"
 
-#: ..\..\..\noskin_a.php:232 ..\..\..\noskin_a.php:244
-#: ..\..\..\noskin_all.php:234 ..\..\..\noskin_all.php:246
-#: ..\..\..\noskin_b.php:235 ..\..\..\noskin_b.php:247
-#: ..\..\..\noskin_roll.php:233 ..\..\..\noskin_roll.php:245
-#: ..\..\..\skins\bluesky\_main.php:151 ..\..\..\skins\custom\_main.php:173
+#: ..\..\..\noskin_a.php:232
+#: ..\..\..\noskin_a.php:244
+#: ..\..\..\noskin_all.php:234
+#: ..\..\..\noskin_all.php:246
+#: ..\..\..\noskin_b.php:235
+#: ..\..\..\noskin_b.php:247
+#: ..\..\..\noskin_roll.php:233
+#: ..\..\..\noskin_roll.php:245
+#: ..\..\..\skins\bluesky\_main.php:151
+#: ..\..\..\skins\custom\_main.php:173
 #: ..\..\..\skins\custom\_main.php:185
 #: ..\..\..\skins\fplanque2002\_main.php:190
 #: ..\..\..\skins\fplanque2002\_main.php:202
@@ -267,32 +314,47 @@ msgstr "Gehele zin"
 msgid "Reset form"
 msgstr "Formulier Leegmaken"
 
-#: ..\..\..\noskin_a.php:243 ..\..\..\noskin_all.php:245
-#: ..\..\..\noskin_b.php:246 ..\..\..\noskin_roll.php:244
-#: ..\..\..\skins\bluesky\_main.php:150 ..\..\..\skins\custom\_main.php:184
+#: ..\..\..\noskin_a.php:243
+#: ..\..\..\noskin_all.php:245
+#: ..\..\..\noskin_b.php:246
+#: ..\..\..\noskin_roll.php:244
+#: ..\..\..\skins\bluesky\_main.php:150
+#: ..\..\..\skins\custom\_main.php:184
 #: ..\..\..\skins\fplanque2002\_main.php:201
 #: ..\..\..\skins\guadeloupe\_main.php:151
 #: ..\..\..\skins\originalb2\_main.php:147
 msgid "Get selection"
 msgstr "Haal selectie op"
 
-#: ..\..\..\noskin_a.php:249 ..\..\..\noskin_all.php:251
-#: ..\..\..\noskin_b.php:252 ..\..\..\noskin_roll.php:250
-#: ..\..\..\admin\_edit_showposts.php:380 ..\..\..\skins\basic\_main.php:137
-#: ..\..\..\skins\bluesky\_main.php:185 ..\..\..\skins\custom\_main.php:190
+#: ..\..\..\noskin_a.php:249
+#: ..\..\..\noskin_all.php:251
+#: ..\..\..\noskin_b.php:252
+#: ..\..\..\noskin_roll.php:250
+#: ..\..\..\admin\_edit_showposts.php:380
+#: ..\..\..\skins\basic\_main.php:137
+#: ..\..\..\skins\bluesky\_main.php:185
+#: ..\..\..\skins\custom\_main.php:190
 #: ..\..\..\skins\fplanque2002\_main.php:207
 #: ..\..\..\skins\guadeloupe\_main.php:186
 msgid "Archives"
 msgstr "Archief"
 
-#: ..\..\..\noskin_a.php:254 ..\..\..\noskin_a.php:267
-#: ..\..\..\noskin_a.php:276 ..\..\..\noskin_all.php:256
-#: ..\..\..\noskin_all.php:269 ..\..\..\noskin_all.php:278
-#: ..\..\..\noskin_b.php:257 ..\..\..\noskin_b.php:270
-#: ..\..\..\noskin_b.php:279 ..\..\..\noskin_roll.php:255
-#: ..\..\..\noskin_roll.php:268 ..\..\..\noskin_roll.php:277
-#: ..\..\..\skins\bluesky\_main.php:198 ..\..\..\skins\bluesky\_main.php:207
-#: ..\..\..\skins\custom\_main.php:195 ..\..\..\skins\custom\_main.php:219
+#: ..\..\..\noskin_a.php:254
+#: ..\..\..\noskin_a.php:267
+#: ..\..\..\noskin_a.php:276
+#: ..\..\..\noskin_all.php:256
+#: ..\..\..\noskin_all.php:269
+#: ..\..\..\noskin_all.php:278
+#: ..\..\..\noskin_b.php:257
+#: ..\..\..\noskin_b.php:270
+#: ..\..\..\noskin_b.php:279
+#: ..\..\..\noskin_roll.php:255
+#: ..\..\..\noskin_roll.php:268
+#: ..\..\..\noskin_roll.php:277
+#: ..\..\..\skins\bluesky\_main.php:198
+#: ..\..\..\skins\bluesky\_main.php:207
+#: ..\..\..\skins\custom\_main.php:195
+#: ..\..\..\skins\custom\_main.php:219
 #: ..\..\..\skins\custom\_main.php:228
 #: ..\..\..\skins\fplanque2002\_main.php:212
 #: ..\..\..\skins\fplanque2002\_main.php:235
@@ -302,31 +364,41 @@ msgstr "Archief"
 msgid "more..."
 msgstr "meer..."
 
-#: ..\..\..\noskin_a.php:261 ..\..\..\noskin_all.php:263
-#: ..\..\..\noskin_b.php:264 ..\..\..\noskin_roll.php:262
-#: ..\..\..\skins\bluesky\_main.php:192 ..\..\..\skins\custom\_main.php:213
+#: ..\..\..\noskin_a.php:261
+#: ..\..\..\noskin_all.php:263
+#: ..\..\..\noskin_b.php:264
+#: ..\..\..\noskin_roll.php:262
+#: ..\..\..\skins\bluesky\_main.php:192
+#: ..\..\..\skins\custom\_main.php:213
 #: ..\..\..\skins\fplanque2002\_main.php:229
 #: ..\..\..\skins\guadeloupe\_main.php:193
 msgid "Recent Referers"
 msgstr "Recente Refererenden"
 
-#: ..\..\..\noskin_a.php:270 ..\..\..\noskin_all.php:272
-#: ..\..\..\noskin_b.php:273 ..\..\..\noskin_roll.php:271
-#: ..\..\..\skins\bluesky\_main.php:201 ..\..\..\skins\custom\_main.php:222
+#: ..\..\..\noskin_a.php:270
+#: ..\..\..\noskin_all.php:272
+#: ..\..\..\noskin_b.php:273
+#: ..\..\..\noskin_roll.php:271
+#: ..\..\..\skins\bluesky\_main.php:201
+#: ..\..\..\skins\custom\_main.php:222
 #: ..\..\..\skins\fplanque2002\_main.php:238
 #: ..\..\..\skins\guadeloupe\_main.php:202
 msgid "Top Referers"
 msgstr "Hoogste Refererenden"
 
-#: ..\..\..\noskin_a.php:284 ..\..\..\noskin_all.php:286
-#: ..\..\..\noskin_b.php:287 ..\..\..\noskin_roll.php:285
+#: ..\..\..\noskin_a.php:284
+#: ..\..\..\noskin_all.php:286
+#: ..\..\..\noskin_b.php:287
+#: ..\..\..\noskin_roll.php:285
 #: ..\..\..\skins\custom\_main.php:236
 #: ..\..\..\skins\fplanque2002\_main.php:252
 msgid "Blogroll"
 msgstr "Blogroll"
 
-#: ..\..\..\noskin_a.php:305 ..\..\..\noskin_all.php:307
-#: ..\..\..\noskin_b.php:308 ..\..\..\noskin_roll.php:306
+#: ..\..\..\noskin_a.php:305
+#: ..\..\..\noskin_all.php:307
+#: ..\..\..\noskin_b.php:308
+#: ..\..\..\noskin_roll.php:306
 #: ..\..\..\skins\custom\_main.php:256
 #: ..\..\..\skins\fplanque2002\_main.php:273
 msgid "Syndicate this blog"
@@ -338,15 +410,14 @@ msgstr "Samenvatings demo"
 
 #: ..\..\..\summary.php:67
 msgid "This demo template displays a summary of last posts in all blogs"
-msgstr ""
-"Dit is het template dat de samenvatting van de laatste artikelen in alle "
-"weblogs weergeeft"
+msgstr "Dit is het template dat de samenvatting van de laatste artikelen in alle weblogs weergeeft"
 
 #: ..\..\..\summary.php:98
 msgid "More posts..."
 msgstr "Meer artikelen..."
 
-#: ..\..\..\admin\b2antispam.php:14 ..\..\..\admin\_menutop.php:94
+#: ..\..\..\admin\b2antispam.php:14
+#: ..\..\..\admin\_menutop.php:94
 #: ..\..\..\admin\_users_groupform.php:95
 msgid "Antispam"
 msgstr "AntiSpam"
@@ -354,8 +425,7 @@ msgstr "AntiSpam"
 #: ..\..\..\admin\b2antispam.php:44
 #, php-format
 msgid "The keyword [%s] is too short, it has to be a minimum of 5 characters!"
-msgstr ""
-"Het sleutelwoord [%s] is te kort, het moet minimaal 5 karakters bevatten!"
+msgstr "Het sleutelwoord [%s] is te kort, het moet minimaal 5 karakters bevatten!"
 
 #: ..\..\..\admin\b2antispam.php:52
 #, php-format
@@ -411,10 +481,11 @@ msgstr "Bannen van het sleutelwoord [%s] in de lokale lijst"
 msgid "Report the keyword [%s] as abuse to b2evolution.net."
 msgstr "Rapporteer het sleutelwoord [%s] als misbuik aan b2evolution.net."
 
-#: ..\..\..\admin\b2antispam.php:188 ..\..\..\admin\b2antispam.php:271
+#: ..\..\..\admin\b2antispam.php:188
+#: ..\..\..\admin\b2antispam.php:271
 #: ..\..\..\admin\_blogs_advanced.form.php:27
 msgid "Terms of service"
-msgstr ""
+msgstr "Algemene Voorwaarden"
 
 #: ..\..\..\admin\b2antispam.php:195
 msgid "Perform selected operations"
@@ -438,29 +509,20 @@ msgid "Banned domains blacklist"
 msgstr "Zwarte lijst van gebande domeinen"
 
 #: ..\..\..\admin\b2antispam.php:260
-msgid ""
-"Any URL containing one of the following keywords will be banned from posts, "
-"comments and logs."
-msgstr ""
-"Iedere URL die 1 van de volgende sleutelwoorden bevat woord geband van "
-"artikels, reacties en weblogs. "
+msgid "Any URL containing one of the following keywords will be banned from posts, comments and logs."
+msgstr "Iedere URL die 1 van de volgende sleutelwoorden bevat woord geband van artikels, reacties en weblogs. "
 
 #: ..\..\..\admin\b2antispam.php:263
-msgid ""
-"If a keyword restricts legitimate domains, click on the green tick to stop "
-"banning with this keyword."
-msgstr ""
-"Als een sleutelwoord legitieme domeinen tegenhoud, klik dan op het groene "
-"vinkje om te stoppen met bannen van dit sleutelwoord."
+msgid "If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword."
+msgstr "Als een sleutelwoord legitieme domeinen tegenhoud, klik dan op het groene vinkje om te stoppen met bannen van dit sleutelwoord."
 
 #: ..\..\..\admin\b2antispam.php:270
-#, fuzzy
 msgid "Request abuse update from centralized blacklist!"
-msgstr "Vraag een update van de centrale zwarte lijst aan."
+msgstr "Vraag een update van de centrale zwarte lijst aan!"
 
 #: ..\..\..\admin\b2antispam.php:281
 msgid "Allow keyword back (Remove it from the blacklist)"
-msgstr "Sta het sleutelwoord weer toe (verwijder van zwarte lijst)"
+msgstr "Sta het sleutelwoord weer toe (verwijder van de zwarte lijst)"
 
 #: ..\..\..\admin\b2antispam.php:281
 msgid "Allow Back"
@@ -482,8 +544,10 @@ msgstr "Controleer log-hits en reacties voor dit sleutelwoord!"
 msgid "Re-check"
 msgstr "Hercontroleer"
 
-#: ..\..\..\admin\b2blogs.php:13 ..\..\..\admin\_blogs_list.php:13
-#: ..\..\..\admin\_menutop.php:77 ..\..\..\admin\_users_groupform.php:85
+#: ..\..\..\admin\b2blogs.php:13
+#: ..\..\..\admin\_blogs_list.php:13
+#: ..\..\..\admin\_menutop.php:77
+#: ..\..\..\admin\_users_groupform.php:85
 #: ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
 msgid "Blogs"
@@ -530,18 +594,23 @@ msgstr "Kan niet aanmaken!"
 msgid "You should <a %s>create categories</a> for this blog now!"
 msgstr "Je moet nu <a href=\"%s\">categorien aanmaken</a> voor dit weblog"
 
-#: ..\..\..\admin\b2blogs.php:146 ..\..\..\admin\b2blogs.php:276
-#: ..\..\..\admin\b2blogs.php:303 ..\..\..\admin\b2options.php:25
-#: ..\..\..\admin\b2options.php:428 ..\..\..\admin\_users_groupform.php:71
+#: ..\..\..\admin\b2blogs.php:146
+#: ..\..\..\admin\b2blogs.php:276
+#: ..\..\..\admin\b2blogs.php:303
+#: ..\..\..\admin\b2options.php:25
+#: ..\..\..\admin\b2options.php:428
+#: ..\..\..\admin\_users_groupform.php:71
 msgid "General"
 msgstr "Algemeen"
 
-#: ..\..\..\admin\b2blogs.php:149 ..\..\..\admin\b2blogs.php:279
+#: ..\..\..\admin\b2blogs.php:149
+#: ..\..\..\admin\b2blogs.php:279
 #: ..\..\..\admin\b2blogs.php:309
 msgid "Permissions"
 msgstr "Rechten"
 
-#: ..\..\..\admin\b2blogs.php:152 ..\..\..\admin\b2blogs.php:282
+#: ..\..\..\admin\b2blogs.php:152
+#: ..\..\..\admin\b2blogs.php:282
 #: ..\..\..\admin\b2blogs.php:315
 msgid "Advanced"
 msgstr "Geavanceerd"
@@ -551,7 +620,8 @@ msgstr "Geavanceerd"
 msgid "Updating Blog [%s]..."
 msgstr "Bijwerken weblog [%s]..."
 
-#: ..\..\..\admin\b2blogs.php:178 ..\..\..\admin\edit_actions.php:211
+#: ..\..\..\admin\b2blogs.php:178
+#: ..\..\..\admin\edit_actions.php:211
 msgid "Cannot update, please correct these errors:"
 msgstr "Kan niet bijwerken, los deze problemen op:"
 
@@ -565,13 +635,11 @@ msgid "Delete Blog [%s]?"
 msgstr "Verwijder Weblog [%s]?"
 
 #: ..\..\..\admin\b2blogs.php:387
-msgid ""
-"Deleting this blog will also delete all its categories, posts and comments!"
-msgstr ""
-"Verwijderen van dit weblog zal ook alle categoriën, artikelen en reacties "
-"verwijderen!"
+msgid "Deleting this blog will also delete all its categories, posts and comments!"
+msgstr "Verwijderen van dit weblog zal ook alle categoriën, artikelen en reacties verwijderen!"
 
-#: ..\..\..\admin\b2blogs.php:389 ..\..\..\admin\b2users.php:265
+#: ..\..\..\admin\b2blogs.php:389
+#: ..\..\..\admin\b2users.php:265
 #: ..\..\..\admin\b2users.php:322
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "DIT KAN NIET ONGEDAAN GEMAAKT WORDEN!"
@@ -579,22 +647,21 @@ msgstr "DIT KAN NIET ONGEDAAN GEMAAKT WORDEN!"
 #: ..\..\..\admin\b2blogs.php:402
 #, php-format
 msgid "Also try to delete stub file [<strong><a %s>%s</a></strong>]"
-msgstr ""
-"Probeer ook het stub bestand  [<strong><a %s>%s</a></strong>] te verwijderen"
+msgstr "Probeer ook het stub bestand  [<strong><a %s>%s</a></strong>] te verwijderen"
 
 #: ..\..\..\admin\b2blogs.php:410
 #, php-format
 msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
-msgstr ""
-"Probeer ook het statische bestand  [<strong><a %s>%s</a></strong>] te "
-"verwijderen"
+msgstr "Probeer ook het statische bestand  [<strong><a %s>%s</a></strong>] te verwijderen"
 
-#: ..\..\..\admin\b2blogs.php:416 ..\..\..\admin\b2users.php:273
+#: ..\..\..\admin\b2blogs.php:416
+#: ..\..\..\admin\b2users.php:273
 #: ..\..\..\admin\b2users.php:330
 msgid "I am sure!"
 msgstr "Ik weet het zeker!"
 
-#: ..\..\..\admin\b2blogs.php:419 ..\..\..\admin\b2users.php:276
+#: ..\..\..\admin\b2blogs.php:419
+#: ..\..\..\admin\b2users.php:276
 #: ..\..\..\admin\b2users.php:333
 msgid "CANCEL"
 msgstr "ANNULEREN"
@@ -610,22 +677,22 @@ msgstr "Je hebt geen statische bestandsnaam opgegeven voor dit weblog!"
 
 #: ..\..\..\admin\b2blogs.php:509
 msgid "File cannot be written!"
-msgstr ""
+msgstr "Bestand kan niet worden geschreven!"
 
 #: ..\..\..\admin\b2blogs.php:510
 #, php-format
-msgid ""
-"You sould check the permission for [%s]. See <a %s>online manual on file "
-"permissions</a>."
+msgid "You sould check the permission for [%s]. See <a %s>online manual on file permissions</a>."
 msgstr ""
 
 #: ..\..\..\admin\b2blogs.php:516
-#, fuzzy, php-format
+#, php-format
 msgid "Writing to file [%s]..."
-msgstr "Schrijven naar bestand ..."
+msgstr "Schrijven naar bestand [%s] ..."
 
-#: ..\..\..\admin\b2blogs.php:520 ..\..\..\admin\edit_actions.php:118
-#: ..\..\..\admin\edit_actions.php:246 ..\..\..\admin\edit_actions.php:338
+#: ..\..\..\admin\b2blogs.php:520
+#: ..\..\..\admin\edit_actions.php:118
+#: ..\..\..\admin\edit_actions.php:246
+#: ..\..\..\admin\edit_actions.php:338
 #: ..\..\..\admin\edit_actions.php:402
 #: ..\..\..\b2evocore\_functions_antispam.php:208
 #: ..\..\..\b2evocore\_functions_antispam.php:321
@@ -640,20 +707,15 @@ msgstr "Klaar"
 msgid "Browse blog:"
 msgstr "Blader door weblog"
 
-#: ..\..\..\admin\b2browse.php:56 ..\..\..\admin\b2categories.php:290
+#: ..\..\..\admin\b2browse.php:56
+#: ..\..\..\admin\b2categories.php:290
 #: ..\..\..\admin\b2edit.php:162
 #, php-format
-msgid ""
-"Since you're a newcomer, you'll have to wait for an admin to authorize you "
-"to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. "
-"When you're promoted, just reload this page and you'll be able to blog. :)"
-msgstr ""
-"Aangezien je nieuw bent, zul je moeten wachten tot een admin je heeft "
-"toegestaan om te kunnen plaatsen.\tJe kan ook <a %s>e-mailen naar de admin</"
-"a> en vragen om promotie. Wanneer dit is gebeurt, dan herlaad deze pagina en "
-"je zal kunnen webloggen. :)"
+msgid "Since you're a newcomer, you'll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
+msgstr "Aangezien je nieuw bent, zul je moeten wachten tot een admin je heeft toegestaan om te kunnen plaatsen.\tJe kan ook <a %s>e-mailen naar de admin</a> en vragen om promotie. Wanneer dit is gebeurt, dan herlaad deze pagina en je zal kunnen webloggen. :)"
 
-#: ..\..\..\admin\b2categories.php:13 ..\..\..\admin\_cats_list.php:13
+#: ..\..\..\admin\b2categories.php:13
+#: ..\..\..\admin\_cats_list.php:13
 msgid "Categories for blog:"
 msgstr "Categoriën voor weblog:"
 
@@ -683,12 +745,18 @@ msgstr "Verwijderen van categorie #%d : %s ..."
 #: ..\..\..\admin\b2categories.php:156
 #: ..\..\..\b2evocore\_functions_users.php:70
 #: ..\..\..\b2evocore\_functions_users.php:101
-#: ..\..\..\htsrv\profile_update.php:50 ..\..\..\htsrv\profile_update.php:60
-#: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\profile_update.php:75
-#: ..\..\..\htsrv\profile_update.php:84 ..\..\..\htsrv\profile_update.php:92
-#: ..\..\..\htsrv\profile_update.php:97 ..\..\..\htsrv\register.php:41
-#: ..\..\..\htsrv\register.php:48 ..\..\..\htsrv\register.php:55
-#: ..\..\..\htsrv\register.php:71 ..\..\..\htsrv\register.php:76
+#: ..\..\..\htsrv\profile_update.php:50
+#: ..\..\..\htsrv\profile_update.php:60
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\profile_update.php:75
+#: ..\..\..\htsrv\profile_update.php:84
+#: ..\..\..\htsrv\profile_update.php:92
+#: ..\..\..\htsrv\profile_update.php:97
+#: ..\..\..\htsrv\register.php:41
+#: ..\..\..\htsrv\register.php:48
+#: ..\..\..\htsrv\register.php:55
+#: ..\..\..\htsrv\register.php:71
+#: ..\..\..\htsrv\register.php:76
 #: ..\..\..\htsrv\register.php:87
 msgid "ERROR"
 msgstr "FOUT"
@@ -701,11 +769,15 @@ msgstr "Categorie is verwijdert."
 msgid "Properties for category:"
 msgstr "Eigenschappen voor categorie"
 
-#: ..\..\..\admin\b2categories.php:188 ..\..\..\admin\b2upload.php:218
-#: ..\..\..\admin\_edit_form.php:128 ..\..\..\admin\_set_regional.form.php:49
+#: ..\..\..\admin\b2categories.php:188
+#: ..\..\..\admin\b2upload.php:218
+#: ..\..\..\admin\_edit_form.php:128
+#: ..\..\..\admin\_set_regional.form.php:49
 #: ..\..\..\admin\_set_regional.form.php:122
-#: ..\..\..\admin\_users_groupform.php:74 ..\..\..\admin\_users_list.php:19
-#: ..\..\..\skins\_feedback.php:170 ..\..\..\skins\basic\_feedback.php:165
+#: ..\..\..\admin\_users_groupform.php:74
+#: ..\..\..\admin\_users_list.php:19
+#: ..\..\..\skins\_feedback.php:170
+#: ..\..\..\skins\basic\_feedback.php:165
 msgid "Name"
 msgstr "Naam"
 
@@ -713,7 +785,8 @@ msgstr "Naam"
 msgid "New parent category"
 msgstr "Nieuwe hoofd categorie"
 
-#: ..\..\..\admin\b2categories.php:218 ..\..\..\admin\b2categories.php:237
+#: ..\..\..\admin\b2categories.php:218
+#: ..\..\..\admin\b2categories.php:237
 msgid "Old Parent"
 msgstr "Oud Ouder"
 
@@ -725,7 +798,8 @@ msgstr "Root (Niks hierboven)"
 msgid "Edit category!"
 msgstr "Bewerk categorie!"
 
-#: ..\..\..\admin\b2edit.php:26 ..\..\..\admin\edit_actions.php:191
+#: ..\..\..\admin\b2edit.php:26
+#: ..\..\..\admin\edit_actions.php:191
 #: ..\..\..\admin\edit_actions.php:292
 msgid "Oops, no post with this ID."
 msgstr "Oeps, geen artikel met dit ID"
@@ -751,52 +825,47 @@ msgstr "Bewerk reactie"
 msgid "New post in blog:"
 msgstr "Nieuw artikel in weblog:"
 
-#: ..\..\..\admin\b2edit.php:143 ..\..\..\admin\b2edit.php:172
-msgid ""
-"Since this blog has no categories, you cannot post to it. You must create "
-"categories first."
-msgstr ""
-"Aangezien dit weblog nog geen categoriën heeft, kunt U niets plaatsen. U "
-"moet eerst categoriën aanmaken."
+#: ..\..\..\admin\b2edit.php:143
+#: ..\..\..\admin\b2edit.php:172
+msgid "Since this blog has no categories, you cannot post to it. You must create categories first."
+msgstr "Aangezien dit weblog nog geen categoriën heeft, kunt U niets plaatsen. U moet eerst categoriën aanmaken."
 
 #: ..\..\..\admin\b2edit.php:147
 msgid "Switch to this blog (keeping your input if Javascript is active)"
 msgstr "Schakel naar dit weblog (behoud Uw invoer als javascript aanstaat)"
 
-#: ..\..\..\admin\b2login.php:19 ..\..\..\admin\b2upload.php:20
+#: ..\..\..\admin\b2login.php:19
+#: ..\..\..\admin\b2upload.php:20
 #: ..\..\..\htsrv\_header.php:14
 msgid "b2evo"
 msgstr "b2evo"
 
-#: ..\..\..\admin\b2login.php:19 ..\..\..\b2evocore\_functions_users.php:342
+#: ..\..\..\admin\b2login.php:19
+#: ..\..\..\b2evocore\_functions_users.php:342
 msgid "Login..."
 msgstr "Inloggen..."
 
 #: ..\..\..\admin\b2login.php:22
-msgid ""
-"In b2evolution, you do not need to point to the b2login.php page to log in."
-msgstr ""
-"In b2evolution is het niet nodig om naar de b2login.php te verwijzen om in "
-"te loggen."
+msgid "In b2evolution, you do not need to point to the b2login.php page to log in."
+msgstr "In b2evolution is het niet nodig om naar de b2login.php te verwijzen om in te loggen."
 
 #: ..\..\..\admin\b2login.php:23
 #, php-format
-msgid ""
-"Simply point directly to the backoffice page you need, for example: %s or %"
-"s. b2evo will prompt you to log in if needed."
-msgstr ""
-"Verwijs simpel naar de backoffice pagina die U nodig heeft, bijvoorbeeld: %s "
-"of %s. b2evo zal U vragen om in te loggen indien nodig."
+msgid "Simply point directly to the backoffice page you need, for example: %s or %s. b2evo will prompt you to log in if needed."
+msgstr "Verwijs simpel naar de backoffice pagina die U nodig heeft, bijvoorbeeld: %s of %s. b2evo zal U vragen om in te loggen indien nodig."
 
-#: ..\..\..\admin\b2options.php:13 ..\..\..\admin\_menutop.php:121
+#: ..\..\..\admin\b2options.php:13
+#: ..\..\..\admin\_menutop.php:121
 msgid "Settings"
 msgstr "Instellingen"
 
-#: ..\..\..\admin\b2options.php:28 ..\..\..\admin\b2options.php:436
+#: ..\..\..\admin\b2options.php:28
+#: ..\..\..\admin\b2options.php:436
 msgid "Regional"
 msgstr "Regionaal"
 
-#: ..\..\..\admin\b2options.php:31 ..\..\..\admin\b2options.php:442
+#: ..\..\..\admin\b2options.php:31
+#: ..\..\..\admin\b2options.php:442
 msgid "Plug-ins"
 msgstr "Plug-ins"
 
@@ -822,7 +891,8 @@ msgstr "Je moet geen lege taalbestanden aanmaken!"
 msgid "Inserted locale '%s' into database."
 msgstr "Vertaling '%s' in de database verwerkt."
 
-#: ..\..\..\admin\b2options.php:168 ..\..\..\admin\b2options.php:185
+#: ..\..\..\admin\b2options.php:168
+#: ..\..\..\admin\b2options.php:185
 #, php-format
 msgid "Updated locale '%s'."
 msgstr "Taal '%s' bijgewerkt."
@@ -833,11 +903,8 @@ msgid "Created locale '%s'."
 msgstr "Taal '%s' aangemaakt."
 
 #: ..\..\..\admin\b2options.php:206
-msgid ""
-"Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded."
-msgstr ""
-"Taal tabel verwijderd, de standaarden van <code>/conf/_locales.php</code> "
-"zijn geladen."
+msgid "Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded."
+msgstr "Taal tabel verwijderd, de standaarden van <code>/conf/_locales.php</code> zijn geladen."
 
 #: ..\..\..\admin\b2options.php:219
 #, php-format
@@ -865,7 +932,8 @@ msgstr "Laden van de Spellingscontrole. Even geduld"
 msgid "View Stats for Blog:"
 msgstr "Bekijk statistieken voor dit weblog:"
 
-#: ..\..\..\admin\b2stats.php:23 ..\..\..\admin\b2stats.php:27
+#: ..\..\..\admin\b2stats.php:23
+#: ..\..\..\admin\b2stats.php:27
 #: ..\..\..\b2evocore\_class_dataobjectcache.php:204
 msgid "None"
 msgstr "Geen"
@@ -885,19 +953,23 @@ msgstr "Verwijder hit #%d..."
 msgid "Pruning hits for %s..."
 msgstr "Inkrimpen hits van %s..."
 
-#: ..\..\..\admin\b2stats.php:112 ..\..\..\admin\b2stats.php:154
+#: ..\..\..\admin\b2stats.php:112
+#: ..\..\..\admin\b2stats.php:154
 msgid "Summary"
 msgstr "Samenvatting"
 
-#: ..\..\..\admin\b2stats.php:118 ..\..\..\admin\b2stats.php:175
+#: ..\..\..\admin\b2stats.php:118
+#: ..\..\..\admin\b2stats.php:175
 msgid "Referers"
 msgstr "Refererenden"
 
-#: ..\..\..\admin\b2stats.php:124 ..\..\..\admin\b2stats.php:176
+#: ..\..\..\admin\b2stats.php:124
+#: ..\..\..\admin\b2stats.php:176
 msgid "Refering Searches"
 msgstr "Refererende Zoekregels"
 
-#: ..\..\..\admin\b2stats.php:130 ..\..\..\admin\b2stats.php:178
+#: ..\..\..\admin\b2stats.php:130
+#: ..\..\..\admin\b2stats.php:178
 msgid "Syndication"
 msgstr "Syndicatie"
 
@@ -905,7 +977,8 @@ msgstr "Syndicatie"
 msgid "User Agents"
 msgstr "Browsers"
 
-#: ..\..\..\admin\b2stats.php:142 ..\..\..\admin\b2stats.php:179
+#: ..\..\..\admin\b2stats.php:142
+#: ..\..\..\admin\b2stats.php:179
 msgid "Direct Accesses"
 msgstr "Directe Bezoekers"
 
@@ -926,15 +999,18 @@ msgid "Prune this date!"
 msgstr "Opruimen van deze datum!"
 
 #. TRANS: Abbrev. for Prune (stats)
-#: ..\..\..\admin\b2stats.php:192 ..\..\..\admin\b2stats.php:221
+#: ..\..\..\admin\b2stats.php:192
+#: ..\..\..\admin\b2stats.php:221
 msgid "Prune"
 msgstr "Opruimen"
 
-#: ..\..\..\admin\b2stats.php:192 ..\..\..\admin\b2stats.php:221
+#: ..\..\..\admin\b2stats.php:192
+#: ..\..\..\admin\b2stats.php:221
 msgid "Prune hits for this date!"
 msgstr "Opruimen van hits van deze datum!"
 
-#: ..\..\..\admin\b2stats.php:241 ..\..\..\skins\_stats.php:16
+#: ..\..\..\admin\b2stats.php:241
+#: ..\..\..\skins\_stats.php:16
 msgid "Last referers"
 msgstr "Laatste Refererenden"
 
@@ -942,16 +1018,21 @@ msgstr "Laatste Refererenden"
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Dit zijn hits van externe webpagina's die refereren aan dit weblog"
 
-#: ..\..\..\admin\b2stats.php:251 ..\..\..\admin\b2stats.php:295
+#: ..\..\..\admin\b2stats.php:251
+#: ..\..\..\admin\b2stats.php:295
 #: ..\..\..\admin\b2stats.php:365
 msgid "Delete this hit!"
 msgstr "Verwijder deze hit!"
 
 #. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:251 ..\..\..\admin\b2stats.php:295
-#: ..\..\..\admin\b2stats.php:365 ..\..\..\admin\_blogs_list.php:23
-#: ..\..\..\admin\_blogs_list.php:81 ..\..\..\admin\_cats_list.php:31
-#: ..\..\..\admin\_users_list.php:76 ..\..\..\admin\_users_list.php:143
+#: ..\..\..\admin\b2stats.php:251
+#: ..\..\..\admin\b2stats.php:295
+#: ..\..\..\admin\b2stats.php:365
+#: ..\..\..\admin\_blogs_list.php:23
+#: ..\..\..\admin\_blogs_list.php:81
+#: ..\..\..\admin\_cats_list.php:31
+#: ..\..\..\admin\_users_list.php:76
+#: ..\..\..\admin\_users_list.php:143
 msgid "Del"
 msgstr "Verwijder"
 
@@ -964,18 +1045,21 @@ msgstr "Log als een zoekregel"
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#: ..\..\..\admin\b2stats.php:258 ..\..\..\admin\b2stats.php:272
+#: ..\..\..\admin\b2stats.php:258
+#: ..\..\..\admin\b2stats.php:272
 #: ..\..\..\admin\_edit_showposts.php:219
 msgid "Ban this domain!"
 msgstr "Blokkeer dit domein!"
 
 #. TRANS: Abbrev.
-#: ..\..\..\admin\b2stats.php:258 ..\..\..\admin\b2stats.php:272
+#: ..\..\..\admin\b2stats.php:258
+#: ..\..\..\admin\b2stats.php:272
 #: ..\..\..\admin\_edit_showposts.php:219
 msgid "Ban"
 msgstr "Blokkeer"
 
-#: ..\..\..\admin\b2stats.php:266 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:266
+#: ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Hoogste Refererenden"
 
@@ -983,45 +1067,36 @@ msgstr "Hoogste Refererenden"
 msgid "Total referers"
 msgstr "Totaal Refererenden"
 
-#: ..\..\..\admin\b2stats.php:285 ..\..\..\skins\_stats.php:36
+#: ..\..\..\admin\b2stats.php:285
+#: ..\..\..\skins\_stats.php:36
 msgid "Last refering searches"
 msgstr "Laatste refererende zoekregels"
 
 #: ..\..\..\admin\b2stats.php:286
-msgid ""
-"These are hits from people who came to this blog system through a search "
-"engine. (Search engines must be listed in /conf/_stats.php)"
-msgstr ""
-"Dit zijn hits van mensen die hier kwamen via een zoekmachine. (Zoekmachines "
-"moeten opgegeven zijn in /conf/_stats.php)"
+msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
+msgstr "Dit zijn hits van mensen die hier kwamen via een zoekmachine. (Zoekmachines moeten opgegeven zijn in /conf/_stats.php)"
 
 #: ..\..\..\admin\b2stats.php:306
 msgid "Top refering search engines"
 msgstr "Hoogste refererende zoekmachines"
 
-#: ..\..\..\admin\b2stats.php:318 ..\..\..\skins\_stats.php:60
+#: ..\..\..\admin\b2stats.php:318
+#: ..\..\..\skins\_stats.php:60
 msgid "Top Indexing Robots"
 msgstr "Hoogste Indexeer Robots"
 
 #: ..\..\..\admin\b2stats.php:319
-msgid ""
-"These are hits from automated robots like search engines' indexing robots. "
-"(Robots must be listed in /conf/_stats.php)"
-msgstr ""
-"Dit zijn hits van automatische robots zoals zoekmachine indexeer robots. "
-"(Robots moeten in de lijst staan in /conf/_stats.php)"
+msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/_stats.php)"
+msgstr "Dit zijn hits van automatische robots zoals zoekmachine indexeer robots. (Robots moeten in de lijst staan in /conf/_stats.php)"
 
-#: ..\..\..\admin\b2stats.php:336 ..\..\..\skins\_stats.php:75
+#: ..\..\..\admin\b2stats.php:336
+#: ..\..\..\skins\_stats.php:75
 msgid "Top Aggregators"
 msgstr "Hoogste Verzamelaars"
 
 #: ..\..\..\admin\b2stats.php:337
-msgid ""
-"These are hits from RSS news aggregators. (Aggregators must be listed in /"
-"conf/_stats.php)"
-msgstr ""
-"Dit zijn hits van RSS nieuws verzamelaars. (Verzamelaars moeten opgegeven "
-"zijn in /conf/_stats.php)"
+msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)"
+msgstr "Dit zijn hits van RSS nieuws verzamelaars. (Verzamelaars moeten opgegeven zijn in /conf/_stats.php)"
 
 #: ..\..\..\admin\b2stats.php:348
 msgid "Total RSS hits"
@@ -1032,14 +1107,8 @@ msgid "Last direct accesses"
 msgstr "Laatste directe bezoekers"
 
 #: ..\..\..\admin\b2stats.php:356
-msgid ""
-"These are hits from people who came to this blog system by direct access "
-"(either by typing the URL directly, or using a bookmark. Invalid (too short) "
-"referers are also listed here.)"
-msgstr ""
-"Dit zijn hits van mensen die direkt op dit weblog kwamen (door de URL in te "
-"typen, of gebruik makend van een bookmark. Verkeerde (te korte) refererenden "
-"staan ook hier.)"
+msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
+msgstr "Dit zijn hits van mensen die direkt op dit weblog kwamen (door de URL in te typen, of gebruik makend van een bookmark. Verkeerde (te korte) refererenden staan ook hier.)"
 
 #: ..\..\..\admin\b2stats.php:379
 msgid "Top User Agents"
@@ -1055,7 +1124,7 @@ msgstr "Lijst:"
 
 #: ..\..\..\admin\b2template.php:58
 msgid "Invalid filename!"
-msgstr "verkeerde bestandsnaam"
+msgstr "Verkeerde bestandsnaam"
 
 #: ..\..\..\admin\b2template.php:62
 msgid "Oops, no such file !"
@@ -1066,50 +1135,31 @@ msgid "File edited!"
 msgstr "Bestand bewerkt!"
 
 #: ..\..\..\admin\b2template.php:77
-msgid ""
-"Be careful what you do, editing this file could break your template! Do not "
-"edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you "
-"don't know what you're doing!"
-msgstr ""
-"Wees voorzichtig met wat je doet, bewerken van dit bestand kan je sjabloon "
-"beschadigen. Bewerk niet wat tussen <code>&lt;?php</code> en <code>?&gt;</"
-"code> staat, als je niet weet wat je doet!"
+msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
+msgstr "Wees voorzichtig met wat je doet, bewerken van dit bestand kan je sjabloon beschadigen. Bewerk niet wat tussen <code>&lt;?php</code> en <code>?&gt;</code> staat, als je niet weet wat je doet!"
 
 #: ..\..\..\admin\b2template.php:86
 msgid "update template !"
 msgstr "Bijwerken van sjabloon !"
 
 #: ..\..\..\admin\b2template.php:90
-msgid ""
-"(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
-msgstr ""
-"(je kan dat bestand/sjabloon niet bijwerken: je moet het schrijfbaar maken, "
-"CHMOD 766)"
+msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
+msgstr "(je kan dat bestand/sjabloon niet bijwerken: je moet het schrijfbaar maken, CHMOD 766)"
 
 #: ..\..\..\admin\b2template.php:102
-msgid ""
-"This screen allows you to edit the <strong>custom skin</strong> (located "
-"under /skins/custom). "
-msgstr ""
-"In dit scherm kun je de <strong>custom skin</strong> bewerken (bevind zich "
-"in /skins/custom)."
+msgid "This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom). "
+msgstr "In dit scherm kun je de <strong>custom skin</strong> bewerken (bevind zich in /skins/custom)."
 
 #: ..\..\..\admin\b2template.php:103
-msgid ""
-"You can edit any of the following files (provided it's writable by the "
-"server, e.g. CHMOD 766)"
-msgstr ""
-"Je kan de volgende bestanden bewerken (er vanuit gaande dat ze schrijfbaar "
-"zijn voor de webserver, CHMOD 766)"
+msgid "You can edit any of the following files (provided it's writable by the server, e.g. CHMOD 766)"
+msgstr "Je kan de volgende bestanden bewerken (er vanuit gaande dat ze schrijfbaar zijn voor de webserver, CHMOD 766)"
 
 #: ..\..\..\admin\b2template.php:120
 msgid "This is the template that displays the links to the archives for a blog"
-msgstr ""
-"Dit is het template dat de links naar het archief voor een weblog weergeeft"
+msgstr "Dit is het template dat de links naar het archief voor een weblog weergeeft"
 
 #: ..\..\..\admin\b2template.php:123
-msgid ""
-"This is the template that displays the (recursive) list of (sub)categories"
+msgid "This is the template that displays the (recursive) list of (sub)categories"
 msgstr "Dit is het template dat de lijst van (sub)categoriën weergeeft"
 
 #: ..\..\..\admin\b2template.php:126
@@ -1118,9 +1168,7 @@ msgstr "Dit is het template dat de reacties op een artikel weergeeft"
 
 #: ..\..\..\admin\b2template.php:129
 msgid "This is the template that displays the last comments for a blog"
-msgstr ""
-"Dit is het template dat de links naar de laatste reacties voor een weblog "
-"weergeeft"
+msgstr "Dit is het template dat de links naar de laatste reacties voor een weblog weergeeft"
 
 #: ..\..\..\admin\b2template.php:132
 msgid "This is the main template. It displays the blog."
@@ -1143,18 +1191,12 @@ msgid "This is the page displayed in the trackback popup"
 msgstr "Dit is de pagina die word weergegeven in de trackback popup"
 
 #: ..\..\..\admin\b2template.php:154
-msgid ""
-"Note: of course, you can also edit the files/templates in your text editor "
-"and upload them. This online editor is only meant to be used when you don't "
-"have access to a text editor..."
-msgstr ""
-"NB: Natuurlijk kan je ook de bestanden/sjablonen in je tekstverwerker "
-"bewerken en dan uploaden. Deze online bewerker is eerder bedoelt voor als je "
-"geen toegang hebt tot een tekstverwerker..."
+msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
+msgstr "NB: Natuurlijk kan je ook de bestanden/sjablonen in je tekstverwerker bewerken en dan uploaden. Deze online bewerker is eerder bedoelt voor als je geen toegang hebt tot een tekstverwerker..."
 
 #: ..\..\..\admin\b2upload.php:20
 msgid "upload images/files"
-msgstr "Upload een bestand/afbeelding"
+msgstr "upload afbeeldingen/bestanden"
 
 #: ..\..\..\admin\b2upload.php:102
 msgid "File upload"
@@ -1169,8 +1211,10 @@ msgstr "Toegestane bestandstypes:"
 msgid "Maximum allowed file size: %d KB"
 msgstr "Maximale toegestane bestandsgrootte: %d KB"
 
-#: ..\..\..\admin\b2upload.php:109 ..\..\..\admin\b2upload.php:180
-#: ..\..\..\admin\_blogs_form.php:30 ..\..\..\admin\_set_plugins.form.php:23
+#: ..\..\..\admin\b2upload.php:109
+#: ..\..\..\admin\b2upload.php:180
+#: ..\..\..\admin\_blogs_form.php:30
+#: ..\..\..\admin\_set_plugins.form.php:23
 #: ..\..\..\admin\_set_plugins.form.php:46
 msgid "Description"
 msgstr "Beschrijving"
@@ -1184,7 +1228,8 @@ msgstr "Uploaden !"
 msgid "File %s: type %s is not allowed."
 msgstr "Bestand %s: type %s is niet toegestaan."
 
-#: ..\..\..\admin\b2upload.php:165 ..\..\..\admin\b2upload.php:191
+#: ..\..\..\admin\b2upload.php:165
+#: ..\..\..\admin\b2upload.php:191
 #: ..\..\..\admin\b2upload.php:194
 msgid "Couldn't upload your file to:"
 msgstr "Kan jouw bestand niet uploaden naar:"
@@ -1226,7 +1271,7 @@ msgstr "Jouw bestand <strong>\"%s\"</strong> is succesvol geupload !"
 
 #: ..\..\..\admin\b2upload.php:210
 msgid "Here's the code to display it:"
-msgstr "Hier is de code om het weer te geven:"
+msgstr "Hier is de code om weer te geven:"
 
 #: ..\..\..\admin\b2upload.php:214
 msgid "Add the code to your post !"
@@ -1240,7 +1285,8 @@ msgstr "Afbeelding Details"
 msgid "Size"
 msgstr "Grootte"
 
-#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:495
+#: ..\..\..\admin\b2upload.php:224
+#: ..\..\..\admin\_edit_form.php:495
 msgid "Type"
 msgstr "Type"
 
@@ -1250,7 +1296,7 @@ msgstr "Sluit dit venster"
 
 #: ..\..\..\admin\b2users.php:13
 msgid "User management"
-msgstr "Gebruikers onderhoud"
+msgstr "Gebruikers beheer"
 
 #: ..\..\..\admin\b2users.php:32
 msgid "You have no permission to edit users/groups!"
@@ -1267,18 +1313,15 @@ msgstr "Gebruikerslevel moet tussen de %d en %d zijn."
 
 #: ..\..\..\admin\b2users.php:90
 #, php-format
-msgid ""
-"The login already exists. Please <a %s>edit this login</a> instead of "
-"overwriting it this way."
-msgstr ""
-"De Login bestaat al. Gebruik <a href=\"%s\">bewerk deze login</a> in plaats "
-"van overschrijven op deze manier."
+msgid "The login already exists. Please <a %s>edit this login</a> instead of overwriting it this way."
+msgstr "De Login bestaat al. Gebruik <a href=\"%s\">bewerk deze login</a> in plaats van overschrijven op deze manier."
 
 #: ..\..\..\admin\b2users.php:136
 msgid "You typed two different passwords."
 msgstr "Je hebt twee verschillende wachtwoorden opgegeven."
 
-#: ..\..\..\admin\b2users.php:142 ..\..\..\htsrv\profile_update.php:103
+#: ..\..\..\admin\b2users.php:142
+#: ..\..\..\htsrv\profile_update.php:103
 #: ..\..\..\htsrv\register.php:62
 #, php-format
 msgid "The mimimum password length is %d characters."
@@ -1324,9 +1367,7 @@ msgstr "Waarschuwing"
 
 #: ..\..\..\admin\b2users.php:263
 msgid "deleting an user also deletes all posts made by this user."
-msgstr ""
-"het verwijderen van een gebruiker verwijdert ook de artikelen van deze "
-"gebruiker"
+msgstr "het verwijderen van een gebruiker verwijdert ook de artikelen van deze gebruiker"
 
 #: ..\..\..\admin\b2users.php:286
 msgid "Deleting User..."
@@ -1351,12 +1392,8 @@ msgstr "Groep verwijdert..."
 
 #: ..\..\..\admin\b2users.php:361
 #, php-format
-msgid ""
-"The group name already exists. Please <a %s>edit this group</a> instead of "
-"overwriting it this way."
-msgstr ""
-"De groeps naam bestaat al. Gebruik <a href=\"%s\">bewerk deze groep</a> in "
-"plaats van overschrijven op deze manier."
+msgid "The group name already exists. Please <a %s>edit this group</a> instead of overwriting it this way."
+msgstr "De groeps naam bestaat al. Gebruik <a href=\"%s\">bewerk deze groep</a> in plaats van overschrijven op deze manier."
 
 #: ..\..\..\admin\b2users.php:415
 msgid "Group updated."
@@ -1382,17 +1419,22 @@ msgstr "De groep was niet bijgewerkt:"
 msgid "Adding new post..."
 msgstr "Toevoegen nieuw artikel..."
 
-#: ..\..\..\admin\edit_actions.php:88 ..\..\..\admin\edit_actions.php:205
-#: ..\..\..\admin\edit_actions.php:437 ..\..\..\htsrv\comment_post.php:63
-#: ..\..\..\htsrv\trackback.php:63 ..\..\..\xmlsrv\xmlrpc.php:1368
+#: ..\..\..\admin\edit_actions.php:88
+#: ..\..\..\admin\edit_actions.php:205
+#: ..\..\..\admin\edit_actions.php:437
+#: ..\..\..\htsrv\comment_post.php:63
+#: ..\..\..\htsrv\trackback.php:63
+#: ..\..\..\xmlsrv\xmlrpc.php:1368
 msgid "Supplied URL is invalid: "
 msgstr "Opgegeven URL is onjuist:"
 
-#: ..\..\..\admin\edit_actions.php:94 ..\..\..\htsrv\getmail.php:243
+#: ..\..\..\admin\edit_actions.php:94
+#: ..\..\..\htsrv\getmail.php:243
 msgid "Cannot post, please correct these errors:"
 msgstr "Kan niet plaatsen, los deze fouten op:"
 
-#: ..\..\..\admin\edit_actions.php:95 ..\..\..\admin\edit_actions.php:212
+#: ..\..\..\admin\edit_actions.php:95
+#: ..\..\..\admin\edit_actions.php:212
 #: ..\..\..\admin\edit_actions.php:442
 msgid "Back to post editing"
 msgstr "Terug naar artikelbewerking"
@@ -1401,17 +1443,16 @@ msgstr "Terug naar artikelbewerking"
 msgid "Recording post..."
 msgstr "Opslaan artikel"
 
-#: ..\..\..\admin\edit_actions.php:114 ..\..\..\admin\edit_actions.php:398
+#: ..\..\..\admin\edit_actions.php:114
+#: ..\..\..\admin\edit_actions.php:398
 msgid "Sleeping..."
 msgstr "Slapen..."
 
-#: ..\..\..\admin\edit_actions.php:124 ..\..\..\admin\edit_actions.php:252
+#: ..\..\..\admin\edit_actions.php:124
+#: ..\..\..\admin\edit_actions.php:252
 #: ..\..\..\admin\edit_actions.php:344
-msgid ""
-"Post not publicly published: skipping trackback, pingback and blog pings..."
-msgstr ""
-"Artikel niet publiekelijk gepubliseerd: overslaan van trackback, pingback en "
-"weblog pings..."
+msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
+msgstr "Artikel niet publiekelijk gepubliseerd: overslaan van trackback, pingback en weblog pings..."
 
 #: ..\..\..\admin\edit_actions.php:152
 msgid "Posting Done..."
@@ -1421,23 +1462,26 @@ msgstr "Plaatsen Gereed ..."
 msgid "Updating post..."
 msgstr "Bijwerken artikel..."
 
-#: ..\..\..\admin\edit_actions.php:268 ..\..\..\admin\edit_actions.php:355
+#: ..\..\..\admin\edit_actions.php:268
+#: ..\..\..\admin\edit_actions.php:355
 msgid "Post had already pinged: skipping blog pings..."
-msgstr "Artikel is al gepingd: overslaan van weblog pings..."
+msgstr "Artikel is al gepingt: overslaan van weblog pingen..."
 
-#: ..\..\..\admin\edit_actions.php:280 ..\..\..\admin\edit_actions.php:367
+#: ..\..\..\admin\edit_actions.php:280
+#: ..\..\..\admin\edit_actions.php:367
 msgid "Updating done..."
 msgstr "Bijwerken is klaar..."
 
 #: ..\..\..\admin\edit_actions.php:297
 msgid "Updating post status..."
-msgstr "Bijwerken artikel status..."
+msgstr "Bijwerken van artikel status..."
 
 #: ..\..\..\admin\edit_actions.php:380
 msgid "Oops, no post with this ID!"
 msgstr "Oeps, geen artikel met dit ID"
 
-#: ..\..\..\admin\edit_actions.php:384 ..\..\..\admin\edit_actions.php:392
+#: ..\..\..\admin\edit_actions.php:384
+#: ..\..\..\admin\edit_actions.php:392
 msgid "Deleting post..."
 msgstr "Verwijderen artikel..."
 
@@ -1455,15 +1499,14 @@ msgstr "Terug naar artikelen!"
 
 #: ..\..\..\admin\edit_actions.php:507
 msgid "You may also want to generate static pages or view your blogs..."
-msgstr ""
-"Je wilt misschien ook nog statische pagina's aanmaken of je weblog "
-"bekijken..."
+msgstr "Je wilt misschien ook nog statische pagina's aanmaken of je weblog bekijken..."
 
 #: ..\..\..\admin\edit_actions.php:515
 msgid "New post"
 msgstr "Nieuw Artikel"
 
-#: ..\..\..\admin\tools.php:14 ..\..\..\admin\_menutop.php:128
+#: ..\..\..\admin\tools.php:14
+#: ..\..\..\admin\_menutop.php:128
 msgid "Tools"
 msgstr "Hulpmiddelen"
 
@@ -1471,13 +1514,17 @@ msgstr "Hulpmiddelen"
 msgid "Bookmarklet"
 msgstr "Bookmarklet"
 
-#: ..\..\..\admin\tools.php:26 ..\..\..\admin\tools.php:33
-#: ..\..\..\admin\tools.php:41 ..\..\..\admin\tools.php:48
+#: ..\..\..\admin\tools.php:26
+#: ..\..\..\admin\tools.php:33
+#: ..\..\..\admin\tools.php:41
+#: ..\..\..\admin\tools.php:48
 msgid "Add this link to your Favorites/Bookmarks:"
-msgstr "Voeg deze link toe aan je Favorieten/Bookmarks"
+msgstr "Voeg deze link toe aan je Favorieten/Bookmarks:"
 
-#: ..\..\..\admin\tools.php:27 ..\..\..\admin\tools.php:34
-#: ..\..\..\admin\tools.php:42 ..\..\..\admin\tools.php:49
+#: ..\..\..\admin\tools.php:27
+#: ..\..\..\admin\tools.php:34
+#: ..\..\..\admin\tools.php:42
+#: ..\..\..\admin\tools.php:49
 msgid "b2evo bookmarklet"
 msgstr "b2evo bookmarklet"
 
@@ -1489,7 +1536,8 @@ msgstr "Plaats op b2evolution"
 msgid "No Sidebar found! You must use Mozilla 0.9.4 or later!"
 msgstr "Geen Zijbalk gevonden. Je moet Mozilla 0.9.4. of later gebruiken!"
 
-#: ..\..\..\admin\tools.php:70 ..\..\..\admin\tools.php:79
+#: ..\..\..\admin\tools.php:70
+#: ..\..\..\admin\tools.php:79
 msgid "SideBar"
 msgstr "Zijbalk"
 
@@ -1515,12 +1563,8 @@ msgid "Destination Static Filename"
 msgstr "Statische Bestandsnaam"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
-msgid ""
-"This is the .html file that will be created when you generate a static "
-"version of the blog homepage."
-msgstr ""
-"Dit is de bestandsnaam van het .html bestand dat zal worden gebruikt om een "
-"statische(.html) versie van het weblog te genereren."
+msgid "This is the .html file that will be created when you generate a static version of the blog homepage."
+msgstr "Dit is de bestandsnaam van het .html bestand dat zal worden gebruikt om een statische(.html) versie van het weblog te genereren."
 
 #: ..\..\..\admin\_blogs_advanced.form.php:25
 msgid "After each new post..."
@@ -1532,7 +1576,7 @@ msgstr "Pingen van b2evolution.net"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:27
 msgid "to get listed on the \"recently updated\" list on b2evolution.net"
-msgstr ""
+msgstr "om getoond te worden op de \"recently updated\" lijst op b2evolution.net"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:28
 msgid "Ping technorati.com"
@@ -1561,26 +1605,16 @@ msgid "Allow trackbacks"
 msgstr "TrackBacks toestaan"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:37
-msgid ""
-"Allow other bloggers to send trackbacks to this blog, letting you know when "
-"they refer to it. This will also let you send trackbacks to other blogs."
-msgstr ""
-"Sta ander webloggers toe om een trackback te sturen naar dit weblog, daarmee "
-"laten ze je weten dat ze er naartoe refereren. Dit zal jou ook toestaan om "
-"zelf trackbacks te versturen naar andere weblogs."
+msgid "Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs."
+msgstr "Sta ander webloggers toe om een trackback te sturen naar dit weblog, daarmee laten ze je weten dat ze er naartoe refereren. Dit zal jou ook toestaan om zelf trackbacks te versturen naar andere weblogs."
 
 #: ..\..\..\admin\_blogs_advanced.form.php:38
 msgid "Allow pingbacks"
 msgstr "PingBacks toestaan"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:38
-msgid ""
-"Allow other bloggers to send pingbacks to this blog, letting you know when "
-"they refer to it. This will also let you send pingbacks to other blogs."
-msgstr ""
-"Sta ander webloggers toe om een pingback te sturen naar dit weblog, daarmee "
-"laten ze je weten dat ze er naartoe refereren. Dit zal jou ook toestaan om "
-"zelf pingbacks te versturen naar andere weblogs."
+msgid "Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs."
+msgstr "Sta ander webloggers toe om een pingback te sturen naar dit weblog, daarmee laten ze je weten dat ze er naartoe refereren. Dit zal jou ook toestaan om zelf pingbacks te versturen naar andere weblogs."
 
 #: ..\..\..\admin\_blogs_advanced.form.php:45
 #: ..\..\..\admin\_blogs_form.php:56
@@ -1589,7 +1623,8 @@ msgid "Update blog!"
 msgstr "Bijwerken weblog!"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:46
-#: ..\..\..\admin\_blogs_form.php:57 ..\..\..\admin\_blogs_new.form.php:24
+#: ..\..\..\admin\_blogs_form.php:57
+#: ..\..\..\admin\_blogs_new.form.php:24
 #: ..\..\..\admin\_blogs_permissions.form.php:200
 #: ..\..\..\admin\_edit_showposts.php:532
 #: ..\..\..\admin\_set_general.form.php:79
@@ -1597,8 +1632,10 @@ msgstr "Bijwerken weblog!"
 #: ..\..\..\admin\_set_regional.form.php:72
 #: ..\..\..\admin\_set_regional.form.php:204
 #: ..\..\..\admin\_set_regional.form.php:319
-#: ..\..\..\admin\_users_form.php:207 ..\..\..\admin\_users_groupform.php:125
-#: ..\..\..\install\index.php:278 ..\..\..\skins\_profile.php:92
+#: ..\..\..\admin\_users_form.php:207
+#: ..\..\..\admin\_users_groupform.php:125
+#: ..\..\..\install\index.php:278
+#: ..\..\..\skins\_profile.php:92
 msgid "Reset"
 msgstr "Reset"
 
@@ -1612,32 +1649,23 @@ msgstr "Standaard skin:"
 
 #: ..\..\..\admin\_blogs_form.php:21
 msgid "This is the default skin that will be used to display this blog."
-msgstr ""
-"Dit is de standaard skin die word gebruikt bij weergave van dit weblog."
+msgstr "Dit is de standaard skin die word gebruikt bij weergave van dit weblog."
 
 #: ..\..\..\admin\_blogs_form.php:23
 msgid "Allow skin switching"
 msgstr "Sta skin wisseling toe"
 
 #: ..\..\..\admin\_blogs_form.php:23
-msgid ""
-"Users will be able to select another skin to view the blog (and their "
-"prefered skin will be saved in a cookie)."
-msgstr ""
-"Gebruikers kunnen een andere skin kiezen om het weblog te bekijken (en hun "
-"gekozen skin zal worden bewaard in een cookie)."
+msgid "Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie)."
+msgstr "Gebruikers kunnen een andere skin kiezen om het weblog te bekijken (en hun gekozen skin zal worden bewaard in een cookie)."
 
 #: ..\..\..\admin\_blogs_form.php:25
 msgid "Display blog list"
 msgstr "Toon weblog lijst"
 
 #: ..\..\..\admin\_blogs_form.php:25
-msgid ""
-"Check this if you want to display the list of all blogs on your blog page "
-"(if your skin or template supports this)."
-msgstr ""
-"Vink dit aan als je een lijst van alle weblogs wilt weergeven op jouw weblog "
-"pagina (als jouw skin of slabloon dit toestaat)."
+msgid "Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this)."
+msgstr "Vink dit aan als je een lijst van alle weblogs wilt weergeven op jouw weblog pagina (als jouw skin of slabloon dit toestaat)."
 
 #: ..\..\..\admin\_blogs_form.php:32
 msgid "Tagline"
@@ -1667,7 +1695,8 @@ msgstr "Dit word gebruikt in de meta tag sleutelwoorden. GEEN HTML!"
 msgid "Long Description"
 msgstr "Lange Omschrijving"
 
-#: ..\..\..\admin\_blogs_form.php:43 ..\..\..\admin\_blogs_form.php:49
+#: ..\..\..\admin\_blogs_form.php:43
+#: ..\..\..\admin\_blogs_form.php:49
 msgid "This is displayed on the blog template."
 msgstr "Dit word weergegeven in het weblog sjabloon"
 
@@ -1679,7 +1708,8 @@ msgstr "Blogroll tekst"
 msgid "Blog"
 msgstr "Weblog"
 
-#: ..\..\..\admin\_blogs_list.php:17 ..\..\..\admin\_blogs_main.subform.php:15
+#: ..\..\..\admin\_blogs_list.php:17
+#: ..\..\..\admin\_blogs_main.subform.php:15
 msgid "Full Name"
 msgstr "Volledige Naam"
 
@@ -1691,14 +1721,19 @@ msgstr "Weblog URL"
 msgid "Static File"
 msgstr "Statisch Bestand"
 
-#: ..\..\..\admin\_blogs_list.php:20 ..\..\..\admin\_set_regional.form.php:46
-#: ..\..\..\admin\_set_regional.form.php:120 ..\..\..\admin\_users_form.php:96
-#: ..\..\..\htsrv\_reg_form.php:42 ..\..\..\skins\_profile.php:68
+#: ..\..\..\admin\_blogs_list.php:20
+#: ..\..\..\admin\_set_regional.form.php:46
+#: ..\..\..\admin\_set_regional.form.php:120
+#: ..\..\..\admin\_users_form.php:96
+#: ..\..\..\htsrv\_reg_form.php:42
+#: ..\..\..\skins\_profile.php:68
 msgid "Locale"
 msgstr "Taal"
 
-#: ..\..\..\admin\_blogs_list.php:42 ..\..\..\admin\_cats_list.php:27
-#: ..\..\..\admin\_users_list.php:56 ..\..\..\admin\_users_list.php:95
+#: ..\..\..\admin\_blogs_list.php:42
+#: ..\..\..\admin\_cats_list.php:27
+#: ..\..\..\admin\_users_list.php:56
+#: ..\..\..\admin\_users_list.php:95
 msgid "Properties"
 msgstr "Eigenschappen"
 
@@ -1719,21 +1754,29 @@ msgstr "Verwijder dit weblog!"
 #: ..\..\..\admin\_blogs_list.php:81
 #, php-format
 msgid ""
-"Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete "
-"ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n"
-"\\nThis CANNOT be undone!"
+"Are you sure you want to delete blog #%d ?\\n"
+"\\n"
+"WARNING: This will delete ALL POST, COMMENTS,\\n"
+"CATEGORIES and other data related to that Blog!\\n"
+"\\n"
+"This CANNOT be undone!"
 msgstr ""
-"Weet je zeker dat je  webblog #%d wilt verwijderen?\\n\\nWAARSCHUWING: Dit "
-"zal ALLE ARTIKELEN, REACTIES,\\nCATEGORIËN en andere gerelateerde data van "
-"het weblog verwijderen!\\n\\nDit KAN NIET ongedaan gemaakt worden!"
+"Weet je zeker dat je  webblog #%d wilt verwijderen?\\n"
+"\\n"
+"WAARSCHUWING: Dit zal ALLE ARTIKELEN, REACTIES,\\n"
+"CATEGORIËN en andere gerelateerde data van het weblog verwijderen!\\n"
+"\\n"
+"Dit KAN NIET ongedaan gemaakt worden!"
 
 #: ..\..\..\admin\_blogs_list.php:82
 msgid "Copy this blog!"
 msgstr "Kopieer dit weblog!"
 
 #. TRANS: Abbrev. for Copy
-#: ..\..\..\admin\_blogs_list.php:82 ..\..\..\admin\_set_regional.form.php:197
-#: ..\..\..\admin\_users_list.php:69 ..\..\..\admin\_users_list.php:137
+#: ..\..\..\admin\_blogs_list.php:82
+#: ..\..\..\admin\_set_regional.form.php:197
+#: ..\..\..\admin\_users_list.php:69
+#: ..\..\..\admin\_users_list.php:137
 msgid "Copy"
 msgstr "Kopieer"
 
@@ -1798,12 +1841,8 @@ msgid "URL blog name / Stub name"
 msgstr "URL weblog naam / Stub naam"
 
 #: ..\..\..\admin\_blogs_main.subform.php:40
-msgid ""
-"Used in URLs to identify this blog. This should be the stub filename if you "
-"use stub file access."
-msgstr ""
-"Word gebruikt in de URLS om dit weblog te identificeren. Dit zou de stub "
-"bestandsnaam moeten zijn als je stub toegang gebruikt."
+msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
+msgstr "Word gebruikt in de URLS om dit weblog te identificeren. Dit zou de stub bestandsnaam moeten zijn als je stub toegang gebruikt."
 
 #: ..\..\..\admin\_blogs_new.form.php:13
 msgid "New blog"
@@ -1947,17 +1986,8 @@ msgid "New category here"
 msgstr "Nieuwe categorie hier"
 
 #: ..\..\..\admin\_cats_list.php:60
-msgid ""
-"<strong>Note:</strong> Deleting a category does not delete posts from that "
-"category. It will just assign them to the parent category. When deleting a "
-"root category, posts will be assigned to the oldest remaining category in "
-"the same blog (smallest category number)."
-msgstr ""
-"<strong>NB:</strong>Verwijderen van een categorie verwijdert niet de "
-"artikelen uit deze categorie. Het zal deze toevoegen aan de hoofd categorie. "
-"Als je een hoofdcategorie verwijdert, zullen de artikelen worden "
-"overgeplaatst naar de oudst overgebleven categorie in hetzelfde weblog "
-"(kleinste categorie nummer)."
+msgid "<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number)."
+msgstr "<strong>NB:</strong>Verwijderen van een categorie verwijdert niet de artikelen uit deze categorie. Het zal deze toevoegen aan de hoofd categorie. Als je een hoofdcategorie verwijdert, zullen de artikelen worden overgeplaatst naar de oudst overgebleven categorie in hetzelfde weblog (kleinste categorie nummer)."
 
 #: ..\..\..\admin\_edit_form.php:99
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:362
@@ -1972,30 +2002,40 @@ msgstr "Taal"
 msgid "Link to url"
 msgstr "Link naar URL"
 
-#: ..\..\..\admin\_edit_form.php:132 ..\..\..\admin\_users_form.php:104
-#: ..\..\..\admin\_users_list.php:20 ..\..\..\htsrv\comment_post.php:138
-#: ..\..\..\htsrv\register.php:118 ..\..\..\htsrv\_reg_complete.php:15
-#: ..\..\..\htsrv\_reg_form.php:37 ..\..\..\skins\_feedback.php:177
-#: ..\..\..\skins\_profile.php:69 ..\..\..\skins\basic\_feedback.php:170
+#: ..\..\..\admin\_edit_form.php:132
+#: ..\..\..\admin\_users_form.php:104
+#: ..\..\..\admin\_users_list.php:20
+#: ..\..\..\htsrv\comment_post.php:138
+#: ..\..\..\htsrv\register.php:118
+#: ..\..\..\htsrv\_reg_complete.php:15
+#: ..\..\..\htsrv\_reg_form.php:37
+#: ..\..\..\skins\_feedback.php:177
+#: ..\..\..\skins\_profile.php:69
+#: ..\..\..\skins\basic\_feedback.php:170
 #: ..\..\..\skins\basic\_profile.php:71
 msgid "Email"
 msgstr "E-mail"
 
-#: ..\..\..\admin\_edit_form.php:136 ..\..\..\admin\_users_form.php:116
+#: ..\..\..\admin\_edit_form.php:136
+#: ..\..\..\admin\_users_form.php:116
 #: ..\..\..\admin\_users_list.php:21
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:345
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:357
-#: ..\..\..\skins\_profile.php:70 ..\..\..\skins\basic\_profile.php:72
+#: ..\..\..\skins\_profile.php:70
+#: ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
 msgstr "URL"
 
-#: ..\..\..\admin\_edit_form.php:160 ..\..\..\admin\_edit_showposts.php:296
-#: ..\..\..\admin\_set_general.form.php:48 ..\..\..\skins\_feedback.php:207
+#: ..\..\..\admin\_edit_form.php:160
+#: ..\..\..\admin\_edit_showposts.php:296
+#: ..\..\..\admin\_set_general.form.php:48
+#: ..\..\..\skins\_feedback.php:207
 #: ..\..\..\skins\basic\_feedback.php:199
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
-#: ..\..\..\admin\_edit_form.php:160 ..\..\..\admin\_set_general.form.php:48
+#: ..\..\..\admin\_edit_form.php:160
+#: ..\..\..\admin\_set_general.form.php:48
 msgid "This option is deprecated, you should avoid using it."
 msgstr "Deze optie is verouderd, je moet proberen om hem niet te grbuiken."
 
@@ -2055,7 +2095,8 @@ msgstr "TrackBack URLs"
 msgid "(Separate by space)"
 msgstr "(Gescheiden door spatie)"
 
-#: ..\..\..\admin\_edit_form.php:283 ..\..\..\admin\_edit_form.php:496
+#: ..\..\..\admin\_edit_form.php:283
+#: ..\..\..\admin\_edit_form.php:496
 #: ..\..\..\admin\_edit_showposts.php:133
 msgid "Status"
 msgstr "Status"
@@ -2064,17 +2105,17 @@ msgstr "Status"
 msgid "The post will be publicly published"
 msgstr "Het artikel zal publiekelijk worden gepubliseerd"
 
-#: ..\..\..\admin\_edit_form.php:289 ..\..\..\admin\_edit_showposts.php:354
+#: ..\..\..\admin\_edit_form.php:289
+#: ..\..\..\admin\_edit_showposts.php:354
 msgid "Published (Public)"
 msgstr "Gepubliseerd (Publiekelijk)"
 
 #: ..\..\..\admin\_edit_form.php:295
 msgid "The post will be published but visible only by logged-in blog members"
-msgstr ""
-"Het artikel word gepubliseerd, maar alleen zichtbaar voor ingelogde weblog "
-"leden"
+msgstr "Het artikel word gepubliseerd, maar alleen zichtbaar voor ingelogde weblog leden"
 
-#: ..\..\..\admin\_edit_form.php:295 ..\..\..\admin\_edit_showposts.php:356
+#: ..\..\..\admin\_edit_form.php:295
+#: ..\..\..\admin\_edit_showposts.php:356
 msgid "Protected (Members only)"
 msgstr "Beschermd (Alleen leden)"
 
@@ -2082,28 +2123,29 @@ msgstr "Beschermd (Alleen leden)"
 msgid "The post will be published but visible only by yourself"
 msgstr "Het artikel word gepubliseerd, maar alleen zichtbaar voor uzelf"
 
-#: ..\..\..\admin\_edit_form.php:301 ..\..\..\admin\_edit_showposts.php:358
+#: ..\..\..\admin\_edit_form.php:301
+#: ..\..\..\admin\_edit_showposts.php:358
 msgid "Private (You only)"
 msgstr "Privé (Alleen Uzelf)"
 
-#: ..\..\..\admin\_edit_form.php:307 ..\..\..\admin\_edit_form.php:313
+#: ..\..\..\admin\_edit_form.php:307
+#: ..\..\..\admin\_edit_form.php:313
 msgid "The post will appear only in the backoffice"
 msgstr "Het artikel zal alleen verschijnen in het backoffice"
 
-#: ..\..\..\admin\_edit_form.php:307 ..\..\..\admin\_edit_showposts.php:360
+#: ..\..\..\admin\_edit_form.php:307
+#: ..\..\..\admin\_edit_showposts.php:360
 msgid "Draft (Not published!)"
 msgstr "Ontwerp (Niet gepubliseerd)"
 
-#: ..\..\..\admin\_edit_form.php:313 ..\..\..\admin\_edit_showposts.php:362
+#: ..\..\..\admin\_edit_form.php:313
+#: ..\..\..\admin\_edit_showposts.php:362
 msgid "Deprecated (Not published!)"
 msgstr "Verouderd (Niet gepubliseerd)"
 
 #: ..\..\..\admin\_edit_form.php:327
-msgid ""
-"Select main category in target blog and optionnaly check addtionnal "
-"categories"
-msgstr ""
-"Selecteer hoofd categorie in doel weblog en kies optioneel extra categoriën"
+msgid "Select main category in target blog and optionnaly check addtionnal categories"
+msgstr "Selecteer hoofd categorie in doel weblog en kies optioneel extra categoriën"
 
 #: ..\..\..\admin\_edit_form.php:348
 msgid "Select as an additionnal category"
@@ -2119,19 +2161,20 @@ msgstr "NB: Gekruisd plaatsen tussen meerdere weblogs is momenteel toegestaan."
 
 #: ..\..\..\admin\_edit_form.php:400
 msgid "Note: Cross posting among multiple blogs is currently disabled."
-msgstr ""
-"NB: Gekruisd plaatsen tussen meerdere weblogs is momenteel niet toegestaan."
+msgstr "NB: Gekruisd plaatsen tussen meerdere weblogs is momenteel niet toegestaan."
 
 #: ..\..\..\admin\_edit_form.php:402
 msgid "Note: Cross posting among multiple categories is currently disabled."
-msgstr ""
-"NB: Gekruisd plaatsen tussen meerdere categoriën is momenteel niet "
-"toegestaan."
+msgstr "NB: Gekruisd plaatsen tussen meerdere categoriën is momenteel niet toegestaan."
 
-#: ..\..\..\admin\_edit_form.php:412 ..\..\..\admin\_edit_showposts.php:192
-#: ..\..\..\skins\_feedback.php:50 ..\..\..\skins\basic\_feedback.php:50
-#: ..\..\..\skins\custom\_main.php:261 ..\..\..\skins\custom\_main.php:266
-#: ..\..\..\skins\custom\_main.php:271 ..\..\..\skins\custom\_main.php:276
+#: ..\..\..\admin\_edit_form.php:412
+#: ..\..\..\admin\_edit_showposts.php:192
+#: ..\..\..\skins\_feedback.php:50
+#: ..\..\..\skins\basic\_feedback.php:50
+#: ..\..\..\skins\custom\_main.php:261
+#: ..\..\..\skins\custom\_main.php:266
+#: ..\..\..\skins\custom\_main.php:271
+#: ..\..\..\skins\custom\_main.php:276
 #: ..\..\..\skins\fplanque2002\_main.php:278
 #: ..\..\..\skins\fplanque2002\_main.php:283
 #: ..\..\..\skins\fplanque2002\_main.php:288
@@ -2171,7 +2214,8 @@ msgstr "Renderer"
 msgid "Comment info"
 msgstr "Reactie info"
 
-#: ..\..\..\admin\_edit_form.php:494 ..\..\..\htsrv\comment_post.php:131
+#: ..\..\..\admin\_edit_form.php:494
+#: ..\..\..\htsrv\comment_post.php:131
 #: ..\..\..\htsrv\comment_post.php:137
 msgid "Author"
 msgstr "Auteur"
@@ -2243,11 +2287,11 @@ msgstr "Verwijder"
 
 #: ..\..\..\admin\_edit_showposts.php:163
 msgid ""
-"You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
-"delete."
+"You are about to delete this post!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
 msgstr ""
-"Je staat op het punt dit artikel te verwijderen\\n\\'Annuleren\\' om te "
-"stoppen, \\'OK\\' om te verwijderen."
+"Je staat op het punt dit artikel te verwijderen\\n"
+"\\'Annuleren\\' om te stoppen, \\'OK\\' om te verwijderen."
 
 #: ..\..\..\admin\_edit_showposts.php:173
 msgid "Publish NOW!"
@@ -2272,34 +2316,36 @@ msgstr "1 reactie"
 #: ..\..\..\admin\_edit_showposts.php:179
 #: ..\..\..\b2evocore\_class_item.php:693
 #: ..\..\..\b2evocore\_functions_comments.php:207
-#, fuzzy, php-format
+#, php-format
 msgid "%d comments"
-msgstr "% reacties"
+msgstr "%d reacties"
 
 #: ..\..\..\admin\_edit_showposts.php:180
 msgid "1 Trackback"
 msgstr "1 TrackBack"
 
 #: ..\..\..\admin\_edit_showposts.php:180
-#, fuzzy, php-format
+#, php-format
 msgid "%d Trackbacks"
-msgstr "% TrackBacks"
+msgstr "%d TrackBacks"
 
 #: ..\..\..\admin\_edit_showposts.php:181
 msgid "1 Pingback"
 msgstr "1 PingBack"
 
 #: ..\..\..\admin\_edit_showposts.php:181
-#, fuzzy, php-format
+#, php-format
 msgid "%d Pingbacks"
-msgstr "% PingBacks"
+msgstr "%d PingBacks"
 
-#: ..\..\..\admin\_edit_showposts.php:192 ..\..\..\skins\_feedback.php:61
+#: ..\..\..\admin\_edit_showposts.php:192
+#: ..\..\..\skins\_feedback.php:61
 #: ..\..\..\skins\basic\_feedback.php:61
 msgid "Trackbacks"
 msgstr "TrackBacks"
 
-#: ..\..\..\admin\_edit_showposts.php:192 ..\..\..\skins\_feedback.php:66
+#: ..\..\..\admin\_edit_showposts.php:192
+#: ..\..\..\skins\_feedback.php:66
 #: ..\..\..\skins\basic\_feedback.php:66
 msgid "Pingbacks"
 msgstr "PingBacks"
@@ -2308,67 +2354,78 @@ msgstr "PingBacks"
 msgid "No feedback for this post yet..."
 msgstr "Nog geen reacties op dit artikel ..."
 
-#: ..\..\..\admin\_edit_showposts.php:231 ..\..\..\skins\_feedback.php:105
+#: ..\..\..\admin\_edit_showposts.php:231
+#: ..\..\..\skins\_feedback.php:105
 #: ..\..\..\skins\basic\_feedback.php:103
 msgid "Comment from:"
 msgstr "Reactie van:"
 
-#: ..\..\..\admin\_edit_showposts.php:235 ..\..\..\skins\_feedback.php:111
+#: ..\..\..\admin\_edit_showposts.php:235
+#: ..\..\..\skins\_feedback.php:111
 #: ..\..\..\skins\basic\_feedback.php:109
 msgid "Trackback from:"
 msgstr "TrackBack van:"
 
-#: ..\..\..\admin\_edit_showposts.php:239 ..\..\..\skins\_feedback.php:116
+#: ..\..\..\admin\_edit_showposts.php:239
+#: ..\..\..\skins\_feedback.php:116
 #: ..\..\..\skins\basic\_feedback.php:114
 msgid "Pingback from:"
 msgstr "PingBack van:"
 
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
+#: ..\..\..\admin\_edit_showposts.php:249
+#: ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
 msgid "Permamnent link to this comment"
 msgstr "Permanente link naar deze reactie"
 
 #: ..\..\..\admin\_edit_showposts.php:256
 msgid ""
-"You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
-"delete."
+"You are about to delete this comment!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
 msgstr ""
-"Je staat op het punt deze reactie te verwijderen\\n\\'Annuleren\\' om te "
-"stoppen, \\'OK\\' om te verwijderen."
+"Je staat op het punt deze reactie te verwijderen\\n"
+"\\'Annuleren\\' om te stoppen, \\'OK\\' om te verwijderen."
 
 #: ..\..\..\admin\_edit_showposts.php:271
 #: ..\..\..\b2evocore\_class_item.php:691
 #: ..\..\..\b2evocore\_functions_comments.php:205
-#: ..\..\..\skins\_feedback.php:139 ..\..\..\skins\basic\_feedback.php:133
+#: ..\..\..\skins\_feedback.php:139
+#: ..\..\..\skins\basic\_feedback.php:133
 msgid "Leave a comment"
 msgstr "Plaats een reactie"
 
-#: ..\..\..\admin\_edit_showposts.php:279 ..\..\..\skins\_feedback.php:158
+#: ..\..\..\admin\_edit_showposts.php:279
+#: ..\..\..\skins\_feedback.php:158
 #: ..\..\..\skins\basic\_feedback.php:153
 msgid "User"
 msgstr "Gebruiker"
 
-#: ..\..\..\admin\_edit_showposts.php:282 ..\..\..\skins\_feedback.php:161
+#: ..\..\..\admin\_edit_showposts.php:282
+#: ..\..\..\skins\_feedback.php:161
 #: ..\..\..\skins\basic\_feedback.php:156
 msgid "Edit profile"
 msgstr "Bewerk profiel"
 
-#: ..\..\..\admin\_edit_showposts.php:287 ..\..\..\skins\_feedback.php:195
+#: ..\..\..\admin\_edit_showposts.php:287
+#: ..\..\..\skins\_feedback.php:195
 #: ..\..\..\skins\basic\_feedback.php:187
 msgid "Comment text"
 msgstr "Reactie tekst"
 
-#: ..\..\..\admin\_edit_showposts.php:289 ..\..\..\skins\_feedback.php:197
+#: ..\..\..\admin\_edit_showposts.php:289
+#: ..\..\..\skins\_feedback.php:197
 #: ..\..\..\skins\basic\_feedback.php:189
 msgid "Allowed XHTML tags"
 msgstr "Toegestande XHTML tags"
 
-#: ..\..\..\admin\_edit_showposts.php:289 ..\..\..\skins\_feedback.php:198
+#: ..\..\..\admin\_edit_showposts.php:289
+#: ..\..\..\skins\_feedback.php:198
 #: ..\..\..\skins\basic\_feedback.php:190
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URLs, e-mail, AIM en ICQs worden automatisch geconverteerd."
 
-#: ..\..\..\admin\_edit_showposts.php:295 ..\..\..\skins\_feedback.php:203
+#: ..\..\..\admin\_edit_showposts.php:295
+#: ..\..\..\skins\_feedback.php:203
 #: ..\..\..\skins\basic\_feedback.php:195
 msgid "Options"
 msgstr "Opties"
@@ -2377,7 +2434,8 @@ msgstr "Opties"
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Enters worden &lt;br&gt;)"
 
-#: ..\..\..\admin\_edit_showposts.php:303 ..\..\..\skins\_feedback.php:220
+#: ..\..\..\admin\_edit_showposts.php:303
+#: ..\..\..\skins\_feedback.php:220
 #: ..\..\..\skins\basic\_feedback.php:212
 msgid "Send comment"
 msgstr "Verstuur reactie"
@@ -2450,7 +2508,8 @@ msgstr "Blader/Bewerk"
 msgid "Stats"
 msgstr "Statistieken"
 
-#: ..\..\..\admin\_menutop.php:103 ..\..\..\admin\_users_groupform.php:101
+#: ..\..\..\admin\_menutop.php:103
+#: ..\..\..\admin\_users_groupform.php:101
 msgid "Templates"
 msgstr "Sjablonen"
 
@@ -2468,8 +2527,7 @@ msgstr "Nieuwe gebruikers kunnen registreren"
 
 #: ..\..\..\admin\_set_general.form.php:20
 msgid "Check to allow new users to register themselves."
-msgstr ""
-"Aanvinken om toe te staan dat nieuwe gebruikers zichzelf kunnen registreren."
+msgstr "Aanvinken om toe te staan dat nieuwe gebruikers zichzelf kunnen registreren."
 
 #: ..\..\..\admin\_set_general.form.php:22
 msgid "Group for new users"
@@ -2548,14 +2606,8 @@ msgid "Use extra-path info"
 msgstr "Gebruik extra-path info"
 
 #: ..\..\..\admin\_set_general.form.php:55
-msgid ""
-"Recommended if your webserver supports it. Links will look like "
-"'stub/2003/05/20/post_title' instead of 'stub?"
-"title=post_title&c=1&tb=1&pb=1&more=1'."
-msgstr ""
-"Aangeraden als je webserver het ondersteunt. Links zullen er uitzien als "
-"stub/2003/05/20/post_titel in plaats van stub?"
-"title=post_title&c=1&tb=1&pb=1&more=1"
+msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
+msgstr "Aangeraden als je webserver het ondersteunt. Links zullen er uitzien als stub/2003/05/20/post_titel in plaats van stub?title=post_title&c=1&tb=1&pb=1&more=1"
 
 #: ..\..\..\admin\_set_general.form.php:58
 msgid "Post called up by its URL title (Recommended)"
@@ -2571,9 +2623,7 @@ msgstr "Artikel op archief pagina, aangeroepen via zijn ID"
 
 #: ..\..\..\admin\_set_general.form.php:61
 msgid "Post on archive page, located by its title (for Cafelog compatibility)"
-msgstr ""
-"Artikel op archief pagina, aangeroepen via zijn titel (voor Cafelog "
-"compatibiliteit)"
+msgstr "Artikel op archief pagina, aangeroepen via zijn titel (voor Cafelog compatibiliteit)"
 
 #: ..\..\..\admin\_set_general.form.php:62
 msgid "Permalink type"
@@ -2595,8 +2645,10 @@ msgstr "voor gebruikers."
 #: ..\..\..\admin\_set_plugins.form.php:68
 #: ..\..\..\admin\_set_regional.form.php:71
 #: ..\..\..\admin\_set_regional.form.php:318
-#: ..\..\..\admin\_users_form.php:206 ..\..\..\admin\_users_groupform.php:124
-#: ..\..\..\skins\_profile.php:91 ..\..\..\skins\basic\_profile.php:93
+#: ..\..\..\admin\_users_form.php:206
+#: ..\..\..\admin\_users_groupform.php:124
+#: ..\..\..\skins\_profile.php:91
+#: ..\..\..\skins\basic\_profile.php:93
 msgid "Update"
 msgstr "Bijwerken"
 
@@ -2627,12 +2679,8 @@ msgstr "Bewerk Taal"
 
 #: ..\..\..\admin\_set_regional.form.php:46
 #, php-format
-msgid ""
-"The first two letters should be a <a %s>ISO 639 language code</a>. The last "
-"two letters should be a <a %s>ISO 3166 country code</a>."
-msgstr ""
-"De eerste twee letters moeten de  <a %s>ISO 639 taal code</a> zijn. De "
-"laatste twee letters moeten de  <a %s>ISO 3166 land code</a> zijn."
+msgid "The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>."
+msgstr "De eerste twee letters moeten de  <a %s>ISO 639 taal code</a> zijn. De laatste twee letters moeten de  <a %s>ISO 3166 land code</a> zijn."
 
 #: ..\..\..\admin\_set_regional.form.php:47
 #: ..\..\..\admin\_set_regional.form.php:121
@@ -2682,9 +2730,7 @@ msgstr "Taal bestand"
 
 #: ..\..\..\admin\_set_regional.form.php:58
 msgid "the message file being used, from <code>locales</code> subdirectory"
-msgstr ""
-"het berichten bestand wat word gebruikt, van de <code>locales</code> "
-"subdirectory"
+msgstr "het berichten bestand wat word gebruikt, van de <code>locales</code> subdirectory"
 
 #: ..\..\..\admin\_set_regional.form.php:59
 #: ..\..\..\admin\_set_regional.form.php:146
@@ -2692,17 +2738,11 @@ msgid "Priority"
 msgstr "Prioriteit"
 
 #: ..\..\..\admin\_set_regional.form.php:60
-msgid ""
-"1 is highest. It's use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE "
-"header), when we have more than locale with the requested language. It also "
-"affects the order in which locales are shown in dropdown boxes etc."
-msgstr ""
-"1 is het hoogste. Het word gebruikt voor de automatische taal detectie (van "
-"HTTP_ACCEPT_LANGUAGE header), wanneer we meer vertalingen hebben met de "
-"gewenste taal. Het heeft ook invloed op de volgorde waarmee de vertalingen "
-"worden getoond in de dropdown lijstjes etc."
+msgid "1 is highest. It's use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc."
+msgstr "1 is het hoogste. Het word gebruikt voor de automatische taal detectie (van HTTP_ACCEPT_LANGUAGE header), wanneer we meer vertalingen hebben met de gewenste taal. Het heeft ook invloed op de volgorde waarmee de vertalingen worden getoond in de dropdown lijstjes etc."
 
-#: ..\..\..\admin\_set_regional.form.php:71 ..\..\..\admin\_users_form.php:206
+#: ..\..\..\admin\_set_regional.form.php:71
+#: ..\..\..\admin\_users_form.php:206
 #: ..\..\..\admin\_users_groupform.php:124
 msgid "Create"
 msgstr "Aanmaken"
@@ -2715,14 +2755,8 @@ msgstr "Dit zal de taal \\'%s\\' vervangen. Ok?"
 
 #: ..\..\..\admin\_set_regional.form.php:75
 #, php-format
-msgid ""
-"We'll use the flag out of subdirectories from <code>%s</code>, where the "
-"filename is equal to the language part of the locale (characters 4-5; file "
-"extension is gif)."
-msgstr ""
-"We zullen de vlaggen uit de subdirectories van <code>%s</code> gebruiken, "
-"waar de bestandsnaam gelijk is aan het taal gedeelte van de taal(karakters 4-"
-"5; bestandsextensie is .gif)."
+msgid "We'll use the flag out of subdirectories from <code>%s</code>, where the filename is equal to the language part of the locale (characters 4-5; file extension is gif)."
+msgstr "We zullen de vlaggen uit de subdirectories van <code>%s</code> gebruiken, waar de bestandsnaam gelijk is aan het taal gedeelte van de taal(karakters 4-5; bestandsextensie is .gif)."
 
 #: ..\..\..\admin\_set_regional.form.php:85
 msgid "Note: default locale is not enabled."
@@ -2742,23 +2776,16 @@ msgstr "in uren"
 
 #: ..\..\..\admin\_set_regional.form.php:96
 #, php-format
-msgid ""
-"If you're not on the timezone of your server. Current server time is: %s."
-msgstr ""
-"Als je je niet in de tijdzone van de server bevind. Huidige server tijd is: %"
-"s."
+msgid "If you're not on the timezone of your server. Current server time is: %s."
+msgstr "Als je je niet in de tijdzone van de server bevind. Huidige server tijd is: %s."
 
 #: ..\..\..\admin\_set_regional.form.php:97
 msgid "Default locale"
 msgstr "Standaard Taal"
 
 #: ..\..\..\admin\_set_regional.form.php:97
-msgid ""
-"Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or "
-"blog locale (in this order)."
-msgstr ""
-"Standaard taal. Word overschreven door de HTTP_ACCEPT_LANGUAGE header, "
-"gebruikers vertaling of weblog vertaling (in deze volgorde)."
+msgid "Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or blog locale (in this order)."
+msgstr "Standaard taal. Word overschreven door de HTTP_ACCEPT_LANGUAGE header, gebruikers vertaling of weblog vertaling (in deze volgorde)."
 
 #: ..\..\..\admin\_set_regional.form.php:103
 msgid "Available locales"
@@ -2781,7 +2808,8 @@ msgid "Time fmt"
 msgstr "Tijd formaat"
 
 #: ..\..\..\admin\_set_regional.form.php:125
-#: ..\..\..\admin\_set_regional.form.php:199 ..\..\..\admin\_users_list.php:31
+#: ..\..\..\admin\_set_regional.form.php:199
+#: ..\..\..\admin\_users_list.php:31
 msgid "Edit"
 msgstr "Bewerk"
 
@@ -2875,34 +2903,47 @@ msgstr "Creeër een nieuw gebruikers profiel"
 msgid "Profile for:"
 msgstr "Profiel voor:"
 
-#: ..\..\..\admin\_users_form.php:76 ..\..\..\admin\_users_form.php:87
+#: ..\..\..\admin\_users_form.php:76
+#: ..\..\..\admin\_users_form.php:87
 #: ..\..\..\skins\_profile.php:58
 msgid "Login"
 msgstr "Inloggen"
 
-#: ..\..\..\admin\_users_form.php:77 ..\..\..\admin\_users_form.php:88
-#: ..\..\..\admin\_users_form.php:90 ..\..\..\admin\_users_form.php:91
-#: ..\..\..\skins\_profile.php:47 ..\..\..\skins\_profile.php:59
-#: ..\..\..\skins\_profile.php:61 ..\..\..\skins\_profile.php:62
+#: ..\..\..\admin\_users_form.php:77
+#: ..\..\..\admin\_users_form.php:88
+#: ..\..\..\admin\_users_form.php:90
+#: ..\..\..\admin\_users_form.php:91
+#: ..\..\..\skins\_profile.php:47
+#: ..\..\..\skins\_profile.php:59
+#: ..\..\..\skins\_profile.php:61
+#: ..\..\..\skins\_profile.php:62
 #: ..\..\..\skins\basic\_profile.php:49
 msgid "First name"
 msgstr "Voornaam"
 
-#: ..\..\..\admin\_users_form.php:78 ..\..\..\admin\_users_form.php:89
-#: ..\..\..\admin\_users_form.php:90 ..\..\..\admin\_users_form.php:91
-#: ..\..\..\skins\_profile.php:48 ..\..\..\skins\_profile.php:60
-#: ..\..\..\skins\_profile.php:61 ..\..\..\skins\_profile.php:62
+#: ..\..\..\admin\_users_form.php:78
+#: ..\..\..\admin\_users_form.php:89
+#: ..\..\..\admin\_users_form.php:90
+#: ..\..\..\admin\_users_form.php:91
+#: ..\..\..\skins\_profile.php:48
+#: ..\..\..\skins\_profile.php:60
+#: ..\..\..\skins\_profile.php:61
+#: ..\..\..\skins\_profile.php:62
 #: ..\..\..\skins\basic\_profile.php:50
 msgid "Last name"
 msgstr "Achternaam"
 
-#: ..\..\..\admin\_users_form.php:79 ..\..\..\admin\_users_form.php:86
-#: ..\..\..\admin\_users_list.php:18 ..\..\..\skins\_profile.php:49
-#: ..\..\..\skins\_profile.php:57 ..\..\..\skins\basic\_profile.php:51
+#: ..\..\..\admin\_users_form.php:79
+#: ..\..\..\admin\_users_form.php:86
+#: ..\..\..\admin\_users_list.php:18
+#: ..\..\..\skins\_profile.php:49
+#: ..\..\..\skins\_profile.php:57
+#: ..\..\..\skins\basic\_profile.php:51
 msgid "Nickname"
 msgstr "Bijnaam"
 
-#: ..\..\..\admin\_users_form.php:82 ..\..\..\skins\_profile.php:53
+#: ..\..\..\admin\_users_form.php:82
+#: ..\..\..\skins\_profile.php:53
 #: ..\..\..\skins\basic\_profile.php:55
 msgid "Identity shown"
 msgstr "Getoonde Identiteit"
@@ -2919,7 +2960,8 @@ msgstr "Bezoek Homepage"
 msgid "Search on ICQ.com"
 msgstr "Zoek op ICQ.com"
 
-#: ..\..\..\admin\_users_form.php:123 ..\..\..\skins\_profile.php:71
+#: ..\..\..\admin\_users_form.php:123
+#: ..\..\..\skins\_profile.php:71
 #: ..\..\..\skins\basic\_profile.php:73
 msgid "ICQ"
 msgstr "ICQ"
@@ -2940,26 +2982,26 @@ msgstr "MSN IM"
 msgid "YahooIM"
 msgstr "YahooIM"
 
-#: ..\..\..\admin\_users_form.php:136 ..\..\..\skins\_profile.php:76
+#: ..\..\..\admin\_users_form.php:136
+#: ..\..\..\skins\_profile.php:76
 #: ..\..\..\skins\basic\_profile.php:78
 msgid "Notifications"
 msgstr "Notificaties"
 
-#: ..\..\..\admin\_users_form.php:138 ..\..\..\skins\_profile.php:76
+#: ..\..\..\admin\_users_form.php:138
+#: ..\..\..\skins\_profile.php:76
 #: ..\..\..\skins\basic\_profile.php:78
-msgid ""
-"Check this to receive notification whenever one of your posts receives "
-"comments, trackbacks, etc."
-msgstr ""
-"Vink dit aan als je een notificatie wenst te ontvangen als er een reactie, "
-"trackback etc. op jouw artikel is."
+msgid "Check this to receive notification whenever one of your posts receives comments, trackbacks, etc."
+msgstr "Vink dit aan als je een notificatie wenst te ontvangen als er een reactie, trackback etc. op jouw artikel is."
 
-#: ..\..\..\admin\_users_form.php:142 ..\..\..\skins\_profile.php:80
+#: ..\..\..\admin\_users_form.php:142
+#: ..\..\..\skins\_profile.php:80
 #: ..\..\..\skins\basic\_profile.php:82
 msgid "New password"
 msgstr "Nieuw wachtwoord"
 
-#: ..\..\..\admin\_users_form.php:146 ..\..\..\skins\_profile.php:85
+#: ..\..\..\admin\_users_form.php:146
+#: ..\..\..\skins\_profile.php:85
 #: ..\..\..\skins\basic\_profile.php:87
 msgid "Confirm new password"
 msgstr "Bevestig nieuw wachtwoord"
@@ -2968,15 +3010,20 @@ msgstr "Bevestig nieuw wachtwoord"
 msgid "User information"
 msgstr "Gebruikers informatie"
 
-#: ..\..\..\admin\_users_form.php:157 ..\..\..\admin\_users_groupform.php:62
-#: ..\..\..\admin\_users_list.php:16 ..\..\..\skins\_profile.php:31
+#: ..\..\..\admin\_users_form.php:157
+#: ..\..\..\admin\_users_groupform.php:62
+#: ..\..\..\admin\_users_list.php:16
+#: ..\..\..\skins\_profile.php:31
 #: ..\..\..\skins\basic\_profile.php:33
 msgid "ID"
 msgstr "ID"
 
-#: ..\..\..\admin\_users_form.php:161 ..\..\..\skins\_profile.php:42
-#: ..\..\..\skins\basic\_profile.php:44 ..\..\..\skins\custom\_main.php:260
-#: ..\..\..\skins\custom\_main.php:265 ..\..\..\skins\custom\_main.php:270
+#: ..\..\..\admin\_users_form.php:161
+#: ..\..\..\skins\_profile.php:42
+#: ..\..\..\skins\basic\_profile.php:44
+#: ..\..\..\skins\custom\_main.php:260
+#: ..\..\..\skins\custom\_main.php:265
+#: ..\..\..\skins\custom\_main.php:270
 #: ..\..\..\skins\custom\_main.php:275
 #: ..\..\..\skins\fplanque2002\_main.php:277
 #: ..\..\..\skins\fplanque2002\_main.php:282
@@ -3005,12 +3052,15 @@ msgstr "Met Browser:"
 msgid "User rights"
 msgstr "Gebruikers rechten"
 
-#: ..\..\..\admin\_users_form.php:186 ..\..\..\admin\_users_list.php:27
-#: ..\..\..\skins\_profile.php:37 ..\..\..\skins\basic\_profile.php:39
+#: ..\..\..\admin\_users_form.php:186
+#: ..\..\..\admin\_users_list.php:27
+#: ..\..\..\skins\_profile.php:37
+#: ..\..\..\skins\basic\_profile.php:39
 msgid "Level"
 msgstr "Level"
 
-#: ..\..\..\admin\_users_form.php:191 ..\..\..\admin\_users_form.php:196
+#: ..\..\..\admin\_users_form.php:191
+#: ..\..\..\admin\_users_form.php:196
 msgid "User group"
 msgstr "Gebruikers groep"
 
@@ -3103,7 +3153,8 @@ msgstr "Standaard groep voor nieuwe gebruikers"
 msgid "Copy group"
 msgstr "Kopieer groep"
 
-#: ..\..\..\admin\_users_list.php:75 ..\..\..\admin\_users_list.php:76
+#: ..\..\..\admin\_users_list.php:75
+#: ..\..\..\admin\_users_list.php:76
 msgid "Delete group"
 msgstr "Verwijder groep"
 
@@ -3115,18 +3166,19 @@ msgstr "verhoog gebruikers level"
 msgid "decrease user level"
 msgstr "verlaag gebruikers level"
 
-#: ..\..\..\admin\_users_list.php:142 ..\..\..\admin\_users_list.php:143
+#: ..\..\..\admin\_users_list.php:142
+#: ..\..\..\admin\_users_list.php:143
 msgid "Delete user"
 msgstr "Verwijder gebruiker"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_users_list.php:142
 msgid ""
-"Are you sure you want to delete this user?\\nWarning: all his posts will be "
-"deleted too!"
+"Are you sure you want to delete this user?\\n"
+"Warning: all his posts will be deleted too!"
 msgstr ""
-"Weet U zeker dat u deze gebruiker wilt verwijderen?\\nWaarschuwing:: alle "
-"artikelen van deze gebruiker zullen ook worden verwijderd!"
+"Weet U zeker dat u deze gebruiker wilt verwijderen?\\n"
+"Waarschuwing:: alle artikelen van deze gebruiker zullen ook worden verwijderd!"
 
 #: ..\..\..\admin\_users_list.php:160
 msgid "New user..."
@@ -3138,19 +3190,14 @@ msgstr "Nieuwe groep..."
 
 #: ..\..\..\b2evocore\_blog_main.php:220
 #, php-format
-msgid ""
-"The default skin [%s] does not exist. It must be properly set in the blog "
-"stub file [%s]. Contact the <a %s>webmaster</a>..."
-msgstr ""
-"De standaard skin [%s}] bestaat niet! Het moet goed worden opgegeven in het "
-"weblog stub bestand [%s]. Neem contact op met de <a %s>webmaster</a>..."
+msgid "The default skin [%s] does not exist. It must be properly set in the blog stub file [%s]. Contact the <a %s>webmaster</a>..."
+msgstr "De standaard skin [%s}] bestaat niet! Het moet goed worden opgegeven in het weblog stub bestand [%s]. Neem contact op met de <a %s>webmaster</a>..."
 
 #: ..\..\..\b2evocore\_class_blog.php:355
 #: ..\..\..\b2evocore\_class_blog.php:369
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
-msgstr ""
-"FOUT! Kon niet verwijderen! Je moet het bestand [%s] met de hand verwijderen."
+msgstr "FOUT! Kon niet verwijderen! Je moet het bestand [%s] met de hand verwijderen."
 
 #: ..\..\..\b2evocore\_class_calendar.php:178
 #, php-format
@@ -3171,7 +3218,6 @@ msgid "one post in this month"
 msgstr "één artikel in deze maand"
 
 #: ..\..\..\b2evocore\_class_calendar.php:283
-#, fuzzy
 msgid "previous month"
 msgstr "vorige maand"
 
@@ -3211,12 +3257,11 @@ msgstr "Sorry, er is niets om te tonen..."
 #: ..\..\..\b2evocore\_class_db.php:86
 #, php-format
 msgid "Error selecting database [%s]!"
-msgstr ""
+msgstr "Fout bij selecteren database [%s]!"
 
 #: ..\..\..\b2evocore\_class_db.php:141
-#, fuzzy
 msgid "MySQL error!"
-msgstr "Oeps, MySQL fout!"
+msgstr "MySQL fout!"
 
 #: ..\..\..\b2evocore\_class_group.php:63
 msgid "New group"
@@ -3298,9 +3343,9 @@ msgid "1 feedback"
 msgstr "1 reactie"
 
 #: ..\..\..\b2evocore\_class_item.php:677
-#, fuzzy, php-format
+#, php-format
 msgid "%d feedbacks"
-msgstr "% reacties"
+msgstr "%d reacties"
 
 #: ..\..\..\b2evocore\_class_item.php:690
 msgid "Display comments / Leave a comment"
@@ -3322,9 +3367,9 @@ msgstr "TrackBack (1)"
 
 #: ..\..\..\b2evocore\_class_item.php:701
 #: ..\..\..\b2evocore\_functions_trackback.php:174
-#, fuzzy, php-format
+#, php-format
 msgid "Trackbacks (%d)"
-msgstr "TrackBacks (%)"
+msgstr "TrackBacks (%d)"
 
 #: ..\..\..\b2evocore\_class_item.php:706
 msgid "Display pingbacks"
@@ -3341,9 +3386,9 @@ msgid "Pingback (1)"
 msgstr "PingBack (1)"
 
 #: ..\..\..\b2evocore\_class_item.php:709
-#, fuzzy, php-format
+#, php-format
 msgid "Pingback (%d)"
-msgstr "PingBack (%)"
+msgstr "PingBack (%d)"
 
 #: ..\..\..\b2evocore\_class_itemlist.php:518
 msgid "Invalid post, please correct these errors:"
@@ -3353,7 +3398,8 @@ msgstr "Kan niet plaatsen, los deze fouten op:"
 msgid "Sorry, there is no post to display..."
 msgstr "Sorry, er is geen artikel om te tonen..."
 
-#: ..\..\..\b2evocore\_class_pop3.php:78 ..\..\..\b2evocore\_class_pop3.php:86
+#: ..\..\..\b2evocore\_class_pop3.php:78
+#: ..\..\..\b2evocore\_class_pop3.php:86
 #: ..\..\..\b2evocore\_class_pop3.php:98
 msgid "POP3 connect:"
 msgstr "POP3 verbinding"
@@ -3362,7 +3408,8 @@ msgstr "POP3 verbinding"
 msgid "No server specified"
 msgstr "Geen server opgegeven"
 
-#: ..\..\..\b2evocore\_class_pop3.php:86 ..\..\..\b2evocore\_class_pop3.php:98
+#: ..\..\..\b2evocore\_class_pop3.php:86
+#: ..\..\..\b2evocore\_class_pop3.php:98
 #: ..\..\..\b2evocore\_class_pop3.php:137
 #: ..\..\..\b2evocore\_class_pop3.php:337
 #: ..\..\..\b2evocore\_class_pop3.php:385
@@ -3533,8 +3580,7 @@ msgstr "Commando mislukt"
 
 #: ..\..\..\b2evocore\_class_settings.php:38
 msgid "Sorry, your b2evolution database does not match the script version."
-msgstr ""
-"Sorry, jouw b2evolution database komt niet overeen met de script versie."
+msgstr "Sorry, jouw b2evolution database komt niet overeen met de script versie."
 
 #: ..\..\..\b2evocore\_class_user.php:58
 msgid "New user"
@@ -3569,7 +3615,8 @@ msgstr "Geen Antwoord!"
 msgid "Remote error"
 msgstr "Remote fout"
 
-#: ..\..\..\b2evocore\_functions.php:604 ..\..\..\b2evocore\_functions.php:609
+#: ..\..\..\b2evocore\_functions.php:604
+#: ..\..\..\b2evocore\_functions.php:609
 msgid "Response"
 msgstr "Antwoord"
 
@@ -3686,8 +3733,7 @@ msgstr "Kan niet verwijderen zolang er sub-categoriën zijn!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:119
 msgid "Cannot delete last category if there are posts inside!"
-msgstr ""
-"Kan de laatste categorie niet verwijderen zolang er artikelen in staan!"
+msgstr "Kan de laatste categorie niet verwijderen zolang er artikelen in staan!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:206
 #, php-format
@@ -3741,7 +3787,8 @@ msgstr "geen query - geen parameters!"
 msgid "no query string found"
 msgstr "geen query string gevonden"
 
-#: ..\..\..\b2evocore\_functions_locale.php:342 ..\..\..\install\index.php:83
+#: ..\..\..\b2evocore\_functions_locale.php:342
+#: ..\..\..\install\index.php:83
 msgid "name"
 msgstr "naam"
 
@@ -3787,17 +3834,17 @@ msgstr "Start met ontvangen van headers en content"
 #: ..\..\..\b2evocore\_functions_pingback.php:178
 #: ..\..\..\b2evocore\_functions_pingback.php:179
 msgid "Pingback server found from X-Pingback header:"
-msgstr "Pinback server gevonden in X-Pingback header:"
+msgstr "Pingback server gevonden in X-Pingback header:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:192
 #: ..\..\..\b2evocore\_functions_pingback.php:193
 msgid "Pingback server found from Pingback <link /> tag:"
-msgstr "Pinback server gevondenvan Pingback <link /> tag:"
+msgstr "Pingback server gevonden van Pingback <link /> tag:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:201
 #: ..\..\..\b2evocore\_functions_pingback.php:202
 msgid "Pingback server not found in headers and content"
-msgstr "Pinback server niet gevonden in header en content"
+msgstr "Pingback server niet gevonden in header en content"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:207
 #: ..\..\..\b2evocore\_functions_pingback.php:208
@@ -3821,7 +3868,7 @@ msgstr "Pagina Waarvandaan Gelinkt:"
 #: ..\..\..\b2evocore\_functions_pingback.php:231
 #, php-format
 msgid "Pinging %s..."
-msgstr "Pinging %s..."
+msgstr "Pingen %s..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:241
 msgid "END"
@@ -3832,25 +3879,25 @@ msgid "Pingbacks done."
 msgstr "PingBacks klaar."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:268
-#, fuzzy, php-format
+#, php-format
 msgid "Pingbacks (%d)"
-msgstr "PingBacks (%)"
+msgstr "PingBacks (%d)"
 
 #: ..\..\..\b2evocore\_functions_pings.php:28
 msgid "Pinging b2evolution.net..."
-msgstr "Pinging b2evolution.net..."
+msgstr "Pingen van b2evolution.net..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:79
 msgid "Pinging Weblogs.com..."
-msgstr "Pinging Weblogs.com..."
+msgstr "Pingen van Weblogs.com..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:140
 msgid "Pinging Blo.gs..."
-msgstr "Pinging Blo.gs..."
+msgstr "Pingen Blo.gs..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:193
 msgid "Pinging technorati.com..."
-msgstr "Pinging technorati.com..."
+msgstr "Pingen van technorati.com..."
 
 #: ..\..\..\b2evocore\_functions_template.php:47
 msgid "Archives for"
@@ -4003,7 +4050,7 @@ msgstr "Don"
 msgid "Fri"
 msgstr "Vrij"
 
-#. TRANS: abbrev. for Saturday
+#  TRANS: abbrev. for Saturday
 #: ..\..\..\b2evocore\_vars.php:131
 msgid "Sat"
 msgstr "Zat"
@@ -4102,7 +4149,7 @@ msgstr "Aug"
 msgid "Sep"
 msgstr "Sep"
 
-#. TRANS: abbrev. for October
+#  TRANS: abbrev. for October
 #: ..\..\..\b2evocore\_vars.php:168
 msgid "Oct"
 msgstr "Okt"
@@ -4225,12 +4272,14 @@ msgstr "Kan de reactie niet plaatsen, los de volgende problemen op:"
 msgid "Back to comment editing"
 msgstr "Terug naar reactie bewerking"
 
-#: ..\..\..\htsrv\comment_post.php:124 ..\..\..\htsrv\comment_post.php:127
+#: ..\..\..\htsrv\comment_post.php:124
+#: ..\..\..\htsrv\comment_post.php:127
 #, php-format
 msgid "New comment on your post #%d \"%s\""
 msgstr "Nieuwe reactie op jouw artikel #%d \"%s\""
 
-#: ..\..\..\htsrv\comment_post.php:139 ..\..\..\htsrv\trackback.php:104
+#: ..\..\..\htsrv\comment_post.php:139
+#: ..\..\..\htsrv\trackback.php:104
 #: ..\..\..\xmlsrv\xmlrpc.php:1401
 msgid "Url"
 msgstr "Url"
@@ -4239,7 +4288,8 @@ msgstr "Url"
 msgid "Comment"
 msgstr "Reactie"
 
-#: ..\..\..\htsrv\comment_post.php:142 ..\..\..\htsrv\trackback.php:106
+#: ..\..\..\htsrv\comment_post.php:142
+#: ..\..\..\htsrv\trackback.php:106
 #: ..\..\..\xmlsrv\xmlrpc.php:1403
 msgid "Edit/Delete"
 msgstr "Bewerk/Verwijder"
@@ -4281,10 +4331,14 @@ msgstr "Onderwerp voorvoegsel komt niet overeen"
 msgid "Raw content:"
 msgstr "Raw inhoud:"
 
-#: ..\..\..\htsrv\getmail.php:199 ..\..\..\htsrv\login.php:79
-#: ..\..\..\htsrv\register.php:118 ..\..\..\htsrv\_login_form.php:42
-#: ..\..\..\htsrv\_lostpass_form.php:22 ..\..\..\htsrv\_reg_complete.php:14
-#: ..\..\..\htsrv\_reg_form.php:23 ..\..\..\skins\_profile.php:28
+#: ..\..\..\htsrv\getmail.php:199
+#: ..\..\..\htsrv\login.php:79
+#: ..\..\..\htsrv\register.php:118
+#: ..\..\..\htsrv\_login_form.php:42
+#: ..\..\..\htsrv\_lostpass_form.php:22
+#: ..\..\..\htsrv\_reg_complete.php:14
+#: ..\..\..\htsrv\_reg_form.php:23
+#: ..\..\..\skins\_profile.php:28
 #: ..\..\..\skins\basic\_profile.php:30
 msgid "Login:"
 msgstr "Inloggen"
@@ -4321,12 +4375,10 @@ msgstr "Geplaatste Inhoud"
 msgid "Mission complete, message deleted."
 msgstr "Missie voltooid, bericht verwijdert."
 
-#: ..\..\..\htsrv\login.php:73 ..\..\..\htsrv\login.php:96
-msgid ""
-"An email with the new password was sent successfully to your email address."
-msgstr ""
-"Een email met het nieuwe wachtwoord is succesvol verzonden naar jouw email "
-"adres."
+#: ..\..\..\htsrv\login.php:73
+#: ..\..\..\htsrv\login.php:96
+msgid "An email with the new password was sent successfully to your email address."
+msgstr "Een email met het nieuwe wachtwoord is succesvol verzonden naar jouw email adres."
 
 #: ..\..\..\htsrv\login.php:80
 msgid "New Password:"
@@ -4356,7 +4408,8 @@ msgstr "NB: Je bent al ingelogd!"
 msgid "Continue..."
 msgstr "Doorgaan..."
 
-#: ..\..\..\htsrv\profile_update.php:33 ..\..\..\skins\_profile.php:16
+#: ..\..\..\htsrv\profile_update.php:33
+#: ..\..\..\skins\_profile.php:16
 #: ..\..\..\skins\basic\_profile.php:16
 msgid "You are not logged in."
 msgstr "Je bent niet ingelogd!"
@@ -4365,10 +4418,14 @@ msgstr "Je bent niet ingelogd!"
 msgid "You are not logged in under the same account you are trying to modify."
 msgstr "Je bent niet ingelogd onder het account wat U probeert te wijzigen."
 
-#: ..\..\..\htsrv\profile_update.php:44 ..\..\..\htsrv\profile_update.php:51
-#: ..\..\..\htsrv\profile_update.php:61 ..\..\..\htsrv\profile_update.php:70
-#: ..\..\..\htsrv\profile_update.php:76 ..\..\..\htsrv\profile_update.php:93
-#: ..\..\..\htsrv\profile_update.php:98 ..\..\..\htsrv\profile_update.php:104
+#: ..\..\..\htsrv\profile_update.php:44
+#: ..\..\..\htsrv\profile_update.php:51
+#: ..\..\..\htsrv\profile_update.php:61
+#: ..\..\..\htsrv\profile_update.php:70
+#: ..\..\..\htsrv\profile_update.php:76
+#: ..\..\..\htsrv\profile_update.php:93
+#: ..\..\..\htsrv\profile_update.php:98
+#: ..\..\..\htsrv\profile_update.php:104
 msgid "Back to profile"
 msgstr "Terug naar profiel"
 
@@ -4378,27 +4435,26 @@ msgstr "geef jouw bijnaam op (kan hetzelfde zijn als jouw login)"
 
 #: ..\..\..\htsrv\profile_update.php:60
 msgid "your ICQ UIN can only be a number, no letters allowed"
-msgstr ""
-"jouw ICQ UIN kan alleen maar nummers zijn, het mag geen letters bevatten."
+msgstr "jouw ICQ UIN kan alleen maar nummers zijn, het mag geen letters bevatten."
 
-#: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\register.php:71
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\register.php:71
 msgid "please type your e-mail address"
 msgstr "geef jouw email adres op"
 
-#: ..\..\..\htsrv\profile_update.php:75 ..\..\..\htsrv\register.php:76
+#: ..\..\..\htsrv\profile_update.php:75
+#: ..\..\..\htsrv\register.php:76
 msgid "the email address is invalid"
 msgstr "Het email adres is niet juist"
 
-#: ..\..\..\htsrv\profile_update.php:84 ..\..\..\htsrv\profile_update.php:92
+#: ..\..\..\htsrv\profile_update.php:84
+#: ..\..\..\htsrv\profile_update.php:92
 msgid "you typed your new password only once. Go back to type it twice."
-msgstr ""
-"je hebt jouw wachtwoord maar een keer opgegeven. Ga terug om het tweemaal op "
-"te geven."
+msgstr "je hebt jouw wachtwoord maar een keer opgegeven. Ga terug om het tweemaal op te geven."
 
 #: ..\..\..\htsrv\profile_update.php:97
 msgid "you typed two different passwords. Go back to correct that."
-msgstr ""
-"Je hebt twee verschillende wachtwoorden opgegeven. Ga terug en los dat op."
+msgstr "Je hebt twee verschillende wachtwoorden opgegeven. Ga terug en los dat op."
 
 #: ..\..\..\htsrv\register.php:41
 msgid "please enter a Login"
@@ -4416,7 +4472,8 @@ msgstr "geef hetzelfde wachtwoord in de twee wachtwoord velden"
 msgid "this login is already registered, please choose another one"
 msgstr "deze login is al geregistreerd, kies een andere a.u.b."
 
-#: ..\..\..\htsrv\register.php:117 ..\..\..\htsrv\register.php:121
+#: ..\..\..\htsrv\register.php:117
+#: ..\..\..\htsrv\register.php:121
 msgid "new user registration on your blog"
 msgstr "nieuwe gebruikersregistratie op jouw weblog"
 
@@ -4424,16 +4481,19 @@ msgstr "nieuwe gebruikersregistratie op jouw weblog"
 msgid "Manage users"
 msgstr "Beheer gebruikers"
 
-#: ..\..\..\htsrv\trackback.php:97 ..\..\..\htsrv\trackback.php:101
+#: ..\..\..\htsrv\trackback.php:97
+#: ..\..\..\htsrv\trackback.php:101
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Nieuwe trackback op jouw artikel #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:103 ..\..\..\xmlsrv\xmlrpc.php:1400
+#: ..\..\..\htsrv\trackback.php:103
+#: ..\..\..\xmlsrv\xmlrpc.php:1400
 msgid "Website"
 msgstr "Website"
 
-#: ..\..\..\htsrv\trackback.php:105 ..\..\..\xmlsrv\xmlrpc.php:1402
+#: ..\..\..\htsrv\trackback.php:105
+#: ..\..\..\xmlsrv\xmlrpc.php:1402
 msgid "Excerpt"
 msgstr "Uittreksel"
 
@@ -4445,11 +4505,13 @@ msgstr "Inlog formulier"
 msgid "You will have to accept cookies in order to log in."
 msgstr "Je moet cookies accepteren om in te kunnen loggen."
 
-#: ..\..\..\htsrv\_login_form.php:47 ..\..\..\htsrv\_reg_form.php:28
+#: ..\..\..\htsrv\_login_form.php:47
+#: ..\..\..\htsrv\_reg_form.php:28
 msgid "Password:"
 msgstr "Wachtwoord"
 
-#: ..\..\..\htsrv\_login_form.php:53 ..\..\..\htsrv\_reg_complete.php:20
+#: ..\..\..\htsrv\_login_form.php:53
+#: ..\..\..\htsrv\_reg_complete.php:20
 msgid "Log in!"
 msgstr "Inloggen!"
 
@@ -4463,9 +4525,7 @@ msgstr "Wachtwoord vergeten?"
 
 #: ..\..\..\htsrv\_lostpass_form.php:14
 msgid "A new password will be generated and sent to you by email."
-msgstr ""
-"Een nieuw wachtwoord zal worden gegenereerd en naar U verstuurd worden per e-"
-"mail."
+msgstr "Een nieuw wachtwoord zal worden gegenereerd en naar U verstuurd worden per e-mail."
 
 #: ..\..\..\htsrv\_lostpass_form.php:28
 msgid "Generate new password!"
@@ -4522,41 +4582,35 @@ msgstr "Installer voor versie"
 
 #: ..\..\..\install\index.php:54
 msgid "Current installation"
-msgstr ""
+msgstr "Huidige installatie"
 
 #: ..\..\..\install\index.php:55
 msgid "Install menu"
-msgstr ""
+msgstr "Installatie menu"
 
 #: ..\..\..\install\index.php:56
-#, fuzzy
 msgid "PHP info"
-msgstr "PHP versie"
+msgstr "PHP info"
 
 #: ..\..\..\install\index.php:57
-#, fuzzy
 msgid "Go to Blogs"
-msgstr "Naar het weblog"
+msgstr "Ga naar weblogs"
 
 #: ..\..\..\install\index.php:58
-#, fuzzy
 msgid "Go to Admin"
-msgstr "Admin"
+msgstr "G naar Admin"
 
 #: ..\..\..\install\index.php:59
-#, fuzzy
 msgid "Online"
-msgstr "Onderschrift"
+msgstr "Online"
 
 #: ..\..\..\install\index.php:60
-#, fuzzy
 msgid "Manual"
-msgstr "Januari"
+msgstr "Handboek"
 
 #: ..\..\..\install\index.php:61
-#, fuzzy
 msgid "Support"
-msgstr "Rapporteer"
+msgstr "Ondersteuning"
 
 #: ..\..\..\install\index.php:70
 msgid "Language/Locale"
@@ -4567,92 +4621,76 @@ msgid "Choose a default language/locale for your b2evo installation."
 msgstr "Kies de standaard taal/vertaling voor jouw b2evo installatie"
 
 #: ..\..\..\install\index.php:99
-msgid ""
-"Check your database config settings below and update them if necessary..."
-msgstr ""
+msgid "Check your database config settings below and update them if necessary..."
+msgstr "Controleer jouw database configuratie hier beneden en werk deze bij waar nodig..."
 
 #: ..\..\..\install\index.php:109
 #, php-format
-msgid ""
-"The minimum requirement for this version of b2evolution is PHP version %s, "
-"but you have %s!"
-msgstr ""
-"De minimale vereiste voor deze versie van b2evolution is PHP versie %s, maar "
-"jij hebt %s!"
+msgid "The minimum requirement for this version of b2evolution is PHP version %s, but you have %s!"
+msgstr "De minimale vereiste voor deze versie van b2evolution is PHP versie %s, maar jij hebt %s!"
 
 #: ..\..\..\install\index.php:132
-msgid ""
-"It seems that the database config settings you entered don't work. Please "
-"check them carefully and try again..."
+msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
 msgstr ""
 
 #: ..\..\..\install\index.php:142
 #, php-format
 msgid "Could not load original conf file [%s]. Is it missing?"
-msgstr ""
+msgstr "Kon het originele configuratie bestand niet laden [%s]. Bestaat deze wel?"
 
 #: ..\..\..\install\index.php:172
 msgid "Config file update"
-msgstr ""
+msgstr "Configuratie bestand bijwerken"
 
 #: ..\..\..\install\index.php:173
 #, php-format
 msgid "We cannot automatically update your config file [%s]!"
-msgstr ""
+msgstr "We kunnen niet automatisch jouw configuratie bestand bijwerken [%s]!"
 
 #: ..\..\..\install\index.php:174
 msgid "There are two ways to deal with this:"
-msgstr ""
+msgstr "Er zijn twee manieren om hier mee om te gaan:"
 
 #: ..\..\..\install\index.php:176
-msgid ""
-"You can allow the installer to update the config file by changing its "
-"permissions:"
+msgid "You can allow the installer to update the config file by changing its permissions:"
 msgstr ""
 
 #: ..\..\..\install\index.php:178
 #, php-format
-msgid ""
-"<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about "
-"permissions</a>."
+msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
 msgstr ""
 
 #: ..\..\..\install\index.php:179
 msgid "Come back to this page and refresh/reload."
-msgstr ""
+msgstr "Kom terug op deze pagina en ververs/herlaad de pagina."
 
 #: ..\..\..\install\index.php:183
 msgid "Alternatively, you can update the config file manually:"
-msgstr ""
+msgstr "Als alternatief, kan je het configuratie bestand handmatig bijwerken:"
 
 #: ..\..\..\install\index.php:185
 msgid "Open the _config.php file locally with a text editor."
-msgstr ""
+msgstr "Open het _config.php bestand lokaal met een tekstverwerker"
 
 #: ..\..\..\install\index.php:186
-#, fuzzy
 msgid "Delete all contents!"
-msgstr "Artikel Inhoud"
+msgstr "Verwijder alle inhoud!"
 
 #: ..\..\..\install\index.php:187
 msgid "Copy the contents from the box below."
-msgstr ""
+msgstr "Kopieer de inhoud van de box hier beneden."
 
 #: ..\..\..\install\index.php:188
-msgid ""
-"Paste them into your local text editor. <strong>ATTENTION: make sure there "
-"is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</"
-"strong> Any space, tab, newline or blank line at the end of the conf file "
-"may prevent cookies from being set when you try to log in later."
+msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
 msgstr ""
 
 #: ..\..\..\install\index.php:189
 msgid "Save the new _config.php file locally."
-msgstr ""
+msgstr "Bewaar het nieuwe _config.php bestand lokaal."
 
 #: ..\..\..\install\index.php:190
 msgid "Upload the file to your server, into the /_conf folder."
-msgstr ""
+msgstr "Upload het bestand naar de server, in de /_conf map."
 
 #: ..\..\..\install\index.php:191
 #, php-format
@@ -4661,138 +4699,109 @@ msgstr ""
 
 #: ..\..\..\install\index.php:195
 msgid "This is how your _config.php should look like:"
-msgstr ""
+msgstr "Dit is hoe jouw _config.php eruit zou moeten zien:"
 
 #: ..\..\..\install\index.php:215
 #, php-format
 msgid "Your configuration file [%s] has been successfully updated."
-msgstr ""
+msgstr "Jouw configuratie bestand [%s] is met succes bijgewerkt."
 
 #: ..\..\..\install\index.php:245
-#, fuzzy
 msgid "Base configuration"
-msgstr "Gebruikers informatie"
+msgstr "Basis configuratie"
 
 #: ..\..\..\install\index.php:247
-msgid ""
-"Your config file has not been edited yet. You can do this by filling in the "
-"form below."
-msgstr ""
+msgid "Your config file has not been edited yet. You can do this by filling in the form below."
+msgstr "Je configatie bestand is nog niet bewerkt. Je kan dit doen door het onderstaande formulier in te vullen."
 
 #: ..\..\..\install\index.php:249
 msgid "This is the minimum info we need to set up b2evolution on this server:"
-msgstr ""
+msgstr "Dit is de minimale info die we moeten weten om b2evolution te installeren op deze server:"
 
 #: ..\..\..\install\index.php:256
-msgid ""
-"Database you want to install into (These settings should be provided by your "
-"host)"
-msgstr ""
+msgid "Database you want to install into (These settings should be provided by your host)"
+msgstr "Database waar je in wilt installeren (Deze instellingen zouden je moeten zijn gegeven door je hosting provider)"
 
-#: ..\..\..\install\index.php:258 ..\..\..\install\index.php:349
-#, fuzzy
+#: ..\..\..\install\index.php:258
+#: ..\..\..\install\index.php:349
 msgid "mySQL Username"
-msgstr "Gebruikersnaam"
+msgstr "mySQL Gebruikersnaam"
 
 #: ..\..\..\install\index.php:258
 msgid "Your username to access the database"
-msgstr ""
+msgstr "Jouw gebruikersnaam voor toegang tot de database"
 
-#: ..\..\..\install\index.php:259 ..\..\..\install\index.php:350
-#, fuzzy
+#: ..\..\..\install\index.php:259
+#: ..\..\..\install\index.php:350
 msgid "mySQL Password"
-msgstr "Wachtwoord"
+msgstr "mySQL Wachtwoord"
 
 #: ..\..\..\install\index.php:259
 msgid "Your password to access the database"
-msgstr ""
-
-#: ..\..\..\install\index.php:260 ..\..\..\install\index.php:351
-#, fuzzy
-msgid "mySQL Database"
-msgstr "Database"
+msgstr "Jouw wachtwoord voor toegang tot de database"
 
 #: ..\..\..\install\index.php:260
-#, fuzzy
-msgid "Name of the database you want to use"
-msgstr "Weet je zeker dat je wilt resetten?"
+#: ..\..\..\install\index.php:351
+msgid "mySQL Database"
+msgstr "mySQL Database"
 
-#: ..\..\..\install\index.php:261 ..\..\..\install\index.php:352
+#: ..\..\..\install\index.php:260
+msgid "Name of the database you want to use"
+msgstr "Naam van de database die je wilt gebruiken"
+
+#: ..\..\..\install\index.php:261
+#: ..\..\..\install\index.php:352
 msgid "mySQL Host"
-msgstr ""
+msgstr "mySQL Host"
 
 #: ..\..\..\install\index.php:261
 msgid "You probably won't have to change this"
-msgstr ""
+msgstr "Je hoeft dit waarschijnlijk niet te veranderen"
 
 #: ..\..\..\install\index.php:266
-#, fuzzy
 msgid "Additional settings"
-msgstr "Extra acties"
-
-#: ..\..\..\install\index.php:268 ..\..\..\install\index.php:353
-#, fuzzy
-msgid "Base URL"
-msgstr "Weblog URL"
+msgstr "Extra instellingen"
 
 #: ..\..\..\install\index.php:268
-msgid ""
-"This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY "
-"or not much will work. If you want to test b2evolution on your local "
-"machine, in order for login cookies to work, you MUST use http://"
-"<strong>localhost</strong>/path... Do NOT use your machine's name!"
+#: ..\..\..\install\index.php:353
+msgid "Base URL"
+msgstr "Basis URL"
+
+#: ..\..\..\install\index.php:268
+msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
 msgstr ""
 
 #: ..\..\..\install\index.php:270
 msgid "Your email"
-msgstr ""
+msgstr "Jouw email"
 
 #: ..\..\..\install\index.php:270
-msgid ""
-"Will be used in severe error messages so that users can contact you. You "
-"will also receive notifications for new user registrations."
+msgid "Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations."
 msgstr ""
 
 #: ..\..\..\install\index.php:277
 msgid "Update config file"
-msgstr ""
+msgstr "Bijwerken configuratiebestand"
 
 #: ..\..\..\install\index.php:297
 msgid "What do you want to install?"
 msgstr "Wat wil je installeren?"
 
 #: ..\..\..\install\index.php:301
-msgid ""
-"The database tables installation can be done in different ways. Choose one:"
-msgstr ""
-"De database tabellen installatie kan op drie verschillende manieren worden "
-"gedaan. Kies er één:"
+msgid "The database tables installation can be done in different ways. Choose one:"
+msgstr "De database tabellen installatie kan op drie verschillende manieren worden gedaan. Kies er één:"
 
 #: ..\..\..\install\index.php:304
-msgid ""
-"<strong>New Install</strong>: Install b2evolution database tables with "
-"sample data."
-msgstr ""
-"<strong>Nieuwe Installatie</strong>: Installeer b2evolution database "
-"tabellen met voorbeeld data."
+msgid "<strong>New Install</strong>: Install b2evolution database tables with sample data."
+msgstr "<strong>Nieuwe Installatie</strong>: Installeer b2evolution database tabellen met voorbeeld data."
 
 #: ..\..\..\install\index.php:307
-msgid ""
-"<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade "
-"your b2evolution database tables in order to make them compatible with the "
-"current version!"
-msgstr ""
-"<strong>Bijwerken vanaf een vorige versie van b2evolution</strong>: "
-"Bijwerken van jouw b2evolution database tabellen om ze gelijk te maken met "
-"de huidige versie!"
+msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!"
+msgstr "<strong>Bijwerken vanaf een vorige versie van b2evolution</strong>: Bijwerken van jouw b2evolution database tabellen om ze gelijk te maken met de huidige versie!"
 
 #: ..\..\..\install\index.php:310
-msgid ""
-"<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution "
-"database tables and copy your existing Cafelog/b2 data into them."
-msgstr ""
-"<strong>Bijwerken vanaf Cafelog/b2 v 0.6.x</strong>: Installeer b2evolution "
-"database tablellen en kopieer jouw bestaande Cafelog/b2 data erin."
+msgid "<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them."
+msgstr "<strong>Bijwerken vanaf Cafelog/b2 v 0.6.x</strong>: Installeer b2evolution database tablellen en kopieer jouw bestaande Cafelog/b2 data erin."
 
 #: ..\..\..\install\index.php:317
 msgid "Delete b2evolution tables"
@@ -4801,20 +4810,14 @@ msgstr "Verwijder b2evolution tabellen"
 #: ..\..\..\install\index.php:318
 #, fuzzy
 msgid ""
-"If you have installed b2evolution tables before and wish to start anew, you "
-"must delete the\n"
-"\t\t\t\t\tb2evolution tables before you can start a new installation. "
-"<strong>WARNING: All your b2evolution\n"
-"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any "
-"other tables though, if you have\n"
+"If you have installed b2evolution tables before and wish to start anew, you must delete the\n"
+"\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n"
+"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n"
 "\t\t\t\t\tsome, will not be touched in any way."
 msgstr ""
-"If you have installed b2evolution tables before and wish to start anew, you "
-"must delete the\n"
-"\t\t\t\t\tb2evolution tables before you can start a new installation. "
-"<strong>WARNING: All your b2evolution\n"
-"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any "
-"other tables though, if you have\n"
+"If you have installed b2evolution tables before and wish to start anew, you must delete the\n"
+"\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n"
+"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n"
 "\t\t\t\t\tsome, will not be touched in any way."
 
 #: ..\..\..\install\index.php:326
@@ -4823,36 +4826,25 @@ msgstr "Installeer nu de Database Tabellen !"
 
 #: ..\..\..\install\index.php:333
 msgid "Need to start anew?"
-msgstr ""
+msgstr "Opnieuw beginnen?"
 
 #: ..\..\..\install\index.php:334
 #, fuzzy
-msgid ""
-"<p>If you have installed b2evolution tables before and wish to start anew, "
-"you must delete the b2evolution tables before you can start a new "
-"installation. b2evolution can delete its own tables for you, but for obvious "
-"security reasons, this feature is disabled by default.</p>"
+msgid "<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>"
 msgstr ""
-"If you have installed b2evolution tables before and wish to start anew, you "
-"must delete the\n"
-"\t\t\t\t\tb2evolution tables before you can start a new installation. "
-"<strong>WARNING: All your b2evolution\n"
-"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any "
-"other tables though, if you have\n"
+"If you have installed b2evolution tables before and wish to start anew, you must delete the\n"
+"\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n"
+"\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n"
 "\t\t\t\t\tsome, will not be touched in any way."
 
 #: ..\..\..\install\index.php:344
 msgid "Config file recap..."
-msgstr ""
+msgstr "Configuratie bestand ophalen..."
 
 #: ..\..\..\install\index.php:346
-#, fuzzy, php-format
-msgid ""
-"If you don't see correct settings here, STOP before going any further, and "
-"<a %s>redo your configuration</a>."
-msgstr ""
-"(Als je hier niet de juiste instellingen ziet, STOP dan voordat je verder "
-"gaat, en controleer jouw configuratie.)"
+#, php-format
+msgid "If you don't see correct settings here, STOP before going any further, and <a %s>redo your configuration</a>."
+msgstr "(Als je hier niet de juiste instellingen ziet, STOP dan voordat je verder gaat, en <a %s>controleer jouw configuratie</a>.)"
 
 #: ..\..\..\install\index.php:350
 msgid "(Set, but not shown for security reasons)"
@@ -4869,46 +4861,38 @@ msgstr "Installatie is gelukt!"
 #: ..\..\..\install\index.php:371
 #, php-format
 msgid ""
-"<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\"."
-"</p>\n"
-"\t\t<p>Note that password carefully! It is a <em>random</em> password that "
-"is given to you when you install b2evolution. If you lose it, you will have "
-"to delete the database tables and re-install anew.</p>"
+"<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\".</p>\n"
+"\t\t<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>"
 msgstr ""
-"<p>Je kan nu <a %s>inloggen</a> met de login \"admin\" en wachtwoord \"%s\"."
-"</p>\n"
-"\t\t<p>Let op het wachtwoord! Dit is een <em>willekeurig</em> gekozen "
-"wachtwoord dat je is gegeven wanneer je b2evolution installeerd. Als je het "
-"kwijtraakt, zal je alle database tabellen meten verwijderen en opnieuw "
-"installeren.</p>"
+"<p>Je kan nu <a %s>inloggen</a> met de login \"admin\" en wachtwoord \"%s\".</p>\n"
+"\t\t<p>Let op het wachtwoord! Dit is een <em>willekeurig</em> gekozen wachtwoord dat je is gegeven wanneer je b2evolution installeerd. Als je het kwijtraakt, zal je alle database tabellen meten verwijderen en opnieuw installeren.</p>"
 
 #: ..\..\..\install\index.php:385
 msgid "Upgrading data in existing b2evolution database"
 msgstr "Bijwerken van de data in een bestaande b2evolution database"
 
-#: ..\..\..\install\index.php:389 ..\..\..\install\index.php:408
+#: ..\..\..\install\index.php:389
+#: ..\..\..\install\index.php:408
 msgid "Upgrade completed successfully!"
 msgstr "Upgrade is succesvol voltooid!"
 
-#: ..\..\..\install\index.php:390 ..\..\..\install\index.php:409
+#: ..\..\..\install\index.php:390
+#: ..\..\..\install\index.php:409
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
-msgstr ""
-"Je kan nu <A %s>inloggen</a> met jouw standaard %s gebruikersnaam en "
-"wachtwoord"
+msgstr "Je kan nu <A %s>inloggen</a> met jouw standaard %s gebruikersnaam en wachtwoord"
 
 #: ..\..\..\install\index.php:403
 msgid "Installing b2evolution tables and copying existing b2 data"
 msgstr "Installeer b2evolution tabellen en kopieer de bestaande b2 data erin"
 
 #: ..\..\..\install\index.php:422
-#, fuzzy
 msgid "Deleting b2evolution tables from the datatase"
-msgstr "Installeer b2evolution tabellen met voorbeeld data"
+msgstr "Verwijder b2evolution tabellen uit de database"
 
 #: ..\..\..\install\index.php:426
 msgid "<p>For security reasons, the reset feature is disabled by default.</p>"
-msgstr ""
+msgstr "<p>Om beveiligingsredenenen, is de reset functie standaard uitgeschakeld.</p>"
 
 #: ..\..\..\install\index.php:436
 msgid "Reset done!"
@@ -4919,91 +4903,53 @@ msgid "Back to menu"
 msgstr "Terug naar menu"
 
 #: ..\..\..\install\index.php:444
-#, fuzzy
 msgid "official website"
-msgstr "Officiële website"
+msgstr "officiële website"
 
 #: ..\..\..\install\index.php:446
 msgid "contact"
-msgstr ""
+msgstr "contact"
 
 #: ..\..\..\install\_functions_cafelogupgrade.php:33
 #, php-format
-msgid ""
-"This blog holds all your posts upgraded from Cafelog. This blog is named '%"
-"s'. It has index #%d in the database. By default it is accessed through a "
-"stub file called '<code>%s</code>'. %s"
-msgstr ""
-"Dit weblog bevat alle artikelen die zijn geupgrade vanuit Cafelog. Het "
-"weblog heet '%s'. Het heeft index #%d in de database. Standaard bereikbaar "
-"via een stub bestand genaamd '<code>%s</code>'. %s"
+msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"
+msgstr "Dit weblog bevat alle artikelen die zijn geupgrade vanuit Cafelog. Het weblog heet '%s'. Het heeft index #%d in de database. Standaard bereikbaar via een stub bestand genaamd '<code>%s</code>'. %s"
 
 #: ..\..\..\install\_functions_create.php:402
 msgid "This is a sample blogroll entry"
 msgstr "Dit een voorbeeld artikel van de blogroll"
 
 #: ..\..\..\install\_functions_create.php:402
-msgid ""
-"This is sample text describing the blogroll entry. In most cases however, "
-"you'll want to leave this blank, providing just a Title and an Url for your "
-"blogroll entries (favorite/related sites)."
-msgstr ""
-"Deze voorbeeld tekst beschrijft een blogroll artikel. In de meeste gevallen "
-"zal je dit leeg willen laten met alleen een Titel en een URL voor jouw "
-"blogroll artikelen. (favorieten/gerelateerde websites)."
+msgid "This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."
+msgstr "Deze voorbeeld tekst beschrijft een blogroll artikel. In de meeste gevallen zal je dit leeg willen laten met alleen een Titel en een URL voor jouw blogroll artikelen. (favorieten/gerelateerde websites)."
 
 #: ..\..\..\install\_functions_create.php:423
 #, php-format
-msgid ""
-"This is a demo blog named '%s'. It has index #%d in the database. By default "
-"it is accessed through a stub file called '<code>%s</code>'. %s"
-msgstr ""
-"Dit is een demo weblog genaamd '%s'. Het heeft index #%d in de database. "
-"Standaard bereikbaar via een stub bestand genaamd '<code>%s</code>'. %s"
+msgid "This is a demo blog named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"
+msgstr "Dit is een demo weblog genaamd '%s'. Het heeft index #%d in de database. Standaard bereikbaar via een stub bestand genaamd '<code>%s</code>'. %s"
 
 #: ..\..\..\install\_functions_create.php:425
 #, php-format
 msgid ""
 "<br />\n"
 "<br />\n"
-"You can edit this file to change the default skin used for this blog. You "
-"can also rename this file to a better name; but make sure you update the new "
-"name in the blogs admin.<br />\n"
+"You can edit this file to change the default skin used for this blog. You can also rename this file to a better name; but make sure you update the new name in the blogs admin.<br />\n"
 "<br />\n"
-"If you don't want to use skins, use the provided '<code>%s</code>' file "
-"instead."
+"If you don't want to use skins, use the provided '<code>%s</code>' file instead."
 msgstr ""
 "<br />\n"
 "<br />\n"
-"Je kan dit bestand bewerken om de standaard skin van dit weblog te "
-"veranderen. Je kan dit bestand ook hernoemen naar een betere naam; maar zorg "
-"er wel voor dat je die nieuwe naam ook in de weblog administratie verandert."
-"<br />\n"
+"Je kan dit bestand bewerken om de standaard skin van dit weblog te veranderen. Je kan dit bestand ook hernoemen naar een betere naam; maar zorg er wel voor dat je die nieuwe naam ook in de weblog administratie verandert.<br />\n"
 "<br />\n"
 "Als je geen skins wilt gebruiken, gebruik dan het '<code>%s</code>' bestand."
 
 #: ..\..\..\install\_functions_create.php:438
-msgid ""
-"Note: Blog #1 is a very special blog! It automatically aggregates all posts "
-"from all other blogs. This allows you to easily track everything that is "
-"posted on this system. You can hide this blog from the public by clearing "
-"it's 'Stub Urlname' in the blogs admin."
-msgstr ""
-"NB: WebLog #1 is een heel speciaal weblog! Het bevat automatisch alle "
-"artikelen uit alle weblogs. Op deze manier kan je makkelijk alles in de "
-"gaten houden wat er word geplaatst op dit systeem. Je kan dit weblog ook "
-"afschermen voor het publieke gedeelte door de 'Stub Urlnaam' leeg te maken "
-"in de weblogs administratie."
+msgid "Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin."
+msgstr "NB: WebLog #1 is een heel speciaal weblog! Het bevat automatisch alle artikelen uit alle weblogs. Op deze manier kan je makkelijk alles in de gaten houden wat er word geplaatst op dit systeem. Je kan dit weblog ook afschermen voor het publieke gedeelte door de 'Stub Urlnaam' leeg te maken in de weblogs administratie."
 
 #: ..\..\..\install\_functions_create.php:459
-#, fuzzy
-msgid ""
-"However, the main purpose for this blog is to be included as a side item to "
-"other blogs where it will display your favorite/related links."
-msgstr ""
-"Maar, het hoofddoel voor dit weblog is om te worden bijgevoegd als een "
-"zijbalk van andere weblogs waar het jouw favorieten/gerelateerde websites "
-"zal bevatten. Dit word ook 'Blogroll'genoemd."
+msgid "However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
+msgstr "Maar, het hoofddoel voor dit weblog is om te worden bijgevoegd als een zijbalk van andere weblogs waar het jouw favorieten/gerelateerde websites zal bevatten."
 
 #: ..\..\..\install\_functions_create.php:526
 msgid "Clean Permalinks! :idea:"
@@ -5011,21 +4957,13 @@ msgstr "Schone Permalinks :idea:"
 
 #: ..\..\..\install\_functions_create.php:526
 msgid ""
-"<p>b2evolution uses old-style permalinks and feedback links by default. This "
-"is to ensure maximum compatibility with various webserver configurations.</"
-"p>\n"
+"<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>\n"
 "\n"
-"<p>Nethertheless, once you feel comfortable with b2evolution, you should try "
-"activating clean permalinks in the Options screen... (check 'use extra-path "
-"info')</p>"
+"<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Options screen... (check 'use extra-path info')</p>"
 msgstr ""
-"<p>b2evolution uses old-style permalinks and feedback links by default. This "
-"is to ensure maximum compatibility with various webserver configurations.</"
-"p>\n"
+"<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>\n"
 "\n"
-"<p>Nethertheless, once you feel comfortable with b2evolution, you should try "
-"activating clean permalinks in the /conf/_advanced.php file... (<code>"
-"$use_extra_path_info = 1;</code>)</p>"
+"<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the /conf/_advanced.php file... (<code>$use_extra_path_info = 1;</code>)</p>"
 
 #: ..\..\..\install\_functions_create.php:532
 msgid "Apache optimization... :idea:"
@@ -5033,25 +4971,13 @@ msgstr "Apache optimalisatie... :idea:"
 
 #: ..\..\..\install\_functions_create.php:532
 msgid ""
-"<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> "
-"there are two files called [<code>sample.htaccess</code>]. You should try "
-"renaming those to [<code>.htaccess</code>].</p>\n"
+"<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].</p>\n"
 "\n"
-"<p>This will optimize the way b2evolution is handled by the webserver (if "
-"you are using Apache). These files are not active by default because a few "
-"hosts would display an error right away when you try to use them. If this "
-"happens to you when you rename the files, just remove them and you'll be "
-"fine.</p>"
+"<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine.</p>"
 msgstr ""
-"<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> "
-"there are two files called [<code>sample.htaccess</code>]. You should try "
-"renaming those to [<code>.htaccess</code>].</p>\n"
+"<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].</p>\n"
 "\n"
-"<p>This will optimize the way b2evolution is handled by the webserver (if "
-"you are using Apache). These files are not active by default because a few "
-"hosts would display an error right away when you try to use them. If this "
-"happens to you when you rename the files, just remove them and you'll be "
-"fine.</p>"
+"<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine.</p>"
 
 #: ..\..\..\install\_functions_create.php:538
 msgid "About evoSkins... :idea:"
@@ -5061,33 +4987,19 @@ msgstr "Over evoSkins... :idea:"
 msgid ""
 "<p>By default, b2evolution blogs are displayed using a default skin.</p>\n"
 "\n"
-"<p>Readers can choose a new skin by using the skin switcher integrated in "
-"most skins.</p>\n"
+"<p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>\n"
 "\n"
-"<p>You can change the default skin used for any blog by editing the "
-"parameters you will find in the stub file, for example <code>blog_b.php</"
-"code>. Of course, that is unless you have switched to using templates (like "
-"<code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</"
-"code>) + skins.</p>\n"
+"<p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>\n"
 "\n"
-"<p>You can restrict available skins by deleting some of them from the /blogs/"
-"skins folder. You can also create new skins by duplicating, renaming and "
-"customizing any existing skin folder. Read the manual on evoSkins!</p>"
+"<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>"
 msgstr ""
 "<p>By default, b2evolution blogs are displayed using a default skin.</p>\n"
 "\n"
-"<p>Readers can choose a new skin by using the skin switcher integrated in "
-"most skins.</p>\n"
+"<p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>\n"
 "\n"
-"<p>You can change the default skin used for any blog by editing the "
-"parameters you will find in the stub file, for example <code>blog_b.php</"
-"code>. Of course, that is unless you have switched to using templates (like "
-"<code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</"
-"code>) + skins.</p>\n"
+"<p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>\n"
 "\n"
-"<p>You can restrict available skins by deleting some of them from the /blogs/"
-"skins folder. You can also create new skins by duplicating, renaming and "
-"customizing any existing skin folder. Read the manual on evoSkins!</p>"
+"<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>"
 
 #: ..\..\..\install\_functions_create.php:548
 msgid "Skins *or* Templates ?"
@@ -5095,61 +5007,29 @@ msgstr "Skins *of* Sjablonen ?"
 
 #: ..\..\..\install\_functions_create.php:548
 msgid ""
-"<p>By default, all pre-installed blogs use skins, not templates. (More on "
-"skins in another post.)</p>\n"
+"<p>By default, all pre-installed blogs use skins, not templates. (More on skins in another post.)</p>\n"
 "\n"
-"<p>That means, blogs are accessed through 'stub' files called something like "
-"'<code>blog_b.php</code>'. These files set a few parameters such as the blog "
-"to display and the default skin to use, then they pass on the display job to "
-"a skin. You can edit the stub files to change the default skin used as well "
-"as other parameters. </p>\n"
+"<p>That means, blogs are accessed through 'stub' files called something like '<code>blog_b.php</code>'. These files set a few parameters such as the blog to display and the default skin to use, then they pass on the display job to a skin. You can edit the stub files to change the default skin used as well as other parameters. </p>\n"
 "\n"
-"<p>Alternatively, if you wish to use plain templates instead of skins, use "
-"the provided '<code>noskin_*.php</code>' files instead of the stub files. "
-"For example, for Blog B, the template file would be '<code>noskin_b.php</"
-"code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</"
-"code>' in the blogs admin.</p>\n"
+"<p>Alternatively, if you wish to use plain templates instead of skins, use the provided '<code>noskin_*.php</code>' files instead of the stub files. For example, for Blog B, the template file would be '<code>noskin_b.php</code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</code>' in the blogs admin.</p>\n"
 "\n"
 "<!--more-->\n"
 "\n"
-"<p>Either way, you can rename the stub/template files (<code>blog_*.php</"
-"code> or <code>noskin_*.php</code>) to better names, including to "
-"'<code>index.php</code>' for your main blog; but once again, make sure you "
-"update the new names in the blogs admin.</p>\n"
+"<p>Either way, you can rename the stub/template files (<code>blog_*.php</code> or <code>noskin_*.php</code>) to better names, including to '<code>index.php</code>' for your main blog; but once again, make sure you update the new names in the blogs admin.</p>\n"
 "\n"
-"<p>Finally, if you don't use templates, you can delete all <code>noskin_*."
-"php</code> files if you want. Also, if you don't use skins, you can delete "
-"all <code>blog_*.php</code> files as well as the subfolders in the /skins "
-"folder. But, do not delete the whole skins folder, even templates need some "
-"files in there!</p>"
+"<p>Finally, if you don't use templates, you can delete all <code>noskin_*.php</code> files if you want. Also, if you don't use skins, you can delete all <code>blog_*.php</code> files as well as the subfolders in the /skins folder. But, do not delete the whole skins folder, even templates need some files in there!</p>"
 msgstr ""
-"<p>By default, all pre-installed blogs use skins, not templates. (More on "
-"skins in another post.)</p>\n"
+"<p>By default, all pre-installed blogs use skins, not templates. (More on skins in another post.)</p>\n"
 "\n"
-"<p>That means, blogs are accessed through 'stub' files called something like "
-"'<code>blog_b.php</code>'. These files set a few parameters such as the blog "
-"to display and the default skin to use, then they pass on the display job to "
-"a skin. You can edit the stub files to change the default skin used as well "
-"as other parameters. </p>\n"
+"<p>That means, blogs are accessed through 'stub' files called something like '<code>blog_b.php</code>'. These files set a few parameters such as the blog to display and the default skin to use, then they pass on the display job to a skin. You can edit the stub files to change the default skin used as well as other parameters. </p>\n"
 "\n"
-"<p>Alternatively, if you wish to use plain templates instead of skins, use "
-"the provided '<code>noskin_*.php</code>' files instead of the stub files. "
-"For example, for Blog B, the template file would be '<code>noskin_b.php</"
-"code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</"
-"code>' in the blogs admin.</p>\n"
+"<p>Alternatively, if you wish to use plain templates instead of skins, use the provided '<code>noskin_*.php</code>' files instead of the stub files. For example, for Blog B, the template file would be '<code>noskin_b.php</code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</code>' in the blogs admin.</p>\n"
 "\n"
 "<!--more-->\n"
 "\n"
-"<p>Either way, you can rename the stub/template files (<code>blog_*.php</"
-"code> or <code>noskin_*.php</code>) to better names, including to "
-"'<code>index.php</code>' for your main blog; but once again, make sure you "
-"update the new names in the blogs admin.</p>\n"
+"<p>Either way, you can rename the stub/template files (<code>blog_*.php</code> or <code>noskin_*.php</code>) to better names, including to '<code>index.php</code>' for your main blog; but once again, make sure you update the new names in the blogs admin.</p>\n"
 "\n"
-"<p>Finally, if you don't use templates, you can delete all <code>noskin_*."
-"php</code> files if you want. Also, if you don't use skins, you can delete "
-"all <code>blog_*.php</code> files as well as the subfolders in the /skins "
-"folder. But, do not delete the whole skins folder, even templates need some "
-"files in there!</p>"
+"<p>Finally, if you don't use templates, you can delete all <code>noskin_*.php</code> files if you want. Also, if you don't use skins, you can delete all <code>blog_*.php</code> files as well as the subfolders in the /skins folder. But, do not delete the whole skins folder, even templates need some files in there!</p>"
 
 #: ..\..\..\install\_functions_create.php:562
 msgid "Multiple Blogs, new blogs, old blogs..."
@@ -5157,20 +5037,15 @@ msgstr "Meerdere Weblogs, nieuwe weblogs, oude weblogs..."
 
 #: ..\..\..\install\_functions_create.php:563
 msgid ""
-"<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', "
-"'Blog B' and 'Blogroll'.</p>\n"
+"<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>\n"
 "\n"
-"<p>Some of these blogs have a special role. Read about it on the "
-"corresponding page.</p>\n"
+"<p>Some of these blogs have a special role. Read about it on the corresponding page.</p>\n"
 "\n"
-"<p>You can create additional blogs or delete unwanted blogs from the blogs "
-"admin.</p>"
+"<p>You can create additional blogs or delete unwanted blogs from the blogs admin.</p>"
 msgstr ""
-"<p>Standaard, b2evolution begint met  4 weblogs, genaamd 'Blog All', 'Blog "
-"A', 'Blog B' en 'Blogroll'.</p>\n"
+"<p>Standaard, b2evolution begint met  4 weblogs, genaamd 'Blog All', 'Blog A', 'Blog B' en 'Blogroll'.</p>\n"
 "\n"
-"<p>Sommige van deze weblogs hebben een speciale functie. Lees hierover op de "
-"corresponderende pagina.</p>\n"
+"<p>Sommige van deze weblogs hebben een speciale functie. Lees hierover op de corresponderende pagina.</p>\n"
 "\n"
 "<p>Je kan extra weblogs aanmaken vanuit de weblogs administratie.</p>\n"
 "\n"
@@ -5182,51 +5057,27 @@ msgstr "Bestands rechten!"
 #: ..\..\..\install\_functions_create.php:573
 #, fuzzy
 msgid ""
-"<p><strong>This is pretty important. Make sure you read this in order to "
-"have a fully functionning installation!</strong></p>\n"
+"<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>\n"
 "\n"
 "<ul>\n"
 "\n"
-"\t<li>In order to create new blogs from the admin interface or to generate "
-"static pages for your blogs, the <code>/blogs</code> folder needs to be "
-"writable by the PHP process on the server. You may need to do a chmod on "
-"this folder. If you don't know exactly try a chmod 777. You can do this "
-"either with an FTP program, a Unix shell or a web file manager like the one "
-"built into cPanel. If your server is running Windows you probably don't need "
-"to change anything.</li>\n"
+"\t<li>In order to create new blogs from the admin interface or to generate static pages for your blogs, the <code>/blogs</code> folder needs to be writable by the PHP process on the server. You may need to do a chmod on this folder. If you don't know exactly try a chmod 777. You can do this either with an FTP program, a Unix shell or a web file manager like the one built into cPanel. If your server is running Windows you probably don't need to change anything.</li>\n"
 "\n"
-"\t<li>In order to use the template editor for the custom skin, your <code>/"
-"skins/custom</code> folder needs to be writable by the PHP process on the "
-"server. Same as above.</li>\n"
+"\t<li>In order to use the template editor for the custom skin, your <code>/skins/custom</code> folder needs to be writable by the PHP process on the server. Same as above.</li>\n"
 "\n"
-"\t<li>This isn't necessary but ensures your security: do a chmod 644 on all "
-"files in the <code>/blogs/conf</code> directory, so no-one can overwrite "
-"them except you. If your server is running Windows, then set the file to "
-"'read-only'.</li>\n"
+"\t<li>This isn't necessary but ensures your security: do a chmod 644 on all files in the <code>/blogs/conf</code> directory, so no-one can overwrite them except you. If your server is running Windows, then set the file to 'read-only'.</li>\n"
 "\n"
 "</ul>"
 msgstr ""
-"<p><strong>This is pretty important. Make sure you read this in order to "
-"have a fully functionning installation!</strong></p>\n"
+"<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>\n"
 "\n"
 "<ul>\n"
 "\n"
-"  <li>In order to create new blogs from the admin interface or to generate "
-"static pages for your blogs, the <code>/blogs</code> folder needs to be "
-"writable by the PHP process on the server. You may need to do a chmod on "
-"this folder. If you don't know exactly try a chmod 777. You can do this "
-"either with an FTP program, a Unix shell or a web file manager like the one "
-"built into cPanel. If your server is running Windows you probably don't need "
-"to change anything.</li>\n"
+"  <li>In order to create new blogs from the admin interface or to generate static pages for your blogs, the <code>/blogs</code> folder needs to be writable by the PHP process on the server. You may need to do a chmod on this folder. If you don't know exactly try a chmod 777. You can do this either with an FTP program, a Unix shell or a web file manager like the one built into cPanel. If your server is running Windows you probably don't need to change anything.</li>\n"
 "\n"
-"  <li>In order to use the template editor for the custom skin, your <code>/"
-"skins/custom</code> folder needs to be writable by the PHP process on the "
-"server. Same as above.</li>\n"
+"  <li>In order to use the template editor for the custom skin, your <code>/skins/custom</code> folder needs to be writable by the PHP process on the server. Same as above.</li>\n"
 "\n"
-"  <li>This isn't necessary but ensures your security: do a chmod 644 on all "
-"files in the <code>/blogs/conf</code> directory, so no-one can overwrite "
-"them except you. If your server is running Windows, then set the file to "
-"'read-only'.</li>\n"
+"  <li>This isn't necessary but ensures your security: do a chmod 644 on all files in the <code>/blogs/conf</code> directory, so no-one can overwrite them except you. If your server is running Windows, then set the file to 'read-only'.</li>\n"
 "\n"
 "</ul>"
 
@@ -5238,22 +5089,15 @@ msgstr "Belangrijke informatie :idea:"
 msgid ""
 "<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>\n"
 "\n"
-"<p>All these entries are designed to help you so, as EdB would say: \"read "
-"them all before you start hacking away!\" ;)</p>\n"
+"<p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)</p>\n"
 "\n"
-"<p>If you wish, you can delete these posts one by one after you have read "
-"them. You could also change their status to 'deprecated' in order to "
-"visually keep track of what you have already read.</p>"
+"<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>"
 msgstr ""
-"<p>Blog B bevat een aantal artikelen uit de 'b2evolution Tips' categorie.</"
-"p>\n"
+"<p>Blog B bevat een aantal artikelen uit de 'b2evolution Tips' categorie.</p>\n"
 "\n"
-"<p>Al deze artikelen zijn ontworpen om jou te helpen, zoals EdB zou zeggen: "
-"\"lees ze allemaal voordat je begint met aanpassen!\" ;)</p>\n"
+"<p>Al deze artikelen zijn ontworpen om jou te helpen, zoals EdB zou zeggen: \"lees ze allemaal voordat je begint met aanpassen!\" ;)</p>\n"
 "\n"
-"<p>Als je wilt kan je deze artikelen één voor één verwijderen als je ze "
-"gelezen hebt. Je kan de status veranderen naar 'verouderd' om zelf bij te "
-"kunnen houden wat je al gelezen hebt.</p>"
+"<p>Als je wilt kan je deze artikelen één voor één verwijderen als je ze gelezen hebt. Je kan de status veranderen naar 'verouderd' om zelf bij te kunnen houden wat je al gelezen hebt.</p>"
 
 #: ..\..\..\install\_functions_create.php:625
 msgid "First Post"
@@ -5298,13 +5142,8 @@ msgstr ""
 "<p>Dit verschijnt alleen op weblog B en in 1 enkele categorie.</p>"
 
 #: ..\..\..\install\_functions_create.php:657
-msgid ""
-"Hi, this is a comment.<br />To delete a comment, just log in, and view the "
-"posts' comments, there you will have the option to edit or delete them."
-msgstr ""
-"Hi, dit is een reactie.<br />Om een reactie te verijderen, log dan in, en "
-"bekijk de reacties van een artikel, daar heb je de optie om te bewerken en "
-"te verijderen."
+msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
+msgstr "Hi, dit is een reactie.<br />Om een reactie te verijderen, log dan in, en bekijk de reacties van een artikel, daar heb je de optie om te bewerken en te verijderen."
 
 #: ..\..\..\install\_functions_install.php:26
 msgid "Checking DB schema version..."
@@ -5390,56 +5229,68 @@ msgstr "Reactie tekst"
 msgid "more"
 msgstr "meer"
 
-#: ..\..\..\skins\_feedback.php:72 ..\..\..\skins\basic\_feedback.php:71
+#: ..\..\..\skins\_feedback.php:72
+#: ..\..\..\skins\basic\_feedback.php:71
 msgid "Trackback address for this post:"
 msgstr "TrackBack adres voor dit artikel:"
 
-#. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
-#: ..\..\..\skins\_feedback.php:91 ..\..\..\skins\basic\_feedback.php:90
+#  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
+#: ..\..\..\skins\_feedback.php:91
+#: ..\..\..\skins\basic\_feedback.php:90
 #, php-format
 msgid "No %s for this post yet..."
 msgstr "Nog geen %s op dit artikel ..."
 
-#: ..\..\..\skins\_feedback.php:179 ..\..\..\skins\basic\_feedback.php:172
+#: ..\..\..\skins\_feedback.php:179
+#: ..\..\..\skins\basic\_feedback.php:172
 msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr ""
-"Jouw e-mail adres zal <strong>niet</strong> worden weergegeven op de site."
+msgstr "Jouw e-mail adres zal <strong>niet</strong> worden weergegeven op de site."
 
-#: ..\..\..\skins\_feedback.php:184 ..\..\..\skins\basic\_feedback.php:177
+#: ..\..\..\skins\_feedback.php:184
+#: ..\..\..\skins\basic\_feedback.php:177
 msgid "Site/Url"
 msgstr "Site/URL"
 
-#: ..\..\..\skins\_feedback.php:186 ..\..\..\skins\basic\_feedback.php:179
+#: ..\..\..\skins\_feedback.php:186
+#: ..\..\..\skins\basic\_feedback.php:179
 msgid "Your URL will be displayed."
 msgstr "Jouw URL zal worden weergegeven"
 
-#: ..\..\..\skins\_feedback.php:207 ..\..\..\skins\basic\_feedback.php:199
+#: ..\..\..\skins\_feedback.php:207
+#: ..\..\..\skins\basic\_feedback.php:199
 msgid "Line breaks become &lt;br /&gt;"
 msgstr "Enters worden &lt;br /&gt;"
 
-#: ..\..\..\skins\_feedback.php:212 ..\..\..\skins\basic\_feedback.php:204
+#: ..\..\..\skins\_feedback.php:212
+#: ..\..\..\skins\basic\_feedback.php:204
 msgid "Remember me"
 msgstr "Onthou mij"
 
-#: ..\..\..\skins\_feedback.php:212 ..\..\..\skins\basic\_feedback.php:204
+#: ..\..\..\skins\_feedback.php:212
+#: ..\..\..\skins\basic\_feedback.php:204
 msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Plaats cookies voor naam, e-mail &amp; url)"
 
-#: ..\..\..\skins\_lastcomments.php:28 ..\..\..\xmlsrv\atom.comments.php:22
-#: ..\..\..\xmlsrv\rdf.comments.php:38 ..\..\..\xmlsrv\rss.comments.php:25
+#: ..\..\..\skins\_lastcomments.php:28
+#: ..\..\..\xmlsrv\atom.comments.php:22
+#: ..\..\..\xmlsrv\rdf.comments.php:38
+#: ..\..\..\xmlsrv\rss.comments.php:25
 #: ..\..\..\xmlsrv\rss2.comments.php:27
 msgid "In response to:"
 msgstr "Antwoord op:"
 
-#: ..\..\..\skins\_profile.php:72 ..\..\..\skins\basic\_profile.php:74
+#: ..\..\..\skins\_profile.php:72
+#: ..\..\..\skins\basic\_profile.php:74
 msgid "AOL I.M."
 msgstr "AOL IM"
 
-#: ..\..\..\skins\_profile.php:73 ..\..\..\skins\basic\_profile.php:75
+#: ..\..\..\skins\_profile.php:73
+#: ..\..\..\skins\basic\_profile.php:75
 msgid "MSN I.M."
 msgstr "MSN IM"
 
-#: ..\..\..\skins\_profile.php:74 ..\..\..\skins\basic\_profile.php:76
+#: ..\..\..\skins\_profile.php:74
+#: ..\..\..\skins\basic\_profile.php:76
 msgid "Yahoo I.M."
 msgstr "Yahoo IM"
 
@@ -5468,7 +5319,8 @@ msgstr "Selecteer WebLog:"
 msgid "Select skin:"
 msgstr "Selecteer skin:"
 
-#: ..\..\..\skins\basic\_main.php:82 ..\..\..\skins\custom\_main.php:82
+#: ..\..\..\skins\basic\_main.php:82
+#: ..\..\..\skins\custom\_main.php:82
 msgid "words"
 msgstr "woorden"
 
@@ -5490,128 +5342,15 @@ msgstr "Kies skin"
 msgid "Browse all posts by this author"
 msgstr "Blader door alle artikelen van deze auteur"
 
-#: ..\..\..\xmlsrv\rdf.php:45 ..\..\..\xmlsrv\rss.php:27
+#: ..\..\..\xmlsrv\rdf.php:45
+#: ..\..\..\xmlsrv\rss.php:27
 #: ..\..\..\xmlsrv\rss2.php:34
 msgid "[...] Read more!"
 msgstr "[...] Lees Meer!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1394 ..\..\..\xmlsrv\xmlrpc.php:1398
+#: ..\..\..\xmlsrv\xmlrpc.php:1394
+#: ..\..\..\xmlsrv\xmlrpc.php:1398
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
 
-#~ msgid "Keyword"
-#~ msgstr "Sleutelwoord"
-
-#~ msgid "<p>Changing mod to %o</p>"
-#~ msgstr "<p>Verander mod naar %o</p>"
-
-#~ msgid "chmod failed!"
-#~ msgstr "chmod commando mislukt"
-
-#~ msgid "<p>Changing owner to %s</p>"
-#~ msgstr "<p>Wijzigen eigenaar naar %s</p>"
-
-#~ msgid "chown failed!"
-#~ msgstr "chown commando mislukt"
-
-#~ msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
-#~ msgstr ""
-#~ "Genereren van pagina <strong>%s</strong> naar <strong>%s</strong>..."
-
-#~ msgid "Source Stub Filename"
-#~ msgstr "Stub Bestandsnaam"
-
-#~ msgid ""
-#~ "This is the .php file that will be executed to generate a static version "
-#~ "of the blog homepage. This should typically be a stub file."
-#~ msgstr ""
-#~ "Dit is de bestandsnaam van het .php bestand dat zal worden gebruikt om "
-#~ "een statische(.html) versie van het weblog te genereren. Dit zou meestal "
-#~ "een stub bestand moeten zijn."
-
-#~ msgid ""
-#~ "to get listed on the 'recently updated' list. PLEASE NOTE: If you removed "
-#~ "the b2evolution button and the link to b2evolution from your blog, don't "
-#~ "even bother enabling this. You will *not* be approved and your blog will "
-#~ "be blacklisted. Also, the Full Name of your blog must be written in ISO "
-#~ "8859-1 (Latin-1) charset, otherwise we cannot display it on b2evolution."
-#~ "net. You can use HTML entities (e-g &amp;Kappa;) for non latin chars."
-#~ msgstr ""
-#~ "om te worden weergegeven op de \"recently updated\" lijst. LET OP: Als je "
-#~ "de b2evolution button verwijderd en de link naar de b2evolution site van "
-#~ "jouw weblog, doe geen moeite om dit aan te zetten. Je zal *NIET* worden "
-#~ "toegestaan en jouw weblog zal op de zwarte lijst komen. Ook zal de "
-#~ "volledige naam van je weblog in ISO 8859-1 (Latin-1) karakters moeten "
-#~ "zijn geschreven, anders kunnen we hem niet weergeven op b2evolution.net. "
-#~ "Je kan HTML codes  (e-g &amp;Kappa;) gebruiken om niet latin karakters "
-#~ "weer te geven."
-
-#~ msgid "Cats"
-#~ msgstr "Categoriën"
-
-#~ msgid "Can't connect to the database server. MySQL said:"
-#~ msgstr "Kan geen verbinding maken met de database server. MySQL zei:"
-
-#~ msgid "Can't connect to the database %s. MySQL said:"
-#~ msgstr "Kan geen verbinding maken met de database %s. MySQL zei:"
-
-#~ msgid ""
-#~ "Could not connect to database! Check you settings in <code>%s</code>!"
-#~ msgstr ""
-#~ "Kon geen database verbinding maken! Controleer jouw instellingen in <code>"
-#~ "%s</code>!"
-
-#~ msgid "First time install"
-#~ msgstr "Eerste keer installeren"
-
-#~ msgid "These are your settings from the config file:"
-#~ msgstr "Dit zijn de instellingen uit jouw config bestand:"
-
-#~ msgid "Host"
-#~ msgstr "Host"
-
-#, fuzzy
-#~ msgid ""
-#~ "<h2>Need to start anew?</h2>\n"
-#~ "\t\t\t<p>If you have installed b2evolution tables before and wish to "
-#~ "start anew, you must delete the b2evolution tables before you can start a "
-#~ "new installation. b2evolution can delete its own tables for you, but for "
-#~ "obvious security reasons, this feature is disabled by default.</p>\n"
-#~ "\t\t\t<p>To enable it, please go to the /conf/_config.php file and change:"
-#~ "</p>\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 0;</pre>\n"
-#~ "\t\t\tto\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
-#~ "\t\t\t<p>Then reload this page and a reset option will appear.</p>"
-#~ msgstr ""
-#~ "<h2>Need to start anew?</h2>\n"
-#~ "\t\t\t<p>If you have installed b2evolution tables before and wish to "
-#~ "start anew, you must delete the b2evolution tables before you can start a "
-#~ "new installation. b2evolution can delete its own tables for you, but for "
-#~ "obvious security reasons, this feature is disabled by default.</p>\n"
-#~ "\t\t\t<p>To enable it, please go to the /conf/_config.php file and change:"
-#~ "</p>\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 0;</pre>\n"
-#~ "\t\t\tto\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
-#~ "\t\t\t<p>Then reload this page and a reset option will appear.</p>"
-
-#~ msgid ""
-#~ "<p>For security reasons, the reset feature is disabled by default.</p>\n"
-#~ "\t\t\t<p>To enable it, please go back the /conf/_config.php file and "
-#~ "change:</p>\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 0;</pre>\n"
-#~ "\t\t\tto\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
-#~ "\t\t\t<p>Then reload this page and resetting will take place.</p>"
-#~ msgstr ""
-#~ "<p>Voor beveiligings redenen is de reset mogelijkheid standaard uitgezet."
-#~ "</p>\n"
-#~ "\t\t\t<p>Om het aan te zetten ga terug naar het  /conf/_config.php "
-#~ "bestand en wijzig:</p>\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 0;</pre>\n"
-#~ "\t\t\tnaar\n"
-#~ "\t\t\t<pre>$allow_evodb_reset = 1;</pre>\n"
-#~ "\t\t\t<p>Herlaad daarna deze pagina en het resetten zal dan plaatsvinden."
-#~ "</p>"
