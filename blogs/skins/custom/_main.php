@@ -76,7 +76,7 @@
 			the_categories();
 			echo ', ';
 			the_wordcount();
-			echo ' words';
+			echo ' ', T_('words');
 		?>
 		</div>
 		<h3 class="bTitle"><?php the_title(); ?></h3>
