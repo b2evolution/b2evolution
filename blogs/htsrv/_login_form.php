@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * b2evolution - http://b2evolution.net/
  *
@@ -9,17 +9,17 @@
  */
 $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
-require(dirname(__FILE__).'/_header.php'); 
+require(dirname(__FILE__).'/_header.php');
 
 param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
 param( 'log', 'string', '' );		// last typed login
 
 $location = $redirect_to;
-
 ?>
+
 <form action="<?php echo $location  ?>" method="post" class="fform">
-	<?php 
-		if( !empty($mode) ) 
+	<?php
+		if( !empty($mode) )
 		{	// We're in the process of bookmarkletting something, we don't want to loose it:
 			param( 'text', 'html', '' );
 			param( 'popupurl', 'html', '' );
@@ -29,21 +29,21 @@ $location = $redirect_to;
 			<input type="hidden" name="text" value="<?php echo format_to_output( $text, 'formvalue' ) ?>" />
 			<input type="hidden" name="popupurl" value="<?php echo format_to_output( $popupurl, 'formvalue' ) ?>" />
 			<input type="hidden" name="popuptitle" value="<?php echo format_to_output( $popuptitle, 'formvalue' ) ?>" />
-		<?php 
-		} 
+		<?php
+		}
 	?>
 
 	<fieldset>
 		<fieldset>
-			<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div> 
+			<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div>
 			<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="<?php echo format_to_output($log, 'formvalue'); ?>" class="large" /></div>
 		</fieldset>
-	
+
 		<fieldset>
-			<div class="label"><label for="pwd"><?php echo T_('Password:') ?></label></div> 
+			<div class="label"><label for="pwd"><?php echo T_('Password:') ?></label></div>
 			<div class="input"><input type="password" name="pwd" id="pwd" size="16" maxlength="20" value="" class="large" /></div>
 		</fieldset>
-	
+
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Log in!') ?>" class="search" />
@@ -57,6 +57,6 @@ $location = $redirect_to;
 <a href="<?php echo $htsrv_url ?>/login.php?action=lostpassword&redirect_to=<?php echo urlencode( $redirect_to ) ?>"><?php echo T_('Lost your password ?') ?></a>
 </div>
 
-<?php 
-	require(dirname(__FILE__).'/_footer.php'); 
+<?php
+	require(dirname(__FILE__).'/_footer.php');
 ?>

@@ -203,8 +203,8 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
  */
 function get_userdatabylogin($user_login)
 {
-	global $DB, $tableusers, $cache_userdata,$use_cache;
-	if ((empty($cache_userdata[$user_login])) OR (!$use_cache))
+	global $DB, $tableusers, $cache_userdata, $use_cache;
+	if( (empty($cache_userdata[$user_login])) OR (!$use_cache) )
 	{
 		$sql = "SELECT * 
 						FROM $tableusers 
@@ -357,7 +357,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 {
 	global $htsrv_url, $blog;
 
-	if( is_logged_in() || !get_settings('pref_newusers_canregister'))
+	if( is_logged_in() || !get_settings('newusers_canregister'))
 	{	// There's no need to provide this link if already logged in or if we won't let him register
 		return false;
 	}

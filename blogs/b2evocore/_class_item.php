@@ -94,7 +94,7 @@ class Item extends DataObject
 		global $DB, $cacheweekly;
 
 		if( empty( $mode ) )
-			$mode = get_settings( 'pref_permalink_type' );
+			$mode = get_settings( 'permalink_type' );
 	
 		if( $force_single && (strpos( $mode, 'archive' ) !== false) )
 		{	// Comments cannot be displayed in archive mode
@@ -145,7 +145,7 @@ class Item extends DataObject
 				}
 		}
 
-		if( ! get_settings('pref_links_extrapath') )
+		if( ! get_settings('links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
 	
 			switch( $dest_type ) 
@@ -216,7 +216,7 @@ class Item extends DataObject
 	function anchor( $mode = '' ) 
 	{
 		if( empty( $mode ) )
-			$mode = get_settings( 'pref_permalink_type' );
+			$mode = get_settings( 'permalink_type' );
 
 		switch( $mode )
 		{
@@ -861,7 +861,7 @@ class Item extends DataObject
 	{
 		global $htsrv_url;
 
-		if( get_settings('pref_links_extrapath') ) 
+		if( get_settings('links_extrapath') ) 
 		{
 			echo "$htsrv_url/trackback.php/$this->ID";
 		}

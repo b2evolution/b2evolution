@@ -68,52 +68,53 @@ locale_activate( $default_locale );
 		list( $version_main, $version_minor ) = explode( '.', phpversion() );
 		if( ($version_main * 100 + $version_minor) < 401 )
 		{
-			die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
+			die( '<p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is PHP version %s, but you have %s!'), '4.1.0', phpversion() ).'</strong></p>');
 		}
 	?>
 	<p><?php echo T_('These are your settings from the config file:')?>
 	<br />
-	<?php echo T_("(If you don't see correct settings here, STOP before going any further, and check your configuration.)")?>
+	<?php echo T_('(If you don\'t see correct settings here, STOP before going any further, and check your configuration.)')?>
 	</p>
 <pre>
-mySQL Host: <?php echo DB_HOST ?> &nbsp;
-mySQL Database: <?php echo DB_NAME ?> &nbsp;
-mySQL Username: <?php echo DB_USER ?> &nbsp;
-mySQL Password: <?php echo ((DB_PASSWORD != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )?> &nbsp;
-</pre>
-	<?php
-	if( empty($action) )
-	{
-		?>
-		<h2><?php echo T_('Language/Locale')?></h2>
-		<p><?php echo T_('Choose a default locale.<br /> Clicking it should directly activate it.')?></p>
-		
-		<ul style="margin-left: 2ex;list-style:none;" >
-	
-		<?php
-		// present available locales on first screen
-		foreach( $locales as $lkey => $lvalue )
-		{
-			echo '<li>';
-			if( $default_locale == $lkey ) echo '<strong>';	
-			echo ' <a href="?locale='. $lkey. '">';
-			locale_flag( $lkey );
-			echo $lvalue['name'];
-			echo '</a>';
-			echo '</li>';
-			
-			if( $default_locale == $lkey ) echo '</strong>';	
-		}
-		echo '</ul>';
-	}
+<?php echo 
+'mySQL '.T_('Host').': '.DB_HOST." &nbsp;\n".
+'mySQL '.T_('Database').': '.DB_NAME." &nbsp;\n".
+'mySQL '.T_('Username').': '.DB_USER." &nbsp;\n".
+'mySQL '.T_('Password').': '.((DB_PASSWORD != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') ).' &nbsp;
+</pre>';
+
+if( empty($action) )
+{
 	?>
+	<h2><?php echo T_('Language/Locale')?></h2>
+	<p><?php echo T_('Choose a default locale.<br /> Clicking it should directly activate it.')?></p>
+	
+	<ul style="margin-left: 2ex;list-style:none;" >
+
+	<?php
+	// present available locales on first screen
+	foreach( $locales as $lkey => $lvalue )
+	{
+		echo '<li>';
+		if( $default_locale == $lkey ) echo '<strong>';	
+		echo ' <a href="?locale='. $lkey. '">';
+		locale_flag( $lkey );
+		echo $lvalue['name'];
+		echo '</a>';
+		echo '</li>';
+		
+		if( $default_locale == $lkey ) echo '</strong>';	
+	}
+	echo '</ul>';
+}
+?>
 </div>
 
 <?php
 
 $new_db_version = 8060;				// next time: 8070
 
-/*
+/**
  * check_db_version(-)
  *
  * Note: version number 8000 once meant 0.8.00.0, but I decided to switch to sequential
@@ -124,12 +125,25 @@ function check_db_version()
 {
 	global $DB, $old_db_version, $new_db_version, $tablesettings;
 
-	echo '<p>Checking DB schema version... ';
-	$old_db_version = $DB->get_var( "SELECT db_version FROM $tablesettings" );
-	if( $old_db_version == NULL ) die( 'NOT FOUND! This is not a b2evolution database.' );
+	echo '<p>'.T_('Checking DB schema version...').' ';
+	$DB->query( "SELECT * FROM $tablesettings LIMIT 1" );
+	$colinfo = $DB->get_col_info();
+	
+	if( $colinfo[0] == 'set_name' )
+	{ // we have new table format
+		$old_db_version = $DB->get_var( "SELECT set_value FROM $tablesettings WHERE set_name = 'db_version'" );
+	}
+	else
+	{
+		$old_db_version = $DB->get_var( "SELECT db_version FROM $tablesettings" );
+	}
+	
+	if( $old_db_version == NULL ) die( T_('NOT FOUND! This is not a b2evolution database.') );
+	
 	echo $old_db_version, ' : ';
-	if( $old_db_version < 8000 ) die( 'This version is too old!' );
-	if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
+	
+	if( $old_db_version < 8000 ) die( T_('This version is too old!') );
+	if( $old_db_version > $new_db_version ) die( T_('This version is too recent! We cannot downgrade to it!') );
 	echo "OK.<br />\n";
 }
 
@@ -283,7 +297,9 @@ switch( $action )
 ?>
 <!-- InstanceEndEditable -->
 <div id="rowfooter">
-<a href="http://b2evolution.net/">official website</a> &middot; <a href="http://b2evolution.net/about/license.html">GNU GPL license</a> &middot; <a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
+<a href="http://b2evolution.net/"><?php echo T_('official website'); if( substr(locale_lang(false), 0, 2) != 'en' ) echo ' [en]';?></a> &middot;
+<a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license'); if( substr(locale_lang(false), 0, 2) != 'en' ) echo ' [en]';?></a> &middot;
+<a href="http://fplanque.net/About/index.html"><?php echo T_('contact:') ?> Fran&ccedil;ois PLANQUE</a>
 </div>
 
 </body>

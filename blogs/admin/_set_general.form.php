@@ -18,42 +18,42 @@
 		<legend><?php echo T_('Default user rights') ?></legend>
 		<?php
 	
-		form_checkbox( 'pref_newusers_canregister', get_settings('pref_newusers_canregister'), T_('New users can register'), sprintf( T_('Check to allow new users to register themselves.' ) ) );
+		form_checkbox( 'newusers_canregister', get_settings('newusers_canregister'), T_('New users can register'), sprintf( T_('Check to allow new users to register themselves.' ) ) );
 	
-		form_select_object( 'pref_newusers_grp_ID', get_settings('pref_newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
+		form_select_object( 'newusers_grp_ID', get_settings('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 	
-		form_text( 'pref_newusers_level', get_settings('pref_newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
+		form_text( 'newusers_level', get_settings('newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
 		?>
 	</fieldset>
 	
 	<fieldset>
 		<legend><?php echo T_('Display options') ?></legend>
 		<?php
-			form_radio( 'newwhat_to_show', get_settings('what_to_show'),
+			form_radio( 'what_to_show', get_settings('what_to_show'),
 					array(  array( 'days', T_('days') ),
 									array( 'posts', T_('posts') ),
 									array( 'paged', T_('posts paged') )
 								), T_('Display mode') );
 	
-			form_text( 'newposts_per_page', get_settings('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
+			form_text( 'posts_per_page', get_settings('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
 	
-			form_radio( 'newarchive_mode', get_settings('archive_mode'),
+			form_radio( 'archive_mode', get_settings('archive_mode'),
 					array(  array( 'monthly', T_('monthly') ),
 									array( 'weekly', T_('weekly') ),
 									array( 'daily', T_('daily') ),
 									array( 'postbypost', T_('post by post') )
 								), T_('Archive mode') );
 	
-			form_checkbox( 'newautobr', get_settings('AutoBR'), T_('Auto-BR'), T_('This option is deprecated, you should avoid using it.') );
+			form_checkbox( 'autoBR', get_settings('autoBR'), T_('Auto-BR'), T_('This option is deprecated, you should avoid using it.') );
 		?>
 	</fieldset>
 	
 	<fieldset>
 		<legend><?php echo T_('Link options') ?></legend>
 		<?php
-			form_checkbox( 'pref_links_extrapath', get_settings('pref_links_extrapath'), T_('Use extra-path info'), sprintf( T_('Recommended if your webserver supports it. Links will look like <code>stub/2003/05/20/post_title</code> instead of <code>stub?title=post_title&c=1&tb=1&pb=1&more=1</code>' ) ) );
+			form_checkbox( 'links_extrapath', get_settings('links_extrapath'), T_('Use extra-path info'), sprintf( T_('Recommended if your webserver supports it. Links will look like <code>stub/2003/05/20/post_title</code> instead of <code>stub?title=post_title&c=1&tb=1&pb=1&more=1</code>' ) ) );
 	
-			form_radio( 'pref_permalink_type', get_settings('pref_permalink_type'),
+			form_radio( 'permalink_type', get_settings('permalink_type'),
 					array(  array( 'urltitle', T_('Post called up by its URL title (Recommended)') ),
 									array( 'pid', T_('Post called up by its ID') ),
 									array( 'archive#id', T_('Post on archive page, located by its ID') ),

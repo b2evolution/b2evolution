@@ -266,7 +266,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	if( empty($locale) ) $locale = $current_locale; 
 
 	// extract flag name:
-	$country = substr( $locale, 3, 2 );
+	$country = strtolower(substr( $locale, 3, 2 ));
 	
 	if( ! is_file(dirname(__FILE__).'/'.$core_dirout.'/'.$img_subdir.'/flags/'.$collection.'/'.$country.'.gif') )
 	{	// File does not exist
@@ -381,6 +381,7 @@ function locale_overwritefromDB()
 						loc_messages, loc_priority, loc_enabled
 						FROM '.$tablelocales.' ORDER BY loc_priority';
 	$rows = $DB->get_results( $query, ARRAY_A );
+	
 	if( count( $rows ) ) foreach( $rows as $row )
 	{	// Loop through loaded locales:
 		
@@ -434,6 +435,7 @@ function locale_overwritefromDB()
 	// overwrite default_locale from DB settings - if enabled.
 	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
 	$locale_fromdb = get_settings('default_locale');
+
 	if( $locale_fromdb  )
 	{
 		/*
@@ -503,6 +505,4 @@ function locale_updateDB()
 	
 	return (bool)$q;
 }
-
-
 ?>

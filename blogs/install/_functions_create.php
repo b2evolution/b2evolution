@@ -9,7 +9,7 @@
  * @package install
  */
 if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
-	die('Please, do not access this page directly.');
+	die( 'Please, do not access this page directly.' );
 
 /*
  * create_b2evo_tables(-)
@@ -30,22 +30,11 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Settings... ';
 	$query = "CREATE TABLE $tablesettings (
-		ID tinyint DEFAULT 1 NOT NULL,
-		default_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL,
-		posts_per_page int unsigned DEFAULT 7 NOT NULL,
-		what_to_show varchar(10) DEFAULT 'days' NOT NULL,
-		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL,
-		time_difference tinyint DEFAULT 0 NOT NULL,
-		AutoBR tinyint DEFAULT 1 NOT NULL,
-		db_version INT DEFAULT $new_db_version NOT NULL,
-		last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00',
-		pref_newusers_grp_ID int unsigned DEFAULT 4 NOT NULL,
-		pref_newusers_level tinyint unsigned DEFAULT 1 NOT NULL,
-		pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL,
-		pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
-		pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle',
-		PRIMARY KEY (ID)
-	)";
+		set_name VARCHAR( 30 ) NOT NULL ,
+		set_value VARCHAR( 255 ) NULL ,
+		PRIMARY KEY ( set_name )
+		)";
+
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -726,10 +715,22 @@ function populate_main_tables()
 
 
 	echo 'Creating default settings... ';
-
 	// SETTINGS!
-	$query = "INSERT INTO $tablesettings ( ID, default_locale, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update, pref_newusers_grp_ID )
-	VALUES ( 1, '$default_locale', 5, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
+	$query = "REPLACE INTO $tablesettings ( set_name, set_value ) VALUES
+						( 'db_version', '$new_db_version' ),
+						( 'default_locale', '$default_locale' ),
+						( 'posts_per_page', '5' ),
+						( 'what_to_show', 'paged' ),
+						( 'archive_mode', 'monthly' ),
+						( 'time_difference', '0' ),
+						( 'autoBR', '1' ),
+						( 'antispam_last_update', '2000-01-01 00:00:00' ),
+						( 'newusers_grp_ID', '".$Group_Users->get('ID')."' ),
+						
+						( 'newusers_level', '1' ),
+						( 'newusers_canregister', '0' ),
+						( 'links_extrapath', '0' ),
+						( 'permalink_type', 'urltitle' )";
 	$DB->query( $query );
 
 	echo "OK.<br />\n";

@@ -74,6 +74,7 @@ $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_I
 // $BlogCache = & new DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
 $ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
 
+
 // Plug-ins init:
 $Renderer = & new Renderer();
 $Toolbars = & new Toolbars();

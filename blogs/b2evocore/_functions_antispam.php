@@ -243,7 +243,7 @@ function b2evonet_poll_abuse( $display = true )
 	}
 	
 	// Get datetime from last update, because we only want newer stuff...
-	$m = get_settings( 'last_antispam_update' );
+	$m = get_settings( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
 	echo '<p>', T_('Latest update timestamp'), ': ', $m, '</p>';
 	$startat = mysql2date( 'Ymd\TH:i:s', $m );
@@ -303,7 +303,7 @@ function b2evonet_poll_abuse( $display = true )
 					echo '<p>', T_('New latest update timestamp'), ': ', $endedat, '</p>';
 					
 					$DB->query( "UPDATE $tablesettings 
-													SET last_antispam_update = '$endedat'" );
+													SET antispam_last_update = '$endedat'" );
 				}				
 			}
 		}

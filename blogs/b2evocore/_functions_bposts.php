@@ -1348,7 +1348,7 @@ function gen_permalink(
 	// Defaults:
 	if (empty($use_anchor_mode)) $use_anchor_mode = 'id';
 	if (empty($use_destination))
-			$use_destination = ( strstr( get_settings('pref_permalink_type'), 'archive' ) !== false )
+			$use_destination = ( strstr( get_settings('permalink_type'), 'archive' ) !== false )
 					? 'archive' : 'single';
 	if ($use_destination=='archive') $use_destination = get_settings('archive_mode');
 
@@ -1366,7 +1366,7 @@ function gen_permalink(
 			break;
 	}
 
-	if( ! get_settings('pref_links_extrapath') )
+	if( ! get_settings('links_extrapath') )
 	{	// We reference by Query: Dirty but explicit permalinks
 
 		switch($use_destination)

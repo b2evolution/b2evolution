@@ -289,7 +289,7 @@ function upgrade_b2evo_tables()
 										AFTER post_issue_date,
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
-							CHANGE COLUMN post_trackbacks post_url varchar(250) NOT NULL default NULL,
+							CHANGE COLUMN post_trackbacks post_url varchar(250) NULL default NULL,
 							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported'),
 							ADD COLUMN post_renderers VARCHAR(179) NOT NULL default 'default',
 							DROP INDEX post_date,
@@ -313,14 +313,69 @@ function upgrade_b2evo_tables()
 
 		// convert given languages to locales
 		convert_lang_to_locale( $tableblogs, 'blog_locale', 'blog_ID' );
+
+
+		echo 'Converting settings table... ';
 		
-		echo 'Upgrading settings table... ';
-		$query = "ALTER TABLE $tablesettings
-							ADD COLUMN default_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL AFTER ID,
-							ADD COLUMN pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
-							ADD COLUMN pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle'";
+		// get old settings
+		$query = "SELECT * FROM $tablesettings";
+		$row = $DB->get_row( $query, ARRAY_A );
+				
+		#pre_dump($row, 'oldrow');
+		$transform = array(
+			'posts_per_page' => array(7),
+			'what_to_show' => array('days'),
+			'archive_mode' => array('weekly'),
+			'time_difference' => array(0),
+			'AutoBR' => array(1, 'autoBR'),
+			'last_antispam_update' => array('2000-01-01 00:00:00', 'antispam_last_update'),
+			'pref_newusers_grp_ID' => array(4, 'newusers_grp_ID'),
+			'pref_newusers_level'  => array(1, 'newusers_level'),
+			'pref_newusers_canregister' => array(0, 'newusers_canregister'),
+		);
+		
+		$query = "INSERT INTO $tablesettings (set_name, set_value) VALUES ";
+		
+		foreach( $transform as $oldkey => $newarr )
+		{
+			$newname = (isset($newarr[1])) ? $newarr[1] : $oldkey;
+			if( !isset( $row[$oldkey] ) )
+			{
+				echo '&nbsp;&middot;Setting '.$oldkey.' not found, using defaults.<br />';
+				$trans[ $newname ] = $newarr[0];
+			}
+			else
+			{
+				$trans[ $newname ] = $row[$oldkey];
+			}
+		}
+		
+		$query .= "
+			( 'db_version', '$new_db_version' ),
+			( 'default_locale', 'en-EU' ),
+			( 'links_extrapath', '0' ),
+			( 'permalink_type', 'urltitle' )";
+		
+		foreach( $trans as $name => $value )
+		{
+			$query .= ", ('$name', '".$DB->escape($value)."')";
+		}
+		
+		// drop old table
+		$DB->query( "DROP TABLE IF EXISTS $tablesettings");
+		
+		// create new table
+		$DB->query( "CREATE TABLE $tablesettings (
+								set_name VARCHAR( 30 ) NOT NULL ,
+								set_value VARCHAR( 255 ) NULL ,
+								PRIMARY KEY ( set_name )
+								)");
+
+		// write new settings
+		#echo $query;
 		$DB->query( $query );
 		echo "OK.<br />\n";
+
 
 		echo 'Upgrading Blog-User permissions table... ';
 		$query = "ALTER TABLE $tableblogusers
@@ -357,7 +412,8 @@ function upgrade_b2evo_tables()
 	}
 	
 	echo "Update DB schema version to $new_db_version... ";
-	$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
+	#$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
+	$query = "UPDATE $tablesettings SET set_value = '$new_db_version' WHERE set_name = 'db_version'";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

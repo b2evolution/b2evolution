@@ -145,7 +145,7 @@ function trackback_url($display = 1)
 {
 	global $htsrv_url, $id;
 	
-	if( get_settings('pref_links_extrapath') ) 
+	if( get_settings('links_extrapath') ) 
 	{
 		$tb_url = "$htsrv_url/trackback.php/$id";
 	} 

@@ -470,24 +470,41 @@ function is_email($user_email) {
 }
 
 
-/*
- * get_settings(-)
+/**
+ * Get setting from DB (cached)
+ *
+ * {@internal get_settings(-) }}
+ *
+ * @param string setting to retrieve
  */
 function get_settings( $setting )
 {
 	global $DB, $tablesettings, $cache_settings;
 
-	if( empty($cache_settings) )
+	if( empty($cache_settings) || !isset($cache_settings->$setting) )
 	{
-		$sql = "SELECT *
-						FROM $tablesettings";
-		$cache_settings = $DB->get_row( $sql );
+		$sql = "SELECT set_name, set_value FROM $tablesettings";
+		
+		$q = $DB->get_results( $sql );
+		
+		foreach( $q as $loop_q )
+		{
+			$cache_settings->{$loop_q->set_name} = $loop_q->set_value;
+		}
 	}
-	return $cache_settings->$setting;
+	if( isset($cache_settings->$setting) )
+	{
+		return $cache_settings->$setting;
+	}
+	else
+	{
+		debug_log("Setting '$setting' not defined.");
+		return false;
+	}
 }
 
 
-/*
+/**
  * overrides settings that have been read from DB
  *
  * @param string setting name
@@ -500,6 +517,29 @@ function set_settings( $setting, $value )
 	$cache_settings->$setting = $value;
 
 	return true;
+}
+
+
+/**
+ * changes settings into DB
+ *
+ * @param string setting name
+ * @param mixed setting value
+ */
+function change_settings( $setting, $value, $escape = true )
+{
+	global $cache_settings, $tablesettings, $DB;
+	
+	// change the cached settings
+	$cache_settings->$setting = $value;
+	
+	if( $escape )
+	{
+		$DB->escape($value);
+	}
+	$query = "UPDATE $tablesettings SET set_value = '".$value."' WHERE set_name = '$setting'";
+	
+	return $DB->query( $query );
 }
 
 
@@ -855,18 +895,20 @@ function remove_magic_quotes( $mixed )
  * - html (does nothing)
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
- * @return mixed Final value of Variable
+ * @param boolean Override if variable already set
+ * @param boolean Force setting of variable to default?
+ * @return mixed Final value of Variable, or false if we don't force setting and and did not set
  *
- * @todo add option to override what's already set.
+ * @todo add option to override what's already set. DONE.
  */
-function param(	$var, $type = '',	$default = '', $memorize = false )
+function param(	$var, $type = '',	$default = '', $memorize = false, $override = false, $forceset = true )
 {
 	global $$var;
 	global $global_param_list;
 
 	// Check if already set
 	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
-	if( !isset( $$var ) )
+	if( !isset( $$var ) || $override )
 	{
 		if( isset($_POST[$var]) )
 		{
@@ -885,12 +927,16 @@ function param(	$var, $type = '',	$default = '', $memorize = false )
 		}
 		elseif( $default === true )
 		{
-			die( sprintf( T_('Parameter %s is required!'), $var ) );
+			die( '<p class="error">'.sprintf( T_('Parameter %s is required!'), $var ).'</p>' );
 		}
-		else
+		elseif( $forceset )
 		{
 			$$var = $default;
 			// echo "$var=".$$var." set to default<br/>";
+		}
+		else
+		{ // don't set the variable
+			return false;
 		}
 	}
 	else

@@ -190,7 +190,7 @@
 				
 		if(  $edited_User->get('ID') != 1 )
 		{
-			$chosengroup = ( $edited_User->Group === NULL ) ? get_settings('pref_newusers_grp_ID') : $edited_User->Group->get('ID');
+			$chosengroup = ( $edited_User->Group === NULL ) ? get_settings('newusers_grp_ID') : $edited_User->Group->get('ID');
 			form_select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 		}
 		else

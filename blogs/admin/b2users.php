@@ -285,7 +285,7 @@ switch ($action)
 		{
 			errors_add( T_('You can\'t delete Group #1!') );
 		}
-		if( $id == get_settings('pref_newusers_grp_ID' ) )
+		if( $id == get_settings('newusers_grp_ID' ) )
 		{
 			errors_add( T_('You can\'t delete the default group for new users!') );
 		}

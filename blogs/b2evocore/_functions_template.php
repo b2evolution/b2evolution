@@ -122,7 +122,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	else
 		$link = $file;
 
-	if( (! get_settings('pref_links_extrapath')) || (!empty($params)) )
+	if( (! get_settings('links_extrapath')) || (!empty($params)) )
 	{	// We reference by Query: Dirty but explicit permalinks
 		$link .= '?'.$params.'&amp;m=';
 		$separator = '';
@@ -145,7 +145,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	}
 	elseif( !empty( $week ) )
 	{
-		if( ! get_settings('pref_links_extrapath') )
+		if( ! get_settings('links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
 			$link .= '&amp;w='.$week;
 		}
