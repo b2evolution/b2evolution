@@ -76,7 +76,8 @@
 			form_text( 'newuser_yim', get_user_info( 'yim' ), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
 
 			form_checkbox( 'newuser_notify', get_user_info( 'notify' ), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
-		?>
+			form_checkbox( 'newuser_showonline', get_user_info( 'showonline' ), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
+ 		?>
 
 		<fieldset>
 			<div class="label"><label for="pass1"><?php echo T_('New password') ?>:</label></div>
