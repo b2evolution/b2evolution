@@ -1181,10 +1181,11 @@ function autoquote( & $string )
  * validate_url(-)
  *
  * fplanque: 0.8.5: changed return values
+ * vegarg: switched to MySQL antispam list
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
-	global $block_urls;
+	global $tableblacklist, $querycount;
 
 	if( empty($url) ) 
 	{	// Empty URL, no problem
@@ -1203,6 +1204,14 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// Search for blocked URLs:
+	$query = "SELECT * FROM $tableblacklist";
+	$querycount++;
+	$q = mysql_query( $query ) or mysql_oops( $query );
+	$block_urls = array();
+	while( list($id,$tmp) = mysql_fetch_row($q) )
+	{
+		$block_urls[] = $tmp;
+	}
 	foreach ($block_urls as $block)
 	{
 		if( strpos($url, $block) !== false)
