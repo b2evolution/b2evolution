@@ -47,6 +47,7 @@ class Settings
 	 */
 	function get( $setting )
 	{
+		global $Debuglog;
 		// echo 'get: '.$setting.'<br />';
 
 		if( isset($this->$setting) )
@@ -55,7 +56,7 @@ class Settings
 		}
 		else
 		{
-			debug_log("Setting '$setting' not defined.");
+			$Debuglog->add("Setting '$setting' not defined.");
 			return false;
 		}
 	}

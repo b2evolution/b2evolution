@@ -20,16 +20,13 @@ if( isset( $main_init ) )
 $main_init = true;
 
 require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/_functions.php' );
-
-timer_start();
-
-require_once( dirname(__FILE__).'/_vars.php' );	// sets various arrays and vars for use in b2
 require_once( dirname(__FILE__).'/_class_log.php' );
-
-$DebugLog = new Log( 'note' );
+$Debuglog = new Log( 'note' );
 $Messages = new Log( 'error' );
 
+require_once( dirname(__FILE__).'/_functions.php' );
+timer_start();
+require_once( dirname(__FILE__).'/_vars.php' );	// sets various arrays and vars for use in b2
 require_once( dirname(__FILE__).'/_class_settings.php' );
 require_once( dirname(__FILE__).'/_class_db.php' );
 require_once( dirname(__FILE__).'/_functions_template.php' );	// function to be called from templates
@@ -74,13 +71,13 @@ $servertimenow = time();
 $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
 
 
-debug_log('default_locale from conf: '.$default_locale);
+$Debuglog->add('default_locale from conf: '.$default_locale);
 
 locale_overwritefromDB();
-debug_log('default_locale from DB: '.$default_locale);
+$Debuglog->add('default_locale from DB: '.$default_locale);
 
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
-debug_log('default_locale from HTTP_ACCEPT: '.$default_locale);
+$Debuglog->add('default_locale from HTTP_ACCEPT: '.$default_locale);
 
 // Activate default locale:
 locale_activate( $default_locale );
@@ -108,7 +105,7 @@ if( is_logged_in() && $current_User->get('locale') != $default_locale )
 { // change locale to users preference
 	$default_locale = $current_User->get('locale');
 	locale_activate( $default_locale );
-	debug_log('default_locale from user profile: '.$default_locale);
+	$Debuglog->add('default_locale from user profile: '.$default_locale);
 }
 
 
@@ -121,7 +118,7 @@ $uri_reloaded = (bool)$DB->get_var("SELECT visitID FROM $tablehitlog
 												AND hit_remote_addr = ".$DB->quote($_SERVER['REMOTE_ADDR'])."
 												AND hit_user_agent = ".$DB->quote($HTTP_USER_AGENT) );
 if( $uri_reloaded )
-	debug_log( 'URI-reload!' );
+	$Debuglog->add( 'URI-reload!' );
 
 
 // Load hacks file if it exists

@@ -63,7 +63,6 @@
 		function setCheckboxes(the_form, the_elements, do_check)
 		{
 			var elts = document.forms[the_form].elements[the_elements];
-			/*alert( typeof(document.forms[the_form].elements[the_elements]) );*/
 			
 			var elts_cnt = (typeof(elts.length) != 'undefined')
 											? elts.length
@@ -80,8 +79,8 @@
 		}
 		function toggleCheckboxes(my_form, the_elements)
 		{
-			if(my_form.checkall.checked) setCheckboxes(my_form.name, the_elements, true);
-			else  setCheckboxes(my_form.name, the_elements, false);
+			if(document.forms[my_form].checkall.checked) setCheckboxes(my_form, the_elements, true);
+			else  setCheckboxes(my_form, the_elements, false);
 		}
 		//-->
 		</script>

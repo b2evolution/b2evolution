@@ -14,6 +14,9 @@
  *  - assign comment_author_ID to comments if user exist?!
  *
  * CHANGES:
+ *  0.9.0.6:
+ *   - Fixes..
+ *   - Auto-P more flexible.
  *  0.9.0.5: released with b2evo
  *   - minor UI changes
  *   - fixed mode links
@@ -77,7 +80,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 <div id="header">
 	<a href="http://b2evolution.net"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 	<div id="headinfo">
-	<br /><span style="font-size:150%; font-weight:bold">import Movable Type into b2evolution - v0.9.0.5</span>
+	<br /><span style="font-size:150%; font-weight:bold">import Movable Type into b2evolution - v0.9.0.5a</span>
 	</div>
 
 	<?php
@@ -368,7 +371,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			if( $mode != 'easy' )
 			{ // we'll use 'default' when importing
 				?>
-				<div class="label">Renderers</div>
+				<div class="label">Renderers:</div>
 				<div class="input"><?php renderer_list() ?></div>
 			<?php } ?>
 		</fieldset>
@@ -561,11 +564,27 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 
 
 		// get renderers
-		( $mode == 'easy' ) ? $default_renderers = array('default') : $default_renderers = array();
-		if( isset( $_POST['renderers'] ) )
+		if( $mode != 'easy' )
 		{
-			$default_renderers = $_POST['renderers'];
+			$default_renderers = array();
+			if( !isset($_POST['renderers']) )
+			{ // all unchecked
+				$default_renderers = array();
+			}
+			else $default_renderers = $_POST['renderers'];
+			
+			// the special Auto-P renderer
+			param( 'autop', 'string', true );
+			if( $autop === '1' )
+			{ // use always
+				$default_renderers[] = 'b2WPAutP';
+			}
 		}
+		else
+		{
+			$default_renderers = $Renderer->validate_list( array('default') );
+		}
+
 		
 		/*
 		// get image s&r
@@ -675,7 +694,15 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			++$i;
 			echo "\n<li>Processing post ";
 
+			preg_match( '/(AUTHOR: )?(.*?)\n/s', $post, $match );
+			$post_author = $match[2];
+			
+			$post = preg_replace("|^.*?\n|s", '', $post);
+			
+			echo 'from '.format_to_output( $post_author, 'entityencoded' ).' ';
+			
 			$post_catids = array();
+			$post_renderers = $default_renderers;
 
 			// Take the pings out first
 			preg_match("|(-----\n\nPING:.*)|s", $post, $pings);
@@ -736,21 +763,20 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				// Now we decide what it is and what to do with it
 				switch($key)
 				{
-					case 'AUTHOR':
-						$post_author = $value;
-						echo 'from '.format_to_output( $value, 'entityencoded' ).' ';
-						break;
 					case 'TITLE':
-						echo '<em>'.$value.'</em>... ';
+						echo '<em>'.strip_tags($value).'</em>... ';
 						$post_title = $value;
 						break;
 					case 'STATUS':
 						if( $value == 'Publish' )
-						{
 							$post_status = 'published';
+						elseif( $value == 'Draft' )
+							$post_status = 'draft';
+						else
+						{
+							echo '<p class="error">Unknown post status ['.$value.'], using "draft".';
+							$post_status = 'draft';
 						}
-						else $post_status = $value;
-						if( empty($post_status) ) $post_status = 'publish';
 						break;
 					case 'ALLOW COMMENTS':
 						$post_allow_comments = $value;
@@ -764,15 +790,36 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 						}
 						break;
 					case 'CONVERT BREAKS':
-						if( $value == '__default__' || $value == '' )
+						if( $value == '__default__' || empty($value) )
 							$post_convert_breaks = $default_convert_breaks;
-						else $post_convert_breaks = $value;
+						elseif( $value == 'textile_2'	&& array_search( 'b2DATxtl', $post_renderers ) === false )
+						{ // add the textile 2 renderer to the post's renderers
+							$post_renderers[] = 'b2DATxtl';
+							$post_convert_breaks = 1;  // TODO: check if this makes sense!
+						}
+						elseif( preg_match('/\d+/', $value) )
+						{
+							$post_convert_breaks = (int)( $value > 0 );
+						}
+						else
+						{
+							echo '<p class="error">Unknown CONVERT BREAKS value, using default ('.$default_convert_breaks.')..';
+							$post_convert_breaks = $default_convert_breaks;
+						}
+						
+						if( $autop == 'depends' && $post_convert_breaks && array_search( 'b2WPAutP', $post_renderers ) === false  )
+						{ // add the Auto-P renderer
+							$post_renderers[] = 'b2WPAutP';
+						}
+						
 						break;
 					case 'ALLOW PINGS':
-						$post_allow_pings = trim($metadata[2][0]);
-						if ($post_allow_pings == 1) {
+						if( $value == 1)
+						{
 							$post_allow_pings = 'open';
-						} else {
+						}
+						else
+						{
 							$post_allow_pings = 'closed';
 						}
 						break;
@@ -789,7 +836,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 						}
 						break;
 					case 'DATE':
-						$post_date = strtotime($value);
+						$post_date = strtotime( $value );
 						$post_date = date('Y-m-d H:i:s', $post_date);
 						break;
 					default:
@@ -815,7 +862,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 
 			// Let's check to see if it's in already
 			if( $post_ID = $DB->get_var("SELECT ID FROM $tableposts WHERE post_title = ".$DB->quote($post_title)." AND post_issue_date = '$post_date'")) {
-				echo '<span style="color:green">Post already imported.</span>';
+				echo '<span style="color:#09c">Post already imported.</span>';
 			}
 			else
 			{ // insert post
@@ -926,7 +973,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				$post_ID =
 					bpost_create( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_catids,
 												$post_status,	$post_locale,	'' /* $post_trackbacks */, $post_convert_breaks, true /* $pingsdone */,
-												'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $default_renderers );
+												'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
 
 				echo ' <span style="color:green">Post imported successfully (maincat: '.get_catname( $post_category );
 				if( count($post_catids) )
@@ -1045,6 +1092,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			<li><?php echo $count_userscreated ?> user(s) created.</li>
 			<li><?php echo $count_commentscreated ?> comment(s) imported.</li>
 			<li><?php echo $count_trackbackscreated ?> trackback(s) imported.</li>
+			<li>in <?php echo number_format(timer_stop(), 3) ?> seconds.</li>
 		</ul>
 		<a href="<?php echo $admin_dirout ?>">Have fun in your blogs</a> or <a href="<?php echo $admin_url ?>">go to admin</a> (it's fun there, too)</h3>
 		<?php
@@ -1210,7 +1258,8 @@ function import_data_extract_authors_cats()
 	}
 
 	$importdata = preg_replace("/\r?\n|\r/", "\n", $buffer);
-	$posts = explode('--------', $importdata);
+	$posts = preg_split( '/--------\nAUTHOR: /', $importdata ); 
+	#$posts = explode('--------', $importdata);
 
 	$authors = array(); $tempauthors = array();
 	$categories = array(); $tempcategories = array();
@@ -1219,6 +1268,9 @@ function import_data_extract_authors_cats()
 	{
 		if ('' != trim($post))
 		{
+			preg_match("|(AUTHOR: )?(.*)\n|", $post, $thematch);
+			array_push($tempauthors, trim($thematch[2])); //store the extracted author names in a temporary array
+			
 			if( !preg_match( '/(PRIMARY )?CATEGORY: (.*?)\n/', $post, $match ) || empty($match[2]) )
 			{
 				$tempcategories[] = '[no category assigned]';
@@ -1240,8 +1292,6 @@ function import_data_extract_authors_cats()
 			// remember how many times used as primary category
 			@$categories_countprim[ $tempcategories[ count($tempcategories)-1 ] ]++;
 
-			preg_match("|AUTHOR:(.*)|", $post, $thematch);
-			array_push($tempauthors, trim($thematch[1])); //store the extracted author names in a temporary array
 		}
 		else
 		{
@@ -1278,6 +1328,22 @@ function renderer_list()
 		if( $loop_RendererPlugin->apply_when == 'stealth'
 			|| $loop_RendererPlugin->apply_when == 'never' )
 		{	// This is not an option.
+			continue;
+		}
+		elseif( $loop_RendererPlugin->code == 'b2WPAutP' )
+		{ // special Auto-P plugin
+			?>
+			<div class="input">
+				<label for="textile" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name() ?>:</strong></label>
+				<div style="margin-left:2ex" />
+				<input type="radio" name="autop" value="1" class="checkbox" checked="checked" /> yes (always)<br>
+				<input type="radio" name="autop" value="0" class="checkbox" /> no (never)<br>
+				<input type="radio" name="autop" value="depends" class="checkbox" /> depends on CONVERT BREAKS
+				<span class="notes"> ..that means it will apply if convert breaks results to true (set to either 1, textile_2 or __DEFAULT__ (and &quot;Convert-breaks default&quot; checked above)</span>
+				
+				</div>
+			</div>
+			<?php
 			continue;
 		}
 		?>

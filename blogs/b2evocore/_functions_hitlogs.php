@@ -36,17 +36,17 @@ function log_hit()
 	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
 	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
 	global $HTTP_USER_AGENT;
-	global $uri_reloaded;
+	global $uri_reloaded, $Debuglog;
 	
 	# TODO: check for already logged?
 	
-	debug_log( 'Hit Log: '. "ReqURI: ".$ReqURI );
-	debug_log( 'Hit Log: '. "Remote Addr: ".$_SERVER['REMOTE_ADDR'] );
-	debug_log( 'Hit Log: '. "referer: ".$HTTP_REFERER );
-	#debug_log( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'] );
-	debug_log( 'Hit Log: '. "User Agent: ".$HTTP_USER_AGENT );
+	$Debuglog->add( 'Hit Log: '. "ReqURI: ".$ReqURI );
+	$Debuglog->add( 'Hit Log: '. "Remote Addr: ".$_SERVER['REMOTE_ADDR'] );
+	$Debuglog->add( 'Hit Log: '. "referer: ".$HTTP_REFERER );
+	#$Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'] );
+	$Debuglog->add( 'Hit Log: '. "User Agent: ".$HTTP_USER_AGENT );
 
-	// debug_log( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+	// $Debuglog->add( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 	
 	if( $uri_reloaded )
 	{ // the Request is considered as reload
@@ -59,12 +59,12 @@ function log_hit()
 	{ // then they have tried something funny,
 		// putting HTML or PHP into the HTTP_REFERER
 		// $ignore = 'badchar';
-		debug_log( 'Hit Log: bad char in referer');
+		$Debuglog->add( 'Hit Log: bad char in referer');
 		return;		// Hazardous
 	}
 	elseif( $error = validate_url( $HTTP_REFERER, $comments_allowed_uri_scheme ) )
 	{	// if they are trying to inject javascript or a blocked (spam) URL
-		debug_log( 'Hit Log: '. $error);
+		$Debuglog->add( 'Hit Log: '. $error);
 		return;		// Hazardous
 	}
 	
@@ -74,7 +74,7 @@ function log_hit()
 		if( stristr($HTTP_REFERER, $site) )
 		{
 			// $ignore = 'blacklist';
-			debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');
+			$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');
 			return;
 		}
 	}
@@ -84,7 +84,7 @@ function log_hit()
 			|| stristr($ReqPath, 'atom')  )
 	{
 		$ignore = 'rss';
-		// don't mess up the XML!! debug_log( 'Hit Log: referer ignored (RSS));
+		// don't mess up the XML!! $Debuglog->add( 'Hit Log: referer ignored (RSS));
 	}
 	else
 	{	// Lookup robots
@@ -93,7 +93,7 @@ function log_hit()
 			if( ($user_agent[0] == 'robot') && (strstr($HTTP_USER_AGENT, $user_agent[1])) )
 			{
 				$ignore = "robot";
-				debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('robot'). ')');
+				$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('robot'). ')');
 				break;
 			}
 		}
@@ -104,7 +104,7 @@ function log_hit()
 		if( strlen($HTTP_REFERER) < 13 )
 		{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
 			$ignore = 'invalid';
-			debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
+			$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
 		}
 	}
 
@@ -112,11 +112,11 @@ function log_hit()
 	{	// identify search engines
 		foreach($search_engines as $engine)
 		{
-			// debug_log( 'Hit Log: '."engine: ".$engine);
+			// $Debuglog->add( 'Hit Log: '."engine: ".$engine);
 			if( stristr($HTTP_REFERER, $engine) )
 			{
 				$ignore = 'search';
-				debug_log( 'Hit Log: '. T_('referer ignored'). " (". T_('search engine'). ")");
+				$Debuglog->add( 'Hit Log: '. T_('referer ignored'). " (". T_('search engine'). ")");
 				break;
 			}
 		}
@@ -124,7 +124,7 @@ function log_hit()
 
 	if( $doubleCheckReferers )
 	{
-		debug_log( 'Hit Log: '. T_('loading referering page') );
+		$Debuglog->add( 'Hit Log: '. T_('loading referering page') );
 
 		// this is so that the page up until the call to
 		// logReferer will get shown before it tries to check
@@ -135,7 +135,7 @@ function log_hit()
 		if( strlen($HTTP_REFERER) > 0 )
 		{
 			$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $ReqURI;
-			// debug_log( 'Hit Log: '. "full current url: ".$fullCurrentURL);
+			// $Debuglog->add( 'Hit Log: '. "full current url: ".$fullCurrentURL);
 
 			$fp = @fopen( $HTTP_REFERER, 'r' );
 			if( $fp )
@@ -148,14 +148,14 @@ function log_hit()
 				}
 				if (strstr($page,$fullCurrentURL))
 				{
-					debug_log( 'Hit Log: '. T_('found current url in page') );
+					$Debuglog->add( 'Hit Log: '. T_('found current url in page') );
 					$goodReferer = 1;
 				}
 			}
 			
 			if( !$goodReferer )
 			{	// This was probably spam!
-				debug_log( 'Hit Log: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
+				$Debuglog->add( 'Hit Log: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
 				return;
 			}
 		}

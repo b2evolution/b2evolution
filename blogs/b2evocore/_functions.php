@@ -1100,21 +1100,6 @@ function pre_dump($dump, $title = '')
 }
 
 
-$debug_messages = array();
-/**
- * Log a debug string to be displayed later. (Typically at the end of the page)
- *
- * {@internal debug_log(-) }}
- *
- * @param boolean true to force output
- */
-function debug_log( $message )
-{
-	global $debug_messages;
-
-	$debug_messages[] = $message;
-}
-
 /**
  * Outputs debug info. (Typically at the end of the page)
  *
@@ -1126,7 +1111,7 @@ function debug_info( $force = false )
 {
 	global $debug;
 	global $querycount;
-	global $debug_messages;
+	global $Debuglog;
 	global $DB;
 	global $obhandler_debug;
 
@@ -1139,10 +1124,10 @@ function debug_info( $force = false )
 			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 		}
 
-		if( count( $debug_messages ) )
+		if( $Debuglog->count() )
 		{
 			echo '<h3>Debug messages</h3><ul>';
-			foreach( $debug_messages as $message )
+			foreach( $Debuglog->messages() as $message )
 			{
 				echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';
 			}
@@ -1300,7 +1285,7 @@ function url_add_tail( $url, $tail )
  */
 function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 {
-	global $b2_version, $current_locale, $locales;
+	global $b2_version, $current_locale, $locales, $Debuglog;
 	
 	if( !is_array( $headers ) )
 	{ // make sure $headers is an array
@@ -1326,7 +1311,7 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 		$headerstring .= implode( "\n", $headers );
 	}
 	
-	debug_log( "Sending mail from $from to $to - subject $subject." );
+	$Debuglog->add( "Sending mail from $from to $to - subject $subject." );
 	
 	return @mail( $to, $subject, $message, $headerstring );
 }

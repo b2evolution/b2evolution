@@ -478,15 +478,16 @@ if( $Messages->count( 'all' ) )
 	?>
 	<div class="panelinfo">
 	<?php
+	
 	$Messages->display(
 		(isset( $edited_user_ID ) ?
 			(($edited_user_ID == 0) ? T_('The user was not created:') : T_('The user was not updated:'))
 		: (isset( $edited_grp_ID) ?
 			(($edited_grp_ID == 0) ? T_('The group was not created:') : T_('The group was not updated:'))
 			: '')
-		), '', 'error');
+		), '', true, 'error');
 	
-	$Messages->display( '', '', 'note' );
+	$Messages->display( '', '', true, 'note' );
 	?>
 	</div>
 	<?php

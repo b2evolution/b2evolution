@@ -58,12 +58,12 @@ class DataObjectCache
 	 */
 	function load_all()
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
 		if( $this->all_loaded )
 			return	false;	// Already loaded;
 
-		debug_log( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename";
 		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
@@ -90,9 +90,9 @@ class DataObjectCache
 	 */
 	function load_list( $req_list )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
-		debug_log( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
 		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
@@ -146,11 +146,11 @@ class DataObjectCache
 	 */
 	function get_by_ID( $req_ID, $halt_on_error = true )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
 		if( !empty( $this->cache[ $req_ID ] ) )
 		{	// Already in cache
-			// debug_log( "Accessing $this->objtype($req_ID) from cache" );
+			// $Debuglog->add( "Accessing $this->objtype($req_ID) from cache" );
 			return $this->cache[ $req_ID ];
 		}
 		elseif( !$this->all_loaded )
@@ -161,7 +161,7 @@ class DataObjectCache
 			}
 			else
 			{ // Load just the requested object:
-				debug_log( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
+				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
 				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
 				$row = $DB->get_row( $sql );
 				$dbIDname = $this->dbIDname;

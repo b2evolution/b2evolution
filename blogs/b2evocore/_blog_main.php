@@ -59,11 +59,11 @@ if( empty($disp) )
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 // Activate matching locale:
-debug_log('Activating blog locale: '.$Blog->get('locale'));
+$Debuglog->add('Activating blog locale: '.$Blog->get('locale'));
 locale_activate( $Blog->get('locale') );
 
 // Update the active session for the current user
-debug_log('Updating the active session for the current user');
+$Debuglog->add('Updating the active session for the current user');
 online_user_update();
 
 // -------------------------

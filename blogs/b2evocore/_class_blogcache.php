@@ -39,10 +39,10 @@ class BlogCache extends DataObjectCache
 	 */
 	function get_by_stub( $req_stub, $halt_on_error = true )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
 		// Load just the requested object:
-		debug_log( "Loading <strong>$this->objtype($req_stub)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_stub)</strong> into cache" );
 		$sql = "SELECT * 
 						FROM $this->dbtablename 
 						WHERE blog_stub = ".$DB->quote($req_stub);

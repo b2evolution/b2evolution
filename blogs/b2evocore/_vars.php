@@ -38,8 +38,8 @@ else
 	$ReqPath = explode( '?', $ReqURI, 2 );
 	$ReqPath = $ReqPath[0];
 }
-debug_log( 'Request URI: '.$ReqURI );
-debug_log( 'Request Path: '.$ReqPath );
+$Debuglog->add( 'Request URI: '.$ReqURI );
+$Debuglog->add( 'Request Path: '.$ReqPath );
 
 
 
@@ -91,13 +91,13 @@ if( $HTTP_USER_AGENT != '' )
 	if ($HTTP_USER_AGENT != strip_tags($HTTP_USER_AGENT))
 	{ // then they have tried something funky,
 		// putting HTML or PHP into the HTTP_USER_AGENT
-		debug_log( 'setting vars: '.T_('bad char in User Agent'));
+		$Debuglog->add( 'setting vars: '.T_('bad char in User Agent'));
 		$HTTP_USER_AGENT = T_('bad char in User Agent');
 	}
 
 }
 $is_IE = (($is_macIE) || ($is_winIE));
-// debug_log( 'setting vars: '. "User Agent: ".$HTTP_USER_AGENT);
+// $Debuglog->add( 'setting vars: '. "User Agent: ".$HTTP_USER_AGENT);
 
 
 // server detection
