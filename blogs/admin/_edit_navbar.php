@@ -49,6 +49,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			<?php
 				$Form = & new Form( $pagenow, 'showXfirstlastposts', 'get', 'none' );
 				$Form->begin_form( '' );
+				$Form->hidden( 'tab', $tab );
 				$Form->hidden( 'blog', $blog );
 				if( $MainList->unit == 'days' )
 				{

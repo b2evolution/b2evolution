@@ -37,6 +37,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
+ * @author fplanque: François PLANQUE.
  *
  * @version $Id$
  */
@@ -974,4 +975,10 @@ class AdminUI_general
 
 }
 
+/*
+ * $Log$
+ * Revision 1.12  2005/03/11 12:40:15  fplanque
+ * multiple browsing views, part ONE
+ *
+ */
 ?>
