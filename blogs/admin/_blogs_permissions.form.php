@@ -9,7 +9,7 @@
  * @package admin
  */
 ?>
-<form class="fform" method="post" name="FormPerm">
+<form action="b2blogs.php" class="fform" method="post" name="FormPerm">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="perm" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />

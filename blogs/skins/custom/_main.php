@@ -170,7 +170,7 @@
 
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
-		<form name="SearchForm" method="get" class="search" action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>">
+		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'SearchForm' ) ?>
 			<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
 			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
 			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
@@ -182,7 +182,7 @@
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Categories') ?></h3>
-		<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
+		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 			require( dirname(__FILE__).'/_categories.php' );
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>

@@ -10,7 +10,7 @@
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.9.1+CVS-20040522';
+$b2_version = '0.9.1+CVS-20040523';
 $new_db_version = 8070;				// next time: 8080
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/

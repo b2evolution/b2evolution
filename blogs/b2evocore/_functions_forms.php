@@ -208,4 +208,39 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 	echo "</td></tr>\n\n";
 }
 
+
+/**
+ * creates a form header and puts GET params of $action into hidden form inputs
+ */
+function form_formstart( $action, $class = '', $name = '', $method = 'get' )
+{
+	if( $method == 'get' )
+	{
+		$action = explode( '?', $action );
+		if( isset($action[1]) )
+		{ // we have GET params in $action
+			$getparams = preg_split( '/&amp;|&/i', $action[1], -1, PREG_SPLIT_NO_EMPTY );
+		}
+		$action = $action[0];
+	}
+	
+	echo '<form action="'.$action.'" method="'.$method.'"';
+	
+	if( !empty($name) ) echo ' name="'.$name.'"';
+	if( !empty($class) ) echo ' class="'.$class.'"';
+	
+	echo '>';
+	if( isset($getparams) )
+	{
+		foreach( $getparams as $param)
+		{
+			$param = explode( '=', $param );
+			if( isset($param[1]) )
+			{
+				echo '<input type="hidden" name="'.$param[0].'" value="'.$param[1].'" />';
+			}
+		}
+	}
+	
+}
 ?>

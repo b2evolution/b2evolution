@@ -148,7 +148,7 @@
 
 <h4>Categories&nbsp;:</h4>
 <!-- ---------------------------- START OF CATEGORIES ---------------------------- -->
-<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
+<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 <?php require( dirname(__FILE__).'/_categories.php' ); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 <input type="reset" value="<?php echo T_('Reset form') ?>" />

@@ -235,7 +235,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
-		<form name="searchform" method="get" class="search" action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>">
+		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'searchform' ) ?>
 				<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="s1" />
 				<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
 				<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
@@ -247,7 +247,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Categories') ?></h3>
-		<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
+		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 			require( get_path('skins').'/_categories.php');
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>

@@ -22,7 +22,7 @@
 </p>
 
 <!-- this is for the spellchecker -->
-<form name="SPELLDATA"><div>
+<form action="" name="SPELLDATA"><div>
 <input name="formname" type="hidden" value="" />
 <input name="messagebodyname" type="hidden" value="" />
 <input name="subjectname" type="hidden" value="" />

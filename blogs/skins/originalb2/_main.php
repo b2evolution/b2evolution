@@ -142,7 +142,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 
 <h4>categories:</h4>
-<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
+<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 <?php	require( dirname(__FILE__).'/_categories.php' ); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 </form>
@@ -150,7 +150,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 
 <h4>search:</h4>
 
-<form name="searchform" method="get" action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>">
+<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', 'searchform' ) ?>
 	<input type="text" name="s" size="15" style="width: 100%" />
 	<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
 </form>

@@ -9,7 +9,7 @@
  * @package admin
  */
 ?>
-<form class="fform" method="post">
+<form action="b2blogs.php" class="fform" method="post">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="advanced" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />

@@ -153,7 +153,7 @@ if ( ereg('image/',$img1_type)) {
 <p><strong><?php echo T_('File uploaded !') ?></strong></p>
 <p><?php printf( T_('Your file <strong>"%s"</strong> was uploaded successfully !'), $img1_name ); ?></p>
 <p><?php echo T_('Here\'s the code to display it:') ?></p>
-<p><form>
+<p><form action="b2upload.php">
 <!--<textarea cols="25" rows="3" wrap="virtual"><?php echo "&lt;img src=&quot;$fileupload_url/$img1_name&quot; border=&quot;0&quot; alt=&quot;&quot; /&gt;"; ?></textarea>-->
 <input type="text" name="imgpath" value="<?php echo $piece_of_code; ?>" size="40" class="large" /><br />
 <input type="button" name="close" value="<?php echo T_('Add the code to your post !') ?>" class="search" onClick="targetopener('<?php echo $piece_of_code; ?>')" />
@@ -170,7 +170,7 @@ if ( ereg('image/',$img1_type)) {
 <?php echo "$img1_type"; ?>
 </p>
 <p align="right">
-<form>
+<form action="b2upload.php">
 <input type="button" name="close" value="<?php echo T_('Close this window') ?>" class="search" onClick="window.close()" />
 </form>
 </p>

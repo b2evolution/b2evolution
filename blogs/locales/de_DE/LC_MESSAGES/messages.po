@@ -2112,12 +2112,12 @@ msgstr "Nächsten %d"
 #. TRANS: x TO y OF z
 #: ..\..\..\admin\_edit_navbar.php:39
 msgid " to "
-msgstr "bis"
+msgstr " bis "
 
 #. TRANS: x TO y OF z
 #: ..\..\..\admin\_edit_navbar.php:41
 msgid " of "
-msgstr "von"
+msgstr " von "
 
 #: ..\..\..\admin\_edit_navbar.php:47
 msgid "from the end"

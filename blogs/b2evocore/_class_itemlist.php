@@ -45,6 +45,9 @@ class ItemList extends DataObjectList
 	var $max_paged;						// Max page number for paged display
 
 	var $group_by_cat;
+	
+	var $limitdate_start;
+	var $limitdate_end;
 
 	// Used in looping
 	var $row_num;							// Current row
@@ -103,7 +106,7 @@ class ItemList extends DataObjectList
 		$this->preview = $preview;
 		$this->blog = $blog;
 		$this->p = $p;
-
+		
 		if( !empty($posts) )
 			$posts_per_page = $posts;
 		elseif( !empty($default_posts_per_page) )
@@ -335,7 +338,7 @@ class ItemList extends DataObjectList
 		 * ----------------------------------------------------
 		 */
 		if( !empty($poststart) )
-		{ // fp added: when in backoffice: always page
+		{ // fp added: when in backoffice: always paged
 			// echo 'POSTSTART-POSTEND ';
 			if( $postend < $poststart )
 			{
@@ -349,14 +352,16 @@ class ItemList extends DataObjectList
 			elseif ($what_to_show == 'days')
 			{
 				$posts = $postend - $poststart + 1;
-				echo 'days=',$posts;
+				// echo 'days=',$posts;
 				$lastpostdate = get_lastpostdate( $blog, $show_statuses );
 				$lastpostdate = mysql2date('Y-m-d 23:59:59',$lastpostdate);
-				echo $lastpostdate;
+				// echo $lastpostdate;
 				$lastpostdate = mysql2date('U',$lastpostdate);
-				$startdate = date('Y-m-d H:i:s', ($lastpostdate - (($poststart -1) * 86400)));
-				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend) * 86400)));
-				$where .= ' AND post_issue_date > \''. $otherdate . '\' AND post_issue_date <= \''. $startdate . '\'';
+				$this->limitdate_end = $lastpostdate - (($poststart -1) * 86400);
+				$this->limitdate_start = $lastpostdate+1 - (($postend) * 86400);
+				$where .= ' AND post_issue_date >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start ) 
+									.'\' AND post_issue_date <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
+				
 			}
 		}
 		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
@@ -391,7 +396,6 @@ class ItemList extends DataObjectList
 		{
 			echo 'DEFAULT - NO LIMIT';
 		}*/
-
 
 		/*
 		 * ----------------------------------------------------
