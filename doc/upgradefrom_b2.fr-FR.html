@@ -39,15 +39,22 @@
 
 <p>La procédure de mise à jour ci dessous a été testée exclusivement avec b2 versions 0.6.1 et 0.6.2. Cependant, nous pensons que les versions 0.5.x devraient également pouvoir être mises à jour sans problèmes. Dans tous les cas, si vous utilisez une version antérieure de b2, vous pouvez faire un essai de mise à jour sans risque. b2evolution n'abimera pas vos données, même s'il n'arrive pas à les comprendre. Le pire qui pourrait arriver est un message d'erreur.</p>
 
-<p><em>However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new.</em></p>
+<p><em>However, as always, it is wise to do a backup of your current website / blog / database
+(depending on what you already have) before starting to install something new.</em></p>
 
 <p>Après avoit dézippé le fichier de distribution de b2evolution:</p>
 
 <ol class="expanded">
-<li>On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!<br />
+<li>On your server, locate the mysql database you are already using for Cafelog/b2.
+	You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will
+	not alter your Cafelog/b2 tables and data in any way!<br />
 		<span class="small"><br />
-		<strong>Note 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way.<br />
-		<strong>Note 2:</strong> Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database.</span>
+		<strong>Note 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with
+		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
+		b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 .
+		Your existing tables will not be affected in any way.<br />
+		<strong>Note 2:</strong> Why the same database? Because the SQL process we use to copy the data -- which is fast and
+		secure -- can only be done within a single database.</span>
 </li>
 
 <li>Téléchargez les fichiers de b2evolution sur votre serveur web.<br />
@@ -59,8 +66,8 @@ Supposons que vous installiez les contenus du répertoire blogs à l'emplacement <
 <li>Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/b2evo/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés, copiera vos données b2 vers b2evolution (sans altérer b2) et configurera b2evolution pour vous. </li>
 <li>Vérifiez que la nouvelle installation fonctionne.</li>
 <li>Sur les serveurs de production, il est recommandé de supprimer le sous répertoire <code>/install</code>.</li>
-<li>Consultez le <a href="http://wiki.b2evolution.net/">wiki</a> ou les <a href="http://wiki.b2evolution.net/">forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit b2 existant vers b2evolution.</li>
-<li>Une fois que l'installation de base est terminée, il y a quelques <a href="http://b2evolution.net/man/install/trickystuff.html">choses légèrement délicates à régler</a> (manual en ligne).</li>
+<li>Check the <a href="http://wiki.b2evolution.net/">wiki</a> or the <a href="http://forums.b2evolution.net/">forums</a> for notes on upgrading your existing b2 template to b2evolution.</li>
+<li>After basic install is done, there are a few <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things you may need to take care of</a> (online manual).</li>
 </ol>
 
 	<div id="rowfooter">

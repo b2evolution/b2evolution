@@ -142,7 +142,7 @@ class POFile // {{{
 		}
 
 		// replace links
-		$msgid = preg_replace('/<a(\s+.*?)href=".*?"(.*?)>/', '<a$1%href$2>', $msgid);
+		$msgid = preg_replace('/<a\s+([^>]*)>/', '<a %s>', $msgid);
 
 		// we don't want tabs and returns in the msgid, but we must escape '"'
 		$search = array("\r", "\n", "\t", '"');
@@ -165,34 +165,34 @@ class POFile // {{{
 	 */
 	function translate( $msgid )
 	{
-		if( preg_match('/<a(.*?)(href=".*?")(,*?)>/', $msgid, $matches) )
+		$omsgid = $msgid;  // remember
+		
+		if( preg_match_all('/<a\s+([^>]*)>/', $msgid, $matches) )
 		{	// we have to replace links
-			// remember urls
-			$urls = $matches[2];
+			// remember a-tag params
+			$aparams = $matches[1];
 
-			// generate clean msgid
-			$msgid = preg_replace('/<a(.*?)href="(.*?)"(,*?)>/', '<a$1%href$3>', $msgid);
+			// generate clean msgid like in .po files
+			$msgid = preg_replace('/<a\s+([^>]*)>/', '<a %s>', $msgid);
 		}
 
 		// we don't have formatting in the .po files, but escaped '"'
 		$msgid = str_replace( array("\r", "\n", "\t", '"'), array('', ' ', '', '\"'), $msgid);
 
-		#pre_dump($msgid);
-
 		if( isset($this->msgids[ $msgid ]) )
 		{
 			$trans = $this->msgids[ $msgid ]['trans'];
 
-			if( isset($urls) )
+			if( isset($aparams) )
 			{
-				$trans = str_replace('%href', $urls, $trans);
+				$trans = vsprintf($trans, $aparams);
 			}
 
 			return $trans;
 		}
 		else
 		{
-			return TRANSTAG_OPEN.$msgid.TRANSTAG_CLOSE;
+			return TRANSTAG_OPEN.$omsgid.TRANSTAG_CLOSE;
 		}
 	}
 
@@ -426,7 +426,7 @@ switch( $action )
 			$lm = 0;  // represents line numer - 1
 			foreach( $matches_msgids[1] as $match )
 			{
-				while( $match[1] > $matches_line[0][ $lm ][1] )
+				while( isset($matches_line[0][$lm]) && ($match[1] > $matches_line[0][ $lm ][1]) )
 				{ // assign line numbers
 					$lm++;
 				}

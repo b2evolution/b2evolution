@@ -114,7 +114,7 @@ msgid "b2evolution is probably the most comprehensive blog engine you can find! 
 msgstr ""
 
 #: ../../index.src.html:35
-msgid "You will find complete information on the official <a %href>b2evolution website</a>."
+msgid "You will find complete information on the official <a %s>b2evolution website</a>."
 msgstr ""
 
 #: ../../index.src.html:36
@@ -229,7 +229,7 @@ msgstr ""
 #: ../../doc/install_new.src.html:50
 #: ../../doc/upgradefrom_b2.src.html:69
 #: ../../doc/upgradefrom_b2evo.src.html:48
-msgid "After basic install is done, there are a few <a %href>tricky things you may need to take care of</a> (online manual)."
+msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:6
@@ -281,7 +281,7 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:68
-msgid "Check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
@@ -309,7 +309,7 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:44
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %href>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading specific files from a specific version to another."
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr ""
 
 msgid "English (EU)"

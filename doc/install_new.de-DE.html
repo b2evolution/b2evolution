@@ -30,8 +30,8 @@
 			<ul style="margin-left: 2ex;list-style:none;">
 		<li><a href="install_new.html"><img src="../blogs/img/flags/w16px/eu.gif" alt="English (EU)" border="1"  class="flag"/> Englisch (EU)</a></li>
 		<li><a href="install_new.de-DE.html"><img src="../blogs/img/flags/w16px/de.gif" alt="German (DE)" border="1"  class="flag"/><strong> Deutsch (DE)</strong></a></li>
-		<li><a href="install_new.fr-FR.html"><img src="../blogs/img/flags/w16px/fr.gif" alt="French (FR)" border="1"  class="flag"/> French (FR)</a></li>
-		<li><a href="install_new.nl-NL.html"><img src="../blogs/img/flags/w16px/nl.gif" alt="Dutch (NL)" border="1"  class="flag"/> Dutch (NL)</a></li>
+		<li><a href="install_new.fr-FR.html"><img src="../blogs/img/flags/w16px/fr.gif" alt="French (FR)" border="1"  class="flag"/> Französisch (FR)</a></li>
+		<li><a href="install_new.nl-NL.html"><img src="../blogs/img/flags/w16px/nl.gif" alt="Dutch (NL)" border="1"  class="flag"/> Holländisch (NL)</a></li>
 	</ul>
 	</div>
 	
@@ -39,19 +39,21 @@
 
 <p>Sobald du die b2evolution Distribution entpackt hast:</p>
 
-<ol class="expanded"><li>On your server, create or locate a mysql database for b2evolution. (For example, you can call it \"b2evolution\")<br />
+<ol class="expanded"><li>Auf deinem Server solltest du eine MySQL Datenbank für b2evolution bereit- oder erstellen. (du kannst sie zB "b2evolution" nennen)<br />
 	<br />
-	<span class="small"><strong>Note:</strong> Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way.</span></li>
-  <li>Upload the b2evolution files to your website.<br />
+	<span class="small"><strong>Anmerkung:</strong> Sofern du nicht die Konfiguration geändert hast, beginnen alle Tabellen, die von b2evolution erstellt werden mit evo_ . Solange du keine andere Anwendung hast, die das gleiche Prefix benutzt, ist es sicher b2evolution in eine Datenbank zu installieren, die es sich mit anderen Anwendungen teilt. Cafelog/b2 benutzte zB b2 als Tabellen-Prefix. Deine vorhandenen Tabellen werden in keinster Weise angerührt.</span></li>
+  <li>Lade die b2evolution Dateien auf deine Webseite hoch, entsprechend der URL die du gerade konfiguriert hast.<br />
 	<br />
-	<span class="small"><strong>Note: </strong>Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another.<br />
+	<span class="small"><strong>Anmerkung: </strong>Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another.<br />
 	</span>
 <br />
 Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ...</li>
-  <li>Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you. </li>
-<li>Check to make sure the new installation works.</li>
-<li>On production servers, it is recommended that you delete the <code>/install</code> subfolder.</li>
-<li>Nach der Basisinstallation gibt es noch ein paar <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things die du beachten solltest</a> (Online Anleitung).</li>
+  <li>Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br />
+<br />
+The installer will ask you a few questions, create required database tables and configure b2evolution for you. </li>
+<li>Überprüfe, ob die neue Installation funktioniert.</li>
+<li>Auf Produktionsservern ist es empfehlenswert, den Unterordner /blogs/install zu löschen.</li>
+<li>Nach der Grundinstallation gibt es noch ein paar <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things die du beachten solltest</a> (Online Anleitung).</li>
 </ol>
 
 	<div id="rowfooter">
