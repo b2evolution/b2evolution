@@ -57,7 +57,10 @@ function locale_activate( $locale )
 	
 	# Activate the charset for default language in gettext:
 	$current_charset = $locales[$locale]['charset'];
-	bind_textdomain_codeset( 'messages', $current_charset );
+	if( function_exists( 'bind_textdomain_codeset' ) )
+	{
+		bind_textdomain_codeset( 'messages', $current_charset );
+	}
 	
 	# Set locale for default language:
 	# This will influence the way numbers are displayed, etc.

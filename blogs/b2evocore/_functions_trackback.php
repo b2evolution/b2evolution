@@ -148,7 +148,7 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = _('Trackback (0)');
 	if( $one == '#' ) $one = _('Trackback (1)');
-	if( $more == '#' ) $more = _('Trackback (%)');
+	if( $more == '#' ) $more = _('Trackbacks (%)');
 
 	global $id, $tablecomments, $tb, $querycount, $cache_trackbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'trackbacks');

@@ -243,7 +243,7 @@ function pingback_number($zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = _('Pingback (0)');
 	if( $one == '#' ) $one = _('Pingback (1)');
-	if( $more == '#' ) $more = _('Pingback (%)');
+	if( $more == '#' ) $more = _('Pingbacks (%)');
 
 	global $id, $tablecomments, $tb, $querycount, $cache_pingbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'pingbacks');
