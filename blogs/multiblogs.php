@@ -1,32 +1,21 @@
 <?php
 	/*
-	 * This is the main template to display a blog without using skins.
+	 * This is a demo template displaying multiple blogs on the same page
 	 *
-	 * Same display using evoSkins: blog_all.php
+	 * If you're new to b2evolution templates or skins, you should not start with this file
+	 * It will be easier to start examining blog_a.php or noskin_a.php for instance...
 	 */
 
-	# First, select which blog you want to display here!
-	# You can find these numbers in the back-office under the Blogs section.
-	# You can also create new blogs over there.
-	$blog = 4;   	// 4 is for the blogroll
+	# First blog will be displayed the regular way (why bother?)
+	$blog = 2;   	// 2 is for "demo blog A" or your upgraded blog (depends on your install)
 
-	# Tell b2evolution you don't want to use evoSkins for this template:
+	# Tell b2evolution you don't want to use evoSkins 
+	# (evoSkins are designed to display only one blog at once + optionnaly a blogroll)
 	$skin = '';
 	
 	# This setting retricts posts to those published, thus hiding drafts.
 	# You should not have to change this.
 	$show_statuses = "'published'";
-
-	# This is the blog to be used as a blogroll (set to 0 if you don't want to use this feature)
-	$blogroll_blog = 4;
-
-	# This is the list of categories to restrict the blogroll to (cats will be displayed recursively)
-	# Example: $blogroll_cat = '4,6,7';
-	$blogroll_cat = '';
-
-	# This is the array if categories to restrict the blogroll to (non recursive)
-	# Example: $blogroll_catsel = array( 4, 6, 7 );
-	$blogroll_catsel = array( );
 
 	# Here you can set a limit before which posts will be ignored
 	# You can use a unix timestamp value or 'now' which will hide all posts in the past
@@ -36,21 +25,20 @@
 	# You can use a unix timestamp value or 'now' which will hide all posts in the future
 	$timestamp_max = 'now';
 
+	# Additionnaly, you can set other values (see URL params in the manual)...
+	# $order = 'ASC'; // This for example would display the blog in chronological order...
 
 	# Let b2evolution handle the query string and load the blog data:
 	include(dirname(__FILE__)."/b2evocore/_blog_main.php");
 	
-	
-	# Now, below you'll find the main template...
-	
+	# Now, below you'll find the magic template...
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title><?php
-	bloginfo('name', 'htmlhead');
+<title>Multiblog demo<?php
 	single_cat_title( ' - ', 'htmlhead' );
 	single_month_title( ' - ', 'htmlhead' );
 	single_post_title( ' - ', 'htmlhead' );
@@ -88,11 +76,11 @@
 	$blog_item_start = '';				
 	$blog_item_end = '';
 	# This is the class of for the selected blog link:
-	$blog_selected_link_class = 'NavButton2Curr';
+	$blog_selected_link_class = 'NavButton2';
 	# This is the class of for the other blog links:
 	$blog_other_link_class = 'NavButton2';
 	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small"><img src="'. $baseurl.'/img/down_small.gif" width="14" height="12" border="0" alt="['._('Selected').']" title="" class="top" />';				
+	$blog_selected_name_before = '<span class="small">';				
 	$blog_selected_name_after = '</span>';
 	# This is additionnal markup before and after the other blog names
 	$blog_other_name_before = '<span class="small">';				
@@ -105,7 +93,7 @@
 <div class="NavBar">
 <div id="Logo">&nbsp;</div>
 <div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php bloginfo('name', 'htmlbody') ?><!-- InstanceEndEditable --></h1>
+<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" -->Multiblog demo<!-- InstanceEndEditable --></h1>
 </div>
 </div>
 
@@ -115,11 +103,15 @@
 </div>
 
 
-<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php bloginfo('tagline', 'htmlbody') ?><!-- InstanceEndEditable --></div>
+<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" -->This demo template displays 3 blogs at once (1 on the left, 2 on the right)<!-- InstanceEndEditable --></div>
 
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
+
+<!-- =================================== START OF MAIN AREA =================================== -->
+
 <div class="bPosts">
+<h2>#1: <a href="<?php bloginfo('blogurl', 'raw') ?>"><?php echo bloginfo( 'name', 'html' ) ?></a></h2>
 <h2><?php
 	single_cat_title();
 	single_month_title();
@@ -132,7 +124,6 @@
 	}
 ?></h2>
 
-<!-- =================================== START OF MAIN AREA =================================== -->
 
 <?php	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) while( $MainList->get_item() )
@@ -153,7 +144,7 @@ the_date( '', '<h2>', '</h2>' );
 		<div class="bSmallPrint">
 		<a href="<?php permalink_link() ?>#comments" title="Display comments / Leave a comment"><?php comments_number() ?></a>
 		-
-		<a href="<?php permalink_link() ?>#trackbacks" title="Display trackbacks / Get trackback address for this post"><?php trackback_number('', '') ?></a>
+		<a href="<?php permalink_link() ?>#trackbacks" title="Display trackbacks / Get trackback address for this post"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
 		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
@@ -193,90 +184,78 @@ the_date( '', '<h2>', '</h2>' );
 
 <div class="bSideBar">
 
+	<!-- =================================== START OF BLOG B =================================== -->
+
 	<div class="bSideItem">
-	  <h3><?php bloginfo('name', 'htmlbody') ?></h3>
-	  <p><?php bloginfo('longdesc', 'htmlbody'); ?></p>
-		<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
-		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
-		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
-		<ul>
-	  	<li><a href="<?php bloginfo('staticurl', 'raw') ?>"><strong><?php echo _('Recently') ?></strong></a> <span class="dimmed"><?php echo _('(cached)') ?></span></li>
-	  	<li><a href="<?php bloginfo('dynurl', 'raw') ?>"><strong><?php echo _('Recently') ?></strong></a> <span class="dimmed"><?php echo _('(no cache)') ?></span></li>
-		</ul>
-		<?php	// -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			include( dirname(__FILE__)."/_calendar.php"); 
-			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
-		<ul>
-	  	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong><?php echo _('Last comments') ?></strong></a></li>
-	  	<li><a href="<?php bloginfo('blogstatsurl') ?>"><strong><?php echo _('Some viewing statistics') ?></strong></a></li>
-		</ul>
-	</div>
+	<?php
+		// Dirty trick until we get everything into objects:
+		$saved_blog = $blog;  
+		$blog = 3;	// Blog B now
+	?>
+		<h3>#2: <a href="<?php bloginfo('blogurl', 'raw') ?>"><?php echo bloginfo( 'name', 'html' ) ?></a></h3>
+	<?php
+		// You can restrict to specific categories by listing them in the two params below: '', array()
+		// '', array(9,15) will restrict to cats 9 and 15
+		// '9,15', array() will restrict to cats 9,15 and all their subcats
+		$BlogBList = new ItemList( $blog,  $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
+			
+		while( $BlogBList->get_item() )
+		{ 
+		?>
+		<div class="bPostSide" lang="<?php the_lang() ?>">
+			<?php permalink_anchor(); ?>
 	
-	<div class="bSideItem">
-    <h3 class="sideItemTitle"><?php echo _('Search') ?></h3>
-		<form name="searchform" method="get" class="search" action="<?php bloginfo('blogurl', 'raw') ?>">
-				<input type="text" name="s" size="30" value="<?php echo $s ?>" class="s1" />
-				<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo _('All Words') ?></label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo _('Some Word') ?></label>
-				<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
-			<input type="submit" name="submit" value="<?php echo _('Search') ?>" />
-			<input type="reset" value="<?php echo _('Reset form') ?>" />
-		</form>
+			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
+			<div class="bText">
+				<?php the_content(); ?>
+				<?php link_pages("<br />Pages: ","<br />","number") ?>
+			</div>
+		</div>
+		<?php
+		}
+		
+		// Restore after dirty trick:
+		$blog = $saved_blog;		
+	?>
 	</div>
 
+	<!-- =================================== START OF BLOG C =================================== -->
+
 	<div class="bSideItem">
-		<h3><?php echo _('Categories') ?></h3>
-		<form action="<?php bloginfo('blogurl', 'raw') ?>" method="get">
-		<?php	// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			include( dirname(__FILE__)."/_categories.php"); 
-			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
-		<br />
-		<input type="submit" value="<?php echo _('Get selection') ?>" />
-		<input type="reset" value="<?php echo _('Reset form') ?>" />
-		</form>
+	<?php
+		// Dirty trick until we get everything into objects:
+		$saved_blog = $blog;  
+		$blog = 4;		// Blogroll now
+	?>
+		<h3>#3: <a href="<?php bloginfo('blogurl', 'raw') ?>"><?php echo bloginfo( 'name', 'html' ) ?></a></h3>
+	<?php
+		// You can restrict to specific categories by listing them in the two params below: '', array()
+		// '', array(9,15) will restrict to cats 9 and 15
+		// '9,15', array() will restrict to cats 9,15 and all their subcats
+		$BlogRollList = new ItemList( $blog,  $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', '3', 'posts', $timestamp_min, $timestamp_max );
+		
+		while( $BlogRollList->get_item() )
+		{
+?>
+		<div class="bPostSide" lang="<?php the_lang() ?>">
+			<?php permalink_anchor(); ?>
+	
+			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
+			<div class="bText">
+				<?php the_content(); ?>
+				<?php link_pages("<br />Pages: ","<br />","number") ?>
+			</div>
+		</div>
+		<?php
+		}
+		
+		// Restore after dirty trick:
+		$blog = $saved_blog;		
+	?>
 	</div>
 
-	<div class="bSideItem">
-    <h3>Archives</h3>
-    <ul>
-			<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				include( dirname(__FILE__)."/_archives.php"); 
-				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-				<li><a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo _('more...') ?></a></li>
-	  </ul>
-  </div>
+	<!-- =================================== END OF BLOG C =================================== -->
 
-	<?php if (! $stats) 
-	{ ?>
-<div class="bSideItem">
-		<h3><?php echo _('Recent Referers') ?></h3>
-			<?php refererList(5,'global'); ?>
-	  	<ul>
-				<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
-					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-				<?php } // End stat loop ?>
-				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo _('more...') ?></a></li>
-			</ul>
-		<br />
-		<h3><?php echo _('Top Referers') ?></h3>
-			<?php refererList(5,'global',0,0,'no','baseDomain'); ?>
-	   	<ul>
-				<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
-					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-				<?php } // End stat loop ?>
-				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo _('more...') ?></a></li>
-			</ul>
-</div>
-
-	<?php } ?>
-
-
-	<div class="bSideItem">
-    <h3><?php echo _('Blogroll') ?></h3>
-		<?php	// -------------------------- BLOGROLL INCLUDED HERE -----------------------------
-			include( dirname(__FILE__)."/_blogroll.php"); 
-			// -------------------------------- END OF BLOGROLL ---------------------------------- ?>
-	</div>
 
 	<div class="bSideItem">
     <h3><?php echo _('Misc') ?></h3>
@@ -284,20 +263,6 @@ the_date( '', '<h2>', '</h2>' );
 			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a></li>
 			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a></li>
 		</ul>	
-	</div>
-
-	<div class="bSideItem">
-    <h3><?php echo _('Syndicate this blog') ?> <img src="<?php echo $baseurl; ?>/img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
-
-
-      <ul>
-        <li><a href="<?php bloginfo('rss_url', 'raw'); ?>">RSS 0.92 (Userland)</a></li>
-        <li><a href="<?php bloginfo('rdf_url', 'raw'); ?>">RSS 1.0 (RDF)</a></li>
-        <li><a href="<?php bloginfo('rss2_url', 'raw'); ?>">RSS 2.0 (Userland)</a></li>
-      </ul>
-      <p><a href="http://www.xml.com/pub/a/2002/12/18/dive-into-xml.html" title="xml.com - External - English">What
-        is RSS?</a> by Mark Pilgrim</p>
-
 	</div>
 
 	<p class="center">powered by<br />
@@ -318,7 +283,7 @@ the_date( '', '<h2>', '</h2>' );
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
+		echo "Debug: $querycount queries - ".number_format(timer_stop(),3)." seconds";
 	}
 ?>
 <!-- InstanceEndEditable --></p>
