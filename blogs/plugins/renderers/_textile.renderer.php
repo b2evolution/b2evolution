@@ -199,7 +199,7 @@ Applying Attributes:
 class textile_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2DATxtl';
-	var $name = 'Textile';
+	var $name = 'Textile (beta)';
 	var $priority = 20;
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true; 

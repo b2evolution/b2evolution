@@ -17,48 +17,60 @@
  */
 
 
-# MySQL settings. Fill in your database details (check carefully or nothing will work!)
+/**#@+
+ * MySQL settings. Fill in your database details (check carefully or nothing will work!)
+ */
 define( 'DB_USER', 'demouser' );      // your MySQL username
 define( 'DB_PASSWORD', 'demopass' );  // ...and password
 define( 'DB_NAME', 'b2evolution' );   // the name of the database
 define( 'DB_HOST', 'localhost' );     // mySQL Server (typically 'localhost')
+/**#@-*/
 
 
-# the tables prefix (gets placed before each b2evo table name),
-# use this to have multiple installations in one DB.
+/**
+ * the tables prefix (gets placed before each b2evo table name),
+ * use this to have multiple installations in one DB.
+ */
 $tableprefix = 'evo_';
 
 
-# If you want to be able to reset your existing b2evolution tables and start anew
-# you must set $allow_evodb_reset to 1.
-#
-# NEVER LEAVE THIS SETTING ON ANYTHING ELSE THAN 0 (ZERO) ON A PRODUCTION SERVER.
-# IF THIS IS ON (1) AND YOU FORGET TO DELETE THE INSTALL FOLDER, ANYONE WOULD BE ABLE TO
-# ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
-#
+/**
+ * If you want to be able to reset your existing b2evolution tables and start anew
+ * you must set $allow_evodb_reset to 1.
+ *
+ * NEVER LEAVE THIS SETTING ON ANYTHING ELSE THAN 0 (ZERO) ON A PRODUCTION SERVER.
+ * IF THIS IS ON (1) AND YOU FORGET TO DELETE THE INSTALL FOLDER, ANYONE WOULD BE ABLE TO
+ * ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
+ */
 $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on production servers
 
 
-# $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
-# It should be set to the URL where you can find the blog templates and/or the blog stub files,
-# that means index.php, blog_b.php, etc.
-# Note: Blogs can be in subdirectories of the baseurl. However, no blog should be outside
-# of there, or some tricky things may fail (e-g: pingback)
-#
-# IMPORTANT: If you want to test b2evolution on your local machine, do NOT use that machine's
-# name in the $baseurl!
-# For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs !
-# Use http://localhost/b2evolution/blogs instead. And log in on localhost too, not homer!
-# If you don't, login cookies will not hold.
+/**
+ * $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
+ * It should be set to the URL where you can find the blog templates and/or the blog stub files,
+ * that means index.php, blog_b.php, etc.
+ * Note: Blogs can be in subdirectories of the baseurl. However, no blog should be outside
+ * of there, or some tricky things may fail (e-g: pingback)
+ *
+ * IMPORTANT: If you want to test b2evolution on your local machine, do NOT use that machine's
+ * name in the $baseurl!
+ * For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs !
+ * Use http://localhost/b2evolution/blogs instead. And log in on localhost too, not homer!
+ * If you don't, login cookies will not hold.
+ */
 $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
 
-# Your email. Will be used in severe error messages so that users can contact you.
-# You will also receive notifications for new user registrations there.
+/**
+ * Your email. Will be used in severe error messages so that users can contact you.
+ * You will also receive notifications for new user registrations there.
+ */
 $admin_email = 'postmaster@localhost';
 
 
-# Once you have edited this file to your settings, set the following to 1 (one):
+/**
+ * Once you have edited this file to your settings, set the following to 1 (one):
+ */
 $config_is_done = 0;
 
 

@@ -23,7 +23,7 @@ $require_name_email = 1;
 if( !isset($default_to_blog) ) $default_to_blog = 2;
 
 # Set the length of the online session time out. This is for the Who's Online block.
-$online_session_timeout = 300;
+$online_session_timeout = 300;  // TODO: into backoffice?
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
@@ -266,6 +266,11 @@ $plugins_subdir_dirout = '..';               // Relative path to go back to base
  */
 $install_subdir = 'install';                 // Subdirectory relative to base
 $install_dirout = '..';                      // Relative path to go back to base
+/**
+ * Location of the root media folder.
+ */
+$media_subdir = 'media';                     // Subdirectory relative to base
+$media_dirout = '..';                        // Relative path to go back to base
 
 
 // ** CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! **

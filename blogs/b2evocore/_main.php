@@ -38,7 +38,6 @@ require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
 require_once( dirname(__FILE__).'/_class_calendar.php' );
 require_once( dirname(__FILE__).'/_functions_hitlogs.php' ); // referer logging
 require_once( dirname(__FILE__).'/_functions_forms.php' );
-require_once( dirname(__FILE__).'/_functions_forms.php' );
 require_once( dirname(__FILE__).'/_class_renderer.php' );
 require_once( dirname(__FILE__).'/_class_toolbars.php' );
 
