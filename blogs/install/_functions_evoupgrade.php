@@ -622,7 +622,7 @@ function upgrade_b2evo_tables()
 		echo 'Altering Categories table... ';
 		$DB->query( "ALTER TABLE T_categories
 									MODIFY COLUMN cat_ID int(11) unsigned NOT NULL auto_increment, 
-									MODIFU COLUMN cat_parent_ID int(11) unsigned NULL,
+									MODIFY COLUMN cat_parent_ID int(11) unsigned NULL,
 									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default 2" ); 
 		echo "OK.<br />\n";
 
