@@ -2,7 +2,8 @@
 $title = _('Blogs');
 $standalone=1;
 require_once (dirname(__FILE__).'/b2header.php'); // this will actually load blog params for req blog
-set_param( 'action' );
+param( 'action' );
+
 
 switch($action) 
 {
@@ -16,19 +17,19 @@ switch($action)
 		echo "<div class=\"panelblock\">\n";
 		echo '<h2>', _('New blog'), ":</h2>\n";
 		// EDIT FORM:
-		set_param( 'blog_name', 'string', 'new weblog' );
-		set_param( 'blog_shortname', 'string', 'new blog' );
-		set_param( 'blog_tagline', 'html', '' );
-		set_param( 'blog_description', 'string', '' );
-		set_param( 'blog_longdesc', 'html', '' );
-		set_param( 'blog_lang', 'string', $default_language );
-		set_param( 'blog_siteurl', 'string', $baseurl );
-		set_param( 'blog_filename', 'string', 'new_file.php' );
-		set_param( 'blog_staticfilename', 'string', '' );
-		set_param( 'blog_stub', 'string', 'new_file.php' );
-		set_param( 'blog_roll', 'html', '' );
-		set_param( 'blog_keywords', 'string', '' );
-		set_param( 'blog_UID', 'string', '' );
+		param( 'blog_name', 'string', 'new weblog' );
+		param( 'blog_shortname', 'string', 'new blog' );
+		param( 'blog_tagline', 'html', '' );
+		param( 'blog_description', 'string', '' );
+		param( 'blog_longdesc', 'html', '' );
+		param( 'blog_lang', 'string', $default_language );
+		param( 'blog_siteurl', 'string', $baseurl );
+		param( 'blog_filename', 'string', 'new_file.php' );
+		param( 'blog_staticfilename', 'string', '' );
+		param( 'blog_stub', 'string', 'new_file.php' );
+		param( 'blog_roll', 'html', '' );
+		param( 'blog_keywords', 'string', '' );
+		param( 'blog_UID', 'string', '' );
 		$next_action = 'create';
 		include($b2inc."/_blogs_form.php");
 		echo '</div>';
@@ -43,19 +44,19 @@ switch($action)
 			die( _('You have no right to edit the blogs.') );
 		}
 	
-		set_param( 'blog_name', 'string', true );
-		set_param( 'blog_shortname', 'string', true );
-		set_param( 'blog_tagline', 'html', '' );
-		set_param( 'blog_description', 'string', '' );
-		set_param( 'blog_longdesc', 'html', '' );
-		set_param( 'blog_lang', 'string', 'en' );
-		set_param( 'blog_siteurl', 'string', true );
-		set_param( 'blog_filename', 'string', true );
-		set_param( 'blog_staticfilename', 'string', '' );
-		set_param( 'blog_stub', 'string', '' );
-		set_param( 'blog_roll', 'html', '' );
-		set_param( 'blog_keywords', 'string', '' );
-		set_param( 'blog_UID', 'string', '' );
+		param( 'blog_name', 'string', true );
+		param( 'blog_shortname', 'string', true );
+		param( 'blog_tagline', 'html', '' );
+		param( 'blog_description', 'string', '' );
+		param( 'blog_longdesc', 'html', '' );
+		param( 'blog_lang', 'string', 'en' );
+		param( 'blog_siteurl', 'string', true );
+		param( 'blog_filename', 'string', true );
+		param( 'blog_staticfilename', 'string', '' );
+		param( 'blog_stub', 'string', '' );
+		param( 'blog_roll', 'html', '' );
+		param( 'blog_keywords', 'string', '' );
+		param( 'blog_UID', 'string', '' );
 	
 		echo "<p>Creating blog...</p>";
 		
@@ -165,20 +166,20 @@ switch($action)
 			die( _('You have no right to edit the blogs.') );
 		}
 	
-		set_param( 'blog', 'integer', true );
-		set_param( 'blog_name', 'string', true );
-		set_param( 'blog_shortname', 'string', true );
-		set_param( 'blog_tagline', 'html', '' );
-		set_param( 'blog_description', 'string', '' );
-		set_param( 'blog_longdesc', 'html', '' );
-		set_param( 'blog_lang', 'string', 'en' );
-		set_param( 'blog_siteurl', 'string', true );
-		set_param( 'blog_filename', 'string', true );
-		set_param( 'blog_staticfilename', 'string', '' );
-		set_param( 'blog_stub', 'string', '' );
-		set_param( 'blog_roll', 'html', '' );
-		set_param( 'blog_keywords', 'string', '' );
-		set_param( 'blog_UID', 'string', '' );
+		param( 'blog', 'integer', true );
+		param( 'blog_name', 'string', true );
+		param( 'blog_shortname', 'string', true );
+		param( 'blog_tagline', 'html', '' );
+		param( 'blog_description', 'string', '' );
+		param( 'blog_longdesc', 'html', '' );
+		param( 'blog_lang', 'string', 'en' );
+		param( 'blog_siteurl', 'string', true );
+		param( 'blog_filename', 'string', true );
+		param( 'blog_staticfilename', 'string', '' );
+		param( 'blog_stub', 'string', '' );
+		param( 'blog_roll', 'html', '' );
+		param( 'blog_keywords', 'string', '' );
+		param( 'blog_UID', 'string', '' );
 	
 		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
 									 $blog_staticfilename, 
