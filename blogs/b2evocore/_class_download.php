@@ -12,7 +12,10 @@
  *
  * @package evocore
  */
-if( !defined('DB_USER') ) die( 'You have to many shoes you mentalist.' );
+if(ereg('_class', $_SERVER['SCRIPT_NAME']))
+{
+    die("You have too many shoes");
+}
 
  //dirname(__FILE__).'/
 require_once( '_class_http.php');
@@ -48,16 +51,16 @@ class download
                 [fragment] => anchor
            )
            */
-            $url_array = parse_url($url)
+            $url_array = parse_url($url);
             $hostname = $url_array["host"];
             $path = $url_array["url"];
             $vars = $url_array["query"];
             $port = $url_array["port"];
 
-          };
+          }
           else { die();};
          if (!is_null($destination){
-          };
+          }
           else { die();};
           switch ($type)
              {

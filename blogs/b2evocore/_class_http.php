@@ -16,8 +16,10 @@
  *
  * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
  **/
-
-if( !defined('DB_USER') ) die( 'You have to many shoes you mentalist.' );
+if(ereg('_class', $_SERVER['SCRIPT_NAME']))
+{
+    die("You have too many shoes");
+}
 
 
 class http {
@@ -85,6 +87,8 @@ class http {
         // lets make our ua something unique to b2evo ...
 	$user_agent = "b2evolution";
 
+        if (!is_null($vars))
+        {
 	$urlencoded = "";
 	//lets encode the url
         while (list($key,$value) = each($vars))
@@ -95,6 +99,8 @@ class http {
         $content_length = strlen($urlencoded);
         //lets make geturl, be $url and $urlencoded
         $geturl = $url . "?" . $urlencoded;
+        }
+        else {  $geturl = $url; };
         //what headers do we need?
         $headers = "GET $geturl HTTP/1.1\r\n"
         ."Accept: */*\r\n"
@@ -142,7 +148,7 @@ class http {
         };
 
         //lets make the url
-        $url = "http://" . $server . ":" . $port . $url
+        $url = "http://" . $server . ":" . $port . $url;
         // lets start the hair curling
         $ch = curl_init($url);
         // lets set our ua to $user_agent
@@ -185,7 +191,21 @@ class http {
         };
 
         //lets make the url
-        $url = "http://" . $server . ":" . $port . $url
+       if (!is_null($vars))
+        {
+	$urlencoded = "";
+	//lets encode the url
+        while (list($key,$value) = each($vars))
+		$urlencoded.= urlencode($key) . "=" . urlencode($value) . "&";
+	//lets trim it
+        $urlencoded = substr($urlencoded,0,-1);
+	//set the content length
+        $content_length = strlen($urlencoded);
+        //lets make geturl, be $url and $urlencoded
+        $geturl = $url . "?" . $urlencoded;
+        }
+        else {  $geturl = $url; };
+
         // lets start the hair curling
         $ch = curl_init($url);
         // lets set our ua to $user_agent
