@@ -82,7 +82,7 @@ class Results
 	 * @param integer current page to display
 	 * @param string ordering of columns (special syntax)
 	 */
-	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL)
+	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL )
 	{
 		global $DB;
 		$this->DB = $DB;
@@ -189,22 +189,38 @@ class Results
 		}
 
  		$sql_count = $this->sql;
+		// echo $sql_count;
 
-		//test of the SQL query to avoid an SQL error in case of a query on one single table:
-		if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
-			die( "Can't understand query..." );
-
-/*		if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
-		{ // there was a coma or a JOIN clause in the FROM clause of the original query,
+		/*
+		 *
+		 * On a un problème avec la recherche sur les sociétés
+		 * si on fait un select count(*), ça sort un nombre de réponses énorme
+		 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
+		 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
+		 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
+		 * bizarre....
+		 */
+		// Tentative 1:
+		// if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
+		//  die( "Can't understand query..." );
+		// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
+		// { // there was a coma or a JOIN clause in the FROM clause of the original query,
+		// Tentative 2:
+		// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
+		if( preg_match( '#\s DISTINCT \s#six', $sql_count ) )
+		{ //
 			// Get rid of any Aliases in colmun names:
-			$sql_count = preg_replace( '#\s+ AS \s+ ([A-Za-z_]+?) #six', ' ', $sql_count );
+			$sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
 			// ** We must use field names in the COUNT **
 			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
 		}
-		else */
+		else
 		{	// Single table request: we must NOT use field names in the count.
 			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
 		}
+
+		// echo $sql_count;
+
 		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
 	}
 
@@ -257,6 +273,7 @@ class Results
 					'footer_end' => "</div>\n\n",
 					'no_results' => T_('No results.'),
 				'after' => '</div>',
+				'sort_type' => 'basic'
 				);
 		}
 
@@ -342,21 +359,53 @@ class Results
 							$order_desc.='-';
 						}
 					}
+						
+					$style = $this->params['sort_type'];
+					
+					if( $this->params['sort_type'] == 'single' )
+					{ // single sort mode
+						
+						$color_asc = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'black' : 'grey' ; //color of the ascending arrow
+						$color_desc = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'black' : 'grey' ; //color of the descending arrow
 
-					$color_asc = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'black' : 'grey' ; //color of the ascending arrow
-					$color_desc = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'black' : 'grey' ; //color of the descending arrow
-
-						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).'" title="'.T_('Ascending Order')
-								.'" height="12px" width="11px" ><img src="../admin/img/'.$color_asc.'_arrow_down.gif" alt="A" title="'.T_('Ascending Order')
-								.'" ></a>'
-								.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).'" title="'.T_('Descending Order')
-								.'" height="12px" width="11px" ><img src="../admin/img/'.$color_desc.'_arrow_up.gif" alt="D" title="'.T_('Descending Order')
-								.'" ></a> ';
+						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).$param_action.'" title="'.T_('Ascending Order')
+									.'" class="img" ><img src="../admin/img/'.$color_asc.'_arrow_down.gif" alt="A" title="'.T_('Ascending Order')
+									.'" height="12px" width="11px" ></a>'
+									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).$param_action.'" title="'.T_('Descending Order')
+									.'" class="img" ><img src="../admin/img/'.$color_desc.'_arrow_up.gif" alt="D" title="'.T_('Descending Order')
+									.'"  height="12px" width="11px"></a> ';
+					}
+					
+					
+					$sort_type = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? $order_desc : $order_asc;
+					
+					$title = strstr( $sort_type, 'A' ) ? T_('Ascending order') : T_('Descending order');
+					echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type)
+							 .'" title="'.$title.'" ';
+							
+					$pos =  strpos( $this->order, 'D');
+					
+					if( strstr( $this->order, 'A' ) )
+					{
+						$pos = strpos( $this->order, 'A' );
+					}
+					
+					if( $col_count == $pos ) 
+					{ //the column header must be displayed in bold
+						echo 'class="'.$style.'_current"  >';
+					}
+					else
+					{
+						echo 'class="'.$style.'_sort_link"  >';
+					}
+						
+					echo $col_header.'</a>';
+					
+					
+					$col_count++;
+					
+ 					echo $this->params['colhead_end'];
 				}
-				echo $col_header;
-
- 				echo $this->params['colhead_end'];
-				$col_count++;
 			}
 
     	echo $this->params['head_end'];
@@ -768,6 +817,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.7  2005/01/12 20:40:40  fplanque
+ * no message
+ *
  * Revision 1.6  2005/01/03 15:17:52  fplanque
  * no message
  *
