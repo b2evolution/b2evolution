@@ -18,6 +18,7 @@ switch($action)
 {
 	case 'new':
 		// ---------- New blog form ----------
+		$admin_pagetitle .= ' :: '.T_('New');
 		require( dirname(__FILE__). '/_menutop.php' );
 		require( dirname(__FILE__). '/_menutop_end.php' );
 
@@ -31,29 +32,14 @@ switch($action)
 		param( 'blog_name', 'string', 'new weblog' );
 		param( 'blog_shortname', 'string', 'new blog' );
 		param( 'blog_tagline', 'html', '' );
-		param( 'blog_description', 'string', '' );
-		param( 'blog_longdesc', 'html', '' );
 		param( 'blog_locale', 'string', $default_locale );
 		param( 'blog_siteurl', 'string', '' );
-		param( 'blog_filename', 'string', 'new_file.php' );
-		param( 'blog_staticfilename', 'string', '' );
 		param( 'blog_stub', 'string', 'new_file.php' );
-		param( 'blog_roll', 'html', '' );
-		param( 'blog_keywords', 'string', '' );
-		param( 'blog_UID', 'string', '' );
-		param( 'blog_allowtrackbacks', 'integer', 0 );
-		param( 'blog_allowpingbacks', 'integer', 0 );
-		param( 'blog_pingb2evonet', 'integer', 0 );
-		param( 'blog_pingtechnorati', 'integer', 0 );
-		param( 'blog_pingweblogs', 'integer', 0 );
-		param( 'blog_pingblodotgs', 'integer', 0 );
-		param( 'blog_disp_bloglist', 'integer', 0 );
 		param( 'blog_default_skin', 'string', '' );
-		$next_action = 'create';
-		require( dirname(__FILE__) . '/_blogs_form.php' );
+		require( dirname(__FILE__) . '/_blogs_new.form.php' );
 		echo '</div>';
-		break;
-
+		require( dirname(__FILE__). '/_footer.php' );
+		exit();
 
 
 	case 'create':
@@ -69,28 +55,10 @@ switch($action)
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
 		param( 'blog_tagline', 'html', '' );
-		param( 'blog_description', 'string', '' );
-		param( 'blog_longdesc', 'html', '' );
 		param( 'blog_locale', 'string', $default_locale );
 		param( 'blog_siteurl', 'string', true );
-		param( 'blog_filename', 'string', true );
-		param( 'blog_staticfilename', 'string', '' );
 		param( 'blog_stub', 'string', '' );
-		param( 'blog_roll', 'html', '' );
-		param( 'blog_keywords', 'string', '' );
-		param( 'blog_UID', 'string', '' );
-		param( 'blog_allowtrackbacks', 'integer', 0 );
-		param( 'blog_allowpingbacks', 'integer', 0 );
-		param( 'blog_pingb2evonet', 'integer', 0 );
-		param( 'blog_pingtechnorati', 'integer', 0 );
-		param( 'blog_pingweblogs', 'integer', 0 );
-		param( 'blog_pingblodotgs', 'integer', 0 );
-		param( 'blog_disp_bloglist', 'integer', 0 );
 		param( 'blog_default_skin', 'string', '' );
-
-		$blog_tagline = format_to_post($blog_tagline, 0, 0);
-		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
-		$blog_roll = format_to_post($blog_roll, 0, 0);
 
 		if ( errors_display( T_('Cannot create, please correct these errors:'),
 			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog form').'</a>]'))
@@ -102,17 +70,20 @@ switch($action)
 
 		echo '<h3>' . T_('Creating blog...') . '</h3>';
 
-		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, $blog_filename,
-									$blog_stub,  $blog_staticfilename,
-									$blog_tagline, $blog_description, $blog_longdesc, $blog_locale, $blog_roll,
-									$blog_keywords, $blog_UID, $blog_disp_bloglist ) or mysql_oops( $query );
+		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, '',
+									$blog_stub, '', '', '', '', $blog_locale, '', '', '', 0 ) or mysql_oops( $query );
 
-		// Set the user permissions for this blog
-		blog_update_user_perms( $blog_ID );
+		// Set default user permissions for this blog
+		// Proceed insertions:
+		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+											bloguser_perm_cats, bloguser_perm_properties )
+									VALUES ( $blog_ID, $current_User->ID, 1, 'published,protected,private,draft,deprecated', 
+																1, 1, 1, 1 )" );
 
 		// Quick hack to create a stub file:
-		if( $blog_siteurl == '' )
-		{
+		if( $blog_siteurl == '' && (1 == 0) )
+		{ // TEMPORARILY DISABLED	
 			echo '<p>', T_('Trying to create stub file'), '</p>';
 			// Determine the edit folder:
 			$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
@@ -223,7 +194,6 @@ switch($action)
 		$blog_pingblodotgs = get_bloginfo( 'pingblodotgs' );
 		$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
 		$blog_default_skin = get_bloginfo( 'default_skin' );
-		$next_action = 'update';
 		?>
 		<div class="pt" >
 			<ul class="tabs">
