@@ -1,14 +1,45 @@
 <?php
 /**
- * This file implements the Filelist class.
+ * This file implements the Filelist class. {{{
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @package admin
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ *
+ * @version $Id$ }}}
  *
  * @todo: method add() to allow specific file (outside path)
+ *
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -37,6 +68,21 @@ class Filelist
 	 * @var array
 	 */
 	var $entries = array();
+
+	/**
+	 * Number of directories
+	 */
+	var $count_dirs;
+
+	/**
+	 * Number of files
+	 */
+	var $count_files;
+
+	/**
+	 * Number of bytes
+	 */
+	var $count_bytes;
 
 	/**
 	 * the current index of the directory items (looping)
@@ -111,6 +157,7 @@ class Filelist
 		}
 
 		$this->entries = array();
+		$this->count_bytes = $this->count_files = $this->count_dirs = 0;
 
 		if( $this->filter === NULL || $this->filter_regexp )
 		{
@@ -156,6 +203,16 @@ class Filelist
 				{
 					$this->entries[ $i ]->set_size( get_dirsize_recursive( $this->listpath.$entry ) );
 				}
+
+				if( $this->entries[$i]->is_dir() )
+				{
+					$this->count_dirs++;
+				}
+				else
+				{
+					$this->count_files++;
+				}
+				$this->count_bytes += $this->entries[$i]->get_size();
 			}
 
 			if( $this->filter === NULL || $this->filter_regexp )
@@ -285,6 +342,24 @@ class Filelist
 			}
 			return $r;
 		}
+	}
+
+
+	function get_countdirs()
+	{
+		return $this->count_dirs;
+	}
+
+
+	function get_countfiles()
+	{
+		return $this->count_files;
+	}
+
+
+	function get_countbytes()
+	{
+		return $this->count_bytes;
 	}
 
 

@@ -1,12 +1,42 @@
 <?php
 /**
- * This file implements the File class.
+ * This file implements the File class. {{{
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @package admin
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ *
+ * @version $Id$ }}}
  *
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -68,8 +98,10 @@ class File
 
 
 	/**
-	 * sets size
+	 * Set size
+	 *
 	 * @param mixed either size as integer or NULL for directories, when no full dir size requested
+	 * @return boolean false if param $size is invalid, true on success
 	 */
 	function set_size( $size )
 	{
@@ -128,17 +160,30 @@ class File
 	}
 
 
-	function get_perms( $type = 'octal' )
+	function get_perms( $type = NULL )
 	{
 		switch( $type )
 		{
-			case 'raw':   return $this->perms;
-			case 'octal': return substr( sprintf('%o', $this->perms), -3 );
-			case 'lsl':   return $this->translatePerm( $this->current_entry['perms'] );
+			case 'raw':
+				return $this->perms;
+			case 'lsl':
+				return translatePerm( $this->perms );
+			case NULL:
+				if( is_windows() )
+				{
+					if( $this->perms & 0x0080 )
+					{
+						return 'r+w';
+					}
+					else return 'r';
+				}
+			case 'octal':
+				return substr( sprintf('%o', $this->perms), -3 );
 		}
 
 		return false;
 	}
+
 
 	/**
 	 * get size of an image or false if not an image
@@ -220,12 +265,12 @@ class File
 	/**
 	 * Change permissions of the file
 	 *
-	 * @param string chmod (octal format, eg '777')
+	 * @param string chmod (three-digit-format, eg '777')
 	 * @return mixed new permissions on success (octal format), false on failure
 	 */
 	function chmod( $chmod )
 	{
-		$chmod = '0'.$chmod;
+		$chmod = octdec( $chmod );
 		if( chmod( $this->get_path(true), $chmod) )
 		{
 			clearstatcache();
@@ -238,6 +283,7 @@ class File
 			return false;
 		}
 	}
+
 }
 
 ?>
