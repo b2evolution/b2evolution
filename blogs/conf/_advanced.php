@@ -22,6 +22,8 @@ $require_name_email = 1;
 # 1 is also a popular choice, since it is a special blog aggregating all the others
 if( !isset($default_to_blog) ) $default_to_blog = 2;
 
+# Set the length of the online session time out. This is for the Who's Online block.
+$online_session_timeout = 300;
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
@@ -107,6 +109,7 @@ $tableantispam   = $tableprefix.'antispam';
 $tablegroups     = $tableprefix.'groups';
 $tableblogusers  = $tableprefix.'blogusers';
 $tablelocales    = $tableprefix.'locales';
+$tablesessions   = $tableprefix.'sessions';
 /**#@-*/
 
 /**#@+
