@@ -56,6 +56,19 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+
+		$blog_tagline = format_to_post($blog_tagline, 0, 0);
+		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
+		$blog_roll = format_to_post($blo_roll, 0, 0);
+
+		if ( errors_display( T_('Cannot update, please correct these errors:'),
+			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog creating').'</a>]'))
+		{
+			require( dirname(__FILE__).'/_footer.php' );
+			die();
+			break;
+		}
+
 	
 		echo "<p>Creating blog...</p>";
 		
@@ -179,6 +192,18 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+
+		$blog_tagline = format_to_post($blog_tagline, 0, 0);
+		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
+		$blog_roll = format_to_post($blo_roll, 0, 0);
+
+		if ( errors_display( T_('Cannot update, please correct these errors:'),
+			'[<a href="javascript:history.go(-1)">'.T_('Back to blog editing').'</a>]'))  
+		{
+			require( dirname(__FILE__).'/_footer.php' );
+			die();
+			break;
+		}
 	
 		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
 									 $blog_staticfilename, 

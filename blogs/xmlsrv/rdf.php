@@ -12,7 +12,7 @@
 ?>
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->
 <rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"         xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-<channel rdf:about="<?php bloginfo('url', 'xml') ?>">
+<channel rdf:about="<?php bloginfo('url', 'xmlattr') ?>">
   <title><?php bloginfo('name', 'xml') ?></title>
   <link><?php bloginfo('link', 'xml') ?></link>
   <description><?php bloginfo('description', 'xml') ?></description>

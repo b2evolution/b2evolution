@@ -76,6 +76,11 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// do nothing!
 			break;
 
+		case 'formvalue':
+			$content = convert_chars($content, 'html');
+			$content = htmlspecialchars( $content );
+			break;
+
 		case 'xml':
 			// Remove the markup:
 			// echo 'xml';
@@ -93,6 +98,24 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = convert_chars($content, 'html');
 			break;
 
+		case 'xmlattr':
+			// Remove the markup:
+			convert_bbcode($content);
+			$content = strip_tags($content);
+
+			$content = convert_chars($content, 'xml');
+			$content = htmlspecialchars( $content );
+			break;
+
+		case 'htmlattr':
+			// Remove the markup:
+			convert_bbcode($content);
+			$content = strip_tags($content);
+
+			$content = convert_chars($content, 'html');
+			$content = htmlspecialchars( $content );
+			break;
+			
 		case 'entityencoded':
 			if( $use_textile ) $content = textile( $content );
 			convert_bbcode($content);

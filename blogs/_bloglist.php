@@ -48,7 +48,7 @@
 			echo '<a href="';
 			blog_list_iteminfo('blogurl', 'raw');
 			echo '" class="', $blog_selected_link_class, '" title="';
-			blog_list_iteminfo($blog_title_param, 'htmlheader');
+			blog_list_iteminfo($blog_title_param, 'htmlattr');
 			echo '">';
 			echo $blog_selected_name_before;
 			blog_list_iteminfo($blog_name_param, 'htmlbody');
@@ -60,7 +60,7 @@
 			echo '<a href="';
 			blog_list_iteminfo('blogurl', 'raw');
 			echo '" class="', $blog_other_link_class, '" title="';
-			blog_list_iteminfo($blog_title_param, 'htmlheader');
+			blog_list_iteminfo($blog_title_param, 'htmlattr');
 			echo '">';
 			echo $blog_other_name_before;
 			blog_list_iteminfo($blog_name_param, 'htmlbody');

@@ -222,7 +222,7 @@ function trackback_rdf($timezone=0)
 		echo '    dc:identifier="';
 		permalink_single();
 		echo '"'."\n";
-		echo '    dc:title="'.addslashes(format_to_output(get_the_title(),'xml')).'"'."\n";
+		echo '    dc:title="'.addslashes(format_to_output(get_the_title(),'xmlattr')).'"'."\n";
 		echo '    trackback:ping="'.trackback_url(0).'" />'."\n";
 		echo '</rdf:RDF>';
 		echo "-->\n";

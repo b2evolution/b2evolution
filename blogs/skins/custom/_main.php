@@ -26,8 +26,8 @@
 ?>
 </title>
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-<meta name="description" content="<?php bloginfo('shortdesc', 'htmlhead'); ?>" />
-<meta name="keywords" content="<?php bloginfo('keywords', 'htmlhead'); ?>" />
+<meta name="description" content="<?php bloginfo('shortdesc', 'htmlattr'); ?>" />
+<meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
 <link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
 <link rel="alternate" type="text/xml" title="RSS" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url', 'raw'); ?>" />

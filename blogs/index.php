@@ -43,7 +43,7 @@
 		echo ': <a href="';
 		blog_list_iteminfo('blogurl', 'raw');
 		echo '" title="';
-		blog_list_iteminfo( 'shortdesc', 'htmlheader');
+		blog_list_iteminfo( 'shortdesc', 'htmlattr');
 		echo '">';
 		blog_list_iteminfo( 'name', 'htmlbody');
 		echo '</a></strong> &nbsp; (';
