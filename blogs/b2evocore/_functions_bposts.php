@@ -239,7 +239,6 @@ function bpost_delete( $post_ID )
 }
 
 
-
 /* 
  * get_lastpostdate(-) 
  */
@@ -290,7 +289,7 @@ function get_postdata($postid)
 	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
 
-	//echo $sql;
+	// echo $sql;
 
 	$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
 	$querycount++;

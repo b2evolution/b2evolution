@@ -163,6 +163,7 @@ class Group extends DataObject
 						break;	
 				}
 		}		
+
 		return false;	// Permission denied!
 	}
 	

@@ -185,11 +185,12 @@ class User extends DataObject
 	 * @param string Permission name, can be one of:
 	 *								- 'upload'
 	 *								- 'edit_timestamp'
+	 *								- 'cats_post_statuses', see {@link User::check_perm_catsusers()}
 	 *								- either group permission names, see {@link Group::check_perm()}
 	 *								- either blogusers permission names, see {@link User::check_perm_blogusers()}
 	 * @param string Permission level
 	 * @param boolean Execution will halt if this is !0 and permission is denied
-	 * @param integer Permission target blog ID
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean 0 if permission denied
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
@@ -199,16 +200,24 @@ class User extends DataObject
 		$perm = false;
 	
 		switch( $permname )
-		{
+		{ // What permission do we want to check?
 			case 'upload':
+				// Global permission to upload files...
 				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel) && ((ereg(" ".$this->login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==""));
 				break;
 		
 			case 'edit_timestamp':
+				// Global permission to edit timestamps...
 				$perm = ($this->level >= 5);
+				break;
+
+			case 'cats_post_statuses':
+				// Category permissions...
+				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
 				break;
 		
 			case 'blog_properties':
+				// Blog permission to edit its properties... (depending on user AND hits group)
 				// Forward request to group:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{	// If group says yes
@@ -224,21 +233,72 @@ class User extends DataObject
 			case 'blog_comments':
 			case 'blog_cats':
 			case 'blog_genstatic':
+				// Blog permission to this or that... (depending on this user only)
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				break;
 			
 			default:
+				// Other global permissions (see if the group can handle them)
 				// Forward request to group:
 				$perm = $this->Group->check_perm( $permname, $permlevel );
 		}
 		
 		if( !$perm && $assert )
 		{ // We can't let this go on!
-			die( T_('Permission denied!') );
+			die( T_('Permission denied!').' ('.$permname.'/'.$permlevel.')' );
 		}
 		
 		return $perm;
 	}
+
+
+	/** 
+	 * Check permission for this user on a set of specified categories
+	 *
+	 * This is not for direct use, please call {@link User::check_perm()} instead
+	 *
+	 * {@internal User::check_perm_catsusers(-) }}
+	 *
+	 * @see User::check_perm()
+	 * @param string Permission name, can be one of the following:
+	 *									- cat_post_statuses
+	 *									- more to come later...
+	 * @param string Permission level
+	 * @param array Array of target cat IDs
+	 * @return boolean 0 if permission denied
+	 */
+	function check_perm_catsusers( $permname, $permlevel, & $perm_target_cats )
+	{
+		// Check if permission is granted:
+		switch( $permname )
+		{
+			case 'cats_post_statuses':
+				// We'll actually pass this on to blog permissions
+				// First we need to create an array of blogs, not cats
+				$perm_target_blogs = array();
+				foreach( $perm_target_cats as $loop_cat_ID )
+				{
+					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
+					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br/>";
+					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
+					{	// not already in list: add it:
+						$perm_target_blogs[] = $loop_cat_blog_ID;
+					}
+				}
+				// Now we'll check permissions for each blog:
+				foreach( $perm_target_blogs as $loop_blog_ID )
+				{
+					if( ! $this->check_perm_blogusers( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
+					{	// If at least one blog is denied:
+						return false;	// permission denied
+					}
+				}
+				return true;	// Permission granted
+		}
+
+		return false; 	// permission denied
+	}
+
 
 	/** 
 	 * Check permission for this user on a specified blog

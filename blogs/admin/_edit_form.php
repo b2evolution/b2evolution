@@ -360,6 +360,7 @@ if( $action != 'editcomment' )
 			{ // run recursively through the cats
 				$current_blog_ID = $i_blog->blog_ID;
 				if( ! blog_has_cats( $current_blog_ID ) ) continue;
+				if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
 				echo "<h4>".$i_blog->blog_name."</h4>\n";
 				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
 											'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
