@@ -213,8 +213,8 @@ function format_to_post($content, $autobr=0, $is_comment=0)
 		if( preg_match ('#\s(on[a-z]+)\s*=#i', $check, $matches)
 			// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=
 			// usemap=
-			|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $matches)
-			|| preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $matches) )
+			|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches)
+			|| preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
 		{
 			errors_add( 'Illegal markup found: '.htmlspecialchars($matches[1]) );
 		}
