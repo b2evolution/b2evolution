@@ -176,7 +176,7 @@ textarea,input,select {
 	margin: 1px;
 }
 input.checkbox {
-	background-color: #ffffff;
+	background-color: #fff;
 	border-width: 0px;
 	padding: 0px;
 	margin: 0px;
@@ -597,7 +597,7 @@ tr.group {
 	font-weight: bold;
 	background-color: #eee;
 }
-label.radiooption {
+span.radiooption {
 	white-space: nowrap;
 	margin-right: 1em;
 }
@@ -632,12 +632,12 @@ table.fileman td.icon, td.checkbox, td.perms {
 }
 table.fileman td.type {
 	text-align: center;
-	width:10%;
+	width:15%;
 	font-size: 80%;
 }
 table.fileman td.filename {
 	text-align: left;
-	width: 50%;
+	width: 45%;
 	font-size: 100%;
 }
 table.fileman td.timestamp {
@@ -675,7 +675,8 @@ table.fileman th {
 }
 .toolbar {
 }
-.toolbaritem input, select {
+.toolbaritem input,
+.toolbaritem select {
 	font-size:84%;
 }
 .toolbaritem {
@@ -700,5 +701,4 @@ div.fm_options {
 	float:right;
 	border: 1px solid #d91;
 	padding:1ex;
-
 }

@@ -28,6 +28,9 @@ switch( $tab )
 	case 'general':
 		$admin_pagetitle .= ' :: '. T_('General');
 		break;
+	case 'files':
+		$admin_pagetitle .= ' :: '. T_('File Management');
+		break;
 	case 'regional':
 		$admin_pagetitle .= ' :: '. T_('Regional'); 
 		break;
@@ -43,7 +46,7 @@ require( dirname(__FILE__). '/_menutop_end.php' );
 if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract' ))
 		|| !empty($prioup) || !empty($priodown) || !empty($delete)
 	)
-{
+{ // We have an action to do..
 	// Check permission:
 	$current_User->check_perm( 'options', 'edit', true );
 	
@@ -91,7 +94,26 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			
 			break;
 
-
+		
+		case 'files':
+			param( 'upload_enabled', 'integer', 0 );
+			$Settings->set( 'upload_enable', $reloadpage_timeout );
+			param( 'upload_realpath', 'string', true );
+			$Settings->set( 'upload_realpath', $reloadpage_realpath );
+			param( 'upload_url', 'string', true );
+			$Settings->set( 'upload_url', $reloadpage_url );
+			
+			param( 'upload_allowedext', 'string', true );
+			$Settings->set( 'upload_allowedext', trim($reloadpage_allowedext) );
+			param( 'upload_maxkb', 'integer', 0 );
+			$Settings->set( 'upload_maxkb', $reloadpage_maxkb );
+			
+			#param( 'upload_minlevel', 'integer', true );
+			#$Settings->set( 'upload_minlevel', $reloadpage_minlevel );
+			
+			break;
+			
+			
 		case 'regional':
 		switch( $action )
 		{ // in case of regional actions
@@ -405,25 +427,16 @@ $current_User->check_perm( 'options', 'view', true );
 		<div class="panelblocktabs">
 			<ul class="tabs">
 			<?php
-				if( $tab == 'general' )
-					echo '<li class="current">';
-				else
-					echo '<li>';
-				echo '<a href="b2options.php">'. T_('General'). '</a></li>';
-				
-				if( $tab == 'regional' )
-					echo '<li class="current">';
-				else
-					echo '<li>';
-				echo '<a href="b2options.php?tab=regional';
-				if( $notransext ) echo '&amp;notransext=1';
-				echo '">'. T_('Regional'). '</a></li>';
-		
-				if( $tab == 'plugins' )
-					echo '<li class="current">';
-				else
-					echo '<li>';
-				echo '<a href="b2options.php?tab=plugins">'. T_('Plug-ins'). '</a></li>';
+				foreach( array(
+									'general' => array( T_('General'), '' ),
+									'files' => array( T_('File management'), '' ),
+									'regional' => array( T_('Regional'), ( $notransext ? '&amp;notransext=1' : '' ) ),
+									'plugins' => array( T_('Plug-ins'), '')
+									) as $ltab => $lvalue )
+				{
+					echo $tab == $ltab ? '<li class="current">' : '<li>';
+					echo '<a href="b2options.php?tab='.$ltab.$lvalue[1].'">'.$lvalue[0].'</a></li>';
+				}
 			?>
 			</ul>
 		</div>
@@ -435,6 +448,11 @@ $current_User->check_perm( 'options', 'view', true );
 			case 'general':
 				// ---------- GENERAL OPTIONS ----------
 				require_once dirname(__FILE__).'/_set_general.form.php';
+				break;
+			
+			case 'files':
+				// ---------- FILE MANAGEMENT OPTIONS ----------
+				require_once dirname(__FILE__).'/_set_files.form.php';
 				break;
 			
 			case 'regional':

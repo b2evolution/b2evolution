@@ -12,7 +12,7 @@
  *
  * @package admin
  */
- 
+
 require_once( dirname(__FILE__).'/_header.php' );
 require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_filemanager.php' );
 #ob_start();
@@ -38,10 +38,11 @@ $Fileman = new FileManager( $current_User, 'files.php', $cd, $order, $asc );
 if( $action == '' && $file != '' )
 { // a file is selected/clicked, default action
 ?>
-<html>
-	<head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+<head>
 	<title><?php echo $file.'&mdash;'.T_('b2evolution Filemanager') ?></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<link href="<?php echo $admin_url ?>/admin.css" rel="stylesheet" type="text/css" />
 	<style type="text/css">
 	<!--
@@ -53,7 +54,7 @@ if( $action == '' && $file != '' )
 	</head>
 
 	<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
-	
+
 	<?php
 		if( preg_match( '/\.(jpe?g|gif|png|swf)$/i', $file) )
 		{ // image
@@ -67,12 +68,12 @@ if( $action == '' && $file != '' )
 		{ // display raw file
 			param( 'showlinenrs', 'integer', 0 );
 			$buffer = file( $Fileman->cget_file( $file, 'path' ) );
-			
+
 			// TODO: check if new window was opened and provide close X in case
 			/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'/img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
-			
+
 			echo T_('file').': '.$file.'<br />';
-			
+
 			if( !count($buffer) )
 			{
 				echo ' ** '.T_('empty file').' ** ';
@@ -80,9 +81,9 @@ if( $action == '' && $file != '' )
 			else
 			{
 				echo count($buffer).' '.T_('lines').'<br />';
-				
+
 				$linenr_width = strlen( count($buffer)+1 );
-				
+
 				?>
 				<noscript type="text/javascript">
 					<a href="<?php echo $_SERVER['PHP_SELF'].'?cd='.$cd.'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
@@ -94,7 +95,7 @@ if( $action == '' && $file != '' )
 				document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
 				//-->
 				</script>
-				
+
 				<pre><?php
 				foreach( $buffer as $linenr => $line )
 				{
@@ -103,10 +104,10 @@ if( $action == '' && $file != '' )
 					echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $line ) );  // TODO: customize tab-width
 				}
 			}
-			
-			// TODO: stupid thing, document.getElementsByName seems to not work with IE here, so I have to use getElementsByTagName. This could perhaps check for the nodes name though. 
+
+			// TODO: stupid thing, document.getElementsByName seems to not work with IE here, so I have to use getElementsByTagName. This could perhaps check for the nodes name though.
 			?></pre>
-			
+
 			<script type="text/javascript">
 			<!--
 			showlinenrs = true;
@@ -147,8 +148,8 @@ if( $action == '' && $file != '' )
 				document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
 			}
 			-->
-			</script>			
-			
+			</script>
+
 			<?php
 		}
 		?>
@@ -160,18 +161,19 @@ exit;
 }
 
 
+// Actions for selected files
 if( $selaction != '' )
 {
 	param( 'selectedfiles', 'array', array() );
 	param( 'sel_recursive', 'array', array() );
-	
+
 	// map informations
 	foreach( $selectedfiles as $nr => $name )
 	{
 		$withsubdirs[ $name ] = in_array( $name, $sel_recursive );
-		
+
 	}
-	
+
 	if( !count( $selectedfiles ) )
 	{
 		$Fileman->Messages->add( T_('Nothing selected.') );
@@ -181,11 +183,11 @@ if( $selaction != '' )
 		case T_('Send by mail'):
 			echo 'todo: Send selected by mail, query email address..';
 			break;
-		
+
 		case T_('Download'):
 			param( 'zipname', 'string', '' );
 			param( 'exclude_sd', 'integer', 0 );
-			
+
 			if( empty($zipname) )
 			{
 				require( dirname(__FILE__).'/_menutop.php' );
@@ -210,14 +212,14 @@ if( $selaction != '' )
 				<form action="files.php" class="fform" method="post">
 				<fieldset>
 					<legend><?php echo T_('Please give a filename and choose zip format:') ?></legend>
-					
+
 					<?php
 					foreach( $selectedfiles as $file )
 					{?>
 					<input type="hidden" name="selectedfiles[]" value="<?php echo format_to_output( $file, 'formvalue' ) ?>" />
 					<?php
 					}?>
-					
+
 					<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
 					<?php
 					form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.') );
@@ -233,46 +235,46 @@ if( $selaction != '' )
 			else
 			{ // Downloading
 				require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_zip.php' );
-				
+
 				$options = array (
 					'basedir' => $Fileman->cwd,
 					'inmemory' => 1,
 					'recurse' => 1-$exclude_sd,
 				);
-					
+
 				$zipfile = new zip_file( $zipname );
 				$zipfile->set_options( $options );
 				$zipfile->add_files( $Fileman->arraylist() );
 				$zipfile->create_archive();
-				
+
 				#header('Content-length: ' . filesize($path));
 				$zipfile->download_file();
 				exit;
 				#$Fileman->Messages->add( sprintf(T_('Zipfile [%s] sent to you!'), $selectedfiles[0]), 'note' );
-				
+
 			}
-		
+
 			break;
-			
+
 		case T_('Delete'):
 			// TODO: extra confirmation?
-			
+
 			foreach( $selectedfiles as $file )
 			{
 				$Fileman->Messages->add( sprintf(T_('Would delete [%s]'), $file).( $withsubdirs[$file] ? ' ('.T_('with subdirectories').')' : '').'..', 'note' );
-				
+
 			}
-			
+
 			break;
 	}
 }
 
 switch( $action ) // (we catched empty action before)
 {
-	case T_('Create new'):  // create new file/dir
+	case 'createnew':  // create new file/dir
 		param( 'createnew', 'string', '' );
 		param( 'createname', 'string', '' );
-		
+
 		if( $createnew == 'dir' )
 		{
 			if( $Fileman->createdir( $createname ) )
@@ -291,27 +293,28 @@ switch( $action ) // (we catched empty action before)
 			break;
 		}
 		break;
-	
+
 	case 'delete':
 		param( 'file', 'string', '' );
-		
+
 		$Fileman->Messages->add( 'Would delete '.$file.' and reload..', 'note' );
 		/*if( $Fileman->delete( $file ) )
 		{
 			$Fileman->reloadpage();
 		}*/
-		
+
 		break;
+
 	case 'rename':
 		param( 'file', 'string', '' );
-		
+
 		echo 'todo: Rename dialog..';
 		break;
-		
+
 	case 'editperm':
 		param( 'file', 'string', '' );
 		param( 'chmod', 'string', '' );
-		
+
 		if( empty($chmod) )
 		{
 			$message = '
@@ -327,7 +330,69 @@ switch( $action ) // (we catched empty action before)
 			$oldperm = $Fileman->cget_file( $file, 'perms' );
 			pre_dump( $Fileman->cdo_file( $file, 'chmod', $chmod ), 'chmod!');
 		}
-		
+
+		break;
+
+	case 'upload':
+		// Check permissions:
+		if( !$Fileman->perm( 'upload' ) )
+		{
+			$Fileman->Messages->add( T_('You have no permissions to upload into this directory.') );
+		}
+		else
+		{
+
+			if( isset($_FILES) && count( $_FILES ) )
+			{
+				echo 'Uploaded';
+
+				pre_dump( $_FILES, 'uploaded' );
+				
+				/*if( isset( $_FILES[''] ) )
+				switch( $
+				UPLOAD_ERR_OK
+				Value: 0; There is no error, the file uploaded with success.
+				
+				UPLOAD_ERR_INI_SIZE
+				Value: 1; The uploaded file exceeds the upload_max_filesize directive in php.ini.
+				
+				UPLOAD_ERR_FORM_SIZE
+				Value: 2; The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+				
+				UPLOAD_ERR_PARTIAL
+				Value: 3; The uploaded file was only partially uploaded.
+				
+				UPLOAD_ERR_NO_FILE
+				Value: 4; No file was uploaded.*/
+
+			}
+			else
+			{
+				$allowedftypes = preg_split( '/\s+/', trim( $fileupload_allowedtypes) );
+	
+				$message = '
+				<p><strong>'.T_('File upload').'</strong></p>
+				<p>'.T_('Allowed file types:').' '.implode(', ', $allowedftypes).'</p>
+				<p>'.sprintf( T_('Maximum allowed file size: %d KB'), $fileupload_maxk ).'</p>
+				
+				<form enctype="multipart/form-data" action="'.$Fileman->curl().'" method="post">
+					<input type="hidden" name="MAX_FILE_SIZE" value="'.($fileupload_maxk*1024).'" />
+					<input type="hidden" name="action" value="upload" />';
+					
+					for( $i = 0; $i < 3; $i++ )
+					{
+						$message .= '<input name="uploadfile['.$i.']" type="file" size="40" /><br />';
+						//'.T_('Description').':	<input type="text" name="imgdesc['.$i.']" size="50" /><br />';
+					}
+					
+					$message .= '
+					<input type="submit" value="'.T_('Upload !').'" class="search" />
+					</form>
+					';
+			}
+
+		}
+
 		break;
 }
 
@@ -356,15 +421,15 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 <div class="toolbar">
 	<form action="files.php" name="search" class="toolbaritem">
 		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-		<input type="text" name="searchfor" value="--todo--" size="20" /> 
+		<input type="text" name="searchfor" value="--todo--" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
 	<form action="files.php" name="filter" class="toolbaritem">
 		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-		<input type="text" name="filter" value="--todo--" size="20" /> 
+		<input type="text" name="filter" value="--todo--" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 	</form>
-	
+
 	<div class="clear"></div>
 </div>
 
@@ -392,7 +457,7 @@ $i = 0;
 while( $Fileman->next() )
 {
 	$i++;
-	
+
 	$link_default_js = 'if( (typeof clickedonlink) == \'undefined\' ){ window.open(\''.$Fileman->cget('link')."', 'fileman_default', 'toolbar=0,resizable=yes,";
 	if( $r = $Fileman->cget('imgsize', 'widthheight') )
 	{
@@ -400,7 +465,7 @@ while( $Fileman->next() )
 	}
 	$link_default_js .= "')}";
 	$link_default_js = '';
-	
+
 	?>
 	<tr style="background:<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>" onmouseout="this.style.background='<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>'" onmouseover="this.style.background='#ddd'" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
 		<td class="checkbox">
@@ -418,7 +483,7 @@ while( $Fileman->next() )
 			{
 				echo '<a href="'.$Fileman->cget('link').'" title="'.T_('open in new window').'" target="_blank">[new]</a>';
 			}
-			
+
 			?>
 		</td>
 		<td class="type"><?php $Fileman->cdisp('type') ?></td>
@@ -449,7 +514,7 @@ if( $i == 0 )
 ?>
 <tr class="bottomrow">
 
-<td colspan="4">
+<td colspan="8">
 <?php
 if( $i != 0 )
 {
@@ -475,34 +540,43 @@ if( $i != 0 )
 }
 ?>
 </td>
-<td colspan="4" style="text-align:right">
-	<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-	<select name="createnew">
-		<option value="file"><?php echo T_('file') ?></option> 
-		<option value="dir"><?php echo T_('directory') ?></option> 
-	</select>
-	<input type="text" name="createname" value="" size="20" /> 
-	<input type="submit" name="action" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
-</td>
 
 </tr>
 </table>
 </form>
 
-<div id="options" class="fm_options">
-	<a id="options_title" href="javascript:toggle_options()"><?php echo T_('show options') ?></a>
-	<div id="options_list">
-		<br />
-		(not functional yet)
-		sort dirs at top <input type="checkbox" />
-		<br />
-		a <input type="checkbox" />
-		<br />
-		a <input type="checkbox" />
-		<br />
-		(storable in cookie/userprefs?)
+<div class="toolbar">
+	<div id="options" class="fm_options">
+		<a id="options_title" href="javascript:toggle_options()"><?php echo T_('show options') ?></a>
+		<div id="options_list">
+			<br />
+			(not functional yet)
+			sort dirs at top <input type="checkbox" />
+			<br />
+			a <input type="checkbox" />
+			<br />
+			a <input type="checkbox" />
+			<br />
+			(storable in cookie/userprefs?)
+		</div>
 	</div>
+
+	<form action="files.php" name="filter" class="toolbaritem">
+		<input type="hidden" name="action" value="upload" />
+		<input type="submit" value="<?php echo format_to_output( T_('Upload a file/image'), 'formvalue' ) ?>" />
+	</form>
+
+	<form action="files.php" name="filter" class="toolbaritem">
+		<select name="createnew">
+			<option value="file"><?php echo T_('file') ?></option>
+			<option value="dir"><?php echo T_('directory') ?></option>
+		</select>
+		<input type="text" name="createname" value="" size="20" />
+		<input type="hidden" name="action" value="createnew" />
+		<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
+	</form>
 </div>
+
 <script type="text/javascript">
 <!--
 showoptions = true;

@@ -123,12 +123,12 @@ function form_radio(
 	foreach( $field_options as $loop_field_option )
 	{
 		if( $field_lines ) echo "<div>\n";
-		echo '<label class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
+		echo '<span class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
 		if( $field_value == $loop_field_option[0] )
 		{
 			echo ' checked="checked"';
 		}
-		echo '> ', $loop_field_option[1], '</label>';
+		echo ' /> ', $loop_field_option[1], '</span>';
 		if( isset( $loop_field_option[2] ) )
 			echo '<span class="notes">', $loop_field_option[2], '</span>';
 		if( $field_lines ) echo "</div>\n";
@@ -153,7 +153,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 	{
 		echo ' class="', $field_class,'"';
 	}
-	echo '/>';
+	echo ' />';
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";
 }
@@ -175,7 +175,7 @@ function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note 
 	{
 		echo ' class="', $field_class,'"';
 	}
-	echo '/>';
+	echo ' />';
 	echo '  <small class="notes">', $field_note, '</small></td>';
 	echo "</tr>\n\n";
 }

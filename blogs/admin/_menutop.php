@@ -51,6 +51,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				the_form.elements['blog_perm_comments_'+String(id)].checked = allchecked[i];
 				the_form.elements['blog_perm_cats_'+String(id)].checked = allchecked[i];
 				the_form.elements['blog_perm_properties_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_upload_'+String(id)].checked = allchecked[i];
 				
 				setcheckallspan( i );
 			}

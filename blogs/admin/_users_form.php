@@ -77,7 +77,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 																					: $edited_User->dget('login', 'formvalue') )
 		?>" />
 		
-	<fieldset>
+	<fieldset class="left70">
 		<legend><?php echo T_('User') ?></legend>
 		<?php
 			if( $allowed_to_edit )
@@ -182,14 +182,18 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	<fieldset>
 		<legend><?php echo T_('User rights') ?></legend>
 		<?php
-		$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
+		$field_note = array(
+			'level' => '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' ),
+			'upload' => '' );
 		if( $user_profile_only )
 		{
-			form_info( T_('Level'), $edited_User->dget('level'), $field_note );
+			form_info( T_('Level'), $edited_User->dget('level'), $field_note['level'] );
+			form_info( T_('Upload'), $edited_User->dget('upload_ufolder'), $field_note['upload'] );
 		}
 		else
 		{
-			form_text( 'edited_user_level', $edited_User->dget('level', 'formvalue'), 2, T_('Level'), $field_note, 2 );
+			form_text( 'edited_user_level', $edited_User->dget('level', 'formvalue'), 2, T_('Level'), $field_note['level'], 2 );
+			form_checkbox( 'edited_user_upload_ufolder', $edited_User->dget('upload_ufolder', 'formvalue'), T_('Upload into userfolder'), $field_note['upload'] );
 		}
 		if( $edited_User->get('ID') != 1 && !$user_profile_only )
 		{
@@ -204,21 +208,6 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		?>
 	</fieldset>
 
-	<?php
-	if( $allowed_to_edit )
-	{ ?>
-	<fieldset>
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
-			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php 
-	} 
-	?>
-
 	<fieldset>
 		<legend><?php echo T_('User information') ?></legend>
 		<?php
@@ -230,6 +219,21 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			form_info( T_('With Browser'), $edited_User->dget('browser') );
 		?>
 	</fieldset>
+
+	<?php
+	if( $allowed_to_edit )
+	{ ?>
+	<fieldset class="submit">
+		<fieldset>
+			<div class="input">
+				<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
+			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+			</div>
+		</fieldset>
+	</fieldset>
+	<?php 
+	} 
+	?>
 
 	</form>
 	

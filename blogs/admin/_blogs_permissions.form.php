@@ -26,6 +26,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Upload') ?></th>
 				<th rowspan="2"></th>
 			</tr>
 			<tr>
@@ -36,14 +37,14 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<th><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="12">
+				<td colspan="13">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
 			<?php
 				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
-													bloguser_perm_properties
+													bloguser_perm_properties, bloguser_perm_upload
 									FROM $tableusers INNER JOIN $tableblogusers
 													ON ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = $blog
@@ -127,6 +128,13 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 						</td>
 						<td class="center">
+							<input type="checkbox" name="blog_perm_upload_<?php echo $loop_row['ID'] ?>"
+								<?php if( $loop_row['bloguser_perm_upload'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
+						</td>
+						<td class="center">
 							<a href="#" onclick="toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
 								<span id="checkallspan_<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
 							</a>
@@ -137,7 +145,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				}
 				?>
 			<tr class="group">
-				<td colspan="12">
+				<td colspan="13">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
@@ -195,6 +203,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 						<td class="center">
 							<input type="checkbox" name="blog_perm_properties_<?php echo $loop_row['ID'] ?>"
 								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_upload_<?php echo $loop_row['ID'] ?>"
+								value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
 						</td>
 						<td class="center">
 							<a href="#" onclick="toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);">

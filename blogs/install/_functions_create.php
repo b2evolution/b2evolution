@@ -61,6 +61,7 @@ function create_b2evo_tables()
 		user_idmode varchar(20) NOT NULL DEFAULT 'login',
 		user_notify tinyint(1) NOT NULL default 1,
 		user_showonline tinyint(1) NOT NULL default 1,
+		user_upload_ufolder tinyint(1) NOT NULL default 0,
 		user_grp_ID int(4) NOT NULL default 1,
 		PRIMARY KEY user_ID (ID),
 		UNIQUE user_login (user_login),
@@ -372,6 +373,7 @@ function create_groups()
 		bloguser_perm_comments tinyint NOT NULL default 0,
 		bloguser_perm_cats tinyint NOT NULL default 0,
 		bloguser_perm_properties tinyint NOT NULL default 0,
+		bloguser_perm_upload tinyint NOT NULL default 0,
 		PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 	)";
 	$DB->query( $query );

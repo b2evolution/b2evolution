@@ -30,7 +30,7 @@ form.fform fieldset {
 	border: 1px solid #ddd;
 	margin-bottom: 1ex;
 	background-color: #fff;
-	padding: 0;
+	padding: 0 0 1ex 0;
 }
 form.fform fieldset fieldset {
 	clear: both;
@@ -42,14 +42,26 @@ form.fform div.label {
 	float: left;
 	width: 24%;
 	text-align: right;
-	padding-top: .6ex;
+	padding-top: 3px;
 	font-weight:bold;
 }
 form.fform div.input {
 	float: right;
 	width: 75%;
 }
-
+form.fform fieldset.submit {
+	border:0;
+	clear:both;
+}
+form.fform fieldset.left70 {
+	width:60%;
+	float:left;
+}
+form.fform div.input input[type=checkbox],
+form.fform div.input input[type=radio]
+{
+	margin-top: 5px;
+}
 
 
 /* 18/80% forms */

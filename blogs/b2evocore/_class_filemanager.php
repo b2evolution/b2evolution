@@ -46,6 +46,8 @@ class FileManager
 
 		$this->Messages = new Log( 'error' );
 
+		$this->user = $current_User;
+		
 		$this->order = $order;
 		$this->orderasc = $asc;
 
@@ -54,7 +56,7 @@ class FileManager
 		$media_dir = $basepath.'/'.$media_subdir;
 		#$media_dir = 'd:\\home';
 
-		if( $current_User->login == 'demouser' )
+		if( $this->user->login == 'demouser' )
 		{
 			$media_dir = $basepath.'/media_test';
 			$media_subdir = 'media_test';
@@ -241,16 +243,26 @@ class FileManager
 	
 	
 	/**
-	 * get the current url, with all relevant GET params
+	 * get the current url, with all relevant GET params (cd, order, asc)
+	 *
+	 * @param string override cd
+	 * @param string override order
+	 * @param string override asc
 	 */
-	function curl()
+	function curl( $cd = '#', $order = '#', $asc = '#' )
 	{
 		$r = $this->url;
 		
-		foreach( array('order', 'asc', 'cd') as $check )
+		foreach( array('cd', 'order', 'asc') as $check )
 		{
-			if( isset( $_GET[ $check ] ) )
+			if( isset( $_GET[ $check ] ) && $$check == '#' )
+			{
 				$r = url_add_param( $r, $check.'='.$_GET[$check] );
+			}
+			elseif( $$check != '#' )
+			{
+				$r = url_add_param( $r, $check.'='.$$check );
+			}
 		}
 		
 		return $r;
@@ -1227,10 +1239,32 @@ class FileManager
 		foreach( $clickabledirs as $nr => $dir )
 		{
 			if( $nr > 0 ) $cd .= $dir.'/';
-			$r .= '/<a href="'.url_add_param( $this->url, 'cd='.$cd ).'">'.$dir.'</a>';
+			$r .= '/<a href="'.$this->curl( $cd ).'">'.$dir.'</a>';
 		}
 
 		return $r;
+	}
+	
+	
+	/**
+	 * check permissions
+	 *
+	 * @param string for what? (upload)
+	 * @return true if permission granted, false if not
+	 */
+	function perm( $for )
+	{
+		global $Debuglog;
+		
+		switch( $for )
+		{
+			case 'upload':
+				return $this->user->check_perm( 'upload', 'any', false );
+			
+			default:  // return false if not defined
+				$Debuglog->add( 'Filemanager: permission check for ['.$for.'] not defined!' );
+				return false;
+		}
 	}
 
 }

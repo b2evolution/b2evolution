@@ -237,7 +237,7 @@ function get_userdatabylogin( $user_login )
  */
 function get_userdata($userid)
 {
-	global $DB,$tableusers, $cache_userdata;
+	global $DB, $tableusers, $cache_userdata;
 	if( empty($cache_userdata[$userid] ) )
 	{	// We do a progressive cache load beacuse there can be many many users!
 		$sql = "SELECT *

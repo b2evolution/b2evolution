@@ -542,7 +542,8 @@ function upgrade_b2evo_tables()
 		
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
-							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify";
+							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify,
+							ADD COLUMN user_upload_ufolder tinyint(1) NOT NULL default 0 AFTER user_showonline";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
@@ -550,6 +551,22 @@ function upgrade_b2evo_tables()
 		$query = "INSERT INTO $tablesettings (set_name, set_value)
 							VALUES ( 'reloadpage_timeout', '300' )";
 		$DB->query( $query );
+		echo "OK.<br />\n";
+		
+		echo 'Creating user preferences table... ';
+		// create new table
+		$DB->query( "CREATE TABLE $tableuserprefs (
+								upref_user_ID INT() NOT NULL ,
+								upref_name VARCHAR( 30 ) NOT NULL,
+								upref_value VARCHAR( 255 ) NULL,
+								PRIMARY KEY ( upref_user_ID, upref_name )
+								)");
+		echo "OK.<br />\n";
+
+		
+		echo 'Altering table for Blog-User permissions... ';
+		$DB->query( "ALTER TABLE $tableblogusers
+								ADD COLUMN bloguser_perm_upload tinyint NOT NULL default 0" );
 		echo "OK.<br />\n";
 		
 	}

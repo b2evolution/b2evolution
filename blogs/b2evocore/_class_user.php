@@ -42,6 +42,7 @@ class User extends DataObject
 	var	$level;
 	var	$notify;
 	var	$showonline;
+	var $upload_ufolder; // allowed to upload into his user folder
 
 	var $Group;	// Pointer to group
 
@@ -52,6 +53,8 @@ class User extends DataObject
 	 * User::User(-)
 	 *
 	 * Constructor
+	 *
+	 * @param array existing userdata {@link get_userdata()}}
 	 */
 	function User( $userdata = NULL )
 	{
@@ -83,6 +86,7 @@ class User extends DataObject
 			$this->level = 0;
 			$this->notify = 1;
 			$this->showonline = 1;
+			$this->upload_ufolder = false;
 			// Group for this user:
 			$this->Group = NULL;
 		}
@@ -110,6 +114,7 @@ class User extends DataObject
 			$this->level = $userdata['user_level'];
 			$this->notify = $userdata['user_notify'];
 			$this->showonline = $userdata['user_showonline'];
+			$this->upload_ufolder = $userdata['user_upload_ufolder'];
 
 			// Group for this user:
 			$this->Group = $GroupCache->get_by_ID( $userdata['user_grp_ID'] );
