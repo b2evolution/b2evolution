@@ -13,7 +13,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.6.2</h1>
+<h1 id="version">Version: 0.8.7</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -723,10 +723,6 @@ switch( $action )
 	
 		if( $old_db_version < 8040 )
 		{
-			global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-                        $tablepostcats, $tablehitlog, $tableantispam, $tablepluginsettings;
-	                global $baseurl, $new_db_version;
-			
 			echo "<p>Creating Anti-Spam Ban List... ";
 			create_antispam();
 			echo "OK.<br />\n";
@@ -735,15 +731,16 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 
-		#	echo "<p>Creating plugin settings table... ";
-		#	create_pluginsettings();
-		#	echo "OK.<br />\n";
-	               
+		}	               
 			
+		if( $old_db_version < 8050 )
+		{
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
 			 */
-			// post_title VARCHAR(250)
+			#	echo "<p>Creating plugin settings table... ";
+			#	create_pluginsettings();
+			#	echo "OK.<br />\n";
 		}
 		
 		// $new_db_version = 8001; // FOR TESTING

@@ -8,7 +8,6 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-require_once dirname(__FILE__)."/$core_dirout/$conf_subdir/_antispam.php";
 require_once (dirname(__FILE__)."/_functions_cats.php");
 require_once (dirname(__FILE__)."/_functions_blogs.php");
 require_once (dirname(__FILE__)."/_functions_bposts.php");

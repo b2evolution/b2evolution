@@ -243,6 +243,7 @@ case "editpost":
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);		
 			pingCafelog($cafelogID, $post_title, $post_ID);
+			pingTechnorati($blogparams);
 		}
 	}	
 	

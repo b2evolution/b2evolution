@@ -22,7 +22,7 @@ $use_post_url = 1;			// 1 to enable, 0 to disable
 
 # When banning referrers/comment URLs, do you want to automatically remove any referrers and comments containing the banned domain?
 # (you will be asked to confirm the ban if you enable this)
-$deluxe_ban = 0;	// 1 to enable, 0 to disable
+$deluxe_ban = 1;	// 1 to enable, 0 to disable
 
 # Do not edit the following unless you known what you're doing...
 
