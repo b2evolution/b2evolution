@@ -50,47 +50,47 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * @todo Move it to some /conf file.
  */
 $fm_filetypes = array( // {{{
-	'\.ai' => T_('Adobe illustrator'),
-	'\.bmp' => T_('Bmp image'),
-	'\.bz'  => T_('Bz Archive'),
-	'\.c' => T_('Source C '),
+	'\.ai' => T_('Adobe Illustrator'),
+	'\.bmp' => T_('BMP image'),
+	'\.bz'  => T_('BZ archive'),
+	'\.c' => T_('C source'),
 	'\.cgi' => T_('CGI file'),
 	'\.(conf|inf)' => T_('Config file'),
-	'\.cpp' => T_('Source C++'),
+	'\.cpp' => T_('C++ source'),
 	'\.css' => T_('Stylesheet'),
-	'\.doc' => T_('MS Office'),
-	'\.exe' => T_('Executable'),
-	'\.gif' => T_('Gif image'),
-	'\.gz'  => T_('Gz Archive'),
+	'\.doc' => T_('MS Word document'),
+	'\.exe' => T_('Windows executable'),
+	'\.gif' => T_('GIF image'),
+	'\.gz'  => T_('GZ archive'),
 	'\.h' => T_('Header file'),
 	'\.hlp' => T_('Help file'),
-	'\.ht(access|passwd)' => T_('Apache file'),
-	'\.htm' => T_('Hyper text'),
-	'\.html' => T_('Hyper text'),
+	'\.ht(access|passwd)' => T_('Apache conf.'),
+	'\.htm' => T_('HyperText Markup'),
+	'\.html' => T_('HyperText Markup'),
 	'\.htt' => T_('Windows access'),
 	'\.inc' => T_('Include file'),
-	'\.ini' => T_('Setting file'),
-	'\.jpe?g' => T_('Jpeg Image'),
+	'\.ini' => T_('Settings file'),
+	'\.jpe?g' => T_('JPEG image'),
 	'\.js'  => T_('JavaScript'),
 	'\.log' => T_('Log file'),
-	'\.mdb' => T_('Access DB'),
-	'\.midi' => T_('Media file'),
+	'\.mdb' => T_('Access database'),
+	'\.midi' => T_('MIDI file'),
 	'\.p(hp[345]?|html)' => T_('PHP script'),
 	'\.pl' => T_('Perl script'),
-	'\.png' => T_('Png image'),
-	'\.ppt' => T_('MS Power point'),
-	'\.psd' => T_('Photoshop Image'),
-	'\.ram?' => T_('Realmedia file'),
-	'\.rar' => T_('Rar Archive'),
+	'\.png' => T_('PNG image'),
+	'\.ppt' => T_('MS Powerpoint'),
+	'\.psd' => T_('Photoshop image'),
+	'\.ram?' => T_('RealMedia file'),
+	'\.rar' => T_('RAR Archive'),
 	'\.rtf' => T_('Rich Text Format'),
-	'\.sql' => T_('SQL file'),
+	'\.sql' => T_('SQL query file'),
 	'\.s[tx]w' => T_('OpenOffice file'),
 	'\.te?xt' => T_('Text document'),
-	'\.tgz' => T_('Tar gz archive'),
-	'\.vbs' => T_('MS Vb script'),
-	'\.wri' => T_('Document'),
+	'\.tgz' => T_('TAR GZ archive'),
+	'\.vbs' => T_('MS VBscript'),
+	'\.wri' => T_('MS Write document'),
 	'\.xml' => T_('XML file'),
-	'\.zip' => T_('Zip Archive'),
+	'\.zip' => T_('ZIP archive'),
 ); // }}}
 
 
@@ -737,6 +737,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2005/01/27 13:34:58  fplanque
+ * i18n tuning
+ *
  * Revision 1.19  2005/01/26 23:44:34  blueyed
  * no message
  *

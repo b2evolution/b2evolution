@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2005-01-26 14:58+0100\n"
+"POT-Creation-Date: 2005-01-26 20:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1319,7 +1319,7 @@ msgid "You must provide an absolute URL (starting with <code>http://</code> or <
 msgstr ""
 
 #: ..\..\..\admin\blogs.php:111
-msgid "You must provide an relative URL (without <code>http://</code> or <code>https://</code>)!"
+msgid "You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!"
 msgstr ""
 
 #: ..\..\..\admin\blogs.php:119
@@ -1589,7 +1589,7 @@ msgid "Archive filename"
 msgstr ""
 
 #: ..\..\..\admin\files.php:194
-msgid "This is the file's name that will get sent to you."
+msgid "This is the name of the file which will get sent to you."
 msgstr ""
 
 #: ..\..\..\admin\files.php:196
@@ -3165,11 +3165,11 @@ msgid "Information"
 msgstr ""
 
 #: ..\..\..\admin\_files_browse.inc.php:575
-msgid "Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."
+msgid "Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files)."
 msgstr ""
 
 #: ..\..\..\admin\_files_browse.inc.php:576
-msgid "Clicking on a file's icon lets the browser handle the file."
+msgid "Clicking on a file icon lets the browser handle the file."
 msgstr ""
 
 #. TRANS: Warning this is a javascript string
@@ -3658,7 +3658,7 @@ msgid "Archive mode"
 msgstr ""
 
 #: ..\..\..\admin\_set_general.form.php:54
-msgid "Email/MSS Auto-BR"
+msgid "Email/MMS Auto-BR"
 msgstr ""
 
 #: ..\..\..\admin\_set_general.form.php:54
@@ -4794,19 +4794,19 @@ msgid "New element"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:53
-msgid "Adobe illustrator"
+msgid "Adobe Illustrator"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:54
-msgid "Bmp image"
+msgid "BMP image"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:55
-msgid "Bz Archive"
+msgid "BZ archive"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:56
-msgid "Source C "
+msgid "C source"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:57
@@ -4818,7 +4818,7 @@ msgid "Config file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:59
-msgid "Source C++"
+msgid "C++ source"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:60
@@ -4826,19 +4826,19 @@ msgid "Stylesheet"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:61
-msgid "MS Office"
+msgid "MS Word document"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:62
-msgid "Executable"
+msgid "Windows executable"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:63
-msgid "Gif image"
+msgid "GIF image"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:64
-msgid "Gz Archive"
+msgid "GZ archive"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:65
@@ -4850,12 +4850,12 @@ msgid "Help file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:67
-msgid "Apache file"
+msgid "Apache conf."
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:68
 #: ..\..\..\evocore\_file.class.php:69
-msgid "Hyper text"
+msgid "HyperText Markup"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:70
@@ -4867,11 +4867,11 @@ msgid "Include file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:72
-msgid "Setting file"
+msgid "Settings file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:73
-msgid "Jpeg Image"
+msgid "JPEG image"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:74
@@ -4883,11 +4883,11 @@ msgid "Log file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:76
-msgid "Access DB"
+msgid "Access database"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:77
-msgid "Media file"
+msgid "MIDI file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:78
@@ -4899,23 +4899,23 @@ msgid "Perl script"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:80
-msgid "Png image"
+msgid "PNG image"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:81
-msgid "MS Power point"
+msgid "MS Powerpoint"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:82
-msgid "Photoshop Image"
+msgid "Photoshop image"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:83
-msgid "Realmedia file"
+msgid "RealMedia file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:84
-msgid "Rar Archive"
+msgid "RAR Archive"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:85
@@ -4923,7 +4923,7 @@ msgid "Rich Text Format"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:86
-msgid "SQL file"
+msgid "SQL query file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:87
@@ -4935,15 +4935,15 @@ msgid "Text document"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:89
-msgid "Tar gz archive"
+msgid "TAR GZ archive"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:90
-msgid "MS Vb script"
+msgid "MS VBscript"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:91
-msgid "Document"
+msgid "MS Write document"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:92
@@ -4951,7 +4951,7 @@ msgid "XML file"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:93
-msgid "Zip Archive"
+msgid "ZIP archive"
 msgstr ""
 
 #: ..\..\..\evocore\_file.class.php:352

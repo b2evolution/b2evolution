@@ -217,7 +217,7 @@ if( !empty($action) )
 					<fieldset>
 						<legend>'.T_('Download options').'</legend>
 						'
-						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
+						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the name of the file which will get sent to you."), 80, '', 'text', false )."\n"
 						.( $SelectedFiles->countDirs() ?
 								form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
 								'' )
@@ -1146,6 +1146,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.71  2005/01/27 13:34:57  fplanque
+ * i18n tuning
+ *
  * Revision 1.70  2005/01/26 23:44:40  blueyed
  * no message
  *

@@ -51,7 +51,7 @@ $Form->radio( 'archive_mode', $Settings->get('archive_mode'),
 											array( 'postbypost', T_('post by post') )
 										), T_('Archive mode') );
 
-$Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MSS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
+$Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MMS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
 
 $Form->fieldset_end();
 

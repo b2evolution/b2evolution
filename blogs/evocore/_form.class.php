@@ -160,12 +160,14 @@ class Form
 
 		if( !empty($field_label) )
 		{
+			// $this->empty_label = true;	// Memorize this
 			$r .= $this->labelstart
 						.'<label for="'.$field_name.'">'.$field_label.$this->label_suffix.'</label>'
 						.$this->labelend;
 		}
 		else
 		{	// Empty label:
+			// $this->empty_label = false;	// Memorize this
 			$r .= $this->labelempty;
 		}
 

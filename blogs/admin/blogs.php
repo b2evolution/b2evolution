@@ -108,7 +108,7 @@ function set_edited_Blog_from_params( $for )
 				$blog_siteurl = & $blog_siteurl_relative;
 				if( preg_match( '#^https?://#', $blog_siteurl ) )
 				{
-					$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an relative URL (without <code>http://</code> or <code>https://</code>)!') );
+					$Messages->add( T_('Blog Folder URL').': '.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!') );
 				}
 			}
 			$edited_Blog->set( 'siteurl', $blog_siteurl );
@@ -559,6 +559,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.23  2005/01/27 13:34:57  fplanque
+ * i18n tuning
+ *
  * Revision 1.22  2005/01/13 19:53:48  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

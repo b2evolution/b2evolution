@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2005-01-26 14:58+0100\n"
-"PO-Revision-Date: 2005-01-26 17:12+0100\n"
+"POT-Creation-Date: 2005-01-26 20:52+0100\n"
+"PO-Revision-Date: 2005-01-26 21:35+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -364,12 +364,12 @@ msgstr "Référent"
 
 #: ..\..\..\admin\b2antispam.php:163
 msgid "Ref. IP"
-msgstr ""
+msgstr "IP Réf."
 
 #: ..\..\..\admin\b2antispam.php:164
 #: ..\..\..\admin\b2stats.php:468
 msgid "Target Blog"
-msgstr ""
+msgstr "Blog cible"
 
 #: ..\..\..\admin\b2antispam.php:165
 msgid "Target URL"
@@ -394,15 +394,15 @@ msgstr "Auteur"
 
 #: ..\..\..\admin\b2antispam.php:212
 msgid "Auth. URL"
-msgstr ""
+msgstr "URL Auteur"
 
 #: ..\..\..\admin\b2antispam.php:213
 msgid "Auth. IP"
-msgstr ""
+msgstr "IP Auteur"
 
 #: ..\..\..\admin\b2antispam.php:214
 msgid "Content starts with..."
-msgstr ""
+msgstr "Contenu commence par..."
 
 #: ..\..\..\admin\b2antispam.php:253
 #, php-format
@@ -605,7 +605,7 @@ msgstr "Racine (Pas de parent)"
 
 #: ..\..\..\admin\b2categories.php:238
 msgid "Note: Moving categories across blogs is enabled. Use with caution."
-msgstr ""
+msgstr "Note: Le déplacement de catégories entre blogs est activé. Utilisez avec précaution."
 
 #: ..\..\..\admin\b2categories.php:254
 msgid "Note: Moving categories across blogs is disabled."
@@ -808,7 +808,7 @@ msgstr "Sur Liste Noire"
 
 #: ..\..\..\admin\b2stats.php:227
 msgid "Access summary"
-msgstr ""
+msgstr "Résumé des accès."
 
 #: ..\..\..\admin\b2stats.php:334
 msgid "Total"
@@ -895,7 +895,7 @@ msgstr "Bannir"
 
 #: ..\..\..\admin\b2stats.php:473
 msgid "Requested URI"
-msgstr ""
+msgstr "URI demandée"
 
 #: ..\..\..\admin\b2stats.php:484
 #: ..\..\..\admin\b2stats.php:489
@@ -1332,11 +1332,11 @@ msgstr "URL du répertoire du blog"
 #: ..\..\..\admin\blogs.php:103
 #: ..\..\..\admin\blogs.php:156
 msgid "You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!"
-msgstr ""
+msgstr "Vous devez indiquer une URL absolue (commençant par <code>http://</code> ou <code>https://</code>)!"
 
 #: ..\..\..\admin\blogs.php:111
-msgid "You must provide an relative URL (without <code>http://</code> or <code>https://</code>)!"
-msgstr ""
+msgid "You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!"
+msgstr "Vous devez indiquer une URL relative (sans <code>http://</code> ni <code>https://</code>)!"
 
 #: ..\..\..\admin\blogs.php:119
 msgid "You must provide an URL blog name!"
@@ -1351,11 +1351,11 @@ msgstr "Ce 'Nom URL' est déjà utilisé pour un autre blog. Veuillez choisir un au
 #: ..\..\..\admin\blogs.php:163
 #: ..\..\..\admin\_blogs_advanced.form.php:72
 msgid "Media dir location"
-msgstr ""
+msgstr "Emplacement du rép. média"
 
 #: ..\..\..\admin\blogs.php:152
 msgid "You must provide the full path of the media directory."
-msgstr ""
+msgstr "Vous devez un indiquer le chemin complet du répertoire média."
 
 #: ..\..\..\admin\blogs.php:163
 msgid "You must provide the media subdirectory."
@@ -1569,7 +1569,7 @@ msgstr "Vos paramètres utilisateurs ont été mis à jour."
 
 #: ..\..\..\admin\files.php:137
 msgid "You have to enable JavaScript to use this feature."
-msgstr ""
+msgstr "Vous devez activer JavaScript pour utiliser cette fonction."
 
 #: ..\..\..\admin\files.php:149
 #: ..\..\..\admin\_files_browse.inc.php:417
@@ -1584,7 +1584,7 @@ msgstr "Envoyer par email"
 #: ..\..\..\admin\files.php:408
 #: ..\..\..\admin\_files_browse.inc.php:501
 msgid "Nothing selected."
-msgstr ""
+msgstr "Vous n'avez rien sélectionné."
 
 #: ..\..\..\admin\files.php:163
 #: ..\..\..\admin\files.php:201
@@ -1594,7 +1594,7 @@ msgstr "Télécharger"
 
 #: ..\..\..\admin\files.php:180
 msgid "You want to download:"
-msgstr ""
+msgstr "Vous voulez télécharger:"
 
 #: ..\..\..\admin\files.php:192
 msgid "Download options"
@@ -1602,19 +1602,19 @@ msgstr "Options de download"
 
 #: ..\..\..\admin\files.php:194
 msgid "Archive filename"
-msgstr ""
+msgstr "Nom du fichier archive"
 
 #: ..\..\..\admin\files.php:194
-msgid "This is the file's name that will get sent to you."
-msgstr ""
+msgid "This is the name of the file which will get sent to you."
+msgstr "Il s'agit du nom du fichier qui va vous être envoyé."
 
 #: ..\..\..\admin\files.php:196
 msgid "Exclude subdirectories"
-msgstr ""
+msgstr "Exclure les sous-dossiers"
 
 #: ..\..\..\admin\files.php:196
 msgid "This will exclude subdirectories of selected directories."
-msgstr ""
+msgstr "Ceci va exclure les sous-dossiers des dossiers sélectionnés."
 
 #: ..\..\..\admin\files.php:253
 msgid "Do you really want to delete the following files?"
@@ -1627,7 +1627,7 @@ msgstr "Voulez vous vraiment supprimer le fichier suivant?"
 #: ..\..\..\admin\files.php:268
 #, php-format
 msgid "Check to include subdirectories of &laquo;%s&raquo;"
-msgstr ""
+msgstr "Cochez pour inclure les sous dossiers de &laquo;%s&raquo;"
 
 #: ..\..\..\admin\files.php:274
 msgid "Including subdirectories"
@@ -1641,7 +1641,7 @@ msgstr "Modifier les permissions"
 #: ..\..\..\admin\files.php:331
 #, php-format
 msgid "Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;."
-msgstr ""
+msgstr "Echec du changement de permissions sur &laquo;%s&raquo; vers &laquo;%s&raquo;."
 
 #: ..\..\..\admin\files.php:335
 #, php-format
@@ -1651,15 +1651,15 @@ msgstr "Permissions pour &laquo;%s&raquo; non modifiées."
 #: ..\..\..\admin\files.php:339
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;."
-msgstr ""
+msgstr "Permissions de &laquo;%s&raquo; changées en &laquo;%s&raquo;."
 
 #: ..\..\..\admin\files.php:371
 msgid "Read-only"
-msgstr ""
+msgstr "Lecture seule"
 
 #: ..\..\..\admin\files.php:380
 msgid "Read and write"
-msgstr ""
+msgstr "Lecture/Ecriture"
 
 #: ..\..\..\admin\files.php:392
 msgid "Set new permissions"
@@ -1672,7 +1672,7 @@ msgstr "Upload"
 
 #: ..\..\..\admin\files.php:460
 msgid "You have no permissions to upload into this directory."
-msgstr ""
+msgstr "Vous n'avez pas la permission d'uploader dans ce répertoire."
 
 #: ..\..\..\admin\files.php:490
 #, php-format
@@ -1682,7 +1682,7 @@ msgstr "Le fichier &laquo;%s&raquo; est trop volumineux et n'a pas été accepté."
 #: ..\..\..\admin\files.php:498
 #, php-format
 msgid "The uploaded file &laquo;%s&raquo; exceeds the upload_max_filesize directive in php.ini."
-msgstr ""
+msgstr "Le fichier uploadé &laquo;%s&raquo; dépasse la taille maximale upload_max_filesize définie dans php.ini."
 
 #: ..\..\..\admin\files.php:502
 #, php-format
@@ -1702,7 +1702,7 @@ msgstr "Erreur inconnue avec le fichier &laquo;%s&raquo;."
 #: ..\..\..\admin\files.php:515
 #, php-format
 msgid "The file &laquo;%s&raquo; does not seem to be a valid upload!"
-msgstr ""
+msgstr "Le fichier &laquo;%s&raquo; ne semble pas être un upload valide!"
 
 #: ..\..\..\admin\files.php:524
 #: ..\..\..\admin\files.php:765
@@ -1719,7 +1719,7 @@ msgstr "L'extension de fichier &laquo;%s&raquo; n'est pas permise."
 #: ..\..\..\admin\files.php:537
 #, php-format
 msgid "The file type (MIME) &laquo;%s&raquo; of &laquo;%s&raquo; is not allowed."
-msgstr ""
+msgstr "Le type MIME &laquo;%s&raquo; du fichier &laquo;%s&raquo; n'est pas autorisé."
 
 #: ..\..\..\admin\files.php:547
 #: ..\..\..\admin\files.php:777
@@ -1751,7 +1751,7 @@ msgstr "Description du fichier"
 #: ..\..\..\admin\files.php:628
 #: ..\..\..\admin\files.php:700
 msgid "New filename (without path)"
-msgstr ""
+msgstr "Nouveau nom de fichier (sans chemin d'accès)"
 
 #: ..\..\..\admin\files.php:648
 msgid "Files to upload"
@@ -1791,7 +1791,7 @@ msgstr "Pas de fichiers source!"
 
 #: ..\..\..\admin\files.php:772
 msgid "Source- and target file are the same. Please choose another name or directory."
-msgstr ""
+msgstr "Les fichiers source et cible sont identiques. Veuillez choisir un autre nom ou un autre répertoire."
 
 #: ..\..\..\admin\files.php:784
 #, php-format
@@ -1816,7 +1816,7 @@ msgstr "&laquo;%s&raquo; déplacé vers &laquo;%s&raquo;."
 #: ..\..\..\admin\files.php:819
 #, php-format
 msgid "Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;."
-msgstr ""
+msgstr "Impossible de supprimer &laquo;%s&raquo;, cependant le fichier a été copié vers &laquo;%s&raquo;."
 
 #: ..\..\..\admin\files.php:829
 #, php-format
@@ -1826,7 +1826,7 @@ msgstr "&laquo;%s&raquo; copié vers &laquo;%s&raquo;."
 #: ..\..\..\admin\files.php:838
 #, php-format
 msgid "Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;."
-msgstr ""
+msgstr "Impossible de copier &laquo;%s&raquo; vers &laquo;%s&raquo;."
 
 #: ..\..\..\admin\files.php:854
 #: ..\..\..\admin\_files_browse.inc.php:565
@@ -1844,11 +1844,11 @@ msgstr "Déplacer"
 
 #: ..\..\..\admin\files.php:868
 msgid "Copy / Move / Rename"
-msgstr ""
+msgstr "Copier / Déplacer / Renommer"
 
 #: ..\..\..\admin\files.php:873
 msgid "You are in copy-move-rename mode."
-msgstr ""
+msgstr "Vous êtes en mode copier / déplacer / renommer."
 
 #: ..\..\..\admin\files.php:874
 msgid "Please navigate to the desired location."
@@ -1865,7 +1865,7 @@ msgstr "Le fichier existant &laquo;%s&raquo; sera remplacé avec ce fichier."
 
 #: ..\..\..\admin\files.php:902
 msgid "Keep source file"
-msgstr ""
+msgstr "Conserver le fichier source."
 
 #: ..\..\..\admin\files.php:913
 msgid "Do not delete the source file."
@@ -1922,13 +1922,12 @@ msgstr "Quitter le mode upload"
 #: ..\..\..\admin\_menutop.php:377
 #: ..\..\..\admin\_submenu.inc.php:46
 msgid "Files"
-msgstr ""
+msgstr "Fichiers"
 
-#  TRANS: current default blog
 #: ..\..\..\admin\fileset.php:63
 #: ..\..\..\admin\_set_files.form.php:113
 msgid "Set defaults"
-msgstr ""
+msgstr "Définir valeur par défaut"
 
 #: ..\..\..\admin\fileset.php:102
 msgid "File settings updated."
@@ -1986,7 +1985,7 @@ msgstr "Installation du plug-in:"
 
 #: ..\..\..\admin\plugins.php:76
 msgid "Uninstalling plugin #"
-msgstr ""
+msgstr "Désinstallation du plug-in n°"
 
 #: ..\..\..\admin\plugins.php:86
 msgid "Plugin info"
@@ -1994,11 +1993,11 @@ msgstr "Infos plug-in"
 
 #: ..\..\..\admin\plugins.php:88
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 #: ..\..\..\admin\plugins.php:88
 msgid "This 8 character code uniquely identifies the functionality of this plugin."
-msgstr ""
+msgstr "Ce code de 8 caractères identifie de manière unique les fonctionnalités de ce plugin."
 
 #: ..\..\..\admin\plugins.php:89
 msgid "Short desc"
@@ -2052,7 +2051,7 @@ msgstr "Il s'agit du nom du fichier .html qui sera créé lorsque vous générerez u
 
 #: ..\..\..\admin\_blogs_advanced.form.php:56
 msgid "Media library"
-msgstr ""
+msgstr "Bibliothèque média"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:60
 #: ..\..\..\admin\_blogs_list.php:73
@@ -2063,11 +2062,11 @@ msgstr "Par défaut"
 #: ..\..\..\admin\_blogs_advanced.form.php:61
 #, php-format
 msgid "subdirectory &quot;%s&quot; (URL blog name) of %s"
-msgstr ""
+msgstr "sous dossier &quot;%s&quot; (nom URL du blog) de %s"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:63
 msgid "Subdirectory of media folder"
-msgstr ""
+msgstr "Sous-dossier du répertoire média"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:67
 msgid "Custom location"
@@ -2127,19 +2126,19 @@ msgstr "Options avancées"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:85
 msgid "Always on all posts"
-msgstr ""
+msgstr "Toujours sur tous les articles"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:85
 msgid "Always allow comments on every posts"
-msgstr ""
+msgstr "Toujours autoriser les commentaires sur tous les articles"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:86
 msgid "Can be disabled on a per post basis"
-msgstr ""
+msgstr "Possibilité de désactiver article par article"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:86
 msgid "Comments can be disabled on each post separatly"
-msgstr ""
+msgstr "Les commentaires peuvent être désactivés sur chaque article de manière indépendante"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:87
 msgid "No comments are allowed in this blog"
@@ -2213,11 +2212,11 @@ msgstr "Paramètres d'accès"
 
 #: ..\..\..\admin\_blogs_general.form.php:95
 msgid "Relative to baseurl"
-msgstr ""
+msgstr "Relatif à baseurl"
 
 #: ..\..\..\admin\_blogs_general.form.php:99
 msgid "With trailing slash. By default, leave this field empty. If you want to use a subfolder, you must handle it accordingly on the Webserver (e-g: create a subfolder + stub file or use mod_rewrite)."
-msgstr ""
+msgstr "Avec / final. Par défaut, laissez ce champ vide. Si vous voulez utiliser un sous dossier, vous devez le gérer de manière concordante sur le serveur web (par exemple créer un sous dossier + un fichier stub ou bien utiliser mod_rewrite)."
 
 #: ..\..\..\admin\_blogs_general.form.php:103
 msgid "Absolute URL"
@@ -2225,15 +2224,15 @@ msgstr "URL absolue"
 
 #: ..\..\..\admin\_blogs_general.form.php:106
 msgid "With trailing slash."
-msgstr ""
+msgstr "Avec / final."
 
 #: ..\..\..\admin\_blogs_general.form.php:123
 msgid "Automatic detection by index.php"
-msgstr ""
+msgstr "Détection automatique par index.php"
 
 #: ..\..\..\admin\_blogs_general.form.php:124
 msgid "Match absolute URL or use default blog"
-msgstr ""
+msgstr "Détection d'une URL absolue ou utilisation du blog par défaut"
 
 #. TRANS: NO current default blog
 #: ..\..\..\admin\_blogs_general.form.php:126
@@ -2248,11 +2247,11 @@ msgstr "Par défaut actuel :"
 
 #: ..\..\..\admin\_blogs_general.form.php:132
 msgid "Explicit reference on index.php"
-msgstr ""
+msgstr "Référence explicite sur index.php"
 
 #: ..\..\..\admin\_blogs_general.form.php:133
 msgid "You might want to use extra-path info with this."
-msgstr ""
+msgstr "Vous voudrez probablement utiliser ceci en conjonction avec les extra-path infos."
 
 #: ..\..\..\admin\_blogs_general.form.php:137
 msgid "Explicit reference to stub file (Advanced)"
@@ -2264,7 +2263,7 @@ msgstr "Nom Stub"
 
 #: ..\..\..\admin\_blogs_general.form.php:141
 msgid "For this to work, you must handle it accordingly on the Webserver (e-g: create a stub file or use mod_rewrite)."
-msgstr ""
+msgstr "Pour que ceci fonctionne, vous devez le gérer de manière appropriée sur le serveur web (par exemple: créer un fichier stub ou utiliser mod_rewrite)."
 
 #: ..\..\..\admin\_blogs_general.form.php:144
 msgid "Preferred access type"
@@ -2276,7 +2275,7 @@ msgstr "Nom URL pour le blog"
 
 #: ..\..\..\admin\_blogs_general.form.php:147
 msgid "Used to uniquely identify this blog. Appears in URLs when using extra-path info."
-msgstr ""
+msgstr "Utilisé pour identifier ce blog de manière unique. Apparait dans les URLs lorsque les extra path infos sont activées."
 
 #: ..\..\..\admin\_blogs_general.form.php:149
 msgid "URL preview"
@@ -2525,7 +2524,7 @@ msgstr "Administration"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:150
 msgid "Custom"
-msgstr ""
+msgstr "Spécial"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:181
 #: ..\..\..\admin\_users_groupform.php:84
@@ -2609,7 +2608,7 @@ msgstr "Périmé"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:218
 msgid "Read"
-msgstr ""
+msgstr "Lire"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:219
 #: ..\..\..\admin\_menutop.php:341
@@ -2775,7 +2774,7 @@ msgstr "vues"
 
 #: ..\..\..\admin\_edit_showposts.php:155
 msgid "Assigned to:"
-msgstr ""
+msgstr "Assignée à:"
 
 #: ..\..\..\admin\_edit_showposts.php:158
 #: ..\..\..\evocore\_item.funcs.php:1455
@@ -3010,16 +3009,16 @@ msgstr "semaine"
 #: ..\..\..\admin\_files_browse.inc.php:68
 #: ..\..\..\admin\_files_browse.inc.php:371
 msgid "Filter"
-msgstr ""
+msgstr "Filtre"
 
 #: ..\..\..\admin\_files_browse.inc.php:72
 msgid "Filter is regular expression"
-msgstr ""
+msgstr "Le filtre est une expression régulière"
 
 #. TRANS: short for "is regular expression"
 #: ..\..\..\admin\_files_browse.inc.php:74
 msgid "RegExp"
-msgstr ""
+msgstr "RegExp"
 
 #: ..\..\..\admin\_files_browse.inc.php:76
 #: ..\..\..\admin\_set_plugins.form.php:21
@@ -3033,11 +3032,11 @@ msgstr "Désactiver"
 #: ..\..\..\admin\_files_browse.inc.php:101
 #: ..\..\..\admin\_files_browse.inc.php:105
 msgid "Normal mode"
-msgstr ""
+msgstr "Mode normal"
 
 #: ..\..\..\admin\_files_browse.inc.php:102
 msgid "All files and folders, including subdirectories"
-msgstr ""
+msgstr "Tous les fichiers et dossiers, y compris les sous dossiers"
 
 #: ..\..\..\admin\_files_browse.inc.php:106
 msgid "Flat mode"
@@ -3045,7 +3044,7 @@ msgstr "Mode à plat"
 
 #: ..\..\..\admin\_files_browse.inc.php:159
 msgid "Change root"
-msgstr ""
+msgstr "Changer de racine"
 
 #: ..\..\..\admin\_files_browse.inc.php:179
 msgid "Current dir"
@@ -3053,7 +3052,7 @@ msgstr "Rep courant"
 
 #: ..\..\..\admin\_files_browse.inc.php:195
 msgid "A popup has discovered that the displayed content of this window is not up to date. Click to reload."
-msgstr ""
+msgstr "Une popup a découvert que le cotenu affiché dans cette fenêtre n'est plus à jour. Cliquez pour recharger."
 
 #: ..\..\..\admin\_files_browse.inc.php:205
 #, php-format
@@ -3067,11 +3066,11 @@ msgstr "Un répertoire"
 #: ..\..\..\admin\_files_browse.inc.php:206
 #, php-format
 msgid "%d directories"
-msgstr ""
+msgstr "%d dossiers"
 
 #: ..\..\..\admin\_files_browse.inc.php:206
 msgid "No directories"
-msgstr ""
+msgstr "Aucun dossier"
 
 #: ..\..\..\admin\_files_browse.inc.php:208
 msgid "One file"
@@ -3111,19 +3110,19 @@ msgstr "Aller dans ce répertoire"
 
 #: ..\..\..\admin\_files_browse.inc.php:270
 msgid "Let the browser handle this file"
-msgstr ""
+msgstr "Laisser le navigateur gérer ce fichier"
 
 #: ..\..\..\admin\_files_browse.inc.php:280
 msgid "Open in a new window"
-msgstr ""
+msgstr "Ouvrir dans une nouvelle fenêtre"
 
 #: ..\..\..\admin\_files_browse.inc.php:304
 msgid "The filename appears to be invalid and may cause problems."
-msgstr ""
+msgstr "Le nom du fichier semble invalide et risque de poser des problèmes."
 
 #: ..\..\..\admin\_files_browse.inc.php:329
 msgid "The directory of the file"
-msgstr ""
+msgstr "Le répertoire du fichier"
 
 #: ..\..\..\admin\_files_browse.inc.php:370
 msgid "No files found."
@@ -3156,7 +3155,7 @@ msgstr "Supprimer les fichiers sélectionnés"
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_files_browse.inc.php:402
 msgid "Do you really want to delete the selected files?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer les fichiers sélectionnés?"
 
 #: ..\..\..\admin\_files_browse.inc.php:410
 msgid "Download the selected files"
@@ -3164,7 +3163,7 @@ msgstr "Télécharger les fichiers sélectionnés"
 
 #: ..\..\..\admin\_files_browse.inc.php:429
 msgid "Open in new windows"
-msgstr ""
+msgstr "Ouvrir dans de nouvelles fenêtres"
 
 #: ..\..\..\admin\_files_browse.inc.php:523
 msgid "file"
@@ -3181,7 +3180,7 @@ msgstr "Charger un fichier/image"
 
 #: ..\..\..\admin\_files_browse.inc.php:557
 msgid "Icon legend"
-msgstr ""
+msgstr "Légende des icônes"
 
 #: ..\..\..\admin\_files_browse.inc.php:559
 msgid "Home dir"
@@ -3189,7 +3188,7 @@ msgstr "Répertoire de base"
 
 #: ..\..\..\admin\_files_browse.inc.php:560
 msgid "Up one level"
-msgstr ""
+msgstr "Monter d'un niveau"
 
 #: ..\..\..\admin\_files_browse.inc.php:561
 msgid "Open in new window"
@@ -3212,12 +3211,12 @@ msgid "Information"
 msgstr "Information"
 
 #: ..\..\..\admin\_files_browse.inc.php:575
-msgid "Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."
-msgstr ""
+msgid "Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files)."
+msgstr "Un clic sur le nom d'un fichier appelle l'action par défaut (les images sont affichées sous forme d'image, les autres fichiers sont affichés en texte brut)."
 
 #: ..\..\..\admin\_files_browse.inc.php:576
-msgid "Clicking on a file's icon lets the browser handle the file."
-msgstr ""
+msgid "Clicking on a file icon lets the browser handle the file."
+msgstr "Un clic sur l'icône d'un fichier laisser le navigateur gérer le fichier."
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_files_browse.inc.php:597
@@ -3233,27 +3232,27 @@ msgstr "Montrer les options"
 
 #: ..\..\..\admin\_files_browse.inc.php:602
 msgid "Sort directories at top"
-msgstr ""
+msgstr "Afficher les dossiers en premier"
 
 #: ..\..\..\admin\_files_browse.inc.php:605
 msgid "Show hidden files"
-msgstr ""
+msgstr "Montrer les fichiers cachés"
 
 #: ..\..\..\admin\_files_browse.inc.php:608
 msgid "File permissions like &quot;ls -l&quot;"
-msgstr ""
+msgstr "Afficher les permissions comme &quot;ls -l&quot;"
 
 #: ..\..\..\admin\_files_browse.inc.php:611
 msgid "Display the image size of image files"
-msgstr ""
+msgstr "Afficher les dimensions des images"
 
 #: ..\..\..\admin\_files_browse.inc.php:614
 msgid "Recursive size of directories"
-msgstr ""
+msgstr "Calcul récursif de la taille des dossiers"
 
 #: ..\..\..\admin\_files_browse.inc.php:617
 msgid "Always show the Filemanager (upload mode, ..)"
-msgstr ""
+msgstr "Toujours montrer le Gestionnaire de fichiers (mode upload, ...)"
 
 #: ..\..\..\admin\_files_browse.inc.php:625
 msgid "Update !"
@@ -3261,7 +3260,7 @@ msgstr "Mettre à jour !"
 
 #: ..\..\..\admin\_file_view.inc.php:59
 msgid "Click anywhere in this window to close it."
-msgstr ""
+msgstr "Cliquez n'importe où dans cette fenêtre pour la fermer."
 
 #: ..\..\..\admin\_file_view.inc.php:69
 msgid "The selected image"
@@ -3284,13 +3283,13 @@ msgstr "%d lignes"
 #: ..\..\..\admin\_file_view.inc.php:103
 #: ..\..\..\admin\_file_view.inc.php:151
 msgid "hide line numbers"
-msgstr ""
+msgstr "cacher les numéros de ligne"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_file_view.inc.php:104
 #: ..\..\..\admin\_file_view.inc.php:136
 msgid "show line numbers"
-msgstr ""
+msgstr "montrer les numéros de lignes"
 
 #: ..\..\..\admin\_file_view.inc.php:178
 #: ..\..\..\evocore\_filemanager.class.php:348
@@ -3354,11 +3353,11 @@ msgstr "Propriétés de workflow"
 
 #: ..\..\..\admin\_item.form.php:209
 msgid "Task status"
-msgstr ""
+msgstr "Statut de la tâche."
 
 #: ..\..\..\admin\_item.form.php:211
 msgid "Assigned to"
-msgstr ""
+msgstr "Assignée à"
 
 #: ..\..\..\admin\_item.form.php:214
 #: ..\..\..\admin\_set_plugins.form.php:20
@@ -3393,7 +3392,7 @@ msgstr "(Séparez par un espace)"
 
 #: ..\..\..\admin\_item.form.php:270
 msgid "Visibility / Sharing"
-msgstr ""
+msgstr "Visibilité / Partage"
 
 #: ..\..\..\admin\_item.form.php:296
 msgid "Visitors can leave comments on this post."
@@ -3427,11 +3426,11 @@ msgstr "Formatteurs de texte"
 #: ..\..\..\admin\_item.form.php:375
 #: ..\..\..\evocore\_item.class.php:1279
 msgid "No renderer plugins are installed."
-msgstr ""
+msgstr "Aucun plugin de formattage n'est installé."
 
 #: ..\..\..\admin\_listeditor.php:55
 msgid "Cannot edit entry!"
-msgstr ""
+msgstr "Impossible d'éditer l'entrée!"
 
 #: ..\..\..\admin\_listeditor.php:56
 #: ..\..\..\admin\_listeditor.php:102
@@ -3536,7 +3535,7 @@ msgstr "Activer le gestionnaire de fichiers"
 
 #: ..\..\..\admin\_set_files.form.php:28
 msgid "Check to enable the Filemanager."
-msgstr ""
+msgstr "Cochez pour activer le gestionnaire de fichiers."
 
 #: ..\..\..\admin\_set_files.form.php:31
 msgid "Enable blog directories"
@@ -3544,7 +3543,7 @@ msgstr "Activer les répertoires média pour les blogs"
 
 #: ..\..\..\admin\_set_files.form.php:32
 msgid "Check to enable root directories for blogs."
-msgstr ""
+msgstr "Cochez pour activer les dossiers racine pour chaque blog."
 
 #: ..\..\..\admin\_set_files.form.php:37
 msgid "Enable group directories"
@@ -3552,7 +3551,7 @@ msgstr "Activer les répertoires média pour les groupes"
 
 #: ..\..\..\admin\_set_files.form.php:38
 msgid "Check to enable root directories for groups."
-msgstr ""
+msgstr "Cochez pour activer les dossiers racine pour chaque groupe."
 
 #: ..\..\..\admin\_set_files.form.php:43
 msgid "Enable user directories"
@@ -3560,23 +3559,23 @@ msgstr "Activer les répertoires média pour les utilisateurs"
 
 #: ..\..\..\admin\_set_files.form.php:44
 msgid "Check to enable root directories for users."
-msgstr ""
+msgstr "Cochez pour activer les dossiers racine pour chaque utilisateur."
 
 #: ..\..\..\admin\_set_files.form.php:49
 msgid "Enable creation of dirs"
-msgstr ""
+msgstr "Autoriser la création de dossiers."
 
 #: ..\..\..\admin\_set_files.form.php:50
 msgid "Check to enable creation of directories."
-msgstr ""
+msgstr "Cochez pour autoriser la création de nouveaux dossiers."
 
 #: ..\..\..\admin\_set_files.form.php:55
 msgid "Enable creation of files"
-msgstr ""
+msgstr "Autoriser la création de fichiers"
 
 #: ..\..\..\admin\_set_files.form.php:56
 msgid "Check to enable creation of files."
-msgstr ""
+msgstr "Cochez pour autoriser la création de nouveaux fichiers."
 
 #: ..\..\..\admin\_set_files.form.php:62
 msgid "Upload options"
@@ -3598,7 +3597,7 @@ msgstr "Séparez par un espace."
 #: ..\..\..\admin\_set_files.form.php:72
 #: ..\..\..\admin\_set_files.form.php:80
 msgid "Leave it empty to disable this check."
-msgstr ""
+msgstr "Laissez vide pour désactiver cette vérification."
 
 #. TRANS: %s gets replaced with an example setting
 #: ..\..\..\admin\_set_files.form.php:73
@@ -3622,7 +3621,7 @@ msgstr "Nom de fichier valide"
 
 #: ..\..\..\admin\_set_files.form.php:97
 msgid "Regular expression"
-msgstr ""
+msgstr "Expression régulière"
 
 #: ..\..\..\admin\_set_general.form.php:22
 msgid "Default user rights"
@@ -3705,12 +3704,12 @@ msgid "Archive mode"
 msgstr "Mode d'archivage"
 
 #: ..\..\..\admin\_set_general.form.php:54
-msgid "Email/MSS Auto-BR"
-msgstr ""
+msgid "Email/MMS Auto-BR"
+msgstr "Auto-BR Email/MSS"
 
 #: ..\..\..\admin\_set_general.form.php:54
 msgid "Add &lt;BR /&gt; tags to mail/MMS posts."
-msgstr ""
+msgstr "Ajouter des tags &lt;BR /&gt; aux articles envoyés par email/MMS."
 
 #: ..\..\..\admin\_set_general.form.php:60
 msgid "Link options"
@@ -3766,11 +3765,11 @@ msgstr "Options diverses"
 
 #: ..\..\..\admin\_set_general.form.php:84
 msgid "Reload-page timeout"
-msgstr ""
+msgstr "Timeout de reload"
 
 #: ..\..\..\admin\_set_general.form.php:84
 msgid "Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit."
-msgstr ""
+msgstr "Temps (en seconde) devant s'écouler avant qu'une requête sur une même URI depuis la même IP et le même User Agent soit considérée comme un nouveau hit."
 
 #: ..\..\..\admin\_set_plugins.form.php:14
 msgid "Installed plug-ins"
@@ -3783,7 +3782,7 @@ msgstr "Plug-in"
 
 #: ..\..\..\admin\_set_plugins.form.php:33
 msgid "Un-install this plugin!"
-msgstr ""
+msgstr "Désinstaller ce plug-in!"
 
 #: ..\..\..\admin\_set_plugins.form.php:45
 msgid "Available plug-ins"
@@ -4251,7 +4250,7 @@ msgstr "Montrer en ligne"
 #: ..\..\..\admin\_users_form.php:148
 #: ..\..\..\skins\_profile.php:59
 msgid "Check this to be displayed as online when visiting the site."
-msgstr ""
+msgstr "Cochez ceci pour être apparaitre comme connecté lorsque vous visitez le site."
 
 #: ..\..\..\admin\_users_form.php:149
 msgid "Preferred locale"
@@ -4485,7 +4484,7 @@ msgstr "Heure:"
 #: ..\..\..\admin\skins\evo\_body_top.php:54
 #: ..\..\..\admin\skins\legacy\_body_top.php:59
 msgid "Greenwich Mean Time "
-msgstr ""
+msgstr "Greenwich Mean Time "
 
 #. TRANS: short for Greenwich Mean Time
 #: ..\..\..\admin\skins\evo\_body_top.php:54
@@ -4500,7 +4499,7 @@ msgstr "Connecté sous:"
 
 #: ..\..\..\admin\skins\legacy\_body_top.php:46
 msgid "Style:"
-msgstr ""
+msgstr "Style:"
 
 #: ..\..\..\conf\_icons.php:11
 msgid "Folder"
@@ -4528,7 +4527,7 @@ msgstr "ascendant"
 
 #: ..\..\..\conf\_icons.php:75
 msgid "descending"
-msgstr ""
+msgstr "descendant"
 
 #: ..\..\..\conf\_icons.php:80
 msgid "New window"
@@ -4644,7 +4643,7 @@ msgstr "Portugais (BR)"
 
 #: ..\..\..\conf\_locales.php:242
 msgid "Slovak (SK)"
-msgstr ""
+msgstr "Slovaque (SK)"
 
 #: ..\..\..\conf\_locales.php:249
 msgid "Swedish (SE)"
@@ -4826,7 +4825,7 @@ msgstr "EMail"
 
 #: ..\..\..\evocore\_comment.class.php:391
 msgid "Send email to comment author"
-msgstr ""
+msgstr "Envoyer email à l'auteur du commentaire"
 
 #: ..\..\..\evocore\_commentlist.class.php:175
 #: ..\..\..\skins\_lastcomments.php:25
@@ -4836,7 +4835,7 @@ msgstr "Pas de commentaire pour l'instant..."
 #: ..\..\..\evocore\_dataobject.class.php:389
 #, php-format
 msgid "Last modified on %s by %s"
-msgstr ""
+msgstr "Dernière modification le %s par %s"
 
 #: ..\..\..\evocore\_db.class.php:189
 #, php-format
@@ -4852,52 +4851,52 @@ msgid "New element"
 msgstr "Nouvel élément"
 
 #: ..\..\..\evocore\_file.class.php:53
-msgid "Adobe illustrator"
-msgstr ""
+msgid "Adobe Illustrator"
+msgstr "Adobe Illustrator"
 
 #: ..\..\..\evocore\_file.class.php:54
-msgid "Bmp image"
-msgstr ""
+msgid "BMP image"
+msgstr "Image BMP"
 
 #: ..\..\..\evocore\_file.class.php:55
-msgid "Bz Archive"
-msgstr "Archive Bz"
+msgid "BZ archive"
+msgstr "Archive BZ"
 
 #: ..\..\..\evocore\_file.class.php:56
-msgid "Source C "
-msgstr ""
+msgid "C source"
+msgstr "Source C"
 
 #: ..\..\..\evocore\_file.class.php:57
 msgid "CGI file"
-msgstr ""
+msgstr "Fichier CGI"
 
 #: ..\..\..\evocore\_file.class.php:58
 msgid "Config file"
 msgstr "Fichier de config"
 
 #: ..\..\..\evocore\_file.class.php:59
-msgid "Source C++"
-msgstr ""
+msgid "C++ source"
+msgstr "Source C++"
 
 #: ..\..\..\evocore\_file.class.php:60
 msgid "Stylesheet"
-msgstr ""
+msgstr "Feuille de style"
 
 #: ..\..\..\evocore\_file.class.php:61
-msgid "MS Office"
-msgstr ""
+msgid "MS Word document"
+msgstr "Document MS Word"
 
 #: ..\..\..\evocore\_file.class.php:62
-msgid "Executable"
-msgstr ""
+msgid "Windows executable"
+msgstr "Exécutable Windows"
 
 #: ..\..\..\evocore\_file.class.php:63
-msgid "Gif image"
-msgstr ""
+msgid "GIF image"
+msgstr "Image GIF"
 
 #: ..\..\..\evocore\_file.class.php:64
-msgid "Gz Archive"
-msgstr "Archive Gz"
+msgid "GZ archive"
+msgstr "Archive GZ"
 
 #: ..\..\..\evocore\_file.class.php:65
 msgid "Header file"
@@ -4908,13 +4907,13 @@ msgid "Help file"
 msgstr "Fichier d'aide"
 
 #: ..\..\..\evocore\_file.class.php:67
-msgid "Apache file"
-msgstr ""
+msgid "Apache conf."
+msgstr "Config. Apache"
 
 #: ..\..\..\evocore\_file.class.php:68
 #: ..\..\..\evocore\_file.class.php:69
-msgid "Hyper text"
-msgstr ""
+msgid "HyperText Markup"
+msgstr "HyperText Markup"
 
 #: ..\..\..\evocore\_file.class.php:70
 msgid "Windows access"
@@ -4925,64 +4924,64 @@ msgid "Include file"
 msgstr "Fichier include"
 
 #: ..\..\..\evocore\_file.class.php:72
-msgid "Setting file"
+msgid "Settings file"
 msgstr "Fichiers de paramètres"
 
 #: ..\..\..\evocore\_file.class.php:73
-msgid "Jpeg Image"
-msgstr ""
+msgid "JPEG image"
+msgstr "Image JPEG"
 
 #: ..\..\..\evocore\_file.class.php:74
 msgid "JavaScript"
-msgstr ""
+msgstr "JavaScript"
 
 #: ..\..\..\evocore\_file.class.php:75
 msgid "Log file"
 msgstr "Fichier journal"
 
 #: ..\..\..\evocore\_file.class.php:76
-msgid "Access DB"
+msgid "Access database"
 msgstr "Base Access"
 
 #: ..\..\..\evocore\_file.class.php:77
-msgid "Media file"
+msgid "MIDI file"
 msgstr "Fichier MIDI"
 
 #: ..\..\..\evocore\_file.class.php:78
 msgid "PHP script"
-msgstr ""
+msgstr "Script PHP"
 
 #: ..\..\..\evocore\_file.class.php:79
 msgid "Perl script"
 msgstr "Script Perl"
 
 #: ..\..\..\evocore\_file.class.php:80
-msgid "Png image"
-msgstr ""
+msgid "PNG image"
+msgstr "Image PNG"
 
 #: ..\..\..\evocore\_file.class.php:81
-msgid "MS Power point"
-msgstr ""
+msgid "MS Powerpoint"
+msgstr "MS Powerpoint"
 
 #: ..\..\..\evocore\_file.class.php:82
-msgid "Photoshop Image"
-msgstr ""
+msgid "Photoshop image"
+msgstr "Image Photoshop"
 
 #: ..\..\..\evocore\_file.class.php:83
-msgid "Realmedia file"
-msgstr "Fichier Realmedia"
+msgid "RealMedia file"
+msgstr "Fichier RealMedia"
 
 #: ..\..\..\evocore\_file.class.php:84
-msgid "Rar Archive"
+msgid "RAR Archive"
 msgstr "Archive RAR"
 
 #: ..\..\..\evocore\_file.class.php:85
 msgid "Rich Text Format"
-msgstr ""
+msgstr "Rich Text Format"
 
 #: ..\..\..\evocore\_file.class.php:86
-msgid "SQL file"
-msgstr "Fichier SQL"
+msgid "SQL query file"
+msgstr "Fichier requête SQL"
 
 #: ..\..\..\evocore\_file.class.php:87
 msgid "OpenOffice file"
@@ -4993,23 +4992,23 @@ msgid "Text document"
 msgstr "Fichier OpenOffice"
 
 #: ..\..\..\evocore\_file.class.php:89
-msgid "Tar gz archive"
-msgstr "Archive TAR.GZ"
+msgid "TAR GZ archive"
+msgstr "Archive TAR GZ"
 
 #: ..\..\..\evocore\_file.class.php:90
-msgid "MS Vb script"
-msgstr ""
+msgid "MS VBscript"
+msgstr "MS VBscript"
 
 #: ..\..\..\evocore\_file.class.php:91
-msgid "Document"
-msgstr "Document"
+msgid "MS Write document"
+msgstr "Document MS Write"
 
 #: ..\..\..\evocore\_file.class.php:92
 msgid "XML file"
 msgstr "Fichier XML."
 
 #: ..\..\..\evocore\_file.class.php:93
-msgid "Zip Archive"
+msgid "ZIP archive"
 msgstr "Archive ZIP"
 
 #: ..\..\..\evocore\_file.class.php:352
@@ -5034,7 +5033,7 @@ msgstr "Inconnu"
 #: ..\..\..\evocore\_file.class.php:575
 #: ..\..\..\evocore\_misc.funcs.php:1623
 msgid "&lt;dir&gt;"
-msgstr ""
+msgstr "&lt;dossier&gt;"
 
 #: ..\..\..\evocore\_file.funcs.php:59
 msgid "B."
@@ -5087,7 +5086,7 @@ msgstr "expression régulière"
 
 #: ..\..\..\evocore\_filemanager.class.php:243
 msgid "No access to root directory."
-msgstr ""
+msgstr "Pas d'accès au répertoire racine."
 
 #: ..\..\..\evocore\_filemanager.class.php:248
 #, php-format
@@ -5134,7 +5133,7 @@ msgstr "Mon dossier média"
 #: ..\..\..\evocore\_filemanager.class.php:756
 #, php-format
 msgid "Sort ascending by: %s"
-msgstr ""
+msgstr "Tri ascendant sur: %s"
 
 #. TRANS: %s gets replaced with column names 'Name', 'Type', ..
 #: ..\..\..\evocore\_filemanager.class.php:758
@@ -5144,7 +5143,7 @@ msgstr "Tri descendant sur: %s"
 
 #: ..\..\..\evocore\_filemanager.class.php:1005
 msgid "Open this directory in the Filemanager"
-msgstr ""
+msgstr "Ouvrir ce répertoire dans le gestionnaire de fichiers."
 
 #: ..\..\..\evocore\_filemanager.class.php:1092
 msgid "Cannot create a directory without name."
@@ -5157,7 +5156,7 @@ msgstr "Impossible de créer un fichier sans nom."
 #: ..\..\..\evocore\_filemanager.class.php:1099
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid directory."
-msgstr ""
+msgstr "&laquo;%s&raquo; n'est pas un dossier valide."
 
 #: ..\..\..\evocore\_filemanager.class.php:1117
 #, php-format
@@ -5172,16 +5171,16 @@ msgstr "Le dossier &laquo;%s&raquo; a été créé."
 #: ..\..\..\evocore\_filemanager.class.php:1130
 #, php-format
 msgid "Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;."
-msgstr ""
+msgstr "Impossible de créer le fichier &laquo;%s&raquo; dans &laquo;%s&raquo;."
 
 #: ..\..\..\evocore\_filemanager.class.php:1134
 #, php-format
 msgid "Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;."
-msgstr ""
+msgstr "Impossible de créer le dossier &laquo;%s&raquo; dans &laquo;%s&raquo;."
 
 #: ..\..\..\evocore\_filemanager.class.php:1151
 msgid "No directory."
-msgstr ""
+msgstr "Aucun répertoire."
 
 #: ..\..\..\evocore\_filemanager.class.php:1176
 msgid "Change to this directory"
@@ -5344,7 +5343,7 @@ msgstr "Suite:"
 
 #: ..\..\..\evocore\_item.class.php:853
 msgid "Send email to post author"
-msgstr ""
+msgstr "Envoyer un email à l'auteur de l'article."
 
 #: ..\..\..\evocore\_item.class.php:940
 msgid "Display feedback / Leave a comment"
@@ -5743,7 +5742,7 @@ msgstr "Pas de résultats."
 
 #: ..\..\..\evocore\_results.class.php:477
 msgid "Change Order"
-msgstr ""
+msgstr "Changer l'ordre"
 
 #: ..\..\..\evocore\_results.class.php:857
 msgid "Pages"
@@ -5787,7 +5786,7 @@ msgstr "Envoi d'un trackaback à:"
 
 #: ..\..\..\evocore\_trackback.funcs.php:157
 msgid "Succeeded"
-msgstr ""
+msgstr "Succès"
 
 #: ..\..\..\evocore\_trackback.funcs.php:160
 msgid "Failed"
@@ -5795,11 +5794,11 @@ msgstr "Echec"
 
 #: ..\..\..\evocore\_trackback.funcs.php:163
 msgid "Unknown error"
-msgstr ""
+msgstr "Erreur inconnue"
 
 #: ..\..\..\evocore\_trackback.funcs.php:169
 msgid "No valid trackback response. Maybe the given url is not a Trackback url."
-msgstr ""
+msgstr "Réponse trackback invalide. Pëut-être que l'URL indiquée n'est pas une URL de Trackback."
 
 #: ..\..\..\evocore\_trackback.funcs.php:171
 msgid "Response:"
@@ -6323,12 +6322,12 @@ msgstr "Message envoyé depuis votre commentaire:"
 
 #: ..\..\..\htsrv\message_send.php:68
 msgid "Message sent from your post:"
-msgstr ""
+msgstr "Message envoyé depuis votre article:"
 
 #: ..\..\..\htsrv\message_send.php:73
 #, php-format
 msgid "This message was sent via the messaging system on %s."
-msgstr ""
+msgstr "Ce message a été envoyé via le système de messagerie sur %s."
 
 #: ..\..\..\htsrv\profile_update.php:40
 #: ..\..\..\skins\_profile.php:21
@@ -6662,7 +6661,7 @@ msgstr "Préfixe des tables MySQL"
 
 #: ..\..\..\install\index.php:291
 msgid "All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB."
-msgstr ""
+msgstr "Toutes les tables de la base de données seront préfixées avec ceci. Vous avez besoin de changer cette valeur uniquement dans le cas où vous voulez avoir plusieurs installations de b2evo dans la même base de données."
 
 #: ..\..\..\install\index.php:296
 msgid "Additional settings"
@@ -6740,6 +6739,8 @@ msgid ""
 "Are you sure you want to delete your existing %s tables?\\n"
 "Do you have a backup?"
 msgstr ""
+"Etes vous sûr de vouloir supprimer vous tables %s?\\n"
+"Avez-vous un backup?"
 
 #: ..\..\..\install\index.php:375
 msgid "Need to start anew?"
@@ -7375,7 +7376,7 @@ msgstr "Ce skin tag affiche la liste des archives d'articles."
 
 #: ..\..\..\plugins\_archives.plugin.php:71
 msgid "Archives can be grouped monthly, daily, weekly or post by post."
-msgstr ""
+msgstr "Les archives peuvent être groupées par mois, jour, semaine ou article par article."
 
 #: ..\..\..\plugins\_archives.plugin.php:111
 msgid "More..."
@@ -7395,11 +7396,11 @@ msgstr "Formatage BB e-g [b]bold[/b]"
 
 #: ..\..\..\plugins\_bookmarklet.plugin.php:60
 msgid "Allow bookmarklet blogging."
-msgstr ""
+msgstr "Permet de blogger par bookmarklet."
 
 #: ..\..\..\plugins\_bookmarklet.plugin.php:61
 msgid "Adds a tool allowing blogging through a bookmarklet."
-msgstr ""
+msgstr "Ajoute un outil permettant de blogger à travers une bookmarklet."
 
 #: ..\..\..\plugins\_bookmarklet.plugin.php:82
 #: ..\..\..\plugins\_bookmarklet.plugin.php:90
@@ -7427,11 +7428,11 @@ msgstr "**gras** \\italiques\\ //italiques// __souligné__ ##tt## %%codeblock%%"
 
 #: ..\..\..\plugins\_linklogger.plugin.php:38
 msgid "Adds all external links to the blog's Autolinkblog"
-msgstr ""
+msgstr "Ajoute tous les liens externes à l'autolinkblog du blog"
 
 #: ..\..\..\plugins\_linklogger.plugin.php:39
 msgid "Rewrites external URLs so that we can count clicks on them ....... "
-msgstr ""
+msgstr "Reécrit les URLs externes de telle manière à permettre le comptage des clicks..."
 
 #: ..\..\..\plugins\_quicktags.plugin.php:33
 msgid "Easy HTML tags inserting"
@@ -7503,11 +7504,11 @@ msgstr "Texte ALTernatif"
 
 #: ..\..\..\plugins\_sidebar.plugin.php:60
 msgid "Allow sidebar blogging."
-msgstr ""
+msgstr "Permet de blogger dans la sidebar."
 
 #: ..\..\..\plugins\_sidebar.plugin.php:61
 msgid "Adds a tool allowing blogging from the sidebar."
-msgstr ""
+msgstr "Ajoute un outil permettant de blogger depuis la sidebar."
 
 #: ..\..\..\plugins\_sidebar.plugin.php:87
 msgid "Post to b2evolution"
@@ -7532,7 +7533,7 @@ msgstr "Sidebar b2evo"
 
 #: ..\..\..\plugins\_smilies.plugin.php:64
 msgid "Graphical smileys"
-msgstr ""
+msgstr "Smilies graphiques"
 
 #: ..\..\..\plugins\_smilies.plugin.php:65
 msgid "One click smilies inserting + Convert text smilies to icons"
@@ -7540,11 +7541,11 @@ msgstr "Insertion de smilies en un clic + Conversion de smilies texte en icônes.
 
 #: ..\..\..\plugins\_spellcheck.plugin.php:35
 msgid "Simple Spellchecker (English only)"
-msgstr ""
+msgstr "Correcteur d'orthographe rudimentaire (Anglais uniquement)"
 
 #: ..\..\..\plugins\_spellcheck.plugin.php:36
 msgid "This plugins calls a simple online spellchecker."
-msgstr ""
+msgstr "Ce plug-in appelle un correcteur d'orthographe en ligne rudimentaire."
 
 #: ..\..\..\plugins\_spellcheck.plugin.php:122
 msgid "Spellcheck"
@@ -7552,11 +7553,11 @@ msgstr "Orthographe"
 
 #: ..\..\..\plugins\_test.plugin.php:77
 msgid "Test plugin"
-msgstr ""
+msgstr "Plug-in Test"
 
 #: ..\..\..\plugins\_test.plugin.php:78
 msgid "This plugin responds to virtually all possible plugin events :P"
-msgstr ""
+msgstr "Ce plug-in répond à pratiquement tous les évènements plug-in possibles :P"
 
 #: ..\..\..\plugins\_textile.plugin.php:232
 msgid "Humane Web Text Generator 2.0 beta"
@@ -7574,14 +7575,19 @@ msgid ""
 "===== h5 =====\n"
 "====== h6 ======"
 msgstr ""
+"== h2 ==\n"
+"=== h3 ===\n"
+"==== h4 ====\n"
+"===== h5 =====\n"
+"====== h6 ======"
 
 #: ..\..\..\plugins\_wikilinks.plugin.php:38
 msgid "Wiki Links converter"
-msgstr ""
+msgstr "Convertisseur Wiki Links"
 
 #: ..\..\..\plugins\_wikilinks.plugin.php:39
 msgid "WikiWord links ((link)) [[link ]]"
-msgstr ""
+msgstr "WikiWord links ((link)) [[link ]]"
 
 # C:\www\b2evo090\blogs\skins\_categories.php:17
 #  TRANS: All categories, skin's categories list
@@ -7699,7 +7705,7 @@ msgstr "Message"
 
 #: ..\..\..\skins\_msgform.php:107
 msgid "Plain text only."
-msgstr ""
+msgstr "Texte brut uniquement."
 
 #: ..\..\..\skins\_msgform.php:112
 msgid "Send message"
@@ -7726,7 +7732,7 @@ msgstr "Nouveau mot de passe"
 
 #: ..\..\..\skins\_profile.php:68
 msgid "Leave blank to leave the password unchanged."
-msgstr ""
+msgstr "Laissez vide si vous ne voulez pas modifier le mot de passe."
 
 #: ..\..\..\skins\_profile.php:69
 msgid "Confirm"

@@ -549,7 +549,6 @@ if( $countFiles )
 <fieldset class="iconlegend">
 	<legend><?php echo T_('Icon legend') ?></legend>
 	<ul class="iconlegend">
-		<li><?php echo getIcon( 'folder_home' ).' '.T_('Home dir'); ?></li>
 		<li><?php echo getIcon( 'folder_parent' ).' '.T_('Up one level'); ?></li>
 		<li><?php echo getIcon( 'window_new' ).' '.T_('Open in new window'); ?></li>
 		<!-- Not implemented yet: span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit file'); ?></span -->
@@ -565,8 +564,8 @@ if( $countFiles )
 <legend><?php echo T_('Information') ?></legend>
 
 <ul>
-	<li><?php echo T_("Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
-	<li><?php echo T_("Clicking on a file's icon lets the browser handle the file."); ?></li>
+	<li><?php echo T_("Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
+	<li><?php echo T_("Clicking on a file icon lets the browser handle the file."); ?></li>
 </ul>
 </fieldset>
 <?php
@@ -657,6 +656,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.6  2005/01/27 13:34:56  fplanque
+ * i18n tuning
+ *
  * Revision 1.5  2005/01/26 23:44:40  blueyed
  * no message
  *
