@@ -511,14 +511,36 @@ switch( $action )
 		echo "OK.<br />\n";
 		
 		echo "Copying users... ";
-		$query = "INSERT INTO $tableusers(" .
-						"ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, " .
-						"user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode" .
-					") SELECT " .
-						"ID, user_login, MD5(user_pass), user_firstname, user_lastname, user_nickname, user_icq, user_email, " .
-						"user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode " .
-						"FROM $oldtableusers";
-		
+		$query = "INSERT INTO $tableusers( ID, user_login, user_pass, user_firstname, user_lastname,
+								user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser,
+								dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode ) 
+							SELECT ID, user_login, MD5(user_pass), user_firstname, user_lastname, user_nickname,
+								user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour,
+								user_level,	user_aim, user_msn, user_yim, user_idmode 
+							FROM $oldtableusers";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
+
+		echo "Setting groups...";
+		$query = "UPDATE $tableusers
+								 SET user_grp_ID = ".$Group_Users->get('ID')."
+							 WHERE user_level = 0";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		echo "Setting groups...";
+		$query = "UPDATE $tableusers
+								 SET user_grp_ID = ".$Group_Bloggers->get('ID')."
+							 WHERE user_level > 0 and user_level < 10 ";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		echo "OK.<br />\n";
+
+		echo "Creating user blog permissions... ";
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
+								bloguser_perm_delpost, bloguser_perm_comments, bloguser_perm_poststatuses)
+							SELECT 2, ID, 1, 1, 'published,deprecated,protected,private,draft'
+							FROM $oldtableusers
+							WHERE user_level > 0";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 		

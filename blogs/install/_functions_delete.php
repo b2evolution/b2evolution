@@ -10,7 +10,7 @@
 function db_delete()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-        $tablepostcats, $tablehitlog, $tableantispam, $tablegroups;
+        $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
 
 	echo "Droping Antispam table...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableantispam";
@@ -46,6 +46,10 @@ function db_delete()
 	
 	echo "Droping Blogs...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableblogs";
+	$q = mysql_query($query) or mysql_oops( $query );
+	
+	echo "Droping Blogusers...<br />\n";
+	$query = "DROP TABLE IF EXISTS $tableblogusers";
 	$q = mysql_query($query) or mysql_oops( $query );
 	
 	echo "Droping Settings...</p>\n";

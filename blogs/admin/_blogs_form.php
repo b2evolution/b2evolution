@@ -47,6 +47,123 @@ switch( $next_action )
 	</fieldset>
 
 	<fieldset>
+		<legend><?php echo T_('User permissions') ?></legend>
+		<table class="thin">
+			<tr>
+				<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
+				<th colspan="5"><?php echo T_('Can post/edit with following statuses:') ?></th>
+			</tr>
+			<tr>
+				<th><?php echo T_('Published') ?></th>
+				<th><?php echo T_('Protected') ?></th>
+				<th><?php echo T_('Private') ?></th>
+				<th><?php echo T_('Draft') ?></th>
+				<th><?php echo T_('Deprecated') ?></th>
+			</tr>
+			<tr class="group">
+				<td colspan="7">
+					<strong><?php echo T_('Members') ?></strong>
+				</td>
+			</tr>
+			<?php
+				$query = "SELECT ID, user_login, bloguser_perm_poststatuses FROM $tableusers INNER JOIN $tableblogusers ON ID = bloguser_user_ID WHERE bloguser_blog_ID = $blog ORDER BY user_login";
+				$result = mysql_query($query) or mysql_oops( $query ); 
+				$querycount++; 
+				$members=array();
+				while($loop_row = mysql_fetch_array($result) )
+				{	// Go through users:
+					$members[] = $loop_row['ID'];
+					$perm_post = explode( ',', $loop_row['bloguser_perm_poststatuses'] );
+					?>
+					<tr>
+						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
+										<?php if( in_array( 'published', $perm_post ) ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="published" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_protected_<?php echo $loop_row['ID'] ?>"
+										<?php if( in_array( 'protected', $perm_post ) ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="protected" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_private_<?php echo $loop_row['ID'] ?>"
+										<?php if( in_array( 'private', $perm_post ) ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="private" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_draft_<?php echo $loop_row['ID'] ?>"
+										<?php if( in_array( 'draft', $perm_post ) ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="draft" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_deprecated_<?php echo $loop_row['ID'] ?>"
+										<?php if( in_array( 'deprecated', $perm_post ) ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="deprecated" />
+						</td>
+					</tr>
+					<?php
+				}
+				?>
+			<tr class="group">
+				<td colspan="7">
+					<strong><?php echo T_('Non members') ?></strong>
+				</td>
+			</tr>
+				<?php
+				$query = "SELECT ID, user_login FROM $tableusers ";
+				if( count( $members ) )
+				{
+					$query .= "WHERE ID NOT IN (".implode( ',', $members ) .") ";
+				}
+				$query .= "ORDER BY user_login";
+				$result = mysql_query($query) or mysql_oops( $query ); 
+				$querycount++; 
+				while($loop_row = mysql_fetch_array($result) )
+				{	// Go through users:
+					?>
+					<tr>
+						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
+										value="published" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_protected_<?php echo $loop_row['ID'] ?>"
+										value="protected" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_private_<?php echo $loop_row['ID'] ?>"
+										value="private" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_draft_<?php echo $loop_row['ID'] ?>"
+										value="draft" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_deprecated_<?php echo $loop_row['ID'] ?>"
+										value="deprecated" />
+						</td>
+					</tr>
+					<?php
+				}
+			?>
+		</table>
+		<br />
+	</fieldset>
+
+	<fieldset>
 		<legend><?php echo T_('After each new post...') ?></legend>
 		<?php 
 			form_checkbox( 'blog_pingb2evonet', $blog_pingb2evonet, T_('Ping b2evolution.net'), T_("to get listed on the \"recently updated\" list. PLEASE NOTE: If you removed the b2evolution button and the link to b2evolution from your blog, don't even bother enabling this. You will *not* be approved and your blog will be blacklisted. Also, the Full Name of your blog must be written in ISO 8859-1 (Latin-1) charset, otherwise we cannot display it on b2evolution.net. You can use HTML entities (e-g &amp;Kappa;) for non latin chars.") );

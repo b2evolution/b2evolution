@@ -89,7 +89,11 @@ switch($action)
 		$new_User->set( 'domain', isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '' );
 		$new_User->set( 'browser', isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' );
 		$new_User->set_datecreated( $localtimenow );
-		$new_User->setGroup( Group_get_by_ID( get_settings('pref_newusers_grp_ID') ) );
+		$pref_newusers_grp_ID = get_settings('pref_newusers_grp_ID');
+		// echo $pref_newusers_grp_ID;
+		$new_user_Group = Group_get_by_ID( $pref_newusers_grp_ID );
+		// echo $new_user_Group->disp('name');
+		$new_User->setGroup( $new_user_Group );
 		$new_User->dbinsert();
 
 		// TODO: END TRANSACTION !!

@@ -30,6 +30,9 @@ class User extends DataObject
 
 	var $Group;	// Pointer to group
 
+	// Blog posts statuses permissions:
+	var $blog_post_statuses = array();
+
 	/* 
 	 * User::User(-)
 	 *
@@ -174,10 +177,20 @@ class User extends DataObject
 	 *
 	 * Check permission
 	 */
-	function check_perm( $permname, $permlevel, $assert = false )
+	function check_perm( $permname, $permlevel, $assert = false, $perm_target = NULL )
 	{
-		// Forward request to group:
-		$perm = $this->Group->check_perm( $permname, $permlevel );
+		$perm = false;
+	
+		switch( $permname )
+		{
+			case 'blog_post_statuses':
+				$perm = $this->check_perm_blog_post_statuses( $permname, $permlevel, $perm_target );
+				break;
+			
+			default:
+				// Forward request to group:
+				$perm = $this->Group->check_perm( $permname, $permlevel );
+		}
 		
 		if( !$perm && $assert )
 		{ // We can't let this go on!
@@ -185,6 +198,51 @@ class User extends DataObject
 		}
 		
 		return $perm;
+	}
+
+	/*
+	 * User::check_perm_blog_post_statuses(-)
+	 *
+	 * Check permission on allowed blog post statuses
+	 */
+	function check_perm_blog_post_statuses( $permname, $permlevel, $perm_target_blog )
+	{
+		global $tableblogusers, $querycount;
+		
+		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
+		{	// Allowed blog post statuses have not been loaded yet:
+			if( $this->ID == 0 )
+			{	// User not in DB, nothing to load!:
+				return false;	// Permission denied			
+			}
+
+			// Load now:
+			// echo 'loading allowed statuses';
+			$query = "SELECT bloguser_perm_poststatuses
+								FROM $tableblogusers 
+								WHERE bloguser_blog_ID = $perm_target_blog
+								  AND bloguser_user_ID = $this->ID";
+			// echo $query, '<br />';
+			$result = mysql_query($query) or mysql_oops( $query ); 
+			$querycount++; 
+			$row = mysql_fetch_array($result);
+			$bloguser_perm_post = $row['bloguser_perm_poststatuses'];
+			if( empty($bloguser_perm_post ) )
+				$this->blog_post_statuses[$perm_target_blog] = array();
+			else
+				$this->blog_post_statuses[$perm_target_blog] = explode( ',', $bloguser_perm_post );
+		}
+	
+		// Check if permission is granted:
+		if( $permlevel == 'any' )
+		{ // Any prermission will do:
+			// echo count($this->blog_post_statuses);
+			return ( count($this->blog_post_statuses[$perm_target_blog]) > 0 );
+		}
+		
+		// We want a specific permission:
+		// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
+		return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog] );
 	}
 	
 }

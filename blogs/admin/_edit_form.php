@@ -242,15 +242,38 @@ if( $action != 'editcomment' )
 	<fieldset title="Status">
 		<legend><?php echo T_('Status') ?></legend>
 
-		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Published (Public)') ?></label><br />
-
-		<label title="<?php echo T_('The post will be published but visible only by logged-in team members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Protected (Members only)') ?></label><br />
-
-		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Private (You only)') ?></label><br />
-
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Draft (Not published!)') ?></label><br />
-
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Deprecated (Not published!)') ?></label><br />
+		<?php 
+		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?>><?php echo T_('Published (Public)') ?></label><br />
+		<?php 
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will be published but visible only by logged-in team members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?>><?php echo T_('Protected (Members only)') ?></label><br />
+		<?php 
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?>><?php echo T_('Private (You only)') ?></label><br />
+		<?php 
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?>><?php echo T_('Draft (Not published!)') ?></label><br />
+		<?php 
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?>><?php echo T_('Deprecated (Not published!)') ?></label><br />
+		<?php 
+		}
+		?>
 
 	</fieldset>
 	
@@ -266,8 +289,7 @@ if( $action != 'editcomment' )
 	<?php 
 		// ----------------------------  CATEGORIES ------------------------------
 		$default_main_cat = 0;
-		$tabindex = 22;
-	
+
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query();	// make sure the caches are loaded
 		function cat_select_before_first( $parent_cat_ID, $level )
@@ -283,7 +305,7 @@ if( $action != 'editcomment' )
 			
 			if( $allow_cross_posting )
 			{ // We allow cross posting, display checkbox:
-				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
+				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
 				if (($cat_ID == $postdata["Category"]) or (in_array( $cat_ID, $post_extracats )))
 					echo ' checked="checked"';
 				echo '>';
@@ -296,7 +318,7 @@ if( $action != 'editcomment' )
 				{	// Assign default cat for new post
 					$default_main_cat = $cat_ID;
 				}
-				echo '<input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'" tabindex="21"';
+				echo '<input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
 				if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
 					echo ' checked="checked"';
 				echo '>';
@@ -348,9 +370,9 @@ if( $action != 'editcomment' )
 	<fieldset title="Status">
 		<legend><?php echo T_('Comments') ?></legend>
 
-		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Open') ?></label><br />
+		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?>><?php echo T_('Open') ?></label><br />
 
-		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Closed') ?></label><br />
+		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?>><?php echo T_('Closed') ?></label><br />
 
 	</fieldset>
 

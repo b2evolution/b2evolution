@@ -37,36 +37,32 @@ case "edit":
 	
 	require (dirname(__FILE__).'/_menutop_end.php');
 
-	if ($user_level > 0) 
-	{
-		$authordata = get_userdata($postdata['Author_ID']);
-		if ($user_level < $authordata['user_level'])
-			die("You don't have the right to edit <strong>".$authordata['user_login']."</strong>'s posts.");
+	$post_status = $postdata['Status'];
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+	// Check level:
+	$authordata = get_userdata($postdata['Author_ID']);
+	if ($user_level < $authordata['user_level'])
+		die("You don't have the right to edit <strong>".$authordata['user_login']."</strong>'s posts.");
 
-		$edited_post_title = format_to_edit($postdata['Title']);
-		$post_url = format_to_edit( $postdata['Url'] );
-		$autobr = $postdata['AutoBR'];
-		$content = format_to_edit( $postdata['Content'], $autobr );
-		$post_pingback = 0;
-		$post_trackbacks = '';
-		$post_status = $postdata['Status'];
-		$post_comments = $postdata['comments'];
-		$post_extracats = postcats_get_byID( $post );
-		$edit_date = 0;
-		$aa = mysql2date('Y', $postdata['Date']);
-		$mm = mysql2date('m', $postdata['Date']);
-		$jj = mysql2date('d', $postdata['Date']);
-		$hh = mysql2date('H', $postdata['Date']);
-		$mn = mysql2date('i', $postdata['Date']);
-		$ss = mysql2date('s', $postdata['Date']);
+	$edited_post_title = format_to_edit($postdata['Title']);
+	$post_url = format_to_edit( $postdata['Url'] );
+	$autobr = $postdata['AutoBR'];
+	$content = format_to_edit( $postdata['Content'], $autobr );
+	$post_pingback = 0;
+	$post_trackbacks = '';
+	$post_comments = $postdata['comments'];
+	$post_extracats = postcats_get_byID( $post );
+	$edit_date = 0;
+	$aa = mysql2date('Y', $postdata['Date']);
+	$mm = mysql2date('m', $postdata['Date']);
+	$jj = mysql2date('d', $postdata['Date']);
+	$hh = mysql2date('H', $postdata['Date']);
+	$mn = mysql2date('i', $postdata['Date']);
+	$ss = mysql2date('s', $postdata['Date']);
 
-		$form_action = 'editpost';
-		require(dirname(__FILE__).'/_edit_form.php');
-	} 
-	else
-	{
-		printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion"' );
-	}
+	$form_action = 'editpost';
+	require(dirname(__FILE__).'/_edit_form.php');
 
 	break;
 
@@ -84,10 +80,8 @@ case "editcomment":
 	echo "#".$commentdata["comment_ID"];
 	require (dirname(__FILE__).'/_menutop_end.php');
 
-	if ($user_level == 0) 
-	{
-		die(T_('Cheatin\' uh ?'));
-	}
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
 
 	$content = $commentdata['comment_content'];
 	$content = format_to_edit($content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') );
@@ -141,6 +135,9 @@ default:
 	} // --------------------------------- END OF BLOG LIST --------------------------------- 
 
 	require (dirname(__FILE__).'/_menutop_end.php');
+
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
 
 	if ($user_level > 0) 
 	{

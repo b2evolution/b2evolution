@@ -118,7 +118,9 @@
 					echo ' ', T_('by'), ' ';
 					the_author();
 					echo ' (';
-					the_author_nickname();
+					the_author_login();
+					echo ', ', T_('level:');
+					the_author_level();
 					echo '), ';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo T_('in'), ' ';

@@ -221,11 +221,13 @@ function create_antispam()
 /*
  * create_groups(-)
  *
+ * Create user permissions
+ *
  * Used when creating full install and upgrading from earlier versions
  */
 function create_groups()
 {
-	global $tablegroups, $Group_Admins, $Group_Bloggers, $Group_Users;
+	global $tablegroups, $tableblogusers, $Group_Admins, $Group_Bloggers, $Group_Users;
 	
 	$query = "CREATE TABLE $tablegroups (
 		grp_ID int(11) NOT NULL auto_increment,
@@ -277,6 +279,17 @@ function create_groups()
 	$Group_Users->set( 'perm_users', 'none' );
 	$Group_Users->dbinsert();
 
+
+	$query = "CREATE TABLE $tableblogusers (
+		bloguser_blog_ID int(11) NOT NULL default 0,
+		bloguser_user_ID int(11) NOT NULL default 0,
+		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
+		bloguser_perm_delpost int(11) NOT NULL default 0,
+		bloguser_perm_comments int(11) NOT NULL default 0,
+		PRIMARY KEY (bloguser_blog_ID,bloguser_user_ID)
+	)";
+	$q = mysql_query($query) or mysql_oops( $query );
+	
 }
 
 /*

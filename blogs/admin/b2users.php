@@ -32,9 +32,6 @@ case 'userupdate':
 	/* 
 	 * Update user:
 	 */
-	require(dirname(__FILE__).'/_menutop.php');
-	require(dirname(__FILE__).'/_menutop_end.php');
-
 	// Check permission:
 	$current_User->check_perm( 'users', 'edit', true );
 

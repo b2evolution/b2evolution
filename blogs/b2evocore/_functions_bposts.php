@@ -1020,6 +1020,15 @@ function the_author( $format = 'htmlbody' )
 
 
 /*
+ * the_author_level(-)
+ */
+function the_author_level() 
+{
+	global $authordata;
+	echo $authordata['user_level'];
+}
+
+/*
  * the_author_login(-)
  */
 function the_author_login( $format = 'htmlbody' ) 

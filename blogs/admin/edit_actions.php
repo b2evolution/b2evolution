@@ -43,6 +43,10 @@ case 'post':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
+	param( 'post_status', 'string', 'published' );
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
 	param( "post_autobr", 'integer', 0 );
 	param( "post_pingback", 'integer', 0 );
 	param( 'trackback_url', 'string' );
@@ -50,7 +54,6 @@ case 'post':
 	param( 'content', 'html' );
 	param( 'post_title', 'html' );
 	param( 'post_url', 'string' );
-	param( 'post_status', 'string', 'published' );
 	param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 	param( 'post_extracats', 'array', array() );
 	param( 'post_lang', 'string', $default_language );
@@ -144,12 +147,18 @@ case 'editpost':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 	
-	if ($user_level == 0)
-	die ("Cheatin' uh ?");
-
-	param( "post_ID", 'integer', true );
 	param( "post_category", 'integer', true );
 	$blog = get_catblog($post_category); 
+
+	param( 'post_status', 'string', 'published' );
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+	param( 'post_ID', 'integer', true );
+
+	if ($user_level == 0)	// TODO: this is not enough!
+	die ("Cheatin' uh ?");
+
 	param( "post_autobr", 'integer', 0 );
 	param( "post_pingback", 'integer', 0 );
 	param( 'trackback_url', 'string' );
@@ -157,7 +166,7 @@ case 'editpost':
 	param( 'content', 'html' );
 	param( 'post_title', 'html' );
 	param( 'post_url', 'string' );
-	param( 'post_status', 'string', 'published' );
+
 	param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 	param( 'post_extracats', 'array', array() );
 	param( 'post_lang', 'string', $default_language );
@@ -262,14 +271,18 @@ case 'publish':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 	
-	if ($user_level == 0)
-	die ("Cheatin' uh ?");
-
-	param( "post_ID", 'integer', true );
-	$post_status = 'published';
-	$post_date = date('Y-m-d H:i:s', $localtimenow);
+	param( 'post_ID', 'integer', true );
 	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 	$blog = get_catblog($postdata['Category']); 
+
+	$post_status = 'published';
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+	if ($user_level == 0)	// TODO: this is not enough!
+	die ("Cheatin' uh ?");
+
+	$post_date = date('Y-m-d H:i:s', $localtimenow);
 	$post_title = $postdata['Title'];
 	$post_url = $postdata['Url'];
 	
@@ -344,14 +357,15 @@ case "delete":
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
-	if ($user_level == 0)
-	die ("Cheatin' uh ?");
-
 	param( 'post', 'integer' );
 	// echo $post;
 	$postdata = get_postdata($post) or die(T_('Oops, no post with this ID!'));
-	$authordata = get_userdata($postdata['Author_ID']);
+	$blog = get_catblog($postdata['Category']); 
 
+	// Check permission:
+	$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
+
+	$authordata = get_userdata($postdata['Author_ID']);
 	if ($user_level < $authordata['user_level'])
 	die (sprintf( T_('You don\'t have the right to delete <strong>%s</strong>\'s posts.'), $authordata['user_login'] ));
 

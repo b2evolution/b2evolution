@@ -15,6 +15,7 @@ h1 {
 	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
 	color: #BBCCDD;
 	font-size: 112%;
+	font-weight:normal;
 }
 h1.logintitle {
 	color: #000;
