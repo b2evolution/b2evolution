@@ -23,10 +23,12 @@ $languages = array(
 	'en' => NT_('English'),
 	'fr' => NT_('French'),
 	'ja' => NT_('Japanese'),
+	'nb' => NT_('Norwegian Bokm&aring;l'), 
 	'pt' => NT_('Portuguese'),
 	'es' => NT_('Spanish'),
 	'sv' => NT_('Swedish'),
 	);
+
 
 # Default locale used for backoffice and notification messages
 # These use an ISO 639 language code, a '_' and an ISO 3166 country code
@@ -44,7 +46,7 @@ $default_locale = 'en_US';
 #  and localization:
 # Add what you need and comment what you don't need
 $locales = array(
-	'en_US' => array( // English, US
+	'en_US' => array( // English, USA
 									'charset' => 'iso-8859-1',	// gettext will convert to this
 									'datefmt' => 'm/d/y',	
 									'timefmt' => 'h:i:s a',	
@@ -54,22 +56,27 @@ $locales = array(
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
 								),
-	'fr_FR' => array( // French	
+	'fr_FR' => array( // French, FRANCE	
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
 								),
-	'ja_JP' => array(	// Japanese
+	'ja_JP' => array(	// Japanese, JAPAN
 									'charset' => 'utf-8',
 									'datefmt' => 'Y/m/d',
 									'timefmt' => 'H:i:s',
 								),
-	'nl_NL' => array( // Dutch
+	'nb_NO' => array( // Bokmål, NORWAY    
+									'charset' => 'iso-8859-1', 
+									'datefmt' => 'd.m.y', 
+									'timefmt' => 'H:i:s',    
+                ), 
+	'nl_NL' => array( // Dutch, NETHERLANDS
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd-m-y',
 									'timefmt' => 'H:i:s',	
 								),
-	'pt_BR' => array( // Portuguese / Brazil	
+	'pt_BR' => array( // Portuguese, BRAZIL	
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
