@@ -29,7 +29,7 @@ switch( $tab )
 		$admin_pagetitle .= ' :: '. T_('General');
 		break;
 	case 'files':
-		$admin_pagetitle .= ' :: '. T_('File Management');
+		$admin_pagetitle .= ' :: '. T_('Files');
 		break;
 	case 'regional':
 		$admin_pagetitle .= ' :: '. T_('Regional'); 
@@ -429,7 +429,7 @@ $current_User->check_perm( 'options', 'view', true );
 			<?php
 				foreach( array(
 									'general' => array( T_('General'), '' ),
-									'files' => array( T_('File management'), '' ),
+									'files' => array( T_('Files'), '' ),
 									'regional' => array( T_('Regional'), ( $notransext ? '&amp;notransext=1' : '' ) ),
 									'plugins' => array( T_('Plug-ins'), '')
 									) as $ltab => $lvalue )

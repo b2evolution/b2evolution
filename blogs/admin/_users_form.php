@@ -83,9 +83,9 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			if( $allowed_to_edit )
 			{
 				form_text( 'edited_user_login', $edited_User->dget('login', 'formvalue'), 20, T_('Login'), '', 20 );
-				form_text( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 30, T_('First name'), '', 50 );
-				form_text( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 30, T_('Last name'), '', 50 );
-				form_text( 'edited_user_nickname', $edited_User->dget('nickname', 'formvalue'), 30, T_('Nickname'), '', 50 );
+				form_text( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 20, T_('First name'), '', 50 );
+				form_text( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 20, T_('Last name'), '', 50 );
+				form_text( 'edited_user_nickname', $edited_User->dget('nickname', 'formvalue'), 20, T_('Nickname'), '', 50 );
 			?>
 
 			<fieldset>
@@ -122,7 +122,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" /></a>';
 
 			if( $allowed_to_edit )
-				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 50, T_('Email'), $fieldnote, 100 );
+				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 30, T_('Email'), $fieldnote, 100 );
 			else
 				form_info( T_('Email'), $edited_User->dget('email'), $fieldnote );
 			
@@ -136,7 +136,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			}
 			else $fieldnote = '';
 			if( $allowed_to_edit )
-				form_text( 'edited_user_url', $edited_User->dget('url', 'formvalue'), 50, T_('URL'), $fieldnote, 100 );
+				form_text( 'edited_user_url', $edited_User->dget('url', 'formvalue'), 30, T_('URL'), $fieldnote, 100 );
 			else
 				form_info( T_('URL'), $edited_User->dget('url'), $fieldnote );
 			
@@ -146,7 +146,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			}
 			else $fieldnote = '';
 			if( $allowed_to_edit )
-				form_text( 'edited_user_icq', $edited_User->dget('icq', 'formvalue'), 50, T_('ICQ'), $fieldnote, 10 );
+				form_text( 'edited_user_icq', $edited_User->dget('icq', 'formvalue'), 30, T_('ICQ'), $fieldnote, 10 );
 			else
 				form_info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $fieldnote );
 			
@@ -157,9 +157,9 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			else $fieldnote = '';
 			if( $allowed_to_edit )
 			{
-				form_text( 'edited_user_aim', $edited_User->dget('aim', 'formvalue'), 50, T_('AIM'), $fieldnote, 50 );
-				form_text( 'edited_user_msn', $edited_User->dget('msn', 'formvalue'), 50, T_('MSN IM'), '', 100 );
-				form_text( 'edited_user_yim', $edited_User->dget('yim', 'formvalue'), 50, T_('YahooIM'), '', 50 );
+				form_text( 'edited_user_aim', $edited_User->dget('aim', 'formvalue'), 30, T_('AIM'), $fieldnote, 50 );
+				form_text( 'edited_user_msn', $edited_User->dget('msn', 'formvalue'), 30, T_('MSN IM'), '', 100 );
+				form_text( 'edited_user_yim', $edited_User->dget('yim', 'formvalue'), 30, T_('YahooIM'), '', 50 );
 
 				form_checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
 				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
