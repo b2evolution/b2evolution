@@ -3,7 +3,7 @@
 # this will select the default blog template to be displayed
 # if the URL is just .../blogs/
 <IfModule mod_dir.c>
-	DirectoryIndex index.php
+	DirectoryIndex index.php index.html
 </IfModule>
 
 
