@@ -47,6 +47,33 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 class ldap_plugin extends Plugin
 {
+	/*
+	 * LDAP config
+	 * TODO: move to plugin settings.
+	 */
+	/**
+	 * @var string The LDAP server.
+	 */
+	var $ldap_server = 'exchange.excample.com';
+	/**
+	 * The LDAP RDN, used to bind to the server.
+	 * <code>%s</code> gets replaced by the user login.
+	 * @var string
+	 */
+	var $ldap_rdn = 'cn=%s,ou=<Organisation Unit>,o=<Organisation>';
+	/**
+	 * The LDAP base DN, used as base dn for search.
+	 * @var string
+	 */
+	var $ldap_base_dn = 'cn=Recipients,ou=<Organisation Unit>,o=<Organisation>';
+	/**
+	 * The search filter used to get information about the user.
+	 * <code>%s</code> gets replaced by the user login.
+	 * @var string
+	 */
+	var $ldap_searchFilter = 'rdn=%s';
+
+
 	var $code = 'evo_ldap';
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
@@ -83,24 +110,57 @@ class ldap_plugin extends Plugin
 	function LoginAttempt( $params )
 	{
 		global $Debuglog, $localtimenow;
-		global $UserCache;
-
+		global $UserCache, $GroupCache, $Settings, $Hit;
 
 		if( $LocalUser =& $UserCache->get_by_login( $params['login'] )
-			&& $LocalUser->pass == $params['pass_md5'] )
-			{ // User exist (with this password), do nothing
-				return true;
+				&& $LocalUser->pass == $params['pass_md5'] )
+		{ // User exist (with this password), do nothing
+			return true;
 		}
 		else
 		{ // authenticate against LDAP
-
-			// TODO: implement.. :)
-			$ldap_answer = 0;
-
-			if( !$ldap_answer )
+			if( !function_exists( 'ldap_connect' ) )
 			{
+				$Debuglog->add( 'LDAP does not seem to be compiled into PHP.', 'ldap_plugin' );
 				return false;
 			}
+
+			if( !($ldapconn = @ldap_connect( $this->ldap_server )) )
+			{
+				$Debuglog->add( 'Could not connect to LDAP server &laquo;'.$this->ldap_server.'&raquo;!', 'ldap_plugin' );
+				return false;
+			}
+
+			$this->ldap_rdn = sprintf( $this->ldap_rdn, $params['login'] );
+
+			$Debuglog->add( 'Using rdn &laquo;'.$this->ldap_rdn.'&raquo;..', 'ldap_plugin' );
+
+			if( !@ldap_bind($ldapconn, $this->ldap_rdn, $params['pass']) )
+			{
+				$Debuglog->add( 'Could not bind to LDAP server!', 'ldap_plugin' );
+				return false;
+			}
+
+			$searchResult = ldap_search( $ldapconn,
+																		$this->ldap_base_dn,
+																		sprintf( $this->ldap_searchFilter, $params['login'] ) );
+
+			$searchInfo = ldap_get_entries($ldapconn, $searchResult);
+
+			if( $searchInfo['count'] != 1 )
+			{ // nicht nur ein bzw kein Eintrag gefunden
+				$Debuglog->add( 'Found '.$searchInfo['count'].' entries with search!', 'ldap_plugin' );
+
+				/*
+				for ($i=0; $i<$searchInfo["count"]; $i++) {
+					echo "dn: ". $searchInfo[$i]["dn"] ."<br>";
+					echo "first cn entry: ". $searchInfo[$i]["cn"][0] ."<br>";
+					echo "first email entry: ". $searchInfo[$i]["mail"][0] ."<p>";
+				}
+				*/
+			}
+			#pre_dump( $searchInfo );
+
 
 			if( $LocalUser )
 			{ // User exists already locally, but password does not match
@@ -113,25 +173,36 @@ class ldap_plugin extends Plugin
 				$NewUser->set( 'login', $params['login'] );
 				$NewUser->set( 'nickname', $params['login'] );
 				$NewUser->set( 'pass', $params['pass_md5'] );
-				$NewUser->set( 'firstname', '' );
-				$NewUser->set( 'lastname', '' );
-				$NewUser->set( 'email', '' );
-				$NewUser->set( 'idmode', 'login' );
-				$NewUser->set( 'locale', '' ); // $Settings->get('default_locale')
-				$NewUser->set( 'email', '' );
-				$NewUser->set( 'url', '' );
-				$NewUser->set( 'icq', 0 );
-				$NewUser->set( 'aim', '' );
-				$NewUser->set( 'msn', '' );
-				$NewUser->set( 'yim', '' );
-				$NewUser->set( 'ip', '' );
-				$NewUser->set( 'domain', '' );
-				$NewUser->set( 'browser', '' );
+
+				if( isset($searchInfo[0]['givenname'][0]) )
+				{
+					$NewUser->set( 'firstname', $searchInfo[0]['givenname'][0] );
+				}
+				if( isset($searchInfo[0]['sn'][0]) )
+				{
+					$NewUser->set( 'lastname', $searchInfo[0]['sn'][0] );
+				}
+				if( isset($searchInfo[0]['mail'][0]) )
+				{
+					$NewUser->set( 'email', $searchInfo[0]['mail'][0] );
+				}
+				$NewUser->set( 'idmode', 'namefl' );
+				$NewUser->set( 'locale', locale_from_httpaccept() ); // use the browser's locale
+				#$NewUser->set( 'url', '' );
+				#$NewUser->set( 'icq', 0 );
+				#$NewUser->set( 'aim', '' );
+				#$NewUser->set( 'msn', '' );
+				#$NewUser->set( 'yim', '' );
+				$NewUser->set( 'ip', $Hit->IP );
+				$NewUser->set( 'domain', $Hit->getRemoteHost() );
+				$NewUser->set( 'browser', $Hit->getUserAgent() );
 				$NewUser->set_datecreated( $localtimenow );
 				$NewUser->set( 'level', 1 );
 				$NewUser->set( 'notify', 1 );
 				$NewUser->set( 'showonline', 1 );
-				// $NewUser->setGroup( .. );
+
+				$UsersGroup =& $GroupCache->get_by_ID($Settings->get('newusers_grp_ID'));
+				$NewUser->setGroup( &$UsersGroup );
 
 				$NewUser->dbinsert();
 
