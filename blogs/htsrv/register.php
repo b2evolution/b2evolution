@@ -90,10 +90,8 @@ switch( $action )
 			$new_User->set( 'pass', md5($pass1) ); // encrypted
 			$new_User->set( 'nickname', $login );
 			$new_User->set( 'email', $email );
-			$new_User->set( 'ip', '127.0.0.1' );
-			$new_User->set( 'domain', 'localhost' );
 			$new_User->set( 'ip', getIpList( true ) );
-			$new_User->set( 'domain', isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '' );
+			$new_User->set( 'domain', $Hit->getRemoteHost() );
 			$new_User->set( 'browser', $Hit->getUserAgent();
 			$new_User->set_datecreated( $localtimenow );
 			$new_User->set( 'level', $Settings->get('newusers_level') );

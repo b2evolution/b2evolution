@@ -86,6 +86,14 @@ class Hit
 	var $userAgent;
 
 	/**
+	 * The user's remote host.
+	 * Use {@link getRemoteHost()} to access it (lazy filled).
+	 * @var string
+	 * @access protected
+	 */
+	var $_remoteHost;
+
+	/**
 	 * The user agent type.
 	 *
 	 * The default setting ('unknown') is taken for new entries (into T_useragents),
@@ -153,7 +161,7 @@ class Hit
 		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
 		$Debuglog->add( 'userAgent: '.$this->userAgent, 'hit' );
 		$Debuglog->add( 'Referrer: '.$this->referer, 'hit' );
-		// $Debuglog->add( 'Remote Host: '.$_SERVER['REMOTE_HOST'], 'hit' );
+		$Debuglog->add( 'Remote Host: '.$this->getRemoteHost(), 'hit' );
 	}
 
 
@@ -521,6 +529,29 @@ class Hit
 	function getUserAgent()
 	{
 		return $this->userAgent;
+	}
+
+
+	/**
+	 * Get the remote Hostname.
+	 *
+	 * @return string
+	 */
+	function getRemoteHost()
+	{
+		if( is_null($this->_remoteHost) )
+		{
+			if( isset( $_SERVER['REMOTE_HOST'] ) )
+			{
+				$this->RemoteHost = $_SERVER['REMOTE_HOST'];
+			}
+			else
+			{
+				$this->RemoteHost = @gethostbyaddr($this->IP);
+			}
+		}
+
+		return $this->_remoteHost;
 	}
 
 
