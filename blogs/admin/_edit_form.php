@@ -451,15 +451,17 @@ if( $action != 'editcomment' )
 	<fieldset>
 		<legend><?php echo T_('Renderers') ?></legend>
 		<?php
-		$Plugins->restart();	 // make sure iterator is at start position
+		$Plugins->restart(); // make sure iterator is at start position
+		$atLeastOneRenderer = false;
 		while( $loop_RendererPlugin = $Plugins->get_next() )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 			if( $loop_RendererPlugin->apply_when == 'stealth'
 				|| $loop_RendererPlugin->apply_when == 'never' )
-			{	// This is not an option.
+			{ // This is not an option.
 				continue;
 			}
+			$atLeastOneRenderer = true;
 			?>
 			<div>
 				<input type="checkbox" class="checkbox" name="renderers[]"
@@ -508,6 +510,11 @@ if( $action != 'editcomment' )
 		</div>
 		<?php
 		}
+		if( !$atLeastOneRenderer )
+		{
+			echo T_('No renderer plugins are installed.');
+		}
+
 		?>
 	</fieldset>
 
