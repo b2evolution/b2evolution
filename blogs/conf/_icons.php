@@ -148,6 +148,10 @@ $map_iconfiles = array(
 		'file' => $img_subdir.'expand.gif',
 		'alt' => T_('Open'),
 	),
+	'reload' => array(
+		'file' => $img_subdir.'reload.png',
+		'alt' => T_('Reload'),
+	),
 );
 
 
