@@ -12,7 +12,7 @@
  */
 ?>
 <div class="panelblock">
-	<div style="float:right">[<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php">X</a>]</div>
+	<div style="float:right"><a title="<?php echo T_('Close user profile'); ?>" href="b2users.php">[ X ]</a></div>
 	<h2><?php echo T_('Profile for:'), ' ', $edited_User->disp('nickname') ?></h2>
 
 	<form class="fform" method="post" action="b2users.php">

@@ -17,15 +17,13 @@ param( 'action', 'string' );
 param( 'user', 'int', 0 );
 param( 'group', 'int', 0 );
 
+// show the top menu
 require(dirname(__FILE__). '/_menutop.php');
 require(dirname(__FILE__). '/_menutop_end.php');
 
 
 switch ($action)
 {
-	case 'useredit': // old-style
-	break;
-
 	case 'userupdate':
 		/*
 		 * Update user:
@@ -44,13 +42,10 @@ switch ($action)
 
 		$edited_User->dbupdate();	// Commit update to the DB
 
-		#header('Location: b2users.php');
-		#exit();
-		
-		// remember to display the forms
+		// remember, to display the forms
 		$user = $edited_user_ID;
 		
-		echo '<div class="panelblock">User updated.</div>';
+		echo '<div class="panelblock">' . T_('User updated.') . '</div>';
 		break;
 
 
@@ -61,27 +56,35 @@ switch ($action)
 		param( 'prom', 'string', true );
 		param( 'id', 'integer', true );
 
-		if( empty($prom) )
-		{
-			header('Location: b2users.php');
-		}
-
 		$user_data = get_userdata( $id );
 		$usertopromote_level = get_user_info( 'level', $user_data );
-
-		if( $prom == 'up' )
+		
+		if( ! in_array($prom, array('up', 'down'))
+				|| ($prom == 'up' && $usertopromote_level > 9)
+				|| ($prom == 'down' && $usertopromote_level < 1)
+			)
 		{
-			$sql = "UPDATE $tableusers SET user_level=user_level+1 WHERE ID = $id";
+			echo '<div class="panelblock"><span class="error">' . T_('Invalid promotion.') . '</span></div>';
 		}
-		elseif( $prom == 'down' )
+		else
 		{
-			$sql = "UPDATE $tableusers SET user_level=user_level-1 WHERE ID = $id";
+	
+			if( $prom == 'up' )
+			{
+				$sql = "UPDATE $tableusers SET user_level=user_level+1 WHERE ID = $id";
+			}
+			elseif( $prom == 'down' )
+			{
+				$sql = "UPDATE $tableusers SET user_level=user_level-1 WHERE ID = $id";
+			}
+			$result = mysql_query($sql);
+			
+			if( $result )
+				echo '<div class="panelblock">User promoted.</div>';
+			else
+				echo '<div class="panelblock"><span class="error">' . sprintf(T_('Couldn\'t change %d\'s level.', $id));
+			
 		}
-		$result = mysql_query($sql) or die("Couldn't change $id's level.");
-
-		#header('Location: b2users.php' . ( ( $user != 0 )? '?user='. $user : '') );
-		#exit();
-		echo '<div class="panelblock">User promoted.</div>';
 		break;
 
 
@@ -100,15 +103,8 @@ switch ($action)
 		// Delete from DB:
 		$edited_User->dbdelete();
 
-		#header('Location: b2users.php');
-		#exit();
-		
 		echo '<div class="panelblock">User deleted.</div>';
 		break;
-
-
-	case 'groupedit': // old-style
-	break;
 
 
 	case 'groupupdate':
@@ -150,43 +146,29 @@ switch ($action)
 		// remember to display the forms
 		$group = $edited_grp_ID;
 
-		#header('Location: b2users.php');
-		#exit();
-		echo '<div class="panelblock">Group updated.</div>';
+		echo '<div class="panelblock">' . T_('Group updated.') . '</div>';
 		break;
-
-
-	default:
-		#require( dirname(__FILE__). '/_menutop.php');
-		#require( dirname(__FILE__). '/_menutop_end.php');
 
 }
 
 if( $current_User->check_perm( 'users', 'view', false ) )
 {
-	if( ($group != 0) ){
-		/*
-		 * View group:
-		 */
+	// view group
+	if( ($group != 0) )
+	{
 		// Check permission:
 		$current_User->check_perm( 'users', 'view', true );
 		
-		#param( 'grp_ID', 'integer', true );
 		$edited_Group = Group_get_by_ID( $group );
-		#require(dirname(__FILE__). '/_menutop.php');
-		#require(dirname(__FILE__). '/_menutop_end.php');
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
 		
-	/*
-	 * View user, if we have a 'user' param
-	 */
+	// view user
 	if( $user != 0 )
 	{
 			// Check permission:
 			$current_User->check_perm( 'users', 'view', true );
 	
-			#param( 'user', 'integer', true );
 			$edited_User = & new User( get_userdata($user) );
 			require(dirname(__FILE__). '/_users_form.php');
 	}
@@ -197,5 +179,6 @@ if( $current_User->check_perm( 'users', 'view', false ) ){
 	// Display user list:
 	require( dirname(__FILE__). '/_users_list.php' );
 }
+
 require( dirname(__FILE__). '/_footer.php' );
 ?>
