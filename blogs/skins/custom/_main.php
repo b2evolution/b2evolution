@@ -20,6 +20,7 @@
 	arcdir_title( ' - ', 'htmlhead' );
 	last_comments_title( ' - ', 'htmlhead' );
 	stats_title( ' - ', 'htmlhead' );
+	msgform_title( ' - ', 'htmlhead' );
 ?>
 </title>
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
@@ -55,6 +56,7 @@
 	last_comments_title();
 	stats_title();
 	profile_title();
+	msgform_title();
 ?></h2>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
@@ -93,7 +95,10 @@
 			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
-			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+			<span class="bIcons">
+				<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" border="0" class="middle"></a>
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a> 
+			</span>
 
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
@@ -148,6 +153,11 @@
 			// this includes the profile form if requested
 			require( dirname(__FILE__).'/_profile.php');
 			break;
+		case 'msgform':
+			// this includes the email form if requested
+			require( dirname(__FILE__).'/_msgform.php');
+			break;
+
 	}
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
