@@ -25,7 +25,7 @@
 	param( 'orderby', 'string', '', true );					// list of fields to order by
 	param( 'posts', 'integer', '', true );					// # of posts to display on the page
 	param( 'paged', 'integer', '', true );					// List page number in paged display
-	param( 'poststart', 'integer', '', true );			// Start results at this position
+	param( 'poststart', 'integer', 1, true );			// Start results at this position
 	param( 'postend', 'integer', '', true );				// End results at this position
 	param( 's', 'string', '', true );								// Search string
 	param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
@@ -80,10 +80,14 @@
 		}
 	}
 	
-	if (!$poststart) 
+	if(!$poststart) 
 	{
 		$poststart=1;
-		$postend=$posts;
+	}
+	
+	if(!$postend) 
+	{
+		$postend=$poststart+$posts-1;
 	}
 	
 	$nextXstart=$postend+1;
@@ -95,8 +99,6 @@
 	{
 		$previousXstart = 1;
 	}
-	// these lines are b2's "motor", do not alter nor remove them
-
 
 	require dirname(__FILE__).'/_edit_navbar.php'; 
 	?>

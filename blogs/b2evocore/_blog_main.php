@@ -174,6 +174,15 @@ if( $skin != '' )
 		}
 	}
 
+	// Check that requested skin exists
+	if( !is_dir($skin_folder.'/'.$skin) )
+	{
+		if( $skin == $default_skin )
+			$skin .= T_(' (default skin)');
+		printf( T_('The requested skin [%s] does not exist. The blog cannot be displayed. Contact the <a %s>webmaster</a>...'), $skin, 'href="mailto:'.$admin_email.'"');
+		die();	
+	}
+
 	if( $template == 'popup' )
 	{	// Do the popup display
 		require "$skin_folder/$skin/_popup.php";
@@ -190,5 +199,6 @@ else
 		require get_path( 'skins' ).'/_popup.php';
 		exit();
 	}
+	// If we end up here the blog file should be a full template, not just a stub...
 }
 ?>

@@ -314,16 +314,17 @@ class ItemList
 		 * Limits:
 		 * ----------------------------------------------------
 		 */
-		if( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
-		{	// (no restriction if we request a month... some permalinks may point to the archive!)
-			// echo 'ARCHIVE - no limits';
-			$limits = '';
-		}
-		elseif( !empty($postend) && ($postend >= $poststart) )
+		if( !empty($poststart) )
 		// fp removed && (!$m) && (!$w) && (!$whichcat) && (!$s) 
+		// fp added: when in backoffice: always page
 		{
 			// echo 'POSTSTART-POSTEND';
-			if ($what_to_show == 'posts' || ($what_to_show == 'paged' && (!$paged)))
+			if( $postend < $poststart )
+			{
+				$postend = $poststart + $posts_per_page - 1;
+			}
+			
+			if ($what_to_show == 'posts' || $what_to_show == 'paged')
 			{
 				$posts = $postend - $poststart + 1;
 				$limits = ' LIMIT '.($poststart-1).','.$posts;
@@ -338,6 +339,11 @@ class ItemList
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend -1) * 86400)));
 				$where .= ' AND post_date > \''.$otherdate.'\' AND post_date < \''.$startdate.'\'';
 			}
+		}
+		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
+		{	// (no restriction if we request a month... some permalinks may point to the archive!)
+			// echo 'ARCHIVE - no limits';
+			$limits = '';
 		}
 		elseif ($what_to_show == 'posts')
 		{
@@ -362,11 +368,11 @@ class ItemList
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
 			$where .= ' AND post_date > \''.$otherdate.'\'';
 		}
-/*		else
+		/* else
 		{
 			echo 'DEFAULT - NO LIMIT';
-		}
-*/	
+		}*/
+	
 
 		/*
 		 * ----------------------------------------------------

@@ -17,7 +17,7 @@
 
 
 
-# Your email. Will be used in backoffice error messages. 
+# Your email. Will be used in severe error messages so that users can contact you. 
 # You will also receive notifications for new user registrations.
 $admin_email = 'postmaster@localhost';
 

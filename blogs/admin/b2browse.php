@@ -26,12 +26,12 @@ for( $curr_blog_ID=blog_list_start('stub');
 	echo $sep;
 	if( $curr_blog_ID == $blog ) 
 	{ // This is the blog being displayed on this page ?>
-	<strong>[<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>&action=<?php echo $action; ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
+	<strong>[<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
 	<?php 
 	} 
 	else 
 	{ // This is another blog ?>
-	<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>&action=<?php echo $action; ?>"><?php blog_list_iteminfo('shortname') ?></a>
+	<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
 	<?php 
 	} 
 	$sep = ' | ';
