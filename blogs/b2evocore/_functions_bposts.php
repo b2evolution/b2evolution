@@ -49,7 +49,7 @@ function bpost_create(
 	// TODO: START TRANSACTION
 
 	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".count_words($post_content)." )";
+	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content)." )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -124,7 +124,7 @@ function bpost_update(
 	// $query .= "post_trackbacks = '$post_trackbacks', ";
 	$query .= "post_autobr = $autobr, ";
 	$query .= "post_flags = '".implode(',',$post_flags)."', ";
-	$query .= "post_wordcount = '".count_words($post_content)."' ";
+	$query .= "post_wordcount = '".bpost_count_words($post_content)."' ";
 	$query .= "WHERE ID = $post_ID";
 	// echo $query;
 	$querycount++;
@@ -1230,14 +1230,21 @@ function is_new_day()
 	}
 }
 
+
 /*
- * count_words(-)
+ * bpost_count_words(-)
  *
  * Returns the number of the words in a string, sans HTML
  */
-function count_words($string)
+function bpost_count_words($string)
 {
-	return str_word_count(strip_tags($string));
+	if( function_exists( str_word_count ) )
+	{
+		return str_word_count(strip_tags($string));
+	}
+	
+	// TODO: alternative counting for PHP < 4.3
+	return 0;
 }
 
 ?>
