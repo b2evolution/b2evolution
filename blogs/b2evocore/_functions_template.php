@@ -74,15 +74,18 @@ function add_filter($tag, $function_to_add)
  * Functions to be called from the template
  */
 
-/*
+/**
  * single_month_title(-)
  *
  * fplanque: 0.8.3: changed defaults
+ *
+ * @param string prefix to display, default is 'Archives for: '
+ * @param string format to output, default 'htmlbody'
+ * @param boolean show the year as link to year's archive (in monthly mode)
  */
-function single_month_title( $prefix = '#', $display = 'htmlbody' )
+function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyeararchive = true )
 {
 	global $m, $w, $month;
-	global $single_month_title_linktoyeararchive;
 
 	if( $prefix == '#' ) $prefix = ' '.T_('Archives for').': ';
 
@@ -95,7 +98,7 @@ function single_month_title( $prefix = '#', $display = 'htmlbody' )
 			$my_month = '';
 		$my_day = substr($m,6,2);
 
-		if( $display == 'htmlbody' && !empty( $my_month ) && $single_month_title_linktoyeararchive )
+		if( $display == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
 		{ // display year as link to year's archive
 			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false ) . '">' . $my_year . '</a>';
 		}

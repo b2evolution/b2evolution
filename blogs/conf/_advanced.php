@@ -174,24 +174,6 @@ $cookie_expires = time() + 31536000;		// Default: one year from now
 $cookie_expired = time() - 86400;				// Default: 24 hours ago
 
 
-// ** Calendar settings **
-
-/**
- * Should the name of current month link to archive of that month?
- */
-$calendar_caption_linktomontharchive = 1;
-
-/**
- * enable switching the year in Calendar caption.
- */
-$calendar_caption_switchyears = 0;
-
-/**
- * display link to archive of year from title of monthly archives.
- */
-$single_month_title_linktoyeararchive = 1;
-
-
 // ** Location of the b2evolution subdirectories **
 
 /*

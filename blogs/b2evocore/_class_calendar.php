@@ -154,18 +154,22 @@ class Calendar
 		$this->$var = $value;
 	}
 
-	/*
+	/**
 	 * Calendar->display(-)
 	 *
-	 * display the calendar
+	 * display the calendar.
+	 *
+	 * @param string
+	 * @param string
+	 * @param boolean display current month as link to archive of that month?
+	 * @param boolean display links to previous/next year in caption
 	 */
-	function display( $file='', $params='' )	// Page to use for links
+	function display( $file = '', $params = '', $linktomontharchive = true, $switchyears = false )	// Page to use for links
 	{
 		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $weekday, $weekday_abbrev;
 		global $start_of_week;
-		global $calendar_caption_linktomontharchive, $calendar_caption_switchyears;
 
 		$end_of_week = (($start_of_week + 7) % 7);
 
@@ -246,7 +250,7 @@ class Calendar
 			archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
 			.'">&gt;</a>';
 		
-		if( $calendar_caption_switchyears )
+		if( $switchyears )
 		{ // create links to previous/next year
 			$previous_year_link = '<a href="'.
 				archive_link( $this->year - 1, $this->month, '', '', false, $file, $params )
@@ -268,12 +272,12 @@ class Calendar
 			echo isset( $previous_year_link ) ? $previous_year_link : '';
 			echo $previous_month_link;
 
-			if( $calendar_caption_linktomontharchive )
+			if( $linktomontharchive )
 			{	// chosen month with link to archives
 				echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'">';
 			}
 			echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
-			if( $calendar_caption_linktomontharchive )
+			if( $linktomontharchive )
 			{	// close link to month archive
 				echo '</a>';
 			}
