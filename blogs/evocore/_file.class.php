@@ -44,7 +44,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 /**
- * These are the filetypes. The extension is a regular expression that must match the end of the file.
+ * These are the filetypes.
+ * The extension is a regular expression that must match the end of the file.
+ *
+ * @todo Move it to some /conf file.
  */
 $fm_filetypes = array( // {{{
 	'\.ai' => T_('Adobe illustrator'),
@@ -139,21 +142,25 @@ class File extends DataObject
 	/**
 	 * We haven't checked for meta data yet
 	 */
-	var	$meta = 'unknown';
+	var $meta = 'unknown';
 
+	/**#@+
+	 * @access protected
+	 */
 	/**
 	 * Cached iconfile name
-	 * @todo why do we use underscores for these??
 	 */
 	var $_iconfilename = NULL;
 	var $_dir;
-	var	$_name;
+	var $_name;
 	var $_md5ID;
 	var $_exists;
 	var $_isDir;
 	var $_size;
 	var $_lastMod;
 	var $_perms;
+	/**#@-*/
+
 
 	/**
 	 * Constructor, not meant to be called directly. Use {@link getFile()}
@@ -179,10 +186,9 @@ class File extends DataObject
 		$this->refresh();
 
 		if( $meta )
-		{	// Try to load DB meta info:
+		{ // Try to load DB meta info:
 			$this->load_meta();
 		}
-
 	}
 
 
@@ -196,9 +202,10 @@ class File extends DataObject
 		global $DB, $Debuglog;
 
 		if( $this->meta == 'unknown' )
-		{	// We haven't tried loading yet:
-			if( $row = $DB->get_row( 'SELECT * FROM T_files WHERE file_path = '.$DB->quote($this->getPath()) ) )
-			{	// We found meta data
+		{ // We haven't tried loading yet:
+			if( $row = $DB->get_row( 'SELECT * FROM T_files
+																WHERE file_path = '.$DB->quote($this->getPath()) ) )
+			{ // We found meta data
 				$Debuglog->add('Loaded metadata for '.$this->getPath());
 				$this->meta = 'loaded';
 				$this->ID = $row->file_ID;
@@ -227,14 +234,18 @@ class File extends DataObject
 	function create( $type = 'file', $chmod = NULL )
 	{
 		if( $type == 'dir' )
-		{	// Create an empty directory:
-			// TODO: this is GEEKY unreadable code!!
-			$r = $chmod === NULL ?
-						@mkdir( $this->_dir.$this->_name ) :
-						@mkdir( $this->_dir.$this->_name, octdec($chmod) );
+		{ // Create an empty directory:
+			if( $chmod === NULL )
+			{
+				$r = @mkdir( $this->_dir.$this->_name );
+			}
+			else
+			{
+				$r = @mkdir( $this->_dir.$this->_name, octdec($chmod) );
+			}
 		}
 		else
-		{	// Create an empty file:
+		{ // Create an empty file:
 			$r = touch( $this->_dir.$this->_name );
 			if( $chmod !== NULL )
 			{
@@ -243,7 +254,7 @@ class File extends DataObject
 		}
 
 		if( $r )
-		{	// Get/Memorize detailed file info:
+		{ // Get/Memorize detailed file info:
 			$this->refresh();
 		}
 
@@ -346,6 +357,7 @@ class File extends DataObject
 		}
 	}
 
+
 	/**
 	 * Get the File's directory.
 	 *
@@ -388,6 +400,7 @@ class File extends DataObject
 		}
 	}
 
+
 	/**
 	 * Get the file type as a descriptive string.
 	 */
@@ -396,7 +409,7 @@ class File extends DataObject
 		global $fm_filetypes;
 
 		if( isset( $this->_type ) )
-		{	// The type is already cached for this object:
+		{ // The type is already cached for this object:
 			return $this->_type;
 		}
 
@@ -648,10 +661,10 @@ class File extends DataObject
 			return false;
 		}
 
- 		$this->_exists = false;
+		$this->_exists = false;
 
- 		// Check if there is meta data to be removed:
- 		if( $this->load_meta() )
+		// Check if there is meta data to be removed:
+		if( $this->load_meta() )
 		{ // remove meta data from DB:
 			$this->dbdelete();
 		}
@@ -688,6 +701,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2005/01/16 18:32:27  blueyed
+ * doc, whitespace
+ *
  * Revision 1.15  2005/01/15 20:20:51  blueyed
  * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to getIcon())
  *
