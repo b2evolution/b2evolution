@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2003-09-04 02:40+0200\n"
-"PO-Revision-Date: 2003-09-06 21:43+0100\n"
+"PO-Revision-Date: 2003-09-06 23:00+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -977,7 +977,7 @@ msgstr "Mission achevée; message supprimé."
 
 #: ..\..\..\admin\b2mail.php:275
 msgid "Level 0 users can't post."
-msgstr "Les utilisateur de niveau 0 ne peuvent pas publier."
+msgstr "Les utilisateurs de niveau 0 ne peuvent pas publier."
 
 #: ..\..\..\admin\b2mail.php:294
 msgid "End."

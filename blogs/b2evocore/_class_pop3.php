@@ -31,17 +31,17 @@ class POP3 {
 
     var $MAILSERVER = '';       // Set this to hard code the server name
 
-    var $DEBUG      = FALSE;    // set to true to echo pop3
+    var $DEBUG      = false;    // set to true to echo pop3
                                 // commands and responses to error_log
                                 // this WILL log passwords!
 
     var $BANNER     = '';       //  Holds the banner returned by the
                                 //  pop server - used for apop()
 
-    var $RFC1939    = TRUE;     //  Set by noop(). See rfc1939.txt
+    var $RFC1939    = true;     //  Set by noop(). See rfc1939.txt
                                 //
 
-    var $ALLOWAPOP  = FASLE;    //  Allow or disallow apop()
+    var $ALLOWAPOP  = false;    //  Allow or disallow apop()
                                 //  This must be set to true
                                 //  manually
 
@@ -67,7 +67,8 @@ class POP3 {
         return true;
     }
 
-    function connect ($server, $port = 110)  {
+    function connect ($server, $port = 110)  
+		{
         //  Opens a socket to the specified server. Unless overridden,
         //  port defaults to 110. Returns true on success, false on fail
 

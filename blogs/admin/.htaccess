@@ -5,12 +5,17 @@
 DirectoryIndex b2edit.php
 
 
-# edit_actions is the only file performing long operations
+# edit_actions is performing long operations
 # having gzip encoding here would prevent progressive output
 # so we want to deactivate this
 # NOTE: We still have to configure sending in smaller chunks!
 # Anyone know how to do this?? :)
 <Files edit_actions.php>
+	<IfModule mod_gzip.c>
+		mod_gzip_on                   No
+	</IfModule>
+</Files>
+<Files b2mail.php>
 	<IfModule mod_gzip.c>
 		mod_gzip_on                   No
 	</IfModule>

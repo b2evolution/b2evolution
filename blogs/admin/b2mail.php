@@ -3,6 +3,7 @@
  * pop3-2-b2 mail to blog
  * v0.3 20020716
  */
+$output_debugging_info = 0;		# =1 if you want to output debugging info
  
 require_once(dirname(__FILE__).'/../conf/b2evo_config.php');
 require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
@@ -15,10 +16,6 @@ require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
 dbconnect();
 timer_start();
 
-
-$output_debugging_info = 0;		# =1 if you want to output debugging info
-
-
 $autobr = get_settings('AutoBR');
 $time_difference = get_settings('time_difference');
 
@@ -27,7 +24,7 @@ if ($use_phoneemail) {
 	$time_difference = 0;
 }
 
-error_reporting(2037);
+// error_reporting(2037);
 
 
 
@@ -96,11 +93,13 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 					$subject = explode($phoneemail_separator, $subject);
 					$subject = trim($subject[0]);
 				}
-				if (!ereg($subjectprefix, $subject)) {
+				if (!ereg($subjectprefix, $subject)) 
+				{
 					continue;
 				}
 			}
-			if (preg_match('/Date: /', $line)) { // of the form '20 Mar 2002 20:32:37'
+			if (preg_match('/Date: /', $line))
+			{ // of the form '20 Mar 2002 20:32:37'
 				$ddate = trim($line);
 				$ddate = str_replace('Date: ', '', $ddate);
 				if (strpos($ddate, ',')) {
@@ -193,23 +192,23 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 
 	$blah = explode(':', $userpassstring);
-	$user_login = $blah[0];
-	$user_pass = $blah[1];
+	$user_login = trim($blah[0]);
+	$user_pass = trim($blah[1]);
 
 	$content = $contentfirstline.str_replace($firstline, '', $content);
 	$content = trim($content);
 
 	echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
 
-	if(!user_pass_ok($user_login,$user_pass)) 
+	if(!user_pass_ok( $user_login, $user_pass )) 
 	{
 		echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
 		continue;
 	}
 
-	$row = mysql_fetch_object($result);
-	$user_level = $row->user_level;
-	$post_author = $row->ID;
+	$userdata = get_userdatabylogin($user_login);
+	$user_level = $userdata['user_level'];
+	$post_author = $userdata['ID'];
 
 	if ($user_level > 0) 
 	{
@@ -283,13 +282,16 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 }
 
-if ($output_debugging_info) {
+if ($output_debugging_info) 
+{
 	ob_end_flush();
-} else {
+}
+else
+{
 	ob_end_clean();
 }
 
-echo T_('End.'), "<br />\n";
+echo T_('OK.'), "<br />\n";
 
 $pop3->quit();
 
