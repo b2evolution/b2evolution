@@ -53,7 +53,16 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class Log
 {
+	/**
+	 * The stored messages (by level).
+	 * @var array
+	 */
 	var $messages = array();
+
+	/**
+	 * Default level for messages.
+	 * @var string
+	 */
 	var $defaultlevel = 'error';
 
 	/**
@@ -70,6 +79,11 @@ class Log
 	 * @var boolean Should {@link add()} automatically output the messages?
 	 */
 	var $dumpAdds = false;
+
+	/**
+	 * @var array Cache for {@link count()}
+	 */
+	var $_count = array();
 
 
 	/**
@@ -96,6 +110,7 @@ class Log
 		if( $level == 'all' )
 		{
 			unset( $this->messages );
+			$this->_count = array();
 		}
 		else
 		{
@@ -104,6 +119,8 @@ class Log
 				$level = $this->defaultlevel;
 			}
 			unset( $this->messages[ $level ] );
+			unset( $this->_count[$level] );
+			unset( $this->_count['all'] );
 		}
 	}
 
@@ -123,6 +140,12 @@ class Log
 		}
 
 		$this->messages[ $level ][] = $message;
+
+		if( empty($this->_count[$level]) )
+		{
+			$this->_count[$level] = 0;
+		}
+		$this->_count[$level]++;
 
 
 		if( $this->dumpAdds || $dumpThis )
@@ -213,8 +236,12 @@ class Log
 	 * @param mixed the outer div, see {@link display()}
 	 * @param mixed the css class for inner paragraphs
 	 */
-	function displayParagraphs( $level = NULL, $outerdivclass = 'panelinfo', $cssclass = false )
+	function displayParagraphs( $level = NULL, $outerdivclass = 'panelinfo', $cssclass = NULL )
 	{
+		if( is_null($cssclass) )
+		{
+			$cssclass = array( 'all' => array( 'divClass' => false ) );
+		}
 		return $this->display( '', '', true, $level, $cssclass, 'p', $outerdivclass );
 	}
 
@@ -256,34 +283,43 @@ class Log
 	{
 		if( is_null( $head ) )
 		{ // Use object default:
-			$head = $this->head;
+			$head = isset( $this->head ) ? $this->head : '';
 		}
 		if( is_null( $foot ) )
 		{ // Use object default:
-			$foot = $this->foot;
+			$foot = isset( $this->foot ) ? $this->foot : '';
 		}
-
-		if( $level === NULL )
+		if( is_null( $level ) )
 		{
-			$level = isset( $this->defaultlevel ) ?
-								$this->defaultlevel :
-								'error';
+			$level = isset( $this->defaultlevel ) ? $this->defaultlevel : 'error';
 		}
 		if( !is_bool($display) )
-		{
+		{ // We have just a string - static use case
 			$messages = array( $level => array($display) );
+		}
+		elseif( !$this->count( $level ) )
+		{ // no messages
+			return false;
 		}
 		else
 		{
-			$messages =& $this->getMessages( $level );
+			$messages = $this->getMessages( $level );
 		}
 
-		if( !count($messages) )
+		if( !is_array($cssclass) )
 		{
-			return false;
+			$cssclass = array( 'all' => array( 'class' => is_null($cssclass)
+																											? NULL
+																											: $cssclass,
+																					'divClass' => true ) );
 		}
-		$disp = '';
+		elseif( !isset($cssclass['all']) )
+		{
+			$cssclass['all'] = array( 'class' => NULL, 'divClass' => true );
+		}
 
+
+		$disp = '';
 
 		if( $outerdivclass )
 		{
@@ -292,14 +328,24 @@ class Log
 
 		$disp .= Log::getHeadFoot( $head, 'container', '<h2>%s</h2>' );
 
+
 		foreach( $messages as $llevel => $lmessages )
 		{
-			$lcssclass = ( $cssclass === NULL ? 'log_'.$llevel : $cssclass );
+			$lcssclass = isset($cssclass[$llevel]) ? $cssclass[$llevel] : $cssclass['all'];
+			if( !isset($lcssclass['class']) || is_null($lcssclass['class']) )
+			{
+				$lcssclass['class'] = 'log_'.$llevel;
+			}
+			if( !isset($lcssclass['divClass']) || is_null($lcssclass['divClass']) || $lcssclass['divClass'] === true )
+			{
+				$lcssclass['divClass'] = $lcssclass['class'];
+			}
+
 
 			$disp .= "\n";
-			if( $lcssclass )
+			if( $lcssclass['divClass'] )
 			{
-				$disp .= "\t<div class=\"$lcssclass\">";
+				$disp .= "\t<div class=\"{$lcssclass['divClass']}\">";
 			}
 
 			$disp .= Log::getHeadFoot( $head, $llevel, '<h3>%s</h3>' );
@@ -312,20 +358,20 @@ class Log
 			// implode messages
 			if( $style == 'ul' )
 			{
-				$disp .= "\t<ul".( $lcssclass ? " class=\"$lcssclass\"" : '' ).'><li>'
+				$disp .= "\t<ul".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'><li>'
 							.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
 			}
 			elseif( $style == 'p' )
 			{
-				$disp .= "\t<p".( $lcssclass ? " class=\"$lcssclass\"" : '' ).'>'
-							.implode( "</p>\n<p class=\"$lcssclass\">", $lmessages )."</p>\n";
+				$disp .= "\t<p".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'>'
+							.implode( "</p>\n<p class=\"{$lcssclass['class']}\">", $lmessages )."</p>\n";
 			}
 			else
 			{
 				$disp .= "\t".implode( "\n<br />\t", $lmessages );
 			}
 			$disp .= Log::getHeadFoot( $foot, $llevel, "\n<p>%s</p>" );
-			if( $lcssclass )
+			if( $lcssclass['divClass'] )
 			{
 				$disp .= "\t</div>\n";
 			}
@@ -430,6 +476,23 @@ class Log
 	 */
 	function count( $level = NULL )
 	{
+		if( is_null($level) )
+		{
+			$level = $this->defaultlevel;
+		}
+		if( is_string($level) )
+		{
+			if( empty( $this->_count[$level] ) )
+			{
+				$this->_count[$level] = count( $this->getMessages( $level, true ) );
+			}
+			if( $level != 'all' )
+			{
+				unset($this->_count['all']);
+			}
+			return $this->_count[$level];
+		}
+
 		return count( $this->getMessages( $level, true ) );
 	}
 
@@ -450,7 +513,7 @@ class Log
 	{
 		$messages = array();
 
-		if( $level === NULL )
+		if( is_null($level) )
 		{
 			$level = $this->defaultlevel;
 		}
@@ -475,21 +538,21 @@ class Log
 				sort($level);
 				continue;
 			}
-			if( in_array($llevel, $levelsDone ) )
+			if( in_array( $llevel, $levelsDone ) )
 			{
 				continue;
 			}
 			$levelsDone[] = $llevel;
 
 
-			if( !isset($this->messages[$llevel]) || !count($this->messages[$llevel]) )
-			{
+			if( !isset($this->messages[$llevel][0]) )
+			{ // no messages
 				continue;
 			}
 
 			if( $singleDimension )
 			{
-				$messages += $this->messages[$llevel];
+				$messages = array_merge( $messages, $this->messages[$llevel] );
 			}
 			else
 			{
@@ -503,6 +566,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/22 02:27:51  blueyed
+ * refactoring, optimized, fix for getMessages( plain )
+ *
  * Revision 1.11  2005/02/21 00:34:34  blueyed
  * check for defined DB_USER!
  *
