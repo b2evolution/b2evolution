@@ -907,10 +907,6 @@ class Form extends Widget
 		{ //a name has been specified
 			$r .= ' name="'.$options[1].'" ';
 		}
-		else
-		{
-			$r .= ' name="submit" ';
-		}
 
 		if( !empty($options[2]) )
 		{ //a value has been specified
