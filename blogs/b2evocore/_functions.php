@@ -818,11 +818,13 @@ function remove_magic_quotes( $mixed )
  * - object
  * - null
  * - html (does nothing)
+ * - '' (does nothing)
+ * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
  * @param boolean Override if variable already set
  * @param boolean Force setting of variable to default?
- * @return mixed Final value of Variable, or false if we don't force setting and and did not set
+ * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
 function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 {
@@ -872,7 +874,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 	}
 
 	// type will be forced even if it was set before and not overriden
-	if( !empty($type) )
+	if( !empty($type) && $$var !== NULL )
 	{ // Force the type
 		// echo "forcing type!";
 		switch( $type )
@@ -1412,6 +1414,21 @@ function traperror( $reset = 1 )
 	else
 	{
 		$iERRORES++;
+	}
+}
+
+
+/**
+ * if first parameter evaluates to true printf() gets called using the first parameter
+ * as args and the second parameter as print-pattern
+ * @param mixed variable to test and print eventually
+ * @param string printf-pattern to use (including %s etc to refer to the first param
+ */
+function disp_cond( $var, $disp )
+{
+	if( $var )
+	{
+		printf( $disp, $var );
 	}
 }
 ?>
