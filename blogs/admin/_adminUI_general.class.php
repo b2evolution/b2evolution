@@ -150,6 +150,7 @@ class AdminUI_general
 	 *
 	 * @todo Use BlogCache(?)
 	 * @todo Use a template (i wanna make an UL/LI/A list structure in newer skins)
+	 * @todo maybe rename to getHtmlCollectionList
 	 *
 	 * @param string name of required permission needed to display the blog in the list
  	 * @param string level of required permission needed to display the blog in the list
@@ -164,13 +165,17 @@ class AdminUI_general
 	{
 		global $current_User, $blog;
 
-		$html = '';
+		$template = $this->getMenuTemplate( 'CollectionList' );
+
+		$r = $template['before'];
 
 		if( !is_null($all_title) )
-		{
-			$html .= '<a href="'.$all_url
+		{	// We want to add an "all" button
+			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= '<a href="'.$all_url
 						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
 						.$all_title.'</a> ';
+			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
 		for( $curr_blog_ID = blog_list_start();
@@ -182,7 +187,9 @@ class AdminUI_general
 				continue;
 			}
 
-			$html .= '<a href="'.sprintf( $url_format, $curr_blog_ID )
+			$r .= $template[ $curr_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
+
+			$r .= '<a href="'.sprintf( $url_format, $curr_blog_ID )
 						.'" class="'.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
 
 			if( ! is_null($onclick) )
@@ -190,10 +197,14 @@ class AdminUI_general
 				$html .= ' onclick="'.sprintf( $onclick, $curr_blog_ID ).'"';
 			}
 
-			$html .= '>'.blog_list_iteminfo( 'shortname', false ).'</a> ';
+			$r .= '>'.blog_list_iteminfo( 'shortname', false ).'</a> ';
+
+			$r .= $template[ $curr_blog_ID == $blog ? 'afterEachSel' : 'afterEach' ];
 		}
 
-		return $html;
+		$r .= $template['after'];
+
+		return $r;
 	}
 
 
@@ -373,10 +384,16 @@ class AdminUI_general
 
 	/**
 	 * Get a template by name and depth.
+	 *
+	 * Templates can handle multiple depth levels
+	 *
 	 * This is a method (and not a member array) to allow dynamic generation.
+	 * fp>>I'm not so sure about this... feels a little bloated... gotta think about it..
+	 *
+	 * @todo fp>>daniel does this work for menus only? Can we generalize it to getTemplate?
 	 *
 	 * @param string Name of the template ('main', 'sub')
-	 * @param YEAH, WHAT????
+	 * @param integer nesting level (start at 0)
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
 	function getMenuTemplate( $name, $depth = 0 )
@@ -406,7 +423,7 @@ class AdminUI_general
 												);
 
 					default:
-						// What the fck ???
+						// any sublevel
 						return array( 'before' => '<ul class="submenu">',
 													'after' => '</ul>',
 													'beforeEach' => '<li>',
@@ -437,8 +454,28 @@ class AdminUI_general
 						'afterEachSel' => '</li>',
 					);
 
+			case 'CollectionList':
+				// fp>>daniel: is it a bad idea to put this here??
+				return array(
+						'before' => '',
+						'after' => '',
+						'beforeEach' => '',
+						'afterEach' => '',
+						'beforeEachSel' => '',
+						'afterEachSel' => '',
+					);
+				// fp>> I'll use the following as soon as I have time to play with the CSS:
+				return array(
+						'before' => '<ul class="submenu">',
+						'after' => '</ul>',
+						'beforeEach' => '<li>',
+						'afterEach' => '</li>',
+						'beforeEachSel' => '<li class="current">',
+						'afterEachSel' => '</li>',
+					);
+
 			default:
-				die( 'Unknown $name for AdminUI::getMenuTemplate(): '.var_export($name, true) );
+				die( 'Unknown $name for AdminUI::getMenuTemplate(): '.var_export($name, true) /* PHP 4.2 ! */ );
 		}
 	}
 
