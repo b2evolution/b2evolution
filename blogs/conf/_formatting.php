@@ -403,16 +403,11 @@ $comments_allowed_uri_scheme = array
 );
 
 
-#Translation of HTML entities and special characters
-$b2_htmltrans = array_flip(get_html_translation_table(HTML_ENTITIES));
-$b2_htmltrans['<'] = '<';	# preserve HTML
-$b2_htmltrans['>'] = '>';	# preserve HTML
-
-$b2_htmltransbis = array(
-	'&#8211;' => ' ', '&#8212;' => ' ', '&#8216;' => ' ', '&#8217;' => ' ',
-	'&#8220;' => ' ', '&#8221;' => ' ', '&#8226;' => ' ', '&#8364;' => ' ',
-	'&lt;' => '&#60;',	# preserve fake HTML
-	'&gt;' => '&#62;',	# preserve fake HTML
+# Translation of HTML entities and special characters
+$b2_htmltrans = array(
+	// '&#8211;' => ' ', '&#8212;' => ' ', '&#8216;' => ' ', '&#8217;' => ' ',
+	// '&#8220;' => ' ', '&#8221;' => ' ', '&#8226;' => ' ', '&#8364;' => ' ',
+	'&lt;' => '&#60;',	'&gt;' => '&#62;',
 	'&sp;' => '&#32;', '&excl;' => '&#33;', '&quot;' => '&#34;', '&num;' => '&#35;', 
 	'&dollar;' =>  '&#36;', '&percnt;' => '&#37;', '&amp;' => '&#38;', '&apos;' => '&#39;', 
 	'&lpar;' => '&#40;', '&rpar;' => '&#41;',
@@ -507,11 +502,11 @@ $b2_htmltransbis = array(
 	'&rang;' => '&#9002;', '&loz;' => '&#9674;', '&spades;' => '&#9824;', '&clubs;' => '&#9827;', 
 	'&hearts;' => '&#9829;', '&diams;' => '&#9830;'
 );
-$b2_htmltrans = array_merge($b2_htmltrans,$b2_htmltransbis);
 
 # Translation of invalid Unicode references range to valid range
 # these are Windows CP1252 specific characters
 # they would look weird on non-Windows browsers
+# if you've ever pasted text from MSWord, you'll understand
 $b2_htmltranswinuni = array(
 	'&#128;' => '&#8364;', // the Euro sign
 	'&#130;' => '&#8218;', 

@@ -943,9 +943,6 @@ function bloggergetrecentposts($m)
 			$content .= "<category>".$postdata["Category"]."</category>";
 			$content .= $postdata["Content"];
 
-#			$content = convert_chars($content,"html");
-#			$content = $postdata["Title"];
-
 			$authordata = get_userdata($postdata["Author_ID"]);
 			switch($authordata['user_idmode']) 
 			{
@@ -1344,15 +1341,16 @@ function pingback_ping($m)
 
 				preg_match('|<title>([^<]*?)</title>|is', $linea, $matchtitle);
 
-				$linea = convert_chars( $linea, 'html' );		// warning: this also removes title!
+				// You never know what kind of crap you may have gotten on the web...
+				$linea = convert_chars( $linea, 'html' );
 
 				$pagelinkedto = convert_chars( $pagelinkedto, 'html' );
 				$linea = strip_all_but_one_link($linea, $pagelinkedto, $log);
 				// fplanque: removed $linea = preg_replace('#&([^amp\;])#is', '&amp;$1', $linea);
 				
-				debug_fwrite($log, 'SECOND SEARCH '.convert_chars($pagelinkedto).' in text block #####'.$linea."####\n\n");
-				$pos2 = strpos($linea, convert_chars($pagelinkedto));
-				$pos3 = strpos($linea, str_replace('http://www.', 'http://', convert_chars($pagelinkedto)));
+				debug_fwrite($log, 'SECOND SEARCH '.$pagelinkedto.' in text block #####'.$linea."####\n\n");
+				$pos2 = strpos($linea, $pagelinkedto);
+				$pos3 = strpos($linea, str_replace('http://www.', 'http://', $pagelinkedto));
 				if (is_integer($pos2) || is_integer($pos3))
 				{
 					debug_fwrite($log, 'The page really links to us :)'."\n");

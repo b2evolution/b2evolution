@@ -424,7 +424,7 @@ function comment_text()
 
 	if( $use_textile ) $comment = textile( $comment );
 
-	$comment = format_to_output( $comment, 'htmlbody' );
+	$comment = format_to_output( $comment, 'htmlcontent' );
 	echo $comment;
 }
 

@@ -544,7 +544,7 @@ function the_title(
 	$before='',						// HTML/text to be displayed before title
 	$after='', 						// HTML/text to be displayed after title
 	$add_link = true, 		// Added link to this title?
-	$format = 'htmlbody',	// Format to use (example: "htmlbody" or "xml")
+	$format = 'htmlrendered',	// Format to use (example: "htmlbody" or "xml")
 	$disp = true )				// Display output?
 {
 	global $postdata;
@@ -641,7 +641,7 @@ function the_content(
 	$more_anchor='#',
 	$before_more_link = '#',
 	$after_more_link = '#',
-	$format = 'htmlbody',
+	$format = 'htmlcontent',
 	$cut = 0,
 	$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
 	$disppage = '#' ) // page number to display specific page, # for url parameter

@@ -66,21 +66,23 @@ function mysql_oops($sql_query)
 
 
 /**
- * Format the content for being output
+ * Format a string/content for being output
  *
  * {@internal format_to_output(-) }}
  *
  * @author fplanque
  * @param string raw text
  * @param string format, can be one of the following
- * - raw: does nothing
- * - formvalue
- * - htmlbody
- * - htmlhead,
- * - htmlattr
- * - xml
- * - xmlattr
- * - entityencoded,
+ * - raw: do nothing
+ * - htmlcontent: content displayed in HTML page body: apply renders and allow full HTML
+ * - htmlrendered: idem
+ * - entityencoded: Special mode for RSS 0.92: apply renders and allow full HTML but escape it
+ * - htmlbody: display in HTML page body: allow full HTML
+ * - htmlhead: strips out HTML (mainly for use in Title)
+ * - htmlattr: use as an attribute: strips tags and escapes quotes
+ * - formvalue: use as a form value: escapes quotes and < > but leaves code alone
+ * - xml: use in an XML file: strip HTML tags
+ * - xmlattr: use as an attribute: strips tags and escapes quotes
  * @return string formatted text
  */
 function format_to_output( $content, $format = 'htmlbody' )
@@ -92,70 +94,73 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// do nothing!
 			break;
 
-		case 'formvalue':
-			// convert_chars() do too much at this time,
-			// so temporally commented out.
-			// $content = convert_chars($content, 'html');
-			$content = htmlspecialchars( $content );
-			break;
-
-		case 'xml':
-			// Remove the markup:
-			// echo 'xml';
+		case 'htmlcontent':
+		case 'htmlrendered':
+			// content displayed in HTML page body: apply renders and allow full HTML
 			convert_bbcode($content);
-			$content = strip_tags($content);
-
-			$content = convert_chars($content, 'xml');
-			break;
-
-		case 'htmlhead':
-			// Remove the markup:
-			convert_bbcode($content);
-			$content = strip_tags($content);
-
+			convert_gmcode($content);
+			$content = make_clickable($content);
+			convert_smilies($content);
+			phpcurlme( $content );
 			$content = convert_chars($content, 'html');
-			break;
-
-		case 'xmlattr':
-			// Remove the markup:
-			convert_bbcode($content);
-			$content = strip_tags($content);
-
-			$content = convert_chars($content, 'xml');
-			$content = str_replace('"', '&quot;', $content );
-			break;
-
-		case 'htmlattr':
-			// Remove the markup:
-			convert_bbcode($content);
-			$content = strip_tags($content);
-
-			$content = convert_chars($content, 'html');
-			$content = str_replace('"', '&quot;', $content );
 			break;
 
 		case 'entityencoded':
+			// Special mode for RSS 0.92: apply renders and allow full HTML but escape it
 			convert_bbcode($content);
 			convert_gmcode($content);
 			$content = make_clickable($content);
 			convert_smilies($content);
-			$content = convert_chars($content, 'html');
 			phpcurlme( $content );
+			$content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
 			break;
-
+			
 		case 'htmlbody':
-		default:
-			// echo 'html';
-			convert_bbcode($content);
-			convert_gmcode($content);
-			$content = make_clickable($content);
-			convert_smilies($content);
+			// display in HTML page body: allow full HTML
 			$content = convert_chars($content, 'html');
-			phpcurlme( $content );
-	}
+			break;
 
-	// echo 'formated:', $content;
+		case 'htmlhead':
+			// strips out HTML (mainly for use in Title)
+			$content = strip_tags($content);
+			$content = convert_chars($content, 'html');
+			break;
+
+		case 'htmlattr':
+			// use as an attribute: strips tags and escapes quotes
+			$content = strip_tags($content);
+			$content = convert_chars($content, 'html');
+			$content = str_replace('"', '&quot;', $content );
+			$content = str_replace("'", '&#039;', $content );
+			break;
+
+		case 'formvalue':
+			// use as a form value: escapes quotes and < > but leaves code alone
+			$content = htmlspecialchars( $content );
+			$content = str_replace('"', '&quot;', $content );
+			$content = str_replace("'", '&#039;', $content );
+			$content = str_replace('<', '&lt;', $content );
+			$content = str_replace(">", '&gt;', $content );
+			break;
+
+		case 'xml':
+			// use in an XML file: strip HTML tags
+			$content = strip_tags($content);
+			$content = convert_chars($content, 'xml');
+			break;
+
+		case 'xmlattr':
+			// use as an attribute: strips tags and escapes quotes
+			$content = strip_tags($content);
+			$content = convert_chars($content, 'xml');
+			$content = str_replace('"', '&quot;', $content );
+			$content = str_replace("'", '&#039;', $content );
+			break;
+
+		default:
+			die( 'Output format ['.$format.'] not supported.' );
+	}
 
 	return $content;
 }
@@ -269,41 +274,35 @@ function unautobrize($content)
 /*
  * zeroise(-)
  */
-function zeroise($number,$threshold) { // function to add leading zeros when necessary
+function zeroise($number,$threshold) 
+{ // function to add leading zeros when necessary
 	$l=strlen($number);
 	if ($l<$threshold)
 		for ($i=0; $i<($threshold-$l); $i=$i+1) { $number='0'.$number;	}
 	return($number);
-	}
-
-/*
- * backslashit(-)
- */
-function backslashit($string) {
-	$string = preg_replace('/([a-z])/i', '\\\\\1', $string);
-	return $string;
 }
 
 
+
 /*
- * convert_chars(-)
+ * Convert all non ASCII chars (except if UTF-8) to &#nnnn; unicode references.
+ * Also convert entities to &#nnnn; unicode references if output is not HTML (eg XML)
  *
- * Convert special chars
+ * Preserves < > and quotes.
+ *
+ * {@internal convert_chars(-)}}
  *
  * fplanque: simplified
  * sakichan: pregs instead of loop
  */
 function convert_chars( $content, $flag='html' )
 {
-	$newcontent = "";
-
 	global $b2_htmltrans, $b2_htmltranswinuni;
 
-	$content = preg_replace("/<title>(.+?)<\/title>/","",$content);
-	$content = preg_replace("/<category>(.+?)<\/category>/","",$content);
+	// $content = preg_replace("/<title>(.+?)<\/title>/","",$content);
+	// $content = preg_replace("/<category>(.+?)<\/category>/","",$content);
 
-	$content = strtr($content, $b2_htmltrans);
-
+	// Convert highbyte non ASCII/UTF-8 chars to urefs:
 	if (locale_charset(false) != 'utf-8')
 	{	// This is a single byte charset
 		$content = preg_replace_callback(
@@ -312,24 +311,24 @@ function convert_chars( $content, $flag='html' )
 			$content);
 	}
 
-	if ($flag == "html")
-	{
-		$newcontent = preg_replace('/&(?!#)/', '&amp;', $content);
+	// Convert Windows CP1252 => Unicode (valid HTML)
+	$content = strtr( $content, $b2_htmltranswinuni);
+
+	if( $flag == 'html' )
+	{ // we can use entities
+		// Convert & chars that are not used in an entity
+		$content = preg_replace('/&(?![#A-Za-z0-9]{2,20};)/', '&amp;', $content);
 	}
 	else
 	{	// unicode, xml...
-		$newcontent = preg_replace('/&(?!#)/', '&#38;', $content);
+		// Convert & chars that are not used in an entity
+		$content = preg_replace('/&(?![#A-Za-z0-9]{2,20};)/', '&#38;', $content);
+
+		// Convert HTML entities to urefs:
+		$content = strtr($content, $b2_htmltrans);
 	}
 
-	// now converting: Windows CP1252 => Unicode (valid HTML)
-	// (if you've ever pasted text from MSWord, you'll understand)
-	$newcontent = strtr($newcontent, $b2_htmltranswinuni);
-
-	// you can delete these 2 lines if you don't like <br /> and <hr />
-	$newcontent = str_replace("<br>","<br />",$newcontent);
-	$newcontent = str_replace("<hr>","<hr />",$newcontent);
-
-	return($newcontent);
+	return( $content );
 }
 
 /*
@@ -1251,10 +1250,9 @@ function validate_url( $url, & $allowed_uri_scheme )
  * {@internal pre_dump(-) }}
  *
  * @author blueyed
+ *
  * @param mixed variable to dump
  * @param string title to display
- * @return -
- *
  */
 function pre_dump($dump, $title = '')
 {

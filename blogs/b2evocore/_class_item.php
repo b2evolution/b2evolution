@@ -395,7 +395,7 @@ class Item extends DataObject
 		$more_anchor = '#', 
 		$before_more = '#', 
 		$after_more = '#', 
-		$format = 'htmlbody', 
+		$format = 'htmlcontent', 
 		$cut = 0,
 		$stripteaser = false, 
 		$more_file = ''
@@ -647,7 +647,7 @@ class Item extends DataObject
 		$before='',						// HTML/text to be displayed before title
 		$after='', 						// HTML/text to be displayed after title
 		$add_link = true, 		// Added link to this title?
-		$format = 'htmlbody' ) 
+		$format = 'htmlrendered' ) 
 	{
 		if( empty($this->title) && $add_link )
 			$title = $this->url;

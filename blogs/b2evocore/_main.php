@@ -42,8 +42,13 @@ if( !isset($demo_mode) ) $demo_mode = 0;
 
 
 // register output buffer handler
-$debug = 0; // FOR TESTING ONLY - OBHANDLERTEST
-ob_start( 'obhandler' );
+//$debug = 0; // FOR TESTING ONLY - OBHANDLERTEST
+//ob_start( 'obhandler' );
+// PLEASE DON'T COMMIT TEST CODE INTO CVS :/
+if( $use_gzipcompression && extension_loaded('zlib') )
+{	// gzipping the output of the script
+	ob_start( 'ob_gzhandler' );
+}
 
 
 // Connecting to the db:
@@ -73,8 +78,5 @@ if( $error = veriflog( $login_required ) )
 }
 
 // Load hacks file if it exists
-if( file_exists( dirname(__FILE__) . '/../conf/hacks.php' ) )
-{
-	require_once( dirname(__FILE__) . '/../conf/hacks.php' );
-}
+@include_once( dirname(__FILE__) . '/../conf/hacks.php' );
 ?>

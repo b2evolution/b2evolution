@@ -219,7 +219,7 @@ class Comment extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function content( $format = 'htmlbody' ) 
+	function content( $format = 'htmlcontent' ) 
 	{
 		global $use_textile;
 	
