@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2004-03-21 01:47+0100\n"
-"PO-Revision-Date: 2004-03-21 16:13+0100\n"
+"PO-Revision-Date: 2004-03-22 15:08+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -582,7 +582,7 @@ msgstr "Rapporteer misbruik aan de centrale zwarte lijst!"
 
 #: ..\..\..\admin\b2antispam.php:185
 msgid "Request abuse update from centralized blacklist."
-msgstr "Vraag een misbruik update van de centrale zwarte lijst."
+msgstr "Vraag een update van de centrale zwarte lijst aan."
 
 #: ..\..\..\admin\b2antispam.php:192
 msgid "Add a banned keyword"
@@ -1224,11 +1224,11 @@ msgstr "Laatste directe bezoekers"
 
 #: ..\..\..\admin\b2stats.php:368
 msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
-msgstr "Dit zijn hits van mensen die direkt op dit weblog kwamen (waren het niet door de URL in te typen, of gebruik makend van een bookmark. Verkeerde (te korte) refererenden staan ook hier.)"
+msgstr "Dit zijn hits van mensen die direkt op dit weblog kwamen (door de URL in te typen, of gebruik makend van een bookmark. Verkeerde (te korte) refererenden staan ook hier.)"
 
 #: ..\..\..\admin\b2stats.php:398
 msgid "Top User Agents"
-msgstr "Top User Agents"
+msgstr "Meest gebruikte Browsers"
 
 #: ..\..\..\admin\b2template.php:11
 #: ..\..\..\admin\_menutop.php:92
@@ -1590,17 +1590,17 @@ msgstr "Kunnen plaatsen/bewerken met de volgende status:"
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:60
 msgid "Delete<br />posts"
-msgstr "Verwijderen<br /> artikelen"
+msgstr "Verwijderen<br />Artikelen"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:61
 msgid "Edit<br />comts"
-msgstr "Bewerk<br />reacties"
+msgstr "Bewerk<br />Reacties"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:62
 msgid "Edit<br />cats"
-msgstr "Bewerk<br />cats"
+msgstr "Bewerk<br />Categoriën"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:63
@@ -2269,19 +2269,19 @@ msgstr "Extern - Engels"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "INSerted [Alt-I]"
-msgstr "Cursief [Alt-I]"
+msgstr "Onderstrepen [Alt-I]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "DELeted [Alt-D]"
-msgstr "Verwijder [Alt-D]"
+msgstr "Doorhalen [Alt-D]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "STRong [Alt-S]"
-msgstr "Sterk [Alt-S]"
+msgstr "Vet [Alt-S]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "EMphasis [Alt-E]"
-msgstr "EMphasis [Alt-E]"
+msgstr "Cursief [Alt-E]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "CODE [Alt-C]"
@@ -2493,7 +2493,7 @@ msgstr "Registreer een nieuwe gebruiker..."
 
 #: ..\..\..\admin\_users_list.php:97
 msgid "To delete an user, bring his/her level to zero, then click on the red cross."
-msgstr "Om een gebruiker te verwijderen, berng zijn/haar level naar 0, en klik daarna op het rode kruis."
+msgstr "Om een gebruiker te verwijderen, breng zijn/haar level naar 0, en klik daarna op het rode kruis."
 
 #: ..\..\..\admin\_users_list.php:98
 msgid "deleting an user also deletes all posts made by this user."
