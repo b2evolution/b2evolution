@@ -425,80 +425,96 @@ function profile_title( $prefix = ' ', $display = 'htmlbody' )
 
 
 /**
- * Check profile parameters
+ * Check profile parameters and add errors to {@link $Messages}.
  *
- * @param string nickname (mandatory)
- * @param string ICQ UIN (must be a number)
- * @param string email address (mandatory, must be well formed)
- * @param string url (must be well formed, in allowed scheme, not blacklisted)
- * @param string password 1
- * @param string password 2
+ * @param array associative array
+ *              'nickname': is mandatory
+ *              'icq': must be a number
+ *              'email': mandatory, must be well formed
+ *              'url': must be well formed, in allowed scheme, not blacklisted
+ *              'pass1' / 'pass2': passwords (twice), must be the same
  */
-function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, $newuser_url,
-																$pass1, $pass2 )
+function profile_check_params( $params )
 {
 	global $Messages, $Settings;
+	global $comments_allowed_uri_scheme;
+
+
+	if( !is_array($params) )
+	{
+		$params = array( $params );
+	}
+
+	// checking login has been typed:
+	if( isset($params['login']) && empty($params['login']) )
+	{
+		$Messages->add( T_('Please enter a login.') );
+	}
 
 	// checking the nickname has been typed
-	if(empty($newuser_nickname))
+	if( isset($params['nickname']) && empty($params['nickname']) )
 	{
 		$Messages->add( T_('Please enter a nickname (can be the same as your login).') );
 	}
 
 	// if the ICQ UIN has been entered, check to see if it has only numbers
-	if(!empty($newuser_icq))
+	if( !empty($params['icq']) )
 	{
-		if(!ereg("^[0-9]+$", $newuser_icq))
+		if( !preg_match( '^[0-9]+$', $params['icq']) )
 		{
 			$Messages->add( T_('The ICQ UIN can only be a number, no letters allowed.') );
 		}
 	}
 
 	// checking e-mail address
-	if( empty($newuser_email) )
+	if( isset($params['email']) )
 	{
-		$Messages->add( T_('Please enter an e-mail address.') );
-	}
-	elseif( !is_email($newuser_email) )
-	{
-		$Messages->add( T_('The email address is invalid.') );
+		if( empty($params['email']) )
+		{
+			$Messages->add( T_('Please enter an e-mail address.') );
+		}
+		elseif( !is_email($params['email']) )
+		{
+			$Messages->add( T_('The email address is invalid.') );
+		}
 	}
 
 	// Checking URL:
-	if( $error = validate_url( $newuser_url, $comments_allowed_uri_scheme ) )
+	if( isset($params['url']) )
 	{
-		$Messages->add( T_('Supplied URL is invalid: ') . $error );
+		if( $error = validate_url( $params['url'], $comments_allowed_uri_scheme ) )
+		{
+			$Messages->add( T_('Supplied URL is invalid: ') . $error );
+		}
 	}
 
 	// Check passwords:
-	if( empty($pass1) )
+	if( isset($params['pass1']) )
 	{
-		if( !empty($pass2) )
+		// checking the password has been typed twice
+		if( empty($params['pass1']) || empty($params['pass2']) )
 		{
-			$Messages->add( T_('Please enter the new password twice.') );
+			$Messages->add( T_('Please enter your password twice.') );
 		}
-		$updatepassword = '';
-	}
-	else
-	{
-		if( empty($pass2) )
-		{
-			$Messages->add( T_('Please enter the new password twice.') );
-		}
-		elseif($pass1 != $pass2)
+
+		// checking the password has been typed twice the same:
+		if( $params['pass1'] != $params['pass2'] )
 		{
 			$Messages->add( T_('You typed two different passwords.') );
 		}
-		elseif( strlen($pass1) < $Settings->get('user_minpwdlen') )
+		elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
+						|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
 		{
-			$Messages->add( sprintf( T_('The mimimum password length is %d characters.'),
-																$Settings->get('user_minpwdlen')) );
+			$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
 		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/20 23:03:24  blueyed
+ * profile_check_params() enhanced
+ *
  * Revision 1.14  2005/02/19 18:20:47  blueyed
  * obsolete functions removed
  *

@@ -156,8 +156,12 @@ else switch ($action)
 		param( 'edited_user_pass2', 'string', true );
 
 		// Perfom check on parameters:
-		profile_check_params( $edited_user_nickname, $edited_user_icq, $edited_user_email, $edited_user_url,
-																$edited_user_pass1, $edited_user_pass2 );
+		profile_check_params( array( 'nickname' => $edited_user_nickname,
+																	'icq' => $edited_user_icq,
+																	'email' => $edited_user_email,
+																	'url' => $edited_user_url,
+																	'pass1' => $edited_user_pass1,
+																	'pass2' => $edited_user_pass2 ) );
 
 		$edited_User->set( 'login', $edited_user_login );
 		$edited_User->set( 'firstname', $edited_user_firstname );
@@ -179,7 +183,7 @@ else switch ($action)
 			$Messages->add( T_('Please enter a password.') );
 		}
 
-		if( !$Messages->count() )
+		if( !$Messages->count( 'error' ) )
 		{ // OK, no error.
 
 			if( !empty($edited_user_pass2) )
