@@ -84,7 +84,7 @@ class ItemList extends DataObjectList
 		$s = '',															// Search string
 		$sentence = '',												// Search for sentence or for words
 		$exact = '',													// Require exact match of title or contents
-		$preview = '',												// Is this preview
+		$preview = 0,													// Is this preview
 		$default_posts_per_page = '',
 		$init_what_to_show = '',
 		$timestamp_min = '',									// Do not show posts before this timestamp
@@ -449,14 +449,15 @@ class ItemList extends DataObjectList
 		// echo $where;
 
 		if ($preview)
-		{
-			$this->request = 'SELECT 0 AS ID'; // dummy mysql query for the preview
+		{	// PREVIEW MODE:
+			$this->request = $this->preview_request();
 		}
 
 		//echo $this->request;
 		$this->result_rows = $DB->get_results( $this->request );
 
 		$this->result_num_rows = $DB->num_rows;
+		// echo $this->result_num_rows, ' items';
 
 		// Make a list of posts for future queries!
 		// Also make arrays...
@@ -474,6 +475,80 @@ class ItemList extends DataObjectList
 
 		// Initialize loop stuff:
 		$this->restart();
+	}
+
+	// dummy mysql query for the preview
+	function preview_request()
+	{
+		// we need globals for the param function
+		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
+						$post_title, $post_url, $post_category, $post_autobr, $edit_date,
+						$aa, $mm, $jj, $hh, $mn, $ss;
+		global $DB, $localtimenow;
+
+		$id = 0;
+		param( 'preview_userid', 'integer', true );
+		param( 'post_status', 'string', true );
+		param( 'post_locale', 'string', true );
+		param( 'content', 'html', true );
+		param( 'post_title', 'html', true );
+		param( 'post_url', 'string', true );
+		param( 'post_category', 'integer', true );
+		param( 'post_autobr', 'integer', 0 );
+
+		$post_title = format_to_post( $post_title, 0 );
+		$content = format_to_post( $content, $post_autobr );
+
+		param( 'edit_date', 'integer', 0 );
+		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
+		{ // We use user date
+			param( 'aa', 'integer', 2000 );
+			param( 'mm', 'integer', 1 );
+			param( 'jj', 'integer', 1 );
+			param( 'hh', 'integer', 20 );
+			param( 'mn', 'integer', 30 );
+			param( 'ss', 'integer', 0 );
+			$jj = ($jj > 31) ? 31 : $jj;
+			$hh = ($hh > 23) ? $hh - 24 : $hh;
+			$mn = ($mn > 59) ? $mn - 60 : $mn;
+			$ss = ($ss > 59) ? $ss - 60 : $ss;
+			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
+		}
+		else
+		{ // We use current time
+			$post_date = date('Y-m-d H:i:s', $localtimenow);
+		}
+
+
+		if( $errcontent = errors_display( T_('Invalid post, please correct these errors:'), '', false ) )
+		{
+			$content = $errcontent;
+		}
+
+		// little funky fix for IEwin, rawk on that code
+		global $is_winIE;
+		if (($is_winIE) && (!isset($IEWin_bookmarklet_fix)))
+		{
+			$content =	preg_replace('/\%u([0-9A-F]{4,4})/e',	 "'&#'.base_convert('\\1',16,10). ';'", $content);
+		}
+
+		return "SELECT	
+										0 AS ID, 
+										$preview_userid AS post_author, 
+										'$post_date' AS post_issue_date,
+										'$post_date' AS post_mod_date,
+										'".$DB->escape($post_status)."' AS post_status,
+										'".$DB->escape($post_locale)."' AS post_locale, 
+										'".$DB->escape($content)."' AS post_content, 
+										'".$DB->escape($post_title)."' AS post_title,
+										NULL AS post_urltitle, 
+										'".$DB->escape($post_url)."' AS post_trackbacks, 
+										$post_category AS post_category,
+										$post_autobr AS post_autobr, 
+										'' AS post_flags, 
+										".bpost_count_words( $content )." AS post_wordcount, 
+										'open' AS post_comments,
+										0 AS post_karma";
 	}
 
 	/*
@@ -634,8 +709,8 @@ class ItemList extends DataObjectList
 	}
 
 
-	/*
-	 * ItemList->get_postdata(-)
+	/**
+	 * {@internal ItemList::get_postdata(-)}}
 	 *
 	 * Init postdata
 	 */
@@ -644,103 +719,29 @@ class ItemList extends DataObjectList
 		global $id, $postdata, $authordata, $day, $page, $pages, $multipage, $more, $numpages;
 		global $pagenow, $current_User;
 
-		if(!$this->preview)
-		{ // This is not preview:
-			// echo 'REAL POST';
-			$row = & $this->row;
-			$id = $row->ID;
-			if( empty($id) )
-			{
-				die('No post data available! 421');
-			}
-			// echo 'starting ',$row->post_title;
-			$postdata = array (
-				'ID' => $row->ID,
-				'Author_ID' => $row->post_author,
-				'Date' => $row->post_issue_date,
-				'Status' => $row->post_status,
-				'Locale' =>	 $row->post_locale,
-				'Content' => $row->post_content,
-				'Title' => $row->post_title,
-				'Url' => $row->post_trackbacks,
-				'Category' => $row->post_category,
-				'AutoBR' => $row->post_autobr,
-				'Flags' => explode( ',', $row->post_flags ),
-				'Wordcount' => $row->post_wordcount,
-				'comments' => $row->post_comments,
-				'Karma' => $row->post_karma // this isn't used yet
-				);
+		$row = & $this->row;
+		if( empty($row->post_issue_date) )
+		{
+			die('ItemList::get_postdata(-) => No post data available!');
 		}
-		else
-		{ // We are in preview mode!
-			// echo 'PREVIEW';
-			// we need globals for the param function
-			global $preview_userid, $preview_date, $post_status, $post_locale, $content,
-							$post_title, $post_url, $post_category, $post_autobr, $edit_date,
-							$aa, $mm, $jj, $hh, $mn, $ss, $localtimenow;
-
-			$id = 0;
-			param( 'preview_userid', 'integer', true );
-			param( 'post_status', 'string', true );
-			param( 'post_locale', 'string', true );
-			param( 'content', 'html', true );
-			param( 'post_title', 'html', true );
-			param( 'post_url', 'string', true );
-			param( 'post_category', 'integer', true );
-			param( 'post_autobr', 'integer', 0 );
-
-			$post_title = format_to_post( $post_title, 0 );
-			$content = format_to_post( $content, $post_autobr );
-
-			param( 'edit_date', 'integer', 0 );
-			if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-			{ // We use user date
-				param( 'aa', 'integer', 2000 );
-				param( 'mm', 'integer', 1 );
-				param( 'jj', 'integer', 1 );
-				param( 'hh', 'integer', 20 );
-				param( 'mn', 'integer', 30 );
-				param( 'ss', 'integer', 0 );
-				$jj = ($jj > 31) ? 31 : $jj;
-				$hh = ($hh > 23) ? $hh - 24 : $hh;
-				$mn = ($mn > 59) ? $mn - 60 : $mn;
-				$ss = ($ss > 59) ? $ss - 60 : $ss;
-				$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
-			}
-			else
-			{ // We use current time
-				$post_date = date('Y-m-d H:i:s', $localtimenow);
-			}
-
-
-			if( $errcontent = errors_display( T_('Invalid post, please correct these errors:'), '', false ) )
-			{
-				$content = $errcontent;
-			}
-
-			// little funky fix for IEwin, rawk on that code
-			global $is_winIE;
-			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix)))
-			{
-				$content =	preg_replace('/\%u([0-9A-F]{4,4})/e',	 "'&#'.base_convert('\\1',16,10). ';'", $content);
-			}
-
-			$postdata = array (
-				'ID' => 0,
-				'Author_ID' => $preview_userid,
-				'Date' => $post_date,
-				'Status' => $post_status,
-				'Locale' =>	 $post_locale,
-				'Content' => $content,
-				'Title' => $post_title,
-				'Url' => $post_url,
-				'Category' => $post_category,
-				'AutoBR' => $post_autobr,
-				'Flags' => array(),
-				'Wordcount' => bpost_count_words( $content ),
-				'Karma' => 0 // this isn't used yet
-				);
-		} // End if preview
+		$id = $row->ID;
+		// echo 'starting ',$row->post_title;
+		$postdata = array (
+			'ID' => $row->ID,
+			'Author_ID' => $row->post_author,
+			'Date' => $row->post_issue_date,
+			'Status' => $row->post_status,
+			'Locale' =>	 $row->post_locale,
+			'Content' => $row->post_content,
+			'Title' => $row->post_title,
+			'Url' => $row->post_trackbacks,
+			'Category' => $row->post_category,
+			'AutoBR' => $row->post_autobr,
+			'Flags' => explode( ',', $row->post_flags ),
+			'Wordcount' => $row->post_wordcount,
+			'comments' => $row->post_comments,
+			'Karma' => $row->post_karma // this isn't used yet
+			);
 
 		// echo ' title: ',$postdata['Title'];
 		$authordata = get_userdata($postdata['Author_ID']);

@@ -592,16 +592,27 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
  *
  * fplanque: 0.8.3: changed defaults
  */
-function single_post_title($prefix = '#', $display = 'htmlhead' )
+function single_post_title( $prefix = '#', $display = 'htmlhead' )
 {
-	global $p, $title;
+	global $p, $title, $preview;
 	
-	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
-
+	$disp_title = '';
+	
 	if( intval( $p ) || (!empty( $title )) )
 	{
+		if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
 		$post_data = get_postdata($p);
 		$disp_title = $post_data['Title'];
+	}
+	
+	if( $preview )
+	{
+		if( $prefix == '#' ) $prefix = ' ';
+		$disp_title = T_('PREVIEW');
+	}
+	
+	if( !empty( $disp_title ) )
+	{
 		if ($display)
 		{
 			echo format_to_output( $prefix.$disp_title, $display );
