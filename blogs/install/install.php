@@ -238,7 +238,7 @@ function create_antispam()
 	$query = "CREATE TABLE $tableantispam (
 		aspm_ID bigint(11) NOT NULL auto_increment,
 		aspm_string varchar(80) NOT NULL,
-		aspm_source enum( 'local','reported','central' ) NOT NULL default 'local',
+		aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
 		PRIMARY KEY (aspm_ID),
 		UNIQUE aspm_string (aspm_string)
 	)";
@@ -320,7 +320,7 @@ function populate_antispam()
 	"('free.ynsbbs.com.ru'), ('pimpvision.com'), ('baltimorejewishtimes.com'), ".
 	"('123adultsearch.com'), ('girls.twistys.net'), ('visitcelebrities.com'), ".
 	"('bushflash.com'), ('buechercrawler.de'), ('enyamodel.com'), ".
-	"('consulmex-la.com'), ('socksproxy.de'), ('exxxplorer.net'), ".
+	"('consulmex-la.com'), ('socksproxy.de'), ('xxx'), ".
 	"('jahreswagen-portal.net'), ('conzendo.de'), ".
 	/*
 	These sites try to set cookies with the name "url" and content being the
