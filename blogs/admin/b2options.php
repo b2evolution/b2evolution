@@ -96,8 +96,13 @@ if( $action == 'update' )
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
 ?>
+
+
 	<div class="pt" >
 		<div class="panelblocktabs">
+			<ul class="tabs">
+				<!-- Yes, this empty UL is needed! It's a hack for correct CSS display on Mozilla -->
+			</ul>
 			<ul class="tabs">
 			<?php
 				if( $tab == '' )
@@ -117,9 +122,7 @@ $current_User->check_perm( 'options', 'view', true );
 				else
 					echo '<li>';
 				echo '<a href="b2options.php?tab=plugins">'. T_('Plug-ins'). '</a></li>';
-		
 			?>
-		
 			</ul>
 		</div>
 	</div>
