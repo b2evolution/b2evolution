@@ -515,6 +515,24 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 
 
 /**
+ * Display the user's prefered name
+ *
+ * Used in result lists.
+ *
+ * @param integer user ID
+ */
+function user_preferedname( $user_ID )
+{
+	global $UserCache;
+	if( !empty( $user_ID ) )
+	{
+		$User = & $UserCache->get_by_ID( $user_ID );
+		$User->disp('preferedname');
+	}
+}
+
+
+/**
  * Display "User profile" title if it has been requested
  *
  * {@internal profile_title(-) }}
@@ -613,6 +631,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/15 17:51:38  fplanque
+ * added user_preferedname()
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *
