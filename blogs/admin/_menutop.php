@@ -83,7 +83,7 @@ if( empty($mode) )
 	}
 	if($user_level >= 9 || $demo_mode)
 	{
-		echo "| \n";
+		echo " | \n";
 		echo '<a href="b2antispam.php" class="menutop">', T_('Anti-Spam'), '</a>';
 	}
 	
