@@ -48,7 +48,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 require_once dirname(__FILE__).'/_comment.class.php';
 
 /**
- * Generic comments/trackbacks/pingbacks numbering
+ * Generic comments/trackbacks/pingbacks counting
  *
  * {@internal generic_ctp_number(-)}}
  *
@@ -335,6 +335,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/16 15:48:06  fplanque
+ * merged with work app :p
+ *
  * Revision 1.6  2005/02/15 22:05:06  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *

@@ -850,7 +850,7 @@ function cat_select_header()
 	global $current_blog_ID, $blog, $allow_cross_posting;
 
 	$r = '<thead><tr><th class="selector catsel_main">'.T_('Main').'</th>';
-	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
+	if( $allow_cross_posting >= 1 )
 	{ // This is current blog or we allow moving posts accross blogs
 		$r .= '<th class="selector catsel_extra">'.T_('Extra').'</th>';
 	}
@@ -937,6 +937,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/16 15:48:06  fplanque
+ * merged with work app :p
+ *
  * Revision 1.16  2005/02/15 22:05:08  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *

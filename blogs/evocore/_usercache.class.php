@@ -124,7 +124,7 @@ class UserCache extends DataObjectCache
 	/**
 	 * Load members of a given blog
 	 *
-	 * {@internal DataObjectCache::load_list(-) }}
+	 * {@internal UserCache::load_blogmembers(-) }}
 	 *
 	 * @param integer blog ID to load members for
 	 */
@@ -133,7 +133,7 @@ class UserCache extends DataObjectCache
 		global $DB, $Debuglog;
 
 		static $alreadyLoaded = array();
-		// TODO: doesn't $this->cache already fit this purpose??
+		// TODO: do no use static but a member var
 		if( isset( $alreadyLoaded[$blog_ID] ) )
 		{
 			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
@@ -215,6 +215,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/16 15:48:06  fplanque
+ * merged with work app :p
+ *
  * Revision 1.11  2005/02/15 20:05:52  fplanque
  * no message
  *

@@ -222,6 +222,12 @@ $map_iconfiles = array(
 		'size' => array( 14, 14 ),
 	),
 
+
+ 	'link' => array(
+		'file' => $admin_subdir.'img/chain_link.gif',
+		'alt' => T_('Link'),
+		'size' => array( 14, 14 ),
+	),
 );
 
 ?>

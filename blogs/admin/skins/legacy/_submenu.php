@@ -32,6 +32,11 @@
  *
  * @version $Id$
  */
+if( !isset($submenu) )
+{
+ echo '<div class="panelblock">';
+ return;
+}
 ?>
 <div class="pt">
 	<ul class="hack">
@@ -49,3 +54,4 @@
 		</ul>
 	</div>
 </div>
+<div class="tabbedpanelblock">

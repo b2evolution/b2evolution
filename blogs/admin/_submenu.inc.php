@@ -73,19 +73,15 @@ switch( $admin_tab )
 
 	default:
 		// NO SUBMENU!
-		echo '<div class="panelblock">';
-		return;
 }
 
 // Include submenu display
 require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_submenu.php';
 
-echo '<div class="tabbedpanelblock">';
-
 /*
  * $Log$
- * Revision 1.8  2005/02/15 20:05:58  fplanque
- * no message
+ * Revision 1.9  2005/02/16 15:48:04  fplanque
+ * merged with work app :p
  *
  * Revision 1.6  2004/12/17 20:38:51  fplanque
  * started extending item/post capabilities (extra status, type)

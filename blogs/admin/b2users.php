@@ -129,9 +129,10 @@ else switch ($action)
 		}
 
 		// check if new login already exists for another user_ID
-		$query = "SELECT ID FROM T_users
-							WHERE user_login = '$edited_user_login'
-								AND ID != $edited_user_ID";
+		$query = "SELECT ID
+								FROM T_users
+							 WHERE user_login = '$edited_user_login'
+							   AND ID != $edited_user_ID";
 
 		if( $q = $DB->get_var( $query ) )
 		{
@@ -193,9 +194,6 @@ else switch ($action)
 
 				$Messages->add( T_('User updated.'), 'note' );
 
-				// Commit changes in cache:
-				// not ready: $UserCache->add( $edited_Group );
-				// is this working now?
 			}
 			else
 			{ // Insert user into DB
@@ -321,6 +319,7 @@ else switch ($action)
 			// Delete from DB:
 			echo '<div class="panelinfo"><h3>'.T_('Deleting User...').'</h3>';
 			$deleted_User->dbdelete( true );
+			unset($deleted_User);
 			echo '</div>';
 		}
 
@@ -468,6 +467,7 @@ else switch ($action)
 		{ // confirmed
 			// Delete from DB:
 			$del_Group->dbdelete( true );
+			unset($del_Group);
 			$Messages->add( T_('Group deleted...'), 'note' );
 		}
 
