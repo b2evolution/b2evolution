@@ -354,10 +354,10 @@ function remove_ban( $hit_ID )
  */
 function ban_affected_hits($keyword)
 {
-	global 	$querycount, $tablehitlog, $res_stats;
+	global 	$querycount, $tablehitlog, $res_affected_hits;
 
 	$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%' ORDER BY baseDomain ASC";
-	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
+	$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
 
@@ -366,10 +366,10 @@ function ban_affected_hits($keyword)
  */
 function ban_affected_comments()
 {
-	global 	$querycount, $tablecomments, $res_stats;
+	global 	$querycount, $tablecomments, $res_affected_comments;
 
 	$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%' ORDER BY comment_date ASC";
-	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
+	$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
 

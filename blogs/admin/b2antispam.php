@@ -38,19 +38,23 @@ switch( $action )
 			<div class="panelblock">
 				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
 				<?php ban_affected_comments($keyword) ?>
-				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows($res_stats) ) ?></p>
+				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ) ?></p>
 				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_stats)){ ?>
+					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>
-						<td><?php echo $row_stats['comment_date'] ?></td>
+						<td><?php
+						preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
+						$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
+						echo date(locale_datefmt()." ".locale_timefmt(), $date);
+						?></td>
 						<td><?php echo $row_stats['comment_author'] ?></a></td>
 						<td><?php echo $row_stats['comment_author_url'] ?></td>
 						<td><?php
 						$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
-						if ( strlen($comment_content) > 60 )
+						if ( strlen($comment_content) > 70 )
 						{
-							// Trail off (truncate and add '...') after 60 chars
-							echo substr($comment_content, 0, 60) . "...";
+							// Trail off (truncate and add '...') after 70 chars
+							echo substr($comment_content, 0, 70) . "...";
 						}
 						else
 						{
@@ -62,9 +66,9 @@ switch( $action )
 				</table>
 				
 				<?php ban_affected_hits($keyword) ?>
-				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows($res_stats) ) ?></p>
+				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
 				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
 					<tr>
 						<td><?php stats_time() ?></td>
 						<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
@@ -80,7 +84,7 @@ switch( $action )
 					<input type="hidden" name="confirm" value="confirm" />
 					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
 					<input type="hidden" name="action" value="ban" />
-					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" />
+					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
 					</p>
 				</form>
 			</div>
@@ -128,19 +132,23 @@ switch( $action )
 			<div class="panelblock">
 				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
 				<?php ban_affected_comments($keyword) ?>
-				<p><?php printf ( T_('Banning the domain %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows($res_stats) ) ?></p>
+				<p><?php printf ( T_('Banning the domain %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ) ?></p>
 				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_stats)){ ?>
+					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>
-						<td><?php echo $row_stats['comment_date'] ?></td>
+						<td><?php
+						preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
+						$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
+						echo date(locale_datefmt()." ".locale_timefmt(), $date);
+						?></td>
 						<td><?php echo $row_stats['comment_author'] ?></a></td>
 						<td><?php echo $row_stats['comment_author_url'] ?></td>
 						<td><?php
 						$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
-						if ( strlen($comment_content) > 60 )
+						if ( strlen($comment_content) > 70 )
 						{
-							// Trail off (truncate and add '...') after 60 chars
-							echo substr($comment_content, 0, 60) . "...";
+							// Trail off (truncate and add '...') after 70 chars
+							echo substr($comment_content, 0, 70) . "...";
 						}
 						else
 						{
@@ -152,9 +160,9 @@ switch( $action )
 				</table>
 				
 				<?php ban_affected_hits($keyword) ?>
-				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows($res_stats) ) ?></p>
+				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
 				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
 					<tr>
 						<td><?php stats_time() ?></td>
 						<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
@@ -170,7 +178,7 @@ switch( $action )
 					<input type="hidden" name="confirm" value="confirm" />
 					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
 					<input type="hidden" name="action" value="ban" />
-					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" />
+					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
 					</p>
 				</form>
 			</div>
