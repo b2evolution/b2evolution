@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -55,6 +55,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/28 09:06:33  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.2  2005/02/21 00:34:34  blueyed
  * check for defined DB_USER!
  *

@@ -4,11 +4,11 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -21,8 +21,8 @@ class autolinks_plugin extends Plugin
 	var $priority = 60;
 
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true; 
-	var $apply_to_xml = false; 
+	var $apply_to_html = true;
+	var $apply_to_xml = false;
 	var $short_desc;
 	var $long_desc;
 
@@ -58,7 +58,7 @@ class autolinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		$content = make_clickable( $content );
-		
+
 		return true;
 	}
 }

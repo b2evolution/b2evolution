@@ -5,8 +5,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -1195,6 +1195,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.78  2005/02/28 09:06:39  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.77  2005/02/27 20:34:49  blueyed
  * Admin UI refactoring
  *

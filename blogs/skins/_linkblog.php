@@ -7,17 +7,17 @@
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
 	 *
 	 * @package evoskins
 	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
-	
+	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
 	if( !isset( $linkblog ) )
 	{	// No link blog explicitely specified, we use default:
 		$linkblog = $Blog->get('links_blog_ID');
 	}
-	
+
 	if( ! $linkblog )
 	{	// No linkblog blog requested for this blog
 		return;
@@ -37,52 +37,52 @@
 	# Item delimiters:
 	if(!isset($linkblog_item_before)) $linkblog_item_before = '<li>';
 	if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';
-	
-	
+
+
 	// --- //
-	
-	
+
+
 	// Load the linkblog blog:
 	$LinkblogList = & new ItemList( $linkblog, array(), '', '', '', $linkblog_cat, $linkblog_catsel, '', 'ASC',
 																	'main_cat_ID title', '', '', '', '', '', '', '', '', $linkblog_limit,
 																	'posts', $timestamp_min, $timestamp_max );
-	
-	
+
+
 	// Dirty trick until we get everything into objects:
-	$saved_blog = $blog;  
+	$saved_blog = $blog;
 	$blog = $linkblog;
-	
+
 	// Open the global list
 	echo $linkblog_main_start;
-		
+
 	$previous_cat = '';
 	$linkblog_cat = '';
-	
+
 	while( $Item = $LinkblogList->get_category_group() )
 	{
 		// Open new cat:
 		echo $linkblog_catname_before;
 		$Item->main_category();
 		echo $linkblog_catname_after;
-		
+
 		while( $Item = $LinkblogList->get_item() )
 		{
 			echo $linkblog_item_before;
-			$Item->title(); 
+			$Item->title();
 			echo ' ';
-			$Item->content( 1, 0, T_('more'), '[', ']' );	// Description + more link 
+			$Item->content( 1, 0, T_('more'), '[', ']' );	// Description + more link
 			?>
 			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 			<?php
 			echo $linkblog_item_after;
 		}
-	
+
 		// Close cat
 		echo $linkblog_catlist_end;
 	}
 	// Close the global list
 	echo $linkblog_main_end;
-	
+
 	// Restore after dirty trick:
-	$blog = $saved_blog;		
+	$blog = $saved_blog;
 ?>

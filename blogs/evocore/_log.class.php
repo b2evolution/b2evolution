@@ -39,7 +39,7 @@
  * @version $Id$ }}}
  *
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -566,6 +566,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/28 09:06:33  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.12  2005/02/22 02:27:51  blueyed
  * refactoring, optimized, fix for getMessages( plain )
  *

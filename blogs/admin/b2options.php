@@ -327,7 +327,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 						fwrite( $fp, " * Global lang file\n" );
 						fwrite( $fp, " * This file was generated automatically from messages.po\n" );
 						fwrite( $fp, " */\n" );
-						fwrite( $fp, "if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );" );
+						fwrite( $fp, "if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );" );
 						fwrite( $fp, "\n\n" );
 
 
@@ -433,6 +433,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.87  2005/02/28 09:06:39  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.86  2005/02/27 20:34:49  blueyed
  * Admin UI refactoring
  *

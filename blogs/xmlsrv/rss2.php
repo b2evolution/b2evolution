@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *

@@ -13,8 +13,9 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -49,6 +50,12 @@
  * this modified class under other licenses. "Just include a link to where you got it from."
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -59,7 +66,7 @@
  * @version $Id$
  * @todo transaction support
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * ezSQL Constants
@@ -804,6 +811,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/28 09:06:32  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.10  2005/02/23 22:32:44  blueyed
  * output xdebug function stack in case of error
  *

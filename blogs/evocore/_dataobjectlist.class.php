@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 require_once dirname(__FILE__).'/_results.class.php';
 
@@ -61,7 +61,7 @@ class DataObjectList extends Results
 
 	/**#@-*/
 
-	/** 
+	/**
 	 * Constructor
 	 *
 	 * If provided, executes SQL query via parent Results object
@@ -118,6 +118,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/28 09:06:32  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.4  2005/01/03 15:17:52  fplanque
  * no message
  *

@@ -58,8 +58,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
  *
@@ -271,7 +271,7 @@ param( 'mode', 'string', 'normal' );
 
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
 
-		<p>We'll import into b2evolution's database &quot;<?php echo DB_NAME ?>&quot;.</p>
+		<p>We'll import into b2evolution's database &quot;<?php echo $EvoConfig->DB['name'] ?>&quot;.</p>
 		</div>
 		<div class="panelinfo">
 			<p>Before importing, you should check the URLs of any &lt;img&gt; tags you may have in <?php echo $exportedfile ?>. Will these URLs still be valid after the migration? If not, we advise you do a search and replace on <?php echo $exportedfile ?> before continuing.</p>

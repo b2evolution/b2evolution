@@ -4,30 +4,36 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal
  * The University of North Carolina at Charlotte grants François PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
- * 
+ *
  * Jason EDGECOMBE grants François PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
+ * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  * @author fplanque: Francois PLANQUE.
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 // Prepare last part of blog URL preview:
 switch( $edited_Blog->get( 'access_type' ) )

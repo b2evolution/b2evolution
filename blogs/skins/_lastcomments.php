@@ -9,19 +9,19 @@
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
 	 *
 	 * @package evoskins
 	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-	if( $disp != 'comments' ) 
+	if( $disp != 'comments' )
 	{	// We have not asked for comments to be displayed...
 		return false;		// Nothing to do here!
 	}
-	
+
 	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
-	
+
 	$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 
 	while( $Comment = $CommentList->get_next() )
@@ -30,7 +30,7 @@
 		<a name="c<?php $Comment->ID() ?>"></a>
 		<div class="bComment">
 			<h3 class="bTitle">
-				<?php echo T_('In response to:') ?> 
+				<?php echo T_('In response to:') ?>
 				<a href="<?php $Comment->Item->permalink() ?>"><?php $Comment->Item->title( '', '', false ) ?></a>
 			</h3>
 			<div class="bCommentTitle">
@@ -47,6 +47,6 @@
 			</div>
 		</div>
 		<!-- ========== END of a COMMENT ========== -->
-		<?php 
+		<?php
 	}	// End of comment loop.
 ?>

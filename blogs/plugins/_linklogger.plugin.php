@@ -9,9 +9,9 @@
  *
  * TODO: add params to interface. Each Blog should have an own linklogger category.
  * TODO: if $this->destformat changes all links would show up again.. :/ Prefix it?
- * NOTE: we could link to the original post in linkloggers post's content.. :) 
+ * NOTE: we could link to the original post in linkloggers post's content.. :)
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 class linklogger_plugin extends Plugin
 {
@@ -87,7 +87,7 @@ class linklogger_plugin extends Plugin
 		 */
 		$this->linklogger_cat_ID = $blog + 1; // linklogger category is the linkblog of current blog
 
-		
+
 		// check if main category exists
 		if( !get_the_category_by_ID( $this->linklogger_cat_ID, false ) )
 		{ // linklogger category does not exist
@@ -105,7 +105,7 @@ class linklogger_plugin extends Plugin
 			}
 		}
 
-		
+
 		// this will replace all a-tags by using a callback function (below)
 		$content = preg_replace('#(<a .*?>)(.*?)</a>#ei', '$this->replace_callback(stripslashes("$1"), stripslashes("$2"))', $content);
 

@@ -7,12 +7,12 @@
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
 	 *
 	 * @package evoskins
 	 * @subpackage wpc
 	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 	# You can customize the following as you wish:
 	if(!isset($cat_all)) $cat_all = T_('All'); // Set to empty to hide

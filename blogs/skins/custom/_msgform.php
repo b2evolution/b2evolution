@@ -8,7 +8,7 @@
 	 * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
 	 * Note: don't cod ethis URL by hand, use the template functions to generate it!
 	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 	/*

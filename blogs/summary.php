@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -122,15 +122,15 @@ require(dirname(__FILE__).'/evocore/_main.inc.php');
 
 	<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
 
-	<?php if( isset($Blog) ) 
+	<?php if( isset($Blog) )
 	{ ?>
 
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
-	
+
 	<?php } ?>
-	
+
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 
 <!-- InstanceEndEditable --></p>

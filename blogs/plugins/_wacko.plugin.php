@@ -6,12 +6,12 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  * @ignore
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -23,7 +23,7 @@ class wacko_plugin extends Plugin
 	var $name = 'Wacko formatting';
 	var $priority = 30;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the markup
 	var $short_desc;
 	var $long_desc;
@@ -34,20 +34,20 @@ class wacko_plugin extends Plugin
 	 * @access private
 	 */
 	var $search = array(
-											'#( ^ | \s ) ====== (.+?) ====== #x',	
-											'#( ^ | \s ) ===== (.+?) ===== #x',	
-											'#( ^ | \s ) ==== (.+?) ==== #x',	
-											'#( ^ | \s ) === (.+?) === #x',	
-											'#( ^ | \s ) == (.+?) == #x',	
+											'#( ^ | \s ) ====== (.+?) ====== #x',
+											'#( ^ | \s ) ===== (.+?) ===== #x',
+											'#( ^ | \s ) ==== (.+?) ==== #x',
+											'#( ^ | \s ) === (.+?) === #x',
+											'#( ^ | \s ) == (.+?) == #x',
 											'#^ \s* --- \s* $#xm',	// multiline start/stop checking
-											'/ %%% 								
+											'/ %%%
 												( \s*? \n )? 				# Eat optional blank line after %%%
-												(.+?) 
+												(.+?)
 												( \n \s*? )? 				# Eat optional blank line before %%%
-												%%% 
+												%%%
 											/sxe'		// %%%escaped codeblock%%%
 											);
-	
+
 	/**
 	 * HTML replace array
 	 *
@@ -84,7 +84,7 @@ class wacko_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::Render(-)}} 
+	 * {@internal gmcode_Rendererplugin::Render(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * 							(Output format, see {@link format_to_output()})
@@ -100,7 +100,7 @@ class wacko_plugin extends Plugin
 		$content = & $params['data'];
 
 		$content = preg_replace( $this->search, $this->replace, $content );
-		
+
 		// Find bullet lists
 		$lines = explode( "\n", $content );
 		$lists = array();
@@ -152,7 +152,7 @@ class wacko_plugin extends Plugin
 					continue;
 				}
 
-				// Normal line. 
+				// Normal line.
 
 				if( $current_depth )
 				{ // We must go back to 0
@@ -170,7 +170,7 @@ class wacko_plugin extends Plugin
 		{ // We must go back to 0
 			$content .= '</'.implode( ">\n</", $lists ).">\n";
 		}
-		
+
 		return true;
 	}
 }

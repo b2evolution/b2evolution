@@ -6,11 +6,11 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -22,7 +22,7 @@ class bbcode_plugin extends Plugin
 	var $name = 'BB code';
 	var $priority = 50;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = true;  // strip the BBcode
 	var $short_desc;
 	var $long_desc;
@@ -58,7 +58,7 @@ class bbcode_plugin extends Plugin
 									//	'#\[email](.+?)\[/email]#eis',		// E-mail
 									//	'#\[email=(.+?)](.+?)\[/email]#eis'
 									);
-	
+
 	/**
 	 * HTML replace array
 	 *
@@ -105,7 +105,7 @@ class bbcode_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal BBcode::Render(-)}} 
+	 * {@internal BBcode::Render(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * 							(Output format, see {@link format_to_output()})
@@ -121,7 +121,7 @@ class bbcode_plugin extends Plugin
 		$content = & $params['data'];
 
 		$content = preg_replace( $this->search, $this->replace, $content );
-		
+
 		return true;
 	}
 

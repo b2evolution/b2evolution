@@ -40,7 +40,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -628,6 +628,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/28 09:06:33  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.6  2005/02/21 00:48:15  blueyed
  * parse error fixed
  *

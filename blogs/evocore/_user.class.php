@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -852,6 +852,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/28 09:06:34  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.15  2005/02/27 20:24:48  blueyed
  * minor
  *

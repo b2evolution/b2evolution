@@ -4,13 +4,13 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author bgorge
  *
  * @package plugins
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -22,7 +22,7 @@ class smilies_plugin extends Plugin
 	var $name = 'Smilies';
 	var $priority = 80;
 	var $apply_when = 'always';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the smilies alone
 
 	/**
@@ -31,7 +31,7 @@ class smilies_plugin extends Plugin
 	 * @access private
 	 */
 	var $search;
-	
+
 	/**
 	 * IMG replace array
 	 *
@@ -169,7 +169,7 @@ class smilies_plugin extends Plugin
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
@@ -177,7 +177,7 @@ class smilies_plugin extends Plugin
 
 			$tmpsmilies = $this->smilies;
 			uksort($tmpsmilies, 'smiliescmp');
-	
+
 			foreach($tmpsmilies as $smiley => $img)
 			{
 				$this->search[] = $smiley;
@@ -186,7 +186,7 @@ class smilies_plugin extends Plugin
 				{
 					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
 				}
-	
+
 				// We don't use getimagesize() here until we have a mean
 				// to preprocess smilies. It takes up to much time when
 				// processing them at display time.
@@ -219,10 +219,10 @@ class smilies_plugin extends Plugin
 		{ // No code blocks, replace on the whole thing
 			$content = $this->ReplaceTagSafe($content);
 		}
-	
+
 		return true;
 	}
-	
+
 	function preg_insert_smilies_callback($s)
 	{
 		return str_replace( $this->search, $this->replace, $s[1]) . $s[2];
@@ -233,7 +233,7 @@ class smilies_plugin extends Plugin
 		$search = "/([^<]*)(<[^>]+>)/si";
 
 		return preg_replace_callback($search, array($this, 'preg_insert_smilies_callback'), $text);
-	}		
+	}
 }
 
 /**

@@ -13,7 +13,7 @@
  *
  * @package plugins
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -36,7 +36,7 @@ Version 2.0 beta
 Copyright (c) 2003-2004, Dean Allen <dean@textism.com>
 All rights reserved.
 
-Thanks to Carlo Zottmann <carlo@g-blog.net> for refactoring 
+Thanks to Carlo Zottmann <carlo@g-blog.net> for refactoring
 Textile's procedural code into a class framework
 
 _____________
@@ -205,7 +205,7 @@ class textile_plugin extends Plugin
 	var $name = 'Textile (beta)';
 	var $priority = 20;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = true; 	// Strip the markup
 	var $short_desc;
 	var $long_desc;
@@ -254,7 +254,7 @@ class textile_plugin extends Plugin
 		/**
 		 * Perform rendering
 		 *
-		 * {@internal gmcode_Rendererplugin::Render(-)}} 
+		 * {@internal gmcode_Rendererplugin::Render(-)}}
 		 *
 		 * @param array Associative array of parameters
 		 * 							(Output format, see {@link format_to_output()})
@@ -274,22 +274,22 @@ class textile_plugin extends Plugin
 			$lite = '';
 			// $encode = '';
 			$noimage = '';
-		
+
 			// if (get_magic_quotes_gpc())
 			//    $text = stripslashes($text);
 
 			$text = $this->incomingEntities($content);
 			$text = $this->encodeEntities($text);
-			
+
 			/* if ($encode) {
 				return $text;
 			} else { */
-        
+
 			$text = $this->fixEntities($text);
 			$text = $this->cleanWhiteSpace($text);
-	
+
 			$text = $this->getRefs($text);
-	
+
 			$text = $this->noTextile($text);
 			$text = $this->links($text);
 			if (!$noimage) {
@@ -301,7 +301,7 @@ class textile_plugin extends Plugin
 			$text = $this->footnoteRef($text);
 			$text = $this->glyphs($text);
 			$text = $this->retrieve($text);
-	
+
 			if (!$lite) {
 				$text = $this->lists($text);
 				$text = $this->table($text);
@@ -310,15 +310,15 @@ class textile_plugin extends Plugin
 
 				// clean up <notextile>
 			$text = preg_replace('/<\/?notextile>/', "", $text);
-	
+
 				// turn the temp char back to an ampersand entity
 			$text = str_replace("x%x%", "&#38;", $text);
-	
+
 				// just to be tidy
 			$content = str_replace("<br />", "<br />\n", $text);
-	
+
       //	}
-		
+
 			return true;
     }
 
@@ -393,7 +393,7 @@ class textile_plugin extends Plugin
     function table($text)
     {
         $text = $text . "\n\n";
-        return preg_replace_callback("/^(?:table(_?{$this->s}{$this->a}{$this->c})\. ?\n)?^({$this->a}{$this->c}\.? ?\|.*\|)\n\n/smU", 
+        return preg_replace_callback("/^(?:table(_?{$this->s}{$this->a}{$this->c})\. ?\n)?^({$this->a}{$this->c}\.? ?\|.*\|)\n\n/smU",
            array(&$this, "fTable"), $text);
     }
 
@@ -580,7 +580,7 @@ class textile_plugin extends Plugin
 //		$this->dump($out);
 
         return $out;
-    
+
     }
 
 // -------------------------------------------------------------
@@ -686,10 +686,10 @@ function refs($m)
     {
         return preg_replace_callback("/
             (?:^|(?<=[\s\(])|([[{]))        # before
-            @                               
+            @
             (?:\|(\w+)\|)?                  # lang
             (.+)                            # code
-            @                               
+            @
             (?:$|([\]}])|
             (?=[[:punct:]]{1,2}|
             \s|$))                           # after
@@ -981,7 +981,7 @@ function refs($m)
             return '';
         }
     }
-    
+
 // -------------------------------------------------------------
     function dump()
     {

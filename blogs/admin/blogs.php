@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
@@ -565,6 +565,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.28  2005/02/28 09:06:39  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.27  2005/02/27 20:34:49  blueyed
  * Admin UI refactoring
  *

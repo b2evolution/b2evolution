@@ -42,7 +42,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -396,6 +396,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.19  2005/02/28 09:06:34  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.18  2005/02/23 04:06:16  blueyed
  * minor
  *

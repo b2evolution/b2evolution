@@ -4,15 +4,15 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  *
  * TODO: make it a method of ItemList, usable in real blogs, too
  * TODO: links to result's pages, not only stoopid 'forward'/'backward'
- * ...FP: change buttons into parameter-links 
+ * ...FP: change buttons into parameter-links
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 ?>
 <table cellpadding="0" cellspacing="0" border="0">
 	<tr>
@@ -64,7 +64,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<input type="text" name="postend" value="<?php echo $postend ?>" size="4" maxlength="10" />
 				<?php /* TRANS: x TO y OF z */ echo T_(' of ') ?> <?php echo $MainList->get_total_num_posts() ?>
 				<?php } ?>
-				
+
 			<select name="order">
 				<option value="DESC" <?php
 				$i = $order;

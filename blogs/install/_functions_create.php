@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -49,7 +49,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Create b2 tables.
@@ -938,7 +938,7 @@ function create_b2evo_tables_092()
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID INT(10) DEFAULT NULL,
 									PRIMARY KEY( sess_ID ),
-									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID ),
+									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
 	echo "OK.<br />\n";
 

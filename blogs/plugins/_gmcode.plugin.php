@@ -6,11 +6,11 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * @package plugins
@@ -21,7 +21,7 @@ class gmcode_plugin extends Plugin
 	var $name = 'GM code';
 	var $priority = 45;
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the GMcode markup
 	var $short_desc;
 	var $long_desc;
@@ -37,14 +37,14 @@ class gmcode_plugin extends Plugin
 											'# (?<!:) \x2f\x2f (.+?) \x2f\x2f #x',		// //italics// (not preceded by : as in http://)
 											'# __ (.+?) __ #x',		// __underline__
 											'/ \#\# (.+?) \#\# /x',		// ##tt##
-											'/ %%								
+											'/ %%
 												( \s*? \n )? 				# Eat optional blank line after %%%
-												(.+?) 
+												(.+?)
 												( \n \s*? )? 				# Eat optional blank line before %%%
 												%%
 											/sx'		// %%codeblock%%
 											);
-	
+
 	/**
 	 * HTML replace array
 	 *
@@ -91,7 +91,7 @@ class gmcode_plugin extends Plugin
 		$content = & $params['data'];
 
 		$content = preg_replace( $this->search, $this->replace, $content );
-		
+
 		return true;
 	}
 }

@@ -24,14 +24,16 @@
  */
 
 
-/**#@+
- * MySQL settings. Fill in your database details (check carefully or nothing will work!)
+/**
+ * MySQL DB settings.
+ * Fill in your database details (check carefully or nothing will work!)
  */
-define( 'DB_USER', 'demouser' );      // your MySQL username
-define( 'DB_PASSWORD', 'demopass' );  // ...and password
-define( 'DB_NAME', 'b2evolution' );   // the name of the database
-define( 'DB_HOST', 'localhost' );     // MySQL Server (typically 'localhost')
-/**#@-*/
+$EvoConfig->DB = array(
+	'user'     => 'demouser',     // your MySQL username
+	'password' => 'demopass',     // ...and password
+	'name'     => 'b2evolution',  // the name of the database
+	'host'     => 'localhost',    // MySQL Server (typically 'localhost')
+	);
 
 
 /**
@@ -93,6 +95,9 @@ $config_is_done = 0;
 # got your basic installation working. They'll let you customize a lot of things!
 
 # DO NOT EDIT THE FOLLOWING!
+
+define( 'EVO_CONFIG_LOADED', true );
+
 @include_once dirname(__FILE__).'/_config_TEST.php';    // Put testing conf in there (For testing, you can also set $install_password here)
 require_once  dirname(__FILE__).'/_advanced.php';       // advanced settings
 require_once  dirname(__FILE__).'/_locales.php';        // locale settings

@@ -4,11 +4,11 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 ?>
 <div class="panelblock">
 <?php
@@ -16,18 +16,18 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	{
 		echo '<h2>'.T_('Categories for blog:'), ' ', $Blog->dget('name').'</h2>';
 	}
-	
+
 	// ----------------- START RECURSIVE CAT LIST ----------------
 	cat_query( false );	// make sure the caches are loaded
 
-	/** 
+	/**
 	 * callback to start sublist
 	 */
 	function cat_edit_before_first( $parent_cat_ID, $level )
 	{	// callback to start sublist
-		
+
 	}
-	/** 
+	/**
 	 * callback to display sublist element
 	 */
 	function cat_edit_before_each( $cat_ID, $level )
@@ -44,7 +44,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		echo "
 <ul>\n";
 	}
-	/** 
+	/**
 	 * callback to display sublist element
 	 */
 	function cat_edit_after_each( $cat_ID, $level )
@@ -55,7 +55,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		echo "</ul>\n";
 		echo "</li>\n";
 	}
-	/** 
+	/**
 	 * callback to end sublist
 	 */
 	function cat_edit_after_last( $parent_cat_ID, $level )

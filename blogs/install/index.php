@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
  */
@@ -104,7 +104,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
-	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases, $db_table_options, false );
+	$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_table_options, false );
 	if( $DB->error )
 	{ // restart conf
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
@@ -159,9 +159,10 @@ switch( $action )
 		{
 			$conf_filepath = $conf_path.'_config.php';
 			// Read original:
-			$conf = file( $conf_filepath );
+			$conf = implode( '', file( $conf_filepath ) );
+
 			if( empty( $conf ) )
-			{	// This should actually never happen, just in case...
+			{ // This should actually never happen, just in case...
 				printf( '<p class="error">Could not load original conf file [%s]. Is it missing?</p>', $conf_filepath );
 				break;
 			}
@@ -170,20 +171,23 @@ switch( $action )
 			// Update conf:
 			$conf = preg_replace(
 														array(
-																		"#define\(\s*'DB_USER',\s*'.*?'\s*\);#",
-																		"#define\(\s*'DB_PASSWORD',\s*'.*?'\s*\);#",
-																		"#define\(\s*'DB_NAME',\s*'.*?'\s*\);#",
-																		"#define\(\s*'DB_HOST',\s*'.*?'\s*\);#",
+																		'#\$EvoConfig->DB\s*=\s*array\(
+																			\s*[\'"]user[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+																			\s*[\'"]password[\'"]\s*=>\s*[\'"].*?[\'"], ([^\n\r]*\r?\n)
+																			\s*[\'"]name[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+																			\s*[\'"]host[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+																			#ixs',
 																		"#tableprefix\s*=\s*'.*?';#",
 																		"#baseurl\s*=\s*'.*?';#",
 																		"#admin_email\s*=\s*'.*?';#",
 																		"#config_is_done\s*=.*?;#",
 																	),
 														array(
-																		"define( 'DB_USER', '$conf_db_user' );",
-																		"define( 'DB_PASSWORD', '$conf_db_password' );",
-																		"define( 'DB_NAME', '$conf_db_name' );",
-																		"define( 'DB_HOST', '$conf_db_host' );",
+																		"\$EvoConfig->DB = array(\n"
+																			."\t'user'     => '$conf_db_user',\$1"
+																			."\t'password' => '$conf_db_password',\$2"
+																			."\t'name'     => '$conf_db_name',\$3"
+																			."\t'host'     => '$conf_db_host',\$4",
 																		"tableprefix = '$conf_db_tableprefix';",
 																		"baseurl = '$conf_baseurl';",
 																		"admin_email = '$conf_admin_email';",
@@ -231,13 +235,10 @@ switch( $action )
 			}
 			else
 			{ // Write new contents:
-				foreach( $conf as $conf_line )
-				{
-					fwrite( $f, $conf_line );
-				}
+				fwrite( $f, $conf );
 				fclose($f);
 
-				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
+				printf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
 
 				$tableprefix = $conf_db_tableprefix;
 				$baseurl = $conf_baseurl;
@@ -258,10 +259,10 @@ switch( $action )
 		if( (($action == 'start') && ($allow_evodb_reset == 1)) || (!$config_is_done) )
 		{
 			// Set default params if not provided otherwise:
-			param( 'conf_db_user', 'string', DB_USER );
-			param( 'conf_db_password', 'string', DB_PASSWORD );
-			param( 'conf_db_name', 'string', DB_NAME );
-			param( 'conf_db_host', 'string', DB_HOST );
+			param( 'conf_db_user', 'string', $EvoConfig->DB['user'] );
+			param( 'conf_db_password', 'string', $EvoConfig->DB['password'] );
+			param( 'conf_db_name', 'string', $EvoConfig->DB['name'] );
+			param( 'conf_db_host', 'string', $EvoConfig->DB['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
 			// Guess baseurl:
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
@@ -391,10 +392,10 @@ to
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 
 		<?php
-		if( !isset($conf_db_user) ) $conf_db_user = DB_USER;
-		if( !isset($conf_db_password) ) $conf_db_password = DB_PASSWORD;
-		if( !isset($conf_db_name) ) $conf_db_name = DB_NAME;
-		if( !isset($conf_db_host) ) $conf_db_host = DB_HOST;
+		if( !isset($conf_db_user) ) $conf_db_user = $EvoConfig->DB['user'];
+		if( !isset($conf_db_password) ) $conf_db_password = $EvoConfig->DB['password'];
+		if( !isset($conf_db_name) ) $conf_db_name = $EvoConfig->DB['name'];
+		if( !isset($conf_db_host) ) $conf_db_host = $EvoConfig->DB['host'];
 
 		echo '<pre>',
 		T_('MySQL Username').': '.$conf_db_user."\n".

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -73,7 +73,7 @@ class Group extends DataObject
 	var	$perm_templates;
 	var	$perm_users;
 
-	/** 
+	/**
 	 * Constructor
 	 *
 	 * {@internal Group::Group(-) }}
@@ -108,9 +108,9 @@ class Group extends DataObject
 			$this->perm_templates = $db_row->grp_perm_templates;
 			$this->perm_users = $db_row->grp_perm_users;
 		}
-	}	
-	
-	/** 
+	}
+
+	/**
 	 * Set param value
 	 *
 	 * {@internal Group::set(-) }}
@@ -125,13 +125,13 @@ class Group extends DataObject
 			case 'perm_templates':
 				parent::set_param( $parname, 'number', $parvalue );
 			break;
-			
+
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
-	/** 
+	/**
 	 * Check a permission for this group
 	 *
 	 * {@internal Group::check_perm(-) }}
@@ -157,19 +157,19 @@ class Group extends DataObject
 				if( $permvalue )
 					return true;	// Permission granted
 				break;
-				
+
 			case 'blogs':
 				switch( $permvalue )
 				{
 					case 'editall':
 						// All permissions granted
 						return true;	// Permission granted
-						
+
 					case 'viewall':
 						// User can only ask for view perm
 						if(( $permlevel == 'view' ) || ( $permlevel == 'any' ))
 							return true;	// Permission granted
-						break;	
+						break;
 				}
 
 			case 'stats':
@@ -181,18 +181,18 @@ class Group extends DataObject
 					case 'edit':
 						// All permissions granted
 						return true;	// Permission granted
-						
+
 					case 'view':
 						// User can only ask for view perm
 						if( $permlevel == 'view' )
 							return true;	// Permission granted
-						break;	
+						break;
 				}
-		}		
+		}
 
 		return false;	// Permission denied!
 	}
-	
+
 
 	/**
 	 * Template function: display name of blog
@@ -210,7 +210,7 @@ class Group extends DataObject
 			return $this->dget( 'name', $format );
 		}
 	}
-	
+
 	/**
 	 * Template function: return name of blog
 	 *
@@ -226,6 +226,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/28 09:06:33  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.3  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

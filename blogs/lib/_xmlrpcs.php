@@ -38,18 +38,18 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 // XML RPC Server class
 // requires: xmlrpc.php
 
-$_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString), 
+$_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString),
 																array($xmlrpcArray));
 $_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';
 /**
  * listMethods: either a string, or nothing
  */
-function _xmlrpcs_listMethods($server, $m) 
+function _xmlrpcs_listMethods($server, $m)
 {
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 	$v=new xmlrpcval();
@@ -71,7 +71,7 @@ $_xmlrpcs_methodSignature_doc='Returns an array of known signatures (an array of
 /**
  * {@internal _xmlrpcs_methodSignature(-)}}
  */
-function _xmlrpcs_methodSignature($server, $m) 
+function _xmlrpcs_methodSignature($server, $m)
 {
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 
@@ -109,7 +109,7 @@ function _xmlrpcs_methodSignature($server, $m)
 
 $_xmlrpcs_methodHelp_sig=array(array($xmlrpcString, $xmlrpcString));
 $_xmlrpcs_methodHelp_doc='Returns help text if defined for the method passed, otherwise returns an empty string';
-function _xmlrpcs_methodHelp($server, $m) 
+function _xmlrpcs_methodHelp($server, $m)
 {
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 
@@ -155,7 +155,7 @@ $_xmlrpcs_dmap=array(
  * Register a debugging message to be sent back in output
  */
 $_xmlrpc_debuginfo="";
-function xmlrpc_debugmsg($m) 
+function xmlrpc_debugmsg($m)
 {
 	global $_xmlrpc_debuginfo;
 	$_xmlrpc_debuginfo=$_xmlrpc_debuginfo . $m . "\n";
@@ -165,14 +165,14 @@ function xmlrpc_debugmsg($m)
  * @package evocore
  * @subpackage xmlrpc
  */
-class xmlrpc_server 
+class xmlrpc_server
 {
   var $dmap=array();
 
 	/*
 	 * Constructor:
 	 */
-  function xmlrpc_server($dispMap, $serviceNow=1) 
+  function xmlrpc_server($dispMap, $serviceNow=1)
 	{
 		global $HTTP_RAW_POST_DATA;
 		// dispMap is a despatch array of methods
@@ -181,41 +181,41 @@ class xmlrpc_server
 		// doesn't appear in the map then an unknown
 		// method error is generated
 		$this->dmap=$dispMap;
-		if ($serviceNow) 
+		if ($serviceNow)
 		{
 			$this->service();
 		}
   }
 
-	function serializeDebug() 
+	function serializeDebug()
 	{
 		global $_xmlrpc_debuginfo;
-		if ($_xmlrpc_debuginfo!="") 
+		if ($_xmlrpc_debuginfo!="")
 			return "<!-- DEBUG INFO:\n\n" .
 				$_xmlrpc_debuginfo . "\n-->\n";
 		else
 			return "";
 	}
 
-	function service() 
+	function service()
 	{
 		$r=$this->parseRequest();
 		// TODO: charset:  encoding=\"iso-8859-1\"
-		$payload="<?xml version=\"1.0\"?>\n" . 
+		$payload="<?xml version=\"1.0\"?>\n" .
 			$this->serializeDebug() .							// Include debug info as comments
 			$r->serialize();
-		Header("Content-type: text/xml\r\nContent-length: " . 
+		Header("Content-type: text/xml\r\nContent-length: " .
 					 strlen(trim($payload)));
 		print trim($payload);
 	}
 
-	function verifySignature($in, $sig) 
+	function verifySignature($in, $sig)
 	{
-		for($i=0; $i < sizeof($sig); $i++) 
+		for($i=0; $i < sizeof($sig); $i++)
 		{
 			// check each possible signature in turn
 			$cursig=$sig[$i];
-			if (sizeof($cursig)==$in->getNumParams()+1) 
+			if (sizeof($cursig)==$in->getNumParams()+1)
 			{
 				$itsOK=1;
 				for($n=0; $n<$in->getNumParams(); $n++) {
@@ -240,39 +240,39 @@ class xmlrpc_server
 		return array(0, "Wanted $wanted, got $got at param $pno)");
 	}
 
-	/** 
-	 * 
+	/**
+	 *
 	 *
 	 * {@internal parseRequest(-) }}
 	 */
-  function parseRequest($data="") 
+  function parseRequest($data="")
 	{
 		global $_xh,$HTTP_RAW_POST_DATA;
 		global $xmlrpcerr, $xmlrpcstr, $xmlrpcerrxml, $xmlrpc_defencoding,
 			$_xmlrpcs_dmap;
-	
-		if ($data=="") 
+
+		if ($data=="")
 		{
 			$data=$HTTP_RAW_POST_DATA;
 		}
 		// xmlrpc_debugmsg( 'Data received: ['.$data.']' );
-		
-		
+
+
 		$parser = xml_parser_create($xmlrpc_defencoding);
-	
+
 		$_xh[$parser]=array();
 		$_xh[$parser]['st']="";
-		$_xh[$parser]['cm']=0; 
-		$_xh[$parser]['isf']=0; 
+		$_xh[$parser]['cm']=0;
+		$_xh[$parser]['isf']=0;
 		$_xh[$parser]['params']=array();
 		$_xh[$parser]['method']="";
-	
+
 		// decompose incoming XML into request structure:
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
 		xml_set_element_handler($parser, "xmlrpc_se", "xmlrpc_ee");
 		xml_set_character_data_handler($parser, "xmlrpc_cd");
 		xml_set_default_handler($parser, "xmlrpc_dh");
-		if (!xml_parse($parser, $data, 1)) 
+		if (!xml_parse($parser, $data, 1))
 		{
 			// return XML error as a faultCode
 			$r=new xmlrpcresp(0,
@@ -281,7 +281,7 @@ class xmlrpc_server
 						xml_error_string(xml_get_error_code($parser)),
 						xml_get_current_line_number($parser)));
 			xml_parser_free($parser);
-		} 
+		}
 		else
 		{	// XML parsing succeeded:
 			xml_parser_free($parser);
@@ -295,12 +295,12 @@ class xmlrpc_server
 			}
 			// uncomment this to really see what the server's getting!
 			// xmlrpc_debugmsg($plist);
-			
+
 			// now to deal with the method:
 			$methName = $_xh[$parser]['method'];
 			logIO( 'I', 'Called method:'.$methName );
 
-			if (ereg("^system\.", $methName)) 
+			if (ereg("^system\.", $methName))
 			{
 				$dmap=$_xmlrpcs_dmap; $sysCall=1;
 			} else {
@@ -309,17 +309,17 @@ class xmlrpc_server
 			if (isset($dmap[$methName]['function'])) {
 				// dispatch if exists
 				if (isset($dmap[$methName]['signature'])) {
-					$sr=$this->verifySignature($m, 
+					$sr=$this->verifySignature($m,
 																		$dmap[$methName]['signature'] );
 				}
 				if ( (!isset($dmap[$methName]['signature']))
 						 || $sr[0]) {
 					// if no signature or correct signature
-					if ($sysCall) { 
-						eval('$r=' . $dmap[$methName]['function'] . 
+					if ($sysCall) {
+						eval('$r=' . $dmap[$methName]['function'] .
 								 '($this, $m);');
 					} else {
-						eval('$r=' . $dmap[$methName]['function'] . 
+						eval('$r=' . $dmap[$methName]['function'] .
 								 '($m);');
 					}
 				} else {

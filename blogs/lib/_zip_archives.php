@@ -7,13 +7,13 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author Devin Doucette - darksnoopy@shaw.ca
  *
  * @package evocore
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Class Archive
@@ -814,6 +814,9 @@ class zip_file extends archive
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/28 09:06:44  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.2  2004/10/16 01:31:24  blueyed
  * documentation changes
  *

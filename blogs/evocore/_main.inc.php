@@ -138,7 +138,7 @@ require_once( dirname(__FILE__).'/_db.class.php' );
  *
  * @global DB $DB
  */
-$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases, $db_table_options );
+$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_table_options );
 
 require_once( dirname(__FILE__).'/_results.class.php' );
 
@@ -424,6 +424,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.23  2005/02/28 09:06:33  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.22  2005/02/28 01:32:32  blueyed
  * Hitlog refactoring, part uno.
  *

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -942,6 +942,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/28 09:06:33  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
  * Revision 1.14  2005/02/27 20:28:03  blueyed
  * taken count() out of loop
  *
