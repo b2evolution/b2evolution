@@ -597,7 +597,7 @@ tr.group {
 	font-weight: bold;
 	background-color: #eee;
 }
-span.radiooption {
+label.radiooption {
 	white-space: nowrap;
 	margin-right: 1em;
 }

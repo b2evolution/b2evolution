@@ -28,9 +28,9 @@ class GeneralSettings extends AbstractSettings
 	 */
 	function GeneralSettings()
 	{ // constructor
-		global $new_db_version, $tablesettings;
+		global $new_db_version;
 
-		$this->dbtablename = $tablesettings;
+		$this->dbtablename = 'EVO_settings';
 		$this->colkeynames = array( 'set_name' );
 		$this->colvaluename = 'set_value';
 

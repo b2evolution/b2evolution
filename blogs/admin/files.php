@@ -33,6 +33,18 @@ if( $current_User->level < 10 )
 	die( 'This is alpha. You need user level 10 to play with this.' );
 }
 
+if( $action == 'update_settings' )
+{
+	param( 'option_dirsattop', 'integer', 0 );
+	$UserSettings->set( 'fm_dirsattop', $option_dirsattop );
+		
+	if( $UserSettings->updateDB() )
+	{
+		$Messages->add( T_('User preferences updated').'.', 'note' );
+	}
+}
+
+
 $Fileman = new FileManager( $current_User, 'files.php', $cd, $order, $asc );
 
 if( $action == '' && $file != '' )
@@ -394,16 +406,6 @@ switch( $action ) // (we catched empty action before)
 		}
 
 		break;
-	
-	case 'update_options':
-		param( 'option_dirsattop', 'integer', 0 );
-		$UserSettings->set( 'fm_dirsattop', $option_dirsattop );
-		
-		if( $UserSettings->updateDB() )
-		{
-			$Fileman->Messages->add( T_('User preferences updated').'.', 'note' );
-		}
-		break;
 }
 
 
@@ -565,7 +567,7 @@ if( $i != 0 )
 			<br />
 
 			<?php echo $Fileman->form_hiddeninputs() ?>
-			<input type="hidden" name="action" value="update_options" />
+			<input type="hidden" name="action" value="update_settings" />
 			<div class="input">
 			<input type="submit" value="<?php echo T_('Update !') ?>" />
 			</div>

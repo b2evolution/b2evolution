@@ -30,9 +30,7 @@ class UserSettings extends AbstractSettings
 	 */
 	function UserSettings()
 	{ // constructor
-		global $new_db_version, $tableusersettings;
-
-		$this->dbtablename = $tableusersettings;
+		$this->dbtablename = 'EVO_usersettings';
 		$this->colkeynames = array( 'uset_user_ID', 'uset_name' );
 		$this->colvaluename = 'uset_value';
 		

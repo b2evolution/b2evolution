@@ -49,9 +49,8 @@ class AbstractSettings
 	{
 		global $DB;
 
-		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.
-																					$this->colvaluename.
-		                            ' FROM '.$this->dbtablename );
+		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
+																.' FROM '.$this->dbtablename );
 
 		if( !$result )
 		{

@@ -37,20 +37,22 @@ class FileManager
 	/**
 	 * Constructor
 	 *
-	 * @param User the current User
+	 * @param User the current User {@link User}}
 	 * @param string the root dir
 	 */
-	function FileManager( $current_User, $url, $dir = '#', $order = 'name', $asc = '#' )
+	function FileManager( $cUser, $url, $dir = '#', $order = 'name', $asc = '#' )
 	{
 		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
 
 		$this->Messages = new Log( 'error' );
 
-		$this->user = $current_User;
+		$this->user = $cUser;
 
 		$this->order = $order;
 		$this->orderasc = $asc;
 
+		$this->loadSettings();
+		
 		$this->imgpath = $basepath.'/'.$admin_subdir.'/img/fileicons/';
 		$this->imgurl = $admin_url.'/img/fileicons/';
 		$media_dir = $basepath.'/'.$media_subdir;
@@ -1264,6 +1266,17 @@ class FileManager
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * get prefs from user's Settings
+	 */
+	function loadSettings()
+	{
+		global $UserSettings;
+		
+		$this->dirsattop = $UserSettings->get( 'fm_dirsattop', $this->user->ID );
 	}
 
 

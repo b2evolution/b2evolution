@@ -58,6 +58,9 @@ function db_delete()
 
 	echo "Dropping Locales...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS EVO_locales' );
+
+	echo "Dropping User Settings...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS EVO_usersettings' );
 }
 
 ?>
