@@ -911,26 +911,26 @@ function remove_magic_quotes( $mixed )
 function param( $var, $type = '', $default = '', $memorize = false,
 								$override = false, $forceset = true )
 {
-	global $$var, $global_param_list, $Debuglog;
+	global $global_param_list, $Debuglog;
 
 	// Check if already set
 	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
-	if( !isset( $$var ) || $override )
+	if( !isset( $GLOBALS[$var] ) || $override )
 	{
 		if( isset($_POST[$var]) )
 		{
-			$$var = remove_magic_quotes( $_POST[$var] );
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by POST', 'params' );
+			$GLOBALS[$var] = remove_magic_quotes( $_POST[$var] );
+			$Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by POST', 'params' );
 		}
 		elseif( isset($_GET[$var]) )
 		{
-			$$var = remove_magic_quotes($_GET[$var]);
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by GET', 'params' );
+			$GLOBALS[$var] = remove_magic_quotes($_GET[$var]);
+			$Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by GET', 'params' );
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
-			$$var = remove_magic_quotes($_COOKIE[$var]);
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by COOKIE', 'params' );
+			$GLOBALS[$var] = remove_magic_quotes($_COOKIE[$var]);
+			$Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by COOKIE', 'params' );
 		}
 		elseif( $default === true )
 		{
@@ -938,8 +938,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $forceset )
 		{
-			$$var = $default;
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by default', 'params' );
+			$GLOBALS[$var] = $default;
+			$Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by default', 'params' );
 		}
 		else
 		{ // param not found! don't set the variable.
@@ -949,13 +949,13 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	}
 	else
 	{ // Variable was already set but we need to remove the auto quotes
-		$$var = remove_magic_quotes($$var);
+		$GLOBALS[$var] = remove_magic_quotes($GLOBALS[$var]);
 
-		$Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($$var, true).']!', 'params' );
+		$Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
 	// type will be forced even if it was set before and not overriden
-	if( !empty($type) && $$var !== NULL )
+	if( !empty($type) && $GLOBALS[$var] !== NULL )
 	{ // Force the type
 		// echo "forcing type!";
 		switch( $type )
@@ -965,13 +965,12 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				break;
 
 			case 'string':
-				// echo $var, '=', $$var, '<br />';
-				$$var = trim( strip_tags($$var) );
+				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
 				break;
 
 			default:
-				settype( $$var, $type );
-				$Debuglog->add( 'param(-): '.$var.' typed to '.$type.', new value='.$$var, 'params' );
+				settype( $GLOBALS[$var], $type );
+				$Debuglog->add( 'param(-): '.$var.' typed to '.$type.', new value='.$GLOBALS[$var], 'params' );
 		}
 	}
 
@@ -985,8 +984,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 	}
 
-	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
-	return $$var;
+	// echo $var, '(', gettype($GLOBALS[$var]), ')=', $GLOBALS[$var], '<br />';
+	return $GLOBALS[$var];
 }
 
 
@@ -1683,6 +1682,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.25  2005/01/05 02:52:37  blueyed
+ * explicit $GLOBAL[] for param()
+ *
  * Revision 1.24  2005/01/03 12:33:07  fplanque
  * extended datetime hadling
  *
