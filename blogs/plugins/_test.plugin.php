@@ -50,7 +50,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 class test_plugin extends Plugin
 {
-	/*
+	/**
 	 * Variables below MUST be overriden by plugin implementations,
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
