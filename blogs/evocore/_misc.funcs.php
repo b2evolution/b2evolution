@@ -479,7 +479,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
  *
  * {@internal get_weekstartend(-)}}
  */
-function get_weekstartend($mysqlstring, $startOfWeek)
+function get_weekstartend( $mysqlstring, $startOfWeek )
 {
 	$my = substr($mysqlstring, 0, 4);
 	$mm = substr($mysqlstring, 5, 2);
@@ -487,7 +487,7 @@ function get_weekstartend($mysqlstring, $startOfWeek)
 	$day = mktime(0, 0, 0, $mm, $md, $my);
 	$weekday = date('w', $day);
 	$i = 86400;
-	while( $weekday > $startOfWeek )
+	while( $weekday <> $startOfWeek )
 	{
 		$weekday = date('w', $day);
 		$day = $day - 86400;
@@ -495,6 +495,9 @@ function get_weekstartend($mysqlstring, $startOfWeek)
 	}
 	$week['start'] = $day + 86400 - $i;
 	$week['end']   = $day + 691199;
+
+	#pre_dump( 'weekstartend: '.$mysqlstring, date( 'Y-m-d', $week['start'] ), date( 'Y-m-d', $week['end'] ) );
+
 	return( $week );
 }
 
@@ -1889,6 +1892,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.48  2005/02/23 19:31:59  blueyed
+ * get_weekstartend() fixed
+ *
  * Revision 1.47  2005/02/23 04:26:18  blueyed
  * moved global $start_of_week into $locales properties
  *

@@ -340,12 +340,15 @@ class Calendar
 
 			// caution: offset bug inside
 			$calendarblah = get_weekstartend($datestartofmonth, locale_startofweek());
-			if (mysql2date('w', $datestartofmonth) == locale_startofweek()) {
+			if (mysql2date('w', $datestartofmonth) == locale_startofweek())
+			{
 				$calendarfirst = $calendarblah['start'] + 1 + 3600;     // adjust for daylight savings time
-			} else {
+			}
+			else
+			{
 				$calendarfirst = $calendarblah['end'] - 604799 + 3600;  // adjust for daylight savings time
 			}
-			//echo 'calendarfirst=', $calendarfirst;
+			#pre_dump( 'calendarfirst', date('Y-m-d', $calendarfirst) );
 
 			$calendarblah = get_weekstartend($dateendofmonth, $end_of_week);
 			if (mysql2date('w', $dateendofmonth) == $end_of_week) {
@@ -353,11 +356,14 @@ class Calendar
 			} else {
 				$calendarlast = $calendarblah['end'] + 10000;
 			}
-			//echo 'calendarlast=', $calendarlast;
+			#pre_dump( 'calendarlast', date('Y-m-d', $calendarlast) );
 
 			// here the offset bug is corrected
-			if ((intval(date('d', $calendarfirst)) > 1) && (intval(date('m', $calendarfirst)) == intval($this->month))) {
+			if( (intval(date('d', $calendarfirst)) > 1) && (intval(date('m', $calendarfirst)) == intval($this->month)) )
+			{
+				#pre_dump( 'with offset bug', date('Y-m-d', $calendarfirst) );
 				$calendarfirst = $calendarfirst - 604800;
+				#pre_dump( 'without offset bug', date('Y-m-d', $calendarfirst) );
 			}
 		}
 		else
@@ -552,7 +558,7 @@ class Calendar
 			$j = 0;
 			$k = 1;
 
-			for($i = $calendarfirst; $i < ($calendarlast + 86400); $i = $i + 86400)
+			for( $i = $calendarfirst; $i < ($calendarlast + 86400); $i = $i + 86400 )
 			{ // loop day by day (86400 seconds = 24 hours)
 				if ($newrow == 1)
 				{ // We need to start a new row:
@@ -688,6 +694,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/23 19:31:58  blueyed
+ * get_weekstartend() fixed
+ *
  * Revision 1.5  2005/02/23 04:26:18  blueyed
  * moved global $start_of_week into $locales properties
  *
