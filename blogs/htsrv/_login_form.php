@@ -22,7 +22,7 @@ param( 'log', 'string', '' );		// last typed login
 $location = $redirect_to;
 $Debuglog->add( 'location: '.$location );
 
-$Form = & new Form( $location );
+$Form = & new Form( $location, '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 

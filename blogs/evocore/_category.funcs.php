@@ -524,6 +524,8 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 	$callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, // Callback functions
 	$level = 0 )	// Caller nesting level, just to keep track of how far we go :)
 {
+	$r = '';
+
 	// echo 'Number of cats=', count($ccats);
 	if( ! empty( $ccats ) ) // this can happen if there are no cats at all!
 	{
@@ -534,19 +536,22 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 			{ // this cat is in the blog and is a child of the parent
 				if( $child_count++ == 0 )
 				{	// this is the first child
-						$callback_before_first( $parent_ID, $level );
+						$r .= $callback_before_first( $parent_ID, $level );
 				}
-				if( $callback_before_each( $icat_ID, $level ) ) continue;
-				cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each,
-											$callback_after_each, $callback_after_last, $level+1 );
-				$callback_after_each( $icat_ID, $level );
+				// was: if( $callback_before_each( $icat_ID, $level ) ) continue;
+				$r .= $callback_before_each( $icat_ID, $level );
+				$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each,
+														$callback_after_each, $callback_after_last, $level+1 );
+				$r .= $callback_after_each( $icat_ID, $level );
 			}
 		}
 		if( $child_count )
 		{	// There have been children
-			$callback_after_last( $parent_ID, $level );
+			$r .= $callback_after_last( $parent_ID, $level );
 		}
 	}
+
+	return $r;
 }
 
 
@@ -856,6 +861,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/25 15:07:19  fplanque
+ * cleanup
+ *
  * Revision 1.7  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

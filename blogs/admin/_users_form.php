@@ -55,36 +55,27 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		?>
 		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close user profile'); ?>" class="middle" /></a>
 	</div>
-	<?php } ?>
-
-	<h2><?php
-	if( $edited_User->get('ID') == 0 )
-	{
-		echo T_('Create new user profile');
-	}
-	else
-	{
-		echo T_('Profile for:').' '.$edited_User->dget('firstname').' '.$edited_User->dget('lastname')
-					.' ['.$edited_User->dget('login').']';
-	}
-	?></h2>
-
-<?php
-
-$Form->action = 'b2users.php';
-if( $user != 0 ) $Form->action .= '?user='.$user;
-
+	<?php }
 	
-$Form = & new Form( $Form->action, 'form' );
-	
-$Form->begin_form( 'fform' );
+
+$Form = & new Form( 'b2users.php', 'form' );
+
+if( $edited_User->get('ID') == 0 )
+{
+	$Form->begin_form( 'fform', T_('Create new user profile') );
+}
+else
+{
+	$Form->begin_form( 'fform', T_('Profile for:').' '.$edited_User->dget('firstname').' '.$edited_User->dget('lastname')
+				.' ['.$edited_User->dget('login').']' );
+}
 
 $Form->hidden( 'action', 'userupdate' );
 $Form->hidden( 'edited_user_ID', $edited_User->dget('ID','formvalue') );
 $Form->hidden( 'edited_user_oldlogin', $edited_User->dget('login', 'formvalue') );
 	
 $Form->fieldset( T_('User rights') );
-	
+
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
 if( $user_profile_only )
 {
@@ -207,7 +198,7 @@ $Form->info( T_('From Domain'), $edited_User->dget('domain') );
 $Form->info( T_('With Browser'), $edited_User->dget('browser') );
 
 $Form->fieldset_end();
-$Form->end_form();		
+$Form->end_form();
 
 ?>
 

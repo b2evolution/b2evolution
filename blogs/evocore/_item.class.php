@@ -1193,6 +1193,95 @@ class Item extends DataObject
 
 
 	/**
+	 * Template function: display checkable list of renderers
+	 *
+	 * {@internal Item::renderer_checkboxes(-)}}
+	 */
+	function renderer_checkboxes()
+	{
+		global $Plugins;
+
+		$Plugins->restart(); // make sure iterator is at start position
+
+		$atLeastOneRenderer = false;
+
+		while( $loop_RendererPlugin = $Plugins->get_next() )
+		{ // Go through whole list of renders
+			// echo ' ',$loop_RendererPlugin->code;
+			if( $loop_RendererPlugin->apply_when == 'stealth'
+				|| $loop_RendererPlugin->apply_when == 'never' )
+			{ // This is not an option.
+				continue;
+			}
+			$atLeastOneRenderer = true;
+
+			echo '<div>';
+
+			echo '<input type="checkbox" class="checkbox" name="renderers[]" value="';
+			$loop_RendererPlugin->code();
+			echo '" id="';
+			$loop_RendererPlugin->code();
+			echo '"';
+
+			switch( $loop_RendererPlugin->apply_when )
+			{
+				case 'always':
+					// echo 'FORCED';
+					echo ' checked="checked"';
+					echo ' disabled="disabled"';
+					break;
+
+				case 'opt-out':
+					if( in_array( $loop_RendererPlugin->code, $this->renderers ) // Option is activated
+						|| in_array( 'default', $this->renderers ) ) // OR we're asking for default renderer set
+					{
+						// echo 'OPT';
+						echo ' checked="checked"';
+					}
+					// else echo 'NO';
+					break;
+
+				case 'opt-in':
+					if( in_array( $loop_RendererPlugin->code, $this->renderers ) ) // Option is activated
+					{
+						// echo 'OPT';
+						echo ' checked="checked"';
+					}
+					// else echo 'NO';
+					break;
+
+				case 'lazy':
+					// cannot select
+					if( in_array( $loop_RendererPlugin->code, $this->renderers ) ) // Option is activated
+					{
+						// echo 'OPT';
+						echo ' checked="checked"';
+					}
+					echo ' disabled="disabled"';
+					break;
+			}
+
+			echo ' title="';
+			$loop_RendererPlugin->short_desc();
+			echo '" />'.
+						'<label for="';
+			$loop_RendererPlugin->code();
+			echo '" title="';
+			$loop_RendererPlugin->short_desc();
+			echo '">';
+			$loop_RendererPlugin->name();
+			echo '</label>';
+			echo "</div>\n";
+		}
+
+		if( !$atLeastOneRenderer )
+		{
+			echo T_('No renderer plugins are installed.');
+		}
+	}
+
+
+	/**
 	 * Template function: display status of item
 	 *
 	 * Statuses:
@@ -1641,6 +1730,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2005/01/25 15:07:22  fplanque
+ * cleanup
+ *
  * Revision 1.17  2005/01/20 20:38:58  fplanque
  * refactoring
  *

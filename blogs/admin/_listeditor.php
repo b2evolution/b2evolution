@@ -212,12 +212,10 @@ $Results->display();
 
 $Form = & new form( '', 'form' );
 
-$Form->begin_form( 'fform' );
+$Form->begin_form( 'fform', ( $action != 'edit' ) ? T_('New entry') : T_('Edit entry') );
 
 $Form->hidden( 'action', ($action != 'edit' ) ? 'create' : 'update' );
 
-$Form->fieldset( ( $action != 'edit' ) ? T_('New entry') : T_('Edit entry') );
-	
 if( $action == 'edit' )
 {
 	$Form->hidden( 'div_firm_ID', $ID );					
@@ -225,7 +223,6 @@ if( $action == 'edit' )
 }
 
 $Form->text( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', $edited_name_maxlen );
-$Form->fieldset_end();
 
 if( $action != 'edit' )
 {

@@ -73,6 +73,7 @@ class Form
 	 */
 	var $_fieldsets = array();
 
+	var $label_suffix = ':';
 
 	/**
 	 * Constructor
@@ -89,35 +90,57 @@ class Form
 		$this->form_name = $form_name;
 		$this->form_action = $form_action;
 		$this->form_method = $form_method;
+		$this->layout = $layout;
 
-		switch( $layout )
+		switch( $this->layout )
 		{
 			case 'table':
+				$this->formstart = '<table cellspacing="0">'."\n";
+				$this->titlestart = '<thead><tr class="formtitle"><th colspan="2"><div class="results_title">';
+				$this->titleend = '</div></td></tr></thead>'."\n";
 				$this->fieldstart = "<tr>\n";
 				$this->labelstart = '<td class="label">';
 				$this->labelend = "</td>\n";
+				$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
 				$this->inputstart = '<td class="input">';
 				$this->inputend = "</td>\n";
 				$this->fieldend = "</tr>\n\n";
+				$this->buttonsstart = '<tr class="buttons"><td colspan="2">';
+				$this->buttonsend = "</td></tr>\n";
+				$this->formend = "</table>\n";
 				break;
 
 			case 'fieldset':
+				$this->formstart = '';
+				$this->titlestart = '';
+				$this->titleend = "\n";
 				$this->fieldstart = "<fieldset>\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
+				$this->labelempty = '';
 				$this->inputstart = '<div class="input">';
 				$this->inputend = "</div>\n";
 				$this->fieldend = "</fieldset>\n\n";
+				$this->buttonsstart = '<fieldset><div class="input">';
+				$this->buttonsend = "</div></fieldset>\n\n";
+				$this->formend = '';
 				break;
 
 			default:
 				// "none" (no layout)
+				$this->formstart = '';
+				$this->titlestart = '';
+				$this->titleend = "\n";
 				$this->fieldstart = '';
 				$this->labelstart = '';
 				$this->labelend = "\n";
+				$this->labelempty = '';
 				$this->inputstart = '';
 				$this->inputend = "\n";
 				$this->fieldend = "\n";
+				$this->buttonsstart = '';
+				$this->buttonsend = "\n";
+				$this->formend = '';
 		}
 	}
 
@@ -131,15 +154,19 @@ class Form
 	 * @param string the field label
 	 * @return the generated HTML
 	 */
-	function begin_field( $field_name, $field_label )
+	function begin_field( $field_name = '', $field_label = '' )
 	{
 		$r = $this->fieldstart;
 
 		if( !empty($field_label) )
 		{
 			$r .= $this->labelstart
-						.'<label for="'.$field_name.'">'.$field_label.':</label>'
+						.'<label for="'.$field_name.'">'.$field_label.$this->label_suffix.'</label>'
 						.$this->labelend;
+		}
+		else
+		{	// Empty label:
+			$r .= $this->labelempty;
 		}
 
 		$r .= $this->inputstart;
@@ -165,6 +192,8 @@ class Form
 	/**
 	 * Begin fieldset (with legend).
 	 *
+	 * @deprecated by ::fieldset but all functionality is not available
+	 * @author blueyed
 	 * @see {@link end_fieldset()}
 	 * @param string The fieldset legend
 	 * @param string fieldname of a checkbox that controls .disable of all
@@ -190,6 +219,8 @@ class Form
 	 * End a fieldset (and output/return it).
 	 *
 	 * This handles
+	 * @deprecated by ::fieldset_end but all functionality is not available
+	 * @author blueyed
 	 */
 	function end_fieldset()
 	{
@@ -448,22 +479,25 @@ class Form
 	/**
 	 * Builds the form field
 	 *
+	 $ @param strinf title to display on top of the form
 	 * @param string the class to use for the form tag
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function begin_form( $form_class = NULL )
+	function begin_form( $form_class = NULL, $form_title = '' )
 	{
-		if( $form_class === NULL )
-		{
-			$form_class = $this->form_class;
-		}
-
 		$r = "\n\n".'<form name="'.$this->form_name.'" id="'.$this->form_name
 					.'" method="'.$this->form_method
 					.'" action="'.$this->form_action.'"'
 					.( !empty( $form_class ) ? ' class="'.$form_class : '' )
-					.'">';
-		$r .= "\n";
+					.'">'."\n"
+					.$this->formstart;
+
+		if( !empty($form_title) )
+		{
+			$r .= $this->titlestart
+						.$form_title
+						.$this->titleend;
+		}
 
 		if( $this->output )
 		{
@@ -489,12 +523,13 @@ class Form
 		{
 			$output = $this->output;
 			$this->output = 0;
-		
+
 			$r .= $this->buttons( $buttons );
-			
+
 			$this->output = $output;
 		}
-		$r .= "\n</form>\n\n";
+		$r .= $this->formend
+					."\n</form>\n\n";
 		
 		if( $this->output )
 		{
@@ -513,19 +548,40 @@ class Form
 	 * @param string the title of the fieldset to display in the 'legend' tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function fieldset( $title, $class='' )
+	function fieldset( $title, $class='fieldset' )
 	{
-		$r = '<fieldset ';
-		if( $class != '' )
-		{ //there is a class option to display in the fieldset tag
-			$r .= 'class="'.$class.'" ';
-		}
-		$r .= '>'."\n";
+		switch( $this->layout )
+		{
+			case 'table':
+				$r = '<tr ';
+				if( $class != '' )
+				{ //there is a class option to display in the fieldset tag
+					$r .= 'class="'.$class.'" ';
+				}
+				$r .= '><td colspan="2">'."\n";
 
-		if( $title != '' )
-		{ // there is a legend tag to display
-			$r .= '<legend>'.$title."</legend>\n";
+				if( $title != '' )
+				{ // there is a legend tag to display
+					$r .= $title;
+				}
+
+				$r .= "</td></tr>\n";
+				break;
+
+			default:
+				$r = '<fieldset ';
+				if( $class != '' )
+				{ //there is a class option to display in the fieldset tag
+					$r .= 'class="'.$class.'" ';
+				}
+				$r .= '>'."\n";
+
+				if( $title != '' )
+				{ // there is a legend tag to display
+					$r .= '<legend>'.$title."</legend>\n";
+				}
 		}
+
 
 		if( $this->output )
 		{
@@ -536,7 +592,7 @@ class Form
 		{
 			return $r;
 		}
-	}
+}
 
 
 	/**
@@ -546,7 +602,16 @@ class Form
 	 */
 	function fieldset_end()
 	{
-		$r = "</fieldset>\n";
+		switch( $this->layout )
+		{
+			case 'table':
+				$r = '';
+				break;
+
+			default:
+				$r = "</fieldset>\n";
+		}
+
 		if( $this->output )
 		{
 			echo $r;
@@ -589,7 +654,7 @@ class Form
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
 			}
-			$r .= ' />'.$option[2]."<br />\n";
+			$r .= ' class="checkbox" />'.$option[2]."<br />\n";
 		}
 		$r .= $this->end_field();
 		if( $this->output )
@@ -702,20 +767,35 @@ class Form
 	 */
 	function info( $field_label, $field_info )
 	{
-		$r = "<fieldset>\n".
-				 '<div class="label">'.$field_label.":</div>\n".
-				 '<div class="info">'.$field_info."</div>\n".
-				 "</fieldset>\n\n";
+		$r = $this->fieldstart;
+
+		if( !empty($field_label) )
+		{
+			$r .= $this->labelstart
+						.$field_label.$this->label_suffix
+						.$this->labelend;
+		}
+		else
+		{	// Empty label:
+			$r = $this->labelempty;
+		}
+
+		$r .= $this->inputstart;
+
+		$r .= $field_info;
+
+    $r .= $this->inputend
+				.$this->fieldend;
 
 		if( $this->output )
-			{
-				echo $r;
-				return true;
-			}
-			else
-			{
-				return $r;
-			}	
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
 	}
 	
 	/**
@@ -732,21 +812,16 @@ class Form
 	 * @param boolean to select or not the default display
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function buttons( $options='' )
+	function buttons( $options = '' )
 	{
-		$r = "\n";
+		$r = '';
 		$hidden = 1; // boolean that tests if the buttons are all hidden
-		
-		// possible header to display if there are not only hidden buttons 
-		$header = '<fieldset class="submit">'."\n";
-		$header .= "\t<fieldset>\n";
-		$header .= "\t\t".'<div class="input">';
-		
+
 		if( !empty( $options ) )
 		{
 			foreach( $options as $options )
 			{
-				if( !strcasecmp( $options[0], 'hidden' ) )
+				if( $options[0] != 'hidden' )
 				{ //test if the current button is hidden and sets $hidden to 0 if not
 					$hidden = 0;
 				}
@@ -762,15 +837,10 @@ class Form
 			$r .= "\t\t\t".'<input type="submit" value="'.T_('Save !').'" class="SaveButton"/>'."\n";
 			$r .= "\t\t\t".'<input type="reset" value="'.T_('Reset').'" class="ResetButton"/>'."\n";
 		}*/
-		
-		// possible footer to display if there are not only hidden buttons
-		$footer = "\t\t</div>\n";
-		$footer .= "\t</fieldset>\n";
-		$footer .= "</fieldset>\n\n";
-			
-		if( $hidden )
-		{	// there are not only hidden buttons : additional tags 
-			$r = $header.$r.$footer;
+
+		if( ! $hidden )
+		{	// there are not only hidden buttons : additional tags
+			$r = $this->buttonsstart.$r.$this->buttonsend;
 		}
 				
 		if( $this->output )

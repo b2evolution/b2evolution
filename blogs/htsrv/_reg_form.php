@@ -16,7 +16,7 @@ $page_title = T_('Register form');
 $page_icon = 'icon_register.gif';
 require(dirname(__FILE__).'/_header.php');
 
-$Form = & new Form( $htsrv_url.'register.php', '' );
+$Form = & new Form( $htsrv_url.'register.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 

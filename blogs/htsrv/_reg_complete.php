@@ -21,7 +21,7 @@ require(dirname(__FILE__).'/_header.php');
 
 <?php
 
-	$Form =& new Form( $htsrv_url, 'login' );
+	$Form =& new Form( $htsrv_url, 'login', 'post', 'fieldset' );
 	
 	$Form->begin_form( '' );
 	

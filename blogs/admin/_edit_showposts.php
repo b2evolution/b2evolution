@@ -407,18 +407,19 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	$Form->hidden( 'blog', $blog );
 	
 	$Form->fieldset( 'Posts to show', ('Posts to show') );
-	echo $Form->inputstart;
+	?>
+	<div>
 
-	?>	
-	
 	<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" '?> />
 	<label for="ts_min"><?php echo T_('Past') ?></label><br />
 
 	<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" '?> />
 	<label for="ts_max"><?php echo T_('Future') ?></label>
+
 	</div>
 
 	<div>
+
 	<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" '?> />
 	<label for="sh_published"><?php echo T_('Published (Public)') ?></label><br />
 
@@ -434,11 +435,11 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> />
 	<label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br />
 
+ 	</div>
+
 	<?php
-	echo $Form->inputend;
 	$Form->fieldset_end();
-	
-	
+
 	
 	$Form->fieldset( T_('Title / Text contains'), 'Text' );			
 

@@ -116,7 +116,7 @@ $Form->hidden( 'preview_userid', $user_ID );
 
 	$Form->select( 'post_locale', $post_locale, 'locale_options_return', T_('Language') );
 
-	$Form->select_object( 'item_typ_ID', $post_locale, $itemTypeCache, T_('Type') );
+	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $itemTypeCache, T_('Type') );
 
 	if( $use_post_url )
 	{
@@ -189,12 +189,12 @@ $Form->hidden( 'preview_userid', $user_ID );
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
 	  if( $next_action == 'create' )
-	  {	// If not cjhecked, create time will be used...
+	  {	// If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
 		}
 	}
 
-	$Form->text( 'post_urltitle', $post_urltitle, 40, '<strong>'.T_('URL Title').'</strong>',
+	$Form->text( 'post_urltitle', $post_urltitle, 40, T_('URL Title'),
 							 T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
 
 	$Form->fieldset_end();
@@ -260,7 +260,7 @@ $Form->hidden( 'preview_userid', $user_ID );
 
 	$Form->fieldset( T_('Categories'), 'extracats' );
 
-	cat_select();
+	echo cat_select();
 
 	$Form->fieldset_end();
 
@@ -394,6 +394,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.12  2005/01/25 15:07:18  fplanque
+ * cleanup
+ *
  * Revision 1.11  2005/01/20 20:38:58  fplanque
  * refactoring
  *

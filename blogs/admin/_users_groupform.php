@@ -53,77 +53,78 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		?>
 
 	<a title="<?php echo T_('Close group profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close group profile'); ?>" class="middle" /></a></div>
-	<h2><?php
+
+	<?php
+
+	$Form = & new Form( 'b2users.php' );
 	if( $edited_Group->get('ID') == 0 )
 	{
-		echo T_('Creating new group');
+		$Form->begin_form( 'fform', T_('Creating new group') );
 	}
 	else
 	{
-		echo ($current_User->check_perm( 'users', 'edit' )) ? T_('Editing group:') : T_('Viewing group:');
-		echo ' '.( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ).' ('.T_('ID').' '.$edited_Group->get('ID').')';
+		$title = ($current_User->check_perm( 'users', 'edit' ) ? T_('Editing group:') : T_('Viewing group:') )
+							.' '.
+							( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->dget('name') )
+							.' ('.T_('ID').' '.$edited_Group->ID.')';
+		$Form->begin_form( 'fform', $title );
+
+    $Form->hidden( 'action', 'groupupdate' );
+    $Form->hidden( 'edited_grp_ID', $edited_Group->ID );
+    $Form->hidden( 'edited_grp_oldname', isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->dget('name','formvalue') );
 	}
-	?></h2>
 
-	<form class="fform" method="post" action="b2users.php">
-		<input type="hidden" name="action" value="groupupdate" />
-		<input type="hidden" name="edited_grp_ID" value="<?php $edited_Group->disp('ID','formvalue') ?>" />
+	$Form->fieldset( T_('General') );
+	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
+	$Form->fieldset_end();
 
-		<fieldset>
-			<legend><?php echo T_('General') ?></legend>
-			<input type="hidden" name="edited_grp_oldname" value="<?php echo ( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ) ?>" />
-			<?php
-				form_text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
-			?>
-		</fieldset>
+ 	$Form->fieldset( T_('Permissons for members of this group') );
 
-		<fieldset>
-			<legend><?php echo T_('Permissons for members of this group') ?></legend>
-			<?php
-				form_radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
-						array(  array( 'user', T_('User permissions') ),
-										array( 'viewall', T_('View all') ),
-										array( 'editall', T_('Full Access') )
-									), T_('Blogs') );
-				form_radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
-						array(  array( 'none', T_('No Access') ),
-										array( 'view', T_('View only') ),
-										array( 'edit', T_('Full Access') )
-									), T_('Statistics') );
-				form_radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
-						array(  array( 'none', T_('No Access') ),
-										array( 'view', T_('View only') ),
-										array( 'edit', T_('Full Access') )
-									), T_('Antispam') );
-				form_radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
-						array(  array( 'none', T_('No Access') ),
-										array( 'view', T_('View only') ),
-										array( 'edit', T_('Full Access') )
-									), T_('Global options') );
-				form_checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
+	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
+			array(  array( 'user', T_('User permissions') ),
+							array( 'viewall', T_('View all') ),
+							array( 'editall', T_('Full Access') )
+						), T_('Blogs') );
+	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
+			array(  array( 'none', T_('No Access') ),
+							array( 'view', T_('View only') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Statistics') );
+	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
+			array(  array( 'none', T_('No Access') ),
+							array( 'view', T_('View only') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Antispam') );
+	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
+			array(  array( 'none', T_('No Access') ),
+							array( 'view', T_('View only') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Global options') );
+	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
 
-				if( $edited_Group->get('ID') != 1 )
-				{	// Groups others than #1 can be prevented from editing users
-					form_radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
-							array(  array( 'none', T_('No Access') ),
-											array( 'view', T_('View only') ),
-											array( 'edit', T_('Full Access') )
-										), T_('User/Group Management') );
-				}
-				else
-				{
-					form_info( T_('User/Group Management'), T_('Full Access') );
-				}
-			?>
-		</fieldset>
+	if( $edited_Group->get('ID') != 1 )
+	{	// Groups others than #1 can be prevented from editing users
+		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
+				array(  array( 'none', T_('No Access') ),
+								array( 'view', T_('View only') ),
+								array( 'edit', T_('Full Access') )
+							), T_('User/Group Management') );
+	}
+	else
+	{
+		$Form->info( T_('User/Group Management'), T_('Full Access') );
+	}
+	$Form->fieldset_end();
 
-		<?php
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			form_submit();
-		} ?>
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{
+		$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
+													 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	}
 
-		<div class="clear"></div>
-	</form>
+	$Form->fieldset_end();
+	$Form->end_form();
+	?>
+
 
 </div>

@@ -20,7 +20,7 @@ require(dirname(__FILE__).'/_header.php');
 
 <?php
 
-	$Form = & new Form( $htsrv_url );
+	$Form = & new Form( $htsrv_url, '', 'post', 'fieldset' );
 	
 	$Form->begin_form( 'fform' );
 	
