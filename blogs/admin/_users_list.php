@@ -33,7 +33,7 @@
 			?>
 			<tr class="group">
 				<td colspan="7">
-					<strong><a href="b2users.php?action=groupedit&amp;grp_ID=<?php echo $loop_grp_ID ?>"><?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></a></strong>
+					<strong><a href="b2users.php?action=groupedit&amp;grp_ID=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></a></strong>
 				</td>
 			</tr>
 			<?php
@@ -47,7 +47,9 @@
 			$email = $loop_User->get('email');
 			$url = $loop_User->get('url');
 			echo "<td>", $loop_User->get('ID'), "</td>\n";
-			echo '<td><a href="b2users.php?action=useredit&amp;user=', $loop_User->get('ID'), '">', $loop_User->get('login'), "</a></td>\n";
+			echo '<td><a href="b2users.php?action=useredit&amp;user=', $loop_User->get('ID'), '">';
+			echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
+			echo $loop_User->get('login'), "</a></td>\n";
 			?>
 			<td><?php $loop_User->disp('nickname') ?></td>
 			<?php
@@ -65,7 +67,7 @@
 			if( ($loop_User->get('level') == 0) && $current_User->check_perm( 'users', 'edit' ) )
 			{
 				?>
-				<a href="b2users.php?action=delete&id=<?php echo $loop_User->get('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
+				<a href="b2users.php?action=delete&id=<?php echo $loop_User->get('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" /></a>
 				<?php
 			}
 			echo "</td>\n";
@@ -81,7 +83,7 @@
 	{ ?>
 		<div class="panelblock">
 			<?php	
-			echo '<p>[<a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php">', T_('Register a new user...'), '</a>]</p>'; ?>
+			echo '<p><a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> ', T_('Register a new user...'), '</a></p>'; ?>
 	
 			<p><?php echo T_('To delete an user, bring his/her level to zero, then click on the red cross.') ?><br />
 			<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?></p>

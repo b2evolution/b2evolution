@@ -22,7 +22,7 @@
 	{
 		?>
 		<tr>
-			<td><strong><?php blog_list_iteminfo('ID') ?>&nbsp;[<a href="b2blogs.php?action=edit&blog=<?php blog_list_iteminfo('ID') ?>"><?php echo T_('Edit') ?></a>]&nbsp;:&nbsp;<?php blog_list_iteminfo('shortname') ?></strong></td>
+			<td><strong><?php blog_list_iteminfo('ID') ?>&nbsp;<a href="b2blogs.php?action=edit&blog=<?php blog_list_iteminfo('ID') ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo  T_('Properties') ?>" />&nbsp;<?php blog_list_iteminfo('shortname') ?></strong></td>
 			<td><?php blog_list_iteminfo('name') ?></td>
 			<td><a href="<?php blog_list_iteminfo('dynurl') ?>"><?php blog_list_iteminfo('filename') ?></a></td>
 			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('stub') ?></a></td>
@@ -41,5 +41,5 @@
 	}
 	?>
 </table>
-<p>[<a href="b2blogs.php?action=new"><?php echo T_('Create new blog !') ?></a>]</p>
+<p class="center"><a href="b2blogs.php?action=new"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> <?php echo T_('Create new blog !') ?></a></p>
 </div>

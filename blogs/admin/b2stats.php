@@ -240,7 +240,7 @@ switch( $show )
 				<?php if( $current_User->check_perm( 'stats', 'edit' ) ) 
 					{ ?>
 					<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" title="<?php echo T_('Delete this hit!') ?>" /></a>
-				[<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Log as a search instead') ?>"><?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?></a>]
+				<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Log as a search instead') ?>"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?>" title="<?php echo T_('Log as a search instead') ?>" /></a>
 				<?php } ?>
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a>
 			</td>

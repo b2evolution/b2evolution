@@ -239,15 +239,22 @@ break;
 	function cat_edit_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		$cat = get_the_category_by_ID( $cat_ID );
-		echo "<li><strong>".$cat['cat_name'].'</strong>';
-		echo " [<a href=\"?action=Edit&cat_ID=".$cat_ID.'">', T_('Edit'), '</a>]';
-		echo " [<a href=\"?action=Delete&cat_ID=", $cat_ID, 
-			'" onClick="return confirm(\'Are you sure you want to delete?\')">', T_('Delete'), '</a>]';
-		echo "<ul>\n";
+		echo '<li>';
+		echo "<a href=\"?action=Edit&cat_ID=".$cat_ID.'">';
+		echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" />';
+		echo '</a> <strong>'.$cat['cat_name'].'</strong>';
+		echo " <a href=\"?action=Delete&cat_ID=", $cat_ID, 
+			'" onClick="return confirm(\'Are you sure you want to delete?\')">';
+		echo '<img src="img/xross.gif" width="13" height="13" class="middle" alt="', /* TRANS: Abbrev. for Delete */ T_('Del'), '" />';
+		echo '</a>';
+		echo "
+<ul>\n";
 	}
 	function cat_edit_after_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		echo "<li>[<a href=\"?action=newcat&parent_cat_ID=".$cat_ID.'">', T_('New sub-category here'), "</a>]</li>\n";
+		echo "<li><a href=\"?action=newcat&parent_cat_ID=".$cat_ID.'">';
+		echo '<img src="img/new.png" width="13" height="12" class="middle" alt="', T_('Create'), '" /> ';
+		echo T_('New sub-category here'), "</a></li>\n";
 		echo "</ul>\n";
 		echo "</li>\n";
 	}
@@ -259,16 +266,19 @@ break;
 	}
 	foreach( $cache_blogs as $i_blog )
 	{ // run recursively through the cats
-		echo "<h3>".$i_blog->blog_name."</h3>\n";
+		echo "
+<h3>".$i_blog->blog_name."</h3>\n";
 		echo "<ul>\n";
 		cat_children( $cache_categories, $i_blog->blog_ID, NULL, 'cat_edit_before_first', 'cat_edit_before_each', 'cat_edit_after_each', 'cat_edit_after_last', 0 );
-		echo "<li>[<a href=\"?action=newcat&blog_ID=".$i_blog->blog_ID, '">', T_('New category here'), "</a>]</li>\n";
+		echo "<li><a href=\"?action=newcat&blog_ID=".$i_blog->blog_ID, '">';
+		echo '<img src="img/new.png" width="13" height="12" class="middle" alt="', T_('Create'), '" /> ';
+		echo T_('New category here'), "</a></li>\n";
 		echo "</ul>\n";
 	}
 	// ----------------- END RECURSIVE CAT LIST ----------------
 ?>
 	<p><?php echo T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).') ?></p>
-	</div>
+</div>
 
 
 <?php require( dirname(__FILE__).'/_footer.php' ); 
