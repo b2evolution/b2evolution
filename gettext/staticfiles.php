@@ -110,7 +110,7 @@ function htmlmenu()
 	global $targets, $highlight_untranslated;
 	echo '
 	<hr />
-	<br />	
+	<br />
 	<div style="width:75%;margin:auto">
 	<form method="get" class="fform">
 	<fieldset>
@@ -122,7 +122,7 @@ function htmlmenu()
 		<br /><br /><input type="submit" value="create static files from locales .po files" class="search" />
 	</fieldset>
 	</form>
-	
+
 	<form method="get" class="fform">
 	<fieldset>
 		<legend>extract</legend>
@@ -185,9 +185,9 @@ class POFile // {{{
 	function translate( $msgid )
 	{
 		$omsgid = $msgid;  // remember
-		
+
 		if( preg_match_all('/<a\s+([^>]*)>/', $msgid, $matches) )
-		{	// we have to replace links
+		{ // we have to replace links
 			// remember a-tag params
 			$aparams = $matches[1];
 

@@ -32,7 +32,7 @@ function set_upgrade_checkpoint( $version )
 	{
 		$query = "UPDATE T_settings
 								SET set_value = '$version'
-								WHERE set_name = 'db_version'" );
+								WHERE set_name = 'db_version'";
 	}
 	$DB->query( $query );
 

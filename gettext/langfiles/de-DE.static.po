@@ -377,8 +377,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Starte das Installations-Skript auf deinem Server. Es befindet sich in <code>http://deineseite.de/b2evo/install</code>. Dann folge einfach den Anweisungen dort.<br /> <br /> Der Installer wird dir ein paar Fragen stellen, die notwendigen Datenbank-Tabellen erstellen, deine WordPress-Daten nach b2evo kopieren (ohne WordPress zu beeinträchtigen) und b2evolution für dich konfigurieren."
 
 #: ../../doc/upfrom_wordpress.src.html:68
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
-msgstr "Schaue im <a %s>Wiki</a> oder den <a %s>Foren</a> nach Hinweise, um dein vorhandenes WordPress-Template &amp; -Skin nach b2evolution upzugraden."
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
+msgstr "Schaue in der <a %s>Anleitung</a> oder den <a %s>Foren</a> nach Hinweisen, um dein vorhandenes WordPress-Template &amp; -Skin nach b2evolution upzugraden."
 
 #: ../../doc/upfrom_wordpress.src.html:70
 msgid "You can reuse your current WordPress CSS design in a snap by copying your style.css file into any b2evolution skin folder which name starts with wpc_ (which stands for WordPress CSS compatible)"
@@ -413,8 +413,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Starte das Installations-Skript auf deinem Server. Es befindet sich in <code>http://deineseite.de/b2evo/install</code>. Dann folge einfach den Anweisungen dort.<br /> <br /> Der Installer wird dir ein paar Fragen stellen, die notwendigen Datenbank-Tabellen erstellen, deine b2-Daten nach b2evo kopieren (ohne b2 zu beeinträchtigen) und b2evolution für dich konfigurieren."
 
 #: ../../doc/upgradefrom_b2.src.html:69
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr "Schaue im <a %s>Wiki</a> oder den <a %s>Foren</a> nach Hinweisen, um dein vorhandenes b2-Template (Vorlage) nach b2evolution upzugraden."
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "Schaue in der <a %s>Anleitung</a> oder den <a %s>Foren</a> nach Hinweisen, um dein vorhandenes b2-Template (Vorlage) nach b2evolution upzugraden."
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
@@ -430,15 +430,15 @@ msgstr "Lösche alle vorhandenen b2evolution-Dateien auf dem Server, bevor du die
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
 msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
-msgstr "Lade <strong>alle neuen b2evolution Dateien aus dem /blogs-Ordner</strong> auf deine Seite hoch. Wir können es nicht genug betonen: <strong>ALLE DATEIEN</strong>! Und das heisst, dass du nicht von dir veränderte Dateien, einschliesslich /conf, Skins, Blog-Templates (Vorlagen), Stub-Dateien, etc weiterverwenden kannst, wie sie sind!<br /><br /> Das bedeutet, dass du all diese Dateien nochmals anpassen musst. Es tut uns leid, aber durch den Fortschritt der Entwicklung und dem Hinzufügen von neuen Funktionen können wir nicht garantieren, dass irgendwas funktioniert, wenn du älteren Dateien übernimmst. <strong>Jedoch</strong>, da du die Dateien in Schritt 1 gesichert hast, kannst du versuchen, sie teilweise wiederzuverwenden, nachdem der Upgrade-Prozess beendet ist. Siehe Schritt 8 unten."
+msgstr "Lade <strong>alle neuen b2evolution Dateien aus dem /blogs-Ordner</strong> auf deine Seite hoch. Wir können es nicht genug betonen: <strong>ALLE DATEIEN</strong>! Und das heisst, du kannst keine Dateien weiterverwenden (auch nicht /conf, Skins, Blog-Templates (Vorlagen), Stub-Dateien, etc)!  Du musst diese (neuen) Dateien nach dem Upload nochmals anpassen.<br /><br />Es tut uns leid, aber durch den Fortschritt der Entwicklung und dem Hinzufügen von neuen Funktionen können wir nicht garantieren, dass irgendetwas funktioniert, wenn du älteren Dateien übernimmst. <strong>Jedoch</strong>, da du die Dateien in Schritt 1 gesichert hast, kannst du versuchen, sie teilweise wiederzuverwenden, nachdem der Upgrade-Prozess beendet ist. Siehe  dazu Schritt 8."
 
 #: ../../doc/upgradefrom_b2evo.src.html:41
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
 msgstr "Starte das Installations-Skript auf deinem Server. Es befindet sich in <code>http://deineseite.de/deinblogsordner/install</code>. Dann folge einfach den Anweisungen dort.<br /> <br /> Der Installer wird dich nach ein paar grundlegenden Einstellungen fragen (falls du nicht schon die Datei /conf/_config.php vor dem Hochladen angepasst hast) und dich dann das Datenbank-Upgrade zur aktuellen Version durchführen lassen."
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
-msgstr "Jetzt solltest du deine vorherigen Anpassungen wiederherstellen. Wir empfehlen ein diff/merge-Werkzeug wie <a %s>WinMerge</a>. So kannst du einfach deine alten (gesicherten) Dateien mit den neuen vergleichen (sogar ganze Verzeichnisse auf einmal) and entsprechende Anpassungen treffen.<br /><br /> Du kannst auch im <a %s>Wiki</a> oder den <a %s>Foren</a> für Hinweise zum Upgraden spezifischer Dateien von einer bestimmten Version zu einer anderen suchen/fragen."
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgstr "Nun kannst du deine Veränderungen wiederherstellen. Wir empfehlen dir dazu ein Vergleichsprogramm (Diff/Merge-Tool) wie zB <a %s>WinMerge</a>. So kannst du einfach deine alten (gesicherten) Dateien mit den neuen vergleichen (sogar ganze Verzeichnisse auf einmal) und entsprechende Anpassungen treffen.<br /><br /> Du kannst ebenso im <a %s>Handbuch</a> (Manual) oder den <a %s>Foren</a> nachschauen, um Hinweise zu finden, wie du bestimmte Dateien von einer älteren Version zu einer neueren anpasst."
 
 #: ../../doc/upgradefrom_gl.src.html:6
 msgid "Upgrading from GeekLog"
