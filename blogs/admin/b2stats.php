@@ -233,7 +233,7 @@ switch( $show )
 	<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
 	<?php refererList(40,'global',1,1,'no','',$blog); ?>
 	<table class='thin'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 		<tr>
 			<td><?php stats_time() ?></td>
 			<td>
@@ -257,7 +257,7 @@ switch( $show )
 	<h3><?php echo T_('Top referers') ?>:</h3>
 	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<td><a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
@@ -284,7 +284,7 @@ switch( $show )
 	<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',1,1,"'search'",'',$blog); ?>
 	<table class='thin'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 		<tr>
 			<td><?php stats_time() ?></td>
 			<td>
@@ -304,7 +304,7 @@ switch( $show )
 	<h3><?php echo T_('Top refering search engines') ?>:</h3>
 	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<td class="right"><?php stats_hit_count() ?></td>
@@ -317,7 +317,7 @@ switch( $show )
 	<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td><?php stats_referer("<a href=\"", "\">") ?><?php stats_user_agent('robots') ?><?php stats_referer("", "</a>", false) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
@@ -342,7 +342,7 @@ switch( $show )
 	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(40,'global',0,0,"'rss'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td><?php stats_user_agent(true) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
@@ -368,7 +368,7 @@ switch( $show )
 	<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 	<?php refererList(10,'global',1,1,"'invalid'",'',$blog); ?>
 	<table class='thin'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 		<tr>
 			<td><?php stats_time() ?></td>
 			<?php if( $current_User->check_perm( 'stats', 'edit' ) )
@@ -398,7 +398,7 @@ switch( $show )
 	<h3><?php echo T_('Top User Agents') ?>:</h3>
 	<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td><?php stats_user_agent( false ) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>

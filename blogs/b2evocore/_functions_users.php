@@ -201,13 +201,13 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
  */
 function get_userdatabylogin($user_login)
 {
-	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache))
+	global $DB, $tableusers, $cache_userdata,$use_cache;
+	if ((empty($cache_userdata[$user_login])) OR (!$use_cache))
 	{
-		$sql = "SELECT * FROM $tableusers WHERE user_login = '$user_login'";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$myrow = mysql_fetch_array($result);
-		$querycount++;
+		$sql = "SELECT * 
+						FROM $tableusers 
+						WHERE user_login = '$user_login'";
+		$myrow = $DB->get_row( $sql, ARRAY_A );
 		$cache_userdata[$user_login] = $myrow;
 	}
 	else
@@ -222,13 +222,13 @@ function get_userdatabylogin($user_login)
  */
 function get_userdata($userid)
 {
-	global $tableusers,$querycount,$cache_userdata,$use_cache;
+	global $DB,$tableusers, $cache_userdata,$use_cache;
 	if ((empty($cache_userdata[$userid])) OR (!$use_cache))
 	{	// We do a progressive cache load beacuse there can be many many users!
-		$sql = "SELECT * FROM $tableusers WHERE ID = $userid";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
-		while ($myrow = mysql_fetch_array($result))
+		$sql = "SELECT * 
+						FROM $tableusers 
+						WHERE ID = $userid";
+		if( $myrow = $DB->get_row( $sql, ARRAY_A ) )
 		{
 			 $cache_userdata[$myrow['ID']] = $myrow;
 		}
@@ -243,46 +243,16 @@ function get_userdata($userid)
 
 
 
-/*
- * get_userid(-)
- */
-function get_userid($user_login)
-{
-	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache))
-	{
-	/*	$sql = "SELECT ID FROM $tableusers WHERE user_login = '$user_login'";
-		$result = mysql_query($sql) or die("No user with the login <i>$user_login</i>");
-		$myrow = mysql_fetch_array($result);
-		$querycount++;
-		$cache_userdata["$user_login"] = $myrow;
-	 *
-	 * Optimized by R. U. Serious
-	 */
-		$sql = "SELECT user_login, ID FROM $tableusers";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
-		while ($myrow = mysql_fetch_array($result))
-		{
-			 $cache_userdata[$myrow['user_login']] = $myrow['ID'];
-		}
-		$myrow = $cache_userdata["$user_login"];
-	}
-	return($myrow[0]);
-}
-
 
 /*
  * get_usernumposts(-)
  */
 function get_usernumposts( $userid )
 {
-	global $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments,$querycount;
-	$sql = "SELECT count(*) AS count FROM $tableposts WHERE post_author = $userid";
-	$result = mysql_query($sql) or mysql_oops( $sql );
-	$querycount++;
-	$myrow = mysql_fetch_array($result);
-	return $myrow['count'];
+	global $DB, $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments;
+	return $DB->get_var( "SELECT count(*) 
+													FROM $tableposts 
+											   WHERE post_author = $userid" );
 }
 
 

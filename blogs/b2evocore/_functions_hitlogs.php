@@ -32,7 +32,7 @@ if ($topRefererList)
  */
 function log_hit()
 {
-	global $DB, $querycount, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
+	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
 	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page;
 	
 	$ReqURI = $_SERVER['REQUEST_URI'];
@@ -181,11 +181,7 @@ function log_hit()
 					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$ignore', 
 									'".$DB->escape($ref)."', '".$DB->escape($baseDomain)."', $blog, 
 									'".$DB->escape($RemoteAddr)."', '".$DB->escape($UserAgent)."')";
-
-	// print $sql;
-
-	mysql_query($sql) or mysql_oops( $sql );
-	$querycount++;
+	$DB->query( $sql );
 
 }
 
@@ -197,11 +193,10 @@ function log_hit()
  */
 function hit_delete( $hit_ID )
 {
-	global $tablehitlog, $querycount;
+	global $DB, $tablehitlog;
 
 	$sql ="DELETE FROM $tablehitlog WHERE visitID = $hit_ID";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
+	$DB->query( $sql );
 
 }
 
@@ -212,12 +207,11 @@ function hit_delete( $hit_ID )
  */
 function hit_prune( $date )
 {
-	global $tablehitlog, $querycount;
+	global $DB, $tablehitlog;
 
 	$iso_date = date ('Y-m-d', $date);
 	$sql ="DELETE FROM $tablehitlog WHERE DATE_FORMAT(visitTime,'%Y-%m-%d') = '$iso_date'";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
+	$DB->query( $sql );
 
 }
 
@@ -228,15 +222,13 @@ function hit_prune( $date )
  */
 function hit_change_type( $hit_ID, $type )
 {
-	global $tablehitlog, $querycount;
+	global $DB, $tablehitlog;
 
 	$sql ="UPDATE $tablehitlog ".
 				"SET hit_ignore = '$type', ".
 				"    visitTime = visitTime ".	// prevent mySQL from updating timestamp
 				"WHERE visitID = $hit_ID";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
-
+	$DB->query( $sql );
 }
 
 
@@ -256,7 +248,7 @@ function refererList(
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false ) // Get the user agent
 {
-	global 	$querycount, $tablehitlog, $res_stats, $stats_total_hits;
+	global 	$DB, $tablehitlog, $res_stats, $stats_total_hits;
 	$i=2;
 
 	autoquote( $type );		// In case quotes are missing
@@ -313,17 +305,12 @@ function refererList(
 	}
 	$sql .= " LIMIT $howMany";
 
-	//echo $sql;
-	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
-	$querycount++;
+	$res_stats = $DB->get_results( $sql, ARRAY_A );
 
 	if( $get_total_hits )
 	{	// we need to get total hits
-		$sql = "SELECT COUNT(*) AS total_hits ".$sql_from_where;
-		$res_total_hits = mysql_query( $sql ) or mysql_oops( $sql );
-		$querycount++;
-		$row_total_hits = mysql_fetch_array($res_total_hits);
-		$stats_total_hits = $row_total_hits['total_hits'];
+		$sql = "SELECT COUNT(*) ".$sql_from_where;
+		$stats_total_hits = $DB->get_var( $sql );
 	}
 	else
 	{	// we're not getting total hits

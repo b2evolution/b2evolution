@@ -190,7 +190,7 @@
 	<h4><?php echo T_('Recent Referers') ?></h4>
 	<?php refererList(5,'global',0,0,'no','',($blog>1)?$blog:''); ?>
 	<ul>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 		<?php } // End stat loop ?>
 		<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
@@ -199,7 +199,7 @@
 	<h4><?php echo T_('Top Referers') ?></h4>
 	<?php refererList(5,'global',0,0,'no','baseDomain',($blog>1)?$blog:''); ?>
 	<ul>
-		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
+		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 		<?php } // End stat loop ?>
 		<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
