@@ -358,6 +358,14 @@ function make_clickable($text)
 /***** // Formatting functions *****/
 
 /**
+ * Convert a MYSQL date to a UNIX timestamp
+ */
+function mysql2timestamp( $m )
+{
+	return mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
+}
+
+/**
  * Format a MYSQL date to current locale date format.
  *
  * {@internal mysql2localedate(-)}}
@@ -386,7 +394,7 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 		return false;
 
 	// Get a timestamp:
-	$unixtimestamp = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
+	$unixtimestamp = mysql2timestamp( $m );
 
 	return date_i18n( $dateformatstring, $unixtimestamp, $useGM );
 }
@@ -1631,28 +1639,53 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /**
  * Validate ISO date
+ *
+ * @param string date
+ * @param string time
+ * @param boolean is date required ?
+ * @param boolean is time required ?
  */
-function make_valid_date( $date, $time )
+function make_valid_date( $date, $time = '', $req_date = true, $req_time = true )
 {
 	global $Messages;
 
-	if( ! preg_match( '#^\d\d\d\d-\d\d-\d\d$#', $date ) )
-	{
-		$Messages->add( T_('Date is invalid'), 'error' );
+	if( ! empty($date) )
+	{	// A date is provided:
+		if( ! preg_match( '#^\d\d\d\d-\d\d-\d\d$#', $date ) )
+		{
+			$Messages->add( T_('Date is invalid'), 'error' );
+			$date = '2000-01-01';
+		}
+	}
+	elseif( $req_date )
+	{	// No date but it was required!
+		$Messages->add( T_('Date is required'), 'error' );
 		$date = '2000-01-01';
 	}
 
-	if( ! preg_match( '#^\d\d:\d\d:\d\d$#', $time ) )
-	{
-		$Messages->add( T_('Time is invalid'), 'error' );
+	if( ! empty($time) )
+	{	// A time is provided:
+		if( ! preg_match( '#^\d\d:\d\d:\d\d$#', $time ) )
+		{
+			$Messages->add( T_('Time is invalid'), 'error' );
+			$time = '00:00:00';
+		}
+	}
+	elseif( $req_time )
+	{	// No time but it was required!
+		$Messages->add( T_('Time is required'), 'error' );
 		$time = '00:00:00';
 	}
 
-	return $date.' '.$time;
+
+	return $date.(empty($time) ? '' : ' '.$time );
 }
 
 /*
  * $Log$
+ * Revision 1.24  2005/01/03 12:33:07  fplanque
+ * extended datetime hadling
+ *
  * Revision 1.23  2005/01/03 06:18:31  blueyed
  * changed pre_dump() syntax
  *
