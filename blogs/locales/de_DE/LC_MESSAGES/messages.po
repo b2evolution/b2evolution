@@ -1216,7 +1216,7 @@ msgstr "Diese Seite wird im Trackback-Popup angezeigt"
 
 #: ..\..\..\admin\b2template.php:152
 msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
-msgstr "Beachte: natürlich kannst du die Dateien/Vorlagen auch im Texteditor bearbeiten und sie hochladen. Dieser Onlineeditor ist nur für den Fall gedacht, wenn du keinen Zugriff auf einen Texteditor hast..."
+msgstr "Anmerkung: natürlich kannst du die Dateien/Vorlagen auch im Texteditor bearbeiten und sie hochladen. Dieser Onlineeditor ist nur für den Fall gedacht, wenn du keinen Zugriff auf einen Texteditor hast..."
 
 #: ..\..\..\admin\b2upload.php:18
 msgid "upload images/files"
@@ -1987,15 +1987,15 @@ msgstr "Wähle als HAUPT-Kategorie"
 
 #: ..\..\..\admin\_edit_form.php:391
 msgid "Note: Cross posting among multiple blogs is enabled."
-msgstr "Beachte: Quer-Einträge in mehrere Blogs sind möglich."
+msgstr "Anmerkung: Quer-Einträge in mehrere Blogs sind möglich."
 
 #: ..\..\..\admin\_edit_form.php:402
 msgid "Note: Cross posting among multiple blogs is currently disabled."
-msgstr "Beachte: Quer-Einträge in mehrere Blogs sind derzeit nicht möglich."
+msgstr "Anmerkung: Quer-Einträge in mehrere Blogs sind derzeit nicht möglich."
 
 #: ..\..\..\admin\_edit_form.php:404
 msgid "Note: Cross posting among multiple categories is currently disabled."
-msgstr "Beachte: Quer-Einträge in mehrere Kategorien ist derzeit nicht möglich."
+msgstr "Anmerkung: Quer-Einträge in mehrere Kategorien ist derzeit nicht möglich."
 
 #: ..\..\..\admin\_edit_form.php:414
 #: ..\..\..\admin\_edit_showposts.php:198
@@ -2473,7 +2473,7 @@ msgstr "Toolbar Plugins"
 
 #: ..\..\..\admin\_set_regional.form.php:16
 msgid "Note: default locale is not enabled."
-msgstr "Beachte: Standard-Locale ist nicht eingeschaltet."
+msgstr "Anmerkung: Standard-Locale ist nicht eingeschaltet."
 
 #: ..\..\..\admin\_set_regional.form.php:24
 msgid "Regional settings"
@@ -4033,7 +4033,7 @@ msgstr "Mögliche Ursache: dein Host könnte die mail() Funktion abgestellt haben.
 
 #: ..\..\..\htsrv\login.php:104
 msgid "Note: You are already logged in!"
-msgstr "Beachte: Du bist schon eingeloggt!"
+msgstr "Anmerkung: Du bist schon eingeloggt!"
 
 #: ..\..\..\htsrv\login.php:107
 msgid "Continue..."
@@ -4214,7 +4214,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:448
 msgid "Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin."
-msgstr "Beachte: Blog #1 ist ein sehr spezielles Blog! Es vereinigt automatisch alle Einträge der anderen Blogs. Das erlaubt dir, ganz einfach alles zu verfolgen, was in diesem System geschrieben steht. Du kannst dieses Blog vor der Öffentlichkeit verstecken, indem du seinen &quot;Stub&quot;-URLnamen im Backoffice (Adminbereich) leerst."
+msgstr "Anmerkung: Blog #1 ist ein sehr spezielles Blog! Es vereinigt automatisch alle Einträge der anderen Blogs. Das erlaubt dir, ganz einfach alles zu verfolgen, was in diesem System geschrieben steht. Du kannst dieses Blog vor der Öffentlichkeit verstecken, indem du seinen &quot;Stub&quot;-URLnamen im Backoffice (Adminbereich) leerst."
 
 #: ..\..\..\install\_functions_create.php:469
 msgid "However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links. This is commonly referred to as a 'Blogroll'."

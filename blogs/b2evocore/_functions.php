@@ -473,81 +473,6 @@ function is_email($user_email) {
 }
 
 
-/**
- * Get setting from DB (cached)
- *
- * {@internal get_settings(-) }}
- * @deprecated
- * @param string setting to retrieve
- */
-function get_settings( $setting )
-{
-	global $DB, $tablesettings, $cache_settings;
-
-	if( empty($cache_settings) || !isset($cache_settings->$setting) )
-	{
-		$sql = "SELECT set_name, set_value FROM $tablesettings";
-		
-		$q = $DB->get_results( $sql );
-		
-		foreach( $q as $loop_q )
-		{
-			$cache_settings->{$loop_q->set_name} = $loop_q->set_value;
-		}
-	}
-	if( isset($cache_settings->$setting) )
-	{
-		return $cache_settings->$setting;
-	}
-	else
-	{
-		debug_log("Setting '$setting' not defined.");
-		return false;
-	}
-}
-
-
-/**
- * overrides settings that have been read from DB
- *
- * @deprecated
- * @param string setting name
- * @param mixed setting value
- */
-function set_settings( $setting, $value )
-{
-	global $cache_settings;
-
-	$cache_settings->$setting = $value;
-
-	return true;
-}
-
-
-/**
- * Change a setting and save it into DB
- *
- * Setting will be created if it doesn't exist
- *
- * {@internal change_setting(-)}}
- *
- * @deprecated
- * @param string setting name
- * @param mixed setting value
- */
-function change_setting( $name, $value )
-{
-	global $cache_settings, $tablesettings, $DB;
-
-	// change the cached settings
-	$cache_settings->$name = $value;
-
-	// update DB	
-	return $DB->query( "REPLACE INTO $tablesettings ( set_name, set_value )
-											VALUES( '$name', '".$DB->escape($value)."')" );
-}
-
-
 function alert_error( $msg )
 { // displays a warning box with an error message (original by KYank)
 	?>
@@ -1334,41 +1259,8 @@ function obhandler( $output )
 
 	header( 'Content-Length: '. strlen($out) );
 	return $out;
-
-	/* {{{ additional things we could do in this handler
-		- We could have a global $lastmodified that would be checked against according
-			header and throw a 304 then, too.
-		- global var that reflects "No caching!", if set
-
-
-		code excerpts below:
-
-		header ("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-		header ("Pragma: no-cache"); // HTTP/1.0
-
-		header('Cache-Control: max-age=3600, must-revalidate');
-
-		# get LastModified from db entries
-		if ($site->subMenu[0] == 'links'){
-			$sql = 'SELECT UNIX_TIMESTAMP(dt) FROM tq_links WHERE submenu="links&' .
-								$site->subMenu[1] . '" AND unix_timestamp(dt)-' . $lastModified . '>0 ORDER BY dt DESC';
-			$result = $site->dbquery($sql, 'get_lm_linkdb', true);
-			if (mysql_numrows($result) > 0) $lastModified = mysql_result($result, 0);
-		}
-
-		# check and react on "If-Modified-Since" header
-		if(isset($headers["If-Modified-Since"]) && $_SERVER['REQUEST_METHOD'] != 'POST') {
-			$arraySince = explode(";", $headers["If-Modified-Since"]);
-			$since = strtotime($arraySince[0]);
-			if ($since >= $lastModified) $refresh = false;
-		}
-
-		header('Expires: ' . $header_expires);
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastModified));
-		//header("Cache-Control: max-age=86400, must-revalidate");
-		//header("Cache-Control: max-age=10, must-revalidate");
-		}}}*/
 }
+
 
 /**
  * Add param(s) at the end of an URL, using either ? or &amp; depending on exiting url
@@ -1380,6 +1272,11 @@ function obhandler( $output )
  */
 function url_add_param( $url, $param )
 {
+	if( empty($param) )
+	{
+		return $url;
+	}
+	
 	if( strpos( $url, '?' ) !== false )
 	{	// There are already params in the URL
 		return $url.'&amp;'.$param;
@@ -1388,6 +1285,7 @@ function url_add_param( $url, $param )
 	// These are the first params
 	return $url.'?'.$param;
 }
+
 
 /**
  * Add a tail (starting with /) at the end of an URL before any params (starting with ?)
@@ -1407,9 +1305,12 @@ function url_add_tail( $url, $tail )
 
 	return $parts[0].$tail;
 }
- 
+
+
 /**
  * sends a mail, wraps PHP's mail() function
+ *
+ * send_mail(-)
  *
  * @param string recipient
  * @param string subject of the mail

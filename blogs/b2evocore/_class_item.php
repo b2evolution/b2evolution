@@ -726,14 +726,7 @@ class Item extends DataObject
 		$url = $this->gen_permalink( $mode, $blogurl, true );
 		if( $use_popup )
 		{ // We need to tell b2evo to use the popup template
-			if( strpos( $url, '?' ) )
-			{	// We already have a ? in the destination URL
-				$url .= '&amp;template=popup';
-			}
-			else
-			{
-				$url .= '?template=popup';
-			}
+			$url = url_add_param( $url, 'template=popup' );
 		}
 
 		echo $before;

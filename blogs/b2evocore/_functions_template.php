@@ -1,27 +1,22 @@
 <?php
 /**
- * Misc template functions
- * 
+ * Misc Functions to be called from the template
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package b2evocore
- * @author sThis file built upon code from original b2 - http://cafelog.com/
+ * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
-require_once (dirname(__FILE__)."/_functions_cats.php");
-require_once (dirname(__FILE__)."/_functions_blogs.php");
-require_once (dirname(__FILE__)."/_functions_bposts.php");
-require_once (dirname(__FILE__)."/_functions_comments.php");
-require_once (dirname(__FILE__)."/_functions_trackback.php");
-require_once (dirname(__FILE__)."/_functions_pingback.php");
+require_once( dirname(__FILE__).'/_functions_cats.php' );
+require_once( dirname(__FILE__).'/_functions_blogs.php' );
+require_once( dirname(__FILE__).'/_functions_bposts.php' );
+require_once( dirname(__FILE__).'/_functions_comments.php' );
+require_once( dirname(__FILE__).'/_functions_trackback.php' );
+require_once( dirname(__FILE__).'/_functions_pingback.php' );
 
-
-
-/*
- * Functions to be called from the template
- */
 
 /**
  * Template function: output base URL to b2evo's image folder
@@ -122,7 +117,7 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
 function archive_link( $year, $month, $day = '', $week = '', $show = true, $file = '', $params = '' )
 {
 	global $Settings;
-	
+
 	if( empty($file) )
 		$link = get_bloginfo('blogurl');
 	else
@@ -130,7 +125,8 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 	if( (! $Settings->get('links_extrapath')) || (!empty($params)) )
 	{	// We reference by Query: Dirty but explicit permalinks
-		$link .= '?'.$params.'&amp;m=';
+		$link = url_add_param( $link, $params );
+		$link = url_add_param( $link, 'm=' );
 		$separator = '';
 	}
 	else
@@ -153,7 +149,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	{
 		if( ! $Settings->get('links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
-			$link .= '&amp;w='.$week;
+			$link = url_add_param( $link, 'w='.$week );
 		}
 		else
 		{
