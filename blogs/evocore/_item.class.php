@@ -1444,7 +1444,7 @@ class Item extends DataObject
 	function title(
 		$before='',						// HTML/text to be displayed before title
 		$after='', 						// HTML/text to be displayed after title
-		$add_link = true, 		// Added link to this title?
+		$add_link = true, 		// Add link to this title?
 		$format = 'htmlbody' )
 	{
 		if( empty($this->title) && $add_link )
@@ -1793,6 +1793,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2005/03/10 16:10:26  fplanque
+ * no message
+ *
  * Revision 1.28  2005/03/08 20:32:07  fplanque
  * small fixes; slightly enhanced WEEK() handling
  *
