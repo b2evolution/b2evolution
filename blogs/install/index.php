@@ -325,6 +325,7 @@ switch( $action )
 		 */
 		?>
 		<h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
+
 		<form action="index.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 
@@ -359,7 +360,12 @@ switch( $action )
 				}
 			?>
 
-			<p><input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;" /></p>
+			<p>
+			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
+				onclick="if( document.getElementById( 'deletedb' ).checked ) { return confirm( '<?php
+					printf( /* TRANS: Warning this is a javascript string */ T_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
+					?>' ); }" />
+			</p>
 			</form>
 		<?php
 		if( $allow_evodb_reset != 1 )
