@@ -741,14 +741,14 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/21 00:34:34  blueyed
+ * check for defined DB_USER!
+ *
  * Revision 1.21  2005/02/18 19:16:15  fplanque
  * started relation restriction/cascading handling
  *
  * Revision 1.20  2005/01/27 13:34:58  fplanque
  * i18n tuning
- *
- * Revision 1.19  2005/01/26 23:44:34  blueyed
- * no message
  *
  * Revision 1.18  2005/01/21 20:47:46  blueyed
  * doc, getLastMod() extended

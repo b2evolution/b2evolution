@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * This is displayed when registration is complete
  *
@@ -8,29 +8,33 @@
  *
  * @package htsrv
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Include page header:
  */
 $page_title = T_('Registration complete');
 $page_icon = 'icon_register.gif';
-require(dirname(__FILE__).'/_header.php'); 
-?>
-<p><?php echo T_('Login:') ?> <strong><?php echo $login ?>&nbsp;</strong></p>
-<p><?php echo T_('Email') ?>: <strong><?php echo $email ?>&nbsp;</strong></p>
+require(dirname(__FILE__).'/_header.php');
 
-<?php
 
-	$Form =& new Form( $htsrv_url, 'login', 'post', 'fieldset' );
-	
-	$Form->begin_form( '' );
-	
-	$Form->hidden( 'log', $login );
-	$Form->hidden( 'redirect_to', $redirect_to );
-	$Form->submit( 'submit', T_('Log in!'), 'search' );
-	
-	$Form->end_form();
+$Form =& new Form( $htsrv_url.'login.php', 'login', 'post', 'fieldset' );
+$Form->hidden( 'log', $login );
+$Form->hidden( 'redirect_to', $redirect_to );
 
-<?php 
-	require(dirname(__FILE__).'/_footer.php'); 
+$Form->begin_form( 'fform' );
+
+$Form->fieldset();
+$Form->info( T_('Login'), $login );
+$Form->info( T_('Email'), $email );
+$Form->fieldset_end();
+
+$Form->fieldset( '', 'submit' );
+$Form->submit( array( '', T_('Log in!'), 'ActionButton' ) );
+$Form->fieldset_end();
+
+$Form->end_form();
+
+require(dirname(__FILE__).'/_footer.php');
 ?>

@@ -8,6 +8,8 @@
  *
  * @package htsrv
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Include page header:
@@ -15,6 +17,7 @@
 $page_title = T_('Register form');
 $page_icon = 'icon_register.gif';
 require(dirname(__FILE__).'/_header.php');
+
 
 $Form = & new Form( $htsrv_url.'register.php', '', 'post', 'fieldset' );
 

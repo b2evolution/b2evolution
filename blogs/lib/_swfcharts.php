@@ -1,4 +1,6 @@
 <?php
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 // charts.php v1.6
 // ------------------------------------------------------------------------
 // Copyright (c) 2004, maani.us
@@ -19,7 +21,7 @@ function DrawChart($chart)
 	if(!isset($chart[ 'canvas_bg' ]['width' ])){$chart[ 'canvas_bg' ]['width' ] =400;}
 	if(!isset($chart[ 'canvas_bg' ]['height' ])){$chart[ 'canvas_bg' ]['height' ] =250;}
 	if(!isset($chart[ 'canvas_bg' ]['color' ])){$chart[ 'canvas_bg' ]['color' ] = "666666";}
-								
+
 	$params="";
 	$allKeys= array_keys($chart);
 	for ($i=0;$i<count($allKeys);$i++)
@@ -38,7 +40,7 @@ function DrawChart($chart)
 				}
 			}
 			break;
-				
+
 			case "draw_text":
 			for ($r=0;$r<count($chart[ 'draw_text' ]);$r++){
 				$params=$params."text_".$r."=";
@@ -50,7 +52,7 @@ function DrawChart($chart)
 				$params=$params."&";
 			}
 			break;
-			
+
 			case "link":
 			for ($r=0;$r<count($chart[ 'link' ]);$r++){
 				$params=$params."link_".$r."=";
@@ -62,7 +64,7 @@ function DrawChart($chart)
 				$params=$params."&";
 			}
 			break;
-			
+
 			default:
 			if(gettype($chart[$allKeys[$i]])=="array" ){
 				$params=$params.$allKeys[$i]."=";

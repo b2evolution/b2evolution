@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * This is the registration form when disabled
  *
@@ -8,15 +8,22 @@
  *
  * @package htsrv
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Include page header:
  */
 $page_title = T_('Registration Currently Disabled');
-require(dirname(__FILE__).'/_header.php'); 
+require( dirname(__FILE__).'/_header.php' );
+
+Log::display( '', '', T_('User registration is currently not allowed.'), 'error' );
+
 ?>
-<p><?php echo T_('User registration is currently not allowed.') ?></p>
-<p><a href="<?php echo $baseurl ?>" ><?php echo T_('Home') ?></a></p>
-<?php 
-	require(dirname(__FILE__).'/_footer.php'); 
+<p class="center">
+	<a href="<?php echo $baseurl ?>" ><?php echo T_('Home') ?></a>
+</p>
+
+<?php
+require( dirname(__FILE__).'/_footer.php' );
 ?>

@@ -8,6 +8,8 @@
  *
  * @package htsrv
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Include page header:
@@ -31,7 +33,7 @@ if( !empty($mode) )
 	param( 'text', 'html', '' );
 	param( 'popupurl', 'html', '' );
 	param( 'popuptitle', 'html', '' );
-		
+
 	$Form->hidden( 'mode', $mode );
 	$Form->hidden( 'text', $text );
 	$Form->hidden( 'popupurl', $popupurl );
@@ -45,19 +47,19 @@ echo $Form->fieldstart;
 <?php
 
 	$Form->text( 'log', $log, 16, T_('Login'), '', 20 , 'large' );
-	
+
 	$Form->password( 'pwd', '', 16, T_('Password'), '', 20, 'large' );
-	
+
 	echo $Form->fieldstart;
 	echo $Form->inputstart;
 	$Form->submit( array( 'submit', T_('Log in!'), 'search' ) );
 	echo $Form->inputend;
 	echo $Form->fieldend;
-	
+
 	echo $Form->fieldend;
-	
+
 	$Form->end_form();
-	
+
 ?>
 
 <div style="text-align:right">
@@ -65,6 +67,7 @@ echo $Form->fieldstart;
 <a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php echo urlencode( $redirect_to ) ?>"><?php echo T_('Lost your password ?') ?></a>
 </div>
 
+
 <?php
-	require(dirname(__FILE__).'/_footer.php');
+require(dirname(__FILE__).'/_footer.php');
 ?>

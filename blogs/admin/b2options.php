@@ -321,6 +321,10 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					fwrite( $fp, " * Global lang file\n" );
 					fwrite( $fp, " * This file was generated automatically from messages.po\n" );
 					fwrite( $fp, " */\n" );
+					fwrite( $fp, "if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );" );
+					fwrite( $fp, "\n\n" );
+
+
 					fwrite( $fp, "\n\$trans['".$locales[$locale]['messages']."'] = array(" );
 					// echo '<pre>';
 					foreach( $ttrans as $line )
@@ -428,6 +432,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.83  2005/02/21 00:34:36  blueyed
+ * check for defined DB_USER!
+ *
  * Revision 1.82  2004/12/17 20:38:51  fplanque
  * started extending item/post capabilities (extra status, type)
  *

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -32,16 +32,18 @@
  *
  * @version $Id$
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 if( !isset($submenu) )
 {
- echo '<div class="panelblock">';
- return;
+	echo '<div class="panelblock">';
+	return;
 }
 ?>
 <div class="pt" >
 	<?php
 		if( isset($blogListButtons) )
-		{	// We have displayed something above, we'll get a display bug on firefox if we don't do this:
+		{ // We have displayed something above, we'll get a display bug on firefox if we don't do this:
 			?>
 			<ul class="hack">
 				<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>

@@ -8,6 +8,8 @@
  *
  * @package htsrv
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Include page header:

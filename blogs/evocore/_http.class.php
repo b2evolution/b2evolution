@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -33,6 +33,8 @@
  *
  * @version $Id$
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Class Http
@@ -75,7 +77,7 @@ class Http {
         ."Connection: Keep-Alive\r\n"
         ."Cache-Control: no-cache\r\n"
         ."Content-Length: $content_length\r\n\r\n";
-	// lets open a socket for the post, 
+	// lets open a socket for the post,
 	$post = fsockopen($server, $port);
 	//could we create the socket ?
         if (!$post) {
@@ -133,7 +135,7 @@ class Http {
         ."Cache-Control: no-cache\r\n"
         ."Content-Length: $content_length\r\n\r\n";
 
-	// lets open a socket for the post, 
+	// lets open a socket for the post,
 	$get = fsockopen($server, $port);
 	//could we create the socket ?
         if (!$get) {
@@ -243,7 +245,7 @@ class Http {
 
         // perform get
         $ret=curl_exec($ch);
-        //everythings been "get"'ed 
+        //everythings been "get"'ed
         curl_close($ch);
         // return the output
 	return $ret;
@@ -252,6 +254,9 @@ class Http {
 
 /*
  * $Log$
+ * Revision 1.2  2005/02/21 00:34:34  blueyed
+ * check for defined DB_USER!
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

@@ -5,9 +5,9 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2004-2005 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -54,6 +54,8 @@
  *
  * @version $Id$
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Initialize everything:
@@ -330,6 +332,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/21 00:34:34  blueyed
+ * check for defined DB_USER!
+ *
  * Revision 1.5  2005/02/15 22:05:03  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *

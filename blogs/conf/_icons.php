@@ -1,4 +1,10 @@
 <?php
+/**
+ *
+ *
+ */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Map of filenames for icons and their respective alt tag.

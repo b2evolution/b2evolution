@@ -5,8 +5,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -39,6 +39,8 @@
  *
  * @version $Id$
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 // Display submenu:
 require dirname(__FILE__).'/_submenu.inc.php';
@@ -680,6 +682,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/21 00:34:36  blueyed
+ * check for defined DB_USER!
+ *
  * Revision 1.9  2005/02/08 01:01:39  blueyed
  * moved searchbox, beautified create bar.
  *
