@@ -29,7 +29,7 @@ function veriflog( $login_required = false )
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error;
 	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
 	global $current_User;
-	global $DB;
+	global $DB, $UserCache;
 
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
 	// Warning: unset() prevent from setting a new global value later in the func !!! :((
@@ -137,8 +137,8 @@ function veriflog( $login_required = false )
 	 */
 	// echo 'LOGGED IN';
 	$userdata	= get_userdatabylogin($user_login);
-	$current_User = new User( $userdata );	// COPY!
-	//echo $current_User->disp('login');
+	$current_User = $UserCache->get_by_ID( $userdata['ID'] ); // COPY!?
+	# echo $current_User->disp('login');
 
 	$user_ID = $userdata['ID'];
 	$user_nickname = $userdata['user_nickname'];

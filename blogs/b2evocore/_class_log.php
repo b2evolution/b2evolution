@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Log class, which logs notes and errors. {{{
+ * This file implements the Log class, which logs notes and errors.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -36,7 +36,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$ }}}
+ * @version $Id$
  *
  */
 

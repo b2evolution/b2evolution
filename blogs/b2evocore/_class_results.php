@@ -90,6 +90,10 @@ class Results
 		if( is_null( $this->params ) )
 		{	// Set default params:
 			$this->params = array(
+				'before' => '<div>',
+					'header_start' => '',
+					'header_text' => '',
+					'header_end' => '',
 					'list_start' => '<table class="grouped" cellspacing="0">',
 						'head_start' => '<thead>',
 							'colhead_start' => '<th>',
@@ -109,15 +113,20 @@ class Results
 					'list_end' => '</table>',
 					'footer_start' => '<div class="center">',
 					'footer_text' => T_( '$prev$ page $page$/$total_pages$ $next$' ),
+						'prev_text' => '&lt;',
+						'next_text' => '&gt;',
 					'footer_end' => '</div>',
 					'no_results' => T_('No results.'),
+				'after' => '</div>',
 				);
 		}
 
+		echo $this->params['before'];
 
 	 	if( ! count($this->rows) )
 		{	// There are no results! Nothing to display!
 			echo $this->params['no_results'];
+			echo $this->params['after'];
 			return 0;
 		}
 
@@ -141,6 +150,10 @@ class Results
 				$this->cols[] = '$'.$col.'$';
 			}
 		}
+
+   	echo $this->params['header_start'];
+   	$this->nav_text( $this->params['header_text'] );
+   	echo $this->params['header_end'];
 
 		echo $this->params['list_start'];
 
@@ -205,6 +218,25 @@ class Results
 		echo $this->params['list_end'];
 
    	echo $this->params['footer_start'];
+   	$this->nav_text( $this->params['footer_text'] );
+   	echo $this->params['footer_end'];
+
+		echo $this->params['after'];
+
+		return $line_count;
+	}
+
+
+	/**
+	 * Display navigation text, based on template:
+	 *
+	 * @param strin template
+	 */
+	function nav_text( $template )
+	{
+		if( empty( $template ) )
+			return;
+
 		echo preg_replace( array(
 															'#\$start\$#',
 															'#\$end\$#',
@@ -221,16 +253,13 @@ class Results
 											 				$this->page,
 											 				$this->total_pages,
 											 				($this->page>1) ? '<a href="'.regenerate_url( 'page', 'page='.($this->page-1) ).
-											 					'">&lt;</a>' : '',
+											 					'">'.$this->params['prev_text'].'</a>' : '',
 											 				($this->page<$this->total_pages) ? '<a href="'.regenerate_url( 'page', 'page='.($this->page+1) ).
-											 					'">&gt;</a>' : '',
+											 					'">'.$this->params['next_text'].'</a>' : '',
 											 			),
-											 $this->params['footer_text'] );
-   	echo $this->params['footer_end'];
+											 	$template );
 
-		return $line_count;
 	}
-
 
 }
 ?>

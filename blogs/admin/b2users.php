@@ -64,7 +64,7 @@ else switch ($action)
 
 		if( $template > -1 )
 		{ // we use a template
-			$edited_User = & new User( get_userdata($template) );
+			$edited_User = $UserCache->get_by_ID($template);	// Copy !
 			$edited_User->set('ID', 0);
 		}
 		else
@@ -85,7 +85,7 @@ else switch ($action)
 		}
 		else
 		{	// we edit an existing user:
-			$edited_User = & new User( get_userdata( $edited_user_ID ) );
+			$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
 		}
 
 		if( $user_profile_only && $edited_user_ID != $current_User->ID )
@@ -293,8 +293,7 @@ else switch ($action)
 			break;
 		}
 
-		$user_data = get_userdata( $id );
-		$deleted_User = & new User( $user_data );
+		$deleted_User = & $UserCache->get_by_ID( $id );
 
 		if( !$confirm )
 		{?>
@@ -508,7 +507,7 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 	$request = "SELECT T_users.*, grp_ID, grp_name
 							FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
 							ORDER BY grp_name, user_login";
-	$userlist = $DB->get_results( $request, ARRAY_A );
+	$userlist = $DB->get_results( $request );
 
 
 	if( ($group != 0) || in_array($action, array( 'newgroup', 'groupupdate' ))  )
@@ -539,7 +538,7 @@ if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
 { // Display user form
 	if( !isset($edited_User) )
 	{
-		$edited_User = & new User( get_userdata($user) );
+		$edited_User = & $UserCache->get_by_ID( $user );
 	}
 
 	require(dirname(__FILE__). '/_users_form.php');

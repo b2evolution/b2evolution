@@ -73,7 +73,7 @@ $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $DB;
+	global $blog_ID, $DB, $UserCache;
 	global $cafelogID, $sleep_after_edit;
 	global $Settings, $Messages;
 
@@ -103,7 +103,7 @@ function b2newpost($m)
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata['ID'];
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	// Check if category exists
 	if( get_the_category_by_ID( $category, false ) === false )
@@ -251,7 +251,7 @@ function b2_getPostURL($m)
 {
 	global $xmlrpcerruser;
 	global $siteurl;
-	global $ItemCache;
+	global $ItemCache, $UserCache;
 
 	$blog_ID = $m->getParam(0);
 	$blog_ID = $blog_ID->scalarval();
@@ -272,7 +272,7 @@ function b2_getPostURL($m)
 	}
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
@@ -328,7 +328,7 @@ function bloggernewpost( $m )
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $default_category, $DB;
 	global $cafelogID, $sleep_after_edit;
-	global $Settings, $Messages;
+	global $Settings, $Messages, $UserCache;
 
 	logIO('I','Called function: blogger.newPost');
 
@@ -353,7 +353,7 @@ function bloggernewpost( $m )
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
 	{	// There was no category passed in the content:
@@ -464,7 +464,7 @@ function bloggereditpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $ItemCache;
 	global $cafelogID, $sleep_after_edit, $default_category, $DB;
-	global $Messages;
+	global $Messages, $UserCache;
 
 	logIO('I','Called function: blogger.editPost');
 
@@ -508,7 +508,7 @@ function bloggereditpost($m)
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($newcontent) ) )
 	{	// No category specified
@@ -626,7 +626,7 @@ $bloggerdeletepost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, 
 function bloggerdeletepost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $DB;
+	global $blog_ID, $DB, $UserCache;
 	global $sleep_after_edit;
 
 	$post_ID = $m->getParam(1);
@@ -653,7 +653,7 @@ function bloggerdeletepost($m)
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	$post_category = $postdata['Category'];
 	$blog_ID = get_catblog($post_category);
@@ -711,7 +711,7 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggergetusersblogs($m)
 {
-	global $xmlrpcerruser;
+	global $xmlrpcerruser, $UserCache;
 	global $baseurl;
 
 	$username = $m->getParam(1);
@@ -727,7 +727,7 @@ function bloggergetusersblogs($m)
 	}
 
 	$userdata = get_userdatabylogin( $username );
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	$resp_array = array();
 	// Loop through all blogs:
@@ -909,7 +909,7 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
  */
 function bloggergetrecentposts( $m )
 {
-	global $xmlrpcerruser, $DB, $show_statuses;
+	global $xmlrpcerruser, $DB, $show_statuses, $UserCache;
 	global $blog;
 
 	$blog_ID = $m->getParam(1);
@@ -931,7 +931,7 @@ function bloggergetrecentposts( $m )
 	}
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
@@ -1012,7 +1012,7 @@ $bloggergettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggergettemplate($m)
 {
-	global $xmlrpcerruser;
+	global $xmlrpcerruser, $UserCache;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1033,7 +1033,7 @@ function bloggergettemplate($m)
 	}
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'templates' ) )
@@ -1093,7 +1093,7 @@ $bloggersettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggersettemplate( $m )
 {
-	global $xmlrpcerruser, $blogfilename;
+	global $xmlrpcerruser, $blogfilename, $UserCache;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1117,7 +1117,7 @@ function bloggersettemplate( $m )
 	}
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = & new User( $userdata );
+	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'templates' ) )
@@ -1512,7 +1512,3 @@ $s=new xmlrpc_server(
 				);
 
 ?>
-
-
-
-

@@ -54,13 +54,13 @@ function online_user_display( $before = '', $after = '' )
 	$users = array( 'guests' => 0,
 									'registered' => 0 );
 
-	$rows = $DB->get_results( 'SELECT sess_user_ID	FROM T_sessions', ARRAY_A );
+	$rows = $DB->get_results( 'SELECT sess_user_ID
+															 FROM T_sessions', ARRAY_A );
 	if( count( $rows ) ) foreach( $rows as $row )
 	{	// Loop through active sessions
 		if( !empty( $row['sess_user_ID'] ) )
 		{	// This session is logged in:
-			$user_ID = get_userdata( $row['sess_user_ID'] );
-			$User = new User($user_ID);
+			$User = & $UserCache->get_by_ID( $row['sess_user_ID'] );
 			if( $User->showonline )
 			{
 				echo $before;

@@ -153,7 +153,8 @@ require_once( dirname(__FILE__).'/_class_archivelist.php' );
 
 require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
 // Object caches init:
-$GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
+$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
+$UserCache = & new DataObjectCache( 'User', false, 'T_users', 'user_', 'ID' );
 $BlogCache = & new BlogCache();
 $ItemCache = & new ItemCache();
 

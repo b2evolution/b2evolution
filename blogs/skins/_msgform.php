@@ -41,8 +41,7 @@
 	// Get the name of the recipient
 	if(!empty($recipient_id))
 	{ // If the email is to a registerd user get the email address from the users table
-		$user = get_userdata( $recipient_id );
-		$User = new User($user);
+		$User = & $UserCache->get_by_ID( $recipient_id );
 		$recipient_name = $User->get('preferedname');
  		$recipient_address = $User->get('email');
 	}

@@ -59,10 +59,8 @@ class Group extends DataObject
 	 */
 	function Group( $db_row = NULL )
 	{
-		global $tablegroups;
-		
 		// Call parent constructor:
-		parent::DataObject( $tablegroups, 'grp_', 'grp_ID' );
+		parent::DataObject( 'T_users', 'grp_', 'grp_ID' );
 	
 		if( $db_row == NULL )
 		{

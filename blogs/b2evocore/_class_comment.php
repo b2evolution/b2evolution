@@ -44,7 +44,7 @@ class Comment extends DataObject
 	 */
 	function Comment( $db_row = NULL )
 	{
-		global $tablecomments, $ItemCache;
+		global $tablecomments, $ItemCache, $UserCache;
 		
 		// Call parent constructor:
 		parent::DataObject( $tablecomments, 'comment_', 'comment_ID' );
@@ -64,8 +64,7 @@ class Comment extends DataObject
 			$author_ID = $db_row['comment_author_ID'];
 			if( !empty($author_ID) )
 			{
-				$authordata = get_userdata( $author_ID );
-				$this->author_User = new User( $authordata ); // COPY!
+				$this->author_User = & $UserCache->get_by_ID( $author_ID ); // NO COPY...(?)
 			}
 						
 			$this->type = $db_row['comment_type'];

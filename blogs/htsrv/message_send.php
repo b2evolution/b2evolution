@@ -28,8 +28,7 @@ $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( 
 
 if( !empty( $recipient_id ) )
 { // Get the email address for the recipient if a member.
-	$user = get_userdata( $recipient_id );
-	$user = new User($user);
+	$user = & $UserCache->get_by_ID( $recipient_id );
 	// fplanque: this fails on my mailserver:
 	// $recipient_address = trim($user->get('preferedname')) . ' <' . $user->get('email') . '>';
 	$recipient_address = $user->get('email');

@@ -153,7 +153,7 @@ class FileManager extends Filelist
 	function FileManager( &$cUser, $url, $root, $path = '', $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $asc = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
-		global $BlogCache;
+		global $BlogCache, $UserCache;
 
 		$this->User =& $cUser;
 		$this->Messages =& new Log( 'error' );
@@ -175,7 +175,7 @@ class FileManager extends Filelist
 					break;
 
 				case 'user':
-					$tUser = new User( get_userdata($root_A[1]) );
+					$tUser = & $UserCache->get_by_ID($root_A[1]);
 					$this->root_dir = $tUser->getMediaDir();
 					$this->root_url = $tUser->getMediaUrl();
 					break;

@@ -8,6 +8,8 @@
  *
  * @package evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
+ * @author fplanque: François PLANQUE
+ * @author : Jun MUTO
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 

@@ -26,7 +26,8 @@ param( 'cat', 'integer', $default_category, true );
 
 if( !user_pass_ok( $login, $pass, false ) || $_SERVER['CONTENT_TYPE'] != "application/vnd.wap.mms-message" || strlen( $HTTP_RAW_POST_DATA ) == 0 ) exit;
 
-$current_User = & new User( get_userdatabylogin( $login ) );
+$userdata = get_userdatabylogin($login);
+$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 $post_category = $cat;
 $blog = get_catblog($post_category); 
 

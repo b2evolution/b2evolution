@@ -54,18 +54,19 @@ class User extends DataObject
 	 *
 	 * {@internal User::User(-)}}
 	 *
-	 * @param array existing userdata {@link get_userdata()}}
+	 * @param object DB row
 	 */
-	function User( $userdata = NULL )
+	function User( $db_row = NULL )
 	{
-		global $GroupCache, $tableusers, $default_locale;
+		global $GroupCache, $default_locale;
 
 		// Call parent constructor:
-		parent::DataObject( $tableusers, 'user_' );
+		parent::DataObject( 'T_groups', 'user_' );
 
+		// FP: WHAT IS THIS FOR???:
 		$this->Messages = new Log( 'error' );
 
-		if( $userdata == NULL )
+		if( $db_row == NULL )
 		{
 			// echo 'Creating blank user';
 			$this->login = 'login';
@@ -94,30 +95,30 @@ class User extends DataObject
 		else
 		{
 			// echo 'Instanciating existing user';
-			$this->ID = $userdata['ID'];
-			$this->login = $userdata['user_login'];
-			$this->pass = $userdata['user_pass'];
-			$this->firstname = $userdata['user_firstname'];
-			$this->lastname = $userdata['user_lastname'];
-			$this->nickname = $userdata['user_nickname'];
-			$this->idmode = $userdata['user_idmode'];
-			$this->locale = $userdata['user_locale'];
-			$this->email = $userdata['user_email'];
-			$this->url = $userdata['user_url'];
-			$this->icq = $userdata['user_icq'];
-			$this->aim = $userdata['user_aim'];
-			$this->msn = $userdata['user_msn'];
-			$this->yim = $userdata['user_yim'];
-			$this->ip = $userdata['user_ip'];
-			$this->domain = $userdata['user_domain'];
-			$this->browser = $userdata['user_browser'];
-			$this->datecreated = $userdata['dateYMDhour'];
-			$this->level = $userdata['user_level'];
-			$this->notify = $userdata['user_notify'];
-			$this->showonline = $userdata['user_showonline'];
+			$this->ID          = $db_row->ID;
+			$this->login       = $db_row->user_login;
+			$this->pass        = $db_row->user_pass;
+			$this->firstname   = $db_row->user_firstname;
+			$this->lastname    = $db_row->user_lastname;
+			$this->nickname    = $db_row->user_nickname;
+			$this->idmode      = $db_row->user_idmode;
+			$this->locale      = $db_row->user_locale;
+			$this->email       = $db_row->user_email;
+			$this->url         = $db_row->user_url;
+			$this->icq         = $db_row->user_icq;
+			$this->aim         = $db_row->user_aim;
+			$this->msn         = $db_row->user_msn;
+			$this->yim         = $db_row->user_yim;
+			$this->ip          = $db_row->user_ip;
+			$this->domain      = $db_row->user_domain;
+			$this->browser     = $db_row->user_browser;
+			$this->datecreated = $db_row->dateYMDhour;
+			$this->level       = $db_row->user_level;
+			$this->notify      = $db_row->user_notify;
+			$this->showonline  = $db_row->user_showonline;
 
 			// Group for this user:
-			$this->Group = $GroupCache->get_by_ID( $userdata['user_grp_ID'] );
+			$this->Group = $GroupCache->get_by_ID( $db_row->user_grp_ID );
 		}
 	}
 

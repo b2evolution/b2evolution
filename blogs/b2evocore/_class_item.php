@@ -68,7 +68,7 @@ class Item extends DataObject
 	 */
 	function Item( $db_row = NULL )
 	{
-		global $tableposts;
+		global $tableposts, $UserCache;
 
 		// Call parent constructor:
 		parent::DataObject( $tableposts, 'post_', 'ID' );
@@ -82,8 +82,7 @@ class Item extends DataObject
 		else
 		{
 			$this->ID = $db_row->ID;
-			$authordata = get_userdata($db_row->post_author);
-			$this->Author = new User( $authordata ); // COPY!
+			$this->Author = & $UserCache->get_by_ID( $db_row->post_author ); // NO COPY...(?)
 			$this->issue_date = $db_row->post_issue_date;
 			$this->mod_date = $db_row->post_mod_date;
 			$this->status = $db_row->post_status;
