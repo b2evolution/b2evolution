@@ -24,10 +24,7 @@
 <feed version="0.3" xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
 	<title><?php
 		$Blog->disp( 'name', 'xml' );
-		single_cat_title( ' - ', 'xml' );
-		single_month_title( ' - ', 'xml' );
-		single_post_title( ' - ', 'xml' );
-		last_comments_title( ' - ', 'xml' ) ;
+		request_title( ' - ', '', ' - ', 'xml' );
 	?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?>" />
 	<generator url="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>

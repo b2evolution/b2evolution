@@ -68,13 +68,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
-		single_cat_title( ' - ', 'htmlhead' );
-		single_month_title( ' - ', 'htmlhead' );
-		single_post_title( ' - ', 'htmlhead' );
-		arcdir_title( ' - ', 'htmlhead' );
-		last_comments_title( ' - ', 'htmlhead' );
-		stats_title( ' - ', 'htmlhead' );
-		profile_title( ' - ', 'htmlhead' );
+		request_title( ' - ', '', ' - ', 'htmlhead' );
 	?></title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
@@ -135,15 +129,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
 <div class="bPosts">
-<h2><?php
-	single_cat_title();
-	single_month_title();
-	single_post_title();
-	arcdir_title();
-	last_comments_title();
-	stats_title();
-	profile_title();
-?></h2>
+<?php request_title( '<h2>', '</h2>' ) ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 

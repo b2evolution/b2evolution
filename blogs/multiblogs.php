@@ -43,15 +43,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title>Multiblog demo<?php
-	single_cat_title( ' - ', 'htmlhead' );
-	single_month_title( ' - ', 'htmlhead' );
-	single_post_title( ' - ', 'htmlhead' );
-	arcdir_title( ' - ', 'htmlhead' );
-	last_comments_title( ' - ', 'htmlhead' );
-	stats_title( ' - ', 'htmlhead' );
-	profile_title( ' - ', 'htmlhead' );
-?></title>
+<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 <base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! ?>" />
@@ -115,16 +107,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 
 <div class="bPosts">
 <h2>#1: <a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog->disp( 'name', 'htmlbody' ) ?></a></h2>
-<h2><?php
-	single_cat_title();
-	single_month_title();
-	single_post_title();
-	arcdir_title();
-	last_comments_title();
-	stats_title();
-	profile_title();
-?></h2>
-
+<?php request_title( '<h2>', '</h2>' ) ?>
 
 <?php // ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post

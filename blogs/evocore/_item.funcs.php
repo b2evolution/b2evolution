@@ -190,52 +190,12 @@ function get_postdata($postid)
 }
 
 
-/**
- * {@internal single_post_title(-)}}
+/*
+ * single_post_title(-)
  *
- * @todo posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
- * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
+ * @movedTo _obsolete092.php
  */
-function single_post_title( $prefix = '#', $display = 'htmlhead' )
-{
-	global $p, $title, $preview, $ItemCache;
 
-	$disp_title = '';
-
-	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
-
-	if( $preview )
-	{
-		if( $prefix == '#' ) $prefix = ' ';
-		$disp_title = T_('PREVIEW');
-	}
-	elseif( intval($p) )
-	{
-		if( $Item = $ItemCache->get_by_ID( $p, false ) )
-		{
-			$disp_title = $Item->get('title');
-		}
-	}
-	elseif( !empty( $title ) )
-	{
-		if( $Item = $ItemCache->get_by_urltitle( $title, false ) )
-		{
-			$disp_title = $Item->get('title');
-		}
-	}
-
-	if( !empty( $disp_title ) )
-	{
-		if ($display)
-		{
-			echo $prefix, format_to_output($disp_title, $display );
-		}
-		else
-		{
-			return $disp_title;
-		}
-	}
-}
 
 
 /**
@@ -940,6 +900,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.22  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.21  2005/03/08 20:32:07  fplanque
  * small fixes; slightly enhanced WEEK() handling
  *

@@ -74,12 +74,8 @@ $AdminUI->dispPayloadBegin();
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
 
-
-	echo '<h2>';
-	single_cat_title();
-	single_month_title( T_(' Date range: '), 'htmlbody', true, 'b2browse.php', 'blog='.$blog );
-	single_post_title();
-	echo '</h2>';
+	// Display title depending on selection params:
+	request_title( '<h2>', '</h2>', '<br />', 'htmlbody', true, true, 'b2browse.php', 'blog='.$blog );
 
 	if( !$posts )
 	{

@@ -171,31 +171,10 @@ function Comment_get_by_ID( $comment_ID )
 
 
 /*
- * TEMPLATE functions
- */
-
-/**
- * Display "Last comments" title if these have been requested
+ * last_comments_title(-)
  *
- * {@internal last_comments_title(-) }}
- *
- * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to
- *              return value instead of displaying it
+ * @movedTo _obsolete092.php
  */
-function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
-{
-	global $disp;
-
-	if( $disp == 'comments' )
-	{
-		$info = $prefix.T_('Last comments');
-		if ($display)
-			echo format_to_output( $info, $display );
-		else
-			return $info;
-	}
-}
 
 
 /***** Comment tags *****/
@@ -335,6 +314,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.9  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.8  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

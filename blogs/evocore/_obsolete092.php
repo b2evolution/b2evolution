@@ -1235,6 +1235,292 @@ function redirect_js($url,$title="...") {
 // _misc.funcs.php }}}
 
 
+// _template_funcs.php {{{
+
+
+/**
+ * single_month_title(-)
+ *
+ * fplanque: 0.8.3: changed defaults
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @todo Respect locales datefmt
+ *
+ * @param string prefix to display, default is 'Archives for: '
+ * @param string format to output, default 'htmlbody'
+ * @param boolean show the year as link to year's archive (in monthly mode)
+ */
+function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyeararchive = true, $blogurl = '', $params = '' )
+{
+	global $m, $w, $month;
+
+	if( $prefix == '#' ) $prefix = ' '.T_('Archives for').': ';
+
+	if( !empty($m) && $display )
+	{
+		$my_year = substr($m,0,4);
+		if( strlen($m) > 4 )
+			$my_month = T_($month[substr($m,4,2)]);
+		else
+			$my_month = '';
+		$my_day = substr($m,6,2);
+
+		if( $display == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
+		{ // display year as link to year's archive
+			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
+		}
+
+
+		$title = $prefix.$my_month.' '.$my_year;
+
+		if( !empty( $my_day ) )
+		{	// We also want to display a day
+			$title .= ", $my_day";
+		}
+
+		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
+		{	// We also want to display a week number
+			$title .= ", week $w";
+		}
+
+		echo format_to_output( $title, $display );
+	}
+}
+
+/**
+ * Display "Archive Directory" title if it has been requested
+ *
+ * {@internal arcdir_title(-) }}
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to
+ *								return value instead of displaying it
+ */
+function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
+{
+	global $disp;
+
+	if( $disp == 'arcdir' )
+	{
+		$info = $prefix.T_('Archive Directory');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
+// _template_funcs.php }}}
+
+
+// _item_funcs.php {{{
+
+/**
+ * {@internal single_post_title(-)}}
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @todo posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
+ * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
+ */
+function single_post_title( $prefix = '#', $display = 'htmlhead' )
+{
+	global $p, $title, $preview, $ItemCache;
+
+	$disp_title = '';
+
+	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
+
+	if( $preview )
+	{
+		if( $prefix == '#' ) $prefix = ' ';
+		$disp_title = T_('PREVIEW');
+	}
+	elseif( intval($p) )
+	{
+		if( $Item = $ItemCache->get_by_ID( $p, false ) )
+		{
+			$disp_title = $Item->get('title');
+		}
+	}
+	elseif( !empty( $title ) )
+	{
+		if( $Item = $ItemCache->get_by_urltitle( $title, false ) )
+		{
+			$disp_title = $Item->get('title');
+		}
+	}
+
+	if( !empty( $disp_title ) )
+	{
+		if ($display)
+		{
+			echo $prefix, format_to_output($disp_title, $display );
+		}
+		else
+		{
+			return $disp_title;
+		}
+	}
+}
+
+// _item_funcs.php }}}
+
+
+// _category_funcs.php {{{
+
+/**
+ * Display currently filtered categories names
+ *
+ * This tag is out of the b2 loop.
+ * It outputs the title of the category when you load the page with <code>?cat=</code>
+ * When the weblog page is loaded without ?cat=, this tag doesn't display anything.
+ * Generally, you could use this as a page title.
+ *
+ * fplanque: multiple category support (so it's not really 'single' anymore!)
+ *
+ * {@internal single_cat_title(-) }}
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to
+ *								return value instead of displaying it
+ */
+function single_cat_title( $prefix = '#', $display = 'htmlbody' )
+{
+	global $cat, $cat_array;
+	if( $prefix == '#' )
+	{
+		if( count($cat_array) > 1 )
+			$prefix = ' '.T_('Categories').': ';
+		else $prefix = ' '.T_('Category').': ';
+	}
+
+	if( !empty($cat_array) )
+	{ // We have requested specific categories...
+		$cat_names = array();
+		foreach( $cat_array as $cat_ID )
+		{
+			$my_cat = get_the_category_by_ID($cat_ID);
+			$cat_names[] = $my_cat['cat_name'];
+		}
+		$cat_names_string = implode( ", ", $cat_names );
+		if( !empty( $cat_names_string ) )
+		{
+			if( strstr($cat,'-') )
+			{
+				$cat_names_string = 'All but '.$cat_names_string;
+			}
+			if ($display)
+				echo format_to_output( $prefix.$cat_names_string, $display );
+			else
+				return $cat_names_string;
+		}
+	}
+}
+
+// _category_funcs.php }}}
+
+
+/**
+ * Display "Last comments" title if these have been requested
+ *
+ * {@internal last_comments_title(-) }}
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to
+ *              return value instead of displaying it
+ */
+function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
+{
+	global $disp;
+
+	if( $disp == 'comments' )
+	{
+		$info = $prefix.T_('Last comments');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
+/**
+ * Display "Statistics" title if these have been requested
+ *
+ * {@internal stats_title(-) }}
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to
+ *								return value instead of displaying it
+ */
+function stats_title( $prefix = ' ', $display = 'htmlbody' )
+{
+	global $disp;
+
+	if( $disp == 'stats' )
+	{
+		$info = $prefix. T_('Statistics');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
+/**
+ * Display "User profile" title if it has been requested
+ *
+ * {@internal profile_title(-) }}
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to
+ *              return value instead of displaying it
+ */
+function profile_title( $prefix = ' ', $display = 'htmlbody' )
+{
+	global $disp;
+
+	if( $disp == 'profile' )
+	{
+		$info = $prefix.T_('User profile');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
+
+/**
+ * Display "Message User" title if it has been requested
+ *
+ * {@internal msg_title(-) }}
+ *
+ * @todo move to {@link Request} class (fplanque)
+ *
+ * @deprecated Deprecated by {@link request_title()}
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to
+ *								return value instead of displaying it
+ */
+function msgform_title( $prefix = ' ', $display = 'htmlbody' )
+{
+	global $disp;
+
+	if( $disp == 'msgform' )
+	{
+		$info = $prefix.T_('Send an email message');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
 // globals {{{
 
 /**
@@ -1275,6 +1561,9 @@ $tableusersettings = $tableprefix.'usersettings';
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.9  2005/03/06 16:30:40  blueyed
  * deprecated global table names.
  *

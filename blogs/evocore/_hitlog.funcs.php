@@ -363,33 +363,18 @@ function stats_user_agent( $translate = false )
 }
 
 
-/**
- * Display "Statistics" title if these have been requested
+/*
+ * stats_title(-)
  *
- * {@internal stats_title(-) }}
- *
- * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to
- *								return value instead of displaying it
+ * @movedTo _obsolete092.php
  */
-function stats_title( $prefix = ' ', $display = 'htmlbody' )
-{
-	global $disp;
-
-	if( $disp == 'stats' )
-	{
-		$info = $prefix. T_('Statistics');
-		if ($display)
-			echo format_to_output( $info, $display );
-		else
-			return $info;
-	}
-}
-
 
 
 /*
  * $Log$
+ * Revision 1.8  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.7  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

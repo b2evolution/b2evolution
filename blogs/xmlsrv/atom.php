@@ -25,9 +25,7 @@
 <feed version="0.3" xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
 	<title><?php
 		$Blog->disp( 'name', 'xml' );
-		single_cat_title( ' - ', 'xml' );
-		single_month_title( ' - ', 'xml' );
-		single_post_title( ' - ', 'xml' );
+		request_title( ' - ', '', ' - ', 'xml' );
 	?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
 	<tagline><?php $Blog->disp( 'shortdesc', 'xml' ) ?></tagline>

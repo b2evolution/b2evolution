@@ -277,28 +277,11 @@ function user_preferedname( $user_ID )
 }
 
 
-/**
- * Display "User profile" title if it has been requested
+/*
+ * profile_title(-)
  *
- * {@internal profile_title(-) }}
- *
- * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to
- *              return value instead of displaying it
+ * @movedTo _obsolete092.php
  */
-function profile_title( $prefix = ' ', $display = 'htmlbody' )
-{
-	global $disp;
-
-	if( $disp == 'profile' )
-	{
-		$info = $prefix.T_('User profile');
-		if ($display)
-			echo format_to_output( $info, $display );
-		else
-			return $info;
-	}
-}
 
 
 /**
@@ -396,6 +379,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.20  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.19  2005/02/28 09:06:34  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

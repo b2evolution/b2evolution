@@ -604,55 +604,11 @@ function cat_query( $load_postcounts = false, $dbtable_items = 'T_posts', $dbpre
 }
 
 
-/**
- * Display currently filtered categories names
+/*
+ * single_cat_title(-)
  *
- * This tag is out of the b2 loop.
- * It outputs the title of the category when you load the page with <code>?cat=</code>
- * When the weblog page is loaded without ?cat=, this tag doesn't display anything.
- * Generally, you could use this as a page title.
- *
- * fplanque: multiple category support (so it's not really 'single' anymore!)
- *
- * {@internal single_cat_title(-) }}
- *
- * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to
- *								return value instead of displaying it
+ * @movedTo _obsolete092.php
  */
-function single_cat_title( $prefix = '#', $display = 'htmlbody' )
-{
-	global $cat, $cat_array;
-	if( $prefix == '#' )
-	{
-		if( count($cat_array) > 1 )
-			$prefix = ' '.T_('Categories').': ';
-		else $prefix = ' '.T_('Category').': ';
-	}
-
-	if( !empty($cat_array) )
-	{ // We have requested specific categories...
-		$cat_names = array();
-		foreach( $cat_array as $cat_ID )
-		{
-			$my_cat = get_the_category_by_ID($cat_ID);
-			$cat_names[] = $my_cat['cat_name'];
-		}
-		$cat_names_string = implode( ", ", $cat_names );
-		if( !empty( $cat_names_string ) )
-		{
-			if( strstr($cat,'-') )
-			{
-				$cat_names_string = 'All but '.$cat_names_string;
-			}
-			if ($display)
-				echo format_to_output( $prefix.$cat_names_string, $display );
-			else
-				return $cat_names_string;
-		}
-	}
-}
-
 
 
 /**
@@ -866,6 +822,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.15  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.14  2005/03/07 17:36:11  fplanque
  * made more generic
  *

@@ -60,9 +60,7 @@ echo '<?xml version="1.0"?'.'>';
 	<channel>
 		<title><?php
 			$Blog->disp( 'name', 'xml' );
-			single_cat_title( ' - ', 'xml' );
-			single_month_title( ' - ', 'xml' );
-			single_post_title( ' - ', 'xml' );
+			request_title( ' - ', '', ' - ', 'xml' );
 		?></title>
 		<link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
 		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>

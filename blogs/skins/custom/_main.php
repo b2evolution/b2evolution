@@ -57,14 +57,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
-		single_cat_title( ' - ', 'htmlhead' );
-		single_month_title( ' - ', 'htmlhead' );
-		single_post_title( ' - ', 'htmlhead' );
-		arcdir_title( ' - ', 'htmlhead' );
-		last_comments_title( ' - ', 'htmlhead' );
-		stats_title( ' - ', 'htmlhead' );
-		msgform_title( ' - ', 'htmlhead' );
-		profile_title( ' - ', 'htmlhead' );
+		request_title( ' - ', '', ' - ', 'htmlhead' );
 	?>
 	</title>
 	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
@@ -103,16 +96,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 </div>
 
 <div class="bPosts">
-<h2><?php
-	single_cat_title();
-	single_month_title();
-	single_post_title();
-	arcdir_title();
-	last_comments_title();
-	stats_title();
-	profile_title();
-	msgform_title();
-?></h2>
+<?php request_title( '<h2>', '</h2>' ) ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 

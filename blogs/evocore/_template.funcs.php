@@ -64,77 +64,162 @@ function imgbase()
 	echo $img_url;
 }
 
+
 /**
- * single_month_title(-)
+ * Display a global title matching filter params
  *
- * fplanque: 0.8.3: changed defaults
+ * Outputs the title of the category when you load the page with <code>?cat=</code>
+ * Display "Archive Directory" title if it has been requested
+ * Display "Last comments" title if these have been requested
+ * Display "Statistics" title if these have been requested
+ * Display "User profile" title if it has been requested
  *
- * @todo Respect locales datefmt
+ * @todo single month: Respect locales datefmt
+ * @todo single post: posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
+ * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
  *
- * @param string prefix to display, default is 'Archives for: '
+ * @param string prefix to display if a title is generated
+ * @param string suffix to display if a title is generated
+ * @param string glue to uise if multiple title elements are generated
  * @param string format to output, default 'htmlbody'
+ * @param boolean display title? (if false: return)
  * @param boolean show the year as link to year's archive (in monthly mode)
  */
-function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyeararchive = true, $blogurl = '', $params = '' )
+function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'htmlbody',
+												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '' )
 {
-	global $m, $w, $month;
+	global $cat, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp;
 
-	if( $prefix == '#' ) $prefix = ' '.T_('Archives for').': ';
+	$r = array();
 
-	if( !empty($m) && $display )
+	switch( $disp )
 	{
-		$my_year = substr($m,0,4);
-		if( strlen($m) > 4 )
-			$my_month = T_($month[substr($m,4,2)]);
+		case 'arcdir':
+			// We are requesting the archive directory:
+			$r[] = T_('Archive Directory');
+			break;
+			
+		case 'comments':
+			// We are requesting the last comments:
+			$r[] = T_('Last comments');
+			break;
+			
+		case 'stats':
+			// We are requesting the stats:
+			$r[] = T_('Statistics');
+			break;
+			
+		case 'profile':
+			// We are requesting the user profile:
+			$r[] = T_('User profile');
+			break;
+			
+		case 'msgform':
+			// We are requesting the message form:
+			$r[] = T_('Send an email message');
+			break;
+		
+		default:
+			// We are displaying (a) message(s)...
+			if( $preview )
+			{	// We are requesting a post preview:
+				$r[] = T_('PREVIEW');
+			}
+			elseif( intval($p) )
+			{	// We are requesting a specific post by ID:
+				if( $Item = $ItemCache->get_by_ID( $p, false ) )
+				{
+					$r[] = T_('Post details').': '.$Item->get('title');
+				}
+			}
+			elseif( !empty( $title ) )
+			{	// We are requesting a specific post by title:
+				if( $Item = $ItemCache->get_by_urltitle( $title, false ) )
+				{
+					$r[] = T_('Post details').': '.$Item->get('title');
+				}
+			}
+			else
+			{	// Multiple messages...
+			
+				if( !empty($cat_array) )
+				{ // We have requested specific categories...
+					$cat_names = array();
+					foreach( $cat_array as $cat_ID )
+					{
+						$my_cat = get_the_category_by_ID($cat_ID);
+						$cat_names[] = $my_cat['cat_name'];
+					}
+					$cat_names_string = implode( ", ", $cat_names );
+					if( !empty( $cat_names_string ) )
+					{
+						if( strstr($cat,'-') )
+						{
+							$cat_names_string = T_('All but ').$cat_names_string;
+						}
+			
+						if( count($cat_array) > 1 )
+							$r[] = T_('Categories').': '.$cat_names_string;
+						else 
+							$r[] = T_('Category').': '.$cat_names_string;
+					}
+				}
+			}			
+
+			if( !empty($m) )
+			{	// We have asked for a specific timeframe:
+			
+				$my_year = substr($m,0,4);
+				if( strlen($m) > 4 )
+				{ // We have requested a month too:
+					$my_month = T_($month[substr($m,4,2)]);
+				}
+				else
+				{
+					$my_month = '';
+				}
+				// Requested a day?
+				$my_day = substr($m,6,2);
+		
+				if( $format == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
+				{ // display year as link to year's archive
+					$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
+				}
+		
+				$arch = T_('Archives for').': '.$my_month.' '.$my_year;
+		
+				if( !empty( $my_day ) )
+				{	// We also want to display a day
+					$arch .= ", $my_day";
+				}
+		
+				if( !empty($w) && ($w>=0) ) // Note: week # can be 0
+				{	// We also want to display a week number
+					$arch .= ", week $w";
+				}
+				
+				$r[] = $arch;
+			}
+	}
+
+	if( !empty( $r ) )
+	{ // We have something to display:
+		$r = implode( $glue, $r );
+		$r = $prefix.format_to_output( $r, $format ).$suffix;
+		if( $display )
+			echo $r;
 		else
-			$my_month = '';
-		$my_day = substr($m,6,2);
-
-		if( $display == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
-		{ // display year as link to year's archive
-			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
-		}
-
-
-		$title = $prefix.$my_month.' '.$my_year;
-
-		if( !empty( $my_day ) )
-		{	// We also want to display a day
-			$title .= ", $my_day";
-		}
-
-		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
-		{	// We also want to display a week number
-			$title .= ", week $w";
-		}
-
-		echo format_to_output( $title, $display );
+			return $r;
 	}
 }
 
 
-/**
- * Display "Archive Directory" title if it has been requested
+/*
+ * single_month_title(-)
+ * arcdir_title(-)
  *
- * {@internal arcdir_title(-) }}
- *
- * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to
- *								return value instead of displaying it
+ * @movedTo _obsolete092.php
  */
-function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
-{
-	global $disp;
-
-	if( $disp == 'arcdir' )
-	{
-		$info = $prefix.T_('Archive Directory');
-		if ($display)
-			echo format_to_output( $info, $display );
-		else
-			return $info;
-	}
-}
 
 
 /**
@@ -204,6 +289,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.4  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.3  2005/02/28 09:06:34  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

@@ -43,33 +43,18 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * Display "Message User" title if it has been requested
+/*
+ * msg_title(-)
  *
- * {@internal msg_title(-) }}
- *
- * @todo move to {@link Request} class (fplanque)
- *
- * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to
- *								return value instead of displaying it
+ * @movedTo _obsolete092.php
  */
-function msgform_title( $prefix = ' ', $display = 'htmlbody' )
-{
-	global $disp;
 
-	if( $disp == 'msgform' )
-	{
-		$info = $prefix.T_('Send an email message');
-		if ($display)
-			echo format_to_output( $info, $display );
-		else
-			return $info;
-	}
-}
 
 /*
  * $Log$
+ * Revision 1.5  2005/03/09 14:54:26  fplanque
+ * refactored *_title() galore to requested_title()
+ *
  * Revision 1.4  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

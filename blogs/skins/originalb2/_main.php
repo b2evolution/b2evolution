@@ -57,7 +57,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <!-- layout credits goto http://bluerobot.com/web/layouts/layout2.html -->
 
 <head xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-	<title><?php $Blog->disp( 'name', 'htmlbody' ) ?><?php single_post_title(' :: ', 'htmlhead') ?><?php single_cat_title(' :: ', 'htmlhead') ?><?php single_month_title(' :: ', 'htmlhead') ?></title>
+	<title><?php $Blog->disp( 'name', 'htmlbody' ) ?><?php request_title( ' :: ', '', ' :: ', 'htmlhead' ) ?></title>
 	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
