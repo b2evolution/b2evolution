@@ -185,12 +185,15 @@ class BlogCache extends DataObjectCache
 		// We force a full load!
 		$this->load_all();
 	
-		parent::option_list( $default, $allow_none, 'prefered_name' );
+		parent::option_list( $default, $allow_none, 'name' );
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/04 23:45:47  fplanque
+ * bugfix
+ *
  * Revision 1.4  2004/12/21 21:22:46  fplanque
  * factoring/cleanup
  *
