@@ -13,7 +13,7 @@ require_once( EVODIR.'/blogs/evocore/_filelist.class.php' );
 
 class FilelistTestCase extends FilemanUnitTestCase
 {
-	function FileTestCase()
+	function FilelistTestCase()
 	{
 		$this->UnitTestCase( 'Filelist class test' );
 	}
@@ -127,9 +127,9 @@ class FilelistTestCase extends FilemanUnitTestCase
 }
 
 
-if( !isset( $test ) )
+if( !isset( $this ) )
 { // Called directly, run the TestCase alone
-	$test = new FileTestCase();
+	$test = new FilelistTestCase();
 	$test->run( new HtmlReporter() );
 	unset( $test );
 }
