@@ -70,7 +70,7 @@ define( 'ARRAY_A', 'ARRAY_A', true);
 define( 'ARRAY_N', 'ARRAY_N', true);
 
 if( ! function_exists( 'mysql_real_escape_string' ) )
-{	// Function only available since PHP 4.3.0
+{ // Function only available since PHP 4.3.0
 	function mysql_real_escape_string( $unescaped_string )
 	{
 		return mysql_escape_string( $unescaped_string );
@@ -84,7 +84,6 @@ if( ! function_exists( 'mysql_real_escape_string' ) )
  */
 class DB
 {
-
 	var $trace = false;      // same as $debug_all
 	var $debug_all = false;  // same as $trace
 	var $show_errors = true;
@@ -194,6 +193,7 @@ class DB
 		}
 	}
 
+
 	/**
 	 * Format a string correctly for safe insert under all PHP conditions
 	 */
@@ -202,6 +202,7 @@ class DB
 		return mysql_real_escape_string($str);
 	}
 
+
 	function quote($str)
 	{
 		if( $str === NULL )
@@ -209,6 +210,7 @@ class DB
 		else
 			return "'".mysql_real_escape_string($str)."'";
 	}
+
 
 	function null($val)
 	{
@@ -222,9 +224,10 @@ class DB
 	/**
 	 * Returns the appropriate string to compare $val in a WHERE clause.
 	 *
+	 * @param mixed Value to create a "compare-String" for
 	 * @return string Either 'IS NULL', 'IN ("a", "b", "c")' or " = 'a'".
 	 */
-	function compString($val)
+	function compString( $val )
 	{
 		if( $val === NULL )
 		{
@@ -244,7 +247,7 @@ class DB
 	/**
 	 * Print SQL/DB error.
 	 */
-	function print_error($str = "")
+	function print_error( $str = '' )
 	{
 		// All errors go to the global error array $EZSQL_ERROR..
 		global $EZSQL_ERROR;
@@ -257,8 +260,8 @@ class DB
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array
 						(
-							"query" => $this->last_query,
-							"error_str"  => $this->last_error
+							'query' => $this->last_query,
+							'error_str'  => $this->last_error
 						);
 
 		// Is error output turned on or not..
@@ -274,6 +277,7 @@ class DB
 
 		if( $this->halt_on_error ) die();
 	}
+
 
 	/**
 	 * Kill cached query results
@@ -337,7 +341,7 @@ class DB
 		}
 
 		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query) )
-		{	// Query was an insert, delete, update, replace:
+		{ // Query was an insert, delete, update, replace:
 
 			// echo 'insert, delete, update, replace';
 
@@ -354,21 +358,21 @@ class DB
 			$return_val = $this->rows_affected;
 		}
 		else
-		{	// Query was a select:
+		{ // Query was a select:
 
 			// echo 'select';
 
 			// Take note of column info
-			$i=0;
-			while ($i < @mysql_num_fields($this->result))
+			$i = 0;
+			while( $i < @mysql_num_fields($this->result) )
 			{
 				$this->col_info[$i] = @mysql_fetch_field($this->result);
 				$i++;
 			}
 
 			// Store Query Results
-			$num_rows=0;
-			while ( $row = @mysql_fetch_object($this->result) )
+			$num_rows = 0;
+			while( $row = @mysql_fetch_object($this->result) )
 			{
 				// Store relults as an objects within main array
 				$this->last_result[$num_rows] = $row;
@@ -386,40 +390,52 @@ class DB
 		}
 
 		// If debug ALL queries
-		$this->trace || $this->debug_all ? $this->debug() : NULL ;
+		if( $this->trace || $this->debug_all )
+		{
+			$this->debug();
+		}
 
 		return $return_val;
-
 	}
+
 
 	/**
 	 * Get one variable from the DB - see docs for more detail
+	 *
+	 * @return false|mixed false if not found, the value otherwise
 	 */
-	function get_var( $query=NULL, $x=0, $y=0, $title = '' )
+	function get_var( $query = NULL, $x = 0, $y = 0, $title = '' )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_var(\"$query\",$x,$y)";
 
 		// If there is a query then perform it if not then use cached results..
-		if ( $query )
+		if( $query )
 		{
 			$this->query($query, $title);
 		}
 
 		// Extract var out of cached results based x,y vals
-		if ( $this->last_result[$y] )
+		if( $this->last_result[$y] )
 		{
 			$values = array_values(get_object_vars($this->last_result[$y]));
 		}
 
-		// If there is a value return it else return NULL
-		return (isset($values[$x]) && $values[$x]!=='') ? $values[$x] : NULL;
+		if( isset($values[$x]) )
+		{
+			return $values[$x];
+		}
+
+		return false;
 	}
+
 
 	/**
 	 * Get one row from the DB - see docs for more detail
+	 *
+	 * @return array
 	 */
-	function get_row($query=NULL,$output=OBJECT,$y=0, $title = '' )
+	function get_row( $query = NULL, $output = OBJECT, $y = 0, $title = '' )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_row(\"$query\",$output,$y)";
@@ -434,64 +450,82 @@ class DB
 		// If the output is an object then return object using the row offset..
 		if ( $output == OBJECT )
 		{
-			return $this->last_result[$y]?$this->last_result[$y]:NULL;
+			return $this->last_result[$y]
+							? $this->last_result[$y]
+							: array();
 		}
 		// If the output is an associative array then return row as such..
 		elseif ( $output == ARRAY_A )
 		{
-			return $this->last_result[$y]?get_object_vars($this->last_result[$y]):NULL;
+			return $this->last_result[$y]
+							? get_object_vars( $this->last_result[$y] )
+							: array();
 		}
 		// If the output is an numerical array then return row as such..
 		elseif ( $output == ARRAY_N )
 		{
-			return $this->last_result[$y]?array_values(get_object_vars($this->last_result[$y])):NULL;
+			return $this->last_result[$y]
+							? array_values( get_object_vars($this->last_result[$y]) )
+							: array();
 		}
 		// If invalid output type was specified..
 		else
 		{
 			$this->print_error(" \$db->get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
 		}
-
 	}
+
 
 	/**
 	 * Function to get 1 column from the cached result set based in X index
 	 * see docs for usage and info
+	 *
+	 * @return array
 	 */
-	function get_col( $query = NULL, $x=0, $title = '' )
+	function get_col( $query = NULL, $x = 0, $title = '' )
 	{
-
 		// If there is a query then perform it if not then use cached results..
-		if ( $query )
+		if( $query )
 		{
-			$this->query($query, $title);
+			$this->query( $query, $title );
 		}
 
 		// Extract the column values
 		$new_array = array();
-		for ( $i=0; $i < count($this->last_result); $i++ )
+		for ( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
 		{
-			$new_array[$i] = $this->get_var(NULL,$x,$i);
+			$new_array[$i] = $this->get_var( NULL, $x, $i );
 		}
 
 		return $new_array;
 	}
 
-	function get_list( $query = NULL, $x=0 )
+
+	/**
+	 * Get a column as comma-seperated list.
+	 *
+	 * @param string|NULL Query to execute
+	 * @param integer Column of the result set
+	 * @return string
+	 */
+	function get_list( $query = NULL, $x = 0 )
 	{
-		return implode( ',', $this->get_col( $query, $x=0 ) );
+		return implode( ',', $this->get_col( $query, $x = 0 ) );
 	}
+
 
 	/**
 	 * Return the the query as a result set - see docs for more details
+	 *
+	 * @return array
 	 */
-	function get_results( $query=NULL, $output = OBJECT, $title = '' )
+	function get_results( $query = NULL, $output = OBJECT, $title = '' )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_results(\"$query\", $output)";
 
 		// If there is a query then perform it if not then use cached results..
-		if ( $query )
+		if( $query )
 		{
 			$this->query($query, $title);
 		}
@@ -499,16 +533,18 @@ class DB
 		// Send back array of objects. Each row is an object
 		if ( $output == OBJECT )
 		{
-			return $this->last_result;
+			return $this->last_result ? $this->last_result : array();
 		}
 		elseif ( $output == ARRAY_A || $output == ARRAY_N )
 		{
-			if ( $this->last_result )
+			$new_array = array();
+
+			if( $this->last_result )
 			{
-				$i=0;
+				$i = 0;
+
 				foreach( $this->last_result as $row )
 				{
-
 					$new_array[$i] = get_object_vars($row);
 
 					if ( $output == ARRAY_N )
@@ -523,7 +559,7 @@ class DB
 			}
 			else
 			{
-				return NULL;
+				return array();
 			}
 		}
 	}
@@ -533,14 +569,13 @@ class DB
 	 * Function to get column meta data info pertaining to the last query
 	 * see docs for more info and usage
 	 */
-	function get_col_info($info_type="name",$col_offset=-1)
+	function get_col_info( $info_type = 'name', $col_offset = -1 )
 	{
-
-		if ( $this->col_info )
+		if( $this->col_info )
 		{
-			if ( $col_offset == -1 )
+			if( $col_offset == -1 )
 			{
-				$i=0;
+				$i = 0;
 				foreach($this->col_info as $col )
 				{
 					$new_array[$i] = $col->{$info_type};
@@ -552,45 +587,50 @@ class DB
 			{
 				return $this->col_info[$col_offset]->{$info_type};
 			}
-
 		}
-
 	}
 
 
 	/**
 	 * Dumps the contents of any input variable to screen in a nicely
 	 * formatted and easy to understand way - any type: Object, Var or Array
+	 *
+	 * @param mixed Variable to dump
 	 */
-	function vardump($mixed='')
+	function vardump( $mixed = '' )
 	{
-
-		echo "<p><table><tr><td bgcolor=ffffff><blockquote><font color=000090>";
-		echo "<pre><font face=arial>";
+		echo '<p><table><tr><td bgcolor="fff"><blockquote style="color:#000090">';
+		echo '<pre style="font-family:Arial">';
 
 		if ( ! $this->vardump_called )
 		{
-			echo "<font color=800080><b>ezSQL</b> (v".EZSQL_VERSION.") <b>Variable Dump..</b></font>\n\n";
+			echo '<span style="color:#800080"><strong>ezSQL</strong> (v'.EZSQL_VERSION.") <strong>Variable Dump..</strong></span>\n\n";
 		}
 
 		$var_type = gettype ($mixed);
-		print_r(($mixed?$mixed:"<font color=red>No Value / False</font>"));
-		echo "\n\n<b>Type:</b> " . ucfirst($var_type) . "\n";
-		echo "<b>Last Query</b> [$this->num_queries]<b>:</b> ".($this->last_query?$this->last_query:"NULL")."\n";
-		echo "<b>Last Function Call:</b> " . ($this->func_call?$this->func_call:"None")."\n";
-		echo "<b>Last Rows Returned:</b> ".count($this->last_result)."\n";
-		echo "</font></pre></font></blockquote></td></tr></table>".$this->donation();
+		print_r( ( $mixed ? $mixed : '<span style="color:#f00">No Value / False</span>') );
+		echo "\n\n<strong>Type:</strong> ".ucfirst( $var_type )."\n"
+				."<strong>Last Query</strong> [$this->num_queries]<strong>:</strong> "
+				.( $this->last_query ? $this->last_query : "NULL" )."\n"
+				.'<strong>Last Function Call:</strong> '.( $this->func_call ? $this->func_call : 'None' )."\n"
+				.'<strong>Last Rows Returned:</strong> '.count( $this->last_result )."\n"
+				.'</pre></blockquote></td></tr></table>';
 		echo "\n<hr size=1 noshade color=dddddd>";
 
 		$this->vardump_called = true;
-
 	}
 
-	// Alias for the above function
-	function dumpvar($mixed)
+
+	/**
+	 * Alias for {@link vardump()}
+	 *
+	 * @param mixed Variable to dump
+	 */
+	function dumpvar( $mixed )
 	{
-		$this->vardump($mixed);
+		$this->vardump( $mixed );
 	}
+
 
 	/**
 	 * Displays the last query string that was sent to the database & a
@@ -599,8 +639,7 @@ class DB
 	 */
 	function debug()
 	{
-
-		echo "<blockquote>";
+		echo '<blockquote>';
 
 		// Only show ezSQL credits once..
 		if ( ! $this->debug_called )
@@ -615,7 +654,6 @@ class DB
 
 		if ( $this->col_info )
 		{
-
 			// =====================================================
 			// Results top rows
 
@@ -623,7 +661,7 @@ class DB
 			echo "<tr bgcolor=eeeeee><td nowrap valign=bottom><font color=555599 face=arial size=2><b>(row)</b></font></td>";
 
 
-			for ( $i=0; $i < count($this->col_info); $i++ )
+			for ( $i = 0, count = count($this->col_info); $i < $count; $i++ )
 			{
 				echo "<td nowrap align=left valign=top><font size=1 color=555599 face=arial>{$this->col_info[$i]->type} {$this->col_info[$i]->max_length}</font><br><span style='font-family: arial; font-size: 10pt; font-weight: bold;'>{$this->col_info[$i]->name}</span></td>";
 			}
@@ -633,7 +671,7 @@ class DB
 			// ======================================================
 			// print main results
 
-		if ( $this->last_result )
+		if( $this->last_result )
 		{
 
 			$i=0;
@@ -664,11 +702,12 @@ class DB
 			echo "<font face=arial size=2>No Results</font>";
 		}
 
-		echo "</blockquote></blockquote><hr noshade color=dddddd size=1>";
+		echo '</blockquote></blockquote><hr style="border:none;height:1px;border-top:1px solid #ebebd8;margin:2ex 0;">';
 
 
 		$this->debug_called = true;
 	}
+
 
 	/**
 	 * Displays all queries that have been exectuted
@@ -698,6 +737,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/08 00:43:15  blueyed
+ * doc, whitespace, html, get_results() and get_row() now always return array, get_var() return false in case of error
+ *
  * Revision 1.5  2004/11/09 00:25:11  blueyed
  * minor translation changes (+MySQL spelling :/)
  *
