@@ -146,6 +146,7 @@
 			</div>
 
 			<p style="clear:both;">
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="rightmargin"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php
 				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'scope' ), false, $blog ) )
 				{
@@ -180,10 +181,9 @@
 				[ <a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php $Item->ID() ?>&c=1"><?php
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('% comments'));
-				trackback_number('', ', '.T_('1 Trackback'), ', '.T_('% Trackbacks'));
-				pingback_number('', ', '.T_('1 Pingback'), ', '.T_('% Pingbacks'));
-				?></a>
-				- <a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to this post') ?>"><?php echo T_('Permalink') ?></a> ]
+				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('% Trackbacks'));
+				pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('% Pingbacks'));
+				?></a> ]
 			</p>
 
 			<?php
@@ -250,6 +250,7 @@
 							<?php $Comment->content() ?>
 						</div>
 						<p>
+						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment')	?>" class="rightmargin"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 						<?php
 						if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
 						{	// If SUer has permission to edit comments:
