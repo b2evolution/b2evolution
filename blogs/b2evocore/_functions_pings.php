@@ -34,8 +34,11 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 			$client->debug = 1;
 		}
 		else
+		{
 			$client = new xmlrpc_client('/evonetsrv/xmlrpc.php', 'b2evolution.net', 80);
-
+			// $client->debug = 1;
+		}
+		
 		$message = new xmlrpcmsg( 'b2evo.ping', array( 
 															new xmlrpcval('id') ,			// Reserved
 															new xmlrpcval('user'),		// Reserved

@@ -94,8 +94,6 @@ else
 	{
 		printf( T_('setcookie %s failed!'), $cookie_pass );
 	}
-
-	echo '<br />';
 }
 
 
