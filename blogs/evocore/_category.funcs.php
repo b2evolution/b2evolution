@@ -156,7 +156,7 @@ function cat_delete( $cat_ID )
 		// echo "remap to: $remap_cat_ID<br />";
 		// May be NULL if this was the last cat (But there are no posts inside)
 
-		if( ($remap_cat_ID == NULL) && (! empty($IDarray)) )
+		if( !$remap_cat_ID && !empty($IDarray) )
 		{
 			return T_("Cannot delete last category if there are posts inside!");
 		}
@@ -824,14 +824,14 @@ function blog_copy_cats($srcblog, $destblog)
 	// ----------------- END RECURSIVE CAT LIST ----------------
 }
 
-/** 
+/**
  * callback to start sublist
  */
 function cat_copy_before_first( $parent_cat_ID, $level )
 {	// callback to start sublist
 }
 
-/** 
+/**
  * callback to display sublist element
  */
 function cat_copy_before_each( $cat_ID, $level )
@@ -843,7 +843,7 @@ function cat_copy_before_each( $cat_ID, $level )
 	$cat_parents[$level+1]=cat_create( $cat['cat_name'], $cat_parents[$level] , $edited_Blog->ID);
 }
 
-/** 
+/**
  * callback to display sublist element
  */
 function cat_copy_after_each( $cat_ID, $level )
@@ -851,16 +851,19 @@ function cat_copy_after_each( $cat_ID, $level )
 	echo "</li>\n";
 }
 
-/** 
+/**
  * callback to end sublist
  */
 function cat_copy_after_last( $parent_cat_ID, $level )
 {	// callback to end sublist
 }
-	
+
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/08 04:07:46  blueyed
+ * fixed results from DB::get_var()
+ *
  * Revision 1.8  2005/01/25 15:07:19  fplanque
  * cleanup
  *

@@ -129,13 +129,11 @@ else switch ($action)
 		}
 
 		// check if new login already exists for another user_ID
-		$query = "SELECT ID
-								FROM T_users
-							 WHERE user_login = '$edited_user_login'
-							   AND ID != $edited_user_ID";
-		$q = $DB->get_var( $query );
+		$query = "SELECT ID FROM T_users
+							WHERE user_login = '$edited_user_login'
+								AND ID != $edited_user_ID";
 
-		if( $q !== NULL )
+		if( $q = $DB->get_var( $query ) )
 		{
 			$Messages->add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ));
 		}
@@ -301,18 +299,18 @@ else switch ($action)
 			<p>
 				<?php
 					$Form = & new Form( 'b2users.php', 'form', 'get' );
-	
-					$Form->begin_form( 'inline' );		
+
+					$Form->begin_form( 'inline' );
 					$Form->hidden( 'action', 'deleteuser' );
 					$Form->hidden( 'id', $deleted_User->ID );
 					$Form->hidden( 'confirm', 1 );
 					$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 					$Form->end_form();
-					
+
 					$Form->begin_form( 'inline' );
 					$Form->submit( array( '', T_('CANCEL'), 'search' ) );
 					$Form->end_form();
-					
+
 				?>
 			</p>
 
@@ -360,9 +358,8 @@ else switch ($action)
 
 		// check if the group name already exists for another group
 		$query = "SELECT grp_ID FROM T_groups WHERE grp_name = '$edited_grp_name' AND grp_ID != $edited_grp_ID";
-		$q = $DB->get_var( $query );
 
-		if( $q !== NULL )
+		if( $q = $DB->get_var( $query ) )
 		{
 			$Messages->add( sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 'href="?group='.$q.'"' ));
 		}

@@ -94,7 +94,7 @@ class UserCache extends DataObjectCache
 																									WHERE user_login = "'.$login.'"' );
 		}
 
-		if( is_null($this->cache_login[$login]) )
+		if( !$this->cache_login[$login] )
 		{
 			return false;
 		}
@@ -187,6 +187,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/08 04:07:47  blueyed
+ * fixed results from DB::get_var()
+ *
  * Revision 1.5  2005/01/20 20:38:58  fplanque
  * refactoring
  *

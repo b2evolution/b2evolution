@@ -25,7 +25,7 @@ function check_db_version()
 	$DB->query( 'SELECT * FROM T_settings LIMIT 1' );
 
 	if( $DB->get_col_info('name', 0) == 'set_name' )
-	{ // we have new table format
+	{ // we have new table format (since 0.9)
 		$old_db_version = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "db_version"' );
 	}
 	else
@@ -33,7 +33,7 @@ function check_db_version()
 		$old_db_version = $DB->get_var( 'SELECT db_version FROM T_settings' );
 	}
 
-	if( $old_db_version == NULL ) die( T_('NOT FOUND! This is not a b2evolution database.') );
+	if( empty($old_db_version) ) die( T_('NOT FOUND! This is not a b2evolution database.') );
 
 	echo $old_db_version, ' : ';
 
