@@ -131,6 +131,10 @@ $use_gzipcompression = 0;
 $use_etags = 0;
 
 
+# CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
+$sleep_after_edit = 0;			// let DB do its stuff...
+
+
 // ** Cookies **
 
 # This is the path that will be associated to cookies
