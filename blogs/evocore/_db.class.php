@@ -661,7 +661,7 @@ class DB
 			echo "<tr bgcolor=eeeeee><td nowrap valign=bottom><font color=555599 face=arial size=2><b>(row)</b></font></td>";
 
 
-			for ( $i = 0, count = count($this->col_info); $i < $count; $i++ )
+			for ( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
 			{
 				echo "<td nowrap align=left valign=top><font size=1 color=555599 face=arial>{$this->col_info[$i]->type} {$this->col_info[$i]->max_length}</font><br><span style='font-family: arial; font-size: 10pt; font-weight: bold;'>{$this->col_info[$i]->name}</span></td>";
 			}
@@ -737,6 +737,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/08 01:11:21  blueyed
+ * stoopid parse error fixed
+ *
  * Revision 1.6  2005/02/08 00:43:15  blueyed
  * doc, whitespace, html, get_results() and get_row() now always return array, get_var() return false in case of error
  *
