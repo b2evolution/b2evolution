@@ -13,7 +13,7 @@
 # 0 to disable
 # 1 to ensable
 $use_textile = 0;				// 0,1 use textile, see http://www.textism.com/tools/textile/
-$use_gmcode = 0;        // 0,1 use GreyMatter-styles: **bold** \italic\ __underline__
+$use_gmcode = 1;        // 0,1 use GreyMatter-styles: **bold** \italic\ __underline__
 $use_bbcode = 0;        // 0,1 use BBCode, like [b]bold[/b]
 $use_smartquotes = 0;		// 0,1 convert quotes into smart/curly quotes
 $use_autolink = 1;			// 0,1 automatically make web, mail, aim and icq addresses clickable
@@ -45,18 +45,19 @@ $use_security_checker = 0;
 # WARNING: disabling both $use_html_checker and $use_security_checker is suicidal !
 
 
-
 #GreyMatter formatting search and replace arrays
 $b2_gmcode['in'] = array(
-	'#\\*\*(.+?)\\*\*#is',		// **bold**
-	'#\\\\(.+?)\\\\#is',		// \\italic\\
-	'#\__(.+?)\__#is'		// __underline__
-);
+													'#\*\*(.+?)\*\*#',		// **bold**
+													'#\x5c\x5c(.+?)\x5c\x5c#',		// \\italic\\
+													'#//(.+?)//#',		// //italic//
+													'#__(.+?)__#'		// __underline__
+												);
 $b2_gmcode['out'] = array(
-	'<strong>$1</strong>',
-	'<em>$1</em>',
-	'<span style="text-decoration:underline">$1</span>'
-);
+													'<strong>$1</strong>',
+													'<em>$1</em>',
+													'<em>$1</em>',
+													'<span style="text-decoration:underline">$1</span>'
+												);
 
 
 

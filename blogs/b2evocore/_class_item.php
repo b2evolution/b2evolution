@@ -401,8 +401,6 @@ class Item extends DataObject
 		$more_file = ''
 		) 
 	{
-		global $use_textile;
-		
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 		
 		if( $more_link_text == '#' ) 
@@ -478,8 +476,6 @@ class Item extends DataObject
 			$output = $content_parts[0];
 		}
 
-		if( $use_textile ) $output = textile( $output );
-	
 		$output = format_to_output( $output, $format );
 		
 		if( ($format == 'xml') && $cut )

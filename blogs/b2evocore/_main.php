@@ -18,10 +18,13 @@ if( isset( $main_init ) )
 $main_init = true;
 
 require_once( dirname(__FILE__). '/../conf/_config.php');
+require_once( dirname(__FILE__). '/_functions.php');
+
+timer_start();
+
 require_once( dirname(__FILE__). '/_class_db.php');
 require_once( dirname(__FILE__). '/_vars.php');	// sets various arrays and vars for use in b2
 require_once( dirname(__FILE__). '/_functions_template.php');	// function to be called from templates
-require_once( dirname(__FILE__). '/_functions.php');
 require_once( dirname(__FILE__). '/_functions_xmlrpc.php');	
 require_once( dirname(__FILE__). '/_functions_xmlrpcs.php');
 require_once( dirname(__FILE__). '/_class_blog.php');
@@ -32,13 +35,8 @@ require_once( dirname(__FILE__). '/_class_dataobjectcache.php');
 require_once( dirname(__FILE__). '/_class_calendar.php');
 require_once( dirname(__FILE__). '/_functions_hitlogs.php'); // referer logging
 require_once( dirname(__FILE__). '/_functions_forms.php');
-
-
-timer_start();
-
-
-if( !isset($debug) ) $debug = 0;
-if( !isset($demo_mode) ) $demo_mode = 0;
+require_once( dirname(__FILE__). '/_functions_forms.php');
+require_once( dirname(__FILE__). '/_class_renderer.php');
 
 
 // register output buffer handler
@@ -69,6 +67,9 @@ $localtimenow = $servertimenow + ($time_difference * 3600);
 $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
 // $BlogCache = & new DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
 $ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
+
+// Renderer init:
+$Renderer = & new Renderer();
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;

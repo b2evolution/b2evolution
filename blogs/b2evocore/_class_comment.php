@@ -221,14 +221,9 @@ class Comment extends DataObject
 	 */
 	function content( $format = 'htmlcontent' ) 
 	{
-		global $use_textile;
-	
 		$comment = $this->content;
 		$comment = str_replace('<trackback />', '', $comment);
 		$comment = str_replace('<pingback />', '', $comment);
-	
-		if( $use_textile ) $comment = textile( $comment );
-	
 		$comment = format_to_output( $comment, $format );
 		echo $comment;
 	}

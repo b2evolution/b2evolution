@@ -7,7 +7,6 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-if( $use_textile ) require_once( dirname(__FILE__). '/_functions_textile.php' );
 
 /*
  * bpost_create(-)
@@ -34,7 +33,7 @@ function bpost_create(
 	$post_comments = 'open' )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+	global $use_bbcode, $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
@@ -42,7 +41,6 @@ function bpost_create(
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
 	if( $use_bbcode ) $post_flags[] = 'bbcode';
-	if( $use_gmcode ) $post_flags[] = 'gmcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
@@ -110,7 +108,7 @@ function bpost_update(
 	$post_comments = 'open' )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+	global $use_bbcode, $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
@@ -118,7 +116,6 @@ function bpost_update(
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
 	if( $use_bbcode ) $post_flags[] = 'bbcode';
-	if( $use_gmcode ) $post_flags[] = 'gmcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
@@ -183,7 +180,7 @@ function bpost_update_status(
 	$post_timestamp = '' )
 {
 	global $DB, $tableposts, $tablepostcats;
-	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+	global $use_bbcode, $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
@@ -191,7 +188,6 @@ function bpost_update_status(
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
 	if( $use_bbcode ) $post_flags[] = 'bbcode';
-	if( $use_gmcode ) $post_flags[] = 'gmcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
@@ -646,7 +642,6 @@ function the_content(
 	$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
 	$disppage = '#' ) // page number to display specific page, # for url parameter
 {
-	global $use_textile;
 	global $id, $postdata, $pages, $multipage, $numpages;
 	global $preview;
 
@@ -720,14 +715,7 @@ function the_content(
 		$output =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
 	}
 
-
-	$content = $output;
-
-
-
-	if( $use_textile ) $content = textile( $content );
-
-	$content = format_to_output( $content, $format );
+	$content = format_to_output( $output, $format );
 
 	if( ($format == 'xml') && $cut )
 	{	// Let's cut this down...

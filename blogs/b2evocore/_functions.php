@@ -75,7 +75,7 @@ function mysql_oops($sql_query)
  * @param string format, can be one of the following
  * - raw: do nothing
  * - htmlcontent: content displayed in HTML page body: apply renders and allow full HTML
- * - htmlrendered: idem
+ * - htmlrendered: idem but with limited renderers
  * - entityencoded: Special mode for RSS 0.92: apply renders and allow full HTML but escape it
  * - htmlbody: display in HTML page body: allow full HTML
  * - htmlhead: strips out HTML (mainly for use in Title)
@@ -87,7 +87,8 @@ function mysql_oops($sql_query)
  */
 function format_to_output( $content, $format = 'htmlbody' )
 {
-	// echo '<font color=red>format [', $content, ']to: ', $format, '</font>';
+	global $Renderer;
+
 	switch( $format )
 	{
 		case 'raw':
@@ -95,23 +96,20 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 
 		case 'htmlcontent':
+			// content displayed in HTML page body: apply renders and allow full HTML
+			$content = $Renderer->render( $content, 'content' );
+			$content = convert_chars($content, 'html');
+			break;
+			
 		case 'htmlrendered':
 			// content displayed in HTML page body: apply renders and allow full HTML
-			convert_bbcode($content);
-			convert_gmcode($content);
-			$content = make_clickable($content);
-			convert_smilies($content);
-			phpcurlme( $content );
+			$content = $Renderer->render( $content, 'other' );
 			$content = convert_chars($content, 'html');
 			break;
 
 		case 'entityencoded':
 			// Special mode for RSS 0.92: apply renders and allow full HTML but escape it
-			convert_bbcode($content);
-			convert_gmcode($content);
-			$content = make_clickable($content);
-			convert_smilies($content);
-			phpcurlme( $content );
+			$content = $Renderer->render( $content, 'content' );
 			$content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
 			break;
@@ -312,7 +310,8 @@ function convert_chars( $content, $flag='html' )
 	}
 
 	// Convert Windows CP1252 => Unicode (valid HTML)
-	$content = strtr( $content, $b2_htmltranswinuni);
+	// TODO: should this go to input conversions instead (?)
+	$content = strtr( $content, $b2_htmltranswinuni );
 
 	if( $flag == 'html' )
 	{ // we can use entities
@@ -364,7 +363,8 @@ function convert_bbcode_email($content)
 function convert_gmcode( & $content)
 {
 	global $b2_gmcode, $use_gmcode;
-	if ($use_gmcode) {
+	if ($use_gmcode) 
+	{
 		$content = preg_replace($b2_gmcode["in"], $b2_gmcode["out"], $content);
 	}
 }
