@@ -21,6 +21,8 @@ body {
 	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size: 84%;
+	background-image: url(skins/evo/rsc/leftfade.png);
+	background-repeat: repeat-y;
 }
 
 /* Titles */
@@ -316,7 +318,6 @@ div#mainmenu {
 	clear:left;
 	float:left;
 	width:12em;
-	background-color:#69f;
 	/* border:	1px solid #f0f; */
 }
 .panelbody {
@@ -384,16 +385,19 @@ div.panelblock {
 	padding:0;
 }
 #mainmenu li{
-	border: 1px solid #fff;
-	margin: 1px;
+	border: 1px solid #ddd;
+	background: #fff;
+	margin: .5ex;
 	padding: .5ex;
 }
 #mainmenu li.current {
-	background: #fff;
+	border: 1px solid #008;
+	background: #ddd;
 	font-weight: bold;
 }
 #mainmenu li:hover{
-	background: #cde;
+	border: 1px solid #00b;
+	background: #f0f0f0;
 	font-weight: bold;
 }
 ul.tabs {

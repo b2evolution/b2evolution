@@ -166,9 +166,9 @@ class DataObject
 
 
 	/**
-	 * DataObject::dbinsert(-)
-	 *
 	 * Insert object into DB based on previously recorded changes
+	 *
+	 * {@internal DataObject::dbinsert(-)}}
 	 */
 	function dbinsert( )
 	{
@@ -348,7 +348,7 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 	{
 		$User = & $UserCache->get_by_ID( $pos_lastedit_user_ID );
 
-		$modified = T_('Last modified on ').mysql2localedate( $pos_datemodified ).T_(' by ').$User->dget('preferedname');
+		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferedname') );
 
 		return '<img src="img/clock.png" width="16" height="16" class="middle" alt="'.$modified.
 														'" title="'.$modified.'" /> ';
@@ -358,6 +358,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/26 19:38:35  fplanque
+ * no message
+ *
  * Revision 1.4  2004/11/22 17:48:20  fplanque
  * skin cosmetics
  *

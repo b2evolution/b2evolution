@@ -12,7 +12,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo T_('b2evo') ?> &gt; <?php echo $page_title ?></title>
+	<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
 	<base href="<?php echo $htsrv_url; ?>">
 	<link href="<?php echo $admin_url ?>variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="<?php echo $admin_url ?>desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />

@@ -42,6 +42,34 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
+/**
+ * Start an field group.
+ *
+ * Fieldset with legend.
+ */
+function form_groupstart( $title = '' )
+{
+	echo "<fieldset>\n"
+				.'<legend>'.$title."</legend>\n";
+}
+
+
+/**
+ * End an field group.
+ *
+ * Fieldset with legend.
+ */
+function form_groupend( $title = '' )
+{
+	echo "</fieldset>\n";
+}
+
+
+/**
+ * Start an input field.
+ *
+ * A field is a fielset containing a label div and an input div.
+ */
 function form_fieldstart( $field_name, $field_label )
 {
 	return "<fieldset>\n"
@@ -49,11 +77,21 @@ function form_fieldstart( $field_name, $field_label )
 			.'<div class="input">';
 }
 
+/**
+ * End an input field.
+ *
+ * A field is a fielset containing a label div and an input div.
+ */
 function form_fieldend()
 {
 	return "</div>\n</fieldset>\n\n";
 }
 
+/**
+ * Start an info field.
+ *
+ * An info field is a fielset containing a label div and an info div.
+ */
 function form_infostart( $field_label )
 {
 	return "<fieldset>\n".
@@ -61,6 +99,11 @@ function form_infostart( $field_label )
 					'<div class="info">';
 }
 
+/**
+ * End an info field.
+ *
+ * An info field is a fielset containing a label div and an info div.
+ */
 function form_infoend()
 {
 	return "</div>\n</fieldset>\n\n";
@@ -68,7 +111,7 @@ function form_infoend()
 
 
 /**
- * builds an text (or password) input field.
+ * Builds a text (or password) input field.
  *
  * {@internal form_text(-)}}
  * @param string the name of the input field
@@ -82,14 +125,17 @@ function form_infoend()
  * @param boolean display (default) or return
  * @return mixed true (if output) or the generated HTML if not outputting
  */
-function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '', $inputtype = 'text', $output = true  )
+function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
+										$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $output = true  )
 {
 	if( $field_maxlength == 0 )
 		$field_maxlength = $field_size;
 
 	$r = "<fieldset>\n"
 			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
-			.'<div class="input"><input type="'.$inputtype.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_size.'" maxlength="'.$field_maxlength.'" value="'.format_to_output($field_value, 'formvalue').'"';
+			.'<div class="input"><input type="'.$inputtype.'" name="'.$field_name
+			.'" id="'.$field_name.'" size="'.$field_size.'" maxlength="'.$field_maxlength
+			.'" value="'.format_to_output($field_value, 'formvalue').'"';
 	if( !empty($field_class) )
 	{
 		$r .= ' class="'.$field_class.'"';
@@ -114,8 +160,44 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	}
 }
 
+
+/*
+ * form_text_tr(-)
+ */
+function form_text_tr( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '' )
+{
+	if( $field_maxlength == 0 )
+		$field_maxlength = $field_size;
+
+	echo '<tr>';
+	echo '  <td align="right"><label for="', $field_name, '"><strong>', $field_label, ':</strong></label></td>';
+	echo '  <td><input type="text" name="', $field_name, '" id="', $field_name, '" size="', $field_size, '" maxlength="', $field_maxlength, '" value="', format_to_output($field_value, 'formvalue'),'"';
+	if( !empty($field_class) )
+	{
+		echo ' class="', $field_class,'"';
+	}
+	echo '/>';
+	echo '  <small>', $field_note, '</small></td>';
+	echo "</tr>\n\n";
+}
+
+
 /**
- * Display a text area
+ * Builds a hidden field.
+ *
+ * {@internal form_hidden(-)}}
+ * @param string name
+ * @param string value
+ */
+function form_hidden( $field_name, $field_value )
+{
+	echo '<input type="hidden" name="'.$field_name
+			.'" value="'.format_to_output($field_value, 'formvalue').'" />'."\n";
+}
+
+
+/**
+ * Build a text area.
  *
  * @param string
  * @param string
@@ -140,27 +222,6 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label,
 	echo '>'.$field_value.'</textarea></fieldset>';
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";
-}
-
-
-/*
- * form_text_tr(-)
- */
-function form_text_tr( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '' )
-{
-	if( $field_maxlength == 0 )
-		$field_maxlength = $field_size;
-
-	echo '<tr>';
-	echo '  <td align="right"><label for="', $field_name, '"><strong>', $field_label, ':</strong></label></td>';
-	echo '  <td><input type="text" name="', $field_name, '" id="', $field_name, '" size="', $field_size, '" maxlength="', $field_maxlength, '" value="', format_to_output($field_value, 'formvalue'),'"';
-	if( !empty($field_class) )
-	{
-		echo ' class="', $field_class,'"';
-	}
-	echo '/>';
-	echo '  <small>', $field_note, '</small></td>';
-	echo "</tr>\n\n";
 }
 
 
@@ -286,6 +347,7 @@ function form_radio(
 
 /**
  * form_checkbox(-)
+ *
  * @param string the name of the checkbox
  * @param boolean initial value
  * @param string label
@@ -299,7 +361,8 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 {
 	$r = "<fieldset>\n"
 			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
-			.'<div class="input"><input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
+			.'<div class="input"><input type="checkbox" class="checkbox" name="'.$field_name.'" id="'
+			.$field_name.'" value="1"';
 	if( $field_value )
 	{
 		$r .= ' checked="checked"';
@@ -324,7 +387,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 }
 
 
-/*
+/**
  * form_checkbox_tr(-)
  */
 function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note = '', $field_class = '' )
@@ -379,7 +442,7 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 
 
 /**
- * creates a form header and puts GET params of $action into hidden form inputs
+ * Builds a form header and puts GET params of $action into hidden form inputs
  *
  * {@internal form_formstart(-)}}
  */
@@ -416,7 +479,9 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 	}
 }
 
-
+/**
+ *
+ */
 function form_submit( $submit_attribs = '' )
 {
 	?>
@@ -433,6 +498,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.6  2004/11/26 19:38:35  fplanque
+ * no message
+ *
  * Revision 1.5  2004/11/15 18:57:05  fplanque
  * cosmetics
  *

@@ -896,7 +896,8 @@ function remove_magic_quotes( $mixed )
  * @param boolean Force setting of variable to default?
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
-function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
+function param( $var, $type = '', $default = '', $memorize = false,
+								$override = false, $forceset = true )
 {
 	global $$var, $global_param_list, $Debuglog;
 
@@ -1640,6 +1641,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.14  2004/11/26 19:38:35  fplanque
+ * no message
+ *
  * Revision 1.13  2004/11/22 17:48:20  fplanque
  * skin cosmetics
  *

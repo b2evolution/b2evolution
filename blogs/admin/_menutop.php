@@ -14,7 +14,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $app_name.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
+	<title><?php echo $app_shortname.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
 	<?php 
 	// Include links (to CSS...)
 	require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_head_links.php';
