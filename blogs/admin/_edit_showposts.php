@@ -256,42 +256,42 @@
 					
 					<fieldset>
 						<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
-						<div class="input"><input type="text" name="author" id="author" value="<?php echo $user_nickname ?>" size="40" tabindex="1" class="bComment" /></div>
+						<div class="input"><input type="text" name="author" id="author" value="<?php echo $user_nickname ?>" size="40" class="bComment" /></div>
 					</fieldset>
 			
 					
 					<fieldset>
 						<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
-						<div class="input"><input type="text" name="email" id="email" value="<?php echo $user_email ?>" size="40" tabindex="2" class="bComment" /><br />
+						<div class="input"><input type="text" name="email" id="email" value="<?php echo $user_email ?>" size="40" class="bComment" /><br />
 							<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
 						</div>
 					</fieldset>
 					
 					<fieldset>
 						<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
-						<div class="input"><input type="text" name="url" id="url" value="<?php echo $user_url ?>" size="40" tabindex="3" class="bComment" /><br />
+						<div class="input"><input type="text" name="url" id="url" value="<?php echo $user_url ?>" size="40" class="bComment" /><br />
 							<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
 						</div>
 					</fieldset>
 							
 					<fieldset>
 						<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
-						<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" tabindex="4" class="bComment"></textarea><br />
+						<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" class="bComment"></textarea><br />
 							<span class="notes"><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), '<br />', T_('URLs, email, AIM and ICQs will be converted automatically.'); ?></span>
 						</div>
 					</fieldset>
 							
 					<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
 					<fieldset>
-						<div class="label"><?php echo T_('Options') ?>:</div>
-						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes"><?php echo T_('(Line breaks become &lt;br&gt;)') ?></span>
+						<div class="label"><label><?php echo T_('Options') ?>:</label></div>
+						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes"><?php echo T_('(Line breaks become &lt;br&gt;)') ?></span>
 						</div>
 					</fieldset>
 					<?php } ?>
 				
 					<fieldset>
 						<div class="input">
-							<input type="submit" name="submit" class="buttonarea" value="<?php echo T_('Send comment') ?>" tabindex="8" />
+							<input type="submit" name="submit" value="<?php echo T_('Send comment') ?>" class="search" />
 						</div>
 					</fieldset>
 				
