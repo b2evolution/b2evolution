@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  */
@@ -855,6 +855,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.19  2005/03/02 18:30:53  fplanque
+ * tedious merging... :/
+ *
  * Revision 1.18  2005/03/02 17:04:15  blueyed
  * submenus not bold
  *

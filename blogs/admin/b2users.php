@@ -67,7 +67,7 @@ else switch ($action)
 		}
 		else
 		{ // we use an empty user
-			$edited_User = new User();
+			$edited_User = & new User(); // daniel, why would we remove the & here ?
 		}
 
 		break;
@@ -78,7 +78,7 @@ else switch ($action)
 		param( 'edited_user_ID', 'integer', true );
 		if( $edited_user_ID == 0 )
 		{ // we create a new user
-			$edited_User = new User();
+			$edited_User = & new User();
 			$edited_User->set_datecreated( $localtimenow );
 		}
 		else

@@ -330,11 +330,12 @@ class AdminUI_general extends Widget
 
 				break;
 
-			case 'sub': // submenu, we support just one depth
+			case 'sub': // submenu, we support just one sub-level
 				return array(
 						'before' => '<div class="pt">'
 												."\n".'<ul class="hack">'
 												."\n<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>"
+												// Note: this hack MAY NOT be needed when not using pixels instead of decimal ems or exs in the CSS
 												."\n</ul>"
 												."\n".'<div class="panelblocktabs">'
 												."\n".'<ul class="tabs">',

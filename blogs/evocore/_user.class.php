@@ -115,7 +115,7 @@ class User extends DataObject
 			$this->set( 'lastname', '' );
 			$this->set( 'nickname', '' );
 			$this->set( 'idmode', 'login' );
-			$this->set( 'locale', $default_locale ); // QUESTION: use $Settings->get('default_locale') ?
+			$this->set( 'locale', $default_locale ); // QUESTION: use $Settings->get('default_locale') ? fp: if u want
 			$this->set( 'email', '' );
 			$this->set( 'url', '' );
 			$this->set( 'icq', 0 );
@@ -857,6 +857,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2005/03/02 18:30:56  fplanque
+ * tedious merging... :/
+ *
  * Revision 1.17  2005/03/01 23:26:34  blueyed
  * upload perms..
  *

@@ -81,6 +81,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
    All stylesheets will be included if the blog settings allow it
    and the files exist. CSS rules say that the latter style sheets can
    override earlier stylesheets.
+	fp>>TODO: all this code has to go into a single template tag!
  */
 if( $Blog->allowblogcss && file_exists( $Blog->get('mediadir').'customstyle.css' ) )
 {

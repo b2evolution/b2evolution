@@ -345,6 +345,7 @@ class Plugin
 	 * Event handlers {{{
 	 */
 
+
 	/**
 	 * Event handler: Called when ending the admin html head section.
 	 *
@@ -353,9 +354,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead( $params )
+	function AdminEndHtmlHead( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
@@ -367,9 +368,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
-	function AdminAfterPageFooter( $params )
+	function AdminAfterPageFooter( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
@@ -381,13 +382,13 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayToolbar( $params )
+	function DisplayToolbar( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
-	/**
+ 	/**
 	 * Event handler: Called when displaying editor buttons.
 	 *
 	 * {@internal Plugin::DisplayEditorButton(-)}}
@@ -395,9 +396,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayEditorButton( $params )
+	function DisplayEditorButton( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
@@ -409,11 +410,10 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean success?
 	 */
-	function DoAction( $params )
+	function DoAction( & $params )
 	{
-		echo T_('No such action!');
-
-		return NULL;  // Do nothing by default.
+	 	echo T_('No such action!');
+		return false;		// Action failed!
 	}
 
 
@@ -466,8 +466,8 @@ class Plugin
 		}
 	}
 
-
-	/**
+	
+ 	/**
 	 * Event handler: Called when displaying the tool menu.
 	 *
 	 * {@internal Plugin::ToolMenu(-)}}
@@ -475,9 +475,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function ToolMenu( $params )
+	function ToolMenu( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 	/*
@@ -488,6 +488,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2005/03/02 18:30:56  fplanque
+ * tedious merging... :/
+ *
  * Revision 1.4  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

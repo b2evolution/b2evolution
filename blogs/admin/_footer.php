@@ -19,9 +19,9 @@ echo $AdminUI->getBodyBottom();
 -
 <a href="http://b2evolution.net/about/license.html" class="nobr"><?php echo T_('GPL License') ?></a>
 -
-<span class="nobr">&copy;2001-2002 by <a href="http://cafelog.com/">Michel V</a></span>
+<span class="nobr">&copy;2001-2002 by <a href="http://cafelog.com/">Michel V</a> &amp; others</span>
 -
-<span class="nobr">&copy;2003-2004 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a></span>
+<span class="nobr">&copy;2003-2005 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> &amp; others.</span>
 </p>
 
 <?php

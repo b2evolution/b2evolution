@@ -197,7 +197,7 @@ echo "Copy any images from /images/articles of geeklog to /media of b2evo";
 /* *************************************************************************************
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * ************************************************************************************ */
 function urltitle_validate2( $urltitle, $title, $post_ID = 0, $query_only = false )
 {

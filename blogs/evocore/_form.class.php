@@ -592,7 +592,7 @@ class Form extends Widget
 	{
 		switch( $this->layout )
 		{
-			case 'table': // QUESTION: better use <th> instead of <tr>?
+			case 'table': // QUESTION: better use <th> instead of <tr>? fp: no i don't think so, i think TH is only for real table column headers (on the real top of the table)
 				$r = '<tr ';
 				if( $class != '' )
 				{ //there is a class option to display in the fieldset tag
@@ -876,7 +876,8 @@ class Form extends Widget
 
 		$r = $this->begin_field( $field_name, $field_label );
 
-		// QUESTION: What is this?
+		// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
+		// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
 		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
 
 		$r .= '<textarea';
@@ -890,7 +891,7 @@ class Form extends Widget
 		}
 		$r .= ' rows="'.$field_rows.'" cols="'.$field_cols.'">'
 					.$field_value.'</textarea>'
-					// QUESTION: What is this?
+					// NOTE: this one is for compensating the previous pixel in case of center aligns.
 					.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
 
 		if( !empty($field_note) )
