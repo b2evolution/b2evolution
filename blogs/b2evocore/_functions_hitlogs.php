@@ -2,12 +2,43 @@
 /**
  * This file implements functions for logging of hits and extracting stats.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * This file was inspired by N C Young's Referer Script released in
+ * the public domain on 07/19/2002. {@link (http://ncyoung.com/entry/57).
+ * See also {@link http://ncyoung.com/demo/referer/}.
+ * }}
  *
  * @package evocore
- * @author This file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author N C Young (nathan@ncyoung.com).
+ * @author blueyed: Daniel HAHLER.
+ * @author fplanque: Francois PLANQUE.
+ * @author vegarg: Vegar BERG GULDAL.
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -613,17 +644,24 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 
 
 
-/* select count(*) as nb, hit_ignore
-from b2hitlog
-group by hit_ignore
-order by nb desc
-
-
-update b2hitlog
-set hit_ignore ='robot'
-where `hit_ignore` LIKE 'invalid' AND `hit_user_agent` LIKE 'FAST-WebCrawler/%'
-
-
-
-*/
+/*
+ * $Log$
+ * Revision 1.55  2004/10/12 17:22:30  fplanque
+ * Edited code documentation.
+ *
+ * Revision 1.14  2004/2/8 16:7:1  vegarg
+ * Bugfix in log_hit(). (thanks to mg)
+ *
+ * Revision 1.13  2004/2/1 20:8:27  vegarg
+ * Direct hits are now logged when doubleCheckReferers is enabled. (contrib by kiesow)
+ *
+ * Revision 1.11  2004/1/16 16:49:49  vegarg
+ * Added (incomplete) prune date option, which for some reason doesn't work yet.
+ *
+ * Revision 1.9  2004/1/16 14:12:16  vegarg
+ * Added functions for b2antispam.php.
+ *
+ * Revision 1.1.1.1.2.1  2003/9/1 17:34:21  sakichan
+ * SECURITY: SQL injection fix
+ */
 ?>

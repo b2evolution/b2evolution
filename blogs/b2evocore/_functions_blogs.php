@@ -2,11 +2,37 @@
 /**
  * This file implements Blog handling functions.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
  *
  * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
+ * @author gorgeb: EPISTEMA (Bertrand Gorge).
+ * @author sakichan: Nobuo SAKIYAMA.
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -470,4 +496,16 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 	return $raw_info;
 }
 
+
+/*
+ * $Log$
+ * Revision 1.55  2004/10/12 17:22:29  fplanque
+ * Edited code documentation.
+ *
+ * Revision 1.53  2004/10/6 9:37:31  gorgeb
+ * Added allowcomments, a per blog setting taking three values : always, post_by_post, never.
+ *
+ * Revision 1.1.1.1.2.1  2003/8/31 6:23:31  sakichan
+ * Security fixes for various XSS vulnerability and SQL injection vulnerability
+ */
 ?>

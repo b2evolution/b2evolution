@@ -27,7 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
@@ -264,4 +264,11 @@ class Results
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.4  2004/10/12 17:22:29  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

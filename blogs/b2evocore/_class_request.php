@@ -2,9 +2,10 @@
 /**
  * This file implements the Request class.
  *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,12 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
- *
- * {@internal Below is a list of former authors whose contributions to this file have been
- *            either removed or redesigned and rewritten anew:
- *            - (none)
- * }}
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -54,4 +50,11 @@ class Request
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.2  2004/10/12 17:22:29  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

@@ -99,4 +99,11 @@ class UserSettings extends AbstractSettings
 			return parent::set( $user, $setting, $value );
 	}
 }
+
+/*
+ * $Log$
+ * Revision 1.7  2004/10/12 17:22:29  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>
