@@ -130,8 +130,11 @@ class User extends DataObject
 			$this->set( 'level', 0 );
 			$this->set( 'notify', 1 );
 			$this->set( 'showonline', 1 );
-			// Group for this user:
-			$this->setGroup( $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') ) );
+
+			if( isset( $GroupCache ) )
+			{ // Group for this user:
+				$this->setGroup( $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') ) );
+			}
 		}
 		else
 		{
@@ -843,6 +846,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/23 21:43:30  blueyed
+ * fix instantiating new User without existing $GroupCache (install)
+ *
  * Revision 1.13  2005/02/23 04:26:18  blueyed
  * moved global $start_of_week into $locales properties
  *
