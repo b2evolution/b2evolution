@@ -29,6 +29,12 @@ require_once (dirname(__FILE__).'/_class_archivelist.php');
 require_once (dirname(__FILE__).'/_class_calendar.php');
 require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
 
+//////
+//	Added 04.01.03 by Travis S.
+//	Require _class_blogstats.php if it available.  Remove if( ) once this file becomes standard.
+if( file_exists( dirname( __FILE__ ) . '/_class_blogstats.php' ) )
+	require_once( dirname( __FILE__ ) . '/_class_blogstats.php' );
+
 
 timer_start();
 
