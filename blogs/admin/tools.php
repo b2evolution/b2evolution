@@ -9,6 +9,10 @@
  * @package admin
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
+
+/**
+ * Includes:
+ */
 require_once( dirname(__FILE__).'/_header.php' ); // this will actually load blog params for req blog
 $admin_tab = 'tools';
 $admin_pagetitle = T_('Tools');

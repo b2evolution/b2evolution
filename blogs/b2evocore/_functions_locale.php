@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -41,6 +41,9 @@ if( ($use_l10n == 1) && function_exists('_') )
 elseif( $use_l10n == 2 )
 {	// We are going to use b2evo localization:
 
+	/**
+	 * @ignore
+	 */
 	function T_( $string, $req_locale = '' )
 	{
 		global $trans, $current_locale, $locales;
@@ -84,6 +87,9 @@ elseif( $use_l10n == 2 )
 else
 {	// We are not localizing at all:
 
+	/**
+	 * @ignore
+	 */
 	function T_( $string, $req_locale = '' )
 	{
 		return $string;

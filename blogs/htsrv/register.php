@@ -3,12 +3,14 @@
  * Register a new user
  *
  * b2evolution - {@link http://b2evolution.net/}
- *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evolution
+ * @package htsrv
+ */
+ 
+/**
+ * Includes:
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
 require_once( dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php" );

@@ -8,6 +8,9 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
 require_once dirname(__FILE__).'/../renderer.class.php';
 
 function clean_pre($text) 
@@ -17,6 +20,9 @@ function clean_pre($text)
 	return $text;
 }
 
+/**
+ * @package plugins
+ */
 class auto_p_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPAutP';

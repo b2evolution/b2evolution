@@ -1,11 +1,18 @@
 <?php
-	/*
+	/**
 	 * This is the template that displays the contents of the feedback popup
 	 *
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
 	 * To display the stats, you should call a stub AND pass the right parameters
 	 * For example: /blogs/index.php?disp=stats
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
+	 * @subpackage originalb2
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -29,7 +36,9 @@
 <div id="contentcomments">
 
 <?php
-	// this includes the feedback and a form to add a new comment depending on request
+	/**
+	 * this includes the feedback and a form to add a new comment depending on request
+	 */
 	$disp_comments = 1;					// Display the comments if requested
 	$disp_comment_form = 1;			// Display the comments form if comments requested
 	$disp_trackbacks = 1;				// Display the trackbacks if requested

@@ -1,9 +1,16 @@
 <?php
-	/*
+	/**
 	 * This is the template that displays (recursive) list of (sub)categories
 	 *
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
+	 * @subpackage bluesky
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -23,7 +30,7 @@
 	if(!isset($cat_blog_start)) $cat_blog_start = '<h4>';
 	if(!isset($cat_blog_end)) $cat_blog_end = '</h4>';
 
-	/*
+	/**
 	 * We now call the default categories handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */

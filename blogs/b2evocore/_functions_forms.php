@@ -6,11 +6,11 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/*
+/**
  * form_text(-)
  */
 function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '', $inputtype = 'text' )

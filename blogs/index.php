@@ -10,10 +10,13 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evolution
+ * @package evoskins
+ * @subpackage noskin
  */
 
-// First thing: Do the minimal initializations required for b2evo:
+/**
+ * First thing: Do the minimal initializations required for b2evo:
+ */
 require_once dirname(__FILE__).'/b2evocore/_main.php';
 
 // Check if a specific blog has been requested in the URL:

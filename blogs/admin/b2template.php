@@ -9,6 +9,10 @@
  * @package admin
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
+
+/**
+ * Includes:
+ */
 require_once(dirname(__FILE__). '/_header.php');
 $admin_tab = 'templates';
 $admin_pagetitle = T_('Custom skin template editing');

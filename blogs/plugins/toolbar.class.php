@@ -12,10 +12,15 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
 require_once dirname(__FILE__).'/plugin.class.php';
 
 /**
  * ToolbarPlugin Class
+ *
+ * @package plugins
  */
 class ToolbarPlugin extends Plugin
 {

@@ -1,14 +1,17 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file updates the current user's profile!
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * This file update the current user's profile!
+ * @package htsrv
  */
 
-// Initialize everything:
+/**
+ * Initialize everything:
+ */
 require_once( dirname(__FILE__) . '/../b2evocore/_main.php' );
 
 // Getting GET or POST parameters:

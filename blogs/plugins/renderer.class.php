@@ -12,11 +12,15 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
 require_once dirname(__FILE__).'/renderer.class.php';
 
 /**
  * RendererPlugin Class
  *
+ * @package plugins
  * @abstract
  */
 class RendererPlugin extends Plugin

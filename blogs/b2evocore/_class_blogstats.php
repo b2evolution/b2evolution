@@ -1,7 +1,5 @@
 <?php
 /**
- * @deprecated
- *
  * b2evolution - http://b2evolution.net/
  *
  * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
@@ -24,9 +22,16 @@
  *
  *	Last Modified
  *		12/12/03 - Travis Swicegood: Created file.
+ *
+ * @deprecated functionality will be moved to ItemList
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @deprecated deprecated
+ * @package evocore
+ */
 class BlogStats{
 	var $blog;				// Blog # (1 = all blogs)
 	var $request;			// SQL query string

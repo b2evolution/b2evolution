@@ -1,15 +1,19 @@
 <?php 
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This is the registration form when disabled
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * This is the registration form
+ * @package htsrv
  */
 
-	$page_title = T_('Registration Currently Disabled');
-	require(dirname(__FILE__).'/_header.php'); 
+/**
+ * Include page header:
+ */
+$page_title = T_('Registration Currently Disabled');
+require(dirname(__FILE__).'/_header.php'); 
 ?>
 <p><?php echo T_('User registration is currently not allowed.') ?></p>
 <p><a href="<?php echo $baseurl ?>" ><?php echo T_('Home') ?></a></p>

@@ -13,6 +13,9 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package evoskins
+ * @subpackage noskin
  */
 
 # First, select which blog you want to display here!
@@ -49,7 +52,9 @@ $timestamp_max = 'now';
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...
 
-# Let b2evolution handle the query string and load the blog data:
+/**
+ * Let b2evolution handle the query string and load the blog data:
+ */
 require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
 

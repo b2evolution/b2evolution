@@ -10,14 +10,15 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  * @author Justin Vincent (justin@visunet.ie), {@link http://php.justinvincent.com}
  * @todo PLEASE NOTE: this class isn't exactly as reliable as I'd like to. I am doing some transformations. (fplanque)
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-// ==================================================================
-//	ezSQL Constants
+/**
+ * ezSQL Constants
+ */
 define("EZSQL_VERSION","1.25");
 define("OBJECT","OBJECT",true);
 define("ARRAY_A","ARRAY_A",true);
@@ -31,9 +32,11 @@ if( ! function_exists( 'mysql_real_escape_string' ) )
 	}
 }
 
-// ==================================================================
-//	The Main Class
-
+/**
+ * The Main Class
+ *
+ * @package evocore
+ */
 class DB
 {
 
@@ -56,8 +59,9 @@ class DB
 	 */
 	var $queries = array();
 	
-	// ==================================================================
-	//	DB Constructor - connects to the server and selects a database
+	/**
+	 * DB Constructor - connects to the server and selects a database
+	 */
 	function db( $dbuser, $dbpassword, $dbname, $dbhost, $halt_on_error = true)
 	{
 		$this->halt_on_error = $halt_on_error;
@@ -79,8 +83,9 @@ class DB
 		}
 	}
 
-	// ==================================================================
-	//	Select a DB (if another one needs to be selected)
+	/**
+	 * Select a DB (if another one needs to be selected)
+	 */
 	function select($db)
 	{
 		if ( !@mysql_select_db($db,$this->dbh))
@@ -93,8 +98,9 @@ class DB
 		}
 	}
 
-	// ====================================================================
-	//	Format a string correctly for safe insert under all PHP conditions
+	/**
+	 * Format a string correctly for safe insert under all PHP conditions
+	 */
 	function escape($str)
 	{
 		return mysql_real_escape_string($str);				
@@ -116,8 +122,9 @@ class DB
 			return $val;				
 	}
 
-	// ==================================================================
-	//	Print SQL/DB error.
+	/**
+	 * Print SQL/DB error.
+	 */
 	function print_error($str = "")
 	{
 		// All errors go to the global error array $EZSQL_ERROR..
@@ -149,8 +156,9 @@ class DB
 		if( $this->halt_on_error ) die();
 	}
 
-	// ==================================================================
-	//	Kill cached query results
+	/**
+	 * Kill cached query results
+	 */
 	function flush()
 	{
 		// Get rid of these
@@ -257,8 +265,9 @@ class DB
 
 	}
 
-	// ==================================================================
-	//	Get one variable from the DB - see docs for more detail
+	/**
+	 * Get one variable from the DB - see docs for more detail
+	 */
 	function get_var( $query=NULL, $x=0, $y=0, $title = '' )
 	{
 		// Log how the function was called
@@ -280,8 +289,9 @@ class DB
 		return (isset($values[$x]) && $values[$x]!=='') ? $values[$x] : NULL;
 	}
 
-	// ==================================================================
-	//	Get one row from the DB - see docs for more detail
+	/**
+	 * Get one row from the DB - see docs for more detail
+	 */
 	function get_row($query=NULL,$output=OBJECT,$y=0, $title = '' )
 	{
 		// Log how the function was called
@@ -317,9 +327,10 @@ class DB
 
 	}
 
-	// ==================================================================
-	//	Function to get 1 column from the cached result set based in X index
-	// se docs for usage and info
+	/**
+	 * Function to get 1 column from the cached result set based in X index
+	 * see docs for usage and info
+	 */
 	function get_col( $query = NULL, $x=0, $title = '' )
 	{
 
@@ -344,8 +355,9 @@ class DB
 		return implode( ',', $this->get_col( $query, $x=0 ) );
 	}
 	
-	// ==================================================================
-	// Return the the query as a result set - see docs for more details
+	/**
+	 * Return the the query as a result set - see docs for more details
+	 */
 	function get_results( $query=NULL, $output = OBJECT, $title = '' )
 	{
 		// Log how the function was called
@@ -390,9 +402,10 @@ class DB
 	}
 
 
-	// ==================================================================
-	// Function to get column meta data info pertaining to the last query
-	// see docs for more info and usage
+	/**
+	 * Function to get column meta data info pertaining to the last query
+	 * see docs for more info and usage
+	 */
 	function get_col_info($info_type="name",$col_offset=-1)
 	{
 
@@ -418,9 +431,10 @@ class DB
 	}
 
 
-	// ==================================================================
-	// Dumps the contents of any input variable to screen in a nicely
-	// formatted and easy to understand way - any type: Object, Var or Array
+	/**
+	 * Dumps the contents of any input variable to screen in a nicely
+	 * formatted and easy to understand way - any type: Object, Var or Array
+	 */
 	function vardump($mixed='')
 	{
 
@@ -451,10 +465,11 @@ class DB
 		$this->vardump($mixed);
 	}
 
-	// ==================================================================
-	// Displays the last query string that was sent to the database & a
-	// table listing results (if there were any).
-	// (abstracted into a seperate file to save server overhead).
+	/**
+	 * Displays the last query string that was sent to the database & a
+	 * table listing results (if there were any).
+	 * (abstracted into a seperate file to save server overhead).
+	 */
 	function debug()
 	{
 

@@ -1,17 +1,17 @@
 <?php
 /**
- * file
+ * This file handles trackback requests
  *
  * b2evolution - {@link http://b2evolution.net/}
- *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evolution
+ * @package htsrv
  */
 
-// Initialize everything:
+/**
+ * Initialize everything:
+ */
 require_once (dirname(__FILE__).'/../b2evocore/_main.php');
 
 // statuses allowed for acting on:

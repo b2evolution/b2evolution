@@ -1,12 +1,22 @@
 <?php
-	/*
+	/**
 	 * This template generates an Atom feed for the requested blog's latest posts
-	 * (http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html)
+	 *
+	 * See {@link http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html}
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package xmlsrv
 	 */
 	$skin = '';										// We don't want this do be displayed in a skin !
 	$show_statuses = array();			// Restrict to published posts
 	$timestamp_min = '';					// Show past
 	$timestamp_max = 'now';				// Hide future
+	/**
+	 * Initialize everything:
+	 */
 	require dirname(__FILE__).'/../b2evocore/_blog_main.php';
 	header("Content-type: application/atom+xml");
 	// header("Content-type: text/xml");

@@ -1,12 +1,19 @@
 <?php
-/*
- * This is the main template. It displays the blog.
- *
- * However this file is not meant to be called directly.
- * It is meant to be called automagically by b2evolution.
- * To display a blog, you should call a stub file instead, for example:
- * /blogs/index.php or /blogs/blog_b.php
- */
+	/**
+	 * This is the main template. It displays the blog.
+	 *
+	 * However this file is not meant to be called directly.
+	 * It is meant to be called automagically by b2evolution.
+	 * To display a blog, you should call a stub file instead, for example:
+	 * /blogs/index.php or /blogs/blog_b.php
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
+	 * @subpackage babyblues
+	 */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <html lang="<?php locale_lang() ?>">

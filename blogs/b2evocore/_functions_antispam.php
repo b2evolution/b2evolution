@@ -6,12 +6,12 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
-/*
+/**
  * antispam_create(-)
  *
  * Insert a new abuse string into DB
@@ -39,7 +39,7 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 }
 
 
-/*
+/**
  * antispam_update_source(-)
  *
  * Note: We search by string because we sometimes don't know the ID 

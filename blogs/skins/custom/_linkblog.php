@@ -1,9 +1,16 @@
 <?php
-	/*
+	/**
 	 * This is the template that displays the linkblog
 	 *
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
+	 * @subpackage custom
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		
@@ -21,7 +28,7 @@
 	if(!isset($linkblog_item_before)) $linkblog_item_before = '<li>';
 	if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';
 
-	/*
+	/**
 	 * This skin has no special formatting for the linkblog, so...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 * all we want to do here, is call the default linkblog handler.

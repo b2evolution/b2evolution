@@ -2,13 +2,6 @@
 /**
  * This script imports Movable Type entries into b2evolution.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @package internal
- * @author blueyed - http://hahler.de/daniel
- *
  * TODO:
  *  - list of all posts, editable (overkill?)
  *  - assign comment_author_ID to comments if user exist?!
@@ -44,19 +37,29 @@
  *  0.1:
  *   - first release
  *
- * Credits go to the WordPress team (http://wordpress.org), where I got the basic import-mt.php script with
- * most of the core functions. Thank you!
+ * Credits go to the WordPress team (http://wordpress.org), where I got the basic 
+ * import-mt.php script with most of the core functions. Thank you!
  *
- * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS) and Movable Type 2.64 and 2.661.
+ * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS) 
+ * and Movable Type 2.64 and 2.661.
  * It should work quite alright with b2evo 0.9 though.
  *
  * Feedback is very welcome (http://thequod.de/contact).
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @author blueyed - http://hahler.de/daniel
+ * @package admin
  */
 
-// enter the relative path of the import.txt file containing the MT entries.
-// If the file is called import.txt and it is in /admin, then this line
-// should be:
-// define('MTEXPORT', 'import.txt');
+/**
+ * enter the relative path of the import.txt file containing the MT entries.
+ * If the file is called import.txt and it is in /admin, then this line should be:
+ * define('MTEXPORT', 'import.txt');
+ * NOTE: Leave blank for UI selection.
+ */
 define('MTEXPORT', ''); // you only need this to force a specific file instead of using a dropdown list
                         // of the .txt files in the /admin folder
 

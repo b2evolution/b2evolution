@@ -8,10 +8,16 @@
  * @copyright (c)1999-2002 The SquirrelMail Project Team
  * @copyright (c)1999 CDI (cdi@thewebmasters.net) All Rights Reserved
  *
- * @package pop3
+ * @package evocore
+ * @subpackage pop3
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * An RFC 1939 compliant wrapper class for the POP3 protocol.
+ *
+ * @package evocore
+ */
 class POP3 {
 	var $ERROR			= '';				//	Error string.
 

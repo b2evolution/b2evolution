@@ -340,11 +340,17 @@ if( $action != 'editcomment' )
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query();	// make sure the caches are loaded
+		/**
+		 * callback to start sublist
+		 */
 		function cat_select_before_first( $parent_cat_ID, $level )
 		{	// callback to start sublist
 			echo "\n<ul>\n";
 		}
 
+		/**
+		 * callback to display sublist element
+		 */
 		function cat_select_before_each( $cat_ID, $level )
 		{	// callback to display sublist element
 			global $current_blog_ID, $blog, $cat, $postdata, $post_extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
@@ -373,10 +379,16 @@ if( $action != 'editcomment' )
 			}
 			echo ' '.$this_cat['cat_name'];
 		}
+		/**
+		 * callback after each sublist element
+		 */
 		function cat_select_after_each( $cat_ID, $level )
 		{	// callback after each sublist element
 			echo "</li>\n";
 		}
+		/**
+		 * callback to end sublist
+		 */
 		function cat_select_after_last( $parent_cat_ID, $level )
 		{	// callback to end sublist
 			echo "</ul>\n";

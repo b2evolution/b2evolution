@@ -1,5 +1,5 @@
 <?php 
-/*
+/**
  * Displays second part of page menu (after the page title)
  *
  * b2evolution - {@link http://b2evolution.net/}

@@ -8,6 +8,10 @@
  *
  * @package admin
  */
+
+/**
+ * Includes:
+ */
 require_once( dirname(__FILE__) . '/_header.php' );
 $admin_tab = 'cats';
 $admin_pagetitle = T_('Categories for blog:');

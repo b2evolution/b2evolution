@@ -8,6 +8,10 @@
  *
  * @package admin
  */
+
+/**
+ * Includes:
+ */
 require( dirname(__FILE__). '/_header.php' );
 $admin_tab = 'options';
 $admin_pagetitle = T_('Settings');

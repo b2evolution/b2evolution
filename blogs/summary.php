@@ -1,13 +1,23 @@
 <?php
-	/*
-	 * This is a demo template displaying a summary of the last posts in each blog
-	 *
-	 * If you're new to b2evolution templates or skins, you should not start with this file
-	 * It will be easier to start examining blog_a.php or noskin_a.php for instance...
-	 */
-	// Check this: we are requiring _main.php INSTEAD of _blog_main.php because we are not
-	// trying to initialize any particular blog
-	require(dirname(__FILE__).'/b2evocore/_main.php');
+/**
+ * This is a demo template displaying a summary of the last posts in each blog
+ *
+ * If you're new to b2evolution templates or skins, you should not start with this file
+ * It will be easier to start examining blog_a.php or noskin_a.php for instance...
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package evoskins
+ * @subpackage noskin
+ */
+
+/**
+ * Check this: we are requiring _main.php INSTEAD of _blog_main.php because we are not
+ * trying to initialize any particular blog
+ */
+require(dirname(__FILE__).'/b2evocore/_main.php');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->

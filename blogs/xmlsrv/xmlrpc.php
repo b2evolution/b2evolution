@@ -11,7 +11,11 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package api
+ * @package xmlsrv
+ */
+
+/**
+ * Initialize everything:
  */
 require_once(dirname(__FILE__).'/../conf/_config.php' );
 require_once(dirname(__FILE__)."/../$core_subdir/_main.php" );
@@ -65,9 +69,6 @@ $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
  * b2 API
  *
  * {@internal b2newpost(-) }}
- *
- * @param 
- * @return
  */
 function b2newpost($m)
 {

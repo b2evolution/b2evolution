@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -17,6 +17,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  *
  * This is typically an abstract class, useful only when derived.
  *
+ * @package evocore
  * @version beta
  * @abstract
  */

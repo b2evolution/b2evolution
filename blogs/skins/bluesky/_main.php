@@ -1,11 +1,18 @@
 <?php 
-	/*
+	/**
 	 * This is the main template. It displays the blog.
 	 *
 	 * However this file is not meant to be called directly.
 	 * It is meant to be called automagically by b2evolution.
 	 * To display a blog, you should call a stub file instead, for example:
 	 * /blogs/index.php or /blogs/blog_b.php
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
+	 * @subpackage bluesky
 	 */
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -85,7 +92,9 @@
 
 <div class="contenuinteraction">
 <?php
-		// this includes the trackback url, comments, trackbacks, pingbacks and a form to add a new comment
+		/**
+		 * this includes the trackback url, comments, trackbacks, pingbacks and a form to add a new comment
+		 */
 		$disp_comments = 1;					// Display the comments if requested
 		$disp_comment_form = 1;			// Display the comments form if comments requested
 		$disp_trackbacks = 1;				// Display the trackbacks if requested

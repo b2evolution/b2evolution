@@ -9,6 +9,10 @@
  * @package admin
  * @deprecated In b2evolution, you do not need to point to the b2login.php page to log in.
  */
+
+/**
+ * Includes:
+ */
 require_once(dirname(__FILE__).'/../conf/_config.php');
 require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_main.php");
 ?>

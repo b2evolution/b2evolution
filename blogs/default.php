@@ -10,10 +10,14 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evolution
+ * @package evoskins
+ * @subpackage noskin
  */
 
-// First thing: Do the minimal initializations required for b2evo:
+/**
+ * Check this: we are requiring _main.php INSTEAD of _blog_main.php because we are not
+ * trying to initialize any particular blog
+ */
 require_once dirname(__FILE__).'/b2evocore/_main.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

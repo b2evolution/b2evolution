@@ -9,7 +9,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( isset( $main_init ) )
 {	// Prevent double loading since require_once won't work in all situations
@@ -19,6 +19,9 @@ if( isset( $main_init ) )
 }
 $main_init = true;
 
+/**
+ * Includes:
+ */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
 require_once( dirname(__FILE__).'/_class_log.php' );
 $Debuglog = new Log( 'note' );

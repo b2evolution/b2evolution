@@ -8,8 +8,13 @@
  *
  * @package admin
  */
+
+/**
+ * Includes:
+ */
 require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_antispam.php');
+
 $admin_tab = 'antispam';
 $admin_pagetitle = T_('Antispam');
 

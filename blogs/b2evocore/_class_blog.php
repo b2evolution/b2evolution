@@ -6,16 +6,21 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
 require_once dirname(__FILE__).'/_class_dataobject.php';
 
 /**
  * Blog
  *
  * Blog object with params
+ *
+ * @package evocore
  */
 class Blog extends DataObject
 {
@@ -143,7 +148,7 @@ class Blog extends DataObject
 	 *
 	 * {@internal Blog::gen_blogurl(-)}}
 	 *
-	 * @type string default|dynamic|static
+	 * @param string default|dynamic|static
 	 * @param boolean should this be an absolute URL? (otherwise: relative to $baseurl)
 	 */
 	function gen_blogurl( $type = 'default', $absolute = true )

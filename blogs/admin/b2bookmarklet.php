@@ -10,6 +10,9 @@
  */
 
 $mode = 'bookmarklet';
+/**
+ * Forward request to normal edit screen
+ */
 require_once(dirname(__FILE__).'/b2edit.php');
 
 ?>

@@ -1,37 +1,42 @@
 <?php
-	/*
-	 * This is a demo template displaying multiple blogs on the same page
-	 *
-	 * If you're new to b2evolution templates or skins, you should not start with this file
-	 * It will be easier to start examining blog_a.php or noskin_a.php for instance...
-	 */
+/**
+ * This is a demo template displaying multiple blogs on the same page
+ *
+ * If you're new to b2evolution templates or skins, you should not start with this file
+ * It will be easier to start examining blog_a.php or noskin_a.php for instance...
+ *
+ * @package evoskins
+ * @subpackage noskin
+ */
 
-	# First blog will be displayed the regular way (why bother?)
-	$blog = 2;		// 2 is for "demo blog A" or your upgraded blog (depends on your install)
+# First blog will be displayed the regular way (why bother?)
+$blog = 2;		// 2 is for "demo blog A" or your upgraded blog (depends on your install)
 
-	# Tell b2evolution you don't want to use evoSkins
-	# (evoSkins are designed to display only one blog at once + optionnaly a linkblog)
-	$skin = '';
+# Tell b2evolution you don't want to use evoSkins
+# (evoSkins are designed to display only one blog at once + optionnaly a linkblog)
+$skin = '';
 
-	# This setting retricts posts to those published, thus hiding drafts.
-	# You should not have to change this.
-	$show_statuses = array();
+# This setting retricts posts to those published, thus hiding drafts.
+# You should not have to change this.
+$show_statuses = array();
 
-	# Here you can set a limit before which posts will be ignored
-	# You can use a unix timestamp value or 'now' which will hide all posts in the past
-	$timestamp_min = '';
+# Here you can set a limit before which posts will be ignored
+# You can use a unix timestamp value or 'now' which will hide all posts in the past
+$timestamp_min = '';
 
-	# Here you can set a limit after which posts will be ignored
-	# You can use a unix timestamp value or 'now' which will hide all posts in the future
-	$timestamp_max = 'now';
+# Here you can set a limit after which posts will be ignored
+# You can use a unix timestamp value or 'now' which will hide all posts in the future
+$timestamp_max = 'now';
 
-	# Additionnaly, you can set other values (see URL params in the manual)...
-	# $order = 'ASC'; // This for example would display the blog in chronological order...
+# Additionnaly, you can set other values (see URL params in the manual)...
+# $order = 'ASC'; // This for example would display the blog in chronological order...
 
-	# Let b2evolution handle the query string and load the blog data:
-	require(dirname(__FILE__).'/b2evocore/_blog_main.php');
+/**
+ * Let b2evolution handle the query string and load the blog data:
+ */
+require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
-	# Now, below you'll find the magic template...
+# Now, below you'll find the magic template...
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->

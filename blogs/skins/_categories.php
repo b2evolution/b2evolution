@@ -1,9 +1,15 @@
 <?php
-	/*
+	/**
 	 * This is the template that displays (recursive) list of (sub)categories
 	 *
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -32,12 +38,18 @@
 	cat_query();	// make sure the caches are loaded
 	if( ! isset( $cat_array ) ) $cat_array = array();
 	
+	/**
+	 * callback to start sublist
+	 */
 	function cat_list_before_first( $parent_cat_ID, $level )
 	{	// callback to start sublist
 		global $cat_group_start;
 		if( $level > 0 ) echo "\n",$cat_group_start,"\n";
 	}
 	
+	/**
+	 * callback to display sublist element
+	 */
 	function cat_list_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		global $blogfilename, $cat_array, $cat_line_start, $cat_line_checkbox;
@@ -63,12 +75,18 @@
 		}
 	}
 	
+	/**
+	 * callback to display sublist element
+	 */
 	function cat_list_after_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		global $cat_line_end;
 		echo $cat_line_end,"\n";
 	}
 	
+	/**
+	 * callback to end sublist
+	 */
 	function cat_list_after_last( $parent_cat_ID, $level )
 	{	// callback to end sublist
 		global  $cat_group_end;

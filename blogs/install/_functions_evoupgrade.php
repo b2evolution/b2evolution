@@ -10,7 +10,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/*
+/**
  * upgrade_b2evo_tables(-)
  */
 function upgrade_b2evo_tables()

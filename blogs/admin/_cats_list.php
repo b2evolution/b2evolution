@@ -16,10 +16,17 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	
 	// ----------------- START RECURSIVE CAT LIST ----------------
 	cat_query();	// make sure the caches are loaded
+
+	/** 
+	 * callback to start sublist
+	 */
 	function cat_edit_before_first( $parent_cat_ID, $level )
 	{	// callback to start sublist
 		
 	}
+	/** 
+	 * callback to display sublist element
+	 */
 	function cat_edit_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		$cat = get_the_category_by_ID( $cat_ID );
@@ -34,6 +41,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		echo "
 <ul>\n";
 	}
+	/** 
+	 * callback to display sublist element
+	 */
 	function cat_edit_after_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		echo "<li><a href=\"?action=newcat&parent_cat_ID=".$cat_ID.'">';
@@ -42,6 +52,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		echo "</ul>\n";
 		echo "</li>\n";
 	}
+	/** 
+	 * callback to end sublist
+	 */
 	function cat_edit_after_last( $parent_cat_ID, $level )
 	{	// callback to end sublist
 		if( $level > 0 )

@@ -14,8 +14,14 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
 require_once dirname(__FILE__).'/../toolbar.class.php';
 
+/**
+ * @package plugins
+ */
 class quicktags_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evQTag';

@@ -11,7 +11,10 @@
  * @package admin
  */
 
-# You can choose the page you want as the default below:
+
+/**
+ * You can choose the page you want as the default below:
+ */
 require( dirname(__FILE__).'/b2edit.php' );
 
 ?>

@@ -10,6 +10,9 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * db_delete(-)
+ */
 function db_delete()
 {
 	global $DB, $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,

@@ -6,14 +6,17 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
 require_once dirname(__FILE__). '/_class_comment.php';
 
-/*
+/**
  * generic_ctp_number(-)
  *
  * generic comments/trackbacks/pingbacks numbering

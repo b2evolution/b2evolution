@@ -1,9 +1,15 @@
 <?php
-/*
+/**
  * This is b2evolution's admin config file
- * Version of this file: 0.9
  *
  * This sets how the back-office works
+ * Last significant changes to this file: version 0.9.0.0
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package conf
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 

@@ -9,6 +9,10 @@
  * @package admin
  * @author original hack by shockingbird.com
  */
+
+/**
+ * Includes:
+ */
 require_once (dirname(__FILE__).'/_header.php');
 
 // Check permissions:

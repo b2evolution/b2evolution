@@ -9,7 +9,9 @@
  * @package install
  */
 
-// include config and default functions
+/**
+ * include config and default functions:
+ */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
 require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_class_log.php" );
 $Debuglog = new Log( 'note' );

@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  *
  * $Id$

@@ -1,6 +1,7 @@
 <?php
 /**
- * @package xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
+ * @package evocore
+ * @subpackage xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
  * @copyright Edd Dumbill <edd@usefulinc.com> (C) 1999-2001
  */
 // additional fixes for case of missing xml extension file by Michel Valdrighi <m@tidakada.com>
@@ -42,10 +43,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 // XML RPC Server class
 // requires: xmlrpc.php
 
-// listMethods: either a string, or nothing
 $_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString), 
 																array($xmlrpcArray));
 $_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';
+/**
+ * listMethods: either a string, or nothing
+ */
 function _xmlrpcs_listMethods($server, $m) 
 {
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
@@ -65,6 +68,9 @@ function _xmlrpcs_listMethods($server, $m)
 
 $_xmlrpcs_methodSignature_sig=array(array($xmlrpcArray, $xmlrpcString));
 $_xmlrpcs_methodSignature_doc='Returns an array of known signatures (an array of arrays) for the method name passed. If no signatures are known, returns a none-array (test for type != array to detect missing signature)';
+/**
+ * {@internal _xmlrpcs_methodSignature(-)}}
+ */
 function _xmlrpcs_methodSignature($server, $m) 
 {
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
@@ -145,7 +151,7 @@ $_xmlrpcs_dmap=array(
 													 "docstring" => $_xmlrpcs_methodSignature_doc)
 										 );
 
-/*
+/**
  * Register a debugging message to be sent back in output
  */
 $_xmlrpc_debuginfo="";
@@ -155,6 +161,10 @@ function xmlrpc_debugmsg($m)
 	$_xmlrpc_debuginfo=$_xmlrpc_debuginfo . $m . "\n";
 }
 
+/**
+ * @package evocore
+ * @subpackage xmlrpc
+ */
 class xmlrpc_server 
 {
   var $dmap=array();
@@ -234,9 +244,6 @@ class xmlrpc_server
 	 * 
 	 *
 	 * {@internal parseRequest(-) }}
-	 *
-	 * @param 
-	 * @return
 	 */
   function parseRequest($data="") 
 	{

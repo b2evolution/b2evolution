@@ -11,8 +11,12 @@
  *
  * @copyright (c)2004 by Hans Reinders - {@link http://hansreinders.com}
  *
- * @package mms
+ * @package htsrv
  * @todo MOVE THIS FILE TO /htsrv
+ */
+ 
+/**
+ * Initalize:
  */
 require_once( dirname(__FILE__).'/b2evocore/_main.php' );
 
@@ -216,7 +220,9 @@ function writeBackSendConf( $md ) {
 	for ( $j = 0; $j < $i; $j++ ) print( chr( $reply[$j] ) );
 }
 
-
+/**
+ * @package htsrv
+ */
 class MMSDecoder {
 	var $data;
 	var $curp;
@@ -637,7 +643,9 @@ class MMSDecoder {
 
 }
 
-
+/**
+ * @package htsrv
+ */
 class Part
 {
 

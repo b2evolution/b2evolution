@@ -8,6 +8,10 @@
  *
  * @package admin
  */
+
+/**
+ * Includes:
+ */
 require_once (dirname(__FILE__). '/_header.php');
 $admin_tab = 'edit';	// Exception to this below (new post)
 param( 'action', 'string' );

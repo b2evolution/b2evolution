@@ -1,7 +1,17 @@
 <?php
-/*
- * b2evolution localization & language config
- * Version of this file: 0.9.0.5
+/**
+ * This is b2evolution's localization & language config file
+ *
+ * This file sets the default configuration for locales.
+ * IMPORTANT: Most of these settings can be overriden in the admin (regional settings) and will then
+ * be saved to the database. The database settings superseede settings in this file.
+ * Last significant changes to this file: version 0.9.0.5
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package conf
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -23,7 +33,9 @@ $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 $default_locale = 'en-EU';
 
 
-// Load locale related functions: (we need NT_(-) here)
+/**
+ * Load locale related functions: (we need NT_(-) here)
+ */
 require_once( dirname(__FILE__). "/$conf_dirout/$core_subdir/_functions_locale.php" );
 
 

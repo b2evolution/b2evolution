@@ -10,7 +10,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/*
+/**
  * create_b2evo_tables(-)
  *
  * Used for fresh install + upgrade from b2

@@ -1,6 +1,7 @@
 <?php
 /**
- * @package xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
+ * @package evocore
+ * @subpackage xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
  * @copyright Edd Dumbill <edd@usefulinc.com> (C) 1999-2001
  */
 //
@@ -43,6 +44,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 # b2 fix. some servers have stupid warnings
 # error_reporting(0);
 
+/**
+ * logIO(-)
+ */
 if (!function_exists('logIO')) 
 {
 	function logIO($m="",$n="") 
@@ -58,22 +62,42 @@ if(function_exists('xml_parser_create'))
 }
 elseif( !(bool)ini_get('enable_dl') || (bool)ini_get('safe_mode')) 
 { // We'll not be able to do dynamic loading (fix by Sakichan)
+	/**
+	 * @ignore
+	 */
 	define("CANUSEXMLRPC", 0);		
 }
 elseif($WINDIR) 
 {	// Win 32 fix. From: "Leo West" <lwest@imaginet.fr>
 	if (@dl("php3_xml.dll")) 
 	{
+		/**
+		 * @ignore
+		 */
 		define("CANUSEXMLRPC", 1);
-	} else {
+	} 
+	else
+	{
+		/**
+		 * @ignore
+		 */
 		define("CANUSEXMLRPC", 0);
 	}
 } 
 else
 {
-	if (@dl("xml.so")) {
+	if (@dl("xml.so")) 
+	{
+		/**
+		 * @ignore
+		 */
 		define("CANUSEXMLRPC", 1);
-	} else {
+	}
+	else
+	{
+		/**
+		 * @ignore
+		 */
 		define("CANUSEXMLRPC", 0);
 	}
 }
@@ -153,6 +177,9 @@ $xmlrpc_backslash=chr(92).chr(92);
 
 $_xh=array();
 
+/**
+ * {@internal xmlrpc_entity_decode(-)}}
+ */
 function xmlrpc_entity_decode($string) {
   $top=split("&", $string);
   $op="";
@@ -390,6 +417,10 @@ function xmlrpc_dh($parser, $data)
   }
 }
 
+/**
+ * @package evocore
+ * @subpackage xmlrpc
+ */
 class xmlrpc_client 
 {
   var $path;
@@ -561,6 +592,10 @@ class xmlrpc_client
 
 } // end class xmlrpc_client
 
+/**
+ * @package evocore
+ * @subpackage xmlrpc
+ */
 class xmlrpcresp 
 {
   var $xv;
@@ -631,6 +666,10 @@ class xmlrpcresp
   }
 }
 
+/**
+ * @package evocore
+ * @subpackage xmlrpc
+ */
 class xmlrpcmsg 
 {
   var $payload;
@@ -815,6 +854,10 @@ class xmlrpcmsg
 
 }
 
+/**
+ * @package evocore
+ * @subpackage xmlrpc
+ */
 class xmlrpcval 
 {
   var $me=array();

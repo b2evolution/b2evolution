@@ -1,11 +1,21 @@
 <?php
-	/*
+	/**
 	 * This template generates an Atom feed for the requested blog's latest posts
-	 * (http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html)
+	 *
+	 * See {@link http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html}
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package xmlsrv
 	 */
 	$skin = '';								// We don't want this do be displayed in a skin !
 	$disp = 'comments';				// What we want is the latest comments
 	$show_statuses = array(); // Restrict to published comments
+	/**
+	 * Initialize everything:
+	 */
 	require dirname(__FILE__).'/../b2evocore/_blog_main.php';
 	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
 	header("Content-type: application/atom+xml");

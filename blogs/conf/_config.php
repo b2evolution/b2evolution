@@ -1,9 +1,10 @@
 <?php
 /**
- * This is b2evolution's config file
- * Last structural changes in this file: version 0.9.1
+ * This is b2evolution's main config file
  *
  * You need to edit this file to your settings before attempting to install the database!
+ * Last significant changes to this file: version 0.9.1
+ *
  *
  * Reminder: every line starting with # or // is a comment, multiline comments are
  *           surrounded by '/*' and '* /' (without space).
@@ -14,6 +15,12 @@
  *
  * Contributors: you should override this file by creating a file named _config_TEST.php 
  * (see end of this file)
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package conf
  */
 
 

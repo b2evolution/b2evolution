@@ -1,9 +1,15 @@
 <?php
-/*
- * b2evolution formatting config
- * Version of this file: 0.9.0.6
+/**
+ * This is b2evolution's formatting config file
  *
- * This sets how posts and comments are formatted
+ * This file sets how b2evolution will parse and format texts (posts, comments, etc.)
+ * Last significant changes to this file: version 0.9.0.6
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package conf
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -52,8 +58,9 @@ $use_security_checker = 0;
 
 // DEFINITION of allowed XHTML code for POSTS (posted in the backoffice)
 
-// Allowed Entity classes
-
+/**
+ * Allowed Entity classes
+ */
 // define('E_special_pre', 'br span bdo');			// Strict
 // define('E_special', E_special_pre.' img');		// Strict
 define('E_special_extra', 'img' );							// Transitional

@@ -8,6 +8,10 @@
  *
  * @package admin
  */
+
+/**
+ * Includes:
+ */
 require( dirname(__FILE__).'/_header.php' );
 $admin_pagetitle = T_('Spell Check');
 ?>

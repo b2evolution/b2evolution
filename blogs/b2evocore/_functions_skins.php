@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package evocore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -40,7 +40,8 @@ function skinbase()
 /**
  * checks if a skin exists
  *
- * {@internal skin_exists(-)}
+ * {@internal skin_exists(-)}}
+ *
  * @return boolean true is exists, false if not
  * @param skin name (directory name)
  */

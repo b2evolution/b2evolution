@@ -16,6 +16,10 @@
  *
  * @package admin
  */
+
+/**
+ * Includes:
+ */
 require_once( dirname(__FILE__) . '/_header.php' );
 $admin_tab = 'edit';
 

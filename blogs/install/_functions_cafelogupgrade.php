@@ -10,8 +10,8 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/*
- * upgrade_cafelog_tables(-)
+/**
+ * {@internal upgrade_cafelog_tables(-)}}
  */
 function upgrade_cafelog_tables()
 {

@@ -7,10 +7,11 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
+ * @ignore
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/*
+/**
  * upgrade_cafelog_tables(-)
  */
 function upgrade_cafelog_tables()

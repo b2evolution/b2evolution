@@ -13,6 +13,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <div class="bPosts">
 	<div class="bPost">
 	<?php
+	/**
+	 * Includes:
+	 */	
 	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_itemlist.php' );
 	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_calendar.php' );
 	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_archivelist.php' );
