@@ -1231,11 +1231,11 @@ function obhandler( $output )
 
 		// prefix with PUB or AUT.
 		if( is_logged_in() )
-			$ETag = 'AUT';    // A private page
-		else $ETag = 'PUB'; // and public one
+			$ETag = '"AUT';    // A private page
+		else $ETag = '"PUB'; // and public one
 
 		$ETag .= md5( $out );
-		header( 'ETag: '. $ETag );
+		header( 'ETag: '. $ETag . '"' );
 
 		// decide to send out or not
 		if( isset($_SERVER['HTTP_IF_NONE_MATCH'])
@@ -1248,6 +1248,7 @@ function obhandler( $output )
 
 	if( !$sendout )
 	{  // send 304 and die
+		header( 'Content-Length: 0' );
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
 		#log_hit();  // log this somehow?
 		die;

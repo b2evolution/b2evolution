@@ -100,11 +100,7 @@ if( $action == 'update' )
 				
 			}
 			
-			if( $locales != $templocales )
-			{
-				#echo 'CHANGED!';
-				$locales = $templocales;
-			}
+			$locales = $templocales;
 			
 			$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled ) VALUES ";
 			foreach( $locales as $localekey => $lval )
@@ -126,17 +122,14 @@ if( $action == 'update' )
 			$query = substr($query, 0, -2);
 			$q = $DB->query($query);
 			
-			if( !$locales[$newdefault_locale]['enabled'] )
-			{
-				$status_update[] = '<span class="error">' . T_('Default locale should be enabled.') . '</span>';
-			}
-			elseif( $newdefault_locale != $default_locale )
+			if( $newdefault_locale != $default_locale )
 			{
 				// set default locale
 				$query = "UPDATE $tablesettings	SET
 							default_locale = '$newdefault_locale',
 							time_difference = $newtime_difference";
 				$q = $DB->query($query);
+				$default_locale = $newdefault_locale;
 				$status_update[] = T_('New default locale set.');
 			}
 			

@@ -8,8 +8,11 @@
  *
  * @package admin
  */
+if( !$locales[$default_locale]['enabled'] )
+{ // default locale is not enabled
+	echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
+}
 ?>
-
 <form class="fform" name="form" action="b2options.php" method="post">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
@@ -160,11 +163,13 @@
 		}
 		echo '</tr>';
 	}
-	echo '</table>
-	<br />
-	<div align="center">
-	<a href="?tab=regional&amp;action=reset" onClick="return confirm(\''.T_('Are you sure you want to reset?').'\')"><img src="img/xross.gif" height="13" width="13" alt="'.T_('Reset to defaults').'" title="'.T_('Reset to defaults').'" border="0" /></a> '.T_('Reset to defaults').'!';
 	?>
+	</table>
+	<br />
+	<div style="text-align:center;padding:1em;">
+	<a href="?tab=regional&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" alt="X" title="<?php echo T_('Reset to defaults');?>" border="0" /></a>
+	<br /><?php echo T_('Reset to defaults');?>!
+	</div>
 	</fieldset>
 
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
