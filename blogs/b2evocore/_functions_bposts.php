@@ -781,7 +781,7 @@ function the_content(
  * link_pages(-)
  * vegarg: small bug when using $more_file fixed
  */
-function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='')
+function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%d', $more_file='')
 {
 	global $id, $page, $numpages, $multipage, $more;
 	global $blogfilename;
@@ -800,7 +800,7 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 		{
 			for ($i = 1; $i < ($numpages+1); $i = $i + 1)
 			{
-				$j = str_replace('%', "$i", $pagelink);
+				$j = str_replace('%d', $i, $pagelink);
 				echo ' ';
 				if( ($i != $page) || ( (!$more) && ($page==1) ))
 					echo '<a href="'.url_add_param($file, 'p='.$id.'&amp;more=1&amp;page='.$i).'">';
