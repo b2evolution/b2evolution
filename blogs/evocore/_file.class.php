@@ -236,11 +236,11 @@ class File extends DataObject
 		if( $type == 'dir' )
 		{ // Create an empty directory:
 			if( $chmod === NULL )
-			{	// Create dir with default permissions (correct?)
+			{ // Create dir with default permissions (777)
 				$r = @mkdir( $this->_dir.$this->_name );
 			}
 			else
-			{	// Create directory with specifi permissions:
+			{ // Create directory with specific permissions:
 				$r = @mkdir( $this->_dir.$this->_name, octdec($chmod) );
 			}
 		}
@@ -453,9 +453,19 @@ class File extends DataObject
 	 */
 	function getLastMod( $format = '#' )
 	{
-		if( $format == '#' )
+		switch( $format )
 		{
-			$format = locale_datefmt().' '.locale_timefmt();
+			case '#':
+				$format = locale_datefmt().' '.locale_timefmt();
+				break;
+
+			case 'date':
+				$format = locale_datefmt();
+				break;
+
+			case 'time':
+				$format = locale_timefmt();
+				break;
 		}
 
 		return date_i18n( $format, $this->_lastMod );
@@ -701,8 +711,8 @@ class File extends DataObject
 
 /*
  * $Log$
- * Revision 1.17  2005/01/20 14:00:44  fplanque
- * no message
+ * Revision 1.18  2005/01/21 20:47:46  blueyed
+ * doc, getLastMod() extended
  *
  * Revision 1.16  2005/01/16 18:32:27  blueyed
  * doc, whitespace
