@@ -36,6 +36,18 @@ class download
          *              post
          *   $destination   = "/tmp/beecat.tar.gz"
          */
+         $data = getToMemory($url, $type)
+         $fp = fopen($destination, "w");
+
+         fclose($fp);
+        }
+
+    function getToMemory   ($url, $type) {
+        /*
+         *   $url = "http://www.wheely-bin.co.uk/facecake.php"
+         *   $type   =  get
+         *              post
+         */
          if (!is_null($url){
           /*
            parse_url("http://username:password@hostname:81/path?arg=value#anchor");
@@ -80,11 +92,7 @@ class download
                         http::socket_get($server, $port, $url, $vars);
                         break;
              };
-
-         $fp = fopen($destination, "w");
-         fclose($fp);
-        };
-
+    }
 };
 
 ?>
