@@ -166,7 +166,7 @@ switch( $show )
 	</table>
 	
 	<h3><?php echo _('Top refering search engines') ?>:</h3>
-	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blogtrue); ?>
+	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 			<tr>
