@@ -84,7 +84,7 @@ class AdminUI_general
 	 * Visual path seperator (used in html title, ..)
 	 * @var string
 	 */
-	var $pathSeperator = ' :: ';
+	var $pathSeperator;
 
 	/**
 	 * The Logo for the admin (build in constructor).
@@ -123,15 +123,23 @@ class AdminUI_general
 
 		$this->mode = $mode;
 
-		$this->admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
-												.'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'
-												.T_("visit b2evolution's website").'" width="185" height="40" /></a>';
-		$this->exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
-											&bull;
-											<a href="'.$baseurl.'">'.T_('Exit to blogs').'
-											<img src="img/close.gif" width="14" height="14" class="top" alt="" title="'
-											.T_('Exit to blogs').'" /></a><br />';
+		if( is_null($this->admin_logo) )
+		{
+			global $app_admin_logo;
+			$this->admin_logo = $app_admin_logo;
+		}
 
+		if( is_null($this->exit_links) )
+		{
+			global $app_exit_links;
+			$this->exit_links = $app_exit_links;
+		}
+
+		if( is_null($this->pathSeperator) )
+		{
+			global $admin_path_seprator;
+			$this->pathSeperator = $admin_path_seprator;
+		}
 
 		$this->initTemplates();
 	}
@@ -977,6 +985,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.13  2005/03/13 19:46:53  blueyed
+ * application config layer
+ *
  * Revision 1.12  2005/03/11 12:40:15  fplanque
  * multiple browsing views, part ONE
  *
