@@ -139,7 +139,6 @@ if ($use_spellchecker)
 
 	<div class="center">
 	<?php // --------------------------- TOOLBARS ------------------------------------
-		require( dirname(__FILE__). '/_quicktags.php');
 		$Toolbars->display();
 	?>
 	</div>
