@@ -52,7 +52,10 @@ function safefilename( $path )
  */
 function get_dirsize_recursive( $path )
 {
-	$dir = opendir( $path );
+	if( !($dir = @opendir( $path )) )
+	{
+		return false;
+	}
 	$total = 0;
 	while( $cur = readdir($dir) ) if( !in_array( $cur, array('.', '..')) )
 	{

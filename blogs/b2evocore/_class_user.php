@@ -63,9 +63,6 @@ class User extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_' );
 
-		// FP: WHAT IS THIS FOR???:
-		$this->Messages = new Log( 'error' );
-
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank user';
@@ -164,22 +161,19 @@ class User extends DataObject
 	 */
 	function getMediaDir()
 	{
-		global $basepath, $media_subdir;
+		global $basepath, $media_subdir, $Messages;
 
 		$userdir = $basepath.$media_subdir.'users/'.safefilename($this->login).'/';
 		if( !is_dir( $userdir ) )
 		{
 			if( !mkdir( $userdir ) ) // defaults to 0777
-			{
-				if( $Log !== NULL )
-				{ // add error
-					$this->Messages->add( sprintf( T_("The user's directory [%s] could not be created."), $userdir ), 'error' );
-				}
+			{ // add error
+				$Messages->add( sprintf( T_("The user's directory [%s] could not be created."), $userdir ), 'error' );
 				return false;
 			}
-			elseif( $Log !== NULL )
+			else
 			{ // add note
-				$this->Messages->add( sprintf( T_("The user's directory %s has been created with permissions %s."), $userdir, '777' ), 'note' );
+				$Messages->add( sprintf( T_("The user's directory %s has been created with permissions %s."), $userdir, '777' ), 'note' );
 			}
 		}
 		return $userdir;

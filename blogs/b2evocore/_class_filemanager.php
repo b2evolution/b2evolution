@@ -287,14 +287,17 @@ class FileManager extends Filelist
 
 
 	/**
-	 * get the current url, with all relevant GET params (cd, order, asc)
+	 * Get the current url, with all relevant GET params (root, path, filterString,
+	 * filterIsRegexp, order, orderasc).
+	 * Params can be overridden or be forced to
 	 *
 	 * @param string override root (blog_X or user_X)
 	 * @param string override cd
 	 * @param string override order
 	 * @param integer override asc
 	 */
-	function curl( $root = NULL, $path = NULL, $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $orderasc = NULL )
+	function getCurUrl( $root = NULL, $path = NULL, $filterString = NULL,
+											$filterIsRegexp = NULL, $order = NULL, $orderasc = NULL )
 	{
 		$r = $this->url;
 
@@ -319,12 +322,13 @@ class FileManager extends Filelist
 
 
 	/**
-	 * generates hidden input fields for forms, based on {@link curl()}}
+	 * Generates hidden input fields for forms, based on {@link getCurUrll()}
 	 */
-	function form_hiddeninputs( $root = NULL, $path = NULL, $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $asc = NULL )
+	function getFormHiddenInputs( $root = NULL, $path = NULL, $filterString = NULL,
+															$filterIsRegexp = NULL, $order = NULL, $asc = NULL )
 	{
-		// get curl(), remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $filterString, $filterIsRegexp, $order, $asc ), strlen( $this->url )+1 ) );
+		// get current Url, remove leading URL and '?'
+		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -362,7 +366,7 @@ class FileManager extends Filelist
 		}
 
 		$r[] = array( 'type' => 'user',
-										'name' => T_('user media folder') );
+										'name' => T_('Your media folder') );
 
 		return $r;
 	}
@@ -374,7 +378,7 @@ class FileManager extends Filelist
 	function getLinkSort( $type, $atext )
 	{
 		$r = '<a href="'
-					.$this->curl( NULL, NULL, NULL, NULL, $type, false );
+					.$this->getCurUrl( NULL, NULL, NULL, NULL, $type, false );
 
 		if( $this->order == $type )
 		{ // change asc
@@ -471,11 +475,11 @@ class FileManager extends Filelist
 	{
 		if( $this->cur_File->isDir() && $param != 'forcefile' )
 		{
-			return $this->curl( NULL, $this->path.$this->cur_File->getName() );
+			return $this->getCurUrl( NULL, $this->path.$this->cur_File->getName() );
 		}
 		else
 		{
-			return $this->curl( NULL, $this->path ).'&amp;file='.urlencode( $this->cur_File->getName() );
+			return $this->getCurUrl( NULL, $this->path ).'&amp;file='.urlencode( $this->cur_File->getName() );
 		}
 	}
 
@@ -537,7 +541,7 @@ class FileManager extends Filelist
 		{ // cannot go higher
 			return false;
 		}
-		return $this->curl( NULL, $this->path.'..' );
+		return $this->getCurUrl( NULL, $this->path.'..' );
 	}
 
 
@@ -546,7 +550,7 @@ class FileManager extends Filelist
 	 */
 	function getLinkHome()
 	{
-		return $this->curl( 'user', false );
+		return $this->getCurUrl( 'user', false );
 	}
 
 
@@ -808,6 +812,7 @@ class FileManager extends Filelist
 		{
 			$path = $this->cwd;
 		}
+
 		$path = trailing_slash( $path );
 		if( $chmod == NULL )
 		{
@@ -916,7 +921,8 @@ class FileManager extends Filelist
 
 
 	/**
-	 * returns cwd, where the accessible directories (below root)  are clickable
+	 * Returns cwd, where the accessible directories (below root) are clickable
+	 *
 	 * @return string cwd as clickable html
 	 */
 	function getCwdClickable()
@@ -931,7 +937,6 @@ class FileManager extends Filelist
 		// get the part that is clickable
 		$clickabledirs = explode( '/', substr( $this->cwd, strlen($r) ) );
 
-		$r .= '<a href="'.$this->curl( NULL, false ).'">'.array_shift( $clickabledirs ).'</a>';
 		$cd = '';
 		foreach( $clickabledirs as $nr => $dir )
 		{
@@ -939,8 +944,12 @@ class FileManager extends Filelist
 			{
 				break;
 			}
-			$r .= '/<a href="'.$this->curl( NULL, $cd.$dir ).'">'.$dir.'</a>';
-			$cd .= $dir.'/';
+			if( $nr )
+			{
+				$cd .= $dir.'/';
+			}
+			$r .= '<a href="'.$this->getCurUrl( NULL, $cd )
+					.'" title="'.T_('Change to this directory').'">'.$dir.'/</a>';
 		}
 
 		return $r;

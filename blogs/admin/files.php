@@ -147,7 +147,7 @@ if( $action == '' && $file != '' && $curFile )
 
 					?>
 					<noscript type="text/javascript">
-						<a href="<?php echo $Fileman->curl().'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
+						<a href="<?php echo $Fileman->getCurUrl().'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
 							.( $showlinenrs ? T_('hide line numbers') : T_('show line numbers') ).'</a>';
 					?>
 					</noscript>
@@ -283,7 +283,7 @@ if( $selaction != '' )
 							$msg_action .= '<input type="hidden" name="selectedfiles[]" value="'.format_to_output( $file, 'formvalue' )."\" />\n";
 						}
 
-						$msg_action .= $Fileman->form_hiddeninputs()."\n"
+						$msg_action .= $Fileman->getFormHiddenInputs()."\n"
 												.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is file's name that will be send to you."), 80, '', 'text', false )."\n"
 												.form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n"
 												.'<div class="input"><input type="submit" name="selaction" value="'.T_('Download').'" class="search" /></div>
@@ -352,30 +352,54 @@ switch( $action ) // {{{ (we catched empty action before)
 		}
 		break;
 
+
 	case 'delete':
+		// TODO: checkperm!
 		if( !$curFile )
 		{
 			break;
 		}
-		// TODO: checkperm!
-		$filename = $curFile->getName();
-		if( !$Fileman->unlink( $curFile ) )
+		param( 'confirmed', 'integer', 0 );
+		if( !$confirmed )
 		{
-			$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
-																						T_('Could not delete directory [%s] (not empty?).') :
-																						T_('Could not delete [%s].') ),
-																						$filename ) );
+			$msg_action = '<p>'.sprintf( T_('Do you really want to delete [%s]?'), $file ).'</p>'
+			.'
+			<form action="" class="inline">
+				<input type="hidden" name="confirmed" value="1" />
+				<input type="hidden" name="action" value="delete" />
+				<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
+				'.$Fileman->getFormHiddenInputs().'
+				<input type="submit" value="'.T_('I am sure!').'" />
+			</form>
+			<form action="" class="inline">
+				'.$Fileman->getFormHiddenInputs().'
+				<input type="submit" value="'.T_('CANCEL').'" />
+			</form>
+			';
 		}
 		else
 		{
-			$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
-																						T_('Deleted directory [%s].') :
-																						T_('Deleted file [%s].') ),
-																						$filename ), 'note' );
+			$filename = $curFile->getName();
+			if( !$Fileman->unlink( $curFile ) )
+			{
+				$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
+																							T_('Could not delete directory [%s] (not empty?).') :
+																							T_('Could not delete [%s].') ),
+																							$filename ) );
+			}
+			else
+			{
+				$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
+																							T_('Deleted directory [%s].') :
+																							T_('Deleted file [%s].') ),
+																							$filename ), 'note' );
+			}
 		}
 		break;
 
-	case 'rename': // TODO: catch renaming to same filename (and deleting existing one)
+
+	case 'rename':
+		// TODO: catch renaming to same filename (and deleting existing one)
 		if( !$curFile )
 		{
 			break;
@@ -397,7 +421,7 @@ switch( $action ) // {{{ (we catched empty action before)
 				{
 					$Fileman->Messages->add( sprintf( T_('The file [%s] already exists.'), $newname ).'
 					<form action="">
-					'.$Fileman->form_hiddeninputs().'
+					'.$Fileman->getFormHiddenInputs().'
 					<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 					<input type="hidden" name="newname" value="'.format_to_output( $newname, 'formvalue' ).'" />
 					<input type="hidden" name="overwrite" value="1" />
@@ -441,7 +465,7 @@ switch( $action ) // {{{ (we catched empty action before)
 		}
 		$msg_action .= '
 		<form name="form_rename" action="">
-		'.$Fileman->form_hiddeninputs().'
+		'.$Fileman->getFormHiddenInputs().'
 		<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 		<input type="hidden" name="action" value="rename" />
 		<label for="form_newname">'.sprintf( T_('New name for [%s]:'), $file ).'</label>
@@ -452,6 +476,7 @@ switch( $action ) // {{{ (we catched empty action before)
 		$js_focus = 'document.form_rename.form_newname';
 
 		break;
+
 
 	case 'editperm':
 		if( !$curFile )
@@ -482,7 +507,7 @@ switch( $action ) // {{{ (we catched empty action before)
 		{
 			$msg_action = '
 			<form name="form_chmod" action="files.php">
-			'.$Fileman->form_hiddeninputs().'
+			'.$Fileman->getFormHiddenInputs().'
 			<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 			<input type="hidden" name="action" value="editperm" />
 			';
@@ -507,6 +532,7 @@ switch( $action ) // {{{ (we catched empty action before)
 
 		}
 		break;
+
 
 	case 'upload':
 		// Check permissions:
@@ -600,7 +626,7 @@ switch( $action ) // {{{ (we catched empty action before)
 				<p>'.T_('Allowed file types:').' '.implode(', ', $allowedftypes).'</p>
 				<p>'.sprintf( T_('Maximum allowed file size: %d KB'), $fileupload_maxk ).'</p>
 
-				<form enctype="multipart/form-data" action="'.$Fileman->curl().'" method="post">
+				<form enctype="multipart/form-data" action="'.$Fileman->getCurUrl().'" method="post">
 					<input type="hidden" name="MAX_FILE_SIZE" value="'.($fileupload_maxk*1024).'" />
 					<input type="hidden" name="action" value="upload" />
 					<div id="uploadfileinputs">
@@ -635,15 +661,13 @@ require dirname(__FILE__).'/_menutop_end.php';
 // output errors, notes and action messages
 if( isset( $msg_action )
 		|| $Fileman->Messages->count( array( 'error', 'note' ) )
-		|| $Messages->count( 'all' )
-		|| $Fileman->User->Messages->count( 'all' ) )
+		|| $Messages->count( 'all' ) )
 {
 	?>
 	<div class="panelinfo">
 		<?php
 		$Messages->display( '', '', true, 'all' );
 		$Fileman->Messages->display( '', '', true, array( 'error', 'note' ) );
-		$Fileman->User->Messages->display( '', '', true, 'all' );
 
 		if( isset($msg_action) )
 		{
@@ -674,7 +698,7 @@ if( isset( $msg_action )
 	if( count($rootlist) > 1 )
 	{ // provide list of roots
 		echo '<form action="files.php" name="roots" class="toolbaritem">'
-					.$Fileman->form_hiddeninputs( false );
+					.$Fileman->getFormHiddenInputs( false );
 		echo '<select name="root" onchange="this.form.submit()">';
 
 		foreach( $rootlist as $lroot )
@@ -699,7 +723,7 @@ if( isset( $msg_action )
 	?>
 
 	<form action="files.php" name="search" class="toolbaritem">
-		<?php echo $Fileman->form_hiddeninputs() ?>
+		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="text" name="searchfor" value="--todo--" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
@@ -710,7 +734,7 @@ if( isset( $msg_action )
 		{ // "reset filter" form
 		?>
 		<form action="files.php" name="unfilter" class="toolbaritem">
-			<?php echo $Fileman->form_hiddeninputs( NULL, NULL, false, false ) ?>
+			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
 			<input type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
 		</form>
 		<?php
@@ -718,7 +742,7 @@ if( isset( $msg_action )
 		?>
 
 		<form action="files.php" name="filter" class="toolbaritem">
-			<?php echo $Fileman->form_hiddeninputs( NULL, NULL, false, false ) ?>
+			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
 			<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
 			<input type="checkbox" name="filter_regexp" title="<?php echo format_to_output( T_('Filter is regular expression'), 'formvalue' ) ?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> />
 			<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
@@ -759,7 +783,7 @@ if( $Fileman->isFiltering() )
 
 <tbody>
 <?php
-param( 'checkall', 'integer', NULL );  // Non-Javascript-CheckAll
+param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 
 $i = 0;
 $Fileman->sort();
@@ -774,8 +798,10 @@ while( $lFile = $Fileman->getNextFile() )
 		<td class="checkbox">
 			<input title="<?php echo T_('Select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
-		<td class="icon" onclick="window.location.href = '<?php echo $Fileman->getLinkCurfile() ?>'">
-			<?php echo $Fileman->getIcon( $lFile, 'imgtag' ) ?>
+		<td class="icon">
+			<a href="<?php echo $Fileman->getLinkCurfile() ?>">
+				<?php echo $Fileman->getIcon( $lFile, 'imgtag' ) ?>
+			</a>
 		</td>
 		<td class="filename">
 			<a href="<?php echo $Fileman->getLinkCurfile() ?>" target="fileman_default" onclick="return false;">
@@ -875,19 +901,12 @@ function openselectedfiles( checkonly )
 </script>
 <tr class="group"><td colspan="8">
 	<a id="checkallspan_0" href="<?php
-		echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
+		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
 		?>" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]'); return false;"><?php
-		if( !isset($checkall) )
-		{
-			echo T_('(un)check all');
-		}
-		else
-		{ // Non-JS
-			echo ($checkall) ? T_('uncheck all') : T_('check all');
-		}
+		echo ($checkall) ? T_('uncheck all') : T_('check all');
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
-	<?php echo $Fileman->form_hiddeninputs() ?>
+	<?php echo $Fileman->getFormHiddenInputs() ?>
 	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" />
 	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" />
 	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" />
@@ -911,7 +930,7 @@ function openselectedfiles( checkonly )
 	param( 'options_show', 'integer', 0 );
 	?>
 	<form class="toolbaritem" action="files.php" method="post">
-		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
+		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
 			onclick="return toggle_options();"><?php
 			echo ( $options_show ) ? T_('Hide options') : T_('Show options') ?></a>
 
@@ -929,7 +948,7 @@ function openselectedfiles( checkonly )
 			<label for="option_recursivedirsize"><?php echo T_('Recursive size of directories') ?></label>
 			<br />
 
-			<?php echo $Fileman->form_hiddeninputs() ?>
+			<?php echo $Fileman->getFormHiddenInputs() ?>
 			<input type="hidden" name="action" value="update_settings" />
 			<input type="hidden" name="options_show" value="1" />
 			<div class="input">
@@ -964,7 +983,7 @@ function openselectedfiles( checkonly )
 	</form>
 
 	<form action="files.php" name="filter" class="toolbaritem">
-		<?php echo $Fileman->form_hiddeninputs() ?>
+		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="hidden" name="action" value="upload" />
 		<input type="submit" value="<?php echo format_to_output( T_('Upload a file/image'), 'formvalue' ) ?>" />
 	</form>
@@ -976,7 +995,7 @@ function openselectedfiles( checkonly )
 		</select>
 		<input type="text" name="createname" value="" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
-		<?php echo $Fileman->form_hiddeninputs() ?>
+		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="hidden" name="action" value="createnew" />
 	</form>
 </div>
