@@ -128,7 +128,7 @@ switch($action)
 			flush();
 			sleep($sleep_after_edit);
 		}
-		echo '<p>', T_('Posting Done...'), "</p>\n";
+		echo '<p>'.T_('Done.').'</p>';
 		echo "</div>\n";
 
 		if( $post_status != 'published' )
@@ -149,6 +149,7 @@ switch($action)
 			pingBlogs($blogparams);
 			pingTechnorati($blogparams);
 		}
+		echo '<div class="panelinfo"><p>', T_('Posting Done...'), "</p></div>\n";
 		break;
 
 
@@ -244,6 +245,7 @@ switch($action)
 			flush();
 			sleep($sleep_after_edit);
 		}
+		echo '<p>'.T_('Done.').'</p></div>';
 
 		if( $post_status != 'published' )
 		{
@@ -276,8 +278,7 @@ switch($action)
 			}
 		}
 
-		echo '<p>', T_('Updating done...'), "</p>\n";
-		echo "</div>\n";
+		echo '<div class="panelinfo"><p>', T_('Updating done...'), "</p></div>\n";
 		break;
 
 
@@ -308,7 +309,7 @@ switch($action)
 		$post_url = $postdata['Url'];
 
 		echo "<div class=\"panelinfo\">\n";
-		echo "<h3>Updating post status...</h3>\n";
+		echo '<h3>'.T_('Updating post status...')."</h3>\n";
 
 		// We need to check the previous flags...
 		$post_flags = $postdata['Flags'];
@@ -363,7 +364,7 @@ switch($action)
 			}
 		}
 
-		$status_action = T_('Updating done...');
+		echo '<div class="panelinfo"><p>'.T_('Updating done...').'</p></div>';
 
 		break;
 

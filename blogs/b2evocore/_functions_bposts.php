@@ -181,6 +181,7 @@ function bpost_update_status(
 {
 	global $DB, $tableposts, $tablepostcats;
 	global $localtimenow;
+	global $query;
 
 	// Handle the flags:
 	$post_flags = array();
