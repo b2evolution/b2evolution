@@ -1020,7 +1020,7 @@ function create_b2evo_tables_092()
 	$DB->query( "CREATE TABLE T_basedomains (
 								dom_ID INT UNSIGNED NOT NULL AUTO_INCREMENT,
 								dom_name VARCHAR(255) NOT NULL DEFAULT '',
-								dom_status ENUM('new','whitelist','blacklist') NOT NULL DEFAULT 'new',
+								dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
 								PRIMARY KEY (dom_ID),
 								UNIQUE (dom_name) )" );
 	echo "OK.<br />\n";
