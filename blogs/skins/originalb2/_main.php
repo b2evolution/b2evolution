@@ -43,7 +43,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 &nbsp;-&nbsp;
 Categories: <?php $Item->categories() ?>
 &nbsp;-&nbsp;
-<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a>
+<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->Author->prefered_name() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a>
 </div>
 
 <div class="storyContent">

@@ -23,7 +23,7 @@
     <item>
       <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
       <description><?php
-        the_link( '', ' ', 'xml' );
+        $Item->url_link( '', ' ', 'xml' );
         $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
       ?></description>
       <link><?php permalink_single() ?></link>

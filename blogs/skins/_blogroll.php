@@ -46,11 +46,11 @@
 	$previous_cat = '';
 	$blogroll_cat = '';
 
-	while( $BlogRollList->get_category_group() )
+	while( $Item = $BlogRollList->get_category_group() )
 	{
 		// Open new cat:
 		echo $blogroll_catname_before;
-		the_category();
+		$Item->main_category();
 		echo $blogroll_catname_after;
 		
 		while( $Item = $BlogRollList->get_item() )

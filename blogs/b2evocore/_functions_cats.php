@@ -262,6 +262,8 @@ function get_the_category_by_ID($cat_ID)
  * Get category name for current post
  *
  * fplanque: simplified
+ *
+ * @deprecated
  */
 function get_the_category() 
 {
@@ -624,13 +626,15 @@ function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 
 
 
-/*
+/**
  * the_category(-) 
  *
  * echoes the main category name
  * the name of the main category the post belongs to. 
  * you can as an admin add categories, and rename them if needed. 
  * default category is 'General', you can rename it too.
+ *
+ * @deprecated deprecated by {@link Item::main_category()}
  */
 function the_category( $format = 'htmlbody' ) 
 {

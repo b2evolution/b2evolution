@@ -178,6 +178,19 @@ class Item extends DataObject
 	
 
 	/** 
+	 * Template function: display main category name
+	 *
+	 * {@internal Item::main_category(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function main_category( $format = 'htmlbody' ) 
+	{
+		echo format_to_output( get_catname( $this->main_cat_ID ), $format );
+	}
+
+
+	/** 
 	 * Template function: display content of item
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
@@ -450,6 +463,27 @@ class Item extends DataObject
 		echo $before;
 		echo $title;
 		echo $after;
+	}
+
+	/** 
+	 * Template function: Display link to item related url
+	 *
+	 * {@internal Item::url_link(-) }}
+	 *
+	 * @param string string to display before the url (if exists)
+	 * @param string string to display after the url (if exists)
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function url_link( $before='', $after='', $format = 'htmlbody' ) 
+	{
+		if( !empty( $this->url ) )
+		{
+			echo $before;
+			echo '<a href="', $this->url, '">';
+			echo format_to_output( $this->url, $format );
+			echo '</a>';
+			echo $after;
+		}
 	}
 
 	/** 

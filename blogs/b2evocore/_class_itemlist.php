@@ -544,8 +544,8 @@ class ItemList extends DataObjectList
 	}
 
 
-	/*
-	 * ItemList->get_category_group(-)
+	/**
+	 * {@internal ItemList::get_category_group()}}
 	 */
 	function get_category_group()
 	{
@@ -573,12 +573,13 @@ class ItemList extends DataObjectList
 		// Go back now so that the fetch row doesn't skip one!
 		$this->row_num --;
 
-		return $this->row;
+		$this->last_Item = new Item( $this->row ); // COPY !
+		return $this->last_Item;
 	}
 
 
-	/*
-	 * ItemList->get_item(-)
+	/**
+	 * {@internal ItemList::get_item()}}
 	 */
 	function get_item( )
 	{

@@ -39,13 +39,13 @@ while( $Item = $MainList->get_item() )
   <link><?php permalink_single() ?></link>
   <dc:date><?php $Item->date( 'isoZ', true ) ?></dc:date>
   <dc:creator><?php $Item->Author->prefered_name( 'xml' ) ?></dc:creator>
-  <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
+  <dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
   <description><?php
-    the_link( '', ' ', 'xml' );
+    $Item->url_link( '', ' ', 'xml' );
     $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
   ?></description>
   <content:encoded><![CDATA[<?php
-    the_link( '<p>', '</p>' );
+    $Item->url_link( '<p>', '</p>' );
     $Item->content()
   ?>]]></content:encoded>
 </item>

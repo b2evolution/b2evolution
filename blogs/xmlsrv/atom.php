@@ -29,7 +29,7 @@
 		<modified><?php $Item->date( 'isoZ', true ) ?></modified>
 		<issued><?php $Item->date( 'isoZ', true ) ?></issued>
 		<content type="text/html" mode="escaped"><![CDATA[<?php
-			the_link( '<p>', '</p>' );
+			$Item->url_link( '<p>', '</p>' );
 			$Item->content()
 		?>]]></content>
 	</entry>

@@ -30,11 +30,11 @@
       <?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
       <guid isPermaLink="false"><?php the_ID() ?>@<?php echo $baseurl ?></guid>
       <description><?php
-        the_link( '', ' ', 'xml' );
+        $Item->url_link( '', ' ', 'xml' );
         $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
       ?></description>
       <content:encoded><![CDATA[<?php
-        the_link( '<p>', '</p>' );
+        $Item->url_link( '<p>', '</p>' );
         $Item->content()
       ?>]]></content:encoded>
       <comments><?php comments_link( '', 1, 1 ) ?></comments>

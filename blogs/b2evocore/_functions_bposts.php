@@ -472,6 +472,8 @@ function the_title(
  * the_link(-)
  *
  * Display post link
+ *
+ * @deprecated deprecated by {@link Item::url_link()}
  */
 function the_link( $before='', $after='', $format = 'htmlbody' ) 
 {
