@@ -270,6 +270,7 @@ function create_locales()
 		loc_timefmt varchar(10) NOT NULL default 'H:i:s',
 		loc_name varchar(40) NOT NULL default '',
 		loc_messages varchar(20) NOT NULL default '',
+		loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
 		loc_enabled tinyint(4) NOT NULL default '1',
 		PRIMARY KEY loc_locale( loc_locale )
 	) COMMENT='saves available locales'";

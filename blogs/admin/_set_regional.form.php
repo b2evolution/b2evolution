@@ -8,14 +8,17 @@
  *
  * @package admin
  */
+param( 'notransext', 'int', 0 );
+param( 'newtemplate', 'string', '' );
+
 if( !$locales[$default_locale]['enabled'] )
 { // default locale is not enabled
 	echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 }
 ?>
-<form class="fform" name="form" action="b2options.php" method="post">
+<form class="fform" name="form" action="b2options.php?tab=regional" method="post">
 	<input type="hidden" name="action" value="update" />
-	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
+	<input type="hidden" name="notransext" value="<?php echo $notransext;?>" />
 	
 	<fieldset>
 		<legend><?php echo T_('Regional settings') ?></legend>
@@ -32,9 +35,9 @@ if( !$locales[$default_locale]['enabled'] )
 	
 	<div style="text-align:center;padding:1em;">
 	<a href="?tab=regional<?php
-	if( !isset($_GET['transperc']) )
+	if( !$notransext )
 	{
-		echo '&amp;transperc=1">' . T_('Hide translation percentages');
+		echo '&amp;notransext=1">' . T_('Hide translation percentages');
 		$showtranslationpercentage = 1;
 	}
 	else
@@ -47,25 +50,24 @@ if( !$locales[$default_locale]['enabled'] )
 	
 	<table class="thin" border="1">
 	<tr>
-		<th><?php echo  T_('Locale') ?></th>
-		<th><?php echo  T_('Enabled') ?></th>
-		<th><?php echo  T_('Name') ?></th>
-		<th><?php echo  T_('Charset') ?></th>
-		<th><?php echo  T_('Date fmt') ?></th>
-		<th><?php echo  T_('Time fmt') ?></th>
-		<th><?php echo  T_('Lang file') ?></th>
+		<th><?php echo T_('Locale') ?></th>
+		<th><?php echo T_('Enabled') ?></th>
+		<th><?php echo T_('Name') ?></th>
+		<th><?php echo T_('Date fmt') ?></th>
+		<th><?php echo T_('Time fmt') ?></th>
 		<?php if( $showtranslationpercentage )
 		{?>
-		<th><?php echo  T_('Strings') ?></th>
-		<th><?php echo  T_('Translated') ?></th>
+		<th><?php echo T_('Strings') ?></th>
+		<th><?php echo T_('Translated') ?></th>
 		<?php if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
 		{ ?>
-		<th><?php echo  T_('Extract') ?></th>
+		<th><?php echo T_('Extract') ?></th>
 		<?php }
 		} ?>
+		<th></th>
 	</tr>
 	<?php
-	$i = 0; // counter to distinguish POSTed locales later, array trick (name="loc_enabled[]") fails for unchecked boxes
+	$i = 0; // counter to distinguish POSTed locales later
 	foreach( $locales as $lkey => $lval )
 	{
 		$i++;
@@ -73,30 +75,24 @@ if( !$locales[$default_locale]['enabled'] )
 		<tr style="text-align:center">
 		<td style="text-align:left">
 			<?php
-			echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />';
+			echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />'
+			#.$lval['priority'].'. '
+			;
 			locale_flag( $lkey );
 			echo'
 			<strong>'.$lkey.'</strong>
 		</td>
 		<td>
 			<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
-		'#<input type="text" name="loc_'.$i.'_locale" value="'.$lkey.'" />
-		.'
 		</td>
 		<td>
 			<input type="text" name="loc_'.$i.'_name" value="'.$locales[$lkey]['name'].'" maxlength="40" size="17" />
-		</td>
-		<td>
-			<input type="text" name="loc_'.$i.'_charset" value="'.$locales[$lkey]['charset'].'" maxlength="15" size="12" />
 		</td>
 		<td>
 			<input type="text" name="loc_'.$i.'_datefmt" value="'.$locales[$lkey]['datefmt'].'" maxlength="10" size="6" />
 		</td>
 		<td>
 			<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="6" />
-		</td>
-		<td>
-			<input type="text" name="loc_'.$i.'_messages" value="'.$locales[$lkey]['messages'].'" maxlength="10" size="6" />
 		</td>';
 
 		if( $showtranslationpercentage )
@@ -105,9 +101,7 @@ if( !$locales[$default_locale]['enabled'] )
 			$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 			if( ! is_file( $po_file ) )
 			{
-				?>
-					<td colspan="3">No language file...</td>
-				<?php
+				echo '<td colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
 			}
 			else
 			{	// File exists:
@@ -183,27 +177,94 @@ if( !$locales[$default_locale]['enabled'] )
 				}
 			}
 		} // show message file percentage/extraction
-		echo '</tr>';
+		echo '
+		<td align="left">
+		';
+		if( $i > 1 )
+		{ // show "move prio up"
+			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" border="0" alt="'.T_('up').'" title="'.T_('Move priority up').'" /></a>';
+		}
+		else
+		{
+			echo '<img src="img/blank.gif" width="14" border="0" />';
+		}
+
+		if( $i < count($locales) )
+		{ // show "move prio down"
+			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" border="0" alt="'.T_('down').'" title="'.T_('Move priority down').'" /></a>';
+		}
+		else
+		{
+			echo '<img src="img/blank.gif" width="14" border="0" />';
+		}
+		echo '
+		<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;newtemplate='.$lkey.'#createnew"><img src="img/new.png" border="0" alt="'.T_('new').'" title="'.T_('Use as template for &quot;Create New&quot; form').'" /></a>
+		';
+		if( isset($lval[ 'fromdb' ]) )
+		{ // allow to delete locales loaded from db
+			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" border="0" alt="X" title="'.T_('Delete from DB!').'" /></a>';
+		}
+		echo '
+		</tr>';
 	}
 	?>
 	</table>
-	<br />
 	<div style="text-align:center;padding:1em;">
-	<a href="?tab=regional&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" alt="X" title="<?php echo T_('Reset to defaults');?>" border="0" /></a>
+	<a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" alt="X" title="<?php echo T_('Reset to defaults');?>" border="0" /></a>
 	<br /><?php echo T_('Reset to defaults');?>!
 	</div>
-	</fieldset>
-
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ ?>
-	<fieldset>
-		<fieldset>
-			<div <?php echo ( $tab == 'regional' ) ? 'style="text-align:center"' : 'class="input"'?>>
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
-			</div>
-		</fieldset>
+	{
+	?>
+	<div style="text-align:center;padding-bottom:1em;">
+		<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
+		<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
+	</div>
 	</fieldset>
-	<?php } ?>
+	</form>
+	
+	<fieldset style="text-align:center;" id="createnew">
+		<legend><?php echo T_('Edit / Create new Locale') ?></legend>
+		<p><?php echo T_('This form lets you edit an existing locale or create a new one, if the locale does not exist yet. Use the &quot;New&quot; icon next to the existing locales to use them as template here.')?></p>
+		<form method="post" action="b2options.php?tab=regional" name="createnew">
+			<input type="hidden" name="notransext" value="<?php echo $notransext;?>" />
 
+			<?php
+			// read template
+			
+			if( isset($locales[$newtemplate]) )
+			{
+				$ltemplate = $locales[ $newtemplate ];
+			}?>
+			<table>
+			<tr>
+			<th><?php echo T_('Locale') ?></th>
+			<th><?php echo T_('Enabled') ?></th>
+			<th><?php echo T_('Name') ?></th>
+			<th><?php echo T_('Charset') ?></th>
+			<th><?php echo T_('Date fmt') ?></th>
+			<th><?php echo T_('Time fmt') ?></th>
+			<th><?php echo T_('Lang file') ?></th>
+			</tr><tr>
+			<?php
+			echo '
+			<input type="hidden" name="action" value="createnew" />
+			<td><input type="text" name="newloc_locale" value="'.$newtemplate.'" maxlength="20" size="6" /></td>
+			<td><input type="checkbox" name="newloc_enabled" value="1"'.(isset($ltemplate['enabled']) && $ltemplate['enabled'] ? 'checked="checked"' : '').' /></td>
+			<td><input type="text" name="newloc_name" value="'.(isset($ltemplate['name']) ? $ltemplate['name'] : '').'" maxlength="40" size="17" /></td>
+			<td><input type="text" name="newloc_charset" value="'.(isset($ltemplate['charset']) ? $ltemplate['charset'] : '').'" maxlength="15" size="12" /></td>
+			<td><input type="text" name="newloc_datefmt" value="'.(isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : '').'" maxlength="10" size="6" /></td>
+			<td><input type="text" name="newloc_timefmt" value="'.(isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : '').'" maxlength="10" size="6" /></td>
+			<td><input type="text" name="newloc_messages" value="'.(isset($ltemplate['messages']) ? $ltemplate['messages'] : '').'" maxlength="10" size="6" /></td>
+			<td><input type="submit" name="submit" value="'.T_('Create').'" class="search" onClick="var Locales = new Array(\''.implode("', '", array_keys($locales)).'\'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};"></td>
+			
+			</tr>
+			</table>
+			
+			<p>'.sprintf(T_('We\'ll use the flag out of subdirectories from <code>%s</code>, where the filename is equal to the language part of the locale (characters 4-5; file extension is gif).'), '/'.$img_subdir.'/flags/').'</p>
+			
+		</form>
+	</fieldset>';
+	
+	}?>
 </form>

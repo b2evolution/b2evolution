@@ -1969,15 +1969,15 @@ msgstr "Wähle als HAUPT-Kategorie"
 
 #: ..\..\..\admin\_edit_form.php:369
 msgid "Note: Cross posting among multiple blogs is enabled."
-msgstr "Beachte: Quer-Beiträge in mehrere Blogs sind möglich."
+msgstr "Beachte: Quer-Einträge in mehrere Blogs sind möglich."
 
 #: ..\..\..\admin\_edit_form.php:380
 msgid "Note: Cross posting among multiple blogs is currently disabled."
-msgstr "Beachte: Quer-Beiträge in mehrere Blogs sind derzeit nicht möglich."
+msgstr "Beachte: Quer-Einträge in mehrere Blogs sind derzeit nicht möglich."
 
 #: ..\..\..\admin\_edit_form.php:382
 msgid "Note: Cross posting among multiple categories is currently disabled."
-msgstr "Beachte: Quer-Beiträge in mehrere Kategorien ist derzeit nicht möglich."
+msgstr "Beachte: Quer-Einträge in mehrere Kategorien ist derzeit nicht möglich."
 
 #: ..\..\..\admin\_edit_form.php:392
 #: ..\..\..\admin\_edit_showposts.php:202

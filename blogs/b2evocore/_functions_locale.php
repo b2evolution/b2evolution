@@ -36,6 +36,11 @@ elseif( $use_l10n == 2 )
 	{
 		global $trans, $current_locale, $locales;
 
+		if( empty($string) )
+		{ // don't return .po file info in this case
+			return '';
+		}
+		
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
 		
@@ -340,27 +345,71 @@ function locale_from_httpaccept()
 }
 
 /**
+ * user sort function to sort locales by priority
+ *
+ * 1 is highest priority.
+ *
+ */
+function locale_priosort( $a, $b )
+{
+	return $a['priority'] - $b['priority'];
+}
+
+/**
  * load locales from DB into $locales array. Also sets $default_locale.
  *
  */
 function locale_overwritefromDB()
 {
 	global $tablelocales, $DB, $locales, $default_locale;
+	
+	$priocounter = 0;
+	$usedprios = array(0);
+	
 	$query = 'SELECT
-						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled
+						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled
 						FROM '. $tablelocales;
 	$rows = $DB->get_results( $query, ARRAY_A );
 	if( count( $rows ) ) foreach( $rows as $row )
 	{
-			$locales[ $row['loc_locale'] ] = array(
-				'charset'  => $row[ 'loc_charset' ],
-				'datefmt'  => $row[ 'loc_datefmt' ],
-				'timefmt'  => $row[ 'loc_timefmt' ],
-				'name'     => $row[ 'loc_name' ],
-				'messages' => $row[ 'loc_messages' ],
-				'enabled'  => $row[ 'loc_enabled' ]		
-			);
+		while( in_array($row['loc_priority'], $usedprios) )
+		{ // find next priority
+			$priocounter++;
+			$row['loc_priority'] = $priocounter;
+		}
+		$usedprios[] = $row['loc_priority'];
+				
+		$locales[ $row['loc_locale'] ] = array(
+			'charset'  => $row[ 'loc_charset' ],
+			'datefmt'  => $row[ 'loc_datefmt' ],
+			'timefmt'  => $row[ 'loc_timefmt' ],
+			'name'     => $row[ 'loc_name' ],
+			'messages' => $row[ 'loc_messages' ],
+			'priority' => $row[ 'loc_priority' ],
+			'enabled'  => $row[ 'loc_enabled' ],
+			'fromdb'   => 1
+		);
 	}
+	
+	// set default priorities, if nothing was set in DB
+	// newly added locales (in conf/_locale.php) will get prio 1,
+	// equal priorities will be shifted down.
+	if( count($rows) != count($locales) )
+	{ // we have locales from conf file that need a priority
+		ksort( $locales );
+		foreach( $locales as $lkey => $lval ) if( !isset($lval['priority']) )
+		{
+			while( in_array( $locales[$lkey]['priority'], $usedprios) )
+			{
+				$priocounter++;
+				$locales[$lkey]['priority'] = $priocounter;
+			}
+			$usedprios[] = $locales[$lkey]['priority'];
+		}
+	}
+	
+	// sort by priority
+	uasort( $locales, 'locale_priosort' );
 	
 	// overwrite default_locale from DB settings - if enabled.
 	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
@@ -373,6 +422,64 @@ function locale_overwritefromDB()
 			$default_locale = 'en-EU';
 		
 	}
+}
+
+
+/**
+ * write $locales array to DB table
+ *
+ * @author blueyed
+ */
+function locale_updateDB()
+{
+	global $locales, $tablelocales, $DB;
+	
+	$templocales = $locales;
+			
+	$lnr = 0;
+	foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
+	{
+		$lfield = $matches[2];
+			
+		if( $matches[1] != $lnr )
+		{ // we have a new locale
+			$lnr = $matches[1];
+			$plocale = $pval;
+			
+			// checkboxes default to 0
+			$templocales[ $plocale ]['enabled'] = 0;
+		}
+		elseif( $lnr != 0 )  // be sure to have catched a locale before
+		{
+			$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
+		}
+		
+	}
+	
+	$locales = $templocales;
+	
+	$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
+	foreach( $locales as $localekey => $lval )
+	{
+		if( empty($lval['messages']) )
+		{ // if not explicit messages file is given we'll translate the locale
+			$lval['messages'] = strtr($localekey, '-', '_');
+		}
+		$query .= "(
+		'$localekey',
+		'{$lval['charset']}',
+		'{$lval['datefmt']}',
+		'{$lval['timefmt']}',
+		'{$lval['name']}',
+		'{$lval['messages']}',
+		'{$lval['priority']}',
+		'{$lval['enabled']}'
+		), ";
+	}
+	$query = substr($query, 0, -2);
+	$q = $DB->query($query);
+	
+	return (bool)$q;
 }
 
 

@@ -48,11 +48,6 @@ if( $use_obhandler )
 { // register output buffer handler
 	ob_start( 'obhandler' );
 }
-/* @outforrelease
-if( $use_gzipcompression && extension_loaded('zlib') )
-{	// gzipping the output of the script
-	ob_start( 'ob_gzhandler' );
-}*/
 
 
 // Connecting to the db:
@@ -82,6 +77,7 @@ $ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
 // Plug-ins init:
 $Renderer = & new Renderer();
 $Toolbars = & new Toolbars();
+
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;

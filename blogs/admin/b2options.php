@@ -14,6 +14,10 @@ $admin_tab = 'options';
 $admin_pagetitle = T_('Settings');
 param( 'action', 'string' );
 param( 'tab', 'string', 'general' );
+param( 'prioup', 'string', '' );
+param( 'priodown', 'string', '' );
+param( 'delete', 'string', '' );
+
 switch( $tab )
 {
 	case 'general':
@@ -31,7 +35,9 @@ require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
 
-if( $action == 'update' )
+if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
+		|| !empty($prioup) || !empty($priodown) || !empty($delete)
+	)
 {
 	// Check permission:
 	$current_User->check_perm( 'options', 'edit', true );
@@ -73,68 +79,263 @@ if( $action == 'update' )
 
 
 		case 'regional':
-			// UPDATE regional settings
-			
-			param( 'newdefault_locale', 'string', true);
-			param( 'newtime_difference', 'integer', true );
-			
-			$templocales = $locales;
-			
-			$lnr = 0;
-			foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
-			{
-				$lfield = $matches[2];
-				
-				if( $matches[1] != $lnr )
-				{ // we have a new locale
-					$lnr = $matches[1];
-					$plocale = $pval;
+			switch( $action )
+			{ // in case of regional actions
+				// UPDATE regional settings
+				case 'update':
+					param( 'newdefault_locale', 'string', true);
+					param( 'newtime_difference', 'integer', true );
 					
-					// checkboxes default to 0
-					$templocales[ $plocale ]['enabled'] = 0;
-				}
-				elseif( $lnr != 0 )  // be sure to have catched a locale before
-				{
-					$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
-				}
+					if( locale_updateDB() )
+					{
+						$status_update[] = T_('Regional settings updated.');
+					}
+					
+					if( $newdefault_locale != $default_locale )
+					{
+						// set default locale
+						$query = "UPDATE $tablesettings	SET
+									default_locale = '$newdefault_locale',
+									time_difference = $newtime_difference";
+						$q = $DB->query($query);
+						
+						$default_locale = $newdefault_locale;
+						
+						$status_update[] = T_('New default locale set.');
+					}
+					break;
 				
+				// CREATE/EDIT locale
+				case 'createnew':
+					param( 'newloc_locale', 'string', true);
+					param( 'newloc_enabled', 'integer', 0);
+					param( 'newloc_name', 'string', true);
+					param( 'newloc_charset', 'string', true);
+					param( 'newloc_datefmt', 'string', true);
+					param( 'newloc_timefmt', 'string', true);
+					param( 'newloc_messages', 'string', true);
+					
+					$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
+						VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt', '$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
+					$q = $DB->query($query);
+					
+					if( mysql_affected_rows() )
+					{
+						if( mysql_affected_rows() == 2)
+						{
+							$status_update[] = sprintf(T_("Updated locale '%s'."), $newloc_locale);
+						}
+						else
+						{
+							$status_update[] = sprintf(T_("Created locale '%s'."), $newloc_locale);
+						}
+					}
+					break;
+
+				
+				// RESET locales in DB
+				case 'reset':
+					// reload locales
+					unset( $locales );
+					include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
+					@include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_overrides_TEST.php' );
+					
+					// delete everything from locales table
+					$query = "DELETE FROM $tablelocales WHERE 1";
+					$q = $DB->query($query);
+					
+					// reset default_locale
+					$query = "UPDATE $tablesettings SET default_locale = '$default_locale'";
+					$q = $DB->query($query);
+					
+					$status_update[] = T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.');
+					break;
+				
+				// EXTRACT locale
+				case 'extract':
+					param( 'locale', 'string', true );
+					// Get PO file for that locale:
+					echo '<div class="panelinfo">';
+					echo '<h3>Extracting language file for ', $locale, '...</h3>';
+					$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po';
+					if( ! is_file( $po_file ) )
+					{
+						echo '<p class="error">'.sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po').'</p>';
+					}
+					else
+					{	// File exists:
+						// Get PO file for that locale:
+						$lines = file( $po_file);
+						$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
+						$all = 0;
+						$fuzzy=0;
+						$untranslated=0;
+						$translated=0;
+						$status='-';
+						$matches = array();
+						$sources = array();
+						$loc_vars = array();
+						$trans = array();
+						foreach ($lines as $line) 
+						{
+							// echo 'LINE:', $line, '<br />';
+							if(trim($line) == '' )	
+							{	// Blank line, go back to base status:
+								if( $status == 't' )
+								{	// ** End of a translation **:
+									if( $msgstr == '' )
+									{
+										$untranslated++;
+										// echo 'untranslated: ', $msgid, '<br />';
+									}
+									else
+									{
+										$translated++;
+										
+										// Inspect where the string is used
+										$sources = array_unique( $sources );
+										// echo '<p>sources: ', implode( ', ', $sources ), '</p>';
+										foreach( $sources as $source )
+										{
+											if( !isset( $loc_vars[$source]  ) ) $loc_vars[$source] = 1;
+											else $loc_vars[$source] ++;
+										}
+						
+										// Save the string
+										// $trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
+										// $trans[] = "\n\t\"$msgid\" => \"$msgstr\",";
+										$trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
+						
+									}
+								}
+								$status = '-';
+								$msgid = '';
+								$msgstr = '';
+								$sources = array();
+							}
+							elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches)) 
+							{	// Encountered an original text
+								$status = 'o';
+								$msgid = $matches[1];
+								// echo 'original: "', $msgid, '"<br />';
+								$all++;
+							}
+							elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches)) 
+							{	// Encountered a translated text
+								$status = 't';
+								$msgstr = $matches[1];
+								// echo 'translated: "', $msgstr, '"<br />';
+							}
+							elseif( preg_match( '#^"(.*)"#', $line, $matches)) 
+							{	// Encountered a followup line
+								if ($status=='o') 
+									$msgid .= $matches[1];
+								elseif ($status=='t')
+									$msgstr .= $matches[1];
+							}
+							elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches)) 
+							{	// Encountered a source code location comment
+								// echo $matches[0],'<br />';
+								$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
+								// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
+								$c = preg_match_all( '@ ../../../([^/:]*)@', $sourcefiles, $matches);
+								for( $i = 0; $i < $c; $i++ )
+								{
+									$sources[] = $matches[1][$i];
+								}
+								// echo '<br />';
+							}
+							elseif(strpos($line,'#, fuzzy') === 0) 
+								$fuzzy++;
+						}
+						
+						
+						ksort( $loc_vars );
+						foreach( $loc_vars as $source => $c )
+						{
+							echo $source, ' = ', $c, '<br />';
+						}
+						
+						$outfile = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/_global.php';
+						$fp = fopen( $outfile, 'w+' );
+						fwrite( $fp, "<?php\n" );
+						fwrite( $fp, "/*\n" );
+						fwrite( $fp, " * Global lang file\n" );
+						fwrite( $fp, " * This file was generated automatically from messages.po\n" );
+						fwrite( $fp, " */\n" );
+						fwrite( $fp, "\n\$trans['".$locales[$locale]['messages']."'] = array(" );
+						// echo '<pre>';
+						foreach( $trans as $line )
+						{
+							// echo htmlspecialchars( $line );
+							fwrite( $fp, $line );
+						}
+						// echo '</pre>';
+						fwrite( $fp, "\n);\n?>" );
+						fclose( $fp );
+					}
+					echo '</div>';
+					
+					break;
+				
+				default:
+					// DELETE locale from DB
+					if( !empty($delete) )
+					{
+						$query = "DELETE FROM $tablelocales WHERE loc_locale = '$delete'";
+						$q = $DB->query( $query );
+						
+						// reload locales
+						unset( $locales );
+						include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
+						@include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_overrides_TEST.php' );
+						
+						$status_update[] = sprintf(T_("Deleted locale '%s' from database."), $delete);
+					}
+					// SWITCH PRIORITIES -----------------
+					elseif( !empty($prioup) )
+					{
+						$switchcond = 'return ($lval[\'priority\'] > $i && $lval[\'priority\'] < $locales[ $prioup ][\'priority\']);';
+						$i = -1;
+						$lswitch = $prioup;
+					}
+					elseif( !empty($priodown) )
+					{
+						$switchcond = 'return ($lval[\'priority\'] < $i && $lval[\'priority\'] > $locales[ $priodown ][\'priority\']);';
+						$i = 256;
+						$lswitch = $priodown;
+					}
+					
+					if( isset($switchcond) )
+					{ // we want to switch priorities
+						
+						foreach( $locales as $lkey => $lval )
+						{ // find nearest priority
+							if( eval($switchcond) )
+							{
+								// remember it
+								$i = $lval['priority'];
+								$lswitchwith = $lkey;
+							}
+						}
+						if( $i > -1 && $i < 256 )
+						{	// switch
+							#echo 'Switching prio '.$locales[ $lswitchwith ]['priority'].' with '.$locales[ $lswitch ]['priority'].'<br />';
+							$locales[ $lswitchwith ]['priority'] = $locales[ $lswitch ]['priority'];
+							$locales[ $lswitch ]['priority'] = $i;
+							
+							$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )	VALUES
+								( '$lswitch', '{$locales[ $lswitch ]['charset']}', '{$locales[ $lswitch ]['datefmt']}', '{$locales[ $lswitch ]['timefmt']}', '{$locales[ $lswitch ]['name']}', '{$locales[ $lswitch ]['messages']}', '{$locales[ $lswitch ]['priority']}', '{$locales[ $lswitch ]['enabled']}'),
+								( '$lswitchwith', '{$locales[ $lswitchwith ]['charset']}', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '{$locales[ $lswitchwith ]['enabled']}')";
+							$q = $DB->query( $query );
+							
+							$status_update[] = T_('Switched priorities.');
+						}
+						
+					}
+					break;
 			}
-			
-			$locales = $templocales;
-			
-			$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled ) VALUES ";
-			foreach( $locales as $localekey => $lval )
-			{
-				if( !isset($lval['messages']) )
-				{ // if not explicit messages file is given we'll translate the locale
-					$lval['messages'] = strtr($localekey, '-', '_');
-				}
-				$query .= "(
-				'$localekey',
-				'{$lval['charset']}',
-				'{$lval['datefmt']}',
-				'{$lval['timefmt']}',
-				'{$lval['name']}',
-				'{$lval['messages']}',
-				'{$lval['enabled']}'
-				), ";
-			}
-			$query = substr($query, 0, -2);
-			$q = $DB->query($query);
-			
-			if( $newdefault_locale != $default_locale )
-			{
-				// set default locale
-				$query = "UPDATE $tablesettings	SET
-							default_locale = '$newdefault_locale',
-							time_difference = $newtime_difference";
-				$q = $DB->query($query);
-				$default_locale = $newdefault_locale;
-				$status_update[] = T_('New default locale set.');
-			}
-			
-			$status_update[] = T_('Regional settings updated.');
-		
+			locale_overwritefromDB();
 			break;
 
 
@@ -143,6 +344,7 @@ if( $action == 'update' )
 			break;
 		
 	}
+	
 	if( count($status_update) )
 	{
 		echo '<div class="panelinfo">';
@@ -150,150 +352,7 @@ if( $action == 'update' )
 		echo '</div>';
 	}
 }
-elseif( $action == 'reset' && $tab == 'regional' )
-{
-	unset( $locales );
-	include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
-	
-	// delete everything from locales table
-	$query = "DELETE FROM $tablelocales WHERE 1";
-	$q = $DB->query($query);
-	echo '<div class="panelinfo"><p>'.T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.').'</p></div>';
-	
-	// reset default_locale
-	$query = "UPDATE $tablesettings SET default_locale = '$default_locale'";
-	$q = $DB->query($query);
-	
-	// clear settings cache
-	$cache_settings = '';
-}
-elseif( $action == 'extract' && $tab == 'regional' )
-{
-	param( 'locale', 'string', true );
-	// Get PO file for that locale:
-	echo '<div class="panelinfo">';
-	echo '<h3>Extracting language file for ', $locale, '...</h3>';
-	$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po';
-	if( ! is_file( $po_file ) )
-	{
-		echo '<p>', T_('File not found.'), '</p>';
-	}
-	else
-	{	// File exists:
-		// Get PO file for that locale:
-		$lines = file( $po_file);
-		$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
-		$all = 0;
-		$fuzzy=0;
-		$untranslated=0;
-		$translated=0;
-		$status='-';
-		$matches = array();
-		$sources = array();
-		$loc_vars = array();
-		$trans = array();
-		foreach ($lines as $line) 
-		{
-			// echo 'LINE:', $line, '<br />';
-			if(trim($line) == '' )	
-			{	// Blank line, go back to base status:
-				if( $status == 't' )
-				{	// ** End of a translation **:
-					if( $msgstr == '' )
-					{
-						$untranslated++;
-						// echo 'untranslated: ', $msgid, '<br />';
-					}
-					else
-					{
-						$translated++;
-						
-						// Inspect where the string is used
-						$sources = array_unique( $sources );
-						// echo '<p>sources: ', implode( ', ', $sources ), '</p>';
-						foreach( $sources as $source )
-						{
-							if( !isset( $loc_vars[$source]  ) ) $loc_vars[$source] = 1;
-							else $loc_vars[$source] ++;
-						}
-		
-						// Save the string
-						// $trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
-						// $trans[] = "\n\t\"$msgid\" => \"$msgstr\",";
-						$trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
-		
-					}
-				}
-				$status = '-';
-				$msgid = '';
-				$msgstr = '';
-				$sources = array();
-			}
-			elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches)) 
-			{	// Encountered an original text
-				$status = 'o';
-				$msgid = $matches[1];
-				// echo 'original: "', $msgid, '"<br />';
-				$all++;
-			}
-			elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches)) 
-			{	// Encountered a translated text
-				$status = 't';
-				$msgstr = $matches[1];
-				// echo 'translated: "', $msgstr, '"<br />';
-			}
-			elseif( preg_match( '#^"(.*)"#', $line, $matches)) 
-			{	// Encountered a followup line
-				if ($status=='o') 
-					$msgid .= $matches[1];
-				elseif ($status=='t')
-					$msgstr .= $matches[1];
-			}
-			elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches)) 
-			{	// Encountered a source code location comment
-				// echo $matches[0],'<br />';
-				$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
-				// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
-				$c = preg_match_all( '@ ../../../([^/:]*)@', $sourcefiles, $matches);
-				for( $i = 0; $i < $c; $i++ )
-				{
-					$sources[] = $matches[1][$i];
-				}
-				// echo '<br />';
-			}
-			elseif(strpos($line,'#, fuzzy') === 0) 
-				$fuzzy++;
-		}
-		
-		
-		ksort( $loc_vars );
-		foreach( $loc_vars as $source => $c )
-		{
-			echo $source, ' = ', $c, '<br />';
-		}
-		
-		$outfile = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/_global.php';
-		$fp = fopen( $outfile, 'w+' );
-		fwrite( $fp, "<?php\n" );
-		fwrite( $fp, "/*\n" );
-		fwrite( $fp, " * Global lang file\n" );
-		fwrite( $fp, " * This file was generated automatically from messages.po\n" );
-		fwrite( $fp, " */\n" );
-		fwrite( $fp, "\n\$trans['".$locales[$locale]['messages']."'] = array(" );
-		// echo '<pre>';
-		foreach( $trans as $line )
-		{
-			// echo htmlspecialchars( $line );
-			fwrite( $fp, $line );
-		}
-		// echo '</pre>';
-		fwrite( $fp, "\n);\n?>" );
-		fclose( $fp );
-	}
-	echo '</div>';
-}
-	
-	
+
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
 ?>
