@@ -51,7 +51,7 @@ require_once dirname(__FILE__).'/_dataobjectlist.class.php';
  *
  * @package evocore
  */
-class ArchiveList extends DataObjectList
+class ArchiveList extends Results
 {
 	var $blog;
 	var $archive_mode;
@@ -79,7 +79,7 @@ class ArchiveList extends DataObjectList
 		$show_statuses = array(),
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
-		$limit = '',
+		$limit = 100,
  		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 
@@ -125,74 +125,129 @@ class ArchiveList extends DataObjectList
 			$where_link = ' AND ';
 		}
 
-		if( !empty($limit) )
-		{
-			$limit = ' LIMIT 0,'.$limit;
-		}
+		$this->where = $where;
 
-
-		switch( $archive_mode )
+		switch( $this->archive_mode )
 		{
 			case 'monthly':
 				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
-				$this->request = 'SELECT YEAR('.$dbprefix.'datestart) AS year, MONTH('.$dbprefix.'datestart) AS month,
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
 																	COUNT(DISTINCT postcat_post_ID) AS count
-													FROM (T_posts INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
+													FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$where.'
+													'.$this->where.'
 													GROUP BY year, month
-													ORDER BY year DESC, month DESC
-													'.$limit;
+													ORDER BY year DESC, month DESC';
 				break;
 
 			case 'daily':
 				// ------------------------------- DAILY ARCHIVES -------------------------------------
-				$this->request = 'SELECT YEAR('.$dbprefix.'datestart) AS year, MONTH('.$dbprefix.'datestart) AS month,
-																	DAYOFMONTH('.$dbprefix.'datestart) AS day,
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
+																	DAYOFMONTH('.$this->dbprefix.'datestart) AS day,
 																	COUNT(DISTINCT postcat_post_ID) AS count
 													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$where.'
+													'.$this->where.'
 													GROUP BY year, month, day
-													ORDER BY year DESC, month DESC, day DESC
-													'.$limit;
+													ORDER BY year DESC, month DESC, day DESC';
 				break;
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$this->request = 'SELECT YEAR('.$dbprefix.'datestart) AS year, WEEK('.$dbprefix.'datestart) AS week,
-																	COUNT(DISTINCT postcat_'.$dbprefix.'ID) AS count
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, WEEK('.$this->dbprefix.'datestart) AS week,
+																	COUNT(DISTINCT postcat_'.$this->dbprefix.'ID) AS count
 													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$where.'
+													'.$this->where.'
 													GROUP BY year, week
-													ORDER BY year DESC, week DESC
-													'.$limit;
+													ORDER BY year DESC, week DESC';
 				break;
 
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-				$this->request = 'SELECT DISTINCT '.$dbIDname.', '.$dbprefix.'datestart, '.$dbprefix.'title
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_'.$dbprefix.'ID)
+				$sql = 'SELECT DISTINCT '.$this->dbIDname.', '.$this->dbprefix.'datestart, '.$this->dbprefix.'title
+													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_'.$this->dbprefix.'ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$where.'
-													ORDER BY '.$dbprefix.'datestart DESC
-													'.$limit;
+													'.$this->where.'
+													ORDER BY '.$this->dbprefix.'datestart DESC';
 		}
 
-		// echo $this->request.'<br/>';
+		parent::Results( $sql, $limit, 'archivelist_', 1 );
 
-		$this->result = $DB->get_results( $this->request, ARRAY_A );;
+		$this->restart();
+	}
 
-		$this->result_num_rows = $DB->num_rows;
-		// echo 'rows='.$this->result_num_rows.'<br/>';
 
+	/**
+	 * Count the number of rows of the SQL result
+	 *
+	 * These queries are complex enough for us not to have to rewrite them:
+	 */
+	function count_total_rows()
+	{
+		switch( $this->archive_mode )
+		{
+			case 'monthly':
+				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) )
+													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+													.$this->where;
+				break;
+
+			case 'daily':
+				// ------------------------------- DAILY ARCHIVES -------------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
+																	DAYOFMONTH('.$this->dbprefix.'datestart) )
+													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+													.$this->where;
+				break;
+
+			case 'weekly':
+				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), WEEK('.$this->dbprefix.'datestart) )
+													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+													.$this->where;
+				break;
+
+			case 'postbypost':
+			default:
+				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT '.$this->dbIDname.' )
+													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+													.$this->where;
+		}
+
+		// echo $sql_count;
+
+		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
+
+		// echo 'total rows='.$this->total_rows;
+	}
+
+
+	/**
+	 * Rewind resultset
+	 *
+	 * {@internal DataObjectList::restart(-) }}
+	 */
+	function restart()
+	{
+		// Make sure query has executed at least once:
+		$this->query( $this->sql );
+
+		$this->current_idx = 0;
 		$this->arc_w_last = '';
 	}
 
 	/**
 	 * Getting next item in archive list
+	 *
+	 * WARNING: these are *NOT* Item objects!
 	 *
 	 * {@internal ArchiveList->get_item(-)}}
 	 */
@@ -205,33 +260,33 @@ class ArchiveList extends DataObjectList
 			return false;
 		}
 
-		$arc_row = $this->result[ $this->current_idx++ ];
+		$arc_row = $this->rows[ $this->current_idx++ ];
 
 		switch( $this->archive_mode )
 		{
 			case 'monthly':
-				$arc_year  = $arc_row['year'];
-				$arc_month = $arc_row['month'];
-				$arc_count = $arc_row['count'];
+				$arc_year  = $arc_row->year;
+				$arc_month = $arc_row->month;
+				$arc_count = $arc_row->count;
 				return true;
 
 			case 'daily':
-				$arc_year  = $arc_row['year'];
-				$arc_month = $arc_row['month'];
-				$arc_dayofmonth = $arc_row['day'];
-				$arc_count = $arc_row['count'];
+				$arc_year  = $arc_row->year;
+				$arc_month = $arc_row->month;
+				$arc_dayofmonth = $arc_row->day;
+				$arc_count = $arc_row->count;
 				return true;
 
 			case 'weekly':
-				$arc_year  = $arc_row['year'];
-				$arc_w = $arc_row['week'];
-				$arc_count = $arc_row['count'];
+				$arc_year  = $arc_row->year;
+				$arc_w = $arc_row->week;
+				$arc_count = $arc_row->count;
 				return true;
 
 			case 'postbypost':
 			default:
-				$post_ID = $arc_row['ID'];
-				$post_title = $arc_row[$this->dbprefix.'title'];
+				$post_ID = $arc_row->ID;
+				$post_title = $arc_row[$this->dbprefix->title];
 				return true;
 		}
 	}
@@ -239,6 +294,11 @@ class ArchiveList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/27 18:37:58  fplanque
+ * changed class inheritence
+ *
+ * Changed parent to Results!!
+ *
  * Revision 1.4  2004/12/13 21:29:58  fplanque
  * refactoring
  *

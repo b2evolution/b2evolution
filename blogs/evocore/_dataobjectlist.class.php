@@ -33,6 +33,8 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+require_once dirname(__FILE__).'/_results.class.php';
+
 /**
  * Data Object List Base Class
  *
@@ -42,7 +44,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * @version beta
  * @abstract
  */
-class DataObjectList
+class DataObjectList extends Results
 {
 	/**#@+
 	 * @access private
@@ -51,108 +53,69 @@ class DataObjectList
 	var $dbprefix;
 	var $dbIDname;
 	var $posts_per_page = 15;
-	/** 
-	 * SQL query string
-	 */
-	var $request;
-	/**
-	 * DB Result set (array)
-	 */
-	var $result;
-	/**
-	 * Number of rows in result set. Typically equal to $posts_per_page, once loaded.
-	 */
-	var $result_num_rows = 0;
+
 	/**
 	 * Object array
 	 */
 	var $Obj = array();
-	/**
-	 * Current object idx in array:
-	 */
-	var $current_idx = 0;
+
 	/**#@-*/
 
 	/** 
 	 * Constructor
+	 *
+	 * If provided, executes SQL query via parent Results object
 	 *
 	 * {@internal DataObjectList::DataObjectList(-) }}
 	 *
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
+	 * @param string SQL query
+	 * @param integer number of lines displayed on one screen
+	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
+	 * @param integer current page to display
+	 * @param string ordering of columns (special syntax)
 	 */
-	function DataObjectList( $tablename, $prefix = '', $dbIDname = 'ID' )
+	function DataObjectList( $tablename, $prefix = '', $dbIDname = 'ID', $sql = NULL, $limit = 20,
+														$param_prefix = '',	$page = NULL, $order = NULL )
 	{
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
-	}	
 
-	/**
-	 * Get nummber of rows available for display
-	 *
-	 * {@internal DataObjectList::get_num_rows(-) }}
-	 *
-	 * @return integer
-	 */
-	function get_num_rows()
-	{
-		return $this->result_num_rows;
+		if( !is_null( $sql ) )
+		{	// We have an SQL query to execute:
+			parent::Results( $sql, $limit, $param_prefix, $page, $order );
+		}
+		else
+		{	// TODO: do we want to autogenerate a query here???
+
+		}
 	}
 
-	/** 
-	 * Get next comment in list
+
+	/**
+	 * Get next object in list
 	 *
 	 * {@internal CommentList::get_next(-) }}
 	 */
-	function get_next()
+	function & get_next()
 	{
 		if( $this->current_idx >= $this->result_num_rows )
 		{	// No more comment in list
 			return false;
 		}
-		return  $this->Obj[$this->current_idx++];
+		return $this->Obj[$this->current_idx++];
 	}
 
-	/**
-	 * Rewind resultset
-	 *
-	 * {@internal DataObjectList::restart(-) }}
-	 */
-	function restart()
-	{
-		$this->current_idx = 0;
-	}
-	
-	
-	/**
-	 * Template function: display message if list is empty
-	 *
-	 * {@internal DataObjectList::display_if_empty(-) }}
-	 *
-	 * @param string String to display if list is empty
-   * @return true if empty
-	 */
-	function display_if_empty( $message = '' )
-	{
-		if( empty($message) ) 
-		{	// Default message:
-			$message = T_('Sorry, there is nothing to display...');
-		}
-
-		if( $this->result_num_rows == 0 )
-		{
-			echo $message;
-      return true;
-		}
-    return false;
-	}
-	
 }
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/27 18:37:58  fplanque
+ * changed class inheritence
+ *
  * Revision 1.2  2004/12/10 19:45:55  fplanque
  * refactoring
  *
@@ -161,6 +124,5 @@ class DataObjectList
  *
  * Revision 1.12  2004/10/12 10:27:18  fplanque
  * Edited code documentation.
- *
  */
 ?>

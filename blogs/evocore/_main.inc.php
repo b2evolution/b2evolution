@@ -293,8 +293,8 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
- * Revision 1.11  2004/12/23 21:19:41  fplanque
- * no message
+ * Revision 1.12  2004/12/27 18:37:58  fplanque
+ * changed class inheritence
  *
  * Revision 1.10  2004/12/21 21:18:38  fplanque
  * Finished handling of assigning posts/items to users

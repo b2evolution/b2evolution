@@ -51,18 +51,36 @@ class Results
 	var $limit;
 	var $page;
 	var $total_pages;
-	var $rows;
+	var $rows = NULL;
 	var $action;
 	var $col_headers = NULL;
 	var $cols = NULL;
 	var $params = NULL;
 
 	/**
+	 * Number of rows in result set for current page.
+	 */
+	var $result_num_rows = NULL;
+
+
+ 	/**
+	 * Current object idx in array:
+	 */
+	var $current_idx = 0;
+
+
+	/**
 	 * Constructor
+	 *
+	 *
+	 *
+	 * @todo fsaya: WHAT IS $action ????!!
 	 *
 	 * @param string SQL query
 	 * @param integer number of lines displayed on one screen
-	 * @param 
+	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
+	 * @param integer current page to display
+	 * @param string ordering of columns (special syntax)
 	 */
 	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL, $action = NULL)
 	{
@@ -71,10 +89,12 @@ class Results
  		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
-		$sql_count = $this->sql_count( $sql );
-		
+
 		// Count total rows:
-		if( $this->total_rows = $sql_count )
+		$this->count_total_rows();
+
+		// Check (default)page number & (default)order..
+		if( $this->total_rows )
 		{
 	    $this->total_pages = ceil($this->total_rows / $this->limit);
 
@@ -83,46 +103,122 @@ class Results
 				$page = param(  $param_prefix.'page', 'integer', 1, true );
 			}
 			$this->page = min( $page, $this->total_pages ) ;
-		
+
 			if( is_null($order) )
 			{ //attribution of an order type
 				$order = param( $param_prefix.'order', 'string', '', true );
 			}
 			$this->order = $order;
- 			
+
 			if( is_null($action) )
 			{ //attribution of a page number
 				$action = param(  'action', 'string', '', true );
 			}
 			$this->page = min( $page, $this->total_pages ) ;
 		}
-
-		else 
+		else
 		{ //there is no page to display
 	    $this->total_pages = 0;
 	    $this->$page = 0;
 		}
 	}
 
+
 	/**
-	 * return the number of rows of the SQL result
+	 * Rewind resultset
+	 *
+	 * {@internal DataObjectList::restart(-) }}
 	 */
-	function sql_count( $sql )
-	{	//test of the SQL query to avoid an SQL error in case of a query on one single table
-		if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql, $matches ) ) die( 'Error' );
+	function restart()
+	{
+		// Make sure query has exexuted:
+		$this->query( $this->sql );
+
+		$this->current_idx = 0;
+	}
+
+
+	/**
+	 * Run the query now!
+	 *
+	 * Will only run if it has not executed before.
+	 */
+	function query( $sql )
+	{
+		if( is_null( $this->rows ) )
+		{	// Query has not executed yet:
+
+			$this->asc = ' ASC ';
+
+			if( $this->order !== '' )
+			{ //$order is not an empty string
+				$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
+			}
+			elseif( isset( $this->col_orders ) )
+			{
+				$pos = $this->first_defined_order( $this->col_orders );
+				for( $i = 0; $i < $pos; $i++)
+				{
+					$this->order .= '-';
+				}
+				$this->order .= strstr( $this->asc, 'A' ) ? 'A' : 'D';
+			}
+
+			if( strpos( $this->sql, 'ORDER BY') === false )
+			{ //there is no ORDER BY clause in the original SQL query
+				$this->sql.=$this->order($this->order, $this->asc);
+			}
+			else
+			{ //the chosen order must be inserted into an existing ORDER BY clause
+				$split = split( 'ORDER BY', $this->sql );
+				$this->sql = $split['0']
+					.( ( $this->order($this->order, $this->asc) !== '' ) ? $this->order($this->order, $this->asc).', ' : ' ORDER BY ' )
+					.$split['1'];
+			}
+
+			// Limit to requested page
+			$sql = $this->sql.' LIMIT '.($this->page-1)*$this->limit.', '.$this->limit;
+
+			// Execute query and store results
+			$this->rows = $this->DB->get_results( $sql );
+
+			// Store row count
+	 		$this->result_num_rows = $this->DB->num_rows;
+
+   		// echo 'rows on page='.$this->result_num_rows;
+		}
+	}
+
+
+	/**
+	 * Count the number of rows of the SQL result
+	 *
+	 * This is done by dynamicallt modifying the SQL query and forging a COUNT() into it.
+	 */
+	function count_total_rows()
+	{
+		//test of the SQL query to avoid an SQL error in case of a query on one single table:
+		if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $this->sql, $matches ) )
+			die( 'Error' );
 
 		if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
-		{ //there was a semicolon or a JOIN clause in the FROM clause of the original query
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql );
+		{ // there was a coma or a JOIN clause in the FROM clause of the original query,
+			// We must use field names in the COUNT
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $this->sql );
+			// Get rid of any Aliases in colmun names:
+			$sql_count = preg_replace( '#\s+ AS \s+ (.*?) (,|FROM)#six', ' $2', $sql_count );
 		}
 		else
-		{
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql );
+		{	// Single table request: we must NOT use field names in the count.
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $this->sql );
 		}
-		return $this->DB->get_var ($sql_count );//count total rows
+		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
 	}
-		
+
+
 	/**
+	 * Display paged list/table based on object parameters
+	 *
 	 * @return int # of rows displayed
 	 */
 	function display()
@@ -178,37 +274,11 @@ class Results
 			return 0;
 		}
 
-		$this->asc = ' ASC ';
 
-		if( $this->order !== '' )
-		{ //$order is not an empty string
-			$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
-		}
-		elseif( isset( $this->col_orders ) )
-		{
-			$pos = $this->first_defined_order( $this->col_orders );
-			for( $i = 0; $i < $pos; $i++)
-			{
-				$this->order .= '-';
-			}
-			$this->order .= strstr( $this->asc, 'A' ) ? 'A' : 'D';
-		}
-	
-		if( strpos( $this->sql, 'ORDER BY') === false )
-		{ //there is no ORDER BY clause in the original SQL query
-			$this->sql.=$this->order($this->order, $this->asc);
-		}
-		else
-		{ //the chosen order must be inserted into an existing ORDER BY clause
-			$split = split( 'ORDER BY', $this->sql );
-			$this->sql = $split['0']
-				.( ( $this->order($this->order, $this->asc) !== '' ) ? $this->order($this->order, $this->asc).', ' : ' ORDER BY ' )
-				.$split['1'];
-		}
+		// Make sure query has executed and we're at the top of the resultset:
+		$this->restart();
 
-		//Execute real query
-		$this->rows = $this->DB->get_results( $this->sql.' LIMIT '.($this->page-1)*$this->limit.', '.$this->limit, ARRAY_A );
-		
+
 		if( is_null( $this->cols ) )
 		{	// Let's create default column definitions:
 			$this->cols = array();
@@ -242,24 +312,25 @@ class Results
 			$col_names = array();
 		
 			foreach( $this->col_headers as $col_header )
-			{
+			{ // For each column:
+
 				if( ($col_count==0) && isset($this->params['col_start_first']) )
-				{
+				{ // First column can get special formatting:
 					echo $this->params['colhead_start_first'];
 				}
 				else
-				{
+				{	// Regular columns:
 					echo $this->params['colhead_start'];
 				}
-				
+
 				if( isset( $this->col_orders[$col_count] ) && strcasecmp( $this->col_orders[$col_count], '' ) )
 				{ //the column can be ordered
-					
+
 					$order_asc = '';
 					$order_desc = '';
 					$color_asc = '';
 					$color_desc = '';
-					
+
 					for( $i = 0; $i < count($this->cols); $i++)
 					{ //construction of the values which can be taken by $order
 						if(	$i == $col_count )
@@ -273,17 +344,17 @@ class Results
 							$order_desc.='-';
 						}
 					}
-						
-					$color_asc = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'black' : 'grey' ; //color of the ascending arrow 
+
+					$color_asc = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'black' : 'grey' ; //color of the ascending arrow
 					$color_desc = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'black' : 'grey' ; //color of the descending arrow
-					
+
 						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).'" title="'.T_('Ascending Order')
 								.'" height="12px" width="11px" ><img src="../admin/img/'.$color_asc.'_arrow_down.gif" alt="A" title="'.T_('Ascending Order')
-								.'" ></a>' 
+								.'" ></a>'
 								.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).'" title="'.T_('Descending Order')
 								.'" height="12px" width="11px" ><img src="../admin/img/'.$color_desc.'_arrow_up.gif" alt="D" title="'.T_('Descending Order')
 								.'" ></a> ';
-				}	
+				}
 				echo $col_header;
 
  				echo $this->params['colhead_end'];
@@ -299,10 +370,12 @@ class Results
 
    	echo $this->params['body_start'];
 
-		$line_count = 0;
+
+		// Display lines!! :
 		foreach( $this->rows as $row )
 		{	// For each row/line:
-			if( ($line_count % 2) && isset($this->params['line_start_odd']) )
+
+			if( ($this->current_idx % 2) && isset($this->params['line_start_odd']) )
 				echo $this->params['line_start_odd'];
 			else
 				echo $this->params['line_start'];
@@ -310,13 +383,14 @@ class Results
 			$col_count = 0;
 			foreach( $this->cols as $col )
 			{	// For each column:
+
 				if( ($col_count==0) && isset($this->params['col_start_first']) )
 				 	echo $this->params['col_start_first'];
 				else
 					echo $this->params['col_start'];
 
 				// Make variable substitution:
-				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row['$1']).'", $col );
+				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $col );
 				// Make callback function substitution:
 				$output = preg_replace( '#% (.+?) %#ix', "'.$1.'", $output );
 
@@ -326,7 +400,7 @@ class Results
 				$col_count++;
 			}
 			echo $this->params['line_end'];
-			$line_count++;
+			$this->current_idx++;
 		}
    	echo $this->params['body_end'];
 
@@ -338,11 +412,12 @@ class Results
 
 		echo $this->params['after'];
 
-		return $line_count;
+		return $this->current_idx;
 	}
 
+
 	/**
-	 * return the way the table has to be ordered
+	 * Returns the way the list/table has to be ordered
 	 */
 	function order($order, $asc)
 	{	
@@ -359,8 +434,9 @@ class Results
 		return $sql_order;
 	}
 
+
 	/**
-	 * return the position of  first defined element of an array
+	 * Returns the position of first defined element of an array
 	 */
 	function first_defined_order($array)
 	{
@@ -379,7 +455,7 @@ class Results
 	
 	
 	/**
-	 * Display navigation text, based on template:
+	 * Displays navigation text, based on template:
 	 *
 	 * @param string template
 	 */
@@ -456,26 +532,28 @@ class Results
 			}
 	}
 
-	/*
-	 * returns the first page number to be displayed in the list
+
+	/**
+	 * Returns the first page number to be displayed in the list
 	 */
 	function first()
 	{
 		if( $this->page <= intval( $this->params['list_span']/2 ))
-		{ //the current page number is small
+		{ // the current page number is small
 			return 1;
 		}
 		elseif( $this->page > $this->total_pages-intval( $this->params['list_span']/2 ))
-		{ //the current page number is big
+		{ // the current page number is big
 			return max( 1, $this->total_pages-$this->params['list_span']+1);
 		}
 		else
-		{ //the current page number can be centered
-			return $this->page-intval($this->params['list_span']/2); 
+		{ // the current page number can be centered
+			return $this->page-intval($this->params['list_span']/2);
 		}
 	}
-	
-	/*
+
+
+	/**
 	 * returns the last page number to be displayed in the list
 	 */
 	function last()
@@ -489,8 +567,9 @@ class Results
 			return min( $this->total_pages, $this->first()+$this->params['list_span']-1 );
 		}
 	}
-	
-	/*
+
+
+	/**
 	 * returns the link to the first page, if necessary
 	 */
 	function display_first()
@@ -504,10 +583,11 @@ class Results
 			return NULL;
 		}
 	}
-	
-	/*
-	 * returns the link to the first page, if necessary
-	 */	
+
+
+	/**
+	 * returns the link to the last page, if necessary
+	 */
 	function display_last()
 	{
 		if( $this->last() < $this->total_pages )
@@ -519,8 +599,9 @@ class Results
 			return NULL;
 		}
 	}
-	
-	/*
+
+
+	/**
 	 * returns a link to previous pages, if necessary
 	 */
 	function display_prev()
@@ -532,8 +613,9 @@ class Results
 		}
 			
 	}
-	
-	/*
+
+
+	/**
 	 * returns a link to next pages, if necessary
 	 */
 	function display_next()
@@ -634,14 +716,53 @@ class Results
 		return $scroll;
 	}
 
+
+	/**
+	 * Get number of rows available for display
+	 *
+	 * {@internal DataObjectList::get_num_rows(-) }}
+	 *
+	 * @return integer
+	 */
+	function get_num_rows()
+	{
+		return $this->result_num_rows;
+	}
+
+
+	/**
+	 * Template function: display message if list is empty
+	 *
+	 * {@internal DataObjectList::display_if_empty(-) }}
+	 *
+	 * @param string String to display if list is empty
+   * @return true if empty
+	 */
+	function display_if_empty( $message = '' )
+	{
+		if( empty($message) )
+		{	// Default message:
+			$message = T_('Sorry, there is nothing to display...');
+		}
+
+		if( $this->result_num_rows == 0 )
+		{
+			echo $message;
+      return true;
+		}
+    return false;
+	}
+
 }
 
 
 
 /*
  * $Log$
- * Revision 1.4  2004/12/23 21:19:41  fplanque
- * no message
+ * Revision 1.5  2004/12/27 18:37:58  fplanque
+ * changed class inheritence
+ *
+ * Moved stuff down from DataObjectList class
  *
  * Revision 1.3  2004/12/17 20:39:48  fplanque
  * added sort orders and extended navigation

@@ -582,7 +582,11 @@ class ItemList extends DataObjectList
 		$this->restart();
 	}
 
-	// dummy mysql query for the preview
+
+
+	/**
+	 * dummy mysql query for the preview
+	 */
 	function preview_request()
 	{
 		// we need globals for the param function
@@ -951,8 +955,8 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
- * Revision 1.12  2004/12/23 21:19:41  fplanque
- * no message
+ * Revision 1.13  2004/12/27 18:37:58  fplanque
+ * changed class inheritence
  *
  * Revision 1.11  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
