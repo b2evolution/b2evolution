@@ -7,7 +7,7 @@
  */
 require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_hitlogs.php');	// referer logging
-$title = T_('Anti-Spam');
+$title = T_('Antispam');
 
 param( 'action', 'string' );
 param( 'confirm', 'string' );
@@ -17,16 +17,15 @@ require(dirname(__FILE__).'/_menutop_end.php');
 
 if ($user_level < 9 && ! $demo_mode) 
 {
-		die( '<p>'.T_('You have no right to view the blacklist.').'</p>' );
+		die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
 }
 
 switch( $action )
 {
-	// 		param( 'hit_ID', 'integer', true );	// Required!
 	case 'bankeyword':
-		if ($user_level < 9 && ! $demo_mode)
+		if ($user_level < 9)
 		{
-			die( '<p>'.T_('You have no right to ban domains.').'</p>' );
+			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
 		}
 
 		param( 'keyword', 'string', true );	// Required!
@@ -36,7 +35,7 @@ switch( $action )
 			// Show confirmation page:
 			?>
 			<div class="panelblock">
-				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
+				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
 				<?php ban_affected_comments($keyword, 'keyword') ?>
 				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ) ?></p>
 				<table class="thin">
@@ -80,12 +79,10 @@ switch( $action )
 				
 				<p><?php echo T_('Are you sure you want to continue?') ?></p>
 				<form action="b2antispam.php" method="get">
-					<p>
 					<input type="hidden" name="confirm" value="confirm" />
 					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
 					<input type="hidden" name="action" value="bankeyword" />
-					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
-					</p>
+					<input type="submit" value="<?php echo T_('Ban the keyword + delete matching hits and comments') ?>" class="search" />
 				</form>
 			</div>
 			<?php
@@ -118,9 +115,9 @@ switch( $action )
 		break;
 
 	case 'banhit':
-		if ($user_level < 9 && ! $demo_mode)
+		if ($user_level < 9)
 		{
-			die( '<p>'.T_('You have no right to ban domains.').'</p>' );
+			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
 		}
 
 		param( 'hit_ID', 'integer', true );	// Required!
@@ -130,7 +127,7 @@ switch( $action )
 			// Show confirmation page:
 			?>
 			<div class="panelblock">
-				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
+				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
 				<?php ban_affected_comments($hit_ID, 'hit_ID') ?>
 				<p><?php printf ( T_('Banning the domain of referer hit #%d from the statistics and comments would lead to the deletion of the following %d comments:'), $hit_ID, mysql_affected_rows() ) ?></p>
 				<table class="thin">
@@ -174,12 +171,10 @@ switch( $action )
 				
 				<p><?php echo T_('Are you sure you want to continue?') ?></p>
 				<form action="b2antispam.php" method="get">
-					<p>
 					<input type="hidden" name="confirm" value="confirm" />
 					<input type="hidden" name="hit_ID" value="<?php echo $hit_ID ?>" />
 					<input type="hidden" name="action" value="banhit" />
-					<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
-					</p>
+					<input type="submit" value="<?php echo T_('Ban the domain + delete matching hits and comments') ?>" class="search" />
 				</form>
 			</div>
 			<?php
@@ -214,9 +209,9 @@ switch( $action )
 		
 	case 'remove':
 		// Remove a domain from ban list:
-		if ( $user_level < 9 && ! $demo_mode )
+		if ($user_level < 9)
 		{
-				die( '<p>'.T_('You have no right to remove domains from the ban list.').'</p>' );
+			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
 		}
 		param( 'hit_ID', 'integer', true );	// Required!
 		?>
@@ -232,15 +227,14 @@ switch( $action )
 ?>
 
 <div class="panelblock">
-
-	<h3><?php echo T_('Ban list') ?>:</h3>
-	<p><?php echo T_('Domains containing the listed keywords are banned from logging hits and commenting. To allow comments and log hits on your blogs from a banned domain, click the tick to remove it from the list.') ?></p>
+	<h2><?php echo T_('Banned domains blacklist') ?></h2>
+	<p><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs. If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.') ?></p>
 	<?php list_antiSpam() ?>
 	<table class='thin'>
 		<?php while( $row_stats = mysql_fetch_array($res_stats) ) {  ?>
 		<tr>
 			<td>
-				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Remove from blacklist') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
+				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
 				<?php antiSpam_domain() ?>
 			</td>
 		</tr>
@@ -250,12 +244,12 @@ switch( $action )
 </div>
 
 <div class="panelblock">
-	<h3><?php echo T_('Ban by keyword') ?>:</h3>
+	<h2><?php echo T_('Add a banned keyword') ?></h2>
 	<form action="b2antispam.php" method="GET">
 		<p>
-		<?php echo T_('Keyword') ?>: <input type="text" size="30" name="keyword" /> &nbsp; 
+		<?php echo T_('Keyword') ?>: <input type="text" size="30" name="keyword" />
 		<input type="hidden" name="action" value="bankeyword" />
-		<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
+		<input type="submit" value="<?php echo T_('Ban this keyword!') ?>" class="search" />
 		</p>
 	</form>
 </div>

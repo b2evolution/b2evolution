@@ -20,9 +20,11 @@ $use_quicktags = 1;     //  1 to enable, 0 to disable
 # Do you want to be able to link each post to an URL ?
 $use_post_url = 1;			// 1 to enable, 0 to disable
 
-# When banning referrers/comment URLs, do you want to automatically remove any referrers and comments containing the banned domain?
+# When banning referrers/comment URLs, do you want to automatically remove 
+# any referrers and comments containing the banned domain?
 # (you will be asked to confirm the ban if you enable this)
 $deluxe_ban = 1;	// 1 to enable, 0 to disable
+
 
 # Do not edit the following unless you known what you're doing...
 

@@ -40,6 +40,8 @@ if( empty($mode) )
 	 
 	<ul>
 	<?php
+		param( 'blog', 'integer', $default_to_blog, true );	// We need thos for the urls
+
 		if( $title == T_('New post in blog:') )
 			echo '<li class="current">';
 		else
@@ -61,6 +63,15 @@ if( empty($mode) )
 			echo '<a href="b2stats.php" >', T_('Stats'), '</a></li>';
 		}
 	
+		if($user_level >= 9 || $demo_mode)
+		{
+			if( $title == T_('Antispam') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2antispam.php" >', T_('Antispam'), '</a></li>';
+		}
+		
 		if($user_level >= 3 || $demo_mode) 
 		{
 			if( $title == T_('Categories') )
@@ -97,15 +108,6 @@ if( empty($mode) )
 			echo '<a href="b2template.php">', T_('Templates'), '</a></li>';
 		}
 	
-		if($user_level >= 9 || $demo_mode)
-		{
-			if( $title == T_('Anti-Spam') )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="b2antispam.php" >', T_('Anti-Spam'), '</a></li>';
-		}
-		
 		if( $title == T_('User management') )
 			echo '<li class="current">';
 		else
