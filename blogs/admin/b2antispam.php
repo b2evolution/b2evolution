@@ -227,7 +227,7 @@ switch( $action )
 
 	<h3><?php echo T_('Ban list') ?>:</h3>
 	<p><?php echo T_('Domains containing the listed keywords are banned from logging hits and commenting. To allow comments and log hits on your blogs from a banned domain, click the cross to remove it from the list.') ?></p>
-	<?php list_blackList() ?>
+	<?php list_antiSpam() ?>
 	<table class='thin'>
 		<?php while( $row_stats = mysql_fetch_array($res_stats) ) {  ?>
 		<tr>

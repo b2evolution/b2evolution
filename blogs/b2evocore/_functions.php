@@ -1181,11 +1181,11 @@ function autoquote( & $string )
  * validate_url(-)
  *
  * fplanque: 0.8.5: changed return values
- * vegarg: switched to MySQL antispam list
+ * vegarg: 0.8.6.2: switched to MySQL antispam list
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
-	global $tableblacklist, $querycount;
+	global $tableantispam, $querycount;
 
 	if( empty($url) ) 
 	{	// Empty URL, no problem
