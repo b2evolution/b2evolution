@@ -286,9 +286,10 @@ function get_domain_from_hit_ID( $hit_ID )
 {
 	global $tablehitlog, $querycount;
 
-	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = '$hit_ID' LIMIT 1";
+	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = $hit_ID";
 	$querycount++;
 	$q = mysql_query($sql) or mysql_oops( $sql );
+	if( mysql_num_rows($q) == 0 ) die( 'That hit does not exists!' );	// BE CAREFUL ABOUT THAT !!! or you return an empty string and you end up deleting ALL logs !!!
 	while( list($domain) = mysql_fetch_row($q) )
 	{
 		return $domain;
