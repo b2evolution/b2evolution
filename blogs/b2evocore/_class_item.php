@@ -23,6 +23,7 @@ class Item extends DataObject
 	var $scope;
 	var $lang;
 	var $title;
+	var $urltitle;
 	var $content;
 	var $wordcount = 0;
 	var $main_cat_ID = 0;
@@ -62,6 +63,7 @@ class Item extends DataObject
 			$this->scope = $db_row->post_status;
 			$this->lang = $db_row->post_lang;
 			$this->title = $db_row->post_title;
+			$this->urltitle = $db_row->post_urltitle;
 			$this->content = $db_row->post_content;
 			$this->wordcount = $db_row->post_wordcount;
 			$this->main_cat_ID = $db_row->post_category;

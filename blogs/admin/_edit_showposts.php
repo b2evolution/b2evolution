@@ -256,11 +256,11 @@
 						?>
 						<form action="b2edit.php" method="get" class="inline">
 							<input type="hidden" name="action" value="editcomment">
-							<input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>">
+							<input type="hidden" name="comment" value="<?php $Comment->ID() ?>">
 							<input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
 						</form>
 						<form action="edit_actions.php" method="get" class="inline">
-							<input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php echo $commentdata['comment_ID'] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
+							<input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php $Comment->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
 						</form>
 						<?php
 						}

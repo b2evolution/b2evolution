@@ -424,8 +424,8 @@ class ItemList extends DataObjectList
 		}
 
 		$this->request = "SELECT DISTINCT ID, post_author, post_issue_date,  post_mod_date,
-																		  post_status, post_lang,
-																			post_content, post_title, post_trackbacks, post_category,
+																		  post_status, post_lang,	post_content, post_title, 
+																			post_urltitle, post_trackbacks, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
 																			post_karma
 											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)

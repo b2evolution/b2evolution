@@ -56,6 +56,7 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 <h1 id="version">Version: 0.8.9+CVS</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
+<!-- InstanceBeginEditable name="Main" -->
 <div class="FigZone">
 <?php
 	foreach( $locales as $localekey => $localevalue ){
@@ -79,7 +80,7 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 	}
 ?>
 </div>
-<!-- InstanceBeginEditable name="Main" -->
+
 <h1>Database tables installation</h1>
 <p>PHP version: <?php echo phpversion(); ?></p>
 <?php

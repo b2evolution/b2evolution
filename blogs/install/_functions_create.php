@@ -330,31 +330,31 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, 'http://tin-men.net/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://tin-men.net/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, 'http://www.rononline.nl/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://www.rononline.nl/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, 'http://www.tenderfeelings.be/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.tenderfeelings.be/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, 'http://www.fromthecrossroads.ws/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.fromthecrossroads.ws/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, 'http://b2evolution.net/' ) or mysql_oops( $query );
+	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, 'http://b2evolution.net/' ) or mysql_oops( $query );
+	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' ) or mysql_oops( $query );
 
 	echo "OK.<br />\n";
 

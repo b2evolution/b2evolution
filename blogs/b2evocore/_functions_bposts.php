@@ -29,6 +29,7 @@ function bpost_create(
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
+	$post_urltitle = '',
 	$post_url = '',
 	$post_comments = 'open' )
 {
@@ -51,8 +52,14 @@ function bpost_create(
 
 	// TODO: START TRANSACTION
 
-	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_issue_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount, post_comments ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', '".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
+	// validate url title
+	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0 );
+
+	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content, 
+														post_issue_date, post_mod_date, post_category,  post_status, post_lang, 
+														post_trackbacks, post_autobr, post_flags, post_wordcount, 
+														post_comments ) ";
+	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_urltitle)."', '".addslashes($post_content)."',	'$post_timestamp', '".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -97,6 +104,7 @@ function bpost_update(
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
+	$post_urltitle = '',
 	$post_url = '',
 	$post_comments = 'open' )
 {
@@ -118,8 +126,13 @@ function bpost_update(
 	$extra_cat_IDs = array_unique( $extra_cat_IDs );
 
 	// TODO: START TRANSACTION
+
+	// validate url title
+	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $post_ID );
+
 	$query = "UPDATE $tableposts SET ";
 	$query .= "post_title = '".addslashes($post_title)."', ";
+	$query .= "post_urltitle = '".addslashes($post_urltitle)."', ";
 	$query .= "post_trackbacks = '".addslashes($post_url)."', ";		// temporay use of post_trackbacks
 	$query .= "post_content = '".addslashes($post_content)."', ";
 	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
@@ -244,6 +257,7 @@ function bpost_delete( $post_ID )
 }
 
 
+
 /* 
  * get_lastpostdate(-) 
  */
@@ -269,6 +283,83 @@ function get_lastpostdate( $blog = 1, $show_statuses = '' )
 	return($lastpostdate);
 }
 
+
+/** 
+ * Validate URL title
+ *
+ * Using title as a source if url title is empty
+ *
+ * {@internal urltitle_validate(-) }}
+ *
+ * @param string url title to validate
+ * @param string real title to use as a source if $urltitle is empty
+ * @param integer ID of post
+ * @return string validated url title
+ */
+function urltitle_validate( $urltitle, $title, $post_ID = 0 )
+{
+	global $tableposts, $querycount;
+
+	$urltitle = trim( $urltitle );
+	
+	if( empty( $urltitle )  ) $urltitle = $title;
+	if( empty( $urltitle )  ) $urltitle = 'title';
+	
+	// echo 'staring with: ', $urltitle, '<br />';
+	
+	// Replace HTML entities
+	$urltitle = htmlentities( $urltitle, ENT_NOQUOTES );
+	// Keep only one char in emtities!
+	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle ); 
+	// Remove non acceptable chars
+	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '_', $urltitle ); 
+	$urltitle = preg_replace( '/^_+/', '', $urltitle ); 
+	$urltitle = preg_replace( '/_+$/', '', $urltitle ); 
+	// Uppercase the first character of each word in a string 
+	$urltitle = strtolower( $urltitle );
+	
+	// Remove trailing number for search:
+	$urlsearch = preg_replace( '/_[0-9]+$/', '', $urltitle ); 
+
+	// Find all occurrences of urltitle+number in the DB:
+	$sql = "SELECT post_urltitle
+					FROM $tableposts
+					WHERE post_urltitle REGEXP '^".$urlsearch."(_[0-9]+)?$'
+					  AND ID <> $post_ID";
+	$result = mysql_query($sql) or mysql_oops( $sql );
+	$querycount++;
+	
+	$exact_match = false;
+	$highest_number = 0;
+	$matches = array();
+	while( $row = mysql_fetch_assoc( $result ) )
+	{
+		$existing_urltitle = $row['post_urltitle'];
+		// echo "existing = $existing_urltitle <br />";
+		if( $existing_urltitle == $urltitle )
+		{ // We have an exact match, we'll have to change the number.
+			$exact_match = true;
+		}
+		if( preg_match( '/_([0-9]+)$/', $existing_urltitle, $matches ) )
+		{	// This one has a number, we extract it:
+			$existing_number = (integer) $matches[1];
+			if( $existing_number > $highest_number )
+			{ // This is th enew high
+				$highest_number = $existing_number;
+			}
+		}
+	}
+	// echo "highest existing number = $highest_number <br />";
+		
+	if( $exact_match )
+	{	// We got an exact match, we need to change the number:
+		$urltitle = $urlsearch.'_'.($highest_number + 1);
+	}
+		
+	// echo "using = $urltitle <br />";
+		
+	return $urltitle;
+}
 
 /*
  * get_postdata(-)
@@ -296,7 +387,7 @@ function get_postdata($postid)
 
 	// echo $sql;
 
-	$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
+	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
 	if (mysql_num_rows($result)) 
 	{
@@ -328,6 +419,44 @@ function get_postdata($postid)
 }
 
 
+/** 
+ * Get an Item by its ID
+ *
+ * {@internal Item_get_by_ID(-) }}
+ *
+ * @todo cacheing?
+ *
+ * @param integer post ID
+ * @return Item requested object or false
+ */
+function Item_get_by_ID( $post_ID ) 
+{
+	global $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $querycount, $show_statuses;
+
+	// We have to load the post
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_lang, 
+									post_content, post_title, post_urltitle, post_trackbacks, post_category, 
+									post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID 
+					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID 
+					WHERE ID = $post_ID";
+	// Restrict to the statuses we want to show:
+	// echo $show_statuses;
+	$sql .= ' AND '.statuses_where_clause( $show_statuses );
+
+	// echo $sql;
+
+	$result = mysql_query($sql) or mysql_oops( $sql );
+	$querycount++;
+
+	if( mysql_num_rows($result) == 0 ) 
+	{
+		return false;
+	}
+
+	$row = mysql_fetch_object( $result );
+
+	return new Item( $row );	// COPY !
+}
 
 
 /**

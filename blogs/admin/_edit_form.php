@@ -98,7 +98,7 @@ if ($use_spellchecker)
 
 		<span class="line">
 		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
+		<input type="text" name="post_title" size="45" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
 		</span>
 
 		<span class="line">
@@ -109,7 +109,7 @@ if ($use_spellchecker)
 		<?php if( $use_post_url ) { ?>
 		<span class="line">
 		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-		<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" />
+		<input type="text" name="post_url"  size="40" value="<?php echo format_to_output( $post_url, 'hrmlattr' ) ?>" id="post_url" tabindex="3" />
 		</span>
 		<?php } else { ?>
 		<input type="hidden" name="post_url"  size="40" value="" id="post_url" />
@@ -175,7 +175,7 @@ if ($use_spellchecker)
 		T_('Edit this !'); ?>" class="search" style="font-weight: bold;" tabindex="10" />
 
 
-	<?php if ($use_spellchecker)
+	<?php if( $use_spellchecker )
 	{ // ------------------------------- SPELL CHECKER ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Spellcheck') ?>"
 		onClick="DoSpell('post','content','');" class="search" tabindex="11" />
@@ -228,26 +228,50 @@ if ($use_spellchecker)
 		</span></div>
 		<?php
 		}
-
-		if( $action != "editcomment")
+		if( $action != 'editcomment' )
 		{ // this is for everything but comment editing
-			if( get_bloginfo('allowpingbacks') )
-			{ // --------------------------- PINGBACK --------------------------------------
 		?>
-		<div><input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" <?php
-		if ($post_pingback) echo ' checked="checked"' ?> tabindex="20" /><label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label></div>
+		<div>
+			<label for="post_urltitle"><strong><?php echo T_('URL Title') ?>:</strong></label>
+			<input type="text" name="post_urltitle" id="post_urltitle" tabindex="22" value="<?php echo format_to_output( $post_urltitle, 'htmlattr' ); ?>" size="40" maxlength="50" />
+			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
+		</div>
 		<?php
-			}
-
-			if( get_bloginfo('allowtrackbacks') )
-			{	// --------------------------- TRACKBACK --------------------------------------
-		?>
-		<div><label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="21" value="<?php echo format_to_edit( $post_trackbacks ); ?>" /></div>
-		<?php
-			}
 		}
 		?>
 	</fieldset>
+			
+	<?php
+	if( $action != 'editcomment' )
+	{ // this is for everything but comment editing
+		?>
+		<fieldset>
+		<legend><?php echo T_('Additional actions') ?></legend>
+		<?php
+		if( get_bloginfo('allowpingbacks') )
+		{ // --------------------------- PINGBACK --------------------------------------
+		?>
+		<div>
+			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" 
+				<?php	if ($post_pingback) { echo ' checked="checked"'; } ?> tabindex="20" />
+			<label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label>
+		</div>
+		<?php
+		}
+
+		if( get_bloginfo('allowtrackbacks') )
+		{	// --------------------------- TRACKBACK --------------------------------------
+		?>
+		<div>
+			<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="21" value="<?php echo format_to_output( $post_trackbacks, 'htmlattr' ); ?>" />
+		</div>
+		<?php
+		}
+		?>
+		</fieldset>
+	<?php			
+	}
+	?>
 </div>
 
 <!-- ================================== END OF EDIT FORM =================================== -->

@@ -579,7 +579,7 @@ function bloggereditpost($m)
 	}
 
 	// UPDATE POST IN DB:
-	if( !bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, 'en', '', 0, $pingsdone ) )
+	if( !bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, 'en', '', 0, $pingsdone, '', '', 'open' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
 					"For some strange yet very annoying reason, the entry couldn't be edited.");

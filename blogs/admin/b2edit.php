@@ -25,37 +25,40 @@ switch($action)
 		 * Display post editing form
 		 */
 		param( 'post', 'integer', true );
-		$postdata = get_postdata($post) or die( T_('Oops, no post with this ID.') );
-		$post_lang = $postdata['Lang'];
-		$cat = $postdata['Category'];
+		$postdata = get_postdata( $post ) or die( T_('Oops, no post with this ID.') );
+		$edited_Item = Item_get_by_ID( $post );
+		$post_lang = $edited_Item->get( 'lang' );
+		$cat = $edited_Item->get( 'main_cat_ID' );
 		$blog = get_catblog($cat); 
 	
 		$title = T_('Editing post');
 		require (dirname(__FILE__).'/_menutop.php');
 	
-		printf( T_('#%d in blog: %s'), $postdata['ID'], get_bloginfo( 'name' ) );
+		printf( T_('#%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
 		
 		require (dirname(__FILE__).'/_menutop_end.php');
 	
-		$post_status = $postdata['Status'];
+		$post_status = $edited_Item->get( 'scope' );
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 	
-		$edited_post_title = format_to_edit($postdata['Title']);
-		$post_url = format_to_edit( $postdata['Url'] );
-		$autobr = $postdata['AutoBR'];
-		$content = format_to_edit( $postdata['Content'], $autobr );
+		$post_title = $edited_Item->get( 'title' );
+		$post_urltitle = $edited_Item->get( 'urltitle' );
+		$post_url = $edited_Item->get( 'url' );
+		$autobr = $edited_Item->get( 'autobr' );
+		$content = format_to_edit( $edited_Item->get( 'content' ), $autobr );
 		$post_pingback = 0;
 		$post_trackbacks = '';
-		$post_comments = $postdata['comments'];
+		$post_comments = $edited_Item->get( 'comments' );
 		$post_extracats = postcats_get_byID( $post );
 		$edit_date = 0;
-		$aa = mysql2date('Y', $postdata['Date']);
-		$mm = mysql2date('m', $postdata['Date']);
-		$jj = mysql2date('d', $postdata['Date']);
-		$hh = mysql2date('H', $postdata['Date']);
-		$mn = mysql2date('i', $postdata['Date']);
-		$ss = mysql2date('s', $postdata['Date']);
+		$post_issue_date = $edited_Item->get( 'issue_date' );
+		$aa = mysql2date('Y', $post_issue_date  );
+		$mm = mysql2date('m', $post_issue_date  );
+		$jj = mysql2date('d', $post_issue_date  );
+		$hh = mysql2date('H', $post_issue_date  );
+		$mn = mysql2date('i', $post_issue_date  );
+		$ss = mysql2date('s', $post_issue_date  );
 	
 		$form_action = 'editpost';
 		require(dirname(__FILE__).'/_edit_form.php');
@@ -183,8 +186,6 @@ switch($action)
 				$post_status = 'deprecated';
 		}
 
-	
-
 		$action='post';
 		
 		// These are bookmarklet params:
@@ -201,10 +202,10 @@ switch($action)
 		param( 'content', 'html', $text );
 		$content = format_to_edit( $content, false );
 		param( 'post_title', 'html', $popuptitle );
-		$edited_post_title = format_to_edit( $post_title, false );
+		param( 'post_urltitle', 'string', '' );
 		param( 'post_url', 'string', $popupurl );
 		$post_url = format_to_edit( $post_url, false );
-		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
+		param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_lang', 'string', $default_locale );
 

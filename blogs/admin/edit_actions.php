@@ -66,6 +66,7 @@ switch($action)
 		$post_trackbacks = & $trackback_url;
 		param( 'content', 'html' );
 		param( 'post_title', 'html' );
+		param( 'post_urltitle', 'string' );
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_lang', 'string', $default_locale );
@@ -100,7 +101,7 @@ switch($action)
 		$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	$post_extracats, $post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url, $post_comments ) or mysql_oops($query);
+		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	$post_extracats, $post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_urltitle, $post_url, $post_comments ) or mysql_oops($query);
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
@@ -174,6 +175,7 @@ switch($action)
 		$post_trackbacks = $trackback_url;
 		param( 'content', 'html' );
 		param( 'post_title', 'html' );
+		param( 'post_urltitle', 'string' );
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_lang', 'string', $default_locale );
@@ -189,7 +191,7 @@ switch($action)
 		}
 
 		// CHECK and FORMAT content
-		$post_title = format_to_post($post_title,0,0);
+		$post_title = format_to_post( $post_title, 0, 0 );
 		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
 		{
 			errors_add( T_('Supplied URL is invalid: ').$error );
@@ -221,7 +223,7 @@ switch($action)
 		}
 
 		// UPDATE POST IN DB:
-		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url, $post_comments ) or mysql_oops($query);
+		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_urltitle, $post_url, $post_comments ) or mysql_oops($query);
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
