@@ -48,8 +48,8 @@ function bpost_create(
 
 	// TODO: START TRANSACTION
 
-	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."' )";
+	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount ) ";
+	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".count_words($post_content)." )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -123,7 +123,8 @@ function bpost_update(
 	$query .= "post_lang = '$post_lang', ";
 	// $query .= "post_trackbacks = '$post_trackbacks', ";
 	$query .= "post_autobr = $autobr, ";
-	$query .= "post_flags = '".implode(',',$post_flags)."' ";
+	$query .= "post_flags = '".implode(',',$post_flags)."', ";
+	$query .= "post_wordcount = '".count_words($post_content)."' ";
 	$query .= "WHERE ID = $post_ID";
 	// echo $query;
 	$querycount++;
@@ -243,7 +244,7 @@ function get_postdata($postid)
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
 	// fplanque changed: $sql = "SELECT * FROM $tableposts WHERE ID = $postid";
-	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
+	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
 	if( ! empty( $show_statuses ) )
 	{
 		$sql .= " AND post_status IN ($show_statuses) ";
@@ -267,10 +268,11 @@ function get_postdata($postid)
 			'Category' => $myrow->post_category, 
 			'AutoBR' => $myrow->post_autobr,
 			'Flags' => explode( ',', $myrow->post_flags ),
+			'Wordcount' => $myrow->post_wordcount,
 			'Blog' => $myrow->cat_blog_ID,
 			);
 
-		// Caching is particularly usefull when displaying a single post and you call single_post_title several times
+		// Caching is particularly useful when displaying a single post and you call single_post_title several times
 		if( !isset( $postdata ) ) $postdata = $mypostdata;	// Will save time, next time :)
 
 		return($mypostdata);
@@ -414,6 +416,16 @@ function the_language()
 	echo $languages[ $post_lang ];
 }
 
+/*
+ * the_wordcount(-)
+ * Display the number of words in the post
+ *
+ */
+function the_wordcount()
+{
+	global $postdata;
+	echo $postdata['Wordcount'];
+}
 
 /*
  * the_title(-)
@@ -1218,5 +1230,14 @@ function is_new_day()
 	}
 }
 
+/*
+ * count_words(-)
+ *
+ * Returns the number of the words in a string, sans HTML
+ */
+function count_words($string)
+{
+	return str_word_count(strip_tags($string));
+}
 
 ?>

@@ -70,7 +70,14 @@
 		<?php permalink_anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
-		<?php the_time();  echo ', ', T_('Categories'), ': ';  the_categories() ?>
+		<?
+			the_time();
+			echo ', ', T_('Categories'), ': ';
+			the_categories();
+			echo ', ';
+			the_wordcount();
+			echo ' words';
+		?>
 		</div>
 		<h3 class="bTitle"><?php the_title(); ?></h3>
 		<div class="bText">

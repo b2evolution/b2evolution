@@ -407,7 +407,7 @@ class ItemList
 		}
 
 	
-		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_karma ";
+		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_karma ";
 	
 		$this->request .= "FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 		
@@ -613,6 +613,7 @@ class ItemList
 				'Category' => $row->post_category,
 				'AutoBR' => $row->post_autobr, 
 				'Flags' => explode( ',', $row->post_flags ),
+				'Wordcount' => $row->post_wordcount,
 				'Karma' => $row->post_karma // this isn't used yet 
 				);
 		} 
