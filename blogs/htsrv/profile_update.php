@@ -25,6 +25,7 @@ param( 'newuser_yim', 'string', '' );
 param( 'newuser_url', 'string', '' );
 param( 'newuser_email', 'string', '' );
 param( 'newuser_notify', 'integer', 0 );
+param( 'newuser_showonline', 'integer', 0 );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 
@@ -126,7 +127,8 @@ $DB->query( "UPDATE $tableusers
 										user_yim= '".$DB->escape($newuser_yim)."',
 										user_idmode= '".$DB->escape($newuser_idmode)."',
 										user_locale= '".$DB->escape($newuser_locale)."',
-										user_notify= $newuser_notify
+										user_notify= $newuser_notify,
+										user_showonline= $newuser_showonline
 							WHERE ID = $user_ID" );
 
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
