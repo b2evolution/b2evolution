@@ -143,7 +143,7 @@ class AbstractSettings
 				return false;
 		}
 
-		$Debuglog->add( 'AbstractSetting: queried setting ['.implode( '/', $args ).'] not defined.' );
+		$Debuglog->add( 'AbstractSetting: info: queried setting ['.implode( ' / ', $args ).'] not defined.' );
 		return false;
 	}
 

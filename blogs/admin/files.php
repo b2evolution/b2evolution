@@ -480,14 +480,14 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 
 		foreach( $rootlist as $lroot )
 		{
-			if( !(int)$lroot['id'] )
+			$lroot_value = $lroot['type'];
+			if( isset($lroot['id']) )
 			{
-				$Debuglog->add( 'ID invalid for root type ['.$lroot['type'].']: '.var_export( $lroot['id'], true ), 'fileman' );
-				continue;
+				$lroot_value .= '_'.$lroot['id'];
 			}
-			echo '<option value="'.$lroot['type'].'_'.$lroot['id'].'"';
+			echo '<option value="'.$lroot_value.'"';
 
-			if( $root == $lroot['type'].'_'.$lroot['id'] )
+			if( $root == $lroot_value )
 			{
 				echo ' selected="selected"';
 			}
@@ -600,7 +600,10 @@ if( $i == 0 )
 	<tr>
 	<td colspan="8" class="error">
 	<?php
-	echo T_('The directory is empty.');
+	if( !$Fileman->Messages->display( '', '', true, 'fl_error' ) )
+	{
+		echo T_('The directory is empty.');
+	}
 	if( $Fileman->is_filtering() )
 	{
 		echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';

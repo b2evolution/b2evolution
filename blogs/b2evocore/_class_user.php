@@ -42,12 +42,12 @@ class User extends DataObject
 	var $level;
 	var $notify;
 	var $showonline;
-	#var $upload_ufolder; // allowed to upload into his user folder
 
 	var $Group; // Pointer to group
 
 	// Blog posts statuses permissions:
 	var $blog_post_statuses = array();
+
 
 	/**
 	 * Constructor
@@ -86,7 +86,6 @@ class User extends DataObject
 			$this->level = 0;
 			$this->notify = 1;
 			$this->showonline = 1;
-			#$this->upload_ufolder = false;
 			// Group for this user:
 			$this->Group = NULL;
 		}
@@ -114,22 +113,21 @@ class User extends DataObject
 			$this->level = $userdata['user_level'];
 			$this->notify = $userdata['user_notify'];
 			$this->showonline = $userdata['user_showonline'];
-			#$this->upload_ufolder = $userdata['user_upload_ufolder'];
 
 			// Group for this user:
 			$this->Group = $GroupCache->get_by_ID( $userdata['user_grp_ID'] );
 		}
 	}
 
+
 	/**
 	 * Get a param
 	 *
 	 * {@internal User::get(-)}}
+	 * @param string the parameter
 	 */
 	function get( $parname )
 	{
-		global $basepath, $baseurl, $media_subdir;
-
 		switch( $parname )
 		{
 			case 'preferedname':
@@ -149,22 +147,55 @@ class User extends DataObject
 			case 'num_posts':
 				return get_usernumposts( $this->ID );
 
-			case 'fm_rootdir':
-				$userdir = $basepath.$media_subdir.'users/'.safefilename($this->login).'/';
-				if( !is_dir( $userdir ) )
-				{
-					mkdir( $userdir ); // defaults to 0777
-				}
-				return $userdir;
-
-			case 'fm_rooturl':
-				return $baseurl.$media_subdir.'users/'.$this->login.'/';
-
 			default:
 			// All other params:
 				return parent::get( $parname );
 		}
 	}
+
+
+	/**
+	 * Get the path to the media directory. If it does not exist, it will be created.
+	 *
+	 * @param Log a Log object, where Messages get appended (uses levels 'note' and 'error')
+	 * @return mixed the path as string on success, false if the dir could not be created
+	 */
+	function get_mediadir( &$Log )
+	{
+		global $basepath, $media_subdir;
+
+		$userdir = $basepath.$media_subdir.'users/'.safefilename($this->login).'/';
+		if( !is_dir( $userdir ) )
+		{
+			if( !mkdir( $userdir ) ) // defaults to 0777
+			{
+				if( $Log !== NULL )
+				{ // add error
+					$Log->add( sprintf( T_("The user's directory [%s] could not be created."), $userdir ), 'error' );
+				}
+				return false;
+			}
+			elseif( $Log !== NULL )
+			{ // add note
+				$Log->add( sprintf( T_("The user's directory %s has been created with permissions %s."), $userdir, '777' ), 'note' );
+			}
+		}
+		return $userdir;
+	}
+
+
+	/**
+	 * Get the URL to the media folder
+	 *
+	 * @return string the URL
+	 */
+	function get_mediaurl()
+	{
+		global $baseurl, $media_subdir;
+
+		return $baseurl.$media_subdir.'users/'.$this->login.'/';
+	}
+
 
 	/*
 	 * User::set(-)
@@ -186,6 +217,7 @@ class User extends DataObject
 		}
 	}
 
+
 	/*
 	 * User::set_datecreated(-)
 	 *
@@ -199,6 +231,7 @@ class User extends DataObject
 		$this->dbchange( 'dateYMDhour' , 'string', 'datecreated' );
 	}
 
+
 	/*
 	 * User::setGroup(-)
 	 *
@@ -210,6 +243,7 @@ class User extends DataObject
 
 		$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
 	}
+
 
 	/**
 	 * Check permission for this user
@@ -522,6 +556,7 @@ class User extends DataObject
 		$this->disp( 'login', $format );
 	}
 
+
 	/**
 	 * Provide link to message form for this user
 	 *
@@ -557,6 +592,7 @@ class User extends DataObject
 		return true;
 	}
 
+
 	/**
 	 * Template function: display user's prefered name
 	 *
@@ -568,6 +604,7 @@ class User extends DataObject
 	{
 		$this->disp( 'preferedname', $format );
 	}
+
 
 	/**
 	 * Template function: display user's URL
@@ -587,6 +624,5 @@ class User extends DataObject
 			echo $after;
 		}
 	}
-
 }
 ?>

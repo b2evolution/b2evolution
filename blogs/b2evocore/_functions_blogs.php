@@ -109,7 +109,7 @@ function blog_update_user_perms( $blog )
 			$easy_perms = blogperms_from_easy( $easy_mode );
 
 			$inserted_values[] = " ( $blog, $loop_user_ID, ".$easy_perms['bloguser_ismember']
-														.', "'.implode( ',', $easy_perms['bloguser_perm_poststatuses'] )
+														.', "'.$easy_perms['bloguser_perm_poststatuses']
 														.'", '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_comments']
 														.', '.$easy_perms['bloguser_perm_cats'].', '.$easy_perms['bloguser_perm_properties']
 														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']

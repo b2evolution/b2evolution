@@ -25,12 +25,18 @@ require_once dirname(__FILE__).'/_functions_files.php';
  */
 class Filelist
 {
-	var $path = '';
+	var $listpath = '';
 	var $filter = NULL;
 	var $filter_regexp = NULL;
 
 
 	/* -- PRIVATE -- */
+
+	/**
+	 * the list of Files
+	 * @var array
+	 */
+	var $entries = array();
 
 	/**
 	 * the current index of the directory items (looping)
@@ -80,6 +86,11 @@ class Filelist
 	{
 		$this->listpath = trailing_slash( $path );
 		$this->showhidden = (bool)$showhidden;
+		if( empty($path) )
+		{
+			$this->Messages->add( 'No valid path provided.', 'fl_error' );
+			$this->listpath = false;
+		}
 	}
 
 
@@ -90,6 +101,10 @@ class Filelist
 	 */
 	function load( $recursivedirsize = NULL )
 	{
+		if( !$this->listpath )
+		{
+			return false;
+		}
 		if( $recursivedirsize === NULL )
 		{
 			$recursivedirsize = $this->recursivedirsize;

@@ -215,7 +215,12 @@ function str2path( $path )
 
 	if( !empty($pwd) )
 	{ // path exists
-		return array( str_replace( '\\', '/', $pwd).'/', true );
+		$pwd = str_replace( '\\', '/', $pwd);
+		if( substr( $pwd, -1 ) !== '/' )
+		{
+			$pwd .= '/';
+		}
+		return array( $pwd, true );
 	}
 	else
 	{ // no realpath

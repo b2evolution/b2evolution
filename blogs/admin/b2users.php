@@ -160,7 +160,7 @@ else switch ($action)
 		param( 'edited_user_pass2', 'string', true );
 
 		// Perfom check on parameters:
-    profile_check_params( $edited_user_nickname, $edited_user_icq, $edited_user_email, $edited_user_url,
+		profile_check_params( $edited_user_nickname, $edited_user_icq, $edited_user_email, $edited_user_url,
 																$edited_user_pass1, $edited_user_pass2 );
 
 		$edited_User->set( 'login', $edited_user_login );

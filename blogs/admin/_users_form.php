@@ -65,17 +65,14 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	else
 	{
 		echo T_('Profile for:').' '.$edited_User->dget('firstname').' '.$edited_User->dget('lastname')
-					.' ['.( isset($edited_user_oldlogin)? $edited_user_oldlogin : $edited_User->dget('login') ).']';
+					.' ['.$edited_User->dget('login').']';
 	}
 	?></h2>
 
 	<form class="fform" method="post" action="b2users.php<?php if( $user != 0 ) echo '?user='.$user?>">
 		<input type="hidden" name="action" value="userupdate" />
 		<input type="hidden" name="edited_user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
-		<input type="hidden" name="edited_user_oldlogin" value="<?php
-			echo ( isset($edited_user_oldlogin) ? format_to_output($edited_user_oldlogin, 'formvalue')
-																					: $edited_User->dget('login', 'formvalue') )
-		?>" />
+		<input type="hidden" name="edited_user_oldlogin" value="<?php echo $edited_User->dget('login', 'formvalue') ?>" />
 
 
 	<fieldset>
@@ -130,7 +127,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				$aim_fieldnote = '';
 
 			if( $allowed_to_edit )
-			{	// We can edit the values:
+			{ // We can edit the values:
 				form_text( 'edited_user_login', $edited_User->dget('login', 'formvalue'), 20, T_('Login'), '', 20 );
 				form_text( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 20, T_('First name'), '', 50 );
 				form_text( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 20, T_('Last name'), '', 50 );

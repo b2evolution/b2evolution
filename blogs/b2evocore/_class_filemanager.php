@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/_class_filelist.php';
 class FileManager extends Filelist
 {
 	/**
-	 * root (like user_X or blog_X), defaults to current user's dir (#)
+	 * root ('user', 'user_X' or 'blog_X' - X is id)
 	 * @param string
 	 */
 	var $root;
@@ -103,7 +103,7 @@ class FileManager extends Filelist
 	 *
 	 * @param User the current User {@link User}}
 	 * @param string the URL where the object is included (for generating links)
-	 * @param string the root directory ('user' => user's dir)
+	 * @param string the root directory ('user', 'user_X', 'blog_X')
 	 * @param string the dir of the Filemanager object (relative to root)
 	 * @param string filter files by what?
 	 * @param boolean is the filter a regular expression (default is glob pattern)
@@ -136,8 +136,8 @@ class FileManager extends Filelist
 
 				case 'user':
 					$tUser = new User( get_userdata($root_A[1]) );
-					$this->root_dir = $tUser->get( 'fm_rootdir' );
-					$this->root_url = $tUser->get( 'fm_rooturl' );
+					$this->root_dir = $tUser->get_mediadir( $this->Messages );
+					$this->root_url = $tUser->get_mediaurl();
 					break;
 			}
 		}
@@ -145,34 +145,49 @@ class FileManager extends Filelist
 		{
 			case NULL:
 			case 'user':
-				$this->root_dir = $this->User->get( 'fm_rootdir' );
-				$this->root_url = $this->User->get( 'fm_rooturl' );
+				$this->root_dir = $this->User->get_mediadir( $this->Messages );
+				$this->root_url = $this->User->get_mediaurl();
 				break;
 		}
 
-		$this->cwd = trailing_slash( $this->root_dir.$path );
+		list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->root_dir );
+		$this->debug( $real_root_dir, 'real_root_dir' );
 
-		// get real cwd
-
-		list( $realpath, $realpath_exists ) = str2path( $this->cwd );
-		$this->debug( $realpath, 'realpath' );
-
-
-		if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
-		{ // cwd is not below root!
-			$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
-			$this->cwd = $this->root_dir;
+		if( !$this->root_dir )
+		{
+			$this->Messages->add( T_('No access to root directory.'), 'error' );
+			$this->cwd = NULL;
+		}
+		elseif( !$real_root_dir_exists )
+		{
+			$this->Messages->add( sprintf( T_('The root directory [%s] does not exist.'), $this->root_dir ), 'error' );
+			$this->cwd = NULL;
 		}
 		else
-		{ // allowed
-			if( !$realpath_exists )
-			{ // does not exist
-				$this->Messages->add( sprintf( T_('The directory [%s] does not exist.'), $this->cwd ) );
+		{
+			$this->cwd = trailing_slash( $this->root_dir.$path );
+			// get real cwd
+
+			list( $realpath, $realpath_exists ) = str2path( $this->cwd );
+			$this->debug( $realpath, 'realpath' );
+
+
+			if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
+			{ // cwd is not below root!
+				$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
 				$this->cwd = $this->root_dir;
 			}
 			else
-			{
-				$this->cwd = $realpath;
+			{ // allowed
+				if( !$realpath_exists )
+				{ // does not exist
+					$this->Messages->add( sprintf( T_('The directory [%s] does not exist.'), $this->cwd ) );
+					$this->cwd = NULL;
+				}
+				else
+				{
+					$this->cwd = $realpath;
+				}
 			}
 		}
 
@@ -216,7 +231,7 @@ class FileManager extends Filelist
 		/**
 		 * These are the filetypes. The extension is a regular expression that must match the end of the file.
 		 */
-		$this->filetypes = array(
+		$this->filetypes = array( // {{{
 			'.ai' => T_('Adobe illustrator'),
 			'.bmp' => T_('Bmp image'),
 			'.bz'  => T_('Bz Archive'),
@@ -258,7 +273,8 @@ class FileManager extends Filelist
 			'.wri' => T_('Document'),
 			'.xml' => T_('XML file'),
 			'.zip' => T_('Zip Archive'),
-		);
+		); // }}}
+
 
 		// the directory entries
 		parent::Filelist( $this->cwd, $this->filter, $this->filter_regexp, $this->order, $this->orderasc );
@@ -357,7 +373,6 @@ class FileManager extends Filelist
 		}
 
 		$r[] = array( 'type' => 'user',
-										'id' => $this->User->ID,
 										'name' => T_('user media folder') );
 
 		return $r;
@@ -793,29 +808,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * get an array list of a specific type
-	 *
-	 * @param string type ('dirs' or 'files', '' means all)
-	 * @param return array
-	 */
-	function arraylist( $type = '' )
-	{
-		$r = array();
-		foreach( $this->entries as $entry )
-		{
-			if( $type == ''
-					|| ( $type == 'files' && $entry->get_type() != 'dir' )
-					|| ( $type == 'dirs' && $entry->get_type() == 'dir' )
-				)
-			{
-				$r[] = $entry->get_name();
-			}
-		}
-		return $r;
-	}
-
-
-	/**
 	 * Remove a file or directory.
 	 *
 	 * @param string filename, defaults to current loop entry
@@ -1014,9 +1006,13 @@ class FileManager extends Filelist
 		pre_dump( $what, '[Fileman] '.$desc );
 		$Debuglog->add( ob_get_contents() );
 		if( $forceoutput )
+		{
 			ob_end_flush();
+		}
 		else
+		{
 			ob_end_clean();
+		}
 	}
 
 
@@ -1026,16 +1022,22 @@ class FileManager extends Filelist
 	 */
 	function cwd_clickable()
 	{
+		if( !$this->cwd )
+		{
+			return ' -- '.T_('No directory.').' -- ';
+		}
+		$r = $this->root_dir; // not clickable
+
 		// get the part that is clickable
-
-		$pos_lastslash = strrpos( $this->root_dir, '/' );
-		$r = substr( $this->root_dir, 0, $pos_lastslash );
-
-		$clickabledirs = explode( '/', substr( $this->cwd, $pos_lastslash+1 ) );
+		$clickabledirs = explode( '/', substr( $this->cwd, strlen( $this->root_dir ) ) );
 
 		$cd = '';
 		foreach( $clickabledirs as $nr => $dir )
 		{
+			if( empty($dir) )
+			{
+				break;
+			}
 			$r .= '/<a href="'.$this->curl( NULL, $cd.$dir ).'">'.$dir.'</a>';
 			$cd .= $dir.'/';
 		}

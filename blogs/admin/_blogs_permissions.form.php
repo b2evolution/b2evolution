@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view (+more :/) for the blogs permission management.
+ * This file implements the UI view for the blogs permission management.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -31,97 +31,97 @@ function list_users( $layout, $query )
 	}
 
 
-	foreach( $rows as $loop_row )
+	foreach( $rows as $lrow )
 	{ // Go through users:
-		$displayed[] = $loop_row['ID'];
+		$displayed[] = $lrow['ID'];
 		switch( $layout )
 		{
 			case 'wide':
-				$perm_post = isset($loop_row['bloguser_perm_poststatuses']) ? explode( ',', $loop_row['bloguser_perm_poststatuses'] ) : array();
+				$perm_post = isset($lrow['bloguser_perm_poststatuses']) ? explode( ',', $lrow['bloguser_perm_poststatuses'] ) : array();
 				?>
 				<tr<?php if( count($displayed)%2 == 1 ) echo ' class="odd"'; ?>>
-					<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
+					<td><?php echo format_to_output( $lrow['user_login'], 'htmlbody' ); ?></td>
 					<td class="center">
-						<input id="checkallspan_state_<?php echo $loop_row['ID'] ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_ismember'] ) && $loop_row['bloguser_ismember'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input id="checkallspan_state_<?php echo $lrow['ID'] ?>" type="checkbox" name="blog_ismember_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_ismember'] ) && $lrow['bloguser_ismember'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
+						<input type="checkbox" name="blog_perm_published_<?php echo $lrow['ID'] ?>"
 							<?php if( in_array( 'published', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_protected_<?php echo $loop_row['ID'] ?>"
+						<input type="checkbox" name="blog_perm_protected_<?php echo $lrow['ID'] ?>"
 							<?php if( in_array( 'protected', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to post into this blog with protected status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_private_<?php echo $loop_row['ID'] ?>"
+						<input type="checkbox" name="blog_perm_private_<?php echo $lrow['ID'] ?>"
 							<?php if( in_array( 'private', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_draft_<?php echo $loop_row['ID'] ?>"
+						<input type="checkbox" name="blog_perm_draft_<?php echo $lrow['ID'] ?>"
 							<?php if( in_array( 'draft', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to post into this blog with draft status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_deprecated_<?php echo $loop_row['ID'] ?>"
+						<input type="checkbox" name="blog_perm_deprecated_<?php echo $lrow['ID'] ?>"
 							<?php if( in_array( 'deprecated', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to post into this blog with deprecated status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_delpost_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset($loop_row['bloguser_perm_delpost']) && $loop_row['bloguser_perm_delpost'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_delpost_<?php echo $lrow['ID'] ?>"
+							<?php if( isset($lrow['bloguser_perm_delpost']) && $lrow['bloguser_perm_delpost'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to delete posts in this blog') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_comments_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_perm_comments'] ) && $loop_row['bloguser_perm_comments'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_comments_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_perm_comments'] ) && $lrow['bloguser_perm_comments'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to edit comments in this blog') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_cats_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_perm_cats'] ) && $loop_row['bloguser_perm_cats'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_cats_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_perm_cats'] ) && $lrow['bloguser_perm_cats'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to edit categories for this blog') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_properties_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_perm_properties'] ) && $loop_row['bloguser_perm_properties'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_properties_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_perm_properties'] ) && $lrow['bloguser_perm_properties'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_media_upload_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_perm_media_upload'] ) && $loop_row['bloguser_perm_media_upload'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_media_upload_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_perm_media_upload'] ) && $lrow['bloguser_perm_media_upload'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_media_browse_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_perm_media_browse'] ) && $loop_row['bloguser_perm_media_browse'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_media_browse_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_perm_media_browse'] ) && $lrow['bloguser_perm_media_browse'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_("Permission to browse blog's media folder") ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_media_change_<?php echo $loop_row['ID'] ?>"
-							<?php if( isset( $loop_row['bloguser_perm_media_change'] ) && $loop_row['bloguser_perm_media_change'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="update_checkboxes_wide( this, <?php echo $loop_row['ID'] ?>);"
+						<input type="checkbox" name="blog_perm_media_change_<?php echo $lrow['ID'] ?>"
+							<?php if( isset( $lrow['bloguser_perm_media_change'] ) && $lrow['bloguser_perm_media_change'] != 0  ) { ?> checked="checked" <?php } ?>
+							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);"
 							value="1" title="<?php echo T_("Permission to change the blog's media folder content") ?>" />
 					</td>
 					<td class="center">
-						<a href="javascript:toggleall_wide(document.FormPerm, <?php echo $loop_row['ID'] ?>);setcheckallspan(<?php echo $loop_row['ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
-							<span id="checkallspan_<?php echo $loop_row['ID'] ?>"><?php echo T_('(un)check all')?></span>
+						<a href="javascript:toggleall_wide(document.FormPerm, <?php echo $lrow['ID'] ?>);merge_from_wide( document.FormPerm, <?php echo $lrow['ID'] ?>); setcheckallspan(<?php echo $lrow['ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
+							<span id="checkallspan_<?php echo $lrow['ID'] ?>"><?php echo T_('(un)check all')?></span>
 						</a>
 					</td>
 				</tr>
@@ -136,10 +136,10 @@ function list_users( $layout, $query )
 
 			default: ?>
 				<tr<?php if( count($displayed)%2 == 1 ) echo ' class="odd"'; ?>>
-					<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
+					<td><?php echo format_to_output( $lrow['user_login'], 'htmlbody' ); ?></td>
 					<td>
 						<?php
-						$user_easy_group = blogperms_get_easy( $loop_row );
+						$user_easy_group = blogperms_get_easy( $lrow );
 						foreach( array(
 													array( 'nomember', T_('No Member') ),
 													array( 'member', T_('Member') ),
@@ -149,12 +149,12 @@ function list_users( $layout, $query )
 												) as $easy_group )
 						{
 							?>
-							<input type="radio" name="blog_perm_easy_<?php echo $loop_row['ID'] ?>" value="<?php echo $easy_group[0] ?>"<?php
+							<input type="radio" name="blog_perm_easy_<?php echo $lrow['ID'] ?>" value="<?php echo $easy_group[0] ?>"<?php
 							if( $easy_group[0] == $user_easy_group )
 							{
 								echo ' checked="checked"';
 							}
-							?> onclick="merge_from_easy( this, <?php echo $loop_row['ID'] ?> )" /> <?php echo $easy_group[1];
+							?> onclick="merge_from_easy( this, <?php echo $lrow['ID'] ?> )" /> <?php echo $easy_group[1];
 						}
 						?>
 					</td>
@@ -298,148 +298,3 @@ function list_users( $layout, $query )
 
 </form>
 
-
-<script type="text/javascript">
-	<!--
-	function switch_layout( layout )
-	{
-		if( layout == 'debug' )
-		{
-			document.getElementById( 'userlist_default' ).style.display='block';
-			document.getElementById( 'userlist_wide' ).style.display='block';
-		}
-		else if( layout == 'wide' )
-		{
-			document.getElementById( 'userlist_default' ).style.display='none';
-			document.getElementById( 'userlist_wide' ).style.display='block';
-			document.FormPerm.layout.value = 'wide';
-		}
-		else
-		{
-			document.getElementById( 'userlist_wide' ).style.display='none';
-			document.getElementById( 'userlist_default' ).style.display='block';
-			document.FormPerm.layout.value = 'default';
-		}
-	}
-
-
-	/**
-	 * Updates form tables that are hidden (other layouts)
-	 *
-	 */
-	function merge_from_easy( source, userid )
-	{
-		if( source.name.indexOf( 'blog_perm_easy_' ) != 0 )
-		{
-			return;
-		}
-		if( source.value == 'custom' )
-		{ // don't change anything
-			return;
-		}
-
-		// reset all checkboxes
-		toggleall_wide( source.form, userid, 0 );
-
-		switch( source.value )
-		{
-			case 'admin':
-				source.form.elements['blog_perm_cats_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_properties_'+String(userid)].checked = 1;
-			case 'editor':
-				source.form.elements['blog_perm_published_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_protected_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_private_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_draft_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_deprecated_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_delpost_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_comments_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_media_browse_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_media_upload_'+String(userid)].checked = 1;
-				source.form.elements['blog_perm_media_change_'+String(userid)].checked = 1;
-			case 'member':
-				source.form.elements['blog_ismember_'+String(userid)].click();
-		}
-	}
-
-
-	function update_checkboxes_wide( source, userid )
-	{
-		if( typeof(source.checked) != 'undefined' )
-		{ // source is checkbox
-			f = source.form;
-
-			if( source.id.indexOf( idprefix+'_state_'+String(userid) ) == 0 )
-			{
-				if( !source.checked ){ toggleall_wide( f, userid, 0 ) }
-				setcheckallspan(userid, source.checked);
-			}
-			else if( source.checked && !f.elements[idprefix+'_state_'+String(userid)].checked )
-			{
-				f.elements['checkallspan_state_'+String(userid)].click();
-			}
-		}
-		else
-		{
-			f = source;
-		}
-
-		var toeasy = '';
-		if( !f.elements['blog_ismember_'+String(userid)].checked )
-		{
-			toeasy = 'nomember';
-		}
-		else
-		{
-			var perms_editor = Number(f.elements['blog_perm_deprecated_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_draft_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_private_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_protected_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_published_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_delpost_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_comments_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_media_upload_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_media_browse_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_media_change_'+String(userid)].checked);
-
-			var perms_admin = Number(f.elements['blog_perm_properties_'+String(userid)].checked)
-											+Number(f.elements['blog_perm_cats_'+String(userid)].checked);
-
-			if( perms_editor == 10 )
-			{ // has full editor rights
-				switch( perms_admin )
-				{
-					case 0: toeasy = 'editor'; break;
-					case 1: toeasy = 'custom'; break;
-					case 2: toeasy = 'admin'; break;
-				}
-			}
-			else if( perms_editor == 0 )
-			{
-				if( perms_admin )
-				{
-					toeasy = 'custom';
-				}
-				else
-				{
-					toeasy = 'member';
-				}
-			}
-			else
-			{
-				toeasy = 'custom';
-			}
-		}
-
-
-		for( i = 0; i < f.elements['blog_perm_easy_'+String(userid)].length; i++ )
-		{
-			if( f.elements['blog_perm_easy_'+String(userid)][i].value == toeasy )
-			{
-				f.elements['blog_perm_easy_'+String(userid)][i].checked = 1;
-				break;
-			};
-		}
-	}
-	//-->
-</script>
