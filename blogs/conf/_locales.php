@@ -56,7 +56,7 @@ $locales = array(
 									),
 	'da-DK' => array(	'name' => NT_('Danish (DK)'),
 										'charset' => 'iso-8859-1',
-										'datefmt' => 'd:m:y',
+										'datefmt' => 'd/m/y',
 										'timefmt' => 'H:i:s',
 										'messages' => 'da_DK',
 										'enabled' => 1,

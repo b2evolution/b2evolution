@@ -43,7 +43,7 @@
 	{ // If the email is to a non user comment poster get the email address from the comments table
 		$sql = 'SELECT comment_author, comment_author_email
 			FROM T_comments
-			WHERE comment_ID = "'.$comment_id.'"';
+			WHERE comment_ID = '.$comment_id;
 		$row = $DB->get_row( $sql );
 		$recipient_name = $row->comment_author;
 	}

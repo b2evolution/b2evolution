@@ -21,13 +21,13 @@ require_once dirname(__FILE__).'/_class_blogcache.php';
  * Create a new a blog
  * This funtion has to handle all needed DB dependencies!
  *
- * fplanque: created
+ * @todo: move this to Blog object
  */
 function blog_create(
 	$blog_name,
 	$blog_shortname,
 	$blog_siteurl,
-	$blog_stub,
+	$blog_stub,									// This will temporarily be assigned to both STUB and URLNAME
 	$blog_staticfilename = '',
 	$blog_tagline = '',
 	$blog_description = '',
@@ -51,7 +51,7 @@ function blog_create(
 	if( $blog_locale == '#' ) $blog_locale = $default_locale;
 
 	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
-						blog_stub, blog_staticfilename,
+						blog_stub, blog_urlname, blog_staticfilename,
 						blog_tagline, blog_description, blog_longdesc, blog_locale, blog_notes, blog_keywords,
 						blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
 						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
@@ -61,6 +61,7 @@ function blog_create(
 	$query .= "'".$DB->escape($blog_shortname)."', ";
 	$query .= "'".$DB->escape($blog_siteurl)."', ";
 	$query .= "'".$DB->escape($blog_stub)."', ";
+	$query .= "'".$DB->escape($blog_stub)."', ";		// This one is for urlname
 	$query .= "'".$DB->escape($blog_staticfilename)."', ";
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_description)."', ";

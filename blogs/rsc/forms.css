@@ -1,4 +1,4 @@
-/*
+/**
  * Default Form styles
  * Feel free to override all these styles in your own skins
  */
@@ -28,7 +28,7 @@ fieldset .notes {
 }
 
 fieldset div.notes {
-	margin: 1ex 20px;
+	margin: 1ex;
 }
 
 input.large,

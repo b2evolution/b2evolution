@@ -113,12 +113,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" class="middle" alt="<?php echo T_('EMail') ?>" /></a>
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a> 
 			</span>
-			<?php
-				$Item->feedback_link( 'comments' ); // Link to comments
-				$Item->feedback_link( 'trackbacks', ' &bull; ' ); // Link to trackbacks
-				$Item->feedback_link( 'pingbacks', ' &bull; ' ); // Link to trackbacks
-				$Item->edit_link( ' &bull; ' );  // Link to backoffice for editing
-			?>
+
+			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
+
+			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
@@ -246,7 +246,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</div>
 	<?php } ?>
 
-	<?php if ($disp != 'stats')
+	<?php if( $disp != 'stats' )
 	{ ?>
 	<div class="bSideItem">
 		<h3><?php echo T_('Recent Referers') ?></h3>
