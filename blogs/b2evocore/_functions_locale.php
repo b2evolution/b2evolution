@@ -226,9 +226,9 @@ function locale_options( $default = '' )
 /**
  *	Detect language from HTTP_ACCEPT_LANGUAGE
  *
- *	@return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
+ * @author dAniel
+ * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
  *	
- *	blueyed: created
  */
 function locale_from_httpaccept()
 {

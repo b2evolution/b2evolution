@@ -254,8 +254,7 @@ function create_antispam()
  * create_locales(-)
  *
  * Used when creating full install and upgrading from earlier versions
- *
- * blueyed: created
+ * @author dAniel
  *
  */
 function create_locales()
@@ -275,31 +274,6 @@ function create_locales()
 	) COMMENT='saves available locales'";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
-
-	echo 'Creating Locales... ';
-	if( isset($locales) && is_array($locales) )
-	{
-		foreach( $locales as $localekey => $lval )
-		{
-			if( !isset($lval['messages']) )
-			{ // if not explicit messages file is given we'll translate the locale
-				$lval['messages'] = strtr($localekey, '-', '_');
-			}
-			$query = "INSERT INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled )
-				VALUES (
-				'$localekey',
-				'{$lval['charset']}',
-				'{$lval['datefmt']}',
-				'{$lval['timefmt']}',
-				'{$lval['name']}',
-				'{$lval['messages']}',
-				1
-				)";
-			$q = mysql_query($query) or mysql_oops( $query );
-		}
-		echo 'OK.';
-	} else echo 'failed: array $locales not defined.';
-	echo "<br />\n";
 
 }
 
@@ -400,6 +374,10 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://tin-men.net/' ) or mysql_oops( $query );
+
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://thequod.de/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);

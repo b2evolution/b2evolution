@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "POT-Creation-Date: 2004-04-05 22:37+0200\n"
-"PO-Revision-Date: 2004-04-14 15:39+0100\n"
+"PO-Revision-Date: 2004-04-17 19:23+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -973,7 +973,7 @@ msgstr "Konvertiert Zeilenumbrüche zu &lt;br /&gt; Tags."
 #: ..\..\..\skins\_profile.php:91
 #: ..\..\..\skins\basic\_profile.php:93
 msgid "Update"
-msgstr "Update"
+msgstr "Aktualisieren"
 
 #: ..\..\..\admin\b2options.php:109
 #: ..\..\..\admin\_blogs_form.php:280

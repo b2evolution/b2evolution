@@ -1254,11 +1254,10 @@ function validate_url( $url, & $allowed_uri_scheme )
  *
  * {@internal pre_dump(-) }}
  *
+ * @author dAniel
  * @param mixed variable to dump
  * @param string title to display
  * @return -
- *
- * blueyed: created 04-04-15
  *
  */
 function pre_dump($dump, $title = '')

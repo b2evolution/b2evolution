@@ -220,10 +220,10 @@ function upgrade_b2evo_tables()
 	{	// upgrade to 0.8.9+CVS
 
 		/**
+		 *
 		 * converts languages in a given table into according locales
 		 *
-		 * blueyed: created
-		 *
+		 * @author dAniel
 		 * @param string name of the table
 		 * @param string name of the column where lang is stored
 		 * @param string name of the table's ID column

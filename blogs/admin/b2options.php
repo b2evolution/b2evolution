@@ -14,9 +14,36 @@ $title = T_('Options');
 	locales admin in the backoffice should READ **everything** from the
 	array and WRITE to the array+DB. That way new locales introduced in new
 	releases will be transparently added to the enabled locales.
+
+	echo 'Creating Locales... ';
+	if( isset($locales) && is_array($locales) )
+	{
+		$query = "INSERT INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled )";
+		foreach( $locales as $localekey => $lval )
+		{
+			if( !isset($lval['messages']) )
+			{ // if not explicit messages file is given we'll translate the locale
+				$lval['messages'] = strtr($localekey, '-', '_');
+			}
+			$query .= " VALUES (
+			'$localekey',
+			'{$lval['charset']}',
+			'{$lval['datefmt']}',
+			'{$lval['timefmt']}',
+			'{$lval['name']}',
+			'{$lval['messages']}',
+			'{$lval['enabled']}',
+			)";
+		}
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo 'OK.';
+	} else echo 'failed: array $locales not defined.';
+	echo "<br />\n";
+
 */
 
 param( 'action', 'string' );
+
 
 switch($action)
 {

@@ -19,7 +19,7 @@ $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 # This MUST BE in the list below
 $default_locale = 'en-US';
 
-$default_locale = 'fr-FR';  // for testing :))
+$default_locale = 'de-DE';  // for testing :))
 
 
 // we need this here, because we include _functions_locale after defining locales
@@ -37,8 +37,10 @@ function NT_($string)
 
 
 //{{{ defining the locales:
-# These are default settings. They are used for creating the locales table
-# in the DB and remain as a fallback option afterwards.
+# These are the default settings.
+# This array will be overwritten from DB if locales are set there,
+# that is when they get updated from the Backoffice
+# They are also used as fallback, if we have no access to the DB yet.
 # IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
 $locales = array(
 	'cs-CZ' => array(	'name' => NT_('Czech (CZ)'),
