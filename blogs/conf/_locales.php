@@ -18,6 +18,7 @@ require_once (dirname(__FILE__)."/$conf_dirout/$core_subdir/_functions_locale.ph
 
 # Supported languages for posts:
 $languages = array(
+	'cs' => NT_('Czech'),
 	'nl' => NT_('Dutch'),
 	'en' => NT_('English'),
 	'fr' => NT_('French'),
@@ -44,6 +45,11 @@ $default_locale = 'fr_FR';			// For testing :))
 #  and localization:
 # Add what you need and comment what you don't need
 $locales = array(
+	'cs_CZ' => array( // Czech, CZECH REPUBLIC
+									'charset' => 'utf-8',
+									'datefmt' => 'd. m. y',
+									'timefmt' => 'H.i:s',
+								),
 	'de_DE' => array( // German, Germany
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
