@@ -53,51 +53,36 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 		case 'general':
 			// UPDATE general settings:
 			
-			$defaults = array
-			( // checkboxes
-				'AutoBR' => 0,
-				'newusers_canregister' => 0,
-				'links_extrapath' => 0
-			);
+			param( 'default_blog_ID', 'integer', true );
+			$Settings->set( 'default_blog_ID', $default_blog_ID );
+			param( 'default_blog_ID', 'integer', true );
+			$Settings->set( 'default_blog_ID', $default_blog_ID );
+			param( 'posts_per_page', 'integer', true );
+			$Settings->set( 'posts_per_page', $posts_per_page );
+			param( 'what_to_show', 'string', true );
+			$Settings->set( 'what_to_show', $what_to_show );
+			param( 'archive_mode', 'string', true );
+			$Settings->set( 'archive_mode', $archive_mode );
+			param( 'AutoBR', 'integer', 0 );
+			$Settings->set( 'AutoBR', $AutoBR );
+			param( 'newusers_canregister', 'integer', 0 );
+			$Settings->set( 'newusers_canregister', $newusers_canregister );
+			param( 'newusers_grp_ID', 'integer', true );
+			$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
+			param( 'newusers_level', 'integer', true );
+			$Settings->set( 'newusers_level', $newusers_level );
+			param( 'links_extrapath', 'integer', 0 );
+			$Settings->set( 'links_extrapath', $links_extrapath );
+			param( 'permalink_type', 'string', true );
+			$Settings->set( 'permalink_type', $permalink_type );
+			param( 'user_minpwdlen', 'integer', true );
+			$Settings->set( 'user_minpwdlen', $user_minpwdlen );
+			param( 'reloadpage_timeout', 'integer', true );
+			$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 			
-			// FP: TODO: this whole block is grotesque. Poor maintaincance. Make it sequential calls to ->set()
-			foreach( array( 'default_blog_ID', 'posts_per_page', 'what_to_show', 'archive_mode', 'AutoBR',
-											'newusers_canregister', 'newusers_grp_ID', 'newusers_level',
-											'links_extrapath', 'permalink_type', 'user_minpwdlen', 'reloadpage_timeout') as $param )
+			if( $Settings->updateDB() )
 			{
-				// force type, string parameters must be listed here
-				$ptype = in_array($param, array( 'what_to_show', 'archive_mode', 'permalink_type' ) ) ? 'string' : 'integer';
-				
-				if( param($param, $ptype, '', false, false, false) !== false ) // don't force setting
-				{ // We have provided a new value
-					$Settings->set( $param, $$param );
-				}
-				elseif( in_array($$param, $defaults) )
-				{
-					if( $Settings->get($param) != $$param )
-					{
-						$Settings->set( $param, $defaults[$param] );
-					}
-				}
-				else
-				{
-					errors_add( sprintf(T_('Parameter %s required!'), $param) );
-				}
-			}
-			
-			if( errors() )
-			{
-				echo '<div class="panelinfo">';
-				errors_display('', '');
-				echo '</div>';
-				break;
-			}
-			else
-			{
-				if( $Settings->updateDB() )
-				{
-					$status_update[] = T_('General settings updated.');
-				}
+				$status_update[] = T_('General settings updated.');
 			}
 			
 			break;
