@@ -802,5 +802,22 @@ class ItemList extends DataObjectList
 			echo $after;
 		}
 	}
+
+	/**
+	 * Template function: display message if list is empty
+	 *
+	 * {@internal ItemList::display_if_empty(-) }}
+	 *
+	 * @param string String to display if list is empty
+	 */
+	function display_if_empty( $message = '' )
+	{
+		if( empty($message) ) 
+		{	// Default message:
+			$message = T_('Sorry, there is no post to display...');
+		}
+
+		parent::display_if_empty( $message );
+	}
 }
 ?>

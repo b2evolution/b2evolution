@@ -30,9 +30,7 @@ class Item extends DataObject
 	var $comments;			// Comments status
 	var $url;					// Should move
 	var $autobr = 0;		// Should move
-	/**
-	 * @access private
-	 */
+	// Derived:
 	var $blog_ID;
 
 	/**

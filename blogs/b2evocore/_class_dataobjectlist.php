@@ -110,8 +110,13 @@ class DataObjectList
 	 *
 	 * @param string String to display if list is empty
 	 */
-	function display_if_empty( $message = 'Sorry, there is nothing to display...' )
+	function display_if_empty( $message = '' )
 	{
+		if( empty($message) ) 
+		{	// Default message:
+			$message = T_('Sorry, there is nothing to display...');
+		}
+
 		if( $this->result_num_rows == 0 )
 		{
 			echo $message;

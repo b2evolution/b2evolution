@@ -55,6 +55,8 @@
 	?></h2>
 
 	<?php	// ---------------------------------- START OF POSTS --------------------------------------
+	if( isset($MainList) ) $MainList->display_if_empty();	// Display message if no post
+
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 		$MainList->date_if_changed();

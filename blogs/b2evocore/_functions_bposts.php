@@ -432,6 +432,34 @@ function Item_get_by_ID( $post_ID )
 	return new Item( $row );	// COPY !
 }
 
+/**
+ * Get an Item by its urltitle
+ *
+ * {@internal Item_get_by_title(-) }}
+ *
+ * @todo cacheing?
+ *
+ * @param string url title of Item
+ * @return Item requested object or false
+ */
+function Item_get_by_title( $urltitle )
+{
+	global $DB, $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
+
+	// We have to load the post
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
+									post_content, post_title, post_urltitle, post_url, post_category,
+									post_autobr, post_flags, post_wordcount, post_comments, 
+									post_renderers, cat_blog_ID
+					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
+					WHERE post_urltitle = ".$DB->quote($urltitle);
+
+	if( ! ($row = $DB->get_row( $sql )) )
+		return false;
+
+	return new Item( $row );	// COPY !
+}
+
 
 /**
  * get_the_title(-)

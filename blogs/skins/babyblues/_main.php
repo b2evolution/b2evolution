@@ -28,6 +28,8 @@
 	<!-- // b2 loop start -->
 	 
 	<?php	// ------------------------------------- START OF POSTS -------------------------------------
+	if( isset($MainList) ) $MainList->display_if_empty();	// Display message if no post
+
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 	?>

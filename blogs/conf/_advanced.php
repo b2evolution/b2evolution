@@ -74,6 +74,12 @@ $phoneemail_separator = ':::';
 # When pinging http://blo.gs, use extended ping to RSS?
 $use_rss = 1;
 
+# If a particular post is requested (by id or title) but on the wrong blog,
+# do you want to automatically redirect to the right blog?
+# This is overly usefull if you move posts or categories from one blog to another
+# If this is disabled, the post will be displayed in the wrong blog template.
+$redirect_to_postblog = 1;
+
 
 // ** DB table names **
 

@@ -138,6 +138,23 @@ if( ($pos = strpos( $path_string[0], $blog_baseurl )) !== false )
 if ( empty( $disp ) )
 { // If we are going to display posts and not something special...
 
+	// On single post requests, check if we're on the right blog!
+	if( $redirect_to_postblog && ( (!empty($p)) || (!empty($title)) ) )
+	{	// Yes we need to check.
+		if( !empty($p) )
+			$Item = Item_get_by_ID( $p );
+		else
+			$Item = Item_get_by_title( $title );
+			
+		if( ($Item !== false) && ($Item->blog_ID != $blog) )
+		{	// We're on the wrong blog (probably an old permalink) let's redirect
+			$new_permalink = $Item->gen_permalink();
+			header ("Location: $new_permalink");
+			exit();
+		}
+	}
+
+	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, 
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
 															$preview, '', '', $timestamp_min, $timestamp_max, $title );
