@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the AbstractSettings class designed to handle all kinds of settings. {{{
+ * This file implements the AbstractSettings class designed to handle all kinds of settings.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -35,9 +35,9 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE
  *
- * @version $Id$ }}}
- *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -323,4 +323,11 @@ class AbstractSettings
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.13  2004/10/11 19:02:04  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

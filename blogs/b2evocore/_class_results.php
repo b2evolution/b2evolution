@@ -50,6 +50,8 @@ class Results
 
 	/**
 	 * @param string SQL query
+	 * @param integer number of lines displayed on one screen
+	 * @param 
 	 */
 	function Results( $sql, $limit = 20, $page = NULL )
 	{
