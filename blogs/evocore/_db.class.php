@@ -733,10 +733,38 @@ class DB
 			echo 'Rows: ', $query['rows'];
 		}
 	}
+
+
+	/**
+	 * @todo implement transactions!
+	 */
+	function begin()
+	{
+	}
+
+
+	/**
+	 * @todo implement transactions!
+	 */
+	function commit()
+	{
+	}
+
+
+	/**
+	 * @todo implement transactions!
+	 */
+	function rollback()
+	{
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/17 19:36:23  fplanque
+ * no message
+ *
  * Revision 1.7  2005/02/08 01:11:21  blueyed
  * stoopid parse error fixed
  *

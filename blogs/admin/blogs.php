@@ -462,6 +462,7 @@ switch($action)
 			$edited_Blog->disp( 'name' );
 			echo ']...</h3>';
 			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, true );
+			unset($edited_Blog);
 			echo '</div>';
 		}
 		break;
@@ -559,6 +560,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.25  2005/02/17 19:36:23  fplanque
+ * no message
+ *
  * Revision 1.24  2005/02/15 22:05:24  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *

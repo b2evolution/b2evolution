@@ -950,12 +950,31 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
-	 * @param array an array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function hidden( $field_name, $field_value )
 	{
 		$r = '<input type="hidden" name="'.$field_name.'" value="'.$field_value.'" />';
+
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
+	function hiddens( $hiddens )
+	{
+		$r = '';
+
+		foreach( $hiddens as $hidden )
+		{
+			$r .= '<input type="hidden" name="'.$hidden[0].'" value="'.$hidden[1].'" />';
+		}
 
 		if( $this->output )
 		{

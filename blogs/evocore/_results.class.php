@@ -82,6 +82,7 @@ class Results extends Widget
 	 *   - $this->params['col_start'];
 	 */
 	var $col_starts = NULL;
+	var $col_headstarts = NULL;
 	var $params = NULL;
 
 	/**
@@ -384,7 +385,11 @@ class Results extends Widget
 			foreach( $this->col_headers as $col_header )
 			{ // For each column:
 
-				if( ($col_count==0) && isset($this->params['colhead_start_first']) )
+				if( isset($this->col_headstarts[$col_count] ) )
+				{ // We have a customized column start for this one:
+					echo $this->col_headstarts[$col_count];
+				}
+				elseif( ($col_count==0) && isset($this->params['colhead_start_first']) )
 				{ // First column can get special formatting:
 					echo $this->params['colhead_start_first'];
 				}
@@ -547,8 +552,12 @@ class Results extends Widget
 
 				$output .= $col;
 
-				// Make variable substitution:
+				// Make variable substitution for STRINGS:
 				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $output );
+				// Make variable substitution for RAWS:
+				$output = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $output );
+				// Make variable substitution for full ROW:
+				$output = str_replace( '{row}', '$row', $output );
 				// Make callback function substitution:
 				$output = preg_replace( '#% (.+?) %#ix', "'.$1.'", $output );
 
@@ -581,12 +590,14 @@ class Results extends Widget
 	{
 		$sql_order = '';
 
-		if ( isset( $this->col_orders ) )
+		if ( !empty( $this->col_orders ) )
 		{ //the names of the DB columns are defined
 			$pos = max( strpos( $order, 'A' ), strpos( $order, 'D' ) );
-			$sql_order = ' ORDER BY '.$this->col_orders[$pos].' '.$asc;
-
-			$sql_order = str_replace( ',', $this->asc.', ', $sql_order );
+			if( !empty( $this->col_orders[$pos] ) )
+			{
+				$sql_order = ' ORDER BY '.$this->col_orders[$pos].' '.$asc;
+				$sql_order = str_replace( ',', $this->asc.', ', $sql_order );
+			}
 		}
 
 		return $sql_order;
@@ -931,6 +942,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/17 19:36:24  fplanque
+ * no message
+ *
  * Revision 1.12  2005/01/28 19:28:03  fplanque
  * enhanced UI widgets
  *

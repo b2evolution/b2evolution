@@ -912,7 +912,7 @@ function remove_magic_quotes( $mixed )
 function param( $var, $type = '', $default = '', $memorize = false,
 								$override = false, $forceset = true )
 {
-	global $$var, $global_param_list, $Debuglog;
+	global $$var, $global_param_list, $Debuglog, $debug;
 
 	// Check if already set
 	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
@@ -935,7 +935,9 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $default === true )
 		{
-			die( '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>' );
+			echo '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>';
+			if( ! $debug )
+				die();
 		}
 		elseif( $forceset )
 		{
@@ -978,16 +980,45 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 	if( $memorize )
 	{ // Memorize this parameter
-		if( !isset($global_param_list) )
-		{ // Init list if necessary:
-			$global_param_list = array();
-		}
-		$Debuglog->add( "Memorize(".count($global_param_list).") 'var' => $var, 'type' => $type, 'default' => $default <br />", 'params');
-		$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
+		memorize_param( $var, $type, $default );
 	}
 
 	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
 	return $$var;
+}
+
+
+function memorize_param( $var, $type, $default, $value = NULL )
+{
+	global $Debuglog, $global_param_list, $$var;
+
+	if( !isset($global_param_list) )
+	{ // Init list if necessary:
+		$Debuglog->add( 'init $global_param_list', 'params' );
+		$global_param_list = array();
+	}
+
+	$Debuglog->add( "memorize_param() 'var' => $var, 'type' => $type, 'default' => $default"
+									.(is_null($value) ? '' : " value=$value"), 'params');
+	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
+
+	if( !is_null( $value ) )
+	{	// We want to set the variable too.
+		$$var = $value;
+	}
+}
+
+/**
+ * Forget a param so that is will not get included in subsequent {@see regenerate_url()} calls
+ */
+function forget_param( $var )
+{
+	global $Debuglog, $global_param_list;
+
+	$Debuglog->add( 'forget_param('.$var.')', 'params' );
+
+	unset( $global_param_list[$var] );
+
 }
 
 
@@ -1073,11 +1104,24 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 			{
 				global $$var;
 				$value = $$var;
-				// echo "var=$var, type=$type, defval=[$defval], val=[$value] \n";
+				// $Debuglog->add( "var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 				if( (!empty($value)) && ($value != $defval) )
 				{ // Value exists and is not set to default value:
 					// echo "adding $var \n";
-					$params[] = $var.'='.$value;
+					if( $type === 'array' ) 
+					{ //there is a special formatting in case of arrays
+						$url_array = array();
+						$i = 0;
+						foreach( $value as $value )
+						{
+							$params[] = $var.'['.$i.']='.$value;
+							$i++;
+						}
+					}
+					else
+					{	// no array : normal formatting
+						$params[] = $var.'='.$value;
+					}
 				}
 				// else echo "ignoring $var \n";
 			}
@@ -1091,11 +1135,14 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 
 	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
 
+	/*
+   * fplanque: who added this? what for? why prevent relative paths?
+   *
 	if( $basehost != $_SERVER['HTTP_HOST'] && !preg_match( '#^https?://#', $url ) )
 	{
 		$url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].( substr( $url, 0, 1 ) == '/' ? '' : '/' ).$url;
 	}
-
+	*/
 
 	if( !empty( $params ) )
 	{
@@ -1711,6 +1758,49 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 	return $date.(empty($time) ? '' : ' '.$time );
 }
 
+/**
+ * function used during the call to the results to specify 
+ * whether the selection checkbox of the current item must be checked
+ *
+ * @param integer item id
+ * @param string item name
+ * @return string the correct input tag
+ */
+function result_input( $item_ID, $item_name )
+{
+	global $cols_check, $item_ID_array;
+	
+	$r = '';
+	
+	if( !in_array( $item_ID, $item_ID_array ) )
+	{ //the current item id is not present in the item id array
+		$item_ID_array[] = $item_ID; //construction of the ID list
+		
+		$r .= '<input type="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
+	
+		if( in_array( $item_ID, $cols_check ) )
+		{
+			$r .= ' checked="checked" ';
+		}
+		else
+		{
+			$r .= '';
+		}
+	
+		$r .= ' />';
+	}
+	
+	return $r;
+}
+
+
+function bullet( $bool )
+{
+	if( $bool )
+		return getIcon( 'bullet_full', 'imgtag', array( 'alt'=>'&bull;' ) );
+
+	return getIcon( 'bullet_empty', 'imgtag', array( 'alt'=>'&nbsp;' ) );
+}
 
 /**
  * Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR,
@@ -1766,6 +1856,9 @@ function getBaseDomain( $url )
 
 /*
  * $Log$
+ * Revision 1.41  2005/02/17 19:36:24  fplanque
+ * no message
+ *
  * Revision 1.40  2005/02/15 22:05:09  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *

@@ -65,6 +65,7 @@ class DataObject
 	var $creator_field;
 	var $lasteditor_field;
 	var $dbchanges = array();
+	var $delete_restrictions = array();
 	/**#@-*/
 
 	/**
@@ -270,6 +271,74 @@ class DataObject
 
 
 	/**
+	 * Check relations before deleting
+	 *
+	 * @return boolean true if no restriction prevents deletion
+	 */
+	function check_delete( $restrict_title )
+	{
+		global $DB, $Messages, $db_aliases;
+
+		foreach( $this->delete_restrictions as $restriction )
+		{
+			if( !isset( $db_aliases[$restriction['table']] ) )
+			{	// We have no declaration for this table, we consider we don't deal with this table in this app:
+				continue;
+			}
+
+			$count = $DB->get_var( 'SELECT COUNT(*)
+																FROM '.$restriction['table'].'
+															 WHERE '.$restriction['fk'].' = '.$this->ID );
+			if( $count )
+			{
+				$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+			}
+		}
+
+		if( $Messages->count('restrict') )
+		{	// There are restrictions:
+			$Messages->head = array(
+					'container' => $restrict_title,
+					'restrict' => T_('The following relations prevent deletion:')
+				);
+			$Messages->foot =	T_('Please delete related objects before you proceed.');
+			return false;	// Can't delete
+		}
+
+		return true;	// can delete
+	}
+
+
+	/**
+	 * Displays form to confirm deletion of this object
+	 */
+	function confirm_delete( $confirm_title, $delete_action, $hiddens )
+	{
+		// No restrictions, ask for confirmation:
+		echo '<div class="panelinfo">';
+		echo '<h2>'.$confirm_title.'</h2>';
+		echo '<h3>'.T_('THIS CANNOT BE UNDONE!').'</h3>';
+
+		$Form = & new Form( '', '', 'get', '' );
+
+		$Form->begin_form( 'inline' );
+			$Form->hiddens( $hiddens );
+			$Form->hidden( 'action', $delete_action );
+			$Form->hidden( 'confirm', 1 );
+			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
+		$Form->end_form();
+
+		$Form->begin_form( 'inline' );
+			$Form->hiddens( $hiddens );
+			$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
+		$Form->end_form();
+
+		echo '</div>';
+		return true;
+	}
+
+
+	/**
 	 * Get a member param by its name
 	 *
 	 * {@internal DataObject::get(-) }}
@@ -396,6 +465,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/17 19:36:23  fplanque
+ * no message
+ *
  * Revision 1.11  2005/01/12 20:22:51  fplanque
  * started file/dataobject linking
  *

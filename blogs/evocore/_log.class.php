@@ -55,6 +55,16 @@ class Log
 	var $defaultlevel = 'error';
 
 	/**
+	 * @var mixed string or array to display before messages
+	 */
+	var $head = '';
+
+	/**
+	 * @var strinf to display after messages
+	 */
+	var $foot = '';
+
+	/**
 	 * @var boolean Should {@link add()} automatically output the messages?
 	 */
 	var $dumpAdds = false;
@@ -231,7 +241,7 @@ class Log
 	 *               'container' is then top
 	 * @param string footer (default: empty), might be array ( level => msg ),
 	 *               'container' is then bottom
-	 * @param boolean to display or return (default: true)
+	 * @param boolean to display or return (default: display)
 	 * @param mixed the level of messages to use (level, 'all', or list of levels (array))
 	 * @param string the CSS class of the messages div tag (default: 'log_'.$level)
 	 * @param string the style to use, 'ul', 'p', 'br'
@@ -239,9 +249,18 @@ class Log
 	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
-	function display( $head = '', $foot = '', $display = true, $level = NULL,
+	function display( $head = NULL, $foot = NULL, $display = true, $level = NULL,
 										$cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
 	{
+		if( is_null( $head ) )
+		{	// Use object default:
+			$head = $this->head;
+		}
+		if( is_null( $foot ) )
+		{	// Use object default:
+			$foot = $this->foot;
+		}
+
 		if( $level === NULL )
 		{
 			$level = isset( $this->defaultlevel ) ?
@@ -281,7 +300,7 @@ class Log
 				$disp .= "\t<div class=\"$lcssclass\">";
 			}
 
-			$disp .= Log::getHeadFoot( $head, $llevel, '<h2>%s</h2>' );
+			$disp .= Log::getHeadFoot( $head, $llevel, '<h3>%s</h3>' );
 
 			if( $style == NULL )
 			{ // 'br' for a single message, 'ul' for more
@@ -480,6 +499,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/17 19:36:24  fplanque
+ * no message
+ *
  * Revision 1.8  2005/02/10 22:59:56  blueyed
  * added NULL handling for 2nd parameters for display_cond()
  *

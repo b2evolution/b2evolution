@@ -821,7 +821,7 @@ function cat_select( $display_info = true )
 	else
 	{ // BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
-		$r .= '<table class="catselect">'.cat_select_header();
+		$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
 		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
 		$r .= '</table>';
@@ -937,6 +937,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.18  2005/02/17 19:36:24  fplanque
+ * no message
+ *
  * Revision 1.17  2005/02/16 15:48:06  fplanque
  * merged with work app :p
  *
