@@ -71,8 +71,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 {
 	$test = 0;
 
-	global $baseurl, $use_b2evonetabusereporting;
-	if( ! $use_b2evonetabusereporting ) return false;
+	global $baseurl;
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";

@@ -26,8 +26,9 @@ $use_post_url = 1;			// 1 to enable, 0 to disable
 # (you will be asked to confirm the ban if you enable this)
 $deluxe_ban = 1;	// 1 to enable, 0 to disable
 
-# When banning, do you want to report abuse to the centralized ban list at b2evolution.net?
-$use_b2evonetabusereporting = 1;
+# When banning, do you want to automatically report abuse to the 
+# centralized ban list at b2evolution.net?
+$auto_report_abuse = 1;
 
 # Do not edit the following unless you known what you're doing...
 

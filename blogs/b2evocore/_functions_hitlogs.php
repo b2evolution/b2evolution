@@ -303,7 +303,7 @@ function get_domain_from_hit_ID( $hit_ID )
  */
 function keyword_ban( $keyword )
 {
-	global $tableantispam, $tablehitlog, $tablecomments, $querycount, $deluxe_ban;
+	global $tableantispam, $tablehitlog, $tablecomments, $querycount, $deluxe_ban, $auto_report_abuse;
 
 	echo '<div class="panelinfo">';
 	printf( '<p>'.T_('Banning the keyword %s...').'</p>', $keyword);
@@ -329,7 +329,10 @@ function keyword_ban( $keyword )
 	echo '</div>';
 	
 	// Report this keyword as abuse:
-	b2evonet_report_abuse( $keyword );
+	if( $auto_report_abuse )
+	{
+		b2evonet_report_abuse( $keyword );
+	}
 }
 
 /*
