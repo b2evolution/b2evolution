@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MG blog\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2004-04-05 22:37+0200\n"
-"PO-Revision-Date: 2004-03-09 13:22+0200\n"
+"PO-Revision-Date: 2004-04-04 23:18+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgstr "Ðis ðablonas demonstruoja 3 blogus ið karto (vienà kairëje, 2 deðinëje)"
 #: ..\..\..\skins\fplanque2002\_main.php:90
 #: ..\..\..\skins\fplanque2002\_main.php:106
 msgid "Permanent link to full entry"
-msgstr "Nekintanti (permanent) nuoroda á visà straipsná"
+msgstr "Nekintanti (permanent) nuoroda á visà temà"
 
 #: ..\..\..\multiblogs.php:135 ..\..\..\multiblogs.php:151
 #: ..\..\..\multiblogs.php:219 ..\..\..\multiblogs.php:254
@@ -163,7 +163,7 @@ msgstr "Rodyti komentarus / Komentuoti"
 #: ..\..\..\skins\custom\_main.php:88
 #: ..\..\..\skins\fplanque2002\_main.php:101
 msgid "Display trackbacks / Get trackback address for this post"
-msgstr "Parodyti trackback'us / Ðio áraðo trackback'o adresas"
+msgstr "Parodyti trakbakus / Ðio áraðo trakbako adresas"
 
 #: ..\..\..\multiblogs.php:149 ..\..\..\noskin_a.php:158
 #: ..\..\..\noskin_all.php:159 ..\..\..\noskin_b.php:159
@@ -171,7 +171,7 @@ msgstr "Parodyti trackback'us / Ðio áraðo trackback'o adresas"
 #: ..\..\..\skins\custom\_main.php:91
 #: ..\..\..\skins\fplanque2002\_main.php:104
 msgid "Display pingbacks"
-msgstr "Pingback'ai"
+msgstr "Pingbakai"
 
 #: ..\..\..\multiblogs.php:152 ..\..\..\noskin_a.php:161
 #: ..\..\..\noskin_all.php:162 ..\..\..\noskin_b.php:162
@@ -421,21 +421,19 @@ msgstr "Trinamas áraðas #%d ið blokuojamø sàraðo..."
 
 #: ..\..\..\admin\b2antispam.php:153
 msgid "Banned domains blacklist"
-msgstr "Blokuoti domenai juodajame sàraðe"
+msgstr "Juodasis sàraðas"
 
 #: ..\..\..\admin\b2antispam.php:154
-#, fuzzy
 msgid ""
 "Any URL containing one of the following keywords will be banned from posts, "
 "comments and logs."
-msgstr "Bet koks URL, turintis vienà ið ðiø raktaþodþiø bus blokuojami straipsniuose, komentaruose ir loguose. Jei raktaþodis susijæs su patikimu domenu, paspauskite ant þalios parinktuku ir domenas su ðiuo raktaþodþiu bus nebeblokuojamas."
+msgstr "Bet koks URL, turintis vienà ið ðiø raktaþodþiø bus blokuojamas temose, komentaruose ir statistikoje. "
 
 #: ..\..\..\admin\b2antispam.php:157
-#, fuzzy
 msgid ""
 "If a keyword restricts legitimate domains, click on the green tick to stop "
 "banning with this keyword."
-msgstr "Bet koks URL, turintis vienà ið ðiø raktaþodþiø bus blokuojami straipsniuose, komentaruose ir loguose. Jei raktaþodis susijæs su patikimu domenu, paspauskite ant þalios parinktuku ir domenas su ðiuo raktaþodþiu bus nebeblokuojamas."
+msgstr "Jei raktaþodis susijæs su patikimu domenu, paspauskite ant þalios varnelës ir domenas su ðiuo raktaþodþiu bus atblokuotas."
 
 #: ..\..\..\admin\b2antispam.php:167
 msgid "Allow keyword back (Remove it from the blacklist)"
@@ -451,11 +449,11 @@ msgstr "Praneðkite apie paþeidimus á centralizuotà blokavimø sàraðà!"
 
 #: ..\..\..\admin\b2antispam.php:185
 msgid "Request abuse update from centralized blacklist."
-msgstr "Atnaujinti paþeidëjø sàraðà ið centralizuoto juodojo sàraðo."
+msgstr "Atnaujinti ið centralizuoto juodojo sàraðo."
 
 #: ..\..\..\admin\b2antispam.php:192
 msgid "Add a banned keyword"
-msgstr "Pridëti blokuojamà raktaþodá"
+msgstr "Átraukti naujà raktaþodá"
 
 #: ..\..\..\admin\b2antispam.php:195
 msgid "Keyword"
@@ -523,7 +521,7 @@ msgstr "\"chmod\" komanda nepavyko!"
 #: ..\..\..\admin\b2blogs.php:163
 #, php-format
 msgid "<p>Changing owner to %s</p>"
-msgstr "<p>Keiciamas savininkas á %s</p>"
+msgstr "<p>Keièiamas savininkas á %s</p>"
 
 #: ..\..\..\admin\b2blogs.php:166
 msgid "chown failed!"
@@ -577,18 +575,17 @@ msgstr "Narðyti blogà:"
 
 #: ..\..\..\admin\b2browse.php:59 ..\..\..\admin\b2categories.php:291
 #: ..\..\..\admin\b2edit.php:153
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Since you're a newcomer, you'll have to wait for an admin to authorize you "
 "to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. "
 "When you're promoted, just reload this page and you'll be able to blog. :)"
-msgstr "Kadangi jûs esate èia naujas asmuo, todël palaukite kol administratorius pakeis jûsø lygá  á 1.\tKai tai bus padaryta, galësite kurti naujas temas. Jûs taip pat galite <a %s>susisiekti su administratoriumi</a>, praðydami paaukðtinimo. ;) Kai jûsø lygis pakeltas, paprasèiausiai perkraukite puslapá ir galësite raðyti."
+msgstr "Kadangi jûs esate èia naujas asmuo, todël palaukite kol administratorius pakeis jûsø lygá  á 1.\tKai tai bus padaryta, galësite kurti naujas temas. Jûs taip pat galite <a %s>susisiekti su administratoriumi</a>, praðydami paaukðtinimo. ;) Kai jûsø lygis bus pakeltas, paprasèiausiai perkraukite puslapá ir galësite raðyti."
 
 #: ..\..\..\admin\b2categories.php:14 ..\..\..\admin\_cats_list.php:15
 #: ..\..\..\admin\_menutop.php:60
-#, fuzzy
 msgid "Categories for blog:"
-msgstr "Kategorijos"
+msgstr "Kategorijos:"
 
 #: ..\..\..\admin\b2categories.php:78
 #, php-format
@@ -631,9 +628,8 @@ msgid "Category deleted."
 msgstr "Kategorija iðtrinta."
 
 #: ..\..\..\admin\b2categories.php:186
-#, fuzzy
 msgid "Properties for category:"
-msgstr "Sukurti kategorijà"
+msgstr "Kategorijos ypatybës:"
 
 #: ..\..\..\admin\b2categories.php:189 ..\..\..\admin\b2upload.php:216
 #: ..\..\..\admin\_edit_form.php:125 ..\..\..\admin\_edit_showposts.php:258
@@ -669,9 +665,9 @@ msgid "Editing post"
 msgstr "Redaguojama tema"
 
 #: ..\..\..\admin\b2edit.php:36
-#, fuzzy, php-format
+#, php-format
 msgid "#%d in blog: %s"
-msgstr "Nauja kategorija bloge: %s"
+msgstr "#%d bloge: %s"
 
 #: ..\..\..\admin\b2edit.php:72
 msgid "Oops, no comment with this ID!"
@@ -726,50 +722,49 @@ msgstr "Nustatymai"
 
 #: ..\..\..\admin\b2options.php:60
 msgid "Regional settings"
-msgstr ""
+msgstr "Regiono nustatymai"
 
 #: ..\..\..\admin\b2options.php:62
 msgid "Time difference"
 msgstr "Laiko skirtumas"
 
 #: ..\..\..\admin\b2options.php:62
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "If you're not on the timezone of your server. Current server time is: %s."
-msgstr "jeigu jûsø laiko juosta nesutampa su serverio vietos laiko juosta"
+msgstr "Jeigu jûsø laiko juosta nesutampa su serverio vietos laiko juosta. Dabartinis serverio laikas: %s."
 
 #: ..\..\..\admin\b2options.php:69
 msgid "Default user rights"
-msgstr ""
+msgstr "Vartotojø teisës pagal nutylëjimà"
 
 #: ..\..\..\admin\b2options.php:72
 msgid "New users can register"
-msgstr ""
+msgstr "Nauji vartotojai gali registruotis"
 
 #: ..\..\..\admin\b2options.php:72
 msgid "Check to allow new users to register themselves."
-msgstr ""
+msgstr "Pasirinkite, norëdami leisti vartotojams registruotis patiems."
 
 #: ..\..\..\admin\b2options.php:74
 msgid "Group for new users"
-msgstr ""
+msgstr "Naujø vartotojø grupë"
 
 #: ..\..\..\admin\b2options.php:74
 msgid "Groups determine user roles and permissions."
-msgstr ""
+msgstr "Grupës nustato vartotojø teises ir vaidmenis."
 
 #: ..\..\..\admin\b2options.php:76
 msgid "Level for new users"
-msgstr ""
+msgstr "Naujø vartotojø lygis"
 
 #: ..\..\..\admin\b2options.php:76
 msgid "Levels determine hierarchy of users in blogs."
-msgstr ""
+msgstr "Lygiai nustato vartotojø hierarchijà ðiame webloge."
 
 #: ..\..\..\admin\b2options.php:82
-#, fuzzy
 msgid "Post options"
-msgstr "Áraðo turinys"
+msgstr "Temos nustatymai"
 
 #: ..\..\..\admin\b2options.php:85
 msgid "days"
@@ -785,11 +780,11 @@ msgstr "puslapiai áraðø "
 
 #: ..\..\..\admin\b2options.php:88
 msgid "Display mode"
-msgstr ""
+msgstr "Rodymo metodas"
 
 #: ..\..\..\admin\b2options.php:90
 msgid "Posts/Days per page"
-msgstr ""
+msgstr "Temø/Dienø puslapyje"
 
 #: ..\..\..\admin\b2options.php:93
 msgid "daily"
@@ -818,9 +813,8 @@ msgid "Auto-BR"
 msgstr "Auto-BR"
 
 #: ..\..\..\admin\b2options.php:99
-#, fuzzy
 msgid "Converts line-breaks into &lt;br /&gt; tags."
-msgstr "konvertuoti eilutës nukelimà á &lt;br /&gt; "
+msgstr "Konvertuoja eilutës nukëlimà á &lt;br /&gt; ."
 
 #: ..\..\..\admin\b2options.php:108 ..\..\..\admin\_users_form.php:110
 #: ..\..\..\admin\_users_groupform.php:76 ..\..\..\skins\_profile.php:91
@@ -921,7 +915,7 @@ msgstr "Tiesioginiai Apsilankymai"
 #: ..\..\..\admin\b2stats.php:61
 #, php-format
 msgid "Changing hit #%d type to: %s"
-msgstr "Keiciamas perþiûrø #%d tipas á: %s"
+msgstr "Keièiamas apsilankymo #%d tipas á: %s"
 
 #: ..\..\..\admin\b2stats.php:78
 #, php-format
@@ -947,7 +941,7 @@ msgstr "Data"
 
 #: ..\..\..\admin\b2stats.php:163
 msgid "Indexing Robots"
-msgstr "Indeksuojantys Robotai"
+msgstr "Robotai"
 
 #: ..\..\..\admin\b2stats.php:166
 msgid "Total"
@@ -1032,7 +1026,7 @@ msgstr "paieðkos sistemos"
 
 #: ..\..\..\admin\b2stats.php:316 ..\..\..\skins\_stats.php:60
 msgid "Top Indexing Robots"
-msgstr "Indeksuojantys Robotai"
+msgstr "Robotai"
 
 #: ..\..\..\admin\b2stats.php:317
 msgid ""
@@ -1128,7 +1122,7 @@ msgstr "Tai ðablonas, kuris rodo pasikartojanèiø (recursive) (sub)kategorijø sàr
 
 #: ..\..\..\admin\b2template.php:123
 msgid "This is the template that displays the feedback for a post"
-msgstr "Tai ðablonas, kuris rodo atsiliepimus straipsniuose"
+msgstr "Tai ðablonas, kuris rodo atsiliepimus temose"
 
 #: ..\..\..\admin\b2template.php:126
 msgid "This is the template that displays the last comments for a blog"
@@ -1148,11 +1142,11 @@ msgstr "Tai iððokantis puslapis, rodantis komentarus"
 
 #: ..\..\..\admin\b2template.php:138
 msgid "This is the page displayed in the pingback popup"
-msgstr "Tai iððokantis puslapis, rodantis \"pingback\""
+msgstr "Tai iððokantis puslapis, rodantis \"pingbakus\""
 
 #: ..\..\..\admin\b2template.php:141
 msgid "This is the page displayed in the trackback popup"
-msgstr "Tai iððokantis puslapis, rodantis \"trackback\""
+msgstr "Tai iððokantis puslapis, rodantis \"trakbakus\""
 
 #: ..\..\..\admin\b2template.php:151
 msgid ""
@@ -1237,9 +1231,8 @@ msgid "Here's the code to display it:"
 msgstr "Nuotraukos áterpimo XHTML kodas:"
 
 #: ..\..\..\admin\b2upload.php:212
-#, fuzzy
 msgid "Add the code to your post !"
-msgstr "Itraukti ðià nuorodà á Favorites:"
+msgstr "Áterpti kodà á temà !"
 
 #: ..\..\..\admin\b2upload.php:215
 msgid "Image Details"
@@ -1278,7 +1271,7 @@ msgstr "Negalima áraðyti, praðome iðtaisyti ðias klaidas:"
 #: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:204
 #: ..\..\..\admin\edit_actions.php:437
 msgid "Back to post editing"
-msgstr "Atgal á straipsnio redagavimà"
+msgstr "Atgal á temos redagavimà"
 
 #: ..\..\..\admin\edit_actions.php:99
 msgid "Recording post..."
@@ -1292,7 +1285,7 @@ msgstr "Miegu..."
 #: ..\..\..\admin\edit_actions.php:334
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
-msgstr "Áraðas neskelbiams vieðai: atðaukiamas \"trackback\", \"pingback\" ir blogø ping'inimas..."
+msgstr "Áraðas neskelbiamas vieðai: atðaukiamas \"trakbakas\", \"pingbakas\" ir blogø pinginimas..."
 
 #: ..\..\..\admin\edit_actions.php:147
 msgid "Posting Done..."
@@ -1333,7 +1326,7 @@ msgstr "Negaliu atnaujinti komentarø, praðome iðtaisyti ðias klaidas:"
 
 #: ..\..\..\admin\edit_actions.php:490
 msgid "Back to posts!"
-msgstr "Atgal á straipsnius!"
+msgstr "Atgal á temas!"
 
 #: ..\..\..\admin\edit_actions.php:492
 msgid "You may also want to generate static pages or view your blogs..."
@@ -1341,7 +1334,7 @@ msgstr "Jûs galbût norësite sugeneruoti statinius puslapius ar perþiûrëti savo b
 
 #: ..\..\..\admin\edit_actions.php:500
 msgid "New post"
-msgstr "Naujas straipsnis"
+msgstr "Nauja tema"
 
 #: ..\..\..\admin\_blogs_form.php:16
 msgid "Create new blog!"
@@ -1353,7 +1346,7 @@ msgstr "Atnaujinti blogà!"
 
 #: ..\..\..\admin\_blogs_form.php:29
 msgid "General parameters"
-msgstr ""
+msgstr "Bendri nustatymai"
 
 #: ..\..\..\admin\_blogs_form.php:31 ..\..\..\admin\_blogs_list.php:19
 msgid "Full Name"
@@ -1369,7 +1362,7 @@ msgstr "Pagrindinë Kalba"
 
 #: ..\..\..\admin\_blogs_form.php:38
 msgid "Access parameters"
-msgstr ""
+msgstr "Priëjimo parametrai"
 
 #: ..\..\..\admin\_blogs_form.php:40
 msgid "Blog Folder URL"
@@ -1405,7 +1398,7 @@ msgid ""
 "<strong>If you are not sure how to set this, use the same as Stub Filename.</"
 "strong> This is used by permalinks, trackback, pingback, etc. Setting this "
 "incorrectly may cause these to fail."
-msgstr "Tai <strong>URL</strong> pavadinimas (pvz: blog_b.php) , nadojamas ðiam blogui rodyti. Áprastas nustatymas bûtø toks pat kaip ir Failo Pavadinimas, be .php plëtinio, jei jûsø serveris palaiko tai. <strong>Jei nesate tikri kokius nustatymus naudoti, naudokite toká pat kaip Stub Failo Pavadinimas.</strong>. Tai naudojama \"permalink'uose\", \"trackback'uose\", \"pingback'uose\" ir t.t. Neteisingas ðiø parametrø nustatymas paveiktø iðvardintas opcijas."
+msgstr "Tai <strong>URL</strong> pavadinimas (pvz: blog_b.php) , nadojamas ðiam blogui rodyti. Áprastas nustatymas bûtø toks pat kaip ir Failo Pavadinimas, be .php plëtinio, jei jûsø serveris palaiko tai. <strong>Jei nesate tikri, kokius nustatymus naudoti, naudokite toká pat kaip Stub Failo Pavadinimas.</strong>. Tai naudojama \"permalinkuose\", \"trakbakuose\", \"pingbakuose\" ir t.t. Neteisingas ðiø parametrø nustatymas paveiktø iðvardintas opcijas."
 
 #: ..\..\..\admin\_blogs_form.php:50 ..\..\..\admin\_blogs_list.php:22
 msgid "Static Filename"
@@ -1419,7 +1412,7 @@ msgstr "Tai failo pavadinimas, kuris bus naudojamas blogo pradinio puslapio stat
 
 #: ..\..\..\admin\_blogs_form.php:55 ..\..\..\admin\_users_groupform.php:34
 msgid "User permissions"
-msgstr ""
+msgstr "Vartotojø teisës"
 
 #. TRANS: table header for user list
 #: ..\..\..\admin\_blogs_form.php:58 ..\..\..\admin\_users_list.php:24
@@ -1429,28 +1422,27 @@ msgstr "Prisijungimo vardas"
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:59
 msgid "Can post/edit with following statuses:"
-msgstr ""
+msgstr "Gali skelbti/redaguoti su ðiais statusais:"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:60
-#, fuzzy
 msgid "Delete<br />posts"
-msgstr "Trinami áraðai..."
+msgstr "Trinti<br />áraðus"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:61
 msgid "Edit<br />comts"
-msgstr ""
+msgstr "Redaguoti<br />koment."
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:62
 msgid "Edit<br />cats"
-msgstr ""
+msgstr "Redaguoti<br />kateg."
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:63
 msgid "Edit<br />blog"
-msgstr ""
+msgstr "Redaguoti<br />blogà"
 
 # Posto statusas (administracinëje dalyje)
 #: ..\..\..\admin\_blogs_form.php:66 ..\..\..\b2evocore\_vars.php:175
@@ -1476,60 +1468,56 @@ msgid "Deprecated"
 msgstr "Atmestas"
 
 #: ..\..\..\admin\_blogs_form.php:74
-#, fuzzy
 msgid "Members"
-msgstr "Lapkritis"
+msgstr "Nariai"
 
 #: ..\..\..\admin\_blogs_form.php:100 ..\..\..\admin\_blogs_form.php:114
 #: ..\..\..\admin\_blogs_form.php:184 ..\..\..\admin\_blogs_form.php:192
 msgid "Permission to post into this blog with private status"
-msgstr ""
+msgstr "Leidimas raðyti temas ðiame bloge su statusu \"Privatu\""
 
 #: ..\..\..\admin\_blogs_form.php:107 ..\..\..\admin\_blogs_form.php:188
 msgid "Permission to post into this blog with protected status"
-msgstr ""
+msgstr "Leidimas raðyti temas ðiame bloge su statusu \"Ribota\""
 
 #: ..\..\..\admin\_blogs_form.php:121 ..\..\..\admin\_blogs_form.php:196
 msgid "Permission to post into this blog with draft status"
-msgstr ""
+msgstr "Leidimas raðyti temas ðiame bloge su statusu \"Juodraðtis\""
 
 #: ..\..\..\admin\_blogs_form.php:128 ..\..\..\admin\_blogs_form.php:200
 msgid "Permission to post into this blog with deprecated status"
-msgstr ""
+msgstr "Leidimas raðyti temas ðiame bloge su statusu \"Atðaukta\""
 
 #: ..\..\..\admin\_blogs_form.php:135 ..\..\..\admin\_blogs_form.php:204
 msgid "Permission to delete posts in this blog"
-msgstr ""
+msgstr "Leidimas trinti temas ðiame bloge"
 
 #: ..\..\..\admin\_blogs_form.php:142 ..\..\..\admin\_blogs_form.php:208
 msgid "Permission to edit comments in this blog"
-msgstr ""
+msgstr "Leidimas redaguoti komentarus ðiame bloge"
 
 #: ..\..\..\admin\_blogs_form.php:149 ..\..\..\admin\_blogs_form.php:211
-#, fuzzy
 msgid "Permission to edit categories for this blog"
-msgstr "Jøs neturite teisës redaguoti nustatymø ðiame bloge."
+msgstr "Teisë redaguoti kategorijas ðiame bloge"
 
 #: ..\..\..\admin\_blogs_form.php:156 ..\..\..\admin\_blogs_form.php:215
 msgid "Permission to edit blog properties"
-msgstr ""
+msgstr "Leidimas redaguoti blogo ypatybes"
 
 #: ..\..\..\admin\_blogs_form.php:164
-#, fuzzy
 msgid "Non members"
-msgstr "Lapkritis"
+msgstr "Ne nariai"
 
 #: ..\..\..\admin\_blogs_form.php:226
-#, fuzzy
 msgid "After each new post..."
-msgstr "Áraðomas naujas strapsnis..."
+msgstr "Po kiekvienos naujos temos..."
+
+#: ..\..\..\admin\_blogs_form.php:228
+msgid "Ping b2evolution.net"
+msgstr "Pinginti b2evolution.net"
 
 #: ..\..\..\admin\_blogs_form.php:228
 #, fuzzy
-msgid "Ping b2evolution.net"
-msgstr "Pinginam b2evolution.net..."
-
-#: ..\..\..\admin\_blogs_form.php:228
 msgid ""
 "to get listed on the 'recently updated' list. PLEASE NOTE: If you removed "
 "the b2evolution button and the link to b2evolution from your blog, don't "
@@ -1537,27 +1525,24 @@ msgid ""
 "blacklisted. Also, the Full Name of your blog must be written in ISO 8859-1 "
 "(Latin-1) charset, otherwise we cannot display it on b2evolution.net. You "
 "can use HTML entities (e-g &amp;Kappa;) for non latin chars."
-msgstr ""
+msgstr "paþymëti norint, kad jûsø dienoraðtis bûtø átrauktas á \"Neseniai atnaujinta\" sàraðà. PRAÐOME ATSIMINTI: Jeigu jûs paðalinote b2evolution skydelá ir nuorodà á b2evolution ið savo dienoraðèio, net nesivarginkite ájungdami tai. Jûsø dienoraðtis nebus átrauktas á ðá sàraðà ir bus blokuojamas. Be to, jûsø dienoraðèio \"Pilnas Pavadinimas\" turi bûti paraðytas ISO 8859-1 (Latin-1) kodote , kitaip mes negalime jo parodyti b2evolution.net svetainëje. Jûs galite naudoti HTML simbolius (pvz. &amp;Kappa;) ne lotyniðkiems simboliams."
 
 #: ..\..\..\admin\_blogs_form.php:229
-#, fuzzy
 msgid "Ping technorati.com"
-msgstr "Pinginam technorati.com..."
+msgstr "Pinginti technorati.com"
 
 #: ..\..\..\admin\_blogs_form.php:229 ..\..\..\admin\_blogs_form.php:230
 #: ..\..\..\admin\_blogs_form.php:231
 msgid "to give notice of new post."
-msgstr ""
+msgstr "praneðti apie naujà áraðà."
 
 #: ..\..\..\admin\_blogs_form.php:230
-#, fuzzy
 msgid "Ping weblogs.com"
-msgstr "Pinginam Weblogs.com..."
+msgstr "Pinginti weblogs.com"
 
 #: ..\..\..\admin\_blogs_form.php:231
-#, fuzzy
 msgid "Ping blo.gs"
-msgstr "Pinginam Blo.gs..."
+msgstr "Pinginti blo.gs"
 
 #: ..\..\..\admin\_blogs_form.php:238
 msgid "Tagline"
@@ -1593,43 +1578,41 @@ msgstr "Tai rodoma blogo ðablone."
 
 #: ..\..\..\admin\_blogs_form.php:260
 msgid "Default display options"
-msgstr ""
+msgstr "Standartiniai atvaizdavimo nustatymai"
 
 #: ..\..\..\admin\_blogs_form.php:264
 msgid "Display blog list"
-msgstr ""
+msgstr "Rodyti blogø sàraðà"
 
 #: ..\..\..\admin\_blogs_form.php:264
 msgid ""
 "Check this if you want to display the list of all blogs on your blog page "
 "(if your skin or template supports this)."
-msgstr ""
+msgstr "Paþymëkite tai, norëdami rodyti visø sistemos blogø sàraðà puslapyje (jeigu jûsø ðablono nustatymai tai palaiko)."
 
 #: ..\..\..\admin\_blogs_form.php:269
 msgid "Advanced options"
-msgstr ""
+msgstr "Iðplëstiniai nustatymai"
 
 #: ..\..\..\admin\_blogs_form.php:271
-#, fuzzy
 msgid "Allow trackbacks"
-msgstr "Trackbackø: %"
+msgstr "Leisti trakbakus"
 
 #: ..\..\..\admin\_blogs_form.php:271
 msgid ""
 "Allow other bloggers to send trackbacks to this blog, letting you know when "
 "they refer to it. This will also let you send trackbacks to other blogs."
-msgstr ""
+msgstr "Leisti kitiems blogeriams siøsti trakbakus á ðá blogà, suteikiant jums galimybæ suþinoti kai jie raðo apie jus. Tai taip pat suteiks jums galimybæ siøsti trakbakus á kitus blogus."
 
 #: ..\..\..\admin\_blogs_form.php:272
-#, fuzzy
 msgid "Allow pingbacks"
-msgstr "Gràþinti"
+msgstr "Leisti pingbakus"
 
 #: ..\..\..\admin\_blogs_form.php:272
 msgid ""
 "Allow other bloggers to send pingbacks to this blog, letting you know when "
 "they refer to it. This will also let you send pingbacks to other blogs."
-msgstr ""
+msgstr "Leisti kitiems blogeriams siøsti pingbakus á ðá blogà, suteikiant jums galimybæ suþinoti kai jie raðo apie jus. Tai taip pat suteiks jums galimybæ siøsti pingbakus á kitus blogus."
 
 #: ..\..\..\admin\_blogs_list.php:21
 msgid "Stub URLname"
@@ -1642,9 +1625,8 @@ msgstr "Kalba"
 # Posto statusas (administracinëje dalyje)
 #: ..\..\..\admin\_blogs_list.php:41 ..\..\..\admin\_cats_list.php:29
 #: ..\..\..\admin\_users_list.php:41 ..\..\..\admin\_users_list.php:56
-#, fuzzy
 msgid "Properties"
-msgstr "Apsaugotas"
+msgstr "Ypatybës"
 
 #  TRANS: "generate !" vertimas
 #. TRANS: abbrev. for "generate !"
@@ -1657,9 +1639,8 @@ msgid "Create new blog !"
 msgstr "Sukurti naujà blogà !"
 
 #: ..\..\..\admin\_cats_list.php:41 ..\..\..\admin\_cats_list.php:57
-#, fuzzy
 msgid "Create"
-msgstr "Kuriama"
+msgstr "Sukurti"
 
 #: ..\..\..\admin\_cats_list.php:42
 msgid "New sub-category here"
@@ -1731,24 +1712,23 @@ msgstr "Atsiøsti failà/nuotraukà"
 
 #: ..\..\..\admin\_edit_form.php:191
 msgid "Advanced properties"
-msgstr ""
+msgstr "Iðplëstinës ypatybës"
 
 #: ..\..\..\admin\_edit_form.php:200
-#, fuzzy
 msgid "Edit timestamp"
-msgstr "Paskutinio atnaujinimo laikas ir data"
+msgstr "Redaguoti laikà ir datà"
 
 #: ..\..\..\admin\_edit_form.php:238
 msgid "Pingback"
-msgstr "Pingback'ai"
+msgstr "Pingbakai"
 
 #: ..\..\..\admin\_edit_form.php:238
 msgid "(Send a pingback to all URLs in this post)"
-msgstr "(Siøsti Pingback'us á visus ðiame straipsnyje nurodytus URL)"
+msgstr "(Siøsti Pingbakus á visus ðioje temoje nurodytus URL)"
 
 #: ..\..\..\admin\_edit_form.php:245
 msgid "Trackback URLs"
-msgstr "Trackback'o URL"
+msgstr "Trakbako URL"
 
 #: ..\..\..\admin\_edit_form.php:245
 msgid "(Separate by space)"
@@ -1769,8 +1749,7 @@ msgstr "Paskelbtas (Vieðas)"
 
 #: ..\..\..\admin\_edit_form.php:275
 msgid "The post will be published but visible only by logged-in team members"
-msgstr ""
-"Straipsnis bus paskelbtas, bet matomas tik prisijungusiems komandos nariams."
+msgstr "Tema bus paskelbta, bet matoma tik prisijungusiems komandos nariams."
 
 #: ..\..\..\admin\_edit_form.php:275 ..\..\..\admin\_edit_showposts.php:347
 msgid "Protected (Members only)"
@@ -1778,7 +1757,7 @@ msgstr "Ribota (Tik nariams)"
 
 #: ..\..\..\admin\_edit_form.php:281
 msgid "The post will be published but visible only by yourself"
-msgstr "Straipsnis bus paskelbtas, bet matysite tik patys"
+msgstr "Tema bus paskelbta, bet matysite tik jûs"
 
 #: ..\..\..\admin\_edit_form.php:281 ..\..\..\admin\_edit_showposts.php:349
 msgid "Private (You only)"
@@ -1786,7 +1765,7 @@ msgstr "Privatu (Tik jûs)"
 
 #: ..\..\..\admin\_edit_form.php:287 ..\..\..\admin\_edit_form.php:293
 msgid "The post will appear only in the backoffice"
-msgstr "Straipsnis atsiras tik administracinëje dalyje"
+msgstr "Tema atsiras tik administracinëje dalyje"
 
 #: ..\..\..\admin\_edit_form.php:287 ..\..\..\admin\_edit_showposts.php:351
 msgid "Draft (Not published!)"
@@ -1800,7 +1779,7 @@ msgstr "Atðauktas (Neskelbtas!)"
 msgid ""
 "Select main category in target blog and optionnaly check addtionnal "
 "categories"
-msgstr "Pasirinkite pagrindinæ kategorijà aktyviama bloge. Papildomai galite pasirinkti kitas kategorijas"
+msgstr "Pasirinkite pagrindinæ kategorijà aktyviame bloge. Papildomai galite pasirinkti kitas kategorijas"
 
 #: ..\..\..\admin\_edit_form.php:328
 msgid "Select as an additionnal category"
@@ -1829,19 +1808,19 @@ msgstr "Komentarai"
 
 #: ..\..\..\admin\_edit_form.php:394
 msgid "Visitors can leave comments on this post."
-msgstr ""
+msgstr "Lankytojai gali komentuoti ðioje temoje."
 
 #: ..\..\..\admin\_edit_form.php:394
 msgid "Open"
-msgstr ""
+msgstr "Ájungta"
 
 #: ..\..\..\admin\_edit_form.php:396
 msgid "Visitors can NOT leave comments on this post."
-msgstr ""
+msgstr "Lankytojai NEGALI komentuoti ðioje temoje."
 
 #: ..\..\..\admin\_edit_form.php:396
 msgid "Closed"
-msgstr ""
+msgstr "Iðjungta"
 
 #: ..\..\..\admin\_edit_form.php:408
 msgid "Comment info"
@@ -1895,9 +1874,8 @@ msgid "by"
 msgstr "Autorius:"
 
 #: ..\..\..\admin\_edit_showposts.php:127
-#, fuzzy
 msgid "level:"
-msgstr "Lygis"
+msgstr "lygis:"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\admin\_edit_showposts.php:131
@@ -1919,7 +1897,7 @@ msgstr "Trinti"
 msgid ""
 "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
-msgstr "Jûs ruoðiatës iðtrinti ðá straipsná!\\n\\'Atðaukti\\'jei persigalvojote, \\'OK\\' norint iðtrinti."
+msgstr "Jûs norite iðtrinti ðáà temà!\\n\\'Cancel\\' jei persigalvojote, \\'OK\\' norint iðtrinti."
 
 # Posto statusas (administracinëje dalyje)
 #: ..\..\..\admin\_edit_showposts.php:177
@@ -1948,29 +1926,29 @@ msgstr "komentarø: %"
 
 #: ..\..\..\admin\_edit_showposts.php:185
 msgid "1 Trackback"
-msgstr "1 Trackbackas"
+msgstr "1 Trakbakas"
 
 #: ..\..\..\admin\_edit_showposts.php:185
 msgid "% Trackbacks"
-msgstr "Trackbackø: %"
+msgstr "Trakbakø: %"
 
 #: ..\..\..\admin\_edit_showposts.php:186
 msgid "1 Pingback"
-msgstr "1 Pingbackas"
+msgstr "1 Pingbakas"
 
 #: ..\..\..\admin\_edit_showposts.php:186
 msgid "% Pingbacks"
-msgstr "Pingbackø: %"
+msgstr "Pingbakø: %"
 
 #: ..\..\..\admin\_edit_showposts.php:188
 msgid "Permanent link to this post"
-msgstr "Arch. nuoroda á ðá straipsná"
+msgstr "Arch. nuoroda á ðáà temà"
 
 #: ..\..\..\admin\_edit_showposts.php:233
 msgid ""
 "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
-msgstr "Jûs ruoðiatës iðtrinti ðá komentarà!\\n\\'Atðaukti\\' jei persigalvojote, \\'OK\\' norint iðtrinti."
+msgstr "Jûs ruoðiatës iðtrinti ðá komentarà!\\n\\'Cancel\\' jei persigalvojote, \\'OK\\' norint iðtrinti."
 
 #: ..\..\..\admin\_edit_showposts.php:249
 #: ..\..\..\b2evocore\_functions_comments.php:197
@@ -2067,13 +2045,12 @@ msgid "Exit to blogs"
 msgstr "Persijungti á blogus"
 
 #: ..\..\..\admin\_menutop.php:39
-#, fuzzy
 msgid "Blog time:"
-msgstr "Tinka!"
+msgstr "Dienoraðèio laikas:"
 
 #: ..\..\..\admin\_menutop.php:40
 msgid "GMT:"
-msgstr ""
+msgstr "GMT:"
 
 #: ..\..\..\admin\_menutop.php:41
 msgid "Logged in as:"
@@ -2220,33 +2197,31 @@ msgstr "ID"
 #: ..\..\..\admin\_users_form.php:72 ..\..\..\skins\_profile.php:42
 #: ..\..\..\skins\basic\_profile.php:44
 msgid "Posts"
-msgstr "Straipsniai"
+msgstr "Temos"
 
 #: ..\..\..\admin\_users_form.php:74
 msgid "Identity"
 msgstr "Tapatybë"
 
 #: ..\..\..\admin\_users_form.php:76
-#, fuzzy
 msgid "Created on:"
-msgstr "Kuriama"
+msgstr "Sukurta:"
 
 #: ..\..\..\admin\_users_form.php:78
 msgid "From IP:"
-msgstr ""
+msgstr "Ið IP:"
 
 #: ..\..\..\admin\_users_form.php:80
 msgid "From Domain:"
-msgstr ""
+msgstr "Ið Domeno:"
 
 #: ..\..\..\admin\_users_form.php:82
 msgid "With Browser:"
-msgstr ""
+msgstr "Su Narðykle:"
 
 #: ..\..\..\admin\_users_form.php:88
-#, fuzzy
 msgid "User rights"
-msgstr "User Agents"
+msgstr "Vartotojø teisës"
 
 #: ..\..\..\admin\_users_form.php:89 ..\..\..\admin\_users_list.php:29
 #: ..\..\..\skins\_profile.php:37 ..\..\..\skins\basic\_profile.php:39
@@ -2255,26 +2230,23 @@ msgstr "Lygis"
 
 #: ..\..\..\admin\_users_form.php:94 ..\..\..\admin\_users_form.php:98
 msgid "User group"
-msgstr ""
+msgstr "Vartotojø grupë"
 
 #: ..\..\..\admin\_users_groupform.php:17
-#, fuzzy
 msgid "Editing group:"
-msgstr "Redaguojama tema"
+msgstr "Redaguojama grupë:"
 
 #: ..\..\..\admin\_users_groupform.php:24
-#, fuzzy
 msgid "General"
-msgstr "Centrinis"
+msgstr "Bendras"
 
 #: ..\..\..\admin\_users_groupform.php:31
 msgid "Permissons for members of this group"
-msgstr ""
+msgstr "Ðio grupës nariø leidimai"
 
 #: ..\..\..\admin\_users_groupform.php:35
-#, fuzzy
 msgid "View all"
-msgstr "Perþiûrëti Statistikà"
+msgstr "Þiûrëti viskà"
 
 #: ..\..\..\admin\_users_groupform.php:36
 #: ..\..\..\admin\_users_groupform.php:41
@@ -2283,52 +2255,49 @@ msgstr "Perþiûrëti Statistikà"
 #: ..\..\..\admin\_users_groupform.php:60
 #: ..\..\..\admin\_users_groupform.php:65
 msgid "Full Access"
-msgstr ""
+msgstr "Visiskas Priëjimas"
 
 #: ..\..\..\admin\_users_groupform.php:39
 #: ..\..\..\admin\_users_groupform.php:44
 #: ..\..\..\admin\_users_groupform.php:49
 #: ..\..\..\admin\_users_groupform.php:58
 msgid "No Access"
-msgstr ""
+msgstr "Neprieinama"
 
 #: ..\..\..\admin\_users_groupform.php:40
 #: ..\..\..\admin\_users_groupform.php:45
 #: ..\..\..\admin\_users_groupform.php:50
 #: ..\..\..\admin\_users_groupform.php:59
 msgid "View only"
-msgstr ""
+msgstr "Tik þiûrëti"
 
 #: ..\..\..\admin\_users_groupform.php:52
 msgid "Global options"
-msgstr ""
+msgstr "Globalûs nustatymai"
 
 #: ..\..\..\admin\_users_groupform.php:53
-#, fuzzy
 msgid "Check to allow template editing."
-msgstr "\"Custom\" ðablono redagavimas"
+msgstr "Paþymëti norint leisti redaguoti ðablonà."
 
 #: ..\..\..\admin\_users_groupform.php:61
 #: ..\..\..\admin\_users_groupform.php:65
-#, fuzzy
 msgid "User/Group Management"
-msgstr "Vartotojø valdymas"
+msgstr "Vartotojø/Grupës Valdymas"
 
 #: ..\..\..\admin\_users_list.php:15
 msgid "Groups &amp; Users"
-msgstr ""
+msgstr "Grupës ir Vartotojai"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_users_list.php:79
 msgid ""
 "Are you sure you want to delete this user?\\nWarning: all his posts will be "
 "deleted too!"
-msgstr "Ar tikrai norite iðtrinti ðá vartotojà?\\nPerspëjimas: Visi jo straipsniai bus iðtrinti taip pat!"
+msgstr "Ar tikrai norite iðtrinti ðá vartotojà?\\nPerspëjimas: Visos jo temos bus iðtrintos taip pat!"
 
 #: ..\..\..\admin\_users_list.php:95
-#, fuzzy
 msgid "Register a new user..."
-msgstr "Registruotis..."
+msgstr "Registruoti naujà vartotojà..."
 
 #: ..\..\..\admin\_users_list.php:97
 msgid ""
@@ -2337,7 +2306,7 @@ msgstr "Norëdami iðtrinti vartotojà, sumaþinkite jo lygá iki 0 ir paspauskite ra
 
 #: ..\..\..\admin\_users_list.php:98
 msgid "deleting an user also deletes all posts made by this user."
-msgstr "vartotojo iðtrynimas taip pat iðtrina to vartotojo paraðytus straipsnius."
+msgstr "vartotojo ipaðalinimas taip pat ipaðalina to vartotojo paraðytas temas."
 
 #: ..\..\..\b2evocore\_blog_main.php:160
 #, php-format
@@ -2348,7 +2317,7 @@ msgstr "Negaliu parodyti blogo, nes [%s] ðablonas neegzistuoja. Jis turi bûti nu
 
 #: ..\..\..\b2evocore\_class_group.php:65
 msgid "New group"
-msgstr ""
+msgstr "Nauja grupë"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:95
 msgid "Parser error: "
@@ -2567,13 +2536,12 @@ msgid "Command failed "
 msgstr "Komanda nepavyko"
 
 #: ..\..\..\b2evocore\_class_user.php:56
-#, fuzzy
 msgid "New user"
-msgstr "Naujas straipsnis"
+msgstr "Naujas vartotojas"
 
 #: ..\..\..\b2evocore\_class_user.php:248
 msgid "Permission denied!"
-msgstr ""
+msgstr "Uþdrausta!"
 
 #: ..\..\..\b2evocore\_functions.php:37
 msgid "Can't connect to the database server. MySQL said:"
@@ -2602,9 +2570,8 @@ msgid "If nothing happens, click <a %s>here</a>."
 msgstr "jei nieko nevyksta, paspauskite <a %s>èia</a>."
 
 #: ..\..\..\b2evocore\_functions.php:772
-#, fuzzy
 msgid "No response!"
-msgstr "Atsakymas:"
+msgstr "Nëra atsakymo!"
 
 #: ..\..\..\b2evocore\_functions.php:777
 msgid "Remote error"
@@ -2654,7 +2621,7 @@ msgstr "Atðaukta ( veikiam localhost'e)."
 
 #: ..\..\..\b2evocore\_functions_antispam.php:297
 msgid "Requesting abuse list from b2evolution.net..."
-msgstr "Praðome paþeidimø sàraðo ið b2evolution.net..."
+msgstr "Praðome paþeidëjø sàraðo ið b2evolution.net..."
 
 #: ..\..\..\b2evocore\_functions_antispam.php:315
 msgid "Latest update timestamp"
@@ -2666,7 +2633,7 @@ msgstr "Neuþbaigtas atsakymas."
 
 #: ..\..\..\b2evocore\_functions_antispam.php:348
 msgid "No new blacklisted strings are available."
-msgstr ""
+msgstr "Naujø blokuojamø áraðø nëra."
 
 #: ..\..\..\b2evocore\_functions_antispam.php:352
 msgid "Adding strings to local blacklist"
@@ -2724,11 +2691,11 @@ msgstr "Ankstesnis puslapis"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:676
 msgid "Previous post"
-msgstr "Ankstesnis straipsnis"
+msgstr "Ankstesnës temos"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:729
 msgid "Next post"
-msgstr "Kitas straipsnis"
+msgstr "Kita tema"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:822
 msgid "Next Page"
@@ -2744,7 +2711,7 @@ msgstr "Negaliu iðtrinti jei egzistuoja sub-kategorijos!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:148
 msgid "Cannot delete last category if there are posts inside!"
-msgstr "Negaliu iðtrinti paskutinës kategorijos jei joje yra straipsniø!"
+msgstr "Negaliu iðtrinti paskutinës kategorijos jei joje yra temø!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:254
 #, php-format
@@ -2810,11 +2777,11 @@ msgstr "Statistika"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:23
 msgid "Sending pingbacks..."
-msgstr "Siunèiami pingback'ai..."
+msgstr "Siunèiami pingbakai..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:28
 msgid "No pingback to be done."
-msgstr "Pingback'ai nenumatyti."
+msgstr "Pingbakai nenumatyti."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:34
 msgid "BEGIN"
@@ -2850,26 +2817,26 @@ msgstr "Pradedu gauti antraðtes ir turiná"
 #: ..\..\..\b2evocore\_functions_pingback.php:166
 #: ..\..\..\b2evocore\_functions_pingback.php:167
 msgid "Pingback server found from X-Pingback header:"
-msgstr "Pingback serveris rastas pagal  X-Pingback antraðtes:"
+msgstr "Pingbak serveris rastas pagal  X-Pingback antraðtes:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:180
 #: ..\..\..\b2evocore\_functions_pingback.php:181
 msgid "Pingback server found from Pingback <link /> tag:"
-msgstr "Pingback serveris rastas pagal Pingback <link /> plëtiná:"
+msgstr "Pingbak serveris rastas pagal Pingbak <link /> plëtiná:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:189
 #: ..\..\..\b2evocore\_functions_pingback.php:190
 msgid "Pingback server not found in headers and content"
-msgstr "Pingback serveris nerastas antraðtëse ir turinyje"
+msgstr "Pingbak serveris nerastas antraðtëse ir turinyje"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:195
 #: ..\..\..\b2evocore\_functions_pingback.php:196
 msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
-msgstr "Pingback serverio URL tuðèias (gali bûti, kad tai  PHP fget klaida)"
+msgstr "Pingbak serverio URL tuðèias (gali bûti, kad tai  PHP fget klaida)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:201
 msgid "Pingback server data"
-msgstr "Pingback serverio duomenys"
+msgstr "Pingbak serverio duomenys"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:211
 #: ..\..\..\b2evocore\_functions_pingback.php:212
@@ -2892,19 +2859,19 @@ msgstr "PABAIGA"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:231
 msgid "Pingbacks done."
-msgstr "Pingbackai ávykdyti."
+msgstr "Pingbakai ávykdyti."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:253
 msgid "Pingback (0)"
-msgstr "Pingbackø (0)"
+msgstr "Pingbakø (0)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:254
 msgid "Pingback (1)"
-msgstr "Pingbackas (1)"
+msgstr "Pingbakas (1)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:255
 msgid "Pingbacks (%)"
-msgstr "Pingbackai (%)"
+msgstr "Pingbakai (%)"
 
 #: ..\..\..\b2evocore\_functions_pings.php:26
 msgid "Pinging b2evolution.net..."
@@ -2932,11 +2899,11 @@ msgstr "Archyvas"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:22
 msgid "Sending trackbacks..."
-msgstr "Siunèiam trackbackus..."
+msgstr "Siunèiam trakbakus..."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:25
 msgid "No trackback to be sent."
-msgstr "Nëra siunèiamø trackbackø."
+msgstr "Nëra siunèiamø trakbakø."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:31
 msgid "Excerpt to be sent:"
@@ -2944,11 +2911,11 @@ msgstr "Paruoðta siuntimui iðtrauka:"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:39
 msgid "Trackbacks done."
-msgstr "Trackbackai ávykdyti ."
+msgstr "Trakbakai ávykdyti ."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:53
 msgid "Sending trackback to:"
-msgstr "Siunèiam trackbackà á:"
+msgstr "Siunèiam trakbakà á:"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:110
 msgid "Response:"
@@ -2956,15 +2923,15 @@ msgstr "Atsakymas:"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:154
 msgid "Trackback (0)"
-msgstr "Trackbackø (0)"
+msgstr "Trakbakø (0)"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:155
 msgid "Trackback (1)"
-msgstr "Trackbackas (1)"
+msgstr "Trakbakas (1)"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:156
 msgid "Trackbacks (%)"
-msgstr "Trackbackø (%)"
+msgstr "Trakbakø (%)"
 
 #: ..\..\..\b2evocore\_functions_users.php:68
 msgid "wrong login/password."
@@ -3211,7 +3178,7 @@ msgstr "Centrinis"
 
 #: ..\..\..\conf\_locales.php:21
 msgid "Czech"
-msgstr ""
+msgstr "Èekø"
 
 #: ..\..\..\conf\_locales.php:22
 msgid "Dutch"
@@ -3263,7 +3230,7 @@ msgstr "Supaprastinta Kinø"
 
 #: ..\..\..\htsrv\comment_post.php:23
 msgid "Sorry but comments are now closed for this post."
-msgstr ""
+msgstr "Atsipraðome, bet ðije temoje komentavimas iðjungtas."
 
 #: ..\..\..\htsrv\comment_post.php:36
 msgid "Please fill in the name field"
@@ -3292,7 +3259,7 @@ msgstr "Atgal á komentarø redagavimà"
 #: ..\..\..\htsrv\comment_post.php:102 ..\..\..\htsrv\comment_post.php:106
 #, php-format
 msgid "New comment on your post #%d \"%s\""
-msgstr "Naujas komentaras straipsnyje #%d \"%s\""
+msgstr "Naujas komentaras tema #%d \"%s\""
 
 #: ..\..\..\htsrv\comment_post.php:108
 msgid "Author"
@@ -3367,7 +3334,7 @@ msgstr "Blogo ID"
 
 #: ..\..\..\htsrv\getmail.php:240
 msgid "Permission denied."
-msgstr ""
+msgstr "Uþdrausta."
 
 #: ..\..\..\htsrv\getmail.php:270
 msgid "Posted title"
@@ -3410,9 +3377,8 @@ msgid "Note: You are already logged in!"
 msgstr "Pastaba: Jûs jau prisijungæ!"
 
 #: ..\..\..\htsrv\login.php:106
-#, fuzzy
 msgid "Continue..."
-msgstr "Prisijungti..."
+msgstr "Tæsti..."
 
 #: ..\..\..\htsrv\profile_update.php:32 ..\..\..\skins\_profile.php:16
 #: ..\..\..\skins\basic\_profile.php:16
@@ -3480,7 +3446,7 @@ msgstr "Redaguoti vartotojus"
 #: ..\..\..\htsrv\trackback.php:96 ..\..\..\htsrv\trackback.php:100
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
-msgstr "Naujas trackbackas straipsnyje #%d \"%s\""
+msgstr "Naujas trakbakas temoje #%d \"%s\""
 
 #: ..\..\..\htsrv\trackback.php:102 ..\..\..\xmlsrv\xmlrpc.php:1461
 msgid "Website"
@@ -3745,8 +3711,9 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\install\_functions_create.php:544
+#, fuzzy
 msgid "File permissions!"
-msgstr ""
+msgstr "Vartotojø teisës"
 
 #: ..\..\..\install\_functions_create.php:544
 msgid ""
@@ -3831,15 +3798,15 @@ msgstr "daugiau"
 
 #: ..\..\..\skins\_feedback.php:48 ..\..\..\skins\basic\_feedback.php:48
 msgid "Trackbacks"
-msgstr "Trackbackai"
+msgstr "Trakbakai"
 
 #: ..\..\..\skins\_feedback.php:53 ..\..\..\skins\basic\_feedback.php:53
 msgid "Pingbacks"
-msgstr "Pingbackai"
+msgstr "Pingbakai"
 
 #: ..\..\..\skins\_feedback.php:58 ..\..\..\skins\basic\_feedback.php:58
 msgid "Trackback address for this post:"
-msgstr "Ðio straipsnio trackbacko URL:"
+msgstr "Ðios temos trakbako URL:"
 
 #: ..\..\..\skins\_feedback.php:89 ..\..\..\skins\basic\_feedback.php:88
 msgid "Comment from:"
@@ -3847,22 +3814,22 @@ msgstr "Komentaro autorius"
 
 #: ..\..\..\skins\_feedback.php:104 ..\..\..\skins\basic\_feedback.php:99
 msgid "Trackback from:"
-msgstr "Trackbackas ið:"
+msgstr "Trakbakas ið:"
 
 #: ..\..\..\skins\_feedback.php:119 ..\..\..\skins\basic\_feedback.php:110
 msgid "Pingback from:"
-msgstr "Pingbackas ið:"
+msgstr "Pingbakas ið:"
 
 #  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #: ..\..\..\skins\_feedback.php:134 ..\..\..\skins\basic\_feedback.php:122
 #, php-format
 msgid "No %s for this post yet..."
-msgstr "%s ðiam straipsniui nëra..."
+msgstr "%s ðiai temai nëra..."
 
 #: ..\..\..\skins\_feedback.php:143 ..\..\..\skins\basic\_feedback.php:131
 msgid "Comments are closed for this post."
-msgstr ""
+msgstr "Komentavimas ðioje temoje iðjungtas."
 
 #: ..\..\..\skins\_feedback.php:195 ..\..\..\skins\basic\_feedback.php:183
 msgid "Line breaks become &lt;br /&gt;"
@@ -3887,16 +3854,15 @@ msgstr "Komentaras:"
 #: ..\..\..\skins\_lastcomments.php:33
 #, php-format
 msgid "Original post on %s"
-msgstr "Originalus straipsnis %s kategorijoje"
+msgstr "Originali tema %s kategorijoje"
 
 #: ..\..\..\skins\_profile.php:53 ..\..\..\skins\basic\_profile.php:55
 msgid "Identity shown"
 msgstr "Id parodyta"
 
 #: ..\..\..\skins\_profile.php:72 ..\..\..\skins\basic\_profile.php:74
-#, fuzzy
 msgid "AOL I.M."
-msgstr "MSN I.M."
+msgstr "AOL I.M."
 
 #: ..\..\..\skins\_profile.php:73 ..\..\..\skins\basic\_profile.php:75
 msgid "MSN I.M."
@@ -3908,13 +3874,13 @@ msgstr "Yahoo I.M."
 
 #: ..\..\..\skins\_profile.php:76 ..\..\..\skins\basic\_profile.php:78
 msgid "Notifications"
-msgstr ""
+msgstr "Praneðimai"
 
 #: ..\..\..\skins\_profile.php:76 ..\..\..\skins\basic\_profile.php:78
 msgid ""
 "Check this to receive notification whenever one of your posts receives "
 "comments, trackbacks, etc."
-msgstr ""
+msgstr "Pasirinkite ar norite gauti praneðimus apie naujus komentarus, trakbakus ir kt. jûsø temose. "
 
 #: ..\..\..\skins\_profile.php:80 ..\..\..\skins\basic\_profile.php:82
 msgid "New password"
@@ -3986,91 +3952,10 @@ msgstr "[...] Daugiau!"
 #: ..\..\..\xmlsrv\xmlrpc.php:1455 ..\..\..\xmlsrv\xmlrpc.php:1459
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
-msgstr "Naujas pingbackas straipsnyje #%d \"%s\""
+msgstr "Naujas pingbakas temoje #%d \"%s\""
 
 #~ msgid "A blog tool like it oughta be!"
 #~ msgstr "Blogas toks kaip ir turi bûti!"
 
 #~ msgid "External - English"
 #~ msgstr "Iðorinië - Anglø"
-
-#~ msgid "You have no right to edit the blacklist."
-#~ msgstr "Jûs neturite teisës redaguoti juodojo saraðo."
-
-#~ msgid "You have no right to edit the blogs."
-#~ msgstr "Jûs neturite teisës redaguoti blogø."
-
-#~ msgid "You have no right to generate static pages."
-#~ msgstr "Jûs neturite teisës generuoti statiniø puslapiø."
-
-#~ msgid "You have no right to edit the categories."
-#~ msgstr "Jûs neturite teisës redaguoti kategorijø."
-
-#~ msgid "<strong>Old</strong> name"
-#~ msgstr "<strong>Senas </strong> pavadinimas"
-
-#~ msgid "<strong>New</strong> name"
-#~ msgstr "<strong>Naujas</strong> pavadinimas"
-
-#~ msgid "Edit"
-#~ msgstr "Redaguoti"
-
-#~ msgid "Cheatin' uh ?"
-#~ msgstr "Sukèiauji, a?"
-
-#~ msgid "Show"
-#~ msgstr "Rodyti"
-
-#~ msgid "You have no right to view stats."
-#~ msgstr "Jûs neturite teisës perþiûrëti statistikà."
-
-#~ msgid "You have no right to change a hit type."
-#~ msgstr "Jûs neturite teisës keisti apsilankymo tipo."
-
-#~ msgid "You have no right to delete a hit."
-#~ msgstr "Jûs neturite teisës iðtrinti ðio apsilankymo."
-
-#~ msgid "Can't change the level of an user whose level is higher than yours."
-#~ msgstr "Nagalima pakeisti vartotojo lygio, kadangi jis aukðtesnis uþ jûsø."
-
-#~ msgid "Can't delete an user whose level is higher than yours."
-#~ msgstr "Nagalima iðtrinti vartotojo,  kadangi jo lygis aukðtesnis uþ jûsø."
-
-#~ msgid "Couldn't delete user #%d."
-#~ msgstr "Negalima iðtrinti vartotojo #%d."
-
-#~ msgid "Couldn't delete user #%d's posts."
-#~ msgstr "Negalima iðtrinti vartotojo #%d straipsniø."
-
-#~ msgid "Click on an user's login name to see his/her complete Profile."
-#~ msgstr "Norëdami pamatyti vartotojo pilnà profilá, paspauskite ant jo slapyvardþio."
-
-#~ msgid "To edit your Profile, click on your login name."
-#~ msgstr "Noredami redaguoti savo Profilá, paspauskite ant \"Mano Profolis\" meniu nuorodos."
-
-#~ msgid "Active users"
-#~ msgstr "Aktyvûs vartotojai"
-
-#~ msgid "Inactive users (level 0)"
-#~ msgstr "Neaktyvûs vartotojai (lygis 0)"
-
-#~ msgid "You have no right to edit the templates."
-#~ msgstr "Jûs neturite teisës redaguoti ðablonø."
-
-#~ msgid "The admin disabled this function"
-#~ msgstr "Administratorius iðjungë ðià funkcijà"
-
-#~ msgid "You don't have the right to delete <strong>%s</strong>'s posts."
-#~ msgstr "Jûs neturite teisës iðtrinti <strong>%s</strong> áraðø."
-
-#~ msgid "Oops, no comment with this ID."
-#~ msgstr "Uuups, nerasta komentarø su ðiuo ID!"
-
-#~ msgid "Pinging Cafelog.com..."
-#~ msgstr "Pinginam Cafelog.com..."
-
-#~ msgid "Level 0 users can't post."
-#~ msgstr "Vartotojai su 0 lygiu negali raðyti."
-
-#~ msgid "Register ?"
-#~ msgstr "Registruotis ?"
