@@ -26,6 +26,9 @@
  * }}
  *
  * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * PROGIDISTRI grants François PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -34,6 +37,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
@@ -42,17 +46,43 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
-
 /**
  * Form class
  */
 class Form
 {
-	var	$output = true;
+	var $output = true;
+
+	/**
+	 * CSS class of the form, used as default for {@link end_form()}
+	 */
+	var $form_class = '';
+
+	/**
+	 * Number of fieldsets currently defined.
+	 * If greater then 0, output will be buffered.
+	 * @see begin_fieldset()
+	 * @see end_fieldset()
+	 * @var integer
+	 * @access protected
+	 */
+	var $_count_fieldsets = 0;
+
+	/**
+	 * Buffer for fieldsets.
+	 * @see begin_fieldset()
+	 * @see end_fieldset()
+	 * @var array
+	 * @access protected
+	 */
+	var $_fieldsets = array();
+
 
 	/**
 	 * Constructor
-	 * 
+	 *
+	 * @todo Provide buffering of whole Form to be able to add onsubmit-JS to enable disabled (group) checkboxes again
+	 *
 	 * @param string the name of the form
 	 * @param string the action to execute when the form is submitted
 	 * @param string the method used to send data
@@ -76,6 +106,7 @@ class Form
 				break;
 
 			case 'fieldset':
+				$this->form_class = 'fform';
 				$this->fieldstart = "<fieldset>\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
@@ -103,7 +134,7 @@ class Form
 	 *
 	 * @param string the name of the field
 	 * @param string the field label
-	 * @return the generated HTML 
+	 * @return the generated HTML
 	 */
 	function begin_field( $field_name, $field_label )
 	{
@@ -114,12 +145,13 @@ class Form
 					.$this->inputstart;
 	}
 
-  /**
+
+	/**
 	 * End an input field.
 	 *
 	 * A field is a fielset containing a label div and an input div.
 	 *
-	 * @return the generated HTML 
+	 * @return the generated HTML
 	 */
 	function end_field()
 	{
@@ -127,10 +159,73 @@ class Form
 					.$this->fieldend;
 	}
 
+
+	/**
+	 * Begin fieldset (with legend).
+	 *
+	 * @see {@link end_fieldset()}
+	 * @param string The fieldset legend
+	 * @param string fieldname of a checkbox that controls .disable of all
+	 *               elements in the fieldset group (checkbox and text only for now).
+	 */
+	function begin_fieldset( $legend, $disableBy = NULL )
+	{
+		$r = "\n<fieldset>\n";
+		if( !empty($legend) )
+		{
+			$r .= "\t<legend>$legend</legend>\n";
+		}
+
+		$this->_count_fieldsets++;
+		$this->_fieldsets[$this->_count_fieldsets]['html'] = $r;
+
+		$this->_fieldsets[$this->_count_fieldsets]['disableBy'] = $disableBy;
+		$this->_fieldsets[$this->_count_fieldsets]['disableTags'] = array();
+	}
+
+
+	/**
+	 * End a fieldset (and output/return it).
+	 *
+	 * This handles
+	 */
+	function end_fieldset()
+	{
+		$fieldset = array_pop( $this->_fieldsets );
+		$this->_count_fieldsets--;
+
+		$r = $fieldset['html'];
+
+		// Create onclick-JS to control the groups' elements
+		$onclick = '';
+		foreach( $fieldset['disableTags'] as $lFieldName )
+		{
+			$onclick .= $this->form_name.".$lFieldName.disabled = !this.checked; ";
+		}
+		if( !empty($onclick) )
+		{
+			$onclick = ' onclick="'.$onclick.'"';
+		}
+
+		$r = str_replace( '%disableByOnclick%', $onclick, $r )
+					."\n</fieldset>\n";
+
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
+
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use ::password() for password fields
+	 * Note: please use {@link password()} for password fields
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value
@@ -165,7 +260,12 @@ class Form
 
 		$r .= $this->end_field();
 
-		if( $this->output )
+		if( $this->_count_fieldsets )
+		{
+			$this->_fieldsets[$this->_count_fieldsets]['html'] .= $r;
+			return true;
+		}
+		elseif( $this->output )
 		{
 			echo $r;
 			return true;
@@ -175,6 +275,7 @@ class Form
 			return $r;
 		}
 	}
+
 
 	/**
 	 * Builds a password input field.
@@ -198,7 +299,7 @@ class Form
 	}
 
 
-  /**
+	/**
 	 * Builds a date input field.
 	 *
 	 * @param string the name of the input field
@@ -213,13 +314,13 @@ class Form
 
 		$field_size = strlen( $date_format );
 
- 		// Get date part of datetime:
+		// Get date part of datetime:
 		$field_value = substr( $field_value, 0, 10 );
 
- 		$r = $this->begin_field( $field_name, $field_label )
+		$r = $this->begin_field( $field_name, $field_label )
 				.'<script language="JavaScript">
 						<!--
-					  var cal_'.$field_name.' = new CalendarPopup();
+						var cal_'.$field_name.' = new CalendarPopup();
 						cal_'.$field_name.'.showYearNavigation();
 						cal_'.$field_name.'.showNavigationDropdowns();
 						// cal_'.$field_name.'.showYearNavigationInput();
@@ -236,7 +337,7 @@ class Form
 							."'".T_($month['10'])."',"
 							."'".T_($month['11'])."',"
 							."'".T_($month['12'])."');\n"
-				.'	cal_'.$field_name.'.setDayHeaders( '
+				.' cal_'.$field_name.'.setDayHeaders( '
 							."'".T_($weekday_letter[0])."',"
 							."'".T_($weekday_letter[1])."',"
 							."'".T_($weekday_letter[2])."',"
@@ -244,7 +345,7 @@ class Form
 							."'".T_($weekday_letter[4])."',"
 							."'".T_($weekday_letter[5])."',"
 							."'".T_($weekday_letter[6])."' );\n"
-				.'	cal_'.$field_name.'.setWeekStartDay('.$start_of_week.');
+				.' cal_'.$field_name.'.setWeekStartDay('.$start_of_week.');
 						cal_'.$field_name.".setTodayText('".T_('Today')."');
 						// -->
 					</script>\n"
@@ -253,7 +354,7 @@ class Form
 				." />\n"
 				.'<a href="#" onClick="cal_'.$field_name.'.select(document.forms[0].'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
 				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a>'
-			  .' <span class="notes">('.$date_format.')</span>'
+				.' <span class="notes">('.$date_format.')</span>'
 				.$this->end_field();
 
 		if( $this->output )
@@ -268,7 +369,7 @@ class Form
 	}
 
 
- 	/**
+	/**
 	 * Builds a time input field.
 	 *
 	 * @param string the name of the input field
@@ -297,10 +398,11 @@ class Form
 	 * @param string note
 	 * @param string CSS class
 	 * @param boolean to output (default)  or not
+	 * @param string additional attribs to be inserted into the input tag
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_value, $field_label, $field_note = '', 
-											$field_class = '' )
+	function checkbox( $field_name, $field_value, $field_label, $field_note = '',
+											$field_class = '', $attribs = '' )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
 				.'<input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
@@ -312,9 +414,76 @@ class Form
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
+		if( $this->_count_fieldsets )
+		{
+			if( $field_name == $this->_fieldsets[$this->_count_fieldsets]['disableBy'] )
+			{
+				$r .= '%disableByOnclick%';
+			}
+			else
+			{
+				$this->_fieldsets[$this->_count_fieldsets]['disableTags'][] = $field_name;
+				// Enable controlling checkbox
+				$r .= ' onclick="'.$this->form_name.'.'.$this->_fieldsets[$this->_count_fieldsets]['disableBy'].'.checked = true;"';
+			}
+		}
+		if( !empty($attribs) )
+		{
+			$r .= ' '.$attribs;
+		}
+
 		$r .= " />\n"
 				.'<span class="notes">'.$field_note."</span>\n"
 				.$this->end_field();
+
+		if( $this->_count_fieldsets )
+		{
+			$this->_fieldsets[$this->_count_fieldsets]['html'] .= $r;
+			return true;
+		}
+		elseif( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
+
+	/**
+	 * Returns 'disabled="disabled"' if the boolean param is false.
+	 *
+	 * @static
+	 * @return string 'disabled="disabled"', ''
+	 */
+	function disabled( $boolean )
+	{
+		return $boolean ? 'disabled="disabled"' : '';
+	}
+
+
+	/**
+	 * Builds the form field
+	 *
+	 * @param string the class to use for the form tag
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function begin_form( $form_class = NULL )
+	{
+		if( $form_class === NULL )
+		{
+			$form_class = $this->form_class;
+		}
+
+		$r = "\n\n".'<form name="'.$this->form_name.'" id="'.$this->form_name
+					.'" method="'.$this->form_method
+					.'" action="'.$this->form_action.'"'
+					.( !empty( $form_class ) ? ' class="'.$form_class : '' )
+					.'">';
+		$r .= "\n";
 
 		if( $this->output )
 		{
@@ -326,31 +495,8 @@ class Form
 			return $r;
 		}
 	}
-	
-	
-	/**
-	 * Builds the form field
-	 *
-	 * @param string the class to use for the form tag
-	 * @return mixed true (if output) or the generated HTML if not outputting
-	 */
-	function begin_form( $form_class = '' )
-	{
-		$r = "\n\n".'<form name="'.$this->form_name.'" id="'.$this->form_name
-					.'" method="'.$this->form_method
-					.'" action="'.$this->form_action.'" class="'.$form_class.'" >';
-		$r .= "\n";
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
-	} 
-	 
+
+
 	/**
 	 * Ends the form field
 	 *
@@ -369,7 +515,7 @@ class Form
 			return $r;
 		}
 	}
-	 
+
 	/**
 	 * Buidls the fieldset tag
 	 *
@@ -384,12 +530,12 @@ class Form
 			$r .= 'class="'.$class.'" ';
 		}
 		$r .= '>'."\n";
-		
+
 		if( $title != '' )
 		{ // there is a legend tag to display
 			$r .= '<legend>'.$title."</legend>\n";
 		}
-		
+
 		if( $this->output )
 		{
 			echo $r;
@@ -400,8 +546,8 @@ class Form
 			return $r;
 		}
 	}
-		
-		
+
+
 	/**
 	 * Ends the fieldset tag
 	 *
@@ -419,20 +565,20 @@ class Form
 		{
 			return $r;
 		}
-	} 
-	
-	
+	}
+
+
 	/**
 	 * Ends the fieldset tag
 	 *
 	 * the two-dimension array must indicate, for each checkbox:
-	 *  - the name, 
-	 *  - the value, 
+	 *  - the name,
+	 *  - the value,
 	 *  - the comment to put between <input> and <br />
 	 *  - a boolean indicating whether the box must be checked or not
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *
-	 * @param array a two-dimension array containinj the parameters of the input tag 
+	 * @param array a two-dimension array containinj the parameters of the input tag
 	 * @param boolean initial value
 	 * @param string name
 	 * @param string label
@@ -451,9 +597,9 @@ class Form
 			if( isset( $option[4] ) && $option[4] )
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
-			} 
+			}
 			$r .= ' />'.$option[2]."<br />\n";
-		}	
+		}
 		$r .= $this->end_field();
 		if( $this->output )
 		{
@@ -463,9 +609,10 @@ class Form
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
+
 	/**
 	 * Display a select field and populate it with a callback function.
 	 *
@@ -503,9 +650,10 @@ class Form
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
+
 	/**
 	 * Builds a button
 	 *
@@ -516,7 +664,7 @@ class Form
 	 * @param string optional parameter to specify an onclick action using javascript
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function button( $field_type = 'button', $field_name, $field_value, $field_class, 
+	function button( $field_type = 'button', $field_name, $field_value, $field_class,
 										$field_label, $onclick )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
@@ -535,9 +683,9 @@ class Form
 		else
 		{
 			return $r;
-		}	
+		}
 	}
-	
+
 }
 
 ?>
