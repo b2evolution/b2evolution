@@ -492,9 +492,12 @@ switch( $Fileman->getMode() )
 		}
 
 		$LogUpload = new Log( 'error' );
-		$allowedFileExtensions = trim( $Settings->get( 'upload_allowedext' ) );
-		$allowedMimeTypes = trim( $Settings->get( 'upload_allowedmime' ) );
+		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ) );
+		$allowedMimeTypes = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedmime' ) ) );
 
+		/**
+		 * @var array Remember failed files (and the error messages)
+		 */
 		$failedFiles = array();
 
 
@@ -506,18 +509,20 @@ switch( $Fileman->getMode() )
 
 			foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 			{
-				if( empty($lName) )
-				{ // no name
+				if( empty( $lName ) )
+				{
+					if( !empty( $uploadfile_alt[$lKey] ) || !empty( $uploadfile_desc[$lKey] ) || !empty( $uploadfile_name[$lKey] ) )
+					{ // Remember the file as failed when additional info provided.
+						$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
+					}
 					continue;
 				}
 
-				// pop it again if we succeeded
-				$failedFiles[] = $lKey;
 
 				if( ( $Settings->get( 'upload_maxkb' ) && $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
 						|| $_FILES['uploadfile']['error'][$lKey] == UPLOAD_ERR_FORM_SIZE ) // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
 				{ // bigger than defined by blog
-					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; is too big and has not been accepted.'), $lName ) );
+					$failedFiles[$lKey] = sprintf( /* TRANS: %s will be replaced by the difference */ T_('The file is %s too big.'), bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ) );
 					continue;
 				}
 				elseif( $_FILES['uploadfile']['error'][$lKey] )
@@ -525,24 +530,32 @@ switch( $Fileman->getMode() )
 					switch( $_FILES['uploadfile']['error'][$lKey] )
 					{
 						case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
-							$LogUpload->add( sprintf( T_('The uploaded file &laquo;%s&raquo; exceeds the upload_max_filesize directive in php.ini.'), $lName ) );
+							$failedFiles[$lKey] = T_('The file exceeds the upload_max_filesize directive in php.ini.');
 							continue 2;
 
 						case UPLOAD_ERR_PARTIAL:
-							$LogUpload->add( sprintf( T_('The uploaded file &laquo;%s&raquo; was only partially uploaded.'), $lName ) );
+							$failedFiles[$lKey] = T_('The file was only partially uploaded.');
 							continue 2;
 
 						case UPLOAD_ERR_NO_FILE:
-							$LogUpload->add( sprintf( T_('No file was uploaded (%s).'), $lName ) );
+							// Is probably the same as empty($lName) before.
+							$failedFiles[$lKey] = T_('No file was uploaded.');
 							continue 2;
+
+						case 6:
+						case UPLOAD_ERR_NO_TMP_DIR: // PHP 4.3.10, 5.0.3
+							// Missing a temporary folder.
+							$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
+							continue 2;
+
 					}
 
-					$LogUpload->add( sprintf( T_('Unknown error with file &laquo;%s&raquo;.'), $lName ) );
+					$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
 					continue;
 				}
 				elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
 				{
-					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; does not seem to be a valid upload!'), $lName ) );
+					$failedFiles[$lKey] = T_('The file does not seem to be a valid upload!');
 					continue;
 				}
 
@@ -551,20 +564,31 @@ switch( $Fileman->getMode() )
 
 				if( !isFilename( $newName ) )
 				{
-					$LogUpload->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newName ) );
+					$failedFiles[$lKey] = sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newName );
 					continue;
 				}
-				elseif( !empty($allowedFileExtensions)
-								&& !preg_match( '#\.'.preg_replace( array( '#\s+#', '/#/' ), array( '|', '\#' ), $allowedFileExtensions ).'$#', $newName  ) )
-				{
-					$LogUpload->add( sprintf( T_('The file extension of &laquo;%s&raquo; is not allowed.'), $newName ) );
-					continue;
+
+				if( !empty($allowedFileExtensions) )
+				{ // check extension
+					if( preg_match( '#\.([^.]+)$#', $newName, $match ) )
+					{
+						$extension = $match[1];
+
+						if( !in_array( $extension, $allowedFileExtensions ) )
+						{
+							$failedFiles[$lKey] = sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension );
+							continue;
+						}
+					}
+					// NOTE: Files with no extension are allowed..
 				}
-				elseif( !empty($allowedMimeTypes)
-								&& !empty( $_FILES['uploadfile']['type'][$lKey] ) // browser provided type
-								&& !preg_match( '#\.'.preg_replace( array( '#\s+#', '/#/' ), array( '|', '\#' ), $allowedMimeTypes ).'$#', $newName  ) )
+
+				if( !empty($allowedMimeTypes)
+						&& !empty( $_FILES['uploadfile']['type'][$lKey] ) // browser provided type
+						&& in_array( $_FILES['uploadfile']['type'][$lKey], $allowedMimeTypes )
+					)
 				{
-					$LogUpload->add( sprintf( T_('The file type (MIME) &laquo;%s&raquo; of &laquo;%s&raquo; is not allowed.'), $_FILES['uploadfile']['type'][$lKey], $newName ) );
+					$failedFiles[$lKey] = sprintf( T_('The file type (MIME) &laquo;%s&raquo; is not allowed.'), $_FILES['uploadfile']['type'][$lKey] );
 					continue;
 				}
 
@@ -574,14 +598,17 @@ switch( $Fileman->getMode() )
 				if( $newFile->exists() )
 				{
 					// TODO: Rename/Overwriting
-					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->getName() ) );
+					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->getName() );
 					continue;
 				}
-				elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
+				elseif( !move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
+				{
+					$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
+					continue;
+				}
+				else
 				{
 					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->getName() ), 'note' );
-
-					array_pop( $failedFiles );
 
 					$newFile->refresh();
 					$Fileman->addFile( $newFile );
@@ -671,7 +698,12 @@ switch( $Fileman->getMode() )
 
 				<h1><?php echo T_('File upload'); ?></h1> <?php /* TODO: We need a good (smaller) default h1! */ ?>
 
-				<?php $LogUpload->display( '', '', true, 'all' ); ?>
+				<?php
+				if( count( $failedFiles ) )
+				{
+					$LogUpload->add( T_('Some file uploads failed. Please check the errors below.'), 'note' );
+				}
+				$LogUpload->display( '', '', true, 'all' ); ?>
 
 
 				<fieldset style="float:left;width:60%;">
@@ -683,15 +715,15 @@ switch( $Fileman->getMode() )
 
 						if( $allowedFileExtensions )
 						{
-							$restrictNotes[] = T_('Allowed file extensions').': '.str_replace( ' ', ', ', $allowedFileExtensions );
+							$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.implode( ', ', $allowedFileExtensions );
 						}
 						if( $allowedMimeTypes )
 						{
-							$restrictNotes[] = T_('Allowed MIME types').': '.str_replace( ' ', ', ', $allowedMimeTypes );
+							$restrictNotes[] = '<strong>'.T_('Allowed MIME types').'</strong>: '.implode( ', ', $allowedMimeTypes );
 						}
 						if( $Settings->get( 'upload_maxkb' ) )
 						{
-							$restrictNotes[] = sprintf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
+							$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
 						}
 
 						if( $restrictNotes )
@@ -704,16 +736,22 @@ switch( $Fileman->getMode() )
 
 					<ul id="uploadfileinputs">
 						<?php
-						$failedFiles[] = NULL; // display at least one
-
-
-						foreach( $failedFiles as $lKey )
+						$failedFiles[] = NULL; // display at least one upload div
+						foreach( $failedFiles as $lKey => $lMessage )
 						{
 							?><li<?php
-								if( $lKey !== NULL )
+								if( $lMessage !== NULL )
 								{
 									echo ' class="invalid" title="'./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'"';
 								} ?>>
+
+								<?php
+								if( $lMessage !== NULL )
+								{
+									Log::display( '', '', $lMessage, 'error' );
+								}
+								?>
+
 								<label><?php echo T_('Choose a file'); ?>:</label><br />
 								<input name="uploadfile[]" type="file" size="37" /><br />
 
@@ -1047,6 +1085,9 @@ switch( $Fileman->getMode() )
 
 // "Display/hide Filemanager" and "Leave mode" buttons
 
+$showFilemanager = !$Fileman->getMode()
+										|| ( $UserSettings->get('fm_forceFM') || $Fileman->forceFM );
+
 $toggleButtons = array();
 
 if( $Fileman->getMode() )
@@ -1055,8 +1096,8 @@ if( $Fileman->getMode() )
 	{ // FM is not forced - link to hide/display
 		$toggleButtons[] =
 			'<a class="ActionButton"'
-			.' href="'.$Fileman->getCurUrl( array( 'forceFM' => Filemanager::getToggled( $Fileman->forceFM ) ) ).'">'
-			.( $Fileman->forceFM !== 0
+			.' href="'.$Fileman->getCurUrl( array( 'forceFM' => 1-$Fileman->forceFM ) ).'">'
+			.( $showFilemanager
 					? T_('Hide Filemanager')
 					: T_('Display Filemanager') ).'</a>';
 	}
@@ -1125,7 +1166,7 @@ if( isset($action_msg) )
 // }}}
 
 
-if( $Fileman->getMode() && ( !$Fileman->forceFM ) )
+if( !$showFilemanager )
 { // We're in a mode and don't force the FM
 	?>
 	</div>
@@ -1146,11 +1187,11 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.72  2005/02/08 01:06:52  blueyed
+ * fileupload reworked, fixed "Display FM" / "Leave mode" buttons
+ *
  * Revision 1.71  2005/01/27 13:34:57  fplanque
  * i18n tuning
- *
- * Revision 1.70  2005/01/26 23:44:40  blueyed
- * no message
  *
  * Revision 1.69  2005/01/26 17:55:23  blueyed
  * catching up..
