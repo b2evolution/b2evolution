@@ -20,51 +20,51 @@ function db_delete()
 
 	echo "Dropping Antispam table...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableantispam";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Hit-Logs...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablehitlog";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Comments...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablecomments";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Categories-to-Posts relationships...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablepostcats";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Categories...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablecategories";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Posts...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableposts";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Users...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableusers";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Groups...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablegroups";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Blogs...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableblogs";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Blogusers...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableblogusers";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Settings...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablesettings";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "Dropping Locales...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablelocales";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 }
 
 ?>
