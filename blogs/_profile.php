@@ -11,6 +11,11 @@
 	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
 		die("Please, do not access this page directly.");
 
+	if( ! is_loggued_in() )
+	{	// must be loggued in!
+		echo '<p>', T_( 'You are not loggued in.' ), '</p>';
+		return;
+	}
 	// --- //
 ?>
 
@@ -70,8 +75,8 @@
 
 
 		<fieldset>
-			<div class="label"><label for="user_email"><?php echo T_('Email') ?>:</label></div>
-			<div class="input"><input type="text" name="user_email" id="user_email" value="<?php user_info( 'email', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
+			<div class="label"><label for="newuser_email"><?php echo T_('Email') ?>:</label></div>
+			<div class="input"><input type="text" name="newuser_email" id="newuser_email" value="<?php user_info( 'email', 'formvalue' ) ?>" size="40" tabindex="1" class="bComment" /></div>
 		</fieldset>
 
 		<fieldset>
@@ -112,7 +117,7 @@
 	
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" class="buttonarea" value="<?php echo T_('Update') ?>" tabindex="8" />
+				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" tabindex="8" class="search" />
 			</div>
 		</fieldset>
 	

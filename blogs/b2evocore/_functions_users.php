@@ -280,7 +280,7 @@ function get_user_info( $show='', $this_userdata = '' )
 			$output = $this_userdata['user_nickname'];
 			break;
 
-		case 'idmide':
+		case 'idmode':
 			$output = $this_userdata['user_idmode'];
 			break;
 
@@ -439,16 +439,21 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  */
 function user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $pathserver, $user_login, $blog;
+	global $pathserver, $user_level, $blog;
 
 	if( ! is_loggued_in() ) return false;
+
+	if( $user_level == 0 ) 
+	{ // If user is NOT active:
+		return false;
+	}
 
 	if( $link_text == '' ) $link_text = T_('Admin');
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
 
 	echo $before;
 	echo '<a href="', $pathserver, '/b2edit.php" title="', $link_title, '">';
-	printf( $link_text, $user_login );
+	echo $link_text ;
 	echo '</a>';
 	echo $after;
 }

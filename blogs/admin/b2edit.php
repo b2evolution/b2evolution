@@ -47,7 +47,7 @@ switch($action)
 case 'new':
 	/*
 	 * --------------------------------------------------------------------
-	 * New post form
+	 * New post form  (can be a bookmarklet form if mode == bookmarklet )
 	 */
 	$title = T_('New post in blog:');
 	require (dirname(__FILE__).'/_menutop.php');
@@ -64,9 +64,14 @@ case 'new':
 		}
 
 		$action='post';
+		set_param( 'popuptitle', 'string', '' );
+		$edited_post_title = format_to_edit( $popuptitle );
+		set_param( 'popupurl', 'string', '' );
+		$post_url = format_to_edit( $popupurl );
+		set_param( 'text', 'html', '' );
+		$content = format_to_edit( $text );
 		$post_lang = $default_language;
 		$post_status = $default_post_status;		// 'published' or 'draft' or ...
-		$post_url = '';
 
 		$extracats = array();
 		require(dirname(__FILE__).'/_edit_form.php');
@@ -107,13 +112,12 @@ case "edit":
 		if ($user_level < $authordata[13])
 			die("You don't have the right to edit <strong>".$authordata[1]."</strong>'s posts.");
 
-		$content = $postdata["Content"];
+		$edited_post_title = format_to_edit($postdata["Title"]);
+		$post_url = format_to_edit( $postdata["Url"] );
+		$content = format_to_edit( $postdata["Content"] );
 		$autobr = $postdata["AutoBR"];
 		$post_status = $postdata["Status"];
 		$extracats = postcats_get_byID( $post );
-		$content = format_to_edit($content);
-		$edited_post_title = format_to_edit($postdata["Title"]);
-		$post_url = format_to_edit($postdata["Url"]);
 
 		require(dirname(__FILE__).'/_edit_form.php');
 	} 

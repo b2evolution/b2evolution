@@ -20,7 +20,8 @@ if (!get_magic_quotes_gpc())
 	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
 }
 
-set_param( 'action', 'string' );
+set_param( 'action', 'string', '' );
+set_param( 'mode', 'string', '' );
 
 switch($action) 
 {
@@ -120,12 +121,8 @@ case 'post':
 	set_param( 'mode', 'string', '' );
 	switch($mode) 
 	{
-		case "bookmarklet":
-			$location="b2bookmarklet.php?a=b";
-			break;
-			
 		case "sidebar":
-			$location="b2sidebar.php?a=b";
+			$location="b2sidebar.php?a=b&blog=$blog";
 			break;
 			
 		default:

@@ -12,8 +12,7 @@ require_once(dirname(__FILE__)."/$b2inc/_main.php");
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
 // bookmarklet stuff:
-param( 'error', 'string', '' );
-param( 'text', 'string', '' );
+param( 'text', 'html', '' );
 param( 'popupurl', 'string', '' );
 param( 'popuptitle', 'string', '' );
 
@@ -112,21 +111,32 @@ switch($action)
 
 			switch($mode)
 			{
-				case "bookmarklet":
-					$location = "b2bookmarklet.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
+				case 'bookmarklet':
+					// Caution: any ; (like in &amp;) in the $location will break the refresh!
+					$location = $redirect_to.'?popuptitle='.urlencode($popuptitle).'&popupurl='.urlencode($popupurl).'&text='.urlencode($text);
 					break;
-				case "sidebar":
-					$location = "sidebar.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
+
+				case 'sidebar':
+					// Caution: any ; (like in &amp;) in the $location will break the refresh!
+					$location = $redirect_to.'b2sidebar.php?popuptitle='.urlencode($popuptitle).'&popupurl='.urlencode($popupurl).'&text='.urlencode($text);
 					break;
-				case "profile":
-					$location = "profile.php?text=$text&popupurl=$popupurl&popuptitle=$popuptitle";
-					break;
+
 				default:
 					$location = $redirect_to;
 					break;
 			}
 
-			header("Refresh:0;url=$location");
+			header("Refresh:1;url=$location");
+			?>
+			<html>
+				<head></head>
+				<body>
+					<p>Your are being redirected.</p>
+					<p>If nothing happens, <a href="<?php echo $location ?>">click here</a>.</p>
+				</body>
+			</html>
+			<?php
+			
 		}
 
 		break; // case 'login'

@@ -14,6 +14,9 @@ require_once(dirname(__FILE__)."/../conf/b2evo_admin.php");
 // Do the MAIN initializations:
 require_once(dirname(__FILE__)."/$b2inc/_main.php");
 
+// If not in sidebar or bookmarklet
+if( ! isset($mode) ) $mode = '';
+
 if( ! is_loggued_in() )
 {	// If user is not loggued in:
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -22,6 +25,7 @@ if( ! is_loggued_in() )
 	header("Pragma: no-cache");
 
 	$error = T_('You must log in!');
+	$redirect_to = $pathserver.'/'.$pagenow;
 	require(dirname(__FILE__)."/$pathadmin_out/$pathhtsrv/login.php");
 	exit();
 }
@@ -31,10 +35,14 @@ $posts_per_page = get_settings('posts_per_page');
 $time_difference = get_settings('time_difference');
 $autobr = get_settings('AutoBR');
 
+set_param( 'blog', 'integer', $default_to_blog, true );
 
-// let's deactivate quicktags on IE Mac and Lynx, because they don't work there.
-if (($is_macIE) || ($is_lynx))
-	$use_quicktags=0;
+if( $blog != '' ) 
+	get_blogparams();
+
+
+/*
+ This sounds totally ridiculous:
 
 $b2varstoreset = array( 'profile','standalone','redirect','redirect_url','a','popuptitle','popupurl','text', 'trackback', 'pingback');
 for ($i=0; $i<count($b2varstoreset); $i += 1) {
@@ -52,9 +60,7 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 	}
 }
 
-set_param( 'blog', 'integer', $default_to_blog, true );
+*/
 
-if( $blog != '' ) 
-	get_blogparams();
 
 ?>

@@ -12,33 +12,33 @@
 require_once (dirname(__FILE__).'/_main.php');
 
 // Getting GET or POST parameters:
-set_param( 'blog', 'integer', $default_to_blog, true );
-set_param( 'p', 'integer' );							// Specific post number to display
-set_param( 'm', 'integer', '', true );							// YearMonth(Day) to display
-set_param( 'w', 'integer', '', true );							// Week number
-set_param( 'cat', 'string', '', true );							// List of cats to restrict to
-set_param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
-set_param( 'author', 'integer', '', true );					// List of authors to restrict to
-set_param( 'order', 'string', 'DESC', true );		// ASC or DESC
-set_param( 'orderby', 'string', '', true );					// list of fields to order by
-set_param( 'posts', 'integer', '', true );					// # of posts to display on the page
-set_param( 'paged', 'integer', '', true );					// List page number in paged display
-set_param( 'poststart', 'integer', '', true );			// Start results at this position
-set_param( 'postend', 'integer', '', true );				// End results at this position
+param( 'blog', 'integer', $default_to_blog, true );
+param( 'p', 'integer' );							// Specific post number to display
+param( 'm', 'integer', '', true );							// YearMonth(Day) to display
+param( 'w', 'integer', '', true );							// Week number
+param( 'cat', 'string', '', true );							// List of cats to restrict to
+param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
+param( 'author', 'integer', '', true );					// List of authors to restrict to
+param( 'order', 'string', 'DESC', true );		// ASC or DESC
+param( 'orderby', 'string', '', true );					// list of fields to order by
+param( 'posts', 'integer', '', true );					// # of posts to display on the page
+param( 'paged', 'integer', '', true );					// List page number in paged display
+param( 'poststart', 'integer', '', true );			// Start results at this position
+param( 'postend', 'integer', '', true );				// End results at this position
 // set_param( 'search', 'string' );				// obsolete (dangerous!)
-set_param( 's', 'string', '', true );								// Search string
-set_param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
-set_param( 'exact', 'integer', '', true );					// Require exact match of title or contents
-set_param( 'preview', 'integer', 0, true );				// Is this preview ?
-set_param( 'calendar', 'string', '', true );				// Display a specific month in the calendar
-set_param( 'c', 'string' );
-set_param( 'withcomments', 'integer' );
-set_param( 'page', 'integer' );
-set_param( 'more', 'integer', 0 );
-set_param( 'tb', 'integer', 0 );
-set_param( 'pb', 'integer', 0 );
-set_param( 'disp', 'string' );
-set_param( 'stats', 'integer', 0 );					// deprecated
+param( 's', 'string', '', true );								// Search string
+param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
+param( 'exact', 'integer', '', true );					// Require exact match of title or contents
+param( 'preview', 'integer', 0, true );				// Is this preview ?
+param( 'calendar', 'string', '', true );				// Display a specific month in the calendar
+param( 'c', 'string' );
+param( 'withcomments', 'integer' );						// DEPRECATED
+param( 'page', 'integer' );
+param( 'more', 'integer', 0 );
+param( 'tb', 'integer', 0 );
+param( 'pb', 'integer', 0 );
+param( 'disp', 'string' );
+param( 'stats', 'integer', 0 );					// deprecated
 if(!isset($timestamp_min)) $timestamp_min = '';
 if(!isset($timestamp_max)) $timestamp_max = '';
 

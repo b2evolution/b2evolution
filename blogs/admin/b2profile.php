@@ -1,111 +1,13 @@
 <?php 
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
-$title = T_('Profile');
 
 param( 'action', 'string', '' );
 param( 'redirect', 'string', '' );
 param( 'profile', 'string', '' );
 param( 'user', 'integer', '' );
 
-param( 'newuser_firstname', 'string', '' );
-param( 'newuser_lastname', 'string', '' );
-param( 'newuser_nickname', 'string', '' );
-param( 'newuser_icq', 'string', '' );
-param( 'newuser_aim', 'string', '' );
-param( 'newuser_msn', 'string', '' );
-param( 'newuser_yim', 'string', '' );
-param( 'newuser_url', 'string', '' );
-param( 'newuser_email', 'string', '' );
-param( 'newuser_idmode', 'string', '' );
-param( 'pass1', 'string', '' );
-param( 'pass2', 'string', '' );
-
 switch($action) 
 {
-	
-	case 'update':
-	
-		if( !isset($demo_mode) )
-		{
-			$demo_mode = 0;
-		}
-		if( $demo_mode && ($user_login == 'demouser'))
-		{
-			die( 'Demo mode: you can\'t edit the demouser profile!'.'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
-		}
-
-		/* checking the nickname has been typed */
-		if (empty($newuser_nickname))
-		{
-			die ('<strong>'.T_('ERROR').'</strong>: '.T_('please enter your nickname (can be the same as your login)').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
-			return false;
-		}
-	
-		/* if the ICQ UIN has been entered, check to see if it has only numbers */
-		if (!empty($newuser_icq))
-		{
-			if (!ereg("^[0-9]+$", $newuser_icq))
-			{
-				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('your ICQ UIN can only be a number, no letters allowed').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
-				return false;
-			}
-		}
-	
-		/* checking e-mail address */
-		if (empty($newuser_email))
-		{
-			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('please type your e-mail address').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
-			return false;
-		}
-		elseif (!is_email($newuser_email))
-		{
-			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('the email address isn\'t correct').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
-			return false;
-		}
-	
-		if ($pass1 == '')
-		{
-			if ($pass2 != '')
-			{
-				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.'));
-			}
-			$updatepassword = '';
-		}
-		else
-		{
-			if ($pass2 == '')
-			{
-				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.') );
-			}
-			if ($pass1 != $pass2)
-			{
-				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed two different passwords. Go back to correct that.') );
-			}
-			$newuser_pass = md5($pass1);
-			$updatepassword = "user_pass = '$newuser_pass', ";
-			if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-			{
-				printf( T_('setcookie %s failed!'), $cookie_pass );
-			}
-
-			echo '<br />';
-		}
-
-
-		$query = "UPDATE $tableusers SET user_firstname = '$newuser_firstname', ".$updatepassword."user_lastname='$newuser_lastname', user_nickname='$newuser_nickname', user_icq='$newuser_icq', user_email='$newuser_email', user_url='$newuser_url', user_aim='$newuser_aim', user_msn='$newuser_msn', user_yim='$newuser_yim', user_idmode='$newuser_idmode' WHERE ID = $user_ID";
-		$result = mysql_query($query) or mysql_oops( $query );
-	
-		?>
-		<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-		<body onload="window.close();">
-			<?php echo T_('Profile updated!') ?><br />
-			<?php echo T_('If that window doesn\'t close itself, close it yourself :p') ?>
-		</body>
-		</html>
-		<?php
-	
-	break; // case 'update'
-	
 	
 	case "viewprofile":
 	
@@ -113,7 +15,7 @@ switch($action)
 		if( $_COOKIE[$cookie_user] == $profiledata["user_login"])
 			header("Location: b2profile.php");
 	
-		$profile=1;
+		$title = T_('Profile');
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 		?>
@@ -231,247 +133,108 @@ switch($action)
 	break; // case 'viewprofile'
 	
 	
-	case 'IErightclick':
-	
-		$profile = 1;
-		require(dirname(__FILE__).'/_menutop.php');
-		require(dirname(__FILE__).'/_menutop_end.php');
-	
-		$bookmarklet_tbpb  = ($use_trackback) ? '&trackback=1' : '';
-		$bookmarklet_tbpb .= ($use_pingback)  ? '&pingback=1'  : '';
-		$bookmarklet_height= ($use_trackback) ? 340 : 300;
-	
-		?>
-	
-		<div class="menutop">&nbsp;<?php echo T_('IE one-click bookmarklet') ?></div>
-	
-		<table width="100%" cellpadding="20">
-		<tr><td>
-	
-		<p><?php echo T_('To have a one-click bookmarklet, just copy and paste this into a new text file:') ?></p>
-		<?php
-		$regedit = "REGEDIT4\r\n[HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\MenuExt\Post To &b2 : ".$blogname."]\r\n@=\"javascript:doc=external.menuArguments.document;Q=doc.selection.createRange().text;void(btw=window.open('".$pathserver."/b2bookmarklet.php?text='+escape(Q)+'".$bookmarklet_tbpb."&popupurl='+escape(doc.location.href)+'&popuptitle='+escape(doc.title),'b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=".$bookmarklet_height.",left=100,top=150,status=yes'));btw.focus();\"\r\n\"contexts\"=hex:31\"";
-		?>
-		<pre style="margin: 20px; background-color: #cccccc; border: 1px dashed #333333; padding: 5px; font-size: 12px;"><?php echo $regedit; ?></pre>
-		<p><?php echo T_('Save it as b2.reg, and double-click on this file in an Explorer window. Answer Yes to the question, and restart Internet Explorer.') ?></p>
-		<p><?php echo T_('That\'s it, you can now right-click in an IE window and select \'Post to b2\' to make the bookmarklet appear :)') ?></p>
-	
-		<p align="center">
-			<form>
-			<input class="search" type="button" value="1" name="<?php echo T_('Close this window') ?>" />
-			</form>
-		</p>
-		</td></tr>
-		</table>
-		<?php
-	
-	break; // case 'IErightclick'
-	
 	
 	default:
-	
-		$profile=1;
+		/*
+		 * Display urrent user's profile:
+		 */	
+
+		$title = T_('My Profile');
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		$profiledata=get_userdata($user_ID);
-	
-		$bookmarklet_tbpb  = ($use_trackback) ? '&trackback=1' : '';
-		$bookmarklet_tbpb .= ($use_pingback)  ? '&pingback=1'  : '';
-		$bookmarklet_height= 450;
-	
+
 		?>
-	
-		<form name="form" action="b2profile.php" method="post">
-		<input type="hidden" name="action" value="update" />
-		<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
-		<table width="100%">
-		<td width="200" valign="top">
-	
-		<table cellpadding="5" cellspacing="0">
-		<tr>
-		<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
-		<td><?php echo $profiledata["user_login"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('First name') ?>:</strong></td>
-		<td><input type="text" name="newuser_firstname" value="<?php echo $profiledata["user_firstname"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('Last name') ?>:</strong></td>
-		<td><input type="text" name="newuser_lastname" value="<?php echo $profiledata["user_lastname"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('Nickname') ?>:</strong></td>
-		<td><input type="text" name="newuser_nickname" value="<?php echo $profiledata["user_nickname"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('Email') ?>:</strong></td>
-		<td><input type="text" name="newuser_email" value="<?php echo $profiledata["user_email"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('URL') ?>:</strong></td>
-		<td><input type="text" name="newuser_url" value="<?php echo $profiledata["user_url"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('ICQ') ?>:</strong></td>
-		<td><input type="text" name="newuser_icq" value="<?php if ($profiledata["user_icq"] > 0) { echo $profiledata["user_icq"]; } ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('AIM') ?>:</strong></td>
-		<td><input type="text" name="newuser_aim" value="<?php echo $profiledata["user_aim"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('MSN IM') ?>:</strong></td>
-		<td><input type="text" name="newuser_msn" value="<?php echo $profiledata["user_msn"] ?>" class="postform" /></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('YahooIM') ?>:</strong></td>
-		<td><input type="text" name="newuser_yim" value="<?php echo $profiledata["user_yim"] ?>" class="postform" /></td>
-		</tr>
-		</table>
-	
-		</td>
-		<td valign="top">
-	
-		<table cellpadding="5" cellspacing="0">
-		<tr>
-		<td>
-		<strong><?php echo T_('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
-		</tr>
-		<tr>
-		<td>
-		<strong><?php echo T_('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
-		</td>
-		</tr>
-		<tr>
-		<td>
-		<strong><?php echo T_('Posts') ?>:</strong>
+		
+<div class="bPosts">
+	<div class="bPost">
+		<h2><?php echo T_('Edit your profile') ?></h2>
 		<?php
-		$posts=get_usernumposts($user_ID);
-		echo $posts;
+			require(dirname(__FILE__).'/'.$pathadmin_out.'/_profile.php');
 		?>
-		</td>
-		</tr>
-		<tr>
-		<td>
-		<?php echo T_('<strong>Identity</strong> on the blog') ?>:<br />
-		<select name="newuser_idmode" class="postform">
-		<option value="nickname"<?php
-		if ($profiledata["user_idmode"]=="nickname")
-		echo ' selected="selected"'; ?>><?php echo $profiledata["user_nickname"] ?></option>
-		<option value="login"<?php
-		if ($profiledata["user_idmode"]=="login")
-		echo ' selected="selected"'; ?>><?php echo $profiledata["user_login"] ?></option>
-		<option value="firstname"<?php
-		if ($profiledata["user_idmode"]=="firstname")
-		echo ' selected="selected"'; ?>><?php echo $profiledata["user_firstname"] ?></option>
-		<option value="lastname"<?php
-		if ($profiledata["user_idmode"]=="lastname")
-		echo ' selected="selected"'; ?>><?php echo $profiledata["user_lastname"] ?></option>
-		<option value="namefl"<?php
-		if ($profiledata["user_idmode"]=="namefl")
-		echo ' selected="selected"'; ?>><?php echo $profiledata["user_firstname"]." ".$profiledata["user_lastname"] ?></option>
-		<option value="namelf"<?php
-		if ($profiledata["user_idmode"]=="namelf")
-		echo ' selected="selected"'; ?>><?php echo $profiledata["user_lastname"]." ".$profiledata["user_firstname"] ?></option>
-		</select>
-		</td>
-		</tr>
-		<tr>
-		<td>
-		<br />
-		<?php echo T_('New <strong>password</strong> (twice):') ?><br />
-		<input type="password" name="pass1" size="16" value="" class="postform" /><br />
-		<input type="password" name="pass2" size="16" value="" class="postform" />
-		</td>
-		</tr>
+	</div>
+</div>
+
+<!-- ================================== START OF SIDEBAR ================================== -->
+
+<div class="bSideBar">
+	<div class="bSideItem">
 	<?php
-	if($user_level > 0) {
-	?>	<tr>
-	<td><br /><strong><?php echo T_('Bookmarklet') ?></strong><br />
-	<?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-	<?php
-	if($is_NS4 || $is_gecko) {
-	?>
-	<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2 bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo T_('b2 - bookmarklet') ?></a>
-	<?php
-	}
-	elseif ($is_winIE)
-	{
-	?>
-	<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo T_('b2 - bookmarklet') ?></a>
-	
-	<script type="text/javascript" language="javascript">
-	<!--
-	function oneclickbookmarklet(blah) {
-		window.open ("b2profile.php?action=IErightclick", "oneclickbookmarklet", "width=600, height=450, location=0, menubar=0, resizable=1, scrollbars=1, status=1, titlebar=0, toolbar=0, screenX=120, left=120, screenY=120, top=120");
-	}
-	// -->
-	</script>
-	
-	<br /><br />
-	<?php echo T_('One-click bookmarklet:') ?><br />
-	<a href="javascript:oneclickbookmarklet(0);"><?php echo T_('Click here') ?></a>
-	
-	<?php
-	}
-	elseif($is_opera)
-	{
-	?>
-	<a href="javascript:void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo T_('b2 - bookmarklet') ?></a>
-	<?php
+	if( $user_level > 0 ) 
+	{ // If user is active:
+		?>	
+		<h2><?php echo T_('Bookmarklet') ?></h2>
+		
+		<?php
+		if($is_NS4 || $is_gecko) 
+		{
+			?>
+			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
+			<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<?php
+		}
+		elseif ($is_winIE)
+		{
+			?>
+			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
+			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a>
+			</p>
+			<?php
+		}
+		elseif($is_opera)
+		{
+			?>
+			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
+			<a href="javascript:void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<?php
 		}
 		elseif($is_macIE)
 		{
-	?>
-	<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(document.getSelection())+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo T_('b2 - bookmarklet') ?></a> <?php
+			?>
+			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
+			<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(document.getSelection())+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<?php
 		}
-	?>
-<?php
+
+
+		// Sidebar:
 		if ($is_gecko)
 		{
-?>
-	<br /><br />
-	<script language="JavaScript">
-		function addPanel()
+			?>
+			<script language="JavaScript">
+				function addPanel()
+				{
+					if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
+						window.sidebar.addPanel("b2 post","<?php echo $pathserver ?>/b2sidebar.php","");
+					else
+						alert("<?php echo T_('No Sidebar found!  You must use Mozilla 0.9.4 or later!') ?>");
+				}
+			</script>
+			<br />
+			<h2><?php echo T_('SideBar') ?></h2>
+			<p><?php printf( T_('Add the <a %s>b2 Sidebar</a> !'), 'href="#" onClick="addPanel()"' ); ?></p>
+			<?php
+		}
+		elseif($is_winIE || $is_macIE)
 		{
-			if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
-				window.sidebar.addPanel("b2 post","<?php echo $pathserver ?>/b2sidebar.php","");
-			else
-				alert("<?php echo T_('No Sidebar found!  You must use Mozilla 0.9.4 or later!') ?>");
+			?>
+			<br />
+			<h2><?php echo T_('SideBar') ?></h2>
+			<p><?php echo T_('Add this link to your favorites:') ?><br />
+			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?text='+escape(Q)+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'_search'))"><?php echo T_('b2 Sidebar') ?></a></p>
+			<?php 
 		}
-	</script>
-	<strong><?php echo T_('SideBar') ?></strong><br />
-	<?php printf( T_('Add the <a %s>b2 Sidebar</a> !'), 'href="#" onClick="addPanel()"' ); ?>
-<?php
-			}
-			elseif($is_winIE || $is_macIE)
-			{
+		?>
+		</div>
+	<?php
+	} // /user is active
 ?>
-	<br /><br />
-	<strong><?php echo T_('SideBar') ?></strong><br />
-	<?php echo T_('Add this link to your favorites:') ?><br /><a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?text='+escape(Q)+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'_search'))"><?php echo T_('b2 Sidebar') ?></a>.
+</div>
+<div style="clear:both;"></div>
 <?php
-		}
-?>
-		</td>
-		</tr>
-<?php
-		}
-?>	</table>
-		</td></tr>
-	<tr>
-		<td colspan="2" align="center"><br /><input class="search" type="submit" value="Update" name="submit"><br /><?php echo T_('Note: closes the popup window.') ?></td>
-		</tr>
-		</table>
-	
-		</form>
-		<?php
-	
 	break; // case default
+
 } // switch($action)
 
-/* </Profile | My Profile> */
 require( dirname(__FILE__).'/_footer.php' ); 
 
 ?>

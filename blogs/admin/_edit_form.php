@@ -73,12 +73,15 @@ switch($action)
 	{ // this is for everything but comment editing
 	?>
 	
-	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label><input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
+	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
+	<input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
 	
-	<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label><select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select>
+	<nobr><label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
+	<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select></nobr>
 	<br />
 	
-	<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label> <input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" /><br />
+	<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
+	<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" /><br />
 	
 	<?php
 	} 
@@ -98,7 +101,11 @@ switch($action)
 	<div class="center">
 	<?php if ($use_quicktags) require( dirname(__FILE__).'/_quicktags.php'); ?>
 	</div>
+	
+
 	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" border="0" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
+
+
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
 	if ($autobr) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"> <?php echo T_('Auto-BR (converts line-breaks into &lt;br /&gt; tags)') ?></label><br />
 	

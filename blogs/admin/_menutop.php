@@ -70,10 +70,6 @@
 </head>
 <body>
 
-<?php
-if ($profile==0) 
-{
-?>
 <img src="img/blank.gif" width="1" height="5" alt="" border="0" />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr height="15">
@@ -128,7 +124,7 @@ if ($profile==0)
 	echo " | \n";
 	echo '<a href="b2team.php" class="menutop">', T_('Users'), '</a>';
 	echo " | \n";
-	echo '<a href="javascript:profile(', $user_ID, ')" class="menutop">', T_('My Profile'), '</a>';
+	echo '<a href="b2profile.php" class="menutop">', T_('My Profile'), '</a>';
 ?>
 </div>
 </td>
@@ -146,7 +142,4 @@ if ($profile==0)
 <td>&nbsp;</td>
 <td style="padding-left: 6px;" colspan="2">
 	<span class="menutoptitle">:: <?php echo $title; ?></span>
-<?php
-}
-?>
 

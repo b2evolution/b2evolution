@@ -1,39 +1,25 @@
 <?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * This file posts a comment!
+ */
 
-require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
-require_once(dirname(__FILE__)."/$b2inc/_vars.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions.php");
+// Initialize everything:
+require_once (dirname(__FILE__).'/_main.php');
 
-dbconnect();
-
-function add_magic_quotes($array) 
-{
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-} 
-
-if (!get_magic_quotes_gpc()) 
-{
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-set_param( 'comment_post_ID', 'integer', true ); // required
-set_param( 'author', 'string' );
-set_param( 'email', 'string' );
-set_param( 'url', 'string' );
-set_param( 'comment' , 'html', true );	// mandatory
+// Getting GET or POST parameters:
+param( 'comment_post_ID', 'integer', true ); // required
+param( 'author', 'string' );
+param( 'email', 'string' );
+param( 'url', 'string' );
+param( 'comment' , 'html', true );	// mandatory
 $original_comment = $comment;
-set_param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
-set_param( 'comment_cookies', 'integer', 0 );
+param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
+param( 'comment_cookies', 'integer', 0 );
 
 if ($require_name_email && (empty($author)) )
 { 

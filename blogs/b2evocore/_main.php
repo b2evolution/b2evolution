@@ -21,9 +21,13 @@ require_once (dirname(__FILE__).'/_class_archivelist.php');
 require_once (dirname(__FILE__).'/_class_calendar.php');
 require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
 
-if (!isset($debug))		$debug=0;
 
 timer_start();
+
+
+if( !isset($debug) ) $debug=0;
+if( !isset($demo_mode) ) $demo_mode = 0;
+
 
 if( $use_gzipcompression && extension_loaded('zlib') )
 {	// gzipping the output of the script

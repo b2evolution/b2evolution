@@ -95,6 +95,9 @@ $b2_gecko_correction['out'] = array(
 $is_Apache	= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
 $is_IIS		= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false ? 1 : 0;
 
+// let's deactivate quicktags on IE Mac and Lynx, because they don't work there.
+if (($is_macIE) || ($is_lynx))
+	$use_quicktags=0;
 
 /* sorts the smilies' array by length
   this is important if you want :)) to superseede :) for example
