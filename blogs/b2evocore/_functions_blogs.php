@@ -173,19 +173,19 @@ function blog_update_user_perms( $blog )
 		$perm_post = array();
 		
 		$perm_published = param( 'blog_perm_published_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_published) ) $perm_post[] = $perm_published;
+		if( !empty($perm_published) ) $perm_post[] = 'published';
 
 		$perm_protected = param( 'blog_perm_protected_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_protected) ) $perm_post[] = $perm_protected;
+		if( !empty($perm_protected) ) $perm_post[] = 'protected';
 
 		$perm_private = param( 'blog_perm_private_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_private) ) $perm_post[] = $perm_private;
+		if( !empty($perm_private) ) $perm_post[] = 'private';
 
 		$perm_draft = param( 'blog_perm_draft_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_draft) ) $perm_post[] = $perm_draft;
+		if( !empty($perm_draft) ) $perm_post[] = 'draft';
 
 		$perm_deprecated = param( 'blog_perm_deprecated_'.$loop_user_ID, 'string', '' );
-		if( !empty($perm_deprecated) ) $perm_post[] = $perm_deprecated;
+		if( !empty($perm_deprecated) ) $perm_post[] = 'deprecated';
 
 		$perm_delpost = param( 'blog_perm_delpost_'.$loop_user_ID, 'integer', 0 );
 		$perm_comments = param( 'blog_perm_comments_'.$loop_user_ID, 'integer', 0 );
