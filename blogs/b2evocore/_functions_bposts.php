@@ -51,7 +51,7 @@ function bpost_create(
 
 	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content,
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
-														post_trackbacks, post_autobr, post_flags, post_wordcount,
+														post_url, post_autobr, post_flags, post_wordcount,
 														post_comments )
 						VALUES( $author_user_ID, '".$DB->escape($post_title)."', '".$DB->escape($post_urltitle)."',
 										'".$DB->escape($post_content)."',	'".$DB->escape($post_timestamp)."',
@@ -123,7 +123,7 @@ function bpost_update(
 	$query = "UPDATE $tableposts
 						SET post_title = '".$DB->escape($post_title)."',
 								post_urltitle = '".$DB->escape($post_urltitle)."',
-								post_trackbacks = '".$DB->escape($post_url)."',
+								post_url = '".$DB->escape($post_url)."',
 								post_content = '".$DB->escape($post_content)."',
 								post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."',
 								post_category = $main_cat_ID,
@@ -350,7 +350,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
@@ -367,7 +367,7 @@ function get_postdata($postid)
 			'Locale' =>  $myrow->post_locale,
 			'Content' => $myrow->post_content,
 			'Title' => $myrow->post_title,
-			'Url' => $myrow->post_trackbacks,
+			'Url' => $myrow->post_url,
 			'Category' => $myrow->post_category,
 			'AutoBR' => $myrow->post_autobr,
 			'Flags' => explode( ',', $myrow->post_flags ),
@@ -402,7 +402,7 @@ function Item_get_by_ID( $post_ID )
 
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
-									post_content, post_title, post_urltitle, post_trackbacks, post_category,
+									post_content, post_title, post_urltitle, post_url, post_category,
 									post_autobr, post_flags, post_wordcount, post_comments, 
 									'' AS post_renderers, cat_blog_ID
 					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID

@@ -70,7 +70,7 @@ class Item extends DataObject
 			$this->flags = $db_row->post_flags;
 			$this->comments = $db_row->post_comments;			// Comments status
 			$this->renderers = explode( '.', $db_row->post_renderers );
-			$this->url = $db_row->post_trackbacks;				// Should move
+			$this->url = $db_row->post_url;				// Should move
 			$this->autobr = $db_row->post_autobr;					// Should move
 			// Private vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );

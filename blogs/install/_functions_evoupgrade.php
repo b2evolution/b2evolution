@@ -288,6 +288,9 @@ function upgrade_b2evo_tables()
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
 										AFTER post_issue_date,
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-US',
+							DROP COLUMN post_url,
+							CHANGE COLUMN post_trackbacks post_url varchar(250) NULL default NULL,
+							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported'),
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";

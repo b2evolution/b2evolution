@@ -430,7 +430,7 @@ class ItemList extends DataObjectList
 
 		$this->request = "SELECT DISTINCT ID, post_author, post_issue_date,	 post_mod_date,
 																			post_status, post_locale, post_content, post_title,
-																			post_urltitle, post_trackbacks, post_category,
+																			post_urltitle, post_url, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
 																			'' AS post_renderers, post_karma
 											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)
@@ -544,7 +544,7 @@ class ItemList extends DataObjectList
 										'".$DB->escape($content)."' AS post_content, 
 										'".$DB->escape($post_title)."' AS post_title,
 										NULL AS post_urltitle, 
-										'".$DB->escape($post_url)."' AS post_trackbacks, 
+										'".$DB->escape($post_url)."' AS post_url, 
 										$post_category AS post_category,
 										$post_autobr AS post_autobr, 
 										'' AS post_flags, 
@@ -740,7 +740,7 @@ class ItemList extends DataObjectList
 			'Locale' =>	 $row->post_locale,
 			'Content' => $row->post_content,
 			'Title' => $row->post_title,
-			'Url' => $row->post_trackbacks,
+			'Url' => $row->post_url,
 			'Category' => $row->post_category,
 			'AutoBR' => $row->post_autobr,
 			'Flags' => explode( ',', $row->post_flags ),
