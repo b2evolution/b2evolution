@@ -62,6 +62,57 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 
 
 /*
+ * b2evonet_report_abuse(-)
+ *
+ * pings b2evolution.net to report abuse from a particular domain
+ * EXPERIMENTAL
+ */
+function b2evonet_report_abuse( $abuse_string, $display = true ) 
+{
+	$test = 0;
+
+	global $baseurl, $use_b2evonetabusereporting;
+	if( ! $use_b2evonetabusereporting ) return false;
+	if( $display )
+	{	
+		echo "<div class=\"panelinfo\">\n";
+		echo '<h3>', T_('Reporting abuse to b2evolution.net...'), "</h3>\n";
+	}
+	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test ) 
+	{
+		if( $test )
+		{
+		 	$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
+			$client->debug = 1;
+		}
+		else
+		{
+			$client = new xmlrpc_client('/evonetsrv/xmlrpc.php', 'b2evolution.net', 80);
+			// $client->debug = 1;
+		}
+		
+		$message = new xmlrpcmsg( 'b2evo.reportabuse', array( 
+															new xmlrpcval('id') ,			// Reserved
+															new xmlrpcval('user'),		// Reserved
+															new xmlrpcval('pass'),		// Reserved
+															new xmlrpcval($abuse_string), 
+															new xmlrpcval($baseurl),
+														)  );
+		$result = $client->send($message);
+		$ret = xmlrpc_displayresult( $result );
+		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
+		return($ret);
+	} 
+	else 
+	{
+		if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
+		return(false);
+	}
+}
+
+
+
+/*
  * pingWeblogs(-)
  *
  * pings Weblogs.com

@@ -216,9 +216,6 @@ function create_b2evo_tables()
 	echo "Creating table for Anti-Spam Ban List...</p>\n";
 	create_antispam();
 
-#	echo "Creating table for Plugin Settings...</p>\n";
-#	create_pluginsettings();
-
 	echo "<p>All tables created successfully.</p>\n";
 }
 
@@ -326,15 +323,6 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	
 }
-
-/*
- * This is currently useless...
- *
-function create_pluginsettings()
-{
-	global $tablepluginsettings;
-}
- */
 
 
 dbconnect() or die( "<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>" );
@@ -802,9 +790,6 @@ switch( $action )
 		echo "Populating Anti-Spam table...";
 		populate_antispam();
 		echo "OK.<br />\n";
-	#	echo "<p>Creating plugin settings table... ";
-	#	create_pluginsettings();
-	#	echo "OK.<br />\n";
 		
 
 		// end benchmarking
@@ -851,7 +836,7 @@ switch( $action )
 		$query = "DROP TABLE IF EXISTS $tablepluginsettings";
 		$q = mysql_query($query) or mysql_oops( $query );
 
-		echo "Droping Anti-Spam table...<br />\n";
+		echo "Droping Antispam table...<br />\n";
 		$query = "DROP TABLE IF EXISTS $tableantispam";
 		$q = mysql_query($query) or mysql_oops( $query );
 

@@ -87,31 +87,10 @@ switch( $action )
 			</div>
 			<?php
 		}
-		elseif ( $deluxe_ban && $confirm )
-		{
-			// BAN a keyword, DELETE stats entries and comments:
-			?>
-			<div class="panelinfo">
-				<p><?php printf( T_('Banning the keyword %s, and removing all related comments and hits...'), $keyword) ?></p>
-				<?php 
-				keyword_ban( $keyword );
-				?>
-			</div>
-			<?php
+		else
+		{	// BAN a keyword + (if requested) DELETE stats entries and comments:
+			keyword_ban( $keyword );
 		}
-		elseif ( ! $deluxe_ban )
-		{
-			// BAN a keyword, leaving stats entries and comments in place:
-			?>
-			<div class="panelinfo">
-				<p><?php printf( T_('Banning the keyword %s...'), $keyword) ?></p>
-				<?php 
-				keyword_ban( $keyword );
-				?>
-			</div>
-			<?php
-		}
-		// Should there be an "else" clause here?
 		break;
 
 	case 'banhit':
@@ -179,32 +158,10 @@ switch( $action )
 			</div>
 			<?php
 		}
-		elseif ( $deluxe_ban && $confirm )
-		{
-			// BAN a domain, DELETE stats entries and comments:
-			?>
-			<div class="panelinfo">
-				<p><?php printf( T_('Banning the referer of hit #%d, and removing all their comments and hits...'), $hit_ID) ?></p>
-				<?php 
-				domain_ban( $hit_ID );
-				?>
-			</div>
-			<?php
+		else
+		{	// BAN a keyword + (if requested) DELETE stats entries and comments:
+			keyword_ban( get_domain_from_hit_ID($hit_ID) );
 		}
-		elseif ( ! $deluxe_ban )
-		{
-			// BAN a domain, leaving stats entries and comments in place:
-			
-			?>
-			<div class="panelinfo">
-				<p><?php printf( T_('Banning the referer of hit #%d...'), $hit_ID) ?></p>
-				<?php 
-				domain_ban( $hit_ID );
-				?>
-			</div>
-		<?php
-		}
-		// Should there be an "else" clause here?
 		break;
 		
 	case 'remove':

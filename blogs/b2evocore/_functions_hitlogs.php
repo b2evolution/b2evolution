@@ -296,36 +296,6 @@ function get_domain_from_hit_ID( $hit_ID )
 }
 
 /*
- * domain_ban(-)
- *
- * Ban a domain
- */
-function domain_ban( $hit_ID )
-{
-	global $tablehitlog, $tablecomments, $tableantispam, $querycount, $deluxe_ban;
-
-	$domain = get_domain_from_hit_ID($hit_ID);
-	$sql ="INSERT INTO $tableantispam VALUES ('', '$domain')";
-	$querycount++;
-	mysql_query($sql) or mysql_oops( $sql );
-	
-	if ( $deluxe_ban )
-	{
-		// Delete all banned comments and stats entries
-		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = '$domain'";	// This is quite drastic!
-		$querycount++;
-		mysql_query($sql) or mysql_oops( $sql );
-		
-		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
-		$querycount++;
-		mysql_query($sql) or mysql_oops( $sql );
-	}
-
-}
-
-/*
  * keyword_ban(-)
  *
  * Ban any URL containing a certain keyword
@@ -334,13 +304,16 @@ function keyword_ban( $keyword )
 {
 	global $tableantispam, $tablehitlog, $tablecomments, $querycount, $deluxe_ban;
 
+	echo '<div class="panelinfo">';
+	printf( '<p>'.T_('Banning the keyword %s...').'</p>', $keyword);
+	
 	$sql ="INSERT INTO $tableantispam VALUES ('', '$keyword')";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 	
 	if ( $deluxe_ban )
-	{
-		// Delete all banned comments and stats entries
+	{ // Delete all banned comments and stats entries
+		echo '<p>'.T_('Removing all related comments and hits...').'</p>';
 		// Stats entries first
 		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%'";	// This is quite drastic!
 		$querycount++;
@@ -351,6 +324,11 @@ function keyword_ban( $keyword )
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 	}
+	
+	echo '</div>';
+	
+	// Report this keyword as abuse:
+	b2evonet_report_abuse( $keyword );
 }
 
 /*
