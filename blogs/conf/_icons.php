@@ -211,12 +211,7 @@ $map_iconfiles = array(
 		'alt' => T_('Edit'),
 		'size' => array( 18, 13 ),
 	),
-	'xross' => array(		// TODO: generic name for 'xross' should be "delete"
-		'file' => $admin_subdir.'img/xross.gif',
-		'alt' => T_('Del'),
-		'size' => array( 13, 13 ),
-	),
-	'delete' => array(		// TODO: generic name for 'xross' should be "delete"
+	'delete' => array(
 		'file' => $admin_subdir.'img/xross.gif',
 		'alt' => T_('Del'),
 		'size' => array( 13, 13 ),
