@@ -25,8 +25,10 @@ if( $use_html_checker ) require_once (dirname(__FILE__).'/_class_htmlchecker.php
 
 /* functions... */
 
-/*
- * dbconnect(-)
+/**
+ * Connect to MySQL database
+ *
+ * {@internal dbconnect(-) }
  */
 function dbconnect()
 {
@@ -45,8 +47,9 @@ function dbconnect()
  *
  * {@internal mysql_oops(-) }
  *
- * @author fplanque
- * @param $sql_query The query which led to the error
+ * @param string The query which led to the error
+ *
+ * @return boolean success?
  */
 function mysql_oops($sql_query)
 {
@@ -1208,11 +1211,20 @@ function autoquote( & $string )
 }
 
 
-/*
- * validate_url(-)
+/**
+ * Check the validity of a given URL 
+ *
+ * Checks allowed URI schemes and URL ban list
+ * URL can be empty
  *
  * fplanque: 0.8.5: changed return values
  * vegarg: 0.8.6.2: switched to MySQL antispam list
+ *
+ * {@internal validate_url(-) }
+ *
+ * @param string Url to validate
+ * @param array Allowed URI schemes (see /conf/_formatting.php)
+ * @return mixed false or error message
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
