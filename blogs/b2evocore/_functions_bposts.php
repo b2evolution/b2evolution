@@ -119,8 +119,6 @@ function bpost_update(
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
 	global $localtimenow, $default_locale;
 
-	if( $post_locale == '#' ) $post_locale = $default_locale;
-
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
@@ -142,12 +140,16 @@ function bpost_update(
 								post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."',
 								post_category = $main_cat_ID,
 								post_status = '".$DB->escape($post_status)."',
-								post_locale = '".$DB->escape($post_locale)."',
 								post_autobr = $autobr,
 								post_flags = '".$DB->escape(implode(',',$post_flags))."',
 								post_wordcount = ".bpost_count_words($post_content).",
 								post_comments = '".$DB->escape($post_comments)."',
 								post_renderers = '".$DB->escape(implode('.',$post_renderers))."'";
+								if( $post_locale != '#' )
+								{ // only update if it was changed
+									$query .= ",
+								post_locale = '".$DB->escape($post_locale)."'";
+								}
 
 	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp' ";
 	$query .= "WHERE ID = $post_ID";

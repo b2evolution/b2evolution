@@ -917,9 +917,9 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
  *
  * fplanque: created
  */
-function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
+function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $global_param_list;
+	global $global_param_list, $ReqURI;
 
 	if( $ignore == '' )
 		$ignore = array( );
@@ -986,15 +986,14 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 		}
 	}
 
-
 	if( ! empty( $set ) )
 	{
 		$params = array_merge( $params, $set );
 	}
 
-	$url = (empty($pagefileurl)) ? get_bloginfo('url') : $pagefileurl;
+	$url = empty($pagefileurl) ? $ReqURI : $pagefileurl;
 
-	if( ! empty( $params ) )
+	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
 	}

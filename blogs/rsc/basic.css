@@ -17,7 +17,7 @@
 div.error,
 div.log_error {
 	padding: 0 2ex;
-	margin: 3ex auto;
+	margin: 1ex auto;
 	border: 1px solid #fed;
 	background: #fff5ee;
 	color: #FF0000;
@@ -28,7 +28,6 @@ ul.log {
 }
 
 p.error,
-p.log_error,
 span.error {
 	color: #FF0000;
 	font-weight:bold;

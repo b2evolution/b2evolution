@@ -611,7 +611,50 @@ fieldset legend {
 /* FileManager */
 table.fileman {
 	margin:auto;
-	text-align:right;
 	width: 100%;
+	
+	/*border: 1px solid #ccc;*/
+	border-collapse: collapse;
 }
-
+table.fileman td {
+	border-bottom: 1px solid #ccc;
+	/*background-color: #E1DBDC;*/
+	padding: .3ex 2ex;
+}
+table.fileman td.icon, td.checkbox, td.perms {
+	width:3%;
+	text-align:center;
+}
+table.fileman td.type {
+	text-align: center;
+	width:11%;
+}
+table.fileman td.filename {
+	text-align: left;
+	width: 37%;
+}
+table.fileman td.timestamp {
+	text-align: center;
+	width:15%;
+}
+table.fileman td.size {
+	text-align: right;
+	width:8%;
+}
+table.fileman td.actions {
+	text-align: right;
+	white-space: nowrap;
+	width:20%;
+}
+table.fileman tr.toprow td {
+	padding: .3ex 1ex;
+	border-bottom:none;
+	background-color: #F0F0F0;
+}
+table.fileman th {
+	color: #fff;
+	background-color: #ccc;
+	border-left: 1px solid #FFF;
+	border-right: 1px solid #FFF;
+	padding: 1ex 1ex;
+}

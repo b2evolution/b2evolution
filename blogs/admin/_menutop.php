@@ -185,6 +185,14 @@ if( empty($mode) )
 			echo '<a href="b2users.php" >', T_('User Profile'), '</a></li>';
 		}
 
+		if( $current_User->level >= 10 ) // TODO: check filemanager permission
+		{
+			if( $admin_tab == 'files' )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="files.php">', T_('Files'), '</a></li>';
+		}
 
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{

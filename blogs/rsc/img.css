@@ -1,5 +1,9 @@
 /* Image styles */
 
+img {
+	border: none;
+}
+
 img.top {
 	vertical-align: top;
 	border: 0px;
