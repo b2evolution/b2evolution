@@ -390,7 +390,7 @@ class Form extends Widget
 				.'<input type="text" name="'.$field_name.'" id="'.$field_name.'"
 					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"'
 				." />\n"
-				.'<a href="#" onClick="cal_'.$field_name.'.select(get_form(this).'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
+				.'<a href="#" onClick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
 				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a>'
 				.' <span class="notes">('.$date_format.')</span>'
 				.$this->end_field();
