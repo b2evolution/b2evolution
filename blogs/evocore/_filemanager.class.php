@@ -376,9 +376,9 @@ class FileManager extends Filelist
 	}
 
 
-	function dispButtonUpload( $title = '#', $attribs = '' )
+	function dispButtonUpload( $title = NULL, $attribs = '' )
 	{
-		if( $title = '#' )
+		if( $title === NULL )
 		{
 			$title = T_('Upload a file/image');
 		}
@@ -403,7 +403,7 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$url = $this->getCurUrl( array( 'mode' => 'file_upload',
+		$url = $this->getCurUrl( array( 'mode' => 'file_cmr',
 																		'source' => urlencode( $this->curFile->getPath( true ) ),
 																		'keepsource' => (int)($mode == 'copy') ) );
 
@@ -1219,6 +1219,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.10  2004/11/10 22:44:26  blueyed
+ * small fix
+ *
  * Revision 1.9  2004/11/09 00:25:12  blueyed
  * minor translation changes (+MySQL spelling :/)
  *
