@@ -1,0 +1,3395 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois PLANQUE
+# This file is distributed under the same license as the PACKAGE package.
+# Martin Kopta <martin<dot>kopta<at-sign>garcon<dot-nospam>cz>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CZECH VERSION 1.0\n"
+"POT-Creation-Date: 2004-01-13 01:52+0100\n"
+"PO-Revision-Date: 2004-03-21 00:16+0100\n"
+"Last-Translator: Martin Kopta <n/a>\n"
+"Language-Team: cs <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ..\..\..\index.php:7
+msgid "my b2evolution"
+msgstr "moje b2evolution"
+
+#: ..\..\..\index.php:7
+msgid "my blogs"
+msgstr "moje blogy"
+
+#: ..\..\..\index.php:14
+msgid "A blog tool like it oughta be!"
+msgstr "Nástroj k blogování jak má být!"
+
+#: ..\..\..\index.php:15
+#: C:\www\b2evolution\blogs\index.php:32
+msgid "My blogs"
+msgstr "Moje blogy"
+
+#: ..\..\..\index.php:27
+msgid "My Back-Office"
+msgstr "Můj redakční systém"
+
+#: ..\..\..\index.php:30
+msgid "This page is a placeholder providing links to your blogs and additionnal demos of what you can do with b2evolution."
+msgstr "Tato strana je rezervovaná pro odkazy k vašim blogům a dalším ukázkám, co se dá dělat s b2evolution."
+
+#: ..\..\..\index.php:31
+msgid "Of course, you don't want to keep all that for your website. Just select what you need and erase what you don't. You will probably also delete this page and rename one of your blogs to index.php. (When you do that, don't forget to update that blog settings in the back office, so the moved blog knows its new filename/URL! ;)."
+msgstr "Na svém webu samozřejmě nemusíte mít všechno. Prostě si vyberte, co potřebujete a zbytek smažte. Nejspíš vymažete i tuto stránku a přejmenujete některý z blogů na index.php. (Až to uděláte, nezapoměňte obnovit také nastavení weblogu v redakčním systému, aby přestěhovaný web znal své nové umístění! ;)."
+
+#: ..\..\..\index.php:42
+#, php-format
+msgid "Blog #%d"
+msgstr "Blog #%d"
+
+#: ..\..\..\index.php:63
+msgid "Blog #1"
+msgstr "Blog #1"
+
+#: ..\..\..\index.php:63
+msgid "This is a special blog that aggregates all messages from all other blogs!"
+msgstr "Toto je zvláštní blog, který sdružuje příspěvky ze všech blogů!"
+
+#: ..\..\..\index.php:68
+msgid "Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office."
+msgstr "Upozornění: výše uvedený seznam (takové to menu) je automaticky vygenerovaná a obsahuje pouze blogy, které mají nastavený &bdquo;kořen URL&ldquo;. Ten můžete nastavit v předvolbách blogu v redakčním sytému."
+
+#: ..\..\..\index.php:69
+msgid "More demos"
+msgstr "Další ukázky"
+
+#: ..\..\..\index.php:71
+#: C:\www\b2evolution\blogs\index.php:72
+msgid "Custom template"
+msgstr "Vlastní šablona"
+
+#: ..\..\..\index.php:71
+msgid "Multiple blogs displayed on the same page"
+msgstr "Více blogů zobrazených na stejné straně"
+
+#: ..\..\..\index.php:72
+msgid "Summary of last posts in all blogs"
+msgstr "Přehled nových příspěvků ve všech blozích"
+
+#: ..\..\..\index.php:74
+msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
+msgstr "Upozornění: tyto ukázky nevyužívají evoSkin (ani kdyby byl povolen při instalaci). Jediným způsobem jak změnit jejich vzhled je upravit jejich šablonu v PHP. Ovšem jsou to jen ukázky, které vás mají inspirovat při tvorbě vlastních šablon."
+
+#: ..\..\..\index.php:76
+msgid "official website"
+msgstr "oficiální web"
+
+#: ..\..\..\index.php:76
+msgid "GNU GPL license"
+msgstr "licence GNU GPL"
+
+#: ..\..\..\multiblogs.php:47
+#: ..\..\..\multiblogs.php:121
+#: ..\..\..\noskin_a.php:59
+#: ..\..\..\noskin_a.php:129
+#: ..\..\..\noskin_a.php:221
+#: ..\..\..\noskin_all.php:60
+#: ..\..\..\noskin_all.php:130
+#: ..\..\..\noskin_all.php:223
+#: ..\..\..\noskin_b.php:59
+#: ..\..\..\noskin_b.php:130
+#: ..\..\..\noskin_b.php:232
+#: ..\..\..\noskin_roll.php:59
+#: ..\..\..\noskin_roll.php:129
+#: ..\..\..\noskin_roll.php:222
+#: ..\..\..\skins\bluesky\_main.php:20
+#: ..\..\..\skins\bluesky\_main.php:46
+#: ..\..\..\skins\bluesky\_main.php:127
+#: ..\..\..\skins\custom\_main.php:22
+#: ..\..\..\skins\custom\_main.php:56
+#: ..\..\..\skins\custom\_main.php:155
+#: ..\..\..\skins\fplanque2002\_main.php:23
+#: ..\..\..\skins\fplanque2002\_main.php:76
+#: ..\..\..\skins\fplanque2002\_main.php:168
+#: ..\..\..\skins\guadeloupe\_main.php:20
+#: ..\..\..\skins\guadeloupe\_main.php:46
+#: ..\..\..\skins\guadeloupe\_main.php:127
+msgid "Last comments"
+msgstr "Nové komentáře"
+
+#: ..\..\..\multiblogs.php:48
+#: ..\..\..\multiblogs.php:122
+#: ..\..\..\noskin_a.php:60
+#: ..\..\..\noskin_a.php:130
+#: ..\..\..\noskin_all.php:61
+#: ..\..\..\noskin_all.php:131
+#: ..\..\..\noskin_b.php:60
+#: ..\..\..\noskin_b.php:131
+#: ..\..\..\noskin_roll.php:60
+#: ..\..\..\noskin_roll.php:130
+#: ..\..\..\skins\bluesky\_main.php:21
+#: ..\..\..\skins\bluesky\_main.php:47
+#: ..\..\..\skins\custom\_main.php:23
+#: ..\..\..\skins\custom\_main.php:57
+#: ..\..\..\skins\fplanque2002\_main.php:24
+#: ..\..\..\skins\fplanque2002\_main.php:77
+#: ..\..\..\skins\guadeloupe\_main.php:21
+#: ..\..\..\skins\guadeloupe\_main.php:47
+msgid "Statistics"
+msgstr "Statistiky"
+
+#: ..\..\..\multiblogs.php:49
+#: ..\..\..\multiblogs.php:123
+#: ..\..\..\noskin_a.php:61
+#: ..\..\..\noskin_a.php:131
+#: ..\..\..\noskin_all.php:62
+#: ..\..\..\noskin_all.php:132
+#: ..\..\..\noskin_b.php:61
+#: ..\..\..\noskin_b.php:132
+#: ..\..\..\noskin_roll.php:61
+#: ..\..\..\noskin_roll.php:131
+#: ..\..\..\skins\custom\_main.php:24
+#: ..\..\..\skins\custom\_main.php:58
+#: ..\..\..\skins\fplanque2002\_main.php:25
+#: ..\..\..\skins\fplanque2002\_main.php:78
+msgid "Archive Directory"
+msgstr "Složka archivu"
+
+#: ..\..\..\multiblogs.php:96
+msgid "Multiblog demo"
+msgstr "Ukázka multiblogu"
+
+#: ..\..\..\multiblogs.php:106
+msgid "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
+msgstr "Tato ukázka blogu zobrazuje tři blogy v jednom (1 vlevo a dva vpravo)"
+
+# Dovolil jsem si Permalink přeložit jako "trvalinku".
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:220
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\noskin_a.php:161
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:162
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:162
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\summary.php:91
+#: ..\..\..\skins\_blogroll.php:61
+#: ..\..\..\skins\custom\_main.php:72
+#: ..\..\..\skins\custom\_main.php:95
+#: ..\..\..\skins\fplanque2002\_main.php:92
+#: ..\..\..\skins\fplanque2002\_main.php:108
+#, fuzzy
+msgid "Permanent link to full entry"
+msgstr "Trvalinka k celému příspěvku"
+
+# Dovolil jsem si Permalink přeložit jako Trvalinku.
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:152
+#: ..\..\..\multiblogs.php:220
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\noskin_a.php:161
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:162
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:162
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\admin\_edit_showposts.php:163
+#: ..\..\..\skins\_blogroll.php:61
+#: ..\..\..\skins\custom\_main.php:95
+#: ..\..\..\skins\fplanque2002\_main.php:92
+#: ..\..\..\skins\fplanque2002\_main.php:108
+#: ..\..\..\skins\guadeloupe\_main.php:62
+#, fuzzy
+msgid "Permalink"
+msgstr "Trvalinka"
+
+#: ..\..\..\multiblogs.php:137
+#: ..\..\..\noskin_a.php:146
+#: ..\..\..\noskin_a.php:239
+#: ..\..\..\noskin_all.php:147
+#: ..\..\..\noskin_all.php:241
+#: ..\..\..\noskin_b.php:147
+#: ..\..\..\noskin_b.php:250
+#: ..\..\..\noskin_roll.php:146
+#: ..\..\..\noskin_roll.php:240
+#: ..\..\..\admin\b2categories.php:9
+#: ..\..\..\admin\b2categories.php:230
+#: ..\..\..\admin\_edit_form.php:254
+#: ..\..\..\admin\_edit_showposts.php:418
+#: ..\..\..\skins\custom\_main.php:75
+#: ..\..\..\skins\custom\_main.php:173
+#: ..\..\..\skins\fplanque2002\_main.php:93
+#: ..\..\..\skins\fplanque2002\_main.php:186
+msgid "Categories"
+msgstr "Rubriky"
+
+#: ..\..\..\multiblogs.php:145
+#: ..\..\..\noskin_a.php:154
+#: ..\..\..\noskin_all.php:155
+#: ..\..\..\noskin_b.php:155
+#: ..\..\..\noskin_roll.php:154
+#: ..\..\..\skins\custom\_main.php:88
+#: ..\..\..\skins\fplanque2002\_main.php:101
+msgid "Display comments / Leave a comment"
+msgstr "Zobrazit komentáře / Přidat komentář"
+
+#: ..\..\..\multiblogs.php:147
+#: ..\..\..\noskin_a.php:156
+#: ..\..\..\noskin_all.php:157
+#: ..\..\..\noskin_b.php:157
+#: ..\..\..\noskin_roll.php:156
+#: ..\..\..\skins\custom\_main.php:90
+#: ..\..\..\skins\fplanque2002\_main.php:103
+#, fuzzy
+msgid "Display trackbacks / Get trackback address for this post"
+msgstr "Zobrazit zpětné stopy (trackback) / Adresa zpětné stopy tohoto příspěvku"
+
+#: ..\..\..\multiblogs.php:150
+#: ..\..\..\noskin_a.php:159
+#: ..\..\..\noskin_all.php:160
+#: ..\..\..\noskin_b.php:160
+#: ..\..\..\noskin_roll.php:159
+#: ..\..\..\skins\custom\_main.php:93
+#: ..\..\..\skins\fplanque2002\_main.php:106
+#, fuzzy
+msgid "Display pingbacks"
+msgstr "Zobrazit ozvěnu (pingback)"
+
+#: ..\..\..\multiblogs.php:153
+#: ..\..\..\noskin_a.php:162
+#: ..\..\..\noskin_all.php:163
+#: ..\..\..\noskin_b.php:163
+#: ..\..\..\noskin_roll.php:162
+#: ..\..\..\skins\custom\_main.php:96
+#: ..\..\..\skins\fplanque2002\_main.php:109
+#, php-format
+msgid "- %d queries so far"
+msgstr "- %d požadavků dosud"
+
+#: ..\..\..\multiblogs.php:273
+#: ..\..\..\noskin_a.php:293
+#: ..\..\..\noskin_all.php:295
+#: ..\..\..\noskin_b.php:304
+#: ..\..\..\noskin_roll.php:294
+#: ..\..\..\skins\babyblues\_main.php:100
+#: ..\..\..\skins\bluesky\_main.php:206
+#: ..\..\..\skins\custom\_main.php:238
+#: ..\..\..\skins\fplanque2002\_main.php:250
+#: ..\..\..\skins\guadeloupe\_main.php:207
+msgid "Misc"
+msgstr "Různé"
+
+#: ..\..\..\noskin_a.php:95
+#: ..\..\..\noskin_all.php:96
+#: ..\..\..\noskin_b.php:96
+#: ..\..\..\noskin_roll.php:95
+#: ..\..\..\skins\fplanque2002\_bloglist.php:27
+msgid "Selected"
+msgstr "Vybrané"
+
+#: ..\..\..\noskin_a.php:214
+#: ..\..\..\noskin_a.php:215
+#: ..\..\..\noskin_all.php:216
+#: ..\..\..\noskin_all.php:217
+#: ..\..\..\noskin_b.php:225
+#: ..\..\..\noskin_b.php:226
+#: ..\..\..\noskin_roll.php:215
+#: ..\..\..\noskin_roll.php:216
+#: ..\..\..\skins\bluesky\_main.php:123
+#: ..\..\..\skins\bluesky\_main.php:124
+#: ..\..\..\skins\custom\_main.php:148
+#: ..\..\..\skins\custom\_main.php:149
+#: ..\..\..\skins\fplanque2002\_main.php:161
+#: ..\..\..\skins\fplanque2002\_main.php:162
+#: ..\..\..\skins\guadeloupe\_main.php:123
+#: ..\..\..\skins\guadeloupe\_main.php:124
+msgid "Recently"
+msgstr "Nové"
+
+#: ..\..\..\noskin_a.php:214
+#: ..\..\..\noskin_all.php:216
+#: ..\..\..\noskin_b.php:225
+#: ..\..\..\noskin_roll.php:215
+#: ..\..\..\skins\bluesky\_main.php:123
+#: ..\..\..\skins\custom\_main.php:148
+#: ..\..\..\skins\fplanque2002\_main.php:161
+#: ..\..\..\skins\guadeloupe\_main.php:123
+#, fuzzy
+msgid "(cached)"
+msgstr "(uloženo ve vyrovnávací paměti)"
+
+#: ..\..\..\noskin_a.php:215
+#: ..\..\..\noskin_all.php:217
+#: ..\..\..\noskin_b.php:226
+#: ..\..\..\noskin_roll.php:216
+#: ..\..\..\skins\bluesky\_main.php:124
+#: ..\..\..\skins\custom\_main.php:149
+#: ..\..\..\skins\fplanque2002\_main.php:162
+#: ..\..\..\skins\guadeloupe\_main.php:124
+#, fuzzy
+msgid "(no cache)"
+msgstr "(žádná vyrovnávací paměť)"
+
+#: ..\..\..\noskin_a.php:222
+#: ..\..\..\noskin_all.php:224
+#: ..\..\..\noskin_b.php:233
+#: ..\..\..\noskin_roll.php:223
+#: ..\..\..\skins\custom\_main.php:156
+#: ..\..\..\skins\fplanque2002\_main.php:169
+msgid "Some viewing statistics"
+msgstr "Několik statistik zobrazení"
+
+#: ..\..\..\noskin_a.php:227
+#: ..\..\..\noskin_a.php:233
+#: ..\..\..\noskin_all.php:229
+#: ..\..\..\noskin_all.php:235
+#: ..\..\..\noskin_b.php:238
+#: ..\..\..\noskin_b.php:244
+#: ..\..\..\noskin_roll.php:228
+#: ..\..\..\noskin_roll.php:234
+#: ..\..\..\admin\_edit_showposts.php:303
+#: ..\..\..\admin\_edit_showposts.php:493
+#: ..\..\..\skins\custom\_main.php:161
+#: ..\..\..\skins\custom\_main.php:167
+#: ..\..\..\skins\fplanque2002\_main.php:174
+#: ..\..\..\skins\fplanque2002\_main.php:180
+#: ..\..\..\skins\originalb2\_main.php:144
+msgid "Search"
+msgstr "Vyhledat"
+
+#: ..\..\..\noskin_a.php:230
+#: ..\..\..\noskin_all.php:232
+#: ..\..\..\noskin_b.php:241
+#: ..\..\..\noskin_roll.php:231
+#: ..\..\..\skins\custom\_main.php:164
+#: ..\..\..\skins\fplanque2002\_main.php:177
+msgid "All Words"
+msgstr "Všechna slova"
+
+#: ..\..\..\noskin_a.php:231
+#: ..\..\..\noskin_all.php:233
+#: ..\..\..\noskin_b.php:242
+#: ..\..\..\noskin_roll.php:232
+#: ..\..\..\skins\custom\_main.php:165
+#: ..\..\..\skins\fplanque2002\_main.php:178
+msgid "Some Word"
+msgstr "Některá slova"
+
+#: ..\..\..\noskin_a.php:232
+#: ..\..\..\noskin_all.php:234
+#: ..\..\..\noskin_b.php:243
+#: ..\..\..\noskin_roll.php:233
+#: ..\..\..\admin\_edit_showposts.php:338
+#: ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\skins\fplanque2002\_main.php:179
+msgid "Entire phrase"
+msgstr "Celou frázi"
+
+#: ..\..\..\noskin_a.php:234
+#: ..\..\..\noskin_a.php:246
+#: ..\..\..\noskin_all.php:236
+#: ..\..\..\noskin_all.php:248
+#: ..\..\..\noskin_b.php:245
+#: ..\..\..\noskin_b.php:257
+#: ..\..\..\noskin_roll.php:235
+#: ..\..\..\noskin_roll.php:247
+#: ..\..\..\skins\bluesky\_main.php:142
+#: ..\..\..\skins\custom\_main.php:168
+#: ..\..\..\skins\custom\_main.php:180
+#: ..\..\..\skins\fplanque2002\_main.php:181
+#: ..\..\..\skins\fplanque2002\_main.php:193
+#: ..\..\..\skins\guadeloupe\_main.php:143
+msgid "Reset form"
+msgstr "Zrušit"
+
+#: ..\..\..\noskin_a.php:245
+#: ..\..\..\noskin_all.php:247
+#: ..\..\..\noskin_b.php:256
+#: ..\..\..\noskin_roll.php:246
+#: ..\..\..\skins\bluesky\_main.php:141
+#: ..\..\..\skins\custom\_main.php:179
+#: ..\..\..\skins\fplanque2002\_main.php:192
+#: ..\..\..\skins\guadeloupe\_main.php:142
+#: ..\..\..\skins\originalb2\_main.php:136
+#, fuzzy
+msgid "Get selection"
+msgstr "Získat vybrané"
+
+#: ..\..\..\noskin_a.php:251
+#: ..\..\..\noskin_all.php:253
+#: ..\..\..\noskin_b.php:262
+#: ..\..\..\noskin_roll.php:252
+#: ..\..\..\admin\_edit_showposts.php:342
+#: ..\..\..\skins\bluesky\_main.php:176
+#: ..\..\..\skins\custom\_main.php:185
+#: ..\..\..\skins\fplanque2002\_main.php:198
+#: ..\..\..\skins\guadeloupe\_main.php:177
+msgid "Archives"
+msgstr "Archiv"
+
+#: ..\..\..\noskin_a.php:256
+#: ..\..\..\noskin_a.php:269
+#: ..\..\..\noskin_a.php:278
+#: ..\..\..\noskin_all.php:258
+#: ..\..\..\noskin_all.php:271
+#: ..\..\..\noskin_all.php:280
+#: ..\..\..\noskin_b.php:267
+#: ..\..\..\noskin_b.php:280
+#: ..\..\..\noskin_b.php:289
+#: ..\..\..\noskin_roll.php:257
+#: ..\..\..\noskin_roll.php:270
+#: ..\..\..\noskin_roll.php:279
+#: ..\..\..\skins\bluesky\_main.php:189
+#: ..\..\..\skins\bluesky\_main.php:198
+#: ..\..\..\skins\custom\_main.php:190
+#: ..\..\..\skins\custom\_main.php:214
+#: ..\..\..\skins\custom\_main.php:223
+#: ..\..\..\skins\fplanque2002\_main.php:203
+#: ..\..\..\skins\fplanque2002\_main.php:226
+#: ..\..\..\skins\fplanque2002\_main.php:235
+#: ..\..\..\skins\guadeloupe\_main.php:190
+#: ..\..\..\skins\guadeloupe\_main.php:199
+msgid "more..."
+msgstr "více..."
+
+#: ..\..\..\noskin_a.php:263
+#: ..\..\..\noskin_all.php:265
+#: ..\..\..\noskin_b.php:274
+#: ..\..\..\noskin_roll.php:264
+#: ..\..\..\skins\bluesky\_main.php:183
+#: ..\..\..\skins\custom\_main.php:208
+#: ..\..\..\skins\fplanque2002\_main.php:220
+#: ..\..\..\skins\guadeloupe\_main.php:184
+#, fuzzy
+msgid "Recent Referers"
+msgstr "Aktuální odkazovače"
+
+#: ..\..\..\noskin_a.php:272
+#: ..\..\..\noskin_all.php:274
+#: ..\..\..\noskin_b.php:283
+#: ..\..\..\noskin_roll.php:273
+#: ..\..\..\skins\bluesky\_main.php:192
+#: ..\..\..\skins\custom\_main.php:217
+#: ..\..\..\skins\fplanque2002\_main.php:229
+#: ..\..\..\skins\guadeloupe\_main.php:193
+msgid "Top Referers"
+msgstr "Nejčastější odkazovače"
+
+#: ..\..\..\noskin_a.php:286
+#: ..\..\..\noskin_all.php:288
+#: ..\..\..\noskin_b.php:297
+#: ..\..\..\noskin_roll.php:287
+#: ..\..\..\admin\_blogs_form.php:59
+#: ..\..\..\skins\bluesky\_main.php:203
+#: ..\..\..\skins\custom\_main.php:231
+#: ..\..\..\skins\fplanque2002\_main.php:243
+#: ..\..\..\skins\guadeloupe\_main.php:204
+#, fuzzy
+msgid "Blogroll"
+msgstr "Oblíbené weby"
+
+#: ..\..\..\noskin_a.php:307
+#: ..\..\..\noskin_all.php:309
+#: ..\..\..\noskin_b.php:318
+#: ..\..\..\noskin_roll.php:308
+#: ..\..\..\skins\custom\_main.php:251
+#: ..\..\..\skins\fplanque2002\_main.php:264
+msgid "Syndicate this blog"
+msgstr "Sdílení blogu"
+
+#: ..\..\..\noskin_a.php:337
+#: ..\..\..\noskin_all.php:339
+#: ..\..\..\noskin_b.php:347
+#: ..\..\..\noskin_roll.php:338
+#: ..\..\..\skins\babyblues\_main.php:124
+#: ..\..\..\skins\bluesky\_main.php:233
+#: ..\..\..\skins\custom\_main.php:273
+#: ..\..\..\skins\fplanque2002\_main.php:293
+#: ..\..\..\skins\guadeloupe\_main.php:234
+#: ..\..\..\skins\originalb2\_main.php:180
+#, php-format
+msgid "Totals: %d posts - %d queries - %01.3f seconds"
+msgstr "Celkem: %d příspěvků - %d doatzů - %01.3f sekund"
+
+#: ..\..\..\summary.php:56
+#, fuzzy
+msgid "Summary demo"
+msgstr "Ukázkový přehled"
+
+#: ..\..\..\summary.php:66
+msgid "This demo template displays a summary of last posts in all blogs"
+msgstr "Tato ukázková šablona zobrazuje přehled nových příspěvků ve všech blozích"
+
+#: ..\..\..\summary.php:97
+msgid "More posts..."
+msgstr "Další příspěvky..."
+
+#: ..\..\..\admin\b2blogs.php:9
+#: ..\..\..\admin\_blogs_list.php:10
+#: ..\..\..\admin\_menutop.php:67
+#: ..\..\..\skins\bluesky\_bloglist.php:17
+#: ..\..\..\skins\guadeloupe\_bloglist.php:17
+msgid "Blogs"
+msgstr "Blogy"
+
+#: ..\..\..\admin\b2blogs.php:21
+#: ..\..\..\admin\b2blogs.php:51
+#: ..\..\..\admin\b2blogs.php:161
+#: ..\..\..\admin\b2blogs.php:187
+#: ..\..\..\admin\b2blogs.php:282
+msgid "You have no right to edit the blogs."
+msgstr "Nemáte oprávnění k úpravě blogů."
+
+#: ..\..\..\admin\b2blogs.php:24
+msgid "New blog"
+msgstr "Nový blog"
+
+#: ..\..\..\admin\b2blogs.php:71
+#: ..\..\..\admin\b2blogs.php:208
+#: ..\..\..\admin\edit_actions.php:181
+msgid "Cannot update, please correct these errors:"
+msgstr "Nelze obnovit, prosím opravte následující chyby:"
+
+#: ..\..\..\admin\b2blogs.php:72
+msgid "Back to new blog form"
+msgstr "Zpět na založení nového blogu"
+
+#: ..\..\..\admin\b2blogs.php:80
+#, fuzzy
+msgid "Creating blog..."
+msgstr "Vytváří se blog..."
+
+#: ..\..\..\admin\b2blogs.php:91
+msgid "Trying to create stub file"
+msgstr "Pokouším se vytvořit kořenný soubor"
+
+#: ..\..\..\admin\b2blogs.php:102
+msgid "Loading"
+msgstr "Nahrávám"
+
+#: ..\..\..\admin\b2blogs.php:106
+msgid "Could not load stub model."
+msgstr "Nelze nahrát kořenný model."
+
+#: ..\..\..\admin\b2blogs.php:111
+msgid "Creating"
+msgstr "Vytvářím"
+
+#: ..\..\..\admin\b2blogs.php:130
+#, php-format
+msgid "<p>Changing mod to %o</p>"
+msgstr "<p>Měním mód na %o</p>"
+
+#: ..\..\..\admin\b2blogs.php:133
+#: ..\..\..\admin\b2blogs.php:142
+#: ..\..\..\admin\b2team.php:227
+msgid "Warning"
+msgstr "Upozornění"
+
+#: ..\..\..\admin\b2blogs.php:133
+msgid "chmod failed!"
+msgstr "Selhal chmod!"
+
+#: ..\..\..\admin\b2blogs.php:139
+#, php-format
+msgid "<p>Changing owner to %s</p>"
+msgstr "<p>Měním vlastníka na %s</p>"
+
+#: ..\..\..\admin\b2blogs.php:142
+msgid "chown failed!"
+msgstr "Selhal chown!"
+
+#: ..\..\..\admin\b2blogs.php:149
+#, php-format
+msgid "You should <a href=\"%s\">create categories</a> for this blog now!"
+msgstr "Nyní byste měli <a href=\"%s\">vytvořit rubriky</a> pro tento blog!"
+
+#: ..\..\..\admin\b2blogs.php:164
+msgid "Blog params for:"
+msgstr "Vlastnosti blogu pro:"
+
+#: ..\..\..\admin\b2blogs.php:209
+msgid "Back to blog editing"
+msgstr "Zpět na úpravu blogu"
+
+#: ..\..\..\admin\b2blogs.php:232
+#: ..\..\..\admin\_blogs_list.php:13
+msgid "Blog"
+msgstr "Blog"
+
+#: ..\..\..\admin\b2blogs.php:236
+msgid "You have no right to generate static pages."
+msgstr "Nemáte oprávnění vytvořit statické stránky."
+
+#: ..\..\..\admin\b2blogs.php:242
+msgid "You haven't set a static filename for this blog!"
+msgstr "Nebyl určen název souboru pro statické stránky tohoto blogu!"
+
+#: ..\..\..\admin\b2blogs.php:251
+#, php-format
+msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
+msgstr "Vytvářím z <strong>%s</strong> stránku <strong>%s</strong>..."
+
+#: ..\..\..\admin\b2blogs.php:263
+msgid "Writing to file..."
+msgstr "Zapisuji do souboru..."
+
+#: ..\..\..\admin\b2blogs.php:269
+#: ..\..\..\admin\edit_actions.php:97
+#: ..\..\..\admin\edit_actions.php:214
+#: ..\..\..\admin\edit_actions.php:285
+#: ..\..\..\b2evocore\_functions_pings.php:53
+#: ..\..\..\b2evocore\_functions_pings.php:87
+#: ..\..\..\b2evocore\_functions_pings.php:146
+#: ..\..\..\b2evocore\_functions_pings.php:191
+msgid "Done."
+msgstr "Hotovo."
+
+#: ..\..\..\admin\b2browse.php:16
+msgid "Browse blog:"
+msgstr "Prohlížet blog:"
+
+#: ..\..\..\admin\b2browse.php:52
+#: ..\..\..\admin\b2edit.php:69
+#: ..\..\..\admin\b2edit.php:195
+#, php-format
+msgid "Since you're a newcomer, you'll have to wait for an admin to raise your level to 1, in order to be authorized to post.\tYou can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
+msgstr "Jelikož jste nováček, musíte vyčkat, než vám správce přidělí práva úrovně 1, abyste mohl psát příspěvky.\tMůžete  <a %s>poslat email správci</a> a požádat ho u změnu. Až získáte oprávnění, načtěte znovu tuto stranu a budete moci přispívat. :)"
+
+#: ..\..\..\admin\b2categories.php:21
+#: ..\..\..\admin\b2categories.php:62
+#: ..\..\..\admin\b2categories.php:91
+#: ..\..\..\admin\b2categories.php:120
+#: ..\..\..\admin\b2categories.php:203
+#: ..\..\..\admin\b2categories.php:222
+msgid "You have no right to edit the categories."
+msgstr "Nemáte oprávnění upravovat rubriky."
+
+#: ..\..\..\admin\b2categories.php:31
+#, php-format
+msgid "New sub-category in category: %s"
+msgstr "Nová podrubrika v rubrice: %s"
+
+#: ..\..\..\admin\b2categories.php:41
+#, php-format
+msgid "New category in blog: %s"
+msgstr "Nová rubrika v blogu: %s"
+
+#: ..\..\..\admin\b2categories.php:48
+msgid "New category name"
+msgstr "Nový název rubriky"
+
+#: ..\..\..\admin\b2categories.php:49
+msgid "Create category"
+msgstr "Vytvořit rubriku"
+
+#: ..\..\..\admin\b2categories.php:95
+msgid "Deleting category..."
+msgstr "Ruším rubriku..."
+
+#: ..\..\..\admin\b2categories.php:103
+#: ..\..\..\b2evocore\_functions_users.php:107
+#: ..\..\..\b2evocore\_functions_users.php:138
+#: ..\..\..\htsrv\profile_update.php:47
+#: ..\..\..\htsrv\profile_update.php:56
+#: ..\..\..\htsrv\profile_update.php:64
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\profile_update.php:77
+#: ..\..\..\htsrv\profile_update.php:85
+#: ..\..\..\htsrv\profile_update.php:89
+#: ..\..\..\htsrv\register.php:34
+#: ..\..\..\htsrv\register.php:41
+#: ..\..\..\htsrv\register.php:48
+#: ..\..\..\htsrv\register.php:56
+#: ..\..\..\htsrv\register.php:61
+#: ..\..\..\htsrv\register.php:76
+msgid "ERROR"
+msgstr "CHYBA"
+
+#: ..\..\..\admin\b2categories.php:107
+msgid "Category deleted."
+msgstr "Rubrika zrušena."
+
+#: ..\..\..\admin\b2categories.php:130
+msgid "<strong>Old</strong> name"
+msgstr "<strong>Původní</strong> název"
+
+#: ..\..\..\admin\b2categories.php:133
+msgid "<strong>New</strong> name"
+msgstr "<strong>Nový</strong> název"
+
+#: ..\..\..\admin\b2categories.php:137
+msgid "New parent category"
+msgstr "Nová nadřazená rubrika"
+
+#: ..\..\..\admin\b2categories.php:163
+#: ..\..\..\admin\b2categories.php:182
+#, fuzzy
+msgid "Old Parent"
+msgstr "Původní nadřazená"
+
+#: ..\..\..\admin\b2categories.php:180
+#, fuzzy
+msgid "Root (No parent)"
+msgstr "Základní (žádné nadřazené)"
+
+#: ..\..\..\admin\b2categories.php:191
+msgid "Edit category!"
+msgstr "Upravit rubriku!"
+
+#: ..\..\..\admin\b2categories.php:243
+#: ..\..\..\admin\_blogs_list.php:25
+#: ..\..\..\admin\_edit_form.php:195
+msgid "Edit"
+msgstr "Upravit"
+
+#: ..\..\..\admin\b2categories.php:245
+#: ..\..\..\admin\_edit_showposts.php:154
+#: ..\..\..\admin\_edit_showposts.php:204
+msgid "Delete"
+msgstr "Smazat"
+
+#: ..\..\..\admin\b2categories.php:250
+msgid "New sub-category here"
+msgstr "Nová podrubrika zde"
+
+#: ..\..\..\admin\b2categories.php:265
+msgid "New category here"
+msgstr "Nová rubrika zde"
+
+#: ..\..\..\admin\b2categories.php:270
+msgid "<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number)."
+msgstr "<strong>Poznámka:</strong> Při mazání rubriky nedojde ke smazání příspěvků z dané rubriky. Příspěvky budou převedeny do nadřazené rubriky. Pokud smažete základní rubriku, příspěvky budou převedeny do nejstarší rubriky na blogu (s nejnižším číslem rubriky)."
+
+#: ..\..\..\admin\b2edit.php:30
+#: ..\..\..\admin\edit_actions.php:163
+msgid "Oops, no post with this ID."
+msgstr "Ajaj, příspěvek s tímto ID neexistuje."
+
+#: ..\..\..\admin\b2edit.php:35
+msgid "Editing post"
+msgstr "Upravit příspěvek"
+
+#: ..\..\..\admin\b2edit.php:81
+msgid "Oops, no comment with this ID!"
+msgstr "Ajaj, komentář s tímto ID neexistuje!"
+
+#: ..\..\..\admin\b2edit.php:83
+msgid "Editing comment"
+msgstr "Upravit komentář"
+
+#: ..\..\..\admin\b2edit.php:92
+#: ..\..\..\admin\b2upload.php:13
+#: ..\..\..\admin\edit_actions.php:66
+#: ..\..\..\admin\edit_actions.php:326
+msgid "Cheatin' uh ?"
+msgstr "Švindlujeme, co?"
+
+#: ..\..\..\admin\b2edit.php:118
+msgid "New post in blog:"
+msgstr "Nový příspěvek v blogu:"
+
+#: ..\..\..\admin\b2edit.php:134
+#: ..\..\..\admin\b2edit.php:154
+msgid "Since this blog has no categories, you cannot post to it. You must create categories first."
+msgstr "Jelikož tento blog nemá žádné rubriky, nemůžete do něj přispívat. Musíte nejdříve založit rubriky."
+
+#: ..\..\..\admin\b2edit.php:138
+msgid "Switch to this blog (keeping your input if Javascript is active)"
+msgstr "Přepnout na tento blog (data budou zachována, pokud je zapnutý JavaScript)"
+
+#: ..\..\..\admin\b2login.php:16
+#: ..\..\..\admin\b2upload.php:21
+#: ..\..\..\htsrv\_header.php:14
+msgid "b2evo"
+msgstr "b2evo"
+
+#: ..\..\..\admin\b2login.php:16
+#: ..\..\..\b2evocore\_functions_users.php:459
+msgid "Login..."
+msgstr "Přihlášení..."
+
+#: ..\..\..\admin\b2login.php:19
+msgid "In b2evolution, you do not need to point to the b2login.php page to log in."
+msgstr "V b2evoluion nemusíte chodit na stránku b2login.php, abyste se přihlásil."
+
+#: ..\..\..\admin\b2login.php:20
+#, php-format
+msgid "Simply point directly to the backoffice page you need, for example: %s or %s. b2evo will prompt you to log in if needed."
+msgstr "Stačí otevřít kteroukoli stránku z redakčního systému, již potřebujete, např.: %s nebo %s. b2evo se vás v případě potřeby zeptá na přihlašovací údaje."
+
+#: ..\..\..\admin\b2options.php:11
+#: ..\..\..\admin\_edit_showposts.php:257
+#: ..\..\..\admin\_menutop.php:72
+#: ..\..\..\skins\_feedback.php:182
+msgid "Options"
+msgstr "Možnosti"
+
+#: ..\..\..\admin\b2options.php:20
+#: ..\..\..\admin\b2options.php:41
+msgid "You have no right to edit the options for this blog."
+msgstr "Nemáte oprávnění měnit nastavení tohoto blogu."
+
+#: ..\..\..\admin\b2options.php:52
+msgid "Show"
+msgstr "Zobrazit"
+
+#: ..\..\..\admin\b2options.php:59
+msgid "days"
+msgstr "dnů"
+
+#: ..\..\..\admin\b2options.php:63
+msgid "posts"
+msgstr "příspěvků"
+
+#: ..\..\..\admin\b2options.php:67
+msgid "posts paged"
+msgstr "stránek s příspěvky"
+
+#: ..\..\..\admin\b2options.php:72
+msgid "Archive mode"
+msgstr "Způsob archivace"
+
+#: ..\..\..\admin\b2options.php:79
+msgid "daily"
+msgstr "po dnech"
+
+#: ..\..\..\admin\b2options.php:83
+msgid "weekly"
+msgstr "po týdnech"
+
+#: ..\..\..\admin\b2options.php:87
+msgid "monthly"
+msgstr "po měsících"
+
+#: ..\..\..\admin\b2options.php:91
+msgid "post by post"
+msgstr "každý příspěvek zvlášť"
+
+#: ..\..\..\admin\b2options.php:95
+msgid "Time difference"
+msgstr "Časový posun"
+
+#: ..\..\..\admin\b2options.php:97
+msgid "if you're not on the timezone of your server"
+msgstr "pokud nejste ve stejném časovém pásmu jako váš server"
+
+#: ..\..\..\admin\b2options.php:101
+#: ..\..\..\admin\_edit_form.php:150
+#: ..\..\..\admin\_edit_showposts.php:258
+#: ..\..\..\skins\_feedback.php:186
+msgid "Auto-BR"
+msgstr "Automatické zalamování řádeky"
+
+#: ..\..\..\admin\b2options.php:112
+msgid "converts line-breaks into &lt;br /&gt; tags"
+msgstr "převádí konce řádek na  značku &lt;BR&gt;"
+
+#: ..\..\..\admin\b2options.php:118
+#: ..\..\..\skins\_profile.php:120
+msgid "Update"
+msgstr "Obnovit"
+
+#: ..\..\..\admin\b2profile.php:16
+#: ..\..\..\admin\_menutop.php:82
+msgid "My Profile"
+msgstr "Můj profil"
+
+#: ..\..\..\admin\b2profile.php:24
+#: ..\..\..\b2evocore\_functions_users.php:572
+msgid "Edit your profile"
+msgstr "Upravit vlastní profil"
+
+#: ..\..\..\admin\b2profile.php:39
+msgid "Bookmarklet"
+msgstr "Bookmarklet"
+
+#: ..\..\..\admin\b2profile.php:45
+#: ..\..\..\admin\b2profile.php:52
+#: ..\..\..\admin\b2profile.php:60
+#: ..\..\..\admin\b2profile.php:67
+msgid "Add this link to your Favorites/Bookmarks:"
+msgstr "Přidat tento odkaz mezi oblíbené záložky:"
+
+#: ..\..\..\admin\b2profile.php:46
+#: ..\..\..\admin\b2profile.php:53
+#: ..\..\..\admin\b2profile.php:61
+#: ..\..\..\admin\b2profile.php:68
+msgid "b2evo bookmarklet"
+msgstr "b2evo bookmarklet"
+
+#: ..\..\..\admin\b2profile.php:81
+msgid "Post to b2evolution"
+msgstr "Odeslat do b2evolution"
+
+#: ..\..\..\admin\b2profile.php:83
+msgid "No Sidebar found! You must use Mozilla 0.9.4 or later!"
+msgstr "Sidebar nebyl nalezen! Použijte prohlížeč Mozilla 0.9.4 nebo novější!"
+
+#: ..\..\..\admin\b2profile.php:87
+#: ..\..\..\admin\b2profile.php:95
+msgid "SideBar"
+msgstr "Sidebar"
+
+#: ..\..\..\admin\b2profile.php:88
+#, php-format
+msgid "Add the <a %s>b2evo sidebar</a> !"
+msgstr "Přidat <a %s>b2evo sidebar</a> !"
+
+#: ..\..\..\admin\b2profile.php:96
+msgid "Add this link to your favorites:"
+msgstr "Přidat tento odkaz k oblíbeným:"
+
+#: ..\..\..\admin\b2profile.php:97
+msgid "b2evo sidebar"
+msgstr "b2evo sidebar"
+
+#: ..\..\..\admin\b2spell.php:11
+msgid "Spell Check"
+msgstr "Oprava pravopisu"
+
+#: ..\..\..\admin\b2spell.php:78
+msgid "Loading Spell Checker. Please wait"
+msgstr "Načítám pravopisný slovník, čekejte prosím"
+
+#: ..\..\..\admin\b2stats.php:10
+msgid "View Stats"
+msgstr "Zobrazit statistiky"
+
+#: ..\..\..\admin\b2stats.php:22
+#: ..\..\..\admin\b2stats.php:126
+msgid "Summary"
+msgstr "Přehled"
+
+#: ..\..\..\admin\b2stats.php:26
+#: ..\..\..\admin\b2stats.php:149
+msgid "Referers"
+msgstr "Odkazovače"
+
+#: ..\..\..\admin\b2stats.php:30
+#: ..\..\..\admin\b2stats.php:150
+msgid "Refering Searches"
+msgstr "Jak jste nás našli"
+
+#: ..\..\..\admin\b2stats.php:34
+#: ..\..\..\admin\b2stats.php:152
+msgid "Syndication"
+msgstr "Sdílení"
+
+#: ..\..\..\admin\b2stats.php:38
+msgid "User Agents"
+msgstr "Prohlížeče"
+
+#: ..\..\..\admin\b2stats.php:42
+#: ..\..\..\admin\b2stats.php:153
+msgid "Direct Accesses"
+msgstr "Přímý přístup"
+
+#: ..\..\..\admin\b2stats.php:51
+msgid "You have no right to view stats."
+msgstr "Nemáte oprávnění prohlížet statistiky."
+
+#: ..\..\..\admin\b2stats.php:59
+#, fuzzy
+msgid "You have no right to change a hit type."
+msgstr "Nemáte oprávnění měnit druh přístupu."
+
+#: ..\..\..\admin\b2stats.php:66
+#, fuzzy, php-format
+msgid "Changing hit #%d type to: %s"
+msgstr "Měním druh přístupu #%d na: %s"
+
+#: ..\..\..\admin\b2stats.php:78
+#, fuzzy
+msgid "You have no right to delete a hit."
+msgstr "Nemáte oprávnění smazat přístup."
+
+#: ..\..\..\admin\b2stats.php:83
+#, fuzzy, php-format
+msgid "Deleting hit #%d..."
+msgstr "Mažu přístup #%d..."
+
+#: ..\..\..\admin\b2stats.php:95
+msgid "Filter"
+msgstr "Filtrovat"
+
+#: ..\..\..\admin\b2stats.php:98
+#: ..\..\..\admin\b2stats.php:102
+msgid "None"
+msgstr "Nic"
+
+#: ..\..\..\admin\b2stats.php:148
+msgid "Date"
+msgstr "Datum"
+
+#: ..\..\..\admin\b2stats.php:151
+msgid "Indexing Robots"
+msgstr "Indexující roboty"
+
+#: ..\..\..\admin\b2stats.php:154
+msgid "Total"
+msgstr "Celkem"
+
+#: ..\..\..\admin\b2stats.php:208
+#: ..\..\..\skins\_stats.php:16
+#, fuzzy
+msgid "Last referers"
+msgstr "Aktuální odkazovače"
+
+#: ..\..\..\admin\b2stats.php:209
+msgid "These are hits from external web pages refering to this blog"
+msgstr "Toto jsou přístupy z vnějších stránek, které odkazují na tento blog"
+
+#: ..\..\..\admin\b2stats.php:216
+#: ..\..\..\admin\b2stats.php:259
+#: ..\..\..\admin\b2stats.php:339
+#, fuzzy
+msgid "Delete this hit!"
+msgstr "Smazat tento přístup!"
+
+#  TRANS: Abbrev. for Delete (stats)
+#: ..\..\..\admin\b2stats.php:216
+#: ..\..\..\admin\b2stats.php:259
+#: ..\..\..\admin\b2stats.php:339
+#: ..\..\..\admin\_user_list.php:45
+#, fuzzy
+msgid "Del"
+msgstr "Del"
+
+#: ..\..\..\admin\b2stats.php:217
+#, fuzzy
+msgid "Log as a search instead"
+msgstr "Zaznamenat jako hledání"
+
+#  TRANS: Abbrev. for "move to searches" (stats)
+#: ..\..\..\admin\b2stats.php:217
+#, fuzzy
+msgid "-&gt;S"
+msgstr "-&gt;H"
+
+#: ..\..\..\admin\b2stats.php:226
+#: ..\..\..\skins\_stats.php:26
+#, fuzzy
+msgid "Top referers"
+msgstr "Nejčastější odkazovače"
+
+#: ..\..\..\admin\b2stats.php:237
+#, fuzzy
+msgid "Total referers"
+msgstr "Odkazovače celkem"
+
+#: ..\..\..\admin\b2stats.php:251
+#: ..\..\..\skins\_stats.php:36
+#, fuzzy
+msgid "Last refering searches"
+msgstr "Aktuální přístupy z vyhledávání"
+
+#: ..\..\..\admin\b2stats.php:252
+msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
+msgstr "toto jsou přístupy lidí, kteří navštívili tento systém pro blogování z vyhledavače. (Vyhledavače musejí být uvedeny v seznamu /conf/_stats.php)"
+
+#: ..\..\..\admin\b2stats.php:268
+msgid "Top refering search engines"
+msgstr "Nejčastěji odkazující vyhledavače"
+
+#: ..\..\..\admin\b2stats.php:280
+#: ..\..\..\skins\_stats.php:60
+msgid "Top Indexing Robots"
+msgstr "Nejčastěji indexující roboty"
+
+#: ..\..\..\admin\b2stats.php:281
+msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/_stats.php)"
+msgstr "Toto jsou přístupy od samočinných robotů, jako jsou indexovací roboty vyhledavačů. (Roboty musí být uvedeny v seznamu /conf/_stats.php)"
+
+#: ..\..\..\admin\b2stats.php:305
+#: ..\..\..\skins\_stats.php:75
+msgid "Top Aggregators"
+msgstr "Nejčastěší čtečky"
+
+#: ..\..\..\admin\b2stats.php:306
+msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)"
+msgstr "Toto jsou přístupy ze čteček RSS. (Čtečky musejí být uvedeny v seznamu /conf/_stats.php)"
+
+#: ..\..\..\admin\b2stats.php:317
+msgid "Total RSS hits"
+msgstr "Přístupů k RSS celkem"
+
+#: ..\..\..\admin\b2stats.php:331
+msgid "Last direct accesses"
+msgstr "Aktuální přímé přístupy"
+
+#: ..\..\..\admin\b2stats.php:332
+msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
+msgstr "Toto jsou přístupy lidí, kteří navštívili tento systém pro blogování přímo (buď zadání adresy do prohlížeče, nebo otevřením ze záložky oblíbených odkazů. Chybné odkazovače [příliš krátké] jsou zde uvedeny také.)"
+
+#: ..\..\..\admin\b2stats.php:359
+msgid "Top User Agents"
+msgstr "Nejčastější prohlížeče"
+
+#: ..\..\..\admin\b2team.php:11
+msgid "User management"
+msgstr "Správa uživatelů"
+
+#: ..\..\..\admin\b2team.php:28
+msgid "Profile for:"
+msgstr "Profil pro:"
+
+#: ..\..\..\admin\b2team.php:35
+#: ..\..\..\htsrv\getmail.php:209
+#: ..\..\..\htsrv\login.php:74
+#: ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_login_form.php:37
+#: ..\..\..\htsrv\_lostpass_form.php:21
+#: ..\..\..\htsrv\_reg_complete.php:14
+#: ..\..\..\htsrv\_reg_form.php:22
+#: ..\..\..\skins\_profile.php:28
+msgid "Login:"
+msgstr "Přihlašovací jméno:"
+
+#: ..\..\..\admin\b2team.php:39
+#: ..\..\..\skins\_profile.php:47
+msgid "First name"
+msgstr "Vlastní jméno"
+
+#: ..\..\..\admin\b2team.php:43
+#: ..\..\..\skins\_profile.php:52
+msgid "Last name"
+msgstr "Příjmení"
+
+#: ..\..\..\admin\b2team.php:47
+#: ..\..\..\admin\_user_list.php:13
+#: ..\..\..\skins\_profile.php:57
+msgid "Nickname"
+msgstr "Přezdívka"
+
+#: ..\..\..\admin\b2team.php:51
+#: ..\..\..\admin\_edit_form.php:127
+#: ..\..\..\admin\_edit_showposts.php:235
+#: ..\..\..\admin\_user_list.php:15
+#: ..\..\..\htsrv\comment_post.php:100
+#: ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_reg_complete.php:15
+#: ..\..\..\htsrv\_reg_form.php:35
+#: ..\..\..\skins\_feedback.php:160
+#: ..\..\..\skins\_profile.php:78
+msgid "Email"
+msgstr "Email"
+
+#: ..\..\..\admin\b2team.php:55
+#: ..\..\..\admin\_edit_form.php:131
+#: ..\..\..\admin\_quicktags.php:164
+#: ..\..\..\admin\_user_list.php:16
+#: ..\..\..\skins\_profile.php:83
+#, fuzzy
+msgid "URL"
+msgstr "WWW"
+
+#: ..\..\..\admin\b2team.php:59
+#: ..\..\..\skins\_profile.php:88
+msgid "ICQ"
+msgstr "ICQ"
+
+#: ..\..\..\admin\b2team.php:63
+#: ..\..\..\skins\_profile.php:93
+msgid "AIM"
+msgstr "AIM"
+
+#: ..\..\..\admin\b2team.php:67
+msgid "MSN IM"
+msgstr "MSN IM"
+
+#: ..\..\..\admin\b2team.php:71
+msgid "YahooIM"
+msgstr "YahooIM"
+
+#: ..\..\..\admin\b2team.php:82
+#: ..\..\..\admin\_user_list.php:11
+#: ..\..\..\skins\_profile.php:31
+msgid "ID"
+msgstr "ID"
+
+#: ..\..\..\admin\b2team.php:86
+#: ..\..\..\admin\_user_list.php:17
+#: ..\..\..\skins\_profile.php:37
+msgid "Level"
+msgstr "Úroveň"
+
+#: ..\..\..\admin\b2team.php:91
+#: ..\..\..\skins\_profile.php:42
+msgid "Posts"
+msgstr "Příspěvky"
+
+#: ..\..\..\admin\b2team.php:100
+msgid "Identity"
+msgstr "Totožnost"
+
+#: ..\..\..\admin\b2team.php:149
+msgid "Can't change the level of an user whose level is higher than yours."
+msgstr "Nemůžete měnit úroveň uživatelům s vyšší úrovní, než je vaše."
+
+#: ..\..\..\admin\b2team.php:173
+msgid "Can't delete an user whose level is higher than yours."
+msgstr "Nemůžete zrušit uživatele, jehož úroveň je vyšší než vaše."
+
+#: ..\..\..\admin\b2team.php:176
+#, php-format
+msgid "Couldn't delete user #%d."
+msgstr "Nelze zrušit uživatele #%d."
+
+#: ..\..\..\admin\b2team.php:180
+#, php-format
+msgid "Couldn't delete user #%d's posts."
+msgstr "Nelze smazat příspěvky uživatele #%d."
+
+#: ..\..\..\admin\b2team.php:192
+msgid "Click on an user's login name to see his/her complete Profile."
+msgstr "Pro prohlížení profilu klepněte na přihlašovací jméno uživatele."
+
+#: ..\..\..\admin\b2team.php:193
+msgid "To edit your Profile, click on your login name."
+msgstr "Pro úpravu vlastního profilu klepněte na své přihlašovací jméno."
+
+#: ..\..\..\admin\b2team.php:200
+msgid "Active users"
+msgstr "Aktivní uživatelé"
+
+#: ..\..\..\admin\b2team.php:210
+msgid "Inactive users (level 0)"
+msgstr "Neaktivní uživatelé (úroveň 0)"
+
+#: ..\..\..\admin\b2team.php:226
+msgid "To delete an user, bring his/her level to zero, then click on the red cross."
+msgstr "Pro smazání uživatele snižte jeho úroveň na nulu a klepnětena červené překřížení."
+
+#: ..\..\..\admin\b2team.php:227
+msgid "deleting an user also deletes all posts made by this user."
+msgstr "smazáním uživatele smažete také všechny jeho příspěvky."
+
+#: ..\..\..\admin\b2template.php:11
+msgid "Custom skin template editing"
+msgstr "Úprava vlastní šablony vzhledu"
+
+#: ..\..\..\admin\b2template.php:25
+#: ..\..\..\admin\b2template.php:47
+msgid "You have no right to edit the templates."
+msgstr "Nemáte oprávnění upravovat šablony."
+
+#: ..\..\..\admin\b2template.php:58
+msgid "Listing:"
+msgstr "Výpis:"
+
+#: ..\..\..\admin\b2template.php:62
+msgid "Invalid filename!"
+msgstr "Neplantý název souboru!"
+
+#: ..\..\..\admin\b2template.php:66
+msgid "Oops, no such file !"
+msgstr "Ajaj, takový soubor není!"
+
+#: ..\..\..\admin\b2template.php:77
+msgid "File edited!"
+msgstr "Soubor upraven!"
+
+#: ..\..\..\admin\b2template.php:81
+msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
+msgstr "Buďte obezřetní ve svém konání, změnou tohoto souboru můžete poškodit svou šablonu! Neupravujte nic mezi značkami <code>&lt;?php</code> a <code>?&gt;</code> pokud si nejste jisti, co se stane!"
+
+#: ..\..\..\admin\b2template.php:90
+msgid "update template !"
+msgstr "upravit šablonu!"
+
+#: ..\..\..\admin\b2template.php:94
+msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
+msgstr "(nelze upravit tento soubor/šablonu: povolte u něj zápis, např. CHMOD 766)"
+
+#: ..\..\..\admin\b2template.php:106
+msgid "This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom)."
+msgstr "Na této obrazovce můžete upravit <strong>vlastnosti vzhledu</strong> (uloženo v /skons/custom)."
+
+#: ..\..\..\admin\b2template.php:107
+msgid "You can edit any of the following files (provided it's writable by the server, e.g. CHMOD 766)"
+msgstr "Můžete upravit kterýkoli z následujících souborů (pokud jsou zapisovatelné serverem, např. CHMOD 766)"
+
+#: ..\..\..\admin\b2template.php:124
+msgid "This is the template that displays the links to the archives for a blog"
+msgstr "Tato šablona zobrazuje odkazy k archivům blogu"
+
+#: ..\..\..\admin\b2template.php:127
+msgid "This is the template that displays the (recursive) list of (sub)categories"
+msgstr "Tato šablona zobrazuje (rekurzivní) seznam (pod)rubrik"
+
+#: ..\..\..\admin\b2template.php:130
+msgid "This is the template that displays the feedback for a post"
+msgstr "Tato šablona zobrazuje ohlasy na příspěvek"
+
+#: ..\..\..\admin\b2template.php:133
+msgid "This is the template that displays the last comments for a blog"
+msgstr "Tato šablona zobrazuje aktuální komentáře na blogu"
+
+#: ..\..\..\admin\b2template.php:136
+msgid "This is the main template. It displays the blog."
+msgstr "Toto je hlavní šablona. Zobrazuje blog."
+
+#: ..\..\..\admin\b2template.php:139
+msgid "This is the template that displays stats for a blog"
+msgstr "Tato šablona zobrazuje statistiku blogu"
+
+#: ..\..\..\admin\b2template.php:142
+msgid "This is the page displayed in the comment popup"
+msgstr "Tato stránka se zobrazí v okně s komentáři"
+
+#: ..\..\..\admin\b2template.php:145
+#, fuzzy
+msgid "This is the page displayed in the pingback popup"
+msgstr "Tato stránka se zobrazí v okne s ozvěnou (pingback)"
+
+#: ..\..\..\admin\b2template.php:148
+#, fuzzy
+msgid "This is the page displayed in the trackback popup"
+msgstr "Tato stránka se zobrazí v okně se zpětnou stopou (trackback)"
+
+#: ..\..\..\admin\b2template.php:158
+msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
+msgstr "Poznámka: Můžete samozřejmě upravit soubory/šablony i ve svém textovém editoru a nahrát je na server. Tento online editor se vám může hodit, pokud nemůžete využít vlastní textový editor..."
+
+#: ..\..\..\admin\b2upload.php:16
+msgid "The admin disabled this function"
+msgstr "Správce vyřadil tuto funkci z provozu"
+
+#: ..\..\..\admin\b2upload.php:21
+msgid "upload images/files"
+msgstr "nahrát obrázky/soubory"
+
+#: ..\..\..\admin\b2upload.php:107
+msgid "File upload"
+msgstr "Nahrát soubor"
+
+#: ..\..\..\admin\b2upload.php:108
+msgid "Allowed file types:"
+msgstr "Povolené druhy souborů:"
+
+#: ..\..\..\admin\b2upload.php:109
+#, php-format
+msgid "Maximum allowed file size: %d KB"
+msgstr "Maximální povolená velikost: %d KB"
+
+#: ..\..\..\admin\b2upload.php:114
+#: ..\..\..\admin\b2upload.php:189
+msgid "Description"
+msgstr "Popis"
+
+#: ..\..\..\admin\b2upload.php:117
+msgid "Upload !"
+msgstr "Nahrát!"
+
+#: ..\..\..\admin\b2upload.php:145
+#, php-format
+msgid "File %s: type %s is not allowed."
+msgstr "Soubor %s: druh %s není povolen."
+
+#: ..\..\..\admin\b2upload.php:174
+#: ..\..\..\admin\b2upload.php:204
+#: ..\..\..\admin\b2upload.php:207
+msgid "Couldn't upload your file to:"
+msgstr "Nelze nahrát váš soubor na:"
+
+#: ..\..\..\admin\b2upload.php:178
+msgid "Duplicate File?"
+msgstr "Duplicitní soubor?"
+
+#: ..\..\..\admin\b2upload.php:179
+#, php-format
+msgid "The filename \"%s\" already exists!"
+msgstr "Soubor s názvem \"%s\" již existuje!"
+
+#: ..\..\..\admin\b2upload.php:180
+#, php-format
+msgid "Filename \"%s\" moved to \"%s\""
+msgstr "Soubor \"%s\" byl přesunut do \"%s\""
+
+#: ..\..\..\admin\b2upload.php:181
+msgid "Confirm or rename:"
+msgstr "Potvrdit nebo přejmenovat:"
+
+#: ..\..\..\admin\b2upload.php:187
+msgid "Alternate name"
+msgstr "Náhradní název"
+
+#: ..\..\..\admin\b2upload.php:191
+msgid "Confirm !"
+msgstr "Potvrdit!"
+
+#: ..\..\..\admin\b2upload.php:221
+msgid "File uploaded !"
+msgstr "Soubor byl nahrán!"
+
+#: ..\..\..\admin\b2upload.php:222
+#, php-format
+msgid "Your file <strong>\"%s\"</strong> was uploaded successfully !"
+msgstr "Váš soubor <strong>\"%s\"</strong>  byl vpořádku nahrán!"
+
+#: ..\..\..\admin\b2upload.php:223
+#, fuzzy
+msgid "Here's the code to display it:"
+msgstr "Kód ke zobrazení:"
+
+#: ..\..\..\admin\b2upload.php:230
+msgid "Image Details"
+msgstr "Vlastnosti obrázku"
+
+#: ..\..\..\admin\b2upload.php:231
+#: ..\..\..\admin\_edit_form.php:123
+#: ..\..\..\admin\_edit_showposts.php:229
+#: ..\..\..\admin\_user_list.php:14
+#: ..\..\..\skins\_feedback.php:154
+msgid "Name"
+msgstr "Název"
+
+#: ..\..\..\admin\b2upload.php:234
+msgid "Size"
+msgstr "Rozměry"
+
+#: ..\..\..\admin\b2upload.php:237
+#: ..\..\..\admin\_edit_form.php:350
+msgid "Type"
+msgstr "Druh"
+
+#: ..\..\..\admin\b2upload.php:242
+msgid "Close this window"
+msgstr "Zavřít okno"
+
+#: ..\..\..\admin\edit_actions.php:42
+msgid "Adding new post..."
+msgstr "Přidat nový příspěvek..."
+
+#: ..\..\..\admin\edit_actions.php:72
+#: ..\..\..\admin\edit_actions.php:177
+#: ..\..\..\admin\edit_actions.php:347
+#: ..\..\..\htsrv\comment_post.php:45
+#: ..\..\..\htsrv\trackback.php:60
+#: ..\..\..\xmlsrv\xmlrpc.php:1202
+msgid "Supplied URL is invalid: "
+msgstr "Zadaná adresa je neplatná:"
+
+#: ..\..\..\admin\edit_actions.php:76
+#: ..\..\..\htsrv\getmail.php:241
+msgid "Cannot post, please correct these errors:"
+msgstr "Nelze zveřejnit, prosím opravte následující chyby:"
+
+#: ..\..\..\admin\edit_actions.php:77
+#: ..\..\..\admin\edit_actions.php:182
+#: ..\..\..\admin\edit_actions.php:352
+msgid "Back to post editing"
+msgstr "Zpět k úpravám příspěvku"
+
+#: ..\..\..\admin\edit_actions.php:83
+msgid "Recording post..."
+msgstr "Nahrávám příspěvek..."
+
+#: ..\..\..\admin\edit_actions.php:93
+#: ..\..\..\admin\edit_actions.php:281
+msgid "Sleeping..."
+msgstr "Uspávání..."
+
+#: ..\..\..\admin\edit_actions.php:103
+#: ..\..\..\admin\edit_actions.php:220
+#, fuzzy
+msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
+msgstr "Příspěvek není veřejně publikován: vynechávám zpětnou stopu (trackback), ozvěnu (pingback) a pingování blogu"
+
+#: ..\..\..\admin\edit_actions.php:131
+#: ..\..\..\admin\edit_actions.php:248
+msgid "Posting Done..."
+msgstr "Zveřejnění dokončeno...."
+
+#: ..\..\..\admin\edit_actions.php:142
+msgid "Updating post..."
+msgstr "Obnovuji příspěvek..."
+
+#: ..\..\..\admin\edit_actions.php:236
+#, fuzzy
+msgid "Post had already pinged: skipping blog pings..."
+msgstr "Příspěvek již byl pingnut: přeskakuji pingování blogů"
+
+#: ..\..\..\admin\edit_actions.php:259
+#: ..\..\..\admin\edit_actions.php:275
+msgid "Deleting post..."
+msgstr "Mažu příspěvek..."
+
+#: ..\..\..\admin\edit_actions.php:268
+msgid "Oops, no post with this ID!"
+msgstr "Ajaj, příspěvek s tímto ID neexistuje!"
+
+#: ..\..\..\admin\edit_actions.php:272
+#, php-format
+msgid "You don't have the right to delete <strong>%s</strong>'s posts."
+msgstr "Nemáte opravnění mazat příspěvky uživatele <strong>%s</strong> ."
+
+#: ..\..\..\admin\edit_actions.php:290
+msgid "Deleting Done..."
+msgstr "Smazání dokončeno..."
+
+#: ..\..\..\admin\edit_actions.php:310
+msgid "Oops, no comment with this ID."
+msgstr "Ajaj, komentář s tímto ID neexistuje."
+
+#: ..\..\..\admin\edit_actions.php:351
+msgid "Cannot update comment, please correct these errors:"
+msgstr "Nelze upravit komentář, prosím opravte následující chyby:"
+
+#: ..\..\..\admin\edit_actions.php:377
+msgid "Back to posts!"
+msgstr "Zpět k příspěvkům!"
+
+#: ..\..\..\admin\edit_actions.php:379
+msgid "You may also want to generate static pages or view your blogs..."
+msgstr "Můžete také chtít vytvořit statiscké stránky nebo prohlížet své blogy..."
+
+#: ..\..\..\admin\edit_actions.php:387
+msgid "New post"
+msgstr "Nový příspěvek"
+
+#: ..\..\..\admin\_blogs_form.php:12
+msgid "Create new blog!"
+msgstr "Vytvořit nový blog!"
+
+#: ..\..\..\admin\_blogs_form.php:16
+msgid "Update blog!"
+msgstr "Upravit blog!"
+
+#: ..\..\..\admin\_blogs_form.php:25
+#: ..\..\..\admin\_blogs_list.php:14
+msgid "Full Name"
+msgstr "Celý název"
+
+#: ..\..\..\admin\_blogs_form.php:30
+msgid "Short Name"
+msgstr "Zkrácený název"
+
+#: ..\..\..\admin\_blogs_form.php:35
+msgid "Tagline"
+msgstr "Slogan"
+
+#: ..\..\..\admin\_blogs_form.php:37
+msgid "This is diplayed under the blog name on the blog template"
+msgstr "Toto se zobrazí pod názvem blogu všabloně blogu"
+
+#: ..\..\..\admin\_blogs_form.php:41
+msgid "Short Description"
+msgstr "Stručný popis"
+
+#: ..\..\..\admin\_blogs_form.php:43
+msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
+msgstr "Toto bude použito v popisné meta-značce a v kanálech RSS. Ne v HTML!"
+
+#: ..\..\..\admin\_blogs_form.php:47
+msgid "Keywords"
+msgstr "Klíčová slova"
+
+#: ..\..\..\admin\_blogs_form.php:49
+msgid "This is is used in meta tag keywords. NO HTML!"
+msgstr "Toto bude použito v meta-značce klíčových slov. Ne v HTML!"
+
+#: ..\..\..\admin\_blogs_form.php:53
+msgid "Long Description"
+msgstr "Dlouhý popisek"
+
+#: ..\..\..\admin\_blogs_form.php:55
+#: ..\..\..\admin\_blogs_form.php:61
+msgid "This is displayed on the blog template."
+msgstr "Toto se zobrazí v šabloně blogu."
+
+#: ..\..\..\admin\_blogs_form.php:65
+msgid "Main Language"
+msgstr "Hlavní jazyk"
+
+#: ..\..\..\admin\_blogs_form.php:70
+#, fuzzy
+msgid "Blog Folder URL"
+msgstr "Adresa složky blogu"
+
+#: ..\..\..\admin\_blogs_form.php:72
+msgid "This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live. No trailing slash. (If you don't know, leave this field empty.)"
+msgstr "Toto je adresa složky na serveru, kde se nachází <em>název kořenného souboru</em> a <em>název statického souboru</em>. Bez koncového lomítka. (Pokud nevíte, nevyplňujte.)"
+
+#: ..\..\..\admin\_blogs_form.php:76
+#: ..\..\..\admin\_blogs_list.php:15
+msgid "Stub Filename"
+msgstr "Název kořenného souboru"
+
+#: ..\..\..\admin\_blogs_form.php:78
+msgid "This is the <strong>file</strong>name of the main file (e-g: blog_b.php) used to display this blog. This is used mainly for static page generation, but setting this incorrectly may also cause navigation to fail."
+msgstr "Toto je název hlavního <strong>souboru</strong> (např.: blog_b.php), který bude používán pro zobrazení tohoto blogu. Soubor  je využíván nejčastěji při vytváření statických stránek, ale jeho špatné nastavení může způsobit chyby i při navigaci."
+
+#: ..\..\..\admin\_blogs_form.php:82
+#, fuzzy
+msgid "Stub Urlname"
+msgstr "Adresa kořene"
+
+#: ..\..\..\admin\_blogs_form.php:84
+#, fuzzy
+msgid "This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used to display this blog. A typical setting would be setting this to your Filename without the .php extension, if your webserver supports this. <strong>If you are not sure how to set this, use the same as Stub Filename.</strong> This is used by permalinks, trackback, pingback, etc. Setting this incorrectly may cause these to fail."
+msgstr "Toto je <strong>url</strong>, adresa psaná v prohlížeči, názevu hlavního souboru (např.: blog_b.php). Váš webserver může být například nastaven tak, že sám doplňuje příonu .php. <strong>Pokud si nejste jisti, napiště název kořenného souboru.</strong> Toto URL bude používáno v trvalinkách, zpětných stopách, ozvěnách ap. Špatným nastavením způsobíte chybu."
+
+#: ..\..\..\admin\_blogs_form.php:88
+#: ..\..\..\admin\_blogs_list.php:17
+msgid "Static Filename"
+msgstr "Název statického souboru"
+
+#: ..\..\..\admin\_blogs_form.php:90
+msgid "This is the filename that will be used when you generate a static (.html) version of the blog homepage."
+msgstr "Toto je název souboru, který bude použit pro vygenerování statické (.html) verze titulní strany blogu."
+
+#: ..\..\..\admin\_blogs_list.php:16
+msgid "Stub URLname"
+msgstr "Adresa kořene"
+
+#: ..\..\..\admin\_blogs_list.php:18
+msgid "Lang"
+msgstr "Jazyk"
+
+#  TRANS: abbrev. for "generate !"
+#: ..\..\..\admin\_blogs_list.php:33
+msgid "Gen!"
+msgstr "Vytvořit!"
+
+#: ..\..\..\admin\_blogs_list.php:44
+msgid "Create new blog !"
+msgstr "Vytvořit nový blog!"
+
+#: ..\..\..\admin\_edit_form.php:97
+#: ..\..\..\admin\_quicktags.php:188
+msgid "Title"
+msgstr "Nadpis"
+
+#: ..\..\..\admin\_edit_form.php:102
+msgid "Language"
+msgstr "Jazyk"
+
+#: ..\..\..\admin\_edit_form.php:108
+msgid "Link to url"
+msgstr "Odkaz na URL"
+
+#: ..\..\..\admin\_edit_form.php:150
+msgid "(converts line-breaks into &lt;br /&gt; tags)"
+msgstr "(převádí konce řádků na značku &lt;br /&gt;)"
+
+#: ..\..\..\admin\_edit_form.php:159
+#, fuzzy
+msgid "Pingback"
+msgstr "Ozvěna (Pingback)"
+
+#: ..\..\..\admin\_edit_form.php:159
+#, fuzzy
+msgid "(Send a pingback to all URLs in this post)"
+msgstr "(Odeslat ozvěnu na všechny adresy z tohoto příspěvku)"
+
+#: ..\..\..\admin\_edit_form.php:166
+#, fuzzy
+msgid "Trackback URLs"
+msgstr "Adresy zpětné vazby"
+
+#: ..\..\..\admin\_edit_form.php:166
+msgid "(Separate by space)"
+msgstr "(Oddělit mezerou)"
+
+#: ..\..\..\admin\_edit_form.php:173
+msgid "Preview"
+msgstr "Náhled"
+
+#: ..\..\..\admin\_edit_form.php:178
+msgid "Blog this !"
+msgstr "Zablogovat!"
+
+#: ..\..\..\admin\_edit_form.php:178
+msgid "Edit this !"
+msgstr "Upravit!"
+
+#: ..\..\..\admin\_edit_form.php:183
+msgid "Spellcheck"
+msgstr "Pravopis"
+
+#: ..\..\..\admin\_edit_form.php:188
+msgid "Upload a file/image"
+msgstr "Nahrát soubor/obrázek"
+
+#: ..\..\..\admin\_edit_form.php:239
+#: ..\..\..\admin\_edit_form.php:351
+#: ..\..\..\admin\_edit_showposts.php:128
+msgid "Status"
+msgstr "Status"
+
+#: ..\..\..\admin\_edit_form.php:241
+msgid "The post will be publicly published"
+msgstr "Příspěvek bude veřejně publikován"
+
+#: ..\..\..\admin\_edit_form.php:241
+#: ..\..\..\admin\_edit_showposts.php:316
+msgid "Published (Public)"
+msgstr "Publikováno (veřejně)"
+
+#: ..\..\..\admin\_edit_form.php:243
+msgid "The post will be published but visible only by logged-in team members"
+msgstr "Příspěvek bude publikován, ale bude přístupný jen přihlášeným uživatelům."
+
+#: ..\..\..\admin\_edit_form.php:243
+#: ..\..\..\admin\_edit_showposts.php:318
+msgid "Protected (Members only)"
+msgstr "Chráněno (jen pro členy)"
+
+#: ..\..\..\admin\_edit_form.php:245
+msgid "The post will be published but visible only by yourself"
+msgstr "Příspěvek bude publikován, ale uvidíte ho jen vy"
+
+#: ..\..\..\admin\_edit_form.php:245
+#: ..\..\..\admin\_edit_showposts.php:320
+msgid "Private (You only)"
+msgstr "Soukromé (jen pro vás)"
+
+#: ..\..\..\admin\_edit_form.php:247
+#: ..\..\..\admin\_edit_form.php:249
+msgid "The post will appear only in the backoffice"
+msgstr "Příspěvek se zobrazí jen v redakčním systému"
+
+#: ..\..\..\admin\_edit_form.php:247
+#: ..\..\..\admin\_edit_showposts.php:322
+msgid "Draft (Not published!)"
+msgstr "Nanečisto (nepublikováno!)"
+
+#: ..\..\..\admin\_edit_form.php:249
+#: ..\..\..\admin\_edit_showposts.php:324
+msgid "Deprecated (Not published!)"
+msgstr "Neschváleno (nepublikováno!)"
+
+#: ..\..\..\admin\_edit_form.php:258
+msgid "Select main category in target blog and optionnaly check addtionnal categories"
+msgstr "Vyberte hlavní rubriku v cílovém blogu a případně označte i doplňkové rubriky"
+
+#: ..\..\..\admin\_edit_form.php:280
+msgid "Select as an additionnal category"
+msgstr "Vyberte jako doplňkovou rubriku"
+
+#: ..\..\..\admin\_edit_form.php:293
+msgid "Select as MAIN category"
+msgstr "Vyberte jako HLAVNÍ rubriku"
+
+#: ..\..\..\admin\_edit_form.php:320
+msgid "Note: Cross posting among multiple blogs is enabled."
+msgstr "Poznámka: Křížové publikování napříč více blogy povoleno."
+
+#: ..\..\..\admin\_edit_form.php:331
+msgid "Note: Cross posting among multiple blogs is currently disabled."
+msgstr "Poznámka: Křížové publikování napříč více blogy není povoleno."
+
+#: ..\..\..\admin\_edit_form.php:333
+msgid "Note: Cross posting among multiple categories is currently disabled."
+msgstr "Poznámka: Křížové publikování ve více rubrikách nyní není povoleno."
+
+#: ..\..\..\admin\_edit_form.php:349
+msgid "Comment info"
+msgstr "Info ke komentáři"
+
+#: ..\..\..\admin\_edit_form.php:352
+msgid "IP address"
+msgstr "IP-adresa"
+
+#: ..\..\..\admin\_edit_navbar.php:16
+#, php-format
+msgid "Previous %d"
+msgstr "Předchozí %d"
+
+#: ..\..\..\admin\_edit_navbar.php:24
+#, php-format
+msgid "Next %d"
+msgstr "Následující %d"
+
+#  TRANS: x TO y OF z
+#: ..\..\..\admin\_edit_navbar.php:36
+msgid " to "
+msgstr "na"
+
+#  TRANS: x TO y OF z
+#: ..\..\..\admin\_edit_navbar.php:38
+msgid " of "
+msgstr "z"
+
+#: ..\..\..\admin\_edit_navbar.php:44
+msgid "from the end"
+msgstr "od konce"
+
+#: ..\..\..\admin\_edit_navbar.php:48
+msgid "from the start"
+msgstr "od začátku"
+
+#: ..\..\..\admin\_edit_navbar.php:50
+msgid "OK"
+msgstr "Budiž"
+
+#: ..\..\..\admin\_edit_showposts.php:66
+msgid " Date range: "
+msgstr "Rozpětí data"
+
+#  TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+#: ..\..\..\admin\_edit_showposts.php:118
+msgid "by"
+msgstr "od"
+
+#  TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+#: ..\..\..\admin\_edit_showposts.php:124
+msgid "in"
+msgstr "v"
+
+#  TRANS: Edit button text (&nbsp; for extra space)
+#: ..\..\..\admin\_edit_showposts.php:151
+#: ..\..\..\admin\_edit_showposts.php:201
+msgid "&nbsp; Edit &nbsp;"
+msgstr "&#xA0; Upravit &#xA0;"
+
+#: ..\..\..\admin\_edit_showposts.php:154
+msgid ""
+"You are about to delete this post!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
+msgstr ""
+"Opravdu chcete smazat tento příspěvek?\\n"
+"\\'Storno\\' zamezí smazání, \\'Budiž\\' smaže příspěvek."
+
+#  TRANS: Link to comments for current post
+#: ..\..\..\admin\_edit_showposts.php:159
+msgid "no comment"
+msgstr "bez komentáře"
+
+#: ..\..\..\admin\_edit_showposts.php:159
+#: ..\..\..\b2evocore\_functions_comments.php:150
+msgid "1 comment"
+msgstr "1 komentář"
+
+#: ..\..\..\admin\_edit_showposts.php:159
+#: ..\..\..\b2evocore\_functions_comments.php:151
+#, php-format
+msgid "%d comments"
+msgstr "%d komentářů"
+
+#: ..\..\..\admin\_edit_showposts.php:160
+msgid "1 Trackback"
+msgstr "1 zpětná stopa"
+
+#: ..\..\..\admin\_edit_showposts.php:160
+msgid "%d Trackbacks"
+msgstr "%d zpětných stop"
+
+#: ..\..\..\admin\_edit_showposts.php:161
+msgid "1 Pingback"
+msgstr "1 ozněna"
+
+#: ..\..\..\admin\_edit_showposts.php:161
+msgid "%d Pingbacks"
+msgstr "%d ozvěn"
+
+#: ..\..\..\admin\_edit_showposts.php:163
+msgid "Permanent link to this post"
+msgstr "Trvalinka k příspěvku"
+
+#: ..\..\..\admin\_edit_showposts.php:177
+#: ..\..\..\skins\_feedback.php:43
+msgid "Comments"
+msgstr "Komentáře"
+
+#: ..\..\..\admin\_edit_showposts.php:204
+msgid ""
+"You are about to delete this comment!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
+msgstr ""
+"Opravdu chcete smazat tento komentář?\\n"
+"\\'Storno\\' zamezí smazání, \\'Budiž\\' smaže komentář."
+
+#: ..\..\..\admin\_edit_showposts.php:220
+#: ..\..\..\b2evocore\_functions_comments.php:149
+#: ..\..\..\skins\_feedback.php:139
+msgid "Leave a comment"
+msgstr "Přidat komentář"
+
+#: ..\..\..\admin\_edit_showposts.php:237
+#: ..\..\..\skins\_feedback.php:162
+msgid "Your email address will <strong>not</strong> be displayed on this site."
+msgstr "Váš email <strong>nebude</strong> zveřejněn."
+
+#: ..\..\..\admin\_edit_showposts.php:242
+#: ..\..\..\skins\_feedback.php:167
+msgid "Site/Url"
+msgstr "WWW"
+
+#: ..\..\..\admin\_edit_showposts.php:244
+#: ..\..\..\skins\_feedback.php:169
+msgid "Your URL will be displayed."
+msgstr "Vaše WWW-adresa bude zveřejněna."
+
+#: ..\..\..\admin\_edit_showposts.php:249
+#: ..\..\..\skins\_feedback.php:174
+msgid "Comment text"
+msgstr "Text komentáře"
+
+#: ..\..\..\admin\_edit_showposts.php:251
+#: ..\..\..\skins\_feedback.php:176
+msgid "Allowed XHTML tags"
+msgstr "Značky XHTML jsou povoleny"
+
+#: ..\..\..\admin\_edit_showposts.php:251
+#: ..\..\..\skins\_feedback.php:177
+msgid "URLs, email, AIM and ICQs will be converted automatically."
+msgstr "Odkazy, emaily a čísla AIM a ICQ budou automaticky převedeny."
+
+#: ..\..\..\admin\_edit_showposts.php:258
+msgid "(Line breaks become &lt;br&gt;)"
+msgstr "(Konce řádků budou převedeny na &lt;br&gt;)"
+
+#: ..\..\..\admin\_edit_showposts.php:265
+#: ..\..\..\skins\_feedback.php:195
+msgid "Send comment"
+msgstr "Odeslat komentář"
+
+#: ..\..\..\admin\_edit_showposts.php:308
+msgid "Posts to show"
+msgstr "Příspěvků k zobrazení"
+
+#: ..\..\..\admin\_edit_showposts.php:310
+msgid "Past"
+msgstr "Minulé"
+
+#: ..\..\..\admin\_edit_showposts.php:312
+msgid "Future"
+msgstr "Budoucí"
+
+#: ..\..\..\admin\_edit_showposts.php:332
+msgid "Title / Text contains"
+msgstr "Nadpis / Text obsahuje"
+
+#: ..\..\..\admin\_edit_showposts.php:336
+msgid "Words"
+msgstr "Slova"
+
+#: ..\..\..\admin\_edit_showposts.php:336
+msgid "AND"
+msgstr "a zároveň"
+
+#: ..\..\..\admin\_edit_showposts.php:337
+msgid "OR"
+msgstr "nebo"
+
+#: ..\..\..\admin\_edit_showposts.php:494
+msgid "Reset"
+msgstr "Zrušit"
+
+#: ..\..\..\admin\_footer.php:14
+#, php-format
+msgid "<p>%d queries - %01.3f seconds</p>"
+msgstr "<p>%d dotazů - %01.3f sekund</p>"
+
+#: ..\..\..\admin\_footer.php:21
+msgid "GPL License"
+msgstr "Licence GPL"
+
+#: ..\..\..\admin\_menutop.php:39
+msgid "logged in as:"
+msgstr "Přihlášen jako:"
+
+#: ..\..\..\admin\_menutop.php:51
+msgid "New Post"
+msgstr "Nový příspěvek"
+
+#: ..\..\..\admin\_menutop.php:53
+msgid "Browse/Edit"
+msgstr "Procházet/Upravit"
+
+#: ..\..\..\admin\_menutop.php:57
+msgid "Stats"
+msgstr "Statistiky"
+
+#: ..\..\..\admin\_menutop.php:62
+msgid "Cats"
+msgstr "Rubriky"
+
+#: ..\..\..\admin\_menutop.php:77
+msgid "Templates"
+msgstr "Šablony"
+
+#: ..\..\..\admin\_menutop.php:80
+#: ..\..\..\locales\puttenv.php:18
+#: ..\..\..\locales\puttenv.php:23
+#: ..\..\..\locales\puttenv.php:29
+msgid "Users"
+msgstr "Uživatelé"
+
+#: ..\..\..\admin\_menutop.php:88
+msgid "Exit to blogs"
+msgstr "Výstup k blogům"
+
+#: ..\..\..\admin\_menutop.php:90
+msgid "Logout"
+msgstr "Odhlásit"
+
+#: ..\..\..\admin\_quicktags.php:180
+msgid "ALTernate text"
+msgstr "Zástupný text (ALT)"
+
+#  TRANS: Default title when inserting links into post
+#: ..\..\..\admin\_quicktags.php:189
+msgid "External - English"
+msgstr "Odkaz na anglicky psaný web"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "INSerted [Alt-I]"
+msgstr "Vloženo (INS) [Alt-I]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "DELeted [Alt-D]"
+msgstr "Zrušeno (DEL) [Alt-D]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "STRong [Alt-S]"
+msgstr "Tučně (STRONG) [Alt-S]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "EMphasis [Alt-E]"
+msgstr "Zvýraznění (EM) [Alt+E]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "CODE [Alt-C]"
+msgstr "Zdrojový kód (CODE) [Alt-C]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "Paragraph [Alt-P]"
+msgstr "Odstavec (P) [Alt-P]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "Unordered List [Alt-U]"
+msgstr "Neuspořádaný seznam (UL) [Alt-U]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "List Item [Alt-L]"
+msgstr "Položka seznamu (LI) [Alt-L]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "BLOCKQUOTE [Alt-B]"
+msgstr "Odstavcová citace (BLOCKQUOTE) [Alt-B]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "IMaGe [Alt-G]"
+msgstr "Obrázek (IMG) [Alt-G]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "A href [Alt-A]"
+msgstr "Odkaz (A) [Alt-A]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "Close all tags"
+msgstr "Uzavřít značky"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "More [Alt-M]"
+msgstr "Pokračování [Alt-M]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "no teaser [Alt-T]"
+msgstr "Bez úvodu [Alt-T]"
+
+#: ..\..\..\admin\_quicktags.php:214
+msgid "next page [Alt-Q]"
+msgstr "Další strana [Alt-Q]"
+
+#  TRANS: table header for user list
+#: ..\..\..\admin\_user_list.php:12
+msgid "Login "
+msgstr "Uživatel"
+
+#  TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_user_list.php:45
+msgid ""
+"Are you sure you want to delete this user?\\n"
+"Warning: all his posts will be deleted too!"
+msgstr ""
+"Opravdu chcete smazat tohoto uživatele?\\n"
+"Upozornění: všechny jeho příspěvky budou smazány!"
+
+#: ..\..\..\b2evocore\_blog_main.php:154
+#, php-format
+msgid "The default skin [%s] does not exist. It must be properly set in the blog stub file [%s]. Contact the <a %s>webmaster</a>..."
+msgstr "Výchozí vzhled [%s] nebyl nastaven. Musí být přesně zadán v kořenném souboru blogu [%s]. Uvědomte <a %s>správce</a>..."
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:112
+msgid "Tag <code>body</code> can only be used once!"
+msgstr "Značka <code>body</code>  může být použita jen jednou!"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:125
+msgid "Illegal tag"
+msgstr "Nepovolená značka"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:132
+#, php-format
+msgid "Tag %s must occur inside another tag"
+msgstr "Značka %s se musí vyskytovat uvnitř jiné značky"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:134
+#, php-format
+msgid "Tag %s is not allowed within tag %s"
+msgstr "Značka %s není povolena uvnitř značky %s"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:142
+#, php-format
+msgid "Tag %s may not have attribute %s"
+msgstr "Značka %s nesmí mít vlastnost %s"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:150
+msgid "Found invalid URL: "
+msgstr "Nalezen chybn odkaz:"
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:173
+#, php-format
+msgid "Tag %s may not contain raw character data"
+msgstr "Značka %s nesmí obsahovat prostý text"
+
+#: ..\..\..\b2evocore\_class_pop3.php:81
+#: ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:101
+msgid "POP3 connect:"
+msgstr "Spojení POP3:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:81
+msgid "No server specified"
+msgstr "Server nebyl určen"
+
+#: ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:101
+#: ..\..\..\b2evocore\_class_pop3.php:140
+#: ..\..\..\b2evocore\_class_pop3.php:275
+#: ..\..\..\b2evocore\_class_pop3.php:329
+#: ..\..\..\b2evocore\_class_pop3.php:340
+#: ..\..\..\b2evocore\_class_pop3.php:388
+#: ..\..\..\b2evocore\_class_pop3.php:421
+#: ..\..\..\b2evocore\_class_pop3.php:454
+#: ..\..\..\b2evocore\_class_pop3.php:553
+#: ..\..\..\b2evocore\_class_pop3.php:576
+msgid "Error "
+msgstr "Chyba"
+
+#: ..\..\..\b2evocore\_class_pop3.php:109
+msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
+msgstr "POP3: předčasný NOOP OK, server porušuje RFC 1939"
+
+#: ..\..\..\b2evocore\_class_pop3.php:119
+#, fuzzy
+msgid "POP3 noop:"
+msgstr "POP3 noop:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:119
+#: ..\..\..\b2evocore\_class_pop3.php:185
+#: ..\..\..\b2evocore\_class_pop3.php:234
+#: ..\..\..\b2evocore\_class_pop3.php:259
+#: ..\..\..\b2evocore\_class_pop3.php:301
+#: ..\..\..\b2evocore\_class_pop3.php:375
+#: ..\..\..\b2evocore\_class_pop3.php:414
+#: ..\..\..\b2evocore\_class_pop3.php:444
+#: ..\..\..\b2evocore\_class_pop3.php:478
+#: ..\..\..\b2evocore\_class_pop3.php:541
+#: ..\..\..\b2evocore\_class_pop3.php:609
+msgid "No connection to server"
+msgstr "Spojení se serverem není navázáno"
+
+#: ..\..\..\b2evocore\_class_pop3.php:132
+#: ..\..\..\b2evocore\_class_pop3.php:135
+#: ..\..\..\b2evocore\_class_pop3.php:140
+msgid "POP3 user:"
+msgstr "Uživatel POP3:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:132
+#: ..\..\..\b2evocore\_class_pop3.php:191
+msgid "No login ID submitted"
+msgstr "Přihlašovací ID nebylo zadáno"
+
+#: ..\..\..\b2evocore\_class_pop3.php:135
+#: ..\..\..\b2evocore\_class_pop3.php:155
+msgid "connection not established"
+msgstr "spojení není navázáno"
+
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:155
+#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:169
+msgid "POP3 pass:"
+msgstr "Heslo POP3:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:194
+msgid "No password submitted"
+msgstr "Heslo nebylo zadáno"
+
+#: ..\..\..\b2evocore\_class_pop3.php:160
+msgid "authentication failed "
+msgstr "oveření selhalo"
+
+#: ..\..\..\b2evocore\_class_pop3.php:169
+#: ..\..\..\b2evocore\_class_pop3.php:218
+msgid "NOOP failed. Server not RFC 1939 compliant"
+msgstr "NOOP selhal. Server porušuje RFC 1939"
+
+#: ..\..\..\b2evocore\_class_pop3.php:185
+#: ..\..\..\b2evocore\_class_pop3.php:191
+#: ..\..\..\b2evocore\_class_pop3.php:194
+#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:209
+#: ..\..\..\b2evocore\_class_pop3.php:218
+#, fuzzy
+msgid "POP3 apop:"
+msgstr "POP3 apop:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:199
+msgid "No server banner"
+msgstr "Server nemá banner"
+
+#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:209
+msgid "abort"
+msgstr "přerušit"
+
+#: ..\..\..\b2evocore\_class_pop3.php:209
+#, fuzzy
+msgid "apop authentication failed"
+msgstr "ověření apop selhalo"
+
+#: ..\..\..\b2evocore\_class_pop3.php:234
+#, fuzzy
+msgid "POP3 login:"
+msgstr "POP3 login:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:259
+#: ..\..\..\b2evocore\_class_pop3.php:275
+#, fuzzy
+msgid "POP3 top:"
+msgstr "POP3 top:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:301
+#: ..\..\..\b2evocore\_class_pop3.php:329
+#: ..\..\..\b2evocore\_class_pop3.php:340
+#: ..\..\..\b2evocore\_class_pop3.php:352
+#, fuzzy
+msgid "POP3 pop_list:"
+msgstr "POP3 pop_list:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:352
+msgid "Premature end of list"
+msgstr "Předčasné ukončení seznamu"
+
+#: ..\..\..\b2evocore\_class_pop3.php:375
+#: ..\..\..\b2evocore\_class_pop3.php:388
+#, fuzzy
+msgid "POP3 get:"
+msgstr "POP3 get:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:414
+#: ..\..\..\b2evocore\_class_pop3.php:421
+#, fuzzy
+msgid "POP3 last:"
+msgstr "POP3 last:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:444
+#: ..\..\..\b2evocore\_class_pop3.php:454
+#, fuzzy
+msgid "POP3 reset:"
+msgstr "POP3 reset:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:478
+#: ..\..\..\b2evocore\_class_pop3.php:484
+#, fuzzy
+msgid "POP3 send_cmd:"
+msgstr "POP3 send_cmd:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:484
+#, fuzzy
+msgid "Empty command string"
+msgstr "Vyprázdnit řetězec příkazů"
+
+#: ..\..\..\b2evocore\_class_pop3.php:504
+#, fuzzy
+msgid "POP3 quit:"
+msgstr "POP3 quit:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:504
+msgid "connection does not exist"
+msgstr "spojení neexistuje"
+
+#: ..\..\..\b2evocore\_class_pop3.php:541
+#: ..\..\..\b2evocore\_class_pop3.php:553
+#: ..\..\..\b2evocore\_class_pop3.php:576
+msgid "POP3 uidl:"
+msgstr "POP3 uidl:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:609
+#: ..\..\..\b2evocore\_class_pop3.php:614
+#: ..\..\..\b2evocore\_class_pop3.php:620
+msgid "POP3 delete:"
+msgstr "POP3 delete:"
+
+#: ..\..\..\b2evocore\_class_pop3.php:614
+msgid "No msg number submitted"
+msgstr "Nebylo vloženo číslo zprávy"
+
+#: ..\..\..\b2evocore\_class_pop3.php:620
+msgid "Command failed "
+msgstr "Příkaz selhal"
+
+#: ..\..\..\b2evocore\_functions.php:36
+msgid "Can't connect to the database server. MySQL said:"
+msgstr "Nelze navázat spojení s databázovým serverem. MySQL říká:"
+
+#: ..\..\..\b2evocore\_functions.php:38
+#, php-format
+msgid "Can't connect to the database %s. MySQL said:"
+msgstr "Nelze navázat spojení s databází %s. MySQL říká:"
+
+#: ..\..\..\b2evocore\_functions.php:49
+msgid "Oops, MySQL error!"
+msgstr "Ajaj, chyba MySQL!"
+
+#: ..\..\..\b2evocore\_functions.php:644
+msgid "go back"
+msgstr "zpět"
+
+#: ..\..\..\b2evocore\_functions.php:674
+msgid "Redirecting you to:"
+msgstr "Přesměrování na:"
+
+#: ..\..\..\b2evocore\_functions.php:676
+#, php-format
+msgid "If nothing happens, click <a %s>here</a>."
+msgstr "Pokud se nic neděje, kleněte <a %s>sem</a>."
+
+#: ..\..\..\b2evocore\_functions.php:993
+#, php-format
+msgid "Parameter %s is required!"
+msgstr "Vlastnost %s je povinná!"
+
+#: ..\..\..\b2evocore\_functions.php:1196
+msgid "Invalid URL"
+msgstr "Neplatné URL"
+
+#: ..\..\..\b2evocore\_functions.php:1202
+msgid "URI scheme not allowed"
+msgstr "Použité schéma URI není povoleno"
+
+#: ..\..\..\b2evocore\_functions.php:1210
+msgid "URL not allowed"
+msgstr "URL není povoleno"
+
+#: ..\..\..\b2evocore\_functions_blogs.php:267
+msgid "Requested blog does not exist!"
+msgstr "Požadovaný blog neexistuje!"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:447
+msgid "Post details"
+msgstr "Vlastnosti příspěvku"
+
+#  TRANS: this is the default text for the extended post "more" link
+#: ..\..\..\b2evocore\_functions_bposts.php:488
+msgid "Read more!"
+msgstr "Pokračování..."
+
+#  TRANS: this is the default text displayed once the more link has been activated
+#: ..\..\..\b2evocore\_functions_bposts.php:493
+msgid "More:"
+msgstr "Pokračování:"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:589
+msgid "Next page"
+msgstr "Následující strana"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:590
+msgid "Previous page"
+msgstr "Předchozí strana"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:633
+msgid "Previous post"
+msgstr "Předchozí příspěvek"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:686
+msgid "Next post"
+msgstr "Následující příspěvek"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:779
+msgid "Next Page"
+msgstr "Následující strana"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:806
+msgid "Previous Page"
+msgstr "Předchozí strana"
+
+#: ..\..\..\b2evocore\_functions_cats.php:95
+msgid "Cannot delete if there are sub-categories!"
+msgstr "Nelze smazat pokud obsahuje podrubriky!"
+
+#: ..\..\..\b2evocore\_functions_cats.php:146
+msgid "Cannot delete last category if there are posts inside!"
+msgstr "Nelze smazat poslední rubriku, pokud obsahuje příspěvky!"
+
+#: ..\..\..\b2evocore\_functions_cats.php:252
+#, php-format
+msgid "Requested category %s does not exist!"
+msgstr "Požadovaná rubrika %s neexistuje!"
+
+#: ..\..\..\b2evocore\_functions_cats.php:584
+msgid "Category"
+msgstr "Rubrika"
+
+#  TRANS: When the categories for a specific post are displayed, the user can click
+#  on these cats to browse them, this is the default href title displayed there
+#: ..\..\..\b2evocore\_functions_cats.php:649
+msgid "Browse category"
+msgstr "Procházet rubriky"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:64
+msgid "bad char in User Agent"
+msgstr "špatný znak v User Agentu"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:92
+#: ..\..\..\b2evocore\_functions_hitlogs.php:109
+#: ..\..\..\b2evocore\_functions_hitlogs.php:120
+#: ..\..\..\b2evocore\_functions_hitlogs.php:133
+msgid "referer ignored"
+msgstr "odkazovač ognorován"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:92
+msgid "BlackList"
+msgstr "Černá listina"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:109
+msgid "robot"
+msgstr "robot"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:120
+msgid "invalid"
+msgstr "neplatný"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:133
+msgid "search engine"
+msgstr "vyhledavač"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:142
+msgid "loading referering page"
+msgstr "načítám odkazující stranu"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:161
+msgid "found current url in page"
+msgstr "nalezeno současné URL ve stránce"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:426
+msgid "not a query - no params!"
+msgstr "žádný dotaz - žádné parametry!"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:451
+msgid "no query string found"
+msgstr "nebyl nalezen text dotazu"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:23
+#, fuzzy
+msgid "Sending pingbacks..."
+msgstr "Odesílám ozvěnu..."
+
+#: ..\..\..\b2evocore\_functions_pingback.php:28
+#, fuzzy
+msgid "No pingback to be done."
+msgstr "Žádná ozvěna nebude."
+
+#: ..\..\..\b2evocore\_functions_pingback.php:34
+msgid "BEGIN"
+msgstr "ZAČÁTEK"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:65
+msgid "Post contents"
+msgstr "Komentáře příspěvků"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:96
+#: ..\..\..\b2evocore\_functions_pingback.php:97
+msgid "Processing:"
+msgstr "Probíhá:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:101
+#: ..\..\..\b2evocore\_functions_pingback.php:102
+msgid "Couldn't find a hostname for:"
+msgstr "Nelze nalézt název serveru pro:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:116
+msgid "Connect to server at:"
+msgstr "Připojení k serveru na:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:120
+#: ..\..\..\b2evocore\_functions_pingback.php:121
+msgid "Couldn't open a connection to:"
+msgstr "Nelze otevřít spojení k:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:132
+#, fuzzy
+msgid "Start receiving headers and content"
+msgstr "Přijímám hlavičky a obsah"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:166
+#: ..\..\..\b2evocore\_functions_pingback.php:167
+#, fuzzy
+msgid "Pingback server found from X-Pingback header:"
+msgstr "Server ozvěny byl nalezen z hlavičky X-Pingback:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:180
+#: ..\..\..\b2evocore\_functions_pingback.php:181
+#, fuzzy
+msgid "Pingback server found from Pingback <link /> tag:"
+msgstr "Server ozvěny byl nalezen ze značky &lt;link /&gt; Pingback:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:189
+#: ..\..\..\b2evocore\_functions_pingback.php:190
+#, fuzzy
+msgid "Pingback server not found in headers and content"
+msgstr "Server ozvěny nebyl nalezen z hlaviček ani obsahu"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:195
+#: ..\..\..\b2evocore\_functions_pingback.php:196
+#, fuzzy
+msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
+msgstr "Adresa serveru ozvěny je prázdná (může jít o vnitřní chybu fgets v PHP)"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:201
+#, fuzzy
+msgid "Pingback server data"
+msgstr "Data serveru ozvěny"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:211
+#: ..\..\..\b2evocore\_functions_pingback.php:212
+msgid "Page Linked To:"
+msgstr "Stránka odkazuje k:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:213
+#: ..\..\..\b2evocore\_functions_pingback.php:214
+msgid "Page Linked From:"
+msgstr "Stránka odkazuje z:"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:219
+#, fuzzy, php-format
+msgid "Pinging %s..."
+msgstr "Ozývám se %s..."
+
+#: ..\..\..\b2evocore\_functions_pingback.php:229
+msgid "END"
+msgstr "KONEC"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:231
+#, fuzzy
+msgid "Pingbacks done."
+msgstr "Ozvěny dozněly."
+
+#: ..\..\..\b2evocore\_functions_pingback.php:253
+msgid "Pingback (0)"
+msgstr "Žádné ozvěny"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:254
+msgid "Pingback (1)"
+msgstr "Ozvěna (1)"
+
+#: ..\..\..\b2evocore\_functions_pingback.php:255
+msgid "Pingbacks (%)"
+msgstr "Ozvěny (%)"
+
+#: ..\..\..\b2evocore\_functions_pings.php:27
+#, fuzzy
+msgid "Pinging b2evolution.net..."
+msgstr "Ozývám se b2evolution.net..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:58
+#: ..\..\..\b2evocore\_functions_pings.php:92
+#: ..\..\..\b2evocore\_functions_pings.php:149
+#: ..\..\..\b2evocore\_functions_pings.php:196
+#, fuzzy
+msgid "Aborted (Running on localhost)."
+msgstr "Přerušeno (Běh na místním serveru)"
+
+#: ..\..\..\b2evocore\_functions_pings.php:77
+#, fuzzy
+msgid "Pinging Weblogs.com..."
+msgstr "Ozývám se na Weblogs.com..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:135
+#, fuzzy
+msgid "Pinging Cafelog.com..."
+msgstr "Ozývám se na Cafeblog.com..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:167
+#, fuzzy
+msgid "Pinging Blo.gs..."
+msgstr "Ozývám se na Blo.gs..."
+
+#: ..\..\..\b2evocore\_functions_template.php:84
+msgid "Archives for"
+msgstr "Archivy pro"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:22
+#, fuzzy
+msgid "Sending trackbacks..."
+msgstr "Odesílám zpětné stopy..."
+
+#: ..\..\..\b2evocore\_functions_trackback.php:25
+#, fuzzy
+msgid "No trackback to be sent."
+msgstr "Zpětná stopa nebyla odeslána."
+
+#: ..\..\..\b2evocore\_functions_trackback.php:31
+msgid "Excerpt to be sent:"
+msgstr "Výtah k odeslání:"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:39
+#, fuzzy
+msgid "Trackbacks done."
+msgstr "Zpětné stopy odeslány."
+
+#: ..\..\..\b2evocore\_functions_trackback.php:53
+#, fuzzy
+msgid "Sending trackback to:"
+msgstr "Odesílám zpětné stopy na:"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:110
+msgid "Response:"
+msgstr "Odezva:"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:150
+msgid "Trackback (0)"
+msgstr "Žádné zpětné stopy"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:151
+msgid "Trackback (1)"
+msgstr "Zpětná stopa (1)"
+
+#: ..\..\..\b2evocore\_functions_trackback.php:152
+msgid "Trackbacks (%)"
+msgstr "Zpětné stopy (%)"
+
+#: ..\..\..\b2evocore\_functions_users.php:107
+msgid "wrong login/password."
+msgstr "špatné přihlašovací jméno/heslo."
+
+#: ..\..\..\b2evocore\_functions_users.php:113
+#: ..\..\..\b2evocore\_functions_users.php:115
+#: ..\..\..\htsrv\profile_update.php:95
+#, php-format
+msgid "setcookie %s failed!"
+msgstr "Nastavení cookie %s selhalo!"
+
+#: ..\..\..\b2evocore\_functions_users.php:138
+msgid "login/password no longer valid."
+msgstr "Přihlašovací jméno/heslo již neplatí."
+
+#: ..\..\..\b2evocore\_functions_users.php:159
+msgid "You must log in!"
+msgstr "Musíte se přihlásit!"
+
+#: ..\..\..\b2evocore\_functions_users.php:460
+msgid "Login if you have an account..."
+msgstr "Přihlašte se, pokud zde máte účet..."
+
+#: ..\..\..\b2evocore\_functions_users.php:489
+msgid "Register..."
+msgstr "Registrovat..."
+
+#: ..\..\..\b2evocore\_functions_users.php:490
+msgid "Register to open an account..."
+msgstr "Registrujte se pro založení účtu..."
+
+#: ..\..\..\b2evocore\_functions_users.php:517
+#, php-format
+msgid "Logout (%s)"
+msgstr "Odhlásit (%s)"
+
+#: ..\..\..\b2evocore\_functions_users.php:518
+msgid "Logout from your account"
+msgstr "Odhlaste se ze svého účtu"
+
+#: ..\..\..\b2evocore\_functions_users.php:549
+msgid "Admin"
+msgstr "Správce"
+
+#: ..\..\..\b2evocore\_functions_users.php:550
+msgid "Go to the back-office"
+msgstr "Jděte do redakčního systému"
+
+#: ..\..\..\b2evocore\_functions_users.php:571
+#, php-format
+msgid "Profile (%s)"
+msgstr "Profil (%s)"
+
+#: ..\..\..\b2evocore\_vars.php:108
+msgid "Sunday"
+msgstr "Neděle"
+
+#: ..\..\..\b2evocore\_vars.php:109
+msgid "Monday"
+msgstr "Pondělí"
+
+#: ..\..\..\b2evocore\_vars.php:110
+msgid "Tuesday"
+msgstr "Úterý"
+
+#: ..\..\..\b2evocore\_vars.php:111
+msgid "Wednesday"
+msgstr "Středa"
+
+#: ..\..\..\b2evocore\_vars.php:112
+msgid "Thursday"
+msgstr "Čtvrtek"
+
+#: ..\..\..\b2evocore\_vars.php:113
+msgid "Friday"
+msgstr "Pátek"
+
+#: ..\..\..\b2evocore\_vars.php:114
+msgid "Saturday"
+msgstr "Sobota"
+
+#  TRANS: abbrev. for Sunday
+#: ..\..\..\b2evocore\_vars.php:118
+msgid "Sun"
+msgstr "Ne"
+
+#  TRANS: abbrev. for Monday
+#: ..\..\..\b2evocore\_vars.php:120
+msgid "Mon"
+msgstr "Po"
+
+#  TRANS: abbrev. for Tuesday
+#: ..\..\..\b2evocore\_vars.php:122
+msgid "Tue"
+msgstr "Út"
+
+#  TRANS: abbrev. for Wednesday
+#: ..\..\..\b2evocore\_vars.php:124
+msgid "Wed"
+msgstr "St"
+
+#  TRANS: abbrev. for Thursday
+#: ..\..\..\b2evocore\_vars.php:126
+msgid "Thu"
+msgstr "Čt"
+
+#  TRANS: abbrev. for Friday
+#: ..\..\..\b2evocore\_vars.php:128
+msgid "Fri"
+msgstr "Pá"
+
+#  TRANS: abbrev. for Saturday
+#: ..\..\..\b2evocore\_vars.php:130
+msgid "Sat"
+msgstr "So"
+
+#: ..\..\..\b2evocore\_vars.php:133
+msgid "January"
+msgstr "leden"
+
+#: ..\..\..\b2evocore\_vars.php:134
+msgid "February"
+msgstr "únor"
+
+#: ..\..\..\b2evocore\_vars.php:135
+msgid "March"
+msgstr "březen"
+
+#: ..\..\..\b2evocore\_vars.php:136
+msgid "April"
+msgstr "duben"
+
+#  TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
+#: ..\..\..\b2evocore\_vars.php:138
+msgid "May "
+msgstr "květen"
+
+#: ..\..\..\b2evocore\_vars.php:139
+msgid "June"
+msgstr "červen"
+
+#: ..\..\..\b2evocore\_vars.php:140
+msgid "July"
+msgstr "červenec"
+
+#: ..\..\..\b2evocore\_vars.php:141
+msgid "August"
+msgstr "srpen"
+
+#: ..\..\..\b2evocore\_vars.php:142
+msgid "September"
+msgstr "září"
+
+#: ..\..\..\b2evocore\_vars.php:143
+msgid "October"
+msgstr "říjen"
+
+#: ..\..\..\b2evocore\_vars.php:144
+msgid "November"
+msgstr "listopad"
+
+#: ..\..\..\b2evocore\_vars.php:145
+msgid "December"
+msgstr "prosinec"
+
+#  TRANS: abbrev. for January
+#: ..\..\..\b2evocore\_vars.php:149
+msgid "Jan"
+msgstr "I."
+
+#  TRANS: abbrev. for February
+#: ..\..\..\b2evocore\_vars.php:151
+msgid "Feb"
+msgstr "II."
+
+#  TRANS: abbrev. for March
+#: ..\..\..\b2evocore\_vars.php:153
+msgid "Mar"
+msgstr "III."
+
+#  TRANS: abbrev. for April
+#: ..\..\..\b2evocore\_vars.php:155
+msgid "Apr"
+msgstr "IV."
+
+#  TRANS: abbrev. for May
+#: ..\..\..\b2evocore\_vars.php:157
+msgid "May"
+msgstr "V."
+
+#  TRANS: abbrev. for June
+#: ..\..\..\b2evocore\_vars.php:159
+msgid "Jun"
+msgstr "VI."
+
+#  TRANS: abbrev. for July
+#: ..\..\..\b2evocore\_vars.php:161
+msgid "Jul"
+msgstr "VII."
+
+#  TRANS: abbrev. for August
+#: ..\..\..\b2evocore\_vars.php:163
+msgid "Aug"
+msgstr "VIII."
+
+#  TRANS: abbrev. for September
+#: ..\..\..\b2evocore\_vars.php:165
+msgid "Sep"
+msgstr "IX."
+
+#  TRANS: abbrev. for October
+#: ..\..\..\b2evocore\_vars.php:167
+msgid "Oct"
+msgstr "X."
+
+#  TRANS: abbrev. for November
+#: ..\..\..\b2evocore\_vars.php:169
+msgid "Nov"
+msgstr "XI."
+
+#  TRANS: abbrev. for December
+#: ..\..\..\b2evocore\_vars.php:171
+msgid "Dec"
+msgstr "XII."
+
+#: ..\..\..\b2evocore\_vars.php:175
+msgid "Published"
+msgstr "Publikováno"
+
+#: ..\..\..\b2evocore\_vars.php:176
+msgid "Deprecated"
+msgstr "Neschváleno"
+
+#: ..\..\..\b2evocore\_vars.php:177
+msgid "Protected"
+msgstr "Chráněno"
+
+#: ..\..\..\b2evocore\_vars.php:178
+msgid "Private"
+msgstr "Soukromé"
+
+#: ..\..\..\b2evocore\_vars.php:179
+msgid "Draft"
+msgstr "Nanečisto"
+
+#: ..\..\..\conf\_locales.php:22
+msgid "Dutch"
+msgstr "Holandsky"
+
+#: ..\..\..\conf\_locales.php:23
+msgid "English"
+msgstr "Anglicky"
+
+#: ..\..\..\conf\_locales.php:24
+msgid "French"
+msgstr "Francousky"
+
+#: ..\..\..\conf\_locales.php:25
+msgid "German"
+msgstr "Německy"
+
+#: ..\..\..\conf\_locales.php:26
+msgid "Japanese"
+msgstr "Japonsky"
+
+#: ..\..\..\conf\_locales.php:27
+msgid "Lithuanian"
+msgstr "Litevsky"
+
+#: ..\..\..\conf\_locales.php:28
+msgid "Norwegian Bokm&aring;l"
+msgstr "Norsky spisovně"
+
+#: ..\..\..\conf\_locales.php:29
+msgid "Portuguese"
+msgstr "Portugalsky"
+
+#: ..\..\..\conf\_locales.php:30
+msgid "Spanish"
+msgstr "Španělsky"
+
+#: ..\..\..\conf\_locales.php:31
+msgid "Swedish"
+msgstr "Švédsky"
+
+#: ..\..\..\htsrv\comment_post.php:29
+msgid "Please fill in the name field"
+msgstr "Prosím vyplňte jméno"
+
+#: ..\..\..\htsrv\comment_post.php:33
+msgid "Please fill in the email field"
+msgstr "Prosím vyplňte email"
+
+#: ..\..\..\htsrv\comment_post.php:37
+msgid "Supplied email address is invalid"
+msgstr "Zadaný email je neplatný"
+
+#: ..\..\..\htsrv\comment_post.php:72
+msgid "You can only post a new comment every 30 seconds."
+msgstr "Nový komentář můžete přidat jen jednou za půl minuty."
+
+#: ..\..\..\htsrv\comment_post.php:75
+msgid "Cannot post comment, please correct these errors:"
+msgstr "Nelze uložit komentář, prosím, opravte následující chyby:"
+
+#: ..\..\..\htsrv\comment_post.php:76
+msgid "Back to comment editing"
+msgstr "Zpět k úpravě komentáře"
+
+#: ..\..\..\htsrv\comment_post.php:93
+#: ..\..\..\htsrv\comment_post.php:97
+#, php-format
+msgid "New comment on your post #%d \"%s\""
+msgstr "Nový komentář k vašemu příspěvku #%d \"%s\""
+
+#: ..\..\..\htsrv\comment_post.php:99
+msgid "Author"
+msgstr "Autor"
+
+#: ..\..\..\htsrv\comment_post.php:101
+#: ..\..\..\htsrv\trackback.php:97
+#: ..\..\..\xmlsrv\xmlrpc.php:1228
+msgid "Url"
+msgstr "URL"
+
+#: ..\..\..\htsrv\comment_post.php:102
+msgid "Comment"
+msgstr "Komentář"
+
+#: ..\..\..\htsrv\comment_post.php:103
+#: ..\..\..\htsrv\trackback.php:99
+#: ..\..\..\xmlsrv\xmlrpc.php:1230
+msgid "Edit/Delete"
+msgstr "Upravit/Smazat"
+
+#: ..\..\..\htsrv\getmail.php:38
+#, fuzzy
+msgid "Connecting to pop server..."
+msgstr "Připojuji se k poštovnímu serveru..."
+
+#: ..\..\..\htsrv\getmail.php:40
+msgid "Connection failed:"
+msgstr "Spojení selhalo:"
+
+#: ..\..\..\htsrv\getmail.php:44
+#, fuzzy
+msgid "Logging into pop server..."
+msgstr "Přihlašuji se k poštovnímu serveru..."
+
+#: ..\..\..\htsrv\getmail.php:48
+msgid "No mail or Login Failed:"
+msgstr "Žádný mail nebo selhalo přihlášení:"
+
+#: ..\..\..\htsrv\getmail.php:59
+#, php-format
+msgid "Getting message #%d..."
+msgstr "Stahuji zprávu #%d..."
+
+#: ..\..\..\htsrv\getmail.php:68
+msgid "Processing..."
+msgstr "Pracuji..."
+
+#: ..\..\..\htsrv\getmail.php:147
+msgid "Too old"
+msgstr "Příliš starý"
+
+#: ..\..\..\htsrv\getmail.php:153
+msgid "Subject prefix does not match"
+msgstr "Předpona předmětu nebyla rozpoznána"
+
+#: ..\..\..\htsrv\getmail.php:173
+msgid "Raw content:"
+msgstr "Prostý obsah:"
+
+#: ..\..\..\htsrv\getmail.php:209
+msgid "Pass:"
+msgstr "Heslo:"
+
+#: ..\..\..\htsrv\getmail.php:213
+msgid "Wrong login or password."
+msgstr "Špatné přihlašovací jméno nebo heslo."
+
+#: ..\..\..\htsrv\getmail.php:233
+msgid "Category ID"
+msgstr "Rubrika ID"
+
+#: ..\..\..\htsrv\getmail.php:255
+msgid "Blog ID"
+msgstr "Blog ID"
+
+#: ..\..\..\htsrv\getmail.php:263
+msgid "Posted title"
+msgstr "Zadaný nadpis"
+
+#: ..\..\..\htsrv\getmail.php:264
+msgid "Posted content"
+msgstr "Zadaný obsah"
+
+#: ..\..\..\htsrv\getmail.php:274
+msgid "Mission complete, message deleted."
+msgstr "Mise splněna, zpráva smazána."
+
+#: ..\..\..\htsrv\getmail.php:280
+msgid "Level 0 users can't post."
+msgstr "Uživatelé úrovně 0 nemohou přidávat příspěvky."
+
+#: ..\..\..\htsrv\getmail.php:302
+msgid "OK."
+msgstr "OK."
+
+#: ..\..\..\htsrv\login.php:65
+#: ..\..\..\htsrv\login.php:87
+msgid "The email was sent successfully to your email address."
+msgstr "Email byl vpořádku odeslán na vaši emailovou adresu."
+
+#: ..\..\..\htsrv\login.php:66
+#: ..\..\..\htsrv\login.php:88
+msgid "Click here to login !"
+msgstr "Pro přihlášení klepněte zde!"
+
+#: ..\..\..\htsrv\login.php:75
+msgid "New Password:"
+msgstr "Nové heslo:"
+
+#: ..\..\..\htsrv\login.php:80
+msgid "your weblog's login/password"
+msgstr "přihlašovací jméno/heslo vašeho blogu"
+
+#: ..\..\..\htsrv\login.php:82
+msgid "The email could not be sent."
+msgstr "Email nelze odeslat."
+
+#: ..\..\..\htsrv\login.php:83
+msgid "Possible reason: your host may have disabled the mail() function...</p>"
+msgstr "Pravděpodobný důvod: server nepodporuje funkci mail()...</p>"
+
+#: ..\..\..\htsrv\login.php:99
+msgid "Note: You are already logged in!"
+msgstr "Potnámka: Přihlášení proběhlo vpořádku!"
+
+#: ..\..\..\htsrv\profile_update.php:31
+#: ..\..\..\skins\_profile.php:16
+msgid "You are not logged in."
+msgstr "Nejste přihlášen."
+
+#: ..\..\..\htsrv\profile_update.php:36
+msgid "You are not logged in under the same account you are trying to modify."
+msgstr "Nejste přihlášen ke stejnému účtu, který se snažíte upravit."
+
+#: ..\..\..\htsrv\profile_update.php:41
+#: ..\..\..\htsrv\profile_update.php:47
+#: ..\..\..\htsrv\profile_update.php:56
+#: ..\..\..\htsrv\profile_update.php:64
+#: ..\..\..\htsrv\profile_update.php:69
+msgid "Back to profile"
+msgstr "Zpět do profilu"
+
+#: ..\..\..\htsrv\profile_update.php:47
+msgid "please enter your nickname (can be the same as your login)"
+msgstr "prosím, vyplňte svou přezdívku (může se shodovat s přihlašovacím jménem)"
+
+#: ..\..\..\htsrv\profile_update.php:56
+msgid "your ICQ UIN can only be a number, no letters allowed"
+msgstr "Vaše ICQ UIN může obsahovat jen čísla, písmena nejsou dovolena"
+
+#: ..\..\..\htsrv\profile_update.php:64
+#: ..\..\..\htsrv\register.php:56
+msgid "please type your e-mail address"
+msgstr "prosím, vyplňte svůj email"
+
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\register.php:61
+msgid "the email address is invalid"
+msgstr "emailová adresa je neplatná"
+
+#: ..\..\..\htsrv\profile_update.php:77
+#: ..\..\..\htsrv\profile_update.php:85
+msgid "you typed your new password only once. Go back to type it twice."
+msgstr "nové heslo jste zadal jen jednou. Vraťte se a vyplňte ho dvakrát."
+
+#: ..\..\..\htsrv\profile_update.php:89
+msgid "you typed two different passwords. Go back to correct that."
+msgstr "napsal jste heslo pokaždé jinak. Vraťte se a opravte to."
+
+#: ..\..\..\htsrv\register.php:34
+msgid "please enter a Login"
+msgstr "prosím, vyplňte přihlašovací jméno"
+
+#: ..\..\..\htsrv\register.php:41
+msgid "please enter your password twice"
+msgstr "prosím, zadejte své heslo dvakrát"
+
+#: ..\..\..\htsrv\register.php:48
+msgid "please type the same password in the two password fields"
+msgstr "prosím, vyplňte do obou polí pro heslo stejné heslo"
+
+#: ..\..\..\htsrv\register.php:76
+msgid "this login is already registered, please choose another one"
+msgstr "zvolené přihlašovací jméno již existuje, prosím, vyberte si jiné"
+
+#: ..\..\..\htsrv\register.php:91
+#: ..\..\..\htsrv\register.php:95
+msgid "new user registration on your blog"
+msgstr "registrace nového uživatele na váš blog"
+
+#: ..\..\..\htsrv\register.php:93
+msgid "Manage users"
+msgstr "Správa uživatelů"
+
+#: ..\..\..\htsrv\trackback.php:90
+#: ..\..\..\htsrv\trackback.php:94
+#, php-format
+msgid "New trackback on your post #%d \"%s\""
+msgstr "Nová zpětná stopa k vašemu příspěvku #%d \"%s\""
+
+#: ..\..\..\htsrv\trackback.php:96
+#: ..\..\..\xmlsrv\xmlrpc.php:1227
+#, fuzzy
+msgid "Website"
+msgstr "Website"
+
+#: ..\..\..\htsrv\trackback.php:98
+#: ..\..\..\xmlsrv\xmlrpc.php:1229
+#, fuzzy
+msgid "Excerpt"
+msgstr "Výtah"
+
+#: ..\..\..\htsrv\_login_form.php:10
+msgid "Login form"
+msgstr "Přihlášení od"
+
+#: ..\..\..\htsrv\_login_form.php:42
+#: ..\..\..\htsrv\_reg_form.php:27
+msgid "Password:"
+msgstr "Heslo:"
+
+#: ..\..\..\htsrv\_login_form.php:48
+#: ..\..\..\htsrv\_reg_complete.php:20
+msgid "Log in!"
+msgstr "Přihlásit!"
+
+#: ..\..\..\htsrv\_login_form.php:55
+msgid "Register ?"
+msgstr "Registrovat?"
+
+#: ..\..\..\htsrv\_login_form.php:57
+msgid "Lost your password ?"
+msgstr "Zapomněl jste heslo?"
+
+#: ..\..\..\htsrv\_lostpass_form.php:10
+msgid "Lost password ?"
+msgstr "Zapomněl jste heslo?"
+
+#: ..\..\..\htsrv\_lostpass_form.php:14
+msgid "A new password will be generated and sent to you by email."
+msgstr "Nové heslo bude vytvořeno a zasláno na váš email."
+
+#: ..\..\..\htsrv\_lostpass_form.php:27
+msgid "Generate new password!"
+msgstr "Vytvořit nové heslo!"
+
+#: ..\..\..\htsrv\_reg_complete.php:10
+msgid "Registration complete"
+msgstr "Registrace dokončena"
+
+#: ..\..\..\htsrv\_reg_disabled.php:11
+msgid "Registration Currently Disabled"
+msgstr "Nové registrace nyní nejsou možné"
+
+#: ..\..\..\htsrv\_reg_disabled.php:14
+msgid "User registration is currently not allowed."
+msgstr "Registrace nových uživatelů nyní ení možná."
+
+#: ..\..\..\htsrv\_reg_disabled.php:15
+msgid "Home"
+msgstr "Domů"
+
+#: ..\..\..\htsrv\_reg_form.php:11
+msgid "Register form"
+msgstr "Registrace od"
+
+#: ..\..\..\htsrv\_reg_form.php:27
+msgid "(twice)"
+msgstr "(dvakrát)"
+
+#: ..\..\..\htsrv\_reg_form.php:41
+msgid "Register!"
+msgstr "Registrovat!"
+
+#: ..\..\..\skins\_blogroll.php:59
+msgid "more"
+msgstr "více"
+
+#: ..\..\..\skins\_feedback.php:48
+#, fuzzy
+msgid "Trackbacks"
+msgstr "Zpětné stopy"
+
+#: ..\..\..\skins\_feedback.php:53
+#, fuzzy
+msgid "Pingbacks"
+msgstr "Ozvěny"
+
+#: ..\..\..\skins\_feedback.php:58
+#, fuzzy
+msgid "Trackback address for this post:"
+msgstr "Adresy zpětných stop pro tento příspěvek:"
+
+#: ..\..\..\skins\_feedback.php:89
+msgid "Comment from:"
+msgstr "Komentář od:"
+
+#: ..\..\..\skins\_feedback.php:104
+msgid "Trackback from:"
+msgstr "Zpětná stopa od:"
+
+#: ..\..\..\skins\_feedback.php:119
+msgid "Pingback from:"
+msgstr "Ozvěna od:"
+
+#  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
+#: ..\..\..\skins\_feedback.php:134
+#, php-format
+msgid "No %s for this post yet..."
+msgstr "Zatím žádné nové %s pro tento příspěvek..."
+
+#: ..\..\..\skins\_feedback.php:186
+msgid "Line breaks become &lt;br /&gt;"
+msgstr "Konce řádku budou převedeny na &lt;br /&gt;"
+
+#: ..\..\..\skins\_feedback.php:189
+msgid "Remember me"
+msgstr "Zapamatovat"
+
+#: ..\..\..\skins\_feedback.php:189
+msgid "(Set cookies for name, email &amp; url)"
+msgstr "(Uloží cookie se jménem, emailem a URL)"
+
+#: ..\..\..\skins\_lastcomments.php:22
+msgid "No comment yet..."
+msgstr "Zatím bez komentáře..."
+
+#: ..\..\..\skins\_lastcomments.php:33
+msgid "In response to:"
+msgstr "Jako odpověď na:"
+
+#: ..\..\..\skins\_lastcomments.php:33
+#, php-format
+msgid "Original post on %s"
+msgstr "Původní příspěvek %s"
+
+#: ..\..\..\skins\_profile.php:62
+msgid "Identity shown"
+msgstr "totožnost zobrazena"
+
+#: ..\..\..\skins\_profile.php:98
+msgid "MSN I.M."
+msgstr "MSN IM"
+
+#: ..\..\..\skins\_profile.php:103
+msgid "Yahoo I.M."
+msgstr "YahooIM"
+
+#: ..\..\..\skins\_profile.php:109
+msgid "New password"
+msgstr "Nové heslo"
+
+#: ..\..\..\skins\_profile.php:114
+msgid "Confirm new password"
+msgstr "Potvrdit nové heslo"
+
+#: ..\..\..\skins\_stats.php:46
+msgid "Top refering engines"
+msgstr "Nejčastější odkazující vyhledavače"
+
+#: ..\..\..\skins\babyblues\_bloglist.php:17
+msgid "blogs"
+msgstr "blogy"
+
+#: ..\..\..\skins\babyblues\_main.php:85
+msgid "skin the site"
+msgstr "vzhled pro web"
+
+#: ..\..\..\skins\babyblues\_main.php:93
+#: ..\..\..\skins\originalb2\_main.php:147
+msgid "archives"
+msgstr "archivy"
+
+#: ..\..\..\skins\bluesky\_main.php:70
+#: ..\..\..\skins\guadeloupe\_main.php:70
+msgid "Display feedback / Leave a comment"
+msgstr "Zobrazit komentáře / Přidat komentář"
+
+#: ..\..\..\skins\bluesky\_main.php:157
+#: ..\..\..\skins\guadeloupe\_main.php:158
+msgid "Choose a skin"
+msgstr "Vybrat vzhled"
+
+#: ..\..\..\skins\custom\_main.php:79
+msgid "words"
+msgstr "slov"
+
+#: ..\..\..\skins\custom\_main.php:195
+#: ..\..\..\skins\fplanque2002\_main.php:207
+msgid "Choose skin"
+msgstr "Vybrat vzhled"
+
+#: ..\..\..\skins\originalb2\_main.php:44
+msgid "Browse all posts by this author"
+msgstr "Procházet všechny příspěvky od tohoto autora"
+
+#: ..\..\..\xmlsrv\rdf.php:41
+#: ..\..\..\xmlsrv\rss.php:27
+#: ..\..\..\xmlsrv\rss2.php:34
+msgid "[...] Read more!"
+msgstr "(Pokračování...)"
+
+#: ..\..\..\xmlsrv\xmlrpc.php:1221
+#: ..\..\..\xmlsrv\xmlrpc.php:1225
+#, fuzzy, php-format
+msgid "New pingback on your post #%d \"%s\""
+msgstr "Nová ozvěna k vašemu příspěvku #%d \"%s\""
+
