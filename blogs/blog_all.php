@@ -44,5 +44,5 @@
 
 
 	# That's it, now let b2evolution do the rest! :)
-	include(dirname(__FILE__)."/b2evocore/_blog_main.php");
+	require(dirname(__FILE__)."/b2evocore/_blog_main.php");
 ?>

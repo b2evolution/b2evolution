@@ -8,8 +8,8 @@ param( 'action' );
 switch($action) 
 {
 	case 'new':
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop.php');
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop_end.php');
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) 
 		{
 			die( _('You have no right to edit the blogs.') );
@@ -31,15 +31,15 @@ switch($action)
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
 		$next_action = 'create';
-		include($b2inc."/_blogs_form.php");
+		require(dirname(__FILE__).'/_blogs_form.php');
 		echo '</div>';
 		break;
 	
 		
 		
 	case 'create':
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop.php');
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop_end.php');
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) {
 			die( _('You have no right to edit the blogs.') );
 		}
@@ -133,8 +133,8 @@ switch($action)
 	
 	
 	case 'edit':
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop.php');
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop_end.php');
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) {
 			die( _('You have no right to edit the blogs.') );
 		}
@@ -154,7 +154,7 @@ switch($action)
 		$blog_roll = get_bloginfo('blogroll');
 		$blog_keywords = get_bloginfo('keywords');
 		$next_action = 'update';
-		include($b2inc."/_blogs_form.php");
+		require(dirname(__FILE__).'/_blogs_form.php');
 		echo '</div>';
 		break;
 		
@@ -194,8 +194,8 @@ switch($action)
 	
 	
 	case 'GenStatic':
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop.php');
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop_end.php');
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 	?>
 		<div class="panelinfo">
 			<p><?php echo _('Blog'), ': ', get_bloginfo('name') ?></p>
@@ -248,8 +248,8 @@ switch($action)
 	
 	
 	default:
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop.php');
-		include(dirname(__FILE__).'/'.$b2inc.'/_menutop_end.php');
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) {
 			die( _('You have no right to edit the blogs.') );
 		}
@@ -257,6 +257,6 @@ switch($action)
 }
 
 // List the blogs:
-include($b2inc."/_blogs_list.php"); 
-include($b2inc."/_footer.php"); 
+require( dirname(__FILE__).'/_blogs_list.php' ); 
+require( dirname(__FILE__).'/_footer.php' ); 
 ?>

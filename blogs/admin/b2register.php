@@ -1,8 +1,8 @@
 <?php
 /* <Register> */
 
-include("../conf/b2evo_config.php");
-include($b2inc."/_functions.php");
+require('../conf/b2evo_config.php');
+require( dirname(__FILE__).'/'.$b2inc.'/_functions.php' );
 
 function add_magic_quotes($array) {
 	foreach ($array as $k => $v) {

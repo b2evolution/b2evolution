@@ -8,7 +8,7 @@ set_param( 'action', 'string' );
 set_param( 'show', 'string', 'referers' );
 set_param( 'blog', 'string', '' );
 
-include($b2inc."/_menutop.php");
+require(dirname(__FILE__).'/_menutop.php');
 ?>
 <span class="menutopbloglist">
 	:
@@ -35,7 +35,7 @@ include($b2inc."/_menutop.php");
 	?>
 </span>
 <?php
-include($b2inc."/_menutop_end.php");
+require(dirname(__FILE__).'/_menutop_end.php');
 
 if ($user_level < 9) 
 {
@@ -303,5 +303,5 @@ switch( $show )
 		break;
 }
 
-	include($b2inc."/_footer.php"); 
+require( dirname(__FILE__).'/_footer.php' ); 
 ?>

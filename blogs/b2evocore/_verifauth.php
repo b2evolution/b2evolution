@@ -65,7 +65,7 @@ function veriflog()
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-cache, must-revalidate");
 		header("Pragma: no-cache");
-		include(dirname(__FILE__).'/'.$pathcore_out.'/'.$backoffice_subdir."/b2login.php");
+		require(dirname(__FILE__).'/'.$pathcore_out.'/'.$backoffice_subdir."/b2login.php");
 		exit();
 	}
 #}

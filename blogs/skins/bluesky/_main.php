@@ -79,7 +79,7 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 ?>
 </div>
 
@@ -89,10 +89,10 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 <?php
 		// this includes the last comments if requested
-		include( dirname(__FILE__)."/_lastcomments.php");
+		require( dirname(__FILE__)."/_lastcomments.php");
 
 		// this includes the stats if requested
-		include( dirname(__FILE__)."/_stats.php");
+		require( dirname(__FILE__)."/_stats.php");
 ?>
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
@@ -113,14 +113,14 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	include( dirname(__FILE__)."/_bloglist.php"); 
+	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id=categories>
 <h4>Categories&nbsp;:</h4>
 <!-- ---------------------------- START OF CATEGORIES ---------------------------- -->
 <form action="<?php bloginfo('blogurl') ?>" method="get">
-<?php	include( dirname(__FILE__)."/_categories.php"); ?>
+<?php	require( dirname(__FILE__)."/_categories.php"); ?>
 <input type="submit" value="<?php echo _('Get selection') ?>" />
 <input type="reset" value="<?php echo _('Reset form') ?>" />
 </form>
@@ -158,7 +158,7 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 <h4>Archives&nbsp;:</h4>
 <ul>
-	<?php	include( dirname(__FILE__)."/_archives.php"); ?>
+	<?php	require( dirname(__FILE__)."/_archives.php"); ?>
 </ul>
 
 <?php if (! $stats) { ?>

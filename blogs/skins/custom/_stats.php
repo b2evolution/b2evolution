@@ -14,5 +14,5 @@
 	 * We now call the default stats handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	include dirname(__FILE__).'/../../_stats.php';
+	require dirname(__FILE__).'/../../_stats.php';
 ?>

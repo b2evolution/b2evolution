@@ -27,6 +27,6 @@
 	 * We now call the default categories handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	include dirname(__FILE__).'/../../_categories.php';
+	require dirname(__FILE__).'/../../_categories.php';
 
 ?>

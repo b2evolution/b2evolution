@@ -56,11 +56,11 @@ case 'new':
 	$standalone = 1;
 	$title = _('New post in blog:');
 	require_once (dirname(__FILE__)."/b2header.php");
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
+	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
-	include (dirname(__FILE__)."/_edit_blogselect.php");
+	require (dirname(__FILE__).'/_edit_blogselect.php');
 	echo '</span>';
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require (dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level > 0) 
 	{
@@ -70,7 +70,7 @@ case 'new':
 		$post_url = '';
 
 		$extracats = array();
-		include($b2inc."/_edit_form.php");
+		require(dirname(__FILE__).'/_edit_form.php');
 	} 
 	else
 	{
@@ -100,11 +100,11 @@ case "edit":
 	$blog = get_catblog($cat); 
 
 	$title = _('Editing post');
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
+	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
   echo "#".$postdata["ID"]." in blog: ".$blogname;
 	echo '</span>';
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require (dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level > 0) 
 	{
@@ -120,7 +120,7 @@ case "edit":
 		$edited_post_title = format_to_edit($postdata["Title"]);
 		$post_url = format_to_edit($postdata["Url"]);
 
-		include($b2inc."/_edit_form.php");
+		require(dirname(__FILE__).'/_edit_form.php');
 	} 
 	else
 	{
@@ -141,11 +141,11 @@ case "editcomment":
 	$commentdata = get_commentdata($comment,1) or die( _('Oops, no comment with this ID!') );
 
 	$title = _('Editing comment');
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
+	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
 	echo "#".$commentdata["comment_ID"];
 	echo '</span>';
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require (dirname(__FILE__).'/_menutop_end.php');
 
 	get_currentuserinfo();
 
@@ -158,7 +158,7 @@ case "editcomment":
 
 	$content = format_to_edit($content);
 	
-	include($b2inc.'/_edit_form.php');
+	require(dirname(__FILE__).'/_edit_form.php');
 
 	break;
 
@@ -172,16 +172,16 @@ default:
 	$standalone = 1;
 	$title = _('Browse blog:');
 	require_once (dirname(__FILE__)."/b2header.php");
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
+	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
-	include (dirname(__FILE__)."/_edit_blogselect.php");
+	require (dirname(__FILE__).'/_edit_blogselect.php');
 	echo '</span>';
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require (dirname(__FILE__).'/_menutop_end.php');
 
 	
 	if ($user_level > 0) 
 	{
-		include $b2inc."/_edit_showposts.php";
+		require dirname(__FILE__).'/_edit_showposts.php';
 	} 
 	else
 	{ 
@@ -194,4 +194,6 @@ default:
 
 }
 
-include($b2inc."/_footer.php") ?>
+require( dirname(__FILE__).'/_footer.php' ); 
+
+?>

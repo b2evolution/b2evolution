@@ -29,7 +29,7 @@
 	# $order = 'ASC'; // This for example would display the blog in chronological order...
 
 	# Let b2evolution handle the query string and load the blog data:
-	include(dirname(__FILE__)."/b2evocore/_blog_main.php");
+	require(dirname(__FILE__)."/b2evocore/_blog_main.php");
 	
 	# Now, below you'll find the magic template...
 ?>
@@ -86,7 +86,7 @@
 	$blog_other_name_before = '<span class="small">';				
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	include( dirname(__FILE__)."/_bloglist.php"); 
+	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
@@ -159,7 +159,7 @@ the_date( '', '<h2>', '</h2>' );
 
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
@@ -169,13 +169,13 @@ the_date( '', '<h2>', '</h2>' );
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 
 	// this includes the last comments if requested:
-	include( dirname(__FILE__)."/_lastcomments.php");
+	require( dirname(__FILE__)."/_lastcomments.php");
 
 	// this includes the statistics if requested:
-	include( dirname(__FILE__)."/_stats.php");
+	require( dirname(__FILE__)."/_stats.php");
 
 	// this includes the archive directory if requested
-	include( dirname(__FILE__)."/_arcdir.php");
+	require( dirname(__FILE__)."/_arcdir.php");
 
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>

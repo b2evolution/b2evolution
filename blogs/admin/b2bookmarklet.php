@@ -169,7 +169,7 @@ if (($is_gecko) && (!isset($Gecko_bookmarklet_fix))) {
 <td align="left" height="40">
 <table width="100%" cellpadding="0" cellspacing="0">
 <td align="left" valign="bottom"><strong>Post</strong></td>
-<td align="right" valign="bottom"><?php if ($use_quicktags) include($b2inc."/_quicktags.php"); ?></td>
+<td align="right" valign="bottom"><?php if ($use_quicktags) require( dirname(__FILE__).'/_quicktags.php' ); ?></td>
 </table>
 <?php
 if ((preg_match("/Nav/",$HTTP_USER_AGENT)) || (preg_match("/Mozilla\/4\.7/",$HTTP_USER_AGENT))) {

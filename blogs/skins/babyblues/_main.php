@@ -46,7 +46,7 @@
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 ?>
 
 <p>
@@ -54,7 +54,7 @@
 </div>
 <div id="side">
 	<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-		include( dirname(__FILE__)."/_bloglist.php"); 
+		require( dirname(__FILE__)."/_bloglist.php"); 
 		// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 	<div class="sidetitle" align="center">skin the site</div>
@@ -68,7 +68,7 @@
 	<div class="sidetitle" align="center">archives</div>
 	<div class="sidebody">
 	<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-		include( dirname(__FILE__)."/_archives.php"); 
+		require( dirname(__FILE__)."/_archives.php"); 
 		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 	</div>
 

@@ -16,5 +16,5 @@
 	 * We now call the default feedback handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	include dirname(__FILE__).'/../../_feedback.php';
+	require dirname(__FILE__).'/../../_feedback.php';
 ?>

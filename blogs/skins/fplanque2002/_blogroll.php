@@ -26,6 +26,6 @@
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 * all we want to do here, is call the default blogroll handler.
 	 */
-	include dirname(__FILE__).'/../../_blogroll.php';
+	require dirname(__FILE__).'/../../_blogroll.php';
 
 ?>

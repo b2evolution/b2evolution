@@ -38,7 +38,7 @@
 
 
 	# Let b2evolution handle the query string and load the blog data:
-	include(dirname(__FILE__)."/b2evocore/_blog_main.php");
+	require(dirname(__FILE__)."/b2evocore/_blog_main.php");
 	
 	
 	# Now, below you'll find the main template...
@@ -98,7 +98,7 @@
 	$blog_other_name_before = '<span class="small">';				
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	include( dirname(__FILE__)."/_bloglist.php"); 
+	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
@@ -168,7 +168,7 @@ the_date( '', '<h2>', '</h2>' );
 
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
@@ -178,13 +178,13 @@ the_date( '', '<h2>', '</h2>' );
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 
 	// this includes the last comments if requested:
-	include( dirname(__FILE__)."/_lastcomments.php");
+	require( dirname(__FILE__)."/_lastcomments.php");
 
 	// this includes the statistics if requested:
-	include( dirname(__FILE__)."/_stats.php");
+	require( dirname(__FILE__)."/_stats.php");
 
 	// this includes the archive directory if requested
-	include( dirname(__FILE__)."/_arcdir.php");
+	require( dirname(__FILE__)."/_arcdir.php");
 
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
@@ -204,7 +204,7 @@ the_date( '', '<h2>', '</h2>' );
 	  	<li><a href="<?php bloginfo('dynurl', 'raw') ?>"><strong><?php echo _('Recently') ?></strong></a> <span class="dimmed"><?php echo _('(no cache)') ?></span></li>
 		</ul>
 		<?php	// -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			include( dirname(__FILE__)."/_calendar.php"); 
+			require( dirname(__FILE__)."/_calendar.php"); 
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
 	  	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong><?php echo _('Last comments') ?></strong></a></li>
@@ -228,7 +228,7 @@ the_date( '', '<h2>', '</h2>' );
 		<h3><?php echo _('Categories') ?></h3>
 		<form action="<?php bloginfo('blogurl', 'raw') ?>" method="get">
 		<?php	// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			include( dirname(__FILE__)."/_categories.php"); 
+			require( dirname(__FILE__)."/_categories.php"); 
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
 		<input type="submit" value="<?php echo _('Get selection') ?>" />
@@ -240,7 +240,7 @@ the_date( '', '<h2>', '</h2>' );
     <h3><?php echo _('Archives') ?></h3>
     <ul>
 			<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				include( dirname(__FILE__)."/_archives.php"); 
+				require( dirname(__FILE__)."/_archives.php"); 
 				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 				<li><a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo _('more...') ?></a></li>
 	  </ul>
@@ -274,7 +274,7 @@ the_date( '', '<h2>', '</h2>' );
 	<div class="bSideItem">
     <h3><?php echo _('Blogroll') ?></h3>
 		<?php	// -------------------------- BLOGROLL INCLUDED HERE -----------------------------
-			include( dirname(__FILE__)."/_blogroll.php"); 
+			require( dirname(__FILE__)."/_blogroll.php"); 
 			// -------------------------------- END OF BLOGROLL ---------------------------------- ?>
 	</div>
 

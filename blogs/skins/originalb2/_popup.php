@@ -40,7 +40,7 @@
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 ?>
 </div>
 

@@ -81,7 +81,7 @@ break;
 default:
 	
 	$standalone=0;
-	include ("b2header.php");
+	require( dirname(__FILE__).'/b2header.php' );
 	?>
 	<div class="panelblock">
 	<table cellspacing="0" cellpadding="5" border="0" width="100%">
@@ -210,4 +210,5 @@ break;
 }
 	
 /* </Team> */
-include($b2inc."/_footer.php") ?>
+require( dirname(__FILE__).'/_footer.php' ); 
+?>

@@ -177,18 +177,18 @@ if( $skin != '' )
 
 	if( $template == 'popup' )
 	{	// Do the popup display
-		include "$skin_folder/$skin/_popup.php";
+		require "$skin_folder/$skin/_popup.php";
 	}
 	else
 	{	// Do the main display
-		include "$skin_folder/$skin/_main.php";
+		require "$skin_folder/$skin/_main.php";
 	}
 }
 else
 {	// no skin specified !
 	if( $template == 'popup' )
 	{	// Do the popup display
-		include dirname(__FILE__)."/$pathcore_out./_popup.php";
+		require dirname(__FILE__).'/'.$pathcore_out.'/_popup.php';
 		exit();
 	}
 }

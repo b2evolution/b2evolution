@@ -1,5 +1,5 @@
 <?php 
-	include(dirname(__FILE__)."/b2evocore/_main.php");
+	require(dirname(__FILE__)."/b2evocore/_main.php");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><head>
@@ -22,7 +22,7 @@
 	$blog_item_start = '';				
 	$blog_item_end = ' &middot; ';
 	// Include the bloglist
-	include( dirname(__FILE__)."/_bloglist.php"); 
+	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 	<a href="admin/b2login.php"><?php echo _('My Back-Office') ?></a>
 </div>

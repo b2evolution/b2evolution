@@ -38,6 +38,6 @@
 	 * We now call the default bloglist handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	include dirname(__FILE__).'/../../_bloglist.php';
+	require dirname(__FILE__).'/../../_bloglist.php';
 
 ?>

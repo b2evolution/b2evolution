@@ -121,8 +121,8 @@ switch($action)
 			header("Location: b2profile.php");
 	
 		$profile=1;
-		include($b2inc."/_menutop.php");
-		include($b2inc."/_menutop_end.php");
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 		?>
 	
 		<div class="menutop" align="center">
@@ -241,8 +241,8 @@ switch($action)
 	case 'IErightclick':
 	
 		$profile = 1;
-		include($b2inc."/_menutop.php");
-		include($b2inc."/_menutop_end.php");
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 	
 		$bookmarklet_tbpb  = ($use_trackback) ? '&trackback=1' : '';
 		$bookmarklet_tbpb .= ($use_pingback)  ? '&pingback=1'  : '';
@@ -278,8 +278,8 @@ switch($action)
 	default:
 	
 		$profile=1;
-		include($b2inc."/_menutop.php");
-		include($b2inc."/_menutop_end.php");
+		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__).'/_menutop_end.php');
 		$profiledata=get_userdata($user_ID);
 	
 		$bookmarklet_tbpb  = ($use_trackback) ? '&trackback=1' : '';
@@ -464,4 +464,6 @@ switch($action)
 }
 
 /* </Profile | My Profile> */
-include dirname(__FILE__)."/$b2inc/_footer.php" ?>
+require( dirname(__FILE__).'/_footer.php' ); 
+
+?>

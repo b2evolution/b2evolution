@@ -6,6 +6,6 @@
  */
 require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
 
-include (dirname(__FILE__)."/$pathadmin_out/$pathhtsrv/comment_post.php");
+require (dirname(__FILE__)."/$pathadmin_out/$pathhtsrv/comment_post.php");
 
 ?>

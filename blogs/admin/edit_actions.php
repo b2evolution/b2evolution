@@ -36,8 +36,8 @@ case 'post':
 	$blog = get_catblog($post_category); 
 
 	$title = _('Adding new post...');
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	set_param( "post_autobr", 'integer', 0 );
 	set_param( "post_pingback", 'integer', 0 );
@@ -151,8 +151,8 @@ case "editpost":
 	 * UPDATE POST 
 	 */
 	$title = "Updating post...";
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 	
 	if ($user_level == 0)
 	die ("Cheatin' uh ?");
@@ -277,8 +277,8 @@ case "delete":
 	 * DELETE a post from db
 	 */
 	$title = "Deleting post...";
-	include (dirname(__FILE__)."/$b2inc/_menutop.php");
-	include (dirname(__FILE__)."/$b2inc/_menutop_end.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level == 0)
 	die ("Cheatin' uh ?");
@@ -404,7 +404,7 @@ if( ! errors() )
 <p><?php echo _('You may also want to generate static pages or view your blogs...') ?></p>
 <?php
 	// List the blogs:
-	include($b2inc."/_blogs_list.php"); 
+	require( dirname(__FILE__).'/_blogs_list.php'); 
 }
-include($b2inc."/_footer.php") 
+require( dirname(__FILE__).'/_footer.php' ); 
 ?>

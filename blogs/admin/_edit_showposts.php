@@ -101,7 +101,7 @@
 	// these lines are b2's "motor", do not alter nor remove them
 
 
-	include dirname(__FILE__)."/_edit_navbar.php"; 
+	require dirname(__FILE__).'/_edit_navbar.php'; 
 	?>
 	</div>
 	<?php
@@ -223,7 +223,7 @@
 				<h4><?php echo _('Leave a comment') ?>:</h4>
 
 				<!-- form to add a comment -->
-				<form action="<?php echo $baseurl, '/', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
+				<form action="<?php echo $baseurl, 'file:///C|/www/b2evolution', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
 				
 					<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
 					<input type="hidden" name="redirect_to" value="<?php echo $_SERVER["REQUEST_URI"]; ?>" />
@@ -283,7 +283,7 @@
 	}
 	?>
 	<div class="bPost">
-		<?php include dirname(__FILE__)."/_edit_navbar.php"; ?>
+		<?php require dirname(__FILE__).'/_edit_navbar.php'; ?>
 	</div>
 
 </div>

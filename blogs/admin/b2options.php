@@ -40,7 +40,7 @@ switch($action) {
 case "update":
 
 	$standalone = 1;
-	include ("b2header.php");
+	require( dirname(__FILE__).'/b2header.php');
 	if ($user_level <= 3) 
 	{
 		die( _('You have no right to edit the options for this blog.') );
@@ -62,7 +62,7 @@ break;
 default:
 
 	$standalone=0;
-	include ("b2header.php");
+	require( dirname(__FILE__).'/b2header.php');
 	if ($user_level <= 3) 
 	{
 		die( _('You have no right to edit the options for this blog.') );
@@ -156,4 +156,6 @@ break;
 }
 
 /* </Options> */
-include($b2inc."/_footer.php") ?>
+require( dirname(__FILE__).'/_footer.php' ); 
+
+?>

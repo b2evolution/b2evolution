@@ -23,7 +23,7 @@
 </head>
 <body>
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	include( dirname(__FILE__)."/_bloglist.php"); 
+	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id="header"><a href="<?php bloginfo('blogurl'); ?>" title="<?php bloginfo('name'); ?>"><?php bloginfo('name'); ?></a></div>
@@ -66,7 +66,7 @@ Categories: <?php the_categories() ?>
 		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 0;				// Display the pingbacks if requested
 		$disp_title = "Comments:";
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 
 		// this includes the trackbacks
 		$disp_comments = 0;					// Display the comments if requested
@@ -75,7 +75,7 @@ Categories: <?php the_categories() ?>
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 0;				// Display the pingbacks if requested
 		$disp_title = "Trackbacks:";
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 
 		// this includes the pingbacks
 		$disp_comments = 0;					// Display the comments if requested
@@ -84,7 +84,7 @@ Categories: <?php the_categories() ?>
 		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		$disp_title = "Pingbacks:";
-		include( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");
 ?>
 
 </div>
@@ -107,7 +107,7 @@ Categories: <?php the_categories() ?>
 
 <h4>categories:</h4>
 <form action="<?php bloginfo('blogurl') ?>" method="get">
-<?php	include( dirname(__FILE__)."/_categories.php"); ?>
+<?php	require( dirname(__FILE__)."/_categories.php"); ?>
 <input type="submit" value="<?php echo _('Get selection') ?>" />
 </form>
 
@@ -121,7 +121,7 @@ Categories: <?php the_categories() ?>
 
 <h4>archives:</h4>
 <ul class="compress">
-<?php	include( dirname(__FILE__)."/_archives.php"); ?>
+<?php	require( dirname(__FILE__)."/_archives.php"); ?>
 </ul>
 
 <h4>skins:</h4>

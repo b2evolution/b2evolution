@@ -55,7 +55,7 @@ if( $blog != '' )
 
 if ($standalone != 1) 
 {
-	include($b2inc."/_menutop.php");
-	include($b2inc."/_menutop_end.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 }
 ?>

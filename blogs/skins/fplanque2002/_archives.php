@@ -27,6 +27,6 @@
 	 * We now call the default archives handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	include dirname(__FILE__).'/../../_archives.php';
+	require dirname(__FILE__).'/../../_archives.php';
 
 ?>

@@ -8,7 +8,7 @@
 	$show_statuses = "'published'";     // Restrict to published posts
 	$timestamp_min = '';								// Show past
 	$timestamp_max = 'now';							// Hide future
-  include dirname(__FILE__)."/../b2evocore/_blog_main.php";
+  require dirname(__FILE__)."/../b2evocore/_blog_main.php";
   header("Content-type: text/xml");
   echo "<?xml version=\"1.0\"?".">";
 ?>

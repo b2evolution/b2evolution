@@ -21,7 +21,7 @@
 		/*
 		 * And then... call the default archive include.
 		 */
-		include dirname(__FILE__).'/_archives.php';
+		require dirname(__FILE__).'/_archives.php';
 		unset( $archive_limit );
 		echo '</ul>';
 	}

@@ -96,7 +96,7 @@ switch($action)
 	?>
 	
 	<div class="center">
-	<?php if ($use_quicktags) include($b2inc.'/_quicktags.php'); ?>
+	<?php if ($use_quicktags) require( dirname(__FILE__).'/_quicktags.php'); ?>
 	</div>
 	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" border="0" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php

@@ -294,4 +294,5 @@ break;
 	</div>
 
 
-<?php include($b2inc."/_footer.php"); ?>
+<?php require( dirname(__FILE__).'/_footer.php' ); 
+ ?>
