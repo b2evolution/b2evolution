@@ -90,7 +90,7 @@ class FileManager
 
 
 	/**
-	 * order files by what?
+	 * order files by what? (name/type/size/lastm/perms)
 	 * 'name' as default.
 	 * @var string
 	 * @access protected
@@ -120,10 +120,12 @@ class FileManager
 	 * @param string the root directory ('user' => user's dir)
 	 * @param string the URL where the object is included (for generating links)
 	 * @param string the dir of the Filemanager object (relative to root)
+	 * @param string filter files by what?
+	 * @param boolean is the filter a regular expression (default is glob pattern)
 	 * @param string order files by what? ('#' means 'name')
-	 * @param string
+	 * @param boolean order ascending or descending? '#' means ascending for 'name', descending for other
 	 */
-	function FileManager( $cUser, $url, $root = '#', $cd = '', $order = '#', $asc = '#' )
+	function FileManager( &$cUser, $url, $root = '#', $path = '', $filter = '#', $filter_regexp = '#', $order = '#', $asc = '#' )
 	{
 		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
 		global $BlogCache;
@@ -131,10 +133,18 @@ class FileManager
 		$this->entries = array();  // the directory entries
 		$this->Messages = new Log( 'error' );
 
-		$this->User = $cUser;
+		$this->User =& $cUser;
 
-		$this->order = $order;
-		$this->orderasc = $asc;
+		$this->filter = $filter;
+		$this->filter_regexp = $filter_regexp;
+		if( $this->filter_regexp && !isRegexp( $this->filter ) )
+		{
+			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filter ) );
+			$this->filter = '.*';
+		}
+
+		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastm', 'perms' ) ) ? $order : '#' );
+		$this->orderasc = ( $asc == '#' ? '#' : (bool)$asc );
 
 		$this->loadSettings();
 
@@ -146,18 +156,17 @@ class FileManager
 		$this->imgurl = $admin_url.'img/fileicons/';
 
 		// TODO: get user's/group's root
-		#$this->root_dir = $media_dir;
-		#$this->root_url = $baseurl.$media_subdir;
 
-		// get root directory
+
+		// -- get/translate root directory ----
 		$this->root = $root;
 
 		$root_A = explode( '_', $this->root );
 
 		if( $this->User->login == 'demouser' )
 		{
-			$this->root_dir = $basepath.'media_test';
-			$this->root_url = $baseurl.'media_test';
+			$this->root_dir = $basepath.'media_test/';
+			$this->root_url = $baseurl.'media_test/';
 		}
 		elseif( count( $root_A ) == 2 )
 		{
@@ -174,42 +183,46 @@ class FileManager
 		{
 			case '#':
 			case 'user':
-				$this->root_dir = $basepath.$media_subdir.'users/'.$this->User->login;
-				$this->root_url = $baseurl.$media_subdir.'users/'.$this->User->login;
+				$this->root_dir = $this->User->get( 'fm_rootdir' );
+				$this->root_url = $this->User->get( 'fm_rooturl' );
 				break;
 
 			default:  // straight path
-				$this->root_dir = $root;
+				$this->root_dir = trailing_slash( $root );
 		}
 
 		$this->debug( $this->root, 'root' );
 		$this->debug( $this->root_dir, 'root_dir' );
 		$this->debug( $this->root_url, 'root_url' );
 
-		$this->cwd = $this->root_dir.$cd;
+		$this->cwd = trailing_slash( $this->root_dir.$path );
 		$this->debug( $this->cwd, 'cwd' );
 
 		// get real cwd
-		$realcwd = str_replace( '\\', '/', realpath($this->cwd) );
-		$this->debug( $realcwd, 'real cwd' );
+		$realpath = realpath($this->cwd);
+		$this->debug( $realpath, 'realpath()' );
 
-		if( empty($realcwd) )
+		if( !$realpath )
 		{ // does not exist
 			$this->cwd = $this->root_dir;
 		}
-		elseif( !preg_match( '#^'.$this->root_dir.'/#', $realcwd.'/' ) )
-		{ // cwd is not below root!
-			$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
-			$this->cwd = $this->root_dir;
-		}
 		else
-		{ // allowed
-			$this->cwd = $realcwd;
+		{
+			$realpath = trailing_slash( str_replace( '\\', '/', $realpath ) );
+
+			if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
+			{ // cwd is not below root!
+				$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
+				$this->cwd = $this->root_dir;
+			}
+			else
+			{ // allowed
+				$this->cwd = $realpath;
+			}
 		}
 
 		// get the subpath relative to root
 		$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
-		$this->path .= '/';
 		$this->debug( $this->path, 'path' );
 
 
@@ -275,19 +288,37 @@ class FileManager
 
 	function loadentries()
 	{
-		$dir = @dir( $this->cwd );
-		if( !$dir )
+		if( $this->filter == '#' || $this->filter_regexp )
+		{
+			$dir = @dir( $this->cwd );
+			$diropened = (bool)$dir;
+		}
+		else
+		{
+			$oldcwd = getcwd();
+			$diropened = @chdir( $this->cwd );
+			$dir = glob( $this->filter, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
+			chdir( $oldcwd );
+		}
+
+		if( !$diropened )
 		{
 			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->cwd ) );
-			$this->entries = false;
+			return false;
 		}
 		else
 		{ // read the directory
+			if( $dir === false )
+			{ // glob-$dir is empty/false
+				return false;
+			}
 			$i = 0;
-			while( $entry = $dir->read() )
+			while( ( ($this->filter == '#' || $this->filter_regexp) && ($entry = $dir->read()) )
+						|| ($this->filter != '#' && !$this->filter_regexp && ( $entry = each( $dir ) ) && ( $entry = $entry[1] ) ) )
 			{
 				if( $entry == '.' || $entry == '..'
 						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
+						|| ( $this->filter != '#' && $this->filter_regexp && !preg_match( '#'.str_replace( '#', '\#', $this->filter ).'#', $entry ) ) // does not match the regexp filter
 					)
 				{ // don't use these
 					continue;
@@ -306,36 +337,18 @@ class FileManager
 				else
 				{
 					$this->entries[ $i ]['type'] = 'file';
-					$this->entries[ $i ]['size'] = filesize( $this->cwd.'/'.$entry );
+					$this->entries[ $i ]['size'] = filesize( $this->cwd.$entry );
 				}
 
-				$this->entries[ $i ]['lastm'] = filemtime( $this->cwd.'/'.$entry );
-				$this->entries[ $i ]['perms'] = fileperms( $this->cwd.'/'.$entry );
+				$this->entries[ $i ]['lastm'] = filemtime( $this->cwd.$entry );
+				$this->entries[ $i ]['perms'] = fileperms( $this->cwd.$entry );
 
 			}
-			$dir->close();
+			if( $this->filter_regexp )
+			{
+				$dir->close();
+			}
 
-		}
-
-
-	}
-
-
-	/**
-	 * @return integer 1 for ascending sorting, 0 for descending
-	 */
-	function is_sortingasc( $type = '' )
-	{
-		if( empty($type) )
-			$type = $this->order;
-
-		if( $this->orderasc == '#' )
-		{ // default
-			return ( $type == 'name' ) ? 1 : 0;
-		}
-		else
-		{
-			return ( $this->orderasc ) ? 1 : 0;
 		}
 	}
 
@@ -348,18 +361,18 @@ class FileManager
 	 * @param string override order
 	 * @param integer override asc
 	 */
-	function curl( $root = '#', $path = '#', $order = '#', $orderasc = '#' )
+	function curl( $root = '#', $path = '#', $filter = '#', $filter_regexp = '#', $order = '#', $orderasc = '#' )
 	{
 		$r = $this->url;
 
-		foreach( array('root', 'path', 'order', 'orderasc') as $check )
+		foreach( array('root', 'path', 'filter', 'filter_regexp', 'order', 'orderasc') as $check )
 		{
 			if( $$check === false )
 			{ // don't include
 				continue;
 			}
 			if( $$check != '#' )
-			{
+			{ // use local param
 				$r = url_add_param( $r, $check.'='.$$check );
 			}
 			elseif( $this->$check != '#' )
@@ -375,10 +388,10 @@ class FileManager
 	/**
 	 * generates hidden input fields for forms, based on {@link curl()}}
 	 */
-	function form_hiddeninputs( $root = '#', $path = '#', $order = '#', $asc = '#' )
+	function form_hiddeninputs( $root = '#', $path = '#', $filter = '#', $filter_regexp = '#', $order = '#', $asc = '#' )
 	{
 		// get curl(), remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $order, $asc ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $filter, $filter_regexp, $order, $asc ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -416,9 +429,62 @@ class FileManager
 	}
 
 
+	/**
+	 * return the current filter
+	 *
+	 * @param boolean add a note when it's a regexp?
+	 * @return string the filter
+	 */
+	function get_filter( $note = true )
+	{
+		if( $this->filter == '#' )
+		{
+			return T_('no filter');
+		}
+		else
+		{
+			$r = $this->filter;
+			if( $note && $this->filter_regexp )
+			{
+				$r .= ' ('.T_('regular expression').')';
+			}
+			return $r;
+		}
+	}
+
+
+	/**
+	 * @return integer 1 for ascending sorting, 0 for descending
+	 */
+	function is_sortingasc( $type = '' )
+	{
+		if( empty($type) )
+			$type = $this->order;
+
+		if( $this->orderasc == '#' )
+		{ // default
+			return ( $type == 'name' ) ? 1 : 0;
+		}
+		else
+		{
+			return ( $this->orderasc ) ? 1 : 0;
+		}
+	}
+
+
+	/**
+	 * is a filter active?
+	 * @return boolean
+	 */
+	function is_filtering()
+	{
+		return $this->filter !== '#';
+	}
+
+
 	function sortlink( $type )
 	{
-		$r = $this->curl( '#', '#', $type, false );
+		$r = $this->curl( '#', '#', '#', '#', $type, false );
 
 		if( $this->order == $type )
 		{ // change asc
@@ -432,10 +498,11 @@ class FileManager
 	function link_sort( $type, $atext )
 	{
 		$r = '<a href="'.$this->sortlink( $type ).'" title="'
-		.( ($this->order == $type && (1 - $this->is_sortingasc($type)))
-			|| ($this->order != $type
-					&& !(1 - $this->is_sortingasc($type)))
-							? T_('sort ascending by this column') : T_('sort descending by this column')).'">'.$atext.'</a>';
+		.( ($this->order == $type && !$this->is_sortingasc($type))
+				||( $this->order != $type
+						&& $this->is_sortingasc($type))
+							? T_('sort ascending by this column') : T_('sort descending by this column'))
+		.'">'.$atext.'</a>';
 
 		if( $this->order == $type )
 		{

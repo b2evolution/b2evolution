@@ -128,6 +128,8 @@ class User extends DataObject
 	 */
 	function get( $parname )
 	{
+		global $basepath, $baseurl, $media_subdir;
+
 		switch( $parname )
 		{
 			case 'preferedname':
@@ -144,8 +146,14 @@ class User extends DataObject
 						return parent::get($this->idmode);
 				}
 
-      case 'num_posts':
-        return get_usernumposts( $this->ID );
+			case 'num_posts':
+				return get_usernumposts( $this->ID );
+
+			case 'fm_rootdir':
+				return $basepath.$media_subdir.'users/'.$this->login.'/';
+
+			case 'fm_rooturl':
+				return $baseurl.$media_subdir.'users/'.$this->login.'/';
 
 			default:
 			// All other params:

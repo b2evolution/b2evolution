@@ -20,13 +20,12 @@
 }
 
 
-#filemanmain table.grouped {
-	clear:both;
-	border-collapse: collapse;
-}
-
 #filemanmain table.grouped td {
 	text-align:center;
+}
+#filemanmain table.grouped td.error {
+	padding:2ex;
+	color:red;
 }
 #filemanmain table.grouped td.icon,
 #filemanmain table.grouped td.checkbox,
@@ -63,6 +62,12 @@
 	vertical-align:bottom;
 	padding-left: 3ex;
 	float:right;
+}
+
+.toolbaritem_group {
+}
+.toolbaritem_group .toolbaritem {
+	padding-left: 1ex;
 }
 
 div.fm_query {

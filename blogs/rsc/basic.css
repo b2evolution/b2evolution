@@ -54,7 +54,8 @@ div.error ul,
 div.error ol,
 div.log_error ul,
 div.log_error ol {
-	margin-bottom: 0ex;
+	margin-top: 1ex;
+	margin-bottom: 1ex;
 }
 ul.log {
 	list-style: square;

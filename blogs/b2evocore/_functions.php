@@ -1377,4 +1377,43 @@ function str2path( $path )
 		return array( '/'.implode('/', $pwdArr), false );
 	}
 }
+
+
+/**
+ * checks if a given regular expression is valid.
+ *
+ * It changes the error_handler and restores it.
+ *
+ * @author plenque at hotmail dot com {@link http://php.net/manual/en/function.preg-match.php}
+ * @param string the regular expression to test
+ * @return boolean
+ */
+Function isRegexp( $sREGEXP )
+{
+	$sPREVIOUSHANDLER = Set_Error_Handler ("TrapError");
+	preg_match( '#'.str_replace( '#', '\#', $sREGEXP ).'#', '' );
+	restore_error_handler( $sPREVIOUSHANDLER );
+	return !traperror();
+}
+
+/**
+ * Meant to replace error handler.
+ *
+ * @return integer number of errors
+ */
+function traperror( $reset = 1 )
+{
+	static $iERRORES;
+
+	if( !func_num_args() )
+	{
+		$iRETORNO = $iERRORES;
+		$iERRORES = 0;
+		return $iRETORNO;
+	}
+	else
+	{
+		$iERRORES++;
+	}
+}
 ?>

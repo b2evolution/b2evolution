@@ -25,6 +25,8 @@ param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
 param( 'selaction', 'string', '' );  // action for selected files/dirs
 
 param( 'file', 'string', '' );       // selected file
+param( 'filter', 'string', '#' );
+param( 'filter_regexp', 'integer', 0 );
 param( 'order', 'string', 'name' );
 param( 'asc', 'string', '#' );
 
@@ -53,7 +55,7 @@ if( $action == 'update_settings' )
 }
 
 
-$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $asc );
+$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $filter, $filter_regexp, $order, $asc );
 
 if( $action == '' && $file != '' )
 { // a file is selected/clicked, default action
@@ -416,7 +418,11 @@ switch( $action ) // (we catched empty action before)
 
 
 require( dirname(__FILE__).'/_menutop.php' );
-echo T_('Current directory').': '.$Fileman->cwd_clickable();
+echo '<br />'.T_('Current directory').': '.$Fileman->cwd_clickable();
+if( $Fileman->is_filtering() )
+{
+	echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';
+}
 require( dirname(__FILE__).'/_menutop_end.php' );
 
 ?>
@@ -475,11 +481,28 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 		<input type="text" name="searchfor" value="--todo--" size="20" />
 		<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
+
+	<span class="toolbaritem_group">
+	<?php
+	if( $Fileman->is_filtering() )
+	{
+	?>
+	<form action="files.php" name="unfilter" class="toolbaritem">
+		<?php echo $Fileman->form_hiddeninputs() ?>
+		<input type="hidden" name="filter" value="#" />
+		<input type="submit" value="<?php echo format_to_output( T_('No Filter'), 'formvalue' ) ?>" />
+	</form>
+	<?php
+	}
+	?>
+
 	<form action="files.php" name="filter" class="toolbaritem">
 		<?php echo $Fileman->form_hiddeninputs() ?>
-		<input type="text" name="filter" value="--todo--" size="20" />
+		<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>" size="20" />
+		<input type="checkbox" name="filter_regexp" title="<?php echo format_to_output( T_('Filter is regular expression'), 'formvalue' ) ?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> />
 		<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 	</form>
+	</span>
 
 	<div class="clear"></div>
 </div>
@@ -556,8 +579,15 @@ if( $i == 0 )
 { // empty directory
 	?>
 	<tr>
-	<td colspan="8" class="left">
-	<?php echo T_('The directory is empty.') ?>
+	<td colspan="8" class="error">
+	<?php
+	echo T_('The directory is empty.');
+	if( $Fileman->is_filtering() )
+	{
+		echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';
+	}
+
+	?>
 	</td>
 	</tr>
 	<?php
