@@ -36,8 +36,9 @@
 	
 <h1>Instructions d'installation pour les nouveaux utilisateurs</h1>
 
-<p>Once you have unzipped the b2evolution distribution:</p>
+<p>This page will be updated. Don't waste time translating this... </p>
 
+<p>Once you have unzipped the b2evolution distribution:</p>
 <ol class="expanded">
 <li>On your server, create or locate a mysql database for b2evolution. (For example, you can call it &quot;b2evolution&quot;)</li>
 <li>On your computer, edit the file <strong>/blogs/conf/_config.php</strong> with a text editor and set theparameters according to your current configuration. There are basically 3 things to set:
@@ -46,21 +47,19 @@
 		<li>The URL where you are going to run b2evolution.<br />
 			<span class="small"><br />
 				<strong>Please note:</strong>
-				It is recommended that you do a first test installation by uploading the whole demo structure to your website, starting with the folder b2evolution. This way, your new blogs will have an URL of the form: http://www.yoursite.com/b2evolution/blogs/blog_a.php...<br />
-				Of course you can change this later when you are comfortable with b2evolution. By then, you will probably want to upload just the contents of your &quot;blogs&quot; folder, so your blogs can be accessed directly through http://www.yoursite.com or http://www.yoursite.com/blog_a.php...
+				You will probably want to upload just the contents of your &quot;blogs&quot; folder, so your blogs can be accessed directly through http://www.yoursite.com or http://www.yoursite.com/blog_a.php...
 			</span>
 		</li>
 		<li>Your e-mail address (where you will receive notifications for new registrations, etc.)</li>
 	</ul>
 </li>
 <li>Upload the b2evolution files to your website, according to the URL you have just configured.</li>
-<li><strong>Come back to this page on your server</strong>, (should be something like http://www.yoursite.com/b2evolution/doc/install_new.html) and <a %href>run the database tables installation</a>. This will create tables for b2evo in the above-mentioned database. It will also create sample contents (please take due note of the admin password that will be given to you).
+<li><strong>Run the installation script on your server. </strong>It is located in /install . This will create tables for b2evo in the above-mentioned database. It will also create sample contents (please take due note of the admin password that will be given to you).
 	<br />
 	<span class="small"><br />
 		<strong>Please note:</strong>
 		Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way.
-	</span>
-</li>
+	</span></li>
 <li>You are done! :)
 	You can now <a %href>read the blogs</a> or <a %href>log into the back-office</a> and start playing!
 	<img src="../blogs/img/smilies/icon_wink.gif" width="15" height="15" class="middle" />

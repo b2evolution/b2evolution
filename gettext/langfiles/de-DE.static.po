@@ -126,7 +126,7 @@ msgstr "b2evolution ganz neu installieren"
 
 #: ../../index.src.html:40
 msgid "Existing b2evolution users:"
-msgstr "vorhandene b2evolution Benutzer:"
+msgstr "Vorhandene b2evolution Benutzer:"
 
 #: ../../index.src.html:40
 msgid "upgrading from a previous version of b2evolution"
