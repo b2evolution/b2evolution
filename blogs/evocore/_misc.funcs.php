@@ -967,7 +967,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 			case 'string':
 				// echo $var, '=', $$var, '<br />';
-				$$var = trim( strip_tags($$var) );
+				$$var = trim( strip_tags((string)$$var) );
 				break;
 
 			default:
@@ -1889,6 +1889,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.45  2005/02/22 02:44:50  blueyed
+ * E_NOTICE fix for param()
+ *
  * Revision 1.44  2005/02/20 23:09:04  blueyed
  * header_nocache() added, Debuglog-output: display 'note' after 'error'
  *
