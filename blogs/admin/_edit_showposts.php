@@ -138,7 +138,7 @@
 				?>
 			</div>
 
-			<p>
+			<p style="clear:both;">
 			<?php
 			if (($user_level > $authordata[13]) or ($user_login == $authordata[1])) 
 			{

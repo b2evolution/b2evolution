@@ -55,7 +55,7 @@
 	<?php } ?>
 	
 	<?php if( $disp_trackback_url ) {	// We want to display the trackback URL: ?>
-	<h4>Trackback address for this post:</h4>
+	<h4><?php echo T_('Trackback address for this post:') ?></h4>
 	<code><?php trackback_url() ?></code>
 	<?php } ?>
 	
@@ -86,7 +86,7 @@
 				<!-- comment -->
 				<a name="c<?php comment_ID() ?>"></a>
 				<div class="bComment">
-					<div class="bCommentTitle">Comment from <?php comment_author() ?> <?php comment_author_url_link("", " &middot; ", "") ?></div>
+					<div class="bCommentTitle"><?php echo T_('Comment from:') ?> <?php comment_author() ?> <?php comment_author_url_link("", " &middot; ", "") ?></div>
 					<div class="bCommentText">
 					<?php comment_text() ?>
 					</div>
@@ -136,7 +136,7 @@
 	
 	
 	<?php if( $disp_comment_form ) {	// We want to display the comments form: ?>
-	<h4>Leave a comment:</h4>
+	<h4><?php echo T_('Leave a comment') ?>:</h4>
 	
 	<?php
 		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
@@ -192,7 +192,7 @@
 	
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" class="buttonarea" value="Send comment" tabindex="8" />
+				<input type="submit" name="submit" class="buttonarea" value="<?php echo T_('Send comment') ?>" tabindex="8" />
 			</div>
 		</fieldset>
 	
