@@ -22,13 +22,13 @@
 			form_select( 'blog_locale', $blog_locale, 'locale_options', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 		?>
 	</fieldset>
-	
+
 	<fieldset>
 		<legend><?php echo T_('Access parameters') ?></legend>
-	
+
 		<?php
 			$blog_baseurl = preg_match('#^https?://#', $blog_siteurl) ? $blog_siteurl : $baseurl;
-			
+
 			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $blog) )
 			{
 				$defblog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'));
@@ -50,7 +50,7 @@
 										$blog_baseurl.'/'.$blog_stub.' &nbsp; '.T_('You MUST create a stub file for this to work.')
 						),
 					), T_('Preferred access type'), true );
-		
+
 			form_radio( 'blog_siteurl_type', $blog_siteurl_type,
 					array(
 						array( 'relative',
@@ -61,11 +61,11 @@
 						)
 					),
 					T_('Blog Folder URL'), true, T_('No trailing slash. (If you don\'t know, leave this field empty.)') );
-					
+
 			form_text( 'blog_stub', $blog_stub, 20, T_('URL blog name / Stub name'), T_('Used in URLs to identify this blog. This should be the stub filename if you use stub file access.'), 30 );
 		?>
 	</fieldset>
-				
+
 	<fieldset>
 		<legend><?php echo T_('Default display options') ?></legend>
 		<?php
@@ -76,7 +76,7 @@
 			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
 
 			form_checkbox( 'blog_in_bloglist', $blog_in_bloglist, T_('Include in public blog list'), T_('Check this if you want to this blog to be displayed in the list of all public blogs.') );
-		
+
 			form_select_object( 'blog_linkblog', $blog_linkblog, $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
 		?>
 	</fieldset>
@@ -86,7 +86,7 @@
 		<?php
 			form_text( 'blog_tagline', $blog_tagline, 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
 		?>
-		
+
 		<fieldset>
 			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div>
 			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="8" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
@@ -105,14 +105,14 @@
 			<div class="input"><textarea name="blog_notes" id="blog_notes" rows="8" cols="50" class="large"><?php echo $blog_notes ?></textarea>
 			<span class="notes"><?php echo T_('Additional info.') ?></span></div>
 		</fieldset>
-	
+
 	</fieldset>
-	
+
 	<fieldset class="submit">
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo ($next_action == 'create') ? T_('Create new blog!') : T_('Update blog!') ?>" class="search">
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
+				<input type="submit" name="submit" value="<?php echo ($next_action == 'create') ? T_('Create new blog!') : T_('Update blog!') ?>" class="search" />
+				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 			</div>
 		</fieldset>
 	</fieldset>

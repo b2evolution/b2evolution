@@ -1,7 +1,7 @@
 <?php
 /**
  * Fast Form handling
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -40,7 +40,7 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	$r .= " />\n"
 				.'<span class="notes">'.$field_note."</span></div>\n"
 				."</fieldset>\n\n";
-				
+
 	if( $output )
 	{
 		echo $r;
@@ -148,13 +148,13 @@ function form_radio(
 	$field_lines = false,
 	$field_notes = '' )
 {
-	echo '<fieldset>';
-	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input">';
+	echo "\n".'<fieldset class="setting">';
+	echo "\n".'  <div class="label"><label>', $field_label, ':</label></div>';
+	echo "\n".'  <div class="input"><fieldset class="input">';
 	foreach( $field_options as $loop_field_option )
 	{
 		if( $field_lines ) echo "<div>\n";
-		echo '<label class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
+		echo '<label class="radiooption"><input type="radio" class="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
 		if( $field_value == $loop_field_option[0] )
 		{
 			echo ' checked="checked"';
@@ -166,13 +166,13 @@ function form_radio(
 	}
 	if( !empty( $field_notes ) )
 	{
-		echo '  <div class="notes">'.$field_notes.'</div>';
+		echo '<div class="notes">'.$field_notes.'</div>';
 	}
-	echo "</fieldset>\n\n";
+	echo "\n  </fieldset></div>\n</fieldset>\n";
 }
 
 
-/*
+/**
  * form_checkbox(-)
  * @param string the name of the checkbox
  * @param boolean initial value
@@ -198,7 +198,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 	$r .= " />\n"
 				.'<span class="notes">'.$field_note."</span></div>\n"
 				."</fieldset>\n\n";
-				
+
 	if( $output )
 	{
 		echo $r;
@@ -240,7 +240,7 @@ function form_info( $field_label, $field_info, $field_note = '' )
 {
 	echo '<fieldset>';
 	echo '  <div class="label">', $field_label, ':</div>';
-	echo '  <div class="input" style="padding-top: .6ex;">', $field_info;
+	echo '  <div class="info">', $field_info;
 	if( !empty($field_note) )	echo '&nbsp; <small class="notes">', $field_note, '</small>';
 	echo '</div>';
 	echo "</fieldset>\n\n";
@@ -255,9 +255,9 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 	echo '<tr>';
 	echo '  <td align="right"><strong>', $field_label, ':</strong></td>';
 	echo '  <td>', $field_info;
-	
+
 	if( !empty($field_note) )	echo ' <td class="small">', $field_note, '</td>';
-	
+
 	echo "</td></tr>\n\n";
 }
 
@@ -278,13 +278,13 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 		}
 		$action = $action[0];
 	}
-	
+
 	echo '<form action="'.$action.'" method="'.$method.'"';
-	
+
 	if( !empty($name) ) echo ' name="'.$name.'"';
 	if( !empty($id) ) echo ' id="'.$id.'"';
 	if( !empty($class) ) echo ' class="'.$class.'"';
-	
+
 	echo '>';
 
 	if( isset($getparams) )
@@ -298,6 +298,20 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 			}
 		}
 	}
-	
+}
+
+
+function form_submit( $submit_attribs = '' )
+{
+	?>
+	<fieldset class="submit">
+		<fieldset>
+			<div class="input">
+				<input type="submit" name="submit" value="<?php echo T_('Save !') ?>" class="SaveButton" <?php echo $submit_attribs; ?> />
+				<input type="reset" value="<?php echo T_('Reset') ?>" class="ResetButton" />
+			</div>
+		</fieldset>
+	</fieldset>
+	<?php
 }
 ?>

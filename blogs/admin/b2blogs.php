@@ -33,7 +33,7 @@ switch($action)
 		<div class="panelinfo">
 			<h3><?php echo T_('Creating blog...') ?></h3>
 		<?php
-	
+
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_longdesc', 'html', '' );
 		param( 'blog_notes', 'html', '' );
@@ -54,7 +54,7 @@ switch($action)
 		param( 'blog_default_skin', 'string', true );
 		param( 'blog_force_skin', 'integer', 0 );
 		$blog_force_skin = 1-$blog_force_skin;
-		
+
 		$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
 		$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 		$blog_notes = format_to_post( $blog_notes, 0, 0 );
@@ -64,7 +64,7 @@ switch($action)
 		{
 			if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
 			{
-				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with http:// or https:// !') );
+				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) !') );
 			}
 			$blog_siteurl = $blog_siteurl_absolute;
 		}
@@ -82,7 +82,7 @@ switch($action)
 		{
 			$Messages->add( T_('Blog Folder URL').': '.T_('No trailing slash, please.') );
 		}
-		
+
 		if( empty($blog_stub) )
 		{	// Stub name is empty
 			$Messages->add( T_('You must provide an URL blog name / Stub name!') );
@@ -97,7 +97,7 @@ switch($action)
 		if( !$Messages->display( T_('Cannot create, please correct these errors:' ), '') )
 		{
 			$edited_Blog = & new Blog( NULL );
-		
+
 			$edited_Blog->set( 'tagline', $blog_tagline );
 			$edited_Blog->set( 'longdesc', $blog_longdesc );
 			$edited_Blog->set( 'notes', $blog_notes );
@@ -123,21 +123,21 @@ switch($action)
 
 			// DB INSERT
 			$edited_Blog->dbinsert();
-	
+
 			// Set default user permissions for this blog
 			// Proceed insertions:
 			$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 												bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 												bloguser_perm_cats, bloguser_perm_properties )
 										VALUES ( $edited_Blog->ID, $current_User->ID, 1,
-														 'published,protected,private,draft,deprecated', 
+														 'published,protected,private,draft,deprecated',
 															1, 1, 1, 1 )" );
-	
+
 			// Commit changes in cache:
 			$BlogCache->add( $edited_Blog );
 
 			echo '<p><strong>';
-			printf( T_('You should <a %s>create categories</a> for this blog now!'), 
+			printf( T_('You should <a %s>create categories</a> for this blog now!'),
 							'href="b2categories.php?action=newcat&amp;blog='.$edited_Blog->ID.'"' );
 			echo '</strong></p>';
 			echo '</div>';
@@ -154,10 +154,10 @@ switch($action)
 			$admin_pagetitle .= ' :: '.T_('New');
 			require( dirname(__FILE__). '/_menutop.php' );
 			require( dirname(__FILE__). '/_menutop_end.php' );
-	
+
 			// Check permissions:
 			$current_User->check_perm( 'blogs', 'create', true );
-			
+
 			param( 'blog_name', 'string', T_('New weblog') );
 			param( 'blog_shortname', 'string', T_('New blog') );
 			param( 'blog_tagline', 'html', '' );
@@ -269,7 +269,7 @@ switch($action)
 				{
 					$Messages->add( T_('Blog Folder URL').': '.T_('No trailing slash, please.') );
 				}
-				
+
 				if( empty($blog_stub) )
 				{	// Stub name is empty
 					$Messages->add( T_('You must provide an URL blog name / Stub name!') );
@@ -340,7 +340,7 @@ switch($action)
 		if( !$Messages->count() )
 		{	// Commit update to the DB:
 			$edited_Blog->dbupdate();
-		
+
 			// Commit changes in cache:
 			$BlogCache->add( $edited_Blog );
 		}
@@ -371,7 +371,7 @@ switch($action)
 			}
 			require( dirname(__FILE__). '/_menutop.php' );
 			require( dirname(__FILE__). '/_menutop_end.php' );
-		
+
 			// Check permissions:
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		}
@@ -394,20 +394,20 @@ switch($action)
 					else
 						echo '<li>';
 					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=perm">'. T_('Permissions'). '</a></li>';
-					
+
 					if( $tab == 'advanced' )
 						echo '<li class="current">';
 					else
 						echo '<li>';
 					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=advanced">'. T_('Advanced'). '</a></li>';
-					
+
 				?>
 				</ul>
 			</div>
 		</div>
 		<div class="tabbedpanelblock">
-		
-		<?php 
+
+		<?php
 		switch( $tab )
 		{
 			case 'general':
@@ -443,11 +443,11 @@ switch($action)
 				$next_action = 'update';
 				require( dirname(__FILE__).'/_blogs_general.form.php' );
 				break;
-				
+
 			case 'perm':
 				require( dirname(__FILE__).'/_blogs_permissions.form.php' );
 				break;
-				
+
 			case 'advanced':
 				$blog_staticfilename = get_bloginfo( 'staticfilename' );
 				$blog_allowtrackbacks = get_bloginfo( 'allowtrackbacks' );
@@ -462,7 +462,7 @@ switch($action)
 		echo '</div>';
 		require( dirname(__FILE__).'/_footer.php' );
 		exit();
-		
+
 
 
 
@@ -496,8 +496,8 @@ switch($action)
 						<input type="hidden" name="action" _="delete" />
 						<input type="hidden" name="blog" _="<?php $deleted_Blog->ID() ?>" />
 						<input type="hidden" name="confirm" _="1" />
-						
-						<?php 
+
+						<?php
 						if( is_file( $deleted_Blog->get('dynfilepath') ) )
 						{
 							?>
@@ -507,15 +507,15 @@ switch($action)
 							<?php
 						}
 						if( is_file( $deleted_Blog->get('staticfilepath') ) )
-						{ 
+						{
 							?>
 							<input type="checkbox" id="delete_static_file" name="delete_static_file" _="1" />
 							<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->dget('staticurl').'"', $deleted_Blog->dget('staticfilepath') ); ?></label><br />
 							<br />
 							<?php
 						}
-						?>						
-						
+						?>
+
 						<input type="submit" _="<?php echo T_('I am sure!') ?>" class="search" />
 					</form>
 					<form action="b2blogs.php" method="get" class="inline">
@@ -550,7 +550,7 @@ switch($action)
 		?>
 			<div class="panelinfo">
 				<h3>
-				<?php 
+				<?php
 					printf( T_('Generating static page for blog [%s]'), $edited_Blog->dget('name') );
 				?>
 				</h3>
@@ -589,7 +589,7 @@ switch($action)
 				// That's it, now let b2evolution do the rest! :)
 				require $basepath.'/'.$core_subdir.'/_blog_main.php';
 				break;
-			
+
 			case 'stub':
 				// Access through stub file
 				require $edited_Blog->get('dynfilepath');
@@ -607,7 +607,7 @@ switch($action)
 		{	// could not open file
 			?>
 			<div class="error">
-				<p class="error"><?php echo T_('File cannot be written!') ?></p>			
+				<p class="error"><?php echo T_('File cannot be written!') ?></p>
 				<p><?php printf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ); ?></p>
 			</div>
 			<?php
@@ -617,7 +617,7 @@ switch($action)
 			printf( '<p>'.T_('Writing to file [%s]...').'</p>', $staticfilename );
 			fwrite( $fp, $page );
 			fclose( $fp );
-	
+
 			echo '<p>'.T_('Done.').'</p>';
 		}
 		?>
