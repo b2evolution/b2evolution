@@ -44,6 +44,9 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+require_once  dirname(__FILE__).'/'.$core_dirout.$conf_subdir.'_application.php';    // application settings
+
+
 $new_db_version = 8070;				// next time: 8080
 
 
@@ -235,6 +238,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.19  2005/03/13 21:13:48  blueyed
+ * include application vars
+ *
  * Revision 1.18  2005/03/13 19:46:53  blueyed
  * application config layer
  *
