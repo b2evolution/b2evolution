@@ -104,11 +104,26 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 			type="image"
 			name="actionArray[filter_unset]"
 			class="ActionButton"
-			src="<?php echo getIcon( 'xross', 'url' ) ?>" />
+			src="<?php echo getIcon( 'delete', 'url' ) ?>" />
 		<?php
 	}
 	?>
 </form>
+
+
+<?php /* Not implemented yet:
+
+<!-- SEARCH BOX: -->
+
+<form class="toolbaritem" id="fmbar_search">
+	<input type="text" name="searchfor" value="--todo--" size="20" />
+	<input type="image"
+		class="ActionButton"
+		title="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>"
+		src="<glasses>" />
+</form>
+
+*/ ?>
 
 
 <!-- THE MAIN FORM -->
@@ -135,22 +150,6 @@ $filetable_cols = 8;
 	<td colspan="<?php echo $filetable_cols ?>" class="firstcol lastcol">
 
 		<?php
-
-		/* Not implemented yet:
-
-		<!-- SEARCH BOX: -->
-
-		<div class="toolbaritem">
-			<input type="text" name="searchfor" value="--todo--" size="20" />
-			<input type="image"
-				class="ActionButton"
-				title="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>"
-				src="<glasses>" />
-		</div>
-
-		*/
-
-
 		$rootlist = $Fileman->getRootList();
 
 		if( count($rootlist) > 1 )
@@ -545,13 +544,12 @@ if( $countFiles )
 			{
 				echo ' selected="selected"';
 			} ?>><?php echo T_('New directory') ?></option>
-	</select>
-	:
+	</select>:
 	<input type="text" name="createname" value="<?php
 		if( isset( $createname ) )
 		{
 			echo $createname;
-		} ?>" size="20" />
+		} ?>" size="15" />
 	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
 	<input type="hidden" name="action" value="createnew" />
 </form>
@@ -682,6 +680,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/08 01:01:39  blueyed
+ * moved searchbox, beautified create bar.
+ *
  * Revision 1.8  2005/01/27 21:56:07  blueyed
  * layout..
  *
