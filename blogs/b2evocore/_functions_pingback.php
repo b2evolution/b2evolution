@@ -12,7 +12,7 @@
 /*
  * pingback(-)
  */
-function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blog_ID, $display = true) 
+function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, & $blogparams, $display = true) 
 {	// Sending pingback
 	// original code by Mort (http://mort.mine.nu:8080)
 	global $b2_version;
@@ -43,7 +43,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 		$x_pingback_str = 'x-pingback: ';
 		$pingback_href_original_pos = 27;
 	
-		$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $blog_ID ) );
+		$blogurl = get_bloginfo('blogurl', $blogparams );
 		$pagelinkedfrom = gen_permalink( $blogurl, $post_ID );
 
 		if( !empty($post_url) )

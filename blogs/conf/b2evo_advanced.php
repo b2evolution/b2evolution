@@ -93,6 +93,8 @@ $notify_from = $b2evo_name.'@'.$basehost; // comment this if you want to customi
 
 
 
+# set this to 1 if you want your site to be listed on http://b2evolution.net when you add a new post
+$use_b2evonetping = 1;
 
 # fill these only if you have a Cafelog ID,
 # this enables your blog to be in the Recently Updated b2 blogs list.

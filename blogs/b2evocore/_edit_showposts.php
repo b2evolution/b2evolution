@@ -258,7 +258,7 @@
 					<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
 					<fieldset>
 						<div class="label"><?php echo _('Options') ?>:</div>
-						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo " checked=\"checked\"" ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes"><?php echo _('(Line breaks become &lt;br&gt;)') ?></span>
+						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes"><?php echo _('(Line breaks become &lt;br&gt;)') ?></span>
 						</div>
 					</fieldset>
 					<?php } ?>
@@ -311,13 +311,13 @@
 			<fieldset title="Posts to show">
 				<legend><?php echo _('Posts to show') ?></legend>
 				<div>
-				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked ' ?>/><label for="ts_min"><?php echo _('Past') ?></label><br />
-				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked ' ?>/><label for="ts_max"><?php echo _('Future') ?></label>
+				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" ' ?>/><label for="ts_min"><?php echo _('Past') ?></label><br />
+				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo _('Future') ?></label>
 				</div>
 				
 				<div>
 				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="ts_min"><?php echo _('Draft') ?></label><br />
-				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked ' ?>/><label for="ts_max"><?php echo _('Published') ?></label>
+				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo _('Published') ?></label>
 				</div>
 				
 			</fieldset>
@@ -327,9 +327,9 @@
 				<div>
 				<input type="text" name="s" size="20" value="<?php echo $s ?>" class="SearchField" />
 				</div>
-				<?php echo _('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked ' ?>/><label for="sentAND"><?php echo _('AND') ?></label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked ' ?>/><label for="sentOR"><?php echo _('OR') ?></label>
-				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
+				<?php echo _('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo _('AND') ?></label>
+				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo _('OR') ?></label>
+				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
 			</fieldset>
 
 			<fieldset title="Archives">
@@ -361,7 +361,7 @@
 							// --------------------------------- MONTHLY ARCHIVES ---------------------------------
 							$arc_m = $arc_year.zeroise($arc_month,2);
 							echo '<input type="radio" name="m" value="'.$arc_m.'" class="checkbox"';
-							if( $m == $arc_m ) echo ' checked' ;
+							if( $m == $arc_m ) echo ' checked="checked"' ;
 							echo ' />';
 							echo '<a href="'.$arc_link_start.'m='.$arc_m.'">';
 							echo _($month[zeroise($arc_month,2)]),' ',$arc_year;
@@ -372,7 +372,7 @@
 							// --------------------------------- DAILY ARCHIVES -----------------------------------
 							$arc_m = $arc_year.zeroise($arc_month,2).zeroise($arc_dayofmonth,2);
 							echo '<input type="radio" name="m" value="'.$arc_m.'" class="checkbox"';
-							if( $m == $arc_m ) echo ' checked' ;
+							if( $m == $arc_m ) echo ' checked="checked"' ;
 							echo ' />';
 							echo '<a href="'.$arc_link_start.'m='.$arc_m.'">';
 							echo mysql2date($archive_day_date_format, $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
@@ -438,7 +438,7 @@
 					echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
 					if( in_array( $cat_ID, $cat_array ) )
 					{	// This category is in the current selection
-						echo " checked";
+						echo ' checked="checked"';
 					}
 					echo ' />';
 					echo '<a href="', $pagenow, '?blog=', $blog, '&amp;cat=', $cat_ID, '">', $cat['cat_name'], '</a> (', $cat['cat_postcount'] ,')';

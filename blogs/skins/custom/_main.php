@@ -93,7 +93,7 @@ if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page 
 		<a href="<?php permalink_link() ?>#trackbacks" title="Display trackbacks / Get trackback address for this post"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
-		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number("Pingback (0)", "Pingback (1)", "Pingback (%)") ?></a>
+		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
 		-
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
 		<?php if( $debug==1 ) printf( _('- %d queries so far'), $querycount); ?>
@@ -152,9 +152,9 @@ if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page 
     <h3 class="sideItemTitle"><?php echo _('Search') ?></h3>
 		<form name="SearchForm" method="get" class="search" action="<?php bloginfo('blogurl') ?>">
 			<input type="text" name="s" size="30" value="<?php echo $s ?>" class="SearchField" /><br />
-			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked ' ?>/><label for="sentAND"><?php echo _('All Words') ?></label>
-			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked ' ?>/><label for="sentOR"><?php echo _('Some Word') ?></label>
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
+			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo _('All Words') ?></label>
+			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo _('Some Word') ?></label>
+			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
 			<input type="submit" name="submit" value="<?php echo _('Search') ?>" />
 			<input type="reset" value="<?php echo _('Reset form') ?>" />
 		</form>

@@ -139,7 +139,7 @@ the_date( '', '<h2>', '</h2>' );
 		<a href="<?php permalink_link() ?>#trackbacks" title="Display trackbacks / Get trackback address for this post"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
-		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number("Pingback (0)", "Pingback (1)", "Pingback (%)") ?></a>
+		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
 		-
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
 		<?php if( $debug==1 ) printf( _('- %d queries so far'), $querycount); ?>

@@ -43,6 +43,7 @@ require_once (dirname(__FILE__)."/../$pathcore/_functions.php" ); // db funcs
 require_once (dirname(__FILE__)."/../$pathcore/_functions_cats.php" );
 require_once (dirname(__FILE__)."/../$pathcore/_functions_bposts.php" );
 
+// ALTER TABLE `fplanque`.`b2blogs` CHANGE `blog_longdesc` `blog_longdesc` TEXT DEFAULT NULL 
 
 function create_b2evo_tables()
 {
@@ -576,7 +577,7 @@ switch( $action )
 
  <p>The delete feature enables you to come back here later and start anew with a different option, so feel free to experiment :)</p>
  	
-<p><input type="radio" name="action" value="newdb" checked> <strong>New Install</strong>: Install b2evolution tables with sample data.</p>
+<p><input type="radio" name="action" value="newdb" checked="checked"> <strong>New Install</strong>: Install b2evolution tables with sample data.</p>
 	
 		<p><input type="radio" name="action" value="evodb"> <strong>Upgrade from a previous version of b2evolution</strong>: This is NOT necessary by now!</p>
 
@@ -589,7 +590,7 @@ switch( $action )
 	<fieldset>
 		<legend>What display system would you like to be activated by default?</legend>
 	
-		<p><input type="radio" name="skins" value="1" checked> <strong>evoSkins</strong>: Blogs will be displayed with a variety of skins you can choose from at reading time. (Recommended)</p>
+		<p><input type="radio" name="skins" value="1" checked="checked"> <strong>evoSkins</strong>: Blogs will be displayed with a variety of skins you can choose from at reading time. (Recommended)</p>
 
 		<p><input type="radio" name="skins" value="0"> <strong>templates</strong>: Blogs will be displayed in an example template. (This is how the original b2 used to work)</p>
 		

@@ -183,7 +183,7 @@
 			<div class="input">
 			
 			<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
-			<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo " checked=\"checked\"" ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes">(<?php echo _('Line breaks become &lt;br /&gt;') ?>)</span><br />
+			<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes">(<?php echo _('Line breaks become &lt;br /&gt;') ?>)</span><br />
 			<?php } ?>
 
 			<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo _('Remember me') ?></label> <span class="notes"><?php echo _('(Set cookies for name, email &amp; url)') ?></span>

@@ -113,14 +113,16 @@ function b2newpost($m)
 
 
 		if (!isset($blog_ID)) { $blog_ID = get_catblog($category); }
+		$blogparams = get_blogparams_by_ID( $blog_ID );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
 			sleep($sleep_after_edit);
 		}
 
-		pingback( true, $content, $post_title, '', $post_ID, $blog_ID, false);
-		pingWeblogs($blog_ID, false );
-		pingBlogs($blog_ID);
+		pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+		pingb2evonet( $blogparams, $post_ID, $post_title, false );
+		pingWeblogs($blogparams, false );
+		pingBlogs($blogparams);
 		pingCafelog($cafelogID, $post_title, $post_ID);
 
 		return new xmlrpcresp(new xmlrpcval("$post_ID"));
@@ -376,11 +378,14 @@ function bloggernewpost($m)
 		{	// If post is publicly published:
 			logIO("O","Doing pingbacks...");
 			if (!isset($blog_ID)) { $blog_ID = get_catblog($post_category); }
-			pingback( true, $content, $post_title, '', $post_ID, $blog_ID, false);
+			$blogparams = get_blogparams_by_ID( $blog_ID );
+			pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+			logIO("O","Pinging b2evolution.net...");
+			pingb2evonet( $blogparams, $post_ID, $post_title, false );
 			logIO("O","Pinging Weblogs...");
-			pingWeblogs( $blog_ID, false );
+			pingWeblogs( $blogparams, false );
 			logIO("O","Pinging Blo.gs...");
-			pingBlogs($blog_ID);
+			pingBlogs($blogparams);
 			logIO("O","Pinging Cafelog...");
 			pingCafelog($cafelogID, $post_title, $post_ID);
 		}
@@ -519,11 +524,14 @@ function bloggereditpost($m)
 				// only pingback once, at the same time we do the pings!
 				logIO("O","Doing pingbacks...");
 				if (!isset($blog_ID)) { $blog_ID = get_catblog($post_category); }
-				pingback( true, $content, $post_title, '', $post_ID, $blog_ID, false);
+				$blogparams = get_blogparams_by_ID( $blog_ID );
+				pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+				logIO("O","Pinging b2evolution.net...");
+				pingb2evonet( $blogparams, $post_ID, $post_title, false );
 				logIO("O","Pinging Weblogs...");
-				pingWeblogs( $blog_ID, false );
+				pingWeblogs( $blogparams, false );
 				logIO("O","Pinging Blo.gs...");
-				pingBlogs($blog_ID);
+				pingBlogs($blogparams);
 				logIO("O","Pinging Cafelog...");
 				pingCafelog($cafelogID, $post_title, $post_ID);
 			}

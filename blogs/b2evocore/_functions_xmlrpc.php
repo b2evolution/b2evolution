@@ -394,8 +394,11 @@ class xmlrpc_client {
   var $cert="";
   var $certpass="";
   
-  function xmlrpc_client($path, $server, $port=0) {
-    $this->port=$port; $this->server=$server; $this->path=$path;
+  function xmlrpc_client($path, $server, $port=0) 
+	{
+    $this->port=$port; 
+		$this->server=$server; 
+		$this->path=$path;
   }
 
   function setDebug($in) {

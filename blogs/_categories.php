@@ -46,7 +46,7 @@
 		echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'"';
 		if( in_array( $cat_ID, $cat_array ) )
 		{	// This category is in the current selection
-			echo " checked";
+			echo ' checked="checked"';
 		}
 		echo ' />';
 		echo "<a href=\"".get_bloginfo('blogurl').'?cat='.$cat_ID."\">".$cat['cat_name'].'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';

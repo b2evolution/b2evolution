@@ -179,11 +179,14 @@ class xmlrpc_server {
 		print trim($payload);
 	}
 
-	function verifySignature($in, $sig) {
-		for($i=0; $i<sizeof($sig); $i++) {
+	function verifySignature($in, $sig) 
+	{
+		for($i=0; $i < sizeof($sig); $i++) 
+		{
 			// check each possible signature in turn
 			$cursig=$sig[$i];
-			if (sizeof($cursig)==$in->getNumParams()+1) {
+			if (sizeof($cursig)==$in->getNumParams()+1) 
+			{
 				$itsOK=1;
 				for($n=0; $n<$in->getNumParams(); $n++) {
 					$p=$in->getParam($n);
@@ -200,11 +203,11 @@ class xmlrpc_server {
 						break;
 					}
 				}
-			if ($itsOK) 
-				return array(1);
+				if ($itsOK) return array(1);
 			}
+			else return array(0, "Signature size does not match");
 		}
-		return array(0, "Wanted ${wanted}, got ${got} at param ${pno})");
+		return array(0, "Wanted $wanted, got $got at param $pno)");
 	}
 
   function parseRequest($data="") {

@@ -115,7 +115,7 @@ if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page 
 		<a href="<?php permalink_link() ?>#trackbacks" title="Display trackbacks / Get trackback address for this post"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
-		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number("Pingback (0)", "Pingback (1)", "Pingback (%)") ?></a>
+		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
 		-
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
 		<?php if( $debug==1 ) printf( _('- %d queries so far'), $querycount); ?>
@@ -174,9 +174,9 @@ if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page 
     <h3 class="sideItemTitle"><?php echo _('Search') ?></h3>
 		<form name="SearchForm" method="get" class="search" action="<?php bloginfo('blogurl') ?>">
 			<input type="text" name="s" size="30" value="<?php echo $s ?>" class="SearchField" /><br />
-			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked ' ?>/><label for="sentAND"><?php echo _('All Words') ?></label>
-			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked ' ?>/><label for="sentOR"><?php echo _('Some Word') ?></label>
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
+			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo _('All Words') ?></label>
+			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo _('Some Word') ?></label>
+			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
 			<input type="submit" name="submit" value="<?php echo _('Search') ?>" />
 			<input type="reset" value="<?php echo _('Reset form') ?>" />
 		</form>
@@ -203,7 +203,6 @@ if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page 
 				<li><a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo _('more...') ?></a></li>
 	  </ul>
   </div>
-
 	<div class="bSideItem">
     <h3>Choose skin</h3>
 		<ul>
@@ -257,21 +256,19 @@ if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page 
 
 	<div class="bSideItem">
     <h3><?php echo _('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
-
       <ul>
         <li><a href="<?php bloginfo('rss_url', 'raw'); ?>">RSS 0.92 (Userland)</a></li>
         <li><a href="<?php bloginfo('rdf_url', 'raw'); ?>">RSS 1.0 (RDF)</a></li>
         <li><a href="<?php bloginfo('rss2_url', 'raw'); ?>">RSS 2.0 (Userland)</a></li>
       </ul>
       <p><a href="http://www.xml.com/pub/a/2002/12/18/dive-into-xml.html" title="xml.com - External - English">What is RSS?</a> by Mark Pilgrim</p>
-
 	</div>
 
 	<p class="center">powered by<br />
 	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
+<!-- InstanceEndEditable -->
 </div>
-<!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
   <tr> 
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>

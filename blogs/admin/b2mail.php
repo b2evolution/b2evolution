@@ -248,10 +248,11 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 			$blog_ID = get_catblog($post_category); 
 			echo '<p><strong>', _('Blog ID'), ':</strong> ',$blog_ID,'</p>';
-			
-			pingback( true, $content, $post_title, '', $post_ID, $blog_ID, true);
-			pingWeblogs($blog_ID);
-			pingBlogs($blog_ID);
+			$blogparams = get_blogparams_by_ID( $blog_ID );
+			pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
+			pingb2evonet( $blogparams, $post_ID, $post_title);
+			pingWeblogs($blogparams);
+			pingBlogs($blogparams);
 			pingCafelog($cafelogID, $post_title, $post_ID);
 		}
 		echo "\n<p><strong>", _('Posted title'), ':</strong> ', $post_title, '<br />';

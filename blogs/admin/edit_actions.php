@@ -77,7 +77,7 @@ case 'post':
 	$content = format_to_post($content,$post_autobr,0);
 
 	if( errors_display( _('Cannot post, please correct these errors:'), 
-			'[<a href="javascript:history.go(-1)">', _('Back to post editing'), '</a>]' ) )
+			'[<a href="javascript:history.go(-1)">'._('Back to post editing').'</a>]' ) )
 	{
 		break;
 	}
@@ -108,12 +108,14 @@ case 'post':
 	}
 	else
 	{	// We do all the pinging now!
+		$blogparams = get_blogparams_by_ID( $blog );
 		// trackback
 		trackbacks( $post_trackbacks, $content, $post_title, $post_ID);
 		// pingback
-		pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blog);
-		pingWeblogs($blog);
-		pingBlogs($blog);		
+		pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blogparams);
+		pingb2evonet($blogparams, $post_ID, $post_title);
+		pingWeblogs($blogparams);
+		pingBlogs($blogparams);		
 		pingCafelog($cafelogID, $post_title, $post_ID);
 	}
 
@@ -194,7 +196,7 @@ case "editpost":
 	$content = format_to_post($content,$post_autobr,0);
 
 	if( errors_display( _('Cannot update, please correct these errors:'), 
-			'[<a href="javascript:history.go(-1)">', _('Back to post editing'), '</a>]' ) )
+			'[<a href="javascript:history.go(-1)">'._('Back to post editing').'</a>]' ) )
 	{
 		break;
 	}
@@ -238,10 +240,12 @@ case "editpost":
 	}
 	else
 	{	// We may do some pinging now!
+		$blogparams = get_blogparams_by_ID( $blog );
+
 		// trackback
 		trackbacks( $post_trackbacks, $content,  $post_title, $post_ID );	
 		// pingback
-		pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blog);
+		pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blogparams);
 	
 		// ping ?	
 		if( in_array( 'pingsdone', $post_flags ) )
@@ -252,8 +256,9 @@ case "editpost":
 		}
 		else
 		{	// We'll ping now
-			pingWeblogs($blog);
-			pingBlogs($blog);		
+			pingb2evonet( $blogparams, $post_ID, $post_title);
+			pingWeblogs($blogparams);
+			pingBlogs($blogparams);		
 			pingCafelog($cafelogID, $post_title, $post_ID);
 		}
 	}	
@@ -371,7 +376,7 @@ case "editedcomment":
 	$content = format_to_post($content,$post_autobr,0); // We are faking this NOT to be a comment
 
 	if( errors_display( _('Cannot update comment, please correct these errors:'), 
-			'[<a href="javascript:history.go(-1)">', _('Back to post editing'), '</a>]' ) )
+			'[<a href="javascript:history.go(-1)">'._('Back to post editing').'</a>]' ) )
 	{
 		break;
 	}
