@@ -33,6 +33,7 @@
  *
  * @version $Id$
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 switch( $admin_tab )
 {	// Submenu depends on main admin page:

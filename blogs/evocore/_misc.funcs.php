@@ -958,6 +958,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 
 			default:
 				settype( $$var, $type );
+				$Debuglog->add( 'param(-): '.$var.' typed to '.$type.', new value='.$$var, 'params' );
 		}
 	}
 
@@ -1594,6 +1595,9 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 
 /*
  * $Log$
+ * Revision 1.6  2004/11/02 10:46:58  fplanque
+ * no message
+ *
  * Revision 1.5  2004/10/21 00:14:44  blueyed
  * moved
  *
