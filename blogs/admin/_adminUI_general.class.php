@@ -168,15 +168,15 @@ class AdminUI_general
 			return $this->title;
 		}
 		elseif( $title = $this->getPathProperty( 'last', array( 'title' ) ) )
-		{ // ??
+		{ // Title property of the path
 			return $title;
 		}
 		elseif( $title = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
-		{ // ??
+		{ // Title property for the node of the current path
 			return $title;
 		}
 		else
-		{ // ??
+		{ // Fallback: implode title/text properties of the path
 			$titles = $this->getPropertiesForPath( $this->path, array( 'title', 'text' ) );
 			if( $reversedDefault )
 			{	// We have asked for reverse order of the path elements:
@@ -201,11 +201,11 @@ class AdminUI_general
 			$r .= $this->title_titlearea;
 		}
 		elseif( $titleForTitlearea = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
-		{ // ??
+		{ // Title property for the node of the current path
 			$r .= $titleForTitlearea;
 		}
 		else
-		{ // ??
+		{ // Fallback to {@link getTitle()}
 			$r .= $this->getTitle();
 		}
 
@@ -1006,6 +1006,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.17  2005/03/18 00:24:04  blueyed
+ * doc
+ *
  * Revision 1.16  2005/03/17 14:06:37  fplanque
  * put back page titles in logical order
  *
