@@ -411,7 +411,7 @@ function convert_smilies( & $content)
 					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
 				}
 				
-				$b2_smiliesreplace[] = "<img src='$smilies_directory/$img' alt='$smiley_masked' class='middle' />";
+				$b2_smiliesreplace[] = "<img src='$smilies_directory/$img' border='0' alt='$smiley_masked' class='middle' />";
 			}
 		}
 
