@@ -18,15 +18,15 @@ switch($action)
 		// EDIT FORM:
 		set_param( 'blog_name', 'string', 'new weblog' );
 		set_param( 'blog_shortname', 'string', 'new blog' );
-		set_param( 'blog_tagline', 'string', '' );
+		set_param( 'blog_tagline', 'html', '' );
 		set_param( 'blog_description', 'string', '' );
-		set_param( 'blog_longdesc', 'string', '' );
+		set_param( 'blog_longdesc', 'html', '' );
 		set_param( 'blog_lang', 'string', $default_language );
 		set_param( 'blog_siteurl', 'string', $baseurl );
 		set_param( 'blog_filename', 'string', 'new_file.php' );
 		set_param( 'blog_staticfilename', 'string', '' );
 		set_param( 'blog_stub', 'string', 'new_file.php' );
-		set_param( 'blog_roll', 'string', '' );
+		set_param( 'blog_roll', 'html', '' );
 		set_param( 'blog_keywords', 'string', '' );
 		set_param( 'blog_UID', 'string', '' );
 		$next_action = 'create';
@@ -45,15 +45,15 @@ switch($action)
 	
 		set_param( 'blog_name', 'string', true );
 		set_param( 'blog_shortname', 'string', true );
-		set_param( 'blog_tagline', 'string', '' );
+		set_param( 'blog_tagline', 'html', '' );
 		set_param( 'blog_description', 'string', '' );
-		set_param( 'blog_longdesc', 'string', '' );
+		set_param( 'blog_longdesc', 'html', '' );
 		set_param( 'blog_lang', 'string', 'en' );
 		set_param( 'blog_siteurl', 'string', true );
 		set_param( 'blog_filename', 'string', true );
 		set_param( 'blog_staticfilename', 'string', '' );
 		set_param( 'blog_stub', 'string', '' );
-		set_param( 'blog_roll', 'string', '' );
+		set_param( 'blog_roll', 'html', '' );
 		set_param( 'blog_keywords', 'string', '' );
 		set_param( 'blog_UID', 'string', '' );
 	
@@ -168,15 +168,15 @@ switch($action)
 		set_param( 'blog', 'integer', true );
 		set_param( 'blog_name', 'string', true );
 		set_param( 'blog_shortname', 'string', true );
-		set_param( 'blog_tagline', 'string', '' );
+		set_param( 'blog_tagline', 'html', '' );
 		set_param( 'blog_description', 'string', '' );
-		set_param( 'blog_longdesc', 'string', '' );
+		set_param( 'blog_longdesc', 'html', '' );
 		set_param( 'blog_lang', 'string', 'en' );
 		set_param( 'blog_siteurl', 'string', true );
 		set_param( 'blog_filename', 'string', true );
 		set_param( 'blog_staticfilename', 'string', '' );
 		set_param( 'blog_stub', 'string', '' );
-		set_param( 'blog_roll', 'string', '' );
+		set_param( 'blog_roll', 'html', '' );
 		set_param( 'blog_keywords', 'string', '' );
 		set_param( 'blog_UID', 'string', '' );
 	
