@@ -104,7 +104,7 @@ function list_antiSpam()
 function antiSpam_ID()
 {
 	global $row_stats;
-	echo $row_stats['ID'];
+	echo $row_stats['aspm_ID'];
 }
 
 /*
