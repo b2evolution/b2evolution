@@ -60,6 +60,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				'links_extrapath' => 0
 			);
 			
+			// FP: TODO: this whole block is grotesque. Poor maintaincance. Make it sequential calls to ->set()
 			foreach( array( 'default_blog_ID', 'posts_per_page', 'what_to_show', 'archive_mode', 'AutoBR',
 											'newusers_canregister', 'newusers_grp_ID', 'newusers_level',
 											'links_extrapath', 'permalink_type', 'user_minpwdlen', 'reloadpage_timeout') as $param )

@@ -10,8 +10,8 @@
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.9.1+CVS';
-$new_db_version = 8062;				// next time: 8070
+$b2_version = '0.9.1-CVS';
+$new_db_version = 8070;				// next time: 8080
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
 if( !isset($_SERVER['REQUEST_URI']) )
@@ -89,7 +89,7 @@ if( $HTTP_USER_AGENT != '' )
 	}
 
 	if ($HTTP_USER_AGENT != strip_tags($HTTP_USER_AGENT))
-	{ // then they have tried something funny,
+	{ // then they have tried something funky,
 		// putting HTML or PHP into the HTTP_USER_AGENT
 		debug_log( 'setting vars: '.T_('bad char in User Agent'));
 		$HTTP_USER_AGENT = T_('bad char in User Agent');

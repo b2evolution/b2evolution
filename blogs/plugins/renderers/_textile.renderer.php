@@ -226,7 +226,7 @@ class textile_Rendererplugin extends RendererPlugin
 	 */
 	function textile_Rendererplugin()
 	{
-		$this->short_desc = T_('Humane Web Text Generator');
+		$this->short_desc = T_('Humane Web Text Generator 2.0 beta');
 		$this->long_desc = T_('No description available');
 	}
 

@@ -1335,6 +1335,8 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 
 /**
  * wrapper for quick rendering
+ *
+ * FP: what do we need this for? (this is breaking the object paradigm)
  */
 function render( $string, $renderercode, $format )
 {

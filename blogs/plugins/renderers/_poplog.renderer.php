@@ -17,7 +17,7 @@ class poplog_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evPopL';
 	var $name = 'Poplog';
-	var $priority = 30;
+	var $priority = 65;
 
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true;

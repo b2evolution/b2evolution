@@ -28,5 +28,5 @@ img.rightmargin {
 
 img.flag {
 	vertical-align: middle;
-	border: 1px solid;
+	border: 1px solid #000;
 }

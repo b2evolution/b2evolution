@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-15 18:03+0900\n"
+"PO-Revision-Date: 2004-05-29 05:09+0900\n"
 "Last-Translator: Jun MUTO <jmuto@saku2.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -180,7 +180,7 @@ msgstr "新規ユーザ用インストール説明書"
 #: ../../doc/upgradefrom_b2.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
-msgstr "始める前に、b2evolution のいくつかのネットワーク機能を利用するために、あなたには簡単な <a %s>サービス規約</a> に同意していただく必要があります。"
+msgstr "始める前に、b2evolution のいくつかのネットワーク機能を利用する際には、あなたは我々の簡単な <a %s>サービス規約</a> に同意する必要があることに注意してください。"
 
 #: ../../doc/install_new.src.html:36
 #: ../../doc/upgradefrom_b2.src.html:43
@@ -234,7 +234,7 @@ msgstr "公開サーバでは、<code>/install</code> サブフォルダを削�
 #: ../../doc/upgradefrom_b2.src.html:70
 #: ../../doc/upgradefrom_b2evo.src.html:50
 msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
-msgstr "基本的なインストールが終わった後で、いくつかの <a %s>処理する必要がある手の込んだ事柄</a> (オンライン マニュアル) があります。"
+msgstr "基本的なインストールが終わった後で、いくつかの <a %s>処理する必要がある注意を要する事柄</a> (オンライン マニュアル) があります。"
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"

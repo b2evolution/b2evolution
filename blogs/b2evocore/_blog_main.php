@@ -148,9 +148,9 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	if( $redirect_to_postblog && ( $disp == 'post' ) )
 	{	// Yes we need to check.
 		if( !empty($p) )
-			$Item = Item_get_by_ID( $p );
+			$Item = Item_get_by_ID( $p );	// TODO: use cache
 		else
-			$Item = Item_get_by_title( $title );
+			$Item = Item_get_by_title( $title );	// TODO: use cache
 			
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{	// We're on the wrong blog (probably an old permalink) let's redirect

@@ -487,6 +487,42 @@ function upgrade_b2evo_tables()
 			}
 		}
 		echo "OK.<br />\n";
+
+		echo "Creating DB schema version checkpoint at 8062... ";
+		// This is because the next operation might timeout!
+		// The checkpoint will allow to restart the script and continue where it stopped
+		$DB->query( "UPDATE $tablesettings 
+										SET set_value = '8062' 
+									WHERE set_name = 'db_version'" );
+		echo "OK.<br />\n";
+	}
+
+	if( $old_db_version < 8064 )
+	{	// --------------------------------------------
+		// upgrade to 0.9.0.6
+		// --------------------------------------------
+		echo "Checking for extra quote escaping in comments... ";
+		$query = "SELECT comment_ID, comment_content
+								FROM $tablecomments
+							 WHERE comment_content LIKE '%\\\\\\\\\'%'
+							 		OR comment_content LIKE '%\\\\\\\\\"%' "; 
+		/* FP: the above looks overkill, but mySQL is really full of surprises...
+						tested on 4.0.14-nt */
+		// echo $query;
+		$rows = $DB->get_results( $query, ARRAY_A );
+		if( $DB->num_rows )
+		{
+			echo 'Updating '.$DB->num_rows.' comments... ';
+			foreach( $rows as $row )
+			{
+				$query = "UPDATE $tablecomments
+									SET comment_content = ".$DB->quote( stripslashes( $row['comment_content'] ) )."
+									WHERE comment_ID = ".$row['comment_ID'];
+				// echo '<br />'.$query;
+				$DB->query( $query );
+			}
+		}
+		echo "OK.<br />\n";
 	}
 
 	if( $old_db_version < 8070 )

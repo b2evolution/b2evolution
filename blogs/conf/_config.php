@@ -23,10 +23,9 @@ define( 'DB_PASSWORD', 'demopass' );  // ...and password
 define( 'DB_NAME', 'b2evolution' );   // the name of the database
 define( 'DB_HOST', 'localhost' );     // mySQL Server (typically 'localhost')
 
-/**
- * the tables prefix (gets placed before each b2evo table name),
- * use this to have multiple installations in one DB.
- */
+
+# the tables prefix (gets placed before each b2evo table name),
+# use this to have multiple installations in one DB.
 $tableprefix = 'evo_';
 
 
