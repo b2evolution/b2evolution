@@ -40,7 +40,8 @@ function upgrade_b2evo_tables()
 	{
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
-							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
+							MODIFY COLUMN user_pass CHAR(32) NOT NULL,
+							ADD COLUMN user_showonline TINYINT(1) NOT NULL DEFAULT '1'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -180,6 +181,7 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
+							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
 							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login',
 							ADD KEY user_grp_ID (user_grp_ID)";
