@@ -895,9 +895,7 @@ class Item extends DataObject
 		if( !empty( $this->url ) )
 		{
 			echo $before;
-			echo '<a href="', $this->url, '">';
-			echo format_to_output( $this->url, $format );
-			echo '</a>';
+			echo format_to_output( '<a href="'.$this->url.'">'.$this->url.'</a>', $format );
 			echo $after;
 		}
 	}

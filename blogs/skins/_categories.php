@@ -49,7 +49,7 @@
 			echo ' checked="checked"';
 		}
 		echo ' />';
-		echo "<a href=\"".get_bloginfo('blogurl').'?cat='.$cat_ID."\">".$cat['cat_name'].'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
+		echo "<a href=\"".get_bloginfo('blogurl').'?cat='.$cat_ID."\">".format_to_output($cat['cat_name'], 'htmlbody').'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
 		if( in_array( $cat_ID, $cat_array ) )
 		{	// This category is in the current selection
 			echo "*";
