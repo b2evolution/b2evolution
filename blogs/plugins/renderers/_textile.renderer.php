@@ -200,6 +200,10 @@ class textile_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2DATxtl';
 	var $priority = 20;
+	var $name = 'Textile';
+	var $short_desc;
+	var $long_desc;
+	
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true; 
 	var $apply_to_xml = true; 	// Strip the markup
@@ -223,7 +227,6 @@ class textile_Rendererplugin extends RendererPlugin
 	 */
 	function textile_Rendererplugin()
 	{
-		$this->name = T_('Textile');
 		$this->short_desc = T_('Humane Web Text Generator');
 		$this->long_desc = T_('No description available');
 	}

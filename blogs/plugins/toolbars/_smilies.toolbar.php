@@ -14,6 +14,9 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evSmil';
 	var $priority = 70;
+	var $name = 'Smilies';
+	var $short_desc;
+	var $long_desc;
 
 	/**
 	 * Smiley definitions
@@ -37,7 +40,6 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	 */
 	function smilies_Toolbarplugin()
 	{
-		$this->name = T_('Smilies');
 		$this->short_desc = T_('One click smilies inserting');
 		$this->long_desc = T_('No description available');
 

@@ -318,10 +318,14 @@
 	</div>
 	<?php
 	}
+	
+	if( $MainList->get_total_num_posts() )
+	{ // don't display navbar twice if we have no post
 	?>
 	<div class="bPost">
 		<?php require dirname(__FILE__). '/_edit_navbar.php'; ?>
 	</div>
+	<?php } ?>
 
 </div>
 

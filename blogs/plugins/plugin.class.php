@@ -23,6 +23,9 @@ class Plugin
 	 */
 	var $code = '';
 	var $priority = 50;
+	var $name = 'Unnamed plug-in';
+	var $short_desc;
+	var $long_desc;
 
 	/**#@-*/
 
@@ -33,7 +36,6 @@ class Plugin
 	 */
 	function Plugin()
 	{
-		$this->name = T_('Unnamed plug-in');
 		$this->short_desc = T_('No desc available');
 		$this->long_desc = T_('No description available');
 	}

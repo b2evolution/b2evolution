@@ -13,6 +13,10 @@ class texturize_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPTxrz';
 	var $priority = 90;
+	var $name = 'Texturize';
+	var $short_desc;
+	var $long_desc;
+	
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;
@@ -25,7 +29,6 @@ class texturize_Rendererplugin extends RendererPlugin
 	 */
 	function texturize_Rendererplugin()
 	{
-		$this->name = 'Texturize';
 		$this->short_desc = 'Smart quotes and more';
 		$this->long_desc = 'No description available';
 	}

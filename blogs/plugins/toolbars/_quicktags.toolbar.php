@@ -18,6 +18,9 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evQTag';
 	var $priority = 30;
+	var $name = 'Quick Tags';
+	var $short_desc;
+	var $long_desc;
 
 
 	/**
@@ -27,7 +30,6 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 	 */
 	function quicktags_Toolbarplugin()
 	{
-		$this->name = T_('Quick Tags');
 		$this->short_desc = T_('Easy HTML tags inserting');
 		$this->long_desc = T_('No description available');
 	}

@@ -14,6 +14,10 @@ class smilies_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evSmil';
 	var $priority = 80;
+	var $name = 'Smilies';
+	var $short_desc;
+	var $long_desc;
+	
 	var $apply_when = 'always';
 	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the smilies alone
@@ -54,7 +58,6 @@ class smilies_Rendererplugin extends RendererPlugin
 	 */
 	function smilies_Rendererplugin()
 	{
-		$this->name = T_('Smilies');
 		$this->short_desc = T_('Convert text smilies to icons');
 		$this->long_desc = T_('No description available');
 

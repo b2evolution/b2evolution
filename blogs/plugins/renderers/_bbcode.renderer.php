@@ -16,6 +16,10 @@ class bbcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evBBco';
 	var $priority = 43;
+	var $name = 'BB code';
+	var $short_desc;
+	var $long_desc;
+	
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;  // strip the BBcode
@@ -69,7 +73,6 @@ class bbcode_Rendererplugin extends RendererPlugin
 	 */
 	function bbcode_Rendererplugin()
 	{
-		$this->name = T_('BB code');
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
 		$this->long_desc = T_('No description available');
 	}

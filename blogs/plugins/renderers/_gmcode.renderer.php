@@ -16,6 +16,10 @@ class gmcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evGMco';
 	var $priority = 41;
+	var $name = 'GM code';
+	var $short_desc;
+	var $long_desc;
+	
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the GMcode markup
@@ -52,7 +56,6 @@ class gmcode_Rendererplugin extends RendererPlugin
 	 */
 	function gmcode_Rendererplugin()
 	{
-		$this->name = T_('GM code');
 		$this->short_desc = T_('GreyMatter style formatting');
 		$this->long_desc = T_('No description available');
 	}
