@@ -243,6 +243,13 @@
 
 
 	<div class="bSideItem">
+		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online') ?></h3>
+		<?$count = online_user_display('','<br />');?>
+		<? echo T_('Guest Users:') . $count['guests']; ?>
+        </div>
+
+
+	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>
 		<ul>
 			<?php
