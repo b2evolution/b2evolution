@@ -20,7 +20,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<th><?php echo T_('Name') ?></th>
 		<th><?php echo T_('Email') ?></th>
 		<th><?php echo T_('URL') ?></th>
-		<th<?php
+		<?php
+			echo '<th';
+			if( ! $current_User->check_perm( 'users', 'edit', false ) )
+			{ // This will be last col:
+				echo ' class="lastcol"';
+			}
 			if( $current_User->check_perm( 'users', 'edit', false ) )
 			{ // extra table cell for +/-
 				echo ' colspan="2"';
@@ -29,7 +34,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<?php
 			if( $current_User->check_perm( 'users', 'edit', false ) )
 			{
-				echo '<th>'.T_('Edit').'</th>';
+				echo '<th class="lastcol">'.T_('Edit').'</th>';
 			}
 		?>
 	</tr>
@@ -54,7 +59,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			{ // ---------- We just entered a new group! ----------
 				?>
 				<tr class="group">
-					<td colspan="7">
+					<td colspan="7" class="firstcol">
 						<strong><a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row->grp_name, 'htmlbody' ); ?></a></strong>
 						<?php
 							if( $loop_grp_ID == $Settings->get('newusers_grp_ID') )
@@ -68,7 +73,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 					{ // copy
 						?>
 						<td>&nbsp;</td>
-						<td>
+						<td class="lastcol">
 							<a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /></a>
 
 							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a>
@@ -101,9 +106,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				echo '<td><a href="b2users.php?user=', $loop_User->get('ID'), '">';
 				echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
 				echo $loop_User->get('login'), "</a></td>\n";
-				?>
-				<td><?php $loop_User->disp('nickname') ?></td>
-				<?php
+				echo '<td>';
+				$loop_User->disp('nickname');
+				echo '</td>';
 				echo '<td>', $loop_User->get('firstname').'&nbsp;'.$loop_User->get('lastname')."</td>\n";
 				echo '<td>&nbsp;';
 				if( !empty($email) )
@@ -138,7 +143,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 									.'" title="'.T_('increase user level').'">+</a> ';
 					}
 
-					echo '</td><td>';
+					echo '</td><td class="lastcol">';
 
 					// edit user
 					echo ' <a href="b2users.php?user=', $loop_User->get('ID'), '"><img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /></a> ';

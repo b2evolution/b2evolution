@@ -75,7 +75,8 @@ class AdminUI extends AdminUI_general
 				break;
 
 
-			default: // delegate to parent
+			default:
+				// Delegate to parent class:
 				return parent::getMenuTemplate( $name, $depth );
 		}
 	}

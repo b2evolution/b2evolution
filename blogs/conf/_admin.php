@@ -172,6 +172,4 @@ $fileupload_allowedusers = '';
  * @global int $maxlength_urlname_stub
  */
 $maxlength_urlname_stub = 30;
-
-
 ?>

@@ -269,60 +269,9 @@ class Results extends Widget
 			$this->params = & $display_params;
 		}
 		elseif( empty( $this->params ) )
-		{ // Set default params:
-			$this->params = array(
-				'before' => '<div class="results">',
-					'header_start' => '<div class="results_nav">',
-					'header_text' => '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$',
-					'header_text_single' => T_('1 page'),
-					'header_end' => '</div>',
-					'title_start' => "<div>\n",
-					'title_end' => "</div>\n",
-					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
-						'head_start' => "<thead><tr>\n",
-							'head_title' => '<th colspan="$nb_cols$">$title$</th></tr>'."\n\n<tr>\n",
-							'colhead_start' => '<th>',
-							'colhead_start_first' => '<th class="firstcol">',
-							'colhead_start_last' => '<th class="lastcol">',
-							'colhead_end' => "</th>\n",
-							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order').'" height="12" width="11" />',
-							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order').'" height="12" width="11" />',
-							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order').'" height="12" width="11" />',
-							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order').'" height="12" width="11" />',
-							'basic_sort_off' => '<img src="../admin/img/basic_sort_off.gif" width="16" height="16" />',
-							'basic_sort_asc' => '<img src="../admin/img/basic_sort_asc.gif" width="16" height="16" />',
-							'basic_sort_desc' => '<img src="../admin/img/basic_sort_desc.gif" width="16" height="16" />',
-						'head_end' => "</tr></thead>\n\n",
-						'tfoot_start' => "<tfoot>\n",
-						'tfoot_end' => "</tfoot>\n\n",
-						'body_start' => "<tbody>\n",
-							'line_start' => "<tr>\n",
-							'line_start_odd' => '<tr class="odd">'."\n",
-							'line_start_last' => '<tr class="lastline">'."\n",
-							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td>',
-								'col_start_first' => '<td class="firstcol">',
-								'col_start_last' => '<td class="lastcol">',
-								'col_end' => "</td>\n",
-							'line_end' => "</tr>\n\n",
-						'body_end' => "</tbody>\n\n",
-					'list_end' => "</table>\n\n",
-					'footer_start' => '<div class="results_nav">',
-					'footer_text' => /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
-														'<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$'
-														/* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
-					'footer_text_single' => T_('1 page'),
-						'prev_text' => T_('Previous'),
-						'next_text' => T_('Next'),
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
-						'list_span' => 11,
-						'scroll_list_range' => 5,
-					'footer_end' => "</div>\n\n",
-					'no_results' => T_('No results.'),
-				'after' => '</div>',
-				'sort_type' => 'basic'
-				);
+		{ // Set default params from Admin Skin:
+			global $AdminUI;
+			$this->params = $AdminUI->getMenuTemplate( 'Results' );
 		}
 
 		echo $this->params['before'];
@@ -946,6 +895,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.17  2005/03/21 17:38:01  fplanque
+ * results/table layout refactoring
+ *
  * Revision 1.16  2005/03/02 15:37:59  fplanque
  * experimentoing better count() automation :/
  *

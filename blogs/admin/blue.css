@@ -253,8 +253,9 @@ table.grouped th {
 	border-left: 1px solid #9e9286;
 	color: #9e9286;
 	background-color: #efede0;
-	font-weight: normal;
-	padding:0 1ex;
+	font-weight: bold;
+	padding-left: 1ex;
+	padding-right: 1ex;
 }
 
 table.grouped th a.basic_current,
@@ -855,6 +856,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.20  2005/03/21 17:37:57  fplanque
+ * results/table layout refactoring
+ *
  * Revision 1.19  2005/03/02 18:30:53  fplanque
  * tedious merging... :/
  *
