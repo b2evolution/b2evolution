@@ -1,4 +1,11 @@
-
+<?php 
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ */
+?>
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
 	<tr>
 		<td>

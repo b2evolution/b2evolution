@@ -1,4 +1,10 @@
 <?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ */
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = T_('Blogs');
 param( 'action' );

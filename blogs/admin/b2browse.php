@@ -9,6 +9,9 @@
  */
 require_once (dirname(__FILE__).'/_header.php');
 
+param( 'blog', 'integer', $default_to_blog, true );
+get_blogparams();
+
 $title = T_('Browse blog:');
 require (dirname(__FILE__).'/_menutop.php');
 echo '<span class="menutopbloglist">';

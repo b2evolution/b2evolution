@@ -1,3 +1,11 @@
+<?php 
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ */
+?>
 <div class="bPosts">
 	<div class="bPost">
 	<?php

@@ -1,5 +1,14 @@
 <?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ */
 require_once( dirname(__FILE__).'/_header.php' );
+
+param( 'blog', 'integer', $default_to_blog, true );
+get_blogparams();
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );

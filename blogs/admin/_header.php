@@ -14,9 +14,5 @@ require_once(dirname(__FILE__).'/../conf/_admin.php');
 $login_required = true;
 require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_main.php");
 
-param( 'blog', 'integer', $default_to_blog, true );
-if( $blog != '' ) 
-	get_blogparams();
-
 param( 'mode', 'string', '' );		// Sidebar, bookmarklet
 ?>

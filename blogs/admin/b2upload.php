@@ -1,5 +1,12 @@
 <?php
-/* b2 File Upload - original hack by shockingbird.com */
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * b2 File Upload - original hack by shockingbird.com
+ */
 require_once (dirname(__FILE__).'/_header.php');
 
 if ($user_level == 0) //Checks to see if user has logged in

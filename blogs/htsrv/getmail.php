@@ -1,17 +1,22 @@
 <?php
 /*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
  * pop3-2-b2 mail to blog
- * v0.3 20020716
+ * This file built upon code from original b2 - http://cafelog.com/
  */
 $output_debugging_info = 0;		# =1 if you want to output debugging info
  
 require_once(dirname(__FILE__).'/../conf/_config.php');
-require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions_template.php");
-require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions.php");
-require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_vars.php");
-require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_class_pop3.php");
-require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions_xmlrpc.php");
-require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_functions_xmlrpcs.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions_template.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_vars.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_class_pop3.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions_xmlrpc.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_functions_xmlrpcs.php");
 
 dbconnect();
 timer_start();

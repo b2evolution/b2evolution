@@ -9,9 +9,9 @@ require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_hitlogs.php');						// referer logging
 $title = T_('View Stats');
 
+param( 'blog', 'integer', 0, true );
 param( 'action', 'string' );
 param( 'show', 'string', 'referers' );
-param( 'blog', 'string', '' );
 
 require(dirname(__FILE__).'/_menutop.php');
 ?>
