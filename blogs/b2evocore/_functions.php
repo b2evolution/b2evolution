@@ -146,13 +146,12 @@ function format_to_output( $content, $format = 'htmlbody' )
 /*
  * format_to_edit(-)
  */
-function format_to_edit($content)
+function format_to_edit( $content, $autobr = false )
 {
-	global $autobr;
 	$content = stripslashes($content);
-	if ($autobr)
+	if( $autobr )
 	{
-		//echo "unBR</strong>";
+		// echo 'unBR:',htmlspecialchars(str_replace( ' ', '*', $content) );
 		$content = unautobrize($content);
 	}
 
@@ -245,11 +244,12 @@ function autobrize($content) {
 /*
  * unautobrize(-)
  */
-function unautobrize($content) {
+function unautobrize($content) 
+{
 	$content = preg_replace("/<br>\n/", "\n", $content);   //for PHP versions before 4.0.5
 	$content = preg_replace("/<br \/>\n/", "\n", $content);
 	return($content);
-	}
+}
 
 /*
  * zeroise(-)
@@ -730,7 +730,11 @@ function xmlrpc_getpostcategory($content) {
 	return($post_category);
 }
 
-function xmlrpc_removepostdata($content) {
+/*
+ * xmlrpc_removepostdata(-)
+ */
+function xmlrpc_removepostdata($content) 
+{
 	$content = preg_replace('/<title>(.+?)<\/title>/si', '', $content);
 	$content = preg_replace('/<category>(.+?)<\/category>/si', '', $content);
 	$content = trim($content);

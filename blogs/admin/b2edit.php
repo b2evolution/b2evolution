@@ -28,8 +28,8 @@ case "edit":
 	 */
 	param( "post", 'integer', true );
 	$postdata = get_postdata($post) or die( T_('Oops, no post with this ID.') );
-	$post_lang = $postdata["Lang"];
-	$cat = $postdata["Category"];
+	$post_lang = $postdata['Lang'];
+	$cat = $postdata['Category'];
 	$blog = get_catblog($cat); 
 
 	$title = T_('Editing post');
@@ -41,17 +41,17 @@ case "edit":
 
 	if ($user_level > 0) 
 	{
-		$authordata = get_userdata($postdata["Author_ID"]);
+		$authordata = get_userdata($postdata['Author_ID']);
 		if ($user_level < $authordata[13])
 			die("You don't have the right to edit <strong>".$authordata[1]."</strong>'s posts.");
 
-		$edited_post_title = format_to_edit($postdata["Title"]);
-		$post_url = format_to_edit( $postdata["Url"] );
-		$content = format_to_edit( $postdata["Content"] );
-		$autobr = $postdata["AutoBR"];
+		$edited_post_title = format_to_edit($postdata['Title']);
+		$post_url = format_to_edit( $postdata['Url'] );
+		$autobr = $postdata['AutoBR'];
+		$content = format_to_edit( $postdata['Content'], $autobr );
 		$post_pingback = 0;
 		$post_trackbacks = '';
-		$post_status = $postdata["Status"];
+		$post_status = $postdata['Status'];
 		$post_extracats = postcats_get_byID( $post );
 		$edit_date = 0;
 		$aa = mysql2date('Y', $postdata['Date']);
@@ -93,7 +93,7 @@ case "editcomment":
 	}
 
 	$content = $commentdata['comment_content'];
-	$content = format_to_edit($content);
+	$content = format_to_edit($content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') );
 	$edit_date = 0;
 	$aa = mysql2date('Y', $commentdata['comment_date']);
 	$mm = mysql2date('m', $commentdata['comment_date']);
@@ -168,11 +168,11 @@ default:
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
 		param( 'content', 'html', $text );
-		$content = format_to_edit( $content );
+		$content = format_to_edit( $content, false );
 		param( 'post_title', 'html', $popuptitle );
-		$edited_post_title = format_to_edit( $post_title );
+		$edited_post_title = format_to_edit( $post_title, false );
 		param( 'post_url', 'string', $popupurl );
-		$post_url = format_to_edit( $post_url );
+		$post_url = format_to_edit( $post_url, false );
 		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_lang', 'string', $default_language );
