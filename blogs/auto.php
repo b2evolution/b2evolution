@@ -1,7 +1,10 @@
+
+<?PHP
+
 //New Auto.php mailing list sender, updated to work with SQL
 //Revisions to date checking, send mailing list, allowing for specific emails
 //to users based on preferences.
-<?PHP
+
 require_once (dirname(__FILE__).'/conf/_config.php');
 $my_date = date("Y-m-d H:i:s",$my_date); //Get todays date
 $its_date="";
@@ -23,16 +26,19 @@ $i=0;
 
 //Query for for some basic params for mailinglist.
  
-$sql = "SELECT mail_list_last_run ";
+$sql = "SELECT mail_list_last_run, mail_list_nick, mail_list_subject, mail_list_address ";
 $sql .= "FROM $tablesettings";
 $result =  mysql_query($sql);
 
 $row = mysql_fetch_object($result);
-$last_run = $row->mail_list_last_run;        
+$last_run = $row->mail_list_last_run;
+$subject = $row->mail_list_subject;
+$nick = $row->mail_list_nick;
+$address = $row->mail_list_address;        
 
 //If the script hasn't been run today, let's go!
-//if( strtotime($last_run) < strtotime( date("Ymd") ) )
-//{
+if( strtotime($last_run) < strtotime( date("Ymd") ) )
+{
         //Update time stamp on mailing list
         $stamp=date("Ymd");
         $sql = "UPDATE $tablesettings ";
@@ -41,9 +47,9 @@ $last_run = $row->mail_list_last_run;
         
         
         $last_run = strtotime($last_run);
-        echo " * $last_run *"; 
+ 
         $last_run=date("Y-m-d H:i:s",$last_run);
-        echo " * $last_run *";
+
         
         
         //Query for Post Data, Sort into an array of categories not updated yet
@@ -52,7 +58,7 @@ $last_run = $row->mail_list_last_run;
         $result = mysql_query($sql);
         while( $row = mysql_fetch_object($result) )
         {
-                echo "$last_run $row->post_date \n";
+                
                 $found=1;
                 $j=0;
                 foreach($post_cat as $cat_num)
@@ -74,9 +80,6 @@ $last_run = $row->mail_list_last_run;
          
         }
         
-        //FOR TESTING--REMOVE FOR FINISHED
-        foreach($post_cat as $cat) echo "* $cat *";
-        foreach($post_count as $cat) echo "- $cat -";
         
         $i=0;
         $sql = "SELECT cat_ID, cat_name ";
@@ -95,8 +98,6 @@ $last_run = $row->mail_list_last_run;
                 }
         }
         
-        //FOR TESTING ONLY
-        foreach($cat_name as $cat) echo "- $cat -";
         
         $sql = "SELECT email_address, ID, cat_subscribe ";
         $sql .= "FROM $tablemailinglist";
@@ -143,17 +144,16 @@ $last_run = $row->mail_list_last_run;
         ------------------------------------------------------------------------------------- ";
         
         //Send the email.
-        echo "\n $body";
-        echo "\n $email_address";
-	echo "\n $sendmail";
-        //if($sendmail==1) mail($email_address, $subject, $body, "From: $nick <$address>");
+     
+        if($sendmail==1) mail($email_address, $subject, $body, "From: $nick <$address>");
         
-        //}
+      
 }
-//}
-//else
-//{
-//        echo "I've been run already";
-//}
+        echo "The script has been run. You will not be able to run it again until tomorrow.";
+}
+else
+{
+        echo "The script has already been run today.";
+}
 
 ?>
