@@ -168,10 +168,32 @@ class BlogCache extends DataObjectCache
 
 		return $bloglist;
 	}
+
+	/**
+	 * Display form option list with cache contents
+	 *
+	 * Loads the whole cache!!!
+	 *
+	 * {@internal BlogCache::option_list(-) }}
+	 *
+	 * @todo is it good to load all entries here? check usage! (Default blog/linkblog selecrtion, MT plugin...)
+	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID 0
+	 */
+	function option_list( $default = 0, $allow_none = false )
+	{
+		// We force a full load!
+		$this->load_all();
+	
+		parent::option_list( $default, $allow_none, 'prefered_name' );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/21 21:22:46  fplanque
+ * factoring/cleanup
+ *
  * Revision 1.3  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

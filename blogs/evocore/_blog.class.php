@@ -586,10 +586,24 @@ class Blog extends DataObject
 		echo '<br />Done.</p>';
 	}
 
+
+	/**
+	 * Template function: display name of blog
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function name( $format = 'htmlbody' )
+	{
+		$this->disp( 'name', $format );
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/21 21:22:46  fplanque
+ * factoring/cleanup
+ *
  * Revision 1.4  2004/12/15 20:50:33  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

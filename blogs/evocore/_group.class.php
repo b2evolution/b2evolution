@@ -193,10 +193,24 @@ class Group extends DataObject
 		return false;	// Permission denied!
 	}
 	
+
+	/**
+	 * Template function: display name of blog
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function name( $format = 'htmlbody' )
+	{
+		$this->disp( 'name', $format );
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/21 21:22:46  fplanque
+ * factoring/cleanup
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

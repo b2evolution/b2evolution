@@ -283,12 +283,12 @@ function form_select_object(
 	echo '  <div class="input"><select name="', $field_name, '" id="', $field_name, '"';
 	if( !empty($field_class) )
 	{
-		echo ' class="', $field_class,'"';
+		echo ' class="'.$field_class.'"';
 	}
 	echo '>';
 	$field_object->option_list( $field_value, $allow_none );
 	echo '  </select>';
-	echo '  <span class="notes">', $field_note, '</span></div>';
+	echo '  <span class="notes">'.$field_note.'</span></div>';
 	echo "</fieldset>\n\n";
 }
 
@@ -498,6 +498,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/21 21:22:46  fplanque
+ * factoring/cleanup
+ *
  * Revision 1.6  2004/11/26 19:38:35  fplanque
  * no message
  *

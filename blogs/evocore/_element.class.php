@@ -88,10 +88,25 @@ class Element extends DataObject
  		$Debuglog->add( "Created element <strong>$this->name</strong>" );
 
 	}
+
+
+	/**
+	 * Template function: display name of item
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function name( $format = 'htmlbody' )
+	{
+		$this->disp( 'name', $format );
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/21 21:22:46  fplanque
+ * factoring/cleanup
+ *
  * Revision 1.1  2004/12/17 20:38:52  fplanque
  * started extending item/post capabilities (extra status, type)
  *
