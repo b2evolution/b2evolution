@@ -35,7 +35,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Includes:
  */
-$error_head = '';
 param( 'action', 'string', 'list' );
 
 /**
@@ -52,11 +51,12 @@ switch( $action )
 														WHERE $edited_table_IDcol = $ID" );
 		if( $DB->num_rows != 1 )
 		{
-			$error_head = T_('Cannot edit entry!');
+			$Messages->head = T_('Cannot edit entry!');
 			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
 			$action = 'list';
 		}
 		break;
+
 
 	case 'create':
 		// Insert into database...:
@@ -98,7 +98,7 @@ switch( $action )
 
 			if( $DB->rows_affected != 1 )
 			{
-				$error_head = T_('Cannot delete entry!');
+				$Messages->head = T_('Cannot delete entry!');
 				$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
 			}
 			else
@@ -121,16 +121,11 @@ switch( $action )
  */
 require dirname(__FILE__).'/_menutop.php';
 
+
 // Display messages:
 if( $Messages->count( 'all' ) )
 { // we have errors/notes
-	?>
-	<div class="panelinfo">
-	<?php
-		$Messages->display( $error_head, '', true, 'all' );
-	?>
-	</div>
-	<?php
+	$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'panelinfo' );
 }
 
 
@@ -146,22 +141,22 @@ if( ($action == 'delete') && !$confirm )
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 		<p>
-
+		
 		<?php
 		$Form = & new Form( '', 'form', 'get' );
-
-		$Form->begin_form( 'inline' );
+	
+		$Form->begin_form( 'inline' );		
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
-
+		
 		$Form->begin_form( 'inline' );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
 		?>
-
+		
 		</p>
 
 	</div>
@@ -169,7 +164,11 @@ if( ($action == 'delete') && !$confirm )
 }
 
 
+// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
 $AdminUI->dispSubmenu();
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+
 
 // Create result set:
 $Results = new Results(	"SELECT $edited_table_IDcol, $edited_table_namecol
@@ -209,11 +208,23 @@ if( isset( $results_params ) )
 
 $Results->display();
 
+// FORM:
+switch( $action )
+{
+	case 'edit':
+	case 'delete':
+		$creating = false;
+		break;
+
+	default:
+		$creating = true;
+}
+
 $Form = & new form( '', 'form' );
 
-$Form->begin_form( 'fform', ( $action != 'edit' ) ? T_('New entry') : T_('Edit entry') );
+$Form->begin_form( 'fform', $creating ? T_('New entry') : T_('Edit entry') );
 
-$Form->hidden( 'action', ($action != 'edit' ) ? 'create' : 'update' );
+$Form->hidden( 'action', $creating ? 'create' : 'update' );
 
 if( $action == 'edit' )
 {
@@ -223,7 +234,7 @@ if( $action == 'edit' )
 
 $Form->text( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', $edited_name_maxlen );
 
-if( $action != 'edit' )
+if( $creating )
 {
 	$Form->end_form( array( array( '', '', T_('Record'), 'SaveButton' ),
 									 array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );

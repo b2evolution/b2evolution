@@ -42,8 +42,8 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-
-class AdminUI_general extends Widget
+// fp>>daniel: I don't think this is a widget!
+class AdminUI_general
 {
 	/**
 	 * The menus.
@@ -86,30 +86,60 @@ class AdminUI_general extends Widget
 
 
 	/**
+	 * Displays a menu, any level.
 	 *
-	 *
+	 * @param f*g undocumented, NULL will display main menu
+	 * @param f*g undocumented {@link what?}
 	 * @return
 	 */
-	function dispMenu( $path, $template = 'main' )
+	function dispMenu( $path = NULL, $template = 'main' )
 	{
+		//echo ' dispMenu-BEGIN ';
 		echo $this->getHtmlMenuEntries( $path, $template );
+		//echo ' dispMenu-END ';
 	}
 
 
 	/**
-	 * Display a submenu.
+	 * Display a submenu (1st sublevel).
 	 *
 	 * @param array|NULL Path of the menu to display.
 	 * @return
 	 */
 	function dispSubmenu( $path = NULL )
 	{
+		//echo ' dispSubmenu-BEGIN ';
+
 		if( is_null($path) )
 		{
 			$path = array( $this->getPath(0) );
 		}
 
 		$this->dispMenu( $path, 'sub' );
+
+  	//echo ' dispSubmenu-END ';
+	}
+
+
+	/**
+	 * Display the end of the payload block
+	 */
+	function dispPayloadBegin()
+	{
+		// fp>> In current skins this merged with the SubMenu (tabs)
+		// fp>> I don't understand the templating stuff well enough to implement it right now...
+	}
+
+
+	/**
+	 * Display the end of the payload block
+	 *
+	 * Was: _sub_end.inc.php
+	 */
+	function dispPayloadEnd()
+	{
+		// fp>> I don't understand the templating stuff well enough to implement it right now...
+		echo "</div>\n";
 	}
 
 
@@ -292,6 +322,7 @@ class AdminUI_general extends Widget
 	 * This is a method (and not a member array) to allow dynamic generation.
 	 *
 	 * @param string Name of the template ('main', 'sub')
+	 * @param YEAH, WHAT????
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
 	function getMenuTemplate( $name, $depth = 0 )
@@ -301,7 +332,8 @@ class AdminUI_general extends Widget
 			case 'main':
 				switch( $depth )
 				{
-					case 0: // main level
+					case 0:
+						// main level
 						global $app_shortname, $app_version;
 
 						return array( 'before' => '<div id="mainmenu"><ul>',
@@ -318,7 +350,9 @@ class AdminUI_general extends Widget
 															'recurseSelected' => true,  // recurse for subentries if an entry is selected
 														),
 												);
+
 					default:
+						// What the fck ???
 						return array( 'before' => '<ul class="submenu">',
 													'after' => '</ul>',
 													'beforeEach' => '<li>',
@@ -330,7 +364,8 @@ class AdminUI_general extends Widget
 
 				break;
 
-			case 'sub': // submenu, we support just one sub-level
+			case 'sub':
+				// submenu, we support just one sub-level
 				return array(
 						'before' => '<div class="pt">'
 												."\n".'<ul class="hack">'

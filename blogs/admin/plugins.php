@@ -47,8 +47,12 @@ require( dirname(__FILE__). '/_menutop.php' );
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->dispSubmenu();
 
+// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
+$AdminUI->dispSubmenu();
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+ 
 
 // Discover additional plugins:
 $AvailablePlugins = & new Plugins();
@@ -97,7 +101,8 @@ $Messages->displayParagraphs( 'note' );
 
 require dirname(__FILE__).'/_set_plugins.form.php';
 
-require dirname(__FILE__).'/_sub_end.inc.php';
+// End payload block:
+$AdminUI->dispPayloadEnd();
 
 require dirname(__FILE__).'/_footer.php';
 ?>

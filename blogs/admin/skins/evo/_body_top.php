@@ -85,7 +85,8 @@ if( empty($mode) )
 	</div>
 
 	<?php
-	$AdminUI->dispMenu( NULL );
+	// Display MAIN menu:
+	$AdminUI->dispMenu();
 	?>
 
 

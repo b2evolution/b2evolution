@@ -359,7 +359,11 @@ switch($action)
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		}
 
+		// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
 		$AdminUI->dispSubmenu();
+		// Begin payload block:
+		$AdminUI->dispPayloadBegin();
+
 
 		switch( $AdminUI->getPath(1) )
 		{
@@ -393,7 +397,10 @@ switch($action)
 				require( dirname(__FILE__).'/_blogs_advanced.form.php' );
 				break;
 		}
-		require dirname(__FILE__).'/_sub_end.inc.php';
+
+		// End payload block:
+		$AdminUI->dispPayloadEnd();
+
 		break;
 
 
@@ -571,6 +578,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.30  2005/03/04 18:40:27  fplanque
+ * added Payload display wrappers to admin skin object
+ *
  * Revision 1.29  2005/03/02 17:07:33  blueyed
  * no message
  *

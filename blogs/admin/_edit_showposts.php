@@ -10,7 +10,11 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
 $AdminUI->dispSubmenu();
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+
 ?>
 <div class="left_col">
 	<div class="NavBar">
@@ -624,7 +628,7 @@ $AdminUI->dispSubmenu();
 <div class="clear"></div>
 <?php
 
-// End block:
-require dirname(__FILE__).'/_sub_end.inc.php';
+// End payload block:
+$AdminUI->dispPayloadEnd();
 
 ?>

@@ -109,11 +109,15 @@ $Messages->displayParagraphs( 'all' );
 // Check permission to view:
 $current_User->check_perm( 'options', 'view', true );
 
+// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
 $AdminUI->dispSubmenu();
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
 
 require dirname(__FILE__).'/_set_files.form.php';
 
-require dirname(__FILE__).'/_sub_end.inc.php';
+// End payload block:
+$AdminUI->dispPayloadEnd();
 
 require dirname(__FILE__).'/_footer.php';
 ?>

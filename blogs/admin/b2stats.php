@@ -84,7 +84,10 @@ $current_User->check_perm( 'stats', 'view', true );
  * Not fully functional..
  */
 Log::display( '', '', 'This is not working due to hitlog refactoring, sorry.', 'note' );
-require dirname(__FILE__).'/_sub_end.inc.php';
+
+// End payload block:
+$AdminUI->dispPayloadEnd();
+
 require dirname(__FILE__).'/_footer.php';
 return;
 
@@ -141,7 +144,11 @@ switch( $action )
 }
 
 
+// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
 $AdminUI->dispSubmenu();
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+
 
 switch( $AdminUI->getPath(1) )
 {
@@ -811,7 +818,8 @@ switch( $AdminUI->getPath(1) )
 			break;
 }
 
-require dirname(__FILE__).'/_sub_end.inc.php';
+// End payload block:
+$AdminUI->dispPayloadEnd();
 
 require dirname(__FILE__).'/_footer.php';
 ?>

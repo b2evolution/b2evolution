@@ -42,7 +42,11 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
+// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
 $AdminUI->dispSubmenu();
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+
 
 ?>
 
@@ -676,11 +680,14 @@ param( 'options_show', 'integer', 0 );
 <div class="clear"></div>
 
 <?php
-// Display submenu:
-require dirname(__FILE__).'/_sub_end.inc.php';
+// End payload block:
+$AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.13  2005/03/04 18:40:26  fplanque
+ * added Payload display wrappers to admin skin object
+ *
  * Revision 1.12  2005/02/28 09:06:37  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
