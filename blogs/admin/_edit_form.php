@@ -41,11 +41,10 @@ if ($use_spellchecker)
 		var saved_action =  form.attributes.getNamedItem('action').value;
 		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
 		form.target = 'b2evo_preview';
-		// FP: Daniel please explain why you want to move this from here:
-		form.submit();
 		preview_window = window.open( '', 'b2evo_preview' );
 		preview_window.focus();
-		// to here: form.submit();
+		// submit after target window is created.
+		form.submit();
 		form.attributes.getNamedItem('action').value = saved_action;
 		form.target = '_self';
 	}

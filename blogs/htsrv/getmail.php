@@ -206,7 +206,6 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 
 	$userdata = get_userdatabylogin($user_login);
 	$loop_User = & new User( $userdata );
-	$post_author = $userdata['ID'];
 
 	// --- get infos from content -----------
 	$post_title = xmlrpc_getposttitle($content);
@@ -247,7 +246,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 		}
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', $default_locale, '',	$Settings->get('AutoBR'), true );
+		$post_ID = bpost_create( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{

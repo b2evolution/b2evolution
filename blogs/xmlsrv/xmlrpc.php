@@ -69,7 +69,7 @@ function b2newpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $DB;
 	global $cafelogID, $sleep_after_edit;
-	global $Settings;
+	global $Settings, $Messages;
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
