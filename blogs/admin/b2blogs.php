@@ -173,8 +173,8 @@ switch($action)
 
 		?>
 		<p><strong><?php 
-			printf( T_('You should <a href="%s">create categories</a> for this blog now!'), 
-			'b2categories.php?action=newcat&blog_ID=' . $blog_ID );
+			printf( T_('You should <a %s>create categories</a> for this blog now!'), 
+			'href="b2categories.php?action=newcat&blog_ID='.$blog_ID.'"' );
 		?></strong></p>
 		</div>
 		<?php
@@ -364,9 +364,7 @@ switch($action)
 			<div class="panelinfo">
 				<h3>
 				<?php 
-					echo T_('Generating static page for blog [');
-					$edited_Blog->disp('name');
-					echo ']'; 
+					printf( T_('Generating static page for blog [%s]'), $edited_Blog->get('name') );
 				?>
 				</h3>
 		<?php

@@ -71,7 +71,7 @@ switch ($action)
 		
 		if( $q !== NULL )
 		{
-			errors_add( sprintf( T_('The login already exists. Please <a href="%s">edit this login</a> instead of overwriting it this way.'), '?user='.$q ));
+			errors_add( sprintf( T_('The login already exists. Please <a %s>edit this login</a> instead of overwriting it this way.'), 'href="?user='.$q.'"' ));
 		}
 		
 		if( $edited_user_ID == 0 )
@@ -192,7 +192,7 @@ switch ($action)
 			if( $result )
 				echo '<div class="panelinfo"><p>'.T_('User promoted.');
 			else
-				echo '<div class="panelinfo"><p class="error">' . sprintf(T_('Couldn\'t change %d\'s level.', $id));
+				echo '<div class="panelinfo"><p class="error">' . sprintf( T_('Couldn\'t change %s\'s level.'), $user_data['user_login'] );
 			echo '</p></div>';
 			
 			// reset cache

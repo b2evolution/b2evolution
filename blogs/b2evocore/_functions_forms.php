@@ -47,6 +47,7 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
 	echo "</tr>\n\n";
 }
 
+
 /*
  * form_select(-)
  */
@@ -128,6 +129,7 @@ function form_radio(
 	echo "</fieldset>\n\n";
 }
 
+
 /*
  * form_checkbox(-)
  */
@@ -148,6 +150,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";
 }
+
 
 /*
  * form_checkbox_tr(-)
@@ -181,6 +184,5 @@ function form_info( $field_label, $field_info )
 	echo '  <div class="input" style="padding-top: .6ex;">', $field_info, '</div>';
 	echo "</fieldset>\n\n";
 }
-
 
 ?>

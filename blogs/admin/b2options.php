@@ -12,6 +12,7 @@
 require( dirname(__FILE__). '/_header.php' );
 $admin_tab = 'options';
 $admin_pagetitle = T_('Settings');
+
 param( 'action', 'string' );
 param( 'tab', 'string', 'general' );
 param( 'prioup', 'string', '' );
@@ -35,7 +36,7 @@ require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
 
-if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
+if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract' ))
 		|| !empty($prioup) || !empty($priodown) || !empty($delete)
 	)
 {
@@ -79,7 +80,7 @@ if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
 
 
 		case 'regional':
-			switch( $action )
+		switch( $action )
 			{ // in case of regional actions
 				// UPDATE regional settings
 				case 'update':
@@ -106,8 +107,15 @@ if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
 					break;
 				
 				// CREATE/EDIT locale
-				case 'createnew':
+				case 'updatelocale':
+				case 'createlocale':
 					param( 'newloc_locale', 'string', true);
+					if( empty($newloc_locale) )
+					{
+						$status_update[] = '<span class="error">'.T_('You must not create empty locales!').'</span>';
+						break;
+					}
+					
 					param( 'newloc_enabled', 'integer', 0);
 					param( 'newloc_name', 'string', true);
 					param( 'newloc_charset', 'string', true);
@@ -115,24 +123,59 @@ if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
 					param( 'newloc_timefmt', 'string', true);
 					param( 'newloc_messages', 'string', true);
 					
-					$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
-						VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt', '$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
-					$q = $DB->query($query);
-					
-					if( mysql_affected_rows() )
+					if( $action == 'updatelocale' )
 					{
-						if( mysql_affected_rows() == 2)
-						{
-							$status_update[] = sprintf(T_("Updated locale '%s'."), $newloc_locale);
+						param( 'oldloc_locale', 'string', true);
+						
+						$query = "SELECT loc_locale FROM $tablelocales WHERE loc_locale = '$oldloc_locale'";
+						if( !$DB->get_var( $query ) )
+						{ // old locale is not in DB yet. Insert and disable it.
+							$query = "INSERT INTO $tablelocales
+												( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
+												VALUES ( '$oldloc_locale',
+												'{$locales[$oldloc_locale]['charset']}', '{$locales[$oldloc_locale]['datefmt']}',
+												'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['name']}',
+												'{$locales[$oldloc_locale]['messages']}', '{$locales[$oldloc_locale]['priority']}', 0)";
+							$q = $DB->query($query);
+							$status_update[] = sprintf(T_("Inserted locale '%s' into database."), $oldloc_locale);
+						}
+						
+						if( $oldloc_locale != $newloc_locale )
+						{ // locale key was renamed, we remember to create the new one
+							$l_insertnew = 1;
 						}
 						else
+						{	// update database
+							$query = "UPDATE $tablelocales
+												SET loc_locale = '$newloc_locale', loc_charset = '$newloc_charset', loc_datefmt = '$newloc_datefmt',
+												loc_timefmt = '$newloc_timefmt', loc_name = '$newloc_name', loc_messages = '$newloc_messages',
+												loc_enabled = '$newloc_enabled'
+												WHERE loc_locale = '$oldloc_locale'";
+							$q = $DB->query($query);
+							$status_update[] = sprintf(T_("Updated locale '%s'."), $newloc_locale);
+						}
+					}
+					
+					if( $action == 'createlocale' || isset( $l_insertnew ) )
+					{
+						$query = "REPLACE INTO $tablelocales
+											( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
+											VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
+											'$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
+						$q = $DB->query($query);
+						if( mysql_affected_rows() == 1)
 						{
 							$status_update[] = sprintf(T_("Created locale '%s'."), $newloc_locale);
 						}
+						else
+						{
+							$status_update[] = sprintf(T_("Updated locale '%s'."), $newloc_locale);
+						}
 					}
+
 					break;
 
-				
+
 				// RESET locales in DB
 				case 'reset':
 					// reload locales

@@ -375,7 +375,7 @@ function locale_overwritefromDB()
 	global $tablelocales, $DB, $locales, $default_locale;
 	
 	$usedprios = array();  // remember which priorities are used already.
-	
+	$priocounter = 0;
 	$query = 'SELECT
 						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name,
 						loc_messages, loc_priority, loc_enabled
@@ -383,15 +383,26 @@ function locale_overwritefromDB()
 	$rows = $DB->get_results( $query, ARRAY_A );
 	if( count( $rows ) ) foreach( $rows as $row )
 	{	// Loop through loaded locales:
-		$usedprios[] = $row['loc_priority'];
-				
+		
+		if( $row['loc_priority'] == $priocounter )
+		{ // priority conflict (the same)
+			$priocounter++;
+		}
+		else
+		{
+			$priocounter = $row['loc_priority'];
+		}
+		
+		//remember that we used this
+		$usedprios[] = $priocounter;
+		
 		$locales[ $row['loc_locale'] ] = array(
 																			'charset'  => $row[ 'loc_charset' ],
 																			'datefmt'  => $row[ 'loc_datefmt' ],
 																			'timefmt'  => $row[ 'loc_timefmt' ],
 																			'name'     => $row[ 'loc_name' ],
 																			'messages' => $row[ 'loc_messages' ],
-																			'priority' => $row[ 'loc_priority' ],
+																			'priority' => $priocounter,
 																			'enabled'  => $row[ 'loc_enabled' ],
 																			'fromdb'   => 1
 																		);
