@@ -353,7 +353,8 @@ to
 		T_('mySQL Password').': '.((DB_PASSWORD != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
 		T_('mySQL Database').': '.DB_NAME."\n".
 		T_('mySQL Host').': '.DB_HOST."\n\n".
-		T_('Base URL').': '.$baseurl.
+		T_('Base URL').': '.$baseurl."\n".
+		T_('Your email').': '.$admin_email.
 		'</pre>'; 
 		break;
 

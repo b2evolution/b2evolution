@@ -94,7 +94,7 @@ function create_b2evo_tables()
 		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
 		blog_force_skin TINYINT(1) NOT NULL default 0,
 		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-		blog_linkblog INT(4) INT(4) NOT NULL DEFAUL 0,
+		blog_linkblog INT(4) NOT NULL DEFAULT 0,
 		blog_public TINYINT(1) NOT NULL DEFAULT 1,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	 (blog_ID)
@@ -459,7 +459,7 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_ID = 4;
-	$blog_listblog_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_linkblog_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	echo "OK.<br />\n";
 
