@@ -119,15 +119,15 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'pingweblogs',     param( 'blog_pingweblogs',     'integer', 0 ) );
 			$edited_Blog->set( 'pingblodotgs',    param( 'blog_pingblodotgs',    'integer', 0 ) );
 			$edited_Blog->set( 'media_location',  param( 'blog_media_location',  'string', 'default' ) );
-			$edited_Blog->set( 'media_subdir',    param( 'blog_media_subdir',    'string', '' ) );
-			$edited_Blog->set( 'media_fullpath',  param( 'blog_media_fullpath',  'string', '' ) );
-			$edited_Blog->set( 'media_url',       param( 'blog_media_url',       'string', '' ) );
+			$edited_Blog->setMediaSubDir(         param( 'blog_media_subdir',    'string', '' ) );
+			$edited_Blog->setMediaFullPath(       param( 'blog_media_fullpath',  'string', '' ) );
+			$edited_Blog->setMediaUrl(            param( 'blog_media_url',       'string', '' ) );
 
 			// check params
 			switch( $edited_Blog->get( 'media_location' ) )
 			{
 				case 'custom': // custom path and URL
-					if( '' == $edited_Blog->get( 'media_fullpath' ) )  // TODO: check for slashes/real path
+					if( '' == $edited_Blog->get( 'media_fullpath' ) )
 					{
 						$Messages->add( T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
 					}
@@ -138,7 +138,7 @@ function set_edited_Blog_from_params( $for )
 					break;
 
 				case 'subdir':
-					if( '' == $edited_Blog->get( 'media_subdir' ) )  // TODO: check for slashes/real path
+					if( '' == $edited_Blog->get( 'media_subdir' ) )
 					{
 						$Messages->add( T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
 					}

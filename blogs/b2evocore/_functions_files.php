@@ -151,7 +151,14 @@ function imgsize( $path, $param )
  */
 function trailing_slash( $path )
 {
-	return( substr( $path, -1 ) == '/' ? $path : $path.'/' );
+	if( empty($path) || substr( $path, -1 ) == '/' )
+	{
+		return $path;
+	}
+	else
+	{
+		return $path.'/';
+	}
 }
 
 

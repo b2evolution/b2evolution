@@ -366,7 +366,7 @@ class FileManager extends Filelist
 		}
 
 		$r[] = array( 'type' => 'user',
-										'name' => T_('Your media folder') );
+										'name' => T_('My media folder') );
 
 		return $r;
 	}

@@ -280,7 +280,7 @@ $start_of_week = 1;
  * Warning: do *not* extract .PO files you have not edited yourself.
  * Shipped .PO files contain automatic translations that have *not* been reviewed.
  *
- * @param boolean
+ * @global boolean
  */
 $allow_po_extraction = 0;
 

@@ -173,7 +173,7 @@ class User extends DataObject
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The user's directory %s has been created with permissions %s."), $userdir, '777' ), 'note' );
+				$Messages->add( sprintf( T_("The user's directory [%s] has been created with permissions %s."), $userdir, '777' ), 'note' );
 			}
 		}
 		return $userdir;

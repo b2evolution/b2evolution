@@ -14,17 +14,18 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Includes:
  */
-require_once dirname(__FILE__).'/_functions_cats.php';
+require_once dirname(__FILE__).'/_functions_antispam.php';
 require_once dirname(__FILE__).'/_functions_blogs.php';
 require_once dirname(__FILE__).'/_functions_bposts.php';
-require_once dirname(__FILE__).'/_functions_users.php';
-require_once dirname(__FILE__).'/_functions_trackback.php';
+require_once dirname(__FILE__).'/_functions_cats.php';
+require_once dirname(__FILE__).'/_functions_files.php';
+require_once dirname(__FILE__).'/_functions_message.php';
+require_once dirname(__FILE__).'/_functions_onlineusers.php';
 require_once dirname(__FILE__).'/_functions_pingback.php';
 require_once dirname(__FILE__).'/_functions_pings.php';
 require_once dirname(__FILE__).'/_functions_skins.php';
-require_once dirname(__FILE__).'/_functions_antispam.php';
-require_once dirname(__FILE__).'/_functions_onlineusers.php';
-require_once dirname(__FILE__).'/_functions_message.php';
+require_once dirname(__FILE__).'/_functions_trackback.php';
+require_once dirname(__FILE__).'/_functions_users.php';
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
 if( $use_html_checker ) require_once dirname(__FILE__).'/_class_htmlchecker.php';
 

@@ -73,7 +73,7 @@ class Blog extends DataObject
 	var $links_blog_ID = 0;
 	var $notes;
 	var $keywords;
-	var $allowcomments = 'post_by_post';	
+	var $allowcomments = 'post_by_post';
 	var $allowtrackbacks = 0;
 	var $allowpingbacks = 0;
 	var $pingb2evonet = 0;
@@ -153,6 +153,39 @@ class Blog extends DataObject
 
 
 	/**
+	 * Set the media folder's subdir
+	 *
+	 * @param string the subdirectory
+	 */
+	function setMediaSubDir( $path )
+	{
+		parent::set_param( 'media_subdir', 'string', trailing_slash( $path ) );
+	}
+
+
+	/**
+	 * Set the full path of the media folder
+	 *
+	 * @param string the full path
+	 */
+	function setMediaFullPath( $path )
+	{
+		parent::set_param( 'media_fullpath', 'string', trailing_slash( $path ) );
+	}
+
+
+	/**
+	 * Set the full URL of the media folder
+	 *
+	 * @param string the full URL
+	 */
+	function setMediaUrl( $url )
+	{
+		parent::set_param( 'media_url', 'string', trailing_slash( $url ) );
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * {@internal Blog::set(-) }}
@@ -191,6 +224,7 @@ class Blog extends DataObject
 				parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
+
 
 	/**
 	 * Generate blog URL
@@ -268,17 +302,38 @@ class Blog extends DataObject
 	 */
 	function gen_mediadir( $absolute = true )
 	{
-		global $basepath, $media_subdir;
+		global $basepath, $media_subdir, $Messages;
 
 		switch( $this->media_location )
 		{
 			case 'default':
-				return $absolute ? $basepath.$media_subdir.'blogs/'.$this->urlname : $this->urlname;
+				$mediadir = $basepath.$media_subdir.'blogs/'.$this->urlname;
+				break;
 			case 'subdir':
-				return $absolute ? $basepath.$media_subdir.'blogs/'.$this->media_subdir : $this->media_subdir;
+				$mediadir = $basepath.$media_subdir.'blogs/'.$this->media_subdir;
+				break;
 			case 'custom':
-				return $absolute ? $this->media_fullpath : preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $this->media_fullpath );
+				$mediadir = $this->media_fullpath;
+				break;
 		}
+
+		if( !is_dir( $mediadir ) )
+		{
+			if( !mkdir( $mediadir ) ) // defaults to 0777
+			{ // add error
+				$Messages->add( sprintf( T_("The blog's media directory [%s] could not be created."), $mediadir ), 'error' );
+				return false;
+			}
+			else
+			{ // add note
+				$Messages->add( sprintf( T_("The blog's media directory [%s] has been created with permissions %s."), $mediadir, '777' ), 'note' );
+			}
+		}
+
+		return $absolute ?
+						$mediadir :
+						preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $this->media_fullpath );
+
 	}
 
 
@@ -528,6 +583,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2004/10/11 19:22:16  blueyed
+ * no message
+ *
  * Revision 1.43  2004/10/11 18:44:09  fplanque
  * Edited code documentation.
  *
