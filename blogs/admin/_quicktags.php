@@ -1,11 +1,11 @@
 <?php
 /*
+ * This is Ron's remix!
+ *
  * b2evolution - http://b2evolution.net/
  *
  * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
- * This file built upon code from original b2 - http://cafelog.com/
  */
 if( ! $use_quicktags && ! $use_smilies )
 {	// We have nothing to do here
@@ -357,11 +357,13 @@ function b2evo_grins() {
 	global $smilies_directory, $b2smilies;
 	$grins = '';
 	$smiled = array();
-    foreach ($b2smilies as $smiley => $grin) {
-		if (!in_array($grin, $smiled)) {
+	foreach ($b2smilies as $smiley => $grin) 
+	{
+		if (!in_array($grin, $smiled)) 
+		{
 			$smiled[] = $grin;
 			$smiley = str_replace(' ', '', $smiley);
-			$grins .= '<img src="'.$smilies_directory.'/'.$grin.'" alt="'.$smiley.'" onclick="grin(\''.$smiley.'\');"/> ';
+			$grins .= '<img src="'.$smilies_directory.'/'.$grin.'" alt="'.$smiley.'" onclick="grin(\''.str_replace("'","\'",$smiley).'\');"/> ';
 		}
 	}
 
@@ -369,7 +371,8 @@ function b2evo_grins() {
 	ob_start();
 ?>
 <script type="text/javascript">
-function grin(tag) {
+function grin(tag) 
+{
 	var myField;
 	if (document.getElementById('content') && document.getElementById('content').type == 'textarea') {
 		myField = document.getElementById('content');
@@ -411,5 +414,7 @@ function grin(tag) {
 
 <?php
 if( $use_smilies )
-b2evo_grins();
+{
+	b2evo_grins();
+}
 ?>

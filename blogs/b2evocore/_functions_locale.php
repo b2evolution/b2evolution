@@ -53,7 +53,7 @@ elseif( $use_l10n==2 )
 				
 		if( isset( $trans[$current_locale][$search] ) )
 		{	// If the string has been translated:
-			return str_replace( '\n', "\n", $trans[$current_locale][$search] );
+			return $trans[$current_locale][$search];
 		}
 		
 		// echo "Not found!";
