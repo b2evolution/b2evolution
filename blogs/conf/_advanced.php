@@ -45,7 +45,7 @@ if( !isset($default_to_blog) ) $default_to_blog = 2;
  *
  * @global int $online_session_timeout
  */
-$online_session_timeout = 300; // default: 5 minutes
+$online_session_timeout = 300; // default: 5 minutes (300s)
 
 
 // Get hostname out of baseurl

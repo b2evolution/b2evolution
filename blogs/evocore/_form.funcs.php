@@ -82,11 +82,18 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 }
 
 /**
+ * Display a text area
  *
- *
- * form_textarea(-)
+ * @param string
+ * @param string
+ * @param integer
+ * @param string
+ * @param string
+ * @param integer
+ * @param string
  */
-function form_textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '' )
+function form_textarea( $field_name, $field_value, $field_rows, $field_label,
+												$field_note = '', $field_cols = 50 , $field_class = '' )
 {
 	global $img_url;
 
@@ -125,7 +132,7 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
 
 
 /*
- * form_select(-)
+ * Display a select field and populate it with a callback function.
  */
 function form_select(
 	$field_name,
@@ -151,9 +158,15 @@ function form_select(
 
 
 /*
- * form_select_object(-)
+ * Display a select field and populate it with a cache object.
  *
- * same as select but on cache object
+ * @param string field name
+ * @param string default field value
+ * @param DataObjectCache Cache containing values for list
+ * @param string field label to be display before the field
+ * @param string note to be displayed after the field
+ * @param boolean allow to select [none] in list
+ * @param string CSS class for select
  */
 function form_select_object(
 	$field_name,
@@ -379,6 +392,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 16:28:41  fplanque
+ * minor changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

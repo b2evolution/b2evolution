@@ -222,8 +222,6 @@ class DataObjectCache
 	 */
 	function option_list( $default = 0, $allow_none = false )
 	{
-		global $cache_Groups;
-
 		if( ! $this->all_loaded )
 			$this->load_all();
 
@@ -247,6 +245,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 16:28:40  fplanque
+ * minor changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

@@ -45,6 +45,8 @@
  * A $10 donation has been made to Justin VINCENT on behalf of the b2evolution team.
  * The package has been relicensed as GPL based on
  * "You may do what you like with ezSQL - no exceptions."
+ * 2004-10-14 (email): Justin VINCENT grants François PLANQUE the right to relicense
+ * this modified class under other licenses. "Just include a link to where you got it from."
  * }}
  *
  * @package evocore
@@ -657,6 +659,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 16:28:41  fplanque
+ * minor changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

@@ -168,6 +168,8 @@ a.PublishButton:hover {
 
 input.search,
 input.SaveButton,
+input.DeleteButton,
+input.CancelButton,
 input.ResetButton,
 div.edit_actions input,
 div.PostActionsArea input {
@@ -183,6 +185,8 @@ div.PostActionsArea input {
 	margin: 1px 1px;
 }
 input.search:hover,
+input.DeleteButton:hover,
+input.CancelButton:hover,
 div.edit_actions input:hover,
 div.PostActionsArea input:hover {
 	color: #00b;
@@ -193,10 +197,13 @@ div.PostActionsArea input:hover {
 }
 
 input.SaveButton,
+input.DeleteButton,
+input.CancelButton,
 div.edit_actions input.SaveButton {
 	font-weight: bold;
 }
 input.SaveButton:hover,
+input.DeleteButton:hover,
 input.ResetButton:hover,
 div.edit_actions input.SaveButton:hover,
 div.edit_actions input.DeleteButton:hover {

@@ -40,9 +40,11 @@
  */
 
 /**
- * Log class
+ * Log class. Logs notes and errors.
  *
- * logs notes and errors.
+ * Messages can be logged into different categories (aka levels)
+ * Examples: 'note', 'error'. Note: 'all' is reserved to display all levels together.
+ * Messages can later be displayed grouped by category/level.
  */
 class Log
 {
@@ -63,7 +65,7 @@ class Log
 
 
 	/**
-	 * clears the Log
+	 * Clears the Log.
 	 *
 	 * @param string level, use 'all' to unset all levels
 	 */
@@ -85,7 +87,7 @@ class Log
 
 
 	/**
-	 * add a message to the Log
+	 * Add a message to the Log.
 	 *
 	 * @param string the message
 	 * @param string the level, default is to use the object's default level
@@ -93,7 +95,7 @@ class Log
 	function add( $message, $level = '#' )
 	{
 		if( $level == '#' )
-		{
+		{	// By default, we use the default level:
 			$level = $this->defaultlevel;
 		}
 
@@ -103,6 +105,8 @@ class Log
 
 	/**
 	 * Get header/footer for a specific level, used by {@link display()}
+	 *
+	 * @todo Daniel, please describe what this is to be used for.
 	 *
 	 * @param mixed head or foot (array [ level => head/foot or string [for container])
 	 * @param string the level (or container)
@@ -142,6 +146,8 @@ class Log
 
 	/**
 	 * Display messages of the Log object.
+	 *
+	 * @todo Daniel, please describe the advanced features.
 	 *
 	 * @param string header/title (default: empty), might be array ( level => msg ),
 	 *               'container' is then top
@@ -359,6 +365,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/14 16:28:41  fplanque
+ * minor changes
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

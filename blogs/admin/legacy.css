@@ -110,6 +110,8 @@ a.PublishButton:hover {
 input.search,
 input.SaveButton,
 input.ResetButton,
+input.DeleteButton,
+input.CancelButton,
 div.edit_actions input,
 div.PostActionsArea input {
 	background-image: url("img/legacy-button.gif");
@@ -118,6 +120,7 @@ div.PostActionsArea input {
 
 }
 input.search:hover,
+input.CancelButton:hover,
 div.edit_actions input:hover,
 div.PostActionsArea input:hover {
 	background-color: #fec;
@@ -125,6 +128,12 @@ div.PostActionsArea input:hover {
 	border: 1px solid #00b;
 
 }
+
+input.DeleteButton:hover {
+	background-color: #fec;
+	background-image: url("img/legacy-button.gif");
+}
+
 /* Tables: */
 
 table.grouped

@@ -46,7 +46,10 @@ div.edit_actions input.DeleteButton:hover {
 fieldset.submit input.SaveButton:hover,
 fieldset.submit input.ResetButton:hover,
 input.search,
-input.search:hover {
+input.search:hover,
+input.DeleteButton:hover,
+input.CancelButton:hover
+{
 	color:#333;
 	background-color: #e1ddce;
 	background-image: url("../admin/img/desert-button.gif");
