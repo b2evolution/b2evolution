@@ -152,6 +152,11 @@ $map_iconfiles = array(
 		'file' => $img_subdir.'reload.png',
 		'alt' => T_('Reload'),
 	),
+	'download' => array(
+		'file' => $img_subdir.'download_manager.png',
+		'alt' => T_('Download'),
+	),
+
 );
 
 
@@ -161,20 +166,37 @@ $map_iconfiles = array(
  * @global array filename relative to {@link $basepath} => width, height
  */
 $map_iconsizes = array(
-	$admin_subdir.'img/fileicons/folder.png' => array( 16, 16 ),
-	$admin_subdir.'img/fileicons/default.png' => array( 16, 16 ),
-	$admin_subdir.'img/fileicons/empty.png' => array( 16, 16 ),
-	$admin_subdir.'img/up.png' => array( 22, 22 ),
-	$admin_subdir.'img/folder_home2.png' => array( 22, 22 ),
-	$admin_subdir.'img/edit.png' => array( 16, 16 ),
-	$admin_subdir.'img/filecopy.png' => array( 16, 16 ),
-	$admin_subdir.'img/filemove.png' => array( 16, 16 ),
-	$admin_subdir.'img/filerename.png' => array( 16, 16 ),
-	$admin_subdir.'img/filedelete.png' => array( 16, 16 ),
-	$admin_subdir.'img/fileperms.gif' => array( 16, 16 ),
 	$admin_subdir.'img/ascending.png' => array( 16, 16 ),
 	$admin_subdir.'img/descending.png' => array( 16, 16 ),
+	$admin_subdir.'img/edit.png' => array( 16, 16 ),
+	$admin_subdir.'img/filecopy.png' => array( 16, 16 ),
+	$admin_subdir.'img/filedelete.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/default.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/document.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/empty.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/encrypted.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/folder.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/image2.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/log.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/message.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/pdf-document.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/php.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/pk.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/sound.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/tar.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/tgz.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/video.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/wordprocessing.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileicons/www.png' => array( 16, 16 ),
+	$admin_subdir.'img/filemove.png' => array( 16, 16 ),
+	$admin_subdir.'img/fileperms.gif' => array( 16, 16 ),
+	$admin_subdir.'img/filerename.png' => array( 16, 16 ),
+	$admin_subdir.'img/folder_home2.png' => array( 22, 22 ),
+	$admin_subdir.'img/up.png' => array( 22, 22 ),
 	$admin_subdir.'img/window_new.png' => array( 15, 13 ),
+	$img_subdir.'download_manager.png' => array( 16, 16 ),
+	$img_subdir.'reload.png' => array( 16, 16 ),
+
 );
 
 ?>
