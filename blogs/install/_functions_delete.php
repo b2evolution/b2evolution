@@ -10,6 +10,9 @@
  *
  * @package install
  */
+if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
+	die("Please, do not access this page directly.");
+
 function db_delete()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,

@@ -736,8 +736,6 @@ $bloggergetusersblogs_doc='returns the user\'s blogs - this is a dummy function,
  *					- name (blogName), 
  *					- URL (url),
  *					- bool: can user edit template? (isAdmin).
- *
- * @todo A LOT !!!
  */
 function bloggergetusersblogs($m) 
 {

@@ -474,7 +474,7 @@ switch($action)
 		// Delete from Db:
 		$edited_Comment->dbdelete();
 	
-		header ("Location: b2browse.php?blog=$blog&p=$p&c=1#comments"); //?a=dc");
+		header ("Location: b2browse.php?blog=$blog&p=$comment_post_ID&c=1#comments");
 		exit();
 	
 	

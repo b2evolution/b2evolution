@@ -10,28 +10,10 @@
  *
  * @package install
  */
+if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
+	die("Please, do not access this page directly.");
 
 
-/*
- * devupg_b2evo_tables(-)
- *
- * Development upgrade
- * Do only the very last upgardes inside of current DB version number
- */
-function devupg_b2evo_tables()
-{
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments,
-					$tableblogs, $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
-	global $baseurl, $old_db_version, $new_db_version;
-
-
-		echo "<p>Upgrading blogs table... ";
-		$query = "ALTER TABLE $tableblogs
-							ADD COLUMN blog_disp_bloglist tinyint NOT NULL DEFAULT 1";
-		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.<br />\n";
-
-}
 
 /*
  * upgrade_b2evo_tables(-)
@@ -53,20 +35,20 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8010 )
 	{
-		echo "<p>Upgrading users table... ";
+		echo "Upgrading users table... ";
 		$query = "ALTER TABLE $tableusers 
 							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Upgrading blogs table... ";
+		echo "Upgrading blogs table... ";
 		$query = "ALTER TABLE $tableblogs 
 							MODIFY COLUMN blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							MODIFY COLUMN blog_longdesc TEXT NULL DEFAULT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Upgrading categories table... ";
+		echo "Upgrading categories table... ";
 		$query = "ALTER TABLE $tablecategories 
 							ADD COLUMN cat_description VARCHAR(250) NULL DEFAULT NULL,
 							ADD COLUMN cat_longdesc TEXT NULL DEFAULT NULL,
@@ -74,7 +56,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Upgrading posts table... ";
+		echo "Upgrading posts table... ";
 		$query = "ALTER TABLE $tableposts 
 							MODIFY COLUMN post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							ADD COLUMN post_urltitle VARCHAR(50) NULL DEFAULT NULL AFTER post_title,
@@ -83,7 +65,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Generating wordcounts... ";
+		echo "Generating wordcounts... ";
 		$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		$rows_updated = 0;
@@ -99,7 +81,7 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8020 )
 	{
-		echo "<p>Encoding passwords... ";
+		echo "Encoding passwords... ";
 		$query = "UPDATE $tableusers 
 							SET user_pass = MD5(user_pass)";
 		$q = mysql_query($query) or mysql_oops( $query );
@@ -108,13 +90,13 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8030 )
 	{
-		echo "<p>Deleting unecessary logs... ";
+		echo "Deleting unecessary logs... ";
 		$query = "DELETE FROM $tablehitlog
 							WHERE hit_ignore IN ('badchar', 'blacklist')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Updating blog urls... ";
+		echo "Updating blog urls... ";
 		$query = "SELECT blog_ID, blog_siteurl FROM $tableblogs";
 		$q = mysql_query($query) or mysql_oops( $query );
 		$rows_updated = 0;
@@ -143,15 +125,9 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8040 )
 	{
-		echo "<p>Creating Anti-Spam Ban List... ";
 		create_antispam();
-		echo "OK.<br />\n";
 		
-		echo "<p>Populating Anti-Spam table... ";
-		populate_antispam();
-		echo "OK.<br />\n";
-
-		echo "<p>Upgrading Settings table... ";
+		echo "Upgrading Settings table... ";
 		$query = "ALTER TABLE $tablesettings
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$q = mysql_query($query) or mysql_oops( $query );
@@ -160,7 +136,7 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8050 )
 	{
-		echo "<p>Upgrading blogs table... ";
+		echo "Upgrading blogs table... ";
 		$query = "ALTER TABLE $tableblogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
 							ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 1,
@@ -172,11 +148,9 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Creating Groups List... ";
 		create_groups();
-		echo "OK.<br />\n";
 
-		echo "<p>Upgrading users table... ";
+		echo "Upgrading users table... ";
 		$query = "ALTER TABLE $tableusers
 							DROP KEY ID,
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
@@ -186,7 +160,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "<p>Upgrading settings table... ";
+		echo "Upgrading settings table... ";
 		$query = "ALTER TABLE $tablesettings
 							DROP COLUMN time_format,
 							DROP COLUMN date_format,
@@ -207,7 +181,7 @@ function upgrade_b2evo_tables()
 		 */
 	}
 	
-	echo "<p>Update DB schema version to $new_db_version... ";
+	echo "Update DB schema version to $new_db_version... ";
 	$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
