@@ -53,7 +53,7 @@ switch($action)
 		$post_trackbacks = '';
 		$post_comments = $edited_Item->get( 'comments' );
 		$post_extracats = postcats_get_byID( $post );
-		$edit_date = 0;
+		# $edit_date = 0;
 		$post_issue_date = $edited_Item->get( 'issue_date' );
 		$renderers = $edited_Item->get( 'renderers' );
 		$aa = mysql2date('Y', $post_issue_date  );
@@ -64,7 +64,7 @@ switch($action)
 		$ss = mysql2date('s', $post_issue_date  );
 
 		$form_action = 'editpost';
-		require(dirname(__FILE__).'/_edit_form.php');
+		require(dirname(__FILE__).'/_item.form.php');
 
 		break;
 
@@ -75,43 +75,29 @@ switch($action)
 		 * Display comment in edit form
 		 */
 		param( 'comment', 'integer', true );
-		$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
 		$edited_Comment = Comment_get_by_ID( $comment );
 
-		$admin_pagetitle = T_('Editing comment').' #'.$commentdata['comment_ID'];
+		$admin_pagetitle = T_('Editing comment').' #'.$edited_Comment->ID;
 		require (dirname(__FILE__).'/_menutop.php');
 
-		$comment_post_ID = $commentdata['comment_post_ID'];
-		$comment_postdata = get_postdata( $comment_post_ID );
-		$blog = get_catblog( $comment_postdata['Category'] );
+		$blog = $edited_Comment->Item->blog_ID;
 		$Blog = Blog_get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
 
-		$content = $commentdata['comment_content'];
-		$content = format_to_edit($content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') );
-		$post_autobr = ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out');
-		$edit_date = 0;
-		$aa = mysql2date('Y', $commentdata['comment_date']);
-		$mm = mysql2date('m', $commentdata['comment_date']);
-		$jj = mysql2date('d', $commentdata['comment_date']);
-		$hh = mysql2date('H', $commentdata['comment_date']);
-		$mn = mysql2date('i', $commentdata['comment_date']);
-		$ss = mysql2date('s', $commentdata['comment_date']);
-
-		$form_action = 'editedcomment';
-		require(dirname(__FILE__).'/_edit_form.php');
+		require(dirname(__FILE__).'/_comment.form.php');
 
 		break;
 
 
 	default:
-		param( 'blog', 'integer', 0 );
 		/*
 		 * --------------------------------------------------------------------
 		 * New post form  (can be a bookmarklet form if mode == bookmarklet )
 		 */
+		param( 'blog', 'integer', 0 );
+
 		$admin_pagetitle = $admin_pagetitle_titlearea = T_('New post in blog:');
 
 
@@ -241,7 +227,7 @@ switch($action)
 		param( 'ss', 'string', date( 's', $localtimenow) );
 
 		$form_action = 'post';
-		require(dirname(__FILE__).'/_edit_form.php');
+		require(dirname(__FILE__).'/_item.form.php');
 }
 
 require( dirname(__FILE__).'/_footer.php' );

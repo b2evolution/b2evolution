@@ -1,12 +1,35 @@
 <?php
 /**
- * This file implements the UI view for editing a post/comment.
+ * This file implements the Post form.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
  *
  * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -72,63 +95,36 @@ if( isset($Blog) )
 	<fieldset>
 		<legend><?php echo T_('Post contents') ?></legend>
 
-	<?php
+	<span class="line">
+	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
+	<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'formvalue') ?>" id="post_title" tabindex="1" />
+	</span>
 
-	if ($action != 'editcomment')
-	{ // ------------------------------ POST HEADER -----------------------
-		$target_type = 'Item';
-		?>
+	<span class="line">
+	<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
+	<select name="post_locale" id="post_locale" tabindex="2"><?php locale_options( $post_locale ) ?></select>
+	</span>
 
-		<span class="line">
-		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'formvalue') ?>" id="post_title" tabindex="1" />
-		</span>
-
-		<span class="line">
-		<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
-		<select name="post_locale" id="post_locale" tabindex="2"><?php locale_options( $post_locale ) ?></select>
-		</span>
-
-		<?php if( $use_post_url ) { ?>
+	<?php if( $use_post_url )
+	{ ?>
 		<span class="line">
 		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
 		<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'formvalue' ) ?>" id="post_url" tabindex="3" />
 		</span>
-		<?php } else { ?>
-		<input type="hidden" name="post_url" size="40" value="" id="post_url" />
 		<?php
-		}
 	}
 	else
-	{	// -------------------------- COMMENT HEADER -----------------------
-		$target_type = 'Comment';
+	{
 		?>
-		<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
-
+		<input type="hidden" name="post_url" size="40" value="" id="post_url" />
 		<?php
-		if( $edited_Comment->author_User === NULL )
-		{ // This is not a member comment
-			?>
-			<span class="line">
-			<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata['comment_author']) ?>" id="name" tabindex="1" />
-			</span>
-
-			<span class="line">
-			<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata['comment_author_email']) ?>" id="email" tabindex="2" />
-			</span>
-
-			<span class="line">
-			<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata['comment_author_url']) ?>" id="URL" tabindex="3" />
-			</span>
-		<?php
-		}
 	}
 	?>
 
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => $target_type ) );
+		$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => 'Item' ) );
 	?>
 	</div>
 
@@ -144,15 +140,10 @@ if( isset($Blog) )
 	</script>
 
 	<div class="edit_actions">
-	<?php
-	if($use_preview && ($action != 'editcomment') )
-	{ // ------------------------------- PREVIEW ---------------------------------- ?>
+	<?php // ------------------------------- ACTIONS ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);"
 		tabindex="9" />
-	<?php
-	}
 
-	// ------------------------------- SAVE ---------------------------------- ?>
 	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" tabindex="10" />
 
 	<?php
@@ -162,12 +153,6 @@ if( isset($Blog) )
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
-	elseif( $action == 'editcomment' )
-	{	// Editing comment
-		// Display delete button if user has permission to:
-		$edited_Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
-	}
-
 
 	if( $use_filemanager )
 	{	// ------------------------------- UPLOAD ----------------------------------
@@ -177,7 +162,7 @@ if( isset($Blog) )
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => $target_type ) );
+	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item' ) );
 
 	?>
 	</div>
@@ -192,7 +177,7 @@ if( isset($Blog) )
 			?>
 			<div>
 			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp"
-				tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> />
+				tabindex="13" />
 			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
 			<span class="nobr">
 			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
@@ -224,9 +209,6 @@ if( isset($Blog) )
 		</span></div>
 		<?php
 		}
-
-		if( $action != 'editcomment' )
-		{ // this is for everything but comment editing
 		?>
 		<div>
 			<span class="line">
@@ -236,24 +218,11 @@ if( isset($Blog) )
 			</span>
 		</div>
 
-		<?php
-		}
-		else
-		{	// This is for comment editiing only:
-			// --------------------------- AUTOBR -------------------------------------- 	
-			?>
-			<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-			if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
-			<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
-			<?php
-		}
-		?>
-
 	</fieldset>
 
 	<?php
-	if( ($action != 'editcomment') && isset( $Blog ) && ((get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks'))) )
-	{ // this is for everything but comment editing
+	if( isset( $Blog ) && ((get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks'))) )
+	{
 		?>
 		<fieldset>
 		<legend><?php echo T_('Additional actions') ?></legend>
@@ -287,10 +256,6 @@ if( isset($Blog) )
 
 <div class="right_col">
 
-<?php
-
-if( $action != 'editcomment' )
-{ // ------------------------------- POST STATUS ---------------------------------- ?>
 	<fieldset>
 		<legend><?php echo T_('Status') ?></legend>
 
@@ -440,7 +405,7 @@ if( $action != 'editcomment' )
 		</div>
 	</fieldset>
 	<?php
-		if( $Blog->allowcomments == 'post_by_post' )
+		if( isset($Blog) && ($Blog->allowcomments == 'post_by_post') ) 
 		{
 	?>
 	<fieldset>
@@ -530,21 +495,8 @@ if( $action != 'editcomment' )
 	</fieldset>
 
 <?php
-}
 
-if ($action == "editcomment")
-{
-?>
-	<fieldset>
-		<legend><?php echo T_('Comment info') ?></legend>
-		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
-		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $commentdata["comment_type"]; ?></p>
-		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $commentdata["comment_status"]; ?></p>
-		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $commentdata["comment_author_IP"]; ?></p>
-
-<?php
-}
-/* elseif ($action == "edit")
+/* if ($action == "edit")
 {
 // 		<p><strong>Pings:</strong> <?php echo in_array( 'pingsdone', $postdata["Flags"] ) ? 'Done':'Not done yet';
 }*/
@@ -557,3 +509,12 @@ if ($action == "editcomment")
 
 </form>
 <!-- ================================== END OF EDIT FORM ================================== -->
+
+<?php
+/*
+ * $Log$
+ * Revision 1.1  2004/12/14 20:27:11  fplanque
+ * splited post/comment edit forms
+ *
+ */
+?>
