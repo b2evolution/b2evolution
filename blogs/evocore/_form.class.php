@@ -447,9 +447,9 @@ class Form extends Widget
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
-		if( !empty($field_id) )
+		if( !empty($field_name) )
 		{
-			$r .= ' id="'.$field_id.'"';
+			$r .= ' id="'.$field_name.'"';
 		}
 		if( $field_checked )
 		{
@@ -486,14 +486,17 @@ class Form extends Widget
 	/**
 	 * Builds the form field
 	 *
-	 $ @param string title to display on top of the form
+	 * @param string title to display on top of the form
 	 * @param string the class to use for the form tag
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function begin_form( $form_class = NULL, $form_title = '' )
 	{
-		$r = "\n\n".'<form name="'.$this->form_name.'" id="'.$this->form_name
-					.'" method="'.$this->form_method
+		$r = "\n\n"
+					.'<form'
+					.( !empty( $this->form_name ) ? ' name="'.$this->form_name.'"' : '' )
+					.( !empty( $this->form_name ) ? ' id="'.$this->form_name.'"' : '' )
+					.' method="'.$this->form_method
 					.'" action="'.$this->form_action.'"'
 					.( !empty( $form_class ) ? ' class="'.$form_class : '' )
 					.'">'."\n"
@@ -699,7 +702,12 @@ class Form extends Widget
 		$field_class = '' )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
-					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+					."\n"
+					.'<select';
+		if( !empty($field_name) )
+		{
+			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
+		}
 		if( !empty($field_class) )
 		{
 			$r.= ' class="'.$field_class.'"';
@@ -740,15 +748,22 @@ class Form extends Widget
 
 		$r = $this->begin_field( $field_name, $field_label );
 
+		// QUESTION: What is this?
 		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
-		$r .= '<textarea name="'.$field_name.'" id="'.$field_name.'" rows="'.$field_rows
-					.'" cols="'.$field_cols.'"';
+
+		$r .= '<textarea';
+		if( !empty($field_name) )
+		{
+			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
+		}
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
-		$r .= '>'.$field_value.'</textarea>';
-		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
+		$r .= ' rows="'.$field_rows.'" cols="'.$field_cols.'">'
+					.$field_value.'</textarea>'
+					// QUESTION: What is this?
+					.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
 
 		if( !empty($field_note) )
 		{
@@ -968,6 +983,10 @@ class Form extends Widget
 		}
 	}
 
+
+	/**
+	 *
+	 */
 	function hiddens( $hiddens )
 	{
 		$r = '';
@@ -1011,7 +1030,7 @@ class Form extends Widget
 		$submit_fields[0] = '';
 
 		foreach( $options as $option )
-		{// construction of the option array for the button method
+		{ // construction of the option array for the button method
 			$submit_fields[$i] = $option;
 			$i++;
 		}
