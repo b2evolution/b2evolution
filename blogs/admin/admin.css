@@ -607,3 +607,11 @@ fieldset legend {
 	color: #BCD;
 }
 
+
+/* FileManager */
+table.fileman {
+	margin:auto;
+	text-align:right;
+	width: 100%;
+}
+

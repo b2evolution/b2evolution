@@ -520,7 +520,7 @@ class ItemList extends DataObjectList
 		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
 
 
-		if( $errcontent = errors_display( T_('Invalid post, please correct these errors:'), '', false ) )
+		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false ) )
 		{
 			$content = $errcontent;
 		}

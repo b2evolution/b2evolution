@@ -17,7 +17,6 @@ require_once( dirname(__FILE__). '/_functions_trackback.php' );
 require_once( dirname(__FILE__). '/_functions_pingback.php' );
 require_once( dirname(__FILE__). '/_functions_pings.php' );
 require_once( dirname(__FILE__). '/_functions_skins.php' );
-require_once( dirname(__FILE__). '/_functions_errors.php' );
 require_once( dirname(__FILE__). '/_functions_antispam.php' );
 require_once( dirname(__FILE__). '/_functions_onlineusers.php' );
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
@@ -37,12 +36,12 @@ if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.ph
  *
  * @return boolean success?
  */
-function mysql_oops($sql_query)
+function mysql_oops( $sql_query )
 {
 	$error  = '<p class="error">'. T_('Oops, MySQL error!'). '</p>'
 		. '<p>Your query:<br /><code>'. $sql_query. '</code></p>'
 		. '<p>MySQL said:<br /><code>'. mysql_error(). ' (error '. mysql_errno(). ')</code></p>';
-	die($error);
+	die( $error );
 }
 
 
@@ -205,13 +204,13 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0 )
 			|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches)
 			|| preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
 		{
-			errors_add( 'Illegal markup found: '.htmlspecialchars($matches[1]) );
+			$Messages->add( 'Illegal markup found: '.htmlspecialchars($matches[1]) );
 		}
 		// Styling restictions:
 		$matches = array();
 		if( $is_comment && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
 		{
-			errors_add( 'Unallowed CSS markup found: '.htmlspecialchars($matches[1]) );
+			$Messages->add( 'Unallowed CSS markup found: '.htmlspecialchars($matches[1]) );
 		}
 	}
 	return($content);

@@ -60,11 +60,11 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	// CHECK and FORMAT content	
 	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		errors_add( T_('Supplied URL is invalid: ').$error );	
+		$Messages->add( T_('Supplied URL is invalid: ').$error );	
 	}
 	$comment = format_to_post($comment,1,1);
 
-	if( $errstring = errors_string( 'Cannot insert trackback, please correct these errors:', '' ) )
+	if( $errstring = $Messages->string( 'Cannot insert trackback, please correct these errors:', '' ) )
 	{
 		trackback_response(2, $errstring);	// TODO: check that error code 2 is ok
 		die();

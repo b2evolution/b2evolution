@@ -19,8 +19,8 @@ switch($action)
 	case 'create':
 		// ---------- Create blog in DB ----------
 		$admin_pagetitle .= ' :: '.T_('New');
-		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
+		require( dirname(__FILE__).'/_menutop.php' );
+		require( dirname(__FILE__).'/_menutop_end.php' );
 
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
@@ -55,16 +55,16 @@ switch($action)
 
 		if( empty($blog_stub) )
 		{	// Stub name is empty
-			errors_add( T_('You must provide an URL blog name / Stub name!') );
+			$Messages->add( T_('You must provide an URL blog name / Stub name!') );
 		}
 		else if( $DB->get_var( "SELECT COUNT(*)
 												FROM $tableblogs
 												WHERE blog_stub = ".$DB->quote($blog_stub) ) )
 		{	// Stub name is already in use
-			errors_add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
+			$Messages->add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
 		}
 
-		if( ! errors_display( T_('Cannot create, please correct these errors:' ), '') )
+		if( !$Messages->display( T_('Cannot create, please correct these errors:' ), '') )
 		{
 			$edited_Blog = & new Blog( NULL );
 		
@@ -214,17 +214,17 @@ switch($action)
 
 				if( empty($blog_stub) )
 				{	// Stub name is empty
-					errors_add( T_('You must provide an URL blog name / Stub name!') );
+					$Messages->add( T_('You must provide an URL blog name / Stub name!') );
 				}
 				else if( $DB->get_var( "SELECT COUNT(*)
 														FROM $tableblogs
 														WHERE blog_stub = ".$DB->quote($blog_stub)."
 															AND blog_ID <> ".$edited_Blog->ID ) )
 				{	// Stub name is already in use
-					errors_add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
+					$Messages->add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
 				}
 
-				if ( errors_display( T_('Cannot update, please correct these errors:' ), '') )
+				if ( $Messages->display( T_('Cannot update, please correct these errors:' ), '') )
 				{
 					echo '</div>';
 					break;
@@ -279,7 +279,7 @@ switch($action)
 				break;
 		}
 
-		if( !errors() )
+		if( !$Messages->count() )
 		{	// Commit update to the DB:
 			$edited_Blog->dbupdate();
 		

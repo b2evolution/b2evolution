@@ -97,14 +97,14 @@ switch($action)
 		$post_title = format_to_post($post_title,0,0);
 		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
 		{
-			errors_add( T_('Supplied URL is invalid: ').$error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error );
 		}
 		$content = format_to_post($content,$post_autobr,0);
 
-		if( errors() )
+		if( $Messages->count() )
 		{
 			echo '<div class="panelinfo">';
-			errors_display( T_('Cannot post, please correct these errors:'),
+			$Messages->display( T_('Cannot post, please correct these errors:'),
 				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
 			echo '</div>';
 			break;
@@ -203,14 +203,14 @@ switch($action)
 		$post_title = format_to_post( $post_title, 0, 0 );
 		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
 		{
-			errors_add( T_('Supplied URL is invalid: ').$error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error );
 		}
 		$content = format_to_post($content,$post_autobr,0);
 
-		if( errors() )
+		if( $Messages->count() )
 		{
 			echo '<div class="panelinfo">';
-			errors_display( T_('Cannot update, please correct these errors:'),
+			$Messages->display( T_('Cannot update, please correct these errors:'),
 				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
 			echo '</div>';
 			break;
@@ -442,11 +442,11 @@ switch($action)
 		// CHECK and FORMAT content
 		if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
 		{
-			errors_add( T_('Supplied URL is invalid: ').$error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error );
 		}
 		$content = format_to_post($content,$post_autobr,0); // We are faking this NOT to be a comment
 
-		if( errors_display( T_('Cannot update comment, please correct these errors:'),
+		if( $Messages->display( T_('Cannot update comment, please correct these errors:'),
 				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
 		{
 			break;

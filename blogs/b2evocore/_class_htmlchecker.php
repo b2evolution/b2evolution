@@ -191,8 +191,9 @@ class SafeHtmlChecker
 		
 		function html_error( $string )
 		{
+			global $Messages;
 			$this->error = true;
-			errors_add( $string );
+			$Messages->add( $string );
 		}
 		
 		/* 

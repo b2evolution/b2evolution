@@ -25,6 +25,7 @@
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines - checkboxes are meant */ echo T_('check<br />all') ?></th>
 			</tr>
 			<tr>
 				<th><?php echo T_('Published') ?></th>
@@ -34,7 +35,7 @@
 				<th><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="11">
+				<td colspan="12">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
@@ -123,12 +124,18 @@
 								<?php } ?>
 								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 						</td>
+						<td class="center">
+							<input type="checkbox" name="checkall_<?php echo $loop_row['ID'] ?>"
+								checked="checked"
+								onclick="checkall(this.form, <?php echo $loop_row['ID'] ?>, this.checked)"
+								value="1" title="<?php echo T_('(Un)check all boxes') ?>" />
+						</td>
 					</tr>
 					<?php
 				}
 				?>
 			<tr class="group">
-				<td colspan="11">
+				<td colspan="12">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
@@ -184,6 +191,11 @@
 						<td class="center">
 							<input type="checkbox" name="blog_perm_properties_<?php echo $loop_row['ID'] ?>"
 								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="checkall_<?php echo $loop_row['ID'] ?>"
+								onclick="checkall(this.form, <?php echo $loop_row['ID'] ?>, this.checked)"
+								value="1" title="<?php echo T_('(Un)check all boxes') ?>" />
 						</td>
 					</tr>
 					<?php

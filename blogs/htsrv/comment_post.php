@@ -21,7 +21,7 @@ $commented_Item = Item_get_by_ID( $comment_post_ID );
 
 if( ! $commented_Item->can_comment( '', '', '', '' ) )
 {
-	errors_add( T_('You cannot leave comments on this post!') );
+	$Messages->add( T_('You cannot leave comments on this post!') );
 }
 
 param( 'author', 'string' );
@@ -44,13 +44,13 @@ else
 
 	if ($require_name_email)
 	{ // Blog wants Name and EMail with comments
-		if( empty($author) ) errors_add( T_('Please fill in the name field') );
-		if( empty($email) ) errors_add( T_('Please fill in the email field') );
+		if( empty($author) ) $Messages->add( T_('Please fill in the name field') );
+		if( empty($email) ) $Messages->add( T_('Please fill in the email field') );
 	}
 	
 	if( (!empty($email)) && (!is_email($email)) )
 	{
-		errors_add( T_('Supplied email address is invalid') );
+		$Messages->add( T_('Supplied email address is invalid') );
 	}
 	
 	// add 'http://' if no protocol defined for URL
@@ -60,7 +60,7 @@ else
 	}
 	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		errors_add( T_('Supplied URL is invalid: ') . $error );	
+		$Messages->add( T_('Supplied URL is invalid: ') . $error );	
 	}
 }
 
@@ -74,7 +74,7 @@ $comment = format_to_post($original_comment, $comment_autobr, 1);
 
 if( empty($comment) )
 { // comment should not be empty!
-	errors_add( T_('Please do not send empty comment') );
+	$Messages->add( T_('Please do not send empty comment') );
 }
 
 /* flood-protection */
@@ -91,14 +91,14 @@ if( $then = $DB->get_var( $query ) )
 }
 if( !$ok )
 {
-	errors_add( T_('You can only post a new comment every 30 seconds.') );
+	$Messages->add( T_('You can only post a new comment every 30 seconds.') );
 }
 /* end flood-protection */
 
-if( errors_display( T_('Cannot post comment, please correct these errors:'),
+if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ) )
 {
-	exit();
+	exit(); // TODO: nicer displaying here
 }
 
 $query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author, 

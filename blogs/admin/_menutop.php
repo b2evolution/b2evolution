@@ -15,10 +15,79 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title>b2evo :: <?php echo preg_replace( '/:$/', '', $admin_pagetitle ); ?></title>
 	<link href="admin.css" rel="stylesheet" type="text/css" />
-	<?php if( $mode == 'sidebar' )
+	<?php
+	if( $mode == 'sidebar' )
 	{ ?>
 	<link href="sidebar.css" rel="stylesheet" type="text/css" />
-	<?php } ?>
+	<?php }
+
+	// -- Inject javascript ----------------
+	if( $admin_tab == 'blogs' )
+	{
+		?>
+		<script type="text/javascript">
+		<!--
+		function checkall( the_form, id, status )
+		{
+			the_form.elements['blog_ismember_'+id].checked = -status;
+			the_form.elements['blog_perm_published_'+id].checked = -status;
+			the_form.elements['blog_perm_protected_'+id].checked = -status;
+			the_form.elements['blog_perm_private_'+id].checked = -status;
+			the_form.elements['blog_perm_draft_'+id].checked = -status;
+			the_form.elements['blog_perm_deprecated_'+id].checked = -status;
+			the_form.elements['blog_perm_delpost_'+id].checked = -status;
+			the_form.elements['blog_perm_comments_'+id].checked = -status;
+			the_form.elements['blog_perm_cats_'+id].checked = -status;
+			the_form.elements['blog_perm_properties_'+id].checked = -status;
+		}
+		//-->
+		</script>
+		<?php
+	}
+	
+	if( $admin_tab == 'files' )
+	{
+		?>
+		<script type="text/javascript">
+		<!--
+		<?php
+		/**
+		 * Checks/unchecks all tables
+		 *
+		 * @param string the form name
+		 * @param string the checkboxes elements name
+		 * @param boolean whether to check or to uncheck the element
+		 *
+		 * @return boolean always true
+		 */	?>
+		function setCheckboxes(the_form, the_elements, do_check)
+		{
+			var elts = document.forms[the_form].elements[the_elements];
+			/*alert( typeof(document.forms[the_form].elements[the_elements]) );*/
+			
+			var elts_cnt = (typeof(elts.length) != 'undefined')
+											? elts.length
+											: 0;
+
+			if (elts_cnt) {
+				for (var i = 0; i < elts_cnt; i++) {
+						elts[i].checked = do_check;
+				} // end for
+			} else {
+				elts.checked = do_check;
+			}
+			return true;
+		}
+		function toggleCheckboxes(my_form, the_elements)
+		{
+			if(my_form.checkall.checked) setCheckboxes(my_form.name, the_elements, true);
+			else  setCheckboxes(my_form.name, the_elements, false);
+		}
+		//-->
+		</script>
+	<?php
+	}
+	?>
 </head>
 <body>
 
