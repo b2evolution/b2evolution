@@ -85,7 +85,6 @@ div.panelblocktabs
 {
 	clear: both;
 	margin-top: 1ex;
-	margin-bottom: -1px;
 	float:left;
 	width:100%;
 	background: url("img/tabs_bg.gif") repeat-x bottom;
@@ -96,7 +95,7 @@ div.tabbedpanelblock {
 	clear: both;
 	border: 1px solid #765;
 	background-color: #fbfaf9;
-	/*border-top: none;*/
+	border-top: none;
 	padding: 1ex 2ex 2ex 2ex;
 	margin: 0 3ex 2ex 3ex;
 }
@@ -654,7 +653,7 @@ fieldset.extracats {
 }
 div.extracats {
 	/* border: 1px solid #f00; */
-	height: 48ex;
+	height: 44ex;
 	overflow: auto;
 	padding: 0ex 1ex;
 	margin: 0ex;
