@@ -2103,7 +2103,7 @@ msgid ""
 "Select main category in target blog and optionnaly check addtionnal "
 "categories"
 msgstr ""
-"Wähle Hauptkategorie im Ziel-Blog und markiere optional weitere Kategorien"
+"Wähle die Hauptkategorie im Ziel-Blog und markiere optional weitere Kategorien"
 
 #: ..\..\..\admin\_edit_form.php:348
 msgid "Select as an additionnal category"

@@ -157,7 +157,8 @@ if ($use_spellchecker)
 
 	<?php // --------------------------- AUTOBR -------------------------------------- 	?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-	if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
+	if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
+	<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
 
 	<?php
 	if($use_preview && ($action != 'editcomment') )
@@ -286,31 +287,36 @@ if( $action != 'editcomment' )
 		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?>><?php echo T_('Published (Public)') ?></label><br />
+		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Published (Public)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?>><?php echo T_('Protected (Members only)') ?></label><br />
+		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Protected (Members only)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?>><?php echo T_('Private (You only)') ?></label><br />
+		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Private (You only)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?>><?php echo T_('Draft (Not published!)') ?></label><br />
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Draft (Not published!)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?>><?php echo T_('Deprecated (Not published!)') ?></label><br />
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Deprecated (Not published!)') ?></label><br />
 		<?php
 		}
 		?>
@@ -324,7 +330,7 @@ if( $action != 'editcomment' )
 
 		<div class="extracats">
 
-		<p class="extracatnote"><?php echo T_('Select main category in target blog and optionnaly check addtionnal categories') ?>:</p>
+		<p class="extracatnote"><?php echo T_('Select main category in target blog and optionally check additional categories') ?>:</p>
 
 	<?php
 		// ----------------------------  CATEGORIES ------------------------------
@@ -358,12 +364,12 @@ if( $action != 'editcomment' )
 				{	// Assign default cat for new post
 					$default_main_cat = $cat_ID;
 				}
-				echo '<input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
+				echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
 				if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
 					echo ' checked="checked"';
 				echo '>';
 			}
-			echo $this_cat['cat_name'];
+			echo ' '.$this_cat['cat_name'];
 		}
 		function cat_select_after_each( $cat_ID, $level )
 		{	// callback after each sublist element
@@ -411,11 +417,14 @@ if( $action != 'editcomment' )
 	<fieldset title="Status">
 		<legend><?php echo T_('Comments') ?></legend>
 
-		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?>><?php echo T_('Open') ?></label><br />
+		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Open') ?></label><br />
 
-		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?>><?php echo T_('Closed') ?></label><br />
+		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Closed') ?></label><br />
 
-		<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?>><?php echo T_('Disabled') ?></label><br />
+		<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?>>
+		<?php echo T_('Disabled') ?></label><br />
 
 	</fieldset>
 

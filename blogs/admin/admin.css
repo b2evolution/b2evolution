@@ -601,3 +601,9 @@ label.radiooption {
 	white-space: nowrap;
 	margin-right: 1em;
 }
+
+fieldset legend {
+	font-weight: bold;
+	color: #7DA1DB;
+}
+
