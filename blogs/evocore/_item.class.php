@@ -179,11 +179,12 @@ class Item extends DataObject
 		$this->st_required = false;	// extra status NOT required
 
 		if( $db_row == NULL )
-		{
+		{ // New item:
 			$this->ID = 0;
 			$this->issue_date = date('Y-m-d H:i:s', $localtimenow);
 			$this->flags = array();
 			$this->renderers = array();
+			$this->status = 'published';
 		}
 		else
 		{
@@ -1758,6 +1759,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2005/03/07 18:27:04  fplanque
+ * minor
+ *
  * Revision 1.26  2005/03/04 18:39:41  fplanque
  * handle NULL properties
  *
