@@ -6,7 +6,7 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
  *	Filename:	/b2evocore/_class_blogstats.php
- *	Created on:	12/12/03 
+ *	Created on:	12/12/03
  *	Created by:	Travis Swicegood <travis@domain51productions.com>
  *	File Description
  *		This file contains the code for the blogstats class.  The main purpose of this class
@@ -15,22 +15,22 @@
  *
  *	Practical Use
  *		The first use of this class is to generate a total number of blog entries.  Searches
- *		can be limited to specific blogs and/or categories.  This number would them be used to 
- *		create random number within a range to display a random blog entry.  Example: Blog 
- *		that contains a list of quotes with a random quote being displayed each time a page 
+ *		can be limited to specific blogs and/or categories.  This number would them be used to
+ *		create random number within a range to display a random blog entry.  Example: Blog
+ *		that contains a list of quotes with a random quote being displayed each time a page
  *		is loaded.
  *
  *	Last Modified
  *		12/12/03 - Travis Swicegood: Created file.
  */
- 
+
 class BlogStats{
 	var $blog;				// Blog # (1 = all blogs)
 	var $request;			// SQL query string
 	var $result;			// SQL results
 	var $total_posts;		// Number of total posts (loaded via $this->get_post_total())
 
-	function BlogStats( 
+	function BlogStats(
 		$blog = 1, 							// What blog to display (def: all blogs)
 		$show_statuses = array(),			// What status to display?
 //		$p = '',							// Specific post number to display
@@ -55,7 +55,7 @@ class BlogStats{
 		global $tableposts, $tablepostcats, $tablecategories;	// ?
 		global $cache_categories, $time_difference;				// ?
 		global $cat_array; 										// communication with recursive callback funcs
-	
+
 	//////
 	//	Which blog is used?
 		$this->blog = $blog;
@@ -71,55 +71,55 @@ class BlogStats{
 
 		// WE ARE GOING TO CONSTRUCT THE "AND" CLOSE
 		// THIS IS GOING TO LAST FOR MANY MANY LINES...
-		
+
 		// if a month is specified in the querystring, load that month
-		if ($m != '') 
+		if ($m != '')
 		{
 			$m = ''.intval($m);
-			$where .= ' AND YEAR(post_issue_date)='.substr($m,0,4);
+			$where .= ' AND YEAR(post_issue_date)='. substr($m,0,4);
 			if (strlen($m)>5)
-				$where .= ' AND MONTH(post_issue_date)='.substr($m,4,2);
+				$where .= ' AND MONTH(post_issue_date)='. substr($m,4,2);
 			if (strlen($m)>7)
-				$where .= ' AND DAYOFMONTH(post_issue_date)='.substr($m,6,2);
+				$where .= ' AND DAYOFMONTH(post_issue_date)='. substr($m,6,2);
 			if (strlen($m)>9)
-				$where .= ' AND HOUR(post_issue_date)='.substr($m,8,2);
+				$where .= ' AND HOUR(post_issue_date)='. substr($m,8,2);
 			if (strlen($m)>11)
-				$where .= ' AND MINUTE(post_issue_date)='.substr($m,10,2);
+				$where .= ' AND MINUTE(post_issue_date)='. substr($m,10,2);
 			if (strlen($m)>13)
-				$where .= ' AND SECOND(post_issue_date)='.substr($m,12,2);
+				$where .= ' AND SECOND(post_issue_date)='. substr($m,12,2);
 		}
-	
+
 		// If a week number is specified
-		if ($w != '') 
+		if ($w != '')
 		{
 			$w = ''.intval($w);
 			$where .= ' AND WEEK(post_issue_date,1)='.$w;
 		}
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * Search stuff:
 		 * ----------------------------------------------------
 		 */
-		if(!empty($s)) 
+		if(!empty($s))
 		{
 			$search = ' AND (';
 			if ($exact)	// We want exact match of title or contents
 				$n = '';
 			else // The words/sentence are/is to be included in in the title or the contents
 				$n = '%';
-			if( ($sentence == '1') or ($sentence == 'sentence') ) 
+			if( ($sentence == '1') or ($sentence == 'sentence') )
 			{ // Sentence search
 				$s = trim($s);
 				$search .= '(post_title LIKE \''.$n.$s.$n.'\') OR (post_content LIKE \''.$n.$s.$n.'\')';
 			}
 			else
 			{	// Word search
-				if( strtoupper( $sentence ) == 'OR' ) 
+				if( strtoupper( $sentence ) == 'OR' )
 					$swords = 'OR';
 				else
 					$swords = 'AND';
-			
+
 				// puts spaces instead of commas
 				$s = preg_replace('/, +/', '', $s);
 				$s = str_replace(',', ' ', $s);
@@ -127,12 +127,12 @@ class BlogStats{
 				$s = trim($s);
 				$s_array = explode(' ',$s);
 				$join = '';
-				for ( $i = 0; $i < count($s_array); $i++) 
+				for ( $i = 0; $i < count($s_array); $i++)
 				{
 					$search .= ' '.$join.' ( (post_title LIKE \''.$n.$s_array[$i].$n.'\') OR (post_content LIKE \''.$n.$s_array[$i].$n.'\') ) ';
 					$join = $swords;
 				}
-			} 
+			}
 
 			$search .= ')';
 
@@ -140,18 +140,18 @@ class BlogStats{
 		}
 		else
 		{
-			$search = ''; 
+			$search = '';
 		}
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * Category stuff:
 		 * ----------------------------------------------------
 		 */
 		$eq = 'IN'; // default
-	
+
 		$cat_array = array();		// this is a global var
-	
+
 		// Check for cat string (which will be handled recursively)
 		if ( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
 		{	// specified a category string:
@@ -166,7 +166,7 @@ class BlogStats{
 			{	// We want to include cats
 				$req_cat_array = explode(' ',$cat);
 			}
-	
+
 			// Getting required sub-categories:
 			// and add everything to cat array
 			// ----------------- START RECURSIVE CAT LIST ----------------
@@ -183,7 +183,7 @@ class BlogStats{
 			}
 			// ----------------- END RECURSIVE CAT LIST ----------------
 		}
-	
+
 		// Add explicit selections:
 		if( ! empty( $catsel ))
 		{
@@ -191,7 +191,7 @@ class BlogStats{
 			$cat_array = array_merge( $cat_array, $catsel );
 			array_unique( $cat_array );
 		}
-	
+
 		if( empty($cat_array) )
 		{
 			$whichcat='';
@@ -201,22 +201,22 @@ class BlogStats{
 			$whichcat .= ' AND postcat_cat_ID '.$eq.' ('.implode(",", $cat_array).') ';
 			// echo $whichcat;
 		}
-	
-	
-	
+
+
+
 		/*
 		 * ----------------------------------------------------
 		 * Author stuff:
 		 * ----------------------------------------------------
 		 */
-		if((empty($author)) || ($author == 'all')) 
+		if((empty($author)) || ($author == 'all'))
 		{
 			$whichauthor='';
-		} 
-		elseif (intval($author)) 
+		}
+		elseif (intval($author))
 		{
 			$author = intval($author);
-			if (stristr($author, '-')) 
+			if (stristr($author, '-'))
 			{
 				$eq = '!=';
 				$andor = 'AND';
@@ -235,14 +235,14 @@ class BlogStats{
 
 		$where .= $search.$whichcat.$whichauthor;
 
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * Limits:
 		 * ----------------------------------------------------
 		 */
 		if( !empty($poststart) )
-		// fp removed && (!$m) && (!$w) && (!$whichcat) && (!$s) 
+		// fp removed && (!$m) && (!$w) && (!$whichcat) && (!$s)
 		// fp added: when in backoffice: always page
 		{
 			// echo 'POSTSTART-POSTEND';
@@ -250,7 +250,7 @@ class BlogStats{
 			{
 				$postend = $poststart + $posts_per_page - 1;
 			}
-			
+
 			if ($what_to_show == 'posts' || $what_to_show == 'paged')
 			{
 				$posts = $postend - $poststart + 1;
@@ -278,7 +278,7 @@ class BlogStats{
 			$limits = ' LIMIT '.$posts_per_page;
 		}
 		elseif( $what_to_show == 'paged' )
-		{	
+		{
 			// echo 'PAGED';
 			$pgstrt = '';
 			if ($paged) {
@@ -295,7 +295,7 @@ class BlogStats{
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
 			$where .= ' AND post_issue_date > \''.$otherdate.'\'';
 		}
-	
+
 
 		/*
 		 * ----------------------------------------------------
@@ -309,12 +309,12 @@ class BlogStats{
 		 * Time limits:
 		 * ----------------------------------------------------
 		 */
-		if( $timestamp_min == 'now' ) 
+		if( $timestamp_min == 'now' )
 		{
 			// echo 'hide past';
 			$timestamp_min = time();
 		}
-		if( !empty($timestamp_min) ) 
+		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			// echo 'before';
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
@@ -326,21 +326,21 @@ class BlogStats{
 			// echo 'hide future';
 			$timestamp_max = time();
 		}
-		if( !empty($timestamp_max) ) 
+		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
 			$where .= ' AND post_issue_date <= \''.$date_max.'\'';
 		}
 
-	
+
 		$this->request = "SELECT COUNT( DISTINCT post_id ) as total_posts ";
-	
-		$this->request .= "FROM 
-				($tableposts 
-					INNER JOIN $tablepostcats ON ID = postcat_post_ID) 
+
+		$this->request .= "FROM
+				($tableposts
+					INNER JOIN $tablepostcats ON ID = postcat_post_ID)
 					INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
-		
+
 		if( $blog == 1 )
 		{	// Special case: we aggregate all cats from all blogs
 			$this->request .= "WHERE 1 ";
@@ -349,17 +349,17 @@ class BlogStats{
 		{
 			$this->request .= "WHERE cat_blog_ID = $blog ";
 		}
-	
-		
+
+
 		if ($preview)
 		{
 			$this->request = 'SELECT 0 AS ID'; // dummy mysql query for the preview
 		}
-	
+
 		//echo $this->request;
 		$querycount++;
 		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
-		
+
 		$row = mysql_fetch_object( $this->result );
 		$this->total_posts = $row->total_posts;
 

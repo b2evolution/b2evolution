@@ -18,7 +18,7 @@ function cat_req( $parent_cat_ID, $level )
 	global $cat_array;
 	// echo "[$parent_cat_ID] ";
 	if( ! in_array( $parent_cat_ID, $cat_array ) )
-	{	// Not already visited
+	{ // Not already visited
 		$cat_array[] = $parent_cat_ID;
 	}
 	else
@@ -49,8 +49,8 @@ class ItemList extends DataObjectList
 	var $group_by_cat;
 
 	// Used in looping
-	var	$row_num;							// Current row
-	var	$row;									// Current row
+	var $row_num;							// Current row
+	var $row;									// Current row
 	var $main_cat;						// Current main category
 	var $previous_main_cat;		// Previous one
 	/**
@@ -79,7 +79,7 @@ class ItemList extends DataObjectList
 		$author = '',													// List of authors to restrict to
 		$order = '',													// ASC or DESC
 		$orderby = '',												// list of fields to order by
-		$posts = '', 													// # of posts to display on the page
+		$posts = '',													// # of posts to display on the page
 		$paged = '',													// List page number in paged display
 		$poststart = '',											// Start results at this position
 		$postend = '',												// End results at this position
@@ -91,7 +91,7 @@ class ItemList extends DataObjectList
 		$init_what_to_show = '',
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
-		$title = ''	)													// urltitle of post to display
+		$title = '' )													// urltitle of post to display
 	{
 		global $querycount;
 		global $tableposts, $tablepostcats, $tablecategories;
@@ -182,7 +182,7 @@ class ItemList extends DataObjectList
 				$search .= '(post_title LIKE \''. $n. $s. $n. '\') OR (post_content LIKE \''. $n. $s. $n.'\')';
 			}
 			else
-			{	// Word search
+			{ // Word search
 				if( strtoupper( $sentence ) == 'OR' )
 					$swords = 'OR';
 				else
@@ -222,16 +222,16 @@ class ItemList extends DataObjectList
 
 		// Check for cat string (which will be handled recursively)
 		if( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
-		{	// specified a category string:
+		{ // specified a category string:
 			$cat = str_replace(',', ' ', $cat);
 			if( strstr($cat, '-') )
-			{	// We want to exclude cats
+			{ // We want to exclude cats
 				$eq = 'NOT IN';
 				$cats = explode('-', $cat);
 				$req_cat_array = explode(' ', $cats[1]);
 			}
 			else
-			{	// We want to include cats
+			{ // We want to include cats
 				$req_cat_array = explode(' ', $cat);
 			}
 
@@ -243,7 +243,7 @@ class ItemList extends DataObjectList
 			{ // run recursively through the cats
 				settype( $cat_ID, 'integer' ); // make sure
 				if( ! in_array( $cat_ID, $cat_array ) )
-				{	// Not already in list
+				{ // Not already in list
 					$cat_array[] = $cat_ID;
 					cat_children( $cache_categories, ($blog==1)?0:$blog, $cat_ID, 'cat_req_dummy', 'cat_req',
 												'cat_req_dummy', 'cat_req_dummy', 1 );
@@ -361,7 +361,7 @@ class ItemList extends DataObjectList
 			}
 		}
 		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
-		{	// (no restriction if we request a month... some permalinks may point to the archive!)
+		{ // (no restriction if we request a month... some permalinks may point to the archive!)
 			// echo 'ARCHIVE - no limits';
 			$limits = '';
 		}
@@ -396,7 +396,7 @@ class ItemList extends DataObjectList
 
 		/*
 		 * ----------------------------------------------------
-		 *  Restrict to the statuses we want to show:
+		 *	Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
 		$where .= ' AND ' . statuses_where_clause( $show_statuses );
@@ -412,7 +412,7 @@ class ItemList extends DataObjectList
 			$timestamp_min = time();
 		}
 		if( !empty($timestamp_min) )
-		{	// Hide posts before
+		{ // Hide posts before
 			// echo 'before';
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
 			$where .= ' AND post_issue_date >= \''. $date_min.'\'';
@@ -424,14 +424,14 @@ class ItemList extends DataObjectList
 			$timestamp_max = time();
 		}
 		if( !empty($timestamp_max) )
-		{	// Hide posts after
+		{ // Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
 			$where .= ' AND post_issue_date <= \''. $date_max.'\'';
 		}
 
-		$this->request = "SELECT DISTINCT ID, post_author, post_issue_date,  post_mod_date,
-																		  post_status, post_lang,	post_content, post_title, 
+		$this->request = "SELECT DISTINCT ID, post_author, post_issue_date,	 post_mod_date,
+																			post_status, post_locale, post_content, post_title,
 																			post_urltitle, post_trackbacks, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
 																			post_karma
@@ -439,7 +439,7 @@ class ItemList extends DataObjectList
 														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 
 		if( $blog == 1 )
-		{	// Special case: we aggregate all cats from all blogs
+		{ // Special case: we aggregate all cats from all blogs
 			$this->request .= 'WHERE 1 ';
 		}
 		else
@@ -507,7 +507,7 @@ class ItemList extends DataObjectList
 	function get_max_paged()
 	{
 		if( empty($this->max_paged) )
-		{	// Not already cached:
+		{ // Not already cached:
 			$this->calc_max();
 		}
 		//echo 'max paged= ', $this->max_paged;
@@ -515,7 +515,7 @@ class ItemList extends DataObjectList
 	}
 
 
-	/** 
+	/**
 	 * Template function: display last mod date (datetime) of Item
 	 *
 	 * {@internal ItemList::mod_date(-) }}
@@ -527,14 +527,14 @@ class ItemList extends DataObjectList
 	{
 		$mod_date_timestamp = 0;
 		foreach( $this->result_rows as $loop_row )
-		{	// Go through whole list
+		{ // Go through whole list
 			$m = $loop_row->post_mod_date;
 			$loop_mod_date = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
 			if( $loop_mod_date > $mod_date_timestamp )
 				$mod_date_timestamp = $loop_mod_date;
 		}
 
-		if( empty($format) ) 
+		if( empty($format) )
 			echo date_i18n( locale_datefmt(), $mod_date_timestamp, $useGM );
 		else
 			echo date_i18n( $format, $mod_date_timestamp, $useGM );
@@ -549,7 +549,7 @@ class ItemList extends DataObjectList
 	function get_total_num_posts()
 	{
 		if( empty($this->total_num_posts) )
-		{	// Not already cached:
+		{ // Not already cached:
 			$this->calc_max();
 		}
 		return $this->total_num_posts;
@@ -565,7 +565,7 @@ class ItemList extends DataObjectList
 	{
 		$nxt_request = $this->request;
 		if( $pos = strpos(strtoupper($this->request), 'LIMIT'))
-		{	// Remove the limit form the request
+		{ // Remove the limit form the request
 			$nxt_request = substr($this->request, 0, $pos);
 		}
 		//echo $nxt_request;
@@ -588,13 +588,13 @@ class ItemList extends DataObjectList
 		$this->group_by_cat = true;
 
 		if( ($this->row_num > $this->result_num_rows) || ($this->result_num_rows == 0) )
-		{	// We are at the the end!
+		{ // We are at the the end!
 			// echo 'END';
 			return false;
 		}
 
 		if( $this->row_num == 0 )
-		{	// We need to initialize
+		{ // We need to initialize
 			$this->row = & $this->result_rows[0];
 			$row = $this->row;
 			$this->row_num = 1;
@@ -619,7 +619,7 @@ class ItemList extends DataObjectList
 	{
 		global $row;
 		if( $this->row_num >= $this->result_num_rows )
-		{	// We would pass the end!
+		{ // We would pass the end!
 			$this->row_num++;
 			return false;
 		}
@@ -630,8 +630,8 @@ class ItemList extends DataObjectList
 		$this->get_postdata();
 
 
-		if(	$this->group_by_cat && ($this->main_cat != $this->row->post_category) )
-		{	// Category change
+		if( $this->group_by_cat && ($this->main_cat != $this->row->post_category) )
+		{ // Category change
 			// echo '<p>CAT CHANGE!</p>';
 			return false;
 		}
@@ -652,7 +652,7 @@ class ItemList extends DataObjectList
 		global $pagenow, $current_User;
 
 		if(!$this->preview)
-		{	// This is not preview:
+		{ // This is not preview:
 			// echo 'REAL POST';
 			$row = & $this->row;
 			$id = $row->ID;
@@ -666,7 +666,7 @@ class ItemList extends DataObjectList
 				'Author_ID' => $row->post_author,
 				'Date' => $row->post_issue_date,
 				'Status' => $row->post_status,
-				'Lang' =>  $row->post_lang,
+				'Locale' =>	 $row->post_locale,
 				'Content' => $row->post_content,
 				'Title' => $row->post_title,
 				'Url' => $row->post_trackbacks,
@@ -679,17 +679,17 @@ class ItemList extends DataObjectList
 				);
 		}
 		else
-		{	// We are in preview mode!
+		{ // We are in preview mode!
 			// echo 'PREVIEW';
 			// we need globals for the param function
-			global $preview_userid, $preview_date, $post_status, $post_lang, $content,
+			global $preview_userid, $preview_date, $post_status, $post_locale, $content,
 							$post_title, $post_url, $post_category, $post_autobr, $edit_date,
 							$aa, $mm, $jj, $hh, $mn, $ss, $localtimenow;
 
 			$id = 0;
 			param( 'preview_userid', 'integer', true );
 			param( 'post_status', 'string', true );
-			param( 'post_lang', 'string', true );
+			param( 'post_locale', 'string', true );
 			param( 'content', 'html', true );
 			param( 'post_title', 'html', true );
 			param( 'post_url', 'string', true );
@@ -701,7 +701,7 @@ class ItemList extends DataObjectList
 
 			param( 'edit_date', 'integer', 0 );
 			if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-			{	// We use user date
+			{ // We use user date
 				param( 'aa', 'integer', 2000 );
 				param( 'mm', 'integer', 1 );
 				param( 'jj', 'integer', 1 );
@@ -715,7 +715,7 @@ class ItemList extends DataObjectList
 				$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
 			}
 			else
-			{	// We use current time
+			{ // We use current time
 				$post_date = date('Y-m-d H:i:s', $localtimenow);
 			}
 
@@ -729,7 +729,7 @@ class ItemList extends DataObjectList
 			global $is_winIE;
 			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix)))
 			{
-				$content =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10). ';'", $content);
+				$content =	preg_replace('/\%u([0-9A-F]{4,4})/e',	 "'&#'.base_convert('\\1',16,10). ';'", $content);
 			}
 
 			$postdata = array (
@@ -737,7 +737,7 @@ class ItemList extends DataObjectList
 				'Author_ID' => $preview_userid,
 				'Date' => $post_date,
 				'Status' => $post_status,
-				'Lang' =>  $post_lang,
+				'Locale' =>	 $post_locale,
 				'Content' => $content,
 				'Title' => $post_title,
 				'Url' => $post_url,

@@ -102,8 +102,8 @@ if ($use_spellchecker)
 		</span>
 
 		<span class="line">
-		<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
-		<select name="post_lang" id="post_lang" tabindex="2"><?php locale_options( $post_lang ) ?></select>
+		<label for="post_locale"><strong><?php echo T_('Locale/Language?') ?>:</strong></label>
+		<select name="post_locale" id="post_lang" tabindex="2"><?php locale_options( $post_locale ) ?></select>
 		</span>
 
 		<?php if( $use_post_url ) { ?>

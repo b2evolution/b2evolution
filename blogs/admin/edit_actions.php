@@ -69,7 +69,7 @@ switch($action)
 		param( 'post_urltitle', 'string' );
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-		param( 'post_lang', 'string', $default_locale );
+		param( 'post_locale', 'string', $default_locale );
 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
@@ -101,7 +101,7 @@ switch($action)
 		$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	$post_extracats, $post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_urltitle, $post_url, $post_comments ) or mysql_oops($query);
+		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	$post_extracats, $post_status, $post_locale, '',	$post_autobr, $pingsdone, $post_urltitle, $post_url, $post_comments ) or mysql_oops($query);
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
@@ -178,7 +178,7 @@ switch($action)
 		param( 'post_urltitle', 'string' );
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-		param( 'post_lang', 'string', $default_locale );
+		param( 'post_locale', 'string', $default_locale );
 
 		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
@@ -223,7 +223,7 @@ switch($action)
 		}
 
 		// UPDATE POST IN DB:
-		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_urltitle, $post_url, $post_comments ) or mysql_oops($query);
+		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats, 	$post_status, $post_locale, '',	$post_autobr, $pingsdone, $post_urltitle, $post_url, $post_comments ) or mysql_oops($query);
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{

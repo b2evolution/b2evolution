@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * b2evolution - http://b2evolution.net/
  *
@@ -7,7 +7,7 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-if( $use_textile ) require_once (dirname(__FILE__).'/_functions_textile.php');
+if( $use_textile ) require_once( dirname(__FILE__). '/_functions_textile.php' );
 
 /*
  * bpost_create(-)
@@ -17,7 +17,7 @@ if( $use_textile ) require_once (dirname(__FILE__).'/_functions_textile.php');
  *
  * fplanque: created
  */
-function bpost_create( 
+function bpost_create(
 	$author_user_ID, 							// Author
 	$post_title,
 	$post_content,
@@ -25,7 +25,7 @@ function bpost_create(
 	$main_cat_ID = 1,									// Main cat ID
 	$extra_cat_IDs = array(),			// Table of extra cats
 	$post_status = 'published',
-	$post_lang = 'en',
+	$post_locale = 'en_US',
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
@@ -45,7 +45,7 @@ function bpost_create(
 	if( $use_gmcode ) $post_flags[] = 'gmcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
-	
+
 	// make sure main cat is in extracat list and there are no duplicates
 	$extra_cat_IDs[] = $main_cat_ID;
 	$extra_cat_IDs = array_unique( $extra_cat_IDs );
@@ -55,11 +55,11 @@ function bpost_create(
 	// validate url title
 	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0 );
 
-	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content, 
-														post_issue_date, post_mod_date, post_category,  post_status, post_lang, 
-														post_trackbacks, post_autobr, post_flags, post_wordcount, 
+	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content,
+														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
+														post_trackbacks, post_autobr, post_flags, post_wordcount,
 														post_comments ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_urltitle)."', '".addslashes($post_content)."',	'$post_timestamp', '".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
+	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_urltitle)."', '".addslashes($post_content)."',	'$post_timestamp', '".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, '$post_status', '$post_locale', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -92,7 +92,7 @@ function bpost_create(
  *
  * fplanque: created
  */
-function bpost_update( 
+function bpost_update(
 	$post_ID,
 	$post_title,
 	$post_content,
@@ -100,7 +100,7 @@ function bpost_update(
 	$main_cat_ID = 1,							// Main cat ID
 	$extra_cat_IDs = array(),			// Table of extra cats
 	$post_status = 'published',
-	$post_lang = 'en',
+	$post_locale = 'en_US',
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
@@ -139,7 +139,7 @@ function bpost_update(
 	$query .= "post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', ";
 	$query .= "post_category = $main_cat_ID, ";
 	$query .= "post_status = '$post_status', ";
-	$query .= "post_lang = '$post_lang', ";
+	$query .= "post_locale = '$post_locale', ";
 	// $query .= "post_trackbacks = '$post_trackbacks', ";
 	$query .= "post_autobr = $autobr, ";
 	$query .= "post_flags = '".implode(',',$post_flags)."', ";
@@ -184,7 +184,7 @@ function bpost_update(
  *
  * fplanque: created
  */
-function bpost_update_status( 
+function bpost_update_status(
 	$post_ID,
 	$post_status = 'published',
 	$pingsdone = true,
@@ -258,13 +258,13 @@ function bpost_delete( $post_ID )
 
 
 
-/* 
- * get_lastpostdate(-) 
+/*
+ * get_lastpostdate(-)
  */
-function get_lastpostdate( $blog = 1, $show_statuses = '' ) 
+function get_lastpostdate( $blog = 1, $show_statuses = '' )
 {
 	global $localtimenow, $postdata;
-	
+
 	// echo 'getting last post date';
 	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', 'date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
 
@@ -284,7 +284,7 @@ function get_lastpostdate( $blog = 1, $show_statuses = '' )
 }
 
 
-/** 
+/**
  * Validate URL title
  *
  * Using title as a source if url title is empty
@@ -301,21 +301,21 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 	global $tableposts, $querycount;
 
 	$urltitle = trim( $urltitle );
-	
+
 	if( empty( $urltitle )  ) $urltitle = $title;
 	if( empty( $urltitle )  ) $urltitle = 'title';
-	
+
 	// echo 'staring with: ', $urltitle, '<br />';
-	
+
 	// Replace HTML entities
 	$urltitle = htmlentities( $urltitle, ENT_NOQUOTES );
 	// Keep only one char in emtities!
-	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle ); 
+	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle );
 	// Remove non acceptable chars
-	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '_', $urltitle ); 
-	$urltitle = preg_replace( '/^_+/', '', $urltitle ); 
-	$urltitle = preg_replace( '/_+$/', '', $urltitle ); 
-	// Uppercase the first character of each word in a string 
+	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '_', $urltitle );
+	$urltitle = preg_replace( '/^_+/', '', $urltitle );
+	$urltitle = preg_replace( '/_+$/', '', $urltitle );
+	// Uppercase the first character of each word in a string
 	$urltitle = strtolower( $urltitle );
 
 	preg_match( '/^(.*?)(_[0-9]+)?$/', $urltitle, $matches );
@@ -326,7 +326,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 	{
 		$urltitle = $urlbase . $matches[2];
 	}
-	
+
 
 	// Find all occurrences of urltitle+number in the DB:
 	$sql = "SELECT post_urltitle
@@ -335,7 +335,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 					  AND ID <> $post_ID";
 	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
-	
+
 	$exact_match = false;
 	$highest_number = 0;
 	while( $row = mysql_fetch_assoc( $result ) )
@@ -356,14 +356,14 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 		}
 	}
 	// echo "highest existing number = $highest_number <br />";
-		
+
 	if( $exact_match )
 	{	// We got an exact match, we need to change the number:
 		$urltitle = $urlbase.'_'.($highest_number + 1);
 	}
-		
+
 	// echo "using = $urltitle <br />";
-		
+
 	return $urltitle;
 }
 
@@ -372,7 +372,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
  *
  * if global $postdata was not set il will be
  */
-function get_postdata($postid) 
+function get_postdata($postid)
 {
 	global $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $querycount, $show_statuses;
 
@@ -386,7 +386,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
@@ -395,23 +395,23 @@ function get_postdata($postid)
 
 	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
-	if (mysql_num_rows($result)) 
+	if (mysql_num_rows($result))
 	{
 		$myrow = mysql_fetch_object($result);
 		$mypostdata = array (
-			'ID' => $myrow->ID, 
-			'Author_ID' => $myrow->post_author, 
-			'Date' => $myrow->post_issue_date, 
-			'Status' => $myrow->post_status, 
-			'Lang' =>  $myrow->post_lang, 
-			'Content' => $myrow->post_content, 
-			'Title' => $myrow->post_title, 
-			'Url' => $myrow->post_trackbacks, 
-			'Category' => $myrow->post_category, 
+			'ID' => $myrow->ID,
+			'Author_ID' => $myrow->post_author,
+			'Date' => $myrow->post_issue_date,
+			'Status' => $myrow->post_status,
+			'Locale' =>  $myrow->post_locale,
+			'Content' => $myrow->post_content,
+			'Title' => $myrow->post_title,
+			'Url' => $myrow->post_trackbacks,
+			'Category' => $myrow->post_category,
 			'AutoBR' => $myrow->post_autobr,
 			'Flags' => explode( ',', $myrow->post_flags ),
 			'Wordcount' => $myrow->post_wordcount,
-			'comments' => $myrow->post_comments, 
+			'comments' => $myrow->post_comments,
 			'Blog' => $myrow->cat_blog_ID,
 			);
 
@@ -419,13 +419,13 @@ function get_postdata($postid)
 		if( !isset( $postdata ) ) $postdata = $mypostdata;	// Will save time, next time :)
 
 		return($mypostdata);
-	} 
-	
+	}
+
 	return false;
 }
 
 
-/** 
+/**
  * Get an Item by its ID
  *
  * {@internal Item_get_by_ID(-) }}
@@ -435,15 +435,15 @@ function get_postdata($postid)
  * @param integer post ID
  * @return Item requested object or false
  */
-function Item_get_by_ID( $post_ID ) 
+function Item_get_by_ID( $post_ID )
 {
 	global $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $querycount, $show_statuses;
 
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_lang, 
-									post_content, post_title, post_urltitle, post_trackbacks, post_category, 
-									post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID 
-					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID 
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
+									post_content, post_title, post_urltitle, post_trackbacks, post_category,
+									post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID
+					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
@@ -454,7 +454,7 @@ function Item_get_by_ID( $post_ID )
 	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
 
-	if( mysql_num_rows($result) == 0 ) 
+	if( mysql_num_rows($result) == 0 )
 	{
 		return false;
 	}
@@ -470,7 +470,7 @@ function Item_get_by_ID( $post_ID )
  *
  * @deprecated
  */
-function get_the_title() 
+function get_the_title()
 {
 	global $id,$postdata;
 	$output = trim(stripslashes($postdata['Title']));
@@ -480,13 +480,13 @@ function get_the_title()
 
 
 
-/* 
+/*
  * TEMPLATE FUNCTIONS
  */
 
 
 /*****
- * Post tags 
+ * Post tags
  *****/
 
 
@@ -498,7 +498,7 @@ function get_the_title()
  * @deprecated deprecated by {@link DataObject::ID()}
  *
  */
-function the_ID() 
+function the_ID()
 {
 	global $id;
 	echo $id;
@@ -511,7 +511,7 @@ function the_ID()
  *
  * @deprecated deprecated by {@link Item::scope()}
  */
-function the_status( $raw = true ) 
+function the_status( $raw = true )
 {
 	global $post_statuses, $postdata;
 	$status = $postdata['Status'];
@@ -529,11 +529,11 @@ function the_status( $raw = true )
  *
  * @deprecated deprecated by {@link Item::lang()}
  */
-function the_lang() 
+/*function the_lang()
 {
 	global $postdata;
 	echo $postdata['Lang'];
-}
+}*/
 
 /*
  * the_language(-)
@@ -542,12 +542,12 @@ function the_lang()
  *
  * @deprecated deprecated by {@link Item::language()}
  */
-function the_language() 
+/*function the_language()
 {
 	global $postdata, $languages;
 	$post_lang = $postdata['Lang'];
 	echo $languages[ $post_lang ];
-}
+}*/
 
 /*
  * the_wordcount(-)
@@ -556,11 +556,11 @@ function the_language()
  *
  * @deprecated deprecated by {@link Item::wordcount()}
  */
-function the_wordcount()
+/*function the_wordcount()
 {
 	global $postdata;
 	echo $postdata['Wordcount'];
-}
+}*/
 
 /*
  * the_title(-)
@@ -570,15 +570,15 @@ function the_wordcount()
  *
  * @deprecated deprecated by {@link Item::title()}
  */
-function the_title( 
+/*function the_title(
 	$before='',						// HTML/text to be displayed before title
 	$after='', 						// HTML/text to be displayed after title
 	$add_link = true, 		// Added link to this title?
 	$format = 'htmlbody',	// Format to use (example: "htmlbody" or "xml")
 	$disp = true )				// Display output?
 {
-	global $postdata; 
-	
+	global $postdata;
+
 	$title = get_the_title();
 	$url = trim($postdata['Url']);
 
@@ -605,7 +605,7 @@ function the_title(
 		echo $return_str;
 	else
 		return $return_str;
-}
+}*/
 
 
 /*
@@ -615,12 +615,12 @@ function the_title(
  *
  * @deprecated deprecated by {@link Item::url_link()}
  */
-function the_link( $before='', $after='', $format = 'htmlbody' ) 
+/*function the_link( $before='', $after='', $format = 'htmlbody' )
 {
-	global $postdata; 
-	
+	global $postdata;
+
 	$url = trim($postdata['Url']);
-	
+
 	if( empty($url) )
 	{
 		return false;
@@ -629,7 +629,7 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
 	$link = $before.'<a href="'.$url.'">'.$url.'</a>'.$after;
 
 	echo format_to_output( $link, $format );
-}
+}*/
 
 
 
@@ -638,20 +638,20 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
  *
  * fplanque: 0.8.3: changed defaults
  */
-function single_post_title($prefix = '#', $display = 'htmlhead' ) 
+function single_post_title($prefix = '#', $display = 'htmlhead' )
 {
 	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
 
 	global $p, $title;
-	if( intval( $p ) || (!empty( $title )) ) 
+	if( intval( $p ) || (!empty( $title )) )
 	{
 		$post_data = get_postdata($p);
 		$disp_title = stripslashes($post_data['Title']);
-		if ($display) 
+		if ($display)
 		{
 			echo format_to_output( $prefix.$disp_title, $display );
 		}
-		else 
+		else
 		{
 			return $disp_title;
 		}
@@ -664,14 +664,14 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
  *
  * @deprecated deprecated by {@link Item::content()}
  */
-function the_content( 
-	$more_link_text='#', 
-	$stripteaser=0, 
-	$more_file='', 
-	$more_anchor='#', 
-	$before_more_link = '#', 
-	$after_more_link = '#', 
-	$format = 'htmlbody', 
+function the_content(
+	$more_link_text='#',
+	$stripteaser=0,
+	$more_file='',
+	$more_anchor='#',
+	$before_more_link = '#',
+	$after_more_link = '#',
+	$format = 'htmlbody',
 	$cut = 0,
 	$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
 	$disppage = '#' ) // page number to display specific page, # for url parameter
@@ -679,25 +679,25 @@ function the_content(
 	global $use_textile;
 	global $id, $postdata, $pages, $multipage, $numpages;
 	global $preview, $use_extra_path_info;
-	
+
 	// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
-	
-	if( $more_link_text == '#' ) 
+
+	if( $more_link_text == '#' )
 	{	// TRANS: this is the default text for the extended post "more" link
 		$more_link_text = '=> '.T_('Read more!');
 	}
 
-	if( $more_anchor == '#' ) 
+	if( $more_anchor == '#' )
 	{	// TRANS: this is the default text displayed once the more link has been activated
 		$more_anchor = '['.T_('More:').']';
 	}
 
-	if( $before_more_link == '#' ) 
+	if( $before_more_link == '#' )
 		$before_more_link = '<p class="bMore">';
 
-	if( $after_more_link == '#' ) 
+	if( $after_more_link == '#' )
 		$after_more_link = '</p>';
-	
+
 	if( $dispmore === '#' )
 	{
 		global $more;
@@ -709,11 +709,11 @@ function the_content(
 		global $page;
 		$disppage = $page;
 	}
-	if( $disppage > $numpages ) $disppage = $numpages;	
+	if( $disppage > $numpages ) $disppage = $numpages;
 	// echo 'Using: dmore=', $dispmore, ' dpage=', $disppage;
 
 	$output = '';
-	if ($more_file != '') 
+	if ($more_file != '')
 		$file = $more_file;
 	else
 		$file = get_bloginfo('blogurl');
@@ -730,22 +730,22 @@ function the_content(
 	}
 	$output .= $teaser;
 
-	if (count($content)>1) 
+	if (count($content)>1)
 	{
-		if ($dispmore) 
+		if ($dispmore)
 		{	// Viewer has already asked for more
 			if( !empty($more_anchor) ) $output .= $before_more_link;
 			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
 			if( !empty($more_anchor) ) $output .= $after_more_link;
 			$output .= $content[1];
-		} 
-		else 
+		}
+		else
 		{ // We are offering to read more
 			$more_link = gen_permalink( $file, $id, 'id', 'single', 1 );
 			$output .= $before_more_link.'<a href="'.$more_link.'#more'.$id.'">'.$more_link_text.'</a>'.$after_more_link;
 		}
 	}
-	if ($preview) 
+	if ($preview)
 	{ // preview fix for javascript bug with foreign languages
 		$output =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
 	}
@@ -758,13 +758,13 @@ function the_content(
 	if( $use_textile ) $content = textile( $content );
 
 	$content = format_to_output( $content, $format );
-	
+
 	if( ($format == 'xml') && $cut )
 	{	// Let's cut this down...
 		$blah = explode(' ', $content);
-		if (count($blah) > $cut) 
+		if (count($blah) > $cut)
 		{
-			for ($i=0; $i<$cut; $i++) 
+			for ($i=0; $i<$cut; $i++)
 			{
 				$excerpt .= $blah[$i].' ';
 			}
@@ -781,7 +781,7 @@ function the_content(
  * link_pages(-)
  * vegarg: small bug when using $more_file fixed
  */
-function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='') 
+function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='')
 {
 	global $id,$page,$numpages, $multipage, $more;
 	global $blogfilename;
@@ -789,16 +789,16 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
 	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
 
-	if ($more_file != '') 
+	if ($more_file != '')
 		$file = $more_file;
 	else
 		$file = get_bloginfo('blogurl');
 
 	if(($multipage)) { // && ($more)) {
 		echo $before;
-		if ($next_or_number=='number') 
+		if ($next_or_number=='number')
 		{
-			for ($i = 1; $i < ($numpages+1); $i = $i + 1) 
+			for ($i = 1; $i < ($numpages+1); $i = $i + 1)
 			{
 				$j=str_replace('%',"$i",$pagelink);
 				echo " ";
@@ -808,7 +808,7 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 				if (($i != $page) || ((!$more) && ($page==1)))
 					echo '</a>';
 			}
-		} 
+		}
 		else
 		{
 			$i=$page-1;
@@ -828,16 +828,16 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
  *
  *
  */
-function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='') 
+function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
 {
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
 	global $tableposts, $id, $postdata, $siteurl, $blogfilename, $querycount;
 	global $p, $posts, $posts_per_page, $s;
 
-	if(($p) || ($posts==1)) 
+	if(($p) || ($posts==1))
 	{
-		
+
 		$current_post_date = $postdata['Date'];
 		$current_category = $postdata['Category'];
 
@@ -881,19 +881,19 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
  *
  *
  */
-function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='') 
+function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='')
 {
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
 	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount, $localtimenow;
 	global $time_difference;
-	if(($p) || ($posts==1)) 
+	if(($p) || ($posts==1))
 	{
-		
+
 		$current_post_date = $postdata['Date'];
 		$current_category = $postdata['Category'];
 		$sqlcat = '';
-		if ($in_same_cat != 'no') 
+		if ($in_same_cat != 'no')
 		{
 			$sqlcat = " AND post_category='$current_category' ";
 		}
@@ -939,11 +939,11 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 function next_posts($max_page = 0, $page='' )
 {
 	global $p, $paged, $what_to_show;
-	if (empty($p) && ($what_to_show == 'paged')) 
+	if (empty($p) && ($what_to_show == 'paged'))
 	{
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
-		if (!$max_page || $max_page >= $nextpage) 
+		if (!$max_page || $max_page >= $nextpage)
 		{
 			echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
 		}
@@ -957,7 +957,7 @@ function next_posts($max_page = 0, $page='' )
  *
  * fplanque: reduced to the max!
  */
-function previous_posts( $page='' ) 
+function previous_posts( $page='' )
 {
 	global $p, $paged, $what_to_show;
 	if (empty($p) && ($what_to_show == 'paged'))
@@ -966,7 +966,7 @@ function previous_posts( $page='' )
 		if ($nextpage < 1) $nextpage = 1;
 		echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
 	}
-} 
+}
 
 
 /*
@@ -974,18 +974,18 @@ function previous_posts( $page='' )
  *
  *
  */
-function next_posts_link($label='#', $max_page=0, $page='') 
+function next_posts_link($label='#', $max_page=0, $page='')
 {
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
 	global $p, $paged, $result, $request, $posts_per_page, $what_to_show;
-	if ($what_to_show == 'paged') 
+	if ($what_to_show == 'paged')
 	{
 		global $MainList;
 		if (!$max_page)	$max_page = $MainList->get_max_paged();
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
-		if (empty($p) && (empty($paged) || $nextpage <= $max_page)) 
+		if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 		{
 			echo '<a href="';
 			echo next_posts($max_page, $page);
@@ -1001,12 +1001,12 @@ function next_posts_link($label='#', $max_page=0, $page='')
  *
  *
  */
-function previous_posts_link($label='#', $page='') 
+function previous_posts_link($label='#', $page='')
 {
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
 	global $p, $paged, $what_to_show;
-	if (empty($p)  && ($paged > 1) && ($what_to_show == 'paged')) 
+	if (empty($p)  && ($paged > 1) && ($what_to_show == 'paged'))
 	{
 		echo '<a href="';
 		echo previous_posts( $page );
@@ -1021,14 +1021,14 @@ function previous_posts_link($label='#', $page='')
  *
  *
  */
-function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='') 
+function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {
 	global $request, $p, $what_to_show;
-	if( !empty( $request ) && empty($p) && ($what_to_show == 'paged')) 
+	if( !empty( $request ) && empty($p) && ($what_to_show == 'paged'))
 	{
 		global $MainList;
 		$max_paged = $MainList->get_max_paged();
-		if( $max_paged > 1 ) 
+		if( $max_paged > 1 )
 		{
 			previous_posts_link( $prelabel, $page );
 			echo htmlspecialchars($sep);
@@ -1038,26 +1038,26 @@ function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 }
 
 /*****
- * // Post tags 
+ * // Post tags
  *****/
 
 
 
 
 /*****
- * Date/Time tags 
+ * Date/Time tags
  *****/
- 
+
 /**
  * the_date(-)
  *
  * @deprecated deprecated by {@link ItemList::date_if_changed()}
  */
-function the_date($d='', $before='', $after='', $echo = 1) 
+function the_date($d='', $before='', $after='', $echo = 1)
 {
 	global $id, $postdata, $day, $previousday, $newday;
 	$the_date = '';
-	if ($day != $previousday) 
+	if ($day != $previousday)
 	{
 		$the_date .= $before;
 		if ($d=='') {
@@ -1080,19 +1080,19 @@ function the_date($d='', $before='', $after='', $echo = 1)
  *
  *
  * @deprecated deprecated by {@link Item::time()} / {@link Item::date()}
- * 
+ *
  */
 function the_time($d='', $echo = 1, $useGM = 0)
 {
 	global $id,$postdata;
-	if ($d=='') 
+	if ($d=='')
 	{
 		$the_time = mysql2date( locale_timefmt(), $postdata['Date'], $useGM);
 	} else {
 		$the_time = mysql2date( $d, $postdata['Date'], $useGM);
 	}
 
-	if ($echo) 
+	if ($echo)
 	{
 		echo $the_time;
 	} else {
@@ -1105,7 +1105,7 @@ function the_time($d='', $echo = 1, $useGM = 0)
  *
  *
  */
-function the_weekday() 
+function the_weekday()
 {
 	global $weekday,$id,$postdata;
 	$the_weekday = T_($weekday[mysql2date('w', $postdata['Date'])]);
@@ -1117,7 +1117,7 @@ function the_weekday()
  *
  *
  */
-function the_weekday_date($before='',$after='') 
+function the_weekday_date($before='',$after='')
 {
 	global $weekday,$id,$postdata,$day,$previousweekday;
 	$the_weekday_date = '';
@@ -1132,11 +1132,11 @@ function the_weekday_date($before='',$after='')
 }
 
 /*****
- * // Date/Time tags 
+ * // Date/Time tags
  *****/
 
 /*****
- * Author tags 
+ * Author tags
  *****/
 
 /*
@@ -1144,7 +1144,7 @@ function the_weekday_date($before='',$after='')
  *
  * @deprecated deprecated by {@link User::prefered_name()}
  */
-function the_author( $format = 'htmlbody' ) 
+function the_author( $format = 'htmlbody' )
 {
 	global $authordata;
 	switch( $authordata['user_idmode'] )
@@ -1152,31 +1152,31 @@ function the_author( $format = 'htmlbody' )
 		case 'nickname':
 			$author = $authordata['user_nickname'];
 			break;
-			
+
 		case 'login':
 			$author = $authordata['user_login'];
 			break;
-			
+
 		case 'firstname':
 			$author = $authordata['user_firstname'];
 			break;
-			
+
 		case 'lastname':
 			$author = $authordata['user_lastname'];
 			break;
-			
+
 		case 'namefl':
 			$author = $authordata['user_firstname'].' '.$authordata['user_lastname'];
 			break;
-			
+
 		case 'namelf':
 			$author = $authordata['user_lastname'].' '.$authordata['user_firstname'];
 			break;
-			
+
 		default:
 			$author = $authordata['user_nickname'];
 	}
-	
+
 	echo format_to_output( $author, $format );
 }
 
@@ -1186,7 +1186,7 @@ function the_author( $format = 'htmlbody' )
  *
  * @deprecated deprecated by {@link User::level()}
  */
-function the_author_level() 
+function the_author_level()
 {
 	global $authordata;
 	echo $authordata['user_level'];
@@ -1197,7 +1197,7 @@ function the_author_level()
  *
  * @deprecated deprecated by {@link User::level()}
  */
-function the_author_login( $format = 'htmlbody' ) 
+function the_author_login( $format = 'htmlbody' )
 {
 	global $id,$authordata;
 	echo format_to_output( $authordata['user_login'], $format );
@@ -1206,27 +1206,27 @@ function the_author_login( $format = 'htmlbody' )
 /*
  * the_author_firstname(-)
  */
-function the_author_firstname( $format = 'htmlbody' ) 
+function the_author_firstname( $format = 'htmlbody' )
 {
-	global $id,$authordata;	
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_firstname'], $format );
 }
 
 /*
  * the_author_lastname(-)
  */
-function the_author_lastname( $format = 'htmlbody' ) 
+function the_author_lastname( $format = 'htmlbody' )
 {
-	global $id,$authordata;	
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_lastname'], $format );
 }
 
 /*
  * the_author_nickname(-)
  */
-function the_author_nickname( $format = 'htmlbody' ) 
+function the_author_nickname( $format = 'htmlbody' )
 {
-	global $id,$authordata;	
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_nickname'], $format );
 }
 
@@ -1235,18 +1235,18 @@ function the_author_nickname( $format = 'htmlbody' )
  *
  * @deprecated deprecated by {@link DataObject::ID()}
  */
-function the_author_ID() 
+function the_author_ID()
 {
-	global $id,$authordata;		
+	global $id,$authordata;
 	echo $authordata['ID'];
 }
 
 /*
  * the_author_email(-)
  */
-function the_author_email( $format = 'raw' ) 
+function the_author_email( $format = 'raw' )
 {
-	global $id,$authordata;			
+	global $id,$authordata;
 	echo format_to_output( antispambot($authordata['user_email']), $format );
 }
 
@@ -1255,60 +1255,60 @@ function the_author_email( $format = 'raw' )
  *
  * @deprecated deprecated by {@link User::url()}
  */
-function the_author_url( $format = 'raw' ) 
+function the_author_url( $format = 'raw' )
 {
-	global $id,$authordata;			
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_url'], $format );
 }
 
 /*
  * the_author_icq(-)
  */
-function the_author_icq( $format = 'raw' ) 
+function the_author_icq( $format = 'raw' )
 {
-	global $id,$authordata;			
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_icq'], $format );
 }
 
 /*
  * the_author_aim(-)
  */
-function the_author_aim( $format = 'raw' ) 
+function the_author_aim( $format = 'raw' )
 {
-	global $id,$authordata;			
+	global $id,$authordata;
 	echo format_to_output( str_replace(' ', '+', $authordata['user_aim']), $format );
 }
 
 /*
  * the_author_yim(-)
  */
-function the_author_yim( $format = 'raw' ) 
+function the_author_yim( $format = 'raw' )
 {
-	global $id,$authordata;			
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_yim'], $format );
 }
 
 /*
  * the_author_msn(-)
  */
-function the_author_msn( $format = 'raw' ) 
+function the_author_msn( $format = 'raw' )
 {
-	global $id,$authordata;	
+	global $id,$authordata;
 	echo format_to_output( $authordata['user_msn'], $format );
 }
 
 /*
  * the_author_posts(-)
  */
-function the_author_posts() 
+function the_author_posts()
 {
-	global $id,$postdata;	
+	global $id,$postdata;
 	$posts=get_usernumposts($postdata['Author_ID']);
 	echo $posts;
 }
 
 /*****
- * // Author tags 
+ * // Author tags
  *****/
 
 
@@ -1326,7 +1326,7 @@ function the_author_posts()
  *
  * @deprecated deprecated by {@link Item::anchor()}
  */
-function permalink_anchor( $mode = 'id' ) 
+function permalink_anchor( $mode = 'id' )
 {
 	global $id, $postdata;
 	switch(strtolower($mode))
@@ -1376,13 +1376,13 @@ function gen_permalink(
 	if (empty($use_pingback)) $use_pingback = $permalink_include_pingback;
 
 	// Generate anchor
-	switch(strtolower($use_anchor_mode)) 
+	switch(strtolower($use_anchor_mode))
 	{
 		case 'title':
 			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
 			$anchor = $title;
 			break;
-	
+
 		case 'id':
 		default:
 			$anchor = $id;
@@ -1411,7 +1411,7 @@ function gen_permalink(
 			$options .=  '&amp;pb=1';
 		}
 
-		switch($use_destination) 
+		switch($use_destination)
 		{
 			case 'monthly':
 				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).$options.'#'.$anchor;
@@ -1437,7 +1437,7 @@ function gen_permalink(
 	}
 	else
 	{	// We reference by path (CLEAN permalinks!)
-		switch($use_destination) 
+		switch($use_destination)
 		{
 			case 'monthly':
 				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'#'.$anchor;
@@ -1462,7 +1462,7 @@ function gen_permalink(
 				break;
 		}
 	}
-	
+
 	return $permalink;
 }
 
@@ -1489,7 +1489,7 @@ function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
  *
  * @deprecated deprecated by {@link Item::permalink()}
  */
-function permalink_single($file='') 
+function permalink_single($file='')
 {
 	global $id;
 	if (empty($file)) $file = get_bloginfo('blogurl');
@@ -1507,7 +1507,7 @@ function permalink_single($file='')
 /*
  * is_new_day(-)
  */
-function is_new_day() 
+function is_new_day()
 {
 	global $day, $previousday;
 	if ($day != $previousday) {
@@ -1581,7 +1581,7 @@ function statuses_where_clause( $show_statuses = '' )
 			unset( $show_statuses[$key] );
 		}
 	}
-	
+
 	// Remaining statuses:
 	$other_statuses = '';
 	$sep = '';
@@ -1591,7 +1591,7 @@ function statuses_where_clause( $show_statuses = '' )
 		$sep = ',';
 	}
 	if( strlen( $other_statuses ) )
-	{				
+	{
 		$where .= $or.'post_status IN ('. $other_statuses .') ';
 	}
 

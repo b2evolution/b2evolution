@@ -19,9 +19,9 @@ if( ($use_l10n == 1) && function_exists('_') )
 {	// We are going to use GETTEXT
 	function T_( $string, $req_locale = '' )
 	{
-		global $current_locale;
+		global $current_messages;
 		
-		if( empty( $req_locale ) || $req_locale == $current_locale )
+		if( empty( $req_locale ) || $req_locale == $current_messages )
 		{	// We have not asked for a different locale than the currently active one:
 			return _($string);
 		}
@@ -33,27 +33,28 @@ elseif( $use_l10n == 2 )
 {	// We are going to use b2evo localization:
 	function T_( $string, $req_locale = '' )
 	{
-		global $trans, $current_locale;
+		global $trans, $current_messages;
 		
 		// By default we use the current locale:
-		if( empty($req_locale) ) $req_locale = $current_locale;
+		if( empty($req_locale) ) $req_locale = $current_messages;
 
 		$search = str_replace( "\n", '\n', $string );
 		$search = str_replace( "\r", '', $search );
 		// echo "Translating ", $search, " to $req_locale<br />";
 		
-		if( !isset($trans[$current_locale] ) )
+		#echo locale_messages($req_locale); exit;
+		if( !isset($trans[ $current_messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
-			@include_once( dirname(__FILE__).'/../locales/'.$req_locale.'/_global.php' );
-			if( !isset($trans[$current_locale] ) )
+			@include_once( dirname(__FILE__). '/../locales/'. locale_fromdb($req_locale, 'messages'). '/_global.php' );
+			if( !isset($trans[ $current_messages ] ) )
 			{	// Still not loaded... file doesn't exist, memorize that no translation are available
-				$trans[$current_locale] = array();
+				$trans[ $current_messages ] = array();
 			}
 		}
 				
-		if( isset( $trans[$current_locale][$search] ) )
+		if( isset( $trans[ $current_messages ][ $search ] ) )
 		{	// If the string has been translated:
-			return $trans[$current_locale][$search];
+			return $trans[ $current_messages ][ $search ];
 		}
 		
 		// echo "Not found!";
@@ -78,7 +79,7 @@ else
  */
 function locale_activate( $locale )
 {
-	global $use_l10n, $locales, $current_locale, $current_charset, $weekday, $month;
+	global $use_l10n, $locales, $current_locale, $current_messages, $current_charset, $weekday, $month;
 
 	if( $locale == $current_locale )
 	{
@@ -88,13 +89,15 @@ function locale_activate( $locale )
 	// Memorize new locale:
 	$current_locale = $locale;
 	// Memorize new charset:
-	$current_charset = $locales[$locale]['charset'];
+	#$current_charset = $locales[ $locale ][ 'charset' ];
+	$current_charset = locale_fromdb( $locale, 'charset' );
+	$current_messages = locale_fromdb( $locale, 'messages' );
 
 	// Activate translations in gettext:
-	if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )
+	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
 	{	// Only if we war eusing GETTEXT ( if not, look into T_(-) ...)
 		# Activate the locale->language in gettext:
-		putenv( 'LC_ALL='.$locale ); 
+		putenv( 'LC_ALL='. $current_messages );
 		// Note: default of safe_mode_allowed_env_vars is "PHP_ ", 
 		// so you need to add "LC_" by editing php.ini. 
 
@@ -214,6 +217,31 @@ function locale_options( $default = '' )
 	}
 }
 
+/*
+ * locale_fromdb(-)
+ *
+ *	@return returns given property from DB
+ *	
+ *	blueyed: created. Temporary. Should consider using a class for locales.
+ */
+function locale_fromdb( $locale, $what )
+{
+	return false;  // damn, no db-connection.
+	
+	global $tablelocales, $querycount;
+	$query = "SELECT loc_$what FROM $tablelocales WHERE loc_locale = '$locale'";
+	$result = mysql_query( $query ) or mysql_oops( $query );
+	$querycount++;
+	if( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) )
+	{
+		return $row[ 'loc_'. $what ];
+	}
+	else
+	{
+		return false;
+	}
+	
+}
 
 /*
  * locale_from_httpaccept(-)

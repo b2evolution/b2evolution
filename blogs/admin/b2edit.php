@@ -10,7 +10,7 @@
  *
  * @package admin
  */
-require_once (dirname(__FILE__).'/_header.php');
+require_once (dirname(__FILE__). '/_header.php');
 
 param( 'action', 'string' );
 
@@ -27,16 +27,16 @@ switch($action)
 		param( 'post', 'integer', true );
 		$postdata = get_postdata( $post ) or die( T_('Oops, no post with this ID.') );
 		$edited_Item = Item_get_by_ID( $post );
-		$post_lang = $edited_Item->get( 'lang' );
+		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
 		$blog = get_catblog($cat); 
 	
 		$title = T_('Editing post');
-		require (dirname(__FILE__).'/_menutop.php');
+		require (dirname(__FILE__). '/_menutop.php');
 	
 		printf( T_('#%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
 		
-		require (dirname(__FILE__).'/_menutop_end.php');
+		require (dirname(__FILE__). '/_menutop_end.php');
 	
 		$post_status = $edited_Item->get( 'scope' );
 		// Check permission:
@@ -207,7 +207,7 @@ switch($action)
 		$post_url = format_to_edit( $post_url, false );
 		param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
-		param( 'post_lang', 'string', $default_locale );
+		param( 'post_locale', 'string', $default_locale );
 
 		param( 'edit_date', 'integer', 0 );
 		param( 'aa', 'string', date( 'Y', $localtimenow) );

@@ -10,7 +10,7 @@
  *
  * @package admin
  */
-require_once( dirname(__FILE__) . '/_header.php' ); // this will actually load blog params for req blog
+require_once( dirname(__FILE__). '/_header.php' ); // this will actually load blog params for req blog
 $title = T_('Blogs');
 param( 'action', 'string' );
 
@@ -18,8 +18,8 @@ switch($action)
 {
 	case 'new':
 		// New blog form:
-		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
+		require( dirname(__FILE__). '/_menutop.php' );
+		require( dirname(__FILE__). '/_menutop_end.php' );
 
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
@@ -33,7 +33,7 @@ switch($action)
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_description', 'string', '' );
 		param( 'blog_longdesc', 'html', '' );
-		param( 'blog_lang', 'string', $default_locale );
+		param( 'blog_locale', 'string', $default_locale );
 		param( 'blog_siteurl', 'string', '' );
 		param( 'blog_filename', 'string', 'new_file.php' );
 		param( 'blog_staticfilename', 'string', '' );
@@ -69,7 +69,7 @@ switch($action)
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_description', 'string', '' );
 		param( 'blog_longdesc', 'html', '' );
-		param( 'blog_lang', 'string', 'en' );
+		param( 'blog_locale', 'string', $default_locale );
 		param( 'blog_siteurl', 'string', true );
 		param( 'blog_filename', 'string', true );
 		param( 'blog_staticfilename', 'string', '' );
@@ -103,8 +103,8 @@ switch($action)
 
 		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, $blog_filename,
 									$blog_stub,  $blog_staticfilename,
-									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll,
-									$blog_keywords, $blog_UID, blog_disp_bloglist ) or mysql_oops( $query );
+									$blog_tagline, $blog_description, $blog_longdesc, $blog_locale, $blog_roll,
+									$blog_keywords, $blog_UID, $blog_disp_bloglist ) or mysql_oops( $query );
 
 		// Set the user permissions for this blog
 		blog_update_user_perms( $blog_ID );
@@ -183,8 +183,8 @@ switch($action)
 	case 'edit':
 		// Edit blog form:
 		param( 'blog', 'integer', true );
-		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
+		require( dirname(__FILE__). '/_menutop.php' );
+		require( dirname(__FILE__). '/_menutop_end.php' );
 
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
@@ -197,7 +197,7 @@ switch($action)
 		$blog_tagline = get_bloginfo( 'tagline' );
 		$blog_description = get_bloginfo( 'description' );
 		$blog_longdesc = get_bloginfo( 'longdesc' );
-		$blog_lang = get_bloginfo( 'lang' );
+		$blog_locale = get_bloginfo( 'locale' );
 		$blog_siteurl = get_bloginfo( 'subdir' );
 		$blog_filename = get_bloginfo( 'filename' );
 		$blog_staticfilename = get_bloginfo( 'staticfilename' );
@@ -230,7 +230,7 @@ switch($action)
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_description', 'string', '' );
 		param( 'blog_longdesc', 'html', '' );
-		param( 'blog_lang', 'string', 'en' );
+		param( 'blog_locale', 'string', $default_locale );
 		param( 'blog_siteurl', 'string', true );
 		param( 'blog_filename', 'string', true );
 		param( 'blog_staticfilename', 'string', '' );
@@ -262,7 +262,8 @@ switch($action)
 		// Update core blog params
 		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
 									$blog_staticfilename,
-									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll,
+									$blog_tagline, $blog_description, $blog_longdesc,
+									$blog_locale, $blog_roll,
 									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
 									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
 									$blog_disp_bloglist )
@@ -313,7 +314,7 @@ switch($action)
 
 		echo T_('Writing to file...'), '<br />', "\n";
 
-		$fp = fopen ( $staticfilename, "w");
+		$fp = fopen ( $staticfilename, 'w');
 		fwrite($fp, $page);
 		fclose($fp);
 
@@ -327,12 +328,12 @@ switch($action)
 
 
 	default:
-		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
+		require( dirname(__FILE__). '/_menutop.php' );
+		require( dirname(__FILE__). '/_menutop_end.php' );
 
 }
 
 // List the blogs:
-require( dirname(__FILE__) . '/_blogs_list.php' );
-require( dirname(__FILE__) . '/_footer.php' );
+require( dirname(__FILE__). '/_blogs_list.php' );
+require( dirname(__FILE__). '/_footer.php' );
 ?>

@@ -10,13 +10,14 @@
  *
  * @package install
  */
-if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-	die("Please, do not access this page directly.");
+if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
+	die('Please, do not access this page directly.');
 
 /*
  * create_b2evo_tables(-)
  *
  * Used for fresh install + upgrade from b2
+ *
  */
 function create_b2evo_tables()
 {
@@ -25,6 +26,7 @@ function create_b2evo_tables()
 	global $baseurl, $new_db_version;
 
 	create_groups();
+
 
 	echo "Creating table for Settings... ";
 	$query = "CREATE TABLE $tablesettings (
@@ -43,6 +45,7 @@ function create_b2evo_tables()
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
+
 
 	echo "Creating table for Users...";
 	$query = "CREATE TABLE $tableusers (
@@ -73,6 +76,7 @@ function create_b2evo_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
+
 	echo "Creating table for Blogs...";
 	$query = "CREATE TABLE $tableblogs (
 		blog_ID int(4) NOT NULL auto_increment,
@@ -102,6 +106,7 @@ function create_b2evo_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
+
 	echo "Creating table for Categories...";
 	$query="CREATE TABLE $tablecategories (
 		cat_ID int(4) NOT NULL auto_increment,
@@ -117,6 +122,7 @@ function create_b2evo_tables()
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
+
 
 	echo "Creating table for Posts...";
 	$query = "CREATE TABLE $tableposts (
@@ -148,6 +154,7 @@ function create_b2evo_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
+
 	echo "Creating table for Categories-to-Posts relationships...";
 	$query = "CREATE TABLE $tablepostcats (
 		postcat_post_ID int(11) NOT NULL default '0',
@@ -156,6 +163,7 @@ function create_b2evo_tables()
 	)"; // We might want to add an index on cat_ID here...
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
+
 
 	echo "Creating table for Comments...";
 	$query = "CREATE TABLE $tablecomments (
@@ -178,6 +186,7 @@ function create_b2evo_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
+
 	echo "Creating table for Hit-Logs...";
 	$query = "CREATE TABLE $tablehitlog (
 		visitID bigint(11) NOT NULL auto_increment,
@@ -198,7 +207,11 @@ function create_b2evo_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
+
 	create_antispam();
+
+
+	create_locales();
 }
 
 
@@ -211,7 +224,7 @@ function create_antispam()
 {
 	global $tableantispam;
 
-	echo "Creating table for Antispam Blackist...";
+	echo 'Creating table for Antispam Blackist...';
 	$query = "CREATE TABLE $tableantispam (
 		aspm_ID bigint(11) NOT NULL auto_increment,
 		aspm_string varchar(80) NOT NULL,
@@ -232,6 +245,60 @@ function create_antispam()
 	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
 	mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
+}
+
+/*
+ * create_locales(-)
+ *
+ * Used when creating full install and upgrading from earlier versions
+ *
+ * blueyed: created
+ *
+ */
+function create_locales()
+{
+	global $tablelocales, $locales;
+	
+	echo 'Creating table for Locales...';
+	$query = "CREATE TABLE $tablelocales (
+		loc_locale varchar(10) NOT NULL default '',
+		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
+		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
+		loc_timefmt varchar(10) NOT NULL default 'H:i:s',
+		loc_lang varchar(30) NOT NULL default '',
+		loc_messages varchar(10) NOT NULL default '',
+		loc_enabled tinyint(4) NOT NULL default '1',
+		PRIMARY KEY  (loc_locale)
+	) COMMENT='saves available locales'";
+	$q = mysql_query($query) or mysql_oops( $query );
+	echo "OK.<br />\n";
+
+	echo 'Creating Locales...';
+	if( isset($locales) && is_array($locales) )
+	{
+		foreach( $locales as $localekey => $lval )
+		{
+			if( !isset($lval['messages']) )
+			{ // if not explicit messages file is given we'll translate the locale
+				$lval['messages'] = strtr($localekey, '-', '_');
+			}
+			$query = "INSERT INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_lang, loc_messages, loc_enabled )
+				VALUES (
+				'$localekey',
+				'{$lval['charset']}',
+				'{$lval['datefmt']}',
+				'{$lval['timefmt']}',
+				'{$lval['language']}',
+				'{$lval['messages']}',
+				1
+				)";
+			$q = mysql_query($query) or mysql_oops( $query );
+			pre_dump($query);
+		}
+		echo 'OK.';
+	} else echo 'failed: array $locales not defined.';
+	echo "<br />\n";
+
 }
 
 
@@ -560,7 +627,8 @@ function create_default_contents( $populate_blog_a = true )
 /*
  * populate_main_tables(-)
  *
- * This is called only for fresh installs
+ * This is called only for fresh installs and fills the tables with demo/tutorial things
+ *
  */
 function populate_main_tables()
 {
@@ -616,7 +684,8 @@ function populate_main_tables()
 
 	echo "OK.<br />\n";
 
-	echo 'Creating default users... ';
+
+	echo 'Creating default users...';
 
 	// USERS !
 	$User_Admin = & new User();
@@ -644,7 +713,8 @@ function populate_main_tables()
 
 	echo "OK.<br />\n";
 
-	echo "Creating user blog permissions... ";
+
+	echo 'Creating user blog permissions...';
 	// Admin for blog A:
 	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,

@@ -58,7 +58,7 @@ if( empty($disp) )
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 // Activate matching locale:
-locale_activate( locale_by_lang( get_bloginfo('lang') ) );
+locale_activate( locale_by_lang( get_bloginfo('locale') ) );
 
 // Extra path info decoding:
 $ReqURI = $_SERVER['REQUEST_URI'];

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Displays blog properties form
  *
@@ -15,7 +15,7 @@ switch( $next_action )
 	case 'create':
 		$submit = T_('Create new blog!');
 		break;
-		
+
 	case 'update':
 		$submit = T_('Update blog!');
 		break;
@@ -27,22 +27,22 @@ switch( $next_action )
 
 	<fieldset>
 		<legend><?php echo T_('General parameters') ?></legend>
-		<?php 
+		<?php
 			form_text( 'blog_name', $blog_name, 50, T_('Full Name') );
 			form_text( 'blog_shortname', $blog_shortname, 12, T_('Short Name') );
-			form_select( 'blog_lang', $blog_lang, 'locale_options', T_('Main Language') );
+			form_select( 'blog_locale', $blog_locale, 'locale_options', T_('Main Locale') );
 		?>
 	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Access parameters') ?></legend>
 		<fieldset>
-			<div class="label"><label for="blog_siteurl"><?php echo T_('Blog Folder URL') ?>: </label></div> 
+			<div class="label"><label for="blog_siteurl"><?php echo T_('Blog Folder URL') ?>: </label></div>
 			<div class="input"><code><?php echo $baseurl ?></code><input type="text" name="blog_siteurl" id="blog_siteurl" size="40" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>"/>
 			<span class="notes"><?php echo T_('This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live. No trailing slash. (If you don\'t know, leave this field empty.)') ?></span></div>
 		</fieldset>
-		
-		<?php 
+
+		<?php
 			form_text( 'blog_filename', $blog_filename, 30, T_('Stub Filename'), T_('This is the <strong>file</strong>name of the main file (e-g: blog_b.php) used to display this blog. This is used mainly for static page generation, but setting this incorrectly may also cause navigation to fail.') );
 
 			form_text( 'blog_stub', $blog_stub, 30, T_('Stub Urlname'), T_('This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used to display this blog. A typical setting would be setting this to your Filename without the .php extension, if your webserver supports this. <strong>If you are not sure how to set this, use the same as Stub Filename.</strong> This is used by permalinks, trackback, pingback, etc. Setting this incorrectly may cause these to fail.') );
@@ -75,15 +75,15 @@ switch( $next_action )
 				</td>
 			</tr>
 			<?php
-				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, 
+				$query = "SELECT ID, user_login, bloguser_perm_poststatuses,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties
-									FROM $tableusers INNER JOIN $tableblogusers 
-													ON ID = bloguser_user_ID 
-									WHERE bloguser_blog_ID = $blog 
+									FROM $tableusers INNER JOIN $tableblogusers
+													ON ID = bloguser_user_ID
+									WHERE bloguser_blog_ID = $blog
 									ORDER BY user_login";
-				$result = mysql_query($query) or mysql_oops( $query ); 
-				$querycount++; 
+				$result = mysql_query($query) or mysql_oops( $query );
+				$querycount++;
 				$members=array();
 				while($loop_row = mysql_fetch_array($result) )
 				{	// Go through users:
@@ -165,15 +165,15 @@ switch( $next_action )
 				</td>
 			</tr>
 				<?php
-				$query = "SELECT ID, user_login 
+				$query = "SELECT ID, user_login
 									FROM $tableusers ";
 				if( count( $members ) )
 				{
 					$query .= "WHERE ID NOT IN (".implode( ',', $members ) .") ";
 				}
 				$query .= "ORDER BY user_login";
-				$result = mysql_query($query) or mysql_oops( $query ); 
-				$querycount++; 
+				$result = mysql_query($query) or mysql_oops( $query );
+				$querycount++;
 				while($loop_row = mysql_fetch_array($result) )
 				{	// Go through users:
 					?>
@@ -224,17 +224,17 @@ switch( $next_action )
 
 	<fieldset>
 		<legend><?php echo T_('After each new post...') ?></legend>
-		<?php 
+		<?php
 			form_checkbox( 'blog_pingb2evonet', $blog_pingb2evonet, T_('Ping b2evolution.net'), T_("to get listed on the 'recently updated' list. PLEASE NOTE: If you removed the b2evolution button and the link to b2evolution from your blog, don't even bother enabling this. You will *not* be approved and your blog will be blacklisted. Also, the Full Name of your blog must be written in ISO 8859-1 (Latin-1) charset, otherwise we cannot display it on b2evolution.net. You can use HTML entities (e-g &amp;Kappa;) for non latin chars.") );
 			form_checkbox( 'blog_pingtechnorati', $blog_pingtechnorati, T_('Ping technorati.com'), T_('to give notice of new post.') );
 			form_checkbox( 'blog_pingweblogs', $blog_pingweblogs, T_('Ping weblogs.com'), T_('to give notice of new post.') );
 			form_checkbox( 'blog_pingblodotgs', $blog_pingblodotgs, T_('Ping blo.gs'), T_('to give notice of new post.') );
 		?>
 	</fieldset>
-			
+
 	<fieldset>
 		<legend><?php echo T_('Description') ?></legend>
-		<?php 
+		<?php
 			form_text( 'blog_tagline', $blog_tagline, 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template'), 250 );
 
 			form_text( 'blog_description', $blog_description, 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
@@ -242,23 +242,23 @@ switch( $next_action )
 			form_text( 'blog_keywords', $blog_keywords, 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 
 		?>
-		
+
 		<fieldset>
-			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div> 
+			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div>
 			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="3" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
 			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
 		</fieldset>
-		
+
 		<fieldset>
-			<div class="label"><label for="blog_roll" ><?php echo T_('Blogroll') ?>:</label></div> 
+			<div class="label"><label for="blog_roll" ><?php echo T_('Blogroll') ?>:</label></div>
 			<div class="input"><textarea name="blog_roll" id="blog_roll" rows="3" cols="50" class="large"><?php echo $blog_roll ?></textarea>
 			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
 		</fieldset>
-	</fieldset>	
+	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Default display options') ?></legend>
-		<?php 
+		<?php
 			// form_select( 'blog_default_skin', $blog_default_skin, 'groups_options', T_('Default skin') , T_('This is the skin that will be used until the user selects another skin (which will be saved in a cookie)') );
 
 			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display blog list'), T_("Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this).") );
@@ -267,12 +267,12 @@ switch( $next_action )
 
 	<fieldset>
 		<legend><?php echo T_('Advanced options') ?></legend>
-		<?php 
+		<?php
 			form_checkbox( 'blog_allowtrackbacks', $blog_allowtrackbacks, T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 			form_checkbox( 'blog_allowpingbacks', $blog_allowpingbacks, T_('Allow pingbacks'), T_("Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs.") );
 		?>
 	</fieldset>
-		
+
 	<fieldset>
 		<fieldset>
 			<div class="input">

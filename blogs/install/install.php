@@ -102,7 +102,7 @@ mySQL Password: <?php echo (($dbpassword!='demopass' ? "(Set, but not shown for 
 
 <?php
 
-$new_db_version = 8060;				// next time: 8070
+$new_db_version = 8070;				// next time: 8070
 
 /*
  * check_db_version(-)
@@ -115,16 +115,16 @@ function check_db_version()
 {
 	global $old_db_version, $new_db_version, $tablesettings;
 
-		echo "<p>Checking DB schema version... ";
-		$query = "SELECT db_version FROM $tablesettings WHERE ID = 1";
-		$q = mysql_query($query) or mysql_oops( $query );
-		$row = mysql_fetch_assoc($q);
-		if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
-		$old_db_version = $row['db_version'];
-		echo $old_db_version, ' : ';
-		if( $old_db_version < 8000 ) die( 'This version is too old!' );
-		if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
-		echo "OK.<br />\n";
+	echo '<p>Checking DB schema version... ';
+	$query = "SELECT db_version FROM $tablesettings WHERE ID = 1";
+	$q = mysql_query($query) or mysql_oops( $query );
+	$row = mysql_fetch_assoc($q);
+	if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
+	$old_db_version = $row['db_version'];
+	echo $old_db_version, ' : ';
+	if( $old_db_version < 8000 ) die( 'This version is too old!' );
+	if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
+	echo "OK.<br />\n";
 }
 
 
@@ -132,7 +132,7 @@ dbconnect() or die( '<p>Could not connect to database! Check you settings in /co
 
 param( 'action', 'string' );
 
-$timestamp = time()-120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+$timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
 $stub_all = 'blog_all';
 $stub_a = 'blog_a';
@@ -166,7 +166,7 @@ switch( $action )
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
 		 * -----------------------------------------------------------------------------------
 		 */
-		require_once (dirname(__FILE__)."/_functions_evoupgrade.php" );
+		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 		?>
 		<h2>Upgrading data in existing b2evolution database</h2>
 		<?php
@@ -174,7 +174,7 @@ switch( $action )
 		?>
 		<p>Upgrade completed successfully!</p>
 		<p>Now you can <a href="../admin/b2edit.php">log in</a> with your usual b2evolution username and password.</p>
-	 <?php
+		<?php
 		break;
 
 
@@ -184,7 +184,7 @@ switch( $action )
 		 * UPGRADE FROM B2 : Create a new db structure + copy content from previous b2
 		 * -----------------------------------------------------------------------------------
 		 */
-		require_once (dirname(__FILE__)."/_functions_cafelogupgrade.php" );
+		require_once( dirname(__FILE__). '/_functions_cafelogupgrade.php' );
 		?>
 		<h2>Installing b2evolution tables and copying existing b2 data</h2>
 		<?php

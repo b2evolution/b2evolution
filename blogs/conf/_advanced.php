@@ -102,6 +102,7 @@ $tablehitlog = 'evo_hitlog';
 $tableantispam = 'evo_antispam';
 $tablegroups = 'evo_groups';
 $tableblogusers = 'evo_blogusers';
+$tablelocales = 'evo_locales';
 
 
 # old b2 tables used exclusively by the upgrade mode of the install script

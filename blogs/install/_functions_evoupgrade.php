@@ -10,8 +10,8 @@
  *
  * @package install
  */
-if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-	die("Please, do not access this page directly.");
+if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1) == '_' )
+	die( 'Please, do not access this page directly.' );
 
 
 
@@ -24,6 +24,7 @@ function upgrade_b2evo_tables()
 					$tableblogs, $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
 	global $baseurl, $old_db_version, $new_db_version;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $locales, $default_locale;
 
 	// Check DB version:
 	check_db_version();
@@ -34,31 +35,32 @@ function upgrade_b2evo_tables()
 		return;
 	}
 
+
 	if( $old_db_version < 8010 )
 	{
-		echo "Upgrading users table... ";
-		$query = "ALTER TABLE $tableusers 
+		echo 'Upgrading users table...';
+		$query = "ALTER TABLE $tableusers
 							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Upgrading blogs table... ";
-		$query = "ALTER TABLE $tableblogs 
+		echo 'Upgrading blogs table...';
+		$query = "ALTER TABLE $tableblogs
 							MODIFY COLUMN blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							MODIFY COLUMN blog_longdesc TEXT NULL DEFAULT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Upgrading categories table... ";
-		$query = "ALTER TABLE $tablecategories 
+		echo 'Upgrading categories table...';
+		$query = "ALTER TABLE $tablecategories
 							ADD COLUMN cat_description VARCHAR(250) NULL DEFAULT NULL,
 							ADD COLUMN cat_longdesc TEXT NULL DEFAULT NULL,
 							ADD COLUMN cat_icon VARCHAR(30) NULL DEFAULT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Upgrading posts table... ";
-		$query = "ALTER TABLE $tableposts 
+		echo 'Upgrading posts table...';
+		$query = "ALTER TABLE $tableposts
 							MODIFY COLUMN post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							ADD COLUMN post_urltitle VARCHAR(50) NULL DEFAULT NULL AFTER post_title,
 							ADD COLUMN post_url VARCHAR(250) NULL DEFAULT NULL AFTER post_urltitle,
@@ -66,11 +68,11 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Generating wordcounts... ";
+		echo 'Generating wordcounts...';
 		$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		$rows_updated = 0;
-		while($row = mysql_fetch_assoc($q)) 
+		while($row = mysql_fetch_assoc($q))
 		{
 			$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
 			$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
@@ -82,26 +84,27 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8020 )
 	{
-		echo "Encoding passwords... ";
-		$query = "UPDATE $tableusers 
+		echo 'Encoding passwords...';
+		$query = "UPDATE $tableusers
 							SET user_pass = MD5(user_pass)";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 	}
 
+
 	if( $old_db_version < 8030 )
 	{
-		echo "Deleting unecessary logs... ";
+		echo 'Deleting unecessary logs...';
 		$query = "DELETE FROM $tablehitlog
 							WHERE hit_ignore IN ('badchar', 'blacklist')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Updating blog urls... ";
+		echo 'Updating blog urls...';
 		$query = "SELECT blog_ID, blog_siteurl FROM $tableblogs";
 		$q = mysql_query($query) or mysql_oops( $query );
 		$rows_updated = 0;
-		while($row = mysql_fetch_assoc($q)) 
+		while($row = mysql_fetch_assoc($q))
 		{
 			$blog_ID = $row['blog_ID'];
 			$blog_siteurl = $row['blog_siteurl'];
@@ -118,26 +121,28 @@ function upgrade_b2evo_tables()
 			$query_update_blog = "UPDATE $tableblogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
 			// echo $query_update_blog, '<br>';
 			mysql_query($query_update_blog) or mysql_oops( $query_update_wordcount );
-			$rows_updated++; 
+			$rows_updated++;
 		}
 		echo "OK. ($rows_updated rows updated)</p>\n";
 
 	}
 
+
 	if( $old_db_version < 8040 )
 	{
 		create_antispam();
-		
-		echo "Upgrading Settings table... ";
+
+		echo 'Upgrading Settings table...';
 		$query = "ALTER TABLE $tablesettings
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
-	}	               
+	}
+
 
 	if( $old_db_version < 8050 )
 	{
-		echo "Upgrading blogs table... ";
+		echo 'Upgrading blogs table...';
 		$query = "ALTER TABLE $tableblogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
 							ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 1,
@@ -152,19 +157,19 @@ function upgrade_b2evo_tables()
 		// Create User Groups
 		create_groups();
 
-		echo "Creating user blog permissions... ";
+		echo 'Creating user blog permissions...';
 		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
-		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
-								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
 							SELECT blog_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
 							FROM $tableusers, $tableblogs
 							WHERE user_level = 10";
 		$q = mysql_query($query) or mysql_oops( $query );
-		
+
 		// Normal users: basic rights for all blogs (can't stop doing joins :P)
-		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
-								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
 							SELECT blog_ID, ID, 'published,protected,private,draft', 0, 1, 0, 0
 							FROM $tableusers, $tableblogs
@@ -172,34 +177,34 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Upgrading users table... ";
+		echo 'Upgrading users table...';
 		$query = "ALTER TABLE $tableusers
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
-							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login', 
+							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login',
 							ADD KEY user_grp_ID (user_grp_ID)";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo "Assigning user groups... ";
+		echo 'Assigning user groups...';
 
 		// Default is 1, so admins are already set.
 
 		// Basic Users:
-		$query = "UPDATE $tableusers 
+		$query = "UPDATE $tableusers
 							SET user_grp_ID = $Group_Users->ID
 							WHERE user_level = 0";
 		$q = mysql_query($query) or mysql_oops( $query );
 
 		// Bloggers:
-		$query = "UPDATE $tableusers 
+		$query = "UPDATE $tableusers
 							SET user_grp_ID = $Group_Bloggers->ID
 							WHERE user_level > 0 AND user_level < 10";
 		$q = mysql_query($query) or mysql_oops( $query );
 
 		echo "OK.<br />\n";
 
-		echo "Upgrading settings table... ";
+		echo 'Upgrading settings table...';
 		$query = "ALTER TABLE $tablesettings
 							DROP COLUMN time_format,
 							DROP COLUMN date_format,
@@ -209,37 +214,94 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 	}
-		
+
+
 	if( $old_db_version < 8060 )
 	{
-		echo "Upgrading posts table... ";
-		$query = "ALTER TABLE $tableposts 
+		echo 'Upgrading posts table...';
+		$query = "ALTER TABLE $tableposts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' AFTER post_issue_date,
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date (post_issue_date)";
 		$q = mysql_query($query) or mysql_oops( $query );
 
-		$query = "UPDATE $tableposts 
+		$query = "UPDATE $tableposts
 							SET post_mod_date = post_issue_date";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 	}
 
+
 	if( $old_db_version < 8070 )
 	{
-		/* 
+		/*
 		 * CONTRIBUTORS: If you need some more changes, put them here!
 		 * Then create a new extension block, and increase db version numbers
 		 * everywhere where needed in this file.
 		 */
+		
+		create_locales();
+		
+		// change name of blog_lang to blog_locale
+		$query = "ALTER TABLE $tableblogs CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en_US'";
+		$q = mysql_query($query) or mysql_oops( $query );
+		
+		// change name of post_lang to post_locale
+		$query = "ALTER TABLE $tableposts CHANGE post_lang post_locale varchar(20) NOT NULL default 'en_US'";
+		$q = mysql_query($query) or mysql_oops( $query );
+		
+		// convert given languages to locales, for blogs and posts
+		foreach( array(
+							$tableblogs => array('blog_ID', 'blog_locale'),
+							$tableposts => array('ID', 'post_locale')
+						) as $table => $params )
+		{
+			list($ID, $dblocale) = $params;
+			
+			echo '<br /><strong>Converting lang to locale for '. $table. '..</strong><br />';
+			$query = "SELECT $ID, $dblocale FROM $table";
+			echo "Query: $query <br />";
+			$result = mysql_query($query) or mysql_oops( $query );
+			
+			while( $row = mysql_fetch_array( $result ) ){
+				echo $row[ $ID ]. ': checking '. $row[ $dblocale ]. '.. ';
+				if( strlen($row[ $dblocale ]) == 2 )
+				{ // we have a two char lang to convert
+					$q = false;
+					foreach( $locales as $localekey => $v )
+					{  // loop given locales
+						if( substr($localekey, 0, 2) == $row[ $dblocale ] )
+						{  // if language matches, update
+							$query = "UPDATE $table SET $dblocale = '$localekey'";
+							$q = mysql_query($query) or mysql_oops( $query );
+							echo 'Updated to '. $localekey. '<br />';
+							break;
+						}
+					}
+					if( !$result ) echo 'Could not update <br />';
+				}
+				else
+				{
+					if( !preg_match('/[a-z]{2}-[A-Z]{2}/', $row[ $dblocale ]) )
+					{ // no valid locale in DB, setting default.
+						$query = "UPDATE $table SET $dblocale = '$default_locale'";
+						$q = mysql_query($query) or mysql_oops( $query );
+						echo 'Forced to default '. $default_locale. '<br />';
+						
+					} else echo 'Nothing to update, already valid!<br />';
+					
+				}
+			}
+		}
+		echo "OK.<br />\n";
 	}
 	
 	echo "Update DB schema version to $new_db_version... ";
 	$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
-	
+
 }
 
 

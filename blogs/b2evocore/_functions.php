@@ -55,7 +55,7 @@ function mysql_oops($sql_query)
 {
 	$error  = '<p class="error">'. T_('Oops, MySQL error!'). '</p>'
 		. '<p>Your query:<br /><code>'. $sql_query. '</code></p>'
-		. '<p>MySQL said:<br /><code>'. mysql_error(). '</code></p>';
+		. '<p>MySQL said:<br /><code>'. mysql_error(). ' (error '. mysql_errno(). ')</code></p>';
 	die($error);
 }
 

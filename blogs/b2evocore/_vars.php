@@ -12,7 +12,7 @@
 $b2_version = '0.8.9+CVS';
 
 // Activate gettext:
-if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )
+if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
 {	// We are going to use GETTEXT
 	// Specify location of translation tables :
 	bindtextdomain( 'messages', dirname(__FILE__). '/../locales');

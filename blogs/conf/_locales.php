@@ -13,7 +13,121 @@ $use_l10n = 2;
 # To be used for m17n support:
 $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 
-/* # Supported languages for posts:
+
+# Default locale used for backoffice and notification messages
+# These use an ISO 639 language code, a '_' and an ISO 3166 country code
+# This MUST BE in the list below
+$default_locale = 'en-US';
+
+$default_locale = 'de-DE';  // for testing :))
+
+
+// we need this here, because we include _functions_locale after defining locales
+// This is temporary.
+/*
+ * NT_(-)
+ *
+ * No Translation
+ * Nevertheless, the string will be extracted by the gettext tools
+ */
+function NT_($string)
+{
+	return $string;
+}
+
+
+//{{{ defining the locales:
+# Add what you need and comment what you don't need
+$locales = array(
+	'cs-CZ' => array( // Czech, CZECH REPUBLIC
+									'charset' => 'utf-8',
+									'datefmt' => 'd. m. y',
+									'timefmt' => 'H.i:s',
+									'language' => NT_('Czech'),
+								),
+	'de-DE' => array( // German, Germany
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('German'),
+								),
+	'en-US' => array( // English, USA
+									'charset' => 'iso-8859-1',	// gettext will convert to this
+									'datefmt' => 'm/d/y',
+									'timefmt' => 'h:i:s a',
+									'language' => NT_('English'),
+								),
+	'es-ES' => array(	// Spanish, SPAIN
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Spanish'),
+								),
+	'fr-FR' => array( // French, FRANCE
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('French'),
+								),
+	'it-IT' => array( // Italian, Italy
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Italian'),
+								),
+	'ja-JP' => array(	// Japanese, JAPAN
+									'charset' => 'utf-8',
+									'datefmt' => 'Y/m/d',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Japanese'),
+								),
+	'lt-LT' => array( // Lithuanian
+									'charset' => 'Windows-1257',
+									'datefmt' => 'Y-m-d',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Lithuanian'),
+								),
+	'nb-NO' => array( // Bokmål, NORWAY
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Norwegian Bokm&aring;l'),
+								),
+	'nl-NL' => array( // Dutch, NETHERLANDS
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd-m-y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Dutch'),
+								),
+	'pt-BR' => array( // Portuguese, BRAZIL
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Portuguese'),
+								),
+	'sv-SE' => array( // Sweedish, SWEDEN
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'y-m-d',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Swedish'),
+								),
+	'zh-CN' => array( // Simplified Chinese, CHINA
+									'charset' => 'gb2312',
+									'datefmt' => 'y-m-d',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Simplified Chinese'),
+								),
+	'zh-TW' => array( // Traditional Chinese, TAIWAN
+									'charset' => 'utf-8',
+									'datefmt' => 'Y-m-d',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Traditional Chinese'),
+								),
+);
+//}}}
+
+
+/*{{{ # Supported languages for posts: - oldstyle
 $languages = array(
 	'cs' => NT_('Czech'),
 	'nl' => NT_('Dutch'),
@@ -30,120 +144,7 @@ $languages = array(
 	'zh' => NT_('Simplified Chinese'),
 //	'zh' => NT_('Traditional Chinese'),
 	);
-*/
-
-
-# Default locale used for backoffice and notification messages
-# These use an ISO 639 language code, a '_' and an ISO 3166 country code
-# This MUST BE in the list below
-$default_locale = 'en_US';
-
-$default_locale = 'fr_FR';  // for testing :))
-
-
-// we need this here, because we include _functions_locale after defining locales
-// This is temporary.
-/*
- * NT_(-)
- * 
- * No Translation
- * Nevertheless, the string will be extracted by the gettext tools
- */
-function NT_($string)
-{
-	return $string;
-}
-
-
-//{{{ defining the locales:
-# Add what you need and comment what you don't need
-$locales = array(
-	'cs_CZ' => array( // Czech, CZECH REPUBLIC
-									'charset' => 'utf-8',
-									'datefmt' => 'd. m. y',
-									'timefmt' => 'H.i:s',
-									'language' => NT_('Czech'),
-								),
-	'de_DE' => array( // German, Germany
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('German'),
-								),
-	'en_US' => array( // English, USA
-									'charset' => 'iso-8859-1',	// gettext will convert to this
-									'datefmt' => 'm/d/y',
-									'timefmt' => 'h:i:s a',
-									'language' => NT_('English'),
-								),
-	'es_ES' => array(	// Spanish, SPAIN
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Spanish'),
-								),
-	'fr_FR' => array( // French, FRANCE
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('French'),
-								),
-	'it_IT' => array( // Italian, Italy
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Italian'),
-								),
-	'ja_JP' => array(	// Japanese, JAPAN
-									'charset' => 'utf-8',
-									'datefmt' => 'Y/m/d',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Japanese'),
-								),
-	'lt_LT' => array( // Lithuanian
-									'charset' => 'Windows-1257',
-									'datefmt' => 'Y-m-d',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Lithuanian'),
-								),
-	'nb_NO' => array( // Bokmål, NORWAY
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Norwegian Bokm&aring;l'),
-								),
-	'nl_NL' => array( // Dutch, NETHERLANDS
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd-m-y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Dutch'),
-								),
-	'pt_BR' => array( // Portuguese, BRAZIL
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Portuguese'),
-								),
-	'sv_SE' => array( // Sweedish, SWEDEN
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'y-m-d',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Swedish'),
-								),
-	'zh_CN' => array( // Simplified Chinese, CHINA
-									'charset' => 'gb2312',
-									'datefmt' => 'y-m-d',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Simplified Chinese'),
-								),
-	'zh_TW' => array( // Traditional Chinese, TAIWAN
-									'charset' => 'utf-8',
-									'datefmt' => 'Y-m-d',
-									'timefmt' => 'H:i:s',
-									'language' => NT_('Traditional Chinese'),
-								),
-);
-//}}}
+}}}*/
 
 
 // Load locale related functions: (ne need NT_() here)

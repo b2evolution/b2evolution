@@ -61,7 +61,7 @@ class Item extends DataObject
 			$this->issue_date = $db_row->post_issue_date;
 			$this->mod_date = $db_row->post_mod_date;
 			$this->scope = $db_row->post_status;
-			$this->lang = $db_row->post_lang;
+			$this->locale = $db_row->post_locale;
 			$this->title = $db_row->post_title;
 			$this->urltitle = $db_row->post_urltitle;
 			$this->content = $db_row->post_content;

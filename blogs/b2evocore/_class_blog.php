@@ -65,7 +65,7 @@ class Blog extends DataObject
 			$this->tagline = $db_row->blog_tagline;
 			$this->shortdesc = $db_row->blog_description;	// description
 			$this->longdesc = $db_row->blog_longdesc;
-			$this->lang = $db_row->blog_lang;
+			$this->locale = $db_row->blog_locale;
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->filename = $db_row->blog_filename;
 			$this->staticfilename = $db_row->blog_staticfilename;
