@@ -7,6 +7,7 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -29,6 +30,10 @@
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
 * @package evocore
@@ -36,6 +41,8 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
+ * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
+ * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
  */
@@ -835,6 +842,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/06 21:45:24  jwedgeco
+ * Added header info and granted Francois PLANQUE the right to relicense under the Mozilla Public License.
+ *
  * Revision 1.4  2004/11/30 21:51:34  jwedgeco
  * when copying a blog, categories are copied as well.
  *

@@ -5,8 +5,22 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
+ *
+ * {@internal
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
+ * }}
  *
  * @package admin
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE.
+ * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
+ * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
