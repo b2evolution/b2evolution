@@ -141,14 +141,14 @@ function imgsize( $path, $param )
 
 
 /**
- * add a trailing slash, if none present
+ * Add a trailing slash, if none present
  *
  * @param string the path/url
  * @return string the path/url with trailing slash
  */
 function trailing_slash( $path )
 {
-	return( preg_match( '#/$#', $path ) ? $path : $path.'/' );
+	return( substr( $path, -1 ) == '/' ? $path : $path.'/' );
 }
 
 
