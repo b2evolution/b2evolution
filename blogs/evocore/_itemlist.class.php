@@ -146,6 +146,7 @@ class ItemList extends DataObjectList
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
+	 * @param string YearMonth(Day) to start at, '' for first available
 	 * @param string Name of Class for objects within this list
 	 * @param string Name of the DB table
 	 * @param string Prefix of fields in the table
@@ -174,6 +175,7 @@ class ItemList extends DataObjectList
 		$timestamp_min = '',        // Do not show posts before this timestamp
 		$timestamp_max = 'now',     // Do not show posts after this timestamp
 		$title = '',                // urltitle of post to display
+		$dstart = '',               // YearMonth(Day) to start at, '' for first available
 		$objType = 'Item',
 		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
@@ -224,17 +226,17 @@ class ItemList extends DataObjectList
 		if( $m != '' )
 		{
 			$m = '' . intval($m);
-			$where .= ' AND YEAR('.$dbprefix.'datestart)=' . substr($m,0,4);
+			$where .= ' AND YEAR('.$dbprefix.'datestart)='.intval(substr($m,0,4));
 			if( strlen($m) > 5 )
-				$where .= ' AND MONTH('.$dbprefix.'datestart)=' . substr($m,4,2);
+				$where .= ' AND MONTH('.$dbprefix.'datestart)='.intval(substr($m,4,2));
 			if( strlen($m) > 7 )
-				$where .= ' AND DAYOFMONTH('.$dbprefix.'datestart)=' . substr($m,6,2);
+				$where .= ' AND DAYOFMONTH('.$dbprefix.'datestart)='.intval(substr($m,6,2));
 			if( strlen($m) > 9 )
-				$where .= ' AND HOUR('.$dbprefix.'datestart)=' . substr($m,8,2);
+				$where .= ' AND HOUR('.$dbprefix.'datestart)='.intval(substr($m,8,2));
 			if( strlen($m) > 11 )
-				$where .= ' AND MINUTE('.$dbprefix.'datestart)=' . substr($m,10,2);
+				$where .= ' AND MINUTE('.$dbprefix.'datestart)='.intval(substr($m,10,2));
 			if( strlen($m) > 13 )
-				$where .= ' AND SECOND('.$dbprefix.'datestart)=' . substr($m,12,2);
+				$where .= ' AND SECOND('.$dbprefix.'datestart)='.intval(substr($m,12,2));
 		}
 
 		// If a week number is specified
@@ -255,6 +257,7 @@ class ItemList extends DataObjectList
 		{
 			$where .= ' AND post_urltitle = '.$DB->quote($title);
 		}
+
 
 		/*
 		 * ----------------------------------------------------
@@ -424,11 +427,30 @@ class ItemList extends DataObjectList
 
 
 		/*
+		 * if a start date is specified in the querystring, crop anything before
+		 */
+		if( !empty($dstart) )
+		{
+			// Add trailing 0s: YYYYMMDDHHMMSS
+			$dstart0 = $dstart.'00000000000000';
+
+			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
+											.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
+
+			$where .= ' AND '.$dbprefix.'datestart >= \''.$dstart_mysql.'\'';
+		}
+
+
+		/*
 		 * ----------------------------------------------------
-		 * Limits:
+		 * Paging limits:
 		 * ----------------------------------------------------
 		 */
-		if( !empty($poststart) )
+		if( !empty($p) || !empty($title) )
+		{ // Single post: no paging required!
+			$limits = '';
+		}
+		elseif( !empty($poststart) )
 		{ // When in backoffice...  (to be deprecated...)
 			// echo 'POSTSTART-POSTEND ';
 			if( $postend < $poststart )
@@ -448,12 +470,11 @@ class ItemList extends DataObjectList
 				$lastpostdate = $this->get_lastpostdate();
 				$lastpostdate = mysql2date('Y-m-d 23:59:59',$lastpostdate);
 				// echo $lastpostdate;
-				$lastpostdate = mysql2date('U',$lastpostdate);
+				$lastpostdate = mysql2timestamp( $lastpostdate );
 				$this->limitdate_end = $lastpostdate - (($poststart -1) * 86400);
 				$this->limitdate_start = $lastpostdate+1 - (($postend) * 86400);
 				$where .= ' AND '.$dbprefix.'datestart >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
 									.'\' AND '.$dbprefix.'datestart <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
-
 			}
 		}
 		elseif( !empty($m) )
@@ -472,21 +493,31 @@ class ItemList extends DataObjectList
 			$limits = 'LIMIT '. $pgstrt.$posts_per_page;
 		}
 		elseif( $unit == 'days' )
-		{
+		{	// We are going to limit to x days:
 			// echo 'LIMIT DAYS ';
-			if( !empty($p) || !empty($title) || !empty($keywords) || !empty($cat) || !empty($author) )
-			{ // We are in DAYS mode but we can't restrict on these!
-				$limits = '';
+			if( empty( $dstart ) )
+			{ // We have no start date, we'll display the last x days:
+				if( !empty($keywords) || !empty($cat) || !empty($author) )
+				{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
+					$limits = '';
+				}
+				else
+				{ // We are going to limit to LAST x days:
+					$lastpostdate = $this->get_lastpostdate();
+					$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
+					$lastpostdate = mysql2date('U',$lastpostdate);
+					// go back x days
+					$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
+					$where .= ' AND '.$dbprefix.'datestart > \''. $otherdate.'\'';
+				}
 			}
 			else
-			{
-				$lastpostdate = $this->get_lastpostdate();
-				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
-				$lastpostdate = mysql2date('U',$lastpostdate);
-				// go back x days
-				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
-
-				$where .= ' AND '.$dbprefix.'datestart > \''. $otherdate.'\'';
+			{	// We have a start date, we'll display x days starting from that point:
+				// $dstart_mysql has been calculated earlier
+				$dstart_ts = mysql2timestamp( $dstart_mysql );
+				// go forward x days
+				$enddate_ts = date('Y-m-d H:i:s', ($dstart_ts + ($posts_per_page * 86400)));
+				$where .= ' AND '.$dbprefix.'datestart < \''. $enddate_ts.'\'';
 			}
 		}
 		else
@@ -502,7 +533,7 @@ class ItemList extends DataObjectList
 
 		/*
 		 * ----------------------------------------------------
-		 * Time limits:
+		 * Timestamp limits:
 		 * ----------------------------------------------------
 		 */
 		if( $timestamp_min == 'now' )
@@ -672,8 +703,8 @@ class ItemList extends DataObjectList
 		// echo 'getting last post date';
 		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
 																		 '', 'DESC', 'datestart', 1, '','', '', '', '', '', '', 'posts',
-																		 $this->timestamp_min, $this->timestamp_max, '', $this->objType,
-																		 $this->dbtablename, $this->dbprefix, $this->dbIDname );
+																		 $this->timestamp_min, $this->timestamp_max, '', '',
+																		 $this->objType, $this->dbtablename, $this->dbprefix, $this->dbIDname );
 
 		if( $LastItem = $LastPostList->get_item() )
 		{
@@ -962,6 +993,10 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.23  2005/03/10 16:07:20  fplanque
+ * cleaned up paging
+ * added dstart param
+ *
  * Revision 1.22  2005/03/09 20:29:40  fplanque
  * added 'unit' param to allow choice between displaying x days or x posts
  * deprecated 'paged' mode (ultimately, everything should be pageable)
