@@ -41,6 +41,16 @@ class bbcode_plugin extends Plugin
 									'!\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is',
 									'#\[size=([0-9]+?)](.+?)\[/size]#is',
 									'#\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is',
+									// Following lines added by Georges (iznogoudmc)
+									// (Remove comment if modification validated)
+									'#\[code](.+?)\[/code]#is',
+									'#\[quote](.+?)\[/quote]#is',
+									'#\[list=1](.+?)\[/list]#is',
+									'#\[list=a](.+?)\[/list]#is',
+									'#\[list](.+?)\[/list]#is',
+									'#\[\*](.+?)\n#is',
+									// End of Georges' add
+									// (Remove comment if modification validated)
 									// The following are dangerous, until we security check resulting code.
 									//	'#\[img](.+?)\[/img]#is',		// Image
 									//	'#\[url](.+?)\[/url]#is',		// URL
@@ -62,6 +72,16 @@ class bbcode_plugin extends Plugin
 									'<span style="color:$1">$2</span>',
 									'<span style="font-size:$1px">$2</span>',
 									'<span style="font-family:$1">$2</span>',
+									// Following lines added by Georges (iznogoudmc)
+									// (Remove comment if modification validated)
+									'<pre>$1</pre>',
+									'&laquo;&nbsp;$1&nbsp;&raquo;',
+									'<ol type="1">$1</ol>',
+									'<ol type="a">$1</ol>',
+									'<ul>$1</ul>',
+									'<li>$1</li>',
+									// End of Georges' add
+									// (Remove comment if modification validated)
 									//	'<img src="$1" alt="" />',		// Image
 									//	'<a href="$1">$1</a>',		// URL
 									//	'<a href="$1" title="$2">$2</a>',
