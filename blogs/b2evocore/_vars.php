@@ -13,11 +13,13 @@
 $b2_version = '0.8.3-alpha2';
 
 // Activate gettext:
-// Specify location of translation tables :
-bindtextdomain( 'messages', dirname(__FILE__).'/../locales'); 
-// Choose domain: (name of the .mo files)
-textdomain( 'messages' );
-
+if( function_exists( 'bindtextdomain' ) && function_exists('textdomain' ) )
+{	// Only if gettext is available
+	// Specify location of translation tables :
+	bindtextdomain( 'messages', dirname(__FILE__).'/../locales'); 
+	// Choose domain: (name of the .mo files)
+	textdomain( 'messages' );
+}
 // Choose lang and set default locale:
 locale_activate( $default_locale );
 

@@ -1,7 +1,5 @@
 <?php
-
-$standalone=1;
-require_once dirname(__FILE__).'/b2header.php';
+require_once( dirname(__FILE__).'/_header.php' );
 
 function add_magic_quotes($array) 
 {

@@ -1,6 +1,5 @@
 <?php 
-$standalone=1;
-require_once (dirname(__FILE__).'/b2header.php'); // this will actually load blog params for req blog
+require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = _('Profile');
 
 function add_magic_quotes($array) {

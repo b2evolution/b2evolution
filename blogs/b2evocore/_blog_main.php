@@ -12,7 +12,6 @@
 require_once (dirname(__FILE__).'/_main.php');
 
 // Getting GET or POST parameters:
-if(!isset($default_to_blog)) $default_to_blog = 1;
 set_param( 'blog', 'integer', $default_to_blog, true );
 set_param( 'p', 'integer' );							// Specific post number to display
 set_param( 'm', 'integer', '', true );							// YearMonth(Day) to display

@@ -1,4 +1,5 @@
 <?php
+require_once (dirname(__FILE__).'/_header.php');
 
 function add_magic_quotes($array) {
 	foreach ($array as $k => $v) {
@@ -41,11 +42,6 @@ for ($i=0; $i<count($b2varstoreset); $i += 1)
 }
 
 
-
-$default_blog = 2;
-
-
-
 switch($action) 
 {
 case 'new':
@@ -53,9 +49,7 @@ case 'new':
 	 * --------------------------------------------------------------------
 	 * New post form
 	 */
-	$standalone = 1;
 	$title = _('New post in blog:');
-	require_once (dirname(__FILE__)."/b2header.php");
 	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
 	require (dirname(__FILE__).'/_edit_blogselect.php');
@@ -94,10 +88,6 @@ case "edit":
 	 * --------------------------------------------------------------------
 	 * Display post editing form
 	 */
-	$standalone = 1;
-	require_once (dirname(__FILE__)."/b2header.php");
-
-	dbconnect();
 	set_param( "post", 'integer', true );
 	$postdata = get_postdata($post) or die( _('Oops, no post with this ID.') );
 	$post_lang = $postdata["Lang"];
@@ -140,8 +130,6 @@ case "editcomment":
 	 * --------------------------------------------------------------------
 	 * Display comment in edit form
 	 */
-	$standalone=1;
-	require_once (dirname(__FILE__)."/b2header.php");
 	set_param( 'comment', 'integer', true );
 	$commentdata = get_commentdata($comment,1) or die( _('Oops, no comment with this ID!') );
 
@@ -174,9 +162,7 @@ default:
 	 * --------------------------------------------------------------------
 	 * Display posts
 	 */
-	$standalone = 1;
 	$title = _('Browse blog:');
-	require_once (dirname(__FILE__)."/b2header.php");
 	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
 	require (dirname(__FILE__).'/_edit_blogselect.php');

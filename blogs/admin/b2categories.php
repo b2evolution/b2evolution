@@ -1,4 +1,6 @@
 <?php
+require_once (dirname(__FILE__).'/_header.php');
+
 $title = _('Categories');
 /* <Categories> */
 
@@ -39,8 +41,8 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 switch($action) 
 {
 case "newcat":
-	$standalone=0;
-	require_once (dirname(__FILE__)."/b2header.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level < 3) 
 	{
@@ -83,9 +85,6 @@ case "addcat":
 	/*
 	 * INSERT new cat into db
 	 */
-	$standalone = 1;
-	require_once(dirname(__FILE__)."/b2header.php");
-
 	if ($user_level < 3)
 	die ("Cheatin' uh ?");
 	
@@ -110,9 +109,8 @@ case "addcat":
 
 
 case "Delete":
-
-	$standalone = 0;
-	require_once(dirname(__FILE__)."/b2header.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	echo "<div class=\"panelinfo\">\n";
 	echo '<h3>', _('Deleting category...'), "</h3>\n";
@@ -139,8 +137,8 @@ case "Delete":
 
 
 case "Edit":
-
-	require_once (dirname(__FILE__)."/b2header.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 	$cat_ID = $_GET['cat_ID'];
 	$cat_name = get_catname($cat_ID);
 	$cat_name = addslashes($cat_name);
@@ -218,10 +216,6 @@ case "Edit":
 	break;
 
 case "editedcat":
-
-	$standalone = 1;
-	require_once(dirname(__FILE__).'/b2header.php');
-
 	if ($user_level < 3)
 	die ("Cheatin' uh ?");
 	
@@ -237,8 +231,8 @@ break;
 
 default:
 
-	$standalone=0;
-	require_once (dirname(__FILE__)."/b2header.php");
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 	if ($user_level < 3) 
 	{
 		die( 

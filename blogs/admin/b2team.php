@@ -1,4 +1,5 @@
 <?php
+require_once (dirname(__FILE__).'/_header.php');
 $title = _('User management');
 /* <Team> */
 	
@@ -21,10 +22,6 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 switch ($action) {
 	
 case "promote":
-
-	$standalone = 1;
-	require_once (dirname(__FILE__)."/b2header.php");
-
 	if (empty($HTTP_GET_VARS["prom"])) {
 		header("Location: b2team.php");
 	}
@@ -51,10 +48,6 @@ case "promote":
 break;
 
 case "delete":
-
-	$standalone = 1;
-	require_once (dirname(__FILE__)."/b2header.php");
-
 	$id = $HTTP_GET_VARS["id"];
 
 	if (!$id) {
@@ -79,9 +72,8 @@ case "delete":
 break;
 
 default:
-	
-	$standalone=0;
-	require( dirname(__FILE__).'/b2header.php' );
+	require( dirname(__FILE__).'/_menutop.php');
+	require( dirname(__FILE__).'/_menutop_end.php');
 	?>
 	<div class="panelblock">
 	<table cellspacing="0" cellpadding="5" border="0" width="100%">

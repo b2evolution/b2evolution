@@ -1,10 +1,9 @@
 <?php
+require(dirname(__FILE__).'/_header.php');
+
 /* <Bookmarklet> */
 
 $mode = "bookmarklet";
-
-$standalone = 1;
-require(dirname(__FILE__)."/b2header.php");
 
 if ($user_level == 0)
 die( _('Cheatin\' uh ?') );

@@ -2,7 +2,6 @@
   /*
    * This template generates an RSS 1.0 (RDF) feed for the requested blog
    */
-  $default_to_blog = 1; // This is the default. Should be overidden in url e-g: rss.php?blog=2
   $skin = '';                          // We don't want this do be displayed in a skin !
 	$show_statuses = "'published'";     // Restrict to published posts
 	$timestamp_min = '';								// Show past

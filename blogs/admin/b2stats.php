@@ -1,8 +1,7 @@
 <?php
-$title = _('View Stats');
-$standalone=1;
-require_once (dirname(__FILE__)."/b2header.php");
+require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$b2inc.'/_functions_hitlogs.php');						// referer logging
+$title = _('View Stats');
 
 set_param( 'action', 'string' );
 set_param( 'show', 'string', 'referers' );

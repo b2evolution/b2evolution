@@ -1,7 +1,6 @@
 <?php
+require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = _('Blogs');
-$standalone=1;
-require_once (dirname(__FILE__).'/b2header.php'); // this will actually load blog params for req blog
 param( 'action' );
 
 

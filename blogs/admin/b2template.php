@@ -1,7 +1,6 @@
 <?php
+require_once(dirname(__FILE__).'/_header.php');
 /* <Template> */
-
-require_once(dirname(__FILE__).'/../conf/b2evo_config.php');
 $title = _('Custom skin template editing');
 
 /*
@@ -47,10 +46,6 @@ switch($action)
 {
 
 case "update":
-
-	$standalone=1;
-	require_once(dirname(__FILE__)."/b2header.php");
-
 	if ($user_level < 3) 
 	{
 		die( _('You have no right to edit the templates.') );
@@ -70,8 +65,8 @@ case "update":
 	break;
 
 default:
-
-	require( dirname(__FILE__).'/b2header.php' );
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level <= 3) 
 	{

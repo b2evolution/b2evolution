@@ -1,4 +1,5 @@
 <?php
+require( dirname(__FILE__).'/_header.php');
 $title = _('Options');
 /* <Options> */
 
@@ -38,9 +39,6 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 switch($action) {
 
 case "update":
-
-	$standalone = 1;
-	require( dirname(__FILE__).'/b2header.php');
 	if ($user_level <= 3) 
 	{
 		die( _('You have no right to edit the options for this blog.') );
@@ -60,9 +58,8 @@ case "update":
 break;
 
 default:
-
-	$standalone=0;
-	require( dirname(__FILE__).'/b2header.php');
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 	if ($user_level <= 3) 
 	{
 		die( _('You have no right to edit the options for this blog.') );

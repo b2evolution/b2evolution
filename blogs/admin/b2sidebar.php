@@ -1,10 +1,9 @@
 <?php
+require_once (dirname(__FILE__).'/_header.php');
 /* <Sidebar> */
 
 $mode = 'sidebar';
 
-$standalone = 1;
-require_once (dirname(__FILE__)."/b2header.php");
 
 get_currentuserinfo();
 

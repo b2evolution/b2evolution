@@ -69,6 +69,11 @@ $display_blog_list = 0;
 # set this to  1 if you want to be able to cross-post among multiple blogs
 $allow_cross_posting = 0;
 
+# Set the blog # to be used when not otherwise specified:
+# 2 is the default setting, since it is the first user blog created by b2evo
+# 1 is also a popular choice, since it is a special blog aggregating all the others
+$default_to_blog = 2;
+
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder
 # IT IS RECOMMENDED YOU DO NOT TOUCH THOSE SETTINGS 
