@@ -272,6 +272,44 @@ class DB
 			echo '<p class="error">', T_('MySQL error!'), '</p>';
 			echo '<p>', $this->last_error, '</p>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query:<br /><code>'. $this->last_query. '</code></p>';
+
+			if( function_exists( 'xdebug_is_enabled' ) && xdebug_is_enabled() )
+			{
+				?>
+				<table class="grouped">
+					<thead>
+						<tr>
+							<th>Function / Include</th>
+							<th>File</th>
+							<th>Line</th>
+						</tr>
+					</thead>
+
+				<?php
+				foreach( xdebug_get_function_stack() as $lStack )
+				{
+					?>
+					<tr>
+						<td>
+							<?php
+							if( isset( $lStack['include_filename'] ) )
+							{
+								echo '<strong>=&gt;</strong>'.$lStack['include_filename'];
+							}
+							else
+							{
+								echo $lStack['function'].'()';
+							}
+							?>
+						</td>
+						<td><?php echo $lStack['file'] ?></td>
+						<td><?php echo $lStack['line'] ?></td>
+					</tr>
+					<?php
+				}
+				echo '</table>';
+			}
+
 			echo '</div>';
 		}
 
@@ -762,6 +800,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/23 22:18:39  blueyed
+ * output xdebug function stack on error
+ *
  * Revision 1.8  2005/02/17 19:36:23  fplanque
  * no message
  *
