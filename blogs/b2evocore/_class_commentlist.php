@@ -58,7 +58,7 @@ class CommentList extends DataObjectList
 		elseif( !empty($default_posts_per_page) )
 			$this->posts_per_page = $default_posts_per_page;
 
-		$this->request = "SELECT DISTINCT comment_ID, comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma, comment_type, comment_status, ID, post_title, blog_ID, blog_name, blog_siteurl, blog_stub 
+		$this->request = "SELECT DISTINCT comment_ID, comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma, comment_type, comment_status, ID, blog_ID, blog_name, blog_siteurl, blog_stub 
 											FROM (((($tablecomments INNER JOIN $tableposts ON comment_post_ID = ID) ";
 		
 		// Find main blog for each related post  TODO: use get_blogaprams_by_ID

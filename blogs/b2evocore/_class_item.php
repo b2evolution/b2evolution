@@ -85,7 +85,7 @@ class Item extends DataObject
 	 *
 	 * @todo archives modes in clean mode
 	 * 
-	 * @param string 'post', 'archive#id' or 'archive#title'
+	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
 	function gen_permalink( $mode, $blogurl )

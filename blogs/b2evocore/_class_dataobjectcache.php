@@ -64,6 +64,7 @@ class DataObjectCache
 		if( $this->all_loaded )
 			return	false;	// Already loaded;
 		
+		debug_log( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename";
 		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++;
@@ -93,6 +94,7 @@ class DataObjectCache
 	{
 		global $querycount;
 
+		debug_log( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
 		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++;
@@ -146,8 +148,14 @@ class DataObjectCache
 	 */
 	function get_by_ID( $req_ID ) 
 	{
+		global $querycount;
 
-		if( empty( $this->cache[ $req_ID ] ) && (! $this->all_loaded) )
+		if( !empty( $this->cache[ $req_ID ] ) )
+		{	// Already in cache
+			// debug_log( "Accessing $this->objtype($req_ID) from cache" );
+			return $this->cache[ $req_ID ];
+		}
+		elseif( !$this->all_loaded )
 		{	// Not in cache, but not everything is loaded yet
 			if( $this->load_all )
 			{	// It's ok to just load everything:
@@ -155,6 +163,7 @@ class DataObjectCache
 			}
 			else
 			{ // Load just the requested object:
+				debug_log( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
 				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
 				$result = mysql_query($sql) or mysql_oops( $sql );
 				$querycount++;

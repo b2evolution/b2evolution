@@ -35,7 +35,7 @@
 while( $Comment = $CommentList->get_next() )
 {	// Loop through comments:	?>
 <item rdf:about="<?php $Comment->permalink() ?>">
-  <title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->post_title( 'xml' ) ?></title>
+  <title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
   <link><?php $Comment->permalink() ?></link>
   <dc:date><?php $Comment->date( 'isoZ', true ); ?></dc:date>
   <dc:creator><?php $Comment->author( 'xml' ) ?></dc:creator>

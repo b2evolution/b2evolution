@@ -1266,6 +1266,22 @@ function pre_dump($dump, $title = '')
 	echo '</pre>';
 }
 
+
+$debug_messages = array();
+/** 
+ * Log a debug string to be displayed later. (Typically at the end of the page)
+ *
+ * {@internal debug_log(-) }}
+ *
+ * @param boolean true to force output
+ */
+function debug_log( $message )
+{
+	global $debug_messages;
+	
+	$debug_messages[] = $message;
+}
+
 /** 
  * Outputs debug info. (Typically at the end of the page)
  *
@@ -1277,10 +1293,22 @@ function debug_info( $force = false )
 {
 	global $debug;
 	global $querycount;
+	global $debug_messages;
 	
 	if( $debug || $force )
 	{
 		echo "Debug: $querycount queries - ".number_format(timer_stop(),3)." seconds";
+
+		if( count( $debug_messages ) )
+		{
+			echo '<h2>Debug messages</h2><ul>';
+			foreach( $debug_messages as $message )
+			{
+				echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';
+			}
+			echo '</ul>';
+		}
+
 	}
 }
 

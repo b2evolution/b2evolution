@@ -61,7 +61,7 @@ $localtimenow = $servertimenow + ($time_difference * 3600);
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
 // $BlogCache = & new DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
-$ItemCache = & new DataObjectCache( 'Item', true, $tableposts, 'post_', 'ID' );
+$ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;

@@ -24,7 +24,7 @@
     <?php while( $Comment = $CommentList->get_next() )
 		{	// Loop through comments:	?>
     <item>
-      <title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->post_title( 'xml' ) ?></title>
+      <title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
       <pubDate><?php $Comment->time( 'r', true ); ?></pubDate>
       <guid isPermaLink="false">c<?php $Comment->ID() ?>@<?php echo $baseurl ?></guid>
       <description><?php $Comment->content( 'xml' ) ?></description>

@@ -18,11 +18,10 @@ require_once dirname(__FILE__). '/_class_dataobject.php';
 class Comment extends DataObject
 {
 	/**
-	 * @access private
+	 * @access protected
 	 */
 	var $Item = NULL;
 	
-	var	$post_ID;
 	var	$type;
 	var	$status;
 	var	$author;
@@ -33,7 +32,6 @@ class Comment extends DataObject
 	var	$content;
 	var	$karma;
 	// Extra vars:
-	var $post_title;
 	var $blog_ID;
 	var $blogparams;
 	var $blog_name;
@@ -45,7 +43,7 @@ class Comment extends DataObject
 	 */
 	function Comment( $db_row = NULL )
 	{
-		global $tablecomments;
+		global $tablecomments, $ItemCache;
 		
 		// Call parent constructor:
 		parent::DataObject( $tablecomments, 'comment_', 'comment_ID' );
@@ -57,8 +55,8 @@ class Comment extends DataObject
 		else
 		{
 			$this->ID = $db_row['comment_ID'];
-			$this->post_ID = $db_row['comment_post_ID'];
-			// echo 'post_ID=',$this->post_ID;
+			// Get parent Item
+			$this->Item = $ItemCache->get_by_ID(  $db_row['comment_post_ID'] );
 			$this->type = $db_row['comment_type'];
 			$this->status = $db_row['comment_status'];
 			$this->author = $db_row['comment_author'];
@@ -74,7 +72,6 @@ class Comment extends DataObject
 			if( isset( $db_row['blog_ID'] ) )
 			{
 				$this->blog_ID = $db_row['blog_ID'];
-				$this->post_title = $db_row['post_title'];
 				$this->blogparams = get_blogparams_by_ID($this->blog_ID);
 				$this->blog_name = $db_row['blog_name'];
 			}
@@ -90,7 +87,9 @@ class Comment extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'post_ID':
+			case 'Item':
+				die ('coment->Post assignement not handled');
+	
 			case 'karma':
 				parent::set_param( $parname, 'int', $parvalue );
 			break;
@@ -98,33 +97,6 @@ class Comment extends DataObject
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
-	}
-
-	/** 
-	 * Get a member param by its name
-	 *
-	 * {@internal Comment::get(-) }}
-	 *
-	 * @param mixed Name of parameter
-	 * @return mixed Value of parameter
-	 */
-	function get( $parname )
-	{
-		switch( $parname )
-		{
-			case 'post_link':
-				// Link to original post:
-				return gen_permalink( get_bloginfo( 'blogurl', $this->blogparams ), 
-															$this->post_ID, 'id', 'single' );
-
-			case 'permalink':
-				// Permament link to comment:
-				$post_permalink = gen_permalink( get_bloginfo( 'blogurl', $this->blogparams ), 
-															$this->post_ID, 'id', 'single' );
-				return $post_permalink.'#c'.$this->ID;
-		}
-		// Default:		
-		return $this->$parname;	
 	}
 
 
@@ -227,35 +199,28 @@ class Comment extends DataObject
 
 
 	/** 
-	 * Template function: display comment's original post's title
-	 *
-	 * {@internal Comment::post_title(-) }}
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function post_title( $format = 'htmlbody' ) 
-	{
-		$this->disp( 'post_title', $format );
-	}
-
-	/** 
-	 * Template function: display link to comment's original post
-	 *
-	 * {@internal Comment::post_link(-) }}
-	 */
-	function post_link() 
-	{
-		$this->disp( 'post_link', 'raw' );
-	}
-
-	/** 
 	 * Template function: display permalink to this comment
 	 *
 	 * {@internal Comment::permalink(-) }}
+	 * 
+	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
+	 * @param string url to use
 	 */
-	function permalink() 
+	function permalink( $mode = '', $blogurl='' )
 	{
-		$this->disp( 'permalink', 'raw' );
+		if( empty( $mode ) )
+			$mode = get_settings( 'pref_permalink_type' );
+
+		// some permalink modes are not acceptable here:
+		switch( $mode )
+		{
+			case 'archive#id':
+			case 'archive#title':			
+			  $mode = 'pid';
+		}
+
+		$post_permalink = $this->Item->gen_permalink( $mode, $blogurl );
+		echo $post_permalink.'#c'.$this->ID;
 	}
 
 	/** 

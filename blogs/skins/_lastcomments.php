@@ -26,7 +26,7 @@
 		<div class="bComment">
 			<h3 class="bTitle">
 				<?php echo T_('In response to:') ?> 
-				<a href="<?php $Comment->post_link() ?>" title="<?php echo T_('Original post on:') ?> <?php  $Comment->disp( 'blog_name', 'htmlattr' ) ?>"><?php $Comment->post_title() ?></a>
+				<a href="<?php $Comment->Item->permalink() ?>" title="<?php echo T_('Original post on:') ?> <?php  $Comment->disp( 'blog_name', 'htmlattr' ) ?>"><?php $Comment->Item->title( '', '', false ) ?></a>
 			</h3>
 			<div class="bCommentTitle">
 				<?php $Comment->author() ?>
@@ -36,6 +36,7 @@
 				<?php $Comment->content() ?>
 			</div>
 			<div class="bCommentSmallPrint">
+				<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment') ?>" class="rightmargin"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			</div>
 		</div>
