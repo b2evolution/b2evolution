@@ -41,6 +41,14 @@ class DataObjectList
 	 * Number of rows in result set. Typically equal to $posts_per_page, once loaded.
 	 */
 	var $result_num_rows = 0;
+	/**
+	 * Object array
+	 */
+	var $Obj = array();
+	/**
+	 * Current object idx in array:
+	 */
+	var $current_idx = 0;
 	/**#@-*/
 
 	/** 
@@ -71,6 +79,20 @@ class DataObjectList
 		return $this->result_num_rows;
 	}
 
+	/** 
+	 * Get next comment in list
+	 *
+	 * {@internal CommentList::get_next(-) }}
+	 */
+	function get_next()
+	{
+		if( $this->current_idx >= $this->result_num_rows )
+		{	// No more comment in list
+			return false;
+		}
+		return  $this->Obj[$this->current_idx++];
+	}
+
 	/**
 	 * Rewind resultset
 	 *
@@ -78,7 +100,7 @@ class DataObjectList
 	 */
 	function restart()
 	{
-		mysql_data_seek ($this->result, 0) or die( 'Could not rewind resultset!' );
+		$this->current_idx = 0;
 	}
 	
 	

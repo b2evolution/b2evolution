@@ -31,10 +31,6 @@ class Comment extends DataObject
 	var	$date;
 	var	$content;
 	var	$karma;
-	// Extra vars:
-	var $blog_ID;
-	var $blogparams;
-	var $blog_name;
 
 	/* 
 	 * Comment::Comment(-)
@@ -68,13 +64,6 @@ class Comment extends DataObject
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
 			$this->karma = $db_row['comment_karma'];
-			// Extra vars:
-			if( isset( $db_row['blog_ID'] ) )
-			{
-				$this->blog_ID = $db_row['blog_ID'];
-				$this->blogparams = get_blogparams_by_ID($this->blog_ID);
-				$this->blog_name = $db_row['blog_name'];
-			}
 		}
 	}	
 	

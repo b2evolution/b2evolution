@@ -114,11 +114,11 @@ class DataObjectCache
 	 *
 	 * {@internal DataObjectCache::add(-) }}
 	 */
-	function add( $Obj )
+	function add( & $Obj )
 	{
 		if( isset($Obj->ID) && $Obj->ID != 0 )
 		{
-			$this->cache[$Obj->ID] = $Obj;
+			$this->cache[$Obj->ID] = & $Obj;
 			return true;
 		}
 		return false;
