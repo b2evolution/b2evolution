@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 19:24+0200\n"
+"POT-Creation-Date: 2004-05-11 20:01+0200\n"
 "PO-Revision-Date: 2004-03-06 03:15+0100\n"
 "Last-Translator: Christina Svensson <b2evo04@cs.se>\n"
 "MIME-Version: 1.0\n"
@@ -1302,8 +1302,8 @@ msgstr "Profilen uppdaterad"
 #: ..\..\..\admin\b2users.php:419
 #, php-format
 msgid ""
-"The group name already exists. Please <a %s>edit this group</a> instead of "
-"overwriting it this way."
+"This group name already exists! Do you want to <a %s>edit the existing "
+"group</a>?"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:473
@@ -2714,7 +2714,7 @@ msgid "Lang file"
 msgstr "Språk"
 
 #: ..\..\..\admin\_set_regional.form.php:57
-msgid "the message file being used, from <code>locales</code> subdirectory"
+msgid "the lang file being used, from <code>locales</code> subdirectory"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:58
@@ -2779,8 +2779,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:96
 msgid ""
-"Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or "
-"blog locale (in this order)."
+"Overriden by browser config, user locale or blog locale (in this order)."
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:102
@@ -4275,11 +4274,6 @@ msgstr "Norska (bokmal)"
 msgid "Dutch (NL)"
 msgstr "Holländska"
 
-#: ..\..\..\conf\_locales.php:121
-#, fuzzy
-msgid "Portuguese (BR)"
-msgstr "Portugisiska"
-
 #: ..\..\..\conf\_locales.php:128
 #, fuzzy
 msgid "Swedish (SE)"
@@ -5524,6 +5518,10 @@ msgstr "[...] Läs mer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Ny pingback på ditt inlägg #%d \"%s\""
+
+#, fuzzy
+#~ msgid "Portuguese (BR)"
+#~ msgstr "Portugisiska"
 
 #, fuzzy
 #~ msgid "You have no permission to edit other users or groups!"

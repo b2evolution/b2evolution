@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
-"POT-Creation-Date: 2004-05-11 19:24+0200\n"
-"PO-Revision-Date: 2004-05-11 19:50+0100\n"
+"POT-Creation-Date: 2004-05-11 20:01+0200\n"
+"PO-Revision-Date: 2004-05-11 20:05+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1199,7 +1199,7 @@ msgstr "Le niveau de l'utilisateur doit être compris entre %d et %d."
 #: ..\..\..\admin\b2users.php:152
 #, php-format
 msgid "This login already exists. Do you want to <a %s>edit the existing user</a>?"
-msgstr ""
+msgstr "Cet identifiant existe déjà. Voulez-vous <a %s>éditer l'utilisateur existant</a>?"
 
 #: ..\..\..\admin\b2users.php:187
 msgid "You typed two different passwords."
@@ -1272,8 +1272,8 @@ msgstr "Groupe supprimé..."
 
 #: ..\..\..\admin\b2users.php:419
 #, php-format
-msgid "The group name already exists. Please <a %s>edit this group</a> instead of overwriting it this way."
-msgstr ""
+msgid "This group name already exists! Do you want to <a %s>edit the existing group</a>?"
+msgstr "Ce groupe existe déjà. Voulez-vous <a %s>éditer le groupe existant</a>?"
 
 #: ..\..\..\admin\b2users.php:473
 msgid "Group updated."
@@ -1541,7 +1541,7 @@ msgstr "Autoriser la sélection d'autres habillages."
 
 #: ..\..\..\admin\_blogs_form.php:23
 msgid "Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie)."
-msgstr ""
+msgstr "Les utilisateurs pourront sélectionner un autre habillage pour voir le blog (et leur habillage préféré sera sauvé dans un cookie)."
 
 #: ..\..\..\admin\_blogs_form.php:25
 msgid "Display public blog list"
@@ -1557,7 +1557,7 @@ msgstr "Inclure dans la liste des blogs publics"
 
 #: ..\..\..\admin\_blogs_form.php:27
 msgid "Check this if you want to this blog to be displayed in the list of all public blogs."
-msgstr ""
+msgstr "Cochez si vous voulez que ce blog soit inclus dans la liste des blogs publics."
 
 #: ..\..\..\admin\_blogs_form.php:29
 msgid "Default linkblog"
@@ -1709,7 +1709,7 @@ msgstr "Nom Court"
 
 #: ..\..\..\admin\_blogs_main.subform.php:16
 msgid "Will be used in selection menus and throughout the admin interface."
-msgstr ""
+msgstr "Sera utilisé dans les menus de sélection au travers de l'interface d'administration."
 
 #: ..\..\..\admin\_blogs_main.subform.php:17
 msgid "Main Locale"
@@ -1755,7 +1755,7 @@ msgstr "Nom URL du blog / fichier stub"
 
 #: ..\..\..\admin\_blogs_main.subform.php:46
 msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
-msgstr ""
+msgstr "Utilisé dans les URLs pour identifier ce blog. Entrez le nom du fichier stub si vous utilisez un accès par fichier stub."
 
 #: ..\..\..\admin\_blogs_new.form.php:13
 msgid "New blog"
@@ -1887,12 +1887,15 @@ msgstr "Permission de modifier les propriétés de ce blog"
 msgid "Non members"
 msgstr "Non membres"
 
+#  TRANS: Javascript string
 #. TRANS: Javascript string
 #: ..\..\..\admin\_blogs_permissions.form.php:202
 msgid ""
 "Warning! You are about to remove your own permission to edit this blog!\\n"
 "You won\\'t have access to its properties any longer if you do that!"
 msgstr ""
+"Attention! Vous êtes sur le point de supprimer votre propre permission d'éditer ce blog!\\n"
+"Vous ne pourrez plus accéder aux priorités de ce blog si vous continuez!"
 
 #: ..\..\..\admin\_cats_list.php:26
 msgid "Edit category properties"
@@ -2538,7 +2541,7 @@ msgstr "Utiliser les URL étendues"
 
 #: ..\..\..\admin\_set_general.form.php:55
 msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
-msgstr ""
+msgstr "Recommandé si votre serveur web le support. Les liens ressembleront à 'stub/2003/05/20/titre_article' au lieu de 'stub?title=titre_article&c=1&tb=1&pb=1&more=1'."
 
 #: ..\..\..\admin\_set_general.form.php:58
 msgid "Post called up by its URL title (Recommended)"
@@ -2646,7 +2649,7 @@ msgstr "Format de date"
 #: ..\..\..\admin\_set_regional.form.php:53
 #, php-format
 msgid "the date format, see <a %s>the specs</a>"
-msgstr ""
+msgstr "le format de date, voir <a %s>specs</a>"
 
 #: ..\..\..\admin\_set_regional.form.php:54
 msgid "Time format"
@@ -2655,7 +2658,7 @@ msgstr "Format de l'heure"
 #: ..\..\..\admin\_set_regional.form.php:55
 #, php-format
 msgid "the time format, see <a %s>the specs</a>"
-msgstr ""
+msgstr "le format de l'heure, voir <a %s>specs</a>"
 
 #: ..\..\..\admin\_set_regional.form.php:56
 #: ..\..\..\admin\_set_regional.form.php:145
@@ -2663,7 +2666,7 @@ msgid "Lang file"
 msgstr "Fichier langue"
 
 #: ..\..\..\admin\_set_regional.form.php:57
-msgid "the message file being used, from <code>locales</code> subdirectory"
+msgid "the lang file being used, from <code>locales</code> subdirectory"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:58
@@ -2720,7 +2723,7 @@ msgid "Default locale"
 msgstr "Locale par défaut"
 
 #: ..\..\..\admin\_set_regional.form.php:96
-msgid "Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or blog locale (in this order)."
+msgid "Overriden by browser config, user locale or blog locale (in this order)."
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:102
@@ -4189,10 +4192,6 @@ msgstr "Norvégien (NO)"
 msgid "Dutch (NL)"
 msgstr "Néerlandais (NL)"
 
-#: ..\..\..\conf\_locales.php:121
-msgid "Portuguese (BR)"
-msgstr "Portuguais (BR)"
-
 #: ..\..\..\conf\_locales.php:128
 msgid "Swedish (SE)"
 msgstr "Suédois (SE)"
@@ -4810,7 +4809,7 @@ msgstr "Email de l'administrateur"
 
 #: ..\..\..\install\index.php:370
 msgid "Installing b2evolution tables with sample data"
-msgstr ""
+msgstr "Installation des tables b2evolution avec des données d'exemple"
 
 #: ..\..\..\install\index.php:375
 msgid "Installation successful!"
@@ -4825,7 +4824,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:390
 msgid "Upgrading data in existing b2evolution database"
-msgstr ""
+msgstr "Mise à jour des données dans base de données b2evolution existante"
 
 #: ..\..\..\install\index.php:394
 #: ..\..\..\install\index.php:413
@@ -4848,7 +4847,7 @@ msgstr "Supprimer les tables b2evolution de la base de données"
 
 #: ..\..\..\install\index.php:431
 msgid "For security reasons, the reset feature is disabled by default."
-msgstr ""
+msgstr "Pour des raisons de sécurité, la fonction de remise à zéro est désactivée par défaut."
 
 #: ..\..\..\install\index.php:441
 msgid "Reset done!"

@@ -54,7 +54,7 @@ if( !empty($locale) && $action != 'extract' )
 		form_text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'),
 			sprintf( T_('the time format, see <a %s>the specs</a>'), 'href="link"'), 10 );
 		form_text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
-			T_('the message file being used, from <code>locales</code> subdirectory'), 20 );
+			T_('the lang file being used, from <code>locales</code> subdirectory'), 20 );
 		form_text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
 			T_('1 is highest. It\'s use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc.'), 5 );
 

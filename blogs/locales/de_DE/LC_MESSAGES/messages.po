@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 19:24+0200\n"
+"POT-Creation-Date: 2004-05-11 20:01+0200\n"
 "PO-Revision-Date: 2004-05-09 22:08+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -1275,13 +1275,13 @@ msgid "Group deleted..."
 msgstr "Gruppe gelöscht..."
 
 #: ..\..\..\admin\b2users.php:419
-#, php-format
+#, fuzzy, php-format
 msgid ""
-"The group name already exists. Please <a %s>edit this group</a> instead of "
-"overwriting it this way."
+"This group name already exists! Do you want to <a %s>edit the existing "
+"group</a>?"
 msgstr ""
-"Der Gruppenname existiert bereits. Bitte <a %s>editiere diese Gruppe</a> "
-"anstatt sie so zu überschreiben."
+"Der Login existiert bereits. Bitte <a %s>editiere diesen Login</a> anstatt "
+"ihn so zu überschreiben."
 
 #: ..\..\..\admin\b2users.php:473
 msgid "Group updated."
@@ -2671,7 +2671,8 @@ msgid "Lang file"
 msgstr "Sprachdatei"
 
 #: ..\..\..\admin\_set_regional.form.php:57
-msgid "the message file being used, from <code>locales</code> subdirectory"
+#, fuzzy
+msgid "the lang file being used, from <code>locales</code> subdirectory"
 msgstr ""
 "die message Datei die aus dem Unterverzeichnis <code>locales</code> benutzt "
 "wird"
@@ -2743,9 +2744,9 @@ msgid "Default locale"
 msgstr "Standard-Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:96
+#, fuzzy
 msgid ""
-"Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or "
-"blog locale (in this order)."
+"Overriden by browser config, user locale or blog locale (in this order)."
 msgstr ""
 "Standard-Locale. Wird von HTTP_ACCEPT_LANGUAGE-Header, Benutzer-Locale oder "
 "Blog-Locale überschrieben (in dieser Reihenfolge)."
@@ -4202,10 +4203,6 @@ msgstr "Norwegisch (NO)"
 msgid "Dutch (NL)"
 msgstr "Holländisch (NL)"
 
-#: ..\..\..\conf\_locales.php:121
-msgid "Portuguese (BR)"
-msgstr "Portugiesisch (BR)"
-
 #: ..\..\..\conf\_locales.php:128
 msgid "Swedish (SE)"
 msgstr "Schwedisch (SE)"
@@ -5533,6 +5530,16 @@ msgstr "[...] Lies mehr!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
+#~ msgid ""
+#~ "The group name already exists. Please <a %s>edit this group</a> instead "
+#~ "of overwriting it this way."
+#~ msgstr ""
+#~ "Der Gruppenname existiert bereits. Bitte <a %s>editiere diese Gruppe</a> "
+#~ "anstatt sie so zu überschreiben."
+
+#~ msgid "Portuguese (BR)"
+#~ msgstr "Portugiesisch (BR)"
 
 #~ msgid "Visit homepage"
 #~ msgstr "Besuche Homepage"

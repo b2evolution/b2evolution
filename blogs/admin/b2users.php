@@ -416,7 +416,7 @@ else switch ($action)
 		
 		if( $q !== NULL )
 		{
-			errors_add( sprintf( T_('The group name already exists. Please <a %s>edit this group</a> instead of overwriting it this way.'), 'href="?group='.$q.'"' ));
+			errors_add( sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 'href="?group='.$q.'"' ));
 		}
 		
 		if( $edited_grp_ID == 0 )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 19:24+0200\n"
+"POT-Creation-Date: 2004-05-11 20:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1323,8 +1323,8 @@ msgstr ""
 #: ..\..\..\admin\b2users.php:419
 #, php-format
 msgid ""
-"The group name already exists. Please <a %s>edit this group</a> instead of "
-"overwriting it this way."
+"This group name already exists! Do you want to <a %s>edit the existing "
+"group</a>?"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:473
@@ -2723,7 +2723,7 @@ msgid "Lang file"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:57
-msgid "the message file being used, from <code>locales</code> subdirectory"
+msgid "the lang file being used, from <code>locales</code> subdirectory"
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:58
@@ -2786,8 +2786,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:96
 msgid ""
-"Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or "
-"blog locale (in this order)."
+"Overriden by browser config, user locale or blog locale (in this order)."
 msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:102
@@ -4255,10 +4254,6 @@ msgstr ""
 
 #: ..\..\..\conf\_locales.php:114
 msgid "Dutch (NL)"
-msgstr ""
-
-#: ..\..\..\conf\_locales.php:121
-msgid "Portuguese (BR)"
 msgstr ""
 
 #: ..\..\..\conf\_locales.php:128
