@@ -55,6 +55,7 @@ require dirname(__FILE__).'/_submenu.inc.php';
 // Discover additional plugins:
 $AvailablePlugins = & new Plugins();
 $AvailablePlugins->discover();
+$AvailablePlugins->sort('name');
 
 
 switch( $action )
