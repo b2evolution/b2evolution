@@ -16,7 +16,7 @@ param( 'action', 'string' );
 
 switch($action) 
 {
-	case "edit":
+	case 'edit':
 		/*
 		 * --------------------------------------------------------------------
 		 * Display post editing form
@@ -60,7 +60,7 @@ switch($action)
 		break;
 	
 	
-	case "editcomment":
+	case 'editcomment':
 		/*
 		 * --------------------------------------------------------------------
 		 * Display comment in edit form
@@ -70,11 +70,15 @@ switch($action)
 	
 		$title = T_('Editing comment');
 		require (dirname(__FILE__).'/_menutop.php');
-		echo "#".$commentdata["comment_ID"];
+		echo "#".$commentdata['comment_ID'];
 		require (dirname(__FILE__).'/_menutop_end.php');
+
+		$comment_post_ID = $commentdata['comment_post_ID'];
+		$comment_postdata = get_postdata( $comment_post_ID );
+		$blog = get_catblog( $comment_postdata['Category'] );
 	
 		// Check permission:
-		$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
+		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
 	
 		$content = $commentdata['comment_content'];
 		$content = format_to_edit($content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') );

@@ -262,7 +262,7 @@ class User extends DataObject
 	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
 	{
 		global $tableblogusers, $querycount;
-		// echo "checkin for $permname >= $permlevel on blog $perm_arget_blot<br />";
+		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 		
 		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
 		{	// Allowed blog post statuses have not been loaded yet:
