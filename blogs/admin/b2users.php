@@ -36,8 +36,8 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	$user_profile_only = 1;
 	
 	if( ($action && $action != 'userupdate') )
-	{
-		errors_add( T_('You have no permission to edit other users or groups!') );
+	{	// This should be prevented un the UI
+		errors_add( 'You have no permission to edit other users or groups!' );
 		$action = ''; // don't show group form (we have no group ID)
 	}
 	elseif( $demo_mode && $action && $current_User->login == 'demouser' )
@@ -149,7 +149,7 @@ else switch ($action)
 		
 		if( $q !== NULL )
 		{
-			errors_add( sprintf( T_('The login already exists. Please <a %s>edit this login</a> instead of overwriting it this way.'), 'href="?user='.$q.'"' ));
+			errors_add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ));
 		}
 		
 		$edited_User->set( 'login', $edited_user_login );

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 17:43+0200\n"
+"POT-Creation-Date: 2004-05-11 19:24+0200\n"
 "PO-Revision-Date: 2004-05-09 22:08+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -270,7 +270,7 @@ msgstr "Gehe zum Back-Office!"
 msgid "Official website"
 msgstr "Offizielle Webseite"
 
-#: ..\..\..\default.php:91 ..\..\..\install\index.php:449
+#: ..\..\..\default.php:91 ..\..\..\install\index.php:450
 msgid "GNU GPL license"
 msgstr "GNU GPL Lizenz"
 
@@ -630,8 +630,8 @@ msgid "Properties for category:"
 msgstr "Eigenschaften für Kategorie:"
 
 #: ..\..\..\admin\b2categories.php:188 ..\..\..\admin\b2upload.php:218
-#: ..\..\..\admin\_edit_form.php:128 ..\..\..\admin\_set_regional.form.php:49
-#: ..\..\..\admin\_set_regional.form.php:122
+#: ..\..\..\admin\_edit_form.php:128 ..\..\..\admin\_set_regional.form.php:48
+#: ..\..\..\admin\_set_regional.form.php:121
 #: ..\..\..\admin\_users_groupform.php:75 ..\..\..\admin\_users_list.php:19
 #: ..\..\..\skins\_feedback.php:170 ..\..\..\skins\basic\_feedback.php:165
 msgid "Name"
@@ -1178,11 +1178,6 @@ msgstr "Schliesse dieses Fenster"
 msgid "User management"
 msgstr "Benutzerverwaltung"
 
-#: ..\..\..\admin\b2users.php:40
-#, fuzzy
-msgid "You have no permission to edit other users or groups!"
-msgstr "Du darfst keine Benutzer/Gruppen ändern!"
-
 #: ..\..\..\admin\b2users.php:45
 msgid "You cannot change the demouser profile in demo mode!"
 msgstr ""
@@ -1203,10 +1198,9 @@ msgid "User level must be between %d and %d."
 msgstr "Benutzerlevel muss zwischen %d und %d liegen."
 
 #: ..\..\..\admin\b2users.php:152
-#, php-format
+#, fuzzy, php-format
 msgid ""
-"The login already exists. Please <a %s>edit this login</a> instead of "
-"overwriting it this way."
+"This login already exists. Do you want to <a %s>edit the existing user</a>?"
 msgstr ""
 "Der Login existiert bereits. Bitte <a %s>editiere diesen Login</a> anstatt "
 "ihn so zu überschreiben."
@@ -1532,9 +1526,9 @@ msgstr "Blog aktualisieren!"
 #: ..\..\..\admin\_edit_showposts.php:532
 #: ..\..\..\admin\_set_general.form.php:79
 #: ..\..\..\admin\_set_plugins.form.php:69
-#: ..\..\..\admin\_set_regional.form.php:72
-#: ..\..\..\admin\_set_regional.form.php:204
-#: ..\..\..\admin\_set_regional.form.php:319
+#: ..\..\..\admin\_set_regional.form.php:71
+#: ..\..\..\admin\_set_regional.form.php:203
+#: ..\..\..\admin\_set_regional.form.php:318
 #: ..\..\..\admin\_users_form.php:211 ..\..\..\admin\_users_groupform.php:126
 #: ..\..\..\install\index.php:278 ..\..\..\skins\_profile.php:92
 msgid "Reset"
@@ -1660,7 +1654,7 @@ msgid "Static File"
 msgstr "Statische Datei"
 
 #: ..\..\..\admin\_blogs_list.php:20 ..\..\..\admin\_set_regional.form.php:46
-#: ..\..\..\admin\_set_regional.form.php:120
+#: ..\..\..\admin\_set_regional.form.php:119
 #: ..\..\..\admin\_users_form.php:118 ..\..\..\htsrv\_reg_form.php:42
 #: ..\..\..\skins\_profile.php:68
 msgid "Locale"
@@ -1707,7 +1701,7 @@ msgstr "Kopiere dieses Blog!"
 
 #  TRANS: Abbrev. for Copy
 #. TRANS: Abbrev. for Copy
-#: ..\..\..\admin\_blogs_list.php:82 ..\..\..\admin\_set_regional.form.php:197
+#: ..\..\..\admin\_blogs_list.php:82 ..\..\..\admin\_set_regional.form.php:196
 #: ..\..\..\admin\_users_list.php:69 ..\..\..\admin\_users_list.php:137
 msgid "Copy"
 msgstr "Kopieren"
@@ -1917,8 +1911,8 @@ msgstr "Nicht-Mitglieder"
 #. TRANS: Javascript string
 #: ..\..\..\admin\_blogs_permissions.form.php:202
 msgid ""
-"Warning! You are about to withdraw your permission to edit this blog!\\nYou "
-"won\\'t have access to its properties if you do that!"
+"Warning! You are about to remove your own permission to edit this blog!"
+"\\nYou won\\'t have access to its properties any longer if you do that!"
 msgstr ""
 
 #: ..\..\..\admin\_cats_list.php:26
@@ -2585,8 +2579,8 @@ msgstr "für Benutzer."
 
 #: ..\..\..\admin\_set_general.form.php:78
 #: ..\..\..\admin\_set_plugins.form.php:68
-#: ..\..\..\admin\_set_regional.form.php:71
-#: ..\..\..\admin\_set_regional.form.php:318
+#: ..\..\..\admin\_set_regional.form.php:70
+#: ..\..\..\admin\_set_regional.form.php:317
 #: ..\..\..\admin\_users_form.php:210 ..\..\..\admin\_users_groupform.php:125
 #: ..\..\..\skins\_profile.php:91 ..\..\..\skins\basic\_profile.php:93
 msgid "Update"
@@ -2610,13 +2604,13 @@ msgid "Toolbar plug-ins"
 msgstr "Toolbar Plugins"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-#: ..\..\..\admin\_set_regional.form.php:303
+#: ..\..\..\admin\_set_regional.form.php:302
 msgid "Create new locale"
 msgstr "Erstelle neue Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
+#: ..\..\..\admin\_set_regional.form.php:153
+#: ..\..\..\admin\_set_regional.form.php:198
 msgid "Edit locale"
 msgstr "Editiere Locale"
 
@@ -2630,63 +2624,64 @@ msgstr ""
 "Die letzten zwei Buchstaben sollten ein <a %s>ISO 3166 Ländercode</a> sein."
 
 #: ..\..\..\admin\_set_regional.form.php:47
-#: ..\..\..\admin\_set_regional.form.php:121
+#: ..\..\..\admin\_set_regional.form.php:120
 msgid "Enabled"
 msgstr "Eingeschaltet"
 
-#: ..\..\..\admin\_set_regional.form.php:48
-msgid "should the locale be available?"
+#: ..\..\..\admin\_set_regional.form.php:47
+#, fuzzy
+msgid "Should this locale be available to users?"
 msgstr "soll diese Locale verfügbar sein?"
 
-#: ..\..\..\admin\_set_regional.form.php:50
+#: ..\..\..\admin\_set_regional.form.php:49
 msgid "name of the locale"
 msgstr "Name der Locale"
 
-#: ..\..\..\admin\_set_regional.form.php:51
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:50
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Charset"
 msgstr "Zeichensatz"
 
-#: ..\..\..\admin\_set_regional.form.php:52
+#: ..\..\..\admin\_set_regional.form.php:51
 #, php-format
 msgid "the charset for this locale. see <a %s>the specs</a>"
 msgstr "der Zeichensatz für diese Locale, siehe <a %s>Format-Beschreibung</a>"
 
-#: ..\..\..\admin\_set_regional.form.php:53
+#: ..\..\..\admin\_set_regional.form.php:52
 msgid "Date format"
 msgstr "Datumsformat"
 
-#: ..\..\..\admin\_set_regional.form.php:54
+#: ..\..\..\admin\_set_regional.form.php:53
 #, php-format
 msgid "the date format, see <a %s>the specs</a>"
 msgstr "das Datumsformat, siehe <a %s>Format-Beschreibung</a>"
 
-#: ..\..\..\admin\_set_regional.form.php:55
+#: ..\..\..\admin\_set_regional.form.php:54
 msgid "Time format"
 msgstr "Zeitformat"
 
-#: ..\..\..\admin\_set_regional.form.php:56
+#: ..\..\..\admin\_set_regional.form.php:55
 #, php-format
 msgid "the time format, see <a %s>the specs</a>"
 msgstr "das Zeitformat, siehe <a %s>Format-Beschreibung</a>"
 
-#: ..\..\..\admin\_set_regional.form.php:57
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:56
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Lang file"
 msgstr "Sprachdatei"
 
-#: ..\..\..\admin\_set_regional.form.php:58
+#: ..\..\..\admin\_set_regional.form.php:57
 msgid "the message file being used, from <code>locales</code> subdirectory"
 msgstr ""
 "die message Datei die aus dem Unterverzeichnis <code>locales</code> benutzt "
 "wird"
 
-#: ..\..\..\admin\_set_regional.form.php:59
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:58
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Priority"
 msgstr "Priorität"
 
-#: ..\..\..\admin\_set_regional.form.php:60
+#: ..\..\..\admin\_set_regional.form.php:59
 msgid ""
 "1 is highest. It's use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE "
 "header), when we have more than locale with the requested language. It also "
@@ -2697,19 +2692,19 @@ msgstr ""
 "angeforderten Sprache vorhanden sind. Es hat ausserdem Einfluss darauf, in "
 "welcher Reihenfolge Locales in Dropdown-Boxen angezeigt werden etc."
 
-#: ..\..\..\admin\_set_regional.form.php:71 ..\..\..\admin\_users_form.php:210
+#: ..\..\..\admin\_set_regional.form.php:70 ..\..\..\admin\_users_form.php:210
 #: ..\..\..\admin\_users_groupform.php:125
 msgid "Create"
 msgstr "Erstellen"
 
 #  TRANS: this is a Javascript string
 #. TRANS: this is a Javascript string
-#: ..\..\..\admin\_set_regional.form.php:71
+#: ..\..\..\admin\_set_regional.form.php:70
 #, php-format
 msgid "This will replace locale \\'%s\\'. Ok?"
 msgstr "Das wird Locale \\'%s\\' ersetzen. Ok?"
 
-#: ..\..\..\admin\_set_regional.form.php:75
+#: ..\..\..\admin\_set_regional.form.php:74
 #, php-format
 msgid ""
 "We'll use the flag out of subdirectories from <code>%s</code>, where the "
@@ -2720,34 +2715,34 @@ msgstr ""
 "wobei der Dateiname dem Sprachen-Teil der Locale entspricht (Zeichen 4-5; "
 "Dateiendung ist gif)."
 
-#: ..\..\..\admin\_set_regional.form.php:85
+#: ..\..\..\admin\_set_regional.form.php:84
 msgid "Note: default locale is not enabled."
 msgstr "Anmerkung: Standard-Locale ist nicht eingeschaltet."
 
-#: ..\..\..\admin\_set_regional.form.php:93
+#: ..\..\..\admin\_set_regional.form.php:92
 msgid "Regional settings"
 msgstr "Regionale Einstellungen"
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:95
 msgid "Time difference"
 msgstr "Zeitunterschied"
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:95
 msgid "in hours"
 msgstr "in Stunden"
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:95
 #, php-format
 msgid ""
 "If you're not on the timezone of your server. Current server time is: %s."
 msgstr ""
 "Falls du nicht in der Zeitzone des Servers bist. Aktuelle Serverzeit ist: %s."
 
-#: ..\..\..\admin\_set_regional.form.php:97
+#: ..\..\..\admin\_set_regional.form.php:96
 msgid "Default locale"
 msgstr "Standard-Locale"
 
-#: ..\..\..\admin\_set_regional.form.php:97
+#: ..\..\..\admin\_set_regional.form.php:96
 msgid ""
 "Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or "
 "blog locale (in this order)."
@@ -2755,81 +2750,81 @@ msgstr ""
 "Standard-Locale. Wird von HTTP_ACCEPT_LANGUAGE-Header, Benutzer-Locale oder "
 "Blog-Locale überschrieben (in dieser Reihenfolge)."
 
-#: ..\..\..\admin\_set_regional.form.php:103
+#: ..\..\..\admin\_set_regional.form.php:102
 msgid "Available locales"
 msgstr "Verfügbare Locales"
 
-#: ..\..\..\admin\_set_regional.form.php:108
+#: ..\..\..\admin\_set_regional.form.php:107
 msgid "Hide translation info"
 msgstr "Verstecke Übersetzungs-Infos"
 
-#: ..\..\..\admin\_set_regional.form.php:113
+#: ..\..\..\admin\_set_regional.form.php:112
 msgid "Show translation info"
 msgstr "Zeige Übersetzungs-Infos"
 
-#: ..\..\..\admin\_set_regional.form.php:123
+#: ..\..\..\admin\_set_regional.form.php:122
 msgid "Date fmt"
 msgstr "Datumsformat"
 
-#: ..\..\..\admin\_set_regional.form.php:124
+#: ..\..\..\admin\_set_regional.form.php:123
 msgid "Time fmt"
 msgstr "Zeitformat"
 
-#: ..\..\..\admin\_set_regional.form.php:125
-#: ..\..\..\admin\_set_regional.form.php:199 ..\..\..\admin\_users_list.php:31
+#: ..\..\..\admin\_set_regional.form.php:124
+#: ..\..\..\admin\_set_regional.form.php:198 ..\..\..\admin\_users_list.php:31
 msgid "Edit"
 msgstr "Ändern"
 
-#: ..\..\..\admin\_set_regional.form.php:129
+#: ..\..\..\admin\_set_regional.form.php:128
 msgid "Strings"
 msgstr "Zeichenketten"
 
-#: ..\..\..\admin\_set_regional.form.php:130
+#: ..\..\..\admin\_set_regional.form.php:129
 msgid "Translated"
 msgstr "Übersetzt"
 
-#: ..\..\..\admin\_set_regional.form.php:134
-#: ..\..\..\admin\_set_regional.form.php:291
+#: ..\..\..\admin\_set_regional.form.php:133
+#: ..\..\..\admin\_set_regional.form.php:290
 msgid "Extract"
 msgstr "Extrahieren"
 
-#: ..\..\..\admin\_set_regional.form.php:181
+#: ..\..\..\admin\_set_regional.form.php:180
 msgid "up"
 msgstr "hoch"
 
-#: ..\..\..\admin\_set_regional.form.php:181
+#: ..\..\..\admin\_set_regional.form.php:180
 msgid "Move priority up"
 msgstr "Erhöhe Priorität"
 
-#: ..\..\..\admin\_set_regional.form.php:190
+#: ..\..\..\admin\_set_regional.form.php:189
 msgid "down"
 msgstr "runter"
 
-#: ..\..\..\admin\_set_regional.form.php:190
+#: ..\..\..\admin\_set_regional.form.php:189
 msgid "Move priority down"
 msgstr "Verringere Priorität"
 
-#: ..\..\..\admin\_set_regional.form.php:197
+#: ..\..\..\admin\_set_regional.form.php:196
 msgid "Copy locale"
 msgstr "Kopiere Locale"
 
-#: ..\..\..\admin\_set_regional.form.php:204
+#: ..\..\..\admin\_set_regional.form.php:203
 msgid "Reset custom settings"
 msgstr "verwerfe Anpassungen"
 
-#: ..\..\..\admin\_set_regional.form.php:215
+#: ..\..\..\admin\_set_regional.form.php:214
 msgid "No language file..."
 msgstr "Keine Sprachdatei..."
 
-#: ..\..\..\admin\_set_regional.form.php:291
+#: ..\..\..\admin\_set_regional.form.php:290
 msgid "Extract .po file into b2evo-format"
 msgstr "Extrahiere .po-Datei ins b2evo-Format"
 
-#: ..\..\..\admin\_set_regional.form.php:306
+#: ..\..\..\admin\_set_regional.form.php:305
 msgid "Are you sure you want to reset?"
 msgstr "Bist du sicher, zurücksetzen zu wollen?"
 
-#: ..\..\..\admin\_set_regional.form.php:306
+#: ..\..\..\admin\_set_regional.form.php:305
 msgid "Reset to defaults (delete database table)"
 msgstr "Auf Voreinstellungen zurücksetzen (löscht Datenbank-Tabelle)"
 
@@ -2909,8 +2904,9 @@ msgid "Send an email"
 msgstr "Admin"
 
 #: ..\..\..\admin\_users_form.php:134
-msgid "Visit homepage"
-msgstr "Besuche Homepage"
+#, fuzzy
+msgid "Visit the site"
+msgstr "skinne die Seite"
 
 #: ..\..\..\admin\_users_form.php:144
 msgid "Search on ICQ.com"
@@ -4613,12 +4609,6 @@ msgstr ""
 "nicht funktionieren. Bitte überprüfe sie sorgfältig und versuche es "
 "nochmal..."
 
-#: ..\..\..\install\index.php:142
-#, php-format
-msgid "Could not load original conf file [%s]. Is it missing?"
-msgstr ""
-"Konnte die ursprüngliche Konfigurationsdatei [%s] nicht laden. Fehlt sie?"
-
 #: ..\..\..\install\index.php:172
 msgid "Config file update"
 msgstr "Update der Konfigurationsdatei"
@@ -4732,7 +4722,7 @@ msgstr ""
 "Datenbank in die du installieren möchtest (Diese Einstellungen sollten von "
 "deinem Host bereitgestellt werden)"
 
-#: ..\..\..\install\index.php:258 ..\..\..\install\index.php:352
+#: ..\..\..\install\index.php:258 ..\..\..\install\index.php:353
 msgid "mySQL Username"
 msgstr "mySQL Benutzername"
 
@@ -4740,7 +4730,7 @@ msgstr "mySQL Benutzername"
 msgid "Your username to access the database"
 msgstr "Dein Benutzername für den Datenbank-Zugriff"
 
-#: ..\..\..\install\index.php:259 ..\..\..\install\index.php:353
+#: ..\..\..\install\index.php:259 ..\..\..\install\index.php:354
 msgid "mySQL Password"
 msgstr "mySQL Passwort"
 
@@ -4748,7 +4738,7 @@ msgstr "mySQL Passwort"
 msgid "Your password to access the database"
 msgstr "Dein Passwort für den Datenbank-Zugriff"
 
-#: ..\..\..\install\index.php:260 ..\..\..\install\index.php:354
+#: ..\..\..\install\index.php:260 ..\..\..\install\index.php:355
 msgid "mySQL Database"
 msgstr "mySQL Datenbank"
 
@@ -4756,7 +4746,7 @@ msgstr "mySQL Datenbank"
 msgid "Name of the database you want to use"
 msgstr "Name der Datenbank, die du benutzen möchtest"
 
-#: ..\..\..\install\index.php:261 ..\..\..\install\index.php:355
+#: ..\..\..\install\index.php:261 ..\..\..\install\index.php:356
 msgid "mySQL Host"
 msgstr "mySQL Host"
 
@@ -4768,7 +4758,7 @@ msgstr "Du wirst das wahrscheinlich nicht ändern müssen"
 msgid "Additional settings"
 msgstr "Weitere Einstellungen"
 
-#: ..\..\..\install\index.php:268 ..\..\..\install\index.php:356
+#: ..\..\..\install\index.php:268 ..\..\..\install\index.php:357
 msgid "Base URL"
 msgstr "Basis-URL"
 
@@ -4873,18 +4863,18 @@ msgstr "Möchtest du neu anfangen?"
 
 #: ..\..\..\install\index.php:337
 msgid ""
-"<p>If you have installed b2evolution tables before and wish to start anew, "
-"you must delete the b2evolution tables before you can start a new "
-"installation. b2evolution can delete its own tables for you, but for obvious "
-"security reasons, this feature is disabled by default.</p>"
+"If you have installed b2evolution tables before and wish to start anew, you "
+"must delete the b2evolution tables before you can start a new installation. "
+"b2evolution can delete its own tables for you, but for obvious security "
+"reasons, this feature is disabled by default."
 msgstr ""
 
-#: ..\..\..\install\index.php:347
+#: ..\..\..\install\index.php:348
 #, fuzzy
 msgid "Base config recap..."
 msgstr "Basis-Konfiguration"
 
-#: ..\..\..\install\index.php:349
+#: ..\..\..\install\index.php:350
 #, fuzzy, php-format
 msgid ""
 "If you don't see correct settings here, STOP before going any further, and "
@@ -4893,24 +4883,24 @@ msgstr ""
 "(Falls du hier keine korrekten Werte siehst, HÖR AUF weiterzumachen und <a %"
 "s>überprüfe deine Konfiguration</a>.)"
 
-#: ..\..\..\install\index.php:353
+#: ..\..\..\install\index.php:354
 msgid "(Set, but not shown for security reasons)"
 msgstr "(Gesetzt, aber aus Sicherheitsgründen nicht angezeigt)"
 
-#: ..\..\..\install\index.php:357
+#: ..\..\..\install\index.php:358
 #, fuzzy
 msgid "Admin email"
 msgstr "Admin"
 
-#: ..\..\..\install\index.php:369
+#: ..\..\..\install\index.php:370
 msgid "Installing b2evolution tables with sample data"
 msgstr "Installiere b2evolution mit Beispieldaten"
 
-#: ..\..\..\install\index.php:374
+#: ..\..\..\install\index.php:375
 msgid "Installation successful!"
 msgstr "Installation erfolgreich!"
 
-#: ..\..\..\install\index.php:376
+#: ..\..\..\install\index.php:377
 #, fuzzy, php-format
 msgid ""
 "<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\"."
@@ -4925,46 +4915,46 @@ msgstr ""
 "das dir bei der Installation gegeben wird. Falls du es verlierst, wirst du "
 "die Datenbank-Tabellen löschen und neu installieren müssen.</p>"
 
-#: ..\..\..\install\index.php:389
+#: ..\..\..\install\index.php:390
 msgid "Upgrading data in existing b2evolution database"
 msgstr "Upgrade Daten in vorhandener b2evolution-Datenbank"
 
-#: ..\..\..\install\index.php:393 ..\..\..\install\index.php:412
+#: ..\..\..\install\index.php:394 ..\..\..\install\index.php:413
 msgid "Upgrade completed successfully!"
 msgstr "Upgrade erfolgreich beendet!"
 
-#: ..\..\..\install\index.php:394 ..\..\..\install\index.php:413
+#: ..\..\..\install\index.php:395 ..\..\..\install\index.php:414
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr ""
 "Jetzt kannst du dich mit deinem üblichen %2$s Benutzernamen und Passwort <a %"
 "1$s>einloggen</a>."
 
-#: ..\..\..\install\index.php:407
+#: ..\..\..\install\index.php:408
 msgid "Installing b2evolution tables and copying existing b2 data"
 msgstr "Installiere b2evolution Tabellen und kopiere vorhandene b2-Daten"
 
-#: ..\..\..\install\index.php:426
+#: ..\..\..\install\index.php:427
 msgid "Deleting b2evolution tables from the datatase"
 msgstr "Lösche b2evolution-Tabellen aus der Datenbank"
 
-#: ..\..\..\install\index.php:430
-msgid "<p>For security reasons, the reset feature is disabled by default.</p>"
+#: ..\..\..\install\index.php:431
+msgid "For security reasons, the reset feature is disabled by default."
 msgstr ""
 
-#: ..\..\..\install\index.php:440
+#: ..\..\..\install\index.php:441
 msgid "Reset done!"
 msgstr "Zurücksetzung erfolgt!"
 
-#: ..\..\..\install\index.php:441
+#: ..\..\..\install\index.php:442
 msgid "Back to menu"
 msgstr "Zurück zum Menu"
 
-#: ..\..\..\install\index.php:448
+#: ..\..\..\install\index.php:449
 msgid "official website"
 msgstr "offizielle Webseite"
 
-#: ..\..\..\install\index.php:450
+#: ..\..\..\install\index.php:451
 msgid "contact"
 msgstr "Kontakt"
 
@@ -5543,6 +5533,17 @@ msgstr "[...] Lies mehr!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
+#~ msgid "Visit homepage"
+#~ msgstr "Besuche Homepage"
+
+#, fuzzy
+#~ msgid "You have no permission to edit other users or groups!"
+#~ msgstr "Du darfst keine Benutzer/Gruppen ändern!"
+
+#~ msgid "Could not load original conf file [%s]. Is it missing?"
+#~ msgstr ""
+#~ "Konnte die ursprüngliche Konfigurationsdatei [%s] nicht laden. Fehlt sie?"
 
 #~ msgid "Couldn't change %s's level."
 #~ msgstr "Konnte %s's Level nicht ändern."

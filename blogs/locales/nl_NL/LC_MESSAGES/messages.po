@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 17:43+0200\n"
+"POT-Creation-Date: 2004-05-11 19:24+0200\n"
 "PO-Revision-Date: 2004-05-11 13:48+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: b2evolution <>\n"
@@ -269,7 +269,7 @@ msgstr "Ga naar het back-office"
 msgid "Official website"
 msgstr "Officiële website"
 
-#: ..\..\..\default.php:91 ..\..\..\install\index.php:449
+#: ..\..\..\default.php:91 ..\..\..\install\index.php:450
 msgid "GNU GPL license"
 msgstr "GNU GPL Licentie"
 
@@ -629,8 +629,8 @@ msgid "Properties for category:"
 msgstr "Eigenschappen voor categorie"
 
 #: ..\..\..\admin\b2categories.php:188 ..\..\..\admin\b2upload.php:218
-#: ..\..\..\admin\_edit_form.php:128 ..\..\..\admin\_set_regional.form.php:49
-#: ..\..\..\admin\_set_regional.form.php:122
+#: ..\..\..\admin\_edit_form.php:128 ..\..\..\admin\_set_regional.form.php:48
+#: ..\..\..\admin\_set_regional.form.php:121
 #: ..\..\..\admin\_users_groupform.php:75 ..\..\..\admin\_users_list.php:19
 #: ..\..\..\skins\_feedback.php:170 ..\..\..\skins\basic\_feedback.php:165
 msgid "Name"
@@ -1180,10 +1180,6 @@ msgstr "Sluit dit venster"
 msgid "User management"
 msgstr "Gebruikers beheer"
 
-#: ..\..\..\admin\b2users.php:40
-msgid "You have no permission to edit other users or groups!"
-msgstr "Je hebt geen rechten om andere gebruikers/groepen te bewerken!"
-
 #: ..\..\..\admin\b2users.php:45
 msgid "You cannot change the demouser profile in demo mode!"
 msgstr "Je kan de demo gebruiker niet veranderen in de demo modus!"
@@ -1204,10 +1200,9 @@ msgid "User level must be between %d and %d."
 msgstr "Gebruikerslevel moet tussen de %d en %d zijn."
 
 #: ..\..\..\admin\b2users.php:152
-#, php-format
+#, fuzzy, php-format
 msgid ""
-"The login already exists. Please <a %s>edit this login</a> instead of "
-"overwriting it this way."
+"This login already exists. Do you want to <a %s>edit the existing user</a>?"
 msgstr ""
 "De Login bestaat al. Gebruik <a href=\"%s\">bewerk deze login</a> in plaats "
 "van overschrijven op deze manier."
@@ -1532,9 +1527,9 @@ msgstr "Bijwerken weblog!"
 #: ..\..\..\admin\_edit_showposts.php:532
 #: ..\..\..\admin\_set_general.form.php:79
 #: ..\..\..\admin\_set_plugins.form.php:69
-#: ..\..\..\admin\_set_regional.form.php:72
-#: ..\..\..\admin\_set_regional.form.php:204
-#: ..\..\..\admin\_set_regional.form.php:319
+#: ..\..\..\admin\_set_regional.form.php:71
+#: ..\..\..\admin\_set_regional.form.php:203
+#: ..\..\..\admin\_set_regional.form.php:318
 #: ..\..\..\admin\_users_form.php:211 ..\..\..\admin\_users_groupform.php:126
 #: ..\..\..\install\index.php:278 ..\..\..\skins\_profile.php:92
 msgid "Reset"
@@ -1653,7 +1648,7 @@ msgid "Static File"
 msgstr "Statisch Bestand"
 
 #: ..\..\..\admin\_blogs_list.php:20 ..\..\..\admin\_set_regional.form.php:46
-#: ..\..\..\admin\_set_regional.form.php:120
+#: ..\..\..\admin\_set_regional.form.php:119
 #: ..\..\..\admin\_users_form.php:118 ..\..\..\htsrv\_reg_form.php:42
 #: ..\..\..\skins\_profile.php:68
 msgid "Locale"
@@ -1698,7 +1693,7 @@ msgid "Copy this blog!"
 msgstr "Kopieer dit weblog!"
 
 #. TRANS: Abbrev. for Copy
-#: ..\..\..\admin\_blogs_list.php:82 ..\..\..\admin\_set_regional.form.php:197
+#: ..\..\..\admin\_blogs_list.php:82 ..\..\..\admin\_set_regional.form.php:196
 #: ..\..\..\admin\_users_list.php:69 ..\..\..\admin\_users_list.php:137
 msgid "Copy"
 msgstr "Kopieer"
@@ -1903,9 +1898,10 @@ msgstr "Niet leden"
 
 #. TRANS: Javascript string
 #: ..\..\..\admin\_blogs_permissions.form.php:202
+#, fuzzy
 msgid ""
-"Warning! You are about to withdraw your permission to edit this blog!\\nYou "
-"won\\'t have access to its properties if you do that!"
+"Warning! You are about to remove your own permission to edit this blog!"
+"\\nYou won\\'t have access to its properties any longer if you do that!"
 msgstr ""
 "Waarschuwing! Je staat op het punt om jezelf minder rechten te geven om dit "
 "weblog te bewerken!\\nJe zal geen toegang hebben tot de eigenschappen als je "
@@ -2579,8 +2575,8 @@ msgstr "voor gebruikers."
 
 #: ..\..\..\admin\_set_general.form.php:78
 #: ..\..\..\admin\_set_plugins.form.php:68
-#: ..\..\..\admin\_set_regional.form.php:71
-#: ..\..\..\admin\_set_regional.form.php:318
+#: ..\..\..\admin\_set_regional.form.php:70
+#: ..\..\..\admin\_set_regional.form.php:317
 #: ..\..\..\admin\_users_form.php:210 ..\..\..\admin\_users_groupform.php:125
 #: ..\..\..\skins\_profile.php:91 ..\..\..\skins\basic\_profile.php:93
 msgid "Update"
@@ -2604,13 +2600,13 @@ msgid "Toolbar plug-ins"
 msgstr "Werkbalk plug-ins"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-#: ..\..\..\admin\_set_regional.form.php:303
+#: ..\..\..\admin\_set_regional.form.php:302
 msgid "Create new locale"
 msgstr "Creeër een nieuw taal"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-#: ..\..\..\admin\_set_regional.form.php:154
-#: ..\..\..\admin\_set_regional.form.php:199
+#: ..\..\..\admin\_set_regional.form.php:153
+#: ..\..\..\admin\_set_regional.form.php:198
 msgid "Edit locale"
 msgstr "Bewerk taal"
 
@@ -2624,63 +2620,64 @@ msgstr ""
 "laatste twee letters moeten de  <a %s>ISO 3166 land code</a> zijn."
 
 #: ..\..\..\admin\_set_regional.form.php:47
-#: ..\..\..\admin\_set_regional.form.php:121
+#: ..\..\..\admin\_set_regional.form.php:120
 msgid "Enabled"
 msgstr "Ingeschakeld"
 
-#: ..\..\..\admin\_set_regional.form.php:48
-msgid "should the locale be available?"
+#: ..\..\..\admin\_set_regional.form.php:47
+#, fuzzy
+msgid "Should this locale be available to users?"
 msgstr "moet de vertaling beschikbaar zijn?"
 
-#: ..\..\..\admin\_set_regional.form.php:50
+#: ..\..\..\admin\_set_regional.form.php:49
 msgid "name of the locale"
 msgstr "naam van de taal"
 
-#: ..\..\..\admin\_set_regional.form.php:51
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:50
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Charset"
 msgstr "Tekenset"
 
-#: ..\..\..\admin\_set_regional.form.php:52
+#: ..\..\..\admin\_set_regional.form.php:51
 #, php-format
 msgid "the charset for this locale. see <a %s>the specs</a>"
 msgstr "De tekenset voor deze vertaling, zie <a %s>de uitleg</a>"
 
-#: ..\..\..\admin\_set_regional.form.php:53
+#: ..\..\..\admin\_set_regional.form.php:52
 msgid "Date format"
 msgstr "Datum formaat"
 
-#: ..\..\..\admin\_set_regional.form.php:54
+#: ..\..\..\admin\_set_regional.form.php:53
 #, php-format
 msgid "the date format, see <a %s>the specs</a>"
 msgstr "datum formaat, zie <a %s>de uitleg</a>"
 
-#: ..\..\..\admin\_set_regional.form.php:55
+#: ..\..\..\admin\_set_regional.form.php:54
 msgid "Time format"
 msgstr "Tijd formaat"
 
-#: ..\..\..\admin\_set_regional.form.php:56
+#: ..\..\..\admin\_set_regional.form.php:55
 #, php-format
 msgid "the time format, see <a %s>the specs</a>"
 msgstr "tijd formaat, zie <a %s>de uitleg</a>"
 
-#: ..\..\..\admin\_set_regional.form.php:57
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:56
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Lang file"
 msgstr "Taal bestand"
 
-#: ..\..\..\admin\_set_regional.form.php:58
+#: ..\..\..\admin\_set_regional.form.php:57
 msgid "the message file being used, from <code>locales</code> subdirectory"
 msgstr ""
 "het berichten bestand wat word gebruikt, van de <code>locales</code> "
 "subdirectory"
 
-#: ..\..\..\admin\_set_regional.form.php:59
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:58
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Priority"
 msgstr "Prioriteit"
 
-#: ..\..\..\admin\_set_regional.form.php:60
+#: ..\..\..\admin\_set_regional.form.php:59
 msgid ""
 "1 is highest. It's use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE "
 "header), when we have more than locale with the requested language. It also "
@@ -2691,18 +2688,18 @@ msgstr ""
 "gewenste taal. Het heeft ook invloed op de volgorde waarmee de vertalingen "
 "worden getoond in de dropdown lijstjes etc."
 
-#: ..\..\..\admin\_set_regional.form.php:71 ..\..\..\admin\_users_form.php:210
+#: ..\..\..\admin\_set_regional.form.php:70 ..\..\..\admin\_users_form.php:210
 #: ..\..\..\admin\_users_groupform.php:125
 msgid "Create"
 msgstr "Aanmaken"
 
 #. TRANS: this is a Javascript string
-#: ..\..\..\admin\_set_regional.form.php:71
+#: ..\..\..\admin\_set_regional.form.php:70
 #, php-format
 msgid "This will replace locale \\'%s\\'. Ok?"
 msgstr "Dit zal de taal \\'%s\\' vervangen. Ok?"
 
-#: ..\..\..\admin\_set_regional.form.php:75
+#: ..\..\..\admin\_set_regional.form.php:74
 #, php-format
 msgid ""
 "We'll use the flag out of subdirectories from <code>%s</code>, where the "
@@ -2713,23 +2710,23 @@ msgstr ""
 "waar de bestandsnaam gelijk is aan het taal gedeelte van de taal(karakters 4-"
 "5; bestandsextensie is .gif)."
 
-#: ..\..\..\admin\_set_regional.form.php:85
+#: ..\..\..\admin\_set_regional.form.php:84
 msgid "Note: default locale is not enabled."
 msgstr "NB: standaard taal is niet aangezet."
 
-#: ..\..\..\admin\_set_regional.form.php:93
+#: ..\..\..\admin\_set_regional.form.php:92
 msgid "Regional settings"
 msgstr "Regio Instellingen"
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:95
 msgid "Time difference"
 msgstr "Tijdsverschil"
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:95
 msgid "in hours"
 msgstr "in uren"
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:95
 #, php-format
 msgid ""
 "If you're not on the timezone of your server. Current server time is: %s."
@@ -2737,11 +2734,11 @@ msgstr ""
 "Als je je niet in de tijdzone van de server bevind. Huidige server tijd is: %"
 "s."
 
-#: ..\..\..\admin\_set_regional.form.php:97
+#: ..\..\..\admin\_set_regional.form.php:96
 msgid "Default locale"
 msgstr "Standaard Taal"
 
-#: ..\..\..\admin\_set_regional.form.php:97
+#: ..\..\..\admin\_set_regional.form.php:96
 msgid ""
 "Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or "
 "blog locale (in this order)."
@@ -2749,81 +2746,81 @@ msgstr ""
 "Standaard taal. Word overschreven door de HTTP_ACCEPT_LANGUAGE header, "
 "gebruikers vertaling of weblog vertaling (in deze volgorde)."
 
-#: ..\..\..\admin\_set_regional.form.php:103
+#: ..\..\..\admin\_set_regional.form.php:102
 msgid "Available locales"
 msgstr "Beschikbare talen"
 
-#: ..\..\..\admin\_set_regional.form.php:108
+#: ..\..\..\admin\_set_regional.form.php:107
 msgid "Hide translation info"
 msgstr "Verberg vertaal percentages"
 
-#: ..\..\..\admin\_set_regional.form.php:113
+#: ..\..\..\admin\_set_regional.form.php:112
 msgid "Show translation info"
 msgstr "Toon vertaal percentages"
 
-#: ..\..\..\admin\_set_regional.form.php:123
+#: ..\..\..\admin\_set_regional.form.php:122
 msgid "Date fmt"
 msgstr "Datum formaat"
 
-#: ..\..\..\admin\_set_regional.form.php:124
+#: ..\..\..\admin\_set_regional.form.php:123
 msgid "Time fmt"
 msgstr "Tijd formaat"
 
-#: ..\..\..\admin\_set_regional.form.php:125
-#: ..\..\..\admin\_set_regional.form.php:199 ..\..\..\admin\_users_list.php:31
+#: ..\..\..\admin\_set_regional.form.php:124
+#: ..\..\..\admin\_set_regional.form.php:198 ..\..\..\admin\_users_list.php:31
 msgid "Edit"
 msgstr "Bewerk"
 
-#: ..\..\..\admin\_set_regional.form.php:129
+#: ..\..\..\admin\_set_regional.form.php:128
 msgid "Strings"
 msgstr "Strings"
 
-#: ..\..\..\admin\_set_regional.form.php:130
+#: ..\..\..\admin\_set_regional.form.php:129
 msgid "Translated"
 msgstr "Vertaald"
 
-#: ..\..\..\admin\_set_regional.form.php:134
-#: ..\..\..\admin\_set_regional.form.php:291
+#: ..\..\..\admin\_set_regional.form.php:133
+#: ..\..\..\admin\_set_regional.form.php:290
 msgid "Extract"
 msgstr "Uitpakken"
 
-#: ..\..\..\admin\_set_regional.form.php:181
+#: ..\..\..\admin\_set_regional.form.php:180
 msgid "up"
 msgstr "Boven"
 
-#: ..\..\..\admin\_set_regional.form.php:181
+#: ..\..\..\admin\_set_regional.form.php:180
 msgid "Move priority up"
 msgstr "Verplaats prioriteit naar boven"
 
-#: ..\..\..\admin\_set_regional.form.php:190
+#: ..\..\..\admin\_set_regional.form.php:189
 msgid "down"
 msgstr "Beneden"
 
-#: ..\..\..\admin\_set_regional.form.php:190
+#: ..\..\..\admin\_set_regional.form.php:189
 msgid "Move priority down"
 msgstr "Verplaats prioriteit naar beneden"
 
-#: ..\..\..\admin\_set_regional.form.php:197
+#: ..\..\..\admin\_set_regional.form.php:196
 msgid "Copy locale"
 msgstr "Kopieer taal"
 
-#: ..\..\..\admin\_set_regional.form.php:204
+#: ..\..\..\admin\_set_regional.form.php:203
 msgid "Reset custom settings"
 msgstr "Herstel overige instellingen"
 
-#: ..\..\..\admin\_set_regional.form.php:215
+#: ..\..\..\admin\_set_regional.form.php:214
 msgid "No language file..."
 msgstr "Geen taal bestand..."
 
-#: ..\..\..\admin\_set_regional.form.php:291
+#: ..\..\..\admin\_set_regional.form.php:290
 msgid "Extract .po file into b2evo-format"
 msgstr "Pak .po bestand uit in het b2evo-formaat"
 
-#: ..\..\..\admin\_set_regional.form.php:306
+#: ..\..\..\admin\_set_regional.form.php:305
 msgid "Are you sure you want to reset?"
 msgstr "Weet je zeker dat je wilt resetten?"
 
-#: ..\..\..\admin\_set_regional.form.php:306
+#: ..\..\..\admin\_set_regional.form.php:305
 msgid "Reset to defaults (delete database table)"
 msgstr "Reset naar standaard (verwijder database tabel)"
 
@@ -2901,8 +2898,9 @@ msgid "Send an email"
 msgstr "Verstuur een email"
 
 #: ..\..\..\admin\_users_form.php:134
-msgid "Visit homepage"
-msgstr "Bezoek Homepage"
+#, fuzzy
+msgid "Visit the site"
+msgstr "skin de site"
 
 #: ..\..\..\admin\_users_form.php:144
 msgid "Search on ICQ.com"
@@ -4590,12 +4588,6 @@ msgid ""
 "check them carefully and try again..."
 msgstr ""
 
-#: ..\..\..\install\index.php:142
-#, php-format
-msgid "Could not load original conf file [%s]. Is it missing?"
-msgstr ""
-"Kon het originele configuratie bestand niet laden [%s]. Bestaat deze wel?"
-
 #: ..\..\..\install\index.php:172
 msgid "Config file update"
 msgstr "Configuratie bestand bijwerken"
@@ -4698,7 +4690,7 @@ msgstr ""
 "Database waar je in wilt installeren (Deze instellingen zouden je moeten "
 "zijn gegeven door je hosting provider)"
 
-#: ..\..\..\install\index.php:258 ..\..\..\install\index.php:352
+#: ..\..\..\install\index.php:258 ..\..\..\install\index.php:353
 msgid "mySQL Username"
 msgstr "mySQL Gebruikersnaam"
 
@@ -4706,7 +4698,7 @@ msgstr "mySQL Gebruikersnaam"
 msgid "Your username to access the database"
 msgstr "Jouw gebruikersnaam voor toegang tot de database"
 
-#: ..\..\..\install\index.php:259 ..\..\..\install\index.php:353
+#: ..\..\..\install\index.php:259 ..\..\..\install\index.php:354
 msgid "mySQL Password"
 msgstr "mySQL Wachtwoord"
 
@@ -4714,7 +4706,7 @@ msgstr "mySQL Wachtwoord"
 msgid "Your password to access the database"
 msgstr "Jouw wachtwoord voor toegang tot de database"
 
-#: ..\..\..\install\index.php:260 ..\..\..\install\index.php:354
+#: ..\..\..\install\index.php:260 ..\..\..\install\index.php:355
 msgid "mySQL Database"
 msgstr "mySQL Database"
 
@@ -4722,7 +4714,7 @@ msgstr "mySQL Database"
 msgid "Name of the database you want to use"
 msgstr "Naam van de database die je wilt gebruiken"
 
-#: ..\..\..\install\index.php:261 ..\..\..\install\index.php:355
+#: ..\..\..\install\index.php:261 ..\..\..\install\index.php:356
 msgid "mySQL Host"
 msgstr "mySQL Host"
 
@@ -4734,7 +4726,7 @@ msgstr "Je hoeft dit waarschijnlijk niet te veranderen"
 msgid "Additional settings"
 msgstr "Extra instellingen"
 
-#: ..\..\..\install\index.php:268 ..\..\..\install\index.php:356
+#: ..\..\..\install\index.php:268 ..\..\..\install\index.php:357
 msgid "Base URL"
 msgstr "Basis URL"
 
@@ -4836,10 +4828,10 @@ msgstr "Opnieuw beginnen?"
 #: ..\..\..\install\index.php:337
 #, fuzzy
 msgid ""
-"<p>If you have installed b2evolution tables before and wish to start anew, "
-"you must delete the b2evolution tables before you can start a new "
-"installation. b2evolution can delete its own tables for you, but for obvious "
-"security reasons, this feature is disabled by default.</p>"
+"If you have installed b2evolution tables before and wish to start anew, you "
+"must delete the b2evolution tables before you can start a new installation. "
+"b2evolution can delete its own tables for you, but for obvious security "
+"reasons, this feature is disabled by default."
 msgstr ""
 "If you have installed b2evolution tables before and wish to start anew, you "
 "must delete the\n"
@@ -4849,12 +4841,12 @@ msgstr ""
 "other tables though, if you have\n"
 "\t\t\t\t\tsome, will not be touched in any way."
 
-#: ..\..\..\install\index.php:347
+#: ..\..\..\install\index.php:348
 #, fuzzy
 msgid "Base config recap..."
 msgstr "Configuratie bestand ophalen..."
 
-#: ..\..\..\install\index.php:349
+#: ..\..\..\install\index.php:350
 #, php-format
 msgid ""
 "If you don't see correct settings here, STOP before going any further, and "
@@ -4863,23 +4855,23 @@ msgstr ""
 "(Als je hier niet de juiste instellingen ziet, STOP dan voordat je verder "
 "gaat, en <a %s>controleer jouw basis configuratie</a>.)"
 
-#: ..\..\..\install\index.php:353
+#: ..\..\..\install\index.php:354
 msgid "(Set, but not shown for security reasons)"
 msgstr "(Gevonden, maar word niet getoond uit veiligheidsoverwegingen)"
 
-#: ..\..\..\install\index.php:357
+#: ..\..\..\install\index.php:358
 msgid "Admin email"
 msgstr "Admin email"
 
-#: ..\..\..\install\index.php:369
+#: ..\..\..\install\index.php:370
 msgid "Installing b2evolution tables with sample data"
 msgstr "Installeer b2evolution tabellen met voorbeeld data"
 
-#: ..\..\..\install\index.php:374
+#: ..\..\..\install\index.php:375
 msgid "Installation successful!"
 msgstr "Installatie is gelukt!"
 
-#: ..\..\..\install\index.php:376
+#: ..\..\..\install\index.php:377
 #, php-format
 msgid ""
 "<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\"."
@@ -4895,47 +4887,48 @@ msgstr ""
 "kwijtraakt, zal je alle database tabellen meten verwijderen en opnieuw "
 "installeren.</p>"
 
-#: ..\..\..\install\index.php:389
+#: ..\..\..\install\index.php:390
 msgid "Upgrading data in existing b2evolution database"
 msgstr "Bijwerken van de data in een bestaande b2evolution database"
 
-#: ..\..\..\install\index.php:393 ..\..\..\install\index.php:412
+#: ..\..\..\install\index.php:394 ..\..\..\install\index.php:413
 msgid "Upgrade completed successfully!"
 msgstr "Upgrade is succesvol voltooid!"
 
-#: ..\..\..\install\index.php:394 ..\..\..\install\index.php:413
+#: ..\..\..\install\index.php:395 ..\..\..\install\index.php:414
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr ""
 "Je kan nu <A %s>inloggen</a> met jouw standaard %s gebruikersnaam en "
 "wachtwoord"
 
-#: ..\..\..\install\index.php:407
+#: ..\..\..\install\index.php:408
 msgid "Installing b2evolution tables and copying existing b2 data"
 msgstr "Installeer b2evolution tabellen en kopieer de bestaande b2 data erin"
 
-#: ..\..\..\install\index.php:426
+#: ..\..\..\install\index.php:427
 msgid "Deleting b2evolution tables from the datatase"
 msgstr "Verwijder b2evolution tabellen uit de database"
 
-#: ..\..\..\install\index.php:430
-msgid "<p>For security reasons, the reset feature is disabled by default.</p>"
+#: ..\..\..\install\index.php:431
+#, fuzzy
+msgid "For security reasons, the reset feature is disabled by default."
 msgstr ""
 "<p>Om beveiligingsredenenen, is de reset functie standaard uitgeschakeld.</p>"
 
-#: ..\..\..\install\index.php:440
+#: ..\..\..\install\index.php:441
 msgid "Reset done!"
 msgstr "Herstellen is gedaan!"
 
-#: ..\..\..\install\index.php:441
+#: ..\..\..\install\index.php:442
 msgid "Back to menu"
 msgstr "Terug naar menu"
 
-#: ..\..\..\install\index.php:448
+#: ..\..\..\install\index.php:449
 msgid "official website"
 msgstr "officiële website"
 
-#: ..\..\..\install\index.php:450
+#: ..\..\..\install\index.php:451
 msgid "contact"
 msgstr "contact"
 
@@ -5503,6 +5496,16 @@ msgstr "[...] Lees Meer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
+
+#~ msgid "Visit homepage"
+#~ msgstr "Bezoek Homepage"
+
+#~ msgid "You have no permission to edit other users or groups!"
+#~ msgstr "Je hebt geen rechten om andere gebruikers/groepen te bewerken!"
+
+#~ msgid "Could not load original conf file [%s]. Is it missing?"
+#~ msgstr ""
+#~ "Kon het originele configuratie bestand niet laden [%s]. Bestaat deze wel?"
 
 #~ msgid "Couldn't change %s's level."
 #~ msgstr "Kon %s's level niet veranderen."

@@ -131,7 +131,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				{
 					$url = 'http://'.$url;
 				}
-				$fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Visit homepage').'" /></a>';
+				$fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Visit the site').'" /></a>';
 			}
 			else $fieldnote = '';
 			if( $allowed_to_edit )

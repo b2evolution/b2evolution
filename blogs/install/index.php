@@ -139,7 +139,7 @@ switch( $action )
 			$conf = file( $conf_filepath );
 			if( empty( $conf ) )
 			{	// This should actually never happen, just in case...
-				printf( '<p class="error">'.T_('Could not load original conf file [%s]. Is it missing?').'</p>', $conf_filepath );
+				printf( '<p class="error">Could not load original conf file [%s]. Is it missing?</p>', $conf_filepath );
 				break;
 			}
 	
@@ -334,7 +334,8 @@ switch( $action )
 			?>
 			<br />
 			<h2><?php echo T_('Need to start anew?') ?></h2>
-			<?php echo T_('<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>');
+			<p><?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
+			echo '</p>';
 			echo( '<p>To enable it, please go to the /conf/_config.php file and change:</p>
 <pre>$allow_evodb_reset = 0;</pre>
 to
@@ -427,7 +428,7 @@ to
 		<?php
 		if( $allow_evodb_reset != 1 )
 		{
-			echo T_('<p>For security reasons, the reset feature is disabled by default.</p>' );
+			echo '<p>'.T_('For security reasons, the reset feature is disabled by default.' ).'</p>';
 			echo( '<p>To enable it, please go to the /conf/_config.php file and change:</p>
 <pre>$allow_evodb_reset = 0;</pre>
 to
