@@ -1109,23 +1109,21 @@ function validate_url( $url, & $allowed_uri_scheme )
  */
 function pre_dump($dump, $title = '', $output = 1 )
 {
-	if( !$output )
-	{
-		ob_start();
-	}
-	echo "\n".'<pre>';
+	$r = "\n<pre>";
 	if( $title !== '' )
 	{
-		echo $title. ': <br />';
+		$r .= $title. ': <br />';
 	}
-	var_dump($dump);
-	echo '</pre>'."\n";
+	$r .= htmlspecialchars( var_export($dump, true) )
+			."</pre>\n";
 
 	if( !$output )
 	{
-		$r = ob_get_contents();
-		ob_end_clean();
 		return $r;
+	}
+	else
+	{
+		echo $r;
 	}
 }
 

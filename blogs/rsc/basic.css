@@ -44,6 +44,7 @@ code {
 }
 
 
+div.log_all,
 div.log_note,
 div.log_error,
 div.error {
@@ -65,9 +66,9 @@ div.log_note ul,
 div.log_note ol,
 div.log_error ul,
 div.log_error ol {
-	margin-top: 1ex;
-	margin-bottom: 1ex;
 	list-style: square;
+	margin:1ex 0;
+	padding-left:3ex;
 }
 
 p.error,

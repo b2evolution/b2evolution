@@ -204,9 +204,23 @@ class Filelist
 	/**
 	 * Add a file to the list
 	 */
-	function addFile( $name )
+	function addFile( $name, $allPaths = false )
 	{
-		$entry = new File( $name, $this->listpath );
+		if( basename($name) != $name )
+		{ // path attached
+			if( !$allPaths && (dirname($name).'/' != $this->listpath) )
+			{ // not this list's path
+				return false;
+			}
+			else
+			{
+				$entry = new File( basename($name), dirname($name).'/' );
+			}
+		}
+		else
+		{
+			$entry = new File( $name, $this->listpath );
+		}
 
 		if( $this->recursivedirsize && $entry->isDir( $this->listpath.$name ) )
 		{

@@ -169,7 +169,7 @@ class FileManager extends Filelist
 
 				case 'user':
 					$tUser = new User( get_userdata($root_A[1]) );
-					$this->root_dir = $tUser->getMediaDir( $this->Messages );
+					$this->root_dir = $tUser->getMediaDir();
 					$this->root_url = $tUser->getMediaUrl();
 					break;
 			}
@@ -178,7 +178,7 @@ class FileManager extends Filelist
 		{
 			case NULL:
 			case 'user':
-				$this->root_dir = $this->User->getMediaDir( $this->Messages );
+				$this->root_dir = $this->User->getMediaDir();
 				$this->root_url = $this->User->getMediaUrl();
 				break;
 		}
@@ -611,9 +611,13 @@ class FileManager extends Filelist
 				$r = '<img class="middle" src="'.$this->getIcon( $for, 'url' ).'" '.$this->getIcon( $for, 'size', 'string' )
 				.' alt="';
 
-				if( $for == 'cfile' )
+				if( is_a( $for, 'file' ) )
 				{ // extension as alt-tag for cfile-icons
-					$r .= $this->cur_File->getExt();
+					if( $for->isDir() )
+					{
+						$r .= /* TRANS short for directory */ T_('[dir]');
+					}
+					$r .= $for->getExt();
 				}
 
 				$r .= '" title="'.$this->getFileType( $for );
@@ -786,10 +790,13 @@ class FileManager extends Filelist
 
 	/**
 	 * Create a directory.
+	 *
 	 * @param string the name of the directory
 	 * @param string path to create the directory in (default is cwd)
 	 * @param integer permissions for the new directory (octal format)
 	 * @return boolean true on success, false on failure
+	 *
+	 * @todo merge with createFile!
 	 */
 	function createDir( $dirname, $path = NULL, $chmod = NULL )
 	{
@@ -809,6 +816,11 @@ class FileManager extends Filelist
 		if( empty($dirname) )
 		{
 			$this->Messages->add( T_('Cannot create empty directory.') );
+			return false;
+		}
+		elseif( !isFilename($dirname) )
+		{
+			$this->Messages->add( sprintf(T_('[%s] is not a valid directory.'), $dirname) );
 			return false;
 		}
 		elseif( !@mkdir( $path.$dirname, $chmod ) )
@@ -841,6 +853,11 @@ class FileManager extends Filelist
 		if( empty($filename) )
 		{
 			$this->Messages->add( T_('Cannot create empty file.') );
+			return false;
+		}
+		elseif( !isFilename($filename) )
+		{
+			$this->Messages->add( sprintf(T_('[%s] is not a valid filename.'), $filename) );
 			return false;
 		}
 		elseif( file_exists($path) )

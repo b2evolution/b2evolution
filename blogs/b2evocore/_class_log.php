@@ -110,11 +110,17 @@ class Log
 	 */
 	function display( $head = '', $foot = '', $display = true, $level = NULL, $cssclass = NULL, $style = NULL )
 	{
-		$messages = & $this->messages( $level, true );
+		static $levelAllRecurse = false;
 
+		$messages = & $this->messages( $level ); // we get an subarray for each level (if level == 'all')
 		if( !count($messages) )
 		{
 			return false;
+		}
+
+		if( $level == 'all' && count($messages) == 1 )
+		{ // only one level has messages, leave 'all' mode
+			list( $level, $messages ) = each($messages);
 		}
 
 		if( $level === NULL )
@@ -128,37 +134,52 @@ class Log
 		}
 
 		$disp = "\n<div class=\"$cssclass\">";
-
-		if( !empty($head) )
-		{ // header
-			$disp .= '<h2>'.$head.'</h2>';
-		}
-
-		if( $style == NULL )
-		{ // '<br>' for a single message, '<ul>' for more
-			$style = count($messages) == 1 ? '<br>' : '<ul>';
-		}
-
-		// implode messages
-		if( $style == '<ul>' )
+		if( !$levelAllRecurse )
 		{
-			$disp .= '<ul><li>'.implode( "</li>\n<li>", $messages ).'</li></ul>';
+			if( !empty($head) )
+			{ // header
+				$disp .= '<h2>'.$head.'</h2>';
+			}
 		}
-		elseif( $style == '<p>' )
+
+		if( $level == 'all' )
 		{
-			$disp .= '<p>'.implode( "</p>\n<p>", $messages ).'</p>';
+			$levelAllRecurse = true;
+			foreach( $messages as $llevel => $lmessages )
+			{
+				$disp .= $this->display( '', '', false, $llevel, NULL, $style );
+			}
+			$levelAllRecurse = false;
 		}
 		else
 		{
-			$disp .= implode( '<br />', $messages );
+			if( $style == NULL )
+			{ // '<br>' for a single message, '<ul>' for more
+				$style = count($messages) == 1 ? '<br>' : '<ul>';
+			}
+
+			// implode messages
+			if( $style == '<ul>' )
+			{
+				$disp .= '<ul class="'.$cssclass.'"><li>'.implode( "</li>\n<li>", $messages ).'</li></ul>';
+			}
+			elseif( $style == '<p>' )
+			{
+				$disp .= '<p class="'.$cssclass.'">'.implode( "</p>\n<p>", $messages ).'</p>';
+			}
+			else
+			{
+				$disp .= implode( '<br />', $messages );
+			}
 		}
 
-
-		if( !empty($foot) )
+		if( !$levelAllRecurse )
 		{
-			$disp .= '<p>'.$foot.'</p>';
+			if( !empty($foot) )
+			{
+				$disp .= '<p>'.$foot.'</p>';
+			}
 		}
-
 		$disp .= '</div>';
 
 		if( $display )

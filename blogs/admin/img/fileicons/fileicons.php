@@ -68,19 +68,20 @@ $fm_fileicons_special = array(
  * These are the file icons. The extension is a regular expression that must match the end of the file.
  */
 $fm_fileicons = array(
-	'.(gif|png|jpe?g)' => 'image2.png',
-	'.html?' => 'www.png',
-	'.log' => 'log.png',
-	'.(mp3|ogg|wav)' => 'sound.png',
-	'.(mpe?g|avi)' => 'video.png',
-	'.msg' => 'message.png',
-	'.pdf' => 'pdf-document.png',
-	'.php[34]?' => 'php.png',
-	'.(pgp|gpg)' => 'encrypted.png',
-	'.tar' => 'tar.png',
-	'.tgz' => 'tgz.png',
-	'.te?xt' => 'document.png',
-	'.(zip|rar)' => 'pk.png',
+	'\.(s[txd]w|doc|rtf)' => 'wordprocessing.png',
+	'\.(gif|png|jpe?g)' => 'image2.png',
+	'\.html?' => 'www.png',
+	'\.log' => 'log.png',
+	'\.(mp3|ogg|wav)' => 'sound.png',
+	'\.(mpe?g|avi)' => 'video.png',
+	'\.msg' => 'message.png',
+	'\.pdf' => 'pdf-document.png',
+	'\.php[34]?' => 'php.png',
+	'\.(pgp|gpg)' => 'encrypted.png',
+	'\.tar' => 'tar.png',
+	'\.tgz' => 'tgz.png',
+	'\.te?xt' => 'document.png',
+	'\.(zip|rar)' => 'pk.png',
 );
 
 ?>

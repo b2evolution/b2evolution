@@ -126,7 +126,7 @@ if( $action == '' && $file != '' && $curFile )
 				</div>
 				<?php
 			}
-			elseif( ($buffer = @file( $curFile->get_path( true ) )) !== false )
+			elseif( ($buffer = @file( $curFile->getPath( true ) )) !== false )
 			{{{ // display raw file
 				param( 'showlinenrs', 'integer', 0 );
 
@@ -516,56 +516,106 @@ switch( $action ) // {{{ (we catched empty action before)
 		}
 		else
 		{
-
 			if( isset($_FILES) && count( $_FILES ) )
 			{
-				echo 'Uploaded';
+				foreach( $_FILES['uploadfile']['name'] as $lkey => $lName )
+				{
+					if( empty($lName) )
+					{ // no name
+						continue;
+					}
 
-				pre_dump( $_FILES, 'uploaded' );
+					if( $_FILES['uploadfile']['size'][$lkey] > $fileupload_maxk*1024 )
+					{
+						$Fileman->Messages->add( sprintf( T_('The file [%s] is too big and was not accepted.'), $lName ) );
+						continue;
+					}
+					elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey] ) )
+					{
+						$Fileman->Messages->add( sprintf( T_('The file [%s] does not seem to be a valid upload!'), $lName ) );
+						continue;
+					}
 
-				/*if( isset( $_FILES[''] ) )
-				switch( $
-				UPLOAD_ERR_OK
-				Value: 0; There is no error, the file uploaded with success.
+					$newName = $Fileman->User->getMediaDir().basename( $lName );
+					if( file_exists( $newName ) )
+					{
+						// TODO: Rename/Overwriting
+						$Fileman->Messages->add( sprintf( T_('The file [%s] already exists.'), basename($newName) ) );
+						continue;
+					}
+					elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey], $newName ) )
+					{
+						$Fileman->Messages->add( sprintf( T_('The file [%s] was successfully uploaded.'), basename($newName) ), 'note' );
+						$Fileman->addFile( $newName );
+						continue;
+					}
 
-				UPLOAD_ERR_INI_SIZE
-				Value: 1; The uploaded file exceeds the upload_max_filesize directive in php.ini.
+					$tError = 'An error occured ('.$lName.'):<br />';
 
-				UPLOAD_ERR_FORM_SIZE
-				Value: 2; The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+					switch( $_FILES['uploadfile']['error'][$lkey] )
+					{
+						case UPLOAD_ERR_OK:
+							$tError .= 'There is no error, the file uploaded with success.';
+							break;
+						case UPLOAD_ERR_INI_SIZE:
+							$tError .= 'The uploaded file exceeds the upload_max_filesize directive in php.ini.';
+							break;
 
-				UPLOAD_ERR_PARTIAL
-				Value: 3; The uploaded file was only partially uploaded.
+						case UPLOAD_ERR_FORM_SIZE:
+							$tError .= 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.';
+							break;
 
-				UPLOAD_ERR_NO_FILE
-				Value: 4; No file was uploaded.*/
+						case UPLOAD_ERR_PARTIAL:
+							$tError .= 'The uploaded file was only partially uploaded.';
+							break;
 
+						case UPLOAD_ERR_NO_FILE:
+							$tError .= 'No file was uploaded.';
+							break;
+					}
+					$Fileman->Messages->add( $tError.'<br />'.var_export( $_FILES, true ) );
+				}
 			}
 			else
 			{
 				$allowedftypes = preg_split( '/\s+/', trim( $fileupload_allowedtypes) );
 
 				$msg_action = '
+				<script type="text/javascript">
+					<!--
+					function addAnotherFileInput()
+					{
+						var newInput = document.createElement("input");
+						newInput.name="uploadfile[]";
+						newInput.type="file";
+						newInput.size=40;
+
+						uploadfiles = document.getElementById("uploadfileinputs");
+						uploadfiles.appendChild( newInput );
+						uploadfiles.appendChild( document.createElement("br") );
+					}
+					// -->
+				</script>
 				<p><strong>'.T_('File upload').'</strong></p>
 				<p>'.T_('Allowed file types:').' '.implode(', ', $allowedftypes).'</p>
 				<p>'.sprintf( T_('Maximum allowed file size: %d KB'), $fileupload_maxk ).'</p>
 
 				<form enctype="multipart/form-data" action="'.$Fileman->curl().'" method="post">
 					<input type="hidden" name="MAX_FILE_SIZE" value="'.($fileupload_maxk*1024).'" />
-					<input type="hidden" name="action" value="upload" />';
-
-					for( $i = 0; $i < 3; $i++ )
-					{
-						$msg_action .= '<input name="uploadfile['.$i.']" type="file" size="40" /><br />';
+					<input type="hidden" name="action" value="upload" />
+					<div id="uploadfileinputs">
+					<input name="uploadfile[]" type="file" size="40" /><br />
+					</div>';
 						//'.T_('Description').':	<input type="text" name="imgdesc['.$i.']" size="50" /><br />';
-					}
 
 					$msg_action .= '
-					<input type="submit" value="'.T_('Upload !').'" class="search" />
+					<input type="button" value="'.T_('Add another file').'" onclick="addAnotherFileInput();" />
+					<input type="submit" value="'.T_('Upload !').'" onclick="clickedSubmit=1" />
+					<br />
+					'.sprintf( T_('Maximum upload filesize is %s.'), bytesreadable( $fileupload_maxk*1024 ) ).'
 					</form>
 					';
 			}
-
 		}
 
 		break;
@@ -583,28 +633,29 @@ require dirname(__FILE__).'/_menutop_end.php';
 <?php
 
 // output errors, notes and action messages
-if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
-		|| $Messages->count( 'all' ) )
+if( isset( $msg_action )
+		|| $Fileman->Messages->count( 'all' )
+		|| $Messages->count( 'all' )
+		|| $Fileman->User->Messages->count( 'all' ) )
 {
 	?>
 	<div class="panelinfo">
 		<?php
-		$Messages->display(); // error
-		$Messages->display( '', '', true, 'note' );
-		$Fileman->Messages->display(); // error
-		$Fileman->Messages->display( '', '', true, 'note' );
+		$Messages->display( '', '', true, 'all' );
+		$Fileman->Messages->display( '', '', true, 'all' );
+		$Fileman->User->Messages->display( '', '', true, 'all' );
+
 		if( isset($msg_action) )
 		{
 			echo $msg_action;
 			if( isset( $js_focus ) )
-			{
+			{ // we want to auto-focus a field
 				echo '
 				<script type="text/javascript">
 					<!--
 					'.$js_focus.'.focus();
 					// -->
 				</script>';
-
 			}
 		}
 		?>
@@ -761,7 +812,9 @@ while( $lFile = $Fileman->getNextFile() )
 			disp_cond( $Fileman->getLinkCurfile_edit(), '<a href="%s">'.$Fileman->getIcon( 'edit', 'imgtag' ).'</a>' );
 			disp_cond( $Fileman->getLinkCurfile_copymove(), '<a href="%s">'.$Fileman->getIcon( 'copymove', 'imgtag' ).'</a>' );
 			disp_cond( $Fileman->getLinkCurfile_rename(), '<a href="%s">'.$Fileman->getIcon( 'rename', 'imgtag' ).'</a>' );
-			disp_cond( $Fileman->getLinkCurfile_delete(), '<a href="%s">'.$Fileman->getIcon( 'delete', 'imgtag' ).'</a>' );
+			disp_cond( $Fileman->getLinkCurfile_delete(), '<a href="%s" onclick="return confirm(\''
+				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete [%s]?'),
+				format_to_output( $lFile->getName(), 'formvalue' ) ).'\');">'.$Fileman->getIcon( 'delete', 'imgtag' ).'</a>' );
 			?></td>
 	</tr>
 	<?php
@@ -791,7 +844,7 @@ if( $i != 0 )
 ?>
 <script type="text/javascript">
 <!--
-function openselectedfiles()
+function openselectedfiles( checkonly )
 {
 	elems = document.getElementsByName( 'selectedfiles[]' );
 	fm_popup_type = 'selected';
@@ -800,14 +853,22 @@ function openselectedfiles()
 	{
 		if( elems[i].checked )
 		{
-			id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
-			document.getElementById( 'button_new_'+id ).click();
+			if( !checkonly )
+			{
+				id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
+				document.getElementById( 'button_new_'+id ).click();
+			}
 			opened++;
 		}
 	}
 	if( !opened )
 	{
 		alert( '<?php echo /* TRANS: Warning this is a javascript string */ T_('Nothing selected.') ?>' );
+		return false;
+	}
+	else
+	{
+		return true;
 	}
 }
 // -->
@@ -827,9 +888,9 @@ function openselectedfiles()
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
 	<?php echo $Fileman->form_hiddeninputs() ?>
-	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>')" />
-	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
-	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
+	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" />
+	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" />
+	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" />
 	<input type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
 	&mdash; <?php
 	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );

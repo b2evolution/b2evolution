@@ -63,6 +63,8 @@ class User extends DataObject
 		// Call parent constructor:
 		parent::DataObject( $tableusers, 'user_' );
 
+		$this->Messages = new Log( 'error' );
+
 		if( $userdata == NULL )
 		{
 			// echo 'Creating blank user';
@@ -157,10 +159,9 @@ class User extends DataObject
 	/**
 	 * Get the path to the media directory. If it does not exist, it will be created.
 	 *
-	 * @param Log a Log object, where Messages get appended (uses levels 'note' and 'error')
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
-	function getMediaDir( &$Log )
+	function getMediaDir()
 	{
 		global $basepath, $media_subdir;
 
@@ -171,13 +172,13 @@ class User extends DataObject
 			{
 				if( $Log !== NULL )
 				{ // add error
-					$Log->add( sprintf( T_("The user's directory [%s] could not be created."), $userdir ), 'error' );
+					$this->Messages->add( sprintf( T_("The user's directory [%s] could not be created."), $userdir ), 'error' );
 				}
 				return false;
 			}
 			elseif( $Log !== NULL )
 			{ // add note
-				$Log->add( sprintf( T_("The user's directory %s has been created with permissions %s."), $userdir, '777' ), 'note' );
+				$this->Messages->add( sprintf( T_("The user's directory %s has been created with permissions %s."), $userdir, '777' ), 'note' );
 			}
 		}
 		return $userdir;
