@@ -304,6 +304,7 @@ while( $lFile =& $Fileman->getNextFile() )
 			if( !isFilename( $lFile->getName() ) )
 			{
 				// TODO: Warning icon with hint
+				echo getIcon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
 			}
 
 			?>
@@ -311,7 +312,7 @@ while( $lFile =& $Fileman->getNextFile() )
 
 			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
 				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
-				if( $Fileman->flatmode && $Fileman->getOrder() == 'path' )
+				if( $Fileman->flatmode && $Fileman->getOrder() != 'name' )
 				{
 					echo './'.$Fileman->getFileSubpath( $lFile );
 				}
@@ -666,6 +667,9 @@ param( 'options_show', 'integer', 0 );
 <?php
 /*
  * $Log$
+ * Revision 1.2  2005/01/15 20:32:14  blueyed
+ * small fix, warning icon
+ *
  * Revision 1.1  2005/01/12 17:55:51  fplanque
  * extracted browsing interface into separate file to make code more readable
  *

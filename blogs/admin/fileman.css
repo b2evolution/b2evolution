@@ -35,6 +35,7 @@
 }
 #filemanmain table.grouped th {
 	white-space:nowrap;
+	padding:0 .5ex;
 }
 #filemanmain table.grouped td {
 	text-align:center;
