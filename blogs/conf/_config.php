@@ -12,7 +12,6 @@
  * "unexpected T_STRING" parse errors!
  */
 
-$debug = true;		// FOR TESTING ONLY
 
 # MySQL settings. Fill in your database details (check carefully or nothing will work!)
 define( 'DB_USER', 'demouser' );				// your MySQL username
@@ -28,8 +27,6 @@ define( 'DB_HOST', 'localhost' );				// mySQL Server (typically 'localhost')
 # ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
 $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on production servers
 
-$allow_evodb_reset = 1;  // FOR TESTING
-
 
 # $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
 # It should be set to the URL where you can find the blog templates and/or the blog stub files,
@@ -43,15 +40,10 @@ $allow_evodb_reset = 1;  // FOR TESTING
 # If you don't, login cookies will not hold. 
 $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
-$baseurl = 'http://b2test.local/blogs';		// FOR TESTING
-
-
 
 # Your email. Will be used in severe error messages so that users can contact you. 
 # You will also receive notifications for new user registrations.
 $admin_email = 'postmaster@localhost';
-
-$admin_email = 'blog@fplanque.net';  // FOR testing
 
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder
@@ -61,8 +53,10 @@ $admin_email = 'blog@fplanque.net';  // FOR testing
 # got your basic installation working. They'll let you customize a lot of things!
 
 # DO NOT EDIT THE FOLLOWING!
+@include_once (dirname(__FILE__)."/_config_TEST.php"); // Put testing conf in there
 require_once (dirname(__FILE__)."/_advanced.php");
 require_once (dirname(__FILE__)."/_locales.php");
 require_once (dirname(__FILE__)."/_formatting.php");
+@include_once (dirname(__FILE__)."/_overrides_TEST.php"); // Override for testing in there
 
 ?>

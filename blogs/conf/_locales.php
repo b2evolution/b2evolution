@@ -19,8 +19,6 @@ $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 # This MUST BE in the list below
 $default_locale = 'en-US';
 
-$default_locale = 'fr-FR';  // for testing :))
-
 
 // we need this here, because we include _functions_locale after defining locales
 // This is temporary.
