@@ -11,13 +11,11 @@
  */
 function skinbase()
 {
-	global $skins_subdir, $skin;
-	
-	bloginfo('siteurl');
+	global $baseurl, $skins_subdir, $skin;
 	
 	if( !empty( $skin ) )
 	{
-		echo "/$skins_subdir/$skin/";
+		echo "$baseurl/$skins_subdir/$skin/";
 	}
 	else
 	{	// No skin used:

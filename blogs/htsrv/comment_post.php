@@ -63,17 +63,15 @@ $email = addslashes($email);
 $url = addslashes($url);
 
 /* flood-protection */
-$query = "SELECT * FROM $tablecomments WHERE comment_author_IP='$user_ip' ORDER BY comment_date DESC LIMIT 1";
+$query = "SELECT max(comment_date) as maxdate FROM $tablecomments WHERE comment_author_IP='$user_ip'";
 $result = mysql_query($query);
 $ok=1;
-if (!empty($result)) 
+if(mysql_num_rows($result)) 
 {
-	while($row = mysql_fetch_object($result)) 
-	{
-		$then=$row->comment_date;
-	}
-	$time_lastcomment=mysql2date("U","$then");
-	$time_newcomment=mysql2date("U","$now");
+	$row = mysql_fetch_object($result);
+	$then=$row->maxdate;
+	$time_lastcomment=mysql2date("U",$then);
+	$time_newcomment=mysql2date("U",$now);
 	if (($time_newcomment - $time_lastcomment) < 30)
 		$ok=0;
 }
