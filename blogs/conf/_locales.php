@@ -39,11 +39,7 @@ $languages = array(
 $default_locale = 'en_US';
 
 
-$default_locale = 'fr_FR';			// For testing :))
-// $default_locale = 'de_DE';			// For testing :))
-// $default_locale = 'ja_JP';			// For testing :))
-// $default_locale = 'nl_NL';			// For testing :))
-// $default_locale = 'zh_CN';			// For testing :))
+//$default_locale = 'fr_FR';			// For testing :))
 
 
 #  and localization:

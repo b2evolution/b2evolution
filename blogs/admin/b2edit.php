@@ -34,9 +34,7 @@ case "edit":
 
 	$title = T_('Editing post');
 	require (dirname(__FILE__).'/_menutop.php');
-	echo '<span class="menutopbloglist">';
   echo "#".$postdata["ID"]." in blog: ".$blogname;
-	echo '</span>';
 	require (dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level > 0) 
@@ -82,9 +80,7 @@ case "editcomment":
 
 	$title = T_('Editing comment');
 	require (dirname(__FILE__).'/_menutop.php');
-	echo '<span class="menutopbloglist">';
 	echo "#".$commentdata["comment_ID"];
-	echo '</span>';
 	require (dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level == 0) 
@@ -117,7 +113,6 @@ default:
 	 */
 	$title = T_('New post in blog:');
 	require (dirname(__FILE__).'/_menutop.php');
-	echo '<span class="menutopbloglist">';
 
 	// ---------------------------------- START OF BLOG LIST ----------------------------------
 	$sep = '';
@@ -144,7 +139,6 @@ default:
 		$sep = ' | ';
 	} // --------------------------------- END OF BLOG LIST --------------------------------- 
 
-	echo '</span>';
 	require (dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level > 0) 

@@ -15,7 +15,6 @@ param( 'show', 'string', 'referers' );
 
 require(dirname(__FILE__).'/_menutop.php');
 ?>
-<span class="menutopbloglist">
 	:
 	<?php 
 	if( $show == 'summary' ) echo '<strong>[';
@@ -41,9 +40,7 @@ require(dirname(__FILE__).'/_menutop.php');
 	if( $show == 'other' ) echo '<strong>[';
 	echo '<a href="b2stats.php?show=other&blog=', $blog, '">', T_('Direct Accesses'), '</a>';
 	if( $show == 'other' ) echo ']</strong>'; 
-	?>
-</span>
-<?php
+
 require(dirname(__FILE__).'/_menutop_end.php');
 
 if ($user_level < 9 && ! $demo_mode) 

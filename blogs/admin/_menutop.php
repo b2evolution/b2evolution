@@ -26,84 +26,107 @@
 if( empty($mode) )
 {	// We're not running in an special mode (bookmarklet, sidebar...)
 ?>
-<img src="img/blank.gif" width="1" height="5" alt="" border="0" />
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr height="15">
 
-<td height="15" width="20"><img src="img/blank.gif" width="1" height="1" alt="" /></td>
+<div id="header">
+	<div id="headfunctions">
+	<?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong> &middot;
+	<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout') ?></a> &middot;
+	<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
+	</div>
 
-<td rowspan="3" width="50" valign="top"><a href="http://b2evolution.net/"><img src="img/b2minilogo.png" width="50" height="50" border="0" alt="visit b2evolution's website" style="border-width:1px; border-color: #999999; border-style: dashed" /></a></td>
-
-<td><strong><span style="color:#333333">e</span><span style="color:#554433">v</span><span style="color:#775522">o</span><span style="color:#996622">l</span><span style="color:#bb7722">u</span><span style="color:#cc8811">t</span><span style="color:#dd9911">i</span><span style="color:#ee9900">o</span><span style="color:#ff9900">n</span></strong> <?php echo $b2_version ?></td>
-
-<td style="color: #b0b0b0; padding-right: 1ex; font-family: verdana, arial, helvetica; font-size: 10px;" align="right"><?php echo T_('logged in as:') ?> <strong><?php echo $user_login; ?></strong></td>
-
-</tr>
-<tr>
-
-<td class="menutop" width="20">&nbsp;
-</td>
-
-<td class="menutop"<?php if ($is_NS4) { echo " width=\"500\""; } ?>>
-<div class="menutop"<?php if ($is_NS4) { echo " width=\"500\""; } ?>>
-&nbsp;
-<?php 
-	echo '<a href="b2edit.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('New Post'), '</a>';
-	echo " | \n";
-	echo '<a href="b2browse.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('Browse/Edit'), '</a>';
-	if($user_level >= 9 || $demo_mode) 
-	{
-		echo " | \n";
-		echo '<a href="b2stats.php" class="menutop">', T_('Stats'), '</a>';
-	}
-	if($user_level >= 3 || $demo_mode) 
-	{
-		echo " | \n";
-		echo '<a href="b2categories.php" class="menutop">', T_('Cats'), '</a>';
-	}
-	if($user_level >= 9 || $demo_mode) 
-	{
-		echo " | \n";
-		echo '<a href="b2blogs.php" class="menutop">', T_('Blogs'), '</a>';
-	}
-	if($user_level >= 9) 
-	{
-		echo " | \n";
-		echo '<a href="b2options.php" class="menutop">', T_('Options'), '</a>';
-	}
-	if($user_level >= 3 || $demo_mode) 
-	{
-		echo " | \n";
-		echo '<a href="b2template.php" class="menutop">', T_('Templates'), '</a>';
-	}
-	if($user_level >= 9 || $demo_mode)
-	{
-		echo " | \n";
-		echo '<a href="b2antispam.php" class="menutop">', T_('Anti-Spam'), '</a>';
-	}
+	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
+	Version <?php echo $b2_version ?>
 	
-	echo " | \n";
-	echo '<a href="b2team.php" class="menutop">', T_('Users'), '</a>';
-	echo " | \n";
-	echo '<a href="b2profile.php" class="menutop">', T_('My Profile'), '</a>';
-?>
+	 
+	<ul>
+	<?php
+		if( $title == T_('New post in blog:') )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('New Post'), '</a></li>';
+	
+		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Browse/Edit'), '</a></li>';
+	
+		if($user_level >= 9 || $demo_mode) 
+		{
+			if( $title == T_('View Stats') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2stats.php" >', T_('Stats'), '</a></li>';
+		}
+	
+		if($user_level >= 3 || $demo_mode) 
+		{
+			if( $title == T_('Categories') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2categories.php" >', T_('Cats'), '</a></li>';
+		}
+	
+		if($user_level >= 9 || $demo_mode) 
+		{
+			if( $title == T_('Blogs') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2blogs.php" >', T_('Blogs'), '</a></li>';
+		}
+	
+		if($user_level >= 9) 
+		{
+			if( $title == T_('Options') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2options.php" >', T_('Options'), '</a></li>';
+		}
+	
+		if($user_level >= 3 || $demo_mode) 
+		{
+			if( $title == T_('Custom skin template editing') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2template.php">', T_('Templates'), '</a></li>';
+		}
+	
+		if($user_level >= 9 || $demo_mode)
+		{
+			if( $title == T_('Anti-Spam') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2antispam.php" >', T_('Anti-Spam'), '</a></li>';
+		}
+		
+		if( $title == T_('User management') )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2team.php" >', T_('Users'), '</a></li>';
+	
+		if( $title == T_('My Profile') )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2profile.php" >', T_('My Profile'), '</a></li>';
+	
+	?>
+	
+	</ul>
 </div>
-</td>
 
-<td class="menutop" align="right" bgcolor="#FF9900">
-<a href="<?php echo $baseurl ?>" class="menutop"><?php echo T_('Exit to blogs') ?></a>
-|
-<a href="<?php echo $htsrv_url ?>/login.php?action=logout" class="menutop"><?php echo T_('Logout') ?></a>
-&nbsp;
-</td>
-
-</tr>
-<tr>
-
-<td>&nbsp;</td>
-<td style="padding-left: 6px;" colspan="2">
 <?php 
 }	// / not in special mode
 ?>
-	<span class="menutoptitle">:: <?php echo $title; ?></span>
+	
+<div class="menutoptitle"><strong>:: <?php echo $title; ?></strong>
+
 

@@ -171,52 +171,8 @@ legend
 	background-image: url("../admin/img/b2button2.gif");
 }
 
-.menutop {
-	color: #999999;
-	font-family: Verdana, Geneva, Arial, Helvetica;
-	font-size: 10px;
-	background-color: #def;
-}
-a.menutop {
-	background-color: transparent;
-	color: #3366CC; 
-	font-weight: normal;
-	border-width: 0px;
-}
-a.menutop:hover {
-	color: #FF9900;
-	text-decoration: underline;
-	font-weight: normal;
-}
 
-.menutoptitle {
-	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
-	color: #BBCCDD;
-	font-size: 14px;
-	font-weight: bold;
-	}
-.menutopbloglist
-{
-	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
-	color: #BBCCDD;
-	font-size: 14px;
-}
 
-.b2menutop { 
-	color: #333333; 
-	font-family: Verdana, Geneva, Arial, Helvetica;
-	font-size: 10px;
-}
-a.b2menutop {
-	background-color: transparent;
-	color: #0066ff; 
-	font-weight: lighter;
-}
-a.b2menutop:hover {
-	color: #ff9900; 
-	font-weight: bold;
-	text-decoration: none;
-}
 xmp { /* Just in case */
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 10pt;
@@ -258,18 +214,6 @@ div.input
 {
 	float: right;
 	width: 75%;
-}
-
-
-td.menutop {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	border-color: #999999;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 0px;
-	border-right-width: 0px;
-	border-style: dashed;
 }
 
 textarea,input,select {
@@ -407,5 +351,88 @@ abbr {
 span.line
 {
 	white-space: nowrap;
+}
+
+
+/* ---- Header + Menu --- */
+
+
+#header 
+{
+  /* float:left; */
+  width:100%;
+  background: /* #DAE0D2 */ url("img/bg.gif") repeat-x bottom;
+  /* font-size:93%; */
+	font-size: 85%;
+  /* line-height:normal; */
+}
+#evologo
+{
+	padding-left: 1em;
+	vertical-align: middle;
+	border: 0;
+}
+#headfunctions
+{
+	float: right;
+	text-align:right;
+	margin: 1ex;
+	color: #b0b0b0;
+}
+#header ul 
+{
+  margin:0;
+  padding: 0.1ex 1em 0;
+  list-style: none;
+}
+#header li 
+{
+  float:left;
+  background:url("img/left.gif") no-repeat left top;
+  margin:0;
+  padding:0 0 0 9px;
+}
+#header li a 
+{
+  float:left;
+  display:block;
+  background: url("img/right.gif") no-repeat right top;
+  padding:4px 11px 3px 2px;
+  text-decoration:none;
+  /* font-weight:bold; */
+  color:#765;
+  }
+/* Commented Backslash Hack
+   hides rule from IE5-Mac \*/
+#header li a {float:none;}
+/* End IE5-Mac hack */
+#header li a:hover 
+{
+	text-decoration: underline;
+}
+#header li.current 
+{
+  background-image:url("img/left_on.gif");
+}
+#header li.current a 
+{
+  background-image:url("img/right_on.gif");
+  color:#333;
+  padding-bottom:4px;
+}
+
+div.menutoptitle 
+{
+	margin: 1ex 2ex 0;
+	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
+	color: #BBCCDD;
+	font-size: 14px;
+}
+
+.menutopbloglist
+{
+	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
+	color: #FF0000;
+	font-size: 14px;
 }
 

@@ -15,7 +15,6 @@ get_blogparams();
 
 $title = T_('Browse blog:');
 require (dirname(__FILE__).'/_menutop.php');
-echo '<span class="menutopbloglist">';
 
 // ---------------------------------- START OF BLOG LIST ----------------------------------
 $sep = '';
@@ -37,7 +36,6 @@ for( $curr_blog_ID=blog_list_start('stub');
 	$sep = ' | ';
 } // --------------------------------- END OF BLOG LIST --------------------------------- 
 
-echo '</span>';
 require (dirname(__FILE__).'/_menutop_end.php');
 
 
