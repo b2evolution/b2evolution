@@ -74,7 +74,7 @@
 	<?php link_pages("<br />Pages: ","<br />","number") ?>
 </div>
 <div class=interaction><a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display feedback / Leave a comment') ?>"><?php comments_number() ?>, <?php trackback_number() ?>, <?php pingback_number() ?></a>
-<?php trackback_rdf() // trackback autodiscovery information ?>
+<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 </div>
 
 <div class="contenuinteraction">

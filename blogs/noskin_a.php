@@ -153,7 +153,7 @@
 		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
 		-
 		<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
-		<?php trackback_rdf() // trackback autodiscovery information ?>
+		<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		-
 		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
 		-
@@ -338,13 +338,7 @@
 
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
-<?php // $blog=1;  fplanque: removed
-	log_hit();	// log the hit on this page
-	if ($debug==1)
-	{
-		printf( T_('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
-	}
-?>
+<?php log_hit();	// log the hit on this page ?>
 <!-- InstanceEndEditable --></p>
 </body>
 <!-- InstanceEnd --></html>

@@ -20,12 +20,12 @@
 	<?php while( $Item = $MainList->get_item() ) {  ?>
 	<entry>
 		<title type="text/plain" mode="xml"><?php $Item->title( '', '', false, 'xml' ) ?></title>
-		<link rel="alternate" type="text/html" href="<?php permalink_single() ?>" />
+		<link rel="alternate" type="text/html" href="<?php $Item->permalink( 'single' ) ?>" />
 		<author>
 			<name><?php $Item->Author->prefered_name( 'xml' ) ?></name>
 			<?php $Item->Author->url( '<url>', "</url>\n", 'xml' ) ?>
 		</author>
-		<id><?php permalink_single() ?></id>
+		<id><?php $Item->permalink( 'single' ) ?></id>
 		<modified><?php $Item->date( 'isoZ', true ) ?></modified>
 		<issued><?php $Item->date( 'isoZ', true ) ?></issued>
 		<content type="text/html" mode="escaped"><![CDATA[<?php

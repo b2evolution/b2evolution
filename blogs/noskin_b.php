@@ -154,7 +154,7 @@
 		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
 		-
 		<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
-		<?php trackback_rdf() // trackback autodiscovery information ?>
+		<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		-
 		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
 		-

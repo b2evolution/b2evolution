@@ -80,8 +80,7 @@ class Item extends DataObject
 	 *
 	 * @todo archives modes in clean mode
 	 *
-	 * @param string date/time format: leave empty to use locale default time format
-	 * @param boolean true if you want GMT
+	 * @param string 'id' or 'title'
 	 */
 	function anchor( $mode = 'id' ) 
 	{
@@ -387,14 +386,39 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::permalink(-) }}
 	 *
-	 * @param string 'id' or 'title'
-	 * @param string filename to use
+	 * @param string 'post', 'archive#id' or 'archive#title'
+	 * @param string url to use
 	 */
-	function permalink( $mode = 'id', $file='' )
+	function permalink( $mode = '', $blogurl='' )
 	{
-		if( empty($file) ) 
-			$file = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
-		echo gen_permalink( $file, $this->ID, $mode );
+		global $permalink_destination;
+	
+		switch( $mode )
+		{
+			case 'post':
+				$mode_dest = 'single';
+				$mode_anchor = '';	// Unused
+				break;
+			
+			case 'archive#id':
+				$mode_dest = 'archive';
+				$mode_anchor = 'id';
+				break;
+
+			case 'archive#title':
+				$mode_dest = 'archive';
+				$mode_anchor = 'title';
+				break;
+			
+			default:
+				$mode_dest = $permalink_destination;
+				$mode_anchor = 'id';
+		}
+
+		if( empty($blogurl) ) 
+			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
+
+		echo gen_permalink( $blogurl, $this->ID, $mode_anchor, $mode_dest );
 	}
 
 
@@ -464,6 +488,57 @@ class Item extends DataObject
 		echo $title;
 		echo $after;
 	}
+	
+	/** 
+	 * Template function: Displays trackback autodiscovery information
+	 *
+	 * {@internal Item::trackback_rdf(-) }}
+	 */
+	function trackback_rdf() 
+	{
+		// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
+		// fplanque WARNING: this isn't a very clean way to validate :/
+		// fplanque added: html comments (not perfect but better way of validating!)
+		echo "<!--\n";
+		echo '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" '."\n";
+		echo '  xmlns:dc="http://purl.org/dc/elements/1.1/"'."\n";
+		echo '  xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">'."\n";
+		echo '<rdf:Description'."\n";
+		echo '  rdf:about="';
+		$this->permalink( 'single' );
+		echo '"'."\n";
+		echo '  dc:identifier="';
+		$this->permalink( 'single' );
+		echo '"'."\n";
+		$this->title( '  dc:title="', '"'."\n", false, 'xmlattr' );
+		echo '  trackback:ping="';
+		$this->trackback_url();
+		echo '" />'."\n";
+		echo '</rdf:RDF>';
+		echo "-->\n";
+		// }
+	}
+
+
+	/** 
+	 * Template function: displays url to use to trackback this item
+	 *
+	 * {@internal Item::trackback_url(-) }}
+	 */
+	function trackback_url() 
+	{
+		global $htsrv_url, $use_extra_path_info;
+
+		if( $use_extra_path_info ) 
+		{
+			echo "$htsrv_url/trackback.php/$this->ID";
+		}
+		else 
+		{
+			echo "$htsrv_url/trackback.php?tb_id=$this->ID";
+		}
+	}
+
 
 	/** 
 	 * Template function: Display link to item related url

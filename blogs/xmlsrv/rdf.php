@@ -25,7 +25,7 @@
   <items>
     <rdf:Seq>
     <?php while( $Item = $MainList->get_item() ) { ?>
-      <rdf:li rdf:resource="<?php permalink_single() ?>"/>
+      <rdf:li rdf:resource="<?php $Item->permalink( 'single' ) ?>"/>
     <?php } ?>
     </rdf:Seq>
   </items>
@@ -34,9 +34,9 @@
 $MainList->restart(); 
 while( $Item = $MainList->get_item() ) 
 { ?>
-<item rdf:about="<?php permalink_single() ?>">
+<item rdf:about="<?php $Item->permalink( 'single' ) ?>">
   <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
-  <link><?php permalink_single() ?></link>
+  <link><?php $Item->permalink( 'single' ) ?></link>
   <dc:date><?php $Item->date( 'isoZ', true ) ?></dc:date>
   <dc:creator><?php $Item->Author->prefered_name( 'xml' ) ?></dc:creator>
   <dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>

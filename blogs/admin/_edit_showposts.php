@@ -186,7 +186,7 @@
 				trackback_number('', ', '.T_('1 Trackback'), ', '.T_('% Trackbacks'));
 				pingback_number('', ', '.T_('1 Pingback'), ', '.T_('% Pingbacks'));
 				?></a>
-				- <a href="<?php permalink_single(); ?>" title="<?php echo T_('Permanent link to this post') ?>"><?php echo T_('Permalink') ?></a> ]
+				- <a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to this post') ?>"><?php echo T_('Permalink') ?></a> ]
 			</p>
 
 			<?php

@@ -26,7 +26,7 @@
         $Item->url_link( '', ' ', 'xml' );
         $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
       ?></description>
-      <link><?php permalink_single() ?></link>
+      <link><?php $Item->permalink( 'single' ) ?></link>
     </item>
     <?php } ?>
   </channel>

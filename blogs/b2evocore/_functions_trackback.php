@@ -132,6 +132,10 @@ function trackback_response($error = 0, $error_message = '')
  * Trackback tags 
  *****/
 
+/**
+ *
+ * @deprecated deprecated by {@link Item::trackback_url()}
+ */
 function trackback_url($display = 1) {
 	global $htsrv_url, $id, $use_extra_path_info;
 	if( $use_extra_path_info ) {
@@ -210,8 +214,13 @@ function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 	echo '</a>';
 }
 
+/**
+ * This adds trackback autodiscovery information
+ *
+ * @deprecated deprecated by {@link Item::trackback_rdf()}
+ */
 function trackback_rdf($timezone=0) 
-{	// This adds trackback autodiscovery information
+{
 	global $id, $blogfilename;	// fplanque added: $blogfilename
 	// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
 	// fplanque WARNING: this isn't a very clean way to validate :/

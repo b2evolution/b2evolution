@@ -28,23 +28,23 @@
 	<!-- // b2 loop start -->
 	 
 	<?php	// ------------------------------------- START OF POSTS -------------------------------------
-		if( isset($MainList) ) while( $Item = $MainList->get_item() )
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 	?>
 	<div class="date" align="right"><?php $MainList->date_if_changed( '', '' ) ?></div><br />
 		<?php $Item->anchor(); ?>
 		<div class="title"><?php $Item->title(); ?></div>
 		<?php $Item->content(); ?>
-		 <?php link_pages("<br />Pages: ","<br />","number") ?>
-	
-		 <div class="posted">by <?php $Item->Author->prefered_name() ?> at <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a><br />
-		<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
-	<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
-	<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |
-	<a href="?cat=<?php the_category_ID() ?>" title="category: <?php $Item->main_category( 'htmlattr' ) ?>"><?php $Item->main_category() ?></a>
-	<?php trackback_rdf() ?>
+		<?php link_pages("<br />Pages: ","<br />","number") ?>
+		<div class="posted">by <?php $Item->Author->prefered_name() ?> 
+			at <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a><br />
+			<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
+			<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
+			<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |
+			<a href="?cat=<?php the_category_ID() ?>" title="category: <?php $Item->main_category( 'htmlattr' ) ?>"><?php $Item->main_category() ?></a>
+			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
-				<?php
+		<?php
 			// this includes the trackback url, comments, trackbacks, pingbacks and a form to add a new comment
 			$disp_comments = 1;					// Display the comments if requested
 			$disp_comment_form = 1;			// Display the comments form if comments requested

@@ -1343,10 +1343,12 @@ function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
 	echo gen_permalink( $file, $post_ID, $mode );
 }
 
-/*
+/**
  * permalink_single(-)
  *
  * Permalink forced to a single post
+ *
+ * @deprecated deprecated by {@link Item::permalink()}
  */
 function permalink_single($file='') 
 {

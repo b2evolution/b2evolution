@@ -55,7 +55,7 @@ Categories: <?php $Item->categories() ?>
 <?php trackback_popup_link() ?> 
 <?php pingback_popup_link() ?>
 
-<?php trackback_rdf() ?>
+<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
 <?php
 		// THIS is an example of how to display unmixed comments, trackbacks and pingbacks.
@@ -173,14 +173,7 @@ Categories: <?php $Item->categories() ?>
 <a href="http://validator.w3.org/check/referer" title="this page validates as XHTML 1.0 Transitional"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" border="0" /></a><br />
 <a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 </div>
-
-<?php
-	log_hit();	// log the hit on this page
-	if ($debug==1)
-	{
-		printf( T_('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
-	}
-?>
+<?php	log_hit();	// log the hit on this page ?>
 </body>
 </html>
 

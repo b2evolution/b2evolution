@@ -58,7 +58,9 @@ class Comment extends DataObject
 			$this->status = $db_row['comment_status'];
 			$this->author = $db_row['comment_author'];
 			$this->author_email = $db_row['comment_author_email'];
-			$this->author_url = $db_row['comment_author_url'];
+			$url = trim( $db_row['comment_author_url'] );
+			$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
+			$this->author_url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 			$this->author_IP = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
@@ -122,6 +124,17 @@ class Comment extends DataObject
 
 
 	/** 
+	 * Template function: display anchor for permalinks to refer to
+	 *
+	 * {@internal Comment::anchor(-) }}
+	 */
+	function anchor() 
+	{
+		echo '<a name="c'.$this->ID.'"></a>';
+	}
+
+
+	/** 
 	 * Template function: display link to comment author's provided URL
 	 *
 	 * {@internal Comment::author_url(-) }}
@@ -133,14 +146,11 @@ class Comment extends DataObject
 	 */
 	function author_url( $linktext='', $before='', $after='', $makelink = true ) 
 	{
-		$url = trim($this->author_url);
-		$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
-		$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
-		if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url'))
+		if( strlen( $this->author_url ) > 10 )
 		{	// If URL exists:
 			echo $before;
-			if( $makelink ) echo '<a href="'.$url.'">';
-			echo ($linktext != '') ? $linktext : $url;
+			if( $makelink ) echo '<a href="'.$this->author_url.'">';
+			echo ($linktext != '') ? $linktext : $this->author_url;
 			if( $makelink ) echo '</a>';
 			echo $after;
 		}
@@ -152,10 +162,15 @@ class Comment extends DataObject
 	 * {@internal Comment::author(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean true for link, false if you want NO html link
 	 */
-	function author( $format = 'htmlbody' ) 
+	function author( $format = 'htmlbody', $makelink = false ) 
 	{
+		if( strlen( $this->author_url ) <= 10 ) $makelink = false;
+		
+		if( $makelink ) echo '<a href="'.$this->author_url.'">';
 		$this->disp( 'author', $format );
+		if( $makelink ) echo '</a>';
 	}
 
 	/** 

@@ -19,8 +19,8 @@ class CommentList extends DataObjectList
 {
 	var $blog;
 	
-	/* 
-	 * CommentList::CommentList(-)
+	/** 
+	 * {@internal CommentList::CommentList(-)}}
 	 *
 	 * Constructor
 	 */
@@ -28,7 +28,7 @@ class CommentList extends DataObjectList
 		$blog = 1, 
 		$comment_types = "'comment'",
 		$show_statuses = array(),							// Not used yet					
-		$p = '',															// Not used yet
+		$p = '',															// Restrict to specific post
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC
 		$orderby = '',												// list of fields to order by
@@ -65,9 +65,12 @@ class CommentList extends DataObjectList
 		$this->request .= "INNER JOIN $tablecategories maincat ON post_category = maincat.cat_ID) 
 												INNER JOIN $tableblogs ON maincat.cat_blog_ID = blog_ID) ";
 		
-		// Restrict to viewable posts/cats on current blog
-		if( $blog > 1 )
-		{
+		if( !empty( $p ) )
+		{	// Restrict to comments on selected post
+			$this->request .= ") WHERE comment_post_ID = $p AND ";
+		}
+		elseif( $blog > 1 )
+		{	// Restrict to viewable posts/cats on current blog
 			$this->request .= "INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories othercats ON postcat_cat_ID = othercats.cat_ID WHERE othercats.cat_blog_ID = $blog AND ";
 		}
 		else

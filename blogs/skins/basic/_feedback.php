@@ -56,74 +56,62 @@
 	
 	<?php if( $disp_trackback_url ) {	// We want to display the trackback URL: ?>
 	<h4><?php echo T_('Trackback address for this post:') ?></h4>
-	<code><?php trackback_url() ?></code>
+	<code><?php $Item->trackback_url() ?></code>
 	<?php } ?>
 	
 	<?php
 	if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	{
-		
 		if( $disp_comments ) 
 	?>
 	
 	<!-- Title for comments, tbs, pbs... -->
 	<h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 	
-	
 	<?php
-		$queryc = "SELECT * FROM $tablecomments WHERE comment_post_ID = $id AND comment_type IN (".implode(',', $type_list).") ORDER BY comment_date";
-		$resultc = mysql_query($queryc) or mysql_oops( $queryc );
-		if ($resultc)
-		{
-		$wxcvbn_c=0; 
-		while($rowc = mysql_fetch_object($resultc)) 
-		{
-			$wxcvbn_c++; 
-			$commentdata = get_commentdata($rowc->comment_ID); 
-			switch( $commentdata['comment_type'] )
+	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $id, '', 'ASC' );
+	
+	$CommentList->display_if_empty( 
+								'<p>' . 
+								sprintf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */ 
+													T_('No %s for this post yet...'), implode( "/", $disp_title) ) . 
+								'</p>' );
+	
+	while( $Comment = $CommentList->get_next() )
+	{	// Loop through comments:	
+		?>
+		<!-- ---------- START of a COMMENT/TB/PB ---------- -->
+		<?php $Comment->anchor() ?>
+		<h5>
+		<?php
+			switch( $Comment->get( 'type' ) )
 			{
-			case 'comment': // Display a comment: ?>
-				<!-- comment -->
-				<a name="c<?php comment_ID() ?>"></a>
-				<h5><?php echo T_('Comment from:') ?> <?php comment_author() ?> <?php comment_author_url_link("", " &middot; ", "") ?></h5>
-				<blockquote>
-					<small><?php comment_date() ?> @ <?php comment_time("H:i") ?></small>
-					<div><?php comment_text() ?></div>
-				</blockquote>
-				<!-- /comment -->
-			<?php break;
-			
-			case 'trackback': // Display a trackback: ?>
-				<!-- trackback -->
-				<a name="tb<?php comment_ID() ?>"></a>
-				<h5><?php echo T_('Trackback from:') ?> <a href="<?php comment_author_url(); ?>" title="<?php comment_author() ?>"><?php comment_author() ?></a></h5>
-				<blockquote>
-					<small><?php comment_date() ?> @ <?php comment_time("H:i") ?></small>
-					<div><?php comment_text() ?></div>
-				</blockquote>
-				<!-- /trackback -->
-			<?php break;
-			
-			case 'pingback': // Display a pingback: ?>
-				<!-- pingback -->
-				<a name="pb<?php comment_ID() ?>"></a>
-				<h5><?php echo T_('Pingback from:') ?> <a href="<?php comment_author_url(); ?>" title="<?php comment_author() ?>"><?php comment_author() ?></a></h5>
-				<blockquote>
-					<small><?php comment_date() ?> @ <?php comment_time("H:i") ?></small>
-					<div><?php comment_text() ?></div>
-				</blockquote>
-				<!-- /pingback -->
-			<?php break;
-			}
-		} // end of the loop, don't delete
+				case 'comment': // Display a comment: 
+					echo T_('Comment from:') ?> 
+					<?php $Comment->author() ?> 
+					<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
+					<?php break;
+
+				case 'trackback': // Display a trackback:
+					echo T_('Trackback from:') ?> 
+					<?php $Comment->author( 'htmlbody', true ) ?>
+					<?php break;
+
+				case 'pingback': // Display a pingback:
+					echo T_('Pingback from:') ?> 
+					<?php $Comment->author( 'htmlbody', true ) ?>
+					<?php break;
+			} 
+		?>
+		</h5>
+		<blockquote>
+			<small><?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?></small>
+			<div><?php $Comment->content() ?></div>
+		</blockquote>
+		<!-- ---------- END of a COMMENT/TB/PB ---------- -->
+		<?php
 	} 
-	if ($wxcvbn_c == 0) { ?>
-	<!-- this is displayed if there are no comments so far -->
-	<p><?php printf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */ T_('No %s for this post yet...'), implode( "/", $disp_title) ); ?></p>
-	<?php /* if you delete this the sky will fall on your head */ } ?>
 	
-	
-	<?php 
 	if( $disp_comment_form ) 
 	{	// We want to display the comments form: 
 		if( $postdata['comments'] != 'open' )
