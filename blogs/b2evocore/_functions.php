@@ -158,11 +158,11 @@ function format_to_edit( $content, $autobr = false )
 /*
  * format_to_post(-)
  */
-function format_to_post( $content, $autobr = 0, $is_comment = 0 )
+function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'ISO-8859-1' )
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attribues, $uri_attrs, $allowed_uri_scheme;
-	global $comments_allowed_tags, $comments_allowed_attribues, $comments_uri_attrs, $comments_allowed_uri_scheme;
+	global $comments_allowed_tags, $comments_allowed_attribues, $comments_allowed_uri_scheme;
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content= preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
@@ -183,12 +183,12 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0 )
 		if( ! $is_comment )
 		{
 			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attribues,
-																			$uri_attrs, $allowed_uri_scheme );
+																			$uri_attrs, $allowed_uri_scheme, $encoding );
 		}
 		else
 		{
 			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attribues,
-																			$uri_attrs, $comments_allowed_uri_scheme );
+																			$uri_attrs, $comments_allowed_uri_scheme, $encoding );
 		}
 
 		$checker->check( $content );

@@ -23,14 +23,14 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * @param string locale to translate to, '' to use current locale (basic gettext does only support '')
  */
 if( ($use_l10n == 1) && function_exists('_') )
-{	// We are going to use GETTEXT
+{ // We are going to use GETTEXT
 
 	function T_( $string, $req_locale = '' )
 	{
 		global $current_messages;
 
 		if( empty( $req_locale ) || $req_locale == $current_messages )
-		{	// We have not asked for a different locale than the currently active one:
+		{ // We have not asked for a different locale than the currently active one:
 			return _($string);
 		}
 		// We have asked for a funky locale... we'll get english instead:
@@ -39,7 +39,7 @@ if( ($use_l10n == 1) && function_exists('_') )
 
 }
 elseif( $use_l10n == 2 )
-{	// We are going to use b2evo localization:
+{ // We are going to use b2evo localization:
 
 	/**
 	 * @ignore
@@ -62,18 +62,18 @@ elseif( $use_l10n == 2 )
 		// echo "Translating ", $search, " to $messages<br />";
 
 		if( !isset($trans[ $messages ] ) )
-		{	// Translations for current locale have not yet been loaded:
+		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
 			@include_once dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
 			if( !isset($trans[ $messages ] ) )
-			{	// Still not loaded... file doesn't exist, memorize that no translation are available
+			{ // Still not loaded... file doesn't exist, memorize that no translation are available
 				// echo 'file not found!';
 				$trans[ $messages ] = array();
 			}
 		}
 
 		if( isset( $trans[ $messages ][ $search ] ) )
-		{	// If the string has been translated:
+		{ // If the string has been translated:
 			return $trans[ $messages ][ $search ];
 		}
 
@@ -85,7 +85,7 @@ elseif( $use_l10n == 2 )
 
 }
 else
-{	// We are not localizing at all:
+{ // We are not localizing at all:
 
 	/**
 	 * @ignore
@@ -98,7 +98,7 @@ else
 }
 
 
-/*
+/**
  * NT_(-)
  *
  * No Translation
@@ -141,7 +141,7 @@ function locale_restore_previous()
 }
 
 
-/*
+/**
  * locale_activate(-)
  *
  * returns true if locale has been changed
@@ -165,7 +165,7 @@ function locale_activate( $locale )
 
 	// Activate translations in gettext:
 	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
-	{	// Only if we are using GETTEXT ( if not, look into T_(-) ...)
+	{ // Only if we are using GETTEXT ( if not, look into T_(-) ...)
 		# Activate the locale->language in gettext:
 
 		// Note: default of safe_mode_allowed_env_vars is "PHP_ ",
@@ -178,7 +178,7 @@ function locale_activate( $locale )
 
 		# Activate the charset for conversions in gettext:
 		if( function_exists( 'bind_textdomain_codeset' ) )
-		{	// Only if this gettext supports code conversions
+		{ // Only if this gettext supports code conversions
 			bind_textdomain_codeset( 'messages', $current_charset );
 		}
 	}
@@ -195,7 +195,7 @@ function locale_activate( $locale )
 }
 
 
-/*
+/**
  * locale_by_lang(-)
  *
  * Find first locale matching lang
@@ -207,14 +207,14 @@ function locale_by_lang( $lang, $fallback_to_default = true )
 	foreach( $locales as $locale => $locale_params )
 	{
 		if( substr( $locale, 0 ,2 ) == $lang )
-		{	// found first matching locale
+		{ // found first matching locale
 			return $locale;
 		}
 	}
 
 	// Not found...
 	if( $fallback_to_default )
-	return $default_locale;
+		return $default_locale;
 	else
 		return $lang;
 }
@@ -303,7 +303,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	$country = strtolower(substr( $locale, 3, 2 ));
 
 	if( ! is_file(dirname(__FILE__).'/'.$core_dirout.'/'.$img_subdir.'/flags/'.$collection.'/'.$country.'.gif') )
-	{	// File does not exist
+	{ // File does not exist
 		$country = 'default';
 	}
 
@@ -380,16 +380,16 @@ function locale_from_httpaccept()
 		$selected_full_match = false;
 
 		foreach( $locales as $localekey => $locale )
-		{	// Check each locale
+		{ // Check each locale
 			if( ! $locale['enabled'] )
-			{	// We only want to use activated locales
+			{ // We only want to use activated locales
 				continue;
 			}
 			// echo '<br />searching ', $localekey, ' in HTTP_ACCEPT_LANGUAGE ';
 			if( ($pos = strpos( $accept, strtolower($localekey) )) !== false )
-			{	// We found full locale
+			{ // We found full locale
 				if( !$selected_full_match || ($pos <= $selected_match_pos) )
-				{	// This is a better choice than what we had before OR EQUIVALENT but with exact locale
+				{ // This is a better choice than what we had before OR EQUIVALENT but with exact locale
 					// echo $localekey.' @ '.$pos.' is better than '.
 					//		$selected_locale.' @ '.$selected_match_pos.'<br />';
 					$selected_locale = $localekey;
@@ -401,9 +401,9 @@ function locale_from_httpaccept()
 			}
 
 			if( !$selected_full_match && ($pos = strpos( $accept, substr($localekey, 0, 2) )) !== false )
-			{	// We have no exact match yet but found lang code match
+			{ // We have no exact match yet but found lang code match
 				if( $pos < $selected_match_pos )
-				{	// This is a better choice than what we had before
+				{ // This is a better choice than what we had before
 					// echo $localekey.' @ '.$pos.' is better than '.
 					//		$selected_locale.' @ '.$selected_match_pos.'<br />';
 					$selected_locale = $localekey;
@@ -452,7 +452,7 @@ function locale_overwritefromDB()
 	$rows = $DB->get_results( $query, ARRAY_A );
 
 	if( count( $rows ) ) foreach( $rows as $row )
-	{	// Loop through loaded locales:
+	{ // Loop through loaded locales:
 
 		if( $row['loc_priority'] == $priocounter )
 		{ // priority conflict (the same)
@@ -484,9 +484,9 @@ function locale_overwritefromDB()
 	{ // we have locales from conf file that need a priority
 		$priocounter = 1;
 		foreach( $locales as $lkey => $lval )
-		{	// Loop through memory locales:
+		{ // Loop through memory locales:
 			if( !isset($lval['priority']) )
-			{	// Found one that has no assigned priority
+			{ // Found one that has no assigned priority
 				while( in_array( $priocounter, $usedprios ) )
 				{
 					$priocounter++;

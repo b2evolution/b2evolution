@@ -38,7 +38,7 @@ function set_edited_Blog_from_params( $for )
 {{{
 	global $edited_Blog, $default_locale;
 	global $blog_siteurl_type, $blog_siteurl_relative, $blog_siteurl_absolute;
-	global $DB, $Messages;
+	global $DB, $Messages, $locales;
 
 	switch( $for )
 	{
@@ -66,9 +66,9 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'keywords',      param( 'blog_keywords',      'string', $req ? true : '' ) );
 
 			// format html
-			$edited_Blog->set( 'tagline',       format_to_post( param( 'blog_tagline',  'html', $req ? true : '' ), 0, 0 ) );
-			$edited_Blog->set( 'longdesc',      format_to_post( param( 'blog_longdesc', 'html', $req ? true : '' ), 0, 0 ) );
-			$edited_Blog->set( 'notes',         format_to_post( param( 'blog_notes',    'html', $req ? true : '' ), 0, 0 ) );
+			$edited_Blog->set( 'tagline',       format_to_post( param( 'blog_tagline',  'html', $req ? true : '' ), 0, 0, $locales[ $edited_Blog->get('locale') ][ 'charset' ] ) );
+			$edited_Blog->set( 'longdesc',      format_to_post( param( 'blog_longdesc', 'html', $req ? true : '' ), 0, 0, $locales[ $edited_Blog->get('locale') ][ 'charset' ] ) );
+			$edited_Blog->set( 'notes',         format_to_post( param( 'blog_notes',    'html', $req ? true : '' ), 0, 0, $locales[ $edited_Blog->get('locale') ][ 'charset' ] ) );
 
 
 			// abstract settings (determines blog_siteurl)
