@@ -243,7 +243,7 @@ class User extends DataObject
 	/** 
 	 * Check permission for this user on a specified blog
 	 *
-	 * This is not for direct use, please call {@link User::check_perm()) instead
+	 * This is not for direct use, please call {@link User::check_perm()} instead
 	 *
 	 * {@internal User::check_perm_blogusers(-) }}
 	 *
