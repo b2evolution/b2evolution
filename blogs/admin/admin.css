@@ -195,7 +195,7 @@ table.thin,
 table.thincols {
 	border: 1px solid #ccc;
 	margin: auto;
-	border-collapse: collapse
+	border-collapse: collapse;
 }
 table.thin td {
 	border-bottom: 1px solid #ccc;
@@ -252,6 +252,7 @@ abbr {
 	margin-top: 0ex;
 	margin-bottom: 0ex;
 	padding-bottom: 1ex;
+	clear: both;
 }
 
 
@@ -608,6 +609,13 @@ fieldset legend {
 
 
 /* FileManager */
+
+#filemanmain {
+	/*border: 1px solid red;*/
+	padding-bottom: 3ex;
+	padding:1ex;
+}
+
 table.fileman {
 	margin:auto;
 	width: 100%;
@@ -620,15 +628,15 @@ table.fileman td {
 	border-bottom: 1px solid #ccc;
 	/*background-color: #E1DBDC;*/
 	padding: .3ex 2ex;
-	font-size: 80%;
 }
 table.fileman td.icon, td.checkbox, td.perms {
-	width:1%;
+	width:2%;
 	text-align:center;
 }
 table.fileman td.type {
 	text-align: center;
-	width:13%;
+	width:10%;
+	font-size: 80%;
 }
 table.fileman td.filename {
 	text-align: left;
@@ -639,6 +647,7 @@ table.fileman td.timestamp {
 	text-align: center;
 	white-space: nowrap;
 	width:15%;
+	font-size: 80%;
 }
 table.fileman td.size {
 	text-align: right;
@@ -648,6 +657,9 @@ table.fileman td.actions {
 	text-align: right;
 	white-space: nowrap;
 	width:25%;
+}
+table.fileman tr.toprow td input {
+	font-size: 84%;
 }
 table.fileman tr.toprow td {
 	padding: .3ex 1ex;
@@ -661,23 +673,32 @@ table.fileman th {
 	border-right: 1px solid #FFF;
 	padding: 1ex 1ex;
 }
-.toolbaritem input {
-	font-size:100%;
+.toolbar {
+}
+.toolbaritem input, select {
+	font-size:84%;
 }
 .toolbaritem {
 	text-align:right;
 	margin-bottom:0.5ex;
 	vertical-align:bottom;
-	display:inline;
-	float:right;
 	padding-left: 3ex;
+	float:right;
 }
-.messages {
+
+div.fm_messages {
 	border:1px dashed #d91;
-	margin-bottom:1ex;
 	padding:1ex;
+	margin-bottom:2ex;
 }
-div fileman_query {
+div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;
+}
+div.fm_options {
+	text-align:right;
+	float:right;
+	border: 1px solid #d91;
+	padding:1ex;
+
 }

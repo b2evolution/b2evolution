@@ -17,20 +17,37 @@ $new_db_version = 8070;				// next time: 8080
 if( !isset($_SERVER['REQUEST_URI']) )
 { // IIS
 	if( isset($_SERVER['URL']) )
-	{ //ISAPI
+	{ // ISAPI
 		$ReqPath = $_SERVER['URL'];
 	}
 	elseif( isset($_SERVER['PATH_INFO']) )
-	{ //CGI/FastCGI 
-		$ReqPath = $_SERVER['PATH_INFO']; 
+	{ // CGI/FastCGI
+		$ReqPath = $_SERVER['PATH_INFO'];
 	}
 	elseif( isset($_SERVER['SCRIPT_NAME']) )
-	{ //Some Odd Win2k Stuff
+	{ // Some Odd Win2k Stuff
 		$ReqPath = $_SERVER['SCRIPT_NAME'];
 	}
-	else
-	{ //The Old Stand-By
+	elseif( isset($_SERVER['PHP_SELF']) )
+	{ // The Old Stand-By
 		$ReqPath = $_SERVER['PHP_SELF'];
+	}
+	else
+	{
+		?>
+		<p><span class="error">Warning: $ReqPath could not be set. Probably an odd IIS problem.</span><br />
+		Go to your <a href="<?php echo $baseurl.'/'.$install_subdir ?>/phpinfo.php">phpinfo page</a>,
+		look for occurences of <code><?php
+		// take the baseurlroot out..
+		echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.'/'.$install_subdir )
+		?>/phpinfo.php</code> and copy all lines
+		containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
+		you're running on.
+		<br />
+		(If you have deleted your install folder &ndash; what is recommened after successful setup &ndash;
+		you have to upload it again before doing this).
+		</p>
+		<?php
 	}
 
 	$ReqURI = $ReqPath;
@@ -40,7 +57,7 @@ if( !isset($_SERVER['REQUEST_URI']) )
 	}
 }
 else
-{ // apache...
+{	// apache...
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
 	$ReqPath = explode( '?', $ReqURI, 2 );
