@@ -29,7 +29,7 @@
 		echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" />';
 		echo '</a> <strong>'.$cat['cat_name'].'</strong>';
 		echo " <a href=\"?action=Delete&cat_ID=", $cat_ID, 
-			'" onClick="return confirm(\'Are you sure you want to delete?\')">';
+			'" onClick="return confirm(\''.T_('Are you sure you want to delete?').'\')">';
 		echo '<img src="img/xross.gif" width="13" height="13" class="middle" alt="', /* TRANS: Abbrev. for Delete */ T_('Del'), '" />';
 		echo '</a>';
 		echo "

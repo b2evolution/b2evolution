@@ -501,25 +501,17 @@ class ItemList extends DataObjectList
 		$content = format_to_post( $content, $post_autobr );
 		$post_renderers = implode( '.', $renderers );
 
-		param( 'edit_date', 'integer', 0 );
-		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-		{ // We use user date
-			param( 'aa', 'integer', 2000 );
-			param( 'mm', 'integer', 1 );
-			param( 'jj', 'integer', 1 );
-			param( 'hh', 'integer', 20 );
-			param( 'mn', 'integer', 30 );
-			param( 'ss', 'integer', 0 );
-			$jj = ($jj > 31) ? 31 : $jj;
-			$hh = ($hh > 23) ? $hh - 24 : $hh;
-			$mn = ($mn > 59) ? $mn - 60 : $mn;
-			$ss = ($ss > 59) ? $ss - 60 : $ss;
-			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
-		}
-		else
-		{ // We use current time
-			$post_date = date('Y-m-d H:i:s', $localtimenow);
-		}
+		param( 'aa', 'integer', 2000 );
+		param( 'mm', 'integer', 1 );
+		param( 'jj', 'integer', 1 );
+		param( 'hh', 'integer', 20 );
+		param( 'mn', 'integer', 30 );
+		param( 'ss', 'integer', 0 );
+		$jj = ($jj > 31) ? 31 : $jj;
+		$hh = ($hh > 23) ? $hh - 24 : $hh;
+		$mn = ($mn > 59) ? $mn - 60 : $mn;
+		$ss = ($ss > 59) ? $ss - 60 : $ss;
+		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
 
 
 		if( $errcontent = errors_display( T_('Invalid post, please correct these errors:'), '', false ) )
