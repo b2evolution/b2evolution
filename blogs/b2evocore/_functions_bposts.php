@@ -1305,7 +1305,7 @@ function statuses_where_clause( $show_statuses = '' )
 	$where = ' ( ';
 	$or = '';
 
-	if( $key = array_search( 'private', $show_statuses ) )
+	if( ($key = array_search( 'private', $show_statuses )) !== false )
 	{	// Special handling for Private status:
 		unset( $show_statuses[$key] );
 		if( is_logged_in() )
@@ -1331,8 +1331,13 @@ function statuses_where_clause( $show_statuses = '' )
 	{
 		$other_statuses .= $sep.'\''.$other_status.'\'';
 		$sep = ',';
-	}				
-	$where .= $or.'post_status IN ('. $other_statuses .') ) ';
+	}
+	if( strlen( $other_statuses ) )
+	{				
+		$where .= $or.'post_status IN ('. $other_statuses .') ';
+	}
+
+	$where .= ') ';
 
 	// echo $where;
 	return $where;
