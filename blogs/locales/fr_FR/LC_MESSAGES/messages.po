@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"POT-Creation-Date: 2003-08-22 19:52+0200\n"
-"PO-Revision-Date: 2003-08-22 21:03+0100\n"
+"POT-Creation-Date: 2003-08-24 21:26+0200\n"
+"PO-Revision-Date: 2003-08-24 21:28+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +102,7 @@ msgstr "Licence GPL"
 #: ..\..\..\skins\bluesky\_main.php:110
 #: ..\..\..\skins\custom\_main.php:22
 #: ..\..\..\skins\custom\_main.php:56
-#: ..\..\..\skins\custom\_main.php:136
+#: ..\..\..\skins\custom\_main.php:143
 #: ..\..\..\skins\fplanque2002\_main.php:23
 #: ..\..\..\skins\fplanque2002\_main.php:76
 #: ..\..\..\skins\fplanque2002\_main.php:156
@@ -162,8 +162,8 @@ msgstr "Liste des Archives"
 #: ..\..\..\admin\b2categories.php:4
 #: ..\..\..\admin\_edit_form.php:200
 #: ..\..\..\admin\_edit_showposts.php:413
-#: ..\..\..\skins\custom\_main.php:73
-#: ..\..\..\skins\custom\_main.php:154
+#: ..\..\..\skins\custom\_main.php:75
+#: ..\..\..\skins\custom\_main.php:161
 #: ..\..\..\skins\fplanque2002\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:174
 msgid "Categories"
@@ -174,7 +174,7 @@ msgstr "Catégories"
 #: ..\..\..\noskin_all.php:163
 #: ..\..\..\noskin_b.php:162
 #: ..\..\..\noskin_roll.php:162
-#: ..\..\..\skins\custom\_main.php:89
+#: ..\..\..\skins\custom\_main.php:96
 #: ..\..\..\skins\fplanque2002\_main.php:109
 #, php-format
 msgid "- %d queries so far"
@@ -187,7 +187,7 @@ msgstr "- %d requêtes jusqu'ici"
 #: ..\..\..\noskin_roll.php:282
 #: ..\..\..\skins\babyblues\_main.php:75
 #: ..\..\..\skins\bluesky\_main.php:189
-#: ..\..\..\skins\custom\_main.php:219
+#: ..\..\..\skins\custom\_main.php:226
 #: ..\..\..\skins\fplanque2002\_main.php:238
 #: ..\..\..\skins\guadeloupe\_main.php:190
 msgid "Misc"
@@ -200,7 +200,7 @@ msgstr "Divers"
 #: ..\..\..\noskin_roll.php:284
 #: ..\..\..\skins\babyblues\_main.php:77
 #: ..\..\..\skins\bluesky\_main.php:191
-#: ..\..\..\skins\custom\_main.php:221
+#: ..\..\..\skins\custom\_main.php:228
 #: ..\..\..\skins\fplanque2002\_main.php:240
 #: ..\..\..\skins\guadeloupe\_main.php:192
 #: ..\..\..\skins\originalb2\_main.php:137
@@ -214,7 +214,7 @@ msgstr "S'identifier..."
 #: ..\..\..\noskin_roll.php:285
 #: ..\..\..\skins\babyblues\_main.php:78
 #: ..\..\..\skins\bluesky\_main.php:192
-#: ..\..\..\skins\custom\_main.php:222
+#: ..\..\..\skins\custom\_main.php:229
 #: ..\..\..\skins\fplanque2002\_main.php:241
 #: ..\..\..\skins\guadeloupe\_main.php:193
 #: ..\..\..\skins\originalb2\_main.php:138
@@ -239,8 +239,8 @@ msgstr "Sélectionné"
 #: ..\..\..\noskin_roll.php:204
 #: ..\..\..\skins\bluesky\_main.php:106
 #: ..\..\..\skins\bluesky\_main.php:107
-#: ..\..\..\skins\custom\_main.php:129
-#: ..\..\..\skins\custom\_main.php:130
+#: ..\..\..\skins\custom\_main.php:136
+#: ..\..\..\skins\custom\_main.php:137
 #: ..\..\..\skins\fplanque2002\_main.php:149
 #: ..\..\..\skins\fplanque2002\_main.php:150
 #: ..\..\..\skins\guadeloupe\_main.php:106
@@ -253,7 +253,7 @@ msgstr "Récemment"
 #: ..\..\..\noskin_b.php:203
 #: ..\..\..\noskin_roll.php:203
 #: ..\..\..\skins\bluesky\_main.php:106
-#: ..\..\..\skins\custom\_main.php:129
+#: ..\..\..\skins\custom\_main.php:136
 #: ..\..\..\skins\fplanque2002\_main.php:149
 #: ..\..\..\skins\guadeloupe\_main.php:106
 msgid "(cached)"
@@ -264,7 +264,7 @@ msgstr "(en cache)"
 #: ..\..\..\noskin_b.php:204
 #: ..\..\..\noskin_roll.php:204
 #: ..\..\..\skins\bluesky\_main.php:107
-#: ..\..\..\skins\custom\_main.php:130
+#: ..\..\..\skins\custom\_main.php:137
 #: ..\..\..\skins\fplanque2002\_main.php:150
 #: ..\..\..\skins\guadeloupe\_main.php:107
 msgid "(no cache)"
@@ -275,7 +275,7 @@ msgstr "(sans cache)"
 #: ..\..\..\noskin_all.php:212
 #: ..\..\..\noskin_b.php:211
 #: ..\..\..\noskin_roll.php:211
-#: ..\..\..\skins\custom\_main.php:137
+#: ..\..\..\skins\custom\_main.php:144
 #: ..\..\..\skins\fplanque2002\_main.php:157
 msgid "Some viewing statistics"
 msgstr "Quelques statistiques"
@@ -290,8 +290,8 @@ msgstr "Quelques statistiques"
 #: ..\..\..\noskin_roll.php:222
 #: ..\..\..\admin\_edit_showposts.php:307
 #: ..\..\..\admin\_edit_showposts.php:488
-#: ..\..\..\skins\custom\_main.php:142
-#: ..\..\..\skins\custom\_main.php:148
+#: ..\..\..\skins\custom\_main.php:149
+#: ..\..\..\skins\custom\_main.php:155
 #: ..\..\..\skins\fplanque2002\_main.php:162
 #: ..\..\..\skins\fplanque2002\_main.php:168
 #: ..\..\..\skins\originalb2\_main.php:119
@@ -302,7 +302,7 @@ msgstr "Rechercher"
 #: ..\..\..\noskin_all.php:220
 #: ..\..\..\noskin_b.php:219
 #: ..\..\..\noskin_roll.php:219
-#: ..\..\..\skins\custom\_main.php:145
+#: ..\..\..\skins\custom\_main.php:152
 #: ..\..\..\skins\fplanque2002\_main.php:165
 msgid "All Words"
 msgstr "Tous les mots"
@@ -311,7 +311,7 @@ msgstr "Tous les mots"
 #: ..\..\..\noskin_all.php:221
 #: ..\..\..\noskin_b.php:220
 #: ..\..\..\noskin_roll.php:220
-#: ..\..\..\skins\custom\_main.php:146
+#: ..\..\..\skins\custom\_main.php:153
 #: ..\..\..\skins\fplanque2002\_main.php:166
 msgid "Some Word"
 msgstr "N'importe quel mot"
@@ -321,7 +321,7 @@ msgstr "N'importe quel mot"
 #: ..\..\..\noskin_b.php:221
 #: ..\..\..\noskin_roll.php:221
 #: ..\..\..\admin\_edit_showposts.php:332
-#: ..\..\..\skins\custom\_main.php:147
+#: ..\..\..\skins\custom\_main.php:154
 #: ..\..\..\skins\fplanque2002\_main.php:167
 msgid "Sentence"
 msgstr "Phrase complète"
@@ -335,8 +335,8 @@ msgstr "Phrase complète"
 #: ..\..\..\noskin_roll.php:223
 #: ..\..\..\noskin_roll.php:235
 #: ..\..\..\skins\bluesky\_main.php:125
-#: ..\..\..\skins\custom\_main.php:149
-#: ..\..\..\skins\custom\_main.php:161
+#: ..\..\..\skins\custom\_main.php:156
+#: ..\..\..\skins\custom\_main.php:168
 #: ..\..\..\skins\fplanque2002\_main.php:169
 #: ..\..\..\skins\fplanque2002\_main.php:181
 #: ..\..\..\skins\guadeloupe\_main.php:126
@@ -348,7 +348,7 @@ msgstr "Valeurs par défaut"
 #: ..\..\..\noskin_b.php:234
 #: ..\..\..\noskin_roll.php:234
 #: ..\..\..\skins\bluesky\_main.php:124
-#: ..\..\..\skins\custom\_main.php:160
+#: ..\..\..\skins\custom\_main.php:167
 #: ..\..\..\skins\fplanque2002\_main.php:180
 #: ..\..\..\skins\guadeloupe\_main.php:125
 #: ..\..\..\skins\originalb2\_main.php:111
@@ -369,9 +369,9 @@ msgstr "Obtenir sélection"
 #: ..\..\..\noskin_roll.php:267
 #: ..\..\..\skins\bluesky\_main.php:172
 #: ..\..\..\skins\bluesky\_main.php:181
-#: ..\..\..\skins\custom\_main.php:171
-#: ..\..\..\skins\custom\_main.php:195
-#: ..\..\..\skins\custom\_main.php:204
+#: ..\..\..\skins\custom\_main.php:178
+#: ..\..\..\skins\custom\_main.php:202
+#: ..\..\..\skins\custom\_main.php:211
 #: ..\..\..\skins\fplanque2002\_main.php:191
 #: ..\..\..\skins\fplanque2002\_main.php:214
 #: ..\..\..\skins\fplanque2002\_main.php:223
@@ -385,7 +385,7 @@ msgstr "suite..."
 #: ..\..\..\noskin_b.php:252
 #: ..\..\..\noskin_roll.php:252
 #: ..\..\..\skins\bluesky\_main.php:166
-#: ..\..\..\skins\custom\_main.php:189
+#: ..\..\..\skins\custom\_main.php:196
 #: ..\..\..\skins\fplanque2002\_main.php:208
 #: ..\..\..\skins\guadeloupe\_main.php:167
 msgid "Recent Referers"
@@ -396,7 +396,7 @@ msgstr "Référents récents"
 #: ..\..\..\noskin_b.php:261
 #: ..\..\..\noskin_roll.php:261
 #: ..\..\..\skins\bluesky\_main.php:175
-#: ..\..\..\skins\custom\_main.php:198
+#: ..\..\..\skins\custom\_main.php:205
 #: ..\..\..\skins\fplanque2002\_main.php:217
 #: ..\..\..\skins\guadeloupe\_main.php:176
 msgid "Top Referers"
@@ -408,7 +408,7 @@ msgstr "Référents les plus fréquents"
 #: ..\..\..\noskin_roll.php:275
 #: ..\..\..\admin\_blogs_form.php:52
 #: ..\..\..\skins\bluesky\_main.php:186
-#: ..\..\..\skins\custom\_main.php:212
+#: ..\..\..\skins\custom\_main.php:219
 #: ..\..\..\skins\fplanque2002\_main.php:231
 #: ..\..\..\skins\guadeloupe\_main.php:187
 msgid "Blogroll"
@@ -418,7 +418,7 @@ msgstr "Blogs à lire"
 #: ..\..\..\noskin_all.php:291
 #: ..\..\..\noskin_b.php:290
 #: ..\..\..\noskin_roll.php:290
-#: ..\..\..\skins\custom\_main.php:227
+#: ..\..\..\skins\custom\_main.php:234
 #: ..\..\..\skins\fplanque2002\_main.php:246
 msgid "Syndicate this blog"
 msgstr "Pompez ce blog"
@@ -429,7 +429,7 @@ msgstr "Pompez ce blog"
 #: ..\..\..\noskin_roll.php:321
 #: ..\..\..\skins\babyblues\_main.php:93
 #: ..\..\..\skins\bluesky\_main.php:210
-#: ..\..\..\skins\custom\_main.php:250
+#: ..\..\..\skins\custom\_main.php:257
 #: ..\..\..\skins\fplanque2002\_main.php:273
 #: ..\..\..\skins\guadeloupe\_main.php:211
 #: ..\..\..\skins\originalb2\_main.php:150
@@ -2341,7 +2341,6 @@ msgid "POP3 apop:"
 msgstr "POP3 apop:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:198
-#, fuzzy
 msgid "No server banner"
 msgstr "No server banner"
 
@@ -2464,40 +2463,40 @@ msgstr "Le blog demandé n'existe pas!"
 
 #  TRANS: this is the default text for the extended post "more" link
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_functions_bposts.php:310
+#: ..\..\..\b2evocore\_functions_bposts.php:312
 msgid "Read more!"
 msgstr "Lire la suite!"
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_functions_bposts.php:315
+#: ..\..\..\b2evocore\_functions_bposts.php:317
 msgid "More:"
 msgstr "Suite:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:481
+#: ..\..\..\b2evocore\_functions_bposts.php:493
 msgid "Post details"
 msgstr "Article complet"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:532
+#: ..\..\..\b2evocore\_functions_bposts.php:544
 msgid "Next page"
 msgstr "Page suivante"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:533
+#: ..\..\..\b2evocore\_functions_bposts.php:545
 msgid "Previous page"
 msgstr "Page précédente"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:574
+#: ..\..\..\b2evocore\_functions_bposts.php:586
 msgid "Previous post"
 msgstr "Article précédent"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:627
+#: ..\..\..\b2evocore\_functions_bposts.php:639
 msgid "Next post"
 msgstr "Article suivant"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:720
+#: ..\..\..\b2evocore\_functions_bposts.php:732
 msgid "Next Page"
 msgstr "Page suivante"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:747
+#: ..\..\..\b2evocore\_functions_bposts.php:759
 msgid "Previous Page"
 msgstr "Page Précédente"
 
@@ -2999,6 +2998,10 @@ msgstr "Extrait"
 #: ..\..\..\skins\babyblues\_bloglist.php:17
 msgid "blogs"
 msgstr "blogs"
+
+#: ..\..\..\skins\custom\_main.php:79
+msgid "words"
+msgstr "mots"
 
 #: ..\..\..\skins\originalb2\_main.php:44
 msgid "Browse all posts by this author"

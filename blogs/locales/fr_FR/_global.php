@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-08-22 19:52+0200\nPO-Revision-Date: 2003-08-22 21:03+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-08-24 21:26+0200\nPO-Revision-Date: 2003-08-24 21:28+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -604,6 +604,7 @@ $trans['fr_FR'] = array(
 	'Website' => 'Site web',
 	'Excerpt' => 'Extrait',
 	'blogs' => 'blogs',
+	'words' => 'mots',
 	'Browse all posts by this author' => 'Parcourir tous les articles de cet auteur',
 	'[...] Read more!' => '[...] Lire la suite!',
 	'New pingback on your post #%d \"%s\"' => 'Nouveau pingback sur votre article n°%d \"%s\"',
