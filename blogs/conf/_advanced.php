@@ -53,7 +53,7 @@ $permalink_destination = 'single';					// 'single' is HIGHLY RECOMMENDED !!!
 $permalink_include_more = 1;			// Set this to 1 for permalinks to include full post text
 $permalink_include_comments = 1;	// Set this to 1 for permalinks to include comments
 $permalink_include_trackback = 1;	// Set this to 1 for permalinks to include trackbacks
-$permalink_include_pingback = 1;	// Set this to 1 for permalinks to include pingbackss
+$permalink_include_pingback = 1;	// Set this to 1 for permalinks to include pingbacks
 
 # Extra path info allows really clean URLS for permalinks
 # They will look like http://localhost/b2evolution/blogs/demoa/2003/05/20/p4

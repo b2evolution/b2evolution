@@ -1240,20 +1240,6 @@ function permalink_single($file='')
 }
 
 
-/*
- * full_post_link(-)
- *
- * Displays link to comments/trackback/pingback page
- *
- * WARNING: OUT OF B2 LOOP ONLY!
- */
-function full_post_link( $id, $file='' ) 
-{
-	if( ($file == '') || ($file == '/')	)
-		$file = get_bloginfo('blogurl');
-	echo gen_permalink(	$file, $id,	'id', 'single',	true, true, true, true );
-}
-
 /***** // Permalink tags *****/
 
 

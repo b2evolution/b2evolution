@@ -109,7 +109,7 @@ class ArchiveList
 			case 'postbypost':
 			default:
 				// --------------------------------- POSY BY POST ARCHIVES ---------------------------------------
-				$this->request="SELECT ID,post_date,post_title ".
+				$this->request="SELECT DISTINCT ID, post_date, post_title ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
 						" ORDER BY post_date DESC".

@@ -103,7 +103,7 @@
 		<a href="<?php permalink_link() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
-		<a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
+		<a href="<?php permalink_link() ?>#pingbacks" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
 		-
 		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
 		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>

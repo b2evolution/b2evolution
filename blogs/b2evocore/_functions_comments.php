@@ -379,7 +379,7 @@ function comment_post_title()
 function comment_post_link() 
 {
 	global $commentdata;
-	echo full_post_link($commentdata['post_ID'], $commentdata['blog_siteurl']."/".$commentdata['blog_stub']);	// Links to original blog for the post
+	echo gen_permalink( $commentdata['blog_siteurl'].'/'.$commentdata['blog_stub'], $commentdata['post_ID'],	'id', 'single' );
 }
 
 
