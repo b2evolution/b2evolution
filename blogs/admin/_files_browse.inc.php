@@ -1,0 +1,673 @@
+<?php
+/**
+ * This file implements the UI for file browsing.
+ *
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
+ *
+ * @version $Id$
+ */
+?>
+
+<div class="panelblock">
+
+<?php
+	// ---------------------------------------------------
+	// Display main user interface : file list & controls:
+	// ---------------------------------------------------
+
+	/* Not implemented yet:
+
+	<!-- SEARCH BOX: -->
+
+	<form action="files.php#FM_anchor" name="search" class="toolbaritem">
+		<?php echo $Fileman->getFormHiddenInputs() ?>
+		<input type="hidden" name="action" value="search" />
+		<input type="text" name="searchfor" value="--todo--" size="20" />
+		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
+	</form>
+
+	*/
+	?>
+
+	<!-- FILTER BOX: -->
+
+	<div class="toolbaritem">
+		<form action="files.php#FM_anchor" name="filter" class="inline">
+			<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
+			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
+			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
+				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
+				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
+				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
+
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
+		</form>
+
+		<?php
+		if( $Fileman->isFiltering() )
+		{ // "reset filter" form
+		?>
+		<form action="files.php#FM_anchor" name="unfilter" class="inline">
+			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Disable'), 'formvalue' ) ?>" />
+		</form>
+		<?php
+		}
+		?>
+
+	</div>
+
+
+	<!-- FLAT MODE: -->
+
+	<form action="files.php#FM_anchor" name="flatmode" class="toolbaritem">
+		<?php echo $Fileman->getFormHiddenInputs( array( 'flatmode' => false ) ) ?>
+		<input type="hidden" name="flatmode" value="<?php echo $flatmode ? 0 : 1; ?>" />
+		<input class="ActionButton" type="submit" title="<?php
+			echo format_to_output( $flatmode ?
+															T_('Normal mode') :
+															T_('All files and folders, including subdirectories'), 'formvalue' );
+			?>" value="<?php
+			echo format_to_output( $flatmode ?
+															T_('Normal mode') :
+															T_('Flat mode'), 'formvalue' ); ?>" />
+	</form>
+</div>
+
+<div class="clear"></div>
+
+
+<div class="panelblock">
+
+<form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
+<input type="hidden" name="confirmed" value="0" />
+<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
+<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
+<?php echo $Fileman->getFormHiddenInputs() ?>
+
+
+<table class="grouped">
+
+<?php
+/**
+ * @global integer Number of cols for the files table, 8 by default
+ */
+$filetable_cols = 8;
+
+?>
+
+<thead>
+<tr>
+	<td colspan="<?php echo $filetable_cols ?>">
+
+	<?php
+	$rootlist = $Fileman->getRootList();
+	if( count($rootlist) > 1 )
+	{ // provide list of roots
+	?>
+		<!-- ROOT LISTS -->
+
+		<div class="fm_roots">
+
+			<select name="rootIDAndPath" class="fm_roots" onchange="this.form.submit()">
+			<?php
+			foreach( $rootlist as $lroot )
+			{
+				echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
+
+				if( $root == $lroot['id']
+						|| $root === NULL && $lroot['id'] == 'user' )
+				{
+					echo ' selected="selected"';
+				}
+
+				echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+			}
+
+			echo '</select>
+
+			<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
+		</div>
+		';
+	}
+	?>
+
+
+	<?php
+	// -----------------------------------------------
+	// Display table header: directory location info:
+	// -----------------------------------------------
+
+
+	// Quick links to usual homes for user, group and maybe blog...:
+	// echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
+	// TODO: add group home...
+	// TODO: add blog home?
+
+
+	// Display current dir:
+	echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
+
+
+	// Display current filter:
+	if( $Fileman->isFiltering() )
+	{
+		echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
+		// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
+	}
+
+
+	// The hidden reload button
+	?>
+
+	<span style="display:none;" id="fm_reloadhint">
+		<a href="<?php echo $Fileman->getCurUrl() ?>"
+			title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
+			<?php echo getIcon( 'reload' ) ?>
+		</a>
+	</span>
+
+
+	<?php
+	// Display filecounts:
+	?>
+
+	<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
+	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+	echo ', ';
+	disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
+	echo ', '.bytesreadable( $Fileman->countBytes() );
+	?>
+	)</span>
+	</td>
+</tr>
+<tr>
+	<th colspan="2"><?php $Fileman->dispButtonParent(); ?></th>
+	<th><?php
+		echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
+
+		if( $Fileman->flatmode )
+		{
+			echo ' &ndash; '.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') );
+		}
+
+	?></th>
+
+	<th><?php echo $Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ) ?></th>
+	<th><?php echo /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions') ?></th>
+</tr>
+</thead>
+
+<tbody>
+<?php
+param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
+
+$Fileman->sort();
+
+$countFiles = 0;
+while( $lFile =& $Fileman->getNextFile() )
+{ // loop through all Files:
+	?>
+
+	<tr<?php
+		if( $countFiles%2 ) echo ' class="odd"';
+		?> onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();">
+		<td class="checkbox">
+			<input title="<?php echo T_('Select this file') ?>" type="checkbox"
+				name="fm_selected[]"
+				value="<?php echo $lFile->getID(); ?>"
+				id="cb_filename_<?php echo $countFiles ?>"
+				onclick="this.click();"<?php
+				if( $checkall || $Fileman->isSelected( $lFile ) )
+				{
+					echo ' checked="checked"';
+				}
+				?> />
+		</td>
+
+		<td class="icon">
+			<a href="<?php
+				if( $lFile->isDir() )
+				{
+					echo $Fileman->getLinkFile( $lFile ).'" title="'.T_('Change into this directory');
+				}
+				else
+				{
+					echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
+				}
+				?>"
+				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
+				echo getIcon( $lFile ) ?></a>
+		</td>
+
+		<td class="filename">
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
+				target="fileman_default"
+				title="<?php echo T_('Open in a new window'); ?>"
+				onclick="return false;">
+
+				<button class="filenameIcon" type="button"
+					id="button_new_<?php echo $countFiles ?>"
+					onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();
+						<?php
+
+						$imgsize = $lFile->getImageSize( 'widthheight' );
+						echo $Fileman->getJsPopupCode( NULL,
+							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
+							($imgsize ? $imgsize[0]+42 : NULL),
+							($imgsize ? $imgsize[1]+42 : NULL) );
+
+						?>"
+					><?php
+					echo getIcon( 'window_new' );
+				?></button></a>
+
+			<?php
+
+			if( !isFilename( $lFile->getName() ) )
+			{
+				// TODO: Warning icon with hint
+			}
+
+			?>
+
+
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
+				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
+				if( $Fileman->flatmode && $Fileman->getOrder() == 'path' )
+				{
+					echo './'.$Fileman->getFileSubpath( $lFile );
+				}
+				else
+				{
+					echo $lFile->getName();
+				}
+				disp_cond( $Fileman->getFileImageSize(), ' (%s)' )
+				?>
+			</a>
+
+			<?php
+
+			if( $Fileman->flatmode && $Fileman->getOrder() == 'name' )
+			{
+				?>
+				<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
+				$subPath = $Fileman->getFileSubpath( $lFile, false );
+				if( empty( $subPath ) )
+				{
+					$subPath = './';
+				}
+				echo $subPath;
+				?>
+				</div>
+				<?php
+			}
+
+			?>
+		</td>
+
+		<td class="type"><?php echo $lFile->getType() ?></td>
+		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
+		<td class="timestamp"><?php echo $lFile->getLastMod() ?></td>
+		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
+		<td class="actions"><?php
+			// Not implemented yet: $Fileman->dispButtonFileEdit();
+			$Fileman->dispButtonFileRename();
+			$Fileman->dispButtonFileCopy();
+			$Fileman->dispButtonFileMove();
+			$Fileman->dispButtonFileDelete();
+			?></td>
+	</tr>
+
+	<?php
+	$countFiles++;
+}
+
+
+if( $countFiles == 0 )
+{ // Filelist errors or "directory is empty"
+	?>
+	<tr>
+	<td colspan="<?php echo $filetable_cols ?>">
+	<?php
+	if( !$Fileman->Messages->count( 'fl_error' ) )
+	{ // no Filelist errors, the directory must be empty
+		$Fileman->Messages->add( T_('No files found.')
+			.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->getFilter().'&raquo;' : '' ), 'fl_error' );
+	}
+	$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
+
+	?>
+	</td>
+	</tr>
+	<?php
+}
+else
+{ // -------------
+	// Footer with "check all", "with selected: ..":
+	// --------------
+?>
+<tr class="group">
+	<td colspan="<?php echo $filetable_cols ?>">
+	<a id="checkallspan_0" href="<?php
+		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
+		?>" onclick="toggleCheckboxes('FilesForm', 'fm_selected[]'); return false;"><?php
+		echo ($checkall) ? T_('uncheck all') : T_('check all');
+		?></a>
+	&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
+
+	<input class="DeleteButton"
+		title="<?php echo T_('Delete the selected files') ?>"
+		name="actionArray[delete]"
+		value="delete"
+		type="image"
+		src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
+		onclick="if( r = openselectedfiles(true) )
+							{
+								if( confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') )
+								{
+									document.getElementById( 'FilesForm' ).confirmed.value = 1;
+									return true;
+								}
+							}; return false;" />
+
+	<!-- Not implemented yet: input class="ActionButton"
+		title="<?php echo T_('Download the selected files') ?>"
+		name="actionArray[download]"
+		value="download"
+		type="image"
+		src="<?php echo getIcon( 'download', 'url' ) ?>"
+		onclick="return openselectedfiles(true);" / -->
+
+	<!-- Not implemented yet: input class="ActionButton" type="submit" name="action" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
+
+	<?php
+
+	/*
+	TODO: "link these into current post" (that is to say the post that opened the popup window).
+				This would create <img> or <a href> tags depending on file types.
+	*/
+
+	?>
+
+	<input class="ActionButton"
+		title="<?php echo T_('Open in new windows'); ?>"
+		name="actionArray[open_in_new_windows]"
+		value="open_in_new_windows"
+		type="image"
+		src="<?php echo getIcon( 'window_new', 'url' ) ?>"
+		onclick="openselectedfiles(); return false;" />
+
+	<?php
+	/* Not fully functional
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Rename the selected files'); ?>"
+		value="file_cmr"
+		onclick="return openselectedfiles(true);"
+		src="<?php echo getIcon( 'file_rename', 'url' ); ?>" />
+
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Copy the selected files'); ?>"
+		value="file_cmr"
+		onclick="return openselectedfiles(true);"
+		src="<?php echo getIcon( 'file_copy', 'url' ); ?>" />
+
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Move the selected files'); ?>"
+		value="file_cmr"
+		onclick="return openselectedfiles(true);"
+		src="<?php echo getIcon( 'file_move', 'url' ); ?>" />
+
+	<input class="ActionButton" type="image" name="action" value="editperm"
+		onclick="return openselectedfiles(true);"
+		title="<?php echo T_('Change permissions for the selected files'); ?>"
+		src="<?php echo getIcon( 'file_perms', 'url' ); ?>" />
+
+	*/ ?>
+
+	</td>
+</tr>
+<?php
+}
+?>
+</tbody>
+
+</table>
+
+</form>
+
+
+<?php
+if( $countFiles )
+{
+	?>
+
+	<script type="text/javascript">
+	<!--
+	function openselectedfiles( checkonly )
+	{
+		elems = document.getElementsByName( 'fm_selected[]' );
+		fm_popup_type = 'selected';
+		var opened = 0;
+		for( i = 0; i < elems.length; i++ )
+		{
+			if( elems[i].checked )
+			{
+				if( !checkonly )
+				{
+					id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
+					document.getElementById( 'button_new_'+id ).click();
+				}
+				opened++;
+			}
+		}
+		if( !opened )
+		{
+			alert( '<?php echo /* TRANS: Warning this is a javascript string */ T_('Nothing selected.') ?>' );
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	// -->
+	</script>
+
+	<?php
+}
+?>
+
+
+<!-- CREATE: -->
+
+<form action="files.php#FM_anchor" class="toolbaritem">
+	<?php echo $Fileman->getFormHiddenInputs(); ?>
+	<label class="tooltitle"><?php echo T_('New'); ?></label>
+	<select name="createnew">
+		<option value="file"><?php echo T_('file') ?></option>
+		<option value="dir"<?php
+			if( isset($createnew) && $createnew == 'dir' )
+			{
+				echo ' selected="selected"';
+			} ?>><?php echo T_('directory') ?></option>
+	</select>
+	:
+	<input type="text" name="createname" value="<?php
+		if( isset( $createname ) )
+		{
+			echo $createname;
+		} ?>" size="20" />
+	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+	<input type="hidden" name="action" value="createnew" />
+</form>
+
+
+<!-- UPLOAD: -->
+
+<form enctype="multipart/form-data" action="files.php" method="post" class="toolbaritem">
+	<?php form_hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); ?>
+	<?php echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) ); ?>
+
+	<div>
+		<input class="ActionButton" name="uploadfile[]" type="file" size="10" />
+		<input class="ActionButton" type="submit" value="<?php echo T_('Upload a file/image'); ?>" />
+	</div>
+</form>
+
+
+<div class="clear"></div>
+
+<fieldset class="iconlegend">
+	<legend><?php echo T_('Icon legend') ?></legend>
+	<ul class="iconlegend">
+		<li><?php echo getIcon( 'folder_home' ).' '.T_('Home dir'); ?></li>
+		<li><?php echo getIcon( 'folder_parent' ).' '.T_('Up one level'); ?></li>
+		<li><?php echo getIcon( 'window_new' ).' '.T_('Open in new window'); ?></li>
+		<!-- Not implemented yet: span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit file'); ?></span -->
+		<li><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></li>
+		<li><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></li>
+		<li><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></li>
+		<li><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></li>
+		<li><?php echo getIcon( 'file_perms' ).' '.T_('Change permissions'); ?></li>
+	</ul>
+</fieldset>
+
+<fieldset>
+<legend><?php echo T_('Information') ?></legend>
+
+<ul>
+	<li><?php echo T_("Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
+	<li><?php echo T_("Clicking on a file's icon lets the browser handle the file."); ?></li>
+</ul>
+</fieldset>
+<?php
+
+
+// ------------------
+// Display options:
+// Let's keep these at the end since they won't be accessed more than occasionaly
+// and only by advanced users
+// ------------------
+param( 'options_show', 'integer', 0 );
+?>
+<form action="files.php#FM_anchor" id="options_form" method="post">
+	<fieldset>
+	<legend><a id="options_toggle" href="<?php
+	echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
+																									'options_show=1' :
+																									'' ) )
+	?>" onclick="return toggle_options();"><?php
+	echo $options_show ?
+				T_('Hide options') :
+				T_('Show options'); ?></a></legend>
+
+	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
+		<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( !$UserSettings->get('fm_dirsnotattop') ) echo ' checked="checked"' ?> />
+		<label for="option_dirsattop"><?php echo T_('Sort directories at top') ?></label>
+		<br />
+		<input type="checkbox" id="option_showhidden" name="option_showhidden" value="1"<?php if( $UserSettings->get('fm_showhidden') ) echo ' checked="checked"' ?> />
+		<label for="option_showhidden"><?php echo T_('Show hidden files') ?></label>
+		<br />
+		<input type="checkbox" id="option_permlikelsl" name="option_permlikelsl" value="1"<?php if( $UserSettings->get('fm_permlikelsl') ) echo ' checked="checked"' ?> />
+		<label for="option_permlikelsl"><?php echo T_('File permissions like &quot;ls -l&quot;') ?></label>
+		<br />
+		<input type="checkbox" id="option_getimagesizes" name="option_getimagesizes" value="1"<?php if( $UserSettings->get('fm_getimagesizes') ) echo ' checked="checked"' ?> />
+		<label for="option_getimagesizes"><?php echo T_('Display the image size of image files') ?></label>
+		<br />
+		<input type="checkbox" id="option_recursivedirsize" name="option_recursivedirsize" value="1"<?php if( $UserSettings->get('fm_recursivedirsize') ) echo ' checked="checked"' ?> />
+		<label for="option_recursivedirsize"><?php echo T_('Recursive size of directories') ?></label>
+		<br />
+		<input type="checkbox" id="option_forceFM" name="option_forceFM" value="1"<?php if( $UserSettings->get('fm_forceFM') ) echo ' checked="checked"' ?> />
+		<label for="option_forceFM"><?php echo T_('Always show the Filemanager (upload mode, ..)') ?></label>
+		<br />
+
+		<?php echo $Fileman->getFormHiddenInputs() ?>
+		<input type="hidden" name="action" value="update_settings" />
+		<input type="hidden" name="options_show" value="1" />
+
+		<div class="input">
+			<input type="submit" value="<?php echo T_('Update !') ?>" />
+		</div>
+	</div>
+	</fieldset>
+
+	<script type="text/javascript">
+	<!--
+		showoptions = <?php echo ($options_show) ? 'true' : 'false' ?>;
+
+		function toggle_options()
+		{
+			if( showoptions )
+			{
+				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('Show options') ?>');
+				var display_list = 'none';
+				showoptions = false;
+			}
+			else
+			{
+				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('Hide options') ?>');
+				var display_list = 'inline';
+				showoptions = true;
+			}
+			document.getElementById('options_list').style.display = display_list;
+			document.getElementById('options_toggle').replaceChild(replace, document.getElementById( 'options_toggle' ).firstChild);
+			return false;
+		}
+	// -->
+	</script>
+</form>
+
+
+
+</div>
+
+<div class="clear"></div>
+
+</div>
+
+<?php
+/*
+ * $Log$
+ * Revision 1.1  2005/01/12 17:55:51  fplanque
+ * extracted browsing interface into separate file to make code more readable
+ *
+ */
+?>
