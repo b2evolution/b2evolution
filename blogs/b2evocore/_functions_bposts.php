@@ -1238,7 +1238,7 @@ function is_new_day()
  */
 function bpost_count_words($string)
 {
-	if( function_exists( str_word_count ) )
+	if( function_exists( 'str_word_count' ) )
 	{
 		return str_word_count(strip_tags($string));
 	}
