@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.6.1\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2004-03-08 18:43+0100\nPO-Revision-Date: 2004-03-08 18:45+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.6.1\nPOT-Creation-Date: 2004-03-08 18:43+0100\nPO-Revision-Date: 2004-03-12 22:42+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -161,7 +161,7 @@ $trans['fr_FR'] = array(
 	'Add the <a %s>b2evo sidebar</a> !' => 'Ajoutez la <a %s>Sidebar b2evo</a> !',
 	'Add this link to your favorites:' => 'Ajoutez ce lien à vos favoris:',
 	'b2evo sidebar' => 'Sidebar b2evo',
-	'Spell Check' => 'Vérification de l\'orthographe',
+	'Spell Check' => 'Vérification orthographique',
 	'Loading Spell Checker. Please wait' => 'Chargement du vérificateur d\'orthographe. Merci de patienter.',
 	'View Stats' => 'Statistiques',
 	'Summary' => 'Résumé',
@@ -329,10 +329,10 @@ $trans['fr_FR'] = array(
 	'(Send a pingback to all URLs in this post)' => '(Envoyer un Pingback aux URLs contenues dans cet article)',
 	'Trackback URLs' => 'URL de Trackback',
 	'(Separate by space)' => '(Séparez par un espace)',
-	'Preview' => 'Prévisualisation',
+	'Preview' => 'Prévisualiser',
 	'Blog this !' => 'Blogguer ceci !',
 	'Edit this !' => 'Enregistrer !',
-	'Spellcheck' => 'Vérifier l\'orthographe',
+	'Spellcheck' => 'Orthographe',
 	'Upload a file/image' => 'Charger un fichier/image',
 	'Status' => 'Statut',
 	'The post will be publicly published' => 'L\'article sera publiquement publié',

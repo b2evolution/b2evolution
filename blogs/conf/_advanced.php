@@ -84,7 +84,7 @@ $use_rss = 1;
 // ** Image upload **
 
 # set this to 0 to disable file upload, or 1 to enable it
-$use_fileupload = 0;
+$use_fileupload = 1;
 # enter the real path of the directory where you'll upload the pictures
 #   if you're unsure about what your real path is, please ask your host's support staff
 #   note that the  directory must be writable by the webserver (ChMod 766)

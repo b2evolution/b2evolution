@@ -135,70 +135,82 @@
 	<?php /* if you delete this the sky will fall on your head */ } ?>
 	
 	
-	<?php if( $disp_comment_form ) {	// We want to display the comments form: ?>
-	<h4><?php echo T_('Leave a comment') ?>:</h4>
-	
-	<?php
-		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
-	?>
-	
-	<!-- form to add a comment -->
-	<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
-	
-		<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
-		<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>" />
+	<?php 
+	if( $disp_comment_form ) 
+	{	// We want to display the comments form: 
+		if( $postdata['comments'] != 'open' )
+		{ ?>
+		<p><em><?php echo  T_('Comments are closed for this post.') ?></em></p>
+		<?php }
+		else
+		{
+		?>
+		<h4><?php echo T_('Leave a comment') ?>:</h4>
 		
-		<fieldset>
-			<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
-			<div class="input"><input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" /></div>
-		</fieldset>
-
+		<?php
+			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+			$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+			$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		?>
 		
-		<fieldset>
-			<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
-			<div class="input"><input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" /><br />
-				<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
-			</div>
-		</fieldset>
+		<!-- form to add a comment -->
+		<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 		
-		<fieldset>
-			<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
-			<div class="input"><input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" /><br />
-				<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
-			</div>
-		</fieldset>
-				
-		<fieldset>
-			<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
-			<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" tabindex="4" class="bComment"></textarea><br />
-				<span class="notes"><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?><br />
-				<?php echo T_('URLs, email, AIM and ICQs will be converted automatically.') ?></span>
-			</div>
-		</fieldset>
-				
-		<fieldset>
-			<div class="label"><?php echo T_('Options') ?>:</div>
-			<div class="input">
+			<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
+			<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>" />
 			
-			<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
-			<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes">(<?php echo T_('Line breaks become &lt;br /&gt;') ?>)</span><br />
-			<?php } ?>
-
-			<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo T_('Remember me') ?></label> <span class="notes"><?php echo T_('(Set cookies for name, email &amp; url)') ?></span>
-			</div>
-		</fieldset>
+			<fieldset>
+				<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
+				<div class="input"><input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" /></div>
+			</fieldset>
 	
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" class="buttonarea" value="<?php echo T_('Send comment') ?>" tabindex="8" />
-			</div>
-		</fieldset>
+			
+			<fieldset>
+				<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
+				<div class="input"><input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" /><br />
+					<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
+				</div>
+			</fieldset>
+			
+			<fieldset>
+				<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
+				<div class="input"><input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" /><br />
+					<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
+				</div>
+			</fieldset>
+					
+			<fieldset>
+				<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
+				<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" tabindex="4" class="bComment"></textarea><br />
+					<span class="notes"><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?><br />
+					<?php echo T_('URLs, email, AIM and ICQs will be converted automatically.') ?></span>
+				</div>
+			</fieldset>
+					
+			<fieldset>
+				<div class="label"><?php echo T_('Options') ?>:</div>
+				<div class="input">
+				
+				<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
+				<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes">(<?php echo T_('Line breaks become &lt;br /&gt;') ?>)</span><br />
+				<?php } ?>
 	
-		<div class="clear"></div>
-	
-	</form>
-	<?php } // end of comment form ?>
+				<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo T_('Remember me') ?></label> <span class="notes"><?php echo T_('(Set cookies for name, email &amp; url)') ?></span>
+				</div>
+			</fieldset>
+		
+			<fieldset>
+				<div class="input">
+					<input type="submit" name="submit" class="buttonarea" value="<?php echo T_('Send comment') ?>" tabindex="8" />
+				</div>
+			</fieldset>
+		
+			<div class="clear"></div>
+		
+		</form>
+	<?php 
+		} 
+	}
+	?>
 
 <?php } // if you delete this the sky will fall on your head ?>

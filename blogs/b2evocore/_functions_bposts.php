@@ -29,7 +29,8 @@ function bpost_create(
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
-	$post_url = '' )
+	$post_url = '',
+	$post_comments = 'open' )
 {
 	global $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
@@ -49,8 +50,8 @@ function bpost_create(
 
 	// TODO: START TRANSACTION
 
-	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount ) ";
-	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content)." )";
+	$query = "INSERT INTO $tableposts( post_author, post_title, post_content, post_date, post_category,  post_status, post_lang, post_trackbacks, post_autobr, post_flags, post_wordcount, post_comments ) ";
+	$query .= "VALUES( $author_user_ID, '".addslashes($post_title)."', '".addslashes($post_content)."',	'$post_timestamp', $main_cat_ID,  '$post_status', '$post_lang', '".addslashes($post_url)."', $autobr, '".implode(',',$post_flags)."', ".bpost_count_words($post_content).", '".addslashes($post_comments)."' )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -95,7 +96,8 @@ function bpost_update(
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
-	$post_url = '' )
+	$post_url = '',
+	$post_comments = 'open' )
 {
 	global $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
@@ -125,7 +127,8 @@ function bpost_update(
 	// $query .= "post_trackbacks = '$post_trackbacks', ";
 	$query .= "post_autobr = $autobr, ";
 	$query .= "post_flags = '".implode(',',$post_flags)."', ";
-	$query .= "post_wordcount = '".bpost_count_words($post_content)."' ";
+	$query .= "post_wordcount = ".bpost_count_words($post_content).", ";
+	$query .= "post_comments = '".addslashes($post_comments)."' ";
 	$query .= "WHERE ID = $post_ID";
 	// echo $query;
 	$querycount++;
@@ -282,7 +285,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
+	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
@@ -307,6 +310,7 @@ function get_postdata($postid)
 			'AutoBR' => $myrow->post_autobr,
 			'Flags' => explode( ',', $myrow->post_flags ),
 			'Wordcount' => $myrow->post_wordcount,
+			'comments' => $myrow->post_comments, 
 			'Blog' => $myrow->cat_blog_ID,
 			);
 

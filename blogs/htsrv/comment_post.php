@@ -16,6 +16,13 @@ $show_statuses = array( 'published', 'protected', 'private' );
 
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
+
+$postdata = get_postdata($comment_post_ID);
+if( $postdata['comments'] != 'open' )
+{
+	errors_add( T_('Sorry but comments are now closed for this post.') );
+}
+
 param( 'author', 'string' );
 param( 'email', 'string' );
 param( 'url', 'string' );
@@ -87,7 +94,6 @@ $result = mysql_query($query) or mysql_oops( $query );
 /*
  * New comment notification:
  */
-$postdata = get_postdata($comment_post_ID);
 $blog = $postdata['Blog'];
 $authordata = get_userdata($postdata['Author_ID']);
 if( get_user_info( 'notify', $authordata ) )

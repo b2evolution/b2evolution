@@ -149,25 +149,7 @@ if ($use_spellchecker)
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
 	if ($autobr) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
 	
-	<?php
-	if( $action != "editcomment")
-	{ // this is for everything but comment editing
-		if( get_bloginfo('allowpingbacks') )
-		{ // --------------------------- PINGBACK --------------------------------------
-	?>
-	<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" <?php
-	if ($post_pingback) echo ' checked="checked"' ?> tabindex="7" /><label for="pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label><br />
-	<?php
-		}
-
-		if( get_bloginfo('allowtrackbacks') )
-		{	// --------------------------- TRACKBACK --------------------------------------
-	?>
-	<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="8" value="<?php echo format_to_edit( $post_trackbacks ); ?>" />
-	<?php 
-		}
-	}
-	
+	<?php	
 	if($use_preview && ($action != 'editcomment') )  
 	{ ?>
 	<input type="button" value="<?php echo T_('Preview') ?>" onClick="open_preview(this.form);" class="search" tabindex="9" />
@@ -186,44 +168,66 @@ if ($use_spellchecker)
 	
 	if ( ($use_fileupload) && ($user_level >= $fileupload_minlevel) && ((ereg(" ".$user_login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)=="")) ) { ?>
 	<input type="button" value="<?php echo T_('Upload a file/image') ?>" onClick="launchupload();" class="search" tabindex="12"  />
-	<?php }
+	<?php } ?>
 	
-	if ($user_level > 4) 
-	{	// ------------------------------------ TIME STAMP -------------------------------------
+	<fieldset>
+		<legend><?php echo T_('Advanced properties') ?></legend>
+
+		<?php
+		if ($user_level > 4) 
+		{	// ------------------------------------ TIME STAMP -------------------------------------
+			?>
+			<div><input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> /><label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
+			<span class="nobr">
+			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
+			<select name="mm" tabindex="15">
+			<?php 
+			for ($i=1; $i < 13; $i=$i+1) 
+			{
+				echo "\t\t\t<option value=\"$i\"";
+				if ($i == $mm)
+				echo ' selected="selected"';
+				if ($i < 10) {
+					$ii = "0".$i;
+				} else {
+					$ii = "$i";
+				}
+				echo ">";
+				if( $mode == 'sidebar' )
+					echo T_($month_abbrev[$ii]);
+				else
+					echo T_($month[$ii]);
+				echo "</option>\n";
+			} 
+			?>
+		</select>
+		<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" />
+		</span>
+		<span class="nobr">@
+		<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" />:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" tabindex="18" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" tabindex="19" />
+		</span></div>
+		<?php
+		}
+
+		if( $action != "editcomment")
+		{ // this is for everything but comment editing
+			if( get_bloginfo('allowpingbacks') )
+			{ // --------------------------- PINGBACK --------------------------------------
 		?>
-		<br />
-		<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> /><label for="timestamp"><?php echo T_('Edit') ?>:</label>
-		<span class="nobr">
-		<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
-		<select name="mm" tabindex="15">
-		<?php 
-		for ($i=1; $i < 13; $i=$i+1) 
-		{
-			echo "\t\t\t<option value=\"$i\"";
-			if ($i == $mm)
-			echo ' selected="selected"';
-			if ($i < 10) {
-				$ii = "0".$i;
-			} else {
-				$ii = "$i";
+		<div><input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" <?php
+		if ($post_pingback) echo ' checked="checked"' ?> tabindex="20" /><label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label></div>	
+		<?php
 			}
-			echo ">";
-			if( $mode == 'sidebar' )
-				echo T_($month_abbrev[$ii]);
-			else
-				echo T_($month[$ii]);
-			echo "</option>\n";
-		} 
+	
+			if( get_bloginfo('allowtrackbacks') )
+			{	// --------------------------- TRACKBACK --------------------------------------
 		?>
-	</select>
-	<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" />
-	</span>
-	<span class="nobr">@
-	<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" />:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" tabindex="18" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" tabindex="19" />
-	</span>
-	<?php
-	}
-	?>
+		<div><label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="21" value="<?php echo format_to_edit( $post_trackbacks ); ?>" /></div>
+		<?php 
+			}
+		}
+		?>
+	</fieldset>
 </div>
 
 <!-- ================================== END OF EDIT FORM =================================== -->
@@ -250,94 +254,106 @@ if( $action != 'editcomment' )
 
 	</fieldset>
 	
-	<fieldset title="Categories" class="extracats">
-	<legend><?php echo T_('Categories') ?></legend>
 
-	<div class="extracats">
-
-	<p class="extracatnote"><?php echo T_('Select main category in target blog and optionnaly check addtionnal categories') ?>:</p>
-
-<?php 
-	// ----------------------------  CATEGORIES ------------------------------
-	$default_main_cat = 0;
-	$tabindex = 22;
-
-	// ----------------- START RECURSIVE CAT LIST ----------------
-	cat_query();	// make sure the caches are loaded
-	function cat_select_before_first( $parent_cat_ID, $level )
-	{	// callback to start sublist
-		echo "\n<ul>\n";
-	}
 	
-	function cat_select_before_each( $cat_ID, $level )
-	{	// callback to display sublist element
-		global $current_blog_ID, $blog, $cat, $postdata, $post_extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
-		$this_cat = get_the_category_by_ID( $cat_ID );
-		echo '<li>';
-		
-		if( $allow_cross_posting )
-		{ // We allow cross posting, display checkbox:
-			echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
-			if (($cat_ID == $postdata["Category"]) or (in_array( $cat_ID, $post_extracats )))
-				echo ' checked="checked"';
-			echo '>';
+	<fieldset title="Categories" class="extracats">
+		<legend><?php echo T_('Categories') ?></legend>
+	
+		<div class="extracats">
+	
+		<p class="extracatnote"><?php echo T_('Select main category in target blog and optionnaly check addtionnal categories') ?>:</p>
+	
+	<?php 
+		// ----------------------------  CATEGORIES ------------------------------
+		$default_main_cat = 0;
+		$tabindex = 22;
+	
+		// ----------------- START RECURSIVE CAT LIST ----------------
+		cat_query();	// make sure the caches are loaded
+		function cat_select_before_first( $parent_cat_ID, $level )
+		{	// callback to start sublist
+			echo "\n<ul>\n";
 		}
 		
-		// Radio for main cat:
-		if( $current_blog_ID == $blog )
-		{
-			if( ($default_main_cat == 0) && ($action == 'post') )
-			{	// Assign default cat for new post
-				$default_main_cat = $cat_ID;
+		function cat_select_before_each( $cat_ID, $level )
+		{	// callback to display sublist element
+			global $current_blog_ID, $blog, $cat, $postdata, $post_extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
+			$this_cat = get_the_category_by_ID( $cat_ID );
+			echo '<li>';
+			
+			if( $allow_cross_posting )
+			{ // We allow cross posting, display checkbox:
+				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
+				if (($cat_ID == $postdata["Category"]) or (in_array( $cat_ID, $post_extracats )))
+					echo ' checked="checked"';
+				echo '>';
 			}
-			echo '<input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'" tabindex="21"';
-			if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
-				echo ' checked="checked"';
-			echo '>';
-		}		
-		echo $this_cat['cat_name'];
-	}
-	function cat_select_after_each( $cat_ID, $level )
-	{	// callback after each sublist element
-		echo "</li>\n";
-	}
-	function cat_select_after_last( $parent_cat_ID, $level )
-	{	// callback to end sublist
-		echo "</ul>\n";
-	}
-
-	if( $allow_cross_posting == 2 )
-	{	// If BLOG cross posting enabled, go through all blogs with cats:
-		foreach( $cache_blogs as $i_blog )
-		{ // run recursively through the cats
-			$current_blog_ID = $i_blog->blog_ID;
-			if( ! blog_has_cats( $current_blog_ID ) ) continue;
-			echo "<h4>".$i_blog->blog_name."</h4>\n";
+			
+			// Radio for main cat:
+			if( $current_blog_ID == $blog )
+			{
+				if( ($default_main_cat == 0) && ($action == 'post') )
+				{	// Assign default cat for new post
+					$default_main_cat = $cat_ID;
+				}
+				echo '<input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'" tabindex="21"';
+				if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
+					echo ' checked="checked"';
+				echo '>';
+			}		
+			echo $this_cat['cat_name'];
+		}
+		function cat_select_after_each( $cat_ID, $level )
+		{	// callback after each sublist element
+			echo "</li>\n";
+		}
+		function cat_select_after_last( $parent_cat_ID, $level )
+		{	// callback to end sublist
+			echo "</ul>\n";
+		}
+	
+		if( $allow_cross_posting == 2 )
+		{	// If BLOG cross posting enabled, go through all blogs with cats:
+			foreach( $cache_blogs as $i_blog )
+			{ // run recursively through the cats
+				$current_blog_ID = $i_blog->blog_ID;
+				if( ! blog_has_cats( $current_blog_ID ) ) continue;
+				echo "<h4>".$i_blog->blog_name."</h4>\n";
+				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
+											'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+			}
+			?>
+			<p class="notes"><?php echo T_('Note: Cross posting among multiple blogs is enabled.') ?></p>
+			<?php
+		}
+		else
+		{	// BLOG Cross posting is disabled. Current blog only:
+			$current_blog_ID = $blog;
 			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+			?>
+			<p class="notes"><?php
+			if( $allow_cross_posting )
+				echo T_('Note: Cross posting among multiple blogs is currently disabled.');
+			else
+				echo T_('Note: Cross posting among multiple categories is currently disabled.');
+			?></p>
+			<?php
 		}
+		// ----------------- END RECURSIVE CAT LIST ----------------
 		?>
-		<p class="notes"><?php echo T_('Note: Cross posting among multiple blogs is enabled.') ?></p>
-		<?php
-	}
-	else
-	{	// BLOG Cross posting is disabled. Current blog only:
-		$current_blog_ID = $blog;
-		cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
-									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-		?>
-		<p class="notes"><?php
-		if( $allow_cross_posting )
-			echo T_('Note: Cross posting among multiple blogs is currently disabled.');
-		else
-			echo T_('Note: Cross posting among multiple categories is currently disabled.');
-		?></p>
-		<?php
-	}
-	// ----------------- END RECURSIVE CAT LIST ----------------
-	?>
-	</div>
+		</div>
 	</fieldset>
+
+	<fieldset title="Status">
+		<legend><?php echo T_('Comments') ?></legend>
+
+		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Open') ?></label><br />
+
+		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Closed') ?></label><br />
+
+	</fieldset>
+
 	</div>
 <?php
 }

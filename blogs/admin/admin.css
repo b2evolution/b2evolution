@@ -616,7 +616,8 @@ span.bCalendarToday {
 }
 
 .bSideItem fieldset,
-.bSideItem2 fieldset {
+.bSideItem2 fieldset,
+.bPost fieldset {
 	border: 1px solid #ddd;
 	margin: 0ex 0ex 1ex;
 	padding: 1ex;
@@ -628,11 +629,12 @@ span.bCalendarToday {
 fieldset.extracats {
 	border: 1px solid #ccc;
 	padding: 0ex;
+	margin: 0ex;
 	overflow: visible;
 }
 div.extracats {
 	/* border: 1px solid #f00; */
-	height: 50ex;
+	height: 48ex;
 	overflow: auto;
 	padding: 0ex 1ex;
 	margin: 0ex;

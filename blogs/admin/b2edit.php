@@ -19,8 +19,6 @@ $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecate
 
 switch($action) 
 {
-
-
 case "edit":
 	/*
 	 * --------------------------------------------------------------------
@@ -34,7 +32,9 @@ case "edit":
 
 	$title = T_('Editing post');
 	require (dirname(__FILE__).'/_menutop.php');
-  echo "#".$postdata["ID"]." in blog: ".$blogname;
+
+  printf( T_('#%d in blog: %s'), $postdata['ID'], get_bloginfo( 'name' ) );
+	
 	require (dirname(__FILE__).'/_menutop_end.php');
 
 	if ($user_level > 0) 
@@ -50,6 +50,7 @@ case "edit":
 		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_status = $postdata['Status'];
+		$post_comments = $postdata['comments'];
 		$post_extracats = postcats_get_byID( $post );
 		$edit_date = 0;
 		$aa = mysql2date('Y', $postdata['Date']);
@@ -168,6 +169,7 @@ default:
 		param( 'post_url', 'string', $popupurl );
 		$post_url = format_to_edit( $post_url, false );
 		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
+		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_lang', 'string', $default_language );
 
