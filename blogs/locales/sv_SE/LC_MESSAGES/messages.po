@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-03 02:29+0200\n"
+"POT-Creation-Date: 2004-04-03 03:10+0200\n"
 "PO-Revision-Date: 2004-03-06 03:15+0100\n"
 "Last-Translator: Christina Svensson <b2evo04@cs.se>\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr "mina bloggar:"
 msgid "Multilingual multiuser multiblog engine!"
 msgstr ""
 
-#: ..\..\..\index.php:15
+#: ..\..\..\index.php:15 ..\..\..\index.php:32
 #, fuzzy
 msgid "My blogs"
 msgstr "Mina bloggar:"
@@ -77,7 +77,7 @@ msgstr ""
 msgid "More demos"
 msgstr ""
 
-#: ..\..\..\index.php:71
+#: ..\..\..\index.php:71 ..\..\..\index.php:72
 #, fuzzy
 msgid "Custom template"
 msgstr "Anpassningsbar sidmall"

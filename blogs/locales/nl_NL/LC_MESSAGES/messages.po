@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-03 02:29+0200\n"
+"POT-Creation-Date: 2004-04-03 03:10+0200\n"
 "PO-Revision-Date: 2004-03-22 15:08+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr "mijn weblogs"
 msgid "Multilingual multiuser multiblog engine!"
 msgstr ""
 
-#: ..\..\..\index.php:15
+#: ..\..\..\index.php:15 ..\..\..\index.php:32
 msgid "My blogs"
 msgstr "Mijn weblogs"
 
@@ -87,7 +87,7 @@ msgstr ""
 msgid "More demos"
 msgstr "Meer demos"
 
-#: ..\..\..\index.php:71
+#: ..\..\..\index.php:71 ..\..\..\index.php:72
 msgid "Custom template"
 msgstr "Aangepast skin sjabloon"
 

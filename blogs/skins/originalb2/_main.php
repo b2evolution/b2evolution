@@ -16,8 +16,11 @@
 	@import url(layout2b.css);
 	</style>
 	<link rel="stylesheet" type="text/css" media="print" href="print.css" />
-	<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url'); ?>" />
-	<link rel="alternate" type="text/xml" title="RSS" href="<?php bloginfo('rss2_url'); ?>" />
+	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+	<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
+	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php bloginfo('atom_url', 'raw'); ?>" />
 	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
 	<?php comments_popup_script() // Included javascript to open pop up windows ?>
 </head>

@@ -67,8 +67,11 @@
 <base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! ?>" />
 <meta name="description" content="<?php bloginfo('shortdesc', 'htmlattr'); ?>" />
 <meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
+<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
 <link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
-<link rel="alternate" type="text/xml" title="RSS" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php bloginfo('atom_url', 'raw'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url', 'raw'); ?>" />
 <link href="skins/fplanque2002/blog.css" rel="stylesheet" type="text/css" />
  <!-- InstanceEndEditable --> 
@@ -313,6 +316,7 @@ the_date( '', '<h2>', '</h2>' );
         <li><a href="<?php bloginfo('rss_url', 'raw'); ?>">RSS 0.92 (Userland)</a></li>
         <li><a href="<?php bloginfo('rdf_url', 'raw'); ?>">RSS 1.0 (RDF)</a></li>
         <li><a href="<?php bloginfo('rss2_url', 'raw'); ?>">RSS 2.0 (Userland)</a></li>
+				<li><a href="<?php bloginfo('atom_url', 'raw'); ?>">Atom 0.3</a></li>
       </ul>
       <a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
 
@@ -338,6 +342,7 @@ the_date( '', '<h2>', '</h2>' );
 	
 	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('rss2_url', 'raw'); ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
+	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('atom_url', 'raw'); ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php // $blog=1;  fplanque: removed
 	log_hit();	// log the hit on this page

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-03 02:29+0200\n"
+"POT-Creation-Date: 2004-04-03 03:10+0200\n"
 "PO-Revision-Date: 2003-09-12 00:51+0100\n"
 "Last-Translator: Héctor Delcourt <flikarmonth_NOQUIEROSPAM_@iespana.es>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgid "Multilingual multiuser multiblog engine!"
 msgstr ""
 
 # C:\www\b2evolution\blogs\index.php:32
-#: ..\..\..\index.php:15
+#: ..\..\..\index.php:15 ..\..\..\index.php:32
 msgid "My blogs"
 msgstr "Mis bit&aacute;coras"
 
@@ -76,7 +76,7 @@ msgstr ""
 msgid "More demos"
 msgstr "M&aacute;s demostraciones"
 
-#: ..\..\..\index.php:71
+#: ..\..\..\index.php:71 ..\..\..\index.php:72
 msgid "Custom template"
 msgstr "Plantilla personalizada"
 

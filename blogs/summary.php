@@ -115,6 +115,7 @@
 	
 	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('rss2_url', 'raw'); ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
+	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('atom_url', 'raw'); ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php 
 	if ($debug==1)

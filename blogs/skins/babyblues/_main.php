@@ -8,7 +8,8 @@
 	 * /blogs/index.php or /blogs/blog_b.php
 	 */
 ?>
-<html>
+<html lang="<?php locale_lang() ?>">
+<head>
 <head>
 <title>Baby Blues</title>
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />

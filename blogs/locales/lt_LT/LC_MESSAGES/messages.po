@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MG blog\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-03 02:29+0200\n"
+"POT-Creation-Date: 2004-04-03 03:10+0200\n"
 "PO-Revision-Date: 2004-03-09 13:22+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
@@ -27,7 +27,7 @@ msgstr "mano blogai"
 msgid "Multilingual multiuser multiblog engine!"
 msgstr ""
 
-#: ..\..\..\index.php:15
+#: ..\..\..\index.php:15 ..\..\..\index.php:32
 msgid "My blogs"
 msgstr "Mano blogai"
 
@@ -75,7 +75,7 @@ msgstr "Atsiminkite: Aukðèiau esantis sàraðas (kaip ir meniu) yra generuojamas a
 msgid "More demos"
 msgstr "Daugiau demonstracijø"
 
-#: ..\..\..\index.php:71
+#: ..\..\..\index.php:71 ..\..\..\index.php:72
 msgid "Custom template"
 msgstr "Specialus ðablonas"
 

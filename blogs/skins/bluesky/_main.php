@@ -24,8 +24,11 @@
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<meta name="description" content="<?php bloginfo('shortdesc', 'htmlattr'); ?>" />
 	<meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
-	<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url'); ?>" />
-	<link rel="alternate" type="text/xml" title="RSS" href="<?php bloginfo('rss2_url'); ?>" />
+	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+	<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
+	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
+	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php bloginfo('atom_url', 'raw'); ?>" />
 	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
 	<link title="Ciel bleu" media="screen" href="cielbleu.css" type="text/css" rel="stylesheet" />
 </head>
@@ -210,9 +213,10 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 		user_profile_link( '<li>', '</li>' ); 
 		user_logout_link( '<li>', '</li>' ); 
 	?>
-  <li><a href="<?php bloginfo('rss_url'); ?>">RSS 0.92 (Userland)</a></li>
-	<li><a href="<?php bloginfo('rdf_url'); ?>">RSS 1.0 (RDF)</a></li>
-	<li><a href="<?php bloginfo('rss2_url'); ?>">RSS 2.0 (Userland)</a></li>
+  <li><a href="<?php bloginfo('rss_url', 'raw'); ?>">RSS 0.92 (Userland)</a></li>
+	<li><a href="<?php bloginfo('rdf_url', 'raw'); ?>">RSS 1.0 (RDF)</a></li>
+	<li><a href="<?php bloginfo('rss2_url', 'raw'); ?>">RSS 2.0 (Userland)</a></li>
+	<li><a href="<?php bloginfo('atom_url', 'raw'); ?>">Atom 0.3</a></li>
   <li><a href="http://validator.w3.org/check/referer">XHTML valide</a> 
 </li>
 </ul>

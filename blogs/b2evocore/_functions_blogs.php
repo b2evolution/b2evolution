@@ -315,6 +315,10 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			$output = $xmlsrv_url.'/rss2.php?blog='.$this_blogparams->blog_ID;
 			break;
 			
+		case 'atom_url':
+			$output = $xmlsrv_url.'/atom.php?blog='.$this_blogparams->blog_ID;
+			break;
+			
 		case 'pingback_url':
 			$output = $xmlsrv_url.'/xmlrpc.php';
 			break;
