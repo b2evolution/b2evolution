@@ -204,7 +204,7 @@ class DB
 
 	// ==================================================================
 	//	Get one variable from the DB - see docs for more detail
-	function get_var($query=NULL,$x=0,$y=0)
+	function get_var( $query=NULL, $x=0, $y=0 )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_var(\"$query\",$x,$y)";
@@ -222,7 +222,7 @@ class DB
 		}
 
 		// If there is a value return it else return NULL
-		return (isset($values[$x]) && $values[$x]!=='')?$values[$x]:NULL;
+		return (isset($values[$x]) && $values[$x]!=='') ? $values[$x] : NULL;
 	}
 
 	// ==================================================================

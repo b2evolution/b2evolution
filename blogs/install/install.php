@@ -129,14 +129,11 @@ $new_db_version = 8060;				// next time: 8070
  */
 function check_db_version()
 {
-	global $old_db_version, $new_db_version, $tablesettings;
+	global $DB, $old_db_version, $new_db_version, $tablesettings;
 
 	echo '<p>Checking DB schema version... ';
-	$query = "SELECT db_version FROM $tablesettings WHERE ID = 1";
-	$q = mysql_query($query) or mysql_oops( $query );
-	$row = mysql_fetch_assoc($q);
-	if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
-	$old_db_version = $row['db_version'];
+	$old_db_version = $DB->get_var( "SELECT db_version FROM $tablesettings" );
+	if( $old_db_version == NULL ) die( 'NOT FOUND! This is not a b2evolution database.' );
 	echo $old_db_version, ' : ';
 	if( $old_db_version < 8000 ) die( 'This version is too old!' );
 	if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );

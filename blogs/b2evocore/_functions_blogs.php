@@ -66,12 +66,10 @@ function blog_create(
 	$blog_allowtrackbacks, $blog_allowpingbacks,
 	$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
 	$blog_disp_bloglist )	";
-	$querycount++;
-	$result = mysql_query($query);
+	if( ! ($DB->query( $query )) )
+		return 0;
 
-	if( !$result ) return 0;
-
-	return mysql_insert_id();  // blog ID
+	return $DB->insert_id;  // blog ID
 }
 
 
@@ -132,11 +130,7 @@ function blog_update(
 	$query .= " blog_disp_bloglist = $blog_disp_bloglist ";
 	$query .= "WHERE blog_ID= $blog_ID";
 	// echo $query;
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-
-	return 1;	// success
+	return $DB->query( $query );
 }
 
 
@@ -150,24 +144,18 @@ function blog_update(
  */
 function blog_update_user_perms( $blog )
 {
-	global $tableblogusers, $tableusers, $querycount;
+	global $DB, $tableblogusers, $tableusers;
 
 	// Delete old perms for thos blog:
-	$query = "DELETE FROM $tableblogusers
-						WHERE bloguser_blog_ID = $blog";
-	// echo $query, '<br />';
-	$res_delete = mysql_query($query) or mysql_oops( $query );
-	$querycount++;
+	$DB->query( "DELETE FROM $tableblogusers
+								WHERE bloguser_blog_ID = $blog" );
 
 	// Now we need a full user list:
-	$query = "SELECT ID FROM $tableusers";
-	$result = mysql_query($query) or mysql_oops( $query );
-	$querycount++;
+	$user_IDs = $DB->get_col( "SELECT ID FROM $tableusers" );
 
 	$inserted_values = array();
-	while($loop_row = mysql_fetch_array($result) )
+	if( count( $user_IDs ) ) foreach( $user_IDs as $loop_user_ID )
 	{	// Check new permissions for each user:
-		$loop_user_ID = $loop_row['ID'];
 		// echo "getting perms for user : $loop_user_ID <br />";
 
 		$perm_post = array();
@@ -206,13 +194,10 @@ function blog_update_user_perms( $blog )
 	// Proceed insertions:
 	if( count( $inserted_values ) )
 	{
-		$query_insert = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 											bloguser_perm_cats, bloguser_perm_properties )
-										 VALUES ".implode( ',', $inserted_values );
-		// echo $query_insert, '<br />';
-		$res_update = mysql_query($query_insert) or mysql_oops( $query_insert );
-		$querycount++;
+									VALUES ".implode( ',', $inserted_values ) );
 	}
 }
 
@@ -398,14 +383,13 @@ function Blog_get_by_ID( $blog_ID )
  */
 function blog_load_cache()
 {
-	global $tableblogs, $cache_blogs, $use_cache, $querycount;
+	global $DB, $tableblogs, $cache_blogs, $use_cache;
 	if( empty($cache_blogs) || !$use_cache )
 	{
 		$cache_blogs = array();
 		$query = "SELECT * FROM $tableblogs ORDER BY blog_ID";
-		$result = mysql_query($query) or mysql_oops( $query );
-		$querycount++;
-		while( $this_blog = mysql_fetch_object($result) )
+		$result = $DB->get_results( $query );
+		if( count( $result ) ) foreach( $result as $this_blog )
 		{
 			$cache_blogs[$this_blog->blog_ID] = $this_blog;
 			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
