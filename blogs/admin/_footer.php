@@ -39,6 +39,12 @@ if( $admin_tab == 'files' || ($admin_tab == 'blogs' && $tab == 'perm') )
 ?>
 <script type="text/javascript">
 	initcheckall();
+	<?php
+	if( $admin_tab == 'files' )
+	{
+	?> setcheckallspan(0<?php if( isset($checkall) ) echo ', '.(int)$checkall; ?>); <?php
+	}
+	?>
 </script>
 <?php
 }

@@ -27,7 +27,7 @@ class File
 	function File( $name, $path = NULL )
 	{
 		$this->name = $name;
-		$this->path = $path === NULL ? trailing_slash( getcwd() ) : trailing_slash( $path );
+		$this->path = trailing_slash( $path === NULL ? getcwd() : $path );
 
 		if( is_dir( $path.$name ) )
 		{
@@ -119,7 +119,7 @@ class File
 	}
 
 
-	function get_perms( $type = 'raw' )
+	function get_perms( $type = 'octal' )
 	{
 		switch( $type )
 		{
@@ -184,6 +184,49 @@ class File
 		else
 		{
 			return bytesreadable( $this->size );
+		}
+	}
+
+
+	/**
+	 * Rename the file
+	 *
+	 * @param string new name (without path!)
+	 * @return boolean true on success, false on failure
+	 */
+	function rename( $newname )
+	{
+		if( rename( $this->get_path( true ), $this->get_path().$newname ) )
+		{
+			$this->name = $newname;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	/**
+	 * Change permissions of the file
+	 *
+	 * @param string chmod (octal format, eg '777')
+	 * @return mixed new permissions on success (octal format), false on failure
+	 */
+	function chmod( $chmod )
+	{
+		$chmod = '0'.$chmod;
+		if( chmod( $this->get_path(true), $chmod) )
+		{
+			clearstatcache();
+			// update current entry
+			$this->set_perms( fileperms( $this->get_path(true) ) );
+			return $this->get_perms();
+		}
+		else
+		{
+			return false;
 		}
 	}
 }

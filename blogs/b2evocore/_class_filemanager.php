@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/_class_filelist.php';
  */
 class FileManager extends Filelist
 {
+	// {{{ class variables
 	/**
 	 * root ('user', 'user_X' or 'blog_X' - X is id)
 	 * @param string
@@ -73,7 +74,6 @@ class FileManager extends Filelist
 
 
 	/* ----- PRIVATE ----- */
-
 	/**
 	 * order files by what? (name/type/size/lastm/perms)
 	 * 'name' as default.
@@ -96,6 +96,8 @@ class FileManager extends Filelist
 	 * @access protected
 	 */
 	var $path = '';
+
+	// }}}
 
 
 	/**
@@ -427,6 +429,31 @@ class FileManager extends Filelist
 		{
 			$File = $this->cur_File;
 		}
+		elseif( is_string( $File ) )
+		{{{ // special names
+			switch( $File )
+			{
+				case 'parent':
+					return T_('go to parent directory');
+				case 'home':
+					return T_('home directory');
+				case 'descending':
+					return T_('descending');
+				case 'ascending':
+					return T_('ascending');
+				case 'edit':
+					return T_('Edit');
+				case 'copymove':
+					return T_('Copy/Move');
+				case 'rename':
+					return T_('Rename');
+				case 'delete':
+					return T_('Delete');
+				case 'window_new':
+					return T_('Open in new window');
+			}
+			return false;
+		}}}
 
 		if( $File->get_type() == 'dir' )
 		{
@@ -504,12 +531,20 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * get link to delete current file
+	 * @return string the URL
+	 */
 	function get_link_curfile_rename()
 	{
 		return $this->get_link_curfile('forcefile').'&amp;action=rename';
 	}
 
 
+	/**
+	 * get link to delete current file
+	 * @return string the URL
+	 */
 	function get_link_curfile_delete()
 	{
 		return $this->get_link_curfile('forcefile').'&amp;action=delete';
@@ -518,10 +553,14 @@ class FileManager extends Filelist
 
 	/**
 	 * get the link to the parent folder
+	 * @return mixed URL or false if
 	 */
 	function get_link_parent()
 	{
-		// TODO: check if allowed
+		if( empty($this->path) )
+		{ // cannot go higher
+			return false;
+		}
 		return $this->curl( NULL, $this->path.'..' );
 	}
 
@@ -531,7 +570,7 @@ class FileManager extends Filelist
 	 */
 	function get_link_home()
 	{
-		return $this->curl( NULL, false );
+		return $this->curl( 'user', false );
 	}
 
 
@@ -542,7 +581,7 @@ class FileManager extends Filelist
 	 * @param string optional parameter
 	 * @param string gets through sprintf where %s gets replaced with the result
 	 */
-	function cget( $what, $param = '', $displayiftrue = '' )
+	function depr_cget( $what, $param = '', $displayiftrue = '' )
 	{
 		echo '<p class="error">bad cget: ['.$what.']</p>';
 		return;
@@ -578,60 +617,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * wrapper for cget() to display right away
-	 * @param string property of loop file
-	 * @param mixed optional parameter
-	 */
-	function cdisp( $what, $param = '', $displayiftrue = '' )
-	{
-		if( ( $r = $this->cget( $what, $param, $displayiftrue ) ) !== false )
-		{
-			echo $r;
-			return true;
-		}
-		return $r;
-	}
-
-
-	/**
-	 * wrapper for cget_file() to display right away
-	 * @param string the file
-	 * @param string property of loop file
-	 * @param mixed optional parameter
-	 */
-	function cdisp_file( $file, $what, $param = '', $displayiftrue = '' )
-	{
-		if( ( $r = $this->cget_file( $file, $what, $param, $displayiftrue ) ) !== false )
-		{
-			echo $r;
-		}
-		return $r;
-	}
-
-
-	/**
-	 * is the current file a directory?
-	 *
-	 * @param string force a specific file
-	 * @return boolean true if yes, false if not
-	 */
-	function cisdir( $file = '' )
-	{
-		if( $file != '' )
-		{
-			if( $this->loadc( $file ) )
-			{
-				$isdir = ($this->current_entry['type'] == 'dir');
-				$this->restorec();
-				return $isdir;
-			}
-			else return false;
-		}
-		return ($this->current_entry['type'] == 'dir');
-	}
-
-
-	/**
 	 * get properties of a special icon
 	 *
 	 * @param string icon for what (special puposes or 'cfile' for current file/dir)
@@ -643,9 +628,13 @@ class FileManager extends Filelist
 		if( $for == 'cfile' )
 		{
 			if( !$this->cur_File )
+			{
 				$iconfile = false;
+			}
 			elseif( $this->cur_File->get_type() == 'dir' )
+			{
 				$iconfile = $this->fileicons_special['folder'];
+			}
 			else
 			{
 				$iconfile = $this->fileicons_special['unknown'];
@@ -668,8 +657,8 @@ class FileManager extends Filelist
 
 		if( !$iconfile || !file_exists( $this->imgpath.$iconfile ) )
 		{
-			#return false;
-			return '<p class="error">[no image for '.$for.'!]</p>';
+			#return '<div class="error">[no image for '.$for.'!]</div>';
+			return false;
 		}
 
 		switch( $what )
@@ -695,7 +684,7 @@ class FileManager extends Filelist
 					$r .= $this->cur_File->get_ext();
 				}
 
-				$r .= '" title="'.$this->type( $for );
+				$r .= '" title="'.$this->get_File_type( $for );
 
 				$r .= '" />';
 				break;
@@ -704,32 +693,6 @@ class FileManager extends Filelist
 			default:
 				echo 'unknown what: '.$what;
 		}
-
-		return $r;
-	}
-
-
-	function type( $param )
-	{
-		if( $param == 'parent' )
-			$r = T_('go to parent directory');
-		elseif( $param == 'home' )
-			$r = T_('home directory');
-		elseif( $param == 'descending' )
-			$r = T_('descending');
-		elseif( $param == 'ascending' )
-			$r = T_('ascending');
-		elseif( $param == 'edit' )
-			$r = T_('Edit');
-		elseif( $param == 'copymove' )
-			$r = T_('Copy/Move');
-		elseif( $param == 'rename' )
-			$r = T_('Rename');
-		elseif( $param == 'delete' )
-			$r = T_('Delete');
-		elseif( $param == 'window_new' )
-			$r = T_('Open in new window');
-		else $r = false;
 
 		return $r;
 	}
@@ -749,33 +712,6 @@ class FileManager extends Filelist
 			$path = $this->cget( 'path' );
 			switch( $what )
 			{
-				case 'chmod':
-					if( !file_exists($path) )
-					{
-						$this->Messages->add( sprintf(T_('File [%s] does not exists.'), $filename) );
-					}
-					else
-					{
-						$oldperm = $this->cget( 'perms' );
-						if( chmod( $path, decoct($param) ) )
-						{
-							clearstatcache();
-							// update current entry
-							$this->entries[ $this->current_file_idx ]['perms'] = fileperms( $path );
-							$this->current_entry['perms'] = fileperms( $path );
-							$r = true;
-						}
-						if( $oldperm != $this->cget( 'perms' ) )
-						{
-							$this->Messages->add( sprintf( T_('Changed permissions for [%s] to %s.'), $filename, $this->cget( 'perms' ) ), 'note' );
-						}
-						else
-						{
-							$this->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $filename ) );
-						}
-					}
-					break;
-
 				case 'send':
 					if( is_dir($path) )
 					{ // we cannot send directories!
@@ -895,6 +831,11 @@ class FileManager extends Filelist
 	function create_rootdir( $path, $suggested_name, $chmod = NULL )
 	{
 		global $Debuglog;
+
+		if( $chmod === NULL )
+		{
+			$chmod = $this->default_chmod_dir;
+		}
 
 		$realname = safefilename( $suggested_name );
 		if( $realname != $suggested_name )
@@ -1026,11 +967,13 @@ class FileManager extends Filelist
 		{
 			return ' -- '.T_('No directory.').' -- ';
 		}
-		$r = $this->root_dir; // not clickable
+		// not clickable
+		$r = substr( $this->root_dir, 0, strrpos( substr($this->root_dir, 0, -1), '/' )+1 );
 
 		// get the part that is clickable
-		$clickabledirs = explode( '/', substr( $this->cwd, strlen( $this->root_dir ) ) );
+		$clickabledirs = explode( '/', substr( $this->cwd, strlen($r) ) );
 
+		$r .= '<a href="'.$this->curl( NULL, false ).'">'.array_shift( $clickabledirs ).'</a>';
 		$cd = '';
 		foreach( $clickabledirs as $nr => $dir )
 		{

@@ -292,9 +292,9 @@ class Filelist
 	 * go to next entry
 	 *
 	 * @param string can be used to query only 'file's or 'dir's.
-	 * @return boolean File object on success, false on end of list
+	 * @return boolean File object (by reference) on success, false on end of list
 	 */
-	function get_File_next( $type = '' )
+	function &get_File_next( $type = '' )
 	{
 		$this->current_file_idx++;
 		if( !count($this->entries) || $this->current_file_idx >= count( $this->entries ) )
@@ -326,9 +326,9 @@ class Filelist
 	 * (for restoring see {@link Fileman::restorec()})
 	 *
 	 * @param string the filename (in cwd)
-	 * @return mixed File object on success, false on failure.
+	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function get_File_by_filename( $filename )
+	function &get_File_by_filename( $filename )
 	{
 		$this->save_idx[] = $this->current_file_idx;
 
@@ -405,6 +405,32 @@ class Filelist
 			if( $File->get_name() == $find )
 			{
 				return $key;
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * Unlinks (deletes) a file
+	 *
+	 * @param File file object
+	 * @return boolean true on success, false on failure
+	 */
+	function unlink( $File )
+	{
+		foreach( $this->entries as $lkey => $lentry )
+		{
+			if( $lentry == $File )
+			{
+				$unlinked = @unlink( $lentry->get_path(true) );
+				if( !$unlinked )
+				{
+					return false;
+				}
+
+				unset( $this->entries[$lkey] );
+				return true;
 			}
 		}
 		return false;

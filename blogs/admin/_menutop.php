@@ -45,7 +45,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					 * Toggles all checkboxes of the wide layout
 					 *
 					 * @param form the form
-					 * @param integer the user id
+					 * @param integer the checkbox group id
 					 * @param integer force set/unset
 					 */
 					function toggleall_wide( the_form, id, set )

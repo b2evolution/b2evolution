@@ -53,16 +53,19 @@ if( $action == 'update_settings' )
 // instanciate Filemanager object
 $Fileman = new FileManager( $current_User, 'files.php', $root, $path, $filter, $filter_regexp, $order, $asc );
 
-
-if( $action == '' && $file != '' )
-{ // a file is selected/clicked, default action
-	$curFile = $Fileman->get_File_by_filename( $file );
+if( !empty($file) )
+{ // a file is given as parameter
+	$curFile =& $Fileman->get_File_by_filename( $file );
 
 	if( !$curFile )
 	{
 		$Fileman->Messages->add( sprintf( T_('File [%s] could not be accessed!'), $file ) );
 	}
-	else
+}
+
+
+if( $action == '' && $file != '' && $curFile )
+{ // a file is selected/clicked, default action
 	{{{ // do the default action
 
 		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -196,9 +199,8 @@ if( $action == '' && $file != '' )
 }
 
 
-// Actions for selected files
 if( $selaction != '' )
-{
+{{{ // Actions for selected files
 	param( 'selectedfiles', 'array', array() );
 
 	if( !count( $selectedfiles ) )
@@ -301,11 +303,11 @@ if( $selaction != '' )
 				break;
 		}
 	}
-}
+}}}
 
 
-switch( $action ) // (we catched empty action before)
-{ // {{{
+switch( $action ) // {{{ (we catched empty action before)
+{
 	case 'createnew':  // create new file/dir
 		param( 'createnew', 'string', '' );
 		param( 'createname', 'string', '' );
@@ -330,40 +332,129 @@ switch( $action ) // (we catched empty action before)
 		break;
 
 	case 'delete':
-		param( 'file', 'string', '' );
-
-		$Fileman->Messages->add( 'Would delete '.$file.' and reload..', 'note' );
-		/*if( $Fileman->delete( $file ) )
+		// TODO: checkperm!
+		$filename = $curFile->get_name();
+		if( !$Fileman->unlink( $curFile ) )
 		{
-			$Fileman->reloadpage();
-		}*/
-
+			$Fileman->Messages->add( sprintf( T_('Could not delete [%s].'), $filename ) );
+		}
+		else
+		{
+			$Fileman->Messages->add( sprintf( T_('Deleted file [%s].'), $filename ), 'note' );
+		}
 		break;
 
 	case 'rename':
-		param( 'file', 'string', '' );
+		if( !$curFile )
+		{
+			break;
+		}
+		param( 'newname', 'string', '' );
+		param( 'overwrite', 'integer', 0 );
+		$dontrename = false;
 
-		echo 'todo: Rename dialog..';
+		if( !empty($newname) )
+		{ // rename the file
+			if( !is_filename($newname) )
+			{
+				$Fileman->Messages->add( sprintf( T_('[%s] is not a valid filename.'), $newname ) );
+				$dontrename = true;
+			}
+			elseif( file_exists( $curFile->get_path().$newname ) )
+			{ // target filename already given to another file
+				if( !$overwrite )
+				{
+					$Fileman->Messages->add( sprintf( T_('The file [%s] already exists.'), $newname ).'
+					<form action="">
+					'.$Fileman->form_hiddeninputs().'
+					<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
+					<input type="hidden" name="newname" value="'.format_to_output( $newname, 'formvalue' ).'" />
+					<input type="hidden" name="overwrite" value="1" />
+					<input type="hidden" name="action" value="rename" />
+					<input type="submit" value="'.format_to_output( T_('Overwrite existing file!'), 'formvalue' ).'" />
+					</form>
+					' );
+					$dontrename = true;
+				}
+				else
+				{ // unlink existing file
+					if( !$curFile->unlink() )
+					{
+						$Fileman->Messages->add( sprintf( T_('Could not delete [%s].'), $newname ) );
+						$dontrename = true;
+					}
+					else
+					{
+						$Fileman->Messages->add( sprintf( T_('Deleted file [%s].'), $newname ), 'note' );
+					}
+				}
+			}
+
+			if( !$dontrename )
+			{
+				if( $curFile->rename( $newname ) )
+				{
+					$Fileman->Messages->add( sprintf( T_('Renamed [%s] to [%s].'), $file, $newname ), 'note' );
+					break;
+				}
+				else
+				{
+					$Fileman->Messages->add( sprintf( T_('Could not rename [%s] to [%s].'), $file, $newname ) );
+				}
+			}
+		}
+
+		if( !isset($msg_action) )
+		{
+			$msg_action = '';
+		}
+		$msg_action .= '
+		<form action="">
+		'.$Fileman->form_hiddeninputs().'
+		<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
+		<input type="hidden" name="action" value="rename" />
+		<label for="form_newname">'.sprintf( T_('New name for [%s]:'), $file ).'</label>
+		<input type="text" id="form_newname" name="newname" value="'.format_to_output( $newname, 'formvalue' ).'" maxlength="255" size="30" />
+		<input type="submit" value="'.format_to_output( T_('Rename it'), 'formvalue' ).'" />
+		</form>';
+
 		break;
 
 	case 'editperm':
-		param( 'file', 'string', '' );
+		if( !$curFile )
+		{
+			break;
+		}
 		param( 'chmod', 'string', '' );
 
-		if( empty($chmod) )
+		if( !empty($chmod) )
+		{
+			$oldperms = $curFile->get_perms();
+			$newperms = $curFile->chmod( $chmod );
+			if( $newperms === false )
+			{
+				$Fileman->Messages->add( sprintf( T_('Failed to set permissions on [%s] to [%s].'), $curFile->get_name(), $chmod ) );
+			}
+			elseif( $newperms === $oldperms )
+			{
+				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $curFile->get_name() ), 'note' );
+			}
+			else
+			{
+				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $curFile->get_name(), $curFile->get_perms() ), 'note' );
+			}
+			#pre_dump( $Fileman->cdo_file( $file, 'chmod', $chmod ), 'chmod!');
+		}
+		else
 		{
 			$msg_action = '
 			<form action="files.php">
 			'.$Fileman->form_hiddeninputs().'
 			<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
-			<input type="text" name="chmod" value="'.$Fileman->cget_file( $file, 'perms', 'octal' ).'" maxlength="3" size="3" />
-			<input type="submit" name="action" value="editperm" />
+			<input type="hidden" name="action" value="editperm" />
+			<input type="text" name="chmod" value="'.$curFile->get_perms( 'octal' ).'" maxlength="3" size="3" />
+			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
 			</form>';
-		}
-		else
-		{
-			$oldperm = $Fileman->cget_file( $file, 'perms' );
-			pre_dump( $Fileman->cdo_file( $file, 'chmod', $chmod ), 'chmod!');
 		}
 
 		break;
@@ -429,7 +520,8 @@ switch( $action ) // (we catched empty action before)
 		}
 
 		break;
-} // }}}
+	// }}}
+}
 
 
 // the top menu and header
@@ -471,6 +563,9 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 <div class="toolbar">
 	<?php
 	$rootlist = $Fileman->get_roots();
+
+	// link to user home
+	echo '<a class="toolbaritem" href="'.$Fileman->get_link_home().'">'.$Fileman->get_icon( 'home', 'imgtag' ).'</a>';
 
 	if( count($rootlist) > 1 )
 	{ // provide list of roots
@@ -533,10 +628,10 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 <table class="grouped">
 <thead>
 <tr>
-	<th colspan="2" class="nobr">
-		<a href="<?php echo $Fileman->get_link_home() ?>"><?php echo $Fileman->get_icon( 'home', 'imgtag' ) ?></a>
-		&nbsp;
-		<a href="<?php echo $Fileman->get_link_parent() ?>"><?php echo $Fileman->get_icon( 'parent', 'imgtag' ) ?></a>
+	<th colspan="2">
+		<?php
+		disp_cond( $Fileman->get_link_parent(), '&nbsp;<a href="%s">'.$Fileman->get_icon( 'parent', 'imgtag' ).'</a>' );
+		?>
 	</th>
 	<th><?php echo $Fileman->link_sort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
@@ -549,7 +644,7 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 
 <tbody>
 <?php
-param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
+param( 'checkall', 'integer', NULL );  // Non-Javascript-CheckAll
 
 $i = 0;
 $Fileman->sort();
@@ -614,37 +709,33 @@ if( $i == 0 )
 	</tr>
 	<?php
 }
-?>
-</tbody>
 
-<?php
 if( $i != 0 )
 {{{ // Footer with "check all", "with selected: .."
 ?>
-<tfoot>
 <tr class="group"><td colspan="8">
-	<script type="text/javascript">
-	<!--
-	document.write('<a href="#" onclick="toggleCheckboxes(\'FilesForm\', \'selectedfiles[]\');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>"><span id="checkallspan_0"><?php echo T_('(un)check all')?></span></a>');
-	//-->
-	</script>
-	<noscript type="text/javascript">
-		<a href="<?php
+	<a id="checkallspan_0" name="hui" href="<?php
 		echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
-		echo '">';
-		echo ($checkall) ? T_('uncheck all') : T_('check all');
+		?>" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]'); return false;"><?php
+		if( !isset($checkall) )
+		{
+			echo T_('(un)check all');
+		}
+		else
+		{ // Non-JS
+			echo ($checkall) ? T_('uncheck all_1') : T_('check all');
+		}
 		?></a>
-	</noscript>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
 	<?php echo $Fileman->form_hiddeninputs() ?>
 	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
 	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
 	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
 </td></tr>
-</tfoot>
 <?php
 }}}
 ?>
+</tbody>
 </table>
 </form>
 
@@ -675,15 +766,12 @@ if( $i != 0 )
 			</div>
 		</div>
 
-		<noscript type="text/javascript">
-		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"><?php
-			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
-		</noscript>
 
+		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
+			onclick="javascript:toggle_options();"><?php
+			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
 		<script type="text/javascript">
 		<!--
-			document.write( '<a id="options_toggle" href="javascript:toggle_options()"><?php echo T_("show options") ?></a>' )
-
 			showoptions = <?php echo ($options_show) ? 'false' : 'true' ?>;
 			toggle_options();
 
@@ -706,6 +794,7 @@ if( $i != 0 )
 			}
 		// -->
 		</script>
+
 	</form>
 
 	<form action="files.php" name="filter" class="toolbaritem">

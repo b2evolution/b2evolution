@@ -99,22 +99,24 @@ class Log
 			else $disp .= '<ul class="log">';
 		}
 
-		if( $style != '<ul>' )
-			$disp .= '<p>';
-
-		foreach( $messages as $message )
+		if( $style == '<ul>' )
 		{
-			if( $style == '<ul>' )
-				$disp .= '<li>'.$message.'</li>';
-			else
-				$disp .= $message.'<br />';
+			$disp .= '<li>'.implode( '</li><li>', $messages ).'</li>';
+		}
+		else
+		{
+			$disp .= implode( '<br />', $messages );
 		}
 
-		// close list
-		$disp .= ( $style == '<ul>' ) ? '</ul>' : '</p>';
+		if( $style == '<ul>' )
+		{ // close list
+			$disp .= '</ul>';
+		}
 
 		if( !empty($foot) )
+		{
 			$disp .= '<p class="'.$class.'">'.$foot.'</p>';
+		}
 
 		$disp .= '</div>';
 
