@@ -59,46 +59,43 @@ switch( $cat )
 */
 
 
-switch($action)
+if( $action == 'update' )
 {
-	case 'update':
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+	// Check permission:
+	$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'newposts_per_page', 'integer', true );
-		param( 'newwhat_to_show', 'string', true );
-		param( 'newarchive_mode', 'string', true );
-		param( 'newtime_difference', 'integer', true );
-		param( 'newautobr', 'integer', true );
-		param( 'pref_newusers_canregister', 'integer', 0 );
-		param( 'pref_newusers_grp_ID', 'integer', true );
-		param( 'pref_newusers_level', 'integer', true );
-		param( 'pref_links_extrapath', 'integer', 0 );
-		param( 'pref_permalink_type', 'string', true );
+	param( 'newposts_per_page', 'integer', true );
+	param( 'newwhat_to_show', 'string', true );
+	param( 'newarchive_mode', 'string', true );
+	param( 'newtime_difference', 'integer', true );
+	param( 'newautobr', 'integer', true );
+	param( 'pref_newusers_canregister', 'integer', 0 );
+	param( 'pref_newusers_grp_ID', 'integer', true );
+	param( 'pref_newusers_level', 'integer', true );
+	param( 'pref_links_extrapath', 'integer', 0 );
+	param( 'pref_permalink_type', 'string', true );
 
-		$query = "UPDATE $tablesettings
-							SET posts_per_page = $newposts_per_page,
-									what_to_show = '".$DB->escape($newwhat_to_show)."',
-									archive_mode = '".$DB->escape($newarchive_mode)."',
-									time_difference = $newtime_difference,
-									AutoBR = $newautobr,
-									pref_newusers_canregister = $pref_newusers_canregister,
-									pref_newusers_level = $pref_newusers_level,
-									pref_newusers_grp_ID = $pref_newusers_grp_ID,
-									pref_links_extrapath = $pref_links_extrapath,
-									pref_permalink_type = '".$DB->escape($pref_permalink_type)."'";
-		mysql_query($query) or mysql_oops( $query );
-		$querycount++;
+	$query = "UPDATE $tablesettings
+						SET posts_per_page = $newposts_per_page,
+								what_to_show = '".$DB->escape($newwhat_to_show)."',
+								archive_mode = '".$DB->escape($newarchive_mode)."',
+								time_difference = $newtime_difference,
+								AutoBR = $newautobr,
+								pref_newusers_canregister = $pref_newusers_canregister,
+								pref_newusers_level = $pref_newusers_level,
+								pref_newusers_grp_ID = $pref_newusers_grp_ID,
+								pref_links_extrapath = $pref_links_extrapath,
+								pref_permalink_type = '".$DB->escape($pref_permalink_type)."'";
+	mysql_query($query) or mysql_oops( $query );
+	$querycount++;
 
-		header ("Location: b2options.php");
-
-	break;
-
-	default:
-
-		// Check permission:
-		$current_User->check_perm( 'options', 'view', true );
-		?>
+	#header ("Location: b2options.php");
+	echo '<div class="panelblock">Updated.</div>';
+}
+	
+// Check permission:
+$current_User->check_perm( 'options', 'view', true );
+?>
 
 	<div id="catheader">
 	<ul>
@@ -212,9 +209,6 @@ switch($action)
 	</div>
 
 	<?php
-
-	break;
-}
 
 require( dirname(__FILE__). '/_footer.php' );
 
