@@ -5,8 +5,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -29,6 +29,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -105,6 +106,35 @@ class UserCache extends DataObjectCache
 		}
 
 		return $this->cache_login[$login];
+	}
+
+
+	/**
+	 * Get a user object by login, only if password matches.
+	 *
+	 * @param string Login
+	 * @param string Password
+	 * @param boolean Password is MD5()'ed
+	 * @return false|User
+	 */
+	function & get_by_loginAndPwd( $login, $pass, $pass_is_md5 = true )
+	{
+		if( !($User =& $this->get_by_login( $login )) )
+		{
+			return false;
+		}
+
+		if( !$pass_is_md5 )
+		{
+			$pass = md5($pass);
+		}
+
+		if( $User->pass != $pass )
+		{
+			return false;
+		}
+
+		return $User;
 	}
 
 
@@ -220,6 +250,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/20 23:08:41  blueyed
+ * get_by_loginAndPwd() added
+ *
  * Revision 1.13  2005/02/18 00:36:08  blueyed
  * $alreadyCached class member
  *
