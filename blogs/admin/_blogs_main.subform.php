@@ -22,10 +22,10 @@
 	<legend><?php echo T_('Access parameters') ?></legend>
 
 	<?php
-		if( $Settings->get('default_blog_ID') != $blog )
+		if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $blog) )
 		{
 			$defblog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'));
-			$defblog = $defblog->get('shortname');
+			$defblog = $defblog->dget('shortname');
 		}
 		form_radio( 'blog_access_type', $blog_access_type,
 				array(  array( 'default', T_('Default blog on index.php'), $baseurl.$blog_siteurl.'/index.php'.( isset($defblog) ? '  ['.T_('Current default is:').' '.$defblog.']' : '' ) ),
