@@ -6,6 +6,11 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @todo: alternate lines with two different colors
+ * @todo: thumbnail view
+ * @todo: PHPInfo (special permission)
+ * @todo: directly run PHP-code (eval)
+ *
  * @package admin
  */
  
@@ -30,7 +35,7 @@ if( $current_User->login == 'demouser' )
 else
 if( $current_User->level < 10 )
 {
-	die( 'this is beta. you need user level 10 to play with this.' );
+	die( 'This is alpha. You need user level 10 to play with this.' );
 }
 
 $Fileman = new FileManager( $current_User, 'files.php', $cd, $order, $asc );
@@ -45,7 +50,7 @@ if( $action == '' && $file != '' )
 	<link href="<?php echo $admin_url ?>/admin.css" rel="stylesheet" type="text/css" />
 	<style type="text/css">
 	<!--
-	div.image { text-align:center;clear:both;margin-top:5ex; }
+	div.image { text-align:center;clear:both;margin:1ex; }
 	img.image { border:1px dashed #d91;padding:1ex; }
 	.linenr { background-color: #ff0; font-weight:bold; }
 	-->
@@ -55,7 +60,7 @@ if( $action == '' && $file != '' )
 	<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
 	
 	<?php
-		if( preg_match( '/\.(jpe?g|gif|png|swf)$/', $file) )
+		if( preg_match( '/\.(jpe?g|gif|png|swf)$/i', $file) )
 		{ // image
 			?>
 			<div class="image">
@@ -68,29 +73,90 @@ if( $action == '' && $file != '' )
 			param( 'showlinenrs', 'integer', 0 );
 			$buffer = file( $Fileman->cget_file( $file, 'path' ) );
 			
-			$linenr_width = floor( count($buffer)/10 )+1;
+			// TODO: check if new window was opened and provide close X in case
+			/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'/img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
 			
-			?>
-			<a href="<?php echo $_SERVER['PHP_SELF'].'?cd='.$cd.'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
-			.( $showlinenrs ? T_('hide line numbers') : T_('show line numbers') ).'</a>';
+			echo T_('file').': '.$file.'<br />';
 			
-			echo "\n<pre>";
 			if( !count($buffer) )
 			{
 				echo ' ** '.T_('empty file').' ** ';
 			}
-			else foreach( $buffer as $linenr => $line )
+			else
 			{
-				if( $showlinenrs )
-					echo '<span name="linenr" class="linenr"> '.str_pad($linenr+1, $linenr_width, ' ', STR_PAD_LEFT).' </span>';
-					echo htmlspecialchars( $line );
+				echo count($buffer).' '.T_('lines').'<br />';
+				
+				$linenr_width = strlen( count($buffer)+1 );
+				
+				?>
+				<noscript type="text/javascript">
+					<a href="<?php echo $_SERVER['PHP_SELF'].'?cd='.$cd.'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
+						.( $showlinenrs ? T_('hide line numbers') : T_('show line numbers') ).'</a>';
+				?>
+				</noscript>
+				<script type="text/javascript">
+				<!--
+				document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
+				//-->
+				</script>
+				
+				<pre><?php
+				foreach( $buffer as $linenr => $line )
+				{
+					echo '<span name="linenr" class="linenr">';
+					if( $showlinenrs ) echo ' '.str_pad($linenr+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
+					echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $line ) );  // TODO: customize tab-width
+				}
 			}
-			echo '</pre>';
+			
+			// TODO: stupid thing, document.getElementsByName seems to not work with IE here, so I have to use getElementsByTagName. This could perhaps check for the nodes name though. 
+			?></pre>
+			
+			<script type="text/javascript">
+			<!--
+			showlinenrs = true;
+			toggle_linenrs();
+			function toggle_linenrs()
+			{
+				if( showlinenrs )
+				{
+					var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('show line numbers') ?>');
+					showlinenrs = false;
+					var text = document.createTextNode( '' );
+					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+					{
+						if( document.getElementsByTagName("span")[i].hasChildNodes() )
+							document.getElementsByTagName("span")[i].firstChild.data = '';
+						else
+						{
+							document.getElementsByTagName("span")[i].appendChild( text );
+						}
+					}
+				}
+				else
+				{
+					var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('hide line numbers') ?>');
+					showlinenrs = true;
+					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+					{
+						var text = String(i+1);
+						var upto = <?php echo $linenr_width ?>-text.length;
+						for( var j=0; j<upto; j++ ){ text = ' '+text; }
+						if( document.getElementsByTagName("span")[i].hasChildNodes() )
+							document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
+						else
+							document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
+					}
+				}
+
+				document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
+			}
+			-->
+			</script>			
+			
+			<?php
 		}
 		?>
-		<!--
-		<br /><br />
-		<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'/img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>-->
 
 	</body>
 </html>
@@ -111,7 +177,6 @@ if( $selaction != '' )
 		
 	}
 	
-
 	if( !count( $selectedfiles ) )
 	{
 		$Fileman->Messages->add( T_('Nothing selected.') );
@@ -174,12 +239,19 @@ if( $selaction != '' )
 			{ // Downloading
 				require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_zip.php' );
 				
-				$flags[ 'recursesd' ] = $recursesd; // TODO: add a comment to archive?
+				$options = array (
+					'basedir' => $Fileman->cwd,
+					'inmemory' => 1,
+					'recurse' => $recursesd,
+				);
 					
-				$zipfile = new zipfile($Fileman->cwd, $flags);
-				$zipfile->addfiles( $Fileman->arraylist('files') );
-				$zipfile->adddirectories( $Fileman->arraylist('dirs') );
-				$zipfile->filedownload( $zipname );
+				$zipfile = new zip_file( $zipname );
+				$zipfile->set_options( $options );
+				$zipfile->add_files( $Fileman->arraylist() );
+				$zipfile->create_archive();
+				
+				#header('Content-length: ' . filesize($path));
+				$zipfile->download_file();
 				exit;
 				#$Fileman->Messages->add( sprintf(T_('Zipfile [%s] sent to you!'), $selectedfiles[0]), 'note' );
 				
@@ -200,21 +272,28 @@ if( $selaction != '' )
 	}
 }
 
-switch( $action ) // we catched empty action before
+switch( $action ) // (we catched empty action before)
 {
-	case 'createdir':
+	case T_('Create new'):  // create new file/dir
+		param( 'createnew', 'string', '' );
 		param( 'createname', 'string', '' );
-		if( $Fileman->createdir( $createname ) )
+		
+		if( $createnew == 'dir' )
 		{
-			$Fileman->reloadpage();
+			if( $Fileman->createdir( $createname ) )
+			{
+				$Fileman->reloadpage();
+			}
+			break;
 		}
-		break;
-	
-	case 'createfile':
-		param( 'createname', 'string', '' );
-		if( $Fileman->createfile( $createname ) )
+		elseif( $createnew == 'file' )
 		{
-			$Fileman->reloadpage();
+			param( 'createname', 'string', '' );
+			if( $Fileman->createfile( $createname ) )
+			{
+				$Fileman->reloadpage();
+			}
+			break;
 		}
 		break;
 	
@@ -259,7 +338,7 @@ switch( $action ) // we catched empty action before
 
 
 require( dirname(__FILE__).'/_menutop.php' );
-echo T_('Current directory').': '.$Fileman->cwd;
+echo T_('Current directory').': '.$Fileman->cwd_clickable();
 require( dirname(__FILE__).'/_menutop_end.php' );
 
 ?>
@@ -280,47 +359,28 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 }
 ?>
 <div class="toolbar">
-<form action="files.php" name="search" class="toolbaritem">
-	<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-	<input type="text" name="searchfor" value="" size="20" /> 
-	<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
-</form>
-
-<form action="files.php" name="createnew" class="toolbaritem">
-	<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-	<select name="action">
-		<option value="createfile"><?php echo T_('file') ?></option> 
-		<option value="createdir"><?php echo T_('directory') ?></option> 
-	</select>
-	<input type="text" name="createname" value="" size="20" /> 
-	<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
-</form>
-<div class="clear"></div>
+	<form action="files.php" name="search" class="toolbaritem">
+		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<input type="text" name="searchfor" value="--todo--" size="20" /> 
+		<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
+	</form>
+	<form action="files.php" name="filter" class="toolbaritem">
+		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<input type="text" name="filter" value="--todo--" size="20" /> 
+		<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
+	</form>
+	
+	<div class="clear"></div>
 </div>
 
-<form name="FilesForm" action="files.php">
+<form name="FilesForm" action="files.php" method="post">
 <table class="fileman">
-<tr class="toprow">
-	<td colspan="2" class="center">
-		<a href="<?php $Fileman->cdisp('link', 'home') ?>"><?php $Fileman->cdisp('iconimg', 'home') ?></a>
-		&nbsp;
-		<a href="<?php $Fileman->cdisp('link', 'parent') ?>"><?php $Fileman->cdisp('iconimg', 'parent') ?></a>
-	</td>
-	<td colspan="6" class="right">
-		<strong><?php echo T_('with selected files:') ?> </strong>
-		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-		<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
-		<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
-		<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
-	</td>
-</tr>
 
 <tr>
-	<th colspan="2" style="font-weight:normal;font-size:89%;white-space:nowrap;">
-		<a href="#" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
-			<span id="checkallspan_0"><?php echo T_('(un)check all')?></span>
-		</a>
-	
+	<th colspan="2" style="white-space:nowrap;">
+		<a href="<?php $Fileman->cdisp('link', 'home') ?>"><?php echo $Fileman->icon('home', 'imgtag') ?></a>
+		&nbsp;
+		<a href="<?php $Fileman->cdisp('link', 'parent') ?>"><?php $Fileman->cdisp('iconimg', 'parent') ?></a>
 	</th>
 	<th><?php echo $Fileman->link_sort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
@@ -331,6 +391,8 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 </tr>
 
 <?php
+param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
+
 $i = 0;
 while( $Fileman->next() )
 {
@@ -345,9 +407,9 @@ while( $Fileman->next() )
 	$link_default_js = '';
 	
 	?>
-	<tr onmouseout="this.style.background='#fff'" onmouseover="this.style.background='#ddd'" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
+	<tr style="background:<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>" onmouseout="this.style.background='<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>'" onmouseover="this.style.background='#ddd'" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $Fileman->cdisp('name'), 'formvalue' ) ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();" />
+			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $Fileman->cdisp('name'), 'formvalue' ) ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
 		<td class="icon" onclick="window.location.href = '<?php $Fileman->cdisp('link') ?>'">
 			<?php /*echo $i++;*/ $Fileman->cdisp('iconimg') ?>
@@ -368,16 +430,13 @@ while( $Fileman->next() )
 		<td class="size"><?php $Fileman->cdisp('nicesize') ?></td>
 		<td class="timestamp"><?php $Fileman->cdisp('lastmod') ?></td>
 		<td class="perms"><?php $Fileman->cdisp( 'link_editperm', '', '<a href="%s">'.$Fileman->cget('perms', 'octal').'</a>' ) ?></td>
-		<td class="actions">
-			<?php	$Fileman->cdisp( 'link_edit', '', '<a href="%s">['./* TRANS: edit file */ T_('Edit').']</a>' ); ?>
-			<?php $Fileman->cdisp( 'link_copymove', '', '<a href="%s">['./* TRANS: file copy/move */ T_('Copy / Move').']</a>' ); ?>
-			<?php $Fileman->cdisp( 'link_rename', '', '<a href="%s">['./* TRANS: file rename */ T_('Rename').']</a>' ); ?>
-			<?php	$Fileman->cdisp( 'link_delete', '', '<a href="%s">['./* TRANS: delete file */ T_('Delete').']</a>'
-																						.($Fileman->cisdir() == 'dir' ? ' <input title="'.T_('include sub-directories for selected-files action.').'" class="checkbox" type="checkbox" name="sel_recursive[]" value="'.format_to_output( $Fileman->cget('name'), 'formvalue' ).'" />' : '') ); ?>
-			<?php
-				// TODO: action link
-			?>
-		</td>
+		<td class="actions"><?php
+			$Fileman->cdisp( 'link_edit', '', '<a href="%s">['./* TRANS: edit file */ T_('Edit').']</a>' );
+			$Fileman->cdisp( 'link_copymove', '', '<a href="%s">['./* TRANS: file copy/move */ T_('Copy / Move').']</a>' );
+			$Fileman->cdisp( 'link_rename', '', '<a href="%s">['./* TRANS: file rename */ T_('Rename').']</a>' );
+			$Fileman->cdisp( 'link_delete', '', '<a href="%s">['./* TRANS: delete file */ T_('Delete').']</a>' );
+			// TODO: action link
+			?></td>
 	</tr>
 	<?php
 }
@@ -391,6 +450,43 @@ if( $i == 0 )
 	</tr>
 	<?php
 }
+else
+{
+	?>
+	<tr class="bottomrow">
+	<td colspan="6">
+		<script type="text/javascript">
+		<!--
+		document.write('<a href="#" onclick="toggleCheckboxes(\'FilesForm\', \'selectedfiles[]\');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>"><span id="checkallspan_0"><?php echo T_('(un)check all')?></span></a>');
+		//-->
+		</script>
+		<noscript type="text/javascript">
+			<a href="<?php
+			echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
+			echo '">';
+			echo ($checkall) ? T_('uncheck all') : T_('check all');
+			?></a>
+		</noscript>
+		&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
+		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
+		<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
+		<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
+	</td>
+	
+	<td colspan="2" style="text-align:right">
+		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+		<select name="createnew">
+			<option value="file"><?php echo T_('file') ?></option> 
+			<option value="dir"><?php echo T_('directory') ?></option> 
+		</select>
+		<input type="text" name="createname" value="" size="20" /> 
+		<input type="submit" name="action" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
+	</td>
+	
+	</tr>
+	<?php
+}
 ?>
 </table>
 </form>
@@ -399,7 +495,8 @@ if( $i == 0 )
 	<a id="options_title" href="javascript:toggle_options()"><?php echo T_('show options') ?></a>
 	<div id="options_list">
 		<br />
-		a <input type="checkbox" />
+		(not functional yet)
+		sort dirs at top <input type="checkbox" />
 		<br />
 		a <input type="checkbox" />
 		<br />

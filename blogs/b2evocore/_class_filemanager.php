@@ -7,7 +7,11 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
+ *
+ * @todo: Permissions!
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 class FileManager
 {
 	var $root;
@@ -40,23 +44,24 @@ class FileManager
 	 */
 	function FileManager( $current_User, $url, $dir = '#', $order = 'name', $asc = '#' )
 	{
-		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir;
+		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
 
 		$this->Messages = new Log( 'error' );
 
 		$this->order = $order;
 		$this->orderasc = $asc;
-		
+
 		$this->imgpath = $basepath.'/'.$admin_subdir.'/img/fileicons/';
+		$this->imgurl = $admin_url.'/img/fileicons/';
 		$media_dir = $basepath.'/'.$media_subdir;
 		#$media_dir = 'd:\\home';
-		
+
 		if( $current_User->login == 'demouser' )
 		{
 			$media_dir = $basepath.'/media_test';
 			$media_subdir = 'media_test';
 		}
-		
+
 		$media_dir = str_replace( '\\', '/', $media_dir );
 
 		// base URL, used for created links
@@ -69,7 +74,7 @@ class FileManager
 		$this->debug( $this->root, 'root' );
 		$this->root_url = $baseurl.'/'.$media_subdir;
 		$this->debug( $this->root_url, 'root_url' );
-		
+
 		if( $dir == '#' || empty($dir) )
 		{
 			$this->cwd = $media_dir;
@@ -83,7 +88,7 @@ class FileManager
 		// get real cwd
 		$realcwd = str_replace( '\\', '/', realpath($this->cwd) );
 		$this->debug( $realcwd, 'real cwd' );
-		
+
 		if( empty($realcwd) )
 		{ // does not exist
 			$this->cwd = $this->root;
@@ -97,7 +102,7 @@ class FileManager
 		{
 			$this->cwd = $realcwd;
 		}
-		
+
 		// get the subpath relative to root
 		$this->subpath = preg_replace( '#^'.$this->root.'#', '', $this->cwd );
 		$this->subpath .= '/';
@@ -149,7 +154,7 @@ class FileManager
 
 		// load file icons..
 		require( $core_dirout.'/'.$admin_subdir.'/img/fileicons/fileicons.php' );
-		
+
 		/**
 		 * These are the filetypes. The extension is a regular expression that must match the end of the file.
 		 */
@@ -212,7 +217,7 @@ class FileManager
 	{
 		if( empty($type) )
 			$type = $this->order;
-		
+
 		if( $this->orderasc == '#' )
 		{ // default
 			return ( $type == 'name' ) ? 1 : 0;
@@ -227,10 +232,27 @@ class FileManager
 	function sortlink( $type )
 	{
 		$r = url_add_param( $this->url, 'cd='.$this->subpath.'&amp;order='.$type );
-		
+
 		if( $this->order == $type )
 		{ // change asc
 			$r .= '&amp;asc='.(1 - $this->is_sortingasc());
+		}
+
+		return $r;
+	}
+	
+	
+	/**
+	 * get the current url, with all relevant GET params
+	 */
+	function curl()
+	{
+		$r = $this->url;
+		
+		foreach( array('order', 'asc', 'cd') as $check )
+		{
+			if( isset( $_GET[ $check ] ) )
+				$r = url_add_param( $r, $check.'='.$_GET[$check] );
 		}
 		
 		return $r;
@@ -240,20 +262,25 @@ class FileManager
 	function link_sort( $type, $atext )
 	{
 		$r = '<a href="'.url_add_param( $this->url, 'cd='.$this->subpath.'&amp;order='.$type );
-		
+
 		if( $this->order == $type )
 		{ // change asc
 			$r .= '&amp;asc='.(1 - $this->is_sortingasc());
 		}
-		
-		$r .= '">'.$atext.'</a>';
-		
+
+		$r .= '" title="'.
+		( ($this->order == $type && (1 - $this->is_sortingasc($type)))
+			|| ($this->order != $type && !(1 - $this->is_sortingasc($type)))
+			? T_('sort ascending by this column') : T_('sort descending by this column')).'">'.$atext.'</a>';
+
 		if( $this->order == $type )
 		{
-			if( $this->is_sortingasc() ) $r .= ' ['.T_('asc').']';
-			else $r .= ' ['.T_('desc').']';
+			if( $this->is_sortingasc() )
+				$r .= ' '.$this->icon( 'ascending', 'imgtag' );
+			else
+				$r .= ' '.$this->icon( 'descending', 'imgtag' );
 		}
-		
+
 		return $r;
 	}
 
@@ -270,10 +297,10 @@ class FileManager
 		{
 			return false;
 		}
-		
+
 		if( $order == '#' )
 			$order = $this->order;
-		
+
 		if( $asc == '#' )
 		{
 			if( $this->orderasc != '#' )
@@ -404,10 +431,8 @@ class FileManager
 	 */
 	function cget( $what, $param = '', $displayiftrue = '' )
 	{
-		global $basepath, $admin_subdir, $admin_url;
-		
 		$path = isset($this->current_entry) ? $this->cwd.'/'.$this->current_entry['name'] : false;
-		
+
 		/* // detect dying loops
 		global $owhat;
 		if( $what == $owhat )
@@ -417,24 +442,24 @@ class FileManager
 		}
 		$owhat = $what;*/
 
-		
+
 		switch( $what )
 		{
 			case 'path':
 				$r = $path;
 				break;
-				
+
 			case 'url':
 				$r = $this->root_url.$this->subpath.$this->current_entry['name'];
 				break;
-			
-			case 'ext':  // the file extension, replaced in $displayiftrue
-				if( empty($param) && preg_match('/\.([^.])+$/', $this->current_entry['name'], $match) )
+
+			case 'ext':  // the file extension
+				if( preg_match('/\.([^.])+$/', $this->current_entry['name'], $match) )
 					$r = $match[1];
 				else
 					$r = false;
 				break;
-			
+
 			case 'perms':
 				if( $param != 'octal'
 						&& ($this->permlikelsl || $param == 'lsl') )
@@ -449,7 +474,7 @@ class FileManager
 				else
 					$r = '';
 				break;
-				
+
 			case 'imgsize':
 				$r = $this->imgsize( $path, $param );
 				break;
@@ -499,71 +524,23 @@ class FileManager
 				break;
 
 			case 'type':
-				if( $param == 'parent' )
-					$r = T_('go to parent directory');
-				elseif( $param == 'home' )
-					$r = T_('home directory');
-				elseif( !isset($this->current_entry) )
-					$r = false;
-				elseif( $this->current_entry['type'] == 'dir' )
-					$r = T_('directory');
-				else
-				{
-					$found = false;
-					foreach( $this->filetypes as $type => $desc )
-					{
-						if( preg_match('/'.$type.'$/i', $this->current_entry['name']) )
-						{
-							$r = $desc;
-							$found = true;
-							break;
-						}
-					}
-					if( !$found ) $r = T_('unknown');
-				}
+				$r = $this->type( 'cfile' );
 				break;
 
 			case 'iconfile':
-				if( $param == 'parent' )
-					$r = $this->fileicons_special['parent'];
-				elseif( $param == 'home' )
-					$r = $this->fileicons_special['home'];
-				elseif( $param == 'newwin' )
-					$r = $this->fileicons_special['newwin'];
-				elseif( !isset($this->current_entry) )
-					$r = false;
-				elseif( $this->current_entry['type'] == 'dir' )
-					$r = $this->fileicons_special['folder'];
-				else foreach( $this->fileicons as $ext => $imgfile )
-				{
-					$r = $this->fileicons_special['unknown'];
-					if( preg_match( '/'.$ext.'$/i', $this->current_entry['name'], $match ) )
-					{
-						$r = $imgfile;
-						break;
-					}
-				}
+				$r = $this->icon( 'cfile', 'file' );
 				break;
-				
-			case 'iconurl':
-				$r = $this->cget( 'iconfile', $param, $admin_url.'/img/fileicons/%s' );
-				break;
-				
-			case 'iconsize':
-				$r = $this->imgsize( $this->imgpath.$this->cget( 'iconfile', $param ), 'string' );
-				break;
-				
-			case 'iconimg':
-				$imgfile = $this->cget( 'iconfile', $param );
 
-				if( !is_file($this->imgpath.$imgfile) )
-				{
-					$r = false;
-				}
-				else
-				{
-					$r = '<img src="'.$this->cget( 'iconurl', $param ).'" '.$this->cget( 'iconsize', $param ).' '.$this->cget('ext', $param, ' alt="%s"').' title="'.$this->cget('type', $param).'" />';
-				}
+			case 'iconurl':
+				$r = $this->icon( 'cfile', 'url' );
+				break;
+
+			case 'iconsize':
+				$r = $this->icon( 'cfile', 'size', $param );
+				break;
+
+			case 'iconimg':
+				$r = $this->icon( $param, 'imgtag', $param );	
 				break;
 
 			default:
@@ -571,12 +548,14 @@ class FileManager
 				break;
 		}
 		if( $r && !empty($displayiftrue) )
+		{
 			return sprintf( $displayiftrue, $r );
+		}
 		else
 			return $r;
 	}
 
-	
+
 	/**
 	 * wrapper for cget() to display right away
 	 * @param string property of loop file
@@ -591,8 +570,8 @@ class FileManager
 		}
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * wrapper for cget_file() to display right away
 	 * @param string the file
@@ -607,8 +586,8 @@ class FileManager
 		}
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * is the current file a directory?
 	 *
@@ -629,6 +608,119 @@ class FileManager
 		}
 		return ($this->current_entry['type'] == 'dir');
 	}
+
+
+	/**
+	 * get properties of a special icon 
+	 *
+	 * @param string icon for what (special puposes or 'cfile' for current file/dir)
+	 * @param string what to return for that icon (file, url, size {@link see Fileman::imgsize()}})
+	 * @param string additional parameter (for size)
+	 */
+	function icon( $for, $what, $param = '' )
+	{
+		if( $for == 'cfile' )
+		{
+			if( !isset($this->current_entry) )
+				$iconfile = false;
+			elseif( $this->current_entry['type'] == 'dir' )
+				$iconfile = $this->fileicons_special['folder'];
+			else
+			{
+				$iconfile = $this->fileicons_special['unknown'];
+				foreach( $this->fileicons as $ext => $imgfile )
+				{
+					if( preg_match( '/'.$ext.'$/i', $this->current_entry['name'], $match ) )
+					{
+						$iconfile = $imgfile;
+						break;
+					}
+				}
+			}
+		}
+		elseif( isset( $this->fileicons_special[$for] ) )
+		{
+			$iconfile = $this->fileicons_special[$for];
+		}
+		else $iconfile = false;
+
+		if( !$iconfile || !file_exists( $this->imgpath.'/'.$iconfile ) )
+		{
+			return false;
+		}
+
+		switch( $what )
+		{
+			case 'file':
+				$r = $iconfile;
+				break;
+
+			case 'url':
+				$r = $this->imgurl.'/'.$iconfile;
+				break;
+
+			case 'size':
+				$r = $this->imgsize( $this->imgpath.$iconfile, $param );
+				break;
+				
+			case 'imgtag':
+				$r = '<img src="'.$this->icon( $for, 'url' ).'" '.$this->icon( $for, 'size', 'string' )
+				.' alt="';
+				
+				if( $for == 'cfile' )
+				{ // extension as alt-tag for cfile-icons
+					$r .= $this->cget( 'ext' );
+				}
+				
+				$r .= '" title="'.$this->type( $for );
+				
+				$r .= '" />';
+				break;
+
+				
+			default:
+				echo 'unknown what: '.$what;
+		}
+		
+		return $r;
+	}
+
+
+	function type( $param )
+	{
+		if( $param == 'cfile' )
+		{
+			if( !isset($this->current_entry) )
+				$r = false;
+			elseif( $this->current_entry['type'] == 'dir' )
+				$r = T_('directory');
+			else
+			{
+				$found = false;
+				foreach( $this->filetypes as $type => $desc )
+				{
+					if( preg_match('/'.$type.'$/i', $this->current_entry['name']) )
+					{
+						$r = $desc;
+						$found = true;
+						break;
+					}
+				}
+				if( !$found ) $r = T_('unknown');
+			}
+		}
+		elseif( $param == 'parent' )
+			$r = T_('go to parent directory');
+		elseif( $param == 'home' )
+			$r = T_('home directory');
+		elseif( $param == 'descending' )
+			$r = T_('descending');
+		elseif( $param == 'ascending' )
+			$r = T_('ascending');
+		else $r = false;
+		
+		return $r;
+	}
 	
 	
 	/**
@@ -642,7 +734,7 @@ class FileManager
 	function loadc( $file )
 	{
 		$this->save_idx[] = $this->current_idx;
-		
+
 		if( ($this->current_idx = $this->findkey( $file )) === false )
 		{ // file could not be found
 			$this->current_idx = array_pop( $this->save_idx );
@@ -654,8 +746,8 @@ class FileManager
 			return true;
 		}
 	}
-	
-	
+
+
 	/**
 	 * restores the previous current entry (see {@link Fileman::loadc()})
 	 * @return boolean true on success, false on failure (if there are no entries to restore on the stack)
@@ -676,8 +768,8 @@ class FileManager
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * wrapper to get properties of a specific file.
 	 *
@@ -695,13 +787,13 @@ class FileManager
 		{
 			return false;
 		}
-		
+
 		$this->restorec();
 		return $r;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * do actions to a file/dir
 	 *
@@ -742,7 +834,7 @@ class FileManager
 						}
 					}
 					break;
-					
+
 				case 'send':
 					if( is_dir($path) )
 					{ // we cannot send directories!
@@ -753,11 +845,11 @@ class FileManager
 						header('Content-type: application/octet-stream');
 						//force download dialog
 						header('Content-disposition: attachment; filename="' . $filename . '"');
-					
+
 						header('Content-transfer-encoding: binary');
 						header('Content-length: ' . filesize($path));
-					
-						//send file contents 
+
+						//send file contents
 						readfile($path);
 						exit;
 					}
@@ -768,7 +860,7 @@ class FileManager
 			$this->Messages->add( sprintf( T_('File [%s] not found.'), $filename ) );
 			return false;
 		}
-		
+
 		$this->restorec();
 		return $r;
 	}
@@ -793,19 +885,18 @@ class FileManager
 	/**
 	 * get an array list of a specific type
 	 *
-	 * @param string type ('dirs' or 'files')
+	 * @param string type ('dirs' or 'files', '' means all)
 	 * @param return array
 	 */
-	function arraylist( $type )
+	function arraylist( $type = '' )
 	{
 		$r = array();
 		foreach( $this->entries as $entry )
 		{
-			if( $type == 'files' && $entry['type'] != 'dir' )
-			{
-				$r[] = $entry['name'];
-			}
-			elseif( $type == 'dirs' && $entry['type'] == 'dir' )
+			if( $type == ''
+					|| ( $type == 'files' && $entry['type'] != 'dir' )
+					|| ( $type == 'dirs' && $entry['type'] == 'dir' )
+				)
 			{
 				$r[] = $entry['name'];
 			}
@@ -1012,7 +1103,7 @@ class FileManager
 	function debug( $what, $desc, $forceoutput = 0 )
 	{
 		global $Debuglog;
-		
+
 		ob_start();
 		pre_dump( $what, '[Fileman] '.$desc );
 		$Debuglog->add( ob_get_contents() );
@@ -1046,7 +1137,7 @@ class FileManager
 		return rmdir( $dir );
 	}
 
-	
+
 	/**
 	 * get size of directory, including anything in there.
 	 *
@@ -1069,7 +1160,7 @@ class FileManager
 		}
 	return $total;
 	}
-		
+
 
 	/**
 	 * get the size of an image file
@@ -1079,7 +1170,7 @@ class FileManager
 	 */
 	function imgsize( $path, $param )
 	{
-		if( !preg_match( '/\.(jpe?g|gif|png|swf)$/', $path) )
+		if( !preg_match( '/\.(jpe?g|gif|png|swf)$/i', $path) )
 		{
 			return false;
 		}
@@ -1109,6 +1200,30 @@ class FileManager
 			else
 				return $size[0].'x'.$size[1];
 		}
+	}
+
+
+	/**
+	 * returns cwd, where the accessible directories (below root)  are clickable
+	 * @return string cwd as clickable html
+	 */
+	function cwd_clickable()
+	{
+		// get the part that is clickable
+
+		$pos_lastslash = strrpos( $this->root, '/' );
+		$r = substr( $this->root, 0, $pos_lastslash );
+
+		$clickabledirs = explode( '/', substr( $this->cwd, $pos_lastslash+1 ) );
+
+		$cd = '/';
+		foreach( $clickabledirs as $nr => $dir )
+		{
+			if( $nr > 0 ) $cd .= $dir.'/';
+			$r .= '/<a href="'.url_add_param( $this->url, 'cd='.$cd ).'">'.$dir.'</a>';
+		}
+
+		return $r;
 	}
 
 }

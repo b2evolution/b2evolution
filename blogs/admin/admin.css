@@ -618,15 +618,12 @@ fieldset legend {
 
 table.fileman {
 	margin:auto;
-	width: 100%;
+	width:100%;
 	clear:both;
-	
-	/*border: 1px solid #ccc;*/
 	border-collapse: collapse;
 }
 table.fileman td {
 	border-bottom: 1px solid #ccc;
-	/*background-color: #E1DBDC;*/
 	padding: .3ex 2ex;
 }
 table.fileman td.icon, td.checkbox, td.perms {
@@ -658,10 +655,10 @@ table.fileman td.actions {
 	white-space: nowrap;
 	width:25%;
 }
-table.fileman tr.toprow td input {
+table.fileman tr.toprow, tr.bottomrow td input {
 	font-size: 84%;
 }
-table.fileman tr.toprow td {
+table.fileman tr.toprow, tr.bottomrow td {
 	padding: .3ex 1ex;
 	border-bottom:none;
 	background-color: #F0F0F0;

@@ -7,6 +7,7 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evocore
+ * @deprecated by {@link _class_log.php}}
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
