@@ -409,6 +409,8 @@ class User extends DataObject
 	 * - user/blog permissions
 	 *
 	 * {@internal User::dbdelete(-) }}
+	 *
+	 * @todo delete comments on user's posts
 	 */
 	function dbdelete()
 	{
@@ -417,11 +419,11 @@ class User extends DataObject
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
 		// Delete comments
-		$sql="DELETE FROM $tablecomments INNER JOIN $tableposts 
+	/*	$sql="DELETE FROM $tablecomments INNER JOIN $tableposts 
 												ON comment_post_ID = ID
 								 WHERE post_author = $this->ID";
 		$result=mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
+		$querycount++; */
 
 		// Delete posts
 		$sql="DELETE FROM $tableposts WHERE post_author = $this->ID";

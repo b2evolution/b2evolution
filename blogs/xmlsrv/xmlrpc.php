@@ -19,10 +19,16 @@
 $debug = 0;
 
 require_once(dirname(__FILE__)."/../conf/_config.php");
+
+// We don't know who we're talking to, so all messages will be in english:
+$default_locale = 'en_US';
+
 require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
 
+// All statuses are allowed for display/acting on (including drafts and deprecated posts):
+$show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
+
 $use_cache = 1;
-$post_autobr = 1;
 $post_default_title = ""; // posts submitted via the xmlrpc interface get that title
 $post_default_category = 1; // posts submitted via the xmlrpc interface go into that category
 
@@ -63,7 +69,7 @@ $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata,$post_autobr;
+	global $blog_ID,$cache_userdata;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -99,7 +105,7 @@ function b2newpost($m)
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID );
+	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -243,7 +249,7 @@ function b2_getPostURL($m)
 	$current_User = new User( $userdata );
 
 	// Check permission:
-	if( ! $current_User->is_blog_member( $blog_ID );
+	if( ! $current_User->is_blog_member( $blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -354,7 +360,7 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
 function bloggernewpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata,$post_autobr;
+	global $blog_ID,$cache_userdata;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -392,7 +398,7 @@ function bloggernewpost($m)
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID );
+	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -487,7 +493,7 @@ function bloggereditpost($m)
 {
 
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$cache_userdata,$tableposts, $tablepostcats,$post_autobr;
+	global $blog_ID,$cache_userdata,$tableposts, $tablepostcats;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
 	$err="";
@@ -497,13 +503,12 @@ function bloggereditpost($m)
 	dbconnect();
 
 	$post_ID=$m->getParam(1);
-	$username=$m->getParam(2);
-	$password=$m->getParam(3);
-	$newcontent=$m->getParam(4);
-	$publish=$m->getParam(5);
-
 	$post_ID = $post_ID->scalarval();
+
+	$username=$m->getParam(2);
 	$username = $username->scalarval();
+
+	$password=$m->getParam(3);
 	$password = $password->scalarval();
 
 	if( !user_pass_ok($username,$password) ) 
@@ -512,15 +517,17 @@ function bloggereditpost($m)
            'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-
+	$newcontent=$m->getParam(4);
 	$newcontent = $newcontent->scalarval();
+
+	$publish=$m->getParam(5);
 	$publish = $publish->scalarval();
 	$status = $publish ? 'published' : 'draft';
 	logIO('I',"Publish: $publish -> Status: $status");
 
 	if( ! ($postdata = get_postdata($post_ID)) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+2, "No such post."); // user error 2
+		return new xmlrpcresp(0, $xmlrpcerruser+2, "No such post (#$post_ID)."); // user error 2
 	}
 	
 	logIO('O','Old post Title: '.$postdata['Title']);
@@ -535,7 +542,7 @@ function bloggereditpost($m)
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID );
+	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -642,7 +649,7 @@ $bloggerdeletepost_doc='Deletes a post, blogger-api like';
 function bloggerdeletepost($m) 
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$tableposts,$cache_userdata,$post_autobr;
+	global $blog_ID,$tableposts,$cache_userdata;
 	global $post_default_title,$post_default_category, $sleep_after_edit;
 	$err="";
 
@@ -677,7 +684,7 @@ function bloggerdeletepost($m)
 	$blog_ID = get_catblog($post_category);
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $blog_ID );
+	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -711,6 +718,9 @@ $bloggergetusersblogs_doc='returns the user\'s blogs - this is a dummy function,
  * Data is returned as an array of <struct>'s containing the ID (blogid), name (blogName), 
  * and URL (url) of each blog. 
  *
+ * Non official: Also return a boolean stating wether or not the user can edit th eblog templates
+ * (isAdmin).
+ *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUsersBlogs.html}
  *
  * {@internal bloggergetusersblogs(-) }}
@@ -724,7 +734,8 @@ $bloggergetusersblogs_doc='returns the user\'s blogs - this is a dummy function,
  * @return xmlrpcresp XML-RPC Response, an array of <struct>'s containing for each blog:
  *					- ID (blogid), 
  *					- name (blogName), 
- *					- URL (url) . 
+ *					- URL (url),
+ *					- bool: can user edit template? (isAdmin).
  *
  * @todo A LOT !!!
  */
@@ -734,44 +745,41 @@ function bloggergetusersblogs($m)
 	global $tableusers, $tableblogs, $baseurl;
 
 	$username = $m->getParam(1);
-	$username = $user_login->scalarval();
+	$username = $username->scalarval();
 
-	$password=$m->getParam(2);
+	$password = $m->getParam(2);
 	$password = $password->scalarval();
 
-	if (user_pass_ok($username,$password)) 
+	if( ! user_pass_ok($username,$password) )  
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
            'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	dbconnect();
+	$userdata = get_userdatabylogin( $username );
+ 	$current_User = new User( $userdata );
 
-	$sql = "SELECT * FROM $tableblogs ORDER BY blog_name ASC";
-	$result = mysql_query($sql) or die($sql);
+	$resp_array = array();
+	// Loop through all blogs:
+	for( $curr_blog_ID=blog_list_start(); 
+				$curr_blog_ID!=false; 
+				 $curr_blog_ID=blog_list_next() ) 
+	{ 
+		if( ! $current_User->is_blog_member( $curr_blog_ID ) )
+		{	// Current user is not a member of this blog...
+			continue;
+		}
 
-	$i = 0;
-	while($row = mysql_fetch_object($result))
-	{
-		$blogid = $row->blog_ID;
-		$blogname = $row->blog_name;
-		$siteurl = $row->blog_siteurl;
-		$blogstub = $row->blog_stub;
-
-		$struct[$i]  = new xmlrpcval(array("isAdmin" => new xmlrpcval($is_admin,"boolean"),
-								"url" => new xmlrpcval($baseurl.$siteurl."/".$blogstub),
-								"blogid" => new xmlrpcval($blogid),
-								"blogName" => new xmlrpcval($blogname)
-								),"struct");
-		$i = $i + 1;
+		$resp_array[] = new xmlrpcval( array(
+					"blogid" => new xmlrpcval( $curr_blog_ID ),
+					"blogName" => new xmlrpcval( blog_list_iteminfo('shortname', false) ),
+					"url" => new xmlrpcval( blog_list_iteminfo('blogurl', false) ),
+					"isAdmin" => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ) ,'boolean')
+												), 'struct');
 	}
 
-	$data = array($struct[0]);
-	for ($j=1; $j<$i; $j++) {
-		array_push($data, $struct[$j]);
-	}
 
-	$resp = new xmlrpcval($data, "array");
+	$resp = new xmlrpcval($resp_array, 'array');
 
 	return new xmlrpcresp($resp);
 }
@@ -884,7 +892,8 @@ function bloggergetpost($m)
 	if (user_pass_ok($username,$password)) {
 		$postdata = get_postdata($post_ID);
 
-		if ($postdata["Date"] != "") {
+		if ($postdata["Date"] != "") 
+		{
 
 			$post_date = mysql2date("U", $postdata["Date"]);
 			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
@@ -1102,7 +1111,7 @@ function bloggergettemplate($m)
 	$current_User = new User( $userdata );
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'templates' );
+	if( ! $current_User->check_perm( 'templates' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -1196,7 +1205,7 @@ function bloggersettemplate($m)
 	$current_User = new User( $userdata );
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'templates' );
+	if( ! $current_User->check_perm( 'templates' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");

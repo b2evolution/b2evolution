@@ -87,7 +87,7 @@ if( empty($mode) )
 			echo '<a href="b2antispam.php" >', T_('Antispam'), '</a></li>';
 		}
 		
-		if( $current_User->check_perm( 'templates', '' ) )
+		if( $current_User->check_perm( 'templates', 'any' ) )
 		{
 			if( $title == T_('Custom skin template editing') )
 				echo '<li class="current">';
