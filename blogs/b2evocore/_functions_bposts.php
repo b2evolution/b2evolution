@@ -529,11 +529,11 @@ function the_status( $raw = true )
  *
  * @deprecated deprecated by {@link Item::lang()}
  */
-/*function the_lang()
+function the_lang()
 {
 	global $postdata;
 	echo $postdata['Locale'];
-}*/
+}
 
 /*
  * the_language(-)
@@ -542,12 +542,12 @@ function the_status( $raw = true )
  *
  * @deprecated deprecated by {@link Item::language()}
  */
-/*function the_language()
+function the_language()
 {
 	global $postdata, $languages;
 	$post_lang = $postdata['Locale'];
 	echo $languages[ $post_lang ];
-}*/
+}
 
 /*
  * the_wordcount(-)
@@ -556,11 +556,11 @@ function the_status( $raw = true )
  *
  * @deprecated deprecated by {@link Item::wordcount()}
  */
-/*function the_wordcount()
+function the_wordcount()
 {
 	global $postdata;
 	echo $postdata['Wordcount'];
-}*/
+}
 
 /*
  * the_title(-)
@@ -570,7 +570,7 @@ function the_status( $raw = true )
  *
  * @deprecated deprecated by {@link Item::title()}
  */
-/*function the_title(
+function the_title(
 	$before='',						// HTML/text to be displayed before title
 	$after='', 						// HTML/text to be displayed after title
 	$add_link = true, 		// Added link to this title?
@@ -605,7 +605,7 @@ function the_status( $raw = true )
 		echo $return_str;
 	else
 		return $return_str;
-}*/
+}
 
 
 /*
@@ -615,7 +615,7 @@ function the_status( $raw = true )
  *
  * @deprecated deprecated by {@link Item::url_link()}
  */
-/*function the_link( $before='', $after='', $format = 'htmlbody' )
+function the_link( $before='', $after='', $format = 'htmlbody' )
 {
 	global $postdata;
 
@@ -629,7 +629,7 @@ function the_status( $raw = true )
 	$link = $before.'<a href="'.$url.'">'.$url.'</a>'.$after;
 
 	echo format_to_output( $link, $format );
-}*/
+}
 
 
 
@@ -1352,14 +1352,14 @@ function permalink_anchor( $mode = 'id' )
  * @deprecated deprecated by {@link Item::gen_permalink(-)}
  */
 function gen_permalink(
-	$file, 											// base URL of the blog
-	$id,												// post ID to be linked to
-	$use_anchor_mode = '', 			// Default to id
-	$use_destination = '',			// Default to config
-	$use_more = NULL,						// DEPRECATED
-	$use_comments = NULL,	// DEPRECATED
-	$use_trackback = NULL,	// DEPRECATED
-	$use_pingback = NULL )	// DEPRECATED
+	$file,                  // base URL of the blog
+	$id,                    // post ID to be linked to
+	$use_anchor_mode = '',  // Default to id
+	$use_destination = '',  // Default to config
+	$use_more = NULL,			  // DEPRECATED
+	$use_comments = NULL,   // DEPRECATED
+	$use_trackback = NULL,  // DEPRECATED
+	$use_pingback = NULL )  // DEPRECATED
 {
 	global $cacheweekly;
 

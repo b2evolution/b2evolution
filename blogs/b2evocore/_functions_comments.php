@@ -332,13 +332,12 @@ function comment_author_url($echo=true)
 	$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 	// convert & into &amp;
 	$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
-	if ($url != 'http://') {
+	if ($url != 'http://')
+	{
 		if ($echo)
-		{
 			echo $url;
-		}else{
+		else
 			return $url;
-		}
 	}
 }
 

@@ -227,7 +227,7 @@ function create_antispam()
 {
 	global $tableantispam;
 
-	echo 'Creating table for Antispam Blackist...';
+	echo 'Creating table for Antispam Blackist... ';
 	$query = "CREATE TABLE $tableantispam (
 		aspm_ID bigint(11) NOT NULL auto_increment,
 		aspm_string varchar(80) NOT NULL,
@@ -262,13 +262,13 @@ function create_locales()
 {
 	global $tablelocales, $locales;
 	
-	echo 'Creating table for Locales...';
+	echo 'Creating table for Locales... ';
 	$query = "CREATE TABLE $tablelocales (
 		loc_locale varchar(10) NOT NULL default '',
 		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
 		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
 		loc_timefmt varchar(10) NOT NULL default 'H:i:s',
-		loc_lang varchar(30) NOT NULL default '',
+		loc_name varchar(40) NOT NULL default '',
 		loc_messages varchar(10) NOT NULL default '',
 		loc_enabled tinyint(4) NOT NULL default '1',
 		PRIMARY KEY loc_locale( loc_locale )
@@ -276,7 +276,7 @@ function create_locales()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
-	echo 'Creating Locales...';
+	echo 'Creating Locales... ';
 	if( isset($locales) && is_array($locales) )
 	{
 		foreach( $locales as $localekey => $lval )
@@ -285,18 +285,17 @@ function create_locales()
 			{ // if not explicit messages file is given we'll translate the locale
 				$lval['messages'] = strtr($localekey, '-', '_');
 			}
-			$query = "INSERT INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_lang, loc_messages, loc_enabled )
+			$query = "INSERT INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled )
 				VALUES (
 				'$localekey',
 				'{$lval['charset']}',
 				'{$lval['datefmt']}',
 				'{$lval['timefmt']}',
-				'{$lval['language']}',
+				'{$lval['name']}',
 				'{$lval['messages']}',
 				1
 				)";
 			$q = mysql_query($query) or mysql_oops( $query );
-			pre_dump($query);
 		}
 		echo 'OK.';
 	} else echo 'failed: array $locales not defined.';
@@ -502,7 +501,7 @@ function create_default_categories( $populate_blog_a = true )
 	global $query, $timestamp;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
 
-	echo 'Creating sample categories...';
+	echo 'Creating sample categories... ';
 
 	if( $populate_blog_a )
 	{
@@ -648,7 +647,7 @@ function populate_main_tables()
 
 	create_default_categories();
 
-	echo 'Creating sample posts for blog A...';
+	echo 'Creating sample posts for blog A... ';
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -688,7 +687,7 @@ function populate_main_tables()
 	echo "OK.<br />\n";
 
 
-	echo 'Creating default users...';
+	echo 'Creating default users... ';
 
 	// USERS !
 	$User_Admin = & new User();
@@ -717,7 +716,7 @@ function populate_main_tables()
 	echo "OK.<br />\n";
 
 
-	echo 'Creating user blog permissions...';
+	echo 'Creating user blog permissions... ';
 	// Admin for blog A:
 	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,

@@ -38,20 +38,20 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8010 )
 	{
-		echo 'Upgrading users table...';
+		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
 							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading blogs table...';
+		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE $tableblogs
 							MODIFY COLUMN blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							MODIFY COLUMN blog_longdesc TEXT NULL DEFAULT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading categories table...';
+		echo 'Upgrading categories table... ';
 		$query = "ALTER TABLE $tablecategories
 							ADD COLUMN cat_description VARCHAR(250) NULL DEFAULT NULL,
 							ADD COLUMN cat_longdesc TEXT NULL DEFAULT NULL,
@@ -59,7 +59,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading posts table...';
+		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE $tableposts
 							MODIFY COLUMN post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							ADD COLUMN post_urltitle VARCHAR(50) NULL DEFAULT NULL AFTER post_title,
@@ -68,7 +68,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Generating wordcounts...';
+		echo 'Generating wordcounts... ';
 		$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		$rows_updated = 0;
@@ -84,7 +84,7 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8020 )
 	{
-		echo 'Encoding passwords...';
+		echo 'Encoding passwords... ';
 		$query = "UPDATE $tableusers
 							SET user_pass = MD5(user_pass)";
 		$q = mysql_query($query) or mysql_oops( $query );
@@ -94,13 +94,13 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8030 )
 	{
-		echo 'Deleting unecessary logs...';
+		echo 'Deleting unecessary logs... ';
 		$query = "DELETE FROM $tablehitlog
 							WHERE hit_ignore IN ('badchar', 'blacklist')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Updating blog urls...';
+		echo 'Updating blog urls... ';
 		$query = "SELECT blog_ID, blog_siteurl FROM $tableblogs";
 		$q = mysql_query($query) or mysql_oops( $query );
 		$rows_updated = 0;
@@ -132,7 +132,7 @@ function upgrade_b2evo_tables()
 	{ // upgarde to 0.8.7
 		create_antispam();
 
-		echo 'Upgrading Settings table...';
+		echo 'Upgrading Settings table... ';
 		$query = "ALTER TABLE $tablesettings
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$q = mysql_query($query) or mysql_oops( $query );
@@ -142,7 +142,7 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8050 )
 	{ // upgrade to 0.8.9
-		echo 'Upgrading blogs table...';
+		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE $tableblogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
 							ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 1,
@@ -157,7 +157,7 @@ function upgrade_b2evo_tables()
 		// Create User Groups
 		create_groups();
 
-		echo 'Creating user blog permissions...';
+		echo 'Creating user blog permissions... ';
 		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
 		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
@@ -177,7 +177,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading users table...';
+		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
@@ -186,7 +186,7 @@ function upgrade_b2evo_tables()
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Assigning user groups...';
+		echo 'Assigning user groups... ';
 
 		// Default is 1, so admins are already set.
 
@@ -204,7 +204,7 @@ function upgrade_b2evo_tables()
 
 		echo "OK.<br />\n";
 
-		echo 'Upgrading settings table...';
+		echo 'Upgrading settings table... ';
 		$query = "ALTER TABLE $tablesettings
 							DROP COLUMN time_format,
 							DROP COLUMN date_format,
@@ -219,9 +219,75 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8060 )
 	{	// upgrade to 0.8.9+CVS
 
+		/**
+		 * converts languages in a given table into according locales
+		 *
+		 * @param string name of the table
+		 * @param string name of the column where lang is stored
+		 * @param string name of the table's ID column
+		 *
+		 * blueyed: created
+		 *
+		 */
+		function convert_lang_to_locale( $table, $columnlang, $columnID )
+		{
+			global $locales, $default_locale;
+			
+			# TODO: check, if 'xx-XX' is suitable
+			if( !preg_match('/[a-z]{2}-[A-Z]{2}/', $default_locale) )
+			{ // we want a valid locale
+				$default_locale = 'en_US';
+			}
+			
+			echo '<br /><strong>Converting languages to locales for '. $table. '..</strong><br />';
+		
+			// query given languages in $table
+			$query = "SELECT $columnID, $columnlang FROM $table";
+			$result = mysql_query($query) or mysql_oops( $query );
+			
+			$languagestoconvert = array();
+			while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) )
+			{
+				// remember the ID for that locale
+				$languagestoconvert[ $row[ $columnlang ] ][] = $row[ $columnID ];
+			}
+			
+			foreach( $languagestoconvert as $lkey => $lIDs)
+			{ // converting the languages we've found
+				$converted = false;
+				echo 'Converting language \''. $lkey. '\' (with IDs: '. implode( ', ', $lIDs ). ').. ';
+				if( strlen($lkey) == 2 )
+				{ // we have an old two letter lang code to convert
+					foreach( $locales as $newlkey => $v )
+					{  // loop given locales
+						if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
+						{  // if language matches, update
+							$query = "UPDATE $table SET $columnlang = '$newlkey' WHERE $columnlang = '$lkey'";
+							$converted = mysql_query($query) or mysql_oops( $query );
+							echo 'updated to locale \''. $newlkey. '\'<br />';
+							break;
+						}
+					}
+				}
+				
+				if( !$converted )
+				{ // we have nothing converted yet
+					# TODO: check, if 'xx-XX' is suitable
+					if( !preg_match('/[a-z]{2}-[A-Z]{2}/', $lkey) )
+					{ // no valid locale in DB, setting default.
+						$query = "UPDATE $table SET $columnlang = '$default_locale' WHERE $columnlang = '$lkey'";
+						$q = mysql_query($query) or mysql_oops( $query );
+						echo 'forced to default locale \''. $default_locale. '\'<br />';
+						
+					} else echo 'nothing to update, already valid!<br />';
+				}
+			}
+			echo "\n";
+		}  // convert_lang_to_locale(-)
+		
 		create_locales();
 		
-		echo 'Upgrading posts table...';
+		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE $tableposts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
@@ -230,20 +296,33 @@ function upgrade_b2evo_tables()
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
+		/*
+		DH to FP: I got this here:
+		MySQL said:
+		You have an error in your SQL syntax. Check the manual that corresponds to your MySQL server version for the right syntax to use near 'DROP INDEX post_date, ADD INDEX post_issue_date( post_i (error 1064)
+		# so I used just this for testing:
+		# $query = "ALTER TABLE $tableposts CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US'";
+		*/
 		$q = mysql_query($query) or mysql_oops( $query );
-
+		
 		$query = "UPDATE $tableposts
 							SET post_mod_date = post_issue_date";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading blogs table...';
-		$query = "ALTER TABLE $tableblogs 
+		// convert given languages to locales
+		convert_lang_to_locale( $tableposts, 'post_locale', 'ID' );
+		
+		echo 'Upgrading blogs table... ';
+		$query = "ALTER TABLE $tableblogs
 							CHANGE blog_lang blog_locale varchar(10) NOT NULL default 'en-US'";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading settings table...';
+		// convert given languages to locales
+		convert_lang_to_locale( $tableblogs, 'blog_locale', 'blog_ID' );
+		
+		echo 'Upgrading settings table... ';
 		$query = "ALTER TABLE $tablesettings
 							ADD COLUMN pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
 							ADD COLUMN pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle'";
@@ -261,53 +340,6 @@ function upgrade_b2evo_tables()
 		 * everywhere where needed in this file.
 		 */
 		
-		// FP to DH: some stuff already moved and merged with previous block
-		// Following needs rewrite
-		
-		// convert given languages to locales, for blogs and posts
-		foreach( array(
-							$tableblogs => array('blog_ID', 'blog_locale'),
-							$tableposts => array('ID', 'post_locale')
-						) as $table => $params )
-		{
-			list($ID, $dblocale) = $params;
-			
-			echo '<br /><strong>Converting lang to locale for '. $table. '..</strong><br />';
-			$query = "SELECT $ID, $dblocale FROM $table";
-			echo "Query: $query <br />";
-			$result = mysql_query($query) or mysql_oops( $query );
-			
-			while( $row = mysql_fetch_array( $result ) ){
-				echo $row[ $ID ]. ': checking '. $row[ $dblocale ]. '.. ';
-				if( strlen($row[ $dblocale ]) == 2 )
-				{ // we have a two char lang to convert
-					$q = false;
-					foreach( $locales as $localekey => $v )
-					{  // loop given locales
-						if( substr($localekey, 0, 2) == $row[ $dblocale ] )
-						{  // if language matches, update
-							$query = "UPDATE $table SET $dblocale = '$localekey'";
-							$q = mysql_query($query) or mysql_oops( $query );
-							echo 'Updated to '. $localekey. '<br />';
-							break;
-						}
-					}
-					if( !$result ) echo 'Could not update <br />';
-				}
-				else
-				{
-					if( !preg_match('/[a-z]{2}-[A-Z]{2}/', $row[ $dblocale ]) )
-					{ // no valid locale in DB, setting default.
-						$query = "UPDATE $table SET $dblocale = '$default_locale'";
-						$q = mysql_query($query) or mysql_oops( $query );
-						echo 'Forced to default '. $default_locale. '<br />';
-						
-					} else echo 'Nothing to update, already valid!<br />';
-					
-				}
-			}
-		}
-		echo "OK.<br />\n";
 	}
 	
 	echo "Update DB schema version to $new_db_version... ";

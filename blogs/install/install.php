@@ -19,17 +19,19 @@ require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bpost
 require_once (dirname(__FILE__). '/_functions_create.php' );
 
 
-// catch explicit set locale
-param('setlocale', 'string');
-if( $setlocale == '' )
+param( 'action', 'string' );
+// explicit set locale
+param('locale', 'string');
+
+if( $locale == '' )
 { // detect language
 	$default_locale = locale_from_httpaccept();
 	#echo 'detected locale: ' . $default_locale. '<br />';
 }
 else
 {
-	if( preg_match('/[a-z]{2}-[A-Z]{2}/', $setlocale) )
-		$default_locale = $setlocale;
+	if( preg_match('/[a-z]{2}-[A-Z]{2}/', $locale) )
+		$default_locale = $locale;
 }
 
 
@@ -57,31 +59,45 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
-<div class="FigZone">
+
+
 <?php
-	foreach( $locales as $localekey => $localevalue ){
-		$llang = substr( $localekey, strpos($localekey, '-') + 1, 2 );
-		if( $default_locale == $localekey )
-			echo '<span style="font-size:120%;font-weight:bold;">';	
-		echo ' <a href="?setlocale='. $localekey. '">';
-		#pre_dump(dirname(__FILE__). "/$install_dirout/img/flags/10px/$llang.gif");
-		if( is_file(dirname(__FILE__). "/$install_dirout/img/flags/10px/$llang.gif") )
-		{  // we have a flag for that locale
-			echo '<img src="'. $install_dirout. '/img/flags/10px/'. $llang. '.gif" width="'
-				. ( ($default_locale == $localekey)? '20' : '15' ) . 'px" alt="'. $llang. '" />';
-		} else
-		{
-			#echo T_($localevalue['language']);
-			echo '['. $localevalue['language']. ']';
-		};
-		echo '</a> ';
+
+if( empty($action) )
+{
+	echo '<div style="float:right;border:1px dotted black;padding:1ex;">
+	<h2>Settings</h2>
+	<p>Choose a default locale. Clicking it should directly activate it.</p>
+	
+	<ul style="margin-left: 2ex;list-style:none;" >';
+
+	// present available locales on first screen
+	foreach( $locales as $lkey => $lvalue ){
+		$lflag = substr( $lkey, strpos($lkey, '-') + 1, 2 );
 		
-		if( $default_locale == $localekey ) echo '</span>';	
+		echo '<li>';
+		if( $locale == $lkey )
+			echo '<span style="font-size:120%;font-weight:bold;">';	
+		echo ' <a href="?locale='. $lkey. '">';
+		
+		if( is_file(dirname(__FILE__). "/$install_dirout/img/flags/10px/$lflag.gif") )
+		{  // we have a flag for that locale
+			echo '<img src="'. $install_dirout. '/img/flags/10px/'. $lflag. '.gif" width="'
+				. ( ($default_locale == $lkey)? '20' : '15' ) . 'px" alt="'. $lvalue['name']. '" border="0" /> ';
+		}
+		#echo T_($localevalue['language']);
+		echo $lvalue['name'];
+		echo '</a> </li>';
+		
+		if( $default_locale == $lkey ) echo '</span>';	
 	}
+	echo '</ul></div>';
+}
 ?>
-</div>
 
 <h1>Database tables installation</h1>
+<br />
+
 <p>PHP version: <?php echo phpversion(); ?></p>
 <?php
 	list( $version_main, $version_minor ) = explode( '.', phpversion() );
@@ -129,8 +145,6 @@ function check_db_version()
 
 
 dbconnect() or die( '<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>' );
-
-param( 'action', 'string' );
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
@@ -203,7 +217,7 @@ switch( $action )
 		 * DELETE DB: Delete the db structure!!! (Everything will be lost)
 		 * -----------------------------------------------------------------------------------
 		 */
-		require_once (dirname(__FILE__).'/_functions_delete.php');
+		require_once( dirname(__FILE__). '/_functions_delete.php' );
 		?>
 		<h2>Deleting b2evolution tables from the datatase</h2>
 		<?php
@@ -237,6 +251,7 @@ switch( $action )
 		?>
 		<h2>What do you want to install?</h2>
 		<form action="install.php" method="get">
+			<input type="hidden" name="locale" value="<?php echo $locale; ?>" />
 			<p>The database tables installation can be done in different ways. Choose one:</p>
 			<p><input type="radio" name="action" value="newdb" checked="checked"> <strong>New Install</strong>: Install b2evolution database tables with sample data.</p>
 			<p><input type="radio" name="action" value="evoupgrade"> <strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!</p>

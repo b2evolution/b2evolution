@@ -43,111 +43,119 @@ function NT_($string)
 #
 $locales = array(
 	'cs-CZ' => array( // Czech, CZECH REPUBLIC
+									'name' => NT_('Czech (Czech Republic)'),
 									'charset' => 'utf-8',
 									'datefmt' => 'd. m. y',
 									'timefmt' => 'H.i:s',
-									'language' => NT_('Czech'),
+									'messages' => 'cs_CZ',
+									'enabled' => 1,
 								),
-	'de-DE' => array( // German, Germany
+	'de-DE' => array( // German, GERMANY
+									'name' => NT_('German (Germany)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('German'),
+									'messages' => 'de_DE',
+									'enabled' => 1,
 								),
 	'en-US' => array( // English, USA
+									'name' => NT_('English (USA)'),
 									'charset' => 'iso-8859-1',	// gettext will convert to this
 									'datefmt' => 'm/d/y',
 									'timefmt' => 'h:i:s a',
-									'language' => NT_('English'),
+									'messages' => 'en_US',
+									'enabled' => 1,
 								),
 	'es-ES' => array(	// Spanish, SPAIN
+									'name' => NT_('Spanish (SPAIN)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Spanish'),
+									'messages' => 'es_ES',
+									'enabled' => 1,
 								),
 	'fr-FR' => array( // French, FRANCE
+									'name' => NT_('French'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('French'),
+									'messages' => 'fr_FR',
+									'enabled' => 1,
 								),
-	'it-IT' => array( // Italian, Italy
+	'it-IT' => array( // Italian, ITALY
+									'name' => NT_('Italian (Italy)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Italian'),
+									'messages' => 'it_IT',
+									'enabled' => 1,
 								),
 	'ja-JP' => array(	// Japanese, JAPAN
+									'name' => NT_('Japanese (Japan)'),
 									'charset' => 'utf-8',
 									'datefmt' => 'Y/m/d',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Japanese'),
+									'messages' => 'ja_JP',
+									'enabled' => 1,
 								),
-	'lt-LT' => array( // Lithuanian
+	'lt-LT' => array( // Lithuanian, LITHUANIA
+									'name' => NT_('Lithuanian (Lithuania)'),
 									'charset' => 'Windows-1257',
 									'datefmt' => 'Y-m-d',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Lithuanian'),
+									'messages' => 'lt_LT',
+									'enabled' => 1,
 								),
 	'nb-NO' => array( // Bokmål, NORWAY
+									'name' => NT_('Bokm&aring;l (Norway)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Norwegian Bokm&aring;l'),
+									'messages' => 'nb_NO',
+									'enabled' => 1,
 								),
 	'nl-NL' => array( // Dutch, NETHERLANDS
+									'name' => NT_('Dutch (Netherlands)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd-m-y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Dutch'),
+									'messages' => 'nl_NL',
+									'enabled' => 1,
 								),
 	'pt-BR' => array( // Portuguese, BRAZIL
+									'name' => NT_('Portuguese (Brazil)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Portuguese'),
+									'messages' => 'pt_BR',
+									'enabled' => 1,
 								),
 	'sv-SE' => array( // Sweedish, SWEDEN
+									'name' => NT_('Swedish (Sweden)'),
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'y-m-d',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Swedish'),
+									'messages' => 'sv_SE',
+									'enabled' => 1,
 								),
 	'zh-CN' => array( // Simplified Chinese, CHINA
+									'name' => NT_('Simplified Chinese (China)'),
 									'charset' => 'gb2312',
 									'datefmt' => 'y-m-d',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Simplified Chinese'),
+									'messages' => 'zh_CN',
+									'enabled' => 1,
 								),
 	'zh-TW' => array( // Traditional Chinese, TAIWAN
+									'name' => NT_('Traditional Chinese (Taiwan)'),
 									'charset' => 'utf-8',
 									'datefmt' => 'Y-m-d',
 									'timefmt' => 'H:i:s',
-									'language' => NT_('Traditional Chinese'),
+									'messages' => 'zh_TW',
+									'enabled' => 1,
 								),
 );
 //}}}
-
-
-/*{{{ # Supported languages for posts: - oldstyle
-$languages = array(
-	'cs' => NT_('Czech'),
-	'nl' => NT_('Dutch'),
-	'en' => NT_('English'),
-	'fr' => NT_('French'),
-	'de' => NT_('German'),
-	'it' => NT_('Italian'),
-	'ja' => NT_('Japanese'),
-	'lt' => NT_('Lithuanian'),
-	'nb' => NT_('Norwegian Bokm&aring;l'),
-	'pt' => NT_('Portuguese'),
-	'es' => NT_('Spanish'),
-	'sv' => NT_('Swedish'),
-	'zh' => NT_('Simplified Chinese'),
-//	'zh' => NT_('Traditional Chinese'),
-	);
-}}}*/
 
 
 // Load locale related functions: (ne need NT_() here)

@@ -45,7 +45,7 @@ elseif( $use_l10n == 2 )
 		#echo locale_messages($req_locale); exit;
 		if( !isset($trans[ $current_messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
-			@include_once( dirname(__FILE__). '/../locales/'. locale_fromdb($req_locale, 'messages'). '/_global.php' );
+			@include_once( dirname(__FILE__). '/../locales/'. $locales[ $req_locale ][ 'messages' ]. '/_global.php' );
 			if( !isset($trans[ $current_messages ] ) )
 			{	// Still not loaded... file doesn't exist, memorize that no translation are available
 				$trans[ $current_messages ] = array();
@@ -90,8 +90,8 @@ function locale_activate( $locale )
 	$current_locale = $locale;
 	// Memorize new charset:
 	#$current_charset = $locales[ $locale ][ 'charset' ];
-	$current_charset = locale_fromdb( $locale, 'charset' );
-	$current_messages = locale_fromdb( $locale, 'messages' );
+	$current_charset = $locales[ $locale ][ 'charset' ];
+	$current_messages = $locales[ $locale][ 'messages' ];
 
 	// Activate translations in gettext:
 	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
@@ -217,34 +217,9 @@ function locale_options( $default = '' )
 	}
 }
 
-/*
- * locale_fromdb(-)
- *
- *	@return returns given property from DB
- *	
- *	blueyed: created. Temporary. Should consider using a class for locales.
- */
-function locale_fromdb( $locale, $what )
-{
-	return false;  // damn, no db-connection.
-	
-	global $tablelocales, $querycount;
-	$query = "SELECT loc_$what FROM $tablelocales WHERE loc_locale = '$locale'";
-	$result = mysql_query( $query ) or mysql_oops( $query );
-	$querycount++;
-	if( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) )
-	{
-		return $row[ 'loc_'. $what ];
-	}
-	else
-	{
-		return false;
-	}
-	
-}
 
-/*
- * locale_from_httpaccept(-)
+/**
+ *	Detect language from HTTP_ACCEPT_LANGUAGE
  *
  *	@return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
  *	
@@ -274,6 +249,33 @@ function locale_from_httpaccept()
 			return $matches[2];
 	}
 	return $default_locale;
+}
+
+
+// load locales from DB into $locales array
+
+return;
+$query = 'SELECT
+					loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled
+					FROM '. $tablelocales;
+$result = mysql_query( $query ) or mysql_oops( $query );
+$querycount++;
+
+while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) )
+{
+	if( $row[ 'loc_enabled' ] ){
+		$locales[ $row['loc_locale'] ] = array(
+			'charset'  => $row[ 'loc_charset' ],
+			'dateftm'  => $row[ 'loc_datefmt' ],
+			'timeftm'  => $row[ 'loc_timefmt' ],
+			'name'     => $row[ 'loc_name' ],
+			'messages' => $row[ 'loc_messages' ],
+		);
+	}
+	else
+	{
+		unset( $locales[ $row['loc_locale'] ] );
+	}
 }
 
 ?>

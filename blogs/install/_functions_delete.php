@@ -10,56 +10,60 @@
  *
  * @package install
  */
-if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-	die("Please, do not access this page directly.");
+if( substr( basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
+	die(' Please, do not access this page directly.' );
 
 function db_delete()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-        $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
+				$tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
 
-	echo "Droping Antispam table...<br />\n";
+	echo "Dropping Antispam table...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableantispam";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Hit-Logs...<br />\n";
+
+	echo "Dropping Hit-Logs...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablehitlog";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Comments...<br />\n";
+
+	echo "Dropping Comments...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablecomments";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Categories-to-Posts relationships...<br />\n";
+
+	echo "Dropping Categories-to-Posts relationships...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablepostcats";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Categories...<br />\n";
+
+	echo "Dropping Categories...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablecategories";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Posts...<br />\n";
+
+	echo "Dropping Posts...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableposts";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Users...<br />\n";
+
+	echo "Dropping Users...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableusers";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Groups...<br />\n";
+
+	echo "Dropping Groups...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablegroups";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Blogs...<br />\n";
+
+	echo "Dropping Blogs...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableblogs";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Blogusers...<br />\n";
+
+	echo "Dropping Blogusers...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tableblogusers";
 	$q = mysql_query($query) or mysql_oops( $query );
-	
-	echo "Droping Settings...</p>\n";
+
+	echo "Dropping Settings...<br />\n";
 	$query = "DROP TABLE IF EXISTS $tablesettings";
+	$q = mysql_query($query) or mysql_oops( $query );
+
+	echo "Dropping Locales...<br />\n";
+	$query = "DROP TABLE IF EXISTS $tablelocales";
 	$q = mysql_query($query) or mysql_oops( $query );
 }
 
