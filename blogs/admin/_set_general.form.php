@@ -67,7 +67,7 @@
 	{ ?>
 	<fieldset>
 		<fieldset>
-			<div <?php echo ( $tab == 'regional' ) ? 'style="text-align:center"' : 'class="input"'?>>
+			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
 				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 			</div>

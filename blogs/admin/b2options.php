@@ -66,13 +66,13 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			{
 				if( param($param, 'string', '', false, false, false) !== false ) // don't force setting
 				{ // We have provided a new value
-					change_settings( $param, $$param );
+					change_setting( $param, $$param );
 				}
 				elseif( in_array($$param, $defaults) )
 				{
 					if( get_settings($param) != $$param )
 					{
-						change_settings( $param, $defaults[$param] );
+						change_setting( $param, $defaults[$param] );
 					}
 				}
 				else
@@ -104,19 +104,11 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				param( 'newdefault_locale', 'string', true);
 				param( 'newtime_difference', 'integer', true );
 				
-				if( locale_updateDB() )
-				{
-					$status_update[] = T_('Regional settings updated.');
-				}
-				
-				if( $newdefault_locale != get_settings('default_locale') )
-				{
-					// set default locale
-					change_settings('default_locale', $newdefault_locale);
-					change_settings('time_difference', $newtime_difference);
-					
-					$status_update[] = T_('New default locale set.');
-				}
+				change_setting('default_locale', $newdefault_locale);
+				change_setting('time_difference', $newtime_difference);
+				locale_updateDB();
+
+				$status_update[] = T_('Regional settings updated.');
 				break;
 
 
@@ -202,8 +194,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$q = $DB->query($query);
 				
 				// reset default_locale
-				$query = "UPDATE $tablesettings SET default_locale = '$default_locale'";
-				$q = $DB->query($query);
+				change_setting( 'default_locale', $default_locale );
 				
 				$status_update[] = T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.');
 				break;
@@ -344,7 +335,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					
 					// reload locales
 					unset( $locales );
-					include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
+					require( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
 					@include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_overrides_TEST.php' );
 					
 					$status_update[] = sprintf(T_("Deleted locale '%s' from database."), $delete);

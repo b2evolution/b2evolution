@@ -523,25 +523,25 @@ function set_settings( $setting, $value )
 
 
 /**
- * changes settings into DB
+ * Change a setting and save it into DB
+ *
+ * Setting will be created if it doesn't exist
+ *
+ * {@internal change_setting(-)}}
  *
  * @param string setting name
  * @param mixed setting value
  */
-function change_settings( $setting, $value, $escape = true )
+function change_setting( $name, $value )
 {
 	global $cache_settings, $tablesettings, $DB;
-	
+
 	// change the cached settings
-	$cache_settings->$setting = $value;
-	
-	if( $escape )
-	{
-		$DB->escape($value);
-	}
-	$query = "UPDATE $tablesettings SET set_value = '".$value."' WHERE set_name = '$setting'";
-	
-	return $DB->query( $query );
+	$cache_settings->$name = $value;
+
+	// update DB	
+	return $DB->query( "REPLACE INTO $tablesettings ( set_name, set_value )
+											VALUES( '$name', '".$DB->escape($value)."')" );
 }
 
 
