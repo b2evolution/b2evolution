@@ -92,8 +92,8 @@ function upgrade_cafelog_tables()
 
 	echo 'Copying Cafelog posts... ';
 	// Warning: This will copy a lot of categories to 0. We need to fix those later!
-	$query = "INSERT INTO T_posts( ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content,post_title, post_category, post_autobr, post_flags, post_karma)
-						SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 1, 'pingsdone,imported', post_karma
+	$query = "INSERT INTO T_posts( ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content,post_title, post_category, post_autobr, post_flags)
+						SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 1, 'pingsdone,imported'
 						FROM $wp_prefix"."posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";

@@ -29,17 +29,26 @@ function db_delete()
 	echo "Dropping Categories-to-Posts relationships...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_postcats' );
 
+	echo "Dropping Posts...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_posts' );
+
 	echo "Dropping Categories...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_categories' );
 
-	echo "Dropping Posts...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_posts' );
+	echo "Dropping Post Statuses...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_poststatuses' );
+
+	echo "Dropping Post Types...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_posttypes' );
 
 	echo "Dropping User Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
 
  	echo "Dropping User sessions...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_sessions' );
+
+	echo "Dropping Blogusers...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_blogusers' );
 
 	echo "Dropping Users...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_users' );
@@ -49,9 +58,6 @@ function db_delete()
 
 	echo "Dropping Blogs...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_blogs' );
-
-	echo "Dropping Blogusers...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_blogusers' );
 
 	echo "Dropping Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_settings' );

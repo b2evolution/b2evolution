@@ -104,7 +104,7 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Blogs... ';
 	$query = "CREATE TABLE T_blogs (
-		blog_ID int(4) NOT NULL auto_increment,
+		blog_ID int(11) unsigned NOT NULL auto_increment,
 		blog_shortname varchar(12) NULL default '',
 		blog_name varchar(50) NOT NULL default '',
 		blog_tagline varchar(250) NULL default '',
@@ -148,7 +148,7 @@ function create_b2evo_tables()
 		cat_ID int(4) NOT NULL auto_increment,
 		cat_parent_ID int(11) default NULL,
 		cat_name tinytext NOT NULL,
-		cat_blog_ID int(11) NOT NULL default '2',
+		cat_blog_ID int(11) unsigned NOT NULL default '2',
 		cat_description VARCHAR(250) NULL DEFAULT NULL,
 		cat_longdesc TEXT NULL DEFAULT NULL,
 		cat_icon VARCHAR(30) NULL DEFAULT NULL,
@@ -162,32 +162,39 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Posts... ';
 	$query = "CREATE TABLE T_posts (
-		ID int(10) unsigned NOT NULL auto_increment,
-		post_author int(4) NOT NULL default '0',
-		post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
-		post_mod_date datetime NOT NULL default '0000-00-00 00:00:00',
-		post_status enum('published','deprecated','protected','private','draft')
-									NOT NULL default 'published',
-		post_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-		post_content text NOT NULL,
-		post_title text NOT NULL,
-		post_urltitle VARCHAR(50) NULL DEFAULT NULL,
-		post_url VARCHAR(250) NULL DEFAULT NULL,
-		post_category int(4) NOT NULL default '0',
-		post_autobr tinyint(4) NOT NULL default '1',
-		post_flags SET( 'pingsdone', 'imported'),
-		post_views INT NOT NULL DEFAULT '0',
-		post_karma int(11) NOT NULL default '0',
-		post_wordcount int(11) default NULL,
-		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-		post_commentsexpire DATETIME DEFAULT NULL,
-		post_renderers VARCHAR(179) NOT NULL default 'default',
+		ID 										int(10) unsigned NOT NULL auto_increment,
+		post_parent_ID				int(10) unsigned NULL,
+		post_author 					int(11) unsigned NOT NULL default '0',
+		post_assigned_user_ID	int(10) unsigned NULL,
+		post_issue_date				datetime NOT NULL default '0000-00-00 00:00:00',
+		post_mod_date					datetime NOT NULL default '0000-00-00 00:00:00',
+		post_status						enum('published','deprecated','protected','private','draft')
+														NOT NULL default 'published',
+		post_pst_ID						int(11) unsigned NULL,
+		post_ptyp_ID					int(11) unsigned NULL,
+		post_locale						VARCHAR(20) NOT NULL DEFAULT 'en-EU',
+		post_content					text NOT NULL,
+		post_title						text NOT NULL,
+		post_urltitle					VARCHAR(50) NULL DEFAULT NULL,
+		post_url							VARCHAR(250) NULL DEFAULT NULL,
+		post_category					int(4) NOT NULL default '0',
+		post_autobr						tinyint(4) NOT NULL default '1',
+		post_flags						SET( 'pingsdone', 'imported'),
+		post_views						INT NOT NULL DEFAULT '0',
+		post_wordcount				int(11) default NULL,
+		post_comments					ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+		post_commentsexpire 	DATETIME DEFAULT NULL,
+		post_renderers 				VARCHAR(179) NOT NULL default 'default',
 		PRIMARY KEY post_ID( ID ),
+		UNIQUE post_urltitle( post_urltitle ),
 		INDEX post_issue_date( post_issue_date ),
 		INDEX post_category( post_category ),
 		INDEX post_author( post_author ),
 		INDEX post_status( post_status ),
-		UNIQUE post_urltitle( post_urltitle )
+		INDEX post_parent_ID( post_parent_ID ),
+		INDEX post_assigned_user_ID( post_assigned_user_ID ),
+		INDEX post_ptyp_ID( post_ptyp_ID ),
+		INDEX post_pst_ID( post_pst_ID )
 	)";
 	$DB->query( $query );
 	echo "OK.<br />\n";
@@ -195,7 +202,7 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Categories-to-Posts relationships... ';
 	$query = "CREATE TABLE T_postcats (
-		postcat_post_ID int(11) NOT NULL default '0',
+		postcat_post_ID int(11) unsigned NOT NULL default '0',
 		postcat_cat_ID int(11) NOT NULL default '0',
 		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID)
 	)"; // We might want to add an index on cat_ID here...
@@ -205,8 +212,8 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Comments... ';
 	$query = "CREATE TABLE T_comments (
-		comment_ID int(11) unsigned NOT NULL auto_increment,
-		comment_post_ID int(11) NOT NULL default '0',
+		comment_ID				int(11) unsigned NOT NULL auto_increment,
+		comment_post_ID		int(11) unsigned NOT NULL default '0',
 		comment_type enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
 		comment_status ENUM('published', 'deprecated', 'protected', 'private', 'draft') DEFAULT 'published' NOT NULL,
 		comment_author_ID int unsigned NULL default NULL,
@@ -246,13 +253,16 @@ function create_b2evo_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
+
 	// Additionnal tables:
 	create_antispam();
 	create_locales();
 	create_b2evo_tables_091();
+
+	
+	// Create relations:
+	create_b2evo_relations();
 }
-
-
 
 
 /*
@@ -385,8 +395,8 @@ function create_groups()
 
 	echo 'Creating table for Blog-User permissions... ';
 	$query = "CREATE TABLE T_blogusers (
-		bloguser_blog_ID int NOT NULL default 0,
-		bloguser_user_ID int NOT NULL default 0,
+		bloguser_blog_ID int(11) unsigned NOT NULL default 0,
+		bloguser_user_ID int(11) unsigned NOT NULL default 0,
 		bloguser_ismember tinyint NOT NULL default 0,
 		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
 		bloguser_perm_delpost tinyint NOT NULL default 0,
@@ -772,6 +782,47 @@ function populate_main_tables()
 
 	create_default_categories();
 
+	echo 'Creating default users... ';
+
+	// USERS !
+	$User_Admin = & new User();
+	$User_Admin->set( 'login', 'admin' );
+	if( !isset( $install_password ) )
+	{
+		$random_password = substr(md5(uniqid(microtime())),0,6);
+	}
+	else
+	{
+		$random_password = $install_password;
+	}
+	$User_Admin->set( 'pass', md5($random_password) );	// random
+	$User_Admin->set( 'nickname', 'admin' );
+	$User_Admin->set( 'email', $admin_email );
+	$User_Admin->set( 'ip', '127.0.0.1' );
+	$User_Admin->set( 'domain', 'localhost' );
+	$User_Admin->set( 'level', 10 );
+	$User_Admin->set( 'locale', $default_locale );
+	$User_Admin->set_datecreated( $timestamp++ );
+	// Note: NEVER use database time (may be out of sync + no TZ control)
+	$User_Admin->setGroup( $Group_Admins );
+	$User_Admin->dbinsert();
+
+	$User_Demo = & new User();
+	$User_Demo->set( 'login', 'demouser' );
+	$User_Demo->set( 'pass', md5($random_password) ); // random
+	$User_Demo->set( 'nickname', 'Mr. Demo' );
+	$User_Demo->set( 'email', $admin_email );
+	$User_Demo->set( 'ip', '127.0.0.1' );
+	$User_Demo->set( 'domain', 'localhost' );
+	$User_Demo->set( 'level', 0 );
+	$User_Demo->set( 'locale', $default_locale );
+	$User_Demo->set_datecreated( $timestamp++ );
+	$User_Demo->setGroup( $Group_Users );
+	$User_Demo->dbinsert();
+
+	echo "OK.<br />\n";
+
+
 	echo 'Creating sample posts for blog A... ';
 
 	// Insert a post:
@@ -812,47 +863,6 @@ function populate_main_tables()
 									 '$now', '".
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 0)";
 	$DB->query( $query );
-
-	echo "OK.<br />\n";
-
-
-	echo 'Creating default users... ';
-
-	// USERS !
-	$User_Admin = & new User();
-	$User_Admin->set( 'login', 'admin' );
-	if( !isset( $install_password ) )
-	{
-		$random_password = substr(md5(uniqid(microtime())),0,6);
-	}
-	else
-	{
-		$random_password = $install_password;
-	}
-	$User_Admin->set( 'pass', md5($random_password) );	// random
-	$User_Admin->set( 'nickname', 'admin' );
-	$User_Admin->set( 'email', $admin_email );
-	$User_Admin->set( 'ip', '127.0.0.1' );
-	$User_Admin->set( 'domain', 'localhost' );
-	$User_Admin->set( 'level', 10 );
-	$User_Admin->set( 'locale', $default_locale );
-	$User_Admin->set_datecreated( $timestamp++ );
-	// Note: NEVER use database time (may be out of sync + no TZ control)
-	$User_Admin->setGroup( $Group_Admins );
-	$User_Admin->dbinsert();
-
-	$User_Demo = & new User();
-	$User_Demo->set( 'login', 'demouser' );
-	$User_Demo->set( 'pass', md5($random_password) ); // random
-	$User_Demo->set( 'nickname', 'Mr. Demo' );
-	$User_Demo->set( 'email', $admin_email );
-	$User_Demo->set( 'ip', '127.0.0.1' );
-	$User_Demo->set( 'domain', 'localhost' );
-	$User_Demo->set( 'level', 0 );
-	$User_Demo->set( 'locale', $default_locale );
-	$User_Demo->set_datecreated( $timestamp++ );
-	$User_Demo->setGroup( $Group_Users );
-	$User_Demo->dbinsert();
 
 	echo "OK.<br />\n";
 
@@ -899,14 +909,16 @@ function create_b2evo_tables_091()
 								)" );
 	echo "OK.<br />\n";
 
+
 	echo 'Creating user settings table... ';
 	$DB->query( "CREATE TABLE T_usersettings (
-									uset_user_ID INT(10) NOT NULL ,
+									uset_user_ID INT(11) UNSIGNED NOT NULL,
 									uset_name VARCHAR( 30 ) NOT NULL,
 									uset_value VARCHAR( 255 ) NULL,
 									PRIMARY KEY ( uset_user_ID, uset_name )
 								)");
 	echo "OK.<br />\n";
+
 
 	echo 'Creating plugins table... ';
 	$DB->query( "CREATE TABLE T_plugins (
@@ -915,6 +927,26 @@ function create_b2evo_tables_091()
 									plug_classname varchar(40) NOT NULL default '',
 									PRIMARY KEY (plug_ID)
 								)");
+	echo "OK.<br />\n";
+
+
+	echo 'Creating table for Post Statuses... ';
+	$query="CREATE TABLE T_poststatuses (
+									pst_ID                int(11) unsigned     not null AUTO_INCREMENT,
+									pst_name              varchar(30)          not null,
+									primary key (pst_ID)
+								)";
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
+
+	echo 'Creating table for Post Types... ';
+	$query="CREATE TABLE T_posttypes (
+									ptyp_ID               int(11) unsigned     not null AUTO_INCREMENT,
+									ptyp_name             varchar(30)          not null,
+									primary key (ptyp_ID)
+								)";
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -933,5 +965,111 @@ function create_b2evo_tables_091()
 
 	 */
 }
+
+
+/**
+ * Create relations
+ */
+function create_b2evo_relations()
+{
+	global $DB, $db_use_fkeys;
+
+	if( !$db_use_fkeys )
+		return false;
+
+	echo 'Creating relations... ';
+
+	$DB->query( 'alter table T_blogusers 
+								add constraint FK_bloguser_blog_ID 
+								 			foreign key (bloguser_blog_ID)
+											references T_blogs (blog_ID) 
+											on delete restrict 
+											on update restrict,
+								add constraint FK_bloguser_user_ID
+											foreign key (bloguser_user_ID)
+											references T_users (ID)
+											on delete restrict
+											on update restrict' );
+	
+	$DB->query( 'alter table T_categories
+								add constraint FK_cat_blog_ID
+											foreign key (cat_blog_ID)
+											references T_blogs (blog_ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_cat_parent_ID
+											foreign key (cat_parent_ID)
+											references T_categories (cat_ID)
+											on delete restrict
+											on update restrict' );
+	
+	$DB->query( 'alter table T_comments
+								add constraint FK_comment_post_ID
+											foreign key (comment_post_ID)
+											references T_posts (ID)
+											on delete restrict
+											on update restrict' );
+	
+	$DB->query( 'alter table T_postcats
+								add constraint FK_postcat_cat_ID
+											foreign key (postcat_cat_ID)
+											references T_categories (cat_ID)
+											on delete restrict
+											on update restrict,											
+								add constraint FK_postcat_post_ID
+											foreign key (postcat_post_ID)
+											references T_posts (ID)
+											on delete restrict
+											on update restrict' );
+	
+	$DB->query( 'alter table T_posts
+								add constraint FK_post_assigned_user_ID
+											foreign key (post_assigned_user_ID)
+											references T_users (ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_post_creator_user_ID
+											foreign key (post_author)
+											references T_users (ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_post_main_cat_ID
+											foreign key (post_category)
+											references T_categories (cat_ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_post_parent_ID
+											foreign key (post_parent_ID)
+											references T_posts (ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_post_pst_ID
+											foreign key (post_pst_ID)
+											references T_poststatuses (pst_ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_post_ptyp_ID
+											foreign key (post_ptyp_ID)
+											references T_posttypes (ptyp_ID)
+											on delete restrict
+											on update restrict' );
+	
+	$DB->query( 'alter table T_users 
+								add constraint FK_user_grp_ID
+											foreign key (user_grp_ID)
+											references T_groups (grp_ID)
+											on delete restrict
+											on update restrict' );
+	
+	$DB->query( 'alter table T_usersettings
+								add constraint FK_uset_user_ID 
+											foreign key (uset_user_ID)
+											references T_users (ID)
+											on delete restrict
+											on update restrict' );
+
+	echo "OK.<br />\n";
+}
+
 
 ?>

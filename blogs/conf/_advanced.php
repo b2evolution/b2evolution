@@ -160,6 +160,8 @@ $db_aliases = array(
 		'T_locales'      => $tablelocales     ,
 		'T_sessions'     => $tablesessions    ,
 		'T_usersettings' => $tableusersettings,
+		'T_posttypes'    => $tableprefix.'posttypes',
+		'T_poststatuses' => $tableprefix.'poststatuses',
 		'T_plugins'      => $tableprefix.'plugins',
 	);
 
@@ -178,6 +180,18 @@ $db_table_options = '';
 # $db_table_options = ' ENGINE=InnoDB ';
 // Development settings:
 # $db_table_options = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
+
+
+/**
+ * Foreign key options.
+ *
+ * Set this to true if your MySQL supports Foreign keys.
+ * Recommended for professional use.
+ * Typically requires InnoDB to be set in $db_table_options.
+ *
+ * @global $db_use_fkeys
+ */
+$db_use_fkeys = false;
 
 
 /**#@+

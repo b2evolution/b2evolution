@@ -86,8 +86,8 @@ function b2newpost($m)
 	$content = $m->getParam(4);
 	$content = $content->scalarval();
 
-	$title = $m->getParam(6);
-	$title = $title->scalarval();
+	$post_title = $m->getParam(6);
+	$post_title = $post_title->scalarval();
 
 	$category = $m->getParam(7);
 	$category = $category->scalarval();

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2003-08-22 19:52+0200\n"
-"PO-Revision-Date: 2004-08-22 17:47+0800\n"
-"Last-Translator: Jimy Huang <i-yo-wai-ya@yahoo.com.tw>\n"
+"PO-Revision-Date: 2004-10-26 02:26+0800\n"
+"Last-Translator: Jimmy Huang <i-yo-wai-ya@yahoo.com.tw>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -1655,7 +1655,7 @@ msgstr ""
 
 #: ..\..\..\admin\_blogs_general.form.php:42
 msgid "You MUST create a stub file for this to work."
-msgstr ""
+msgstr "要使用這個功能，你必須為blog建立個人設定檔(stub file)"
 
 #: ..\..\..\admin\_blogs_general.form.php:43
 msgid "Preferred access type"
@@ -1667,11 +1667,11 @@ msgstr ""
 
 #: ..\..\..\admin\_blogs_general.form.php:49
 msgid "No trailing slash. (If you don't know, leave this field empty.)"
-msgstr ""
+msgstr "結尾不用加斜線(如果你不瞭解這個功能, 請不要填上任何資訊)"
 
 #: ..\..\..\admin\_blogs_general.form.php:54
 msgid "URL blog name / Stub name"
-msgstr ""
+msgstr "blog名稱 / 自訂名稱(stub name)的連結(URL)"
 
 #: ..\..\..\admin\_blogs_general.form.php:54
 msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
@@ -1916,49 +1916,49 @@ msgstr "成員"
 #: ..\..\..\admin\_blogs_permissions.form.php:64
 #: ..\..\..\admin\_blogs_permissions.form.php:161
 msgid "Permission to read protected posts"
-msgstr ""
+msgstr "擁有閱讀「保護」權限的文章"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:71
 #: ..\..\..\admin\_blogs_permissions.form.php:85
 #: ..\..\..\admin\_blogs_permissions.form.php:165
 #: ..\..\..\admin\_blogs_permissions.form.php:173
 msgid "Permission to post into this blog with private status"
-msgstr ""
+msgstr "可在此blog張貼「私人」權限的文章"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:78
 #: ..\..\..\admin\_blogs_permissions.form.php:169
 msgid "Permission to post into this blog with protected status"
-msgstr ""
+msgstr "可在此blog張貼「保護」權限的文章"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:92
 #: ..\..\..\admin\_blogs_permissions.form.php:177
 msgid "Permission to post into this blog with draft status"
-msgstr ""
+msgstr "可在此blog張貼「草稿」權限的文章"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:99
 #: ..\..\..\admin\_blogs_permissions.form.php:181
 msgid "Permission to post into this blog with deprecated status"
-msgstr ""
+msgstr "可在此blog「棄置」文章"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:106
 #: ..\..\..\admin\_blogs_permissions.form.php:185
 msgid "Permission to delete posts in this blog"
-msgstr ""
+msgstr "可在此blog刪除文章"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:113
 #: ..\..\..\admin\_blogs_permissions.form.php:189
 msgid "Permission to edit comments in this blog"
-msgstr ""
+msgstr "可在此blog編輯評論"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:120
 #: ..\..\..\admin\_blogs_permissions.form.php:193
 msgid "Permission to edit categories for this blog"
-msgstr ""
+msgstr "可在此blog編輯分類"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:127
 #: ..\..\..\admin\_blogs_permissions.form.php:197
 msgid "Permission to edit blog properties"
-msgstr ""
+msgstr "擁有編輯blog屬性的權限"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:130
 msgid "(un)selects all checkboxes using Javascript"
@@ -1979,19 +1979,21 @@ msgid ""
 "Warning! You are about to remove your own permission to edit this blog!\\n"
 "You won\\'t have access to its properties any longer if you do that!"
 msgstr ""
+"!!警告!! 你正要刪除自己編輯此blog的權限\\n"
+"如果確定刪除，你將\\'t不能存取任何此blog的權限!"
 
 #: ..\..\..\admin\_cats_list.php:34
 msgid "Edit category properties"
-msgstr ""
+msgstr "編輯分類的屬性"
 
 #  TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_cats_list.php:38
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "確定要刪除嗎？"
 
 #: ..\..\..\admin\_cats_list.php:51
 msgid "New sub-category here"
-msgstr ""
+msgstr "新增子分類"
 
 #: ..\..\..\admin\_cats_list.php:70
 msgid "New category here"
@@ -2072,7 +2074,7 @@ msgstr "編輯時間"
 
 #: ..\..\..\admin\_edit_form.php:252
 msgid "URL Title"
-msgstr ""
+msgstr "連結"
 
 #: ..\..\..\admin\_edit_form.php:254
 msgid "(to be used in permalinks)"
@@ -2086,12 +2088,12 @@ msgstr ""
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:208
 #: ..\..\..\skins\wpc_default\_feedback.php:208
 msgid "Auto-BR"
-msgstr ""
+msgstr "自動斷行(Auto-BR)"
 
 #: ..\..\..\admin\_edit_form.php:263
 #: ..\..\..\admin\_set_general.form.php:49
 msgid "This option is deprecated, you should avoid using it."
-msgstr ""
+msgstr "不建議使用此選項"
 
 #: ..\..\..\admin\_edit_form.php:272
 msgid "Additional actions"
@@ -2111,7 +2113,7 @@ msgstr "引用(Trackback) 的連結"
 
 #: ..\..\..\admin\_edit_form.php:289
 msgid "(Separate by space)"
-msgstr ""
+msgstr "以空白分隔"
 
 #: ..\..\..\admin\_edit_form.php:310
 #: ..\..\..\admin\_edit_form.php:543
@@ -2204,7 +2206,7 @@ msgstr "關閉"
 
 #: ..\..\..\admin\_edit_form.php:464
 msgid "Visitors cannot see nor leave comments on this post."
-msgstr ""
+msgstr "訪客權限無法看見此文章，也不能評論"
 
 #: ..\..\..\admin\_edit_form.php:465
 msgid "Disabled"
@@ -2456,7 +2458,7 @@ msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:385
 msgid "Words"
-msgstr ""
+msgstr "字數"
 
 #: ..\..\..\admin\_edit_showposts.php:386
 msgid "AND"
@@ -2576,55 +2578,55 @@ msgstr ""
 
 #: ..\..\..\admin\_set_general.form.php:35
 msgid "days"
-msgstr ""
+msgstr "日期模式"
 
 #: ..\..\..\admin\_set_general.form.php:36
 msgid "posts"
-msgstr ""
+msgstr "單篇文章模式"
 
 #: ..\..\..\admin\_set_general.form.php:37
 msgid "posts paged"
-msgstr ""
+msgstr "多文分頁模式"
 
 #: ..\..\..\admin\_set_general.form.php:38
 msgid "Display mode"
-msgstr ""
+msgstr "顯示模式"
 
 #: ..\..\..\admin\_set_general.form.php:40
 msgid "Posts/Days per page"
-msgstr ""
+msgstr "每頁顯示多少文章 / 天"
 
 #: ..\..\..\admin\_set_general.form.php:43
 msgid "monthly"
-msgstr ""
+msgstr "每月"
 
 #: ..\..\..\admin\_set_general.form.php:44
 msgid "weekly"
-msgstr ""
+msgstr "每週"
 
 #: ..\..\..\admin\_set_general.form.php:45
 msgid "daily"
-msgstr ""
+msgstr "每天"
 
 #: ..\..\..\admin\_set_general.form.php:46
 msgid "post by post"
-msgstr ""
+msgstr "每篇文章"
 
 #: ..\..\..\admin\_set_general.form.php:47
 msgid "Archive mode"
-msgstr ""
+msgstr "文章彙整模式"
 
 #: ..\..\..\admin\_set_general.form.php:54
 msgid "Link options"
-msgstr ""
+msgstr "連結選項"
 
 #: ..\..\..\admin\_set_general.form.php:56
 msgid "Use extra-path info"
-msgstr ""
+msgstr "使用較美觀路徑顯示"
 
 #: ..\..\..\admin\_set_general.form.php:56
 msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
-msgstr ""
+msgstr "建議使用. 如果你的網頁伺服器支援, 連結將會顯示成 'stub/2003/05/20/post_title' 而不是 'stub?title=post_title&c=1&tb=1&pb=1&more=1'"
 
 #: ..\..\..\admin\_set_general.form.php:59
 msgid "Post called up by its URL title (Recommended)"
@@ -3030,19 +3032,19 @@ msgstr "重新載入預設值 (刪除資料庫裡的表格)"
 
 #: ..\..\..\admin\_users_form.php:50
 msgid "first user"
-msgstr ""
+msgstr "第一個使用者"
 
 #: ..\..\..\admin\_users_form.php:51
 msgid "previous user"
-msgstr ""
+msgstr "上個使用者"
 
 #: ..\..\..\admin\_users_form.php:52
 msgid "next user"
-msgstr ""
+msgstr "下個使用者"
 
 #: ..\..\..\admin\_users_form.php:53
 msgid "last user"
-msgstr ""
+msgstr "最後一個使用者"
 
 #: ..\..\..\admin\_users_form.php:56
 msgid "Close user profile"
@@ -3204,7 +3206,7 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:38
 #: ..\..\..\skins\basic\_profile.php:39
 msgid "ID"
-msgstr ""
+msgstr "編號"
 
 #: ..\..\..\admin\_users_form.php:224
 #: ..\..\..\skins\_profile.php:49
@@ -3214,7 +3216,7 @@ msgstr ""
 #: ..\..\..\skins\custom\_main.php:289
 #: ..\..\..\skins\custom\_main.php:294
 msgid "Posts"
-msgstr ""
+msgstr "文章"
 
 #: ..\..\..\admin\_users_form.php:225
 msgid "Created on"
@@ -3230,23 +3232,23 @@ msgstr ""
 
 #: ..\..\..\admin\_users_form.php:228
 msgid "With Browser"
-msgstr ""
+msgstr "使用的瀏覽器"
 
 #: ..\..\..\admin\_users_groupform.php:48
 msgid "first group"
-msgstr ""
+msgstr "第一個群組"
 
 #: ..\..\..\admin\_users_groupform.php:49
 msgid "previous group"
-msgstr ""
+msgstr "上一個群組"
 
 #: ..\..\..\admin\_users_groupform.php:50
 msgid "next group"
-msgstr ""
+msgstr "下一個群組"
 
 #: ..\..\..\admin\_users_groupform.php:51
 msgid "last group"
-msgstr ""
+msgstr "最後一個群組"
 
 #: ..\..\..\admin\_users_groupform.php:55
 msgid "Close group profile"
@@ -3258,11 +3260,11 @@ msgstr ""
 
 #: ..\..\..\admin\_users_groupform.php:63
 msgid "Editing group:"
-msgstr ""
+msgstr "編輯群組 :"
 
 #: ..\..\..\admin\_users_groupform.php:63
 msgid "Viewing group:"
-msgstr ""
+msgstr "顯示群組:"
 
 #: ..\..\..\admin\_users_groupform.php:81
 msgid "Permissons for members of this group"
@@ -3270,7 +3272,7 @@ msgstr ""
 
 #: ..\..\..\admin\_users_groupform.php:85
 msgid "View all"
-msgstr ""
+msgstr "顯示全部"
 
 #: ..\..\..\admin\_users_groupform.php:86
 #: ..\..\..\admin\_users_groupform.php:91
@@ -3293,7 +3295,7 @@ msgstr ""
 #: ..\..\..\admin\_users_groupform.php:100
 #: ..\..\..\admin\_users_groupform.php:109
 msgid "View only"
-msgstr ""
+msgstr "只顯示"
 
 #: ..\..\..\admin\_users_groupform.php:92
 #: ..\..\..\b2evocore\_functions_hitlogs.php:528
@@ -3323,23 +3325,23 @@ msgstr ""
 
 #: ..\..\..\admin\_users_list.php:73
 msgid "Copy group"
-msgstr ""
+msgstr "群組複製"
 
 #: ..\..\..\admin\_users_list.php:79
 msgid "Delete group"
-msgstr ""
+msgstr "群組刪除"
 
 #: ..\..\..\admin\_users_list.php:132
 msgid "decrease user level"
-msgstr ""
+msgstr "減少使用者等級"
 
 #: ..\..\..\admin\_users_list.php:137
 msgid "increase user level"
-msgstr ""
+msgstr "增加使用者等級"
 
 #: ..\..\..\admin\_users_list.php:151
 msgid "Delete user"
-msgstr ""
+msgstr "刪除使用者"
 
 #  TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_users_list.php:151
@@ -3350,11 +3352,11 @@ msgstr ""
 
 #: ..\..\..\admin\_users_list.php:168
 msgid "New user..."
-msgstr ""
+msgstr "新增使用者..."
 
 #: ..\..\..\admin\_users_list.php:170
 msgid "New group..."
-msgstr ""
+msgstr "新增群組..."
 
 #: ..\..\..\b2evocore\_blog_main.php:204
 #, php-format
@@ -3371,28 +3373,28 @@ msgstr ""
 #: ..\..\..\b2evocore\_class_calendar.php:197
 #, php-format
 msgid "%d posts"
-msgstr ""
+msgstr "%d篇文章"
 
 #: ..\..\..\b2evocore\_class_calendar.php:193
 #: ..\..\..\b2evocore\_class_calendar.php:198
 msgid "1 post"
-msgstr ""
+msgstr "1篇文章"
 
 #: ..\..\..\b2evocore\_class_calendar.php:301
 msgid "previous month"
-msgstr ""
+msgstr "上個月"
 
 #: ..\..\..\b2evocore\_class_calendar.php:305
 msgid "next month"
-msgstr ""
+msgstr "下個月"
 
 #: ..\..\..\b2evocore\_class_calendar.php:332
 msgid "previous year"
-msgstr ""
+msgstr "上一年"
 
 #: ..\..\..\b2evocore\_class_calendar.php:335
 msgid "next year"
-msgstr ""
+msgstr "下一年"
 
 #: ..\..\..\b2evocore\_class_calendar.php:364
 msgid "go to month's archive"
@@ -3400,7 +3402,7 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_class_comment.php:135
 msgid "Member"
-msgstr ""
+msgstr "成員"
 
 #: ..\..\..\b2evocore\_class_comment.php:143
 msgid "Visitor"
@@ -3408,16 +3410,16 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_class_comment.php:263
 msgid "Edit this comment"
-msgstr ""
+msgstr "編輯此評論"
 
 #: ..\..\..\b2evocore\_class_comment.php:299
 #: ..\..\..\b2evocore\_class_item.php:825
 msgid "Delete"
-msgstr ""
+msgstr "刪除"
 
 #: ..\..\..\b2evocore\_class_comment.php:300
 msgid "Delete this comment"
-msgstr ""
+msgstr "刪除此評論"
 
 #  TRANS: Warning this is a javascript string
 #: ..\..\..\b2evocore\_class_comment.php:310
@@ -3443,7 +3445,7 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_class_db.php:150
 msgid "MySQL error!"
-msgstr ""
+msgstr "MySQL錯誤!"
 
 #: ..\..\..\b2evocore\_class_group.php:70
 msgid "New group"
@@ -3478,7 +3480,7 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:162
 msgid "Found invalid URL: "
-msgstr ""
+msgstr "偵測到不合法的網址(URL)"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:185
 #, php-format
@@ -3490,7 +3492,7 @@ msgstr ""
 #: ..\..\..\b2evocore\_class_item.php:300
 #: ..\..\..\b2evocore\_functions_cats.php:637
 msgid "Browse category"
-msgstr ""
+msgstr "瀏覽分類"
 
 #: ..\..\..\b2evocore\_class_item.php:403
 msgid "Comments are closed for this post."
@@ -3504,13 +3506,13 @@ msgstr ""
 #: ..\..\..\b2evocore\_class_item.php:465
 #: ..\..\..\b2evocore\_functions_bposts.php:732
 msgid "Read more!"
-msgstr "詳全文..."
+msgstr "深入閱讀..."
 
 #  TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\b2evocore\_class_item.php:470
 #: ..\..\..\b2evocore\_functions_bposts.php:737
 msgid "More:"
-msgstr ""
+msgstr "全文:"
 
 #: ..\..\..\b2evocore\_class_item.php:712
 msgid "Display feedback / Leave a comment"
@@ -3587,11 +3589,11 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_class_item.php:880
 msgid "Edit this post"
-msgstr ""
+msgstr "編輯此文章"
 
 #: ..\..\..\b2evocore\_class_item.php:919
 msgid "Publish NOW!"
-msgstr ""
+msgstr "公開發表!"
 
 #: ..\..\..\b2evocore\_class_item.php:920
 msgid "Publish now using current date and time."
@@ -3778,24 +3780,24 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions.php:47
 msgid "Oops, MySQL error!"
-msgstr ""
+msgstr "MySQL 錯誤!"
 
 #: ..\..\..\b2evocore\_functions.php:479
 msgid "go back"
-msgstr ""
+msgstr "回到上一頁"
 
 #: ..\..\..\b2evocore\_functions.php:511
 msgid "Redirecting you to:"
-msgstr ""
+msgstr "網頁重導至:"
 
 #: ..\..\..\b2evocore\_functions.php:513
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
-msgstr ""
+msgstr "如果沒有進入另一個畫面，請<a %s>按此</a>"
 
 #: ..\..\..\b2evocore\_functions.php:592
 msgid "No response!"
-msgstr ""
+msgstr "沒有回應!"
 
 #: ..\..\..\b2evocore\_functions.php:597
 msgid "Remote error"
@@ -3804,16 +3806,16 @@ msgstr ""
 #: ..\..\..\b2evocore\_functions.php:612
 #: ..\..\..\b2evocore\_functions.php:617
 msgid "Response"
-msgstr ""
+msgstr "回應"
 
 #: ..\..\..\b2evocore\_functions.php:854
 #, php-format
 msgid "Parameter %s is required!"
-msgstr ""
+msgstr "必須要有%s"
 
 #: ..\..\..\b2evocore\_functions.php:1065
 msgid "Invalid URL"
-msgstr ""
+msgstr "不合法的網址(URL)"
 
 #: ..\..\..\b2evocore\_functions.php:1071
 msgid "URI scheme not allowed"
@@ -3883,12 +3885,12 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_bposts.php:661
 msgid "Post details"
-msgstr ""
+msgstr "文章詳細內容"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:666
 #: ..\..\..\b2evocore\_functions_bposts.php:702
 msgid "PREVIEW"
-msgstr ""
+msgstr "預覽"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:828
 msgid "Next page"
@@ -3900,11 +3902,11 @@ msgstr "上一頁"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:874
 msgid "Previous post"
-msgstr ""
+msgstr "上一篇"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:931
 msgid "Next post"
-msgstr ""
+msgstr "下一篇"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:1043
 msgid "Next Page"
@@ -3916,20 +3918,20 @@ msgstr "上一頁"
 
 #: ..\..\..\b2evocore\_functions_cats.php:88
 msgid "Cannot delete if there are sub-categories!"
-msgstr ""
+msgstr "仍有子分類，所以無法刪除"
 
 #: ..\..\..\b2evocore\_functions_cats.php:120
 msgid "Cannot delete last category if there are posts inside!"
-msgstr ""
+msgstr "如果還有文章，無法刪除唯一的分類"
 
 #: ..\..\..\b2evocore\_functions_cats.php:215
 #, php-format
 msgid "Requested category %s does not exist!"
-msgstr ""
+msgstr "要求的分類「%s」不存在"
 
 #: ..\..\..\b2evocore\_functions_cats.php:568
 msgid "Category"
-msgstr ""
+msgstr "分類"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:58
 #: ..\..\..\b2evocore\_vars.php:134
@@ -3954,11 +3956,11 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:116
 msgid "invalid"
-msgstr ""
+msgstr "不合法"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:128
 msgid "search engine"
-msgstr ""
+msgstr "搜尋引擎"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:136
 msgid "loading referering page"
@@ -3970,28 +3972,28 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:450
 msgid "not a query - no params!"
-msgstr ""
+msgstr "不合法的查詢－沒有字串"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:475
 msgid "no query string found"
-msgstr ""
+msgstr "找不到你所查詢字詞"
 
 #: ..\..\..\b2evocore\_functions_locale.php:354
 #: ..\..\..\install\index.php:85
 msgid "name"
-msgstr ""
+msgstr "名"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:36
 msgid "Sending pingbacks..."
-msgstr ""
+msgstr "傳送pingbacks(通告)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:41
 msgid "No pingback to be done."
-msgstr ""
+msgstr "沒有pingback(通告)需被傳送"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:47
 msgid "BEGIN"
-msgstr ""
+msgstr "開始"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:109
 #: ..\..\..\b2evocore\_functions_pingback.php:110
@@ -4001,30 +4003,30 @@ msgstr ""
 #: ..\..\..\b2evocore\_functions_pingback.php:114
 #: ..\..\..\b2evocore\_functions_pingback.php:115
 msgid "Couldn't find a hostname for:"
-msgstr ""
+msgstr "找不到主機位置為:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:129
 msgid "Connect to server at:"
-msgstr ""
+msgstr "連結伺服器在: "
 
 #: ..\..\..\b2evocore\_functions_pingback.php:133
 #: ..\..\..\b2evocore\_functions_pingback.php:134
 msgid "Couldn't open a connection to:"
-msgstr ""
+msgstr "無法建立連結在: "
 
 #: ..\..\..\b2evocore\_functions_pingback.php:145
 msgid "Start receiving headers and content"
-msgstr ""
+msgstr "開始接收標題和內文"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:179
 #: ..\..\..\b2evocore\_functions_pingback.php:180
 msgid "Pingback server found from X-Pingback header:"
-msgstr ""
+msgstr "找到Pingback(通告)伺服器在X-Pingback的標頭: "
 
 #: ..\..\..\b2evocore\_functions_pingback.php:193
 #: ..\..\..\b2evocore\_functions_pingback.php:194
 msgid "Pingback server found from Pingback <link /> tag:"
-msgstr ""
+msgstr "找到Pingback(通告)伺服器在Pingback <link /> 標籤: "
 
 #: ..\..\..\b2evocore\_functions_pingback.php:202
 #: ..\..\..\b2evocore\_functions_pingback.php:203
@@ -4038,17 +4040,17 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_pingback.php:214
 msgid "Pingback server data"
-msgstr ""
+msgstr "Pingback(通告)伺服器的資料"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:224
 #: ..\..\..\b2evocore\_functions_pingback.php:225
 msgid "Page Linked To:"
-msgstr ""
+msgstr "網頁連至:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:226
 #: ..\..\..\b2evocore\_functions_pingback.php:227
 msgid "Page Linked From:"
-msgstr ""
+msgstr "網頁連由: "
 
 #: ..\..\..\b2evocore\_functions_pingback.php:232
 #, php-format
@@ -4057,27 +4059,27 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_pingback.php:242
 msgid "END"
-msgstr ""
+msgstr "結束"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:244
 msgid "Pingbacks done."
-msgstr ""
+msgstr "通告程序完成"
 
 #: ..\..\..\b2evocore\_functions_pings.php:32
 msgid "Pinging b2evolution.net..."
-msgstr ""
+msgstr "通知b2evolution.net..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:77
 msgid "Pinging Weblogs.com..."
-msgstr ""
+msgstr "通知Weblogs.com..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:139
 msgid "Pinging Blo.gs..."
-msgstr ""
+msgstr "通知Blo.gs..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:194
 msgid "Pinging technorati.com..."
-msgstr ""
+msgstr "通知technorati.com..."
 
 #: ..\..\..\b2evocore\_functions_template.php:51
 msgid "Archives for"
@@ -4089,31 +4091,31 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_trackback.php:24
 msgid "Sending trackbacks..."
-msgstr ""
+msgstr "正在傳送引文(trackback)..."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:27
 msgid "No trackback to be sent."
-msgstr ""
+msgstr "沒有引用需要傳送"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:32
 msgid "Excerpt to be sent:"
-msgstr ""
+msgstr "傳送摘要: "
 
 #: ..\..\..\b2evocore\_functions_trackback.php:40
 msgid "Trackbacks done."
-msgstr ""
+msgstr "引文傳送完成"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:59
 msgid "Sending trackback to:"
-msgstr ""
+msgstr "傳送引文至: "
 
 #: ..\..\..\b2evocore\_functions_trackback.php:117
 msgid "Response:"
-msgstr ""
+msgstr "回應:"
 
 #: ..\..\..\b2evocore\_functions_users.php:76
 msgid "wrong login/password."
-msgstr ""
+msgstr "錯誤的 使用者/密碼"
 
 #: ..\..\..\b2evocore\_functions_users.php:82
 #: ..\..\..\b2evocore\_functions_users.php:84
@@ -4128,49 +4130,49 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_users.php:128
 msgid "You must log in!"
-msgstr ""
+msgstr "你必須登入!"
 
 #: ..\..\..\b2evocore\_functions_users.php:349
 msgid "Login if you have an account..."
-msgstr ""
+msgstr "有帳號的請登入"
 
 #: ..\..\..\b2evocore\_functions_users.php:385
 msgid "Register..."
-msgstr ""
+msgstr "註冊..."
 
 #: ..\..\..\b2evocore\_functions_users.php:386
 msgid "Register to open an account..."
-msgstr ""
+msgstr "註冊新帳號"
 
 #: ..\..\..\b2evocore\_functions_users.php:420
 #, php-format
 msgid "Logout (%s)"
-msgstr ""
+msgstr "登出 (%s)"
 
 #: ..\..\..\b2evocore\_functions_users.php:421
 msgid "Logout from your account"
-msgstr ""
+msgstr "登出你的帳號"
 
 #: ..\..\..\b2evocore\_functions_users.php:446
 msgid "Admin"
-msgstr ""
+msgstr "管理模式"
 
 #: ..\..\..\b2evocore\_functions_users.php:447
 msgid "Go to the back-office"
-msgstr ""
+msgstr "至管理模式"
 
 #: ..\..\..\b2evocore\_functions_users.php:470
 #, php-format
 msgid "Profile (%s)"
-msgstr ""
+msgstr "個人設定(%s)"
 
 #: ..\..\..\b2evocore\_functions_users.php:471
 msgid "Edit your profile"
-msgstr ""
+msgstr "編輯你的個人設定"
 
 #: ..\..\..\b2evocore\_functions_users.php:496
 msgid "User profile"
-msgstr ""
+msgstr "使用者設定檔"
 
 #: ..\..\..\b2evocore\_vars.php:149
 msgid "Sunday"
@@ -4600,11 +4602,11 @@ msgstr ""
 
 #: ..\..\..\htsrv\getmail.php:228
 msgid "Category ID"
-msgstr ""
+msgstr "分類編號(ID)"
 
 #: ..\..\..\htsrv\getmail.php:233
 msgid "Blog ID"
-msgstr ""
+msgstr "Blog 編號(ID)"
 
 #: ..\..\..\htsrv\getmail.php:238
 msgid "Permission denied."
@@ -4969,95 +4971,95 @@ msgstr ""
 #: ..\..\..\install\index.php:274
 #: ..\..\..\install\index.php:378
 msgid "mySQL Username"
-msgstr ""
+msgstr "mySQL使用者名稱"
 
 #: ..\..\..\install\index.php:274
 msgid "Your username to access the database"
-msgstr ""
+msgstr "您存取資料庫的使用者名稱"
 
 #: ..\..\..\install\index.php:275
 #: ..\..\..\install\index.php:379
 msgid "mySQL Password"
-msgstr ""
+msgstr "mySQL 密碼"
 
 #: ..\..\..\install\index.php:275
 msgid "Your password to access the database"
-msgstr ""
+msgstr "您存取資料庫的密碼"
 
 #: ..\..\..\install\index.php:276
 #: ..\..\..\install\index.php:380
 msgid "mySQL Database"
-msgstr ""
+msgstr "mySQL的資料庫"
 
 #: ..\..\..\install\index.php:276
 msgid "Name of the database you want to use"
-msgstr ""
+msgstr "你所想要使用的資料庫名稱"
 
 #: ..\..\..\install\index.php:277
 #: ..\..\..\install\index.php:381
 msgid "mySQL Host"
-msgstr ""
+msgstr "mySQL Host"
 
 #: ..\..\..\install\index.php:277
 msgid "You probably won't have to change this"
-msgstr ""
+msgstr "通常你不用調整此選項"
 
 #: ..\..\..\install\index.php:282
 msgid "Additional settings"
-msgstr ""
+msgstr "進階選項"
 
 #: ..\..\..\install\index.php:284
 #: ..\..\..\install\index.php:382
 msgid "Base URL"
-msgstr ""
+msgstr "Base URL"
 
 #: ..\..\..\install\index.php:284
 msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
-msgstr ""
+msgstr "這就是b2evo和您的blog預設的位置，<strong>請注意調整</strong>不然將無法啟用。如果您只想在你本機上測試b2evolution，為了讓登入時cookie可以運作，您「必須」用 http://<strong>localhost</strong>/path... ，而不要用你機器的名稱。"
 
 #: ..\..\..\install\index.php:286
 msgid "Your email"
-msgstr ""
+msgstr "您的email"
 
 #: ..\..\..\install\index.php:286
 msgid "Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations."
-msgstr ""
+msgstr "使用者將可以聯繫您，並傳送系統錯誤訊息。新使用者註冊時，您也會收到通知"
 
 #: ..\..\..\install\index.php:293
 msgid "Update config file"
-msgstr ""
+msgstr "更新設定檔"
 
 #: ..\..\..\install\index.php:313
 msgid "How do you want to install b2evolution?"
-msgstr ""
+msgstr "您想如何安裝b2evolution?"
 
 #: ..\..\..\install\index.php:317
 msgid "The installation can be done in different ways. Choose one:"
-msgstr ""
+msgstr "將可選擇下列幾種方式安裝: "
 
 #: ..\..\..\install\index.php:320
 msgid "<strong>New Install</strong>: Install b2evolution database tables with sample data."
-msgstr ""
+msgstr "<strong>全新安裝</strong>: 安裝b2evolution資料庫和範例"
 
 #: ..\..\..\install\index.php:323
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!"
-msgstr ""
+msgstr "<strong>從先前的b2evolution版本升級</strong>: 為了讓資料可正確的在最新版本運作，將會升級您的b2evolution資料庫"
 
 #: ..\..\..\install\index.php:326
 msgid "<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them."
-msgstr ""
+msgstr "<strong>從 Cafelog/b2 v 0.6.x 升級為b2evolution</strong>: 安裝b2evolution資料庫，並且轉換您現存在 Cafelog/b2 的資料"
 
 #: ..\..\..\install\index.php:329
 msgid "<strong>Upgrade from Manywhere Miniblog</strong>: Install b2evolution database tables and copy your existing Miniblog data into them."
-msgstr ""
+msgstr "<strong>從Manywhere Miniblog 升級為b2evolution</strong>: 安裝b2evolution資料庫，並且轉換您現存在 Miniblog 的資料"
 
 #: ..\..\..\install\index.php:332
 msgid "<strong>Upgrade from WordPress v 1.2</strong>: Install b2evolution database tables and copy your existing WordPress data into them."
-msgstr ""
+msgstr "<strong>從 WordPress v 1.2 升級為b2evolution</strong>:  安裝b2evolution資料庫，並且轉換您現存在 WordPress 的資料"
 
 #: ..\..\..\install\index.php:339
 msgid "Delete b2evolution tables"
-msgstr ""
+msgstr "刪除b2evolution的資料表(tables)"
 
 #: ..\..\..\install\index.php:340
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way."
@@ -5154,19 +5156,19 @@ msgstr ""
 
 #: ..\..\..\install\index.php:507
 msgid "Reset done!"
-msgstr ""
+msgstr "重設完成!"
 
 #: ..\..\..\install\index.php:508
 msgid "Back to menu"
-msgstr ""
+msgstr "回到選單"
 
 #: ..\..\..\install\index.php:515
 msgid "official website"
-msgstr ""
+msgstr "官方網站"
 
 #: ..\..\..\install\index.php:517
 msgid "contact"
-msgstr ""
+msgstr "聯繫"
 
 #: ..\..\..\install\_functions_cafelogupgrade.php:30
 #, php-format
@@ -5448,7 +5450,7 @@ msgstr ""
 
 #: ..\..\..\plugins\plugin.class.php:44
 msgid "No desc available"
-msgstr ""
+msgstr "沒有功能描述"
 
 #: ..\..\..\plugins\plugin.class.php:45
 #: ..\..\..\plugins\renderers\_autolinks.renderer.php:42
@@ -5459,40 +5461,40 @@ msgstr ""
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:47
 #: ..\..\..\plugins\toolbars\_smilies.toolbar.php:57
 msgid "No description available"
-msgstr ""
+msgstr "沒有功能描述"
 
 #: ..\..\..\plugins\renderers\_autolinks.renderer.php:41
 msgid "Make URLs clickable"
-msgstr ""
+msgstr "自動轉換連結"
 
 #: ..\..\..\plugins\renderers\_auto_p.renderer.php:41
 msgid "Automatic &lt;P&gt; and &lt;BR&gt; tags"
-msgstr ""
+msgstr "自動段落 &lt;P&gt; 和自動斷行 &lt;BR&gt; "
 
 #: ..\..\..\plugins\renderers\_bbcode.renderer.php:83
 msgid "BB formatting e-g [b]bold[/b]"
-msgstr ""
+msgstr "BB formatting e-g [b]bold[/b]"
 
 #: ..\..\..\plugins\renderers\_gmcode.renderer.php:75
 msgid "GreyMatter style formatting"
-msgstr ""
+msgstr "GreyMatter style formatting"
 
 #: ..\..\..\plugins\renderers\_gmcode.renderer.php:76
 #, php-format
 msgid "**bold** \\italics\\ //italics// __underline__ ##tt## %%codeblock%%"
-msgstr ""
+msgstr "**粗體** \\斜體\\//斜體// __底線__ ##tt## %%程式碼%%"
 
 #: ..\..\..\plugins\renderers\_smilies.renderer.php:68
 msgid "Convert text smilies to icons"
-msgstr ""
+msgstr "將特定文字轉換為表情符號"
 
 #: ..\..\..\plugins\renderers\_textile.renderer.php:237
 msgid "Humane Web Text Generator 2.0 beta"
-msgstr ""
+msgstr "Humane Web Text Generator 2.0 beta"
 
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:46
 msgid "Easy HTML tags inserting"
-msgstr ""
+msgstr "簡單插入HTML標籤"
 
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:90
 msgid "INSerted [Alt-I]"
@@ -5544,7 +5546,7 @@ msgstr "插入詳全文 More [Alt-M]"
 
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:189
 msgid "no teaser [Alt-T]"
-msgstr ""
+msgstr "不顯示導文[Alt-T]"
 
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:197
 msgid "next page [Alt-Q]"
@@ -5560,7 +5562,7 @@ msgstr ""
 
 #: ..\..\..\plugins\toolbars\_smilies.toolbar.php:56
 msgid "One click smilies inserting"
-msgstr ""
+msgstr "點選即會插入表情符號"
 
 #  TRANS: All categories, skin's categories list
 #: ..\..\..\skins\_categories.php:17
@@ -5579,12 +5581,12 @@ msgstr "引用(Trackback)本文章的的連結為:"
 #: ..\..\..\skins\wpc_default\_feedback.php:97
 #, php-format
 msgid "No %s for this post yet..."
-msgstr ""
+msgstr "此文章還沒有 %s"
 
 #: ..\..\..\skins\_feedback.php:185
 #: ..\..\..\skins\basic\_feedback.php:180
 msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr ""
+msgstr "您的email將<strong>不會</strong>被公開"
 
 #: ..\..\..\skins\_feedback.php:190
 #: ..\..\..\skins\basic\_feedback.php:185
@@ -5615,7 +5617,7 @@ msgstr "記得我的帳號"
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:213
 #: ..\..\..\skins\wpc_default\_feedback.php:213
 msgid "(Set cookies for name, email &amp; url)"
-msgstr ""
+msgstr "(為名稱、emial和url設定cookies)"
 
 #: ..\..\..\skins\_lastcomments.php:33
 #: ..\..\..\xmlsrv\atom.comments.php:38
@@ -5670,7 +5672,7 @@ msgstr "文章彙整"
 
 #: ..\..\..\skins\basic\_bloglist.php:23
 msgid "Select blog:"
-msgstr ""
+msgstr "選擇blog: "
 
 #: ..\..\..\skins\basic\_main.php:46
 msgid "Select skin:"
@@ -5679,7 +5681,7 @@ msgstr "選擇樣式 : "
 #: ..\..\..\skins\basic\_main.php:98
 #: ..\..\..\skins\custom\_main.php:93
 msgid "words"
-msgstr ""
+msgstr "字"
 
 #: ..\..\..\skins\basic\_main.php:103
 msgid "Read more..."
@@ -5703,7 +5705,7 @@ msgstr "閱覽此作者的所有文章"
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:86
 #: ..\..\..\skins\wpc_default\_feedback.php:86
 msgid "The <acronym title=\"Uniform Resource Identifier\">URI</acronym> to TrackBack this entry is:"
-msgstr "引用這個項目的<acronym title=\"連結\">URI</acronym>為:"
+msgstr "引用這個項目的<acronym title=\"Uniform Resource Identifier\">URI</acronym>為:"
 
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:114
 #: ..\..\..\skins\wpc_default\_feedback.php:114
@@ -5765,7 +5767,7 @@ msgstr "使用RSS格式訂閱本網站"
 #: ..\..\..\skins\wpc_aubmach\_main.php:175
 #: ..\..\..\skins\wpc_default\_main.php:178
 msgid "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
-msgstr ""
+msgstr "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 
 #: ..\..\..\skins\wpc_aubmach\_main.php:176
 #: ..\..\..\skins\wpc_default\_main.php:179
@@ -5775,7 +5777,7 @@ msgstr "以RSS格式觀看所有文章的最新留言"
 #: ..\..\..\skins\wpc_aubmach\_main.php:176
 #: ..\..\..\skins\wpc_default\_main.php:179
 msgid "Comments <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
-msgstr ""
+msgstr "訂閱評論 <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 
 #: ..\..\..\skins\wpc_aubmach\_main.php:177
 #: ..\..\..\skins\wpc_default\_main.php:180
@@ -5785,19 +5787,19 @@ msgstr "此網頁符合 XHTML 1.0 Transitional 標準"
 #: ..\..\..\skins\wpc_aubmach\_main.php:177
 #: ..\..\..\skins\wpc_default\_main.php:180
 msgid "Valid <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
-msgstr ""
+msgstr "符合 <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr> 標準"
 
 #: ..\..\..\skins\wpc_aubmach\_main.php:178
 #: ..\..\..\skins\wpc_aubmach\_main.php:188
 #: ..\..\..\skins\wpc_default\_main.php:181
 #: ..\..\..\skins\wpc_default\_main.php:191
 msgid "Powered by b2evolution; multilingual multiuser multi-blog engine."
-msgstr ""
+msgstr "Powered by b2evolution; multilingual multiuser multi-blog engine."
 
 #: ..\..\..\skins\wpc_aubmach\_main.php:189
 #: ..\..\..\skins\wpc_default\_main.php:192
 msgid "This skin features a CSS file originally designed for WordPress (See design credits in style.css)."
-msgstr ""
+msgstr "這個樣式的CSS檔原本設計給WordPress使用(可在style.css中察看design credits)"
 
 #: ..\..\..\skins\wpc_aubmach\_main.php:190
 #: ..\..\..\skins\wpc_default\_main.php:193

@@ -63,7 +63,7 @@ require_once dirname(__FILE__).'/'.$conf_dirout.$core_subdir.'_locale.funcs.php'
  * Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
  * IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
  */
-$locales = array( // {{{
+$locales = array(
 	'cs-CZ' => array( 'name' => NT_('Czech (CZ)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'd. m. y',
@@ -132,6 +132,13 @@ $locales = array( // {{{
 										'datefmt' => 'd/m/y',
 										'timefmt' => 'h:i:s a',
 										'messages' => 'en_NZ',
+										'enabled' => 1,
+									),
+	'en-SG' => array( 'name' => NT_('English (SG)'),
+										'charset' => 'iso-8859-1',
+										'datefmt' => 'd/m/y',
+										'timefmt' => 'H:i:s a',
+										'messages' => 'en_SG',
 										'enabled' => 1,
 									),
 	'es-ES' => array( 'name' => NT_('Spanish (ES)'),
@@ -232,6 +239,13 @@ $locales = array( // {{{
 										'messages' => 'pt_BR',
 										'enabled' => 1,
 									),
+	'sk-SK' => array( 'name' => NT_('Slovak (SK)'),
+										'charset' => 'utf-8',
+										'datefmt' => 'y-m-d',
+										'timefmt' => 'H:i:s',
+										'messages' => 'sk_SK',
+										'enabled' => 1,
+									),
 	'sv-SE' => array( 'name' => NT_('Swedish (SE)'),
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'y-m-d',
@@ -261,7 +275,6 @@ $locales = array( // {{{
 										'enabled' => 1,
 									),
 );
-//}}}
 
 
 /**

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-05-18 03:09+0200\n"
-"PO-Revision-Date: 2004-07-06 16:25+0100\n"
+"PO-Revision-Date: 2004-10-09 12:45+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1443,7 +1443,7 @@ msgstr ""
 #: ..\..\..\admin\tools.php:41
 #: ..\..\..\admin\tools.php:48
 msgid "Add this link to your Favorites/Bookmarks:"
-msgstr ""
+msgstr "Tilføj dette link til dine favoritter/bogmærker: "
 
 #: ..\..\..\admin\tools.php:27
 #: ..\..\..\admin\tools.php:34
@@ -1707,7 +1707,7 @@ msgstr "Nøgleord"
 
 #: ..\..\..\admin\_blogs_general.form.php:87
 msgid "This is is used in meta tag keywords. NO HTML!"
-msgstr ""
+msgstr "Dette er brugt i \"mega tag\" nøgleord. INGEN HTML!"
 
 #: ..\..\..\admin\_blogs_general.form.php:92
 msgid "Notes"
@@ -1971,7 +1971,7 @@ msgstr "Link til url"
 #: ..\..\..\skins\basic\_feedback.php:170
 #: ..\..\..\skins\basic\_profile.php:71
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: ..\..\..\admin\_edit_form.php:136
 #: ..\..\..\admin\_users_form.php:138
@@ -1982,7 +1982,7 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:70
 #: ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: ..\..\..\admin\_edit_form.php:161
 #: ..\..\..\admin\_edit_showposts.php:299
@@ -1990,16 +1990,16 @@ msgstr ""
 #: ..\..\..\skins\_feedback.php:207
 #: ..\..\..\skins\basic\_feedback.php:199
 msgid "Auto-BR"
-msgstr ""
+msgstr "Auto-linieskift"
 
 #: ..\..\..\admin\_edit_form.php:161
 #: ..\..\..\admin\_set_general.form.php:48
 msgid "This option is deprecated, you should avoid using it."
-msgstr ""
+msgstr "Denne instilling er forældet, du skal undgå at bruge den."
 
 #: ..\..\..\admin\_edit_form.php:166
 msgid "Preview"
-msgstr ""
+msgstr "Smugkig"
 
 #: ..\..\..\admin\_edit_form.php:172
 msgid "Blog this !"
@@ -2023,7 +2023,7 @@ msgstr ""
 
 #: ..\..\..\admin\_edit_form.php:197
 msgid "Edit timestamp"
-msgstr ""
+msgstr "Rediger tidsmærke"
 
 #: ..\..\..\admin\_edit_form.php:232
 msgid "URL Title"
@@ -2031,7 +2031,7 @@ msgstr "URL titel"
 
 #: ..\..\..\admin\_edit_form.php:234
 msgid "(to be used in permalinks)"
-msgstr ""
+msgstr "(bruges i permalinks)"
 
 #: ..\..\..\admin\_edit_form.php:246
 msgid "Additional actions"
@@ -2057,7 +2057,7 @@ msgstr ""
 #: ..\..\..\admin\_edit_form.php:505
 #: ..\..\..\admin\_edit_showposts.php:133
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: ..\..\..\admin\_edit_form.php:290
 msgid "The post will be publicly published"
@@ -2070,7 +2070,7 @@ msgstr "Udgivet (Offentlig)"
 
 #: ..\..\..\admin\_edit_form.php:297
 msgid "The post will be published but visible only by logged-in blog members"
-msgstr ""
+msgstr "Dette indlæg vil blive offentliggjort, men kun synligt for blogmedlemmer der er logget ind"
 
 #: ..\..\..\admin\_edit_form.php:298
 #: ..\..\..\admin\_edit_showposts.php:367
@@ -2079,7 +2079,7 @@ msgstr "Beskyttet (Kun medlemmer)"
 
 #: ..\..\..\admin\_edit_form.php:304
 msgid "The post will be published but visible only by yourself"
-msgstr ""
+msgstr "Dette indlæg vil kun være synligt for dig selv"
 
 #: ..\..\..\admin\_edit_form.php:305
 #: ..\..\..\admin\_edit_showposts.php:370
@@ -2089,7 +2089,7 @@ msgstr "Privat (Kun for dig)"
 #: ..\..\..\admin\_edit_form.php:311
 #: ..\..\..\admin\_edit_form.php:318
 msgid "The post will appear only in the backoffice"
-msgstr ""
+msgstr "Dette indlæg vil kun være i administrationsdelen"
 
 #: ..\..\..\admin\_edit_form.php:312
 #: ..\..\..\admin\_edit_showposts.php:373
@@ -2415,7 +2415,7 @@ msgstr "Fremtid"
 
 #: ..\..\..\admin\_edit_showposts.php:384
 msgid "Title / Text contains"
-msgstr ""
+msgstr "Titel / Tekst indeholder"
 
 #: ..\..\..\admin\_edit_showposts.php:388
 msgid "Words"
@@ -2472,7 +2472,7 @@ msgstr "Stats"
 #: ..\..\..\admin\_menutop.php:103
 #: ..\..\..\admin\_users_groupform.php:102
 msgid "Templates"
-msgstr ""
+msgstr "Skabeloner"
 
 #: ..\..\..\admin\_menutop.php:113
 msgid "Users"
@@ -2492,7 +2492,7 @@ msgstr "Ny bruger kan registere"
 
 #: ..\..\..\admin\_set_general.form.php:20
 msgid "Check to allow new users to register themselves."
-msgstr ""
+msgstr "Marker for at tillade at nye brugere selv kan registere."
 
 #: ..\..\..\admin\_set_general.form.php:22
 msgid "Group for new users"
@@ -2653,11 +2653,11 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:47
 #: ..\..\..\admin\_set_regional.form.php:154
 msgid "Enabled"
-msgstr ""
+msgstr "Slået til"
 
 #: ..\..\..\admin\_set_regional.form.php:47
 msgid "Should this locale be available to users?"
-msgstr ""
+msgstr "Skal denne lokale være tilgængelig for alle brugere?"
 
 #: ..\..\..\admin\_set_regional.form.php:49
 msgid "name of the locale"
@@ -2726,7 +2726,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:73
 msgid "Date/Time Formats"
-msgstr ""
+msgstr "Dato/tids formater"
 
 #: ..\..\..\admin\_set_regional.form.php:74
 msgid "The following characters are recognized in the format strings:"
@@ -2911,7 +2911,7 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:236
 #: ..\..\..\admin\_users_list.php:31
 msgid "Edit"
-msgstr ""
+msgstr "Rediger"
 
 #: ..\..\..\admin\_set_regional.form.php:166
 msgid "Strings"
@@ -2919,32 +2919,32 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:167
 msgid "Translated"
-msgstr ""
+msgstr "Oversat"
 
 #: ..\..\..\admin\_set_regional.form.php:171
 #: ..\..\..\admin\_set_regional.form.php:328
 msgid "Extract"
-msgstr ""
+msgstr "Udpak"
 
 #: ..\..\..\admin\_set_regional.form.php:218
 msgid "up"
-msgstr ""
+msgstr "op"
 
 #: ..\..\..\admin\_set_regional.form.php:218
 msgid "Move priority up"
-msgstr ""
+msgstr "Flyt prioritet op"
 
 #: ..\..\..\admin\_set_regional.form.php:227
 msgid "down"
-msgstr ""
+msgstr "ned"
 
 #: ..\..\..\admin\_set_regional.form.php:227
 msgid "Move priority down"
-msgstr ""
+msgstr "Flyt prioritet ned"
 
 #: ..\..\..\admin\_set_regional.form.php:234
 msgid "Copy locale"
-msgstr ""
+msgstr "Kopier lokale"
 
 #: ..\..\..\admin\_set_regional.form.php:241
 msgid "Reset custom settings"
@@ -2952,7 +2952,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:252
 msgid "No language file..."
-msgstr ""
+msgstr "Ingen sprogfil"
 
 #: ..\..\..\admin\_set_regional.form.php:328
 msgid "Extract .po file into b2evo-format"
@@ -2969,11 +2969,11 @@ msgstr ""
 
 #: ..\..\..\admin\_users_form.php:49
 msgid "first user"
-msgstr ""
+msgstr "første bruger"
 
 #: ..\..\..\admin\_users_form.php:50
 msgid "previous user"
-msgstr ""
+msgstr "næste bruger"
 
 #: ..\..\..\admin\_users_form.php:51
 msgid "next user"
@@ -2981,26 +2981,26 @@ msgstr "næste bruger"
 
 #: ..\..\..\admin\_users_form.php:52
 msgid "last user"
-msgstr ""
+msgstr "sidste bruger"
 
 #: ..\..\..\admin\_users_form.php:55
 msgid "Close user profile"
-msgstr ""
+msgstr "Luk bruger profil"
 
 #: ..\..\..\admin\_users_form.php:62
 msgid "Create new user profile"
-msgstr ""
+msgstr "Lav ny brugerprofil"
 
 #: ..\..\..\admin\_users_form.php:66
 msgid "Profile for:"
-msgstr ""
+msgstr "Profil for:"
 
 #: ..\..\..\admin\_users_form.php:84
 #: ..\..\..\admin\_users_form.php:98
 #: ..\..\..\admin\_users_form.php:113
 #: ..\..\..\skins\_profile.php:58
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 #: ..\..\..\admin\_users_form.php:85
 #: ..\..\..\admin\_users_form.php:99
@@ -3013,7 +3013,7 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:62
 #: ..\..\..\skins\basic\_profile.php:49
 msgid "First name"
-msgstr ""
+msgstr "Fornavn"
 
 #: ..\..\..\admin\_users_form.php:86
 #: ..\..\..\admin\_users_form.php:100
@@ -3026,7 +3026,7 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:62
 #: ..\..\..\skins\basic\_profile.php:50
 msgid "Last name"
-msgstr ""
+msgstr "Efternavn"
 
 #: ..\..\..\admin\_users_form.php:87
 #: ..\..\..\admin\_users_form.php:97
@@ -3036,18 +3036,18 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:57
 #: ..\..\..\skins\basic\_profile.php:51
 msgid "Nickname"
-msgstr ""
+msgstr "Kælenavn"
 
 #: ..\..\..\admin\_users_form.php:92
 #: ..\..\..\admin\_users_form.php:117
 #: ..\..\..\skins\_profile.php:53
 #: ..\..\..\skins\basic\_profile.php:55
 msgid "Identity shown"
-msgstr ""
+msgstr "Identitet vist"
 
 #: ..\..\..\admin\_users_form.php:108
 msgid "Preferred locale"
-msgstr ""
+msgstr "Foretrukket lokalindstilling"
 
 #: ..\..\..\admin\_users_form.php:108
 #: ..\..\..\admin\_users_form.php:118
@@ -3056,15 +3056,15 @@ msgstr ""
 
 #: ..\..\..\admin\_users_form.php:121
 msgid "Send an email"
-msgstr ""
+msgstr "Send en email"
 
 #: ..\..\..\admin\_users_form.php:134
 msgid "Visit the site"
-msgstr ""
+msgstr "Besøg siden"
 
 #: ..\..\..\admin\_users_form.php:144
 msgid "Search on ICQ.com"
-msgstr ""
+msgstr "Søg på ICQ.com"
 
 #: ..\..\..\admin\_users_form.php:148
 #: ..\..\..\admin\_users_form.php:150
@@ -3144,16 +3144,16 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:37
 #: ..\..\..\skins\basic\_profile.php:39
 msgid "Level"
-msgstr ""
+msgstr "Niveau"
 
 #: ..\..\..\admin\_users_form.php:194
 #: ..\..\..\admin\_users_form.php:199
 msgid "User group"
-msgstr ""
+msgstr "Brugergruppe"
 
 #: ..\..\..\admin\_users_form.php:220
 msgid "User information"
-msgstr ""
+msgstr "Brugerinformation"
 
 #: ..\..\..\admin\_users_form.php:222
 #: ..\..\..\admin\_users_groupform.php:63
@@ -3161,7 +3161,7 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:31
 #: ..\..\..\skins\basic\_profile.php:33
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: ..\..\..\admin\_users_form.php:223
 #: ..\..\..\skins\_profile.php:42
@@ -3175,31 +3175,31 @@ msgstr ""
 #: ..\..\..\skins\fplanque2002\_main.php:283
 #: ..\..\..\skins\fplanque2002\_main.php:288
 msgid "Posts"
-msgstr ""
+msgstr "Indlæg"
 
 #: ..\..\..\admin\_users_form.php:224
 msgid "Created on"
-msgstr ""
+msgstr "Lavet den"
 
 #: ..\..\..\admin\_users_form.php:225
 msgid "From IP"
-msgstr ""
+msgstr "Fra IP"
 
 #: ..\..\..\admin\_users_form.php:226
 msgid "From Domain"
-msgstr ""
+msgstr "Fra Domæne"
 
 #: ..\..\..\admin\_users_form.php:227
 msgid "With Browser"
-msgstr ""
+msgstr "Med Browser"
 
 #: ..\..\..\admin\_users_groupform.php:47
 msgid "first group"
-msgstr ""
+msgstr "første gruppe"
 
 #: ..\..\..\admin\_users_groupform.php:48
 msgid "previous group"
-msgstr ""
+msgstr "forrige gruppe"
 
 #: ..\..\..\admin\_users_groupform.php:49
 msgid "next group"
@@ -3207,31 +3207,31 @@ msgstr "næste gruppe"
 
 #: ..\..\..\admin\_users_groupform.php:50
 msgid "last group"
-msgstr ""
+msgstr "sidste gruppe"
 
 #: ..\..\..\admin\_users_groupform.php:54
 msgid "Close group profile"
-msgstr ""
+msgstr "Luk gruppeprofil"
 
 #: ..\..\..\admin\_users_groupform.php:58
 msgid "Creating new group"
-msgstr ""
+msgstr "Lav ny gruppe"
 
 #: ..\..\..\admin\_users_groupform.php:62
 msgid "Editing group:"
-msgstr ""
+msgstr "Rediger gruppe:"
 
 #: ..\..\..\admin\_users_groupform.php:62
 msgid "Viewing group:"
-msgstr ""
+msgstr "Se gruppe:"
 
 #: ..\..\..\admin\_users_groupform.php:80
 msgid "Permissons for members of this group"
-msgstr ""
+msgstr "Tilladelser for medlemmer af denne gruppe"
 
 #: ..\..\..\admin\_users_groupform.php:84
 msgid "View all"
-msgstr ""
+msgstr "Se alle"
 
 #: ..\..\..\admin\_users_groupform.php:85
 #: ..\..\..\admin\_users_groupform.php:90
@@ -3240,7 +3240,7 @@ msgstr ""
 #: ..\..\..\admin\_users_groupform.php:109
 #: ..\..\..\admin\_users_groupform.php:114
 msgid "Full Access"
-msgstr ""
+msgstr "Fuld adgang"
 
 #: ..\..\..\admin\_users_groupform.php:88
 #: ..\..\..\admin\_users_groupform.php:93
@@ -3254,12 +3254,12 @@ msgstr "Ingen adgang"
 #: ..\..\..\admin\_users_groupform.php:99
 #: ..\..\..\admin\_users_groupform.php:108
 msgid "View only"
-msgstr ""
+msgstr "Se kun"
 
 #: ..\..\..\admin\_users_groupform.php:91
 #: ..\..\..\b2evocore\_functions_hitlogs.php:528
 msgid "Statistics"
-msgstr ""
+msgstr "Statistik"
 
 #: ..\..\..\admin\_users_groupform.php:101
 msgid "Global options"
@@ -3302,7 +3302,7 @@ msgstr ""
 #: ..\..\..\admin\_users_list.php:147
 #: ..\..\..\admin\_users_list.php:148
 msgid "Delete user"
-msgstr ""
+msgstr "Slet bruger"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_users_list.php:147
@@ -3427,12 +3427,12 @@ msgstr ""
 msgid "Tag %s may not contain raw character data"
 msgstr ""
 
-#. TRANS: When the categories for a specific post are displayed, the user can click
-#. on these cats to browse them, this is the default href title displayed there
+#  TRANS: When the categories for a specific post are displayed, the user can click
+#  on these cats to browse them, this is the default href title displayed there
 #: ..\..\..\b2evocore\_class_item.php:274
 #: ..\..\..\b2evocore\_functions_cats.php:631
 msgid "Browse category"
-msgstr ""
+msgstr "Gennemse kategori"
 
 #: ..\..\..\b2evocore\_class_item.php:372
 msgid "This post is not published. You cannot leave comments."
@@ -3801,11 +3801,11 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_bposts.php:655
 msgid "Post details"
-msgstr ""
+msgstr "Indlæg detaljer"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:663
 msgid "PREVIEW"
-msgstr ""
+msgstr "SMUGKIG"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:800
 msgid "Next page"
@@ -3833,7 +3833,7 @@ msgstr "Forrige side"
 
 #: ..\..\..\b2evocore\_functions_cats.php:87
 msgid "Cannot delete if there are sub-categories!"
-msgstr ""
+msgstr "Kan ikke slette hvis der er underkategorier"
 
 #: ..\..\..\b2evocore\_functions_cats.php:119
 msgid "Cannot delete last category if there are posts inside!"
@@ -3846,7 +3846,7 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_cats.php:562
 msgid "Category"
-msgstr ""
+msgstr "Kategori"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:57
 msgid "bad char in User Agent"
@@ -3873,7 +3873,7 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:127
 msgid "search engine"
-msgstr ""
+msgstr "søgemaskine"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:135
 msgid "loading referering page"
@@ -3894,7 +3894,7 @@ msgstr ""
 #: ..\..\..\b2evocore\_functions_locale.php:347
 #: ..\..\..\install\index.php:83
 msgid "name"
-msgstr ""
+msgstr "navn"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:35
 msgid "Sending pingbacks..."
@@ -4000,11 +4000,11 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_template.php:47
 msgid "Archives for"
-msgstr ""
+msgstr "Arkiver for"
 
 #: ..\..\..\b2evocore\_functions_template.php:96
 msgid "Archive Directory"
-msgstr ""
+msgstr "Arkiv folder"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:24
 msgid "Sending trackbacks..."
@@ -4072,7 +4072,7 @@ msgstr "Log ud fra din konto..."
 
 #: ..\..\..\b2evocore\_functions_users.php:433
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: ..\..\..\b2evocore\_functions_users.php:434
 msgid "Go to the back-office"
@@ -4269,11 +4269,11 @@ msgstr "Lokal"
 
 #: ..\..\..\b2evocore\_vars.php:186
 msgid "Reported"
-msgstr ""
+msgstr "Rapporteret"
 
 #: ..\..\..\b2evocore\_vars.php:187
 msgid "Central"
-msgstr ""
+msgstr "Central"
 
 #: ..\..\..\conf\_locales.php:37
 msgid "Czech (CZ)"
@@ -4448,11 +4448,11 @@ msgstr ""
 
 #: ..\..\..\htsrv\getmail.php:223
 msgid "Category ID"
-msgstr ""
+msgstr "Kategori ID"
 
 #: ..\..\..\htsrv\getmail.php:228
 msgid "Blog ID"
-msgstr ""
+msgstr "Blog ID"
 
 #: ..\..\..\htsrv\getmail.php:233
 msgid "Permission denied."
@@ -4477,19 +4477,19 @@ msgstr ""
 
 #: ..\..\..\htsrv\login.php:80
 msgid "New Password:"
-msgstr ""
+msgstr "Nyt kodeord"
 
 #: ..\..\..\htsrv\login.php:81
 msgid "You can login here:"
-msgstr ""
+msgstr "Du kan logge ind her:"
 
 #: ..\..\..\htsrv\login.php:86
 msgid "your weblog's login/password"
-msgstr ""
+msgstr "din weblogs brugernavn/kodeord"
 
 #: ..\..\..\htsrv\login.php:88
 msgid "The email could not be sent."
-msgstr ""
+msgstr "Email kunne ikke sendes."
 
 #: ..\..\..\htsrv\login.php:89
 msgid "Possible reason: your host may have disabled the mail() function..."
@@ -4497,17 +4497,17 @@ msgstr ""
 
 #: ..\..\..\htsrv\login.php:110
 msgid "Note: You are already logged in!"
-msgstr ""
+msgstr "Bemærk: Du er allerede logget ind!"
 
 #: ..\..\..\htsrv\login.php:117
 msgid "Continue..."
-msgstr ""
+msgstr "Fortsæt"
 
 #: ..\..\..\htsrv\profile_update.php:33
 #: ..\..\..\skins\_profile.php:16
 #: ..\..\..\skins\basic\_profile.php:16
 msgid "You are not logged in."
-msgstr ""
+msgstr "Du er ikke logget ind."
 
 #: ..\..\..\htsrv\profile_update.php:38
 msgid "You are not logged in under the same account you are trying to modify."
@@ -4522,7 +4522,7 @@ msgstr ""
 #: ..\..\..\htsrv\profile_update.php:98
 #: ..\..\..\htsrv\profile_update.php:104
 msgid "Back to profile"
-msgstr ""
+msgstr "Tilbage til profil"
 
 #: ..\..\..\htsrv\profile_update.php:50
 msgid "please enter your nickname (can be the same as your login)"
@@ -4540,7 +4540,7 @@ msgstr "skriv venligst din emailadresse"
 #: ..\..\..\htsrv\profile_update.php:75
 #: ..\..\..\htsrv\register.php:76
 msgid "the email address is invalid"
-msgstr ""
+msgstr "emailadressen er ugyldig"
 
 #: ..\..\..\htsrv\profile_update.php:84
 #: ..\..\..\htsrv\profile_update.php:92
@@ -4570,7 +4570,7 @@ msgstr ""
 #: ..\..\..\htsrv\register.php:117
 #: ..\..\..\htsrv\register.php:121
 msgid "new user registration on your blog"
-msgstr ""
+msgstr "ny brugerregistering på din blog"
 
 #: ..\..\..\htsrv\register.php:119
 msgid "Manage users"
@@ -4585,7 +4585,7 @@ msgstr ""
 #: ..\..\..\htsrv\trackback.php:103
 #: ..\..\..\xmlsrv\xmlrpc.php:1400
 msgid "Website"
-msgstr ""
+msgstr "Hjemmeside"
 
 #: ..\..\..\htsrv\trackback.php:105
 #: ..\..\..\xmlsrv\xmlrpc.php:1402
@@ -4637,23 +4637,23 @@ msgstr "Registeringen er færdig"
 
 #: ..\..\..\htsrv\_reg_disabled.php:11
 msgid "Registration Currently Disabled"
-msgstr ""
+msgstr "Registering er pt. slået fra"
 
 #: ..\..\..\htsrv\_reg_disabled.php:14
 msgid "User registration is currently not allowed."
-msgstr ""
+msgstr "Brugerregistering er pt. ikke tilladt."
 
 #: ..\..\..\htsrv\_reg_disabled.php:15
 msgid "Home"
-msgstr ""
+msgstr "Hjem"
 
 #: ..\..\..\htsrv\_reg_form.php:11
 msgid "Register form"
-msgstr ""
+msgstr "Registering formular"
 
 #: ..\..\..\htsrv\_reg_form.php:28
 msgid "(twice)"
-msgstr ""
+msgstr "(to gange)"
 
 #: ..\..\..\htsrv\_reg_form.php:32
 #, php-format
@@ -4662,15 +4662,15 @@ msgstr ""
 
 #: ..\..\..\htsrv\_reg_form.php:42
 msgid "Preferred language"
-msgstr ""
+msgstr "Foretrukket sprog"
 
 #: ..\..\..\htsrv\_reg_form.php:46
 msgid "Register!"
-msgstr ""
+msgstr "Register!"
 
 #: ..\..\..\htsrv\_reg_form.php:53
 msgid "Log into existing account..."
-msgstr ""
+msgstr "Log ind på eksisterende konto..."
 
 #: ..\..\..\install\index.php:45
 msgid "b2evo installer"
@@ -4981,19 +4981,19 @@ msgstr ""
 
 #: ..\..\..\install\index.php:460
 msgid "Reset done!"
-msgstr ""
+msgstr "Nulstil færdig!"
 
 #: ..\..\..\install\index.php:461
 msgid "Back to menu"
-msgstr ""
+msgstr "Tilbage til menu"
 
 #: ..\..\..\install\index.php:468
 msgid "official website"
-msgstr ""
+msgstr "officiel hjemmeside"
 
 #: ..\..\..\install\index.php:470
 msgid "contact"
-msgstr ""
+msgstr "kontakt"
 
 #: ..\..\..\install\_functions_cafelogupgrade.php:33
 #, php-format
@@ -5002,7 +5002,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:405
 msgid "This is a sample linkblog entry"
-msgstr ""
+msgstr "Dette er et eksempel linkblog indlæg"
 
 #: ..\..\..\install\_functions_create.php:405
 msgid "This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."
@@ -5023,7 +5023,7 @@ msgstr ""
 #: ..\..\..\install\_functions_create.php:488
 #, php-format
 msgid "%s Title"
-msgstr ""
+msgstr "%s Titel"
 
 #: ..\..\..\install\_functions_create.php:440
 #: ..\..\..\install\_functions_create.php:457
@@ -5055,7 +5055,7 @@ msgstr ""
 #: ..\..\..\install\_functions_create.php:498
 #, php-format
 msgid "Keywords for %s"
-msgstr ""
+msgstr "Nøgleord for %s"
 
 #: ..\..\..\install\_functions_create.php:486
 msgid "The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
@@ -5185,7 +5185,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:648
 msgid "Important information"
-msgstr ""
+msgstr "Vigtig information"
 
 #: ..\..\..\install\_functions_create.php:648
 msgid ""
@@ -5198,7 +5198,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:686
 msgid "First Post"
-msgstr ""
+msgstr "Første indlæg"
 
 #: ..\..\..\install\_functions_create.php:686
 msgid ""

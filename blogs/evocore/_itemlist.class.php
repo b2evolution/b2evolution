@@ -513,7 +513,7 @@ class ItemList extends DataObjectList
 																			post_status, post_locale, post_content, post_title,
 																			post_urltitle, post_url, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
-																			post_views, post_renderers, post_karma
+																			post_views, post_renderers
 											FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
 														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
@@ -625,8 +625,7 @@ class ItemList extends DataObjectList
 										'' AS post_flags,
 										".bpost_count_words( $content )." AS post_wordcount,
 										'open' AS post_comments,
-										'".$DB->escape( $post_renderers )."' AS post_renderers,
-										0 AS post_karma";
+										'".$DB->escape( $post_renderers )."' AS post_renderers";
 	}
 
 	/*
@@ -821,8 +820,7 @@ class ItemList extends DataObjectList
 			'Flags' => explode( ',', $row->post_flags ),
 			'Wordcount' => $row->post_wordcount,
 			'views' => $row->post_views,
-			'comments' => $row->post_comments,
-			'Karma' => $row->post_karma // this isn't used yet
+			'comments' => $row->post_comments
 			);
 
 		// echo ' title: ',$postdata['Title'];
@@ -907,6 +905,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/09 21:21:20  fplanque
+ * introduced foreign key support
+ *
  * Revision 1.3  2004/11/09 00:25:12  blueyed
  * minor translation changes (+MySQL spelling :/)
  *

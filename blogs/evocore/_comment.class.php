@@ -66,7 +66,6 @@ class Comment extends DataObject
 	var	$author_ip;
 	var	$date;
 	var	$content;
-	var	$karma;
 
 	/**
 	 * Comment::Comment(-)
@@ -108,7 +107,6 @@ class Comment extends DataObject
 			$this->author_ip = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
-			$this->karma = $db_row['comment_karma'];
 		}
 	}
 
@@ -123,9 +121,6 @@ class Comment extends DataObject
 		{
 			case 'Item':
 				die ('coment->Post assignement not handled');
-
-			case 'karma':
-				parent::set_param( $parname, 'number', $parvalue );
 			break;
 
 			default:
@@ -483,6 +478,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/09 21:21:19  fplanque
+ * introduced foreign key support
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

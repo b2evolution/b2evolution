@@ -139,9 +139,6 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// New tables:
-	create_b2evo_tables_091();
-
 	if( $old_db_version < 8010 )
 	{
 		echo 'Upgrading users table... ';
@@ -490,9 +487,14 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8070 )
-	{{{ // upgrade to 0.9.1
+	{ // ---------------------------------- upgrade to 0.9.1
+
+		// New tables:
+		create_b2evo_tables_091();
+
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
+							MODIFY COLUMN blog_ID int unsigned NOT NULL auto_increment,
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
 							ADD blog_media_location ENUM( 'default', 'subdir', 'custom' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
 							ADD blog_media_subdir VARCHAR( 255 ) NOT NULL AFTER blog_media_location,
@@ -513,8 +515,18 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE T_posts
-							ADD post_views INT NOT NULL DEFAULT '0' AFTER post_flags,
-							ADD post_commentsexpire DATETIME DEFAULT NULL AFTER post_comments";
+							DROP COLUMN post_karma,
+							MODIFY COLUMN post_author	int(11) unsigned NOT NULL default '0',
+							ADD post_parent_ID				int(10) unsigned NULL AFTER ID,
+							ADD post_assigned_user_ID	int(10) unsigned NULL AFTER post_author,
+							ADD post_pst_ID						int(11) unsigned NULL AFTER post_status,
+							ADD post_ptyp_ID					int(11) unsigned NULL AFTER post_pst_ID,
+							ADD post_views						INT NOT NULL DEFAULT '0' AFTER post_flags,
+							ADD post_commentsexpire		DATETIME DEFAULT NULL AFTER post_comments,
+							ADD INDEX post_parent_ID( post_parent_ID ),
+							ADD INDEX post_assigned_user_ID( post_assigned_user_ID ),
+							ADD INDEX post_ptyp_ID( post_ptyp_ID ),
+							ADD INDEX post_pst_ID( post_pst_ID ) ";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -537,7 +549,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		// {{{ explicit upload permissions
+		// explicit upload permissions
 		$notset = $set = array();
 		if( isset($fileupload_allowedusers) && !empty($fileupload_allowedusers) )
 		{
@@ -569,11 +581,12 @@ function upgrade_b2evo_tables()
 			}
 			echo "<br />OK.<br />\n";
 		}
-		// }}}
 
 
 		echo 'Altering table for Blog-User permissions... ';
 		$DB->query( 'ALTER TABLE T_blogusers
+									MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
+									MODIFY COLUMN bloguser_user_ID int(11) unsigned NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_upload tinyint NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_browse tinyint NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );
@@ -582,11 +595,29 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
-				ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post'";
+									ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
-	}}}
+		echo 'Altering comments table... ';
+		$DB->query( "ALTER TABLE T_comments
+									MODIFY COLUMN comment_post_ID		int(11) unsigned NOT NULL default '0'" );
+		echo "OK.<br />\n";
+			
+		echo 'Altering Posts to Categories table... ';
+		$DB->query( "ALTER TABLE T_postcats
+									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL default '0'" ); 
+		echo "OK.<br />\n";
+
+		echo 'Altering Categories table... ';
+		$DB->query( "ALTER TABLE T_categories
+									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default '2'" ); 
+		echo "OK.<br />\n";
+
+		// Create relations:
+		create_b2evo_relations();
+
+	}
 
 
 	if( $old_db_version < 8080 )
