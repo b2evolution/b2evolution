@@ -15,8 +15,7 @@
 	<tr>
 		<th><?php echo T_('Blog') ?></th>
 		<th><?php echo T_('Full Name') ?></th>
-		<th><?php echo T_('Stub Filename') ?></th>
-		<th><?php echo T_('Stub URLname') ?></th>
+		<th><?php echo T_('URL blog name') ?></th>
 		<th><?php echo T_('Static Filename') ?></th>
 		<th><?php echo T_('Locale') ?></th>
 		<?php if( $current_User->check_perm( 'blog_properties', 'edit', false ) )
@@ -49,7 +48,6 @@
 					} ?>
 					</strong></td>
 			<td><?php blog_list_iteminfo('name') ?></td>
-			<td><a href="<?php blog_list_iteminfo('dynurl') ?>"><?php blog_list_iteminfo('filename') ?></a></td>
 			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('stub') ?></a></td>
 			<td>
 				<?php if( $staticfilename=blog_list_iteminfo('staticfilename',false) )

@@ -12,6 +12,7 @@ require_once( dirname(__FILE__). '/_header.php' ); // this will actually load bl
 $admin_tab = 'blogs';
 $admin_pagetitle = T_('Blogs');
 param( 'action', 'string' );
+param( 'tab', 'string', 'general' );
 
 switch($action)
 {
@@ -182,14 +183,25 @@ switch($action)
 	case 'edit':
 		// ---------- Edit blog form ----------
 		param( 'blog', 'integer', true );
+		$admin_pagetitle .= ' :: ['.get_bloginfo('shortname').']';
+		switch( $tab )
+		{
+			case 'general':
+				$admin_pagetitle .= ' :: '. T_('General');
+				break;
+			case 'perm':
+				$admin_pagetitle .= ' :: '. T_('Permissions');
+				break;
+			case 'advanced':
+				$admin_pagetitle .= ' :: '. T_('Advanced');
+				break;
+		}
 		require( dirname(__FILE__). '/_menutop.php' );
 		require( dirname(__FILE__). '/_menutop_end.php' );
 
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		echo "<div class=\"panelblock\">\n";
-		echo '<h2>', T_('Blog params for:'), ' ', get_bloginfo('name'), "</h2>\n";
 		// EDIT FORM:
 		$blog_name = get_bloginfo( 'name' );
 		$blog_shortname = get_bloginfo( 'shortname' );
@@ -212,10 +224,44 @@ switch($action)
 		$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
 		$blog_default_skin = get_bloginfo( 'default_skin' );
 		$next_action = 'update';
+		?>
+		<div class="pt" >
+			<ul class="tabs">
+				<!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display -->
+			</ul>
+			<div class="panelblocktabs">
+				<ul class="tabs">
+				<?php
+					if( $tab == 'general' )
+						echo '<li class="current">';
+					else
+						echo '<li>';
+					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit">'. T_('General'). '</a></li>';
+
+					if( $tab == 'perm' )
+						echo '<li class="current">';
+					else
+						echo '<li>';
+					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=perm">'. T_('Permissions'). '</a></li>';
+					
+					if( $tab == 'advanced' )
+						echo '<li class="current">';
+					else
+						echo '<li>';
+					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=advanced">'. T_('Advanced'). '</a></li>';
+					
+				?>
+				</ul>
+			</div>
+		</div>
+		<div class="tabbedpanelblock">
+		
+		<?php 
 		require( dirname(__FILE__) . '/_blogs_form.php' );
 		echo '</div>';
-		break;
-
+		require( dirname(__FILE__). '/_footer.php' );
+		exit();
+		
 
 	case 'update':
 		// ---------- Update blog in DB ----------

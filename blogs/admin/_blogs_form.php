@@ -26,9 +26,9 @@ switch( $next_action )
 	<fieldset>
 		<legend><?php echo T_('General parameters') ?></legend>
 		<?php
-			form_text( 'blog_name', $blog_name, 50, T_('Full Name') );
-			form_text( 'blog_shortname', $blog_shortname, 12, T_('Short Name') );
-			form_select( 'blog_locale', $blog_locale, 'locale_options', T_('Main Locale') );
+			form_text( 'blog_name', $blog_name, 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
+			form_text( 'blog_shortname', $blog_shortname, 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
+			form_select( 'blog_locale', $blog_locale, 'locale_options', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 		?>
 	</fieldset>
 
@@ -37,13 +37,18 @@ switch( $next_action )
 		<fieldset>
 			<div class="label"><label for="blog_siteurl"><?php echo T_('Blog Folder URL') ?>: </label></div>
 			<div class="input"><code><?php echo $baseurl ?></code><input type="text" name="blog_siteurl" id="blog_siteurl" size="40" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>"/>
-			<span class="notes"><?php echo T_('This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live. No trailing slash. (If you don\'t know, leave this field empty.)') ?></span></div>
+			<span class="notes"><?php echo T_('No trailing slash. (If you don\'t know, leave this field empty.)') ?></span></div>
 		</fieldset>
 
 		<?php
-			form_text( 'blog_filename', $blog_filename, 30, T_('Stub Filename'), T_('This is the <strong>file</strong>name of the main file (e-g: blog_b.php) used to display this blog. This is used mainly for static page generation, but setting this incorrectly may also cause navigation to fail.') );
-
-			form_text( 'blog_stub', $blog_stub, 30, T_('Stub Urlname'), T_('This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used to display this blog. A typical setting would be setting this to your Filename without the .php extension, if your webserver supports this. <strong>If you are not sure how to set this, use the same as Stub Filename.</strong> This is used by permalinks, trackback, pingback, etc. Setting this incorrectly may cause these to fail.') );
+			form_text( 'blog_stub', $blog_stub, 30, T_('URL blog name'), T_('((This help note will be updated))') );
+		?>
+	</fieldset>
+		
+	<fieldset>
+		<legend><?php echo T_('Static file generation') ?></legend>
+		<?php
+			form_text( 'blog_filename', $blog_filename, 30, T_('Source Stub File'), T_('((This help note will be updated))') );
 
 			form_text( 'blog_staticfilename', $blog_staticfilename, 30, T_('Static Filename'), T_('This is the filename that will be used when you generate a static (.html) version of the blog homepage.') );
 		?>
