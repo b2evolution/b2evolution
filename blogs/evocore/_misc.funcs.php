@@ -198,7 +198,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 																			$uri_attrs, $comments_allowed_uri_scheme, $encoding );
 		}
 
-		$checker->check( $content );
+		$checker->check( $content ); // TODO: see if we need to use convert_chars( $content, 'html' )
 	}
 
 	if( !isset( $use_security_checker ) ) $use_security_checker = 1;
@@ -1857,6 +1857,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.56  2005/03/02 16:01:00  fplanque
+ * comment
+ *
  * Revision 1.55  2005/03/02 15:31:54  fplanque
  * minor cleanup
  *
