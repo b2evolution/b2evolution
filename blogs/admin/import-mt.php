@@ -7,6 +7,8 @@
  *  - assign comment_author_ID to comments if user exist?!
  *
  * CHANGES:
+ *  0.9.0.10+:
+ *  - bad bug(s) fixes, regarding post parsing
  *  0.9.0.9:
  *	 + Simulate the import before performing it for real
  *   + Redesign of output and parsing
@@ -491,6 +493,8 @@ param( 'mode', 'string', 'normal' );
 		}
 
 		import_data_extract_authors_cats();
+
+		{{{ // map categories
 		/**
 		 * associative array that maps MT cats to b2evo.
 		 * key is the MT category name.
@@ -581,6 +585,7 @@ param( 'mode', 'string', 'normal' );
 		}
 
 		debug_dump( $catsmapped, 'catsmapped' );
+		}}}
 
 
 
@@ -669,6 +674,9 @@ param( 'mode', 'string', 'normal' );
 		foreach ($posts as $post)
 		{
 			++$i;
+
+			// strip the post's last '-----'
+			$post = preg_replace("|-----\n+$|s", '', $post);
 
 			// first line is author of post
 			$post_author = trim( substr( $post, 0, strpos( $post, "\n", 1 ) ) );
@@ -1346,7 +1354,7 @@ function import_data_extract_authors_cats()
 	}
 
 	$importdata = preg_replace( "/\r?\n|\r/", "\n", $buffer );
-	$posts = preg_split( '/(^|--------\n)AUTHOR: /', $importdata );
+	$posts = preg_split( '/(^|--------\n)(AUTHOR: |$)/', $importdata );
 
 	$authors = array(); $tempauthors = array();
 	$categories = array(); $tempcategories = array();
