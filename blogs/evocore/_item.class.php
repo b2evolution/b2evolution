@@ -78,6 +78,8 @@ $object_def['Item'] = array( // definition of the object:
 									),
 			'allow_null' => array( // specifies column nullability:
 										'assigned_user_ID'=> true,
+										'st_ID'           => true,
+										'typ_ID'          => true,
 									),
 		);
 
@@ -1343,9 +1345,10 @@ class Item extends DataObject
 	 */
 	function extra_status( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		global $itemStatusCache;
+		global $itemStatusCache, $object_def;
 
-		if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, false ) ) )
+		if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, true,
+					/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['st_ID'] ) ) )
 		{ // No status:
 			return;
 		}
@@ -1373,10 +1376,11 @@ class Item extends DataObject
 	 */
 	function type( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		global $itemTypeCache;
+		global $itemTypeCache, $object_def;
 
-		if( ! ($Element = $itemTypeCache->get_by_ID( $this->typ_ID, false) ) )
-		{ // No status:
+		if( ! ($Element = $itemTypeCache->get_by_ID( $this->typ_ID, true,
+    					/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['typ_ID'] ) ) 			)
+    { // No status:
 			return;
 		}
 
@@ -1754,6 +1758,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2005/03/04 18:39:41  fplanque
+ * handle NULL properties
+ *
  * Revision 1.25  2005/03/02 17:07:34  blueyed
  * no message
  *
