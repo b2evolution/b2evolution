@@ -254,4 +254,134 @@ function profile($user_login)
 	global $user_data;
 	echo "<a href=\"#\" OnClick=\"javascript:window.open('b2profile.php?user=".$user_data["user_login"]."','Profile','toolbar=0,status=1,location=0,directories=0,menuBar=0,scrollbars=1,resizable=1,width=480,height=320,left=100,top=100');\">$user_login</a>";
 }
+
+
+/*
+ * user_login_link(-)
+ *
+ * Template tag; Provide a link to login
+ */
+function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $pathserver, $blog;
+
+	if( is_loggued_in() ) return false;
+
+	if( $link_text == '' ) $link_text = T_('Login...');
+	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
+	
+	$redir = '';
+	if( !empty( $blog ) ) 
+	{	// We'll want to return to this blog after login
+		$redir = '?redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
+	}
+	
+	echo $before;
+	echo '<a href="', $pathserver, '/b2login.php', $redir, '" title="', $link_title, '">';
+	echo $link_text;
+	echo '</a>';
+	echo $after;
+}
+
+/*
+ * user_register_link(-)
+ *
+ * Template tag; Provide a link to new user registration
+ */
+function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $pathserver, $users_can_register, $blog;
+
+	if( is_loggued_in() || !$users_can_register) 
+	{	// There's no need to provide this link if already loggued in or if we won't let him register
+		return false;
+	}
+	
+	if( $link_text == '' ) $link_text = T_('Register...');
+	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
+
+	$redir = '';
+	if( !empty( $blog ) ) 
+	{	// We'll want to return to this blog after login
+		$redir = '?redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
+	}
+
+	echo $before;
+	echo '<a href="', $pathserver, '/b2register.php', $redir, '" title="', $link_title, '">';
+	echo $link_text;
+	echo '</a>';
+	echo $after;
+}
+
+
+/*
+ * user_logout_link(-)
+ *
+ * Template tag; Provide a link to logout
+ */
+function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $pathserver, $user_login, $blog;
+
+	if( ! is_loggued_in() ) return false;
+
+	if( $link_text == '' ) $link_text = T_('Logout (%s)');
+	if( $link_title == '#' ) $link_title = T_('Logout from your account');
+
+	$redir = '';
+	if( !empty( $blog ) ) 
+	{	// We'll want to return to this blog after login
+		$redir = '&amp;redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
+	}
+
+	echo $before;
+	echo '<a href="', $pathserver, '/b2login.php?action=logout', $redir, '" title="', $link_title, '">';
+	printf( $link_text, $user_login );
+	echo '</a>';
+	echo $after;
+}
+
+/*
+ * user_admin_link(-)
+ *
+ * Template tag; Provide a link to the backoffice
+ */
+function user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $pathserver, $user_login, $blog;
+
+	if( ! is_loggued_in() ) return false;
+
+	if( $link_text == '' ) $link_text = T_('Admin');
+	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
+
+	echo $before;
+	echo '<a href="', $pathserver, '/b2edit.php" title="', $link_title, '">';
+	printf( $link_text, $user_login );
+	echo '</a>';
+	echo $after;
+}
+
+
+/*
+ * user_profile_link(-)
+ *
+ * Template tag; Provide a link to user profile
+ */
+function user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $pathserver, $user_login, $pagenow;
+
+	if( ! is_loggued_in() ) return false;
+
+	if( $link_text == '' ) $link_text = T_('Profile (%s)');
+	if( $link_title == '#' ) $link_title = T_('Edit your profile');
+
+	echo $before;
+	echo '<span OnClick="javascript:window.open(\'',$pathserver, '/b2profile.php?user=', $user_login,'\',\'Profile\',\'toolbar=0,status=1,location=0,directories=0,menuBar=0,scrollbars=1,resizable=1,width=480,height=320,left=100,top=100\');" title="', $link_title, '">';
+	printf( $link_text, $user_login );
+	echo '</span>';
+	echo $after;
+}
+
 ?>
