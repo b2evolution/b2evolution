@@ -122,7 +122,7 @@ if( empty($mode) )
 	?>
 	
 	</ul>
-</div>*
+</div>
 
 <?php 
 }	// / not in special mode

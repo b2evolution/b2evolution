@@ -359,12 +359,11 @@ span.line
 
 #header 
 {
-  /* float:left; */
+  float:left;
   width:100%;
-  background: /* #DAE0D2 */ url("img/bg.gif") repeat-x bottom;
-  /* font-size:93%; */
+  background: url("img/bg.gif") repeat-x bottom;
 	font-size: 85%;
-  /* line-height:normal; */
+  line-height:normal;
 }
 #evologo
 {
@@ -423,11 +422,12 @@ span.line
 
 div.menutoptitle 
 {
-	margin: 1ex 2ex 0;
+	clear: both;
+	margin: 0 2ex 0;
+	padding: 1ex 0 0 0;
 	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
 	color: #BBCCDD;
 	font-size: 112%;
-	clear: both;
 }
 
 /* --- admin blog display --- */
