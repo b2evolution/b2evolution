@@ -5,8 +5,8 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -1106,7 +1106,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 				if( (!empty($value)) && ($value != $defval) )
 				{ // Value exists and is not set to default value:
 					// echo "adding $var \n";
-					if( $type === 'array' ) 
+					if( $type === 'array' )
 					{ //there is a special formatting in case of arrays
 						$url_array = array();
 						$i = 0;
@@ -1292,7 +1292,7 @@ function debug_info( $force = false )
 																		'template' => false ) ),
 													'',
 													false,
-													array( 'error', 'all' ) ),
+													array( 'error', 'note', 'all' ) ),
 			'htmlbody' );
 		?>
 		</div>
@@ -1762,7 +1762,7 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 }
 
 /**
- * function used during the call to the results to specify 
+ * function used during the call to the results to specify
  * whether the selection checkbox of the current item must be checked
  *
  * @param integer item id
@@ -1772,15 +1772,15 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 function result_input( $item_ID, $item_name )
 {
 	global $cols_check, $item_ID_array;
-	
+
 	$r = '';
-	
+
 	if( !in_array( $item_ID, $item_ID_array ) )
 	{ //the current item id is not present in the item id array
 		$item_ID_array[] = $item_ID; //construction of the ID list
-		
+
 		$r .= '<input type="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
-	
+
 		if( in_array( $item_ID, $cols_check ) )
 		{
 			$r .= ' checked="checked" ';
@@ -1789,10 +1789,10 @@ function result_input( $item_ID, $item_name )
 		{
 			$r .= '';
 		}
-	
+
 		$r .= ' />';
 	}
-	
+
 	return $r;
 }
 
@@ -1862,7 +1862,7 @@ function getBaseDomain( $url )
  *
  * @return string
  */
- function getRandomPassword( $length = NULL )
+function getRandomPassword( $length = NULL )
 {
 	if( is_null($length) )
 	{
@@ -1875,8 +1875,23 @@ function getBaseDomain( $url )
 }
 
 
+/**
+ * Sends HTTP headers to avoid caching of the page.
+ */
+function header_nocache()
+{
+	header('Expires: Tue, 25 Mar 2003 05:00:00 GMT');
+	header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+	header('Cache-Control: no-cache, must-revalidate');
+	header('Pragma: no-cache');
+}
+
+
 /*
  * $Log$
+ * Revision 1.44  2005/02/20 23:09:04  blueyed
+ * header_nocache() added, Debuglog-output: display 'note' after 'error'
+ *
  * Revision 1.43  2005/02/19 22:41:32  blueyed
  * getRandomPassword() added; Debuglog enhanced for send_mail()
  *
