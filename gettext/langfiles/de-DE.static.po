@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-06 02:19+0100\n"
+"PO-Revision-Date: 2004-05-06 04:19+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +102,7 @@ msgstr "Willkommen!"
 
 #: ../../index.src.html:34
 msgid "b2evolution is probably the most comprehensive blog engine you can find! It includes almost any feature you could expect from a blog tool, and more! Plus, it's free, it's open-source (GPL), it runs virtually anywhere (PHP/mySQL) and it's available in many languages!"
-msgstr "b2evolution ist wahrscheinlich die umfassendste Blogmaschine, die du finden kannst! Es enthält fast jedes Feature, dass du von einem Blog-Tool erwarten kannst und mehr! Ausserdem ist es kostenlos, Open-Source (GPL) und es läuft nahezu überall (PHP/mySQL). Zudem ist es in vielen Sprachen verfügbar!"
+msgstr "b2evolution ist wahrscheinlich die umfassendste Blogmaschine, die du finden wirst! Es enthält fast jedes Feature, dass man von einem Blog-Tool erwarten kann und mehr! Ausserdem ist es kostenlos, Open-Source (GPL), es läuft nahezu überall (PHP/mySQL) und ist in vielen Sprachen verfügbar!"
 
 #: ../../index.src.html:35
 msgid "You will find complete information on the official <a %href>b2evolution website</a>."

@@ -10,13 +10,13 @@
  */
 
 // include config and default functions
-require_once( dirname(__FILE__). '/../conf/_config.php' );
-require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_class_db.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_cats.php" );
-require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bposts.php" );
-require_once (dirname(__FILE__). '/_functions_create.php' );
+require_once( dirname(__FILE__).'/../conf/_config.php' );
+require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_vars.php" );
+require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_class_db.php" );
+require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions.php" ); // db funcs
+require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_cats.php" );
+require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts.php" );
+require_once( dirname(__FILE__).'/_functions_create.php' );
 
 param( 'action', 'string' );
 param( 'locale', 'string' );
@@ -47,7 +47,24 @@ locale_activate( $default_locale );
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 <h1 id="version"><?php echo T_('Installer for version '), $b2_version ?></h1>
-<div id="quicklinks">Current installation : <a href="index.php?locale=<?php echo $default_locale ?>">Install menu</a> &middot; <a href="../index.php">Go to Blogs</a> &middot; <a href="../admin/">Go to Admin</a> &middot; Online : <a href="http://b2evolution.net/man/supportfaq.html">Support</a></div>
+<div id="quicklinks"><?php echo T_('Current installation')?> :
+<a href="../../index.<?php
+	if( file_exists('../../index.'.$default_locale.'.html') )
+	{ // we have a translated index page
+		echo $default_locale.'.';
+	}
+	else
+	{ // default start page
+		echo '';
+	}
+?>html"><?php echo T_('Start page') ?></span></a>
+&middot; <a href="index.php?locale=<?php echo $default_locale ?>"><span style="font-variant:small-caps"><?php echo T_('Install menu') ?></span></a>
+&middot; <a href="../index.php"><?php echo T_('Go to Blogs') ?></a>
+&middot; <a href="../admin/"><?php echo T_('Go to Admin') ?></a>
+&middot; <?php echo T_('Online') ?> :
+<a href="http://b2evolution.net/man/"><?php echo T_('Manual') ?></a>
+&middot; <a href="http://b2evolution.net/man/supportfaq.html"><?php echo T_('Support') ?></a>
+</div>
 </div>
 
 <h1><?php echo T_('Database tables installation')?></h1>
