@@ -131,9 +131,10 @@ class AbstractSettings
 	/**
 	 * Get a setting from the DB settings table.
 	 *
-	 * @param string the values for the column keys (depends on $this->colkeynames
-	 *               and must match its count and order)
-	 * @return mixed value on success, false if not found or error occurred
+	 * @param string $args,... the values for the column keys (depends on
+	 *                         $this->colkeynames and must match its count and order)
+	 * @return string|false|NULL value as string on success;
+	 *                           NULL if not found; false in case of error
 	 */
 	function get()
 	{
@@ -149,7 +150,8 @@ class AbstractSettings
 
 		if( count( $args ) != count( $this->colkeynames ) )
 		{
-			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not match $colkeyname.', 'error' );
+			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not '
+											.'match $colkeynames (class '.get_class($this).').', 'error' );
 			return false;
 		}
 
@@ -177,8 +179,8 @@ class AbstractSettings
 				return false;
 		}
 
-		$Debuglog->add( 'AbstractSetting: info: queried setting ['.implode( ' / ', $args ).'] not defined.' );
-		return false;
+		$Debuglog->add( get_class($this).'::get(): queried setting ['.implode( ' / ', $args ).'] not defined.', 'settings' );
+		return NULL;
 	}
 
 
@@ -331,6 +333,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/23 21:32:42  blueyed
+ * documentation, return value
+ *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes
  *
