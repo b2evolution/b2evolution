@@ -4,7 +4,8 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -23,10 +24,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -42,103 +50,104 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class Plugin
 {
-	/**
+	/**#@+
 	 * Variables below MUST be overriden by plugin implementations,
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 
- 	/**
-	 * Default plugin name as it will appear in Lists.
+	/**
+	 * Default plugin name as it will appear in lists.
 	 *
-	 * @global string
+	 * To make it available for translations set it in the constructor by
+	 * using the {@link T_()} function.
+	 *
+	 * @var string
 	 */
 	var $name = 'Unnamed plug-in';
 
 
- 	/**
+	/**
 	 * Globally unique code for this plugin functionality. 8 chars. MUST BE SET.
 	 *
 	 * A common code MIGHT be shared between different plugins providing the same functionnality.
 	 * This allows to replace a given renderer with another one and keep the associations with posts.
 	 * Example: replacing a GIF smiley renderer with an SWF smiley renderer...
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $code = '';
 
- 	/**
+	/**
 	 * Default priority.
 	 *
 	 * Priority determines in which order the plugins get called.
 	 * Range: 1 to 100
 	 *
-	 * @global int
+	 * @var int
 	 */
- 	var $priority = 50;
+	var $priority = 50;
 
-
- 	/**
+	/**
 	 * Plugin version number.
 	 *
 	 * This is for user info only.
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $version = '0';
 
-
- 	/**
+	/**
 	 * Plugin author.
 	 *
 	 * This is for user info only.
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $author = 'Unknown author';
 
-
-  /**
+	/**
 	 * URL for more info about plugin, author and new versions.
 	 *
 	 * This is for user info only.
 	 * If there is no website available, a mailto: URL can be provided.
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $help_url = '';
 
-
- 	/**
+	/**
 	 * Plugin short description.
 	 *
 	 * This shoulb be no longer than a line.
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $short_desc = 'No desc available';
 
+	/**#@-*/
 
-	/**
+
+	/**#@+
 	 * Variables below MAY be overriden.
 	 */
 
- 	/**
+	/**
 	 * Plugin long description.
 	 *
 	 * This should be no longer than a line.
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $long_desc = 'No description available';
 
- 	/**
+	/**
 	 * Should this plugin appear in the tools section?
 	 *
-	 * @global boolean
+	 * @var boolean
 	 */
 	var $is_tool = false;
 
-  /**
+	/**
 	 * When should this rendering plugin apply?
 	 * Possible values:
 	 * - 'stealth'
@@ -148,7 +157,7 @@ class Plugin
 	 * - 'lazy'
 	 * - 'never'
 	 *
-	 * @global string
+	 * @var string
 	 * @todo get this outta here
 	 */
 	var $apply_when = 'never';	// By default, this may not be a rendering plugin
@@ -156,7 +165,7 @@ class Plugin
 	/**
 	 * Should this plugin apply to HTML?
 	 *
-	 * @global string
+	 * @var string
 	 * @todo get this outta here
 	 */
 	var $apply_to_html = true;
@@ -168,14 +177,17 @@ class Plugin
 	 * - it removes some dirty markup when generating the tags (which will get stripped afterwards)
 	 * Note: htmlentityencoded is not considered as XML here.
 	 *
-	 * @global string
+	 * @var string
 	 * @todo get this outta here
 	 */
 	var $apply_to_xml = false;
 
+	/**#@-*/
 
-	/**
+
+	/**#@+
 	 * Variables below MUST NOT be overriden.
+	 * @access private
 	 */
 
 	/**
@@ -183,7 +195,7 @@ class Plugin
 	 *
 	 * Will be set automatically (from filename) when registering plugin.
 	 *
-	 * @global string
+	 * @var string
 	 */
 	var $classname;
 
@@ -192,9 +204,11 @@ class Plugin
 	 *
 	 * 0 means 'NOT installed'
 	 *
-	 * @global int
+	 * @var int
 	 */
 	var $ID = 0;
+
+	/**#@-*/
 
 
 	/**
@@ -238,9 +252,13 @@ class Plugin
 	function name( $format = 'htmlbody', $disp = true )
 	{
 		if( $disp )
+		{
 			echo format_to_output( $this->name, $format );
+		}
 		else
+		{
 			return format_to_output( $this->name, $format );
+		}
 	}
 
 
@@ -256,9 +274,13 @@ class Plugin
 	function short_desc( $format = 'htmlbody', $disp = true )
 	{
 		if( $disp )
+		{
 			echo format_to_output( $this->short_desc, $format );
+		}
 		else
+		{
 			return format_to_output( $this->short_desc, $format );
+		}
 	}
 
 
@@ -274,9 +296,33 @@ class Plugin
 	function long_desc( $format = 'htmlbody', $disp = true )
 	{
 		if( $disp )
+		{
 			echo format_to_output( $this->long_desc, $format );
+		}
 		else
+		{
 			return format_to_output( $this->long_desc, $format );
+		}
+	}
+
+
+	/**
+	 * Display link to the help for this plugin (if set in {@link $help_url}).
+	 *
+	 * @return boolean true if it was displayed; false if not
+	 */
+	function help_link()
+	{
+		if( !empty($this->help_url) )
+		{ // Link to the help for this renderer plugin
+			echo ' <a href="'.$this->help_url.'"'
+						.' target="_blank" title="'.T_('Open help for this renderer in a new window.').'">'
+						.getIcon( 'help' )
+						.'</a>';
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -295,10 +341,9 @@ class Plugin
 	}
 
 
-	/**
-	 * Event handlers:
+	/*
+	 * Event handlers {{{
 	 */
-
 
 	/**
 	 * Event handler: Called when ending the admin html head section.
@@ -308,9 +353,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead( & $params )
+	function AdminEndHtmlHead( $params )
 	{
-		return false;		// Do nothing by default.
+		return NULL;  // Do nothing by default.
 	}
 
 
@@ -322,9 +367,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
-	function AdminAfterPageFooter( & $params )
+	function AdminAfterPageFooter( $params )
 	{
-		return false;		// Do nothing by default.
+		return NULL;  // Do nothing by default.
 	}
 
 
@@ -336,13 +381,13 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayToolbar( & $params )
+	function DisplayToolbar( $params )
 	{
-		return false;		// Do nothing by default.
+		return NULL;  // Do nothing by default.
 	}
 
 
- 	/**
+	/**
 	 * Event handler: Called when displaying editor buttons.
 	 *
 	 * {@internal Plugin::DisplayEditorButton(-)}}
@@ -350,9 +395,9 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayEditorButton( & $params )
+	function DisplayEditorButton( $params )
 	{
-		return false;		// Do nothing by default.
+		return NULL;  // Do nothing by default.
 	}
 
 
@@ -364,10 +409,11 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean success?
 	 */
-	function DoAction( & $params )
+	function DoAction( $params )
 	{
-	 	echo T_('No such action!');
-		return false;		// Action failed!
+		echo T_('No such action!');
+
+		return NULL;  // Do nothing by default.
 	}
 
 
@@ -380,10 +426,10 @@ class Plugin
 	 * {@internal Plugin::Render(-)}}
 	 *
 	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
+	 *              (Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function Render( & $params )
+	function Render( $params )
 	{
 		switch( $params['format'] )
 		{
@@ -420,8 +466,8 @@ class Plugin
 		}
 	}
 
-	
- 	/**
+
+	/**
 	 * Event handler: Called when displaying the tool menu.
 	 *
 	 * {@internal Plugin::ToolMenu(-)}}
@@ -429,15 +475,22 @@ class Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function ToolMenu( & $params )
+	function ToolMenu( $params )
 	{
-		return false;		// Do nothing by default.
+		return NULL;  // Do nothing by default.
 	}
+
+	/*
+	 * Event handlers }}}
+	 */
 
 }
 
 /*
  * $Log$
+ * Revision 1.2  2005/02/20 22:34:40  blueyed
+ * doc, help_link(), don't pass $param as reference
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *
