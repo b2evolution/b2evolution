@@ -222,7 +222,16 @@ function locale_flag( $locale = '', $collection = 'w16px' )
 	{	// File does not exist
 		$country = 'default';
 	}
-	echo '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" /> ';
+	echo '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="';
+	if( $country == 'default')
+	{
+		echo T_('Unknown locale');
+	}
+	else
+	{
+		echo $locales[$locale]['name'];
+	}
+	echo '" border="1" /> ';
 
 }
 
