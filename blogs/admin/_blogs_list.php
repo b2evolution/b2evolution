@@ -31,6 +31,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			<th><?php echo T_('Blog URL') ?></th>
 			<th><?php echo T_('Static File') ?></th>
 			<th><?php echo T_('Locale') ?></th>
+			<th><?php echo /* TRANS: Abbrev. for Copy */ T_('Copy') ?></th>
 			<th><?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?></th>
 		</tr>
 		<?php
@@ -84,9 +85,14 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		<?php if( ($curr_blog_ID == 1) || (!$current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID )) )
 		{ // display empty cell for blog #1 and non deletable blogs
 			echo '<td></td>';
+			echo '<td></td>';
 		}
 		elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 		{ ?>
+		<td class="center">
+			<a href="blogs.php?action=new&amp;blogtemplate=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" ><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Copy */ T_('Copy') ?>" title="<?php echo T_('Copy this blog!') ?>" /></a>
+			<!--<a href="blogs.php?action=copy&amp;blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" title="<?php echo T_('Copy this blog!') ?>" ><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Copy */ T_('Copy') ?>" /></a>-->
+		</td>
 		<td class="center">
 			<a href="blogs.php?action=delete&amp;blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" onclick="return confirm('<?php printf( /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete this blog!') ?>" /></a>
 			<!--<a href="blogs.php?action=copy&amp;blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" title="<?php echo T_('Copy this blog!') ?>" ><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Copy */ T_('Copy') ?>" /></a>-->

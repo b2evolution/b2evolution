@@ -20,17 +20,20 @@ $admin_pagetitle = T_('Blogs');
 
 param( 'action', 'string', '' );
 param( 'tab', 'string', 'general' );
-
+param( 'blogtemplate', 'integer', -1 );
+		
 
 if( $action == 'edit' || $action == 'update' || $action == 'delete' || $action == 'GenStatic' )
 { // we need the blog param
 	param( 'blog', 'integer', true );
 	$edited_Blog = & $BlogCache->get_by_ID( $blog );
 }
-else
-{
+else if ( $action == 'new' && $blogtemplate != -1) {
+		$edited_Blog = & $BlogCache->get_by_ID( $blogtemplate );
+} else {
 	$edited_Blog = & new Blog( NULL );
 }
+
 
 
 function set_edited_Blog_from_params( $for )
@@ -187,8 +190,17 @@ switch($action)
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		set_edited_Blog_from_params( 'new' );
-
+		if ($blogtemplate == -1) {
+			set_edited_Blog_from_params( 'new' );
+		} else {
+			// handle a blog copy
+			$edited_Blog->set( 'name',          param( 'blog_name',          'string', T_('New weblog') ) );
+			$edited_Blog->set( 'shortname',     param( 'blog_shortname',     'string', T_('New blog') ) );
+			$edited_Blog->set( 'stub',          param( 'blog_stub',          'string', '' ) );
+			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', 'new' ) );
+			param( 'blog_siteurl_type',     'string', 'relative' );
+		}
+		
 		echo '<div class="panelblock">';
 		echo '<h2>', T_('New blog'), ':</h2>';
 

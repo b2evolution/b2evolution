@@ -60,6 +60,7 @@ if( $action == 'edit' )
 ?>" class="fform" method="post">
 	<input type="hidden" name="action" value="<?php echo $next_action ?>" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />
+	<input type="hidden" name="blogtemplate" value="<?php echo $blogtemplate; ?>" />
 
 	<fieldset>
 		<legend><?php echo T_('General parameters') ?></legend>
