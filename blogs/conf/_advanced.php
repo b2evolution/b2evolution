@@ -6,6 +6,12 @@
  * This file includes advanced settings for b2evolution
  */
 
+# General params:
+# (these must be forced to prevent URL overrides).
+$debug = false;
+$demo_mode = false;
+
+
 # Comments: set this to 1 to require e-mail and name, or 0 to allow comments without e-mail/name
 $require_name_email = 1;
 
