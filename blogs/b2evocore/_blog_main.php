@@ -34,7 +34,7 @@ param( 'sentence', 'string', 'AND', true );     // Search for sentence or for wo
 param( 'exact', 'integer', '', true );          // Require exact match of title or contents
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
-param( 'c', 'string', '', true );								
+param( 'c', 'string', '', true );
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
 param( 'title', 'string', '', true );						// urtitle of post to display
@@ -47,7 +47,7 @@ if( !isset($timestamp_max) ) $timestamp_max = '';
 
 if( empty($disp) )
 {	// Conversion support for old params:
-	if( $c == 'last') 
+	if( $c == 'last')
 	{	// Translate old last comments caller
 		$disp = 'comments';
 	}
@@ -84,7 +84,7 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	{ // Ignore index.html
 		$i++;
 	}
-	
+
 	if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'(\.php)?$#', $path_elements[$i] )  )
 	{ // Ignore stub file
 		$i++;
@@ -92,29 +92,29 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 
 	// echo $path_elements[$i];
 	if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-	{	// We'll consider this to be the year
+	{ // We'll consider this to be the year
 		$m = $path_elements[$i++];
-		
+
 		if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-		{	// We'll consider this to be the month
+		{ // We'll consider this to be the month
 			$m .= $path_elements[$i++];
-	
+
 			if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-			{	// We'll consider this to be the day
+			{ // We'll consider this to be the day
 				$m .= $path_elements[$i++];
-	
+
 				if( isset( $path_elements[$i] ) && (!empty( $path_elements[$i] )) )
 				{ // We'll consider this to be a ref to a post
 					// We are accessing a post by permalink
 					// Set a lot of defaults as if we had received a complex URL:
 					$m = '';
-					$more=1;							// display the extended entries' text
-					$c=1;									// Display comments
-					$tb=1;								// Display trackbacks
-					$pb=1;								// Display pingbacks
-	
+					$more = 1; // Display the extended entries' text
+					$c = 1;    // Display comments
+					$tb = 1;   // Display trackbacks
+					$pb = 1;   // Display pingbacks
+
 					if( ereg( "p([0-9]+)", $path_elements[$i], $req_post ) )
-					{	// The last param is of the form p000
+					{ // The last param is of the form p000
 						// echo 'post number';
 						$p = $req_post[1];		// Post to display
 					}
@@ -153,7 +153,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 			$Item = Item_get_by_ID( $p );	// TODO: use cache
 		else
 			$Item = Item_get_by_title( $title );	// TODO: use cache
-			
+
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{	// We're on the wrong blog (probably an old permalink) let's redirect
 			$new_permalink = $Item->gen_permalink( '', '', false, '&' );
@@ -164,10 +164,10 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	}
 
 	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
-	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, 
+	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
 															$preview, '', '', $timestamp_min, $timestamp_max, $title );
-	
+
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;
 	$request = & $MainList->request;
@@ -192,7 +192,7 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
-if( !isset( $skin ) ) 
+if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 
 	// We're going to need a default skin:
@@ -201,7 +201,7 @@ if( !isset( $skin ) )
 	{	// Use default from the datatabse
 		$default_skin = $Blog->get('default_skin');
 	}
-	
+
 	if( !skin_exists( $default_skin )	|| empty( $default_skin ) )
 	{ // blog's default skin does not exist
 		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
@@ -217,7 +217,7 @@ if( !isset( $skin ) )
 	else
 	{	// Get the saved skin in cookie or default:
 		param( $cookie_state, 'string', $default_skin );
-		// Get skin by params or default to cookie 
+		// Get skin by params or default to cookie
 		// (if cookie was not set, the $$cookie_state contains default skin!)
 		param( 'skin', 'string', $$cookie_state );
 	}
@@ -230,12 +230,12 @@ param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 {	// We want to display now:
-	
+
 	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
 	{	// We have just asked for the skin explicitely
 		// Set a cookie to remember it:
 		// Including config and functions files   ??
-		
+
 		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
 		{	// This damn failed !
 			echo "<p>setcookie failed!</p>";

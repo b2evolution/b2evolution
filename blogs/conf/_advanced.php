@@ -100,7 +100,7 @@ $redirect_to_postblog = false;
 /**#@+
  * database tables' names
  *
- * (You should not need to change them. 
+ * (You should not need to change them.
  *  If you want to have multiple b2evo installations in a single database you should
  *  change $tableprefix in _config.php)
  */
@@ -169,12 +169,12 @@ $wp_prefix = 'wp_';
  * Disabled by default.
  *
  * Even without using gzip compression or ETags this allows to send a Content-Length.
- * 
- * Warning: this will prevent from sending the output progressively to the webserver. 
- * If a long page takes 2 seconds to be generated completely on a loaded server, the top 
- * of the page will only be sent after those 2 seconds, and the user won't see anything 
+ *
+ * Warning: this will prevent from sending the output progressively to the webserver.
+ * If a long page takes 2 seconds to be generated completely on a loaded server, the top
+ * of the page will only be sent after those 2 seconds, and the user won't see anything
  * during at least 2 seconds (generation + transmission time). Without this setting, the
- * output will be sent progressively starting at 0 seconds and the user will start seeing 
+ * output will be sent progressively starting at 0 seconds and the user will start seeing
  * something earlier (0 + transmission time).
  *
  * @global boolean $use_obhandler
@@ -186,11 +186,11 @@ $use_obhandler = 0;
  *
  * Disabled by default.
  *
- * Can actually be done either by PHP or your webserver [default] 
+ * Can actually be done either by PHP or your webserver [default]
  * (for example if you use Apache with mod_gzip).
  * - Set this to 1 if you want PHP to do gzip compression
  * - Set this to 0 if you want to let Apache do the job instead of PHP (you must enable this there)
- * Letting apache do the compression will make PHP debugging easier. 
+ * Letting apache do the compression will make PHP debugging easier.
  * Thus it is recommended to keep it that way.
  *
  * @global boolean $use_gzipcompression
@@ -257,7 +257,7 @@ $cookie_expired = time() - 86400;				// Default: 24 hours ago
 	- You should keep everything as subdirectories of the base folder
 		($baseurl which is set in _config.php, default is the /blogs folder)
 	- Remember you can set the baseurl to your website root (-> _config.php).
-	
+
 	NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
 
 	Example of a possible setting:
@@ -327,6 +327,7 @@ $install_dirout = '..';                      // Relative path to go back to base
  */
 $media_subdir = 'media';                     // Subdirectory relative to base
 $media_dirout = '..';                        // Relative path to go back to base
+$media_url = $baseurl.'/'.$media_subdir;     // You should not need to change this
 
 
 // ** CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! **

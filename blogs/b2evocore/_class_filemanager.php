@@ -16,10 +16,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 class FileManager
 {
 	/**
-	 * root directory
+	 * root (like user_X or blog_X), defaults to current user
 	 * @param string
 	 */
 	var $root;
+
+	/**
+	 * root directory
+	 * @param string
+	 */
+	var $root_dir;
+
+	/**
+	 * root URL
+	 * @param string
+	 */
+	var $root_url;
 
 	/**
 	 * current working directory
@@ -102,9 +114,10 @@ class FileManager
 	 * @param string order files by what? ('#' means 'name')
 	 * @param string
 	 */
-	function FileManager( $cUser, $root = 'user', $url, $cd = '', $order = '#', $asc = '#' )
+	function FileManager( $cUser, $url, $root = '#', $cd = '', $order = '#', $asc = '#' )
 	{
 		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
+		global $BlogCache;
 
 		$this->entries = array();  // the directory entries
 		$this->Messages = new Log( 'error' );
@@ -124,43 +137,45 @@ class FileManager
 		$this->imgurl = $admin_url.'/img/fileicons/';
 
 		// TODO: get user's/group's root
-		#$this->root = $media_dir;
+		#$this->root_dir = $media_dir;
 		#$this->root_url = $baseurl.'/'.$media_subdir;
 
 		// get root directory
+		$root_A = explode( '_', $root );
+
 		if( $this->User->login == 'demouser' )
 		{
-			$this->root = $basepath.'/media_test';
+			$this->root_dir = $basepath.'/media_test';
 			$this->root_url = $baseurl.'/media_test';
 		}
-		elseif( is_array( $root ) )
+		elseif( count( $root_A ) == 2 )
 		{
-			switch( $root[0] )
+			switch( $root_A[0] )
 			{
 				case 'blog':
-					$Blog = Blog_get_by_ID( $root[1] );
-					$this->root = $Blog->dir_media;
-					$this->root_url = $Blog->url_media;
+					$Blog = $BlogCache->get_by_ID( $root_A[1] );
+					$this->root_dir = $Blog->get( 'mediadir' );
+					$this->root_url = $Blog->get( 'mediaurl' );
 					break;
 			}
 		}
-		else switch( $root )
+		else switch( $root_A[0] )
 		{
+			case '#':
 			case 'user':
-				$this->root = $basepath.'/'.$media_subdir.'/users/'.$this->User->login;
+				$this->root_dir = $basepath.'/'.$media_subdir.'/users/'.$this->User->login;
 				$this->root_url = $baseurl.'/'.$media_subdir.'/users/'.$this->User->login;
 				break;
+
+			default:  // straight path
+				$this->root_dir = $root;
 		}
 
-		#$media_dir = $basepath.'/'.$media_subdir;
-		#$media_dir = 'd:\\home';
-
-		#$media_dir = str_replace( '\\', '/', $media_dir );
-
 		$this->debug( $this->root, 'root' );
+		$this->debug( $this->root_dir, 'root_dir' );
 		$this->debug( $this->root_url, 'root_url' );
 
-		$this->cwd = $this->root.$cd;
+		$this->cwd = $this->root_dir.$cd;
 		$this->debug( $this->cwd, 'cwd' );
 
 		// get real cwd
@@ -169,12 +184,12 @@ class FileManager
 
 		if( empty($realcwd) )
 		{ // does not exist
-			$this->cwd = $this->root;
+			$this->cwd = $this->root_dir;
 		}
-		elseif( !preg_match( '#^'.addslashes($this->root).'/#', $realcwd.'/' ) )
+		elseif( !preg_match( '#^'.$this->root_dir.'/#', $realcwd.'/' ) )
 		{ // cwd is not below root!
 			$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
-			$this->cwd = $this->root;
+			$this->cwd = $this->root_dir;
 		}
 		else
 		{ // allowed
@@ -182,7 +197,7 @@ class FileManager
 		}
 
 		// get the subpath relative to root
-		$this->subpath = preg_replace( '#^'.$this->root.'#', '', $this->cwd );
+		$this->subpath = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
 		$this->subpath .= '/';
 		$this->debug( $this->subpath, 'subpath' );
 
@@ -263,7 +278,7 @@ class FileManager
 				if( $entry == '.' || $entry == '..'
 						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
 					)
-				{ // don't use those
+				{ // don't use these
 					continue;
 				}
 
@@ -330,15 +345,16 @@ class FileManager
 	/**
 	 * get the current url, with all relevant GET params (cd, order, asc)
 	 *
+	 * @param string override root (blog_X or user_X)
 	 * @param string override cd
 	 * @param string override order
 	 * @param boolean override asc
 	 */
-	function curl( $cd = '#', $order = '#', $orderasc = '#' )
+	function curl( $root = '#', $cd = '#', $order = '#', $orderasc = '#' )
 	{
 		$r = $this->url;
 
-		foreach( array('cd', 'order', 'orderasc') as $check )
+		foreach( array('root', 'cd', 'order', 'orderasc') as $check )
 		{
 			if( $$check != '#' )
 			{
@@ -357,7 +373,7 @@ class FileManager
 	/**
 	 * generates hidden input fields for forms, based on {@link curl()}}
 	 */
-	function form_hiddeninputs( $cd = '#', $order = '#', $asc = '#' )
+	function form_hiddeninputs( $root = '#', $cd = '#', $order = '#', $asc = '#' )
 	{
 		// get curl(), remove leading URL and '?'
 		$params = preg_split( '/&amp;/', substr( $this->curl( $cd, $order, $asc ), strlen( $this->url )+1 ) );
@@ -377,9 +393,26 @@ class FileManager
 
 	/**
 	 * generated the option list for available root directories
+	 *
+	 * @param string the selected option (blog_X or user_X)
 	 */
-	function form_optionlist_roots()
+	function form_optionlist_roots( $selected = '' )
 	{
+		global $BlogCache;
+
+		$bloglist = $BlogCache->load_user_blogs( 'member', $this->User->ID );
+
+		foreach( $bloglist as $blog_ID )
+		{
+			$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+			echo '<option value="blog_'.$blog_ID.'"';
+
+			if( $selected == 'blog_'.$blog_ID )
+				echo ' selected="selected"';
+
+			echo '>'.$Blog->dget( 'shortname', 'formvalue' )."</option>\n";
+		}
 	}
 
 
@@ -1430,8 +1463,8 @@ class FileManager
 	{
 		// get the part that is clickable
 
-		$pos_lastslash = strrpos( $this->root, '/' );
-		$r = substr( $this->root, 0, $pos_lastslash );
+		$pos_lastslash = strrpos( $this->root_dir, '/' );
+		$r = substr( $this->root_dir, 0, $pos_lastslash );
 
 		$clickabledirs = explode( '/', substr( $this->cwd, $pos_lastslash+1 ) );
 
@@ -1478,50 +1511,6 @@ class FileManager
 			default:  // return false if not defined
 				$Debuglog->add( 'Filemanager: permission check for ['.$for.'] not defined!' );
 				return false;
-		}
-	}
-
-
-
-	/**
-		Does the same thing as the function realpath(), except it will
-		also translate paths that don't exist on the system.
-
-		@param string the path to be translated
-		@return array [0] = the translated string; [1] = TRUE|FALSE (path exists?)
-	*/
-	function str2path( $path )
-	{
-		$path = str_replace( '\\', '/', $path );
-		$pwd = realpath( $path );
-
-		if( !empty($pwd) )
-		{ // path exists
-			return array( $pwd, true );
-		}
-		else
-		{ // no realpath
-			$pwd = '';
-			$strArr = preg_split( '#/#', $path, -1, PREG_SPLIT_NO_EMPTY );
-			$pwdArr = array();
-			$j = 0;
-			for( $i = 0; $i < count($strArr); $i++ )
-			{
-				if( $strArr[$i] != '..' )
-				{
-					if( $strArr[$i] != '.' )
-					{
-						$pwdArr[$j] = $strArr[$i];
-						$j++;
-					}
-				}
-				else
-				{
-					array_pop( $pwdArr );
-					$j--;
-				}
-			}
-			return array( '/'.implode('/', $pwdArr), false );
 		}
 	}
 

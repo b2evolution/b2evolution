@@ -206,6 +206,7 @@ function get_blogparams_by_ID( $blog_ID )
  * {@internal Blog_get_by_ID(-)}}
  *
  * @todo on a heavy multiblog system, cache them one by one...
+ * @todo move over to BlogCache?!
  *
  * @param integer ID of Blog we want
  */

@@ -224,18 +224,24 @@ class Blog extends DataObject
 	}
 
 
-	function gen_mediadir()
+	/**
+	 * generate the blog's media directory
+	 *
+	 * @todo create if necessary
+	 * @param boolean absolute path or relative to $basepath.'/'.$media_subdir.'/' ?
+	 */
+	function gen_mediadir( $absolute = true )
 	{
-		global $basepath;
+		global $basepath, $media_subdir;
 
 		switch( $this->media_location )
 		{
 			case 'default':
-				return $basepath.'/media/'.$this->urlname;
+				return $absolute ? $basepath.'/'.$media_subdir.'/blogs/'.$this->urlname : $this->urlname;
 			case 'subdir':
-				return $basepath.'/media/'.$this->media_subdir;
+				return $absolute ? $basepath.'/'.$media_subdir.'/blogs/'.$this->media_subdir : $this->media_subdir;
 			case 'custom':
-				return $this->media_fullpath;
+				return $absolute ? $this->media_fullpath : preg_replace( '#^'.$basepath.'/'.$media_subdir.'/blogs/#', '', $this->media_fullpath );
 		}
 	}
 
@@ -247,12 +253,17 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl, $basepath;
+		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url;
 
 		switch( $parname )
 		{
 			case 'mediadir':
 				return $this->gen_mediadir();
+
+			case 'mediaurl':
+				return ($this->media_location == 'custom')
+								? $this->media_url
+								: $media_url.'/blogs/'.$this->gen_mediadir( false );
 
 			case 'subdir':
 				return $this->siteurl;

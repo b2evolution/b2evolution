@@ -28,6 +28,8 @@ param( 'file', 'string', '' );       // selected file
 param( 'order', 'string', 'name' );
 param( 'asc', 'string', '#' );
 
+param( 'root', 'string', 'user' );   // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for supplied user)
+
 if( $current_User->login == 'demouser' )
 {
 }
@@ -39,10 +41,10 @@ if( $current_User->level < 10 )
 
 if( $action == 'update_settings' )
 { // updating user settings
-	$UserSettings->set( 'fm_dirsattop',   param( 'option_dirsattop', 'integer', 0 ) );
+	$UserSettings->set( 'fm_dirsattop',   param( 'option_dirsattop',   'integer', 0 ) );
 	$UserSettings->set( 'fm_permlikelsl', param( 'option_permlikelsl', 'integer', 0 ) );
 	$UserSettings->set( 'fm_fulldirsize', param( 'option_fulldirsize', 'integer', 0 ) );
-	$UserSettings->set( 'fm_showhidden', param( 'option_showhidden', 'integer', 0 ) );
+	$UserSettings->set( 'fm_showhidden',  param( 'option_showhidden',  'integer', 0 ) );
 
 	if( $UserSettings->updateDB() )
 	{
@@ -51,7 +53,7 @@ if( $action == 'update_settings' )
 }
 
 
-$Fileman = new FileManager( $current_User, 'user', 'files.php', $cd, $order, $asc );
+$Fileman = new FileManager( $current_User, 'files.php', $root, $cd, $order, $asc );
 
 if( $action == '' && $file != '' )
 { // a file is selected/clicked, default action
@@ -263,7 +265,7 @@ if( $selaction != '' )
 			break;
 
 		case T_('Delete'):
-			// TODO: extra confirmation?
+			// TODO: extra confirmation
 
 			foreach( $selectedfiles as $file )
 			{
@@ -428,8 +430,18 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 	</div>
 	<?php
 }
+
 ?>
 <div class="toolbar">
+	<form action="files.php" name="roots" class="toolbaritem">
+		<?php echo $Fileman->form_hiddeninputs(); ?>
+
+		<select name="root" onchange="this.form.submit()">
+		<?php echo $Fileman->form_optionlist_roots( $root ); ?>
+		</select>
+		<input type="submit" value="<?php echo T_('Change root') ?>" />
+
+	</form>
 	<form action="files.php" name="search" class="toolbaritem">
 		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="text" name="searchfor" value="--todo--" size="20" />

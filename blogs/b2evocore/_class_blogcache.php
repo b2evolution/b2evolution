@@ -30,7 +30,7 @@ class BlogCache extends DataObjectCache
 	function BlogCache()
 	{
 		global $tableblogs;
-		
+
 		parent::DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
 	}
 
@@ -43,6 +43,7 @@ class BlogCache extends DataObjectCache
 	 *
 	 * @param string stub of object to load
 	 * @param boolean false if you want to return false on error
+	 * @todo use cache
 	 */
 	function get_by_stub( $req_stub, $halt_on_error = true )
 	{
@@ -50,8 +51,8 @@ class BlogCache extends DataObjectCache
 
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_stub)</strong> into cache" );
-		$sql = "SELECT * 
-						FROM $this->dbtablename 
+		$sql = "SELECT *
+						FROM $this->dbtablename
 						WHERE blog_stub = ".$DB->quote($req_stub);
 		$row = $DB->get_row( $sql );
 		if( empty( $row ) )
@@ -59,12 +60,37 @@ class BlogCache extends DataObjectCache
 			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
 			return false;
 		}
-		
+
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
 		$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 
 		return $this->cache[ $row->$dbIDname ];
+	}
+
+
+	/**
+	 * load blogs of a user
+	 *
+	 * @param string criterion: 'member'
+	 * @param integer user ID
+	 * @return array the blog IDs
+	 */
+	function load_user_blogs( $criterion = 'member', $user_ID )
+	{
+		global $DB, $Debuglog;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(is_member)</strong> into cache" );
+
+		$this->load_all();
+
+		$bloglist = $DB->get_col( 'SELECT bloguser_blog_ID
+																FROM T_blogusers
+																WHERE bloguser_user_ID = '.$user_ID );
+
+		$this->load_list( implode( ',', $bloglist ) );
+
+		return $bloglist;
 	}
 }
 ?>
