@@ -79,11 +79,7 @@ class Item extends DataObject
 	var $renderers;
 	var $comments;			// Comments status
 	var $url;					// Should move
-	/**
-	 * @var boolean
-	 * @deprecated
-	 */
-	var $autobr = 0;		// Should move
+
 	/**
 	 * Derived from $main_cat_ID
    *
@@ -115,22 +111,21 @@ class Item extends DataObject
 		{
 			$this->ID = $db_row->ID;
 			$this->Author = & $UserCache->get_by_ID( $db_row->post_creator_user_ID ); // NO COPY...(?)
-			$this->issue_date = $db_row->post_issue_date;
-			$this->mod_date = $db_row->post_mod_date;
+			$this->issue_date = $db_row->post_datestart;
+			$this->mod_date = $db_row->post_datemodified;
 			$this->status = $db_row->post_status;
 			$this->locale = $db_row->post_locale;
 			$this->title = $db_row->post_title;
 			$this->urltitle = $db_row->post_urltitle;
 			$this->content = $db_row->post_content;
 			$this->wordcount = $db_row->post_wordcount;
-			$this->main_cat_ID = $db_row->post_category;
+			$this->main_cat_ID = $db_row->post_main_cat_ID;
 			$this->flags = $db_row->post_flags;
 			$this->comments = $db_row->post_comments;			// Comments status
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->post_renderers );
 			$this->views = $db_row->post_views;
 			$this->url = $db_row->post_url;				// Should move
-			$this->autobr = $db_row->post_autobr;					// Should move
 			// Derived vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
 		}
@@ -1189,6 +1184,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
  * Revision 1.4  2004/12/10 19:45:55  fplanque
  * refactoring
  *

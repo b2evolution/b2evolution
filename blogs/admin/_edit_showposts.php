@@ -53,10 +53,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
 	// Getting current blog info:
-	$blogparams = get_blogparams_by_ID( $blog );
+	#deprecated: $blogparams = get_blogparams_by_ID( $blog );
 
 	// Get the posts to display:
-	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
+	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
+															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
+															$preview, '', '', $timestamp_min, $timestamp_max, '', $dbprefix, $dbIDname );
 
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;
@@ -318,6 +320,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	</div>
 	<?php } ?>
 
+
+
+<p class="center">
+  <a href="<?php echo $add_item_url ?>"><img src="img/new.gif" width="13" height="13" class="middle" alt="" />
+    <?php echo T_('New post...') ?></a>
+</p>
+
+
+
 </div>
 
 
@@ -326,16 +337,25 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <div class="right_col">
 
 	<div class="bSideItem">
-		<h2><?php $Blog->disp( 'name', 'htmlbody' ) ?></h2>
 		<?php
+		if( isset( $Blog ) )
+		{	// We might use this file outside of a blog...
+			echo '<h2>'.$Blog->dget( 'name', 'htmlbody' ).'</h2>';
+		}
+
 		// ---------- CALENDAR ----------
-		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '', $timestamp_min, $timestamp_max );
+		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '',
+																$timestamp_min, $timestamp_max, $dbprefix, $dbIDname );
 		$Calendar->set( 'browseyears', 1 );  // allow browsing years in the calendar's caption
 		$Calendar->set( 'navigation', 'tfoot' );
 		$Calendar->display( $pagenow, 'blog='. $blog );
+
+		if( isset( $Blog ) )
+		{	// We might use this file outside of a blog...
+			echo '<h3>'.T_('Notes').'</h3>';
+			$Blog->disp( 'notes', 'htmlbody' );
+		}
 		?>
-		<h3><?php echo T_('Notes') ?></h3>
-		<?php $Blog->disp( 'notes', 'htmlbody' ) ?>
 	</div>
 
 	<div class="bSideItem">
@@ -406,8 +426,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 				$arc_link_start = $pagenow. '?blog='. $blog. '&amp;';
 
-				$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min, $timestamp_max, 36 );
-
+				$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min,
+																					$timestamp_max, 36, $dbprefix, $dbIDname );
 				while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 				{
 					echo $archive_line_start;

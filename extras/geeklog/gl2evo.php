@@ -112,11 +112,6 @@ while($row = mysql_fetch_assoc($result)){
 	$post_urltitle = urltitle_validate2( $row[title], $row[title], 0 );
 
 
-	// Autobreak plaintext gl entries and not for html entries.
-	if($row[postmode]=='plaintext') $post_autobr='1';
-	else $post_autobr='0';
-
-
 	// Combine the intro and the body into the content field.
 	$post_content = "$row[introtext]\n<!--more-->\n$row[bodytext]";
 
@@ -134,15 +129,14 @@ while($row = mysql_fetch_assoc($result)){
 	// Build the insert sql for the post
 	$ins="INSERT INTO ".$evo_prefix."posts (
 		post_creator_user_ID,
-		post_issue_date,
-		post_mod_date,
+		post_datestart,
+		post_datemodified,
 		post_status,
 		post_locale,
 		post_content,
 		post_title,
 		post_urltitle,
 		post_category,
-		post_autobr,
 		post_flags,
 		post_wordcount
 		) VALUES (
@@ -155,7 +149,6 @@ while($row = mysql_fetch_assoc($result)){
 		'$row[title]',
 		'$post_urltitle',
 		'$post_category',
-		'$post_autobr',
 		'pingsdone',
 		'".bpost_count_words($post_content)."')";
 

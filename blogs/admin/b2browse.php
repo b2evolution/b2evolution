@@ -68,6 +68,9 @@ for( $curr_blog_ID = blog_list_start();
 		$current_User->check_perm( 'blog_ismember', 1, true, $blog );
 
 		// Show the posts:
+		$add_item_url = 'b2edit.php?blog='.$blog;
+		$dbprefix = 'post_';
+		$dbIDname = 'ID';
 		require dirname(__FILE__). '/_edit_showposts.php';
 	}
 

@@ -145,10 +145,10 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Categories... ';
 	$query="CREATE TABLE T_categories (
-		cat_ID int(4) NOT NULL auto_increment,
-		cat_parent_ID int(11) default NULL,
+		cat_ID int(11) unsigned NOT NULL auto_increment,
+		cat_parent_ID int(11) unsigned NULL,
 		cat_name tinytext NOT NULL,
-		cat_blog_ID int(11) unsigned NOT NULL default '2',
+		cat_blog_ID int(11) unsigned NOT NULL default 2,
 		cat_description VARCHAR(250) NULL DEFAULT NULL,
 		cat_longdesc TEXT NULL DEFAULT NULL,
 		cat_icon VARCHAR(30) NULL DEFAULT NULL,
@@ -163,11 +163,11 @@ function create_b2evo_tables()
 	echo 'Creating table for Posts... ';
 	$query = "CREATE TABLE T_posts (
 		ID 										int(10) unsigned NOT NULL auto_increment,
-		post_parent_ID				int(10) unsigned NULL,
-		post_creator_user_ID				int(11) unsigned NOT NULL default '0',
-		post_assigned_user_ID	int(10) unsigned NULL,
-		post_issue_date				datetime NOT NULL default '0000-00-00 00:00:00',
-		post_mod_date					datetime NOT NULL default '0000-00-00 00:00:00',
+		post_parent_ID				int(11) unsigned NULL,
+		post_creator_user_ID	int(11) unsigned NOT NULL,
+		post_assigned_user_ID	int(11) unsigned NULL,
+		post_datestart				datetime NOT NULL,
+		post_datemodified			datetime NOT NULL,
 		post_status						enum('published','deprecated','protected','private','draft')
 														NOT NULL default 'published',
 		post_pst_ID						int(11) unsigned NULL,
@@ -177,18 +177,17 @@ function create_b2evo_tables()
 		post_title						text NOT NULL,
 		post_urltitle					VARCHAR(50) NULL DEFAULT NULL,
 		post_url							VARCHAR(250) NULL DEFAULT NULL,
-		post_category					int(4) NOT NULL default '0',
-		post_autobr						tinyint(4) NOT NULL default '1',
+		post_main_cat_ID			int(11) unsigned NOT NULL,
 		post_flags						SET( 'pingsdone', 'imported'),
-		post_views						INT NOT NULL DEFAULT '0',
+		post_views						INT(11) UNSIGNED NOT NULL DEFAULT 0,
 		post_wordcount				int(11) default NULL,
 		post_comments					ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 		post_commentsexpire 	DATETIME DEFAULT NULL,
 		post_renderers 				VARCHAR(179) NOT NULL default 'default',
 		PRIMARY KEY post_ID( ID ),
 		UNIQUE post_urltitle( post_urltitle ),
-		INDEX post_issue_date( post_issue_date ),
-		INDEX post_category( post_category ),
+		INDEX post_datestart( post_datestart ),
+		INDEX post_main_cat_ID( post_main_cat_ID ),
 		INDEX post_creator_user_ID( post_creator_user_ID ),
 		INDEX post_status( post_status ),
 		INDEX post_parent_ID( post_parent_ID ),
@@ -202,8 +201,8 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Categories-to-Posts relationships... ';
 	$query = "CREATE TABLE T_postcats (
-		postcat_post_ID int(11) unsigned NOT NULL default '0',
-		postcat_cat_ID int(11) NOT NULL default '0',
+		postcat_post_ID int(11) unsigned NOT NULL,
+		postcat_cat_ID int(11) unsigned NOT NULL,
 		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID)
 	)"; // We might want to add an index on cat_ID here...
 	$DB->query( $query );
@@ -1034,7 +1033,7 @@ function create_b2evo_relations()
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_main_cat_ID
-											foreign key (post_category)
+											foreign key (post_main_cat_ID)
 											references T_categories (cat_ID)
 											on delete restrict
 											on update restrict,

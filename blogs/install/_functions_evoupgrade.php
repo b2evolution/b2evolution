@@ -517,16 +517,23 @@ function upgrade_b2evo_tables()
 		$query = "ALTER TABLE T_posts
 							DROP COLUMN post_karma,
 							DROP INDEX post_author,
-							CHANGE COLUMN post_author	post_creator_user_ID int(11) unsigned NOT NULL default '0',
-							ADD post_parent_ID				int(10) unsigned NULL AFTER ID,
-							ADD post_assigned_user_ID	int(10) unsigned NULL AFTER post_creator_user_ID,
+							DROP INDEX post_issue_date,
+							DROP INDEX post_category,
+							CHANGE COLUMN post_author	post_creator_user_ID int(11) unsigned NOT NULL,
+							CHANGE COLUMN post_issue_date	post_datestart datetime NOT NULL,
+							CHANGE COLUMN post_mod_date	post_datemodified datetime NOT NULL,
+							CHANGE COLUMN post_category post_main_cat_ID int(11) unsigned NOT NULL,
+							ADD post_parent_ID				int(11) unsigned NULL AFTER ID,
+							ADD post_assigned_user_ID	int(11) unsigned NULL AFTER post_creator_user_ID,
 							ADD post_pst_ID						int(11) unsigned NULL AFTER post_status,
 							ADD post_ptyp_ID					int(11) unsigned NULL AFTER post_pst_ID,
-							ADD post_views						INT NOT NULL DEFAULT '0' AFTER post_flags,
+							ADD post_views						INT(11) UNSIGNED NOT NULL DEFAULT 0 AFTER post_flags,
 							ADD post_commentsexpire		DATETIME DEFAULT NULL AFTER post_comments,
 							ADD INDEX post_creator_user_ID( post_creator_user_ID ),
 							ADD INDEX post_parent_ID( post_parent_ID ),
 							ADD INDEX post_assigned_user_ID( post_assigned_user_ID ),
+							ADD INDEX post_datestart( post_datestart ),
+							ADD INDEX post_main_cat_ID( post_main_cat_ID ),
 							ADD INDEX post_ptyp_ID( post_ptyp_ID ),
 							ADD INDEX post_pst_ID( post_pst_ID ) ";
 		$DB->query( $query );
@@ -608,12 +615,15 @@ function upgrade_b2evo_tables()
 			
 		echo 'Altering Posts to Categories table... ';
 		$DB->query( "ALTER TABLE T_postcats
-									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL default '0'" ); 
+									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL,
+									MODIFY COLUMN postcat_cat_ID int(11) unsigned NOT NULL" ); 
 		echo "OK.<br />\n";
 
 		echo 'Altering Categories table... ';
 		$DB->query( "ALTER TABLE T_categories
-									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default '2'" ); 
+									MODIFY COLUMN cat_ID int(11) unsigned NOT NULL auto_increment, 
+									MODIFU COLUMN cat_parent_ID int(11) unsigned NULL,
+									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default 2" ); 
 		echo "OK.<br />\n";
 
 		// Create relations:

@@ -49,6 +49,8 @@ class Results
 	var $params = NULL;
 
 	/**
+	 * Constructor
+	 *
 	 * @param string SQL query
 	 * @param integer number of lines displayed on one screen
 	 * @param 
@@ -67,7 +69,7 @@ class Results
 	    $this->total_pages = ceil($this->total_rows / $this->limit);
 
  			if( is_null($page) )
-			{
+			{//attribution of a page number
 				$page = param( 'page', 'integer', 1, true );
 			}
 			$this->page = min( $page, $this->total_pages ) ;
@@ -267,6 +269,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

@@ -79,11 +79,16 @@ class ArchiveList extends DataObjectList
 		$show_statuses = array(),
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
-		$limit = '' )
+		$limit = '',
+ 		$dbprefix = 'post_',
+		$dbIDname = 'ID' )
+
 	{
 		global $DB, $Settings;
 
 		$this->blog = $blog;
+		$this->dbprefix = $dbprefix;
+		$this->dbIDname = $dbIDname;
 		$this->archive_mode = $archive_mode;
 
 		// CONSTRUCT THE WHERE CLAUSE:
@@ -93,7 +98,7 @@ class ArchiveList extends DataObjectList
 		 *  Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$where = ' WHERE '.statuses_where_clause( $show_statuses );
+		$where = ' WHERE '.statuses_where_clause( $show_statuses, $dbprefix );
 		$where_link = ' AND ';
 
 
@@ -102,14 +107,14 @@ class ArchiveList extends DataObjectList
 		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
+			$where .= $where_link.' '.$dbprefix.'datestart >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
+			$where .= $where_link.' '.$dbprefix.'datestart <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 
@@ -130,9 +135,9 @@ class ArchiveList extends DataObjectList
 		{
 			case 'monthly':
 				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
-				$this->request = 'SELECT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month,
+				$this->request = 'SELECT YEAR('.$dbprefix.'datestart) AS year, MONTH('.$dbprefix.'datestart) AS month,
 																	COUNT(DISTINCT postcat_post_ID) AS count
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+													FROM (T_posts INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 													'.$where.'
 													GROUP BY year, month
@@ -142,8 +147,8 @@ class ArchiveList extends DataObjectList
 
 			case 'daily':
 				// ------------------------------- DAILY ARCHIVES -------------------------------------
-				$this->request = 'SELECT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month,
-																	DAYOFMONTH(post_issue_date) AS day,
+				$this->request = 'SELECT YEAR('.$dbprefix.'datestart) AS year, MONTH('.$dbprefix.'datestart) AS month,
+																	DAYOFMONTH('.$dbprefix.'datestart) AS day,
 																	COUNT(DISTINCT postcat_post_ID) AS count
 													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
@@ -155,8 +160,8 @@ class ArchiveList extends DataObjectList
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$this->request = 'SELECT YEAR(post_issue_date) AS year, WEEK(post_issue_date) AS week,
-																	COUNT(DISTINCT postcat_post_ID) AS count
+				$this->request = 'SELECT YEAR('.$dbprefix.'datestart) AS year, WEEK('.$dbprefix.'datestart) AS week,
+																	COUNT(DISTINCT postcat_'.$dbprefix.'ID) AS count
 													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 													'.$where.'
@@ -168,11 +173,11 @@ class ArchiveList extends DataObjectList
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-				$this->request = 'SELECT DISTINCT ID, post_issue_date, post_title
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+				$this->request = 'SELECT DISTINCT '.$dbIDname.', '.$dbprefix.'datestart, '.$dbprefix.'title
+													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_'.$dbprefix.'ID)
 																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 													'.$where.'
-													ORDER BY post_issue_date DESC
+													ORDER BY '.$dbprefix.'datestart DESC
 													'.$limit;
 		}
 
@@ -226,7 +231,7 @@ class ArchiveList extends DataObjectList
 			case 'postbypost':
 			default:
 				$post_ID = $arc_row['ID'];
-				$post_title = $arc_row['post_title'];
+				$post_title = $arc_row[$this->dbprefix.'title'];
 				return true;
 		}
 	}
@@ -234,6 +239,9 @@ class ArchiveList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
  * Revision 1.3  2004/11/09 00:25:11  blueyed
  * minor translation changes (+MySQL spelling :/)
  *

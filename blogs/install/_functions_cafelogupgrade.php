@@ -118,8 +118,8 @@ function upgrade_cafelog_tables()
 
 
 	echo 'Copying Cafelog posts... ';
-	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale, post_content,post_title, post_category, post_autobr, post_flags)
-	SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 1, 'pingsdone,imported' FROM $oldtableposts";
+	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content,post_title, post_main_cat_ID, post_flags)
+	SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 'pingsdone,imported' FROM $oldtableposts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -136,7 +136,7 @@ function upgrade_cafelog_tables()
 	echo "OK. (".count($q)." rows updated)<br />\n";
 
 	echo 'Generating postcats... ';
-	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_category FROM T_posts";
+	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_main_cat_ID FROM T_posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

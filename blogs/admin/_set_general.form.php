@@ -46,7 +46,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 									array( 'postbypost', T_('post by post') )
 								), T_('Archive mode') );
 
-			form_checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Auto-BR'), T_('This option is deprecated, you should avoid using it.') );
+			form_checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MSS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
 		?>
 	</fieldset>
 

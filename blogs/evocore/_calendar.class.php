@@ -109,11 +109,16 @@ class Calendar
 		$m = '',
 		$show_statuses = array(),
 		$timestamp_min = '',		// Do not show posts before this timestamp
-		$timestamp_max = 'now'  )	// Do not show posts after this timestamp
+		$timestamp_max = 'now',	// Do not show posts after this timestamp
+		$dbprefix = 'post_',
+		$dbIDname = 'ID' )
+
 	{
 		global $Settings;
 
 		$this->blog = $blog;
+		$this->dbprefix = $dbprefix;
+		$this->dbIDname = $dbIDname;
 
 		// Find out which month to display:
 		if( empty($m) )
@@ -151,7 +156,7 @@ class Calendar
 		 *  Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$where = ' AND '.statuses_where_clause( $show_statuses );
+		$where = ' AND '.statuses_where_clause( $show_statuses, $dbprefix );
 		$where_link = ' AND ';
 
 		// Restrict to timestamp limits:
@@ -159,14 +164,14 @@ class Calendar
 		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
+			$where .= $where_link.' '.$dbprefix.'datestart >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
+			$where .= $where_link.' '.$dbprefix.'datestart <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 
@@ -271,12 +276,13 @@ class Calendar
 			$searchyear = $this->year;
 			for( $i = 0; $i < $this->searchframe; $i++ )
 			{
-				$arc_sql = "SELECT COUNT(DISTINCT ID), YEAR(post_issue_date), MONTH(post_issue_date), DAYOFMONTH(post_issue_date) AS myday".
-						" FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)".
+				$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
+														DAYOFMONTH('.$this->dbprefix.'datestart) AS myday'.
+						" FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)".
 						" INNER JOIN T_categories ON postcat_cat_ID = cat_ID".
-						" WHERE MONTH(post_issue_date) = '$searchmonth' AND YEAR(post_issue_date) = '$searchyear' ".$this->where.
+						' WHERE MONTH('.$this->dbprefix."datestart) = '$searchmonth' AND YEAR(".$this->dbprefix."datestart) = '$searchyear' ".$this->where.
 						" GROUP BY myday".
-						" ORDER BY post_issue_date DESC";
+						' ORDER BY '.$this->dbprefix.'datestart DESC';
 				$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
 				if( $DB->num_rows > 0 )
@@ -344,12 +350,12 @@ class Calendar
 		else
 		{ // mode is 'year'
 			// Find months with posts
-			$arc_sql = "SELECT COUNT(DISTINCT ID), MONTH(post_issue_date) AS mymonth ".
-						"FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID) ".
+			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), MONTH('.$this->dbprefix.'datestart) AS mymonth '.
+						"FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID) ".
 						"INNER JOIN T_categories ON postcat_cat_ID = cat_ID ".
-						"WHERE YEAR(post_issue_date) = '$this->year' ".$this->where.
+						'WHERE YEAR('.$this->dbprefix."datestart) = '$this->year' ".$this->where.
 						" GROUP BY mymonth".
-						" ORDER BY post_issue_date DESC";
+						' ORDER BY '.$this->dbprefix.'datestart DESC';
 
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
@@ -357,7 +363,7 @@ class Calendar
 			{	// OK we have a month with posts!
 				foreach( $arc_result as $arc_row )
 				{
-					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['COUNT(DISTINCT ID)'];
+					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['COUNT(DISTINCT '.$this->dbIDname.')'];
 				}
 			}
 		}
@@ -630,6 +636,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *

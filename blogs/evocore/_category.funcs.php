@@ -26,7 +26,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
-  * {@internal
+ * {@internal
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -36,7 +36,7 @@
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
-* @package evocore
+ * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
@@ -140,7 +140,7 @@ function cat_delete( $cat_ID )
 	// Get the list of posts in this category
 	$sql = "SELECT ID
 					FROM T_posts
-					WHERE post_category = $cat_ID";
+					WHERE post_main_cat_ID = $cat_ID";
 	$IDarray = $DB->get_col( $sql );
 
 	if( ! $remap_cat_ID )
@@ -180,8 +180,8 @@ function cat_delete( $cat_ID )
 
 		// remap the posts to new category:
 		$sql = "UPDATE T_posts
-							SET post_category = $remap_cat_ID
-							WHERE post_category = $cat_ID";
+							SET post_main_cat_ID = $remap_cat_ID
+							WHERE post_main_cat_ID = $cat_ID";
 		$DB->query( $sql );
 
 		// Before remapping the extracats we need to get rid of mappings that would become duplicates
@@ -397,14 +397,14 @@ function cat_load_cache()
 		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
+			$where .= $where_link.' post_datestart >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
+			$where .= $where_link.' post_datestart <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
 
@@ -576,8 +576,8 @@ function blog_has_cats( $blog_ID )
 function cat_query( )
 {
 	// global $cache_categories; // $cache_blogs,
-
-	blog_load_cache();
+	global $blog;
+	if( $blog != 0 ) blog_load_cache();
 	cat_load_cache();
 }
 
@@ -842,6 +842,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/13 21:29:13  fplanque
+ * refactoring
+ *
  * Revision 1.5  2004/12/06 21:45:24  jwedgeco
  * Added header info and granted Francois PLANQUE the right to relicense under the Mozilla Public License.
  *

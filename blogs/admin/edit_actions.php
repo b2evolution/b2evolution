@@ -74,7 +74,6 @@ switch($action)
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
-		param( 'post_autobr', 'integer', 0 );
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
@@ -102,7 +101,7 @@ switch($action)
 		{
 			$Messages->add( T_('Supplied URL is invalid: ').$error );
 		}
-		$content = format_to_post($content,$post_autobr,0);
+		$content = format_to_post( $content );
 
 		if( $Messages->count() )
 		{
@@ -121,7 +120,7 @@ switch($action)
 
 		// INSERT NEW POST INTO DB:
 		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	
-															$post_extracats, $post_status, $post_locale, '',	$post_autobr, 
+															$post_extracats, $post_status, $post_locale, '', 0, 
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
 															$post_renderers );
 
@@ -178,8 +177,7 @@ switch($action)
 		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
 		param( 'post_ID', 'integer', true );
-		param( "post_autobr", 'integer', 0 );
-		param( "post_pingback", 'integer', 0 );
+		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = $trackback_url;
 		param( 'content', 'html' );
@@ -207,7 +205,7 @@ switch($action)
 		{
 			$Messages->add( T_('Supplied URL is invalid: ').$error );
 		}
-		$content = format_to_post($content,$post_autobr,0);
+		$content = format_to_post( $content );
 
 		if( $Messages->count() )
 		{
@@ -238,7 +236,7 @@ switch($action)
 
 		// UPDATE POST IN DB:
 		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats,
-									$post_status, $post_locale, '',	$post_autobr, $pingsdone, $post_urltitle, 
+									$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle, 
 									$post_url, $post_comments, $post_renderers );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
@@ -436,7 +434,7 @@ switch($action)
 			param( 'newcomment_author_url', 'string' );
 		}
 		param( 'content', 'html' );
-		param( "post_autobr", 'integer', ($comments_use_autobr == 'always')?1:0 );
+		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
 
 
 		// CHECK and FORMAT content
@@ -444,7 +442,7 @@ switch($action)
 		{
 			$Messages->add( T_('Supplied URL is invalid: ').$error );
 		}
-		$content = format_to_post($content,$post_autobr,0); // We are faking this NOT to be a comment
+		$content = format_to_post( $content, $post_autobr, 0); // We are faking this NOT to be a comment
 
 		if( $Messages->display( T_('Cannot update comment, please correct these errors:'),
 				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )

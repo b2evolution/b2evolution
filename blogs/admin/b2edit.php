@@ -19,6 +19,9 @@ param( 'action', 'string' );
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
+// Page conf settings:
+$use_filemanager = true;
+
 switch($action)
 {
 	case 'edit':
@@ -45,8 +48,7 @@ switch($action)
 		$post_title = $edited_Item->get( 'title' );
 		$post_urltitle = $edited_Item->get( 'urltitle' );
 		$post_url = $edited_Item->get( 'url' );
-		$content = format_to_edit( $edited_Item->get( 'content' ), $edited_Item->get( 'autobr' ) );
-		$post_autobr = $edited_Item->get( 'autobr' );
+		$content = format_to_edit( $edited_Item->get( 'content' ) );
 		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_comments = $edited_Item->get( 'comments' );
@@ -215,7 +217,7 @@ switch($action)
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		param( 'post_autobr', 'integer', $Settings->get('AutoBR') );  // Use default if nothing provided
+		param( 'post_autobr', 'integer', 0 );
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;

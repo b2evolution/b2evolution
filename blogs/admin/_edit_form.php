@@ -9,6 +9,9 @@
  * @package admin
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
+if( isset($Blog) )
+{
 ?>
 <script type="text/javascript" language="javascript">
 	<!--
@@ -45,7 +48,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	}
 	// End -->
 </script>
-
+<?php
+}
+?>
 <!-- ================================ START OF EDIT FORM ================================ -->
 
 <form name="post" id="post" action="edit_actions.php" target="_self" method="post">
@@ -164,11 +169,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	}
 
 
-	// ------------------------------- UPLOAD ----------------------------------
-	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
-	$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
-	$Fileman->dispButtonUpload( '#', 'tabindex="12"' );
-
+	if( $use_filemanager )
+	{	// ------------------------------- UPLOAD ----------------------------------
+		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
+		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
+		$Fileman->dispButtonUpload( T_('Files'), 'tabindex="12"' );
+	}
 
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => $target_type ) );
@@ -232,16 +238,21 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 		<?php
 		}
-
-		// --------------------------- AUTOBR -------------------------------------- 	?>
-		<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-		if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
-		<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
+		else
+		{	// This is for comment editiing only:
+			// --------------------------- AUTOBR -------------------------------------- 	
+			?>
+			<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
+			if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
+			<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
+			<?php
+		}
+		?>
 
 	</fieldset>
 
 	<?php
-	if( ($action != 'editcomment') && (get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks')) )
+	if( ($action != 'editcomment') && isset( $Blog ) && ((get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks'))) )
 	{ // this is for everything but comment editing
 		?>
 		<fieldset>

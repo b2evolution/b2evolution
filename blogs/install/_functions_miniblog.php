@@ -95,8 +95,8 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Copying Miniblog posts... ';
-	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_category, post_autobr, post_flags, post_comments )
-						SELECT id, authorId, created, modified, 'published', '$default_locale', content, title, $cat_imported, 0, 'pingsdone,imported', 'open'
+	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title, post_main_cat_ID, post_flags, post_comments )
+						SELECT id, authorId, created, modified, 'published', '$default_locale', content, title, $cat_imported, 'pingsdone,imported', 'open'
 						FROM miniblog
 						WHERE parentId = 0";
 	$DB->query( $query );
@@ -116,7 +116,7 @@ function upgrade_miniblog_tables()
 
 	echo 'Generating postcats... ';
 	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID )
-						SELECT ID, post_category FROM T_posts";
+						SELECT ID, post_main_cat_ID FROM T_posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

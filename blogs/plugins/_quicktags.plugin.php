@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Quicktahs Toolbar plugin for b2evolution
+ * This file implements the Quicktags Toolbar plugin for b2evolution
  *
  * This is Ron's remix!
  * Includes code from the WordPress team -

@@ -2,6 +2,8 @@
 /**
  * This file implements the Archives plugin.
  *
+ * Displays a list of post archives.
+ *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}

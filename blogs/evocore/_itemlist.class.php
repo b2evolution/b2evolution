@@ -188,16 +188,15 @@ class ItemList extends DataObjectList
 		// Columns to be selected:
 		$this->dbcols = array(
 											$dbprefix.'creator_user_ID',
-											$dbprefix.'issue_date',
-											$dbprefix.'mod_date',
+											$dbprefix.'datestart',
+											$dbprefix.'datemodified',
 											$dbprefix.'status',
 											$dbprefix.'locale',
 											$dbprefix.'content',
 											$dbprefix.'title',
 											$dbprefix.'urltitle',
 											$dbprefix.'url',
-											$dbprefix.'category',
-											$dbprefix.'autobr',
+											$dbprefix.'main_cat_ID',
 											$dbprefix.'flags',
 											$dbprefix.'wordcount',
 											$dbprefix.'comments',
@@ -240,23 +239,23 @@ class ItemList extends DataObjectList
 		if( $m != '' )
 		{
 			$m = '' . intval($m);
-			$where .= ' AND YEAR(post_issue_date)=' . substr($m,0,4);
+			$where .= ' AND YEAR('.$dbprefix.'datestart)=' . substr($m,0,4);
 			if( strlen($m) > 5 )
-				$where .= ' AND MONTH(post_issue_date)=' . substr($m,4,2);
+				$where .= ' AND MONTH('.$dbprefix.'datestart)=' . substr($m,4,2);
 			if( strlen($m) > 7 )
-				$where .= ' AND DAYOFMONTH(post_issue_date)=' . substr($m,6,2);
+				$where .= ' AND DAYOFMONTH('.$dbprefix.'datestart)=' . substr($m,6,2);
 			if( strlen($m) > 9 )
-				$where .= ' AND HOUR(post_issue_date)=' . substr($m,8,2);
+				$where .= ' AND HOUR('.$dbprefix.'datestart)=' . substr($m,8,2);
 			if( strlen($m) > 11 )
-				$where .= ' AND MINUTE(post_issue_date)=' . substr($m,10,2);
+				$where .= ' AND MINUTE('.$dbprefix.'datestart)=' . substr($m,10,2);
 			if( strlen($m) > 13 )
-				$where .= ' AND SECOND(post_issue_date)=' . substr($m,12,2);
+				$where .= ' AND SECOND('.$dbprefix.'datestart)=' . substr($m,12,2);
 		}
 
 		// If a week number is specified
 		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
 		{
-			$where .= ' AND WEEK(post_issue_date)='.intval($w);
+			$where .= ' AND WEEK('.$dbprefix.'datestart)='.intval($w);
 		}
 
 		// if a post number is specified, load that post
@@ -269,7 +268,7 @@ class ItemList extends DataObjectList
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
-			$where .= " AND post_urltitle = '$title'";
+			$where .= " AND '.$dbprefix.'urltitle = '$title'";
 		}
 
 		/*
@@ -287,7 +286,7 @@ class ItemList extends DataObjectList
 			if( ($sentence == '1') or ($sentence == 'sentence') )
 			{ // Sentence search
 				$s = $DB->escape(trim($s));
-				$search .= '(post_title LIKE \''. $n. $s. $n. '\') OR (post_content LIKE \''. $n. $s. $n.'\')';
+				$search .= '('.$dbprefix.'title LIKE \''. $n. $s. $n. '\') OR ('.$dbprefix.'content LIKE \''. $n. $s. $n.'\')';
 			}
 			else
 			{ // Word search
@@ -305,7 +304,8 @@ class ItemList extends DataObjectList
 				$join = '';
 				for ( $i = 0; $i < count($s_array); $i++)
 				{
-					$search .= ' '. $join. ' ( (post_title LIKE \''. $n. $DB->escape($s_array[$i]). $n. '\') OR (post_content LIKE \''. $n. $DB->escape($s_array[$i]). $n.'\') ) ';
+					$search .= ' '. $join. ' ( ('.$dbprefix.'title LIKE \''. $n. $DB->escape($s_array[$i]). $n. '\')
+																	OR ('.$dbprefix.'content LIKE \''. $n. $DB->escape($s_array[$i]). $n.'\') ) ';
 					$join = $swords;
 				}
 			}
@@ -401,9 +401,9 @@ class ItemList extends DataObjectList
 				$andor = 'OR';
 			}
 			$author_array = explode(' ', $author);
-			$whichauthor .= ' AND post_creator_user_ID '. $eq.' '. $author_array[0];
+			$whichauthor .= ' AND '.$dbprefix.'creator_user_ID '. $eq.' '. $author_array[0];
 			for ($i = 1; $i < (count($author_array)); $i = $i + 1) {
-				$whichauthor .= ' '. $andor.' post_creator_user_ID '. $eq.' '. $author_array[$i];
+				$whichauthor .= ' '. $andor.' '.$dbprefix.'creator_user_ID '. $eq.' '. $author_array[$i];
 			}
 		}
 
@@ -422,7 +422,7 @@ class ItemList extends DataObjectList
 
 		if(empty($orderby))
 		{
-			$orderby = 'issue_date '. $order;
+			$orderby = 'datestart '. $order;
 		}
 		else
 		{
@@ -432,7 +432,7 @@ class ItemList extends DataObjectList
 			{
 				for($i = 1; $i < (count($orderby_array)); $i++)
 				{
-					$orderby .= ', post_'. $orderby_array[$i]. ' '. $order;
+					$orderby .= ', '.$dbprefix.$orderby_array[$i]. ' '. $order;
 				}
 			}
 		}
@@ -465,8 +465,8 @@ class ItemList extends DataObjectList
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$this->limitdate_end = $lastpostdate - (($poststart -1) * 86400);
 				$this->limitdate_start = $lastpostdate+1 - (($postend) * 86400);
-				$where .= ' AND post_issue_date >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
-									.'\' AND post_issue_date <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
+				$where .= ' AND '.$dbprefix.'datestart >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
+									.'\' AND '.$dbprefix.'datestart <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
 
 			}
 		}
@@ -503,7 +503,7 @@ class ItemList extends DataObjectList
 				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
-				$where .= ' AND post_issue_date > \''. $otherdate.'\'';
+				$where .= ' AND '.$dbprefix.'datestart > \''. $otherdate.'\'';
 			}
 		}
 		/* else
@@ -516,7 +516,7 @@ class ItemList extends DataObjectList
 		 *	Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$where .= ' AND ' . statuses_where_clause( $show_statuses );
+		$where .= ' AND ' . statuses_where_clause( $show_statuses, $dbprefix );
 
 		/*
 		 * ----------------------------------------------------
@@ -532,7 +532,7 @@ class ItemList extends DataObjectList
 		{ // Hide posts before
 			// echo 'hide before '.$timestamp_min;
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= ' AND post_issue_date >= \''. $date_min.'\'';
+			$where .= ' AND '.$dbprefix.'datestart >= \''. $date_min.'\'';
 		}
 
 		if( $timestamp_max == 'now' )
@@ -544,12 +544,12 @@ class ItemList extends DataObjectList
 		{ // Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= ' AND post_issue_date <= \''. $date_max.'\'';
+			$where .= ' AND '.$dbprefix.'datestart <= \''. $date_max.'\'';
 		}
 
 		$this->request = "SELECT DISTINCT $this->dbIDname, "
 																			.implode( ', ', $this->dbcols )
-										.' FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+										.' FROM (T_posts INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
 														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $blog == 1 )
@@ -561,7 +561,7 @@ class ItemList extends DataObjectList
 			$this->request .= 'WHERE cat_blog_ID = '. $blog;
 		}
 
-		$this->request .= $where. " ORDER BY post_$orderby $limits";
+		$this->request .= $where. ' ORDER BY '.$dbprefix.$orderby.' '.$limits;
 		// echo '<br />where=',$where;
 
 		if ($preview)
@@ -598,7 +598,7 @@ class ItemList extends DataObjectList
 	{
 		// we need globals for the param function
 		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
-						$post_title, $post_url, $post_category, $post_autobr, $post_views, $edit_date,
+						$post_title, $post_url, $post_category, $post_views, $edit_date,
 						$aa, $mm, $jj, $hh, $mn, $ss, $renderers;
 		global $DB, $localtimenow, $Messages;
 
@@ -610,12 +610,11 @@ class ItemList extends DataObjectList
 		param( 'post_title', 'html', true );
 		param( 'post_url', 'string', true );
 		param( 'post_category', 'integer', true );
-		param( 'post_autobr', 'integer', 0 );
 		param( 'post_views', 'integer', 0 );
 		param( 'renderers', 'array', array() );
 
 		$post_title = format_to_post( $post_title, 0 );
-		$content = format_to_post( $content, $post_autobr );
+		$content = format_to_post( $content );
 		$post_renderers = implode( '.', $renderers );
 
 		param( 'aa', 'integer', 2000 );
@@ -645,22 +644,21 @@ class ItemList extends DataObjectList
 
 		return "SELECT
 										0 AS ID,
-										$preview_userid AS post_creator_user_ID,
-										'$post_date' AS post_issue_date,
-										'$post_date' AS post_mod_date,
-										'".$DB->escape($post_status)."' AS post_status,
-										'".$DB->escape($post_locale)."' AS post_locale,
-										'".$DB->escape($content)."' AS post_content,
-										'".$DB->escape($post_title)."' AS post_title,
-										NULL AS post_urltitle,
-										'".$DB->escape($post_url)."' AS post_url,
-										$post_category AS post_category,
-										$post_autobr AS post_autobr,
-										$post_views AS post_views,
-										'' AS post_flags,
-										".bpost_count_words( $content )." AS post_wordcount,
-										'open' AS post_comments,
-										'".$DB->escape( $post_renderers )."' AS post_renderers";
+										$preview_userid AS ".$dbprefix."creator_user_ID,
+										'$post_date' AS ".$dbprefix."datestart,
+										'$post_date' AS ".$dbprefix."datemodified,
+										'".$DB->escape($post_status)."' AS ".$dbprefix."status,
+										'".$DB->escape($post_locale)."' AS ".$dbprefix."locale,
+										'".$DB->escape($content)."' AS ".$dbprefix."content,
+										'".$DB->escape($post_title)."' AS ".$dbprefix."title,
+										NULL AS ".$dbprefix."urltitle,
+										'".$DB->escape($post_url)."' AS ".$dbprefix."url,
+										$post_category AS ".$dbprefix."main_cat_ID,
+										$post_views AS ".$dbprefix."views,
+										'' AS ".$dbprefix."flags,
+										".bpost_count_words( $content )." AS ".$dbprefix."wordcount,
+										'open' AS ".$dbprefix."comments,
+										'".$DB->escape( $post_renderers )."' AS ".$dbprefix."renderers";
 	}
 
 
@@ -673,7 +671,7 @@ class ItemList extends DataObjectList
 
 		// echo 'getting last post date';
 		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
-																		 '', 'DESC', 'issue_date', 1, '','', '', '', '', '', '', 1, 'posts',
+																		 '', 'DESC', 'datestart', 1, '','', '', '', '', '', '', 1, 'posts',
 																		 $this->timestamp_min, $this->timestamp_max, '', $this->dbprefix,
 																		 $this->dbIDname );
 
@@ -736,7 +734,7 @@ class ItemList extends DataObjectList
 		$mod_date_timestamp = 0;
 		foreach( $this->result_rows as $loop_row )
 		{ // Go through whole list
-			$m = $loop_row->post_mod_date;
+			$m = $loop_row->post_datemodified;
 			$loop_mod_date = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
 			if( $loop_mod_date > $mod_date_timestamp )
 				$mod_date_timestamp = $loop_mod_date;
@@ -815,7 +813,7 @@ class ItemList extends DataObjectList
 		}
 
 		// Memorize main cat
-		$this->main_cat = $this->row->post_category;
+		$this->main_cat = $this->row->post_main_cat_ID;
 
 		// Go back now so that the fetch row doesn't skip one!
 		$this->row_num --;
@@ -843,7 +841,7 @@ class ItemList extends DataObjectList
 		$this->get_postdata();
 
 
-		if( $this->group_by_cat && ($this->main_cat != $this->row->post_category) )
+		if( $this->group_by_cat && ($this->main_cat != $this->row->post_main_cat_ID) )
 		{ // Category change
 			// echo '<p>CAT CHANGE!</p>';
 			return false;
@@ -865,7 +863,7 @@ class ItemList extends DataObjectList
 		global $pagenow, $current_User;
 
 		$row = & $this->row;
-		if( empty($row->post_issue_date) )
+		if( empty($row->post_datestart) )
 		{
 			die('ItemList::get_postdata(-) => No post data available!');
 		}
@@ -874,14 +872,13 @@ class ItemList extends DataObjectList
 		$postdata = array (
 			'ID' => $row->ID,
 			'Author_ID' => $row->post_creator_user_ID,
-			'Date' => $row->post_issue_date,
+			'Date' => $row->post_datestart,
 			'Status' => $row->post_status,
 			'Locale' =>	 $row->post_locale,
 			'Content' => $row->post_content,
 			'Title' => $row->post_title,
 			'Url' => $row->post_url,
-			'Category' => $row->post_category,
-			'AutoBR' => $row->post_autobr,
+			'Category' => $row->post_main_cat_ID,
 			'Flags' => explode( ',', $row->post_flags ),
 			'Wordcount' => $row->post_wordcount,
 			'views' => $row->post_views,
@@ -970,6 +967,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
  * Revision 1.5  2004/12/10 19:45:55  fplanque
  * refactoring
  *

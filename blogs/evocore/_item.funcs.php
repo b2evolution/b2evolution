@@ -61,7 +61,7 @@ function bpost_create(
 	$post_status = 'published',
 	$post_locale = '#',
 	$post_trackbacks = '',
-	$autobr = 0,                  // No AutoBR has been used by default
+	$autobr = 0,                  // OBSOLETE
 	$pingsdone = true,
 	$post_urltitle = '',
 	$post_url = '',
@@ -89,8 +89,8 @@ function bpost_create(
 	// echo 'INSERTING NEW POST ';
 
 	$query = "INSERT INTO T_posts( post_creator_user_ID, post_title, post_urltitle, post_content,
-														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
-														post_url, post_autobr, post_flags, post_wordcount,
+														post_datestart, post_datemodified, post_main_cat_ID,  post_status, post_locale,
+														post_url, post_flags, post_wordcount,
 														post_comments, post_renderers )
 						VALUES( $author_user_ID, '".$DB->escape($post_title)."',
 										'".$DB->escape($post_urltitle)."',
@@ -101,7 +101,6 @@ function bpost_create(
 										'".$DB->escape($post_status)."',
 										'".$DB->escape($post_locale)."',
 										'".$DB->escape($post_url)."',
-										'".(integer)$autobr."',
 										'".$DB->escape(implode(',',$post_flags))."',
 										".bpost_count_words($post_content).",
 										'".$DB->escape($post_comments)."',
@@ -143,7 +142,7 @@ function bpost_update(
 	$post_status = 'published',
 	$post_locale = '#',
 	$post_trackbacks = '',
-	$autobr = 0,                  // No AutoBR has been used by default
+	$autobr = 0,                  // OBSOLETE
 	$pingsdone = true,
 	$post_urltitle = '',
 	$post_url = '',
@@ -171,10 +170,9 @@ function bpost_update(
 								post_urltitle = '".$DB->escape($post_urltitle)."',
 								post_url = '".$DB->escape($post_url)."',
 								post_content = '".$DB->escape($post_content)."',
-								post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."',
-								post_category = $main_cat_ID,
+								post_datemodified = '".date('Y-m-d H:i:s',$localtimenow)."',
+								post_main_cat_ID = $main_cat_ID,
 								post_status = '".$DB->escape($post_status)."',
-								post_autobr = $autobr,
 								post_flags = '".$DB->escape(implode(',',$post_flags))."',
 								post_wordcount = ".bpost_count_words($post_content).",
 								post_comments = '".$DB->escape($post_comments)."',
@@ -185,7 +183,7 @@ function bpost_update(
 								post_locale = '".$DB->escape($post_locale)."'";
 								}
 
-	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp' ";
+	if( !empty($post_timestamp) )	$query .= ", post_datestart = '$post_timestamp' ";
 	$query .= "WHERE ID = $post_ID";
 	if( ! $DB->query( $query ) ) return 0;
 
@@ -228,8 +226,8 @@ function bpost_update_status(
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 
 	$query = "UPDATE T_posts SET ";
-	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
-	$query .= "post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', ";
+	if( !empty($post_timestamp) )	$query .= "post_datestart = '$post_timestamp', ";
+	$query .= "post_datemodified = '".date('Y-m-d H:i:s',$localtimenow)."', ";
 	$query .= "post_status = '$post_status', ";
 	$query .= "post_flags = '".implode(',',$post_flags)."' ";
 	$query .= "WHERE ID = $post_ID";
@@ -372,9 +370,10 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
+	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title, 
+											post_url, post_main_cat_ID, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
 					FROM T_posts
-					INNER JOIN T_categories ON post_category = cat_ID
+					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
 					WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
@@ -390,14 +389,13 @@ function get_postdata($postid)
 		$mypostdata = array (
 			'ID' => $myrow->ID,
 			'Author_ID' => $myrow->post_creator_user_ID,
-			'Date' => $myrow->post_issue_date,
+			'Date' => $myrow->post_datestart,
 			'Status' => $myrow->post_status,
 			'Locale' =>  $myrow->post_locale,
 			'Content' => $myrow->post_content,
 			'Title' => $myrow->post_title,
 			'Url' => $myrow->post_url,
-			'Category' => $myrow->post_category,
-			'AutoBR' => $myrow->post_autobr,
+			'Category' => $myrow->post_main_cat_ID,
 			'Flags' => explode( ',', $myrow->post_flags ),
 			'Wordcount' => $myrow->post_wordcount,
 			'views' => $myrow->post_views,
@@ -430,11 +428,11 @@ function Item_get_by_ID( $post_ID )
 	global $DB, $postdata, $show_statuses;
 
 	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale,
-									post_content, post_title, post_urltitle, post_url, post_category,
-									post_autobr, post_flags, post_wordcount, post_comments,
+	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale,
+									post_content, post_title, post_urltitle, post_url, post_main_cat_ID,
+									post_flags, post_wordcount, post_comments,
 									post_renderers, post_views, cat_blog_ID
-					FROM T_posts INNER JOIN T_categories ON post_category = cat_ID
+					FROM T_posts INNER JOIN T_categories ON post_main_cat_ID = cat_ID
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
@@ -466,9 +464,9 @@ function Item_get_by_title( $urltitle )
 	global $DB, $postdata, $show_statuses;
 
 	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale,
-									post_content, post_title, post_urltitle, post_url, post_category,
-									post_autobr, post_flags, post_wordcount, post_comments,
+	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale,
+									post_content, post_title, post_urltitle, post_url, post_main_cat_ID,
+									post_flags, post_wordcount, post_comments,
 									post_renderers, post_views, cat_blog_ID
 					FROM T_posts INNER JOIN T_categories ON post_category = cat_ID
 					WHERE post_urltitle = ".$DB->quote($urltitle);
@@ -885,7 +883,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 		$sqlcat = '';
 		if ($in_same_cat != 'no') {
-			$sqlcat = " AND post_category='$current_category' ";
+			$sqlcat = " AND post_main_cat_ID = $current_category ";
 		}
 
 		$sql_exclude_cats = '';
@@ -893,17 +891,17 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 			$blah = explode('and', $excluded_categories);
 			foreach($blah as $category) {
 				$category = intval($category);
-				$sql_exclude_cats .= " AND post_category != $category";
+				$sql_exclude_cats .= " AND post_main_cat_ID <> $category";
 			}
 		}
 
 		$limitprev--;
 		$sql = "SELECT ID,post_title
 						FROM T_posts
-						WHERE post_issue_date < '$current_post_date'
+						WHERE post_datestart < '$current_post_date'
 							$sqlcat
 							$sql_exclude_cats
-						ORDER BY post_issue_date DESC
+						ORDER BY post_datestart DESC
 						LIMIT $limitprev, 1";
 
 		if( $p_info = $DB->get_row( $sql ) )
@@ -940,7 +938,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		$sqlcat = '';
 		if ($in_same_cat != 'no')
 		{
-			$sqlcat = " AND post_category='$current_category' ";
+			$sqlcat = " AND post_main_cat_ID = $current_category ";
 		}
 
 		$sql_exclude_cats = '';
@@ -957,11 +955,11 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		$limitnext--;
 		$sql = "SELECT ID, post_title
 						FROM T_posts
-						WHERE post_issue_date > '$current_post_date'
-							AND post_issue_date < '$now'
+						WHERE post_datestart > '$current_post_date'
+							AND post_datestart < '$now'
 							$sqlcat
 							$sql_exclude_cats
-						ORDER BY post_issue_date ASC
+						ORDER BY post_datestart ASC
 						LIMIT $limitnext, 1";
 
 		if( $p_info = $DB->get_row( $sql ) )
@@ -1611,7 +1609,7 @@ function bpost_count_words($string)
  *
  * @param Array statuses of posts we want to get
  */
-function statuses_where_clause( $show_statuses = '' )
+function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 {
 	global $current_User, $blog;
 
@@ -1627,7 +1625,7 @@ function statuses_where_clause( $show_statuses = '' )
 		if( is_logged_in() )
 		{	// We need to be logged in to have a chance to see this:
 			global $user_ID;
-			$where .= $or." ( post_status = 'private' AND post_creator_user_ID = $user_ID ) ";
+			$where .= $or.' ( '.$dbprefix."status = 'private' AND ".$dbprefix."creator_user_ID = $user_ID ) ";
 			$or = ' OR ';
 		}
 	}
@@ -1652,7 +1650,7 @@ function statuses_where_clause( $show_statuses = '' )
 	}
 	if( strlen( $other_statuses ) )
 	{
-		$where .= $or.'post_status IN ('. $other_statuses .') ';
+		$where .= $or.$dbprefix.'status IN ('. $other_statuses .') ';
 	}
 
 	$where .= ') ';
@@ -1663,6 +1661,9 @@ function statuses_where_clause( $show_statuses = '' )
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
  * Revision 1.3  2004/12/10 19:45:55  fplanque
  * refactoring
  *
