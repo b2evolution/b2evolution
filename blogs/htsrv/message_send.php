@@ -28,11 +28,9 @@ $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( 
 
 if( !empty( $recipient_id ) )
 { // Get the email address for the recipient if a user.
-	$sql = 'SELECT user_firstname, user_lastname, user_email 
-		FROM ' . $tableusers . ' 
-		WHERE ID=' . $recipient_id;
-	$row = $DB->get_row( $sql );
-	$recipient_address = $row->user_firstname . ' ' . $row->user_lastname . '<' . $row->user_email . '>';
+	$user = get_userdata( $recipient_id );
+	$user = new User($user);
+	$recipient_address = $user->get('preferedname') . ' <' . $user->email . '>';
 }
 elseif( !empty( $comment_id ) )
 { // Get the email address for the recipient if a commenter.

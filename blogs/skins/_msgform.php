@@ -33,11 +33,9 @@
 	// Get the name of the reciepeint
 	if(!empty($recipient_id))
 	{ // If the email is to a registerd user get the email address from the users table
-		$sql="SELECT user_firstname, user_lastname 
-			FROM ".$tableusers." 
-			WHERE ID='$recipient_id'";
-		$row = $DB->get_row( $sql );
-		$recipient_name = $row->user_firstname ." ". $row->user_lastname;
+		$user = get_userdata( $recipient_id );
+		$user = new User($user);
+		$recipient_name = $user->get('preferedname');
 	}
 	elseif (!empty($comment_id))
 	{ // If the email is to a non user comment poster get the email address from the comments table
