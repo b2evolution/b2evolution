@@ -163,7 +163,7 @@
 				{
 				?>
 				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
-				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" /></form>
+				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" /></form>
 				<?php
 				}
 
@@ -256,7 +256,7 @@
 						?>
 						<!-- Do not add spaces or line breaks into the following forms. IE would display extra spacing -->
 						<form action="b2edit.php" method="get" class="inline"><input type="hidden" name="action" value="editcomment" /><input type="hidden" name="comment" value="<?php $Comment->ID() ?>" /><input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" /></form>
-						<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php $Comment->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" /></form>
+						<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php $Comment->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( /* TRANS: Warning this is a javascript string */ T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" /></form>
 						<?php
 						}
 						?>

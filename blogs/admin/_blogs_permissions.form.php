@@ -199,7 +199,7 @@
 				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search" <?php
 				if( $current_User->ID != 1 )
 				{	// warning if a user withdraws own permission to edit the blog's properties
-					echo 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\'' /* TRANS: Javascript string */ .T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"';
+					echo 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"';
 				}
 				?> />
 				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />

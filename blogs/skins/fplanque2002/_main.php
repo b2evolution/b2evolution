@@ -198,7 +198,6 @@
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
 		<input type="submit" value="<?php echo T_('Get selection') ?>" />
-		<input type="reset" value="<?php echo T_('Reset form') ?>" />
 		</form>
 	</div>
 
