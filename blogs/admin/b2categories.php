@@ -286,8 +286,9 @@ switch($action)
 		if( $blog == 0 || ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 		{	// No blog could be selected
 			?>
-			<div class="panelblock">
-			<?php printf( T_('Sorry, you have no permission to edit/view any category\'s properties.' ) ); ?>
+			<div class="panelinfo">
+			<p>
+			<?php echo T_('Sorry, you have no permission to edit/view any category\'s properties.' ) ?></p>
 			</div>
 			<?php
 			break;

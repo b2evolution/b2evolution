@@ -8,9 +8,6 @@
  *
  * @package admin
  */
-?>
-<div class="panelblock">
-<?php
 for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = blog_list_next() )
 {
 	if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )
@@ -21,6 +18,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 	{
 		$atleastoneshown = true;
 		?>
+		<div class="panelblock">
 		<h2><?php echo T_('Blogs') ?>:</h2>
 		<table class="thin">
 		<tr>
@@ -98,16 +96,19 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 
 if( !isset( $atleastoneshown ) )
 { // no blog was listed because user has no rights
+	echo '<div class="panelinfo">';
 	echo '<P>'.T_('Sorry, you have no permission to edit/view any blog\'s properties.' ).'</p>';
 }
 else
 { // close table
 	?>
-</table>
-<?php
+	</table>
+	<?php
 }
+
 if( $current_User->check_perm( 'blogs', 'create' ) )
 { ?>
 	<p class="center"><a href="b2blogs.php?action=new"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New blog...') ?></a></p>
-<?php } ?>
+	<?php 
+} ?>
 </div>
