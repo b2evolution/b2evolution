@@ -21,12 +21,12 @@
 	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\"?".">";
 ?>
-<!-- generator="b2evolution/<?php echo $b2_version ?>" -->
+<!-- generator="<?php echo $app_name ?>/<?php echo $app_version ?>" -->
 <rss version="0.92">
 	<channel>
-		<title><?php 
+		<title><?php
 			$Blog->disp( 'name', 'xml' );
-			single_cat_title( ' - ', 'xml' ); 
+			single_cat_title( ' - ', 'xml' );
 			single_month_title( ' - ', 'xml' );
 			single_post_title( ' - ', 'xml' );
 			last_comments_title( ' - ', 'xml' ) ;

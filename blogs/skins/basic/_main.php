@@ -56,8 +56,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		profile_title( ' - ', 'htmlhead' );
 	?>
 	</title>
-	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
+	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 </head>
 <body>
 

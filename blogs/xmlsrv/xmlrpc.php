@@ -1187,7 +1187,7 @@ function pingback_ping( $m )
 {
 
 	global $DB, $notify_from, $xmlrpcerruser;
-	global $baseurl, $b2_version;
+	global $baseurl;
 	global $localtimenow, $Messages;
 
 	$log = debug_fopen('./xmlrpc.log', 'w');
@@ -1429,7 +1429,7 @@ function pingback_ping( $m )
 
 //---------- Tor Jan 2005 Metaweblog experimental API ----------------
 //
-//---------- NB! This implementation is still rather lax with some of the security 
+//---------- NB! This implementation is still rather lax with some of the security
 
 
 
@@ -1440,7 +1440,7 @@ function pingback_ping( $m )
 
 //  Last update 23012004
 
-// image upload 
+// image upload
 
 //  image is supplied coded in the info struct as bits
 
@@ -1464,7 +1464,7 @@ function mwnewMediaObj($m) {
 
 		logIO("O","start of _newmediaobject...");
 
-		
+
 
 		// - getting parameters
 
@@ -1518,13 +1518,13 @@ function mwnewMediaObj($m) {
 
 					logIO("O", 'Have decoded data data?'."\n");
 
-		
+
 
 		// - check filesize TODO
 
 
 
-		
+
 
 		// - check if filetype is allowed (check filename) TODO
 
@@ -1550,9 +1550,9 @@ function mwnewMediaObj($m) {
 
 		// this to avoid nameclashes
 
-			$filename = strftime("%Y%m%d-", time()) . $filename;	
+			$filename = strftime("%Y%m%d-", time()) . $filename;
 
-			
+
 
 		// create file
 
@@ -1577,9 +1577,9 @@ function mwnewMediaObj($m) {
 
 				return _ERROR_BADPERMISSIONS;
 
-			umask($oldumask);				
+			umask($oldumask);
 
-		} 
+		}
 
 
 
@@ -1589,13 +1589,13 @@ function mwnewMediaObj($m) {
 
 		$fh = @fopen($fileupload_realpath ."/". $filename, 'wb');
 
-		
+
 
 		logIO("O", 'Managed  to open file ->'. $filename ."\n");
 
-		
 
-		if (!$fh) 
+
+		if (!$fh)
 
 			return _ERROR_UPLOADFAILED;
 
@@ -1615,19 +1615,19 @@ function mwnewMediaObj($m) {
 
 		logIO("O", 'Ready to chmod file ->'. $filename ."\n");
 
-		
+
 
 		// chmod uploaded file
 
 		$oldumask = umask(0000);
 
-		@chmod($fileupload_realpath . "/" . $filename, 0644); 
+		@chmod($fileupload_realpath . "/" . $filename, 0644);
 
-		umask($oldumask);		
+		umask($oldumask);
 
 		logIO("O", 'Full returned filename ->'. $fileupload_realpath . '/' . $filename ."\n");
 
-		
+
 
 		// - return URL as XML
 
@@ -1635,19 +1635,19 @@ function mwnewMediaObj($m) {
 
 			"url" => new xmlrpcval($baseurl . "/media". "/" . $blogid  . "/" . $filename,'string')
 
-		),'struct');		
+		),'struct');
 
-		
+
 
 		return new xmlrpcresp($urlstruct);
 
 	}
 
-	
 
-	
 
-	
+
+
+
 
 	// metaWeblog.newMediaObject
 
@@ -1657,7 +1657,7 @@ function mwnewMediaObj($m) {
 
 		$xmlrpcStruct,		// "url" element
 
-		
+
 
 		// params
 
@@ -1687,7 +1687,7 @@ $mwnewpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 
 $mwnewpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
 
-/** 
+/**
 
  * mw.newPost
 
@@ -1709,13 +1709,13 @@ function mwnewpost($m)
 	global $Settings, $Messages, $UserCache,$tablecategories;;
 	logIO("O","start of mwnewpost...");
 
-	
+
 
 	$blogid = $m->getParam(0);
 
 	$blogid = $blogid->scalarval();
 
-	
+
 
 	$username = $m->getParam(1);
 
@@ -1934,7 +1934,7 @@ function mwnewpost($m)
 
 	// INSERT NEW POST INTO DB:
 
-	// Tor - comment this out to stop inserts into database 
+	// Tor - comment this out to stop inserts into database
 
 //	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
 	// INSERT NEW POST INTO DB:
@@ -1990,7 +1990,7 @@ $mweditpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 
 $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
 
-/** 
+/**
 
  * mw.EditPost
 
@@ -2014,7 +2014,7 @@ function mweditpost($m)
 	global $Messages, $UserCache,$Settings;
 	logIO("O","start of mwnewpost...");
 
-	
+
 
 	$blogid = $m->getParam(0);
 
@@ -2025,7 +2025,7 @@ function mweditpost($m)
 
 	logIO("O","finished getting post_ID ...".$post_ID);
 
-	
+
 
 	$username = $m->getParam(1);
 
@@ -2207,7 +2207,7 @@ function mwgetcats( $m )
 
 
 
-	$sql = "SELECT * 
+	$sql = "SELECT *
 
 					FROM $tablecategories ";
 
@@ -2215,7 +2215,7 @@ function mwgetcats( $m )
 
 	$sql .= "ORDER BY cat_name ASC";
 
-	
+
 
 	$rows = $DB->get_results( $sql );
 
@@ -2402,7 +2402,7 @@ function metawebloggetrecentposts( $m )
 
 											' - Modified: '.$Item->mod_date );
 
-		
+
 
 		$post_date = mysql2date("U", $Item->issue_date);
 
@@ -2424,9 +2424,9 @@ function metawebloggetrecentposts( $m )
 
 		$authorname = $Item->Author->get('preferedname');
 
-		
 
-		
+
+
 
 		// need a loop here to extract all categoy names
 
@@ -2434,7 +2434,7 @@ function metawebloggetrecentposts( $m )
 
 		$hope_cat_name = get_the_category_by_ID($Item->main_cat_ID);
 
-		
+
 
 		$test = $Item->extra_cat_IDs[0];
 
@@ -2616,7 +2616,7 @@ function mwgetpost($m)
 
 											),"struct");
 
-											
+
 
 			$resp = $struct;
 
@@ -2663,9 +2663,9 @@ function mwgetpost($m)
 
 $s=new xmlrpc_server(
 				array(
-				
-				
-				
+
+
+
 
 							 "metaWeblog.newMediaObject" =>
 
@@ -2695,7 +2695,7 @@ $s=new xmlrpc_server(
 
 										 "docstring" => $mweditpost_doc),
 
-										 
+
 
 							"metaWeblog.getPost" =>
 
@@ -2705,9 +2705,9 @@ $s=new xmlrpc_server(
 
 									 "docstring" => $mwgetpost_doc),
 
-									 
 
-									 							
+
+
 
 							"metaWeblog.getCategories" =>
 
@@ -2717,9 +2717,9 @@ $s=new xmlrpc_server(
 
 										 "docstring" => $mwgetcats_doc),
 
-										 
 
-										 
+
+
 
 							 "metaWeblog.getRecentPosts" =>
 
@@ -2742,8 +2742,8 @@ $s=new xmlrpc_server(
 										 "signature" => $b2getcategories_sig,
 
 										 "docstring" => $b2getcategories_doc),
-										 
-																	 
+
+
 
 							"mt.getPostCategories" =>
 

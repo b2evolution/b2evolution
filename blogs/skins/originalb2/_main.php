@@ -52,7 +52,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 <head xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<title><?php $Blog->disp( 'name', 'htmlbody' ) ?><?php single_post_title(' :: ', 'htmlhead') ?><?php single_cat_title(' :: ', 'htmlhead') ?><?php single_month_title(' :: ', 'htmlhead') ?></title>
-	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
+	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
@@ -62,7 +62,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	@import url(layout2b.css);
 	</style>
 	<link rel="stylesheet" type="text/css" media="print" href="print.css" />
-	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />

@@ -23,15 +23,15 @@
 	echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 ?>
 <feed version="0.3" xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
-	<title><?php 
+	<title><?php
 		$Blog->disp( 'name', 'xml' );
-		single_cat_title( ' - ', 'xml' ); 
+		single_cat_title( ' - ', 'xml' );
 		single_month_title( ' - ', 'xml' );
 		single_post_title( ' - ', 'xml' );
 	?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
 	<tagline><?php $Blog->disp( 'shortdesc', 'xml' ) ?></tagline>
-	<generator url="http://b2evolution.net/" version="<?php echo $b2_version ?>">b2evolution</generator>
+	<generator url="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 	<modified><?php $MainList->mod_date( 'isoZ', true ) ?></modified>
 	<?php while( $Item = $MainList->get_item() ) {	?>
 	<entry>

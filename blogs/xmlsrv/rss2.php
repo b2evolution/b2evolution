@@ -21,12 +21,12 @@
 	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\"?".">";
 ?>
-<!-- generator="b2evolution/<?php echo $b2_version ?>" -->
+<!-- generator="<?php echo $app_name ?>/<?php echo $app_version ?>" -->
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://webns.net/mvcb/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/">
 	<channel>
-		<title><?php 
+		<title><?php
 			$Blog->disp( 'name', 'xml' );
-			single_cat_title( ' - ', 'xml' ); 
+			single_cat_title( ' - ', 'xml' );
 			single_month_title( ' - ', 'xml' );
 			single_post_title( ' - ', 'xml' );
 		?></title>
@@ -34,14 +34,14 @@
 		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://backend.userland.com/rss</docs>
-		<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
+		<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
 		<ttl>60</ttl>
 		<?php while( $Item = $MainList->get_item() ) {	?>
 		<item>
 			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 			<link><?php $Item->permalink( 'single' ) ?></link>
 			<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
-			<?php // Disabled because of spambots: <author><php the_author_email( 'xml' ) ></author>?>
+			<?php /* Disabled because of spambots: <author><php the_author_email( 'xml' ) ></author> */ ?>
 			<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
 			<guid isPermaLink="false"><?php the_ID() ?>@<?php echo $baseurl ?></guid>
 			<description><?php
