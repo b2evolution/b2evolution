@@ -233,12 +233,16 @@ class Results extends Widget
 		// { // there was a coma or a JOIN clause in the FROM clause of the original query,
 		// Tentative 2:
 		// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
-		if( preg_match( '#\s DISTINCT \s#six', $sql_count ) )
+		// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
+		if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
 		{ //
 			// Get rid of any Aliases in colmun names:
-			$sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
+			// $sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
 			// ** We must use field names in the COUNT **
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
+			//$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
+
+			//Tentative 3: we do a distinct on the first field only when counting:
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( DISTINCT '.$matches[1].' ) FROM', $sql_count );
 		}
 		else
 		{ // Single table request: we must NOT use field names in the count.
@@ -942,6 +946,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.16  2005/03/02 15:37:59  fplanque
+ * experimentoing better count() automation :/
+ *
  * Revision 1.15  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
