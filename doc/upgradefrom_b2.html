@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>my b2evolution: Upgrading from the original b2</title>
+<!-- InstanceEndEditable --><link href="../blogs/install/b2evo.css" rel="stylesheet" type="text/css" />
+ 
+<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+</head>
+<body>
+<div id="rowheader" >
+<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
+<div id="tagline">A blog tool like it oughta be!</div>
+<h1 id="version">Version: 0.8.2</h1>
+<div id="quicklinks">Setup Links: <a href="../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="../blogs/install/install.php">My DB Install</a> &middot; <a href="../blogs/index.php">My Blogs</a> &middot; <a href="../blogs/admin/b2login.php">My Back-Office</a></div>
+</div>
+<!-- InstanceBeginEditable name="Main" -->
+<h2>Upgrading from the original b2</h2>
+<p class="small">The upgrade procedure below is for upgrading an original b2 installation. If you are upgrading from an older version of b2evolution, this does not apply to you.</p>
+<p>The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, I think versions 0.5.x should also upgrade  without problems. Anyway, if you run any old version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message.</p>
+<p><em>As always, it is very wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new.</em></p>
+<p>Once you have unzipped the b2evolution distribution:</p>
+<ol class="expanded">
+<li>On your server, locate the mysql database you are already using for b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your b2 data in any way!<br />
+    <small><span class="small"><br />
+    <strong>Note 1:</strong> Unless you changed the config, b2evolution uses tables prefixed with <code>evo_</code> where the orginial b2 used tables prefixed with <code>b2</code>.<br />
+    <strong>Note 2:</strong> Your existing b2 tables and data will not be altered in any way by b2evolution. b2evolution only copies your existing data from <code>b2</code> tables to new <code>evo_</code> tables.<br />
+    <strong>Note 3:</strong> Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database.</span></small></li>
+  <li> On your computer, edit the file <b>/blogs/conf/b2evo_config.php</b> with a text editor and set the parameters according to your current configuration. There are basically 3 things to set:
+      <ul>
+        <li>Your e-mail address</li>
+        <li>Access information to your database (hostname, basename, login, password)</li>
+      <li>The URL where you are going to run b2evolution<br />
+          <span class="small"><br />
+          <strong>Note:</strong> It is recommended that you do a first test installation and/or upgrade by uploading the whole demo structure to your website, starting with the folder b2evolution. This way, your new blogs will have an URL of the form: http://www.yoursite.com/b2evolution/blogs/index.php, http://www.yoursite.com/b2evolution/blogs/blog_b.php, etc.<br />
+        This way, you also leave your existing b2 running safe as is, until you feel comfortable with the upgrade process to work as you expect.<br />
+        Of course you can change this later. By then, you will probably want to upload just the contents of your &quot;blogs&quot; folder, to the exact place your original b2 blog was running.</span></li>
+      </ul>
+  </li>
+  <li>Upload the files to your website, according to the URL you have just configured.</li>
+  <li><strong>Come back to this page on your server</strong>, (should be something like http://www.yoursite.com/b2evolution/doc/upgradefrom_b2.html) and <a href="../blogs/install/install.php">run the database tables installation</a>. This will allow you to create database tables for b2evo and to <strong>copy</strong> of your existing b2 data into them.</li>
+  <li>You can now <a href="../blogs/index.php">read the blogs</a> or <a href="../blogs/admin/b2login.php">log into the back-office</a> and start playing! <img src="../blogs/img/smilies/icon_wink.gif" width="15" height="15" class="middle" /></li>
+  <li>On production servers, <strong>it is strongly recommended that you delete the <b>/blogs/install/</b> subfolder</strong>.</li>
+  <li>
+    <p>After basic install is done, there are a few <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things you may need to take care of</a>. (online manual)</p>
+  </li>
+  <li>
+    <p>To upgrade your existing b2 template, please read the <a href="http://b2evolution.net/man/install/upgradefrom_b2.html#template">online manual about upgrading your b2 template</a>. (online manual)</p>
+  </li>
+</ol>
+<!-- InstanceEndEditable -->
+<div id="rowfooter">
+<a href="http://b2evolution.net/">official website</a> &middot; <a href="http://b2evolution.net/about/license.html">GNU GPL license</a> &middot; <a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
+</div>
+
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,237 @@
+/* Designed by François PLANQUE http://fplanque.net/ */
+
+div.main {
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+/* Styles for main area (left) */
+h2 {
+	margin-left: 8px;
+}
+
+/* Styles for posts */
+.bPosts {
+	vertical-align: top;
+	float: left;
+	width: 66%;
+	overflow: hidden;
+}
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin-right: 10px;
+	margin-left: 20px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dashed #000000;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.bSmallHead {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	color: #339999;
+}
+.bTitle {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bMore
+{
+	text-align: center;
+}
+.bMore a
+{
+	font-weight: bold;
+	font-size: 110%;
+}
+.bSmallPrint,
+.bCommentSmallPrint
+{
+	clear: both;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+/* Styles for comments */
+.bComment {
+	margin-right: 20px;
+	margin-left: 20px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dotted #33CCCC;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.bCommentTitle {
+	margin-top: 8px;
+	margin-bottom: 8px;
+	font-weight: bold;
+}
+.bCommentText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+/* Styles for comment form */
+form.bComment fieldset
+{
+	clear: both;
+	border: none;
+	margin: 2ex 0ex;
+	padding: 0ex;
+	/* border: 1px solid #f00; */
+}
+div.label
+{
+	float: left;
+	width: 18%;
+	text-align: right;
+	font-weight: bold;
+	position: relative;
+	top: .5ex;
+	/* border: 1px solid #00f; */
+}
+form.bComment label
+{
+	font-weight: bold;
+}
+div.input
+{
+	float: right;
+	width: 80%;
+	/* border: 1px solid #00f; */
+}
+input.bComment, 
+textarea.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 98%;
+	margin: 0ex;
+}
+fieldset .notes
+{
+	/* display: block; */
+	font-size: 80%;
+	color: #999999;
+}
+
+
+/* Styles for stats */
+div.statbloc
+{
+	float: left;
+	width: 44%;
+	margin-left: 2%; 
+	margin-right: 0%; 
+	margin-bottom: 2ex;
+	border: 1px solid #33BBBB;
+}
+div.statbloc h3
+{
+	margin-top: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+	color: #FFFFFF;
+	text-align: center;
+	background: #33BBBB;
+	padding: 1ex;
+}
+
+
+/* Styles for sidebar (right) */
+.bSideBar {
+	width: 33%;
+	vertical-align: top;
+	float: right;
+	overflow: hidden;
+}
+.bSideItem {
+	margin-right: 20px;
+	margin-left: 10px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dashed #CCCCCC;
+	padding: 8px;
+}
+.bSideItem h3 {
+	margin-top: 0px;
+	margin-bottom: 8px;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+input.SearchField
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 96%;
+	margin: 0ex;
+}
+
+/* Styles for Calendar: */
+caption.bCalendarMonth
+{
+	border-left: solid 1px #ccc;
+	border-right: solid 1px #ccc;
+	border-top: solid 1px #ccc;
+	margin: auto;
+}
+table.bCalendarTable
+{
+	margin: auto;
+	font-size: 84%;
+	border: solid 1px #ccc;
+}
+tr.bCalendarRow
+{
+	text-align: center;
+}
+th.bCalendarHeaderCell
+{
+	font-size: 84%;
+}
+td.bCalendarCell
+{
+}
+td.bCalendarEmptyCell
+{
+}
+a.bCalendarLinkPost
+{
+	font-weight: bold;
+}

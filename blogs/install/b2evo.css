@@ -1,0 +1,178 @@
+/* Global page layout */
+#rowheader {
+	text-align: center;
+	margin-bottom: 1em;
+}
+#rowfooter {
+	margin-top: 1em;
+	clear: both;
+	text-align: center;
+	border-top: 1px solid #CCCCCC;
+	padding-top: 1ex;
+	color: #ccc;
+	font: 70% Verdana, Arial, Helvetica, sans-serif;
+}
+
+/* For the site header: */
+h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 240%;
+	color: #f90;
+	margin: 0ex;
+}
+#tagline{
+	position: relative;
+	font-style: italic;
+	bottom: 20px;
+}
+#version{
+	position: relative;
+	bottom: 15px;
+	margin-bottom: .3ex;
+}
+#quicklinks {
+	border-top: 1px solid #f90;
+	border-bottom: 1px solid #f90;
+	background-color: #fc9;
+	text-align: center;
+	font: bold 84% Verdana, Arial, Helvetica, sans-serif;
+	padding-top: .1em;
+	padding-bottom: .1em;
+}
+
+
+/* Content styles: */
+h2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 200%;
+	color: #f90;
+	margin-top: 0em;
+}
+h2.next
+{	/* First title in content */
+	margin-top: 1ex;
+}
+h3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 140%;
+	color: #f90;
+}
+h4 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 100%;
+	color: #f90;
+}
+blockquote {
+	border: 2px dotted #999;
+	background-color: #eee;
+	padding-left: 1em;
+	padding-right: 1em;
+	font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+/* Image layout */
+div.FigZone {
+	text-align: center;
+	font: 84% Arial, Helvetica, sans-serif;
+}
+div.FigZone img{
+	border: 0px none;
+	margin: 0ex;
+}
+div.FigCaption {
+	height: 2.5em;
+	margin-top: 1ex;
+}
+div.FigCent240 {
+	float: left;
+	width: 264px;
+	padding: 12px 0ex;
+	margin-right: 1ex;
+	margin-bottom: 1ex;
+	background-color: #ddd;
+	border: 1px solid #aaa;
+	text-align: center;
+}
+
+/* For the site footer: */
+
+
+/* Genral styles */
+body
+{
+	background: #fff;
+	color: #000;
+}
+a:link,
+{
+	color: #6699CC;
+}
+a:active,
+a:visited
+{
+	color: #336699;
+}
+a:hover
+{
+	color: #f90;
+}
+hr {
+	height: 0px;
+	width: 100%;
+	border: 1px solid #ccc;
+}
+
+img.top {
+	vertical-align: top;
+	border: 0px;
+}
+img.middle {
+	vertical-align: middle;
+	border: 0px;
+	margin: 0px;
+}
+img.leftmargin {
+	float: left;
+	border: 0px;
+	margin-right: 1ex;
+	margin-top: .2ex;
+	margin-bottom: .2ex;
+}
+img.rightmargin {
+	float: right;
+	border: 0px;
+	margin-left: 1ex;
+	margin-top: .2ex;
+	margin-bottom: .2ex;
+}
+	
+.right{
+	text-align: right;
+}
+.clear
+{
+	clear: both;
+}.subtitle {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+ul.expanded li, ol.expanded li
+{
+	margin-top: 2ex;
+	margin-bottom: 2ex;
+}
+.small {
+	font-size: 84%;
+}
+fieldset
+{
+	border: 1px solid #ddd;
+	margin: 1em;
+	padding-bottom: 2ex;
+	padding-left: 2ex;
+	padding-right: 2ex;
+}
+legend
+{
+	font-weight: bold;
+}

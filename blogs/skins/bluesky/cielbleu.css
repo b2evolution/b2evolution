@@ -1,0 +1,149 @@
+BODY {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND-IMAGE: url(img/ciel3.jpg); PADDING-BOTTOM: 10px; MARGIN: 0px; COLOR: white; PADDING-TOP: 0px; BACKGROUND-REPEAT: no-repeat; FONT-FAMILY: verdana, arial, helvetica, sans-serif; BACKGROUND-COLOR: #4c69b9;
+	font-size: 84%;
+}
+
+H1 {
+	MARGIN-LEFT: 0.5em;
+	margin-bottom: 0ex;
+}
+H2 {
+	MARGIN-BOTTOM: 4px
+}
+.infos H3 {
+	FONT-SIZE: smaller; TEXT-ALIGN: right
+}
+.infos H4 A:unknown {
+	content: '| '
+}
+A {
+	COLOR: white; BACKGROUND-COLOR: transparent
+}
+A:link {
+	
+}
+A:visited {
+	
+}
+A:hover {
+	COLOR: #4c69b9; BACKGROUND-COLOR: white
+}
+#main {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 10px; MARGIN: 0px 33ex 0px 10px; PADDING-TOP: 10px
+}
+#tagline {
+	MARGIN-LEFT: 1em;
+	font-weight: bold;
+}
+#main .infos {
+	TEXT-ALIGN: right
+}
+.infos H3 {
+	DISPLAY: inline
+}
+.infos H4 {
+	DISPLAY: inline
+}
+.bPost, .bComment {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; MARGIN-BOTTOM: 15px; PADDING-BOTTOM: 10px; BORDER-LEFT: white 1px dotted; PADDING-TOP: 0px; BORDER-BOTTOM: white 1px dotted; moz-border-radius: 20px
+}
+.article {
+	LINE-HEIGHT: 140%
+}
+#main A {
+	FONT-WEIGHT: bold; COLOR: white; TEXT-DECORATION: none
+}
+#main A:hover {
+	COLOR: #4c69b9; BACKGROUND-COLOR: white
+}
+UNKNOWN {
+	FONT-WEIGHT: bold; COLOR: silver; content: " [" attr(hreflang) "]"
+}
+#main Q {
+	FONT-STYLE: italic; quotes: '« ' ' »' '“ ' ' ”'
+}
+DIV.interaction {
+	TEXT-ALIGN: right
+}
+DIV.storyTitle {
+	MARGIN-TOP: 2em
+}
+#menu {
+	BORDER-RIGHT: #999 1px solid;
+	PADDING-RIGHT: 10px;
+	PADDING-LEFT: 10px;
+	RIGHT: 20px;
+	BACKGROUND-IMAGE: url(img/white80.png);
+	PADDING-BOTTOM: 10px;
+	WIDTH: 25ex;
+	COLOR: #4c69b9;
+	PADDING-TOP: 10px;
+	BORDER-BOTTOM: #999 1px solid;
+	POSITION: absolute;
+	TOP: 100px;
+	voice-family: inherit;
+	height: 1208px;
+
+}
+UNKNOWN {
+	WIDTH: 25ex;
+}
+#menu A {
+	COLOR: #4c69b9; BACKGROUND-COLOR: transparent; TEXT-DECORATION: none
+}
+#menu A:hover {
+	COLOR: #eee; BACKGROUND-COLOR: #4c69b9
+}
+#menu H4 {
+	FONT-SIZE: 14px; MARGIN: 12px 0px 4px
+}
+#menu UL {
+	PADDING-left: 0px; 
+	MARGIN-left: 1ex; 
+}
+#menu LI {
+	list-style: none;
+}
+UNKNOWN {
+	
+}
+.center {
+	TEXT-ALIGN: center
+}
+FIELDSET {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; BORDER-TOP-STYLE: none; PADDING-TOP: 0px; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+.contenucomment LABEL {
+	FONT-WEIGHT: bold; FLOAT: left; MARGIN-LEFT: 1em; WIDTH: 9.1em
+}
+.contenucomment INPUT {
+	MARGIN-LEFT: 1em; WIDTH: 20em
+}
+.contenucomment TEXTAREA {
+	MARGIN-LEFT: 1em; WIDTH: 20em
+}
+.fincomment {
+	MARGIN-TOP: 1em; MARGIN-LEFT: 11em
+}
+.author {
+	MARGIN-BOTTOM: 0px
+}
+#prelude {
+	MARGIN-LEFT: 1em
+}
+form
+{
+	margin: 0ex;
+	padding: 0ex;
+}
+img.logo
+{
+	padding: 2px;
+	border: none;
+	vertical-align: middle;
+}
+.baseline
+{
+	border-top: 1px solid #FFFFFF;
+	margin: 2ex;
+}

@@ -1,0 +1,17 @@
+# Apache configuration for the backoffice folder
+
+# this will select the default page to be displayed
+# if the URL is just .../blogs/b2/
+DirectoryIndex b2edit.php
+
+
+# edit_actions is the only file performing long operations
+# having gzip encoding here would prevent progressive output
+# so we want to deactivate this
+# NOTE: We still have to configure sending in smaller chunks!
+# Anyone know how to do this?? :)
+<Files edit_actions.php>
+	<IfModule mod_gzip.c>
+		mod_gzip_on                   No
+	</IfModule>
+</Files>
