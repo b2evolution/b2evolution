@@ -13,6 +13,8 @@
 class Settings
 {
 	/**
+	 * Constructor
+	 *
 	 * loads settings, checks db_version
 	 */
 	function Settings()
@@ -34,8 +36,9 @@ class Settings
 		}
 
 		if( !isset($this->db_version ) || $new_db_version != $this->db_version->value )
-		{
-			die( T_('Sorry, your b2evolution database does not match the script version.') );
+		{	// Database is not up to date:
+			$error_message = 'Database is not up to date.';
+			require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
 		}
 	}
 

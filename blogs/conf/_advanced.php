@@ -258,6 +258,7 @@ $plugins_subdir_dirout = '..';               // Relative path to go back to base
 /**
  * Location of the install folder.
  */
+$install_subdir = 'install';                 // Subdirectory relative to base
 $install_dirout = '..';                      // Relative path to go back to base
 
 

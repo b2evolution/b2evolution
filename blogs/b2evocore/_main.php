@@ -44,14 +44,9 @@ require_once( dirname(__FILE__). '/_class_toolbars.php');
 
 
 if( !$config_is_done )
-{
-	echo '<div style="text-align:center">
-				<img src="'.$img_url.'/b2evolution_logo_360.gif" />
-				<br />version '.$b2_version.'<br />
-				Welcome to b2evolution <br />
-				<p>You don\'t seem to have done the installation yet.. <a href="'.$baseurl.'/install/index.php">please go there</a></p>
-				</div>';
-	exit;
+{	// base config is not done.
+	$error_message = 'Base configuration is not done.';
+	require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
 }
 
 
