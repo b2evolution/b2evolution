@@ -33,7 +33,7 @@ class poplog_Rendererplugin extends RendererPlugin
 	 */
 	function poplog_Rendererplugin()
 	{
-		global $blog, $Settings;
+		global $Settings;
 
 		$this->short_desc = T_('Poplog');
 		$this->long_desc = T_('Rewrites URLs so that we can count them');
@@ -69,6 +69,7 @@ class poplog_Rendererplugin extends RendererPlugin
 	 */
 	function render( & $content, $format )
 	{
+		global $blog;
 		if( ! parent::render( $content, $format ) )
 		{	// We cannot render the required format
 			return false;

@@ -97,8 +97,7 @@
 			if( ($curr_blog_ID == 1) && empty( $cat_all ) ) continue; // Hide blog 1 if requested
 
 			echo $cat_blog_start;
-			?>
-			<a href="<?php blog_list_iteminfo('blogurl', 'raw') ?>"><?php blog_list_iteminfo('name', 'htmlbody') ?></a>
+			?><a href="<?php blog_list_iteminfo('blogurl', 'raw') ?>"><?php blog_list_iteminfo('name', 'htmlbody') ?></a>
 			<?php
 			echo $cat_blog_end;
 	

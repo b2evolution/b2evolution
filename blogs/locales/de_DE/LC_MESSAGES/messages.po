@@ -5178,7 +5178,7 @@ msgstr "Trackback Adresse für diesen Eintrag:"
 #: ..\..\..\skins\_feedback.php:91
 #, php-format
 msgid "No %s for this post yet..."
-msgstr "bisher keine %s für diesen Eintrag"
+msgstr "Bisher keine %s für diesen Eintrag..."
 
 #: ..\..\..\skins\_feedback.php:179
 msgid "Your email address will <strong>not</strong> be displayed on this site."
