@@ -1,7 +1,7 @@
 <?php
 /*
  * This is b2evolution's admin config file
- * Version of this file: 0.8.5
+ * Version of this file: 0.8.7
  *
  * This sets how the back-office works
  *

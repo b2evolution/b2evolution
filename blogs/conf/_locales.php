@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution localization & language config
- * Version of this file: 0.8.6
+ * Version of this file: 0.8.7
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -39,7 +39,7 @@ $languages = array(
 $default_locale = 'en_US';
 
 
-//$default_locale = 'fr_FR';			// For testing :))
+$default_locale = 'fr_FR';			// For testing :))
 
 
 #  and localization:

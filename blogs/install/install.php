@@ -20,6 +20,8 @@
 <h2>Database tables installation</h2>
 <p>PHP version: <?php echo phpversion(); ?></p>
 <?php
+	$test = 1;
+
 	list( $version_main, $version_minor ) = explode( '.', phpversion() );
 	if( ($version_main*100+$version_minor) < 401 )
 	{
@@ -985,7 +987,9 @@ switch( $action )
 	
 		<p><input type="radio" name="action" value="evodb"> <strong>Upgrade from a previous version of b2evolution</strong>: This will upgrade your b2evolution database in order to make it compatible with the current version!</p>
 
+		<?php if( $test ) { ?>
 		<p><input type="radio" name="action" value="redocurrentupgrade"> <strong>DEVELOPMENT ONLY</strong>: Redo the current upgrade step to match your DB with current dev base!</p>
+		<?php } ?>
 
   	<p><input type="radio" name="action" value="upgradedb"> <strong>Upgrade from original b2</strong>: Install b2evolution tables and copy your existing b2 data into them. </p>
 

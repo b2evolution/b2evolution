@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-03-08 18:11+0100\n"
+"POT-Creation-Date: 2004-03-08 18:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -603,23 +603,23 @@ msgstr ""
 msgid "Allow Back"
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:165
+#: ..\..\..\admin\b2antispam.php:164
 msgid "Report abuse to centralized ban blacklist!"
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:171
+#: ..\..\..\admin\b2antispam.php:170
 msgid "Request abuse update from centralized blacklist."
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:175
+#: ..\..\..\admin\b2antispam.php:174
 msgid "Add a banned keyword"
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:178
+#: ..\..\..\admin\b2antispam.php:177
 msgid "Keyword"
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:181
+#: ..\..\..\admin\b2antispam.php:180
 msgid "Ban this keyword!"
 msgstr ""
 
@@ -738,8 +738,8 @@ msgstr ""
 #: ..\..\..\admin\edit_actions.php:215
 #: ..\..\..\admin\edit_actions.php:303
 #: ..\..\..\admin\edit_actions.php:370
-#: ..\..\..\b2evocore\_functions_antispam.php:269
-#: ..\..\..\b2evocore\_functions_antispam.php:377
+#: ..\..\..\b2evocore\_functions_antispam.php:272
+#: ..\..\..\b2evocore\_functions_antispam.php:380
 #: ..\..\..\b2evocore\_functions_pings.php:52
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:146
@@ -2578,20 +2578,20 @@ msgstr ""
 msgid "URL not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:163
+#: ..\..\..\b2evocore\_functions_antispam.php:166
 #, php-format
 msgid "Banning the keyword %s..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:170
+#: ..\..\..\b2evocore\_functions_antispam.php:173
 msgid "Removing all related comments and hits..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:236
+#: ..\..\..\b2evocore\_functions_antispam.php:239
 msgid "Reporting abuse to b2evolution.net..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:274
+#: ..\..\..\b2evocore\_functions_antispam.php:277
 #: ..\..\..\b2evocore\_functions_pings.php:57
 #: ..\..\..\b2evocore\_functions_pings.php:92
 #: ..\..\..\b2evocore\_functions_pings.php:149
@@ -2601,40 +2601,40 @@ msgstr ""
 msgid "Aborted (Running on localhost)."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:294
+#: ..\..\..\b2evocore\_functions_antispam.php:297
 msgid "Requesting abuse list from b2evolution.net..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:312
+#: ..\..\..\b2evocore\_functions_antispam.php:315
 msgid "Latest update timestamp"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:336
+#: ..\..\..\b2evocore\_functions_antispam.php:339
 msgid "Incomplete reponse."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:343
+#: ..\..\..\b2evocore\_functions_antispam.php:346
 msgid "Adding strings to local blacklist"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:346
+#: ..\..\..\b2evocore\_functions_antispam.php:349
 msgid "Adding:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:349
+#: ..\..\..\b2evocore\_functions_antispam.php:352
 #: ..\..\..\htsrv\getmail.php:303
 msgid "OK."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:353
+#: ..\..\..\b2evocore\_functions_antispam.php:356
 msgid "Not necessary! (Already handled)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:362
+#: ..\..\..\b2evocore\_functions_antispam.php:365
 msgid "New latest update timestamp"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:372
+#: ..\..\..\b2evocore\_functions_antispam.php:375
 msgid "Invalid reponse."
 msgstr ""
 
@@ -3147,6 +3147,18 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_vars.php:179
 msgid "Draft"
+msgstr ""
+
+#: ..\..\..\b2evocore\_vars.php:184
+msgid "Local"
+msgstr ""
+
+#: ..\..\..\b2evocore\_vars.php:185
+msgid "Reported"
+msgstr ""
+
+#: ..\..\..\b2evocore\_vars.php:186
+msgid "Central"
 msgstr ""
 
 #: ..\..\..\conf\_locales.php:22

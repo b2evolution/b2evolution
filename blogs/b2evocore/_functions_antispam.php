@@ -136,13 +136,16 @@ function antiSpam_domain()
 /*
  * antiSpam_domain(-)
  */
-function antispam_source( $disp = true )
+function antispam_source( $disp = true, $raw = false )
 {
-	global $row_stats;
+	global $row_stats, $aspm_sources;
+	$asp_source = $row_stats['aspm_source'];
+	if( ! $raw )
+		$asp_source = T_(	$aspm_sources[$asp_source] );
 	if( $disp )
-		echo $row_stats['aspm_source'];
+		echo $asp_source;
 	else
-		return $row_stats['aspm_source'];
+		return $asp_source;
 }
 
 

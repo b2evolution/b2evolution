@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.6.2
+ * Version of this file: 0.8.7
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */

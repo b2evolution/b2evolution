@@ -158,9 +158,8 @@ switch( $action )
 			</td>
 			<td>
 				<?php 
-					$aspm_source = antispam_source(false);
-					echo $aspm_source;
-					if( $aspm_source == 'local' )
+					antispam_source();
+					if( antispam_source(false,true) == 'local' )
 					{
 					?> [<a href="b2antispam.php?action=report&keyword=<?php antiSpam_domain() ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>">Report</a>]
 				<?php } ?>

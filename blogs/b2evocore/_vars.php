@@ -179,4 +179,11 @@ $post_statuses = array (
 	'draft' => NT_('Draft'),
 );
 
+// the antispam sources:
+$aspm_sources = array (
+	'local' => NT_('Local'),
+	'reported' => NT_('Reported'),
+	'central' => NT_('Central'),
+);
+
 ?>
