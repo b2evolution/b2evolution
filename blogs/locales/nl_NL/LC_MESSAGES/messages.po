@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-04 18:10+0200\n"
+"POT-Creation-Date: 2004-04-05 22:37+0200\n"
 "PO-Revision-Date: 2004-03-22 15:08+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -597,7 +597,7 @@ msgstr "Klaar"
 msgid "Browse blog:"
 msgstr "Blader door weblog"
 
-#: ..\..\..\admin\b2browse.php:59 ..\..\..\admin\b2categories.php:287
+#: ..\..\..\admin\b2browse.php:59 ..\..\..\admin\b2categories.php:291
 #: ..\..\..\admin\b2edit.php:153
 #, php-format
 msgid ""
@@ -633,11 +633,12 @@ msgstr "Nieuwe categorie naam"
 msgid "Create category"
 msgstr "Creeer een categorie"
 
-#: ..\..\..\admin\b2categories.php:149
-msgid "Deleting category..."
+#: ..\..\..\admin\b2categories.php:151
+#, fuzzy, php-format
+msgid "Deleting category #%d : %s ..."
 msgstr "Verwijderen van categorie ..."
 
-#: ..\..\..\admin\b2categories.php:155
+#: ..\..\..\admin\b2categories.php:157
 #: ..\..\..\b2evocore\_functions_users.php:68
 #: ..\..\..\b2evocore\_functions_users.php:99
 #: ..\..\..\htsrv\profile_update.php:48 ..\..\..\htsrv\profile_update.php:57
@@ -650,34 +651,34 @@ msgstr "Verwijderen van categorie ..."
 msgid "ERROR"
 msgstr "FOUT"
 
-#: ..\..\..\admin\b2categories.php:159
+#: ..\..\..\admin\b2categories.php:161
 msgid "Category deleted."
 msgstr "Categorie is verwijdert."
 
-#: ..\..\..\admin\b2categories.php:185
+#: ..\..\..\admin\b2categories.php:186
 msgid "Properties for category:"
 msgstr "Eigenschappen voor categorie"
 
-#: ..\..\..\admin\b2categories.php:188 ..\..\..\admin\b2upload.php:216
+#: ..\..\..\admin\b2categories.php:189 ..\..\..\admin\b2upload.php:216
 #: ..\..\..\admin\_edit_form.php:125 ..\..\..\admin\_edit_showposts.php:258
 #: ..\..\..\admin\_users_groupform.php:26 ..\..\..\admin\_users_list.php:26
 #: ..\..\..\skins\_feedback.php:163 ..\..\..\skins\basic\_feedback.php:151
 msgid "Name"
 msgstr "Naam"
 
-#: ..\..\..\admin\b2categories.php:192
+#: ..\..\..\admin\b2categories.php:193
 msgid "New parent category"
 msgstr "Nieuwe hoofd categorie"
 
-#: ..\..\..\admin\b2categories.php:218 ..\..\..\admin\b2categories.php:237
+#: ..\..\..\admin\b2categories.php:219 ..\..\..\admin\b2categories.php:238
 msgid "Old Parent"
 msgstr "Oud Ouder"
 
-#: ..\..\..\admin\b2categories.php:235
+#: ..\..\..\admin\b2categories.php:236
 msgid "Root (No parent)"
 msgstr "Root (Niks hierboven)"
 
-#: ..\..\..\admin\b2categories.php:246
+#: ..\..\..\admin\b2categories.php:247
 msgid "Edit category!"
 msgstr "Bewerk categorie!"
 
@@ -2821,7 +2822,7 @@ msgstr ""
 msgid "Requested category %s does not exist!"
 msgstr "Opgevraagde categorie %s  bestaat niet!"
 
-#: ..\..\..\b2evocore\_functions_cats.php:599
+#: ..\..\..\b2evocore\_functions_cats.php:599 ..\..\..\install\install.php:99
 msgid "Category"
 msgstr "Categorie"
 
@@ -3621,12 +3622,30 @@ msgstr "(tweemaal)"
 msgid "Register!"
 msgstr "Registreer!"
 
+#: ..\..\..\install\install.php:100
+msgid ""
+"<p>This is the firstd post.</p>\n"
+"\n"
+"<p>It appears on both blog A and blog B.</p>"
+msgstr ""
+
 #: ..\..\..\install\_functions_cafelogupgrade.php:34
 #, php-format
 msgid ""
 "This blog holds all your posts upgraded from Cafelog. This blog is named '%"
 "s'. It has index #%d in the database. By default it is accessed through a "
 "stub file called '<code>%s</code>'. %s"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:356
+msgid "This is a sample blogroll entry"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:356
+msgid ""
+"This is sample text describing the blogroll entry. In most cases however, "
+"you'll want to leave this blank, providing just a Title and an Url for your "
+"blogroll entries (favorite/related sites)."
 msgstr ""
 
 #: ..\..\..\install\_functions_create.php:377
@@ -3662,6 +3681,225 @@ msgid ""
 "However, the main purpose for this blog is to be included as a side item to "
 "other blogs where it will display your favorite/related links. This is "
 "commonly referred to as a 'Blogroll'."
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:480
+msgid "Matrix Reloaded"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:480
+msgid ""
+"<p>[This is yet another sample post to demonstrate sub categories]</p>\n"
+"\n"
+"<p>Wait until the end of the super long end credits!</p>\n"
+"\n"
+"<p>If you're patient enough, you'll a get preview of the next episode...</"
+"p>\n"
+"\n"
+"<p>Though... it's just the same anyway! :>></p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:490
+msgid "Clean Permalinks! :idea:"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:490
+msgid ""
+"<p>b2evolution uses old-style permalinks and feedback links by default. This "
+"is to ensure maximum compatibility with various webserver configurations.</"
+"p>\n"
+"\n"
+"<p>Nethertheless, once you feel comfortable with b2evolution, you should try "
+"activating clean permalinks in the /conf/_advanced.php file... (<code>"
+"$use_extra_path_info = 1;</code>)</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:496
+msgid "Apache optimization... :idea:"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:496
+msgid ""
+"<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> "
+"there are two files called [<code>sample.htaccess</code>]. You should try "
+"renaming those to [<code>.htaccess</code>].</p>\n"
+"\n"
+"<p>This will optimize the way b2evolution is handled by the webserver (if "
+"you are using Apache). These files are not active by default because a few "
+"hosts would display an error right away when you try to use them. If this "
+"happens to you when you rename the files, just remove them and you'll be "
+"fine.</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:502
+msgid "About evoSkins... :idea:"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:502
+msgid ""
+"<p>By default, b2evolution blogs are displayed using a default skin.</p>\n"
+"\n"
+"<p>Readers can choose a new skin by using the skin switcher integrated in "
+"most skins.</p>\n"
+"\n"
+"<p>You can change the default skin used for any blog by editing the "
+"parameters you will find in the stub file, for example <code>blog_b.php</"
+"code>. Of course, that is unless you have switched to using templates (like "
+"<code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</"
+"code>) + skins.</p>\n"
+"\n"
+"<p>You can restrict available skins by deleting some of them from the /blogs/"
+"skins folder. You can also create new skins by duplicating, renaming and "
+"customizing any existing skin folder. Read the manual on evoSkins!</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:512
+msgid "Skins *or* Templates ?"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:512
+msgid ""
+"<p>By default, all pre-installed blogs use skins, not templates. (More on "
+"skins in another post.)</p>\n"
+"\n"
+"<p>That means, blogs are accessed through 'stub' files called something like "
+"'<code>blog_b.php</code>'. These files set a few parameters such as the blog "
+"to display and the default skin to use, then they pass on the display job to "
+"a skin. You can edit the stub files to change the default skin used as well "
+"as other parameters. </p>\n"
+"\n"
+"<p>Alternatively, if you wish to use plain templates instead of skins, use "
+"the provided '<code>noskin_*.php</code>' files instead of the stub files. "
+"For example, for Blog B, the template file would be '<code>noskin_b.php</"
+"code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</"
+"code>' in the blogs admin.</p>\n"
+"\n"
+"<!--more-->\n"
+"\n"
+"<p>Either way, you can rename the stub/template files (<code>blog_*.php</"
+"code> or <code>noskin_*.php</code>) to better names, including to "
+"'<code>index.php</code>' for your main blog; but once again, make sure you "
+"update the new names in the blogs admin.</p>\n"
+"\n"
+"<p>Finally, if you don't use templates, you can delete all <code>noskin_*."
+"php</code> files if you want. Also, if you don't use skins, you can delete "
+"all <code>blog_*.php</code> files as well as the subfolders in the /skins "
+"folder. But, do not delete the whole skins folder, even templates need some "
+"files in there!</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:526
+msgid "Multiple Blogs, new blogs, old blogs..."
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:526
+msgid ""
+"<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', "
+"'Blog B' and 'Blogroll'.</p>\n"
+"\n"
+"<p>Some of these blogs have a special role. Read about it on the "
+"corresponding page.</p>\n"
+"\n"
+"<p>You can create additionnal blogs from the blogs admin.</p>\n"
+"\n"
+"<!--more-->\n"
+"\n"
+"<p>Some people have also asked for a feature to delete blogs. We're working "
+"on it, but we certainly do not recommend you go hacking your mySQL database "
+"by hand. It's the best way to leave a lot of junk in there. In the meantime, "
+"there are two things you can do with your old blogs:</p>\n"
+"\n"
+"<ul>\n"
+"  <li>Recycle them: delete the posts, change the name, also rename the "
+"access stub file if you wish. This is better with the database than deleting "
+"a blog and creating a new one.</li>\n"
+"  <li>Hide them: go to the blogs admin and clear the 'Stub URLname'. Your "
+"blog won't appear publicly no more. You can also remove all user permissions "
+"on that blog to hide it from backoffice users (except the admin). Finally, "
+"you can delete the stub file for this blog to make it complete ;)</li>\n"
+"</ul>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:544
+#, fuzzy
+msgid "File permissions!"
+msgstr "Gebruikers rechten"
+
+#: ..\..\..\install\_functions_create.php:544
+msgid ""
+"<p><strong>This is pretty important. Make sure you read this in order to "
+"have a fully functionning installation!</strong></p>\n"
+"\n"
+"<ul>\n"
+"\n"
+"  <li>In order to create new blogs from the admin interface or to generate "
+"static pages for your blogs, the <code>/blogs</code> folder needs to be "
+"writable by the PHP process on the server. You may need to do a chmod on "
+"this folder. If you don't know exactly try a chmod 777. You can do this "
+"either with an FTP program, a Unix shell or a web file manager like the one "
+"built into cPanel. If your server is running Windows you probably don't need "
+"to change anything.</li>\n"
+"\n"
+"  <li>In order to use the template editor for the custom skin, your <code>/"
+"skins/custom</code> folder needs to be writable by the PHP process on the "
+"server. Same as above.</li>\n"
+"\n"
+"  <li>This isn't necessary but ensures your security: do a chmod 644 on all "
+"files in the <code>/blogs/conf</code> directory, so no-one can overwrite "
+"them except you. If your server is running Windows, then set the file to "
+"'read-only'.</li>\n"
+"\n"
+"</ul>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:558
+msgid "Important information :idea:"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:558
+msgid ""
+"<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>\n"
+"\n"
+"<p>All these entries are designed to help you so, as EdB would say: \"read "
+"them all before you start hacking away!\" ;)</p>\n"
+"\n"
+"<p>If you wish, you can delete these posts one by one after you have read "
+"them. You could also change their status to 'deprecated' in order to "
+"visually keep track of what you have already read.</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:593
+msgid "First Post"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:593
+msgid ""
+"<p>This is the first post.</p>\n"
+"\n"
+"<p>It appears on both blog A and blog B.</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:599
+#, fuzzy
+msgid "Second post"
+msgstr "Opslaan artikel"
+
+#: ..\..\..\install\_functions_create.php:599
+msgid ""
+"<p>This is the second post.</p>\n"
+"\n"
+"<p>It appears on blog A only but in multiple categories.</p>"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:605
+msgid "Third post"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:605
+msgid ""
+"<p>This is the third post.</p>\n"
+"\n"
+"<p>It appears on blog B only and in a single category.</p>"
 msgstr ""
 
 #: ..\..\..\skins\_blogroll.php:61

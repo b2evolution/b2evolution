@@ -38,6 +38,10 @@ elseif( $use_l10n==2 )
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
 
+		$search = str_replace( "\n", '\n', $string );
+		$search = str_replace( "\r", '', $search );
+		// echo "Translating ", $search, " to $req_locale<br />";
+		
 		if( !isset($trans[$current_locale] ) )
 		{	// Translations for current locale have not yet been loaded:
 			@include_once( dirname(__FILE__).'/../locales/'.$req_locale.'/_global.php' );
@@ -47,10 +51,13 @@ elseif( $use_l10n==2 )
 			}
 		}
 				
-		if( isset( $trans[$current_locale][$string] ) )
+		if( isset( $trans[$current_locale][$search] ) )
 		{	// If the string has been translated:
-			return $trans[$current_locale][$string];
+			return str_replace( '\n', "\n", $trans[$current_locale][$search] );
 		}
+		
+		// echo "Not found!";
+		
 		// Return the English string:
 		return $string;
 	}

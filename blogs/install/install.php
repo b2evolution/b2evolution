@@ -39,7 +39,8 @@
 	}
 
 	require_once (dirname(__FILE__).'/../conf/_config.php'); 
- 
+	require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_vars.php");
+
  ?>
 
 <p>These are your settings from the config file: (If you don't see correct settings here, STOP before going any further, and check your configuration.)</p>
