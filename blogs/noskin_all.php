@@ -81,21 +81,26 @@
 <div class="pageHeaderContent">
 
 <!-- InstanceBeginEditable name="NavBar2" -->
-<div class="NavBar">
-<?php // ---------------------------------- START OF BLOG LIST ----------------------------------
-for( $curr_blog_ID=blog_list_start('stub'); 
-			$curr_blog_ID!=false; 
-			 $curr_blog_ID=blog_list_next('stub') ) 
-{ # by uncommenting the following lines you can hide some blogs
-	// if( $curr_blog_ID == 1 ) continue; // Hide blog 1...
-	// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
-if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-<a href="<?php blog_list_iteminfo('blogurl', 'raw') ?>" class="NavButton2Curr"><span class="small"><img src="<?php echo $baseurl ?>/img/down_small.gif" width="14" height="12" border="0" alt="Selected" title="" class="top" /><?php blog_list_iteminfo('shortname', 'htmlbody') ?></span></a>
-<?php } else { // This is another blog ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="NavButton2"><span class="small"><?php blog_list_iteminfo('shortname', 'htmlbody') ?></span></a>
-<?php } // End of testing which blog is being displayed 
-} // --------------------------------- END OF BLOG LIST --------------------------------- ?>
-</div>
+<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	# this is what will start and end your blog links
+	$blog_list_start = '<div class="NavBar">';				
+	$blog_list_end = '</div>';				
+	# this is what will separate your blog links
+	$blog_item_start = '';				
+	$blog_item_end = '';
+	# This is the class of for the selected blog link:
+	$blog_selected_link_class = 'NavButton2Curr';
+	# This is the class of for the other blog links:
+	$blog_other_link_class = 'NavButton2';
+	# This is additionnal markup before and after the selected blog name
+	$blog_selected_name_before = '<span class="small"><img src="'. $baseurl.'/img/down_small.gif" width="14" height="12" border="0" alt="['._('Selected').']" title="" class="top" />';				
+	$blog_selected_name_after = '</span>';
+	# This is additionnal markup before and after the other blog names
+	$blog_other_name_before = '<span class="small">';				
+	$blog_other_name_after = '</span>';
+	// Include the bloglist
+	include( dirname(__FILE__)."/_bloglist.php"); 
+	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
 <div class="NavBar">

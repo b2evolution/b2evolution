@@ -3,7 +3,7 @@
  * This is the main template. It displays the blog.
  *
  * However this file is not meant to be called directly.
- * It is ment to be called automagically by b2evolution.
+ * It is meant to be called automagically by b2evolution.
  * To display a blog, you should call a stub file instead, for example:
  * /blogs/index.php or /blogs/blog_b.php
  */
@@ -44,21 +44,9 @@
 <div class="pageHeaderContent">
 
 <!-- InstanceBeginEditable name="NavBar2" -->
-<div class="NavBar">
-<?php // ---------------------------------- START OF BLOG LIST ----------------------------------
-for( $curr_blog_ID=blog_list_start('stub'); 
-			$curr_blog_ID!=false; 
-			 $curr_blog_ID=blog_list_next('stub') ) 
-{ # by uncommenting the following lines you can hide some blogs
-	// if( $curr_blog_ID == 1 ) continue; // Hide blog 1...
-	// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
-if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-<a href="<?php blog_list_iteminfo('blogurl', 'raw') ?>" class="NavButton2Curr"><span class="small"><img src="<?php echo $baseurl ?>/img/down_small.gif" width="14" height="12" border="0" alt="Selected" title="" class="top" /><?php blog_list_iteminfo('shortname', 'htmlbody') ?></span></a>
-<?php } else { // This is another blog ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="NavButton2"><span class="small"><?php blog_list_iteminfo('shortname', 'htmlbody') ?></span></a>
-<?php } // End of testing which blog is being displayed 
-} // --------------------------------- END OF BLOG LIST --------------------------------- ?>
-</div>
+<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	include( dirname(__FILE__)."/_bloglist.php"); 
+	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
 <div class="NavBar">

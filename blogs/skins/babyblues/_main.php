@@ -3,7 +3,7 @@
 	 * This is the main template. It displays the blog.
 	 *
 	 * However this file is not meant to be called directly.
-	 * It is ment to be called automagically by b2evolution.
+	 * It is meant to be called automagically by b2evolution.
 	 * To display a blog, you should call a stub file instead, for example:
 	 * /blogs/index.php or /blogs/blog_b.php
 	 */
@@ -53,34 +53,23 @@
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
 </div>
 <div id="side">
-<div class="sidetitle" align="center">blogs</div>
-<div class="sidebody">
-<?php // ---------------------------------- START OF BLOG LIST ----------------------------------
-for( $curr_blog_ID=blog_list_start('stub'); 
-			$curr_blog_ID!=false; 
-			 $curr_blog_ID=blog_list_next('stub') ) { ?>
-<!-- Button start -->
-<?php if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="NavButton2Curr"><strong><?php blog_list_iteminfo('name') ?></span></strong></a><br />
-<?php } else { // This is another blog ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="NavButton2"><?php blog_list_iteminfo('name') ?></a><br />
-<?php } // End of testing which blog is being displayed ?>
-<!-- Button end -->
-<?php } // --------------------------------- END OF BLOG LIST --------------------------------- ?>
-</div>
-<div class="sidetitle" align="center">skin the site</div>
-<div class="sidebody">
-<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
-			for( skin_list_start(); skin_list_next(); ) { ?>
-				<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a><br />
-			<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
-	
-</div>
+	<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+		include( dirname(__FILE__)."/_bloglist.php"); 
+		// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+
+	<div class="sidetitle" align="center">skin the site</div>
+	<div class="sidebody">
+	<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
+		for( skin_list_start(); skin_list_next(); ) { ?>
+			<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a><br />
+	<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
+	</div>
+
 	<div class="sidetitle" align="center">archives</div>
 	<div class="sidebody">
 	<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-					include( dirname(__FILE__)."/_archives.php"); 
-					// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+		include( dirname(__FILE__)."/_archives.php"); 
+		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 	</div>
 
 	<div class="sidetitle" align="center"><?php echo _('Misc') ?></div>

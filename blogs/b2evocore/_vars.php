@@ -10,7 +10,7 @@
  */
 
 #b2 version
-$b2_version = '0.8.3-alpha1';
+$b2_version = '0.8.3-alpha2';
 
 // Activate gettext:
 // Specify location of translation tables :

@@ -22,18 +22,9 @@
 	<?php comments_popup_script() ?>
 </head>
 <body>
-<?php // ---------------------------------- START OF BLOG LIST ----------------------------------
-for( $curr_blog_ID=blog_list_start('stub'); 
-			$curr_blog_ID!=false; 
-			 $curr_blog_ID=blog_list_next('stub') ) { ?>
-<!-- Button start -->
-<?php if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="BlogButtonCurr"><?php blog_list_iteminfo('name') ?></a>
-<?php } else { // This is another blog ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="BlogButton"><?php blog_list_iteminfo('name') ?></a>
-<?php } // End of testing which blog is being displayed ?>
-<!-- Button end -->
-<?php } // --------------------------------- END OF BLOG LIST --------------------------------- ?>
+<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	include( dirname(__FILE__)."/_bloglist.php"); 
+	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id="header"><a href="<?php bloginfo('blogurl'); ?>" title="<?php bloginfo('name'); ?>"><?php bloginfo('name'); ?></a></div>
 
@@ -50,7 +41,7 @@ if( isset($MainList) ) while( $MainList->get_item() )
 &nbsp;-&nbsp;
 Categories: <?php the_categories() ?>
 &nbsp;-&nbsp;
-<span class="storyAuthor"><?php the_author() ?> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php the_time() ?></a>
+<span class="storyAuthor"><a href="<?php bloginfo('blogurl'); ?>?author=<?php the_author_ID() ?>" title="<?php echo _('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php the_time() ?></a>
 </div>
 
 <div class="storyContent">

@@ -3,7 +3,7 @@
 	 * This is the main template. It displays the blog.
 	 *
 	 * However this file is not meant to be called directly.
-	 * It is ment to be called automagically by b2evolution.
+	 * It is meant to be called automagically by b2evolution.
 	 * To display a blog, you should call a stub file instead, for example:
 	 * /blogs/index.php or /blogs/blog_b.php
 	 */
@@ -112,21 +112,10 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 </ul>
 
 
-<h4>Blogs&nbsp;:</h4>
-<ul>
-<?php // ---------------------------------- START OF BLOG LIST ----------------------------------
-for( $curr_blog_ID=blog_list_start('stub'); 
-			$curr_blog_ID!=false; 
-			 $curr_blog_ID=blog_list_next('stub') ) { ?>
-<!-- Button start -->
-<?php if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-<li><a href="<?php blog_list_iteminfo('blogurl') ?>" class="NavButton2Curr"><strong><?php blog_list_iteminfo('name') ?></span></strong></a></li>
-<?php } else { // This is another blog ?>
-<li><a href="<?php blog_list_iteminfo('blogurl') ?>" class="NavButton2"><?php blog_list_iteminfo('name') ?></a></li>
-<?php } // End of testing which blog is being displayed ?>
-<!-- Button end -->
-<?php } // --------------------------------- END OF BLOG LIST --------------------------------- ?>
-</ul>
+<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	include( dirname(__FILE__)."/_bloglist.php"); 
+	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+
 <div id=categories>
 
 <h4>Categories&nbsp;:</h4>

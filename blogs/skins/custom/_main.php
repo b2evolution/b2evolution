@@ -3,7 +3,7 @@
  * This is the main template. It displays the blog.
  *
  * However this file is not meant to be called directly.
- * It is ment to be called automagically by b2evolution.
+ * It is meant to be called automagically by b2evolution.
  * To display a blog, you should call a stub file instead, for example:
  * /blogs/index.php or /blogs/blog_b.php
  */
@@ -36,19 +36,9 @@
 <body>
 <div class="pageHeader">
 
-<?php // ---------------------------------- START OF BLOG LIST ----------------------------------
-for( $curr_blog_ID=blog_list_start('stub'); 
-			$curr_blog_ID!=false; 
-			 $curr_blog_ID=blog_list_next('stub') ) 
-{ # by uncommenting the following lines you can hide some blogs
-	// if( $curr_blog_ID == 1 ) continue; // Hide blog 1...
-	// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
-if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-<a href="<?php blog_list_iteminfo('blogurl', 'raw') ?>" class="BlogButtonCurr"><?php blog_list_iteminfo('shortname', 'htmlbody') ?></a>
-<?php } else { // This is another blog ?>
-<a href="<?php blog_list_iteminfo('blogurl') ?>" class="BlogButton"><?php blog_list_iteminfo('shortname', 'htmlbody') ?></a>
-<?php } // End of testing which blog is being displayed 
-} // --------------------------------- END OF BLOG LIST --------------------------------- ?>
+<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	include( dirname(__FILE__)."/_bloglist.php"); 
+	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <h1 id="pageTitle"><?php bloginfo('name', 'htmlbody') ?></h1>
 

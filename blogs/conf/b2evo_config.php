@@ -57,6 +57,8 @@ $users_can_register = 0;
 # set this to 0 or 1, whether you want new users to be able to post entries once they registered
 $new_users_can_blog = 0;
 
+# set this to 0 or 1, whether you want to display the blog list on blog templates
+$display_blog_list = 0;
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder
 # IT IS RECOMMENDED YOU DO NOT TOUCH THOSE SETTINGS 
