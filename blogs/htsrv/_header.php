@@ -13,7 +13,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('b2evo') ?> &gt; <?php echo $page_title ?></title>
 	<base href="<?php echo $htsrv_url; ?>/">
-	<link rel="stylesheet" href="<?php echo $admin_url ?>/b2.css" type="text/css">
+	<link rel="stylesheet" href="<?php echo $admin_url ?>/admin.css" type="text/css">
 </head>
 <body>
 

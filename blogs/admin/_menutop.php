@@ -13,8 +13,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title>b2evo &gt; <?php echo $title; ?></title>
-	<link href="b2.css" rel="stylesheet" type="text/css" />
-	<link href="blog.css" rel="stylesheet" type="text/css" />
+	<link href="admin.css" rel="stylesheet" type="text/css" />
 	<?php if( $mode == 'sidebar' )
 	{ ?>
 	<link href="sidebar.css" rel="stylesheet" type="text/css" />
@@ -48,7 +47,7 @@ if( empty($mode) )
 			echo '<li>';
 		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('New Post'), '</a></li>';
 	
-		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) || ($title == T_('Updating post...')) || ($title == T_('Updating post status...')) )
+		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) || ($title == T_('Updating post...')) || ($title == T_('Updating post status...')) || ($title == T_('Deleting post...'))  )
 			echo '<li class="current">';
 		else
 			echo '<li>';

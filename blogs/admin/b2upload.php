@@ -19,7 +19,7 @@ die (T_("The admin disabled this function"));
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('upload images/files') ?></title>
-	<link rel="stylesheet" href="b2.css" type="text/css">
+	<link rel="stylesheet" href="admin.css" type="text/css">
 <?php if ($use_spellchecker) { ?>
 <script type="text/javascript" language="javascript" src="<?php echo $spch_url; ?>"></script><?php } ?>
 <style type="text/css">
