@@ -101,9 +101,24 @@ class smilies_Rendererplugin extends RendererPlugin
 			}
 		}
 
-		// REPLACE:
-		$content = str_replace( $this->search, $this->replace, $content );
 
+		// REPLACE:  But not in code blocks.
+		if( strpos( $content , '<code>' ) !== false )
+		{ // If there are code tags run this substitution
+			$content_parts = preg_split("/<\/?code>/", $content);
+			$content = '';
+			for ( $x = 0 ; $x < count( $content_parts ) ; $x++ )
+			{
+				if ( ( $x % 2 ) == 0 )
+				{ // If x is even then it's not code and replace any smiles
+					$content .= str_replace( $this->search, $this->replace, $content_parts[$x] );
+				}
+				else
+				{ // If x is odd don't replace smiles. and put code tags back in.
+					$content .= '<code>' . $content_parts[$x] . '</code>';
+				}
+			}
+		}
 		return true;
 	}
 }
