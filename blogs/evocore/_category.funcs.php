@@ -778,8 +778,66 @@ function the_category_head( $before='', $after='' )
 	}
 }
 
+/**
+ * Copy the catagory structure from one blog to another
+ * The four cat_copy_* functions after blog_copy_cats are required by blog_copy_cats
+ */
+function blog_copy_cats($srcblog, $destblog)
+ {
+	global $BlogCache, $edited_Blog, $cache_categories, $cat_parents;
+	$edited_Blog = & $BlogCache->get_by_ID( $destblog );
+
+	// ----------------- START RECURSIVE CAT LIST ----------------
+	cat_query();	// make sure the caches are loaded
+	$cat_parents[0]='NULL';
+
+	// run recursively through the cats
+	echo "<ul>\n";
+	cat_children( $cache_categories, $srcblog, NULL, 'cat_copy_before_first', 'cat_copy_before_each', 'cat_copy_after_each', 'cat_copy_after_last', 0 );
+	echo "</ul>\n";
+	// ----------------- END RECURSIVE CAT LIST ----------------
+}
+
+/** 
+ * callback to start sublist
+ */
+function cat_copy_before_first( $parent_cat_ID, $level )
+{	// callback to start sublist
+}
+
+/** 
+ * callback to display sublist element
+ */
+function cat_copy_before_each( $cat_ID, $level )
+{	// callback to display sublist element
+	global $cat_parents, $edited_Blog;
+	$cat = get_the_category_by_ID( $cat_ID );
+	echo '<li>';
+	echo ' <strong>Copying '.$cat['cat_name'].'</strong> level: ' . $level . '</a>';
+	$cat_parents[$level+1]=cat_create( $cat['cat_name'], $cat_parents[$level] , $edited_Blog->ID);
+}
+
+/** 
+ * callback to display sublist element
+ */
+function cat_copy_after_each( $cat_ID, $level )
+{	// callback to display sublist element
+	echo "</li>\n";
+}
+
+/** 
+ * callback to end sublist
+ */
+function cat_copy_after_last( $parent_cat_ID, $level )
+{	// callback to end sublist
+}
+	
+
 /*
  * $Log$
+ * Revision 1.4  2004/11/30 21:51:34  jwedgeco
+ * when copying a blog, categories are copied as well.
+ *
  * Revision 1.3  2004/11/09 00:25:11  blueyed
  * minor translation changes (+MySQL spelling :/)
  *

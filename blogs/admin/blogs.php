@@ -246,13 +246,23 @@ switch($action)
 			// Commit changes in cache:
 			$BlogCache->add( $edited_Blog );
 
-			echo '<p><strong>';
-			printf( T_('You should <a %s>create categories</a> for this blog now!'),
+			if ($blogtemplate==-1)
+			{
+				echo '<p><strong>';
+				printf( T_('You should <a %s>create categories</a> for this blog now!'),
 							'href="b2categories.php?action=newcat&amp;blog='.$edited_Blog->ID.'"' );
-			echo '</strong></p>';
+				echo '</strong></p>';
+			}
+			else 
+			{
+				// copy the categories from $blogtemplateid to $blog	
+				blog_copy_cats($blogtemplate, $edited_Blog->ID);
+			}
 			echo '</div>';
 			break;
 		}
+	
+
 		echo '</div>';
 		// NOTE: no break here, we go on to next form if there was an error!
 
@@ -503,8 +513,12 @@ switch($action)
 require( dirname(__FILE__).'/_blogs_list.php' );
 require( dirname(__FILE__).'/_footer.php' );
 
+
 /*
  * $Log$
+ * Revision 1.19  2004/11/30 21:51:34  jwedgeco
+ * when copying a blog, categories are copied as well.
+ *
  * Revision 1.18  2004/11/22 10:41:58  fplanque
  * minor changes
  *
