@@ -80,8 +80,8 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 			{
 				$smiled[] = $grin;
 				$smiley = str_replace(' ', '', $smiley);
-				$grins .= '<img src="'. $this->smilies_path. '/'. $grin. '" alt="'. $smiley.
-									'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
+				$grins .= '<img src="'. $this->smilies_path. '/'. $grin. '" title="'.$smiley.'" alt="'.$smiley
+									.'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');" /> ';
 			}
 		}
 
