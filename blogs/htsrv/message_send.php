@@ -7,7 +7,6 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
  * This file sends email to the user!
- * $Id$
  */
 
 // Initialize everything:

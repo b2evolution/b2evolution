@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-16 23:18+0100\n"
+"PO-Revision-Date: 2004-07-07 20:58+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,88 +18,140 @@ msgstr ""
 #: ../../index.src.html:17
 #: ../../doc/install_new.src.html:6
 #: ../../doc/install_new.src.html:17
+#: ../../doc/upfrom_miniblog.src.html:6
+#: ../../doc/upfrom_miniblog.src.html:17
+#: ../../doc/upfrom_wordpress.src.html:6
+#: ../../doc/upfrom_wordpress.src.html:17
 #: ../../doc/upgradefrom_b2.src.html:6
 #: ../../doc/upgradefrom_b2.src.html:17
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:17
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:17
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:17
 msgid "b2evo package"
 msgstr "b2evo pakket"
 
 #: ../../index.src.html:6
 #: ../../index.src.html:18
 #: ../../doc/install_new.src.html:18
+#: ../../doc/upfrom_miniblog.src.html:18
+#: ../../doc/upfrom_wordpress.src.html:18
 #: ../../doc/upgradefrom_b2.src.html:18
 #: ../../doc/upgradefrom_b2evo.src.html:18
+#: ../../doc/upgradefrom_gl.src.html:18
+#: ../../doc/upgradefrom_mt.src.html:18
 msgid "Start page"
 msgstr "Startpagina"
 
 #: ../../index.src.html:13
 #: ../../doc/install_new.src.html:13
+#: ../../doc/upfrom_miniblog.src.html:13
+#: ../../doc/upfrom_wordpress.src.html:13
 #: ../../doc/upgradefrom_b2.src.html:13
 #: ../../doc/upgradefrom_b2evo.src.html:13
+#: ../../doc/upgradefrom_gl.src.html:13
+#: ../../doc/upgradefrom_mt.src.html:13
 msgid "b2evolution: official site"
 msgstr "b2evolution: officiele website"
 
 #: ../../index.src.html:14
 #: ../../doc/install_new.src.html:14
+#: ../../doc/upfrom_miniblog.src.html:14
+#: ../../doc/upfrom_wordpress.src.html:14
 #: ../../doc/upgradefrom_b2.src.html:14
 #: ../../doc/upgradefrom_b2evo.src.html:14
+#: ../../doc/upgradefrom_gl.src.html:14
+#: ../../doc/upgradefrom_mt.src.html:14
 msgid "Multilingual multiuser multi-blog engine."
 msgstr "Meertalig pakket voor meerdere gebruikers met meerdere weblogs"
 
 #: ../../index.src.html:15
 #: ../../doc/install_new.src.html:15
+#: ../../doc/upfrom_miniblog.src.html:15
+#: ../../doc/upfrom_wordpress.src.html:15
 #: ../../doc/upgradefrom_b2.src.html:15
 #: ../../doc/upgradefrom_b2evo.src.html:15
+#: ../../doc/upgradefrom_gl.src.html:15
+#: ../../doc/upgradefrom_mt.src.html:15
 msgid "Version"
 msgstr "Versie"
 
 #: ../../index.src.html:19
 #: ../../doc/install_new.src.html:19
+#: ../../doc/upfrom_miniblog.src.html:19
+#: ../../doc/upfrom_wordpress.src.html:19
 #: ../../doc/upgradefrom_b2.src.html:19
 #: ../../doc/upgradefrom_b2evo.src.html:19
+#: ../../doc/upgradefrom_gl.src.html:19
+#: ../../doc/upgradefrom_mt.src.html:19
 msgid "Install"
 msgstr "Installeer"
 
 #: ../../index.src.html:20
 #: ../../doc/install_new.src.html:20
+#: ../../doc/upfrom_miniblog.src.html:20
+#: ../../doc/upfrom_wordpress.src.html:20
 #: ../../doc/upgradefrom_b2.src.html:20
 #: ../../doc/upgradefrom_b2evo.src.html:20
+#: ../../doc/upgradefrom_gl.src.html:20
+#: ../../doc/upgradefrom_mt.src.html:20
 msgid "Blogs"
 msgstr "Weblogs"
 
 #: ../../index.src.html:21
 #: ../../doc/install_new.src.html:21
+#: ../../doc/upfrom_miniblog.src.html:21
+#: ../../doc/upfrom_wordpress.src.html:21
 #: ../../doc/upgradefrom_b2.src.html:21
 #: ../../doc/upgradefrom_b2evo.src.html:21
+#: ../../doc/upgradefrom_gl.src.html:21
+#: ../../doc/upgradefrom_mt.src.html:21
 msgid "Admin"
 msgstr "Admin"
 
 #: ../../index.src.html:22
 #: ../../doc/install_new.src.html:22
+#: ../../doc/upfrom_miniblog.src.html:22
+#: ../../doc/upfrom_wordpress.src.html:22
 #: ../../doc/upgradefrom_b2.src.html:22
 #: ../../doc/upgradefrom_b2evo.src.html:22
+#: ../../doc/upgradefrom_gl.src.html:22
+#: ../../doc/upgradefrom_mt.src.html:22
 msgid "Online"
 msgstr "Online"
 
 #: ../../index.src.html:23
 #: ../../doc/install_new.src.html:23
+#: ../../doc/upfrom_miniblog.src.html:23
+#: ../../doc/upfrom_wordpress.src.html:23
 #: ../../doc/upgradefrom_b2.src.html:23
 #: ../../doc/upgradefrom_b2evo.src.html:23
+#: ../../doc/upgradefrom_gl.src.html:23
+#: ../../doc/upgradefrom_mt.src.html:23
 msgid "Manual"
 msgstr "Handboek"
 
 #: ../../index.src.html:24
 #: ../../doc/install_new.src.html:24
+#: ../../doc/upfrom_miniblog.src.html:24
+#: ../../doc/upfrom_wordpress.src.html:24
 #: ../../doc/upgradefrom_b2.src.html:24
 #: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_gl.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
 msgid "Support"
 msgstr "Ondersteuning"
 
 #: ../../index.src.html:28
 #: ../../doc/install_new.src.html:28
+#: ../../doc/upfrom_miniblog.src.html:28
+#: ../../doc/upfrom_wordpress.src.html:28
 #: ../../doc/upgradefrom_b2.src.html:28
 #: ../../doc/upgradefrom_b2evo.src.html:28
+#: ../../doc/upgradefrom_gl.src.html:28
+#: ../../doc/upgradefrom_mt.src.html:28
 msgid "Available translations for this page:"
 msgstr "Beschikbare vertalingen voor deze pagina:"
 
@@ -123,76 +175,101 @@ msgstr "Snelstart instructies:"
 msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr "Je kan b2evolution installeren in maar een paar minuten. Volg de instructies die van toepassing zijn op jouw situatie:"
 
-#: ../../index.src.html:39
-msgid "New users:"
-msgstr "Nieuwe gebruikers:"
-
-#: ../../index.src.html:39
-msgid "installing b2evolution from scratch"
-msgstr "installeer b2evolution vanaf het begin"
-
 #: ../../index.src.html:40
-msgid "Existing b2evolution users:"
-msgstr "Bestaande b2evolution gebruikers:"
+#: ../../doc/install_new.src.html:6
+#: ../../doc/install_new.src.html:32
+msgid "Installing b2evolution from scratch"
+msgstr "installeer een kale versie van b2evolution"
 
-#: ../../index.src.html:40
-msgid "upgrading from a previous version of b2evolution"
+#: ../../index.src.html:42
+#: ../../doc/upgradefrom_b2evo.src.html:6
+#: ../../doc/upgradefrom_b2evo.src.html:32
+msgid "Upgrading from a previous version of b2evolution"
 msgstr "bijwerken vanaf een vorige versie van b2evolution"
 
-#: ../../index.src.html:41
-msgid "Cafelog/b2 users:"
-msgstr "Cafelog/b2 gebruikers:"
+#: ../../index.src.html:44
+msgid "Upgrading from other blog software:"
+msgstr "Bijwerken vanaf andere weblog software:"
 
-#: ../../index.src.html:41
-msgid "upgrading from Cafelog/b2 version 0.6.x"
-msgstr "bijwerken vanaf Cafelog/b2 versie 0.6.x"
+#: ../../index.src.html:46
+msgid "Cafelog/b2"
+msgstr "Cafelog/b2"
 
-#: ../../index.src.html:45
+#: ../../index.src.html:47
+msgid "GeekLog"
+msgstr "GeekLog"
+
+#: ../../index.src.html:48
+msgid "Manywhere Miniblog"
+msgstr "Manywhere Miniblog"
+
+#: ../../index.src.html:49
+msgid "Movable Type"
+msgstr "Movable Type"
+
+#: ../../index.src.html:50
+msgid "WordPress"
+msgstr "WordPress"
+
+#: ../../index.src.html:56
 #: ../../doc/install_new.src.html:55
+#: ../../doc/upfrom_miniblog.src.html:68
+#: ../../doc/upfrom_wordpress.src.html:75
 #: ../../doc/upgradefrom_b2.src.html:74
 #: ../../doc/upgradefrom_b2evo.src.html:54
+#: ../../doc/upgradefrom_gl.src.html:40
+#: ../../doc/upgradefrom_mt.src.html:45
 msgid "official website"
 msgstr "officiele website"
 
-#: ../../index.src.html:46
+#: ../../index.src.html:57
 #: ../../doc/install_new.src.html:56
+#: ../../doc/upfrom_miniblog.src.html:69
+#: ../../doc/upfrom_wordpress.src.html:76
 #: ../../doc/upgradefrom_b2.src.html:75
 #: ../../doc/upgradefrom_b2evo.src.html:55
+#: ../../doc/upgradefrom_gl.src.html:41
+#: ../../doc/upgradefrom_mt.src.html:46
 msgid "GNU GPL license"
 msgstr "GNU GPL licentie"
 
-#: ../../index.src.html:47
+#: ../../index.src.html:58
 #: ../../doc/install_new.src.html:57
+#: ../../doc/upfrom_miniblog.src.html:70
+#: ../../doc/upfrom_wordpress.src.html:77
 #: ../../doc/upgradefrom_b2.src.html:76
 #: ../../doc/upgradefrom_b2evo.src.html:56
+#: ../../doc/upgradefrom_gl.src.html:42
+#: ../../doc/upgradefrom_mt.src.html:47
 msgid "contact"
 msgstr "contact"
 
-#: ../../doc/install_new.src.html:6
-msgid "Install instructions for new users"
-msgstr "Installatie instructies voor nieuwe gebruikers"
-
-#: ../../doc/install_new.src.html:32
-msgid "Installation instructions for new users"
-msgstr "Installatie instructies voor nieuwe gebruikers"
-
 #: ../../doc/install_new.src.html:34
+#: ../../doc/upfrom_miniblog.src.html:34
+#: ../../doc/upfrom_wordpress.src.html:34
 #: ../../doc/upgradefrom_b2.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/upgradefrom_gl.src.html:33
+#: ../../doc/upgradefrom_mt.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
-msgstr "Voordat je begint, sommige netwerk opties van b2evolution gaan er vanuit dat j ehet eens bent met onze simpele <a %s>Algemene Voorwaarden</a>."
+msgstr "Voordat je begint, sommige netwerk opties van b2evolution gaan er vanuit dat je het eens bent met onze simpele <a %s>Algemene Voorwaarden</a>."
 
 #: ../../doc/install_new.src.html:36
+#: ../../doc/upfrom_miniblog.src.html:39
+#: ../../doc/upfrom_wordpress.src.html:43
 #: ../../doc/upgradefrom_b2.src.html:43
 msgid "Once you have unzipped the b2evolution distribution:"
 msgstr "Zodra je de b2evolution distributie hebt uitgepakt:"
 
 #: ../../doc/install_new.src.html:37
 msgid "On your server, create or locate a mysql database for b2evolution. (For example, you can call it \"b2evolution\")"
-msgstr "Op je server, maak of vind een mysql database voor b2evolution. (Je kan die bijvoorbeeld  &quot;b2evolution&quot; noemen)"
+msgstr "Op je server, maak of vind een mysql database voor b2evolution. (Je kan die bijvoorbeeld  \"b2evolution\" noemen)"
 
 #: ../../doc/install_new.src.html:39
 #: ../../doc/install_new.src.html:42
+#: ../../doc/upfrom_miniblog.src.html:55
+#: ../../doc/upfrom_wordpress.src.html:59
+#: ../../doc/upfrom_wordpress.src.html:70
 #: ../../doc/upgradefrom_b2.src.html:60
 msgid "Note:"
 msgstr "Opmerking:"
@@ -202,9 +279,11 @@ msgid "Unless you changed the config, all tables created by b2evolution are pref
 msgstr "Tenzij je de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. Jouw bestaande tabellen worden dan op geen enkele manier aangetast."
 
 #: ../../doc/install_new.src.html:40
+#: ../../doc/upfrom_miniblog.src.html:53
+#: ../../doc/upfrom_wordpress.src.html:57
 #: ../../doc/upgradefrom_b2.src.html:58
 msgid "Upload the b2evolution files to your website."
-msgstr "Upload de b2evolution bestanden naar je website, die gelijk is aan de URL die je net hebt geconfigureerd."
+msgstr "Upload de b2evolution bestanden naar je website."
 
 #: ../../doc/install_new.src.html:42
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
@@ -219,22 +298,115 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken en b2evolution voor jou configureren."
 
 #: ../../doc/install_new.src.html:49
+#: ../../doc/upfrom_miniblog.src.html:62
+#: ../../doc/upfrom_wordpress.src.html:66
 #: ../../doc/upgradefrom_b2.src.html:67
 #: ../../doc/upgradefrom_b2evo.src.html:44
 msgid "Check to make sure the new installation works."
 msgstr "Controleer of de nieuwe installatie werkt."
 
 #: ../../doc/install_new.src.html:50
+#: ../../doc/upfrom_miniblog.src.html:63
+#: ../../doc/upfrom_wordpress.src.html:67
 #: ../../doc/upgradefrom_b2.src.html:68
 #: ../../doc/upgradefrom_b2evo.src.html:45
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr "Op productie servers, is het aangeraden dat je de <code>/install/</code> directory verwijdert. "
 
 #: ../../doc/install_new.src.html:51
+#: ../../doc/upfrom_miniblog.src.html:64
+#: ../../doc/upfrom_wordpress.src.html:71
 #: ../../doc/upgradefrom_b2.src.html:70
 #: ../../doc/upgradefrom_b2evo.src.html:50
 msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
 msgstr "Nadat de basis installatie is voltooid, zijn er nog wat <a %s>tricky dingen waar je rekening mee moet houden</a> (online handboek)"
+
+#: ../../doc/upfrom_miniblog.src.html:6
+#: ../../doc/upfrom_miniblog.src.html:32
+msgid "Upgrading from Manywhere Miniblog"
+msgstr "Bijwerken vanaf Manywhere Miniblog"
+
+#: ../../doc/upfrom_miniblog.src.html:36
+msgid "As always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+msgstr "Zoals altijd, is het verstandig een backup te maken van jouw huidige website / weblog / database (afhankelijk van wat je al hebt) voordat je iets nieuws installeert."
+
+#: ../../doc/upfrom_miniblog.src.html:42
+msgid "On your server, locate the mysql database you are already using for Manywhere Miniblog. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Miniblog tables and data in any way!"
+msgstr "Op je server, vind uit wat de mysql database is die je nu al gebruikt voor Manywhere Miniblog. Je moet dezelfde database gebruiken om te kunnen bijwerken naar b2evolution. Maak je niet druk, b2evolution zal onder geen beding de tabellen en data van Miniblog aanpassen!"
+
+#: ../../doc/upfrom_miniblog.src.html:46
+#: ../../doc/upfrom_wordpress.src.html:50
+#: ../../doc/upgradefrom_b2.src.html:50
+msgid "Note 1:"
+msgstr "Opmerking 1:"
+
+#: ../../doc/upfrom_miniblog.src.html:46
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Miniblog uses two tables named <code>miniblog</code> and <code>user</code>. Your existing tables will not be affected in any way."
+msgstr "e de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. Bijvoorbeeld, Miniblog gebruikt tabellen genaamd <code>miniblog</code> en <code>user</code>. Jouw bestaande tabellen worden dan op geen enkele manier aangetast."
+
+#: ../../doc/upfrom_miniblog.src.html:50
+#: ../../doc/upfrom_wordpress.src.html:54
+#: ../../doc/upgradefrom_b2.src.html:54
+msgid "Note 2:"
+msgstr "Opmerking 2:"
+
+#: ../../doc/upfrom_miniblog.src.html:50
+#: ../../doc/upfrom_wordpress.src.html:54
+#: ../../doc/upgradefrom_b2.src.html:54
+msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
+msgstr "Waarom dezelfde database? Omdat het SQL proces dat we gebruiken om de data te kopieren -- die snel en veilig is -- alleen kan worden gedaan in een enkele database."
+
+#: ../../doc/upfrom_miniblog.src.html:55
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Miniblog remains fully functional while you check out b2evolution.</strong>"
+msgstr "Alleen de inhoud van de <code>/blogs</code> map zijn nodig om te uploaden naar jouw site. Als je b2evolution als jouw standaard webpage wilt, upload dan de inhoud van de <code>/blogs</code> naar jouw hoofdmap op de webserver. Maar, je kan ook beginnen met het uploaden van de bestanden naar een nieuwe map, <code>/b2evo</code> bijvoorbeeld; op die manier <strong>blijft jouw bestaande Miniblog weblog volledig beschikbaar terwijl jij b2evolution ontdekt.</strong>"
+
+#: ../../doc/upfrom_miniblog.src.html:57
+#: ../../doc/upfrom_wordpress.src.html:61
+#: ../../doc/upgradefrom_b2.src.html:62
+msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
+msgstr "Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinstalleerd in <code>http://jouwsite.com/b2evo</code> ..."
+
+#: ../../doc/upfrom_miniblog.src.html:59
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your Miniblog data to b2evo (without affecting Miniblog) and configure b2evolution for you."
+msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken, kopieren van jouw miniblog data naar b2evo (zonder daarbij miniblog aan te passen) en b2evolution voor jou configureren."
+
+#: ../../doc/upfrom_wordpress.src.html:6
+#: ../../doc/upfrom_wordpress.src.html:32
+msgid "Upgrading from WordPress"
+msgstr "Bijwerken vanaf WordPress"
+
+#: ../../doc/upfrom_wordpress.src.html:36
+msgid "The upgrade procedure below has been tested exclusively with WordPress version 1.2. Though it may not work with other versions, you can still give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
+msgstr "De upgrade procedure hieronder is exclusief getest met WordPress versie 1.2. Het zal waarschijnlijk niet werken met andere versies, maar je kan het wel proberen. b2evolution zal niet jouw data beinvloeden. Het ergste wat kan gebeuren is een foutmelding."
+
+#: ../../doc/upfrom_wordpress.src.html:40
+#: ../../doc/upgradefrom_b2.src.html:40
+msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+msgstr "Maar, zoals altijd, is het verstandig een backup te maken van jouw huidige website / weblog / database (afhankelijk van wat je al hebt) voordat je iets nieuws installeert."
+
+#: ../../doc/upfrom_wordpress.src.html:46
+msgid "On your server, locate the mysql database you are already using for WordPress. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your WordPress tables and data in any way!"
+msgstr "Op je server, vind uit wat de mysql database is die je nu al gebruikt voor WordPress. Je moet dezelfde database gebruiken om te kunnen bijwerken naar b2evolution. Maak je niet druk, b2evolution zal onder geen beding de tabellen en data van Wordpress aanpassen!"
+
+#: ../../doc/upfrom_wordpress.src.html:50
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, WordPress used tables prefixed with wp_ by default. Your existing tables will not be affected in any way."
+msgstr "Tenzij je de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. WordPress gebruikt tabellen voorafgaand met wp_ standaard. Jouw bestaande tabellen worden dan op geen enkele manier aangetast."
+
+#: ../../doc/upfrom_wordpress.src.html:59
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing WordPress blog remains fully functional while you check out b2evolution.</strong>"
+msgstr "Alleen de inhoud van de <code>/blogs</code> map zijn nodig om te uploaden naar jouw site. Als je b2evolution als jouw standaard webpage wilt, upload dan de inhoud van de <code>/blogs</code> naar jouw hoofdmap op de webserver. Maar, je kan ook beginnen met het uploaden van de bestanden naar een nieuwe map, <code>/b2evo</code> bijvoorbeeld; op die manier <strong>blijft jouw bestaande WordPress weblog volledig beschikbaar terwijl jij b2evolution ontdekt.</strong>"
+
+#: ../../doc/upfrom_wordpress.src.html:63
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your WordPress data to b2evo (without affecting WordPress) and configure b2evolution for you."
+msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken, kopieren van jouw WordPress data naar b2evo (zonder daarbij WordPress aan te passen) en b2evolution voor jou configureren."
+
+#: ../../doc/upfrom_wordpress.src.html:68
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
+msgstr "Controleer het <a %s>manual</a> of de <a %s>forums</a> voor aanwijzingen voor het bijwerken van jouw bestaande WordPress sjabloon naar b2evolution."
+
+#: ../../doc/upfrom_wordpress.src.html:70
+msgid "You can reuse your current WordPress CSS design in a snap by copying your style.css file into any b2evolution skin folder which name starts with wpc_ (which stands for WordPress CSS compatible)"
+msgstr "Je kan je huidige WordPress CSS design hergebruiken door jouw style.css bestand te kopieren in een  b2evolution skin map waar de naam van begint met wpc_ (wat staat voor WordPress CSS compatible)"
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"
@@ -248,50 +420,25 @@ msgstr "Bijwerken vanaf Cafelog/B2 (de originele b2)"
 msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
 msgstr "De bijwerk procedure is exclusief getest met de b2 versies 0.6.1 en 0.6.2. Maar, ik denk dat versie 0.5.x ook zonder problemen kunnen worden bijgewerkt. Maargoed, als je een oude versie van b2 gebruikt kun je het zonder problemen proberen. b2evolution zal jouw data niet schaden, zelfs niet als het niet begrepen word. Het ergste wat kan gebeuren is dat je een foutmelding krijgt."
 
-#: ../../doc/upgradefrom_b2.src.html:40
-msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
-msgstr "Maar, zoals altijd, is het verstandig een backup te maken van jouw huidige website / weblog / database (afhankelijk van wat je al hebt) voordat je iets nieuws installeert."
-
 #: ../../doc/upgradefrom_b2.src.html:46
 msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
 msgstr "Op je server, vind uit wat de mysql database is die je nu al gebruikt voor Cafelog/b2. Je moet dezelfde database gebruiken om te kunnen bijwerken naar b2evolution. Maak je niet druk, b2evolution zal onder geen beding de tabellen en data van Cafelog/b2 aanpassen!"
 
 #: ../../doc/upgradefrom_b2.src.html:50
-msgid "Note 1:"
-msgstr "Opmerking 1:"
-
-#: ../../doc/upgradefrom_b2.src.html:50
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
 msgstr "Tenzij je de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. Jouw bestaande tabellen worden dan op geen enkele manier aangetast."
-
-#: ../../doc/upgradefrom_b2.src.html:54
-msgid "Note 2:"
-msgstr "Opmerking 2:"
-
-#: ../../doc/upgradefrom_b2.src.html:54
-msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
-msgstr "Waarom dezelfde database? Omdat het SQL proces dat we gebruiken om de data te kopieren -- die snel en veilig is -- alleen kan worden gedaan in een enkele database."
 
 #: ../../doc/upgradefrom_b2.src.html:60
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>"
 msgstr "Alleen de inhoud van de <code>/blogs</code> map zijn nodig om te uploaden naar jouw site. Als je b2evolution als jouw standaard webpage wilt, upload dan de inhoud van de <code>/blogs</code> naar jouw hoofdmap op de webserver. Maar, je kan ook beginnen met het uploaden van de bestanden naar een nieuwe map, <code>/b2evo</code> bijvoorbeeld; op die manier <strong>blijft jouw bestaande Cafelog/b2 weblog volledig beschikbaar terwijl jij b2evolution ontdekt.</strong>"
-
-#: ../../doc/upgradefrom_b2.src.html:62
-msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
-msgstr "Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinstalleerd in <code>http://jouwsite.com/b2evo</code> ..."
 
 #: ../../doc/upgradefrom_b2.src.html:64
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
 msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken, kopieren van jouw b2 data naar b2evo (zonder daarbij b2 aan te passen) en b2evolution voor jou configureren."
 
 #: ../../doc/upgradefrom_b2.src.html:69
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr "Controleer het <a %s>wiki</a> of de <a %s>forums</a> voor aanwijzingen voor het bijwerken van jouw bestaande b2 sjabloon naar b2evolution."
-
-#: ../../doc/upgradefrom_b2evo.src.html:6
-#: ../../doc/upgradefrom_b2evo.src.html:32
-msgid "Upgrading from a previous version of b2evolution"
-msgstr "Bijwerken vanaf een vorige versie van b2evolution"
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "Controleer het <a %s>manual</a> of de <a %s>forums</a> voor aanwijzingen voor het bijwerken van jouw bestaande b2 sjabloon naar b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
@@ -314,6 +461,49 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen (tenzij je zelf al het /conf/_config.php bestand hebt bijgewerkt voordat je hebt geupload), daarna kan je de database bijwerken van een vorige versie van b2evolution naar de nieuwe."
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr "Het is nu tijd om je vorige aanpassingen terug te brengen. We raden je aan om een diff/merge tool zoals <a %s>WinMerge</a> hiervoor te gebruiken. Die stelt je in staat om makkelijk jouw oude (bakuped) bestanden te vergelijken met de nieuwe bestanden (zelfs hele mappen in één keer) en de verschillen weer te geven.<br /> <br /> Je kan ook de <a %s>wiki</a> of het <a %s>forum</a> voor aanwijzingen over het bijwerken van specifieke bestanden van een vorige versie naar een andere."
+
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:32
+msgid "Upgrading from GeekLog"
+msgstr "Bijwerken vanaf GeekLog"
+
+#: ../../doc/upgradefrom_gl.src.html:35
+#: ../../doc/upgradefrom_mt.src.html:37
+msgid "<a %s>Install b2evolution in the regular way.</a>"
+msgstr "<a %s>Installeer b2evolution op de normale manier.</a>"
+
+#: ../../doc/upgradefrom_gl.src.html:36
+msgid "Follow the specific instructions in <a %s>/extras/geeklog/README.txt</a>"
+msgstr "Volg de specifieke instructies in <a %s>/extras/geeklog/README.txt</a>"
+
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:32
+msgid "Upgrading from Movable Type"
+msgstr "Bijwerken vanaf Movable Type"
+
+#: ../../doc/upgradefrom_mt.src.html:34
+msgid "This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway..."
+msgstr "Deze procedure is getest met Movable Type versie 2.661 maar zou ook moeten werken met andere versies. Je maakt niets kapot door het te proberen..."
+
+#: ../../doc/upgradefrom_mt.src.html:36
+msgid "Use MT's export functionnality to create a .TXT file containing your posts."
+msgstr "Gebruik MT's export functie om een .TXT bestand te maken met jouw artikelen"
+
+#: ../../doc/upgradefrom_mt.src.html:38
+msgid "Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server."
+msgstr "Zodra b2evo werkend is, kopieer jouw .TXT bestand naar de /blogs/admin map op jouw server."
+
+#: ../../doc/upgradefrom_mt.src.html:39
+msgid "In the admin, go to the Tools tab and launch the MT migration utility."
+msgstr "In de admin, ga naar Hulpmiddelen en start de MT migratie utilitie."
+
+#: ../../doc/upgradefrom_mt.src.html:40
+msgid "Follow the instructions on screen."
+msgstr "Volg de insctructies op het scherm."
+
+#: ../../doc/upgradefrom_mt.src.html:41
+msgid "Import will only take a few seconds/minutes depending on how many posts you import."
+msgstr "Importeren zal hooguit een paar secondes/minuten duren afhankelijk van het aantal artikelen."
 

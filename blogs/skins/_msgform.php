@@ -7,8 +7,6 @@
 	 * To display a feedback, you should call a stub AND pass the right parameters
 	 * For example: /blogs/index.php?disp=msgform&recipient_id=n
 	 * Note: don't code this URL by hand, use the template functions to generate it!
-	 *
-	 * $Id$
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 

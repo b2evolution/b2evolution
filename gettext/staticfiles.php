@@ -211,6 +211,7 @@ class POFile // {{{
 		}
 		else
 		{
+			#pre_dump( $msgid, 'not translated!' );
 			return TRANSTAG_OPEN.$omsgid.TRANSTAG_CLOSE;
 		}
 	}
@@ -411,13 +412,31 @@ if( $action )
 
 // change to /blogs folder
 chdir( CHDIR_TO_BLOGS );
+#pre_dump( getcwd(), 'cwd' );
 
 // get the source files
 $srcfiles = array();
-foreach( glob('{*.src.html,doc/*.src.html}', GLOB_BRACE) as $filename )
+
+foreach( array( '.', 'doc' ) as $dir )
 {
-	$srcfiles[] = $filename;
+	if( $fp = opendir($dir) )
+	{
+		while( ($file = readdir($fp) ) !== false )
+		{
+			if( $dir != '.' )
+			{
+				$file = $dir.'/'.$file;
+			}
+			if( is_file($file) && preg_match('/\.src\.html$/', $file))
+			{
+				$srcfiles[] = $file;
+			}
+		}
+		closedir($fp);
+	}
+	else log( 'could not open directory '.$dir );
 }
+
 // echo '<hr />'; pre_dump( $srcfiles, 'source files' ); echo '<hr />';
 
 
@@ -514,7 +533,7 @@ switch( $action )
 				foreach( $targets as $ttarget => $ttargetmessagefile )
 				{ // the link to the static html file for that target message file
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
-					
+
 					$list_avail .=
 					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/img/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
 				}

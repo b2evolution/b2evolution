@@ -530,6 +530,6 @@ to
 <?php
 	debug_info(); // output debug info if requested
 ?>
-?>
+
 </body>
 </html>

@@ -4,7 +4,7 @@
 <head>
 	
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>b2evo pakket: Upgrading from Manywhere Miniblog</title>
+<title>b2evo pakket: Bijwerken vanaf Manywhere Miniblog</title>
 <link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
 	
 	 
@@ -48,35 +48,27 @@
 	</ul>
 	</div>
 	
-<h1>Upgrading from Manywhere Miniblog</h1>
+<h1>Bijwerken vanaf Manywhere Miniblog</h1>
 
-<p>Voordat je begint, sommige netwerk opties van b2evolution gaan er vanuit dat j ehet eens bent met onze simpele <a href="http://b2evolution.net/about/terms.html">Algemene Voorwaarden</a>.</p>
+<p>Voordat je begint, sommige netwerk opties van b2evolution gaan er vanuit dat je het eens bent met onze simpele <a href="http://b2evolution.net/about/terms.html">Algemene Voorwaarden</a>.</p>
 
-<p><em>As always, it is wise to do a backup of your current website / blog / database
-(depending on what you already have) before starting to install something new.</em></p>
+<p><em>Zoals altijd, is het verstandig een backup te maken van jouw huidige website / weblog / database (afhankelijk van wat je al hebt) voordat je iets nieuws installeert.</em></p>
 
 <p>Zodra je de b2evolution distributie hebt uitgepakt:</p>
 
 <ol class="expanded">
-<li>On your server, locate the mysql database you are already using for Manywhere Miniblog.
-	You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will
-	not alter your Miniblog tables and data in any way!<br />
+<li>Op je server, vind uit wat de mysql database is die je nu al gebruikt voor Manywhere Miniblog. Je moet dezelfde database gebruiken om te kunnen bijwerken naar b2evolution. Maak je niet druk, b2evolution zal onder geen beding de tabellen en data van Miniblog aanpassen!<br />
 		<span class="small"><br />
-		<strong>Opmerking 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with
-		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
-		b2evolution in a database shared with other applications. For example, Miniblog uses two tables named <code>miniblog</code> and <code>user</code>.
-		Your existing tables will not be affected in any way.<br />
+		<strong>Opmerking 1: </strong>e de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. Bijvoorbeeld, Miniblog gebruikt tabellen genaamd <code>miniblog</code> en <code>user</code>. Jouw bestaande tabellen worden dan op geen enkele manier aangetast.<br />
 		<strong>Opmerking 2:</strong> Waarom dezelfde database? Omdat het SQL proces dat we gebruiken om de data te kopieren -- die snel en veilig is -- alleen kan worden gedaan in een enkele database.</span></li>
 
-<li>Upload de b2evolution bestanden naar je website, die gelijk is aan de URL die je net hebt geconfigureerd.<br />
+<li>Upload de b2evolution bestanden naar je website.<br />
   <br />
-  <span class="small"><strong>Opmerking:</strong> Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Miniblog remains fully functional while you check out b2evolution.</strong><br />
+  <span class="small"><strong>Opmerking:</strong> Alleen de inhoud van de <code>/blogs</code> map zijn nodig om te uploaden naar jouw site. Als je b2evolution als jouw standaard webpage wilt, upload dan de inhoud van de <code>/blogs</code> naar jouw hoofdmap op de webserver. Maar, je kan ook beginnen met het uploaden van de bestanden naar een nieuwe map, <code>/b2evo</code> bijvoorbeeld; op die manier <strong>blijft jouw bestaande Miniblog weblog volledig beschikbaar terwijl jij b2evolution ontdekt.</strong><br />
   </span> <br />
 Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinstalleerd in <code>http://jouwsite.com/b2evo</code> ...</li>
 
-<li>Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />
-  	<br />
-	The installer will ask you a few questions, create required database tables, copy your Miniblog data to b2evo (without affecting Miniblog) and configure b2evolution for you. </li>
+<li>Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken, kopieren van jouw miniblog data naar b2evo (zonder daarbij miniblog aan te passen) en b2evolution voor jou configureren. </li>
 <li>Controleer of de nieuwe installatie werkt.</li>
 <li>Op productie servers, is het aangeraden dat je de <code>/install/</code> directory verwijdert. </li>
 <li>Nadat de basis installatie is voltooid, zijn er nog wat <a href="http://b2evolution.net/man/install/trickystuff.html">tricky dingen waar je rekening mee moet houden</a> (online handboek)</li>

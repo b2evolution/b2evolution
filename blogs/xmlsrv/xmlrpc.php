@@ -1265,7 +1265,7 @@ function pingback_ping( $m )
 			{ // ...or a string #title, a little more complicated
 				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
 				$sql = "SELECT ID
-								FROM $tableposts
+								FROM T_posts
 								WHERE post_title RLIKE '$title'";
 				$blah = $DB->get_row( $sql, ARRAY_A );
 				if( !empty($DB->last_error) )
