@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution formatting config
- * Version of this file: 0.8.5.3
+ * Version of this file: 0.8.6.1
  *
  * This sets how posts and comments are formatted
  *
@@ -178,9 +178,9 @@ define('E_FLOW_CONTENTS', E_PURE_BLOCK_CONTENTS.' '.E_PURE_INLINE_CONTENTS.' '.E
 define('A_CORE_ATTRS', 'title');
 define('A_I18N_ATTRS', 'xml:lang lang dir');
 define('A_ATTRS', A_CORE_ATTRS.' '.A_I18N_ATTRS.' class');
-define('A_IMG_ATTRS', A_ATTRS.' src alt longdesc height width border'); 
+define('A_IMG_ATTRS', A_ATTRS.' src alt longdesc height width border align'); 
 define('A_CITE_ATTRS', A_ATTRS.' cite');
-define('A_ANCHOR_ATTRS', A_ATTRS.' href hreflang');
+define('A_ANCHOR_ATTRS', A_ATTRS.' href hreflang target');
 define('A_LIST_ATTRS', A_ATTRS.' type');
 define('A_LISTITEM_ATTRS', A_LIST_ATTRS.' value');
 

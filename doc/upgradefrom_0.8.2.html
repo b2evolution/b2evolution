@@ -12,7 +12,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.6</h1>
+<h1 id="version">Version: 0.8.6.1</h1>
 <div id="quicklinks">Setup Links: <a href="../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="../blogs/install/install.php">My DB Install</a> &middot; <a href="../blogs/index.php">My Blogs</a> &middot; <a href="../blogs/admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -21,7 +21,7 @@
 <p>Upgrading from version 0.8.2 or later:</p>
 <ol class="expanded">
   <li>Backup <strong> all b2evolution files</strong>,<strong> including /conf, skins, blog templates  and stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can.</li>
-  <li>Replace <strong>all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles </strong> with the new ones; (This is important in order to activate all security fixes!)</li>
+  <li>Replace <strong>all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles </strong> with the new ones; (This is important in order to activate all security fixes!) If you have customized your blog template/skin, please use the provided demo templates/skins until the end of the upgrade process. You'll find instructions on how to upgrade your customized templates/skins at the end of this procedure.</li>
   <li>Redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other  config files can be used without modification, however you should have look inside for fine tuning once your new version is running; </li>
   <li>Upload the files to your website, according to the URL you have just configured.</li>
   <li><strong>Upload the new files to your server</strong>, and then <a href="../blogs/install/install.php">run the database tables upgrade</a> <strong>on your server</strong>! Once your database is upgraded, it will still work with previous version of b2evolution if for some reason you decide to switch back.</li>
