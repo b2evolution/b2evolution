@@ -54,7 +54,8 @@
 		<a name="pingbacks"></a>
 	<?php } ?>
 	
-	<?php if( $disp_trackback_url ) {	// We want to display the trackback URL: ?>
+	<?php if( $disp_trackback_url ) 
+	{	// We want to display the trackback URL: ?>
 	<h4><?php echo T_('Trackback address for this post:') ?></h4>
 	<code><?php $Item->trackback_url() ?></code>
 	<?php } ?>

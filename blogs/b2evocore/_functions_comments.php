@@ -350,8 +350,10 @@ function comment_author_url_basedomain( $disp = true )
 		return $baseDomain;
 }
 
-/*
+/**
  * comment_author_email_link(-)
+ *
+ * @deprecated deprecated by {@link Comment::author_email()}
  */
 function comment_author_email_link($linktext='', $before='', $after='') 
 {
@@ -384,8 +386,10 @@ function comment_author_url_link($linktext='', $before='', $after='')
 	}
 }
 
-/*
+/**
  * comment_author_IP(-)
+ *
+ * @deprecated deprecated by {@link Comment::author_ip()}
  */
 function comment_author_IP() {
 	global $commentdata;	echo stripslashes($commentdata['comment_author_IP']);

@@ -190,62 +190,85 @@
 
 			// comments
 			if( $c )
-			{
-				$queryc = "SELECT * FROM $tablecomments WHERE comment_post_ID = $id ORDER BY comment_date";
-				$resultc = mysql_query($queryc);
-				if ($resultc) {
+			{ // We have request display of comments
 				?>
-
 				<a name="comments"></a>
-				<h4><?php echo T_('Comments') ?>:</h4>
-
+				<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
 				<?php
-				while($rowc = mysql_fetch_object($resultc))
-				{
-					$commentdata = get_commentdata($rowc->comment_ID);
+			
+				$CommentList = & new CommentList( 0, "'comment','trackback','pingback'", $show_statuses, $Item->ID, '', 'ASC' );
+				
+				$CommentList->display_if_empty( 
+											'<div class="bComment"><p>' . 
+											T_('No feedback for this post yet...') . 
+											'</p></div>' );
+			
+				while( $Comment = $CommentList->get_next() )
+				{	// Loop through comments:	
 					?>
+					<!-- ---------- START of a COMMENT/TB/PB ---------- -->
 					<div class="bComment">
-					<div class="bSmallHead">
-						<strong><?php comment_time('Y/m/d @ H:i:s'); ?></strong>
-						by <strong><?php comment_author() ?> ( <?php comment_author_email_link() ?> / <?php comment_author_url_link();
-						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-						{ ?>
-						<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode(comment_author_url_basedomain(false)) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>
-						<?php } ?> )
-						</strong> (IP: <?php comment_author_IP() ?>)
+						<div class="bSmallHead">
+							<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+							<?php $Comment->author_url( '', ' &middot; Url: ', '' ) ?>
+							<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+							{ ?>
+							<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode(comment_author_url_basedomain(false)) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
+							<?php } ?>
+							<?php $Comment->author_email( '', ' &middot; Email: ' ) ?>
+							<?php $Comment->author_ip( ' &middot; IP: ' ) ?>
+						</div>
+						<div class="bCommentTitle">
+						<?php
+							switch( $Comment->get( 'type' ) )
+							{
+								case 'comment': // Display a comment: 
+									echo T_('Comment from:') ?> 
+									<?php break;
+			
+								case 'trackback': // Display a trackback:
+									echo T_('Trackback from:') ?> 
+									<?php break;
+			
+								case 'pingback': // Display a pingback:
+									echo T_('Pingback from:') ?> 
+									<?php break;
+							} 
+						?>
+						<?php $Comment->author() ?> 
+						</div>
+						<div class="bCommentText">
+							<?php $Comment->content() ?>
+						</div>
+						<p>
+						<?php
+						if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
+						{	// If SUer has permission to edit comments:
+						?>
+						<form action="b2edit.php" method="get" class="inline">
+							<input type="hidden" name="action" value="editcomment">
+							<input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>">
+							<input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
+						</form>
+						<form action="edit_actions.php" method="get" class="inline">
+							<input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php echo $commentdata['comment_ID'] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
+						</form>
+						<?php
+						}
+						?>
+						</p>
+	
 					</div>
-					<div class="bText">
-						<?php comment_text() ?>
-					</div>
-					<p>
-					<?php
-					if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
-					{
-					?>
-					<form action="b2edit.php" method="get" class="inline">
-						<input type="hidden" name="action" value="editcomment">
-						<input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>">
-						<input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
-					</form>
-					<form action="edit_actions.php" method="get" class="inline">
-						<input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php echo $commentdata['comment_ID'] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
-					</form>
-					<?php
-					}
-					?>
-					</p>
-
-				</div>
-
-				<?php //end of the loop, don't delete
+					<!-- ---------- END of a COMMENT/TB/PB ---------- -->
+					<?php //end of the loop, don't delete
 				}
 
 				if( $Item->can_comment() )
 				{ // User can leave a comment
 				?>
+				<!-- ---------- FORM to add a comment ---------- -->
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
-				<!-- form to add a comment -->
 				<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 
 					<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
@@ -295,10 +318,10 @@
 					<div class="clear"></div>
 
 				</form>
+				<!-- ---------- END of FORM to add a comment ---------- -->
 				<?php
-				}
-			}
-		}
+				} // / can comment
+		} // / comments requested
 	?>
 	</div>
 	<?php

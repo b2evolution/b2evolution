@@ -190,7 +190,7 @@ class Item extends DataObject
 
 
 	/** 
-	 * Template function: Check if user can leave comment on this post
+	 * Template function: Check if user can leave comment on this post or display error
 	 *
 	 * {@internal Item::can_comment(-) }}
 	 *

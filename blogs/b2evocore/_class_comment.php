@@ -23,7 +23,7 @@ class Comment extends DataObject
 	var	$author;
 	var	$author_email;
 	var	$author_url;
-	var	$author_IP;
+	var	$author_ip;
 	var	$date;
 	var	$content;
 	var	$karma;
@@ -61,7 +61,7 @@ class Comment extends DataObject
 			$url = trim( $db_row['comment_author_url'] );
 			$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
 			$this->author_url = (!stristr($url, '://')) ? 'http://'.$url : $url;
-			$this->author_IP = $db_row['comment_author_IP'];
+			$this->author_ip = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
 			$this->karma = $db_row['comment_karma'];
@@ -135,6 +135,66 @@ class Comment extends DataObject
 
 
 	/** 
+	 * Template function: display author of comment
+	 *
+	 * {@internal Comment::author(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean true for link, false if you want NO html link
+	 */
+	function author( $format = 'htmlbody', $makelink = false ) 
+	{
+		if( strlen( $this->author_url ) <= 10 ) $makelink = false;
+		
+		if( $makelink ) echo '<a href="'.$this->author_url.'">';
+		$this->disp( 'author', $format );
+		if( $makelink ) echo '</a>';
+	}
+
+
+	/** 
+	 * Template function: display comment's author's IP
+	 *
+	 * {@internal Comment::author_ip(-) }}
+	 * 
+	 * @param string String to display before IP, if IP exists
+	 * @param string String to display after IP, if IP exists
+	 */
+	function author_ip( $before='', $after='' ) 
+	{
+		if( !empty( $this->author_ip ) )
+		{
+			echo $before;
+			echo $this->author_ip;
+			echo $after;
+		}
+	}
+
+
+	/** 
+	 * Template function: display link to comment author's provided email
+	 *
+	 * {@internal Comment::author_email(-) }}
+	 *
+	 * @param string String to display for link: leave empty to display email
+	 * @param string String to display before email, if email exists
+	 * @param string String to display after email, if email exists
+	 * @param boolean false if you want NO html link
+	 */
+	function author_email( $linktext='', $before='', $after='', $makelink = true ) 
+	{
+		if( strlen( $this->author_email ) > 5 )
+		{	// If email exists:
+			echo $before;
+			if( $makelink ) echo '<a href="mailto:'.$this->author_email.'">';
+			echo ($linktext != '') ? $linktext : $this->author_email;
+			if( $makelink ) echo '</a>';
+			echo $after;
+		}
+	}
+
+
+	/** 
 	 * Template function: display link to comment author's provided URL
 	 *
 	 * {@internal Comment::author_url(-) }}
@@ -156,22 +216,6 @@ class Comment extends DataObject
 		}
 	}
 
-	/** 
-	 * Template function: display author of comment
-	 *
-	 * {@internal Comment::author(-) }}
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param boolean true for link, false if you want NO html link
-	 */
-	function author( $format = 'htmlbody', $makelink = false ) 
-	{
-		if( strlen( $this->author_url ) <= 10 ) $makelink = false;
-		
-		if( $makelink ) echo '<a href="'.$this->author_url.'">';
-		$this->disp( 'author', $format );
-		if( $makelink ) echo '</a>';
-	}
 
 	/** 
 	 * Template function: display comment's original post's title
