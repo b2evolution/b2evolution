@@ -52,13 +52,16 @@ $AdminUI->addMenuEntries( NULL, // root
 																							'entries' => array(
 																								'general' => array(
 																									'text' => T_('General'),
-																									'href' => 'blogs.php?tab=general&amp;action=edit&amp;blog='.$blog ),
+																									'href' => 'blogs.php?tab=general&amp;action=edit&amp;blog='.$blog,
+																									'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 																								'perm' => array(
 																									'text' => T_('Permissions'),
-																									'href' => 'blogs.php?tab=perm&amp;action=edit&amp;blog='.$blog ),
+																									'href' => 'blogs.php?tab=perm&amp;action=edit&amp;blog='.$blog,
+																									'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 																								'advanced' => array(
 																									'text' => T_('Advanced'),
-																									'href' => 'blogs.php?tab=advanced&amp;action=edit&amp;blog='.$blog ),
+																									'href' => 'blogs.php?tab=advanced&amp;action=edit&amp;blog='.$blog,
+																									'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 																							)
 																						),
 
@@ -135,8 +138,7 @@ $AdminUI->addMenuEntries( NULL, // root
 
 														'tools' => array( 'text'=>T_('Tools'),
 																							'href'=>'tools.php' ),
-													),
-													'menu_main' // template name
+													)
 										);
 
 

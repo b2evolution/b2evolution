@@ -70,6 +70,15 @@ class AdminUI_general extends Widget
 	 */
 	function AdminUI()
 	{
+		$this->initTemplates();
+	}
+
+
+	/**
+	 * This function should init the templates - like adding Javascript through the {@link addHeadline()} method.
+	 */
+	function initTemplates()
+	{
 	}
 
 
@@ -78,9 +87,119 @@ class AdminUI_general extends Widget
 	 *
 	 * @return
 	 */
-	function addMenuEntries( $node, $entries, $template = 'default' )
+	function dispMenu( $path, $template = 'main' )
 	{
-		$node =& $this->getNode( $node, true );
+		$this->dispMenuEntries( $path, $template );
+	}
+
+
+	/**
+	 * Display a submenu.
+	 *
+	 * @param array|NULL Path of the menu to display.
+	 * @return
+	 */
+	function dispSubmenu( $path = NULL )
+	{
+		if( is_null($path) )
+		{
+			$path = array( $this->getPath(0) );
+		}
+
+		$this->dispMenu( $path, 'sub' );
+	}
+
+
+	/**
+	 *
+	 *
+	 * @return
+	 */
+	function dispMenuEntries( $path, $template, $depth = 0 )
+	{
+		global $current_User;
+
+		$templateForLevel = $this->getMenuTemplate( $template, $depth );
+
+		if( !( $menuEntries = $this->getMenuEntries($path) ) )
+		{
+			if( isset($templateForLevel['empty']) )
+			{
+				echo $templateForLevel['empty'];
+			}
+		}
+		else
+		{
+			echo $templateForLevel['before'];
+
+			$selected = $this->getSelected($path);
+
+			foreach( $menuEntries as $loop_tab => $loop_details )
+			{
+				$perm = true; // By default
+
+				if( ( ( !isset($loop_details['perm_name'])
+								|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) ) )
+							&& ( !isset($loop_details['perm_eval'])
+										|| $perm = eval($loop_details['perm_eval']) )
+						)
+						|| isset($loop_details['text_noperm']) )
+				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
+					$anchor = '<a href="'.$loop_details['href'].'"';
+					if( isset($loop_details['style']) )
+					{
+						$anchor .= ' style="'.$loop_details['style'].'"';
+					}
+
+					$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
+											."</a>";
+
+
+					if( $loop_tab == $selected )
+					{
+						if( !empty( $templateForLevel['_props']['recurseSelected'] )
+								&& ( $recursePath = array_merge( $path, $loop_tab ) )
+								&& ($this->getMenuEntries($recursePath) ) )
+						{
+							echo isset($templateForLevel['beforeEachSelWithSub'])
+										? $templateForLevel['beforeEachSelWithSub']
+										: $templateForLevel['beforeEachSel'];
+							echo $anchor;
+
+							$this->dispMenuEntries( $recursePath, $template, $depth+1 );
+
+							echo isset($templateForLevel['afterEachSelWithSub'])
+										? $templateForLevel['afterEachSelWithSub']
+										: $templateForLevel['afterEachSel'];
+						}
+						else
+						{
+							echo $templateForLevel['beforeEachSel'];
+							echo $anchor;
+							echo $templateForLevel['afterEachSel'];
+						}
+					}
+					else
+					{
+						echo $templateForLevel['beforeEach'];
+						echo $anchor;
+						echo $templateForLevel['afterEach'];
+					}
+				}
+			}
+			echo $templateForLevel['after'];
+		}
+	}
+
+
+	/**
+	 *
+	 *
+	 * @return
+	 */
+	function addMenuEntries( $path, $entries )
+	{
+		$node =& $this->getNode( $path, true );
 
 		foreach( $entries as $lKey => $lMenuProps )
 		{
@@ -89,8 +208,6 @@ class AdminUI_general extends Widget
 				$node['entries'][$lKey] = $lMenuProps;
 			}
 		}
-
-		$node['template'] = $template;
 	}
 
 
@@ -108,7 +225,7 @@ class AdminUI_general extends Widget
 
 
 	/**
-	 * Get the key of a selected entry for a node.
+	 * Get the key of a selected entry for a path.
 	 *
 	 * @return string|false
 	 */
@@ -126,8 +243,9 @@ class AdminUI_general extends Widget
 
 
 	/**
-	 * Get a node (by reference) from the menu entries.
+	 * Get the reference of a node from the menu entries using a path.
 	 *
+	 * @param array|string|NULL The path.
 	 * @return array
 	 */
 	function & getNode( $path, $createIfNotExisting = false )
@@ -163,26 +281,49 @@ class AdminUI_general extends Widget
 
 
 	/**
-	 * Get a template by name.
+	 * Get a template by name and depth.
+	 * This is a method (and not a member array) to allow dynamic generation.
 	 *
-	 * @param string Name of the template
-	 * @return
+	 * @param string Name of the template ('main', 'sub')
+	 * @return array Associative array which defines layout and optionally properties.
 	 */
-	function getTemplate($name)
+	function getMenuTemplate( $name, $depth = 0 )
 	{
-		global $app_shortname, $app_version;
-
 		switch( $name )
 		{
-			case 'menu_main':
-				return array(
-						'before' => '<div id="mainmenu"><ul>',
-						'after' => '</ul>
-												<p class="center">'.$app_shortname.' v <strong>'.$app_version.'</strong></p>
-												</div>',
-					);
+			case 'main':
+				switch( $depth )
+				{
+					case 0: // main level
+						global $app_shortname, $app_version;
 
-			default:
+						return array( 'before' => '<div id="mainmenu"><ul>',
+													'after' => '</ul>
+																			<p class="center">'.$app_shortname.' v <strong>'.$app_version.'</strong></p>
+																			</div>',
+													'beforeEach' => '<li>',
+													'afterEach' => '</li>',
+													'beforeEachSel' => '<li class="current">',
+													'afterEachSel' => '</li>',
+													'beforeEachSelWithSub' => '<li class="parent">',
+													'afterEachSelWithSub' => '<li>',
+													'_props' => array(
+															'recurseSelected' => true,  // recurse for subentries if an entry is selected
+														),
+												);
+					default:
+						return array( 'before' => '<ul class="submenu">',
+													'after' => '</ul>',
+													'beforeEach' => '<li>',
+													'afterEach' => '</li>',
+													'beforeEachSel' => '<li class="current">',
+													'afterEachSel' => '</li>',
+												);
+				}
+
+				break;
+
+			case 'sub': // submenu, we support just one depth
 				return array(
 						'before' => '<div class="pt">'
 												."\n".'<ul class="hack">'
@@ -193,104 +334,14 @@ class AdminUI_general extends Widget
 						'after' => "</ul>\n</div>\n</div>"
 												."\n".'<div class="tabbedpanelblock">',
 						'empty' => '<div class="panelblock">',
+						'beforeEach' => '<li>',
+						'afterEach'  => '</li>',
+						'beforeEachSel' => '<li class="current">',
+						'afterEachSel' => '</li>',
 					);
-		}
-	}
 
-
-	/**
-	 *
-	 *
-	 * @return
-	 */
-	function getTemplateForNode( $node )
-	{
-		$node =& $this->getNode($node);
-
-		if( isset($node['template']) )
-		{
-			return $this->getTemplate($node['template']);
-		}
-
-		return $this->getTemplate('default');
-	}
-
-
-	/**
-	 *
-	 *
-	 * @return
-	 */
-	function dispMenu( $node )
-	{
-		$template = $this->getTemplateForNode( $node );
-
-		if( !$this->getMenuEntries($node) )
-		{
-			echo $template['empty'];
-		}
-		else
-		{
-			echo $template['before'];
-			$this->dispMenuEntries( $node );
-			echo $template['after'];
-		}
-	}
-
-
-	/**
-	 *
-	 *
-	 * @return
-	 */
-	function dispSubmenu( $node = NULL )
-	{
-		global $admin_tab;
-
-		if( is_null($node) )
-		{
-			$node = array( $this->getPath(0) );
-		}
-
-		$this->dispMenu($node);
-	}
-
-
-	/**
-	 *
-	 *
-	 * @return
-	 */
-	function dispMenuEntries( $node, $template = '<li>%s</li>', $templateSelected = '<li class="current">%s</li>' )
-	{
-		global $current_User;
-
-		foreach( $this->getMenuEntries($node) as $loop_tab => $loop_details )
-		{
-			$perm = true; // By default
-
-			if( ( ( !isset($loop_details['perm_name'])
-							|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) ) )
-						&& ( !isset($loop_details['perm_eval'])
-									|| $perm = eval($loop_details['perm_eval']) )
-					)
-					|| isset($loop_details['text_noperm']) )
-			{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-				$anchor = '<a href="'.$loop_details['href'].'"';
-				if( isset($loop_details['style']) )
-				{
-					$anchor .= ' style="'.$loop_details['style'].'"';
-				}
-
-				$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
-										."</a>";
-
-				#pre_dump( $node, $loop_tab, $this->getSelected($node) );
-				printf( ( $loop_tab == $this->getSelected($node)
-										? $templateSelected
-										: $template ),
-								$anchor );
-			}
+			default:
+				die( 'Unknown $name for AdminUI::getMenuTemplate(): '.var_export($name, true) );
 		}
 	}
 

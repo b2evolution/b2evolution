@@ -50,18 +50,33 @@ require_once( dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.clas
  */
 class AdminUI extends AdminUI_general
 {
-	function getTemplate($name)
+	/**
+	 * Get a template by name and depth.
+	 *
+	 * @param string The template name ('main', 'sub').
+	 * @return array
+	 */
+	function getMenuTemplate( $name, $depth )
 	{
 		switch( $name )
 		{
-			case 'menu_main':
-				return array(
-						'before' => '<ul class="tabs">',
-						'after' => '</ul>',
-						);
+			case 'main':
+				switch( $depth )
+				{
+					default: // just one level for now (might provide dropdown later)
+						return array( 'before' => '<ul class="tabs">',
+													'after' => '</ul>',
+													'beforeEach' => '<li>',
+													'afterEach' => '</li>',
+													'beforeEachSel' => '<li class="current">',
+													'afterEachSel' => '</li>',
+												);
+				}
+				break;
 
-			default:
-				return parent::getTemplate($name);
+
+			default: // delegate to parent
+				return parent::getMenuTemplate( $name, $depth );
 		}
 	}
 }
