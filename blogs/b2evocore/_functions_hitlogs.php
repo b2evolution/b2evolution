@@ -176,7 +176,7 @@ function log_hit()
 	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
 
 	$sql ="insert into $tablehitlog( visitURL, hit_ignore, referingURL, baseDomain, hit_blog_ID, hit_remote_addr, hit_user_agent ) ";
-	$sql .= "values( '$ReqURI', '$ignore', '$ref', '$baseDomain', $blog, '$RemoteAddr', '$UserAgent')";
+	$sql .= "values( '".addslashes($ReqURI)."', '$ignore', '".addslashes($ref)."', '".addslashes($baseDomain)."', $blog, '$RemoteAddr', '".addslashes($UserAgent)."')";
 
 
 	// print $sql;
@@ -377,7 +377,7 @@ function stats_blog_name()
 function stats_referer( $before='', $after='', $disp_ref = true )
 {
 	global $row_stats;
-	$ref = trim($row_stats['referingURL']);
+	$ref = trim(stripslashes($row_stats['referingURL']));
 	if( strlen($ref) > 0 )
 	{
 		echo $before;
@@ -392,7 +392,7 @@ function stats_referer( $before='', $after='', $disp_ref = true )
 function stats_basedomain()
 {
 	global $row_stats;
-	echo htmlentities( $row_stats['baseDomain'] );
+	echo htmlentities( stripslashes($row_stats['baseDomain']));
 }
 
 /*
@@ -404,7 +404,7 @@ function stats_search_keywords()
 {
 	global $row_stats;
 	$kwout = '';
-	$ref = $row_stats['referingURL'];
+	$ref = stripslashes($row_stats['referingURL']);
 	if( ($pos_question = strpos( $ref, '?' )) == false )
 	{
 		echo '[', T_('not a query - no params!'), ']';
@@ -441,7 +441,7 @@ function stats_search_keywords()
 function stats_req_URI()
 {
 	global $row_stats;
-	echo htmlentities($row_stats['visitURL']);
+	echo htmlentities(stripslashes($row_stats['visitURL']));
 }
 
 /*
@@ -450,7 +450,7 @@ function stats_req_URI()
 function stats_user_agent( $translate = false )
 {
 	global $row_stats, $user_agents;
-	$UserAgent = $row_stats['hit_user_agent'];
+	$UserAgent = stripslashes($row_stats['hit_user_agent']);
 	if( $translate )
 	{
 		foreach ($user_agents as $curr_user_agent)
