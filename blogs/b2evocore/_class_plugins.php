@@ -269,7 +269,7 @@ class Plugins
 
 		if( !class_exists( $classname ) )
 		{ // the given class does not exist
-			$Debuglog->add( 'Plugin class for ['.$classname.'] not defined - must be same as filename.' );
+			$Debuglog->add( 'Plugin class for ['.$classname.'] not defined - must match the filename.' );
 			return false;
 		}
 		$Plugin = new $classname;	// COPY !
