@@ -152,11 +152,14 @@ function blog_update_user_perms( $blog )
  */
 function get_bloginfo( $show = '', $this_blogparams = '' )
 {
-	global $Blog, $BlogCache;
+	global $Blog, $blog, $BlogCache;
 
 	if( empty( $this_blogparams ) )
 	{	// We want the global blog on the page
-		$current_Blog = & $Blog;		
+		if( isset( $Blog ) )
+			$current_Blog = & $Blog;		
+		else
+			$current_Blog = $BlogCache->get_by_ID($blog);
 	}
 	else
 	{
