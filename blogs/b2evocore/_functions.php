@@ -1121,7 +1121,7 @@ function debug_info( $force = false )
 
 	if( $debug || $force )
 	{
-		echo '<hr class="clear" /><h1>Debug info</h1>';
+		echo '<hr class="clear" /><h2>Debug info</h2>';
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
@@ -1130,10 +1130,10 @@ function debug_info( $force = false )
 
 		if( $Debuglog->count( 'all' ) )
 		{
-			echo '<h2>Debug messages</h2>';
+			echo '<h3>Debug messages</h3>';
 			foreach( $Debuglog->messages( 'all' ) as $level => $messages )
 			{
-				echo '<h3>Level ['.$level.']</h3><ul>';
+				echo '<h4>Level ['.$level.']</h4><ul>';
 				foreach( $messages as $message )
 				{
 					echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';

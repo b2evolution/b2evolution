@@ -8,8 +8,6 @@
  *
  * @package evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
- *
- * $Id$
  */
 
 /**
