@@ -131,10 +131,8 @@ function blog_update_user_perms( $blog )
 								WHERE bloguser_blog_ID = '.$blog );
 
 	// Now we need a full user list:
-	$user_IDs = $DB->get_col( 'SELECT ID FROM T_users' );
-
 	$inserted_values = array();
-	if( count( $user_IDs ) ) foreach( $user_IDs as $loop_user_ID )
+	foreach( $DB->get_col( 'SELECT ID FROM T_users' ) as $loop_user_ID )
 	{ // Check new permissions for each user:
 		// echo "getting perms for user : $loop_user_ID <br />";
 
@@ -505,6 +503,9 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/08 19:29:24  blueyed
+ * improved $DB's get_col() handling
+ *
  * Revision 1.6  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *
