@@ -36,11 +36,24 @@
 		return false;
 	}
 	
+	?>
+	<a name="feedbacks"></a>
+	<?php
+
 	$type_list = array();
 	$disp_title = array();
-	if(  $disp_comments ) { 
-		$type_list[] = "'comment'";
-		$disp_title[] = T_("Comments"); ?>
+	if( $disp_comments ) 
+	{	// We requested to display comments
+		if( $Item->can_see_comments() )
+		{ // User can see a comments
+			$type_list[] = "'comment'";
+			$disp_title[] = T_("Comments"); 
+		}
+		else
+		{ // Use cannot see comments
+			$disp_comments = false;
+		}		
+		?>
 		<a name="comments"></a>
 	<?php } 
 	if( $disp_trackbacks ) { 

@@ -413,6 +413,8 @@ if( $action != 'editcomment' )
 
 		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?>><?php echo T_('Closed') ?></label><br />
 
+		<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?>><?php echo T_('Disabled') ?></label><br />
+
 	</fieldset>
 
 	<fieldset>

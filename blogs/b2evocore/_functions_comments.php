@@ -23,6 +23,8 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{	// we are in preview mode, no comments yet!
 		return 0;
 	}
+	
+	if( $mode == 'feedbacks' ) $mode ='ctp';
 
 	// fplanque added: load whole cache
 	if (!isset($cache_ctp_number) || (!$use_cache))
@@ -191,8 +193,10 @@ function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
 
 
 
-/*
+/**
  * comments_number(-)
+ *
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function comments_number( $zero='#', $one='#', $more='#' )
 {
@@ -215,10 +219,12 @@ function comments_number( $zero='#', $one='#', $more='#' )
 	echo $blah;
 }
 
-/*
- * comments_link(-)
+/**
+ * {@internal comments_link(-)}}
  *
  * Displays link to comments page
+ *
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function comments_link($file='', $tb=0, $pb=0 )
 {

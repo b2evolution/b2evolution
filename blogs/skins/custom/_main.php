@@ -87,26 +87,26 @@
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
-		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
-		-
-		<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
-		<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-		-
-		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
-		</div>
-		<?php	// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
-		$disp_comments = 1;					// Display the comments if requested
-		$disp_comment_form = 1;			// Display the comments form if comments requested
-		$disp_trackbacks = 1;				// Display the trackbacks if requested
+			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+	
+			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
-		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( dirname(__FILE__)."/_feedback.php");
-		// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ---------------- 
-		
-		locale_restore_previous();	// Restore previous locale (Blog locale)
-		?>
+			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+		</div>
+			<?php	// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+			$disp_comments = 1;					// Display the comments if requested
+			$disp_comment_form = 1;			// Display the comments form if comments requested
+			$disp_trackbacks = 1;				// Display the trackbacks if requested
+	
+			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
+			$disp_pingbacks = 1;				// Display the pingbacks if requested
+			require( dirname(__FILE__)."/_feedback.php");
+			// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ---------------- 
+			
+			locale_restore_previous();	// Restore previous locale (Blog locale)
+			?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
 

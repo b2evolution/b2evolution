@@ -255,8 +255,9 @@ function pingback(
  * Pingback tags 
  *****/
 
-/*
+/**
  * pingback_number(-)
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function pingback_number($zero='#', $one='#', $more='#' ) 
 {
@@ -278,8 +279,9 @@ function pingback_number($zero='#', $one='#', $more='#' )
 	echo $blah;
 }
 
-/*
+/**
  * Displays link to the pingback page
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function pingback_link($file='',$c=0,$tb=0) 
 {

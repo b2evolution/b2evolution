@@ -160,8 +160,9 @@ function trackback_url($display = 1)
 	}
 }
 
-/*
+/**
  * trackback_number(-)
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function trackback_number( $zero='#', $one='#', $more='#' ) 
 {
@@ -183,8 +184,9 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 	echo $blah;
 }
 
-/*
+/**
  * Displays link to the trackback page
+ * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function trackback_link($file='',$c=0,$pb=0) 
 {

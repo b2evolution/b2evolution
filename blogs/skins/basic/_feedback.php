@@ -30,6 +30,10 @@
 	{	// Pingback not requested
 		$disp_pingbacks = 0;				// DO NOT Display the pingbacks if not requested
 	}
+
+	?>
+	<a name="feedbacks"></a>
+	<?php
 	
 	if( ! ($disp_comments || $disp_comment_form || $disp_trackbacks || $disp_trackback_url || $disp_pingbacks ) )
 	{	// Nothing more to do....
@@ -38,9 +42,18 @@
 	
 	$type_list = array();
 	$disp_title = array();
-	if(  $disp_comments ) { 
-		$type_list[] = "'comment'";
-		$disp_title[] = T_("Comments"); ?>
+	if(  $disp_comments )	
+	{	// We requested to display comments
+		if( $Item->can_see_comments() )
+		{ // User can see a comments
+			$type_list[] = "'comment'";
+			$disp_title[] = T_("Comments"); 
+		}
+		else
+		{ // Use cannot see comments
+			$disp_comments = false;
+		}		
+		?>
 		<a name="comments"></a>
 	<?php } 
 	if( $disp_trackbacks ) { 

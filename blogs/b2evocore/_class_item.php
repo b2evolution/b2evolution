@@ -326,6 +326,21 @@ class Item extends DataObject
 
 
 	/** 
+	 * Check if user can see comments on this post 
+	 *
+	 * {@internal Item::can_see_comments(-) }}
+	 */
+	function can_see_comments() 
+	{
+		if( $this->comments == 'disabled'  )
+		{	// Comments are disabled on this post
+			return false;
+		}
+
+		return true; // OK, user can see comments
+	}
+
+	/** 
 	 * Template function: Check if user can leave comment on this post or display error
 	 *
 	 * {@internal Item::can_comment(-) }}
@@ -609,7 +624,7 @@ class Item extends DataObject
 	/** 
 	 * Template function: display permalink for item
 	 *
-	 * {@internal Item::permalink(-) }}
+	 * {@internal Item::permalink(-)}}
 	 *
 	 * @param string 'post', 'archive#id' or 'archive#title'
 	 * @param string url to use
@@ -619,6 +634,103 @@ class Item extends DataObject
 		echo $this->gen_permalink( $mode, $blogurl );
 	}
 
+
+	/*
+	 * Template function: Displays link to feedback page (under some conditions)
+	 *
+	 * {@internal Item::feedback_link(-)}}
+	 *
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string String to display before the link (if comments are to be displayed)
+	 * @param string String to display after the link (if comments are to be displayed)
+	 * @param boolean true to hide if no feeback ('#' for default)
+	 * @param string Link text to display when there are 0 comments
+	 * @param string Link text to display when there is 1 comment
+	 * @param string Link text to display when there are >1 comments
+	 * @param string Link title
+	 * @param string 'pid' or 'title'
+	 * @param string url to use
+	 */
+	function feedback_link( $type = 'feedbacks', $before = '', $after = '', 
+													$zero='#', $one='#', $more='#', $title='#', 
+													$hideifnone = '#', $mode = '', $blogurl='' )
+	{
+		switch( $type )
+		{
+			case 'feedbacks':
+				if( $hideifnone == '#' ) $hideifnone = false;
+				if( $title == '#' ) $title = T_('Display feedback / Leave a comment'); 
+				if( $zero == '#' ) $zero = T_('Send feeback');
+				if( $one == '#' ) $one = T_('1 feedback');
+				if( $more == '#' ) $more = T_('% feedbacks'); 
+				break;
+
+			case 'comments':
+				if( ! $this->can_see_comments() )
+					return false;
+				if( $hideifnone == '#' ) 
+				{
+					if( $this->can_comment() )
+						$hideifnone = false;
+					else
+						$hideifnone = true;
+				}
+				if( $title == '#' ) $title = T_('Display comments / Leave a comment'); 
+				if( $zero == '#' ) $zero = T_('Leave a comment');
+				if( $one == '#' ) $one = T_('1 comment');
+				if( $more == '#' ) $more = T_('% comments'); 
+				break;
+
+			case 'trackbacks':
+				if( $hideifnone == '#' ) $hideifnone = false;
+				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post'); 
+				if( $zero == '#' ) $zero = T_('Trackback (0)');
+				if( $one == '#' ) $one = T_('Trackback (1)');
+				if( $more == '#' ) $more = T_('Trackbacks (%)'); 
+				break;
+
+			case 'pingbacks':
+				if( $hideifnone == '#' ) $hideifnone = true;
+				if( $title == '#' ) $title = T_('Display pingbacks'); 
+				if( $zero == '#' ) $zero = T_('Pingback (0)');
+				if( $one == '#' ) $one = T_('Pingback (1)');
+				if( $more == '#' ) $more = T_('Pingback (%)'); 
+				break;
+
+			default:
+				die( "Unkown feedback type [$type]" );		
+		}
+
+		if( empty( $mode ) )
+			$mode = get_settings( 'pref_permalink_type' );
+
+		if( strpos( $mode, 'archive' ) !== false )
+		{	// Comments cannot be displayed in archive mode
+			$mode = 'pid';
+		}
+
+		$number = generic_ctp_number($this->ID, $type);
+
+		if( ($number == 0) && $hideifnone )
+			return false;
+			
+		echo $before;
+
+		echo '<a href="', $this->gen_permalink( $mode, $blogurl ), '#', $type, '" ';
+		echo 'title="', $title, '">';
+
+		if( $number == 0 ) 
+			echo $zero;
+		elseif( $number == 1 )
+			echo $one;
+	 	elseif( $number > 1 ) 
+			echo $more;
+
+		echo '</a>';
+
+		echo $after;
+
+	}
 
 	/** 
 	 * Template function: display status of item
