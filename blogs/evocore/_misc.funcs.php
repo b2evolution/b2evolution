@@ -1448,7 +1448,7 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 
 	$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo;." );
 
-	return mail( $to, $subject, $message, $headerstring );
+	return @mail( $to, $subject, $message, $headerstring );
 }
 
 
@@ -1700,6 +1700,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.36  2005/02/02 01:10:08  blueyed
+ * added @ to mail() again
+ *
  * Revision 1.35  2005/02/02 00:55:53  blueyed
  * send_mail() fixed/enhanced
  *
