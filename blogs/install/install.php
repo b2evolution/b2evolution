@@ -121,9 +121,8 @@ function check_db_version()
 
 	echo '<p>'.T_('Checking DB schema version...').' ';
 	$DB->query( "SELECT * FROM $tablesettings LIMIT 1" );
-	$colinfo = $DB->get_col_info();
 	
-	if( $colinfo[0] == 'set_name' )
+	if( $DB->get_col_info('name', 0) == 'set_name' )
 	{ // we have new table format
 		$old_db_version = $DB->get_var( "SELECT set_value FROM $tablesettings WHERE set_name = 'db_version'" );
 	}

@@ -47,6 +47,9 @@ elseif( $use_l10n == 2 )
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
 		
+		if( empty($req_locale) )
+			return $string;  // don't translate if we have no locale
+		
 		$messages = $locales[$req_locale]['messages'];
 		
 		$search = str_replace( "\n", '\n', $string );

@@ -19,30 +19,24 @@ class Settings
 	{ // constructor
 		global $new_db_version, $DB, $tablesettings;
 
-		$sql = "SELECT set_name, set_value FROM $tablesettings";
-
+		$sql = "SELECT * FROM $tablesettings";
+		
 		$q = $DB->get_results( $sql );
 
-		foreach( $q as $loop_q )
-		{
-			$this->{$loop_q->set_name}->value = $loop_q->set_value;
-			$this->{$loop_q->set_name}->dbstatus = 'uptodate';
-			$this->{$loop_q->set_name}->dbescape = false;
-		}
-
-		if( isset($this->db_version ) )
-		{
-			if( $new_db_version != $this->db_version->value )
+		if( $DB->get_col_info('name', 0) == 'set_name' )
+		{ // read new format only
+			foreach( $q as $loop_q )
 			{
-				die( T_('Your b2evolution database does not match the script version.') );
+				$this->{$loop_q->set_name}->value = $loop_q->set_value;
+				$this->{$loop_q->set_name}->dbstatus = 'uptodate';
+				$this->{$loop_q->set_name}->dbescape = false;
 			}
 		}
-		else
-		{ // hope that it will fit
-			$this->set( 'db_version', $new_db_version );
-			debug_log( 'Note: new db_version set!' );
-		}
 
+		if( !isset($this->db_version ) || $new_db_version != $this->db_version->value )
+		{
+			die( T_('Sorry, your b2evolution database does not match the script version.') );
+		}
 	}
 
 
