@@ -122,16 +122,28 @@
 	<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
+	switch( $disp )
+	{
+		case 'comments':
+			// this includes the last comments if requested:
+			require( dirname(__FILE__).'/_lastcomments.php' );
+			break;
 
-	// this includes the last comments if requested:
-	require( dirname(__FILE__)."/_lastcomments.php");
+		case 'stats':
+			// this includes the statistics if requested:
+			require( dirname(__FILE__).'/_stats.php');
+			break;
+		
+		case 'arcdir':
+			// this includes the archive directory if requested
+			require( dirname(__FILE__).'/_arcdir.php');
+			break;
 
-	// this includes the statistics if requested:
-	require( dirname(__FILE__)."/_stats.php");
-
-	// this includes the archive directory if requested
-	require( dirname(__FILE__)."/_arcdir.php");
-
+		case 'profile':
+			// this includes the profile form if requested
+			require( dirname(__FILE__).'/_profile.php');
+			break;
+	}
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
 
@@ -164,7 +176,7 @@
 			<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
 			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
 			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Sentence') ?></label>
+			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label>
 			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
 			<input type="reset" value="<?php echo T_('Reset form') ?>" />
 		</form>

@@ -87,13 +87,30 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
 
-<?php
-		// this includes the last comments if requested
-		require( dirname(__FILE__)."/_lastcomments.php");
+<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
+	switch( $disp )
+	{
+		case 'comments':
+			// this includes the last comments if requested:
+			require( dirname(__FILE__).'/_lastcomments.php' );
+			break;
 
-		// this includes the stats if requested
-		require( dirname(__FILE__)."/_stats.php");
-?>
+		case 'stats':
+			// this includes the statistics if requested:
+			require( dirname(__FILE__).'/_stats.php');
+			break;
+		
+		case 'arcdir':
+			// this includes the archive directory if requested
+			require( dirname(__FILE__).'/_arcdir.php');
+			break;
+
+		case 'profile':
+			// this includes the profile form if requested
+			require( dirname(__FILE__).'/_profile.php');
+			break;
+	}
+// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 

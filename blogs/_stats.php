@@ -10,7 +10,7 @@
 	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
 		die("Please, do not access this page directly.");
 	
-	if( ($disp == 'stats') || ($stats) ) 
+	if( $disp == 'stats' ) 
 	{ ?>
 	
 	<div class="statbloc"><h3><?php echo T_('Last referers') ?>:</h3>

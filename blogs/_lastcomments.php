@@ -10,7 +10,7 @@
 	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
 		die("Please, do not access this page directly.");
 
-	if( ($disp != 'comments') && ($c != "last") ) 
+	if( $disp != 'comments' ) 
 	{	// We have not asked for comments to be displayed...
 		return false;		// Nothing to do here!
 	}

@@ -231,3 +231,8 @@ a.BlogButton:hover, a.BlogButtonCurr:hover
 {
 	background-color:#fff;
 }
+
+fieldset
+{
+	border: none;
+}

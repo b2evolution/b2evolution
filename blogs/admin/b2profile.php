@@ -2,51 +2,23 @@
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = T_('Profile');
 
-function add_magic_quotes($array)
-{
-	foreach ($array as $k => $v)
-	{
-		if (is_array($v))
-		{
-			$array[$k] = add_magic_quotes($v);
-		}
-		else
-		{
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-}
+param( 'action', 'string', '' );
+param( 'redirect', 'string', '' );
+param( 'profile', 'string', '' );
+param( 'user', 'integer', '' );
 
-if (!get_magic_quotes_gpc())
-{
-	$_GET    = add_magic_quotes($_GET);
-	$_POST   = add_magic_quotes($_POST);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-$b2varstoreset = array('action','standalone','redirect','profile','user');
-
-for ($i=0; $i<count($b2varstoreset); $i++)
-{
-	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var))
-	{
-		if (empty($_POST['$b2var']))
-		{
-			if (empty($_GET['$b2var']))
-			{
-				$$b2var = '';
-			}
-			else
-			{
-				$$b2var = $_GET['$b2var'];
-			}
-		} else {
-			$$b2var = $_POST['$b2var'];
-		}
-	}
-}
+param( 'newuser_firstname', 'string', '' );
+param( 'newuser_lastname', 'string', '' );
+param( 'newuser_nickname', 'string', '' );
+param( 'newuser_icq', 'string', '' );
+param( 'newuser_aim', 'string', '' );
+param( 'newuser_msn', 'string', '' );
+param( 'newuser_yim', 'string', '' );
+param( 'newuser_url', 'string', '' );
+param( 'newuser_email', 'string', '' );
+param( 'newuser_idmode', 'string', '' );
+param( 'pass1', 'string', '' );
+param( 'pass2', 'string', '' );
 
 switch($action) 
 {
@@ -63,36 +35,37 @@ switch($action)
 		}
 
 		/* checking the nickname has been typed */
-		if (empty($_POST['newuser_nickname']))
+		if (empty($newuser_nickname))
 		{
 			die ('<strong>'.T_('ERROR').'</strong>: '.T_('please enter your nickname (can be the same as your login)').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
 	
 		/* if the ICQ UIN has been entered, check to see if it has only numbers */
-		if (!empty($_POST['newuser_icq']))
+		if (!empty($newuser_icq))
 		{
-			if (!ereg("^[0-9]+$", $_POST["newuser_icq"])) {
+			if (!ereg("^[0-9]+$", $newuser_icq))
+			{
 				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('your ICQ UIN can only be a number, no letters allowed').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 				return false;
 			}
 		}
 	
 		/* checking e-mail address */
-		if (empty($_POST["newuser_email"]))
+		if (empty($newuser_email))
 		{
 			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('please type your e-mail address').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
-		elseif (!is_email($_POST['newuser_email']))
+		elseif (!is_email($newuser_email))
 		{
 			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('the email address isn\'t correct').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
 	
-		if ($_POST['pass1'] == '')
+		if ($pass1 == '')
 		{
-			if ($_VARS['pass2'] != '')
+			if ($pass2 != '')
 			{
 				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.'));
 			}
@@ -100,15 +73,15 @@ switch($action)
 		}
 		else
 		{
-			if ($_POST['pass2'] == '')
+			if ($pass2 == '')
 			{
 				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.') );
 			}
-			if ($_POST['pass1'] != $_POST['pass2'])
+			if ($pass1 != $pass2)
 			{
 				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed two different passwords. Go back to correct that.') );
 			}
-			$newuser_pass = md5($_POST['pass1']);
+			$newuser_pass = md5($pass1);
 			$updatepassword = "user_pass = '$newuser_pass', ";
 			if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
 			{
@@ -118,16 +91,6 @@ switch($action)
 			echo '<br />';
 		}
 
-		$newuser_firstname = addslashes($_POST['newuser_firstname']);
-		$newuser_lastname  = addslashes($_POST['newuser_lastname']);
-		$newuser_nickname  = addslashes($_POST['newuser_nickname']);
-		$newuser_icq       = addslashes($_POST['newuser_icq']);
-		$newuser_aim       = addslashes($_POST['newuser_aim']);
-		$newuser_msn       = addslashes($_POST['newuser_msn']);
-		$newuser_yim       = addslashes($_POST['newuser_yim']);
-		$newuser_email     = addslashes($_POST['newuser_email']);
-		$newuser_url       = addslashes($_POST['newuser_url']);
-		$newuser_idmode    = addslashes($_POST['newuser_idmode']);
 
 		$query = "UPDATE $tableusers SET user_firstname = '$newuser_firstname', ".$updatepassword."user_lastname='$newuser_lastname', user_nickname='$newuser_nickname', user_icq='$newuser_icq', user_email='$newuser_email', user_url='$newuser_url', user_aim='$newuser_aim', user_msn='$newuser_msn', user_yim='$newuser_yim', user_idmode='$newuser_idmode' WHERE ID = $user_ID";
 		$result = mysql_query($query) or mysql_oops( $query );

@@ -243,6 +243,53 @@ function get_usernumposts($userid)
 
 
 /*
+ * get_user_info(-)
+ */
+function get_user_info( $show='', $this_userdata = '' )
+{
+	global $userdata;
+
+	if( empty( $this_userdata ) )
+	{	// We want the current user
+		 $this_userdata = & $userdata;
+	}
+
+	switch( $show ) 
+	{
+		case 'firstname':
+			$output = $this_userdata['user_firstname'];
+			break;
+
+		case 'lastname':
+			$output = $this_userdata['user_lastname'];
+			break;
+
+			
+		case 'login':
+		default:
+			$output = $this_userdata['user_login'];
+			break;
+	}
+	return trim($output);
+}
+
+
+/*
+ * user_info(-)
+ *
+ * Template tag
+ */
+function user_info( $show='', $format = 'raw', $display = true ) 
+{
+	$content = get_user_info( $show );
+	$content = format_to_output( $content, $format );
+	if( $display )
+		echo $content;
+	else
+		return $content;
+}
+
+/*
  * profile(-)
  *
  * outputs a link to user profile
@@ -376,9 +423,11 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
 	echo $before;
-	echo '<span OnClick="javascript:window.open(\'',$pathserver, '/b2profile.php?user=', $user_login,'\',\'Profile\',\'toolbar=0,status=1,location=0,directories=0,menuBar=0,scrollbars=1,resizable=1,width=480,height=320,left=100,top=100\');" title="', $link_title, '">';
+	echo '<a href="';
+	bloginfo( 'blogurl', 'raw' );
+	echo '?disp=profile" title="', $link_title, '">';
 	printf( $link_text, $user_login );
-	echo '</span>';
+	echo '</a>';
 	echo $after;
 }
 

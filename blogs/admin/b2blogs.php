@@ -62,7 +62,7 @@ switch($action)
 		$blog_roll = format_to_post($blo_roll, 0, 0);
 
 		if ( errors_display( T_('Cannot update, please correct these errors:'),
-			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog creating').'</a>]'))
+			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog form').'</a>]'))
 		{
 			require( dirname(__FILE__).'/_footer.php' );
 			die();

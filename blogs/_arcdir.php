@@ -10,11 +10,11 @@
 	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
 		die("Please, do not access this page directly.");
 
-	if($disp == 'arcdir')  
+	if( $disp == 'arcdir' )  
 	{ // We have asked to display full archives:
-?>
-<ul>
-<?php
+	?>
+	<ul>
+	<?php
 		/*
 		 * This file is basically just a trick where we set the number of entries to display
 		 * to "no limit"...
@@ -25,6 +25,8 @@
 		 */
 		require dirname(__FILE__).'/_archives.php';
 		unset( $archive_limit );
+	?>
+	</ul>
+	<?php	
+	} 
 ?>
-</ul>
-<?php	} ?>

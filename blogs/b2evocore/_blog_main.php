@@ -43,7 +43,7 @@ if(!isset($timestamp_min)) $timestamp_min = '';
 if(!isset($timestamp_max)) $timestamp_max = '';
 
 if( empty($disp) )
-{
+{	// Conversion support for old params:
 	if( $c == 'last') 
 	{	// Trabslate old last comments caller
 		$disp = 'comments';

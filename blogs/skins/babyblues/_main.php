@@ -51,6 +51,31 @@
 
 <p>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
+
+<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
+	switch( $disp )
+	{
+		case 'comments':
+			// this includes the last comments if requested:
+			require( dirname(__FILE__).'/_lastcomments.php' );
+			break;
+
+		case 'stats':
+			// this includes the statistics if requested:
+			require( dirname(__FILE__).'/_stats.php');
+			break;
+		
+		case 'arcdir':
+			// this includes the archive directory if requested
+			require( dirname(__FILE__).'/_arcdir.php');
+			break;
+
+		case 'profile':
+			// this includes the profile form if requested
+			require( dirname(__FILE__).'/_profile.php');
+			break;
+	}
+// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
 <div id="side">
 	<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------

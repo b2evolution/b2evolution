@@ -139,81 +139,102 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 
 	switch($show) 
 	{
-		case "ID":
+		case 'ID':
 			$output = $this_blogparams->blog_ID;
 			break;
-		case "siteurl":
+
+		case 'siteurl':
 			$output = $this_blogparams->blog_siteurl;
 			break;
-		case "filename":
+			
+		case 'filename':
 			$output = $this_blogparams->blog_filename;
 			break;
-		case "staticfilename":
+			
+		case 'staticfilename':
 			$output = $this_blogparams->blog_staticfilename;
 			break;
-		case "stub":
+			
+		case 'stub':
 			$output = $this_blogparams->blog_stub;
 			break;
-		case "blogurl":
+			
+		case 'blogurl':
 		case 'link':			// RSS wording
-		case "url":
-			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub;
+		case 'url':
+			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub;
 			break;
-		case "dynurl":
-			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_filename;
+			
+		case 'dynurl':
+			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_filename;
 			break;
-		case "staticurl":
-			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_staticfilename;
+			
+		case 'staticurl':
+			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_staticfilename;
 			break;
-		case "blogstatsurl":
-			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub.
+			
+		case 'blogstatsurl':
+			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
 								'?disp=stats';
 			break;
-		case "lastcommentsurl":
-			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub.
+		case 'lastcommentsurl':
+			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
 								'?disp=comments';
 			break;
-		case "tagline":
+			
+		case 'tagline':
 			$output = $this_blogparams->blog_tagline;
 			break;
-		case "description":			// RSS wording
-		case "shortdesc":
+			
+		case 'description':			// RSS wording
+		case 'shortdesc':
 			$output = $this_blogparams->blog_description;
 			break;
-		case "keywords":
+			
+		case 'keywords':
 			$output = $this_blogparams->blog_keywords;
 			break;
-		case "longdesc":
+		case 'longdesc':
 			$output = $this_blogparams->blog_longdesc;
 			break;
-		case "blogroll":
+			
+		case 'blogroll':
 			$output = $this_blogparams->blog_roll;
 			break;
-		case "lang":
+			
+		case 'lang':
 			$output = $this_blogparams->blog_lang;
 			break;
-		case "rdf_url":
+			
+		case 'rdf_url':
 			$output = $xmlsrvurl.'/rdf.php?blog='.$this_blogparams->blog_ID;
 			break;
-		case "rss_url":
+			
+		case 'rss_url':
 			$output = $xmlsrvurl.'/rss.php?blog='.$this_blogparams->blog_ID;
 			break;
-		case "rss2_url":
+			
+		case 'rss2_url':
 			$output = $xmlsrvurl.'/rss2.php?blog='.$this_blogparams->blog_ID;
 			break;
-		case "pingback_url":
+			
+		case 'pingback_url':
 			$output = $xmlsrvurl.'/xmlrpc.php';
 			break;
-		case "admin_email":
+			
+		case 'admin_email':
 			$output = $admin_email;
 			break;
-		case "shortname":
+			
+		case 'shortname':
 			$output =  $this_blogparams->blog_shortname;
 			break;
-		case "default_skin":
+			
+		case 'default_skin':
 			$output =  $this_blogparams->blog_default_skin;
 			break;
-		case "name":
+			
+		case 'name':
 		default:
 			$output =  $this_blogparams->blog_name;
 			break;
@@ -271,10 +292,12 @@ function blog_load_cache()
 
 /*
  * bloginfo(-)
+ *
+ * Template tag
  */
 function bloginfo( $show='', $format = 'raw', $display = true ) 
 {
-	$content = get_bloginfo($show);
+	$content = get_bloginfo( $show );
 	$content = format_to_output( $content, $format );
 	if( $display )
 		echo $content;
