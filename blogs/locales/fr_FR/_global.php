@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-08-24 21:26+0200\nPO-Revision-Date: 2003-08-24 21:28+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-08-24 21:26+0200\nPO-Revision-Date: 2003-09-04 00:02+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -281,7 +281,7 @@ $trans['fr_FR'] = array(
 	'Be careful what you do, editing this file could break your template! Do not edit what\'s between <code>&lt;?php</code> and <code>?&gt;</code> if you don\'t know what you\'re doing!' => 'Attention: en éditant cet fichier vous pouvez rendre votre gabarit inutilisable! N\'éditez pas ce qui se trouve entre <code>&lt;?php</code> et <code>?&gt;</code> si vous ne savez pas précisément ce que vous faites!',
 	'update template !' => 'mise à jour du gabarit !',
 	'(you cannot update that file/template: must make it writable, e.g. CHMOD 766)' => '(vousne pouvez pas mettre à jour ce fichier/gabarit: vous devez autoriser l\'accèd en écriture, avec un chmod 766 mar exemple)',
-	'This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom).' => 'Cette page vous permet d\'éditer l\'habillage <strong>custom<strong> (il se trouve dans le répertoire /skins/custom).',
+	'This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom).' => 'Cette page vous permet d\'éditer l\'habillage <strong>custom</strong> (il se trouve dans le répertoire /skins/custom).',
 	'You can edit any of the following files (provided it\'s writable by the server, e.g. CHMOD 766)' => 'Vous pouvez éditer le fichier de votre choix parmi les suivants (pourvu qu\'il soit autorisé à l\'écriture, chmod 766 par exemple)',
 	'This is the template that displays the links to the archives for a blog' => 'Affiche les liens vers les archives d\'un blog',
 	'This is the template that displays the (recursive) list of (sub)categories' => 'Affiche la liste (récursive) des (sous-)catégories.',

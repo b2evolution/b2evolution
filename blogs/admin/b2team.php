@@ -4,7 +4,126 @@ $title = T_('User management');
 
 param( 'action', 'string' );
 
-switch ($action) {
+switch ($action) 
+{
+case 'view':
+	/*
+	 * TODO: use escaped user functions
+	 */
+	param( 'user', 'integer' );
+	$profiledata=get_userdata($user);
+
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
+	?>
+	<div class="panelblock">
+	<h2><?php echo T_('Profile for:'), ' ', $profiledata["user_nickname"] ?></h2>
+
+	<table width="100%">
+	<tr><td width="250">
+
+	<table cellpadding="5" cellspacing="0">
+	<tr>
+	<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
+	<td><?php echo $profiledata["user_login"] ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('First name') ?></strong></td>
+	<td><?php echo $profiledata["user_firstname"] ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('Last name') ?></strong></td>
+	<td><?php echo $profiledata["user_lastname"] ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('Nickname') ?></strong></td>
+	<td><?php echo $profiledata["user_nickname"] ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('Email') ?></strong></td>
+	<td><?php echo make_clickable($profiledata["user_email"]) ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('URL') ?></strong></td>
+	<td><?php echo $profiledata["user_url"] ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('ICQ') ?></strong></td>
+	<td><?php if ($profiledata["user_icq"] > 0) { echo make_clickable("icq:".$profiledata["user_icq"]); } ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('AIM') ?></strong></td>
+	<td><?php echo make_clickable("aim:".$profiledata["user_aim"]) ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('MSN IM') ?></strong></td>
+	<td><?php echo $profiledata["user_msn"] ?></td>
+	</tr>
+	<tr>
+	<td align="right"><strong><?php echo T_('YahooIM') ?></strong></td>
+	<td><?php echo $profiledata["user_yim"] ?></td>
+	</tr>
+	</table>
+
+	</td>
+	<td valign="top">
+
+	<table cellpadding="5" cellspacing="0">
+	<tr>
+	<td>
+	<strong><?php echo T_('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
+	</tr>
+	<tr>
+	<td>
+	<strong><?php echo T_('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
+	</td>
+	</tr>
+	<tr>
+	<td>
+	<strong><?php echo T_('Posts') ?>:</strong>
+	<?php
+	$posts=get_usernumposts($user);
+	echo $posts;
+	?>
+	</td>
+	</tr>
+	<tr>
+	<td>
+	<strong><?php echo T_('Identity') ?>:</strong><br />
+	<?php
+	switch($profiledata["user_idmode"]) {
+		case "nickname":
+			$r=$profiledata["user_nickname"];
+			break;
+		case "login":
+			$r=$profiledata["user_login"];
+			break;
+		case "firstname":
+			$r=$profiledata["user_firstname"];
+			break;
+		case "lastname":
+			$r=$profiledata["user_lastname"];
+			break;
+		case "namefl":
+			$r=$profiledata["user_firstname"]." ".$profiledata["user_lastname"];
+			break;
+		case "namelf":
+			$r=$profiledata["user_lastname"]." ".$profiledata["user_firstname"];
+			break;
+	}
+	echo $r;
+	?>
+	</td>
+	</tr>
+	</table>
+
+	</td>
+	</table>
+	</div>
+	<?php
+	
+	break;
+	
 	
 case "promote":
 	param( 'prom', 'string' );
@@ -30,12 +149,11 @@ case "promote":
 	$result=mysql_query($sql) or die("Couldn't change $id's level.");
 
 	header("Location: b2team.php");
-
-break;
+	exit();
+	break;
 
 case "delete":
 	param( 'id', 'integer' );
-
 	if (!$id) {
 		header("Location: b2team.php");
 	}
@@ -54,139 +172,53 @@ case "delete":
 	$result=mysql_query($sql) or die( sprintf( T_('Couldn\'t delete user #%d\'s posts.'), $id ) );
 
 	header("Location: b2team.php");
+	exit();
+	break;
 
-break;
 
 default:
 	require( dirname(__FILE__).'/_menutop.php');
 	require( dirname(__FILE__).'/_menutop_end.php');
 	?>
 	<div class="panelblock">
-	<table cellspacing="0" cellpadding="5" border="0" width="100%">
-	<tr>
-	<td><?php echo T_('Click on an user\'s login name to see his/her complete Profile.') ?><br />
-	<?php echo T_('To edit your Profile, click on your login name.') ?></td>
-	</tr>
-</table>
-</div>
+		<?php echo T_('Click on an user\'s login name to see his/her complete Profile.') ?><br />
+		<?php echo T_('To edit your Profile, click on your login name.') ?>
+	</div>
+	<?php
+}
+?>
 
 <div class="panelblock">
-	<p><strong>Active users</strong>
-	<table cellpadding="5" cellspacing="0">
-	<tr>
-	<td class="tabletoprow"><?php echo T_('ID') ?></td>
-	<td class="tabletoprow"><?php echo T_('Nickname') ?></td>
-	<td class="tabletoprow"><?php echo T_('Name') ?></td>
-	<td class="tabletoprow"><?php echo T_('Email') ?></td>
-	<td class="tabletoprow"><?php echo T_('URL') ?></td>
-	<td class="tabletoprow"><?php echo T_('Level') ?></td>
-	<?php if ($user_level > 3) { ?>
-	<td class="tabletoprow"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></td>
-	<?php } ?>
-	</tr>
+	<h2><?php echo T_('Active users') ?></h2>
 	<?php
 	$request = " SELECT * FROM $tableusers WHERE user_level>0 ORDER BY ID";
+	$querycount++; 
 	$result = mysql_query($request);
-	while($row = mysql_fetch_object($result)) {
-		$user_data = get_userdata2($row->ID);
-		echo "<tr>\n<!--".$user_data["user_login"]."-->\n";
-		$email = $user_data["user_email"];
-		$url = $user_data["user_url"];
-		$bg1 = ($user_data["user_login"] == $user_login) ? "style=\"background-image: url('img/b2button.gif');\"" : "bgcolor=\"#dddddd\"";
-		$bg2 = ($user_data["user_login"] == $user_login) ? "style=\"background-image: url('img/b2button.gif');\"" : "bgcolor=\"#eeeeee\"";
-		echo "<td $bg1>".$user_data["ID"]."</td>\n";
-		echo "<td $bg2><strong><a href=\"javascript:profile(".$user_data["ID"].")\">".$user_data["user_nickname"]."</a></strong></td>\n";
-		echo "<td $bg1>".$user_data["user_firstname"]."&nbsp;".$user_data["user_lastname"]."</td>\n";
-		echo "<td $bg2>&nbsp;<a href=\"mailto:$email\" title=\"e-mail: $email\"><img src=\"img/email.gif\" border=\"0\" alt=\"e-mail: $email\" /></a>&nbsp;</td>";
-		echo "<td $bg1>&nbsp;";
-		if (($user_data["user_url"] != "http://") and ($user_data["user_url"] != ""))
-			echo "<a href=\"$url\" target=\"_blank\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
-		echo "</td>\n";
-		echo "<td $bg2>".$user_data["user_level"];
-		if (($user_level >= 2) and ($user_level > ($user_data["user_level"] + 1)))
-			echo " <a href=\"b2team.php?action=promote&id=".$user_data["ID"]."&prom=up\">+</a> ";
-		if (($user_level >= 2) and ($user_level > $user_data["user_level"]) and ($user_data["user_level"] > 0))
-			echo " <a href=\"b2team.php?action=promote&id=".$user_data["ID"]."&prom=down\">-</a> ";
-		echo "</td>\n";
-		if ($user_level > 3) {
-			echo "<td $bg1>".$user_data["user_login"]."</td>\n";
-		}
-		echo "</tr>\n";
-	}
-	
+	require dirname(__FILE__).'/_user_list.php';	
 	?>
-	
-	</table>
-	</p>
 </div>
-<?php
+
+<div class="panelblock">
+	<h2><?php echo T_('Inactive users (level 0)') ?></h2>
+	<?php
 	$request = " SELECT * FROM $tableusers WHERE user_level=0 ORDER BY ID";
+	$querycount++; 
 	$result = mysql_query($request);
+	require dirname(__FILE__).'/_user_list.php';	
+
 	if (mysql_num_rows($result)) {
-?>
-<div class="panelblock">
-	<p><strong>Inactive users (level 0)</strong>
-	<table cellpadding="5" cellspacing="0">
-	<tr>
-	<td class="tabletoprow"><?php echo T_('ID') ?></td>
-	<td class="tabletoprow"><?php echo T_('Nickname') ?></td>
-	<td class="tabletoprow"><?php echo T_('Name') ?></td>
-	<td class="tabletoprow"><?php echo T_('Email') ?></td>
-	<td class="tabletoprow"><?php echo T_('URL') ?></td>
-	<td class="tabletoprow"><?php echo T_('Level') ?></td>
-	<?php if ($user_level > 3) { ?>
-	<td class="tabletoprow"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></td>
-	<?php } ?>
-	</tr>
-	<?php
-	while($row = mysql_fetch_object($result)) 
-	{
-		$user_data = get_userdata2($row->ID);
-		echo "<tr>\n<!--".$user_data["user_login"]."-->\n";
-		$email = $user_data["user_email"];
-		$url = $user_data["user_url"];
-		$bg1 = ($user_data["user_login"] == $user_login) ? "style=\"background-image: url('img/b2button.gif');\"" : "bgcolor=\"#dddddd\"";
-		$bg2 = ($user_data["user_login"] == $user_login) ? "style=\"background-image: url('img/b2button.gif');\"" : "bgcolor=\"#eeeeee\"";
-		echo "<td $bg1>".$user_data["ID"]."</td>\n";
-		echo "<td $bg2><strong><a href=\"javascript:profile(".$user_data["ID"].")\">".$user_data["user_nickname"]."</a></strong></td>\n";
-		echo "<td $bg1>".$user_data["user_firstname"]."&nbsp;".$user_data["user_lastname"]."</td>\n";
-		echo "<td $bg1>&nbsp;<a href=\"mailto:".antispambot($email)."\" title=\"e-mail: ".antispambot($email)."\"><img src=\"img/email.gif\" border=\"0\" alt=\"e-mail: ".antispambot($email)."\" /></a>&nbsp;</td>";
-		echo "<td $bg2>&nbsp;";
-		if (($user_data["user_url"] != "http://") and ($user_data["user_url"] != ""))
-			echo "<a href=\"$url\" target=\"_blank\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
-		echo "</td>\n";
-		echo "<td $bg1>".$user_data["user_level"];
-		if ($user_level >= 2)
-			echo " <a href=\"b2team.php?action=promote&id=".$user_data["ID"]."&prom=up\">+</a> ";
-		if ($user_level >= 3)
-			echo " <a href=\"b2team.php?action=delete&id=".$user_data["ID"]."\" style=\"color:red;font-weight:bold;\">X</a> ";
-		echo "</td>\n";
-		if ($user_level > 3) {
-			echo "<td $bg2>".$user_data["user_login"]."</td>\n";
-		}
-		echo "</tr>\n";
-	}
-	
 	?>
-	
-	</table>
-	</p>
 </div>
 
-	<?php 
-	}
-	if ($user_level >= 3) { ?>
-
-<div class="panelblock">
-	<?php echo T_('To delete an user, bring his/her level to zero, then click on the red cross.') ?><br />
-	<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?>
-</div>
-	<?php
+<?php 
 }
-
-break;
+if ($user_level >= 3) 
+{ ?>
+	<div class="panelblock">
+		<?php echo T_('To delete an user, bring his/her level to zero, then click on the red cross.') ?><br />
+		<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?>
+	</div>
+<?php
 }
-	
-/* </Team> */
 require( dirname(__FILE__).'/_footer.php' ); 
 ?>

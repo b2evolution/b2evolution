@@ -160,7 +160,7 @@ legend
 	color: #999999;
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 10px;
-	background-color: #DDEEFF;
+	background-color: #def;
 }
 a.menutop {
 	background-color: transparent;
@@ -289,19 +289,19 @@ div.large
 
 table.thin
 {
-	border: 1px solid #33CCCC;
+	border: 1px solid #ccc;
 	margin: auto;
 	border-collapse: collapse
 }
 table.thin td
 {
-	border-bottom: 1px solid #33CCCC;
+	border-bottom: 1px solid #ccc;
 	padding: .3ex 1ex;
 }
 table.thin th
 {
-	color: #FFFFFF;
-	background-color: #33CCCC;
+	color: #fff;
+	background-color: #ccc;
 	border-left: 1px solid #FFFFFF;
 	border-right: 1px solid #FFFFFF;
 	padding: .3ex 1ex;

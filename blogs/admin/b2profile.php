@@ -1,149 +1,15 @@
 <?php 
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 
-param( 'action', 'string', '' );
-param( 'redirect', 'string', '' );
-param( 'profile', 'string', '' );
-param( 'user', 'integer', '' );
+/*
+ * Display urrent user's profile:
+ */	
 
-switch($action) 
-{
-	
-	case "viewprofile":
-	
-		$profiledata=get_userdata($user);
-		if( $_COOKIE[$cookie_user] == $profiledata["user_login"])
-			header("Location: b2profile.php");
-	
-		$title = T_('Profile');
-		require(dirname(__FILE__).'/_menutop.php');
-		require(dirname(__FILE__).'/_menutop_end.php');
-		?>
-	
-		<div class="menutop" align="center">
-		<?php echo $profiledata["user_login"] ?>
-		</div>
-	
-		<form name="form" action="b2profile.php" method="post">
-		<input type="hidden" name="action" value="update" />
-		<table width="100%">
-		<tr><td width="250">
-	
-		<table cellpadding="5" cellspacing="0">
-		<tr>
-		<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
-		<td><?php echo $profiledata["user_login"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('First name') ?></strong></td>
-		<td><?php echo $profiledata["user_firstname"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('Last name') ?></strong></td>
-		<td><?php echo $profiledata["user_lastname"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('Nickname') ?></strong></td>
-		<td><?php echo $profiledata["user_nickname"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('Email') ?></strong></td>
-		<td><?php echo make_clickable($profiledata["user_email"]) ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('URL') ?></strong></td>
-		<td><?php echo $profiledata["user_url"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('ICQ') ?></strong></td>
-		<td><?php if ($profiledata["user_icq"] > 0) { echo make_clickable("icq:".$profiledata["user_icq"]); } ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('AIM') ?></strong></td>
-		<td><?php echo make_clickable("aim:".$profiledata["user_aim"]) ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('MSN IM') ?></strong></td>
-		<td><?php echo $profiledata["user_msn"] ?></td>
-		</tr>
-		<tr>
-		<td align="right"><strong><?php echo T_('YahooIM') ?></strong></td>
-		<td><?php echo $profiledata["user_yim"] ?></td>
-		</tr>
-		</table>
-	
-		</td>
-		<td valign="top">
-	
-		<table cellpadding="5" cellspacing="0">
-		<tr>
-		<td>
-		<strong><?php echo T_('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
-		</tr>
-		<tr>
-		<td>
-		<strong><?php echo T_('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
-		</td>
-		</tr>
-		<tr>
-		<td>
-		<strong><?php echo T_('Posts') ?>:</strong>
-		<?php
-		$posts=get_usernumposts($user);
-		echo $posts;
-		?>
-		</td>
-		</tr>
-		<tr>
-		<td>
-		<strong><?php echo T_('Identity') ?>:</strong><br />
-		<?php
-		switch($profiledata["user_idmode"]) {
-			case "nickname":
-				$r=$profiledata["user_nickname"];
-				break;
-			case "login":
-				$r=$profiledata["user_login"];
-				break;
-			case "firstname":
-				$r=$profiledata["user_firstname"];
-				break;
-			case "lastname":
-				$r=$profiledata["user_lastname"];
-				break;
-			case "namefl":
-				$r=$profiledata["user_firstname"]." ".$profiledata["user_lastname"];
-				break;
-			case "namelf":
-				$r=$profiledata["user_lastname"]." ".$profiledata["user_firstname"];
-				break;
-		}
-		echo $r;
-		?>
-		</td>
-		</tr>
-		</table>
-	
-		</td>
-		</table>
-	
-		</form>
-		<?php
-	
-	break; // case 'viewprofile'
-	
-	
-	
-	default:
-		/*
-		 * Display urrent user's profile:
-		 */	
+$title = T_('My Profile');
+require(dirname(__FILE__).'/_menutop.php');
+require(dirname(__FILE__).'/_menutop_end.php');
 
-		$title = T_('My Profile');
-		require(dirname(__FILE__).'/_menutop.php');
-		require(dirname(__FILE__).'/_menutop_end.php');
-
-		?>
+?>
 		
 <div class="bPosts">
 	<div class="bPost">
@@ -231,9 +97,6 @@ switch($action)
 </div>
 <div style="clear:both;"></div>
 <?php
-	break; // case default
-
-} // switch($action)
 
 require( dirname(__FILE__).'/_footer.php' ); 
 

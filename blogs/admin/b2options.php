@@ -39,7 +39,7 @@ default:
 			<form name="form" action="b2options.php" method="post">
 			<input type="hidden" name="action" value="update" />
 	
-			<table width="550" cellpadding="5" cellspacing="0">
+			<table cellpadding="5" cellspacing="0">
 			<tr height="40">
 				<td width="150" height="40"><?php echo T_('Show') ?>:</td>
 				<td width="350"><input type="text" name="newposts_per_page" value="<?php echo $posts_per_page; ?>" size="3">

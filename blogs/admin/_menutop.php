@@ -92,9 +92,8 @@ if( empty($mode) )
 <td rowspan="3" width="50" valign="top"><a href="http://b2evolution.net/"><img src="img/b2minilogo.png" width="50" height="50" border="0" alt="visit b2evolution's website" style="border-width:1px; border-color: #999999; border-style: dashed" /></a></td>
 
 <td><strong><span style="color:#333333">e</span><span style="color:#554433">v</span><span style="color:#775522">o</span><span style="color:#996622">l</span><span style="color:#bb7722">u</span><span style="color:#cc8811">t</span><span style="color:#dd9911">i</span><span style="color:#ee9900">o</span><span style="color:#ff9900">n</span></strong> <?php echo $b2_version ?></td>
-<td width="150" style="text-align: right; padding-rightt: 6px;" align="right">
-<span style="color: #b0b0b0; font-family: verdana, arial, helvetica; font-size: 10px;"><?php echo T_('logged in as:') ?> <strong><?php echo $user_login; ?></strong></span>
-</td>
+
+<td style="color: #b0b0b0; padding-right: 1ex; font-family: verdana, arial, helvetica; font-size: 10px;" align="right"><?php echo T_('logged in as:') ?> <strong><?php echo $user_login; ?></strong></td>
 
 </tr>
 <tr>
