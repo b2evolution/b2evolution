@@ -29,6 +29,8 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
+timer_start();
+
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
 
