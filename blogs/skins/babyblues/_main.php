@@ -23,7 +23,7 @@
 </head>
 <body>
 	<div id="wide">&nbsp;</div>
-	<div id="pic"><img src="babies.jpg"></div>
+	<div id="pic"><img src="babies.jpg" width="467" height="337" alt="babies"></div>
 	<div id="content">
 	<!-- // b2 loop start -->
 
@@ -82,7 +82,10 @@
 				require( dirname(__FILE__).'/_profile.php');
 				break;
 		}
-	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
+	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
+	debug_info();	// output debug info if requested
+	?>
+
 	</div>
 	<div id="side">
 
@@ -126,11 +129,8 @@
 		</div>
 
 	</div>
-
 	<?php
 		log_hit();	// log the hit on this page
-		debug_info();	// output debug info if requested
 	?>
-
 </body>
 </html>

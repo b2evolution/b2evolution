@@ -185,10 +185,21 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
-if(!isset($default_skin)) // Check if this has been forced in stub
+if( !isset($default_skin) ) // Check if this has been forced in stub
+{
+	//$Blog->set( 'default_skin', 'test_does_not_exist' );
+	if( !skin_exists( $Blog->get('default_skin') )
+			|| $Blog->get('default_skin') == '' )
+	{ // blog's default skin does not exist - set to first in list
+		skin_list_start();
+		$Blog->set( 'default_skin', skin_list_next() );
+		$Blog->dbupdate();
+		debug_log(sprintf('new default skin [%s] set for blog [%s]', $Blog->get('default_skin'), $Blog->shortname));
+	}
 	$default_skin = $Blog->get('default_skin');
+}
 
-if(!isset($skin)) // Check if this has been forced in stub
+if( !isset($skin) ) // Check if this has been forced in stub
 {
 	if( $Blog->get('force_skin') )
 	{	// We want to force the use of default skin
@@ -210,14 +221,12 @@ param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 {	// We want to display now:
-	$skin_folder = get_path( 'skins' );
-	
 	// Check that the default skin exists:
 	// Bacause a lot of bloggers will set themseleves a cookie and delete the default skin,
 	// we have to make this fool proof extra checking!
-	if( !is_dir($skin_folder.'/'.$default_skin) )
+	if( !skin_exists( $default_skin ) )
 	{
-		printf( T_('The default skin [%s] does not exist. It must be properly set in the blog stub file [%s]. Contact the <a %s>webmaster</a>...'), $default_skin, $pagenow, 'href="mailto:'.$admin_email.'"');
+		printf( T_('The default skin [%s] does not exist. It must be properly set in the blog properties (blog admin) or blog stub file [%s]. Contact the <a %s>webmaster</a>...'), $default_skin, $pagenow, 'href="mailto:'.$admin_email.'"');
 		die();	
 	}
 	
@@ -245,7 +254,7 @@ if( !empty( $skin ) )
 		// echo ("<p>Invalid skin name!</p>");
 		$skin = $default_skin;
 	}
-	elseif( !is_dir($skin_folder.'/'.$skin) )
+	elseif( !skin_exists($skin) )
 	{
 		// echo "<p>Oops, no such skin!</p>";
 		$skin = $default_skin;
@@ -253,11 +262,11 @@ if( !empty( $skin ) )
 
 	if( $template == 'popup' )
 	{	// Do the popup display
-		require "$skin_folder/$skin/_popup.php";
+		require get_path( 'skins' )."/$skin/_popup.php";
 	}
 	else
 	{	// Do the main display
-		require "$skin_folder/$skin/_main.php";
+		require get_path( 'skins' )."/$skin/_main.php";
 	}
 }
 else

@@ -3167,7 +3167,7 @@ msgid ""
 "The default skin [%s] does not exist. It must be properly set in the blog "
 "stub file [%s]. Contact the <a %s>webmaster</a>..."
 msgstr ""
-"Das Standardskin [%s] existiert nicht. Es muss in der %quot;Stub&quot;-Datei "
+"Das Standardskin [%s] existiert nicht. Es muss in der &quot;Stub&quot;-Datei "
 "des Blogs [%s] gesetzt werden. Kontaktiere den <a %s>Webmaster</a>..."
 
 #: ..\..\..\b2evocore\_class_blog.php:375
