@@ -342,15 +342,20 @@ class User extends DataObject
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
 		global $use_fileupload, $fileupload_minlevel, $fileupload_allowedusers;
+		global $Settings, $UserSettings;
 
 		$perm = false;
 
 		switch( $permname )
 		{ // What permission do we want to check?
 			case 'upload':
-				// Global permission to upload files...
+				/* old:
 				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel)
 								&& ((ereg(' '. $this->login. ' ', $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==''));
+				*/
+				$perm = $Settings->get( 'upload_enabled' )
+								&& ( $this->level >= $Settings->get( 'upload_minlevel' )
+										|| $UserSettings->get( 'upload_allowed' ) );
 				break;
 
 			case 'edit_timestamp':
@@ -852,6 +857,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2005/03/01 23:26:34  blueyed
+ * upload perms..
+ *
  * Revision 1.16  2005/02/28 09:06:34  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
