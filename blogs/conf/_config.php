@@ -1,7 +1,7 @@
 <?php
-/*
+/**
  * This is b2evolution's config file
- * Version of this file: 0.8.9+CVS
+ * Version of this file: 0.9
  *
  * You need to edit this file to your settings before attempting to install the database!
  *
@@ -10,6 +10,8 @@
  * IMPORTANT: Take special care not to erase quotes (') around text parameters 
  * and semicolums (;) at the end of the lines. Otherwise you'll get some 
  * "unexpected T_STRING" parse errors!
+ *
+ * Contributors: you should override this file by creating a file named _config_TEST.php (see end of this file)
  */
 
 
@@ -44,6 +46,11 @@ $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH 
 # Your email. Will be used in severe error messages so that users can contact you. 
 # You will also receive notifications for new user registrations.
 $admin_email = 'postmaster@localhost';
+
+
+# Once you have edited this file to your settings, set the following to 1 (one):
+$config_is_done = 0;
+
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder
 # IT IS RECOMMENDED YOU DO NOT TOUCH THOSE SETTINGS 

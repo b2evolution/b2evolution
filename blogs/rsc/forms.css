@@ -30,11 +30,13 @@ form.fform fieldset {
 	border: 1px solid #ddd;
 	margin-bottom: 1ex;
 	background-color: #fff;
+	padding: 0;
 }
 form.fform fieldset fieldset {
 	clear: both;
 	border: none;
 	margin: 2ex;
+	padding: 0;
 }
 form.fform div.label {
 	float: left;

@@ -280,7 +280,7 @@ class Calendar
 			// Create links to previous/next month
 			$previous_month_link = '<a href="'.
 				archive_link( ($this->month > 1) ? $this->year : ($this->year - 1),	($this->month > 1) ? ($this->month - 1) : 12, '', '', false, $file, $params )
-				.'" title="'.T_('previoust month').'">&lt;</a>&nbsp;&nbsp;';
+				.'" title="'.T_('previous month').'">&lt;</a>&nbsp;&nbsp;';
 	
 			$next_month_link = '&nbsp;&nbsp;<a href="'.
 				archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
