@@ -428,6 +428,59 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a duration input field.
+	 *
+	 * @param string the name of the input field
+	 * @param string initial value (seconds)
+	 * @param string label displayed in front of the field
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function duration( $field_prefix, $duration, $field_label )
+	{
+
+		$r = $this->begin_field( $field_prefix, $field_label );
+
+		$days = floor( $duration / 86400 ); // 24 hours
+		$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$field_prefix.'_days">';
+		$r .= '<option value="0"'.( 0 == $days ? ' selected="selected"' : '' ).">---</option>\n";
+		for( $i = 1; $i <= 30; $i++ )
+		{
+			$r .= '<option value="'.$i.'"'.( $i == $days ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+		}
+		$r .= '</select>'.T_('days')."\n";
+
+		$hours = floor( $duration / 3600 ) % 24;
+		$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$field_prefix.'_hours">';
+		$r .= '<option value="0"'.( 0 == $hours ? ' selected="selected"' : '' ).">---</option>\n";
+		for( $i = 1; $i <= 24; $i++ )
+		{
+			$r .= '<option value="'.$i.'"'.( $i == $hours ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+		}
+		$r .= '</select>'.T_('heures')."\n";
+
+		$minutes = floor( $duration / 60 ) % 60;
+		$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$field_prefix.'_minutes">';
+		$r .= '<option value="0"'.( ($minutes<15) ? ' selected="selected"' : '' ).">00</option>\n";
+		$r .= '<option value="15"'.( ($minutes>=15 && $minutes<30) ? ' selected="selected"' : '' ).">15</option>\n";
+		$r .= '<option value="30"'.( ($minutes>=30 && $minutes<45) ? ' selected="selected"' : '' ).">30</option>\n";
+		$r .= '<option value="45"'.( ($minutes>=45) ? ' selected="selected"' : '' ).">45</option>\n";
+		$r .= '</select>'.T_('minutes')."\n";
+
+		$r .= $this->end_field();
+
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+
+
+	/**
 	 * Build a select to choose a weekday.
 	 *
 	 * @return true|string
