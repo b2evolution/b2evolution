@@ -721,6 +721,11 @@ param( 'mode', 'string', 'normal' );
 		{
 			++$i;
 
+			// Defaults:
+			$post_catids = array();
+			$post_renderers = $default_renderers;
+			$post_status = 'published';
+
 			// strip the post's last '-----'
 			$post = preg_replace("|-----\n+$|s", '', $post);
 
@@ -728,9 +733,6 @@ param( 'mode', 'string', 'normal' );
 			$post_author = trim( substr( $post, 0, strpos( $post, "\n", 1 ) ) );
 			$post = preg_replace( '/^.*\n/', '', $post );
 			$message = "\n<li>Post from ".format_to_output( $post_author, 'entityencoded' ).' <ul>';
-
-			$post_catids = array();
-			$post_renderers = $default_renderers;
 
 			// Take the pings out first
 			preg_match("|(-----\n\nPING:.*)|s", $post, $pings);
@@ -779,7 +781,8 @@ param( 'mode', 'string', 'normal' );
 			$metadata = explode("\n", $post);
 
 			$post_categories = array();
-			foreach ($metadata as $line) if( !empty($line) ) {
+			foreach ($metadata as $line) if( !empty($line) )
+			{
 				debug_dump($line);
 
 				$post_locale = $default_locale;
