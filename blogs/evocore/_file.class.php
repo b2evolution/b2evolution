@@ -158,6 +158,37 @@ class File
 
 
 	/**
+	 * Create the file, if it does not exist.
+	 *
+	 * @param string optional permissions (octal format)
+	 * @return boolean true if file was created, false on failure
+	 */
+	function create( $chmod = NULL )
+	{
+		if( $this->_isDir )
+		{
+			$r = $chmod === NULL ?
+						@mkdir( $this->_path.$this->_name ) :
+						@mkdir( $this->_path.$this->_name, octdec($chmod) );
+		}
+		else
+		{
+			$r = touch( $this->_path.$this->_name );
+			if( $chmod !== NULL )
+			{
+				$this->chmod( $chmod );
+			}
+		}
+
+		if( $r )
+		{
+			$this->_exists = true;
+		}
+		return $r;
+	}
+
+
+	/**
 	 * Refreshes (and inits) information about the file.
 	 */
 	function refresh()
@@ -442,6 +473,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.5  2004/10/24 22:55:12  blueyed
+ * upload, fixes, ..
+ *
  * Revision 1.4  2004/10/23 23:07:16  blueyed
  * case-insensitive for windows!
  *

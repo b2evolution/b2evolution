@@ -82,10 +82,10 @@ class FileManager extends Filelist
 
 
 	/**
-	 * User preference: sort dirs at top
+	 * User preference: sort dirs not at top
 	 * @var boolean
 	 */
-	var $dirsattop = true;
+	var $dirsnotattop = false;
 
 	/**
 	 * User preference: show hidden files?
@@ -134,13 +134,6 @@ class FileManager extends Filelist
 	 * @access protected
 	 */
 	var $mode = NULL;
-
-
-	/**#@+
-	 * "Constants"
-	 */
-	var $FM_EXISTS = 2;
-	/**#@-*/
 
 	// }}}
 
@@ -311,7 +304,7 @@ class FileManager extends Filelist
 	{
 		parent::sort( $this->translate_order( $this->order ),
 									$this->translate_asc( $this->orderasc, $this->translate_order( $this->order ) ),
-									$this->dirsattop );
+									!$this->dirsnotattop );
 
 	}
 
@@ -349,6 +342,21 @@ class FileManager extends Filelist
 			echo '<a title="'.T_('Edit permissions').'" href="'.$link.'">'
 						.$this->curFile->getPerms( $this->permlikelsl ? 'lsl' : '' ).'</a>';
 		}
+	}
+
+
+	function dispButtonUpload( $title = '#', $attribs = '' )
+	{
+		if( $title = '#' )
+		{
+			$title = T_('Upload a file/image');
+		}
+
+		$url = $this->getCurUrl( NULL, NULL, NULL, NULL, NULL, NULL, 'file_upload' );
+
+		echo '<input class="ActionButton" type="button" value="'.format_to_output( $title, 'formvalue' )
+					.'" onclick="'.$this->getJsPopupCode( $url, 'fileman_upload' )
+					.'" '.$attribs.' />';
 	}
 
 
@@ -410,11 +418,26 @@ class FileManager extends Filelist
 
 		if( $url = $this->getLinkFileDelete( $File ) )
 		{
-			echo '<a title="'.T_('Delete').'" href="'.$url.'" onclick="return confirm(\''
+			echo '<a title="'.T_('Delete').'" href="'.$url.'" onclick="if( confirm(\''
 				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete [%s]?'),
-				format_to_output( $File->getName(), 'formvalue' ) ).'\');">'
-				.getIcon( 'file_delete' ).'</a>';
+				format_to_output( $File->getName(), 'formvalue' ) ).'\') )
+				{
+					this.href += \'&amp;confirmed=1\';
+					return true;
+				}
+				else return false;">'.getIcon( 'file_delete' ).'</a>';
 		}
+	}
+
+
+	/**
+	 * Get current working directory.
+	 *
+	 * @return string the current working directory
+	 */
+	function getCwd()
+	{
+		return $this->cwd;
 	}
 
 
@@ -727,6 +750,7 @@ class FileManager extends Filelist
 	 * @param string filename, defaults to current loop entry
 	 * @param boolean delete subdirs of a dir?
 	 * @return boolean true on success, false on failure
+	 * @deprecated not used anymore
 	 */
 	function delete( $file = NULL, $delsubdirs = false )
 	{
@@ -746,7 +770,7 @@ class FileManager extends Filelist
 		}
 		else
 		{ // use a specific entry
-			if( ($key = $this->findkey( $file )) !== false )
+			if( ($key = $this->getKeyByName( $file )) !== false )
 			{
 				$entry = $this->entries[$key];
 			}
@@ -772,7 +796,7 @@ class FileManager extends Filelist
 					return false;
 				}
 			}
-			elseif( @rmdir( $this->cwd.'/'.$entry['name'] ) )
+			elseif( @rmdir( $this->cwd.$entry['name'] ) )
 			{
 				$this->Messages->add( sprintf( T_('Directory [%s] deleted.'), $entry['name'] ), 'note' );
 				return true;
@@ -785,7 +809,7 @@ class FileManager extends Filelist
 		}
 		else
 		{
-			if( unlink( $this->cwd.'/'.$entry['name'] ) )
+			if( unlink( $this->cwd.$entry['name'] ) )
 			{
 				$this->Messages->add( sprintf( T_('File [%s] deleted.'), $entry['name'] ), 'note' );
 				return true;
@@ -832,7 +856,15 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Creates a directory or file.
+	 *
 	 * Meant to be called by {@link createDir()} or {@link createFile()}
+	 *
+	 * @param string type; 'dir' or 'file'
+	 * @param string name of the directory or file
+	 * @param string path of the directory or file, defaults to cwd
+	 * @param integer permissions for the new directory/file (octal format)
+	 * @return false|File false on failure, File on success
 	 */
 	function createDirOrFile( $type, $name, $path = NULL, $chmod = NULL )
 	{
@@ -840,12 +872,8 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		if( $path == NULL )
-		{
-			$path = $this->cwd;
-		}
+		$path = $path === NULL ? $this->cwd : trailing_slash( $path );
 
-		$path = trailing_slash( $path );
 		if( $chmod == NULL )
 		{
 			$chmod = $type == 'dir' ?
@@ -860,7 +888,7 @@ class FileManager extends Filelist
 														T_('Cannot create empty file.') );
 			return false;
 		}
-		if( !isFilename($name) )
+		elseif( !isFilename($name) )
 		{
 			$this->Messages->add( sprintf( ($type == 'dir' ?
 																			T_('[%s] is not a valid directory.') :
@@ -869,68 +897,38 @@ class FileManager extends Filelist
 		}
 
 
-		if( file_exists($path.$name) )
+		$newFile =& getFile( $name, $path );
+
+		if( $newFile->exists() )
 		{
-			$this->Messages->add( sprintf( ($type == 'dir' ?
-																			T_('The directory [%s] already exists.') :
-																			T_('The file [%s] already exists.') ), $name) );
-			return $this->FM_EXISTS;
+			$this->Messages->add( sprintf( T_('The file [%s] already exists.'), $name ) );
+			return false;
 		}
 
-		if( $type == 'file' )
+		if( $newFile->create() )
 		{
-			if( !touch( $path.$name ) )
+			if( $type == 'file' )
 			{
-				$this->Messages->add( sprintf( T_('Could not create file [%s] in [%s].'), $name, $path ) );
-				return false;
+				$this->Messages->add( sprintf( T_('File [%s] created.'), $name ), 'note' );
 			}
-			$this->Messages->add( sprintf( T_('File [%s] created.'), $name ), 'note' );
+			else
+			{
+				$this->Messages->add( sprintf( T_('Directory [%s] created.'), $name ), 'note' );
+			}
 		}
 		else
-		{ // dir
-			if( !@mkdir( $path.$name, $chmod ) )
+		{
+			if( $type == 'file' )
+			{
+				$this->Messages->add( sprintf( T_('Could not create file [%s] in [%s].'), $name, $path ) );
+			}
+			else
 			{
 				$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $name, $path ) );
-				return false;
 			}
-			$this->Messages->add( sprintf( T_('Directory [%s] created.'), $name ), 'note' );
 		}
 
-		if( $newFile = $this->addFile( $path.$name ) )
-		{
-			$newFile->chmod( $chmod );
-			return true;
-		}
-
-		return false;
-	}
-
-
-	/**
-	 * Create a directory
-	 *
-	 * @param string the name of the directory
-	 * @param string path to create the directory in (default is cwd)
-	 * @param integer permissions for the new directory (octal format)
-	 * @return mixed true on success, false (or ->FM_EXISTS) on failure
-	 */
-	function createDir( $dirname, $path = NULL, $chmod = NULL )
-	{
-		return $this->createDirOrFile( 'dir', $dirname, $path, $chmod );
-	}
-
-
-	/**
-	 * Create a file
-	 *
-	 * @param string filename
-	 * @param string path to create the file in (default is cwd)
-	 * @param integer permissions for the new file (octal format)
-	 * @return mixed true on success, false (or ->FM_EXISTS) on failure
-	 */
-	function createFile( $filename, $path = NULL, $chmod = NULL )
-	{
-		return $this->createDirOrFile( 'file', $filename, $path, $chmod );
+		return $newFile;
 	}
 
 
@@ -1004,7 +1002,7 @@ class FileManager extends Filelist
 			$height = 800;
 		}
 
-		$r = "opened = window.open('$href','$target','resizable=yes,scrollbars=yes,";  // status=yes,toolbar=1,location=yes,
+		$r = "opened = window.open('$href','$target','resizable=yes,scrollbars=yes,";  // status=yes,toolbar=1,location=yes,";
 
 		if( $width )
 		{
@@ -1027,7 +1025,7 @@ class FileManager extends Filelist
 	{
 		global $UserSettings;
 
-		$UserSettings->get_cond( $this->dirsattop,        'fm_dirsattop',        $this->User->ID );
+		$UserSettings->get_cond( $this->dirsnotattop,     'fm_dirsnotattop',     $this->User->ID );
 		$UserSettings->get_cond( $this->permlikelsl,      'fm_permlikelsl',      $this->User->ID );
 		$UserSettings->get_cond( $this->recursivedirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
 		$UserSettings->get_cond( $this->showhidden,       'fm_showhidden',       $this->User->ID );
@@ -1118,9 +1116,9 @@ class FileManager extends Filelist
 			if( $r = copy( $SourceFile->getPath(true), $TargetFile->getPath(true) ) )
 			{
 				$TargetFile->refresh();
-				if( !$this->findkey( $TargetFile->getName() ) )
+				if( $this->getKeyByName( $TargetFile->getName() ) === false )
 				{ // File not in filelist (expected)
-					$this->addFile( $TargetFile->getName() );
+					$this->addFile( $TargetFile );
 				}
 			}
 			return $r;
@@ -1131,6 +1129,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.5  2004/10/24 22:55:12  blueyed
+ * upload, fixes, ..
+ *
  * Revision 1.4  2004/10/21 00:41:20  blueyed
  * made JsPopup nice again
  *

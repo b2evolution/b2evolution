@@ -202,14 +202,20 @@ class Filelist
 
 
 	/**
-	 * Add a file to the list. If the file already exists in the list.
+	 * Add a file to the list, by filename.
 	 *
-	 * @param string file name or full path
+	 * @param string|File file name / full path or {@link File} object
 	 * @param boolean allow other paths than the lists default path?
-	 * @return File|false File on success, false on failure
+	 * @return boolean true on success, false on failure (path not allowed,
+	 *                 already in filelist, does not exist)
+	 * @todo optimize (blueyed)
 	 */
 	function addFile( $name, $allPaths = false )
 	{
+		if( is_a( $name, 'file' ) )
+		{
+			$name = $name->getPath(true);
+		}
 		if( basename($name) != $name )
 		{ // path attached
 			if( !$allPaths && (dirname($name).'/' != $this->listpath) )
@@ -218,37 +224,42 @@ class Filelist
 			}
 			else
 			{
-				$entry =& getFile( basename($name), dirname($name).'/' );
+				$NewFile =& getFile( basename($name), dirname($name).'/' );
 			}
 		}
 		else
 		{
-			$entry =& getFile( $name, $this->listpath );
+			$NewFile =& getFile( $name, $this->listpath );
 		}
 
-		if( !$entry->exists() )
+		if( !$NewFile->exists() )
 		{
 			return false;
 		}
 
-		if( $this->recursivedirsize && $entry->isDir( $this->listpath.$name ) )
+		if( $this->getKeyByName( $NewFile->getName() ) === false  )
 		{
-			$entry->setSize( get_dirsize_recursive( $this->listpath.$name ) );
+			$this->entries[] =& $NewFile;
+
+			if( $this->recursivedirsize && $NewFile->isDir() )
+			{ // won't be done in the File constructor
+				$entry->setSize( get_dirsize_recursive( $this->listpath.$name ) );
+			}
+
+			if( $NewFile->isDir() )
+			{
+				$this->count_dirs++;
+			}
+			else
+			{
+				$this->count_files++;
+			}
+			$this->count_bytes += $NewFile->getSize();
+
+			return true;
 		}
 
-		if( $entry->isDir() )
-		{
-			$this->count_dirs++;
-		}
-		else
-		{
-			$this->count_files++;
-		}
-		$this->count_bytes += $entry->getSize();
-
-		$this->entries[] =& $entry;
-
-		return $entry;
+		return false;
 	}
 
 
@@ -275,7 +286,7 @@ class Filelist
 		}
 		if( $dirsattop === NULL )
 		{
-			$dirsattop = $this->dirsattop;
+			$dirsattop = !$this->dirsnotattop;
 		}
 
 		if( $order == 'size' )
@@ -444,7 +455,7 @@ class Filelist
 	{
 		$this->save_idx[] = $this->current_file_idx;
 
-		if( ($this->current_file_idx = $this->findkey( $filename )) === false )
+		if( ($this->current_file_idx = $this->getKeyByName( $filename )) === false )
 		{ // file could not be found
 			$this->current_file_idx = array_pop( $this->save_idx );
 			return false;
@@ -479,17 +490,38 @@ class Filelist
 
 
 	/**
-	 * finds an entry ('name' field) in the entries array
+	 * Get the key of the entries list by filename.
 	 *
 	 * @access protected
 	 * @param string needle
 	 * @return integer the key of the entries array
 	 */
-	function findkey( $find )
+	function getKeyByName( $name )
 	{
 		foreach( $this->entries as $key => $File )
 		{
-			if( $File->getName() == $find )
+			if( $File->getName() == $name )
+			{
+				return $key;
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * Get the key of the entries list by filename and path.
+	 *
+	 * @access protected
+	 * @param string needle
+	 * @param string second needle
+	 * @return integer the key of the entries array
+	 */
+	function getKeyByNameAndPath( $name, $path )
+	{
+		foreach( $this->entries as $key => $File )
+		{
+			if( $File->getName() == $name && $File->getPath() == $path )
 			{
 				return $key;
 			}
@@ -514,8 +546,7 @@ class Filelist
 		}
 		else
 		{ // remove from list
-
-			if( $entryKey = $this->findkey( $File->getName() ) )
+			if( ($entryKey = $this->getKeyByName( $File->getName() )) !== false )
 			{
 				unset( $this->entries[$entryKey] );
 			}
@@ -527,6 +558,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.4  2004/10/24 22:55:12  blueyed
+ * upload, fixes, ..
+ *
  * Revision 1.3  2004/10/21 00:14:44  blueyed
  * moved
  *

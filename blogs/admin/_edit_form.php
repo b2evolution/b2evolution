@@ -43,11 +43,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		form.submit();
 		return false;
 	}
-
-	function launchupload()
-	{
-		window.open ("b2upload.php", "b2upload", "width=380,height=360,location=0,menubar=0,resizable=1,scrollbars=yes,status=1,toolbar=0");
-	}
 	// End -->
 </script>
 
@@ -168,12 +163,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		$edited_Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
 
-	if( $current_User->check_perm( 'upload' ) )
-	{ // ------------------------------- UPLOAD ---------------------------------- ?>
-		<input type="button" value="<?php echo T_('Upload a file/image') ?>"
-		onclick="launchupload();" tabindex="12"  />
-		<?php
-	}
+
+	// ------------------------------- UPLOAD ----------------------------------
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
+	$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
+	$Fileman->dispButtonUpload( '#', 'tabindex="12"' );
+
 
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => $target_type ) );

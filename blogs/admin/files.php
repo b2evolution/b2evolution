@@ -66,7 +66,7 @@ param( 'filter_regexp', 'integer', NULL );
 param( 'order', 'string', NULL );
 param( 'asc', '', NULL );
 
-param( 'root', 'string', NULL );    // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+param( 'root', 'string', NULL );     // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 
 
 if( $current_User->login != 'demouser' && $current_User->level < 10 )
@@ -77,7 +77,7 @@ if( $current_User->login != 'demouser' && $current_User->level < 10 )
 
 if( $action == 'update_settings' )
 { // updating user settings
-	$UserSettings->set( 'fm_dirsattop',        param( 'option_dirsattop',        'integer', 0 ) );
+	$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
 	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
 	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
 	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
@@ -308,7 +308,7 @@ if( $selaction != '' )
 					require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
 
 					$options = array (
-						'basedir' => $Fileman->cwd,
+						'basedir' => $Fileman->getCwd(),
 						'inmemory' => 1,
 						'recurse' => 1-$exclude_sd,
 					);
@@ -352,17 +352,10 @@ if( $selaction != '' )
 switch( $action ) // {{{ (we catched empty action before)
 {
 	case 'createnew':  // create new file/dir
-		param( 'createnew', 'string', '' );
+		param( 'createnew', 'string', '' ); // 'file', 'dir'
 		param( 'createname', 'string', '' );
 
-		if( $createnew == 'dir' )
-		{
-			$Fileman->createDir( $createname );
-		}
-		elseif( $createnew == 'file' )
-		{
-			$Fileman->createFile( $createname );
-		}
+		$Fileman->createDirOrFile( $createnew, $createname );
 		break;
 
 
@@ -382,11 +375,11 @@ switch( $action ) // {{{ (we catched empty action before)
 				<input type="hidden" name="action" value="delete" />
 				<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
 				'.$Fileman->getFormHiddenInputs().'
-				<input type="submit" value="'.T_('I am sure!').'" />
+				<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
 			</form>
 			<form action="" class="inline">
 				'.$Fileman->getFormHiddenInputs().'
-				<input type="submit" value="'.T_('CANCEL').'" />
+				<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
 			</form>
 			';
 		}
@@ -466,118 +459,6 @@ switch( $action ) // {{{ (we catched empty action before)
 		}
 		break;
 
-
-	case 'upload':
-		// Check permissions:
-		if( !$Fileman->perm( 'upload' ) )
-		{
-			$Fileman->Messages->add( T_('You have no permissions to upload into this directory.') );
-		}
-		else
-		{
-			if( isset($_FILES) && count( $_FILES ) )
-			{
-				foreach( $_FILES['uploadfile']['name'] as $lkey => $lName )
-				{
-					if( empty($lName) )
-					{ // no name
-						continue;
-					}
-
-					if( $_FILES['uploadfile']['size'][$lkey] > $fileupload_maxk*1024 )
-					{
-						$Fileman->Messages->add( sprintf( T_('The file [%s] is too big and was not accepted.'), $lName ) );
-						continue;
-					}
-					elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey] ) )
-					{
-						$Fileman->Messages->add( sprintf( T_('The file [%s] does not seem to be a valid upload!'), $lName ) );
-						continue;
-					}
-
-					$newName = $Fileman->User->getMediaDir().basename( $lName );
-					if( file_exists( $newName ) )
-					{
-						// TODO: Rename/Overwriting
-						$Fileman->Messages->add( sprintf( T_('The file [%s] already exists.'), basename($newName) ) );
-						continue;
-					}
-					elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey], $newName ) )
-					{
-						$Fileman->Messages->add( sprintf( T_('The file [%s] was successfully uploaded.'), basename($newName) ), 'note' );
-						$Fileman->addFile( $newName );
-						continue;
-					}
-
-					$tError = 'An error occured ('.$lName.'):<br />';
-
-					switch( $_FILES['uploadfile']['error'][$lkey] )
-					{
-						case UPLOAD_ERR_OK:
-							$tError .= 'There is no error, the file uploaded with success.';
-							break;
-						case UPLOAD_ERR_INI_SIZE:
-							$tError .= 'The uploaded file exceeds the upload_max_filesize directive in php.ini.';
-							break;
-
-						case UPLOAD_ERR_FORM_SIZE:
-							$tError .= 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.';
-							break;
-
-						case UPLOAD_ERR_PARTIAL:
-							$tError .= 'The uploaded file was only partially uploaded.';
-							break;
-
-						case UPLOAD_ERR_NO_FILE:
-							$tError .= 'No file was uploaded.';
-							break;
-					}
-					$Fileman->Messages->add( $tError.'<br />'.var_export( $_FILES, true ) );
-				}
-			}
-			else
-			{
-				$allowedftypes = preg_split( '/\s+/', trim( $fileupload_allowedtypes) );
-
-				$msg_action = '
-				<script type="text/javascript">
-					<!--
-					function addAnotherFileInput()
-					{
-						var newInput = document.createElement("input");
-						newInput.name="uploadfile[]";
-						newInput.type="file";
-						newInput.size=40;
-
-						uploadfiles = document.getElementById("uploadfileinputs");
-						uploadfiles.appendChild( newInput );
-						uploadfiles.appendChild( document.createElement("br") );
-					}
-					// -->
-				</script>
-				<p><strong>'.T_('File upload').'</strong></p>
-				<p>'.T_('Allowed file types:').' '.implode(', ', $allowedftypes).'</p>
-				<p>'.sprintf( T_('Maximum allowed file size: %d KB'), $fileupload_maxk ).'</p>
-
-				<form enctype="multipart/form-data" action="'.$Fileman->getCurUrl().'" method="post">
-					<input type="hidden" name="MAX_FILE_SIZE" value="'.($fileupload_maxk*1024).'" />
-					<input type="hidden" name="action" value="upload" />
-					<div id="uploadfileinputs">
-					<input name="uploadfile[]" type="file" size="40" /><br />
-					</div>';
-						//'.T_('Description').':	<input type="text" name="imgdesc['.$i.']" size="50" /><br />';
-
-					$msg_action .= '
-					<input type="button" value="'.T_('Add another file').'" onclick="addAnotherFileInput();" />
-					<input type="submit" value="'.T_('Upload !').'" onclick="clickedSubmit=1" />
-					<br />
-					'.sprintf( T_('Maximum upload filesize is %s.'), bytesreadable( $fileupload_maxk*1024 ) ).'
-					</form>
-					';
-			}
-		}
-
-		break;
 	// }}}
 }
 
@@ -593,216 +474,348 @@ require dirname(__FILE__).'/_menutop_end.php';
 <div id="filemanmain">
 <?php
 
-while( $Fileman->getMode() == 'file_cmr' )
-{{{
-	$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
+switch( $Fileman->getMode() )
+{ // handle modes {{{
 
-	if( !($SourceFile =& $Fileman->SourceList->getFileByFilename( basename($Fileman->source) )) )
-	{ // source file not in source filelist
-		$Fileman->Messages->add( sprintf( T_('Invalid source file [%s].'), $Fileman->source ) );
-		break;
-	}
-
-	#pre_dump( $SourceFile, 'SourceFile' );
-
-	param( 'newname', 'string', $SourceFile->getName() );
-	param( 'keepsource', 'integer', 0 );
-	param( 'overwrite', 'integer', 0 );
-	param( 'cmr_doit', 'integer', 0 );
-
-
-	if( $cmr_doit )
-	{ // we want Action!
-		if( !isFilename($newname) )
+	case 'file_upload': // {{{ upload mode
+		// Check permissions:
+		if( !$Fileman->perm( 'upload' ) )
 		{
-			$LogCmr->add( sprintf( T_('[%s] is not a valid filename.'), $newname ) );
+			$Fileman->Messages->add( T_('You have no permissions to upload into this directory.') );
+			break;
 		}
-		elseif( ($TargetFile =& getFile( $newname, $Fileman->cwd ))
-						&& $TargetFile->exists() )
-		{ // target filename already given to another file
-			if( $Fileman->cwd.$newname == $SourceFile->getPath(true) )
+
+		$LogUpload = new Log( 'error' );
+		$allowedftypes = preg_split( '/\s+/', trim( $Settings->get( 'upload_allowedext' ) ) );
+
+		if( isset($_FILES) && count( $_FILES ) )
+		{{{ // process uploaded files
+			foreach( $_FILES['uploadfile']['name'] as $lkey => $lName )
 			{
-				$LogCmr->add( T_('Source- and target file are the same. Please choose another name or directory.') );
-				$overwrite = false;
-			}
-			elseif( !$overwrite )
-			{
-				$LogCmr->add( sprintf( T_('The file [%s] already exists.'), $newname ) );
-				$overwrite = 'ask';
-			}
-			else
-			{ // unlink existing file
-				if( !$Fileman->unlink( $TargetFile ) )
+				if( empty($lName) )
+				{ // no name
+					continue;
+				}
+
+				if( $_FILES['uploadfile']['size'][$lkey] > $fileupload_maxk*1024 )
 				{
-					$LogCmr->add( sprintf( T_('Could not delete [%s].'), $newname ) );
+					$LogUpload->add( sprintf( T_('The file [%s] is too big and has not been accepted.'), $lName ) );
+					continue;
 				}
-				else
+				elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey] ) )
 				{
-					$Fileman->Messages->add( sprintf( T_('Deleted file [%s].'), $newname ), 'note' );
+					$LogUpload->add( sprintf( T_('The file [%s] does not seem to be a valid upload!'), $lName ) );
+					continue;
 				}
-			}
-		}
 
-		if( !$LogCmr->count( 'error' ) )
-		{ // no errors, safe for action
-			$oldpath = $SourceFile->getPath(true);
-
-			if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
-			{
-				if( !$keepsource )
-				{ // move/rename
-					if( $Fileman->unlink( $SourceFile ) )
-					{
-						if( $SourceFile->getPath() == $Fileman->cwd )
-						{ // successfully renamed
-							$Fileman->Messages->add( sprintf( T_('Renamed [%s] to [%s].'),
-																								basename($oldpath),
-																								$TargetFile->getName() ), 'note' );
-						}
-						else
-						{ // successfully moved
-							$Fileman->Messages->add( sprintf( T_('Moved [%s] to [%s].'),
-																								$oldpath,
-																								$TargetFile->getName() ), 'note' );
-
-						}
-					}
-					else
-					{
-						$LogCmr->add( sprintf( T_('Could not remove [%s], but the file has been copied to [%s].'),
-																	($SourceFile->getPath() == $Fileman->cwd ?
-																		basename($oldpath) :
-																		$oldpath ),
-																	$TargetFile->getName() ) );
-					}
+				$newName = $Fileman->getCwd().basename( $lName );
+				if( file_exists( $newName ) )
+				{
+					// TODO: Rename/Overwriting
+					$LogUpload->add( sprintf( T_('The file [%s] already exists.'), basename($newName) ) );
+					continue;
 				}
-				else
-				{ // copy only
-					$Fileman->Messages->add( sprintf(
-						T_('Copied [%s] to [%s].'),
-						( $SourceFile->getPath() == $Fileman->cwd ?
-							$SourceFile->getName() :
-							$SourceFile->getPath(true) ),
-						$TargetFile->getName() ), 'note' );
+				elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey], $newName ) )
+				{
+					$Fileman->Messages->add( sprintf( T_('The file [%s] has been successfully uploaded.'), basename($newName) ), 'note' );
+					$Fileman->addFile( $newName );
+					continue;
 				}
+
+				$tError = 'An error occured ('.$lName.'):<br />';
+
+				switch( $_FILES['uploadfile']['error'][$lkey] )
+				{
+					case UPLOAD_ERR_OK:
+						$tError .= 'There is no error, the file uploaded with success.';
+						break;
+					case UPLOAD_ERR_INI_SIZE:
+						$tError .= 'The uploaded file exceeds the upload_max_filesize directive in php.ini.';
+						break;
+
+					case UPLOAD_ERR_FORM_SIZE:
+						$tError .= 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.';
+						break;
+
+					case UPLOAD_ERR_PARTIAL:
+						$tError .= 'The uploaded file was only partially uploaded.';
+						break;
+
+					case UPLOAD_ERR_NO_FILE:
+						$tError .= 'No file was uploaded.';
+						break;
+				}
+				$LogUpload->add( $tError.'<br />'.var_export( $_FILES, true ) );
 			}
-			else
-			{
-				$LogCmr->add( sprintf( T_('Could not copy [%s] to [%s].'),
-																$SourceFile->getPath(true),
-																$TargetFile->getPath(true) ), 'error' );
-			}
-		}
-	}
+		}}}
 
-	if( !$cmr_doit || $LogCmr->count( 'all' ) )
-	{
-		// text and value for JS dynamic fields, when referring to move/rename
-		if( $SourceFile->getPath() == $Fileman->cwd )
-		{
-			$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
-		}
-		else
-		{
-			$submitMoveOrRenameText = format_to_output( T_('Move'), 'formvalue' );
-		}
-		?>
-
-		<div class="panelblock">
-			<form action="" class="fform" id="cmr_form">
-				<?php echo $Fileman->getFormHiddenInputs() ?>
-				<input type="hidden" name="cmr_doit" value="1" />
-				<fieldset>
-					<legend><?php
-					echo T_('Source').': '.$SourceFile->getPath(true);
-					?></legend>
-
-					<div class="notes">
-						<?php
-						echo '<strong>'.T_('You are in copy / move / rename mode.')
-									.'</strong><br />'.T_('Please navigate to the desired location.'); ?>
-					</div>
-
-					<?php
-
-					$LogCmr->display( '', '', true, 'all' );
-
-
-					if( $overwrite === 'ask' )
-					{
-						form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
-														sprintf( T_('The existing file [%s] will be replaced with this file.'),
-																			$TargetFile->getPath(true) ) );
-					}
-					?>
-
-					<fieldset>
-						<div class="label">
-							<label for="fm_keepsource"><?php echo T_('Keep source file') ?>:</label>
-						</div>
-						<div class="input">
-							<input class="checkbox" type="checkbox" value="1" name="keepsource"
-								id="fm_keepsource" onclick="setCmrSubmitButtonValue( this.form );"<?php
-								if( $keepsource )
-								{
-									echo ' checked="checked"';
-								} ?> />
-							<span class="notes"><?php echo T_('Do not delete the source file.') ?></span>
-						</div>
-					</fieldset>
-
-					<fieldset>
-						<div class="label">
-							<label for="fm_newname">New name:</label>
-						</div>
-						<div class="input">
-							<input type="text" name="newname" id="fm_newname" value="<?php echo $newname ?>" />
-						</div>
-					</fieldset>
-					<fieldset>
-						<div class="input">
-							<input id="fm_cmr_submit" type="submit" value="<?php
-								if( $keepsource )
-								{
-									echo format_to_output( T_('Copy'), 'formvalue' );
-								}
-								else
-								{
-									echo $submitMoveOrRenameText;
-								} ?>" />
-							<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ) ?>" />
-						</div>
-					</fieldset>
-				</fieldset>
-			</form>
+		if( !(isset($_FILES) && count( $_FILES )) || $LogUpload->count('all') )
+		{{{ // upload dialog
+			?>
 			<script type="text/javascript">
 				<!--
-				function setCmrSubmitButtonValue()
+				function addAnotherFileInput()
 				{
-					if( document.getElementById( 'fm_keepsource' ).checked )
+					var newInput = document.createElement("input");
+					newInput.name="uploadfile[]";
+					newInput.type="file";
+					newInput.size=40;
+
+					uploadfiles = document.getElementById("uploadfileinputs");
+					uploadfiles.appendChild( newInput );
+					uploadfiles.appendChild( document.createElement("br") );
+				}
+				// -->
+			</script>
+			<div class="panelblock">
+				<form enctype="multipart/form-data" action="" method="post" class="fform">
+					<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $Settings->get( 'upload_maxkb' )*1024 ?>" />
+					<?php echo $Fileman->getFormHiddenInputs() ?>
+					<fieldset>
+					<h2><?php echo T_('File upload')  ?></h2>
+					<p><?php echo T_('Navigate to the directory where you want to upload your file(s) into.') ?></p>
+					<p><?php echo T_('Allowed file types:').' '.implode(', ', $allowedftypes) ?></p>
+					<p><?php printf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) ) ?></p>
+
+					<?php $LogUpload->display( '', '', true, 'all' ); ?>
+
+
+					<fieldset id="uploadfileinputs">
+						<legend><?php echo T_('Files to upload') ?></legend>
+						<input name="uploadfile[]" type="file" size="40" /><br />
+					</fieldset>
+					<?php /*'.T_('Description').':	<input type="text" name="imgdesc['.$i.']" size="50" /><br />'; */ ?>
+
+					<fieldset class="submit">
+						<input class="ActionButton" type="button" value="<?php echo T_('Add another file') ?>" onclick="addAnotherFileInput();" />
+						<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
+					</fieldset>
+					</fieldset>
+				</form>
+			</div>
+
+			<?php
+		}}}
+		else
+		{ // successfully finished, leave mode
+			$Fileman->mode = NULL;
+		}
+
+		// }}}
+		break;
+
+
+	case 'file_cmr': // copy/move/rename a file {{{
+		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
+
+		if( !($SourceFile =& $Fileman->SourceList->getFileByFilename( basename($Fileman->source) )) )
+		{ // source file not in source filelist
+			$Fileman->Messages->add( sprintf( T_('Invalid source file [%s].'), $Fileman->source ) );
+			break;
+		}
+
+		#pre_dump( $SourceFile, 'SourceFile' );
+
+		param( 'newname', 'string', $SourceFile->getName() );
+		param( 'keepsource', 'integer', 0 );
+		param( 'overwrite', 'integer', 0 );
+		param( 'cmr_doit', 'integer', 0 );
+
+
+		if( $cmr_doit )
+		{{{ // we want Action!
+			if( !isFilename($newname) )
+			{
+				$LogCmr->add( sprintf( T_('[%s] is not a valid filename.'), $newname ) );
+			}
+			elseif( ($TargetFile =& getFile( $newname, $Fileman->getCwd() ))
+							&& $TargetFile->exists() )
+			{ // target filename already given to another file
+				if( $TargetFile === $SourceFile )
+				{
+					$LogCmr->add( T_('Source- and target file are the same. Please choose another name or directory.') );
+					$overwrite = false;
+				}
+				elseif( !$overwrite )
+				{
+					$LogCmr->add( sprintf( T_('The file [%s] already exists.'), $newname ) );
+					$overwrite = 'ask';
+				}
+				else
+				{ // unlink existing file
+					if( !$Fileman->unlink( $TargetFile ) )
 					{
-						text = '<?php echo format_to_output( T_('Copy'), 'formvalue' ) ?>';
+						$LogCmr->add( sprintf( T_('Could not delete [%s].'), $newname ) );
 					}
 					else
 					{
-						text = '<?php echo $submitMoveOrRenameText ?>';
+						$Fileman->Messages->add( sprintf( T_('Deleted file [%s].'), $newname ), 'note' );
 					}
-					document.getElementById( 'fm_cmr_submit' ).value = text;
 				}
-				setCmrSubmitButtonValue(); // init call
-				// -->
-			</script>
+			}
 
-		</div>
-		<?php
-	}
-	else
-	{ // successfully finished, leave mode
-		$Fileman->mode = NULL;
-	}
+			if( !$LogCmr->count( 'error' ) )
+			{ // no errors, safe for action
+				$oldpath = $SourceFile->getPath(true);
 
-	break;
-}}}
+				if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
+				{
+					if( !$keepsource )
+					{ // move/rename
+						if( $Fileman->unlink( $SourceFile ) )
+						{
+							if( $SourceFile->getPath() == $Fileman->getCwd() )
+							{ // successfully renamed
+								$Fileman->Messages->add( sprintf( T_('Renamed [%s] to [%s].'),
+																									basename($oldpath),
+																									$TargetFile->getName() ), 'note' );
+							}
+							else
+							{ // successfully moved
+								$Fileman->Messages->add( sprintf( T_('Moved [%s] to [%s].'),
+																									$oldpath,
+																									$TargetFile->getName() ), 'note' );
+
+							}
+						}
+						else
+						{
+							$LogCmr->add( sprintf( T_('Could not remove [%s], but the file has been copied to [%s].'),
+																		($SourceFile->getPath() == $Fileman->getCwd() ?
+																			basename($oldpath) :
+																			$oldpath ),
+																		$TargetFile->getName() ) );
+						}
+					}
+					else
+					{ // copy only
+						$Fileman->Messages->add( sprintf(
+							T_('Copied [%s] to [%s].'),
+							( $SourceFile->getPath() == $Fileman->getCwd() ?
+								$SourceFile->getName() :
+								$SourceFile->getPath(true) ),
+							$TargetFile->getName() ), 'note' );
+					}
+				}
+				else
+				{
+					$LogCmr->add( sprintf( T_('Could not copy [%s] to [%s].'),
+																	$SourceFile->getPath(true),
+																	$TargetFile->getPath(true) ), 'error' );
+				}
+			}
+		}}}
+
+
+		if( !$cmr_doit || $LogCmr->count( 'all' ) )
+		{
+			// text and value for JS dynamic fields, when referring to move/rename
+			if( $SourceFile->getPath() == $Fileman->getCwd() )
+			{
+				$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
+			}
+			else
+			{
+				$submitMoveOrRenameText = format_to_output( T_('Move'), 'formvalue' );
+			}
+			?>
+
+			<div class="panelblock">
+				<form action="" class="fform" id="cmr_form">
+					<?php echo $Fileman->getFormHiddenInputs() ?>
+					<input type="hidden" name="cmr_doit" value="1" />
+					<fieldset>
+						<legend><?php
+						echo T_('Source').': '.$SourceFile->getPath(true);
+						?></legend>
+
+						<div class="notes">
+							<?php
+							echo '<strong>'.T_('You are in copy / move / rename mode.')
+										.'</strong><br />'.T_('Please navigate to the desired location.'); ?>
+						</div>
+
+						<?php
+
+						$LogCmr->display( '', '', true, 'all' );
+
+
+						if( $overwrite === 'ask' )
+						{
+							form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
+															sprintf( T_('The existing file [%s] will be replaced with this file.'),
+																				$TargetFile->getPath(true) ) );
+						}
+						?>
+
+						<fieldset>
+							<div class="label">
+								<label for="fm_keepsource"><?php echo T_('Keep source file') ?>:</label>
+							</div>
+							<div class="input">
+								<input class="checkbox" type="checkbox" value="1" name="keepsource"
+									id="fm_keepsource" onclick="setCmrSubmitButtonValue( this.form );"<?php
+									if( $keepsource )
+									{
+										echo ' checked="checked"';
+									} ?> />
+								<span class="notes"><?php echo T_('Do not delete the source file.') ?></span>
+							</div>
+						</fieldset>
+
+						<fieldset>
+							<div class="label">
+								<label for="fm_newname">New name:</label>
+							</div>
+							<div class="input">
+								<input type="text" name="newname" id="fm_newname" value="<?php echo $newname ?>" />
+							</div>
+						</fieldset>
+						<fieldset>
+							<div class="input">
+								<input id="fm_cmr_submit" type="submit" value="<?php
+									if( $keepsource )
+									{
+										echo format_to_output( T_('Copy'), 'formvalue' );
+									}
+									else
+									{
+										echo $submitMoveOrRenameText;
+									} ?>" />
+								<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ) ?>" />
+							</div>
+						</fieldset>
+					</fieldset>
+				</form>
+				<script type="text/javascript">
+					<!--
+					function setCmrSubmitButtonValue()
+					{
+						if( document.getElementById( 'fm_keepsource' ).checked )
+						{
+							text = '<?php echo format_to_output( T_('Copy'), 'formvalue' ) ?>';
+						}
+						else
+						{
+							text = '<?php echo $submitMoveOrRenameText ?>';
+						}
+						document.getElementById( 'fm_cmr_submit' ).value = text;
+					}
+					setCmrSubmitButtonValue(); // init call
+					// -->
+				</script>
+
+			</div>
+			<?php
+		}
+		else
+		{ // successfully finished, leave mode
+			$Fileman->mode = NULL;
+		}
+
+		// }}}
+		break;
+} // }}}
 
 
 // output errors, notes and action messages {{{
@@ -838,11 +851,10 @@ if( isset( $msg_action )
 ?>
 <div class="panelblock">
 	<?php
+	echo '<a title="'.T_('Go to your home directory').'" class="toolbaritem" href="'
+				.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a>';
+
 	$rootlist = $Fileman->getRootList();
-
-	// link to user home
-	echo '<a class="toolbaritem" href="'.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a>';
-
 	if( count($rootlist) > 1 )
 	{ // provide list of roots
 		echo '<form action="files.php" name="roots" class="toolbaritem">'
@@ -873,7 +885,7 @@ if( isset( $msg_action )
 	<form action="files.php" name="search" class="toolbaritem">
 		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="text" name="searchfor" value="--todo--" size="20" />
-		<input type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
+		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
 
 	<div class="toolbaritem_group">
@@ -883,7 +895,7 @@ if( isset( $msg_action )
 		?>
 		<form action="files.php" name="unfilter" class="toolbaritem">
 			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
-			<input type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
 		</form>
 		<?php
 		}
@@ -893,7 +905,7 @@ if( isset( $msg_action )
 			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
 			<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
 			<input type="checkbox" name="filter_regexp" title="<?php echo format_to_output( T_('Filter is regular expression'), 'formvalue' ) ?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> />
-			<input type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 		</form>
 	</div>
 
@@ -1044,10 +1056,10 @@ function openselectedfiles( checkonly )
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
 	<?php echo $Fileman->getFormHiddenInputs() ?>
-	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" />
-	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" />
-	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" />
-	<input type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
+	<input class="DeleteButton" type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" />
+	<input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" />
+	<input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" />
+	<input class="ActionButton" type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
 	&mdash; <?php
 	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 	echo ', ';
@@ -1063,7 +1075,7 @@ function openselectedfiles( checkonly )
 </form>
 
 <div class="toolbar">
-	<?php
+	<?php // {{{ bottom toolbar
 	param( 'options_show', 'integer', 0 );
 	?>
 	<form class="toolbaritem" action="files.php" method="post">
@@ -1072,7 +1084,7 @@ function openselectedfiles( checkonly )
 			echo ( $options_show ) ? T_('Hide options') : T_('Show options') ?></a>
 
 		<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
-			<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />
+			<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( !$UserSettings->get('fm_dirsnotattop') ) echo ' checked="checked"' ?> />
 			<label for="option_dirsattop"><?php echo T_('Sort directories at top') ?></label>
 			<br />
 			<input type="checkbox" id="option_showhidden" name="option_showhidden" value="1"<?php if( $UserSettings->get('fm_showhidden') ) echo ' checked="checked"' ?> />
@@ -1119,23 +1131,47 @@ function openselectedfiles( checkonly )
 		</script>
 	</form>
 
-	<form action="files.php" name="filter" class="toolbaritem">
-		<?php echo $Fileman->getFormHiddenInputs() ?>
-		<input type="hidden" name="action" value="upload" />
-		<input type="submit" value="<?php echo format_to_output( T_('Upload a file/image'), 'formvalue' ) ?>" />
-	</form>
 
-	<form action="files.php" name="filter" class="toolbaritem">
+	<div class="toolbaritem">
+		<?php $Fileman->dispButtonUpload(); ?>
+	</div>
+
+	<form action="" class="toolbaritem">
 		<select name="createnew">
 			<option value="file"><?php echo T_('file') ?></option>
-			<option value="dir"><?php echo T_('directory') ?></option>
+			<option value="dir"<?php
+				if( isset($createnew) && $createnew == 'dir' )
+				{
+					echo ' selected="selected"';
+				} ?>><?php echo T_('directory') ?></option>
 		</select>
-		<input type="text" name="createname" value="" size="20" />
-		<input type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
+		<input type="text" name="createname" value="<?php
+			if( isset( $createname ) )
+			{
+				echo $createname;
+			} ?>" size="20" />
+		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
 		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="hidden" name="action" value="createnew" />
 	</form>
 </div>
+<?php /* }}} */ ?>
+
+
+<br class="clear" />
+<div class="fform">
+	<fieldset>
+	<legend><?php echo T_('Icon legend') ?></legend>
+		<span class="nobr"><?php echo getIcon( 'folder_parent' ).' '.T_('Go to parent folder'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'folder_home' ).' '.T_('Go to your home directory'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit the file'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></span>
+		<span class="nobr"><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></span>
+	</fieldset>
+</div>
+
 </div>
 <br class="clear" />
 </div>

@@ -80,11 +80,11 @@ $deluxe_ban = 1;  // 1 to enable, 0 to disable
 $report_abuse = 1;
 
 
-// ** Image upload **
-
+// ** Image upload ** {{{ @deprecated moved to admin interface, but used for upgrading to 0.9.2
 /**
  * Set this to 0 to disable file upload, or 1 to enable it
  * @global boolean $use_fileupload
+ * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
 $use_fileupload = 1;
 
@@ -98,6 +98,7 @@ $use_fileupload = 1;
  * Alternatively you may want to use a path relative to $basepath.
  *
  * @global string $fileupload_realpath
+ * @deprecated 0.9.2: the user uploads to his own media folder (or somewhere else with write permissions)
  */
 $fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
 
@@ -109,6 +110,7 @@ $fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
  * Alternatively you may want to use an URL relatibe to $baseurl
  *
  * @global string $fileupload_url
+ * @deprecated 0.9.2: the user uploads to his own media folder (or somewhere else with write permissions)
  */
 $fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
 
@@ -119,6 +121,7 @@ $fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
  * Example: $fileupload_allowedtypes = ' jpg gif png ';
  *
  * @global string $fileupload_allowedtypes
+ * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
 $fileupload_allowedtypes = ' jpg gif png ';
 
@@ -127,12 +130,14 @@ $fileupload_allowedtypes = ' jpg gif png ';
  * if you want to set it to a lower value, here it is (you cannot set a higher value)
  *
  * @global int $fileupload_maxk
+ * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
 $fileupload_maxk = '96'; // in kilo bytes
 
 /**
  * you may not want all users to upload pictures/files, so you can set a minimum level for this
  * @global int $fileupload_minlevel
+ * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
 $fileupload_minlevel = 1;
 
@@ -144,8 +149,10 @@ $fileupload_minlevel = 1;
  * example: $fileupload_allowedusers = ' barbara anne ';
  *
  * @global string $fileupload_allowedusers
+ * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
 $fileupload_allowedusers = '';
+// }}}
 
 
 /**
