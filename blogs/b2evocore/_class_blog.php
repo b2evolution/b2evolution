@@ -528,8 +528,16 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2004/10/11 18:44:09  fplanque
+ * Edited code documentation.
+ *
  * Revision 1.42  2004/10/11 18:40:05  fplanque
  * no message
  *
+ * Revision 1.40  2004/10/6 9:37:31  gorgeb
+ * Added allowcomments, a per blog setting taking three values : always, post_by_post, never.
+ *
+ * Revision 1.23  2004/6/8 15:5:45  jeffbearer
+ * added msgfromurl display option, to display the messaging from
  */
 ?>
