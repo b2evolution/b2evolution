@@ -67,7 +67,7 @@ msgstr "Flere demonstrasjoner"
 # C:\www\b2evolution\blogs\index.php:72
 #: ..\..\..\index.php:71
 msgid "Custom template"
-msgstr "\"Custom\" mal"
+msgstr "Spesiell mal"
 
 #: ..\..\..\index.php:71
 msgid "Multiple blogs displayed on the same page"
