@@ -53,8 +53,7 @@ class CommentList extends DataObjectList
 		
 		if( !empty($posts) )
 			$this->posts_per_page = $posts;
-		elseif( !empty($default_posts_per_page) )
-			$this->posts_per_page = $default_posts_per_page;
+		else $this->posts_per_page = $default_posts_per_page;
 
 		$this->request = "SELECT DISTINCT $tablecomments.*
 											FROM (($tablecomments INNER JOIN $tableposts ON comment_post_ID = ID) ";
@@ -106,7 +105,8 @@ class CommentList extends DataObjectList
 		}
 
 
-		$this->request .= "ORDER BY $orderby LIMIT $this->posts_per_page";
+		$this->request .= "ORDER BY $orderby";
+		if( $this->posts_per_page ) $this->request .= " LIMIT $this->posts_per_page";
 
 		// echo $this->request;
 			
