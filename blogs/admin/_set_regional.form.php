@@ -15,16 +15,16 @@ param( 'locale', 'string', '' );
 if( !empty($locale) && $action != 'extract' )
 {
 	param( 'template', 'string', '' );
-	
+
 	$Form = & new Form( 'b2options.php?tab=regional', 'form' );
-	
+
 	$Form->begin_form( 'fform' );
-	
-	$Form->buttons( array( array( 'hidden', 'notranstext', $notranstext ),
+
+	$Form->buttons( array( array( 'hidden', 'notransext', $notransext ),
 												 array( 'hidden', 'action', ($locale == '_new_') ? 'createlocale' : 'updatelocale' ) ) );
-	
+
 	$Form->fieldset( ($locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
-	
+
 		// read template
 
 		if( isset($locales[$template]) )
@@ -64,11 +64,11 @@ if( !empty($locale) && $action != 'extract' )
 		{ // remove the locale we want to edit from the generated array
 			$l_warnfor = str_replace("'$newlocale'", "'thiswillneverevermatch'", $l_warnfor);
 		}
-		
+
 		$Form->buttons( array( array( '', '', ($locale == '_new_') ? T_('Create') : T_('Update'),
 																	'search', 'var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: Warning this is a javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};' ),
-													 array( 'reset', '', format_to_output(T_('Reset'), 'formvalue'), 'search' ) ) );				
-		
+													 array( 'reset', '', format_to_output(T_('Reset'), 'formvalue'), 'search' ) ) );
+
 		?>
 		<div class="panelinfo">
 			<h3><?php echo T_('Flags') ?></h3>
@@ -124,25 +124,25 @@ else
 	{ // default locale is not enabled
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
-	
+
 	$Form = & new Form( 'b2options.php?tab=regional', 'form' );
-	
+
 	$Form->begin_form( 'fform' );
-	
+
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'notransext', $notransext );
-	
+
 	$Form->fieldset( T_('Regional settings') );
 	$Form->text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
 	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 	$Form->fieldset_end();
-	
+
 	$Form->fieldset( T_('Available locales') );
-	
+
 	?>
 
 		<p class="center">
-		
+
 	<?php
 		if( !$notransext )
 		{
@@ -352,9 +352,9 @@ else
 				<?php
 			}
 		}
-		
+
 	$Form->fieldset_end();
-	
+
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
 		$Form->end_form( array( array( 'submit', '', T_('Save !'), 'SaveButton' ),
