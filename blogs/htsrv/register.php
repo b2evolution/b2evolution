@@ -94,7 +94,7 @@ switch( $action )
 			$new_User->set( 'domain', 'localhost' );
 			$new_User->set( 'ip', getIpList( true ) );
 			$new_User->set( 'domain', isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '' );
-			$new_User->set( 'browser', isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' );
+			$new_User->set( 'browser', $Hit->getUserAgent();
 			$new_User->set_datecreated( $localtimenow );
 			$new_User->set( 'level', $Settings->get('newusers_level') );
 			$new_User->set( 'locale', $locale );

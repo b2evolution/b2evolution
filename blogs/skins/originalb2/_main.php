@@ -246,7 +246,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 </div>
 <?php
-	log_hit();	// log the hit on this page
+	$Hit->log();	// log the hit on this page
 	debug_info();	// output debug info if requested
 ?>
 </body>

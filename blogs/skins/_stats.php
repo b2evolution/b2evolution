@@ -31,7 +31,7 @@
 
 	<div class="statbloc">
 	<h3><?php echo T_('Top referers') ?>:</h3>
-	<?php refererList(10, 'global', 0, 0, 'no', 'baseDomain', ($blog > 1) ? $blog : '', false);
+	<?php refererList(10, 'global', 0, 0, 'no', 'dom_name', ($blog > 1) ? $blog : '', false);
 	if( count( $res_stats ) ) { ?>
 	<ol>
 		<?php foreach( $res_stats as $row_stats ) { ?>
@@ -55,7 +55,7 @@
 
 	<div class="statbloc">
 	<h3><?php echo T_('Top refering engines') ?>:</h3>
-	<?php refererList(10, 'global', 0, 0, 'search', 'baseDomain', ($blog > 1) ? $blog : '', true);
+	<?php refererList(10, 'global', 0, 0, 'search', 'dom_name', ($blog > 1) ? $blog : '', true);
 	if( count( $res_stats ) ) { ?>
 	<table class="invisible">
 		<?php foreach( $res_stats as $row_stats ) { ?>
@@ -71,7 +71,7 @@
 
 	<div class="statbloc">
 	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
-	<?php refererList(10, 'global', 0, 0, 'robot', 'hit_user_agent', ($blog > 1) ? $blog : '', true, true);
+	<?php refererList(10, 'global', 0, 0, 'robot', 'agnt_signature', ($blog > 1) ? $blog : '', true, true);
 	if( count( $res_stats ) ) { ?>
 	<table class="invisible">
 		<?php foreach( $res_stats as $row_stats ) { ?>
@@ -88,7 +88,7 @@
 
 	<div class="statbloc">
 	<h3><?php echo T_('Top Aggregators') ?>:</h3>
-	<?php refererList(10, 'global', 0, 0, 'rss', 'hit_user_agent', ($blog > 1) ? $blog : '', true, true);
+	<?php refererList(10, 'global', 0, 0, 'rss', 'agnt_signature', ($blog > 1) ? $blog : '', true, true);
 	if( count( $res_stats ) ) { ?>
 	<table class="invisible">
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>

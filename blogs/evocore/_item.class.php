@@ -627,7 +627,7 @@ class Item extends DataObject
 	 * Template function: display content of item
 	 *
 	 * Calling this with "MORE" (i-e displaying full content) will increase
-	 * the view counter, except on special occasions, see {@link $hit_type}
+	 * the view counter, except on special occasions, see {@link Hit::isNewView()}.
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
 	 *
@@ -658,7 +658,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Plugins, $hit_type, $more, $preview;
+		global $Plugins, $Hit, $more, $preview;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -683,10 +683,9 @@ class Item extends DataObject
 		}
 
 		/**
-		 * Check if we want to increment view count, see {@link $hit_type}
+		 * Check if we want to increment view count, see {@link Hit::isNewView()}
 		 */
-		if( $dispmore && !$preview &&
-				! in_array( $hit_type, array( 'badchar', 'reload', 'robot', 'preview', 'already_logged' ) ) )
+		if( $dispmore && !$preview && $Hit->isNewView() )
 		{ // Increment view counter
 			$this->set_param( 'views', 'number', $this->views+1 );
 			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
@@ -1517,7 +1516,7 @@ class Item extends DataObject
 	 *
 	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
 	 * (i-e full content), see {@link Item::content()}
-	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link $hit_type}
+	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::isNewView()}
 	 *
 	 * {@internal Item::views(-) }}
 	 */
@@ -1752,6 +1751,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.21  2005/02/20 22:34:10  blueyed
  * item_help() for renderer_checkboxes()
  *

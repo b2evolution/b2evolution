@@ -223,7 +223,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 </p>
 
 <?php
-	log_hit();	// log the hit on this page
+	$Hit->log();	// log the hit on this page
 	debug_info(); // output debug info if requested
 ?>
 

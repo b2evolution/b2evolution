@@ -68,6 +68,15 @@ require(dirname(__FILE__).'/_menutop.php');
 $current_User->check_perm( 'spamblacklist', 'view', true );
 
 
+/**
+ * Not fully functional..
+ */
+Log::display( '', '', 'This is not working due to hitlog refactoring, sorry.', 'note' );
+require dirname(__FILE__).'/_footer.php';
+return;
+
+
+
 switch( $action )
 {
 	case 'ban':
@@ -97,7 +106,7 @@ switch( $action )
 			printf( '<h3>'.T_('Deleting log-hits matching [%s]...').'</h3>', $keyword );
 			// Stats entries first
 			$sql = "DELETE FROM T_hitlog
-							WHERE referingURL LIKE '%$dbkeyword%'";
+							WHERE hit_referer LIKE '%$dbkeyword%'";
 			$DB->query($sql);
 			echo '</div>';
 		}
@@ -139,13 +148,14 @@ switch( $action )
 
 				<?php
 				if( $deluxe_ban )
-				{ // We can we autodelete junk, check for junk:
+				{ // We can autodelete junk, check for junk:
 					// Check for potentially affected log hits:
-					$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL,
-													baseDomain, hit_blog_ID, visitURL, hit_remote_addr
-									FROM T_hitlog
-									WHERE referingURL LIKE '%$dbkeyword%'
-									ORDER BY baseDomain ASC";
+					$sql = "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_uri, hit_referer, dom_name
+													hit_blog_ID, hit_remote_addr
+									FROM T_hitlog, T_basedomains
+									WHERE hit_referer_dom_ID = dom_ID
+										AND hit_referer LIKE '%$dbkeyword%'
+									ORDER BY dom_name ASC";
 					$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 					if( $DB->num_rows == 0 )
 					{ // No matching hits.

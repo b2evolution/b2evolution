@@ -67,16 +67,14 @@ class bookmarklet_plugin extends Plugin
 	 *
 	 * {@internal bookmarklet_plugin::ToolMenu(-)}}
 	 *
-	 * @todo get rid of global $is_gecko, $is_winIE, $is_macIE
-	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function ToolMenu( $params )
 	{
-		global $is_NS4, $is_gecko, $is_winIE, $is_opera, $is_macIE, $admin_url;
+		global $Hit, $admin_url;
 
-		if($is_NS4 || $is_gecko)
+		if( $Hit->is_NS4 || $Hit->is_gecko )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -84,7 +82,7 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
-		elseif ($is_winIE)
+		elseif( $Hit->is_winIE )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -93,7 +91,7 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
-		elseif($is_opera)
+		elseif( $Hit->is_opera )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -101,7 +99,7 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
-		elseif($is_macIE)
+		elseif( $Hit->is_macIE )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />

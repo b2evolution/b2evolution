@@ -21,7 +21,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  *
  * Set to 0 to disable auto pruning
  *
- * @todo Use $Settings
+ * @todo move to admin interface ($Settings), but use for upgrading to 0.9.2
  *
  * @global int $stats_autoprune
  */
@@ -42,7 +42,7 @@ $stats_autoprune = 30; // Default: 30 days
  * older Netscape browsers will not send these. For example you should list
  * http://www.example.com instead of http://www.example.com/ .
  *
- * @todo Use T_basedomains..
+ * @todo move to admin interface (T_basedomains), but use for upgrading to 0.9.2
  *
  * TODO: handle multiple blog roots.
  *
@@ -71,7 +71,7 @@ $blackList = array(
  * The following substrings will be looked up in the referer http header
  * in order to identify search engines
  *
- * @todo Use T_useragents..
+ * @todo move to admin interface?
  *
  * @global array $search_engines
  */
@@ -128,7 +128,7 @@ $search_engines = array(
  *
  * The following substrings will be looked up in the user_agent http header
  *
- * @todo Use T_useragents..
+ * @todo move to admin interface (T_useragents), but use for upgrading to 0.9.2
  *
  * @global array $user_agents
  */
@@ -170,24 +170,6 @@ $user_agents = array(
  * @global boolean $doubleCheckReferers
  */
 $doubleCheckReferers = 0;		// Set to 1 to enable double checking
-
-
-// TODO: move to Hit object members
-# Do not change the following unless you know what you're doing...
-# Due to potential non-thread safety, we'd better do this early
-if( !isset( $HTTP_REFERER ) )
-{ // If this magic variable is not already set:
-	if( isset($_SERVER['HTTP_REFERER']) )
-	{ // This would be the best way to get the referrer,
-		// unfortunatly, it's not always avilable!! :[
-		// If someone has a clue about this, I'd like to hear about it ;)
-		$HTTP_REFERER = $_SERVER['HTTP_REFERER'];
-	}
-	else
-	{ // Fallback method (not thread safe :[[ )
-		$HTTP_REFERER = getenv('HTTP_REFERER');
-	}
-}
 
 
 ?>

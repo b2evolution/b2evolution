@@ -225,11 +225,11 @@ $AdminUI->dispSubmenu();
 							if( $Comment->author_url( '', ' &middot; Url: ', '' )
 									&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 							{ // There is an URL and we have permission to ban...
-								$baseDomain = preg_replace("/http:\/\//i", "", $Comment->author_url);
-								$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
-								$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
+								// TODO: really ban the base domain! - not by keyword
 								?>
-								<a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode($baseDomain) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
+								<a href="b2antispam.php?action=ban&amp;keyword=<?php
+									echo urlencode(getBaseDomain($Comment->author_url))
+									?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
 								<?php
 							}
 							$Comment->author_email( '', ' &middot; Email: ' );

@@ -420,10 +420,23 @@ to
 		create_b2evo_tables();
 		populate_main_tables();
 		?>
-		<p><?php echo T_('Installation successful!')?></p>
+		<h2><?php echo T_('Installation successful!')?></h2>
+
+		<p>
+		<strong>
 		<?php
-		printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
-	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'"', $random_password );
+		printf( T_('Now you can <a %s>log in</a> with the login "admin" and password "%s".'), 'href="'.$admin_url.'"', $random_password );
+		?>
+		</strong>
+		</p>
+
+		<p>
+		<?php
+		echo T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.');
+		?>
+		</p>
+
+		<?php
 		break;
 
 

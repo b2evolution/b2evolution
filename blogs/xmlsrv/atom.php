@@ -51,4 +51,4 @@
 	</entry>
 	<?php } ?>
 </feed>
-<?php log_hit(); // log the hit on this page ?>
+<?php $Hit->log(); // log the hit on this page ?>

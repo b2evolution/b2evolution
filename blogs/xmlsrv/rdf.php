@@ -66,4 +66,4 @@ while( $Item = $MainList->get_item() )
 </item>
 <?php } ?>
 </rdf:RDF>
-<?php log_hit(); // log the hit on this page ?>
+<?php $Hit->log(); // log the hit on this page ?>

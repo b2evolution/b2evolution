@@ -626,10 +626,10 @@ class ItemList extends DataObjectList
 		}
 
 		// little funky fix for IEwin, rawk on that code
-		global $is_winIE;
-		if (($is_winIE) && (!isset($IEWin_bookmarklet_fix)))
-		{
-			$content =	preg_replace('/\%u([0-9A-F]{4,4})/e',	 "'&#'.base_convert('\\1',16,10). ';'", $content);
+		global $Hit;
+		if( ($Hit->is_winIE) && (!isset($IEWin_bookmarklet_fix)) )
+		{ // QUESTION: Is this still needed? What about $IEWin_bookmarklet_fix? (blueyed)
+			$content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $content);
 		}
 
 		/*
@@ -966,6 +966,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.19  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.18  2005/02/19 18:20:47  blueyed
  * obsolete functions removed
  *

@@ -176,6 +176,16 @@ $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
 
 
 /**
+ * The Hit class
+ */
+require_once( dirname(__FILE__).'/_hit.class.php' );
+/**
+ * @global Hit The Hit object
+ */
+$Hit =& new Hit();
+
+
+/**
  * Includes:
  */
 require_once dirname(__FILE__).'/_template.funcs.php';    // function to be called from templates
@@ -363,8 +373,23 @@ if( $Messages->count( 'login_error' ) )
 // Login procedure }}}
 
 
-// Update the active session for the current user:
-online_user_update();
+/**
+ * The Session class
+ */
+require_once( dirname(__FILE__).'/_session.class.php' );
+/**
+ * @global Session The Session object
+ */
+$Session =& new Session();
+
+/**
+ * The Sessions class
+ */
+require_once( dirname(__FILE__).'/_sessions.class.php' );
+/**
+ * @global Sessions The Sessions object
+ */
+$Sessions =& new Sessions();
 
 
 /**
@@ -387,26 +412,6 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 
 
 /**
- * Hit type - determines if hit will be logged and/or increase view count for Items
- *
- * Possible values are:
- * - 'badchar' : referer contains junk or spam : no logging, no counting
- * - 'reload' : page is reloaded : no logging, no counting
- * - 'robot' : page is loaded by a robot: log but don't count view
- * - 'blacklist' (should be 'hidden') : we want to hide the referer, but we count the hit : log & count
- * - 'rss' : RSS feed : log & count
- * - 'invalid' : normal without a referer : log & count
- * - 'search' : referer is a search engine : log & count
- * - 'no' : normal with referer (default) : log & count
- * - 'preview' : preview mode : no logging, no counting
- * - 'already_logged' : this hit has already been logged : no relogging, no recounting
- *
- * @global string $hit_type
- */
-$hit_type = filter_hit();
-
-
-/**
  * Load the icons - we need the users locale set there ({@link T_()})
  */
 require_once( $conf_path.'_icons.php' );
@@ -419,6 +424,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.21  2005/02/23 23:05:06  blueyed
  * fixed login / pass/pass_md5
  *

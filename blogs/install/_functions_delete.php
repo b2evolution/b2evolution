@@ -76,6 +76,12 @@ function db_delete()
 
 	echo "Dropping Plugins registrations...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_plugins' );
+
+	echo "Dropping base domains...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_basedomains' );
+
+	echo "Dropping user agents...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_useragents' );
 }
 
 ?>

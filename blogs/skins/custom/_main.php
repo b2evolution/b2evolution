@@ -27,7 +27,7 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * Jason EDGECOMBE grants François PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -77,24 +77,24 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
    and the files exist. CSS rules say that the latter style sheets can
    override earlier stylesheets.
  */
-if ( ( $Blog->allowblogcss == 1 ) 
+if ( ( $Blog->allowblogcss == 1 )
      && ( file_exists( $Blog->get( "mediadir" ) . "customstyle.css" ) )
      )
     {
-      echo '<link rel="stylesheet" href="' 
-        . $Blog->get( "mediaurl" ) 
+      echo '<link rel="stylesheet" href="'
+        . $Blog->get( "mediaurl" )
         .  'customstyle.css" type="text/css" />' . "\n";
     }
 /* check for a user-specified stylesheet */
 /* TODO Fix the following if statement
    FIXME The if statement below doesn't work
 */
-if ( ( $Blog->allowusercss == 1 ) 
+if ( ( $Blog->allowusercss == 1 )
      && ( file_exists( $current_User->getMediaDir() . "customstyle.css" ) )
      )
     {
-      echo '<link rel="stylesheet" href="' 
-        . $current_User->getMediaUrl() 
+      echo '<link rel="stylesheet" href="'
+        . $current_User->getMediaUrl()
         .  'customstyle.css" type="text/css" />' . "\n";
     }
 ?>
@@ -319,7 +319,7 @@ if ( ( $Blog->allowusercss == 1 )
 			</ul>
 		<br />
 		<h3><?php echo T_('Top Referers') ?></h3>
-			<?php refererList(5, 'global', 0, 0, 'no', 'baseDomain', ($blog > 1) ? $blog : ''); ?>
+			<?php refererList(5, 'global', 0, 0, 'no', 'dom_name', ($blog > 1) ? $blog : ''); ?>
 			<ul>
 				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
@@ -377,11 +377,10 @@ if ( ( $Blog->allowusercss == 1 )
 	</div>
 
 
-  <div class="bSideItem">
+	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
 		<?php
-			$sessions = online_user_display( '', '<br />' );
-			echo T_('Guest Users:').' '.$sessions['guests'];
+			$Sessions->displayOnliners();
 		?>
 	</div>
 
@@ -405,7 +404,7 @@ if ( ( $Blog->allowusercss == 1 )
 	</div>
 
 	<?php
-		log_hit();	// log the hit on this page
+		$Hit->log();	// log the hit on this page
 		debug_info(); // output debug info if requested
 	?>
 </div>

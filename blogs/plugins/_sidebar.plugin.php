@@ -67,16 +67,14 @@ class sidebar_plugin extends Plugin
 	 *
 	 * {@internal sidebar_plugin::ToolMenu(-)}}
 	 *
-	 * @todo get rid of global $is_gecko, $is_winIE, $is_macIE
-	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function ToolMenu( $params )
 	{
-		global $is_gecko, $is_winIE, $is_macIE, $admin_url;
+		global $Hit, $admin_url;
 
-		if($is_gecko)
+		if( $Hit->is_gecko )
 		{
 			?>
 			<script type="text/javascript">
@@ -92,10 +90,10 @@ class sidebar_plugin extends Plugin
 			</script>
 			<p><?php printf( T_('Add the <a %s>b2evo sidebar</a> !'), 'href="#" onclick="addsidebar()"' ); ?></p>
 			<?php
- 			return true;
+			return true;
 		}
 
-		if($is_winIE || $is_macIE)
+		if( $Hit->is_IE )
 		{
 			?>
 			<p><?php echo T_('Add this link to your favorites:') ?><br />

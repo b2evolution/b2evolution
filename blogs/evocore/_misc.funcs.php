@@ -54,7 +54,6 @@ require_once dirname(__FILE__).'/_item.funcs.php';
 require_once dirname(__FILE__).'/_category.funcs.php';
 require_once dirname(__FILE__).'/_file.funcs.php';
 require_once dirname(__FILE__).'/_message.funcs.php';
-require_once dirname(__FILE__).'/_onlineusers.funcs.php';
 require_once dirname(__FILE__).'/_pingback.funcs.php';
 require_once dirname(__FILE__).'/_ping.funcs.php';
 require_once dirname(__FILE__).'/_skin.funcs.php';
@@ -1304,7 +1303,7 @@ function obhandler( $output )
 	{  // send 304 and die
 		header( 'Content-Length: 0' );
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
-		#log_hit();  // log this somehow?
+		#$Hit->log();  // TODO: log this somehow?
 		die;
 	};
 
@@ -1823,7 +1822,7 @@ function header_nocache()
 /**
  * Sends HTTP header to redirect to the previous location (which
  * can be given as function parameter, GET parameter (redirecto_to),
- * is taken from {@link Hit::referrer} or {@link $baseurl})
+ * is taken from {@link Hit::referer} or {@link $baseurl})
  *
  * @return
  */
@@ -1833,7 +1832,7 @@ function header_redirect( $redirectTo = NULL )
 
 	if( is_null($redirectTo) )
 	{
-		$redirectTo = param( 'redirect_to', 'string', $Hit->referrer );
+		$redirectTo = param( 'redirect_to', 'string', $Hit->referer );
 	}
 
 	$location = empty($redirectTo) ? $baseurl : $redirectTo;
@@ -1858,6 +1857,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.53  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.52  2005/02/27 20:30:07  blueyed
  * added header_redirect()
  *

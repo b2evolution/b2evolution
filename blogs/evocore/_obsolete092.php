@@ -1141,6 +1141,21 @@ function comment_post_link()
 // _comment.funcs.php }}}
 
 
+// _hitlog.funcs.php {{{
+
+/**
+ * This is just a stub for the {@link $Hit} object.
+ */
+function log_hit()
+{
+	global $Hit;
+
+	return $Hit->log();
+}
+
+// _hitlog.funcs.php }}}
+
+
 // _misc.funcs.php {{{
 
 /**
@@ -1236,6 +1251,9 @@ $start_of_week = 1;
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.6  2005/02/27 20:29:41  blueyed
  * moved obsolete JS-generating functions
  *

@@ -2,6 +2,8 @@
 /**
  * This file implements functions for logging of hits and extracting stats.
  *
+ * NOTE: the refererList() and stats_* functions are not fully functional ATM. I'll transform them into the Hitlog object during the next days. blueyed.
+ *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -33,7 +35,7 @@
  *
  * {@internal
  * This file was inspired by N C Young's Referer Script released in
- * the public domain on 07/19/2002. {@link (http://ncyoung.com/entry/57).
+ * the public domain on 07/19/2002. {@link http://ncyoung.com/entry/57}.
  * See also {@link http://ncyoung.com/demo/referer/}.
  * }}
  *
@@ -50,7 +52,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 //get most linked to pages on site
-//select count(visitURL) as count, visitURL from b2hitlog group by visitURL order by count desc
+//select count(hit_uri) as count, hit_uri from T_hitlog group by hit_uri order by count desc
 
 /*if ($refererList)
 {
@@ -65,290 +67,12 @@ if ($topRefererList)
 }
 */
 
-/**
- * Detetect when a hit should be discarded
- *
- * There are several situations in which a hit can be discarded:
- * - it's a reload of the same page
- * - it's a spam
- * - it's blacklisted...
- *
- * TODO: we might want to kill the connection on some occasions here... (?)
- *
- * @return boolean true if hit is loggable...
- */
-function filter_hit()
-{
- 	global $Debuglog, $ReqURI, $ReqPath, $DB, $Settings, $localtimenow, $comments_allowed_uri_scheme;
- 	global $blackList, $search_engines, $user_agents, $HTTP_REFERER, $HTTP_USER_AGENT;
-
-	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.getIpList( true ), 'hit' );
-	$Debuglog->add( 'filter_hit: HTTP_REFERER: '.$HTTP_REFERER, 'hit' );
-	// $Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'], 'hit' );
-	$Debuglog->add( 'filter_hit: HTTP_USER_AGENT: '.$HTTP_USER_AGENT, 'hit' );
-
-	/*
-	 * Check if the referer is clean:
-	 */
-	if( $HTTP_REFERER != strip_tags($HTTP_REFERER) )
-	{ // then they have tried something funny,
-		// putting HTML or PHP into the HTTP_REFERER
-		// $ignore = 'badchar';
-		$Debuglog->add( 'filter_hit: bad char in referer', 'hit');
-		return 'badchar';		// Hazardous
-	}
-	elseif( $error = validate_url( $HTTP_REFERER, $comments_allowed_uri_scheme ) )
-	{	// if they are trying to inject javascript or a blocked (spam) URL
-		$Debuglog->add( 'filter_hit: '. $error, 'hit');
-		return 'badchar';		// Hazardous
-	}
-
-
-	/*
-	 * Check for reloads (if the URI has been requested from same IP/useragent
-	 * in past reloadpage_timeout seconds.)
-	 */
-	if( $DB->get_var(
-				'SELECT visitID FROM T_hitlog
-					WHERE	visitURL = '.$DB->quote($ReqURI).'
-						AND UNIX_TIMESTAMP(visitTime)-'.$localtimenow.' < '.$Settings->get('reloadpage_timeout').'
-						AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
-						AND hit_user_agent = '.$DB->quote($HTTP_USER_AGENT) ) )
-	{
-	 	$Debuglog->add( 'filter_hit: URI-reload!', 'hit' );
-	 	return 'reload'; 		// We don't want to log this hit
-	}
-
-
-	/*
-	 * Lookup robots
-	 */
-	foreach( $user_agents as $user_agent )
-	{
-		if( ($user_agent[0] == 'robot') && (strstr($HTTP_USER_AGENT, $user_agent[1])) )
-		{
-			$Debuglog->add( 'filter_hit: robot', 'hit' );
-			return 'robot';
-		}
-	}
-
-
- 	/*
-	 * Check blacklist, see {@link $blackList}
-	 * fplanque: we log these again, because if we didn't we woudln't detect
-	 * reloads on these... and that would be a problem!
-	 */
-	foreach( $blackList as $site )
-	{
-		if( strpos( $HTTP_REFERER, $site ) !== false )
-		{
-			$Debuglog->add( 'filter_hit: referer will be hidden (BlackList)', 'hit' );
-			return 'blacklist';
-		}
-	}
-
-
-	/*
-	 * Check for XML feeds
-	 */
-	if( stristr($ReqPath, 'rss')
-			|| stristr($ReqPath, 'rdf')
-			|| stristr($ReqPath, 'atom') )
-	{
-		$Debuglog->add( 'filter_hit: RSS', 'hit' );
-		return 'rss';
-	}
-
-
-	/*
-	 * Check if we have a valid referer:
-	 * minimum length: http://az.fr/
-	 */
-	if( strlen($HTTP_REFERER) < 13 )
-	{	// this will be considered direct access (although it could be https: ??)
-		$Debuglog->add( 'filter_hit: invalid referer / direct access?', 'hit' );
-		return 'invalid';
-	}
-
-
-	/*
-	 * Is the referer a search engine?
-	 */
-	foreach($search_engines as $engine)
-	{
-		if( stristr($HTTP_REFERER, $engine) )
-		{
-			$Debuglog->add( 'filter_hit: search engine ('.$engine.')', 'hit' );
-			return 'search';
-		}
-	}
-
-
- 	/*
- 	 * We have a valid referer
- 	 */
- 	return 'no';		// Hit type: normal (previous meaning: no ignore)
-}
-
-
-/**
- * Log a hit on a blog page / rss feed
- *
- * This function should be called at the end of the page, otherwise if the page
- * is displaying previous hits, it may display the current one too.
- * The hit will not be logged in special occasions, see {@link $hit_type}
- */
-function log_hit()
-{
-	global $DB, $localtimenow, $blog;
-	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI;
-	global $HTTP_USER_AGENT, $hit_type, $Debuglog;
-	global $stats_autoprune;
-
-	/**
-	 * Make sure we want to log this hit, see {@link $hit_type}
-	 */
-	if( in_array( $hit_type, array( 'badchar', 'reload', 'preview', 'already_logged' ) ) )
-	{	// We don't want to log this hit!
-  	$Debuglog->add( 'log_hit: Hit NOT Logged ('.$hit_type.')', 'hit' );
-		return false;
-	}
-
-	if( $doubleCheckReferers )
-	{
-		$Debuglog->add( 'log_hit: double check: loading referering page', 'hit' );
-
-		// flush now, so that the meat of the page will get shown before it tries to check
-		// back against the refering URL.
-		flush();
-
-		$goodReferer = 0;
-		if( strlen($HTTP_REFERER) > 0 )
-		{
-			$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $ReqURI;
-			// $Debuglog->add( 'Hit Log: '. "full current url: ".$fullCurrentURL, 'hit');
-
-			$fp = @fopen( $HTTP_REFERER, 'r' );
-			if( $fp )
-			{
-				// timeout after 5 seconds
-				socket_set_timeout($fp, 5);
-				while( !feof($fp) )
-				{
-					$page .= trim(fgets($fp));
-				}
-				if (strstr($page,$fullCurrentURL))
-				{
-					$Debuglog->add( 'log_hit: found current url in page', 'hit' );
-					$goodReferer = 1;
-				}
-			}
-
-			if( !$goodReferer )
-			{	// This was probably spam!
-				$Debuglog->add( 'log_hit: '. sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo;', $fullCurrentURL, $page ), 'hit' );
-				return false;
-			}
-		}
-		else
-		{ // Direct accesses are always good hits
-			$goodReferer = 1;
-		}
-	}
-
-	/*
-	 * Record the hit:
-	 */
-	$baseDomain = preg_replace("/http:\/\//i", '', $HTTP_REFERER);
-	$baseDomain = preg_replace("/^www\./i", '', $baseDomain);
-	$baseDomain = preg_replace("/\/.*/i", '', $baseDomain);
-	// insert hit into DB table:
-	$sql = "INSERT INTO T_hitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain,
-																		hit_blog_ID, hit_remote_addr, hit_user_agent )
-					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$hit_type',
-									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog,
-									'".$DB->escape( getIpList( true ) )."', '".$DB->escape($HTTP_USER_AGENT)."')";
-
-	$DB->query( $sql );
-
-	// Remember we have logged already:
-	$hit_type = 'already_logged';
-
-	/*
-	 * Auto pruning of old stats
-	 */
-	if( isset($stats_autoprune) && ($stats_autoprune > 0) )
-	{	// Autopruning is requested
-		$sql = "DELETE FROM T_hitlog
-						 WHERE visitTime < '".date( 'Y-m-d', $localtimenow - ($stats_autoprune * 86400) )."'";
-																														// 1 day = 86400 seconds
-		$rows_affected = $DB->query( $sql );
-		$Debuglog->add( 'log_hit: autopruned '.$rows_affected.' rows.', 'hit' );
-	}
-
-	return true;
-}
-
-
-/**
- * Delete a hit
- *
- * {@internal hit_delete(-) }}
- *
- * @param int ID to delete
- */
-function hit_delete( $hit_ID )
-{
-	global $DB;
-
-	$sql = "DELETE FROM T_hitlog WHERE visitID = $hit_ID";
-
-	return $DB->query( $sql );
-}
-
-
-/**
- * Delete all hits from a certain date
- *
- * {@internal hit_prune(-) }}
- *
- * @param int unix timestamp to delete hits for
- */
-function hit_prune( $date )
-{
-	global $DB;
-
-	$iso_date = date ('Y-m-d', $date);
-	$sql = "DELETE FROM T_hitlog
-					WHERE DATE_FORMAT(visitTime,'%Y-%m-%d') = '$iso_date'";
-
-	return $DB->query( $sql );
-}
-
-
-/**
- * Change type for a hit
- *
- * {@internal hit_change_type(-) }}
- *
- * @param int ID to change
- * @param string new type, must be valid ENUM for hit_ignore field
- */
-function hit_change_type( $hit_ID, $type )
-{
-	global $DB;
-
-	$sql = "UPDATE T_hitlog
-					SET hit_ignore = '$type',
-							visitTime = visitTime "	// prevent mySQL from updating timestamp
-					." WHERE visitID = $hit_ID";
-	return $DB->query( $sql );
-}
-
 
 /**
  *
  * {@internal refererList(-) }}
+ *
+ * @todo Transform to make this a stub for {@link $Hitlist}
  *
  * Extract stats
  */
@@ -357,8 +81,9 @@ function refererList(
 	$visitURL = '',
 	$disp_blog = 0,
 	$disp_uri = 0,
-	$type = "'no'",		// 'no' normal refer, 'invalid', 'badchar', 'blacklist', 'rss', 'robot', 'search'
-	$groupby = '', 	// baseDomain
+	$type = "'referer'",		// was: 'referer' normal refer, 'invalid', 'badchar', 'blacklist', 'rss', 'robot', 'search'
+													// new: 'search', 'blacklist', 'referer', 'direct', 'spam'
+	$groupby = '', 	// dom_name
 	$blog_ID = '',
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false ) // Get the user agent
@@ -367,7 +92,12 @@ function refererList(
 
 	autoquote( $type );		// In case quotes are missing
 
+	$type = preg_replace( "#'no'#", "'referer'", $type );
+
 	$ret = array();
+
+	#return $ret;
+
 
 	//if no visitURL, will show links to current page.
 	//if url given, will show links to that page.
@@ -378,12 +108,16 @@ function refererList(
 	}
 
 	if( $groupby == '' )
-	{	// No grouping:
-		$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL, baseDomain";
+	{ // No grouping:
+		$sql = "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) AS hit_datetime, hit_referer, dom_name";
 	}
 	else
-	{	// group by
-		$sql = "SELECT COUNT(*) AS totalHits, referingURL, baseDomain";
+	{ // group by
+		if( $groupby == 'baseDomain' )
+		{ // compatibility HACK!
+			$groupby = 'dom_name';
+		}
+		$sql = "SELECT COUNT(*) AS totalHits, hit_referer, dom_name";
 	}
 	if( $disp_blog )
 	{
@@ -391,44 +125,47 @@ function refererList(
 	}
 	if( $disp_uri )
 	{
-		$sql .= ", visitURL";
+		$sql .= ", hit_uri";
 	}
 	if( $get_user_agent )
 	{
-		$sql .= ", hit_user_agent";
+		$sql .= ", agnt_signature";
 	}
 
-	$sql_from_where = " FROM T_hitlog WHERE hit_ignore IN ($type)";
+	$sql_from_where = ' FROM T_hitlog, T_basedomains'.( $get_user_agent ? ', T_useragents' : '' ).'
+											WHERE dom_ID = hit_referer_dom_ID ' // TODO: Left join?
+											.( $get_user_agent ? ' AND hit_agnt_ID = agnt_ID' : '' )
+											.' AND hit_referer_type IN ('.$type.')';
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
 	}
 	if ($visitURL != "global")
 	{
-		$sql_from_where .= " AND visitURL = '$visitURL'";
+		$sql_from_where .= " AND hit_uri = '$visitURL'";
 	}
 
 	$sql .= $sql_from_where;
 
 	if( $groupby == '' )
-	{	// No grouping:
-		$sql .= " ORDER BY visitID DESC";
+	{ // No grouping:
+		$sql .= " ORDER BY hit_ID DESC";
 	}
 	else
-	{	// group by
-		$sql .= "	GROUP BY $groupby ORDER BY totalHits DESC";
+	{ // group by
+		$sql .= " GROUP BY $groupby ORDER BY totalHits DESC";
 	}
 	$sql .= " LIMIT $howMany";
 
 	$res_stats = $DB->get_results( $sql, ARRAY_A );
 
 	if( $get_total_hits )
-	{	// we need to get total hits
+	{ // we need to get total hits
 		$sql = "SELECT COUNT(*) ".$sql_from_where;
 		$stats_total_hits = $DB->get_var( $sql );
 	}
 	else
-	{	// we're not getting total hits
+	{ // we're not getting total hits
 		$stats_total_hits = 1;		// just in case some tries a percentage anyway (avoid div by 0)
 	}
 
@@ -461,7 +198,7 @@ function stats_time( $format = '' )
 	global $row_stats;
 	if( $format == '' )
 		$format = locale_datefmt().' '.locale_timefmt();
-	echo date_i18n( $format, $row_stats['visitTime'] );
+	echo date_i18n( $format, $row_stats['hit_datetime'] );
 }
 
 
@@ -528,7 +265,7 @@ function stats_blog_name()
 function stats_referer( $before='', $after='', $disp_ref = true )
 {
 	global $row_stats;
-	$ref = trim($row_stats['referingURL']);
+	$ref = trim($row_stats['hit_referer']);
 	if( strlen($ref) > 0 )
 	{
 		echo $before;
@@ -545,9 +282,9 @@ function stats_basedomain( $disp = true )
 {
 	global $row_stats;
 	if( $disp )
-		echo htmlentities( $row_stats['baseDomain'] );
+		echo htmlentities( $row_stats['dom_name'] );
 	else
-		return $row_stats['baseDomain'];
+		return $row_stats['dom_name'];
 }
 
 
@@ -574,7 +311,7 @@ function stats_search_keywords()
 		{ // found "q" query parameter
 			$q = urldecode($param_parts[1]);
 			if( strpos( $q, 'Ã' ) !== false )
-			{	// Probability that the string is UTF-8 encoded is very high, that'll do for now...
+			{ // Probability that the string is UTF-8 encoded is very high, that'll do for now...
 				//echo "[UTF-8 decoding]";
 				$q = utf8_decode( $q );
 			}
@@ -598,7 +335,7 @@ function stats_search_keywords()
 function stats_req_URI()
 {
 	global $row_stats;
-	echo htmlentities($row_stats['visitURL']);
+	echo htmlentities($row_stats['hit_uri']);
 }
 
 
@@ -610,7 +347,7 @@ function stats_req_URI()
 function stats_user_agent( $translate = false )
 {
 	global $row_stats, $user_agents;
-	$UserAgent = $row_stats[ 'hit_user_agent' ];
+	$UserAgent = $row_stats[ 'agnt_signature' ];
 	if( $translate )
 	{
 		foreach ($user_agents as $curr_user_agent)
@@ -653,6 +390,9 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.5  2005/02/09 21:43:32  blueyed
  * introduced getIpList()
  *

@@ -246,21 +246,18 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Hit-Logs... ';
 	$query = "CREATE TABLE T_hitlog (
-		visitID bigint(11) NOT NULL auto_increment,
-		visitTime timestamp(14) NOT NULL,
-		visitURL varchar(250) default NULL,
-		hit_ignore enum('no','invalid','badchar','blacklist','rss','robot','search') NOT NULL default 'no',
-		referingURL varchar(250) default NULL,
-		baseDomain varchar(250) default NULL,
-		hit_blog_ID int(11) NOT NULL default '0',
-		hit_remote_addr varchar(40) default NULL,
-		hit_user_agent varchar(250) default NULL,
-		PRIMARY KEY (visitID),
-		KEY hit_ignore (hit_ignore),
-		KEY baseDomain (baseDomain),
-		KEY hit_blog_ID (hit_blog_ID),
-		KEY hit_user_agent (hit_user_agent)
-	)";
+							hit_ID bigint(11) NOT NULL AUTO_INCREMENT,
+							hit_sess_ID INT UNSIGNED,
+							hit_datetime DATETIME NOT NULL,
+							hit_uri VARCHAR(250) DEFAULT NULL,
+							hit_agnt_ID INT UNSIGNED,
+							hit_referer_type ENUM('search','blacklist','referer','direct','spam') NOT NULL,
+							hit_referer VARCHAR(255) DEFAULT NULL,
+							hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
+							hit_blog_ID int(11) UNSIGNED NOT NULL DEFAULT '0',
+							hit_remote_addr VARCHAR(40) DEFAULT NULL,
+							PRIMARY KEY (hit_ID)
+						)"; // TODO: keys!
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -940,7 +937,8 @@ function create_b2evo_tables_092()
 									sess_lastseen DATETIME NOT NULL,
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID INT(10) DEFAULT NULL,
-									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
+									PRIMARY KEY( sess_ID ),
+									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID ),
 								)" );
 	echo "OK.<br />\n";
 
@@ -1015,6 +1013,25 @@ function create_b2evo_tables_092()
 									INDEX link_dest_item_ID (link_dest_item_ID),
 									INDEX link_file_ID (link_file_ID)
 								)" );
+	echo "OK.<br />\n";
+
+
+	echo 'Creating table for base domains... ';
+	$DB->query( "CREATE TABLE T_basedomains (
+								dom_ID INT UNSIGNED NOT NULL AUTO_INCREMENT,
+								dom_name VARCHAR(255) NOT NULL DEFAULT '',
+								dom_status ENUM('new','whitelist','blacklist') NOT NULL DEFAULT 'new',
+								PRIMARY KEY (dom_ID),
+								UNIQUE (dom_name) )" );
+	echo "OK.<br />\n";
+
+
+	echo 'Creating table for user agents... ';
+	$DB->query( 'CREATE TABLE T_useragents (
+								agnt_ID INT UNSIGNED NOT NULL AUTO_INCREMENT,
+								agnt_signature VARCHAR( 255 ) NOT NULL,
+								agnt_type ENUM( "rss", "robot", "browser" ) DEFAULT "browser" NOT NULL ,
+								PRIMARY KEY (agnt_ID) )' );
 	echo "OK.<br />\n";
 
 

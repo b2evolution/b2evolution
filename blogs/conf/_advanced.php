@@ -315,12 +315,13 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 /**#@+
  * Names for cookies.
  */
-$cookie_user  = 'cookie'.$instance_name.'user';
-$cookie_pass  = 'cookie'.$instance_name.'pass';
-$cookie_state = 'cookie'.$instance_name.'state';
-$cookie_name  = 'cookie'.$instance_name.'name';
-$cookie_email = 'cookie'.$instance_name.'email';
-$cookie_url   = 'cookie'.$instance_name.'url';
+$cookie_user    = 'cookie'.$instance_name.'user';
+$cookie_pass    = 'cookie'.$instance_name.'pass';
+$cookie_state   = 'cookie'.$instance_name.'state';
+$cookie_name    = 'cookie'.$instance_name.'name';
+$cookie_email   = 'cookie'.$instance_name.'email';
+$cookie_url     = 'cookie'.$instance_name.'url';
+$cookie_session = 'cookie'.$instance_name.'session';
 /**#@-*/
 
 /**

@@ -315,7 +315,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php
-	log_hit();	// log the hit on this page
+	$Hit->log();  // log the hit on this page
 	debug_info(); // output debug info if requested
 ?>
 <!-- InstanceEndEditable --></p>

@@ -91,10 +91,9 @@ param( 'stats', 'integer', 0 );                 // deprecated
 if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
 
-if( !empty($preview) )
-{	// Preview is a special hit type:
-	$Debuglog->add( 'filter_hit sequel: preview', 'hit' );
-	$hit_type = 'preview';
+if( $preview )
+{ // Ignore this hit
+	$Hit->ignore = true;
 }
 
 if( empty($disp) )
@@ -330,6 +329,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.7  2005/02/24 00:20:03  blueyed
  * DB_USER is not always defined (scripts from /xmlsrc)
  *

@@ -50,4 +50,4 @@
 		<?php } // End of comment loop. ?>
 	</channel>
 </rss>
-<?php log_hit(); // log the hit on this page ?>
+<?php $Hit->log(); // log the hit on this page ?>

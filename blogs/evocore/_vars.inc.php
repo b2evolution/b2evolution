@@ -148,53 +148,6 @@ $pagenow = $pagenow[0];
 // So far, we did not include the javascript for popupups
 $b2commentsjavascript = false;
 
-// browser detection
-$is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
-if( !isset($HTTP_USER_AGENT) )
-{
-	if( isset($_SERVER['HTTP_USER_AGENT']) )
-		$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
-	else
-		$HTTP_USER_AGENT = '';
-}
-if( $HTTP_USER_AGENT != '' )
-{
-	if(strpos($HTTP_USER_AGENT, 'Lynx') !== false)
-	{
-		$is_lynx = 1;
-	}
-	elseif(strpos($HTTP_USER_AGENT, 'Gecko') !== false)
-	{
-		$is_gecko = 1;
-	}
-	elseif(strpos($HTTP_USER_AGENT, 'MSIE') !== false && strpos($HTTP_USER_AGENT, 'Win') !== false)
-	{
-		$is_winIE = 1;
-	}
-	elseif(strpos($HTTP_USER_AGENT, 'MSIE') !== false && strpos($HTTP_USER_AGENT, 'Mac') !== false)
-	{
-		$is_macIE = 1;
-	}
-	elseif(strpos($HTTP_USER_AGENT, 'Opera') !== false)
-	{
-		$is_opera = 1;
-	}
-	elseif(strpos($HTTP_USER_AGENT, 'Nav') !== false || preg_match('/Mozilla\/4\./', $HTTP_USER_AGENT))
-	{
-		$is_NS4 = 1;
-	}
-
-	if ($HTTP_USER_AGENT != strip_tags($HTTP_USER_AGENT))
-	{ // then they have tried something funky,
-		// putting HTML or PHP into the HTTP_USER_AGENT
-		$Debuglog->add( 'setting vars: '.T_('bad char in User Agent'), 'hit');
-		$HTTP_USER_AGENT = T_('bad char in User Agent');
-	}
-
-}
-$is_IE = (($is_macIE) || ($is_winIE));
-// $Debuglog->add( 'setting vars: '. "User Agent: ".$HTTP_USER_AGENT);
-
 
 // server detection
 $is_Apache = strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
@@ -294,6 +247,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/28 01:32:32  blueyed
+ * Hitlog refactoring, part uno.
+ *
  * Revision 1.13  2005/02/18 18:12:46  blueyed
  * $instance_name
  *
