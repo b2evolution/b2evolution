@@ -57,7 +57,7 @@
 						<?php
 							if( $loop_grp_ID == $Settings->get('newusers_grp_ID') )
 							{
-								echo '<span style="font-weight:normal">('.T_('default group for new users').')</span>';
+								echo '<span class="notes">('.T_('default group for new users').')</span>';
 							}
 						?>
 					</td>

@@ -1729,7 +1729,7 @@ msgstr "Legt die Sprache der Navigations-Links fürs Blog fest."
 
 #: ..\..\..\admin\_blogs_main.subform.php:22
 msgid "Access parameters"
-msgstr "Zugangsparameter"
+msgstr "Zugriffsparameter"
 
 #: ..\..\..\admin\_blogs_main.subform.php:26
 msgid "Default blog on index.php"
@@ -1753,7 +1753,7 @@ msgstr "Blog Ordner URL"
 
 #: ..\..\..\admin\_blogs_main.subform.php:36
 msgid "No trailing slash. (If you don't know, leave this field empty.)"
-msgstr "Kein anhängenden Slash am Ende. (Wenn du nicht weisst, lass dieses Feld leer.)"
+msgstr "Kein Slash am Ende. (Wenn du nicht weisst, lass dieses Feld leer.)"
 
 #: ..\..\..\admin\_blogs_main.subform.php:40
 msgid "URL blog name / Stub name"

@@ -25,7 +25,7 @@ if( !isset($default_to_blog) ) $default_to_blog = 2;
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
+if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl.'/', $matches ) )
 {
 	$baseurlroot = $matches[1];
 	// echo "baseurlroot=$baseurlroot <br />";

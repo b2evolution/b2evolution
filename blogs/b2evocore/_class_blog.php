@@ -97,6 +97,8 @@ class Blog extends DataObject
 	 */
 	function set( $parname, $parvalue )
 	{
+		global $Settings;
+		
 		switch( $parname )
 		{
 			case 'ID':
@@ -111,6 +113,13 @@ class Blog extends DataObject
 				parent::set_param( $parname, 'int', $parvalue );
 				break;
 			
+			case 'access_type':
+				if( $parvalue == 'default' )
+				{
+					$Settings->set('default_blog_ID', $this->ID);
+					$Settings->updateDB();
+				}
+				
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}

@@ -19,16 +19,16 @@
  * fplanque: created
  */
 function bpost_create(
-	$author_user_ID, 							// Author
+	$author_user_ID,              // Author
 	$post_title,
 	$post_content,
-	$post_timestamp,
-	$main_cat_ID = 1,									// Main cat ID
-	$extra_cat_IDs = array(),			// Table of extra cats
+	$post_timestamp,              // 'Y-m-d H:i:s'
+	$main_cat_ID = 1,             // Main cat ID
+	$extra_cat_IDs = array(),     // Table of extra cats
 	$post_status = 'published',
 	$post_locale = '#',
 	$post_trackbacks = '',
-	$autobr = 0,									// No AutoBR has been used by default
+	$autobr = 0,                  // No AutoBR has been used by default
 	$pingsdone = true,
 	$post_urltitle = '',
 	$post_url = '',
@@ -96,13 +96,13 @@ function bpost_update(
 	$post_ID,
 	$post_title,
 	$post_content,
-	$post_timestamp = '',
-	$main_cat_ID = 1,							// Main cat ID
-	$extra_cat_IDs = array(),			// Table of extra cats
+	$post_timestamp = '',         // 'Y-m-d H:i:s'
+	$main_cat_ID = 1,             // Main cat ID
+	$extra_cat_IDs = array(),     // Table of extra cats
 	$post_status = 'published',
 	$post_locale = '#',
 	$post_trackbacks = '',
-	$autobr = 0,									// No AutoBR has been used by default
+	$autobr = 0,                  // No AutoBR has been used by default
 	$pingsdone = true,
 	$post_urltitle = '',
 	$post_url = '',

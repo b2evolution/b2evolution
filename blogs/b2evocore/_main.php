@@ -76,10 +76,11 @@ $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
 
 
 debug_log('default_locale from conf: '.$default_locale);
+
 locale_overwritefromDB();
 debug_log('default_locale from DB: '.$default_locale);
-// set default locale by autodetect
-$default_locale = locale_from_httpaccept();
+
+$default_locale = locale_from_httpaccept(); // set default locale by autodetect
 debug_log('default_locale from HTTP_ACCEPT: '.$default_locale);
 
 // Activate default locale:
