@@ -185,6 +185,10 @@ class ItemList
 
 			//echo $search;
 		}
+		else
+		{
+			$search = ''; 
+		}
 	
 		/*
 		 * ----------------------------------------------------
@@ -222,8 +226,8 @@ class ItemList
 				if( ! in_array( $cat_ID, $cat_array ) )
 				{	// Not already in list
 					$cat_array[] = $cat_ID;
-					cat_children( $cache_categories, ($blog==1)?0:$blog, $cat_ID, cat_req_dummy, cat_req,
-												cat_req_dummy, cat_req_dummy, 1 );
+					cat_children( $cache_categories, ($blog==1)?0:$blog, $cat_ID, 'cat_req_dummy', 'cat_req',
+												'cat_req_dummy', 'cat_req_dummy', 1 );
 				}
 			}
 			// ----------------- END RECURSIVE CAT LIST ----------------
@@ -403,7 +407,7 @@ class ItemList
 		}
 
 	
-		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags ";
+		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_karma ";
 	
 		$this->request .= "FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 		
@@ -421,12 +425,7 @@ class ItemList
 		
 		if ($preview)
 		{
-			$this->request = 'SELECT 1'; // dummy mysql query for the preview
-			// little funky fix for IEwin, rawk on that code
-			$is_winIE = ((preg_match('/MSIE/',$HTTP_USER_AGENT)) && (preg_match('/Win/',$HTTP_USER_AGENT)));
-			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix))) {
-				$preview_content =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $preview_content);
-			}
+			$this->request = 'SELECT 0 AS ID'; // dummy mysql query for the preview
 		}
 	
 		// echo $this->request;
@@ -641,6 +640,13 @@ class ItemList
 				$content = $errcontent;
 			}
 			
+			// little funky fix for IEwin, rawk on that code
+			global $is_winIE;
+			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix))) 
+			{
+				$content =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $content);
+			}
+
 			$postdata = array (
 				'ID' => 0, 
 				'Author_ID' => $preview_userid,

@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title><?php echo $blogname ?> - feedback on '<?php the_title() ?>'</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<meta http-equiv="reply-to" content="you@yourdomain.com" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
@@ -33,7 +33,7 @@
 ?>
 </div>
 
-<div><b><span style="color: #40B4C3">::</span> <a href="javascript:window.close()">close this window</a></b></div>
+<div><strong><span style="color: #40B4C3">::</span> <a href="javascript:window.close()">close this window</a></strong></div>
 
 </body>
 </html>

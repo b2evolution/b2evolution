@@ -60,41 +60,37 @@ case "register":
 
 	/* checking login has been typed */
 	if ($user_login=='') {
-		die ("<b>ERROR</b>: please enter a Login");
+		die ('<strong>'. _('ERROR'). "</strong>: ". _('please enter a Login'));
 	}
 
 	/* checking the password has been typed twice */
 	if ($pass1=='' ||$pass2=='') {
-		die ("<b>ERROR</b>: please enter your password twice");
+		die ('<strong>'. _('ERROR'). "</strong>: ". _('please enter your password twice'));
 	}
 
 	/* checking the password has been typed twice the same */
 	if ($pass1!=$pass2)	{
-		die ("<b>ERROR</b>: please type the same password in the two password fields");
+		die ('<strong>'. _('ERROR'). "</strong>: ". _('please type the same password in the two password fields'));
 	}
 	$user_nickname=$user_login;
 
 	/* checking e-mail address */
 	if ($user_email=="") {
-		die ("<b>ERROR</b>: please type your e-mail address");
+		die ('<strong>'. _('ERROR'). "</strong>: ". _('please type your e-mail address'));
 	} else if (!is_email($user_email)) {
-		die ("<b>ERROR</b>: the email address isn't correct");
+		die ('<strong>'. _('ERROR'). "</strong>: ". _('the email address is invalid'));
 	}
 
-	$id=mysql_connect($dbhost,$dbusername,$dbpassword);
-	if ($id==false)	{
-		die ("<b>OOPS</b>: can't connect to the server !".mysql_error());
-	}
-
-	mysql_select_db("$dbname") or die ("<b>OOPS</b>: can't select the database $base : ".mysql_error());
+	// Connecting to the db:
+	dbconnect();
 
 	/* checking the login isn't already used by another user */
 	$request =  " SELECT user_login FROM $tableusers WHERE user_login = '$user_login'";
-	$result = mysql_query($request,$id) or die ("<b>OOPS</b>: can't check the login...");
+	$result = mysql_query($request) or mysql_oops( $request );
 	$lines = mysql_num_rows($result);
 	mysql_free_result($result);
 	if ($lines>=1) {
-		die ("<b>ERROR</b>: this login is already registered, please choose another one");
+		die ('<strong>'. _('ERROR'). "</strong>: ". _('this login is already registered, please choose another one'). "");
 	}
 
 	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'] ;
@@ -106,26 +102,23 @@ case "register":
 	$user_nickname=addslashes($user_nickname);
 
 	$query = "INSERT INTO $tableusers (user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) VALUES ('$user_login','$pass1','$user_nickname','$user_email','$user_ip','$user_domain','$user_browser',NOW(),'$new_users_can_blog','nickname')";
-	$result = mysql_query($query);
-	if ($result==false) {
-		die ("<b>ERROR</b>: couldn't register you... please contact the <a href=\"mailto:$admin_email\">webmaster</a> !".mysql_error());
-	}
+	$result = mysql_query($query) or mysql_oops( $query );
 
 	$stars="";
 	for ($i = 0; $i < strlen($pass1); $i = $i + 1) {
 		$stars .= "*";
 	}
 
-	$message  = "new user registration on your blog $blogname:\n\n";
-	$message .= "login: $user_login\n\ne-mail: $user_email\n\n";
-	$message .= "Manage users: $pathserver/b2team.php\n\n";
+	$message  = N_('new user registration on your blog'). ":\n\n";
+	$message .= N_('Login'). ": $user_login\n\n". N_('Email'). ": $user_email\n\n";
+	$message .= N_('Manage users'). ": $pathserver/b2team.php\n\n";
 
-	@mail( $admin_email, "new user registration on your blog $blogname", $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+	@mail( $admin_email, N_('new user registration on your blog'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 
-	?><html>
+	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<title>b2evo &gt; Registration complete</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title><?php echo _('b2evo') ?> &gt; <?php echo _('Registration complete') ?></title>
 <link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
@@ -158,16 +151,16 @@ textarea,input,select {
 <a href="http://b2evolution.net/" target="_blank"><img src="img/b2minilogo.png" border="0" alt="visit b2's homepage" /></a>
 </td>
 <td class="b2menutop" align="center">
-registration<br />complete
+<?php echo _('Registration complete') ?>
 </td>
 </tr>
 
 <tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
 
 <table width="180">
-<tr><td align="right" colspan="2">login: <b><?php echo $user_login ?>&nbsp;</b></td></tr>
-<tr><td align="right" colspan="2">password: <b><?php echo $stars ?>&nbsp;</b></td></tr>
-<tr><td align="right" colspan="2">e-mail: <b><?php echo $user_email ?>&nbsp;</b></td></tr>
+<tr><td align="right" colspan="2"><?php echo _('Login') ?>: <strong><?php echo $user_login ?>&nbsp;</strong></td></tr>
+<tr><td align="right" colspan="2"><?php echo _('Password') ?>: <strong><?php echo $stars ?>&nbsp;</strong></td></tr>
+<tr><td align="right" colspan="2"><?php echo _('Email') ?>: <strong><?php echo $user_email ?>&nbsp;</strong></td></tr>
 <tr><td width="90">&nbsp;</td>
 <td><form name="login" action="b2login.php" method="post">
 <input type="hidden" name="log" value="<?php echo $user_login ?>" />
@@ -190,11 +183,11 @@ break;
 
 case "disabled":
 
-	?><html>
+	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<title>b2 > Registration Currently Disabled</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="b2.css" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title><?php echo _('b2evo') ?> &gt; <?php echo _('Registration Currently Disabled') ?></title>
+	<link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
 <?php
@@ -234,8 +227,8 @@ registration disabled<br />
 <td align="center" valign="center" height="150" colspan="2">
 <table width="80%" height="100%">
 <tr><td class="b2menutop">
-User registration is currently not allowed.<br />
-<a href="<?php echo $baseurl ?>" >Home</a>
+<?php echo _('User registration is currently not allowed.') ?><br />
+<a href="<?php echo $baseurl ?>" ><?php echo _('Home') ?></a>
 </td></tr></table>
 </td>
 </tr>
@@ -253,10 +246,10 @@ break;
 
 default:
 
-	?><html>
+	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<title>b2 > Register form</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title><?php echo _('b2evo') ?> &gt; <?php echo _('Register form') ?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
@@ -299,13 +292,13 @@ registration<br />
 <input type="hidden" name="action" value="register" />
 <table border="0" width="180" class="menutop" style="background-color: #ffffff">
 <tr>
-<td width="150" align="right">login</td>
+<td width="150" align="right"><?php echo _('Login:') ?></td>
 <td>
 <input type="text" name="user_login" size="8" maxlength="20" />
 </td>
 </tr>
 <tr>
-<td align="right">password<br />(twice)</td>
+<td align="right"><?php echo _('Password:') ?><br /><?php echo _('(twice)') ?></td>
 <td>
 <input type="password" name="pass1" size="8" maxlength="100" />
 <br />
@@ -313,7 +306,7 @@ registration<br />
 </td>
 </tr>
 <tr>
-<td align="right">e-mail</td>
+<td align="right"><?php echo _('Email') ?></td>
 <td>
 <input type="text" name="user_email" size="8" maxlength="100" />
 </td>

@@ -26,16 +26,16 @@
 	if( isset($MainList) ) while( $MainList->get_item() )
 {
 ?>
-<div class="date" align="right">	<?php the_date("","",""); ?> </div><br>
+<div class="date" align="right">	<?php the_date(); ?> </div><br />
 <?php permalink_anchor(); ?>
 			<div class="title"><?php the_title(); ?></div>
 <?php the_content(); ?>
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 
-   <div class="posted">by <?php the_author() ?> at <a href="<?php permalink_link() ?>"><?php the_time() ?></a><br>
+   <div class="posted">by <?php the_author() ?> at <a href="<?php permalink_link() ?>"><?php the_time() ?></a><br />
 	<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
-<?php trackback_popup_link("TrackBack (0)", "TrackBack (1)", "TrackBack (%)") ?> |
-<?php pingback_popup_link("PingBack (0)", "PingBack (1)", "PingBack (%)") ?> |
+<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
+<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |
 <a href="?cat=<?php the_category_ID() ?>" title="category: <?php the_category() ?>"><?php the_category() ?></a>
 <?php trackback_rdf() ?>
   </div>
@@ -72,27 +72,28 @@ for( $curr_blog_ID=blog_list_start('stub');
 <div class="sidebody">
 <?php // ---------------------------------- START OF SKIN LIST ----------------------------------
 			for( skin_list_start(); skin_list_next(); ) { ?>
-				<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a><br>
+				<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a><br />
 			<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 	
 </div>
-<div class="sidetitle" align="center">archives</div>
-<div class="sidebody">
-<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				include( dirname(__FILE__)."/_archives.php"); 
-				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-</div>
+	<div class="sidetitle" align="center">archives</div>
+	<div class="sidebody">
+	<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+					include( dirname(__FILE__)."/_archives.php"); 
+					// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+	</div>
 
-<div class="sidetitle" align="center">misc</div>
-<div class="sidebody">
-<a href="<?php echo $pathserver?>/b2login.php">login</a><br>
-<a href="<?php echo $pathserver?>/b2register.php">register</a></div>	
-
-<div class="sidetitle" align="center">credits</div>
-<div class="sidebody">
-design from <a href="http://lifeisadiaper.com" title="designed by Sabrina">Sabrina</a><br>
-powered by <a href="http://b2evolution.net/"title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" class="middle" alt="b2evolution" border="0" /></a><br>
-</div>
+	<div class="sidetitle" align="center"><?php echo _('Misc') ?></div>
+	<div class="sidebody">
+		<a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a><br />
+		<a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a>
+	</div>
+	
+	<div class="sidetitle" align="center">credits</div>
+	<div class="sidebody">
+	design from <a href="http://lifeisadiaper.com" title="designed by Sabrina">Sabrina</a><br />
+	powered by <a href="http://b2evolution.net/"title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" class="middle" alt="b2evolution" border="0" /></a><br />
+	</div>
 
 </div>
 
@@ -100,7 +101,7 @@ powered by <a href="http://b2evolution.net/"title="b2evolution home"><img src=".
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		echo "Totals: $result_num_rows posts - $querycount queries - ".number_format(timer_stop(),3)." seconds";
+		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
 	}
 ?>
 

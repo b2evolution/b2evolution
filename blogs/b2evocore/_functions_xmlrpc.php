@@ -95,12 +95,13 @@ $xmlrpcTypes=array($xmlrpcI4 => 1,
 				   $xmlrpcArray => 2,
 				   $xmlrpcStruct => 3);
 
-$xmlEntities=array(	 "amp" => "&",
+$xmlEntities=array(	"amp" => "&",
 									 "quot" => '"',
 									 "lt" => "<",
 									 "gt" => ">",
 									 "apos" => "'");
 
+// These are left untranslated because they are sent back to the remote system
 $xmlrpcerr["unknown_method"]=1;
 $xmlrpcstr["unknown_method"]="Unknown method";
 $xmlrpcerr["invalid_return"]=2;
@@ -812,12 +813,12 @@ class xmlrpcval {
 		global $xmlrpcTypes, $xmlrpcBoolean;
 
 		if ($this->mytype==1) {
-			echo "<B>xmlrpcval</B>: scalar can have only one value<BR>";
+			echo "<strong>xmlrpcval</strong>: scalar can have only one value<br />";
 			return 0;
 		}
 		$typeof=$xmlrpcTypes[$type];
 		if ($typeof!=1) {
-			echo "<B>xmlrpcval</B>: not a scalar type (${typeof})<BR>";
+			echo "<strong>xmlrpcval</strong>: not a scalar type (${typeof})<br />";
 			return 0;
 		}
 		
@@ -847,8 +848,8 @@ class xmlrpcval {
   function addArray($vals) {
 		global $xmlrpcTypes;
 		if ($this->mytype!=0) {
-			echo "<B>xmlrpcval</B>: already initialized as a [" . 
-				$this->kindOf() . "]<BR>";
+			echo "<strong>xmlrpcval</strong>: already initialized as a [" . 
+				$this->kindOf() . "]<br />";
 			return 0;
 		}
 
@@ -860,8 +861,8 @@ class xmlrpcval {
   function addStruct($vals) {
 	global $xmlrpcTypes;
 	if ($this->mytype!=0) {
-	  echo "<B>xmlrpcval</B>: already initialized as a [" . 
-		$this->kindOf() . "]<BR>";
+	  echo "<strong>xmlrpcval</strong>: already initialized as a [" . 
+		$this->kindOf() . "]<br />";
 	  return 0;
 	}
 	$this->mytype=$xmlrpcTypes["struct"];
@@ -872,10 +873,10 @@ class xmlrpcval {
   function dump($ar) {
 	reset($ar);
 	while ( list( $key, $val ) = each( $ar ) ) {
-	  echo "$key => $val<br>";
+	  echo "$key => $val<br />";
 	  if ($key == 'array')
 		while ( list( $key2, $val2 ) = each( $val ) ) {
-		  echo "-- $key2 => $val2<br>";
+		  echo "-- $key2 => $val2<br />";
 		}
 	}
   }

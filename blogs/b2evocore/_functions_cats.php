@@ -25,7 +25,7 @@ function cat_create(
 	
 	if( $cat_blog_ID == NULL )
 	{
-		if( empty($cat_parent_ID) ) die ( "cat_create(-) missing parameters!" );
+		if( empty($cat_parent_ID) ) die ( 'cat_create(-) missing parameters!' );
 		$parent_cat = get_the_category_by_ID($cat_parent_ID);
 		$cat_blog_ID = $parent_cat['cat_blog_ID']; 
 	}
@@ -92,7 +92,7 @@ function cat_delete( $cat_ID )
 	$row = mysql_fetch_object( $result );
 	
 	$child_count = $row->child_count;
-	if( $child_count != 0 ) return "Cannot delete if there are sub-categories!";
+	if( $child_count != 0 ) return _("Cannot delete if there are sub-categories!");
 	
 	// TODO: find parent
 	$query="SELECT cat_parent_ID, cat_blog_ID FROM $tablecategories WHERE cat_ID = $cat_ID";
@@ -143,7 +143,7 @@ function cat_delete( $cat_ID )
 		}
 		else
 		{
-			return "Cannot delete last category if there are posts inside!";
+			return _("Cannot delete last category if there are posts inside!");
 		}		
 		
 	}
@@ -155,6 +155,8 @@ function cat_delete( $cat_ID )
 	{	
 		$IDlist = " AND postcat_post_ID NOT IN (".implode( ',', $IDarray ).") ";
 	}
+	else
+		$IDList = '';
 
 	// delete when not main cat
 	$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID ".$IDlist;
@@ -247,7 +249,7 @@ function get_the_category_by_ID($cat_ID)
 	{
 		cat_load_cache();
 	}
-	if( !isset( $cache_categories[$cat_ID] ) ) die( "Requested category $cat_ID does not exist!" );
+	if( !isset( $cache_categories[$cat_ID] ) ) die( sprintf( _('Requested category %s does not exist!'),  $cat_ID ) );
 	return $cache_categories[$cat_ID];
 }
 
@@ -322,14 +324,12 @@ function cat_load_cache()
 	global $time_difference;
 	if( !isset($cache_categories)) 
 	{
-
-	
 		$query="SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID ".
 				"FROM $tablecategories ".
 				"ORDER BY cat_name"; 
 		$result=mysql_query($query) or mysql_oops( $query ); 
 		$querycount++; 
-		while ( $myrow = mysql_fetch_array($result)) 
+		while( $myrow = mysql_fetch_array($result) ) 
 		{ 
 			$this_cat['cat_name'] = stripslashes($myrow['cat_name']);
 			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
@@ -337,7 +337,7 @@ function cat_load_cache()
 			$this_cat['cat_postcount'] = 0;					// Will be increased later
 			$this_cat['cat_children'] = array();
 			$cache_categories[$myrow['cat_ID']] = $this_cat;
-			// echo 'just cached:'.$cache_categories[$myrow['cat_ID']]['cat_name'].'<br>';
+			// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'].'<br />';
 		} 
 
 		// Reveal children:
@@ -345,7 +345,10 @@ function cat_load_cache()
 		{
 			foreach( $cache_categories as $icat_ID => $i_cat )
 			{
-				$cache_categories[$i_cat['cat_parent_ID']]['cat_children'][] = $icat_ID;
+				if( $icat_ID )
+				{
+					$cache_categories[$i_cat['cat_parent_ID']]['cat_children'][] = $icat_ID;
+				}
 			}
 		}
 
@@ -381,13 +384,6 @@ function cat_load_cache()
 			$where_link = ' AND ';
 		}
 	
-		// Do we need to restrict categories:
-		if( $blog > 1 ) 
-		{	// Blog #1 aggregates all
-			$where .= $where_link.' cat_blog_ID = '.$blog;
-			$where_link = ' AND ';
-		}
-
 		$query="SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount ".
 				"FROM $tablepostcats INNER JOIN $tableposts ON postcat_post_ID = ID ".
 				$where.
@@ -444,7 +440,7 @@ function cat_load_postcats_cache()
 				 $cache_postcats[$postcat_post_ID] = array();
 			}
 			$cache_postcats[$postcat_post_ID][] = $myrow["postcat_cat_ID"];
-			// echo "just cached: post=$postcat_post_ID  cat=".$myrow["postcat_cat_ID"]."<br>";
+			// echo "just cached: post=$postcat_post_ID  cat=".$myrow["postcat_cat_ID"]."<br />";
 		} 
 	}
 }
@@ -493,7 +489,7 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 		$child_count = 0;
 		foreach( $ccats as $icat_ID => $i_cat )
 		{
-			if( (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
+			if( $icat_ID && (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
 			{ // this cat is in the blog and is a child of the parent
 				if( $child_count++ == 0 )
 				{	// this is the first child
@@ -548,9 +544,12 @@ function cat_query( )
  *  <title><?php bloginfo('name') ?><?php single_cat_title() ?></title>
  *
  * fplanque: multiple category support (so it's not really 'single' anymore!)
+ * 0.8.3: changed defaults
  */
-function single_cat_title($prefix = '', $display = 'htmlhead' ) 
+function single_cat_title( $prefix = '#', $display = 'htmlbody' ) 
 {
+	if( $prefix == '#' ) $prefix = ' '._('Category').': ';
+
 	global $cat, $cat_array;
 	if( !empty($cat_array) ) 
 	{	// We have requested specific categories...
@@ -598,19 +597,27 @@ function the_category( $format = 'htmlbody' )
  * lists all the category names
  *
  * fplanque: created
+ * fplanque: 0.8.3: changed defaults
  */
-function the_categories( $link_title = false,		// false if you want no links
-	$before_main='', $after_main ='', 						// 'hide' to ignore main cat
-	$before_other='', $after_other ='', 					// 'hide' to ignore other cats
-	$before_external='', $after_external ='',	 		// 'hide' to ignore external cats (other blogs)
+function the_categories( $link_title = '#',				// false if you want no links
+	$before_main='<strong>', $after_main='</strong>', // 'hide' to ignore main cat
+	$before_other='', $after_other='', 								// 'hide' to ignore other cats
+	$before_external='<em>', $after_external='</em>',	// 'hide' to ignore external cats (other blogs)
 	$separator = ', ', 
 	$format_each = 'raw', 
 	$format_list = 'htmlbody'
  )
 {
 	global $id, $postdata, $blog, $blogfilename, $cache_postcats, $preview;
+
+	if( $link_title == '#' ) 
+	{	/* TRANS: When the categories for a specific post are displayed, the user can click
+				on these cats to browse them, this is the default href title displayed there */
+		$link_title = _('Browse category');
+	}
+
 	$main_cat_ID = $postdata['Category'];
-	// echo "main cat ID: $main_cat_ID<br>";
+	// echo "main cat ID: $main_cat_ID<br />";
 	cat_load_postcats_cache();
 	$categoryIDs = $cache_postcats[$id];
 	
@@ -705,7 +712,7 @@ function the_categories_IDs()
  */
 function the_category_head($before='',$after='') 
 {
-	global $id, $postdata, $currentcat, $previouscat,$dateformat,$newday;
+	global $id, $postdata, $currentcat, $previouscat, $newday;
 	$currentcat = $postdata['Category'];
 	if ($currentcat != $previouscat) 
 	{
@@ -732,7 +739,7 @@ function dropdown_cats($optionall = 1, $all = 'All')
 	$query="SELECT * FROM $tablecategories";
 	$result=mysql_query($query);
 	$querycount++;
-	echo "<select name=\"cat\" class=\"postform\">\n";
+	echo '<select name="cat" class="postform">', "\n";
 	if (intval($optionall) == 1) 
 	{
 		echo "\t<option value=\"all\">$all</option>\n";
@@ -762,7 +769,6 @@ function list_cats($optionall = 1, 	// Display a link to All cats
 	$all = 'All', $sort_column = 'ID', $sort_order = 'asc', $file = 'blah') 
 {
 	global $tablecategories,$querycount,$blogfilename, $blog; 
-	global $querystring_start, $querystring_equal, $querystring_separator;
 
 	$file = ($file == 'blah') ? $blogfilename : $file;
 	$sort_column = 'cat_'.$sort_column;
@@ -782,13 +788,13 @@ function list_cats($optionall = 1, 	// Display a link to All cats
 
 	if (intval($optionall) == 1) 
 	{
-		echo "\t<li><a href=\"".$file.$querystring_start."cat".$querystring_equal."all\">".$all."</a></li>\n";
+		echo "\t<li><a href=\"".$file.'?cat=all">'.$all."</a></li>\n";
 	}
 
 	while($row = mysql_fetch_object($result)) 
 	{
 		$cat_name = $row->cat_name;
-		echo "\t<li><a href=\"".$file.$querystring_start."cat".$querystring_equal.$row->cat_ID.'">';
+		echo "\t<li><a href=\"".$file.'?cat='.$row->cat_ID.'">';
 		echo format_to_output($cat_name,'htmlbody');
 		echo "</a></li>\n";
 	}

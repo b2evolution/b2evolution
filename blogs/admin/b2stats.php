@@ -1,5 +1,5 @@
 <?php
-$title = "View Stats";
+$title = _('View Stats');
 $standalone=1;
 require_once (dirname(__FILE__)."/b2header.php");
 require_once (dirname(__FILE__).'/'.$b2inc.'/_functions_hitlogs.php');						// referer logging
@@ -12,32 +12,34 @@ include($b2inc."/_menutop.php");
 ?>
 <span class="menutopbloglist">
 	:
-	<?php if( $show == 'referers' ) echo '<strong>['; ?>
-	<a href="b2stats.php?show=referers&blog=<?php echo $blog ?>">Referers</a>
-	<?php if( $show == 'referers' ) echo ']</strong>'; ?>
-	|
-	<?php if( $show == 'refsearches' ) echo '<strong>['; ?>
-	<a href="b2stats.php?show=refsearches&blog=<?php echo $blog ?>">Refering Searches</a>
-	<?php if( $show == 'refsearches' ) echo ']</strong>'; ?>
-	|
-	<?php if( $show == 'syndication' ) echo '<strong>['; ?>
-	<a href="b2stats.php?show=syndication&blog=<?php echo $blog ?>">Syndication</a>
-	<?php if( $show == 'syndication' ) echo ']</strong>'; ?>
-	|
-	<?php if( $show == 'useragents' ) echo '<strong>['; ?>
-	<a href="b2stats.php?show=useragents&blog=<?php echo $blog ?>">User Agents</a>
-	<?php if( $show == 'useragents' ) echo ']</strong>'; ?>
-	|
-	<?php if( $show == 'other' ) echo '<strong>['; ?>
-	<a href="b2stats.php?show=other&blog=<?php echo $blog ?>">Other</a>
-	<?php if( $show == 'other' ) echo ']</strong>'; ?>
+	<?php 
+	if( $show == 'referers' ) echo '<strong>[';
+	echo '<a href="b2stats.php?show=referers&blog=', $blog, '">', _('Referers'), '</a>';
+	if( $show == 'referers' ) echo ']</strong>'; 
+	echo ' | ';
+	if( $show == 'refsearches' ) echo '<strong>['; 
+	echo '<a href="b2stats.php?show=refsearches&blog=', $blog, '">', _('Refering Searches'), '</a>';
+	if( $show == 'refsearches' ) echo ']</strong>';
+	echo ' | ';
+	if( $show == 'syndication' ) echo '<strong>[';
+	echo '<a href="b2stats.php?show=syndication&blog=', $blog, '">', _('Syndication'), '</a>';
+	if( $show == 'syndication' ) echo ']</strong>';
+	echo ' | ';
+	if( $show == 'useragents' ) echo '<strong>[';
+	echo '<a href="b2stats.php?show=useragents&blog=', $blog, '">', _('User Agents'), '</a>';
+	if( $show == 'useragents' ) echo ']</strong>';
+	echo ' | ';
+	if( $show == 'other' ) echo '<strong>[';
+	echo '<a href="b2stats.php?show=other&blog=', $blog, '">', _('Other'), '</a>';
+	if( $show == 'other' ) echo ']</strong>'; 
+	?>
 </span>
 <?php
 include($b2inc."/_menutop_end.php");
 
 if ($user_level < 9) 
 {
-	die("You have no right to view stats.<br>Ask for a promotion to your <a href=\"mailto:$admin_email\">blog admin</a> :)");
+		die( _('You have no right to view stats.') );
 }
 
 switch( $action )
@@ -48,7 +50,7 @@ switch( $action )
 		set_param( 'hit_type', 'string', true );	// Required!
 		?>
 		<div class="panelinfo">
-		<p>Changing hit #<?php echo $hit_ID ?> type to: <?php echo $hit_type ?></p>
+		<p><?php printf( _('Changing hit #%d type to: %s'), $hit_ID, $hit_type) ?></p>
 		<?php 
 		hit_change_type( $hit_ID, $hit_type );	
 		?>
@@ -61,7 +63,7 @@ switch( $action )
 		set_param( 'hit_ID', 'integer', true );	// Required!
 		?>
 		<div class="panelinfo">
-		<p>Deleting hit #<?php echo $hit_ID ?>...</p>
+		<p><?php printf( _('Deleting hit #%d...'), $hit_ID )?></p>
 		<?php 
 		hit_delete( $hit_ID );	
 		?>
@@ -73,18 +75,19 @@ switch( $action )
 function stats_blog_select()
 {
 	global $blog, $show;
-	echo '<p>Filter: ';
-	if( empty($blog) ) { // This is the blog being displayed on this page ?>
-	<strong>[<a href="b2stats.php?show=<?php echo $show ?>">None</a>]</strong>
-	<?php } else { // This is another blog ?>
-	<a href="b2stats.php?show=<?php echo $show ?>">None</a>
-	<?php 
+	echo '<p>', _('Filter'), ': ';
+	if( empty($blog) ) 
+	{ // This is the blog being displayed on this page 
+		echo '<strong>[<a href="b2stats.php?show=', $show, '">', _('None'), '</a>]</strong>';
+	}
+	else
+	{ // This is another blog
+		echo '<a href="b2stats.php?show=', $show, '">', _('None'), '</a>';
 	} 
 	for( $curr_blog_ID=blog_list_start('stub'); 
 				$curr_blog_ID!=false; 
 				 $curr_blog_ID=blog_list_next('stub') ) 
 		{ 
-		echo $sep;
 		if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
 			| <strong>[<a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
 	<?php } else { // This is another blog ?>
@@ -104,15 +107,15 @@ switch( $show )
 
 	<?php stats_blog_select(); ?>
 
-	<h3>Last referers:</h3>
-	<p>These are hits from external web pages refering to this blog.</p>
+	<h3><?php echo _('Last referers') ?>:</h3>
+	<p><?php echo _('These are hits from external web pages refering to this blog') ?>.</p>
 	<?php refererList(40,'global',1,1,'no','',$blog); ?>
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td>
-				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers" title="Delete this hit!">Del</a>]
-				[<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers" title="Log as a search instead">-&gt;S</a>]
+				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers" title="<?php echo _('Delete this hit!') ?>"><?php echo /* TRANS: Abbrev. for Delete (stats) */ _('Del') ?></a>]
+				[<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers" title="<?php echo _('Log as a search instead') ?>"><?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ _('-&gt;S') ?></a>]
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a>
 			</td>
 			<td><?php stats_blog_name() ?></td>
@@ -121,7 +124,7 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 	
-	<h3>Top referers:</h3>
+	<h3><?php echo _('Top referers') ?>:</h3>
 	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -132,7 +135,7 @@ switch( $show )
 			</tr>
 		<?php } // End stat loop ?>
 	</table>
-	<p>Total referers: <?php stats_total_hit_count() ?></p>
+	<p><?php echo _('Total referers') ?>: <?php stats_total_hit_count() ?></p>
 
 </div>
 
@@ -146,14 +149,14 @@ switch( $show )
 
 	<?php stats_blog_select(); ?>
 
-	<h3>Last refering searches:</h3>
-	<p>These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/b2evo_advanced.php)</p>
+	<h3><?php echo _('Last refering searches') ?>:</h3>
+	<p><?php echo _('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/b2evo_advanced.php)') ?></p>
 	<?php refererList(20,'global',1,1,"'search'",'',$blog); ?>
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td>
-				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=refsearches" title="Delete this hit!">Del</a>]
+				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=refsearches" title="<?php echo _('Delete this hit!') ?>"><?php echo _('Del') ?></a>]
 				<?php stats_basedomain() ?></td>
 			<td><a href="<?php stats_referer() ?>"><?php stats_search_keywords() ?></a></td>
 			<td><?php stats_blog_name() ?></td>
@@ -162,7 +165,7 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 	
-	<h3>Top refering search engines:</h3>
+	<h3><?php echo _('Top refering search engines') ?>:</h3>
 	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blogtrue); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -174,8 +177,8 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 	
-	<h3>Top Indexing Robots:</h3>
-	<p>These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)</p>
+	<h3><?php echo _('Top Indexing Robots') ?>:</h3>
+	<p><?php echo _('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)') ?></p>
 	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -199,8 +202,8 @@ switch( $show )
 
 	<?php stats_blog_select(); ?>
 
-	<h3>Top Aggregators:</h3>
-	<p>These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)</p>
+	<h3><?php echo _('Top Aggregators') ?>:</h3>
+	<p><?php echo _('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)') ?></p>
 	<?php refererList(40,'global',0,0,"'rss'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -211,7 +214,7 @@ switch( $show )
 			</tr>
 		<?php } // End stat loop ?>
 	</table>
-	<p>Total RSS hits: <?php stats_total_hit_count() ?></p>
+	<p><?php echo _('Total RSS hits') ?>: <?php stats_total_hit_count() ?></p>
 
 </div>
 
@@ -225,14 +228,14 @@ switch( $show )
 
 	<?php stats_blog_select(); ?>
 
-	<h3>Last direct accesses:</h3>
-	<p>These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)</p>
+	<h3><?php echo _('Last direct accesses') ?>:</h3>
+	<p><?php echo _('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 	<?php refererList(10,'global',1,1,"'invalid'",'',$blog); ?>
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td>
-				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other" title="Delete this hit!">Del</a>]
+				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other" title="<?php echo _('Delete this hit!') ?>"><?php echo _('Del') ?></a>]
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
@@ -240,14 +243,14 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 	
-	<h3>Last blacklisted referers:</h3>
-	<p>These are hits from people who came to this blog system through a blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. By default the blacklist includes all internal references.)</p>
+	<h3><?php echo _('Last blacklisted referers') ?>:</h3>
+	<p><?php echo _('These are hits from people who came to this blog system through a blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. By default the blacklist includes all internal references.)') ?></p>
 	<?php refererList(10,'global',1,1,"'blacklist'",'',$blog); ?>
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td>
-				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other" title="Delete this hit!">Del</a>]
+				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other" title="<?php echo _('Delete this hit!') ?>"><?php echo _('Del') ?></a>]
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
@@ -255,14 +258,14 @@ switch( $show )
 		<?php } // End stat loop ?>
 	</table>
 	
-	<h3>Last bad chars:</h3>
-	<p>These are hits with bad chars in the referer.</p>
+	<h3><?php echo _('Last bad chars') ?>:</h3>
+	<p><?php echo _('These are hits with bad chars in the referer.') ?></p>
 	<?php refererList(10,'global',1,1,"'badchar'",'',$blog); ?>
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td>
-				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other" title="Delete this hit!">Del</a>]
+				[<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other" title="<?php echo _('Delete this hit!') ?>"><?php echo _('Del') ?></a>]
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>

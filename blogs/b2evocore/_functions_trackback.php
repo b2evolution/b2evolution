@@ -16,19 +16,19 @@
  *
  * fplanque: added
  */
-function trackbacks( $post_trackbacks, $content, $post_title, $post_ID)
+function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 {
 	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>Sending trackbacks...</h3>\n";
+	echo "<h3>", _('Sending trackbacks...'), "</h3>\n";
 	if(empty($post_trackbacks)) 
 	{
-		echo "<p>No trackback to be sent.</p>\n";
+		echo "<p>", _('No trackback to be sent.'), "</p>\n";
 	}
 	else
 	{
 		$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
 		$excerpt = stripslashes($excerpt);
-		echo "<p>Excerpt to be sent: $excerpt</p>\n";
+		echo "<p>", _('Excerpt to be sent:'), " $excerpt</p>\n";
 		$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 		foreach($trackback_urls as $tb_url) 
 		{	// trackback each url:
@@ -36,7 +36,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID)
 			if( empty( $tb_url ) ) continue;
 			trackback($tb_url, stripslashes($post_title), $excerpt, $post_ID);
 		}
-		echo "<p>Trackbacks done.</p>\n";
+		echo "<p>", _('Trackbacks done.'), "</p>\n";
 	}
 	echo "</div>\n";
 }
@@ -50,18 +50,15 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID)
 function trackback($trackback_url, $title, $excerpt, 
 					$ID) // post ID 
 {	
-	global $querystring_start, $querystring_equal;
-
-	echo "<p>Sending trackback to: $trackback_url ...\n";
+	echo "<p>", _('Sending trackback to:'), " $trackback_url ...\n";
 
 	$title = urlencode($title);
 	$excerpt = urlencode(stripslashes($excerpt));
 	$blog_name = urlencode(get_bloginfo('name'));
-	// $url = urlencode($siteurl.'/'.$blogfilename.$querystring_start.'p'.$querystring_equal.$ID);
 	$url = gen_permalink( get_bloginfo('blogurl'), $ID );
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
-	// echo "url:$trackback_url<br>$sending:$query_string<br>";
+	// echo "url:$trackback_url<br>$sending:$query_string<br />";
 	if (strstr($trackback_url, '?')) 
 	{
 		echo '[get]';
@@ -109,7 +106,7 @@ function trackback($trackback_url, $title, $excerpt,
 */
 		fclose($fs);
 	}
-	echo "<br \>Response: $result</p>\n";	
+	echo "<br \>", _('Response:'), " $result</p>\n";	
 	return $result;
 }
 
@@ -131,7 +128,7 @@ function trackback_response($error = 0, $error_message = '')
 
 
 /*****
- * TrackBack tags 
+ * Trackback tags 
  *****/
 
 function trackback_url($display = 1) {
@@ -144,7 +141,15 @@ function trackback_url($display = 1) {
 	}
 }
 
-function trackback_number($zero='no trackback', $one='1 trackback', $more='% trackbacks') {
+/*
+ * comments_number(-)
+ */
+function trackback_number( $zero='#', $one='#', $more='#' ) 
+{
+	if( $zero == '#' ) $zero = _('Leave a comment...');
+	if( $one == '#' ) $one = _('1 comment');
+	if( $more == '#' ) $more = _('% comments');
+
 	global $id, $tablecomments, $tb, $querycount, $cache_trackbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'trackbacks');
 	if ($number == 0) {
@@ -165,31 +170,27 @@ function trackback_number($zero='no trackback', $one='1 trackback', $more='% tra
 function trackback_link($file='',$c=0,$pb=0) 
 {
 	global $id;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo $file.$querystring_start.'p'.$querystring_equal.$id;
+	echo $file.'?p='.$id;
 	if( $c == 1 )
-	{	// include comments // fplanque: added
-		echo $querystring_separator.'c'.$querystring_equal.'1';
+	{	// include comments 
+		echo '&amp;c=1';
 	}
-	echo $querystring_separator.'tb'.$querystring_equal.'1';
+	echo '&amp;tb=1';
 	if( $pb == 1 )
-	{	// include pingback // fplanque: added
-		echo $querystring_separator.'pb'.$querystring_equal.'1';
+	{	// include pingback 
+		echo '&amp;pb=1';
 	}
-	echo '#trackbacks';		// fplanque: added s
+	echo '#trackbacks';		
 }
 
 function trackback_popup_link($zero='no trackback', $one='1 trackback', $more='% trackbacks', $CSSclass='') 
 {
 	global $blog, $id, $b2trackbackpopupfile, $b2commentsjavascript;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	echo '<a href="';
 	if ($b2commentsjavascript) {
-		echo get_bloginfo('blogurl').$querystring_start.'template'.$querystring_equal.'popup'.
-					$querystring_separator.'p'.$querystring_equal.$id.
-					$querystring_separator.'tb'.$querystring_equal.'1';
+		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;tb=1';
 		echo '" onclick="b2open(this.href); return false"';
 	} else {
 		// if comments_popup_script() is not in the template, display simple comment link
@@ -204,7 +205,8 @@ function trackback_popup_link($zero='no trackback', $one='1 trackback', $more='%
 	echo '</a>';
 }
 
-function trackback_rdf($timezone=0) {	// This adds trackback autodiscovery information
+function trackback_rdf($timezone=0) 
+{	// This adds trackback autodiscovery information
 	global $pathserver, $id, $HTTP_SERVER_VARS, $blogfilename;	// fplanque added: $blogfilename
 	// if (!stristr($HTTP_SERVER_VARS['HTTP_USER_AGENT'], 'W3C_Validator')) {
 	// fplanque WARNING: this isn't a very clean way to validate :/
@@ -228,7 +230,7 @@ function trackback_rdf($timezone=0) {	// This adds trackback autodiscovery infor
 }
 
 /*****
- * /TrackBack tags 
+ * /Trackback tags 
  *****/
 
 

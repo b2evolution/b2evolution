@@ -20,18 +20,18 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 	if( $display )
 	{
 		echo "<div class=\"panelinfo\">\n";
-		echo "<h3>Sending pingbacks...</h3>\n";
+		echo '<h3>', _('Sending pingbacks...'), '</h3>\n';
 	}
 
 	if( ! $post_pingback )
 	{
-		if( $display ) echo "<p>No pingback to be done.<p>\n";
+		if( $display ) echo '<p>', _('No pingback to be done.'), '<p>\n';
 	}
 	else
 	{
 		$log = debug_fopen('./pingback.log', 'a');
 		$post_links = array();
-		debug_fwrite($log, 'BEGIN '.time()."\n");
+		debug_fwrite($log, _('BEGIN').' '.time()."\n");
 	
 		// Variables
 		$ltrs = '\w';
@@ -58,7 +58,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 		preg_match_all("{\b http : [$any] +? (?= [$punc] * [^$any] | $)}x", $content, $post_links_temp);
 	
 		// Debug
-		debug_fwrite($log, 'Post contents:');
+		debug_fwrite($log, _('Post contents').':');
 		debug_fwrite($log, $content."\n");
 		
 		// Step 2.
@@ -82,13 +82,13 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 	
 		foreach ($post_links as $pagelinkedto)
 		{
-			if( $display ) echo "<p>Processing: $pagelinkedto<br />\n";
-			debug_fwrite($log, 'Processing -- '.$pagelinkedto."\n\n");
+			if( $display ) echo '<p>', _('Processing:'), ' ', $pagelinkedto, "<br />\n";
+			debug_fwrite($log, _('Processing:').' '.$pagelinkedto."\n\n");
 	
 			$bits = parse_url($pagelinkedto);
 			if (!isset($bits['host'])) {
-				if( $display ) echo "Couldn't find a hostname for: $pagelinkedto<br />\n";
-				debug_fwrite($log, 'Couldn\'t find a hostname for '.$pagelinkedto."\n\n");
+				if( $display ) echo _('Couldn\'t find a hostname for:'),' ',$pagelinkedto, "<br />\n";
+				debug_fwrite($log, _('Couldn\'t find a hostname for:').' '.$pagelinkedto."\n\n");
 				continue;
 			}
 			$host = $bits['host'];
@@ -102,11 +102,11 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 			$port = isset($bits['port']) ? $bits['port'] : 80;
 	
 			// Try to connect to the server at $host
-			if( $display ) echo 'connect to server at ',$host;
+			if( $display ) echo _('Connect to server at:'), ' ',$host;
 			$fp = fsockopen($host, $port, $errno, $errstr, 30);
 			if (!$fp) {
-				if( $display ) echo "Couldn't open a connection to: $pagelinkedto<br />\n";
-				debug_fwrite($log, 'Couldn\'t open a connection to '.$host."\n\n");
+				if( $display ) echo _('Couldn\'t open a connection to:'), ' ', $pagelinkedto, "<br />\n";
+				debug_fwrite($log, _('Couldn\'t open a connection to:').' '.$host."\n\n");
 				continue;
 			}
 	
@@ -116,7 +116,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 			fputs($fp, $request);
 	
 			// Start receiving headers and content
-			debug_fwrite($log, 'Start receiving headers and content\n');
+			debug_fwrite($log, _('Start receiving headers and content')."\n");
 			$contents = '';
 			$headers = '';
 			$gettingHeaders = true;
@@ -146,8 +146,8 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 				{	// on a trouvé dans les headers
 					preg_match('#x-pingback: (.+)#is', $headers, $matches);
 					$pingback_server_url = trim($matches[1]);
-					echo "Pingback server found from X-Pingback header: $pingback_server_url<br />\n";
-					debug_fwrite($log, "Pingback server found from X-Pingback header @ $pingback_server_url\n");
+					echo _('Pingback server found from X-Pingback header:'), ' ', $pingback_server_url, "<br />\n";
+					debug_fwrite($log, _('Pingback server found from X-Pingback header:').' '.$pingback_server_url."\n");
 					$found_pingback_server = 1;
 					break;
 				}	
@@ -160,8 +160,8 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 					$pingback_href_end = strpos($contents, $quote, $pingback_href_start);
 					$pingback_server_url_len = $pingback_href_end-$pingback_href_start;
 					$pingback_server_url = substr($contents, $pingback_href_start, $pingback_server_url_len);
-					echo "Pingback server found from Pingback <link /> tag: $pingback_server_url<br />\n";
-					debug_fwrite($log, "Pingback server found from Pingback <link /> tag @ $pingback_server_url\n");
+					echo _('Pingback server found from Pingback <link /> tag:'), ' ', $pingback_server_url, "<br />\n";
+					debug_fwrite($log,  _('Pingback server found from Pingback <link /> tag:').' '.$pingback_server_url."\n");
 					$found_pingback_server = 1;
 					break;
 				}
@@ -169,19 +169,19 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 	
 			if(!$found_pingback_server) 
 			{
-				if( $display )	echo "Pingback server not found in headers and content<br />\n";
-				debug_fwrite($log, "Pingback server not found in headers and content\n\n*************************\n\n");
+				if( $display )	echo _('Pingback server not found in headers and content'), "<br />\n";
+				debug_fwrite($log, _('Pingback server not found in headers and content'). "\n\n*************************\n\n");
 				@fclose($fp);
 			} 
 			elseif( empty($pingback_server_url) )
 			{
-				if( $display )	echo "Pingback server URL is empty (may be an internal PHP fgets error)<br />\n";
-				debug_fwrite($log, "Pingback server URL is empty\n\n*************************\n\n");
+				if( $display )	echo _('Pingback server URL is empty (may be an internal PHP fgets error)'), "<br />\n";
+				debug_fwrite($log, _('Pingback server URL is empty (may be an internal PHP fgets error)'). "\n\n*************************\n\n");
 				@fclose($fp);
 			}
 			else 
 			{
-				debug_fwrite($log,"\n\nPingback server data\n");
+				debug_fwrite($log,"\n\n". _('Pingback server data'). "\n");
 				// Assuming there's a "http://" bit, let's get rid of it
 				$host_clear = substr($pingback_server_url, 7);
 	
@@ -199,15 +199,15 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 	
 				 // Now, the RPC call
 				$method = 'pingback.ping';
-				if( $display )	echo "Page Linked To: $pagelinkedto<br />\n";
-				debug_fwrite($log, 'Page Linked To: '.$pagelinkedto."\n");
-				if( $display )	echo "Page Linked From: $pagelinkedfrom<br />\n";
-				debug_fwrite($log, 'Page Linked From: '.$pagelinkedfrom."\n");
+				if( $display )	echo _('Page Linked To:'), " $pagelinkedto<br />\n";
+				debug_fwrite($log, _('Page Linked To:').' '.$pagelinkedto."\n");
+				if( $display )	echo _('Page Linked From:'), " $pagelinkedfrom<br />\n";
+				debug_fwrite($log, _('Page Linked From:').' '.$pagelinkedfrom."\n");
 
 				$client = new xmlrpc_client($path, $host, 80);
 				// $client->setDebug(true);		// fplanque :))
 				$message = new xmlrpcmsg($method, array(new xmlrpcval($pagelinkedfrom), new xmlrpcval($pagelinkedto)));
-				echo "pinging $host...";
+				printf( _('Pinging %s...'), $host );
 				$result = $client->send($message);
 
 				// Display response
@@ -217,9 +217,9 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 			if( $display )	echo "</p>\n";
 		}
 
-		debug_fwrite($log, "\nEND: ".time()."\n****************************\n\r");
+		debug_fwrite($log, "\n". _('END'). ": ".time()."\n****************************\n\r");
 		debug_fclose($log);
-		if( $display )	echo "<p>Pingbacks done.<p>\n";
+		if( $display )	echo "<p>", _('Pingbacks done.'), "<p>\n";
 	}
 	if( $display )	echo "</div>\n";	
 }
@@ -233,7 +233,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 
 
 /*****
- * PingBack tags 
+ * Pingback tags 
  *****/
 
 function pingback_number($zero='no pingback', $one='1 pingback', $more='% pingbacks') {
@@ -257,30 +257,26 @@ function pingback_number($zero='no pingback', $one='1 pingback', $more='% pingba
 function pingback_link($file='',$c=0,$tb=0) 
 {
 	global $id;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo $file.$querystring_start.'p'.$querystring_equal.$id;
+	echo $file.'?p='.$id;
 	if( $c == 1 )
 	{	// include comments // fplanque: added
-		echo $querystring_separator.'c'.$querystring_equal.'1';
+		echo '&amp;c=1';
 	}
 	if( $tb == 1 )
 	{	// include trackback // fplanque: added
-		echo $querystring_separator.'tb'.$querystring_equal.'1';
+		echo '&amp;tb=1';
 	}
-	echo $querystring_separator.'pb'.$querystring_equal.'1#pingbacks';
+	echo '&amp;pb=1#pingbacks';
 }
 
 function pingback_popup_link($zero='no pingback', $one='1 pingback', $more='% pingbacks', $CSSclass='')
 {
 	global $blog, $id, $b2pingbackpopupfile, $b2commentsjavascript;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	echo '<a href="';
 	if ($b2commentsjavascript) {
-		echo get_bloginfo('blogurl').$querystring_start.'template'.$querystring_equal.'popup'.
-					$querystring_separator.'p'.$querystring_equal.$id.
-					$querystring_separator.'pb'.$querystring_equal.'1';
+		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;pb=1';
 		echo '" onclick="b2open(this.href); return false"';
 	} else {
 		// if comments_popup_script() is not in the template, display simple comment link
@@ -297,7 +293,7 @@ function pingback_popup_link($zero='no pingback', $one='1 pingback', $more='% pi
 
 
 
-/***** // PingBack tags *****/
+/***** // Pingback tags *****/
 
 
 

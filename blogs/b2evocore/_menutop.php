@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
+<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title>b2evo &gt; <?php echo $title; ?></title>
 	<link href="b2.css" rel="stylesheet" type="text/css" />
 	<link href="blog.css" rel="stylesheet" type="text/css" />
@@ -9,7 +9,7 @@
 		<!--
 		function profile(userID) 
 		{
-			window.open ("b2profile.php?action=viewprofile&user="+userID, "Profile", "width=500, height=450, location=0, menubar=0, resizable=0, scrollbars=1, status=1, titlebar=0, toolbar=0, screenX=60, left=60, screenY=60, top=60");
+			window.open ("b2profile.php?action=viewprofile&user="+userID, "Profile", "width=500, height=450, location=0, menubar=1, resizable=1, scrollbars=1, status=1, titlebar=0, toolbar=0, screenX=60, left=60, screenY=60, top=60");
 		}
 	<?php 
 	if ($use_spellchecker) 
@@ -82,9 +82,9 @@ if ($profile==0)
 
 <td rowspan="3" width="50" valign="top"><a href="http://b2evolution.net/"><img src="img/b2minilogo.png" width="50" height="50" border="0" alt="visit b2evolution's website" style="border-width:1px; border-color: #999999; border-style: dashed" /></a></td>
 
-<td><b><span style="color:#333333">e</span><span style="color:#554433">v</span><span style="color:#775522">o</span><span style="color:#996622">l</span><span style="color:#bb7722">u</span><span style="color:#cc8811">t</span><span style="color:#dd9911">i</span><span style="color:#ee9900">o</span><span style="color:#ff9900">n</span></b> <?php echo $b2_version ?></td>
+<td><strong><span style="color:#333333">e</span><span style="color:#554433">v</span><span style="color:#775522">o</span><span style="color:#996622">l</span><span style="color:#bb7722">u</span><span style="color:#cc8811">t</span><span style="color:#dd9911">i</span><span style="color:#ee9900">o</span><span style="color:#ff9900">n</span></strong> <?php echo $b2_version ?></td>
 <td width="150" style="text-align: right; padding-rightt: 6px;">
-<span style="color: #b0b0b0; font-family: verdana, arial, helvetica; font-size: 10px;">logged in as : <b><?php echo $user_login; ?></b></span>
+<span style="color: #b0b0b0; font-family: verdana, arial, helvetica; font-size: 10px;"><?php echo _('logged in as:') ?> <strong><?php echo $user_login; ?></strong></span>
 </td>
 
 </tr>
@@ -95,45 +95,48 @@ if ($profile==0)
 
 <td class="menutop"<?php if ($is_NS4) { echo " width=\"500\""; } ?>>
 <div class="menutop"<?php if ($is_NS4) { echo " width=\"500\""; } ?>>
-
-
-<?php if ($is_NS4) { echo $HTTP_USER_AGENT; } ?>
-
-
-<?php $sep = " | "; ?>
 &nbsp;
-<a href="b2edit.php?action=new&blog=<?php echo $blog; ?>" class="menutop" style="font-weight: bold;">New Post</a>
-<?php echo $sep ?>
-<a href="b2edit.php?blog=<?php echo $blog; ?>" class="menutop" style="font-weight: bold;">Browse/Edit</a>
-<?php
-	if ($pagenow != "b2profile.php") 
+<?php 
+	echo '<a href="b2edit.php?action=new&blog=', $blog, '" class="menutop" style="font-weight: bold;">', _('New Post'), '</a>';
+	echo " | \n";
+	echo '<a href="b2edit.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', _('Browse/Edit'), '</a>';
+	if($user_level >= 9) 
 	{
-		$menu = file(dirname(__FILE__)."/_menutop.txt");
-		$i=0;
-		$j=$menu[0];
-		while ($j != "") {
-			$k = explode("\t",$j);
-			if ($user_level >= $k[0]) {
-				echo "$sep<a href=\"".$k[1]."\" class=\"menutop\">".trim($k[2])."</a>";
-			}
-			$i=$i+1;
-			$j=$menu[$i];
-			if (trim($j) == "***")
-				$j="";
-		}
+		echo " | \n";
+		echo '<a href="b2stats.php" class="menutop">', _('Stats'), '</a>';
 	}
+	if($user_level >= 3) 
+	{
+		echo " | \n";
+		echo '<a href="b2categories.php" class="menutop">', _('Cats'), '</a>';
+	}
+	if($user_level >= 9) 
+	{
+		echo " | \n";
+		echo '<a href="b2blogs.php" class="menutop">', _('Blogs'), '</a>';
+	}
+	if($user_level >= 9) 
+	{
+		echo " | \n";
+		echo '<a href="b2options.php" class="menutop">', _('Options'), '</a>';
+	}
+	if($user_level >= 3) 
+	{
+		echo " | \n";
+		echo '<a href="b2template.php" class="menutop">', _('Templates'), '</a>';
+	}
+	echo " | \n";
+	echo '<a href="b2team.php" class="menutop">', _('Users'), '</a>';
+	echo " | \n";
+	echo '<a href="javascript:profile(', $user_ID, ')" class="menutop">', _('My Profile'), '</a>';
 ?>
-<?php echo $sep ?>
-<a href="b2team.php" class="menutop">Team</a>
-<?php echo $sep ?>
-<a href="javascript:profile(<?php echo $user_ID ?>)" class="menutop">My Profile</a>
 </div>
 </td>
 
 <td class="menutop" align="right" bgcolor="#FF9900">
-<a href="<?php echo $pathadmin_out ?>" class="menutop">Exit to blogs</a>
-<?php echo $sep; ?>
-<a href="b2login.php?action=logout" class="menutop">Logout</a>
+<a href="<?php echo $pathadmin_out ?>" class="menutop"><?php echo _('Exit to blogs') ?></a>
+|
+<a href="b2login.php?action=logout" class="menutop"><?php echo _('Logout') ?></a>
 &nbsp;
 </td>
 

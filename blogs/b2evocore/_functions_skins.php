@@ -104,9 +104,7 @@ function skin_list_iteminfo( $what='', $display = true )
  */
 function skin_change_url()
 {
-	global $querystring_start, $querystring_equal, $querystring_separator;
-
-	echo bloginfo('blogurl').$querystring_start.'skin'.$querystring_equal.rawurlencode(skin_list_iteminfo('name',false));
+	echo bloginfo('blogurl').'?skin='.rawurlencode(skin_list_iteminfo('name',false));
 }
 
 ?>

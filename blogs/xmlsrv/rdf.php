@@ -3,9 +3,9 @@
    * This template generates an RSS 1.0 (RDF) feed for the requested blog
    */
   $default_to_blog = 1; // This is the default. Should be overidden in url e-g: rss.php?blog=2
-  $skin = '';                          // We don't want this do be displayed in a skin ! 
+  $skin = '';                          // We don't want this do be displayed in a skin !
 	$show_statuses = "'published'";     // Restrict to published posts
-	$timestamp_min = '';								// Show past								
+	$timestamp_min = '';								// Show past
 	$timestamp_max = 'now';							// Hide future
   include dirname(__FILE__)."/../b2evocore/_blog_main.php";
   header("Content-type: text/xml");
@@ -39,11 +39,11 @@
   <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
   <description><?php
     the_link( '', ' ', 'xml' );
-    the_content('[...] Read more!', 0, '', '', '', '', 'xml',$rss_excerpt_length );
+    the_content(_('[...] Read more!'), 0, '', '', '', '', 'xml',$rss_excerpt_length );
   ?></description>
   <content:encoded><![CDATA[<?php
     the_link( '<p>', '</p>' );
-    the_content('=> Read more!', 0, '')
+    the_content()
   ?>]]></content:encoded>
 </item>
 <?php } ?>

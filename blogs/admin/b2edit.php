@@ -11,14 +11,16 @@ function add_magic_quotes($array) {
 	return $array;
 } 
 
-if (!get_magic_quotes_gpc()) {
+if (!get_magic_quotes_gpc()) 
+{
 	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
 	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
 	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
 }
 
 $b2varstoreset = array('action','safe_mode','withcomments','c','posts','poststart','postend','content','edited_post_title','comment_error','profile', 'trackback_url');
-for ($i=0; $i<count($b2varstoreset); $i += 1) {
+for ($i=0; $i<count($b2varstoreset); $i += 1) 
+{
 	$b2var = $b2varstoreset[$i];
 	if (!isset($$b2var)) {
 		if (empty($HTTP_POST_VARS["$b2var"])) 
@@ -52,7 +54,7 @@ case 'new':
 	 * New post form
 	 */
 	$standalone = 1;
-	$title = "New post in blog:";
+	$title = _('New post in blog:');
 	require_once (dirname(__FILE__)."/b2header.php");
 	include (dirname(__FILE__)."/$b2inc/_menutop.php");
 	echo '<span class="menutopbloglist">';
@@ -62,9 +64,10 @@ case 'new':
 
 	if ($user_level > 0) 
 	{
-		$action="post";
+		$action='post';
 		$post_lang = $default_language;
 		$post_status = $default_post_status;		// 'published' or 'draft'
+		$post_url = '';
 
 		$extracats = array();
 		include($b2inc."/_edit_form.php");
@@ -73,7 +76,7 @@ case 'new':
 	{
 		?>
 		<div class="panelblock">
-		Since you're a newcomer, you'll have to wait for an admin to raise your level to 1, in order to be authorized to post.<br />You can also <a href="mailto:<?php echo $admin_email ?>?subject=b2-promotion">e-mail the admin</a> to ask for a promotion.<br />When you're promoted, just reload this page and you'll be able to blog. :)
+		<?php printf( _('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' ); ?>
 		</div>
 		<?php
 	
@@ -91,12 +94,12 @@ case "edit":
 
 	dbconnect();
 	set_param( "post", 'integer', true );
-	$postdata = get_postdata($post) or die("Oops, no post with this ID. <a href=\"b2edit.php\">Go back</a> !");
+	$postdata = get_postdata($post) or die( _('Oops, no post with this ID.') );
 	$post_lang = $postdata["Lang"];
 	$cat = $postdata["Category"];
 	$blog = get_catblog($cat); 
 
-	$title = "Editing post";
+	$title = _('Editing post');
 	include (dirname(__FILE__)."/$b2inc/_menutop.php");
 	echo '<span class="menutopbloglist">';
   echo "#".$postdata["ID"]." in blog: ".$blogname;
@@ -107,7 +110,7 @@ case "edit":
 	{
 		$authordata = get_userdata($postdata["Author_ID"]);
 		if ($user_level < $authordata[13])
-			die ("You don't have the right to edit <b>".$authordata[1]."</b>'s posts.");
+			die ("You don't have the right to edit <strong>".$authordata[1]."</strong>'s posts.");
 
 		$content = $postdata["Content"];
 		$autobr = $postdata["AutoBR"];
@@ -121,11 +124,7 @@ case "edit":
 	} 
 	else
 	{
-	?>
-
-	Since you're a newcomer, you'll have to wait for an admin to raise your level to 1, in order to be authorized to post.<br />You can also <a href="mailto:<?php echo $admin_email ?>?subject=b2-promotion">e-mail the admin</a> to ask for a promotion.<br />When you're promoted, just reload this page and you'll be able to blog. :)
-
-	<?php
+		printf( _('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' );
 	}
 
 	break;
@@ -139,9 +138,9 @@ case "editcomment":
 	$standalone=1;
 	require_once (dirname(__FILE__)."/b2header.php");
 	set_param( 'comment', 'integer', true );
-	$commentdata = get_commentdata($comment,1) or die("Oops, no comment with this ID!");
+	$commentdata = get_commentdata($comment,1) or die( _('Oops, no comment with this ID!') );
 
-	$title = "Editing comment";
+	$title = _('Editing comment');
 	include (dirname(__FILE__)."/$b2inc/_menutop.php");
 	echo '<span class="menutopbloglist">';
 	echo "#".$commentdata["comment_ID"];
@@ -152,14 +151,14 @@ case "editcomment":
 
 	if ($user_level == 0) 
 	{
-		die ("Cheatin' uh ?");
+		die(_('Cheatin\' uh ?'));
 	}
 
-	$content = $commentdata["comment_content"];
+	$content = $commentdata['comment_content'];
 
 	$content = format_to_edit($content);
 	
-	include($b2inc."/_edit_form.php");
+	include($b2inc.'/_edit_form.php');
 
 	break;
 
@@ -171,7 +170,7 @@ default:
 	 * Display posts
 	 */
 	$standalone = 1;
-	$title = "Browse blog:";
+	$title = _('Browse blog:');
 	require_once (dirname(__FILE__)."/b2header.php");
 	include (dirname(__FILE__)."/$b2inc/_menutop.php");
 	echo '<span class="menutopbloglist">';
@@ -188,7 +187,7 @@ default:
 	{ 
 	?>
 		<div class="panelblock">
-		Since you're a newcomer, you'll have to wait for an admin to raise your level to 1, in order to be authorized to post.<br />You can also <a href="mailto:<?php echo $admin_email ?>?subject=b2-promotion">e-mail the admin</a> to ask for a promotion.<br />When you're promoted, just reload this page and you'll be able to blog. :)
+		<?php printf( _('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' ); ?>
 		</div>
 	<?php
 	}

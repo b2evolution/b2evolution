@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.2
+ * Version of this file: 0.8.3
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -104,7 +104,7 @@ $use_rss = 1;
 
 
 
-// ** Trackback / PingBack **
+// ** Trackback / Pingback **
 
 # set this to 0 or 1, whether you want to allow your posts to be trackback'able or not
 # note: setting it to zero would also disable sending trackbacks
@@ -188,11 +188,6 @@ $use_cache = 1;							// Not using this will dramatically overquery the DB !
 $use_gzipcompression = 1;		// Set this to 0 if you want to let Apache do the job instead of PHP
 # $sleep_after_edit = 0	// let DB do its stuff...
 
-
-// ** Querystring Configuration ** (don't change if you don't know what you're doing)
-$querystring_start = '?';
-$querystring_equal = '=';
-$querystring_separator = '&amp;';
 
 # Getting vars from web server:
 $REMOTE_ADDR=getenv('REMOTE_ADDR'); /* visitor's IP */

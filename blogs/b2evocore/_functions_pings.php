@@ -23,7 +23,7 @@ function pingWeblogs( $blog_ID = 1, $display = true )
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
-		echo "<h3>Pinging Weblogs.com...</h3>\n";
+		echo '<h3>', _('Pinging Weblogs.com...'), "</h3>\n";
 	}
 	if( ! preg_match("/localhost\//",$baseurl) ) 
 	{
@@ -32,10 +32,10 @@ function pingWeblogs( $blog_ID = 1, $display = true )
 															new xmlrpcval(get_bloginfo('blogurl')) )  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
-		if( $display ) echo "<p>Done.</p>\n</div>\n";
+		if( $display ) echo '<p>', _('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} else {
-		if( $display ) echo "<p>Aborted (Running on localhost).</p>\n</div>\n";
+		if( $display ) echo "<p>", _('Aborted (Running on localhost).'), "</p>\n</div>\n";
 		return(false);
 	}
 }
@@ -51,7 +51,7 @@ function pingWeblogsRss($rss_url)
 	global $baseurl, $use_weblogsrssping, $blogname;
 	if( ! $use_weblogsrssping ) return false;
 	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>Pinging Weblogs.com/rssUpdates...</h3>\n";
+	echo "<h3>", _('Pinging Weblogs.com/rssUpdates...'), "</h3>\n";
 	if( !preg_match("/localhost\//",$baseurl) ) 
 	{
 		flush();
@@ -59,10 +59,10 @@ function pingWeblogsRss($rss_url)
 		$message = new xmlrpcmsg('rssUpdate', array(new xmlrpcval($blogname), new xmlrpcval($rss_url)));
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
-		echo "<p>Done.</p>\n</div>\n";
+		echo "<p>", _('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} else {
-		echo "<p>Aborted (Running on localhost).</p>\n</div>\n";
+		echo "<p>", _('Aborted (Running on localhost).'), "</p>\n</div>\n";
 		return(false);
 	}
 }
@@ -78,19 +78,18 @@ function pingCafelog($cafelogID,$title='',$p='')
 	global $use_cafelogping, $blogname, $baseurl, $blogfilename;
 	if( (! $use_cafelogping) || (empty($cafelogID)) ) return false;
 	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>Pinging Cafelog.com...</h3>\n";
+	echo "<h3>", _('Pinging Cafelog.com...'), "</h3>\n";
 	if ( !preg_match("/localhost\//",$baseurl) ) 
 	{
 		flush();
-		$client = new xmlrpc_client("/
-		", "cafelog.tidakada.com", 80);
+		$client = new xmlrpc_client("/", "cafelog.tidakada.com", 80);
 		$message = new xmlrpcmsg("b2.ping", array(new xmlrpcval($cafelogID), new xmlrpcval($title), new xmlrpcval($p)));
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
-		echo "<p>Done.</p>\n</div>\n";
+		echo "<p>", _('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} else {
-		echo "<p>Aborted (Running on localhost).</p>\n</div>\n";
+		echo "<p>", _('Aborted (Running on localhost).'), "</p>\n</div>\n";
 		return(false);
 	}
 }
@@ -108,7 +107,7 @@ function pingBlogs()
 	global $use_blodotgsping, $use_rss, $blogname, $baseurl, $blogfilename;
 	if( ! $use_blodotgsping ) return false;
 	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>Pinging Blo.gs...</h3>\n";
+	echo "<h3>", _('Pinging Blo.gs...'), "</h3>\n";
 	if( !preg_match('/localhost\//',$baseurl) ) 
 	{
 		flush();
@@ -129,12 +128,12 @@ function pingBlogs()
 		}
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
-		echo "<p>Done.</p>\n</div>\n";
+		echo "<p>", _('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} 
 	else 
 	{
-		echo "<p>Aborted (Running on localhost).</p>\n</div>\n";
+		echo "<p>", _('Aborted (Running on localhost).'), "</p>\n</div>\n";
 		return(false);
 	}
 }

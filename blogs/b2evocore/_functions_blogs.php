@@ -130,7 +130,6 @@ function get_blogparams()
  */
 function get_bloginfo( $show='', $this_blogparams = '' )
 {
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	global $blog, $xmlsrvurl, $admin_email;
 
 	if( empty( $this_blogparams ) )
@@ -168,11 +167,11 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			break;
 		case "blogstatsurl":
 			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub.
-								$querystring_start.'disp'.$querystring_equal.'stats';
+								'?disp=stats';
 			break;
 		case "lastcommentsurl":
 			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub.
-								$querystring_start.'disp'.$querystring_equal.'comments';
+								'?disp=comments';
 			break;
 		case "tagline":
 			$output = $this_blogparams->blog_tagline;
@@ -239,7 +238,7 @@ function get_blogparams_by_ID($blog_ID)
 	{
 		blog_load_cache();
 	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) die( "Requested blog does not exist!" );
+	if( !isset( $cache_blogs[$blog_ID] ) ) die( _('Requested blog does not exist!') );
 	return $cache_blogs[$blog_ID];
 }
 
@@ -258,7 +257,7 @@ function blog_load_cache()
 		while( $this_blog = mysql_fetch_object($result) ) 
 		{ 
 			$cache_blogs[$this_blog->blog_ID] = $this_blog;
-			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br>';
+			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
 		} 
 	}
 }

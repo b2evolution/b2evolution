@@ -8,14 +8,6 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-/* new and improved ! now with more querystring stuff ! */
-if (!isset($querystring_start)) 
-{
-	$querystring_start = '?';
-	$querystring_equal = '=';
-	$querystring_separator = '&amp;';
-}
-
 require_once (dirname(__FILE__)."/_functions_cats.php");
 require_once (dirname(__FILE__)."/_functions_blogs.php");
 require_once (dirname(__FILE__)."/_functions_bposts.php");
@@ -84,14 +76,18 @@ function add_filter($tag, $function_to_add)
 
 /*
  * single_month_title(-)
+ *
+ * fplanque: 0.8.3: changed defaults
  */
-function single_month_title($prefix = '', $display = 'htmlhead' ) 
+function single_month_title($prefix = '#', $display = 'htmlbody' ) 
 {
+	if( $prefix == '#' ) $prefix = ' '._('Archives for').': ';
+
 	global $m, $w, $month;
 	if(!empty($m) && $display) 
 	{
 		$my_year = substr($m,0,4);
-		$my_month = $month[substr($m,4,2)];
+		$my_month = _($month[substr($m,4,2)]);
 		$my_day = substr($m,6,2);
 
 		$title = $prefix.$my_month.' '.$my_year;
@@ -118,7 +114,7 @@ function single_month_title($prefix = '', $display = 'htmlhead' )
  */
 function archive_link( $year, $month, $day='', $week='', $show = true, $file='', $params='' )
 {
-	global $use_extra_path_info, $querystring_start, $querystring_equal, $querystring_separator;
+	global $use_extra_path_info;
 
 	if( empty($file) ) 
 		$link = get_bloginfo('blogurl');
@@ -127,7 +123,7 @@ function archive_link( $year, $month, $day='', $week='', $show = true, $file='',
 
 	if( (! $use_extra_path_info) || (!empty($params)) )
 	{	// We reference by Query: Dirty but explicit permalinks
-		$link .= $querystring_start.$params.$querystring_separator.'m'.$querystring_equal;
+		$link .= '?'.$params.'&amp;m=';
 		$separator = '';
 	}
 	else
@@ -150,7 +146,7 @@ function archive_link( $year, $month, $day='', $week='', $show = true, $file='',
 	{
 		if( ! $use_extra_path_info )
 		{	// We reference by Query: Dirty but explicit permalinks
-			$link .= $querystring_separator.'w'.$querystring_equal.$week;
+			$link .= '&amp;w='.$week;
 		}
 		else
 		{

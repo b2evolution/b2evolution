@@ -1,7 +1,7 @@
 <?php
 /* <Sidebar> */
 
-$mode = "sidebar";
+$mode = 'sidebar';
 
 $standalone = 1;
 require_once (dirname(__FILE__)."/b2header.php");
@@ -15,7 +15,7 @@ $is_macIE = ((preg_match("/MSIE/",$HTTP_USER_AGENT)) && (preg_match("/Mac/",$HTT
 $is_IE    = (($is_macIE) || ($is_winIE));
 
 if ($user_level == 0)
-die ("Cheatin' uh ?");
+die (_('Cheatin\' uh ?'));
 
 $request = " SELECT * FROM $tablesettings ";
 $result = mysql_query($request);
@@ -24,10 +24,11 @@ while($row = mysql_fetch_object($result)) {
 	$autobr=$row->AutoBR;
 }
 ?>
-<html>
+<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<title>b2evo &gt; sidebar</title>
-<link rel="stylesheet" href="b2.css" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title>b2evo &gt; sidebar</title>
+	<link rel="stylesheet" href="b2.css" type="text/css">
 <script type="text/javascript" language="javascript" src="<?php echo $spch_url; ?>"></script>
 <style type="text/css">
 <!--
@@ -69,7 +70,7 @@ textarea,input,select {
 <td><img src="img/b2minilogo.png"></td>
 </table>
 -->
-<form name="post" action="edit_actions.php" method="POST" accept-charset="iso-8859-1">
+<form name="post" action="edit_actions.php" method="POST" accept-charset="<?php locale_charset() ?>">
 <input type="hidden" name="action" value="post" />
 <input type="hidden" name="user_ID" value="<?php echo $user_ID ?>" />
 <input type="hidden" name="mode" value="sidebar" />
@@ -78,22 +79,22 @@ textarea,input,select {
 
 <?php dropdown_categories(); ?>
 
-<textarea rows="8" cols="12" style="width: 100%" name="content" tabindex="2" class="postform" wrap="virtual" onFocus="if (this.value=='Post') { this.value='';}" onBlur="if (this.value=='') {this.value='Post';}">Post</textarea>
+<textarea rows="8" cols="12" style="width: 100%" name="content" tabindex="2" class="postform" wrap="virtual" onFocus="if (this.value=='Post') { this.value='';}" onBlur="if (this.value=='') {this.value='Post';}"><?php echo _('Post') ?></textarea>
 
-<input type="checkbox" name="post_autobr" value="1" <?php if ($autobr) echo " checked" ?> tabindex="4" class="checkbox" id="autobr" /><label for="autobr"> Auto-BR</label><br />
+<input type="checkbox" name="post_autobr" value="1" <?php if ($autobr) echo ' checked="checked"' ?> tabindex="4" class="checkbox" id="autobr" /><label for="autobr"> <?php echo _('Auto-BR') ?></label><br />
 
 <?php if ($use_pingback) { ?>
-<input type="checkbox" class="checkbox" name="post_pingback" value="1" checked="checked" tabindex="5" id="pingback" /><label for="pingback"> PingBack</label>
+<input type="checkbox" class="checkbox" name="post_pingback" value="1" checked="checked" tabindex="5" id="pingback" /><label for="pingback"> <?php echo _('Pingback') ?></label>
 <?php } ?>
 
 <input type="submit" name="submit" value="Blog this !" class="search" tabindex="3" /> 
 
 <?php if ($use_spellchecker) { ?>
-<br /><input type = "button" value = "Spell Check" onclick="var f=document.forms[0]; doSpell( 'en', f.post_content, '$spellchecker_url/sproxy.cgi', true);" class="search" tabindex="6" /><br />
+<br /><input type = "button" value = "<?php echo _('SpellCheck') ?>" onclick="var f=document.forms[0]; doSpell( 'en', f.post_content, '$spellchecker_url/sproxy.cgi', true);" class="search" tabindex="6" /><br />
 <?php }
 
 if ($use_trackback) { ?>
-<br /><label for="trackback"><b>TrackBack</b> an URL:</label><br /><input type="text" name="trackback_url" style="width: 100%" id="trackback" tabindex="7" />
+<br /><label for="trackback"><?php echo _('<strong>Trackback</strong> an URL:') ?></label><br /><input type="text" name="trackback_url" style="width: 100%" id="trackback" tabindex="7" />
 <?php } ?>
 
 <script language="JavaScript">

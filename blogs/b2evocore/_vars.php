@@ -10,8 +10,16 @@
  */
 
 #b2 version
-$b2_version = '0.8.2-dev1';
+$b2_version = '0.8.3-alpha1';
 
+// Activate gettext:
+// Specify location of translation tables :
+bindtextdomain( 'messages', dirname(__FILE__).'/../locales'); 
+// Choose domain: (name of the .mo files)
+textdomain( 'messages' );
+
+// Chose lang and set locale:
+locale_activate( $default_locale );
 
 
 # on which page are we ?
@@ -20,9 +28,6 @@ $pagenow = explode('/', $PHP_SELF);
 $pagenow = trim($pagenow[(sizeof($pagenow)-1)]);
 $pagenow = explode('?', $pagenow);
 $pagenow = $pagenow[0];
-if (($querystring_start == '/') && ($pagenow != 'b2edit.php')) {
-	$pagenow = $siteurl.'/'.$blogfilename;
-}
 
 # browser detection
 $is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
@@ -113,5 +118,29 @@ foreach($b2smiliestrans as $smiley => $img)
 	// fplanque: added class='middle'
 	$b2_smiliesreplace[] = "<img src='$smilies_directory/$img' alt='$smiley_masked' class='middle' />";
 }
+
+# the weekdays and the months.. 
+$weekday[0]=N_('Sunday');
+$weekday[1]=N_('Monday');
+$weekday[2]=N_('Tuesday');
+$weekday[3]=N_('Wednesday');
+$weekday[4]=N_('Thursday');
+$weekday[5]=N_('Friday');
+$weekday[6]=N_('Saturday');
+
+# the months, translate them if necessary - note: this isn't active everywhere yet
+$month['01']=N_('January');
+$month['02']=N_('February');
+$month['03']=N_('March');
+$month['04']=N_('April');
+$month['05']=N_('May');
+$month['06']=N_('June');
+$month['07']=N_('July');
+$month['08']=N_('August');
+$month['09']=N_('September');
+$month['10']=N_('October');
+$month['11']=N_('November');
+$month['12']=N_('December');
+
 
 ?>

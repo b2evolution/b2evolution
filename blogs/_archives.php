@@ -26,7 +26,7 @@
 
 	// --- //
 	
-	$dateformat=get_settings('date_format');
+	$dateformat = locale_datefmt();
 	$time_difference=get_settings('time_difference');
 	
 	if (!$archive_date_format_over_ride) 
@@ -48,7 +48,7 @@
 				echo '<a href="';
 				archive_link( $arc_year, $arc_month );
 				echo '">';
-				echo $month[zeroise($arc_month,2)],' ',$arc_year;
+				echo _($month[zeroise($arc_month,2)]),' ',$arc_year;
 				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
 				break;
 	

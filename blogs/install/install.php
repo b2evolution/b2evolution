@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <!-- InstanceBeginEditable name="doctitle" --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>b2 evolution: Database tables installation</title>
 <!-- InstanceEndEditable --><link href="b2evo.css" rel="stylesheet" type="text/css" />
  
@@ -13,7 +13,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.2</h1>
+<h1 id="version">Version: 0.8.3-alpha1</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2login.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -38,6 +38,7 @@ function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
 $tablepostcats, $tablehitlog;
+	global $baseurl;
 
 	echo "<p>Creating the necessary tables in the database...</p>";
 
@@ -571,7 +572,7 @@ switch( $action )
 
   	<p><input type="radio" name="action" value="upgradedb"> <strong>Upgrade from original b2</strong>: Install b2evolution tables and copy your existing b2 data into them. </p>
 
-  	<p><input type="radio" name="action" value="deletedb"> <strong>Delete b2evolution tables</strong>: If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <b>WARNING: All your b2evolution tables and data will be lost!!!</b> Your original b2 tables though, if you have some, will not be touched.</p>
+  	<p><input type="radio" name="action" value="deletedb"> <strong>Delete b2evolution tables</strong>: If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your original b2 tables though, if you have some, will not be touched.</p>
 		
 	</fieldset>
 

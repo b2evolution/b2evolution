@@ -1,7 +1,31 @@
 <div class="bPosts">
 	<div class="bPost">
 	<?php
+	require_once (dirname(__FILE__).'/_class_itemlist.php');
+	require_once (dirname(__FILE__).'/_class_calendar.php');
+	require_once (dirname(__FILE__).'/_class_archivelist.php');
+
 	
+	set_param( 'blog', 'integer', 2, true );
+	set_param( 'p', 'integer' );							// Specific post number to display
+	set_param( 'm', 'integer', '', true );							// YearMonth(Day) to display
+	set_param( 'w', 'integer', '', true );							// Week number
+	set_param( 'cat', 'string', '', true );							// List of cats to restrict to
+	set_param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
+	set_param( 'author', 'integer', '', true );					// List of authors to restrict to
+	set_param( 'order', 'string', 'DESC', true );		// ASC or DESC
+	set_param( 'orderby', 'string', '', true );					// list of fields to order by
+	set_param( 'posts', 'integer', '', true );					// # of posts to display on the page
+	set_param( 'paged', 'integer', '', true );					// List page number in paged display
+	set_param( 'poststart', 'integer', '', true );			// Start results at this position
+	set_param( 'postend', 'integer', '', true );				// End results at this position
+	set_param( 's', 'string', '', true );								// Search string
+	set_param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
+	set_param( 'exact', 'integer', '', true );					// Require exact match of title or contents
+	$preview = 0;
+	set_param( 'c', 'string' );
+	set_param( 'tb', 'integer', 0 );
+	set_param( 'pb', 'integer', 0 );
 	set_param( 'show_status', 'array', array( 'draft', 'published'), true );	// Array of cats to restrict to
 	$show_statuses = '';
 	$status_sep = '';
@@ -18,20 +42,32 @@
 		$show_past = 1;
 		$show_future = 1;
 	}
-	if( $show_past == 0 ) $timestamp_min = 'now';
-	if( $show_future == 0 ) $timestamp_max = 'now';
+	$timestamp_min = ( $show_past == 0 ) ? 'now' : '';
+	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
+	// Getting current blog info:
+	get_blogparams();
 
+	// Getting settings from db
+	$archive_mode = get_settings('archive_mode');
+	$time_difference = get_settings('time_difference');
 
-	$skin = '';						// No skin will be used! We do the display below
-	include(dirname(__FILE__).'/_blog_main.php');
+	// Get the posts to display:
+	$MainList = new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
+	
+	$posts_per_page = $MainList->posts_per_page;
+	$what_to_show = $MainList->what_to_show;
+	$request = & $MainList->request;
+	// $result = & $MainList->result;
+	$result_num_rows = $MainList->get_num_rows();
+	$postIDlist = & $MainList->postIDlist;
+	$postIDarray = & $MainList->postIDarray;
+
 	
 	echo '<h2>';
-	single_cat_title( " Category: ", 'htmlbody' );
-	single_month_title( " Date: ", 'htmlbody' );
-	single_post_title( " Post details: ", 'htmlbody'  );
-	if ($c == "last") echo "Last comments";
-	if ($stats) echo "Statistics";
+	single_cat_title();
+	single_month_title( _(' Date range: '), 'htmlbody' );
+	single_post_title();
 	echo '</h2>';
 	
 	if (!$posts) 
@@ -75,11 +111,24 @@
   	<div class="bPost<?php the_status() ?>" lang="<?php the_lang() ?>">	
 			<?php permalink_anchor(); ?>
 			<div class="bSmallHead">
-				<b><?php the_time('Y/m/d @ H:i:s'); ?></b> 
-				by <?php the_author() ?> (<a href="javascript:profile(<?php the_author_ID() ?>)"><?php the_author_nickname() ?></a>), 
-				in <?php the_categories( false, "<strong>", "</strong>", "", "", "<em>", "</em>") ?>
-				- <?php the_language() ?>
-				- Status: <?php the_status() ?>
+				<?php 
+					echo '<strong>';
+					the_time('Y/m/d @ H:i:s');
+					echo '</strong>';
+					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+					echo ' ', _('by'), ' ';
+					the_author();
+					echo ' (<a href="javascript:profile(', the_author_ID(), '">';
+					the_author_nickname();
+					echo '</a>), ';
+					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+					echo _('in'), ' ';
+					the_categories( false );
+					echo ' - ';
+					the_language();
+					echo ' - ', _('Status'), ': ';
+					the_status(); 
+				?>
 			</div>
 				
 			<h3 class="bTitle"><?php the_title() ?></h3>
@@ -102,14 +151,19 @@
 				<form action="b2edit.php" method="get" class="inline">
 					<input type="hidden" name="action" value="edit">
 					<input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>">
-					<input type="submit" name="submit" value="&nbsp; Edit &nbsp;" class="search" />
+					<input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo _('&nbsp; Edit &nbsp;') ?>" class="search" />
 				</form>
 				<form action="edit_actions.php" method="get" class="inline">
-					<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="Delete" class="search" onclick="return confirm('You are about to delete this post \'<?php echo $row->post_title ?>\'\n\'Cancel\' to stop, \'OK\' to delete.')" />
+					<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo _('Delete') ?>" class="search" onclick="return confirm('<?php echo _('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
 				</form>
 			<?php } ?>
-				[ <a href="b2edit.php?blog=<?php echo $blog ?>&p=<?php echo $id ?>&c=1"><?php comments_number('no comment', '1 comment', "% comments") ?><?php trackback_number('', ', 1 trackback', ', % trackbacks') ?><?php pingback_number('', ', 1 pingback', ', % pingbacks') ?></a>
-				- <a href="<?php permalink_single(); ?>" title="permalink">Permalink</a> ]
+				[ <a href="b2edit.php?blog=<?php echo $blog ?>&p=<?php echo $id ?>&c=1"><?php 
+				// TRANS: Link to comments for current post
+				comments_number(_('no comment'), _('1 comment'), _('% comments'));
+				trackback_number('', ', '._('1 Trackback'), ', '._('% Trackbacks'));
+				pingback_number('', ', '._('1 Pingback'), ', '._('% Pingbacks')); 
+				?></a>
+				- <a href="<?php permalink_single(); ?>" title="<?php echo _('Permanent link to this post') ?>"><?php echo _('Permalink') ?></a> ]
 			</p>
 				
 			<?php
@@ -123,7 +177,7 @@
 				?>
 
 				<a name="comments"></a>
-				<h4>Comments:</h4>
+				<h4><?php echo _('Comments') ?>:</h4>
 
 				<?php
 				while($rowc = mysql_fetch_object($resultc))
@@ -132,8 +186,8 @@
 					?>
 					<div class="bComment">
 					<div class="bSmallHead">
-						<b><?php comment_time('Y/m/d @ H:i:s'); ?></b> 
-						by <b><?php comment_author() ?> ( <?php comment_author_email_link() ?> / <?php comment_author_url_link() ?> )</b> (IP: <?php comment_author_IP() ?>)
+						<strong><?php comment_time('Y/m/d @ H:i:s'); ?></strong> 
+						by <strong><?php comment_author() ?> ( <?php comment_author_email_link() ?> / <?php comment_author_url_link() ?> )</strong> (IP: <?php comment_author_IP() ?>)
 					</div>
 					<div class="bText">
 						<?php comment_text() ?>
@@ -147,10 +201,10 @@
 						<input type="hidden" name="blog" value="<?php echo $blog ?>">
 						<input type="hidden" name="action" value="editcomment">
 						<input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>">
-						<input type="submit" name="submit" value="&nbsp; Edit &nbsp;" class="search" />
+						<input type="submit" name="submit" value="<?php echo _('&nbsp; Edit &nbsp;') ?>" class="search" />
 					</form>
 					<form action="edit_actions.php" method="get" class="inline">
-						<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>"><input type="hidden" name="p" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="Delete" class="search" onclick="return confirm('You are about to delete this comment\n\'Cancel\' to stop, \'OK\' to delete.')" />
+						<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>"><input type="hidden" name="p" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo _('Delete') ?>" class="search" onclick="return confirm('<?php printf( _('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
 					</form>
 					<?php
 					}
@@ -163,10 +217,10 @@
 				}
 
 				if ($comment_error)
-					echo "<p><font color=\"red\">Error: please fill the required fields (name & comment)</font></p>";
+					echo '<p><font color="red">', _('Error: please fill the required fields (name & comment)'), '</font></p>';
 				?>
 
-				<h4>Leave a comment:</h4>
+				<h4><?php echo _('Leave a comment') ?>:</h4>
 
 				<!-- form to add a comment -->
 				<form action="<?php echo $baseurl, '/', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
@@ -175,44 +229,43 @@
 					<input type="hidden" name="redirect_to" value="<?php echo $_SERVER["REQUEST_URI"]; ?>" />
 					
 					<fieldset>
-						<div class="label"><label for="author">Name:</label></div>
+						<div class="label"><label for="author"><?php echo _('Name') ?>:</label></div>
 						<div class="input"><input type="text" name="author" id="author" value="<?php echo $user_nickname ?>" size="40" tabindex="1" class="bComment" /></div>
 					</fieldset>
 			
 					
 					<fieldset>
-						<div class="label"><label for="email">Email:</label></div>
+						<div class="label"><label for="email"><?php echo _('Email') ?>:</label></div>
 						<div class="input"><input type="text" name="email" id="email" value="<?php echo $user_email ?>" size="40" tabindex="2" class="bComment" /><br />
-							<span class="notes">Your email address will <strong>not</strong> be displayed on this site.</span>
+							<span class="notes"><?php echo _('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
 						</div>
 					</fieldset>
 					
 					<fieldset>
-						<div class="label"><label for="url">Site/Url:</label></div>
+						<div class="label"><label for="url"><?php echo _('Site/Url') ?>:</label></div>
 						<div class="input"><input type="text" name="url" id="url" value="<?php echo $user_url ?>" size="40" tabindex="3" class="bComment" /><br />
-							<span class="notes">Your URL will be displayed.</span>
+							<span class="notes"><?php echo _('Your URL will be displayed.') ?></span>
 						</div>
 					</fieldset>
 							
 					<fieldset>
-						<div class="label"><label for="comment">Comment text:</label></div>
+						<div class="label"><label for="comment"><?php echo _('Comment text') ?>:</label></div>
 						<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" tabindex="4" class="bComment"></textarea><br />
-							<span class="notes">Allowed XHTML tags: <?php echo htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?><br />
-							URLs, email, AIM and ICQs will be converted automatically.</span>
+							<span class="notes"><?php echo _('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), '<br />', _('URLs, email, AIM and ICQs will be converted automatically.'); ?></span>
 						</div>
 					</fieldset>
 							
 					<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
 					<fieldset>
-						<div class="label">Options:</div>
-						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo " checked=\"checked\"" ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr">Auto-BR</label> <span class="notes">(Line breaks become &lt;br&gt;)</span>
+						<div class="label"><?php echo _('Options') ?>:</div>
+						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo " checked=\"checked\"" ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes"><?php echo _('(Line breaks become &lt;br&gt;)') ?></span>
 						</div>
 					</fieldset>
 					<?php } ?>
 				
 					<fieldset>
 						<div class="input">
-							<input type="submit" name="submit" class="buttonarea" value="Send comment" tabindex="8" />
+							<input type="submit" name="submit" class="buttonarea" value="<?php echo _('Send comment') ?>" tabindex="8" />
 						</div>
 					</fieldset>
 				
@@ -251,36 +304,36 @@
 
 	<div class="bSideItem">
 		<form name="searchform" method="get" action="<?php echo $pagenow ?>">
-			<h3><span style="float:right"><input type="submit" name="submit" value="Search" class="search" /></span>Search</h3>
+			<h3><span style="float:right"><input type="submit" name="submit" value="<?php echo _('Search') ?>" class="search" /></span><?php echo _('Search') ?></h3>
 
 			<input type="hidden" name="blog" value="<?php echo $blog ?>">
 
 			<fieldset title="Posts to show">
-				<legend>Posts to show</legend>
+				<legend><?php echo _('Posts to show') ?></legend>
 				<div>
-				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked ' ?>/><label for="ts_min">Past</label><br />
-				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked ' ?>/><label for="ts_max">Future</label>
+				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked ' ?>/><label for="ts_min"><?php echo _('Past') ?></label><br />
+				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked ' ?>/><label for="ts_max"><?php echo _('Future') ?></label>
 				</div>
 				
 				<div>
-				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="ts_min">Draft</label><br />
-				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked ' ?>/><label for="ts_max">Published</label>
+				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="ts_min"><?php echo _('Draft') ?></label><br />
+				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked ' ?>/><label for="ts_max"><?php echo _('Published') ?></label>
 				</div>
 				
 			</fieldset>
 
 			<fieldset title="Text">
-				<legend>Text</legend>
+				<legend><?php echo _('Title / Text contains') ?></legend>
 				<div>
 				<input type="text" name="s" size="20" value="<?php echo $s ?>" class="SearchField" />
 				</div>
-				Words: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked ' ?>/><label for="sentAND">AND</label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked ' ?>/><label for="sentOR">OR</label>
-				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked ' ?>/><label for="sentence">Sentence</label>
+				<?php echo _('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked ' ?>/><label for="sentAND"><?php echo _('AND') ?></label>
+				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked ' ?>/><label for="sentOR"><?php echo _('OR') ?></label>
+				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
 			</fieldset>
 
 			<fieldset title="Archives">
-				<legend>Archives</legend>
+				<legend><?php echo _('Archives') ?></legend>
 				<ul>
 				<?php
 				// this is what will separate your archive links
@@ -289,13 +342,13 @@
 				// this is what will separate dates on weekly archive links
 				$archive_week_separator = ' - ';
 					
-				$dateformat=get_settings('date_format');
+				$dateformat = locale_datefmt();
 				$time_difference=get_settings('time_difference');
 				$archive_day_date_format = $dateformat;
 				$archive_week_start_date_format = $dateformat;
 				$archive_week_end_date_format   = $dateformat;
 
-				$arc_link_start = $pagenow.$querystring_start.'blog'.$querystring_equal.$blog.$querystring_separator;
+				$arc_link_start = $pagenow.'?blog='.$blog.'&amp;';
 
 				$ArchiveList = new ArchiveList( $blog, $archive_mode, $show_statuses,	$timestamp_min, $timestamp_max, 36 );
 				
@@ -310,8 +363,8 @@
 							echo '<input type="radio" name="m" value="'.$arc_m.'" class="checkbox"';
 							if( $m == $arc_m ) echo ' checked' ;
 							echo ' />';
-							echo '<a href="'.$arc_link_start.'m'.$querystring_equal.$arc_m.'">';
-							echo $month[zeroise($arc_month,2)],' ',$arc_year;
+							echo '<a href="'.$arc_link_start.'m='.$arc_m.'">';
+							echo _($month[zeroise($arc_month,2)]),' ',$arc_year;
 							echo "</a> ($arc_count)";
 							break;
 				
@@ -321,7 +374,7 @@
 							echo '<input type="radio" name="m" value="'.$arc_m.'" class="checkbox"';
 							if( $m == $arc_m ) echo ' checked' ;
 							echo ' />';
-							echo '<a href="'.$arc_link_start.'m'.$querystring_equal.$arc_m.'">';
+							echo '<a href="'.$arc_link_start.'m='.$arc_m.'">';
 							echo mysql2date($archive_day_date_format, $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
 							echo "</a> ($arc_count)";
 							break;
@@ -332,7 +385,7 @@
 							$arc_week = get_weekstartend($arc_ymd, $start_of_week);
 							$arc_week_start = date_i18n($archive_week_start_date_format, $arc_week['start']);
 							$arc_week_end = date_i18n($archive_week_end_date_format, $arc_week['end']);
-							echo '<a href="'.$arc_link_start.'m'.$querystring_equal.$arc_year.$querystring_separator.'w'.$querystring_equal.$arc_w.'">';
+							echo '<a href="'.$arc_link_start.'m='.$arc_year.'&amp;w='.$arc_w.'">';
 							echo $arc_week_start.$archive_week_separator.$arc_week_end;
 							echo '</a>';
 						break;
@@ -340,7 +393,7 @@
 						case 'postbypost':
 						default:
 							// ------------------------------- POSY BY POST ARCHIVES -----------------------------
-							echo '<a href="'.$arc_link_start.'p'.$querystring_equal.$post_ID.'">';
+							echo '<a href="'.$arc_link_start.'p='.$post_ID.'">';
 							if ($post_title) {
 								echo strip_tags($post_title);
 							} else {
@@ -357,7 +410,7 @@
 			</fieldset>
 			
 			<fieldset title="Categories">
-				<legend>Categories</legend>
+				<legend><?php echo _('Categories') ?></legend>
 				<ul>
 				<?php 
 				$cat_line_start = '<li>';
@@ -379,7 +432,7 @@
 				}
 				function cat_list_before_each( $cat_ID, $level )
 				{	// callback to display sublist element
-					global $blog, $querystring_start, $querystring_equal, $querystring_separator, $cat_array, $cat_line_start, $pagenow;
+					global $blog, $cat_array, $cat_line_start, $pagenow;
 					$cat = get_the_category_by_ID( $cat_ID );
 					echo $cat_line_start;
 					echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
@@ -388,7 +441,7 @@
 						echo " checked";
 					}
 					echo ' />';
-					echo "<a href=\"".$pagenow.$querystring_start."blog".$querystring_equal.$blog.$querystring_separator."cat".$querystring_equal.$cat_ID."\">".$cat['cat_name']."</a> (", $cat['cat_postcount'] ,')';
+					echo '<a href="', $pagenow, '?blog=', $blog, '&amp;cat=', $cat_ID, '">', $cat['cat_name'], '</a> (', $cat['cat_postcount'] ,')';
 					if( in_array( $cat_ID, $cat_array ) )
 					{	// This category is in the current selection
 						echo "*";
@@ -408,7 +461,7 @@
 				
 				if( $blog > 1 )
 				{	// We want to display cats for one blog
-					cat_children( $cache_categories, $blog, NULL, cat_list_before_first, cat_list_before_each, cat_list_after_each, cat_list_after_last, 0 );
+					cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
 				}
 				else
 				{	// We want to display cats for all blogs
@@ -424,7 +477,7 @@
 						echo $cat_blog_end;
 				
 						// run recursively through the cats
-						cat_children( $cache_categories, $curr_blog_ID, NULL, cat_list_before_first, cat_list_before_each, cat_list_after_each, cat_list_after_last, 1 );
+						cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
 					}
 				}
 				// ----------------- END RECURSIVE CAT LIST ----------------
@@ -432,8 +485,8 @@
 				</ul>
 			</fieldset>
 			
-			<input type="submit" name="submit" value="Search" class="search" />
-			[<a href="<?php echo $pagenow,'?blog=',$blog ?>">Reset</a>]
+			<input type="submit" name="submit" value="<?php echo _('Search') ?>" class="search" />
+			[<a href="<?php echo $pagenow,'?blog=',$blog ?>"><?php echo _('Reset') ?></a>]
 		</form>
 		
 	</div>

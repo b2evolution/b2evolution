@@ -75,7 +75,7 @@ function get_userdata($userid)
 		* Optimized by: R. U. Serious
 		*/
 		$sql = "SELECT * FROM $tableusers"; 
-		$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error()); 
+		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++; 
 		while ($myrow = mysql_fetch_array($result)) 
 		{ 
@@ -88,7 +88,8 @@ function get_userdata($userid)
 	return($myrow);
 }
 
-function get_userdata2($userid) { // for team-listing
+function get_userdata2($userid) 
+{ // for team-listing
 	global $tableusers,$row;
 	$user_data['ID'] = $userid;
 	$user_data['user_login'] = $row->user_login;
@@ -101,12 +102,13 @@ function get_userdata2($userid) { // for team-listing
 	return($user_data);
 }
 
-function get_userdatabylogin($user_login) {
+function get_userdatabylogin($user_login) 
+{
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) {
+	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) 
+	{
 		$sql = "SELECT * FROM $tableusers WHERE user_login = '$user_login'";
-		$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
-		if (!$result)	die($sql."<br /><br />".mysql_error());
+		$result = mysql_query($sql) or mysql_oops( $sql );
 		$myrow = mysql_fetch_array($result);
 		$querycount++;
 		$cache_userdata["$user_login"] = $myrow;
@@ -128,7 +130,7 @@ function get_userid($user_login) {
 	 * Optimized by R. U. Serious
 	 */
 		$sql = "SELECT user_login, ID FROM $tableusers"; 
-		$result = mysql_query($sql) or die("No user with the login <i>$user_login</i>"); 
+		$result = mysql_query($sql) or mysql_oops( $sql ); 
 		$querycount++; 
 		while ($myrow = mysql_fetch_array($result)) 
 		{ 
@@ -139,10 +141,11 @@ function get_userid($user_login) {
 	return($myrow[0]);
 }
 
-function get_usernumposts($userid) {
+function get_usernumposts($userid) 
+{
 	global $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments,$querycount;
 	$sql = "SELECT * FROM $tableposts WHERE post_author = $userid";
-	$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
+	$result = mysql_query($sql) or mysql_oops( $sql );
 	$querycount++;
 	return mysql_num_rows($result);
 }
@@ -156,7 +159,7 @@ function get_currentuserinfo()
 	// *** retrieving user's data from cookies and db - no spoofing
 	$user_login = $_COOKIE[$cookie_user];
 	$userdata = get_userdatabylogin($user_login);
-	$user_level = $userdata["user_level"];
+	$user_level = $userdata['user_level'];
 	$user_ID=$userdata['ID'];
 	$user_nickname=$userdata["user_nickname"];
 	$user_email=$userdata["user_email"];
@@ -167,7 +170,8 @@ function get_currentuserinfo()
 
 
 
-function profile($user_login) {
+function profile($user_login) 
+{
 	global $user_data;
 	echo "<a href=\"#\" OnClick=\"javascript:window.open('b2profile.php?user=".$user_data["user_login"]."','Profile','toolbar=0,status=1,location=0,directories=0,menuBar=0,scrollbars=1,resizable=1,width=480,height=320,left=100,top=100');\">$user_login</a>";
 }

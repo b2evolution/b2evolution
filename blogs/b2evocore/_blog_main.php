@@ -8,8 +8,9 @@
  * This file loads the blog!
  */
 require_once (dirname(__FILE__).'/../conf/b2evo_config.php');
-require_once (dirname(__FILE__).'/_functions_template.php');	// function to be called from templates
+require_once (dirname(__FILE__).'/_functions_locale.php');
 require_once (dirname(__FILE__).'/_vars.php');					// sets various arrays and vars for use in b2
+require_once (dirname(__FILE__).'/_functions_template.php');	// function to be called from templates
 require_once (dirname(__FILE__).'/_functions.php');  
 require_once (dirname(__FILE__).'/_functions_xmlrpc.php');	
 require_once (dirname(__FILE__).'/_functions_xmlrpcs.php');
@@ -17,8 +18,19 @@ require_once (dirname(__FILE__).'/_class_itemlist.php');
 require_once (dirname(__FILE__).'/_class_commentlist.php');
 require_once (dirname(__FILE__).'/_class_archivelist.php');
 require_once (dirname(__FILE__).'/_class_calendar.php');
+require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
+
+
+timer_start();
+
+if( $use_gzipcompression && extension_loaded('zlib') )
+{	// gzipping the output of the script
+	ob_start( 'ob_gzhandler' );
+}
+
 
 // Getting GET or POST parameters:
+if(!isset($default_to_blog)) $default_to_blog = 1;
 set_param( 'blog', 'integer', $default_to_blog, true );
 set_param( 'p', 'integer' );							// Specific post number to display
 set_param( 'm', 'integer', '', true );							// YearMonth(Day) to display
@@ -46,6 +58,8 @@ set_param( 'tb', 'integer', 0 );
 set_param( 'pb', 'integer', 0 );
 set_param( 'disp', 'string' );
 set_param( 'stats', 'integer', 0 );					// deprecated
+if(!isset($timestamp_min)) $timestamp_min = '';
+if(!isset($timestamp_max)) $timestamp_max = '';
 
 if( empty($disp) )
 {
@@ -62,17 +76,20 @@ if( empty($disp) )
 // Connecting to the db:
 dbconnect();
 
-// Getting current blog info (fplanque: added)
+// Getting current blog info:
 get_blogparams();
+
+// Activate matching locale:
+locale_activate( locale_by_lang( get_bloginfo('lang') ) );
 
 // Extra path info decoding:
 $ReqURI = $_SERVER['REQUEST_URI'];
-// echo ":".$ReqURI."<br>";
+// echo ":".$ReqURI."<br />";
 $path_string = explode( '?', $ReqURI, 2 );
 $path_elements = explode( '/', $path_string[0], 20 );						// slice it
 $stub = get_bloginfo( 'stub' );
 // echo "stub=", $stub;
-for( $i = count( $path_elements ); $i >= 0; $i-- )
+for( $i = count( $path_elements )-1; $i >= 0; $i-- )
 {
 	// echo ' -- i=', $i, ' this=', $path_elements[$i] ;
 	if( $path_elements[$i] == $stub )
@@ -82,19 +99,19 @@ for( $i = count( $path_elements ); $i >= 0; $i-- )
 	}
 }
 $i++;
-if( is_numeric( $path_elements[$i] ) )
+if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 {	// We'll consider this to be the year
 	$m = $path_elements[$i++];
 	
-	if( is_numeric( $path_elements[$i] ) )
+	if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 	{	// We'll consider this to be the month
 		$m .= $path_elements[$i++];
 
-		if( is_numeric( $path_elements[$i] ) )
+		if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 		{	// We'll consider this to be the day
 			$m .= $path_elements[$i++];
 
-			if ( ereg( "p([0-9]+)", $path_elements[$i], $req_post )  )
+			if( isset( $path_elements[$i] ) && ereg( "p([0-9]+)", $path_elements[$i], $req_post )  )
 			{	// The last param is of the form p000
 				// We are accessing a post by permalink
 				// Set a lot of defaults as if we had received a complex URL:
@@ -116,18 +133,10 @@ if( is_numeric( $path_elements[$i] ) )
 }
 // else echo "not numeric: ",  $path_elements[$i];
 
-// referer logging
-require_once (dirname(__FILE__).'/_functions_hitlogs.php');
-
 
 // Getting settings from db
 $archive_mode = get_settings('archive_mode');
-$dateformat = stripslashes(get_settings('date_format'));
-$timeformat = stripslashes(get_settings('time_format'));
-// $autobr = get_settings('AutoBR');
 $time_difference = get_settings('time_difference');
-
-if ($pagenow != 'b2edit.php'){ timer_start(); }
 
 
 if ( empty( $disp ) )
@@ -149,23 +158,17 @@ else
 }
 
 
-if( $use_gzipcompression && ($pagenow != 'b2edit.php'))
-{
-	// gzipping the output of the script
-	gzip_compression();
-}
-
-
 /*
  * Now, we'll jump to displaying!
  */
 // Get the saved skin in cookie or default:
+if(!isset($default_skin)) $default_skin = '';
 set_param( $cookie_state, 'string', $default_skin );
 // Get skin by params or default to cookie or default
 set_param( 'skin', 'string', $$cookie_state );
 // check to see if we want to display the popup or the main template
 set_param( 'template', 'string', 'main' );
-if( $skin != "" )
+if( $skin != '' )
 {	// We want to display now:
 	$skin_folder = get_path( 'skins' );
 	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )

@@ -3,10 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!-- layout credits goto http://bluerobot.com/web/layouts/layout2.html -->
 
-<head>
+<head xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<title><?php bloginfo('name') ?><?php single_post_title(' :: ', 'htmlhead') ?><?php single_cat_title(' :: ', 'htmlhead') ?><?php single_month_title(' :: ', 'htmlhead') ?></title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<meta http-equiv="reply-to" content="<?php bloginfo('admin_email'); ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
@@ -41,14 +41,14 @@ for( $curr_blog_ID=blog_list_start('stub');
 
 
 <?php	// -------------------------------------- START OF POSTS ---------------------------------------
-	if( isset($MainList) ) while( $MainList->get_item() )
+if( isset($MainList) ) while( $MainList->get_item() )
 {
-the_date("","<h2>","</h2>");
-		permalink_anchor(); 
+	the_date( '', '<h2>', '</h2>' );
+	permalink_anchor(); 
 ?>
 <div class="storyTitle"><?php the_title(); ?>
 &nbsp;-&nbsp;
-Categories: <?php the_categories( "Browse category", "<strong>", "</strong>", "", "", "<em>", "</em>" ) ?>
+Categories: <?php the_categories() ?>
 &nbsp;-&nbsp;
 <span class="storyAuthor"><?php the_author() ?> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php the_time() ?></a>
 </div>
@@ -59,8 +59,8 @@ Categories: <?php the_categories( "Browse category", "<strong>", "</strong>", ""
 <div class="rightFlush">
 <?php link_pages("<br />Pages: ","<br />","number") ?> 
 <?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> 
-<?php trackback_popup_link("TrackBack (0)", "TrackBack (1)", "TrackBack (%)") ?> 
-<?php pingback_popup_link("PingBack (0)", "PingBack (1)", "PingBack (%)") ?>
+<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> 
+<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?>
 
 <?php trackback_rdf() ?>
 
@@ -117,7 +117,7 @@ Categories: <?php the_categories( "Browse category", "<strong>", "</strong>", ""
 <h4>categories:</h4>
 <form action="<?php bloginfo('blogurl') ?>" method="get">
 <?php	include( dirname(__FILE__)."/_categories.php"); ?>
-<input type="submit" value="get selection" />
+<input type="submit" value="<?php echo _('Get selection') ?>" />
 </form>
 
 
@@ -125,7 +125,7 @@ Categories: <?php the_categories( "Browse category", "<strong>", "</strong>", ""
 
 <form name="searchform" method="get" action="<?php bloginfo('blogurl') ?>">
 	<input type="text" name="s" size="15" style="width: 100%" />
-	<input type="submit" name="submit" value="search" />
+	<input type="submit" name="submit" value="<?php echo _('Search') ?>" />
 </form>
 
 <h4>archives:</h4>
@@ -143,8 +143,8 @@ Categories: <?php the_categories( "Browse category", "<strong>", "</strong>", ""
 
 <h4>other:</h4>
 
-<a href="<?php echo $pathserver?>/b2login.php">login</a><br />
-<a href="<?php echo $pathserver?>/b2register.php">register</a><br />
+<a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a><br />
+<a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a><br />
 <br />
 
 <a href="<?php bloginfo('rss2_url'); ?>"><img src="../../img/xml.gif" alt="view this weblog as RSS !" width="36" height="14" border="0"  /></a><br />
@@ -156,7 +156,7 @@ Categories: <?php the_categories( "Browse category", "<strong>", "</strong>", ""
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		echo "Totals: $result_num_rows posts - $querycount queries - ".number_format(timer_stop(),3)." seconds";
+		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
 	}
 ?>
 </body>

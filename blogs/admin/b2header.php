@@ -9,9 +9,8 @@ require_once(dirname(__FILE__)."/$b2inc/_functions.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpc.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
 
-if (!isset($use_cache))	$use_cache=1;
-if (!isset($blogID))	$blog_ID=1;
 if (!isset($debug))		$debug=0;
+
 timer_start();
 
 get_currentuserinfo();
@@ -26,8 +25,6 @@ while($row = mysql_fetch_object($result))
 	$archive_mode=$row->archive_mode;
 	$time_difference=$row->time_difference;
 	$autobr=$row->AutoBR;
-	$date_format=stripslashes($row->date_format);
-	$time_format=stripslashes($row->time_format);
 }
 
 // let's deactivate quicktags on IE Mac and Lynx, because they don't work there.
@@ -50,7 +47,6 @@ for ($i=0; $i<count($b2varstoreset); $i += 1) {
 	}
 }
 
-// fplanque: added loading of blog params
 if( ($blog=='') && isset($default_blog) )
 	$blog = $default_blog;
 

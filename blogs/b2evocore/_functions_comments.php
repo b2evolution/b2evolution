@@ -27,10 +27,10 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	if (!isset($cache_ctp_number) || (!$use_cache))
 	{
 		global $postIDlist, $postIDarray;
-		// if( $debug ) echo "LOADING generic_ctp_number CACHE for posts: $postIDlist<br>";
+		// if( $debug ) echo "LOADING generic_ctp_number CACHE for posts: $postIDlist<br />";
 		foreach( $postIDarray as $tmp_post_id)
 		{		// Initializes each post to nocount!
-				$cache_ctp_number[$tmp_post_id] = array();
+				$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
 		}
 		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count FROM $tablecomments WHERE comment_post_ID IN ($postIDlist) GROUP BY comment_post_ID, comment_type";
 		$result = mysql_query($query) or mysql_oops($query);
@@ -144,8 +144,12 @@ function get_commentdata($comment_ID,$no_cache=0)
 /*
  * comments_number(-)
  */
-function comments_number($zero='no comment', $one='1 comment', $more='% comments') 
+function comments_number( $zero='#', $one='#', $more='#' ) 
 {
+	if( $zero == '#' ) $zero = _('Trackback (0)');
+	if( $one == '#' ) $one = _('Trackback (1)');
+	if( $more == '#' ) $more = _('Trackbacks (%)');
+
 	// original hack by dodo@regretless.com
 	global $id,$postdata,$tablecomments,$c,$querycount,$cache_commentsnumber,$use_cache;
 	$number = generic_ctp_number($id, 'comments');
@@ -169,17 +173,16 @@ function comments_number($zero='no comment', $one='1 comment', $more='% comments
 function comments_link($file='', $tb=0, $pb=0 ) 
 {
 	global $id;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo $file.$querystring_start.'p'.$querystring_equal.$id.$querystring_separator.'c'.$querystring_equal.			'1';
+	echo $file.'?p='.$id.'&amp;c=1';
 	if( $tb == 1 )
 	{	// include trackback // fplanque: added
-		echo $querystring_separator.'tb'.$querystring_equal.'1';
+		echo '&amp;tb=1';
 	}
 	if( $pb == 1 )
 	{	// include pingback // fplanque: added
-		echo $querystring_separator.'pb'.$querystring_equal.'1';
+		echo '&amp;pb=1';
 	}
 	echo '#comments';
 }
@@ -219,11 +222,10 @@ function comments_popup_script($width=560, $height=400, $file='comment_popup.php
 function comments_popup_link($zero='no comment', $one='1 comment', $more='% comments', $CSSclass='') 
 {
 	global $blog, $id, $b2commentspopupfile, $b2commentsjavascript;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	echo '<a href="';
 	if ($b2commentsjavascript)
 	{
-		echo get_bloginfo('blogurl').$querystring_start.'template'.$querystring_equal.'popup'.$querystring_separator.'p'.$querystring_equal.$id.$querystring_separator.'c'.$querystring_equal.'1';
+		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;c=1';
 		echo '" onclick="b2open(this.href); return false"';
 	} 
 	else 
@@ -331,9 +333,9 @@ function comment_text()
  * comment_date(-)
  */
 function comment_date($d='') {
-	global $commentdata,$dateformat;
+	global $commentdata;
 	if ($d == '') {
-		echo mysql2date($dateformat, $commentdata['comment_date']);
+		echo mysql2date( locale_datefmt(), $commentdata['comment_date']);
 	} else {
 		echo mysql2date($d, $commentdata['comment_date']);
 	}
@@ -343,9 +345,9 @@ function comment_date($d='') {
  * comment_time(-)
  */
 function comment_time($d='') {
-	global $commentdata,$timeformat;
+	global $commentdata;
 	if ($d == '') {
-		echo mysql2date($timeformat, $commentdata['comment_date']);
+		echo mysql2date( locale_timefmt(), $commentdata['comment_date']);
 	} else {
 		echo mysql2date($d, $commentdata['comment_date']);
 	}

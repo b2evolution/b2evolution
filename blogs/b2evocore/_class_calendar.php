@@ -163,7 +163,6 @@ class Calendar
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $weekday;
 		global $start_of_week, $time_difference;
-		global $querystring_start, $querystring_equal;
 													
 		$end_of_week = (($start_of_week + 7) % 7);
 		
@@ -266,8 +265,8 @@ class Calendar
 		
 			for ($i = $start_of_week; $i<($start_of_week+7); $i = $i + 1) 
 			{
-				echo str_replace('[abbr]', $weekday[($i % 7)], $this->headercellstart);
-				echo ucwords(substr($weekday[($i % 7)], 0, $this->headerabbrlenght));
+				echo str_replace('[abbr]', _($weekday[($i % 7)]), $this->headercellstart);
+				echo ucwords(substr(_($weekday[($i % 7)]), 0, $this->headerabbrlenght));
 				echo $this->headercellend;
 			}
 		

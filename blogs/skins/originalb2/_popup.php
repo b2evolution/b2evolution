@@ -14,11 +14,11 @@
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $blogname ?> - feedback on '<?php the_title() ?>'</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<meta http-equiv="reply-to" content="you@yourdomain.com" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
@@ -44,7 +44,7 @@
 ?>
 </div>
 
-<div><b><span style="color: #0099CC">::</span> <a href="javascript:window.close()">close this window</a></b></div>
+<div><strong><span style="color: #0099CC">::</span> <a href="javascript:window.close()">close this window</a></strong></div>
 
 </body>
 </html>

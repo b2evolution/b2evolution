@@ -40,7 +40,7 @@
 	
 	function cat_list_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		global $blogfilename, $querystring_start, $querystring_equal, $cat_array, $cat_line_start;
+		global $blogfilename, $cat_array, $cat_line_start;
 		$cat = get_the_category_by_ID( $cat_ID );
 		echo $cat_line_start;
 		echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'"';
@@ -49,7 +49,7 @@
 			echo " checked";
 		}
 		echo ' />';
-		echo "<a href=\"".get_bloginfo('blogurl').$querystring_start."cat".$querystring_equal.$cat_ID."\">".$cat['cat_name'].'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
+		echo "<a href=\"".get_bloginfo('blogurl').'?cat='.$cat_ID."\">".$cat['cat_name'].'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
 		if( in_array( $cat_ID, $cat_array ) )
 		{	// This category is in the current selection
 			echo "*";
@@ -82,7 +82,7 @@
 			echo $cat_line_end,"\n";
 		}
 
-		cat_children( $cache_categories, $blog, NULL, cat_list_before_first, cat_list_before_each, cat_list_after_each, cat_list_after_last, 0 );
+		cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
 
 		echo "\n",$cat_group_end,"\n";
 	}

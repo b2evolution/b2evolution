@@ -33,17 +33,17 @@ error_reporting(2037);
 
 $pop3 = new POP3();
 
-echo "Connecting to pop server...<br />\n";
+echo _('Connecting to pop server...'), "<br />\n";
 if(!$pop3->connect($mailserver_url, $mailserver_port)) {
-	echo "Connection failed: $pop3->ERROR <br />\n";
+	echo _('Connection failed:'), " $pop3->ERROR <br />\n";
 	exit;
 }
 
-echo "Logging into pop server...<br />\n";
+echo _('Logging into pop server...'), "<br />\n";
 $Count = $pop3->login($mailserver_login, $mailserver_pass);
 if((!$Count) || ($Count == -1)) 
 {
-	echo "No mail or Login Failed: $pop3->ERROR <br />\n";
+	echo _('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
 	$pop3->quit();
 	exit;
 }
@@ -54,16 +54,16 @@ if((!$Count) || ($Count == -1))
 
 for ($iCount=1; $iCount<=$Count; $iCount++) 
 {
-	echo "Getting message $iCount...<br />\n";
+	printf( _('Getting message #%d...')."<br />\n", $iCount ); 
 	$MsgOne = $pop3->get($iCount);
 	if((!$MsgOne) || (gettype($MsgOne) != 'array')) 
 	{
-		echo "oops, $pop3->ERROR<br />\n";
+		echo $pop3->ERROR, "<br />\n";
 		$pop3->quit();
 		exit;
 	}
 
-	echo "Processing...<br />\n";
+	echo _('Processing...'), "<br />\n";
 	$content = '';
 	$content_type = '';
 	$boundary = '';
@@ -137,20 +137,20 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	if ($ddate_difference_days > 14) 
 	{
-		echo 'too old<br />';
+		echo _('Too old'), '<br />';
 		continue;
 	}
 
 	if( !preg_match('/'.$subjectprefix.'/', $subject)) 
 	{
-		echo 'Subject prefix does not match<br />';
+		echo _('Subject prefix does not match'), '<br />';
 		continue;
 	}
 
 	$userpassstring = '';
 
 	echo '<div style="border: 1px dashed #999; padding: 10px; margin: 10px;">';
-	echo "<p><b>$iCount</b></p><p><b>Subject: </b>$subject</p>\n";
+	echo "<p><strong>$iCount</strong></p><p><strong>Subject: </strong>$subject</p>\n";
 
 	$subject = trim(str_replace($subjectprefix, '', $subject));
 
@@ -162,8 +162,8 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 	$content = trim($content);
 
-	echo "<p><b>Content-type:</b> $content_type, <b>boundary:</b> $boundary</p>\n";
-	echo "<p><b>Raw content:</b><br /><xmp>".$content.'</xmp></p>';
+	echo "<p><strong>Content-type:</strong> $content_type, <strong>boundary:</strong> $boundary</p>\n";
+	echo '<p><strong>', _('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
 	
 	$btpos = strpos($content, $bodyterminator);
 	if ($btpos) {
@@ -198,14 +198,14 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$content = $contentfirstline.str_replace($firstline, '', $content);
 	$content = trim($content);
 
-	echo "<p><b>Login:</b> $user_login, <b>Pass:</b> $user_pass</p>";
+	echo '<p><strong>', _('Login:'), '</strong> ', $user_login, ', <strong>', _('Pass:'), '</strong> ', $user_pass, '</p>';
 
 	$sql = "SELECT ID, user_level FROM $tableusers WHERE user_login='$user_login' AND user_pass='$user_pass' ORDER BY ID DESC LIMIT 1";
 	$result = mysql_query($sql);
 
 	if (!mysql_num_rows($result)) 
 	{
-		echo '<p><b>Wrong login or password.</b></p></div>';
+		echo '<p><strong>', _('Wrong login or password.'), '</strong></p></div>';
 		continue;
 	}
 
@@ -225,7 +225,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 		if ($post_category == '') {
 			$post_category = $default_category;
 		}
-		echo '<p><b>Category ID:</b> ',$post_category,'</p>';
+		echo '<p><strong>', _('Category ID'), ':</strong> ',$post_category,'</p>';
 
 		if (!$thisisforfunonly) 
 		{
@@ -233,7 +233,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			$post_title = format_to_post(trim($post_title),0,0);
 			$content = format_to_post(trim($content),$autobr,0);
 		
-			if( errors_display( 'Cannot post, please correct these errors:', '' ) )
+			if( errors_display( _('Cannot post, please correct these errors:'), '' ) )
 			{
 				continue;
 			}
@@ -247,31 +247,31 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			}
 
 			$blog_ID = get_catblog($post_category); 
-			echo '<p><b>Blog ID:</b> ',$blog_ID,'</p>';
+			echo '<p><strong>', _('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 			
 			pingback( true, $content, $post_title, '', $post_ID, $blog_ID, true);
 			pingWeblogs($blog_ID);
 			pingBlogs($blog_ID);
 			pingCafelog($cafelogID, $post_title, $post_ID);
 		}
-		echo "\n<p><b>Posted title:</b> $post_title<br />";
-		echo "\n<b>Posted content:</b><br /><xmp>".$content.'</xmp></p>';
+		echo "\n<p><strong>", _('Posted title'), ':</strong> ', $post_title, '<br />';
+		echo "\n<strong>", _('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
 
 		if(!$pop3->delete($iCount)) 
 		{
-			echo '<p>oops '.$pop3->ERROR.'</p></div>';
+			echo '<p>', $pop3->ERROR, '</p></div>';
 			$pop3->reset();
 			exit;
 		}
 		else 
 		{
-			echo "<p>Mission complete, message <b>$iCount</b> deleted </p>";
+			echo '<p>', _('Mission complete, message deleted.'), '</p>';
 		}
 
 	} 
 	else 
 	{
-		echo '<p><b>Level 0 users can\'t post.</b></p>';
+		echo '<p><strong>', _('Level 0 users can\'t post.'), '</strong></p>';
 	}
 	echo '</div>';
 	if ($output_debugging_info) 
@@ -290,7 +290,7 @@ if ($output_debugging_info) {
 	ob_end_clean();
 }
 
-echo "End.<br />\n";
+echo _('End.'), "<br />\n";
 
 $pop3->quit();
 

@@ -37,7 +37,7 @@ $dbpassword = 'demopass';              // ...and password
 # ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
 $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on production servers
 
-// $allow_evodb_reset = 1;  // FOR TESTING
+$allow_evodb_reset = 1;  // FOR TESTING
 
 # $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
 # It should be set to the URL where you can find the blog stub files index.php, blog_b.php, etc.
@@ -48,7 +48,7 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
 # Note: No blog should be outside of there, or some tricky things may fail (e-g: pingback)
 $baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
-// baseurl = 'http://192.168.0.1/b2evolution/blogs';		// FOR TESTING
+$baseurl = 'http://localhost:8088/b2evolution/blogs';		// FOR TESTING
 
 
 # set this to 0 or 1, whether you want to allow users to register on your blog.
@@ -67,11 +67,12 @@ $new_users_can_blog = 0;
 /* Stop editing */
 
 // Get hostname out of baseurl
-preg_match( '#http://([^/]+)#', $baseurl, $matches );
+preg_match( '#http://([^:/]+)#', $baseurl, $matches );
 $basehost = $matches[1];
+//echo 'basehost=',$basehost;
 
-require_once (dirname(__FILE__)."/b2evo_locale.php");
 require_once (dirname(__FILE__)."/b2evo_advanced.php");
+require_once (dirname(__FILE__)."/b2evo_locale.php");
 require_once (dirname(__FILE__)."/b2evo_formatting.php");
 
 ?>

@@ -1,5 +1,7 @@
-<html>
-<head><title>Loading Spell Checker</title>
+<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title>Loading Spell Checker</title>
 <script ID="clientEventHandlersJS" LANGUAGE="javascript">
 <!--
 

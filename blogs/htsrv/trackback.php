@@ -69,7 +69,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$result = mysql_query($query);
 	if (!$result) 
 	{
-		trackback_response(2, "There is an error with the database, it can't store your comment...<br>Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok
+		trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok
 		die ();
 	}
 	
@@ -80,15 +80,15 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 			$postdata = get_postdata($comment_post_ID);
 			$authordata = get_userdata($postdata["Author_ID"]);
 			$recipient = $authordata["user_email"];
-			$subject = "Trackback on post #$comment_post_ID \"".$postdata["Title"]."\"";
+			$subject = sprintf( N_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
 			// fplanque added:
 			$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 
-			$notify_message  = "New trackback on your post #$comment_post_ID.\n";
+			$notify_message  = sprintf( N_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
 			$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$comment_post_ID."&tb=1\n\n";
-			$notify_message .= "Website: $comment_author (IP: $user_ip , $user_domain)\n";
-			$notify_message .= "Url    : $comment_author_url\n";
-			$notify_message .= "Excerpt: \n".stripslashes($original_comment)."\n";
+			$notify_message .= N_('Website').": $comment_author (IP: $user_ip , $user_domain)\n";
+			$notify_message .= N_('Url')."    : $comment_author_url\n";
+			$notify_message .= N_('Excerpt').": \n".stripslashes($original_comment)."\n";
 
 			@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
 			

@@ -32,11 +32,11 @@
       <guid isPermaLink="false"><?php echo $id; ?>@<?php echo $baseurl ?></guid>
       <description><?php
         the_link( '', ' ', 'xml' );
-        the_content('[...] Read more!', 0, '', '', '', '', 'xml',$rss_excerpt_length );
+        the_content(_('[...] Read more!'), 0, '', '', '', '', 'xml',$rss_excerpt_length );
       ?></description>
       <content:encoded><![CDATA[<?php
         the_link( '<p>', '</p>' );
-        the_content('=> Read more!', 0, '')
+        the_content()
       ?>]]></content:encoded>
       <comments><?php comments_link( '', 1, 1 ) ?></comments>
     </item>

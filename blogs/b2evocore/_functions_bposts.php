@@ -236,7 +236,7 @@ function get_postdata($postid)
 	{	// We are asking for postdata of current post in memory! (we're in the b2 loop)
 		// Already in memory! This will be the case when generating permalink at display
 		// (but not when sending trackbacks!)
-		// echo "*** Accessing post data in memory! ***<br>\n";
+		// echo "*** Accessing post data in memory! ***<br />\n";
 		return($postdata);
 	}
 
@@ -301,12 +301,22 @@ function get_the_title()
  *
  * fplanque: modified read more!
  * added $more_anchor
+ * 0.8.3: $more_anchor now surrounded the before & after link.
  */
-function get_the_content($more_link_text='[...] Read More!', $stripteaser=0, $more_file='', $more_anchor='', $before_more_link = '<p class="bMore">', $after_more_link = '</p>' )
+function get_the_content($more_link_text='#', $stripteaser=0, $more_file='', $more_anchor='#', $before_more_link = '<p class="bMore">', $after_more_link = '</p>' )
 {
+	if( $more_link_text == '#' ) 
+	{	// TRANS: this is the default text for the extended post "more" link
+		$more_link_text = '=> '._('Read more!');
+	}
+
+	if( $more_anchor == '#' ) 
+	{	// TRANS: this is the default text displayed once the more link has been activated
+		$more_anchor = '['._('More:').']';
+	}
+
 	global $id,$postdata,$more,$c,$withcomments,$page,$pages,$multipage,$numpages;
 	global $preview, $use_extra_path_info;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	$output = '';
 	if ($more_file != '') {
 		$file=$more_file;
@@ -329,7 +339,9 @@ function get_the_content($more_link_text='[...] Read More!', $stripteaser=0, $mo
 	{
 		if ($more) 
 		{	// Viewer has already asked for more
+			if( !empty($more_anchor) ) $output .= $before_more_link;
 			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor.$content[1];
+			if( !empty($more_anchor) )  $output .= $after_more_link;
 		} 
 		else 
 		{ // We are offering to read more
@@ -398,7 +410,7 @@ function the_language()
 {
 	global $postdata, $languages;
 	$post_lang = $postdata['Lang'];
-	echo $languages[ $post_lang ][0];
+	echo $languages[ $post_lang ];
 }
 
 
@@ -461,10 +473,12 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
 /*
  * single_post_title(-)
  *
- *
+ * fplanque: 0.8.3: changed defaults
  */
-function single_post_title($prefix = '', $display = 'htmlhead' ) 
+function single_post_title($prefix = '#', $display = 'htmlhead' ) 
 {
+	if( $prefix == '#' ) $prefix = ' '._('Post details').': ';
+
 	global $p;
 	if (intval($p)) {
 		$post_data = get_postdata($p);
@@ -484,7 +498,7 @@ function single_post_title($prefix = '', $display = 'htmlhead' )
 /*
  * the_content(-)
  */
-function the_content( $more_link_text='[...] Read More!', $stripteaser=0, $more_file='',$more_anchor='', $before_more_link = '<p class="bMore">', $after_more_link = '</p>', $format = 'htmlbody', $cut = 0) 
+function the_content( $more_link_text='#', $stripteaser=0, $more_file='', $more_anchor='#', $before_more_link = '<p class="bMore">', $after_more_link = '</p>', $format = 'htmlbody', $cut = 0) 
 {
 	$content = get_the_content($more_link_text,$stripteaser,$more_file,$more_anchor,$before_more_link, $after_more_link);
 	$content = format_to_output( $content, $format );
@@ -512,11 +526,13 @@ function the_content( $more_link_text='[...] Read More!', $stripteaser=0, $more_
  *
  *
  */
-function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='next page', $previouspagelink='previous page', $pagelink='%', $more_file='') 
+function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='') 
 {
+	if( $nextpagelink == '#' ) $nextpagelink = _('Next page');
+	if( $previouspagelink == '#' ) $previouspagelink = _('Previous page');
+
 	global $id,$page,$numpages,$multipage,$more;
 	global $blogfilename;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if ($more_file != '') {
 		$file = $more_file;
 	} else {
@@ -529,7 +545,7 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 				$j=str_replace('%',"$i",$pagelink);
 				echo " ";
 				if (($i != $page) || ((!$more) && ($page==1)))
-					echo '<a href="'.get_bloginfo('blogurl').$querystring_start.'p'.$querystring_equal.$id.$querystring_separator.'more'.$querystring_equal.'1'.$querystring_separator.'page'.$querystring_equal.$i.'">';
+					echo '<a href="'.get_bloginfo('blogurl').'?p='.$id.'&amp;more=1&amp;page='.$i.'">';
 				echo $j;
 				if (($i != $page) || ((!$more) && ($page==1)))
 					echo '</a>';
@@ -537,10 +553,10 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 		} else {
 			$i=$page-1;
 			if ($i)
-				echo ' <a href="'.$file.$querystring_start.'p'.$querystring_equal.$id.$querystring_separator.'page'.$querystring_equal.$i.'">'.$previouspagelink.'</a>';
+				echo ' <a href="'.$file.'?p='.$id.'&amp;page='.$i.'">'.$previouspagelink.'</a>';
 			$i=$page+1;
 			if ($i<=$numpages)
-				echo ' <a href="'.$file.$querystring_start.'p'.$querystring_equal.$id.$querystring_separator.'page'.$querystring_equal.$i.'">'.$nextpagelink.'</a>';
+				echo ' <a href="'.$file.'?p='.$id.'&amp;page='.$i.'">'.$nextpagelink.'</a>';
 		}
 		echo $after;
 	}
@@ -552,11 +568,12 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
  *
  *
  */
-function previous_post($format='%', $previous='previous post: ', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='') 
+function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='') 
 {
+	if( $previous == '#' ) $previous = _('Previous post') . ': ';
+
 	global $tableposts, $id, $postdata, $siteurl, $blogfilename, $querycount;
 	global $p, $posts, $posts_per_page, $s;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 
 	if(($p) || ($posts==1)) 
 	{
@@ -587,7 +604,7 @@ function previous_post($format='%', $previous='previous post: ', $title='yes', $
 			$p_info = mysql_fetch_object($query);
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;
-			$string = '<a href="'.get_bloginfo('blogurl').$querystring_start.'p'.$querystring_equal.$p_id.$querystring_separator.'more'.$querystring_equal.'1'.$querystring_separator.'c'.$querystring_equal.'1">'.$previous;
+			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$previous;
 			if (!($title!='yes')) {
 				$string .= stripslashes($p_title);
 			}
@@ -604,11 +621,12 @@ function previous_post($format='%', $previous='previous post: ', $title='yes', $
  *
  *
  */
-function next_post($format='%', $next='next post: ', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='') 
+function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='') 
 {
+	if( $next == '#' ) $next = _('Next post') . ': ';
+
 	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount;
 	global $time_difference;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if(($p) || ($posts==1)) 
 	{
 		
@@ -640,7 +658,7 @@ function next_post($format='%', $next='next post: ', $title='yes', $in_same_cat=
 			$p_info = mysql_fetch_object($query);
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;
-			$string = '<a href="'.get_bloginfo('blogurl').$querystring_start.'p'.$querystring_equal.$p_id.$querystring_separator.'more'.$querystring_equal.'1'.$querystring_separator.'c'.$querystring_equal.'1">'.$next;
+			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$next;
 			if ($title=='yes') {
 				$string .= stripslashes($p_title);
 			}
@@ -661,14 +679,13 @@ function next_post($format='%', $next='next post: ', $title='yes', $in_same_cat=
 function next_posts($max_page = 0, $page='' )
 {
 	global $p, $paged, $what_to_show;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if (empty($p) && ($what_to_show == 'paged')) 
 	{
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
 		if (!$max_page || $max_page >= $nextpage) 
 		{
-			echo regenerate_url( 'paged', 'paged'.$querystring_equal.$nextpage, $page );
+			echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
 		}
 	}
 }
@@ -683,12 +700,11 @@ function next_posts($max_page = 0, $page='' )
 function previous_posts( $page='' ) 
 {
 	global $p, $paged, $what_to_show;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if (empty($p) && ($what_to_show == 'paged'))
 	{
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
-		echo regenerate_url( 'paged', 'paged'.$querystring_equal.$nextpage, $page );
+		echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
 	}
 } 
 
@@ -698,8 +714,10 @@ function previous_posts( $page='' )
  *
  *
  */
-function next_posts_link($label='Next Page >>', $max_page=0, $page='') 
+function next_posts_link($label='#', $max_page=0, $page='') 
 {
+	if( $label == '#' ) $label = _('Next Page').' >>';
+
 	global $p, $paged, $result, $request, $posts_per_page, $what_to_show;
 	if ($what_to_show == 'paged') 
 	{
@@ -723,8 +741,10 @@ function next_posts_link($label='Next Page >>', $max_page=0, $page='')
  *
  *
  */
-function previous_posts_link($label='<< Previous Page', $page='') 
+function previous_posts_link($label='#', $page='') 
 {
+	if( $label == '#' ) $label = '<< '._('Previous Page');
+
 	global $p, $paged, $what_to_show;
 	if (empty($p)  && ($paged > 1) && ($what_to_show == 'paged')) 
 	{
@@ -741,7 +761,7 @@ function previous_posts_link($label='<< Previous Page', $page='')
  *
  *
  */
-function posts_nav_link($sep=' :: ', $prelabel='<< Previous Page', $nxtlabel='Next Page >>', $page='') 
+function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='') 
 {
 	global $request, $p, $what_to_show;
 	if( !empty( $request ) && empty($p) && ($what_to_show == 'paged')) 
@@ -773,15 +793,15 @@ function posts_nav_link($sep=' :: ', $prelabel='<< Previous Page', $nxtlabel='Ne
  */
 function the_date($d='', $before='', $after='', $echo = 1) 
 {
-	global $id, $postdata, $day, $previousday, $dateformat, $newday;
+	global $id, $postdata, $day, $previousday, $newday;
 	$the_date = '';
 	if ($day != $previousday) 
 	{
 		$the_date .= $before;
 		if ($d=='') {
-			$the_date .= mysql2date($dateformat, $postdata['Date']);
+			$the_date .= mysql2date( locale_datefmt(), $postdata['Date']);
 		} else {
-			$the_date .= mysql2date($d, $postdata['Date']);
+			$the_date .= mysql2date( $d, $postdata['Date']);
 		}
 		$the_date .= $after;
 		$previousday = $day;
@@ -800,12 +820,12 @@ function the_date($d='', $before='', $after='', $echo = 1)
  */
 function the_time($d='', $echo = 1, $useGM = 0)
 {
-	global $id,$postdata,$timeformat;
+	global $id,$postdata;
 	if ($d=='') 
 	{
-		$the_time = mysql2date($timeformat, $postdata['Date'], 1, $useGM);
+		$the_time = mysql2date( locale_timefmt(), $postdata['Date'], 1, $useGM);
 	} else {
-		$the_time = mysql2date($d, $postdata['Date'], 1, $useGM);
+		$the_time = mysql2date( $d, $postdata['Date'], 1, $useGM);
 	}
 
 	if ($echo) 
@@ -824,7 +844,7 @@ function the_time($d='', $echo = 1, $useGM = 0)
 function the_weekday() 
 {
 	global $weekday,$id,$postdata;
-	$the_weekday = $weekday[mysql2date('w', $postdata['Date'])];
+	$the_weekday = _($weekday[mysql2date('w', $postdata['Date'])]);
 	echo $the_weekday;
 }
 
@@ -839,7 +859,7 @@ function the_weekday_date($before='',$after='')
 	$the_weekday_date = '';
 	if ($day != $previousweekday) {
 		$the_weekday_date .= $before;
-		$the_weekday_date .= $weekday[mysql2date('w', $postdata['Date'])];
+		$the_weekday_date .= _($weekday[mysql2date('w', $postdata['Date'])]);
 		$the_weekday_date .= $after;
 		$previousweekday = $day;
 	}
@@ -1030,7 +1050,6 @@ function gen_permalink(
 	$use_pingback = NULL )
 {
 	global $cacheweekly, $use_extra_path_info;
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	global $permalink_include_more, $permalink_include_comments;
 	global $permalink_include_trackback,$permalink_include_pingback;
 
@@ -1042,7 +1061,7 @@ function gen_permalink(
 	if (empty($use_destination)) $use_destination = $permalink_destination;
 	if ($use_destination=='archive') $use_destination = get_settings('archive_mode');
 	if (empty($use_more)) $use_more = $permalink_include_more;
-	if (empty($use_comments)) $use_comments = permalink_include_comments;
+	if (empty($use_comments)) $use_comments = $permalink_include_comments;
 	if (empty($use_trackback)) $use_trackback = $permalink_include_trackback;
 	if (empty($use_pingback)) $use_pingback = $permalink_include_pingback;
 
@@ -1064,27 +1083,28 @@ function gen_permalink(
 	{	// We reference by Query: Dirty but explicit permalinks
 
 		// Generate options
+		$options = '';
 		if( $use_more )
 		{ // permalinks to include full post text
-			$options .=  $querystring_separator.'more'.$querystring_equal.'1';
+			$options .=  '&amp;more=1';
 		}
 		if( $use_comments )
 		{ // permalinks to include comments
-			$options .=  $querystring_separator.'c'.$querystring_equal.'1';
+			$options .=  '&amp;c=1';
 		}
 		if( $use_trackback )
 		{ // permalinks to include trackbacks
-			$options .=  $querystring_separator.'tb'.$querystring_equal.'1';
+			$options .=  '&amp;tb=1';
 		}
 		if( $use_pingback )
 		{ // permalinks to include pingbacks
-			$options .=  $querystring_separator.'pb'.$querystring_equal.'1';
+			$options .=  '&amp;pb=1';
 		}
 
 		switch($use_destination) 
 		{
 			case 'monthly':
-				$permalink = $file.$querystring_start.'m'.$querystring_equal.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).$options.'#'.$anchor;
+				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).$options.'#'.$anchor;
 				break;
 			case 'weekly':
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) {
@@ -1093,15 +1113,15 @@ function gen_permalink(
 					$row = mysql_fetch_row($result);
 					$cacheweekly[$postdata['Date']] = $row[0];
 				}
-				$permalink = $file.$querystring_start.'m'.$querystring_equal.substr($postdata['Date'],0,4).$querystring_separator.'w'.$querystring_equal.$cacheweekly[$postdata['Date']].$options.'#'.$anchor;
+				$permalink = $file.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].$options.'#'.$anchor;
 				break;
 			case 'daily':
-				$permalink = $file.$querystring_start.'m'.$querystring_equal.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).$options.'#'.$anchor;
+				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).$options.'#'.$anchor;
 				break;
 			case 'postbypost':
 			case 'single':
 			default:
-				$permalink = $file.$querystring_start.'p'.$querystring_equal.$id.$options;
+				$permalink = $file.'?p='.$id.$options;
 				break;
 		}
 	}
@@ -1172,7 +1192,6 @@ function permalink_single($file='')
  */
 function full_post_link( $id, $file='' ) 
 {
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
 	echo gen_permalink(	$file, $id,	'id', 'single',	true, true, true, true );

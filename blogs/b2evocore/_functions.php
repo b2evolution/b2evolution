@@ -8,22 +8,6 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-if (!isset($querystring_start))
-{
-	$querystring_start = '?';
-	$querystring_equal = '=';
-	$querystring_separator = '&amp;';
-}
-
-if (!function_exists('_'))
-{
-	function _($string)
-	{
-		return $string;
-	}
-}
-
-
 require_once (dirname(__FILE__)."/_functions_cats.php");
 require_once (dirname(__FILE__)."/_functions_blogs.php");
 require_once (dirname(__FILE__)."/_functions_bposts.php");
@@ -42,8 +26,6 @@ if( $use_textile ) require_once (dirname(__FILE__).'/_functions_textile.php');
 
 /* functions... */
 
-
-
 /*
  * dbconnect(-)
  */
@@ -51,18 +33,21 @@ function dbconnect()
 {
 	global $connexion, $dbhost, $dbusername, $dbpassword, $dbname;
 
-	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword) or die("Can't connect to the database server. MySQL said:<br />".mysql_error());
+	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword) or die( _('Can\'t connect to the database server. MySQL said:').'<br />'.mysql_error());
 
-	$connexionbase = mysql_select_db("$dbname") or die("Can't connect to the database $base. MySQL said:<br />".mysql_error());
+	$connexionbase = mysql_select_db( $dbname ) or die( sprintf(_('Can\'t connect to the database %s. MySQL said:'), $base).'<br />'.mysql_error());
 
 	return(($connexion && $connexionbase));
 }
 
 
+/*
+ * mysql_oops(-)
+ */
 function mysql_oops($sql_query)
 {
-	$error  = '<p class="error">Oops, MySQL error!</p>';
-	$error .= '<p>Your query:<br /><code>'.$sql_query.'</code></p>';		// fplanque corrected stupid bug
+	$error  = '<p class="error">'._('Oops, MySQL error!').'</p>';
+	$error .= '<p>Your query:<br /><code>'.$sql_query.'</code></p>';
 	$error .= '<p>MySQL said:<br /><code>'.mysql_error().'</code></p>';
 	die($error);
 }
@@ -146,7 +131,7 @@ function format_to_edit($content)
 	$content = stripslashes($content);
 	if ($autobr)
 	{
-		//echo "unBR<br>";
+		//echo "unBR</strong>";
 		$content = unautobrize($content);
 	}
 
@@ -468,8 +453,8 @@ function mysql2date($dateformatstring, $mysqlstring, $use_b2configmonthsdays = 1
 	{	// We want default timezone time:
 		if (!empty($month) && !empty($weekday) && $use_b2configmonthsdays)
 		{
-			$datemonth = $month[date('m', $i)];
-			$dateweekday = $weekday[date('w', $i)];
+			$datemonth =_( $month[date('m', $i)]);
+			$dateweekday = _($weekday[date('w', $i)]);
 			$dateformatstring = ' '.$dateformatstring;
 			$dateformatstring = preg_replace("/([^\\\])D/", "\\1".backslashit(substr($dateweekday, 0, 3)), $dateformatstring);
 			$dateformatstring = preg_replace("/([^\\\])F/", "\\1".backslashit($datemonth), $dateformatstring);
@@ -494,8 +479,8 @@ function date_i18n($dateformatstring, $unixtimestamp) {
 	global $month, $weekday;
 	$i = $unixtimestamp;
 	if ((!empty($month)) && (!empty($weekday))) {
-		$datemonth = $month[date('m', $i)];
-		$dateweekday = $weekday[date('w', $i)];
+		$datemonth = _($month[date('m', $i)]);
+		$dateweekday = _($weekday[date('w', $i)]);
 		$dateformatstring = ' '.$dateformatstring;
 		$dateformatstring = preg_replace("/([^\\\])D/", "\\1".backslashit(substr($dateweekday, 0, 3)), $dateformatstring);
 		$dateformatstring = preg_replace("/([^\\\])F/", "\\1".backslashit($datemonth), $dateformatstring);
@@ -573,7 +558,7 @@ function get_settings($setting)
 	if ((empty($cache_settings)) OR (!$use_cache))
 	{
 		$sql = "SELECT * FROM $tablesettings";
-		$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
+		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++;
 		$myrow = mysql_fetch_object($result);
 		$cache_settings = $myrow;
@@ -588,43 +573,13 @@ function get_settings($setting)
 
 
 
-/*
- * gzip_compression(-)
- * Activate gzip compression if supported by this install of PHP
- */
-function gzip_compression()
-{
-	global $gzip_compressed;
-	if (!$gzip_compressed)
-	{
-		$phpver = phpversion(); //start gzip compression
-		if($phpver >= "4.0.4pl1")
-		{
-			if(extension_loaded("zlib"))
-			{
-				ob_start("ob_gzhandler");
-			}
-		}
-		else if($phpver > "4.0")
-		{
-			if(strstr($HTTP_SERVER_VARS['HTTP_ACCEPT_ENCODING'], 'gzip')) {
-				if(extension_loaded("zlib"))
-				{
-					$do_gzip_compress = TRUE;
-					ob_start();
-					ob_implicit_flush(0);
-					header("Content-Encoding: gzip");
-				}
-			}
-		} //end gzip compression - that piece of script courtesy of the phpBB dev team
-		$gzip_compressed=1;
-	}
-}
 
-function alert_error($msg) { // displays a warning box with an error message (original by KYank)
+function alert_error($msg) 
+{ // displays a warning box with an error message (original by KYank)
 	global $$HTTP_SERVER_VARS;
+	global $default_language;
 	?>
-	<html>
+	<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<head>
 	<script language="JavaScript">
 	<!--
@@ -636,14 +591,15 @@ function alert_error($msg) { // displays a warning box with an error message (or
 	<body>
 	<!-- this is for non-JS browsers (actually we should never reach that code, but hey, just in case...) -->
 	<?php echo $msg; ?><br />
-	<a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>">go back</a>
+	<a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>"><?php echo _('go back') ?></a>
 	</body>
 	</html>
 	<?php
 	exit;
 }
 
-function alert_confirm($msg) { // asks a question - if the user clicks Cancel then it brings them back one page
+function alert_confirm($msg) 
+{ // asks a question - if the user clicks Cancel then it brings them back one page
 	?>
 	<script language="JavaScript">
 	<!--
@@ -665,9 +621,9 @@ function redirect_js($url,$title="...") {
 	setTimeout("redirect();", 100);
 	//-->
 	</script>
-	<p>Redirecting you : <b><?php echo $title; ?></b><br />
+	<p><?php echo _('Redirecting you to:') ?> <strong><?php echo $title; ?></strong><br />
 	<br />
-	If nothing happens, click <a href="<?php echo $url; ?>">here</a>.</p>
+	<?php printf( _('If nothing happens, click <a %s>here</a>.'), ' href="'.$url.'"' ); ?></p>
 	<?php
 	exit();
 }
@@ -953,7 +909,7 @@ function set_param(
 		}
 		elseif( $default === true )
 		{
-			die( "Parameter $var is required!" );
+			die( sprintf( _('Parameter %s is required!'), $var ) );
 		}
 		else
 		{
@@ -1001,7 +957,6 @@ function set_param(
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 {
-	global $querystring_start, $querystring_equal, $querystring_separator;
 	global $global_param_list;
 
 	if( !is_array($ignore) )
@@ -1036,7 +991,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 				{	// It's worthwhile retransmitting the catsels
 					foreach( $catsel as $value )
 					{
-						$params[] = 'catsel%5B%5D'.$querystring_equal.$value;
+						$params[] = 'catsel%5B%5D='.$value;
 					}
 				}
 				break;
@@ -1049,7 +1004,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 				{
 					foreach( $show_status as $value )
 					{
-						$params[] = 'show_status%5B%5D'.$querystring_equal.$value;
+						$params[] = 'show_status%5B%5D='.$value;
 					}
 				}
 				break;
@@ -1061,7 +1016,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 				$value = $$var;
 				if( !empty($value) && ($value != $defval) )
 				{ // Value exists and is not set to default value:
-					$params[] = $var.$querystring_equal.$value;
+					$params[] = $var.'='.$value;
 				}
 			}
 		}
@@ -1073,11 +1028,11 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 		$params = array_merge( $params, $set );
 	}
 
-	$url = (empty($pagefileurl)) ? get_bloginfo(url) : $pagefileurl;
+	$url = (empty($pagefileurl)) ? get_bloginfo('url') : $pagefileurl;
 
 	if( ! empty( $params ) )
 	{
-		$url .= $querystring_start.implode( $querystring_separator, $params );
+		$url .= '?'.implode( '&amp;', $params );
 	}
 
 

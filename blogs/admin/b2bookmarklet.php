@@ -7,12 +7,13 @@ $standalone = 1;
 require(dirname(__FILE__)."/b2header.php");
 
 if ($user_level == 0)
-die ("Cheatin' uh ?");
+die( _('Cheatin\' uh ?') );
 
 if ($a=="b") 
 {
-?><html>
+?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <script language="javascript">
 <!--
 window.close()
@@ -24,9 +25,10 @@ window.close()
 } 
 else
 {
-?><html>
+?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<title>b2evo &gt; bookmarklet</title>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+<title><?php echo _('b2evo') ?> &gt; <?php echo _('bookmarklet') ?></title>
 <link rel="stylesheet" href="b2.css" type="text/css">
 <?php
 if ($use_spellchecker) {
@@ -156,9 +158,9 @@ if (($is_gecko) && (!isset($Gecko_bookmarklet_fix))) {
 <td width="40">&nbsp;</td>
 <td align="left" width="100%">
 <table cellspacing="0" cellpadding="0">
-<td height="50" width="250" align="left" valign="bottom"><b>Title</b><br />
+<td height="50" width="250" align="left" valign="bottom"><strong>Title</strong><br />
 <input type="text" name="post_title" size="20" tabindex="1" style="width: 215px;" value="<?php echo stripslashes($popuptitle) ?>" /></td>
-<td width="165" align="left" valign="bottom"><b>Category</b><br /><?php dropdown_categories(); ?></td>
+<td width="165" align="left" valign="bottom"><strong><?php echo _('Category') ?>:</strong><br /><?php dropdown_categories(); ?></td>
 </table>
 </td>
 </tr>
@@ -166,7 +168,7 @@ if (($is_gecko) && (!isset($Gecko_bookmarklet_fix))) {
 <td width="40">&nbsp;</td>
 <td align="left" height="40">
 <table width="100%" cellpadding="0" cellspacing="0">
-<td align="left" valign="bottom"><b>Post</b></td>
+<td align="left" valign="bottom"><strong>Post</strong></td>
 <td align="right" valign="bottom"><?php if ($use_quicktags) include($b2inc."/_quicktags.php"); ?></td>
 </table>
 <?php
@@ -190,11 +192,11 @@ preg_match("/\%u[1-9A-F][1-9A-F][1-9A-F][1-9A-F]/is", $text, $stufftofix);
 
 <table cellpadding="0" cellspacing="0">
 <td align="left" width="90">
-<input type="checkbox" name="post_autobr" value="1" <?php if ($autobr) echo " checked" ?> tabindex="4" class="checkbox" id="autobr" /><label for="autobr"> Auto-BR</label>
+<input type="checkbox" name="post_autobr" value="1" <?php if ($autobr) echo " checked" ?> tabindex="4" class="checkbox" id="autobr" /><label for="autobr"> <?php echo _('Auto-BR') ?></label>
 </td>
 <?php if ($pingback) { ?>
 <td align="left">
-<input type="checkbox" class="checkbox" name="post_pingback" value="1" checked="checked" tabindex="7" id="pingback" /><label for="pingback"> PingBack</label>
+<input type="checkbox" class="checkbox" name="post_pingback" value="1" checked="checked" tabindex="7" id="pingback" /><label for="pingback"> <?php echo _('Pingback') ?></label>
 </td>
 <?php } ?>
 </table>
@@ -203,16 +205,16 @@ preg_match("/\%u[1-9A-F][1-9A-F][1-9A-F][1-9A-F]/is", $text, $stufftofix);
 <input type="button" value="preview" onclick="preview(this.form);" class="search" tabindex="8" />
 <?php } ?>
 
-<input type="submit" name="submit" value="Blog this !" class="search" tabindex="3" /> 
+<input type="submit" name="submit" value="<?php echo _('Blog this !') ?>" class="search" tabindex="3" /> 
 
 <?php if ($use_spellchecker) { ?>
 <!--<input type = "button" value = "Spell Check" onclick="var f=document.forms[0]; doSpell( 'en', f.post_content, '<?php echo $spellchecker_url ?>/sproxy.cgi', true);" class="search" tabindex="5" />-->
-<input type="button" value="Spellcheck" onclick="DoSpell
+<input type="button" value="<?php echo _('Spellcheck') ?>" onclick="DoSpell
 ('post','content','');" class="search" />
 <?php } ?>
 
 <?php if ( ($use_fileupload) && ($user_level >= $fileupload_minlevel) && ((ereg(" ".$user_login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)=="")) ) { ?>
-<input type="button" value="upload a file" onclick="launchupload();" class="search" />
+<input type="button" value="<?php echo _('upload a file/image') ?>" onclick="launchupload();" class="search" />
 <?php } ?>
 
 <script language="JavaScript">
@@ -227,7 +229,7 @@ window.focus();
 <tr>
 <td width="40">&nbsp;</td>
 <td align="left" height="40">
-<b>TrackBack</b> an URL:<br />
+<?php echo _('<strong>Trackback</strong> an URL:') ?><br />
 <input type="text" name="trackback_url" style="width: 415px" />
 </td>
 </tr>

@@ -13,18 +13,18 @@ require_once (dirname(__FILE__)."/$pathcore_out/conf/b2evo_stats.php");
 //get most linked to pages on site
 //select count(visitURL) as count, visitURL from b2hitlog group by visitURL order by count desc
 
-if ($refererList)
+/*if ($refererList)
 {
-	print "referers:<BR>";
+	print "referers:<br />";
 	$ar = refererList($refererList,"global");
-	print join("<BR>",$ar);
+	print join("<br />",$ar);
 }
 
 if ($topRefererList)
 {
-	print join("<br>",topRefererList($topRefererList,"global"));
+	print join("<br />",topRefererList($topRefererList,"global"));
 }
-
+*/
 
 function dbg($string)
 {
@@ -61,7 +61,7 @@ function log_hit()
 	if ($UserAgent != strip_tags($UserAgent))
 	{ //then they have tried something funny,
 		//putting HTML or PHP into the HTTP_REFERER
-		dbg("bad char in User Agent");
+		dbg(_("bad char in User Agent"));
 		$UserAgent = "";
 	}
 
@@ -90,7 +90,7 @@ function log_hit()
 			if ( ($user_agent[0]=='robot') && (strstr($UserAgent, $user_agent[1])) )
 			{
 				$ignore = "robot";
-				dbg("referer ignored (robot)");
+				dbg( _('referer ignored'). " (". _('robot'). ")");
 				break;
 			}
 		}
@@ -101,7 +101,7 @@ function log_hit()
 		if( strlen($ref) < 13 )
 		{	// minimum http://az.fr/
 			$ignore = "invalid";
-			dbg("referer ignored (invalid)");
+			dbg( _('referer ignored'). " (". _('invalid'). ")");
 		}
 		else
 		{	// SEARCH BLACKLIST	
@@ -110,7 +110,7 @@ function log_hit()
 				if (stristr($ref, $site))
 				{
 					$ignore = "blacklist";
-					dbg("referer ignored (BL)");
+					dbg( _('referer ignored'). " (". _('BlackList'). ")");
 					break;
 				}
 			}
@@ -126,7 +126,7 @@ function log_hit()
 			if (stristr($ref, $engine))
 			{
 				$ignore = "search";
-				dbg("referer ignored (search engine)");
+				dbg( _('referer ignored'). " (". _('search engine'). ")");
 				break;
 			}
 		}
@@ -137,7 +137,7 @@ function log_hit()
 	if ($doubleCheckReferers)
 	{
 
-		dbg("loading referering page");
+		dbg(_('loading referering page'));
 
 		//this is so that the page up until the call to
 		//logReferer will get shown before it tries to check
@@ -156,14 +156,14 @@ function log_hit()
 			}
 			if (strstr($page,$fullCurrentURL))
 			{
-				dbg("found current url in page");
+				dbg(_('found current url in page'));
 				$goodReferer = 1;
 			}
 		}
 
 		if(!$goodReferer)
 		{
-			dbg("did not find \n\n:$fullCurrentURL:\n in \n\n\n :$page: \n\n\n");
+			dbg( sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
 			$ref="";
 			//return;
 		}
@@ -407,7 +407,7 @@ function stats_search_keywords()
 	$ref = $row_stats['referingURL'];
 	if( ($pos_question = strpos( $ref, '?' )) == false )
 	{
-		echo "[not a query - no params!]";
+		echo '[', _('not a query - no params!'), ']';
 		return;
 	}
 	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
@@ -432,7 +432,7 @@ function stats_search_keywords()
 			return;
 		}
 	}
-	echo "[no query string!]";
+	echo '[', _('no query string found'), ']';
 }
 
 /*

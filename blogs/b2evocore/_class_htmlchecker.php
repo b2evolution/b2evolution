@@ -110,7 +110,7 @@ class SafeHtmlChecker
         if ($tag == 'body') 
 				{
 						if( count($this->stack) > 0 )
-							$this->html_error(  "Tag <code>body</code> can only by used once!" );
+							$this->html_error( _('Tag <code>body</code> can only be used once!') );
             $this->stack[] = $tag;
             return;
         }
@@ -123,23 +123,23 @@ class SafeHtmlChecker
         }
         // Is tag a legal tag?
         if (!in_array($tag, array_keys($this->tags))) {
-            $this->html_error(  "Illegal tag: <code>$tag</code>" );
+            $this->html_error(  _('Illegal tag'). ": <code>$tag</code>" );
             $this->stack[] = $tag;
             return;
         }
         // Is tag allowed in the current context?
         if (!in_array($tag, explode(' ', $this->tags[$previous]))) {
             if ($previous == 'body') {
-                $this->html_error(  "Tag <code>$tag</code> must occur inside another tag" );
+                $this->html_error(  sprintf( _('Tag %s must occur inside another tag'), '<code>'.$tag.'</code>' ) );
             } else {
-                $this->html_error(  "Tag <code>$tag</code> is not allowed within tag <code>$previous</code>" );
+                $this->html_error(  sprintf( _('Tag %s is not allowed within tag %s'), '<code>'.$tag.'</code>', '<code>'.$previous.'</code>') );
             }
         }
         // Are tag attributes valid?
         foreach ($attrs as $attr => $value) 
 				{
             if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag]))) {
-                $this->html_error(  "Tag <code>$tag</code> may not have attribute <code>$attr</code>" );
+                $this->html_error( sprintf( _('Tag %s may not have attribute %s'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
             }
 						if (in_array($attr, $this->uri_attrs)) 
 						{	// Must this attribute be checked for URIs
@@ -147,7 +147,7 @@ class SafeHtmlChecker
 							$value = trim($value);
 							if( !validate_url( $value, $this->allowed_uri_scheme ) )
 							{
-								$this->html_error( "<code>$attr</code> attributes may not contain the <code>$scheme:</code> protocol" );
+								$this->html_error( sprintf( _('%s attributes may not contain the %s protocol'), '<code>'.$attr.'</code>', '<code>'.$scheme.':</code>') );
 							}
 						}
         }
@@ -170,7 +170,7 @@ class SafeHtmlChecker
         }
         if (trim($cdata) != '') {
             if (!in_array('#PCDATA', explode(' ', $this->tags[$previous]))) {
-                $this->html_error(  "Tag <code>$previous</code> may not contain raw character data" );
+                $this->html_error(  sprintf( _('Tag %s may not contain raw character data'), '<code>'.$previous.'</code>' ) );
             }
         }
     }

@@ -213,7 +213,7 @@ $b2_getPostURL_doc = 'Given a blog ID, username, password, and a post ID, return
 function b2_getPostURL($m)
 {
 	global $xmlrpcerruser;
-	global $siteurl, $querystring_start, $querystring_equal, $querystring_separator;
+	global $siteurl;
 
 	dbconnect();
 
@@ -254,10 +254,10 @@ function b2_getPostURL($m)
 			switch($archive_mode)
 			{
 				case 'daily':
-					$post_URL = $blog_URL.$querystring_start.'m'.$querystring_equal.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$title;
+					$post_URL = $blog_URL.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$title;
 					break;
 				case 'monthly':
-					$post_URL = $blog_URL.$querystring_start.'m'.$querystring_equal.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$title;
+					$post_URL = $blog_URL.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$title;
 					break;
 				case 'weekly':
 					if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) {
@@ -266,10 +266,10 @@ function b2_getPostURL($m)
 						$row = mysql_fetch_row($result);
 						$cacheweekly[$postdata['Date']] = $row[0];
 					}
-					$post_URL = $blog_URL.$querystring_start.'m'.$querystring_equal.substr($postdata['Date'],0,4).$querystring_separator.'w'.$querystring_equal.$cacheweekly[$postdata['Date']].'#'.$title;
+					$post_URL = $blog_URL.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$title;
 					break;
 				case 'postbypost':
-					$post_URL = $blog_URL.$querystring_start.'p'.$querystring_equal.$post_ID;
+					$post_URL = $blog_URL.'?p='.$post_ID;
 					break;
 			}
 		} else {
@@ -381,7 +381,7 @@ function bloggernewpost($m)
 		return new xmlrpcresp(new xmlrpcval("$post_ID"));
 
 	} else {
-		logIO("O","Wrong username/password combination <b>$username / $password</b>");
+		logIO("O","Wrong username/password combination <strong>$username / $password</strong>");
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
            'Wrong username/password combination '.$username.' / '.starify($password));
 	}
@@ -957,7 +957,7 @@ function bloggersettemplate($m) {
 
 
 
-/**** PingBack functions ****/
+/**** Pingback functions ****/
 
 function strip_all_but_one_link($text, $mylink, $log)
 {
@@ -1153,15 +1153,15 @@ function pingback_ping($m) {
 							$postdata = get_postdata($post_ID);
 							$authordata = get_userdata($postdata['Author_ID']);
 							$recipient = $authordata['user_email'];
-							$subject = "Pingback on post #$post_ID \"".$postdata['Title'].'"';
+							$subject = sprintf( N_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
 							// fplanque added:
 							$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 	
-							$notify_message  = "New pingback on your post #$post_ID.\n";
+							$notify_message  = sprintf( N_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$post_ID."&pb=1\n\n";
-							$notify_message .= "Website: $original_title\n";
-							$notify_message .= "Url    : $original_pagelinkedfrom\n";
-							$notify_message .= "Excerpt: \n[...] $original_context [...]\n\n";
+							$notify_message .= N_('Website'). ": $original_title\n";
+							$notify_message .= N_('Url'). "    : $original_pagelinkedfrom\n";
+							$notify_message .= N_('Excerpt'). ": \n[...] $original_context [...]\n\n";
 	
 							@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
 	
@@ -1184,7 +1184,7 @@ function pingback_ping($m) {
 	return new xmlrpcresp(new xmlrpcval($message));
 }
 
-/**** /PingBack functions ****/
+/**** /Pingback functions ****/
 
 
 
@@ -1425,12 +1425,12 @@ $mail_send_sig=array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString,
 													 $xmlrpcString, $xmlrpcString));
 
 $mail_send_doc='mail.send(recipient, subject, text, sender, cc, bcc, mimetype)
-<BR>recipient, cc, and bcc are strings, comma-separated lists of email addresses, as described above.
-<BR>subject is a string, the subject of the message.
-<BR>sender is a string, it\'s the email address of the person sending the message. This string can not be
+<br />recipient, cc, and bcc are strings, comma-separated lists of email addresses, as described above.
+<br />subject is a string, the subject of the message.
+<br />sender is a string, it\'s the email address of the person sending the message. This string can not be
 a comma-separated list, it must contain a single email address only.
 text is a string, it contains the body of the message.
-<BR>mimetype, a string, is a standard MIME type, for example, text/plain.
+<br />mimetype, a string, is a standard MIME type, for example, text/plain.
 ';
 
 // WARNING; this functionality depends on the sendmail -t option
@@ -1594,7 +1594,7 @@ function v1_nestedStruct($m) {
 
 $v1_countTheEntities_sig=array(array($xmlrpcStruct, $xmlrpcString));
 
-$v1_countTheEntities_doc='This handler takes a single parameter, a string, that contains any number of predefined entities, namely &lt;, &gt;, &amp; \' and ".<BR>Your handler must return a struct that contains five fields, all numbers:  ctLeftAngleBrackets, ctRightAngleBrackets, ctAmpersands, ctApostrophes, ctQuotes.';
+$v1_countTheEntities_doc='This handler takes a single parameter, a string, that contains any number of predefined entities, namely &lt;, &gt;, &amp; \' and ".<br />Your handler must return a struct that contains five fields, all numbers:  ctLeftAngleBrackets, ctRightAngleBrackets, ctAmpersands, ctApostrophes, ctQuotes.';
 
 function v1_countTheEntities($m) {
   $sno=$m->getParam(0);

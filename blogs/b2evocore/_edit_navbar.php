@@ -6,7 +6,7 @@
 		<?php	if($previousXend > 0) { ?>
 		<td>
 			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$previousXstart,'postend='.$previousXend), $pagenow); ?>">
-				<input type="submit" name="submitprevious" class="search" value="< Previous <?php echo $posts ?>" />
+				<input type="submit" name="submitprevious" class="search" value="< <?php printf( _('Previous %d'), $posts ) ?>" />
 			</form>
 		</td>
 		<?php	}
@@ -14,7 +14,7 @@
 		<td>
 		
 			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$nextXstart,'postend='.$nextXend), $pagenow); ?>">
-				<input type="submit" name="submitnext" class="search" value="Next <?php echo $posts ?> >" />
+				<input type="submit" name="submitnext" class="search" value="<?php printf( _('Next %d'), $posts ) ?> >" />
 			</form>
 		</td>
 		<?php	}	?>
@@ -26,21 +26,21 @@
 			<form name="showXfirstlastposts" method="get">
 				<input type="hidden" name="blog" value="<?php echo $blog ?>">
 				<input type="text" name="poststart" value="<?php echo $poststart ?>" style="width:40px;" /?>
-				to
+				<?php /* TRANS: x TO y OF z */ echo _(' to ') ?>
 				<input type="text" name="postend" value="<?php echo $postend ?>" style="width:40px;" /?>
-				of <?php echo $MainList->get_total_num_posts() ?>
+				<?php /* TRANS: x TO y OF z */ echo _(' of ') ?> <?php echo $MainList->get_total_num_posts() ?>
 				<select name="order">
 					<option value="DESC" <?php
 					$i = $order;
 					if ($i == "DESC")
 					echo ' selected="selected"';
-					?>>from the end</option>
+					?>><?php echo _('from the end') ?></option>
 					<option value="ASC" <?php
 					if ($i == "ASC")
 					echo ' selected="selected"';
-					?>>from the start</option>
+					?>><?php echo _('from the start') ?></option>
 				</select>
-				<input type="submit" name="submitXtoX" class="search" value="OK" />
+				<input type="submit" name="submitXtoX" class="search" value="<?php echo _('OK') ?>" />
 			</form>
 		</td>
 	</tr>

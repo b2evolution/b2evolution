@@ -9,16 +9,16 @@
 	 */
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php
 		bloginfo('name');
 		single_cat_title( ' - ', 'htmlhead' );
 		single_month_title( ' - ', 'htmlhead' );
 		single_post_title( ' - ', 'htmlhead' );
-		if ($c == "last") echo " - Last comments";
-		if ($stats) echo " - Statistics";
+		if ($c == "last") echo ' - ', _('Last comments');
+		if ($stats) echo ' - ', _('Statistics');
 	?>
 	</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
@@ -40,11 +40,11 @@
 
 <div id=main>
 <h2><?php
-	single_cat_title( " Category: ", 'htmlbody' );
-	single_month_title( " Archives for: ", 'htmlbody' );
-	single_post_title( " Post details: ", 'htmlbody' );
-	if ($c == "last") echo "Last comments";
-	if ($stats) echo "Statistics";
+	single_cat_title();
+	single_month_title();
+	single_post_title();
+	if ($c == "last") echo _('Last comments');
+	if ($stats) echo _('Statistics');
 ?></h2>
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
@@ -61,7 +61,7 @@
 <h3><?php the_date() ?> <a 
 href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&nbsp; 
 
-<h4><?php the_categories( "Browse category", "<strong>", "</strong>", "", "", "<em>", "</em>" ) ?></h4>
+<h4><?php the_categories() ?></h4>
 </div>
 <div class=article>
 	<?php the_content(); ?>
@@ -103,11 +103,11 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 <h4><?php bloginfo('name') ?>&nbsp;:</h4>
 <?php bloginfo('longdesc'); ?>
 <ul>
-	<li><a href="<?php bloginfo('staticurl') ?>"><strong>Recently</strong></a> (cached)</li>
-	<li><a href="<?php bloginfo('dynurl') ?>"><strong>Recently</strong></a> (no cache)</li>
+	<li><a href="<?php bloginfo('staticurl') ?>"><strong><?php echo _('Recently') ?></strong></a><?php echo _('(cached)') ?></li>
+	<li><a href="<?php bloginfo('dynurl') ?>"><strong><?php echo _('Recently') ?></strong></a><?php echo _('(no cache)') ?></li>
 </ul>
 <ul>
-	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong>Last comments</strong></a></li>
+	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong><?php echo _('Last comments') ?></strong></a></li>
 	<li><a href="<?php bloginfo('blogstatsurl') ?>"><strong>Stats</strong></a></li>
 </ul>
 
@@ -133,8 +133,8 @@ for( $curr_blog_ID=blog_list_start('stub');
 <!-- ---------------------------- START OF CATEGORIES ---------------------------- -->
 <form action="<?php bloginfo('blogurl') ?>" method="get">
 <?php	include( dirname(__FILE__)."/_categories.php"); ?>
-<input type="submit" value="Get selection" />
-<input type="reset" />
+<input type="submit" value="<?php echo _('Get selection') ?>" />
+<input type="reset" value="<?php echo _('Reset form') ?>" />
 </form>
 <!-- ----------------------------- END OF CATEGORIES ----------------------------- -->
 </div>
@@ -175,33 +175,33 @@ for( $curr_blog_ID=blog_list_start('stub');
 
 <?php if (! $stats) { ?>
 	
-	<h4>Recent Referers</h4>
+	<h4><?php echo _('Recent Referers') ?></h4>
 	<?php refererList(5,'global',0,0,'no','',($blog>1)?$blog:''); ?>
 	<ul>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 		<?php } // End stat loop ?>
-		<li><a href="<?php bloginfo('blogstatsurl') ?>">more...</a></li>
+		<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo _('more...') ?></a></li>
 	</ul>
 	<br />
-	<h4>Top Referers</h4>
+	<h4><?php echo _('Top Referers') ?></h4>
 	<?php refererList(5,'global',0,0,'no','baseDomain',($blog>1)?$blog:''); ?>
 	<ul>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 		<?php } // End stat loop ?>
-		<li><a href="<?php bloginfo('blogstatsurl') ?>">more...</a></li>
+		<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo _('more...') ?></a></li>
 	</ul>
 
 <?php } ?>
 
-<h4>Blogroll</h4>
+<h4><?php echo _('Blogroll') ?></h4>
 <?php bloginfo('blogroll'); ?>
 
-<h4>Misc</h4>
+<h4><?php echo _('Misc') ?></h4>
 <ul>
-  <li><a href="<?php echo $pathserver?>/b2login.php">login</a> 
-	<li><a href="<?php echo $pathserver?>/b2register.php">register</a></li>
+	<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a></li>
+	<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a></li>
 	<li><a href="<?php bloginfo('rss_url'); ?>">RSS 0.92 (Userland)</a></li>
 	<li><a href="<?php bloginfo('rdf_url'); ?>">RSS 1.0 (RDF)</a></li>
 	<li><a href="<?php bloginfo('rss2_url'); ?>">RSS 2.0 (Userland)</a></li>
@@ -219,7 +219,7 @@ This site works better with web standards! Original skin design courtesy of <a h
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		echo "Totals: $result_num_rows posts - $querycount queries - ".number_format(timer_stop(),3)." seconds";
+		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
 	}
 ?>
 </p>

@@ -128,7 +128,7 @@ class POP3 {
         // Sends the USER command, returns true or false
 
         if( empty($user) ) {
-            $this->ERROR = _("POP3 user:") . ' ' . _("no login ID submitted");
+            $this->ERROR = _("POP3 user:") . ' ' . _('No login ID submitted');
             return false;
         } elseif(!isset($this->FP)) {
             $this->ERROR = _("POP3 user:") . ' ' . _("connection not established");

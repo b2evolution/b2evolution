@@ -37,15 +37,15 @@ set_param( 'comment_cookies', 'integer', 0 );
 
 if ($require_name_email && (empty($author)) )
 { 
-	errors_add( 'Please fill in the name field' );
+	errors_add( _('Please fill in the name field') );
 }
 if ($require_name_email && (empty($email)) )
 { 
-	errors_add( 'Please fill in the email field' );
+	errors_add( _('Please fill in the email field') );
 }
 if( (!empty($email)) && (!is_email($email)) )
 {
-	errors_add( 'Supplied email address is invalid' );
+	errors_add( _('Supplied email address is invalid') );
 }
 $url = ((!stristr($url, '://')) && ($url != '')) ? 'http://'.$url : $url;
 if (strlen($url) < 7) {
@@ -53,7 +53,7 @@ if (strlen($url) < 7) {
 }
 if( ! validate_url( $url, $comments_allowed_uri_scheme) )
 {
-	errors_add( 'Supplied URL is invalid' );
+	errors_add( _('Supplied URL is invalid') );
 }
 
 $user_ip = $REMOTE_ADDR;
@@ -81,7 +81,8 @@ $result = mysql_query($query);
 $ok=1;
 if (!empty($result)) 
 {
-	while($row = mysql_fetch_object($result)) {
+	while($row = mysql_fetch_object($result)) 
+	{
 		$then=$row->comment_date;
 	}
 	$time_lastcomment=mysql2date("U","$then");
@@ -91,11 +92,11 @@ if (!empty($result))
 }
 if( ! $ok ) 
 {
-	errors_add( "You can only post a new comment every 30 seconds" );
+	errors_add( _('You can only post a new comment every 30 seconds.') );
 }
 
-if( errors_display( 'Cannot post comment, please correct these errors:', 
-	'[<a href="javascript:history.go(-1)">Back to comment editing</a>]' ) )
+if( errors_display( _('Cannot post comment, please correct these errors:'), 
+	'[<a href="javascript:history.go(-1)">'._('Back to comment editing').'</a>]' ) )
 {
 	exit();
 }
@@ -103,25 +104,24 @@ if( errors_display( 'Cannot post comment, please correct these errors:',
 /* end flood-protection */
 
 $query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content)  VALUES( $comment_post_ID, 'comment', '$author','$email','$url','$user_ip','$now','$comment' )";
-$result = mysql_query($query);
-if (!$result)
-	die ("There is an error with the database, it can't store your comment...<br>Contact the <a href=\"mailto:$admin_email\">webmaster</a>");
+$result = mysql_query($query) or mysql_oops( $query );
 
 if ($comments_notify) 
-{
+{	
 	$postdata = get_postdata($comment_post_ID);
 	$authordata = get_userdata($postdata["Author_ID"]);
 	$recipient = $authordata["user_email"];
-	$subject = "Comment on post #$comment_post_ID \"".$postdata["Title"]."\"";
+	$subject = sprintf( N_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
 	// fplanque added:
 	$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 
-	$notify_message  = "New comment on your post #$comment_post_ID.\n";
+	// Not translated because sent to someone else...
+	$notify_message  = sprintf( N_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
 	$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$comment_post_ID."&c=1\n\n";
-	$notify_message .= "Author : $comment_author (IP: $user_ip , $user_domain)\n";
-	$notify_message .= "E-mail : $comment_author_email\n";
-	$notify_message .= "Url    : $comment_author_url\n";
-	$notify_message .= "Comment: \n".stripslashes($original_comment)."\n";
+	$notify_message .= N_('Author')." : $comment_author (IP: $user_ip , $user_domain)\n";
+	$notify_message .= N_('Email')."  : $comment_author_email\n";
+	$notify_message .= N_('Url')."    : $comment_author_url\n";
+	$notify_message .= N_('Comment').": \n".stripslashes($original_comment)."\n";
 
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
 
@@ -156,21 +156,21 @@ else
 {	// Erase cookies:
 	if( !empty($_COOKIE[$cookie_name]) ) 
 	{	
-		// echo "del1<br>";
+		// echo "del1<br />";
 		setcookie("comment_author","", $cookie_expired, '/');
 		setcookie("comment_author","", $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 	if( !empty($_COOKIE['comment_author_email']) )
 	{	
-		// echo "del2<br>";
+		// echo "del2<br />";
 		setcookie("comment_author_email","", $cookie_expired, '/');
 		setcookie("comment_author_email","", $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 	if( !empty($_COOKIE['comment_author_url']) )
 	{	
-		// echo "del3<br>";
+		// echo "del3<br />";
 		setcookie("comment_author_url","", $cookie_expired, '/');
 		setcookie("comment_author_url","", $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain);
