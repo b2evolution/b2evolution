@@ -209,7 +209,7 @@ class DataObjectCache
 
 				if( $row = $DB->get_row( $sql ) )
 				{
-					$this->cache[ $row->{$this->dbIDname} ] = new $this->objtype( $row ); // COPY!
+					$this->add( new $this->objtype( $row ) );
 				}
 				else
 				{
@@ -307,6 +307,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/14 21:17:45  blueyed
+ * optimized cache handling
+ *
  * Revision 1.11  2005/02/09 00:27:13  blueyed
  * Removed deprecated globals / userdata handling
  *

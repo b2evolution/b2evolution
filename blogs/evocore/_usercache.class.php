@@ -47,7 +47,7 @@ require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 class UserCache extends DataObjectCache
 {
 	/**
-	 * Cache for login -> ID
+	 * Cache for login -> User object reference
 	 * @access private
 	 * @var array
 	 */
@@ -79,13 +79,6 @@ class UserCache extends DataObjectCache
 	 *
 	 * Does not halt on error.
 	 *
-	 * @todo Daniel, it would be much better if this was carried out the same way as get_by_ID() and if a reference to the
-	 * same User object was stored in the login cache. This would also require overloading the get_by_ID method, but in the
-	 * end this would save 1 query at first request, an dpossibly many more afterwards...
-	 * Francois, IMHO it's ok now. I don't see why I should overload get_by_ID()..
-	 * Daniel, I think my idea was to have get_by_ID set cache_login too, so that you don't query the DB if the user happens to have been cached by get_by_ID before...
-   * However, I think it's even better to only overload add() and make the default DataObjectCache::get_by_ID() call add() instead of writing to ::$cache directly
-	 *
 	 * @return false|User Reference to the user object or false if not found
 	 */
 	function & get_by_login( $login )
@@ -96,8 +89,7 @@ class UserCache extends DataObjectCache
 			global $DB;
 			if( $row = $DB->get_row( 'SELECT * FROM T_users WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
 			{
-				$this->cache[$row->ID] = new User( $row );
-				$this->cache_login[$login] = & $this->cache[$row->ID];
+				$this->add( new User( $row ) );
 			}
 			else
 			{
@@ -113,6 +105,8 @@ class UserCache extends DataObjectCache
 	 * Overload parent's function to also maintain the login cache.
 	 *
 	 * {@internal UserCache::add(-) }}
+	 * @param User
+	 * @return boolean
 	 */
 	function add( & $Obj )
 	{
@@ -133,23 +127,32 @@ class UserCache extends DataObjectCache
 	 * {@internal DataObjectCache::load_list(-) }}
 	 *
 	 * @param integer blog ID to load members for
-	 * @todo write to $cache_login or better: call add()! :)
 	 */
 	function load_blogmembers( $blog_ID )
 	{
 		global $DB, $Debuglog;
 
+		static $alreadyLoaded = array();
+
+		if( isset( $alreadyLoaded[$blog_ID] ) )
+		{
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
+			return false;
+		}
+
+		$alreadyLoaded[$blog_ID] = true;
+
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
 
 		foreach( $DB->get_results( 'SELECT *
-																 FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
+																FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
 																WHERE bloguser_blog_ID = '.$blog_ID.'
 																	AND bloguser_ismember <> 0' ) as $row )
 		{
-			$this->cache[ $row->ID ] = new User( $row ); // COPY!
-			// $obj = $this->cache[ $row->$dbIDname ];
-			// $obj->disp( 'name' );
+			$this->add( new User( $row ) );
 		}
+
+		return true;
 	}
 
 
@@ -212,6 +215,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/14 21:17:54  blueyed
+ * optimized cache handling
+ *
  * Revision 1.9  2005/02/14 14:33:35  fplanque
  * todo..
  *
