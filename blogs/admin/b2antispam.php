@@ -60,7 +60,7 @@ switch( $action )
 					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>
 						<td><?php
-						echo mysql2date(locale_datefmt()." ".locale_timefmt(), $row_stats['comment_date']);
+						echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date']);
 						?></td>
 						<td><?php echo $row_stats['comment_author'] ?></a></td>
 						<td><?php echo $row_stats['comment_author_url'] ?></td>

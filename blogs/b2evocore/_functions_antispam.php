@@ -201,7 +201,7 @@ function ban_affected_hits($banned)
 {
 	global  $querycount, $tablehitlog, $res_affected_hits;
 
-	$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
+	$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL, baseDomain, hit_blog_ID, visitURL FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
 	$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
