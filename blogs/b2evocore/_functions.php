@@ -1299,10 +1299,16 @@ function debug_info( $force = false )
 	global $debug;
 	global $querycount;
 	global $debug_messages;
+	global $DB;
 	
 	if( $debug || $force )
 	{
-		echo "Debug: $querycount queries - ".number_format(timer_stop(),3)." seconds";
+		echo "Debug: ".number_format(timer_stop(),3)." seconds";
+
+		echo '<h2>DB</h2>';
+		
+		echo 'DB queries: ', $DB->num_queries, '<br />';
+		echo 'Old style queries: ', $querycount, '<br />';
 
 		if( count( $debug_messages ) )
 		{

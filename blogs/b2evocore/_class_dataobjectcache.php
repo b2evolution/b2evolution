@@ -59,18 +59,17 @@ class DataObjectCache
 	 */
 	function load_all()
 	{
-		global $querycount;
+		global $DB;
 
 		if( $this->all_loaded )
 			return	false;	// Already loaded;
 		
 		debug_log( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
+		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		while( $row = mysql_fetch_object($result) )
+		foreach( $rows as $row )
 		{
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -92,15 +91,14 @@ class DataObjectCache
 	 */
 	function load_list( $req_list )
 	{
-		global $querycount;
+		global $DB;
 
 		debug_log( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
-		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
+		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		while( $row = mysql_fetch_object($result) )
+		foreach( $rows as $row )
 		{
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -149,7 +147,7 @@ class DataObjectCache
 	 */
 	function get_by_ID( $req_ID, $halt_on_error = true ) 
 	{
-		global $querycount;
+		global $DB;
 
 		if( !empty( $this->cache[ $req_ID ] ) )
 		{	// Already in cache
@@ -166,14 +164,10 @@ class DataObjectCache
 			{ // Load just the requested object:
 				debug_log( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
 				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
-				$result = mysql_query($sql) or mysql_oops( $sql );
-				$querycount++;
+				$row = $DB->get_row( $sql );
 				$dbIDname = $this->dbIDname;
 				$objtype = $this->objtype;
-				while( $row = mysql_fetch_object($result) )
-				{
-					$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
-				}
+				$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			}
 		}
 	

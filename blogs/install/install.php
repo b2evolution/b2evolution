@@ -34,11 +34,7 @@ else
 		$default_locale = $locale;
 }
 
-
 require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
-
-
-#echo T_('my blogs');
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
