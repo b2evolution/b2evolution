@@ -70,9 +70,10 @@ class GeneralSettings extends AbstractSettings
 
 		if( $this->get( 'db_version' ) != $new_db_version )
 		{ // Database is not up to date:
-			$error_message = 'Database schema is not up to date. You have schema version [<em>'
-											.var_export( $this->get( 'db_version' ), true )
-											.'</em>], but we would need [<em>'.$new_db_version.'</em>].';
+			$error_message = 'Database schema is not up to date!'
+												.'<br />'
+												.'You have schema version &laquo;<em>'.(integer)$this->get( 'db_version' ).'</em>&raquo;, '
+												.'but we would need &laquo;<em>'.(integer)$new_db_version.'</em>&raquo;.';
 			require dirname(__FILE__).'/_conf_error.inc.php'; // error & exit
 		}
 	}
@@ -81,6 +82,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/30 22:54:38  blueyed
+ * errormessage beautified
+ *
  * Revision 1.3  2004/11/08 02:23:44  blueyed
  * allow caching by column keys (e.g. user ID)
  *
