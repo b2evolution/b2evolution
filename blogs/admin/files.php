@@ -10,7 +10,7 @@
  */
  
 // FP: this is to check if CVS works: Daniel please say hello below...
-// DH:
+// DH: hello Francois! Nice to meet you in this file.. ;o)
 
 require_once( dirname(__FILE__).'/_header.php' );
 require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_filemanager.php' );
