@@ -58,43 +58,28 @@
 				
 			case 'files':
 			/**
-			 * Checks/unchecks all tables
+			 * Toggles status of a bunch of checkboxes in a form
 			 *
 			 * @param string the form name
-			 * @param string the checkboxes elements name
-			 * @param boolean whether to check or to uncheck the element
-			 *
-			 * @return boolean always true
+			 * @param string the checkbox(es) element(s) name
 			 */	?>
-			function setCheckboxes(the_form, the_elements, do_check)
+			function toggleCheckboxes(the_form, the_elements)
 			{
-				var elts = document.forms[the_form].elements[the_elements];
+				if( allchecked[0] ) allchecked[0] = false;
+				else allchecked[0] = true;
 				
-				var elts_cnt = (typeof(elts.length) != 'undefined')
-												? elts.length
-												: 0;
-	
-				if (elts_cnt) {
-					for (var i = 0; i < elts_cnt; i++) {
-							elts[i].checked = do_check;
-					} // end for
-				} else {
-					elts.checked = do_check;
-				}
-				return true;
-			}
-			
-			function toggleCheckboxes(my_form, the_elements)
+				var elems = document.forms[the_form].elements[the_elements];
+				var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
+				if (elems_cnt)
 			{
-				if( !allchecked[0] )
+					for (var i = 0; i < elems_cnt; i++)
 				{
-					setCheckboxes(my_form, the_elements, true);
-					allchecked[0] = true;
+						elems[i].checked = allchecked[0];
+					} // end for
 				}
 				else
 				{
-					setCheckboxes(my_form, the_elements, false);
-					allchecked[0] = false;
+					elems.checked = allchecked[0];
 				}
 				setcheckallspan(0);
 			}
@@ -102,13 +87,18 @@
 			break;
 		}
 		
-		// general function
-		?>
-		function setcheckallspan( nr, init )
+		// --- general functions ----------------
+		/**
+		 * replaces the text of the [nr]th checkall-html-ID
+		 *
+		 * @param integer number of the checkall "set"
+		 * @param boolean force setting to true/false
+		 */	?>
+		function setcheckallspan( nr, set )
 		{
-			if( typeof allchecked[nr] == 'undefined' )
+			if( typeof allchecked[nr] == 'undefined' || typeof set != 'undefined' )
 			{ // init
-				allchecked[ allchecked.length ] = init;
+				allchecked[ nr ] = set;
 			}
 
 			if( allchecked[nr] )
@@ -116,27 +106,37 @@
 			else					
 				var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('check all') ?>');
 						
-			//alert("set checkallspan"+String(nr));
-			document.getElementById( 'checkallspan'+String(nr) ).replaceChild(replace, document.getElementById( 'checkallspan'+String(nr) ).firstChild);
+			if( document.getElementById( idprefix+'_'+String(nr) ) )
+				document.getElementById( idprefix+'_'+String(nr) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(nr) ).firstChild);
+			//else alert('no element with id '+idprefix+'_'+String(nr));
 		}
 		
-		function initcheckall()
+		<?php
+		/**
+		 * inits the checkall functionality.
+		 *
+		 * @param string the prefix of the IDs where the '(un)check all' text should be set
+		 * @param boolean initial state of the text (if there is no checkbox with ID htmlid + '_state_' + nr)
+		 */ ?>
+		function initcheckall( htmlid, init )
 		{
 			// initialize array
 			allchecked = Array();
+			if( typeof htmlid == 'undefined' ) idprefix = 'checkallspan';
+			else idprefix = htmlid;
 			
 			var i = 0;
 			//alert(document.getElementById("checkallspan"+String(i)));
-			while( id = document.getElementById("checkallspan"+String(i)) )
+			while( id = document.getElementById( idprefix+'_'+String(i)) )
 			{
-				//alert( typeof(document.getElementById('checkall_init'+String(i))) );
-				if( document.getElementById('checkall_init'+String(i)) )
-					setcheckallspan( i, document.getElementById('checkall_init'+String(i)).checked );
+				//alert( document.getElementById(idprefix+'_state_'+String(i)) );
+				if( document.getElementById( idprefix+'_state_'+String(i)) )
+					setcheckallspan( i, document.getElementById( idprefix+'_state_'+String(i)).checked );
 				else setcheckallspan( i, init );
 			
 				i++;
 			}
-			
+			//if( i == 0 ) alert('no elements with ID prefix '+idprefix+' found!');
 		}
 		//-->
 		</script>

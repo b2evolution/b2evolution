@@ -22,9 +22,7 @@ param( 'cat', 'integer', $default_category, true );
 
 if( !user_pass_ok( $login, $pass, false ) || $_SERVER['CONTENT_TYPE'] != "application/vnd.wap.mms-message" || strlen( $HTTP_RAW_POST_DATA ) == 0 ) exit;
 
-$userdata = get_userdatabylogin( $login );
-$current_User = & new User( $userdata );
-$post_author = $userdata['ID'];
+$current_User = & new User( get_userdatabylogin( $login ) );
 $post_category = $cat;
 $blog = get_catblog($post_category); 
 
@@ -695,7 +693,7 @@ $content = format_to_post( trim( $content ), $Settings->get('AutoBR'), 0 );
 
 $post_date = date('Y-m-d H:i:s', $localtimenow);
 
-$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category, array(), 'published', $default_locale, '', $Settings->get('AutoBR'), true );
+$post_ID = bpost_create( $current_User->ID, $post_title, $content, $post_date, $post_category, array(), 'published', $current_User->locale, '', $Settings->get('AutoBR'), true );
 
 if ( isset( $sleep_after_edit ) && $sleep_after_edit > 0 ) 
 {

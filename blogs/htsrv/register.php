@@ -118,7 +118,7 @@ switch( $action )
 		$message .= T_('Login:'). " $login\n\n". T_('Email'). ": $email\n\n";
 		$message .= T_('Manage users'). ": $admin_url/b2users.php\n\n";
 
-		send_mail( $admin_email, T_('new user registration on your blog'), $message );
+		send_mail( $admin_email, T_('new user registration on your blog'), $message, $notify_from );
 
 		locale_restore_previous();
 		

@@ -415,7 +415,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 
 	if( $link_text == '' ) $link_text = T_('Admin');
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
-	// FP: someone please document that:
+	// add the blog param to $page if it is not already in there
 	if( !preg_match('/[&?]blog=/', $page) ) $page = url_add_param( $page, 'blog='.$blog );
 
 	echo $before;

@@ -24,6 +24,14 @@ if( !isset($_SERVER['REQUEST_URI']) )
 	{ //CGI/FastCGI
 		$ReqPath = $_SERVER['PATH_INFO'];
 	}
+	elseif( isset($_SERVER['SCRIPT_NAME']) )
+	{ //Some Odd Win2k Stuff
+		$ReqPath = $_SERVER['SCRIPT_NAME'];
+	}
+	else
+	{ //The Old Stand-By
+		$ReqPath = $_SERVER['PHP_SELF'];
+	}
 
 	$ReqURI = $ReqPath;
 	if( isset($_SERVER['QUERY_STRING']) )
@@ -38,10 +46,9 @@ else
 	$ReqPath = explode( '?', $ReqURI, 2 );
 	$ReqPath = $ReqPath[0];
 }
-// FP: seems like $Debuglog doesn exist yet!.? (bug ininstall)
-// $Debuglog->add( 'Request URI: '.$ReqURI );
-// $Debuglog->add( 'Request Path: '.$ReqPath );
 
+$Debuglog->add( 'Request URI: '.$ReqURI );
+$Debuglog->add( 'Request Path: '.$ReqPath );
 
 
 // on which page are we ?

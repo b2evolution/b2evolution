@@ -58,8 +58,8 @@
 					<tr>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
-							<input id="checkall_init<?php echo $i ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
-								checked="checked"
+							<input id="checkallspan_state_<?php echo $i ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+								checked="checked" onclick="setcheckallspan(<?php echo $i ?>, this.checked)"
 								value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 						</td>
 						<td class="center">
@@ -127,7 +127,7 @@
 						</td>
 						<td class="center">
 							<a href="#" onclick="toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
-								<span id="checkallspan<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
+								<span id="checkallspan_<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
 							</a>
 						</td>
 					</tr>
@@ -155,7 +155,8 @@
 					<tr>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
-							<input id="checkall_init<?php echo $i ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+							<input id="checkallspan_state_<?php echo $i ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+								onclick="setcheckallspan(<?php echo $i ?>, this.checked)"
 								value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 						</td>
 						<td class="center">
@@ -196,7 +197,7 @@
 						</td>
 						<td class="center">
 							<a href="#" onclick="toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);">
-								<span id="checkallspan<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
+								<span id="checkallspan_<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
 							</a>
 						</td>
 					</tr>
