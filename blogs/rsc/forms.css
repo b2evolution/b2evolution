@@ -6,6 +6,7 @@
 
 /* Form layout */
 
+/* 18/80% forms */
 form.bComment fieldset
 {	/* one form line */
 	clear: both;
@@ -13,7 +14,7 @@ form.bComment fieldset
 	margin: 2ex 0ex;
 	padding: 0ex;
 }
-fieldset div.label
+form.bComment fieldset div.label
 { /* label of form line */
 	float: left;
 	width: 18%;
@@ -22,19 +23,22 @@ fieldset div.label
 	margin-top: .5ex;
 	/* border: 1px solid #00f; */
 }
-fieldset div.input
+form.bComment fieldset div.input
 { /* input zone of form line */
 	float: right;
 	width: 80%;
 	/* border: 1px solid #00f; */
 }
-fieldset div.info
+form.bComment fieldset div.info
 { /* info zone of form line */
 	float: right;
 	width: 80%;
 	margin-top: .5ex;
 	/* border: 1px solid #00f; */
 }
+
+/* All forms */
+
 fieldset label {
 	font-weight: bold;
 }

@@ -357,37 +357,41 @@ function locale_priosort( $a, $b )
 /**
  * load locales from DB into $locales array. Also sets $default_locale.
  *
+ * FP: I edited this because I got PHP error notices
  */
 function locale_overwritefromDB()
 {
 	global $tablelocales, $DB, $locales, $default_locale;
 	
 	$priocounter = 0;
-	$usedprios = array(0);
+	// $usedprios = array(0);  // FP: what do we need this for?
 	
 	$query = 'SELECT
-						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled
+						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, 
+						loc_messages, loc_priority, loc_enabled
 						FROM '. $tablelocales;
 	$rows = $DB->get_results( $query, ARRAY_A );
 	if( count( $rows ) ) foreach( $rows as $row )
-	{
+	{	// Loop through loaded locales:
+	
 		while( in_array($row['loc_priority'], $usedprios) )
-		{ // find next priority
+		{ // find next available priority
 			$priocounter++;
-			$row['loc_priority'] = $priocounter;
+			$row['loc_priority'] = $priocounter; // FP: Modifying the rowset is a BAD practice
+			// FP: why change the saved priority here? (extra processing for what value?)
 		}
-		$usedprios[] = $row['loc_priority'];
+		// $usedprios[] = $row['loc_priority'];
 				
 		$locales[ $row['loc_locale'] ] = array(
-			'charset'  => $row[ 'loc_charset' ],
-			'datefmt'  => $row[ 'loc_datefmt' ],
-			'timefmt'  => $row[ 'loc_timefmt' ],
-			'name'     => $row[ 'loc_name' ],
-			'messages' => $row[ 'loc_messages' ],
-			'priority' => $row[ 'loc_priority' ],
-			'enabled'  => $row[ 'loc_enabled' ],
-			'fromdb'   => 1
-		);
+																			'charset'  => $row[ 'loc_charset' ],
+																			'datefmt'  => $row[ 'loc_datefmt' ],
+																			'timefmt'  => $row[ 'loc_timefmt' ],
+																			'name'     => $row[ 'loc_name' ],
+																			'messages' => $row[ 'loc_messages' ],
+																			'priority' => $row[ 'loc_priority' ],
+																			'enabled'  => $row[ 'loc_enabled' ],
+																			'fromdb'   => 1
+																		);
 	}
 	
 	// set default priorities, if nothing was set in DB
@@ -396,14 +400,19 @@ function locale_overwritefromDB()
 	if( count($rows) != count($locales) )
 	{ // we have locales from conf file that need a priority
 		ksort( $locales );
-		foreach( $locales as $lkey => $lval ) if( !isset($lval['priority']) )
-		{
-			while( in_array( $locales[$lkey]['priority'], $usedprios) )
-			{
-				$priocounter++;
-				$locales[$lkey]['priority'] = $priocounter;
+		foreach( $locales as $lkey => $lval ) 
+		{	// Loop through memomry locales:
+			if( !isset($lval['priority']) )
+			{	// Found one that has no assigned priority
+
+				// Priocounter already has max value
+				// while( in_array( $locales[$lkey]['priority'], $usedprios ) )
+				//{
+					$priocounter++;
+					$locales[$lkey]['priority'] = $priocounter;
+				//}
+				// $usedprios[] = $locales[$lkey]['priority'];
 			}
-			$usedprios[] = $locales[$lkey]['priority'];
 		}
 	}
 	
