@@ -23,22 +23,22 @@ class Blog extends DataObject
 	var $shortdesc;	// description
 	var $longdesc;
 	var $locale;
-	var $access_type = 'index.php';
+	var $access_type;
 	var $siteurl;
 	var $staticfilename;
 	var $stub;
-	var $links_blog_ID;
+	var $links_blog_ID = 0;
 	var $notes;
 	var $keywords;
 	var $allowtrackbacks = 0;
 	var $allowpingbacks = 0;
 	var $pingb2evonet = 0;
 	var $pingtechnorati = 0;
-	var $pingweblogs = 0;
+	var $pingweblogs = 1;
 	var $pingblodotgs = 0;
 	var $default_skin;
 	var $force_skin = 0;
-	var $disp_bloglist = 0;
+	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
 
@@ -58,7 +58,14 @@ class Blog extends DataObject
 	
 		if( $db_row == NULL )
 		{
+			global $default_locale;
 			// echo 'Creating blank blog';
+			$this->shortname = T_('New blog');
+			$this->name = T_('New weblog');
+			$this->locale = $default_locale;
+			$this->access_type = 'index.php';
+			$this->stub = 'new';
+			$this->default_skin = 'basic';
 		}
 		else
 		{

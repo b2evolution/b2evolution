@@ -16,32 +16,9 @@ param( 'tab', 'string', 'general' );
 
 switch($action)
 {
-	case 'new':
-		// ---------- New blog form ----------
-		$admin_pagetitle .= ' :: '.T_('New');
-		require( dirname(__FILE__). '/_menutop.php' );
-		require( dirname(__FILE__). '/_menutop_end.php' );
-
-		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
-		
-		param( 'blog_name', 'string', 'new weblog' );
-		param( 'blog_shortname', 'string', 'new blog' );
-		param( 'blog_tagline', 'html', '' );
-		param( 'blog_locale', 'string', $default_locale );
-		param( 'blog_access_type', 'string', 'index.php' );
-		param( 'blog_siteurl', 'string', '' );
-		param( 'blog_stub', 'string', 'new_file.php' );
-		param( 'blog_default_skin', 'string', '' );
-
-		require( dirname(__FILE__) . '/_blogs_new.form.php' );
-
-		require( dirname(__FILE__). '/_footer.php' );
-		exit();
-
-
 	case 'create':
 		// ---------- Create blog in DB ----------
+		$admin_pagetitle .= ' :: '.T_('New');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
 
@@ -52,46 +29,121 @@ switch($action)
 		<div class="panelinfo">
 			<h3><?php echo T_('Creating blog...') ?></h3>
 		<?php
+	
+		param( 'blog_tagline', 'html', '' );
+		param( 'blog_longdesc', 'html', '' );
+		param( 'blog_notes', 'html', '' );
 
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
-		param( 'blog_tagline', 'html', true );
+		param( 'blog_description', 'string', true );
 		param( 'blog_locale', 'string', true );
 		param( 'blog_access_type', 'string', true );
 		param( 'blog_siteurl', 'string', true );
 		param( 'blog_stub', 'string', true );
+		param( 'blog_keywords', 'string', true );
+		param( 'blog_disp_bloglist', 'integer', 0 );
+		param( 'blog_in_bloglist', 'integer', 0 );
+		param( 'blog_linkblog', 'integer', 0 );
 		param( 'blog_default_skin', 'string', true );
+		param( 'blog_force_skin', 'integer', 0 );
+		$blog_force_skin = 1-$blog_force_skin;
+		
+		$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
+		$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
+		$blog_notes = format_to_post( $blog_notes, 0, 0 );
 
-		if ( errors_display( T_('Cannot create, please correct these errors:'),
-			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog form').'</a>]'))
+		if( ! errors_display( T_('Cannot create, please correct these errors:' ), '') )
 		{
+			$edited_Blog = & new Blog( NULL );
+		
+			$edited_Blog->set( 'tagline', $blog_tagline );
+			$edited_Blog->set( 'longdesc', $blog_longdesc );
+			$edited_Blog->set( 'notes', $blog_notes );
+
+			$edited_Blog->set( 'name', $blog_name );
+			$edited_Blog->set( 'shortname', $blog_shortname );
+			$edited_Blog->set( 'description', $blog_description );
+			$edited_Blog->set( 'locale', $blog_locale );
+			$edited_Blog->set( 'access_type', $blog_access_type );
+			$edited_Blog->set( 'siteurl', $blog_siteurl );
+			$edited_Blog->set( 'stub', $blog_stub );
+			$edited_Blog->set( 'keywords', $blog_keywords );
+			$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
+			$edited_Blog->set( 'in_bloglist', $blog_in_bloglist );
+			$edited_Blog->set( 'links_blog_ID', $blog_linkblog );
+			$edited_Blog->set( 'default_skin', $blog_default_skin );
+			$edited_Blog->set( 'force_skin', $blog_force_skin );
+
+			// Additional default params:
+			$edited_Blog->set( 'pingweblogs', 1 );
+			$edited_Blog->set( 'allowtrackbacks', 0 );
+			$edited_Blog->set( 'allowpingbacks', 0 );
+
+			// DB INSERT
+			$edited_Blog->dbinsert();
+	
+			// Set default user permissions for this blog
+			// Proceed insertions:
+			$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+												bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+												bloguser_perm_cats, bloguser_perm_properties )
+										VALUES ( $edited_Blog->ID, $current_User->ID, 1,
+														 'published,protected,private,draft,deprecated', 
+															1, 1, 1, 1 )" );
+	
+			// Commit changes in cache:
+			$BlogCache->add( $edited_Blog );
+
+			echo '<p><strong>';
+			printf( T_('You should <a %s>create categories</a> for this blog now!'), 
+							'href="b2categories.php?action=newcat&amp;blog='.$edited_Blog->ID.'"' );
+			echo '</strong></p>';
 			echo '</div>';
-			require( dirname(__FILE__) . '/_footer.php' );
-			die();
 			break;
 		}
+		echo '</div>';
+		// NOTE: no break here, we go on to nexw form if there was an error!
 
-		// DB INSERT
-		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl,
-									$blog_stub, '', '', '', '', $blog_locale );
 
-		// Set default user permissions for this blog
-		// Proceed insertions:
-		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-											bloguser_perm_cats, bloguser_perm_properties )
-									VALUES ( $blog_ID, $current_User->ID, 1,
-													 'published,protected,private,draft,deprecated', 
-														1, 1, 1, 1 )" );
+	case 'new':
+		// ---------- New blog form ----------
+		if( $action == 'new' )
+		{ // we haven't arrived here after a failed creation:
+			$admin_pagetitle .= ' :: '.T_('New');
+			require( dirname(__FILE__). '/_menutop.php' );
+			require( dirname(__FILE__). '/_menutop_end.php' );
+	
+			// Check permissions:
+			$current_User->check_perm( 'blogs', 'create', true );
+			
+			param( 'blog_name', 'string', T_('New weblog') );
+			param( 'blog_shortname', 'string', T_('New blog') );
+			param( 'blog_tagline', 'html', '' );
+			param( 'blog_locale', 'string', $default_locale );
+			param( 'blog_access_type', 'string', 'index.php' );
+			param( 'blog_siteurl', 'string', '' );
+			param( 'blog_stub', 'string', 'new' );
+			param( 'blog_default_skin', 'string', 'basic' );
+			param( 'blog_longdesc', 'html', '' );
+			param( 'blog_notes', 'html', '' );
+			param( 'blog_description', 'string', '' );
+			param( 'blog_keywords', 'string', '' );
+			$blog_disp_bloglist = 1;
+			$blog_in_bloglist = 1;
+			param( 'blog_linkblog', 'integer', 0 );
+			$blog_force_skin = 0;
+			param( 'blog_linkblog', 'integer', 0 );
+		}
 
-		?>
-		<p><strong><?php 
-			printf( T_('You should <a %s>create categories</a> for this blog now!'), 
-			'href="b2categories.php?action=newcat&amp;blog_ID='.$blog_ID.'"' );
-		?></strong></p>
-		</div>
-		<?php
-		break;
+		echo '<div class="panelblock">';
+		echo'<h2>', T_('New blog'), ':</h2>';
+		$next_action = 'create';
+		require( dirname(__FILE__).'/_blogs_general.form.php' );
+		echo '</div>';
+
+		require( dirname(__FILE__). '/_footer.php' );
+		exit();
 
 
 	case 'update':
@@ -181,6 +233,7 @@ switch($action)
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
 
 				param( 'blog_force_skin', 'integer', 0 );
+				$blog_force_skin = 1-$blog_force_skin;
 				$edited_Blog->set( 'force_skin', 1-$blog_force_skin );
 
 				break;
@@ -305,11 +358,12 @@ switch($action)
 				$blog_in_bloglist = get_bloginfo( 'in_bloglist' );
 				$blog_default_skin = get_bloginfo( 'default_skin' );
 				$blog_force_skin = $edited_Blog->get( 'force_skin' );
-				require( dirname(__FILE__) . '/_blogs_form.php' );
+				$next_action = 'update';
+				require( dirname(__FILE__).'/_blogs_general.form.php' );
 				break;
 				
 			case 'perm':
-				require( dirname(__FILE__) . '/_blogs_permissions.form.php' );
+				require( dirname(__FILE__).'/_blogs_permissions.form.php' );
 				break;
 				
 			case 'advanced':
@@ -320,11 +374,11 @@ switch($action)
 				$blog_pingtechnorati = get_bloginfo( 'pingtechnorati' );
 				$blog_pingweblogs = get_bloginfo( 'pingweblogs' );
 				$blog_pingblodotgs = get_bloginfo( 'pingblodotgs' );
-				require( dirname(__FILE__) . '/_blogs_advanced.form.php' );
+				require( dirname(__FILE__).'/_blogs_advanced.form.php' );
 				break;
 		}
 		echo '</div>';
-		require( dirname(__FILE__). '/_footer.php' );
+		require( dirname(__FILE__).'/_footer.php' );
 		exit();
 		
 
