@@ -83,6 +83,8 @@ class UserCache extends DataObjectCache
 	 * same User object was stored in the login cache. This would also require overloading the get_by_ID method, but in the
 	 * end this would save 1 query at first request, an dpossibly many more afterwards...
 	 * Francois, IMHO it's ok now. I don't see why I should overload get_by_ID()..
+	 * Daniel, I think my idea was to have get_by_ID set cache_login too, so that you don't query the DB if the user happens to have been cached by get_by_ID before...
+   * However, I think it's even better to only overload add() and make the default DataObjectCache::get_by_ID() call add() instead of writing to ::$cache directly
 	 *
 	 * @return false|User Reference to the user object or false if not found
 	 */
@@ -131,6 +133,7 @@ class UserCache extends DataObjectCache
 	 * {@internal DataObjectCache::load_list(-) }}
 	 *
 	 * @param integer blog ID to load members for
+	 * @todo write to $cache_login or better: call add()! :)
 	 */
 	function load_blogmembers( $blog_ID )
 	{
@@ -209,6 +212,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/14 14:33:35  fplanque
+ * todo..
+ *
  * Revision 1.8  2005/02/09 00:27:13  blueyed
  * Removed deprecated globals / userdata handling
  *
