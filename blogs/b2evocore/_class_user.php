@@ -31,6 +31,7 @@ class User extends DataObject
 	var	$datecreated;
 	var	$level;
 	var	$notify;
+	var	$showonline;
 
 	var $Group;	// Pointer to group
 
@@ -71,6 +72,7 @@ class User extends DataObject
 			$this->datecreated = date('Y-m-d H:i:s', time());	// We don't know local time here!
 			$this->level = 0;
 			$this->notify = 1;
+			$this->showonline = 1;
 			// Group for this user:
 			$this->Group = NULL;
 		}
@@ -97,6 +99,7 @@ class User extends DataObject
 			$this->datecreated = $userdata['dateYMDhour'];
 			$this->level = $userdata['user_level'];
 			$this->notify = $userdata['user_notify'];
+			$this->showonline = $userdata['user_showonline'];
 
 			// Group for this user:
 			$this->Group = $GroupCache->get_by_ID( $userdata['user_grp_ID'] );
