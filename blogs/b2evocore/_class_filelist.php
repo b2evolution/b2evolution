@@ -224,7 +224,7 @@ class Filelist
 
 		if( $this->recursivedirsize && $entry->isDir( $this->listpath.$name ) )
 		{
-			$entry->set_size( get_dirsize_recursive( $this->listpath.$name ) );
+			$entry->setSize( get_dirsize_recursive( $this->listpath.$name ) );
 		}
 
 		if( $entry->isDir() )

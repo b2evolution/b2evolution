@@ -122,7 +122,7 @@ if( $action == '' && $file != '' && $curFile )
 			{ // display image file
 				?>
 				<div class="center">
-					<img class="framed" src="<?php echo $Fileman->getFileUrl( $curFile ) ?>" <?php echo $curFile->get_imgsize( 'string' ) ?> />
+					<img class="framed" src="<?php echo $Fileman->getFileUrl( $curFile ) ?>" <?php echo $curFile->getImageSize( 'string' ) ?> />
 				</div>
 				<?php
 			}
@@ -462,7 +462,7 @@ switch( $action ) // {{{ (we catched empty action before)
 
 		if( !empty($chmod) )
 		{
-			$oldperms = $curFile->get_perms();
+			$oldperms = $curFile->getPerms();
 			$newperms = $curFile->chmod( $chmod );
 			if( $newperms === false )
 			{
@@ -474,7 +474,7 @@ switch( $action ) // {{{ (we catched empty action before)
 			}
 			else
 			{
-				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $curFile->getName(), $curFile->get_perms() ), 'note' );
+				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $curFile->getName(), $curFile->getPerms() ), 'note' );
 			}
 			#pre_dump( $Fileman->cdo_file( $file, 'chmod', $chmod ), 'chmod!');
 		}
@@ -489,15 +489,15 @@ switch( $action ) // {{{ (we catched empty action before)
 			if( is_windows() )
 			{
 				$msg_action .= '<input id="chmod_readonly" name="chmod" type="radio" value="444" '
-				.( $curFile->get_perms( 'octal' ) == 444 ? 'checked="checked" ' : '' ).'/>
+				.( $curFile->getPerms( 'octal' ) == 444 ? 'checked="checked" ' : '' ).'/>
 				<label for="chmod_readonly">'.T_('Read-only').'</label><br />
 				<input id="chmod_readwrite" name="chmod" type="radio" value="666" '
-				.( $curFile->get_perms( 'octal' ) == 666 ? 'checked="checked" ' : '' ).'/>
+				.( $curFile->getPerms( 'octal' ) == 666 ? 'checked="checked" ' : '' ).'/>
 				<label for="chmod_readwrite">'.T_('Read and write').'</label><br />';
 			}
 			else
 			{
-				$msg_action .= '<input type="text" name="chmod" value="'.$curFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
+				$msg_action .= '<input type="text" name="chmod" value="'.$curFile->getPerms( 'octal' ).'" maxlength="3" size="3" /><br />';
 				$js_focus = 'document.form_chmod.chmod';
 			}
 			$msg_action .= '
@@ -784,7 +784,7 @@ while( $lFile = $Fileman->getNextFile() )
 				echo $Fileman->getLinkCurfile().( $lFile->isDir() ? '&amp;mode=browseonly' : '' );
 				?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php
 				echo $i ?>'), 'toolbar=0,resizable=yes,scrollbars=yes,<?php
-				if( $r = $lFile->get_imgsize( 'widthheight' ) )
+				if( $r = $lFile->getImageSize( 'widthheight' ) )
 				{ // make the popup 42px wider/higher than the image
 					echo 'width='.($r[0]+42).',height='.($r[1]+42);
 				}
@@ -798,16 +798,16 @@ while( $lFile = $Fileman->getNextFile() )
 			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkCurfile() ?>">
 			<?php
 			echo $lFile->getName();
-			disp_cond( $lFile->get_imgsize(), ' (%s)' )
+			disp_cond( $lFile->getImageSize(), ' (%s)' )
 			?>
 			</a>
 		</td>
 		<td class="type"><?php echo $lFile->getType() ?></td>
 		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
-		<td class="timestamp"><?php echo $lFile->get_lastmod() ?></td>
+		<td class="timestamp"><?php echo $lFile->getLastMod() ?></td>
 		<td class="perms"><?php
 			disp_cond( $Fileman->getLinkCurfile_editperm(),
-									'<a href="%s">'.$lFile->get_perms( $Fileman->permlikelsl ? 'lsl' : '' ).'</a>' ) ?></td>
+									'<a href="%s">'.$lFile->getPerms( $Fileman->permlikelsl ? 'lsl' : '' ).'</a>' ) ?></td>
 		<td class="actions"><?php
 			disp_cond( $Fileman->getLinkCurfile_edit(), '<a href="%s">'.$Fileman->getIcon( 'edit', 'imgtag' ).'</a>' );
 			disp_cond( $Fileman->getLinkCurfile_copymove(), '<a href="%s">'.$Fileman->getIcon( 'copymove', 'imgtag' ).'</a>' );

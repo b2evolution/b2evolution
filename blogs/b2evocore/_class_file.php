@@ -168,13 +168,21 @@ class File
 	}
 
 
-	function get_lastmod()
+	function getLastMod()
 	{
 		return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->_lastm );
 	}
 
 
-	function get_perms( $type = NULL )
+	/**
+	 * Get permissions
+	 *
+	 * @param mixed type; 'raw': integer, 'lsl' string like 'ls -l',
+	 *              'octal': 3 digits; default: 'r'/'r+w' for windows, 'octal'
+	 *              for other OS
+	 * @return string permissions
+	 */
+	function getPerms( $type = NULL )
 	{
 		switch( $type )
 		{
@@ -204,7 +212,7 @@ class File
 	 *
 	 * @param string {@link imgsize()}
 	 */
-	function get_imgsize( $param = 'widthxheight' )
+	function getImageSize( $param = 'widthxheight' )
 	{
 		return imgsize( $this->getPath( true ), $param );
 	}
@@ -259,6 +267,12 @@ class File
 	function setName( $name )
 	{
 		$this->_name = $name;
+	}
+
+
+	function setSize( $bytes )
+	{
+		$this->_size = $bytes;
 	}
 
 

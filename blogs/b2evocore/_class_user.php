@@ -61,7 +61,7 @@ class User extends DataObject
 		global $GroupCache, $default_locale;
 
 		// Call parent constructor:
-		parent::DataObject( 'T_groups', 'user_' );
+		parent::DataObject( 'T_users', 'user_' );
 
 		// FP: WHAT IS THIS FOR???:
 		$this->Messages = new Log( 'error' );
