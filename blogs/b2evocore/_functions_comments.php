@@ -219,7 +219,7 @@ function comments_popup_script($width=560, $height=400, $file='comment_popup.php
  * comments_popup_link(-)
  *
  */
-function comments_popup_link($zero='no comment', $one='1 comment', $more='% comments', $CSSclass='') 
+function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='') 
 {
 	global $blog, $id, $b2commentspopupfile, $b2commentsjavascript;
 	echo '<a href="';

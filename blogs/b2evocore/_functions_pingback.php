@@ -236,7 +236,15 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
  * Pingback tags 
  *****/
 
-function pingback_number($zero='no pingback', $one='1 pingback', $more='% pingbacks') {
+/*
+ * pingback_number(-)
+ */
+function pingback_number($zero='#', $one='#', $more='#' ) 
+{
+	if( $zero == '#' ) $zero = _('Pingback (0)');
+	if( $one == '#' ) $one = _('Pingback (1)');
+	if( $more == '#' ) $more = _('Pingback (%)');
+
 	global $id, $tablecomments, $tb, $querycount, $cache_pingbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'pingbacks');
 	if ($number == 0) {
@@ -271,7 +279,7 @@ function pingback_link($file='',$c=0,$tb=0)
 	echo '&amp;pb=1#pingbacks';
 }
 
-function pingback_popup_link($zero='no pingback', $one='1 pingback', $more='% pingbacks', $CSSclass='')
+function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 {
 	global $blog, $id, $b2pingbackpopupfile, $b2commentsjavascript;
 	echo '<a href="';

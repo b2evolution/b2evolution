@@ -142,13 +142,13 @@ function trackback_url($display = 1) {
 }
 
 /*
- * comments_number(-)
+ * trackback_number(-)
  */
 function trackback_number( $zero='#', $one='#', $more='#' ) 
 {
-	if( $zero == '#' ) $zero = _('Leave a comment...');
-	if( $one == '#' ) $one = _('1 comment');
-	if( $more == '#' ) $more = _('% comments');
+	if( $zero == '#' ) $zero = _('Trackback (0)');
+	if( $one == '#' ) $one = _('Trackback (1)');
+	if( $more == '#' ) $more = _('Trackback (%)');
 
 	global $id, $tablecomments, $tb, $querycount, $cache_trackbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'trackbacks');
@@ -185,7 +185,7 @@ function trackback_link($file='',$c=0,$pb=0)
 	echo '#trackbacks';		
 }
 
-function trackback_popup_link($zero='no trackback', $one='1 trackback', $more='% trackbacks', $CSSclass='') 
+function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='') 
 {
 	global $blog, $id, $b2trackbackpopupfile, $b2commentsjavascript;
 	echo '<a href="';

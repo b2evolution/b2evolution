@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution stats config
- * Version of this file: 0.8.2
+ * Version of this file: 0.8.3
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -41,8 +41,10 @@ $search_engines = Array(
 	'http://www.hotbot.com/',
 	'http://search.canoe.ca/', 				// q =
 	'http://recherche.globetrotter.net/',	//q=
-	'http://search.msn.fr/', 	//q=
+	'search.msn.', 	//q=
 	'http://cgi.search.biglobe.ne.jp/', 	//q=
+	'aolrecherche.aol.fr/',  //q=
+	'altavista.com/',		// q=
 );
 
 
