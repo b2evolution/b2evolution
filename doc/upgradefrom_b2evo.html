@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>b2evo package: Upgrading from previous b2evolution</title>
 <link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
-	
+		
 	 
 </head>
 <body>
@@ -35,17 +35,22 @@
 	</div>
 	
 <h1>Upgrading from a previous version of b2evolution</h1>
-<p>This page will be updated. Don't waste time translating this... </p>
 <ol class="expanded">
-	<li>Backup <strong>all b2evolution files</strong>, <strong>including /conf, skins, blog templates and stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can.</li>
-	<li>Replace <strong>all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles </strong> with the new ones; (This is important in order to activate all security fixes!) If you have customized your blog template/skin, please use the provided demo templates/skins until the end of the upgrade process. You'll find instructions on how to upgrade your customized templates/skins at the end of this procedure.</li>
-	<li>Redo your configuration in the /conf folder as you did previously.
-			As always, the only requirement is to edit _config.php. The other config files can be used without modification (provided you use the <strong>new</strong> ones!), however you should have look inside for fine tuning once your new version is running.</li>
-	<li>Upload the b2evolution files to your website, according to the URL you have just configured.</li>
-	<li>Upload the new files to your server, and then <a href="../blogs/install/index.php">run the database tables upgrade</a> on your server!</li>
-	<li>On production servers, it is recommended that you delete the /blogs/install/ subfolder.</li>
-	<li>Just in case you did not do it before, you may want to check out <a href="http://b2evolution.net/man/install/trickystuff.html">the tricky stuff</a>. (online manual)</li>
-	<li>(If you had custom skins or templates, follow the online instructions about upgrading them <a href="http://b2evolution.net/man/install/upgradefrom_0.8.0.html#templates">from version 0.8.0.x</a> or <a href="http://b2evolution.net/man/install/upgradefrom_0.8.2.html#templates">from version 0.8.2.x</a>. (online manual)</li>
+	<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc...</li>
+	<li>You should also backup your database if you can. This functionality should be provided by your host.</li>
+	<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you also need to replace your customized files, including  /conf, skins, blog templates, stubfiles, etc...<br />
+<br />
+That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to reuse them once the upgrade process is done. See step 7 below.</li>
+	<li>Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> and follow the instructions.<br />
+<br />
+The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one.</li>
+	<li>Check to make sure the new installation works.</li>
+	<li>On production servers, it is recommended that you delete the <code>/install</code> subfolder.</li>
+	<li>It's now time to bring back your previous customizations.
+We recommend you get yourself a diff/merge tool like <a href="http://winmerge.sourceforge.net/">WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br />
+<br />
+You can also check the <a href="http://wiki.b2evolution.net/">wiki</a> or the <a href="http://forums.b2evolution.net/">forums</a> for notes on upgrading specific files from a specific version to another.</li>
+	<li>After basic install is done, there are a few <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things you may need to take care of</a> (online manual).</li>
 </ol>
 
 	<div id="rowfooter">

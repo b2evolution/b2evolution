@@ -32,7 +32,7 @@
 <h1>{{{Upgrading from Cafelog/b2 (the original b2)}}}</h1>
 
 <p>{{{The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2.
-Though, I think versions 0.5.x should also upgrade without problems. Anyway, if you run any old version of b2,
+Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2,
 you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it.
 The worst you would get is an error message.}}}</p>
 
@@ -45,47 +45,28 @@ The worst you would get is an error message.}}}</p>
 <li>{{{On your server, locate the mysql database you are already using for Cafelog/b2.
 	You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will
 	not alter your Cafelog/b2 tables and data in any way!}}}<br />
-		<small><span class="small"><br />
-		<strong>{{{Note 1:}}}</strong>{{{Unless you changed the config, all tables created by b2evolution are prefixed with
+		<span class="small"><br />
+		<strong>{{{Note 1:}}} </strong>{{{Unless you changed the config, all tables created by b2evolution are prefixed with
 		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
 		b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 .
 		Your existing tables will not be affected in any way.}}}<br />
-		<strong>{{{Note 2:}}}</strong>{{{Why the same database? Because the SQL process we use to copy the data -- which is fast and
-		secure -- can only be done within a single database.}}}</span></small>
+		<strong>{{{Note 2:}}}</strong> {{{Why the same database? Because the SQL process we use to copy the data -- which is fast and
+		secure -- can only be done within a single database.}}}</span>
 </li>
 
-<li>{{{On your computer, edit the file <strong>/blogs/conf/_config.php</strong> with a text editor and set the
-	parameters according to your current configuration. There are basically 3 things to set:}}}
-	<ul>
-		<li>{{{Access information to the above-mentioned database (hostname, basename, login, password)}}}</li>
-		<li>{{{The URL where you are going to run b2evolution.}}}<br />
-			<span class="small"><br />
-				<strong>{{{Please note:}}}</strong>{{{It is recommended that you do a first test installation by uploading the whole demo
-				structure to your website, starting with the folder b2evolution. This way, your new blogs will have an URL of
-				the form: http://www.yoursite.com/b2evolution/blogs/blog_a.php...}}}
-					
-				<strong>and your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong><br />
-				
-				{{{Of course you can change this later when you are comfortable with b2evolution. By then, you will probably
-				want to upload just the contents of your &quot;blogs&quot; folder, so your blogs can be accessed directly
-				through http://www.yoursite.com or http://www.yoursite.com/blog_a.php...}}}
-			</span>
-		</li>
-		<li>Your e-mail address (where you will receive notifications for new registrations, etc.) </li>
-	</ul>
-</li>
+<li>{{{Upload the b2evolution files to your website.}}}<br />
+  <br />
+  <span class="small"><strong>{{{Note:}}}</strong> {{{Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>}}}<br />
+  </span> <br />
+{{{Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ...}}}</li>
 
-<li>Upload the b2evolution files to your website, according to the URL you have just configured.</li>
-<li><strong>Come back to this page on your server</strong>, (should be something like http://www.yoursite.com/b2evolution/doc/upgradefrom_b2.html) and <a href="../blogs/install/index.php">run the database tables installation</a>. This will create database tables for b2evo and <strong>copy</strong>	your existing Cafelog/b2 data into them.</li>
-<li>You can now <a href="../blogs/index.php">read the blogs</a> or <a href="../blogs/admin/b2edit.php">log into the back-office</a> and start playing! <img src="../blogs/img/smilies/icon_wink.gif" width="15" height="15" class="middle" /></li>
-<li>On production servers, it is recommended that you delete the /blogs/install/ subfolder.</li>
-<li>
-	<p>After basic install is done, there are a few <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things you may need to take care of</a>. (online manual)</p>
-</li>
-
-<li>
-	<p>To upgrade your existing b2 template, please read the <a href="http://b2evolution.net/man/install/upgradefrom_b2.html#template">online manual about upgrading your b2 template</a>. (online manual)</p>
-</li>
+<li>{{{Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> and follow the instructions.<br />
+  	<br />
+	The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you.}}} </li>
+<li>{{{Check to make sure the new installation works.}}}</li>
+<li>{{{On production servers, it is recommended that you delete the <code>/install</code> subfolder.}}}</li>
+<li>{{{Check the <a href="http://wiki.b2evolution.net/">wiki</a> or the <a href="http://forums.b2evolution.net/">forums</a> for notes on upgrading your existing b2 template to b2evolution.}}}</li>
+<li>{{{After basic install is done, there are a few <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things you may need to take care of</a> (online manual).}}}</li>
 </ol>
 <!-- InstanceEndEditable -->
 	<div id="rowfooter">
