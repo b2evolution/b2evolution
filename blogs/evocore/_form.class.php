@@ -355,7 +355,7 @@ class Form extends Widget
 		$field_value = substr( $field_value, 0, 10 );
 
 		$r = $this->begin_field( $field_name, $field_label )
-				.'<script language="JavaScript">
+				.'<script type="text/javascript">
 						<!--
 						var cal_'.$field_name.' = new CalendarPopup();
 						cal_'.$field_name.'.showYearNavigation();
@@ -928,12 +928,8 @@ class Form extends Widget
 		}
 
 		if( !empty($options[5]) )
-		{ //a name has been specified
+		{ // style supplied
 			$r .= ' style="'.$options[5].'" ';
-		}
-		else
-		{
-			$r .= ' name="submit" ';
 		}
 		$r .= " />\n";
 
