@@ -123,6 +123,58 @@ function user_info( $show = '', $format = 'raw', $display = true )
 		return $content;
 }
 
+
+/**
+ * get_userdatabylogin(-)
+ * @deprecated by UserCache::get_by_login()
+ */
+function get_userdatabylogin( $login )
+{
+	global $DB, $cache_userdata;
+	if( empty($cache_userdata[$login]) )
+	{
+		$sql = "SELECT *
+						FROM T_users
+						WHERE user_login = '".$DB->escape($login)."'";
+		$myrow = $DB->get_row( $sql, ARRAY_A );
+		$cache_userdata[$login] = $myrow;
+	}
+	else
+	{
+		$myrow = $cache_userdata[$login];
+	}
+	return($myrow);
+}
+
+
+/**
+ * get_userdata(-)
+ * @deprecated by UserCache::get_by_ID()
+ */
+function get_userdata( $userid )
+{
+	global $DB, $cache_userdata;
+
+	if( empty($cache_userdata[$userid] ) )
+	{ // We do a progressive cache load because there can be many many users!
+		$sql = "SELECT *
+						FROM T_users
+						WHERE ID = $userid";
+		if( $myrow = $DB->get_row( $sql, ARRAY_A ) )
+		{
+			$cache_userdata[ $myrow['ID'] ] = $myrow;
+		}
+	}
+
+	if( ! isset( $cache_userdata[$userid] ) )
+	{
+		die('Requested user does not exist!');
+	}
+
+	return $cache_userdata[$userid];
+}
+
+
 // _user.funcs.php }}}
 
 
@@ -1092,6 +1144,9 @@ function comment_post_link()
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/19 18:20:47  blueyed
+ * obsolete functions removed
+ *
  * Revision 1.2  2005/02/15 22:35:49  blueyed
  * doc
  *

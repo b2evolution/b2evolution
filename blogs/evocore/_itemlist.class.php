@@ -863,7 +863,7 @@ class ItemList extends DataObjectList
 	 */
 	function get_postdata()
 	{
-		global $id, $postdata, $authordata, $day, $page, $pages, $multipage, $more, $numpages;
+		global $id, $postdata, $day, $page, $pages, $multipage, $more, $numpages;
 		global $pagenow, $current_User;
 
 		$this->last_Item = new $this->objType( $this->row, $this->dbtablename, $this->dbprefix, $this->dbIDname ); // COPY!!
@@ -885,7 +885,7 @@ class ItemList extends DataObjectList
 				'views'      => $this->last_Item->views,
 				'comments'   => $this->last_Item->comments
 			);
-		$authordata = get_userdata($postdata['Author_ID']);
+
 		$day = mysql2date('d.m.y',$postdata['Date']);
 		$currentmonth = mysql2date('m',$postdata['Date']);
 		$numpages = 1;
@@ -966,6 +966,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.18  2005/02/19 18:20:47  blueyed
+ * obsolete functions removed
+ *
  * Revision 1.17  2005/02/10 23:51:43  blueyed
  * added preview-fix todo
  *

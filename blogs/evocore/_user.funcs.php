@@ -214,8 +214,13 @@ function is_logged_in()
 }
 
 
-/*
- * user_pass_ok(-)
+/**
+ * Check if a password is ok for a login.
+ *
+ * @param string login
+ * @param string password
+ * @param boolean Is the password parameter already MD5()'ed?
+ * @return boolean
  */
 function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 {
@@ -235,58 +240,7 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 
 
 /**
- * get_userdatabylogin(-)
- */
-function get_userdatabylogin( $login )
-{
-	global $DB, $cache_userdata;
-	if( empty($cache_userdata[$login]) )
-	{
-		$sql = "SELECT *
-						FROM T_users
-						WHERE user_login = '".$DB->escape($login)."'";
-		$myrow = $DB->get_row( $sql, ARRAY_A );
-		$cache_userdata[$login] = $myrow;
-	}
-	else
-	{
-		$myrow = $cache_userdata[$login];
-	}
-	return($myrow);
-}
-
-
-/**
- * get_userdata(-)
- */
-function get_userdata( $userid )
-{
-	global $DB, $cache_userdata;
-
-	if( empty($cache_userdata[$userid] ) )
-	{ // We do a progressive cache load because there can be many many users!
-		$sql = "SELECT *
-						FROM T_users
-						WHERE ID = $userid";
-		if( $myrow = $DB->get_row( $sql, ARRAY_A ) )
-		{
-			$cache_userdata[ $myrow['ID'] ] = $myrow;
-		}
-	}
-
-	if( ! isset( $cache_userdata[$userid] ) )
-	{
-		die('Requested user does not exist!');
-	}
-
-	return $cache_userdata[$userid];
-}
-
-
-/**
- * user_login_link(-)
- *
- * Template tag; Provide a link to login
+ * Template tag: Provide a link to login
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
@@ -319,9 +273,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 
 
 /**
- * user_register_link(-)
- *
- * Template tag; Provide a link to new user registration
+ * Template tag: Provide a link to new user registration
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
@@ -356,10 +308,8 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 }
 
 
-/*
- * user_logout_link(-)
- *
- * Template tag; Provide a link to logout
+/**
+ * Template tag: Provide a link to logout
  */
 function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
@@ -381,10 +331,8 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 }
 
 
-/*
- * user_admin_link(-)
- *
- * Template tag; Provide a link to the backoffice
+/**
+ * Template tag: Provide a link to the backoffice
  */
 function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link_text = '', $link_title = '#' )
 {
@@ -410,10 +358,8 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 }
 
 
-/*
- * user_profile_link(-)
- *
- * Template tag; Provide a link to user profile
+/**
+ * Template tag: Provide a link to user profile
  */
 function user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
@@ -437,7 +383,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 
 
 /**
- * Display the user's prefered name
+ * Template tag: Display the user's prefered name
  *
  * Used in result lists.
  *
@@ -446,9 +392,9 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 function user_preferedname( $user_ID )
 {
 	global $UserCache;
-	if( !empty( $user_ID ) )
+
+	if( !empty( $user_ID ) && $User =& $UserCache->get_by_ID( $user_ID ) )
 	{
-		$User = & $UserCache->get_by_ID( $user_ID );
 		$User->disp('preferedname');
 	}
 }
@@ -553,6 +499,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/19 18:20:47  blueyed
+ * obsolete functions removed
+ *
  * Revision 1.13  2005/02/15 22:05:10  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *
