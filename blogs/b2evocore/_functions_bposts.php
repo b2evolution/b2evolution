@@ -35,7 +35,7 @@ function bpost_create(
 	$post_comments = 'open',
 	$post_renderers = array() )
 {
-	global $DB, $tableposts, $tablepostcats, $query, $querycount;
+	global $DB, $tableposts, $tablepostcats, $query;
 	global $localtimenow, $default_locale;
 
 	if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -784,7 +784,6 @@ function the_content(
 function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%d', $more_file='')
 {
 	global $id, $page, $numpages, $multipage, $more;
-	global $blogfilename;
 
 	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
 	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
@@ -834,7 +833,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 {
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
-	global $DB, $tableposts, $id, $postdata, $siteurl, $blogfilename;
+	global $DB, $tableposts, $postdata;
 	global $p, $posts, $s;
 
 	if(($p) || ($posts==1))
@@ -891,7 +890,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 {
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
-	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount, $localtimenow;
+	global $tableposts, $p, $posts, $postdata, $localtimenow;
 	if(($p) || ($posts==1))
 	{
 
@@ -1217,7 +1216,7 @@ function the_author_level()
  */
 function the_author_login( $format = 'htmlbody' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_login'], $format );
 }
 
@@ -1226,7 +1225,7 @@ function the_author_login( $format = 'htmlbody' )
  */
 function the_author_firstname( $format = 'htmlbody' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_firstname'], $format );
 }
 
@@ -1235,7 +1234,7 @@ function the_author_firstname( $format = 'htmlbody' )
  */
 function the_author_lastname( $format = 'htmlbody' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_lastname'], $format );
 }
 
@@ -1244,7 +1243,7 @@ function the_author_lastname( $format = 'htmlbody' )
  */
 function the_author_nickname( $format = 'htmlbody' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_nickname'], $format );
 }
 
@@ -1255,7 +1254,7 @@ function the_author_nickname( $format = 'htmlbody' )
  */
 function the_author_ID()
 {
-	global $id,$authordata;
+	global $authordata;
 	echo $authordata['ID'];
 }
 
@@ -1264,7 +1263,7 @@ function the_author_ID()
  */
 function the_author_email( $format = 'raw' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( antispambot($authordata['user_email']), $format );
 }
 
@@ -1275,7 +1274,7 @@ function the_author_email( $format = 'raw' )
  */
 function the_author_url( $format = 'raw' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_url'], $format );
 }
 
@@ -1284,7 +1283,7 @@ function the_author_url( $format = 'raw' )
  */
 function the_author_icq( $format = 'raw' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_icq'], $format );
 }
 
@@ -1293,7 +1292,7 @@ function the_author_icq( $format = 'raw' )
  */
 function the_author_aim( $format = 'raw' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( str_replace(' ', '+', $authordata['user_aim']), $format );
 }
 
@@ -1302,7 +1301,7 @@ function the_author_aim( $format = 'raw' )
  */
 function the_author_yim( $format = 'raw' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_yim'], $format );
 }
 
@@ -1311,7 +1310,7 @@ function the_author_yim( $format = 'raw' )
  */
 function the_author_msn( $format = 'raw' )
 {
-	global $id,$authordata;
+	global $authordata;
 	echo format_to_output( $authordata['user_msn'], $format );
 }
 
@@ -1320,8 +1319,8 @@ function the_author_msn( $format = 'raw' )
  */
 function the_author_posts()
 {
-	global $id,$postdata;
-	$posts=get_usernumposts($postdata['Author_ID']);
+	global $postdata;
+	$posts = get_usernumposts($postdata['Author_ID']);
 	echo $posts;
 }
 

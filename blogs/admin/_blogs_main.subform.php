@@ -28,18 +28,19 @@
 			$defblog = $defblog->dget('shortname');
 		}
 		form_radio( 'blog_access_type', $blog_access_type,
-				array(  array( 'default', T_('Default blog on index.php'), $baseurl.$blog_siteurl.'/index.php'.( isset($defblog) ? '  ['.T_('Current default is:').' '.$defblog.']' : '' ) ),
+				array(  array( 'default', T_('Default blog on index.php'), $edited_Blog->get('baseurl').'index.php'.( isset($defblog) ? '  ['.T_('Current default is:').' '.$defblog.']' : '' ) ),
 								array( 'index.php', T_('Other blog through index.php'), 
-								$baseurl.$blog_siteurl.'/index.php'.( ($Settings->get('links_extrapath')) ? '/'.$blog_stub : '?blog='.$blog) ),
-								array( 'stub', T_('Other blog through stub file'), $baseurl.$blog_siteurl.'/'.$blog_stub ),
+								$edited_Blog->get('baseurl').'index.php'.( ($Settings->get('links_extrapath')) ? '/'.$blog_stub : '?blog='.$blog) ),
+								array( 'stub', T_('Other blog through stub file'), $edited_Blog->get('baseurl').$blog_stub ),
 							), T_('Preferred access type'), true );
 	?>
 	
 	<fieldset>
 		<div class="label"><label for="blog_siteurl"><?php echo T_('Blog Folder URL') ?>: </label></div>
-		<div class="input"><code><?php echo $baseurl ?></code><input type="text" name="blog_siteurl" id="blog_siteurl" size="40" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>"/>
+		<div class="input"><code><?php echo substr($edited_Blog->get('baseurl'), 0, -1) ?></code><input type="text" name="blog_siteurl" id="blog_siteurl" size="40" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>"/>
 		<span class="notes"><?php echo T_('No trailing slash. (If you don\'t know, leave this field empty.)') ?></span></div>
 	</fieldset>
+
 
 	<?php
 		form_text( 'blog_stub', $blog_stub, 20, T_('URL blog name / Stub name'), T_('Used in URLs to identify this blog. This should be the stub filename if you use stub file access.'), 30 );
