@@ -117,10 +117,10 @@ function veriflog( $login_required = false )
 	elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
 	{	/*
 		 * ---------------------------------------------------------
-		 * User was not trying to log in, but he already was loggued in: check validity
+		 * User was not trying to log in, but he already was logged in: check validity
 		 * ---------------------------------------------------------
 		 */
-		// echo 'Was already loggued in...'; 
+		// echo 'Was already logged in...'; 
 
 		$user_login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
 		$user_pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
@@ -144,10 +144,10 @@ function veriflog( $login_required = false )
 	else
 	{	/*
 		 * ---------------------------------------------------------
-		 * User was not loggued in at all
+		 * User was not logged in at all
 		 * ---------------------------------------------------------
 		 */
-		// echo ' NOT loggued in...'; 
+		// echo ' NOT logged in...'; 
 
 		if( $login_required )
 		{
@@ -160,7 +160,7 @@ function veriflog( $login_required = false )
 			exit();
 		}
 	
-		return 0;	// Not loggued in but we don't care
+		return 0;	// Not logged in but we don't care
 	}
 	
 	/*
@@ -210,9 +210,9 @@ function logout()
 }
 
 /*
- * is_loggued_in(-)
+ * is_logged_in(-)
  */
-function is_loggued_in()
+function is_logged_in()
 {
 	global $user_ID;
 	
@@ -454,7 +454,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 {
 	global $htsrv_url, $blog;
 
-	if( is_loggued_in() ) return false;
+	if( is_logged_in() ) return false;
 
 	if( $link_text == '' ) $link_text = T_('Login...');
 	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
@@ -481,8 +481,8 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 {
 	global $htsrv_url, $users_can_register, $blog;
 
-	if( is_loggued_in() || !$users_can_register) 
-	{	// There's no need to provide this link if already loggued in or if we won't let him register
+	if( is_logged_in() || !$users_can_register) 
+	{	// There's no need to provide this link if already logged in or if we won't let him register
 		return false;
 	}
 	
@@ -512,7 +512,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 {
 	global $htsrv_url, $user_login, $blog;
 
-	if( ! is_loggued_in() ) return false;
+	if( ! is_logged_in() ) return false;
 
 	if( $link_text == '' ) $link_text = T_('Logout (%s)');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
@@ -539,7 +539,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 {
 	global $admin_url, $user_level, $blog;
 
-	if( ! is_loggued_in() ) return false;
+	if( ! is_logged_in() ) return false;
 
 	if( $user_level == 0 ) 
 	{ // If user is NOT active:
@@ -566,7 +566,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 {
 	global $user_login, $pagenow;
 
-	if( ! is_loggued_in() ) return false;
+	if( ! is_logged_in() ) return false;
 
 	if( $link_text == '' ) $link_text = T_('Profile (%s)');
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');

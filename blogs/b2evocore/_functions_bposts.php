@@ -1302,8 +1302,8 @@ function statuses_where_clause( $show_statuses = '' )
 	if( $key = array_search( 'private', $show_statuses ) )
 	{	// Special handling for Private status:
 		unset( $show_statuses[$key] );
-		if( is_loggued_in() )
-		{	// We need to be loggued in to have a chance to see this:
+		if( is_logged_in() )
+		{	// We need to be logged in to have a chance to see this:
 			global $user_ID;
 			$where .= $or." ( post_status = 'private' AND post_author = $user_ID ) ";
 			$or = ' OR ';
@@ -1312,8 +1312,8 @@ function statuses_where_clause( $show_statuses = '' )
 
 	if( $key = array_search( 'protected', $show_statuses ) )
 	{	// Special handling for Private status:
-		if( ! is_loggued_in() )
-		{ // we are not allowed to see this if we are not loggued in:
+		if( ! is_logged_in() )
+		{ // we are not allowed to see this if we are not logged in:
 			unset( $show_statuses[$key] );
 		}
 	}

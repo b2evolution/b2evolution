@@ -26,14 +26,14 @@ param( 'newuser_email', 'string', '' );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 
-if( ! is_loggued_in() )
-{	// must be loggued in!
-	die( T_('You are not loggued in.') );
+if( ! is_logged_in() )
+{	// must be logged in!
+	die( T_('You are not logged in.') );
 }
 
 if( $checkuser_id != $user_ID )
 {	// Can only edit your own profile
-	die( T_('You are not loggued in under the same account you are trying to modify.') );
+	die( T_('You are not logged in under the same account you are trying to modify.') );
 }
 
 if( $demo_mode && ($user_login == 'demouser'))

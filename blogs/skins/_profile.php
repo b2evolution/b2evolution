@@ -11,9 +11,9 @@
 	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
 		die("Please, do not access this page directly.");
 
-	if( ! is_loggued_in() )
-	{	// must be loggued in!
-		echo '<p>', T_( 'You are not loggued in.' ), '</p>';
+	if( ! is_logged_in() )
+	{	// must be logged in!
+		echo '<p>', T_( 'You are not logged in.' ), '</p>';
 		return;
 	}
 	// --- //

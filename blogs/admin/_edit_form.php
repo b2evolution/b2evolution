@@ -176,7 +176,7 @@ if( $action != 'editcomment' )
 
 		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Published (Public)') ?></label><br />
 
-		<label title="<?php echo T_('The post will be published but visible only by loggued-in team members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Protected (Members only)') ?></label><br />
+		<label title="<?php echo T_('The post will be published but visible only by logged-in team members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Protected (Members only)') ?></label><br />
 
 		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Private (You only)') ?></label><br />
 

@@ -91,9 +91,9 @@ switch($action)
 		/*
 		 * Default: login form:
 		 */
-		if( is_loggued_in() )
-		{	// The user is already loggued in...
-			$error = T_('Note: You are already loggued in!');
+		if( is_logged_in() )
+		{	// The user is already logged in...
+			$error = T_('Note: You are already logged in!');
 		}
 		
 		// Display login form:
