@@ -24,9 +24,12 @@ require( '../blogs/conf/_config.php' );
 /**#@+
  * Load required functions
  */
+require( '../blogs/evocore/_log.class.php' );
 require( '../blogs/evocore/_misc.funcs.php' );
 require( '../blogs/evocore/_form.funcs.php' );
 /**#@-*/
+
+$Debuglog = new Log();
 
 
 $pofilepath = dirname(__FILE__).'/langfiles';
@@ -56,6 +59,7 @@ foreach( $locales as $key => $value )
 	}
 }
 
+// Discover targets from *.static.po files
 foreach( $pofiles as $po )
 {
 	$target = basename( $po, '.static.po' );
@@ -94,7 +98,7 @@ if( !isset($argv) )
 
 log_('<hr />');
 log_('This script maintains the static html files of the b2evolution project.');
-log_('written by <a href="http://thequod.de">daniel hahler</a>, 2004');
+log_('written by <a href="http://thequod.de/contact">daniel hahler</a>, 2004');
 
 if( isset($argv) )
 { // commandline mode
@@ -128,7 +132,7 @@ function htmlmenu()
 	<div style="width:75%;margin:auto">
 	<form method="get" class="fform">
 	<fieldset>
-		<legend>merge</legend>
+		<legend>Create translated files</legend>
 		<input type="hidden" name="action" value="merge" />
 		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
 		highlight untranslated strings
@@ -139,7 +143,7 @@ function htmlmenu()
 
 	<form method="get" class="fform">
 	<fieldset>
-		<legend>extract</legend>
+		<legend>Extract translatable strings into .POT file</legend>
 		<input type="hidden" name="action" value="extract" />
 		';
 		form_info( 'static POT file', str_replace( '\\', '/', STATIC_POT ) );
@@ -527,9 +531,9 @@ switch( $action )
 				log_( 'building default files');
 				$POFile = new POFile('');
 			}
-			if( $target != DEFAULT_TARGET )
-				$replacesrc = '.'.$target.'.';
-			else $replacesrc = '.';
+			$replacesrc = $target != DEFAULT_TARGET ?
+											'.'.$target.'.' :
+											'.';
 
 
 			foreach( $srcfiles as $srcfile )
@@ -546,19 +550,26 @@ switch( $action )
 					$path_to_root = '../'.$path_to_root;
 				}
 
+
 				// --- build "available translations" list -------------
 				locale_activate( $target );  // activate locale to translate locale names
 
-				$list_avail = "\t".'<ul>'."\n";
-				foreach( $targets as $ttarget => $ttargetmessagefile )
+				// Sort the targets by their translated name
+				$sortedTargets = $targets;
+				uksort( $sortedTargets, create_function( '$a,$b', 'return strcasecmp( T_( $GLOBALS[\'locales\'][$a][\'name\'] ), T_( $GLOBALS[\'locales\'][$b][\'name\'] ) );' ) );
+
+				$trans_available = "\t".'<ul>'."\n";
+				foreach( $sortedTargets as $ttarget => $ttargetmessagefile )
 				{ // the link to the static html file for that target message file
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
 
-					$list_avail .=
+					$trans_available .=
 					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/img/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
 				}
-				$list_avail .= "\t</ul>";
-				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $list_avail, $text );
+				$trans_available .= "\t</ul>";
+
+				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $trans_available, $text );
+
 
 				// standard replacements
 				$search = array(
