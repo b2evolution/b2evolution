@@ -426,6 +426,9 @@ $comments_allowed_attribues = array
 	'small' => C_A_attrs,
 );
 
+/**
+ * URI schemes allowed for URLs in comments and user profiles:
+ */
 $comments_allowed_uri_scheme = array
 (
 	'http',

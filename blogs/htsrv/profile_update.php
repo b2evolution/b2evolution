@@ -81,6 +81,12 @@ elseif (!is_email($newuser_email))
 	return false;
 }
 
+if( $error = validate_url( $newuser_url, $comments_allowed_uri_scheme ) )
+{
+	die( '<strong>' . T_('ERROR') . '</strong>: ' . T_('Supplied URL is invalid: ') . $error );
+	return false;
+}
+
 if ($pass1 == '')
 {
 	if ($pass2 != '')
