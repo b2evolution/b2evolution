@@ -185,48 +185,44 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
-if( !isset($default_skin) ) // Check if this has been forced in stub
-{
+if( !isset( $skin ) ) 
+{ // No skin forced in stub (not even '' for no-skin)...
+
+	// We're going to need a default skin:
+	if(  ( !isset( $default_skin ) ) 					// No default skin forced in stub
+		|| ( !skin_exists( $default_skin ) ) )	// Or the forced default does not exist
+	{	// Use default from the datatabse
 	$default_skin = $Blog->get('default_skin');
+	}
 
 	if( !skin_exists( $default_skin )	|| empty( $default_skin ) )
 	{ // blog's default skin does not exist
-		printf( T_('The default skin [%s] for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or can be overriden in a stub file. Contact the <a %s>webmaster</a>...'), $Blog->get('default_skin'), $Blog->shortname, 'href="'.$admin_url.'/b2blogs.php?action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
+		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
+		// we have to make this fool proof extra checking!
+		printf( T_('The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>...'), $default_skin , $Blog->dget('shortname'), 'href="'.$admin_url.'/b2blogs.php?action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
 		die();
 	}
-}
 
-if( !isset($skin) ) // Check if this has been forced in stub
-{
 	if( $Blog->get('force_skin') )
-	{	// We want to force the use of default skin
+	{	// Blog params tell us to force the use of default skin
 		$skin = $default_skin;
 	}
 	else
-	{
-		// Get the saved skin in cookie or default:
+	{	// Get the saved skin in cookie or default:
 		param( $cookie_state, 'string', $default_skin );
-		// Get skin by params or default to cookie
+		// Get skin by params or default to cookie 
+		// (if cookie was not set, the $$cookie_state contains default skin!)
 		param( 'skin', 'string', $$cookie_state );
 	}
 }
 
-// At this point $skin holds the name of the skin to use, or '' for no skin!
+// At this point $skin holds the name of the skin we want to use, or '' for no skin!
 
 // check to see if we want to display the popup or the main template
 param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 {	// We want to display now:
-	
-	// Check that the default skin exists:
-	// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
-	// we have to make this fool proof extra checking!
-	if( !skin_exists( $default_skin ) )
-	{
-		printf( T_('The default skin [%s] for blog [%s] does not exist. It has been overriden in the stub file [%s]. Contact the <a %s>webmaster</a>...'), $default_skin, $Blog->shortname, $pagenow, 'href="mailto:'.$admin_email.'"');
-		die();	
-	}
 	
 	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
 	{	// We have just asked for the skin explicitely
@@ -268,7 +264,7 @@ if( !empty( $skin ) )
 	}
 }
 else
-{	// no skin specified !
+{	// we don't want to use a skin
 	if( $template == 'popup' )
 	{	// Do the popup display
 		require get_path( 'skins' ).'/_popup.php';

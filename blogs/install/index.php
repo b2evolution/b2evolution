@@ -253,7 +253,7 @@ switch( $action )
 				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
 
 				<fieldset>
-					<legend><?php echo T_('Database you want to install into (These settings should be provided by your host)') ?></legend>
+					<legend><?php echo T_('Database you want to install into') ?></legend>
 					<?php
 						form_text( 'conf_db_user', $conf_db_user, 16, T_('mySQL Username'), sprintf( T_('Your username to access the database' ) ), 16 );
 						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16, '', 'password' );

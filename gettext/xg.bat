@@ -12,7 +12,6 @@ msgmerge -U ..\blogs\locales\ja_JP\LC_MESSAGES\messages.po ..\blogs\locales\mess
 msgmerge -U ..\blogs\locales\lt_LT\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
 msgmerge -U ..\blogs\locales\nb_NO\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
 msgmerge -U ..\blogs\locales\nl_NL\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
-msgmerge -U ..\blogs\locales\pt_BR\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
 msgmerge -U ..\blogs\locales\sv_SE\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
 msgmerge -U ..\blogs\locales\zh_CN\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
 msgmerge -U ..\blogs\locales\zh_TW\LC_MESSAGES\messages.po ..\blogs\locales\messages.pot
