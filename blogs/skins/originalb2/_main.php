@@ -10,8 +10,8 @@
 	<meta http-equiv="reply-to" content="<?php bloginfo('admin_email'); ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
-	<meta name="description" content="<?php bloginfo('shortdesc'); ?>" />
-	<meta name="keywords" content="<?php bloginfo('keywords'); ?>" />
+	<meta name="description" content="<?php bloginfo('shortdesc', 'htmlattr'); ?>" />
+	<meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
 	<style type="text/css" media="screen">
 	@import url(layout2b.css);
 	</style>
