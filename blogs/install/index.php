@@ -49,7 +49,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 <div id="rowheader" >
 	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
-	<h1 id="version"><?php echo T_('Installer for version '), $b2_version ?></h1>
+	<h1 id="version"><?php echo T_('Installer for version '), ' ', $b2_version ?></h1>
 	<div id="quicklinks">
 		<?php echo T_('Current installation') ?>:
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
@@ -63,7 +63,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 </div>
 
 <?php
-if( ($action == 'start') || ($action == 'default') || ($action == 'menu') )
+if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($action == 'menu') )
 {
 	?>
 	<div class="installSideBar">
@@ -79,7 +79,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'menu') )
 		echo '<li>';
 		if( $default_locale == $lkey ) echo '<strong>';
 		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
-		locale_flag( $lkey );
+		locale_flag( $lkey, 'w16px', 'flag', '', true, "$install_dirout/$img_subdir/flags" );
 		echo T_( $lvalue['name'] );
 		echo '</a></li>';
 
@@ -213,6 +213,9 @@ switch( $action )
 				fclose($f);
 
 				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
+				
+				$baseurl = $conf_baseurl;
+				$admin_email = $conf_admin_email;
 				$config_is_done = 1;
 				$action = 'menu';
 			}

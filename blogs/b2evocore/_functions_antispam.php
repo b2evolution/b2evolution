@@ -223,8 +223,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
  */
 function b2evonet_poll_abuse( $display = true ) 
 {
-	global $Settings;
-	global $DB, $baseurl, $tablesettings;
+	global $Settings, $baseurl;
 	
 	$test = 0;
 
@@ -306,8 +305,8 @@ function b2evonet_poll_abuse( $display = true )
 					$endedat = date('Y-m-d H:i:s', iso8601_decode($response['lasttimestamp']) );
 					echo '<p>', T_('New latest update timestamp'), ': ', $endedat, '</p>';
 					
-					$DB->query( "UPDATE $tablesettings 
-													SET antispam_last_update = '$endedat'" );
+					$Settings->set( 'antispam_last_update', $endedat );
+					$Settings->updateDB();
 				}				
 			}
 		}

@@ -62,7 +62,7 @@ class DB
 	
 		$this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword);
 
-		if ( ! $this->dbh )
+		if( ! $this->dbh )
 		{
 			$this->print_error( '<strong>Error establishing a database connection!</strong>
 				<ol>

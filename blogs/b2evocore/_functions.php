@@ -625,16 +625,20 @@ function debug_fopen($filename, $mode) {
 	}
 }
 
-function debug_fwrite($fp, $string) {
+function debug_fwrite($fp, $string) 
+{
 	global $debug;
-	if ($debug == 1) {
+	if( $debug && $fp ) 
+	{
 		fwrite($fp, $string);
 	}
 }
 
-function debug_fclose($fp) {
+function debug_fclose($fp) 
+{
 	global $debug;
-	if ($debug == 1) {
+	if( $debug && $fp ) 
+	{
 		fclose($fp);
 	}
 }

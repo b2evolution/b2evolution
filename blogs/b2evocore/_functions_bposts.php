@@ -348,7 +348,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
  */
 function get_postdata($postid)
 {
-	global $DB, $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $show_statuses;
+	global $DB, $postdata, $tableusers, $tablecategories, $tableposts, $tablecomments, $show_statuses;
 
 	if( !empty($postdata) && $postdata['ID'] == $postid )
 	{	// We are asking for postdata of current post in memory! (we're in the b2 loop)
@@ -411,7 +411,7 @@ function get_postdata($postid)
  */
 function Item_get_by_ID( $post_ID )
 {
-	global $DB, $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
+	global $DB, $postdata, $tableusers, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
 
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
@@ -447,7 +447,7 @@ function Item_get_by_ID( $post_ID )
  */
 function Item_get_by_title( $urltitle )
 {
-	global $DB, $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
+	global $DB, $postdata, $tableusers, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
 
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,

@@ -258,7 +258,7 @@ function get_userdata($userid)
  */
 function get_usernumposts( $userid )
 {
-	global $DB, $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments;
+	global $DB, $tableposts;
 	return $DB->get_var( "SELECT count(*)
 												FROM $tableposts
 												WHERE post_author = $userid" );
