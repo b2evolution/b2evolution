@@ -207,7 +207,7 @@ if( !isset($skin) ) // Check if this has been forced in stub
 		// Get the saved skin in cookie or default:
 		param( $cookie_skin, 'string', $default_skin );
 		// Get skin by params or default to cookie
-		param( 'skin', 'string', $cookie_skin );
+		param( 'skin', 'string', $$cookie_skin );
 	}
 }
 
