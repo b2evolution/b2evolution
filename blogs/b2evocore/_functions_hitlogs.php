@@ -330,14 +330,28 @@ function keyword_ban( $keyword )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$domain%'";	// This is quite drastic!
-		$querycount++;
-		mysql_query($sql) or mysql_oops( $sql );
+	#	$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$domain%'";	// This is quite drastic!
+	#	$querycount++;
+	#	mysql_query($sql) or mysql_oops( $sql );
 		
 		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
-		$querycount++;
-		mysql_query($sql) or mysql_oops( $sql );
+	#	$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
+	#	$querycount++;
+	#	mysql_query($sql) or mysql_oops( $sql );
+	
+	/*	Deleting with LIKE doesn't work like that ^^ - I have to do something like listed on http://www.mysql.com/doc/en/DELETE.html
+			CREATE TEMPORARY TABLE tmptable
+		SELECT A.* FROM table1 AS A, table1 AS B
+		WHERE A.username LIKE '%2'
+		AND A.ID = B.ID
+		AND A.username <> B.username;
+
+		DELETE table1 FROM table1
+		INNER JOIN tmptable
+		ON table1.username = tmptable.username;
+		
+	*/
+
 	}
 }
 
