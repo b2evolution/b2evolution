@@ -14,10 +14,10 @@
  * pingWeblogs(-)
  *
  * pings Weblogs.com
+ * original function by Dries Buytaert for Drupal
  */
 function pingWeblogs( $blog_ID = 1, $display = true ) 
 {
-	// original function by Dries Buytaert for Drupal
 	global $baseurl, $use_weblogsping;
 	if( ! $use_weblogsping ) return false;
 	if( $display )
@@ -25,7 +25,7 @@ function pingWeblogs( $blog_ID = 1, $display = true )
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>', _('Pinging Weblogs.com...'), "</h3>\n";
 	}
-	if( ! preg_match("/localhost\//",$baseurl) ) 
+	if( !preg_match( '#^http://localhost[/:]#', $baseurl) ) 
 	{
 		$client = new xmlrpc_client("/RPC2", "rpc.weblogs.com", 80);
 		$message = new xmlrpcmsg("weblogUpdates.ping", array( new xmlrpcval(get_bloginfo('name')) , 
@@ -34,7 +34,9 @@ function pingWeblogs( $blog_ID = 1, $display = true )
 		$ret = xmlrpc_displayresult( $result );
 		if( $display ) echo '<p>', _('Done.'), "</p>\n</div>\n";
 		return($ret);
-	} else {
+	} 
+	else 
+	{
 		if( $display ) echo "<p>", _('Aborted (Running on localhost).'), "</p>\n</div>\n";
 		return(false);
 	}
@@ -52,7 +54,7 @@ function pingWeblogsRss($rss_url)
 	if( ! $use_weblogsrssping ) return false;
 	echo "<div class=\"panelinfo\">\n";
 	echo "<h3>", _('Pinging Weblogs.com/rssUpdates...'), "</h3>\n";
-	if( !preg_match("/localhost\//",$baseurl) ) 
+	if( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
 	{
 		flush();
 		$client = new xmlrpc_client('/RPC2', 'rssrpc.weblogs.com', 80);
@@ -79,7 +81,7 @@ function pingCafelog($cafelogID,$title='',$p='')
 	if( (! $use_cafelogping) || (empty($cafelogID)) ) return false;
 	echo "<div class=\"panelinfo\">\n";
 	echo "<h3>", _('Pinging Cafelog.com...'), "</h3>\n";
-	if ( !preg_match("/localhost\//",$baseurl) ) 
+	if ( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
 	{
 		flush();
 		$client = new xmlrpc_client("/", "cafelog.tidakada.com", 80);
@@ -108,7 +110,7 @@ function pingBlogs()
 	if( ! $use_blodotgsping ) return false;
 	echo "<div class=\"panelinfo\">\n";
 	echo "<h3>", _('Pinging Blo.gs...'), "</h3>\n";
-	if( !preg_match('/localhost\//',$baseurl) ) 
+	if( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
 	{
 		flush();
 		$url = get_bloginfo('blogurl');

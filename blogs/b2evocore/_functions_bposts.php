@@ -1049,9 +1049,9 @@ function gen_permalink(
 	$use_trackback = NULL,
 	$use_pingback = NULL )
 {
-	global $cacheweekly, $use_extra_path_info;
+	global $cacheweekly, $use_extra_path_info, $permalink_destination;
 	global $permalink_include_more, $permalink_include_comments;
-	global $permalink_include_trackback,$permalink_include_pingback;
+	global $permalink_include_trackback, $permalink_include_pingback;
 
 	// We're gonna need access to more postdata in several cases:
 	$postdata = get_postdata( $id );

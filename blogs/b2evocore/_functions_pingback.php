@@ -20,12 +20,12 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $
 	if( $display )
 	{
 		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', _('Sending pingbacks...'), '</h3>\n';
+		echo '<h3>', _('Sending pingbacks...'), '</h3>', "\n";
 	}
 
 	if( ! $post_pingback )
 	{
-		if( $display ) echo '<p>', _('No pingback to be done.'), '<p>\n';
+		if( $display ) echo '<p>', _('No pingback to be done.'), '<p>', "\n";
 	}
 	else
 	{

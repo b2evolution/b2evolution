@@ -117,7 +117,8 @@ case 'post':
 		pingCafelog($cafelogID, $post_title, $post_ID);
 	}
 
-	switch($HTTP_POST_VARS["mode"]) 
+	set_param( 'mode', 'string', '' );
+	switch($mode) 
 	{
 		case "bookmarklet":
 			$location="b2bookmarklet.php?a=b";
@@ -220,7 +221,8 @@ case "editpost":
 	// UPDATE POST IN DB:
 	bpost_update( $post_ID, $post_title, $content, $datemodif, $post_category,	$post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
 
-	if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
+	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
+	{
 		echo "<p>Sleeping...</p>\n";
 		flush();
 		sleep($sleep_after_edit);
