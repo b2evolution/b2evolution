@@ -694,7 +694,7 @@ You can create additional blogs or delete unwanted blogs from the blogs admin.")
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('This is a multipage post'), T_('This is page 1 of a multipage post.
 
-You can see the other pages by cliking on the links below the text.
+You can see the other pages by clicking on the links below the text.
 
 <!--nextpage-->
 
