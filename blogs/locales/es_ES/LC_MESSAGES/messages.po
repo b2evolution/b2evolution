@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 03:34+0200\n"
+"POT-Creation-Date: 2004-05-11 04:00+0200\n"
 "PO-Revision-Date: 2003-09-12 00:51+0100\n"
 "Last-Translator: Héctor Delcourt <flikarmonth_NOQUIEROSPAM_@iespana.es>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1411,7 +1411,7 @@ msgstr "Fichero estatico"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
 #, fuzzy
-msgid "Destination Static Filename"
+msgid "Static filename"
 msgstr "Fichero estatico"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
@@ -2854,8 +2854,9 @@ msgid "Preferred locale for admin interface, notifications, etc."
 msgstr ""
 
 #: ..\..\..\admin\_users_form.php:121
-msgid "Write Email"
-msgstr ""
+#, fuzzy
+msgid "Send an email"
+msgstr "Administracion"
 
 #: ..\..\..\admin\_users_form.php:134
 msgid "Visit homepage"
@@ -5390,6 +5391,10 @@ msgstr "[...] Leer mas!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nuevo pingback en tu hilo #%d \"%s\""
+
+#, fuzzy
+#~ msgid "Destination Static Filename"
+#~ msgstr "Fichero estatico"
 
 #~ msgid "Loading"
 #~ msgstr "Cargando"

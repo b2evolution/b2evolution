@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 03:34+0200\n"
+"POT-Creation-Date: 2004-05-11 04:00+0200\n"
 "PO-Revision-Date: 2003-09-26 10:20+0300\n"
 "Last-Translator: Arthur H. S. Zapparoli <arthurzap@pop.com.br>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1451,8 +1451,9 @@ msgid "Static file generation"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
-msgid "Destination Static Filename"
-msgstr ""
+#, fuzzy
+msgid "Static filename"
+msgstr "Nome de arquivo inválido!"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
 msgid ""
@@ -2884,9 +2885,8 @@ msgid "Preferred locale for admin interface, notifications, etc."
 msgstr ""
 
 #: ..\..\..\admin\_users_form.php:121
-#, fuzzy
-msgid "Write Email"
-msgstr "Email"
+msgid "Send an email"
+msgstr ""
 
 #: ..\..\..\admin\_users_form.php:134
 msgid "Visit homepage"
@@ -5388,6 +5388,10 @@ msgstr ""
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
+
+#, fuzzy
+#~ msgid "Write Email"
+#~ msgstr "Email"
 
 #~ msgid "Blogroll"
 #~ msgstr "Bolgroll"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.6\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 03:34+0200\n"
+"POT-Creation-Date: 2004-05-11 04:00+0200\n"
 "PO-Revision-Date: 2004-03-08 19:15+0100\n"
 "Last-Translator: Vegar Berg Guldal <mail@funky-m.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1477,7 +1477,7 @@ msgstr "Statisk filnavn"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
 #, fuzzy
-msgid "Destination Static Filename"
+msgid "Static filename"
 msgstr "Statisk filnavn"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
@@ -2951,8 +2951,8 @@ msgstr ""
 
 #: ..\..\..\admin\_users_form.php:121
 #, fuzzy
-msgid "Write Email"
-msgstr "Epost"
+msgid "Send an email"
+msgstr "Admin"
 
 #: ..\..\..\admin\_users_form.php:134
 msgid "Visit homepage"
@@ -5505,6 +5505,14 @@ msgstr "[...] Les mer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nytt pingback på din post nr. %d \"%s\""
+
+#, fuzzy
+#~ msgid "Destination Static Filename"
+#~ msgstr "Statisk filnavn"
+
+#, fuzzy
+#~ msgid "Write Email"
+#~ msgstr "Epost"
 
 #~ msgid "Blogroll"
 #~ msgstr "Blogrull"

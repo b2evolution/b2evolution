@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 03:34+0200\n"
+"POT-Creation-Date: 2004-05-11 04:00+0200\n"
 "PO-Revision-Date: 2004-03-06 03:15+0100\n"
 "Last-Translator: Christina Svensson <b2evo04@cs.se>\n"
 "MIME-Version: 1.0\n"
@@ -1476,7 +1476,7 @@ msgstr "Statiskt filnamn"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
 #, fuzzy
-msgid "Destination Static Filename"
+msgid "Static filename"
 msgstr "Statiskt filnamn"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:20
@@ -2956,9 +2956,8 @@ msgid "Preferred locale for admin interface, notifications, etc."
 msgstr ""
 
 #: ..\..\..\admin\_users_form.php:121
-#, fuzzy
-msgid "Write Email"
-msgstr "E-post"
+msgid "Send an email"
+msgstr ""
 
 #: ..\..\..\admin\_users_form.php:134
 msgid "Visit homepage"
@@ -5544,6 +5543,14 @@ msgstr "[...] Läs mer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Ny pingback på ditt inlägg #%d \"%s\""
+
+#, fuzzy
+#~ msgid "Destination Static Filename"
+#~ msgstr "Statiskt filnamn"
+
+#, fuzzy
+#~ msgid "Write Email"
+#~ msgstr "E-post"
 
 #~ msgid "Blogroll"
 #~ msgstr "Bloggrulle"

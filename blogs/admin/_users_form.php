@@ -118,7 +118,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
 			}
 			
-			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Write Email').'" /></a>';
+			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" /></a>';
 
 			if( $allowed_to_edit )
 				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 50, T_('Email'), $fieldnote, 100 );
