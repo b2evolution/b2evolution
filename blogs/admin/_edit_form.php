@@ -1,55 +1,3 @@
-<?php
-switch($action) 
-{
-	case "post":
-		/*
-		 * -----------------------------------------
-		 * NEW POST:
-		 */
-		$submitbutton_text = T_('Blog this !');
-		$form_action = "post";
-		$form_extra = "";
-		if( ! $use_pingback ) $form_pingback = '';
-		if( ! $use_trackback ) $form_trackback = '';
-		$colspan = 3;
-		$post_date = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
-		break;
-
-
-
-	case "edit":
-		/*
-		 * -----------------------------------------
-		 * EDITING POST:
-		 */
-		$submitbutton_text = T_('Edit this !');
-		$form_action = "editpost";
-		$form_extra = "\" />\n<input type=\"hidden\" name=\"post_ID\" value=\"$post";
-		if( ! $use_pingback ) $form_pingback = '';
-		if( ! $use_trackback ) $form_trackback = '';
-		$colspan = 2;
-		$post_date = $postdata['Date'];
-		break;
-
-
-
-	case "editcomment":
-		/*
-		 * -----------------------------------------
-		 * EDITING COMMENT:
-		 */
-		$submitbutton_text = T_('Edit this !');
-		$form_action = "editedcomment";
-		$form_extra = "\" />\n<input type=\"hidden\" name=\"comment_ID\" value=\"$comment\" />\n<input type=\"hidden\" name=\"comment_post_ID\" value=\"".$commentdata["comment_post_ID"];
-		$form_pingback = '';
-		$form_trackback = '';
-		$colspan = 3;
-		$post_date = $commentdata["comment_date"];
-		break;
-}
-
-?>
-
 <!-- ================================ START OF EDIT FORM ================================ -->
 
 <form name="post" id="post" action="edit_actions.php" target="_self" method="post">
@@ -59,8 +7,12 @@ switch($action)
 <div class="bPost">
 	
 	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
+	<input type="hidden" name="editing" value="1" />
 	<input type="hidden" name="user_ID" value="<?php echo $user_ID ?>" />
-	<input type="hidden" id="action" name="action" value="<?php echo $form_action.$form_extra ?>" />
+	<input type="hidden" id="action" name="action" value="<?php echo $form_action ?>" />
+	<?php if( $action == 'edit' ) { ?>
+	<input type="hidden" name="post_ID" value="<?php echo $post ?>" />
+	<?php } ?>
 
 	<!-- In case we send this to the blog for a preview : -->
 	<input type="hidden" name="preview" value="1" />
@@ -69,30 +21,44 @@ switch($action)
 	
 	<?php 
 	
-	if ($action != "editcomment") 
+	if ($action != 'editcomment') 
 	{ // this is for everything but comment editing
 	?>
 	
+	<nobr>
 	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
 	<input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
+	</nobr>
 	
-	<nobr><label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
-	<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select></nobr>
-	<br />
+	<nobr>
+	<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
+	<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select>
+	</nobr>
 	
+	<nobr>
 	<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-	<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" /><br />
+	<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" />
+	</nobr>
 	
 	<?php
 	} 
 	else 
 	{ // this is for comment editing
 		?>
+	<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
+	<input type="hidden" name="comment_post_ID" value="<?php echo $commentdata['comment_post_ID'] ?>" />
+
+	<nobr>
 	<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata["comment_author"]) ?>" id="name" tabindex="1" />
+	</nobr>
 	
+	<nobr>
 	<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata["comment_author_email"]) ?>" id="email" tabindex="2" />
+	</nobr>
 	
-	<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata["comment_author_url"]) ?>" id="URL" tabindex="3" /><br />
+	<nobr>
+	<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata["comment_author_url"]) ?>" id="URL" tabindex="3" />
+	</nobr>
 	
 	<?php
 	}
@@ -105,7 +71,7 @@ switch($action)
 
 	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" border="0" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
 
-
+	<?php // --------------------------- AUTOBR -------------------------------------- ?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
 	if ($autobr) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"> <?php echo T_('Auto-BR (converts line-breaks into &lt;br /&gt; tags)') ?></label><br />
 	
@@ -113,16 +79,17 @@ switch($action)
 	if( $action != "editcomment")
 	{ // this is for everything but comment editing
 		if( $use_pingback )
-		{
+		{ // --------------------------- PINGBACK --------------------------------------
 	?>
-	<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="pingback" tabindex="7" /><label for="pingback"> <?php echo T_('Pingback the URLs in this post') ?></label><br />
+	<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" <?php
+	if ($post_pingback) echo ' checked="checked"' ?> tabindex="7" /><label for="pingback"> <?php echo T_('Pingback the URLs in this post') ?></label><br />
 	<?php
 		}
 
 		if( $use_trackback )
-		{
+		{	// --------------------------- TRACKBACK --------------------------------------
 	?>
-	<label for="trackback"><?php echo T_('<strong>Trackback</strong> URLs (separate multiple URLs with space)') ?>:</label><br /><input type="text" name="trackback_url" class="large" id="trackback" tabindex="8" />
+	<label for="trackback"><?php echo T_('<strong>Trackback</strong> URLs (separate multiple URLs with space)') ?>:</label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="8" value="<?php echo format_to_edit( $post_trackbacks ); ?>" />
 	<?php 
 		}
 	}
@@ -134,7 +101,8 @@ switch($action)
 	}
 	
 	?>
-	<input type="submit" value="<?php echo $submitbutton_text ?>" class="search" style="font-weight: bold;" tabindex="10" /> 
+	<input type="submit" value="<?php echo ($action == 'post') ? T_('Blog this !') : T_('Edit this !'); ?>" class="search" style="font-weight: bold;" tabindex="10" /> 
+	
 	
 	<?php
 	 if ($use_spellchecker) 
@@ -144,6 +112,8 @@ switch($action)
 	('post','content','');" class="search" tabindex="11" />
 	<?php } ?>
 	
+	
+	
 	<?php if ( ($use_fileupload) && ($user_level >= $fileupload_minlevel) && ((ereg(" ".$user_login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)=="")) ) { ?>
 	<input type="button" value="<?php echo T_('Upload a file/image') ?>" onClick="launchupload();" class="search" tabindex="12"  />
 	<?php }
@@ -152,15 +122,9 @@ switch($action)
 	// if (($user_level > 4) && ($action != "post"))
 	if ($user_level > 4) 
 	{
-		$jj = mysql2date('d', $post_date);
-		$mm = mysql2date('m', $post_date);
-		$aa = mysql2date('Y', $post_date);
-		$hh = mysql2date('H', $post_date);
-		$mn = mysql2date('i', $post_date);
-		$ss = mysql2date('s', $post_date);
 		?>
 		<br />
-		<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" tabindex="13" /><label for="timestamp"><?php echo T_('Edit') ?>:</label>
+		<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> /><label for="timestamp"><?php echo T_('Edit') ?>:</label>
 		<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
 		<select name="mm" tabindex="15">
 		<?php 
@@ -175,7 +139,8 @@ switch($action)
 				$ii = "$i";
 			}
 			echo ">".T_($month[$ii])."</option>\n";
-		} ?>
+		} 
+		?>
 	</select>
 	<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" /> @
 	<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" /> :

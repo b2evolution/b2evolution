@@ -9,7 +9,10 @@
  */
 
 // Initialize everything:
-require_once (dirname(__FILE__).'/_main.php');
+require_once (dirname(__FILE__).'/../b2evocore/_main.php');
+
+// statuses allowed for acting on:
+$show_statuses = array( 'published', 'protected', 'private' );
 
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
@@ -44,9 +47,7 @@ if( ! validate_url( $url, $comments_allowed_uri_scheme) )
 
 $user_ip = $REMOTE_ADDR;
 $user_domain = gethostbyaddr($user_ip);
-$time_difference = get_settings("time_difference");
-$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
-
+$now = date("Y-m-d H:i:s", $localtimenow );
 
 // CHECK and FORMAT content
 //echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);	
@@ -73,7 +74,7 @@ if (!empty($result))
 	}
 	$time_lastcomment=mysql2date("U","$then");
 	$time_newcomment=mysql2date("U","$now");
-	if (($time_newcomment - $time_lastcomment) < 30)
+	if (($time_newcomment - $time_lastcomment) < 0)
 		$ok=0;
 }
 if( ! $ok ) 
@@ -90,6 +91,7 @@ if( errors_display( T_('Cannot post comment, please correct these errors:'),
 /* end flood-protection */
 
 $query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content)  VALUES( $comment_post_ID, 'comment', '$author','$email','$url','$user_ip','$now','$comment' )";
+$querycount++;
 $result = mysql_query($query) or mysql_oops( $query );
 
 if ($comments_notify) 
@@ -98,7 +100,6 @@ if ($comments_notify)
 	$authordata = get_userdata($postdata["Author_ID"]);
 	$recipient = $authordata["user_email"];
 	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
-	// fplanque added:
 	$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 
 	// Not translated because sent to someone else...

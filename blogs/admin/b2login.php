@@ -18,6 +18,6 @@ require_once(dirname(__FILE__)."/$b2inc/_main.php");
 </head>
 <body bgcolor="#ffffff" text="#000000" link="#cccccc" vlink="#cccccc" alink="#ff0000">
 <p>In b2evolution, you do not need to point to the b2login.php page to log in.</p>
-<p>Simply point directly to the backoffice page you need, for example <a href="b2edit.php">b2edit.php</a>. b2evo will prompt you to log in if needed.</p>
+<p>Simply point directly to the backoffice page you need, for example: <a href="b2edit.php">b2edit.php</a> or <a href="b2browse.php">b2browse.php</a>. b2evo will prompt you to log in if needed.</p>
 </body>
 </html>

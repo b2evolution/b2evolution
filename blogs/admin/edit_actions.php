@@ -4,6 +4,9 @@ require_once( dirname(__FILE__).'/_header.php' );
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
 
+// All statuses are allowed for acting on:
+$show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
+
 switch($action) 
 {
 	
@@ -35,7 +38,7 @@ case 'post':
 
 	param( 'edit_date', 'integer' );
 	if (($user_level > 4) && $edit_date) 
-	{
+	{	// We use user date
 		param( 'aa', 'string' );
 		param( 'mm', 'string' );
 		param( 'jj', 'string' );
@@ -47,7 +50,9 @@ case 'post':
 		$mn = ($mn > 59) ? $mn - 60 : $mn;
 		$ss = ($ss > 59) ? $ss - 60 : $ss;
 		$now = "$aa-$mm-$jj $hh:$mn:$ss";
-	} else {
+	}
+	else
+	{	// We use current time
 		$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
 	}
 
@@ -108,7 +113,7 @@ case 'post':
 			break;
 			
 		default:
-			$location="b2edit.php?blog=$blog";
+			$location="b2browse.php?blog=$blog";
 			break;
 	}
 
@@ -247,7 +252,7 @@ case "editpost":
 	<p>Posting Done...<p>
 
 	<?php
-		$location="b2edit.php?blog=$blog";
+		$location="b2browse.php?blog=$blog";
 	break;
 
 
@@ -264,7 +269,8 @@ case "delete":
 	die ("Cheatin' uh ?");
 
 	param( 'post', 'integer' );
-	$postdata=get_postdata($post) or die(T_('Oops, no post with this ID!'));
+	// echo $post;
+	$postdata = get_postdata($post) or die(T_('Oops, no post with this ID!'));
 	$authordata = get_userdata($postdata["Author_ID"]);
 
 	if ($user_level < $authordata[13])
@@ -289,7 +295,7 @@ case "delete":
 	<p><?php echo T_('Deleting Done...') ?><p>
 
 	<?php
-		$location="b2edit.php?blog=$blog";
+		$location="b2browse.php?blog=$blog";
 	break;
 
 
@@ -311,7 +317,7 @@ case "deletecomment":
 	$query = "DELETE FROM $tablecomments WHERE comment_ID=$comment";
 	$result = mysql_query($query) or mysql_oops( $query );
 
-	header ("Location: b2edit.php?blog=$blog&p=$p&c=1#comments"); //?a=dc");
+	header ("Location: b2browse.php?blog=$blog&p=$p&c=1#comments"); //?a=dc");
 	exit();
 
 
@@ -368,13 +374,13 @@ case "editedcomment":
 	$query = "UPDATE $tablecomments SET comment_content=\"$content\", comment_author=\"$newcomment_author\", comment_author_email=\"$newcomment_author_email\", comment_author_url=\"$newcomment_author_url\"".$datemodif." WHERE comment_ID=$comment_ID";
 	$result = mysql_query($query) or mysql_oops($query);
 
-	header ("Location: b2edit.php?blog=$blog&p=$comment_post_ID&c=1#comments"); //?a=ec");
+	header ("Location: b2browse.php?blog=$blog&p=$comment_post_ID&c=1#comments"); //?a=ec");
 	exit();
 
 
 default:
 	echo "nothing to do!";
-	$location="b2edit.php?blog=$blog";
+	$location="b2browse.php?blog=$blog";
 }
 
 if( ! errors() )

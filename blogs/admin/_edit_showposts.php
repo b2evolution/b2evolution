@@ -207,12 +207,14 @@
 				<?php //end of the loop, don't delete
 				}
 
+				if( $postdata['Status'] != 'draft' && $postdata['Status'] != 'deprecated' )
+				{	// Can't leave a comment for non published posts
 				?>
 
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
 				<!-- form to add a comment -->
-				<form action="<?php echo $baseurl, 'file:///C|/www/b2evolution', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
+				<form action="<?php echo $baseurl, '/', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
 				
 					<input type="hidden" name="comment_post_ID" value="<?php echo $id; ?>" />
 					<input type="hidden" name="redirect_to" value="<?php echo $_SERVER["REQUEST_URI"]; ?>" />
@@ -261,12 +263,11 @@
 					<div class="clear"></div>
 				
 				</form>
-
-
-				<?php // if you delete this the sky will fall on your head
+				<?php
 				}
 			}
-			?>
+		}
+	?>
 	</div>
 	<?php
 	}

@@ -102,9 +102,9 @@ if( empty($mode) )
 <div class="menutop"<?php if ($is_NS4) { echo " width=\"500\""; } ?>>
 &nbsp;
 <?php 
-	echo '<a href="b2edit.php?action=new&blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('New Post'), '</a>';
+	echo '<a href="b2edit.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('New Post'), '</a>';
 	echo " | \n";
-	echo '<a href="b2edit.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('Browse/Edit'), '</a>';
+	echo '<a href="b2browse.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('Browse/Edit'), '</a>';
 	if($user_level >= 9) 
 	{
 		echo " | \n";

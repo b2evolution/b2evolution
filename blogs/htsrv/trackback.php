@@ -1,8 +1,17 @@
 <?php 
-require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
-require_once(dirname(__FILE__)."/$b2inc/_vars.php");
-require_once(dirname(__FILE__)."/$b2inc/_functions.php");
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ */
+
+// Initialize everything:
+require_once (dirname(__FILE__).'/../b2evocore/_main.php');
+
+// statuses allowed for acting on:
+$show_statuses = array( 'published', 'protected', 'private' );
 
 param( 'tb_id', 'integer' );
 param( 'url', 'string' );
@@ -43,8 +52,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 
 	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'];
 	$user_domain = gethostbyaddr($user_ip);
-	$time_difference = get_settings('time_difference');
-	$now = date('Y-m-d H:i:s',(time() + ($time_difference * 3600)));
+	$now = date('Y-m-d H:i:s', $localtimenow );
 
 	// CHECK and FORMAT content	
 	if( ! validate_url( $url, $comments_allowed_uri_scheme) )

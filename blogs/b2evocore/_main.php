@@ -40,6 +40,7 @@ dbconnect();
 // Getting settings from db
 $archive_mode = get_settings('archive_mode');
 $time_difference = get_settings('time_difference');
+$localtimenow = time() + ($time_difference * 3600);
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;

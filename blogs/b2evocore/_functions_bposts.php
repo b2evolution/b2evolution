@@ -202,15 +202,10 @@ function bpost_delete( $post_ID )
  */
 function get_lastpostdate() 
 {
-	global $tableposts, $cache_lastpostdate, $use_cache, $time_difference, $pagenow;
+	global $tableposts, $cache_lastpostdate, $use_cache, $time_difference, $pagenow, $localtimenow;
 	if ((!isset($cache_lastpostdate)) OR (!$use_cache)) {
-		$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
-		if ($pagenow != 'b2edit.php') {
-			$showcatzero = 'post_category > 0 AND';
-		} else {
-			$showcatzero = '';
-		}
-		$sql = "SELECT * FROM $tableposts WHERE $showcatzero post_date <= '$now' ORDER BY post_date DESC LIMIT 1";
+		$now = date("Y-m-d H:i:s", $localtimenow);
+		$sql = "SELECT * FROM $tableposts WHERE post_date <= '$now' ORDER BY post_date DESC LIMIT 1";
 		$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
 		$querycount++;
 		$myrow = mysql_fetch_object($result);
@@ -251,6 +246,7 @@ function get_postdata($postid)
 	 *  Restrict to the statuses we want to show:
 	 * ----------------------------------------------------
 	 */
+	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
 
 	//echo $sql;
@@ -642,7 +638,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 {
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
-	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount;
+	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount, $localtimenow;
 	global $time_difference;
 	if(($p) || ($posts==1)) 
 	{
@@ -664,7 +660,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 			}
 		}
 
-		$now = date('Y-m-d H:i:s',(time() + ($time_difference * 3600)));
+		$now = date('Y-m-d H:i:s', $localtimenow );
 
 		$limitnext--;
 		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_date > '$current_post_date' AND post_date < '$now' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_date ASC LIMIT $limitnext,1";

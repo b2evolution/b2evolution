@@ -542,7 +542,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  *
  * Template tag; Provide a link to the backoffice
  */
-function user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link_text = '', $link_title = '#' )
 {
 	global $pathserver, $user_level, $blog;
 
@@ -557,7 +557,7 @@ function user_admin_link( $before = '', $after = '', $link_text = '', $link_titl
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
 
 	echo $before;
-	echo '<a href="', $pathserver, '/b2edit.php" title="', $link_title, '">';
+	echo '<a href="', $pathserver, '/', $page, '" title="', $link_title, '">';
 	echo $link_text ;
 	echo '</a>';
 	echo $after;
