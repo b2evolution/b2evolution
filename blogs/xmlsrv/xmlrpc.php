@@ -8,11 +8,7 @@
 
 $debug = 0;
 
-# fix for mozBlog and other cases where '<?xml' isn't on the very first line
-$HTTP_RAW_POST_DATA=trim($HTTP_RAW_POST_DATA);
-
-include("../conf/b2evo_config.php");
-
+require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpc.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
@@ -24,13 +20,14 @@ $post_autobr = 1;
 $post_default_title = ""; // posts submitted via the xmlrpc interface get that title
 $post_default_category = 1; // posts submitted via the xmlrpc interface go into that category
 
-$xmlrpc_logging = 0;
+$xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
 
 function logIO($io,$msg)
 {
 	global $xmlrpc_logging;
-	if ($xmlrpc_logging) {
-		$fp = fopen("./xmlrpc.log","a+");
+	if ($xmlrpc_logging) 
+	{
+		$fp = fopen( dirname(__FILE__).'/xmlrpc.log',"a+");
 		$date = date("Y-m-d H:i:s ");
 		$iot = ($io == "I") ? " Input: " : " Output: ";
 		fwrite($fp, "\n\n".$date.$iot.$msg);
@@ -44,8 +41,6 @@ function starify($string)
 	$i = strlen($string);
 	return str_repeat('*', $i);
 }
-
-logIO("I",$HTTP_RAW_POST_DATA);
 
 
 
@@ -123,7 +118,7 @@ function b2newpost($m)
 			sleep($sleep_after_edit);
 		}
 
-		pingback( true, $content, $post_ID, $blog_ID, false);
+		pingback( true, $content, $post_title, '', $post_ID, $blog_ID, false);
 		pingWeblogs($blog_ID, false );
 		pingBlogs($blog_ID);
 		pingCafelog($cafelogID, $post_title, $post_ID);
@@ -144,7 +139,7 @@ function b2newpost($m)
  *
  * fplanque: added multiblog support
  */
-$b2getcategories_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 
 $b2getcategories_doc='given a blogID, gives a struct that list categories in that blog, using categoryID and categoryName. categoryName is there so the user would choose a category name from the client, rather than just a number. however, when using b2.newPost, only the category ID number should be sent.';
 
@@ -321,15 +316,21 @@ function bloggernewpost($m)
 	global $cafelogID, $sleep_after_edit;
 	$err="";
 
+	logIO('I','Called function: blogger.newPost');
+
 	dbconnect();
 
 	$username=$m->getParam(2);
 	$password=$m->getParam(3);
 	$content=$m->getParam(4);
+	$publish=$m->getParam(5);
 
 	$username = $username->scalarval();
 	$password = $password->scalarval();
 	$content = $content->scalarval();
+	$publish = $publish->scalarval();
+	$status = $publish ? 'published' : 'draft';
+	logIO('I',"Publish: $publish -> Status: $status");
 
 	if (user_pass_ok($username,$password)) 
 	{
@@ -359,28 +360,38 @@ function bloggernewpost($m)
 		}
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category );
+		$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, 'en', '', 0, $publish );
 
 		if (!$post_ID)
 			return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
            "For some strange yet very annoying reason, your entry couldn't be posted.");
 
-
-		if (!isset($blog_ID)) { $blog_ID = get_catblog($post_category); }
+		logIO("O","Posted ! ID: $post_ID");
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
 			sleep($sleep_after_edit);
 		}
 
-		pingback( true, $content, $post_ID, $blog_ID, false);
-		pingWeblogs($blog_ID,false);
-		pingBlogs($blog_ID);
-		pingCafelog($cafelogID, $post_title, $post_ID);
+		if( $publish )
+		{	// If post is publicly published:
+			logIO("O","Doing pingbacks...");
+			if (!isset($blog_ID)) { $blog_ID = get_catblog($post_category); }
+			pingback( true, $content, $post_title, '', $post_ID, $blog_ID, false);
+			logIO("O","Pinging Weblogs...");
+			pingWeblogs( $blog_ID, false );
+			logIO("O","Pinging Blo.gs...");
+			pingBlogs($blog_ID);
+			logIO("O","Pinging Cafelog...");
+			pingCafelog($cafelogID, $post_title, $post_ID);
+		}
+		
+		logIO("O","All done.");
 
-		logIO("O","Posted ! ID: $post_ID");
 		return new xmlrpcresp(new xmlrpcval("$post_ID"));
 
-	} else {
+	} 
+	else
+	{
 		logIO("O","Wrong username/password combination <strong>$username / $password</strong>");
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
            'Wrong username/password combination '.$username.' / '.starify($password));
@@ -395,12 +406,16 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
 
 $bloggereditpost_doc='Edits a post, blogger-api like';
 
-function bloggereditpost($m) {
+function bloggereditpost($m) 
+{
 
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID,$cache_userdata,$tableposts, $tablepostcats, $use_weblogsping,$post_autobr;
-	global $post_default_title,$post_default_category, $sleep_after_edit;
+	global $post_default_title,$post_default_category;
+	global $cafelogID, $sleep_after_edit;
 	$err="";
+
+	logIO('I','Called function: blogger.editPost');
 
 	dbconnect();
 
@@ -408,35 +423,41 @@ function bloggereditpost($m) {
 	$username=$m->getParam(2);
 	$password=$m->getParam(3);
 	$newcontent=$m->getParam(4);
+	$publish=$m->getParam(5);
 
 	$post_ID = $post_ID->scalarval();
 	$username = $username->scalarval();
 	$password = $password->scalarval();
 	$newcontent = $newcontent->scalarval();
+	$publish = $publish->scalarval();
+	$status = $publish ? 'published' : 'draft';
+	logIO('I',"Publish: $publish -> Status: $status");
 
-	$sql = "SELECT * FROM $tableposts WHERE ID = '$post_ID'";
-	$result = @mysql_query($sql);
-
-	if (!$result)
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-          "No such post.");
+	if( ! ($postdata = get_postdata($post_ID)) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+2, "No such post."); // user error 2
+	}
+	
+	logIO('O','Old post Title: '.$postdata['Title']);
+	$post_author_ID=$postdata['Author_ID'];
+	logIO('O',"Post Author ID: $post_author_ID");
+	$post_authordata=get_userdata($post_author_ID);
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
 	$user_level = $userdata["user_level"];
 
-	$postdata=get_postdata($post_ID);
-	$post_authordata=get_userdata($postdata["Author_ID"]);
-	$post_author_ID=$postdata["Author_ID"];
-
-	if (($user_ID != $post_author_ID) && ($user_level <= $post_authordata["user_level"])) {
+	if (($user_ID != $post_author_ID) && ($user_level <= $post_authordata['user_level'])) 
+	{
 			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
            "Sorry, you do not have the right to edit this post");
 	}
 
-	if (user_pass_ok($username,$password)) {
+	if (user_pass_ok($username,$password)) 
+	{
 
-		if ($user_level < 1) {
+		if ($user_level < 1) 
+		{
 			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
            "Sorry, level 0 users can not edit posts");
 		}
@@ -457,18 +478,63 @@ function bloggereditpost($m) {
 			return new xmlrpcresp(0, $xmlrpcerruser+2, $errstring ); // user error 2
 		}
 
+		// We need to check the previous flags...
+		$post_flags = $postdata['Flags'];
+		if( in_array( 'pingsdone', $post_flags ) )
+		{	// pings have been done before
+			$pingsdone = true;
+		}
+		elseif( !$publish )
+		{	// still not publishing
+			$pingsdone = false;
+		}
+		else
+		{	// We'll be pinging now
+			$pingsdone = true;
+		}
+
 		// UPDATE POST IN DB:
-		if( !bpost_update( $post_ID, $post_title, $content, '', $post_category ) )
+		if( !bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, 'en', '', 0, $pingsdone ) )
+		{
 			return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
   	        "For some strange yet very annoying reason, the entry couldn't be edited.");
-
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
+		}
+		
+		if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
+		{
 			sleep($sleep_after_edit);
 		}
 
+		if( $publish )
+		{	// If post is publicly published:
+
+			// ping ?	
+			if( in_array( 'pingsdone', $post_flags ) )
+			{	// pings have been done before
+				logIO("O","pings have been done before...");
+			}
+			else
+			{	// We'll ping now
+				// We have less control here as in the backoffice, so we'll actually
+				// only pingback once, at the same time we do the pings!
+				logIO("O","Doing pingbacks...");
+				if (!isset($blog_ID)) { $blog_ID = get_catblog($post_category); }
+				pingback( true, $content, $post_title, '', $post_ID, $blog_ID, false);
+				logIO("O","Pinging Weblogs...");
+				pingWeblogs( $blog_ID, false );
+				logIO("O","Pinging Blo.gs...");
+				pingBlogs($blog_ID);
+				logIO("O","Pinging Cafelog...");
+				pingCafelog($cafelogID, $post_title, $post_ID);
+			}
+
+		}
+		
 		return new xmlrpcresp(new xmlrpcval("1", "boolean"));
 
-	} else {
+	} 
+	else 
+	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
            'Wrong username/password combination '.$username.' / '.starify($password));
 	}
@@ -501,20 +567,18 @@ function bloggerdeletepost($m) {
 	$password = $password->scalarval();
 	$newcontent = $newcontent->scalarval();
 
-	$sql = "SELECT * FROM $tableposts WHERE ID = '$post_ID'";
-	$result = @mysql_query($sql);
+	if (! ($postdata=get_postdata($post_ID)) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+2, "No such post.");// user error 2
+	}
 
-	if (!$result)
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-          "No such post.");
+	$post_authordata=get_userdata($postdata["Author_ID"]);
+	$post_author_ID=$postdata["Author_ID"];
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
 	$user_level = $userdata["user_level"];
 
-	$postdata=get_postdata($post_ID);
-	$post_authordata=get_userdata($postdata["Author_ID"]);
-	$post_author_ID=$postdata["Author_ID"];
 
 	if (($user_ID != $post_author_ID) && ($user_level <= $post_authordata["user_level"])) {
 			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
@@ -1704,7 +1768,8 @@ function i_whichToolkit($m) {
 
 /**** SERVER FUNCTIONS ARRAY ****/
 
-$s=new xmlrpc_server( array( "blogger.newPost" =>
+$s=new xmlrpc_server( 
+				array( "blogger.newPost" =>
 							 array("function" => "bloggernewpost",
 										 "signature" => $bloggernewpost_sig,
 										 "docstring" => $bloggernewpost_doc),
@@ -1761,10 +1826,10 @@ $s=new xmlrpc_server( array( "blogger.newPost" =>
 										 "signature" => $b2getcategories_sig,
 										 "docstring" => $b2getcategories_doc),
 
-							 "b2.ping" =>
-							 array("function" => "b2ping",
-										 "signature" => $b2ping_sig,
-										 "docstring" => $b2ping_doc),
+//							 "b2.ping" =>
+//							 array("function" => "b2ping",
+//										 "signature" => $b2ping_sig,
+//										 "docstring" => $b2ping_doc),
 
 							 "pingback.ping" =>
 							 array("function" => "pingback_ping",
@@ -1922,7 +1987,8 @@ $s=new xmlrpc_server( array( "blogger.newPost" =>
 										 "docstring" => $i_whichToolkit_doc),
 
 
-						));
+						)
+				);
 
 ?>
 
