@@ -5,7 +5,7 @@
  */
 
 $trans['de_DE'] = array(
-	'' => "Project-Id-Version: b2evolution 0.8.9\nPOT-Creation-Date: 2004-04-05 22:37+0200\nPO-Revision-Date: 2004-04-13 18:26+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.8.9\nPOT-Creation-Date: 2004-04-05 22:37+0200\nPO-Revision-Date: 2004-04-14 15:39+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'my b2evolution' => "mein b2evolution",
 	'my blogs' => "meine Blogs",
 	'Multilingual multiuser multiblog engine!' => "Multilinguale Multiuser Multiblog Maschine!",
@@ -128,7 +128,7 @@ $trans['de_DE'] = array(
 	'Oops, no comment with this ID!' => "Oops, kein Kommentar mit dieser ID!",
 	'Editing comment' => "Kommentar editieren",
 	'New post in blog:' => "Neue Einträge im Blog:",
-	'Since this blog has no categories, you cannot post to it. You must create categories first.' => "Dieses Blog hat keine Kategorien, du kannst hier nichts schreiben. Du musst erst kategorien erstellen.",
+	'Since this blog has no categories, you cannot post to it. You must create categories first.' => "Dieses Blog hat keine Kategorien, du kannst hier nichts schreiben. Du musst erst Kategorien erstellen.",
 	'Switch to this blog (keeping your input if Javascript is active)' => "Zu diesem Blog wechseln (Eingabe wird behalten, falls Javascript aktiv ist)",
 	'b2evo' => "b2evo",
 	'Login...' => "Login...",
