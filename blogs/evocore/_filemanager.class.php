@@ -454,7 +454,8 @@ class FileManager extends Filelist
 
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_upload', 'mode' => 'upload' ) );
 
-		echo Form::button( 'button', 'fm_upload_popup', $title, 'ActionButton', '', $this->getJsPopupCode( $url, 'fileman_upload' ) );
+		echo '<input type="button" name="fm_upload_popup" value="'.$title.'" class="ActionButton" onclick="'
+					.$this->getJsPopupCode( $url, 'fileman_upload' ).'" />';
 	}
 
 
@@ -1393,6 +1394,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.21  2005/01/20 20:37:16  fplanque
+ * removed static call to Form::button()
+ *
  * Revision 1.20  2005/01/15 17:30:08  blueyed
  * regexp_fileman moved to $Settings
  *
