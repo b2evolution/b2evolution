@@ -427,6 +427,32 @@ class Form extends Widget
 
 
 	/**
+	 * Build a select to choose a weekday.
+	 *
+	 * @return true|string
+	 */
+	function dayOfWeek( $field_name, $field_value, $field_label, $field_note = NULL, $field_class = NULL )
+	{
+		global $weekday_abbrev;
+
+		$field_options = '';
+
+		foreach( $weekday_abbrev as $lNumber => $lWeekday )
+		{
+			$field_options .= '<option';
+
+			if( $field_value == $lNumber )
+			{
+				$field_options .= ' selected="selected"';
+			}
+			$field_options .= ' value="'.$lNumber.'">'.T_($lWeekday).'</option>';
+		}
+
+		return $this->select_options( $field_name, $field_options, $field_label, $field_note, $field_class );
+	}
+
+
+	/**
 	 * Builds a checkbox field
 	 *
 	 * @param string the name of the checkbox
