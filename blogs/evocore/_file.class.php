@@ -137,8 +137,17 @@ class File
 {
 	/**
 	 * Cached iconfile name
+	 * @todo why do we use underscores for these??
 	 */
 	var $_iconfilename = NULL;
+	var $_dir;
+	var	$_name;
+	var $_md5ID;
+	var $_exists;
+	var $_isDir;
+	var $_size;
+	var $_lastMod;
+	var $_perms;
 
 	/**
 	 * Constructor, not to be meant to called directly. Use {@link getFile()}
@@ -153,29 +162,34 @@ class File
 	{
 		$this->setName( $name );
 		$this->setDir( $dir );
+
 		$this->_md5ID = md5( $this->_dir.$this->_name );
 
+		// Get/Memorize detailed file info:
 		$this->refresh();
 	}
 
 
 	/**
-	 * Create the file, if it does not exist.
+	 * Create the file/directory on disk, if it does not exist.
 	 *
-	 * @param string type ('dir' / 'file')
+	 * Also sets file permissions.
+	 *
+	 * @param string type ('dir'|'file')
 	 * @param string optional permissions (octal format)
 	 * @return boolean true if file was created, false on failure
 	 */
 	function create( $type = 'file', $chmod = NULL )
 	{
 		if( $type == 'dir' )
-		{
+		{	// Create an empty directory:
+			// TODO: this is GEEKY unreadable code!!
 			$r = $chmod === NULL ?
 						@mkdir( $this->_dir.$this->_name ) :
 						@mkdir( $this->_dir.$this->_name, octdec($chmod) );
 		}
 		else
-		{
+		{	// Create an empty file:
 			$r = touch( $this->_dir.$this->_name );
 			if( $chmod !== NULL )
 			{
@@ -184,7 +198,7 @@ class File
 		}
 
 		if( $r )
-		{
+		{	// Get/Memorize detailed file info:
 			$this->refresh();
 		}
 		return $r;
@@ -290,14 +304,14 @@ class File
 	/**
 	 * Get the full path (directory and name) to the file.
 	 *
+	 * If the File is a directory, the Path ends with a /
+	 *
 	 * @param boolean full path with name?
 	 */
 	function getPath( $withname = true )
 	{
 		return $this->_dir.$this->_name
-						.( $this->isDir() ?
-								'/' :
-								'' );
+						.( $this->isDir() ? '/' : '' );
 	}
 
 
@@ -318,21 +332,23 @@ class File
 		}
 	}
 
-
+	/**
+	 * Get the file type as a descriptive string.
+	 */
 	function getType()
 	{
+		global $fm_filetypes;
+
 		if( isset( $this->_type ) )
-		{
+		{	// The type is already cached for this object:
 			return $this->_type;
 		}
-
 
 		if( $this->isDir() )
 		{
-			$this->_type = T_('directory');
+			$this->_type = T_('Directory');
 			return $this->_type;
 		}
-		global $fm_filetypes;
 
 		$filename = $this->getName();
 		foreach( $fm_filetypes as $type => $desc )
@@ -344,20 +360,36 @@ class File
 			}
 		}
 
-		$this->_type = T_('unknown');
+		$this->_type = T_('Unknown');
 		return $this->_type;
 	}
 
 
+	/**
+	 * Get file size in bytes
+	 *
+	 * @return integer bytes
+	 */
 	function getSize()
 	{
 		return $this->_size;
 	}
 
 
-	function getLastMod()
+	/**
+	 * Get date of last modification
+	 *
+	 $ @param string date format
+	 * @return string locale formatted date
+	 */
+	function getLastMod( $format = '#' )
 	{
-		return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->_lastMod );
+		if( $format == '#' )
+		{
+			$format = locale_datefmt().' '.locale_timefmt();
+		}
+
+		return date_i18n( $format, $this->_lastMod );
 	}
 
 
@@ -410,17 +442,18 @@ class File
 	{
 		global $map_iconfiles;
 		if( $this->_iconfilename !== NULL )
-		{ // cached
+		{ // Already cached:
 			return $this->_iconfilename;
 		}
 
 		if( $this->isDir() )
-		{
+		{	// Directory icon:
 			$iconfilename = $map_iconfiles['folder']['file'];
 		}
 		else
 		{
 			$iconfilename = $map_iconfiles['file_unknown']['file'];
+			// Loop through known file icons:
 			foreach( $map_iconfiles as $lIconfile )
 			{
 				if( isset( $lIconfile['ext'] )
@@ -440,6 +473,8 @@ class File
 
 	/**
 	 * get size of an image or false if not an image
+	 *
+	 * @todo cache this data
 	 *
 	 * @param string {@link imgsize()}
 	 */
@@ -468,8 +503,9 @@ class File
 
 
 	/**
-	 * Set the File's name.
+	 * Internally sets the filename.
 	 *
+	 * @access private
 	 * @param string
 	 */
 	function setName( $name )
@@ -479,8 +515,9 @@ class File
 
 
 	/**
-	 * Set the File's name.
+	 * Internally sets the file path
 	 *
+	 * @access private
 	 * @param string
 	 */
 	function setDir( $dir )
@@ -489,6 +526,12 @@ class File
 	}
 
 
+	/**
+	 * Internally sets the file/directory size
+	 *
+	 * @access private
+	 * @param integer
+	 */
 	function setSize( $bytes )
 	{
 		$this->_size = $bytes;
@@ -496,8 +539,9 @@ class File
 
 
 	/**
-	 * Rename the file.
+	 * Rename the file in its current directoty on disk.
 	 *
+	 * @access public
 	 * @param string new name (without path!)
 	 * @return boolean true on success, false on failure
 	 */
@@ -516,15 +560,22 @@ class File
 
 
 	/**
-	 * Unlink / Delete the file or folder.
+	 * Unlink/Delete the file or folder from disk.
 	 *
+	 * @access public
 	 * @return boolean true on success, false on failure
 	 */
 	function unlink()
 	{
-		$unlinked = $this->isDir() ?
-								@rmdir( $this->getPath() ) :
-								@unlink( $this->getPath() );
+		if( $this->isDir() )
+		{
+			$unlinked =	@rmdir( $this->getPath() );
+		}
+		else
+		{
+			$unlinked =	@unlink( $this->getPath() );
+		}
+
 		if( !$unlinked )
 		{
 			return false;
@@ -536,8 +587,9 @@ class File
 
 
 	/**
-	 * Change permissions of the file
+	 * Change file permissions on disk.
 	 *
+	 * @access public
 	 * @param string chmod (three-digit-format, eg '777')
 	 * @return mixed new permissions on success (octal format), false on failure
 	 */
@@ -562,6 +614,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.13  2005/01/12 16:07:54  fplanque
+ * documentation
+ *
  * Revision 1.12  2005/01/08 01:24:18  blueyed
  * filelist refactoring
  *
