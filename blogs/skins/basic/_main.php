@@ -21,12 +21,12 @@
 	?>
 	</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <?php /* -- Please leave this for stats -- */ ?>
 </head>
 <body>
 
 	<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-		require( dirname(__FILE__)."/_bloglist.php"); 
+		require( dirname(__FILE__).'/_bloglist.php' ); 
 		// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 	<?php // ------------------------------- START OF SKIN LIST -------------------------------
@@ -106,7 +106,7 @@
 
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__).'/_feedback.php' );
 		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------- 
 
 		locale_restore_previous();	// Restore previous locale (Blog locale)

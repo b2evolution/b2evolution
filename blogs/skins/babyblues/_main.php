@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/*
 	 * This is the main template. It displays the blog.
 	 *
@@ -24,9 +24,9 @@
 <body>
 	<div id="wide">&nbsp;</div>
 	<div id="pic"><img src="babies.jpg"></div>
-	<div id="content"> 
+	<div id="content">
 	<!-- // b2 loop start -->
-	 
+
 	<?php	// ------------------------------------- START OF POSTS -------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty();	// Display message if no post
 
@@ -38,7 +38,7 @@
 		<div class="title"><?php $Item->title(); ?></div>
 		<?php $Item->content(); ?>
 		<?php link_pages("<br />Pages: ","<br />","number") ?>
-		<div class="posted">by <?php $Item->Author->prefered_name() ?> 
+		<div class="posted">by <?php $Item->Author->prefered_name() ?>
 			at <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a><br />
 			<?php $Item->feedback_link( 'comments', '', ' | ' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', '', ' | ' ) // Link to trackbacks ?>
@@ -53,12 +53,12 @@
 			$disp_trackbacks = 1;				// Display the trackbacks if requested
 			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 			$disp_pingbacks = 1;				// Display the pingbacks if requested
-			require( dirname(__FILE__)."/_feedback.php");
+			require( dirname(__FILE__).'/_feedback.php' );
 	?>
-	
+
 	<p>
-	<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
-	
+	<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
+
 	<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 		switch( $disp )
 		{
@@ -66,17 +66,17 @@
 				// this includes the last comments if requested:
 				require( dirname(__FILE__).'/_lastcomments.php' );
 				break;
-	
+
 			case 'stats':
 				// this includes the statistics if requested:
 				require( dirname(__FILE__).'/_stats.php');
 				break;
-			
+
 			case 'arcdir':
 				// this includes the archive directory if requested
 				require( dirname(__FILE__).'/_arcdir.php');
 				break;
-	
+
 			case 'profile':
 				// this includes the profile form if requested
 				require( dirname(__FILE__).'/_profile.php');
@@ -85,13 +85,13 @@
 	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 	</div>
 	<div id="side">
-	
+
 		<div class="sidebody"><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></div>
-	
+
 		<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-			require( dirname(__FILE__)."/_bloglist.php"); 
+			require( dirname(__FILE__).'/_bloglist.php' );
 			// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
-	
+
 		<div class="sidetitle" align="center"><?php echo T_('skin the site') ?></div>
 		<div class="sidebody">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
@@ -99,38 +99,38 @@
 				<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a><br />
 		<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 		</div>
-	
+
 		<div class="sidetitle" align="center"><?php echo T_('archives') ?></div>
 		<div class="sidebody">
 		<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-			require( dirname(__FILE__)."/_archives.php"); 
+			require( dirname(__FILE__).'/_archives.php' );
 			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 		</div>
-	
+
 		<div class="sidetitle" align="center"><?php echo T_('Misc') ?></div>
 		<div class="sidebody">
-			<?php 
+			<?php
 				// Administrative links:
-				user_login_link( '', '<br />' ); 
-				user_register_link( '', '<br />' ); 
-				user_admin_link( '', '<br />' ); 
-				user_profile_link( '', '<br />' ); 
-				user_logout_link( '', '<br />' ); 
+				user_login_link( '', '<br />' );
+				user_register_link( '', '<br />' );
+				user_admin_link( '', '<br />' );
+				user_profile_link( '', '<br />' );
+				user_logout_link( '', '<br />' );
 			?>
 		</div>
-		
+
 		<div class="sidetitle" align="center">credits</div>
 		<div class="sidebody">
 		design from <a href="http://lifeisadiaper.com" title="designed by Sabrina">Sabrina</a><br />
 		powered by <a href="http://b2evolution.net/"title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" class="middle" alt="b2evolution" border="0" /></a><br />
 		</div>
-	
+
 	</div>
-	
-	<?php 
+
+	<?php
 		log_hit();	// log the hit on this page
 		debug_info();	// output debug info if requested
 	?>
-	
+
 </body>
 </html>

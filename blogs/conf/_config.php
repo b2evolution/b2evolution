@@ -59,10 +59,10 @@ $config_is_done = 0;
 # got your basic installation working. They'll let you customize a lot of things!
 
 # DO NOT EDIT THE FOLLOWING!
-@include_once dirname(__FILE__).'/_config_TEST.php'; // Put testing conf in there
-require_once dirname(__FILE__).'/_advanced.php';
-require_once dirname(__FILE__).'/_locales.php';
-require_once dirname(__FILE__).'/_formatting.php';
-require_once dirname(__FILE__).'/_admin.php';
+@include_once dirname(__FILE__).'/_config_TEST.php';    // Put testing conf in there
+require_once  dirname(__FILE__).'/_advanced.php';
+require_once  dirname(__FILE__).'/_locales.php';
+require_once  dirname(__FILE__).'/_formatting.php';
+require_once  dirname(__FILE__).'/_admin.php';
 @include_once dirname(__FILE__).'/_overrides_TEST.php'; // Override for testing in there
 ?>

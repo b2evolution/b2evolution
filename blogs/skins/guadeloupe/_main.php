@@ -26,7 +26,7 @@
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
-	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <?php /* -- Please leave this for stats -- */ ?>
 	<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
@@ -88,7 +88,7 @@
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__).'/_feedback.php' );
 ?>
 </div>
 
@@ -139,7 +139,7 @@
 
 
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require( dirname(__FILE__)."/_bloglist.php");
+	require( dirname(__FILE__).'/_bloglist.php' );
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id=categories>
@@ -147,7 +147,7 @@
 <h4>Categories&nbsp;:</h4>
 <!-- ---------------------------- START OF CATEGORIES ---------------------------- -->
 <form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
-<?php require( dirname(__FILE__)."/_categories.php"); ?>
+<?php require( dirname(__FILE__).'/_categories.php' ); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 <input type="reset" value="<?php echo T_('Reset form') ?>" />
 </form>

@@ -27,7 +27,7 @@
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 <meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 <meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
-<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
+<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <?php /* -- Please leave this for stats -- */ ?>
 <link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
 <link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 <link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
@@ -44,7 +44,7 @@
 
 <!-- InstanceBeginEditable name="NavBar2" -->
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require( dirname(__FILE__)."/_bloglist.php");
+	require( dirname(__FILE__).'/_bloglist.php' );
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
@@ -120,7 +120,7 @@
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 		$disp_trackback_url = 1;		// Display the trackback URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__).'/_feedback.php' );
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------------
 
 		locale_restore_previous();	// Restore previous locale (Blog locale)
@@ -171,7 +171,7 @@
 			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
 		</ul>
 		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			require( dirname(__FILE__)."/_calendar.php");
+			require( dirname(__FILE__).'/_calendar.php' );
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
@@ -195,7 +195,7 @@
 		<h3><?php echo T_('Categories') ?></h3>
 		<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
 		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			require( dirname(__FILE__)."/_categories.php");
+			require( dirname(__FILE__).'/_categories.php' );
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
 		<input type="submit" value="<?php echo T_('Get selection') ?>" />
@@ -207,7 +207,7 @@
 		<h3><?php echo T_('Archives') ?></h3>
 		<ul>
 			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( dirname(__FILE__)."/_archives.php");
+				require( dirname(__FILE__).'/_archives.php' );
 				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 		</ul>
@@ -251,7 +251,7 @@
 	<div class="bSideItem">
 		<h3><?php echo T_('Blogroll') ?></h3>
 		<?php // -------------------------- BLOGROLL INCLUDED HERE -----------------------------
-			require( dirname(__FILE__)."/_blogroll.php");
+			require( dirname(__FILE__).'/_blogroll.php' );
 			// -------------------------------- END OF BLOGROLL ---------------------------------- ?>
 	</div>
 
