@@ -144,13 +144,18 @@ class Filelist
 	 *
 	 * @param string the default path for the files
 	 */
-	function Filelist( $path = '' )
+	function Filelist( $path = '', $allowAllPaths = false )
 	{
-		$this->listpath = trailing_slash( $path );
 		if( empty($path) )
 		{
 			$this->listpath = false;
 		}
+		else
+		{
+			$this->listpath = trailing_slash( $path );
+		}
+
+		$this->_allowAllPaths = $allowAllPaths;
 	}
 
 
@@ -284,28 +289,27 @@ class Filelist
 	 *
 	 * @param string|File file name / full path or {@link File} object
 	 * @param boolean allow other paths than the lists default path?
+	 *                (overrides {@link $_allowAllPaths})
 	 * @return boolean true on success, false on failure (path not allowed,
 	 *                 file does not exist)
 	 * @todo optimize (blueyed)
 	 */
-	function addFileByPath( $path, $allPaths = false )
+	function addFileByPath( $path, $allPaths = NULL )
 	{
 		$basename = basename($path);
-		if( $basename != $path )
-		{ // path attached
-			if( !$allPaths && (dirname($path).'/' != $this->listpath) )
+		$dirname = dirname($path).'/';
+
+		if( $basename != $path
+				&& ( $allPaths === false || ( is_null( $allPaths ) && !$this->_allowAllPaths ) ) )
+		{ // path attached and not all paths allowed
+			if( $dirname != $this->listpath )
 			{ // not this list's path
 				return false;
 			}
-			else
-			{
-				$NewFile =& getFile( $basename, dirname($path).'/' );
-			}
 		}
-		else
-		{
-			$NewFile =& getFile( $path, $this->listpath );
-		}
+
+		$NewFile =& getFile( $basename, $dirname );
+
 
 		if( !$NewFile->exists() )
 		{
@@ -373,6 +377,11 @@ class Filelist
 															( $a->getSize() - $b->getSize() );';
 			}
 		}
+		elseif( $order == 'path' )
+		{ // group by dir
+			$sortfunction = '$r = strcasecmp( $a->getDir(), $b->getDir() );'
+											.'if( $r == 0 ) { $r = strcasecmp( $a->getName(), $b->getName() ); }';
+		}
 		else
 		{
 			$sortfunction = '$r = strcasecmp( $a->get'.$order.'(), $b->get'.$order.'() );';
@@ -421,7 +430,7 @@ class Filelist
 
 		if( $this->orderasc === NULL )
 		{ // default
-			return ( $type == 'name' ) ? 1 : 0;
+			return ( $type == 'name' || $type == 'path' ) ? 1 : 0;
 		}
 		else
 		{
@@ -456,6 +465,17 @@ class Filelist
 			}
 		}
 		return false;
+	}
+
+
+	/**
+	 * Get the order the list is sorted by.
+	 *
+	 * @return NULL|string
+	 */
+	function getOrder()
+	{
+		return $this->order;
 	}
 
 
@@ -672,6 +692,31 @@ class Filelist
 
 
 	/**
+	 * Get the path (and name) of a {@link File} relative to the {@link $listpath list's path}.
+	 *
+	 * @param File the File object
+	 * @param boolean appended with name? (folders will get an ending slash)
+	 * @return string path (and optionally name)
+	 */
+	function getFileSubpath( &$File, $withname = true )
+	{
+		#pre_dump( $File->getDir(), $this->listpath );
+		$path = substr( $File->getDir(), strlen( $this->listpath ) );
+
+		if( $withname )
+		{
+			$path .= $File->getName();
+			if( $File->isDir() )
+			{
+				$path .= '/';
+			}
+		}
+
+		return $path;
+	}
+
+
+	/**
 	 * Unsets a {@link File} from the entries list.
 	 *
 	 * @return boolean true on success, false if not found in list.
@@ -702,6 +747,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.12  2005/01/06 10:15:45  blueyed
+ * FM upload and refactoring
+ *
  * Revision 1.11  2005/01/05 03:04:01  blueyed
  * refactored
  *

@@ -60,14 +60,12 @@ switch( $action )
 
 		param( 'upload_enabled', 'integer', 0 );
 		$Settings->set( 'upload_enabled', $upload_enabled );
-		param( 'upload_realpath', 'string', true );
-		$Settings->set( 'upload_realpath', $upload_realpath );
-		param( 'upload_url', 'string', true );
-		$Settings->set( 'upload_url', $upload_url );
 
 		param( 'upload_allowedext', 'string', true );
 		$Settings->set( 'upload_allowedext', trim($upload_allowedext) );
-		param( 'upload_maxkb', 'integer', 0 );
+		param( 'upload_allowedmime', 'string', true );
+		$Settings->set( 'upload_allowedmime', trim($upload_allowedmime) );
+		param( 'upload_maxkb', 'integer', true );
 		$Settings->set( 'upload_maxkb', $upload_maxkb );
 
 		#param( 'upload_minlevel', 'integer', true );

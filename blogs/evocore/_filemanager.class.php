@@ -141,13 +141,22 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Force display of Filemanager also when in file_upload mode etc.?
+	 * // Is also a usersetting.
+	 * @var boolean
+	 * @access protected
+	 */
+	var $forceFM = NULL;
+
+
+	/**
 	 * These are variables that get considered when regenerating a URL
 	 * @var array
 	 * @access private
 	 */
 	var $_internalGlobals = array(
 			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
-			'mode', 'fm_sources', 'cmr_keepsource', 'flatmode',
+			'mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM'
 		);
 
 	/**
@@ -258,8 +267,9 @@ class FileManager extends Filelist
 			}
 		}
 
-		// get the subpath relative to root
+		// Get the subpath relative to root
 		$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
+
 		// }}}
 
 
@@ -312,6 +322,7 @@ class FileManager extends Filelist
 		$this->order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
 		$this->orderasc = ( $orderasc === NULL  ? NULL : (bool)$orderasc );
 
+
 		$this->loadSettings();
 
 
@@ -338,6 +349,7 @@ class FileManager extends Filelist
 
 		$this->flatmode = $flatmode;
 
+		$this->forceFM = param( 'forceFM', 'integer', NULL );
 
 		$this->load();
 	}
@@ -447,7 +459,7 @@ class FileManager extends Filelist
 	 *
 	 * @param string 'copy', 'move' or 'rename'
 	 */
-	function dispButtonFileCopyMoveRename( $mode )
+	function dispButtonFileCopyMoveRename( $mode, $linkTitle = NULL )
 	{
 		if( $mode != 'copy' && $mode != 'move' && $mode != 'rename' )
 		{
@@ -461,11 +473,19 @@ class FileManager extends Filelist
 		echo '<a href="'.$url.'" target="fileman_copymoverename" onclick="'
 					.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
 					.'" title="';
-		switch( $mode )
+
+		if( $linkTitle === NULL )
 		{
-			case 'copy': echo T_('Copy'); break;
-			case 'move': echo T_('Move'); break;
-			case 'rename': echo T_('Rename'); break;
+			switch( $mode )
+			{
+				case 'copy': echo T_('Copy'); break;
+				case 'move': echo T_('Move'); break;
+				case 'rename': echo T_('Rename'); break;
+			}
+		}
+		else
+		{
+			echo $linkTitle;
 		}
 
 		echo '">'.getIcon( 'file_'.$mode ).'</a>';
@@ -492,10 +512,12 @@ class FileManager extends Filelist
 
 	/**
 	 * Display a button to rename the current File.
+	 *
+	 * @param string Title to display for the link (default is 'Rename')
 	 */
-	function dispButtonFileRename()
+	function dispButtonFileRename( $linkTitle = NULL )
 	{
-		$this->dispButtonFileCopyMoveRename( 'rename' );
+		$this->dispButtonFileCopyMoveRename( 'rename', $linkTitle );
 	}
 
 
@@ -620,7 +642,7 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Generates hidden input fields for forms, based on {@link getCurUrll()}
+	 * Generates hidden input fields for forms, based on {@link getCurUrl()}
 	 *
 	 * @return string
 	 */
@@ -670,7 +692,7 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Get an array of available root directories.
+	 * Get an array of available roots.
 	 *
 	 * @return array of arrays for each root: array( type [blog/user], id, name )
 	 */
@@ -687,12 +709,16 @@ class FileManager extends Filelist
 			$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 			$r[] = array( 'type' => 'blog',
-											'id' => $blog_ID,
-											'name' => $Blog->get( 'shortname' ) );
+										'id' => 'blog_'.$blog_ID,
+										'name' => $Blog->get( 'shortname' ),
+										'path' => $Blog->getMediaDir() );
 		}
 
+		// the user's root
 		$r[] = array( 'type' => 'user',
-										'name' => T_('My media folder') );
+									'id' => 'user',
+									'name' => T_('My media folder'),
+									'path' => $this->User->getMediaDir() );
 
 		return $r;
 	}
@@ -700,7 +726,8 @@ class FileManager extends Filelist
 
 	/**
 	 * Get the link to sort by a column. Handle current order and appends an
-	 * icon to reflect the current state (ascending/descending).
+	 * icon to reflect the current state (ascending/descending), if the column
+	 * is where we're sorting by.
 	 *
 	 * @param string The type (name, path, size, ..)
 	 * @param string The text for the anchor.
@@ -708,25 +735,26 @@ class FileManager extends Filelist
 	 */
 	function getLinkSort( $type, $atext )
 	{
-		$asc = $this->order == $type ?
-						(1 - $this->isSortingAsc()) : // change asc/desc
-						1;
+		$newAsc = $this->order == $type ?
+								(1 - $this->isSortingAsc()) : // change asc/desc
+								1;
+
 
 		$r = '<a href="'
 					.$this->getCurUrl( array( 'order' => $type,
-																		'orderasc' => $asc ) );
+																		'orderasc' => $newAsc ) );
 
 		$r .= '" title="'
-					.( $asc ?
+					.( $newAsc ?
 							/* TRANS: %s gets replaced with column names 'Name', 'Type', .. */
 							sprintf( T_('Sort ascending by: %s'), $atext ) :
 							/* TRANS: %s gets replaced with column names 'Name', 'Type', .. */
 							sprintf( T_('Sort descending by: %s'), $atext ) )
 					.'">'.$atext;
 
-		if( $this->order == $type )
+		if( $this->translate_order($this->order) == $type )
 		{ // add asc/desc image to represent current state
-			$r .= ' '.( !$asc ?
+			$r .= ' '.( $this->isSortingAsc($type) ?
 										getIcon( 'ascending' ) :
 										getIcon( 'descending' ) );
 		}
@@ -750,31 +778,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Get the path (and name) of a {@link File} relative to the cwd.
-	 *
-	 * @param File the File object
-	 * @param boolean appended with name?
-	 * @return string path (and optionally name)
-	 */
-	function getFileSubpath( &$File, $withname = true )
-	{
-		$path = substr( $this->path.$File->getDir(), strlen( $this->cwd ) );
-
-		if( empty($path) )
-		{
-			$path = './';
-		}
-
-		if( $withname )
-		{
-			$path .= $File->getName();
-		}
-
-		return $path;
-	}
-
-
-	/**
 	 * Get the URL of a file.
 	 *
 	 * @param File the File object
@@ -786,7 +789,7 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 
-		return $this->root_url.$this->getFileSubpath($File);
+		return $this->root_url.$this->getFileSubpath( $File );
 	}
 
 
@@ -818,7 +821,7 @@ class FileManager extends Filelist
 		{
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
-				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath($File) ) );
+				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath( $File ) ) );
 			}
 
 			return $File->cache['linkFile_1'];
@@ -924,6 +927,107 @@ class FileManager extends Filelist
 		}
 
 		return $this->_selectedFiles;
+	}
+
+
+	/**
+	 * Get the directories of the supplied path as a radio button tree.
+	 *
+	 * @param string the root path to use
+	 * @param NULL|array list of root IDs (defaults to all)
+	 * @return string
+	 */
+	function getDirectoryTreeRadio( $rootID = NULL, $path = NULL, $rootSubpath = NULL, $rootName = NULL )
+	{
+		static $js_closeClickIDs; // clickopen IDs that should get closed
+
+		if( $rootID === NULL )
+		{
+			$js_closeClickIDs = array();
+
+			$_roots = $this->getRootList();
+
+			$r = '<ul class="clicktree">';
+			foreach( $_roots as $lRoot )
+			{
+				$subR = $this->getDirectoryTreeRadio( $lRoot['id'], $lRoot['path'], '', $lRoot['name'] );
+				if( !empty( $subR['string'] ) )
+				{
+					$r .= '<li>'.$subR['string'].'</li>';
+				}
+			}
+
+			$r .= '</ul>
+						<script type="text/javascript">
+						toggle_clickopen( \''
+						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
+						."' );\n
+						</script>";
+
+			return $r;
+		}
+
+		$Nodelist = new Filelist( $path );
+		$Nodelist->load();
+
+		$rootIDAndPath = format_to_output( serialize( array( 'id' => $rootID, 'path' => $rootSubpath ) ), 'formvalue' );
+		$id_path = md5( $path );
+
+		$r['string'] = '<input type="radio"
+														name="rootIDAndPath"
+														value="'.$rootIDAndPath.'"
+														id="radio_'.$id_path.'"
+														'.( $rootID == $this->root && $rootSubpath == $this->path ? ' checked="checked"' : '' ).'
+														/> ';
+
+		$label = '<label for="radio_'.$id_path.'">'
+							.'<a href="'.$this->getCurUrl( array( 'root' => $rootID, 'path' => $rootSubpath, 'forceFM' => 1 ) ).'">'
+							.( is_string( $rootName ) ? $rootName : basename( $path ) )
+							.'</a>'
+							.'</label>';
+
+		$r['opened'] = ( $rootID == $this->root && $rootSubpath == $this->path ) ?
+										true :
+										NULL;
+
+
+
+		if( !$Nodelist->countDirs() )
+		{
+			$r['string'] .= $label;
+			return $r;
+		}
+		else
+		{ // Process subdirs
+			$r['string'] .= '<img ' // Gets activated by JS and makes only sense with JS
+											.' src="'.getIcon( 'collapse', 'url' ).'"'
+											.' onclick="toggle_clickopen(\''.$id_path.'\');"'
+											.' id="clickimg_'.$id_path.'" alt="+ / -" />
+										'.$label.'
+										<ul class="clicktree" id="clickdiv_'.$id_path.'">
+
+										';
+
+			while( $lFile =& $Nodelist->getNextFile( 'dir' ) )
+			{
+				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->getPath(), $Nodelist->getFileSubpath( $lFile ) );
+
+				if( $rSub['opened'] )
+				{
+					$r['opened'] = $rSub['opened'];
+				}
+
+				$r['string'] .= '<li>'.$rSub['string'].'</li>';
+			}
+
+			if( !$r['opened'] )
+			{
+				$js_closeClickIDs[] = $id_path;
+			}
+			$r['string'] .= '</ul>';
+		}
+
+		return $r;
 	}
 
 
@@ -1144,13 +1248,14 @@ class FileManager extends Filelist
 		}
 		else
 		{
-			return ($order == 'name') ? 1 : 0;
+			return ($order == 'name' || $order == 'path') ? 1 : 0;
 		}
 	}
 
 
 	/**
-	 * translates $order parameter, if it's NULL
+	 * Translates $order parameter, if it's NULL.
+	 *
 	 * @param string order by?
 	 * @return string order by what?
 	 */
@@ -1164,10 +1269,25 @@ class FileManager extends Filelist
 		{
 			return $this->order;
 		}
+		elseif( $this->flatmode )
+		{
+			return 'path';
+		}
 		else
 		{
 			return 'name';
 		}
+	}
+
+
+	/**
+	 * Get the used order.
+	 *
+	 * @return string
+	 */
+	function getOrder()
+	{
+		return $this->translate_order( $this->order );
 	}
 
 
@@ -1253,6 +1373,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.14  2005/01/06 10:15:45  blueyed
+ * FM upload and refactoring
+ *
  * Revision 1.13  2005/01/05 03:04:01  blueyed
  * refactored
  *

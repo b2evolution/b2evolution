@@ -43,6 +43,22 @@ code {
 	font-size: 84%;
 }
 
+ul.clicktree {
+	margin:0 0 0 2ex;
+	padding:0ex;
+	list-style:none;
+}
+
+ul.clicktree ul.clicktree {
+	margin-left:4ex;
+}
+
+ul.plain {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
 
 /*
 {{{ Messages

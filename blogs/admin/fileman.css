@@ -26,14 +26,12 @@
 	width:100%;
 	margin-top:0;
 }
-#filemanmain table.grouped caption {
+#filemanmain table.grouped thead td {
 	text-align:left;
 	padding: .5ex;
-	/* Temporary colors, needs overriding - adjust div.fm_roots, too */
+	/* Temporary colors, needs overriding */
 	background-color: #efede0;
 	border: 1px solid #9e9286;
-	border-bottom: none;
-	border-top: none;
 }
 #filemanmain table.grouped th {
 	white-space:nowrap;
@@ -96,18 +94,13 @@ span.fm_filecounts {
 }
 
 div.fm_roots {
-	background-color: #efede0;
-	border: 1px solid #9e9286;
-	border-bottom:none;
 	padding:.5ex;
 }
-
 
 div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;
 }
-
 
 
 img.framed {
@@ -130,7 +123,7 @@ pre.rawcontent {
 	font-family: Courier New, sans-serif;
 }
 
-button.image {
+.filenameIcon {
 	float:right;
 	border:none;
 	padding:0;
@@ -158,3 +151,9 @@ ul.iconlegend li {
 	margin-bottom:.5ex;
 }
 
+
+fieldset.fm_upload_dirselect {
+	float:right;
+	border:1px solid #ddd;
+	margin:100ex;
+}

@@ -53,10 +53,8 @@ require_once dirname(__FILE__).'/_header.php';
  */
 require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
 
-$admin_tab = 'files';
-$admin_pagetitle = T_('Filemanager').' (beta)';
-
-param( 'path', 'string', '' );       // the path relative to the root dir
+param( 'root', 'string', NULL );     // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+param( 'path', 'string', '/' );       // the path relative to the root dir
 param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
 
 param( 'order', 'string', NULL );
@@ -65,13 +63,18 @@ param( 'filterString', '', NULL );
 param( 'filterIsRegexp', 'integer', NULL );
 param( 'flatmode', '', NULL );
 
-param( 'root', 'string', NULL );     // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-
 
 if( $current_User->login != 'demouser' && $current_User->level < 10 )
 { // allow demouser, but noone else below level 10
 	echo 'The filemanager is still beta. You need user level 10 to play with this.';
 	return;
+}
+
+if( param( 'rootIDAndPath', 'string', '' ) )
+{ // root and path together: decode and override
+	$rootIDAndPath = unserialize( $rootIDAndPath );
+	$root = $rootIDAndPath['id'];
+	$path = $rootIDAndPath['path'];
 }
 
 if( $action == 'update_settings' )
@@ -81,6 +84,7 @@ if( $action == 'update_settings' )
 	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
 	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
 	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+	$UserSettings->set( 'fm_forceFM',          param( 'option_forceFM',          'integer', 0 ) );
 
 	if( $UserSettings->updateDB() )
 	{
@@ -105,11 +109,6 @@ $selectedFiles = $Fileman->getFilelistSelected();
 
 if( !empty($action) )
 {
-	if( !$selectedFiles->count() && $action != 'createnew' )
-	{
-		$Fileman->Messages->add( T_('Nothing selected.') );
-	}
-
 	switch( $action )
 	{
 		// catch JS-only actions
@@ -127,12 +126,24 @@ if( !empty($action) )
 
 
 		case T_('Send by mail'):
+			if( !$selectedFiles->count() )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
 			echo 'TODO: Send selected by mail, query email address..';
 			break;
 
 
 		case T_('Download'):
 			// TODO: provide optional zip formats
+			if( !$selectedFiles->count() )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
 			param( 'zipname', 'string', '' );
 			param( 'exclude_sd', 'integer', 0 );
 
@@ -150,10 +161,10 @@ if( !empty($action) )
 				{
 					if( $lFile->isDir() )
 					{
-						$msg_action .= sprintf('<li>'.T_('Directory [%s]')."</li>\n", $lFile->getName());
+						$msg_action .= sprintf('<li>'.T_('Directory &laquo;%s&raquo;')."</li>\n", $lFile->getName());
 						$atLeastOneDir = true;
 					}
-					else $msg_action .= sprintf('<li>'.T_('File [%s]')."</li>\n", $lFile->getName());
+					else $msg_action .= sprintf('<li>'.T_('File &laquo;%s&raquo;')."</li>\n", $lFile->getName());
 				}
 
 				$msg_action .= '
@@ -209,7 +220,7 @@ if( !empty($action) )
 				#header('Content-length: ' . filesize($path));
 				$zipfile->download_file();
 				exit;
-				#$Fileman->Messages->add( sprintf(T_('Zipfile [%s] sent to you!'), $zipname), 'note' );
+				#$Fileman->Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
 
 			}
 
@@ -217,6 +228,12 @@ if( !empty($action) )
 
 
 		case 'delete': // delete a file/dir, TODO: checkperm! {{{
+			if( !$selectedFiles->count() )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
 			param( 'confirmed', 'integer', 0 );
 			param( 'delsubdirs', 'array', array() );
 
@@ -287,6 +304,12 @@ if( !empty($action) )
 
 
 		case 'editperm': // edit permissions {{{
+			if( !$selectedFiles->count() )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
 			param( 'perms', 'array', array() );
 
 			if( count( $perms ) )
@@ -301,15 +324,15 @@ if( !empty($action) )
 
 					if( $newperms === false )
 					{
-						$Fileman->Messages->add( sprintf( T_('Failed to set permissions on [%s] to [%s].'), $lFile->getName(), $chmod ) );
+						$Fileman->Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->getName(), $chmod ) );
 					}
 					elseif( $newperms === $oldperms )
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $lFile->getName() ), 'note' );
+						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->getName() ), 'note' );
 					}
 					else
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $lFile->getName(), $lFile->getPerms() ), 'note' );
+						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->getName(), $lFile->getPerms() ), 'note' );
 					}
 				}
 			}
@@ -369,7 +392,13 @@ if( !empty($action) )
 			break;
 
 
-		default: // default action (view) {{{
+		case 'default': // default action (view) {{{
+			if( !$selectedFiles->count() )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
 			$selectedFile =& $selectedFiles->getFileByIndex(0);
 
 			// TODO: check if available
@@ -426,11 +455,12 @@ if( !empty($action) )
 
 						?>
 						<noscript type="text/javascript">
-							<a href="<?php echo $Fileman->getLinkFile( $selectedFile ).'&amp;showlinenrs='.(1-$showlinenrs).'">'
-								.( $showlinenrs ?
-										T_('hide line numbers') :
-										T_('show line numbers') ).'</a>';
-						?>
+							<a href="<?php echo $Fileman->getLinkFile( $selectedFile ).'&amp;showlinenrs='.(1-$showlinenrs); ?>">
+
+							<?php echo $showlinenrs ?
+													T_('hide line numbers') :
+													T_('show line numbers');
+							?></a>
 						</noscript>
 						<script type="text/javascript">
 						<!--
@@ -510,10 +540,26 @@ if( !empty($action) )
 			</body>
 		</html>
 		<?php
-		exit;
-
 		// }}}
+			exit;
+
+
+		case 'leaveMode': // leave mode (upload, ..)
+			$Fileman->mode = NULL;
+			header( 'Location: '.$Fileman->getCurUrl() );
+			break;
 	}
+}
+
+
+$admin_tab = 'files';
+$admin_pagetitle = T_('Filemanager').' (beta)';
+
+switch( $Fileman->getMode() )
+{
+	case 'file_upload':
+		$admin_pagetitle = T_('Upload').$admin_path_seprator.$admin_pagetitle;
+		break;
 }
 
 
@@ -541,128 +587,233 @@ switch( $Fileman->getMode() )
 		}
 
 		$LogUpload = new Log( 'error' );
-		$allowedftypes = preg_split( '/\s+/', trim( $Settings->get( 'upload_allowedext' ) ) );
+		$allowedFileExtensions = trim( $Settings->get( 'upload_allowedext' ) );
+		$allowedMimeTypes = preg_split( '/\s+/', trim( $Settings->get( 'upload_allowedmime' ) ) );
 
 		if( isset($_FILES) && count( $_FILES ) )
-		{{{ // process uploaded files
-			foreach( $_FILES['uploadfile']['name'] as $lkey => $lName )
+		{{{ // Process uploaded files
+			param( 'uploadfile_name', 'array', array() );
+
+			foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 			{
 				if( empty($lName) )
 				{ // no name
 					continue;
 				}
 
-				if( $_FILES['uploadfile']['size'][$lkey] > $fileupload_maxk*1024 )
-				{
-					$LogUpload->add( sprintf( T_('The file [%s] is too big and has not been accepted.'), $lName ) );
+				if( ( $Settings->get( 'upload_maxkb' ) && $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
+						|| $_FILES['uploadfile']['error'][$lKey] == UPLOAD_ERR_FORM_SIZE ) // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+				{ // bigger than defined by blog
+					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; is too big and has not been accepted.'), $lName ) );
 					continue;
 				}
-				elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey] ) )
+				elseif( $_FILES['uploadfile']['error'][$lKey] )
 				{
-					$LogUpload->add( sprintf( T_('The file [%s] does not seem to be a valid upload!'), $lName ) );
+					switch( $_FILES['uploadfile']['error'][$lKey] )
+					{
+						case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
+							$LogUpload->add( sprintf( T_('The uploaded file &laquo;%s&raquo; exceeds the upload_max_filesize directive in php.ini.'), $lName ) );
+							continue;
+
+						case UPLOAD_ERR_PARTIAL:
+							$LogUpload->add( sprintf( T_('The uploaded file &laquo;%s&raquo; was only partially uploaded.'), $lName ) );
+							continue;
+
+						case UPLOAD_ERR_NO_FILE:
+							$LogUpload->add( sprintf( T_('No file was uploaded (%s).'), $lName ) );
+							continue;
+					}
+
+					$LogUpload->add( sprintf( T_('Unknown error with file &laquo;%s&raquo;.'), $lName ) );
+					continue;
+				}
+				elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
+				{
+					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; does not seem to be a valid upload!'), $lName ) );
 					continue;
 				}
 
-				$newName = $Fileman->getCwd().basename( $lName );
-				if( file_exists( $newName ) )
+
+				$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
+
+				if( !isFilename( $newName ) )
+				{
+					$LogUpload->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newName ) );
+					continue;
+				}
+				elseif( $allowedFileExtensions
+								&& !preg_match( '#\.'.preg_replace( array( '#\s+#', '/#/' ), array( '|', '\#' ), $allowedFileExtensions ).'$#', $newName  ) )
+				{
+					$LogUpload->add( sprintf( T_('The file extension of &laquo;%s&raquo; is not allowed.'), $newName ) );
+					continue;
+				}
+
+
+				$newFile =& getFile( $lName, $Fileman->getCwd() );
+
+				if( $newFile->exists() )
 				{
 					// TODO: Rename/Overwriting
-					$LogUpload->add( sprintf( T_('The file [%s] already exists.'), basename($newName) ) );
+					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->getName() ) );
 					continue;
 				}
-				elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey], $newName ) )
+				elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
 				{
-					$Fileman->Messages->add( sprintf( T_('The file [%s] has been successfully uploaded.'), basename($newName) ), 'note' );
-					$Fileman->addFileByPath( $newName );
+					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->getName() ), 'note' );
+
+					$newFile->refresh();
+					$Fileman->addFile( $newFile );
 					continue;
 				}
-
-				$tError = 'An error occured ('.$lName.'):<br />';
-
-				switch( $_FILES['uploadfile']['error'][$lkey] )
-				{
-					case UPLOAD_ERR_OK:
-						$tError .= 'There is no error, the file uploaded with success.';
-						break;
-					case UPLOAD_ERR_INI_SIZE:
-						$tError .= 'The uploaded file exceeds the upload_max_filesize directive in php.ini.';
-						break;
-
-					case UPLOAD_ERR_FORM_SIZE:
-						$tError .= 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.';
-						break;
-
-					case UPLOAD_ERR_PARTIAL:
-						$tError .= 'The uploaded file was only partially uploaded.';
-						break;
-
-					case UPLOAD_ERR_NO_FILE:
-						$tError .= 'No file was uploaded.';
-						break;
-				}
-				$LogUpload->add( $tError.'<br />'.var_export( $_FILES, true ) );
 			}
 		}}}
 
-		if( !(isset($_FILES) && count( $_FILES )) || $LogUpload->count('all') )
-		{{{ // upload dialog
-			?>
-			<script type="text/javascript">
-				<!--
-				function addAnotherFileInput()
+
+		// Upload dialog {{{
+		?>
+
+		<script type="text/javascript">
+			/**
+			 * Mighty cool function to append an input or textarea element onto another element.
+			 *
+			 * @usedby addAnotherFileInput()
+			 *
+			 * @author proud daniel hahler :)
+			 */
+			function appendLabelAndInputElements( appendTo, labelText, inputOrTextarea, inputName, inputSizeOrCols, inputMaxLengthOrRows, inputType )
+			{
+				var fileDivLabel = document.createElement("div");
+				fileDivLabel.className = "label";
+				var fileLabel = document.createElement("label");
+				var fileLabelText = document.createTextNode( labelText );
+				fileLabel.appendChild( fileLabelText );
+				fileDivLabel.appendChild( fileLabel );
+				appendTo.appendChild( fileDivLabel );
+
+				var fileDivInput = document.createElement("div");
+				fileDivInput.className = "input";
+				var fileInput = document.createElement( inputOrTextarea );
+				fileInput.name = inputName;
+				if( inputOrTextarea == "input" )
 				{
-					var newInput = document.createElement("input");
-					newInput.name="uploadfile[]";
-					newInput.type="file";
-					newInput.size=40;
-
-					uploadfiles = document.getElementById("uploadfileinputs");
-					uploadfiles.appendChild( newInput );
-					uploadfiles.appendChild( document.createElement("br") );
+					fileInput.type = typeof( inputType ) !== 'undefined' ?
+														inputType :
+														"text";
+					fileInput.size = inputSizeOrCols;
+					if( typeof( inputMaxLengthOrRows ) != 'undefined' )
+					{
+						fileInput.maxlength = inputMaxLengthOrRows;
+					}
 				}
-				// -->
-			</script>
-			<div class="panelblock">
-				<form enctype="multipart/form-data" action="" method="post" class="fform">
-					<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $Settings->get( 'upload_maxkb' )*1024 ?>" />
-					<?php echo $Fileman->getFormHiddenInputs() ?>
-					<fieldset>
-					<h2><?php echo T_('File upload')  ?></h2>
-					<p><?php echo T_('Navigate to the directory where you want to upload your file(s) into.') ?></p>
-					<p><?php echo T_('Allowed file types:').' '.implode(', ', $allowedftypes) ?></p>
-					<p><?php printf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) ) ?></p>
+				else
+				{
+					fileInput.cols = inputSizeOrCols;
+					fileInput.rows = inputMaxLengthOrRows;
+				}
+				fileDivInput.appendChild( fileInput );
+				appendTo.appendChild( fileDivInput );
+			}
 
-					<?php $LogUpload->display( '', '', true, 'all' ); ?>
+			/**
+			 * Add a new fileinput area to the upload form.
+			 *
+			 * @author proud daniel hahler :)
+			 */
+			function addAnotherFileInput()
+			{
+				var newLI = document.createElement("li");
+				newLI.className = "clear";
+				uploadfiles = document.getElementById("uploadfileinputs");
+
+				uploadfiles.appendChild( newLI );
+
+				newLI.appendChild( document.createElement("hr") );
+
+				appendLabelAndInputElements( newLI, "<?php echo T_('Choose a file'); ?>:", "input", "uploadfile[]", "40", "0", "file" );
+				appendLabelAndInputElements( newLI, "<?php echo T_('Alternative text'); ?>:", "input", "uploadfile_alt[]", "40", "80", "text" );
+				appendLabelAndInputElements( newLI, "<?php echo T_('Description of the file'); ?>:", "textarea", "uploadfile_desc[]", "40", "3" );
+				appendLabelAndInputElements( newLI, "<?php echo T_('New filename (without path)'); ?>:", "input", "uploadfile_name[]", "40", "80", "text" );
+			}
+		</script>
 
 
-					<fieldset id="uploadfileinputs">
-						<legend><?php echo T_('Files to upload') ?></legend>
-						<input name="uploadfile[]" type="file" size="40" /><br />
+		<div class="panelblock">
+			<form enctype="multipart/form-data" action="files.php" method="post" class="fform">
+				<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $Settings->get( 'upload_maxkb' )*1024 ?>" />
+				<?php echo $Fileman->getFormHiddenInputs() ?>
+				<fieldset>
+					<legend><?php echo T_('File upload')  ?></legend>
+
+					<fieldset class="fm_upload_dirselect">
+						<legend><?php echo T_('Upload files into:'); ?></legend>
+
+						<?php
+						echo $Fileman->getDirectoryTreeRadio();
+						?>
 					</fieldset>
-					<?php /*'.T_('Description').':	<input type="text" name="imgdesc['.$i.']" size="50" /><br />'; */ ?>
+
+					<fieldset>
+						<p>
+							<?php
+							$restrictNotes = array();
+
+							if( $allowedFileExtensions )
+							{
+								$restrictNotes[] = T_('Allowed file extensions').': '.str_replace( ' ', ', ', $allowedFileExtensions );
+							}
+							if( $allowedMimeTypes )
+							{
+								$restrictNotes[] = T_('Allowed MIME types').': '.implode(', ', $allowedMimeTypes);
+							}
+							if( $Settings->get( 'upload_maxkb' ) )
+							{
+								$restrictNotes[] = sprintf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
+							}
+
+							if( $restrictNotes )
+							{
+								echo implode( '<br />', $restrictNotes ).'<br />';
+							}
+
+							?>
+						</p>
+
+						<?php $LogUpload->display( '', '', true, 'all' ); ?>
+
+
+						<fieldset>
+							<legend><?php echo T_('Files to upload') ?></legend>
+
+							<ul id="uploadfileinputs" class="plain">
+								<li>
+									<div class="label"><label><?php echo T_('Choose a file'); ?>:</label></div>
+									<div class="input"><input name="uploadfile[]" type="file" size="40" /></div>
+
+									<div class="label"><label><?php echo T_('Alternative text'); ?></label>:</div>
+									<div class="input"><input name="uploadfile_alt[]"  type="text" size="40" maxlength="80" /></div>
+
+									<div class="label"><label><?php echo T_('Description of the file'); /* TODO: maxlength */ ?></label>:</div>
+									<div class="input"><textarea name="uploadfile_desc[]" rows="3" cols="40"></textarea></div>
+
+									<div class="label"><label><?php echo T_('New filename (without path)'); ?></label>:</div>
+									<div class="input"><input name="uploadfile_name[]" type="text" size="40" maxlength="80" /></div>
+								</li></ul> <?php /* no text after </li> or JS will bite you! */ ?>
+						</fieldset>
+
+					</fieldset>
 
 					<fieldset class="submit">
 						<input class="ActionButton" type="button" value="<?php echo T_('Add another file') ?>" onclick="addAnotherFileInput();" />
 						<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
 					</fieldset>
-					</fieldset>
+				</fieldset>
 
-					<?php
-					/* not comitted yet
-					echo $Fileman->getDirectoryTreeRadio();
-					*/
+			</form>
 
-					?>
+		</div>
 
-				</form>
-			</div>
-
-			<?php
-		}}}
-		else
-		{ // successfully finished, leave mode
-			$Fileman->mode = NULL;
-		}
+		<?php
+		// }}}
 
 		// }}}
 		break;
@@ -687,7 +838,7 @@ switch( $Fileman->getMode() )
 		{{{ // we want Action!
 			if( !isFilename($newname) )
 			{
-				$LogCmr->add( sprintf( T_('[%s] is not a valid filename.'), $newname ) );
+				$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
 			}
 			elseif( ($TargetFile =& getFile( $newname, $Fileman->getCwd() ))
 							&& $TargetFile->exists() )
@@ -699,18 +850,18 @@ switch( $Fileman->getMode() )
 				}
 				elseif( !$overwrite )
 				{
-					$LogCmr->add( sprintf( T_('The file [%s] already exists.'), $newname ) );
+					$LogCmr->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newname ) );
 					$overwrite = 'ask';
 				}
 				else
 				{ // unlink existing file
 					if( !$Fileman->unlink( $TargetFile ) )
 					{
-						$LogCmr->add( sprintf( T_('Could not delete [%s].'), $newname ) );
+						$LogCmr->add( sprintf( T_('Could not delete &laquo;%s&raquo;.'), $newname ) );
 					}
 					else
 					{
-						$Fileman->Messages->add( sprintf( T_('Deleted file [%s].'), $newname ), 'note' );
+						$Fileman->Messages->add( sprintf( T_('Deleted file &laquo;%s&raquo;.'), $newname ), 'note' );
 					}
 				}
 			}
@@ -727,13 +878,13 @@ switch( $Fileman->getMode() )
 						{
 							if( $SourceFile->getDir() == $Fileman->getCwd() )
 							{ // successfully renamed
-								$Fileman->Messages->add( sprintf( T_('Renamed [%s] to [%s].'),
+								$Fileman->Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																									basename($oldpath),
 																									$TargetFile->getName() ), 'note' );
 							}
 							else
 							{ // successfully moved
-								$Fileman->Messages->add( sprintf( T_('Moved [%s] to [%s].'),
+								$Fileman->Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																									$oldpath,
 																									$TargetFile->getName() ), 'note' );
 
@@ -741,7 +892,7 @@ switch( $Fileman->getMode() )
 						}
 						else
 						{
-							$LogCmr->add( sprintf( T_('Could not remove [%s], but the file has been copied to [%s].'),
+							$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
 																		($SourceFile->getDir() == $Fileman->getCwd() ?
 																			basename($oldpath) :
 																			$oldpath ),
@@ -751,7 +902,7 @@ switch( $Fileman->getMode() )
 					else
 					{ // copy only
 						$Fileman->Messages->add( sprintf(
-							T_('Copied [%s] to [%s].'),
+							T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 							( $SourceFile->getDir() == $Fileman->getCwd() ?
 									$SourceFile->getName() :
 									$SourceFile->getPath() ),
@@ -760,7 +911,7 @@ switch( $Fileman->getMode() )
 				}
 				else
 				{
-					$LogCmr->add( sprintf( T_('Could not copy [%s] to [%s].'),
+					$LogCmr->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																	$SourceFile->getPath(),
 																	$TargetFile->getPath() ), 'error' );
 				}
@@ -818,7 +969,7 @@ switch( $Fileman->getMode() )
 										&& $cmr_overwrite[$SourceFile->getID()] === 'ask' )
 								{
 									form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
-																	sprintf( T_('The existing file [%s] will be replaced with this file.'),
+																	sprintf( T_('The existing file &laquo;%s&raquo; will be replaced with this file.'),
 																						$TargetFile->getPath() ) );
 								}
 								?>
@@ -944,6 +1095,7 @@ if( isset( $msg_action )
 <script type="text/javascript">
 	<!--
 	if( opener
+			&& opener.document.FilesForm
 			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
 			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
 			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->getCwd()); ?>'
@@ -957,6 +1109,52 @@ if( isset( $msg_action )
 	// -->
 </script>
 
+
+<?php
+if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
+{
+	?>
+
+	<p class="center">
+
+		<?php
+		if( $UserSettings->get('fm_forceFM') != 1 )
+		{ // FM is not forced anyway
+			?>
+
+			<a class="ActionButton"
+				href="<?php echo $Fileman->getCurUrl( array( 'forceFM' => !$Fileman->forceFM ) ); ?>">
+				<?php echo $Fileman->forceFM ?
+										T_('Hide Filemanager') :
+										T_('Display Filemanager'); ?></a>
+
+			&middot;
+
+			<?php
+		}
+
+		?>
+
+		<a class="ActionButton" href="<?php echo $Fileman->getCurUrl( array( 'mode' => false ) ) ?>">
+			<?php echo /* TRANS: Button to leave the upload mode */ T_('Leave upload mode'); ?></a>
+
+	</p>
+
+	<?php
+
+	if( !$Fileman->forceFM )
+	{ // what a pity.. ;)
+		?>
+
+		</div>
+
+		<?php
+		require( dirname(__FILE__). '/_footer.php' );
+		return;
+	}
+}
+
+?>
 
 <div class="panelblock">
 <?php
@@ -1036,95 +1234,7 @@ if( isset( $msg_action )
 <?php echo $Fileman->getFormHiddenInputs() ?>
 
 
-<?php
-$rootlist = $Fileman->getRootList();
-if( count($rootlist) > 1 )
-{ // provide list of roots
-?>
-	<!-- ROOT LISTS -->
-
-	<div class="fm_roots">
-
-		<select name="root" class="fm_roots" onchange="this.form.submit()">
-		<?php
-		foreach( $rootlist as $lroot )
-		{
-			$lroot_value = $lroot['type'];
-			if( isset($lroot['id']) )
-			{
-				$lroot_value .= '_'.$lroot['id'];
-			}
-			echo '<option value="'.$lroot_value.'"';
-
-			if( $root == $lroot_value
-					|| $root === NULL && $lroot_value == 'user' )
-			{
-				echo ' selected="selected"';
-			}
-
-			echo '>'.format_to_output( $lroot['name'] )."</option>\n";
-		}
-
-		echo '</select>
-
-		<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
-	</div>
-	';
-}
-?>
-
-
 <table class="grouped">
-<caption>
-<?php
-// -----------------------------------------------
-// Display table caption: directory location info:
-// -----------------------------------------------
-
-
-// Quick links to usual homes for user, group and maybe blog...:
-// echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
-// TODO: add group home...
-// TODO: add blog home?
-
-
-// Display current dir:
-echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
-
-
-// Display current filter:
-if( $Fileman->isFiltering() )
-{
-	echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
-	// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
-}
-
-
-// The hidden reload button
-?>
-
-<span style="display:none;" id="fm_reloadhint">
-	<a href="<?php echo $Fileman->getCurUrl() ?>"
-		title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
-		<?php echo getIcon( 'reload' ) ?>
-	</a>
-</span>
-
-
-<?php
-// Display filecounts:
-?>
-
-<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
-disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
-echo ', ';
-disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
-echo ', '.bytesreadable( $Fileman->countBytes() );
-?>
-)</span>
-
-</caption>
-
 
 <?php
 /**
@@ -1135,6 +1245,90 @@ $filetable_cols = 8;
 ?>
 
 <thead>
+<tr>
+	<td colspan="<?php echo $filetable_cols ?>">
+
+	<?php
+	$rootlist = $Fileman->getRootList();
+	if( count($rootlist) > 1 )
+	{ // provide list of roots
+	?>
+		<!-- ROOT LISTS -->
+
+		<div class="fm_roots">
+
+			<select name="root" class="fm_roots" onchange="this.form.submit()">
+			<?php
+			foreach( $rootlist as $lroot )
+			{
+				echo '<option value="'.$lroot['id'].'"';
+
+				if( $root == $lroot['id']
+						|| $root === NULL && $lroot['id'] == 'user' )
+				{
+					echo ' selected="selected"';
+				}
+
+				echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+			}
+
+			echo '</select>
+
+			<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
+		</div>
+		';
+	}
+	?>
+
+
+	<?php
+	// -----------------------------------------------
+	// Display table header: directory location info:
+	// -----------------------------------------------
+
+
+	// Quick links to usual homes for user, group and maybe blog...:
+	// echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
+	// TODO: add group home...
+	// TODO: add blog home?
+
+
+	// Display current dir:
+	echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
+
+
+	// Display current filter:
+	if( $Fileman->isFiltering() )
+	{
+		echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
+		// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
+	}
+
+
+	// The hidden reload button
+	?>
+
+	<span style="display:none;" id="fm_reloadhint">
+		<a href="<?php echo $Fileman->getCurUrl() ?>"
+			title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
+			<?php echo getIcon( 'reload' ) ?>
+		</a>
+	</span>
+
+
+	<?php
+	// Display filecounts:
+	?>
+
+	<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
+	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+	echo ', ';
+	disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
+	echo ', '.bytesreadable( $Fileman->countBytes() );
+	?>
+	)</span>
+	</td>
+</tr>
 <tr>
 	<th colspan="2"><?php $Fileman->dispButtonParent(); ?></th>
 	<th><?php
@@ -1201,7 +1395,7 @@ while( $lFile =& $Fileman->getNextFile() )
 				title="<?php echo T_('Open in a new window'); ?>"
 				onclick="return false;">
 
-				<button class="image" type="button"
+				<button class="filenameIcon" type="button"
 					id="button_new_<?php echo $countFiles ?>"
 					onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();
 						<?php
@@ -1213,17 +1407,36 @@ while( $lFile =& $Fileman->getNextFile() )
 							($imgsize ? $imgsize[1]+42 : NULL) );
 
 						?>"
-					><?php echo getIcon( 'window_new' )
+					><?php
+					echo getIcon( 'window_new' );
 				?></button></a>
 
-			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>">	<?php
-				echo $lFile->getName();
+			<?php
+
+			if( !isFilename( $lFile->getName() ) )
+			{
+				// TODO: Warning icon with hint
+			}
+
+			?>
+
+
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"><?php
+				if( $Fileman->flatmode && $Fileman->getOrder() == 'path' )
+				{
+					echo './'.$Fileman->getFileSubpath( $lFile );
+				}
+				else
+				{
+					echo $lFile->getName();
+				}
 				disp_cond( $Fileman->getFileImageSize(), ' (%s)' )
 				?>
 			</a>
 
 			<?php
-			if( $Fileman->flatmode )
+
+			if( $Fileman->flatmode && $Fileman->getOrder() == 'name' )
 			{
 				?>
 				<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
@@ -1232,6 +1445,7 @@ while( $lFile =& $Fileman->getNextFile() )
 				</div>
 				<?php
 			}
+
 			?>
 		</td>
 
@@ -1491,6 +1705,9 @@ param( 'options_show', 'integer', 0 );
 		<input type="checkbox" id="option_recursivedirsize" name="option_recursivedirsize" value="1"<?php if( $UserSettings->get('fm_recursivedirsize') ) echo ' checked="checked"' ?> />
 		<label for="option_recursivedirsize"><?php echo T_('Recursive size of directories') ?></label>
 		<br />
+		<input type="checkbox" id="option_forceFM" name="option_forceFM" value="1"<?php if( $UserSettings->get('fm_forceFM') ) echo ' checked="checked"' ?> />
+		<label for="option_forceFM"><?php echo T_('Always show the Filemanager (upload mode, ..)') ?></label>
+		<br />
 
 		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="hidden" name="action" value="update_settings" />
@@ -1531,9 +1748,18 @@ param( 'options_show', 'integer', 0 );
 
 
 </div>
+
 <div class="clear"></div>
 </div>
+
 <?php
 require( dirname(__FILE__). '/_footer.php' );
-#echo replacePngTags( ob_get_clean(), $img_url);
+
+
+/*
+ * $Log$
+ * Revision 1.58  2005/01/06 10:15:46  blueyed
+ * FM upload and refactoring
+ *
+ */
 ?>

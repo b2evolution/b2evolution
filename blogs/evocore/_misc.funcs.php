@@ -1533,9 +1533,9 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
  * @uses $map_iconfiles
  * @param string|File icon for what (special purpose or File object)
  * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
- * @param string additional parameter (for 'size' {@link imgsize()})
+ * @param string class name when getting 'imgtag'
  */
-function getIcon( $for, $what = 'imgtag' )
+function getIcon( $for, $what = 'imgtag', $imgtag_class = 'middle' )
 {
 	global $map_iconfiles;
 	global $basepath, $admin_subdir, $baseurl;
@@ -1573,7 +1573,7 @@ function getIcon( $for, $what = 'imgtag' )
 				return $iconurl;
 			}
 
-			$r = '<img class="middle" src="'.$iconurl.'" '
+			$r = '<img class="'.$imgtag_class.'" src="'.$iconurl.'" '
 					.getIconSize( $iconfile, 'string' )
 					.' alt="';
 
@@ -1683,6 +1683,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.27  2005/01/06 10:15:46  blueyed
+ * FM upload and refactoring
+ *
  * Revision 1.26  2005/01/05 19:14:51  fplanque
  * rollback
  *
