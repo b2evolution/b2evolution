@@ -25,16 +25,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
- * {@internal
- * This file was inspired by N C Young's Referer Script released in
- * the public domain on 07/19/2002. {@link (http://ncyoung.com/entry/57).
- * See also {@link http://ncyoung.com/demo/referer/}.
- * }}
- *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author N C Young (nathan@ncyoung.com).
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
@@ -632,7 +625,7 @@ function locale_updateDB()
 
 /*
  * $Log$
- * Revision 1.60  2004/10/12 17:22:30  fplanque
+ * Revision 1.61  2004/10/12 18:48:33  fplanque
  * Edited code documentation.
  *
  */

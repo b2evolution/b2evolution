@@ -43,6 +43,12 @@
  * @author fplanque: François PLANQUE
  * @author blueyed: Daniel HAHLER
  *
+ * {@internal Below is a list of former authors whose contributions to this file have been
+ *            either removed or redesigned and rewritten anew:
+ *            - t3dworld
+ *            - tswicegood
+ * }}
+ *
  * @version $Id$
  */
 
@@ -264,4 +270,11 @@ $hit_type = filter_hit();
  * Load hacks file if it exists
  */
 @include_once( dirname(__FILE__) . '/../conf/hacks.php' );
+
+/*
+ * $Log$
+ * Revision 1.73  2004/10/12 18:48:34  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>
