@@ -321,7 +321,7 @@ table.grouped tr.odd .firstcol {
 }
 #evologo {
 	float: left;
-	margin: 0 1ex;
+	margin: 2px 1ex 0;
 	border: 0;
 	/* border: 1px solid #00f; */
 }
@@ -342,7 +342,7 @@ table.grouped tr.odd .firstcol {
 	text-decoration: none;
 }
 #headinfo {
-	margin-top: .5ex;
+	padding-top: .5ex;
 	padding-left: 1em;
 	color: #b0b0b0;
 	white-space: nowrap;
@@ -846,6 +846,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.12  2005/01/20 14:00:42  fplanque
+ * no message
+ *
  * Revision 1.11  2005/01/13 19:53:48  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

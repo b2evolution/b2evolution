@@ -8,7 +8,7 @@
 $map_iconfiles = array(
 	'folder' => array(        // icon for folders
 		'file' => $rsc_subdir.'icons/fileicons/folder.png',
-		'alt' => T_('folder'),
+		'alt' => T_('Folder'),
 		'size' => array( 16, 16 ),
 	),
 	'file_unknown' => array(  // icon for unknown files

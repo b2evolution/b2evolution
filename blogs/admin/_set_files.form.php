@@ -101,6 +101,7 @@ $FilesForm->fieldset_end();
 
 // TODO: check/transform $upload_url
 // TODO: check/transform $upload_realpath
+// fplanque->blueyed: are these TODOs real? I don't think they are relevant any more?
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )
