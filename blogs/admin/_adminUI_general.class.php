@@ -43,12 +43,15 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * The general Admin UI class. It provides functions to handle the UI part of the
  * Backoffice.
  *
  * Admin skins should derive from this class and override {@link getMenuTemplate()}
  * for example.
+ *
+ * @todo CODE DOCUMENTATION!!!
  */
 class AdminUI_general
 {
@@ -161,22 +164,22 @@ class AdminUI_general
 	function getTitle( $reversedDefault = false )
 	{
 		if( isset($this->title) )
-		{
+		{ // Explicit title has been set:
 			return $this->title;
 		}
 		elseif( $title = $this->getPathProperty( 'last', array( 'title' ) ) )
-		{
+		{ // ??
 			return $title;
 		}
 		elseif( $title = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
-		{
+		{ // ??
 			return $title;
 		}
 		else
-		{
+		{ // ??
 			$titles = $this->getPropertiesForPath( $this->path, array( 'title', 'text' ) );
 			if( $reversedDefault )
-			{
+			{	// We have asked for reverse order of the path elements:
 				$titles = array_reverse($titles);
 			}
 			return implode( $this->pathSeperator, $titles );
@@ -194,15 +197,15 @@ class AdminUI_general
 		$r = $this->pathSeperator;
 
 		if( isset( $this->title_titlearea ) )
-		{
+		{ // Explicit title has been set:
 			$r .= $this->title_titlearea;
 		}
 		elseif( $titleForTitlearea = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
-		{
+		{ // ??
 			$r .= $titleForTitlearea;
 		}
 		else
-		{
+		{ // ??
 			$r .= $this->getTitle();
 		}
 
@@ -211,7 +214,9 @@ class AdminUI_general
 
 
 	/**
-	 * Get the title for HTML <head>'s <title> tag.
+	 * Get the title for HTML <title> tag.
+	 *
+	 * If no explicit title has been specified, auto construct one from path.
 	 *
 	 * @return string
 	 */
@@ -219,21 +224,21 @@ class AdminUI_general
 	{
 		global $app_shortname;
 
-		$r = '';
+		$r = $app_shortname.$this->pathSeperator;
 
 		if( $htmltitle = $this->getPropertyForNode( $this->path, array( 'htmltitle' ) ) )
-		{ // explicit htmltitle set
+		{ // Explicit htmltitle set:
 			$r .= $htmltitle;
 		}
 		else
-		{
+		{	// No explicit title set, construct Title from path
 			$r .= #preg_replace( '/:$/', '',
-						$this->getTitle( true )
+						$this->getTitle()
 						#)
 						;
 		}
 
-		return $r.$this->pathSeperator.$app_shortname;
+		return $r;
 	}
 
 
@@ -882,9 +887,11 @@ class AdminUI_general
 
 
 	/**
-	 * Set the paths beginning atall the paths passed as arguments.
+	 * Set the paths beginning at all the paths passed as arguments.
 	 *
 	 * This is an easy stub for {@link setPathByNr()}.
+	 *
+	 * @todo DOCUMENTATION!!
 	 *
 	 * @param string|array,... Either the key of the path or an array(keyname, propsArray).
 	 * @uses setPathByNr()
@@ -999,6 +1006,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.16  2005/03/17 14:06:37  fplanque
+ * put back page titles in logical order
+ *
  * Revision 1.15  2005/03/16 19:58:13  fplanque
  * small AdminUI cleanup tasks
  *
