@@ -211,13 +211,20 @@ table.grouped
 	clear:both;
 }
 
-table.grouped td {
+table.grouped tr {
 	background-color: #f5f3ef;
+}
+table.grouped tr:hover,
+table.grouped tr.odd:hover {
+	background-color:#e3dfd0;
+}
+
+table.grouped td {
 	border-left: 1px solid #9e9286;
 	padding: .3ex 1ex;
 }
 
-table.grouped tr.odd td {
+table.grouped tr.odd {
 	background-color: #efede0;
 }
 

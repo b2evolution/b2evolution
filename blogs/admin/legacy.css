@@ -7,7 +7,7 @@
  *
  * @package admin
  */
- 
+
 @import url(desert.css);	/* based on desert.css */
 
 /* Titles */
@@ -132,14 +132,20 @@ table.grouped
 	border: 1px solid #999;
 }
 
-table.grouped td {
+table.grouped tr {
 	background-color: #eee;
+}
+table.grouped tr:hover,
+table.grouped tr.odd:hover {
+	background-color: #ccc;
+}
+table.grouped td {
 	border-left: 1px solid #999;
 }
 
-table.grouped tr.odd td {
+table.grouped tr.odd {
 	background-color: #ddd;
-} 
+}
 
 table.grouped th {
 	border-bottom: 1px solid #999;
@@ -152,7 +158,7 @@ tr.group td {
 	background-color: #ccc;
 	border-left: 0;
 	border-top: 1px solid #999;
-	border-bottom: 1px solid #999;	
+	border-bottom: 1px solid #999;
 }
 
 /* Page layout: */
@@ -163,7 +169,7 @@ div.panelinfo {
 	clear: both;
 	border: 1px solid #def;
 	background: #eef5ff;
-	padding: 0 1ex; 
+	padding: 0 1ex;
 	margin: 1ex 1em;
 }
 /* Main tabs: */
@@ -224,7 +230,7 @@ caption.bCalendarCaption {
 }
 table.bCalendarTable {
 	border: solid 1px #ccc;
-	border-collapse: separate; 
+	border-collapse: separate;
 }
 table.bCalendarTable tfoot td {
 	background-color: #eee;
@@ -235,12 +241,12 @@ table.bCalendarTable a:hover {
 	color: #b0b0b0;
 }
 table.bCalendarTable td:hover /* Not in IE */
-{	
+{
 	background-color: transparent;
 	color: inherit;
 }
 table.bCalendarTable tfoot td:hover /* Not in IE */
-{	
+{
 	background-color: #eee;
 }
 th.bCalendarHeaderCell {
