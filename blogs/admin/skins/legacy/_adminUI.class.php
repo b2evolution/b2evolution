@@ -79,6 +79,17 @@ class AdminUI extends AdminUI_general
 				return parent::getMenuTemplate( $name, $depth );
 		}
 	}
+
+
+	/**
+	 * Close open div.
+	 *
+	 * @return string
+	 */
+	function getBodyBottom()
+	{
+		return "\n</div>\n";
+	}
 }
 
 ?>

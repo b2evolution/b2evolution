@@ -70,6 +70,9 @@ class AdminUI_general extends Widget
 	 */
 	function AdminUI()
 	{
+		global $mode; // TODO: make it a real property
+		$this->mode = $mode;
+
 		$this->initTemplates();
 	}
 
@@ -469,6 +472,28 @@ class AdminUI_general extends Widget
 		{
 			$this->setPathByNr( $arg, $i++ );
 		}
+	}
+
+
+	/**
+	 * Close open divs, etc...
+	 *
+	 * @return string
+	 */
+	function getBodyBottom()
+	{
+		return '';
+	}
+
+
+	/**
+	 * Get the footer of the admin page.
+	 *
+	 * @return string
+	 */
+	function getPageFooter()
+	{
+		return "\n\n</body>\n</html>";
 	}
 }
 

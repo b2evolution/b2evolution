@@ -50,6 +50,22 @@ require_once( dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.clas
  */
 class AdminUI extends AdminUI_general
 {
+	/**
+	 * Close open div(s).
+	 *
+	 * @return string
+	 */
+	function getBodyBottom()
+	{
+		$r = '';
+
+		if( empty($this->mode) )
+		{ // We're not running in an special mode (bookmarklet, sidebar...)
+			$r .= "\n\t</div>";
+		}
+
+		return $r."</div>\n";
+	}
 }
 
 ?>

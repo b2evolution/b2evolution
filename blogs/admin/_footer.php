@@ -11,7 +11,7 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 // Close open divs, etc...
-require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_bottom.php';
+echo $AdminUI->getBodyBottom();
 ?>
 
 <p class="footer">
@@ -26,6 +26,7 @@ require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_bottom.php'
 
 <?php
 // CALL PLUGINS NOW:
+// TODO: clear terminology - AdminUI::getPageFooter() is the very last part!
 $Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
 
@@ -46,6 +47,5 @@ if( $AdminUI->getPath(0) == 'files' || $AdminUI->getPathRange(0,1) == array( 'bl
 
 debug_info();
 
-// Close close body, html....
-require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_page_footer.php';
+echo $AdminUI->getPageFooter();
 ?>
