@@ -104,7 +104,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		 *
 		 * @param integer number of the checkall "set"
 		 * @param boolean force setting to true/false
-		 */	?>
+		 */ ?>
 		function setcheckallspan( nr, set )
 		{
 			if( typeof allchecked[nr] == 'undefined' || typeof set != 'undefined' )

@@ -174,12 +174,12 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 	}
 
 	if( $use_balanceTags )
-	{	// Auto close open tags:
+	{ // Auto close open tags:
 		$content = balanceTags($content, $is_comment);
 	}
 
 	if( $use_html_checker )
-	{	// Check the code:
+	{ // Check the code:
 		if( ! $is_comment )
 		{
 			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attribues,
@@ -274,7 +274,7 @@ function convert_chars( $content, $flag='html' )
 
 	// Convert highbyte non ASCII/UTF-8 chars to urefs:
 	if( (locale_charset(false) != 'utf-8') && (locale_charset(false) != 'gb2312') )
-	{	// This is a single byte charset
+	{ // This is a single byte charset
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
 			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
@@ -291,7 +291,7 @@ function convert_chars( $content, $flag='html' )
 		$content = preg_replace('/&(?![#A-Za-z0-9]{2,20};)/', '&amp;', $content);
 	}
 	else
-	{	// unicode, xml...
+	{ // unicode, xml...
 		// Convert & chars that are not used in an entity
 		$content = preg_replace('/&(?![#A-Za-z0-9]{2,20};)/', '&#38;', $content);
 
@@ -370,7 +370,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		$j = gmdate($dateformatstring, $unixtimestamp - ($Settings->get('time_difference') * 3600));
 	}
 	else
-	{	// We want default timezone time:
+	{ // We want default timezone time:
 		$dateformatstring = ' '.$dateformatstring; // will be removed later
 
 		// echo $dateformatstring, '<br />';
@@ -594,7 +594,7 @@ function xmlrpc_displayresult( $result, $log = '', $display = true )
 		return false;
 	}
 	elseif( $result->faultCode() )
-	{	// We got a remote error:
+	{ // We got a remote error:
 		if( $display ) echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
 		debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
 		return false;
@@ -779,7 +779,7 @@ function balanceTags($text)
 function remove_magic_quotes( $mixed )
 {
 	if( get_magic_quotes_gpc() )
-	{	// That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
+	{ // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
 		if( is_array( $mixed ) )
 		{
 			foreach($mixed as $k => $v)
@@ -823,13 +823,10 @@ function remove_magic_quotes( $mixed )
  * @param boolean Override if variable already set
  * @param boolean Force setting of variable to default?
  * @return mixed Final value of Variable, or false if we don't force setting and and did not set
- *
- * @todo add option to override what's already set. DONE.
  */
 function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 {
-	global $$var;
-	global $global_param_list;
+	global $$var, $global_param_list, $Debuglog;
 
 	// Check if already set
 	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
@@ -866,15 +863,17 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 		}
 	}
 	else
-	{	// Variable was already set but we need to remove the auto quotes
+	{ // Variable was already set but we need to remove the auto quotes
 		$$var = remove_magic_quotes($$var);
+
+		$Debuglog->add( 'param(-): '.$var.' already set! '.pre_dump($$var, '', false) );
 
 		// pre_dump( $$var, $var.' already set' );
 	}
 
 	// type will be forced even if it was set before and not overriden
 	if( !empty($type) )
-	{	// Force the type
+	{ // Force the type
 		// echo "forcing type!";
 		switch( $type )
 		{
@@ -893,7 +892,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 	}
 
 	if( $memorize )
-	{	// Memorize this parameter
+	{ // Memorize this parameter
 		if( !isset($global_param_list) )
 		{ // Init list if necessary:
 			$global_param_list = array();
@@ -937,7 +936,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		$defval = $thisparam['default'];
 
 		if( in_array( $var, $ignore ) )
-		{	// we don't want to include that one
+		{ // we don't want to include that one
 			continue;
 		}
 
@@ -948,7 +947,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 			{
 				global $catsel;
 				if( (! empty($catsel)) && (strpos( $cat, '-' ) === false) )
-				{	// It's worthwhile retransmitting the catsels
+				{ // It's worthwhile retransmitting the catsels
 					foreach( $catsel as $value )
 					{
 						$params[] = 'catsel%5B%5D='.$value;
@@ -1030,7 +1029,7 @@ function get_path( $which='' )
 function autoquote( & $string )
 {
 	if( strpos( $string, "'" ) !== 0 )
-	{	// no quote at position 0
+	{ // no quote at position 0
 		$string = "'".$string."'";
 	}
 }
@@ -1056,18 +1055,18 @@ function validate_url( $url, & $allowed_uri_scheme )
 	global $debug;
 
 	if( empty($url) )
-	{	// Empty URL, no problem
+	{ // Empty URL, no problem
 		return false;
 	}
 
 	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):[0-9]*/', $url, $matches) )
-	{	// Cannot find URI scheme
+	{ // Cannot find URI scheme
 		return T_('Invalid URL');
 	}
 
 	$scheme = strtolower($matches[1]);
 	if(!in_array( $scheme, $allowed_uri_scheme ))
-	{	// Scheme not allowed
+	{ // Scheme not allowed
 		return T_('URI scheme not allowed');
 	}
 
@@ -1092,8 +1091,12 @@ function validate_url( $url, & $allowed_uri_scheme )
  * @param mixed variable to dump
  * @param string title to display
  */
-function pre_dump($dump, $title = '')
+function pre_dump($dump, $title = '', $output = 1 )
 {
+	if( !$output )
+	{
+		ob_start();
+	}
 	echo "\n".'<pre>';
 	if( $title !== '' )
 	{
@@ -1101,6 +1104,15 @@ function pre_dump($dump, $title = '')
 	}
 	var_dump($dump);
 	echo '</pre>'."\n";
+
+	if( !$output )
+	{
+		$r = ob_get_contents();
+		ob_end_clean();
+		return $r;
+	}
+}
+
 }
 
 
@@ -1183,7 +1195,7 @@ function obhandler( $output )
 		$out .= trim($v) . "\n";
 
 	if( $use_etags )
-	{	// Generating ETAG
+	{ // Generating ETAG
 
 		// prefix with PUB or AUT.
 		if( is_logged_in() )
@@ -1249,7 +1261,7 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 	}
 
 	if( strpos( $url, '?' ) !== false )
-	{	// There are already params in the URL
+	{ // There are already params in the URL
 		return $url.$moredelim.$param;
 	}
 

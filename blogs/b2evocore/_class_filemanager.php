@@ -25,7 +25,7 @@ require_once( dirname(__FILE__).'/_functions_files.php' );
 class FileManager
 {
 	/**
-	 * root (like user_X or blog_X), defaults to current user
+	 * root (like user_X or blog_X), defaults to current user's dir (#)
 	 * @param string
 	 */
 	var $root;
@@ -110,7 +110,7 @@ class FileManager
 	 * @var string
 	 * @access protected
 	 */
-	var $cd = '';
+	var $path = '';
 
 
 	/**
@@ -150,7 +150,9 @@ class FileManager
 		#$this->root_url = $baseurl.'/'.$media_subdir;
 
 		// get root directory
-		$root_A = explode( '_', $root );
+		$this->root = $root;
+
+		$root_A = explode( '_', $this->root );
 
 		if( $this->User->login == 'demouser' )
 		{
@@ -206,9 +208,9 @@ class FileManager
 		}
 
 		// get the subpath relative to root
-		$this->subpath = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
-		$this->subpath .= '/';
-		$this->debug( $this->subpath, 'subpath' );
+		$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
+		$this->path .= '/';
+		$this->debug( $this->path, 'path' );
 
 
 		$this->loadentries();
@@ -338,33 +340,24 @@ class FileManager
 	}
 
 
-	function sortlink( $type )
-	{
-		$r = url_add_param( $this->url, 'cd='.$this->subpath.'&amp;order='.$type );
-
-		if( $this->order == $type )
-		{ // change asc
-			$r .= '&amp;asc='.(1 - $this->is_sortingasc());
-		}
-
-		return $r;
-	}
-
-
 	/**
 	 * get the current url, with all relevant GET params (cd, order, asc)
 	 *
 	 * @param string override root (blog_X or user_X)
 	 * @param string override cd
 	 * @param string override order
-	 * @param boolean override asc
+	 * @param integer override asc
 	 */
-	function curl( $root = '#', $cd = '#', $order = '#', $orderasc = '#' )
+	function curl( $root = '#', $path = '#', $order = '#', $orderasc = '#' )
 	{
 		$r = $this->url;
 
-		foreach( array('root', 'cd', 'order', 'orderasc') as $check )
+		foreach( array('root', 'path', 'order', 'orderasc') as $check )
 		{
+			if( $$check === false )
+			{ // don't include
+				continue;
+			}
 			if( $$check != '#' )
 			{
 				$r = url_add_param( $r, $check.'='.$$check );
@@ -382,10 +375,10 @@ class FileManager
 	/**
 	 * generates hidden input fields for forms, based on {@link curl()}}
 	 */
-	function form_hiddeninputs( $root = '#', $cd = '#', $order = '#', $asc = '#' )
+	function form_hiddeninputs( $root = '#', $path = '#', $order = '#', $asc = '#' )
 	{
 		// get curl(), remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->curl( $cd, $order, $asc ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $order, $asc ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -423,19 +416,26 @@ class FileManager
 	}
 
 
-	function link_sort( $type, $atext )
+	function sortlink( $type )
 	{
-		$r = '<a href="'.url_add_param( $this->url, 'cd='.$this->subpath.'&amp;order='.$type );
+		$r = $this->curl( '#', '#', $type, false );
 
 		if( $this->order == $type )
 		{ // change asc
 			$r .= '&amp;asc='.(1 - $this->is_sortingasc());
 		}
 
-		$r .= '" title="'.
-		( ($this->order == $type && (1 - $this->is_sortingasc($type)))
-			|| ($this->order != $type && !(1 - $this->is_sortingasc($type)))
-			? T_('sort ascending by this column') : T_('sort descending by this column')).'">'.$atext.'</a>';
+		return $r;
+	}
+
+
+	function link_sort( $type, $atext )
+	{
+		$r = '<a href="'.$this->sortlink( $type ).'" title="'
+		.( ($this->order == $type && (1 - $this->is_sortingasc($type)))
+			|| ($this->order != $type
+					&& !(1 - $this->is_sortingasc($type)))
+							? T_('sort ascending by this column') : T_('sort descending by this column')).'">'.$atext.'</a>';
 
 		if( $this->order == $type )
 		{
@@ -658,7 +658,7 @@ class FileManager
 				break;
 
 			case 'url':
-				$r = $this->root_url.$this->subpath.$this->current_entry['name'];
+				$r = $this->root_url.$this->path.$this->current_entry['name'];
 				break;
 
 			case 'ext':  // the file extension
@@ -690,20 +690,21 @@ class FileManager
 				break;
 
 			case 'link':
-				if( $param == 'parent' ) // TODO: check if allowed
-					$r = url_add_param( $this->url, 'cd='.urlencode($this->subpath.'..') );
+				if( $param == 'parent' )
+				{ // TODO: check if allowed
+					$r = $this->curl( '#', $this->path.'..' );
+				}
 				elseif( $param == 'home' )
 				{
-					// TODO: provide a dropdown list if various home dirs available to the user
 					$r = $this->url;
 				}
 				elseif( $this->current_entry['type'] == 'dir' && $param != 'forcefile' )
 				{
-					$r = url_add_param( $this->url, 'cd='.urlencode($this->subpath.$this->current_entry['name']) );
+					$r = $this->curl( '#', $this->path.$this->current_entry['name'] );
 				}
 				else
 				{
-					$r = url_add_param( $this->url, 'cd='.urlencode($this->subpath).'&amp;file='.urlencode($this->current_entry['name']) );
+					$r = $this->curl( '#', $this->path ).'&amp;file='.urlencode($this->current_entry['name']);
 				}
 				break;
 
@@ -1357,7 +1358,7 @@ class FileManager
 		foreach( $clickabledirs as $nr => $dir )
 		{
 			if( $nr > 0 ) $cd .= $dir.'/';
-			$r .= '/<a href="'.$this->curl( $cd ).'">'.$dir.'</a>';
+			$r .= '/<a href="'.$this->curl( '#', $cd ).'">'.$dir.'</a>';
 		}
 
 		return $r;

@@ -7,7 +7,7 @@
  *
  * @package admin
  */
- 
+
 @import url(../rsc/basic.css);	/* Import basic styles */
 @import url(../rsc/img.css);	/* Import standard image styles */
 @import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
@@ -206,8 +206,9 @@ div.edit_actions input.DeleteButton:hover {
 table.grouped
 {
 	border: 1px solid #9e9286;
-	margin: auto;
+	margin: 1ex auto;
 	border-collapse: collapse;
+	clear:both;
 }
 
 table.grouped td {

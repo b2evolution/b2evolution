@@ -20,7 +20,7 @@ require( dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_class_filemanag
 $admin_tab = 'files';
 $admin_pagetitle = T_('File Manager').' (alpha)';
 
-param( 'cd', 'string', '' );         // the path relative to the root dir
+param( 'path', 'string', '' );       // the path relative to the root dir
 param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
 param( 'selaction', 'string', '' );  // action for selected files/dirs
 
@@ -28,7 +28,7 @@ param( 'file', 'string', '' );       // selected file
 param( 'order', 'string', 'name' );
 param( 'asc', 'string', '#' );
 
-param( 'root', 'string', 'user' );   // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for supplied user)
+param( 'root', 'string', '#' );   // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 
 if( $current_User->login == 'demouser' )
 {
@@ -53,7 +53,7 @@ if( $action == 'update_settings' )
 }
 
 
-$Fileman = new FileManager( $current_User, 'files.php', $root, $cd, $order, $asc );
+$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $asc );
 
 if( $action == '' && $file != '' )
 { // a file is selected/clicked, default action
@@ -61,7 +61,7 @@ if( $action == '' && $file != '' )
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo $file.'&mdash;'.T_('b2evolution Filemanager') ?></title>
+	<title><?php echo $file.' :: '.T_('b2evolution Filemanager') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
@@ -75,7 +75,7 @@ if( $action == '' && $file != '' )
 	div.image { text-align:center;clear:both;margin:1ex; }
 	img.image { border:1px dashed #d91;padding:1ex; }
 	.linenr { background-color: #ff0; font-weight:bold; }
-	div.fileheader { background:#ccc; border:1px solid #ddd; }
+	div.fileheader { background:#ccc; border:1px solid #ddd; padding:1ex; }
 	pre.rawcontent { margin:0; padding:0 1ex; font-family: Courier New, sans-serif; }
 	-->
 	</style>
@@ -114,7 +114,7 @@ if( $action == '' && $file != '' )
 
 				?>
 				<noscript type="text/javascript">
-					<a href="<?php echo $_SERVER['PHP_SELF'].'?cd='.$cd.'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
+					<a href="<?php echo $Fileman->curl().'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
 						.( $showlinenrs ? T_('hide line numbers') : T_('show line numbers') ).'</a>';
 				?>
 				</noscript>
@@ -450,7 +450,7 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 	if( count($rootlist) > 1 )
 	{ // provide list
 		echo '<form action="files.php" name="roots" class="toolbaritem">'
-					.$Fileman->form_hiddeninputs();
+					.$Fileman->form_hiddeninputs( false );
 		echo '<select name="root" onchange="this.form.submit()">';
 
 		foreach( $rootlist as $lroot )

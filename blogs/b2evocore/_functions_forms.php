@@ -175,12 +175,12 @@ function form_radio(
 	$field_notes = '' )
 {
 	echo '<fieldset class="setting">';
-	echo '  <div class="label">', $field_label, ':</div>';
+	echo '  <div class="label">'.format_to_output($field_label).':</div>';
 	echo '  <div class="input"><fieldset class="input">';
 	foreach( $field_options as $loop_field_option )
 	{
 		if( $field_lines ) echo "<div>\n";
-		echo '<label class="radiooption"><input type="radio" class="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
+		echo '<label class="radiooption"><input type="radio" class="radio" name="'.$field_name.'" value="'.format_to_output( $loop_field_option[0], 'formvalue' ).'"';
 		if( $field_value == $loop_field_option[0] )
 		{
 			echo ' checked="checked"';

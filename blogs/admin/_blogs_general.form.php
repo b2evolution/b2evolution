@@ -76,7 +76,7 @@ function update_urlpreview( base, append )
 						array( 'index.php', T_('Other blog through index.php'),
 										'',
 										'',
-										'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') ? '/'.str_replace( "'", "\'", $edited_Blog->dget( 'stub' ) ) : '?blog='.$edited_Blog->ID ).'\' )"'
+										'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') ? "/'+document.getElementById( 'blog_urlname' ).value" : '?blog='.$edited_Blog->ID."'" ).' )"'
 						),
 						array( 'stub',
 										T_('Other blog through stub file (Advanced)'),

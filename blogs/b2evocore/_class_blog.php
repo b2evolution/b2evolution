@@ -211,7 +211,11 @@ class Blog extends DataObject
 
 			case 'stub':
 				// Access through stub file
-				$blogurl = $base.'/'.$this->stub;
+				$blogurl = $base;
+				if( !empty($this->stub) )
+				{
+					$blogurl .= '/'.$this->stub;
+				}
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
 				{ // We want to force the dynamic page but the URL is not explicitely dynamic
 					$blogurl .= '.php';
@@ -263,7 +267,7 @@ class Blog extends DataObject
 			case 'mediaurl':
 				return ($this->media_location == 'custom')
 								? $this->media_url
-								: $media_url.'/blogs/'.$this->gen_mediadir( false );
+								: $media_url.'/blogs/'.$this->gen_mediadir( false ).'/';
 
 			case 'subdir':
 				return $this->siteurl;
@@ -272,7 +276,7 @@ class Blog extends DataObject
 				return $this->gen_blogurl( 'default', false );
 
 			case 'blogurl':
-			case 'link':			// RSS wording
+			case 'link':    // RSS wording
 			case 'url':
 				return $this->gen_blogurl( 'default' );
 
@@ -295,7 +299,12 @@ class Blog extends DataObject
 				}
 				else
 				{
-					return $baseurl.$this->siteurl.'/';
+					$r = $baseurl.'/';
+					if( !empty($this->siteurl) )
+					{
+						$r .= $this->siteurl.'/';
+					}
+					return $r;
 				}
 
 			case 'cookie_domain':
