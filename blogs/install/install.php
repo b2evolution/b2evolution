@@ -13,7 +13,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.3-beta1</h1>
+<h1 id="version">Version: 0.8.3.3</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2login.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -26,7 +26,7 @@
 		die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
 	}
 
-	require_once (dirname(__FILE__)."/../conf/b2evo_config.php"); 
+	require_once (dirname(__FILE__).'/../conf/b2evo_config.php'); 
  
  ?>
 
@@ -43,8 +43,6 @@ require_once (dirname(__FILE__)."/../$pathcore/_functions.php" ); // db funcs
 require_once (dirname(__FILE__)."/../$pathcore/_functions_cats.php" );
 require_once (dirname(__FILE__)."/../$pathcore/_functions_bposts.php" );
 
-// ALTER TABLE `fplanque`.`b2blogs` CHANGE `blog_longdesc` `blog_longdesc` TEXT DEFAULT NULL 
-
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
@@ -55,15 +53,47 @@ $tablepostcats, $tablehitlog;
 
 	
 	echo "<p>Creating table for Settings...<br />\n";
-	$query = "CREATE TABLE $tablesettings ( ID tinyint(3) DEFAULT '1' NOT NULL, posts_per_page int(4) unsigned DEFAULT '7' NOT NULL, what_to_show varchar(5) DEFAULT 'days' NOT NULL, archive_mode varchar(10) DEFAULT 'weekly' NOT NULL, time_difference tinyint(4) DEFAULT '0' NOT NULL, AutoBR tinyint(1) DEFAULT '1' NOT NULL, time_format varchar(20) DEFAULT 'H:i:s' NOT NULL, date_format varchar(20) DEFAULT 'Y/m/d' NOT NULL, db_version INT DEFAULT '8000' NOT NULL, PRIMARY KEY (ID), KEY ID (ID) )";
+	$query = "CREATE TABLE $tablesettings ( 
+		ID tinyint(3) DEFAULT '1' NOT NULL, 
+		posts_per_page int(4) unsigned DEFAULT '7' NOT NULL, 
+		what_to_show varchar(5) DEFAULT 'days' NOT NULL, 
+		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL, 
+		time_difference tinyint(4) DEFAULT '0' NOT NULL, 
+		AutoBR tinyint(1) DEFAULT '1' NOT NULL, 
+		time_format varchar(20) DEFAULT 'H:i:s' NOT NULL, 
+		date_format varchar(20) DEFAULT 'Y/m/d' NOT NULL, 
+		db_version INT DEFAULT 8010 NOT NULL, 
+		PRIMARY KEY (ID), 
+		KEY ID (ID) 
+	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	
 	
 	echo "Creating table for Users...<br />\n";
-	$query = "CREATE TABLE $tableusers ( ID int(10) unsigned NOT NULL auto_increment, user_login varchar(20) NOT NULL, user_pass varchar(20) NOT NULL, user_firstname varchar(50) NOT NULL, user_lastname varchar(50) NOT NULL, user_nickname varchar(50) NOT NULL, user_icq int(10) unsigned DEFAULT '0' NOT NULL, user_email varchar(100) NOT NULL, user_url varchar(100) NOT NULL, user_ip varchar(15) NOT NULL, user_domain varchar(200) NOT NULL, user_browser varchar(200) NOT NULL, dateYMDhour datetime DEFAULT '0000-00-00 00:00:00' NOT NULL, user_level int(2) unsigned DEFAULT '0' NOT NULL, user_aim varchar(50) NOT NULL, user_msn varchar(100) NOT NULL, user_yim varchar(50) NOT NULL, user_idmode varchar(20) NOT NULL, PRIMARY KEY (ID), UNIQUE ID (ID), UNIQUE (user_login) )";
-$q = mysql_query($query) or mysql_oops( $query );
-	
-
+	$query = "CREATE TABLE $tableusers ( 
+		ID int(10) unsigned NOT NULL auto_increment, 
+		user_login varchar(20) NOT NULL, 
+		user_pass CHAR(32) NOT NULL, 
+		user_firstname varchar(50) NOT NULL, 
+		user_lastname varchar(50) NOT NULL, 
+		user_nickname varchar(50) NOT NULL, 
+		user_icq int(10) unsigned DEFAULT '0' NOT NULL, 
+		user_email varchar(100) NOT NULL, 
+		user_url varchar(100) NOT NULL, 
+		user_ip varchar(15) NOT NULL, 
+		user_domain varchar(200) NOT NULL, 
+		user_browser varchar(200) NOT NULL, 
+		dateYMDhour datetime DEFAULT '0000-00-00 00:00:00' NOT NULL, 
+		user_level int(2) unsigned DEFAULT '0' NOT NULL, 
+		user_aim varchar(50) NOT NULL, 
+		user_msn varchar(100) NOT NULL, 
+		user_yim varchar(50) NOT NULL, 
+		user_idmode varchar(20) NOT NULL, 
+		PRIMARY KEY (ID), 
+		UNIQUE ID (ID), 
+		UNIQUE (user_login) 
+	)";
+	$q = mysql_query($query) or mysql_oops( $query );
 	
 
 	echo "Creating table for Blogs...<br />\n";
@@ -73,8 +103,8 @@ $q = mysql_query($query) or mysql_oops( $query );
 		blog_name varchar(50) NOT NULL default '',
 		blog_tagline varchar(250) NULL default '',
 		blog_description varchar(250) NULL default '',
-		blog_longdesc tinytext,
-		blog_lang varchar(12) NOT NULL default 'en',
+		blog_longdesc TEXT NULL DEFAULT NULL, 
+		blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 		blog_siteurl varchar(120) NOT NULL default '$baseurl',
 		blog_filename varchar(30) NULL default 'blog.php',
 		blog_staticfilename varchar(30) NULL default NULL,
@@ -83,7 +113,8 @@ $q = mysql_query($query) or mysql_oops( $query );
 		blog_keywords tinytext,
 		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'standard',
 		blog_UID VARCHAR(20),
-		PRIMARY KEY  (blog_ID) )";
+		PRIMARY KEY  (blog_ID) 
+	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 
 
@@ -93,6 +124,9 @@ $q = mysql_query($query) or mysql_oops( $query );
 		cat_parent_ID int(11) default NULL,
 		cat_name tinytext NOT NULL,
 		cat_blog_ID int(11) NOT NULL default '2',
+		cat_description VARCHAR(250) NULL DEFAULT NULL,
+		cat_longdesc TEXT NULL DEFAULT NULL,
+		cat_icon VARCHAR(30) NULL DEFAULT NULL,
 		PRIMARY KEY  (cat_ID),
 		KEY cat_blog_ID (cat_blog_ID),
 		KEY cat_parent_ID (cat_parent_ID)
@@ -106,16 +140,19 @@ $q = mysql_query($query) or mysql_oops( $query );
 		post_author int(4) NOT NULL default '0',
 		post_date datetime NOT NULL default '0000-00-00 00:00:00',
 		post_status enum('published','deprecated','protected','private','draft') NOT NULL default 'published',
-		post_lang varchar(12) default NULL,
+		post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 		post_content text NOT NULL,
 		post_title text NOT NULL,
+		post_urltitle VARCHAR(50) NULL DEFAULT NULL,
+		post_url VARCHAR(250) NULL DEFAULT NULL,
 		post_category int(4) NOT NULL default '0',
-		post_trackbacks text,  
+		post_trackbacks TEXT NULL DEFAULT NULL,  
 		post_autobr tinyint(4) NOT NULL default '1',
 		post_flags SET('pingsdone','pbdone','tbdone','html','bbcode','gmcode','smartquotes','smileys','glossary','imported'),
 		post_karma int(11) NOT NULL default '0',
 		post_wordcount int(11) default NULL,
-		PRIMARY KEY  (ID),
+		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+		PRIMARY KEY (ID),
 		KEY post_date (post_date),
 		KEY post_category (post_category),
 		KEY post_author (post_author),
@@ -247,7 +284,8 @@ switch( $action )
 	case 'newdb':
 		/* 
 		 * -----------------------------------------------------------------------------------
-		 * Create a plain new db structure + sample contents
+		 * NEW DB: Create a plain new db structure + sample contents
+		 * -----------------------------------------------------------------------------------
 		 */
 		?>
 		<h3>Installing b2evolution tables with sample data</h3>
@@ -349,8 +387,9 @@ switch( $action )
 		
 		
 		$random_password = substr(md5(uniqid(microtime())),0,6);
-		
 		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '$random_password', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
+		// once md5 is active: 
+/*		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '".md5($random_password)."', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";*/
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "users: OK</p>";
 			
@@ -370,7 +409,8 @@ switch( $action )
 	case 'evodb':
 		/*
 		 * -----------------------------------------------------------------------------------
-		 * Upgrade data from existing b2evolution database
+		 * EVO UPGRADE: Upgrade data from existing b2evolution database
+		 * -----------------------------------------------------------------------------------
 		 */
 		?>
 		<h3>Upgrading data in existing b2evolution database</h3>
@@ -378,29 +418,104 @@ switch( $action )
 		
 		// start benchmarking
 		$time_start = gettimeofday();
-		
-		echo "<p>Generating wordcounts... ";
-		$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
+
+		echo "<p>Checking DB schema version... ";
+		$query = "SELECT db_version FROM $tablesettings WHERE ID = 1";
 		$q = mysql_query($query) or mysql_oops( $query );
+		$row = mysql_fetch_assoc($q);
+		if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
+		$old_db_version = $row['db_version'];
+		$new_db_version = 8010;				// next time: 8020
+		echo $old_db_version, ' : ';
+		if( $old_db_version < 8000 ) die( 'This version is too old!' );
+		if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
+		echo "OK.<br />\n";
 
-		$rows_updated = 0;
+		// Note: version number 8000 once meant 0.8.00.0, but I decided to switch to sequential 
+		// increments of 10 (in case we ever need to introduce intermediate versions for intermediate
+		// bug fixes...)
 
-		while($row = mysql_fetch_assoc($q)) 
+		if( $old_db_version == $new_db_version )
 		{
-			$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
-			$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
-			$rows_updated++;
+			echo '<p>The database schema is already up to date. There is nothing to do.</p>';
+			echo '<p>You can <a href="../admin/b2login.php">log in</a> with your usual b2 username and password.</p>';
+			break;
 		}
 
-		echo "OK. ($rows_updated rows updated)</p>\n";
+		if( $old_db_version < 8010 )
+		{
+			echo "<p>Upgrading users table... ";
+			$query = "ALTER TABLE $tableusers 
+								MODIFY COLUMN user_pass CHAR(32) NOT NULL";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
+			echo "<p>Upgrading blogs table... ";
+			$query = "ALTER TABLE $tableblogs 
+								MODIFY COLUMN blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
+								MODIFY COLUMN blog_longdesc TEXT NULL DEFAULT NULL";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
+			echo "<p>Upgrading categories table... ";
+			$query = "ALTER TABLE $tablecategories 
+								ADD COLUMN cat_description VARCHAR(250) NULL DEFAULT NULL,
+								ADD COLUMN cat_longdesc TEXT NULL DEFAULT NULL,
+								ADD COLUMN cat_icon VARCHAR(30) NULL DEFAULT NULL";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
+			echo "<p>Upgrading posts table... ";
+			$query = "ALTER TABLE $tableposts 
+								MODIFY COLUMN post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
+								ADD COLUMN post_urltitle VARCHAR(50) NULL DEFAULT NULL AFTER post_title,
+								ADD COLUMN post_url VARCHAR(250) NULL DEFAULT NULL AFTER post_urltitle,
+								ADD COLUMN post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open' AFTER post_wordcount";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
+			echo "<p>Generating wordcounts... ";
+			$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
+			$q = mysql_query($query) or mysql_oops( $query );
+			$rows_updated = 0;
+			while($row = mysql_fetch_assoc($q)) 
+			{
+				$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
+				$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
+				$rows_updated++;
+			}
+			echo "OK. ($rows_updated rows updated)</p>\n";
+		}
+
+
+		if( $old_db_version < 8020 )
+		{
+			/* 
+			 * CONTRIBUTORS: If you need some more changes, put them here!
+			 */
+
+/*
+			echo "<p>Encoding passwords... ";
+			$query = "UPDATE $tableusers 
+								SET user_pass = MD5(user_pass)";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+*/
+
 		
+		}
+		
+		// $new_db_version = 8001; // FOR TESTING
+		echo "<p>Update DB schema version to $new_db_version... ";
+		$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
+				
 		// end benchmarking
 		$time_end = gettimeofday();
 		$time_total = (float)($time_end['sec'] - $time_start['sec']) + ((float)($time_end['usec'] - $time_start['usec'])/1000000);
 		$time_total = round($time_total, 3);
-		
 		?>
-		
 		<p>Upgrade completed successfully! (<?php echo $time_total; ?> seconds)</p>
 
 		<p>Now you can <a href="../admin/b2login.php">log in</a> with your usual b2evolution username and password.</p>
@@ -412,7 +527,8 @@ switch( $action )
 	case 'upgradedb':
 		/* 
 		 * -----------------------------------------------------------------------------------
-		 * Create a new db structure + copy content from previous b2
+		 * B2 UPGRADE: Create a new db structure + copy content from previous b2
+		 * -----------------------------------------------------------------------------------
 		 */
 		?>
 		<h3>Installing b2evolution tables and copying existing b2 data</h3>
@@ -447,6 +563,10 @@ switch( $action )
 		
 		echo "Copying users... ";
 		$query = "INSERT INTO $tableusers SELECT * FROM $oldtableusers";
+		// after MD5 activation, replace with:
+/*		$query = "INSERT INTO $tableusers( ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, 		user_level,	user_aim, user_msn, user_yim, user_idmode )
+						 SELECT ID, user_login, MD5(user_pass), user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, 		user_level,	user_aim, user_msn, user_yim, user_idmode FROM $oldtableusers"; */
+		
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 		
@@ -559,7 +679,8 @@ switch( $action )
 	case 'deletedb':
 		/* 
 		 * -----------------------------------------------------------------------------------
-		 * Delete the db structure!!! (Everything will be lost)
+		 * DELETE DB: Delete the db structure!!! (Everything will be lost)
+		 * -----------------------------------------------------------------------------------
 		 */
 		?>
 		
@@ -628,10 +749,11 @@ switch( $action )
 		/* 
 		 * -----------------------------------------------------------------------------------
 		 * Menu
+		 * -----------------------------------------------------------------------------------
 		 */
 ?>
 
-		<h3>What do you want to install?</h3>
+	<h3>What do you want to install?</h3>
 		
 	<form action="install.php" method="post">
 
