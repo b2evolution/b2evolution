@@ -261,8 +261,8 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 dbconnect() or die( "<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>" );
 
-set_param( 'action', 'string' );
-set_param( 'skins', 'integer', 0 );
+param( 'action', 'string' );
+param( 'skins', 'integer', 0 );
 
 $timestamp = time();
 

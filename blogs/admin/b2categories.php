@@ -1,42 +1,8 @@
 <?php
 require_once (dirname(__FILE__).'/_header.php');
-
 $title = T_('Categories');
-/* <Categories> */
 
-function add_magic_quotes($array) {
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-} 
-
-if (!get_magic_quotes_gpc()) {
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-$b2varstoreset = array('action','standalone','cat');
-for ($i=0; $i<count($b2varstoreset); $i += 1) {
-	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
-				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
-			}
-		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
-		}
-	}
-}
-
+param( 'action', 'string' );
 
 switch($action) 
 {
@@ -51,7 +17,7 @@ case "newcat":
 
 	echo "<div class=\"panelblock\">\n";
 
-	$parent_cat_ID = $_GET['parent_cat_ID'];
+	param( 'parent_cat_ID', 'integer' );
 	if( !empty($parent_cat_ID) )
 	{	// We are creating a subcat
 		$parent_cat_name = get_catname($parent_cat_ID);
@@ -63,7 +29,7 @@ case "newcat":
 	}
 	else
 	{ // We are creating a new base cat
-		$blog_ID = $_GET['blog_ID'];
+		param( 'blog_ID', 'integer' );
 		$blogparams = get_blogparams_by_ID($blog_ID);
 		?>
 	<h3><?php printf( T_('New category in blog: %s'), $blogparams->blog_name ); ?></h3>
@@ -88,9 +54,9 @@ case "addcat":
 	if ($user_level < 3)
 	die ("Cheatin' uh ?");
 	
-	$cat_name=addslashes($_POST["cat_name"]);
-	$parent_cat_ID = $_POST['parent_cat_ID'];
-	$cat_blog_ID = $_POST['cat_blog_ID'];
+	param( 'cat_name', 'string' );
+	param( 'parent_cat_ID', 'integer' );
+	param( 'cat_blog_ID', 'integer' );
 
 	if( !empty($parent_cat_ID) )
 	{	// We are creating a subcat
@@ -115,7 +81,7 @@ case "Delete":
 	echo "<div class=\"panelinfo\">\n";
 	echo '<h3>', T_('Deleting category...'), "</h3>\n";
 	
-	$cat_ID = $_GET["cat_ID"];
+	param( 'cat_ID', 'integer' );
 
 	if ($user_level < 3) die ('Cheatin\' uh ?');
 	
@@ -139,7 +105,7 @@ case "Delete":
 case "Edit":
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
-	$cat_ID = $_GET['cat_ID'];
+	param( 'cat_ID', 'integer' );
 	$cat_name = get_catname($cat_ID);
 	$cat_name = addslashes($cat_name);
 	$cat_blog = get_catblog($cat_ID);
@@ -219,9 +185,9 @@ case "editedcat":
 	if ($user_level < 3)
 	die ("Cheatin' uh ?");
 	
-	$cat_name=addslashes($_POST['cat_name']);
-	$cat_ID=$_POST['cat_ID'];
-	$cat_parent_ID=$_POST['cat_parent_ID'];
+	param( 'cat_name', 'string' );
+	param( 'parent_cat_ID', 'integer' );
+	param( 'cat_ID', 'integer' );
 
 	cat_update( $cat_ID, $cat_name, $cat_parent_ID ) or mysql_oops( $query );
 		

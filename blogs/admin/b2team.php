@@ -1,33 +1,19 @@
 <?php
 require_once (dirname(__FILE__).'/_header.php');
 $title = T_('User management');
-/* <Team> */
-	
-$b2varstoreset = array('action','standalone','redirect','profile');
-for ($i=0; $i<count($b2varstoreset); $i += 1) {
-	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
-				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
-			}
-		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
-		}
-	}
-}
+
+param( 'action', 'string' );
 
 switch ($action) {
 	
 case "promote":
-	if (empty($HTTP_GET_VARS["prom"])) {
+	param( 'prom', 'string' );
+	param( 'id', 'integer' );
+	
+	if (empty($prom))
+	{
 		header("Location: b2team.php");
 	}
-
-	$id = $HTTP_GET_VARS["id"];
-	$prom = $HTTP_GET_VARS["prom"];
 
 	$user_data=get_userdata($id);
 	$usertopromote_level=$user_data[13];
@@ -48,7 +34,7 @@ case "promote":
 break;
 
 case "delete":
-	$id = $HTTP_GET_VARS["id"];
+	param( 'id', 'integer' );
 
 	if (!$id) {
 		header("Location: b2team.php");

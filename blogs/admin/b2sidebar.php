@@ -1,8 +1,7 @@
 <?php
-require_once (dirname(__FILE__).'/_header.php');
-/* <Sidebar> */
-
 $mode = 'sidebar';
+$action = 'new';
+require_once (dirname(__FILE__).'/_header.php');
 
 // just your usual browser thing because we're still too far from standards
 $is_gecko = preg_match("/Gecko/",$HTTP_USER_AGENT);

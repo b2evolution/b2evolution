@@ -202,7 +202,6 @@ $sleep_after_edit = 0;			// let DB do its stuff...
 $REMOTE_ADDR=getenv('REMOTE_ADDR'); /* visitor's IP */
 $HTTP_USER_AGENT=getenv('HTTP_USER_AGENT'); /* visitor's browser */
 
-
 /* ## Cookies ## */
 
 # This is the path that will be associated to cookies

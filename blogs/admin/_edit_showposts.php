@@ -6,30 +6,33 @@
 	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_archivelist.php');
 
 	
-	set_param( 'blog', 'integer', 2, true );
-	set_param( 'p', 'integer' );							// Specific post number to display
-	set_param( 'm', 'integer', '', true );							// YearMonth(Day) to display
-	set_param( 'w', 'integer', '', true );							// Week number
-	set_param( 'cat', 'string', '', true );							// List of cats to restrict to
-	set_param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
-	set_param( 'author', 'integer', '', true );					// List of authors to restrict to
-	set_param( 'order', 'string', 'DESC', true );		// ASC or DESC
-	set_param( 'orderby', 'string', '', true );					// list of fields to order by
-	set_param( 'posts', 'integer', '', true );					// # of posts to display on the page
-	set_param( 'paged', 'integer', '', true );					// List page number in paged display
-	set_param( 'poststart', 'integer', '', true );			// Start results at this position
-	set_param( 'postend', 'integer', '', true );				// End results at this position
-	set_param( 's', 'string', '', true );								// Search string
-	set_param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
-	set_param( 'exact', 'integer', '', true );					// Require exact match of title or contents
+	param( 'blog', 'integer', 2, true );
+
+	param( 'safe_mode', 'integer', 0 );		// Blogger style
+
+	param( 'p', 'integer' );							// Specific post number to display
+	param( 'm', 'integer', '', true );							// YearMonth(Day) to display
+	param( 'w', 'integer', '', true );							// Week number
+	param( 'cat', 'string', '', true );							// List of cats to restrict to
+	param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
+	param( 'author', 'integer', '', true );					// List of authors to restrict to
+	param( 'order', 'string', 'DESC', true );		// ASC or DESC
+	param( 'orderby', 'string', '', true );					// list of fields to order by
+	param( 'posts', 'integer', '', true );					// # of posts to display on the page
+	param( 'paged', 'integer', '', true );					// List page number in paged display
+	param( 'poststart', 'integer', '', true );			// Start results at this position
+	param( 'postend', 'integer', '', true );				// End results at this position
+	param( 's', 'string', '', true );								// Search string
+	param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
+	param( 'exact', 'integer', '', true );					// Require exact match of title or contents
 	$preview = 0;
-	set_param( 'c', 'string' );
-	set_param( 'tb', 'integer', 0 );
-	set_param( 'pb', 'integer', 0 );
-	set_param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
+	param( 'c', 'string' );
+	param( 'tb', 'integer', 0 );
+	param( 'pb', 'integer', 0 );
+	param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
 	$show_statuses = $show_status;
-	set_param( 'show_past', 'integer', '0', true ); 
-	set_param( 'show_future', 'integer', '0', true ); 
+	param( 'show_past', 'integer', '0', true ); 
+	param( 'show_future', 'integer', '0', true ); 
 	if( ($show_past == 0) && ( $show_future == 0 ) )
 	{
 		$show_past = 1;
@@ -128,11 +131,9 @@
 
 			<div class="bText">
 				<?php
-				if ($safe_mode)
-					echo "<xmp>";
+				if ($safe_mode) echo "<xmp>";
 				the_content();
-				if ($safe_mode)
-					echo "</xmp>";
+				if ($safe_mode)	echo "</xmp>";
 				?>
 			</div>
 

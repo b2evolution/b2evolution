@@ -201,17 +201,17 @@ switch($action)
 		{
 			?>
 			<script language="JavaScript">
-				function addPanel()
+				function addsidebar()
 				{
 					if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
-						window.sidebar.addPanel("b2 post","<?php echo $pathserver ?>/b2sidebar.php","");
+						window.sidebar.addPanel("<?php echo T_('Post to b2evolution') ?>","<?php echo $pathserver ?>/b2sidebar.php","");
 					else
-						alert("<?php echo T_('No Sidebar found!  You must use Mozilla 0.9.4 or later!') ?>");
+						alert("<?php echo T_('No Sidebar found! You must use Mozilla 0.9.4 or later!') ?>");
 				}
 			</script>
 			<br />
 			<h2><?php echo T_('SideBar') ?></h2>
-			<p><?php printf( T_('Add the <a %s>b2 Sidebar</a> !'), 'href="#" onClick="addPanel()"' ); ?></p>
+			<p><?php printf( T_('Add the <a %s>b2evo sidebar</a> !'), 'href="#" onClick="addsidebar()"' ); ?></p>
 			<?php
 		}
 		elseif($is_winIE || $is_macIE)
@@ -220,7 +220,7 @@ switch($action)
 			<br />
 			<h2><?php echo T_('SideBar') ?></h2>
 			<p><?php echo T_('Add this link to your favorites:') ?><br />
-			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?text='+escape(Q)+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'_search'))"><?php echo T_('b2 Sidebar') ?></a></p>
+			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?popuptitle='+escape(document.title)+'&amp;popupurl='+escape(location.href)+'&amp;text='+escape(Q),'_search'))"><?php echo T_('b2evo sidebar') ?></a></p>
 			<?php 
 		}
 		?>

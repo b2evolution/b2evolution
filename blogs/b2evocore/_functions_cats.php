@@ -419,7 +419,7 @@ function cat_load_postcats_cache()
 	if( $preview ) 
 	{	// Preview mode
 		global $extracats, $post_category;
-		set_param( 'extracats', 'array', array() );
+		param( 'extracats', 'array', array() );
 		if( !in_array( $post_category, $extracats ) )
 			$extracats[] = $post_category;
 		$cache_postcats[0] = $extracats;

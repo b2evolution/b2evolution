@@ -49,16 +49,17 @@ function user_delete( $post_id )
 }
 
 
+
 /*
  * veriflog(-)
  *
  * Verify if user is logged in 
  * checking login & pass in the database 
  */
-function veriflog()
+function veriflog( $login_required = false )
 {
-	global $tableusers, $cookie_user, $cookie_pass, $error;
-	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url, $cookie_user;
+	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $pathcore_out, $pathhtsrv;
+	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url;
 	
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
 	// Warning: unset() prevent from setting a new global value later in the func !!! :((
@@ -71,27 +72,100 @@ function veriflog()
 	$user_email = '';
 	$user_url = '';
 
-	if( !isset($_COOKIE[$cookie_user]) || !isset($_COOKIE[$cookie_pass]) )
-	{
-		return false;
+	// Check if user is trying to login right now:
+	if( isset($_POST['log'] ) && isset($_POST['pwd'] ))
+	{	// Trying to log in with a POST
+		$log = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['log']) : $_POST['log']));
+		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['pwd']) : $_POST['pwd'])));
+		unset($_POST['pwd']); // password is hashed from now on
 	}
-
-	$user_login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
-	$user_pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
-	// echo 'pass=', $user_pass_md5;
-
-	if($user_login == '' || $user_pass_md5 == '')
-	{
-		return false;
+	elseif( isset($_GET['log'] ) && isset($_GET['pwd'] ))
+	{	// Trying to log in with a GET
+		$log = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['log']) : $_GET['log']));
+		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['pwd']) : $_GET['pwd'])));
+		unset($_GET['pwd']); // password is hashed from now on
 	}
 	
-	if( !user_pass_ok( $user_login, $user_pass_md5, true ) )
-	{
-		$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login/password no longer valid');
-		return false;
-	}
+	if( isset($log) )
+	{	/*
+		 * ---------------------------------------------------------
+		 * User is trying to login right now
+		 * ---------------------------------------------------------
+		 */
+		// echo 'Trying to log in right now...'; 
+		 
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-cache, must-revalidate");
+		header("Pragma: no-cache");
 
-	// Login info is OK, we set the global variables:
+		// Check login and password
+		$user_login = $log;
+		if( !( $login_ok = user_pass_ok( $user_login, $user_pass_md5, true ) ) )
+		{
+			// echo 'login failed!!';
+			return '<strong>'. T_('ERROR'). ':</strong> '. T_('wrong login/password.');
+		}
+		
+		// Login succeeded:
+		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
+		if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
+			printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+		if( !setcookie( $cookie_pass, $user_pass_md5, $cookie_expires, $cookie_path, $cookie_domain) )
+			printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+	}
+	elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
+	{	/*
+		 * ---------------------------------------------------------
+		 * User was not trying to log in, but he already was loggued in: check validity
+		 * ---------------------------------------------------------
+		 */
+		// echo 'Was already loggued in...'; 
+
+		$user_login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
+		$user_pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
+		// echo 'pass=', $user_pass_md5;
+
+		if( ! user_pass_ok( $user_login, $user_pass_md5, true ) )
+		{	// login is NOT OK:
+			if( $login_required )
+			{
+				header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+				header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+				header("Cache-Control: no-cache, must-revalidate");
+				header("Pragma: no-cache");
+	
+				return '<strong>'. T_('ERROR'). ':</strong> '. T_('login/password no longer valid.');
+			}
+			
+			return 0;	// Wrong login but we don't care.
+		}
+	}
+	else
+	{	/*
+		 * ---------------------------------------------------------
+		 * User was not loggued in at all
+		 * ---------------------------------------------------------
+		 */
+		// echo ' NOT loggued in...'; 
+
+		if( $login_required )
+		{
+			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+			header("Cache-Control: no-cache, must-revalidate");
+			header("Pragma: no-cache");
+		
+			return T_('You must log in!');
+			exit();
+		}
+	
+		return 0;	// Not loggued in but we don't care
+	}
+	
+	/*
+	 * Login info is OK, we set the global variables:
+	 */
 	$userdata	= get_userdatabylogin($user_login);
 	$user_level	= $userdata['user_level'];
 	// echo 'user level = ', $user_level;
@@ -99,10 +173,41 @@ function veriflog()
 	$user_nickname = $userdata['user_nickname'];
 	$user_email	= $userdata['user_email'];
 	$user_url	= $userdata['user_url'];
-
-	return true;
+	
+	return 0;		// OK	
 }
 
+
+/*
+ * logout
+ *
+ * Log the user out:
+ */
+function logout()
+{
+	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
+	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url;
+	
+	// Reset all global variables 
+	// Note: unset is bugguy on globals
+	$user_login = '';
+	$user_pass_md5 = '';
+	$userdata = '';
+	$user_level = '';
+	$user_ID = '';
+	$user_nickname = '';
+	$user_email = '';
+	$user_url = '';
+
+	setcookie( 'cafeloguser' );		// OLD
+	setcookie( 'cafeloguser', '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
+	setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
+
+	setcookie( 'cafelogpass' );		// OLD
+	setcookie( 'cafelogpass', '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
+	setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
+
+}
 
 /*
  * is_loggued_in(-)

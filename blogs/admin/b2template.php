@@ -1,46 +1,12 @@
 <?php
 require_once(dirname(__FILE__).'/_header.php');
-/* <Template> */
 $title = T_('Custom skin template editing');
 
-/*
- * add_magic_quotes(-)
- */
-function add_magic_quotes($array) 
-{
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-} 
+param( 'action', 'string' );
+param( 'error', 'string' );
+param( 'file', 'string' );
+param( 'a', 'string' );
 
-if (!get_magic_quotes_gpc()) 
-{
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-$b2varstoreset = array('action','standalone','redirect','profile','error','warning','a','file');
-for ($i=0; $i<count($b2varstoreset); $i += 1) 
-{
-	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
-				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
-			}
-		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
-		}
-	}
-}
 
 switch($action) 
 {
@@ -54,7 +20,7 @@ case "update":
 	// Determine the edit folder:
 	$edit_folder = get_path().'/skins/custom';
 
-	$newcontent = stripslashes($_POST["newcontent"]);
+	param( 'newcontent', 'html' );
 	$f = fopen( $edit_folder.'/'.$file , "w+" );
 	fwrite($f,$newcontent);
 	fclose($f);

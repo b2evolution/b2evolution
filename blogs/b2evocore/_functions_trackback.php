@@ -207,8 +207,8 @@ function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 function trackback_rdf($timezone=0) 
 {	// This adds trackback autodiscovery information
-	global $pathserver, $id, $HTTP_SERVER_VARS, $blogfilename;	// fplanque added: $blogfilename
-	// if (!stristr($HTTP_SERVER_VARS['HTTP_USER_AGENT'], 'W3C_Validator')) {
+	global $pathserver, $id, $blogfilename;	// fplanque added: $blogfilename
+	// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
 	// fplanque WARNING: this isn't a very clean way to validate :/
 	// fplanque added: html comments (not perfect but better way of validating!)
 		echo "<!--\n";

@@ -148,8 +148,6 @@ class ItemList
 		 */
 		if(!empty($s)) 
 		{
-			// $s = addslashes_gpc($s);
-			// $search .= ' AND (';
 			$search = ' AND (';
 			if ($exact)	// We want exact match of title or contents
 				$n = '';
@@ -202,8 +200,6 @@ class ItemList
 		// Check for cat string (which will be handled recursively)
 		if ( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
 		{	// specified a category string:
-			// $cat = urldecode($cat);
-			// $cat = addslashes_gpc($cat);
 			$cat = str_replace(',', ' ', $cat);
 			if( strstr($cat,'-') )
 			{	// We want to exclude cats
@@ -625,15 +621,15 @@ class ItemList
 			global $preview_userid, $preview_date, $post_status, $post_lang, $content, $post_title, $post_url, $post_category, $post_autobr;
 	
 			$id = 0;
-			set_param( 'preview_userid', 'integer', true );
-			set_param( 'preview_date', 'string', true );
-			set_param( 'post_status', 'string', true );
-			set_param( 'post_lang', 'string', true );
-			set_param( 'content', 'html', true );
-			set_param( 'post_title', 'html', true );
-			set_param( 'post_url', 'string', true );
-			set_param( 'post_category', 'integer', true );
-			set_param( 'post_autobr', 'integer', 0 );
+			param( 'preview_userid', 'integer', true );
+			param( 'preview_date', 'string', true );
+			param( 'post_status', 'string', true );
+			param( 'post_lang', 'string', true );
+			param( 'content', 'html', true );
+			param( 'post_title', 'html', true );
+			param( 'post_url', 'string', true );
+			param( 'post_category', 'integer', true );
+			param( 'post_autobr', 'integer', 0 );
 	
 			$post_title = format_to_post( $post_title, 0 ); 
 			$content = format_to_post( $content, $post_autobr ); 

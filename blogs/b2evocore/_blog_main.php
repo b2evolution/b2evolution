@@ -25,7 +25,7 @@ param( 'posts', 'integer', '', true );					// # of posts to display on the page
 param( 'paged', 'integer', '', true );					// List page number in paged display
 param( 'poststart', 'integer', '', true );			// Start results at this position
 param( 'postend', 'integer', '', true );				// End results at this position
-// set_param( 'search', 'string' );				// obsolete (dangerous!)
+// param( 'search', 'string' );				// obsolete (dangerous!)
 param( 's', 'string', '', true );								// Search string
 param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
 param( 'exact', 'integer', '', true );					// Require exact match of title or contents
@@ -137,11 +137,11 @@ else
  */
 // Get the saved skin in cookie or default:
 if(!isset($default_skin)) $default_skin = '';
-set_param( $cookie_state, 'string', $default_skin );
+param( $cookie_state, 'string', $default_skin );
 // Get skin by params or default to cookie or default
-set_param( 'skin', 'string', $$cookie_state );
+param( 'skin', 'string', $$cookie_state );
 // check to see if we want to display the popup or the main template
-set_param( 'template', 'string', 'main' );
+param( 'template', 'string', 'main' );
 if( $skin != '' )
 {	// We want to display now:
 	$skin_folder = get_path( 'skins' );

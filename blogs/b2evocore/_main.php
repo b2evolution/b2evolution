@@ -41,6 +41,10 @@ dbconnect();
 $archive_mode = get_settings('archive_mode');
 $time_difference = get_settings('time_difference');
 
-// Load user details if he is loggued in:
-veriflog();
+// Login procedure:
+if( !isset($login_required) ) $login_required = false;
+if( $error = veriflog( $login_required ) )
+{	// Login failed:
+	require(dirname(__FILE__)."/$pathcore_out/$pathhtsrv/login.php");
+}
 ?>

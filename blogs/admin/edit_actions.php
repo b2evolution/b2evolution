@@ -1,27 +1,8 @@
 <?php
 require_once( dirname(__FILE__).'/_header.php' );
 
-function add_magic_quotes($array) 
-{
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-} 
-
-if (!get_magic_quotes_gpc()) 
-{
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-set_param( 'action', 'string', '' );
-set_param( 'mode', 'string', '' );
+param( 'action', 'string', '' );
+param( 'mode', 'string', '' );
 
 switch($action) 
 {
@@ -31,35 +12,36 @@ case 'post':
 	 * --------------------------------------------------------------------
 	 * INSERT POST & more
 	 */
-	set_param( 'post_category', 'integer', true );
+	param( 'post_category', 'integer', true );
 	$blog = get_catblog($post_category); 
 
 	$title = T_('Adding new post...');
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
-	set_param( "post_autobr", 'integer', 0 );
-	set_param( "post_pingback", 'integer', 0 );
-	set_param( 'trackback_url', 'string' );
+	param( "post_autobr", 'integer', 0 );
+	param( "post_pingback", 'integer', 0 );
+	param( 'trackback_url', 'string' );
 	$post_trackbacks = & $trackback_url;
-	set_param( 'content', 'html' );
-	set_param( 'post_title', 'html' );
-	set_param( 'post_url', 'string' );
-	set_param( 'post_status', 'string', 'published' );
-	set_param( 'extracats', array() );
+	param( 'content', 'html' );
+	param( 'post_title', 'html' );
+	param( 'post_url', 'string' );
+	param( 'post_status', 'string', 'published' );
+	param( 'extracats', array() );
 	$post_extracats = & $extracats;
-	set_param( 'post_lang', 'string', $default_language );
+	param( 'post_lang', 'string', $default_language );
 
 	if ($user_level == 0)	die (T_('Cheatin\' uh ?'));
 
-	if (($user_level > 4) && (!empty($HTTP_POST_VARS["edit_date"]))) 
+	param( 'edit_date', 'integer' );
+	if (($user_level > 4) && $edit_date) 
 	{
-		$aa = $HTTP_POST_VARS["aa"];
-		$mm = $HTTP_POST_VARS["mm"];
-		$jj = $HTTP_POST_VARS["jj"];
-		$hh = $HTTP_POST_VARS["hh"];
-		$mn = $HTTP_POST_VARS["mn"];
-		$ss = $HTTP_POST_VARS["ss"];
+		param( 'aa', 'string' );
+		param( 'mm', 'string' );
+		param( 'jj', 'string' );
+		param( 'hh', 'string' );
+		param( 'mn', 'string' );
+		param( 'ss', 'string' );
 		$jj = ($jj > 31) ? 31 : $jj;
 		$hh = ($hh > 23) ? $hh - 24 : $hh;
 		$mn = ($mn > 59) ? $mn - 60 : $mn;
@@ -118,7 +100,7 @@ case 'post':
 		pingCafelog($cafelogID, $post_title, $post_ID);
 	}
 
-	set_param( 'mode', 'string', '' );
+	param( 'mode', 'string', '' );
 	switch($mode) 
 	{
 		case "sidebar":
@@ -152,27 +134,30 @@ case "editpost":
 	if ($user_level == 0)
 	die ("Cheatin' uh ?");
 
-	set_param( "post_ID", 'integer', true );
-	set_param( "post_category", 'integer', true );
+	param( "post_ID", 'integer', true );
+	param( "post_category", 'integer', true );
 	$blog = get_catblog($post_category); 
-	set_param( "post_autobr", 'integer', 0 );
-	set_param( "post_pingback", 'integer', 0 );
-	$post_trackbacks = $HTTP_POST_VARS['trackback_url'];
-	set_param( 'content', 'html' );
-	set_param( 'post_title', 'html' );
-	set_param( 'post_url', 'string' );
-	set_param( 'post_status', 'string', 'published' );
-	$post_extracats = $_POST['extracats'];
-	set_param( 'post_lang', 'string', $default_language );
+	param( "post_autobr", 'integer', 0 );
+	param( "post_pingback", 'integer', 0 );
+	param( 'trackback_url', 'string' );
+	$post_trackbacks = $trackback_url;
+	param( 'content', 'html' );
+	param( 'post_title', 'html' );
+	param( 'post_url', 'string' );
+	param( 'post_status', 'string', 'published' );
+	param( 'extracats', 'array' );
+	$post_extracats = & $extracats;
+	param( 'post_lang', 'string', $default_language );
 
-	if (($user_level > 4) && (!empty($HTTP_POST_VARS["edit_date"]))) 
+	param( 'edit_date', 'integer' );
+	if (($user_level > 4) && $edit_date) 
 	{
-		$aa = $HTTP_POST_VARS["aa"];
-		$mm = $HTTP_POST_VARS["mm"];
-		$jj = $HTTP_POST_VARS["jj"];
-		$hh = $HTTP_POST_VARS["hh"];
-		$mn = $HTTP_POST_VARS["mn"];
-		$ss = $HTTP_POST_VARS["ss"];
+		param( 'aa', 'string' );
+		param( 'mm', 'string' );
+		param( 'jj', 'string' );
+		param( 'hh', 'string' );
+		param( 'mn', 'string' );
+		param( 'ss', 'string' );
 		$jj = ($jj > 31) ? 31 : $jj;
 		$hh = ($hh > 23) ? $hh - 24 : $hh;
 		$mn = ($mn > 59) ? $mn - 60 : $mn;
@@ -216,7 +201,7 @@ case "editpost":
 	}
 
 	// UPDATE POST IN DB:
-	bpost_update( $post_ID, $post_title, $content, $datemodif, $post_category,	$post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
+	bpost_update( $post_ID, $post_title, $content, $datemodif, $post_category, $post_extracats, 	$post_status, $post_lang, '',	$post_autobr, $pingsdone, $post_url ) or mysql_oops($query);
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
 	{
@@ -278,7 +263,7 @@ case "delete":
 	if ($user_level == 0)
 	die ("Cheatin' uh ?");
 
-	$post = $_GET['post'];
+	param( 'post', 'integer' );
 	$postdata=get_postdata($post) or die(T_('Oops, no post with this ID!'));
 	$authordata = get_userdata($postdata["Author_ID"]);
 
@@ -319,9 +304,8 @@ case "deletecomment":
 	if ($user_level == 0)
 		die ("Cheatin' uh ?");
 
-	$blog = $_GET['blog'];
-	$comment = $HTTP_GET_VARS['comment'];
-	$p = $HTTP_GET_VARS['p'];
+	param( 'comment', 'html' );
+	param( 'p', 'integer' );
 	$commentdata=get_commentdata($comment) or die(T_('Oops, no comment with this ID.'));
 
 	$query = "DELETE FROM $tablecomments WHERE comment_ID=$comment";
@@ -340,22 +324,24 @@ case "editedcomment":
 	if ($user_level == 0)
 		die (T_("Cheatin' uh ?"));
 
-	set_param( 'blog', 'integer', true );
-	set_param( 'comment_ID', 'integer', true );
-	set_param( 'comment_post_ID', 'integer', true );
-	set_param( 'newcomment_author', 'string', true );
-	set_param( 'newcomment_author_email', 'string' );
-	set_param( 'newcomment_author_url', 'string' );
-	set_param( 'content', 'html' );
-	set_param( "post_autobr", 'integer', ($comments_use_autobr == 'always')?1:0 );
+	param( 'blog', 'integer', true );
+	param( 'comment_ID', 'integer', true );
+	param( 'comment_post_ID', 'integer', true );
+	param( 'newcomment_author', 'string', true );
+	param( 'newcomment_author_email', 'string' );
+	param( 'newcomment_author_url', 'string' );
+	param( 'content', 'html' );
+	param( "post_autobr", 'integer', ($comments_use_autobr == 'always')?1:0 );
 
-	if (($user_level > 4) && (!empty($HTTP_POST_VARS["edit_date"]))) {
-		$aa = $HTTP_POST_VARS["aa"];
-		$mm = $HTTP_POST_VARS["mm"];
-		$jj = $HTTP_POST_VARS["jj"];
-		$hh = $HTTP_POST_VARS["hh"];
-		$mn = $HTTP_POST_VARS["mn"];
-		$ss = $HTTP_POST_VARS["ss"];
+	param( 'edit_date', 'integer' );
+	if (($user_level > 4) && $edit_date) 
+	{
+		param( 'aa', 'string' );
+		param( 'mm', 'string' );
+		param( 'jj', 'string' );
+		param( 'hh', 'string' );
+		param( 'mn', 'string' );
+		param( 'ss', 'string' );
 		$jj = ($jj > 31) ? 31 : $jj;
 		$hh = ($hh > 23) ? $hh - 24 : $hh;
 		$mn = ($mn > 59) ? $mn - 60 : $mn;

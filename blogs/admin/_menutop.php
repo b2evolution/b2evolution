@@ -28,15 +28,6 @@
 		}
 	<?php
 	}
-	if ($redirect==1) 
-	{ // --------------------------- REDIRECT -------------------------------
-	?>
-		function redirect() {
-			window.location = "<?php echo $redirect_url; ?>";
-		}
-		setTimeout("redirect();", 600);
-	<?php
-	}
 	if( $blog )
 	{ // --------------------------- PREVIEW -------------------------------
 	?>

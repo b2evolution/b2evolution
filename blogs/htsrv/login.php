@@ -22,124 +22,19 @@ switch($action)
 		/*
 		 * Logout:
 		 */
-		param( 'redirect_to', 'string', $htsrvurl.'/login.php' );
-
-		setcookie( 'cafeloguser' );		// OLD
-		setcookie( 'cafeloguser', '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
-		setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
-
-		setcookie( 'cafelogpass');			// OLD
-		setcookie( 'cafelogpass', '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
-		setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
+		// Do the log out!
+		logout();
 
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
 		header("Pragma: no-cache");
 
-		header("Refresh:0;url=$redirect_to");
+		param( 'redirect_to', 'string', $_SERVER['HTTP_REFERER'] );
+		$location = isset($redirect_to) ? $redirect_to : $baseurl.'/' ;
+		header("Refresh:0;url=$location");
 		exit();
 		break; // case 'logout'
-
-
-	case 'login':
-		/*
-		 * Logout:
-		 */
-		param( 'redirect_to', 'string', $pathserver.'/b2edit.php' );
-
-		$log = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['log']) : $_POST['log']));
-		$pwd = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['pwd']) : $_POST['pwd'])));
-		unset($_POST['pwd']); // password is hashed from now on
-
-		function login()
-		{
-			global $dbhost, $dbusername, $dbpassword, $dbname, $log, $pwd, $error, $user_ID;
-			global $tableusers;
-			$user_login = $log;
-			if (!$user_login) 
-			{
-				$error='<strong>'. T_('ERROR'). '</strong>: '. T_('The login field is empty');
-				return false;
-			}
-
-			if (!$pwd) 
-			{
-				$error='<strong>'. T_('ERROR'). '<\\1strong>: '. T_('the password field is empty');
-				return false;
-			}
-
-			$query =  "SELECT ID, user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '$pwd'";
-			$result = mysql_query($query) or mysql_oops( $query );
-
-			$lines = mysql_num_rows($result);
-			if ($lines >= 1)
-			{
-				return true;
-			}
-			else {
-				$error = '<strong>' . T_('ERROR') . '</strong>: ' . T_('Wrong login or password');
-				$pwd = '';
-				return false;
-			}
-		}
-
-		if (!login())
-		{	// Login failed
-			// echo 'login failed!!';
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-			header("Cache-Control: no-cache, must-revalidate");
-			header("Pragma: no-cache");
-
-			header('Refresh:0;url='.$htsrvurl.'/login.php?error='.urlencode( $error ) );
-
-			exit();
-		}
-		else
-		{
-			//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
-			if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
-				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-			if( !setcookie( $cookie_pass, $pwd, $cookie_expires, $cookie_path, $cookie_domain) )
-				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-			header("Cache-Control: no-cache, must-revalidate");
-			header("Pragma: no-cache");
-
-			switch($mode)
-			{
-				case 'bookmarklet':
-					// Caution: any ; (like in &amp;) in the $location will break the refresh!
-					$location = $redirect_to.'?popuptitle='.urlencode($popuptitle).'&popupurl='.urlencode($popupurl).'&text='.urlencode($text);
-					break;
-
-				case 'sidebar':
-					// Caution: any ; (like in &amp;) in the $location will break the refresh!
-					$location = $redirect_to.'b2sidebar.php?popuptitle='.urlencode($popuptitle).'&popupurl='.urlencode($popupurl).'&text='.urlencode($text);
-					break;
-
-				default:
-					$location = $redirect_to;
-					break;
-			}
-
-			header("Refresh:1;url=$location");
-			?>
-			<html>
-				<head></head>
-				<body>
-					<p>Your are being redirected.</p>
-					<p>If nothing happens, <a href="<?php echo $location ?>">click here</a>.</p>
-				</body>
-			</html>
-			<?php
-			
-		}
-
-		break; // case 'login'
 
 
 	case 'lostpassword':
@@ -151,6 +46,7 @@ switch($action)
 		require( dirname(__FILE__).'/_lostpass_form.php' );
 		exit();
 		break; // case 'lostpassword'
+
 
 
 	case 'retrievepassword':
@@ -195,24 +91,14 @@ switch($action)
 		/*
 		 * Default: login form:
 		 */
-		param( 'redirect_to', 'string', $pathserver.'/b2edit.php' );
-		param( 'log', 'string', '' );
-
 		if( is_loggued_in() )
-		{	// The user is already loggued in, no need to go thru this...
-		
-			header("Expires: Wed, 5 Jun 1979 23:41:00 GMT"); /* private joke: this is Michel's birthdate - though officially it's on the 6th, since he's on GMT+1 :) */
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); /* different all the time */
-			header("Cache-Control: no-cache, must-revalidate"); /* to cope with HTTP/1.1 */
-			header("Pragma: no-cache");
-
-			header("Location: $redirect_to");
-			exit();
+		{	// The user is already loggued in...
+			$error = T_('Note: You are already loggued in!');
 		}
+		
 		// Display login form:
 		require( dirname(__FILE__).'/_login_form.php' );
 		exit();
-		break; // case default
 
 } // switch
 

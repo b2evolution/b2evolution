@@ -123,7 +123,8 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 
-$location = (!empty($_POST['redirect_to'])) ? $_POST['redirect_to'] : $_SERVER['HTTP_REFERER'];
+param( 'redirect_to', 'string' );
+$location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
 header("Refresh:0;url=$location");
 
 ?>

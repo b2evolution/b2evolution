@@ -3,9 +3,9 @@ require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$b2inc.'/_functions_hitlogs.php');						// referer logging
 $title = T_('View Stats');
 
-set_param( 'action', 'string' );
-set_param( 'show', 'string', 'referers' );
-set_param( 'blog', 'string', '' );
+param( 'action', 'string' );
+param( 'show', 'string', 'referers' );
+param( 'blog', 'string', '' );
 
 require(dirname(__FILE__).'/_menutop.php');
 ?>
@@ -45,8 +45,8 @@ switch( $action )
 {
 	case 'changetype':
 		// Change the type of a hit:
-		set_param( 'hit_ID', 'integer', true );	// Required!
-		set_param( 'hit_type', 'string', true );	// Required!
+		param( 'hit_ID', 'integer', true );	// Required!
+		param( 'hit_type', 'string', true );	// Required!
 		?>
 		<div class="panelinfo">
 		<p><?php printf( T_('Changing hit #%d type to: %s'), $hit_ID, $hit_type) ?></p>
@@ -59,7 +59,7 @@ switch( $action )
 
 	case 'delete':
 		// DELETE A HIT:
-		set_param( 'hit_ID', 'integer', true );	// Required!
+		param( 'hit_ID', 'integer', true );	// Required!
 		?>
 		<div class="panelinfo">
 		<p><?php printf( T_('Deleting hit #%d...'), $hit_ID )?></p>

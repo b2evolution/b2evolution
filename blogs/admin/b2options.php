@@ -1,40 +1,8 @@
 <?php
 require( dirname(__FILE__).'/_header.php');
 $title = T_('Options');
-/* <Options> */
 
-function add_magic_quotes($array) {
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-} 
-
-if (!get_magic_quotes_gpc()) {
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-$b2varstoreset = array('action','standalone');
-for ($i=0; $i<count($b2varstoreset); $i += 1) {
-	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) {
-			if (empty($HTTP_GET_VARS["$b2var"])) {
-				$$b2var = '';
-			} else {
-				$$b2var = $HTTP_GET_VARS["$b2var"];
-			}
-		} else {
-			$$b2var = $HTTP_POST_VARS["$b2var"];
-		}
-	}
-}
+param( 'action', 'string' );
 
 switch($action) {
 
@@ -44,11 +12,11 @@ case "update":
 		die( T_('You have no right to edit the options for this blog.') );
 	}
 
-	$newposts_per_page=addslashes($HTTP_POST_VARS["newposts_per_page"]);
-	$newwhat_to_show=addslashes($HTTP_POST_VARS["newwhat_to_show"]);
-	$newarchive_mode=addslashes($HTTP_POST_VARS["newarchive_mode"]);
-	$newtime_difference=addslashes($HTTP_POST_VARS["newtime_difference"]);
-	$newautobr=addslashes($HTTP_POST_VARS["newautobr"]);
+	param( 'newposts_per_page', 'integer', true );
+	param( 'newwhat_to_show', 'string', true );
+	param( 'newarchive_mode', 'string', true );
+	param( 'newtime_difference', 'integer', true );
+	param( 'newautobr', 'integer', true );
 	
 	$query = "UPDATE $tablesettings SET posts_per_page=$newposts_per_page, what_to_show='$newwhat_to_show', archive_mode='$newarchive_mode', time_difference=$newtime_difference, AutoBR=$newautobr WHERE ID = 1";
 	mysql_query($query) or mysql_oops( $query );

@@ -1,46 +1,14 @@
 <?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ */
 require_once (dirname(__FILE__).'/_header.php');
 
-function add_magic_quotes($array) {
-	foreach ($array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		}
-	}
-	return $array;
-} 
-
-if (!get_magic_quotes_gpc()) 
-{
-	$HTTP_GET_VARS    = add_magic_quotes($HTTP_GET_VARS);
-	$HTTP_POST_VARS   = add_magic_quotes($HTTP_POST_VARS);
-	$HTTP_COOKIE_VARS = add_magic_quotes($HTTP_COOKIE_VARS);
-}
-
-$b2varstoreset = array('action','safe_mode','withcomments','c','posts','poststart','postend','content','edited_post_title','comment_error','profile', 'trackback_url');
-for ($i=0; $i<count($b2varstoreset); $i += 1) 
-{
-	$b2var = $b2varstoreset[$i];
-	if (!isset($$b2var)) {
-		if (empty($HTTP_POST_VARS["$b2var"])) 
-		{
-			if (empty($HTTP_GET_VARS["$b2var"])) 
-			{
-				$$b2var = '';
-			} else 
-			{
-				$$b2var = $HTTP_GET_VARS["$b2var"];
-			}
-		} 
-		else 
-		{
-			$$b2var = $HTTP_POST_VARS["$b2var"];
-		}
-	}
-}
-
+param( 'action', 'string' );
 
 switch($action) 
 {
@@ -64,11 +32,11 @@ case 'new':
 		}
 
 		$action='post';
-		set_param( 'popuptitle', 'string', '' );
+		param( 'popuptitle', 'string', '' );
 		$edited_post_title = format_to_edit( $popuptitle );
-		set_param( 'popupurl', 'string', '' );
+		param( 'popupurl', 'string', '' );
 		$post_url = format_to_edit( $popupurl );
-		set_param( 'text', 'html', '' );
+		param( 'text', 'html', '' );
 		$content = format_to_edit( $text );
 		$post_lang = $default_language;
 		$post_status = $default_post_status;		// 'published' or 'draft' or ...
@@ -93,7 +61,7 @@ case "edit":
 	 * --------------------------------------------------------------------
 	 * Display post editing form
 	 */
-	set_param( "post", 'integer', true );
+	param( "post", 'integer', true );
 	$postdata = get_postdata($post) or die( T_('Oops, no post with this ID.') );
 	$post_lang = $postdata["Lang"];
 	$cat = $postdata["Category"];
@@ -134,7 +102,7 @@ case "editcomment":
 	 * --------------------------------------------------------------------
 	 * Display comment in edit form
 	 */
-	set_param( 'comment', 'integer', true );
+	param( 'comment', 'integer', true );
 	$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
 
 	$title = T_('Editing comment');
