@@ -390,6 +390,11 @@ class archive
 	}
 }
 
+/**
+ * Class Tar file
+ *
+ * @author Devin Doucette
+ */
 class tar_file extends archive
 {
 	function tar_file($name)
@@ -568,6 +573,11 @@ class tar_file extends archive
 	}
 }
 
+/**
+ * Class Gzip_file
+ *
+ * @author Devin Doucette
+ */
 class gzip_file extends tar_file
 {
 	function gzip_file($name)
@@ -613,6 +623,11 @@ class gzip_file extends tar_file
 	}
 }
 
+/**
+ * Class Bzip_file
+ *
+ * @author Devin Doucette
+ */
 class bzip_file extends tar_file
 {
 	function bzip_file($name)
@@ -658,6 +673,11 @@ class bzip_file extends tar_file
 	}
 }
 
+/**
+ * Class Zip_file
+ *
+ * @author Devin Doucette
+ */
 class zip_file extends archive
 {
 	function zip_file($name)

@@ -105,7 +105,9 @@ class smilies_Rendererplugin extends RendererPlugin
 					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
 				}
 	
-				// QUESTION: use getimagesize() here?
+				// We don't use getimagesize() here until we have a mean
+				// to preprocess smilies. It takes up to much time when
+				// processing them at display time.
 				$this->replace[] = '<img src="'.$this->smilies_path/$img.'" alt="'.$smiley_masked.'" class="middle" />';
 			}
 		}

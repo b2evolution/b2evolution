@@ -4,9 +4,17 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2004 by Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
  *
  * @package evocore
+ */
+
+/**
+ * Class Http
+ *
+ * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
  */
 class http {
   
