@@ -502,13 +502,15 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 
 /**
- * fplanque>>Documentation would make sense
+ * Check permissions on a given blog (by ID) and autoselect an appropriate blog
+ * if necessary.
  *
- * Will check permission, also on preselected blog.
- *
+ * @param integer Pre-selected blog (usually blog GET param)
+ * @param string Permission name that must be given to the {@link $current_User} object.
+ * @param string Permission level that must be given to the {@link $current_User} object.
  * @return integer The selected blog (0 means failure).
  */
-function autoselect_blog( $selectedBlog, $permname, $permlevel )
+function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 {
 	global $current_User;
 	global $default_to_blog;
@@ -547,6 +549,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel )
 
 /*
  * $Log$
+ * Revision 1.11  2005/03/09 19:23:33  blueyed
+ * doc
+ *
  * Revision 1.10  2005/03/08 13:24:42  fplanque
  * minor
  *

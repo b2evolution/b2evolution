@@ -80,7 +80,7 @@ function imgbase()
  *
  * @param string prefix to display if a title is generated
  * @param string suffix to display if a title is generated
- * @param string glue to uise if multiple title elements are generated
+ * @param string glue to use if multiple title elements are generated
  * @param string format to output, default 'htmlbody'
  * @param boolean display title? (if false: return)
  * @param boolean show the year as link to year's archive (in monthly mode)
@@ -289,6 +289,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.5  2005/03/09 19:23:34  blueyed
+ * doc
+ *
  * Revision 1.4  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

@@ -82,7 +82,7 @@ else switch ($action)
 		}
 		else
 		{ // we edit an existing user:
-			$edited_User = & $UserCache->get_by_ID( $edited_user_ID ); // If we edit, why would we copy??
+			$edited_User = $UserCache->get_by_ID( $edited_user_ID ); // Copy! (because we'll compare later the login to $current_User)
 		}
 
 		if( $user_profile_only && $edited_user_ID != $current_User->ID )
@@ -204,12 +204,12 @@ else switch ($action)
 			if( $edited_user_ID == $current_User->ID )
 			{ // current user updates him/herself - we have to set cookies to keep him logged in
 				if( !empty($new_pass) && $current_User->pass != $new_pass )
-				{
+				{ // The user changed his password, update login cookie!
 					setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
 				}
 
 				if( $edited_User->login != $current_User->login )
-				{
+				{ // The user changed his own login, update login cookie!
 					setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
 				}
 
