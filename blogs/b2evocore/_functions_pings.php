@@ -209,7 +209,7 @@ function pingBlogs( & $blogparams )
 *
 */
 function pingTechnorati(& $blogparams, $display = true ) {
-   global $use_technoratiping, $blogfilename;
+   global $baseurl, $use_technoratiping, $blogfilename;
 
    if(!$use_technoratiping) return false;
    if( $display ) {
