@@ -23,6 +23,7 @@ $languages = array(
 	'en' => NT_('English'),
 	'fr' => NT_('French'),
 	'ja' => NT_('Japanese'),
+	'lt' => NT_('Lithuanian'),
 	'nb' => NT_('Norwegian Bokm&aring;l'), 
 	'pt' => NT_('Portuguese'),
 	'es' => NT_('Spanish'),
@@ -66,6 +67,11 @@ $locales = array(
 									'datefmt' => 'Y/m/d',
 									'timefmt' => 'H:i:s',
 								),
+	'lt_LT' => array( // Lithuanian	
+									'charset' => 'Windows-1257',
+									'datefmt' => 'Y-m-d',
+									'timefmt' => 'H:i:s',
+										),
 	'nb_NO' => array( // Bokmål, NORWAY    
 									'charset' => 'iso-8859-1', 
 									'datefmt' => 'd.m.y', 
