@@ -12,7 +12,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title><?php
+<title><?php 
 	$Blog->disp('name', 'htmlhead');
 	single_cat_title( ' - ', 'htmlhead' );
 	single_month_title( ' - ', 'htmlhead' );
@@ -47,7 +47,7 @@
 </div>
 
 <div class="bPosts">
-<h2><?php
+<h2><?php 
 	single_cat_title();
 	single_month_title();
 	single_post_title();

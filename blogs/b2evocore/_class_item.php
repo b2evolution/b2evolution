@@ -77,6 +77,153 @@ class Item extends DataObject
 	}	
 
 
+
+	/**
+ 	 * generate permalink for item
+	 *
+	 * {@internal Item::gen_permalink(-)}}
+	 *
+	 * @todo archives modes in clean mode
+	 * 
+	 * @param string 'post', 'archive#id' or 'archive#title'
+	 * @param string url to use
+	 */
+	function gen_permalink( $mode, $blogurl )
+	{
+		global $cacheweekly, $use_extra_path_info, $permalink_destination;
+		global $permalink_include_more, $permalink_include_comments;
+		global $permalink_include_trackback, $permalink_include_pingback;
+		global $use_extra_path_info;
+
+		if( empty( $mode ) )
+			$mode = 'urltitle';
+	
+		if( empty( $blogurl ) ) 
+			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
+
+		$post_date = $this->issue_date;
+
+		switch( $mode )
+		{
+			case 'archive#id':
+				// Link to an archive page:
+				$dest_type = get_settings('archive_mode');
+				$anchor = $this->ID;
+				break;
+
+			case 'archive#title':
+				// Link to an archive page:
+				$dest_type = get_settings('archive_mode');
+				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
+				break;
+			
+			case 'pid':
+				// Link to individual post:
+				$dest_type = 'postbypost';
+				$urlparam = 'p='.$this->ID;
+				$urltail = 'p'.$this->ID;
+				break;
+				
+			case 'urltitle':
+			default:
+				// Link to individual post:
+				$dest_type = 'postbypost';
+				if( !empty( $this->urltitle ) )
+				{
+					$urlparam = 'title='.$this->urltitle;
+					$urltail = $this->urltitle;
+				}
+				else
+				{
+					$urlparam = 'p='.$this->ID;
+					$urltail = 'p'.$this->ID;
+				}
+		}
+
+		if( ! $use_extra_path_info )
+		{	// We reference by Query: Dirty but explicit permalinks
+	
+			// Generate options
+			$options = '';
+			if( $permalink_include_more )
+			{ // permalinks to include full post text
+				$options .=  '&amp;more=1';
+			}
+			if( $permalink_include_comments )
+			{ // permalinks to include comments
+				$options .=  '&amp;c=1';
+			}
+			if( $permalink_include_trackback )
+			{ // permalinks to include trackbacks
+				$options .=  '&amp;tb=1';
+			}
+			if( $permalink_include_pingback )
+			{ // permalinks to include pingbacks
+				$options .=  '&amp;pb=1';
+			}
+	
+			switch( $dest_type ) 
+			{
+				case 'monthly':
+					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).$options.'#'.$anchor;
+					break;
+					
+				case 'weekly':
+					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date]))) 
+					{
+						$sql = "SELECT WEEK('".$post_date."')";
+						$result = mysql_query($sql);
+						$row = mysql_fetch_row($result);
+						$cacheweekly[$post_date] = $row[0];
+					}
+					$permalink = $blogurl.'?m='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date].$options.'#'.$anchor;
+					break;
+					
+				case 'daily':
+					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2).$options.'#'.$anchor;
+					break;
+					
+				case 'postbypost':
+				default:
+					$permalink = $blogurl.'?'.$urlparam.$options;
+					break;
+			}
+		}
+		else
+		{	// We reference by path (CLEAN permalinks!)
+			switch( $dest_type ) 
+			{
+				case 'monthly':
+					$permalink = $blogurl.mysql2date("/Y/m/", $post_date).'#'.$anchor;
+					break;
+					
+				case 'weekly':
+					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date]))) 
+					{
+						$sql = "SELECT WEEK('".$post_date."')";
+						$result = mysql_query($sql);
+						$row = mysql_fetch_row($result);
+						$cacheweekly[$post_date] = $row[0];
+					}
+					$permalink = $blogurl.mysql2date("/Y/m/", $post_date).'w'.$cacheweekly[$post_date].'/#'.$anchor;
+					break;
+					
+				case 'daily':
+					$permalink = $blogurl.mysql2date("/Y/m/d/", $post_date).'#'.$anchor;
+					break;
+					
+				case 'postbypost':
+				default:
+					// This is THE CLEANEST available: RECOMMENDED!
+					$permalink = $blogurl.mysql2date("/Y/m/d/", $post_date).$urltail;
+					break;
+			}
+		}
+		
+		return $permalink;
+	}
+
+
 	/** 
 	 * Template function: display anchor for permalinks to refer to
 	 *
@@ -475,34 +622,7 @@ class Item extends DataObject
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
-		global $permalink_destination;
-	
-		switch( $mode )
-		{
-			case 'post':
-				$mode_dest = 'single';
-				$mode_anchor = '';	// Unused
-				break;
-			
-			case 'archive#id':
-				$mode_dest = 'archive';
-				$mode_anchor = 'id';
-				break;
-
-			case 'archive#title':
-				$mode_dest = 'archive';
-				$mode_anchor = 'title';
-				break;
-			
-			default:
-				$mode_dest = $permalink_destination;
-				$mode_anchor = 'id';
-		}
-
-		if( empty($blogurl) ) 
-			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
-
-		echo gen_permalink( $blogurl, $this->ID, $mode_anchor, $mode_dest );
+		echo $this->gen_permalink( $mode, $blogurl );
 	}
 
 

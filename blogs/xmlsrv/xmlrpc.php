@@ -218,9 +218,11 @@ function b2getcategories($m)
 
 
 
-/*
+/**
  * b2_getPostURL(-)
  * b2.getPostURL(-)
+ *
+ * @todo call Item::permalink()
  */
 $b2_getPostURL_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 
@@ -268,7 +270,7 @@ function b2_getPostURL($m)
 		{
 			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
 
-			// this code is blatantly derived from gen_permalink()
+			// this code is blatantly derived from DEPRECTAED gen_permalink()
 			$archive_mode = get_settings('archive_mode');
 			switch($archive_mode)
 			{

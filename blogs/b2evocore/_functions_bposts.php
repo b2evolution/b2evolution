@@ -636,17 +636,18 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
 {
 	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
 
-	global $p;
-	if (intval($p)) {
+	global $p, $title;
+	if( intval( $p ) || (!empty( $title )) ) 
+	{
 		$post_data = get_postdata($p);
-		$title = stripslashes($post_data['Title']);
+		$disp_title = stripslashes($post_data['Title']);
 		if ($display) 
 		{
-			echo format_to_output( $prefix.$title, $display );
+			echo format_to_output( $prefix.$disp_title, $display );
 		}
 		else 
 		{
-			return $title;
+			return $disp_title;
 		}
 	}
 }
@@ -1452,8 +1453,6 @@ function gen_permalink(
 			default:
 				// This is THE CLEANEST available: RECOMMENDED!
 				$permalink = $file.mysql2date("/Y/m/d/", $postdata['Date']).'p'.$id;
-				$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
-				$permalink .= "-".$title;
 				break;
 		}
 	}

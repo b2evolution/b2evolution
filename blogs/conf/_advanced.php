@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.9
+ * Version of this file: 0.8.9+CVS
  *
  * This file includes advanced settings for b2evolution
  */
@@ -39,6 +39,7 @@ $notify_from = $b2evo_name.'@'.$basehost; // comment this line if you want to cu
 
 // *** Permalink control ***
 
+# DEPRECATED:
 # What do you want permalinks to link to?
 # 'single' will link to a single post
 # 'archive' will link to the post in the archives
@@ -57,6 +58,8 @@ $permalink_include_pingback = 1;	// Set this to 1 for permalinks to include ping
 # Your server has to suuport this. This requires apache configuration.
 # Note: OVH for example supports this by default.
 $use_extra_path_info = 0; 				// Set this to 1 to enable clean extra path info
+
+$use_extra_path_info = 1; 				// TESTING
 
 
 // ** Configuration for htsrv/getmail.php ** 

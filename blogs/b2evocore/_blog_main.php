@@ -31,9 +31,10 @@ param( 'sentence', 'string', 'AND', true );     // Search for sentence or for wo
 param( 'exact', 'integer', '', true );          // Require exact match of title or contents
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
-param( 'c', 'string', '', true );               // deprecated
+param( 'c', 'string', '', true );            
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
+param( 'title', 'string', '', true );						// urtitle of post to display
 param( 'tb', 'integer', 0, true );
 param( 'pb', 'integer', 0, true );
 param( 'disp', 'string', '', true );
@@ -88,18 +89,24 @@ if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 		{	// We'll consider this to be the day
 			$m .= $path_elements[$i++];
 
-			if( isset( $path_elements[$i] ) && ereg( "p([0-9]+)", $path_elements[$i], $req_post )  )
-			{	// The last param is of the form p000
+			if( isset( $path_elements[$i] ) )
+			{ // We'll consider this to be a ref to a post
 				// We are accessing a post by permalink
 				// Set a lot of defaults as if we had received a complex URL:
-				$p = $req_post[1];		// Post to display
 				$m = '';
 				$more=1;							// display the extended entries' text
 				$c=1;									// Display comments
 				$tb=1;								// Display trackbacks
 				$pb=1;								// Display pingbacks
-			
-				// TODO: allow overrides
+
+			  if( ereg( "p([0-9]+)", $path_elements[$i], $req_post )  )
+				{	// The last param is of the form p000
+					$p = $req_post[1];		// Post to display
+				}
+				else
+				{ // Last param is a string, we'll consider this to be a post urltitle
+					$title = $path_elements[$i];
+				}
 			}
 		}
 	}
@@ -108,14 +115,14 @@ if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 		$w = substr( $path_elements[$i], 1, 2 );
 	}
 }
-// else echo "not numeric: ",  $path_elements[$i];
-
 
 
 if ( empty( $disp ) )
 { // If we are going to display posts and not something special...
 
-	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
+	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, 
+															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
+															$preview, '', '', $timestamp_min, $timestamp_max, $title );
 	
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;

@@ -90,7 +90,8 @@ class ItemList extends DataObjectList
 		$default_posts_per_page = '',
 		$init_what_to_show = '',
 		$timestamp_min = '',									// Do not show posts before this timestamp
-		$timestamp_max = 'now'  )							// Do not show posts after this timestamp
+		$timestamp_max = 'now',								// Do not show posts after this timestamp
+		$title = ''	)													// urltitle of post to display
 	{
 		global $querycount;
 		global $tableposts, $tablepostcats, $tablecategories;
@@ -155,6 +156,12 @@ class ItemList extends DataObjectList
 		{
 			$p = intval($p);
 			$where .= ' AND ID = '. $p;
+		}
+
+		// if a post urltitle is specified, load that post
+		if( !empty( $title ) )
+		{
+			$where .= " AND post_urltitle = '$title'";
 		}
 
 		/*
@@ -783,7 +790,7 @@ class ItemList extends DataObjectList
 	 */
 	function date_if_changed( $before='<h2>', $after='</h2>', $format='' )
 	{
-		$current_item_date = $this->last_Item->get( 'date' );
+		$current_item_date = $this->last_Item->get( 'issue_date' );
 		if($format=='')
 		{
 			$current_item_date = mysql2date( locale_datefmt(), $current_item_date );
