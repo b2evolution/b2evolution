@@ -219,6 +219,7 @@ switch( $show )
 			</td>
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
+			<td><a href="b2antispam.php?action=banhit&hit_ID=<?php stats_hit_ID() ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo T_('Ban') ?>" /></a></td>
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
