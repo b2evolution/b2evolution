@@ -614,13 +614,10 @@ function antispambot($emailaddy, $mailto=0) {
  * Check that email address looks valid
  */
 function is_email($user_email) {
-	$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
+	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
+	$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
 	if(strstr($user_email, '@') && strstr($user_email, '.')) {
-		if (preg_match($chars, $user_email)) {
-			return true;
-		} else {
-			return false;
-		}
+		return (bool)(preg_match($chars, $user_email));
 	} else {
 		return false;
 	}
