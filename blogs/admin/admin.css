@@ -427,6 +427,7 @@ div.menutoptitle
 	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
 	color: #BBCCDD;
 	font-size: 112%;
+	clear: both;
 }
 
 /* --- admin blog display --- */
