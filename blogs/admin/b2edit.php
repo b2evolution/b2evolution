@@ -163,10 +163,13 @@ switch($action)
 		if( ! blog_has_cats( $blog ) )
 		{
 			?>
-			<div class="panelinfo"><p>
-			<?php echo T_('Since this blog has no categories, you cannot post to it. You must create categories first.') ?>
-			</p></div>
+			<div class="panelinfo">
+				<?php
+				Log::display( '', '', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'error' );
+				?>
+			</div>
 			<?php
+
 			break;
 		}
 
@@ -177,7 +180,7 @@ switch($action)
 		// but we need to make sure the requested/default one is ok...
 		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
 		if( ! $current_User->check_perm( 'blog_post_statuses', $post_status, false, $blog ) )
-		{	// We need to find another one:
+		{ // We need to find another one:
 			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
 				$post_status = 'published';
 			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
