@@ -20,12 +20,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 function set_upgrade_checkpoint( $version )
 {
- 	global $DB;
+	global $DB;
 
 	echo "Creating DB schema version checkpoint at $version... ";
-	$DB->query( "UPDATE T_settings
-									SET set_value = '$version'
+
+	if( $version < 8060 )
+	{
+		$query = 'UPDATE T_settings SET db_version = '.$version;
+	}
+	else
+	{
+		$query = "UPDATE T_settings
+								SET set_value = '$version'
 								WHERE set_name = 'db_version'" );
+	}
+	$DB->query( $query );
+
 	echo "OK.<br />\n";
 }
 
@@ -471,16 +481,16 @@ function upgrade_b2evo_tables()
 	}
 
 	if( $old_db_version < 8062 )
-	{	// --------------------------------------------
+	{ // --------------------------------------------
 		// upgrade to 0.9.0.4
 		// --------------------------------------------
-    cleanup_post_quotes();
+		cleanup_post_quotes();
 
 		set_upgrade_checkpoint( '8062' );
 	}
 
 	if( $old_db_version < 8064 )
-	{	// --------------------------------------------
+	{ // --------------------------------------------
 		// upgrade to 0.9.0.6
 		// --------------------------------------------
 		cleanup_comment_quotes();
@@ -550,7 +560,6 @@ function upgrade_b2evo_tables()
 		 * Then create a new extension block, and increase db version numbers
 		 * everywhere where needed in this file.
 		 */
-
 	}
 
 	// Update DB schema version to $new_db_version
