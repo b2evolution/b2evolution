@@ -78,7 +78,7 @@ class Plug
 			$this_dir = dir( $this->plugins_path );
 			while( $this_file = $this_dir->read())
 			{
-				if( preg_match( '/_.+\.'.$this->collection.'\.php/', $this_file ) && is_file( $this->plugins_path. '/'. $this_file ) )
+				if( preg_match( '/^_.+\.'.$this->collection.'\.php$/', $this_file ) && is_file( $this->plugins_path. '/'. $this_file ) )
 				{	// Valid plugin file name:
 					// echo 'Loading ', $this_file, '...<br />';
 					// Load the plugin:
