@@ -1,8 +1,9 @@
 <?php
 
-class FilemanUnitTestCase extends UnitTestCase
+class FilemanUnitTestCase extends EvoUnitTestCase
 {
 	var $tempFiles = array();
+
 
 	/**
 	 * Create a temp file in TMPDIR.

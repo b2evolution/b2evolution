@@ -12,7 +12,7 @@ require_once( dirname(__FILE__).'/config.simpletest.php' );
 /**
  * Our GroupTest
  */
-$test = new OurGroupTest( 'evo Tests Suite');
+$test = new EvoGroupTest( 'evo Tests Suite');
 
 $test->loadAllTests( dirname(__FILE__).'/blogs/' );
 

@@ -17,9 +17,11 @@ require_once( EVODIR.'/blogs/evocore/_file.funcs.php' );
 
 
 /**
- * Our GroupTest class.
+ * Evo GroupTest class.
+ *
+ * Provides methods for our group tests.
  */
-class OurGroupTest extends GroupTest
+class EvoGroupTest extends GroupTest
 {
 	/**
 	 * This method loads all of the *.test.php files it can find.

@@ -59,8 +59,17 @@ require_once( SIMPLETEST_DIR.'mock_objects.php');
 /**#@+
  * Load derived SimpleTest classes
  */
+require_once( dirname(__FILE__).'/classes/simpletest/EvoUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/FilemanUnitTestCase.class.php' );
-require_once( dirname(__FILE__).'/classes/simpletest/OurGroupTest.class.php' );
+require_once( dirname(__FILE__).'/classes/simpletest/EvoGroupTest.class.php' );
 /**#@-*/
+
+
+
+/**
+ * Create a DB Mockobject
+ */
+require_once( EVODIR.'/blogs/evocore/_db.class.php' );
+Mock::generate( 'DB' );
 
 ?>
