@@ -668,7 +668,7 @@ class Item extends DataObject
 													$use_popup = '#',
 													$hideifnone = '#', $mode = '', $blogurl='' )
 	{
-		global $b2commentsjavascript;
+		global $b2commentsjavascript, $BlogCache;
 
 		switch( $type )
 		{
@@ -697,6 +697,11 @@ class Item extends DataObject
 				break;
 
 			case 'trackbacks':
+				$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+				if( ! $current_Blog->get( 'allowtrackbacks' ) )
+				{	// Trackbacks not allowed on this blog:
+					return;
+				}
 				if( $hideifnone == '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
 				if( $zero == '#' ) $zero = T_('Trackback (0)');
@@ -705,6 +710,11 @@ class Item extends DataObject
 				break;
 
 			case 'pingbacks':
+				$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+				if( ! $current_Blog->get( 'allowpingbacks' ) )
+				{	// Pingbacks not allowed on this blog:
+					return;
+				}
 				if( $hideifnone == '#' ) $hideifnone = true;
 				if( $title == '#' ) $title = T_('Display pingbacks');
 				if( $zero == '#' ) $zero = T_('Pingback (0)');
