@@ -26,9 +26,6 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * PROGIDISTRI grants François PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -37,7 +34,6 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
@@ -52,12 +48,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 class Form
 {
 	var $output = true;
-
-	/**
-	 * CSS class of the form, used as default for {@link end_form()}
-	 * This is weird!!
-	 */
-	var $form_class = '';
 
 	/**
 	 * Number of fieldsets currently defined.
