@@ -36,7 +36,11 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 
 <h1><?php echo T_('Welcome to b2evolution') ?></h1>
 
-<p><?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.') ?></p>
+<p>
+	<?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.');
+	?>
+	( <a href="<?php echo $admin_url ?>b2options.php?tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
+</p>
 
 
 <h2><?php echo T_('Individual blogs on this system') ?>:</h2>
@@ -61,8 +65,10 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 		echo ')';
 		echo '</li>';
 	}
-	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	?>
 </ul>
+
 <?php
 // Select Blog #1:
 $blog = 1;
@@ -79,11 +85,11 @@ if( $Blog_all->get( 'stub' ) != '' )
 <p><?php echo T_('Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office.') ?></p>
 <h2><?php echo T_('More demos') ?>:</h2>
 <ul>
-  <li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
-  <li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
-  <li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
+	<li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
+	<li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
+	<li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
 </ul>
-<p><?php echo T_('Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)') ?></p>
+<p><?php echo T_('Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, remember these are just demos destined to inspire you for your own templates ;)') ?></p>
 
 <h2><?php echo T_('Administration') ?>:</h2>
 <ul>
