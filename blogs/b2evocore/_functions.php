@@ -914,14 +914,16 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 }
 
 
-/*
+/**
  * regenerate_url(-)
  *
  * Regenerate current URL from parameters
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
- * fplanque: created
+ * @param mixed string or array of params to ignore
+ * @param mixed string or array of params to set
+ * @param mixed string
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {

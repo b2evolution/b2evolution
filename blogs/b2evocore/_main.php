@@ -72,6 +72,8 @@ require_once( dirname(__FILE__).'/_vars.php' );                  // sets various
 require_once( dirname(__FILE__).'/_class_db.php' );
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
 
+require_once( dirname(__FILE__).'/_class_results.php' );
+
 
 /**
  * Interface to general settings

@@ -303,43 +303,75 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		echo '<br />'.T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
 	}
 	?></p>
-	<?php list_antiSpam() ?>
-	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-	{ ?>
-		<p class="center">
-			[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
-			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
-		</p>
-	<?php } ?>
-	<table class="grouped" cellspacing="0">
+
+	<?php
+	// Create result set:
+	$Results = new Results(	'SELECT aspm_ID, aspm_string, aspm_source
+														 FROM T_antispam
+														ORDER BY aspm_string ASC' );
+
+	// Set headers:
+	$Results->col_headers = array(
+															T_('Keyword'),
+															T_('Source')
+														);
+
+	// Set columns:
+  function antispam_source2( & $row )
+	{
+		global $aspm_sources;
+		$asp_source = $row['aspm_source'];
+		return T_($aspm_sources[$asp_source] );
+	}
+	$Results->cols = array(
+													'$aspm_string$',
+													'%antispam_source2($row)%'
+												);
+
+	// Check if we need to display nore:
+	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+	{	// User can edit, spamlist: add controls to output columns:
+
+		// Add this before results:
+	  ?>
+			<p class="center">
+				[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
+				[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+			</p>
 		<?php
-		$count = 0;
-    if( count($res_stats) ) foreach( $res_stats as $row_stats )
-		{  ?>
-		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
-			<td class="firstcol">
-				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-				{ ?>
-				<a href="b2antispam.php?action=remove&amp;hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
-				<?php }
-				antiSpam_domain( 40 );
-				?>
-			</td>
-			<td><?php antispam_source(); ?></td>
-			<td><?php
-					if( (antispam_source(false,true) == 'local')
-						&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
-					{
-					?>
-					[<a href="b2antispam.php?action=report&amp;keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>"><?php echo T_('Report') ?></a>]
-				<?php } ?>
-				[<a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Check hit-logs and comments for this keyword!') ?>"><?php echo T_('Re-check') ?></a>]
-			</td>
-		</tr>
-		<?php
-    $count++;
-    } // End stat loop ?>
-	</table>
+
+		// Add CHECK to 1st column:
+		$Results->cols[0] = '<a href="b2antispam.php?action=remove&amp;hit_ID=$aspm_ID$" title="'.
+												T_('Allow keyword back (Remove it from the blacklist)').
+												'"><img src="img/tick.gif" width="13" height="13" class="middle" alt="'.
+												T_('Allow Back').'" /></a> '.
+												$Results->cols[0];
+
+		// Add a column for actions:
+		$Results->col_headers[2] = T_('Actions');
+	  function antispam_actions( & $row )
+		{
+			$output = '';
+
+		 	if( $row['aspm_source'] == 'local' )
+			{
+				$output .= '[<a href="b2antispam.php?action=report&amp;keyword='.
+										urlencode( $row['aspm_string'] ).'" title="'.
+										T_('Report abuse to centralized ban blacklist!').'">'.
+										T_('Report').'</a>]';
+			}
+
+			return $output.'[<a href="b2antispam.php?action=ban&amp;keyword='.
+										urlencode( $row['aspm_string'] ).'" title="'.
+										T_('Check hit-logs and comments for this keyword!').'">'.
+										T_('Re-check').'</a>]';
+		}
+		$Results->cols[2] = '%antispam_actions($row)%';
+	}
+
+	// Display results:
+	$Results->display();
+	?>
 </div>
 <?php
 require( dirname(__FILE__).'/_footer.php' );

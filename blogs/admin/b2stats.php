@@ -17,18 +17,18 @@ $admin_tab = 'stats';
 $admin_pagetitle = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
-param( 'tab', 'string', 'summary' );
+param( 'tab', 'string', 'summary', true );
 
 require(dirname(__FILE__) . '/_menutop.php');
 ?>
-<a href="b2stats.php?show=<?php echo $tab ?>&amp;blog=0" class="<?php echo ( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php echo T_('None') ?></a>
+<a href="<?php echo regenerate_url( array('blog','page'), "blog=0" ) ?>" class="<?php echo ( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php echo T_('None') ?></a>
 <?php
 for( $curr_blog_ID=blog_list_start('stub');
 			$curr_blog_ID!=false;
 			 $curr_blog_ID=blog_list_next('stub') )
 	{
 		?>
-		<a href="b2stats.php?show=<?php echo $tab ?>&amp;blog=<?php echo $curr_blog_ID ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
+		<a href="<?php echo regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ) ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
 	<?php
 }
 require( dirname(__FILE__) . '/_menutop_end.php' );
@@ -45,12 +45,12 @@ switch( $action )
 		$current_User->check_perm( 'stats', 'edit', true );
 
 		param( 'hit_ID', 'integer', true );	// Required!
-		param( 'hit_type', 'string', true );	// Required!
+		param( 'new_hit_type', 'string', true );	// Required!
 		?>
 		<div class="panelinfo">
-			<p><?php printf( T_('Changing hit #%d type to: %s'), $hit_ID, $hit_type) ?></p>
+			<p><?php printf( T_('Changing hit #%d type to: %s'), $hit_ID, $new_hit_type) ?></p>
 			<?php
-			hit_change_type( $hit_ID, $hit_type );
+			hit_change_type( $hit_ID, $new_hit_type );
 			?>
 		</div>
 		<?php
@@ -362,36 +362,67 @@ switch( $tab )
 		?>
 	<h2><?php echo T_('Last referers') ?>:</h2>
 	<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
-	<?php refererList(40,'global',1,1,'no','',$blog);
-  if( count( $res_stats ) )
-  { ?>
-	<table class="grouped" cellspacing="0">
-		<?php
-		$count = 0;
-		foreach( $res_stats as $row_stats ) { ?>
-		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-			<td class="firstcol"><?php stats_time() ?></td>
-			<td>
-				<?php if( $current_User->check_perm( 'stats', 'edit' ) )
-					{ ?>
-					<a href="b2stats.php?action=delete&amp;hit_ID=<?php stats_hit_ID() ?>&amp;show=referers&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" title="<?php echo T_('Delete this hit!') ?>" /></a>
-				<a href="b2stats.php?action=changetype&amp;hit_type=search&amp;hit_ID=<?php stats_hit_ID() ?>&amp;show=referers&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Log as a search instead') ?>"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?>" title="<?php echo T_('Log as a search instead') ?>" /></a>
-				<?php } ?>
-				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a>
-			</td>
-			<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-			{ ?>
-			<td><a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
-			<?php } ?>
-			<td><?php stats_blog_name() ?></td>
-			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-		</tr>
-		<?php
-		$count++;
-		} // End stat loop ?>
-	</table>
-  <?php } ?>
+	<?php
+	// Create result set:
+	$Results = new Results(	"SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL,
+																	baseDomain, hit_blog_ID, visitURL
+														 FROM T_hitlog
+														WHERE hit_ignore = 'no' ".
+                            			(empty($blog) ? '' : "AND hit_blog_ID = $blog ").
+                           "ORDER BY visitID DESC" );
 
+  function stats_blog_name2( $blog_ID )
+  {
+		global $BlogCache;
+		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		echo format_to_output( $Blog->name );
+	}
+
+	$Results->col_headers[] = T_('Date Time');
+	$Results->cols[] = '%date_i18n( locale_datefmt().\' \'.locale_timefmt(), \'$visitTime$\' )%';
+	$Results->col_headers[] = T_('Referer');
+	if( $current_User->check_perm( 'stats', 'edit' ) )
+	{
+		$Results->cols[] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$visitID$\')%" title="'.
+												T_('Delete this hit!').
+												'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
+												/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
+												'" title="'.T_('Delete this hit!').'" /></a> '.
+
+												'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$visitID$\')%" title="'.
+												T_('Log as a search instead').
+												'"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="'.
+												/* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S').
+												'" title="'.T_('Log as a search instead').'" /></a> '.
+
+												'<a href="$referingURL$">$baseDomain$</a>';
+	}
+	else
+	{
+		$Results->cols[] = '<a href="$referingURL$">$baseDomain$</a>';
+	}
+
+	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+	{
+		$Results->col_headers[] = /* TRANS: Abbrev. for Spam */ T_('S');
+		$Results->cols[] = '<a href="b2antispam.php?action=ban&amp;keyword=%urlencode( \'$baseDomain$\' )%" title="'.
+												T_('Ban this domain!').'"><img src="img/noicon.gif" class="middle" alt="'.
+												/* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>';
+	}
+
+	if( empty($blog) )
+	{
+		$Results->col_headers[] = T_('Target Blog');
+	 	$Results->cols[] = '%stats_blog_name2( \'$hit_blog_ID$\' )%';
+	}
+
+	$Results->col_headers[] = T_('Requested URI');
+	$Results->cols[] = '<a href="$visitURL$">$visitURL$</a>';
+
+	// Display results:
+	$Results->display();
+
+	?>
 	<h3><?php echo T_('Top referers') ?>:</h3>
 	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true);
   if( count( $res_stats ) )
@@ -464,7 +495,7 @@ switch( $tab )
 		$chart [ 'legend_label' ] = array(// 'layout'  =>  "horizontal",
 		                                  // 'font'    =>  string,
                                       // 'bold'    =>  boolean,
-                                      'size'    =>  10,
+                                      'size'    =>  15,
                                       // 'color'   =>  string,
                                       // 'alpha'   =>  int
                                    );

@@ -99,63 +99,6 @@ function antispam_url( $url )
 }
 
 
-/*
- * list_antiSpam(-)
- *
- * Extract anti-spam
- */
-function list_antiSpam()
-{
-	global $DB, $res_stats;
-
-	$sql = "SELECT aspm_ID, aspm_string, aspm_source
-					FROM T_antispam
-					ORDER BY aspm_string ASC";
-	$res_stats = $DB->get_results( $sql, ARRAY_A );
-}
-
-/*
- * antiSpam_ID(-)
- */
-function antiSpam_ID()
-{
-	global $row_stats;
-	echo $row_stats['aspm_ID'];
-}
-
-/**
- * {@internal antiSpam_domain(-)}}
- *
- * @param mixed max length or false if we don't want to display
- */
-function antiSpam_domain( $dispmax = 80 )
-{
-	global $row_stats;
-	$domain = $row_stats['aspm_string'];
-	if( ! $dispmax )
-		return $domain;
-	elseif( strlen( $domain ) > $dispmax )
-		echo substr( $domain, 0, $dispmax ), '...';
-	else
-		echo $domain;
-}
-
-
-/*
- * antiSpam_domain(-)
- */
-function antispam_source( $disp = true, $raw = false )
-{
-	global $row_stats, $aspm_sources;
-	$asp_source = $row_stats['aspm_source'];
-	if( ! $raw )
-		$asp_source = T_(	$aspm_sources[$asp_source] );
-	if( $disp )
-		echo $asp_source;
-	else
-		return $asp_source;
-}
-
 
 // -------------------- XML-RPC callers ---------------------------
 
