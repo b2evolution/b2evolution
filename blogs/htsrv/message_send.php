@@ -31,6 +31,8 @@ if( !empty( $recipient_id ) )
 	$user = get_userdata( $recipient_id );
 	$user = new User($user);
 	$recipient_address = $user->get('preferedname') . ' <' . $user->email . '>';
+	// Change the locale so the email is in the recipients language
+	locale_temp_switch($user->locale);
 }
 elseif( !empty( $comment_id ) )
 { // Get the email address for the recipient if a commenter.
@@ -49,13 +51,13 @@ else
 if( !empty( $comment_id ) )
 {
 	$message .= "\n\n" . T_('Message sent from your comment:') . "\n";
-	$message .= $Blog->get('url') . '&p=' . $post_id . '&c=1&tb=1&pb=1#' . $comment_id;
+	$message .= url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1#'.$comment_id, '&' );
 
 }
-elseif(!empty($post_id))
+elseif( !empty( $post_id ) )
 {
 	$message .= "\n\n" . T_('Message sent from your post:') . "\n";
-	$message .= $Blog->get('url') . '&p=' . $post_id . '&c=1&tb=1&pb=1';
+	$message .= url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1', '&' );
 }
 
 // Message footer
@@ -65,7 +67,13 @@ $message .= $Blog->get('url') . "\n";
 
 
 // Send mail
-mail($recipient_address , $subject , $message , "From: $sender_name <$sender_address>\r\n");
+send_mail( $recipient_address , $subject, $message , "$sender_name <$sender_address>");
+
+if( isset($user) )
+{
+	// restor the locale to the readers language
+	locale_restore_previous();
+}
 
 // Header redirection
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
