@@ -12,10 +12,10 @@
 	 * @package evoskins
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
-	
+
 	if( ! isset( $Calendar ) )
 	{
-	 	$Calendar = & new Calendar( $blog, (empty($Calendar) ? $m : $Calendar), $show_statuses, $timestamp_min, $timestamp_max );
+		$Calendar = & new Calendar( $blog, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
 	}
 
 	# You can customize the following as you wish.
@@ -32,14 +32,14 @@
 
 	// $Calendar->set( 'rowstart', '<tr class="bCalendarRow">' . "\n" );
 	// $Calendar->set( 'rowend', "</tr>\n"  );
-	
-	// $Calendar->set( 'headerdisplay', 1 );	// set this to 0 if you don't want to display "Mon Tue Wed..." 
+
+	// $Calendar->set( 'headerdisplay', 1 );	// set this to 0 if you don't want to display "Mon Tue Wed..."
 	// $Calendar->set( 'headercellstart', '<th class="bCalendarHeaderCell" abbr="[abbr]">' );	// please leave $abbr there !
 	// $Calendar->set( 'headercellend', "</th>\n" );
-	
+
 	// $Calendar->set( 'cellstart', '<td class="bCalendarCell">' );
 	// $Calendar->set( 'cellend', "</td>\n" );
-	
+
 	// $Calendar->set( 'emptycellstart', '<td class="bCalendarEmptyCell">' );
 	// $Calendar->set( 'emptycellend', "</td>\n" );
 	// $Calendar->set( 'emptycellcontent', '&nbsp;' );
@@ -51,7 +51,7 @@
 
 	// $Calendar->set( 'browseyears', 1 );  // uncomment to allow browsing years in the calendar's caption (month must be displayed)
 	// $Calendar->set( 'linktomontharchive', 0 );  // uncomment to display month not as link to archive of month
-	
+
 	// -- Display number of posts with days/months ---
 	// - set to '' (empty) to disable
 	// - %d gets replaced with the number of posts on that day/month
@@ -62,8 +62,8 @@
 	// $Calendar->set( 'postcount_year_atitle', T_('%d posts');  // in archive links title tag
 
 
-	
+
 	// DISPLAY NOW!
 	$Calendar->display( );
-	
+
 ?>
