@@ -223,14 +223,13 @@ function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 {
 	global $blog, $id, $b2commentspopupfile, $b2commentsjavascript;
 	echo '<a href="';
-	if ($b2commentsjavascript)
+	if($b2commentsjavascript)
 	{
 		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;c=1';
 		echo '" onclick="b2open(this.href); return false"';
 	} 
 	else 
-	{
-		// if comments_popup_script() is not in the template, display simple comment link
+	{	// if comments_popup_script() is not in the template, display simple comment link
 		comments_link();
 		echo '"';
 	}

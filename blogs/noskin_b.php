@@ -70,6 +70,7 @@
 <link rel="alternate" type="text/xml" title="RSS" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url', 'raw'); ?>" />
 <link href="skins/fplanque2002/blog.css" rel="stylesheet" type="text/css" />
+<?php comments_popup_script() // Included javascript to open pop up windows ?>
  <!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="skins/fplanque2002/basic.css" type="text/css" />
 <link rel="stylesheet" href="skins/fplanque2002/fpnav.css" type="text/css" />
@@ -161,6 +162,15 @@ the_date( '', '<h2>', '</h2>' );
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
 		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
 		</div>
+		<div class="bSmallPrint">
+			popups:
+			<?php comments_popup_link() ?> 
+			-
+			<?php trackback_popup_link() ?> 
+			-
+			<?php pingback_popup_link() ?>
+		</div>
+		
 		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
 		$disp_comments = 1;					// Display the comments if requested
 		$disp_comment_form = 1;			// Display the comments form if comments requested

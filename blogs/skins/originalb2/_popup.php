@@ -17,7 +17,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $blogname ?> - feedback on '<?php the_title() ?>'</title>
+	<title><?php echo $blogname ?> - feedback on '<?php the_title( '', '', false, 'htmlhead' ) ?>'</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<style type="text/css" media="screen">
 		@import url( 'layout2b.css' );
@@ -29,13 +29,13 @@
 <div id="contentcomments">
 
 <?php
-		// this includes the feedback and a form to add a new comment depending on request
-		$disp_comments = 1;					// Display the comments if requested
-		$disp_comment_form = 1;			// Display the comments form if comments requested
-		$disp_trackbacks = 1;				// Display the trackbacks if requested
-		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( dirname(__FILE__)."/_feedback.php");
+	// this includes the feedback and a form to add a new comment depending on request
+	$disp_comments = 1;					// Display the comments if requested
+	$disp_comment_form = 1;			// Display the comments form if comments requested
+	$disp_trackbacks = 1;				// Display the trackbacks if requested
+	$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
+	$disp_pingbacks = 1;				// Display the pingbacks if requested
+	require( dirname(__FILE__)."/_feedback.php");
 ?>
 </div>
 

@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.5.1
+ * Version of this file: 0.8.5.7
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -250,6 +250,7 @@ $xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;	// You should not need to change this
 # Location of the skins folder:
 $skins_subdir = 'skins'; 										// Subdirectory relative to base
 $skins_dirout = '..';												// Relative path to go back to base
+$skins_url = $baseurl.'/'.$skins_subdir;		// You should not need to change this
 # Location of the core (the "includes") files:
 $core_subdir = 'b2evocore'; 								// Subdirectory relative to base
 $core_dirout = '..';												// Relative path to go back to base

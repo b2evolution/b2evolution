@@ -141,7 +141,7 @@ param( $cookie_state, 'string', $default_skin );
 // Get skin by params or default to cookie or default
 param( 'skin', 'string', $$cookie_state );
 // check to see if we want to display the popup or the main template
-param( 'template', 'string', 'main' );
+param( 'template', 'string', 'main', true );
 if( $skin != '' )
 {	// We want to display now:
 	$skin_folder = get_path( 'skins' );
@@ -187,7 +187,7 @@ else
 {	// no skin specified !
 	if( $template == 'popup' )
 	{	// Do the popup display
-		require dirname(__FILE__).'/'.$core_dirout.'/_popup.php';
+		require get_path( 'skins' ).'/_popup.php';
 		exit();
 	}
 }

@@ -19,7 +19,7 @@
 	<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url'); ?>" />
 	<link rel="alternate" type="text/xml" title="RSS" href="<?php bloginfo('rss2_url'); ?>" />
 	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-	<?php comments_popup_script() ?>
+	<?php comments_popup_script() // Included javascript to open pop up windows ?>
 </head>
 <body>
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
@@ -49,9 +49,9 @@ Categories: <?php the_categories() ?>
 
 <div class="rightFlush">
 <?php link_pages("<br />Pages: ","<br />","number") ?> 
-<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> 
-<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> 
-<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?>
+<?php comments_popup_link() ?> 
+<?php trackback_popup_link() ?> 
+<?php pingback_popup_link() ?>
 
 <?php trackback_rdf() ?>
 
