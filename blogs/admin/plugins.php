@@ -45,6 +45,19 @@ param( 'action', 'string' );
 require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
+
+// Check permission to display:
+$current_User->check_perm( 'options', 'view', true );
+
+// Display submenu:
+require dirname(__FILE__).'/_submenu.inc.php';
+
+
+// Discover additional plugins:
+$AvailablePlugins = & new Plugins();
+$AvailablePlugins->discover();
+
+
 switch( $action )
 {
 	case 'install':
@@ -64,16 +77,25 @@ switch( $action )
 		$Messages->add( T_('Uninstalling plugin #').$plugin_ID, 'note' );
 		$Plugins->uninstall( $plugin_ID );
 		break;
+
+	case 'info':
+		// Display plugin info:
+		param( 'plugin', 'string', true );
+		$Plugin = $AvailablePlugins->get_by_name( $plugin );
+		?>
+		<fieldset class="fform">
+			<legend><?php echo T_('Plugin info') ?></legend>
+			<?php form_info( T_('Name'), $Plugin->name( 'htmlbody', false ) ); ?>
+			<?php form_info( T_('Code'), $Plugin->code, T_('This 8 character code uniquely identifies the functionality of this plugin.') ); ?>
+			<?php form_info( T_('Short desc'), $Plugin->short_desc( 'htmlbody', false ) ); ?>
+			<?php form_info( T_('Long desc'), $Plugin->long_desc( 'htmlbody', false ) ); ?>
+		</fieldset>
+		<?php
+		break;
 }
 
 if( $msg = $Messages->display( '', '', true, 'note', 'panelinfo', '<p>' ) );
 
-
-// Check permission to display:
-$current_User->check_perm( 'options', 'view', true );
-
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
 
 require dirname(__FILE__).'/_set_plugins.form.php';
 

@@ -227,15 +227,20 @@ class Plugin
 
 
 	/**
-	 * Template function: display plugin name
+	 * Template function: Get displayable plugin name.
 	 *
 	 * {@internal Plugin::name(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean shall we display?
+	 * @return displayable plugin name.
 	 */
-	function name( $format = 'htmlbody' )
+	function name( $format = 'htmlbody', $disp = true )
 	{
-		echo format_to_output( $this->name, $format );
+		if( $disp )
+			echo format_to_output( $this->name, $format );
+		else
+			return format_to_output( $this->name, $format );
 	}
 
 
@@ -245,10 +250,15 @@ class Plugin
 	 * {@internal Plugin::short_desc(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean shall we display?
+	 * @return displayable short desc
 	 */
-	function short_desc( $format = 'htmlbody' )
+	function short_desc( $format = 'htmlbody', $disp = true )
 	{
-		echo format_to_output( $this->short_desc, $format );
+		if( $disp )
+			echo format_to_output( $this->short_desc, $format );
+		else
+			return format_to_output( $this->short_desc, $format );
 	}
 
 
@@ -258,10 +268,15 @@ class Plugin
 	 * {@internal Plugin::long_desc(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean shall we display?
+	 * @return displayable long desc
 	 */
-	function long_desc( $format = 'htmlbody' )
+	function long_desc( $format = 'htmlbody', $disp = true )
 	{
-		echo format_to_output( $this->long_desc, $format );
+		if( $disp )
+			echo format_to_output( $this->long_desc, $format );
+		else
+			return format_to_output( $this->long_desc, $format );
 	}
 
 

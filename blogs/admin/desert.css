@@ -326,6 +326,10 @@ div.panelinfo {
 	padding: 0 1ex;
 	margin: 1ex 1em;
 }
+div.tabbedpanelblock div.panelinfo {
+	/* when embeded, no margin: */
+	margin: 1ex 0;
+}
 div.panelinfo p {
 	margin: 1ex 0;
 	padding: 0;
@@ -429,7 +433,12 @@ div.tabbedpanelblock {
 	padding: 1ex 1em 1ex 1em;
 	margin: 0 1em 2ex 1em;
 }
-
+div.tabbedpanelblock fieldset {
+	border: 1px solid #ddd;
+	margin: 0 0 1ex 0;
+	background-color: #fff;
+	padding: .5ex 1ex;
+}
 
 /* Login screen: */
 div.loginblock {

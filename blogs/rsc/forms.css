@@ -43,19 +43,19 @@ label.radiooption {
 }
 
 /* 24/75% forms - Fast Forms */
-form.fform fieldset {
+.fform fieldset {
 	border: 1px solid #ddd;
-	margin-bottom: 1ex;
+	margin-bottom: 0 0 1ex 0;
 	background-color: #fff;
 	padding: .5ex 1ex;
 }
-form.fform fieldset fieldset {
+.fform fieldset fieldset {
 	border: none;
 	margin: 1ex;
 	padding: 0;
 	/* border: 1px solid #00f; */
 }
-form.fform div.label {
+.fform div.label {
 	float: left;
 	width: 24%;
 	text-align: right;
@@ -64,11 +64,11 @@ form.fform div.label {
 	padding-top: .5ex;
 	/* border: 1px solid #f00; */
 }
-form.fform div.input {
+.fform div.input {
 	margin: 0 0 0 25%;
 	/* border: 1px solid #f00; */
 }
-form.fform fieldset.input{
+.fform fieldset.input{
 	margin: 0;
 	/* border: 1px solid #0f0; */
 }
@@ -80,7 +80,7 @@ form.fform fieldset fieldset fieldset div.label {
 form.fform fieldset fieldset fieldset div.input {
 	width:79%;
 } */
-form.fform div.info {
+.fform div.info {
 	margin: 0 0 0 25%;
 	padding-top: .5ex;
 	/* border: 1px solid #f00; */
@@ -121,4 +121,3 @@ form.bComment fieldset div.info
 	padding-top: .5ex;
 	/* border: 1px solid #f00;*/
 }
-

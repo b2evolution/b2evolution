@@ -56,7 +56,13 @@ class Plugins
 	 * Array of loaded plug-ins:
 	 */
 	var $Plugins = array();
+
+	/**
+	 * Indexes:
+	 * @todo: updates
+	 */
 	var $index_Plugins = array();
+	var $index_name_Plugins = array();
 
 	/**
 	 * Path to plug-ins:
@@ -233,6 +239,7 @@ class Plugins
 			if( $Plugin->ID == $plugin_ID )
 			{	// This one must be unregistered...
 				unset( $this->index_Plugins[ $Plugin->code ] );
+				unset( $this->index_name_Plugins[ $Plugin->$classname ] );
 				$move_by--;
 			}
 			elseif($move_by)
@@ -285,6 +292,7 @@ class Plugins
 	 	$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
 		$this->index_Plugins[ $Plugin->code ] = & $Plugin;
+		$this->index_name_Plugins[ $Plugin->classname ] = & $Plugin;
 
 		// Request event callback registrations:
 		// events = $Plugin->RegisterEvents();
@@ -523,6 +531,7 @@ class Plugins
 	 	global $Debuglog;
 
 		$this->init();
+
 		if( ! isset($this->index_Plugins[ $code ]) )
 		{	// Plugins is not registered
 			$Debuglog->add( 'Requested plugin ['.$code.'] is not registered!' );
@@ -532,6 +541,28 @@ class Plugins
 		$this->index_Plugins[ $code ]->SkinTag( $params );
 
 		return true;
+	}
+
+	/**
+	 * Get a specific plugin by its name.
+	 *
+	 * {@internal Plugins::get_by_name(-)}}
+	 *
+	 * @param string plugin name
+	 * @param Plugin or false
+	 */
+	function & get_by_name( $plugin_name )
+	{
+	 	global $Debuglog;
+
+		$this->init();
+		if( ! isset($this->index_name_Plugins[ $plugin_name ]) )
+		{	// Plugins is not registered
+			$Debuglog->add( 'Requested plugin ['.$plugin_name.'] not found!' );
+			return false;
+		}
+
+		return $this->index_name_Plugins[ $plugin_name ];
 	}
 
 }
