@@ -114,9 +114,9 @@ else
 	<?php
 }
 
-$Debuglog->add( 'vars: HTTP Host: '.$_SERVER['HTTP_HOST'], 'hit' );
-$Debuglog->add( 'vars: Request URI: '.$ReqURI, 'hit' );
-$Debuglog->add( 'vars: Request Path: '.$ReqPath, 'hit' );
+$Debuglog->add( 'HTTP_HOST: '.$_SERVER['HTTP_HOST'], 'vars' );
+$Debuglog->add( '$ReqURI: '.$ReqURI, 'vars' );
+$Debuglog->add( '$ReqPath: '.$ReqPath, 'vars' );
 
 
 // on which page are we ?
@@ -274,6 +274,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/21 23:59:11  blueyed
+ * forgotten..
+ *
  * Revision 1.9  2005/01/21 23:49:32  blueyed
  * created debuglog group 'vars'
  *
