@@ -39,17 +39,12 @@ class BlogStats{
 		$cat = '',							// Category(s): 1,2,3
 		$catsel = array(),					// Same as above except array
 		$author = '',						// List of authors to restrict to
-//		$order = '',						// ASC or DESC
-//		$orderby = '',						// list of fields to order by
 		$posts = '', 						// # of posts to display on the page
-//		$paged = '',						// List page number in paged display
 		$poststart = '',					// Start results at this position
 		$postend = '',						// End results at this position
 		$s = '',							// Search string
 		$sentence = '',						// Search for sentence or for words
 		$exact = '',						// Require exact match of title or contents
-//		$preview = '',						// Is this preview
-//		$default_posts_per_page = '', 		// # of Posts to show
 		$init_what_to_show = '',			// Type of display (example: "posts")
 		$timestamp_min = '',				// Do not show posts before this timestamp
 		$timestamp_max = 'now'  )			// Do not show posts after this timestamp
@@ -65,20 +60,6 @@ class BlogStats{
 	//	Which blog is used?
 		$this->blog = $blog;
 
-	/*
-		if( !empty($posts) )
-			$posts_per_page = $posts;
-		elseif( !empty($default_posts_per_page) )
-			$posts_per_page = $default_posts_per_page;
-		else
-			$posts_per_page = get_settings('posts_per_page');
-		$this->posts_per_page = $posts_per_page; */
-/*
-	//////
-	//	Determine what to show
-		$what_to_show = (empty($init_what_to_show)) ? get_settings('what_to_show') : $init_what_to_show;
-		$this->what_to_show = $what_to_show;
-*/
 	////////
 	// First let's clear some variables
 		$whichcat = '';
@@ -114,13 +95,6 @@ class BlogStats{
 			$w = ''.intval($w);
 			$where .= ' AND WEEK(post_date,1)='.$w;
 		}
-/*	
-		// if a post number is specified, load that post
-		if (($p != '') && ($p != 'all')) 
-		{
-			$p = intval($p);
-			$where .= ' AND ID = '.$p;
-		}*/
 	
 		/*
 		 * ----------------------------------------------------
@@ -264,35 +238,6 @@ class BlogStats{
 	
 		/*
 		 * ----------------------------------------------------
-		 * order by stuff
-		 * ----------------------------------------------------
-		 */
-/*
-		if( (!empty($order)) && ((strtoupper($order) != 'ASC') && (strtoupper($order) != 'DESC'))) 
-		{
-			$order='DESC';
-		}
-	
-		if(empty($orderby))
-		{
-			$orderby='date '.$order;
-		}
-		else
-		{
-			$orderby_array = explode(' ',$orderby);
-			$orderby = $orderby_array[0].' '.$order;
-			if (count($orderby_array)>1) 
-			{
-				for($i = 1; $i < (count($orderby_array)); $i++) 
-				{
-					$orderby .= ', post_'.$orderby_array[$i].' '.$order;
-				}
-			}
-		}
-*/
-
-		/*
-		 * ----------------------------------------------------
 		 * Limits:
 		 * ----------------------------------------------------
 		 */
@@ -350,10 +295,6 @@ class BlogStats{
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
 			$where .= ' AND post_date > \''.$otherdate.'\'';
 		}
-		/* else
-		{
-			echo 'DEFAULT - NO LIMIT';
-		}*/
 	
 
 		/*
