@@ -161,6 +161,47 @@ class http {
 	return $ret;
 
   }
+
+
+
+    function curl_get($server, $port, $url, $vars) {
+  /*
+   *   $server = "www.wheely-bin.co.uk"
+   *   $port   = 80
+   *   $url    = "/facecake.php"
+   *   $vars   = array("who" => "am three", "face" => cake")
+   */
+
+        // lets make our ua something unique to b2evo ...
+	$user_agent = "b2evolution";
+
+        //lets set the port to 80 is its not already set
+        if (is_null($port)){
+           $port = 80;
+        };
+
+        //lets make the url
+        $url = "http://" . $server . ":" . $port . $url
+        // lets start the hair curling
+        $ch = curl_init($url);
+        // lets set our ua to $user_agent
+        curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
+        // lets be verbose for now
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        // lets have the headers
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        // lets follow any redirects
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        // perform get
+        $ret=curl_exec($ch);
+        //everythings been "get"'ed 
+        curl_close($ch);
+        // return the output
+	return $ret;
+
+  }
 };
 
 
