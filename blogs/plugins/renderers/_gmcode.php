@@ -41,7 +41,7 @@ class gmcode_Rendererplugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal GMcode::render(-)}} 
+	 * {@internal gmcode_Rendererplugin::render(-)}} 
 	 */
 	function render( & $content )
 	{

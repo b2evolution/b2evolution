@@ -3,6 +3,8 @@
  * This file implements the Quicktahs Toolbar plugin for b2evolution
  *
  * This is Ron's remix!
+ * Includes code from the WordPress team -
+ *  http://sourceforge.net/project/memberlist.php?group_id=51422
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

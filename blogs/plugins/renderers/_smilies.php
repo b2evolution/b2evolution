@@ -10,6 +10,8 @@
  */
 $plugin_code = 'b2evSmil';
 
+			
+
 class smilies_Rendererplugin
 {
 	/**
@@ -17,14 +19,14 @@ class smilies_Rendererplugin
 	 *
 	 * @access private
 	 */
-	var $search = array();
+	var $search;
 	
 	/**
 	 * IMG replace array
 	 *
 	 * @access private
 	 */
-	var $replace = array();
+	var $replace;
 
 	/**
 	 * Smiley definitions
@@ -62,6 +64,22 @@ class smilies_Rendererplugin
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
+
+
+			/**
+			 * sorts the smilies' array by length
+			 * this is important if you want :)) to superseede :) for example
+			 */
+			function smiliescmp($a, $b)
+			{
+				if(($diff = strlen($b) - strlen($a)) == 0)
+				{
+					return strcmp($a, $b);
+				}
+				return $diff;
+			}
+
+
 			$tmpsmilies = $this->smilies;
 			uksort($tmpsmilies, 'smiliescmp');
 	
@@ -77,7 +95,7 @@ class smilies_Rendererplugin
 				$this->replace[] = "<img src='$this->smilies_path/$img' border='0' alt='$smiley_masked' class='middle' />";
 			}
 		}
-	
+
 		// REPLACE:
 		$content = str_replace( $this->search, $this->replace, $content );
 	}

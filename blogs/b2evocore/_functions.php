@@ -331,24 +331,6 @@ function convert_chars( $content, $flag='html' )
 }
 
 
-
-
-
-
-/* sorts the smilies' array by length
-  this is important if you want :)) to superseede :) for example
-*/
-function smiliescmp($a, $b)
-{
-	if(($diff = strlen($b) - strlen($a)) == 0)
-	{
-		return strcmp($a, $b);
-	}
-	return $diff;
-}
-
-
-
 /*
  * make_clickable(-)
  *
@@ -372,34 +354,6 @@ function make_clickable($text)
 	$ret = substr($ret, 1);
 	return($ret);
 }
-
-
-/*
- * phpcurlme(-)
- *
- * by Matt - http://www.photomatt.net/scripts/phpcurlme
- */
-function phpcurlme( & $string, $language = 'en')
-{
-	global $use_smartquotes;
-	if( $use_smartquotes )
-	{
-		// This should take care of the single quotes
-		$string = preg_replace("/'([dmst])([ .,?!\)\/<])/i", "&#8217;$1$2", $string);
-		$string = preg_replace("/'([lrv])([el])([ .,?!\)\/<])/i", "&#8217;$1$2$3", $string);
-		$string = preg_replace("/([^=])(\s+)'([^ >])?(.*?)([^=])'(\s*)([^>&])/S", "$1$2&#8216;$3$4$5&#8217;$6$7", $string);
-
-		// time for the doubles
-		$string = preg_replace('/([^=])(\s+)"([^ >])?(.*?)([^=])"(\s*)([^>&])/S', "$1$2&#8220;$3$4$5&#8221;$6$7", $string);
-		// multi-paragraph
-		$string = preg_replace('/<p>"(.*)<\/p>/U', "<p>&#8220;$1</p>", $string);
-
-		// not a quote, but whatever
-		$string = str_replace('---', '&#8212;', $string);
-		$string = str_replace('--', '&#8211;', $string);
-	}
-}
-
 
 
 /***** // Formatting functions *****/

@@ -28,10 +28,12 @@ class Renderer
 		$plugins_path = dirname(__FILE__).'/'.$core_dirout.'/'.$plugins_subdir.'/renderers';
 		 
 		if( $use_textile ) require_once( dirname(__FILE__). '/_functions_textile.php' );
+		require_once $plugins_path.'/_auto_p.php';
 		require_once $plugins_path.'/_gmcode.php';
 		require_once $plugins_path.'/_bbcode.php';
 		require_once $plugins_path.'/_autolinks.php';
 		require_once $plugins_path.'/_smilies.php';
+		require_once $plugins_path.'/_texturize.php';
 	}	
 	
 	/* 
@@ -51,19 +53,19 @@ class Renderer
 		{
 			case 'content':
 				//if( $use_textile ) $comment = textile( $comment );
+				$this->Plugins['b2WPAutP']->render( $content );
 				$this->Plugins['b2evGMco']->render( $content );
 				$this->Plugins['b2evBBco']->render( $content );
 				$this->Plugins['b2evALnk']->render( $content );
 				$this->Plugins['b2evSmil']->render( $content );
-				/* autolinks($content);
-				phpcurlme( $content ); */
+				$this->Plugins['b2WPTxrz']->render( $content );
 				break;
 				
 			case 'other':
 				// if( $use_textile ) $comment = textile( $comment );
 				$this->Plugins['b2evGMco']->render( $content );
 				$this->Plugins['b2evSmil']->render( $content );
-				// phpcurlme( $content );
+				$this->Plugins['b2WPTxrz']->render( $content );
 				break;
 
 			default:

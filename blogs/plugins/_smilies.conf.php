@@ -70,5 +70,6 @@ $this->smilies = array(
 								//	'>:XX'			=> 'icon_censored.gif',
 									);
 
+// echo 'Smilies: ', count( $this->smilies );
 
 ?>
