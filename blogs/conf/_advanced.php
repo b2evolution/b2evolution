@@ -67,6 +67,7 @@ if( !isset($default_to_blog) )
  *
  * @global int $online_session_timeout
  * @todo move to $Settings
+ * @todo Rename to "Who's online timeout"
  */
 $online_session_timeout = 300;
 
