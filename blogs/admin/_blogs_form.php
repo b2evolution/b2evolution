@@ -60,9 +60,9 @@
 	</fieldset>
 	
 	<fieldset>
-		<div class="label"><label for="blog_siteurl"><?php echo T_('Site URL') ?>: </label></div> 
-		<div class="input"><input type="text" name="blog_siteurl" id="blog_siteurl" size="60" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>" class="large" />
-		<span class="notes"><?php echo T_('This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live.') ?></span></div>
+		<div class="label"><label for="blog_siteurl"><?php echo T_('Blog Folder URL') ?>: </label></div> 
+		<div class="input"><code><?php echo $baseurl ?></code><input type="text" name="blog_siteurl" id="blog_siteurl" size="40" maxlength="120" value="<?php echo format_to_output($blog_siteurl, 'formvalue') ?>"/>
+		<span class="notes"><?php echo T_('This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live. No trailing slash. (If you don\'t know, leave this field empty.)') ?></span></div>
 	</fieldset>
 	
 	<fieldset>
@@ -78,7 +78,7 @@
 	</fieldset>
 
 	<fieldset>
-		<div class="label"><label for="blog_staticfilename">Static Filename:</label></div> 
+		<div class="label"><label for="blog_staticfilename"><?php echo T_('Static Filename') ?>:</label></div> 
 		<div class="input"><input type="text" name="blog_staticfilename" id="blog_staticfilename" size="30" maxlength="30" value="<?php echo format_to_output($blog_staticfilename, 'formvalue'); ?>" />
 		<span class="notes"><?php echo T_('This is the filename that will be used when you generate a static (.html) version of the blog homepage.') ?></span></div>
 	</fieldset>

@@ -43,7 +43,7 @@ require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions.php" )
 require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_cats.php" );
 require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts.php" );
 
-$new_db_version = 8021;				// next time: 8030
+$new_db_version = 8030;				// next time: 8030
 
 function create_b2evo_tables()
 {
@@ -304,13 +304,13 @@ switch( $action )
 
 		echo "<p>Creating sample contents...</p>\n";
 		
-		blog_create( 'All Blogs', 'All', $baseurl, $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the \'all blogs\' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
+		blog_create( 'All Blogs', 'All', '', $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the \'all blogs\' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
 
-		blog_create( 'Demo Blog A', 'Blog A', $baseurl, $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'This is demo blog A', 'This is description for demo blog A. It has index #2 in the database.', $default_language, 'This is the blogroll for Blog A...', 'blog A keywords', '' ) or mysql_oops( $query );
+		blog_create( 'Demo Blog A', 'Blog A', '', $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'This is demo blog A', 'This is description for demo blog A. It has index #2 in the database.', $default_language, 'This is the blogroll for Blog A...', 'blog A keywords', '' ) or mysql_oops( $query );
 		
-		blog_create( 'Demo Blog B', 'Blog B', $baseurl, $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
+		blog_create( 'Demo Blog B', 'Blog B', '', $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
 
-		blog_create( 'Demo Blogroll', 'Blogroll', $baseurl, $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
+		blog_create( 'Demo Blogroll', 'Blogroll', '', $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
 
 		echo "<p>blogs: OK<br />\n";
 		
@@ -510,12 +510,42 @@ switch( $action )
 								WHERE hit_ignore IN ('badchar', 'blacklist')";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
+
+			echo "<p>Updating blog urls... ";
+			$query = "SELECT blog_ID, blog_siteurl FROM $tableblogs";
+			$q = mysql_query($query) or mysql_oops( $query );
+			$rows_updated = 0;
+			while($row = mysql_fetch_assoc($q)) 
+			{
+				$blog_ID = $row['blog_ID'];
+				$blog_siteurl = $row['blog_siteurl'];
+				// echo $blog_siteurl;
+				if( strpos( $blog_siteurl, $baseurl ) !== 0 )
+				{	// If not found at position 0
+					echo ' <strong>WARNING: please check blog #', $blog_ID, ' manually.</strong> ';
+					continue;
+				}
+				// crop off the baseurl:
+				$blog_siteurl = substr( $blog_siteurl, strlen( $baseurl) );
+				// echo ' -> ', $blog_siteurl,'<br />';
+
+				$query_update_blog = "UPDATE $tableblogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
+				// echo $query_update_blog, '<br>';
+				mysql_query($query_update_blog) or mysql_oops( $query_update_wordcount );
+				$rows_updated++; 
+			}
+			echo "OK. ($rows_updated rows updated)</p>\n";
+
+		}
+	
+		if( $old_db_version < 8040 )
+		{
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
 			 */
 			// post_title VARCHAR(250)
 		}
-			
+		
 		// $new_db_version = 8001; // FOR TESTING
 		echo "<p>Update DB schema version to $new_db_version... ";
 		$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
@@ -552,13 +582,13 @@ switch( $action )
 
 		echo "<p>Creating default blogs...</p>\n";
 		
-		blog_create( 'All Blogs', 'All', $baseurl, $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the \'all blogs\' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
+		blog_create( 'All Blogs', 'All', '', $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the \'all blogs\' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
 
-		blog_create( 'My Upgraded Blog', 'Upgraded', $baseurl, $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'Upgraded blog - no description yet', 'This is description for your upgraded blog. It has index #2 in the database.', $default_language, 'This is the blogroll for Upgraded Blog...', '', '' ) or mysql_oops( $query );
+		blog_create( 'My Upgraded Blog', 'Upgraded', '', $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'Upgraded blog - no description yet', 'This is description for your upgraded blog. It has index #2 in the database.', $default_language, 'This is the blogroll for Upgraded Blog...', '', '' ) or mysql_oops( $query );
 		
-		blog_create( 'Demo Blog B', 'Blog B', $baseurl, $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
+		blog_create( 'Demo Blog B', 'Blog B', '', $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
 
-		blog_create( 'Demo Blogroll', 'Blogroll', $baseurl, $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
+		blog_create( 'Demo Blogroll', 'Blogroll', '', $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
 
 		echo "<p>blogs: OK<br />\n";
 		

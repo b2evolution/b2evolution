@@ -98,7 +98,7 @@ function generic_ctp_number($post_id, $mode = 'comments')
  */
 function get_commentdata($comment_ID,$no_cache=0) 
 { // less flexible, but saves mysql queries
-	global $rowc,$id,$commentdata,$tablecomments,$querycount;
+	global $rowc,$id,$commentdata,$tablecomments,$querycount, $baseurl;
 	if ($no_cache) 
 	{
 		$query="SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
@@ -122,7 +122,7 @@ function get_commentdata($comment_ID,$no_cache=0)
 		if( isset($rowc->ID) ) $myrow['post_ID']=$rowc->ID;	
 		if( isset($rowc->post_title) ) $myrow['post_title']=$rowc->post_title;
 		if( isset($rowc->blog_name) ) $myrow['blog_name']=$rowc->blog_name;
-		if( isset($rowc->blog_siteurl) ) $myrow['blog_siteurl']=$rowc->blog_siteurl;
+		if( isset($rowc->blog_siteurl) ) $myrow['blog_siteurl']=$baseurl.$rowc->blog_siteurl;
 		if( isset($rowc->blog_stub) ) $myrow['blog_stub']=$rowc->blog_stub;
 	}
 	return($myrow);

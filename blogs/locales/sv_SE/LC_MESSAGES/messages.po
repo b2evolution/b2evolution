@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-08 01:04+0200\n"
+"POT-Creation-Date: 2003-09-08 19:13+0200\n"
 "PO-Revision-Date: 2003-08-10 02:45+0100\n"
 "Last-Translator: Per Åkerman <perakerman@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -337,208 +337,6 @@ msgstr "Totalt: %d poster - %d förfrågningar - %0.3f sekunder"
 msgid "Archives"
 msgstr "Arkiv"
 
-#: ..\..\..\_blogroll.php:59
-msgid "more"
-msgstr "mer"
-
-#: ..\..\..\_feedback.php:43 ..\..\..\admin\_edit_showposts.php:167
-msgid "Comments"
-msgstr "Kommentarer"
-
-#: ..\..\..\_feedback.php:48
-#, fuzzy
-msgid "Trackbacks"
-msgstr "% TrackBacks"
-
-#: ..\..\..\_feedback.php:53
-#, fuzzy
-msgid "Pingbacks"
-msgstr "1 PingBack"
-
-#: ..\..\..\_feedback.php:104
-#, fuzzy
-msgid "Trackback from:"
-msgstr "TrackBacks (%)"
-
-#: ..\..\..\_feedback.php:119
-#, fuzzy
-msgid "Pingback from:"
-msgstr "% PingBacks"
-
-#. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
-#: ..\..\..\_feedback.php:134
-#, php-format
-msgid "No %s for this post yet..."
-msgstr ""
-
-#: ..\..\..\_feedback.php:154 ..\..\..\admin\b2upload.php:224
-#: ..\..\..\admin\_edit_form.php:55 ..\..\..\admin\_edit_showposts.php:219
-#: ..\..\..\admin\_user_list.php:6
-msgid "Name"
-msgstr "Namn"
-
-#: ..\..\..\_feedback.php:160 ..\..\..\_profile.php:78
-#: ..\..\..\admin\b2team.php:43 ..\..\..\admin\_edit_form.php:59
-#: ..\..\..\admin\_edit_showposts.php:225 ..\..\..\admin\_user_list.php:7
-#: ..\..\..\htsrv\comment_post.php:109 ..\..\..\htsrv\register.php:91
-#: ..\..\..\htsrv\_reg_complete.php:22 ..\..\..\htsrv\_reg_form.php:38
-msgid "Email"
-msgstr "Email"
-
-#: ..\..\..\_feedback.php:162 ..\..\..\admin\_edit_showposts.php:227
-msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr "Din email-adress kommer <strong>inte</strong> att visas på denna site."
-
-#: ..\..\..\_feedback.php:167 ..\..\..\admin\_edit_showposts.php:232
-msgid "Site/Url"
-msgstr "Site/Url"
-
-#: ..\..\..\_feedback.php:169 ..\..\..\admin\_edit_showposts.php:234
-msgid "Your URL will be displayed."
-msgstr "Din URL kommer att visas."
-
-#: ..\..\..\_feedback.php:174 ..\..\..\admin\_edit_showposts.php:239
-msgid "Comment text"
-msgstr "Kommentarstext"
-
-#: ..\..\..\_feedback.php:176 ..\..\..\admin\_edit_showposts.php:241
-msgid "Allowed XHTML tags"
-msgstr "Tillåtna XHTML taggar"
-
-#: ..\..\..\_feedback.php:177 ..\..\..\admin\_edit_showposts.php:241
-msgid "URLs, email, AIM and ICQs will be converted automatically."
-msgstr "URL:er, email, AIM och ICQ-nummer vill konverteras automatiskt."
-
-#: ..\..\..\_feedback.php:182 ..\..\..\admin\b2options.php:3
-#: ..\..\..\admin\_edit_showposts.php:247 ..\..\..\admin\_menutop.php:125
-msgid "Options"
-msgstr "Valmöjligheter"
-
-#: ..\..\..\_feedback.php:186 ..\..\..\admin\b2options.php:93
-#: ..\..\..\admin\_edit_form.php:82 ..\..\..\admin\_edit_showposts.php:248
-msgid "Auto-BR"
-msgstr "Auto-BR"
-
-#: ..\..\..\_feedback.php:186
-#, fuzzy
-msgid "Line breaks become &lt;br /&gt;"
-msgstr "(radbrytningar blir &lt;br&gt;)"
-
-#: ..\..\..\_feedback.php:189
-#, fuzzy
-msgid "Remember me"
-msgstr "December"
-
-#: ..\..\..\_feedback.php:189
-msgid "(Set cookies for name, email &amp; url)"
-msgstr ""
-
-#: ..\..\..\_profile.php:16 ..\..\..\htsrv\profile_update.php:31
-msgid "You are not loggued in."
-msgstr ""
-
-#: ..\..\..\_profile.php:28 ..\..\..\admin\b2mail.php:201
-#: ..\..\..\admin\b2team.php:27 ..\..\..\htsrv\login.php:71
-#: ..\..\..\htsrv\_login_form.php:49 ..\..\..\htsrv\_reg_form.php:24
-msgid "Login:"
-msgstr "Inloggningsnamn:"
-
-#: ..\..\..\_profile.php:31 ..\..\..\admin\b2team.php:74
-#: ..\..\..\admin\_user_list.php:3
-msgid "ID"
-msgstr ""
-
-#: ..\..\..\_profile.php:37 ..\..\..\admin\b2team.php:78
-#: ..\..\..\admin\_user_list.php:9
-msgid "Level"
-msgstr ""
-
-#: ..\..\..\_profile.php:42 ..\..\..\admin\b2team.php:83
-#, fuzzy
-msgid "Posts"
-msgstr "Tidigare"
-
-#: ..\..\..\_profile.php:47 ..\..\..\admin\b2team.php:31
-msgid "First name"
-msgstr ""
-
-#: ..\..\..\_profile.php:52 ..\..\..\admin\b2team.php:35
-#, fuzzy
-msgid "Last name"
-msgstr "Senaste kommentarerna"
-
-#: ..\..\..\_profile.php:57 ..\..\..\admin\b2team.php:39
-#: ..\..\..\admin\_user_list.php:5
-#, fuzzy
-msgid "Nickname"
-msgstr "Namn"
-
-#: ..\..\..\_profile.php:62
-msgid "Identity shown"
-msgstr ""
-
-#: ..\..\..\_profile.php:83 ..\..\..\admin\b2team.php:47
-#: ..\..\..\admin\_edit_form.php:63 ..\..\..\admin\_quicktags.php:164
-#: ..\..\..\admin\_user_list.php:8
-msgid "URL"
-msgstr "URL"
-
-#: ..\..\..\_profile.php:88 ..\..\..\admin\b2team.php:51
-msgid "ICQ"
-msgstr ""
-
-#: ..\..\..\_profile.php:93 ..\..\..\admin\b2team.php:55
-msgid "AIM"
-msgstr ""
-
-#: ..\..\..\_profile.php:98
-msgid "MSN I.M."
-msgstr ""
-
-#: ..\..\..\_profile.php:103
-msgid "Yahoo I.M."
-msgstr ""
-
-#: ..\..\..\_profile.php:109
-#, fuzzy
-msgid "New password"
-msgstr "Lösenord:"
-
-#: ..\..\..\_profile.php:114
-msgid "Confirm new password"
-msgstr ""
-
-#: ..\..\..\_profile.php:120 ..\..\..\admin\b2options.php:110
-msgid "Update"
-msgstr ""
-
-#: ..\..\..\_stats.php:16 ..\..\..\admin\b2stats.php:200
-#, fuzzy
-msgid "Last referers"
-msgstr "Senaste "
-
-#: ..\..\..\_stats.php:26 ..\..\..\admin\b2stats.php:217
-#, fuzzy
-msgid "Top referers"
-msgstr "Topp Referers"
-
-#: ..\..\..\_stats.php:36 ..\..\..\admin\b2stats.php:242
-msgid "Last refering searches"
-msgstr ""
-
-#: ..\..\..\_stats.php:46
-#, fuzzy
-msgid "Top refering engines"
-msgstr "Topp Referers"
-
-#: ..\..\..\_stats.php:60 ..\..\..\admin\b2stats.php:270
-msgid "Top Indexing Robots"
-msgstr ""
-
-#: ..\..\..\_stats.php:75 ..\..\..\admin\b2stats.php:295
-msgid "Top Aggregators"
-msgstr ""
-
 #: ..\..\..\admin\b2blogs.php:3 ..\..\..\admin\_blogs_list.php:2
 #: ..\..\..\admin\_menutop.php:120 ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
@@ -548,7 +346,7 @@ msgstr "Publicera detta !"
 
 #: ..\..\..\admin\b2blogs.php:14 ..\..\..\admin\b2blogs.php:43
 #: ..\..\..\admin\b2blogs.php:151 ..\..\..\admin\b2blogs.php:178
-#: ..\..\..\admin\b2blogs.php:278
+#: ..\..\..\admin\b2blogs.php:273
 msgid "You have no right to edit the blogs."
 msgstr ""
 
@@ -621,29 +419,29 @@ msgstr ""
 msgid "Back to blog editing"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:225 ..\..\..\admin\_blogs_list.php:5
+#: ..\..\..\admin\b2blogs.php:224 ..\..\..\admin\_blogs_list.php:5
 #, fuzzy
 msgid "Blog"
 msgstr "Blogroll"
 
-#: ..\..\..\admin\b2blogs.php:229
+#: ..\..\..\admin\b2blogs.php:228
 msgid "You have no right to generate static pages."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:235
+#: ..\..\..\admin\b2blogs.php:234
 msgid "You haven't set a static filename for this blog!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:251
+#: ..\..\..\admin\b2blogs.php:243
 #, php-format
 msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:260
+#: ..\..\..\admin\b2blogs.php:255
 msgid "Writing to file..."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:266 ..\..\..\admin\edit_actions.php:88
+#: ..\..\..\admin\b2blogs.php:261 ..\..\..\admin\edit_actions.php:88
 #: ..\..\..\admin\edit_actions.php:209 ..\..\..\admin\edit_actions.php:280
 #: ..\..\..\b2evocore\_functions_pings.php:50
 #: ..\..\..\b2evocore\_functions_pings.php:84
@@ -835,6 +633,12 @@ msgstr ""
 msgid "Raw content:"
 msgstr ""
 
+#: ..\..\..\admin\b2mail.php:201 ..\..\..\admin\b2team.php:27
+#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\_login_form.php:49
+#: ..\..\..\htsrv\_reg_form.php:24 ..\..\..\skins\_profile.php:28
+msgid "Login:"
+msgstr "Inloggningsnamn:"
+
 #: ..\..\..\admin\b2mail.php:201
 #, fuzzy
 msgid "Pass:"
@@ -879,6 +683,11 @@ msgstr ""
 #, fuzzy
 msgid "OK."
 msgstr "OK"
+
+#: ..\..\..\admin\b2options.php:3 ..\..\..\admin\_edit_showposts.php:247
+#: ..\..\..\admin\_menutop.php:125 ..\..\..\skins\_feedback.php:182
+msgid "Options"
+msgstr "Valmöjligheter"
 
 #: ..\..\..\admin\b2options.php:12 ..\..\..\admin\b2options.php:33
 msgid "You have no right to edit the options for this blog."
@@ -929,10 +738,19 @@ msgstr ""
 msgid "if you're not on the timezone of your server"
 msgstr ""
 
+#: ..\..\..\admin\b2options.php:93 ..\..\..\admin\_edit_form.php:82
+#: ..\..\..\admin\_edit_showposts.php:248 ..\..\..\skins\_feedback.php:186
+msgid "Auto-BR"
+msgstr "Auto-BR"
+
 #: ..\..\..\admin\b2options.php:104
 #, fuzzy
 msgid "converts line-breaks into &lt;br /&gt; tags"
 msgstr "Auto-BR (konverterar radbrytningar till &lt;br /&gt; taggar)"
+
+#: ..\..\..\admin\b2options.php:110 ..\..\..\skins\_profile.php:120
+msgid "Update"
+msgstr ""
 
 #: ..\..\..\admin\b2profile.php:8 ..\..\..\admin\_menutop.php:135
 msgid "My Profile"
@@ -1050,6 +868,11 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
+#: ..\..\..\admin\b2stats.php:200 ..\..\..\skins\_stats.php:16
+#, fuzzy
+msgid "Last referers"
+msgstr "Senaste "
+
 #: ..\..\..\admin\b2stats.php:201
 msgid "These are hits from external web pages refering to this blog"
 msgstr ""
@@ -1075,10 +898,19 @@ msgstr ""
 msgid "-&gt;S"
 msgstr ""
 
+#: ..\..\..\admin\b2stats.php:217 ..\..\..\skins\_stats.php:26
+#, fuzzy
+msgid "Top referers"
+msgstr "Topp Referers"
+
 #: ..\..\..\admin\b2stats.php:228
 #, fuzzy
 msgid "Total referers"
 msgstr "Topp Referers"
+
+#: ..\..\..\admin\b2stats.php:242 ..\..\..\skins\_stats.php:36
+msgid "Last refering searches"
+msgstr ""
 
 #: ..\..\..\admin\b2stats.php:243
 msgid ""
@@ -1090,10 +922,18 @@ msgstr ""
 msgid "Top refering search engines"
 msgstr ""
 
+#: ..\..\..\admin\b2stats.php:270 ..\..\..\skins\_stats.php:60
+msgid "Top Indexing Robots"
+msgstr ""
+
 #: ..\..\..\admin\b2stats.php:271
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
 "(Robots must be listed in /conf/_stats.php)"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:295 ..\..\..\skins\_stats.php:75
+msgid "Top Aggregators"
 msgstr ""
 
 #: ..\..\..\admin\b2stats.php:296
@@ -1126,6 +966,43 @@ msgstr ""
 msgid "Profile for:"
 msgstr "Min Profil"
 
+#: ..\..\..\admin\b2team.php:31 ..\..\..\skins\_profile.php:47
+msgid "First name"
+msgstr ""
+
+#: ..\..\..\admin\b2team.php:35 ..\..\..\skins\_profile.php:52
+#, fuzzy
+msgid "Last name"
+msgstr "Senaste kommentarerna"
+
+#: ..\..\..\admin\b2team.php:39 ..\..\..\admin\_user_list.php:5
+#: ..\..\..\skins\_profile.php:57
+#, fuzzy
+msgid "Nickname"
+msgstr "Namn"
+
+#: ..\..\..\admin\b2team.php:43 ..\..\..\admin\_edit_form.php:59
+#: ..\..\..\admin\_edit_showposts.php:225 ..\..\..\admin\_user_list.php:7
+#: ..\..\..\htsrv\comment_post.php:99 ..\..\..\htsrv\register.php:91
+#: ..\..\..\htsrv\_reg_complete.php:22 ..\..\..\htsrv\_reg_form.php:38
+#: ..\..\..\skins\_feedback.php:160 ..\..\..\skins\_profile.php:78
+msgid "Email"
+msgstr "Email"
+
+#: ..\..\..\admin\b2team.php:47 ..\..\..\admin\_edit_form.php:63
+#: ..\..\..\admin\_quicktags.php:164 ..\..\..\admin\_user_list.php:8
+#: ..\..\..\skins\_profile.php:83
+msgid "URL"
+msgstr "URL"
+
+#: ..\..\..\admin\b2team.php:51 ..\..\..\skins\_profile.php:88
+msgid "ICQ"
+msgstr ""
+
+#: ..\..\..\admin\b2team.php:55 ..\..\..\skins\_profile.php:93
+msgid "AIM"
+msgstr ""
+
 #: ..\..\..\admin\b2team.php:59
 msgid "MSN IM"
 msgstr ""
@@ -1133,6 +1010,21 @@ msgstr ""
 #: ..\..\..\admin\b2team.php:63
 msgid "YahooIM"
 msgstr ""
+
+#: ..\..\..\admin\b2team.php:74 ..\..\..\admin\_user_list.php:3
+#: ..\..\..\skins\_profile.php:31
+msgid "ID"
+msgstr ""
+
+#: ..\..\..\admin\b2team.php:78 ..\..\..\admin\_user_list.php:9
+#: ..\..\..\skins\_profile.php:37
+msgid "Level"
+msgstr ""
+
+#: ..\..\..\admin\b2team.php:83 ..\..\..\skins\_profile.php:42
+#, fuzzy
+msgid "Posts"
+msgstr "Tidigare"
 
 #: ..\..\..\admin\b2team.php:92
 msgid "Identity"
@@ -1361,6 +1253,12 @@ msgstr ""
 msgid "Image Details"
 msgstr ""
 
+#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:55
+#: ..\..\..\admin\_edit_showposts.php:219 ..\..\..\admin\_user_list.php:6
+#: ..\..\..\skins\_feedback.php:154
+msgid "Name"
+msgstr "Namn"
+
 #: ..\..\..\admin\b2upload.php:227
 msgid "Size"
 msgstr ""
@@ -1379,7 +1277,7 @@ msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:63 ..\..\..\admin\edit_actions.php:172
 #: ..\..\..\admin\edit_actions.php:342 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1210
+#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1196
 msgid "Supplied URL is invalid: "
 msgstr ""
 
@@ -1505,14 +1403,14 @@ msgid "Main Language"
 msgstr "Språk"
 
 #: ..\..\..\admin\_blogs_form.php:63
-#, fuzzy
-msgid "Site URL"
-msgstr "Site/Url"
+msgid "Blog Folder URL"
+msgstr ""
 
 #: ..\..\..\admin\_blogs_form.php:65
 msgid ""
 "This is the URL to the directory where the <em>Stub filename</em> and "
-"<em>Static filename</em> files live."
+"<em>Static filename</em> files live. No trailing slash. (If you don't know, "
+"leave this field empty.)"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_form.php:69 ..\..\..\admin\_blogs_list.php:7
@@ -1540,6 +1438,10 @@ msgid ""
 "incorrectly may cause these to fail."
 msgstr ""
 
+#: ..\..\..\admin\_blogs_form.php:81 ..\..\..\admin\_blogs_list.php:9
+msgid "Static Filename"
+msgstr ""
+
 #: ..\..\..\admin\_blogs_form.php:83
 msgid ""
 "This is the filename that will be used when you generate a static (.html) "
@@ -1548,10 +1450,6 @@ msgstr ""
 
 #: ..\..\..\admin\_blogs_list.php:8
 msgid "Stub URLname"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_list.php:9
-msgid "Static Filename"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_list.php:10
@@ -1803,6 +1701,10 @@ msgstr "Permanent länk till denna post"
 msgid "Permalink"
 msgstr "Permanent länk"
 
+#: ..\..\..\admin\_edit_showposts.php:167 ..\..\..\skins\_feedback.php:43
+msgid "Comments"
+msgstr "Kommentarer"
+
 #: ..\..\..\admin\_edit_showposts.php:194
 #, fuzzy
 msgid ""
@@ -1816,6 +1718,30 @@ msgstr ""
 #: ..\..\..\b2evocore\_functions_comments.php:149
 msgid "Leave a comment"
 msgstr "Lämna en kommentar"
+
+#: ..\..\..\admin\_edit_showposts.php:227 ..\..\..\skins\_feedback.php:162
+msgid "Your email address will <strong>not</strong> be displayed on this site."
+msgstr "Din email-adress kommer <strong>inte</strong> att visas på denna site."
+
+#: ..\..\..\admin\_edit_showposts.php:232 ..\..\..\skins\_feedback.php:167
+msgid "Site/Url"
+msgstr "Site/Url"
+
+#: ..\..\..\admin\_edit_showposts.php:234 ..\..\..\skins\_feedback.php:169
+msgid "Your URL will be displayed."
+msgstr "Din URL kommer att visas."
+
+#: ..\..\..\admin\_edit_showposts.php:239 ..\..\..\skins\_feedback.php:174
+msgid "Comment text"
+msgstr "Kommentarstext"
+
+#: ..\..\..\admin\_edit_showposts.php:241 ..\..\..\skins\_feedback.php:176
+msgid "Allowed XHTML tags"
+msgstr "Tillåtna XHTML taggar"
+
+#: ..\..\..\admin\_edit_showposts.php:241 ..\..\..\skins\_feedback.php:177
+msgid "URLs, email, AIM and ICQs will be converted automatically."
+msgstr "URL:er, email, AIM och ICQ-nummer vill konverteras automatiskt."
 
 #: ..\..\..\admin\_edit_showposts.php:248
 msgid "(Line breaks become &lt;br&gt;)"
@@ -2221,19 +2147,19 @@ msgstr ""
 msgid "Parameter %s is required!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1190
+#: ..\..\..\b2evocore\_functions.php:1192
 msgid "Invalid URL"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1196
+#: ..\..\..\b2evocore\_functions.php:1198
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1204
+#: ..\..\..\b2evocore\_functions.php:1206
 msgid "URL not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_blogs.php:262
+#: ..\..\..\b2evocore\_functions_blogs.php:267
 #, fuzzy
 msgid "Requested blog does not exist!"
 msgstr "Anslutningen existerar inte"
@@ -2791,34 +2717,34 @@ msgstr ""
 msgid "Supplied email address is invalid"
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:82
+#: ..\..\..\htsrv\comment_post.php:72
 msgid "You can only post a new comment every 30 seconds."
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:85
+#: ..\..\..\htsrv\comment_post.php:75
 msgid "Cannot post comment, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:86
+#: ..\..\..\htsrv\comment_post.php:76
 msgid "Back to comment editing"
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:102 ..\..\..\htsrv\comment_post.php:106
+#: ..\..\..\htsrv\comment_post.php:92 ..\..\..\htsrv\comment_post.php:96
 #, php-format
 msgid "New comment on your post #%d \"%s\""
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:108
+#: ..\..\..\htsrv\comment_post.php:98
 #, fuzzy
 msgid "Author"
 msgstr "Auto-BR"
 
-#: ..\..\..\htsrv\comment_post.php:110 ..\..\..\htsrv\trackback.php:98
-#: ..\..\..\xmlsrv\xmlrpc.php:1235
+#: ..\..\..\htsrv\comment_post.php:100 ..\..\..\htsrv\trackback.php:98
+#: ..\..\..\xmlsrv\xmlrpc.php:1221
 msgid "Url"
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:111
+#: ..\..\..\htsrv\comment_post.php:101
 #, fuzzy
 msgid "Comment"
 msgstr "Kommentarer"
@@ -2850,6 +2776,10 @@ msgstr ""
 
 #: ..\..\..\htsrv\login.php:96
 msgid "Note: You are already loggued in!"
+msgstr ""
+
+#: ..\..\..\htsrv\profile_update.php:31 ..\..\..\skins\_profile.php:16
+msgid "You are not loggued in."
 msgstr ""
 
 #: ..\..\..\htsrv\profile_update.php:36
@@ -2924,11 +2854,11 @@ msgstr ""
 msgid "New trackback on your post #%d \"%s\""
 msgstr ""
 
-#: ..\..\..\htsrv\trackback.php:97 ..\..\..\xmlsrv\xmlrpc.php:1234
+#: ..\..\..\htsrv\trackback.php:97 ..\..\..\xmlsrv\xmlrpc.php:1220
 msgid "Website"
 msgstr ""
 
-#: ..\..\..\htsrv\trackback.php:99 ..\..\..\xmlsrv\xmlrpc.php:1236
+#: ..\..\..\htsrv\trackback.php:99 ..\..\..\xmlsrv\xmlrpc.php:1222
 msgid "Excerpt"
 msgstr ""
 
@@ -2986,6 +2916,76 @@ msgstr "Nollställ formulär"
 msgid "(twice)"
 msgstr "(två gånger)"
 
+#: ..\..\..\skins\_blogroll.php:59
+msgid "more"
+msgstr "mer"
+
+#: ..\..\..\skins\_feedback.php:48
+#, fuzzy
+msgid "Trackbacks"
+msgstr "% TrackBacks"
+
+#: ..\..\..\skins\_feedback.php:53
+#, fuzzy
+msgid "Pingbacks"
+msgstr "1 PingBack"
+
+#: ..\..\..\skins\_feedback.php:104
+#, fuzzy
+msgid "Trackback from:"
+msgstr "TrackBacks (%)"
+
+#: ..\..\..\skins\_feedback.php:119
+#, fuzzy
+msgid "Pingback from:"
+msgstr "% PingBacks"
+
+#. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
+#: ..\..\..\skins\_feedback.php:134
+#, php-format
+msgid "No %s for this post yet..."
+msgstr ""
+
+#: ..\..\..\skins\_feedback.php:186
+#, fuzzy
+msgid "Line breaks become &lt;br /&gt;"
+msgstr "(radbrytningar blir &lt;br&gt;)"
+
+#: ..\..\..\skins\_feedback.php:189
+#, fuzzy
+msgid "Remember me"
+msgstr "December"
+
+#: ..\..\..\skins\_feedback.php:189
+msgid "(Set cookies for name, email &amp; url)"
+msgstr ""
+
+#: ..\..\..\skins\_profile.php:62
+msgid "Identity shown"
+msgstr ""
+
+#: ..\..\..\skins\_profile.php:98
+msgid "MSN I.M."
+msgstr ""
+
+#: ..\..\..\skins\_profile.php:103
+msgid "Yahoo I.M."
+msgstr ""
+
+#: ..\..\..\skins\_profile.php:109
+#, fuzzy
+msgid "New password"
+msgstr "Lösenord:"
+
+#: ..\..\..\skins\_profile.php:114
+msgid "Confirm new password"
+msgstr ""
+
+#: ..\..\..\skins\_stats.php:46
+#, fuzzy
+msgid "Top refering engines"
+msgstr "Topp Referers"
+
 #: ..\..\..\skins\babyblues\_bloglist.php:17
 #, fuzzy
 msgid "blogs"
@@ -3005,10 +3005,14 @@ msgstr ""
 msgid "[...] Read more!"
 msgstr "[...] Läs mer!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1228 ..\..\..\xmlsrv\xmlrpc.php:1232
+#: ..\..\..\xmlsrv\xmlrpc.php:1214 ..\..\..\xmlsrv\xmlrpc.php:1218
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
+
+#, fuzzy
+#~ msgid "Site URL"
+#~ msgstr "Site/Url"
 
 #, fuzzy
 #~ msgid "Post"

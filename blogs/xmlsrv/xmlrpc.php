@@ -629,7 +629,7 @@ function bloggergetusersblogs($m) {
 	// this function will have a real purpose with CafeLog's multiple blogs capability
 
 	global $xmlrpcerruser;
-	global $tableusers, $tableblogs;
+	global $tableusers, $tableblogs, $baseurl;
 
 	$user_login = $m->getParam(1);
 	$user_login = $user_login->scalarval();
@@ -641,7 +641,7 @@ function bloggergetusersblogs($m) {
 
 	$is_admin = mysql_num_rows($result);
 
-	$sql = "SELECT * FROM $tableblogs WHERE blog_ID > 1 ORDER BY blog_name ASC";
+	$sql = "SELECT * FROM $tableblogs ORDER BY blog_name ASC";
 	$result = mysql_query($sql) or die($sql);
 
 	$i = 0;
@@ -653,7 +653,7 @@ function bloggergetusersblogs($m) {
 		$blogstub = $row->blog_stub;
 
 		$struct[$i]  = new xmlrpcval(array("isAdmin" => new xmlrpcval($is_admin,"boolean"),
-								"url" => new xmlrpcval($siteurl."/".$blogstub),
+								"url" => new xmlrpcval($baseurl.$siteurl."/".$blogstub),
 								"blogid" => new xmlrpcval($blogid),
 								"blogName" => new xmlrpcval($blogname)
 								),"struct");
@@ -1216,7 +1216,7 @@ function pingback_ping($m) {
 							$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 	
 							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] )."\n";
-							$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$post_ID."&pb=1\n\n";
+							$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$post_ID."&pb=1\n\n";
 							$notify_message .= T_('Website', $default_locale). ": $original_title\n";
 							$notify_message .= T_('Url', $default_locale). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt', $default_locale). ": \n[...] $original_context [...]\n\n";

@@ -94,7 +94,7 @@ if ($comments_notify)
 
 	// Not translated because sent to someone else...
 	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
-	$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$comment_post_ID."&c=1\n\n";
+	$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$comment_post_ID."&c=1\n\n";
 	$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip , $user_domain)\n";
 	$notify_message .= T_('Email', $default_locale).": $email\n";
 	$notify_message .= T_('Url', $default_locale).": $url\n";

@@ -79,7 +79,7 @@ switch($action)
 		
 	
 		// Quick hack to create a stub file:
-		if( $blog_siteurl == $baseurl )
+		if( $blog_siteurl == '' )
 		{
 			echo '<p>', T_('Trying to create stub file'), '</p>';
 			// Determine the edit folder:
@@ -159,7 +159,7 @@ switch($action)
 		$blog_description = get_bloginfo('description');
 		$blog_longdesc = get_bloginfo('longdesc');
 		$blog_lang = get_bloginfo('lang');
-		$blog_siteurl = get_bloginfo('siteurl');
+		$blog_siteurl = get_bloginfo('subdir');
 		$blog_filename = get_bloginfo('filename');
 		$blog_staticfilename = get_bloginfo('staticfilename');
 		$blog_stub = get_bloginfo('stub');
@@ -195,7 +195,7 @@ switch($action)
 
 		$blog_tagline = format_to_post($blog_tagline, 0, 0);
 		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
-		$blog_roll = format_to_post($blo_roll, 0, 0);
+		$blog_roll = format_to_post($blog_roll, 0, 0);
 
 		if ( errors_display( T_('Cannot update, please correct these errors:'),
 			'[<a href="javascript:history.go(-1)">'.T_('Back to blog editing').'</a>]'))  
@@ -213,7 +213,6 @@ switch($action)
 		header( 'Location: b2blogs.php' );
 		exit();
 		break;
-	
 	
 	
 	
@@ -237,14 +236,7 @@ switch($action)
 		}
 	
 		// Determine the edit folder:
-		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
-		$last_pos = 0;
-		while( $pos = strpos( $current_folder, $admin_subdir, $last_pos ) )
-		{	// make sure we use the last occurrence
-			$edit_folder = substr( $current_folder, 0, $pos-1 );
-			$last_pos = $pos+1;
-		}
-	
+		$edit_folder = get_path( 'base' ) .get_bloginfo('subdir');
 		$filename = $edit_folder.'/'.get_bloginfo('filename');
 		$staticfilename = $edit_folder.'/'.$staticfilename; 
 		
@@ -256,7 +248,10 @@ switch($action)
 		require $filename;	
 		$page = ob_get_contents();
 		ob_end_clean();
-	
+		
+		// Switching back to default locale (the blog page may have changed it):
+		locale_activate( $default_locale );
+
 		echo T_('Writing to file...'), '<br />', "\n";
 	
 		$fp = fopen ( $staticfilename, "w");  

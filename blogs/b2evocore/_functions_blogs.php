@@ -114,13 +114,13 @@ function blog_update(
  */
 function get_blogparams()
 {	
-	global $tableblogs, $blog, $blogparams, $querycount, $blogname, $blogdescription, $siteurl, $blogfilename, $blogstaticfilename;
+	global $tableblogs, $blog, $blogparams, $querycount, $baseurl, $blogname, $blogdescription, $siteurl, $blogfilename, $blogstaticfilename;
 	if( !isset($blog) ) die("No blog set!");
 	$blogparams = get_blogparams_by_ID( $blog );
 	// override those deprecated default settings:
 	$blogname = $blogparams->blog_name;												// deprecated
 	$blogdescription = $blogparams->blog_description;					// deprecated
-	$siteurl = $blogparams->blog_siteurl;											// deprecated
+	$siteurl = $baseurl.$blogparams->blog_siteurl;											// deprecated
 	$blogfilename = $blogparams->blog_filename;								// deprecated
 	$blogstaticfilename = $blogparams->blog_staticfilename;		// deprecated
 }
@@ -130,7 +130,7 @@ function get_blogparams()
  */
 function get_bloginfo( $show='', $this_blogparams = '' )
 {
-	global $blog, $xmlsrv_url, $admin_email;
+	global $blog, $xmlsrv_url, $admin_email, $baseurl;
 
 	if( empty( $this_blogparams ) )
 	{	// We want the global blog on the page
@@ -143,8 +143,12 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			$output = $this_blogparams->blog_ID;
 			break;
 
-		case 'siteurl':
+		case 'subdir':
 			$output = $this_blogparams->blog_siteurl;
+			break;
+
+		case 'siteurl':
+			$output = $baseurl.$this_blogparams->blog_siteurl;
 			break;
 			
 		case 'filename':
@@ -162,23 +166,24 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 		case 'blogurl':
 		case 'link':			// RSS wording
 		case 'url':
-			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub;
+			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub;
 			break;
 			
 		case 'dynurl':
-			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_filename;
+			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_filename;
 			break;
 			
 		case 'staticurl':
-			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_staticfilename;
+			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_staticfilename;
 			break;
 			
 		case 'blogstatsurl':
-			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
+			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
 								'?disp=stats';
 			break;
+			
 		case 'lastcommentsurl':
-			$output = $this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
+			$output = $baseurl.$this_blogparams->blog_siteurl.'/'.$this_blogparams->blog_stub.
 								'?disp=comments';
 			break;
 			

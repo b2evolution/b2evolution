@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-08 01:04+0200\n"
+"POT-Creation-Date: 2003-09-08 19:13+0200\n"
 "PO-Revision-Date: 2003-08-26 09:08+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -349,202 +349,6 @@ msgstr "Totaal: %d artikelen - %d queries - %01.3f secondes"
 msgid "Archives"
 msgstr "Archief"
 
-#: ..\..\..\_blogroll.php:59
-msgid "more"
-msgstr "meer"
-
-#: ..\..\..\_feedback.php:43 ..\..\..\admin\_edit_showposts.php:167
-msgid "Comments"
-msgstr "Reacties"
-
-#: ..\..\..\_feedback.php:48
-msgid "Trackbacks"
-msgstr "TrackBacks"
-
-#: ..\..\..\_feedback.php:53
-msgid "Pingbacks"
-msgstr "PingBacks"
-
-#: ..\..\..\_feedback.php:104
-msgid "Trackback from:"
-msgstr "TrackBack van:"
-
-#: ..\..\..\_feedback.php:119
-msgid "Pingback from:"
-msgstr "PingBack van:"
-
-#. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
-#: ..\..\..\_feedback.php:134
-#, php-format
-msgid "No %s for this post yet..."
-msgstr "Nog geen %s op dit artikel ..."
-
-#: ..\..\..\_feedback.php:154 ..\..\..\admin\b2upload.php:224
-#: ..\..\..\admin\_edit_form.php:55 ..\..\..\admin\_edit_showposts.php:219
-#: ..\..\..\admin\_user_list.php:6
-msgid "Name"
-msgstr "Naam"
-
-#: ..\..\..\_feedback.php:160 ..\..\..\_profile.php:78
-#: ..\..\..\admin\b2team.php:43 ..\..\..\admin\_edit_form.php:59
-#: ..\..\..\admin\_edit_showposts.php:225 ..\..\..\admin\_user_list.php:7
-#: ..\..\..\htsrv\comment_post.php:109 ..\..\..\htsrv\register.php:91
-#: ..\..\..\htsrv\_reg_complete.php:22 ..\..\..\htsrv\_reg_form.php:38
-msgid "Email"
-msgstr "E-mail"
-
-#: ..\..\..\_feedback.php:162 ..\..\..\admin\_edit_showposts.php:227
-msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr ""
-"Jouw e-mail adres zal <strong>niet</strong> worden weergegevn op de site."
-
-#: ..\..\..\_feedback.php:167 ..\..\..\admin\_edit_showposts.php:232
-msgid "Site/Url"
-msgstr "Site/URL"
-
-#: ..\..\..\_feedback.php:169 ..\..\..\admin\_edit_showposts.php:234
-msgid "Your URL will be displayed."
-msgstr "Jouw URL zal worden weergegeven"
-
-#: ..\..\..\_feedback.php:174 ..\..\..\admin\_edit_showposts.php:239
-msgid "Comment text"
-msgstr "Reactie tekst"
-
-#: ..\..\..\_feedback.php:176 ..\..\..\admin\_edit_showposts.php:241
-msgid "Allowed XHTML tags"
-msgstr "Toegestande XHTML tags"
-
-#: ..\..\..\_feedback.php:177 ..\..\..\admin\_edit_showposts.php:241
-msgid "URLs, email, AIM and ICQs will be converted automatically."
-msgstr "URLs, e-mail, AIM en ICQs worden automatisch geconverteerd."
-
-#: ..\..\..\_feedback.php:182 ..\..\..\admin\b2options.php:3
-#: ..\..\..\admin\_edit_showposts.php:247 ..\..\..\admin\_menutop.php:125
-msgid "Options"
-msgstr "Opties"
-
-#: ..\..\..\_feedback.php:186 ..\..\..\admin\b2options.php:93
-#: ..\..\..\admin\_edit_form.php:82 ..\..\..\admin\_edit_showposts.php:248
-msgid "Auto-BR"
-msgstr "Auto-BR"
-
-#: ..\..\..\_feedback.php:186
-msgid "Line breaks become &lt;br /&gt;"
-msgstr "Enters worden &lt;br /&gt;"
-
-#: ..\..\..\_feedback.php:189
-msgid "Remember me"
-msgstr "Onthou mij"
-
-#: ..\..\..\_feedback.php:189
-msgid "(Set cookies for name, email &amp; url)"
-msgstr "(Plaats cookies voor naam, e-mail &amp; url)"
-
-#: ..\..\..\_profile.php:16 ..\..\..\htsrv\profile_update.php:31
-#, fuzzy
-msgid "You are not loggued in."
-msgstr "Je moet inloggen!"
-
-#: ..\..\..\_profile.php:28 ..\..\..\admin\b2mail.php:201
-#: ..\..\..\admin\b2team.php:27 ..\..\..\htsrv\login.php:71
-#: ..\..\..\htsrv\_login_form.php:49 ..\..\..\htsrv\_reg_form.php:24
-msgid "Login:"
-msgstr "Inloggen"
-
-#: ..\..\..\_profile.php:31 ..\..\..\admin\b2team.php:74
-#: ..\..\..\admin\_user_list.php:3
-msgid "ID"
-msgstr "ID"
-
-#: ..\..\..\_profile.php:37 ..\..\..\admin\b2team.php:78
-#: ..\..\..\admin\_user_list.php:9
-msgid "Level"
-msgstr "Level"
-
-#: ..\..\..\_profile.php:42 ..\..\..\admin\b2team.php:83
-msgid "Posts"
-msgstr "Artikelen"
-
-#: ..\..\..\_profile.php:47 ..\..\..\admin\b2team.php:31
-msgid "First name"
-msgstr "Voornaam"
-
-#: ..\..\..\_profile.php:52 ..\..\..\admin\b2team.php:35
-msgid "Last name"
-msgstr "Achternaam"
-
-#: ..\..\..\_profile.php:57 ..\..\..\admin\b2team.php:39
-#: ..\..\..\admin\_user_list.php:5
-msgid "Nickname"
-msgstr "Bijnaam"
-
-#: ..\..\..\_profile.php:62
-#, fuzzy
-msgid "Identity shown"
-msgstr "Identiteit"
-
-#: ..\..\..\_profile.php:83 ..\..\..\admin\b2team.php:47
-#: ..\..\..\admin\_edit_form.php:63 ..\..\..\admin\_quicktags.php:164
-#: ..\..\..\admin\_user_list.php:8
-msgid "URL"
-msgstr "URL"
-
-#: ..\..\..\_profile.php:88 ..\..\..\admin\b2team.php:51
-msgid "ICQ"
-msgstr "ICQ"
-
-#: ..\..\..\_profile.php:93 ..\..\..\admin\b2team.php:55
-msgid "AIM"
-msgstr "AIM"
-
-#: ..\..\..\_profile.php:98
-#, fuzzy
-msgid "MSN I.M."
-msgstr "MSN IM"
-
-#: ..\..\..\_profile.php:103
-#, fuzzy
-msgid "Yahoo I.M."
-msgstr "YahooIM"
-
-#: ..\..\..\_profile.php:109
-#, fuzzy
-msgid "New password"
-msgstr "Wachtwoord"
-
-#: ..\..\..\_profile.php:114
-#, fuzzy
-msgid "Confirm new password"
-msgstr "Verkeerde login of wachtwoord"
-
-#: ..\..\..\_profile.php:120 ..\..\..\admin\b2options.php:110
-msgid "Update"
-msgstr "Update"
-
-#: ..\..\..\_stats.php:16 ..\..\..\admin\b2stats.php:200
-msgid "Last referers"
-msgstr "Laatste Referers"
-
-#: ..\..\..\_stats.php:26 ..\..\..\admin\b2stats.php:217
-msgid "Top referers"
-msgstr "Hoogste Referers"
-
-#: ..\..\..\_stats.php:36 ..\..\..\admin\b2stats.php:242
-msgid "Last refering searches"
-msgstr "Laatste refererende zoekregels"
-
-#: ..\..\..\_stats.php:46
-msgid "Top refering engines"
-msgstr "Hoogste refererende zoekmachines"
-
-#: ..\..\..\_stats.php:60 ..\..\..\admin\b2stats.php:270
-msgid "Top Indexing Robots"
-msgstr "Hoogste Indexeer Robots"
-
-#: ..\..\..\_stats.php:75 ..\..\..\admin\b2stats.php:295
-msgid "Top Aggregators"
-msgstr "Hoogste Verzamelaars"
-
 #: ..\..\..\admin\b2blogs.php:3 ..\..\..\admin\_blogs_list.php:2
 #: ..\..\..\admin\_menutop.php:120 ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
@@ -553,7 +357,7 @@ msgstr "Weblogs"
 
 #: ..\..\..\admin\b2blogs.php:14 ..\..\..\admin\b2blogs.php:43
 #: ..\..\..\admin\b2blogs.php:151 ..\..\..\admin\b2blogs.php:178
-#: ..\..\..\admin\b2blogs.php:278
+#: ..\..\..\admin\b2blogs.php:273
 msgid "You have no right to edit the blogs."
 msgstr "Je hebt geen rechten om de weblogs te bewerken."
 
@@ -624,28 +428,28 @@ msgstr "Weblog parameters voor:"
 msgid "Back to blog editing"
 msgstr "Terug naar artikelbewerking"
 
-#: ..\..\..\admin\b2blogs.php:225 ..\..\..\admin\_blogs_list.php:5
+#: ..\..\..\admin\b2blogs.php:224 ..\..\..\admin\_blogs_list.php:5
 msgid "Blog"
 msgstr "Weblog"
 
-#: ..\..\..\admin\b2blogs.php:229
+#: ..\..\..\admin\b2blogs.php:228
 msgid "You have no right to generate static pages."
 msgstr "Je hebt geen rechten om statische pagina's aan te maken."
 
-#: ..\..\..\admin\b2blogs.php:235
+#: ..\..\..\admin\b2blogs.php:234
 msgid "You haven't set a static filename for this blog!"
 msgstr "Je hebt geen statische bestandsnaam opgegeven voor dit weblog!"
 
-#: ..\..\..\admin\b2blogs.php:251
+#: ..\..\..\admin\b2blogs.php:243
 #, php-format
 msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
 msgstr "Genereren van pagina <strong>%s</strong> naar <strong>%s</strong>..."
 
-#: ..\..\..\admin\b2blogs.php:260
+#: ..\..\..\admin\b2blogs.php:255
 msgid "Writing to file..."
 msgstr "Schrijven naar bestand ..."
 
-#: ..\..\..\admin\b2blogs.php:266 ..\..\..\admin\edit_actions.php:88
+#: ..\..\..\admin\b2blogs.php:261 ..\..\..\admin\edit_actions.php:88
 #: ..\..\..\admin\edit_actions.php:209 ..\..\..\admin\edit_actions.php:280
 #: ..\..\..\b2evocore\_functions_pings.php:50
 #: ..\..\..\b2evocore\_functions_pings.php:84
@@ -839,6 +643,12 @@ msgstr "Onderwerp voorvoegsel komt niet overeen"
 msgid "Raw content:"
 msgstr "Raw inhoud:"
 
+#: ..\..\..\admin\b2mail.php:201 ..\..\..\admin\b2team.php:27
+#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\_login_form.php:49
+#: ..\..\..\htsrv\_reg_form.php:24 ..\..\..\skins\_profile.php:28
+msgid "Login:"
+msgstr "Inloggen"
+
 #: ..\..\..\admin\b2mail.php:201
 msgid "Pass:"
 msgstr "Wachtwoord"
@@ -879,6 +689,11 @@ msgstr "Level 0 gebruikers kunnen niet plaatsen."
 #, fuzzy
 msgid "OK."
 msgstr "OK"
+
+#: ..\..\..\admin\b2options.php:3 ..\..\..\admin\_edit_showposts.php:247
+#: ..\..\..\admin\_menutop.php:125 ..\..\..\skins\_feedback.php:182
+msgid "Options"
+msgstr "Opties"
 
 #: ..\..\..\admin\b2options.php:12 ..\..\..\admin\b2options.php:33
 msgid "You have no right to edit the options for this blog."
@@ -928,9 +743,18 @@ msgstr "Tijdsverschil"
 msgid "if you're not on the timezone of your server"
 msgstr "Als je je niet in de tijdzone van de server bevind"
 
+#: ..\..\..\admin\b2options.php:93 ..\..\..\admin\_edit_form.php:82
+#: ..\..\..\admin\_edit_showposts.php:248 ..\..\..\skins\_feedback.php:186
+msgid "Auto-BR"
+msgstr "Auto-BR"
+
 #: ..\..\..\admin\b2options.php:104
 msgid "converts line-breaks into &lt;br /&gt; tags"
 msgstr "converteer enters naar &lt;br /&gt; tags"
+
+#: ..\..\..\admin\b2options.php:110 ..\..\..\skins\_profile.php:120
+msgid "Update"
+msgstr "Update"
 
 #: ..\..\..\admin\b2profile.php:8 ..\..\..\admin\_menutop.php:135
 msgid "My Profile"
@@ -1050,6 +874,10 @@ msgstr "Hoogste Indexeer Robots"
 msgid "Total"
 msgstr ""
 
+#: ..\..\..\admin\b2stats.php:200 ..\..\..\skins\_stats.php:16
+msgid "Last referers"
+msgstr "Laatste Referers"
+
 #: ..\..\..\admin\b2stats.php:201
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Dit zijn hits van externe webpagina's die refereren aan dit weblog"
@@ -1074,9 +902,17 @@ msgstr "Log als een zoekregel"
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
+#: ..\..\..\admin\b2stats.php:217 ..\..\..\skins\_stats.php:26
+msgid "Top referers"
+msgstr "Hoogste Referers"
+
 #: ..\..\..\admin\b2stats.php:228
 msgid "Total referers"
 msgstr "Totaal Referers"
+
+#: ..\..\..\admin\b2stats.php:242 ..\..\..\skins\_stats.php:36
+msgid "Last refering searches"
+msgstr "Laatste refererende zoekregels"
 
 #: ..\..\..\admin\b2stats.php:243
 #, fuzzy
@@ -1091,6 +927,10 @@ msgstr ""
 msgid "Top refering search engines"
 msgstr "Hoogste refererende zoekmachines"
 
+#: ..\..\..\admin\b2stats.php:270 ..\..\..\skins\_stats.php:60
+msgid "Top Indexing Robots"
+msgstr "Hoogste Indexeer Robots"
+
 #: ..\..\..\admin\b2stats.php:271
 #, fuzzy
 msgid ""
@@ -1099,6 +939,10 @@ msgid ""
 msgstr ""
 "Dit zijn hits van automatische robots zoals zoekmachine indexeer robots. "
 "(Robots moeten in de lijst staan in /conf/b2evo_advanced.php)"
+
+#: ..\..\..\admin\b2stats.php:295 ..\..\..\skins\_stats.php:75
+msgid "Top Aggregators"
+msgstr "Hoogste Verzamelaars"
 
 #: ..\..\..\admin\b2stats.php:296
 #, fuzzy
@@ -1136,6 +980,41 @@ msgstr "Gebruikers onderhoud"
 msgid "Profile for:"
 msgstr "Profiel"
 
+#: ..\..\..\admin\b2team.php:31 ..\..\..\skins\_profile.php:47
+msgid "First name"
+msgstr "Voornaam"
+
+#: ..\..\..\admin\b2team.php:35 ..\..\..\skins\_profile.php:52
+msgid "Last name"
+msgstr "Achternaam"
+
+#: ..\..\..\admin\b2team.php:39 ..\..\..\admin\_user_list.php:5
+#: ..\..\..\skins\_profile.php:57
+msgid "Nickname"
+msgstr "Bijnaam"
+
+#: ..\..\..\admin\b2team.php:43 ..\..\..\admin\_edit_form.php:59
+#: ..\..\..\admin\_edit_showposts.php:225 ..\..\..\admin\_user_list.php:7
+#: ..\..\..\htsrv\comment_post.php:99 ..\..\..\htsrv\register.php:91
+#: ..\..\..\htsrv\_reg_complete.php:22 ..\..\..\htsrv\_reg_form.php:38
+#: ..\..\..\skins\_feedback.php:160 ..\..\..\skins\_profile.php:78
+msgid "Email"
+msgstr "E-mail"
+
+#: ..\..\..\admin\b2team.php:47 ..\..\..\admin\_edit_form.php:63
+#: ..\..\..\admin\_quicktags.php:164 ..\..\..\admin\_user_list.php:8
+#: ..\..\..\skins\_profile.php:83
+msgid "URL"
+msgstr "URL"
+
+#: ..\..\..\admin\b2team.php:51 ..\..\..\skins\_profile.php:88
+msgid "ICQ"
+msgstr "ICQ"
+
+#: ..\..\..\admin\b2team.php:55 ..\..\..\skins\_profile.php:93
+msgid "AIM"
+msgstr "AIM"
+
 #: ..\..\..\admin\b2team.php:59
 msgid "MSN IM"
 msgstr "MSN IM"
@@ -1143,6 +1022,20 @@ msgstr "MSN IM"
 #: ..\..\..\admin\b2team.php:63
 msgid "YahooIM"
 msgstr "YahooIM"
+
+#: ..\..\..\admin\b2team.php:74 ..\..\..\admin\_user_list.php:3
+#: ..\..\..\skins\_profile.php:31
+msgid "ID"
+msgstr "ID"
+
+#: ..\..\..\admin\b2team.php:78 ..\..\..\admin\_user_list.php:9
+#: ..\..\..\skins\_profile.php:37
+msgid "Level"
+msgstr "Level"
+
+#: ..\..\..\admin\b2team.php:83 ..\..\..\skins\_profile.php:42
+msgid "Posts"
+msgstr "Artikelen"
 
 #: ..\..\..\admin\b2team.php:92
 msgid "Identity"
@@ -1389,6 +1282,12 @@ msgstr "Hier is de code om het weer te geven:"
 msgid "Image Details"
 msgstr "Afbeelding Details"
 
+#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:55
+#: ..\..\..\admin\_edit_showposts.php:219 ..\..\..\admin\_user_list.php:6
+#: ..\..\..\skins\_feedback.php:154
+msgid "Name"
+msgstr "Naam"
+
 #: ..\..\..\admin\b2upload.php:227
 msgid "Size"
 msgstr "Grootte"
@@ -1407,7 +1306,7 @@ msgstr "Toevoegen nieuw artikel..."
 
 #: ..\..\..\admin\edit_actions.php:63 ..\..\..\admin\edit_actions.php:172
 #: ..\..\..\admin\edit_actions.php:342 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1210
+#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1196
 #, fuzzy
 msgid "Supplied URL is invalid: "
 msgstr "Opgegeven URL is onjuist"
@@ -1534,13 +1433,15 @@ msgid "Main Language"
 msgstr "Taal"
 
 #: ..\..\..\admin\_blogs_form.php:63
-msgid "Site URL"
-msgstr "Site/URL"
+msgid "Blog Folder URL"
+msgstr ""
 
 #: ..\..\..\admin\_blogs_form.php:65
+#, fuzzy
 msgid ""
 "This is the URL to the directory where the <em>Stub filename</em> and "
-"<em>Static filename</em> files live."
+"<em>Static filename</em> files live. No trailing slash. (If you don't know, "
+"leave this field empty.)"
 msgstr ""
 "Dit is de URL naar de directorie waar de <em>Stub bestandsnaam</em> en "
 "<em>Statische bestandsnaam</em> staan."
@@ -1581,6 +1482,10 @@ msgstr ""
 "gebruikt voor permalinks, trackback, pingback, etc. Foutief instellen zal "
 "zorgen voor problemen."
 
+#: ..\..\..\admin\_blogs_form.php:81 ..\..\..\admin\_blogs_list.php:9
+msgid "Static Filename"
+msgstr "Statische Bestandsnaam"
+
 #: ..\..\..\admin\_blogs_form.php:83
 msgid ""
 "This is the filename that will be used when you generate a static (.html) "
@@ -1592,10 +1497,6 @@ msgstr ""
 #: ..\..\..\admin\_blogs_list.php:8
 msgid "Stub URLname"
 msgstr "Stub URLnaam"
-
-#: ..\..\..\admin\_blogs_list.php:9
-msgid "Static Filename"
-msgstr "Statische Bestandsnaam"
 
 #: ..\..\..\admin\_blogs_list.php:10
 msgid "Lang"
@@ -1842,6 +1743,10 @@ msgstr "Permanente link naar dit artikel"
 msgid "Permalink"
 msgstr "Permalink"
 
+#: ..\..\..\admin\_edit_showposts.php:167 ..\..\..\skins\_feedback.php:43
+msgid "Comments"
+msgstr "Reacties"
+
 #: ..\..\..\admin\_edit_showposts.php:194
 msgid ""
 "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
@@ -1854,6 +1759,31 @@ msgstr ""
 #: ..\..\..\b2evocore\_functions_comments.php:149
 msgid "Leave a comment"
 msgstr "Plaats een reactie"
+
+#: ..\..\..\admin\_edit_showposts.php:227 ..\..\..\skins\_feedback.php:162
+msgid "Your email address will <strong>not</strong> be displayed on this site."
+msgstr ""
+"Jouw e-mail adres zal <strong>niet</strong> worden weergegevn op de site."
+
+#: ..\..\..\admin\_edit_showposts.php:232 ..\..\..\skins\_feedback.php:167
+msgid "Site/Url"
+msgstr "Site/URL"
+
+#: ..\..\..\admin\_edit_showposts.php:234 ..\..\..\skins\_feedback.php:169
+msgid "Your URL will be displayed."
+msgstr "Jouw URL zal worden weergegeven"
+
+#: ..\..\..\admin\_edit_showposts.php:239 ..\..\..\skins\_feedback.php:174
+msgid "Comment text"
+msgstr "Reactie tekst"
+
+#: ..\..\..\admin\_edit_showposts.php:241 ..\..\..\skins\_feedback.php:176
+msgid "Allowed XHTML tags"
+msgstr "Toegestande XHTML tags"
+
+#: ..\..\..\admin\_edit_showposts.php:241 ..\..\..\skins\_feedback.php:177
+msgid "URLs, email, AIM and ICQs will be converted automatically."
+msgstr "URLs, e-mail, AIM en ICQs worden automatisch geconverteerd."
 
 #: ..\..\..\admin\_edit_showposts.php:248
 msgid "(Line breaks become &lt;br&gt;)"
@@ -2257,20 +2187,20 @@ msgstr "Als er niets gebeurt, klik <a %s>hier</a>."
 msgid "Parameter %s is required!"
 msgstr "Parameter %s is nodig!"
 
-#: ..\..\..\b2evocore\_functions.php:1190
+#: ..\..\..\b2evocore\_functions.php:1192
 #, fuzzy
 msgid "Invalid URL"
 msgstr "verkeerd"
 
-#: ..\..\..\b2evocore\_functions.php:1196
+#: ..\..\..\b2evocore\_functions.php:1198
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1204
+#: ..\..\..\b2evocore\_functions.php:1206
 msgid "URL not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_blogs.php:262
+#: ..\..\..\b2evocore\_functions_blogs.php:267
 msgid "Requested blog does not exist!"
 msgstr "Opgevraagd weblog bestaat niet"
 
@@ -2803,33 +2733,33 @@ msgstr "Vult U alstublieft het e-mail veld in"
 msgid "Supplied email address is invalid"
 msgstr "Opgegeven email adres is onjuist"
 
-#: ..\..\..\htsrv\comment_post.php:82
+#: ..\..\..\htsrv\comment_post.php:72
 msgid "You can only post a new comment every 30 seconds."
 msgstr "Ja kan alleen maar om de 30 seconden een reactie plaatsen."
 
-#: ..\..\..\htsrv\comment_post.php:85
+#: ..\..\..\htsrv\comment_post.php:75
 msgid "Cannot post comment, please correct these errors:"
 msgstr "Kan de reactie niet plaatsen, los de volgende problemen op:"
 
-#: ..\..\..\htsrv\comment_post.php:86
+#: ..\..\..\htsrv\comment_post.php:76
 msgid "Back to comment editing"
 msgstr "Terug naar reactie bewerking"
 
-#: ..\..\..\htsrv\comment_post.php:102 ..\..\..\htsrv\comment_post.php:106
+#: ..\..\..\htsrv\comment_post.php:92 ..\..\..\htsrv\comment_post.php:96
 #, php-format
 msgid "New comment on your post #%d \"%s\""
 msgstr "Nieuwe reactie op jouw artikel #%d \"%s\""
 
-#: ..\..\..\htsrv\comment_post.php:108
+#: ..\..\..\htsrv\comment_post.php:98
 msgid "Author"
 msgstr "Auteur"
 
-#: ..\..\..\htsrv\comment_post.php:110 ..\..\..\htsrv\trackback.php:98
-#: ..\..\..\xmlsrv\xmlrpc.php:1235
+#: ..\..\..\htsrv\comment_post.php:100 ..\..\..\htsrv\trackback.php:98
+#: ..\..\..\xmlsrv\xmlrpc.php:1221
 msgid "Url"
 msgstr "Url"
 
-#: ..\..\..\htsrv\comment_post.php:111
+#: ..\..\..\htsrv\comment_post.php:101
 msgid "Comment"
 msgstr "Reactie"
 
@@ -2862,6 +2792,11 @@ msgstr ""
 #: ..\..\..\htsrv\login.php:96
 msgid "Note: You are already loggued in!"
 msgstr ""
+
+#: ..\..\..\htsrv\profile_update.php:31 ..\..\..\skins\_profile.php:16
+#, fuzzy
+msgid "You are not loggued in."
+msgstr "Je moet inloggen!"
 
 #: ..\..\..\htsrv\profile_update.php:36
 msgid "You are not loggued in under the same account you are trying to modify."
@@ -2939,11 +2874,11 @@ msgstr "Beheer gebruikers"
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Nieuwe trackback op jouw artikel #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:97 ..\..\..\xmlsrv\xmlrpc.php:1234
+#: ..\..\..\htsrv\trackback.php:97 ..\..\..\xmlsrv\xmlrpc.php:1220
 msgid "Website"
 msgstr "Website"
 
-#: ..\..\..\htsrv\trackback.php:99 ..\..\..\xmlsrv\xmlrpc.php:1236
+#: ..\..\..\htsrv\trackback.php:99 ..\..\..\xmlsrv\xmlrpc.php:1222
 msgid "Excerpt"
 msgstr "Excerpt"
 
@@ -2998,6 +2933,73 @@ msgstr "Registratie Formulier"
 msgid "(twice)"
 msgstr "(tweemaal)"
 
+#: ..\..\..\skins\_blogroll.php:59
+msgid "more"
+msgstr "meer"
+
+#: ..\..\..\skins\_feedback.php:48
+msgid "Trackbacks"
+msgstr "TrackBacks"
+
+#: ..\..\..\skins\_feedback.php:53
+msgid "Pingbacks"
+msgstr "PingBacks"
+
+#: ..\..\..\skins\_feedback.php:104
+msgid "Trackback from:"
+msgstr "TrackBack van:"
+
+#: ..\..\..\skins\_feedback.php:119
+msgid "Pingback from:"
+msgstr "PingBack van:"
+
+#. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
+#: ..\..\..\skins\_feedback.php:134
+#, php-format
+msgid "No %s for this post yet..."
+msgstr "Nog geen %s op dit artikel ..."
+
+#: ..\..\..\skins\_feedback.php:186
+msgid "Line breaks become &lt;br /&gt;"
+msgstr "Enters worden &lt;br /&gt;"
+
+#: ..\..\..\skins\_feedback.php:189
+msgid "Remember me"
+msgstr "Onthou mij"
+
+#: ..\..\..\skins\_feedback.php:189
+msgid "(Set cookies for name, email &amp; url)"
+msgstr "(Plaats cookies voor naam, e-mail &amp; url)"
+
+#: ..\..\..\skins\_profile.php:62
+#, fuzzy
+msgid "Identity shown"
+msgstr "Identiteit"
+
+#: ..\..\..\skins\_profile.php:98
+#, fuzzy
+msgid "MSN I.M."
+msgstr "MSN IM"
+
+#: ..\..\..\skins\_profile.php:103
+#, fuzzy
+msgid "Yahoo I.M."
+msgstr "YahooIM"
+
+#: ..\..\..\skins\_profile.php:109
+#, fuzzy
+msgid "New password"
+msgstr "Wachtwoord"
+
+#: ..\..\..\skins\_profile.php:114
+#, fuzzy
+msgid "Confirm new password"
+msgstr "Verkeerde login of wachtwoord"
+
+#: ..\..\..\skins\_stats.php:46
+msgid "Top refering engines"
+msgstr "Hoogste refererende zoekmachines"
+
 #: ..\..\..\skins\babyblues\_bloglist.php:17
 msgid "blogs"
 msgstr "weblogs"
@@ -3015,10 +3017,13 @@ msgstr "Blader door alle artikelen van deze auteur"
 msgid "[...] Read more!"
 msgstr "[...] Lees Meer!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1228 ..\..\..\xmlsrv\xmlrpc.php:1232
+#: ..\..\..\xmlsrv\xmlrpc.php:1214 ..\..\..\xmlsrv\xmlrpc.php:1218
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
+
+#~ msgid "Site URL"
+#~ msgstr "Site/URL"
 
 #~ msgid "End."
 #~ msgstr "Einde."
