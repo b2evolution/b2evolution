@@ -59,6 +59,10 @@ if (!$users_can_register)
 switch($action)
 {
 	case 'register':
+		/*
+		 * Do the registration:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2edit.php' );
 
 		function filter($value)	{
 			return ereg("^[a-zA-Z0-9\_-\|]+$",$value);
@@ -69,8 +73,6 @@ switch($action)
 		param( 'pass2', 'string', '' );
 		param( 'user_email', 'string', '' );
 
-		/* declaring global fonctions */
-		// global $user_login,$pass1,$pass2,$user_firstname,$user_nickname,$user_icq,$user_email,$user_url;
 
 		/* checking login has been typed */
 		if($user_login == '')
@@ -120,18 +122,17 @@ switch($action)
 			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one'). "");
 		}
 
-		$user_ip			= $_SERVER['REMOTE_ADDR'];
-		$user_domain	= $_SERVER['REMOTE_HOST'];
-		$user_browser	= $_SERVER['HTTP_USER_AGENT'];
+		$user_ip			= isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+		$user_domain	= isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '';
+		$user_browser	= isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-		$user_login		= addslashes($user_login);
-		$pass1			= addslashes($pass1);
-		$user_nickname	= addslashes($user_nickname);
+		$user_login	= addslashes($user_login);
+		$pass1 = addslashes($pass1);
+		$user_nickname = addslashes($user_nickname);
 
 		$query = "INSERT INTO $tableusers " .
 					"(user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) " .
-					"VALUES " .
-					"('$user_login', '" . md5($pass1) . "', '$user_nickname', '$user_email', '$user_ip', '$user_domain', '$user_browser', NOW(), '$new_users_can_blog', 'nickname')";
+					"VALUES ('$user_login', '" . md5($pass1) . "', '$user_nickname', '$user_email', '$user_ip', '$user_domain', '$user_browser', NOW(), '$new_users_can_blog', 'nickname')";
 		$result = mysql_query($query) or mysql_oops( $query );
 
 		$stars='';
@@ -196,6 +197,7 @@ textarea,input,select {
 <tr><td width="90">&nbsp;</td>
 <td><form name="login" action="b2login.php" method="post">
 <input type="hidden" name="log" value="<?php echo $user_login ?>" />
+<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 <input type="submit" class="search" value="Login" name="submit" /></form></td></tr>
 </table>
 </td>
@@ -214,7 +216,9 @@ textarea,input,select {
 	break; // case 'register'
 
 	case 'disabled':
-
+		/*
+		 * Registration disabled:
+		 */
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
@@ -278,6 +282,10 @@ registration disabled<br />
 	break; // case 'disabled'
 
 	default:
+		/*
+		 * Default: registration form:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2edit.php' );
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -324,6 +332,7 @@ registration<br />
 
 <form method="post" action="b2register.php">
 <input type="hidden" name="action" value="register" />
+<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 <table border="0" width="180" class="menutop" style="background-color: #ffffff">
 <tr>
 <td width="150" align="right"><?php echo T_('Login:') ?></td>

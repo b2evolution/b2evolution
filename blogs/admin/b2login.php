@@ -57,6 +57,10 @@ dbconnect();
 switch($action) 
 {
 	case 'logout':
+		/*
+		 * Logout:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2login.php' );
 
 		setcookie( 'cafeloguser' );		// OLD
 		setcookie( 'cafeloguser', '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
@@ -71,18 +75,21 @@ switch($action)
 		header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
 		header("Pragma: no-cache");
 
-		header("Refresh:0;url=b2login.php");
+		header("Refresh:0;url=$redirect_to");
 		exit();
 
 	break; // case 'logout'
 
 
 	case 'login':
+		/*
+		 * Logout:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2edit.php' );
 
 		$log = $_POST['log'];
 		$pwd = md5($_POST['pwd']);
 		unset($_POST['pwd']); // password is hashed from now on
-		$redirect_to = $_POST['redirect_to'];
 
 		function login()
 		{
@@ -123,12 +130,9 @@ switch($action)
 			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 			header("Cache-Control: no-cache, must-revalidate");
 			header("Pragma: no-cache");
-			if ($is_IIS)
-			{
-				header('Refresh: 0;url=b2login.php?error='.urlencode( $error ) );
-			} else {
-				header('Location: b2login.php?error='.urlencode( $error ) );
-			}
+
+			header('Refresh:0;url=b2login.php?error='.urlencode( $error ) );
+
 			exit();
 		}
 		else
@@ -167,6 +171,10 @@ switch($action)
 
 
 	case 'lostpassword':
+		/*
+		 * Lost password:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2login.php' );
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -242,6 +250,10 @@ textarea,input,select {
 	break; // case 'lostpassword'
 
 	case 'retrievepassword':
+		/*
+		 * Retrieve password:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2login.php' );
 
 		$user_login	= $_POST['user_login'];
 		$user_data	= get_userdatabylogin($user_login);
@@ -284,41 +296,22 @@ textarea,input,select {
 
 
 	default:
+		/*
+		 * Default: login form:
+		 */
+		param( 'redirect_to', 'string', $pathserver.'b2edit.php' );
+		param( 'log', 'string', '' );
 
-		if(!empty($_COOKIE[$cookie_user]) && !empty($_COOKIE[$cookie_pass]))
-		{
-			$user_login		= $_COOKIE[$cookie_user];
-			$user_pass_md5 = $_COOKIE[$cookie_pass];
-		}
-
-		function checklogin()
-		{
-			global $dbhost, $dbusername, $dbpassword, $dbname;
-			global $user_login, $user_pass_md5, $user_ID;
-
-			// echo $user_login; exit;
-			$userdata = get_userdatabylogin($user_login);
-
-			if ($user_pass_md5 != '' && ($user_pass_md5 == $userdata['user_pass']))
-			{
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		if (checklogin())
-		{
+		if( is_loggued_in() )
+		{	// The user is already loggued in, no need to go throw this...
+		
 			header("Expires: Wed, 5 Jun 1979 23:41:00 GMT"); /* private joke: this is Michel's birthdate - though officially it's on the 6th, since he's on GMT+1 :) */
 			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); /* different all the time */
 			header("Cache-Control: no-cache, must-revalidate"); /* to cope with HTTP/1.1 */
 			header("Pragma: no-cache");
-			header("Location: b2edit.php");
+
+			header("Location: $redirect_to");
 			exit();
-		}
-		elseif (!empty($_COOKIE[$cookie_user]))
-		{
-			$error = '<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
 		}
 
 	?><html xml:lang="<?php echo locale_lang ?>" lang="<?php echo locale_lang ?>">
@@ -384,11 +377,11 @@ textarea,input,select {
 <?php
 			}
 ?>
-<input type="hidden" name="redirect_to" value="b2edit.php" />
+<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 <input type="hidden" name="action" value="login" />
 <table width="100" style="background-color: #ffffff">
 <tr><td align="right"><?php echo T_('Login:') ?></td>
-	<td><input type="text" name="log" value="" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
+	<td><input type="text" name="log" value="<?php echo $log ?>" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td align="right"><?php echo T_('Password:') ?></td>
 	<td><input type="password" name="pwd" value="" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td>&nbsp;</td>
