@@ -157,7 +157,7 @@ $Form->labelend = "</strong>\n";
 	<div class="edit_actions">
 	<?php // ------------------------------- ACTIONS ----------------------------------
 		if( $use_preview )
-		{	?>
+		{ ?>
 			<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);" />
 			<?php
 		}
@@ -167,14 +167,14 @@ $Form->labelend = "</strong>\n";
 
 	<?php
 	// ---------- DELETE ----------
-  if( $next_action == 'update' )
-	{	// Editing post
+	if( $next_action == 'update' )
+	{ // Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
 
-	if( $use_filemanager )
-	{	// ------------------------------- UPLOAD ----------------------------------
+	if( $Settings->get( 'fm_enabled' ) && $Settings->get( 'upload_enabled' ) )
+	{ // ------------------------------- UPLOAD ----------------------------------
 		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
 		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
 		$Fileman->dispButtonUploadPopup( T_('Files') );
@@ -536,6 +536,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/10 02:08:37  blueyed
+ * Use $Settings to check if upload allowed
+ *
  * Revision 1.8  2005/01/09 05:36:39  blueyed
  * fileupload
  *

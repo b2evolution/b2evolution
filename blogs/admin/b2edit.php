@@ -23,8 +23,6 @@ param( 'action', 'string' );
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
-// Page conf settings:
-$use_filemanager = true;
 
 switch($action)
 {
