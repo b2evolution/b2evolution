@@ -20,9 +20,9 @@ if ($debug=="1")
 -
 <a href="http://b2evolution.net/about/license.html" class="nobr"><?php echo T_('GPL License') ?></a>
 - 
-<span class="nobr">&copy; 2001-2002 by <a href="http://cafelog.com/">Michel V</a></span>
+<span class="nobr">&copy;2001-2002 by <a href="http://cafelog.com/">Michel V</a></span>
 -
-<span class="nobr">&copy; 2003 by <a href="http://www.fplanque.net/2003/b2evolution/">Fran&ccedil;ois PLANQUE</a></span>
+<span class="nobr">&copy;2003 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a></span>
 </p>
 
 <!-- this is for the spellchecker -->

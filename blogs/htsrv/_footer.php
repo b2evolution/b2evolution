@@ -10,5 +10,10 @@
 ?>
 </div>
 
+<p class="footer">
+<a href="http://b2evolution.net/">b2evolution</a>
+<span class="nobr">&copy;2003 by <a href="http://fplanque.net">Fran&ccedil;ois PLANQUE</a></span>
+</p>
+
 </body>
 </html>
