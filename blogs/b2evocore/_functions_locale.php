@@ -52,11 +52,11 @@ elseif( $use_l10n == 2 )
 
 		$messages = $locales[$req_locale]['messages'];
 
-		$search = str_replace( "\n", '\n', $string );
-		$search = str_replace( "\r", '', $search );
+		// replace special characters that to msgid-equivalents
+		$search = str_replace( array("\n", "\r", "\t"), array('\n', '', '\t'), $string );
+		
 		// echo "Translating ", $search, " to $messages<br />";
 
-		#echo locale_messages($req_locale); exit;
 		if( !isset($trans[ $messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
