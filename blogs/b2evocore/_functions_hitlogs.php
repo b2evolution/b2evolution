@@ -220,7 +220,7 @@ function hit_prune( $date )
 	global $tablehitlog, $querycount;
 
 	$iso_date = date ('Y-m-d', $date);
-	$sql ="DELETE FROM $tablehitlog WHERE visitTime LIKE '$iso_date %'";
+	$sql ="DELETE FROM $tablehitlog WHERE DATE_FORMAT(visitTime,'%Y-%m-%d') = '$iso_date'";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 
