@@ -1208,27 +1208,30 @@ function debug_info( $force = false )
 			$Debuglog->add( 'Memory usage: '.bytesreadable(memory_get_usage()), 'memory' );
 		}
 
+		?>
+		<hr class="clear" />
+		<div class="panelblock">
+		<h2>Debug info</h2>
 
-		echo '<hr class="clear" /><h2>Debug info</h2>';
+		<?php
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
 			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 		}
 
-		format_to_output(
+		echo format_to_output(
 			$Debuglog->display( array( 'container' => '<h3>Debug messages</h3>',
 																	'all' => '<h4>Level [%s]:</h4>' ),
 													'',
 													false,
-													array( 'error', 'all' ),
-													NULL,
-													NULL,
-													'panelblock' ),
+													array( 'error', 'all' ) ),
 			'htmlbody' );
 		?>
+		</div>
 
-		<div class="panelblock">
+
+		<div class="panelinfo">
 			<h3>DB</h3>
 
 			<?php
@@ -1628,8 +1631,8 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
- * Revision 1.8  2004/11/05 00:36:43  blueyed
- * no message
+ * Revision 1.9  2004/11/05 12:48:04  blueyed
+ * Debug output beautified
  *
  * Revision 1.7  2004/11/03 00:58:02  blueyed
  * update
