@@ -86,7 +86,7 @@ if( !isset($default_to_blog) ) $default_to_blog = 2;
 /* Stop editing */
 
 // Get hostname out of baseurl
-preg_match( '#http://([^:/]+)#', $baseurl, $matches );
+preg_match( '#https?://([^:/]+)#', $baseurl, $matches );
 $basehost = $matches[1];
 //echo 'basehost=',$basehost;
 
