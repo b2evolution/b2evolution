@@ -261,7 +261,6 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 										new xmlrpcval('nopassrequired','string'),	// Reserved
 										new xmlrpcval($abuse_string,'string'),		// The abusive string to report
 										new xmlrpcval($baseurl,'string'),					// The base URL of this b2evo
-										new xmlrpcval(0,'int')										// Reserved
 									)  
 								);
 		$result = $client->send($message);
@@ -325,6 +324,7 @@ function b2evonet_poll_abuse( $display = true )
 									new xmlrpcval('annonymous','string'),				// Reserved
 									new xmlrpcval('nopassrequired','string'),		// Reserved
 									new xmlrpcval($startat,'dateTime.iso8601'),	// Datetime to start at
+									new xmlrpcval(0,'int')											// Reserved
 								)  
 							);
 	$result = $client->send($message);

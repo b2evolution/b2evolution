@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution stats config
- * Version of this file: 0.8.5.1
+ * Version of this file: 0.8.7
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */

@@ -65,7 +65,7 @@ switch($action)
 		// TODO: START TRANSACTION !!
 
 		// checking the login isn't already used by another user:
-		$request =  "SELECT user_login FROM $tableusers WHERE user_login = '$login'";
+		$request =  "SELECT user_login FROM $tableusers WHERE user_login = '".addslashes($login)."'";
 		$result = mysql_query($request) or mysql_oops( $request );
 		$lines = mysql_num_rows($result);
 
