@@ -357,7 +357,7 @@ case "editedcomment":
 	$newcomment_author = addslashes($newcomment_author);
 	$newcomment_author_email = addslashes($newcomment_author_email);
 	$newcomment_author_url = addslashes($newcomment_author_url);
-	$query = "UPDATE $tablecomments SET comment_content=\"$content\", comment_author=\"$newcomment_author\", comment_author_email=\"$newcomment_author_email\", comment_author_url=\"$newcomment_author_url\"".$datemodif." WHERE comment_ID=$comment_ID";
+	$query = "UPDATE $tablecomments SET comment_content='".addslashes($content)."', comment_author=\"$newcomment_author\", comment_author_email=\"$newcomment_author_email\", comment_author_url=\"$newcomment_author_url\"".$datemodif." WHERE comment_ID=$comment_ID";
 	$result = mysql_query($query) or mysql_oops($query);
 
 	header ("Location: b2browse.php?blog=$blog&p=$comment_post_ID&c=1#comments"); //?a=ec");

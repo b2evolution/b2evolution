@@ -22,6 +22,7 @@ $block_urls = array(
 	'-tits-',
 	'mneuron.com',
 	'buy-phentermine',
+	'buy-xenadrine',
 	'order-cheap-pills',
 	'menguma.com',
 	'gdough.com',
@@ -30,6 +31,7 @@ $block_urls = array(
 	'pornwizzard.com',
 	'sexgine.com',
 	'zdenka.accepted.cc',
+	'unbeatablemobiles',
 // Light spammers:
 	'pcfamily.ch',
 	'nositeyet.com',
