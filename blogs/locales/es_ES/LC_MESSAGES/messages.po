@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 16:35+0200\n"
+"POT-Creation-Date: 2004-05-11 17:43+0200\n"
 "PO-Revision-Date: 2003-09-12 00:51+0100\n"
 "Last-Translator: Héctor Delcourt <flikarmonth_NOQUIEROSPAM_@iespana.es>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -527,8 +527,8 @@ msgstr ""
 #: ..\..\..\admin\b2blogs.php:475
 #, php-format
 msgid ""
-"You should check the permission for [%s]. See <a %s>online manual on file "
-"permissions</a>."
+"You should check the file permissions for [%s]. See <a %s>online manual on "
+"file permissions</a>."
 msgstr ""
 
 #: ..\..\..\admin\b2blogs.php:481
@@ -721,7 +721,7 @@ msgid "Regional settings updated."
 msgstr ""
 
 #: ..\..\..\admin\b2options.php:128
-msgid "You must not create empty locales!"
+msgid "You must provide a locale code!"
 msgstr ""
 
 #: ..\..\..\admin\b2options.php:153
@@ -1196,11 +1196,6 @@ msgstr "nombre de fichero invalido!"
 msgid "User level changed."
 msgstr ""
 
-#: ..\..\..\admin\b2users.php:281
-#, php-format
-msgid "Couldn't change %s's level."
-msgstr ""
-
 #: ..\..\..\admin\b2users.php:301
 msgid "You can't delete yourself!"
 msgstr ""
@@ -1236,9 +1231,9 @@ msgid "You can't delete the default group for new users!"
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:378
-#, php-format
-msgid "Delete Group [%s]?"
-msgstr ""
+#, fuzzy, php-format
+msgid "Delete group [%s]?"
+msgstr "Sindicar esta bit&aacute;cora"
 
 #: ..\..\..\admin\b2users.php:402
 #, fuzzy
@@ -1696,6 +1691,7 @@ msgstr ""
 msgid "Access parameters"
 msgstr ""
 
+#. TRANS: current default blog
 #: ..\..\..\admin\_blogs_main.subform.php:31
 msgid "Current default is:"
 msgstr ""
@@ -4809,7 +4805,7 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\install\index.php:347
-msgid "Config file recap..."
+msgid "Base config recap..."
 msgstr ""
 
 #: ..\..\..\install\index.php:349

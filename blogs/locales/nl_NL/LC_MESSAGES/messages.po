@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 16:35+0200\n"
+"POT-Creation-Date: 2004-05-11 17:43+0200\n"
 "PO-Revision-Date: 2004-05-11 13:48+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: b2evolution <>\n"
@@ -538,10 +538,10 @@ msgid "File cannot be written!"
 msgstr "Bestand kan niet worden geschreven!"
 
 #: ..\..\..\admin\b2blogs.php:475
-#, php-format
+#, fuzzy, php-format
 msgid ""
-"You should check the permission for [%s]. See <a %s>online manual on file "
-"permissions</a>."
+"You should check the file permissions for [%s]. See <a %s>online manual on "
+"file permissions</a>."
 msgstr ""
 "Je zou de rechten voor [%s] kunnen nakijken. Zie het <a %s>online handboek "
 "over bestands rechten</a>."
@@ -741,8 +741,9 @@ msgid "Regional settings updated."
 msgstr "Regionale instellingen bijgewerkt"
 
 #: ..\..\..\admin\b2options.php:128
-msgid "You must not create empty locales!"
-msgstr "Je moet geen lege taalbestanden aanmaken!"
+#, fuzzy
+msgid "You must provide a locale code!"
+msgstr "Je moet een unieke login opgeven!"
 
 #: ..\..\..\admin\b2options.php:153
 #, php-format
@@ -1237,11 +1238,6 @@ msgstr "Verkeerde promotie"
 msgid "User level changed."
 msgstr "Gebruikers level is verandert."
 
-#: ..\..\..\admin\b2users.php:281
-#, php-format
-msgid "Couldn't change %s's level."
-msgstr "Kon %s's level niet veranderen."
-
 #: ..\..\..\admin\b2users.php:301
 msgid "You can't delete yourself!"
 msgstr "Je kan jezelf niet verwijderen!"
@@ -1278,8 +1274,8 @@ msgid "You can't delete the default group for new users!"
 msgstr "Je kan de standaard groep voor nieuwe gebruikers niet verwijderen!"
 
 #: ..\..\..\admin\b2users.php:378
-#, php-format
-msgid "Delete Group [%s]?"
+#, fuzzy, php-format
+msgid "Delete group [%s]?"
 msgstr "Verwijder Groep [%s]?"
 
 #: ..\..\..\admin\b2users.php:402
@@ -1739,6 +1735,7 @@ msgstr "Bevat de taal van de navigatie links op dit weblog"
 msgid "Access parameters"
 msgstr "Toegang parameters"
 
+#. TRANS: current default blog
 #: ..\..\..\admin\_blogs_main.subform.php:31
 msgid "Current default is:"
 msgstr "Huidige standaard is:"
@@ -4853,7 +4850,8 @@ msgstr ""
 "\t\t\t\t\tsome, will not be touched in any way."
 
 #: ..\..\..\install\index.php:347
-msgid "Config file recap..."
+#, fuzzy
+msgid "Base config recap..."
 msgstr "Configuratie bestand ophalen..."
 
 #: ..\..\..\install\index.php:349
@@ -5505,6 +5503,12 @@ msgstr "[...] Lees Meer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
+
+#~ msgid "Couldn't change %s's level."
+#~ msgstr "Kon %s's level niet veranderen."
+
+#~ msgid "You must not create empty locales!"
+#~ msgstr "Je moet geen lege taalbestanden aanmaken!"
 
 #~ msgid "Create new Locale"
 #~ msgstr "Creeër nieuwe taal"

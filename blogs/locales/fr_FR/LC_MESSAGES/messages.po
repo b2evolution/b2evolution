@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
-"POT-Creation-Date: 2004-05-11 16:35+0200\n"
-"PO-Revision-Date: 2004-05-11 17:14+0100\n"
+"POT-Creation-Date: 2004-05-11 17:43+0200\n"
+"PO-Revision-Date: 2004-05-11 17:44+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -235,7 +235,7 @@ msgstr "Bienvenue dans b2evoltution"
 
 #: ..\..\..\default.php:35
 msgid "This is the default homepage for b2evolution. It will be displayed as long as you don't select a default blog in the general settings."
-msgstr ""
+msgstr "Ceci est la page d'accueil par défaut pour b2evolution. Elle sera affichée tant que vous n'aurez oas sélectionné un blog par défaut dans les réglages généraux."
 
 #: ..\..\..\default.php:38
 msgid "Individual blogs on this system"
@@ -278,7 +278,7 @@ msgstr "Résumé des derniers articles dans tous les blogs"
 
 #: ..\..\..\default.php:80
 msgid "The page you're looking at"
-msgstr ""
+msgstr "La page que vous voyez actuellement"
 
 #: ..\..\..\default.php:82
 msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
@@ -407,7 +407,7 @@ msgstr "Ajouter un mot clef interdit"
 
 #: ..\..\..\admin\b2antispam.php:251
 msgid "Check &amp; ban..."
-msgstr ""
+msgstr "Vérifier &amp; bannir..."
 
 #: ..\..\..\admin\b2antispam.php:259
 msgid "Banned domains blacklist"
@@ -517,7 +517,7 @@ msgstr "Supprimer le blog [%s]?"
 
 #: ..\..\..\admin\b2blogs.php:354
 msgid "Deleting this blog will also delete all its categories, posts and comments!"
-msgstr ""
+msgstr "Supprimer ce blog supprimera également toutes ses catégories, articles et commentaires!"
 
 #: ..\..\..\admin\b2blogs.php:356
 #: ..\..\..\admin\b2users.php:323
@@ -528,12 +528,12 @@ msgstr "CETTE OPERATION N'EST PAS REVERSIBLE!"
 #: ..\..\..\admin\b2blogs.php:369
 #, php-format
 msgid "Also try to delete stub file [<strong><a %s>%s</a></strong>]"
-msgstr ""
+msgstr "Tenter de supprimer également le fichier stub [<strong><a %s>%s</a></strong>]"
 
 #: ..\..\..\admin\b2blogs.php:377
 #, php-format
 msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
-msgstr ""
+msgstr "Tenter de supprimer également le fichier statique [<strong><a %s>%s</a></strong>]"
 
 #: ..\..\..\admin\b2blogs.php:383
 #: ..\..\..\admin\b2users.php:331
@@ -562,8 +562,8 @@ msgstr "Le fichier ne peut pas être enregistré!"
 
 #: ..\..\..\admin\b2blogs.php:475
 #, php-format
-msgid "You should check the permission for [%s]. See <a %s>online manual on file permissions</a>."
-msgstr ""
+msgid "You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>."
+msgstr "Vous devriez vérifier les permissions du fichier [%s]. Voir <a %s>manuel en ligne sur les permissions de fichiers</a>."
 
 #: ..\..\..\admin\b2blogs.php:481
 #, php-format
@@ -764,8 +764,8 @@ msgid "Regional settings updated."
 msgstr "Paramètres régionaux mis à jour."
 
 #: ..\..\..\admin\b2options.php:128
-msgid "You must not create empty locales!"
-msgstr ""
+msgid "You must provide a locale code!"
+msgstr "Vous devez fournir un code de locale!"
 
 #: ..\..\..\admin\b2options.php:153
 #, php-format
@@ -1230,20 +1230,15 @@ msgstr "Promotion invalide."
 
 #: ..\..\..\admin\b2users.php:279
 msgid "User level changed."
-msgstr ""
-
-#: ..\..\..\admin\b2users.php:281
-#, php-format
-msgid "Couldn't change %s's level."
-msgstr ""
+msgstr "Niveau de l'utilisateur modifié."
 
 #: ..\..\..\admin\b2users.php:301
 msgid "You can't delete yourself!"
-msgstr ""
+msgstr "Vous ne pouvez pas supprimer votre propre compte!"
 
 #: ..\..\..\admin\b2users.php:305
 msgid "You can't delete User #1!"
-msgstr ""
+msgstr "Vous ne pouvez pas supprimer l'utilisateur n°1!"
 
 #: ..\..\..\admin\b2users.php:319
 #, php-format
@@ -1264,7 +1259,7 @@ msgstr "Suppression de l'utilisateur..."
 
 #: ..\..\..\admin\b2users.php:361
 msgid "You can't delete Group #1!"
-msgstr ""
+msgstr "Vous ne pouvez pas supprimer le groupe n°1!"
 
 #: ..\..\..\admin\b2users.php:365
 msgid "You can't delete the default group for new users!"
@@ -1272,8 +1267,8 @@ msgstr ""
 
 #: ..\..\..\admin\b2users.php:378
 #, php-format
-msgid "Delete Group [%s]?"
-msgstr ""
+msgid "Delete group [%s]?"
+msgstr "Supprimer le groupe [%s]?"
 
 #: ..\..\..\admin\b2users.php:402
 msgid "Group deleted..."
@@ -1469,7 +1464,7 @@ msgstr "Ping de b2evolution.net"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:27
 msgid "to get listed on the \"recently updated\" list on b2evolution.net"
-msgstr ""
+msgstr "pour être listé dans \"recently updated\" sur b2evolution.net"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:28
 msgid "Ping technorati.com"
@@ -1546,7 +1541,7 @@ msgstr "Il s'agit de l'habillage par défaut qui sera utilisé pour afficher votre
 
 #: ..\..\..\admin\_blogs_form.php:23
 msgid "Allow skin switching"
-msgstr ""
+msgstr "Autoriser la sélection d'autres habillages."
 
 #: ..\..\..\admin\_blogs_form.php:23
 msgid "Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie)."
@@ -1652,7 +1647,7 @@ msgstr "Propriétés"
 #: ..\..\..\admin\_blogs_list.php:53
 #: ..\..\..\admin\_blogs_main.subform.php:31
 msgid "Default blog on index.php"
-msgstr ""
+msgstr "Blog par défaut sur index.php"
 
 #: ..\..\..\admin\_blogs_list.php:53
 msgid "Default"
@@ -1725,9 +1720,11 @@ msgstr ""
 msgid "Access parameters"
 msgstr "Paramètres d'accès"
 
+#  TRANS: current default blog
+#. TRANS: current default blog
 #: ..\..\..\admin\_blogs_main.subform.php:31
 msgid "Current default is:"
-msgstr ""
+msgstr "Actuellement:"
 
 #: ..\..\..\admin\_blogs_main.subform.php:32
 msgid "Other blog through index.php"
@@ -1739,7 +1736,7 @@ msgstr ""
 
 #: ..\..\..\admin\_blogs_main.subform.php:35
 msgid "Preferred access type"
-msgstr ""
+msgstr "Type d'accès préféré"
 
 #: ..\..\..\admin\_blogs_main.subform.php:39
 msgid "Blog Folder URL"
@@ -1751,7 +1748,7 @@ msgstr ""
 
 #: ..\..\..\admin\_blogs_main.subform.php:46
 msgid "URL blog name / Stub name"
-msgstr ""
+msgstr "Nom URL du blog / fichier stub"
 
 #: ..\..\..\admin\_blogs_main.subform.php:46
 msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
@@ -1776,10 +1773,11 @@ msgstr "Permissions des utilisateurs"
 msgid "Login "
 msgstr "Identifiant "
 
+#  TRANS: SHORT table header on TWO lines
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:22
 msgid "Is<br />member"
-msgstr ""
+msgstr "Est<br />membre"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:23
@@ -1886,6 +1884,7 @@ msgstr "Permission de modifier les propriétés de ce blog"
 msgid "Non members"
 msgstr "Non membres"
 
+#  TRANS: Javascript string
 #. TRANS: Javascript string
 #: ..\..\..\admin\_blogs_permissions.form.php:202
 msgid ""
@@ -2130,7 +2129,7 @@ msgstr "Les visiteurs ne peuvent pas voir ou laisser des commentaires sur cet ar
 
 #: ..\..\..\admin\_edit_form.php:418
 msgid "Disabled"
-msgstr ""
+msgstr "Désactivés"
 
 #: ..\..\..\admin\_edit_form.php:423
 msgid "Renderers"
@@ -2618,7 +2617,7 @@ msgstr ""
 #: ..\..\..\admin\_set_regional.form.php:47
 #: ..\..\..\admin\_set_regional.form.php:121
 msgid "Enabled"
-msgstr ""
+msgstr "Activée"
 
 #: ..\..\..\admin\_set_regional.form.php:48
 msgid "should the locale be available?"
@@ -2626,7 +2625,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:50
 msgid "name of the locale"
-msgstr ""
+msgstr "Nom de la locale"
 
 #: ..\..\..\admin\_set_regional.form.php:51
 #: ..\..\..\admin\_set_regional.form.php:146
@@ -2636,7 +2635,7 @@ msgstr "Jeu de caractètes"
 #: ..\..\..\admin\_set_regional.form.php:52
 #, php-format
 msgid "the charset for this locale. see <a %s>the specs</a>"
-msgstr ""
+msgstr "jeu de caractères de cette locale. Voir <a %s>specifications</a>"
 
 #: ..\..\..\admin\_set_regional.form.php:53
 msgid "Date format"
@@ -2681,11 +2680,12 @@ msgid "Create"
 msgstr "Créer"
 
 #  TRANS: this is a Javascript string
+#  TRANS: this is a Javascript string
 #. TRANS: this is a Javascript string
 #: ..\..\..\admin\_set_regional.form.php:71
 #, php-format
 msgid "This will replace locale \\'%s\\'. Ok?"
-msgstr ""
+msgstr "Ceci va remplacer la locale \\'%s\\'. Ok?"
 
 #: ..\..\..\admin\_set_regional.form.php:75
 #, php-format
@@ -2715,7 +2715,7 @@ msgstr "Si vous n'êtes pas dans le même fuseau horaire que le serveur. L'heure c
 
 #: ..\..\..\admin\_set_regional.form.php:97
 msgid "Default locale"
-msgstr ""
+msgstr "Locale par défaut"
 
 #: ..\..\..\admin\_set_regional.form.php:97
 msgid "Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or blog locale (in this order)."
@@ -2723,7 +2723,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:103
 msgid "Available locales"
-msgstr ""
+msgstr "Locales disponibles"
 
 #: ..\..\..\admin\_set_regional.form.php:108
 msgid "Hide translation info"
@@ -2749,16 +2749,16 @@ msgstr "Editer"
 
 #: ..\..\..\admin\_set_regional.form.php:129
 msgid "Strings"
-msgstr ""
+msgstr "Chaines"
 
 #: ..\..\..\admin\_set_regional.form.php:130
 msgid "Translated"
-msgstr ""
+msgstr "Traduites"
 
 #: ..\..\..\admin\_set_regional.form.php:134
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract"
-msgstr ""
+msgstr "Extraire"
 
 #: ..\..\..\admin\_set_regional.form.php:181
 msgid "up"
@@ -2778,7 +2778,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:197
 msgid "Copy locale"
-msgstr ""
+msgstr "Copier la locale"
 
 #: ..\..\..\admin\_set_regional.form.php:204
 msgid "Reset custom settings"
@@ -2786,7 +2786,7 @@ msgstr "Remise à zéro des réglages personnalisés"
 
 #: ..\..\..\admin\_set_regional.form.php:215
 msgid "No language file..."
-msgstr ""
+msgstr "Pas de fichier langue..."
 
 #: ..\..\..\admin\_set_regional.form.php:291
 msgid "Extract .po file into b2evo-format"
@@ -2802,7 +2802,7 @@ msgstr ""
 
 #: ..\..\..\admin\_users_form.php:49
 msgid "first user"
-msgstr ""
+msgstr "premier utilisateur"
 
 #: ..\..\..\admin\_users_form.php:50
 msgid "previous user"
@@ -2814,7 +2814,7 @@ msgstr "utilisateur suivant"
 
 #: ..\..\..\admin\_users_form.php:52
 msgid "last user"
-msgstr ""
+msgstr "dernier utilisateur"
 
 #: ..\..\..\admin\_users_form.php:55
 msgid "Close user profile"
@@ -3665,7 +3665,7 @@ msgstr "Article complet"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:653
 msgid "PREVIEW"
-msgstr ""
+msgstr "PREVISUALISATION"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:788
 msgid "Pages:"
@@ -4201,7 +4201,7 @@ msgstr "Chinois simplifié (CN)"
 
 #: ..\..\..\conf\_locales.php:142
 msgid "Trad. Chinese (TW)"
-msgstr ""
+msgstr "Chinois Trad. (TW)"
 
 #: ..\..\..\htsrv\comment_post.php:24
 msgid "You cannot leave comments on this post!"
@@ -4521,11 +4521,11 @@ msgstr "(deux fois)"
 #: ..\..\..\htsrv\_reg_form.php:32
 #, php-format
 msgid "Minimum %d characters, please."
-msgstr ""
+msgstr "%d caractères minimum, SVP."
 
 #: ..\..\..\htsrv\_reg_form.php:42
 msgid "Preferred language"
-msgstr ""
+msgstr "Langue préférrée"
 
 #: ..\..\..\htsrv\_reg_form.php:46
 msgid "Register!"
@@ -4541,19 +4541,19 @@ msgstr "Installation de b2evo"
 
 #: ..\..\..\install\index.php:52
 msgid "Installer for version "
-msgstr ""
+msgstr "Installateur de la version"
 
 #: ..\..\..\install\index.php:54
 msgid "Current installation"
-msgstr ""
+msgstr "Installation courante"
 
 #: ..\..\..\install\index.php:55
 msgid "Install menu"
-msgstr ""
+msgstr "Menu d'installation"
 
 #: ..\..\..\install\index.php:56
 msgid "PHP info"
-msgstr ""
+msgstr "PHP info"
 
 #: ..\..\..\install\index.php:57
 msgid "Go to Blogs"
@@ -4715,7 +4715,7 @@ msgstr ""
 #: ..\..\..\install\index.php:261
 #: ..\..\..\install\index.php:355
 msgid "mySQL Host"
-msgstr ""
+msgstr "Serveur mySQL"
 
 #: ..\..\..\install\index.php:261
 msgid "You probably won't have to change this"
@@ -4784,7 +4784,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:329
 msgid "GO!"
-msgstr ""
+msgstr "GO!"
 
 #: ..\..\..\install\index.php:336
 msgid "Need to start anew?"
@@ -4795,8 +4795,8 @@ msgid "<p>If you have installed b2evolution tables before and wish to start anew
 msgstr ""
 
 #: ..\..\..\install\index.php:347
-msgid "Config file recap..."
-msgstr ""
+msgid "Base config recap..."
+msgstr "Recapitulatif de la configuration de base..."
 
 #: ..\..\..\install\index.php:349
 #, php-format
@@ -5138,11 +5138,11 @@ msgstr ""
 
 #: ..\..\..\install\_functions_install.php:26
 msgid "Checking DB schema version..."
-msgstr ""
+msgstr "Vérification de la version du schéma BD..."
 
 #: ..\..\..\install\_functions_install.php:38
 msgid "NOT FOUND! This is not a b2evolution database."
-msgstr ""
+msgstr "NON TROUVE! Ceci n'est pas une base de données b2evolution."
 
 #: ..\..\..\install\_functions_install.php:42
 msgid "This version is too old!"

@@ -28,7 +28,7 @@
 			$defblog = $defblog->dget('shortname');
 		}
 		form_radio( 'blog_access_type', $blog_access_type,
-				array(  array( 'default', T_('Default blog on index.php'), $edited_Blog->get('baseurl').'index.php'.( isset($defblog) ? '  ['.T_('Current default is:').' '.$defblog.']' : '' ) ),
+				array(  array( 'default', T_('Default blog on index.php'), $edited_Blog->get('baseurl').'index.php'.( isset($defblog) ? '  ['. /* TRANS: current default blog */ T_('Current default is:').' '.$defblog.']' : '' ) ),
 								array( 'index.php', T_('Other blog through index.php'), 
 								$edited_Blog->get('baseurl').'index.php'.( ($Settings->get('links_extrapath')) ? '/'.$blog_stub : '?blog='.$blog) ),
 								array( 'stub', T_('Other blog through stub file'), $edited_Blog->get('baseurl').$blog_stub ),

@@ -344,7 +344,7 @@ to
 		?>
 		
 		<hr /> 
-		<h2><?php echo T_('Config file recap...')?></h2>
+		<h2><?php echo T_('Base config recap...')?></h2>
 		
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 	

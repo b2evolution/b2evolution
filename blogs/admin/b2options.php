@@ -125,7 +125,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				param( 'newloc_locale', 'string', true);
 				if( empty($newloc_locale) )
 				{
-					$status_update[] = '<span class="error">'.T_('You must not create empty locales!').'</span>';
+					$status_update[] = '<span class="error">'.T_('You must provide a locale code!').'</span>';
 					break;
 				}
 				

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 16:35+0200\n"
+"POT-Creation-Date: 2004-05-11 17:43+0200\n"
 "PO-Revision-Date: 2004-05-09 22:08+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -541,8 +541,8 @@ msgstr "Datei kann nicht geschrieben werden!"
 #: ..\..\..\admin\b2blogs.php:475
 #, fuzzy, php-format
 msgid ""
-"You should check the permission for [%s]. See <a %s>online manual on file "
-"permissions</a>."
+"You should check the file permissions for [%s]. See <a %s>online manual on "
+"file permissions</a>."
 msgstr ""
 "Du solltest die Dateirechte von [%s] überprüfen. Siehe <a %s>Onlineanleitung "
 "über Dateirechte</a>."
@@ -742,8 +742,9 @@ msgid "Regional settings updated."
 msgstr "Regionale Einstellungen aktualisiert."
 
 #: ..\..\..\admin\b2options.php:128
-msgid "You must not create empty locales!"
-msgstr "Du darfst keine leeren Locales erstellen!"
+#, fuzzy
+msgid "You must provide a locale code!"
+msgstr "Du musst ein eindeutiges Login angeben!"
 
 #: ..\..\..\admin\b2options.php:153
 #, php-format
@@ -1236,11 +1237,6 @@ msgstr "Ungültige Beförderung."
 msgid "User level changed."
 msgstr "Benutzerlevel geändert."
 
-#: ..\..\..\admin\b2users.php:281
-#, php-format
-msgid "Couldn't change %s's level."
-msgstr "Konnte %s's Level nicht ändern."
-
 #: ..\..\..\admin\b2users.php:301
 msgid "You can't delete yourself!"
 msgstr "Du kannst dich nicht selbst löschen!"
@@ -1276,8 +1272,8 @@ msgid "You can't delete the default group for new users!"
 msgstr "Du kannst die Standard-Gruppe für neue Benutzer nicht löschen!"
 
 #: ..\..\..\admin\b2users.php:378
-#, php-format
-msgid "Delete Group [%s]?"
+#, fuzzy, php-format
+msgid "Delete group [%s]?"
 msgstr "Lösche Gruppe [%s]?"
 
 #: ..\..\..\admin\b2users.php:402
@@ -1748,6 +1744,7 @@ msgstr "Legt die Sprache der Navigations-Links fürs Blog fest."
 msgid "Access parameters"
 msgstr "Zugriffsparameter"
 
+#. TRANS: current default blog
 #: ..\..\..\admin\_blogs_main.subform.php:31
 msgid "Current default is:"
 msgstr ""
@@ -4883,8 +4880,9 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\install\index.php:347
-msgid "Config file recap..."
-msgstr ""
+#, fuzzy
+msgid "Base config recap..."
+msgstr "Basis-Konfiguration"
 
 #: ..\..\..\install\index.php:349
 #, fuzzy, php-format
@@ -5545,6 +5543,12 @@ msgstr "[...] Lies mehr!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
+#~ msgid "Couldn't change %s's level."
+#~ msgstr "Konnte %s's Level nicht ändern."
+
+#~ msgid "You must not create empty locales!"
+#~ msgstr "Du darfst keine leeren Locales erstellen!"
 
 #~ msgid "Create new Locale"
 #~ msgstr "Erstelle neue Locale"

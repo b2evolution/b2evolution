@@ -278,7 +278,7 @@ else switch ($action)
 			if( $result )
 				echo '<p>'.T_('User level changed.').'</p>';
 			else
-				echo '<p class="error">'.sprintf( T_('Couldn\'t change %s\'s level.'), $user_data['user_login'] );
+				echo '<p class="error">'.sprintf( 'Couldn\'t change %s\'s level.', $user_data['user_login'] );
 			
 			// reset cache
 			$cache_userdata[ $id ] = '';
@@ -375,7 +375,7 @@ else switch ($action)
 		if( !$confirm )
 		{?>
 		<div class="panelinfo">
-			<h3><?php printf( T_('Delete Group [%s]?'), $del_Group->get( 'name' ) )?></h3>
+			<h3><?php printf( T_('Delete group [%s]?'), $del_Group->get( 'name' ) )?></h3>
 
 			<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
