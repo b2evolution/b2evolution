@@ -182,7 +182,7 @@
 	</div>
 
 	<div class="bSideItem">
-    <h3>Archives</h3>
+    <h3><?php echo T_('Archives') ?></h3>
     <ul>
 			<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 				require( dirname(__FILE__)."/_archives.php"); 
@@ -192,7 +192,7 @@
   </div>
 
 	<div class="bSideItem">
-    <h3>Choose skin</h3>
+    <h3><?php echo T_('Choose skin') ?></h3>
 		<ul>
 			<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
 			for( skin_list_start(); skin_list_next(); ) { ?>

@@ -124,7 +124,7 @@
 					echo ' - ';
 					the_language();
 					echo ' - ', T_('Status'), ': ';
-					the_status(); 
+					the_status( false ); 
 				?>
 			</div>
 				

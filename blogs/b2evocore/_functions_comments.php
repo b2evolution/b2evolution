@@ -387,9 +387,13 @@ function comment_post_link()
  * comment_blog_name(-)
  * fplanque added
  */
-function comment_blog_name() 
+function comment_blog_name( $disp = true ) 
 {
-	global $commentdata;	echo stripslashes($commentdata['blog_name']);
+	global $commentdata;
+	$blog_name = stripslashes($commentdata['blog_name']);
+	if( !$disp )
+		return $blog_name;
+	echo $blog_name;
 }
 
 /*****

@@ -154,7 +154,7 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 
 <form id=switcher action="<?php bloginfo('blogurl') ?>" method=get>
-	<fieldset><label for=set><h4>Choose a skin&nbsp;:</h4></label> 
+	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label> 
 	<select id=set name="skin">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
 		for( skin_list_start(); skin_list_next(); ) 
@@ -173,7 +173,7 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 </form>
 
 
-<h4>Archives&nbsp;:</h4>
+<h4><?php echo T_('Archives') ?>&nbsp;:</h4>
 <ul>
 	<?php	require( dirname(__FILE__)."/_archives.php"); ?>
 </ul>

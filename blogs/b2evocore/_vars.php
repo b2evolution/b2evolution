@@ -167,4 +167,13 @@ $month_abbrev['11'] = NT_('Nov');
 // TRANS: abbrev. for December
 $month_abbrev['12'] = NT_('Dec');
 
+// the post statuses:
+$post_status = array (
+	'published' => NT_('Published'),
+	'deprecated' => NT_('Deprecated'),
+	'protected' => NT_('Protected'),
+	'private' => NT_('Private'),
+	'draft' => NT_('Draft'),
+);
+
 ?>

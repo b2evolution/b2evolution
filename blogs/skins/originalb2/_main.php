@@ -144,7 +144,7 @@ Categories: <?php the_categories() ?>
 	<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
 </form>
 
-<h4>archives:</h4>
+<h4><?php echo T_('archives') ?>:</h4>
 <ul class="compress">
 <?php	require( dirname(__FILE__)."/_archives.php"); ?>
 </ul>

@@ -385,10 +385,14 @@ function the_ID()
  *
  * Display post status
  */
-function the_status() 
+function the_status( $raw = true ) 
 {
-	global $postdata;
-	echo $postdata['Status'];
+	global $post_status, $postdata;
+	$status = $postdata['Status'];
+	if( $raw )
+		echo $status;
+	else
+		echo T_($post_status[$status]);
 }
 
 

@@ -19,9 +19,7 @@
 	
 	if( $CommentList->get_num_rows() == 0 )
 	{	// No comment has been found:
-	?>
-		<p>No comment yet...</p>	
-	<?php
+		echo '<p>', T_('No comment yet...'), '</p>';
 	}
 	else 
 	{	// Loop through comments:
@@ -32,7 +30,7 @@
 	
 			<a name="c<?php comment_ID() ?>"></a>
 			<div class="bComment">
-				<h3 class="bTitle">In response to: <a href="<?php comment_post_link() ?>" title="Original post on <?php comment_blog_name() ?>"><?php comment_post_title(); ?></a></h3>
+				<h3 class="bTitle"><?php echo T_('In response to:') ?> <a href="<?php comment_post_link() ?>" title="<?php printf( T_('Original post on %s'), comment_blog_name( false ) ); ?>"><?php comment_post_title(); ?></a></h3>
 				<div class="bCommentTitle"><?php comment_author() ?> <?php comment_author_url_link("", " &middot; ", "") ?></div>
 				<div class="bCommentText">
 					<?php comment_text() ?>

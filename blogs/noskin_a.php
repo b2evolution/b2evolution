@@ -248,7 +248,7 @@ the_date( '', '<h2>', '</h2>' );
 	</div>
 
 	<div class="bSideItem">
-    <h3>Archives</h3>
+    <h3><?php echo T_('Archives') ?></h3>
     <ul>
 			<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 				require( get_path('skins').'/_archives.php'); 

@@ -82,7 +82,7 @@
 		require( dirname(__FILE__)."/_bloglist.php"); 
 		// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
-	<div class="sidetitle" align="center">skin the site</div>
+	<div class="sidetitle" align="center"><?php echo T_('skin the site') ?></div>
 	<div class="sidebody">
 	<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
 		for( skin_list_start(); skin_list_next(); ) { ?>
@@ -90,7 +90,7 @@
 	<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 	</div>
 
-	<div class="sidetitle" align="center">archives</div>
+	<div class="sidetitle" align="center"><?php echo T_('archives') ?></div>
 	<div class="sidebody">
 	<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 		require( dirname(__FILE__)."/_archives.php"); 

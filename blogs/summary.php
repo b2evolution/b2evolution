@@ -53,7 +53,7 @@
 <div class="NavBar">
 <div id="Logo">&nbsp;</div>
 <div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" -->Summary demo<!-- InstanceEndEditable --></h1>
+<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Summary demo') ?><!-- InstanceEndEditable --></h1>
 </div>
 </div>
 
@@ -63,7 +63,7 @@
 </div>
 
 
-<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" -->This demo template displays a summary of last posts in all blogs<!-- InstanceEndEditable --></div>
+<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php echo T_('This demo template displays a summary of last posts in all blogs') ?><!-- InstanceEndEditable --></div>
 
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
@@ -94,7 +94,7 @@
 			<?php
 			}
 			?>
-			<li><a href="<?php blog_list_iteminfo('blogurl', 'raw'); ?>">plus d'articles...</a></li>
+			<li><a href="<?php blog_list_iteminfo('blogurl', 'raw'); ?>"><?php echo T_('More posts...') ?></a></li>
 		</ul>
 		<?php
 	}

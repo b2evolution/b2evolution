@@ -93,7 +93,7 @@
 <div class="NavBar">
 <div id="Logo">&nbsp;</div>
 <div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" -->Multiblog demo<!-- InstanceEndEditable --></h1>
+<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Multiblog demo') ?><!-- InstanceEndEditable --></h1>
 </div>
 </div>
 
@@ -103,7 +103,7 @@
 </div>
 
 
-<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" -->This demo template displays 3 blogs at once (1 on the left, 2 on the right)<!-- InstanceEndEditable --></div>
+<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php echo T_('This demo template displays 3 blogs at once (1 on the left, 2 on the right)') ?><!-- InstanceEndEditable --></div>
 
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
