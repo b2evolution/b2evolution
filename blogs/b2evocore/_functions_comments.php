@@ -307,7 +307,7 @@ function comment_author_url_link($linktext='', $before='', $after='') {
 	if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url')) {
 		$display = ($linktext != '') ? $linktext : stripslashes($url);
 		echo $before;
-		echo '<a href="'.stripslashes($url).'" target="_blank">'.$display.'</a>';
+		echo '<a href="'.stripslashes($url).'">'.$display.'</a>';
 		echo $after;
 	}
 }

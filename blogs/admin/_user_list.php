@@ -28,11 +28,11 @@
 		?>
 		<td><strong><a href="b2team.php?action=view&amp;user=<?php echo $user_data['ID'] ?>"><?php echo $user_data["user_nickname"] ?></a></strong></td>
 		<?php
-		echo "<td>".$user_data["user_firstname"]."&nbsp;".$user_data["user_lastname"]."</td>\n";
+		echo "<td>".$user_data['user_firstname']."&nbsp;".$user_data["user_lastname"]."</td>\n";
 		echo "<td>&nbsp;<a href=\"mailto:$email\" title=\"e-mail: $email\"><img src=\"img/email.gif\" border=\"0\" alt=\"e-mail: $email\" /></a>&nbsp;</td>";
 		echo "<td>&nbsp;";
-		if (($user_data["user_url"] != "http://") and ($user_data["user_url"] != ""))
-			echo "<a href=\"$url\" target=\"_blank\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
+		if (($user_data['user_url'] != "http://") and ($user_data['user_url'] != ""))
+			echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
 		echo "</td>\n";
 		echo "<td>".$user_data["user_level"];
 		if (($user_level >= 2) && ($user_level > ($user_data["user_level"] + 1)))

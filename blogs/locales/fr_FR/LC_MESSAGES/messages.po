@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 0.8.3-alpha1\n"
+"Project-Id-Version: b2evolution 0.8.6.1\n"
 "POT-Creation-Date: 2003-11-02 21:04+0100\n"
 "PO-Revision-Date: 2003-11-02 21:10+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
