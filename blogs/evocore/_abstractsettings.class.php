@@ -73,32 +73,109 @@ class AbstractSettings
 
 
 	/**
+	 * The number of column keys to cache by. This are the first x keys of
+	 * {@link $colkeynames}. 0 means 'load all'.
+	 *
+	 * @var integer
+	 */
+	var $cacheByColKeys = 0;
+
+
+	/**
 	 * The internal cache
 	 *
 	 * @access protected
-	 * @var mixed Contains the loaded settings or false, if not settings available.
+	 * @var array|NULL|false Contains the loaded settings or false, if settings
+	 *                       could not be loaded or NULL if not initialized.
 	 */
-	var $cache = false;
+	var $cache = NULL;
+
+
+	/**
+	 * Do we have loaded everything?
+	 *
+	 * @var boolean
+	 */
+	var $allLoaded = false;
+
 
 	/**
 	 * Constructor, loads settings.
 	 */
 	function AbstractSettings()
 	{
-		global $DB;
+	}
 
-		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
-																.' FROM '.$this->dbtablename );
 
-		if( !$result )
-		{
-			return false;
+	/**
+	 * Load all settings, disregarding the derived classes setting of
+	 * {@link $cacheByColKeys} - useful if you know that you want to get
+	 * all user settings for example.
+	 */
+	function loadAll()
+	{
+		return $this->load();
+	}
+
+
+	/**
+	 *
+	 * @return boolean always true
+	 */
+	function load( $getArgs = NULL )
+	{
+		if( $this->allLoaded )
+		{ // already all loaded
+			return true;
 		}
+
+		/**
+		 * The where clause - gets filled when {@link $cacheByColKeys} is used.
+		 */
+		$where = array();
+
+		if( $this->cacheByColKeys && is_array($getArgs) )
+		{
+			$testCache = $this->cache;
+
+			for( $i = 0; $i < $this->cacheByColKeys; $i++ )
+			{
+				$where[] = $this->colkeynames[$i].' = "'.$getArgs[$i].'"';
+
+				if( !is_array( $testCache )
+						|| !isset( $testCache[$getArgs[$i]] )
+						|| !($testCache =& $testCache[$getArgs[$i]]) )
+				{
+					break;
+				}
+			}
+
+			if( $i == $this->cacheByColKeys )
+			{ // already loaded!
+				return true;
+			}
+		}
+		else
+		{ // we're about to load everything
+			$this->allLoaded = true;
+		}
+
+
+		global $DB;
+		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colkeynames ).', '.$this->colvaluename
+																.' FROM '.$this->dbtablename
+																.( count( $where ) ?
+																		' WHERE '.implode( ' AND ', $where ) :
+																		'' ) );
 
 		switch( count( $this->colkeynames ) )
 		{
 			case 1:
-				foreach( $result as $loop_row )
+				if( !$result )
+				{
+					$this->cache[ $getArgs[0] ] = NULL;
+				}
+				else foreach( $result as $loop_row )
 				{
 					$this->cache[$loop_row->{$this->colkeynames[0]}]->value = $loop_row->{$this->colvaluename};
 					$this->cache[$loop_row->{$this->colkeynames[0]}]->dbuptodate = true;
@@ -106,7 +183,11 @@ class AbstractSettings
 				break;
 
 			case 2:
-				foreach( $result as $loop_row )
+				if( !$result )
+				{
+					$this->cache[ $getArgs[0] ][ $getArgs[1] ] = NULL;
+				}
+				else foreach( $result as $loop_row )
 				{
 					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->value = $loop_row->{$this->colvaluename};
 					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}]->dbuptodate = true;
@@ -114,7 +195,11 @@ class AbstractSettings
 				break;
 
 			case 3:
-				foreach( $result as $loop_row )
+				if( !$result )
+				{
+					$this->cache[ $getArgs[0] ][ $getArgs[1] ][ $getArgs[2] ] = NULL;
+				}
+				else foreach( $result as $loop_row )
 				{
 					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->value = $loop_row->{$this->colvaluename};
 					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->uptodate = true;
@@ -122,9 +207,10 @@ class AbstractSettings
 				break;
 
 			default:
-				die( 'Settings keycount not supported' );
-
+				die( 'Settings keycount not supported for class '.get_class() );
 		}
+
+		return true;
 	}
 
 
@@ -143,10 +229,7 @@ class AbstractSettings
 		$args = func_get_args();
 		// echo 'get: ['.implode(', ', $args ).']<br />';
 
-		if( !$this->cache )
-		{
-			return false;
-		}
+		$this->load( $args );
 
 		if( count( $args ) != count( $this->colkeynames ) )
 		{
@@ -155,32 +238,43 @@ class AbstractSettings
 			return false;
 		}
 
+		$r = false;
+
 		switch( count( $this->colkeynames ) )
 		{
 			case 1:
 				if( isset($this->cache[ $args[0] ]) )
 				{
-					return $this->cache[ $args[0] ]->value;
+					$r = $this->cache[ $args[0] ]->value;
 				}
 				break;
 			case 2:
 				if( isset($this->cache[ $args[0] ][ $args[1] ]) )
 				{
-					return $this->cache[ $args[0] ][ $args[1] ]->value;
+					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
 				break;
 			case 3:
 				if( isset($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]) )
 				{
-					return $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
+					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
 				break;
 			default:
-				return false;
+				$r = false;
 		}
 
-		$Debuglog->add( get_class($this).'::get(): queried setting ['.implode( ' / ', $args ).'] not defined.', 'settings' );
-		return NULL;
+		if( $r === false )
+		{
+			$Debuglog->add( get_class($this).'::get(): queried setting ['.implode( ' / ', $args ).'] not defined.', 'settings' );
+			return NULL;
+		}
+		else
+		{
+			$Debuglog->add( get_class($this).'::get: ['.implode(', ', $args ).']: '
+											.'['.var_export( $r, true ).']', 'settings' );
+			return $r;
+		}
 	}
 
 
@@ -196,7 +290,6 @@ class AbstractSettings
 	function get_cond( &$toset )
 	{
 		$args = func_get_args();
-
 		array_shift( $args );
 
 		$result = call_user_func_array( array( &$this, 'get' ), $args );
@@ -221,13 +314,13 @@ class AbstractSettings
 	 */
 	function set()
 	{
-		global $Debuglog;
-
 		$args = func_get_args();
 		// echo 'get: ['.implode(', ', $args ).']<br />';
 
 		if( count( $args ) != (count( $this->colkeynames ) + 1) )
 		{
+			global $Debuglog;
+
 			$Debuglog->add( 'Count of arguments for AbstractSettings::set() does not match $colkeyname + 1 (colkeyvalue).', 'error' );
 			return false;
 		}
@@ -333,6 +426,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/08 02:23:44  blueyed
+ * allow caching by column keys (e.g. user ID)
+ *
  * Revision 1.3  2004/10/23 21:32:42  blueyed
  * documentation, return value
  *

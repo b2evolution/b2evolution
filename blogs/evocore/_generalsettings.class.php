@@ -65,12 +65,15 @@ class GeneralSettings extends AbstractSettings
 		$this->colkeynames = array( 'set_name' );
 		$this->colvaluename = 'set_value';
 
+
 		parent::AbstractSettings();
 
 		if( $this->get( 'db_version' ) != $new_db_version )
-		{	// Database is not up to date:
-			$error_message = 'Database schema is not up to date. You have schema version '.$this->get( 'db_version' ).', but we would need '.$new_db_version.'.';
-			require dirname(__FILE__).'/_conf_error.inc.php';	// error & exit
+		{ // Database is not up to date:
+			$error_message = 'Database schema is not up to date. You have schema version [<em>'
+											.var_export( $this->get( 'db_version' ), true )
+											.'</em>], but we would need [<em>'.$new_db_version.'</em>].';
+			require dirname(__FILE__).'/_conf_error.inc.php'; // error & exit
 		}
 	}
 
@@ -78,6 +81,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/08 02:23:44  blueyed
+ * allow caching by column keys (e.g. user ID)
+ *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

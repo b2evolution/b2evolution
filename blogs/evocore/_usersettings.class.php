@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UserSettings class, to handle user/name/value triplets. {{{
+ * This file implements the UserSettings class, to handle user/name/value triplets.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -36,7 +36,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$ }}}
+ * @version $Id$
  *
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -62,6 +62,7 @@ class UserSettings extends AbstractSettings
 	{ // constructor
 		$this->dbtablename = 'T_usersettings';
 		$this->colkeynames = array( 'uset_user_ID', 'uset_name' );
+		$this->cacheByColKeys = 1;
 		$this->colvaluename = 'uset_value';
 
 		parent::AbstractSettings();
@@ -69,39 +70,53 @@ class UserSettings extends AbstractSettings
 
 
 	/**
-	 * get a setting from the DB settings table
+	 * Get a setting from the DB user settings table
+	 *
 	 * @param string name of setting
 	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function get( $setting, $user = '#' )
+	function get( $setting, $user = NULL )
 	{
 		global $current_User;
-		if( $user == '#' )
+
+		if( $user === NULL )
+		{
 			return parent::get( $current_User->ID, $setting );
+		}
 		else
+		{
 			return parent::get( $user, $setting );
+		}
 	}
 
 
 	/**
-	 * temporarily sets a setting (updateDB(-) writes it to DB)
+	 * Temporarily sets a user setting ({@link updateDB()} writes it to DB)
 	 *
 	 * @param string name of setting
 	 * @param mixed new value
 	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function set( $setting, $value, $user = '#' )
+	function set( $setting, $value, $user = NULL )
 	{
 		global $current_User;
-		if( $user == '#' )
+
+		if( $user === NULL )
+		{
 			return parent::set( $current_User->ID, $setting, $value );
+		}
 		else
+		{
 			return parent::set( $user, $setting, $value );
+		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.2  2004/11/08 02:23:44  blueyed
+ * allow caching by column keys (e.g. user ID)
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *
