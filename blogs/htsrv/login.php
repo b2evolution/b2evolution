@@ -60,7 +60,7 @@ switch($action)
 		 * Retrieve lost password:
 		 */
 		param( 'log', 'string', true );
-		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url.'/' );
 		// echo 'login: ', $log;
 		$user_data	= get_userdatabylogin($log);
 		$user_email	= $user_data['user_email'];
@@ -109,10 +109,14 @@ switch($action)
 		 */
 		if( is_logged_in() )
 		{	// The user is already logged in...
-			$error = T_('Note: You are already logged in!');
+			// TODO: use $login_error to be clear
+			
+			$error = is_string($error) ? $error.'<br />' : '';
+			$error .= T_('Note: You are already logged in!');
 
+			// Note: if $redirect_to is already set, param() will not touch it.
 			param( 'redirect_to', 'string', $ReqURI );
-			if( basename( $redirect_to ) == basename( $_SERVER['SCRIPT_NAME'] ) )
+			if( preg_match( '/login.php([&?].*)?$/', $redirect_to ) )
 			{ // avoid "endless loops"
 				$redirect_to = $admin_url.'/';
 			}
@@ -121,6 +125,7 @@ switch($action)
 
 		// Display login form:
 		require( dirname(__FILE__).'/_login_form.php' );
+		debug_info();
 		exit();
 
 } // switch

@@ -51,7 +51,7 @@ if( !isset($_SERVER['REQUEST_URI']) )
 		</p>
 		<?php
 	}
-		 
+
 	$ReqURI = $ReqPath;
 	if( isset($_SERVER['QUERY_STRING']) )
 	{ //Made a $_GET request
@@ -66,6 +66,7 @@ else
 	$ReqPath = $ReqPath[0];
 }
 
+$Debuglog->add( 'HTTP Host: '.$_SERVER['HTTP_HOST'] );
 $Debuglog->add( 'Request URI: '.$ReqURI );
 $Debuglog->add( 'Request Path: '.$ReqPath );
 

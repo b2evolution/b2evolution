@@ -9,6 +9,7 @@
  * @package admin
  *
  * @todo: Permissions!
+ * @todo: favorite folders/bookmarks
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -19,7 +20,7 @@ class FileManager
 	 * @param string
 	 */
 	var $root;
-	
+
 	/**
 	 * current working directory
 	 * @param string
@@ -32,22 +33,33 @@ class FileManager
 	 * @var boolean
 	 */
 	var $dirsattop = true;
-	
+
 	/**
 	 * User preference: show hidden files?
 	 * @var boolean
 	 */
 	var $showhidden = true;
+
+	/**
+	 * User preference: show permissions like "ls -l" (true) or octal (false)?
+	 * @var boolean
+	 */
+	var $permlikelsl = true;
+	
+	/**
+	 * User preference: recursive size of dirs?
+	 * @todo needs special permission (server load!)
+	 * @var boolean
+	 */
+	var $fulldirsize = false;
 	
 	// --- going to user options ---
-	var $fulldirsize = false;
-	var $permlikelsl = true; // show permissions like "ls -l" or octal?
 	var $default_chmod_file = 0700;
 	var $default_chmod_dir = 0700;
 
 
 	/* ----- PRIVATE ----- */
-	
+
 	/**
 	 * the current index of the directory items (looping)
 	 * @var integer
@@ -63,7 +75,7 @@ class FileManager
 	 * @access protected
 	 */
 	var $order = '#';
-	
+
 	/**
 	 * files ordered ascending?
 	 * '#' is default and means ascending for 'name', descending for the rest
@@ -77,61 +89,78 @@ class FileManager
 	 * @var string
 	 * @access protected
 	 */
-	var $cd = '#';
+	var $cd = '';
 
 
 	/**
 	 * Constructor
 	 *
 	 * @param User the current User {@link User}}
-	 * @param string the dir of the Filemanager object
+	 * @param string the root directory ('user' => user's dir)
+	 * @param string the URL where the object is included (for generating links)
+	 * @param string the dir of the Filemanager object (relative to root)
 	 * @param string order files by what? ('#' means 'name')
-	 * @param string 
+	 * @param string
 	 */
-	function FileManager( $cUser, $url, $cd = '#', $order = '#', $asc = '#' )
+	function FileManager( $cUser, $root = 'user', $url, $cd = '', $order = '#', $asc = '#' )
 	{
 		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
 
+		$this->entries = array();  // the directory entries
 		$this->Messages = new Log( 'error' );
-		$this->user = $cUser;
+		
+		$this->User = $cUser;
 
 		$this->order = $order;
 		$this->orderasc = $asc;
 
 		$this->loadSettings();
 		
-		$this->imgpath = $basepath.'/'.$admin_subdir.'/img/fileicons/';
-		$this->imgurl = $admin_url.'/img/fileicons/';
-		$media_dir = $basepath.'/'.$media_subdir;
-		#$media_dir = 'd:\\home';
-
-		if( $this->user->login == 'demouser' )
-		{
-			$media_dir = $basepath.'/media_test';
-			$media_subdir = 'media_test';
-		}
-
-		$media_dir = str_replace( '\\', '/', $media_dir );
-
 		// base URL, used for created links
 		$this->url = $url;
 
-		$this->entries = array();  // the directory entries
+		// path/url for images (icons)
+		$this->imgpath = $basepath.'/'.$admin_subdir.'/img/fileicons/';
+		$this->imgurl = $admin_url.'/img/fileicons/';
 
 		// TODO: get user's/group's root
-		$this->root = $media_dir;
+		#$this->root = $media_dir;
+		#$this->root_url = $baseurl.'/'.$media_subdir;
+		
+		// get root directory
+		if( $this->User->login == 'demouser' )
+		{
+			$this->root = $basepath.'/media_test';
+			$this->root_url = $baseurl.'/media_test';
+		}
+		elseif( is_array( $root ) )
+		{
+			switch( $root[0] )
+			{
+				case 'blog':
+					$Blog = Blog_get_by_ID( $root[1] );
+					$this->root = $Blog->dir_media;
+					$this->root_url = $Blog->url_media;
+					break;
+			}
+		}
+		else switch( $root )
+		{
+			case 'user':
+				$this->root = $basepath.'/'.$media_subdir.'/users/'.$this->User->login;
+				$this->root_url = $baseurl.'/'.$media_subdir.'/users/'.$this->User->login;
+				break;
+		}
+
+		#$media_dir = $basepath.'/'.$media_subdir;
+		#$media_dir = 'd:\\home';
+
+		#$media_dir = str_replace( '\\', '/', $media_dir );
+
 		$this->debug( $this->root, 'root' );
-		$this->root_url = $baseurl.'/'.$media_subdir;
 		$this->debug( $this->root_url, 'root_url' );
 
-		if( $cd == '#' || empty($cd) )
-		{
-			$this->cwd = $media_dir;
-		}
-		else
-		{
-			$this->cwd = $this->root.$cd;
-		}
+		$this->cwd = $this->root.$cd;
 		$this->debug( $this->cwd, 'cwd' );
 
 		// get real cwd
@@ -148,9 +177,8 @@ class FileManager
 			$this->cwd = $this->root;
 		}
 		else
-		{
+		{ // allowed
 			$this->cwd = $realcwd;
-			$this->cd = $cd;  // remember the change
 		}
 
 		// get the subpath relative to root
@@ -159,47 +187,7 @@ class FileManager
 		$this->debug( $this->subpath, 'subpath' );
 
 
-		$this->dir = @dir( $this->cwd );
-		if( empty($realcwd) || !$this->dir )
-		{
-			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->cwd ) );
-			$this->entries = false;
-		}
-		else
-		{ // read the directory
-			$i = 0;
-			while( $entry = $this->dir->read() )
-			{
-				if( $entry == '.' || $entry == '..'
-						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
-					)
-				{ // don't use those
-					continue;
-				}
-
-				$i++;
-
-				$this->entries[ $i ]['name'] = $entry;
-				if( is_dir( $this->cwd.'/'.$entry ) )
-				{
-					$this->entries[ $i ]['type'] = 'dir';
-					if( $this->fulldirsize )
-						$this->entries[ $i ]['size'] = $this->get_dirsize( $this->cwd.'/'.$entry );
-					else $this->entries[ $i ]['size'] = false;
-				}
-				else
-				{
-					$this->entries[ $i ]['type'] = 'file';
-					$this->entries[ $i ]['size'] = filesize( $this->cwd.'/'.$entry );
-				}
-
-				$this->entries[ $i ]['lastm'] = filemtime( $this->cwd.'/'.$entry );
-				$this->entries[ $i ]['perms'] = fileperms( $this->cwd.'/'.$entry );
-
-			}
-			$this->dir->close();
-
-		}
+		$this->loadentries();
 
 		// load file icons..
 		require( $core_dirout.'/'.$admin_subdir.'/img/fileicons/fileicons.php' );
@@ -256,6 +244,54 @@ class FileManager
 		$this->restart();
 
 		$this->debug( $this->entries, 'entries' );
+	}
+
+
+	function loadentries()
+	{
+		$dir = @dir( $this->cwd );
+		if( !$dir )
+		{
+			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->cwd ) );
+			$this->entries = false;
+		}
+		else
+		{ // read the directory
+			$i = 0;
+			while( $entry = $dir->read() )
+			{
+				if( $entry == '.' || $entry == '..'
+						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
+					)
+				{ // don't use those
+					continue;
+				}
+
+				$i++;
+
+				$this->entries[ $i ]['name'] = $entry;
+				if( is_dir( $this->cwd.'/'.$entry ) )
+				{
+					$this->entries[ $i ]['type'] = 'dir';
+					if( $this->fulldirsize )
+						$this->entries[ $i ]['size'] = $this->get_dirsize( $this->cwd.'/'.$entry );
+					else $this->entries[ $i ]['size'] = false;
+				}
+				else
+				{
+					$this->entries[ $i ]['type'] = 'file';
+					$this->entries[ $i ]['size'] = filesize( $this->cwd.'/'.$entry );
+				}
+
+				$this->entries[ $i ]['lastm'] = filemtime( $this->cwd.'/'.$entry );
+				$this->entries[ $i ]['perms'] = fileperms( $this->cwd.'/'.$entry );
+
+			}
+			$dir->close();
+
+		}
+
+
 	}
 
 
@@ -339,6 +375,14 @@ class FileManager
 	}
 
 
+	/**
+	 * generated the option list for available root directories
+	 */
+	function form_optionlist_roots()
+	{
+	}
+
+
 	function link_sort( $type, $atext )
 	{
 		$r = '<a href="'.url_add_param( $this->url, 'cd='.$this->subpath.'&amp;order='.$type );
@@ -366,6 +410,50 @@ class FileManager
 
 
 	/**
+	 * translates $asc parameter, if it's '#'
+	 * @param boolean sort ascending?
+	 * @return integer 1 for ascending, 0 for descending
+	 */
+	function translate_asc( $asc, $order )
+	{
+		if( $asc != '#' )
+		{
+			return $asc;
+		}
+		elseif( $this->orderasc != '#' )
+		{
+			return $this->orderasc;
+		}
+		else
+		{
+			return ($order == 'name') ? 1 : 0;
+		}
+	}
+
+
+	/**
+	 * translates $order parameter, if it's '#'
+	 * @param string order by?
+	 * @return string order by what?
+	 */
+	function translate_order( $order )
+	{
+		if( $order != '#' )
+		{
+			return $order;
+		}
+		elseif( $this->order != '#' )
+		{
+			return $this->order;
+		}
+		else
+		{
+			return 'name';
+		}
+	}
+
+
+	/**
 	 * sorts the entries.
 	 *
 	 * @param string the entries key
@@ -378,25 +466,22 @@ class FileManager
 			return false;
 		}
 
-		if( $order == '#' )
-			$order = $this->order;
+		$order = $this->translate_order( $order );
+		$asc = $this->translate_asc( $asc, $order );
 
-		if( $asc == '#' )
+		if( $order == 'size' )
 		{
-			if( $this->orderasc != '#' )
+			if( $this->fulldirsize )
 			{
-				$asc = $this->orderasc;
+				$sortfunction = '$r = ( $a[\'size\'] - $b[\'size\'] );';
 			}
 			else
 			{
-				$asc = ($order == 'name') ? $asc = 1 : $asc = 0;
+				$sortfunction = '$r = ($a[\'type\'].$b[\'type\'] == \'dirdir\') ?
+															strcasecmp( $a[\'name\'], $b[\'name\'] )
+															: ( $a[\'size\'] - $b[\'size\'] );';
 			}
 		}
-
-		if( $order == 'size' )
-			$sortfunction = '$r = ($a[\'type\'].$b[\'type\'] == \'dirdir\') ?
-														strcasecmp( $a[\'name\'], $b[\'name\'] )
-														: ( $a[\'size\'] - $b[\'size\'] );';
 		elseif( $order == 'type' )
 		{ // stupid dirty hack: copy the whole Filemanager into global array to access filetypes // TODO: optimize
 			global $typetemp;
@@ -418,6 +503,7 @@ class FileManager
 													$r = 1;';
 		$sortfunction .= 'return $r;';
 
+		#echo $sortfunction;
 		usort( $this->entries, create_function( '$a, $b', $sortfunction ) );
 	}
 
@@ -1076,12 +1162,41 @@ class FileManager
 		}
 	}
 
+	
+	/**
+	 * Create a root dir, while making the suggested name an safe filename.
+	 * @param string the path where to create the directory
+	 * @param string suggested dirname, will be converted to a safe dirname
+	 * @param integer permissions for the new directory (octal format)
+	 * @return mixed full path that has been created; false on error
+	 */
+	function create_rootdir( $path, $suggested_name, $chmod = '#' )
+	{
+		$realname = $this->safefilename( $suggested_name );
+		if( $this->createdir( $realname, $path, $chmod ) )
+		{
+			return $path.'/'.$realname;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 
 	/**
-	 * create a directory
+	 * Create a directory.
+	 * @param string the name of the directory
+	 * @param string path to create the directory in (default is cwd)
+	 * @param integer permissions for the new directory (octal format)
+	 * @return boolean true on success, false on failure
 	 */
-	function createdir( $dirname, $chmod = '#' )
+	function createdir( $dirname, $path = '#', $chmod = '#' )
 	{
+		if( $path == '#' )
+		{
+			$path = $this->cwd;
+		}
 		if( $chmod == '#' )
 		{
 			$chmod = $this->default_chmod_dir;
@@ -1091,9 +1206,9 @@ class FileManager
 			$this->Messages->add( T_('Cannot create empty directory.') );
 			return false;
 		}
-		elseif( !mkdir( $this->cwd.'/'.$dirname, $chmod ) )
+		elseif( !mkdir( $path.'/'.$dirname, $chmod ) )
 		{
-			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $this->cwd ) );
+			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $path ) );
 			return false;
 		}
 
@@ -1103,7 +1218,9 @@ class FileManager
 
 
 	/**
-	 * create a file
+	 * Create a file
+	 * @param string filename
+	 * @param integer permissions for the new file (octal format)
 	 */
 	function createfile( $filename, $chmod = '#' )
 	{
@@ -1170,12 +1287,20 @@ class FileManager
 
 	/**
 	 * create crossplatform-safe filename
+	 * @param string filename/path
+	 * @return string converted path
 	 */
 	function safefilename( $path )
 	{
-		// TODO: create safe path
+		$path = preg_replace( '/[^A-Za-z0-9]+/', '_', $path );
+		
+		// remove trailing/leading '_'
+		$path = preg_replace( '/^_+/', '', $path );
+		$path = preg_replace( '/_+$/', '', $path );
+	
 		return $path;
 	}
+
 
 	/**
 	 * converts bytes to readable bytes/kb/mb/gb
@@ -1327,10 +1452,11 @@ class FileManager
 	function loadSettings()
 	{
 		global $UserSettings;
-		
-		$UserSettings->get_cond( $this->dirsattop,   'fm_dirsattop',   $this->user->ID );
-		$UserSettings->get_cond( $this->permlikelsl, 'fm_permlikelsl', $this->user->ID );
-		$UserSettings->get_cond( $this->fulldirsize, 'fm_fulldirsize', $this->user->ID );
+
+		$UserSettings->get_cond( $this->dirsattop,   'fm_dirsattop',   $this->User->ID );
+		$UserSettings->get_cond( $this->permlikelsl, 'fm_permlikelsl', $this->User->ID );
+		$UserSettings->get_cond( $this->fulldirsize, 'fm_fulldirsize', $this->User->ID );
+		$UserSettings->get_cond( $this->showhidden,  'fm_showhidden',  $this->User->ID );
 	}
 
 
@@ -1347,7 +1473,7 @@ class FileManager
 		switch( $for )
 		{
 			case 'upload':
-				return $this->user->check_perm( 'upload', 'any', false );
+				return $this->User->check_perm( 'upload', 'any', false );
 
 			default:  // return false if not defined
 				$Debuglog->add( 'Filemanager: permission check for ['.$for.'] not defined!' );

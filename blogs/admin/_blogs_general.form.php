@@ -27,6 +27,8 @@
 		<legend><?php echo T_('Access parameters') ?></legend>
 	
 		<?php
+			$blog_baseurl = preg_match('#^https?://#', $blog_siteurl) ? $blog_siteurl : $baseurl;
+			
 			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $blog) )
 			{
 				$defblog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'));
@@ -35,17 +37,17 @@
 			form_radio( 'blog_access_type', $blog_access_type,
 					array(
 						array( 'default', T_('Default blog on index.php'),
-										$blog_siteurl.'/index.php'.( isset($defblog)
+										$blog_baseurl.'/index.php'.( isset($defblog)
 											? '  ['. /* TRANS: current default blog */ T_('Current default is:').' '.$defblog.']'
 											: '' )
 						),
 						array( 'index.php', T_('Other blog through index.php'),
-										$blog_siteurl.'/index.php'.( $Settings->get('links_extrapath')
+										$blog_baseurl.'/index.php'.( $Settings->get('links_extrapath')
 											? '/'.$blog_stub
 											: '?blog='.$blog)
 						),
 						array( 'stub', T_('Other blog through stub file (Advanced)'),
-										$blog_siteurl.'/'.$blog_stub.' &nbsp; '.T_('You MUST create a stub file for this to work.')
+										$blog_baseurl.'/'.$blog_stub.' &nbsp; '.T_('You MUST create a stub file for this to work.')
 						),
 					), T_('Preferred access type'), true );
 		

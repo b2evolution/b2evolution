@@ -57,6 +57,7 @@ class Blog extends DataObject
 	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
+	var $dir_media;
 
 	/** 
 	 * Constructor
@@ -67,7 +68,7 @@ class Blog extends DataObject
 	 */
 	function Blog( $db_row = NULL )
 	{
-		global $tableblogs;
+		global $tableblogs, $basepath, $media_subdir;
 		
 		// Call parent constructor:
 		parent::DataObject( $tableblogs, 'blog_', 'blog_ID' );
@@ -82,6 +83,10 @@ class Blog extends DataObject
 			$this->access_type = 'index.php';
 			$this->stub = 'new';
 			$this->default_skin = 'basic';
+			#if( !($this->dir_media = Fileman::create_dir( $basepath.'/'.$media_subdir, $this->shortname )) )
+			#{ // mediadir could not be created
+			#	$this->dir_media = false;
+			#}
 		}
 		else
 		{
@@ -164,13 +169,20 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basepath, $Settings;
 		
-		$base = $absolute ? $baseurl : '';
-
+		if( preg_match( '#^https?://#', $this->siteurl ) )
+		{
+			$base = $this->siteurl;
+		}
+		else
+		{
+			$base = $absolute ? $baseurl.$this->siteurl : $this->siteurl;
+		}
+		
 		if( $type == 'static' )
-		{	// We want the static page, there is no acces type option here:
+		{	// We want the static page, there is no access type option here:
 			if( is_file( $basepath.$this->siteurl.'/'.$this->staticfilename ) )
 			{ // If static page exists:
-				return $base.$this->siteurl.'/'.$this->staticfilename;
+				return $base.'/'.$this->staticfilename;
 			}
 		}
 		
@@ -180,7 +192,7 @@ class Blog extends DataObject
 				// Access through index.php as default blog
 				if( $Settings->get('default_blog_ID') == $this->ID )
 				{	// Safety check! We only do that kind of linking if this is really the default blog...
-					return $base.$this->siteurl.'/index.php';
+					return $base.'/index.php';
 				}
 				// ... otherwise, we add the blog ID:
 			
@@ -188,13 +200,13 @@ class Blog extends DataObject
 				// Access through index.php + blog qualifier
 				if( $Settings->get('links_extrapath') )
 				{
-					return $base.$this->siteurl.'/index.php/'.$this->stub;
+					return $base.'/index.php/'.$this->stub;
 				}
-				return $base.$this->siteurl.'/index.php?blog='.$this->ID;
+				return $base.'/index.php?blog='.$this->ID;
 			
 			case 'stub':
 				// Access through stub file
-				$blogurl = $base.$this->siteurl.'/'.$this->stub;
+				$blogurl = $base.'/'.$this->stub;
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
 				{	// We want to force the dynamic page but the URL is not explicitely dynamic
 					$blogurl .= '.php';
@@ -241,8 +253,22 @@ class Blog extends DataObject
 				return $basepath.$this->siteurl.'/'.$this->staticfilename;
 			
 			case 'baseurl':
-				return $baseurl.$this->siteurl.'/';
+				if( preg_match( '#^https?://#', $this->siteurl ) )
+				{
+					return $this->siteurl.'/';
+				}
+				else
+				{
+					return $baseurl.$this->siteurl.'/';
+				}
+				
+			case 'cookie_domain':
+				preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $match );
+				return '.'.$match[2];
 			
+			case 'cookie_path':
+				return preg_replace( '#https?://[^/]+#', '', $this->get('baseurl') );
+				
 			case 'blogstatsurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=stats' );
 			

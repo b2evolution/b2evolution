@@ -232,8 +232,9 @@ if( !empty( $skin ) )
 	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
 	{	// We have just asked for the skin explicitely
 		// Set a cookie to remember it:
-		// Including config and functions files
-		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $cookie_path, $cookie_domain) )
+		// Including config and functions files   ??
+		
+		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
 		{	// This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}

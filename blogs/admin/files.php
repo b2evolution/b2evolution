@@ -34,11 +34,11 @@ if( $current_User->level < 10 )
 }
 
 if( $action == 'update_settings' )
-{
-	
+{ // updating user settings
 	$UserSettings->set( 'fm_dirsattop',   param( 'option_dirsattop', 'integer', 0 ) );
 	$UserSettings->set( 'fm_permlikelsl', param( 'option_permlikelsl', 'integer', 0 ) );
 	$UserSettings->set( 'fm_fulldirsize', param( 'option_fulldirsize', 'integer', 0 ) );
+	$UserSettings->set( 'fm_showhidden', param( 'option_showhidden', 'integer', 0 ) );
 		
 	if( $UserSettings->updateDB() )
 	{
@@ -47,7 +47,7 @@ if( $action == 'update_settings' )
 }
 
 
-$Fileman = new FileManager( $current_User, 'files.php', $cd, $order, $asc );
+$Fileman = new FileManager( $current_User, 'user', 'files.php', $cd, $order, $asc );
 
 if( $action == '' && $file != '' )
 { // a file is selected/clicked, default action
@@ -63,6 +63,8 @@ if( $action == '' && $file != '' )
 	div.image { text-align:center;clear:both;margin:1ex; }
 	img.image { border:1px dashed #d91;padding:1ex; }
 	.linenr { background-color: #ff0; font-weight:bold; }
+	div.fileheader { background:#ccc; border:1px solid #ddd; }
+	pre.rawcontent { margin:0; padding:0 1ex; font-family: Courier New, sans-serif; }
 	-->
 	</style>
 	</head>
@@ -74,7 +76,7 @@ if( $action == '' && $file != '' )
 		{ // image
 			?>
 			<div class="image">
-			<img class="image" src="<?php $Fileman->cdisp_file( $file, 'url' ) ?>" <?php $Fileman->cdisp_file( $file, 'imgsize', 'string' ) ?>>
+				<img class="image" src="<?php $Fileman->cdisp_file( $file, 'url' ) ?>" <?php $Fileman->cdisp_file( $file, 'imgsize', 'string' ) ?>>
 			</div>
 			<?php
 		}
@@ -86,16 +88,16 @@ if( $action == '' && $file != '' )
 			// TODO: check if new window was opened and provide close X in case
 			/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'/img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
 
+			echo '<div class="fileheader">';
 			echo T_('file').': '.$file.'<br />';
 
 			if( !count($buffer) )
 			{
-				echo ' ** '.T_('empty file').' ** ';
+				echo '</div> ** '.T_('empty file').' ** ';
 			}
 			else
 			{
 				echo count($buffer).' '.T_('lines').'<br />';
-
 				$linenr_width = strlen( count($buffer)+1 );
 
 				?>
@@ -110,7 +112,8 @@ if( $action == '' && $file != '' )
 				//-->
 				</script>
 
-				<pre><?php
+				</div>
+				<pre class="rawcontent"><?php
 				foreach( $buffer as $linenr => $line )
 				{
 					echo '<span name="linenr" class="linenr">';
@@ -468,7 +471,7 @@ while( $Fileman->next() )
 		$link_default_js .= 'width='.($r[0]+100).',height='.($r[1]+100);
 	}
 	$link_default_js .= "')}";
-	$link_default_js = '';
+	$link_default_js = '';  // temp. disabled
 
 	?>
 	<tr style="background:<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>" onmouseout="this.style.background='<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>'" onmouseover="this.style.background='#ddd'" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
@@ -483,7 +486,7 @@ while( $Fileman->next() )
 				<?php	$Fileman->cdisp('name'); $Fileman->cdisp('imgsize', '', ' (%s)') ?>
 			<!--noscript type="text/javascript"--></a><!--/noscript-->
 			<?php
-			if( $Fileman->cisdir() )
+			if( 0 && $Fileman->cisdir() )
 			{
 				echo '<a href="'.$Fileman->cget('link').'" title="'.T_('open in new window').'" target="_blank">'
 				.$Fileman->icon( 'window_new' ).'</a>';
@@ -558,6 +561,9 @@ if( $i != 0 )
 		<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 			<?php echo T_('Sort directories at top') ?>
 			<input type="checkbox" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />
+			<br />
+			<?php echo T_('Show hidden files') ?>
+			<input type="checkbox" name="option_showhidden" value="1"<?php if( $UserSettings->get('fm_showhidden') ) echo ' checked="checked"' ?> />
 			<br />
 			<?php echo T_('File permissions like &quot;ls -l&quot;') ?>
 			<input type="checkbox" name="option_permlikelsl" value="1"<?php if( $UserSettings->get('fm_permlikelsl') ) echo ' checked="checked"' ?> />

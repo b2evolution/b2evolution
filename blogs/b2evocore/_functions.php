@@ -918,7 +918,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $global_param_list, $ReqURI;
+	global $global_param_list, $ReqPath, $basehost;
 
 	if( $ignore == '' )
 		$ignore = array( );
@@ -990,7 +990,12 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		$params = array_merge( $params, $set );
 	}
 
-	$url = empty($pagefileurl) ? $ReqURI : $pagefileurl;
+	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
+	
+	if( $basehost != $_SERVER['HTTP_HOST'] && !preg_match( '#^https?://#', $url ) )
+	{
+		$url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].( substr( $url, 0, 1 ) == '/' ? '' : '/' ).$url;
+	}
 
 	if( !empty( $params ) )
 	{
