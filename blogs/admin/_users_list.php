@@ -20,13 +20,14 @@ $userlist = $DB->get_results( $request );
 <h2><?php echo T_('Groups &amp; Users') ?></h2>
 <table class="grouped" cellspacing="0">
 	<tr>
-		<th class="firstcol"><?php echo T_('ID') ?></th>
-		<th><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
-		<th><?php echo T_('Nickname') ?></th>
-		<th><?php echo T_('Name') ?></th>
-		<th><?php echo T_('Email') ?></th>
-		<th><?php echo T_('URL') ?></th>
 		<?php
+			echo '<th class="firstcol">'.T_('ID')."</th>\n";
+			/* TRANS: table header for user list: */
+			echo '<th>'.T_('Login ')."</th>\n";
+			echo '<th>'.T_('Nickname')."</th>\n";
+			echo '<th>'.T_('Name')."</th>\n";
+			echo '<th>'.T_('Email')."</th>\n";
+			echo '<th>'.T_('URL')."</th>\n";
 			echo '<th';
 			if( ! $current_User->check_perm( 'users', 'edit', false ) )
 			{ // This will be last col:
@@ -36,8 +37,8 @@ $userlist = $DB->get_results( $request );
 			{ // extra table cell for +/-
 				echo ' colspan="2"';
 			}
-			echo '>'.T_('Level') ?></th>
-		<?php
+			echo '>'.T_('Level')."</th>\n";
+
 			if( $current_User->check_perm( 'users', 'edit', false ) )
 			{
 				echo '<th class="lastcol">'.T_('Edit').'</th>';
@@ -80,16 +81,15 @@ $userlist = $DB->get_results( $request );
 						?>
 						<td>&nbsp;</td>
 						<td class="lastcol">
-							<a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /></a>
-
-							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a>
 						<?php
+						echo action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'action', 'group='.$loop_grp_ID ) );
+
+						echo action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'action', 'action=newgroup&amp;template='.$loop_grp_ID ) );
+
 						if( ($loop_grp_ID != 1) && ($loop_grp_ID != $Settings->get('newusers_grp_ID'))
 								&& !in_array( $loop_grp_ID, $usedgroups ) )
 						{ // delete
-							?>
-							<a href="b2users.php?action=deletegroup&amp;id=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Delete group') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete group') ?>" /></a>
-							<?php
+							echo action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'action', 'action=deletegroup&amp;id='.$loop_grp_ID ) );
 						}
 						echo '</td>';
 					}
@@ -106,22 +106,30 @@ $userlist = $DB->get_results( $request );
 					echo "<tr class=\"odd\">\n";
 				else
 					echo "<tr>\n";
-				$email = $loop_User->get('email');
-				$url = $loop_User->get('url');
+
 				echo '<td class="firstcol">', $loop_User->get('ID'), "</td>\n";
+
 				echo '<td><a href="b2users.php?user=', $loop_User->get('ID'), '">';
 				echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
 				echo $loop_User->get('login'), "</a></td>\n";
+
 				echo '<td>';
 				$loop_User->disp('nickname');
 				echo '</td>';
+
 				echo '<td>', $loop_User->get('firstname').'&nbsp;'.$loop_User->get('lastname')."</td>\n";
+				// Email:
 				echo '<td>&nbsp;';
+				$email = $loop_User->get('email');
 				if( !empty($email) )
 				{
 					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'"><img src="img/email.gif"  alt="e-mail: '.$email.'" class="middle" /></a>&nbsp;';
 				}
-				echo '</td><td>&nbsp;';
+				echo "</td>\n";
+
+				// URL:
+				echo '<td>&nbsp;';
+				$url = $loop_User->get('url');
 				if (($url != 'http://') and ($url != ''))
 				{
 					if( !preg_match('#://#', $url) )
@@ -132,40 +140,39 @@ $userlist = $DB->get_results( $request );
 				}
 				echo "</td>\n";
 
-				echo "<td>".$loop_User->get('level');
+				// User level:
+				echo '<td>'.$loop_User->get('level').'</td>';
 
 				if( $current_User->check_perm( 'users', 'edit', false ) )
-				{ // edit actions
+				{ // We have permission to edit the user:
 
-					echo '</td><td align="right">';
+					// Promotion buttons:
+					echo '<td align="right">';
 					if( ($loop_User->get('level') > 0) )
 					{ // prom=down
-						echo ' <a href="b2users.php?action=promote&amp;id='. $loop_User->get('ID'). '&amp;prom=down'
-									.'" title="'.T_('decrease user level').'">-</a> ';
+						echo action_icon( T_('Decrease user level'), 'arrow_down',
+										regenerate_url( 'action', 'action=promote&amp;prom=down&amp;id='.$loop_User->get('ID') ) );
 					}
 					if( ($loop_User->get('level') < 10 ) )
 					{ // prom=up
-						echo ' <a href="b2users.php?action=promote&amp;id='. $loop_User->get('ID'). '&amp;prom=up'
-									.'" title="'.T_('increase user level').'">+</a> ';
+						echo action_icon( T_('Increase user level'), 'arrow_up',
+										regenerate_url( 'action', 'action=promote&amp;prom=up&amp;id='.$loop_User->get('ID') ) );
 					}
+					echo '</td>';
 
-					echo '</td><td class="lastcol">';
-
-					// edit user
-					echo ' <a href="b2users.php?user=', $loop_User->get('ID'), '"><img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /></a> ';
-
-					// copy user
-					echo ' <a href="?action=newuser&amp;template='.$loop_User->get('ID').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" /></a> ';
-
+					// Edit actions:
+					echo '<td class="lastcol">';
+					// edit user:
+					echo action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'action', 'user='.$loop_User->get('ID') ) );
+					// copy user:
+					echo action_icon( T_('Duplicate this user...'), 'copy', regenerate_url( 'action', 'action=newuser&amp;template='.$loop_User->get('ID') ) );
 					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
-					{ // delete
-						?>
-						<a href="b2users.php?action=deleteuser&amp;id=<?php echo $loop_User->get('ID') ?>" title="<?php echo T_('Delete user') ?>"  onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete user') ?>" /></a>
-						<?php
+					{ // delete user:
+						echo action_icon( T_('Delete this user!'), 'delete', regenerate_url( 'action', 'action=deleteuser&amp;id='.$loop_User->get('ID') ) );
 					}
+					echo '</td>';
 				}
-				echo "</td>\n";
-				echo "</tr>\n";
+				echo "\n</tr>\n";
 				$count++;
 			}
 		}

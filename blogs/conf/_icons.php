@@ -229,6 +229,17 @@ $map_iconfiles = array(
 	),
 
 
+ 	'arrow_up' => array(
+		'file' => $admin_subdir.'img/arrowup.png',
+		'alt' => T_('+'),
+		'size' => array( 14, 14 ),
+	),
+ 	'arrow_down' => array(
+		'file' => $admin_subdir.'img/arrowdown.png',
+		'alt' => T_('-'),
+		'size' => array( 14, 14 ),
+	),
+
 	'link' => array(
 		'file' => $admin_subdir.'img/chain_link.gif',
 		'alt' => T_('Link'),
