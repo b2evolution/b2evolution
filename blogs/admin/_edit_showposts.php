@@ -107,9 +107,9 @@
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo ' ', T_('by'), ' ';
 					the_author();
-					echo ' (<a href="javascript:profile(', the_author_ID(), '">';
+					echo ' (';
 					the_author_nickname();
-					echo '</a>), ';
+					echo '), ';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo T_('in'), ' ';
 					the_categories( false );

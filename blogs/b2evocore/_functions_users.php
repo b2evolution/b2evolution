@@ -440,16 +440,6 @@ function user_info( $show='', $format = 'raw', $display = true )
 		return $content;
 }
 
-/*
- * profile(-)
- *
- * outputs a link to user profile
- */
-function profile($user_login) 
-{
-	global $user_data;
-	echo "<a href=\"#\" OnClick=\"javascript:window.open('b2profile.php?user=".$user_data["user_login"]."','Profile','toolbar=0,status=1,location=0,directories=0,menuBar=0,scrollbars=1,resizable=1,width=480,height=320,left=100,top=100');\">$user_login</a>";
-}
 
 
 /*

@@ -11,10 +11,6 @@
 	<?php } ?>
 	<script type="text/javascript" language="javascript">
 		<!--
-		function profile(userID) 
-		{
-			window.open ("b2profile.php?action=viewprofile&user="+userID, "Profile", "width=500, height=450, location=0, menubar=1, resizable=1, scrollbars=1, status=1, titlebar=0, toolbar=0, screenX=60, left=60, screenY=60, top=60");
-		}
 	<?php 
 	if ($use_spellchecker) 
 	{ // --------------------------- SPELL CHECKER -------------------------------
