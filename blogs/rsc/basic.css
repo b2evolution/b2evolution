@@ -1,0 +1,16 @@
+/* Basic styles */
+
+.nobr,
+.line
+{
+	white-space: nowrap;
+}
+.right{
+	text-align: right;
+}
+.clear{
+	clear: both;
+}
+.small {
+	font-size: 84%;
+}

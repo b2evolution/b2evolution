@@ -18,6 +18,7 @@ $location = $redirect_to;
 ?>
 
 <form action="<?php echo $location  ?>" method="post" class="fform">
+
 	<?php
 		if( !empty($mode) )
 		{	// We're in the process of bookmarkletting something, we don't want to loose it:
@@ -34,6 +35,9 @@ $location = $redirect_to;
 	?>
 
 	<fieldset>
+
+		<div class="center"><span class="notes"><?php printf( T_('You will have to accept cookies in order to log in.') ) ?></span></div>
+
 		<fieldset>
 			<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div>
 			<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="<?php echo format_to_output($log, 'formvalue'); ?>" class="large" /></div>

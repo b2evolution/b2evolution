@@ -29,9 +29,7 @@
 <h1 class="logintitle"><?php echo $page_title ?></h1>
 </div>
 
-<div class="clear">&nbsp;</div>
-<div class="center"><span class="notes"><?php printf( T_('You\'ll have to allow cookies, please.') ) ?></span></div>
-
+<div class="clear"></div>
 
 <?php
 if( !empty($error) )

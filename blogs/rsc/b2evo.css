@@ -1,4 +1,5 @@
 
+@import url(../rsc/basic.css);	/* Import basic styles */
 @import url(../rsc/img.css);	/* Import standard image styles */
 
 /* Global page layout */
@@ -128,13 +129,7 @@ hr {
 }
 
 	
-.right{
-	text-align: right;
-}
-.clear
-{
-	clear: both;
-}.subtitle {
+.subtitle {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-weight: bold;
 }
@@ -142,9 +137,6 @@ ul.expanded li, ol.expanded li
 {
 	margin-top: 2ex;
 	margin-bottom: 2ex;
-}
-.small {
-	font-size: 84%;
 }
 fieldset
 {

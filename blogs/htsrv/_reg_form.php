@@ -29,7 +29,7 @@ require(dirname(__FILE__).'/_header.php');
 		<div class="input">
 		<input type="password" name="pass1" id="pass1" size="16" maxlength="20" value="" class="large" />
 		<input type="password" name="pass2" id="pass2" size="16" maxlength="20" value="" class="large" />
-		<span class="notes">[<?php printf( T_('min %d characters, please'), $Settings->get('user_minpwdlen') ) ?>]</span>
+		<span class="notes"><?php printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') ) ?></span>
 		</div>
 	</fieldset>
 
@@ -39,16 +39,19 @@ require(dirname(__FILE__).'/_header.php');
 	</fieldset>
 
 	<?php
-	form_select( 'locale', $locale, 'locale_options', T_('Locale') );
+	form_select( 'locale', $default_locale, 'locale_options', T_('Locale'), T_('Prefered language') );
 	?>
 	<fieldset>
 		<div class="input">
 			<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search" />
-			<div><a href="<?php echo $htsrv_url.'/login.php' ?>"><?php echo T_('Log into existing account..') ?></a></div>
 		</div>
 	</fieldset>
 </fieldset>
 </form>
+
+<div style="text-align:right">
+	<a href="<?php echo $htsrv_url.'/login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
+</div>
 
 <?php
 	require(dirname(__FILE__).'/_footer.php');
