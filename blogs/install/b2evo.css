@@ -152,3 +152,10 @@ legend
 {
 	font-weight: bold;
 }
+
+div.installSideBar {
+	float: right;
+	border: 1px dotted black;
+	padding: 1ex;
+	width: 20%;
+}

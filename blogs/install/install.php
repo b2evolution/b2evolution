@@ -35,34 +35,28 @@ locale_activate( $default_locale );
 
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <title>b2 evolution: Database tables installation</title>
 <!-- InstanceEndEditable --><link href="b2evo.css" rel="stylesheet" type="text/css" />
-
+ 
 <!-- InstanceBeginEditable name="head" -->
 <!-- InstanceEndEditable -->
 </head>
 <body>
 <div id="rowheader" >
-<h1><a href="http://b2evolution.net/" title="<?php echo T_('visit b2evolution\'s website')?>"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-<div id="tagline"><?php echo T_('Multilingual multiuser multiblog engine!')?></div>
-<h1 id="version"><?php echo T_('Version')?>: 0.8.9+CVS</h1>
-<div id="quicklinks"><?php echo T_('Setup Links')?>:
-	<a href="../../index.html"><?php echo T_('My b2evo')?></a> &middot;
-	<a href="http://b2evolution.net/man/"><?php echo T_('Online Manual'); if( substr(locale_lang(false), 0, 2) != 'en' ) echo ' [en]';?></a> &middot;
-	<a href="install.php"><?php echo T_('My DB Install')?></a> &middot;
-	<a href="../index.php"><?php echo T_('My Blogs')?></a> &middot;
-	<a href="../admin/b2edit.php"><?php echo T_('My Back-Office')?></a>
-</div>
+<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
+<div id="tagline">Multilingual multiuser multi-blog engine!</div>
+<h1 id="version">Version: 0.8.9+CVS</h1>
+<div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
 
 <h1><?php echo T_('Database tables installation')?></h1>
 
-<div style="float:right;border:1px dotted black;padding:1ex;width:20%">
+<div class="installSideBar">
 	<p><?php echo T_('PHP version')?>: <?php echo phpversion(); ?> [<a href="phpinfo.php">PHP info</a>]</p>
 	<?php
 		list( $version_main, $version_minor ) = explode( '.', phpversion() );
@@ -75,8 +69,8 @@ locale_activate( $default_locale );
 	<br />
 	<?php echo T_('(If you don\'t see correct settings here, STOP before going any further, and check your configuration.)')?>
 	</p>
-<pre>
-<?php echo 
+
+<?php echo '<pre>',
 'mySQL '.T_('Host').': '.DB_HOST." &nbsp;\n".
 'mySQL '.T_('Database').': '.DB_NAME." &nbsp;\n".
 'mySQL '.T_('Username').': '.DB_USER." &nbsp;\n".
@@ -105,7 +99,9 @@ if( empty($action) )
 		
 		if( $default_locale == $lkey ) echo '</strong>';	
 	}
-	echo '</ul>';
+	?>
+	</ul>
+	<?php
 }
 ?>
 </div>
@@ -297,9 +293,7 @@ switch( $action )
 ?>
 <!-- InstanceEndEditable -->
 <div id="rowfooter">
-<a href="http://b2evolution.net/"><?php echo T_('official website'); if( substr(locale_lang(false), 0, 2) != 'en' ) echo ' [en]';?></a> &middot;
-<a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license'); if( substr(locale_lang(false), 0, 2) != 'en' ) echo ' [en]';?></a> &middot;
-<a href="http://fplanque.net/About/index.html"><?php echo T_('contact:') ?> Fran&ccedil;ois PLANQUE</a>
+<a href="http://b2evolution.net/">official website</a> &middot; <a href="http://b2evolution.net/about/license.html">GNU GPL license</a> &middot; <a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
 </div>
 
 </body>
