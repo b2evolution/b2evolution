@@ -109,7 +109,7 @@ switch($action)
 		{	// The user is already logged in...
 			$error = T_('Note: You are already logged in!');
 
-			param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
+			param( 'redirect_to', 'string', $ReqURI );
 			if( basename( $redirect_to ) == basename( $_SERVER['SCRIPT_NAME'] ) )
 			{ // avoid "endless loops"
 				$redirect_to = $admin_url.'/';

@@ -35,13 +35,11 @@ if ($topRefererList)
 function log_hit()
 {
 	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
-	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI;
+	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI, ReqPath;
 	
 	# TODO: check for already logged?
 	
-	// debug_log( 'Hit Log: current url: '. $_SERVER['REQUEST_URI']);
-
-	$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI'];
+	$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $ReqURI;
 	// debug_log( 'Hit Log: '. "full current url: ".$fullCurrentURL);
 
 	$ref = $HTTP_REFERER;
@@ -90,9 +88,9 @@ function log_hit()
 		}
 	}
 			
-	if( stristr($_SERVER['REQUEST_URI'], 'rss')
-			|| stristr($_SERVER['REQUEST_URI'], 'rdf')
-			|| stristr($_SERVER['REQUEST_URI'], 'atom')  )
+	if( stristr($ReqPath, 'rss')
+			|| stristr($ReqPath, 'rdf')
+			|| stristr($ReqPath, 'atom')  )
 	{
 		$ignore = "rss";
 		// don't mess up the XML!! debug_log( 'Hit Log: referer ignored (RSS));
@@ -260,7 +258,7 @@ function refererList(
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false ) // Get the user agent
 {
-	global 	$DB, $tablehitlog, $res_stats, $stats_total_hits;
+	global 	$DB, $tablehitlog, $res_stats, $stats_total_hits, $ReqURI;
 	$i=2;
 
 	autoquote( $type );		// In case quotes are missing
@@ -270,8 +268,9 @@ function refererList(
 	//if no visitURL, will show links to current page.
 	//if url given, will show links to that page.
 	//if url="global" will show links to all pages
-	if (!$visitURL){
-		$visitURL = $_SERVER['REQUEST_URI'];
+	if (!$visitURL)
+	{
+		$visitURL = $ReqURI;
 	}
 
 	if( $groupby == '' )

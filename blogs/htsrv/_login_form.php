@@ -11,7 +11,7 @@ $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
 require(dirname(__FILE__).'/_header.php');
 
-param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
+param( 'redirect_to', 'string', $ReqURI );
 param( 'log', 'string', '' );		// last typed login
 
 $location = $redirect_to;

@@ -21,16 +21,11 @@ param( 'blog', 'integer', '', true );
 
 if( empty($blog) )
 {	// No blog requested, by URL param, let's check extrapath
-
-	$ReqURI = $_SERVER['REQUEST_URI'];
-	// echo "ReqURI:".$ReqURI."<br />";
-	// Remove params:
-	$path_string = explode( '?', $ReqURI, 2 );	
 	// Check and Remove current page url:
 	$index_url = substr( $baseurl, strlen( $baseurlroot ) ) . '/index.php';
-	if( ($pos = strpos( $path_string[0], $index_url )) !== false )
+	if( ($pos = strpos( $ReqPath, $index_url )) !== false )
 	{ // note: $pos will typically be 0
-		$path_string = substr( $path_string[0], $pos+strlen( $index_url ) );
+		$path_string = substr( $ReqPath, $pos+strlen( $index_url ) );
 		// echo "path=$path_string <br>";
 		$path_elements = explode( '/', $path_string, 20 );						// slice it
 		if( isset($path_elements[1]) && (($Blog = $BlogCache->get_by_stub( $path_elements[1], false )) !== false) )

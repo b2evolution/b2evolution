@@ -65,15 +65,11 @@ locale_activate( $Blog->get('locale') );
 // -------------------------
 // Extra path info decoding:
 // -------------------------
-$ReqURI = $_SERVER['REQUEST_URI'];
-//echo "ReqURI:".$ReqURI."<br />";
-// Remove params:
-$path_string = explode( '?', $ReqURI, 2 );	
-// Check and Remove blog baseurl:
+// Check and Remove blog baseurl from ReqPath:
 $blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
-if( ($pos = strpos( $path_string[0], $blog_baseurl )) !== false )
+if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 { // note: $pos will typically be 0
-	$path_string = substr( $path_string[0], $pos+strlen( $blog_baseurl ) );
+	$path_string = substr( $ReqPath, $pos+strlen( $blog_baseurl ) );
 	// echo "path=$path_string <br>";
 	$path_elements = explode( '/', $path_string, 20 );						// slice it
 	$i=0;

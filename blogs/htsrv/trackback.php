@@ -24,7 +24,7 @@ param( 'excerpt', 'html' );
 param( 'blog_name', 'string' );
 if(empty($tb_id))
 {	// No parameter for ID, get if from URL:
-	$path_elements = explode( '/', $_SERVER['REQUEST_URI'], 30 );	
+	$path_elements = explode( '/', $ReqPath, 30 );	
 	$tb_id = intval( $path_elements[count($path_elements)-1] );
 }
 

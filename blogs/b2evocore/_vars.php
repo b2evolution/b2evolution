@@ -22,9 +22,38 @@ if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
 	textdomain( 'messages' );
 }
 
+// Investigation for following code by Isaac - http://isaac.beigetower.org/
+if(!isset($_SERVER['REQUEST_URI'])) 
+{ // IIS 
+	if(isset($_SERVER['URL'])) 
+	{ //ISAPI 
+		$ReqPath = $_SERVER['URL']; 
+	}
+  elseif(isset($_SERVER['PATH_INFO']))
+	{ //CGI/FastCGI 
+		$ReqPath = $_SERVER['PATH_INFO']; 
+	}
+  
+	$ReqURI = $ReqPath;
+	if (isset($_SERVER['QUERY_STRING'])) 
+	{ //Made a $_GET request 
+		$ReqURI .= '?' . $_SERVER['QUERY_STRING']; 
+	}
+}
+else
+{	// apache...
+	$ReqURI = $_SERVER['REQUEST_URI'];
+	// Remove params from reqURI:
+	$ReqPath = explode( '?', $ReqURI, 2 );	
+	$ReqPath = $ReqPath[0];
+}
+debug_log( 'Request URI: '.$ReqURI );
+debug_log( 'Request Path: '.$ReqPath );
+
+
+
 // on which page are we ?
-$PHP_SELF = $_SERVER['PHP_SELF'];
-$pagenow = explode('/', $PHP_SELF);
+$pagenow = explode('/', $_SERVER['PHP_SELF'] );
 $pagenow = trim($pagenow[(sizeof($pagenow)-1)]);
 $pagenow = explode('?', $pagenow);
 $pagenow = $pagenow[0];
