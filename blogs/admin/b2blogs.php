@@ -25,10 +25,6 @@ switch($action)
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		echo "<div class=\"panelblock\">\n";
-		echo '<h2>', T_('New blog'), ":</h2>\n";
-		// EDIT FORM:
-		$blog = 0;
 		param( 'blog_name', 'string', 'new weblog' );
 		param( 'blog_shortname', 'string', 'new blog' );
 		param( 'blog_tagline', 'html', '' );
@@ -36,8 +32,9 @@ switch($action)
 		param( 'blog_siteurl', 'string', '' );
 		param( 'blog_stub', 'string', 'new_file.php' );
 		param( 'blog_default_skin', 'string', '' );
+
 		require( dirname(__FILE__) . '/_blogs_new.form.php' );
-		echo '</div>';
+
 		require( dirname(__FILE__). '/_footer.php' );
 		exit();
 
@@ -49,9 +46,12 @@ switch($action)
 
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
+
 		?>
 		<div class="panelinfo">
+			<h3><?php echo T_('Creating blog...') ?></h3>
 		<?php
+
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
 		param( 'blog_tagline', 'html', '' );
@@ -63,15 +63,15 @@ switch($action)
 		if ( errors_display( T_('Cannot create, please correct these errors:'),
 			'[<a href="javascript:history.go(-1)">'.T_('Back to new blog form').'</a>]'))
 		{
+			echo '</div>';
 			require( dirname(__FILE__) . '/_footer.php' );
 			die();
 			break;
 		}
 
-		echo '<h3>' . T_('Creating blog...') . '</h3>';
-
+		// DB INSERT
 		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, '',
-									$blog_stub, '', '', '', '', $blog_locale, '', '', '', 0 ) or mysql_oops( $query );
+									$blog_stub, '', '', '', '', $blog_locale, '', '', '', 0 );
 
 		// Set default user permissions for this blog
 		// Proceed insertions:
@@ -151,10 +151,11 @@ switch($action)
 		break;
 
 
-	case 'edit':
-		// ---------- Edit blog form ----------
+	case 'update':
+		// ---------- Update blog in DB ----------
 		param( 'blog', 'integer', true );
-		$admin_pagetitle .= ' :: ['.get_bloginfo('shortname').']';
+		$edited_Blog = $BlogCache->get_by_ID( $blog );
+		$admin_pagetitle .= ' :: ['.$edited_Blog->dget('shortname').']';
 		switch( $tab )
 		{
 			case 'general':
@@ -167,33 +168,147 @@ switch($action)
 				$admin_pagetitle .= ' :: '. T_('Advanced');
 				break;
 		}
+
 		require( dirname(__FILE__). '/_menutop.php' );
 		require( dirname(__FILE__). '/_menutop_end.php' );
 
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		// EDIT FORM:
-		$blog_name = get_bloginfo( 'name' );
-		$blog_shortname = get_bloginfo( 'shortname' );
-		$blog_tagline = get_bloginfo( 'tagline' );
-		$blog_description = get_bloginfo( 'description' );
-		$blog_longdesc = get_bloginfo( 'longdesc' );
-		$blog_locale = get_bloginfo( 'locale' );
-		$blog_siteurl = get_bloginfo( 'subdir' );
-		$blog_filename = get_bloginfo( 'filename' );
-		$blog_staticfilename = get_bloginfo( 'staticfilename' );
-		$blog_stub = get_bloginfo( 'stub' );
-		$blog_roll = get_bloginfo( 'blogroll' );
-		$blog_keywords = get_bloginfo( 'keywords' );
-		$blog_allowtrackbacks = get_bloginfo( 'allowtrackbacks' );
-		$blog_allowpingbacks = get_bloginfo( 'allowpingbacks' );
-		$blog_pingb2evonet = get_bloginfo( 'pingb2evonet' );
-		$blog_pingtechnorati = get_bloginfo( 'pingtechnorati' );
-		$blog_pingweblogs = get_bloginfo( 'pingweblogs' );
-		$blog_pingblodotgs = get_bloginfo( 'pingblodotgs' );
-		$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
-		$blog_default_skin = get_bloginfo( 'default_skin' );
+		?>
+		<div class="panelinfo">
+			<h3><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></h3>
+		<?php
+
+		switch( $tab )
+		{
+			case 'general':
+				param( 'blog_tagline', 'html', '' );
+				param( 'blog_longdesc', 'html', '' );
+				param( 'blog_roll', 'html', '' );
+
+				$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
+				$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
+				$blog_roll = format_to_post( $blog_roll, 0, 0 );
+
+				if ( errors_display( T_('Cannot update, please correct these errors:' ),
+					'[<a href="javascript:history.go(-1)">' . T_('Back to blog editing') . '</a>]') )
+				{
+					echo '</div>';
+					require( dirname(__FILE__) . '/_footer.php' );
+					exit();
+				}
+
+				$edited_Blog->set( 'tagline', $blog_tagline );
+				$edited_Blog->set( 'longdesc', $blog_longdesc );
+				$edited_Blog->set( 'roll', $blog_roll );
+
+				param( 'blog_name', 'string', true );
+				$edited_Blog->set( 'name', $blog_name );
+
+				param( 'blog_shortname', 'string', true );
+				$edited_Blog->set( 'shortname', $blog_shortname );
+
+				param( 'blog_description', 'string', '' );
+				$edited_Blog->set( 'description', $blog_description );
+
+				param( 'blog_locale', 'string', $default_locale );
+				$edited_Blog->set( 'locale', $blog_locale );
+
+				param( 'blog_siteurl', 'string', true );
+				$edited_Blog->set( 'siteurl', $blog_siteurl );
+
+				param( 'blog_stub', 'string', '' );
+				$edited_Blog->set( 'stub', $blog_stub );
+
+				param( 'blog_keywords', 'string', '' );
+				$edited_Blog->set( 'keywords', $blog_keywords );
+
+				param( 'blog_disp_bloglist', 'integer', 0 );
+				$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
+
+				break;
+
+			case 'perm':
+				// Update the user permissions for this blog
+				blog_update_user_perms( $blog );
+				break;
+
+			case 'advanced':
+				param( 'blog_filename', 'string', '' );
+				$edited_Blog->set( 'filename', $blog_filename );
+
+				param( 'blog_staticfilename', 'string', '' );
+				$edited_Blog->set( 'staticfilename', $blog_staticfilename );
+
+				param( 'blog_allowtrackbacks', 'integer', 0 );
+				$edited_Blog->set( 'allowtrackbacks', $blog_allowtrackbacks );
+
+				param( 'blog_allowpingbacks', 'integer', 0 );
+				$edited_Blog->set( 'allowpingbacks', $blog_allowpingbacks );
+
+				param( 'blog_pingb2evonet', 'integer', 0 );
+				$edited_Blog->set( 'pingb2evonet', $blog_pingb2evonet );
+
+				param( 'blog_pingtechnorati', 'integer', 0 );
+				$edited_Blog->set( 'pingtechnorati', $blog_pingtechnorati );
+
+				param( 'blog_pingweblogs', 'integer', 0 );
+				$edited_Blog->set( 'pingweblogs', $blog_pingweblogs );
+
+				param( 'blog_pingblodotgs', 'integer', 0 );
+				$edited_Blog->set( 'pingblodotgs', $blog_pingblodotgs );
+
+				param( 'blog_default_skin', 'string', '' );
+				$edited_Blog->set( 'default_skin', $blog_default_skin );
+
+				break;
+		}
+
+		// Commit update to the DB:
+		$edited_Blog->dbupdate();
+		
+		// Commit changes in cache:
+		$BlogCache->add( $edited_Blog );
+
+		// Update core blog params
+		/* blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
+									$blog_staticfilename,
+									$blog_tagline, $blog_description, $blog_longdesc,
+									$blog_locale, $blog_roll,
+									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
+									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
+									$blog_disp_bloglist ); */
+
+		?>
+			</div>
+		<?php
+		// NOTE: no break here, we go on to edit!
+
+	case 'edit':
+		// ---------- Edit blog form ----------
+		if( $action == 'edit' )
+		{	// this has not already been displayed on update:
+			param( 'blog', 'integer', true );
+			$admin_pagetitle .= ' :: ['.get_bloginfo('shortname').']';
+			switch( $tab )
+			{
+				case 'general':
+					$admin_pagetitle .= ' :: '. T_('General');
+					break;
+				case 'perm':
+					$admin_pagetitle .= ' :: '. T_('Permissions');
+					break;
+				case 'advanced':
+					$admin_pagetitle .= ' :: '. T_('Advanced');
+					break;
+			}
+			require( dirname(__FILE__). '/_menutop.php' );
+			require( dirname(__FILE__). '/_menutop_end.php' );
+		
+			// Check permissions:
+			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		}
 		?>
 		<div class="pt" >
 			<ul class="tabs">
@@ -227,68 +342,45 @@ switch($action)
 		<div class="tabbedpanelblock">
 		
 		<?php 
-		require( dirname(__FILE__) . '/_blogs_form.php' );
+		switch( $tab )
+		{
+			case 'general':
+				$blog_name = get_bloginfo( 'name' );
+				$blog_shortname = get_bloginfo( 'shortname' );
+				$blog_tagline = get_bloginfo( 'tagline' );
+				$blog_description = get_bloginfo( 'description' );
+				$blog_longdesc = get_bloginfo( 'longdesc' );
+				$blog_locale = get_bloginfo( 'locale' );
+				$blog_siteurl = get_bloginfo( 'subdir' );
+				$blog_stub = get_bloginfo( 'stub' );
+				$blog_roll = get_bloginfo( 'blogroll' );
+				$blog_keywords = get_bloginfo( 'keywords' );
+				$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
+				$blog_default_skin = get_bloginfo( 'default_skin' );
+				require( dirname(__FILE__) . '/_blogs_form.php' );
+				break;
+				
+			case 'perm':
+				require( dirname(__FILE__) . '/_blogs_permissions.form.php' );
+				break;
+				
+			case 'advanced':
+				$blog_filename = get_bloginfo( 'filename' );
+				$blog_staticfilename = get_bloginfo( 'staticfilename' );
+				$blog_allowtrackbacks = get_bloginfo( 'allowtrackbacks' );
+				$blog_allowpingbacks = get_bloginfo( 'allowpingbacks' );
+				$blog_pingb2evonet = get_bloginfo( 'pingb2evonet' );
+				$blog_pingtechnorati = get_bloginfo( 'pingtechnorati' );
+				$blog_pingweblogs = get_bloginfo( 'pingweblogs' );
+				$blog_pingblodotgs = get_bloginfo( 'pingblodotgs' );
+				require( dirname(__FILE__) . '/_blogs_advanced.form.php' );
+				break;
+		}
 		echo '</div>';
 		require( dirname(__FILE__). '/_footer.php' );
 		exit();
 		
 
-	case 'update':
-		// ---------- Update blog in DB ----------
-		param( 'blog', 'integer', true );
-
-		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-		param( 'blog_name', 'string', true );
-		param( 'blog_shortname', 'string', true );
-		param( 'blog_tagline', 'html', '' );
-		param( 'blog_description', 'string', '' );
-		param( 'blog_longdesc', 'html', '' );
-		param( 'blog_locale', 'string', $default_locale );
-		param( 'blog_siteurl', 'string', true );
-		param( 'blog_filename', 'string', true );
-		param( 'blog_staticfilename', 'string', '' );
-		param( 'blog_stub', 'string', '' );
-		param( 'blog_roll', 'html', '' );
-		param( 'blog_keywords', 'string', '' );
-		param( 'blog_UID', 'string', '' );
-		param( 'blog_allowtrackbacks', 'integer', 0 );
-		param( 'blog_allowpingbacks', 'integer', 0 );
-		param( 'blog_pingb2evonet', 'integer', 0 );
-		param( 'blog_pingtechnorati', 'integer', 0 );
-		param( 'blog_pingweblogs', 'integer', 0 );
-		param( 'blog_pingblodotgs', 'integer', 0 );
-		param( 'blog_disp_bloglist', 'integer', 0 );
-		param( 'blog_default_skin', 'string', '' );
-
-		$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
-		$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
-		$blog_roll = format_to_post( $blog_roll, 0, 0 );
-
-		if ( errors_display( T_('Cannot update, please correct these errors:' ),
-			'[<a href="javascript:history.go(-1)">' . T_('Back to blog editing') . '</a>]') )
-		{
-			require( dirname(__FILE__) . '/_footer.php' );
-			die();
-			break;
-		}
-
-		// Update core blog params
-		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
-									$blog_staticfilename,
-									$blog_tagline, $blog_description, $blog_longdesc,
-									$blog_locale, $blog_roll,
-									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
-									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
-									$blog_disp_bloglist );
-
-		// Update the user permissions for this blog
-		blog_update_user_perms( $blog );
-
-		header( 'Location: b2blogs.php' );
-		exit();
-		break;
 
 
 	case 'delete':
