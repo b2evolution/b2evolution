@@ -11,6 +11,7 @@ $title = T_('Antispam');
 
 param( 'action', 'string' );
 param( 'confirm', 'string' );
+param( 'keyword', 'string' );
 
 require(dirname(__FILE__).'/_menutop.php');
 require(dirname(__FILE__).'/_menutop_end.php');
@@ -24,7 +25,6 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
-		param( 'keyword', 'string', true );	// Required!
 		$keyword = substr( $keyword, 0, 80 );
 		$dbkeyword = addslashes( $keyword );
 		param( 'delhits', 'integer', 0 );
@@ -89,8 +89,6 @@ switch( $action )
 				<input type="hidden" name="action" value="ban" />
 				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
 
-				<p><strong><?php echo T_('Keyword') ?>: </strong><input type="text" size="30" maxlength="80" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" /></p>
-
 				<?php
 				if( $deluxe_ban )
 				{	// We can we autodelete junk, check for junk:
@@ -104,7 +102,7 @@ switch( $action )
 					$querycount++;
 					if( mysql_affected_rows() == 0 )
 					{	// No matching hits.
-						printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', $keyword );
+						printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
 					}
 					else
 					{
@@ -134,7 +132,7 @@ switch( $action )
 					$querycount++;
 					if( mysql_affected_rows() == 0 )
 					{	// No matching hits.
-						printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', $keyword );
+						printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
 					}
 					else
 					{
@@ -180,13 +178,13 @@ switch( $action )
 				{ // Not in blacklist
 				  ?>
 					<p><strong><input type="checkbox" name="blacklist" value="1" checked="checked" />
-					<?php printf ( T_('Blacklist the keyword [%s] locally.'), $keyword ) ?>
+					<?php printf ( T_('Blacklist the keyword [%s] locally.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 					</strong></p>
 
 					<?php if( $report_abuse ) 
 					{ ?>
 						<p><strong><input type="checkbox" name="report" value="1" checked="checked" />
-						<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), $keyword ) ?>
+						<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 						</strong></p>					
 					<?php
 					}
@@ -225,8 +223,6 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
-		param( 'keyword', 'string', true );	// Required!
-
 		// Report this keyword as abuse:
 		b2evonet_report_abuse( $keyword );
 		break;
@@ -241,8 +237,25 @@ switch( $action )
 		b2evonet_poll_abuse( );
 		break;
 }
-?>
 
+
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+{ ?>
+	<div class="panelblock">
+		<h2><?php echo T_('Add a banned keyword') ?></h2>
+		<form action="b2antispam.php" method="GET">
+			<p>
+			<?php echo T_('Keyword') ?>:
+			<input type="text" size="30" maxlength="80" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" /></p>
+			<input type="hidden" name="action" value="ban" />
+			<input type="hidden" name="type" value="keyword" />
+			<input type="submit" value="<?php echo T_('Check &amp; ban...') ?>" class="search" />
+			</p>
+		</form>
+	</div>
+<?php
+}
+?>
 <div class="panelblock">
 	<h2><?php echo T_('Banned domains blacklist') ?></h2>
 	<p><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
@@ -281,21 +294,6 @@ switch( $action )
 		<p>[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
 	<?php } ?>
 </div>
-
-<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
-{ ?>
-<div class="panelblock">
-	<h2><?php echo T_('Add a banned keyword') ?></h2>
-	<form action="b2antispam.php" method="GET">
-		<p>
-		<?php echo T_('Keyword') ?>: <input type="text" size="30" maxlength="80" name="keyword" />
-		<input type="hidden" name="action" value="ban" />
-		<input type="hidden" name="type" value="keyword" />
-		<input type="submit" value="<?php echo T_('Ban this keyword!') ?>" class="search" />
-		</p>
-	</form>
-</div>
 <?php
-}
 require( dirname(__FILE__).'/_footer.php' ); 
 ?>
