@@ -62,12 +62,12 @@ else switch ($action)
 
 		if( $template > -1 )
 		{ // we use a template
-			$edited_User = $UserCache->get_by_ID($template);	// Copy !
+			$edited_User = $UserCache->get_by_ID($template); // Copy !
 			$edited_User->set('ID', 0);
 		}
 		else
 		{ // we use an empty user
-			$edited_User = & new User();
+			$edited_User = new User();
 		}
 
 		break;
@@ -78,12 +78,12 @@ else switch ($action)
 		param( 'edited_user_ID', 'integer', true );
 		if( $edited_user_ID == 0 )
 		{ // we create a new user
-			$edited_User = & new User();
+			$edited_User = new User();
 			$edited_User->set_datecreated( $localtimenow );
 		}
 		else
 		{ // we edit an existing user:
-			$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
+			$edited_User = $UserCache->get_by_ID( $edited_user_ID ); // Copy !
 		}
 
 		if( $user_profile_only && $edited_user_ID != $current_User->ID )
@@ -179,26 +179,14 @@ else switch ($action)
 		$edited_User->set( 'notify', $edited_user_notify );
 		$edited_User->set( 'showonline', $edited_user_showonline );
 
+
 		if( !$Messages->count( 'error' ) )
 		{ // OK, no error.
+			$new_pass = '';
 
 			if( !empty($edited_user_pass2) )
 			{ // Password provided, we must encode it
 				$new_pass = md5( $edited_user_pass2 );
-
-				// Update cookies
-				if( $edited_user_ID == $current_User->ID )
-				{ // current user updates him/herself - we have to set cookies to keep him logged in
-					if( isset($new_pass) && $current_User->pass != $new_pass )
-					{
-						setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
-					}
-
-					if( $current_User->login != $edited_User->login )
-					{
-						setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
-					}
-				}
 
 				$edited_User->set( 'pass', $new_pass ); // set password
 			}
@@ -213,6 +201,24 @@ else switch ($action)
 				$edited_User->dbinsert();
 				$Messages->add( T_('New user created.'), 'note' );
 			}
+
+			if( $edited_user_ID == $current_User->ID )
+			{ // current user updates him/herself - we have to set cookies to keep him logged in
+				if( !empty($new_pass) && $current_User->pass != $new_pass )
+				{
+					setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
+				}
+
+				if( $edited_User->login != $current_User->login )
+				{
+					setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
+				}
+
+				// add to cache and get updated $current_User
+				$UserCache->add( $edited_User );
+				$current_User =& $UserCache->get_by_ID( $edited_user_ID );
+			}
+
 		}
 
 		// display menu
