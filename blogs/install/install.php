@@ -88,7 +88,7 @@ dbconnect() or die( "<p>Could not connect to database! Check you settings in /co
 
 param( 'action', 'string' );
 
-$timestamp = time();
+$timestamp = time()-120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
 $stub_all = 'blog_all';
 $stub_a = 'blog_a';

@@ -349,6 +349,10 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://b2evolution.net/' ) or mysql_oops( $query );
 
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'This is a sample blogroll entry', "This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites).", $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://b2evolution.net/' ) or mysql_oops( $query );
+
 }
 
 /*
@@ -414,7 +418,7 @@ function populate_main_tables()
 	$cat_sports = cat_create( "Sports", $cat_life, 3 )  or mysql_oops( $query );
 	$cat_movies = cat_create( "Movies", $cat_life, 3 )  or mysql_oops( $query );
 	$cat_music = cat_create( "Music", $cat_life, 3 )  or mysql_oops( $query );
-	$cat_b2evo = cat_create( "b2evolution", 'NULL', 3 )  or mysql_oops( $query );
+	$cat_b2evo = cat_create( "b2evolution Tips", 'NULL', 3 )  or mysql_oops( $query );
 
 	// Create categories for blogroll
 	$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 )  or mysql_oops( $query );
@@ -422,49 +426,81 @@ function populate_main_tables()
 	
 	echo "OK.<br />\n";
 
+	// POPULATE THE BLOGROLL:
+	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+
 	echo 'Creating sample posts...';
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'First Post', '<p>This is the first post.</p>
 	
-	<p>It appears on both blog A and blog B.</p>', $now, $cat_ann_a, array( $cat_ann_b ) ) or mysql_oops( $query );
+<p>It appears on both blog A and blog B.</p>', $now, $cat_ann_a, array( $cat_ann_b ) ) or mysql_oops( $query );
 	
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Second post', '<p>This is the second post.</p>
 	
-	<p>It appears on blog A only but in multiple categories.</p>', $now, $cat_news, array( $cat_ann_a, $cat_bg ) ) or mysql_oops( $query );
+<p>It appears on blog A only but in multiple categories.</p>', $now, $cat_news, array( $cat_ann_a, $cat_bg ) ) or mysql_oops( $query );
 	
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Third post', '<p>This is the third post.</p>
 	
-	<p>It appears on blog B only and in a single category.</p>', $now, $cat_fun ) or mysql_oops( $query );
+<p>It appears on blog B only and in a single category.</p>', $now, $cat_fun ) or mysql_oops( $query );
 	
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "Matrix Reloaded", "<p>Wait until the end of the super long end credits!</p>
+	bpost_create( 1, "Matrix Reloaded", "<p>[This is yet another sample post to demonstrate sub categories]</p>
 	
-	<p>If you're patient enough, you'll a get preview of the next episode...</p>
+<p>Wait until the end of the super long end credits!</p>
 	
-	<p>Though... it's just the same anyway! :>></p>", $now, $cat_movies ) or mysql_oops( $query );
+<p>If you're patient enough, you'll a get preview of the next episode...</p>
+	
+<p>Though... it's just the same anyway! :>></p>", $now, $cat_movies ) or mysql_oops( $query );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "Clean Permalinks! :idea:", "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations. Nethertheless, if you feel comfortable, you should try activating clean permalinks in the /conf/_advanced.php file...</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+	bpost_create( 1, "Clean Permalinks! :idea:", "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>
+
+<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the /conf/_advanced.php file... (<code>\$use_extra_path_info = 1;</code>)</p>", $now, $cat_b2evo ) or mysql_oops( $query );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "Clean Skin! :idea:", "<p>By default, b2evolution blogs are displayed in the \'standard\' skin.</p>
+	bpost_create( 1, "Apache optimization... :idea:", "<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].</p>
+	
+<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine.</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, "File permissions!", "<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>
+	
+<ul>
+
+	<li>In order to create new blogs from the admin interface or to generate static pages for your blogs, the <code>/blogs</code> folder needs to be writable by the PHP process on the server. You may need to do a chmod on this folder. If you don't know exactly try a chmod 777. You can do this either with an FTP program, a Unix shell or a web file manager like the one built into cPanel. If your server is running Windows you probably don't need to change anything.</li>
+
+  <li>In order to use the template editor for the custom skin, your <code>/skins/custom</code> folder needs to be writable by the PHP process on the server. Same as above.</li>
+
+  <li>This isn't necessary but ensures your security: do a chmod 644 on all files in the <code>/blogs/conf</code> directory, so no-one can overwrite them except you. If your server is running Windows, then set the file to 'read-only'.</li>
+	
+</ul>", $now, $cat_b2evo ) or mysql_oops( $query );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, "About evoSkins... :idea:", "<p>By default, b2evolution blogs are displayed using a default skin.</p>
 
 <p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>		
 
-<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also change the default skin or force a specific skin. <strong>Actually, you should change the default skin and delete the standard skin, as this one has navigation links at the top that are only good for the sake of the demo. These would be a nonsense on production servers!</strong> Read the manual on evoSkins!</p>", $now, $cat_b2evo ) or mysql_oops( $query );
-	
-	// POPULATE THE BLOGROLL:
-	populate_blogroll( $now, $cat_blogroll_b2evo, $cat_blogroll_contrib );
+<p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>
 
+<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, "Important information :idea:", "<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>
+	
+<p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)", $now, $cat_b2evo, array( $cat_ann_a, $cat_ann_b ) ) or mysql_oops( $query );
+	
 	echo "OK.<br />\n";
 	
 
