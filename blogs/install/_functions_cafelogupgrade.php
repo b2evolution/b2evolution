@@ -33,30 +33,29 @@ function upgrade_cafelog_tables()
 	create_default_blogs( 'Blog A (Upg)', 'Blog A (Cafelog Upgrade)', T_("This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"), false );	
 
 
-	echo 'Copying Cafelog settings...(UNTESTED) ';  // TODO: UNTESTED!	
+	echo 'Copying Cafelog settings... ';
 	// forcing paged mode because this works so much better !!!
 	// You can always change it back in the options if you don't like it.
-	
-	#$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, $new_db_version, '2000-01-01 00:00:00' FROM $oldtablesettings";
 	$query = "SELECT archive_mode, time_difference, AutoBR FROM $oldtablesettings";
 	$q = $DB->get_row( $query, ARRAY_A );
 		
-	$query = "INSERT INTO $tablesettings (set_name, set_value) VALUES
-						('db_version', '$new_db_version'),
-						('default_locale', '$default_locale'),
-						('posts_per_page', '5'),
-						('what_to_show', 'paged'),
-						('archive_mode', '".$q['archive_mode']."'),
-						('time_difference', '".$q['time_difference']."'),
-						('AutoBR', '".$q['AutoBR']."'),
-						('antispam_last_update', '2000-01-01 00:00:00')
-						('newusers_grp_ID', '".$Group_Users->get('ID')."' ),
-						('newusers_level', '1'),
-						('newusers_canregister', '0'),
-						('links_extrapath', '0'),
-						('permalink_type', 'urltitle'),
-						( 'user_minpwdlen', '5' )
-						";
+	$query = "INSERT INTO $tablesettings (set_name, set_value) 
+						VALUES
+									('db_version', '$new_db_version'),
+									('default_locale', '$default_locale'),
+									('posts_per_page', '5'),
+									('what_to_show', 'paged'),
+									('archive_mode', '".$q['archive_mode']."'),
+									('time_difference', '".$q['time_difference']."'),
+									('AutoBR', '".$q['AutoBR']."'),
+									('antispam_last_update', '2000-01-01 00:00:00'),
+									('newusers_grp_ID', '".$Group_Users->get('ID')."' ),
+									('newusers_level', '1'),
+									('newusers_canregister', '0'),
+									('links_extrapath', '0'),
+									('permalink_type', 'urltitle'),
+									( 'user_minpwdlen', '5' )
+									";
 
 	$DB->query( $query );
 	echo "OK.<br />\n";
