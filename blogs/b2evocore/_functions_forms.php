@@ -11,23 +11,45 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * form_text(-)
+ * builds an text (or password) input field.
+ *
+ * {@internal form_text(-)}}
+ * @param string the name of the input field
+ * @param string initial value
+ * @param integer size of the input field
+ * @param string label displayed in front of the field
+ * @param string note displayed with field
+ * @param integer max length of the value (if 0 field_size will be used!)
+ * @param string the CSS class to use
+ * @param string input type (only 'text' or 'password' makes sense)
+ * @param boolean display (default) or return
+ * @return mixed true (if output) or the generated HTML if not outputting
  */
-function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '', $inputtype = 'text' )
+function form_text( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '', $inputtype = 'text', $output = true  )
 {
 	if( $field_maxlength == 0 )
 		$field_maxlength = $field_size;
 
-	echo '<fieldset>';
-	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><input type="', $inputtype, '" name="', $field_name, '" id="', $field_name, '" size="', $field_size, '" maxlength="', $field_maxlength, '" value="', format_to_output($field_value, 'formvalue'),'"';
+	$r = "<fieldset>\n"
+			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
+			.'<div class="input"><input type="'.$inputtype.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_size.'" maxlength="'.$field_maxlength.'" value="'.format_to_output($field_value, 'formvalue').'"';
 	if( !empty($field_class) )
 	{
-		echo ' class="', $field_class,'"';
+		$r .= ' class="'.$field_class.'"';
 	}
-	echo '/>';
-	echo '  <span class="notes">', $field_note, '</span></div>';
-	echo "</fieldset>\n\n";
+	$r .= " />\n"
+				.'<span class="notes">'.$field_note."</span></div>\n"
+				."</fieldset>\n\n";
+				
+	if( $output )
+	{
+		echo $r;
+		return true;
+	}
+	else
+	{
+		return $r;
+	}
 }
 
 
@@ -139,23 +161,40 @@ function form_radio(
 
 /*
  * form_checkbox(-)
+ * @param string the name of the checkbox
+ * @param boolean initial value
+ * @param string label
+ * @param string note
+ * @param string CSS class
+ * @param boolean to output (default)  or not
+ * @return mixed true (if output) or the generated HTML if not outputting
  */
-function form_checkbox( $field_name, $field_value, $field_label, $field_note = '', $field_class = '' )
+function form_checkbox( $field_name, $field_value, $field_label, $field_note = '', $field_class = '', $output = true )
 {
-	echo '<fieldset>';
-	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><input type="checkbox" name="', $field_name, '" id="', $field_name, '" value="1"';
+	$r = "<fieldset>\n"
+			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
+			.'<div class="input"><input type="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
 	if( $field_value )
 	{
-		echo ' checked="checked"';
+		$r .= ' checked="checked"';
 	}
 	if( !empty($field_class) )
 	{
-		echo ' class="', $field_class,'"';
+		$r .= ' class="'.$field_class.'"';
 	}
-	echo ' />';
-	echo '  <span class="notes">', $field_note, '</span></div>';
-	echo "</fieldset>\n\n";
+	$r .= " />\n"
+				.'<span class="notes">'.$field_note."</span></div>\n"
+				."</fieldset>\n\n";
+				
+	if( $output )
+	{
+		echo $r;
+		return true;
+	}
+	else
+	{
+		return $r;
+	}
 }
 
 

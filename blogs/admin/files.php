@@ -179,14 +179,6 @@ exit;
 if( $selaction != '' )
 {
 	param( 'selectedfiles', 'array', array() );
-	param( 'sel_recursive', 'array', array() );
-
-	// map informations
-	foreach( $selectedfiles as $nr => $name )
-	{
-		$withsubdirs[ $name ] = in_array( $name, $sel_recursive );
-
-	}
 
 	if( !count( $selectedfiles ) )
 	{
@@ -204,47 +196,40 @@ if( $selaction != '' )
 
 			if( empty($zipname) )
 			{
-				require( dirname(__FILE__).'/_menutop.php' );
-				require( dirname(__FILE__).'/_menutop_end.php' );
-				?>
+				$message = '
 				<div class="panelblock">
 				<div class="panelinfo">
 				<p>
-				<?php
-				echo T_('You want to download:').'<ul>';
+				'.T_('You want to download:').'<ul>';
+				
 				foreach( $selectedfiles as $file )
 				{
 					if( $Fileman->cisdir( $file ) )
 					{
-						printf('<li>'.T_('Directory [%s]'), $file).( $withsubdirs[$file] ? ' ('.T_('with subdirectories').')' : '').'</li>';
+						$message .= sprintf('<li>'.T_('Directory [%s]'."</li>\n"), $file);
 					}
-					else printf('<li>'.T_('File [%s]'), $file).( $withsubdirs[$file] ? ' ('.T_('with subdirectories').')' : '').'</li>';
+					else $message .= sprintf('<li>'.T_('File [%s]')."</li>\n", $file);
 				}
-				?>
+				
+				$message .= '				
 				</p>
 				</div>
 				<form action="files.php" class="fform" method="post">
 				<fieldset>
-					<legend><?php echo T_('Please give a filename and choose zip format:') ?></legend>
+					<legend>'.T_('Please give a filename and choose zip format:').'</legend>';
 
-					<?php
 					foreach( $selectedfiles as $file )
-					{?>
-					<input type="hidden" name="selectedfiles[]" value="<?php echo format_to_output( $file, 'formvalue' ) ?>" />
-					<?php
+					{
+						$message .= '<input type="hidden" name="selectedfiles[]" value="'.format_to_output( $file, 'formvalue' )."\" />\n";
 					}
 					
-					$Fileman->form_hiddeninputs();
-					
-					form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.') );
-					form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.') );
-					?>
-					<div class="input"><input type="submit" name="selaction" value="<?php echo T_('Download') ?>" class="search" /></div>
+					$message .= $Fileman->form_hiddeninputs()."\n"
+											.form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.'), 80, '', 'text', false )."\n"
+											.form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n"
+											.'<div class="input"><input type="submit" name="selaction" value="'.T_('Download').'" class="search" /></div>
 				</fielset>
 				</form>
-				</div>
-				<?php
-				require( dirname(__FILE__). '/_footer.php' );
+				</div>';
 			}
 			else
 			{ // Downloading
