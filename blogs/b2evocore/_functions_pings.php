@@ -43,10 +43,10 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 															new xmlrpcval('id') ,			// Reserved
 															new xmlrpcval('user'),		// Reserved
 															new xmlrpcval('pass'),		// Reserved
-															new xmlrpcval(get_bloginfo('name', $blogparams)), 
-															new xmlrpcval(get_bloginfo('blogurl', $blogparams)),
-															new xmlrpcval(get_bloginfo('lang', $blogparams)),
-															new xmlrpcval($post_title)
+															new xmlrpcval(bloginfo('name', 'xml', false, $blogparams)), 
+															new xmlrpcval(bloginfo('blogurl', 'xml', false, $blogparams)),
+															new xmlrpcval(bloginfo('lang', 'xml', false, $blogparams)),
+															new xmlrpcval(format_to_output( $post_title, 'xml' ))
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );

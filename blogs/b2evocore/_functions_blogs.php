@@ -300,9 +300,9 @@ function blog_load_cache()
  *
  * Template tag
  */
-function bloginfo( $show='', $format = 'raw', $display = true ) 
+function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams = '' ) 
 {
-	$content = get_bloginfo( $show );
+	$content = get_bloginfo( $show, $this_blogparams );
 	$content = format_to_output( $content, $format );
 	if( $display )
 		echo $content;

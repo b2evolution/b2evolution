@@ -42,7 +42,8 @@
 $_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString), 
 																array($xmlrpcArray));
 $_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';
-function _xmlrpcs_listMethods($server, $m) {
+function _xmlrpcs_listMethods($server, $m) 
+{
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 	$v=new xmlrpcval();
 	$dmap=$server->dmap;
@@ -60,7 +61,8 @@ function _xmlrpcs_listMethods($server, $m) {
 
 $_xmlrpcs_methodSignature_sig=array(array($xmlrpcArray, $xmlrpcString));
 $_xmlrpcs_methodSignature_doc='Returns an array of known signatures (an array of arrays) for the method name passed. If no signatures are known, returns a none-array (test for type != array to detect missing signature)';
-function _xmlrpcs_methodSignature($server, $m) {
+function _xmlrpcs_methodSignature($server, $m) 
+{
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 
 	$methName=$m->getParam(0);
@@ -97,7 +99,8 @@ function _xmlrpcs_methodSignature($server, $m) {
 
 $_xmlrpcs_methodHelp_sig=array(array($xmlrpcString, $xmlrpcString));
 $_xmlrpcs_methodHelp_doc='Returns help text if defined for the method passed, otherwise returns an empty string';
-function _xmlrpcs_methodHelp($server, $m) {
+function _xmlrpcs_methodHelp($server, $m) 
+{
 	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 
 	$methName=$m->getParam(0);
@@ -138,16 +141,25 @@ $_xmlrpcs_dmap=array(
 													 "docstring" => $_xmlrpcs_methodSignature_doc)
 										 );
 
+/*
+ * Register a debugging message to be sent back in output
+ */
 $_xmlrpc_debuginfo="";
-function xmlrpc_debugmsg($m) {
+function xmlrpc_debugmsg($m) 
+{
 	global $_xmlrpc_debuginfo;
 	$_xmlrpc_debuginfo=$_xmlrpc_debuginfo . $m . "\n";
 }
 
-class xmlrpc_server {
+class xmlrpc_server 
+{
   var $dmap=array();
 
-  function xmlrpc_server($dispMap, $serviceNow=1) {
+	/*
+	 * Constructor:
+	 */
+  function xmlrpc_server($dispMap, $serviceNow=1) 
+	{
 		global $HTTP_RAW_POST_DATA;
 		// dispMap is a despatch array of methods
 		// mapped to function names and signatures
@@ -155,12 +167,14 @@ class xmlrpc_server {
 		// doesn't appear in the map then an unknown
 		// method error is generated
 		$this->dmap=$dispMap;
-		if ($serviceNow) {
+		if ($serviceNow) 
+		{
 			$this->service();
 		}
   }
 
-	function serializeDebug() {
+	function serializeDebug() 
+	{
 		global $_xmlrpc_debuginfo;
 		if ($_xmlrpc_debuginfo!="") 
 			return "<!-- DEBUG INFO:\n\n" .
@@ -169,10 +183,11 @@ class xmlrpc_server {
 			return "";
 	}
 
-	function service() {
+	function service() 
+	{
 		$r=$this->parseRequest();
 		$payload="<?xml version=\"1.0\"?>\n" . 
-			$this->serializeDebug() .
+			$this->serializeDebug() .							// Include debug info as comments
 			$r->serialize();
 		Header("Content-type: text/xml\r\nContent-length: " . 
 					 strlen(trim($payload)));
@@ -210,87 +225,91 @@ class xmlrpc_server {
 		return array(0, "Wanted $wanted, got $got at param $pno)");
 	}
 
-  function parseRequest($data="") {
-	global $_xh,$HTTP_RAW_POST_DATA;
-	global $xmlrpcerr, $xmlrpcstr, $xmlrpcerrxml, $xmlrpc_defencoding,
-		$_xmlrpcs_dmap;
-
+  function parseRequest($data="") 
+	{
+		global $_xh,$HTTP_RAW_POST_DATA;
+		global $xmlrpcerr, $xmlrpcstr, $xmlrpcerrxml, $xmlrpc_defencoding,
+			$_xmlrpcs_dmap;
 	
-
-	if ($data=="") {
-	  $data=$HTTP_RAW_POST_DATA;
-	}
-	$parser = xml_parser_create($xmlrpc_defencoding);
-
-	$_xh[$parser]=array();
-	$_xh[$parser]['st']="";
-	$_xh[$parser]['cm']=0; 
-	$_xh[$parser]['isf']=0; 
-	$_xh[$parser]['params']=array();
-	$_xh[$parser]['method']="";
-
-	// decompose incoming XML into request structure
-
-	xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
-	xml_set_element_handler($parser, "xmlrpc_se", "xmlrpc_ee");
-	xml_set_character_data_handler($parser, "xmlrpc_cd");
-	xml_set_default_handler($parser, "xmlrpc_dh");
-	if (!xml_parse($parser, $data, 1)) {
-	  // return XML error as a faultCode
-	  $r=new xmlrpcresp(0,
-						$xmlrpcerrxml+xml_get_error_code($parser),
-						sprintf("XML error: %s at line %d",
-					xml_error_string(xml_get_error_code($parser)),
-				  xml_get_current_line_number($parser)));
-	  xml_parser_free($parser);
-	} else {
-	  xml_parser_free($parser);
-	  $m=new xmlrpcmsg($_xh[$parser]['method']);
-	  // now add parameters in
-	  $plist="";
-	  for($i=0; $i<sizeof($_xh[$parser]['params']); $i++) {
-			//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
-			$plist.="$i - " .  $_xh[$parser]['params'][$i]. " \n";
-			eval('$m->addParam(' . $_xh[$parser]['params'][$i]. ");");
-	  }
-		// uncomment this to really see what the server's getting!
-		// xmlrpc_debugmsg($plist);
-	  // now to deal with the method
-		$methName=$_xh[$parser]['method'];
-		if (ereg("^system\.", $methName)) {
-			$dmap=$_xmlrpcs_dmap; $sysCall=1;
-		} else {
-			$dmap=$this->dmap; $sysCall=0;
+		if ($data=="") 
+		{
+			$data=$HTTP_RAW_POST_DATA;
 		}
-	  if (isset($dmap[$methName]['function'])) {
-			// dispatch if exists
-			if (isset($dmap[$methName]['signature'])) {
-				$sr=$this->verifySignature($m, 
-																	$dmap[$methName]['signature'] );
+		// xmlrpc_debugmsg( 'Data received: ['.$data.']' );
+		
+		
+		$parser = xml_parser_create($xmlrpc_defencoding);
+	
+		$_xh[$parser]=array();
+		$_xh[$parser]['st']="";
+		$_xh[$parser]['cm']=0; 
+		$_xh[$parser]['isf']=0; 
+		$_xh[$parser]['params']=array();
+		$_xh[$parser]['method']="";
+	
+		// decompose incoming XML into request structure
+	
+		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
+		xml_set_element_handler($parser, "xmlrpc_se", "xmlrpc_ee");
+		xml_set_character_data_handler($parser, "xmlrpc_cd");
+		xml_set_default_handler($parser, "xmlrpc_dh");
+		if (!xml_parse($parser, $data, 1)) 
+		{
+			// return XML error as a faultCode
+			$r=new xmlrpcresp(0,
+							$xmlrpcerrxml+xml_get_error_code($parser),
+							sprintf("XML error: %s at line %d",
+						xml_error_string(xml_get_error_code($parser)),
+						xml_get_current_line_number($parser)));
+			xml_parser_free($parser);
+		} else {
+			xml_parser_free($parser);
+			$m=new xmlrpcmsg($_xh[$parser]['method']);
+			// now add parameters in
+			$plist="";
+			for($i=0; $i<sizeof($_xh[$parser]['params']); $i++) {
+				//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
+				$plist.="$i - " .  $_xh[$parser]['params'][$i]. " \n";
+				eval('$m->addParam(' . $_xh[$parser]['params'][$i]. ");");
 			}
-			if ( (!isset($dmap[$methName]['signature']))
-					 || $sr[0]) {
-				// if no signature or correct signature
-				if ($sysCall) { 
-					eval('$r=' . $dmap[$methName]['function'] . 
-							 '($this, $m);');
+			// uncomment this to really see what the server's getting!
+			// xmlrpc_debugmsg($plist);
+			// now to deal with the method
+			$methName=$_xh[$parser]['method'];
+			if (ereg("^system\.", $methName)) {
+				$dmap=$_xmlrpcs_dmap; $sysCall=1;
+			} else {
+				$dmap=$this->dmap; $sysCall=0;
+			}
+			if (isset($dmap[$methName]['function'])) {
+				// dispatch if exists
+				if (isset($dmap[$methName]['signature'])) {
+					$sr=$this->verifySignature($m, 
+																		$dmap[$methName]['signature'] );
+				}
+				if ( (!isset($dmap[$methName]['signature']))
+						 || $sr[0]) {
+					// if no signature or correct signature
+					if ($sysCall) { 
+						eval('$r=' . $dmap[$methName]['function'] . 
+								 '($this, $m);');
+					} else {
+						eval('$r=' . $dmap[$methName]['function'] . 
+								 '($m);');
+					}
 				} else {
-					eval('$r=' . $dmap[$methName]['function'] . 
-							 '($m);');
+					$r=new xmlrpcresp(0,
+								$xmlrpcerr["incorrect_params"],
+								$xmlrpcstr["incorrect_params"].": ". $sr[1]);
 				}
 			} else {
-				$r=new xmlrpcresp(0,
-						  $xmlrpcerr["incorrect_params"],
-						  $xmlrpcstr["incorrect_params"].": ". $sr[1]);
+			// else prepare error response
+			$r=new xmlrpcresp(0,
+								$xmlrpcerr["unknown_method"],
+								$xmlrpcstr["unknown_method"]);
 			}
-	  } else {
-		// else prepare error response
-		$r=new xmlrpcresp(0,
-						  $xmlrpcerr["unknown_method"],
-						  $xmlrpcstr["unknown_method"]);
-	  }
-	}
-	return $r;
+		}
+		return $r;
   }
 
   function echoInput() {

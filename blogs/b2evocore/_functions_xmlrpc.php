@@ -559,12 +559,15 @@ class xmlrpcresp {
   var $hdrs;
 
   function xmlrpcresp($val, $fcode=0, $fstr="") {
-    if ($fcode!=0) {
+    if ($fcode!=0) 
+		{
       $this->xv=0;
       $this->fn=$fcode;
       $this->fs=trim(htmlspecialchars($fstr));
-	  logIO("O",$this->fs);
-    } else {
+	  	// logIO('O',$this->fs);
+    } 
+		else 
+		{
       $this->xv=$val;
       $this->fn=0;
     }
