@@ -1,14 +1,13 @@
-body	{
+body {
 	margin-top: 0px;
 	margin-left: 0px;
 	margin-right: 0px;
 	margin-bottom: 0px;
-  background-color: #FFFFFF;
+	background-color: #FFFFFF;
 	color: #000000; 
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 84%;
 }
-
 h1 {
 	color: #8ae;
 	font-size: 160%;
@@ -17,7 +16,6 @@ h1.logintitle {
 	color: #000;
 	font-size: 120%;
 }
-
 h2 {
 	margin-top: 0ex;
 	margin-bottom: 1ex;
@@ -42,14 +40,11 @@ a:hover {
 	color: #FF3300;
 	text-decoration: underline;
 }
-
-.panelbody 
-{
+.panelbody {
 	margin: 0ex;
 	padding: 0ex;
 	/* border:  1px solid #f00; */
 }
-
 .bPosts {
 	vertical-align: top;
 	float: left;
@@ -68,87 +63,68 @@ a:hover {
 	padding: 0ex;
 	overflow: hidden;
 }
-
-
-
-div.panelblock
-{
+div.panelblock {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
 	margin: 3ex;
 }
-div.loginblock
-{
+div.loginblock {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
 	margin: 3ex auto;
 	width: 30em;
 }
-
-div.paneltopblock
-{
+div.paneltopblock {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
 	margin: 3ex;
-	margin-bottom: 0ex;}
-
-.bPost, .bPostpublished
-{
+	margin-bottom: 0ex;
+}
+.bPost, .bPostpublished {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
 	margin: 3ex;
 	margin-right: 0ex;
 }
-
-.bSideItem
-{
+.bSideItem {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
 	margin: 3ex;
 	margin-left: 0ex;
 }
-.bSideItem2
-{
+.bSideItem2 {
 	border: 1px solid #CCCCCC;
 	padding: 0ex 2ex 2ex;
 	margin: 3ex 3ex 3ex 0ex;
 }
-
-div.panelinfo{
+div.panelinfo {
 	width: 90%;
 	padding: 2ex;
 	margin: 3ex auto;
 	border: 1px solid #def;
 	background: #eef5ff;
 }
-
-div.error{
+div.error {
 	width: 90%;
 	padding: 2ex;
 	margin: 3ex auto;
 	border: 1px solid #fed;
 	background: #fff5ee;
 }
-div.loginblock div.error{
+div.loginblock div.error {
 	width: 95%;
 }
 
-ul.error{
+ul.error {
 	margin-bottom: 0ex;
 }
-
 .error {
 	font-weight: bold;
 	color: #FF0000;
 }
-
-legend
-{
+legend {
 	font-weight: bold;
 }
-
-
-
 .tabletoprow {
 	background-color: #ffffff;
 	color: #000000; 
@@ -170,52 +146,37 @@ legend
 	background-color: #cccccc;
 	background-image: url("../admin/img/b2button2.gif");
 }
-
-
-
 xmp { /* Just in case */
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 10pt;
 }
-form 
-{ 
+form { 
 	margin: 0; 
 	padding: 0; 
 } /* thanks #mozilla */
-
-
-
-form.inline
-{
+form.inline {
 	margin: 0px;
 	padding:0px;
 	display: inline;
 }
-
-
-form.fform fieldset
-{
+form.fform fieldset {
 	clear: both;
 	border: none;
 	margin: 2ex;
 }
-div.label
-{
+div.label {
 	float: left;
 	width: 24%;
 	text-align: right;
 	padding-top: .6ex;
 }
-div.label label
-{
+div.label label {
 	font-weight: bold;
 }
-div.input
-{
+div.input {
 	float: right;
 	width: 75%;
 }
-
 textarea,input,select {
 	background-color: #f0f0f0;
 	border-width: 1px;
@@ -224,81 +185,62 @@ textarea,input,select {
 	padding: 2px;
 	margin: 1px;
 }
-
-input.checkbox 
-{
+input.checkbox {
 	background-color: #ffffff;
 	border-width: 0px;
 	padding: 0px;
 	margin: 0px;
 }
-
-input.searchfield
-{
+input.searchfield {
 	/* Buggued in IE 6: width:100%; */
 	margin: 0ex;
 }
-
 input.large, 
 textarea.large,
-div.large
-{
+div.large {
 	width: 98%;
 	margin: 0ex;
 }
-
 table.thin,
-table.thincols,
-{
+table.thincols {
 	border: 1px solid #ccc;
 	margin: auto;
 	border-collapse: collapse
 }
-table.thin td
-{
+table.thin td {
 	border-bottom: 1px solid #ccc;
 	padding: .3ex 1ex;
 }
-table.thincols td
-{
+table.thincols td {
 	border: 1px solid #ccc;
 	padding: .3ex 1ex;
 }
 table.thin th,
-table.thincols th,
-{
+table.thincols th {
 	color: #fff;
 	background-color: #ccc;
 	border-left: 1px solid #FFFFFF;
 	border-right: 1px solid #FFFFFF;
 	padding: .3ex 1ex;
 }
-
-table.invisible
-{
+table.invisible {
 	margin: 1ex;
 	border-collapse: collapse;
 	margin: auto;
 }
-table.invisible td
-{
+table.invisible td {
 	padding: 0ex 1ex;
 }
-td.right
-{
+td.right {
 	text-align: right;
 }
-
-
-
 blockquote {
 	border: 2px dotted #33CCCC;
 	padding: 12px 16px;
 	background-color: #DDEEEE;
 	margin: 10px;
 }
-.center
-{
+.center {
 	text-align: center;
 }
 img.top {
@@ -323,7 +265,6 @@ img.rightmargin {
 	margin-top: .2ex;
 	margin-bottom: .2ex;
 }
-
 acronym {
 	border-bottom-width: 1px;
 	border-bottom-style: dotted;
@@ -336,16 +277,14 @@ abbr {
 	border-bottom-color: #000000;
 	cursor: help;
 }
-
-.footer{
+.footer {
 	text-align: center;
 	font-size: 74%;
 	margin-top: 0ex;
 	margin-bottom: 0ex;
 	padding-bottom: 1ex;
 }
-.nobr
-{
+.nobr {
 	white-space: nowrap;
 }
 span.line
@@ -357,91 +296,83 @@ span.line
 /* ---- Header + Menu --- */
 
 
-#header 
-{
+#header {
   float:left;
   width:100%;
   background: url("img/bg.gif") repeat-x bottom;
 	font-size: 85%;
   line-height:normal;
 }
-#evologo
-{
+#evologo {
+	float:left;
 	padding-left: 1em;
+	padding-right: 1em;
 	vertical-align: middle;
 	border: 0;
 }
-#headfunctions
-{
-	float: right;
+#headfunctions {
+	margin-top: .5ex;
 	text-align:right;
-	margin: 1ex;
+	margin-right: 1ex;
 	color: #b0b0b0;
 }
-#header ul 
-{
-  margin:0;
-  padding: 0.1ex 1em 0;
-  list-style: none;
+#headinfo {
+	padding-left: 1em;
+	line-height: 150%;
+	color: #b0b0b0;
+	white-space: nowrap;
 }
-#header li 
-{
-  float:left;
-  background:url("img/left_both.gif") no-repeat left top;
-  margin:0;
-  padding:0 0 0 9px;
+#header ul {
+	margin:0;
+	clear: both;
+	padding: 0.1ex 1em 0;
+	list-style: none;
+}
+#header li {
+	float:left;
+	background:url("img/left_both.gif") no-repeat left top;
+	margin:0;
+	padding:0 0 0 9px;
 	border-bottom:1px solid #765;
 }
-#header li a 
-{
-  float:left;
-  display:block;
-  white-space:nowrap;
+#header li a {
+	float:left;
+	display:block;
+	white-space:nowrap;
 	background: url("img/right_both.gif") no-repeat right top;
-  padding:4px 11px 3px 2px;
-  text-decoration:none;
-  /* font-weight:bold; */
-  color:#765;
-  }
-/* Commented Backslash Hack
-   hides rule from IE5-Mac \*/
+	padding:4px 11px 3px 2px;
+	text-decoration:none;
+	color:#765;
+ }
+/* Commented Backslash Hack: hides rule from IE5-Mac \*/
 #header li a {float:none;}
 /* End IE5-Mac hack */
-
 #header li a:hover {
-  color:#333;
+	color:#333;
 	text-decoration: underline;		/* for IE */
 }
-
 #header li:hover {			/* Won't work in IE */
-  background-position:0% -150px;
-  color:#333;
-  }
+	background-position:0% -150px;
+	color:#333;
+}
 #header li:hover a {			/* Won't work in IE */
-  background-position:100% -150px;
-  color:#333;
+	background-position:100% -150px;
+	color:#333;
 	text-decoration: none;
-  }
-
-#header li.current 
-{
-  background-position:0% -150px;
-  border-width:0;
 }
-#header li.current a 
-{
-  background-position:100% -150px;
-  color:#333;
-  padding-bottom:4px;
+#header li.current {
+	background-position:0% -150px;
+	border-width:0;
 }
-
-#header li.current a:hover
-{
+#header li.current a {
+	background-position:100% -150px;
+	color:#333;
+	padding-bottom:4px;
+}
+#header li.current a:hover {
 	text-decoration: underline;
 }
-
-div.menutoptitle 
-{
+div.menutoptitle {
 	clear: both;
 	margin: 0 2ex 0;
 	padding: 1ex 0 0 0;
@@ -460,7 +391,6 @@ div.menutoptitle
 	border: 1px solid #e9f;
 	background-color: #f8f0ff;
 }
-
 .bPostprivate {
 	clear: both;
 	padding: 2ex;
@@ -469,7 +399,6 @@ div.menutoptitle
 	border: 1px solid #f99;
 	background-color: #fff0f0;
 }
-
 .bPostdraft {
 	clear: both;
 	padding: 2ex;
@@ -478,7 +407,6 @@ div.menutoptitle
 	border: 1px dashed #CCCCCC;
 	background-color: #EEEEEE;
 }
-
 .bPostdeprecated {
 	clear: both;
 	padding: 2ex;
@@ -488,7 +416,6 @@ div.menutoptitle
 	background-color: #ddd;
 	color: #999;
 }
-
 .bTitle {
 	margin-top: 8px;
 	margin-bottom: 8px;
@@ -534,24 +461,20 @@ div.menutoptitle
 	margin-bottom: 8px;
 }
 .bSideItem ul,
-.bSideItem2 ul 
-{
+.bSideItem2 ul {
 	margin-left: 8px;
 	padding-left: 8px;
 	margin-top: .5ex;
 	margin-bottom: .5ex;
 }
-.bMore
-{
+.bMore {
 	text-align: center;
 }
-.bMore a
-{
+.bMore a {
 	font-weight: bold;
 	font-size: 110%;
 }
-div.statbloc
-{
+div.statbloc {
 	float: left;
 	width: 44%;
 	margin-left: 2%; 
@@ -559,9 +482,7 @@ div.statbloc
 	margin-bottom: 2ex;
 	border: 1px solid #33BBBB;
 }
-
-div.statbloc h3
-{
+div.statbloc h3 {
 	margin-top: 0px;
 	margin-left: 0px;
 	margin-right: 0px;
@@ -572,21 +493,18 @@ div.statbloc h3
 }
 
 /* Styles for comment form */
-form.bComment fieldset
-{
+form.bComment fieldset {
 	clear: both;
 	border: none;
 	margin: 2ex 0ex;
 	padding: 0ex;
 	/* border: 1px solid #f00; */
 }
-form.bComment label
-{
+form.bComment label {
 	font-weight: bold;
 }
 input.bComment, 
-textarea.bComment
-{
+textarea.bComment {
 	background-color: #f0f0f0;
 	border-width: 1px;
 	border-color: #cccccc;
@@ -595,8 +513,7 @@ textarea.bComment
 	width: 98%;
 	margin: 0ex;
 }
-select.bComment
-{
+select.bComment {
 	background-color: #f0f0f0;
 	border-width: 1px;
 	border-color: #cccccc;
@@ -605,8 +522,7 @@ select.bComment
 	width: 99%;
 	margin: 0ex;
 }
-.notes
-{
+.notes {
 	/* display: block; */
 	font-size: 80%;
 	margin: 1em 0ex;
@@ -614,16 +530,14 @@ select.bComment
 	/* border: 1px solid #f00; */
 }
 
-.field
-{
+.field {
 	background-color: #f0f0f0;
 	border-width: 1px;
 	border-color: #cccccc;
 	border-style: solid;
 	padding: .5ex;
 }
-input.SearchField
-{
+input.SearchField {
 	background-color: #f0f0f0;
 	border-width: 1px;
 	border-color: #cccccc;
@@ -635,48 +549,36 @@ input.SearchField
 
 
 /* Calendar: */
-caption.bCalendarMonth
-{
+caption.bCalendarMonth {
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 	border-top: solid 1px #ccc;
 }
-table.bCalendarTable
-{
+table.bCalendarTable {
 	margin: auto;
 	font-size: 84%;
 	border: solid 1px #ccc;
 }
-tr.bCalendarRow
-{
+tr.bCalendarRow {
 	text-align: center;
 }
-th.bCalendarHeaderCell
-{
+th.bCalendarHeaderCell {
 	font-size: 84%;
 }
-td.bCalendarCell
-{
+td.bCalendarCell {
 }
-td.bCalendarEmptyCell
-{
+td.bCalendarEmptyCell {
 }
-a.bCalendarLinkPost
-{
+a.bCalendarLinkPost {
 }
-span.bCalendarToday
-{
+span.bCalendarToday {
 	font-weight: bold;
 }
-
-
-
 
 .FigZone {
 	text-align: center;
 	margin: 8px;
 }
-
 .FigCent240 {
 	width: 240px;
 	color: #FFFFFF;
@@ -699,48 +601,43 @@ span.bCalendarToday
 	border: none;
 	margin-bottom: 8px;
 }
-.FigZone a{
+.FigZone a {
 	color: #FFFFFF;
 	text-decoration: none;
 }
-.FigZone a:link{
+.FigZone a:link {
 	color: #FFFFFF;
 }
-.FigZone a:visited{
+.FigZone a:visited {
 	color: #FFFFFF;
 }
-.FigZone a:active{
+.FigZone a:active {
 	color: #FFFFFF;
 }
 
 .bSideItem fieldset,
-.bSideItem2 fieldset
-{
+.bSideItem2 fieldset {
 	border: 1px solid #ddd;
 	margin: 0ex 0ex 1ex;
 	padding: 1ex;
 }
 
-.bSideItem fieldset div
-{
+.bSideItem fieldset div {
 	margin: 1ex 0ex;
 }
-fieldset.extracats
-{
+fieldset.extracats {
 	border: 1px solid #ccc;
 	padding: 0ex;
 	overflow: visible;
 }
-div.extracats
-{
+div.extracats {
 	/* border: 1px solid #f00; */
 	height: 50ex;
 	overflow: auto;
 	padding: 0ex 1ex;
 	margin: 0ex;
 }
-.extracatnote
-{
+.extracatnote {
 	/* display: block; */
 	font-size: 80%;
 	margin: 0em 0ex 1em;
@@ -749,35 +646,28 @@ div.extracats
 }
 
 /* Calendar: */
-caption.bCalendarMonth
-{
+caption.bCalendarMonth {
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 	border-top: solid 1px #ccc;
 	font-weight: bold;
 	margin: auto;
 }
-table.bCalendarTable
-{
+table.bCalendarTable {
 	margin: auto;
 	font-size: 77%;
 	border: solid 1px #ccc;
 }
-tr.bCalendarRow
-{
+tr.bCalendarRow {
 	text-align: center;
 }
-th.bCalendarHeaderCell
-{
+th.bCalendarHeaderCell {
 	font-size: 84%;
 }
-td.bCalendarCell
-{
+td.bCalendarCell {
 }
-td.bCalendarEmptyCell
-{
+td.bCalendarEmptyCell {
 }
-a.bCalendarLinkPost
-{
+a.bCalendarLinkPost {
 	font-weight: bold;
 }

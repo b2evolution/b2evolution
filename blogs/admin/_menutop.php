@@ -27,15 +27,19 @@ if( empty($mode) )
 ?>
 
 <div id="header">
+	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
+
 	<div id="headfunctions">
-	<?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong> &middot;
-	<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout') ?></a> &middot;
-	<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
+		<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout') ?></a> &middot;
+		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
 	</div>
 
-	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
-	Version <?php echo $b2_version ?>
-	
+	<div id="headinfo">
+		b2evo v <strong><?php echo $b2_version ?></strong>
+		&middot; <?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
+		&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
+		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong> 
+	</div>
 	 
 	<ul>
 	<?php
