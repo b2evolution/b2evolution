@@ -153,6 +153,8 @@ function upgrade_b2evo_tables()
 
 		// Create User Groups
 		create_groups();
+		$tablegroups_isuptodate = true;
+		$tableblogusers_isuptodate = true;
 
 		echo 'Creating user blog permissions... ';
 		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
@@ -214,7 +216,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8060 )
-	{	// upgrade to 0.8.9+CVS
+	{	// upgrade to 0.9
 		
 		create_locales();
 
@@ -308,7 +310,7 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE $tableblogs
 							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-EU',
-							CHANGE COLUMN blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
+							MODIFY COLUMN blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php AFTER blog_locale',
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin";
 		$DB->query( $query );
@@ -386,12 +388,19 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		if( !isset( $tableblogusers_isuptodate ) )
+		{
+			echo 'Upgrading Blog-User permissions table... ';
+			$query = "ALTER TABLE $tableblogusers
+								ADD COLUMN bloguser_ismember tinyint NOT NULL default 0 AFTER bloguser_user_ID";
+			$DB->query( $query );
 
-		echo 'Upgrading Blog-User permissions table... ';
-		$query = "ALTER TABLE $tableblogusers
-							ADD COLUMN bloguser_ismember tinyint NOT NULL default 0 AFTER bloguser_user_ID";
-		$DB->query( $query );
-		echo "OK.<br />\n";
+			// Any row that is created holds at least one permission,
+			// minimum permsission is to be a member, so we add that one too, to all existing rows.
+			$DB->query( "UPDATE $tableblogusers
+											SET bloguser_ismember = 1" );
+			echo "OK.<br />\n";
+		}
 
 		echo 'Upgrading Comments table... ';
 		$query = "ALTER TABLE $tablecomments
