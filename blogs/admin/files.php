@@ -7,6 +7,7 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -29,6 +30,11 @@
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
  * @package admin
@@ -36,6 +42,8 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: François PLANQUE.
+ * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
+ * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
  *
@@ -1195,6 +1203,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.74  2005/02/11 20:30:20  jwedgeco
+ * Added copyright and license info. I forgot to add it on the last commit.
+ *
  * Revision 1.73  2005/02/11 20:27:51  jwedgeco
  * I added a kludge. For some reason on my setup, the empty() php funtion doesn't work on $allowedFileExtensions when $settings->get(upload_allowedext) is blank.
  *
