@@ -8,7 +8,7 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evocore
- * @author Jeff Bearer - {@link http://www.jeffbearer.com/} + fplanque
+ * @author Jeff Bearer - {@link http://www.jeffbearer.com/} + blueyed, fplanque
  */
 
 /**
