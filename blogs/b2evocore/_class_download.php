@@ -1,6 +1,8 @@
 <?
  /**
- * This classfile implements http gets and posts
+ * This classfile implements file downloads
+ * (and posibly uploads at a later date)
+ *
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -10,10 +12,11 @@
  *
  * @package evocore
  */
-
+if( !defined('DB_USER') ) die( 'You have to many shoes you mentalist.' );
 
  //dirname(__FILE__).'/
 require_once( '_class_http.php');
+
 /**
  * Class download
  *
@@ -22,7 +25,7 @@ require_once( '_class_http.php');
 class download
 {
 
-      	function saveToTemp ($url, $type, $destination)
+      	function saveToFile ($url, $type, $destination)
 	{
          /*
          *   $url = "http://www.wheely-bin.co.uk/facecake.php"
@@ -32,7 +35,7 @@ class download
          */
          if (!is_null($url){
           /*
-           print_r(parse_url("http://username:password@hostname:81/path?arg=value#anchor"));
+           parse_url("http://username:password@hostname:81/path?arg=value#anchor");
            Array
            (
                 [scheme] => http
@@ -58,17 +61,27 @@ class download
           else { die();};
           switch ($type)
              {
-                case "get":
-                        http::socket_get($hostname, $port, $url, $vars);
+                case "socket_get":
+                        $result = http::socket_get($hostname, $port, $url, $vars);
                         break;
-                case "post":
-                        http::socket_post($server, $port, $url, $vars);
+                case "socket_post":
+                        $result = http::socket_post($server, $port, $url, $vars);
+                        break;
+                 case "curl_get":
+                        $result = http::curl_get($hostname, $port, $url, $vars);
+                        break;
+                case "curl_post":
+                        $result = http::curl_post($server, $port, $url, $vars);
                         break;
                 default:
                         http::socket_get($server, $port, $url, $vars);
                         break;
              };
+
+         $fp = fopen($destination, "w");
+         fclose($fp);
         };
+
 };
 
 ?>
