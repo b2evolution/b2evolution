@@ -57,7 +57,7 @@
  */
 require_once dirname(__FILE__).'/_header.php';
 
-$admin_tab = 'files';
+$AdminUI->setPath( 'files' );
 $admin_pagetitle = T_('Filemanager').' (beta)';
 
 
@@ -1195,6 +1195,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.77  2005/02/27 20:34:49  blueyed
+ * Admin UI refactoring
+ *
  * Revision 1.76  2005/02/23 04:06:16  blueyed
  * minor
  *

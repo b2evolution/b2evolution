@@ -36,8 +36,7 @@
  * Includes:
  */
 require( dirname(__FILE__). '/_header.php' );
-$admin_tab = 'options';
-$tab = 'plugins';
+$AdminUI->setPath( 'options', 'plugins' );
 $admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Plug-ins');
 
 param( 'action', 'string' );
@@ -48,8 +47,7 @@ require( dirname(__FILE__). '/_menutop.php' );
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
+$AdminUI->dispSubmenu();
 
 
 // Discover additional plugins:

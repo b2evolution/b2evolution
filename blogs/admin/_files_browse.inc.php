@@ -42,8 +42,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
+$AdminUI->dispSubmenu();
 
 ?>
 
@@ -682,6 +681,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/27 20:34:48  blueyed
+ * Admin UI refactoring
+ *
  * Revision 1.10  2005/02/21 00:34:36  blueyed
  * check for defined DB_USER!
  *

@@ -10,8 +10,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
+$AdminUI->dispSubmenu();
 ?>
 <div class="left_col">
 	<div class="NavBar">

@@ -33,8 +33,7 @@
  */
 require_once dirname(__FILE__). '/_header.php';
 
-$admin_tab = 'options';
-$tab = 'posttypes';
+$AdminUI->setPath( 'options', 'types' );
 $admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Post types management');
 $edited_table = 'T_posttypes';
 $edited_table_IDcol = 'ptyp_ID';
@@ -42,5 +41,5 @@ $edited_table_namecol = 'ptyp_name';
 $edited_table_orderby = 'ptyp_name ASC';
 $edited_name_maxlen = 40;
 
-require dirname(__FILE__). '/_listeditor.php';
+require dirname(__FILE__).'/_listeditor.php';
 ?>

@@ -21,7 +21,7 @@
  * Includes:
  */
 require_once( dirname(__FILE__) . '/_header.php' );
-$admin_tab = 'edit';
+$AdminUI->setPath( 'edit' );
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );

@@ -13,7 +13,7 @@
  * Includes:
  */
 require_once( dirname(__FILE__).'/_header.php' );
-$admin_tab = 'cats';
+$AdminUI->setPath( 'cats' );
 $admin_pagetitle = $admin_pagetitle_titlearea = T_('Categories for blog:');
 param( 'action', 'string' );
 param( 'blog', 'integer', 0 );

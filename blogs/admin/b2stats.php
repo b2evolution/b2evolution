@@ -52,11 +52,13 @@
  * Includes:
  */
 require_once( dirname(__FILE__).'/_header.php' );
-$admin_tab = 'stats';
+
+
+
+$AdminUI->setPath( 'stats', param( 'tab', 'string', 'summary', true ) );
 $admin_pagetitle = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
-param( 'tab', 'string', 'summary', true );
 param( 'blog', 'integer', 0 );
 
 $blogListButtons = '<a href="'.regenerate_url( array('blog','page'), "blog=0" ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('None').'</a> ';
@@ -68,8 +70,8 @@ for( $curr_blog_ID=blog_list_start('stub');
 		$blogListButtons .= '<a href="'.regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
 	}
 
-require(dirname(__FILE__) . '/_menutop.php');
 
+require( dirname(__FILE__).'/_menutop.php' );
 
 // Check permission:
 $current_User->check_perm( 'stats', 'view', true );
@@ -129,10 +131,10 @@ switch( $action )
 		break;
 }
 
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
 
-switch( $tab )
+$AdminUI->dispSubmenu();
+
+switch( $AdminUI->getPath(1) )
 {
 	case 'summary':
 		?>

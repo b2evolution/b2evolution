@@ -8,6 +8,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,36 +27,46 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin-skin
  * @subpackage evo
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 
 if( empty($mode) )
 { // We're not running in an special mode (bookmarklet, sidebar...)
+
+	// GLOBAL HEADER - APP TITLE, LOGOUT, ETC. :
 	?>
 	<div id="header">
 		<?php echo $app_admin_logo; ?>
 
 		<div id="headinfo">
+			<span id="headfunctions">
+				<?php echo $app_exit_links; ?>
+			</span>
 
-		<span id="headfunctions">
-			<?php echo $app_exit_links; ?>
-		</span>
-
-		<?php
-		if( !$obhandler_debug )
-		{ // don't display changing time when we want to test obhandler
-		?>
-			<?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
-			&middot; <abbr title="<?php echo T_('Greenwich Mean Time '); ?>"><?php echo /* TRANS: short for Greenwich Mean Time */ T_('GMT:') ?></abbr> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
-			&middot; <?php echo T_('Logged in as:'), ' <strong>', $current_User->disp('login'); ?></strong>
-		<?php } ?>
+			<?php
+			if( !$obhandler_debug )
+			{ // don't display changing time when we want to test obhandler
+				echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
+				&middot; <abbr title="<?php echo T_('Greenwich Mean Time '); ?>"><?php echo /* TRANS: short for Greenwich Mean Time */ T_('GMT:') ?></abbr> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
+				&middot; <?php echo T_('Logged in as:'), ' <strong>', $current_User->disp('login'); ?></strong>
+			<?php
+			}
+			?>
 		</div>
 
 		<h1>
@@ -73,54 +84,19 @@ if( empty($mode) )
 		</h1>
 	</div>
 
-	<div id="mainmenu">
-	<ul>
 	<?php
-		// GLOBAL MENU :
-		foreach( $menu as $loop_tab => $loop_details )
-		{
-			$perm = true; // By default
-			if( !isset($loop_details['perm_name'])
-					|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
-					|| isset($loop_details['text_noperm']) )
-			{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-				echo $loop_tab == $admin_tab
-							? '<li class="current">'
-							: '<li>';
-
-				echo '<a href="'.$loop_details['href'].'"';
-				if( isset($loop_details['style']) )
-				{
-					echo ' style="'.$loop_details['style'].'"';
-				}
-
-				echo '>';
-
-				echo $perm
-							? $loop_details['text']
-							: $loop_details['text_noperm'];
-
-				echo "</a></li>\n";
-			}
-		}
+	$AdminUI->dispMenu( NULL );
 	?>
-	</ul>
-	<p class="center"><?php echo $app_shortname; ?> v <strong><?php echo $app_version ?></strong></p>
-	</div>
+
 
 	<div class="panelbody">
 	<?php
-	}
+}
 ?>
 
 <div id="payload">
 
 <?php
 // OPTIONAL BLOG SELECTION...
-if( isset($blogListButtons) )
-{ // We have blog selection buttons to display:
-	echo '<div id="TitleArea">';
-	echo $blogListButtons;
-	echo '</div>';
-}
+echo $AdminUI->getBloglistButtons( '<div id="TitleArea">', '</div>' );
 ?>

@@ -146,22 +146,22 @@ if( ($action == 'delete') && !$confirm )
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 		<p>
-		
+
 		<?php
 		$Form = & new Form( '', 'form', 'get' );
-	
-		$Form->begin_form( 'inline' );		
+
+		$Form->begin_form( 'inline' );
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
-		
+
 		$Form->begin_form( 'inline' );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
 		?>
-		
+
 		</p>
 
 	</div>
@@ -169,8 +169,7 @@ if( ($action == 'delete') && !$confirm )
 }
 
 
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
+$AdminUI->dispSubmenu();
 
 // Create result set:
 $Results = new Results(	"SELECT $edited_table_IDcol, $edited_table_namecol
@@ -187,7 +186,7 @@ $Results->col_headers = array(
 													T_('Name'),
 													T_('Actions')
 												 );
-												 
+
 $Results->col_orders = array(
 													$edited_table_IDcol,
 													$edited_table_namecol
@@ -218,7 +217,7 @@ $Form->hidden( 'action', ($action != 'edit' ) ? 'create' : 'update' );
 
 if( $action == 'edit' )
 {
-	$Form->hidden( 'div_firm_ID', $ID );					
+	$Form->hidden( 'div_firm_ID', $ID );
 	$Form->info( T_('ID'), $ID );
 }
 

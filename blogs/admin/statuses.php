@@ -33,8 +33,7 @@
  */
 require_once dirname(__FILE__). '/_header.php';
 
-$admin_tab = 'options';
-$tab = 'poststatuses';
+$AdminUI->setPath( 'options', 'statuses' );
 $admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Post statuses management');
 $edited_table = 'T_poststatuses';
 $edited_table_IDcol = 'pst_ID';

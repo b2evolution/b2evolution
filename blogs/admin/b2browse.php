@@ -17,7 +17,7 @@ require_once (dirname(__FILE__). '/_header.php');
 $itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
 $itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 
-$admin_tab = 'edit';
+$AdminUI->setPath( 'edit' );
 $admin_pagetitle = $admin_pagetitle_titlearea = T_('Browse blog:');
 param( 'blog', 'integer', 0 );
 

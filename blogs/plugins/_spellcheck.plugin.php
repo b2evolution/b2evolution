@@ -47,10 +47,10 @@ class spellcheck_plugin extends Plugin
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		global $admin_tab, $admin_url;
+		global $AdminUI, $admin_url;
 
-		if( $admin_tab != 'new' )
-		{	// We won't need the spellchecker
+		if( $AdminUI->getPath(1) != 'new' )
+		{ // We won't need the spellchecker
 			return false;
 		}
 
@@ -86,12 +86,12 @@ class spellcheck_plugin extends Plugin
 	 */
 	function AdminAfterPageFooter( & $params )
 	{
-	 	if( ! $this->useSpellcheckOnThisPage )
+		if( ! $this->useSpellcheckOnThisPage )
 		{ // no spellcheck on this page, no need for this...
-	 		return false;
+			return false;
 		}
 		?>
-    <!-- this is for the spellchecker -->
+		<!-- this is for the spellchecker -->
 		<form action="" name="SPELLDATA"><div>
 		<input name="formname" type="hidden" value="" />
 		<input name="messagebodyname" type="hidden" value="" />
@@ -106,7 +106,7 @@ class spellcheck_plugin extends Plugin
 	}
 
 
- 	/**
+	/**
 	 * Display an editor button
 	 *
 	 * {@internal Plugin::DisplayEditorButton(-)}}
@@ -117,8 +117,8 @@ class spellcheck_plugin extends Plugin
 	function DisplayEditorButton( & $params )
 	{
 		// This means we are using the spellchecker on this page!
- 		$this->useSpellcheckOnThisPage = true;
-	 	?>
+		$this->useSpellcheckOnThisPage = true;
+		?>
 		<input type="button" value="<?php echo T_('Spellcheck') ?>" onclick="DoSpell('post','content','');" />
 		<?php
 		return true;

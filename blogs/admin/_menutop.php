@@ -18,10 +18,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<title><?php echo $app_shortname.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
 
 	<?php
-	if( !empty( $Backoffice->headlines ) )
-	{
-		echo implode( "\n", $Backoffice->headlines );
-	}
+	echo $AdminUI->getHeadlines();
 	?>
 
 	<script type="text/javascript">
@@ -41,17 +38,17 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	// Include links (to CSS...)
 	require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_head_links.php';
 
-	$Debuglog->add( 'Admin_tab='.$admin_tab );
+	$Debuglog->add( 'Admin-Path: '.var_export($AdminUI->path, true) );
 
-	if( $admin_tab == 'files'
-			|| ($admin_tab == 'blogs' && $tab == 'perm') )
+	if( $AdminUI->getPath(0) == 'files'
+			|| ($AdminUI->getPathRange(0,1) == array('blogs', 'perm') ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 		?>
 		<script type="text/javascript">
 		<!--
 			<?php
-			switch( $admin_tab )
+			switch( $AdminUI->getPath(0) )
 			{
 				case 'blogs': // {{{
 					?>
@@ -342,63 +339,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 <body>
 <?php
-
-param( 'blog', 'integer', 0, true ); // We may need this for the urls
-
-$menu = array(
-	'new' => array( 'text'=>T_('Write'),
-									'href'=>'b2edit.php?blog='.$blog,
-									'style'=>'font-weight: bold;' ),
-
-	'edit' => array( 'text'=>T_('Edit'),
-										'href'=>'b2browse.php?blog='.$blog,
-										'style'=>'font-weight: bold;' ),
-
-	'cats' => array( 'text'=>T_('Categories'),
-										'href'=>'b2categories.php?blog='.$blog ),
-
-	'blogs' => array( 'text'=>T_('Blogs'),
-										'href'=>'blogs.php' ),
-
-	'stats' => array( 'text'=>T_('Stats'),
-										'perm_name'=>'stats',
-										'perm_level'=>'view',
-										'href'=>'b2stats.php' ),
-
-	'antispam' => array( 'text'=>T_('Antispam'),
-												'perm_name'=>'spamblacklist',
-												'perm_level'=>'view',
-												'href'=>'b2antispam.php' ),
-
-	'templates' => array( 'text'=>T_('Templates'),
-												'perm_name'=>'templates',
-												'perm_level'=>'any',
-												'href'=>'b2template.php' ),
-
-	'users' => array( 'text'=>T_('Users'),
-										'perm_name'=>'users',
-										'perm_level'=>'view',
-										'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
-										'href'=>'b2users.php' ),
-
-	'files' => array( 'text'=>T_('Files'),
-										'href'=>'files.php' ),
-
-	'options' => array( 'text'=>T_('Settings'),
-											'perm_name'=>'options',
-											'perm_level'=>'view',
-											'href'=>'b2options.php' ),
-
-	'tools' => array( 'text'=>T_('Tools'),
-										'href'=>'tools.php' ),
-
-	);
-
-if( $current_User->level < 10 )
-{ // TODO: check User/Group perm level
-	unset($menu['files']);
-}
-
 
 // Include title, menu, etc.
 require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_top.php';

@@ -78,8 +78,7 @@ if( isset($Blog) )
 }
 
 
-// Display submenu:
-require dirname(__FILE__).'/_submenu.inc.php';
+$AdminUI->dispSubmenu();
 
 $Form = & new Form( $form_action, 'post', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
@@ -332,6 +331,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/27 20:34:48  blueyed
+ * Admin UI refactoring
+ *
  * Revision 1.15  2005/02/20 22:48:47  blueyed
  * use $edited_Item->renderer_checkboxes()
  *

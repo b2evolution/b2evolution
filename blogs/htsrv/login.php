@@ -132,7 +132,7 @@ switch( $action )
 											.'&reqId='.$requestId
 										."\n\n"
 										.T_('Please note:')
-										.' '.sprintf( T_('For security reasons the link is only valid for %d hours with the same IP address.'), 2 )
+										.' '.sprintf( T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 )
 										."\n\n"
 										.T_('If it was not you that requested this password change, simply ignore this mail.');
 
@@ -166,6 +166,7 @@ switch( $action )
 
 
 	case 'changepwd': // Clicked "Change password request" link from a mail or submit changed pwd
+		param( 'redirect_to', 'string', $admin_url );
 		param( 'reqId', 'string', '' );
 
 		$ForgetfulUser =& $UserCache->get_by_login($login);
@@ -189,7 +190,9 @@ switch( $action )
 				|| !isset($verifyData['time']) || $verifyData['time'] < ( time() - 7200 ) )
 		{
 			$Messages->add( sprintf( T_('Invalid password change request!')
-																.' '.T_('For security reasons the link is only valid for %d hours with the same IP address.'), 2 ) );
+																.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ) );
+			$Messages->add( sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
+																$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.urlencode( $redirect_to ) ) );
 			break;
 		}
 
@@ -209,8 +212,14 @@ switch( $action )
 		$action = '';
 
 		$current_User =& $ForgetfulUser;
+		$user = $current_User->ID; // the selected user in the user admin
 
-		$Backoffice->headlines[] = '<base href="'.$admin_url.'" />';
+		/**
+		 * Init the backoffice.
+		 */
+		require_once( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'_header.php' );
+
+		$AdminUI->addHeadline( '<base href="'.$admin_url.'" />' );
 		require( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'b2users.php' );
 
 		#header( 'Location: '.$baseurl.$admin_subdir.'b2users.php' ); // does not allow to leave a Message and IIS is known to cause problems with setcookie() and redirect.

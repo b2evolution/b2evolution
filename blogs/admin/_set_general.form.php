@@ -15,7 +15,7 @@ $Form = & new Form( 'b2options.php', 'form' );
 $Form->begin_form( 'fform' );
 
 $Form->hidden( 'action', 'update' );
-$Form->hidden( 'tab', $tab );
+$Form->hidden( 'tab', 'general' );
 
 // --------------------------------------------
 

@@ -19,7 +19,6 @@ $FilesForm = & new Form( 'fileset.php', 'filesform' );
 
 $FilesForm->begin_form( 'fform' );
 $FilesForm->hidden( 'action', 'update' );
-$FilesForm->hidden( 'tab', $tab );
 
 $FilesForm->fieldset( T_('Filemanager options') );
 $FilesForm->checkbox( 'fm_enabled',

@@ -34,11 +34,10 @@
 require_once dirname(__FILE__).'/_header.php'; // this will actually load blog params for the requested blog
 
 
-$admin_tab = 'blogs';
+$AdminUI->setPath( 'blogs', param( 'tab', 'string', 'general' ) );
 $admin_pagetitle = T_('Blogs');
 
 param( 'action', 'string', '' );
-param( 'tab', 'string', 'general' );
 param( 'blogtemplate', 'integer', -1 );
 
 
@@ -188,7 +187,7 @@ switch( $action )
 	case 'update':
 	case 'edit':
 		$admin_pagetitle .= ' :: ['.$edited_Blog->dget('shortname').']';
-		switch( $tab )
+		switch( $AdminUI->getPath(1) )
 		{
 			case 'general':
 				$admin_pagetitle .= ' :: '. T_('General');
@@ -214,7 +213,7 @@ switch( $action )
 			continue;
 		}
 
-		$blogListButtons .= ' <a href="blogs.php?action=edit&amp;blog='.$curr_blog_ID.'&amp;tab='.$tab.'" class="'
+		$blogListButtons .= ' <a href="blogs.php?action=edit&amp;blog='.$curr_blog_ID.'&amp;tab='.$AdminUI->getPath(1).'" class="'
 			.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'">'
 			.blog_list_iteminfo( 'shortname', false ).'</a>';
 	}
@@ -315,7 +314,7 @@ switch($action)
 			<h3><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></h3>
 		<?php
 
-		switch( $tab )
+		switch( $AdminUI->getPath(1) )
 		{
 			case 'general':
 				set_edited_Blog_from_params( 'general' );
@@ -354,10 +353,9 @@ switch($action)
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		}
 
-		// Display submenu:
-		require dirname(__FILE__).'/_submenu.inc.php';
+		$AdminUI->dispSubmenu();
 
-		switch( $tab )
+		switch( $AdminUI->getPath(1) )
 		{
 			case 'general':
 
@@ -567,6 +565,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.27  2005/02/27 20:34:49  blueyed
+ * Admin UI refactoring
+ *
  * Revision 1.26  2005/02/24 22:17:45  edgester
  * Added a blog option to allow for a CSS file in the blog media dir to override the skin stylesheet.
  * Added a second blog option to allow for a user CSS file to  override the skin and blog stylesheets.

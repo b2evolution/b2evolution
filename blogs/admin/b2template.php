@@ -14,7 +14,7 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/_header.php';
-$admin_tab = 'templates';
+$AdminUI->setPath( 'templates' );
 $admin_pagetitle = T_('Custom skin template editing');
 
 // Check permission:

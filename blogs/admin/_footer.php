@@ -29,13 +29,13 @@ require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_bottom.php'
 $Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
 
-if( $admin_tab == 'files' || ($admin_tab == 'blogs' && $tab == 'perm') )
+if( $AdminUI->getPath(0) == 'files' || $AdminUI->getPathRange(0,1) == array( 'blogs', 'perm' ) )
 { // init checkall JS functions
 ?>
 <script type="text/javascript">
 	initcheckall();
 	<?php
-	if( $admin_tab == 'files' )
+	if( $AdminUI->getPath(0) == 'files' )
 	{
 	?> setcheckallspan(0<?php if( isset($checkall) ) echo ', '.(int)$checkall; ?>); <?php
 	}

@@ -8,6 +8,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,15 +27,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin-skin
  * @subpackage legacy
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE
  *
  * @version $Id$
  */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 
 if( empty($mode) )
 { // We're not running in an special mode (bookmarklet, sidebar...)
@@ -54,40 +63,18 @@ if( empty($mode) )
 		<?php
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
+			?>
+			<div id="headinfo">
+				b2evo v <strong><?php echo $app_version ?></strong>
+				&middot; <?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
+				&middot; <abbr title="<?php echo T_('Greenwich Mean Time '); ?>"><?php echo /* TRANS: short for Greenwich Mean Time */ T_('GMT:') ?></abbr> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
+				&middot; <?php echo T_('Logged in as:'), ' <strong>', $current_User->disp('login'); ?></strong>
+			</div>
+			<?php
+		}
+
+		$AdminUI->dispMenu(NULL);
 		?>
-		<div id="headinfo">
-			b2evo v <strong><?php echo $app_version ?></strong>
-			&middot; <?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
-			&middot; <abbr title="<?php echo T_('Greenwich Mean Time '); ?>"><?php echo /* TRANS: short for Greenwich Mean Time */ T_('GMT:') ?></abbr> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
-			&middot; <?php echo T_('Logged in as:'), ' <strong>', $current_User->disp('login'); ?></strong>
-		</div>
-		<?php } ?>
-
-		<ul class="tabs">
-		<?php 	// GLOBAL MENU :
-			foreach( $menu as $loop_tab => $loop_details )
-			{
-				$perm = true; // By default
-				if( (!isset($loop_details['perm_name']))
-					|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
-					|| isset($loop_details['text_noperm']) )
-				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-
-					echo (($loop_tab == $admin_tab) ? '<li class="current">' : '<li>');
-
-					echo '<a href="'.$loop_details['href'].'"';
-
-					if( isset($loop_details['style']) ) echo ' style="'.$loop_details['style'].'"';
-
-					echo '>';
-
-					echo ($perm ? $loop_details['text'] : $loop_details['text_noperm'] );
-
-					echo '</a></li>';
-				}
-			}
-		?>
-		</ul>
 	</div>
 	<?php
 } // not in special mode
@@ -97,24 +84,22 @@ if( empty($mode) )
 	<h1>
 	<strong>
 		<?php // CURRENT PAGE TITLE / PATH:
-			echo $admin_path_seprator;
-			if( isset( $admin_pagetitle_titlearea ) )
-			{
-				echo $admin_pagetitle_titlearea;
-			}
-			else
-			{
-				echo $admin_pagetitle;
-			}
+		echo $admin_path_seprator;
+		if( isset( $admin_pagetitle_titlearea ) )
+		{
+			echo $admin_pagetitle_titlearea;
+		}
+		else
+		{
+			echo $admin_pagetitle;
+		}
 		?>
 	</strong>
 
 	<?php // OPTIONAL BLOG SELECTION...
-		if( isset($blogListButtons) )
-		{	// We have blog selection buttons to display:
-			echo $blogListButtons;
-		}
+	echo $AdminUI->getBloglistButtons( '', '' );
 	?>
+
 	</h1>
 </div>
 
