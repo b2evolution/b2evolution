@@ -29,6 +29,7 @@ $languages = array(
 	'pt' => NT_('Portuguese'),
 	'es' => NT_('Spanish'),
 	'sv' => NT_('Swedish'),
+	'zh' => NT_('Traditional Chinese'),
 	'zh' => NT_('Simplified Chinese'),
 	);
 
@@ -37,9 +38,7 @@ $languages = array(
 # These use an ISO 639 language code, a '_' and an ISO 3166 country code
 # This MUST BE in the list below
 $default_locale = 'en_US';
-
-
-$default_locale = 'fr_FR';			// For testing :))
+$default_locale = 'fr_FR';		// for testing :))
 
 
 #  and localization:
@@ -104,6 +103,11 @@ $locales = array(
 									'charset' => 'gb2312',
 									'datefmt' => 'y-m-d',
 									'timefmt' => 'H:i:s',
+								),
+	'zh_TW' => array( // Traditional Chinese, TAIWAN
+									'charset' => 'utf-8',
+									'datefmt' => 'Y-m-d',
+									'timefmt' => 'H:i:s'
 								),
 );
 
