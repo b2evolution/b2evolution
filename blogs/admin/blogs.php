@@ -50,7 +50,7 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'shortname',     param( 'blog_shortname',     'string', $req ? true : T_('New blog') ) );
 			$edited_Blog->set( 'locale',        param( 'blog_locale',        'string', $req ? true : $default_locale ) );
 			$edited_Blog->set( 'access_type',   param( 'blog_access_type',   'string', $req ? true : 'index.php' ) );
-			$edited_Blog->set( 'stub',          param( 'blog_stub',          'string', $req ? true : 'true' ) );
+			$edited_Blog->set( 'stub',          param( 'blog_stub',          'string', $req ? true : '' ) );
 
 			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', $req ? true : 'new' ) );
 			$edited_Blog->set( 'default_skin',  param( 'blog_default_skin',  'string', $req ? true : 'basic' ) );
@@ -197,7 +197,7 @@ switch($action)
 		echo '<h2>', T_('New blog'), ':</h2>';
 
 		$next_action = 'create';
-		require( dirname(__FILE__).'/_blog_gen.form.php' );
+		require( dirname(__FILE__).'/_blogs_general.form.php' );
 
 		echo '</div>';
 
