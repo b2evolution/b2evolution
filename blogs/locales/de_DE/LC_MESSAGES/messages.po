@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "POT-Creation-Date: 2004-05-08 02:04+0200\n"
-"PO-Revision-Date: 2004-05-08 03:31+0100\n"
+"PO-Revision-Date: 2004-05-09 22:08+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -457,7 +457,7 @@ msgstr "Berichte Missbrauch des Schlüsselwortes [%s] an b2evolution.net."
 #: ..\..\..\admin\b2antispam.php:188
 #: ..\..\..\admin\_blogs_advanced.form.php:27
 msgid "Terms of service"
-msgstr ""
+msgstr "Servicebedingungen"
 
 #: ..\..\..\admin\b2antispam.php:195
 msgid "Perform selected operations"
@@ -489,9 +489,8 @@ msgid "If a keyword restricts legitimate domains, click on the green tick to sto
 msgstr "Falls ein Schlüsselwort legitime Domains einschränkt, klicke auf den grünen Haken, um das Verbot des Schlüsselwortes aufzuheben."
 
 #: ..\..\..\admin\b2antispam.php:270
-#, fuzzy
 msgid "Request abuse update from centralized blacklist!"
-msgstr "Fordere Aktualisierung von zentraler Schwarzen Liste an."
+msgstr "Fordere Missbrauchs-Update von zentraler Schwarzen Liste an!"
 
 #: ..\..\..\admin\b2antispam.php:281
 msgid "Allow keyword back (Remove it from the blacklist)"
@@ -642,17 +641,17 @@ msgstr "Du hast keinen statischen Dateinamen für dieses Blog festgelegt!"
 
 #: ..\..\..\admin\b2blogs.php:509
 msgid "File cannot be written!"
-msgstr ""
+msgstr "Datei kann nicht geschrieben werden!"
 
 #: ..\..\..\admin\b2blogs.php:510
 #, php-format
 msgid "You sould check the permission for [%s]. See <a %s>online manual on file permissions</a>."
-msgstr ""
+msgstr "Du solltest die Dateirechte von [%s] überprüfen. Siehe <a %s>Onlineanleitung über Dateirechte</a>."
 
 #: ..\..\..\admin\b2blogs.php:516
-#, fuzzy, php-format
+#, php-format
 msgid "Writing to file [%s]..."
-msgstr "Schreibe in Datei..."
+msgstr "Schreibe in Datei [%s]..."
 
 #: ..\..\..\admin\b2blogs.php:520
 #: ..\..\..\admin\edit_actions.php:246
@@ -1495,7 +1494,7 @@ msgstr "Pinge b2evolution.net"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:27
 msgid "to get listed on the \"recently updated\" list on b2evolution.net"
-msgstr ""
+msgstr "um auf der \"zuletzt aktualisiert\"-Liste auf b2evolution.net zu erscheinen"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:28
 msgid "Ping technorati.com"
@@ -3100,7 +3099,6 @@ msgid "one post in this month"
 msgstr "ein Eintrag in diesem Monat"
 
 #: ..\..\..\b2evocore\_class_calendar.php:283
-#, fuzzy
 msgid "previous month"
 msgstr "voriger Monat"
 
@@ -3140,12 +3138,11 @@ msgstr "Sorry, es gibt nichts anzuzeigen..."
 #: ..\..\..\b2evocore\_class_db.php:86
 #, php-format
 msgid "Error selecting database [%s]!"
-msgstr ""
+msgstr "Fehler beim Auswählen (SELECT) der Datenbank [%s]!"
 
 #: ..\..\..\b2evocore\_class_db.php:141
-#, fuzzy
 msgid "MySQL error!"
-msgstr "Oops, MySQL Fehler!"
+msgstr "MySQL Fehler!"
 
 #: ..\..\..\b2evocore\_class_group.php:63
 msgid "New group"
@@ -4457,37 +4454,31 @@ msgstr ""
 
 #: ..\..\..\install\index.php:55
 msgid "Install menu"
-msgstr ""
+msgstr "Installationsmenu"
 
 #: ..\..\..\install\index.php:56
-#, fuzzy
 msgid "PHP info"
-msgstr "PHP Version"
+msgstr "PHP Info"
 
 #: ..\..\..\install\index.php:57
-#, fuzzy
 msgid "Go to Blogs"
-msgstr "Zu den Blogs"
+msgstr "Gehe zu Blogs"
 
 #: ..\..\..\install\index.php:58
-#, fuzzy
 msgid "Go to Admin"
-msgstr "Admin"
+msgstr "Gehe zu Admin"
 
 #: ..\..\..\install\index.php:59
-#, fuzzy
 msgid "Online"
-msgstr "Untertitel"
+msgstr "Online"
 
 #: ..\..\..\install\index.php:60
-#, fuzzy
 msgid "Manual"
-msgstr "Januar"
+msgstr "Anleitung"
 
 #: ..\..\..\install\index.php:61
-#, fuzzy
 msgid "Support"
-msgstr "Berichten"
+msgstr "Support"
 
 #: ..\..\..\install\index.php:70
 msgid "Language/Locale"
@@ -4499,7 +4490,7 @@ msgstr "Wähle eine Standard-Sprache/Locale für deine b2evo Installation."
 
 #: ..\..\..\install\index.php:99
 msgid "Check your database config settings below and update them if necessary..."
-msgstr ""
+msgstr "Überprüfe deine Datenbank-Konfiguration unten und aktualisiere sie, wenn nötig..."
 
 #: ..\..\..\install\index.php:109
 #, php-format
@@ -4508,161 +4499,152 @@ msgstr "Die Mindestvoraussetung für diese Version von b2evolution ist PHP Versio
 
 #: ..\..\..\install\index.php:132
 msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
-msgstr ""
+msgstr "Es scheint, als würden die Datenbank-Einstellungen die du angegeben hast nicht funktionieren. Bitte überprüfe sie sorgfältig und versuche es nochmal..."
 
 #: ..\..\..\install\index.php:142
 #, php-format
 msgid "Could not load original conf file [%s]. Is it missing?"
-msgstr ""
+msgstr "Konnte die ursprüngliche Konfigurationsdatei [%s] nicht laden. Fehlt sie?"
 
 #: ..\..\..\install\index.php:172
 msgid "Config file update"
-msgstr ""
+msgstr "Update der Konfigurationsdatei"
 
 #: ..\..\..\install\index.php:173
 #, php-format
 msgid "We cannot automatically update your config file [%s]!"
-msgstr ""
+msgstr "Wir können deine Konfigurationsdatei [%s] nicht automatisch aktualisieren!"
 
 #: ..\..\..\install\index.php:174
 msgid "There are two ways to deal with this:"
-msgstr ""
+msgstr "Es gibt zwei Wege, um damit umzugehen:"
 
 #: ..\..\..\install\index.php:176
 msgid "You can allow the installer to update the config file by changing its permissions:"
-msgstr ""
+msgstr "Du kannst dem Installer erlauben, die Konfigurationsdatei zu ändern, indem du ihre Berechtigung änderst:"
 
 #: ..\..\..\install\index.php:178
 #, php-format
 msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
-msgstr ""
+msgstr "<code>chmod 666 %s</code>. Falls nötig, siehe <a %s>Onlineanleitung über Dateirechte</a>."
 
 #: ..\..\..\install\index.php:179
 msgid "Come back to this page and refresh/reload."
-msgstr ""
+msgstr "Komme zurück auf diese Seite und lade sie neu."
 
 #: ..\..\..\install\index.php:183
 msgid "Alternatively, you can update the config file manually:"
-msgstr ""
+msgstr "Alternativ kannst du die Konfigurationsdatei auch manuell aktualisieren:"
 
 #: ..\..\..\install\index.php:185
 msgid "Open the _config.php file locally with a text editor."
-msgstr ""
+msgstr "Öffne die _config.php Datei lokal in einem Texteditor."
 
 #: ..\..\..\install\index.php:186
-#, fuzzy
 msgid "Delete all contents!"
-msgstr "Eintrag-Inhalt"
+msgstr "Lösche den gesamten Inhalt!"
 
 #: ..\..\..\install\index.php:187
 msgid "Copy the contents from the box below."
-msgstr ""
+msgstr "Kopiere den Inhalt aus der unteren Box."
 
 #: ..\..\..\install\index.php:188
 msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
-msgstr ""
+msgstr "Füge ihn in deinen lokalen Texteditor ein. <strong>ACHTUNG: gehe sicher, dass es ABSOLUT KEINEN WHITESPACE nach dem letzten <code>?&gt;</code> in der Datei gibt.</strong> Jedes Leerzeichen, Tab oder neue Zeile am Ende der Konfigurationsdatei könnte verhindern, dass Cookies gesetzt werden, wenn du versuchst, dich später einzuloggen."
 
 #: ..\..\..\install\index.php:189
 msgid "Save the new _config.php file locally."
-msgstr ""
+msgstr "Speichere die neue _config.php lokal."
 
 #: ..\..\..\install\index.php:190
 msgid "Upload the file to your server, into the /_conf folder."
-msgstr ""
+msgstr "Lade die Datei auf deinen Server, in das /_conf Verzeichnis."
 
 #: ..\..\..\install\index.php:191
 #, php-format
 msgid "<a %s>Call the installer from scratch</a>."
-msgstr ""
+msgstr "<a %s>Ruf den Installer erneut auf</a>."
 
 #: ..\..\..\install\index.php:195
 msgid "This is how your _config.php should look like:"
-msgstr ""
+msgstr "So sollte deine _config.php aussehen:"
 
 #: ..\..\..\install\index.php:215
 #, php-format
 msgid "Your configuration file [%s] has been successfully updated."
-msgstr ""
+msgstr "Deine Konfigurationsdatei [%s] wurde erfolgreich aktualisiert."
 
 #: ..\..\..\install\index.php:245
-#, fuzzy
 msgid "Base configuration"
-msgstr "Benutzerinformationen"
+msgstr "Basis-Konfiguration"
 
 #: ..\..\..\install\index.php:247
 msgid "Your config file has not been edited yet. You can do this by filling in the form below."
-msgstr ""
+msgstr "Deine Konfigurationsdatei wurde noch nicht editiert. Du kannst das durch Ausfüllen des unteren Formulars machen."
 
 #: ..\..\..\install\index.php:249
 msgid "This is the minimum info we need to set up b2evolution on this server:"
-msgstr ""
+msgstr "Das sind die Mindestinformationen, die wir brauchen um b2evolution auf diesem Server zu installieren:"
 
 #: ..\..\..\install\index.php:256
 msgid "Database you want to install into (These settings should be provided by your host)"
-msgstr ""
+msgstr "Datenbank in die du installieren möchtest (Diese Einstellungen sollten von deinem Host bereitgestellt werden)"
 
 #: ..\..\..\install\index.php:258
-#, fuzzy
 msgid "mySQL Username"
-msgstr "Benutzername"
+msgstr "mySQL Benutzername"
 
 #: ..\..\..\install\index.php:258
 msgid "Your username to access the database"
-msgstr ""
+msgstr "Dein Benutzername für den Datenbank-Zugriff"
 
 #: ..\..\..\install\index.php:259
-#, fuzzy
 msgid "mySQL Password"
-msgstr "Passwort"
+msgstr "mySQL Passwort"
 
 #: ..\..\..\install\index.php:259
 msgid "Your password to access the database"
-msgstr ""
+msgstr "Dein Passwort für den Datenbank-Zugriff"
 
 #: ..\..\..\install\index.php:260
-#, fuzzy
 msgid "mySQL Database"
-msgstr "Datenbank"
+msgstr "mySQL Datenbank"
 
 #: ..\..\..\install\index.php:260
-#, fuzzy
 msgid "Name of the database you want to use"
-msgstr "Bist du sicher, zurücksetzen zu wollen?"
+msgstr "Name der Datenbank, die du benutzen möchtest"
 
 #: ..\..\..\install\index.php:261
 msgid "mySQL Host"
-msgstr ""
+msgstr "mySQL Host"
 
 #: ..\..\..\install\index.php:261
 msgid "You probably won't have to change this"
-msgstr ""
+msgstr "Du wirst das wahrscheinlich nicht ändern müssen"
 
 #: ..\..\..\install\index.php:266
-#, fuzzy
 msgid "Additional settings"
-msgstr "Weitere Aktionen"
+msgstr "Weitere Einstellungen"
 
 #: ..\..\..\install\index.php:268
-#, fuzzy
 msgid "Base URL"
-msgstr "Blog URL"
+msgstr "Basis-URL"
 
 #: ..\..\..\install\index.php:268
 msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
-msgstr ""
+msgstr "Hier wird b2evo und deine Blogs standardmässig liegen. ÜBERPRÜFE DIES SORGFÄLTIG oder vieles wird nicht funktionieren. Falls du b2evolution auf deiner lokalen Maschine testen willst, MUSST du http://<strong>localhost</strong>/pfad benutzen, damit Cookies funktionieren... Benutze NICHT deinen Computernamen!"
 
 #: ..\..\..\install\index.php:270
 msgid "Your email"
-msgstr ""
+msgstr "Deine EMail"
 
 #: ..\..\..\install\index.php:270
 msgid "Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations."
-msgstr ""
+msgstr "Wird in schweren Fehlermeldungen benutzt, so dass Benutzer dich kontaktieren können. Du wirst hier auch Benachrichtigungen über neue Benutzer-Registrierungen erhalten."
 
 #: ..\..\..\install\index.php:277
-#, fuzzy
 msgid "Update config file"
-msgstr "Blog aktualisieren!"
+msgstr "Config-Datei aktualisieren"
 
 #: ..\..\..\install\index.php:297
 msgid "What do you want to install?"
@@ -4702,7 +4684,7 @@ msgstr "Installiere jetzt die Datenbank-Tabellen !"
 
 #: ..\..\..\install\index.php:333
 msgid "Need to start anew?"
-msgstr ""
+msgstr "Möchtest du neu anfangen?"
 
 #: ..\..\..\install\index.php:334
 msgid "<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>"
@@ -4772,13 +4754,12 @@ msgid "Back to menu"
 msgstr "Zurück zum Menu"
 
 #: ..\..\..\install\index.php:444
-#, fuzzy
 msgid "official website"
-msgstr "Offizielle Webseite"
+msgstr "offizielle Webseite"
 
 #: ..\..\..\install\index.php:446
 msgid "contact"
-msgstr ""
+msgstr "Kontakt"
 
 #: ..\..\..\install\_functions_cafelogupgrade.php:33
 #, php-format
