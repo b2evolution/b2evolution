@@ -37,9 +37,14 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	{
 		$r .= ' class="'.$field_class.'"';
 	}
-	$r .= " />\n"
-				.'<span class="notes">'.$field_note."</span></div>\n"
-				."</fieldset>\n\n";
+	$r .= " />\n";
+
+	if( !empty( $field_note ) )
+	{
+		$r .= '<span class="notes">'.$field_note.'</span>';
+	}
+
+	$r .= "</div>\n</fieldset>\n\n";
 
 	if( $output )
 	{
@@ -135,7 +140,7 @@ function form_select_object(
  * {@internal form_radio(-)}}
  * @param string the name of the radio options
  * @param string the checked option
- * @param array of arrays the radio options (0: value, 1: label, 2: optional [input field, ..], 2: notes )
+ * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: optional [input field, ..], 4: attribs for <input tag> )
  * @param string label
  * @param boolean options on seperate lines (DIVs)
  * @param string notes
@@ -159,14 +164,16 @@ function form_radio(
 		{
 			echo ' checked="checked"';
 		}
+		if( !empty( $loop_field_option[4] ) )
+			echo $loop_field_option[4];
 		echo ' /> ', $loop_field_option[1], '</label>';
 		if( !empty( $loop_field_option[2] ) )
-		{ // optional text for radio option (does not connect input boxes to radio buttons label)
-			echo $loop_field_option[2];
+		{ // notes for radio option
+			echo '<span class="notes">', $loop_field_option[2], '</span>';
 		}
 		if( !empty( $loop_field_option[3] ) )
-		{ // notes for radio option
-			echo '<span class="notes">', $loop_field_option[3], '</span>';
+		{ // optional text for radio option (like additional fieldsets or input boxes)
+			echo $loop_field_option[3];
 		}
 		if( $field_lines ) echo "</div>\n";
 	}

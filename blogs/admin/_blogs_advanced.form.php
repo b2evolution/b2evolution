@@ -25,14 +25,21 @@
 	<fieldset>
 		<legend><?php echo T_('Media library') ?></legend>
 		<?php
-			form_radio( 'blog_media_radio', $blog_media_radio,
+			form_radio( 'blog_media_location', $blog_media_location,
 									array(
-										array( 'default', T_('Default'), '', sprintf( T_('subdirectory of %s'), $basepath.'/'.$media_subdir ) ),
-										array( 'subdir', T_('Subdirectory of media folder'), '<code>'.$basepath.'/'.$media_subdir.'</code><input type="text" name="blog_media_dir_rel" />', '' ),
-										array( 'custom', T_('Custom location'), // TODO: better style!! (own div.class for such cases?)
+										array( 'default',
+														T_('Default'),
+														sprintf( T_('subdirectory of %s'), $basepath.'/'.$media_subdir ) ),
+										array( 'subdir',
+														T_('Subdirectory of media folder'),
+														'',
+														' <span class="nobr"><code>'.$basepath.'/'.$media_subdir.'/</code><input type="text" name="blog_media_subdir" size="20" maxlength="255" value="'.$blog_media_subdir.'" /></span>', '' ),
+										array( 'custom',
+														T_('Custom location'),
+														'',
 														'<fieldset>'
-															.'<div class="label">'.T_('directory').':</div><div class="input"><input type="text" name="blog_media_dir_abs" size="50" /></div>'
-															.'<div class="label">'.T_('URL').':</div><div class="input"><input type="text" name="blog_media_url" size="50" /></div></fielset>' )
+															.'<div class="label">'.T_('directory').':</div><div class="input"><input type="text" name="blog_media_fullpath" size="50" maxlength="255" value="'.$blog_media_fullpath.'" /></div>'
+															.'<div class="label">'.T_('URL').':</div><div class="input"><input type="text" name="blog_media_url" size="50" maxlength="255" value="'.$blog_media_url.'" /></div></fieldset>' )
 									), T_('Media dir location'), true
 								);
 

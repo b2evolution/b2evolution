@@ -21,7 +21,7 @@ $allow_cross_posting = 1;
 
 
 # Default status for new posts:
-$default_post_status = 'published';		// 'published', 'deprecated', 'protected', 'private', 'draft'
+$default_post_status = 'published';  // 'published', 'deprecated', 'protected', 'private', 'draft'
 
 
 # set this to 1 if you want to use the 'preview' function
@@ -33,15 +33,15 @@ $use_spellchecker = 1;
 
 
 # Do you want to be able to link each post to an URL ?
-$use_post_url = 1;			// 1 to enable, 0 to disable
+$use_post_url = 1;  // 1 to enable, 0 to disable
 
 
-# When banning referrers/comment URLs, do you want to remove 
+# When banning referrers/comment URLs, do you want to remove
 # any referrers and comments containing the banned domain?
 # (you will be asked to confirm the ban if you enable this)
-$deluxe_ban = 1;	// 1 to enable, 0 to disable
+$deluxe_ban = 1;  // 1 to enable, 0 to disable
 
-# When banning, do you want to report abuse to the 
+# When banning, do you want to report abuse to the
 # centralized ban list at b2evolution.net?
 $report_abuse = 1;
 
@@ -75,6 +75,11 @@ $fileupload_minlevel = '1';
 #   note: add a space before and after each login name
 #   example: $fileupload_allowedusers = ' barbara anne ';
 $fileupload_allowedusers = '';
+
+/**
+ * max length for blog_urlname and blog_stub values (this gets checked when editing/creating blogs).
+ */
+$maxlength_urlname_stub = 30;
 
 
 # Do not edit the following unless you known what you're doing...

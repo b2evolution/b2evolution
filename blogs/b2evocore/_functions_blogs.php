@@ -1,7 +1,7 @@
 <?php
 /**
  * Blog handling functions
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -133,9 +133,9 @@ function blog_update_user_perms( $blog )
 		if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties )
 		{	// There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
-		
+
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, '".implode(',',$perm_post)."', 
+			$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, '".implode(',',$perm_post)."',
 																$perm_delpost, $perm_comments, $perm_cats, $perm_properties )";
 		}
 	}
@@ -160,9 +160,9 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
 	global $Blog, $blog, $BlogCache;
 
 	if( empty( $this_blogparams ) )
-	{	// We want the global blog on the page
+	{ // We want the global blog on the page
 		if( isset( $Blog ) )
-			$current_Blog = & $Blog;		
+			$current_Blog = & $Blog;
 		else
 			$current_Blog = $BlogCache->get_by_ID($blog);
 	}
@@ -170,7 +170,7 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
 	{
 		$current_Blog = $BlogCache->get_by_ID($this_blogparams->blog_ID);
 	}
-	
+
 	return $current_Blog->get( $show );
 }
 

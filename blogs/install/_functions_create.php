@@ -83,7 +83,8 @@ function create_b2evo_tables()
 		blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php',
 		blog_siteurl varchar(120) NOT NULL default '',
 		blog_staticfilename varchar(30) NULL default NULL,
-		blog_stub VARCHAR(30) NOT NULL DEFAULT 'stub',
+		blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub',
+		blog_urlname VARCHAR(255) NOT NULL DEFAULT 'urlname',
 		blog_notes TEXT NULL,
 		blog_keywords tinytext,
 		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
@@ -98,9 +99,13 @@ function create_b2evo_tables()
 		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
 		blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
+		blog_media_location ENUM( 'default', 'subdir', 'custom' ) DEFAULT 'default' NOT NULL,
+		blog_media_subdir VARCHAR( 255 ) NOT NULL,
+		blog_media_fullpath VARCHAR( 255 ) NOT NULL,
+		blog_media_url VARCHAR( 255 ) NOT NULL,
 		blog_UID VARCHAR(20),
-		PRIMARY KEY	blog_ID (blog_ID),
-	  UNIQUE KEY blog_stub (blog_stub)
+		PRIMARY KEY blog_ID (blog_ID),
+		UNIQUE KEY blog_urlname (blog_urlname)
 	)";
 	$DB->query( $query );
 	echo "OK.<br />\n";
@@ -223,7 +228,7 @@ function create_b2evo_tables_091()
 {
 	global $DB;
 
- 	echo 'Creating table for active sessions... ';
+	echo 'Creating table for active sessions... ';
 	$DB->query( "CREATE TABLE EVO_sessions (
 									sess_time int(10) unsigned NOT NULL,
 									sess_ipaddress varchar(15) NOT NULL,
@@ -291,7 +296,7 @@ function create_locales()
 {
 	global $tablelocales;
 	global $DB;
-	
+
 	echo 'Creating table for Locales... ';
 	$query = "CREATE TABLE $tablelocales (
 		loc_locale varchar(20) NOT NULL default '',
@@ -465,52 +470,52 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_more_longdesc = "<br />
 <br />
 <strong>".T_("This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin.")."</strong>";
-	$blog_all_ID =	blog_create( 
-										sprintf( T_('%s Title'), $blog_shortname ), 
-										$blog_shortname, 
-										'', 
-										$blog_stub, 
-										$blog_stub.'.html', 
-										sprintf( T_('Tagline for %s'), $blog_shortname ), 
-										sprintf( T_('Short description for %s'), $blog_shortname ), 
+	$blog_all_ID =	blog_create(
+										sprintf( T_('%s Title'), $blog_shortname ),
+										$blog_shortname,
+										'',
+										$blog_stub,
+										$blog_stub.'.html',
+										sprintf( T_('Tagline for %s'), $blog_shortname ),
+										sprintf( T_('Short description for %s'), $blog_shortname ),
 										sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-										$default_locale, 
-										sprintf( T_('Notes for %s'), $blog_shortname ), 
-										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										$default_locale,
+										sprintf( T_('Notes for %s'), $blog_shortname ),
+										sprintf( T_('Keywords for %s'), $blog_shortname ),
 										4 );
 
 	$blog_shortname = $blog_a_short;
 	if( $blog_a_long == '#' ) $blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
 	$blog_stub = 'a';
-	$blog_a_ID =	blog_create( 
-										$blog_a_long, 
-										$blog_shortname, 
-										'', 
-										$blog_stub, 
-										$blog_stub.'.html', 
-										sprintf( T_('Tagline for %s'), $blog_shortname ), 
-										sprintf( T_('Short description for %s'), $blog_shortname ), 
+	$blog_a_ID =	blog_create(
+										$blog_a_long,
+										$blog_shortname,
+										'',
+										$blog_stub,
+										$blog_stub.'.html',
+										sprintf( T_('Tagline for %s'), $blog_shortname ),
+										sprintf( T_('Short description for %s'), $blog_shortname ),
 										sprintf(
-	(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ), 
-										$default_locale, 
-										sprintf( T_('Notes for %s'), $blog_shortname ), 
-										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+	(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ),
+										$default_locale,
+										sprintf( T_('Notes for %s'), $blog_shortname ),
+										sprintf( T_('Keywords for %s'), $blog_shortname ),
 										4 );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
-	$blog_b_ID =	blog_create( 
-										sprintf( T_('%s Title'), $blog_shortname ), 
-										$blog_shortname, 
-										'', 
-										$blog_stub, 
-										$blog_stub.'.html', 
-										sprintf( T_('Tagline for %s'), $blog_shortname ), 
-										sprintf( T_('Short description for %s'), $blog_shortname ), 
+	$blog_b_ID =	blog_create(
+										sprintf( T_('%s Title'), $blog_shortname ),
+										$blog_shortname,
+										'',
+										$blog_stub,
+										$blog_stub.'.html',
+										sprintf( T_('Tagline for %s'), $blog_shortname ),
+										sprintf( T_('Short description for %s'), $blog_shortname ),
 										sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-										$default_locale, 
-										sprintf( T_('Notes for %s'), $blog_shortname ), 
-										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										$default_locale,
+										sprintf( T_('Notes for %s'), $blog_shortname ),
+										sprintf( T_('Keywords for %s'), $blog_shortname ),
 										4 );
 
 	$blog_shortname = 'Linkblog';
@@ -518,18 +523,18 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
-	$blog_linkblog_ID = blog_create( 
-										sprintf( T_('%s Title'), $blog_shortname ), 
-										$blog_shortname, 
-										'', 
-										$blog_stub, 
-										$blog_stub.'.html', 
-										sprintf( T_('Tagline for %s'), $blog_shortname ), 
-										sprintf( T_('Short description for %s'), $blog_shortname ), 
+	$blog_linkblog_ID = blog_create(
+										sprintf( T_('%s Title'), $blog_shortname ),
+										$blog_shortname,
+										'',
+										$blog_stub,
+										$blog_stub.'.html',
+										sprintf( T_('Tagline for %s'), $blog_shortname ),
+										sprintf( T_('Short description for %s'), $blog_shortname ),
 										sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-										$default_locale, 
-										sprintf( T_('Notes for %s'), $blog_shortname ), 
-										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										$default_locale,
+										sprintf( T_('Notes for %s'), $blog_shortname ),
+										sprintf( T_('Keywords for %s'), $blog_shortname ),
 										0 /* no Link blog */ );
 
 	echo "OK.<br />\n";
@@ -633,7 +638,7 @@ Either way, make sure you go to the blogs admin and set the correct access metho
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."), 
+	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."),
 								T_("By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.
 
 Some of these blogs have a special role. Read about it on the corresponding page.
@@ -660,7 +665,7 @@ This is page 3.
 This is page 4.
 
 It is the last page.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
-	
+
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_('Extended post with no teaser'), T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.
@@ -668,7 +673,7 @@ It is the last page.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , 
 <!--more--><!--noteaser-->
 
 This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
-	
+
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_('Extended post'), T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.
@@ -676,7 +681,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 <!--more-->
 
 This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
-	
+
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Important information"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
@@ -750,7 +755,7 @@ function populate_main_tables()
 																				comment_author_email, comment_author_url, comment_author_IP,
 																				comment_date, comment_content, comment_karma)
 						VALUES( 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-									 '$now', '". 
+									 '$now', '".
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 0)";
 	$DB->query( $query );
 
@@ -758,7 +763,7 @@ function populate_main_tables()
 
 
 	echo 'Creating default users... ';
-	
+
 	// USERS !
 	$User_Admin = & new User();
 	$User_Admin->set( 'login', 'admin' );
@@ -777,7 +782,7 @@ function populate_main_tables()
 	$User_Admin->set( 'domain', 'localhost' );
 	$User_Admin->set( 'level', 10 );
 	$User_Admin->set( 'locale', $default_locale );
-	$User_Admin->set_datecreated( $timestamp++ );	
+	$User_Admin->set_datecreated( $timestamp++ );
 	// Note: NEVER use database time (may be out of sync + no TZ control)
 	$User_Admin->setGroup( $Group_Admins );
 	$User_Admin->dbinsert();
@@ -806,7 +811,7 @@ function populate_main_tables()
 						VALUES
 							( $blog_all_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_a_ID, ".$User_Admin->get('ID').", 1, 
+							( $blog_a_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
 							( $blog_b_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
@@ -821,7 +826,7 @@ function populate_main_tables()
 
 	echo 'Creating default settings... ';
 	// SETTINGS!
-	$query = "INSERT INTO $tablesettings ( set_name, set_value ) 
+	$query = "INSERT INTO $tablesettings ( set_name, set_value )
 						VALUES ( 'db_version', '$new_db_version' ),
 										( 'default_locale', '$default_locale' ),
 										( 'posts_per_page', '5' ),

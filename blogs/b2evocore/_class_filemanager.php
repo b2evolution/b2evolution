@@ -45,14 +45,14 @@ class FileManager
 	 * @var boolean
 	 */
 	var $permlikelsl = true;
-	
+
 	/**
 	 * User preference: recursive size of dirs?
 	 * @todo needs special permission (server load!)
 	 * @var boolean
 	 */
 	var $fulldirsize = false;
-	
+
 	// --- going to user options ---
 	var $default_chmod_file = 0700;
 	var $default_chmod_dir = 0700;
@@ -108,14 +108,14 @@ class FileManager
 
 		$this->entries = array();  // the directory entries
 		$this->Messages = new Log( 'error' );
-		
+
 		$this->User = $cUser;
 
 		$this->order = $order;
 		$this->orderasc = $asc;
 
 		$this->loadSettings();
-		
+
 		// base URL, used for created links
 		$this->url = $url;
 
@@ -126,7 +126,7 @@ class FileManager
 		// TODO: get user's/group's root
 		#$this->root = $media_dir;
 		#$this->root_url = $baseurl.'/'.$media_subdir;
-		
+
 		// get root directory
 		if( $this->User->login == 'demouser' )
 		{
@@ -1162,7 +1162,7 @@ class FileManager
 		}
 	}
 
-	
+
 	/**
 	 * Create a root dir, while making the suggested name an safe filename.
 	 * @param string the path where to create the directory
@@ -1293,11 +1293,11 @@ class FileManager
 	function safefilename( $path )
 	{
 		$path = preg_replace( '/[^A-Za-z0-9]+/', '_', $path );
-		
+
 		// remove trailing/leading '_'
 		$path = preg_replace( '/^_+/', '', $path );
 		$path = preg_replace( '/_+$/', '', $path );
-	
+
 		return $path;
 	}
 
@@ -1478,6 +1478,50 @@ class FileManager
 			default:  // return false if not defined
 				$Debuglog->add( 'Filemanager: permission check for ['.$for.'] not defined!' );
 				return false;
+		}
+	}
+
+
+
+	/**
+		Does the same thing as the function realpath(), except it will
+		also translate paths that don't exist on the system.
+
+		@param string the path to be translated
+		@return array [0] = the translated string; [1] = TRUE|FALSE (path exists?)
+	*/
+	function str2path( $path )
+	{
+		$path = str_replace( '\\', '/', $path );
+		$pwd = realpath( $path );
+
+		if( !empty($pwd) )
+		{ // path exists
+			return array( $pwd, true );
+		}
+		else
+		{ // no realpath
+			$pwd = '';
+			$strArr = preg_split( '#/#', $path, -1, PREG_SPLIT_NO_EMPTY );
+			$pwdArr = array();
+			$j = 0;
+			for( $i = 0; $i < count($strArr); $i++ )
+			{
+				if( $strArr[$i] != '..' )
+				{
+					if( $strArr[$i] != '.' )
+					{
+						$pwdArr[$j] = $strArr[$i];
+						$j++;
+					}
+				}
+				else
+				{
+					array_pop( $pwdArr );
+					$j--;
+				}
+			}
+			return array( '/'.implode('/', $pwdArr), false );
 		}
 	}
 

@@ -861,7 +861,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		}
 		else
 		{ // param not found! don't set the variable.
-			// Won't be memorized nor type-forced! 
+			// Won't be memorized nor type-forced!
 			return false;
 		}
 	}
@@ -991,7 +991,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 
 	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
-	
+
 	if( $basehost != $_SERVER['HTTP_HOST'] && !preg_match( '#^https?://#', $url ) )
 	{
 		$url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].( substr( $url, 0, 1 ) == '/' ? '' : '/' ).$url;
@@ -1055,29 +1055,29 @@ function validate_url( $url, & $allowed_uri_scheme )
 	global $debug;
 
 	if( empty($url) )
-	{	// Empty URL, no problem
+	{ // Empty URL, no problem
 		return false;
 	}
 
 	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):[0-9]*/', $url, $matches) )
-	{	// Cannot find URI scheme
+	{ // Cannot find URI scheme
 		return T_('Invalid URL');
 	}
 
 	$scheme = strtolower($matches[1]);
 	if(!in_array( $scheme, $allowed_uri_scheme ))
-	{	// Scheme not allowed
+	{ // Scheme not allowed
 		return T_('URI scheme not allowed');
 	}
 
 	// Search for blocked URLs:
 	if( $block = antispam_url($url) )
 	{
-		if( $debug ) return 'Url contains blaclisted word: ['.$block.']';
+		if( $debug ) return 'Url contains blacklisted word: ['.$block.']';
 		return T_('URL not allowed');
 	}
 
-	return false;		// OK
+	return false; // OK
 }
 
 

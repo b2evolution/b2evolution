@@ -36,13 +36,14 @@ class Blog extends DataObject
 	 * Tagline to be displayed on template
 	 */
 	var $tagline;
-	var $shortdesc;	// description
+	var $shortdesc; // description
 	var $longdesc;
 	var $locale;
 	var $access_type;
 	var $siteurl;
 	var $staticfilename;
-	var $stub;
+	var $stub;     // stub file (can be empty)
+	var $urlname;  // used to identify blog in URLs
 	var $links_blog_ID = 0;
 	var $notes;
 	var $keywords;
@@ -57,8 +58,10 @@ class Blog extends DataObject
 	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
-	var $media_dir;
-	var $media_url;
+	var $media_location = 'default';
+	var $media_subdir = '';
+	var $media_fullpath = '';
+	var $media_url = '';
 
 	/**
 	 * Constructor
@@ -82,12 +85,8 @@ class Blog extends DataObject
 			$this->name = T_('New weblog');
 			$this->locale = $default_locale;
 			$this->access_type = 'index.php';
-			$this->stub = 'new';
+			$this->urlname = 'new';
 			$this->default_skin = 'basic';
-			#if( !($this->dir_media = Fileman::create_dir( $basepath.'/'.$media_subdir, $this->shortname )) )
-			#{ // mediadir could not be created
-			#	$this->dir_media = false;
-			#}
 		}
 		else
 		{
@@ -102,6 +101,7 @@ class Blog extends DataObject
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->staticfilename = $db_row->blog_staticfilename;
 			$this->stub = $db_row->blog_stub;
+			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID;
 			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
@@ -115,6 +115,10 @@ class Blog extends DataObject
 			$this->force_skin = $db_row->blog_force_skin;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
 			$this->in_bloglist = $db_row->blog_in_bloglist;
+			$this->media_location = $db_row->blog_media_location;
+			$this->media_subdir = $db_row->blog_media_subdir;
+			$this->media_fullpath = $db_row->blog_media_fullpath;
+			$this->media_url = $db_row->blog_media_url;
 			$this->UID = $db_row->blog_UID;
 		}
 	}

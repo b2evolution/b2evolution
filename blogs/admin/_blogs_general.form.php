@@ -10,6 +10,34 @@
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
+<script type="text/javascript">
+<!--
+
+blogbaseurl = '<?php echo $edited_Blog->get('baseurl') ?>';
+
+function update_IDs( ids, text, notrailingslash )
+{
+	//replace = document.createTextNode( 'lala' );
+
+	if( !notrailingslash )
+	{
+		if( text.length && text.charAt( text.length-1 ) != '/' ) text=text+'/';
+	}
+
+	i = 0;
+	while( document.getElementById( ids+String(i) ) )
+	{
+		if( document.getElementById( ids+String(i) ).hasChildNodes() )
+			document.getElementById( ids+String(i) ).firstChild.data = text;
+		else
+			document.getElementById( ids+String(i) ).appendChild( document.createTextNode( text ) );
+
+		i++;
+	};
+}
+
+//-->
+</script>
 <form action="b2blogs.php" class="fform" method="post">
 	<input type="hidden" name="action" value="<?php echo $next_action ?>" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />
@@ -27,8 +55,6 @@
 		<legend><?php echo T_('Access parameters') ?></legend>
 
 		<?php
-			$blog_baseurl = preg_match('#^https?://#', $blog_siteurl) ? $blog_siteurl : $baseurl;
-
 			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $blog) )
 			{
 				$defblog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'));
@@ -38,22 +64,22 @@
 					array(
 						array( 'default',
 										T_('Default blog on index.php'),
-										'',
-										$blog_baseurl.'/index.php'.( isset($defblog)
+										'<span id="blogbaseurl0">'.$edited_Blog->get('baseurl').'</span>index.php'.( isset($defblog)
 											? '  ['. /* TRANS: current default blog */ T_('Current default is:').' '.$defblog.']'
 											: '' )
 						),
 						array( 'index.php',
 										T_('Other blog through index.php'),
-										'',
-										$blog_baseurl.'/index.php'.( $Settings->get('links_extrapath')
+										'<span id="blogbaseurl1">'.$edited_Blog->get('baseurl').'</span>index.php'.( $Settings->get('links_extrapath')
 											? '/'.$blog_stub
-											: '?blog='.$blog)
+											: '?blog='.$edited_Blog->ID)
 						),
 						array( 'stub',
 										T_('Other blog through stub file (Advanced)'),
-										'',
-										$blog_baseurl.'/'.$blog_stub.' &nbsp; <strong>'.T_('You MUST create a stub file for this to work.').'</strong>'
+										'<span id="blogbaseurl2">'.$edited_Blog->get('baseurl').'</span><span id="blog_stub_js0">'.$blog_stub.'</span><br /><div style="margin-left:28px">('.T_('You MUST create a stub file for this to work.').')</div>',
+										'<div class="label"><label for="blog_stub">'.T_('Stub name').':</label></div>'
+										.'<div class="input"><input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$blog_stub.'" onkeyup="update_IDs( \'blog_stub_js\', this.value, true )" onfocus="document.getElementsByName(\'blog_access_type\')[2].checked = true;" />'
+										.'<span class="notes"></span></div>'
 						),
 					), T_('Preferred access type'), true );
 
@@ -61,16 +87,21 @@
 					array(
 						array( 'relative',
 										T_('relative to baseurl').':',
-										' <code>'.$baseurl.'</code><input type="text" name="blog_siteurl_relative" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'relative' ? format_to_output($blog_siteurl_relative, 'formvalue') : '' ).'" />'
+										'',
+										' <span class="nobr"><code>'.$baseurl.'/</code>
+											<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'relative' ? format_to_output($blog_siteurl_relative, 'formvalue') : '' ).'" onkeyup="update_IDs( \'blogbaseurl\', \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_IDs( \'blogbaseurl\', \''.$baseurl.'\'+this.value );" /></span>',
+										'onfocus="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 						),
 						array( 'absolute',
 										T_('absolute URL').':',
-										'<input type="text" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'absolute' ? format_to_output($blog_siteurl_absolute, 'formvalue') : '' ).'" />'
+										'',
+										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'absolute' ? format_to_output($blog_siteurl_absolute, 'formvalue') : '' ).'" onkeyup="update_IDs( \'blogbaseurl\', this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_IDs( \'blogbaseurl\', this.value );" />',
+										'onfocus="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
 						)
 					),
 					T_('Blog Folder URL'), true, T_('No trailing slash. (If you don\'t know, leave this field empty.)') );
 
-			form_text( 'blog_stub', $blog_stub, 20, T_('URL blog name / Stub name'), T_('Used in URLs to identify this blog. This should be the stub filename if you use stub file access.'), 30 );
+			form_text( 'blog_urlname', $blog_urlname, 20, T_('URL blog name'), T_('Used in URLs to identify this blog.'), $maxlength_urlname_stub );
 		?>
 	</fieldset>
 
