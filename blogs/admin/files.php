@@ -584,10 +584,15 @@ switch( $Fileman->getMode() )
 
 		$LogUpload = new Log( 'error' );
 		$allowedFileExtensions = trim( $Settings->get( 'upload_allowedext' ) );
-		$allowedMimeTypes = preg_split( '/\s+/', trim( $Settings->get( 'upload_allowedmime' ) ) );
+		$allowedMimeTypes = trim( $Settings->get( 'upload_allowedmime' ) );
+
+		$failedFiles = array();
+
 
 		if( isset($_FILES) && count( $_FILES ) )
 		{{{ // Process uploaded files
+			param( 'uploadfile_alt', 'array', array() );
+			param( 'uploadfile_desc', 'array', array() );
 			param( 'uploadfile_name', 'array', array() );
 
 			foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
@@ -596,6 +601,9 @@ switch( $Fileman->getMode() )
 				{ // no name
 					continue;
 				}
+
+				// pop it again if we succeeded
+				$failedFiles[] = $lKey;
 
 				if( ( $Settings->get( 'upload_maxkb' ) && $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
 						|| $_FILES['uploadfile']['error'][$lKey] == UPLOAD_ERR_FORM_SIZE ) // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
@@ -637,10 +645,17 @@ switch( $Fileman->getMode() )
 					$LogUpload->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newName ) );
 					continue;
 				}
-				elseif( $allowedFileExtensions
+				elseif( !empty($allowedFileExtensions)
 								&& !preg_match( '#\.'.preg_replace( array( '#\s+#', '/#/' ), array( '|', '\#' ), $allowedFileExtensions ).'$#', $newName  ) )
 				{
 					$LogUpload->add( sprintf( T_('The file extension of &laquo;%s&raquo; is not allowed.'), $newName ) );
+					continue;
+				}
+				elseif( !empty($allowedMimeTypes)
+								&& !empty( $_FILES['uploadfile']['type'] ) // browser provided type
+								&& !preg_match( '#\.'.preg_replace( array( '#\s+#', '/#/' ), array( '|', '\#' ), $allowedMimeTypes ).'$#', $newName  ) )
+				{
+					$LogUpload->add( sprintf( T_('The file type (MIME) of &laquo;%s&raquo; is not allowed.'), $newName ) );
 					continue;
 				}
 
@@ -656,6 +671,8 @@ switch( $Fileman->getMode() )
 				elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
 				{
 					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->getName() ), 'note' );
+
+					array_pop( $failedFiles );
 
 					$newFile->refresh();
 					$Fileman->addFile( $newFile );
@@ -725,11 +742,6 @@ switch( $Fileman->getMode() )
 
 				uploadfiles.appendChild( newLI );
 
-				hr = document.createElement("hr");
-				hr.style.height = "0";
-				hr.style.border = "none";
-				hr.style.borderBottom = "1px solid #ddd";
-				newLI.appendChild( hr );
 
 				appendLabelAndInputElements( newLI, "<?php echo T_('Choose a file'); ?>:", "input", "uploadfile[]", "40", "0", "file" );
 				appendLabelAndInputElements( newLI, "<?php echo T_('Alternative text'); ?>:", "input", "uploadfile_alt[]", "40", "80", "text" );
@@ -748,7 +760,7 @@ switch( $Fileman->getMode() )
 				form_hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
 				?>
 
-				<h1><?php echo T_('File upload'); ?></h1> <?php /* We need a good (smaller) default h1! */ ?>
+				<h1><?php echo T_('File upload'); ?></h1> <?php /* TODO: We need a good (smaller) default h1! */ ?>
 
 				<p>
 					<?php
@@ -760,7 +772,7 @@ switch( $Fileman->getMode() )
 					}
 					if( $allowedMimeTypes )
 					{
-						$restrictNotes[] = T_('Allowed MIME types').': '.implode(', ', $allowedMimeTypes);
+						$restrictNotes[] = T_('Allowed MIME types').': '.str_replace( ' ', ', ', $allowedMimeTypes );
 					}
 					if( $Settings->get( 'upload_maxkb' ) )
 					{
@@ -782,25 +794,46 @@ switch( $Fileman->getMode() )
 					<legend><?php echo T_('Files to upload') ?></legend>
 
 					<ul id="uploadfileinputs">
-						<li>
-							<label><?php echo T_('Choose a file'); ?>:</label><br />
-							<input name="uploadfile[]" type="file" size="37" /><br />
+						<?php
+						$failedFiles[] = NULL; // display at least one
 
-							<label><?php echo T_('Alternative text'); ?></label>:<br />
-							<input name="uploadfile_alt[]" type="text" size="50" maxlength="80" /><br />
 
-							<label><?php echo T_('Description of the file'); /* TODO: maxlength */ ?></label>:<br />
-							<textarea name="uploadfile_desc[]" rows="3" cols="37"></textarea><br />
+						foreach( $failedFiles as $lKey )
+						{
+							?><li<?php
+								if( $lKey !== NULL )
+								{
+									echo ' class="invalid" title="'./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'"';
+								} ?>>
+								<label><?php echo T_('Choose a file'); ?>:</label><br />
+								<input name="uploadfile[]" type="file" size="37" /><br />
 
-							<label><?php echo T_('New filename (without path)'); ?></label>:<br />
-							<input name="uploadfile_name[]" type="text" size="50" maxlength="80" /><br />
-						</li></ul> <?php /* no text after </li> or JS will bite you! */ ?>
+								<label><?php echo T_('Alternative text'); ?></label>:<br />
+								<input name="uploadfile_alt[]" type="text" size="50" maxlength="80"
+									value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
+									?>" /><br />
+
+								<label><?php echo T_('Description of the file'); /* TODO: maxlength (DB) */ ?></label>:<br />
+								<textarea name="uploadfile_desc[]" rows="3" cols="37"><?php
+									echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
+								?></textarea><br />
+
+								<label><?php echo T_('New filename (without path)'); ?></label>:<br />
+								<input name="uploadfile_name[]" type="text" size="50" maxlength="80"
+									value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
+							</li><?php // no text after </li> or JS will bite you!
+						}
+
+
+						?></ul>
 
 				</fieldset>
 
 				<fieldset>
 					<legend><?php echo T_('Upload files into:'); ?></legend>
-					<?php #echo T_('Choose the directory you want to upload the files into. la la la la la la la'); ?>
+					<?php
+					#echo 'Choose the directory you want to upload the files into. la la la la la la la';
+					?>
 
 					<?php
 					echo $Fileman->getDirectoryTreeRadio();
@@ -1115,7 +1148,7 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 
 		?>
 
-		<a class="ActionButton" href="<?php echo $Fileman->getCurUrl( array( 'mode' => 'browse' ) ) ?>">
+		<a class="ActionButton" href="<?php echo $Fileman->getCurUrl( array( 'fm_mode' => false ) ) ?>">
 			<?php echo /* TRANS: Button to leave the upload mode */ T_('Leave upload mode'); ?></a>
 
 		&mdash;
@@ -1164,8 +1197,8 @@ if( !$Fileman->forceFM && $Fileman->getMode() == 'file_upload' ) // TODO: genera
 
 	</div>
 
-	<?php
 
+	<?php
 
 	require( dirname(__FILE__). '/_footer.php' );
 	return;
@@ -1653,6 +1686,7 @@ if( $countFiles )
 <!-- CREATE: -->
 
 <form action="files.php#FM_anchor" class="toolbaritem">
+	<?php echo $Fileman->getFormHiddenInputs(); ?>
 	<label class="tooltitle"><?php echo T_('New'); ?></label>
 	<select name="createnew">
 		<option value="file"><?php echo T_('file') ?></option>
@@ -1669,15 +1703,20 @@ if( $countFiles )
 			echo $createname;
 		} ?>" size="20" />
 	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
-	<?php echo $Fileman->getFormHiddenInputs() ?>
 	<input type="hidden" name="action" value="createnew" />
 </form>
 
 
 <!-- UPLOAD: -->
 
-<form action="files.php" class="toolbaritem">
-	<?php $Fileman->dispButtonUploadMode(); ?>
+<form enctype="multipart/form-data" action="files.php" method="post" class="toolbaritem">
+	<?php form_hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); ?>
+	<?php echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) ); ?>
+
+	<div>
+		<input class="ActionButton" name="uploadfile[]" type="file" size="10" />
+		<input class="ActionButton" type="submit" value="<?php echo T_('Upload a file/image'); ?>" />
+	</div>
 </form>
 
 
@@ -1796,6 +1835,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.63  2005/01/09 05:36:39  blueyed
+ * fileupload
+ *
  * Revision 1.62  2005/01/08 12:05:50  blueyed
  * small bugfix
  *

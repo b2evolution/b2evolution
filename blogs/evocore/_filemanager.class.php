@@ -125,11 +125,18 @@ class FileManager extends Filelist
 	var $path = '';
 
 	/**
-	 * Remember the mode we're in ('file_cmr')
+	 * Remember the mode we're in ('upload')
 	 * @var string
 	 * @access protected
 	 */
 	var $mode = NULL;
+
+	/**
+	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
+	 * @var string
+	 * @access protected
+	 */
+	var $fm_mode = NULL;
 
 
 	/**
@@ -156,7 +163,7 @@ class FileManager extends Filelist
 	 */
 	var $_internalGlobals = array(
 			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
-			'mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM'
+			'mode', 'fm_mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM'
 		);
 
 	/**
@@ -197,9 +204,7 @@ class FileManager extends Filelist
 
 
 		// {{{ -- get/translate root directory ----
-		$this->root = $root;
-
-		$root_A = explode( '_', $this->root );
+		$root_A = explode( '_', $root );
 
 		if( count($root_A) == 2 && $root_A[1] !== '' )
 		{
@@ -209,12 +214,14 @@ class FileManager extends Filelist
 					$tBlog = $BlogCache->get_by_ID( $root_A[1] );
 					$this->root_dir = $tBlog->get( 'mediadir' );
 					$this->root_url = $tBlog->get( 'mediaurl' );
+					$this->root = 'blog_'.$root_A[1];
 					break;
 
 				case 'user':
 					$tUser = & $UserCache->get_by_ID($root_A[1]);
 					$this->root_dir = $tUser->getMediaDir();
 					$this->root_url = $tUser->getMediaUrl();
+					$this->root = 'user_'.$root_A[1];
 					break;
 			}
 		}
@@ -224,6 +231,7 @@ class FileManager extends Filelist
 			case 'user':
 				$this->root_dir = $this->User->getMediaDir();
 				$this->root_url = $this->User->getMediaUrl();
+				$this->root = 'user';
 				break;
 		}
 
@@ -282,10 +290,15 @@ class FileManager extends Filelist
 		 * Remember mode from passed global.
 		 * @var string
 		 */
-		$this->mode = empty($mode) ? NULL : $mode;
+		$this->mode = $mode;
+		/**
+		 * Get FM mode from params.
+		 * @var string
+		 */
+		$this->fm_mode = param( 'fm_mode', 'string', NULL );
 
-		if( $this->mode
-				&& $this->fm_sources = param( 'fm_sources', 'array', array() ) )
+
+		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
 			if( $this->SourceList =& new Filelist() )
 			{ // TODO: should fail for non-existant sources, or sources where no read-perm
@@ -298,7 +311,7 @@ class FileManager extends Filelist
 			}
 			else
 			{
-				$this->mode = false;
+				$this->fm_mode = false;
 			}
 		}
 		else
@@ -432,27 +445,19 @@ class FileManager extends Filelist
 	 * @param string title for the button
 	 * @param string optional HTML attribs for the input button
 	 */
-	function dispButtonUploadMode( $title = NULL, $attribs = '' )
+	function dispButtonUploadPopup( $title = NULL, $attribs = '' )
 	{
 		if( $title === NULL )
 		{
 			$title = T_('Upload a file/image');
 		}
 
-		$url = $this->getCurUrl( array( 'mode' => 'file_upload' ) );
+		$url = $this->getCurUrl( array( 'fm_mode' => 'file_upload', 'mode' => 'upload' ) );
 
-		echo '<input class="ActionButton" type="button" value="'.format_to_output( $title, 'formvalue' )
-					.'" onclick="'.$this->getJsPopupCode( $url, 'fileman_upload' )
-					.'" '.$attribs.' />';
-	}
-
-
-	/**
-	 * Stub for dispButtonUploadMode() until re-designed
-	 */
-	function dispButtonUpload( $title = NULL, $attribs = '' )
-	{
-		return $this->dispButtonUploadMode( $title, $attribs );
+		echo '<input type="button" class="ActionButton"' // JS-only.. bleh..
+					.' onclick="'.$this->getJsPopupCode( $url, 'fileman_upload' ).'"'
+					.' value="'.format_to_output( $title, 'formvalue' ).'"'
+					.' />';
 	}
 
 
@@ -468,7 +473,7 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$url = $this->getCurUrl( array( 'mode' => 'file_cmr',
+		$url = $this->getCurUrl( array( 'fm_mode' => 'file_cmr',
 																		'fm_sources' => false,
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
 		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->getPath() );
@@ -576,11 +581,11 @@ class FileManager extends Filelist
 	/**
 	 * Get current mode.
 	 *
-	 * @return string|false 'file_cmr'
+	 * @return string|NULL 'file_cmr', 'file_upload'
 	 */
 	function getMode()
 	{
-		return $this->mode;
+		return $this->fm_mode;
 	}
 
 
@@ -1086,8 +1091,8 @@ class FileManager extends Filelist
 		if( empty($name) )
 		{
 			$this->Messages->add( $type == 'dir' ?
-														T_('Cannot create empty directory.') :
-														T_('Cannot create empty file.') );
+														T_('Cannot create a directory without name.') :
+														T_('Cannot create a file without name.') );
 			return false;
 		}
 		elseif( !isFilename($name) )
@@ -1391,6 +1396,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.18  2005/01/09 05:36:38  blueyed
+ * fileupload
+ *
  * Revision 1.17  2005/01/08 01:24:19  blueyed
  * filelist refactoring
  *

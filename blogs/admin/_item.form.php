@@ -177,7 +177,7 @@ $Form->labelend = "</strong>\n";
 	{	// ------------------------------- UPLOAD ----------------------------------
 		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
 		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
-		$Fileman->dispButtonUpload( T_('Files') );
+		$Fileman->dispButtonUploadPopup( T_('Files') );
 	}
 
 	// CALL PLUGINS NOW:
@@ -536,6 +536,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/09 05:36:39  blueyed
+ * fileupload
+ *
  * Revision 1.7  2005/01/03 15:17:51  fplanque
  * no message
  *

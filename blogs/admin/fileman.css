@@ -156,6 +156,15 @@ ul#uploadfileinputs {
 	margin:0;
 	padding:0;
 }
+ul#uploadfileinputs li {
+	border-bottom:1px solid #ddd;
+	margin-bottom:2ex;
+	padding-bottom:2ex;
+}
+ul#uploadfileinputs li.invalid {
+	border:1px solid #f00;
+	padding:2ex;
+}
 ul#uploadfileinputs li input,
 ul#uploadfileinputs li textarea {
 	width:99%;
@@ -169,6 +178,7 @@ ul#uploadfileinputs label {
 
 div.toggleModeAndFM {
 	padding:2ex 0;
+	margin:0 2ex;
 	text-align:center;
 	clear:both;
 	border-top:1px solid #ddd;
