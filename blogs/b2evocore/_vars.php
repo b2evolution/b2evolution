@@ -18,7 +18,7 @@ bindtextdomain( 'messages', dirname(__FILE__).'/../locales');
 // Choose domain: (name of the .mo files)
 textdomain( 'messages' );
 
-// Chose lang and set locale:
+// Choose lang and set default locale:
 locale_activate( $default_locale );
 
 

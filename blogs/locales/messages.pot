@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-08-20 18:08+0200\n"
+"POT-Creation-Date: 2003-08-21 22:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,352 +16,444 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ..\..\..\index.php:47
-#: ..\..\..\index.php:113
+#: ..\..\..\index.php:7
+msgid "my b2evolution"
+msgstr ""
+
+#: ..\..\..\index.php:7
+msgid "my blogs"
+msgstr ""
+
+#: ..\..\..\index.php:14
+msgid "A blog tool like it oughta be!"
+msgstr ""
+
+#: ..\..\..\index.php:15 C:\www\b2evolution\blogs\index.php:32
+msgid "My blogs"
+msgstr ""
+
+#: ..\..\..\index.php:27
+msgid "My Back-Office"
+msgstr ""
+
+#: ..\..\..\index.php:30
+msgid ""
+"This page is a placeholder providing links to your blogs and additionnal "
+"demos of what you can do with b2evolution."
+msgstr ""
+
+#: ..\..\..\index.php:31
+msgid ""
+"Of course, you don't want to keep all that for your website. Just select "
+"what you need and erase what you don't. You will probably also delete this "
+"page and rename one of your blogs to index.php. (When you do that, don't "
+"forget to update that blog settings in the back office, so the moved blog "
+"knows its new filename/URL! ;)."
+msgstr ""
+
+#: ..\..\..\index.php:42
+#, php-format
+msgid "Blog #%d"
+msgstr ""
+
+#: ..\..\..\index.php:63
+msgid "Blog #1"
+msgstr ""
+
+#: ..\..\..\index.php:63
+msgid ""
+"This is a special blog that aggregates all messages from all other blogs!"
+msgstr ""
+
+#: ..\..\..\index.php:68
+msgid ""
+"Please note: the above list (as well as the menu) is automatically generated "
+"and includes only the blogs that have a &quot;stub url name&quot;. You can "
+"set this in the blog configuration in the back-office."
+msgstr ""
+
+#: ..\..\..\index.php:69
+msgid "More demos"
+msgstr ""
+
+#: ..\..\..\index.php:71
+msgid "Custom template"
+msgstr ""
+
+#: ..\..\..\index.php:71
+msgid "Multiple blogs displayed on the same page"
+msgstr ""
+
+#: ..\..\..\index.php:73
+msgid ""
+"Please note: those demos do not make use of evoSkins, even if you enabled "
+"them during install. The only way to change their look and feel is to edit "
+"their PHP template. But once, again, rememner these are just demos destined "
+"to inspire you for your own templates ;)"
+msgstr ""
+
+#: ..\..\..\index.php:75
+msgid "official website"
+msgstr ""
+
+#: ..\..\..\index.php:75
+msgid "GNU GPL license"
+msgstr ""
+
+#: ..\..\..\multiblogs.php:47
+#: ..\..\..\multiblogs.php:121
 #: ..\..\..\noskin_a.php:59
-#: ..\..\..\noskin_a.php:124
-#: ..\..\..\noskin_a.php:204
+#: ..\..\..\noskin_a.php:129
+#: ..\..\..\noskin_a.php:209
 #: ..\..\..\noskin_all.php:60
-#: ..\..\..\noskin_all.php:125
-#: ..\..\..\noskin_all.php:206
+#: ..\..\..\noskin_all.php:130
+#: ..\..\..\noskin_all.php:211
 #: ..\..\..\noskin_b.php:59
-#: ..\..\..\noskin_b.php:124
-#: ..\..\..\noskin_b.php:205
+#: ..\..\..\noskin_b.php:129
+#: ..\..\..\noskin_b.php:210
 #: ..\..\..\noskin_roll.php:59
-#: ..\..\..\noskin_roll.php:123
-#: ..\..\..\noskin_roll.php:204
+#: ..\..\..\noskin_roll.php:129
+#: ..\..\..\noskin_roll.php:210
 #: ..\..\..\skins\bluesky\_main.php:20
 #: ..\..\..\skins\bluesky\_main.php:46
 #: ..\..\..\skins\bluesky\_main.php:110
 #: ..\..\..\skins\custom\_main.php:22
-#: ..\..\..\skins\custom\_main.php:66
-#: ..\..\..\skins\custom\_main.php:146
+#: ..\..\..\skins\custom\_main.php:56
+#: ..\..\..\skins\custom\_main.php:136
 #: ..\..\..\skins\fplanque2002\_main.php:23
-#: ..\..\..\skins\fplanque2002\_main.php:88
-#: ..\..\..\skins\fplanque2002\_main.php:168
+#: ..\..\..\skins\fplanque2002\_main.php:76
+#: ..\..\..\skins\fplanque2002\_main.php:156
 #: ..\..\..\skins\guadeloupe\_main.php:20
 #: ..\..\..\skins\guadeloupe\_main.php:46
 #: ..\..\..\skins\guadeloupe\_main.php:110
 msgid "Last comments"
 msgstr ""
 
-#: ..\..\..\index.php:48
-#: ..\..\..\index.php:114
+#: ..\..\..\multiblogs.php:48
+#: ..\..\..\multiblogs.php:122
 #: ..\..\..\noskin_a.php:60
-#: ..\..\..\noskin_a.php:125
+#: ..\..\..\noskin_a.php:130
 #: ..\..\..\noskin_all.php:61
-#: ..\..\..\noskin_all.php:126
+#: ..\..\..\noskin_all.php:131
 #: ..\..\..\noskin_b.php:60
-#: ..\..\..\noskin_b.php:125
+#: ..\..\..\noskin_b.php:130
 #: ..\..\..\noskin_roll.php:60
-#: ..\..\..\noskin_roll.php:124
+#: ..\..\..\noskin_roll.php:130
 #: ..\..\..\skins\bluesky\_main.php:21
 #: ..\..\..\skins\bluesky\_main.php:47
 #: ..\..\..\skins\custom\_main.php:23
-#: ..\..\..\skins\custom\_main.php:67
+#: ..\..\..\skins\custom\_main.php:57
 #: ..\..\..\skins\fplanque2002\_main.php:24
-#: ..\..\..\skins\fplanque2002\_main.php:89
+#: ..\..\..\skins\fplanque2002\_main.php:77
 #: ..\..\..\skins\guadeloupe\_main.php:21
 #: ..\..\..\skins\guadeloupe\_main.php:47
 msgid "Statistics"
 msgstr ""
 
-#: ..\..\..\index.php:49
-#: ..\..\..\index.php:115
+#: ..\..\..\multiblogs.php:49
+#: ..\..\..\multiblogs.php:123
 #: ..\..\..\noskin_a.php:61
-#: ..\..\..\noskin_a.php:126
+#: ..\..\..\noskin_a.php:131
 #: ..\..\..\noskin_all.php:62
-#: ..\..\..\noskin_all.php:127
+#: ..\..\..\noskin_all.php:132
 #: ..\..\..\noskin_b.php:61
-#: ..\..\..\noskin_b.php:126
+#: ..\..\..\noskin_b.php:131
 #: ..\..\..\noskin_roll.php:61
-#: ..\..\..\noskin_roll.php:125
+#: ..\..\..\noskin_roll.php:131
 #: ..\..\..\skins\custom\_main.php:24
-#: ..\..\..\skins\custom\_main.php:68
+#: ..\..\..\skins\custom\_main.php:58
 #: ..\..\..\skins\fplanque2002\_main.php:25
-#: ..\..\..\skins\fplanque2002\_main.php:90
+#: ..\..\..\skins\fplanque2002\_main.php:78
 msgid "Archive Directory"
 msgstr ""
 
-#: ..\..\..\index.php:129
-#: ..\..\..\noskin_a.php:141
-#: ..\..\..\noskin_a.php:222
-#: ..\..\..\noskin_all.php:142
-#: ..\..\..\noskin_all.php:224
-#: ..\..\..\noskin_b.php:141
-#: ..\..\..\noskin_b.php:223
-#: ..\..\..\noskin_roll.php:140
-#: ..\..\..\noskin_roll.php:222
+#: ..\..\..\multiblogs.php:137
+#: ..\..\..\noskin_a.php:146
+#: ..\..\..\noskin_a.php:227
+#: ..\..\..\noskin_all.php:147
+#: ..\..\..\noskin_all.php:229
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:228
+#: ..\..\..\noskin_roll.php:146
+#: ..\..\..\noskin_roll.php:228
 #: ..\..\..\admin\b2categories.php:2
 #: ..\..\..\b2evocore\_edit_form.php:200
 #: ..\..\..\b2evocore\_edit_showposts.php:413
-#: ..\..\..\skins\custom\_main.php:83
-#: ..\..\..\skins\custom\_main.php:164
-#: ..\..\..\skins\fplanque2002\_main.php:105
-#: ..\..\..\skins\fplanque2002\_main.php:186
+#: ..\..\..\skins\custom\_main.php:73
+#: ..\..\..\skins\custom\_main.php:154
+#: ..\..\..\skins\fplanque2002\_main.php:93
+#: ..\..\..\skins\fplanque2002\_main.php:174
 msgid "Categories"
 msgstr ""
 
-#: ..\..\..\index.php:145
-#: ..\..\..\noskin_a.php:157
-#: ..\..\..\noskin_all.php:158
-#: ..\..\..\noskin_b.php:157
-#: ..\..\..\noskin_roll.php:156
-#: ..\..\..\skins\custom\_main.php:99
-#: ..\..\..\skins\fplanque2002\_main.php:121
+#: ..\..\..\multiblogs.php:153
+#: ..\..\..\noskin_a.php:162
+#: ..\..\..\noskin_all.php:163
+#: ..\..\..\noskin_b.php:162
+#: ..\..\..\noskin_roll.php:162
+#: ..\..\..\skins\custom\_main.php:89
+#: ..\..\..\skins\fplanque2002\_main.php:109
 #, php-format
 msgid "- %d queries so far"
 msgstr ""
 
-#: ..\..\..\index.php:253
-#: ..\..\..\noskin_a.php:276
-#: ..\..\..\noskin_all.php:278
-#: ..\..\..\noskin_b.php:277
-#: ..\..\..\noskin_roll.php:276
-#: ..\..\..\skins\babyblues\_main.php:86
-#: ..\..\..\skins\bluesky\_main.php:201
-#: ..\..\..\skins\custom\_main.php:229
-#: ..\..\..\skins\fplanque2002\_main.php:250
-#: ..\..\..\skins\guadeloupe\_main.php:201
+#: ..\..\..\multiblogs.php:261
+#: ..\..\..\noskin_a.php:281
+#: ..\..\..\noskin_all.php:283
+#: ..\..\..\noskin_b.php:282
+#: ..\..\..\noskin_roll.php:282
+#: ..\..\..\skins\babyblues\_main.php:75
+#: ..\..\..\skins\bluesky\_main.php:189
+#: ..\..\..\skins\custom\_main.php:219
+#: ..\..\..\skins\fplanque2002\_main.php:238
+#: ..\..\..\skins\guadeloupe\_main.php:190
 msgid "Misc"
 msgstr ""
 
-#: ..\..\..\index.php:255
-#: ..\..\..\noskin_a.php:278
-#: ..\..\..\noskin_all.php:280
-#: ..\..\..\noskin_b.php:279
-#: ..\..\..\noskin_roll.php:278
-#: ..\..\..\skins\babyblues\_main.php:88
-#: ..\..\..\skins\bluesky\_main.php:203
-#: ..\..\..\skins\custom\_main.php:231
-#: ..\..\..\skins\fplanque2002\_main.php:252
-#: ..\..\..\skins\guadeloupe\_main.php:203
-#: ..\..\..\skins\originalb2\_main.php:146
+#: ..\..\..\multiblogs.php:263
+#: ..\..\..\noskin_a.php:283
+#: ..\..\..\noskin_all.php:285
+#: ..\..\..\noskin_b.php:284
+#: ..\..\..\noskin_roll.php:284
+#: ..\..\..\skins\babyblues\_main.php:77
+#: ..\..\..\skins\bluesky\_main.php:191
+#: ..\..\..\skins\custom\_main.php:221
+#: ..\..\..\skins\fplanque2002\_main.php:240
+#: ..\..\..\skins\guadeloupe\_main.php:192
+#: ..\..\..\skins\originalb2\_main.php:137
 msgid "Login..."
 msgstr ""
 
-#: ..\..\..\index.php:256
-#: ..\..\..\noskin_a.php:279
-#: ..\..\..\noskin_all.php:281
-#: ..\..\..\noskin_b.php:280
-#: ..\..\..\noskin_roll.php:279
-#: ..\..\..\skins\babyblues\_main.php:89
-#: ..\..\..\skins\bluesky\_main.php:204
-#: ..\..\..\skins\custom\_main.php:232
-#: ..\..\..\skins\fplanque2002\_main.php:253
-#: ..\..\..\skins\guadeloupe\_main.php:204
-#: ..\..\..\skins\originalb2\_main.php:147
+#: ..\..\..\multiblogs.php:264
+#: ..\..\..\noskin_a.php:284
+#: ..\..\..\noskin_all.php:286
+#: ..\..\..\noskin_b.php:285
+#: ..\..\..\noskin_roll.php:285
+#: ..\..\..\skins\babyblues\_main.php:78
+#: ..\..\..\skins\bluesky\_main.php:192
+#: ..\..\..\skins\custom\_main.php:222
+#: ..\..\..\skins\fplanque2002\_main.php:241
+#: ..\..\..\skins\guadeloupe\_main.php:193
+#: ..\..\..\skins\originalb2\_main.php:138
 msgid "Register..."
 msgstr ""
 
-#: ..\..\..\noskin_a.php:197
-#: ..\..\..\noskin_a.php:198
-#: ..\..\..\noskin_all.php:199
-#: ..\..\..\noskin_all.php:200
-#: ..\..\..\noskin_b.php:198
-#: ..\..\..\noskin_b.php:199
-#: ..\..\..\noskin_roll.php:197
-#: ..\..\..\noskin_roll.php:198
+#: ..\..\..\noskin_a.php:95
+#: ..\..\..\noskin_all.php:96
+#: ..\..\..\noskin_b.php:95
+#: ..\..\..\noskin_roll.php:95
+#: ..\..\..\skins\fplanque2002\_bloglist.php:27
+msgid "Selected"
+msgstr ""
+
+#: ..\..\..\noskin_a.php:202
+#: ..\..\..\noskin_a.php:203
+#: ..\..\..\noskin_all.php:204
+#: ..\..\..\noskin_all.php:205
+#: ..\..\..\noskin_b.php:203
+#: ..\..\..\noskin_b.php:204
+#: ..\..\..\noskin_roll.php:203
+#: ..\..\..\noskin_roll.php:204
 #: ..\..\..\skins\bluesky\_main.php:106
 #: ..\..\..\skins\bluesky\_main.php:107
-#: ..\..\..\skins\custom\_main.php:139
-#: ..\..\..\skins\custom\_main.php:140
-#: ..\..\..\skins\fplanque2002\_main.php:161
-#: ..\..\..\skins\fplanque2002\_main.php:162
+#: ..\..\..\skins\custom\_main.php:129
+#: ..\..\..\skins\custom\_main.php:130
+#: ..\..\..\skins\fplanque2002\_main.php:149
+#: ..\..\..\skins\fplanque2002\_main.php:150
 #: ..\..\..\skins\guadeloupe\_main.php:106
 #: ..\..\..\skins\guadeloupe\_main.php:107
 msgid "Recently"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:197
-#: ..\..\..\noskin_all.php:199
-#: ..\..\..\noskin_b.php:198
-#: ..\..\..\noskin_roll.php:197
+#: ..\..\..\noskin_a.php:202
+#: ..\..\..\noskin_all.php:204
+#: ..\..\..\noskin_b.php:203
+#: ..\..\..\noskin_roll.php:203
 #: ..\..\..\skins\bluesky\_main.php:106
-#: ..\..\..\skins\custom\_main.php:139
-#: ..\..\..\skins\fplanque2002\_main.php:161
+#: ..\..\..\skins\custom\_main.php:129
+#: ..\..\..\skins\fplanque2002\_main.php:149
 #: ..\..\..\skins\guadeloupe\_main.php:106
 msgid "(cached)"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:198
-#: ..\..\..\noskin_all.php:200
-#: ..\..\..\noskin_b.php:199
-#: ..\..\..\noskin_roll.php:198
+#: ..\..\..\noskin_a.php:203
+#: ..\..\..\noskin_all.php:205
+#: ..\..\..\noskin_b.php:204
+#: ..\..\..\noskin_roll.php:204
 #: ..\..\..\skins\bluesky\_main.php:107
-#: ..\..\..\skins\custom\_main.php:140
-#: ..\..\..\skins\fplanque2002\_main.php:162
+#: ..\..\..\skins\custom\_main.php:130
+#: ..\..\..\skins\fplanque2002\_main.php:150
 #: ..\..\..\skins\guadeloupe\_main.php:107
 msgid "(no cache)"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:205
-#: ..\..\..\noskin_all.php:207
-#: ..\..\..\noskin_b.php:206
-#: ..\..\..\noskin_roll.php:205
-#: ..\..\..\skins\custom\_main.php:147
-#: ..\..\..\skins\fplanque2002\_main.php:169
+#: ..\..\..\noskin_a.php:210
+#: ..\..\..\noskin_all.php:212
+#: ..\..\..\noskin_b.php:211
+#: ..\..\..\noskin_roll.php:211
+#: ..\..\..\skins\custom\_main.php:137
+#: ..\..\..\skins\fplanque2002\_main.php:157
 msgid "Some viewing statistics"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:210
-#: ..\..\..\noskin_a.php:216
-#: ..\..\..\noskin_all.php:212
-#: ..\..\..\noskin_all.php:218
-#: ..\..\..\noskin_b.php:211
-#: ..\..\..\noskin_b.php:217
-#: ..\..\..\noskin_roll.php:210
+#: ..\..\..\noskin_a.php:215
+#: ..\..\..\noskin_a.php:221
+#: ..\..\..\noskin_all.php:217
+#: ..\..\..\noskin_all.php:223
+#: ..\..\..\noskin_b.php:216
+#: ..\..\..\noskin_b.php:222
 #: ..\..\..\noskin_roll.php:216
+#: ..\..\..\noskin_roll.php:222
 #: ..\..\..\b2evocore\_edit_showposts.php:307
 #: ..\..\..\b2evocore\_edit_showposts.php:488
-#: ..\..\..\skins\custom\_main.php:152
-#: ..\..\..\skins\custom\_main.php:158
-#: ..\..\..\skins\fplanque2002\_main.php:174
-#: ..\..\..\skins\fplanque2002\_main.php:180
-#: ..\..\..\skins\originalb2\_main.php:128
+#: ..\..\..\skins\custom\_main.php:142
+#: ..\..\..\skins\custom\_main.php:148
+#: ..\..\..\skins\fplanque2002\_main.php:162
+#: ..\..\..\skins\fplanque2002\_main.php:168
+#: ..\..\..\skins\originalb2\_main.php:119
 msgid "Search"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:213
-#: ..\..\..\noskin_all.php:215
-#: ..\..\..\noskin_b.php:214
-#: ..\..\..\noskin_roll.php:213
-#: ..\..\..\skins\custom\_main.php:155
-#: ..\..\..\skins\fplanque2002\_main.php:177
+#: ..\..\..\noskin_a.php:218
+#: ..\..\..\noskin_all.php:220
+#: ..\..\..\noskin_b.php:219
+#: ..\..\..\noskin_roll.php:219
+#: ..\..\..\skins\custom\_main.php:145
+#: ..\..\..\skins\fplanque2002\_main.php:165
 msgid "All Words"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:214
-#: ..\..\..\noskin_all.php:216
-#: ..\..\..\noskin_b.php:215
-#: ..\..\..\noskin_roll.php:214
-#: ..\..\..\skins\custom\_main.php:156
-#: ..\..\..\skins\fplanque2002\_main.php:178
+#: ..\..\..\noskin_a.php:219
+#: ..\..\..\noskin_all.php:221
+#: ..\..\..\noskin_b.php:220
+#: ..\..\..\noskin_roll.php:220
+#: ..\..\..\skins\custom\_main.php:146
+#: ..\..\..\skins\fplanque2002\_main.php:166
 msgid "Some Word"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:215
-#: ..\..\..\noskin_all.php:217
-#: ..\..\..\noskin_b.php:216
-#: ..\..\..\noskin_roll.php:215
+#: ..\..\..\noskin_a.php:220
+#: ..\..\..\noskin_all.php:222
+#: ..\..\..\noskin_b.php:221
+#: ..\..\..\noskin_roll.php:221
 #: ..\..\..\b2evocore\_edit_showposts.php:332
-#: ..\..\..\skins\custom\_main.php:157
-#: ..\..\..\skins\fplanque2002\_main.php:179
+#: ..\..\..\skins\custom\_main.php:147
+#: ..\..\..\skins\fplanque2002\_main.php:167
 msgid "Sentence"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:217
-#: ..\..\..\noskin_a.php:229
-#: ..\..\..\noskin_all.php:219
-#: ..\..\..\noskin_all.php:231
-#: ..\..\..\noskin_b.php:218
-#: ..\..\..\noskin_b.php:230
-#: ..\..\..\noskin_roll.php:217
-#: ..\..\..\noskin_roll.php:229
-#: ..\..\..\skins\bluesky\_main.php:137
-#: ..\..\..\skins\custom\_main.php:159
-#: ..\..\..\skins\custom\_main.php:171
+#: ..\..\..\noskin_a.php:222
+#: ..\..\..\noskin_a.php:234
+#: ..\..\..\noskin_all.php:224
+#: ..\..\..\noskin_all.php:236
+#: ..\..\..\noskin_b.php:223
+#: ..\..\..\noskin_b.php:235
+#: ..\..\..\noskin_roll.php:223
+#: ..\..\..\noskin_roll.php:235
+#: ..\..\..\skins\bluesky\_main.php:125
+#: ..\..\..\skins\custom\_main.php:149
+#: ..\..\..\skins\custom\_main.php:161
+#: ..\..\..\skins\fplanque2002\_main.php:169
 #: ..\..\..\skins\fplanque2002\_main.php:181
-#: ..\..\..\skins\fplanque2002\_main.php:193
-#: ..\..\..\skins\guadeloupe\_main.php:137
+#: ..\..\..\skins\guadeloupe\_main.php:126
 msgid "Reset form"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:228
-#: ..\..\..\noskin_all.php:230
-#: ..\..\..\noskin_b.php:229
-#: ..\..\..\noskin_roll.php:228
-#: ..\..\..\skins\bluesky\_main.php:136
-#: ..\..\..\skins\custom\_main.php:170
-#: ..\..\..\skins\fplanque2002\_main.php:192
-#: ..\..\..\skins\guadeloupe\_main.php:136
-#: ..\..\..\skins\originalb2\_main.php:120
+#: ..\..\..\noskin_a.php:233
+#: ..\..\..\noskin_all.php:235
+#: ..\..\..\noskin_b.php:234
+#: ..\..\..\noskin_roll.php:234
+#: ..\..\..\skins\bluesky\_main.php:124
+#: ..\..\..\skins\custom\_main.php:160
+#: ..\..\..\skins\fplanque2002\_main.php:180
+#: ..\..\..\skins\guadeloupe\_main.php:125
+#: ..\..\..\skins\originalb2\_main.php:111
 msgid "Get selection"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:239
-#: ..\..\..\noskin_a.php:252
-#: ..\..\..\noskin_a.php:261
-#: ..\..\..\noskin_all.php:241
-#: ..\..\..\noskin_all.php:254
-#: ..\..\..\noskin_all.php:263
-#: ..\..\..\noskin_b.php:240
-#: ..\..\..\noskin_b.php:253
-#: ..\..\..\noskin_b.php:262
-#: ..\..\..\noskin_roll.php:239
-#: ..\..\..\noskin_roll.php:252
-#: ..\..\..\noskin_roll.php:261
-#: ..\..\..\skins\bluesky\_main.php:184
-#: ..\..\..\skins\bluesky\_main.php:193
-#: ..\..\..\skins\custom\_main.php:181
-#: ..\..\..\skins\custom\_main.php:205
-#: ..\..\..\skins\custom\_main.php:214
-#: ..\..\..\skins\fplanque2002\_main.php:203
-#: ..\..\..\skins\fplanque2002\_main.php:226
-#: ..\..\..\skins\fplanque2002\_main.php:235
-#: ..\..\..\skins\guadeloupe\_main.php:184
-#: ..\..\..\skins\guadeloupe\_main.php:193
+#: ..\..\..\noskin_a.php:244
+#: ..\..\..\noskin_a.php:257
+#: ..\..\..\noskin_a.php:266
+#: ..\..\..\noskin_all.php:246
+#: ..\..\..\noskin_all.php:259
+#: ..\..\..\noskin_all.php:268
+#: ..\..\..\noskin_b.php:245
+#: ..\..\..\noskin_b.php:258
+#: ..\..\..\noskin_b.php:267
+#: ..\..\..\noskin_roll.php:245
+#: ..\..\..\noskin_roll.php:258
+#: ..\..\..\noskin_roll.php:267
+#: ..\..\..\skins\bluesky\_main.php:172
+#: ..\..\..\skins\bluesky\_main.php:181
+#: ..\..\..\skins\custom\_main.php:171
+#: ..\..\..\skins\custom\_main.php:195
+#: ..\..\..\skins\custom\_main.php:204
+#: ..\..\..\skins\fplanque2002\_main.php:191
+#: ..\..\..\skins\fplanque2002\_main.php:214
+#: ..\..\..\skins\fplanque2002\_main.php:223
+#: ..\..\..\skins\guadeloupe\_main.php:173
+#: ..\..\..\skins\guadeloupe\_main.php:182
 msgid "more..."
 msgstr ""
 
-#: ..\..\..\noskin_a.php:246
-#: ..\..\..\noskin_all.php:248
-#: ..\..\..\noskin_b.php:247
-#: ..\..\..\noskin_roll.php:246
-#: ..\..\..\skins\bluesky\_main.php:178
-#: ..\..\..\skins\custom\_main.php:199
-#: ..\..\..\skins\fplanque2002\_main.php:220
-#: ..\..\..\skins\guadeloupe\_main.php:178
+#: ..\..\..\noskin_a.php:251
+#: ..\..\..\noskin_all.php:253
+#: ..\..\..\noskin_b.php:252
+#: ..\..\..\noskin_roll.php:252
+#: ..\..\..\skins\bluesky\_main.php:166
+#: ..\..\..\skins\custom\_main.php:189
+#: ..\..\..\skins\fplanque2002\_main.php:208
+#: ..\..\..\skins\guadeloupe\_main.php:167
 msgid "Recent Referers"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:255
-#: ..\..\..\noskin_all.php:257
-#: ..\..\..\noskin_b.php:256
-#: ..\..\..\noskin_roll.php:255
-#: ..\..\..\skins\bluesky\_main.php:187
-#: ..\..\..\skins\custom\_main.php:208
-#: ..\..\..\skins\fplanque2002\_main.php:229
-#: ..\..\..\skins\guadeloupe\_main.php:187
+#: ..\..\..\noskin_a.php:260
+#: ..\..\..\noskin_all.php:262
+#: ..\..\..\noskin_b.php:261
+#: ..\..\..\noskin_roll.php:261
+#: ..\..\..\skins\bluesky\_main.php:175
+#: ..\..\..\skins\custom\_main.php:198
+#: ..\..\..\skins\fplanque2002\_main.php:217
+#: ..\..\..\skins\guadeloupe\_main.php:176
 msgid "Top Referers"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:269
-#: ..\..\..\noskin_all.php:271
-#: ..\..\..\noskin_b.php:270
-#: ..\..\..\noskin_roll.php:269
+#: ..\..\..\noskin_a.php:274
+#: ..\..\..\noskin_all.php:276
+#: ..\..\..\noskin_b.php:275
+#: ..\..\..\noskin_roll.php:275
 #: ..\..\..\b2evocore\_blogs_form.php:52
-#: ..\..\..\skins\bluesky\_main.php:198
-#: ..\..\..\skins\custom\_main.php:222
-#: ..\..\..\skins\fplanque2002\_main.php:243
-#: ..\..\..\skins\guadeloupe\_main.php:198
+#: ..\..\..\skins\bluesky\_main.php:186
+#: ..\..\..\skins\custom\_main.php:212
+#: ..\..\..\skins\fplanque2002\_main.php:231
+#: ..\..\..\skins\guadeloupe\_main.php:187
 msgid "Blogroll"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:284
-#: ..\..\..\noskin_all.php:286
-#: ..\..\..\noskin_b.php:285
-#: ..\..\..\noskin_roll.php:284
-#: ..\..\..\skins\custom\_main.php:237
-#: ..\..\..\skins\fplanque2002\_main.php:258
+#: ..\..\..\noskin_a.php:289
+#: ..\..\..\noskin_all.php:291
+#: ..\..\..\noskin_b.php:290
+#: ..\..\..\noskin_roll.php:290
+#: ..\..\..\skins\custom\_main.php:227
+#: ..\..\..\skins\fplanque2002\_main.php:246
 msgid "Syndicate this blog"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:315
-#: ..\..\..\noskin_all.php:317
-#: ..\..\..\noskin_b.php:316
-#: ..\..\..\noskin_roll.php:315
-#: ..\..\..\skins\babyblues\_main.php:104
-#: ..\..\..\skins\bluesky\_main.php:222
-#: ..\..\..\skins\custom\_main.php:260
-#: ..\..\..\skins\fplanque2002\_main.php:285
-#: ..\..\..\skins\guadeloupe\_main.php:222
-#: ..\..\..\skins\originalb2\_main.php:159
+#: ..\..\..\noskin_a.php:320
+#: ..\..\..\noskin_all.php:322
+#: ..\..\..\noskin_b.php:321
+#: ..\..\..\noskin_roll.php:321
+#: ..\..\..\skins\babyblues\_main.php:93
+#: ..\..\..\skins\bluesky\_main.php:210
+#: ..\..\..\skins\custom\_main.php:250
+#: ..\..\..\skins\fplanque2002\_main.php:273
+#: ..\..\..\skins\guadeloupe\_main.php:211
+#: ..\..\..\skins\originalb2\_main.php:150
 #, php-format
 msgid "Totals: %d posts - %d queries - %01.3f seconds"
 msgstr ""
 
-#: ..\..\..\noskin_b.php:235
+#: ..\..\..\noskin_b.php:240
 #: ..\..\..\b2evocore\_edit_showposts.php:336
 msgid "Archives"
 msgstr ""
@@ -510,6 +602,8 @@ msgstr ""
 #: ..\..\..\admin\CVS\Base\b2blogs.php:2
 #: ..\..\..\b2evocore\_blogs_list.php:2
 #: ..\..\..\b2evocore\_menutop.php:116
+#: ..\..\..\skins\bluesky\_bloglist.php:17
+#: ..\..\..\skins\guadeloupe\_bloglist.php:17
 msgid "Blogs"
 msgstr ""
 
@@ -2984,6 +3078,14 @@ msgstr ""
 #: ..\..\..\htsrv\trackback.php:91
 #: ..\..\..\xmlsrv\xmlrpc.php:1236
 msgid "Excerpt"
+msgstr ""
+
+#: ..\..\..\skins\babyblues\_bloglist.php:17
+msgid "blogs"
+msgstr ""
+
+#: ..\..\..\skins\originalb2\_main.php:44
+msgid "Browse all posts by this author"
 msgstr ""
 
 #: ..\..\..\xmlsrv\rdf.php:42

@@ -20,7 +20,10 @@ $languages = array(
 # Default locale
 # These use an ISO 639 language code, a '_' and an ISO 3166 country code
 # This MUST BE in the list below
-$default_locale = 'fr_FR';
+$default_locale = 'en_US';
+
+
+$default_locale = 'fr_FR';			// For testing :))
 
 
 #  and localization:
