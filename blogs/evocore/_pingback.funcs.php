@@ -299,7 +299,7 @@ function pingback_number($zero='#', $one='#', $more='#' )
 	if( $one == '#' ) $one = T_('Pingback (1)');
 	if( $more == '#' ) $more = T_('Pingbacks (%d)');
 
-	global $id, $tb, $querycount, $cache_pingbacknumber;
+	global $id, $tb, $cache_pingbacknumber;
 	$number = generic_ctp_number($id, 'pingbacks');
 	if ($number == 0) {
 		$blah = $zero;
@@ -364,6 +364,9 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/17 20:41:14  fplanque
+ * cleanup
+ *
  * Revision 1.3  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

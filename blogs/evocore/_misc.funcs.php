@@ -1202,7 +1202,6 @@ function pre_dump($dump, $title = '', $output = 1 )
 function debug_info( $force = false )
 {
 	global $debug;
-	global $querycount;
 	global $Debuglog;
 	global $DB;
 	global $obhandler_debug;
@@ -1256,7 +1255,6 @@ function debug_info( $force = false )
 			}
 			else
 			{
-				echo 'Old style queries: ', $querycount, '<br />';
 				echo 'DB queries: ', $DB->num_queries, '<br />';
 
 				$DB->dump_queries();
@@ -1645,6 +1643,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.17  2004/12/17 20:41:14  fplanque
+ * cleanup
+ *
  * Revision 1.16  2004/12/15 01:01:33  blueyed
  * improved date_i18n's performance, especially when no special strings are used
  *

@@ -179,7 +179,7 @@ function get_commentdata($comment_ID,$no_cache=0)
  */
 function Comment_get_by_ID( $comment_ID )
 {
-	global $DB, $cache_Comments, $querycount;
+	global $DB, $cache_Comments;
 
 	if( empty($cache_Comments[$comment_ID]) )
 	{	// Load this entry into cache:
@@ -243,7 +243,7 @@ function comments_number( $zero='#', $one='#', $more='#' )
 	if( $more == '#' ) $more = T_('%d comments');
 
 	// original hack by dodo@regretless.com
-	global $id, $postdata, $c, $querycount, $cache_commentsnumber;
+	global $id, $postdata, $c, $cache_commentsnumber;
 	$number = generic_ctp_number($id, 'comments');
 	if ($number == 0) {
 		$blah = $zero;
@@ -555,6 +555,9 @@ function comment_blog_name( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/17 20:41:13  fplanque
+ * cleanup
+ *
  * Revision 1.3  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

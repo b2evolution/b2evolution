@@ -239,7 +239,7 @@ class Plugins
 			if( $Plugin->ID == $plugin_ID )
 			{	// This one must be unregistered...
 				unset( $this->index_Plugins[ $Plugin->code ] );
-				unset( $this->index_name_Plugins[ $Plugin->$classname ] );
+				unset( $this->index_name_Plugins[ $Plugin->classname ] );
 				$move_by--;
 			}
 			elseif($move_by)
@@ -578,6 +578,9 @@ function sort_Plugin( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/17 20:41:14  fplanque
+ * cleanup
+ *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

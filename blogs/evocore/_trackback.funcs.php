@@ -227,7 +227,7 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 	if( $one == '#' ) $one = T_('Trackback (1)');
 	if( $more == '#' ) $more = T_('Trackbacks (%d)');
 
-	global $id, $tb, $querycount, $cache_trackbacknumber;
+	global $id, $tb, $cache_trackbacknumber;
 	$number = generic_ctp_number($id, 'trackbacks');
 	if ($number == 0) {
 		$blah = $zero;
@@ -323,6 +323,9 @@ function trackback_rdf($timezone=0)
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/17 20:41:14  fplanque
+ * cleanup
+ *
  * Revision 1.3  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit
