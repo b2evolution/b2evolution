@@ -56,7 +56,7 @@ function trackback(
 {
 	global $ItemCache;
 
-	echo "<p>", T_('Sending trackback to:'), " $trackback_url ...\n";
+	echo '<p>', T_('Sending trackback to:'), ' ', htmlspecialchars($trackback_url), " ...\n";
 
 	$title = urlencode($title);
 	$excerpt = urlencode($excerpt);
@@ -114,7 +114,27 @@ function trackback(
 */
 		fclose($fs);
 	}
-	echo "<br \>", T_('Response:'), " $result</p>\n";
+	// extract the error code and message, then make the error code readable
+	if ( preg_match("/<error>[\r\n\t ]*(\d+)[\r\n\t ]*<\/error>/", $result, $error) )
+	{
+		preg_match("/<message>(.*?)<\/message>/", $result, $error_message);
+		switch ($error[1]) {
+			case '0':
+				$result_message = '[' . T_('Succeeded') . '] ' . $error_message[1];
+				break;
+			case '1':
+				$result_message = '[' . T_('Failed') . '] ' . $error_message[1];
+				break;
+			default:
+				$result_message = '[' . T_('Unknown error') . ' (' . $error[1] . ')] ' . $error_message[1];
+				break;
+		}
+	}
+	else
+	{
+		$result_message = T_('No valid trackback response. Maybe the given url is not a Trackback url.') . ' "' . $result . '"';
+	}
+	echo '<br />', T_('Response:'), ' ', htmlspecialchars($result_message), "</p>\n";
 	return $result;
 }
 
