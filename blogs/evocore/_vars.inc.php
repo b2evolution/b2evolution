@@ -267,17 +267,10 @@ $post_statuses = array (
 	'draft' => NT_('Draft'),
 );
 
-// the antispam sources:
-$aspm_sources = array (
-	'local' => NT_('Local'),
-	'reported' => NT_('Reported'),
-	'central' => NT_('Central'),
-);
-
 /*
  * $Log$
- * Revision 1.6  2004/12/03 11:57:18  fplanque
- * no message
+ * Revision 1.7  2005/01/11 23:02:13  blueyed
+ * fixed/improved antispan-admin
  *
  * Revision 1.5  2004/11/22 17:48:20  fplanque
  * skin cosmetics

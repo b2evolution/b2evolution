@@ -26,14 +26,18 @@
  * }}
  *
  * {@internal
- ** Vegar BERG GULDAL grants François PLANQUE the right to license
- ** Vegar BERG GULDAL's contributions to this file and the b2evolution project
- ** under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * Vegar BERG GULDAL grants François PLANQUE the right to license
+ * Vegar BERG GULDAL's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
  * @author fplanque: François PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
@@ -53,10 +57,14 @@ param( 'action', 'string' );
 param( 'confirm', 'string' );
 param( 'keyword', 'string' );
 
+/**
+ * Top menu
+ */
 require(dirname(__FILE__).'/_menutop.php');
 
 // Check permission:
 $current_User->check_perm( 'spamblacklist', 'view', true );
+
 
 switch( $action )
 {
@@ -82,7 +90,7 @@ switch( $action )
 		}
 
 		if( $delhits && $deluxe_ban )
-		{	// Delete all banned hit-log entries
+		{ // Delete all banned hit-log entries
 			echo '<div class="panelinfo">';
 			printf( '<h3>'.T_('Deleting log-hits matching [%s]...').'</h3>', $keyword );
 			// Stats entries first
@@ -98,13 +106,13 @@ switch( $action )
 			printf( '<h3>'.T_('Deleting comments matching [%s]...').'</h3>', $keyword );
 			$sql = "DELETE FROM T_comments
 							WHERE comment_author_url LIKE '%$dbkeyword%'
-      				   OR comment_content LIKE '%$dbkeyword%'";
+							OR comment_content LIKE '%$dbkeyword%'";
 			$DB->query($sql);
 			echo '</div>';
 		}
 
 		if( $blacklist )
-		{	// Local blacklist:
+		{ // Local blacklist:
 			echo '<div class="panelinfo">';
 			printf( '<h3>'.T_('Blacklisting the keyword [%s]...').'</h3>', $keyword );
 			// Insert into DB:
@@ -118,7 +126,7 @@ switch( $action )
 		}
 
 		if( !( $delhits || $delcomments || $blacklist || $report ) )
-		{	// Nothing to do, ask user:
+		{ // Nothing to do, ask user:
 			?>
 			<div class="panelblock">
 				<form action="b2antispam.php" method="post">
@@ -129,16 +137,16 @@ switch( $action )
 
 				<?php
 				if( $deluxe_ban )
-				{	// We can we autodelete junk, check for junk:
+				{ // We can we autodelete junk, check for junk:
 					// Check for potentially affected log hits:
 					$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL,
-												 baseDomain, hit_blog_ID, visitURL, hit_remote_addr
-												 FROM T_hitlog
-												 WHERE referingURL LIKE '%$dbkeyword%'
-												 ORDER BY baseDomain ASC";
+													baseDomain, hit_blog_ID, visitURL, hit_remote_addr
+									FROM T_hitlog
+									WHERE referingURL LIKE '%$dbkeyword%'
+									ORDER BY baseDomain ASC";
 					$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 					if( $DB->num_rows == 0 )
-					{	// No matching hits.
+					{ // No matching hits.
 						printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
 					}
 					else
@@ -161,18 +169,19 @@ switch( $action )
 							<?php
 							$count = 0;
 							foreach( $res_affected_hits as $row_stats )
-							{  ?>
-           		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
-								<td class="firstcol"><?php stats_time() ?></td>
-								<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-								<td><?php stats_hit_remote_addr() ?></td>
-								<td><?php stats_blog_name() ?></td>
-								<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-							</tr>
-							<?php
-              $count++;
-              } // End stat loop ?>
-              </tbody>
+							{
+								?>
+								<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+									<td class="firstcol"><?php stats_time() ?></td>
+									<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+									<td><?php stats_hit_remote_addr() ?></td>
+									<td><?php stats_blog_name() ?></td>
+									<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
+								</tr>
+								<?php
+								$count++;
+							} ?>
+							</tbody>
 						</table>
 					<?php
 					}
@@ -182,11 +191,11 @@ switch( $action )
 													comment_author_IP, comment_content
 									FROM T_comments
 									WHERE comment_author_url LIKE '%$dbkeyword%'
-									   OR comment_content LIKE '%$dbkeyword%'
+										OR comment_content LIKE '%$dbkeyword%'
 									ORDER BY comment_date ASC";
 					$res_affected_comments = $DB->get_results( $sql, ARRAY_A );
 					if( $DB->num_rows == 0 )
-					{	// No matching hits.
+					{ // No matching hits.
 						printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
 					}
 					else
@@ -208,9 +217,10 @@ switch( $action )
 							<tbody>
 							<?php
 							$count = 0;
-              foreach( $res_affected_comments as $row_stats )
-							{ // TODO: new Comment( $row_stats ) ?>
-           		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+							foreach( $res_affected_comments as $row_stats )
+							{ // TODO: new Comment( $row_stats )
+								?>
+								<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
 								<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 								<td><?php echo $row_stats['comment_author'] ?></a></td>
 								<td><?php echo $row_stats['comment_author_url'] ?></td>
@@ -227,10 +237,10 @@ switch( $action )
 									echo $comment_content;
 								}
 								?></td>
-							</tr>
-							<?php
-              $count++;
-              } // End stat loop ?>
+								</tr>
+								<?php
+							$count++;
+							} ?>
 							</tbody>
 						</table>
 					<?php
@@ -244,20 +254,22 @@ switch( $action )
 				}
 				else
 				{ // Not in blacklist
-				  ?>
+					?>
 					<p><strong><input type="checkbox" name="blacklist" value="1" checked="checked" />
 					<?php printf ( T_('Blacklist the keyword [%s] locally.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 					</strong></p>
 
-					<?php if( $report_abuse )
-					{ ?>
+					<?php
+					if( $report_abuse )
+					{
+						?>
 						<p>
 						<strong><input type="checkbox" name="report" value="1" checked="checked" />
 						<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 						</strong>
 						[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 						</p>
-					<?php
+						<?php
 					}
 				}
 				?>
@@ -305,13 +317,15 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
-		b2evonet_poll_abuse( );
+		b2evonet_poll_abuse();
 		break;
 }
 
 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-{ ?>
+{
+	?>
+
 	<div class="panelblock">
 		<form action="b2antispam.php" method="get" class="fform">
 			<input type="hidden" name="action" value="ban" />
@@ -321,7 +335,8 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			<input type="submit" value="<?php echo T_('Check &amp; ban...') ?>" class="search" />
 		</form>
 	</div>
-<?php
+
+	<?php
 }
 ?>
 
@@ -336,14 +351,14 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 
 	<?php
 	// Create result set:
-	$Results = new Results(	'SELECT aspm_ID, aspm_string, aspm_source
-														 FROM T_antispam
+	$Results = new Results( 'SELECT aspm_ID, aspm_string, aspm_source
+														FROM T_antispam
 														ORDER BY aspm_string ASC' );
 
 	// Set headers:
 	$Results->col_headers = array(
 															T_('Keyword'),
-															T_('Source')
+															T_('Source'),
 														);
 
 	// Set sort orders:
@@ -353,27 +368,42 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 														);
 
 	// Set columns:
-  function antispam_source2( & $row )
+	function antispam_source2( & $row )
 	{
-		global $aspm_sources;
-		$asp_source = $row['aspm_source'];
-		return T_($aspm_sources[$asp_source] );
+		static $aspm_sources = NULL;
+
+		if( $aspm_sources === NULL )
+		{
+			/**
+			 * @var the antispam sources
+			 * @static
+			 */
+			$aspm_sources = array (
+				'local' => T_('Local'),
+				'reported' => T_('Reported'),
+				'central' => T_('Central'),
+			);
+		}
+
+		return $aspm_sources[$row->aspm_source];
 	}
 	$Results->cols = array(
 													'$aspm_string$',
 													'%antispam_source2($row)%'
 												);
 
-	// Check if we need to display nore:
+	// Check if we need to display more:
 	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-	{	// User can edit, spamlist: add controls to output columns:
+	{ // User can edit, spamlist: add controls to output columns:
 
 		// Add this before results:
-	  ?>
-			<p class="center">
-				[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
-				[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
-			</p>
+		?>
+
+		<p class="center">
+			[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
+			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+		</p>
+
 		<?php
 
 		// Add CHECK to 1st column:
@@ -385,20 +415,20 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 
 		// Add a column for actions:
 		$Results->col_headers[2] = T_('Actions');
-	  function antispam_actions( & $row )
+		function antispam_actions( & $row )
 		{
 			$output = '';
 
-		 	if( $row['aspm_source'] == 'local' )
+			if( $row->aspm_source == 'local' )
 			{
 				$output .= '[<a href="b2antispam.php?action=report&amp;keyword='.
-										urlencode( $row['aspm_string'] ).'" title="'.
+										urlencode( $row->aspm_string ).'" title="'.
 										T_('Report abuse to centralized ban blacklist!').'">'.
 										T_('Report').'</a>]';
 			}
 
 			return $output.'[<a href="b2antispam.php?action=ban&amp;keyword='.
-										urlencode( $row['aspm_string'] ).'" title="'.
+										urlencode( $row->aspm_string ).'" title="'.
 										T_('Check hit-logs and comments for this keyword!').'">'.
 										T_('Re-check').'</a>]';
 		}
@@ -409,6 +439,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	$Results->display();
 	?>
 </div>
+
 <?php
 require( dirname(__FILE__).'/_footer.php' );
 ?>
