@@ -77,9 +77,6 @@
 
 		$buffer_lines = count( $buffer );
 
-		// TODO: check if new window was opened and provide close X in case
-		/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
-
 		echo '<div class="fileheader">';
 		echo T_('File').': '.$selectedFile->getName().'<br />';
 
