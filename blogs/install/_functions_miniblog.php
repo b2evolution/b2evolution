@@ -28,26 +28,7 @@ function upgrade_miniblog_tables()
 	create_default_blogs( 'Blog A (Upg)', 'Blog A (Miniblog Upgrade)', T_("This blog holds all your posts upgraded from Miniblog. This blog is named '%s'. %s"), false );
 
 
-	echo 'Creating default settings...';
-	$query = "INSERT INTO T_settings (set_name, set_value)
-						VALUES
-									('db_version', '$new_db_version'),
-									('default_locale', '$default_locale'),
-									('posts_per_page', '5'),
-									('what_to_show', 'paged'),
-									('archive_mode', 'monthly'),
-									('time_difference', '0'),
-									('AutoBR', '0'),
-									('antispam_last_update', '2000-01-01 00:00:00'),
-									('newusers_grp_ID', '".$Group_Users->get('ID')."' ),
-									('newusers_level', '1'),
-									('newusers_canregister', '0'),
-									('links_extrapath', '0'),
-									('permalink_type', 'urltitle'),
-									( 'user_minpwdlen', '5' )
-									";
-	$DB->query( $query );
-	echo "OK.<br />\n";
+	create_default_settings();
 
 
 	echo 'Copying Miniblog users... ';
@@ -109,7 +90,7 @@ function upgrade_miniblog_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
-	echo 'Creating a default category...';
+	echo 'Creating a default category... ';
 	$cat_imported = cat_create( 'Imported', 'NULL', $blog_a_ID );
 	echo "OK.<br />\n";
 

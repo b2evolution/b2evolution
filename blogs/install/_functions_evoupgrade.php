@@ -45,6 +45,7 @@ function set_upgrade_checkpoint( $version )
 	echo "OK.<br />\n";
 }
 
+
 /**
  * Converts languages in a given table into according locales
  *
@@ -124,6 +125,10 @@ function upgrade_b2evo_tables()
 	global $DB;
 	global $admin_url;
 
+	// used for defaults, when upgrading to 0.9.2
+	global $use_fileupload, $fileupload_allowedtypes, $fileupload_maxk,
+					$fileupload_minlevel, $fileupload_allowedusers;
+
 	// Check DB version:
 	check_db_version();
 	if( $old_db_version == $new_db_version )
@@ -134,8 +139,11 @@ function upgrade_b2evo_tables()
 	}
 
 
+	// New tables:
+	create_b2evo_tables_091();
+
 	if( $old_db_version < 8010 )
-	{
+	{{{
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE T_users
 							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
@@ -177,21 +185,21 @@ function upgrade_b2evo_tables()
 			$DB->query($query_update_wordcount);
 		}
 		echo "OK. (".count($q)." rows updated)<br />\n";
-	}
+	}}}
 
 
 	if( $old_db_version < 8020 )
-	{
+	{{{
 		echo 'Encoding passwords... ';
 		$query = "UPDATE T_users
 							SET user_pass = MD5(user_pass)";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-	}
+	}}}
 
 
 	if( $old_db_version < 8030 )
-	{
+	{{{
 		echo 'Deleting unecessary logs... ';
 		$query = "DELETE FROM T_hitlog
 							WHERE hit_ignore = 'badchar'";
@@ -220,11 +228,11 @@ function upgrade_b2evo_tables()
 			$DB->query( $query_update_blog );
 		}
 		echo "OK. (".count($q)." rows updated)<br />\n";
-	}
+	}}}
 
 
 	if( $old_db_version < 8040 )
-	{ // upgrade to 0.8.7
+	{{{ // upgrade to 0.8.7
 		create_antispam();
 
 		echo 'Upgrading Settings table... ';
@@ -232,11 +240,11 @@ function upgrade_b2evo_tables()
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-	}
+	}}}
 
 
 	if( $old_db_version < 8050 )
-	{ // upgrade to 0.8.9
+	{{{ // upgrade to 0.8.9
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
@@ -312,14 +320,11 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8050' );
-	}
+	}}}
 
 
 	if( $old_db_version < 8060 )
-	{	// --------------------------------------------
-		// upgrade to 0.9
-		// --------------------------------------------
-
+	{{{ // upgrade to 0.9
 		// Important check:
 		$stub_list = $DB->get_col( "SELECT blog_stub
 																	FROM T_blogs
@@ -389,6 +394,7 @@ function upgrade_b2evo_tables()
 		// convert given languages to locales
 		convert_lang_to_locale( $tableblogs, 'blog_locale', 'blog_ID' );
 
+
 		echo 'Converting settings table... ';
 
 		// get old settings
@@ -408,8 +414,6 @@ function upgrade_b2evo_tables()
 			'pref_newusers_canregister' => array(0, 'newusers_canregister'),
 		);
 
-		$query = "INSERT INTO T_settings (set_name, set_value) VALUES ";
-
 		foreach( $transform as $oldkey => $newarr )
 		{
 			$newname = (isset($newarr[1])) ? $newarr[1] : $oldkey;
@@ -424,33 +428,19 @@ function upgrade_b2evo_tables()
 			}
 		}
 
-		$query .= "
-			( 'db_version', '$new_db_version' ),
-			( 'default_locale', 'en-EU' ),
-			( 'links_extrapath', '0' ),
-			( 'permalink_type', 'urltitle' ),
-			( 'user_minpwdlen', '5' )
-			";
-
-		foreach( $trans as $name => $value )
-		{
-			$query .= ", ('$name', '".$DB->escape($value)."')";
-		}
-
 		// drop old table
-		$DB->query( 'DROP TABLE IF EXISTS T_settings');
+		$DB->query( 'DROP TABLE IF EXISTS T_settings' );
 
 		// create new table
 		$DB->query( 'CREATE TABLE T_settings (
-								set_name VARCHAR( 30 ) NOT NULL ,
-								set_value VARCHAR( 255 ) NULL ,
-								PRIMARY KEY ( set_name )
+									set_name VARCHAR( 30 ) NOT NULL ,
+									set_value VARCHAR( 255 ) NULL ,
+									PRIMARY KEY ( set_name )
 								)');
 
-		// write new settings
-		#echo $query;
-		$DB->query( $query );
-		echo "OK.<br />\n";
+		// insert defaults and use transformed settings
+		create_default_settings( $trans );
+
 
 		if( !isset( $tableblogusers_isuptodate ) )
 		{
@@ -482,29 +472,25 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8060' );
-	}
+	}}}
+
 
 	if( $old_db_version < 8062 )
-	{ // --------------------------------------------
-		// upgrade to 0.9.0.4
-		// --------------------------------------------
+	{{{ // upgrade to 0.9.0.4
 		cleanup_post_quotes();
 
 		set_upgrade_checkpoint( '8062' );
-	}
+	}}}
+
 
 	if( $old_db_version < 8064 )
-	{ // --------------------------------------------
-		// upgrade to 0.9.0.6
-		// --------------------------------------------
+	{{{ // upgrade to 0.9.0.6
 		cleanup_comment_quotes();
-	}
+	}}}
+
 
 	if( $old_db_version < 8070 )
-	{	// --------------------------------------------
-		// upgrade to 0.9.1
-		// --------------------------------------------
-
+	{{{ // upgrade to 0.9.1
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
@@ -533,17 +519,58 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Upgrading users table... ';
-		$query = "ALTER TABLE T_users
-							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify,
-							#ADD COLUMN user_upload_ufolder tinyint(1) NOT NULL default 0 AFTER user_showonline";
+		$query = 'ALTER TABLE T_users
+							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify';
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Setting new defaults... ';
-		$query = "INSERT INTO T_settings (set_name, set_value)
-							VALUES ( 'reloadpage_timeout', '300' )";
+		$query = 'INSERT INTO T_settings (set_name, set_value)
+							VALUES
+								( "reloadpage_timeout", "300" ),
+								( "upload_enabled", "'.(isset($use_fileupload) ? $use_fileupload : '1').'" ),
+								( "upload_allowedext", "'.(isset($fileupload_allowedtypes) ? $fileupload_allowedtypes : 'jpg gif png').'" ),
+								( "upload_maxkb", "'.(isset($fileupload_maxk) ? $fileupload_maxk : '96').'" ),
+								( "upload_minlevel", "'.(isset($fileupload_minlevel) ? $fileupload_minlevel : '1').'" )
+							';
 		$DB->query( $query );
 		echo "OK.<br />\n";
+
+
+		// {{{ explicit upload permissions
+		$notset = $set = array();
+		if( isset($fileupload_allowedusers) && !empty($fileupload_allowedusers) )
+		{
+			echo 'Giving explicit upload permissions to users... ';
+			foreach( preg_split( '#\s+#', $fileupload_allowedusers, -1, PREG_SPLIT_NO_EMPTY )
+								as $llogin )
+			{
+				if( $lid = $DB->get_var( "SELECT ID FROM T_users
+																	WHERE user_login = '$llogin'" ) )
+				{
+					$set[$lid] = $llogin;
+				}
+				else
+				{
+					$notset[] = $llogin;
+				}
+			}
+			if( count( $set ) )
+			{
+				$DB->query( 'REPLACE INTO T_usersettings (uset_user_ID, uset_name, uset_value)
+											VALUES ("'
+											.implode( '", "upload_allowed", "1" ), ("', array_keys($set) )
+											.'", "upload_allowed", "1" )' );
+				echo '<br />&nbsp;&middot; set: '.implode( ', ', $set );
+			}
+			if( count( $notset ) )
+			{
+				echo '<br />&nbsp;&middot; login not found: '.implode( ', ', $notset );
+			}
+			echo "<br />OK.<br />\n";
+		}
+		// }}}
+
 
 		echo 'Altering table for Blog-User permissions... ';
 		$DB->query( 'ALTER TABLE T_blogusers
@@ -559,9 +586,7 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
-		// New tables:
-		create_b2evo_tables_091();
-	}
+	}}}
 
 
 	if( $old_db_version < 8080 )

@@ -31,7 +31,7 @@
  *
  * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).  
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package install
@@ -41,20 +41,20 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id$ 
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * create_b2evo_tables(-)
+ * Create b2 tables.
  *
  * Used for fresh install + upgrade from b2
  *
+ * {@internal create_b2evo_tables(-)}}
  */
 function create_b2evo_tables()
 {
-	global $baseurl, $new_db_version;
-	global $DB;
+	global $baseurl, $new_db_version, $DB;
 
 
 	create_groups();
@@ -66,7 +66,6 @@ function create_b2evo_tables()
 		set_value VARCHAR( 255 ) NULL ,
 		PRIMARY KEY ( set_name )
 		)";
-
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -94,7 +93,6 @@ function create_b2evo_tables()
 		user_idmode varchar(20) NOT NULL DEFAULT 'login',
 		user_notify tinyint(1) NOT NULL default 1,
 		user_showonline tinyint(1) NOT NULL default 1,
-		#user_upload_ufolder tinyint(1) NOT NULL default 0,
 		user_grp_ID int(4) NOT NULL default 1,
 		PRIMARY KEY user_ID (ID),
 		UNIQUE user_login (user_login),
@@ -405,14 +403,15 @@ function create_groups()
 
 }
 
-/*
- * populate_linkblog(-)
+
+/**
+ * {@internal populate_linkblog(-)}
  */
 function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 {
 	global $timestamp, $default_locale;
 
-	echo "Creating default linkblog entries... ";
+	echo 'Creating default linkblog entries... ';
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -451,17 +450,18 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 	bpost_create( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	echo "OK.<br />\n";
-
 }
 
 
 /**
- * Create default blogs
+ * Create default blogs.
  *
- * This is called for fresh installs and cafelog upgrade
+ * This is called for fresh installs and cafelog upgrade.
  *
  * {@internal create_default_blogs(-) }}
- *
+ * @param string
+ * @param string
+ * @param string
  */
 function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $blog_a_longdesc = '#' )
 {
@@ -549,12 +549,12 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 }
 
 /**
- * Create default categories
+ * Create default categories.
  *
- * This is called for fresh installs and cafelog upgrade
+ * This is called for fresh installs and cafelog upgrade.
  *
  * {@internal create_default_categories(-) }}
- *
+ * @param boolean
  */
 function create_default_categories( $populate_blog_a = true )
 {
@@ -591,12 +591,12 @@ function create_default_categories( $populate_blog_a = true )
 
 
 /**
- * Create default contents
+ * Create default contents.
  *
- * This is called for fresh installs and cafelog upgrade
+ * This is called for fresh installs and cafelog upgrade.
  *
  * {@internal create_default_contents(-) }}
- *
+ * @param boolean
  */
 function create_default_contents( $populate_blog_a = true )
 {
@@ -702,11 +702,60 @@ If you wish, you can delete these posts one by one after you have read them. You
 }
 
 
-/*
- * populate_main_tables(-)
+/**
+ * Insert default settings into T_settings.
  *
- * This is called only for fresh installs and fills the tables with demo/tutorial things
+ * @param array associative array (settings name => value to use), allows
+ *              overriding of defaults
+ */
+function create_default_settings( $override = array() )
+{
+	global $Group_Users;
+
+	$defaults = array(
+								'db_version' => $new_db_version,
+								'default_locale' => $default_locale,
+								'posts_per_page' => '5',
+								'what_to_show' => 'paged',
+								'archive_mode' => 'monthly',
+								'time_difference' => '0',
+								'AutoBR' => '0',
+								'antispam_last_update' => '2000-01-01 00:00:00',
+								'newusers_grp_ID' => $Group_Users->get('ID'),
+								'newusers_level' => '1',
+								'newusers_canregister' => '0',
+								'links_extrapath' => '0',
+								'permalink_type' => 'urltitle',
+								'user_minpwdlen' => '5',
+								'reloadpage_timeout' => '300',
+								'upload_enabled' => '1',
+								'upload_allowedext' => 'jpg gif png',
+								'upload_maxkb' => '96',
+								'upload_minlevel' => '1',
+							);
+
+	$insertvalues = array();
+	foreach( $defaults as $name => $defaultvalue )
+	{
+		$insertvalues[] = "('$name', '".$DB->escape( isset( $override[$name] ) ?
+																									$override[$name] :
+																									$defaultvalue )."')";
+	}
+
+	echo 'Creating default settings'.( count($override) ?
+																			' (with existing values)' :
+																			'' ).'... ';
+	$DB->query( "INSERT INTO T_settings (set_name, set_value)
+								VALUES ".implode( ', ', $insertvalues ) );
+	echo "OK.<br />\n";
+}
+
+
+/**
+ * This is called only for fresh installs and fills the tables with
+ * demo/tutorial things.
  *
+ * {@internal populate_main_tables(-)}}
  */
 function populate_main_tables()
 {
@@ -829,28 +878,7 @@ function populate_main_tables()
 	echo "OK.<br />\n";
 
 
-	echo 'Creating default settings... ';
-	// SETTINGS!
-	$query = "INSERT INTO T_settings ( set_name, set_value )
-						VALUES ( 'db_version', '$new_db_version' ),
-										( 'default_locale', '$default_locale' ),
-										( 'posts_per_page', '5' ),
-										( 'what_to_show', 'paged' ),
-										( 'archive_mode', 'monthly' ),
-										( 'time_difference', '0' ),
-										( 'autoBR', '1' ),
-										( 'antispam_last_update', '2000-01-01 00:00:00' ),
-										( 'newusers_grp_ID', '".$Group_Users->get('ID')."' ),
-										( 'newusers_level', '1' ),
-										( 'newusers_canregister', '0' ),
-										( 'links_extrapath', '0' ),
-										( 'permalink_type', 'urltitle' ),
-										( 'user_minpwdlen', '5' ),
-										( 'reloadpage_timeout', '300' )
-										";
-	$DB->query( $query );
-
-	echo "OK.<br />\n";
+	create_default_settings();
 
 }
 
@@ -864,10 +892,10 @@ function create_b2evo_tables_091()
 
 	echo 'Creating table for active sessions... ';
 	$DB->query( "CREATE TABLE T_sessions (
-								  sess_time int(10) unsigned NOT NULL default '0',
-								  sess_ipaddress varchar(15) NOT NULL default '',
-								  sess_user_ID int(10) default NULL,
-								  UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
+									sess_time int(10) unsigned NOT NULL default '0',
+									sess_ipaddress varchar(15) NOT NULL default '',
+									sess_user_ID int(10) default NULL,
+									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
 	echo "OK.<br />\n";
 
@@ -881,11 +909,11 @@ function create_b2evo_tables_091()
 	echo "OK.<br />\n";
 
 	echo 'Creating plugins table... ';
-	$DB->query("CREATE TABLE T_plugins (
-							  plug_ID int NOT NULL auto_increment,
-							  plug_priority int NOT NULL default 50,
-							  plug_classname varchar(40) NOT NULL default '',
-							  PRIMARY KEY (plug_ID)
+	$DB->query( "CREATE TABLE T_plugins (
+									plug_ID int NOT NULL auto_increment,
+									plug_priority int NOT NULL default 50,
+									plug_classname varchar(40) NOT NULL default '',
+									PRIMARY KEY (plug_ID)
 								)");
 	echo "OK.<br />\n";
 
