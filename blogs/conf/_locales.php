@@ -23,6 +23,7 @@ $languages = array(
 	'en' => NT_('English'),
 	'fr' => NT_('French'),
 	'de' => NT_('German'),
+	'it' => NT_('Italian'),
 	'ja' => NT_('Japanese'),
 	'lt' => NT_('Lithuanian'),
 	'nb' => NT_('Norwegian Bokm&aring;l'), 
@@ -69,6 +70,11 @@ $locales = array(
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
+								),
+	'it_IT' => array( // Italian, Italy
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
 								),
 	'ja_JP' => array(	// Japanese, JAPAN
 									'charset' => 'utf-8',
