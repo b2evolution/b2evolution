@@ -913,9 +913,10 @@ class Item extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
-   * @param string glue between url params
+   * @param string page url for the delete action
 	 */
-	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button  = false, $glue = '&amp;' )
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+												$button  = false, $actionurl = 'edit_actions.php?action=delete&amp;post=' )
 	{
 		global $current_User, $admin_url;
 
@@ -929,7 +930,7 @@ class Item extends DataObject
 		if( $text == '#' ) $text = T_('Delete');
 		if( $title == '#' ) $title = T_('Delete this post');
 
-		$url = $admin_url.'edit_actions.php?action=delete'.$glue.'post='.$this->ID;
+		$url = $admin_url.$actionurl.$this->ID;
 
 		echo $before;
 		if( $button )
@@ -967,9 +968,10 @@ class Item extends DataObject
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
-   * @param string glue between url params
+   * @param string page url for the delete action
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+											$actionurl = 'edit_actions.php?action=edit&amp;post=' )
 	{
 		global $current_User, $admin_url;
 
@@ -985,7 +987,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Edit this post');
 
 		echo $before;
-		echo '<a href="'.$admin_url.'b2edit.php?action=edit'.$glue.'post='.$this->ID;
+		echo '<a href="'.$admin_url.$actionurl.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -1326,7 +1328,7 @@ class Item extends DataObject
 		$post_comments = 'open',
 		$post_renderers = array() )
 	{
-		global $DB, $query, $querycount;
+		global $DB, $query;
 		global $localtimenow, $default_locale;
 	
 		// Handle the flags:
@@ -1388,7 +1390,7 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::dbdelete(-)}}
 	 */
-	function dbdelete( )
+	function dbdelete( $del_comments = true )
 	{
 		global $DB;
 
@@ -1397,8 +1399,10 @@ class Item extends DataObject
 		// delete extracats
 		$DB->query( "DELETE FROM T_postcats WHERE postcat_post_ID = $this->ID" );
 	
-		// delete comments
-		$DB->query( "DELETE FROM T_comments WHERE comment_post_ID = $this->ID" );
+		if( $del_comments )
+		{	// delete comments
+			$DB->query( "DELETE FROM T_comments WHERE comment_post_ID = $this->ID" );
+		}
 	
 		// delete post
 		$DB->query( "DELETE FROM $this->dbtablename WHERE $this->dbIDname = $this->ID" );
@@ -1409,6 +1413,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/17 20:38:52  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.6  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

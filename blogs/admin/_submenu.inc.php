@@ -44,6 +44,8 @@ switch( $admin_tab )
 			'general' => array( T_('General'), 'b2options.php?tab=general' ),
 			'regional' => array( T_('Regional'), 'b2options.php?tab=regional'.( (isset($notransext) && $notransext) ? '&amp;notransext=1' : '' ) ),
 			'files' => array( T_('Files'), 'fileset.php' ),
+			'statuses' => array( T_('Post statuses'), 'statuses.php'),
+			'types' => array( T_('Post types'), 'types.php'),
 			'plugins' => array( T_('Plug-ins'), 'plugins.php'),
 			);
 		break;
@@ -82,6 +84,9 @@ echo '<div class="tabbedpanelblock">';
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/17 20:38:51  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.5  2004/11/22 17:48:05  fplanque
  * skin cosmetics
  *

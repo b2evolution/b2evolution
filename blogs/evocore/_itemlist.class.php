@@ -75,6 +75,8 @@ function cat_req_dummy() {}
  */
 class ItemList extends DataObjectList
 {
+	var $objType;
+
 	var $preview;
 	var $blog;
 	var $p;
@@ -146,6 +148,8 @@ class ItemList extends DataObjectList
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
+	 * @param
+	 * @param string Name of the DB table
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
@@ -173,6 +177,7 @@ class ItemList extends DataObjectList
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$title = '',													// urltitle of post to display
+		$objType = 'Item',
 		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
@@ -184,6 +189,9 @@ class ItemList extends DataObjectList
 
 		// Call parent constructor:
 		parent::DataObjectList( $dbtable, $dbprefix, $dbIDname );
+
+		// Object type handled by this list
+		$this->objType = $objType;
 
 		// Columns to be selected:
 		$this->dbcols = array(
@@ -672,8 +680,8 @@ class ItemList extends DataObjectList
 		// echo 'getting last post date';
 		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
 																		 '', 'DESC', 'datestart', 1, '','', '', '', '', '', '', 1, 'posts',
-																		 $this->timestamp_min, $this->timestamp_max, '', $this->dbprefix,
-																		 $this->dbIDname );
+																		 $this->timestamp_min, $this->timestamp_max, '', $this->objType,
+																		 $this->dbtablename, $this->dbprefix, $this->dbIDname );
 
 		if( $LastItem = $LastPostList->get_item() )
 		{
@@ -862,7 +870,7 @@ class ItemList extends DataObjectList
 		global $id, $postdata, $authordata, $day, $page, $pages, $multipage, $more, $numpages;
 		global $pagenow, $current_User;
 
-		$this->last_Item = new Item( $this->row, $this->dbtablename, $this->dbprefix, $this->dbIDname ); // COPY!!
+		$this->last_Item = new $this->objType( $this->row, $this->dbtablename, $this->dbprefix, $this->dbIDname ); // COPY!!
 
 		$id = $this->last_Item->ID;
 		// echo 'starting ',$current_Item->title;
@@ -964,6 +972,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.10  2004/12/17 20:38:52  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.9  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

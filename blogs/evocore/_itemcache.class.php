@@ -59,12 +59,15 @@ class ItemCache extends DataObjectCache
 	 * Constructor
 	 *
 	 * {@internal ItemCache::ItemCache(-) }}
+	 *
+	 * @Param string object type of elements in Cache
+	 * @param string Name of the DB table
+	 * @param string Prefix of fields in the table
+	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemCache()
+	function ItemCache( $objType = 'Item', $dbtablename = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID' )
 	{
-		global $tableposts;
-
-		parent::DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
+		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
 
 	/**
@@ -157,6 +160,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/17 20:38:52  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

@@ -82,36 +82,42 @@ if( isset($Blog) )
 
 <div class="left_col">
 
-	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
-	<input type="hidden" id="action" name="action" value="<?php echo $next_action ?>" />
-	<input type="hidden" name="mode" value="<?php echo $mode ?>" />
-	<?php if( $action == 'edit' ) { ?>
-		<input type="hidden" name="post_ID" value="<?php echo $post ?>" />
-	<?php } ?>
+	<?php
+		form_hidden( 'action', $next_action );
+		form_hidden( 'blog', $blog );
+		if( isset( $mode ) )   form_hidden( 'mode', $mode );
+		if( isset( $post ) )   form_hidden( 'post_ID', $post );
+ 		if( isset( $tsk_ID ) ) form_hidden( 'tsk_ID', $tsk_ID );
 
-	<!-- In case we send this to the blog for a preview : -->
-	<input type="hidden" name="preview" value="1" />
-	<input type="hidden" name="more" value="1" />
-	<input type="hidden" name="preview_userid" value="<?php echo $user_ID ?>" />
+		// In case we send this to the blog for a preview :
+		form_hidden( 'preview', 1 );
+		form_hidden( 'more', 1 );
+		form_hidden( 'preview_userid', $user_ID );
+	?>
 
 	<fieldset>
 		<legend><?php echo T_('Post contents') ?></legend>
 
 	<span class="line">
-	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-	<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'formvalue') ?>" id="post_title" tabindex="1" />
+		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
+		<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'formvalue') ?>" id="post_title" />
 	</span>
 
 	<span class="line">
-	<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
-	<select name="post_locale" id="post_locale" tabindex="2"><?php locale_options( $post_locale ) ?></select>
+		<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
+		<select name="post_locale" id="post_locale"><?php locale_options( $post_locale ) ?></select>
+	</span>
+
+ 	<span class="line">
+		<label for="item_typ_ID"><strong><?php echo T_('Type') ?>:</strong></label>
+		<select name="item_typ_ID" id="item_typ_ID"><?php $itemTypeCache->option_list( 0, true ) ?></select>
 	</span>
 
 	<?php if( $use_post_url )
 	{ ?>
 		<span class="line">
-		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-		<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'formvalue' ) ?>" id="post_url" tabindex="3" />
+			<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
+			<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'formvalue' ) ?>" id="post_url" />
 		</span>
 		<?php
 	}
@@ -133,7 +139,7 @@ if( isset($Blog) )
 	<?php // ---------------------------- TEXTAREA -------------------------------------
 	// Note: the pixel images are here for an IE layout bug
 	?>
-	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" id="content" tabindex="4"><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
+	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" id="content" ><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
@@ -143,14 +149,13 @@ if( isset($Blog) )
 
 	<div class="edit_actions">
 	<?php // ------------------------------- ACTIONS ---------------------------------- ?>
-		<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);"
-		tabindex="9" />
+		<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);" />
 
-	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" tabindex="10" />
+	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" />
 
 	<?php
 	// ---------- DELETE ----------
-  if( $action == 'edit' )
+  if( $next_action == 'update' )
 	{	// Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
@@ -160,7 +165,7 @@ if( isset($Blog) )
 	{	// ------------------------------- UPLOAD ----------------------------------
 		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
 		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
-		$Fileman->dispButtonUpload( T_('Files'), 'tabindex="12"' );
+		$Fileman->dispButtonUpload( T_('Files') );
 	}
 
 	// CALL PLUGINS NOW:
@@ -178,12 +183,11 @@ if( isset($Blog) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
 			?>
 			<div>
-			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp"
-				tabindex="13" />
+			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" />
 			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
 			<span class="nobr">
-			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
-			<select name="mm" tabindex="15">
+			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" />
+			<select name="mm">
 			<?php
 			for ($i = 1; $i < 13; $i = $i + 1)
 			{
@@ -204,10 +208,10 @@ if( isset($Blog) )
 			}
 			?>
 		</select>
-		<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" />
+		<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5"/>
 		</span>
 		<span class="nobr">@
-		<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" />:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" tabindex="18" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" tabindex="19" />
+		<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2"/>:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" />
 		</span></div>
 		<?php
 		}
@@ -215,7 +219,7 @@ if( isset($Blog) )
 		<div>
 			<span class="line">
 			<label for="post_urltitle"><strong><?php echo T_('URL Title') ?>:</strong></label>
-			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'formvalue' ); ?>" size="40" maxlength="50" tabindex="20" />
+			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'formvalue' ); ?>" size="40" maxlength="50" />
 			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
 			</span>
 		</div>
@@ -297,7 +301,11 @@ if( isset($Blog) )
 		<?php echo T_('Deprecated (Not published!)') ?></label><br />
 		<?php
 		}
+
+		// --------------- EXTRA STATUS --------------
 		?>
+		<label for="item_st_ID"><strong><?php echo T_('Extra status') ?>:</strong></label>
+		<select name="item_st_ID" id="item_st_ID"><?php $itemStatusCache->option_list( 0, true ) ?></select>
 
 	</fieldset>
 
@@ -329,14 +337,14 @@ if( isset($Blog) )
 		 */
 		function cat_select_before_each( $cat_ID, $level )
 		{	// callback to display sublist element
-			global $current_blog_ID, $blog, $cat, $postdata, $post_extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
+			global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting;
 			$this_cat = get_the_category_by_ID( $cat_ID );
 			echo '<li>';
 
 			if( $allow_cross_posting )
 			{ // We allow cross posting, display checkbox:
 				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
-				if (($cat_ID == $postdata["Category"]) or (in_array( $cat_ID, $post_extracats )))
+				if (($cat_ID == $edited_Item->main_cat_ID) or (in_array( $cat_ID, $post_extracats )))
 					echo ' checked="checked"';
 				echo ' />';
 			}
@@ -344,12 +352,12 @@ if( isset($Blog) )
 			// Radio for main cat:
 			if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 			{ // This is current blog or we allow moving posts accross blogs
-				if( ($default_main_cat == 0) && ($action == 'post') && ($current_blog_ID == $blog) )
+				if( ($default_main_cat == 0) && ($next_action == 'create') && ($current_blog_ID == $blog) )
 				{	// Assign default cat for new post
 					$default_main_cat = $cat_ID;
 				}
 				echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
-				if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
+				if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat))
 					echo ' checked="checked"';
 				echo ' />';
 			}
@@ -407,23 +415,23 @@ if( isset($Blog) )
 		</div>
 	</fieldset>
 	<?php
-		if( isset($Blog) && ($Blog->allowcomments == 'post_by_post') ) 
-		{
-	?>
-	<fieldset>
-		<legend><?php echo T_('Comments') ?></legend>
+		if( $Blog->allowcomments == 'post_by_post' )
+		{	// ---------------- COMMENT STATUS -----------------
+			?>
+			<fieldset>
+				<legend><?php echo T_('Comments') ?></legend>
 
-		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Open') ?></label><br />
+				<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
+				<?php echo T_('Open') ?></label><br />
 
-		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Closed') ?></label><br />
+				<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> />
+				<?php echo T_('Closed') ?></label><br />
 
-		<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Disabled') ?></label><br />
+				<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
+				<?php echo T_('Disabled') ?></label><br />
 
-	</fieldset>
-	<?php
+			</fieldset>
+			<?php
 		}
 	?>
 	<fieldset>
@@ -496,15 +504,6 @@ if( isset($Blog) )
 		?>
 	</fieldset>
 
-<?php
-
-/* if ($action == "edit")
-{
-// 		<p><strong>Pings:</strong> <?php echo in_array( 'pingsdone', $postdata["Flags"] ) ? 'Done':'Not done yet';
-}*/
-
-?>
-
 </div>
 
 <div class="clear"></div>
@@ -515,6 +514,9 @@ if( isset($Blog) )
 <?php
 /*
  * $Log$
+ * Revision 1.3  2004/12/17 20:38:51  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.2  2004/12/15 20:50:31  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit

@@ -75,7 +75,7 @@ switch( $action )
 
 		if( $Settings->updateDB() )
 		{
-			$Messages->add( T_('File settings have been updated.'), 'note' );
+			$Messages->add( T_('File settings updated.'), 'note' );
 		}
 
 		break;

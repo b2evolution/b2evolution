@@ -101,7 +101,14 @@ class DataObjectCache
 		$objtype = $this->objtype;
 		if( count($rows) ) foreach( $rows as $row )
 		{
-			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+			if( $objtype == 'Element' )
+			{ // Instanciate a dataobject with its params:
+				$this->cache[ $row->$dbIDname ] = new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ); // COPY!
+			}
+			else
+			{	// Instantiate a custom object
+				$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+			}
 			// $obj = $this->cache[ $row->$dbIDname ];
 			// $obj->disp( 'name' );
 		}
@@ -252,6 +259,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/17 20:38:52  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.3  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

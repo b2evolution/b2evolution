@@ -69,10 +69,12 @@ for( $curr_blog_ID = blog_list_start();
 
 		// Show the posts:
 		$add_item_url = 'b2edit.php?blog='.$blog;
+		$edit_item_url = 'b2edit.php?action=edit&amp;post=';
+		$delete_item_url = 'edit_actions.php?action=delete&amp;post=';
+		$objType = 'Item';
 		$dbtable = 'T_posts';
 		$dbprefix = 'post_';
 		$dbIDname = 'ID';
-		$use_comments = true;
 		require dirname(__FILE__). '/_edit_showposts.php';
 	}
 

@@ -58,7 +58,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, '', '', $timestamp_min, $timestamp_max, '', $dbtable, $dbprefix, $dbIDname );
+															$preview, '', '', $timestamp_min, $timestamp_max, '', $objType,
+															$dbtable, $dbprefix, $dbIDname );
 
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;
@@ -162,15 +163,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php
  				// Display edit button if current user has the rights:
-				$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+				$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton', $edit_item_url );
 
 				// Display publish NOW button if current user has the rights:
 				$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
 
 				// Display delete button if current user has the rights:
-				$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
+				$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, $delete_item_url );
 
-				if( $use_comments )
+				if( $Blog->allowcomments != 'never' )
 				{ ?>
 					<a href="b2browse.php?blog=<?php echo $blog ?>&amp;p=<?php $Item->ID() ?>&amp;c=1" class="ActionButton"><?php
 					// TRANS: Link to comments for current post

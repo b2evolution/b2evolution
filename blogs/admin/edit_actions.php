@@ -183,7 +183,6 @@ switch($action)
 		param( 'renderers', 'array', array() );
 		$post_renderers = $Plugins->validate_list( $renderers );
 
-		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
@@ -191,7 +190,7 @@ switch($action)
 		}
 		else
 		{	// We use current time
-			$post_date = $postdata['Date'];
+			$post_date = $edited_Item->issue_date;
 		}
 
 		// CHECK and FORMAT content
@@ -215,7 +214,7 @@ switch($action)
 		echo '<h3>'.T_('Updating post...')."</h3>\n";
 
 		// We need to check the previous flags...
-		$post_flags = $postdata['Flags'];
+		$post_flags = explode(',', $edited_Item->flags );
 		if( in_array( 'pingsdone', $post_flags ) )
 		{	// pings have been done before
 			$pingsdone = true;
@@ -277,9 +276,8 @@ switch($action)
 		 * PUBLISH POST NOW
 		 */
 		param( 'post_ID', 'integer', true );
-		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
-		$post_cat =$postdata['Category'];
+		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat); 
 		$blogparams = get_blogparams_by_ID( $blog );
 		$location = 'b2browse.php?blog=' . $blog;
@@ -294,14 +292,14 @@ switch($action)
 		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
 		$post_date = date('Y-m-d H:i:s', $localtimenow);
-		$post_title = $postdata['Title'];
-		$post_url = $postdata['Url'];
+		$post_title = $edited_Item->title;
+		$post_url = $edited_Item->url;
 
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>'.T_('Updating post status...')."</h3>\n";
 
 		// We need to check the previous flags...
-		$post_flags = $postdata['Flags'];
+		$post_flags = explode(',', $edited_Item->flags );
 		if( in_array( 'pingsdone', $post_flags ) )
 		{	// pings have been done before
 			$pingsdone = true;
@@ -316,7 +314,7 @@ switch($action)
 			$edited_Item->set( 'flags', 'pingsdone' );
 		}
 
-		$edited_Item->set( 'datestart', $post_timestamp );
+		$edited_Item->set( 'datestart', $post_date );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 		$edited_Item->set( 'status', $post_status );
 

@@ -13,6 +13,10 @@
  * Includes:
  */
 require_once (dirname(__FILE__). '/_header.php');
+
+$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
+$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
+
 $admin_tab = 'new';
 param( 'action', 'string' );
 
@@ -30,7 +34,6 @@ switch($action)
 		 * Display post editing form
 		 */
 		param( 'post', 'integer', true );
-		$postdata = get_postdata( $post ) or die( T_('Oops, no post with this ID.') );
 		$edited_Item = Item_get_by_ID( $post );
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
@@ -197,8 +200,6 @@ switch($action)
 			else
 				$post_status = 'deprecated';
 		}
-
-		$action = 'post';
 
 		// These are bookmarklet params:
 		param( 'popuptitle', 'string', '' );

@@ -100,7 +100,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 			if( $Settings->updateDB() )
 			{
-				$Messages->add( T_('General settings have been updated.'), 'note' );
+				$Messages->add( T_('General settings updated.'), 'note' );
 			}
 
 			break;
@@ -118,7 +118,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$Settings->set( 'time_difference', $newtime_difference );
 				$Settings->updateDB();
 
-				$Messages->add( T_('Regional settings have been updated.'), 'note' );
+				$Messages->add( T_('Regional settings updated.'), 'note' );
 				break;
 
 
@@ -425,4 +425,11 @@ switch( $tab )
 require dirname(__FILE__).'/_sub_end.inc.php';
 
 require dirname(__FILE__).'/_footer.php';
+
+/*
+ * $Log$
+ * Revision 1.82  2004/12/17 20:38:51  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
+ */
 ?>

@@ -80,7 +80,7 @@ function blog_create(
 	$blog_disp_bloglist	= 1,
 	$blog_in_bloglist = 1 )
 {
-	global $DB, $query, $querycount, $default_locale;
+	global $DB, $query, $default_locale;
 
 	if( $blog_locale == '#' ) $blog_locale = $default_locale;
 
@@ -347,7 +347,7 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
  */
 function get_blogparams_by_ID( $blog_ID )
 {
-	global $cache_blogs, $querycount;
+	global $cache_blogs;
 
 	if( $blog_ID < 1 ) die( 'No blog is selected!' );
 
@@ -372,7 +372,7 @@ function get_blogparams_by_ID( $blog_ID )
  */
 function Blog_get_by_ID( $blog_ID )
 {
-	global $cache_blogs, $querycount;
+	global $cache_blogs;
 
 	if( $blog_ID < 1 ) die( 'No blog is selected!' );
 
@@ -506,6 +506,9 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/17 20:38:52  fplanque
+ * started extending item/post capabilities (extra status, type)
+ *
  * Revision 1.4  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit
