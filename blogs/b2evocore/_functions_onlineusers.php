@@ -26,13 +26,15 @@ function online_user_update()
 		OR sess_ipaddress='$_SERVER[REMOTE_ADDR]'";
 	if( is_logged_in() )
 	{
-		$sql .= " OR sess_userid='$user_ID'";
+		$sql .= " OR sess_user_ID='$user_ID'";
 	}
 	$DB->query( $sql );	
 
 	// Prepare the statement to insert the new session info
-	$sql = "INSERT INTO $tablesessions (sess_time,sess_ipaddress,sess_userid) 
-		VALUES ('".time()."','$_SERVER[REMOTE_ADDR]','$user_ID')";
+	$sql = "INSERT INTO $tablesessions (sess_time,sess_ipaddress,sess_user_ID) 
+		VALUES ('".time()."','$_SERVER[REMOTE_ADDR]',";
+	$sql .= (empty($user_ID)) ? "NULL" : "'$user_ID'";
+	$sql .= ")";
 	$DB->query( $sql );
 }	
 
@@ -52,9 +54,9 @@ function online_user_display( $before = '', $after = '' )
 	global $DB, $tableusers, $tablesessions, $online_session_timeout;
 	$users = array();
 
-	$sql = "SELECT sess_userid
+	$sql = "SELECT sess_user_ID
 		FROM $tablesessions
-		WHERE sess_userid != 0 
+		WHERE sess_user_ID IS NOT NULL 
 		AND " . $tablesessions . ".sess_time > '" . ( time() - $online_session_timeout ) . "'";
 
 	$rows = $DB->get_results( $sql, ARRAY_A );
@@ -62,13 +64,13 @@ function online_user_display( $before = '', $after = '' )
 	$users['registered'] = 0;
 	if( count( $rows ) ) foreach( $rows as $row )
 	{
-		$user = get_userdata( $row['sess_userid'] );
+		$user = get_userdata( $row['sess_user_ID'] );
 		$user = new User($user);
 		if( $user->showonline )
 		{
 			echo $before;
 			echo $user->get('preferedname');
-			echo ' <a href="', msgform_url($row['sess_userid']) , '"><img src="' , imgbase() , 'envelope.gif" height="10" width="13" /></a>';
+			echo ' <a href="', msgform_url($row['sess_user_ID']) , '"><img src="' , imgbase() , 'envelope.gif" height="10" width="13" /></a>';
 			echo $after;
 			$users['registered']++;
 		}
@@ -80,7 +82,7 @@ function online_user_display( $before = '', $after = '' )
 
 	$users['guests'] += $DB->get_var( "SELECT count(*)
 						FROM $tablesessions 
-						WHERE sess_userid='0'");
+						WHERE sess_user_ID IS NULL");
 
 	// Return the number of registered users and the number of guests
 	return $users;
