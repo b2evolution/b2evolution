@@ -249,8 +249,44 @@ table.grouped th {
 	border-left: 1px solid #9e9286;
 	color: #9e9286;
 	background-color: #efede0;
-	padding: .3ex 1ex;
+	font-weight: normal;
+	padding: 0;
 }
+
+table.grouped th a.basic_current,
+table.grouped th a.basic_sort_link {
+	padding: 0 1ex;
+}
+
+table.grouped th a img {
+	vertical-align: middle
+}
+
+table.grouped th a.basic_current,
+table.grouped th a.basic_sort_link {
+	display: block;
+	height: 100%;
+}
+
+table.grouped th a.single_current {
+	font-weight : bold;
+}
+
+table.grouped th a.basic_current {
+	background-color:#e3dfd0;
+	font-weight: bold;
+}
+
+table.grouped th a.basic_sort_link:hover {
+	background-color:#e3dfd0;
+	font-weight: normal;
+}
+
+table.grouped th a.single_current:hover,
+table.grouped th a.single_sort_link:hover {
+	text-decoration: underline;
+}
+
 tr.group td {
 	font-weight: bold;
 	color: #8e8276;
@@ -259,9 +295,11 @@ tr.group td {
 	border-bottom: 1px solid #9e9286;
 	border-left: 0;
 }
+
 td.right {
 	text-align: right;
 }
+
 table.grouped .firstcol,
 table.grouped tr.odd .firstcol {
 	border-left: 0;
@@ -808,6 +846,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.11  2005/01/13 19:53:48  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.10  2005/01/03 15:17:52  fplanque
  * no message
  *

@@ -6,18 +6,22 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @author blueyed: Daniel HAHLER 
+ * @author fplanque: François PLANQUE / PROGIDISTRI
+ * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
+ *
  * @package admin
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
-$FilesForm = new Form( 'fileset.php', 'filesform' );
+$FilesForm = & new Form( 'fileset.php', 'filesform' );
 
 $FilesForm->begin_form( 'fform' );
-form_hidden( 'action', 'update' );
-form_hidden( 'tab', $tab );
+$FilesForm->hidden( 'action', 'update' );
+$FilesForm->hidden( 'tab', $tab );
 
-$FilesForm->begin_fieldset( T_('Filemanager options'), 'fm_enabled' );
+$FilesForm->fieldset( T_('Filemanager options') );
 $FilesForm->checkbox( 'fm_enabled',
 								$Settings->get('fm_enabled'),
 								T_('Enable Filemanager'),
@@ -52,11 +56,10 @@ $FilesForm->checkbox( 'fm_enable_create_file',
 								T_('Check to enable creation of files.' ),
 								'',
 								Form::disabled( !$Settings->get('fm_enabled') ) );
-$FilesForm->end_fieldset();
+$FilesForm->fieldset_end();
 
 
-$FilesForm->begin_fieldset( T_('Upload options'), 'upload_enabled' );
-
+$FilesForm->fieldset( T_('Upload options') );
 $FilesForm->checkbox( 'upload_enabled',
 											$Settings->get('upload_enabled'),
 											T_('Enable upload'),
@@ -87,7 +90,7 @@ $FilesForm->text( 'upload_maxkb',
 // TODO: check/transform $upload_url
 // TODO: check/transform $upload_realpath
 
-$FilesForm->end_fieldset();
+$FilesForm->fieldset_end();
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )

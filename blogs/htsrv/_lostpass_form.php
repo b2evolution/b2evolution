@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * This is the lost password form
  *
@@ -18,25 +18,27 @@ require(dirname(__FILE__).'/_header.php');
 ?>
 <p><?php echo T_('A new password will be generated and sent to you by email.') ?></p>
 
-<form action="<?php echo $htsrv_url ?>login.php" method="post" class="fform">
-	<input type="hidden" name="action" value="retrievepassword" />
-	<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
+<?php
 
-	<fieldset>
-		<fieldset>
-			<div class="label"><label for="log"><?php echo T_('Login:') ?></label></div> 
-			<div class="input"><input type="text" name="log" id="log" size="16" maxlength="20" value="" class="large" /></div>
-		</fieldset>
+	$Form = & new Form( $htsrv_url );
 	
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Generate new password!') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
+	$Form->begin_form( 'fform' );
+	
+	$Form->hidden( 'action', 'retrievepassword' );
+	$Form->hidden( 'redirect_to', $redirect_to );
+	
+	echo $Form->fieldstart;
+	$Form->text( 'log', '', 16, T_('Login'), '', 20 , 'large' );
+	
+	echo $Form->fieldstart;
+	echo $Form->inputstart;
+	$Form->submit( array( 'submit', T_('Generate new password!'), 'search' ) );
+	echo $Form->inputend;
+	echo $Form->fieldend;
+	
+	echo $Form->fieldend;
+	
+	$Form->end_form();
 
-</form>
-
-<?php 
 	require(dirname(__FILE__).'/_footer.php'); 
 ?>

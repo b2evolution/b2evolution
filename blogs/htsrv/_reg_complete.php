@@ -19,12 +19,17 @@ require(dirname(__FILE__).'/_header.php');
 <p><?php echo T_('Login:') ?> <strong><?php echo $login ?>&nbsp;</strong></p>
 <p><?php echo T_('Email') ?>: <strong><?php echo $email ?>&nbsp;</strong></p>
 
-<form name="login" action="<?php echo $htsrv_url ?>login.php" method="post">
-<input type="hidden" name="log" value="<?php echo $login ?>" />
-<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
-<input type="submit" class="search" value="<?php  echo T_('Log in!') ?>" name="submit" />
-</form>
+<?php
 
+	$Form =& new Form( $htsrv_url, 'login' );
+	
+	$Form->begin_form( '' );
+	
+	$Form->hidden( 'log', $login );
+	$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->submit( 'submit', T_('Log in!'), 'search' );
+	
+	$Form->end_form();
 
 <?php 
 	require(dirname(__FILE__).'/_footer.php'); 

@@ -380,12 +380,16 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	elseif( intval($p) )
 	{
 		if(	$Item = $ItemCache->get_by_ID( $p, false ) )
+		{
 			$disp_title = $Item->get('title');
+		}
 	}
 	elseif( !empty( $title ) )
 	{
 		if(	$Item = $ItemCache->get_by_urltitle( $title, false ) )
+		{
 			$disp_title = $Item->get('title');
+		}
 	}
 
 	if( !empty( $disp_title ) )
@@ -1374,6 +1378,9 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/13 19:53:50  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.7  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *

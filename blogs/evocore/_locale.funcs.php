@@ -388,24 +388,50 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
  * {@internal locale_options(-)}}
  *
  * @param string default value
+ * @param boolean echo output?
  */
-function locale_options( $default = '' )
+function locale_options( $default = '', $disp = true )
 {
 	global $locales, $default_locale;
 
 	if( empty( $default ) ) $default = $default_locale;
 
+	$r = '';
 
 	foreach( $locales as $this_localekey => $this_locale )
+	{
 		if( $this_locale['enabled'] || $this_localekey == $default )
 		{
-			echo '<option value="'. $this_localekey. '"';
-			if( $this_localekey == $default ) echo ' selected="selected"';
-			echo '>'. T_($this_locale['name']). '</option>';
+			$r .= '<option value="'. $this_localekey. '"';
+			if( $this_localekey == $default )
+				$r .= ' selected="selected"';
+			$r .= '>'. T_($this_locale['name']). '</option>';
 		}
+	}
 
+	if( $disp )
+	{ // the result must be displayed
+		echo $r;
+		return true;
+	}
+	else
+	{ //the result must be returned
+		return $r;
+	}
 }
 
+/**
+ * [callback function] Returns an <option> set with default locale selected
+ *
+ * {@internal locale_options(-)}}
+ *
+ * @param string default value
+ */
+function locale_options_return( $default = '' )
+{
+	$r = locale_options( $default, false );
+	return $r;
+}
 
 /**
  * Detect language from HTTP_ACCEPT_LANGUAGE
@@ -629,6 +655,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/13 19:53:50  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.4  2005/01/03 06:18:31  blueyed
  * changed pre_dump() syntax
  *

@@ -45,11 +45,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</tr></table>
 		</td>
 		<td>&nbsp;</td>
-
 		<td align="right">
-			<form action="b2browse.php" name="showXfirstlastposts" method="get">
-				<input type="hidden" name="blog" value="<?php echo $blog ?>" />
-				<?php
+			<?php
+				$Form = & new Form( 'b2browse.php', 'showXfirstlastposts', 'get', 'none' );
+				$Form->begin_form( '' );
+				$Form->hidden( 'blog', $blog );
 				if( $what_to_show == 'days' )
 				{
 					// TODO: dropdown / Javascript calendar?
@@ -65,19 +65,21 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<?php /* TRANS: x TO y OF z */ echo T_(' of ') ?> <?php echo $MainList->get_total_num_posts() ?>
 				<?php } ?>
 				
-				<select name="order">
-					<option value="DESC" <?php
-					$i = $order;
-					if ($i == "DESC")
-					echo ' selected="selected"';
-					?>><?php echo T_('from the end') ?></option>
-					<option value="ASC" <?php
-					if ($i == "ASC")
-					echo ' selected="selected"';
-					?>><?php echo T_('from the start') ?></option>
-				</select>
-				<input type="submit" name="submitXtoX" class="search" value="<?php echo T_('OK') ?>" />
-			</form>
+			<select name="order">
+				<option value="DESC" <?php
+				$i = $order;
+				if ($i == "DESC")
+				echo ' selected="selected"';
+				?>><?php echo T_('from the end') ?></option>
+				<option value="ASC" <?php
+				if ($i == "ASC")
+				echo ' selected="selected"';
+				?>><?php echo T_('from the start') ?></option>
+			</select>
+			<?php
+				$Form->submit( array( 'submitXtoX', T_('OK'), 'search' ) );
+				$Form->end_form();
+			?>
 		</td>
 	</tr>
 </table>

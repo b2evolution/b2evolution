@@ -409,35 +409,44 @@ switch($action)
 				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 				<p>
-					<form action="blogs.php" method="get" class="inline">
-						<input type="hidden" name="action" value="delete" />
-						<input type="hidden" name="blog" value="<?php $edited_Blog->ID() ?>" />
-						<input type="hidden" name="confirm" value="1" />
+				
+				<?php
+				
+					$Form = &new Form( 'blogs.php', '', 'get', 'none' );
 
-						<?php
-						if( is_file( $edited_Blog->get('dynfilepath') ) )
-						{
-							?>
-							<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
-							<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('dynurl').'"', $edited_Blog->dget('dynfilepath') ); ?></label><br />
-							<br />
-							<?php
-						}
-						if( is_file( $edited_Blog->get('staticfilepath') ) )
-						{
-							?>
-							<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
-							<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('staticurl').'"', $edited_Blog->dget('staticfilepath') ); ?></label><br />
-							<br />
-							<?php
-						}
+					$Form->begin_form( 'inline' );
+
+					$Form->hidden( 'action', 'delete' );
+					$Form->hidden( 'blog', $edited_Blog->ID );
+					$Form->hidden( 'confirm', 1 );
+
+					if( is_file( $edited_Blog->get('dynfilepath') ) )
+					{
 						?>
+						<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
+						<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('dynurl').'"', $edited_Blog->dget('dynfilepath') ); ?></label><br />
+						<br />
+						<?php
+					}
+					if( is_file( $edited_Blog->get('staticfilepath') ) )
+					{
+						?>
+						<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
+						<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('staticurl').'"', $edited_Blog->dget('staticfilepath') ); ?></label><br />
+						<br />
+						<?php
+					}
 
-						<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
-					</form>
-					<form action="blogs.php" method="get" class="inline">
-						<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
-					</form>
+					$Form->submit( array( '', T_('I am sure!'), 'search' ) );
+
+					$Form->end_form();
+
+
+					$Form->begin_form( 'inline' );
+					$Form->submit( array( '', T_('CANCEL'), 'search' ) );
+					$Form->end_form();
+				?>
+
 				</p>
 
 				</div>
@@ -550,6 +559,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.22  2005/01/13 19:53:48  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.21  2005/01/05 17:48:54  fplanque
  * consistent blog switcher on top
  *

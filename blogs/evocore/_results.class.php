@@ -246,6 +246,13 @@ class Results
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_end' => "</th>\n",
+							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending Order').'" height="12" width="11" />',
+							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending Order').'" height="12" width="11" />',
+							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending Order').'" height="12" width="11" />',
+							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending Order').'" height="12" width="11" />',
+							'basic_sort_off' => '<img src="../admin/img/basic_sort_off.gif" width="16" height="16" />',
+							'basic_sort_asc' => '<img src="../admin/img/basic_sort_asc.gif" width="16" height="16" />',
+							'basic_sort_desc' => '<img src="../admin/img/basic_sort_desc.gif" width="16" height="16" />',
 						'head_end' => "</thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
@@ -259,7 +266,7 @@ class Results
 						'body_end' => "</tbody>\n\n",
 					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="center">',
-					'footer_text' => ($this->total_pages > 1 ) ? 
+					'footer_text' => ( $this->total_pages > 1 ) ? 
 															T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'
 															.'$total_pages$ Pages : $prev$ $list$ $next$ <br />'
 															.'$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') : ' 1 '
@@ -307,6 +314,7 @@ class Results
 			 	$col = $matches[1][$i];
 				
 				$this->cols[] = '$'.$col.'$';
+				echo $col;
 			}
 		}
 		echo $this->params['header_start'];
@@ -348,7 +356,12 @@ class Results
 
 					for( $i = 0; $i < count($this->cols); $i++)
 					{ //construction of the values which can be taken by $order
-						if(	$i == $col_count )
+						if( !empty( $this->default_col ) && !strcasecmp( $this->col_orders[$col_count], $this->default_col ) )
+						{ // there is a default order 
+							$order_asc.='A';
+							$order_desc.='D';
+						}
+						elseif(	$i == $col_count )
 						{ //link ordering the current column
 							$order_asc.='A';
 							$order_desc.='D';
@@ -362,27 +375,12 @@ class Results
 						
 					$style = $this->params['sort_type'];
 					
-					if( $this->params['sort_type'] == 'single' )
-					{ // single sort mode
-						
-						$color_asc = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'black' : 'grey' ; //color of the ascending arrow
-						$color_desc = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'black' : 'grey' ; //color of the descending arrow
-
-						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).$param_action.'" title="'.T_('Ascending Order')
-									.'" class="img" ><img src="../admin/img/'.$color_asc.'_arrow_down.gif" alt="A" title="'.T_('Ascending Order')
-									.'" height="12px" width="11px" ></a>'
-									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).$param_action.'" title="'.T_('Descending Order')
-									.'" class="img" ><img src="../admin/img/'.$color_desc.'_arrow_up.gif" alt="D" title="'.T_('Descending Order')
-									.'"  height="12px" width="11px"></a> ';
-					}
-					
-					
+					$asc_status = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'on' : 'off' ;
+					$desc_status = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'on' : 'off' ;
 					$sort_type = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? $order_desc : $order_asc;
-					
 					$title = strstr( $sort_type, 'A' ) ? T_('Ascending order') : T_('Descending order');
-					echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type)
-							 .'" title="'.$title.'" ';
-							
+					$title = ' title="'.$title.'" ';
+					
 					$pos =  strpos( $this->order, 'D');
 					
 					if( strstr( $this->order, 'A' ) )
@@ -392,20 +390,49 @@ class Results
 					
 					if( $col_count == $pos ) 
 					{ //the column header must be displayed in bold
-						echo 'class="'.$style.'_current"  >';
+						$class = ' class="'.$style.'_current" ';
 					}
 					else
 					{
-						echo 'class="'.$style.'_sort_link"  >';
+						$class = ' class="'.$style.'_sort_link" ';
 					}
-						
-					echo $col_header.'</a>';
+					if( $this->params['sort_type'] == 'single' )
+					{ // single sort mode
+						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type).'" '.$title.$class.' >'
+									.$col_header.'</a>' 
+									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).'" title="'.T_('Ascending Order')
+									.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
+									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).'" title="'.T_('Descending Order')
+									.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
+					}
+					elseif( $this->params['sort_type'] == 'basic' )
+					{ // basic sort mode
 					
+						if( $asc_status == 'off' && $desc_status == 'off' )
+						{ // the sorting is not made on the current column 
+							$sort_item = $this->params['basic_sort_off'];
+						}
+						elseif( $asc_status == 'on' )
+						{ // the sorting is ascending and made on the current column 
+							$sort_item = $this->params['basic_sort_asc'];
+						}
+						elseif( $desc_status == 'on' )
+						{ // the sorting is descending and made on the current column 
+							$sort_item = $this->params['basic_sort_desc'];
+						}
 					
-					$col_count++;
-					
- 					echo $this->params['colhead_end'];
+						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type).'" title="'.T_('Change Order')
+									.'" '.$class.' >'.$col_header.' '.$sort_item.'</a>';
+					}
 				}
+				elseif( !isset( $this->col_orders[$col_count] ) )
+				{ // the column can't be ordered
+					echo $col_header ;
+				}
+				$col_count++;
+					
+ 				echo $this->params['colhead_end'];
+	
 			}
 
     	echo $this->params['head_end'];
@@ -817,6 +844,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/13 19:53:50  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.7  2005/01/12 20:40:40  fplanque
  * no message
  *

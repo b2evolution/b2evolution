@@ -43,16 +43,14 @@ if( empty($mode) )
 		<div id="headinfo">
 	
 		<span id="headfunctions">
-			<a href="<?php echo $htsrv_url ?>login.php?action=logout"><?php echo T_('Logout') ?></a>
-			&bull;
-			<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?> <img src="img/close.gif" width="14" height="14" class="top" alt="" title="<?php echo T_('Exit to blogs') ?>" /></a><br />
+			<?php echo $app_exit_links; ?>
 		</span>
 	
 		<?php
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
 		?>
-			<?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
+			<?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
 			&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
 			&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
 		<?php } ?>

@@ -168,18 +168,18 @@ function list_users( $layout, $query )
 
 	return $displayed;
 }}}
+
+$Form = & new Form( 'blogs.php', 'FormPerm' );
+	
+$Form->begin_form( 'fform' );
+
+$Form->hidden( 'action', 'update' );
+$Form->hidden( 'tab', 'perm' );
+$Form->hidden( 'blog', $edited_Blog->ID );
+$Form->hidden( 'action', $layout );
+
+$Form->fieldset( T_('User permissions') );
 ?>
-
-
-<form action="blogs.php" class="fform" method="post" name="FormPerm">
-	<input type="hidden" name="action" value="update" />
-	<input type="hidden" name="tab" value="perm" />
-	<input type="hidden" name="blog" value="<?php echo $edited_Blog->ID; ?>" />
-	<input type="hidden" name="layout" value="<?php echo $layout; ?>" />
-
-
-	<fieldset>
-		<legend><?php echo T_('User permissions') ?></legend>
 		<div style="float:right">
 			<?php echo T_('Layout').':';
 
@@ -294,12 +294,11 @@ function list_users( $layout, $query )
 			<br />
 		</div>
 
-	</fieldset>
-
 	<?php
+	
+		$Form->fieldset_end();
 		// warning if a user withdraws own permission to edit the blog's properties
 		form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"' : '' )
 	?>
 
 </form>
-

@@ -28,7 +28,8 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
- * @author blueyed
+ * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
+ * @author blueyed: Daniel HAHLER
  * @author gorgeb
  *
  * @version $Id$
@@ -81,36 +82,35 @@ if( isset($Blog) )
 require dirname(__FILE__).'/_submenu.inc.php';
 
 $Form = & new Form( $form_action, 'post', 'post', 'none' );
-$Form->labelstart = '<strong>';
-$Form->labelend = "</strong>\n";
+$Form->fieldstart = '<span class="line">';
+$Form->fieldend = '</span>';
+
+
+// ================================ START OF EDIT FORM ================================
+
+$Form->begin_form( '' );
 
 ?>
-<!-- ================================ START OF EDIT FORM ================================ -->
-
-<form name="post" id="post" action="<?php echo $form_action ?>" method="post">
 
 <div class="left_col">
 
 	<?php
-		form_hidden( 'action', $next_action );
-		form_hidden( 'blog', $blog );
-		if( isset( $mode ) )   form_hidden( 'mode', $mode );
-		if( isset( $post ) )   form_hidden( 'post_ID', $post );
- 		if( isset( $tsk_ID ) ) form_hidden( 'tsk_ID', $tsk_ID );
+		$Form->hidden( 'action', $next_action );
+		$Form->hidden( 'blog', $blog );
+		if( isset( $mode ) )   $Form->hidden( 'mode', $mode );
+		if( isset( $post ) )   $Form->hidden( 'post_ID', $post );
+ 		if( isset( $tsk_ID ) ) $Form->hidden( 'tsk_ID', $tsk_ID );
 
 		// In case we send this to the blog for a preview :
-		form_hidden( 'preview', 1 );
-		form_hidden( 'more', 1 );
-		form_hidden( 'preview_userid', $user_ID );
+		$Form->hidden( 'preview', 1 );
+		$Form->hidden( 'more', 1 );
+		$Form->hidden( 'preview_userid', $user_ID );
+		
+		$Form->fieldset( T_('Post contents') );
+		
+		$Form->text( 'post_title', $post_title, 48, '<strong>'.T_('Title').'</strong>', '', 255 );
+		
 	?>
-
-	<fieldset>
-		<legend><?php echo T_('Post contents') ?></legend>
-
-	<span class="line">
-		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'formvalue') ?>" id="post_title" />
-	</span>
 
 	<span class="line">
 		<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
@@ -123,16 +123,12 @@ $Form->labelend = "</strong>\n";
 	</span>
 
 	<?php if( $use_post_url )
-	{ ?>
-		<span class="line">
-			<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-			<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'formvalue' ) ?>" id="post_url" />
-		</span>
-		<?php
+	{ 
+		$Form->text( 'post_url', $post_url, 40, T_('Link to url'), '', 255 );
 	}
 	else
 	{
-		form_hidden( 'post_url', '' );
+		$Form->hidden( 'post_url', '' );
 	}
 	?>
 
@@ -157,18 +153,15 @@ $Form->labelend = "</strong>\n";
 	<div class="edit_actions">
 	<?php // ------------------------------- ACTIONS ----------------------------------
 		if( $use_preview )
-		{ ?>
-			<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);" />
-			<?php
+		{
+			$Form->button( array( 'button', '', T_('Preview'), '', 'open_preview(this.form);' ) );
 		}
-	?>
 
-	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" />
+		$Form->submit( array( '',/* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ T_('&nbsp; Save ! &nbsp;'), 'SaveButton' ) );
 
-	<?php
 	// ---------- DELETE ----------
-	if( $next_action == 'update' )
-	{ // Editing post
+  if( $next_action == 'update' )
+	{	// Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
@@ -185,12 +178,12 @@ $Form->labelend = "</strong>\n";
 
 	?>
 	</div>
-	</fieldset>
 
-	<fieldset>
-		<legend><?php echo T_('Advanced properties') ?></legend>
+	<?php
+		$Form->fieldset_end();
 
-		<?php
+		$Form->fieldset( T_('Advanced properties') );
+		
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
 			echo "<div>\n";
@@ -203,19 +196,19 @@ $Form->labelend = "</strong>\n";
 			echo "</div>\n";
 		}
 		?>
+		
 		<div>
-			<span class="line">
-			<label for="post_urltitle"><strong><?php echo T_('URL Title') ?>:</strong></label>
-			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'formvalue' ); ?>" size="40" maxlength="50" />
-			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
-			</span>
+		<?php
+			$Form->text( 'post_urltitle', $post_urltitle, 40, '<strong>'.T_('URL Title').'</strong>', 
+									 T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
+		?>
 		</div>
-
-	</fieldset>
-
-
-	<fieldset>
-		<legend><?php echo T_('Workflow properties') ?></legend>
+		
+		<?php
+			$Form->fieldset_end();
+			
+			$Form->fieldset( T_('Workflow properties') );
+		?>
 
 		<div>
 			<label for="item_st_ID"><strong><?php echo T_('Task status') ?>:</strong></label>
@@ -246,17 +239,17 @@ $Form->labelend = "</strong>\n";
 			?>
 		</div>
 
-	</fieldset>
-
 	<?php
+	
+	$Form->fieldset_end();
+	
 	if( isset( $Blog ) && ((get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks'))) )
 	{
-		?>
-		<fieldset>
-		<legend><?php echo T_('Additional actions') ?></legend>
-		<?php
+		$Form->fieldset( T_('Additional actions') );
+		
 		if( get_bloginfo('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
+			
 		?>
 		<div>
 			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback"
@@ -274,9 +267,9 @@ $Form->labelend = "</strong>\n";
 		</div>
 		<?php
 		}
-		?>
-		</fieldset>
-	<?php
+		
+		$Form->fieldset_end();
+		
 	}
 	?>
 
@@ -284,8 +277,11 @@ $Form->labelend = "</strong>\n";
 
 <div class="right_col">
 
-	<fieldset class="extracats">
-		<legend><?php echo T_('Categories') ?></legend>
+	<?php
+	
+	$Form->fieldset( T_('Categories'), 'extracats' );
+	
+	?>
 
 		<div class="extracats">
 
@@ -386,12 +382,13 @@ $Form->labelend = "</strong>\n";
 		// ----------------- END RECURSIVE CAT LIST ----------------
 		?>
 		</div>
-	</fieldset>
-
-	<fieldset>
-		<legend><?php echo T_('Visibility / Sharing') ?></legend>
-
+		
 		<?php
+		
+		$Form->fieldset_end();
+		
+		$Form->fieldset( T_('Visibility / Sharing') );
+		
 		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
 		{
 		?>
@@ -427,16 +424,15 @@ $Form->labelend = "</strong>\n";
 		<?php echo T_('Deprecated (Not published!)') ?></label><br />
 		<?php
 		}
-	?>
-
-	</fieldset>
-
-	<?php
+	
+		$Form->fieldset_end();
+	
 		if( $Blog->allowcomments == 'post_by_post' )
 		{	// ---------------- COMMENT STATUS -----------------
-			?>
-			<fieldset>
-				<legend><?php echo T_('Comments') ?></legend>
+			
+			$Form->fieldset( T_('Comments') );
+			
+			?> 
 
 				<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
 				<?php echo T_('Open') ?></label><br />
@@ -446,15 +442,14 @@ $Form->labelend = "</strong>\n";
 
 				<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
 				<?php echo T_('Disabled') ?></label><br />
-			</fieldset>
+			
 			<?php
+			
+			$Form->fieldset_end();
 		}
-	?>
-
-
-	<fieldset>
-		<legend><?php echo T_('Text Renderers') ?></legend>
-		<?php
+		
+		$Form->fieldset( T_('Text Renderers') );
+	
 		$Plugins->restart(); // make sure iterator is at start position
 		$atLeastOneRenderer = false;
 		while( $loop_RendererPlugin = $Plugins->get_next() )
@@ -519,23 +514,29 @@ $Form->labelend = "</strong>\n";
 			echo T_('No renderer plugins are installed.');
 		}
 
+		$Form->fieldset_end();
+
 		?>
-	</fieldset>
 
 </div>
 
 <div class="clear"></div>
 
-</form>
-<!-- ================================== END OF EDIT FORM ================================== -->
 
 <?php
+
+$Form->end_form();
+
+// ================================== END OF EDIT FORM ==================================
 
 // End block:
 require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/13 19:53:48  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.9  2005/01/10 02:08:37  blueyed
  * Use $Settings to check if upload allowed
  *

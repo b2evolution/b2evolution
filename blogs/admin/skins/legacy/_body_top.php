@@ -46,9 +46,7 @@ if( empty($mode) )
 			<?php echo T_('Style:') ?>
 			<a href="#" onclick="setActiveStyleSheet('Variation'); return false;" title="Variation (Default)">V</a>&middot;<a href="#" onclick="setActiveStyleSheet('Desert'); return false;" title="Desert">D</a>&middot;<a href="#" onclick="setActiveStyleSheet('Legacy'); return false;" title="Legacy">L</a><?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>&middot;<a href="#" onclick="setActiveStyleSheet('Custom'); return false;" title="Custom">C</a><?php } ?>
 			&bull;
-			<a href="<?php echo $htsrv_url ?>login.php?action=logout"><?php echo T_('Logout') ?></a>
-			&bull;
-			<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?> <img src="img/close.gif" width="14" height="14" class="top" alt="" title="<?php echo T_('Exit to blogs') ?>" /></a><br />
+			<?php echo $app_exit_links; ?>
 		</div>
 	
 		<?php
@@ -57,7 +55,7 @@ if( empty($mode) )
 		?>
 		<div id="headinfo">
 			b2evo v <strong><?php echo $app_version ?></strong>
-			&middot; <?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
+			&middot; <?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
 			&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
 			&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
 		</div>

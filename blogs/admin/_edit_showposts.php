@@ -283,11 +283,15 @@ require dirname(__FILE__).'/_submenu.inc.php';
 				<!-- ========== FORM to add a comment ========== -->
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
-				<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" class="bComment">
-
-					<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID(); ?>" />
-					<input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($ReqURI); ?>" />
-
+				<?php
+				
+				$Form = & new Form( $htsrv_url.'comment_post.php', '' );
+	
+				$Form->begin_form( 'bComment' );
+				
+				$Form->hidden( 'comment_post_ID', $Item->ID );
+				$Form->hidden( 'redirect_to', htmlspecialchars($ReqURI) );
+				?>
 					<fieldset>
 						<div class="label"><?php echo T_('User') ?>:</div>
 						<div class="info">
@@ -295,28 +299,37 @@ require dirname(__FILE__).'/_submenu.inc.php';
 							<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 							</div>
 					</fieldset>
+				<?php
+				$Form->textarea( 'comment', '', 12, T_('Comment text'), T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)).'<br />'.T_('URLs, email, AIM and ICQs will be converted automatically.'), 40, 'bComment' );
 
-					<?php
-						form_textarea( 'comment', '', 12, T_('Comment text'), T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)).'<br />'.T_('URLs, email, AIM and ICQs will be converted automatically.'), 40, 'bComment' );
-					 ?>
-
-					<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
-					<fieldset>
-						<div class="label"><label><?php echo T_('Options') ?>:</label></div>
-						<div class="input"><input type="checkbox" class="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes"><?php echo T_('(Line breaks become &lt;br&gt;)') ?></span>
-						</div>
-					</fieldset>
-					<?php } ?>
-
-					<fieldset>
-						<div class="input">
-							<input type="submit" name="submit" value="<?php echo T_('Send comment') ?>" class="SaveButton" />
-						</div>
-					</fieldset>
+				if(substr($comments_use_autobr,0,4) == 'opt-') 
+				{ 
+					echo $Form->fieldstart;
+					echo $Form->labelstart; 
+				?>
+				<label><?php echo T_('Options') ?>:</label>
+				
+				<?php
+					echo $Form->labelend;
+					echo $Form->inputstart;
+					$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' ); 
+					echo $Form->inputend;
+					$Form->fieldset_end();
+					
+				} 
+				
+					echo $Form->fieldstart;
+					echo $Form->inputstart;
+					$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) ); 
+					echo $Form->inputend;
+					$Form->fieldset_end();
+					
+				?>
 
 					<div class="clear"></div>
-
-				</form>
+				<?php
+					$Form->end_form();
+				?>
 				<!-- ========== END of FORM to add a comment ========== -->
 				<?php
 				} // / can comment
@@ -376,58 +389,79 @@ require dirname(__FILE__).'/_submenu.inc.php';
 	</div>
 
 	<div class="bSideItem">
-		<form id="searchform" method="get" action="<?php echo $pagenow ?>">
-			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" style="float:right" />
-			<h3><?php echo T_('Search') ?></h3>
+	
+	<?php 
+	
+	$Form = & new Form( $pagenow, 'searchform', 'get', 'none' );
+	
+	$Form->begin_form( '' );
+	
+	$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
+	
+	?>
+	
+	<h3><?php echo T_('Search') ?></h3>
+	
+	<?php
+	
+	$Form->hidden( 'blog', $blog );
+	
+	$Form->fieldset( 'Posts to show', ('Posts to show') );
+	echo $Form->inputstart;
 
-			<input type="hidden" name="blog" value="<?php echo $blog ?>" />
+	?>	
+	
+	<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" '?> />
+	<label for="ts_min"><?php echo T_('Past') ?></label><br />
 
-			<fieldset title="Posts to show">
-				<legend><?php echo T_('Posts to show') ?></legend>
-				<div>
-				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" '?> />
-				<label for="ts_min"><?php echo T_('Past') ?></label><br />
+	<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" '?> />
+	<label for="ts_max"><?php echo T_('Future') ?></label>
+	</div>
 
-				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" '?> />
-				<label for="ts_max"><?php echo T_('Future') ?></label>
-				</div>
+	<div>
+	<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" '?> />
+	<label for="sh_published"><?php echo T_('Published (Public)') ?></label><br />
 
-				<div>
-				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" '?> />
-				<label for="sh_published"><?php echo T_('Published (Public)') ?></label><br />
+	<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" '?> />
+	<label for="sh_protected"><?php echo T_('Protected (Members only)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" '?> />
-				<label for="sh_protected"><?php echo T_('Protected (Members only)') ?></label><br />
+	<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" '?> />
+	<label for="sh_private"><?php echo T_('Private (You only)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" '?> />
-				<label for="sh_private"><?php echo T_('Private (You only)') ?></label><br />
+	<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked="checked" '?> />
+	<label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked="checked" '?> />
-				<label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
+	<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> />
+	<label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> />
-				<label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br />
+	<?php
+	echo $Form->inputend;
+	$Form->fieldset_end();
+	
+	
+	
+	$Form->fieldset( T_('Title / Text contains'), 'Text' );			
 
-
-				</div>
-
-			</fieldset>
-
-			<fieldset title="Text">
-				<legend><?php echo T_('Title / Text contains') ?></legend>
-				<div>
-				<input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" />
-				</div>
-				<?php echo T_('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
-				<label for="sentAND"><?php echo T_('AND') ?></label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
-				<label for="sentOR"><?php echo T_('OR') ?></label>
-				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
-				<label for="sentence"><?php echo T_('Entire phrase') ?></label>
-			</fieldset>
-
-			<fieldset title="Archives">
-				<legend><?php echo T_('Archives') ?></legend>
+	echo $Form->inputstart;
+	
+	?>
+	<input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" />
+	<?php
+	echo $Form->inputend;
+	echo T_('Words').' : ';
+	?>
+	
+	<input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
+	<label for="sentAND"><?php echo T_('AND') ?></label>
+	<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
+	<label for="sentOR"><?php echo T_('OR') ?></label>
+	<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
+	<label for="sentence"><?php echo T_('Entire phrase') ?></label>
+	<?php
+	$Form->fieldset_end();
+	
+	$Form->fieldset( 'Archives', T_('Archives') );
+	?>
 				<ul>
 				<?php
 				// this is what will separate your archive links
@@ -496,7 +530,9 @@ require dirname(__FILE__).'/_submenu.inc.php';
 				?>
 
 				</ul>
-			</fieldset>
+			<?php
+				$Form->fieldset_end();
+			?>
 
 			<fieldset title="Categories">
 				<legend><?php echo T_('Categories') ?></legend>
@@ -573,10 +609,14 @@ require dirname(__FILE__).'/_submenu.inc.php';
 				?>
 				</ul>
 			</fieldset>
+<?php
 
-			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" />
-			<input type="button" value="<?php echo T_('Reset') ?>" onclick="document.location.href='<?php echo $pagenow,'?blog=',$blog ?>';" class="search" />
-		</form>
+	$Form->submit( array( 'submit', T_('Search'), 'search' ) );
+	$Form->button( array( 'button', '', T_('Reset'), 'search', 'document.location.href='.$pagenow.'?blog='.$blog.';' ) );
+	
+	$Form->end_form();
+
+?>
 
 	</div>
 

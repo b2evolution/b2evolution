@@ -108,7 +108,6 @@ class Form
 				break;
 
 			case 'fieldset':
-				$this->form_class = 'fform';
 				$this->fieldstart = "<fieldset>\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
@@ -253,20 +252,6 @@ class Form
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
-		if( $this->_count_fieldsets )
-		{
-			if( $field_name == $this->_fieldsets[$this->_count_fieldsets]['disableBy'] )
-			{
-				$r .= '%disableByOnclick%';
-			}
-			else
-			{
-				$this->_fieldsets[$this->_count_fieldsets]['disableTags'][] = $field_name;
-				// Enable controlling checkbox
-				$r .= ' onclick="'.$this->form_name.'.'.$this->_fieldsets[$this->_count_fieldsets]['disableBy'].'.checked = true;"';
-			}
-		}
-
 		$r .= " />\n";
 
 		if( !empty( $field_note ) )
@@ -276,12 +261,7 @@ class Form
 
 		$r .= $this->end_field();
 
-		if( $this->_count_fieldsets )
-		{
-			$this->_fieldsets[$this->_count_fieldsets]['html'] .= $r;
-			return true;
-		}
-		elseif( $this->output )
+		if( $this->output )
 		{
 			echo $r;
 			return true;
@@ -412,12 +392,11 @@ class Form
 	 * @param string label
 	 * @param string note
 	 * @param string CSS class
-	 * @param boolean to output (default)  or not
-	 * @param string additional attribs to be inserted into the input tag
+	 * @param a boolean indicating if the checkbox must be checked by default
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_value, $field_label, $field_note = '',
-											$field_class = '', $attribs = '' )
+	function checkbox( $field_name, $field_value, $field_label, $field_note = '', 
+											$field_class = '', $field_checked = 0 )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
 				.'<input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
@@ -429,34 +408,19 @@ class Form
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
-		if( $this->_count_fieldsets )
+		if( !empty($field_id) )
 		{
-			if( $field_name == $this->_fieldsets[$this->_count_fieldsets]['disableBy'] )
-			{
-				$r .= '%disableByOnclick%';
-			}
-			else
-			{
-				$this->_fieldsets[$this->_count_fieldsets]['disableTags'][] = $field_name;
-				// Enable controlling checkbox
-				$r .= ' onclick="'.$this->form_name.'.'.$this->_fieldsets[$this->_count_fieldsets]['disableBy'].'.checked = true;"';
-			}
+			$r .= ' id="'.$field_id.'"';
 		}
-		if( !empty($attribs) )
+		if( $field_checked )
 		{
-			$r .= ' '.$attribs;
+			$r .= ' checked="checked" ';
 		}
-
 		$r .= " />\n"
 				.'<span class="notes">'.$field_note."</span>\n"
 				.$this->end_field();
 
-		if( $this->_count_fieldsets )
-		{
-			$this->_fieldsets[$this->_count_fieldsets]['html'] .= $r;
-			return true;
-		}
-		elseif( $this->output )
+		if( $this->output )
 		{
 			echo $r;
 			return true;
@@ -581,7 +545,7 @@ class Form
 	 */
 	function fieldset_end()
 	{
-		$r = $this->fieldend;
+		$r = "</fieldset>\n";
 		if( $this->output )
 		{
 			echo $r;
@@ -666,8 +630,10 @@ class Form
 		}
 		$r .= ">\n".$field_list_callback( $field_value )
 					."</select>\n"
-					.'<span class="notes">'.$field_note.'</span></div>'
-					."</fieldset>\n\n";
+					.'<span class="notes">'.$field_note.'</span>';
+					
+		$r .= $this->end_field();
+					
 		if( $this->output )
 		{
 			echo $r;
@@ -1043,20 +1009,23 @@ class Form
 		$allow_none = false,
 		$field_class = '' )
 	{
-		$r = "\n";
+		$r = $this->begin_field( $field_name, $field_label )
+					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+		/*$r = "\n";
 		$r .= '<fieldset>';
 		$r .= '  <div class="label"><label for="'.$field_name.'">'.$field_label.':</label></div>';
-		$r.= '  <div class="input"><select name="'.$field_name.'" id="'.$field_name.'"';
+		$r.= '  <div class="input"><select name="'.$field_name.'" id="'.$field_name.'"';*/
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
 		$r .= '>';
-		$r .= $field_object->option_list_return( $field_value, $allow_none, 'name_return' );
-		$r .= '  </select>';
-		$r .= '  <span class="notes">'.$field_note.'</span></div>';
-		$r .= "</fieldset>\n\n";
-	
+		$r .= $field_object->option_list_return( $field_value, $allow_none )
+			 		."</select>\n"
+					.'<span class="notes">'.$field_note.'</span></div>';
+					
+		$r .= $this->end_field();
+					
 		if( $this->output )
 		{
 			echo $r;

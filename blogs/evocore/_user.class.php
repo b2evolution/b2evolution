@@ -628,9 +628,29 @@ class User extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function prefered_name( $format = 'htmlbody' )
+	function prefered_name( $format = 'htmlbody', $disp = true )
 	{
-		$this->disp( 'preferedname', $format );
+		if( $disp )
+		{
+			$this->disp( 'preferedname', $format );
+		}
+		else
+		{
+			$this->dget( 'preferedname', $format );
+		}
+	}
+	
+	/**
+	 * Template function: return user's prefered name
+	 *
+	 * {@internal User::prefered_name(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function prefered_name_return( $format = 'htmlbody' )
+	{
+		$r = $this->prefered_name( $format, false );
+		return $r;
 	}
 
 
@@ -656,6 +676,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2005/01/13 19:53:51  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.6  2004/12/29 04:30:58  blueyed
  * removed safefilename()
  *

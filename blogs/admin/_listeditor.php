@@ -146,15 +146,22 @@ if( ($action == 'delete') && !$confirm )
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 		<p>
-			<form method="get" class="inline">
-				<input type="hidden" name="action" value="delete" />
-				<input type="hidden" name="ID" value="<?php echo $ID ?>" />
-				<input type="hidden" name="confirm" value="1" />
-				<input type="submit" value="<?php echo T_('I am sure!') ?>" class="DeleteButton" />
-			</form>
-			<form method="get" class="inline">
-				<input type="submit" value="<?php echo T_('CANCEL') ?>" class="CancelButton" />
-			</form>
+		
+		<?php
+		$Form = & new Form( '', 'form', 'get' );
+	
+		$Form->begin_form( 'inline' );		
+		$Form->hidden( 'action', 'delete' );
+		$Form->hidden( 'ID', $ID );
+		$Form->hidden( 'confirm', 1 );
+		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+		$Form->end_form();
+		
+		$Form->begin_form( 'inline' );
+		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
+		$Form->end_form()
+		?>
+		
 		</p>
 
 	</div>
@@ -175,67 +182,55 @@ $Results->col_headers = array(
 													T_('Name'),
 													T_('Actions')
 												 );
+												 
+$Results->col_orders = array(
+													$edited_table_IDcol,
+													$edited_table_namecol
+												 );
 
 $Results->cols = array(
 					"\$$edited_table_IDcol\$",
 					'<strong><a href="?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
 						T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
-				action_icon( T_('Edit'), T_('Edit...'), 'properties.png',
+				action_icon( T_('Edit'), T_('Edit...'), 'edit.png',
 											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%', 18 ).
-				action_icon( T_('Copy'), T_('Duplicate...'), 'copy.gif',
+				action_icon( T_('Copy'), T_('Duplicate...'), 'copy.png',
 											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
-				action_icon( T_('Del'), T_('Delete!'), 'xross.gif',
+				action_icon( T_('Del'), T_('Delete!'), 'trash.png',
 											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
 				);
 
 $Results->display();
 
-?>
-	<form class="fform" name="form" method="post">
-		<input type="hidden" name="action" value="<?php echo (($action != 'edit' ) ? 'create' : 'update') ?>" />
+$Form = & new form( '', 'form' );
 
-		<fieldset>
-			<legend><?php echo (( $action != 'edit' ) ? T_('New entry') : T_('Edit entry')) ?></legend>
+$Form->begin_form( 'fform' );
 
-			<?php
-				if( $action == 'edit' )
-				{
-					?>
-					<input type="hidden" name="div_firm_ID" value="<?php echo $ID ?>" />
-					<?php
-					form_info( T_('ID'), $ID );
-				}
+$Form->hidden( 'action', ($action != 'edit' ) ? 'create' : 'update' );
 
-				form_text( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', $edited_name_maxlen );
-			?>
-		</fieldset>
+$Form->fieldset( ( $action != 'edit' ) ? T_('New entry') : T_('Edit entry') );
+	
+if( $action == 'edit' )
+{
+	$Form->hidden( 'div_firm_ID', $ID );					
+	$Form->info( T_('ID'), $ID );
+}
 
-		<fieldset class="submit">
-			<fieldset>
-				<div class="input">
-					<?php
-						if( $action != 'edit' )
-						{
-							?>
-							<input type="submit" name="submit" value="<?php echo T_('Record') ?>" class="SaveButton" />
-							<?php
-						}
-						else
-						{
-							?>
-							<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="SaveButton" />
-							<?php
-						}
-					?>
-					<input type="reset" value="<?php echo T_('Reset') ?>" class="ResetButton" />
-				</div>
-			</fieldset>
-		</fieldset>
+$Form->text( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', $edited_name_maxlen );
+$Form->fieldset_end();
 
-	</form>
+if( $action != 'edit' )
+{
+	$Form->end_form( array( array( '', '', T_('Record'), 'SaveButton' ),
+									 array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
+}
+else
+{
+	$Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
+									 array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
+}
 
-</div>
-<?php
+echo '</div>';
 
 /**
  * Display page footer:

@@ -15,14 +15,16 @@ param( 'locale', 'string', '' );
 if( !empty($locale) && $action != 'extract' )
 {
 	param( 'template', 'string', '' );
-	?>
-	<form class="fform" method="post" action="b2options.php?tab=regional" name="createnew">
-		<input type="hidden" name="notransext" value="<?php echo $notransext;?>" />
-		<input type="hidden" name="action" value="<?php echo ( ($locale == '_new_') ? 'createlocale' : 'updatelocale' ) ?>" />
-		<fieldset id="createnew">
-		<legend><?php echo ( ($locale == '_new_') ? T_('Create new locale') : T_('Edit locale') ) ?></legend>
-
-		<?php
+	
+	$Form = & new Form( 'b2options.php?tab=regional', 'form' );
+	
+	$Form->begin_form( 'fform' );
+	
+	$Form->buttons( array( array( 'hidden', 'notranstext', $notranstext ),
+												 array( 'hidden', 'action', ($locale == '_new_') ? 'createlocale' : 'updatelocale' ) ) );
+	
+	$Form->fieldset( ($locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
+	
 		// read template
 
 		if( isset($locales[$template]) )
@@ -44,16 +46,16 @@ if( !empty($locale) && $action != 'extract' )
 		{ // we need to remember this for updating locale
 			echo '<input type="hidden" name="oldloc_locale" value="'.$newlocale.'" />';
 		}
-		form_text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
-		form_checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
-		form_text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
+		$Form->text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
+		$Form->checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
+		$Form->text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
 			T_('name of the locale'), 40 );
-		form_text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'), T_('Must match the lang file charset.'), 15 );
-		form_text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'), T_('See below.'), 10 );
-		form_text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'), T_('See below.'), 10 );
-		form_text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
+		$Form->text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'), T_('Must match the lang file charset.'), 15 );
+		$Form->text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'), T_('See below.'), 10 );
+		$Form->text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'), T_('See below.'), 10 );
+		$Form->text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
 			T_('the lang file to use, from the <code>locales</code> subdirectory'), 20 );
-		form_text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
+		$Form->text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
 			T_('1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc.'), 5 );
 
 		// generate Javascript array of locales to warn in case of overwriting
@@ -62,11 +64,11 @@ if( !empty($locale) && $action != 'extract' )
 		{ // remove the locale we want to edit from the generated array
 			$l_warnfor = str_replace("'$newlocale'", "'thiswillneverevermatch'", $l_warnfor);
 		}
-		echo '
-		<div class="input">
-		<input type="submit" name="submit" value="'.( ($locale == '_new_') ? T_('Create') : T_('Update') ).'" class="search" onclick="var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: Warning this is a javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};" />
-		<input type="reset" value="'.format_to_output(T_('Reset'), 'formvalue').'" class="search" />
-		</div>';
+		
+		$Form->buttons( array( array( '', '', ($locale == '_new_') ? T_('Create') : T_('Update'),
+																	'search', 'var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: Warning this is a javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};' ),
+													 array( 'reset', '', format_to_output(T_('Reset'), 'formvalue'), 'search' ) ) );				
+		
 		?>
 		<div class="panelinfo">
 			<h3><?php echo T_('Flags') ?></h3>
@@ -122,25 +124,26 @@ else
 	{ // default locale is not enabled
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
+	
+	$Form = & new Form( 'b2options.php?tab=regional', 'form' );
+	
+	$Form->begin_form( 'fform' );
+	
+	$Form->hidden( 'action', 'update' );
+	$Form->hidden( 'notransext', $notransext );
+	
+	$Form->fieldset( T_('Regional settings') );
+	$Form->text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
+	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
+	$Form->fieldset_end();
+	
+	$Form->fieldset( T_('Available locales') );
+	
 	?>
-	<form class="fform" name="form" action="b2options.php?tab=regional" method="post">
-		<input type="hidden" name="action" value="update" />
-		<input type="hidden" name="notransext" value="<?php echo $notransext;?>" />
 
-		<fieldset>
-			<legend><?php echo T_('Regional settings') ?></legend>
-
-			<?php
-			form_text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
-			form_select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
-			?>
-
-		</fieldset>
-
-		<fieldset>
-		<legend><?php echo T_('Available locales'); ?></legend>
-
-		<p class="center"><?php
+		<p class="center">
+		
+	<?php
 		if( !$notransext )
 		{
 			echo '<a href="b2options.php?tab=regional&amp;notransext=1">' . T_('Hide translation info'), '</a>';
@@ -349,16 +352,13 @@ else
 				<?php
 			}
 		}
-		?>
-	</fieldset>
-
-	<?php if( $current_User->check_perm( 'options', 'edit' ) )
+		
+	$Form->fieldset_end();
+	
+	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
-		form_submit();
+		$Form->end_form( array( array( 'submit', '', T_('Save !'), 'SaveButton' ),
+														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) ) ;
 	}
-	?>
-
-</form>
-<?php
 }
 ?>

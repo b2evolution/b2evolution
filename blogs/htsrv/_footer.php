@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * This is the footer file for login/registering services
  *
@@ -15,6 +15,8 @@
 <a href="http://b2evolution.net/">b2evolution</a>
 <span class="nobr">&copy;2003-2004 by <a href="http://fplanque.net">Fran&ccedil;ois PLANQUE</a></span>
 </p>
-
+<?php
+debug_info();
+?>
 </body>
 </html>

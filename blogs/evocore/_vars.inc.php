@@ -52,6 +52,11 @@ $admin_path_seprator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
 									'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
 									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
+$app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+									&bull;
+									<a href="'.$baseurl.'">'.T_('Exit to blogs').'
+									<img src="img/close.gif" width="14" height="14" class="top" alt="" title="'
+									.T_('Exit to blogs').'" /></a><br />';
 
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
@@ -269,6 +274,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/13 19:53:51  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.7  2005/01/11 23:02:13  blueyed
  * fixed/improved antispan-admin
  *

@@ -415,16 +415,27 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::assigned_user_options(-)}}
 	 */
-	function assigned_user_options()
+	function assigned_user_options( $disp = true )
 	{
 		global $UserCache, $object_def;
-
 		// echo '<option>'.$this->ID;
 		$UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
 						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
-						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
+						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
+						$disp );
+						
 	}
 
+	/**
+	 * Template function: display list of assigned user options
+	 *
+	 * {@internal Item::assigned_user_options(-)}}
+	 */
+	function assigned_user_options_return()
+	{
+		$r = $this->assigned_user_options( false );
+		return $r;
+	}
 
 	/**
 	 * Template function: list all the category names
@@ -1597,6 +1608,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2005/01/13 19:53:50  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.15  2005/01/05 02:51:10  blueyed
  * doc
  *

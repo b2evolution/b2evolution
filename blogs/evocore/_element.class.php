@@ -95,15 +95,36 @@ class Element extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function name( $format = 'htmlbody' )
+	function name( $format = 'htmlbody', $disp = true )
 	{
-		$this->disp( 'name', $format );
+		if( $disp )
+		{ //the result must be displayed
+			$this->disp( 'name', $format );
+		}
+		else
+		{ //the result must be returned
+			return $this->dget( 'name', $format );
+		}
+	}
+	
+	/**
+	 * Template function: return name of item
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function name_return( $format = 'htmlbody' )
+	{
+		$r = $this->name( $format, false );
+		return $r;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.3  2005/01/13 19:53:50  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.2  2004/12/21 21:22:46  fplanque
  * factoring/cleanup
  *

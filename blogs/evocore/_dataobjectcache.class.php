@@ -258,10 +258,29 @@ class DataObjectCache
 			echo '</option>'."\n";
 		}
 	}
+	
+	/**
+	 * Returns form option list with cache contents
+	 *
+	 * Load the cache if necessary
+	 *
+	 * {@internal DataObjectCache::get_by_ID(-) }}
+	 *
+	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID 0
+	 */
+	function option_list_return( $default = 0, $allow_none = false )
+	{
+		$r = $this->option_list( $default, $allow_none, 'name_return', false );
+		return $r;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/13 19:53:50  fplanque
+ * Refactoring... mostly by Fabrice... not fully checked :/
+ *
  * Revision 1.7  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

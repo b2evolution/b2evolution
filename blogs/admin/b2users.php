@@ -299,16 +299,21 @@ else switch ($action)
 			<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 			<p>
-				<form action="b2users.php" method="get" class="inline">
-					<input type="hidden" name="action" value="deleteuser" />
-					<input type="hidden" name="id" value="<?php $deleted_User->ID() ?>" />
-					<input type="hidden" name="confirm" value="1" />
-
-					<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
-				</form>
-				<form action="b2users.php" method="get" class="inline">
-					<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
-				</form>
+				<?php
+					$Form = & new Form( 'b2users.php', 'form', 'get' );
+	
+					$Form->begin_form( 'inline' );		
+					$Form->hidden( 'action', 'deleteuser' );
+					$Form->hidden( 'id', $deleted_User->ID );
+					$Form->hidden( 'confirm', 1 );
+					$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
+					$Form->end_form();
+					
+					$Form->begin_form( 'inline' );
+					$Form->submit( array( '', T_('CANCEL'), 'search' ) );
+					$Form->end_form();
+					
+				?>
 			</p>
 
 		</div>
