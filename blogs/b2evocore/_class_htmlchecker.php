@@ -2,14 +2,46 @@
 /**
  * This file implements the SafeHtmlChecker class.
  *
- * checks HTML against a subset of elements to ensure safety and XHTML validation.
+ * Checks HTML against a subset of elements to ensure safety and XHTML validation.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2003 by Nobuo SAKIYAMA - {@link http://www.sakichan.org/}
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * {@internal
+ * This file was inspired by Simon Willison's SafeHtmlChecker released in
+ * the public domain on 23rd Feb 2003.
+ * {@link http://simon.incutio.com/code/php/SafeHtmlChecker.class.php.txt}
+ * }}
  *
  * @package evocore
- * @author Simon Willison, 23rd Feb 2003, modified by fplanque, sakichan
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
+ * @author fplanque: François PLANQUE.
+ * @author sakichan: Nobuo SAKIYAMA.
+ * @author Simon Willison.
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -217,4 +249,10 @@ class SafeHtmlChecker
 
 }
 
+/*
+ * $Log$
+ * Revision 1.13  2004/10/12 16:12:17  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

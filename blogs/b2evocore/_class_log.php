@@ -37,7 +37,6 @@
  * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
- *
  */
 
 /**
@@ -358,4 +357,10 @@ class Log
 
 }
 
+/*
+ * $Log$
+ * Revision 1.16  2004/10/12 16:12:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

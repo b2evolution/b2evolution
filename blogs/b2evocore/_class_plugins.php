@@ -575,4 +575,11 @@ function sort_Plugin( & $a, & $b )
 {
 	return $a->priority - $b->priority;
 }
+
+/*
+ * $Log$
+ * Revision 1.6  2004/10/12 16:12:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

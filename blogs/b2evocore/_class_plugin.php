@@ -435,4 +435,11 @@ class Plugin
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.9  2004/10/12 16:12:18  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>
