@@ -35,18 +35,18 @@ function blog_create(
 						"blog_stub, blog_staticfilename, ".
 						"blog_tagline, blog_description, blog_longdesc, blog_lang, blog_roll, blog_keywords,".
 						"blog_UID ) VALUES ( ";
-	$query .= "'$blog_name', ";
-	$query .= "'$blog_shortname', ";
+	$query .= "'".addslashes($blog_name)."', ";
+	$query .= "'".addslashes($blog_shortname)."', ";
 	$query .= "'$blog_siteurl', ";
 	$query .= "'$blog_filename', ";
 	$query .= "'$blog_stub', ";
 	$query .= "'$blog_staticfilename', ";
-	$query .= "'$blog_tagline', ";
-	$query .= "'$blog_description', ";
-	$query .= "'$blog_longdesc', ";
+	$query .= "'".addslashes($blog_tagline)."', ";
+	$query .= "'".addslashes($blog_description)."', ";
+	$query .= "'".addslashes($blog_longdesc)."', ";
 	$query .= "'$blog_lang', ";
-	$query .= "'$blog_roll', ";
-	$query .= "'$blog_keywords', ";
+	$query .= "'".addslashes($blog_roll)."', ";
+	$query .= "'".addslashes($blog_keywords)."', ";
 	$query .= "'$blog_UID' )";
 	$querycount++;
 	$result = mysql_query($query);
@@ -84,18 +84,18 @@ function blog_update(
 	global $tableblogs, $query, $querycount;
 
 	$query = "UPDATE $tableblogs SET ";
-	$query .= " blog_name = '$blog_name', ";
-	$query .= " blog_shortname = '$blog_shortname', ";
+	$query .= " blog_name = '".addslashes($blog_name)."', ";
+	$query .= " blog_shortname = '".addslashes($blog_shortname)."', ";
 	$query .= " blog_siteurl = '$blog_siteurl', ";
 	$query .= " blog_filename = '$blog_filename', ";
 	$query .= " blog_staticfilename = '$blog_staticfilename', ";
 	$query .= " blog_stub = '$blog_stub', ";
-	$query .= " blog_tagline = '$blog_tagline', ";
-	$query .= " blog_description = '$blog_description', ";
-	$query .= " blog_longdesc = '$blog_longdesc', ";
+	$query .= " blog_tagline = '".addslashes($blog_tagline)."', ";
+	$query .= " blog_description = '".addslashes($blog_description)."', ";
+	$query .= " blog_longdesc = '".addslashes($blog_longdesc)."', ";
 	$query .= " blog_lang = '$blog_lang', ";
-	$query .= " blog_roll = '$blog_roll', ";
-	$query .= " blog_keywords = '$blog_keywords', ";
+	$query .= " blog_roll = '".addslashes($blog_roll)."', ";
+	$query .= " blog_keywords = '".addslashes($blog_keywords)."', ";
 	$query .= " blog_UID = '$blog_UID' ";
 	$query .= "WHERE blog_ID= $blog_ID";
 	$querycount++;
@@ -130,6 +130,7 @@ function get_blogparams()
  */
 function get_bloginfo( $show='', $this_blogparams = '' )
 {
+	global $querystring_start, $querystring_equal, $querystring_separator;
 	global $blog, $xmlsrvurl, $admin_email;
 
 	if( empty( $this_blogparams ) )
@@ -167,11 +168,11 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			break;
 		case "blogstatsurl":
 			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub.
-								'?disp=stats';
+								$querystring_start.'disp'.$querystring_equal.'stats';
 			break;
 		case "lastcommentsurl":
 			$output = $this_blogparams->blog_siteurl."/".$this_blogparams->blog_stub.
-								'?disp=comments';
+								$querystring_start.'disp'.$querystring_equal.'comments';
 			break;
 		case "tagline":
 			$output = $this_blogparams->blog_tagline;
@@ -238,7 +239,7 @@ function get_blogparams_by_ID($blog_ID)
 	{
 		blog_load_cache();
 	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) die( _('Requested blog does not exist!') );
+	if( !isset( $cache_blogs[$blog_ID] ) ) die( "Requested blog does not exist!" );
 	return $cache_blogs[$blog_ID];
 }
 
@@ -257,7 +258,7 @@ function blog_load_cache()
 		while( $this_blog = mysql_fetch_object($result) ) 
 		{ 
 			$cache_blogs[$this_blog->blog_ID] = $this_blog;
-			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
+			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br>';
 		} 
 	}
 }
