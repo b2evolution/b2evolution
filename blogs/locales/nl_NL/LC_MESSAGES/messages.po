@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2004-02-24 14:17+0100\n"
-"PO-Revision-Date: 2004-02-29 17:55+0100\n"
+"PO-Revision-Date: 2004-02-29 18:55+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -980,7 +980,7 @@ msgstr "converteer enters naar &lt;br /&gt; tags"
 #: ..\..\..\admin\b2options.php:118
 #: ..\..\..\skins\_profile.php:120
 msgid "Update"
-msgstr "Update"
+msgstr "Bijwerken"
 
 #: ..\..\..\admin\b2profile.php:16
 #: ..\..\..\admin\_menutop.php:88
@@ -1395,7 +1395,7 @@ msgstr "Wees voorzichtig met wat je doet, bewerken van dit bestand kan je sjablo
 
 #: ..\..\..\admin\b2template.php:90
 msgid "update template !"
-msgstr "update sjabloon !"
+msgstr "Bijwerken sjabloon !"
 
 #: ..\..\..\admin\b2template.php:94
 msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
@@ -1649,7 +1649,7 @@ msgstr "Creeër een nieuw weblog!"
 
 #: ..\..\..\admin\_blogs_form.php:16
 msgid "Update blog!"
-msgstr "Update weblog!"
+msgstr "Bijwerken weblog!"
 
 #: ..\..\..\admin\_blogs_form.php:25
 #: ..\..\..\admin\_blogs_list.php:14
@@ -2573,7 +2573,7 @@ msgstr "geen query string gevonden"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:23
 msgid "Sending pingbacks..."
-msgstr "Verstuus pingbacks..."
+msgstr "Verstuur pingbacks..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:28
 msgid "No pingback to be done."
