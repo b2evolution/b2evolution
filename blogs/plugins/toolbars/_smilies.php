@@ -106,12 +106,4 @@ class smilies_Toolbarplugin
 // Register the plugin:
 $this->Plugins[$plugin_code] = & new smilies_Toolbarplugin();
 
-
-
-function b2evo_grins() 
-{
-	global $smilies_directory, $b2smilies;
-}
-
-
 ?>

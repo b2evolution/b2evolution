@@ -27,6 +27,7 @@ class Toolbars
 		global $core_dirout, $plugins_subdir, $use_textile;
 		$plugins_path = dirname(__FILE__).'/'.$core_dirout.'/'.$plugins_subdir.'/toolbars';
 		 
+		require_once $plugins_path.'/_quicktags.php';
 		require_once $plugins_path.'/_smilies.php';
 	}	
 	
@@ -37,6 +38,7 @@ class Toolbars
 	 */
 	function display()
 	{
+		$this->Plugins['b2evQTag']->display();
 		$this->Plugins['b2evSmil']->display();
 	}	
 	
