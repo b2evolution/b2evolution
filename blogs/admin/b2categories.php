@@ -157,7 +157,7 @@ switch($action)
 		}
 		else
 		{
-			echo T_('Category deleted.');
+			echo '<p>'.T_('Category deleted.').'</p>';
 		}
 		echo "</div>\n";
 		// List the cats:
