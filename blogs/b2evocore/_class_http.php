@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * This file implements the Http class, which gets and posts via both sockets and curl.
  *
