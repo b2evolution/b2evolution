@@ -253,13 +253,17 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 ?>
 <div class="panelblock">
 	<h2><?php echo T_('Banned domains blacklist') ?></h2>
-	<p><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
+	<p class="center"><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
 	if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 	{
-		echo T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
+		echo '</p><p class="center">'.T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
 	}
 	?></p>
 	<?php list_antiSpam() ?>
+	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+	{ ?>
+		<p class="center">[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
+	<?php } ?>
 	<table class='thin'>
 		<?php if( count($res_stats) ) foreach( $res_stats as $row_stats )
 		{  ?>
@@ -285,10 +289,6 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
-	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
-	{ ?>
-		<p>[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
-	<?php } ?>
 </div>
 <?php
 require( dirname(__FILE__).'/_footer.php' ); 
