@@ -1278,6 +1278,8 @@ function gen_permalink(
 			default:
 				// This is THE CLEANEST available: RECOMMENDED!
 				$permalink = $file.mysql2date("/Y/m/d/", $postdata['Date']).'p'.$id;
+				$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
+				$permalink .= "-".$title;
 				break;
 		}
 	}
