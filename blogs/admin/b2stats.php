@@ -161,6 +161,7 @@ switch( $show )
 			{	// We just hit a new day, let's display the previous one:
 				?>
 				<tr>
+					<td><a href="b2stats.php?action=prune&date=<?php echo $this_date ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Prune') ?>" /></a></td>
 					<td><?php echo date( locale_datefmt(), $last_date ) ?></td>
 					<td class="right"><?php echo $hits['no'] ?></td>
 					<td class="right"><?php echo $hits['search'] ?></td>
