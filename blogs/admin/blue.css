@@ -443,6 +443,9 @@ div.panelblock {
 	background: #f0f0f0;
 	font-weight: bold;
 }
+#mainmenu li.parent ul.submenu li {
+	font-weight:normal;
+}
 #mainmenu li a{ /* made mainmenu links clickable in whole li (at least with Mozilla) */
 	display:block;
 	padding:.5ex;
@@ -852,6 +855,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.18  2005/03/02 17:04:15  blueyed
+ * submenus not bold
+ *
  * Revision 1.17  2005/02/28 22:16:24  blueyed
  * AdminUI refactoring (recurse into submenus)
  *
