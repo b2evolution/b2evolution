@@ -227,11 +227,13 @@ if( ($locale_from_get = param( 'locale', 'string', '', false, false, false ))
 	$Debuglog->add( 'Overriding locale from REQUEST: '.$default_locale, 'locale' );
 }
 
+
+// TODO: check valid user, then activate only once the locale!
+
 /**
  * Activate default locale:
  */
 locale_activate( $default_locale );
-
 
 /**
  * Login procedure:
@@ -287,12 +289,21 @@ $hit_type = filter_hit();
 
 
 /**
+ * Load the icons - we need the users locale set there ({@link T_()})
+ */
+require_once( $conf_path.'_icons.php' );
+
+
+/**
  * Load hacks file if it exists
  */
 @include_once( dirname(__FILE__) . '/../conf/hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.13  2005/01/03 06:21:35  blueyed
+ * moved declaration of $map_iconsfiles, $map_iconsizes so that they can make use of T_()
+ *
  * Revision 1.12  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *
