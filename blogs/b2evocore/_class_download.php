@@ -1,15 +1,24 @@
 <?
-/**
- * This classfile implements downloads (from say, SF to the webserver)
+ /**
+ * This classfile implements http gets and posts
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2004 by Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
  *
  * @package evocore
  */
+
+
  //dirname(__FILE__).'/
 require_once( '_class_http.php');
+/**
+ * Class download
+ *
+ * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ */
 class download
 {
 
@@ -50,13 +59,13 @@ class download
           switch ($type)
              {
                 case "get":
-                        http::get($hostname, $port, $url, $vars);
+                        http::socket_get($hostname, $port, $url, $vars);
                         break;
                 case "post":
-                        http::post($server, $port, $url, $vars);
+                        http::socket_post($server, $port, $url, $vars);
                         break;
                 default:
-                        http::get($server, $port, $url, $vars);
+                        http::socket_get($server, $port, $url, $vars);
                         break;
              };
         };
