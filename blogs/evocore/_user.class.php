@@ -194,7 +194,7 @@ class User extends DataObject
 	{
 		global $basepath, $media_subdir, $Messages;
 
-		$userdir = $basepath.$media_subdir.'users/'.safefilename($this->login).'/';
+		$userdir = $basepath.$media_subdir.'users/'.$this->login.'/';
 		if( !is_dir( $userdir ) )
 		{
 			if( !mkdir( $userdir ) ) // defaults to 0777
@@ -656,6 +656,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/29 04:30:58  blueyed
+ * removed safefilename()
+ *
  * Revision 1.5  2004/12/10 19:45:55  fplanque
  * refactoring
  *
