@@ -85,6 +85,7 @@ function create_b2evo_tables()
 		blog_urlname VARCHAR(255) NOT NULL DEFAULT 'urlname',
 		blog_notes TEXT NULL,
 		blog_keywords tinytext,
+		blog_allowcomments VARCHAR(20) NOT NULL default 'always',
 		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
 		blog_allowpingbacks TINYINT(1) NOT NULL default 1,
 		blog_pingb2evonet TINYINT(1) NOT NULL default 0,

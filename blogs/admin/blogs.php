@@ -115,6 +115,7 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'allowpingbacks',  param( 'blog_allowpingbacks',  'integer', 0 ) );
 			$edited_Blog->set( 'pingb2evonet',    param( 'blog_pingb2evonet',    'integer', 0 ) );
 			$edited_Blog->set( 'pingtechnorati',  param( 'blog_pingtechnorati',  'integer', 0 ) );
+			$edited_Blog->set( 'allowcomments',   param( 'blog_allowcomments',   'string', 'always' ) );
 			$edited_Blog->set( 'pingweblogs',     param( 'blog_pingweblogs',     'integer', 0 ) );
 			$edited_Blog->set( 'pingblodotgs',    param( 'blog_pingblodotgs',    'integer', 0 ) );
 			$edited_Blog->set( 'media_location',  param( 'blog_media_location',  'string', 'default' ) );

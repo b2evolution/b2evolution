@@ -47,6 +47,7 @@ class Blog extends DataObject
 	var $links_blog_ID = 0;
 	var $notes;
 	var $keywords;
+	var $allowcomments = 'always';	
 	var $allowtrackbacks = 0;
 	var $allowpingbacks = 0;
 	var $pingb2evonet = 0;
@@ -105,6 +106,7 @@ class Blog extends DataObject
 			$this->links_blog_ID = $db_row->blog_links_blog_ID;
 			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
+			$this->allowcomments = $db_row->blog_allowcomments;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowpingbacks = $db_row->blog_allowpingbacks;
 			$this->pingb2evonet = $db_row->blog_pingb2evonet;

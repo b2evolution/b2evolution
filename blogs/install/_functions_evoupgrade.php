@@ -559,7 +559,16 @@ function upgrade_b2evo_tables()
 		 * Then create a new extension block, and increase db version numbers
 		 * everywhere where needed in this file.
 		 */
+		 
+		echo 'Upgrading blogs table... ';
+		$query = "ALTER TABLE T_blogs
+							ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'always'";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+		 
 	}
+
+
 
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );

@@ -1210,5 +1210,12 @@ $trans['fr_FR'] = array(
 	'In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin.' => "Afin d'assurer une compatibilité maximale avec les fichiers CSS WP, les plupart des fonctionnalités de b2evolution qui n'existent pas dans WP ont été cachées dans cet habillage wpc_* générique.",
 	'[...] Read more!' => "[...] Lire la suite!",
 	'New pingback on your post #%d "%s"' => "Nouveau pingback sur votre article n°%d \"%s\"",
+	'Allow comments' => 'Autoriser les commentaires',
+	'Always on all posts' => 'Toujours sur tout les articles',
+	'Always allow comments on every posts' => 'Toujours autoriser les visiteurs du site à laisser des commentaires',
+	'Can be disabled on a per post basis' => 'Permettre la desactivation des commentaires pour chaque article',
+	'Comments can be disabled on each post separatly' => 'Autoriser les commentaires, mais permettre de les désactiver pour chaque article',
+	'No comments are allowed in this blog' => 'Aucun commentaire n\'est autorisé dans ce blog',
+	'Never allow any comments in this blog' => '',	
 );
 ?>

@@ -59,6 +59,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<fieldset>
 		<legend><?php echo T_('Advanced options') ?></legend>
 		<?php
+			form_radio( 'blog_allowcomments', $blog_allowcomments,
+					array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ), 
+									array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly') ),
+									array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog') ),
+						), T_('Allow comments'), true );
+								
 			form_checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 			form_checkbox( 'blog_allowpingbacks', $edited_Blog->get( 'allowpingbacks' ), T_('Allow pingbacks'), T_("Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs.") );
 		?>

@@ -424,6 +424,11 @@ class Item extends DataObject
 			return false;
 		}
 
+		global $BlogCache;
+		$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+		if ($current_Blog->allowcomments == 'never')
+			return false;
+
 		return true; // OK, user can comment!
 	}
 
