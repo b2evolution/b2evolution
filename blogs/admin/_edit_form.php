@@ -2,7 +2,7 @@
 
 <form name="post" id="post" action="edit_actions.php" target="_self" method="post">
 
-<?php echo $admin_2col_start; ?>
+<?php echo $admin_2col_start;  ?>
 
 <div class="bPost">
 	
@@ -10,8 +10,9 @@
 	<input type="hidden" name="editing" value="1" />
 	<input type="hidden" name="user_ID" value="<?php echo $user_ID ?>" />
 	<input type="hidden" id="action" name="action" value="<?php echo $form_action ?>" />
+	<input type="hidden" name="mode" value="<?php echo $mode ?>" />
 	<?php if( $action == 'edit' ) { ?>
-	<input type="hidden" name="post_ID" value="<?php echo $post ?>" />
+		<input type="hidden" name="post_ID" value="<?php echo $post ?>" />
 	<?php } ?>
 
 	<!-- In case we send this to the blog for a preview : -->
@@ -21,54 +22,57 @@
 	<?php 
 	
 	if ($action != 'editcomment') 
-	{ // this is for everything but comment editing
+	{ // ------------------------------ POST HEADER -----------------------
 	?>
 	
-	<nobr>
+	<span class="line">
 	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
 	<input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
-	</nobr>
+	</span>
 	
-	<nobr>
+	<span class="line">
 	<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
 	<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select>
-	</nobr>
+	</span>
 	
-	<nobr>
+	<span class="line">
 	<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
 	<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" />
-	</nobr>
+	</span>
 	
 	<?php
 	} 
 	else 
-	{ // this is for comment editing
+	{ // ------------------------------ COMMENT HEADER -----------------------
 		?>
 	<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
 	<input type="hidden" name="comment_post_ID" value="<?php echo $commentdata['comment_post_ID'] ?>" />
 
-	<nobr>
+	<span class="line">
 	<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata["comment_author"]) ?>" id="name" tabindex="1" />
-	</nobr>
+	</span>
 	
-	<nobr>
+	<span class="line">
 	<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata["comment_author_email"]) ?>" id="email" tabindex="2" />
-	</nobr>
+	</span>
 	
-	<nobr>
+	<span class="line">
 	<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata["comment_author_url"]) ?>" id="URL" tabindex="3" />
-	</nobr>
+	</span>
 	
 	<?php
 	}
 	?>
 	
 	<div class="center">
-	<?php if ($use_quicktags) require( dirname(__FILE__).'/_quicktags.php'); ?>
+	<?php // --------------------------- QUICK TAGS ------------------------------------
+		require( dirname(__FILE__).'/_quicktags.php'); 
+	?>
 	</div>
 	
-
+	<?php // ---------------------------- TEXTAREA ------------------------------------- ?>
 	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" border="0" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
+
 
 	<?php // --------------------------- AUTOBR -------------------------------------- ?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
@@ -117,13 +121,12 @@
 	<input type="button" value="<?php echo T_('Upload a file/image') ?>" onClick="launchupload();" class="search" tabindex="12"  />
 	<?php }
 	
-	// if the level is 5+, allow user to edit the timestamp - not on 'new post' screen though
-	// if (($user_level > 4) && ($action != "post"))
 	if ($user_level > 4) 
-	{
+	{	// ------------------------------------ TIME STAMP -------------------------------------
 		?>
 		<br />
 		<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> /><label for="timestamp"><?php echo T_('Edit') ?>:</label>
+		<span class="nobr">
 		<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
 		<select name="mm" tabindex="15">
 		<?php 
@@ -137,15 +140,21 @@
 			} else {
 				$ii = "$i";
 			}
-			echo ">".T_($month[$ii])."</option>\n";
+			echo ">";
+			if( $mode == 'sidebar' )
+				echo T_($month_abbrev[$ii]);
+			else
+				echo T_($month[$ii]);
+			echo "</option>\n";
 		} 
 		?>
 	</select>
-	<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" /> @
-	<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" /> :
-	<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" tabindex="18" /> :
-	<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" tabindex="19" />
-		<?php
+	<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" />
+	</span>
+	<span class="nobr">@
+	<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" />:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" tabindex="18" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" tabindex="19" />
+	</span>
+	<?php
 	}
 	?>
 </div>

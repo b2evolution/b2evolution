@@ -1,3 +1,18 @@
+<?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * This file built upon code from original b2 - http://cafelog.com/
+ */
+if( ! $use_quicktags && ! $use_smilies )   
+{	// We have nothing to do here
+	return;
+}
+
+?>
 <script language="JavaScript" type="text/javascript">
 	<!--
 	// b2 quick tags
@@ -192,13 +207,22 @@
 	// -->
 </script>
 
-<input type="button" class="quicktags" accesskey="i" title="<?php echo T_('INSerted [Alt-I]') ?>" name="addbbcode4" value="ins" style="text-decoration: underline;" onClick="bbstyle(this.form,4)" /><input type="button" class="quicktags" accesskey="d" title="<?php echo T_('DELeted [Alt-D]') ?>" name="addbbcode6" value="del" style="text-decoration: line-through;" onClick="bbstyle(this.form,6)" /><input type="button" class="quicktags" accesskey="s" title="<?php echo T_('STRong [Alt-S]') ?>" name="addbbcode0" value="str" style="font-weight:bold;" onClick="bbstyle(this.form,0)" /><input type="button" class="quicktags" accesskey="e" title="<?php echo T_('EMphasis [Alt-E]') ?>" name="addbbcode2" value="em" style="font-style:italic;" onClick="bbstyle(this.form,2)" /><input type="button" class="quicktags" accesskey="c" title="<?php echo T_('CODE [Alt-C]') ?>" name="addbbcode20" value="code" style="font-family: 'Courier New', Courier, mono;" onClick="bbstyle(this.form,20)" /><input type="button" class="quicktags" accesskey="p" title="<?php echo T_('Paragraph [Alt-P]') ?>" name="addbbcode10" value="&lt;p&gt;" style="" onClick="bbstyle(this.form,10)" /><input type="button" class="quicktags" accesskey="u" title="<?php echo T_('Unordered List [Alt-U]') ?>" name="addbbcode18" value="&lt;ul&gt;" style="" onClick="bbstyle(this.form,18)" /><input type="button" class="quicktags" accesskey="l" title="<?php echo T_('List Item [Alt-L]') ?>" name="addbbcode12" value="&lt;li&gt;" style="" onClick="bbstyle(this.form,12)" /><input type="button" class="quicktags" accesskey="b"  title="<?php echo T_('BLOCKQUOTE [Alt-B]') ?>" name="addbbcode8" value="block" style="" onClick="bbstyle(this.form,8)" /><input type="button" class="quicktags" accesskey="g" title="<?php echo T_('IMaGe [Alt-G]') ?>" name="addbbcode14" value="image" style="width: 40px"  onClick="bblink(this.form,'img')" /><input type="button" class="quicktags" accesskey="a" title="<?php echo T_('A href [Alt-A]') ?>" name="addbbcode16" value="link" style="text-decoration: underline; width: 40px" onClick="bblink(this.form,'a')" /><input type="button" class="quicktags" accesskey="x" name="closetags" value="X" title="<?php echo T_('Close all tags') ?>" style="width: 30px; font-weigh: bolder;"  onClick="bbstyle(document.post,-1)" /><input type="button" class="quicktags" accesskey="m" title="<?php echo T_('More [Alt-M]') ?>" name="pagebreak" value="more" style="" onClick="bbinsert(document.post,'','<!--more-->')" /><input type="button" class="quicktags" accesskey="t" title="<?php echo T_('no teaser [Alt-T]') ?>" name="pagebreak" value="NT" style="" onClick="bbinsert(document.post,'','<!--noteaser-->')" />
+<?php 
+if( $use_quicktags )   
+{	// We are using quicktags:	
+?>
+<div class="large"><input type="button" class="quicktags" accesskey="i" title="<?php echo T_('INSerted [Alt-I]') ?>" name="addbbcode4" value="ins" style="text-decoration: underline;" onClick="bbstyle(this.form,4)" /><input type="button" class="quicktags" accesskey="d" title="<?php echo T_('DELeted [Alt-D]') ?>" name="addbbcode6" value="del" style="text-decoration: line-through;" onClick="bbstyle(this.form,6)" /><input type="button" class="quicktags" accesskey="s" title="<?php echo T_('STRong [Alt-S]') ?>" name="addbbcode0" value="str" style="font-weight:bold;" onClick="bbstyle(this.form,0)" /><input type="button" class="quicktags" accesskey="e" title="<?php echo T_('EMphasis [Alt-E]') ?>" name="addbbcode2" value="em" style="font-style:italic;" onClick="bbstyle(this.form,2)" /><input type="button" class="quicktags" accesskey="c" title="<?php echo T_('CODE [Alt-C]') ?>" name="addbbcode20" value="code" style="font-family: 'Courier New', Courier, mono;" onClick="bbstyle(this.form,20)" /><input type="button" class="quicktags" accesskey="p" title="<?php echo T_('Paragraph [Alt-P]') ?>" name="addbbcode10" value="&lt;p&gt;" style="" onClick="bbstyle(this.form,10)" /><input type="button" class="quicktags" accesskey="u" title="<?php echo T_('Unordered List [Alt-U]') ?>" name="addbbcode18" value="&lt;ul&gt;" style="" onClick="bbstyle(this.form,18)" /><input type="button" class="quicktags" accesskey="l" title="<?php echo T_('List Item [Alt-L]') ?>" name="addbbcode12" value="&lt;li&gt;" style="" onClick="bbstyle(this.form,12)" /><input type="button" class="quicktags" accesskey="b"  title="<?php echo T_('BLOCKQUOTE [Alt-B]') ?>" name="addbbcode8" value="block" style="" onClick="bbstyle(this.form,8)" /><input type="button" class="quicktags" accesskey="g" title="<?php echo T_('IMaGe [Alt-G]') ?>" name="addbbcode14" value="img" onClick="bblink(this.form,'img')" /><input type="button" class="quicktags" accesskey="a" title="<?php echo T_('A href [Alt-A]') ?>" name="addbbcode16" value="link" style="text-decoration: underline; width: 40px" onClick="bblink(this.form,'a')" /><input type="button" class="quicktags" accesskey="x" name="closetags" value="X" title="<?php echo T_('Close all tags') ?>" style="width: 30px; font-weigh: bolder;"  onClick="bbstyle(document.post,-1)" /><input type="button" class="quicktags" accesskey="m" title="<?php echo T_('More [Alt-M]') ?>" name="pagebreak" value="more" style="" onClick="bbinsert(document.post,'','<!--more-->')" /><input type="button" class="quicktags" accesskey="t" title="<?php echo T_('no teaser [Alt-T]') ?>" name="pagebreak" value="NT" style="" onClick="bbinsert(document.post,'','<!--noteaser-->')" /></div>
+<?php	
+}
 
-<br />
-
-<?php	// fplanque: added smiley block:
-	foreach($b2smiliestrans as $smiley => $img) 
+if( $use_smilies )
+{	// We are using smilies
+	echo '<div class="large">';
+	foreach($b2smilies as $smiley => $img) 
 	{
-		print '<img src="'.$smilies_directory.'/'.$img.'" alt="'.$smiley.'" class="middle"  onClick="bbinsert(document.post,\'\', \''.str_replace("'","\'",$smiley).'\')" /> '; // TODO: escape ' 	
+		echo '<img src="'.$smilies_directory.'/'.$img.'" alt="'.$smiley.'" class="middle"  onClick="bbinsert(document.post,\'\', \''.str_replace("'","\'",$smiley).'\')" /> '; // TODO: escape ' 	
 	}
+	echo '</div>';
+}
+
 ?>

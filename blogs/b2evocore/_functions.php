@@ -362,15 +362,53 @@ function convert_gmcode( & $content)
 	}
 }
 
+
+
+/* sorts the smilies' array by length
+  this is important if you want :)) to superseede :) for example
+*/
+function smiliescmp($a, $b)
+{
+	if(($diff = strlen($b) - strlen($a)) == 0)
+	{
+		return strcmp($a, $b);
+	}
+	return $diff;
+}
+
 /*
  * convert_smilies(-)
  */
 function convert_smilies( & $content)
 {
 	global $smilies_directory, $use_smilies;
-	global $b2_smiliessearch, $b2_smiliesreplace;
+	global $b2smilies, $b2_smiliessearch, $b2_smiliesreplace;
 	if ($use_smilies)
 	{
+		if( ! isset( $b2_smiliessearch ) )
+		{	// We haven't prepared the smilies yet
+			$b2_smiliessearch = array();
+			$tmpsmilies = $b2smilies;
+			uksort($tmpsmilies, 'smiliescmp');
+
+			foreach($tmpsmilies as $smiley => $img) 
+			{
+				$b2_smiliessearch[] = $smiley;
+				$smiley_masked = '';
+				for ($i = 0; $i < strlen($smiley); $i++ ) 
+				{
+					/* fplanque: with the #160s we prevent recurrent replacing... bleh :(
+						 fplanque changed $smiley_masked .= substr($smiley, $i, 1).chr(160);
+						 better way: (added benefit: handles ' and " escaping for alt attribute!... needed in :') )
+					*/
+					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
+				}
+				
+				$b2_smiliesreplace[] = "<img src='$smilies_directory/$img' alt='$smiley_masked' class='middle' />";
+			}
+		}
+
+		// REPLACE: 
 		$content = str_replace($b2_smiliessearch, $b2_smiliesreplace, $content);
 	}
 }

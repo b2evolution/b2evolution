@@ -10,9 +10,6 @@
 require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
 require_once(dirname(__FILE__)."/../conf/b2evo_admin.php");
 
-// If not in sidebar or bookmarklet
-if( ! isset($mode) ) $mode = '';
-
 // Do the MAIN initializations:
 $login_required = true;
 require_once(dirname(__FILE__)."/$b2inc/_main.php");
@@ -21,4 +18,5 @@ param( 'blog', 'integer', $default_to_blog, true );
 if( $blog != '' ) 
 	get_blogparams();
 
+param( 'mode', 'string', '' );		// Sidebar, bookmarklet
 ?>

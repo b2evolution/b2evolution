@@ -19,6 +19,9 @@
 	padding: 0ex;
 	margin: 1ex;
 }
+.bSideItem2 fieldset
+{
+}
 div.extracats
 {
 	height: auto;
@@ -30,4 +33,23 @@ div.extracats
 {
 	display: none;
 }
-
+span.line
+{
+	white-space: normal;
+	display: block;
+	
+}
+span.line input
+{
+	width: 95%;
+}
+input.large, 
+textarea.large,
+div.large
+{
+	width: 95%;
+	margin: 0ex;
+}
+div.panelinfo{
+	width: 80%;
+}

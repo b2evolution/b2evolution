@@ -232,12 +232,10 @@ case "editpost":
 			pingCafelog($cafelogID, $post_title, $post_ID);
 		}
 	}	
-	?>
 	
-	<p>Posting Done...<p>
+	echo '<p>', T_('Posting Done...'), '</p>';
 
-	<?php
-		$location="b2browse.php?blog=$blog";
+	$location="b2browse.php?blog=$blog";
 	break;
 
 
@@ -361,13 +359,24 @@ default:
 
 if( ! errors() )
 {
-?>
-<p><strong>[<a href="<?php echo $location ?>"><?php echo T_('Back to posts!') ?></a>]</strong></p>
-
-<p><?php echo T_('You may also want to generate static pages or view your blogs...') ?></p>
-<?php
-	// List the blogs:
-	require( dirname(__FILE__).'/_blogs_list.php'); 
+	if( empty( $mode ) )
+	{	// Normal mode:
+		?>
+		<p><strong>[<a href="<?php echo $location ?>"><?php echo T_('Back to posts!') ?></a>]</strong></p>
+		
+		<p><?php echo T_('You may also want to generate static pages or view your blogs...') ?></p>
+		<?php
+		// List the blogs:
+		require( dirname(__FILE__).'/_blogs_list.php'); 
+	}
+	else
+	{	// Special mode:
+	?>
+		<p><strong>[<a href="b2edit.php?blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
+	<?php
+	}
 }
+
+
 require( dirname(__FILE__).'/_footer.php' ); 
 ?>
