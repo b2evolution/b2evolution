@@ -7,7 +7,7 @@
  */
 require_once( dirname(__FILE__).'/_header.php' );
 
-param( 'blog', 'integer', $default_to_blog, true );
+param( 'blog', 'integer', 0, true );
 get_blogparams();
 
 param( 'action', 'string', '' );
@@ -363,7 +363,7 @@ case "delete":
 	$blog = get_catblog($postdata['Category']); 
 
 	// Check permission:
-	$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
+	$current_User->check_perm( 'blog_del_post', '', true, $blog );
 
 	$authordata = get_userdata($postdata['Author_ID']);
 	if ($user_level < $authordata['user_level'])
@@ -403,12 +403,19 @@ case "deletecomment":
 	if ($user_level == 0)
 		die ("Cheatin' uh ?");
 
-	param( 'comment', 'html' );
-	param( 'p', 'integer' );
-	$commentdata=get_commentdata($comment) or die(T_('Oops, no comment with this ID.'));
+	param( 'comment_ID', 'integer', true );
+	// echo $comment_ID;
+	$edited_Comment = Comment_get_by_ID( $comment_ID );
+	$comment_post_ID = $edited_Comment->get('post_ID');
+	// echo $comment_post_ID;
+	$postdata = get_postdata($comment_post_ID) or die(T_('Oops, no post with this ID.'));
+	$blog = get_catblog($postdata['Category']); 
 
-	$query = "DELETE FROM $tablecomments WHERE comment_ID=$comment";
-	$result = mysql_query($query) or mysql_oops( $query );
+	// Check permission:
+	$current_User->check_perm( 'blog_comments', '', true, $blog );
+
+	// Delete from Db:
+	$edited_Comment->dbdelete();
 
 	header ("Location: b2browse.php?blog=$blog&p=$p&c=1#comments"); //?a=dc");
 	exit();
@@ -423,21 +430,23 @@ case "editedcomment":
 	if ($user_level == 0)
 		die (T_("Cheatin' uh ?"));
 
-	param( 'blog', 'integer', true );
 	param( 'comment_ID', 'integer', true );
-	param( 'comment_post_ID', 'integer', true );
+	// echo $comment_ID;
+	$edited_Comment = Comment_get_by_ID( $comment_ID );
+	$comment_post_ID = $edited_Comment->get('post_ID');
+	// echo $comment_post_ID;
+	$postdata = get_postdata($comment_post_ID) or die(T_('Oops, no post with this ID.'));
+	$blog = get_catblog($postdata['Category']); 
+
+	// Check permission:
+	$current_User->check_perm( 'blog_comments', '', true, $blog );
+
 	param( 'newcomment_author', 'string', true );
 	param( 'newcomment_author_email', 'string' );
 	param( 'newcomment_author_url', 'string' );
 	param( 'content', 'html' );
 	param( "post_autobr", 'integer', ($comments_use_autobr == 'always')?1:0 );
 
-	if (($user_level > 4) && $edit_date) 
-	{
-		$datemodif = ", comment_date='". date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) )."' ";
-	} else {
-		$datemodif = "";
-	}
 
 	// CHECK and FORMAT content	
 	if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
@@ -452,11 +461,17 @@ case "editedcomment":
 		break;
 	}
 
-	$newcomment_author = addslashes($newcomment_author);
-	$newcomment_author_email = addslashes($newcomment_author_email);
-	$newcomment_author_url = addslashes($newcomment_author_url);
-	$query = "UPDATE $tablecomments SET comment_content='".addslashes($content)."', comment_author=\"$newcomment_author\", comment_author_email=\"$newcomment_author_email\", comment_author_url=\"$newcomment_author_url\"".$datemodif." WHERE comment_ID=$comment_ID";
-	$result = mysql_query($query) or mysql_oops($query);
+	$edited_Comment->set( 'content', $content );
+	$edited_Comment->set( 'author', $newcomment_author );
+	$edited_Comment->set( 'author_email', $newcomment_author_email );
+	$edited_Comment->set( 'author_url', $newcomment_author_url );
+
+	if (($user_level > 4) && $edit_date) 
+	{
+		$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );
+	}
+
+	$edited_Comment->dbupdate();	// Commit update to the DB
 
 	header ("Location: b2browse.php?blog=$blog&p=$comment_post_ID&c=1#comments"); //?a=ec");
 	exit();

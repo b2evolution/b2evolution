@@ -168,6 +168,25 @@ class DataObject
 		
 		return $result;
 	}
-	
+
+
+	/* 
+	 * DataObject::dbdelete(-)
+	 *
+	 * Delete object from DB
+	 */
+	function dbdelete( )
+	{
+		global $querycount;
+
+		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
+
+		$query = "DELETE FROM $this->dbtablename
+						  WHERE $this->dbIDname = $this->ID";
+		$result = mysql_query($query) or mysql_oops( $query );
+		$querycount++;
+
+		return true;
+	}	
 }
 ?>

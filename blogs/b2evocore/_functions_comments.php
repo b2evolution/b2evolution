@@ -7,6 +7,7 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
+require_once dirname(__FILE__).'/_class_comment.php';
 
 /*
  * generic_ctp_number(-) 
@@ -99,6 +100,7 @@ function generic_ctp_number($post_id, $mode = 'comments')
 function get_commentdata($comment_ID,$no_cache=0) 
 { // less flexible, but saves mysql queries
 	global $rowc,$id,$commentdata,$tablecomments,$querycount, $baseurl;
+
 	if ($no_cache) 
 	{
 		$query="SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
@@ -128,6 +130,30 @@ function get_commentdata($comment_ID,$no_cache=0)
 	return($myrow);
 }
 
+
+/*
+ * Comment_get_by_ID(-)
+ */
+function Comment_get_by_ID( $comment_ID ) 
+{
+	global $cache_Comments, $use_cache, $tablecomments, $querycount;
+	
+	if((empty($cache_Comments[$comment_ID])) OR (!$use_cache)) 
+	{	// Load this entry into cache:
+		$query = "SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
+		$result = mysql_query($query);
+		$querycount++;
+		if( mysql_num_rows( $result ) )
+		{
+			$row = mysql_fetch_array($result);
+			$cache_Comments[$comment_ID] = new Comment( $row );
+		}
+	}
+
+	if( empty( $cache_Comments[ $comment_ID ] ) ) die('Requested comment does not exist!');
+
+	return $cache_Comments[ $comment_ID ];
+}
 
 
 /* 

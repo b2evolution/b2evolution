@@ -52,6 +52,8 @@ switch( $next_action )
 			<tr>
 				<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
 				<th colspan="5"><?php echo T_('Can post/edit with following statuses:') ?></th>
+				<th rowspan="2"><?php echo T_('Delete<br />posts') ?></th>
+				<th rowspan="2"><?php echo T_('Edit<br />comments') ?></th>
 			</tr>
 			<tr>
 				<th><?php echo T_('Published') ?></th>
@@ -61,12 +63,17 @@ switch( $next_action )
 				<th><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="7">
+				<td colspan="8">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
 			<?php
-				$query = "SELECT ID, user_login, bloguser_perm_poststatuses FROM $tableusers INNER JOIN $tableblogusers ON ID = bloguser_user_ID WHERE bloguser_blog_ID = $blog ORDER BY user_login";
+				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, 
+													bloguser_perm_comments, bloguser_perm_delpost 
+									FROM $tableusers INNER JOIN $tableblogusers 
+													ON ID = bloguser_user_ID 
+									WHERE bloguser_blog_ID = $blog 
+									ORDER BY user_login";
 				$result = mysql_query($query) or mysql_oops( $query ); 
 				$querycount++; 
 				$members=array();
@@ -112,17 +119,32 @@ switch( $next_action )
 										<?php } ?>
 										value="deprecated" />
 						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_delpost_<?php echo $loop_row['ID'] ?>"
+										<?php if( $loop_row['bloguser_perm_delpost'] != 0  ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="1" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_comments_<?php echo $loop_row['ID'] ?>"
+										<?php if( $loop_row['bloguser_perm_comments'] != 0  ) { ?>
+										checked="checked"
+										<?php } ?>
+										value="1" />
+						</td>
 					</tr>
 					<?php
 				}
 				?>
 			<tr class="group">
-				<td colspan="7">
+				<td colspan="8">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
 				<?php
-				$query = "SELECT ID, user_login FROM $tableusers ";
+				$query = "SELECT ID, user_login 
+									FROM $tableusers ";
 				if( count( $members ) )
 				{
 					$query .= "WHERE ID NOT IN (".implode( ',', $members ) .") ";
@@ -154,6 +176,14 @@ switch( $next_action )
 						<td class="center">
 							<input type="checkbox" name="blog_perm_deprecated_<?php echo $loop_row['ID'] ?>"
 										value="deprecated" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_delpost_<?php echo $loop_row['ID'] ?>"
+										value="1" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_comments_<?php echo $loop_row['ID'] ?>"
+										value="1" />
 						</td>
 					</tr>
 					<?php

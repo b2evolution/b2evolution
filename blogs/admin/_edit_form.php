@@ -75,8 +75,6 @@ if ($use_spellchecker)
 <div class="bPost">
 	
 	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
-	<input type="hidden" name="editing" value="1" />
-	<input type="hidden" name="user_ID" value="<?php echo $user_ID ?>" />
 	<input type="hidden" id="action" name="action" value="<?php echo $form_action ?>" />
 	<input type="hidden" name="mode" value="<?php echo $mode ?>" />
 	<?php if( $action == 'edit' ) { ?>
@@ -117,7 +115,6 @@ if ($use_spellchecker)
 	{ // ------------------------------ COMMENT HEADER -----------------------
 		?>
 		<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
-		<input type="hidden" name="comment_post_ID" value="<?php echo $commentdata['comment_post_ID'] ?>" />
 	
 		<span class="line">
 		<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata['comment_author']) ?>" id="name" tabindex="1" />

@@ -285,20 +285,29 @@ switch($action)
 			$perm_name_deprecated = 'blog_perm_deprecated_'.$loop_user_ID;
 			param( $perm_name_deprecated, 'string', '' );
 			if( !empty($$perm_name_deprecated) ) $perm_post[] = $$perm_name_deprecated;
+
+			$perm_name_delpost = 'blog_perm_delpost_'.$loop_user_ID;
+			param( $perm_name_delpost, 'integer', 0 );
+			
+			$perm_name_comments = 'blog_perm_comments_'.$loop_user_ID;
+			param( $perm_name_comments, 'integer', 0 );
 			
 			// Update those permissions in DB:
 	
-			if( count($perm_post) )
+			if( count($perm_post) || $$perm_name_delpost || $$perm_name_comments )
 			{	// There are some permissions for this user:
 				// insert new perms:
-				$inserted_values[] = " ( $blog, $loop_user_ID, '".implode(',',$perm_post)."' )";
+				$inserted_values[] = " ( $blog, $loop_user_ID, '".implode(',',$perm_post)."', ".
+																	$$perm_name_delpost.", ".$$perm_name_comments." )";
 			}
 		}
 
 		// Proceed insertions:
 		if( count( $inserted_values ) )
 		{
-			$query_insert = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_perm_poststatuses ) VALUES ".implode( ',', $inserted_values );
+			$query_insert = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
+												bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments ) 
+											 VALUES ".implode( ',', $inserted_values );
 			// echo $query_insert, '<br />';
 			$res_update = mysql_query($query_insert) or mysql_oops( $query_insert ); 
 			$querycount++; 

@@ -184,7 +184,9 @@ class User extends DataObject
 		switch( $permname )
 		{
 			case 'blog_post_statuses':
-				$perm = $this->check_perm_blog_post_statuses( $permname, $permlevel, $perm_target );
+			case 'blog_del_post':
+			case 'blog_comments':
+				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				break;
 			
 			default:
@@ -201,11 +203,11 @@ class User extends DataObject
 	}
 
 	/*
-	 * User::check_perm_blog_post_statuses(-)
+	 * User::check_perm_blogusers(-)
 	 *
-	 * Check permission on allowed blog post statuses
+	 * Check permission on specified blog
 	 */
-	function check_perm_blog_post_statuses( $permname, $permlevel, $perm_target_blog )
+	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
 	{
 		global $tableblogusers, $querycount;
 		
@@ -218,7 +220,7 @@ class User extends DataObject
 
 			// Load now:
 			// echo 'loading allowed statuses';
-			$query = "SELECT bloguser_perm_poststatuses
+			$query = "SELECT bloguser_perm_poststatuses, bloguser_perm_comments, bloguser_perm_delpost
 								FROM $tableblogusers 
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
@@ -226,24 +228,57 @@ class User extends DataObject
 			$result = mysql_query($query) or mysql_oops( $query ); 
 			$querycount++; 
 			$row = mysql_fetch_array($result);
+
+			$this->blog_post_statuses[$perm_target_blog] = array();
+
 			$bloguser_perm_post = $row['bloguser_perm_poststatuses'];
 			if( empty($bloguser_perm_post ) )
-				$this->blog_post_statuses[$perm_target_blog] = array();
+				$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = array();
 			else
-				$this->blog_post_statuses[$perm_target_blog] = explode( ',', $bloguser_perm_post );
+				$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloguser_perm_post );
+
+			// echo $row['bloguser_perm_delpost'];
+			$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
+
+			// echo $row['bloguser_perm_comments'];
+			$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
 		}
 	
 		// Check if permission is granted:
-		if( $permlevel == 'any' )
-		{ // Any prermission will do:
-			// echo count($this->blog_post_statuses);
-			return ( count($this->blog_post_statuses[$perm_target_blog]) > 0 );
+		switch( $permname )
+		{
+			case 'blog_post_statuses':
+				if( $permlevel == 'any' )
+				{ // Any prermission will do:
+					// echo count($this->blog_post_statuses);
+					return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
+				}
+				
+				// We want a specific permission:
+				// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
+				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+
+			default:
+				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname];
+				return $this->blog_post_statuses[$perm_target_blog][$permname];
 		}
-		
-		// We want a specific permission:
-		// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
-		return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog] );
 	}
 	
+	
+	/*
+	 * User::is_blog_member(-)
+	 *
+	 * Check if user is a member of specified blog
+	 */
+	function is_blog_member( $blog_ID )
+	{
+		/* echo 'blog=',$blog_ID ,'<br />';
+		echo 'statuses=', $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID ) ,'<br />';
+		echo 'statuses=', $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )  ,'<br />';
+		echo 'statuses=', $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )  ,'<br />'; */
+		return ( $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID )
+					 || $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
+					 || $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) );
+	}
 }
 ?>

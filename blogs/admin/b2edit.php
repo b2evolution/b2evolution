@@ -8,14 +8,7 @@
  */
 require_once (dirname(__FILE__).'/_header.php');
 
-param( 'blog', 'integer', $default_to_blog, true );
-if( $blog == 0 ) $blog = $default_to_blog;
-get_blogparams();
-
 param( 'action', 'string' );
-
-// All statuses are allowed for acting on:
-$show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
 switch($action) 
 {
@@ -109,12 +102,25 @@ default:
 	$title = T_('New post in blog:');
 	require (dirname(__FILE__).'/_menutop.php');
 
+	if( ($blog == 0) && $current_User->check_perm_blogusers( 'blog_post_statuses', 'any', $default_to_blog ) )
+	{	// Default blog is a valid choice
+		$blog = $default_to_blog;
+	}
+
 	// ---------------------------------- START OF BLOG LIST ----------------------------------
 	$sep = '';
 	for( $curr_blog_ID=blog_list_start('stub'); 
 				$curr_blog_ID!=false; 
 				 $curr_blog_ID=blog_list_next('stub') ) 
 	{ 
+		if( ! $current_User->check_perm_blogusers( 'blog_post_statuses', 'any', $curr_blog_ID ) )
+		{	// Current user is not a member of this blog...
+			continue;
+		}
+		if( $blog == 0 )
+		{	// If no selected blog yet, select this one:
+			$blog = $curr_blog_ID;
+		}
 		echo $sep;
 		if( $curr_blog_ID == $blog ) echo '<strong>';
 		// This is for when Javascript is not available:
@@ -135,6 +141,8 @@ default:
 	} // --------------------------------- END OF BLOG LIST --------------------------------- 
 
 	require (dirname(__FILE__).'/_menutop_end.php');
+
+	get_blogparams();
 
 	// Check permission:
 	$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
