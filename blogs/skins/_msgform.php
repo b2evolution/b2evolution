@@ -7,6 +7,12 @@
 	 * To display a feedback, you should call a stub AND pass the right parameters
 	 * For example: /blogs/index.php?disp=msgform&recipient_id=n
 	 * Note: don't code this URL by hand, use the template functions to generate it!
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package evoskins
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -39,28 +45,31 @@
 		$user = new User($user);
 		$recipient_name = $user->get('preferedname');
 	}
-	elseif (!empty($comment_id))
+	elseif(!empty($comment_id))
 	{ // If the email is to a non user comment poster get the email address from the comments table
 		$sql = 'SELECT comment_author, comment_author_email
-			FROM T_comments
-			WHERE comment_ID = '.$comment_id;
+						FROM T_comments
+						WHERE comment_ID = '.$comment_id;
 		$row = $DB->get_row( $sql );
 		$recipient_name = $row->comment_author;
 	}
 	else
 	{ // Error Gracefully
-		echo 'error';
+		echo 'No recipient specified!';
 		exit;
 	}
 
 	// Get the subject of the email
 	if( !empty($comment_id) || !empty($post_id))
 	{
-		$sql = "SELECT post_title FROM T_posts WHERE ID = '$post_id'";
+		$sql = "SELECT post_title
+						FROM T_posts
+						WHERE ID = '$post_id'";
 		$row = $DB->get_row( $sql );
 		$subject = T_('Re:').' '.$row->post_title;
 	}
 ?>
+	<h2><?php echo T_('Send an email message') ?>:</h2>
 
 	<!-- form to send email -->
 	<form action="<?php echo $htsrv_url ?>message_send.php" method="post" class="bComment">
@@ -85,23 +94,19 @@
 
 		<fieldset>
 			<div class="label"><label for="to"><?php echo T_('To')?>:</label></div>
-			<div class="input"><?php echo $recipient_name;?></div>
+			<div class="info"><strong><?php echo $recipient_name;?></strong></div>
 		</fieldset>
 
 		<?php
-			form_text( 'sender_name', $email_author, 40, T_('From'), '', 50, 'bComment' );
-			form_text( 'sender_address', $email_author_address, 40, T_('E-mail Address'), '',50, 'bComment' );
-			form_text( 'subject', $subject, 40, T_('Subject'), '',50, 'bComment' );
+			form_text( 'sender_name', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'bComment' );
+			form_text( 'sender_address', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
+			form_text( 'subject', $subject, 40, T_('Subject'), T_('Subject of email message.'), 50, 'bComment' );
+			form_textarea( 'message', '', 15, T_('Message'), T_('Plain text only.'), 40, 'bComment' );
 		?>
 
 		<fieldset>
-			<div class="label"><label for="message"><?php echo T_('Message')?>:</label></div>
-			<div class="input"><textarea name="message" id="message" rows="15" cols="25" class="bComment"></textarea></div>
-		</fieldset>
-		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" class="submit" value="<?php echo T_('Send') ?>" />
-				<input type="reset" class="reset" value="<?php echo T_('Reset') ?>" />
+				<input type="submit" name="submit" class="submit" value="<?php echo T_('Send message') ?>" />
 			</div>
 		</fieldset>
 

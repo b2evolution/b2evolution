@@ -7,7 +7,7 @@
 	 * It is meant to be called by an include in the _main.php template.
 	 * To display a feedback, you should call a stub AND pass the right parameters
 	 * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
-	 * Note: don't cod ethis URL by hand, use the template functions to generate it!
+	 * Note: don't code this URL by hand, use the template functions to generate it!
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

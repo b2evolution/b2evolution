@@ -91,8 +91,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 		<?php
 			$Item->issue_time();
-			echo ', ', T_('Categories'), ': ';
-			$Item->categories();
+			echo ', by ';
+			$Item->Author->prefered_name();
+		?>
+		<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" class="middle" alt="<?php echo T_('EMail') ?>" /></a>
+		<?php
 			echo ', ';
 			$Item->wordcount();
 			echo ' ', T_('words');
@@ -101,6 +104,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			echo ' '.T_('views');
 			echo ' &nbsp; ';
 			locale_flag( $Item->locale, 'h10px' );
+			echo '<br /> ', T_('Categories'), ': ';
+			$Item->categories();
 		?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -110,8 +115,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</div>
 		<div class="bSmallPrint">
 			<span class="bIcons">
-				<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" class="middle" alt="<?php echo T_('EMail') ?>" /></a>
-				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a> 
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a>
 			</span>
 
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>

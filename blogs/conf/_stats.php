@@ -18,11 +18,19 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * Stat filters:
  */
 
-# Blacklist: domains that should not be logged for stats
-# The following substrings will be looked up in the referer http header
-# THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam
+/**
+ * Blacklist: domains that should not be logged for stats
+ *
+ * The following substrings will be looked up in the referer http header
+ * THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam
+ * WARNING: you should *NOT* use a slash at the end of simple domain names, as
+ * older Netscape browsers will not send these. For example you should list
+ * http://www.example.com instead of http://www.example.com/ .
+ *
+ * TODO: handle multiple blog roots.
+ */
 $blackList = array(
-	$baseurl,
+	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash
 	'localhost',
 	'127.0.0.1',
 	// stat services

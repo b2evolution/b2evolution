@@ -17,6 +17,9 @@ require_once( dirname(__FILE__) . '/../b2evocore/_main.php' );
 // statuses allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private' );
 
+// Only for 0.9.0.11, for users who will not update their conf! :/
+if( !isset($minimum_comment_interval) ) $minimum_comment_interval = 30;
+
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 

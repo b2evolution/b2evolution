@@ -60,7 +60,7 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 /**
  *
  *
- *
+ * form_textarea(-)
  */
 function form_textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '' )
 {
