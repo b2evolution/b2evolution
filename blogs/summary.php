@@ -88,7 +88,7 @@
 			?>
 			<li lang="<?php the_lang() ?>">
 				<?php the_time( 'd.m.y' ) ?>:
-				<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><?php the_title( '', '', false ); ?></a>
+				<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php the_title( '', '', false ); ?></a>
 				<span class="small">[<?php the_lang() ?>]</span>
 			</li>
 			<?php

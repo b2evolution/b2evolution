@@ -133,7 +133,7 @@ the_date( '', '<h2>', '</h2>' );
 	<div class="bPost" lang="<?php the_lang() ?>">
 		<?php permalink_anchor(); ?>
 		<div class="bSmallHead">
-		<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
+		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 		<?php the_time();  echo ', ', T_('Categories'), ': ';  the_categories() ?>
 		</div>
 		<h3 class="bTitle"><?php the_title(); ?></h3>
@@ -142,14 +142,14 @@ the_date( '', '<h2>', '</h2>' );
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
-		<a href="<?php permalink_link() ?>#comments" title="Display comments / Leave a comment"><?php comments_number() ?></a>
+		<a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
 		-
-		<a href="<?php permalink_link() ?>#trackbacks" title="Display trackbacks / Get trackback address for this post"><?php trackback_number() ?></a>
+		<a href="<?php permalink_link() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
-		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
+		<a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
 		-
-		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
+		<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><?php echo T_('Permalink') ?></a>
 		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
 		</div>
 		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
@@ -217,7 +217,7 @@ the_date( '', '<h2>', '</h2>' );
 		<div class="bPostSide" lang="<?php the_lang() ?>">
 			<?php permalink_anchor(); ?>
 	
-			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
+			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
 			<div class="bText">
 				<?php the_content(); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>
@@ -252,7 +252,7 @@ the_date( '', '<h2>', '</h2>' );
 		<div class="bPostSide" lang="<?php the_lang() ?>">
 			<?php permalink_anchor(); ?>
 	
-			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
+			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
 			<div class="bText">
 				<?php the_content(); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>

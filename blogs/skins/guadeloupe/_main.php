@@ -59,7 +59,7 @@
 <h2><?php the_title(); ?></h2>
 <div class=infos>
 <h3><?php the_date() ?> <a 
-href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&nbsp; 
+href="<?php permalink_link() ?>" title="<?php echo T_('Permalink') ?>"><?php the_time() ?></a></h3>&nbsp; 
 
 <h4><?php the_categories() ?></h4>
 </div>
@@ -67,7 +67,7 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 	<?php the_content(); ?>
 	<?php link_pages("<br />Pages: ","<br />","number") ?>
 </div>
-<div class=interaction><a href="<?php permalink_link() ?>#comments" title="Display feedback / Leave a comment"><?php comments_number() ?>, <?php trackback_number() ?>, <?php pingback_number() ?></a>
+<div class=interaction><a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display feedback / Leave a comment') ?>"><?php comments_number() ?>, <?php trackback_number() ?>, <?php pingback_number() ?></a>
 <?php trackback_rdf() // trackback autodiscovery information ?>
 </div>
 

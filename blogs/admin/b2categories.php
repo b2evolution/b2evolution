@@ -12,7 +12,7 @@ param( 'action', 'string' );
 
 switch($action) 
 {
-case "newcat":
+case 'newcat':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
@@ -46,14 +46,14 @@ case "newcat":
 	?>
 		<input type="hidden" name="action" value="addcat" />
 		<p><?php echo T_('New category name') ?>: <input type="text" name="cat_name" /></p>
-		<input type="submit" name="submit" value="Create category" class="search" />
+		<input type="submit" name="submit" value="<?php echo T_('Create category') ?>" class="search" />
 	</form>
 	</div>
 	<?php
 	break;
 
 
-case "addcat":
+case 'addcat':
 	/*
 	 * INSERT new cat into db
 	 */
@@ -106,9 +106,7 @@ case "Delete":
 	break;
 	
 	
-
-
-case "Edit":
+case 'Edit':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 	param( 'cat_ID', 'integer' );
@@ -126,7 +124,7 @@ case "Edit":
 		<input type="hidden" name="cat_ID" value="<?php echo $cat_ID ?>" />
 		<input type="text" name="cat_name" value="<?php echo $cat_name ?>" />
 		<h3><?php echo T_('New parent category') ?>:</h3>
-<?php		
+	<?php		
 	// ----------------- START RECURSIVE CAT LIST ----------------
 	cat_query();	// make sure the caches are loaded
 	function cat_move_before_first( $parent_cat_ID, $level )
@@ -168,18 +166,18 @@ case "Edit":
 			if( ! $cat_parent_ID ) echo 'checked="checked"';
 		?>
 		/>
-		<label for="cat_parent_none"><strong>Root (No parent)</strong></label>
+		<label for="cat_parent_none"><strong><?php echo T_('Root (No parent)') ?></strong></label>
 		<?php	
 		if( ! $cat_parent_ID ) echo ' &lt;= ', T_('Old Parent');
 		echo "</li>\n";
 
 
 	// RECURSE:
-	cat_children( $cache_categories, $cat_blog, NULL, cat_move_before_first, cat_move_before_each, cat_move_after_each, cat_move_after_last );
+	cat_children( $cache_categories, $cat_blog, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
 
 	// ----------------- END RECURSIVE CAT LIST ----------------
 ?>		
-		<input type="submit" name="submit" value="Edit it !" class="search" />
+		<input type="submit" name="submit" value="<?php echo T_('Edit category!') ?>" class="search" />
 	</form>
 	</div>
 
@@ -187,7 +185,8 @@ case "Edit":
 
 	break;
 
-case "editedcat":
+
+case 'editedcat':
 	if ($user_level < 3)
 	die ("Cheatin' uh ?");
 	
@@ -216,7 +215,7 @@ break;
 ?>
 
 <div class="panelblock">
-<h2>Categories:</h2>
+<h2><?php echo T_('Categories') ?>:</h2>
 <?php 
 	
 	// ----------------- START RECURSIVE CAT LIST ----------------

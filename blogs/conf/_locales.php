@@ -37,7 +37,7 @@ $languages = array(
 $default_locale = 'en_US';
 
 
-// $default_locale = 'fr_FR';			// For testing :))
+$default_locale = 'fr_FR';			// For testing :))
 // $default_locale = 'pt_BR';			// For testing :))
 // $default_locale = 'ja_JP';			// For testing :))
 // $default_locale = 'nl_NL';			// For testing :))

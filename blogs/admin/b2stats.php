@@ -203,6 +203,7 @@ switch( $show )
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
+			<td><?php stats_time() ?></td>
 			<td>
 				<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 				[<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Log as a search instead') ?>"><?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?></a>]
@@ -245,6 +246,7 @@ switch( $show )
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
+			<td><?php stats_time() ?></td>
 			<td>
 				<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=refsearches&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 				<?php stats_basedomain() ?></td>
@@ -324,6 +326,7 @@ switch( $show )
 	<table class='thin'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
+			<td><?php stats_time() ?></td>
 			<td>
 				<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
@@ -345,7 +348,7 @@ switch( $show )
 
 	<?php stats_blog_select(); ?>
 
-	<h3>Top User Agents:</h3>
+	<h3><?php echo T_('Top User Agents') ?>:</h3>
 	<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'hit_user_agent',$blog,true,true); ?>
 	<table class='invisible'>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>

@@ -128,11 +128,7 @@ case 'post':
 			break;
 	}
 
-	?>
-	
-	<p>Posting Done...<p>
-
-	<?php
+	echo '<p>', T_('Posting Done...'), '</p>';
 	break;
 
 

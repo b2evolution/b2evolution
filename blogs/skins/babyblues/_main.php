@@ -27,10 +27,10 @@
 {
 ?>
 <div class="date" align="right">	<?php the_date(); ?> </div><br />
-<?php permalink_anchor(); ?>
-			<div class="title"><?php the_title(); ?></div>
-<?php the_content(); ?>
-		  <?php link_pages("<br />Pages: ","<br />","number") ?>
+	<?php permalink_anchor(); ?>
+	<div class="title"><?php the_title(); ?></div>
+	<?php the_content(); ?>
+	 <?php link_pages("<br />Pages: ","<br />","number") ?>
 
    <div class="posted">by <?php the_author() ?> at <a href="<?php permalink_link() ?>"><?php the_time() ?></a><br />
 	<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |

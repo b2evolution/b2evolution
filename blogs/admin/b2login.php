@@ -14,10 +14,9 @@ require_once(dirname(__FILE__)."/$admin_dirout/$core_subdir/_main.php");
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('Login...') ?></title>
-	<link rel="stylesheet" href="b2.css" type="text/css">
 </head>
-<body bgcolor="#ffffff" text="#000000" link="#cccccc" vlink="#cccccc" alink="#ff0000">
-<p>In b2evolution, you do not need to point to the b2login.php page to log in.</p>
-<p>Simply point directly to the backoffice page you need, for example: <a href="b2edit.php">b2edit.php</a> or <a href="b2browse.php">b2browse.php</a>. b2evo will prompt you to log in if needed.</p>
+<body>
+<p><?php echo T_('In b2evolution, you do not need to point to the b2login.php page to log in.') ?></p>
+<p><?php printf( T_('Simply point directly to the backoffice page you need, for example: %s or %s. b2evo will prompt you to log in if needed.'), '<a href="b2edit.php">b2edit.php</a>', '<a href="b2browse.php">b2browse.php</a>' ); ?></p>
 </body>
 </html>

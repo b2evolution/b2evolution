@@ -73,7 +73,7 @@ if(index<flen){
 <body LANGUAGE=javascript onload="return window_onload()">
 <form action="" method="post" name="SPELLDATA" LANGUAGE="javascript">
 
-	<h1>Loading Spell Checker. Please wait</h1>
+	<h1><?php echo T_('Loading Spell Checker. Please wait') ?></h1>
    <input name="formname"  type="hidden" > 
    <input name="messagebodyname" type="hidden" > 
    <input name="subjectname" type="hidden" >

@@ -39,7 +39,7 @@ function dbg($string)
  */
 function log_hit()
 {
-	global $querycount, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
+	global $querycount, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
 	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER;
 	
 	$ReqURI = $_SERVER['REQUEST_URI'];
@@ -177,8 +177,8 @@ function log_hit()
 	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
 	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
 
-	$sql ="insert into $tablehitlog( visitURL, hit_ignore, referingURL, baseDomain, hit_blog_ID, hit_remote_addr, hit_user_agent ) ";
-	$sql .= "values( '".addslashes($ReqURI)."', '$ignore', '".addslashes($ref)."', '".addslashes($baseDomain)."', $blog, '$RemoteAddr', '".addslashes($UserAgent)."')";
+	$sql ="insert into $tablehitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain, hit_blog_ID, hit_remote_addr, hit_user_agent ) ";
+	$sql .= "values( FROM_UNIXTIME(".$localtimenow."), '".addslashes($ReqURI)."', '$ignore', '".addslashes($ref)."', '".addslashes($baseDomain)."', $blog, '$RemoteAddr', '".addslashes($UserAgent)."')";
 
 
 	// print $sql;
@@ -213,7 +213,10 @@ function hit_change_type( $hit_ID, $type )
 {
 	global $tablehitlog, $querycount;
 
-	$sql ="UPDATE $tablehitlog SET hit_ignore = '$type' WHERE visitID = $hit_ID";
+	$sql ="UPDATE $tablehitlog ".
+				"SET hit_ignore = '$type', ".
+				"    visitTime = visitTime ".	// prevent mySQL from updating timestamp
+				"WHERE visitID = $hit_ID";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 
@@ -253,7 +256,7 @@ function refererList(
 
 	if( $groupby == '' )
 	{	// No grouping:
-		$sql = "SELECT visitID, referingURL, baseDomain";
+		$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL, baseDomain";
 	}
 	else
 	{	// group by
@@ -321,6 +324,17 @@ function stats_hit_ID()
 {
 	global $row_stats;
 	echo $row_stats['visitID'];
+}
+
+/*
+ * stats_time(-)
+ */
+function stats_time( $format = '' )
+{
+	global $row_stats;
+	if( $format == '' ) 
+		$format = locale_datefmt().' '.locale_timefmt();
+	echo date_i18n( $format, $row_stats['visitTime'] );
 }
 
 

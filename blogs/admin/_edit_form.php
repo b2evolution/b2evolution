@@ -170,7 +170,7 @@ if ($use_spellchecker)
 	
 	if($use_preview && ($action != 'editcomment') )  
 	{ ?>
-	<input type="button" value="Preview" onClick="open_preview(this.form);" class="search" tabindex="9" />
+	<input type="button" value="<?php echo T_('Preview') ?>" onClick="open_preview(this.form);" class="search" tabindex="9" />
 	<?php 
 	}
 	

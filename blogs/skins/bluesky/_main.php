@@ -67,7 +67,7 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 	<?php the_content(); ?>
 	<?php link_pages("<br />Pages: ","<br />","number") ?>
 </div>
-<div class=interaction><a href="<?php permalink_link() ?>#comments" title="Display feedback / Leave a comment"><?php comments_number() ?>, <?php trackback_number() ?>, <?php pingback_number() ?></a>
+<div class=interaction><a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display feedback / Leave a comment') ?>"><?php comments_number() ?>, <?php trackback_number() ?>, <?php pingback_number() ?></a>
 <?php trackback_rdf() // trackback autodiscovery information ?>
 </div>
 
