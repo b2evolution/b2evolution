@@ -433,19 +433,12 @@ function the_wordcount()
  * 03.10.10 - Updated function to allow for silent operations
  */
 function the_title( 
-	$before='#',		// HTML/text to be displayed before title
-	$after='#', 		// HTML/text to be displayed after title
-	$add_link = '#', 	// Added link to this title?
-	$format = '#', 		// Format to use (example: "htmlbody" or "xml")
-	$disp = true )		// Display output?
+	$before='',						// HTML/text to be displayed before title
+	$after='', 						// HTML/text to be displayed after title
+	$add_link = true, 		// Added link to this title?
+	$format = 'htmlbody',	// Format to use (example: "htmlbody" or "xml")
+	$disp = true )				// Display output?
 {
-//////
-//	ADDED: 03.10.08 by Travis S.
-//		Created shorthand defaults to stream PHP-code in display.
-	if( $before == '#' ) $before = '';
-	if( $after == '#' ) $after = '';
-	if( $add_link == '#' ) $add_link = true;
-	if( $format == '#' ) $format = 'htmlbody';
 	global $postdata; 
 	
 	$title = get_the_title();
@@ -468,16 +461,12 @@ function the_title(
 		$title = $before.$title.$after;
 	}
 
-//////
-//	ADDED: 03.10.08 by Travis S.
-//		Support for silent operation
-//	MODIFIED: 03.10.10 by Travis S.
-//		Changed to from $run_silent with a false positive to $disp == true to display
+	//	ADDED: 03.10.08 by Travis S. :Support for silent operation
 	$return_str = format_to_output( $title, $format );
 	if( $disp == true )
 		echo $return_str;
-	
-	return $return_str;
+	else
+		return $return_str;
 }
 
 
