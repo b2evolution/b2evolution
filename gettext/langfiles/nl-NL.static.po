@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-16 22:47+0100\n"
+"PO-Revision-Date: 2004-05-16 23:18+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -208,7 +208,7 @@ msgstr "Upload de b2evolution bestanden naar je website, die gelijk is aan de UR
 
 #: ../../doc/install_new.src.html:42
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
-msgstr ""
+msgstr "Alleen de inhoud van de <code>/blogs</code> map zijn nodig om te uploaden naar jouw site. Als je b2evolution als jouw standaard webpage wilt, upload dan de inhoud van de <code>/blogs</code> naar jouw hoofdmap op de webserver. Je kan de  <code>/blogs</code> map naam houden, maar je kan ook een andere naam kiezen."
 
 #: ../../doc/install_new.src.html:45
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
@@ -216,7 +216,7 @@ msgstr "Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinsta
 
 #: ../../doc/install_new.src.html:46
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
-msgstr ""
+msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken en b2evolution voor jou configureren."
 
 #: ../../doc/install_new.src.html:49
 #: ../../doc/upgradefrom_b2.src.html:67
@@ -274,7 +274,7 @@ msgstr "Waarom dezelfde database? Omdat het SQL proces dat we gebruiken om de da
 
 #: ../../doc/upgradefrom_b2.src.html:60
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>"
-msgstr ""
+msgstr "Alleen de inhoud van de <code>/blogs</code> map zijn nodig om te uploaden naar jouw site. Als je b2evolution als jouw standaard webpage wilt, upload dan de inhoud van de <code>/blogs</code> naar jouw hoofdmap op de webserver. Maar, je kan ook beginnen met het uploaden van de bestanden naar een nieuwe map, <code>/b2evo</code> bijvoorbeeld; op die manier <strong>blijft jouw bestaande Cafelog/b2 weblog volledig beschikbaar terwijl jij b2evolution ontdekt.</strong>"
 
 #: ../../doc/upgradefrom_b2.src.html:62
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
@@ -282,7 +282,7 @@ msgstr "Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinsta
 
 #: ../../doc/upgradefrom_b2.src.html:64
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
-msgstr ""
+msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen, de database tabellen aanmaken, kopieren van jouw b2 data naar b2evo (zonder daarbij b2 aan te passen) en b2evolution voor jou configureren."
 
 #: ../../doc/upgradefrom_b2.src.html:69
 msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
@@ -307,13 +307,13 @@ msgstr "Verwijder alle bestaande b2evolution bestanden voordat je de nieuwe uplo
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
 msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
-msgstr ""
+msgstr "Upload <strong>alle nieuwe b2evolution bestanden van de /blogs map</strong> naar jouw site. We kunnen het genoeg zeggen: <strong>ALLE BESTANDEN</strong>!En dat betekent dat je niet jouw aangepaste bestanden kunt hergebruiken, inclusief /conf,skins, weblog sjablonen, stub bestanden zoals ze nu zijn.<br /><br /> Dat betekent dat al deze bestanden opnieuw moet aanpassen. Dit spijt ons, maar door het toevoegen van nieuwe functies e.d., kunnen we niet garanderen dat iets zal werken wanneer je oude bestanden laat staan. <strong>Maar</strong>, omdat je alles hebt gebacked up in stap 1, kan je proberen gedeeltes weer werkend te krijgen nadat het bijwerk proces klaar is. Zie stap 8 hieronder."
 
 #: ../../doc/upgradefrom_b2evo.src.html:41
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
-msgstr ""
+msgstr "Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen (tenzij je zelf al het /conf/_config.php bestand hebt bijgewerkt voordat je hebt geupload), daarna kan je de database bijwerken van een vorige versie van b2evolution naar de nieuwe."
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
-msgstr ""
+msgstr "Het is nu tijd om je vorige aanpassingen terug te brengen. We raden je aan om een diff/merge tool zoals <a %s>WinMerge</a> hiervoor te gebruiken. Die stelt je in staat om makkelijk jouw oude (bakuped) bestanden te vergelijken met de nieuwe bestanden (zelfs hele mappen in één keer) en de verschillen weer te geven.<br /> <br /> Je kan ook de <a %s>wiki</a> of het <a %s>forum</a> voor aanwijzingen over het bijwerken van specifieke bestanden van een vorige versie naar een andere."
 
