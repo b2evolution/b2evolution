@@ -1,6 +1,6 @@
 <?php 
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
-$title = _('Profile');
+$title = T_('Profile');
 
 function add_magic_quotes($array) {
 	foreach ($array as $k => $v) {
@@ -45,45 +45,45 @@ switch($action)
 		if( !isset($demo_mode) ) $demo_mode = 0;
 		if( $demo_mode && ($user_login == 'demouser'))
 		{
-			die( 'Demo mode: you can\'t edit the demouser profile!'.'<br />[<a href="javascript:history.go(-1)">'. _('Back to profile'). '</a>]' );
+			die( 'Demo mode: you can\'t edit the demouser profile!'.'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 		}
 	
 		/* checking the nickname has been typed */
 		if (empty($HTTP_POST_VARS['newuser_nickname'])) {
-			die ('<strong>'._('ERROR').'</strong>: '._('please enter your nickname (can be the same as your login)').'<br />[<a href="javascript:history.go(-1)">'. _('Back to profile'). '</a>]' );
+			die ('<strong>'.T_('ERROR').'</strong>: '.T_('please enter your nickname (can be the same as your login)').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
 	
 		/* if the ICQ UIN has been entered, check to see if it has only numbers */
 		if (!empty($HTTP_POST_VARS['newuser_icq'])) {
 			if ((ereg("^[0-9]+$",$HTTP_POST_VARS["newuser_icq"]))==false) {
-				die ('<strong>'. _('ERROR'). '</strong>: '. _('your ICQ UIN can only be a number, no letters allowed').'<br />[<a href="javascript:history.go(-1)">'. _('Back to profile'). '</a>]' );
+				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('your ICQ UIN can only be a number, no letters allowed').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 				return false;
 			}
 		}
 	
 		/* checking e-mail address */
 		if (empty($HTTP_POST_VARS["newuser_email"])) {
-			die ('<strong>'. _('ERROR'). '</strong>: '. _('please type your e-mail address').'<br />[<a href="javascript:history.go(-1)">'. _('Back to profile'). '</a>]' );
+			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('please type your e-mail address').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		} else if (!is_email($_POST['newuser_email'])) {
-			die ('<strong>'. _('ERROR'). '</strong>: '. _('the email address isn\'t correct').'<br />[<a href="javascript:history.go(-1)">'. _('Back to profile'). '</a>]' );
+			die ('<strong>'. T_('ERROR'). '</strong>: '. T_('the email address isn\'t correct').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 			return false;
 		}
 	
 		if ($HTTP_POST_VARS["pass1"] == "") {
 			if ($HTTP_POST_VARS["pass2"] != "")
-				die ('<strong>'. _('ERROR'). '</strong>: '. _('you typed your new password only once. Go back to type it twice.'));
+				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.'));
 			$updatepassword = "";
 		} else {
 			if ($HTTP_POST_VARS["pass2"] == "")
-				die ('<strong>'. _('ERROR'). '</strong>: '. _('you typed your new password only once. Go back to type it twice.') );
+				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed your new password only once. Go back to type it twice.') );
 			if ($HTTP_POST_VARS["pass1"] != $HTTP_POST_VARS["pass2"])
-				die ('<strong>'. _('ERROR'). '</strong>: '. _('you typed two different passwords. Go back to correct that.') );
+				die ('<strong>'. T_('ERROR'). '</strong>: '. T_('you typed two different passwords. Go back to correct that.') );
 			$newuser_pass = $HTTP_POST_VARS["pass1"];
 			$updatepassword = "user_pass='$newuser_pass', ";
 			if( !setcookie( $cookie_pass, md5($newuser_pass), $cookie_expires, $cookie_path, $cookie_domain) )
-				printf( _('setcookie %s failed!'), $cookie_pass ); 
+				printf( T_('setcookie %s failed!'), $cookie_pass ); 
 				echo '<br />';
 		}
 	
@@ -104,8 +104,8 @@ switch($action)
 		?>
 		<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 		<body onload="window.close();">
-			<?php echo _('Profile updated!') ?><br />
-			<?php echo _('If that window doesn\'t close itself, close it yourself :p') ?>
+			<?php echo T_('Profile updated!') ?><br />
+			<?php echo T_('If that window doesn\'t close itself, close it yourself :p') ?>
 		</body>
 		</html>
 		<?php
@@ -135,43 +135,43 @@ switch($action)
 	
 		<table cellpadding="5" cellspacing="0">
 		<tr>
-		<td align="right"><strong><?php echo _('Login:') ?></strong></td>
+		<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
 		<td><?php echo $profiledata["user_login"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('First name') ?></strong></td>
+		<td align="right"><strong><?php echo T_('First name') ?></strong></td>
 		<td><?php echo $profiledata["user_firstname"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('Last name') ?></strong></td>
+		<td align="right"><strong><?php echo T_('Last name') ?></strong></td>
 		<td><?php echo $profiledata["user_lastname"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('Nickname') ?></strong></td>
+		<td align="right"><strong><?php echo T_('Nickname') ?></strong></td>
 		<td><?php echo $profiledata["user_nickname"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('Email') ?></strong></td>
+		<td align="right"><strong><?php echo T_('Email') ?></strong></td>
 		<td><?php echo make_clickable($profiledata["user_email"]) ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('URL') ?></strong></td>
+		<td align="right"><strong><?php echo T_('URL') ?></strong></td>
 		<td><?php echo $profiledata["user_url"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('ICQ') ?></strong></td>
+		<td align="right"><strong><?php echo T_('ICQ') ?></strong></td>
 		<td><?php if ($profiledata["user_icq"] > 0) { echo make_clickable("icq:".$profiledata["user_icq"]); } ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('AIM') ?></strong></td>
+		<td align="right"><strong><?php echo T_('AIM') ?></strong></td>
 		<td><?php echo make_clickable("aim:".$profiledata["user_aim"]) ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('MSN IM') ?></strong></td>
+		<td align="right"><strong><?php echo T_('MSN IM') ?></strong></td>
 		<td><?php echo $profiledata["user_msn"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('YahooIM') ?></strong></td>
+		<td align="right"><strong><?php echo T_('YahooIM') ?></strong></td>
 		<td><?php echo $profiledata["user_yim"] ?></td>
 		</tr>
 		</table>
@@ -182,16 +182,16 @@ switch($action)
 		<table cellpadding="5" cellspacing="0">
 		<tr>
 		<td>
-		<strong><?php echo _('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
+		<strong><?php echo T_('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
 		</tr>
 		<tr>
 		<td>
-		<strong><?php echo _('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
+		<strong><?php echo T_('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
 		</td>
 		</tr>
 		<tr>
 		<td>
-		<strong><?php echo _('Posts') ?>:</strong>
+		<strong><?php echo T_('Posts') ?>:</strong>
 		<?php
 		$posts=get_usernumposts($user);
 		echo $posts;
@@ -200,7 +200,7 @@ switch($action)
 		</tr>
 		<tr>
 		<td>
-		<strong><?php echo _('Identity') ?>:</strong><br />
+		<strong><?php echo T_('Identity') ?>:</strong><br />
 		<?php
 		switch($profiledata["user_idmode"]) {
 			case "nickname":
@@ -249,22 +249,22 @@ switch($action)
 	
 		?>
 	
-		<div class="menutop">&nbsp;<?php echo _('IE one-click bookmarklet') ?></div>
+		<div class="menutop">&nbsp;<?php echo T_('IE one-click bookmarklet') ?></div>
 	
 		<table width="100%" cellpadding="20">
 		<tr><td>
 	
-		<p><?php echo _('To have a one-click bookmarklet, just copy and paste this into a new text file:') ?></p>
+		<p><?php echo T_('To have a one-click bookmarklet, just copy and paste this into a new text file:') ?></p>
 		<?php
 		$regedit = "REGEDIT4\r\n[HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\MenuExt\Post To &b2 : ".$blogname."]\r\n@=\"javascript:doc=external.menuArguments.document;Q=doc.selection.createRange().text;void(btw=window.open('".$pathserver."/b2bookmarklet.php?text='+escape(Q)+'".$bookmarklet_tbpb."&popupurl='+escape(doc.location.href)+'&popuptitle='+escape(doc.title),'b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=".$bookmarklet_height.",left=100,top=150,status=yes'));btw.focus();\"\r\n\"contexts\"=hex:31\"";
 		?>
 		<pre style="margin: 20px; background-color: #cccccc; border: 1px dashed #333333; padding: 5px; font-size: 12px;"><?php echo $regedit; ?></pre>
-		<p><?php echo _('Save it as b2.reg, and double-click on this file in an Explorer window. Answer Yes to the question, and restart Internet Explorer.') ?></p>
-		<p><?php echo _('That\'s it, you can now right-click in an IE window and select \'Post to b2\' to make the bookmarklet appear :)') ?></p>
+		<p><?php echo T_('Save it as b2.reg, and double-click on this file in an Explorer window. Answer Yes to the question, and restart Internet Explorer.') ?></p>
+		<p><?php echo T_('That\'s it, you can now right-click in an IE window and select \'Post to b2\' to make the bookmarklet appear :)') ?></p>
 	
 		<p align="center">
 			<form>
-			<input class="search" type="button" value="1" name="<?php echo _('Close this window') ?>" />
+			<input class="search" type="button" value="1" name="<?php echo T_('Close this window') ?>" />
 			</form>
 		</p>
 		</td></tr>
@@ -295,43 +295,43 @@ switch($action)
 	
 		<table cellpadding="5" cellspacing="0">
 		<tr>
-		<td align="right"><strong><?php echo _('Login:') ?></strong></td>
+		<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
 		<td><?php echo $profiledata["user_login"] ?></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('First name') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('First name') ?>:</strong></td>
 		<td><input type="text" name="newuser_firstname" value="<?php echo $profiledata["user_firstname"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('Last name') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('Last name') ?>:</strong></td>
 		<td><input type="text" name="newuser_lastname" value="<?php echo $profiledata["user_lastname"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('Nickname') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('Nickname') ?>:</strong></td>
 		<td><input type="text" name="newuser_nickname" value="<?php echo $profiledata["user_nickname"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('Email') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('Email') ?>:</strong></td>
 		<td><input type="text" name="newuser_email" value="<?php echo $profiledata["user_email"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('URL') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('URL') ?>:</strong></td>
 		<td><input type="text" name="newuser_url" value="<?php echo $profiledata["user_url"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('ICQ') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('ICQ') ?>:</strong></td>
 		<td><input type="text" name="newuser_icq" value="<?php if ($profiledata["user_icq"] > 0) { echo $profiledata["user_icq"]; } ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('AIM') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('AIM') ?>:</strong></td>
 		<td><input type="text" name="newuser_aim" value="<?php echo $profiledata["user_aim"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('MSN IM') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('MSN IM') ?>:</strong></td>
 		<td><input type="text" name="newuser_msn" value="<?php echo $profiledata["user_msn"] ?>" class="postform" /></td>
 		</tr>
 		<tr>
-		<td align="right"><strong><?php echo _('YahooIM') ?>:</strong></td>
+		<td align="right"><strong><?php echo T_('YahooIM') ?>:</strong></td>
 		<td><input type="text" name="newuser_yim" value="<?php echo $profiledata["user_yim"] ?>" class="postform" /></td>
 		</tr>
 		</table>
@@ -342,16 +342,16 @@ switch($action)
 		<table cellpadding="5" cellspacing="0">
 		<tr>
 		<td>
-		<strong><?php echo _('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
+		<strong><?php echo T_('ID') ?>:</strong> <?php echo $profiledata["ID"] ?></td>
 		</tr>
 		<tr>
 		<td>
-		<strong><?php echo _('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
+		<strong><?php echo T_('Level') ?>:</strong> <?php echo $profiledata["user_level"] ?>
 		</td>
 		</tr>
 		<tr>
 		<td>
-		<strong><?php echo _('Posts') ?>:</strong>
+		<strong><?php echo T_('Posts') ?>:</strong>
 		<?php
 		$posts=get_usernumposts($user_ID);
 		echo $posts;
@@ -360,7 +360,7 @@ switch($action)
 		</tr>
 		<tr>
 		<td>
-		<?php echo _('<strong>Identity</strong> on the blog') ?>:<br />
+		<?php echo T_('<strong>Identity</strong> on the blog') ?>:<br />
 		<select name="newuser_idmode" class="postform">
 		<option value="nickname"<?php
 		if ($profiledata["user_idmode"]=="nickname")
@@ -386,7 +386,7 @@ switch($action)
 		<tr>
 		<td>
 		<br />
-		<?php echo _('New <strong>password</strong> (twice):') ?><br />
+		<?php echo T_('New <strong>password</strong> (twice):') ?><br />
 		<input type="password" name="pass1" size="16" value="" class="postform" /><br />
 		<input type="password" name="pass2" size="16" value="" class="postform" />
 		</td>
@@ -394,16 +394,16 @@ switch($action)
 	<?php
 	if ($user_level > 0) {
 	?>	<tr>
-	<td><br /><strong><?php echo _('Bookmarklet') ?></strong><br />
-	<?php echo _('Add this link to your Favorites/Bookmarks:') ?><br />
+	<td><br /><strong><?php echo T_('Bookmarklet') ?></strong><br />
+	<?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
 	<?php
 	if ($is_NS4 || $is_gecko) {
 	?>
-	<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2 bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo _('b2 - bookmarklet') ?></a>
+	<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2 bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo T_('b2 - bookmarklet') ?></a>
 	<?php
 	} else if ($is_winIE) {
 	?>
-	<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo _('b2 - bookmarklet') ?></a>
+	<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(Q)+'<?php echo $bookmarklet_tbpb ?>&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo T_('b2 - bookmarklet') ?></a>
 	
 	<script type="text/javascript" language="javascript">
 	<!--
@@ -414,17 +414,17 @@ switch($action)
 	</script>
 	
 	<br /><br />
-	<?php echo _('One-click bookmarklet:') ?><br />
-	<a href="javascript:oneclickbookmarklet(0);"><?php echo _('Click here') ?></a>
+	<?php echo T_('One-click bookmarklet:') ?><br />
+	<a href="javascript:oneclickbookmarklet(0);"><?php echo T_('Click here') ?></a>
 	
 	<?php
 	} else if ($is_opera) {
 	?>
-	<a href="javascript:void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo _('b2 - bookmarklet') ?></a>
+	<a href="javascript:void(window.open('<?php echo $pathserver ?>/b2bookmarklet.php?popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));"><?php echo T_('b2 - bookmarklet') ?></a>
 	<?php
 	} else if ($is_macIE) {
 	?>
-	<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(document.getSelection())+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo _('b2 - bookmarklet') ?></a> <?php
+	<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $pathserver ?>/b2bookmarklet.php?text='+escape(document.getSelection())+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title)+'<?php echo $bookmarklet_tbpb ?>','b2bookmarklet','scrollbars=yes,resizable=yes,width=600,height=<?php echo $bookmarklet_height ?>,left=100,top=150,status=yes'));btw.focus();"><?php echo T_('b2 - bookmarklet') ?></a> <?php
 	}
 	?>
 	<?php if ($is_gecko) { ?>
@@ -435,15 +435,15 @@ switch($action)
 			if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
 				window.sidebar.addPanel("b2 post","<?php echo $pathserver ?>/b2sidebar.php","");
 			else
-				alert("<?php echo _('No Sidebar found!  You must use Mozilla 0.9.4 or later!') ?>");
+				alert("<?php echo T_('No Sidebar found!  You must use Mozilla 0.9.4 or later!') ?>");
 		}
 	</script>
-	<strong><?php echo _('SideBar') ?></strong><br />
-	<?php printf( _('Add the <a %s>b2 Sidebar</a> !'), 'href="#" onClick="addPanel()"' ); ?>
+	<strong><?php echo T_('SideBar') ?></strong><br />
+	<?php printf( T_('Add the <a %s>b2 Sidebar</a> !'), 'href="#" onClick="addPanel()"' ); ?>
 	<?php } elseif (($is_winIE) || ($is_macIE)) { ?>
 	<br /><br />
-	<strong><?php echo _('SideBar') ?></strong><br />
-	<?php echo _('Add this link to your favorites:') ?><br /><a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?text='+escape(Q)+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'_search'))"><?php echo _('b2 Sidebar') ?></a>.
+	<strong><?php echo T_('SideBar') ?></strong><br />
+	<?php echo T_('Add this link to your favorites:') ?><br /><a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $pathserver ?>/b2sidebar.php?text='+escape(Q)+'&popupurl='+escape(location.href)+'&popuptitle='+escape(document.title),'_search'))"><?php echo T_('b2 Sidebar') ?></a>.
 	<?php } ?>
 		</td>
 		</tr>
@@ -452,7 +452,7 @@ switch($action)
 	?>	</table>
 		</td></tr>
 	<tr>
-		<td colspan="2" align="center"><br /><input class="search" type="submit" value="Update" name="submit"><br /><?php echo _('Note: closes the popup window.') ?></td>
+		<td colspan="2" align="center"><br /><input class="search" type="submit" value="Update" name="submit"><br /><?php echo T_('Note: closes the popup window.') ?></td>
 		</tr>
 		</table>
 	

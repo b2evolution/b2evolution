@@ -72,10 +72,10 @@
 		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 	</div>
 
-	<div class="sidetitle" align="center"><?php echo _('Misc') ?></div>
+	<div class="sidetitle" align="center"><?php echo T_('Misc') ?></div>
 	<div class="sidebody">
-		<a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a><br />
-		<a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a>
+		<a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a><br />
+		<a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a>
 	</div>
 	
 	<div class="sidetitle" align="center">credits</div>
@@ -90,7 +90,7 @@
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
+		printf( T_('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
 	}
 ?>
 

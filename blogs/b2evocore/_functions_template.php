@@ -81,13 +81,13 @@ function add_filter($tag, $function_to_add)
  */
 function single_month_title($prefix = '#', $display = 'htmlbody' ) 
 {
-	if( $prefix == '#' ) $prefix = ' '._('Archives for').': ';
+	if( $prefix == '#' ) $prefix = ' '.T_('Archives for').': ';
 
 	global $m, $w, $month;
 	if(!empty($m) && $display) 
 	{
 		$my_year = substr($m,0,4);
-		$my_month = _($month[substr($m,4,2)]);
+		$my_month = T_($month[substr($m,4,2)]);
 		$my_day = substr($m,6,2);
 
 		$title = $prefix.$my_month.' '.$my_year;

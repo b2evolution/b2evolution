@@ -146,9 +146,9 @@ function get_commentdata($comment_ID,$no_cache=0)
  */
 function comments_number( $zero='#', $one='#', $more='#' ) 
 {
-	if( $zero == '#' ) $zero = _('Leave a comment');
-	if( $one == '#' ) $one = _('1 comment');
-	if( $more == '#' ) $more = _('% comments');
+	if( $zero == '#' ) $zero = T_('Leave a comment');
+	if( $one == '#' ) $one = T_('1 comment');
+	if( $more == '#' ) $more = T_('% comments');
 
 	// original hack by dodo@regretless.com
 	global $id,$postdata,$tablecomments,$c,$querycount,$cache_commentsnumber,$use_cache;

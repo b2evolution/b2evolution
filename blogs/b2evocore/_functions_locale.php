@@ -8,30 +8,58 @@
 
 
 
-if(!function_exists('_'))
+/*
+ * T_(-)
+ * 
+ * TRANSLATE!
+ */
+if(function_exists('_'))
 {
-	/*
-	 * _(-)
-	 * 
-	 * Replacement for when gettext is not available.
-	 */
-	function _($string)
+	function T_( $string, $req_locale = '' )
 	{
+		global $current_locale;
+		
+		if( empty( $req_locale ) || $req_locale == $current_locale )
+		{	// We have not asked for a different locale than the currently active
+			return _($string);
+		}
+		// We have asked for a funky locale... we'll get english instead:
+		return $string;
+	}
+}
+else
+{
+	function T_( $string, $req_locale = '' )
+	{
+		global $trans, $current_locale;
+		
+		// By default we use the current locale:
+		if( empty($req_locale) ) $req_locale = $current_locale;
+
+		if( !isset($trans[$current_locale] ) )
+		{	// Translations for current locale have not yet been loaded:
+			require_once( dirname(__FILE__).'/../locales/'.$req_locale.'/_global.php' );
+		}
+				
+		if( isset( $trans[$current_locale][$string] ) )
+		{	// If the string has been translated:
+			return $trans[$current_locale][$string];
+		}
+		// Return the English string:
 		return $string;
 	}
 }
 
-if(!function_exists('N_'))
+
+/*
+ * NT_(-)
+ * 
+ * No Translation
+ * Nevertheless, the string will be extracted by the gettext tools
+ */
+function NT_($string)
 {
-	/*
-	 * N_(-)
-	 * 
-	 * Replacement for when gettext_noop is not available.
-	 */
-	function N_($string)
-	{
-		return $string;
-	}
+	return $string;
 }
 
 
@@ -49,22 +77,29 @@ function locale_activate( $locale )
 		return false;
 	}
 
+	// Memorize new locale:
 	$current_locale = $locale;
-
-	# Activate the default language in gettext:
-	// putenv( 'LANGUAGE='.$default_language );  // doc says to use this... but it doesn't work
-	putenv( 'LC_ALL='.$locale ); 
-	
-	# Activate the charset for default language in gettext:
+	// Memorize new charset:
 	$current_charset = $locales[$locale]['charset'];
-	if( function_exists( 'bind_textdomain_codeset' ) )
-	{
-		bind_textdomain_codeset( 'messages', $current_charset );
+
+	// Activate translations in gettext:
+	if( function_exists( 'bindtextdomain' ) )
+	{	// Only if gettext is available ( if not, look into T_(-) ...)
+		# Activate the locale->language in gettext:
+		putenv( 'LC_ALL='.$locale ); 
+		
+		# Activate the charset for conversions in gettext:
+		if( function_exists( 'bind_textdomain_codeset' ) )
+		{	// Only if this gettext supports code conversions
+			bind_textdomain_codeset( 'messages', $current_charset );
+		}
 	}
+
 	
 	# Set locale for default language:
 	# This will influence the way numbers are displayed, etc.
-	setlocale( LC_ALL, $locale );
+	// We are not using this right now, the default 'C' locale seems just fine
+	// setlocale( LC_ALL, $locale );
 	
 	# Use this to check locale:
 	// echo setlocale( LC_ALL, 0 );
@@ -96,6 +131,8 @@ function locale_by_lang( $lang )
 
 /*
  * locale_lang(-)
+ *
+ * Returns the language code part of a locale name
  */
 function locale_lang( $disp = true )
 {
@@ -157,7 +194,7 @@ function lang_options( $default = '' )
 	{
 		echo '<option value="'.$this_lang.'"';
 		if( $this_lang == $default ) echo ' selected="selected"';
-		echo '>'._($this_lang_name).'</option>';
+		echo '>'.T_($this_lang_name).'</option>';
 	}
 }
 

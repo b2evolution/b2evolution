@@ -77,7 +77,7 @@ class POP3 {
             $server = $this->MAILSERVER;
 
         if(empty($server)){
-            $this->ERROR = _("POP3 connect:") . ' ' . _("No server specified");
+            $this->ERROR = T_("POP3 connect:") . ' ' . T_("No server specified");
             unset($this->FP);
             return false;
         }
@@ -85,7 +85,7 @@ class POP3 {
         $fp = fsockopen("$server", $port, $errno, $errstr);
 
         if(!$fp) {
-            $this->ERROR = _("POP3 connect:") . ' ' . _("Error ") . "[$errno] [$errstr]";
+            $this->ERROR = T_("POP3 connect:") . ' ' . T_("Error ") . "[$errno] [$errstr]";
             unset($this->FP);
             return false;
         }
@@ -97,7 +97,7 @@ class POP3 {
         if($this->DEBUG)
             error_log("POP3 SEND [connect: $server] GOT [$reply]",0);
         if(!$this->is_ok($reply)) {
-            $this->ERROR = _("POP3 connect:") . ' ' . _("Error ") . "[$reply]";
+            $this->ERROR = T_("POP3 connect:") . ' ' . T_("Error ") . "[$reply]";
             unset($this->FP);
             return false;
         }
@@ -105,7 +105,7 @@ class POP3 {
         $this->BANNER = $this->parse_banner($reply);
         $this->RFC1939 = $this->noop();
         if($this->RFC1939) {
-            $this->ERROR = _("POP3: premature NOOP OK, NOT an RFC 1939 Compliant server");
+            $this->ERROR = T_("POP3: premature NOOP OK, NOT an RFC 1939 Compliant server");
             $this->quit();
             return false;
         } else
@@ -115,7 +115,7 @@ class POP3 {
     function noop () {
     
         if(!isset($this->FP)) {
-            $this->ERROR = _("POP3 noop:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 noop:") . ' ' . T_("No connection to server");
             return false;
         } else {
             $cmd = "NOOP";
@@ -128,15 +128,15 @@ class POP3 {
         // Sends the USER command, returns true or false
 
         if( empty($user) ) {
-            $this->ERROR = _("POP3 user:") . ' ' . _('No login ID submitted');
+            $this->ERROR = T_("POP3 user:") . ' ' . T_('No login ID submitted');
             return false;
         } elseif(!isset($this->FP)) {
-            $this->ERROR = _("POP3 user:") . ' ' . _("connection not established");
+            $this->ERROR = T_("POP3 user:") . ' ' . T_("connection not established");
             return false;
         } else {
             $reply = $this->send_cmd("USER $user");
             if(!$this->is_ok($reply)) {
-                $this->ERROR = _("POP3 user:") . ' ' . _("Error ") . "[$reply]";
+                $this->ERROR = T_("POP3 user:") . ' ' . T_("Error ") . "[$reply]";
                 return false;
             } else
                 return true;
@@ -148,15 +148,15 @@ class POP3 {
         // returns false (undef) on Auth failure
 
         if(empty($pass)) {
-            $this->ERROR = _("POP3 pass:") . ' ' . _("No password submitted");
+            $this->ERROR = T_("POP3 pass:") . ' ' . T_("No password submitted");
             return false;
         } elseif(!isset($this->FP)) {
-            $this->ERROR = _("POP3 pass:") . ' ' . _("connection not established");
+            $this->ERROR = T_("POP3 pass:") . ' ' . T_("connection not established");
             return false;
         } else {
             $reply = $this->send_cmd("PASS $pass");
             if(!$this->is_ok($reply)) {
-                $this->ERROR = _("POP3 pass:") . ' ' . _("authentication failed ") . "[$reply]";
+                $this->ERROR = T_("POP3 pass:") . ' ' . T_("authentication failed ") . "[$reply]";
                 $this->quit();
                 return false;
             } else {
@@ -165,7 +165,7 @@ class POP3 {
                 $this->COUNT = $count;
                 $this->RFC1939 = $this->noop();
                 if(!$this->RFC1939) {
-                    $this->ERROR = _("POP3 pass:") . ' ' . _("NOOP failed. Server not RFC 1939 compliant");
+                    $this->ERROR = T_("POP3 pass:") . ' ' . T_("NOOP failed. Server not RFC 1939 compliant");
                     $this->quit();
                     return false;
                 } else
@@ -181,21 +181,21 @@ class POP3 {
         //  (apop is optional per rfc1939)
 
         if(!isset($this->FP)) {
-            $this->ERROR = _("POP3 apop:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 apop:") . ' ' . T_("No connection to server");
             return false;
         } elseif(!$this->ALLOWAPOP) {
             $retVal = $this->login($login,$pass);
             return $retVal;
         } elseif(empty($login)) {
-            $this->ERROR = _("POP3 apop:") . ' ' . _("No login ID submitted");
+            $this->ERROR = T_("POP3 apop:") . ' ' . T_("No login ID submitted");
             return false;
         } elseif(empty($pass)) {
-            $this->ERROR = _("POP3 apop:") . ' ' . _("No password submitted");
+            $this->ERROR = T_("POP3 apop:") . ' ' . T_("No password submitted");
             return false;
         } else {
             $banner = $this->BANNER;
             if( (!$banner) or (empty($banner)) ) {
-                $this->ERROR = _("POP3 apop:") . ' ' . _("No server banner") . ' - ' . _("abort");
+                $this->ERROR = T_("POP3 apop:") . ' ' . T_("No server banner") . ' - ' . T_("abort");
                 $retVal = $this->login($login,$pass);
                 return $retVal;
             } else {
@@ -205,7 +205,7 @@ class POP3 {
                 $cmd = "APOP $login $APOPString";
                 $reply = $this->send_cmd($cmd);
                 if(!$this->is_ok($reply)) {
-                    $this->ERROR = _("POP3 apop:") . ' ' . _("apop authentication failed") . ' - ' . _("abort");
+                    $this->ERROR = T_("POP3 apop:") . ' ' . T_("apop authentication failed") . ' - ' . T_("abort");
                     $retVal = $this->login($login,$pass);
                     return $retVal;
                 } else {
@@ -214,7 +214,7 @@ class POP3 {
                     $this->COUNT = $count;
                     $this->RFC1939 = $this->noop();
                     if(!$this->RFC1939) {
-                        $this->ERROR = _("POP3 apop:") . ' ' . _("NOOP failed. Server not RFC 1939 compliant");
+                        $this->ERROR = T_("POP3 apop:") . ' ' . T_("NOOP failed. Server not RFC 1939 compliant");
                         $this->quit();
                         return false;
                     } else
@@ -230,7 +230,7 @@ class POP3 {
         // the number of messages.)
 
         if( !isset($this->FP) ) {
-            $this->ERROR = _("POP3 login:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 login:") . ' ' . T_("No connection to server");
             return false;
         } else {
             $fp = $this->FP;
@@ -255,7 +255,7 @@ class POP3 {
         //  only the header information, and none of the body.
 
         if(!isset($this->FP)) {
-            $this->ERROR = _("POP3 top:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 top:") . ' ' . T_("No connection to server");
             return false;
         }
         $this->update_timer();
@@ -271,7 +271,7 @@ class POP3 {
         }
         if(!$this->is_ok($reply))
         {
-            $this->ERROR = _("POP3 top:") . ' ' . _("Error ") . "[$reply]";
+            $this->ERROR = T_("POP3 top:") . ' ' . T_("Error ") . "[$reply]";
             return false;
         }
 
@@ -297,7 +297,7 @@ class POP3 {
 
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 pop_list:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 pop_list:") . ' ' . T_("No connection to server");
             return false;
         }
         $fp = $this->FP;
@@ -325,7 +325,7 @@ class POP3 {
             }
             if(!$this->is_ok($reply))
             {
-                $this->ERROR = _("POP3 pop_list:") . ' ' . _("Error ") . "[$reply]";
+                $this->ERROR = T_("POP3 pop_list:") . ' ' . T_("Error ") . "[$reply]";
                 return false;
             }
             list($junk,$num,$size) = explode(" ",$reply);
@@ -336,7 +336,7 @@ class POP3 {
         if(!$this->is_ok($reply))
         {
             $reply = $this->strip_clf($reply);
-            $this->ERROR = _("POP3 pop_list:") . ' ' . _("Error ") .  "[$reply]";
+            $this->ERROR = T_("POP3 pop_list:") . ' ' . T_("Error ") .  "[$reply]";
             return false;
         }
         $MsgArray = array();
@@ -348,7 +348,7 @@ class POP3 {
             $line = $this->strip_clf($line);
             if(ereg("^\.",$line))
             {
-                $this->ERROR = _("POP3 pop_list:") . ' ' . _("Premature end of list");
+                $this->ERROR = T_("POP3 pop_list:") . ' ' . T_("Premature end of list");
                 return false;
             }
             list($thisMsg,$msgSize) = explode(" ",$line);
@@ -371,7 +371,7 @@ class POP3 {
 
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 get:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 get:") . ' ' . T_("No connection to server");
             return false;
         }
 
@@ -384,7 +384,7 @@ class POP3 {
 
         if(!$this->is_ok($reply))
         {
-            $this->ERROR = _("POP3 get:") . ' ' . _("Error ") . "[$reply]";
+            $this->ERROR = T_("POP3 get:") . ' ' . T_("Error ") . "[$reply]";
             return false;
         }
 
@@ -410,14 +410,14 @@ class POP3 {
         $last = -1;
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 last:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 last:") . ' ' . T_("No connection to server");
             return $last;
         }
 
         $reply = $this->send_cmd("STAT");
         if(!$this->is_ok($reply))
         {
-            $this->ERROR = _("POP3 last:") . ' ' . _("Error ") . "[$reply]";
+            $this->ERROR = T_("POP3 last:") . ' ' . T_("Error ") . "[$reply]";
             return $last;
         }
 
@@ -440,7 +440,7 @@ class POP3 {
 
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 reset:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 reset:") . ' ' . T_("No connection to server");
             return false;
         }
         $reply = $this->send_cmd("RSET");
@@ -450,7 +450,7 @@ class POP3 {
             //  response - if it ever does, something truely
             //  wild is going on.
 
-            $this->ERROR = _("POP3 reset:") . ' ' . _("Error ") . "[$reply]";
+            $this->ERROR = T_("POP3 reset:") . ' ' . T_("Error ") . "[$reply]";
             @error_log("POP3 reset: ERROR [$reply]",0);
         }
         $this->quit();
@@ -474,13 +474,13 @@ class POP3 {
 
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 send_cmd:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 send_cmd:") . ' ' . T_("No connection to server");
             return false;
         }
 
         if(empty($cmd))
         {
-            $this->ERROR = _("POP3 send_cmd:") . ' ' . _("Empty command string");
+            $this->ERROR = T_("POP3 send_cmd:") . ' ' . T_("Empty command string");
             return "";
         }
 
@@ -500,7 +500,7 @@ class POP3 {
 
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 quit:") . ' ' . _("connection does not exist");
+            $this->ERROR = T_("POP3 quit:") . ' ' . T_("connection does not exist");
             return false;
         }
         $fp = $this->FP;
@@ -537,7 +537,7 @@ class POP3 {
         //  Array element 0 will contain the total number of msgs
 
         if(!isset($this->FP)) {
-            $this->ERROR = _("POP3 uidl:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 uidl:") . ' ' . T_("No connection to server");
             return false;
         }
 
@@ -549,7 +549,7 @@ class POP3 {
             $reply = $this->send_cmd($cmd);
             if(!$this->is_ok($reply))
             {
-                $this->ERROR = _("POP3 uidl:") . ' ' . _("Error ") . "[$reply]";
+                $this->ERROR = T_("POP3 uidl:") . ' ' . T_("Error ") . "[$reply]";
                 return false;
             }
             list ($ok,$num,$myUidl) = explode(" ",$reply);
@@ -572,7 +572,7 @@ class POP3 {
             if($this->DEBUG) { @error_log("POP3 SEND [$cmd] GOT [$reply]",0); }
             if(!$this->is_ok($reply))
             {
-                $this->ERROR = _("POP3 uidl:") . ' ' . _("Error ") . "[$reply]";
+                $this->ERROR = T_("POP3 uidl:") . ' ' . T_("Error ") . "[$reply]";
                 return false;
             }
 
@@ -605,18 +605,18 @@ class POP3 {
 
         if(!isset($this->FP))
         {
-            $this->ERROR = _("POP3 delete:") . ' ' . _("No connection to server");
+            $this->ERROR = T_("POP3 delete:") . ' ' . T_("No connection to server");
             return false;
         }
         if(empty($msgNum))
         {
-            $this->ERROR = _("POP3 delete:") . ' ' . _("No msg number submitted");
+            $this->ERROR = T_("POP3 delete:") . ' ' . T_("No msg number submitted");
             return false;
         }
         $reply = $this->send_cmd("DELE $msgNum");
         if(!$this->is_ok($reply))
         {
-            $this->ERROR = _("POP3 delete:") . ' ' . _("Command failed ") . "[$reply]";
+            $this->ERROR = T_("POP3 delete:") . ' ' . T_("Command failed ") . "[$reply]";
             return false;
         }
         return true;

@@ -61,7 +61,7 @@ function log_hit()
 	if ($UserAgent != strip_tags($UserAgent))
 	{ //then they have tried something funny,
 		//putting HTML or PHP into the HTTP_REFERER
-		dbg(_("bad char in User Agent"));
+		dbg(T_("bad char in User Agent"));
 		$UserAgent = "";
 	}
 
@@ -90,7 +90,7 @@ function log_hit()
 			if ( ($user_agent[0]=='robot') && (strstr($UserAgent, $user_agent[1])) )
 			{
 				$ignore = "robot";
-				dbg( _('referer ignored'). " (". _('robot'). ")");
+				dbg( T_('referer ignored'). " (". T_('robot'). ")");
 				break;
 			}
 		}
@@ -101,7 +101,7 @@ function log_hit()
 		if( strlen($ref) < 13 )
 		{	// minimum http://az.fr/
 			$ignore = "invalid";
-			dbg( _('referer ignored'). " (". _('invalid'). ")");
+			dbg( T_('referer ignored'). " (". T_('invalid'). ")");
 		}
 		else
 		{	// SEARCH BLACKLIST	
@@ -110,7 +110,7 @@ function log_hit()
 				if (stristr($ref, $site))
 				{
 					$ignore = "blacklist";
-					dbg( _('referer ignored'). " (". _('BlackList'). ")");
+					dbg( T_('referer ignored'). " (". T_('BlackList'). ")");
 					break;
 				}
 			}
@@ -126,7 +126,7 @@ function log_hit()
 			if (stristr($ref, $engine))
 			{
 				$ignore = "search";
-				dbg( _('referer ignored'). " (". _('search engine'). ")");
+				dbg( T_('referer ignored'). " (". T_('search engine'). ")");
 				break;
 			}
 		}
@@ -137,7 +137,7 @@ function log_hit()
 	if ($doubleCheckReferers)
 	{
 
-		dbg(_('loading referering page'));
+		dbg(T_('loading referering page'));
 
 		//this is so that the page up until the call to
 		//logReferer will get shown before it tries to check
@@ -156,7 +156,7 @@ function log_hit()
 			}
 			if (strstr($page,$fullCurrentURL))
 			{
-				dbg(_('found current url in page'));
+				dbg(T_('found current url in page'));
 				$goodReferer = 1;
 			}
 		}
@@ -407,7 +407,7 @@ function stats_search_keywords()
 	$ref = $row_stats['referingURL'];
 	if( ($pos_question = strpos( $ref, '?' )) == false )
 	{
-		echo '[', _('not a query - no params!'), ']';
+		echo '[', T_('not a query - no params!'), ']';
 		return;
 	}
 	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
@@ -432,7 +432,7 @@ function stats_search_keywords()
 			return;
 		}
 	}
-	echo '[', _('no query string found'), ']';
+	echo '[', T_('no query string found'), ']';
 }
 
 /*

@@ -48,7 +48,7 @@
 				echo '<a href="';
 				archive_link( $arc_year, $arc_month );
 				echo '">';
-				echo _($month[zeroise($arc_month,2)]),' ',$arc_year;
+				echo T_($month[zeroise($arc_month,2)]),' ',$arc_year;
 				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
 				break;
 	

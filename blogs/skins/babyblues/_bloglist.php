@@ -14,7 +14,7 @@
 	}
 
 	?>
-<div class="sidetitle" align="center"><?php echo _('blogs') ?></div>
+<div class="sidetitle" align="center"><?php echo T_('blogs') ?></div>
 <div class="sidebody">
 	<?php
 

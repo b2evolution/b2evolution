@@ -24,7 +24,7 @@
 	# This is the class of for the other blog links:
 	if(!isset($blog_other_link_class)) $blog_other_link_class = 'NavButton2';
 	# This is additionnal markup before and after the selected blog name
-	if(!isset($blog_selected_name_before)) $blog_selected_name_before = '<span class="small"><img src="'. $baseurl.'/img/down_small.gif" width="14" height="12" border="0" alt="['._('Selected').']" title="" class="top" />';				
+	if(!isset($blog_selected_name_before)) $blog_selected_name_before = '<span class="small"><img src="'. $baseurl.'/img/down_small.gif" width="14" height="12" border="0" alt="['.T_('Selected').']" title="" class="top" />';				
 	if(!isset($blog_selected_name_after)) $blog_selected_name_after = '</span>';
 	# This is additionnal markup before and after the other blog names
 	if(!isset($blog_other_name_before)) $blog_other_name_before = '<span class="small">';				

@@ -92,7 +92,7 @@ function cat_delete( $cat_ID )
 	$row = mysql_fetch_object( $result );
 	
 	$child_count = $row->child_count;
-	if( $child_count != 0 ) return _("Cannot delete if there are sub-categories!");
+	if( $child_count != 0 ) return T_("Cannot delete if there are sub-categories!");
 	
 	// TODO: find parent
 	$query="SELECT cat_parent_ID, cat_blog_ID FROM $tablecategories WHERE cat_ID = $cat_ID";
@@ -143,7 +143,7 @@ function cat_delete( $cat_ID )
 		}
 		else
 		{
-			return _("Cannot delete last category if there are posts inside!");
+			return T_("Cannot delete last category if there are posts inside!");
 		}		
 		
 	}
@@ -249,7 +249,7 @@ function get_the_category_by_ID($cat_ID)
 	{
 		cat_load_cache();
 	}
-	if( !isset( $cache_categories[$cat_ID] ) ) die( sprintf( _('Requested category %s does not exist!'),  $cat_ID ) );
+	if( !isset( $cache_categories[$cat_ID] ) ) die( sprintf( T_('Requested category %s does not exist!'),  $cat_ID ) );
 	return $cache_categories[$cat_ID];
 }
 
@@ -573,7 +573,7 @@ function cat_query( )
  */
 function single_cat_title( $prefix = '#', $display = 'htmlbody' ) 
 {
-	if( $prefix == '#' ) $prefix = ' '._('Category').': ';
+	if( $prefix == '#' ) $prefix = ' '.T_('Category').': ';
 
 	global $cat, $cat_array;
 	if( !empty($cat_array) ) 
@@ -638,7 +638,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 	if( $link_title == '#' ) 
 	{	/* TRANS: When the categories for a specific post are displayed, the user can click
 				on these cats to browse them, this is the default href title displayed there */
-		$link_title = _('Browse category');
+		$link_title = T_('Browse category');
 	}
 
 	$main_cat_ID = $postdata['Category'];

@@ -19,16 +19,16 @@
 function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 {
 	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>", _('Sending trackbacks...'), "</h3>\n";
+	echo "<h3>", T_('Sending trackbacks...'), "</h3>\n";
 	if(empty($post_trackbacks)) 
 	{
-		echo "<p>", _('No trackback to be sent.'), "</p>\n";
+		echo "<p>", T_('No trackback to be sent.'), "</p>\n";
 	}
 	else
 	{
 		$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
 		$excerpt = stripslashes($excerpt);
-		echo "<p>", _('Excerpt to be sent:'), " $excerpt</p>\n";
+		echo "<p>", T_('Excerpt to be sent:'), " $excerpt</p>\n";
 		$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 		foreach($trackback_urls as $tb_url) 
 		{	// trackback each url:
@@ -36,7 +36,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 			if( empty( $tb_url ) ) continue;
 			trackback($tb_url, stripslashes($post_title), $excerpt, $post_ID);
 		}
-		echo "<p>", _('Trackbacks done.'), "</p>\n";
+		echo "<p>", T_('Trackbacks done.'), "</p>\n";
 	}
 	echo "</div>\n";
 }
@@ -50,7 +50,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 function trackback($trackback_url, $title, $excerpt, 
 					$ID) // post ID 
 {	
-	echo "<p>", _('Sending trackback to:'), " $trackback_url ...\n";
+	echo "<p>", T_('Sending trackback to:'), " $trackback_url ...\n";
 
 	$title = urlencode($title);
 	$excerpt = urlencode(stripslashes($excerpt));
@@ -106,7 +106,7 @@ function trackback($trackback_url, $title, $excerpt,
 */
 		fclose($fs);
 	}
-	echo "<br \>", _('Response:'), " $result</p>\n";	
+	echo "<br \>", T_('Response:'), " $result</p>\n";	
 	return $result;
 }
 
@@ -146,9 +146,9 @@ function trackback_url($display = 1) {
  */
 function trackback_number( $zero='#', $one='#', $more='#' ) 
 {
-	if( $zero == '#' ) $zero = _('Trackback (0)');
-	if( $one == '#' ) $one = _('Trackback (1)');
-	if( $more == '#' ) $more = _('Trackbacks (%)');
+	if( $zero == '#' ) $zero = T_('Trackback (0)');
+	if( $one == '#' ) $one = T_('Trackback (1)');
+	if( $more == '#' ) $more = T_('Trackbacks (%)');
 
 	global $id, $tablecomments, $tb, $querycount, $cache_trackbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'trackbacks');

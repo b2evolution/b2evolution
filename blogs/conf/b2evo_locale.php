@@ -9,12 +9,12 @@ require_once (dirname(__FILE__)."/../$pathcore/_functions_locale.php");
 
 # Supported languages for posts:
 $languages = array(
-	'en' => N_('English'),
-	'fr' => N_('French'),
-	'ja' => N_('Japanese'),
-	'nl' => N_('Dutch'),
-	'pt' => N_('Portuguese'),
-	'sv' => N_('Swedish'),
+	'en' => NT_('English'),
+	'fr' => NT_('French'),
+	'ja' => NT_('Japanese'),
+	'nl' => NT_('Dutch'),
+	'pt' => NT_('Portuguese'),
+	'sv' => NT_('Swedish'),
 	);
 
 # Default locale
@@ -24,6 +24,9 @@ $default_locale = 'en_US';
 
 
 $default_locale = 'fr_FR';			// For testing :))
+// $default_locale = 'ja_JP';			// For testing :))
+// $default_locale = 'nl_NL';			// For testing :))
+// $default_locale = 'sv_SE';			// For testing :))
 
 
 #  and localization:
@@ -103,4 +106,8 @@ $default_language = substr( $default_locale, 0, 2 );
 # day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
 $start_of_week = 1;
 
+# Set this to 1 if you are a translator and wish to use the .po extraction script in 
+# the /locales folder. Do not allow this on production servers as people could harm
+# your operations by continuously recomputing your language files.
+$allow_po_extraction = 1;
 ?>

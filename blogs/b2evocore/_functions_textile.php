@@ -195,8 +195,8 @@ function textile($text)
 
 	# some weird bs with underscores and \b word boundaries, 
 	#  so we'll do those on their own
-	$text = preg_replace('/(^|\s)__(.*)__([[:punct:]]{0,2})(\s|$)?/mU','$1<i>$2</i>$3$4',$text);
-	$text = preg_replace('/(^|\s)_(.*)_([[:punct:]]{0,2})(\s|$)?/mU','$1<em>$2</em>$3$4',$text);
+	$text = preg_replace('/(^|\s)_T_(.*)__([[:punct:]]{0,2})(\s|$)?/mU','$1<i>$2</i>$3$4',$text);
+	$text = preg_replace('/(^|\s)T_(.*)_([[:punct:]]{0,2})(\s|$)?/mU','$1<em>$2</em>$3$4',$text);
 
 	$text = preg_replace('/\^(.*)\^/mU','<sup>$1</sup>',$text);
 

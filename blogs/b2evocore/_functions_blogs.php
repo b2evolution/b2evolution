@@ -238,7 +238,7 @@ function get_blogparams_by_ID($blog_ID)
 	{
 		blog_load_cache();
 	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) die( _('Requested blog does not exist!') );
+	if( !isset( $cache_blogs[$blog_ID] ) ) die( T_('Requested blog does not exist!') );
 	return $cache_blogs[$blog_ID];
 }
 

@@ -37,15 +37,15 @@ set_param( 'comment_cookies', 'integer', 0 );
 
 if ($require_name_email && (empty($author)) )
 { 
-	errors_add( _('Please fill in the name field') );
+	errors_add( T_('Please fill in the name field') );
 }
 if ($require_name_email && (empty($email)) )
 { 
-	errors_add( _('Please fill in the email field') );
+	errors_add( T_('Please fill in the email field') );
 }
 if( (!empty($email)) && (!is_email($email)) )
 {
-	errors_add( _('Supplied email address is invalid') );
+	errors_add( T_('Supplied email address is invalid') );
 }
 $url = ((!stristr($url, '://')) && ($url != '')) ? 'http://'.$url : $url;
 if (strlen($url) < 7) {
@@ -53,7 +53,7 @@ if (strlen($url) < 7) {
 }
 if( ! validate_url( $url, $comments_allowed_uri_scheme) )
 {
-	errors_add( _('Supplied URL is invalid') );
+	errors_add( T_('Supplied URL is invalid') );
 }
 
 $user_ip = $REMOTE_ADDR;
@@ -92,11 +92,11 @@ if (!empty($result))
 }
 if( ! $ok ) 
 {
-	errors_add( _('You can only post a new comment every 30 seconds.') );
+	errors_add( T_('You can only post a new comment every 30 seconds.') );
 }
 
-if( errors_display( _('Cannot post comment, please correct these errors:'), 
-	'[<a href="javascript:history.go(-1)">'._('Back to comment editing').'</a>]' ) )
+if( errors_display( T_('Cannot post comment, please correct these errors:'), 
+	'[<a href="javascript:history.go(-1)">'.T_('Back to comment editing').'</a>]' ) )
 {
 	exit();
 }
@@ -111,17 +111,17 @@ if ($comments_notify)
 	$postdata = get_postdata($comment_post_ID);
 	$authordata = get_userdata($postdata["Author_ID"]);
 	$recipient = $authordata["user_email"];
-	$subject = sprintf( N_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
+	$subject = sprintf( NT_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
 	// fplanque added:
 	$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 
 	// Not translated because sent to someone else...
-	$notify_message  = sprintf( N_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
+	$notify_message  = sprintf( NT_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
 	$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$comment_post_ID."&c=1\n\n";
-	$notify_message .= N_('Author')." : $comment_author (IP: $user_ip , $user_domain)\n";
-	$notify_message .= N_('Email')."  : $comment_author_email\n";
-	$notify_message .= N_('Url')."    : $comment_author_url\n";
-	$notify_message .= N_('Comment').": \n".stripslashes($original_comment)."\n";
+	$notify_message .= NT_('Author')." : $comment_author (IP: $user_ip , $user_domain)\n";
+	$notify_message .= NT_('Email')."  : $comment_author_email\n";
+	$notify_message .= NT_('Url')."    : $comment_author_url\n";
+	$notify_message .= NT_('Comment').": \n".stripslashes($original_comment)."\n";
 
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
 

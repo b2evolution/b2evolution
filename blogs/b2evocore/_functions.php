@@ -33,9 +33,9 @@ function dbconnect()
 {
 	global $connexion, $dbhost, $dbusername, $dbpassword, $dbname;
 
-	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword) or die( _('Can\'t connect to the database server. MySQL said:').'<br />'.mysql_error());
+	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword) or die( T_('Can\'t connect to the database server. MySQL said:').'<br />'.mysql_error());
 
-	$connexionbase = mysql_select_db( $dbname ) or die( sprintf(_('Can\'t connect to the database %s. MySQL said:'), $base).'<br />'.mysql_error());
+	$connexionbase = mysql_select_db( $dbname ) or die( sprintf(T_('Can\'t connect to the database %s. MySQL said:'), $base).'<br />'.mysql_error());
 
 	return(($connexion && $connexionbase));
 }
@@ -46,7 +46,7 @@ function dbconnect()
  */
 function mysql_oops($sql_query)
 {
-	$error  = '<p class="error">'._('Oops, MySQL error!').'</p>';
+	$error  = '<p class="error">'.T_('Oops, MySQL error!').'</p>';
 	$error .= '<p>Your query:<br /><code>'.$sql_query.'</code></p>';
 	$error .= '<p>MySQL said:<br /><code>'.mysql_error().'</code></p>';
 	die($error);
@@ -480,13 +480,13 @@ function date_i18n( $dateformatstring, $unixtimestamp )
 	$j = date($dateformatstring, $unixtimestamp);
 
 	// weekday:
-	$j = str_replace( '@@@l@@@', _($weekday[$dateweekday]), $j);
+	$j = str_replace( '@@@l@@@', T_($weekday[$dateweekday]), $j);
 	// weekday abbrev:
-	$j = str_replace( '@@@D@@@', _($weekday_abbrev[$dateweekday]), $j);
+	$j = str_replace( '@@@D@@@', T_($weekday_abbrev[$dateweekday]), $j);
 	// month:
-	$j = str_replace( '@@@F@@@', _($month[$datemonth]), $j);
+	$j = str_replace( '@@@F@@@', T_($month[$datemonth]), $j);
 	// month abbrev:
-	$j = str_replace( '@@@M@@@', _($month_abbrev[$datemonth]), $j);
+	$j = str_replace( '@@@M@@@', T_($month_abbrev[$datemonth]), $j);
 
 	return $j;
 }
@@ -590,7 +590,7 @@ function alert_error($msg)
 	<body>
 	<!-- this is for non-JS browsers (actually we should never reach that code, but hey, just in case...) -->
 	<?php echo $msg; ?><br />
-	<a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>"><?php echo _('go back') ?></a>
+	<a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>"><?php echo T_('go back') ?></a>
 	</body>
 	</html>
 	<?php
@@ -620,9 +620,9 @@ function redirect_js($url,$title="...") {
 	setTimeout("redirect();", 100);
 	//-->
 	</script>
-	<p><?php echo _('Redirecting you to:') ?> <strong><?php echo $title; ?></strong><br />
+	<p><?php echo T_('Redirecting you to:') ?> <strong><?php echo $title; ?></strong><br />
 	<br />
-	<?php printf( _('If nothing happens, click <a %s>here</a>.'), ' href="'.$url.'"' ); ?></p>
+	<?php printf( T_('If nothing happens, click <a %s>here</a>.'), ' href="'.$url.'"' ); ?></p>
 	<?php
 	exit();
 }
@@ -908,7 +908,7 @@ function set_param(
 		}
 		elseif( $default === true )
 		{
-			die( sprintf( _('Parameter %s is required!'), $var ) );
+			die( sprintf( T_('Parameter %s is required!'), $var ) );
 		}
 		else
 		{
@@ -988,7 +988,7 @@ function param(
 		}
 		elseif( $default === true )
 		{
-			die( sprintf( _('Parameter %s is required!'), $var ) );
+			die( sprintf( T_('Parameter %s is required!'), $var ) );
 		}
 		else
 		{

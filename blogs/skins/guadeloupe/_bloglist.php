@@ -14,7 +14,7 @@
 	}
 
 	# this is what will start and end your blog links
-	if(!isset($blog_list_start)) $blog_list_start = '<h4>'._('Blogs').'&nbsp;:</h4><ul>';				
+	if(!isset($blog_list_start)) $blog_list_start = '<h4>'.T_('Blogs').'&nbsp;:</h4><ul>';				
 	if(!isset($blog_list_end)) $blog_list_end = '</ul>';				
 	# this is what will separate your blog links
 	if(!isset($blog_item_start)) $blog_item_start = '<li>';				

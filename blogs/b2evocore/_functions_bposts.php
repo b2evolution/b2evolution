@@ -307,12 +307,12 @@ function get_the_content($more_link_text='#', $stripteaser=0, $more_file='', $mo
 {
 	if( $more_link_text == '#' ) 
 	{	// TRANS: this is the default text for the extended post "more" link
-		$more_link_text = '=> '._('Read more!');
+		$more_link_text = '=> '.T_('Read more!');
 	}
 
 	if( $more_anchor == '#' ) 
 	{	// TRANS: this is the default text displayed once the more link has been activated
-		$more_anchor = '['._('More:').']';
+		$more_anchor = '['.T_('More:').']';
 	}
 
 	global $id,$postdata,$more,$c,$withcomments,$page,$pages,$multipage,$numpages;
@@ -478,7 +478,7 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
  */
 function single_post_title($prefix = '#', $display = 'htmlhead' ) 
 {
-	if( $prefix == '#' ) $prefix = ' '._('Post details').': ';
+	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
 
 	global $p;
 	if (intval($p)) {
@@ -529,8 +529,8 @@ function the_content( $more_link_text='#', $stripteaser=0, $more_file='', $more_
  */
 function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='') 
 {
-	if( $nextpagelink == '#' ) $nextpagelink = _('Next page');
-	if( $previouspagelink == '#' ) $previouspagelink = _('Previous page');
+	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
+	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
 
 	global $id,$page,$numpages,$multipage,$more;
 	global $blogfilename;
@@ -571,7 +571,7 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
  */
 function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='') 
 {
-	if( $previous == '#' ) $previous = _('Previous post') . ': ';
+	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
 	global $tableposts, $id, $postdata, $siteurl, $blogfilename, $querycount;
 	global $p, $posts, $posts_per_page, $s;
@@ -624,7 +624,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
  */
 function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='') 
 {
-	if( $next == '#' ) $next = _('Next post') . ': ';
+	if( $next == '#' ) $next = T_('Next post') . ': ';
 
 	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount;
 	global $time_difference;
@@ -717,7 +717,7 @@ function previous_posts( $page='' )
  */
 function next_posts_link($label='#', $max_page=0, $page='') 
 {
-	if( $label == '#' ) $label = _('Next Page').' >>';
+	if( $label == '#' ) $label = T_('Next Page').' >>';
 
 	global $p, $paged, $result, $request, $posts_per_page, $what_to_show;
 	if ($what_to_show == 'paged') 
@@ -744,7 +744,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
  */
 function previous_posts_link($label='#', $page='') 
 {
-	if( $label == '#' ) $label = '<< '._('Previous Page');
+	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
 	global $p, $paged, $what_to_show;
 	if (empty($p)  && ($paged > 1) && ($what_to_show == 'paged')) 
@@ -845,7 +845,7 @@ function the_time($d='', $echo = 1, $useGM = 0)
 function the_weekday() 
 {
 	global $weekday,$id,$postdata;
-	$the_weekday = _($weekday[mysql2date('w', $postdata['Date'])]);
+	$the_weekday = T_($weekday[mysql2date('w', $postdata['Date'])]);
 	echo $the_weekday;
 }
 
@@ -860,7 +860,7 @@ function the_weekday_date($before='',$after='')
 	$the_weekday_date = '';
 	if ($day != $previousweekday) {
 		$the_weekday_date .= $before;
-		$the_weekday_date .= _($weekday[mysql2date('w', $postdata['Date'])]);
+		$the_weekday_date .= T_($weekday[mysql2date('w', $postdata['Date'])]);
 		$the_weekday_date .= $after;
 		$previousweekday = $day;
 	}

@@ -1225,15 +1225,15 @@ function pingback_ping($m) {
 							$postdata = get_postdata($post_ID);
 							$authordata = get_userdata($postdata['Author_ID']);
 							$recipient = $authordata['user_email'];
-							$subject = sprintf( N_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
+							$subject = sprintf( NT_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
 							// fplanque added:
 							$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 	
-							$notify_message  = sprintf( N_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
+							$notify_message  = sprintf( NT_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$post_ID."&pb=1\n\n";
-							$notify_message .= N_('Website'). ": $original_title\n";
-							$notify_message .= N_('Url'). "    : $original_pagelinkedfrom\n";
-							$notify_message .= N_('Excerpt'). ": \n[...] $original_context [...]\n\n";
+							$notify_message .= NT_('Website'). ": $original_title\n";
+							$notify_message .= NT_('Url'). "    : $original_pagelinkedfrom\n";
+							$notify_message .= NT_('Excerpt'). ": \n[...] $original_context [...]\n\n";
 	
 							@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
 	

@@ -13,7 +13,7 @@
 	if( ($disp == 'stats') || ($stats) ) 
 	{ ?>
 	
-	<div class="statbloc"><h3><?php echo _('Last referers') ?>:</h3>
+	<div class="statbloc"><h3><?php echo T_('Last referers') ?>:</h3>
 	<?php refererList(10,'global',1,1,'no','',($blog>1)?$blog:''); ?>
 	<ul>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -23,7 +23,7 @@
 	</div>
 	
 	<div class="statbloc">
-	<h3><?php echo _('Top referers') ?>:</h3>
+	<h3><?php echo T_('Top referers') ?>:</h3>
 	<?php refererList(10,'global',0,0,'no','baseDomain',($blog>1)?$blog:'',false); ?>
 	<ol>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -33,7 +33,7 @@
 	</div>
 	
 	<div class="statbloc" style="clear: left;">
-	<h3><?php echo _('Last refering searches') ?>:</h3>
+	<h3><?php echo T_('Last refering searches') ?>:</h3>
 	<?php refererList(20,'global',1,1,'search','',($blog>1)?$blog:''); ?>
 	<ul>
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -43,7 +43,7 @@
 	</div>
 	
 	<div class="statbloc">
-	<h3><?php echo _('Top refering engines') ?>:</h3>
+	<h3><?php echo T_('Top refering engines') ?>:</h3>
 	<?php refererList(10,'global',0,0,'search','baseDomain',($blog>1)?$blog:'',true); ?>
 	<table class="invisible">
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -57,7 +57,7 @@
 	</div>
 	
 	<div class="statbloc">
-	<h3><?php echo _('Top Indexing Robots') ?>:</h3>
+	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
 	<?php refererList(10,'global',0,0,'robot','hit_user_agent',($blog>1)?$blog:'',true,true); ?>
 	<table class="invisible">
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
@@ -72,7 +72,7 @@
 	
 	
 	<div class="statbloc">
-	<h3><?php echo _('Top Aggregators') ?>:</h3>
+	<h3><?php echo T_('Top Aggregators') ?>:</h3>
 	<?php refererList(10,'global',0,0,'rss','hit_user_agent',($blog>1)?$blog:'',true,true); ?>
 	<table class="invisible">
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>

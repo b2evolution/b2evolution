@@ -66,7 +66,7 @@
 	
 	echo '<h2>';
 	single_cat_title();
-	single_month_title( _(' Date range: '), 'htmlbody' );
+	single_month_title( T_(' Date range: '), 'htmlbody' );
 	single_post_title();
 	echo '</h2>';
 	
@@ -116,17 +116,17 @@
 					the_time('Y/m/d @ H:i:s');
 					echo '</strong>';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-					echo ' ', _('by'), ' ';
+					echo ' ', T_('by'), ' ';
 					the_author();
 					echo ' (<a href="javascript:profile(', the_author_ID(), '">';
 					the_author_nickname();
 					echo '</a>), ';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-					echo _('in'), ' ';
+					echo T_('in'), ' ';
 					the_categories( false );
 					echo ' - ';
 					the_language();
-					echo ' - ', _('Status'), ': ';
+					echo ' - ', T_('Status'), ': ';
 					the_status(); 
 				?>
 			</div>
@@ -151,19 +151,19 @@
 				<form action="b2edit.php" method="get" class="inline">
 					<input type="hidden" name="action" value="edit">
 					<input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>">
-					<input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo _('&nbsp; Edit &nbsp;') ?>" class="search" />
+					<input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
 				</form>
 				<form action="edit_actions.php" method="get" class="inline">
-					<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo _('Delete') ?>" class="search" onclick="return confirm('<?php echo _('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
+					<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
 				</form>
 			<?php } ?>
 				[ <a href="b2edit.php?blog=<?php echo $blog ?>&p=<?php echo $id ?>&c=1"><?php 
 				// TRANS: Link to comments for current post
-				comments_number(_('no comment'), _('1 comment'), _('% comments'));
-				trackback_number('', ', '._('1 Trackback'), ', '._('% Trackbacks'));
-				pingback_number('', ', '._('1 Pingback'), ', '._('% Pingbacks')); 
+				comments_number(T_('no comment'), T_('1 comment'), T_('% comments'));
+				trackback_number('', ', '.T_('1 Trackback'), ', '.T_('% Trackbacks'));
+				pingback_number('', ', '.T_('1 Pingback'), ', '.T_('% Pingbacks')); 
 				?></a>
-				- <a href="<?php permalink_single(); ?>" title="<?php echo _('Permanent link to this post') ?>"><?php echo _('Permalink') ?></a> ]
+				- <a href="<?php permalink_single(); ?>" title="<?php echo T_('Permanent link to this post') ?>"><?php echo T_('Permalink') ?></a> ]
 			</p>
 				
 			<?php
@@ -177,7 +177,7 @@
 				?>
 
 				<a name="comments"></a>
-				<h4><?php echo _('Comments') ?>:</h4>
+				<h4><?php echo T_('Comments') ?>:</h4>
 
 				<?php
 				while($rowc = mysql_fetch_object($resultc))
@@ -201,10 +201,10 @@
 						<input type="hidden" name="blog" value="<?php echo $blog ?>">
 						<input type="hidden" name="action" value="editcomment">
 						<input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>">
-						<input type="submit" name="submit" value="<?php echo _('&nbsp; Edit &nbsp;') ?>" class="search" />
+						<input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
 					</form>
 					<form action="edit_actions.php" method="get" class="inline">
-						<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>"><input type="hidden" name="p" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo _('Delete') ?>" class="search" onclick="return confirm('<?php printf( _('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
+						<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment" value="<?php echo $commentdata['comment_ID'] ?>"><input type="hidden" name="p" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
 					</form>
 					<?php
 					}
@@ -217,10 +217,10 @@
 				}
 
 				if ($comment_error)
-					echo '<p><font color="red">', _('Error: please fill the required fields (name & comment)'), '</font></p>';
+					echo '<p><font color="red">', T_('Error: please fill the required fields (name & comment)'), '</font></p>';
 				?>
 
-				<h4><?php echo _('Leave a comment') ?>:</h4>
+				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
 				<!-- form to add a comment -->
 				<form action="<?php echo $baseurl, 'file:///C|/www/b2evolution', $pathhtsrv ?>/comment_post.php" method="post" class="bComment">
@@ -229,43 +229,43 @@
 					<input type="hidden" name="redirect_to" value="<?php echo $_SERVER["REQUEST_URI"]; ?>" />
 					
 					<fieldset>
-						<div class="label"><label for="author"><?php echo _('Name') ?>:</label></div>
+						<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
 						<div class="input"><input type="text" name="author" id="author" value="<?php echo $user_nickname ?>" size="40" tabindex="1" class="bComment" /></div>
 					</fieldset>
 			
 					
 					<fieldset>
-						<div class="label"><label for="email"><?php echo _('Email') ?>:</label></div>
+						<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
 						<div class="input"><input type="text" name="email" id="email" value="<?php echo $user_email ?>" size="40" tabindex="2" class="bComment" /><br />
-							<span class="notes"><?php echo _('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
+							<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
 						</div>
 					</fieldset>
 					
 					<fieldset>
-						<div class="label"><label for="url"><?php echo _('Site/Url') ?>:</label></div>
+						<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
 						<div class="input"><input type="text" name="url" id="url" value="<?php echo $user_url ?>" size="40" tabindex="3" class="bComment" /><br />
-							<span class="notes"><?php echo _('Your URL will be displayed.') ?></span>
+							<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
 						</div>
 					</fieldset>
 							
 					<fieldset>
-						<div class="label"><label for="comment"><?php echo _('Comment text') ?>:</label></div>
+						<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
 						<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" tabindex="4" class="bComment"></textarea><br />
-							<span class="notes"><?php echo _('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), '<br />', _('URLs, email, AIM and ICQs will be converted automatically.'); ?></span>
+							<span class="notes"><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), '<br />', T_('URLs, email, AIM and ICQs will be converted automatically.'); ?></span>
 						</div>
 					</fieldset>
 							
 					<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
 					<fieldset>
-						<div class="label"><?php echo _('Options') ?>:</div>
-						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes"><?php echo _('(Line breaks become &lt;br&gt;)') ?></span>
+						<div class="label"><?php echo T_('Options') ?>:</div>
+						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes"><?php echo T_('(Line breaks become &lt;br&gt;)') ?></span>
 						</div>
 					</fieldset>
 					<?php } ?>
 				
 					<fieldset>
 						<div class="input">
-							<input type="submit" name="submit" class="buttonarea" value="<?php echo _('Send comment') ?>" tabindex="8" />
+							<input type="submit" name="submit" class="buttonarea" value="<?php echo T_('Send comment') ?>" tabindex="8" />
 						</div>
 					</fieldset>
 				
@@ -304,36 +304,36 @@
 
 	<div class="bSideItem">
 		<form name="searchform" method="get" action="<?php echo $pagenow ?>">
-			<h3><span style="float:right"><input type="submit" name="submit" value="<?php echo _('Search') ?>" class="search" /></span><?php echo _('Search') ?></h3>
+			<h3><span style="float:right"><input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" /></span><?php echo T_('Search') ?></h3>
 
 			<input type="hidden" name="blog" value="<?php echo $blog ?>">
 
 			<fieldset title="Posts to show">
-				<legend><?php echo _('Posts to show') ?></legend>
+				<legend><?php echo T_('Posts to show') ?></legend>
 				<div>
-				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" ' ?>/><label for="ts_min"><?php echo _('Past') ?></label><br />
-				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo _('Future') ?></label>
+				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" ' ?>/><label for="ts_min"><?php echo T_('Past') ?></label><br />
+				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo T_('Future') ?></label>
 				</div>
 				
 				<div>
-				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="ts_min"><?php echo _('Draft') ?></label><br />
-				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo _('Published') ?></label>
+				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="ts_min"><?php echo T_('Draft') ?></label><br />
+				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo T_('Published') ?></label>
 				</div>
 				
 			</fieldset>
 
 			<fieldset title="Text">
-				<legend><?php echo _('Title / Text contains') ?></legend>
+				<legend><?php echo T_('Title / Text contains') ?></legend>
 				<div>
 				<input type="text" name="s" size="20" value="<?php echo $s ?>" class="SearchField" />
 				</div>
-				<?php echo _('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo _('AND') ?></label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo _('OR') ?></label>
-				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
+				<?php echo T_('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('AND') ?></label>
+				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('OR') ?></label>
+				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Sentence') ?></label>
 			</fieldset>
 
 			<fieldset title="Archives">
-				<legend><?php echo _('Archives') ?></legend>
+				<legend><?php echo T_('Archives') ?></legend>
 				<ul>
 				<?php
 				// this is what will separate your archive links
@@ -364,7 +364,7 @@
 							if( $m == $arc_m ) echo ' checked="checked"' ;
 							echo ' />';
 							echo '<a href="'.$arc_link_start.'m='.$arc_m.'">';
-							echo _($month[zeroise($arc_month,2)]),' ',$arc_year;
+							echo T_($month[zeroise($arc_month,2)]),' ',$arc_year;
 							echo "</a> ($arc_count)";
 							break;
 				
@@ -410,7 +410,7 @@
 			</fieldset>
 			
 			<fieldset title="Categories">
-				<legend><?php echo _('Categories') ?></legend>
+				<legend><?php echo T_('Categories') ?></legend>
 				<ul>
 				<?php 
 				$cat_line_start = '<li>';
@@ -485,8 +485,8 @@
 				</ul>
 			</fieldset>
 			
-			<input type="submit" name="submit" value="<?php echo _('Search') ?>" class="search" />
-			[<a href="<?php echo $pagenow,'?blog=',$blog ?>"><?php echo _('Reset') ?></a>]
+			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" />
+			[<a href="<?php echo $pagenow,'?blog=',$blog ?>"><?php echo T_('Reset') ?></a>]
 		</form>
 		
 	</div>

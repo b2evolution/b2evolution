@@ -60,25 +60,25 @@ case "register":
 
 	/* checking login has been typed */
 	if ($user_login=='') {
-		die ('<strong>'. _('ERROR'). "</strong>: ". _('please enter a Login'));
+		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login'));
 	}
 
 	/* checking the password has been typed twice */
 	if ($pass1=='' ||$pass2=='') {
-		die ('<strong>'. _('ERROR'). "</strong>: ". _('please enter your password twice'));
+		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter your password twice'));
 	}
 
 	/* checking the password has been typed twice the same */
 	if ($pass1!=$pass2)	{
-		die ('<strong>'. _('ERROR'). "</strong>: ". _('please type the same password in the two password fields'));
+		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type the same password in the two password fields'));
 	}
 	$user_nickname=$user_login;
 
 	/* checking e-mail address */
 	if ($user_email=="") {
-		die ('<strong>'. _('ERROR'). "</strong>: ". _('please type your e-mail address'));
+		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please type your e-mail address'));
 	} else if (!is_email($user_email)) {
-		die ('<strong>'. _('ERROR'). "</strong>: ". _('the email address is invalid'));
+		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('the email address is invalid'));
 	}
 
 	// Connecting to the db:
@@ -90,7 +90,7 @@ case "register":
 	$lines = mysql_num_rows($result);
 	mysql_free_result($result);
 	if ($lines>=1) {
-		die ('<strong>'. _('ERROR'). "</strong>: ". _('this login is already registered, please choose another one'). "");
+		die ('<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one'). "");
 	}
 
 	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'] ;
@@ -109,16 +109,16 @@ case "register":
 		$stars .= "*";
 	}
 
-	$message  = N_('new user registration on your blog'). ":\n\n";
-	$message .= N_('Login'). ": $user_login\n\n". N_('Email'). ": $user_email\n\n";
-	$message .= N_('Manage users'). ": $pathserver/b2team.php\n\n";
+	$message  = NT_('new user registration on your blog'). ":\n\n";
+	$message .= NT_('Login'). ": $user_login\n\n". NT_('Email'). ": $user_email\n\n";
+	$message .= NT_('Manage users'). ": $pathserver/b2team.php\n\n";
 
-	@mail( $admin_email, N_('new user registration on your blog'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+	@mail( $admin_email, NT_('new user registration on your blog'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo _('b2evo') ?> &gt; <?php echo _('Registration complete') ?></title>
+	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('Registration complete') ?></title>
 <link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
@@ -151,16 +151,16 @@ textarea,input,select {
 <a href="http://b2evolution.net/" target="_blank"><img src="img/b2minilogo.png" border="0" alt="visit b2's homepage" /></a>
 </td>
 <td class="b2menutop" align="center">
-<?php echo _('Registration complete') ?>
+<?php echo T_('Registration complete') ?>
 </td>
 </tr>
 
 <tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
 
 <table width="180">
-<tr><td align="right" colspan="2"><?php echo _('Login') ?>: <strong><?php echo $user_login ?>&nbsp;</strong></td></tr>
-<tr><td align="right" colspan="2"><?php echo _('Password') ?>: <strong><?php echo $stars ?>&nbsp;</strong></td></tr>
-<tr><td align="right" colspan="2"><?php echo _('Email') ?>: <strong><?php echo $user_email ?>&nbsp;</strong></td></tr>
+<tr><td align="right" colspan="2"><?php echo T_('Login') ?>: <strong><?php echo $user_login ?>&nbsp;</strong></td></tr>
+<tr><td align="right" colspan="2"><?php echo T_('Password') ?>: <strong><?php echo $stars ?>&nbsp;</strong></td></tr>
+<tr><td align="right" colspan="2"><?php echo T_('Email') ?>: <strong><?php echo $user_email ?>&nbsp;</strong></td></tr>
 <tr><td width="90">&nbsp;</td>
 <td><form name="login" action="b2login.php" method="post">
 <input type="hidden" name="log" value="<?php echo $user_login ?>" />
@@ -186,7 +186,7 @@ case "disabled":
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo _('b2evo') ?> &gt; <?php echo _('Registration Currently Disabled') ?></title>
+	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('Registration Currently Disabled') ?></title>
 	<link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
@@ -227,8 +227,8 @@ registration disabled<br />
 <td align="center" valign="center" height="150" colspan="2">
 <table width="80%" height="100%">
 <tr><td class="b2menutop">
-<?php echo _('User registration is currently not allowed.') ?><br />
-<a href="<?php echo $baseurl ?>" ><?php echo _('Home') ?></a>
+<?php echo T_('User registration is currently not allowed.') ?><br />
+<a href="<?php echo $baseurl ?>" ><?php echo T_('Home') ?></a>
 </td></tr></table>
 </td>
 </tr>
@@ -248,7 +248,7 @@ default:
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<title><?php echo _('b2evo') ?> &gt; <?php echo _('Register form') ?></title>
+<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('Register form') ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
@@ -292,13 +292,13 @@ registration<br />
 <input type="hidden" name="action" value="register" />
 <table border="0" width="180" class="menutop" style="background-color: #ffffff">
 <tr>
-<td width="150" align="right"><?php echo _('Login:') ?></td>
+<td width="150" align="right"><?php echo T_('Login:') ?></td>
 <td>
 <input type="text" name="user_login" size="8" maxlength="20" />
 </td>
 </tr>
 <tr>
-<td align="right"><?php echo _('Password:') ?><br /><?php echo _('(twice)') ?></td>
+<td align="right"><?php echo T_('Password:') ?><br /><?php echo T_('(twice)') ?></td>
 <td>
 <input type="password" name="pass1" size="8" maxlength="100" />
 <br />
@@ -306,7 +306,7 @@ registration<br />
 </td>
 </tr>
 <tr>
-<td align="right"><?php echo _('Email') ?></td>
+<td align="right"><?php echo T_('Email') ?></td>
 <td>
 <input type="text" name="user_email" size="8" maxlength="100" />
 </td>

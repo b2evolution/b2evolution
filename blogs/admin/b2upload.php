@@ -3,15 +3,15 @@
 require_once (dirname(__FILE__).'/_header.php');
 
 if ($user_level == 0) //Checks to see if user has logged in
-die (_("Cheatin' uh ?"));
+die (T_("Cheatin' uh ?"));
 
 if (!$use_fileupload) //Checks if file upload is enabled in the config
-die (_("The admin disabled this function"));
+die (T_("The admin disabled this function"));
 
 ?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo _('b2evo') ?> &gt; <?php echo _('upload images/files') ?></title>
+	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('upload images/files') ?></title>
 	<link rel="stylesheet" href="b2.css" type="text/css">
 <?php if ($use_spellchecker) { ?>
 <script type="text/javascript" language="javascript" src="<?php echo $spch_url; ?>"></script><?php } ?>
@@ -97,17 +97,17 @@ if (!isset($_POST['submit']))
 	$i = explode(" ",$fileupload_allowedtypes);
 	$i = implode(", ",array_slice($i, 1, count($i)-2));
 	?>
-	<p><strong><?php echo _('File upload') ?></strong></p>
-	<p><?php echo _('Allowed file types:'), $i ?></p>
-	<p><?php printf( _('Maximum allowed file size: %d KB'), $fileupload_maxk ); ?></p>
+	<p><strong><?php echo T_('File upload') ?></strong></p>
+	<p><?php echo T_('Allowed file types:'), $i ?></p>
+	<p><?php printf( T_('Maximum allowed file size: %d KB'), $fileupload_maxk ); ?></p>
 	<form action="b2upload.php" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $fileupload_maxk*1024 ?>" />
 	<input type="file" name="img1" size="30" class="uploadform" />
 
-	<p><?php echo _('Description') ?>:<br />
+	<p><?php echo T_('Description') ?>:<br />
 	<input type="text" name="imgdesc" size="30" class="uploadform" /></p>
 	
-	<input type="submit" name="submit" value="<?php echo _('Upload !') ?>" class="search" />
+	<input type="submit" name="submit" value="<?php echo T_('Upload !') ?>" class="search" />
 	</form>
 	</td>
 	</tr>
@@ -135,7 +135,7 @@ if (!empty($HTTP_POST_VARS)) { //$img1_name != "") {
 	$imgtype = " ".$imgtype[count($imgtype)-1]." ";
 
 	if (!ereg(strtolower($imgtype), strtolower($fileupload_allowedtypes))) {
-	    die(sprintf( _('File %s: type %s is not allowed.'), $img1_name, $imgtype ));
+	    die(sprintf( T_('File %s: type %s is not allowed.'), $img1_name, $imgtype ));
 	}
 
 	if (strlen($imgalt)) {
@@ -164,24 +164,24 @@ if (!empty($HTTP_POST_VARS)) { //$img1_name != "") {
 		$i = explode(" ",$fileupload_allowedtypes);
 		$i = implode(", ",array_slice($i, 1, count($i)-2));
 		move_uploaded_file($img1, $pathtofile2) 
-		 or die( _('Couldn\'t upload your file to:').' '.$pathtofile2);
+		 or die( T_('Couldn\'t upload your file to:').' '.$pathtofile2);
 	
 	// duplicate-renaming function contributed by Gary Lawrence Murphy
 	?>
-	<p><strong><?php echo _('Duplicate File?') ?></strong></p>
-	<p><strong><em><?php printf( _('The filename "%s" already exists!'), $img1_name ); ?></em></strong></p>
-	<p><?php printf( _('Filename "%s" moved to "%s"'), $img1, $pathtofile2.'/'.$img2_name ); ?></p>
-	<p><?php echo _('Confirm or rename:') ?></p>
+	<p><strong><?php echo T_('Duplicate File?') ?></strong></p>
+	<p><strong><em><?php printf( T_('The filename "%s" already exists!'), $img1_name ); ?></em></strong></p>
+	<p><?php printf( T_('Filename "%s" moved to "%s"'), $img1, $pathtofile2.'/'.$img2_name ); ?></p>
+	<p><?php echo T_('Confirm or rename:') ?></p>
 	<form action="b2upload.php" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $fileupload_maxk*1024 ?>" />
 	<input type="hidden" name="img1_type" value="<?php echo $img1_type;?>" />
 	<input type="hidden" name="img1_name" value="<?php echo $img2_name;?>" />
 	<input type="hidden" name="img1" value="<?php echo $pathtofile2;?>" />
-	<?php echo _('Alternate name') ?>:<br /><input type="text" name="imgalt" size="30" class="uploadform" value="<?php echo $img2_name;?>" /><br />
+	<?php echo T_('Alternate name') ?>:<br /><input type="text" name="imgalt" size="30" class="uploadform" value="<?php echo $img2_name;?>" /><br />
 	<br />
-	<?php echo _('Description') ?>:<br /><input type="text" name="imgdesc" size="30" class="uploadform" value="<?php echo $imgdesc;?>" />
+	<?php echo T_('Description') ?>:<br /><input type="text" name="imgdesc" size="30" class="uploadform" value="<?php echo $imgdesc;?>" />
 	<br />
-	<input type="submit" name="submit" value="<?php echo _('Confirm !') ?>" class="search" />
+	<input type="submit" name="submit" value="<?php echo T_('Confirm !') ?>" class="search" />
 	</form>
 	</td>
 	</tr>
@@ -194,10 +194,10 @@ if (!empty($HTTP_POST_VARS)) { //$img1_name != "") {
 
 	if (!strlen($imgalt)) {
 		move_uploaded_file($img1, $pathtofile) //Path to your images directory, chmod the dir to 777
-		 or die( _('Couldn\'t upload your file to:').' '.$pathtofile);
+		 or die( T_('Couldn\'t upload your file to:').' '.$pathtofile);
 	} else {
 		rename($img1, $pathtofile)
-		or die( _('Couldn\'t upload your file to:').' '.$pathtofile);
+		or die( T_('Couldn\'t upload your file to:').' '.$pathtofile);
 	}
 
 }
@@ -211,28 +211,28 @@ if ( ereg('image/',$img1_type)) {
 
 ?>
 
-<p><strong><?php echo _('File uploaded !') ?></strong></p>
-<p><?php printf( _('Your file <strong>"%s"</strong> was uploaded successfully !'), $img1_name ); ?></p>
-<p><?php echo _('Here\'s the code to display it:') ?></p>
+<p><strong><?php echo T_('File uploaded !') ?></strong></p>
+<p><?php printf( T_('Your file <strong>"%s"</strong> was uploaded successfully !'), $img1_name ); ?></p>
+<p><?php echo T_('Here\'s the code to display it:') ?></p>
 <p><form>
 <!--<textarea cols="25" rows="3" wrap="virtual"><?php echo "&lt;img src=&quot;$fileupload_url/$img1_name&quot; border=&quot;0&quot; alt=&quot;&quot; /&gt;"; ?></textarea>-->
 <input type="text" name="imgpath" value="<?php echo $piece_of_code; ?>" size="38" style="padding: 5px; margin: 2px;" /><br />
 <input type="button" name="close" value="Add the code to your post !" class="search" onClick="targetopener('<?php echo $piece_of_code; ?>')" style="margin: 2px;" />
 </form>
 </p>
-<p><strong><?php echo _('Image Details') ?></strong>: <br />
-<?php echo _('Name') ?>: 
+<p><strong><?php echo T_('Image Details') ?></strong>: <br />
+<?php echo T_('Name') ?>: 
 <?php echo "$img1_name"; ?>
 <br />
-<?php echo _('Size') ?>: 
+<?php echo T_('Size') ?>: 
 <?php echo round($img1_size/1024,2); ?> KB
 <br />
-<?php echo _('Type') ?>: 
+<?php echo T_('Type') ?>: 
 <?php echo "$img1_type"; ?>
 </p>
 <p align="right">
 <form>
-<input type="button" name="close" value="<?php echo _('Close this window') ?>" class="search" onClick="window.close()" />
+<input type="button" name="close" value="<?php echo T_('Close this window') ?>" class="search" onClick="window.close()" />
 </form>
 </p>
 </td>

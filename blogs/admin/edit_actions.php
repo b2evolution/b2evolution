@@ -33,7 +33,7 @@ case 'post':
 	set_param( 'post_category', 'integer', true );
 	$blog = get_catblog($post_category); 
 
-	$title = _('Adding new post...');
+	$title = T_('Adding new post...');
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
@@ -49,7 +49,7 @@ case 'post':
 	$post_extracats = & $extracats;
 	set_param( 'post_lang', 'string', $default_language );
 
-	if ($user_level == 0)	die (_('Cheatin\' uh ?'));
+	if ($user_level == 0)	die (T_('Cheatin\' uh ?'));
 
 	if (($user_level > 4) && (!empty($HTTP_POST_VARS["edit_date"]))) 
 	{
@@ -71,17 +71,17 @@ case 'post':
 	// CHECK and FORMAT content
 	$post_title = format_to_post($post_title,0,0);
 	if( !validate_url( $post_url, $allowed_uri_scheme ) )
-		errors_add( _('Supplied URL is invalid.') );	
+		errors_add( T_('Supplied URL is invalid.') );	
 	$content = format_to_post($content,$post_autobr,0);
 
-	if( errors_display( _('Cannot post, please correct these errors:'), 
-			'[<a href="javascript:history.go(-1)">'._('Back to post editing').'</a>]' ) )
+	if( errors_display( T_('Cannot post, please correct these errors:'), 
+			'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' ) )
 	{
 		break;
 	}
 
 	echo "<div class=\"panelinfo\">\n";
-	echo '<h3>', _('Recording post...'), "</h3>\n";
+	echo '<h3>', T_('Recording post...'), "</h3>\n";
 
 	// Are we going to do the pings one not?
 	$pingsdone = ( $post_status == 'published' ) ? true : false;
@@ -91,17 +91,17 @@ case 'post':
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
 	{
-		echo '<p>', _('Sleeping...'), "</p>\n";
+		echo '<p>', T_('Sleeping...'), "</p>\n";
 		flush();
 		sleep($sleep_after_edit);
 	}
-	echo '<p>', _('Done.'), "</p>\n";
+	echo '<p>', T_('Done.'), "</p>\n";
 	echo "</div>\n";
 
 	if( $post_status != 'published' )
 	{
 		echo "<div class=\"panelinfo\">\n";
-		echo '<p>', _('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
+		echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
 		echo "</div>\n";
 	}
 	else
@@ -190,11 +190,11 @@ case "editpost":
 	// CHECK and FORMAT content	
 	$post_title = format_to_post($post_title,0,0);
 	if( !validate_url( $post_url, $allowed_uri_scheme ) )
-		errors_add( _('Supplied URL is invalid.') );	
+		errors_add( T_('Supplied URL is invalid.') );	
 	$content = format_to_post($content,$post_autobr,0);
 
-	if( errors_display( _('Cannot update, please correct these errors:'), 
-			'[<a href="javascript:history.go(-1)">'._('Back to post editing').'</a>]' ) )
+	if( errors_display( T_('Cannot update, please correct these errors:'), 
+			'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' ) )
 	{
 		break;
 	}
@@ -203,7 +203,7 @@ case "editpost":
 	echo "<h3>Updating post...</h3>\n";
 
 	// We need to check the previous flags...
-	$postdata = get_postdata($post_ID) or die(_('Oops, no post with this ID.'));
+	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 	$post_flags = $postdata['Flags'];
 	if( in_array( 'pingsdone', $post_flags ) )
 	{	// pings have been done before
@@ -227,13 +227,13 @@ case "editpost":
 		flush();
 		sleep($sleep_after_edit);
 	}
-	echo '<p>', _('Done.'), "</p>\n";
+	echo '<p>', T_('Done.'), "</p>\n";
 	echo "</div>\n";
 
 	if( $post_status != 'published' )
 	{
 		echo "<div class=\"panelinfo\">\n";
-		echo '<p>', _('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
+		echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
 		echo "</div>\n";
 	}
 	else
@@ -249,7 +249,7 @@ case "editpost":
 		if( in_array( 'pingsdone', $post_flags ) )
 		{	// pings have been done before
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', _('Post had already pinged: skipping blog pings...'), "</p>\n";
+			echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
@@ -282,29 +282,29 @@ case "delete":
 	die ("Cheatin' uh ?");
 
 	$post = $_GET['post'];
-	$postdata=get_postdata($post) or die(_('Oops, no post with this ID!'));
+	$postdata=get_postdata($post) or die(T_('Oops, no post with this ID!'));
 	$authordata = get_userdata($postdata["Author_ID"]);
 
 	if ($user_level < $authordata[13])
-	die (sprintf( _('You don\'t have the right to delete <strong>%s</strong>\'s posts.'), $authordata[1] ));
+	die (sprintf( T_('You don\'t have the right to delete <strong>%s</strong>\'s posts.'), $authordata[1] ));
 
 	echo "<div class=\"panelinfo\">\n";
-	echo '<h3>', _('Deleting post...'), "</h3>\n";
+	echo '<h3>', T_('Deleting post...'), "</h3>\n";
 
 	// DELETE POST FROM DB:
 	bpost_delete( $post ) or mysql_oops($query);
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
-		echo '<p>', _('Sleeping...'), "</p>\n";
+		echo '<p>', T_('Sleeping...'), "</p>\n";
 		flush();
 		sleep($sleep_after_edit);
 	}
-	echo '<p>', _('Done.'), "</p>\n";
+	echo '<p>', T_('Done.'), "</p>\n";
 	echo "</div>\n";
 
 	?>
 	
-	<p><?php echo _('Deleting Done...') ?><p>
+	<p><?php echo T_('Deleting Done...') ?><p>
 
 	<?php
 		$location="b2edit.php?blog=$blog";
@@ -325,7 +325,7 @@ case "deletecomment":
 	$blog = $_GET['blog'];
 	$comment = $HTTP_GET_VARS['comment'];
 	$p = $HTTP_GET_VARS['p'];
-	$commentdata=get_commentdata($comment) or die(_('Oops, no comment with this ID.'));
+	$commentdata=get_commentdata($comment) or die(T_('Oops, no comment with this ID.'));
 
 	$query = "DELETE FROM $tablecomments WHERE comment_ID=$comment";
 	$result = mysql_query($query) or mysql_oops( $query );
@@ -341,7 +341,7 @@ case "editedcomment":
 	 */
 
 	if ($user_level == 0)
-		die (_("Cheatin' uh ?"));
+		die (T_("Cheatin' uh ?"));
 
 	set_param( 'blog', 'integer', true );
 	set_param( 'comment_ID', 'integer', true );
@@ -370,11 +370,11 @@ case "editedcomment":
 
 	// CHECK and FORMAT content	
 	if( !validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
-		errors_add( _('Supplied URL is invalid.') );	
+		errors_add( T_('Supplied URL is invalid.') );	
 	$content = format_to_post($content,$post_autobr,0); // We are faking this NOT to be a comment
 
-	if( errors_display( _('Cannot update comment, please correct these errors:'), 
-			'[<a href="javascript:history.go(-1)">'._('Back to post editing').'</a>]' ) )
+	if( errors_display( T_('Cannot update comment, please correct these errors:'), 
+			'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' ) )
 	{
 		break;
 	}
@@ -397,9 +397,9 @@ default:
 if( ! errors() )
 {
 ?>
-<p><strong>[<a href="<?php echo $location ?>"><?php echo _('Back to posts!') ?></a>]</strong></p>
+<p><strong>[<a href="<?php echo $location ?>"><?php echo T_('Back to posts!') ?></a>]</strong></p>
 
-<p><?php echo _('You may also want to generate static pages or view your blogs...') ?></p>
+<p><?php echo T_('You may also want to generate static pages or view your blogs...') ?></p>
 <?php
 	// List the blogs:
 	require( dirname(__FILE__).'/_blogs_list.php'); 

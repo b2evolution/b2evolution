@@ -19,9 +19,9 @@
 	single_post_title( ' - ', 'htmlhead' );
 	switch( $disp )
 	{
-		case 'comments': echo ' - ', _('Last comments'); break;
-		case 'stats': echo ' - ', _('Statistics'); break;
-		case 'arcdir': echo ' - ', _('Archive Directory'); break;
+		case 'comments': echo ' - ', T_('Last comments'); break;
+		case 'stats': echo ' - ', T_('Statistics'); break;
+		case 'arcdir': echo ' - ', T_('Archive Directory'); break;
 	}
 ?>
 </title>
@@ -53,9 +53,9 @@
 	single_post_title();
 	switch( $disp )
 	{
-		case 'comments': echo _('Last comments'); break;
-		case 'stats': echo _('Statistics'); break;
-		case 'arcdir': echo _('Archive Directory'); break;
+		case 'comments': echo T_('Last comments'); break;
+		case 'stats': echo T_('Statistics'); break;
+		case 'arcdir': echo T_('Archive Directory'); break;
 	}
 ?></h2>
 
@@ -70,7 +70,7 @@
 		<?php permalink_anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
-		<?php the_time();  echo ', ', _('Categories'), ': ';  the_categories() ?>
+		<?php the_time();  echo ', ', T_('Categories'), ': ';  the_categories() ?>
 		</div>
 		<h3 class="bTitle"><?php the_title(); ?></h3>
 		<div class="bText">
@@ -86,7 +86,7 @@
 		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
 		-
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
-		<?php if( $debug==1 ) printf( _('- %d queries so far'), $querycount); ?>
+		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
 		</div>
 		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
 		$disp_comments = 1;					// Display the comments if requested
@@ -126,39 +126,39 @@
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>
-	  	<li><a href="<?php bloginfo('staticurl', 'raw') ?>"><strong><?php echo _('Recently') ?></strong></a> <span class="dimmed"><?php echo _('(cached)') ?></span></li>
-	  	<li><a href="<?php bloginfo('dynurl', 'raw') ?>"><strong><?php echo _('Recently') ?></strong></a> <span class="dimmed"><?php echo _('(no cache)') ?></span></li>
+	  	<li><a href="<?php bloginfo('staticurl', 'raw') ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
+	  	<li><a href="<?php bloginfo('dynurl', 'raw') ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
 		</ul>
 		<?php	// -------------------------- CALENDAR INCLUDED HERE -----------------------------
 			require( dirname(__FILE__)."/_calendar.php"); 
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
-	  	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong><?php echo _('Last comments') ?></strong></a></li>
-	  	<li><a href="<?php bloginfo('blogstatsurl') ?>"><strong><?php echo _('Some viewing statistics') ?></strong></a></li>
+	  	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
+	  	<li><a href="<?php bloginfo('blogstatsurl') ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
 		</ul>
 	</div>
 	
 	<div class="bSideItem">
-    <h3 class="sideItemTitle"><?php echo _('Search') ?></h3>
+    <h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
 		<form name="SearchForm" method="get" class="search" action="<?php bloginfo('blogurl') ?>">
 			<input type="text" name="s" size="30" value="<?php echo $s ?>" class="SearchField" /><br />
-			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo _('All Words') ?></label>
-			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo _('Some Word') ?></label>
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo _('Sentence') ?></label>
-			<input type="submit" name="submit" value="<?php echo _('Search') ?>" />
-			<input type="reset" value="<?php echo _('Reset form') ?>" />
+			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
+			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
+			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Sentence') ?></label>
+			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
+			<input type="reset" value="<?php echo T_('Reset form') ?>" />
 		</form>
 	</div>
 
 	<div class="bSideItem">
-		<h3><?php echo _('Categories') ?></h3>
+		<h3><?php echo T_('Categories') ?></h3>
 		<form action="<?php bloginfo('blogurl', 'raw') ?>" method="get">
 		<?php	// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 			require( dirname(__FILE__)."/_categories.php"); 
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
-		<input type="submit" value="<?php echo _('Get selection') ?>" />
-		<input type="reset" value="<?php echo _('Reset form') ?>" />
+		<input type="submit" value="<?php echo T_('Get selection') ?>" />
+		<input type="reset" value="<?php echo T_('Reset form') ?>" />
 		</form>
 	</div>
 
@@ -168,7 +168,7 @@
 			<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 				require( dirname(__FILE__)."/_archives.php"); 
 				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-				<li><a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo _('more...') ?></a></li>
+				<li><a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo T_('more...') ?></a></li>
 	  </ul>
   </div>
 
@@ -186,22 +186,22 @@
 	{ ?>
 	
 	<div class="bSideItem">
-		<h3><?php echo _('Recent Referers') ?></h3>
+		<h3><?php echo T_('Recent Referers') ?></h3>
 			<?php refererList(5,'global',0,0,'no','',($blog>1)?$blog:''); ?>
 	  	<ul>
 				<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 				<?php } // End stat loop ?>
-				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo _('more...') ?></a></li>
+				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo T_('more...') ?></a></li>
 			</ul>
 		<br />
-		<h3><?php echo _('Top Referers') ?></h3>
+		<h3><?php echo T_('Top Referers') ?></h3>
 			<?php refererList(5,'global',0,0,'no','baseDomain',($blog>1)?$blog:''); ?>
 	   	<ul>
 				<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 				<?php } // End stat loop ?>
-				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo _('more...') ?></a></li>
+				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo T_('more...') ?></a></li>
 			</ul>
 	</div>
 
@@ -209,22 +209,22 @@
 
 
 	<div class="bSideItem">
-    <h3><?php echo _('Blogroll') ?></h3>
+    <h3><?php echo T_('Blogroll') ?></h3>
 		<?php	// -------------------------- BLOGROLL INCLUDED HERE -----------------------------
 			require( dirname(__FILE__)."/_blogroll.php"); 
 			// -------------------------------- END OF BLOGROLL ---------------------------------- ?>
 	</div>
 
 	<div class="bSideItem">
-    <h3><?php echo _('Misc') ?></h3>
+    <h3><?php echo T_('Misc') ?></h3>
 		<ul>  
-			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a></li>
-			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a></li>
+			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a></li>
+			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a></li>
 		</ul>	
 	</div>
 
 	<div class="bSideItem">
-    <h3><?php echo _('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
+    <h3><?php echo T_('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 
       <ul>
         <li><a href="<?php bloginfo('rss_url', 'raw'); ?>">RSS 0.92 (Userland)</a></li>
@@ -247,7 +247,7 @@
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
+		printf( T_('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
 	}
 ?>
 </p>

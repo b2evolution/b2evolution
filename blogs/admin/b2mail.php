@@ -33,17 +33,17 @@ error_reporting(2037);
 
 $pop3 = new POP3();
 
-echo _('Connecting to pop server...'), "<br />\n";
+echo T_('Connecting to pop server...'), "<br />\n";
 if(!$pop3->connect($mailserver_url, $mailserver_port)) {
-	echo _('Connection failed:'), " $pop3->ERROR <br />\n";
+	echo T_('Connection failed:'), " $pop3->ERROR <br />\n";
 	exit;
 }
 
-echo _('Logging into pop server...'), "<br />\n";
+echo T_('Logging into pop server...'), "<br />\n";
 $Count = $pop3->login($mailserver_login, $mailserver_pass);
 if((!$Count) || ($Count == -1)) 
 {
-	echo _('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
+	echo T_('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
 	$pop3->quit();
 	exit;
 }
@@ -54,7 +54,7 @@ if((!$Count) || ($Count == -1))
 
 for ($iCount=1; $iCount<=$Count; $iCount++) 
 {
-	printf( _('Getting message #%d...')."<br />\n", $iCount ); 
+	printf( T_('Getting message #%d...')."<br />\n", $iCount ); 
 	$MsgOne = $pop3->get($iCount);
 	if((!$MsgOne) || (gettype($MsgOne) != 'array')) 
 	{
@@ -63,7 +63,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 		exit;
 	}
 
-	echo _('Processing...'), "<br />\n";
+	echo T_('Processing...'), "<br />\n";
 	$content = '';
 	$content_type = '';
 	$boundary = '';
@@ -137,13 +137,13 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	if ($ddate_difference_days > 14) 
 	{
-		echo _('Too old'), '<br />';
+		echo T_('Too old'), '<br />';
 		continue;
 	}
 
 	if( !preg_match('/'.$subjectprefix.'/', $subject)) 
 	{
-		echo _('Subject prefix does not match'), '<br />';
+		echo T_('Subject prefix does not match'), '<br />';
 		continue;
 	}
 
@@ -163,7 +163,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$content = trim($content);
 
 	echo "<p><strong>Content-type:</strong> $content_type, <strong>boundary:</strong> $boundary</p>\n";
-	echo '<p><strong>', _('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
+	echo '<p><strong>', T_('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
 	
 	$btpos = strpos($content, $bodyterminator);
 	if ($btpos) {
@@ -198,14 +198,14 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$content = $contentfirstline.str_replace($firstline, '', $content);
 	$content = trim($content);
 
-	echo '<p><strong>', _('Login:'), '</strong> ', $user_login, ', <strong>', _('Pass:'), '</strong> ', $user_pass, '</p>';
+	echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
 
 	$sql = "SELECT ID, user_level FROM $tableusers WHERE user_login='$user_login' AND user_pass='$user_pass' ORDER BY ID DESC LIMIT 1";
 	$result = mysql_query($sql);
 
 	if (!mysql_num_rows($result)) 
 	{
-		echo '<p><strong>', _('Wrong login or password.'), '</strong></p></div>';
+		echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
 		continue;
 	}
 
@@ -225,7 +225,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 		if ($post_category == '') {
 			$post_category = $default_category;
 		}
-		echo '<p><strong>', _('Category ID'), ':</strong> ',$post_category,'</p>';
+		echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
 
 		if (!$thisisforfunonly) 
 		{
@@ -233,7 +233,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			$post_title = format_to_post(trim($post_title),0,0);
 			$content = format_to_post(trim($content),$autobr,0);
 		
-			if( errors_display( _('Cannot post, please correct these errors:'), '' ) )
+			if( errors_display( T_('Cannot post, please correct these errors:'), '' ) )
 			{
 				continue;
 			}
@@ -247,7 +247,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			}
 
 			$blog_ID = get_catblog($post_category); 
-			echo '<p><strong>', _('Blog ID'), ':</strong> ',$blog_ID,'</p>';
+			echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 			$blogparams = get_blogparams_by_ID( $blog_ID );
 			pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
 			pingb2evonet( $blogparams, $post_ID, $post_title);
@@ -255,8 +255,8 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			pingBlogs($blogparams);
 			pingCafelog($cafelogID, $post_title, $post_ID);
 		}
-		echo "\n<p><strong>", _('Posted title'), ':</strong> ', $post_title, '<br />';
-		echo "\n<strong>", _('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
+		echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
+		echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
 
 		if(!$pop3->delete($iCount)) 
 		{
@@ -266,13 +266,13 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 		}
 		else 
 		{
-			echo '<p>', _('Mission complete, message deleted.'), '</p>';
+			echo '<p>', T_('Mission complete, message deleted.'), '</p>';
 		}
 
 	} 
 	else 
 	{
-		echo '<p><strong>', _('Level 0 users can\'t post.'), '</strong></p>';
+		echo '<p><strong>', T_('Level 0 users can\'t post.'), '</strong></p>';
 	}
 	echo '</div>';
 	if ($output_debugging_info) 
@@ -291,7 +291,7 @@ if ($output_debugging_info) {
 	ob_end_clean();
 }
 
-echo _('End.'), "<br />\n";
+echo T_('End.'), "<br />\n";
 
 $pop3->quit();
 

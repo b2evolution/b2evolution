@@ -41,7 +41,7 @@ if( isset($MainList) ) while( $MainList->get_item() )
 &nbsp;-&nbsp;
 Categories: <?php the_categories() ?>
 &nbsp;-&nbsp;
-<span class="storyAuthor"><a href="<?php bloginfo('blogurl'); ?>?author=<?php the_author_ID() ?>" title="<?php echo _('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php the_time() ?></a>
+<span class="storyAuthor"><a href="<?php bloginfo('blogurl'); ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php the_time() ?></a>
 </div>
 
 <div class="storyContent">
@@ -108,7 +108,7 @@ Categories: <?php the_categories() ?>
 <h4>categories:</h4>
 <form action="<?php bloginfo('blogurl') ?>" method="get">
 <?php	require( dirname(__FILE__)."/_categories.php"); ?>
-<input type="submit" value="<?php echo _('Get selection') ?>" />
+<input type="submit" value="<?php echo T_('Get selection') ?>" />
 </form>
 
 
@@ -116,7 +116,7 @@ Categories: <?php the_categories() ?>
 
 <form name="searchform" method="get" action="<?php bloginfo('blogurl') ?>">
 	<input type="text" name="s" size="15" style="width: 100%" />
-	<input type="submit" name="submit" value="<?php echo _('Search') ?>" />
+	<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
 </form>
 
 <h4>archives:</h4>
@@ -134,8 +134,8 @@ Categories: <?php the_categories() ?>
 
 <h4>other:</h4>
 
-<a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a><br />
-<a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a><br />
+<a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a><br />
+<a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a><br />
 <br />
 
 <a href="<?php bloginfo('rss2_url'); ?>"><img src="../../img/xml.gif" alt="view this weblog as RSS !" width="36" height="14" border="0"  /></a><br />
@@ -147,7 +147,7 @@ Categories: <?php the_categories() ?>
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
-		printf( _('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
+		printf( T_('Totals: %d posts - %d queries - %01.3f seconds'), $result_num_rows, $querycount, timer_stop() );
 	}
 ?>
 </body>

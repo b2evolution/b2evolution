@@ -1,6 +1,6 @@
 <?php
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
-$title = _('Blogs');
+$title = T_('Blogs');
 param( 'action' );
 
 
@@ -11,10 +11,10 @@ switch($action)
 		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) 
 		{
-			die( _('You have no right to edit the blogs.') );
+			die( T_('You have no right to edit the blogs.') );
 		}
 		echo "<div class=\"panelblock\">\n";
-		echo '<h2>', _('New blog'), ":</h2>\n";
+		echo '<h2>', T_('New blog'), ":</h2>\n";
 		// EDIT FORM:
 		param( 'blog_name', 'string', 'new weblog' );
 		param( 'blog_shortname', 'string', 'new blog' );
@@ -40,7 +40,7 @@ switch($action)
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) {
-			die( _('You have no right to edit the blogs.') );
+			die( T_('You have no right to edit the blogs.') );
 		}
 	
 		param( 'blog_name', 'string', true );
@@ -68,7 +68,7 @@ switch($action)
 		// Quick hack to create a stub file:
 		if( $blog_siteurl == $baseurl )
 		{
-			echo '<p>', _('Trying to create stub file'), '</p>';
+			echo '<p>', T_('Trying to create stub file'), '</p>';
 			// Determine the edit folder:
 			$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
 			$last_pos = 0;
@@ -79,16 +79,16 @@ switch($action)
 			}
 	
 			$stub_contents = file( $edit_folder.'/stub.model' );
-			echo '<p>', _('Loading'), ': ', $stub_contents, '</p>';
+			echo '<p>', T_('Loading'), ': ', $stub_contents, '</p>';
 			
 			if( empty( $stub_contents ) )
 			{
-					echo '<p class="error">', _('Could not load stub model.'), '</p>';
+					echo '<p class="error">', T_('Could not load stub model.'), '</p>';
 			}	
 			else
 			{
 				$new_stub_file = $edit_folder.'/'.$blog_filename;
-				echo '<p>', _('Creating'), ': ', $new_stub_file, '</p>';
+				echo '<p>', T_('Creating'), ': ', $new_stub_file, '</p>';
 				$f = fopen( $new_stub_file , "w" );
 				if( $f == false )
 				{
@@ -107,26 +107,26 @@ switch($action)
 				
 				if( isset($default_stub_mod) ) 
 				{
-					printf( _('<p>Changing mod to %o</p>'), $default_stub_mod );
+					printf( T_('<p>Changing mod to %o</p>'), $default_stub_mod );
 					if( ! chmod( $new_stub_file, $default_stub_mod ) )
 					{
-						echo '<p class="error">', _('Warning'), ': ', _('chmod failed!'), '</p>';
+						echo '<p class="error">', T_('Warning'), ': ', T_('chmod failed!'), '</p>';
 					}
 				}
 				
 				if( isset($default_stub_owner) ) 
 				{
-					printf( _('<p>Changing owner to %s</p>'), $default_stub_owner );
+					printf( T_('<p>Changing owner to %s</p>'), $default_stub_owner );
 					if( ! chmod( $new_stub_file, $default_stub_owner ) )
 					{
-						echo '<p class="error">', _('Warning'), ': ', _('chown failed!'), '</p>';
+						echo '<p class="error">', T_('Warning'), ': ', T_('chown failed!'), '</p>';
 					}
 				}
 			}
 		}
 		
 		?>
-		<p><strong><?php printf( _('You should <a href="%s">create categories</a> for this blog now!'), 'b2categories.php?action=newcat&blog_ID='.$blog_ID ); ?></strong></p>
+		<p><strong><?php printf( T_('You should <a href="%s">create categories</a> for this blog now!'), 'b2categories.php?action=newcat&blog_ID='.$blog_ID ); ?></strong></p>
 		<?php
 		break;
 	
@@ -135,10 +135,10 @@ switch($action)
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) {
-			die( _('You have no right to edit the blogs.') );
+			die( T_('You have no right to edit the blogs.') );
 		}
 		echo "<div class=\"panelblock\">\n";
-		echo '<h2>', _('Blog params for:'), ' ', get_bloginfo('name'), "</h2>\n";
+		echo '<h2>', T_('Blog params for:'), ' ', get_bloginfo('name'), "</h2>\n";
 		// EDIT FORM:
 		$blog_name = get_bloginfo('name');
 		$blog_shortname = get_bloginfo('shortname');
@@ -162,7 +162,7 @@ switch($action)
 		
 	case 'update':
 		if ($user_level < 9) {
-			die( _('You have no right to edit the blogs.') );
+			die( T_('You have no right to edit the blogs.') );
 		}
 	
 		param( 'blog', 'integer', true );
@@ -197,17 +197,17 @@ switch($action)
 		require(dirname(__FILE__).'/_menutop_end.php');
 	?>
 		<div class="panelinfo">
-			<p><?php echo _('Blog'), ': ', get_bloginfo('name') ?></p>
+			<p><?php echo T_('Blog'), ': ', get_bloginfo('name') ?></p>
 	<?php
 		if ($user_level < 2) 
 		{
-			die( _('You have no right to generate static pages.') );
+			die( T_('You have no right to generate static pages.') );
 		}
 	
 		$staticfilename = get_bloginfo('staticfilename');
 		if( empty( $staticfilename ) )
 		{
-			echo '<p>', _('You haven\'t set a static filename for this blog!'), "</p>\n</div>\n";
+			echo '<p>', T_('You haven\'t set a static filename for this blog!'), "</p>\n</div>\n";
 			break;
 		}
 	
@@ -223,7 +223,7 @@ switch($action)
 		$filename = $edit_folder.'/'.get_bloginfo('filename');
 		$staticfilename = $edit_folder.'/'.$staticfilename; 
 		
-		printf( _('Generating page from <strong>%s</strong> to <strong>%s</strong>...'), $filename, $staticfilename );
+		printf( T_('Generating page from <strong>%s</strong> to <strong>%s</strong>...'), $filename, $staticfilename );
 		echo "<br />\n";
 		flush();
 		
@@ -232,13 +232,13 @@ switch($action)
 		$page = ob_get_contents();
 		ob_end_clean();
 	
-		echo _('Writing to file...'), '<br />', "\n";
+		echo T_('Writing to file...'), '<br />', "\n";
 	
 		$fp = fopen ( $staticfilename, "w");  
 		fwrite($fp, $page);
 		fclose($fp);
 	
-		echo _('Done.'), '<br />', "\n";
+		echo T_('Done.'), '<br />', "\n";
 	?>
 		</div>
 	<?php 
@@ -250,7 +250,7 @@ switch($action)
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) {
-			die( _('You have no right to edit the blogs.') );
+			die( T_('You have no right to edit the blogs.') );
 		}
 		
 }

@@ -44,9 +44,9 @@
 	single_post_title( ' - ', 'htmlhead' );
 	switch( $disp )
 	{
-		case 'comments': echo ' - ', _('Last comments'); break;
-		case 'stats': echo ' - ', _('Statistics'); break;
-		case 'arcdir': echo ' - ', _('Archive Directory'); break;
+		case 'comments': echo ' - ', T_('Last comments'); break;
+		case 'stats': echo ' - ', T_('Statistics'); break;
+		case 'arcdir': echo ' - ', T_('Archive Directory'); break;
 	}
 ?></title>
 <!-- InstanceEndEditable --> 
@@ -118,9 +118,9 @@
 	single_post_title();
 	switch( $disp )
 	{
-		case 'comments': echo _('Last comments'); break;
-		case 'stats': echo _('Statistics'); break;
-		case 'arcdir': echo _('Archive Directory'); break;
+		case 'comments': echo T_('Last comments'); break;
+		case 'stats': echo T_('Statistics'); break;
+		case 'arcdir': echo T_('Archive Directory'); break;
 	}
 ?></h2>
 
@@ -134,7 +134,7 @@ the_date( '', '<h2>', '</h2>' );
 		<?php permalink_anchor(); ?>
 		<div class="bSmallHead">
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
-		<?php the_time();  echo ', ', _('Categories'), ': ';  the_categories() ?>
+		<?php the_time();  echo ', ', T_('Categories'), ': ';  the_categories() ?>
 		</div>
 		<h3 class="bTitle"><?php the_title(); ?></h3>
 		<div class="bText">
@@ -150,7 +150,7 @@ the_date( '', '<h2>', '</h2>' );
 		<a href="<?php permalink_link() ?>#comments" title="Display pingbacks"><?php pingback_number() ?></a>
 		-
 		<a href="<?php permalink_link() ?>" title="Permanent link to full entry">Permalink</a>
-		<?php if( $debug==1 ) printf( _('- %d queries so far'), $querycount); ?>
+		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
 		</div>
 		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
 		$disp_comments = 1;					// Display the comments if requested
@@ -258,10 +258,10 @@ the_date( '', '<h2>', '</h2>' );
 
 
 	<div class="bSideItem">
-    <h3><?php echo _('Misc') ?></h3>
+    <h3><?php echo T_('Misc') ?></h3>
 		<ul>  
-			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo _('Login...') ?></a></li>
-			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo _('Register...') ?></a></li>
+			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a></li>
+			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a></li>
 		</ul>	
 	</div>
 

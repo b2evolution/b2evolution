@@ -49,7 +49,7 @@ case 'new':
 	 * --------------------------------------------------------------------
 	 * New post form
 	 */
-	$title = _('New post in blog:');
+	$title = T_('New post in blog:');
 	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
 	require (dirname(__FILE__).'/_edit_blogselect.php');
@@ -75,7 +75,7 @@ case 'new':
 	{
 		?>
 		<div class="panelblock">
-		<?php printf( _('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' ); ?>
+		<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' ); ?>
 		</div>
 		<?php
 	
@@ -89,12 +89,12 @@ case "edit":
 	 * Display post editing form
 	 */
 	set_param( "post", 'integer', true );
-	$postdata = get_postdata($post) or die( _('Oops, no post with this ID.') );
+	$postdata = get_postdata($post) or die( T_('Oops, no post with this ID.') );
 	$post_lang = $postdata["Lang"];
 	$cat = $postdata["Category"];
 	$blog = get_catblog($cat); 
 
-	$title = _('Editing post');
+	$title = T_('Editing post');
 	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
   echo "#".$postdata["ID"]." in blog: ".$blogname;
@@ -119,7 +119,7 @@ case "edit":
 	} 
 	else
 	{
-		printf( _('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' );
+		printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' );
 	}
 
 	break;
@@ -131,9 +131,9 @@ case "editcomment":
 	 * Display comment in edit form
 	 */
 	set_param( 'comment', 'integer', true );
-	$commentdata = get_commentdata($comment,1) or die( _('Oops, no comment with this ID!') );
+	$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
 
-	$title = _('Editing comment');
+	$title = T_('Editing comment');
 	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
 	echo "#".$commentdata["comment_ID"];
@@ -144,7 +144,7 @@ case "editcomment":
 
 	if ($user_level == 0) 
 	{
-		die(_('Cheatin\' uh ?'));
+		die(T_('Cheatin\' uh ?'));
 	}
 
 	$content = $commentdata['comment_content'];
@@ -162,7 +162,7 @@ default:
 	 * --------------------------------------------------------------------
 	 * Display posts
 	 */
-	$title = _('Browse blog:');
+	$title = T_('Browse blog:');
 	require (dirname(__FILE__).'/_menutop.php');
 	echo '<span class="menutopbloglist">';
 	require (dirname(__FILE__).'/_edit_blogselect.php');
@@ -178,7 +178,7 @@ default:
 	{ 
 	?>
 		<div class="panelblock">
-		<?php printf( _('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' ); ?>
+		<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to raise your level to 1, in order to be authorized to post.	You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion' ); ?>
 		</div>
 	<?php
 	}

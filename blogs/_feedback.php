@@ -40,17 +40,17 @@
 	$disp_title = array();
 	if(  $disp_comments ) { 
 		$type_list[] = "'comment'";
-		$disp_title[] = _("Comments"); ?>
+		$disp_title[] = T_("Comments"); ?>
 		<a name="comments"></a>
 	<?php } 
 	if( $disp_trackbacks ) { 
 		$type_list[] = "'trackback'";
-		$disp_title[] = _("Trackbacks"); ?>
+		$disp_title[] = T_("Trackbacks"); ?>
 		<a name="trackbacks"></a>
 	<?php }
 	if( $disp_pingbacks ) { 
 		$type_list[] = "'pingback'";
-		$disp_title[] = _("Pingbacks"); ?>
+		$disp_title[] = T_("Pingbacks"); ?>
 		<a name="pingbacks"></a>
 	<?php } ?>
 	
@@ -101,7 +101,7 @@
 				<!-- trackback -->
 				<a name="tb<?php comment_ID() ?>"></a>
 				<div class="bComment">
-					<div class="bCommentTitle"><?php echo _('Trackback from:') ?> <a href="<?php comment_author_url(); ?>" title="<?php comment_author() ?>"><?php comment_author() ?></a></div>
+					<div class="bCommentTitle"><?php echo T_('Trackback from:') ?> <a href="<?php comment_author_url(); ?>" title="<?php comment_author() ?>"><?php comment_author() ?></a></div>
 					<div class="bCommentText">
 					<?php comment_text() ?>
 					</div>
@@ -116,7 +116,7 @@
 				<!-- pingback -->
 				<a name="pb<?php comment_ID() ?>"></a>
 				<div class="bComment">
-					<div class="bCommentTitle"><?php echo _('Pingback from:') ?> <a href="<?php comment_author_url(); ?>" title="<?php comment_author() ?>"><?php comment_author() ?></a></div>
+					<div class="bCommentTitle"><?php echo T_('Pingback from:') ?> <a href="<?php comment_author_url(); ?>" title="<?php comment_author() ?>"><?php comment_author() ?></a></div>
 					<div class="bCommentText">
 					<?php comment_text() ?>
 					</div>
@@ -131,7 +131,7 @@
 	} 
 	if ($wxcvbn_c == 0) { ?>
 	<!-- this is displayed if there are no comments so far -->
-	<p><?php printf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */ _('No %s for this post yet...'), implode( "/", $disp_title) ); ?></p>
+	<p><?php printf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */ T_('No %s for this post yet...'), implode( "/", $disp_title) ); ?></p>
 	<?php /* if you delete this the sky will fall on your head */ } ?>
 	
 	
@@ -151,42 +151,42 @@
 		<!-- fp: for some reason this would not work on 'free', using REFFERER instead ... input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($_SERVER["REQUEST_URI"]); ?>" /-->
 		
 		<fieldset>
-			<div class="label"><label for="author"><?php echo _('Name') ?>:</label></div>
+			<div class="label"><label for="author"><?php echo T_('Name') ?>:</label></div>
 			<div class="input"><input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" /></div>
 		</fieldset>
 
 		
 		<fieldset>
-			<div class="label"><label for="email"><?php echo _('Email') ?>:</label></div>
+			<div class="label"><label for="email"><?php echo T_('Email') ?>:</label></div>
 			<div class="input"><input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" /><br />
-				<span class="notes"><?php echo _('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
+				<span class="notes"><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></span>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<div class="label"><label for="url"><?php echo _('Site/Url') ?>:</label></div>
+			<div class="label"><label for="url"><?php echo T_('Site/Url') ?>:</label></div>
 			<div class="input"><input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" /><br />
-				<span class="notes"><?php echo _('Your URL will be displayed.') ?></span>
+				<span class="notes"><?php echo T_('Your URL will be displayed.') ?></span>
 			</div>
 		</fieldset>
 				
 		<fieldset>
-			<div class="label"><label for="comment"><?php echo _('Comment text') ?>:</label></div>
+			<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
 			<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" tabindex="4" class="bComment"></textarea><br />
-				<span class="notes"><?php echo _('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?><br />
-				<?php echo _('URLs, email, AIM and ICQs will be converted automatically.') ?></span>
+				<span class="notes"><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?><br />
+				<?php echo T_('URLs, email, AIM and ICQs will be converted automatically.') ?></span>
 			</div>
 		</fieldset>
 				
 		<fieldset>
-			<div class="label"><?php echo _('Options') ?>:</div>
+			<div class="label"><?php echo T_('Options') ?>:</div>
 			<div class="input">
 			
 			<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
-			<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo _('Auto-BR') ?></label> <span class="notes">(<?php echo _('Line breaks become &lt;br /&gt;') ?>)</span><br />
+			<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes">(<?php echo T_('Line breaks become &lt;br /&gt;') ?>)</span><br />
 			<?php } ?>
 
-			<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo _('Remember me') ?></label> <span class="notes"><?php echo _('(Set cookies for name, email &amp; url)') ?></span>
+			<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo T_('Remember me') ?></label> <span class="notes"><?php echo T_('(Set cookies for name, email &amp; url)') ?></span>
 			</div>
 		</fieldset>
 	

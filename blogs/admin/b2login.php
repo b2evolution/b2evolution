@@ -86,12 +86,12 @@ case "login":
 		$user_login=$log;
 		$password=$pwd;
 		if (!$user_login) {
-			$error='<strong>'. _('ERROR'). '</strong>: '. _('The login field is empty');
+			$error='<strong>'. T_('ERROR'). '</strong>: '. T_('The login field is empty');
 			return false;
 		}
 
 		if (!$password) {
-			$error='<strong>'. _('ERROR'). '<\\1strong>: '. _('the password field is empty');
+			$error='<strong>'. T_('ERROR'). '<\\1strong>: '. T_('the password field is empty');
 			return false;
 		}
 
@@ -108,7 +108,7 @@ case "login":
 
 		$lines = mysql_num_rows($result);
 		if ($lines<1) {
-			$error='<strong>'. _('ERROR'). '</strong>: '. _('Wrong login or password');
+			$error='<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
 			$pwd='';
 			return false;
 		} else {
@@ -120,7 +120,7 @@ case "login":
 			} 
 			else
 			{
-				$error='<strong>'. _('ERROR'). '</strong>: '. _('Wrong login or password');
+				$error='<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
 				$pwd="";
 				return false;
 			}
@@ -149,16 +149,16 @@ case "login":
 		$user_pass=$pwd;
 		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
 		if( !setcookie( $cookie_user, $user_login, $cookie_expires, $cookie_path, $cookie_domain ) )
-			printf( _('setcookie %s failed!').'<br />', $cookie_user );
+			printf( T_('setcookie %s failed!').'<br />', $cookie_user );
 		if ($pass_is_md5) 
 		{
 			if( !setcookie( $cookie_pass, $user_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-				printf( _('setcookie %s failed!').'<br />', $cookie_user );
+				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
 		} 
 		else
 		{
 			if( !setcookie( $cookie_pass, md5($user_pass), $cookie_expires, $cookie_path, $cookie_domain) )
-				printf( _('setcookie %s failed!').'<br />', $cookie_user );
+				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
 		}
 
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -197,7 +197,7 @@ case "lostpassword":
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo _('b2evo') ?> &gt; <?php echo _('Lost password ?') ?></title>
+	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('Lost password ?') ?></title>
 	<link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
@@ -234,7 +234,7 @@ textarea,input,select {
 
 <tr height="150"><td align="right" valign="bottom" height="150" colspan="2">
 
-<p align="center" style="color: #b0b0b0"><?php echo _('Type your login here and click OK. You will receive an email with your password.') ?></p>
+<p align="center" style="color: #b0b0b0"><?php echo T_('Type your login here and click OK. You will receive an email with your password.') ?></p>
 <?php
 if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0000\">$error</font><br />&nbsp;</div>";
 ?>
@@ -242,10 +242,10 @@ if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0
 <form name="" action="b2login.php" method="post">
 <input type="hidden" name="action" value="retrievepassword" />
 <table width="100" style="background-color: #ffffff">
-<tr><td align="right"><?php echo _('Login') ?></td>
+<tr><td align="right"><?php echo T_('Login') ?></td>
 	<td><input type="text" name="user_login" value="" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td>&nbsp;</td>
-	<td><input type="submit" name="Submit2" value="<?php echo _('OK') ?>" class="search">&nbsp;&nbsp;&nbsp;</td></tr>
+	<td><input type="submit" name="Submit2" value="<?php echo T_('OK') ?>" class="search">&nbsp;&nbsp;&nbsp;</td></tr>
 </table>
 
 </form>
@@ -271,18 +271,18 @@ case "retrievepassword":
 	$user_email = $user_data["user_email"];
 	$user_pass = $user_data["user_pass"];
 
-	$message  = _('Login:')." $user_login\r\n";
-	$message .= _('Password:')." $user_pass\r\n";
+	$message  = T_('Login:')." $user_login\r\n";
+	$message .= T_('Password:')." $user_pass\r\n";
 
-	$m = mail($user_email, _('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+	$m = mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 
 	if ($m == false) {
-		echo '<p>', _('The email could not be sent.'), "<br />\n";
-		echo _('Possible reason: your host may have disabled the mail() function...</p>');
+		echo '<p>', T_('The email could not be sent.'), "<br />\n";
+		echo T_('Possible reason: your host may have disabled the mail() function...</p>');
 		die();
 	} else {
-		echo '<p>', _('The email was sent successfully to your email address.'), "<br />\n";
-		echo '<a href="b2login.php">', _('Click here to login !'), '</a></p>';
+		echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
+		echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
 		die();
 	}
 
@@ -315,7 +315,7 @@ default:
 	{
 		if (!empty($_COOKIE[$cookie_user]))
 		{
-			$error='<strong>'. _('ERROR'). '</strong>: '. _('Wrong login or password');
+			$error='<strong>'. T_('ERROR'). '</strong>: '. T_('Wrong login or password');
 		}
 	} else {
 		header("Expires: Wed, 5 Jun 1979 23:41:00 GMT"); /* private joke: this is Michel's birthdate - though officially it's on the 6th, since he's on GMT+1 :) */
@@ -328,7 +328,7 @@ default:
 	?><html xml:lang="<?php echo locale_lang ?>" lang="<?php echo locale_lang ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo _('b2evo') ?> &gt; <?php echo _('Login form') ?></title>
+	<title><?php echo T_('b2evo') ?> &gt; <?php echo T_('Login form') ?></title>
 	<link rel="stylesheet" href="b2.css" type="text/css">
 <style type="text/css">
 <!--
@@ -361,8 +361,8 @@ textarea,input,select {
 <a href="http://cafelog.com" target="_blank"><img src="img/b2minilogo.png" border="0" alt="visit b2's homepage" /></a>
 </td>
 <td align="right" valign="top">
-<a href="b2register.php" class="b2menutop"><?php echo _('register ?') ?></a><br />
-<a href="b2login.php?action=lostpassword" class="b2menutop"><?php echo _('lost your password ?') ?></a>
+<a href="b2register.php" class="b2menutop"><?php echo T_('register ?') ?></a><br />
+<a href="b2login.php?action=lostpassword" class="b2menutop"><?php echo T_('lost your password ?') ?></a>
 </td>
 </tr>
 
@@ -382,9 +382,9 @@ if ($error) echo "<div align=\"right\" style=\"padding:4px;\"><font color=\"#FF0
 <input type="hidden" name="redirect_to" value="b2edit.php" />
 <input type="hidden" name="action" value="login" />
 <table width="100" style="background-color: #ffffff">
-<tr><td align="right"><?php echo _('Login:') ?></td>
+<tr><td align="right"><?php echo T_('Login:') ?></td>
 	<td><input type="text" name="log" value="" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
-<tr><td align="right"><?php echo _('Password:') ?></td>
+<tr><td align="right"><?php echo T_('Password:') ?></td>
 	<td><input type="password" name="pwd" value="" size="8" />&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td>&nbsp;</td>
 	<td><input type="submit" name="Submit2" value="OK" class="search">&nbsp;&nbsp;&nbsp;</td></tr>

@@ -1,6 +1,6 @@
 <?php
 require( dirname(__FILE__).'/_header.php');
-$title = _('Options');
+$title = T_('Options');
 /* <Options> */
 
 function add_magic_quotes($array) {
@@ -41,7 +41,7 @@ switch($action) {
 case "update":
 	if ($user_level <= 3) 
 	{
-		die( _('You have no right to edit the options for this blog.') );
+		die( T_('You have no right to edit the options for this blog.') );
 	}
 
 	$newposts_per_page=addslashes($HTTP_POST_VARS["newposts_per_page"]);
@@ -62,7 +62,7 @@ default:
 	require(dirname(__FILE__).'/_menutop_end.php');
 	if ($user_level <= 3) 
 	{
-		die( _('You have no right to edit the options for this blog.') );
+		die( T_('You have no right to edit the options for this blog.') );
 	}
 	?>
 	
@@ -73,56 +73,56 @@ default:
 	
 			<table width="550" cellpadding="5" cellspacing="0">
 			<tr height="40">
-				<td width="150" height="40"><?php echo _('Show') ?>:</td>
+				<td width="150" height="40"><?php echo T_('Show') ?>:</td>
 				<td width="350"><input type="text" name="newposts_per_page" value="<?php echo get_settings("posts_per_page") ?>" size="3">
 				<select name="newwhat_to_show">
 				<option value="days" <?php
 				$i = $what_to_show;
 				if ($i == "days")
 				echo ' selected="selected"';
-				?>><?php echo _('days') ?></option>
+				?>><?php echo T_('days') ?></option>
 				<option value="posts" <?php
 				if ($i == "posts")
 				echo ' selected="selected"';
-				?>><?php echo _('posts') ?></option>
+				?>><?php echo T_('posts') ?></option>
 				<option value="paged" <?php
 				if ($i == "paged")
 				echo ' selected="selected"';
-				?>><?php echo _('posts paged') ?></option>
+				?>><?php echo T_('posts paged') ?></option>
 				</select>
 				</td>
 			</tr>
 			<tr height="40">
-				<td height="40"><?php echo _('Archive mode') ?>:</td>
+				<td height="40"><?php echo T_('Archive mode') ?>:</td>
 				<td><select name="newarchive_mode">
 				<?php $i = $archive_mode; ?>
 				<option value="daily"<?php
 				if ($i == "daily")
 				echo " selected";
 				echo ' selected="selected"';
-				?>><?php echo _('daily') ?></option>
+				?>><?php echo T_('daily') ?></option>
 				<option value="weekly"<?php
 				if ($i == "weekly")
 				echo ' selected="selected"';
-				?>><?php echo _('weekly') ?></option>
+				?>><?php echo T_('weekly') ?></option>
 				<option value="monthly"<?php
 				if ($i == "monthly")
 				echo ' selected="selected"';
-				?>><?php echo _('monthly') ?></option>
+				?>><?php echo T_('monthly') ?></option>
 				<option value="postbypost"<?php
 				if ($i == "postbypost")
 				echo ' selected="selected"';
-				?>><?php echo _('post by post') ?></option>
+				?>><?php echo T_('post by post') ?></option>
 				</select>
 			</tr>
 			<tr height="40">
-				<td height="40"><?php echo _('Time difference') ?>:</td>
+				<td height="40"><?php echo T_('Time difference') ?>:</td>
 				<td><input type="text" name="newtime_difference" value="<?php echo $time_difference ?>" size="2">
-				<em> <?php echo _('if you\'re not on the timezone of your server') ?></em>
+				<em> <?php echo T_('if you\'re not on the timezone of your server') ?></em>
 				</td>
 			</tr>
 			<tr height="40">
-				<td height="40" width="150"><?php echo _('Auto-BR') ?>:</td>
+				<td height="40" width="150"><?php echo T_('Auto-BR') ?>:</td>
 				<td><select name="newautobr">
 				<option value="1" <?php
 				if ($autobr)
@@ -133,13 +133,13 @@ default:
 				echo ' selected="selected"';
 				?>>off</option>
 				</select>
-				<em><?php echo _('converts line-breaks into &lt;br /&gt; tags') ?></em>
+				<em><?php echo T_('converts line-breaks into &lt;br /&gt; tags') ?></em>
 				</td>
 			</tr>
 			<tr height="40">
 				<td height="40">&nbsp;</td>
 				<td>
-				<input type="submit" name="submit" value="<?php echo _('Update') ?>" class="search">
+				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
 				</td>
 			</tr>
 		</table>

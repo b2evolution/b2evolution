@@ -38,7 +38,7 @@
   <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
   <description><?php
     the_link( '', ' ', 'xml' );
-    the_content(_('[...] Read more!'), 0, '', '', '', '', 'xml',$rss_excerpt_length );
+    the_content(T_('[...] Read more!'), 0, '', '', '', '', 'xml',$rss_excerpt_length );
   ?></description>
   <content:encoded><![CDATA[<?php
     the_link( '<p>', '</p>' );

@@ -13,7 +13,7 @@
 $b2_version = '0.8.3-alpha2';
 
 // Activate gettext:
-if( function_exists( 'bindtextdomain' ) && function_exists('textdomain' ) )
+if( function_exists( 'bindtextdomain' ) )
 {	// Only if gettext is available
 	// Specify location of translation tables :
 	bindtextdomain( 'messages', dirname(__FILE__).'/../locales'); 
@@ -122,70 +122,70 @@ foreach($b2smiliestrans as $smiley => $img)
 }
 
 # the weekdays and the months.. 
-$weekday[0]=N_('Sunday');
-$weekday[1]=N_('Monday');
-$weekday[2]=N_('Tuesday');
-$weekday[3]=N_('Wednesday');
-$weekday[4]=N_('Thursday');
-$weekday[5]=N_('Friday');
-$weekday[6]=N_('Saturday');
+$weekday[0]=NT_('Sunday');
+$weekday[1]=NT_('Monday');
+$weekday[2]=NT_('Tuesday');
+$weekday[3]=NT_('Wednesday');
+$weekday[4]=NT_('Thursday');
+$weekday[5]=NT_('Friday');
+$weekday[6]=NT_('Saturday');
 
 # the weekdays short form (typically 3 letters)
 // TRANS: abbrev. for Sunday
-$weekday_abbrev[0]=N_('Sun');
+$weekday_abbrev[0]=NT_('Sun');
 // TRANS: abbrev. for Monday
-$weekday_abbrev[1]=N_('Mon');
+$weekday_abbrev[1]=NT_('Mon');
 // TRANS: abbrev. for Tuesday
-$weekday_abbrev[2]=N_('Tue');
+$weekday_abbrev[2]=NT_('Tue');
 // TRANS: abbrev. for Wednesday
-$weekday_abbrev[3]=N_('Wed');
+$weekday_abbrev[3]=NT_('Wed');
 // TRANS: abbrev. for Thursday
-$weekday_abbrev[4]=N_('Thu');
+$weekday_abbrev[4]=NT_('Thu');
 // TRANS: abbrev. for Friday
-$weekday_abbrev[5]=N_('Fri');
+$weekday_abbrev[5]=NT_('Fri');
 // TRANS: abbrev. for Saturday
-$weekday_abbrev[6]=N_('Sat');
+$weekday_abbrev[6]=NT_('Sat');
 
 # the months
-$month['01']=N_('January');
-$month['02']=N_('February');
-$month['03']=N_('March');
-$month['04']=N_('April');
+$month['01']=NT_('January');
+$month['02']=NT_('February');
+$month['03']=NT_('March');
+$month['04']=NT_('April');
 // TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-$month['05']=N_('May ');
-$month['06']=N_('June');
-$month['07']=N_('July');
-$month['08']=N_('August');
-$month['09']=N_('September');
-$month['10']=N_('October');
-$month['11']=N_('November');
-$month['12']=N_('December');
+$month['05']=NT_('May ');
+$month['06']=NT_('June');
+$month['07']=NT_('July');
+$month['08']=NT_('August');
+$month['09']=NT_('September');
+$month['10']=NT_('October');
+$month['11']=NT_('November');
+$month['12']=NT_('December');
 
 # the months short form (typically 3 letters)
 // TRANS: abbrev. for January
-$month_abbrev['01']=N_('Jan');
+$month_abbrev['01']=NT_('Jan');
 // TRANS: abbrev. for February
-$month_abbrev['02']=N_('Feb');
+$month_abbrev['02']=NT_('Feb');
 // TRANS: abbrev. for March
-$month_abbrev['03']=N_('Mar');
+$month_abbrev['03']=NT_('Mar');
 // TRANS: abbrev. for April
-$month_abbrev['04']=N_('Apr');
+$month_abbrev['04']=NT_('Apr');
 // TRANS: abbrev. for May
-$month_abbrev['05']=N_('May');
+$month_abbrev['05']=NT_('May');
 // TRANS: abbrev. for June
-$month_abbrev['06']=N_('Jun');
+$month_abbrev['06']=NT_('Jun');
 // TRANS: abbrev. for July
-$month_abbrev['07']=N_('Jul');
+$month_abbrev['07']=NT_('Jul');
 // TRANS: abbrev. for August
-$month_abbrev['08']=N_('Aug');
+$month_abbrev['08']=NT_('Aug');
 // TRANS: abbrev. for September
-$month_abbrev['09']=N_('Sep');
+$month_abbrev['09']=NT_('Sep');
 // TRANS: abbrev. for October
-$month_abbrev['10']=N_('Oct');
+$month_abbrev['10']=NT_('Oct');
 // TRANS: abbrev. for November
-$month_abbrev['11']=N_('Nov');
+$month_abbrev['11']=NT_('Nov');
 // TRANS: abbrev. for December
-$month_abbrev['12']=N_('Dec');
+$month_abbrev['12']=NT_('Dec');
 
 
 ?>

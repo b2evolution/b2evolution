@@ -56,7 +56,7 @@
 			echo $blogroll_item_before;
 			the_title(); 
 			echo ' ';
-			the_content( _('more'), 0, '', '', '[', ']' );	// Description + more link 
+			the_content( T_('more'), 0, '', '', '[', ']' );	// Description + more link 
 			?>
 			<a href="<?php permalink_link() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
 			<?php

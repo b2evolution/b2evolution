@@ -263,8 +263,8 @@ class Calendar
 		
 			for ($i = $start_of_week; $i<($start_of_week+7); $i = $i + 1) 
 			{
-				echo str_replace('[abbr]', _($weekday[($i % 7)]), $this->headercellstart);
-				echo _($weekday_abbrev[($i % 7)]);
+				echo str_replace('[abbr]', T_($weekday[($i % 7)]), $this->headercellstart);
+				echo T_($weekday_abbrev[($i % 7)]);
 				echo $this->headercellend;
 			}
 		

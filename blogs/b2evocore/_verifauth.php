@@ -27,7 +27,7 @@ function veriflog()
 	}
 	else
 	{
-		$error = _('You must log in!');
+		$error = T_('You must log in!');
 		return false;
 	}
 
@@ -42,7 +42,7 @@ function veriflog()
 	$lines = mysql_num_rows($result);
 	if ($lines<1) 
 	{
-		$error='<strong>'. _('ERROR'). "</strong>: ". _('login no longer exists');
+		$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login no longer exists');
 		return false;
 	} 
 	else
@@ -52,7 +52,7 @@ function veriflog()
 		{
 			return true;
 		} else {
-			$error='<strong>'. _('ERROR'). "</strong>: ". _('login/password no longer valid');
+			$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login/password no longer valid');
 			return false;
 		}
 	}

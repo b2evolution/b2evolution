@@ -1,14 +1,13 @@
 <?php
-//	include ("file:///C|/www/gallery/Version.php");
-//	include ("file:///C|/www/gallery/nls.php");
+include( dirname(__FILE__).'/../conf/b2evo_config.php' );
+include( dirname(__FILE__).'/../b2evocore/_functions.php' );
 
-// $nls=getNLS();
-
-
-$handle=opendir('.');
+$handle=opendir(dirname(__FILE__));
 $i = 0;
+$report = array();
 while ($file = readdir($handle)) 
 {	// For each file in locales directtory:
+	// echo $file, '<br />';
   if(preg_match('#([a-z]){2,2}_([A-Z]){2,2}#', $file, $matches)) 
 	{	// If it matches a locale sub directory
 		// echo '<hr />';
@@ -87,7 +86,7 @@ function my_usort_function ($a, $b)
 	return 0;
 }
 
-uasort ($report, 'my_usort_function');
+uasort($report, 'my_usort_function');
 
 ?>
 
@@ -122,7 +121,10 @@ if ($i%2==0) {
 }
 		echo "\n<tr>";
 		echo "\n\t<td style=\"background-color:$color\">". '-' . "</td>";
-		echo "\n\t<td style=\"background-color:$color\">". $key ."</td>";
+		echo "\n\t<td style=\"background-color:$color\">". $key;
+		if( $allow_po_extraction  )
+			echo ' [<a href="posplit.php?locale='.$key.'">Extract</a>]';
+		echo "</td>";
 		echo "\n\t<td style=\"background-color:#". $value[0] . "\">". $value[1] ."% done</td>";
 		echo "\n\t<td class=\"translated$nr\">". $value[2] ."</td>";
 		echo "\n\t<td class=\"fuzzy$nr\">". $value [3] . "</td>";
