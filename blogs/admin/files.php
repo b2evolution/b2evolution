@@ -382,8 +382,8 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 		&nbsp;
 		<a href="<?php $Fileman->cdisp('link', 'parent') ?>"><?php echo $Fileman->icon( 'parent', 'imgtag' ) ?></a>
 	</th>
-	<th><?php echo $Fileman->link_sort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
+	<th><?php echo $Fileman->link_sort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'lastm', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'perms', /* TRANS: file's permissions */ T_('Perms') ) ?></th>
@@ -414,7 +414,6 @@ while( $Fileman->next() )
 		<td class="icon" onclick="window.location.href = '<?php $Fileman->cdisp('link') ?>'">
 			<?php /*echo $i++;*/ $Fileman->cdisp('iconimg') ?>
 		</td>
-		<td class="type"><?php $Fileman->cdisp('type') ?></td>
 		<td class="filename" onclick="<?php echo $link_default_js ?>">
 			<!--<noscript type="text/javascript">--><a onclick="clickedonlink = 1;" href="<?php $Fileman->cdisp('link') ?>"><!--/noscript-->
 				<?php	$Fileman->cdisp('name'); $Fileman->cdisp('imgsize', '', ' (%s)') ?>
@@ -427,6 +426,7 @@ while( $Fileman->next() )
 			
 			?>
 		</td>
+		<td class="type"><?php $Fileman->cdisp('type') ?></td>
 		<td class="size"><?php $Fileman->cdisp('nicesize') ?></td>
 		<td class="timestamp"><?php $Fileman->cdisp('lastmod') ?></td>
 		<td class="perms"><?php $Fileman->cdisp( 'link_editperm', '', '<a href="%s">'.$Fileman->cget('perms', 'octal').'</a>' ) ?></td>

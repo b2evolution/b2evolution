@@ -20,6 +20,7 @@
 	param( 'recipient_id', 'integer', '' );
 	param( 'post_id', 'integer', '' );
 	param( 'comment_id', 'integer', '' );
+	param( 'subject', 'string', '' );
 
 
 	// If the user has the cookies set from commenting use those as a default from.
@@ -56,7 +57,7 @@
 	{
 		$sql="SELECT post_title FROM ".$tableposts." WHERE ID = '$post_id'";
 		$row = $DB->get_row( $sql );
-		$subject = T_('Re:') . " " . $row->post_title;
+		$subject = T_('Re:').' '.$row->post_title;
 	}
 ?>
 
@@ -74,7 +75,7 @@
 		if( is_logged_in() ) 
 		{ // If the user is logged in default the from address to that info. 
 
-			$email_author = $current_User->get(preferedname);
+			$email_author = $current_User->get('preferedname');
 			$email_author_address = $current_User->email;
 
 		} 
