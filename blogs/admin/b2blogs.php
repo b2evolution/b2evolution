@@ -8,8 +8,6 @@
 require_once (dirname(__FILE__).'/_header.php'); // this will actually load blog params for req blog
 $title = T_('Blogs');
 param( 'action', 'string' );
-param( 'blog', 'integer', $default_to_blog, true );
-
 
 switch($action) 
 {
@@ -42,6 +40,8 @@ switch($action)
 		param( 'blog_pingtechnorati', 'integer', 0 );
 		param( 'blog_pingweblogs', 'integer', 0 );
 		param( 'blog_pingblodotgs', 'integer', 0 );
+		param( 'blog_disp_bloglist', 'integer', 0 );
+		param( 'blog_default_skin', 'string', '' );
 		$next_action = 'create';
 		require(dirname(__FILE__).'/_blogs_form.php');
 		echo '</div>';
@@ -75,6 +75,8 @@ switch($action)
 		param( 'blog_pingtechnorati', 'integer', 0 );
 		param( 'blog_pingweblogs', 'integer', 0 );
 		param( 'blog_pingblodotgs', 'integer', 0 );
+		param( 'blog_disp_bloglist', 'integer', 0 );
+		param( 'blog_default_skin', 'string', '' );
 
 		$blog_tagline = format_to_post($blog_tagline, 0, 0);
 		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
@@ -94,7 +96,7 @@ switch($action)
 		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, 
 									$blog_stub,  $blog_staticfilename, 
 									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll, 
-									$blog_keywords, $blog_UID ) or mysql_oops( $query );
+									$blog_keywords, $blog_UID, blog_disp_bloglist ) or mysql_oops( $query );
 		
 	
 		// Quick hack to create a stub file:
@@ -166,6 +168,7 @@ switch($action)
 	
 	
 	case 'edit':
+		param( 'blog', 'integer', true );
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) 
@@ -193,6 +196,8 @@ switch($action)
 		$blog_pingtechnorati = get_bloginfo('pingtechnorati');
 		$blog_pingweblogs = get_bloginfo('pingweblogs');
 		$blog_pingblodotgs = get_bloginfo('pingblodotgs');
+		$blog_disp_bloglist = get_bloginfo('disp_bloglist');
+		$blog_default_skin = get_bloginfo('default_skin');
 		$next_action = 'update';
 		require(dirname(__FILE__).'/_blogs_form.php');
 		echo '</div>';
@@ -224,6 +229,8 @@ switch($action)
 		param( 'blog_pingtechnorati', 'integer', 0 );
 		param( 'blog_pingweblogs', 'integer', 0 );
 		param( 'blog_pingblodotgs', 'integer', 0 );
+		param( 'blog_disp_bloglist', 'integer', 0 );
+		param( 'blog_default_skin', 'string', '' );
 
 		$blog_tagline = format_to_post($blog_tagline, 0, 0);
 		$blog_longdesc = format_to_post($blog_longdesc, 0, 0);
@@ -241,7 +248,8 @@ switch($action)
 									$blog_staticfilename, 
 									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll, 
 									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
-									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs )
+									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
+									$blog_disp_bloglist )
 								or mysql_oops( $query );
 		
 		/*
@@ -320,6 +328,7 @@ switch($action)
 	
 	
 	case 'GenStatic':
+		param( 'blog', 'integer', true );
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 	?>

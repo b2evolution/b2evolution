@@ -31,8 +31,7 @@ param( 'sentence', 'string', 'AND', true );				// Search for sentence or for wor
 param( 'exact', 'integer', '', true );					// Require exact match of title or contents
 param( 'preview', 'integer', 0, true );				// Is this preview ?
 param( 'calendar', 'string', '', true );				// Display a specific month in the calendar
-param( 'c', 'string', '', true );
-
+param( 'c', 'string', '', true );				// deprecated
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
 param( 'tb', 'integer', 0, true );
@@ -49,7 +48,7 @@ if( empty($disp) )
 		$disp = 'comments';
 	}
 	elseif( $stats )
-	{	// Trabslate old stats caller
+	{	// Translate old stats caller
 		$disp = 'stats';
 	}
 }
@@ -131,6 +130,13 @@ else
 	$result_num_rows = 0;
 }
 
+// Default display params:
+
+// Displaying of vlog list on templates?
+if( !isset($display_blog_list) )
+{	// If not already set in stub:
+	$display_blog_list = get_bloginfo('disp_bloglist');
+}
 
 /*
  * Now, we'll jump to displaying!

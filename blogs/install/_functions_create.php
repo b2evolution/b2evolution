@@ -22,25 +22,25 @@ function create_b2evo_tables()
 	echo "<p>Creating the necessary tables in the database...</p>";
 
 	
-	echo "<p>Creating table for Settings...<br />\n";
-	$query = "CREATE TABLE $tablesettings ( 
-		ID tinyint(3) DEFAULT '1' NOT NULL, 
-		posts_per_page int(4) unsigned DEFAULT '7' NOT NULL, 
-		what_to_show varchar(5) DEFAULT 'days' NOT NULL, 
-		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL, 
-		time_difference tinyint(4) DEFAULT '0' NOT NULL, 
-		AutoBR tinyint(1) DEFAULT '1' NOT NULL, 
-		db_version INT DEFAULT $new_db_version NOT NULL, 
-  	last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00',
-		pref_newusers_grp_ID int(4) unsigned DEFAULT 1 NOT NULL,
-		PRIMARY KEY (ID)
-	)";
-	$q = mysql_query($query) or mysql_oops( $query );
-	
-
 	echo "Creating table for Groups...<br />\n";
 	create_groups();
 
+	echo "<p>Creating table for Settings...<br />\n";
+	$query = "CREATE TABLE $tablesettings ( 
+		ID tinyint DEFAULT 1 NOT NULL, 
+		posts_per_page int unsigned DEFAULT 7 NOT NULL, 
+		what_to_show varchar DEFAULT 'days' NOT NULL, 
+		archive_mode varchar DEFAULT 'weekly' NOT NULL, 
+		time_difference tinyint DEFAULT 0 NOT NULL, 
+		AutoBR tinyint DEFAULT 1 NOT NULL, 
+		db_version INT DEFAULT $new_db_version NOT NULL, 
+  	last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00',
+		pref_newusers_grp_ID int unsigned DEFAULT 4 NOT NULL,
+		pref_newusers_level tinyint unsigned DEFAULT 1 NOT NULL,
+		pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL,
+		PRIMARY KEY (ID)
+	)";
+	$q = mysql_query($query) or mysql_oops( $query );
 	
 	echo "Creating table for Users...<br />\n";
 	$query = "CREATE TABLE $tableusers ( 
@@ -93,6 +93,7 @@ function create_b2evo_tables()
 		blog_pingweblogs tinyint(1) NOT NULL default 0,
 		blog_pingblodotgs tinyint(1) NOT NULL default 0,
 		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'standard',
+		blog_disp_bloglist tinyint NOT NULL DEFAULT 1,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY  (blog_ID) 
 	)";

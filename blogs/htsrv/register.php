@@ -13,7 +13,7 @@ param( 'action', 'string', '' );
 param( 'login', 'string', '' );
 param( 'email', 'string', '' );
 
-if(!$users_can_register)
+if(!get_settings('pref_newusers_canregister'))
 {
 	$action = 'disabled';
 }
@@ -84,11 +84,11 @@ switch($action)
 		$new_User->set( 'email', $email );
 		$new_User->set( 'ip', '127.0.0.1' );
 		$new_User->set( 'domain', 'localhost' );
-		$new_User->set( 'level', $new_users_can_blog );
 		$new_User->set( 'ip', isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '' );
 		$new_User->set( 'domain', isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '' );
 		$new_User->set( 'browser', isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' );
 		$new_User->set_datecreated( $localtimenow );
+		$new_User->set( 'level', get_settings('pref_newusers_level') );
 		$pref_newusers_grp_ID = get_settings('pref_newusers_grp_ID');
 		// echo $pref_newusers_grp_ID;
 		$new_user_Group = Group_get_by_ID( $pref_newusers_grp_ID );

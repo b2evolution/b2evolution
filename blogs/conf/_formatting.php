@@ -1,15 +1,13 @@
 <?php
 /*
  * b2evolution formatting config
- * Version of this file: 0.8.6.1
+ * Version of this file: 0.8.9
  *
  * This sets how posts and comments are formatted
- *
- * Reminder: everything that starts with #, /* or // is a comment
  */
 
 
-/* Formatting */
+// ** Formatting **
 
 # Choose the formatting options for your posts:
 # 0 to disable
@@ -21,12 +19,14 @@ $use_smartquotes = 0;		// 0,1 convert quotes into smart/curly quotes
 $use_autolink = 1;			// 0,1 automatically make web, mail, aim and icq addresses clickable
 $use_balanceTags = 1;		// 0,1 automatically balance unmatched tags in posts and comments. 
 
+
 # Choose formatting options for comments
 # 'never'   : option will never be used
 # 'opt-in'  : option will be used only if user explicitely asks for it
 # 'opt-out' : option will be used by default, but user can refuse
 # 'always'  : option will always be used
 $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
+
 
 /*
  * Validity & Security Checking 
@@ -57,6 +57,7 @@ $b2_gmcode['out'] = array(
 	'<em>$1</em>',
 	'<span style="text-decoration:underline">$1</span>'
 );
+
 
 
 // # BBcode search and replace arrays #
@@ -161,14 +162,16 @@ $b2smilies = array(
  * Typically you'll be mre restrictive on comments.
  */
 
-// DEFINITION of allowed XHTML code for posts (posted in the backoffice)
+// DEFINITION of allowed XHTML code for POSTS (posted in the backoffice)
 
 // Allowed Entity classes
 define('E_SPECIAL_CONTENTS', 'br hr span bdo img');
 define('E_MISC_CONTENTS', 'ins del');
 define('E_PHRASE_CONTENTS', 'em strong i b dfn code q samp kbd var cite abbr acronym sub sup');
 define('E_PURE_INLINE_CONTENTS', E_SPECIAL_CONTENTS.' '.E_PHRASE_CONTENTS.' a #PCDATA');
-define('E_PURE_BLOCK_CONTENTS', 'div dl ul ol blockquote p');
+define('E_PURE_BLOCK_CONTENTS', 'div dl ul ol blockquote p table');
+define('E_TABLE_CONTENTS', 'tr');
+define('E_TR_CONTENTS', 'td');
 define('E_INLINE_CONTENTS', E_PURE_INLINE_CONTENTS.' '.E_MISC_CONTENTS);
 define('E_A_CONTENT_CONTENTS', E_SPECIAL_CONTENTS.' '.E_PHRASE_CONTENTS.' '.E_MISC_CONTENTS.' #PCDATA');
 define('E_BLOCK_CONTENTS', E_PURE_BLOCK_CONTENTS.' '.E_MISC_CONTENTS);
@@ -183,12 +186,17 @@ define('A_CITE_ATTRS', A_ATTRS.' cite');
 define('A_ANCHOR_ATTRS', A_ATTRS.' href hreflang target');
 define('A_LIST_ATTRS', A_ATTRS.' type');
 define('A_LISTITEM_ATTRS', A_LIST_ATTRS.' value');
+define('A_TABLE_ELEMENT_ATTRS', A_ATTRS.' align bgcolor bordercolor bordercolordark bordercolorlight');
+define('A_TABLE_ATTRS', A_TABLE_ELEMENT_ATTRS.' border cols rules summary cellpadding cellspacing');
 
 // Array showing what tags are allowed and what their allowed subtags are.
 $allowed_tags = array
 (
 	'body' => E_FLOW_CONTENTS,
 	'div' => E_FLOW_CONTENTS,
+	'table' => E_TABLE_CONTENTS,
+	'tr' => E_TR_CONTENTS,
+	'td' => E_FLOW_CONTENTS,
 	'p' => E_INLINE_CONTENTS,
 	'blockquote' => E_FLOW_CONTENTS,		// fp ? E_BLOCK_CONTENTS,
 	'ins' => E_FLOW_CONTENTS,
@@ -250,6 +258,9 @@ $allowed_attribues = array
 	'dt' => A_ATTRS,
 	'dd' => A_ATTRS,
 	'p' => A_ATTRS,
+	'table' => A_TABLE_ATTRS,
+	'tr' => A_TABLE_ELEMENT_ATTRS,
+	'td' => A_TABLE_ELEMENT_ATTRS,
 	'div' => A_ATTRS
 );
 
@@ -402,38 +413,99 @@ $b2_htmltransbis = array(
 	'&#8220;' => ' ', '&#8221;' => ' ', '&#8226;' => ' ', '&#8364;' => ' ',
 	'&lt;' => '&#60;',	# preserve fake HTML
 	'&gt;' => '&#62;',	# preserve fake HTML
-	'&sp;' => '&#32;', '&excl;' => '&#33;', '&quot;' => '&#34;', '&num;' => '&#35;', '&dollar;' => '&#36;', '&percnt;' => '&#37;', '&amp;' => '&#38;', '&apos;' => '&#39;', '&lpar;' => '&#40;', '&rpar;' => '&#41;',
-	'&ast;' => '&#42;', '&plus;' => '&#43;', '&comma;' => '&#44;', '&hyphen;' => '&#45;', '&minus;' => '&#45;', '&period;' => '&#46;', '&sol;' => '&#47;', '&colon;' => '&#58;', '&semi;' => '&#59;', '&lt;' => '&#60;',
-	'&equals;' => '&#61;', '&gt;' => '&#62;', '&quest;' => '&#63;', '&commat;' => '&#64;', '&lsqb;' => '&#91;', '&bsol;' => '&#92;', '&rsqb;' => '&#93;', '&circ;' => '&#94;', '&lowbar;' => '&#95;', '&horbar;' => '&#95;',
-	'&grave;' => '&#96;', '&lcub;' => '&#123;', '&verbar;' => '&#124;', '&rcub;' => '&#125;', '&tilde;' => '&#126;', '&lsquor;' => '&#130;', '&ldquor;' => '&#132;',
-	'&ldots;' => '&#133;', '&Scaron;' => '&#138;', '&lsaquo;' => '&#139;', '&OElig;' => '&#140;', '&lsquo;' => '&#145;', '&rsquor;' => '&#145;', '&rsquo;' => '&#146;',
-	'&ldquo;' => '&#147;', '&rdquor;' => '&#147;', '&rdquo;' => '&#148;', '&bull;' => '&#149;', '&ndash;' => '&#150;', '&endash;' => '&#150;', '&mdash;' => '&#151;', '&emdash;' => '&#151;', '&tilde;' => '&#152;', '&trade;' => '&#153;',
-	'&scaron;' => '&#154;', '&rsaquo;' => '&#155;', '&oelig;' => '&#156;', '&Yuml;' => '&#159;', '&nbsp;' => '&#160;', '&iexcl;' => '&#161;', '&cent;' => '&#162;', '&pound;' => '&#163;', '&curren;' => '&#164;', '&yen;' => '&#165;',
-	'&brvbar;' => '&#166;', '&brkbar;' => '&#166;', '&sect;' => '&#167;', '&uml;' => '&#168;', '&die;' => '&#168;', '&copy;' => '&#169;', '&ordf;' => '&#170;', '&laquo;' => '&#171;', '&not;' => '&#172;', '&shy;' => '&#173;',
-	'&reg;' => '&#174;', '&macr;' => '&#175;', '&hibar;' => '&#175;', '&deg;' => '&#176;', '&plusmn;' => '&#177;', '&sup2;' => '&#178;', '&sup3;' => '&#179;', '&acute;' => '&#180;', '&micro;' => '&#181;', '&para;' => '&#182;',
-	'&middot;' => '&#183;', '&cedil;' => '&#184;', '&sup1;' => '&#185;', '&ordm;' => '&#186;', '&raquo;' => '&#187;', '&frac14;' => '&#188;', '&frac12;' => '&#189;', '&half;' => '&#189;', '&frac34;' => '&#190;', '&iquest;' => '&#191;',
-	'&Agrave;' => '&#192;', '&Aacute;' => '&#193;', '&Acirc;' => '&#194;', '&Atilde;' => '&#195;', '&Auml;' => '&#196;', '&Aring;' => '&#197;', '&AElig;' => '&#198;', '&Ccedil;' => '&#199;', '&Egrave;' => '&#200;', '&Eacute;' => '&#201;',
-	'&Ecirc;' => '&#202;', '&Euml;' => '&#203;', '&Igrave;' => '&#204;', '&Iacute;' => '&#205;', '&Icirc;' => '&#206;', '&Iuml;' => '&#207;', '&ETH;' => '&#208;', '&Ntilde;' => '&#209;', '&Ograve;' => '&#210;', '&Oacute;' => '&#211;',
-	'&Ocirc;' => '&#212;', '&Otilde;' => '&#213;', '&Ouml;' => '&#214;', '&times;' => '&#215;', '&Oslash;' => '&#216;', '&Ugrave;' => '&#217;', '&Uacute;' => '&#218;', '&Ucirc;' => '&#219;', '&Uuml;' => '&#220;', '&Yacute;' => '&#221;',
-	'&THORN;' => '&#222;', '&szlig;' => '&#223;', '&agrave;' => '&#224;', '&aacute;' => '&#225;', '&acirc;' => '&#226;', '&atilde;' => '&#227;', '&auml;' => '&#228;', '&aring;' => '&#229;', '&aelig;' => '&#230;', '&ccedil;' => '&#231;',
-	'&egrave;' => '&#232;', '&eacute;' => '&#233;', '&ecirc;' => '&#234;', '&euml;' => '&#235;', '&igrave;' => '&#236;', '&iacute;' => '&#237;', '&icirc;' => '&#238;', '&iuml;' => '&#239;', '&eth;' => '&#240;', '&ntilde;' => '&#241;',
-	'&ograve;' => '&#242;', '&oacute;' => '&#243;', '&ocirc;' => '&#244;', '&otilde;' => '&#245;', '&ouml;' => '&#246;', '&divide;' => '&#247;', '&oslash;' => '&#248;', '&ugrave;' => '&#249;', '&uacute;' => '&#250;', '&ucirc;' => '&#251;',
-	'&uuml;' => '&#252;', '&yacute;' => '&#253;', '&thorn;' => '&#254;', '&yuml;' => '&#255;', '&OElig;' => '&#338;', '&oelig;' => '&#339;', '&Scaron;' => '&#352;', '&scaron;' => '&#353;', '&Yuml;' => '&#376;', '&fnof;' => '&#402;',
-	'&circ;' => '&#710;', '&tilde;' => '&#732;', '&Alpha;' => '&#913;', '&Beta;' => '&#914;', '&Gamma;' => '&#915;', '&Delta;' => '&#916;', '&Epsilon;' => '&#917;', '&Zeta;' => '&#918;', '&Eta;' => '&#919;', '&Theta;' => '&#920;',
-	'&Iota;' => '&#921;', '&Kappa;' => '&#922;', '&Lambda;' => '&#923;', '&Mu;' => '&#924;', '&Nu;' => '&#925;', '&Xi;' => '&#926;', '&Omicron;' => '&#927;', '&Pi;' => '&#928;', '&Rho;' => '&#929;', '&Sigma;' => '&#931;',
-	'&Tau;' => '&#932;', '&Upsilon;' => '&#933;', '&Phi;' => '&#934;', '&Chi;' => '&#935;', '&Psi;' => '&#936;', '&Omega;' => '&#937;', '&alpha;' => '&#945;', '&beta;' => '&#946;', '&gamma;' => '&#947;', '&delta;' => '&#948;',
-	'&epsilon;' => '&#949;', '&zeta;' => '&#950;', '&eta;' => '&#951;', '&theta;' => '&#952;', '&iota;' => '&#953;', '&kappa;' => '&#954;', '&lambda;' => '&#955;', '&mu;' => '&#956;', '&nu;' => '&#957;', '&xi;' => '&#958;',
-	'&omicron;' => '&#959;', '&pi;' => '&#960;', '&rho;' => '&#961;', '&sigmaf;' => '&#962;', '&sigma;' => '&#963;', '&tau;' => '&#964;', '&upsilon;' => '&#965;', '&phi;' => '&#966;', '&chi;' => '&#967;', '&psi;' => '&#968;',
-	'&omega;' => '&#969;', '&thetasym;' => '&#977;', '&upsih;' => '&#978;', '&piv;' => '&#982;', '&ensp;' => '&#8194;', '&emsp;' => '&#8195;', '&thinsp;' => '&#8201;', '&zwnj;' => '&#8204;', '&zwj;' => '&#8205;', '&lrm;' => '&#8206;',
-	'&rlm;' => '&#8207;', '&ndash;' => '&#8211;', '&mdash;' => '&#8212;', '&lsquo;' => '&#8216;', '&rsquo;' => '&#8217;', '&sbquo;' => '&#8218;', '&ldquo;' => '&#8220;', '&rdquo;' => '&#8221;', '&bdquo;' => '&#8222;', '&dagger;' => '&#8224;',
-	'&Dagger;' => '&#8225;', '&bull;' => '&#8226;', '&hellip;' => '&#8230;', '&permil;' => '&#8240;', '&prime;' => '&#8242;', '&Prime;' => '&#8243;', '&lsaquo;' => '&#8249;', '&rsaquo;' => '&#8250;', '&oline;' => '&#8254;', '&frasl;' => '&#8260;',
-	'&euro;' => '&#8364;', '&image;' => '&#8465;', '&weierp;' => '&#8472;', '&real;' => '&#8476;', '&trade;' => '&#8482;', '&alefsym;' => '&#8501;', '&larr;' => '&#8592;', '&uarr;' => '&#8593;', '&rarr;' => '&#8594;', '&darr;' => '&#8595;',
-	'&harr;' => '&#8596;', '&crarr;' => '&#8629;', '&lArr;' => '&#8656;', '&uArr;' => '&#8657;', '&rArr;' => '&#8658;', '&dArr;' => '&#8659;', '&hArr;' => '&#8660;', '&forall;' => '&#8704;', '&part;' => '&#8706;', '&exist;' => '&#8707;',
-	'&empty;' => '&#8709;', '&nabla;' => '&#8711;', '&isin;' => '&#8712;', '&notin;' => '&#8713;', '&ni;' => '&#8715;', '&prod;' => '&#8719;', '&sum;' => '&#8721;', '&minus;' => '&#8722;', '&lowast;' => '&#8727;', '&radic;' => '&#8730;',
-	'&prop;' => '&#8733;', '&infin;' => '&#8734;', '&ang;' => '&#8736;', '&and;' => '&#8743;', '&or;' => '&#8744;', '&cap;' => '&#8745;', '&cup;' => '&#8746;', '&int;' => '&#8747;', '&there4;' => '&#8756;', '&sim;' => '&#8764;',
-	'&cong;' => '&#8773;', '&asymp;' => '&#8776;', '&ne;' => '&#8800;', '&equiv;' => '&#8801;', '&le;' => '&#8804;', '&ge;' => '&#8805;', '&sub;' => '&#8834;', '&sup;' => '&#8835;', '&nsub;' => '&#8836;', '&sube;' => '&#8838;',
-	'&supe;' => '&#8839;', '&oplus;' => '&#8853;', '&otimes;' => '&#8855;', '&perp;' => '&#8869;', '&sdot;' => '&#8901;', '&lceil;' => '&#8968;', '&rceil;' => '&#8969;', '&lfloor;' => '&#8970;', '&rfloor;' => '&#8971;', '&lang;' => '&#9001;',
-	'&rang;' => '&#9002;', '&loz;' => '&#9674;', '&spades;' => '&#9824;', '&clubs;' => '&#9827;', '&hearts;' => '&#9829;', '&diams;' => '&#9830;'
+	'&sp;' => '&#32;', '&excl;' => '&#33;', '&quot;' => '&#34;', '&num;' => '&#35;', 
+	'&dollar;' =>  '&#36;', '&percnt;' => '&#37;', '&amp;' => '&#38;', '&apos;' => '&#39;', 
+	'&lpar;' => '&#40;', '&rpar;' => '&#41;',
+	'&ast;' => '&#42;', '&plus;' => '&#43;', '&comma;' => '&#44;', '&hyphen;' => '&#45;', 
+	'&minus;' => '&#45;', '&period;' => '&#46;', '&sol;' => '&#47;', '&colon;' => '&#58;', 
+	'&semi;' => '&#59;', '&lt;' => '&#60;',
+	'&equals;' => '&#61;', '&gt;' => '&#62;', '&quest;' => '&#63;', '&commat;' => '&#64;', 
+	'&lsqb;' => '&#91;', '&bsol;' => '&#92;', '&rsqb;' => '&#93;', '&circ;' => '&#94;', 
+	'&lowbar;' => '&#95;', '&horbar;' => '&#95;',
+	'&grave;' => '&#96;', '&lcub;' => '&#123;', '&verbar;' => '&#124;', '&rcub;' => '&#125;', 
+	'&tilde;' => '&#126;', '&lsquor;' => '&#130;', '&ldquor;' => '&#132;',
+	'&ldots;' => '&#133;', '&Scaron;' => '&#138;', '&lsaquo;' => '&#139;', '&OElig;' => '&#140;',
+	'&lsquo;' => '&#145;', '&rsquor;' => '&#145;', '&rsquo;' => '&#146;',
+	'&ldquo;' => '&#147;', '&rdquor;' => '&#147;', '&rdquo;' => '&#148;', '&bull;' => '&#149;',
+	'&ndash;' => '&#150;', '&endash;' => '&#150;', '&mdash;' => '&#151;', '&emdash;' => '&#151;',
+	'&tilde;' => '&#152;', '&trade;' => '&#153;',
+	'&scaron;' => '&#154;', '&rsaquo;' => '&#155;', '&oelig;' => '&#156;', '&Yuml;' => '&#159;',
+	'&nbsp;' => '&#160;', '&iexcl;' => '&#161;', '&cent;' => '&#162;', '&pound;' => '&#163;', 
+	'&curren;' => '&#164;', '&yen;' => '&#165;',
+	'&brvbar;' => '&#166;', '&brkbar;' => '&#166;', '&sect;' => '&#167;', '&uml;' => '&#168;', 
+	'&die;' => '&#168;', '&copy;' => '&#169;', '&ordf;' => '&#170;', '&laquo;' => '&#171;', 
+	'&not;' => '&#172;', '&shy;' => '&#173;',
+	'&reg;' => '&#174;', '&macr;' => '&#175;', '&hibar;' => '&#175;', '&deg;' => '&#176;', 
+	'&plusmn;' => '&#177;', '&sup2;' => '&#178;', '&sup3;' => '&#179;', '&acute;' => '&#180;', 
+	'&micro;' => '&#181;', '&para;' => '&#182;',
+	'&middot;' => '&#183;', '&cedil;' => '&#184;', '&sup1;' => '&#185;', '&ordm;' => '&#186;', 
+	'&raquo;' => '&#187;', '&frac14;' => '&#188;', '&frac12;' => '&#189;', '&half;' => '&#189;',
+	'&frac34;' => '&#190;', '&iquest;' => '&#191;',
+	'&Agrave;' => '&#192;', '&Aacute;' => '&#193;', '&Acirc;' => '&#194;', '&Atilde;' => '&#195;', 
+	'&Auml;' => '&#196;', '&Aring;' => '&#197;', '&AElig;' => '&#198;', '&Ccedil;' => '&#199;', 
+	'&Egrave;' => '&#200;', '&Eacute;' => '&#201;',
+	'&Ecirc;' => '&#202;', '&Euml;' => '&#203;', '&Igrave;' => '&#204;', '&Iacute;' => '&#205;', 
+	'&Icirc;' => '&#206;', '&Iuml;' => '&#207;', '&ETH;' => '&#208;', '&Ntilde;' => '&#209;', 
+	'&Ograve;' => '&#210;', '&Oacute;' => '&#211;',
+	'&Ocirc;' => '&#212;', '&Otilde;' => '&#213;', '&Ouml;' => '&#214;', '&times;' => '&#215;',
+	'&Oslash;' => '&#216;', '&Ugrave;' => '&#217;', '&Uacute;' => '&#218;', '&Ucirc;' => '&#219;', 
+	'&Uuml;' => '&#220;', '&Yacute;' => '&#221;',
+	'&THORN;' => '&#222;', '&szlig;' => '&#223;', '&agrave;' => '&#224;', '&aacute;' => '&#225;',
+	'&acirc;' => '&#226;', '&atilde;' => '&#227;', '&auml;' => '&#228;', '&aring;' => '&#229;', 
+	'&aelig;' => '&#230;', '&ccedil;' => '&#231;',
+	'&egrave;' => '&#232;', '&eacute;' => '&#233;', '&ecirc;' => '&#234;', '&euml;' => '&#235;',
+	'&igrave;' => '&#236;', '&iacute;' => '&#237;', '&icirc;' => '&#238;', '&iuml;' => '&#239;', 
+	'&eth;' => '&#240;', '&ntilde;' => '&#241;',
+	'&ograve;' => '&#242;', '&oacute;' => '&#243;', '&ocirc;' => '&#244;', '&otilde;' => '&#245;',
+	'&ouml;' => '&#246;', '&divide;' => '&#247;', '&oslash;' => '&#248;', '&ugrave;' => '&#249;', 
+	'&uacute;' => '&#250;', '&ucirc;' => '&#251;',
+	'&uuml;' => '&#252;', '&yacute;' => '&#253;', '&thorn;' => '&#254;', '&yuml;' => '&#255;', 
+	'&OElig;' => '&#338;', '&oelig;' => '&#339;', '&Scaron;' => '&#352;', '&scaron;' => '&#353;',
+	'&Yuml;' => '&#376;', '&fnof;' => '&#402;',
+	'&circ;' => '&#710;', '&tilde;' => '&#732;', '&Alpha;' => '&#913;', '&Beta;' => '&#914;', 
+	'&Gamma;' => '&#915;', '&Delta;' => '&#916;', '&Epsilon;' => '&#917;', '&Zeta;' => '&#918;', 
+	'&Eta;' => '&#919;', '&Theta;' => '&#920;',
+	'&Iota;' => '&#921;', '&Kappa;' => '&#922;', '&Lambda;' => '&#923;', 
+	'&Mu;' => '&#924;', '&Nu;' => '&#925;', '&Xi;' => '&#926;', 
+	'&Omicron;' => '&#927;', '&Pi;' => '&#928;', '&Rho;' => '&#929;', '&Sigma;' => '&#931;',
+	'&Tau;' => '&#932;', '&Upsilon;' => '&#933;', '&Phi;' => '&#934;', 
+	'&Chi;' => '&#935;', '&Psi;' => '&#936;', '&Omega;' => '&#937;', 
+	'&alpha;' => '&#945;', '&beta;' => '&#946;', '&gamma;' => '&#947;', '&delta;' => '&#948;',
+	'&epsilon;' => '&#949;', '&zeta;' => '&#950;', '&eta;' => '&#951;', 
+	'&theta;' => '&#952;', '&iota;' => '&#953;', '&kappa;' => '&#954;', '&lambda;' => '&#955;', 
+	'&mu;' => '&#956;', '&nu;' => '&#957;', '&xi;' => '&#958;',
+	'&omicron;' => '&#959;', '&pi;' => '&#960;', '&rho;' => '&#961;', '&sigmaf;' => '&#962;', 
+	'&sigma;' => '&#963;', '&tau;' => '&#964;', '&upsilon;' => '&#965;', '&phi;' => '&#966;', 
+	'&chi;' => '&#967;', '&psi;' => '&#968;',
+	'&omega;' => '&#969;', '&thetasym;' => '&#977;', '&upsih;' => '&#978;', '&piv;' => '&#982;',
+	'&ensp;' => '&#8194;', '&emsp;' => '&#8195;', '&thinsp;' => '&#8201;', '&zwnj;' => '&#8204;', 
+	'&zwj;' => '&#8205;', '&lrm;' => '&#8206;',
+	'&rlm;' => '&#8207;', '&ndash;' => '&#8211;', '&mdash;' => '&#8212;', '&lsquo;' => '&#8216;', 
+	'&rsquo;' => '&#8217;', '&sbquo;' => '&#8218;', '&ldquo;' => '&#8220;', '&rdquo;' => '&#8221;', 
+	'&bdquo;' => '&#8222;', '&dagger;' => '&#8224;',
+	'&Dagger;' => '&#8225;', '&bull;' => '&#8226;', '&hellip;' => '&#8230;', '&permil;' => '&#8240;', 
+	'&prime;' => '&#8242;', '&Prime;' => '&#8243;', '&lsaquo;' => '&#8249;', '&rsaquo;' => '&#8250;', 
+	'&oline;' => '&#8254;', '&frasl;' => '&#8260;',
+	'&euro;' => '&#8364;', '&image;' => '&#8465;', '&weierp;' => '&#8472;', '&real;' => '&#8476;', 
+	'&trade;' => '&#8482;', '&alefsym;' => '&#8501;', '&larr;' => '&#8592;', '&uarr;' => '&#8593;', 
+	'&rarr;' => '&#8594;', '&darr;' => '&#8595;',
+	'&harr;' => '&#8596;', '&crarr;' => '&#8629;', '&lArr;' => '&#8656;', '&uArr;' => '&#8657;', 
+	'&rArr;' => '&#8658;', '&dArr;' => '&#8659;', '&hArr;' => '&#8660;', '&forall;' => '&#8704;', 
+	'&part;' => '&#8706;', '&exist;' => '&#8707;',
+	'&empty;' => '&#8709;', '&nabla;' => '&#8711;', '&isin;' => '&#8712;', '&notin;' => '&#8713;', 
+	'&ni;' => '&#8715;', '&prod;' => '&#8719;', '&sum;' => '&#8721;', '&minus;' => '&#8722;', 
+	'&lowast;' => '&#8727;', '&radic;' => '&#8730;',
+	'&prop;' => '&#8733;', '&infin;' => '&#8734;', '&ang;' => '&#8736;', '&and;' => '&#8743;', 
+	'&or;' => '&#8744;', '&cap;' => '&#8745;', '&cup;' => '&#8746;', '&int;' => '&#8747;', 
+	'&there4;' => '&#8756;', '&sim;' => '&#8764;',
+	'&cong;' => '&#8773;', '&asymp;' => '&#8776;', '&ne;' => '&#8800;', '&equiv;' => '&#8801;', 
+	'&le;' => '&#8804;', '&ge;' => '&#8805;', '&sub;' => '&#8834;', '&sup;' => '&#8835;', 
+	'&nsub;' => '&#8836;', '&sube;' => '&#8838;',
+	'&supe;' => '&#8839;', '&oplus;' => '&#8853;', '&otimes;' => '&#8855;', '&perp;' => '&#8869;', 
+	'&sdot;' => '&#8901;', '&lceil;' => '&#8968;', '&rceil;' => '&#8969;', '&lfloor;' => '&#8970;', 
+	'&rfloor;' => '&#8971;', '&lang;' => '&#9001;',
+	'&rang;' => '&#9002;', '&loz;' => '&#9674;', '&spades;' => '&#9824;', '&clubs;' => '&#9827;', 
+	'&hearts;' => '&#9829;', '&diams;' => '&#9830;'
 );
 $b2_htmltrans = array_merge($b2_htmltrans,$b2_htmltransbis);
 
@@ -479,6 +551,5 @@ $b2_htmltranswinuni = array(
 # length (in words) of excerpts in the RSS feed? 0=unlimited
 # Note: this will not apply to html content!
 $rss_excerpt_length = 0;
-
 
 ?>

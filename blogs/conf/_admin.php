@@ -1,11 +1,9 @@
 <?php
 /*
  * This is b2evolution's admin config file
- * Version of this file: 0.8.7
+ * Version of this file: 0.8.9
  *
  * This sets how the back-office works
- *
- * Reminder: everything that starts with #, /* or // is a comment
  */
 
 # Cross posting:
@@ -14,17 +12,22 @@
 # set this to 2 if you want to be able to cross-post among multiple blogs/categories
 $allow_cross_posting = 1;
 
+
 # Default status for new posts:
 $default_post_status = 'published';		// 'published', 'deprecated', 'protected', 'private', 'draft'
+
 
 # set this to 1 if you want to use the 'preview' function
 $use_preview = 1;
 
+
 # set this to 0 to disable the spell checker, or 1 to enable it
 $use_spellchecker = 1;
 
+
 # Do you want to display buttons to help insettion of HTML tags
 $use_quicktags = 1;     //  1 to enable, 0 to disable
+
 
 # Do you want to be able to link each post to an URL ?
 $use_post_url = 1;			// 1 to enable, 0 to disable
@@ -39,8 +42,45 @@ $deluxe_ban = 1;	// 1 to enable, 0 to disable
 # centralized ban list at b2evolution.net?
 $auto_report_abuse = 1;
 
-# Do not edit the following unless you known what you're doing...
 
+// ** Image upload **
+
+# set this to 0 to disable file upload, or 1 to enable it
+$use_fileupload = 1;
+# enter the real path of the directory where you'll upload the pictures
+#   if you're unsure about what your real path is, please ask your host's support staff
+#   note that the  directory must be writable by the webserver (ChMod 766)
+#   note for windows-servers users: use forwardslashes instead of backslashes
+#$fileupload_realpath = '/home/your/site/b2/images';
+$fileupload_realpath = '/home/example/public_html/images';
+# Alternatively you may want to use this form:
+# $fileupload_realpath = dirname(__FILE__).'/../contents';
+# enter the URL of that directory (it's used to generate the links to the pictures)
+$fileupload_url = 'http://example.com/images';
+# Alternatively you may want to use this form:
+# $fileupload_url = $baseurl."/contents";
+# accepted file types, you can add to that list if you want
+#   note: add a space before and after each file type
+#   example: $fileupload_allowedtypes = ' jpg gif png ';
+$fileupload_allowedtypes = ' jpg gif png ';
+# by default, most servers limit the size of uploads to 2048 KB
+#   if you want to set it to a lower value, here it is (you cannot set a higher value)
+$fileupload_maxk = '96';
+# you may not want all users to upload pictures/files, so you can set a minimum level for this
+$fileupload_minlevel = '1';
+# ...or you may authorize only some users. enter their logins here, separated by spaces
+#   if you leave that variable blank, all users who have the minimum level are authorized to upload
+#   note: add a space before and after each login name
+#   example: $fileupload_allowedusers = ' barbara anne ';
+$fileupload_allowedusers = '';
+
+
+# New stub files:
+// $default_stub_mod = 0644;	// don't forget leading 0 !!!
+// $default_stub_owner = 'use_your_unix_username_here';
+
+
+# Do not edit the following unless you known what you're doing...
 # Backoffice two colum display:
 $admin_2col_start = '<div class="bPosts">';
 $admin_2col_nextcol = '</div><div class="bSideBar">';

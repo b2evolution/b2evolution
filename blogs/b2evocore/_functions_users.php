@@ -390,9 +390,9 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $users_can_register, $blog;
+	global $htsrv_url, $blog;
 
-	if( is_logged_in() || !$users_can_register) 
+	if( is_logged_in() || !get_settings('pref_newusers_canregister')) 
 	{	// There's no need to provide this link if already logged in or if we won't let him register
 		return false;
 	}

@@ -1,10 +1,9 @@
 <?php
 /*
  * b2evolution localization & language config
- * Version of this file: 0.8.7
- *
- * Reminder: everything that starts with #, /* or // is a comment
+ * Version of this file: 0.8.9
  */
+
 # Enable localization?
 # set to 0 to disable localization
 # set to 1 to enable gettext localization if supported (not recommended)

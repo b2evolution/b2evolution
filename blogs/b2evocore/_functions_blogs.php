@@ -27,14 +27,24 @@ function blog_create(
 	$blog_lang = 'en',
 	$blog_roll = '',
 	$blog_keywords = '',
-	$blog_UID = '' )
+	$blog_UID = '',
+	$blog_allowtrackbacks = 1,
+	$blog_allowpingbacks = 1,
+	$blog_pingb2evonet = 0,
+	$blog_pingtechnorati = 0,
+	$blog_pingweblogs = 1,
+	$blog_pingblodotgs = 0,
+	$blog_disp_bloglist	= 1
+)
 {
 	global $tableblogs, $query, $querycount;
 
 	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl, blog_filename, ".
 						"blog_stub, blog_staticfilename, ".
 						"blog_tagline, blog_description, blog_longdesc, blog_lang, blog_roll, blog_keywords,".
-						"blog_UID ) VALUES ( ";
+						"blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet, 
+						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotg, blog_disp_bloglist ) 	
+	VALUES ( ";
 	$query .= "'".addslashes($blog_name)."', ";
 	$query .= "'".addslashes($blog_shortname)."', ";
 	$query .= "'$blog_siteurl', ";
@@ -47,7 +57,10 @@ function blog_create(
 	$query .= "'$blog_lang', ";
 	$query .= "'".addslashes($blog_roll)."', ";
 	$query .= "'".addslashes($blog_keywords)."', ";
-	$query .= "'$blog_UID' )";
+	$query .= "'$blog_UID', 
+	$blog_allowtrackbacks, $blog_allowpingbacks,
+	$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs, 
+	$blog_disp_bloglist )	";
 	$querycount++;
 	$result = mysql_query($query);
 
@@ -80,12 +93,13 @@ function blog_update(
 	$blog_roll = '',
 	$blog_keywords = '',
 	$blog_UID = '',
-	$blog_allowtrackbacks = true,
-	$blog_allowpingbacks = true,
-	$blog_pingb2evonet = false,
-	$blog_pingtechnorati = false,
-	$blog_pingweblogs = false,
-	$blog_pingblodotgs = false
+	$blog_allowtrackbacks = 1,
+	$blog_allowpingbacks = 1,
+	$blog_pingb2evonet = 0,
+	$blog_pingtechnorati = 0,
+	$blog_pingweblogs = 1,
+	$blog_pingblodotgs = 0,
+	$blog_disp_bloglist	= 1
 	)
 {
 	global $tableblogs, $query, $querycount;
@@ -109,8 +123,10 @@ function blog_update(
 	$query .= " blog_pingb2evonet = $blog_pingb2evonet, ";
 	$query .= " blog_pingtechnorati = $blog_pingtechnorati, ";
 	$query .= " blog_pingweblogs = $blog_pingweblogs, ";
-	$query .= " blog_pingblodotgs = $blog_pingblodotgs ";
+	$query .= " blog_pingblodotgs = $blog_pingblodotgs, ";
+	$query .= " blog_disp_bloglist = $blog_disp_bloglist ";
 	$query .= "WHERE blog_ID= $blog_ID";
+	// echo $query;
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
@@ -200,6 +216,8 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 		case 'pingtechnorati':
 		case 'pingweblogs':
 		case 'pingblodotgs':
+		case 'default_skin':
+		case 'disp_bloglist':
 			$paramname = 'blog_' . $show;
 			$output =  $this_blogparams->$paramname;
 			break;

@@ -228,6 +228,15 @@ switch( $next_action )
 	</fieldset>	
 
 	<fieldset>
+		<legend><?php echo T_('Default display options') ?></legend>
+		<?php 
+			// form_select( 'blog_default_skin', $blog_default_skin, 'groups_options', T_('Default skin') , T_('This is the skin that will be used until the user selects another skin (which will be saved in a cookie)') );
+
+			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display blog list'), T_("Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this).") );
+		?>
+	</fieldset>
+
+	<fieldset>
 		<legend><?php echo T_('Advanced options') ?></legend>
 		<?php 
 			form_checkbox( 'blog_allowtrackbacks', $blog_allowtrackbacks, T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
