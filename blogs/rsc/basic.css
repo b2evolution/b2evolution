@@ -44,21 +44,26 @@ code {
 }
 
 
-div.log_container,
+/*
+{{{ Messages
+*/
 div.error {
 	padding:1ex;
+}
+div.error,
+div.log_container {
 	margin:1ex auto;
 }
 div.log_container ul,
 div.log_container ol {
 	list-style: square;
+	list-style-image:none;
 	margin:1ex 0;
 	padding-left:3ex;
 }
 div.log_container div {
 	border:1px solid #6287c2;
 	background:#ddd;
-	color:#000;
 	margin:1ex auto;
 	padding:1ex;
 }
@@ -75,3 +80,4 @@ span.error {
 	color: #e00;
 	font-weight:bold;
 }
+/* }}} */

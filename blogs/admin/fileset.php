@@ -54,7 +54,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'upload_enabled', 'integer', 0 );
-		$Settings->set( 'upload_enable', $upload_enabled );
+		$Settings->set( 'upload_enabled', $upload_enabled );
 		param( 'upload_realpath', 'string', true );
 		$Settings->set( 'upload_realpath', $upload_realpath );
 		param( 'upload_url', 'string', true );
@@ -76,7 +76,7 @@ switch( $action )
 		break;
 }
 
-if( $msg = $Messages->display( '', '', true, 'note', 'panelinfo', '<p>' ) );
+$Messages->displayParagraphs( 'note' );
 
 // Check permission to view:
 $current_User->check_perm( 'options', 'view', true );

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Log class, which logs notes and errors.
+ * This file implements the Log class, which logs notes and errors. {{{
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -127,6 +127,20 @@ class Log
 		return false;
 	}
 
+
+	/**
+	 * Wrapper to display messages as simple paragraphs.
+	 *
+	 * @param mixed the level of messages {@link display()}
+	 * @param mixed the outer div {@link display()}
+	 * @param mixed the css class for inner paragraphs
+	 */
+	function displayParagraphs( $level = NULL, $outerdiv = 'panelinfo', $cssclass = false )
+	{
+		return $this->display( '', '', true, $level, $cssclass, 'p', $outerdiv );
+	}
+
+
 	/**
 	 * Display messages of the Log object.
 	 *
@@ -135,13 +149,15 @@ class Log
 	 * @param string footer (default: empty), might be array ( level => msg ),
 	 *               'container' is then bottom
 	 * @param boolean to display or return (default: true)
-	 * @param mixed the level of messages to use (level, 'all', or list of levels (array)
-	 * @param string the CSS class of the outer <div> (default: 'log_'.$level)
-	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
+	 * @param mixed the level of messages to use (level, 'all', or list of levels (array))
+	 * @param string the CSS class of the messages div tag (default: 'log_'.$level)
+	 * @param string the style to use, 'ul', 'p', 'br'
+	 *               (default: 'br' for single message, 'ul' for more)
+	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs)
 	 */
-	function display( $head = '', $foot = '', $display = true, $level = NULL, $cssclass = NULL,
-										$style = NULL )
+	function display( $head = '', $foot = '', $display = true, $level = NULL,
+										$cssclass = NULL, $style = NULL, $outerdiv = 'log_container' )
 	{
 		if( $level === NULL )
 		{
@@ -149,49 +165,64 @@ class Log
 		}
 		$disp = '';
 
-		$messages = & $this->getMessages( $level );
+		$messages =& $this->getMessages( $level );
 		if( !count($messages) )
 		{
 			return false;
 		}
 
-		$disp .= "\n<div class=\"log_container\">";
+		if( $outerdiv )
+		{
+			$disp .= "\n<div class=\"$outerdiv\">";
+		}
 
 		$disp .= $this->getHeadFoot( $head, 'container', '<h2>%s</h2>' );
 
 		foreach( $messages as $llevel => $lmessages )
 		{
 			$lcssclass = ( $cssclass === NULL ? 'log_'.$llevel : $cssclass );
-			$disp .= "\n<div class=\"$lcssclass\">";
+
+			$disp .= "\n";
+			if( $lcssclass )
+			{
+				$disp .= "\t<div class=\"$lcssclass\">";
+			}
 
 			$disp .= $this->getHeadFoot( $head, $llevel, '<h2>%s</h2>' );
 
 			if( $style == NULL )
-			{ // '<br>' for a single message, '<ul>' for more
-				$style = count($lmessages) == 1 ? '<br>' : '<ul>';
+			{ // 'br' for a single message, 'ul' for more
+				$style = count($lmessages) == 1 ? 'br' : 'ul';
 			}
 
 			// implode messages
-			if( $style == '<ul>' )
+			if( $style == 'ul' )
 			{
-				$disp .= '<ul class="'.$lcssclass.'"><li>'.implode( "</li>\n<li>", $lmessages ).'</li></ul>';
+				$disp .= "\t<ul".( $lcssclass ? " class=\"$lcssclass\"" : '' ).'><li>'
+							.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
 			}
-			elseif( $style == '<p>' )
+			elseif( $style == 'p' )
 			{
-				$disp .= '<p class="'.$lcssclass.'">'.implode( "</p>\n<p>", $lmessages ).'</p>';
+				$disp .= "\t<p".( $lcssclass ? " class=\"$lcssclass\"" : '' ).'>'
+							.implode( "</p>\n<p class=\"$lcssclass\">", $lmessages )."</p>\n";
 			}
 			else
 			{
-				$disp .= implode( '<br />', $lmessages );
+				$disp .= "\t".implode( "\n<br />\t", $lmessages );
 			}
-			$disp .= $this->getHeadFoot( $foot, $llevel, '<p>%s</p>' );
-			$disp .= '</div>';
+			$disp .= $this->getHeadFoot( $foot, $llevel, "\n<p>%s</p>" );
+			if( $lcssclass )
+			{
+				$disp .= "\t</div>\n";
+			}
 		}
 
-		$disp .= $this->getHeadFoot( $foot, 'container', '<p>%s</p>' );
+		$disp .= $this->getHeadFoot( $foot, 'container', "\n<p>%s</p>" );
 
-		$disp .= "\n</div>";
-
+		if( $outerdiv )
+		{
+			$disp .= "</div>\n";
+		}
 
 		if( $display )
 		{
@@ -214,13 +245,16 @@ class Log
 	 *               ( level => msg ), 'container' is then bottom
 	 * @param string footer (if more than one message)
 	 * @param boolean to display or return (default: true)
-	 * @param mixed the level of messages to use (level, 'all', or list of levels (array)
-	 * @param string the CSS class of the outer <div> (default: 'log_'.$level)
-	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
+	 * @param mixed the level of messages to use (level, 'all', or list of levels (array))
+	 * @param string the CSS class of the messages div tag (default: 'log_'.$level)
+	 * @param string the style to use, 'ul', 'p', 'br'
+	 *               (default: 'br' for single message, 'ul' for more)
+	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs)
 	 */
-	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '', $display = true,
-													$level = NULL, $cssclass = NULL, $style = '<ul>' )
+	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '',
+													$display = true, $level = NULL, $cssclass = NULL,
+													$style = NULL, $outerdiv = 'log_container' )
 	{
 		switch( $this->count( $level ) )
 		{
@@ -303,22 +337,20 @@ class Log
 			$level = array( $level );
 		}
 
-		foreach( $this->messages as $llevel => $lmsgs )
+		foreach( $level as $llevel )
 		{
-			if( !in_array( $llevel, $level ) )
+			if( !isset($this->messages[$llevel]) || !count($this->messages[$llevel]) )
 			{
 				continue;
 			}
-			foreach( $lmsgs as $lmsg )
+
+			if( $singleDimension )
 			{
-				if( $singleDimension )
-				{
-					$messages[] = $lmsg;
-				}
-				else
-				{
-					$messages[$llevel][] = $lmsg;
-				}
+				$messages += $this->messages[$llevel];
+			}
+			else
+			{
+				$messages[$llevel] = $this->messages[$llevel];
 			}
 		}
 		return $messages;

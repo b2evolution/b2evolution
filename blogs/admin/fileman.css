@@ -75,6 +75,7 @@
 }
 
 div.toolbaritem_group {
+	white-space:nowrap;
 }
 div.toolbaritem_group .toolbaritem {
 	padding-left: 1ex;

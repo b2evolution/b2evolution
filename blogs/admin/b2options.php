@@ -325,7 +325,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					require(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
 					@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
-					$Messages->add( sprintf(T_('Deleted locale [%s] from database.'), $delete) );
+					$Messages->add( sprintf(T_('Deleted locale [%s] from database.'), $delete), 'note' );
 				}
 
 				// --- SWITCH PRIORITIES -----------------
@@ -376,7 +376,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 	}
 
-	if( $msg = $Messages->display( '', '', true, 'note', 'panelinfo', '<p>' ) );
+	$Messages->displayParagraphs( 'note' );
 }
 
 // Check permission:

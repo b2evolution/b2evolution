@@ -94,7 +94,7 @@ switch( $action )
 		break;
 }
 
-if( $msg = $Messages->display( '', '', true, 'note', 'panelinfo', '<p>' ) );
+$Messages->displayParagraphs( 'note' );
 
 
 require dirname(__FILE__).'/_set_plugins.form.php';

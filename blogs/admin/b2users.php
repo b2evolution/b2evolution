@@ -76,7 +76,7 @@ else switch ($action)
 
 
 	case 'userupdate':
-		// Update existing use OR create new user:
+		// Update existing user OR create new user:
 		param( 'edited_user_ID', 'integer', true );
 		if( $edited_user_ID == 0 )
 		{ // we create a new user
