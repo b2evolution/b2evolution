@@ -48,6 +48,20 @@
  * Load config, init and get the {@link $mode mode param}
  */
 require_once dirname(__FILE__).'/_header.php';
+
+$admin_tab = 'files';
+$admin_pagetitle = T_('Filemanager').' (beta)';
+
+
+if( !$Settings->get( 'fm_enabled' ) )
+{
+	require dirname(__FILE__).'/_menutop.php';
+	Log::display( '', '', T_('The filemanager is disabled.') );
+	require( dirname(__FILE__). '/_footer.php' );
+	return;
+}
+
+
 /**
  * Load FileManager class
  */
@@ -128,11 +142,12 @@ if( !empty($action) )
 			param( 'createnew', 'string', '' ); // 'file', 'dir'
 			param( 'createname', 'string', '' );
 
-			$Fileman->createDirOrFile( $createnew, $createname );
+			$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
 			break;
 
 
 		case T_('Send by mail'):
+			// TODO: implement
 			if( !$selectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
@@ -145,6 +160,8 @@ if( !empty($action) )
 
 		case 'download':
 			// TODO: provide optional zip formats
+			$action_title = T_('Download');
+
 			if( !$selectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
@@ -156,21 +173,20 @@ if( !empty($action) )
 
 			if( empty($zipname) )
 			{
-				$msg_action = '
-				<div class="panelblock">
-				<h2>'.T_('Download').'</h2>
-				'
-				.T_('You want to download:').'<ul>';
-
-				$msg_action .=
-					'<li>'.implode( "</li>\n<li>", $selectedFiles->getFilesArray( 'getNameWithType' ) )."</li>\n"
+				$action_msg =
+					"\n"
+					.'<div class="panelblock">'
+					."\n"
+					.T_('You want to download:')
+					.'<ul>'
+					.'<li>'.implode( "</li>\n<li>", $selectedFiles->getFilesArray( 'getNameWithType' ) )."</li>\n"
 					.'</ul>
 
 					<form action="files.php" class="fform" method="post">
-					'
+					' // TODO: use Form class
 					.$Fileman->getFormHiddenInputs()
 					.$Fileman->getFormHiddenSelectedFiles()
-					.form_hidden( 'action', 'download' )
+					.form_hidden( 'action', 'download', false )
 					.'
 					<fieldset>
 						<legend>'.T_('Download options').'</legend>
@@ -186,11 +202,14 @@ if( !empty($action) )
 						</div>
 					</fieldset>
 					</form>
+					</div>
 					';
 			}
 			else
 			{ // Downloading
 				require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
+
+				$arraylist = $selectedFiles->getFilesArray( 'getname' );
 
 				$options = array (
 					'basedir' => $Fileman->getCwd(),
@@ -200,23 +219,11 @@ if( !empty($action) )
 
 				$zipfile = new zip_file( $zipname );
 				$zipfile->set_options( $options );
-
-				$arraylist = array();
-
-				// TODO: flatmode?!
-				foreach( $selectedFiles->entries as $File )
-				{
-					$arraylist[] = $File->getName();
-				}
 				$zipfile->add_files( $arraylist );
-
 				$zipfile->create_archive();
-
-				#header('Content-length: ' . filesize($path));
 				$zipfile->download_file();
 				exit;
 				#$Fileman->Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
-
 			}
 
 			break;
@@ -234,7 +241,7 @@ if( !empty($action) )
 
 			if( !$confirmed )
 			{
-				$msg_action = '
+				$action_msg = '
 					<form action="files.php" class="inline">
 						<input type="hidden" name="confirmed" value="1" />
 						<input type="hidden" name="action" value="delete" />
@@ -242,21 +249,21 @@ if( !empty($action) )
 						.$Fileman->getFormHiddenInputs()."\n";
 
 
-				$msg_action .= $selectedFiles->count() > 1 ?
+				$action_msg .= $selectedFiles->count() > 1 ?
 												T_('Do you really want to delete the following files?') :
 												T_('Do you really want to delete the following file?');
 
-				$msg_action .= '
+				$action_msg .= '
 				<ul>
 				';
 
 				foreach( $selectedFiles->entries as $lFile )
 				{
-					$msg_action .= '<li>'.$lFile->getName();
+					$action_msg .= '<li>'.$lFile->getName();
 
 					if( $lFile->isDir() )
 					{
-						$msg_action .= '
+						$action_msg .= '
 							<br />
 							<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->getName() ).'"
 								type="checkbox"
@@ -267,13 +274,13 @@ if( !empty($action) )
 									.T_( 'Including subdirectories' ).'</label>';
 					}
 
-					$msg_action .= '</li>';
+					$action_msg .= '</li>';
 				}
 
-				$msg_action .= "</ul>\n";
+				$action_msg .= "</ul>\n";
 
 
-				$msg_action .= '
+				$action_msg .= '
 					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
 					</form>
 					<form action="files.php" class="inline">
@@ -299,6 +306,8 @@ if( !empty($action) )
 
 
 		case 'editperm': // edit permissions {{{
+			$action_title = T_('Change permissions');
+
 			if( !$selectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
@@ -308,7 +317,7 @@ if( !empty($action) )
 			param( 'perms', 'array', array() );
 
 			if( count( $perms ) )
-			{
+			{ // Change perms
 				$selectedFiles->restart();
 				while( $lFile =& $selectedFiles->getNextFile() )
 				{
@@ -333,7 +342,9 @@ if( !empty($action) )
 			}
 			else
 			{
-				$msg_action = '
+				// TODO: use Form class, finish non-Windows
+				$action_msg = '
+				<div class="panelblock">
 				<form name="form_chmod" action="files.php">
 				'.$Fileman->getFormHiddenSelectedFiles()
 				.$Fileman->getFormHiddenInputs().'
@@ -347,9 +358,9 @@ if( !empty($action) )
 					{ // more than one file, provide default
 
 					}
-					foreach( $selectedFiles->entries as $lFile )
+					foreach( $selectedFiles->getFilesArray() as $lFile )
 					{
-						$msg_action .= "\n".$Fileman->getFileSubpath( $lFile ).':<br />
+						$action_msg .= "\n".$Fileman->getFileSubpath( $lFile ).':<br />
 						<input id="perms_readonly_'.$lFile->getID().'"
 							name="perms['.$lFile->getID().']"
 							type="radio"
@@ -363,7 +374,7 @@ if( !empty($action) )
 							name="perms['.$lFile->getID().']"
 							type="radio"
 							value="666"'
-							.( $lFile->getPerms( 'octal' ) == 666 ?
+							.( $lFile->getPerms( 'octal' ) == 666 || $lFile->getPerms( 'octal' ) == 777 ?
 									'checked="checked"' :
 									'' ).' />
 						<label for="perms_readwrite_'.$lFile->getID().'">'.T_('Read and write').'</label>
@@ -372,17 +383,18 @@ if( !empty($action) )
 				}
 				else
 				{
-					$msg_action .= '<input type="text" name="chmod" value="'
+					$action_msg .= '<input type="text" name="chmod" value="'
 													.$lFile->getPerms( 'octal' ).'" maxlength="3" size="3" /><br />';
 					$js_focus = 'document.form_chmod.chmod';
 				}
 
-				$msg_action .= '
+				$action_msg .= '
 				<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
 				</form>
+				</div>
 				';
-
 			}
+
 			// }}}
 			break;
 
@@ -547,10 +559,7 @@ if( !empty($action) )
 }
 
 
-// Page title
-$admin_tab = 'files';
-$admin_pagetitle = T_('Filemanager').' (beta)';
-
+// Adjust page title
 switch( $Fileman->getMode() )
 {
 	case 'file_upload':
@@ -1158,24 +1167,29 @@ if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 	<?php
 }
 
+if( isset($action_title) )
+{
+	echo "\n<h2>$action_title</h2>\n";
+}
 
-// output errors, notes and action messages {{{
-if( $Fileman->Messages->count( array( 'error', 'note' ) )
-		|| $Messages->count( 'all' ) )
+// Output errors, notes and action messages {{{
+if( $Fileman->Messages->count( array( 'error', 'note' ) ) || $Messages->count( 'all' ) )
 {
 	?>
+
 	<div class="panelinfo">
 		<?php
 		$Messages->display( '', '', true, 'all' );
 		$Fileman->Messages->display( '', '', true, array( 'error', 'note' ) );
 		?>
 	</div>
+
 	<?php
 }
 
-if( isset($msg_action) )
+if( isset($action_msg) )
 {
-	echo $msg_action;
+	echo $action_msg;
 
 	if( isset( $js_focus ) )
 	{ // we want to auto-focus a field
@@ -1558,7 +1572,7 @@ else
 		?>" onclick="toggleCheckboxes('FilesForm', 'fm_selected[]'); return false;"><?php
 		echo ($checkall) ? T_('uncheck all') : T_('check all');
 		?></a>
-	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
+	&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
 	<input class="DeleteButton"
 		title="<?php echo T_('Delete the selected files') ?>"
@@ -1624,7 +1638,7 @@ else
 
 	<input class="ActionButton" type="image" name="action" value="editperm"
 		onclick="return openselectedfiles(true);"
-		title="<?php echo T_('Change permissions'); ?>"
+		title="<?php echo T_('Change permissions for the selected files'); ?>"
 		src="<?php echo getIcon( 'file_perms', 'url' ); ?>" />
 
 	*/ ?>
@@ -1835,6 +1849,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.64  2005/01/10 02:17:40  blueyed
+ * no message
+ *
  * Revision 1.63  2005/01/09 05:36:39  blueyed
  * fileupload
  *

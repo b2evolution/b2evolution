@@ -732,8 +732,13 @@ class Filelist
 
 
 	/**
+	 * Get the list of File entries.
+	 *
+	 * You can use a method on each object to get this as result instead of the object
+	 * itself.
 	 *
 	 * @param string Use this method on every File and put the result into the list.
+	 * @return array The array with the File objects or method results
 	 */
 	function getFilesArray( $method = NULL )
 	{
@@ -773,6 +778,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.18  2005/01/10 02:17:39  blueyed
+ * no message
+ *
  * Revision 1.17  2005/01/08 22:10:43  blueyed
  * really fixed filelist (hopefully)
  *

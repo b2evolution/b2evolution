@@ -454,10 +454,7 @@ class FileManager extends Filelist
 
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_upload', 'mode' => 'upload' ) );
 
-		echo '<input type="button" class="ActionButton"' // JS-only.. bleh..
-					.' onclick="'.$this->getJsPopupCode( $url, 'fileman_upload' ).'"'
-					.' value="'.format_to_output( $title, 'formvalue' ).'"'
-					.' />';
+		echo Form::button( 'button', 'fm_upload_popup', $title, 'ActionButton', '', $this->getJsPopupCode( $url, 'fileman_upload' ) );
 	}
 
 
@@ -1396,6 +1393,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.19  2005/01/10 02:17:39  blueyed
+ * no message
+ *
  * Revision 1.18  2005/01/09 05:36:38  blueyed
  * fileupload
  *
