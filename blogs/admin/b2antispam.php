@@ -37,7 +37,7 @@ switch( $action )
 			?>
 			<div class="panelblock">
 				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
-				<?php ban_affected_comments($keyword) ?>
+				<?php ban_affected_comments($keyword, 'keyword') ?>
 				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ) ?></p>
 				<table class="thin">
 					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
@@ -65,7 +65,7 @@ switch( $action )
 					<?php } // End stat loop ?>
 				</table>
 				
-				<?php ban_affected_hits($keyword) ?>
+				<?php ban_affected_hits($keyword, 'keyword') ?>
 				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
 				<table class="thin">
 					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
@@ -131,8 +131,8 @@ switch( $action )
 			?>
 			<div class="panelblock">
 				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
-				<?php ban_affected_comments($keyword) ?>
-				<p><?php printf ( T_('Banning the domain %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ) ?></p>
+				<?php ban_affected_comments($hit_ID, 'hit_ID') ?>
+				<p><?php printf ( T_('Banning the referer hit %s from the statistics and comments would lead to the deletion of the following %d comments:'), $hit_ID, mysql_affected_rows() ) ?></p>
 				<table class="thin">
 					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>
@@ -159,7 +159,7 @@ switch( $action )
 					<?php } // End stat loop ?>
 				</table>
 				
-				<?php ban_affected_hits($keyword) ?>
+				<?php ban_affected_hits($hit_ID, 'hit_ID') ?>
 				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
 				<table class="thin">
 					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
