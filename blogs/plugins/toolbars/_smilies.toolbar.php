@@ -8,10 +8,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2evSmil';
+require_once dirname(__FILE__).'/../toolbar.class.php';
 
-class smilies_Toolbarplugin
+class smilies_Toolbarplugin extends ToolbarPlugin
 {
+	var $code = 'b2evSmil';
+	var $name = 'Smilies';
+	var $short_desc = 'One click smilies inserting';
+	var $long_desc = 'No description available';
+
 	/**
 	 * Smiley definitions
 	 *
@@ -104,6 +109,6 @@ class smilies_Toolbarplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new smilies_Toolbarplugin();
+$this->register( new smilies_Toolbarplugin() );
 
 ?>

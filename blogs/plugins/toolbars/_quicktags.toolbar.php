@@ -12,10 +12,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2evQTag';
+require_once dirname(__FILE__).'/../toolbar.class.php';
 
-class quicktags_Toolbarplugin
+class quicktags_Toolbarplugin extends ToolbarPlugin
 {
+	var $code = 'b2evQTag';
+	var $name = 'Quick Tags';
+	var $short_desc = 'Easy HTML tags inserting';
+	var $long_desc = 'No description available';
+
 	/**
 	 * Display the toolbar
 	 *
@@ -365,6 +370,6 @@ class quicktags_Toolbarplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new quicktags_Toolbarplugin();
+$this->register( new quicktags_Toolbarplugin() );
 
 ?>

@@ -10,10 +10,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2evGMco';
+require_once dirname(__FILE__).'/../renderer.class.php';
 
-class gmcode_Rendererplugin
+class gmcode_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2evGMco';
+	var $name = 'GM code';
+	var $short_desc = 'GreyMatter style formatting';
+	var $long_desc = 'No description available';
+
 	/**
 	 * GreyMatter formatting search array
 	 *
@@ -50,6 +55,6 @@ class gmcode_Rendererplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new gmcode_Rendererplugin();
+$this->register( new gmcode_Rendererplugin() );
 
 ?>

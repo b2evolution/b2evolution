@@ -8,10 +8,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2evALnk';
+require_once dirname(__FILE__).'/../renderer.class.php';
 
-class autolinks_Rendererplugin
+class autolinks_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2evALnk';
+	var $name = 'Auto Links';
+	var $short_desc = 'Make URLs clickable';
+	var $long_desc = 'No description available';
+
 	/**
 	 * Perform rendering
 	 *
@@ -24,6 +29,6 @@ class autolinks_Rendererplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new autolinks_Rendererplugin();
+$this->register( new autolinks_Rendererplugin() );
 
 ?>

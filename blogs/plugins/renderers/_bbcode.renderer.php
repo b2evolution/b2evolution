@@ -10,10 +10,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2evBBco';
- 
-class bbcode_Rendererplugin
+require_once dirname(__FILE__).'/../renderer.class.php';
+
+class bbcode_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2evBBco';
+	var $name = 'BB code';
+	var $short_desc = 'BB formatting e-g [b]bold[/b]';
+	var $long_desc = 'No description available';
+
 	/**
 	 * BBcode formatting search array
 	 *
@@ -68,6 +73,6 @@ class bbcode_Rendererplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new bbcode_Rendererplugin();
+$this->register( new bbcode_Rendererplugin() );
 
 ?>

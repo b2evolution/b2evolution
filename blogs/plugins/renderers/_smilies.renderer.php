@@ -8,12 +8,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2evSmil';
+require_once dirname(__FILE__).'/../renderer.class.php';
 
-			
-
-class smilies_Rendererplugin
+class smilies_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2evSmil';
+	var $name = 'Smilies';
+	var $short_desc = 'Convert text smilies to icons';
+	var $long_desc = 'No description available';
+
 	/**
 	 * Text similes search array
 	 *
@@ -102,6 +105,6 @@ class smilies_Rendererplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new smilies_Rendererplugin();
+$this->register( new smilies_Rendererplugin() );
 
 ?>

@@ -13,7 +13,8 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2DATxtl';
+require_once dirname(__FILE__).'/../renderer.class.php';
+
 
 /**
  * Example: get XHTML from a given Textile-markup string ($string)
@@ -195,8 +196,13 @@ Applying Attributes:
 
 */
 
-class textile_Rendererplugin
+class textile_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2DATxtl';
+	var $name = 'Textile';
+	var $short_desc = 'Humane Web Text Generator';
+	var $long_desc = 'No description available';
+
     var $hlgn;
     var $vlgn;
     var $clas;
@@ -956,6 +962,6 @@ function refs($m)
 
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new textile_Rendererplugin();
+$this->register( new textile_Rendererplugin() );
 
 ?>

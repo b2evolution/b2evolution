@@ -6,10 +6,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2WPAutP';
+require_once dirname(__FILE__).'/../renderer.class.php';
 
-class auto_p_Rendererplugin
+class auto_p_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2WPAutP';
+	var $name = 'Auto P';
+	var $short_desc = 'Automatic &lt;P&gt; and &lt;BR&gt; tags';
+	var $long_desc = 'No description available';
+
 	var $br = true; 	// optionally make line breaks
 
 	/**
@@ -42,6 +47,6 @@ class auto_p_Rendererplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new auto_p_Rendererplugin();
+$this->register( new auto_p_Rendererplugin() );
 
 ?>

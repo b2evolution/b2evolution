@@ -7,10 +7,15 @@
  *
  * @package plugins
  */
-$plugin_code = 'b2WPTxrz';
+require_once dirname(__FILE__).'/../renderer.class.php';
 
-class texturize_Rendererplugin
+class texturize_Rendererplugin extends RendererPlugin
 {
+	var $code = 'b2WPTxrz';
+	var $name = 'Texturize';
+	var $short_desc = 'Smart quotes and more';
+	var $long_desc = 'No description available';
+
 	/**
 	 * Perform rendering
 	 *
@@ -65,6 +70,6 @@ class texturize_Rendererplugin
 }
 
 // Register the plugin:
-$this->Plugins[$plugin_code] = & new texturize_Rendererplugin();
+$this->register( new texturize_Rendererplugin() );
 
 ?>
