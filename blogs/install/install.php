@@ -13,7 +13,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.3-alpha2</h1>
+<h1 id="version">Version: 0.8.3-beta1</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2login.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -642,7 +642,7 @@ switch( $action )
  	
 <p><input type="radio" name="action" value="newdb" checked="checked"> <strong>New Install</strong>: Install b2evolution tables with sample data.</p>
 	
-		<p><input type="radio" name="action" value="evodb"> <strong>Upgrade from a previous version of b2evolution</strong>: This is NOT necessary by now!</p>
+		<p><input type="radio" name="action" value="evodb"> <strong>Upgrade from a previous version of b2evolution</strong>: This will upgrade your b2evolution database in order to make it compatible with the current version!</p>
 
   	<p><input type="radio" name="action" value="upgradedb"> <strong>Upgrade from original b2</strong>: Install b2evolution tables and copy your existing b2 data into them. </p>
 

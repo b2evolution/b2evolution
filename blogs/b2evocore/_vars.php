@@ -10,7 +10,7 @@
  */
 
 #b2 version
-$b2_version = '0.8.3-alpha2';
+$b2_version = '0.8.3-beta1';
 
 // Activate gettext:
 if( function_exists( 'bindtextdomain' ) )
