@@ -18,4 +18,6 @@ $login_required = true;
 require_once( dirname(__FILE__) . "/$admin_dirout/$core_subdir/_main.php" );
 
 param( 'mode', 'string', '' );		// Sidebar, bookmarklet
+param( 'blog', 'integer', 0, true );	// We need this for the urls
+
 ?>

@@ -43,8 +43,6 @@ if( empty($mode) )
 	 
 	<ul>
 	<?php
-		param( 'blog', 'integer', 0, true );	// We need this for the urls
-
 		if( ($title == T_('New post in blog:')) || ($title == T_('Adding new post...')) )
 			echo '<li class="current">';
 		else

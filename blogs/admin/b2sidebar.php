@@ -1,6 +1,6 @@
 <?php
 /**
- * file
+ * This is the sidebar page. It actually calls the edit page in 'sidebar' mode.
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
@@ -8,10 +8,9 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evolution
+ * @package admin
  */
 
-$mode = 'bookmarklet';
 $mode = 'sidebar';
 require_once(dirname(__FILE__).'/b2edit.php');
 

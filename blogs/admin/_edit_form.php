@@ -41,7 +41,7 @@ if ($use_spellchecker)
 	{
 		// Stupid thing: having a field called action !
 		var saved_action =  form.attributes.getNamedItem('action').value;
-		form.attributes.getNamedItem('action').value = '<' . '?php $Blog->disp( \'dynurl\', \'raw\' ) ?' . '>';
+		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
 		form.target = 'b2evo_preview';
 		form.submit();
 		preview_window = window.open( '', 'b2evo_preview' );
@@ -102,14 +102,14 @@ if ($use_spellchecker)
 		</span>
 
 		<span class="line">
-		<label for="post_locale"><strong><?php echo T_('Locale/Language?') ?>:</strong></label>
+		<label for="post_locale"><strong><?php echo T_('Lang/Locale') ?>:</strong></label>
 		<select name="post_locale" id="post_lang" tabindex="2"><?php locale_options( $post_locale ) ?></select>
 		</span>
 
 		<?php if( $use_post_url ) { ?>
 		<span class="line">
 		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-		<input type="text" name="post_url"  size="40" value="<?php echo format_to_output( $post_url, 'hrmlattr' ) ?>" id="post_url" tabindex="3" />
+		<input type="text" name="post_url"  size="40" value="<?php echo format_to_output( $post_url, 'htmlattr' ) ?>" id="post_url" tabindex="3" />
 		</span>
 		<?php } else { ?>
 		<input type="hidden" name="post_url"  size="40" value="" id="post_url" />

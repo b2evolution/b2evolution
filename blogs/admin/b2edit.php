@@ -131,7 +131,9 @@ switch($action)
 			echo $sep;
 			if( $curr_blog_ID == $blog ) echo '<strong>';
 			// This is for when Javascript is not available:
-			echo '[<a href="b2edit.php?blog=', $curr_blog_ID, '" ';
+			echo '[<a href="b2edit.php?blog=', $curr_blog_ID;
+			if( !empty( $mode ) ) echo '&amp;mode=', $mode;
+			echo '" ';
 			if( ! blog_has_cats( $curr_blog_ID ) )
 			{	// loop blog has no categories, you cannot post to it.
 				echo 'onClick="alert(\'', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '\'); return false;" title="', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '"';
