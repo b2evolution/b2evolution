@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2004-06-12 21:08+0100\n"
+"PO-Revision-Date: 2004-06-13 23:05+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1506,7 +1506,7 @@ msgstr "Standaard Taal"
 #: ..\..\..\admin\_edit_form.php:333
 #, fuzzy
 msgid "Select main category in target blog and optionally check additional categories"
-msgstr "Select main category in target blog and optionally check additional categories"
+msgstr "Selecteer de hoofd categorie in doel weblog en kies optioneel extra categoriën"
 
 #: ..\..\..\admin\import-mt.php:1104
 #: ..\..\..\admin\_edit_form.php:354
@@ -5193,7 +5193,7 @@ msgstr "Basis URL"
 
 #: ..\..\..\install\index.php:282
 msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
-msgstr ""
+msgstr "Dit is de plek waar b2evo en jouw weblogs standaard staan. CONTROLEER DIT GOED, anders zal veel niet werken. Als je b2evolution wilt testen op jouw lokale machine, en dat de cookies dan goed functioneren, moet je gebruik maken van http://<strong>localhost</strong>/path... Gebruik NIET de machine naam!"
 
 #: ..\..\..\install\index.php:284
 msgid "Your email"
@@ -5242,7 +5242,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:338
 msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
-msgstr ""
+msgstr "<strong>Verander jouw standaard configuratie</strong> (zie onderstaande notitie): Je wilt dit waarschijnlijk alleen doen in situaties wanneer je je b2evolution bestanden of dtabases hebt verplaatst naar een andere lokatie..."
 
 #: ..\..\..\install\index.php:340
 msgid "GO!"
@@ -5640,7 +5640,7 @@ msgstr "Het database schema is al bijgewerkt. Er hoeft niets gedaan te worden."
 #: ..\..\..\install\_functions_evoupgrade.php:232
 #, php-format
 msgid "It appears that the following blog stub names are used more than once: ['%s']"
-msgstr ""
+msgstr "De volgende weblog stub namen worden meerdere malen gebruikt: ['%s']"
 
 #: ..\..\..\install\_functions_evoupgrade.php:234
 #, php-format

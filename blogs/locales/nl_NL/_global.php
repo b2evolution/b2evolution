@@ -5,7 +5,7 @@
  */
 
 $trans['nl_NL'] = array(
-	'' => "Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: \nPO-Revision-Date: 2004-06-12 21:08+0100\nLast-Translator: Ron <ron@rononline.nl>\nLanguage-Team: \nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: \nPO-Revision-Date: 2004-06-13 23:05+0100\nLast-Translator: Ron <ron@rononline.nl>\nLanguage-Team: \nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Geselecteerd",
 	'Categories' => "Categoriën",
 	'Permanent link to full entry' => "Permanente link naar het volledige artikel",
@@ -285,7 +285,7 @@ $trans['nl_NL'] = array(
 	'See <a %s>online manual</a> for details.' => "Bekijk het <a %s>online handboek</a> voor de details.",
 	'Level' => "Level",
 	'Default locale' => "Standaard Taal",
-	'Select main category in target blog and optionally check additional categories' => "Select main category in target blog and optionally check additional categories",
+	'Select main category in target blog and optionally check additional categories' => "Selecteer de hoofd categorie in doel weblog en kies optioneel extra categoriën",
 	'Select as an additionnal category' => "Selecteer als extra categorie",
 	'Select as MAIN category' => "Selecteer als HOOFD categorie",
 	'Tools' => "Hulpmiddelen",
@@ -1057,6 +1057,7 @@ $trans['nl_NL'] = array(
 	'You probably won\'t have to change this' => "Je hoeft dit waarschijnlijk niet te veranderen",
 	'Additional settings' => "Extra instellingen",
 	'Base URL' => "Basis URL",
+	'This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' => "Dit is de plek waar b2evo en jouw weblogs standaard staan. CONTROLEER DIT GOED, anders zal veel niet werken. Als je b2evolution wilt testen op jouw lokale machine, en dat de cookies dan goed functioneren, moet je gebruik maken van http://<strong>localhost</strong>/path... Gebruik NIET de machine naam!",
 	'Your email' => "Jouw email",
 	'Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' => "Zal worden gebruikt in verschillende soorten foutmeldingen zodat gebruikers contact kunnen opnemen. Je zult ook notificaties van nieuwe gebruikers ontvangen.",
 	'Update config file' => "Bijwerken configuratiebestand",
@@ -1067,6 +1068,7 @@ $trans['nl_NL'] = array(
 	'<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.' => "<strong>Bijwerken vanaf Cafelog/b2 v 0.6.x</strong>: Installeer b2evolution database tablellen en kopieer jouw bestaande Cafelog/b2 data erin.",
 	'Delete b2evolution tables' => "Verwijder b2evolution tabellen",
 	'If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.' => "If you have installed b2evolution tables before and wish to start anew, you must delete the\n\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n\t\t\t\t\tsome, will not be touched in any way.",
+	'<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...' => "<strong>Verander jouw standaard configuratie</strong> (zie onderstaande notitie): Je wilt dit waarschijnlijk alleen doen in situaties wanneer je je b2evolution bestanden of dtabases hebt verplaatst naar een andere lokatie...",
 	'GO!' => "GA!",
 	'Need to start anew?' => "Opnieuw beginnen?",
 	'If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.' => "If you have installed b2evolution tables before and wish to start anew, you must delete the\n\t\t\t\t\tb2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution\n\t\t\t\t\ttables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have\n\t\t\t\t\tsome, will not be touched in any way.",
@@ -1122,6 +1124,7 @@ $trans['nl_NL'] = array(
 	'<p>This is the third post.</p>\n\n<p>It appears on blog B only and in a single category.</p>' => "<p>Dit is het derde artikel.</p>\n\n<p>Dit verschijnt alleen op weblog B en in 1 enkele categorie.</p>",
 	'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.' => "Hi, dit is een reactie.<br />Om een reactie te verijderen, log dan in, en bekijk de reacties van een artikel, daar heb je de optie om te bewerken en te verijderen.",
 	'The database schema is already up to date. There is nothing to do.' => "Het database schema is al bijgewerkt. Er hoeft niets gedaan te worden.",
+	'It appears that the following blog stub names are used more than once: [\'%s\']' => "De volgende weblog stub namen worden meerdere malen gebruikt: ['%s']",
 	'I can\'t upgrade until you make them unique. DB field: [%s]' => "Ik kan niet bijwerken totdat je deze uniek maakt. DB veld: [%s]",
 	'Checking DB schema version...' => "Controleer DB schema versie... ",
 	'NOT FOUND! This is not a b2evolution database.' => "NIET GEVONDEN! Dit is geen b2evolution database.",
