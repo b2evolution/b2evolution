@@ -10,7 +10,16 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
+ * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
+ * {@internal
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
+ * }
+ * 
  * @package conf
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -434,6 +443,27 @@ $install_dirout = '../';                 // Relative path to go back to base
 $media_subdir = 'media/';                // Subdirectory relative to base
 $media_dirout = '../';                   // Relative path to go back to base
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
+
+/**
+ * Memcached support. Very experimental!
+ * Must have memcached-client.php in php include path.
+ * download memcached from http://www.danga.com/memcached/
+ * Download phpca php client for memcached from
+ *  http://phpca.cytherianage.net/memcached/
+ */
+$use_memcached = 0;
+
+if ($use_memcached) {
+	include_once 'memcached-client.php';
+	$memcache = new memcached(
+		array( 'servers' => array('127.0.0.1:11211'),
+		'debug' => false, 
+		'compress_threshold' => 10240, 
+		'persistant' => true));
+	$memcache_expire = 3600; //  how long objects stay cached. Default one hour
+}
+
+
 
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

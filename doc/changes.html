@@ -11,6 +11,7 @@
 
 	<h2>0.9.2-CVS</h2>
 	<ul>
+		<li>Added experimental memcached support. Use at your own risk! Change $use_memcached in conf/advanced.php to activate. Requires phpca memcached client and memcached server. See <a href="http://www.danga.com/memcached/">Memcached Homepage</a> for more info.</li>
 		<li>New URL parameter 'dstart' allows to start browsing at specified date (same fprmat as 'm'). useful with unit = 'days'.</li>
 		<li>New URL parameter 'unit' allows overriding of configuration to select what to display: 'posts' or 'days' (fplanque)</li>
 		<li>Slightly enhanced week handling (weeks start on sunday or monday depending on user locale) (requires MySQL >= 4) (fplanque)</li>

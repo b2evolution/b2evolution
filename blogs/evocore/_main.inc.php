@@ -10,6 +10,8 @@
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
+ * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -41,6 +43,10 @@
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
  * @package evocore
@@ -219,13 +225,48 @@ require_once dirname(__FILE__).'/_usercache.class.php';
 require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
 // Object caches init:
-$BlogCache = & new BlogCache();
-$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
-$ItemCache = & new ItemCache();
-$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
-$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
-$LinkCache = & new LinkCache();
-$UserCache = & new UserCache();
+
+$BlogCache = array();
+
+if ( $use_memcached ) 
+{
+	$response = $memcache->set( 'dummy' , 0);
+	$response = $memcache->get( 'BlogCache' );
+	$GroupCache =  $memcache->get( 'GroupCache' );
+	$ItemCache =  $memcache->get( 'ItemCache' );
+	$itemTypeCache =  $memcache->get( 'itemTypeCache' );
+	$itemStatusCache =  $memcache->get( 'itemStatusCache' );
+	$LinkCache =  $memcache->get( 'LinkCache' );
+	$UserCache =  $memcache->get( 'UserCache' );
+//	echo "<pre>\n";
+//	print_r($response);
+//	echo "</pre>\n";
+	
+}
+
+// TODO FIXME test for null on each object.
+if ( $response == null )
+{
+	$BlogCache = & new BlogCache();
+	$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
+	$ItemCache = & new ItemCache();
+	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
+	$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
+	$LinkCache = & new LinkCache();
+	$UserCache = & new UserCache();
+} else 
+{
+	$BlogCache = & $response;	
+//		$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
+//	$ItemCache = & new ItemCache();
+//	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
+//	$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
+//	$LinkCache = & new LinkCache();
+//	$UserCache = & new UserCache();
+	$Debuglog->add( 'Found key BlogCache in memcache: ' .  $BlogCache , 'note' );
+}
+
+
 
 require_once dirname(__FILE__).'/_calendar.class.php';
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
@@ -451,6 +492,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.28  2005/04/05 13:44:22  jwedgeco
+ * Added experimental memcached support. Needs much more work. Use at your own risk.
+ *
  * Revision 1.27  2005/03/15 19:19:47  fplanque
  * minor, moved/centralized some includes
  *

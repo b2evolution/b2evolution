@@ -327,8 +327,23 @@ else
 	// If we end up here the blog file should be a full template, not just a stub...
 }
 
+//global $use_memcached, $memcache, $memcache_expire;
+if ( $use_memcached ) 
+{
+	$response = $memcache->set( 'BlogCache' , $BlogCache );
+	$response = $memcache->set( 'GroupCache' , $GroupCache );
+	$response = $memcache->set( 'ItemCache' , $ItemCache );
+	$response = $memcache->set( 'itemTypeCache' , $itemTypeCache );
+	$response = $memcache->set( 'itemStatusCache' , $itemStatusCache );
+	$response = $memcache->set( 'LinkCache' , $LinkCache );
+	$response = $memcache->set( 'UserCache' , $UserCache );	
+}
+
 /*
  * $Log$
+ * Revision 1.11  2005/04/05 13:44:22  jwedgeco
+ * Added experimental memcached support. Needs much more work. Use at your own risk.
+ *
  * Revision 1.10  2005/03/10 16:08:39  fplanque
  * added dstart param
  *
