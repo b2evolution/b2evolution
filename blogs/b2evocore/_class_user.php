@@ -417,7 +417,7 @@ class User extends DataObject
 	{
 		global $querycount, $tablecomments, $tableposts, $tableblogusers;
 
-		if( $this->ID == 0 ) die( T_('Non persistant object cannot be deleted!') );
+		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
 		// Delete comments
 	/*	$sql="DELETE FROM $tablecomments INNER JOIN $tableposts

@@ -21,145 +21,145 @@ var b2evoLinks = new Array();
 var b2evoOpenTags = new Array();
 
 function b2evoButton(id, display, tagStart, tagEnd, access, tit, open) {
-	this.id = id;				// used to name the toolbar button
+	this.id = id;							// used to name the toolbar button
 	this.display = display;		// label on button
-	this.tagStart = tagStart; 	// open tag
-	this.tagEnd = tagEnd;		// close tag
-	this.access = access;		// access key
-	this.tit = tit;				// title
-	this.open = open;			// set to -1 if tag does not need to be closed
+	this.tagStart = tagStart; // open tag
+	this.tagEnd = tagEnd;			// close tag
+	this.access = access;			// access key
+	this.tit = tit;						// title
+	this.open = open;					// set to -1 if tag does not need to be closed
 }
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ins'
-                                          ,'ins'
-                                          ,'<ins>'
-                                          ,'</ins>'
-                                          ,'i'
-										  ,'<?php echo T_('INSerted [Alt-I]') ?>'
-                                          );
+																					,'ins'
+																					,'<ins>'
+																					,'</ins>'
+																					,'i'
+																					,'<?php echo T_('INSerted [Alt-I]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_del'
-                                          ,'del'
-                                          ,'<del>'
-                                          ,'</del>'
-                                          ,'d'
-										  ,'<?php echo T_('DELeted [Alt-D]') ?>'
-                                          );
+																					,'del'
+																					,'<del>'
+																					,'</del>'
+																					,'d'
+																					,'<?php echo T_('DELeted [Alt-D]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_strong'
-                                          ,'str'
-                                          ,'<strong>'
-                                          ,'</strong>'
-                                          ,'s'
-										  ,'<?php echo T_('STRong [Alt-S]') ?>'
-                                          );
+																					,'str'
+																					,'<strong>'
+																					,'</strong>'
+																					,'s'
+																					,'<?php echo T_('STRong [Alt-S]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_em'
-                                          ,'em'
-                                          ,'<em>'
-                                          ,'</em>'
-                                          ,'e'
-                                          ,'<?php echo T_('EMphasis [Alt-E]') ?>'
-                                          );
+																					,'em'
+																					,'<em>'
+																					,'</em>'
+																					,'e'
+																					,'<?php echo T_('EMphasis [Alt-E]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_code'
-                                          ,'code'
-                                          ,'<code>'
-                                          ,'</code>'
-                                          ,'c'
-										  ,'<?php echo T_('CODE [Alt-C]') ?>'
-                                          );
+																					,'code'
+																					,'<code>'
+																					,'</code>'
+																					,'c'
+																					,'<?php echo T_('CODE [Alt-C]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_par'
-                                          ,'&lt;p&gt;'
-                                          ,'<p>'
-                                          ,'</p>'
-                                          ,'p'
-										  ,'<?php echo T_('Paragraph [Alt-P]') ?>'
-                                          );
+																					,'&lt;p&gt;'
+																					,'<p>'
+																					,'</p>'
+																					,'p'
+																					,'<?php echo T_('Paragraph [Alt-P]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ul'
-                                          ,'&lt;ul&gt;'
-                                          ,'<ul>\n'
-                                          ,'</ul>\n\n'
-                                          ,'u'
-										  ,'<?php echo T_('Unordered List [Alt-U]') ?>'
-                                          );
+																					,'&lt;ul&gt;'
+																					,'<ul>\n'
+																					,'</ul>\n\n'
+																					,'u'
+																					,'<?php echo T_('Unordered List [Alt-U]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ol'
-                                          ,'ol'
-                                          ,'<ol>\n'
-                                          ,'</ol>\n\n'
-                                          ,'o'
-                                          );
+																					,'ol'
+																					,'<ol>\n'
+																					,'</ol>\n\n'
+																					,'o'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_li'
-                                          ,'&lt;li&gt;'
-                                          ,'  <li>'
-                                          ,'</li>\n'
-                                          ,'l'
-										  ,'<?php echo T_('List Item [Alt-L]') ?>'
-                                          );
+																					,'&lt;li&gt;'
+																					,'	<li>'
+																					,'</li>\n'
+																					,'l'
+																					,'<?php echo T_('List Item [Alt-L]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_block'
-                                          ,'block'
-                                          ,'<blockquote>'
-                                          ,'</blockquote>'
-                                          ,'b'
-										  ,'<?php echo T_('BLOCKQUOTE [Alt-B]') ?>'
-                                          );
+																					,'block'
+																					,'<blockquote>'
+																					,'</blockquote>'
+																					,'b'
+																					,'<?php echo T_('BLOCKQUOTE [Alt-B]') ?>'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_img'
-                                          ,'img'
-                                          ,''
-                                          ,''
-                                          ,'g'
-										  ,'<?php echo T_('IMaGe [Alt-G]') ?>'
-                                          ,-1
-                                          ); // special case
+																					,'img'
+																					,''
+																					,''
+																					,'g'
+																					,'<?php echo T_('IMaGe [Alt-G]') ?>'
+																					,-1
+																					); // special case
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_link'
-                                          ,'link'
-                                          ,''
-                                          ,'</a>'
-                                          ,'a'
-										  ,'<?php echo T_('A href [Alt-A]') ?>'
-                                          ); // special case
+																					,'link'
+																					,''
+																					,'</a>'
+																					,'a'
+																					,'<?php echo T_('A href [Alt-A]') ?>'
+																					); // special case
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_pre'
-                                          ,'pre'
-                                          ,'<pre>'
-                                          ,'</pre>'
-										  ,'r'
-										  ,'[Alt-R]'
-                                          );
+																					,'pre'
+																					,'<pre>'
+																					,'</pre>'
+																					,'r'
+																					,'[Alt-R]'
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_more'
-                                          ,'!M'
-                                          ,'<!--more-->'
-                                          ,''
-                                          ,'m'
-										  ,'<?php echo T_('More [Alt-M]') ?>'
-                                          ,-1
-                                          );
+																					,'!M'
+																					,'<!--more-->'
+																					,''
+																					,'m'
+																					,'<?php echo T_('More [Alt-M]') ?>'
+																					,-1
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
-                                          ,'!NT'
-                                          ,'<!--noteaser-->'
-                                          ,''
-                                          ,'t'
-										  ,'<?php echo T_('no teaser [Alt-T]') ?>'
-                                          ,-1
-                                          );
+																					,'!NT'
+																					,'<!--noteaser-->'
+																					,''
+																					,'t'
+																					,'<?php echo T_('no teaser [Alt-T]') ?>'
+																					,-1
+																					);
 
 b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
-                                          ,'!NP'
-                                          ,'<!--nextpage-->'
-                                          ,''
-                                          ,'q'
-										  ,'<?php echo T_('next page [Alt-Q]') ?>'
-                                          ,-1
-                                          );
+																					,'!NP'
+																					,'<!--nextpage-->'
+																					,''
+																					,'q'
+																					,'<?php echo T_('next page [Alt-Q]') ?>'
+																					,-1
+																					);
 
 function b2evoLink() {
 	this.display = '';
@@ -167,17 +167,17 @@ function b2evoLink() {
 	this.newWin = 0;
 }
 
-function b2evoShowButton(button, i) 
+function b2evoShowButton(button, i)
 {
-	if (button.id == 'b2evo_img') 
+	if (button.id == 'b2evo_img')
 	{
 		document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertImage(b2evoCanvas);" value="' + button.display + '" />');
 	}
-	else if (button.id == 'b2evo_link') 
+	else if (button.id == 'b2evo_link')
 	{
 		document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertLink(b2evoCanvas, ' + i + ');" value="' + button.display + '" />');
 	}
-	else 
+	else
 	{
 		document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertTag(b2evoCanvas, ' + i + ');" value="' + button.display + '"  />');
 	}
@@ -235,7 +235,7 @@ function b2evoInsertTag(myField, i) {
 	//IE support
 	if (document.selection) {
 		myField.focus();
-	    sel = document.selection.createRange();
+			sel = document.selection.createRange();
 		if (sel.text.length > 0) {
 			sel.text = b2evoButtons[i].tagStart + sel.text + b2evoButtons[i].tagEnd;
 		}
@@ -258,24 +258,24 @@ function b2evoInsertTag(myField, i) {
 		var cursorPos = endPos;
 		if (startPos != endPos) {
 			myField.value = myField.value.substring(0, startPos)
-			              + b2evoButtons[i].tagStart
-			              + myField.value.substring(startPos, endPos)
-			              + b2evoButtons[i].tagEnd
-			              + myField.value.substring(endPos, myField.value.length);
+										+ b2evoButtons[i].tagStart
+										+ myField.value.substring(startPos, endPos)
+										+ b2evoButtons[i].tagEnd
+										+ myField.value.substring(endPos, myField.value.length);
 			cursorPos += b2evoButtons[i].tagStart.length + edButtons[i].tagEnd.length;
 		}
 		else {
 			if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '') {
 				myField.value = myField.value.substring(0, startPos)
-				              + b2evoButtons[i].tagStart
-				              + myField.value.substring(endPos, myField.value.length);
+											+ b2evoButtons[i].tagStart
+											+ myField.value.substring(endPos, myField.value.length);
 				b2evoAddTag(i);
 				cursorPos = startPos + b2evoButtons[i].tagStart.length;
 			}
 			else {
 				myField.value = myField.value.substring(0, startPos)
-				              + b2evoButtons[i].tagEnd
-				              + myField.value.substring(endPos, myField.value.length);
+											+ b2evoButtons[i].tagEnd
+											+ myField.value.substring(endPos, myField.value.length);
 				b2evoRemoveTag(i);
 				cursorPos = startPos + b2evoButtons[i].tagEnd.length;
 			}
@@ -310,8 +310,8 @@ function b2evoInsertContent(myField, myValue) {
 		var startPos = myField.selectionStart;
 		var endPos = myField.selectionEnd;
 		myField.value = myField.value.substring(0, startPos)
-		              + myValue
-                      + myField.value.substring(endPos, myField.value.length);
+									+ myValue
+									+ myField.value.substring(endPos, myField.value.length);
 		myField.focus();
 		myField.selectionStart = startPos + myValue.length;
 		myField.selectionEnd = startPos + myValue.length;
@@ -361,21 +361,22 @@ function b2evo_grins() {
 	global $smilies_directory, $b2smilies;
 	$grins = '';
 	$smiled = array();
-	foreach ($b2smilies as $smiley => $grin) 
+	foreach ($b2smilies as $smiley => $grin)
 	{
-		if (!in_array($grin, $smiled)) 
+		if (!in_array($grin, $smiled))
 		{
 			$smiled[] = $grin;
 			$smiley = str_replace(' ', '', $smiley);
-			$grins .= '<img src="'.$smilies_directory.'/'.$grin.'" alt="'.$smiley.'" onclick="grin(\''.str_replace("'","\'",$smiley).'\');"/> ';
+			$grins .= '<img src="'. $smilies_directory. '/'. $grin. '" alt="'. $smiley.
+								'" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
 		}
 	}
 
-	print('<div>'.$grins.'</div>');
+	print('<div>'. $grins. '</div>');
 	ob_start();
 ?>
 <script type="text/javascript">
-function grin(tag) 
+function grin(tag)
 {
 	var myField;
 	if (document.getElementById('content') && document.getElementById('content').type == 'textarea') {
