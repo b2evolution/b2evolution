@@ -24,7 +24,7 @@
 	// Include the bloglist
 	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
-	<a href="admin/b2login.php"><?php echo T_('My Back-Office') ?></a>
+	<a href="admin/b2edit.php"><?php echo T_('My Back-Office') ?></a>
 </div>
 </div>
 <p><?php echo T_('This page is a placeholder providing links to your blogs and additionnal demos of what you can do with b2evolution.') ?></p>

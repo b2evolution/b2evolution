@@ -20,7 +20,9 @@ if( ! is_loggued_in() )
 	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 	header("Cache-Control: no-cache, must-revalidate");
 	header("Pragma: no-cache");
-	require(dirname(__FILE__).'/b2login.php');
+
+	$error = T_('You must log in!');
+	require(dirname(__FILE__)."/$pathadmin_out/$pathhtsrv/login.php");
 	exit();
 }
 

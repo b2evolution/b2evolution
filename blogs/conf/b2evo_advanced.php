@@ -251,7 +251,9 @@ $pathcore = 'b2evocore';
 $b2inc = $pathadmin_out.'/'.$pathcore;
 # Relative path to go back to base:
 $pathcore_out = '..';
+# The HTml SeRVices folder:
 $pathhtsrv = "htsrv";
+$htsrvurl = $baseurl.'/'.$pathhtsrv;
 $pathhtsrv_out = "..";
 # END OF SUBDIRECTORY CONFIGURATION
 

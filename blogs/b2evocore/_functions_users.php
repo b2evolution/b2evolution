@@ -73,7 +73,6 @@ function veriflog()
 
 	if( !isset($_COOKIE[$cookie_user]) || !isset($_COOKIE[$cookie_pass]) )
 	{
-		$error = T_('You must log in!');
 		return false;
 	}
 
@@ -83,7 +82,6 @@ function veriflog()
 
 	if($user_login == '' || $user_pass_md5 == '')
 	{
-		$error = T_('You must log in!');
 		return false;
 	}
 	
@@ -263,7 +261,7 @@ function profile($user_login)
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $pathserver, $blog;
+	global $htsrvurl, $blog;
 
 	if( is_loggued_in() ) return false;
 
@@ -277,7 +275,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	}
 	
 	echo $before;
-	echo '<a href="', $pathserver, '/b2login.php', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrvurl, '/login.php', $redir, '" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -290,7 +288,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $pathserver, $users_can_register, $blog;
+	global $htsrvurl, $users_can_register, $blog;
 
 	if( is_loggued_in() || !$users_can_register) 
 	{	// There's no need to provide this link if already loggued in or if we won't let him register
@@ -307,7 +305,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	}
 
 	echo $before;
-	echo '<a href="', $pathserver, '/b2register.php', $redir, '" title="', $link_title, '">';
+	echo '<a href="',  $htsrvurl, '/register.php', $redir, '" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -321,7 +319,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  */
 function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $pathserver, $user_login, $blog;
+	global $htsrvurl, $user_login, $blog;
 
 	if( ! is_loggued_in() ) return false;
 
@@ -335,7 +333,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	}
 
 	echo $before;
-	echo '<a href="', $pathserver, '/b2login.php?action=logout', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrvurl, '/login.php?action=logout', $redir, '" title="', $link_title, '">';
 	printf( $link_text, $user_login );
 	echo '</a>';
 	echo $after;

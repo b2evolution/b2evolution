@@ -14,7 +14,7 @@
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
 <h1 id="version">Version: 0.8.3.3</h1>
-<div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2login.php">My Back-Office</a></div>
+<div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
 <h2>Database tables installation</h2>
@@ -397,7 +397,7 @@ switch( $action )
 		
 		<p>Installation successful !</p>
 		<br />
-		Now you can <a href="../admin/b2login.php">log in</a> with the login "admin" and password "<?php echo $random_password; ?>".<br />
+		Now you can <a href="../admin/b2edit.php">log in</a> with the login "admin" and password "<?php echo $random_password; ?>".<br />
 		<br />
 		<br />
 		Note that password carefully ! It is a <em>random</em> password that is given to you when you install b2. If you lose it, you will have to delete the tables from the database yourself, and re-install b2.
@@ -436,7 +436,7 @@ switch( $action )
 		if( $old_db_version == $new_db_version )
 		{
 			echo '<p>The database schema is already up to date. There is nothing to do.</p>';
-			echo '<p>You can <a href="../admin/b2login.php">log in</a> with your usual b2 username and password.</p>';
+			echo '<p>You can <a href="../admin/b2edit.php">log in</a> with your usual b2 username and password.</p>';
 			break;
 		}
 
@@ -516,7 +516,7 @@ switch( $action )
 		?>
 		<p>Upgrade completed successfully! (<?php echo $time_total; ?> seconds)</p>
 
-		<p>Now you can <a href="../admin/b2login.php">log in</a> with your usual b2evolution username and password.</p>
+		<p>Now you can <a href="../admin/b2edit.php">log in</a> with your usual b2evolution username and password.</p>
 		
  <?php
 	break;
@@ -670,7 +670,7 @@ switch( $action )
 ?>
 		<p>Upgrade completed successfully! (<?php echo $time_total; ?> seconds)</p>
 		
-		<p>Now you can <a href="../admin/b2login.php">log in</a> with your usual b2 username and password.</p>
+		<p>Now you can <a href="../admin/b2edit.php">log in</a> with your usual b2 username and password.</p>
 
 		
 <?php		

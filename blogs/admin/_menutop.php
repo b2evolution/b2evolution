@@ -134,9 +134,9 @@ if ($profile==0)
 </td>
 
 <td class="menutop" align="right" bgcolor="#FF9900">
-<a href="<?php echo $pathadmin_out ?>" class="menutop"><?php echo T_('Exit to blogs') ?></a>
+<a href="<?php echo $baseurl ?>" class="menutop"><?php echo T_('Exit to blogs') ?></a>
 |
-<a href="b2login.php?action=logout" class="menutop"><?php echo T_('Logout') ?></a>
+<a href="<?php echo $htsrvurl ?>/login.php?action=logout" class="menutop"><?php echo T_('Logout') ?></a>
 &nbsp;
 </td>
 
