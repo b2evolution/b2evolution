@@ -165,22 +165,22 @@ a.BlogButtonCurr {
 	background: #6699CC;
 }
 
-A.BlogButton:link,
-A.BlogButton:visited,	
-A.BlogButton:active,
-A.BlogButtonCurr:link,
-A.BlogButtonCurr:visited,	
-A.BlogButtonCurr:active,
+a.BlogButton:link,
+a.BlogButton:visited,	
+a.BlogButton:active,
+a.BlogButtonCurr:link,
+a.BlogButtonCurr:visited,	
+a.BlogButtonCurr:active
 {
 	color: #FFFFFF;
 }
-A.BlogButton:hover		{
+a.BlogButton:hover		{
 	color: #FFFFFF;
 	background: #6699CC;
 
 	/* text-decoration: underline; */
 }
-A.BlogButtonCurr:hover		{
+a.BlogButtonCurr:hover		{
 	color: #336699;
 	/* text-decoration: underline; */
 }
