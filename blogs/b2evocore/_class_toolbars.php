@@ -8,14 +8,13 @@
  *
  * @package evocore
  */
+require_once dirname(__FILE__). '/_class_plug.php';
 
 /**
  * Toolbars Class
  */
-class Toolbars
+class Toolbars extends Plug
 {
-	var $Plugins = array();
-	
 	/* 
 	 * Constructor
 	 *
@@ -24,11 +23,8 @@ class Toolbars
 	 */
 	function Toolbars()
 	{
-		global $core_dirout, $plugins_subdir;
-		$plugins_path = dirname(__FILE__).'/'.$core_dirout.'/'.$plugins_subdir.'/toolbars';
-		 
-		require_once $plugins_path.'/_quicktags.php';
-		require_once $plugins_path.'/_smilies.php';
+		// Call parent constructor:
+		parent::Plug( 'toolbar' );
 	}	
 	
 	/* 
@@ -38,8 +34,10 @@ class Toolbars
 	 */
 	function display()
 	{
-		$this->Plugins['b2evQTag']->display();
-		$this->Plugins['b2evSmil']->display();
+		$this->init();	// Init if not done yet.
+
+		$this->index_Plugins['b2evQTag']->display();
+		$this->index_Plugins['b2evSmil']->display();
 	}	
 	
 }

@@ -8,14 +8,13 @@
  *
  * @package evocore
  */
+require_once dirname(__FILE__).'/_class_plug.php';
 
 /**
  * Renderer Class
  */
-class Renderer
+class Renderer extends Plug
 {
-	var $Plugins = array();
-	
 	/* 
 	 * Constructor
 	 *
@@ -24,16 +23,8 @@ class Renderer
 	 */
 	function Renderer()
 	{
-		global $core_dirout, $plugins_subdir;
-		$plugins_path = dirname(__FILE__).'/'.$core_dirout.'/'.$plugins_subdir.'/renderers';
-		 
-		require_once $plugins_path.'/_textile.php';
-		require_once $plugins_path.'/_auto_p.php';
-		require_once $plugins_path.'/_gmcode.php';
-		require_once $plugins_path.'/_bbcode.php';
-		require_once $plugins_path.'/_autolinks.php';
-		require_once $plugins_path.'/_smilies.php';
-		require_once $plugins_path.'/_texturize.php';
+		// Call parent constructor:
+		parent::Plug( 'renderer' );
 	}	
 	
 	/* 
@@ -47,24 +38,24 @@ class Renderer
 	 */
 	function render( $content, $mode = 'content' )
 	{
-		global $use_textile;
+		$this->init();	// Init if not done yet.
 		
 		switch( $mode )
 		{
 			case 'content':
-				$this->Plugins['b2DATxtl']->render( $content );
-				$this->Plugins['b2WPAutP']->render( $content );
-				$this->Plugins['b2evGMco']->render( $content );
-				$this->Plugins['b2evBBco']->render( $content );
-				$this->Plugins['b2evALnk']->render( $content );
-				$this->Plugins['b2evSmil']->render( $content );
-				$this->Plugins['b2WPTxrz']->render( $content );
+				$this->index_Plugins['b2DATxtl']->render( $content );
+				$this->index_Plugins['b2WPAutP']->render( $content );
+				$this->index_Plugins['b2evGMco']->render( $content );
+				$this->index_Plugins['b2evBBco']->render( $content );
+				$this->index_Plugins['b2evALnk']->render( $content );
+				$this->index_Plugins['b2evSmil']->render( $content );
+				$this->index_Plugins['b2WPTxrz']->render( $content );
 				break;
 				
 			case 'other':
-				$this->Plugins['b2evGMco']->render( $content );
-				$this->Plugins['b2evSmil']->render( $content );
-				$this->Plugins['b2WPTxrz']->render( $content );
+				$this->index_Plugins['b2evGMco']->render( $content );
+				$this->index_Plugins['b2evSmil']->render( $content );
+				$this->index_Plugins['b2WPTxrz']->render( $content );
 				break;
 
 			default:
