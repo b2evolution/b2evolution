@@ -9,11 +9,8 @@
  */
 require_once (dirname(__FILE__).'/_header.php');
 
-if ($user_level == 0) //Checks to see if user has logged in
-die (T_("Cheatin' uh ?"));
-
-if (!$use_fileupload) //Checks if file upload is enabled in the config
-die (T_("The admin disabled this function"));
+// Check permissions:
+$current_User->check_perm( 'upload', 'any', true );
 
 ?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -93,10 +90,6 @@ function targetopener(blah, closeme, closeonly) {
 </head>
 <body>
 
-<table align="center" width="100%" height="100%" cellpadding="15" cellspacing="0" border="1" style="border-width: 1px; border-color: #cccccc;">
-	<tbody>
-	<tr>
-	<td valign="top" style="background-color: transparent; ">
 <?php
 
 if (!isset($_POST['submit']))
@@ -116,10 +109,6 @@ if (!isset($_POST['submit']))
 	
 	<input type="submit" name="submit" value="<?php echo T_('Upload !') ?>" class="search" />
 	</form>
-	</td>
-	</tr>
-	</tbody>
-</table>
 </body>
 </html>
 <?php exit();
@@ -190,10 +179,6 @@ if (!empty($HTTP_POST_VARS)) { //$img1_name != "") {
 	<br />
 	<input type="submit" name="submit" value="<?php echo T_('Confirm !') ?>" class="search" />
 	</form>
-	</td>
-	</tr>
-	</tbody>
-</table>
 </body>
 </html><?php die();
 
@@ -224,7 +209,7 @@ if ( ereg('image/',$img1_type)) {
 <p><form>
 <!--<textarea cols="25" rows="3" wrap="virtual"><?php echo "&lt;img src=&quot;$fileupload_url/$img1_name&quot; border=&quot;0&quot; alt=&quot;&quot; /&gt;"; ?></textarea>-->
 <input type="text" name="imgpath" value="<?php echo $piece_of_code; ?>" size="38" style="padding: 5px; margin: 2px;" /><br />
-<input type="button" name="close" value="Add the code to your post !" class="search" onClick="targetopener('<?php echo $piece_of_code; ?>')" style="margin: 2px;" />
+<input type="button" name="close" value="<?php echo T_('Add the code to your post !') ?>" class="search" onClick="targetopener('<?php echo $piece_of_code; ?>')" style="margin: 2px;" />
 </form>
 </p>
 <p><strong><?php echo T_('Image Details') ?></strong>: <br />
@@ -242,10 +227,6 @@ if ( ereg('image/',$img1_type)) {
 <input type="button" name="close" value="<?php echo T_('Close this window') ?>" class="search" onClick="window.close()" />
 </form>
 </p>
-</td>
-</tr>
-</tbody>
-</table>
 
 </body>
 

@@ -7,9 +7,6 @@
  */
 require_once( dirname(__FILE__).'/_header.php' );
 
-param( 'blog', 'integer', 0, true );
-get_blogparams();
-
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
 
@@ -38,6 +35,7 @@ case 'post':
 	 */
 	param( 'post_category', 'integer', true );
 	$blog = get_catblog($post_category); 
+	get_blogparams();
 
 	$title = T_('Adding new post...');
 	require(dirname(__FILE__).'/_menutop.php');
@@ -58,7 +56,7 @@ case 'post':
 	param( 'post_extracats', 'array', array() );
 	param( 'post_lang', 'string', $default_language );
 
-	if(($user_level > 4) && $edit_date) 
+	if( $edit_date && $current_User->check_perm( 'edit_timestamp' )) 
 	{	// We use user date
 		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
 	}
@@ -66,8 +64,6 @@ case 'post':
 	{	// We use current time
 		$post_date = date('Y-m-d H:i:s', $localtimenow);
 	}
-
-	if ($user_level == 0)	die (T_('Cheatin\' uh ?'));
 
 	// CHECK and FORMAT content
 	$post_title = format_to_post($post_title,0,0);
@@ -143,13 +139,14 @@ case 'editpost':
 	 * --------------------------------------------------------------------
 	 * UPDATE POST 
 	 */
+	param( "post_category", 'integer', true );
+	$blog = get_catblog($post_category); 
+	get_blogparams();
+
 	$title = T_('Updating post...');
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 	
-	param( "post_category", 'integer', true );
-	$blog = get_catblog($post_category); 
-
 	param( 'post_status', 'string', 'published' );
 	// Check permission:
 	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
@@ -172,7 +169,7 @@ case 'editpost':
 	param( 'post_lang', 'string', $default_language );
 
 	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
-	if(($user_level > 4) && $edit_date) 
+	if( $edit_date && $current_User->check_perm( 'edit_timestamp' )) 
 	{	// We use user date
 		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
 	}
@@ -265,19 +262,22 @@ case 'editpost':
 case 'publish':
 	/*
 	 * --------------------------------------------------------------------
-	 * PUBLISH POST
+	 * PUBLISH POST NOW
 	 */
+	param( 'post_ID', 'integer', true );
+	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
+	$post_cat =$postdata['Category'];
+	$blog = get_catblog($post_cat); 
+	get_blogparams();
+
 	$title = T_('Updating post status...');
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
-	
-	param( 'post_ID', 'integer', true );
-	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
-	$blog = get_catblog($postdata['Category']); 
 
 	$post_status = 'published';
-	// Check permission:
+	// Check permissions:
 	$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+	$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
 	if ($user_level == 0)	// TODO: this is not enough!
 	die ("Cheatin' uh ?");
@@ -353,14 +353,15 @@ case "delete":
 	 * --------------------------------------------------------------------
 	 * DELETE a post from db
 	 */
-	$title = T_('Deleting post...');
-	require(dirname(__FILE__).'/_menutop.php');
-	require(dirname(__FILE__).'/_menutop_end.php');
-
 	param( 'post', 'integer' );
 	// echo $post;
 	$postdata = get_postdata($post) or die(T_('Oops, no post with this ID!'));
 	$blog = get_catblog($postdata['Category']); 
+	get_blogparams();
+
+	$title = T_('Deleting post...');
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	// Check permission:
 	$current_User->check_perm( 'blog_del_post', '', true, $blog );

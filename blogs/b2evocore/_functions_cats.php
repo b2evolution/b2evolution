@@ -30,7 +30,8 @@ function cat_create(
 		$cat_blog_ID = $parent_cat['cat_blog_ID']; 
 	}
 
-	$query="INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID) VALUES ( $cat_parent_ID, '$cat_name', $cat_blog_ID )";
+	$query="INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID) 
+					VALUES ( $cat_parent_ID, '$cat_name', $cat_blog_ID )";
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;

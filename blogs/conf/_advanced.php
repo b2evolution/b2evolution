@@ -27,7 +27,7 @@ $basehost = $matches[1];
 # WARNING: don't play with this or you'll have tons of cookies sent away and your
 # readers surely will complain about it!
 # You can change notification email address alone a few lines below
-$b2evo_name = 'b2evo';
+$b2evo_name = 'b2evo';		// MUST BE A SINGLE WORD! NO SPACES!!
 
 
 # default email address for sending notifications (comments, trackbacks, user registrations...)

@@ -183,6 +183,8 @@ class User extends DataObject
 	 * {@internal User::check_perm(-) }
 	 *
 	 * @param string Permission name, can be one of:
+	 *								- 'upload'
+	 *								- 'edit_timestamp'
 	 *								- either group permission names, see {@link Group::check_perm()}
 	 *								- either blogusers permission names, see {@link User::check_perm_blogusers()}
 	 * @param string Permission level
@@ -190,17 +192,28 @@ class User extends DataObject
 	 * @param integer Permission target blog ID
 	 * @return boolean 0 if permission denied
 	 */
-	function check_perm( $permname, $permlevel, $assert = false, $perm_target = NULL )
+	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
+		global $use_fileupload, $fileupload_minlevel, $fileupload_allowedusers;
+
 		$perm = false;
 	
 		switch( $permname )
 		{
+			case 'upload':
+				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel) && ((ereg(" ".$this->login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==""));
+				break;
+		
+			case 'edit_timestamp':
+				$perm = ($this->level >= 5);
+				break;
+		
 			case 'blog_properties':
 				// Forward request to group:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{	// If group says yes
-					return true;
+					$perm = true;
+					break;
 				}
 				// Check user perm for this blog
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
@@ -247,6 +260,7 @@ class User extends DataObject
 	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
 	{
 		global $tableblogusers, $querycount;
+		// echo "checkin for $permname >= $permlevel on blog $perm_arget_blot<br />";
 		
 		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
 		{	// Allowed blog post statuses have not been loaded yet:
@@ -316,6 +330,7 @@ class User extends DataObject
 					 || $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
 					 || $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) 
 					 || $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID ) 
+					 || $this->check_perm_blogusers( 'blog_properties', 1, $blog_ID ) 
 					 );
 	}
 	

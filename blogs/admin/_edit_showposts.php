@@ -151,7 +151,7 @@
 			<?php
 			if(($user_level > $authordata['user_level']) or ($user_ID == $authordata['ID'])) 
 			{
-				if( $current_User->check_perm( 'blog_post_statuses', $postdata['status'], false, $blog ) )
+				if( $current_User->check_perm( 'blog_post_statuses', $postdata['Status'], false, $blog ) )
 				{
 				?>
 				<form action="b2edit.php" method="get" class="inline">
@@ -169,7 +169,9 @@
 				</form>
 				<?php
 				}
-				if( ($postdata['Status'] != 'published') && $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
+				if( ($postdata['Status'] != 'published') 
+						&& $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) 
+						&& $current_User->check_perm( 'edit_timestamp' ) )
 				{
 				?>
 				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />

@@ -153,33 +153,40 @@ if ($use_spellchecker)
 	
 	<?php	
 	if($use_preview && ($action != 'editcomment') )  
-	{ ?>
-	<input type="button" value="<?php echo T_('Preview') ?>" onClick="open_preview(this.form);" class="search" tabindex="9" />
+	{ // ------------------------------- PREVIEW ---------------------------------- ?>
+		<input type="button" value="<?php echo T_('Preview') ?>" onClick="open_preview(this.form);" 
+		class="search" tabindex="9" />
 	<?php 
 	}
 	
-	?>
-	<input type="submit" value="<?php echo ($action == 'post') ? T_('Blog this !') : T_('Edit this !'); ?>" class="search" style="font-weight: bold;" tabindex="10" /> 
+	// ------------------------------- BLOG THIS ! ---------------------------------- ?>
+	<input type="submit" value="<?php echo ($action == 'post') ? T_('Blog this !') : 
+		T_('Edit this !'); ?>" class="search" style="font-weight: bold;" tabindex="10" /> 
 	
 	
 	<?php if ($use_spellchecker) 
 	{ // ------------------------------- SPELL CHECKER ---------------------------------- ?>
-		<input type="button" value="<?php echo T_('Spellcheck') ?>" onClick="DoSpell
-	('post','content','');" class="search" tabindex="11" />
+		<input type="button" value="<?php echo T_('Spellcheck') ?>" 
+		onClick="DoSpell('post','content','');" class="search" tabindex="11" />
 	<?php } 
 	
-	if ( ($use_fileupload) && ($user_level >= $fileupload_minlevel) && ((ereg(" ".$user_login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)=="")) ) { ?>
-	<input type="button" value="<?php echo T_('Upload a file/image') ?>" onClick="launchupload();" class="search" tabindex="12"  />
+	if( $current_User->check_perm( 'upload' ) ) 
+	{ // ------------------------------- UPLOAD ---------------------------------- ?>
+		<input type="button" value="<?php echo T_('Upload a file/image') ?>" 
+		onClick="launchupload();" class="search" tabindex="12"  />
 	<?php } ?>
 	
 	<fieldset>
 		<legend><?php echo T_('Advanced properties') ?></legend>
 
 		<?php
-		if ($user_level > 4) 
+		if( $current_User->check_perm( 'edit_timestamp' ) ) 
 		{	// ------------------------------------ TIME STAMP -------------------------------------
 			?>
-			<div><input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> /><label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
+			<div>
+			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" 
+				tabindex="13" <?php if( $edit_date ) echo 'checked="checked"' ?> />
+			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
 			<span class="nobr">
 			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
 			<select name="mm" tabindex="15">
