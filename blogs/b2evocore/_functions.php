@@ -1087,7 +1087,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 function pre_dump($dump, $title = '')
 {
 	echo "\n".'<pre>';
-	if( $title != '' )
+	if( $title !== '' )
 	{
 		echo $title. ': <br />';
 	}
@@ -1330,12 +1330,18 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array(), $se
 	
 	debug_log( "Sending mail from $from to $to - subject $subject." );
 	
-	if( $setreturnpath )
+	if( $setreturnpath !== false )
 	{ // we want to set the Return-Path
-		if( empty($returnpath) )
+		if( $setreturnpath === true )
 		{ // use from-address for Return-Path
 			$returnpath = $from;
 		}
+		else
+		{
+			$returnpath = $setreturnpath;
+		}
+		// use email address only (encapsulated in <>)
+		$returnpath = preg_replace( array('/.*</', '/>.*/'), '', $returnpath);
 		
 		// set Return-Path for Win32
 		@ini_set('sendmail_from', $returnpath);

@@ -91,7 +91,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 	<?php
 }
 
-if( ($action != 'start') && ($action != 'default') || ($action != 'conf') )
+if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 {	// Connect to DB:
 	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, false );
 	if( $DB->error )
@@ -99,14 +99,17 @@ if( ($action != 'start') && ($action != 'default') || ($action != 'conf') )
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
 		$action = 'start';
 	}
-	$DB->halt_on_error = true;	// From now on, halt on errors.
-
-	// Check MySQL version
-	$mysql_version = $DB->get_var( 'SELECT VERSION()' );
-	list( $mysl_version_main, $mysl_version_minor ) = explode( '.', $mysql_version );
-	if( ($mysl_version_main * 100 + $mysl_version_main) < 323 )
+	else
 	{
-		die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '3.23', $mysql_version ).'</strong></p></div>');
+		$DB->halt_on_error = true;	// From now on, halt on errors.
+
+		// Check MySQL version
+		$mysql_version = $DB->get_var( 'SELECT VERSION()' );
+		list( $mysl_version_main, $mysl_version_minor ) = explode( '.', $mysql_version );
+		if( ($mysl_version_main * 100 + $mysl_version_minor) < 323 )
+		{
+			die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '3.23', $mysql_version ).'</strong></p></div>');
+		}
 	}
 }
 
@@ -155,21 +158,21 @@ switch( $action )
 			// Update conf:
 			$conf = preg_replace(
 														array(
-																		"#(define\(\s*'DB_USER',\s*')(.*?)('\s*\);)#",
-																		"#(define\(\s*'DB_PASSWORD',\s*')(.*?)('\s*\);)#",
-																		"#(define\(\s*'DB_NAME',\s*')(.*?)('\s*\);)#",
-																		"#(define\(\s*'DB_HOST',\s*')(.*?)('\s*\);)#",
-																		"#(baseurl\s*=\s*')(.*?)(';)#",
-																		"#(admin_email\s*=\s*')(.*?)(';)#",
+																		"#define\(\s*'DB_USER',\s*'.*?'\s*\);#",
+																		"#define\(\s*'DB_PASSWORD',\s*'.*?'\s*\);#",
+																		"#define\(\s*'DB_NAME',\s*'.*?'\s*\);#",
+																		"#define\(\s*'DB_HOST',\s*'.*?'\s*\);#",
+																		"#baseurl\s*=\s*'.*?';#",
+																		"#admin_email\s*=\s*'.*?';#",
 																		"#config_is_done\s*=.*?;#",
 																	),
 														array(
-																		'$1'.$conf_db_user.'$3',
-																		'$1'.$conf_db_password.'$3',
-																		'$1'.$conf_db_name.'$3',
-																		'$1'.$conf_db_host.'$3',
-																		'$1'.$conf_baseurl.'$3',
-																		'$1'.$conf_admin_email.'$3',
+																		"define( 'DB_USER', '$conf_db_user' );",
+																		"define( 'DB_PASSWORD', '$conf_db_password' );",
+																		"define( 'DB_NAME', '$conf_db_name' );",
+																		"define( 'DB_HOST', '$conf_db_host' );",
+																		"baseurl = '$conf_baseurl';",
+																		"admin_email = '$conf_admin_email';",
 																		'config_is_done = 1;',
 																	), $conf );
 
@@ -269,7 +272,7 @@ switch( $action )
 						form_text( 'conf_db_user', $conf_db_user, 16, T_('mySQL Username'), sprintf( T_('Your username to access the database' ) ), 16 );
 						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16, '', 'password' );
 						form_text( 'conf_db_name', $conf_db_name, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 16 );
-						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 16 );
+						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 120 );
 					?>
 				</fieldset>
 
@@ -357,11 +360,17 @@ to
 
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 
-		<?php echo '<pre>',
-		T_('mySQL Username').': '.DB_USER."\n".
-		T_('mySQL Password').': '.((DB_PASSWORD != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
-		T_('mySQL Database').': '.DB_NAME."\n".
-		T_('mySQL Host').': '.DB_HOST."\n\n".
+		<?php 
+		if( !isset($conf_db_user) ) $conf_db_user = DB_USER;
+		if( !isset($conf_db_password) ) $conf_db_password = DB_PASSWORD;
+		if( !isset($conf_db_name) ) $conf_db_name = DB_NAME;
+		if( !isset($conf_db_host) ) $conf_db_host = DB_HOST;
+		
+		echo '<pre>',
+		T_('mySQL Username').': '.$conf_db_user."\n".
+		T_('mySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
+		T_('mySQL Database').': '.$conf_db_name."\n".
+		T_('mySQL Host').': '.$conf_db_host."\n\n".
 		T_('Base URL').': '.$baseurl."\n\n".
 		T_('Admin email').': '.$admin_email.
 		'</pre>';

@@ -78,7 +78,7 @@ function upgrade_b2evo_tables()
 																WHERE ID = " . $row['ID'];
 			$DB->query($query_update_wordcount);
 		}
-		echo "OK. (".$count($q)." rows updated)<br />\n";
+		echo "OK. (".count($q)." rows updated)<br />\n";
 	}
 
 
@@ -217,7 +217,9 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8060 )
-	{	// upgrade to 0.9
+	{	// --------------------------------------------
+		// upgrade to 0.9
+		// --------------------------------------------
 		
 		// Important check:
 		$stub_list = $DB->get_col( "SELECT blog_stub
@@ -234,11 +236,10 @@ function upgrade_b2evo_tables()
 			return false;
 		}
 		
-		
+		// Create locales 
 		create_locales();
 
 		/**
-		 *
 		 * converts languages in a given table into according locales
 		 *
 		 * @author blueyed
@@ -302,6 +303,10 @@ function upgrade_b2evo_tables()
 		}  // convert_lang_to_locale(-)
 		
 		echo 'Upgrading posts table... ';
+		$query = "UPDATE $tableposts
+							SET post_urltitle = NULL";
+		$DB->query( $query );
+
 		$query = "ALTER TABLE $tableposts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 

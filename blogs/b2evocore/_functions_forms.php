@@ -69,7 +69,7 @@ function form_select(
 	{
 		echo ' class="', $field_class,'"';
 	}
-	echo '/>';
+	echo '>';
 	eval( $field_list_callback( $field_value ) );
 	echo '  </select>';
 	echo '  <span class="notes">', $field_note, '</span></div>';
@@ -98,7 +98,7 @@ function form_select_object(
 	{
 		echo ' class="', $field_class,'"';
 	}
-	echo '/>';
+	echo '>';
 	$field_object->option_list( $field_value, $allow_none );
 	echo '  </select>';
 	echo '  <span class="notes">', $field_note, '</span></div>';

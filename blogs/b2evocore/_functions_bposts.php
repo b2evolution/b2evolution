@@ -57,12 +57,19 @@ function bpost_create(
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_url, post_autobr, post_flags, post_wordcount,
 														post_comments, post_renderers )
-						VALUES( $author_user_ID, '".$DB->escape($post_title)."', '".$DB->escape($post_urltitle)."',
-										'".$DB->escape($post_content)."',	'".$DB->escape($post_timestamp)."',
-										'".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID,
-										'".$DB->escape($post_status)."', '".$DB->escape($post_locale)."',
-										'".$DB->escape($post_url)."', $autobr, '".$DB->escape(implode(',',$post_flags))."',
-										".bpost_count_words($post_content).", '".$DB->escape($post_comments)."',
+						VALUES( $author_user_ID, '".$DB->escape($post_title)."', 
+										'".$DB->escape($post_urltitle)."',
+										'".$DB->escape($post_content)."',	
+										'".$DB->escape($post_timestamp)."',
+										'".date('Y-m-d H:i:s',$localtimenow)."', 
+										$main_cat_ID,
+										'".$DB->escape($post_status)."', 
+										'".$DB->escape($post_locale)."',
+										'".$DB->escape($post_url)."', 
+										$autobr, 
+										'".$DB->escape(implode(',',$post_flags))."',
+										".bpost_count_words($post_content).", 
+										'".$DB->escape($post_comments)."',
 										'".$DB->escape(implode('.',$post_renderers))."' )";
 	if( ! $DB->query( $query ) ) return 0;
 	$post_ID = $DB->insert_id;

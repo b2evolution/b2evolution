@@ -47,12 +47,9 @@ if( !empty($locale) && $action != 'extract' )
 		form_checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
 		form_text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
 			T_('name of the locale'), 40 );
-		form_text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'),
-			sprintf( T_('the charset for this locale. see <a %s>the specs</a>'), 'href="link"'), 15 );
-		form_text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'),
-			sprintf( T_('the date format, see <a %s>the specs</a>'), 'href="link"'), 10 );
-		form_text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'),
-			sprintf( T_('the time format, see <a %s>the specs</a>'), 'href="link"'), 10 );
+		form_text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'), T_('Must match the lang file charset.'), 15 );
+		form_text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'), T_('See below.'), 10 );
+		form_text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'), T_('See below.'), 10 );
 		form_text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
 			T_('the lang file to use, from the <code>locales</code> subdirectory'), 20 );
 		form_text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
@@ -68,13 +65,51 @@ if( !empty($locale) && $action != 'extract' )
 		<div class="input">
 		<input type="submit" name="submit" value="'.( ($locale == '_new_') ? T_('Create') : T_('Update') ).'" class="search" onClick="var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: Warning this is a javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};" />
 		<input type="reset" value="'.format_to_output(T_('Reset'), 'formvalue').'" class="search" />
-		</div>
+		</div>';
+		?>
 		<div class="panelinfo">
-			<p>'.sprintf(T_('The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'/flags/').'</p>
+			<h3><?php echo T_('Flags') ?></h3>
+			<p><?php printf(T_('The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'/flags/'); ?></p>
+			<h3><?php echo T_('Date/Time Formats') ?></h3>
+			<p><?php echo T_('The following characters are recognized in the format strings:') ?></p>
+			<p>
+			<?php echo T_('a - "am" or "pm"') ?><br />
+			<?php echo T_('A - "AM" or "PM"') ?><br />
+			<?php echo T_('B - Swatch Internet time') ?><br />
+			<?php echo T_('d - day of the month, 2 digits with leading zeros; i.e. "01" to "31"') ?><br />
+			<?php echo T_('D - day of the week, textual, 3 letters; i.e. "Fri"') ?><br />
+			<?php echo T_('F - month, textual, long; i.e. "January"') ?><br />
+			<?php echo T_('g - hour, 12-hour format without leading zeros; i.e. "1" to "12"') ?><br />
+			<?php echo T_('G - hour, 24-hour format without leading zeros; i.e. "0" to "23"') ?><br />
+			<?php echo T_('h - hour, 12-hour format; i.e. "01" to "12"') ?><br />
+			<?php echo T_('H - hour, 24-hour format; i.e. "00" to "23"') ?><br />
+			<?php echo T_('i - minutes; i.e. "00" to "59"') ?><br />
+			<?php echo T_('I (capital i) - "1" if Daylight Savings Time, "0" otherwise.') ?><br />
+			<?php echo T_('j - day of the month without leading zeros; i.e. "1" to "31"') ?><br />
+			<?php echo T_('l (lowercase "L") - day of the week, textual, long; i.e. "Friday"') ?><br />
+			<?php echo T_('L - boolean for whether it is a leap year; i.e. "0" or "1"') ?><br />
+			<?php echo T_('m - month; i.e. "01" to "12"') ?><br />
+			<?php echo T_('M - month, textual, 3 letters; i.e. "Jan"') ?><br />
+			<?php echo T_('n - month without leading zeros; i.e. "1" to "12"') ?><br />
+			<?php echo T_('r - RFC 822 formatted date; i.e. "Thu, 21 Dec 2000 16:01:07 +0200"') ?><br />
+			<?php echo T_('s - seconds; i.e. "00" to "59"') ?><br />
+			<?php echo T_('S - English ordinal suffix, textual, 2 characters; i.e. "th", "nd"') ?><br />
+			<?php echo T_('t - number of days in the given month; i.e. "28" to "31"') ?><br />
+			<?php echo T_('T - Timezone setting of this machine; i.e. "MDT"') ?><br />
+			<?php echo T_('U - seconds since the epoch') ?><br />
+			<?php echo T_('w - day of the week, numeric, i.e. "0" (Sunday) to "6" (Saturday)') ?><br />
+			<?php echo T_('Y - year, 4 digits; i.e. "1999"') ?><br />
+			<?php echo T_('y - year, 2 digits; i.e. "99"') ?><br />
+			<?php echo T_('z - day of the year; i.e. "0" to "365"') ?><br />
+			<?php echo T_('Z - timezone offset in seconds (i.e. "-43200" to "43200"). The offset for timezones west of UTC is always negative, and for those east of UTC is always positive.') ?>
+			</p>
+			<?php echo T_('isoZ - full ISO 8601 format, equivalent to Y-m-d\TH:i:s\Z') ?><br />
+			<p><?php echo T_('Unrecognized characters in the format string will be printed as-is.<br />
+			You can escape characters by preceding them with a \ to print them as-is.') ?></p>
 		</div>
 		</fieldset>
 	</form>
-	';
+	<?php
 }
 else
 { // show main form

@@ -116,7 +116,7 @@ $DB->query( $query );
 $item_author_User = & $commented_Item->Author;
 
 if( $item_author_User->notify 
-		&& $author_ID !== NULL
+		&& (!empty( $item_author_User->email ))
 		&& $author_ID != $item_author_User->ID )  // don't send if original author comments (is logged in)
 {	// Author wants to be notified and does not comment himself:
 	locale_temp_switch($item_author_User->locale);
@@ -139,7 +139,7 @@ if( $item_author_User->notify
 		$notify_message .= T_('Url').": $url\n";
 	}
 	$notify_message .= T_('Comment').": \n".$original_comment."\n\n";
-	$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n";
+	$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$commented_Item->blog_ID.'&p='.$comment_post_ID."&c=1\n";
 	
 	
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
