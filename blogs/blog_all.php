@@ -13,11 +13,8 @@
 	//$blog = 1;   	// 1 is for ALL BLOGS
 	$default_to_blog = 1;		// Just set the default but let user override with ?blog=
 
-	# Now, select the default skin you want to display for this blog.
-	# This setting refers to a subfolder name in the '/skins' folder 
-	$default_skin = 'fplanque2002';
-	# You can *force* a skin with this setting:
-	# $skin = 'fplanque2002';
+	# You could *force* a specific skin here with this setting:
+	# $skin = 'basic';
 	
 	# This setting retricts posts to those published, thus hiding drafts.
 	# You should not have to change this.

@@ -149,14 +149,30 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
-// Get the saved skin in cookie or default:
-if(!isset($default_skin)) $default_skin = '';
-param( $cookie_state, 'string', $default_skin );
-// Get skin by params or default to cookie or default
-param( 'skin', 'string', $$cookie_state );
+if(!isset($default_skin)) // Check if this has been forced in stub
+	$default_skin = $Blog->get('default_skin');
+
+if(!isset($skin)) // Check if this has been forced in stub
+{
+	if( $Blog->get('force_skin') )
+	{	// We want to force the use of default skin
+		$skin = $default_skin;
+	}
+	else
+	{
+		// Get the saved skin in cookie or default:
+		param( $cookie_state, 'string', $default_skin );
+		// Get skin by params or default to cookie or default
+		param( 'skin', 'string', $$cookie_state );
+	}
+}
+
+// At this point $skin holds the name of the skin to use, or '' for no skin!
+
 // check to see if we want to display the popup or the main template
 param( 'template', 'string', 'main', true );
-if( $skin != '' )
+
+if( !empty( $skin ) )
 {	// We want to display now:
 	$skin_folder = get_path( 'skins' );
 	

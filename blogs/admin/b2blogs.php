@@ -230,6 +230,9 @@ switch($action)
 				param( 'blog_default_skin', 'string', '' );
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
 
+				param( 'blog_force_skin', 'integer', 0 );
+				$edited_Blog->set( 'force_skin', 1-$blog_force_skin );
+
 				break;
 
 			case 'perm':
@@ -290,7 +293,8 @@ switch($action)
 		if( $action == 'edit' )
 		{	// this has not already been displayed on update:
 			param( 'blog', 'integer', true );
-			$admin_pagetitle .= ' :: ['.get_bloginfo('shortname').']';
+			$edited_Blog = $BlogCache->get_by_ID( $blog );
+			$admin_pagetitle .= ' :: ['.$edited_Blog->dget('shortname').']';
 			switch( $tab )
 			{
 				case 'general':
@@ -357,6 +361,7 @@ switch($action)
 				$blog_keywords = get_bloginfo( 'keywords' );
 				$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
 				$blog_default_skin = get_bloginfo( 'default_skin' );
+				$blog_force_skin = $edited_Blog->get( 'force_skin' );
 				require( dirname(__FILE__) . '/_blogs_form.php' );
 				break;
 				

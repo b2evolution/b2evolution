@@ -26,13 +26,9 @@ if( empty($blog) )
 }
 
 // A blog has been requested... Let's set a few default params:
-$selected_Blog = $BlogCache->get_by_ID( $blog );
 
-# Select the default skin to be used to display this blog.
-$default_skin = $selected_Blog->get('default_skin');
-# You can *force* a skin with this setting:
-# $skin = 'fplanque2002';
-# This setting refers to a subfolder name in the '/skins' folder 
+# You could *force* a specific skin here with this setting:
+# $skin = 'basic';
 
 # This setting retricts posts to those published, thus hiding drafts.
 # You should not have to change this.

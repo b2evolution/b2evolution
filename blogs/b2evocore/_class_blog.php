@@ -36,6 +36,7 @@ class Blog extends DataObject
 	var $pingweblogs = 0;
 	var $pingblodotgs = 0;
 	var $default_skin;
+	var $force_skin = 0;
 	var $disp_bloglist = 0;
 	var $UID;
 
@@ -79,6 +80,7 @@ class Blog extends DataObject
 			$this->pingweblogs = $db_row->blog_pingweblogs;
 			$this->pingblodotgs = $db_row->blog_pingblodotgs;
 			$this->default_skin = $db_row->blog_default_skin;
+			$this->force_skin = $db_row->blog_force_skin;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
 			$this->UID = $db_row->blog_UID;
 		}
@@ -105,6 +107,7 @@ class Blog extends DataObject
 			case 'pingweblogs':
 			case 'pingblodotgs':
 			case 'disp_bloglist':
+			case 'force_skin':
 				parent::set_param( $parname, 'int', $parvalue );
 				break;
 			

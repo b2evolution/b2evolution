@@ -12,11 +12,8 @@
 	# You can also create new blogs over there. If you do, duplicate this file for the new blog.
 	$blog = 3;   	// 3 is for "demo blog B"
 
-	# Now, select the default skin you want to display for this blog.
-	# This setting refers to a subfolder name in the '/skins' folder 
-	$default_skin = 'originalb2';
-	# You can *force* a skin with this setting:
-	# $skin = 'fplanque2002';
+	# You could *force* a specific skin here with this setting:
+	# $skin = 'basic';
 	
 	# This setting retricts posts to those published, thus hiding drafts.
 	# You should not have to change this.
