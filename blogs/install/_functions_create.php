@@ -262,7 +262,7 @@ function create_b2evo_tables()
 	create_locales();
 	create_b2evo_tables_091();
 
-	
+
 	// Create relations:
 	create_b2evo_relations();
 }
@@ -315,6 +315,7 @@ function create_locales()
 		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
 		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
 		loc_timefmt varchar(10) NOT NULL default 'H:i:s',
+		loc_startofweek TINYINT UNSIGNED NOT NULL,
 		loc_name varchar(40) NOT NULL default '',
 		loc_messages varchar(20) NOT NULL default '',
 		loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
@@ -810,7 +811,7 @@ function populate_main_tables()
 	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
 	{
-		$random_password = substr(md5(uniqid(microtime())),0,6);
+		$random_password = getRandomPassword();
 	}
 	else
 	{
@@ -895,7 +896,7 @@ function populate_main_tables()
 	// Admin for blog A:
 	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-							bloguser_perm_cats, bloguser_perm_properties, 
+							bloguser_perm_cats, bloguser_perm_properties,
 							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 						VALUES
 							( $blog_all_ID, ".$User_Admin->ID.", 1,
@@ -1029,18 +1030,18 @@ function create_b2evo_relations()
 
 	echo 'Creating relations... ';
 
-	$DB->query( 'alter table T_blogusers 
-								add constraint FK_bloguser_blog_ID 
+	$DB->query( 'alter table T_blogusers
+								add constraint FK_bloguser_blog_ID
 								 			foreign key (bloguser_blog_ID)
-											references T_blogs (blog_ID) 
-											on delete restrict 
+											references T_blogs (blog_ID)
+											on delete restrict
 											on update restrict,
 								add constraint FK_bloguser_user_ID
 											foreign key (bloguser_user_ID)
 											references T_users (ID)
 											on delete restrict
 											on update restrict' );
-	
+
 	$DB->query( 'alter table T_categories
 								add constraint FK_cat_blog_ID
 											foreign key (cat_blog_ID)
@@ -1052,26 +1053,26 @@ function create_b2evo_relations()
 											references T_categories (cat_ID)
 											on delete restrict
 											on update restrict' );
-	
+
 	$DB->query( 'alter table T_comments
 								add constraint FK_comment_post_ID
 											foreign key (comment_post_ID)
 											references T_posts (ID)
 											on delete restrict
 											on update restrict' );
-	
+
 	$DB->query( 'alter table T_postcats
 								add constraint FK_postcat_cat_ID
 											foreign key (postcat_cat_ID)
 											references T_categories (cat_ID)
 											on delete restrict
-											on update restrict,											
+											on update restrict,
 								add constraint FK_postcat_post_ID
 											foreign key (postcat_post_ID)
 											references T_posts (ID)
 											on delete restrict
 											on update restrict' );
-	
+
 	$DB->query( 'alter table T_posts
 								add constraint FK_post_assigned_user_ID
 											foreign key (post_assigned_user_ID)
@@ -1132,9 +1133,9 @@ function create_b2evo_relations()
 											references T_groups (grp_ID)
 											on delete restrict
 											on update restrict' );
-	
+
 	$DB->query( 'alter table T_usersettings
-								add constraint FK_uset_user_ID 
+								add constraint FK_uset_user_ID
 											foreign key (uset_user_ID)
 											references T_users (ID)
 											on delete restrict

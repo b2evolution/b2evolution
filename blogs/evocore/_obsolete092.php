@@ -1141,9 +1141,26 @@ function comment_post_link()
 // _comment.funcs.php }}}
 
 
+// globals {{{
+
+/**
+ * day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
+ *
+ * This is used when displaying the calendar only.
+ * Weekly archives are grouped the way MySQL groups days by weeks; see MySQL documentation.
+ *
+ * @global int $start_of_week
+ * @deprecated Moved to locale properties, see {@link $locales}
+ */
+$start_of_week = 1;
+
+// globals }}}
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/23 04:26:18  blueyed
+ * moved global $start_of_week into $locales properties
+ *
  * Revision 1.3  2005/02/19 18:20:47  blueyed
  * obsolete functions removed
  *

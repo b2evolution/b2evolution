@@ -281,7 +281,6 @@ class Calendar
 	{
 		global $DB;
 		global $weekday, $weekday_abbrev, $weekday_letter, $month, $month_abbrev;
-		global $start_of_week;
 		global $Settings;
 
 		$this->file = $file;
@@ -289,7 +288,7 @@ class Calendar
 
 		if( $this->mode == 'month' )
 		{
-			$end_of_week = (($start_of_week + 7) % 7);
+			$end_of_week = ((locale_startofweek() + 7) % 7);
 
 			// Find a month with posts
 			$searchmonth = $this->month;
@@ -340,8 +339,8 @@ class Calendar
 			$dateendofmonth = $this->year.'-'.$this->month.'-'.$daysinmonth;
 
 			// caution: offset bug inside
-			$calendarblah = get_weekstartend($datestartofmonth, $start_of_week);
-			if (mysql2date('w', $datestartofmonth) == $start_of_week) {
+			$calendarblah = get_weekstartend($datestartofmonth, locale_startofweek());
+			if (mysql2date('w', $datestartofmonth) == locale_startofweek()) {
 				$calendarfirst = $calendarblah['start'] + 1 + 3600;     // adjust for daylight savings time
 			} else {
 				$calendarfirst = $calendarblah['end'] - 604799 + 3600;  // adjust for daylight savings time
@@ -432,7 +431,7 @@ class Calendar
 		{ // Weekdays:
 			echo $this->headerrowstart;
 
-			for ($i = $start_of_week; $i < ($start_of_week + 7); $i = $i + 1)
+			for( $i = locale_startofweek(), $j = $i + 7; $i < $j; $i = $i + 1)
 			{
 				echo str_replace('[abbr]', T_($weekday[($i % 7)]), $this->headercellstart);
 				switch( $this->headerdisplay )
@@ -689,6 +688,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/23 04:26:18  blueyed
+ * moved global $start_of_week into $locales properties
+ *
  * Revision 1.4  2005/02/12 03:58:44  blueyed
  * default to $navigation = 'tfoot', fixed queries that find posts in month or on day, refactored navigation link generation
  *

@@ -185,7 +185,7 @@ function NT_( $string )
 /**
  * Temporarily switch to another locale
  *
- * Calls can be nested.
+ * Calls can be nested, see {@link locale_restore_previous}.
  *
  * {@internal locale_temp_switch(-)}}
  *
@@ -193,8 +193,12 @@ function NT_( $string )
  */
 function locale_temp_switch( $locale )
 {
-	global $saved_locale, $current_locale;
-	if( !isset( $saved_locale ) ) $saved_locale = array();
+	global $saved_locales, $current_locale;
+	if( !isset( $saved_locale ) || !is_array( $saved_locale ) )
+	{
+		$saved_locale = array();
+	}
+
 	array_push( $saved_locale, $current_locale );
 	locale_activate( $locale );
 }
@@ -204,12 +208,19 @@ function locale_temp_switch( $locale )
  * Restore the locale in use before the switch
  *
  * {@internal locale_restore_previous(-)}}
+ * @see locale_temp_switch()
+ * @return boolean true on success, false on failure (no locale stored before)
  */
 function locale_restore_previous()
 {
-	global $saved_locale;
-	$locale = array_pop( $saved_locale );
-	locale_activate( $locale );
+	global $saved_locales;
+
+	if( !empty( $saved_locales ) && is_array( $saved_locales ) )
+	{
+		locale_activate( array_pop( $saved_locale ) );
+		return true;
+	}
+	return false;
 }
 
 
@@ -354,6 +365,19 @@ function locale_timefmt()
 	global $locales, $current_locale;
 
 	return $locales[$current_locale]['timefmt'];
+}
+
+
+/**
+ * Returns the current locale's start of week
+ *
+ * @return integer
+ */
+function locale_startofweek()
+{
+	global $locales, $current_locale;
+
+	return (int)$locales[$current_locale]['startofweek'];
 }
 
 
@@ -550,8 +574,8 @@ function locale_overwritefromDB()
 	$usedprios = array();  // remember which priorities are used already.
 	$priocounter = 0;
 	$query = 'SELECT
-						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name,
-						loc_messages, loc_priority, loc_enabled
+						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek,
+						loc_name, loc_messages, loc_priority, loc_enabled
 						FROM T_locales ORDER BY loc_priority';
 
 	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
@@ -570,14 +594,15 @@ function locale_overwritefromDB()
 		$usedprios[] = $priocounter;
 
 		$locales[ $row['loc_locale'] ] = array(
-																			'charset'  => $row[ 'loc_charset' ],
-																			'datefmt'  => $row[ 'loc_datefmt' ],
-																			'timefmt'  => $row[ 'loc_timefmt' ],
-																			'name'     => $row[ 'loc_name' ],
-																			'messages' => $row[ 'loc_messages' ],
-																			'priority' => $priocounter,
-																			'enabled'  => $row[ 'loc_enabled' ],
-																			'fromdb'   => 1
+																			'charset'     => $row[ 'loc_charset' ],
+																			'datefmt'     => $row[ 'loc_datefmt' ],
+																			'timefmt'     => $row[ 'loc_timefmt' ],
+																			'startofweek' => $row[ 'loc_startofweek' ],
+																			'name'        => $row[ 'loc_name' ],
+																			'messages'    => $row[ 'loc_messages' ],
+																			'priority'    => $priocounter,
+																			'enabled'     => $row[ 'loc_enabled' ],
+																			'fromdb'      => 1
 																		);
 	}
 
@@ -648,14 +673,17 @@ function locale_updateDB()
 		}
 		elseif( $lnr != 0 )  // be sure to have catched a locale before
 		{
+			if( $lfield == 'startofweek' && ( $lfield < 0 || $lfield > 6 ) )
+			{ // startofweek must be between 0 and 6
+				continue;
+			}
 			$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
 		}
-
 	}
 
 	$locales = $templocales;
 
-	$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
+	$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
 	foreach( $locales as $localekey => $lval )
 	{
 		if( empty($lval['messages']) )
@@ -667,6 +695,7 @@ function locale_updateDB()
 		'{$lval['charset']}',
 		'{$lval['datefmt']}',
 		'{$lval['timefmt']}',
+		'{$lval['startofweek']}',
 		'{$lval['name']}',
 		'{$lval['messages']}',
 		'{$lval['priority']}',
@@ -679,8 +708,12 @@ function locale_updateDB()
 	return (bool)$q;
 }
 
+
 /*
  * $Log$
+ * Revision 1.9  2005/02/23 04:26:18  blueyed
+ * moved global $start_of_week into $locales properties
+ *
  * Revision 1.8  2005/02/14 13:32:08  fplanque
  * form handling
  *

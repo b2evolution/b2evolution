@@ -479,7 +479,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
  *
  * {@internal get_weekstartend(-)}}
  */
-function get_weekstartend($mysqlstring, $start_of_week)
+function get_weekstartend($mysqlstring, $startOfWeek)
 {
 	$my = substr($mysqlstring, 0, 4);
 	$mm = substr($mysqlstring, 5, 2);
@@ -487,7 +487,7 @@ function get_weekstartend($mysqlstring, $start_of_week)
 	$day = mktime(0, 0, 0, $mm, $md, $my);
 	$weekday = date('w', $day);
 	$i = 86400;
-	while( $weekday > $start_of_week )
+	while( $weekday > $startOfWeek )
 	{
 		$weekday = date('w', $day);
 		$day = $day - 86400;
@@ -1889,6 +1889,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.47  2005/02/23 04:26:18  blueyed
+ * moved global $start_of_week into $locales properties
+ *
  * Revision 1.46  2005/02/22 02:53:02  blueyed
  * typecasting also gives a notice.. better to have it anyway
  *

@@ -42,7 +42,7 @@ switch( $admin_tab )
 		// Settings screen:
 		$submenu = array(
 			'general' => array( T_('General'), 'b2options.php?tab=general' ),
-			'regional' => array( T_('Regional'), 'b2options.php?tab=regional'.( (isset($notransext) && $notransext) ? '&amp;notransext=1' : '' ) ),
+			'regional' => array( T_('Regional'), 'b2options.php?tab=regional'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
 			'files' => array( T_('Files'), 'fileset.php' ),
 			'statuses' => array( T_('Post statuses'), 'statuses.php'),
 			'types' => array( T_('Post types'), 'types.php'),
@@ -80,6 +80,9 @@ require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_submenu.php';
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/23 04:26:21  blueyed
+ * moved global $start_of_week into $locales properties
+ *
  * Revision 1.9  2005/02/16 15:48:04  fplanque
  * merged with work app :p
  *

@@ -608,6 +608,38 @@ class User extends DataObject
 	}
 
 
+	function callback_optionsForIdMode( $value )
+	{
+		$field_options = '';
+		$idmode = $this->get( 'idmode' );
+
+		foreach( array( 'nickname' => array( T_('Nickname') ),
+										'login' => array( T_('Login') ),
+										'firstname' => array( T_('First name') ),
+										'lastname' => array( T_('Last name') ),
+										'namefl' => array( T_('First name').' '.T_('Last name'),
+																				implode( ' ', array( $this->get('firstname'), $this->get('lastname') ) ) ),
+										'namelf' => array( T_('Last name').' '.T_('First name'),
+																				implode( ' ', array( $this->get('lastname'), $this->get('firstname') ) ) ),
+										)
+							as $lIdMode => $lInfo )
+		{
+			$disp = isset( $lInfo[1] ) ? $lInfo[1] : $this->get($lIdMode);
+
+			$field_options .= '<option value="'.$lIdMode.'"';
+			if( $value == $lIdMode )
+			{
+				$field_options .= ' selected="selected"';
+			}
+			$field_options .= '>'.( !empty( $disp ) ? $disp.' ' : ' - ' )
+												.'&laquo;'.$lInfo[0].'&raquo;'
+												.'</option>';
+		}
+
+		return $field_options;
+	}
+
+
 	// Template functions {{{
 
 	/**
@@ -811,6 +843,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/23 04:26:18  blueyed
+ * moved global $start_of_week into $locales properties
+ *
  * Revision 1.12  2005/02/22 02:53:33  blueyed
  * getPreferedName()
  *

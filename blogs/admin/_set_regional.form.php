@@ -10,9 +10,8 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-param( 'locale', 'string', '' );
 
-if( !empty($locale) && $action != 'extract' )
+if( $action == 'edit' )
 {
 	param( 'template', 'string', '' );
 
@@ -20,10 +19,10 @@ if( !empty($locale) && $action != 'extract' )
 
 	$Form->begin_form( 'fform' );
 
-	$Form->buttons( array( array( 'hidden', 'notransext', $notransext ),
-												 array( 'hidden', 'action', ($locale == '_new_') ? 'createlocale' : 'updatelocale' ) ) );
+	$Form->buttons( array( array( 'hidden', 'loc_transinfo', $loc_transinfo ),
+												 array( 'hidden', 'action', ($edit_locale == '_new_') ? 'createlocale' : 'updatelocale' ) ) );
 
-	$Form->fieldset( ($locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
+	$Form->fieldset( ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
 
 		// read template
 
@@ -32,17 +31,17 @@ if( !empty($locale) && $action != 'extract' )
 			$ltemplate = $locales[ $template ];
 			$newlocale = $template;
 		}
-		elseif( $locale != '_new_' && isset($locales[ $locale ]) )
+		elseif( $edit_locale != '_new_' && isset($locales[ $edit_locale ]) )
 		{
-			$ltemplate = $locales[ $locale ];
-			$newlocale = $locale;
+			$ltemplate = $locales[ $edit_locale ];
+			$newlocale = $edit_locale;
 		}
 		else
 		{
 			$newlocale = '';
 		}
 
-		if( $locale != '_new_' )
+		if( $edit_locale != '_new_' )
 		{ // we need to remember this for updating locale
 			echo '<input type="hidden" name="oldloc_locale" value="'.$newlocale.'" />';
 		}
@@ -53,6 +52,7 @@ if( !empty($locale) && $action != 'extract' )
 		$Form->text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'), T_('Must match the lang file charset.'), 15 );
 		$Form->text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'), T_('See below.'), 10 );
 		$Form->text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'), T_('See below.'), 10 );
+		$Form->text( 'newloc_startofweek', (isset($ltemplate['startofweek']) ? $ltemplate['startofweek'] : ''), 1, T_('Start of week'), T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc'), 1 );
 		$Form->text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
 			T_('the lang file to use, from the <code>locales</code> subdirectory'), 20 );
 		$Form->text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
@@ -60,12 +60,12 @@ if( !empty($locale) && $action != 'extract' )
 
 		// generate Javascript array of locales to warn in case of overwriting
 		$l_warnfor = "'".implode("', '", array_keys($locales))."'";
-		if( $locale != '_new_' )
+		if( $edit_locale != '_new_' )
 		{ // remove the locale we want to edit from the generated array
 			$l_warnfor = str_replace("'$newlocale'", "'thiswillneverevermatch'", $l_warnfor);
 		}
 
-		$Form->buttons( array( array( '', '', ($locale == '_new_') ? T_('Create') : T_('Update'),
+		$Form->buttons( array( array( '', '', ($edit_locale == '_new_') ? T_('Create') : T_('Update'),
 																	'search', 'var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: Warning this is a javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};' ),
 													 array( 'reset', '', format_to_output(T_('Reset'), 'formvalue'), 'search' ) ) );
 
@@ -130,7 +130,7 @@ else
 	$Form->begin_form( 'fform' );
 
 	$Form->hidden( 'action', 'update' );
-	$Form->hidden( 'notransext', $notransext );
+	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
 	$Form->fieldset( T_('Regional settings') );
 	$Form->text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
@@ -139,22 +139,21 @@ else
 
 	$Form->fieldset( T_('Available locales') );
 
-	?>
+		?>
 
 		<p class="center">
 
-	<?php
-		if( !$notransext )
+		<?php
+		if( $loc_transinfo )
 		{
-			echo '<a href="b2options.php?tab=regional&amp;notransext=1">' . T_('Hide translation info'), '</a>';
-			$showtranslationpercentage = 1;
+			echo '<a href="b2options.php?tab=regional">' . T_('Hide translation info'), '</a>';
 		}
 		else
 		{
-			echo '<a href="b2options.php?tab=regional">' . T_('Show translation info'), '</a>';
-			$showtranslationpercentage = 0;
+			echo '<a href="b2options.php?tab=regional&amp;loc_transinfo=1">' . T_('Show translation info'), '</a>';
 		}
-		?></p>
+		?>
+		</p>
 
 		<table class="grouped" cellspacing="0">
 		<tr>
@@ -163,12 +162,14 @@ else
 			<th><?php echo T_('Name') ?></th>
 			<th><?php echo T_('Date fmt') ?></th>
 			<th><?php echo T_('Time fmt') ?></th>
+			<th title="<?php echo T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
+				?>"><?php echo T_('Start of week') ?></th>
 			<?php if( $current_User->check_perm( 'options', 'edit' ) )
 			{ ?>
 				<th><?php echo T_('Edit') ?></th>
 				<?php
 			}
-			if( $showtranslationpercentage )
+			if( $loc_transinfo )
 			{
 				?>
 				<th><?php echo T_('Strings') ?></th>
@@ -181,6 +182,8 @@ else
 				}
 			} ?>
 		</tr>
+
+
 		<?php
 		$i = 0; // counter to distinguish POSTed locales later
 		foreach( $locales as $lkey => $lval )
@@ -196,7 +199,8 @@ else
 				<strong>';
 				if( $current_User->check_perm( 'options', 'edit' ) )
 				{
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale='.$lkey.'" title="'.T_('Edit locale').'">';
+					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+								.'&amp;action=edit&amp;edit_locale='.$lkey.'" title="'.T_('Edit locale').'">';
 				}
 				echo $lkey;
 				if( $current_User->check_perm( 'options', 'edit' ) )
@@ -216,6 +220,9 @@ else
 			</td>
 			<td>
 				<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="10" size="6" />
+			</td>
+			<td>
+				<input type="text" name="loc_'.$i.'_startofweek" value="'.$locales[$lkey]['startofweek'].'" maxlength="1" size="1" />
 			</td>';
 
 			if( $current_User->check_perm( 'options', 'edit' ) )
@@ -223,7 +230,9 @@ else
 				echo '<td class="left">';
 				if( $i > 1 )
 				{ // show "move prio up"
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
+					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+								.'&amp;edit_locale='.$lkey
+								.'&amp;action=prioup"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
 				}
 				else
 				{
@@ -232,26 +241,30 @@ else
 
 				if( $i < count($locales) )
 				{ // show "move prio down"
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
+					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+								.'&amp;edit_locale='.$lkey
+								.'&amp;action=priodown"><img src="img/arrowdown.png" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
 				}
 				else
 				{
 					echo '<img src="img/blank.gif" width="14" alt="" />';
 				}
 				echo '
-				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale=_new_&amp;template='.$lkey.'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
+				<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+					.'&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
 
-				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale='.$lkey.'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
+				<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+					.'&amp;action=edit&amp;edit_locale='.$lkey.'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
 				';
 				if( isset($lval[ 'fromdb' ]) )
 				{ // allow to delete locales loaded from db
 					$l_atleastonefromdb = 1;
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
+					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
 				}
 				echo '</td>';
 			}
 
-			if( $showtranslationpercentage )
+			if( $loc_transinfo )
 			{
 				// Get PO file for that locale:
 				$po_file = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
@@ -333,7 +346,7 @@ else
 				{ // Translator options:
 					if( is_file( $po_file ) )
 					{
-						echo "\n\t<td>".'[<a href="b2options.php?tab=regional&amp;action=extract&amp;locale='.$lkey.'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
+						echo "\n\t<td>".'[<a href="b2options.php?tab=regional&amp;action=extract&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
 					}
 				}
 			} // show message file percentage/extraction
@@ -342,13 +355,15 @@ else
 		}
 		?>
 		</table>
-		<?php if( $current_User->check_perm( 'options', 'edit' ) )
+
+		<?php
+		if( $current_User->check_perm( 'options', 'edit' ) )
 		{
 			?>
-			<p class="center"><a href="b2options.php?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;locale=_new_"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('Create new locale');?></a></p>
+			<p class="center"><a href="b2options.php?tab=regional&amp;action=edit<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;edit_locale=_new_"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('Create new locale');?></a></p>
 			<?php if( isset($l_atleastonefromdb) )
 			{ ?>
-				<p class="center"><a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
+				<p class="center"><a href="?tab=regional<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;action=reset" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
 				<?php
 			}
 		}

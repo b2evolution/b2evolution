@@ -347,7 +347,7 @@ class Form extends Widget
 	 */
 	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
 	{
-		global $month, $weekday_letter, $start_of_week;
+		global $month, $weekday_letter;
 
 		$field_size = strlen( $date_format );
 
@@ -382,7 +382,7 @@ class Form extends Widget
 							."'".T_($weekday_letter[4])."',"
 							."'".T_($weekday_letter[5])."',"
 							."'".T_($weekday_letter[6])."' );\n"
-				.' cal_'.$field_name.'.setWeekStartDay('.$start_of_week.');
+				.' cal_'.$field_name.'.setWeekStartDay('.locale_startofweek().');
 						cal_'.$field_name.".setTodayText('".TS_('Today')."');
 						// -->
 					</script>\n"

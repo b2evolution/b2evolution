@@ -544,7 +544,7 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
- 		echo 'Updating post data... ';
+		echo 'Updating post data... ';
 		$query = 'UPDATE T_posts
 							SET post_lastedit_user_ID = post_creator_user_ID,
 									post_datecreated = post_datestart';
@@ -637,6 +637,13 @@ function upgrade_b2evo_tables()
 									MODIFY COLUMN cat_parent_ID int(11) unsigned NULL,
 									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default 2" );
 		echo "OK.<br />\n";
+
+
+		echo 'Altering Locales table... ';
+		$DB->query( 'ALTER TABLE T_locales
+									ADD loc_startofweek TINYINT UNSIGNED NOT NULL AFTER loc_timefmt' );
+		echo "OK.<br />\n";
+
 
 		// Create relations:
 		create_b2evo_relations();
