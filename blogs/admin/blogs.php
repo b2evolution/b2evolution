@@ -28,16 +28,19 @@ if( $action == 'edit' || $action == 'update' || $action == 'delete' || $action =
 	param( 'blog', 'integer', true );
 	$edited_Blog = & $BlogCache->get_by_ID( $blog );
 }
-else if ( $action == 'new' && $blogtemplate != -1) {
+elseif ( $action == 'new' && $blogtemplate != -1)
+{
 		$edited_Blog = & $BlogCache->get_by_ID( $blogtemplate );
-} else {
+}
+else
+{
 	$edited_Blog = & new Blog( NULL );
 }
 
 
 
 function set_edited_Blog_from_params( $for )
-{{{
+{
 	global $edited_Blog, $default_locale;
 	global $blog_siteurl_type, $blog_siteurl_relative, $blog_siteurl_absolute;
 	global $DB, $Messages, $locales;
@@ -150,10 +153,10 @@ function set_edited_Blog_from_params( $for )
 
 			break;
 	}
-}}}
+}
 
 
-// page title {{{
+// page title
 switch( $action )
 {
 	case 'new':
@@ -177,7 +180,7 @@ switch( $action )
 				break;
 		}
 		break;
-} // }}}
+}
 
 
 require( dirname(__FILE__).'/_menutop.php' );
@@ -186,13 +189,16 @@ require( dirname(__FILE__).'/_menutop.php' );
 switch($action)
 {
 	case 'new':
-		// ---------- "New blog" form ---------- {{{
+		// ---------- "New blog" form ----------
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		if ($blogtemplate == -1) {
+		if ($blogtemplate == -1)
+		{
 			set_edited_Blog_from_params( 'new' );
-		} else {
+		}
+		else
+		{
 			// handle a blog copy
 			$edited_Blog->set( 'name',          param( 'blog_name',          'string', T_('New weblog') ) );
 			$edited_Blog->set( 'shortname',     param( 'blog_shortname',     'string', T_('New blog') ) );
@@ -208,13 +214,11 @@ switch($action)
 		require( dirname(__FILE__).'/_blogs_general.form.php' );
 
 		echo '</div>';
-
-		// }}}
 		break;
 
 
 	case 'create':
-		// ---------- Create new blog ---------- {{{
+		// ---------- Create new blog ----------
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -250,12 +254,11 @@ switch($action)
 			break;
 		}
 		echo '</div>';
-		// }}}
 		// NOTE: no break here, we go on to next form if there was an error!
 
 
 	case 'update':
-		// ---------- Update blog in DB ---------- {{{
+		// ---------- Update blog in DB ----------
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
@@ -292,12 +295,12 @@ switch($action)
 
 		?>
 		</div>
-		<?php // }}}
+		<?php
 		// NOTE: no break here, we go on to edit!
 
 
 	case 'edit':
-		// ---------- Edit blog form ---------- {{{
+		// ---------- Edit blog form ----------
 		if( $action == 'edit' )
 		{ // permissions have not been checked on update:
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
@@ -339,12 +342,11 @@ switch($action)
 				break;
 		}
 		require dirname(__FILE__).'/_sub_end.inc.php';
-		// }}}
 		break;
 
 
 	case 'delete':
-		// ----------  Delete a blog from DB ---------- {{{
+		// ----------  Delete a blog from DB ----------
 		param( 'confirm', 'integer', 0 );
 
 		if( $blog == 1 )
@@ -412,12 +414,11 @@ switch($action)
 			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, true );
 			echo '</div>';
 		}
-		// }}}
 		break;
 
 
 	case 'GenStatic':
-		// ----------  Generate static homepage for blog ---------- {{{
+		// ----------  Generate static homepage for blog ----------
 		?>
 			<div class="panelinfo">
 				<h3>
@@ -494,7 +495,6 @@ switch($action)
 		?>
 		</div>
 		<?php
-		// }}}
 		break;
 }
 
