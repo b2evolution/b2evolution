@@ -1533,6 +1533,7 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
 /**
  * Get properties of an icon.
  *
+ * @uses $map_iconfiles
  * @param string|File icon for what (special purpose or File object)
  * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
  * @param string additional parameter (for 'size' {@link imgsize()})
@@ -1607,7 +1608,7 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 /**
  * Get image size for an icon.
  *
- * @uses $map_iconsizes, $map_iconfiles
+ * @uses $map_iconsizes
  * @param string Icon path relative to {@link $basepath}
  * @param string what property/format to get: 'width', 'height', 'widthxheight',
  *               'string' (as for img tags), else 'widthheight' (array)
@@ -1663,8 +1664,8 @@ function make_valid_date( $date, $time )
 
 /*
  * $Log$
- * Revision 1.20  2004/12/29 02:25:55  blueyed
- * no message
+ * Revision 1.21  2004/12/30 22:56:58  blueyed
+ * doc
  *
  * Revision 1.19  2004/12/27 18:37:58  fplanque
  * changed class inheritence
@@ -1678,9 +1679,6 @@ function make_valid_date( $date, $time )
  * Revision 1.15  2004/12/14 18:32:15  fplanque
  * quick optimizations
  *
- * Revision 1.14  2004/11/26 19:38:35  fplanque
- * no message
- *
  * Revision 1.13  2004/11/22 17:48:20  fplanque
  * skin cosmetics
  *
@@ -1690,17 +1688,11 @@ function make_valid_date( $date, $time )
  * Revision 1.11  2004/11/10 22:46:44  blueyed
  * translation adjustments
  *
- * Revision 1.10  2004/11/05 15:44:31  blueyed
- * no message
- *
  * Revision 1.9  2004/11/05 12:48:04  blueyed
  * Debug output beautified
  *
  * Revision 1.7  2004/11/03 00:58:02  blueyed
  * update
- *
- * Revision 1.6  2004/11/02 10:46:58  fplanque
- * no message
  *
  * Revision 1.5  2004/10/21 00:14:44  blueyed
  * moved
