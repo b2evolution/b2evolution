@@ -1240,7 +1240,7 @@ function bpost_count_words($string)
 {
 	$string = trim(strip_tags($string));
 	if( function_exists( 'str_word_count' ) )
-	{
+	{	// PHP >= 4.3
 		return str_word_count($string);
 	}
 

@@ -69,7 +69,7 @@ textarea,input,select {
 <td><img src="img/b2minilogo.png"></td>
 </table>
 -->
-<form name="post" action="edit_actions.php" method="POST" accept-charset="<?php locale_charset() ?>">
+<form name="post" action="edit_actions.php" method="POST">
 <input type="hidden" name="action" value="post" />
 <input type="hidden" name="user_ID" value="<?php echo $user_ID ?>" />
 <input type="hidden" name="mode" value="sidebar" />
