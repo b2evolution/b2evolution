@@ -516,13 +516,15 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE T_posts
 							DROP COLUMN post_karma,
-							MODIFY COLUMN post_author	int(11) unsigned NOT NULL default '0',
+							DROP INDEX post_author,
+							CHANGE COLUMN post_author	post_creator_user_ID int(11) unsigned NOT NULL default '0',
 							ADD post_parent_ID				int(10) unsigned NULL AFTER ID,
-							ADD post_assigned_user_ID	int(10) unsigned NULL AFTER post_author,
+							ADD post_assigned_user_ID	int(10) unsigned NULL AFTER post_creator_user_ID,
 							ADD post_pst_ID						int(11) unsigned NULL AFTER post_status,
 							ADD post_ptyp_ID					int(11) unsigned NULL AFTER post_pst_ID,
 							ADD post_views						INT NOT NULL DEFAULT '0' AFTER post_flags,
 							ADD post_commentsexpire		DATETIME DEFAULT NULL AFTER post_comments,
+							ADD INDEX post_creator_user_ID( post_creator_user_ID ),
 							ADD INDEX post_parent_ID( post_parent_ID ),
 							ADD INDEX post_assigned_user_ID( post_assigned_user_ID ),
 							ADD INDEX post_ptyp_ID( post_ptyp_ID ),

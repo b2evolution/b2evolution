@@ -50,7 +50,7 @@ class DataObjectList
 	var	$dbtablename;
 	var $dbprefix;
 	var $dbIDname;
-	var $posts_per_page = 15;			
+	var $posts_per_page = 15;
 	/** 
 	 * SQL query string
 	 */
@@ -153,6 +153,9 @@ class DataObjectList
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/10 19:45:55  fplanque
+ * refactoring
+ *
  * Revision 1.1  2004/10/13 22:46:32  fplanque
  * renamed [b2]evocore/*
  *

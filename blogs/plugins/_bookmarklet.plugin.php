@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Sidebar plugin.
+ * This file implements the Bookmarket plugin.
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *

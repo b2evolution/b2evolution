@@ -133,7 +133,7 @@ while($row = mysql_fetch_assoc($result)){
 
 	// Build the insert sql for the post
 	$ins="INSERT INTO ".$evo_prefix."posts (
-		post_author,
+		post_creator_user_ID,
 		post_issue_date,
 		post_mod_date,
 		post_status,

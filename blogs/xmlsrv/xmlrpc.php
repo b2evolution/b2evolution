@@ -1291,7 +1291,7 @@ function pingback_ping( $m )
 
 
 		// Check that post exists
-		$sql = 'SELECT post_author
+		$sql = 'SELECT post_creator_user_ID
 						FROM T_posts
 						WHERE ID = '.$post_ID;
 		$rows = $DB->get_results( $sql );

@@ -88,7 +88,7 @@ function bpost_create(
 
 	// echo 'INSERTING NEW POST ';
 
-	$query = "INSERT INTO T_posts( post_author, post_title, post_urltitle, post_content,
+	$query = "INSERT INTO T_posts( post_creator_user_ID, post_title, post_urltitle, post_content,
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_url, post_autobr, post_flags, post_wordcount,
 														post_comments, post_renderers )
@@ -272,40 +272,6 @@ function bpost_delete( $post_ID )
 }
 
 
-
-/**
- * {@internal get_lastpostdate(-)}}
- */
-function get_lastpostdate(
-		$blog = 1,
-		$show_statuses = array(),
-		$cat = '',
-		$catsel = array(),
-		$timestamp_min = '',								// Do not show posts before this timestamp
-		$timestamp_max = 'now'							// Do not show posts after this timestamp
- )
-{
-	global $localtimenow, $postdata;
-
-	// echo 'getting last post date';
-	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', $cat, $catsel, '', 'DESC', 'issue_date', 1, '','', '', '', '', '', '', 1, 'posts', $timestamp_min, $timestamp_max );
-
-	if( $LastItem = $LastPostList->get_item() )
-	{
-		// echo 'we have a last item';
-		$last_postdata = $LastPostList->get_postdata();	// will set $postdata;
-		$lastpostdate = $postdata['Date'];
-	}
-	else
-	{
-		// echo 'we have no last item';
-		$lastpostdate = date("Y-m-d H:i:s", $localtimenow);
-	}
-	// echo $lastpostdate;
-	return($lastpostdate);
-}
-
-
 /**
  * Validate URL title
  *
@@ -406,7 +372,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
+	$sql = "SELECT ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
 					FROM T_posts
 					INNER JOIN T_categories ON post_category = cat_ID
 					WHERE ID = $postid";
@@ -423,7 +389,7 @@ function get_postdata($postid)
 	{
 		$mypostdata = array (
 			'ID' => $myrow->ID,
-			'Author_ID' => $myrow->post_author,
+			'Author_ID' => $myrow->post_creator_user_ID,
 			'Date' => $myrow->post_issue_date,
 			'Status' => $myrow->post_status,
 			'Locale' =>  $myrow->post_locale,
@@ -464,7 +430,7 @@ function Item_get_by_ID( $post_ID )
 	global $DB, $postdata, $show_statuses;
 
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
+	$sql = "SELECT ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
 									post_autobr, post_flags, post_wordcount, post_comments,
 									post_renderers, post_views, cat_blog_ID
@@ -500,7 +466,7 @@ function Item_get_by_title( $urltitle )
 	global $DB, $postdata, $show_statuses;
 
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
+	$sql = "SELECT ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
 									post_autobr, post_flags, post_wordcount, post_comments,
 									post_renderers, post_views, cat_blog_ID
@@ -1661,14 +1627,16 @@ function statuses_where_clause( $show_statuses = '' )
 		if( is_logged_in() )
 		{	// We need to be logged in to have a chance to see this:
 			global $user_ID;
-			$where .= $or." ( post_status = 'private' AND post_author = $user_ID ) ";
+			$where .= $or." ( post_status = 'private' AND post_creator_user_ID = $user_ID ) ";
 			$or = ' OR ';
 		}
 	}
 
 	if( $key = array_search( 'protected', $show_statuses ) )
 	{	// Special handling for Protected status:
-		if( (!is_logged_in()) || (!$current_User->check_perm( 'blog_ismember', 1, false, $blog )) )
+		if( (!is_logged_in())
+			|| ($blog == 0) // No blog specified (ONgsb)
+			|| (!$current_User->check_perm( 'blog_ismember', 1, false, $blog )) )
 		{ // we are not allowed to see this if we are not a member of the current blog:
 			unset( $show_statuses[$key] );
 		}
@@ -1695,6 +1663,9 @@ function statuses_where_clause( $show_statuses = '' )
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/10 19:45:55  fplanque
+ * refactoring
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

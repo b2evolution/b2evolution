@@ -95,7 +95,7 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Copying Miniblog posts... ';
-	$query = "INSERT INTO T_posts( ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_category, post_autobr, post_flags, post_comments )
+	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_category, post_autobr, post_flags, post_comments )
 						SELECT id, authorId, created, modified, 'published', '$default_locale', content, title, $cat_imported, 0, 'pingsdone,imported', 'open'
 						FROM miniblog
 						WHERE parentId = 0";

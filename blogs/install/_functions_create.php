@@ -164,7 +164,7 @@ function create_b2evo_tables()
 	$query = "CREATE TABLE T_posts (
 		ID 										int(10) unsigned NOT NULL auto_increment,
 		post_parent_ID				int(10) unsigned NULL,
-		post_author 					int(11) unsigned NOT NULL default '0',
+		post_creator_user_ID				int(11) unsigned NOT NULL default '0',
 		post_assigned_user_ID	int(10) unsigned NULL,
 		post_issue_date				datetime NOT NULL default '0000-00-00 00:00:00',
 		post_mod_date					datetime NOT NULL default '0000-00-00 00:00:00',
@@ -189,7 +189,7 @@ function create_b2evo_tables()
 		UNIQUE post_urltitle( post_urltitle ),
 		INDEX post_issue_date( post_issue_date ),
 		INDEX post_category( post_category ),
-		INDEX post_author( post_author ),
+		INDEX post_creator_user_ID( post_creator_user_ID ),
 		INDEX post_status( post_status ),
 		INDEX post_parent_ID( post_parent_ID ),
 		INDEX post_assigned_user_ID( post_assigned_user_ID ),
@@ -1029,7 +1029,7 @@ function create_b2evo_relations()
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_creator_user_ID
-											foreign key (post_author)
+											foreign key (post_creator_user_ID)
 											references T_users (ID)
 											on delete restrict
 											on update restrict,

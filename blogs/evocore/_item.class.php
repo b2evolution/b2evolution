@@ -114,7 +114,7 @@ class Item extends DataObject
 		else
 		{
 			$this->ID = $db_row->ID;
-			$this->Author = & $UserCache->get_by_ID( $db_row->post_author ); // NO COPY...(?)
+			$this->Author = & $UserCache->get_by_ID( $db_row->post_creator_user_ID ); // NO COPY...(?)
 			$this->issue_date = $db_row->post_issue_date;
 			$this->mod_date = $db_row->post_mod_date;
 			$this->status = $db_row->post_status;
@@ -1189,6 +1189,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/10 19:45:55  fplanque
+ * refactoring
+ *
  * Revision 1.3  2004/10/17 20:18:37  fplanque
  * minor changes
  *

@@ -520,7 +520,7 @@ class User extends DataObject
 		if( $echo ) echo '<br />Getting post list to delete... ';
 		$post_list = $DB->get_list( "SELECT ID
 																	FROM T_posts
-																	WHERE post_author = $this->ID" );
+																	WHERE post_creator_user_ID = $this->ID" );
 
 		if( empty( $post_list ) )
 		{
@@ -543,7 +543,7 @@ class User extends DataObject
 			// Delete posts
 			if( $echo ) echo '<br />Deleting user\'s posts... ';
 			$ret = $DB->query(	"DELETE FROM T_posts
-														WHERE post_author = $this->ID" );
+														WHERE post_creator_user_ID = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
 		} // no posts
 
@@ -656,6 +656,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/10 19:45:55  fplanque
+ * refactoring
+ *
  * Revision 1.4  2004/11/15 18:57:05  fplanque
  * cosmetics
  *

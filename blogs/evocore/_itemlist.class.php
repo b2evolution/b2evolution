@@ -47,8 +47,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Includes:
  */
-require_once( dirname(__FILE__). '/_dataobjectlist.class.php' );
-require_once( dirname(__FILE__). '/_item.class.php' );
+require_once dirname(__FILE__).'/_dataobjectlist.class.php';
+require_once dirname(__FILE__).'/_item.class.php';
+require_once dirname(__FILE__).'/_item.funcs.php';
 
 function cat_req( $parent_cat_ID, $level )
 {
@@ -105,6 +106,14 @@ class ItemList extends DataObjectList
 	 */
 	var $last_displayed_date = '';
 
+	var $show_statuses;
+	var $cat;
+	var $catsel;
+	var $timestamp_min;
+	var $timestamp_max;
+
+	var $dbcols;
+
 	/**
 	 * Constructor
 	 *
@@ -137,6 +146,8 @@ class ItemList extends DataObjectList
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
+	 * @param string Prefix of fields in the table
+	 * @param string Name of the ID field (including prefix)
 	 */
 	function ItemList(
 		$blog = 1,
@@ -161,7 +172,9 @@ class ItemList extends DataObjectList
 		$init_what_to_show = '',
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
-		$title = '' )													// urltitle of post to display
+		$title = '',													// urltitle of post to display
+		$dbprefix = 'post_',
+		$dbIDname = 'ID' )
 	{
 		global $DB;
 		global $tableposts;
@@ -170,11 +183,36 @@ class ItemList extends DataObjectList
 		global $Settings;
 
 		// Call parent constructor:
-		parent::DataObjectList( $tableposts, 'post_', 'ID' );
+		parent::DataObjectList( $tableposts, $dbprefix, $dbIDname );
+
+		// Columns to be selected:
+		$this->dbcols = array(
+											$dbprefix.'creator_user_ID',
+											$dbprefix.'issue_date',
+											$dbprefix.'mod_date',
+											$dbprefix.'status',
+											$dbprefix.'locale',
+											$dbprefix.'content',
+											$dbprefix.'title',
+											$dbprefix.'urltitle',
+											$dbprefix.'url',
+											$dbprefix.'category',
+											$dbprefix.'autobr',
+											$dbprefix.'flags',
+											$dbprefix.'wordcount',
+											$dbprefix.'comments',
+											$dbprefix.'views',
+											$dbprefix.'renderers' );
 
 		$this->preview = $preview;
 		$this->blog = $blog;
 		$this->p = $p;
+
+		$this->show_statuses = $show_statuses;
+		$this->cat = $cat;
+		$this->catsel = $catsel;
+		$this->timestamp_min = $timestamp_min;
+		$this->timestamp_max = $timestamp_max;
 
 		if( !empty($posts) )
 			$posts_per_page = $posts;
@@ -363,9 +401,9 @@ class ItemList extends DataObjectList
 				$andor = 'OR';
 			}
 			$author_array = explode(' ', $author);
-			$whichauthor .= ' AND post_author '. $eq.' '. $author_array[0];
+			$whichauthor .= ' AND post_creator_user_ID '. $eq.' '. $author_array[0];
 			for ($i = 1; $i < (count($author_array)); $i = $i + 1) {
-				$whichauthor .= ' '. $andor.' post_author '. $eq.' '. $author_array[$i];
+				$whichauthor .= ' '. $andor.' post_creator_user_ID '. $eq.' '. $author_array[$i];
 			}
 		}
 
@@ -421,7 +459,7 @@ class ItemList extends DataObjectList
 			{
 				$posts = $postend - $poststart + 1;
 				// echo 'days=',$posts;
-				$lastpostdate = get_lastpostdate( $blog, $show_statuses, $cat, $catsel,	$timestamp_min, $timestamp_max );
+				$lastpostdate = $this->get_lastpostdate();
 				$lastpostdate = mysql2date('Y-m-d 23:59:59',$lastpostdate);
 				// echo $lastpostdate;
 				$lastpostdate = mysql2date('U',$lastpostdate);
@@ -461,7 +499,7 @@ class ItemList extends DataObjectList
 			}
 			else
 			{
-				$lastpostdate = get_lastpostdate( $blog, $show_statuses, $cat, $catsel,	$timestamp_min, $timestamp_max );
+				$lastpostdate = $this->get_lastpostdate();
 				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
@@ -509,12 +547,9 @@ class ItemList extends DataObjectList
 			$where .= ' AND post_issue_date <= \''. $date_max.'\'';
 		}
 
-		$this->request = 'SELECT DISTINCT ID, post_author, post_issue_date, post_mod_date,
-																			post_status, post_locale, post_content, post_title,
-																			post_urltitle, post_url, post_category,
-																			post_autobr, post_flags, post_wordcount, post_comments,
-																			post_views, post_renderers
-											FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+		$this->request = "SELECT DISTINCT $this->dbIDname, "
+																			.implode( ', ', $this->dbcols )
+										.' FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
 														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $blog == 1 )
@@ -610,7 +645,7 @@ class ItemList extends DataObjectList
 
 		return "SELECT
 										0 AS ID,
-										$preview_userid AS post_author,
+										$preview_userid AS post_creator_user_ID,
 										'$post_date' AS post_issue_date,
 										'$post_date' AS post_mod_date,
 										'".$DB->escape($post_status)."' AS post_status,
@@ -627,6 +662,36 @@ class ItemList extends DataObjectList
 										'open' AS post_comments,
 										'".$DB->escape( $post_renderers )."' AS post_renderers";
 	}
+
+
+	/**
+	 * {@internal ItemList::get_lastpostdate(-)}}
+	 */
+	function get_lastpostdate()
+	{
+		global $localtimenow, $postdata;
+
+		// echo 'getting last post date';
+		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
+																		 '', 'DESC', 'issue_date', 1, '','', '', '', '', '', '', 1, 'posts',
+																		 $this->timestamp_min, $this->timestamp_max, '', $this->dbprefix,
+																		 $this->dbIDname );
+
+		if( $LastItem = $LastPostList->get_item() )
+		{
+			// echo 'we have a last item';
+			$last_postdata = $LastPostList->get_postdata();	// will set $postdata;
+			$lastpostdate = $postdata['Date'];
+		}
+		else
+		{
+			// echo 'we have no last item';
+			$lastpostdate = date('Y-m-d H:i:s', $localtimenow);
+		}
+		// echo $lastpostdate;
+		return($lastpostdate);
+	}
+
 
 	/*
 	 * ItemList->restart(-)
@@ -808,7 +873,7 @@ class ItemList extends DataObjectList
 		// echo 'starting ',$row->post_title;
 		$postdata = array (
 			'ID' => $row->ID,
-			'Author_ID' => $row->post_author,
+			'Author_ID' => $row->post_creator_user_ID,
 			'Date' => $row->post_issue_date,
 			'Status' => $row->post_status,
 			'Locale' =>	 $row->post_locale,
@@ -905,6 +970,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/10 19:45:55  fplanque
+ * refactoring
+ *
  * Revision 1.4  2004/12/09 21:21:20  fplanque
  * introduced foreign key support
  *

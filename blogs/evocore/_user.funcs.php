@@ -299,7 +299,7 @@ function get_usernumposts( $userid )
 	global $DB;
 	return $DB->get_var( "SELECT count(*)
 												FROM T_posts
-												WHERE post_author = $userid" );
+												WHERE post_creator_user_ID = $userid" );
 }
 
 
@@ -631,6 +631,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/10 19:45:55  fplanque
+ * refactoring
+ *
  * Revision 1.4  2004/11/15 18:57:05  fplanque
  * cosmetics
  *
