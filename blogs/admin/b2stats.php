@@ -319,7 +319,7 @@ switch( $show )
 	<table class='invisible'>
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
-				<td><?php stats_referer("<a href=\"", "\">") ?><?php stats_user_agent('robots') ?><?php stats_referer("", "</a>", false) ?></td>
+				<td><?php stats_referer('<a href="', '">') ?><?php stats_user_agent( true ) ?><?php stats_referer('', '</a>', false) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
@@ -340,11 +340,11 @@ switch( $show )
 
 	<h3><?php echo T_('Top Aggregators') ?>:</h3>
 	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
-	<?php refererList(40,'global',0,0,"'rss'",'hit_user_agent',$blog,true,true); ?>
+	<?php refererList(40, 'global', 0, 0, "'rss'", 'hit_user_agent', $blog, true, true); ?>
 	<table class='invisible'>
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
-				<td><?php stats_user_agent(true) ?></td>
+				<td><?php stats_user_agent( true ) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>

@@ -41,10 +41,10 @@ if( !isset($debug) ) $debug = 0;
 if( !isset($demo_mode) ) $demo_mode = 0;
 
 
-if( $use_gzipcompression && extension_loaded('zlib') )
-{	// gzipping the output of the script
-	ob_start( 'ob_gzhandler' );
-}
+// register output buffer handler
+$debug = 0; // FOR TESTING ONLY - OBHANDLERTEST
+ob_start( 'obhandler' );
+
 
 // Connecting to the db:
 dbconnect();

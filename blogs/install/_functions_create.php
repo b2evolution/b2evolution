@@ -256,7 +256,7 @@ function create_antispam()
  * create_locales(-)
  *
  * Used when creating full install and upgrading from earlier versions
- * @author dAniel
+ * @author blueyed
  *
  */
 function create_locales()
@@ -266,7 +266,7 @@ function create_locales()
 	
 	echo 'Creating table for Locales... ';
 	$query = "CREATE TABLE $tablelocales (
-		loc_locale varchar(10) NOT NULL default '',
+		loc_locale varchar(20) NOT NULL default '',
 		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
 		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
 		loc_timefmt varchar(10) NOT NULL default 'H:i:s',

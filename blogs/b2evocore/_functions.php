@@ -1250,7 +1250,7 @@ function validate_url( $url, & $allowed_uri_scheme )
  *
  * {@internal pre_dump(-) }}
  *
- * @author dAniel
+ * @author blueyed
  * @param mixed variable to dump
  * @param string title to display
  * @return -
@@ -1317,6 +1317,149 @@ function debug_info( $force = false )
 		}
 
 	}
+}
+
+/**
+ * Output Buffer handler.
+ *
+ * It will be set in /blogs/evocore/_main.php and handle the output.
+ * It strips every line and generates a md5-ETag, which is checked against the one eventually
+ * being sent by the browser.
+ *
+ * @author blueyed
+ * {@internal obhandler(-) }}
+ *
+ * @param string output given by PHP
+*/
+function obhandler( $output )
+{
+	global $lastmodified, $use_gzipcompression;
+
+	if( !isset( $lastmodified ) )
+	{ // default of lastmodified is now
+		$lastmodified = time();
+	}
+	
+	// strip each line
+	$output = explode("\n", $output);
+	$out = '';
+	foreach ($output as $v)
+		$out .= trim($v) . "\n";
+	
+	//////////////////////////////////////
+	// Generating ETAG
+	
+	// prefix with PUB or AUT.
+	if( is_logged_in() )
+		$ETag = 'AUT';    // A private page
+	else $ETag = 'PUB'; // and public one
+	
+	$ETag .= md5( $out );
+	header( 'ETag: '. $ETag );
+	
+	// decide to send out or not
+	$sendout = true;
+	#return $_SERVER['HTTP_IF_NONE_MATCH'] . "\n---\n". $ETag;
+	if( isset($_SERVER['HTTP_IF_NONE_MATCH'])
+			&& $_SERVER['HTTP_IF_NONE_MATCH'] === $ETag )
+	{ // check ETag
+		$sendout = false;
+	}
+
+	if( !$sendout )
+	{  // send 304 and die
+		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
+		#log_hit();  // log this somehow?
+		die;	
+	};
+		
+	// Send Last-Modified -----------------
+	// We should perhaps make this the central point for this.
+	// Also handle Cache-Control and Pragma here (with global vars).
+	
+	// header( 'Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastmodified) );
+		
+	// GZIP encoding
+	if( $use_gzipcompression
+			&& function_exists( 'gzencode' )
+			&& isset($_SERVER['HTTP_ACCEPT_ENCODING'])
+			&& strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
+	{
+		$out = gzencode($out);
+		header( 'Content-Encoding: gzip' );
+	}
+
+	header( 'Content-Length: '. strlen($out) );
+	return $out;
+	
+	/* {{{ additional things we could do in this handler
+		# These are excerpts taken from my private site.
+		# We could have a global $lastmodified that would be checked against according
+		#  header and throw a 304 then, too.
+		
+		headers = getallheaders();
+		if (isset($site->curMenu['cache_expires'])){
+			$offset = $site->curMenu['cache_expires']; //60 * 60 * 24 * 1;
+			$header_expires = gmdate('D, d M Y H:i:s \G\M\T', time() + $offset);
+			header ("Cache-Control: max-age=$offset, must-revalidate"); // HTTP/1.1 
+		} else $header_expires = 'Fri, 06 Feb 1981 14:22:42 GMT';
+		
+		if ((isset($site->curMenu['nocache']) && ($site->curMenu['nocache'] == true))
+				|| isset($user->name)){
+			header ("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1 
+			header ("Pragma: no-cache"); // HTTP/1.0 
+		}
+		else {
+			header("Cache-Control: max-age=3600, must-revalidate");	
+	
+			# get LastModified from file(s)
+			$contfile = 'content_' . $site->subMenu[0] . '.php';
+			if (file_exists('update.include.stamp')) $lm_included = filemtime('update.include.stamp'); else $lm_included = 0;
+			$lastModified = (filemtime($contfile) > $lm_included)? filemtime($contfile): $lastModified = $lm_included;
+			
+			# get LastModified from db entries
+			if ($site->subMenu[0] == 'links'){
+				$sql = 'SELECT UNIX_TIMESTAMP(dt) FROM tq_links WHERE submenu="links&' . 
+									$site->subMenu[1] . '" AND unix_timestamp(dt)-' . $lastModified . '>0 ORDER BY dt DESC';
+				$result = $site->dbquery($sql, 'get_lm_linkdb', true);
+				if (mysql_numrows($result) > 0) $lastModified = mysql_result($result, 0);
+			}
+			
+			# check and react on "If-Modified-Since" header
+			if(isset($headers["If-Modified-Since"]) && $_SERVER['REQUEST_METHOD'] != 'POST') {
+				$arraySince = explode(";", $headers["If-Modified-Since"]); 
+				$since = strtotime($arraySince[0]);
+				if ($since >= $lastModified) $refresh = false;
+			}
+			# nur, wenn cachen erlaubt ist.
+			header('Expires: ' . $header_expires);
+		}
+	
+		if (isset($user->name))
+			$ETag = "\"AUT" . $lastModified . "\"";  // A private page
+		else $ETag = "\"PUB" . $lastModified . "\"";	 // and public one 
+		
+		if (isset($headers["If-None-Match"])) { // check ETag 
+			$refresh = (strcmp($headers["If-None-Match"], $ETag) == 0 )? FALSE: TRUE;
+		}
+	
+		if(!$refresh) {
+			header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
+			$hit->HTTPcode = '304';
+		};
+			
+		if(!$refresh) {
+			ob_end_clean();
+			die;	
+		}
+		header("ETag: $ETag");
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastModified));
+		
+		header('Content-type: text/html; charset=iso-8859-1');
+	
+		//header("Cache-Control: max-age=86400, must-revalidate");
+		//header("Cache-Control: max-age=10, must-revalidate");
+		}}}*/
 }
 
 ?>

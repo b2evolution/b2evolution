@@ -25,20 +25,21 @@ if ($topRefererList)
 }
 */
 
-/*
- * log_hit(-)
- *
+
+/**
  * Log a hit on a blog page / rss feed
+ *
  */
 function log_hit()
 {
 	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
 	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page;
 	
-	$ReqURI = $_SERVER['REQUEST_URI'];
-	// debug_log( 'Hit Log: '. "current url: ".$ReqURI);
+	# TODO: check for already logged?
+	
+	// debug_log( 'Hit Log: current url: '. $_SERVER['REQUEST_URI']);
 
-	$fullCurrentURL = "http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+	$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI'];
 	// debug_log( 'Hit Log: '. "full current url: ".$fullCurrentURL);
 
 	$ref = $HTTP_REFERER;
@@ -55,7 +56,7 @@ function log_hit()
 	{ //then they have tried something funny,
 		//putting HTML or PHP into the HTTP_REFERER
 		debug_log( 'Hit Log: '.T_("bad char in User Agent"));
-		$UserAgent = "";
+		$UserAgent = '';
 	}
 
 	// debug_log( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -67,12 +68,12 @@ function log_hit()
 	{ //then they have tried something funny,
 		//putting HTML or PHP into the HTTP_REFERER
 		//$ignore = 'badchar';
-		debug_log( 'Hit Log: '.'bad char in referer');
+		debug_log( 'Hit Log: bad char in referer');
 		return;		// Hazardous
 	}
 	elseif( $error = validate_url( $ref, $comments_allowed_uri_scheme ) )
 	{	//if they are trying to inject javascript or a blocked (spam) URL
-		debug_log( 'Hit Log: '.$error);
+		debug_log( 'Hit Log: '. $error);
 		return;		// Hazardous
 	}
 	
@@ -82,24 +83,26 @@ function log_hit()
 		if (stristr($ref, $site))
 		{
 			// $ignore = 'blacklist';
-			debug_log( 'Hit Log: '. T_('referer ignored'). " (". T_('BlackList'). ")");
+			debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');
 			return;
 		}
 	}
 			
-	if( stristr($ReqURI, 'rss') || stristr($ReqURI, 'rdf') || stristr($ReqURI, 'atom')  )
+	if( stristr($_SERVER['REQUEST_URI'], 'rss')
+			|| stristr($_SERVER['REQUEST_URI'], 'rdf')
+			|| stristr($_SERVER['REQUEST_URI'], 'atom')  )
 	{
 		$ignore = "rss";
-		// don't mess up the XML!! debug_log( 'Hit Log: '."referer ignored (RSS)");
+		// don't mess up the XML!! debug_log( 'Hit Log: referer ignored (RSS));
 	}
 	else
 	{	// Lookup robots
 		foreach ($user_agents as $user_agent)
 		{
-			if( ($user_agent[0]=='robot') && (strstr($UserAgent, $user_agent[1])) )
+			if( ($user_agent[0] == 'robot') && (strstr($UserAgent, $user_agent[1])) )
 			{
 				$ignore = "robot";
-				debug_log( 'Hit Log: '. T_('referer ignored'). " (". T_('robot'). ")");
+				debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('robot'). ')');
 				break;
 			}
 		}
@@ -110,10 +113,9 @@ function log_hit()
 		if( strlen($ref) < 13 )
 		{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
 			$ignore = 'invalid';
-			debug_log( 'Hit Log: '. T_('referer ignored'). " (". T_('invalid'). ")");
+			debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
 		}
 	}
-
 
 	if( $ignore == 'no' )
 	{	// identify search engines
@@ -128,11 +130,10 @@ function log_hit()
 			}
 		}
 	}	
-		
 
 	if ($doubleCheckReferers)
 	{
-		debug_log( 'Hit Log: '.T_('loading referering page'));
+		debug_log( 'Hit Log: '. T_('loading referering page') );
 
 		//this is so that the page up until the call to
 		//logReferer will get shown before it tries to check
@@ -153,7 +154,7 @@ function log_hit()
 				}
 				if (strstr($page,$fullCurrentURL))
 				{
-					debug_log( 'Hit Log: '.T_('found current url in page'));
+					debug_log( 'Hit Log: '. T_('found current url in page') );
 					$goodReferer = 1;
 				}
 			}
@@ -171,7 +172,6 @@ function log_hit()
 
 	}
 
-
 	$baseDomain = preg_replace("/http:\/\//i", "", $ref);
 	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
 	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
@@ -186,10 +186,12 @@ function log_hit()
 }
 
 
-/*
- * hit_delete(-)
- *
+/**
  * Delete a hit
+ *
+ * {@internal hit_delete(-) }}
+ *
+ * @param int ID to delete
  */
 function hit_delete( $hit_ID )
 {
@@ -200,10 +202,13 @@ function hit_delete( $hit_ID )
 
 }
 
-/*
- * hit_prune(-)
- *
+
+/**
  * Delete all hits from a certain date
+ *
+ * {@internal hit_prune(-) }}
+ *
+ * @param int unix timestamp to delete hits for
  */
 function hit_prune( $date )
 {
@@ -215,10 +220,14 @@ function hit_prune( $date )
 
 }
 
-/*
- * hit_change_type(-)
- *
+
+/**
  * Change type for a hit
+ *
+ * {@internal hit_change_type(-) }}
+ *
+ * @param int ID to change
+ * @param string new type, must be valid ENUM for hit_ignore field
  */
 function hit_change_type( $hit_ID, $type )
 {
@@ -232,8 +241,9 @@ function hit_change_type( $hit_ID, $type )
 }
 
 
-/*
- * refererList(-)
+/**
+ *
+ * {@internal refererList(-) }}
  *
  * Extract stats
  */
@@ -329,6 +339,7 @@ function stats_hit_ID()
 	echo $row_stats['visitID'];
 }
 
+
 /*
  * stats_time(-)
  */
@@ -350,6 +361,7 @@ function stats_total_hit_count()
 	echo $stats_total_hits;
 }
 
+
 /*
  * stats_hit_count(-)
  */
@@ -358,6 +370,7 @@ function stats_hit_count()
 	global $row_stats;
 	echo $row_stats['totalHits'];
 }
+
 
 /*
  * stats_hit_percent(-)
@@ -371,6 +384,7 @@ function stats_hit_percent(
 	echo number_format( $percent, $decimals, $dec_point, '' ).'&nbsp;%';
 }
 
+
 /*
  * stats_blog_ID(-)
  */
@@ -379,6 +393,7 @@ function stats_blog_ID()
 	global $row_stats;
 	echo $row_stats['hit_blog_ID'];
 }
+
 
 /*
  * stats_blog_name(-)
@@ -389,6 +404,7 @@ function stats_blog_name()
 	$stats_blogparams = get_blogparams_by_ID( $row_stats['hit_blog_ID'] );
 	echo format_to_output( $stats_blogparams->blog_name, 'htmlbody' );
 }
+
 
 /*
  * stats_referer(-)
@@ -405,6 +421,7 @@ function stats_referer( $before='', $after='', $disp_ref = true )
 	}
 }
 
+
 /*
  * stats_basedomain(-)
  */
@@ -417,7 +434,8 @@ function stats_basedomain( $disp = true )
 		return $row_stats['baseDomain'];
 }
 
-/*
+
+/**
  * stats_search_keywords(-)
  *
  * Displays keywords used for search leading to this page
@@ -457,6 +475,7 @@ function stats_search_keywords()
 	echo '[', T_('no query string found'), ']';
 }
 
+
 /*
  * stats_req_URI(-)
  */
@@ -466,13 +485,16 @@ function stats_req_URI()
 	echo htmlentities($row_stats['visitURL']);
 }
 
-/*
+
+/**
  * stats_user_agent(-)
+ *
+ * @param boolean
  */
 function stats_user_agent( $translate = false )
 {
 	global $row_stats, $user_agents;
-	$UserAgent = $row_stats['hit_user_agent'];
+	$UserAgent = $row_stats[ 'hit_user_agent' ];
 	if( $translate )
 	{
 		foreach ($user_agents as $curr_user_agent)
@@ -488,7 +510,7 @@ function stats_user_agent( $translate = false )
 }
 
 
-/** 
+/**
  * Display "Statistics" title if these have been requested
  *
  * {@internal stats_title(-) }}
@@ -503,7 +525,7 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 	
 	if( $disp == 'stats' )
 	{
-		$info = $prefix.T_('Statistics');
+		$info = $prefix. T_('Statistics');
 		if ($display)
 			echo format_to_output( $info, $display );
 		else
@@ -526,5 +548,4 @@ where `hit_ignore` LIKE 'invalid' AND `hit_user_agent` LIKE 'FAST-WebCrawler/%'
 
 
 */
-
 ?>

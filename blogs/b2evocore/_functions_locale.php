@@ -230,7 +230,7 @@ function locale_options( $default = '' )
  *
  * {@internal locale_from_httpaccept(-)}}
  *
- * @author dAniel
+ * @author blueyed
  *
  * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
  */

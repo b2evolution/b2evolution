@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * b2evolution - http://b2evolution.net/
  *
@@ -21,7 +21,7 @@
 </head>
 <body>
 
-<?php 
+<?php
 param( 'blog', 'integer', 0, true );	// We need this for the urls
 
 if( empty($mode) )
@@ -36,13 +36,16 @@ if( empty($mode) )
 		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
 	</div>
 
+	<?php /* FOR TESTING ONLY - OBHANDLERTEST
 	<div id="headinfo">
 		b2evo v <strong><?php echo $b2_version ?></strong>
 		&middot; <?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
 		&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
-		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong> 
+		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
 	</div>
-	 
+	FOR TESTING ONLY - OBHANDLERTEST */ ?>
+	
+	
 	<ul>
 	<?php
 		if( ($title == T_('New post in blog:')) || ($title == T_('Adding new post...')) )
@@ -50,25 +53,25 @@ if( empty($mode) )
 		else
 			echo '<li>';
 		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('New Post'), '</a></li>';
-	
+
 		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) || ($title == T_('Updating post...')) || ($title == T_('Updating post status...')) || ($title == T_('Deleting post...'))  )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Browse/Edit'), '</a></li>';
-	
+
 		if( $title == T_('Categories for blog:') )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2categories.php?blog=', $blog, '" >', T_('Cats'), '</a></li>';
-	
+
 		if( $title == T_('Blogs') )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2blogs.php" >', T_('Blogs'), '</a></li>';
-	
+
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{
 			if( $title == T_('View Stats') )
@@ -77,7 +80,7 @@ if( empty($mode) )
 				echo '<li>';
 			echo '<a href="b2stats.php" >', T_('Stats'), '</a></li>';
 		}
-	
+
 		if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{
 			if( $title == T_('Antispam') )
@@ -86,7 +89,7 @@ if( empty($mode) )
 				echo '<li>';
 			echo '<a href="b2antispam.php" >', T_('Antispam'), '</a></li>';
 		}
-		
+
 		if( $current_User->check_perm( 'templates', 'any' ) )
 		{
 			if( $title == T_('Custom skin template editing') )
@@ -95,7 +98,7 @@ if( empty($mode) )
 				echo '<li>';
 			echo '<a href="b2template.php">', T_('Templates'), '</a></li>';
 		}
-	
+
 		if( $current_User->check_perm( 'users', 'view' ) )
 		{
 			if( $title == T_('User management') )
@@ -104,7 +107,7 @@ if( empty($mode) )
 				echo '<li>';
 			echo '<a href="b2users.php" >', T_('Users'), '</a></li>';
 		}
-			
+
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{
 			if( $title == T_('Options') )
@@ -113,22 +116,22 @@ if( empty($mode) )
 				echo '<li>';
 			echo '<a href="b2options.php" >', T_('Options'), '</a></li>';
 		}
-	
+
 		if( $title == T_('My Profile') )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2profile.php" >', T_('My Profile'), '</a></li>';
-	
+
 	?>
-	
+
 	</ul>
 </div>
 
-<?php 
+<?php
 }	// not in special mode
 ?>
-	
+
 <h1><strong>:: <?php echo $title; ?></strong>
 
 

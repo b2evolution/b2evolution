@@ -222,7 +222,7 @@ function upgrade_b2evo_tables()
 		 *
 		 * converts languages in a given table into according locales
 		 *
-		 * @author dAniel
+		 * @author blueyed
 		 * @param string name of the table
 		 * @param string name of the column where lang is stored
 		 * @param string name of the table's ID column
