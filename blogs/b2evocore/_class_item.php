@@ -18,7 +18,7 @@ class Item extends DataObject
 	var $Author;
 	var $issue_date;
 	var $mod_date;
-	var $scope;
+	var $status;
 	var $locale;
 	var $title;
 	var $urltitle;
@@ -60,7 +60,7 @@ class Item extends DataObject
 			$this->Author = new User( $authordata ); // COPY!
 			$this->issue_date = $db_row->post_issue_date;
 			$this->mod_date = $db_row->post_mod_date;
-			$this->scope = $db_row->post_status;
+			$this->status = $db_row->post_status;
 			$this->locale = $db_row->post_locale;
 			$this->title = $db_row->post_title;
 			$this->urltitle = $db_row->post_urltitle;
@@ -343,7 +343,7 @@ class Item extends DataObject
 						$closed_msg = '#'
 						) 
 	{
-		if( ($this->scope == 'draft') || ($this->scope == 'deprecated' ) )
+		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) )
 		{	// Post is not published
 			if( $non_published_msg == '#' )
 				$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
@@ -621,30 +621,30 @@ class Item extends DataObject
 
 
 	/** 
-	 * Template function: display scope of item
+	 * Template function: display status of item
 	 *
-	 * Scopes:
+	 * Statuses:
 	 * - published
 	 * - deprecated
 	 * - protected
 	 * - private
 	 * - draft
 	 *
-	 * {@internal Item::scope(-) }}
+	 * {@internal Item::status(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function scope( $format = 'htmlbody' ) 
+	function status( $format = 'htmlbody' ) 
 	{
 		global $post_statuses;
 
 		if( $format == 'raw' )
 		{
-			$this->disp( 'scope', 'raw' );
+			$this->disp( 'status', 'raw' );
 		}
 		else
 		{
-			echo format_to_output( T_( $post_statuses[$this->scope] ), $format );
+			echo format_to_output( T_( $post_statuses[$this->status] ), $format );
 		}
 	}
 

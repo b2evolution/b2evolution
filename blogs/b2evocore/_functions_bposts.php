@@ -465,7 +465,7 @@ function the_ID()
  *
  * Display post status
  *
- * @deprecated deprecated by {@link Item::scope()}
+ * @deprecated deprecated by {@link Item::status()}
  */
 function the_status( $raw = true )
 {

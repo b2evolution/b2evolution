@@ -37,7 +37,7 @@ switch($action)
 
 		require (dirname(__FILE__). '/_menutop_end.php');
 
-		$post_status = $edited_Item->get( 'scope' );
+		$post_status = $edited_Item->get( 'status' );
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 

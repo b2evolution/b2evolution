@@ -110,7 +110,7 @@
 	while( $Item = $MainList->get_item() )
 	{
 		?>
-		<div class="bPost<?php $Item->scope( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+		<div class="bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 			<?php 
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			$Item->anchor(); ?>
@@ -132,8 +132,8 @@
 					$Item->categories( false );
 					echo ' - ';
 					locale_flag( $Item->locale, 'h10px' );
-					echo ' - ', T_('Scope'), ': ';
-					$Item->scope();
+					echo ' - ', T_('Status'), ': ';
+					$Item->status();
 				?>
 			</div>
 
@@ -150,7 +150,7 @@
 			<p style="clear:both;">
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php
-				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'scope' ), false, $blog ) )
+				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'status' ), false, $blog ) )
 				{
 				?>
 				<form action="b2edit.php" method="get" class="inline">
