@@ -641,36 +641,36 @@ switch( $Fileman->getMode() )
 
 				<h1><?php echo T_('File upload'); ?></h1> <?php /* TODO: We need a good (smaller) default h1! */ ?>
 
-				<p>
-					<?php
-					$restrictNotes = array();
-
-					if( $allowedFileExtensions )
-					{
-						$restrictNotes[] = T_('Allowed file extensions').': '.str_replace( ' ', ', ', $allowedFileExtensions );
-					}
-					if( $allowedMimeTypes )
-					{
-						$restrictNotes[] = T_('Allowed MIME types').': '.str_replace( ' ', ', ', $allowedMimeTypes );
-					}
-					if( $Settings->get( 'upload_maxkb' ) )
-					{
-						$restrictNotes[] = sprintf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
-					}
-
-					if( $restrictNotes )
-					{
-						echo implode( '<br />', $restrictNotes ).'<br />';
-					}
-
-					?>
-				</p>
-
 				<?php $LogUpload->display( '', '', true, 'all' ); ?>
 
 
 				<fieldset style="float:left;width:60%;">
 					<legend><?php echo T_('Files to upload') ?></legend>
+
+					<p>
+						<?php
+						$restrictNotes = array();
+
+						if( $allowedFileExtensions )
+						{
+							$restrictNotes[] = T_('Allowed file extensions').': '.str_replace( ' ', ', ', $allowedFileExtensions );
+						}
+						if( $allowedMimeTypes )
+						{
+							$restrictNotes[] = T_('Allowed MIME types').': '.str_replace( ' ', ', ', $allowedMimeTypes );
+						}
+						if( $Settings->get( 'upload_maxkb' ) )
+						{
+							$restrictNotes[] = sprintf( T_('Maximum allowed file size: %s'), bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
+						}
+
+						if( $restrictNotes )
+						{
+							echo implode( '<br />', $restrictNotes ).'<br />';
+						}
+
+						?>
+					</p>
 
 					<ul id="uploadfileinputs">
 						<?php
@@ -1099,6 +1099,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.68  2005/01/14 17:39:02  blueyed
+ * layout
+ *
  * Revision 1.67  2005/01/13 20:27:42  blueyed
  * $mode
  *

@@ -157,9 +157,9 @@ ul#uploadfileinputs {
 	padding:0;
 }
 ul#uploadfileinputs li {
-	border-bottom:1px solid #ddd;
-	margin-bottom:2ex;
-	padding-bottom:2ex;
+	border-top:1px solid #ddd;
+	margin-bottom:2ex 0;
+	padding:2ex 0;
 }
 ul#uploadfileinputs li.invalid {
 	border:1px solid #f00;
