@@ -8,7 +8,7 @@
  * pop3-2-b2 mail to blog
  * This file built upon code from original b2 - http://cafelog.com/
  */
-$output_debugging_info = 1;		# =1 if you want to output debugging info
+$output_debugging_info = 0;		# =1 if you want to output debugging info
 
 require_once(dirname(__FILE__).'/../conf/_config.php');
 require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
