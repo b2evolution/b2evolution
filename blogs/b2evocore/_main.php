@@ -17,24 +17,24 @@ if( isset( $main_init ) )
 }
 $main_init = true;
 
-require_once (dirname(__FILE__).'/../conf/_config.php');
-require_once (dirname(__FILE__).'/_vars.php');					// sets various arrays and vars for use in b2
-require_once (dirname(__FILE__).'/_functions_template.php');	// function to be called from templates
-require_once (dirname(__FILE__).'/_functions.php');  
-require_once (dirname(__FILE__).'/_functions_xmlrpc.php');	
-require_once (dirname(__FILE__).'/_functions_xmlrpcs.php');
-require_once (dirname(__FILE__).'/_class_itemlist.php');
-require_once (dirname(__FILE__).'/_class_commentlist.php');
-require_once (dirname(__FILE__).'/_class_archivelist.php');
-require_once (dirname(__FILE__).'/_class_calendar.php');
-require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
-require_once (dirname(__FILE__).'/_functions_forms.php');
+require_once( dirname(__FILE__) . '/../conf/_config.php' );
+require_once( dirname(__FILE__) . '/_vars.php' );               // sets various arrays and vars for use in b2
+require_once( dirname(__FILE__) . '/_functions_template.php' );	// function to be called from templates
+require_once( dirname(__FILE__) . '/_functions.php' );
+require_once( dirname(__FILE__) . '/_functions_xmlrpc.php' );	
+require_once( dirname(__FILE__) . '/_functions_xmlrpcs.php' );
+require_once( dirname(__FILE__) . '/_class_itemlist.php' );
+require_once( dirname(__FILE__) . '/_class_commentlist.php' );
+require_once( dirname(__FILE__) . '/_class_archivelist.php' );
+require_once( dirname(__FILE__) . '/_class_calendar.php' );
+require_once( dirname(__FILE__) . '/_functions_hitlogs.php' );  // referer logging
+require_once( dirname(__FILE__) . '/_functions_forms.php' );
 
 
 timer_start();
 
 
-if( !isset($debug) ) $debug=0;
+if( !isset($debug) ) $debug = 0;
 if( !isset($demo_mode) ) $demo_mode = 0;
 
 
@@ -60,12 +60,12 @@ $localtimenow = $servertimenow + ($time_difference * 3600);
 if( !isset($login_required) ) $login_required = false;
 if( $error = veriflog( $login_required ) )
 {	// Login failed:
-	require(dirname(__FILE__)."/$core_dirout/$htsrv_subdir/login.php");
+	require(dirname(__FILE__) . "/$core_dirout/$htsrv_subdir/login.php");
 }
 
 // Load hacks file if it exists
-if( file_exists( dirname(__FILE__).'/../conf/hacks.php' ) )
+if( file_exists( dirname(__FILE__) . '/../conf/hacks.php' ) )
 {
-	require_once( dirname(__FILE__).'/../conf/hacks.php' );
+	require_once( dirname(__FILE__) . '/../conf/hacks.php' );
 }
 ?>

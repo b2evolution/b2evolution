@@ -7,20 +7,18 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-require_once (dirname(__FILE__)."/_functions_cats.php");
-require_once (dirname(__FILE__)."/_functions_blogs.php");
-require_once (dirname(__FILE__)."/_functions_bposts.php");
-require_once (dirname(__FILE__)."/_functions_users.php");
-require_once (dirname(__FILE__)."/_functions_trackback.php");
-require_once (dirname(__FILE__)."/_functions_pingback.php");
-require_once (dirname(__FILE__)."/_functions_pings.php");
-require_once (dirname(__FILE__)."/_functions_skins.php");
-require_once (dirname(__FILE__).'/_functions_errors.php');
-require_once (dirname(__FILE__).'/_functions_antispam.php');
+require_once( dirname(__FILE__) . '/_functions_cats.php' );
+require_once( dirname(__FILE__) . '/_functions_blogs.php' );
+require_once( dirname(__FILE__) . '/_functions_bposts.php' );
+require_once( dirname(__FILE__) . '/_functions_users.php' );
+require_once( dirname(__FILE__) . '/_functions_trackback.php' );
+require_once( dirname(__FILE__) . '/_functions_pingback.php' );
+require_once( dirname(__FILE__) . '/_functions_pings.php' );
+require_once( dirname(__FILE__) . '/_functions_skins.php' );
+require_once( dirname(__FILE__) . '/_functions_errors.php' );
+require_once( dirname(__FILE__) . '/_functions_antispam.php' );
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
-if( $use_html_checker ) require_once (dirname(__FILE__).'/_class_htmlchecker.php');
-
-
+if( $use_html_checker ) require_once( dirname(__FILE__) . '/_class_htmlchecker.php' );
 
 
 /* functions... */
@@ -54,12 +52,10 @@ function dbconnect()
 function mysql_oops($sql_query)
 {
 	$error  = '<p class="error">'.T_('Oops, MySQL error!').'</p>';
-	$error .= '<p>Your query:<br /><code>'.$sql_query.'</code></p>';
-	$error .= '<p>MySQL said:<br /><code>'.mysql_error().'</code></p>';
+	$error .= '<p>Your query:<br /><code>' . $sql_query . '</code></p>';
+	$error .= '<p>MySQL said:<br /><code>' . mysql_error() . '</code></p>';
 	die($error);
 }
-
-
 
 
 /***** Formatting functions *****/
@@ -288,7 +284,6 @@ function backslashit($string) {
 }
 
 
-
 /*
  * convert_chars(-)
  *
@@ -469,18 +464,18 @@ function phpcurlme( & $string, $language = 'en')
 	if( $use_smartquotes )
 	{
     // This should take care of the single quotes
-    $string = preg_replace("/'([dmst])([ .,?!\)\/<])/i","&#8217;$1$2",$string);
-    $string = preg_replace("/'([lrv])([el])([ .,?!\)\/<])/i","&#8217;$1$2$3",$string);
-    $string = preg_replace("/([^=])(\s+)'([^ >])?(.*?)([^=])'(\s*)([^>&])/S","$1$2&#8216;$3$4$5&#8217;$6$7",$string);
+		$string = preg_replace("/'([dmst])([ .,?!\)\/<])/i", "&#8217;$1$2", $string);
+		$string = preg_replace("/'([lrv])([el])([ .,?!\)\/<])/i", "&#8217;$1$2$3", $string);
+		$string = preg_replace("/([^=])(\s+)'([^ >])?(.*?)([^=])'(\s*)([^>&])/S", "$1$2&#8216;$3$4$5&#8217;$6$7", $string);
 
     // time for the doubles
-    $string = preg_replace('/([^=])(\s+)"([^ >])?(.*?)([^=])"(\s*)([^>&])/S',"$1$2&#8220;$3$4$5&#8221;$6$7",$string);
+		$string = preg_replace('/([^=])(\s+)"([^ >])?(.*?)([^=])"(\s*)([^>&])/S', "$1$2&#8220;$3$4$5&#8221;$6$7", $string);
     // multi-paragraph
-    $string = preg_replace('/<p>"(.*)<\/p>/U',"<p>&#8220;$1</p>",$string);
+		$string = preg_replace('/<p>"(.*)<\/p>/U', "<p>&#8220;$1</p>", $string);
 
     // not a quote, but whatever
-    $string = str_replace('---','&#8212;',$string);
-    $string = str_replace('--','&#8211;',$string);
+		$string = str_replace('---', '&#8212;', $string);
+		$string = str_replace('--', '&#8211;', $string);
   }
 }
 
@@ -600,7 +595,7 @@ function antispambot($emailaddy, $mailto=0) {
 		} elseif ($j==1) {
 			$emailNOSPAMaddy .= substr($emailaddy,$i,1);
 		} elseif ($j==2) {
-			$emailNOSPAMaddy .= '%'.zeroise(dechex(ord(substr($emailaddy, $i, 1))), 2);
+			$emailNOSPAMaddy .= '%' . zeroise(dechex(ord(substr($emailaddy, $i, 1))), 2);
 		}
 	}
 	$emailNOSPAMaddy = str_replace('@','&#64;',$emailNOSPAMaddy);
@@ -646,9 +641,6 @@ function get_settings($setting)
 }
 
 
-
-
-
 function alert_error($msg) 
 { // displays a warning box with an error message (original by KYank)
 	global $default_language;
@@ -672,6 +664,7 @@ function alert_error($msg)
 	exit;
 }
 
+
 function alert_confirm($msg) 
 { // asks a question - if the user clicks Cancel then it brings them back one page
 	?>
@@ -684,6 +677,7 @@ function alert_confirm($msg)
 	</script>
 	<?php
 }
+
 
 function redirect_js($url,$title="...") {
 	?>
@@ -701,6 +695,7 @@ function redirect_js($url,$title="...") {
 	<?php
 	exit();
 }
+
 
 // functions to count the page generation time (from phpBB2)
 // ( or just any time between timer_start() and timer_stop() )
@@ -738,7 +733,6 @@ function xmlrpc_getposttitle($content) {
 	}
 	return($post_title);
 }
-
 
 
 function xmlrpc_getpostcategory($content) {
@@ -865,7 +859,6 @@ function balanceTags($text)
 
 	# b2 bug fix for LOVE <3 (and other situations with '<' before a number)
 	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
-
 
 	while( preg_match("/<(\/?\w*)\s*([^>]*)>/", $text, $regex) )
 	{

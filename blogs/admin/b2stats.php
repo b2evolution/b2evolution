@@ -5,27 +5,27 @@
  * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
-require_once (dirname(__FILE__).'/_header.php');
-require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_hitlogs.php');						// referer logging
+require_once( dirname(__FILE__) . '/_header.php' );
+require_once( dirname(__FILE__) . '/' . $admin_dirout . '/' . $core_subdir . '/_functions_hitlogs.php' ); // referer logging
 $title = T_('View Stats');
 
 param( 'blog', 'integer', 0, true );
 param( 'action', 'string' );
 param( 'show', 'string', 'referers' );
 
-require(dirname(__FILE__).'/_menutop.php');
+require(dirname(__FILE__) . '/_menutop.php');
 ?>
 	:
-	<?php 
+	<?php
 	if( $show == 'summary' ) echo '<strong>[';
 	echo '<a href="b2stats.php?show=summary&blog=', $blog, '">', T_('Summary'), '</a>';
-	if( $show == 'summary' ) echo ']</strong>'; 
+	if( $show == 'summary' ) echo ']</strong>';
 	echo ' | ';
 	if( $show == 'referers' ) echo '<strong>[';
 	echo '<a href="b2stats.php?show=referers&blog=', $blog, '">', T_('Referers'), '</a>';
-	if( $show == 'referers' ) echo ']</strong>'; 
+	if( $show == 'referers' ) echo ']</strong>';
 	echo ' | ';
-	if( $show == 'refsearches' ) echo '<strong>['; 
+	if( $show == 'refsearches' ) echo '<strong>[';
 	echo '<a href="b2stats.php?show=refsearches&blog=', $blog, '">', T_('Refering Searches'), '</a>';
 	if( $show == 'refsearches' ) echo ']</strong>';
 	echo ' | ';
@@ -39,9 +39,9 @@ require(dirname(__FILE__).'/_menutop.php');
 	echo ' | ';
 	if( $show == 'other' ) echo '<strong>[';
 	echo '<a href="b2stats.php?show=other&blog=', $blog, '">', T_('Direct Accesses'), '</a>';
-	if( $show == 'other' ) echo ']</strong>'; 
+	if( $show == 'other' ) echo ']</strong>';
 
-require(dirname(__FILE__).'/_menutop_end.php');
+require( dirname(__FILE__) . '/_menutop_end.php' );
 
 // Check permission:
 $current_User->check_perm( 'stats', 'view', true );
@@ -59,8 +59,8 @@ switch( $action )
 		?>
 		<div class="panelinfo">
 			<p><?php printf( T_('Changing hit #%d type to: %s'), $hit_ID, $hit_type) ?></p>
-			<?php 
-			hit_change_type( $hit_ID, $hit_type );	
+			<?php
+			hit_change_type( $hit_ID, $hit_type );
 			?>
 		</div>
 		<?php
@@ -76,8 +76,8 @@ switch( $action )
 		?>
 		<div class="panelinfo">
 			<p><?php printf( T_('Deleting hit #%d...'), $hit_ID )?></p>
-			<?php 
-			hit_delete( $hit_ID );	
+			<?php
+			hit_delete( $hit_ID );
 			?>
 		</div>
 		<?php
@@ -105,25 +105,25 @@ function stats_blog_select()
 {
 	global $blog, $show;
 	echo '<p>', T_('Filter'), ': ';
-	if( $blog == 0 ) 
-	{ // This is the blog being displayed on this page 
+	if( $blog == 0 )
+	{ // This is the blog being displayed on this page
 		echo '<strong>[<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>]</strong>';
 	}
 	else
 	{ // This is another blog
 		echo '<a href="b2stats.php?show=', $show, '&blog=0">', T_('None'), '</a>';
-	} 
-	for( $curr_blog_ID=blog_list_start('stub'); 
-				$curr_blog_ID!=false; 
-				 $curr_blog_ID=blog_list_next('stub') ) 
-		{ 
+	}
+	for( $curr_blog_ID=blog_list_start('stub');
+				$curr_blog_ID!=false;
+				 $curr_blog_ID=blog_list_next('stub') )
+		{
 		if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
 			| <strong>[<a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
 	<?php } else { // This is another blog ?>
 			| <a href="b2stats.php?show=<?php echo $show ?>&blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
-	<?php 
-		} 
-	} 
+	<?php
+		}
+	}
 	echo '</p>';
 }
 
@@ -150,7 +150,7 @@ switch( $show )
 		$hits['no'] = 0;
 		$hits['invalid'] = 0;
 		// $hits['badchar'] = 0;			// Not used any longer
-		// $hits['blacklist'] = 0;			// Not used any longer	
+		// $hits['blacklist'] = 0;			// Not used any longer
 		$hits['rss'] = 0;
 		$hits['robot'] = 0;
 		$hits['search'] = 0;
@@ -173,10 +173,10 @@ switch( $show )
 			{	// We just hit a new day, let's display the previous one:
 				?>
 				<tr>
-					<td><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+					<td><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ ?>
 							<a href="b2stats.php?action=prune&date=<?php echo $last_date ?>&show=summary&blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
-						<?php 
+						<?php
 						}
 						echo date( locale_datefmt(), $last_date ) ?>
 					</td>
@@ -202,7 +202,7 @@ switch( $show )
 		{	// We had a day pending:
 			?>
 			<tr>
-				<td><?php if( $current_User->check_perm( 'stats', 'edit' ) ) 
+				<td><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 					{ ?>
 					<a href="b2stats.php?action=prune&date=<?php echo $this_date ?>&show=summary&blog=<?php echo $blog ?>" title="<?php echo T_('Prune hits for this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
 					<?php
@@ -222,7 +222,7 @@ switch( $show )
 
 <?php
 		break;
-		
+
 		case 'referers':
 ?>
 <div class="panelblock">
@@ -237,14 +237,14 @@ switch( $show )
 		<tr>
 			<td><?php stats_time() ?></td>
 			<td>
-				<?php if( $current_User->check_perm( 'stats', 'edit' ) ) 
+				<?php if( $current_User->check_perm( 'stats', 'edit' ) )
 					{ ?>
 					<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" title="<?php echo T_('Delete this hit!') ?>" /></a>
 				<a href="b2stats.php?action=changetype&hit_type=search&hit_ID=<?php stats_hit_ID() ?>&show=referers&blog=<?php echo $blog ?>" title="<?php echo T_('Log as a search instead') ?>"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S') ?>" title="<?php echo T_('Log as a search instead') ?>" /></a>
 				<?php } ?>
 				<a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a>
 			</td>
-			<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+			<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ ?>
 			<td><a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
 			<?php } ?>
@@ -253,7 +253,7 @@ switch( $show )
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
-	
+
 	<h3><?php echo T_('Top referers') ?>:</h3>
 	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
@@ -272,7 +272,7 @@ switch( $show )
 
 <?php
 		break;
-		
+
 		case 'refsearches':
 ?>
 
@@ -288,7 +288,7 @@ switch( $show )
 		<tr>
 			<td><?php stats_time() ?></td>
 			<td>
-				<?php if( $current_User->check_perm( 'stats', 'edit' ) ) 
+				<?php if( $current_User->check_perm( 'stats', 'edit' ) )
 				{ ?>
 				<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=refsearches&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 				<?php
@@ -300,7 +300,7 @@ switch( $show )
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
-	
+
 	<h3><?php echo T_('Top refering search engines') ?>:</h3>
 	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
@@ -312,7 +312,7 @@ switch( $show )
 			</tr>
 		<?php } // End stat loop ?>
 	</table>
-	
+
 	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
 	<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true); ?>
@@ -330,7 +330,7 @@ switch( $show )
 
 <?php
 		break;
-		
+
 		case 'syndication':
 ?>
 
@@ -356,7 +356,7 @@ switch( $show )
 
 <?php
 		break;
-		
+
 		case 'other':
 ?>
 
@@ -371,7 +371,7 @@ switch( $show )
 		<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 		<tr>
 			<td><?php stats_time() ?></td>
-			<?php if( $current_User->check_perm( 'stats', 'edit' ) ) 
+			<?php if( $current_User->check_perm( 'stats', 'edit' ) )
 			{ ?>
 			<td>
 				<a href="b2stats.php?action=delete&hit_ID=<?php stats_hit_ID() ?>&show=other&blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
@@ -382,12 +382,12 @@ switch( $show )
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
-	
+
 </div>
 
 <?php
 		break;
-		
+
 		case 'useragents':
 ?>
 
@@ -413,5 +413,5 @@ switch( $show )
 		break;
 }
 
-require( dirname(__FILE__).'/_footer.php' ); 
+require( dirname(__FILE__).'/_footer.php' );
 ?>

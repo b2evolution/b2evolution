@@ -10,8 +10,8 @@
  *
  * @package b2evocore
  */
-require_once dirname(__FILE__).'/_class_dataobjectlist.php';
-require_once dirname(__FILE__).'/_class_item.php';
+require_once( dirname(__FILE__) . '/_class_dataobjectlist.php' );
+require_once( dirname(__FILE__) . '/_class_item.php' );
 
 function cat_req( $parent_cat_ID, $level )
 {
@@ -46,31 +46,31 @@ class ItemList extends DataObjectList
 	var $total_num_posts;			// Total number of posts
 	var $max_paged;						// Max page number for paged display
 
-	var $group_by_cat;	
-	
+	var $group_by_cat;
+
 	// Used in looping
 	var	$row_num;							// Current row
 	var	$row;									// Current row
 	var $main_cat;						// Current main category
-	var $previous_main_cat;		// Previous one		
+	var $previous_main_cat;		// Previous one
 	/**
 	 * @access private
 	 */
-	var $last_Item; 
+	var $last_Item;
 
 	/**
 	 * @access private
 	 */
-	var $last_displayed_date = ''; 
-	 	
-	/* 
+	var $last_displayed_date = '';
+
+	/*
 	 * ItemList::ItemList(-)
 	 *
 	 * Constructor
 	 */
-	function ItemList( 
-		$blog = 1, 
-		$show_statuses = array(),					
+	function ItemList(
+		$blog = 1,
+		$show_statuses = array(),
 		$p = '',															// Specific post number to display
 		$m = '',															// YearMonth(Day) to display
 		$w = '',															// Week number
@@ -87,7 +87,7 @@ class ItemList extends DataObjectList
 		$sentence = '',												// Search for sentence or for words
 		$exact = '',													// Require exact match of title or contents
 		$preview = '',												// Is this preview
-		$default_posts_per_page = '', 
+		$default_posts_per_page = '',
 		$init_what_to_show = '',
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now'  )							// Do not show posts after this timestamp
@@ -96,7 +96,7 @@ class ItemList extends DataObjectList
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $cache_categories, $time_difference;
 		global $cat_array; // communication with recursive callback funcs
-			
+
 		// Call parent constructor:
 		parent::DataObjectList( $tableposts, 'post_', 'ID' );
 
@@ -125,62 +125,62 @@ class ItemList extends DataObjectList
 
 		// WE ARE GOING TO CONSTRUCT THE "AND" CLOSE
 		// THIS IS GOING TO LAST FOR MANY MANY LINES...
-		
+
 		// if a month is specified in the querystring, load that month
-		if ($m != '') 
+		if ($m != '')
 		{
-			$m = ''.intval($m);
-			$where .= ' AND YEAR(post_date)='.substr($m,0,4);
-			if (strlen($m)>5)
-				$where .= ' AND MONTH(post_date)='.substr($m,4,2);
-			if (strlen($m)>7)
-				$where .= ' AND DAYOFMONTH(post_date)='.substr($m,6,2);
-			if (strlen($m)>9)
-				$where .= ' AND HOUR(post_date)='.substr($m,8,2);
-			if (strlen($m)>11)
-				$where .= ' AND MINUTE(post_date)='.substr($m,10,2);
-			if (strlen($m)>13)
-				$where .= ' AND SECOND(post_date)='.substr($m,12,2);
+			$m = '' . intval($m);
+			$where .= ' AND YEAR(post_date)=' . substr($m,0,4);
+			if( strlen($m) > 5 )
+				$where .= ' AND MONTH(post_date)=' . substr($m,4,2);
+			if( strlen($m) > 7 )
+				$where .= ' AND DAYOFMONTH(post_date)=' . substr($m,6,2);
+			if( strlen($m) > 9 )
+				$where .= ' AND HOUR(post_date)=' . substr($m,8,2);
+			if( strlen($m) > 11 )
+				$where .= ' AND MINUTE(post_date)=' . substr($m,10,2);
+			if( strlen($m) > 13 )
+				$where .= ' AND SECOND(post_date)=' . substr($m,12,2);
 		}
-	
+
 		// If a week number is specified
-		if ($w != '') 
+		if ($w != '')
 		{
-			$w = ''.intval($w);
-			$where .= ' AND WEEK(post_date,1)='.$w;
+			$w = '' . intval($w);
+			$where .= ' AND WEEK(post_date,1)=' . $w;
 		}
-	
+
 		// if a post number is specified, load that post
-		if (($p != '') && ($p != 'all')) 
+		if (($p != '') && ($p != 'all'))
 		{
 			$p = intval($p);
-			$where .= ' AND ID = '.$p;
+			$where .= ' AND ID = ' . $p;
 		}
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * Search stuff:
 		 * ----------------------------------------------------
 		 */
-		if(!empty($s)) 
+		if(!empty($s))
 		{
 			$search = ' AND (';
 			if ($exact)	// We want exact match of title or contents
 				$n = '';
 			else // The words/sentence are/is to be included in in the title or the contents
 				$n = '%';
-			if( ($sentence == '1') or ($sentence == 'sentence') ) 
+			if( ($sentence == '1') or ($sentence == 'sentence') )
 			{ // Sentence search
 				$s = trim($s);
 				$search .= '(post_title LIKE \''.$n.$s.$n.'\') OR (post_content LIKE \''.$n.$s.$n.'\')';
 			}
 			else
 			{	// Word search
-				if( strtoupper( $sentence ) == 'OR' ) 
+				if( strtoupper( $sentence ) == 'OR' )
 					$swords = 'OR';
 				else
 					$swords = 'AND';
-			
+
 				// puts spaces instead of commas
 				$s = preg_replace('/, +/', '', $s);
 				$s = str_replace(',', ' ', $s);
@@ -188,12 +188,12 @@ class ItemList extends DataObjectList
 				$s = trim($s);
 				$s_array = explode(' ',$s);
 				$join = '';
-				for ( $i = 0; $i < count($s_array); $i++) 
+				for ( $i = 0; $i < count($s_array); $i++)
 				{
 					$search .= ' '.$join.' ( (post_title LIKE \''.$n.$s_array[$i].$n.'\') OR (post_content LIKE \''.$n.$s_array[$i].$n.'\') ) ';
 					$join = $swords;
 				}
-			} 
+			}
 
 			$search .= ')';
 
@@ -201,33 +201,33 @@ class ItemList extends DataObjectList
 		}
 		else
 		{
-			$search = ''; 
+			$search = '';
 		}
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * Category stuff:
 		 * ----------------------------------------------------
 		 */
 		$eq = 'IN'; // default
-	
+
 		$cat_array = array();		// this is a global var
-	
+
 		// Check for cat string (which will be handled recursively)
 		if ( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
 		{	// specified a category string:
 			$cat = str_replace(',', ' ', $cat);
-			if( strstr($cat,'-') )
+			if( strstr($cat, '-') )
 			{	// We want to exclude cats
 				$eq = 'NOT IN';
-				$cats = explode('-',$cat);
-				$req_cat_array = explode(' ',$cats[1]);
+				$cats = explode('-', $cat);
+				$req_cat_array = explode(' ', $cats[1]);
 			}
 			else
 			{	// We want to include cats
-				$req_cat_array = explode(' ',$cat);
+				$req_cat_array = explode(' ', $cat);
 			}
-	
+
 			// Getting required sub-categories:
 			// and add everything to cat array
 			// ----------------- START RECURSIVE CAT LIST ----------------
@@ -244,7 +244,7 @@ class ItemList extends DataObjectList
 			}
 			// ----------------- END RECURSIVE CAT LIST ----------------
 		}
-	
+
 		// Add explicit selections:
 		if( ! empty( $catsel ))
 		{
@@ -252,7 +252,7 @@ class ItemList extends DataObjectList
 			$cat_array = array_merge( $cat_array, $catsel );
 			array_unique( $cat_array );
 		}
-	
+
 		if( empty($cat_array) )
 		{
 			$whichcat='';
@@ -262,22 +262,20 @@ class ItemList extends DataObjectList
 			$whichcat .= ' AND postcat_cat_ID '.$eq.' ('.implode(",", $cat_array).') ';
 			// echo $whichcat;
 		}
-	
-	
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * Author stuff:
 		 * ----------------------------------------------------
 		 */
-		if((empty($author)) || ($author == 'all')) 
+		if((empty($author)) || ($author == 'all'))
 		{
 			$whichauthor='';
-		} 
-		elseif (intval($author)) 
+		}
+		elseif (intval($author))
 		{
 			$author = intval($author);
-			if (stristr($author, '-')) 
+			if (stristr($author, '-'))
 			{
 				$eq = '!=';
 				$andor = 'AND';
@@ -294,19 +292,19 @@ class ItemList extends DataObjectList
 			}
 		}
 
-		$where .= $search.$whichcat.$whichauthor;
+		$where .= $search . $whichcat . $whichauthor;
 
-	
+
 		/*
 		 * ----------------------------------------------------
 		 * order by stuff
 		 * ----------------------------------------------------
 		 */
-		if( (!empty($order)) && ((strtoupper($order) != 'ASC') && (strtoupper($order) != 'DESC'))) 
+		if( (!empty($order)) && ((strtoupper($order) != 'ASC') && (strtoupper($order) != 'DESC')))
 		{
 			$order='DESC';
 		}
-	
+
 		if(empty($orderby))
 		{
 			$orderby='date '.$order;
@@ -315,15 +313,15 @@ class ItemList extends DataObjectList
 		{
 			$orderby_array = explode(' ',$orderby);
 			$orderby = $orderby_array[0].' '.$order;
-			if (count($orderby_array)>1) 
+			if (count($orderby_array)>1)
 			{
-				for($i = 1; $i < (count($orderby_array)); $i++) 
+				for($i = 1; $i < (count($orderby_array)); $i++)
 				{
 					$orderby .= ', post_'.$orderby_array[$i].' '.$order;
 				}
 			}
 		}
-	
+
 
 		/*
 		 * ----------------------------------------------------
@@ -352,7 +350,7 @@ class ItemList extends DataObjectList
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$startdate = date('Y-m-d H:i:s', ($lastpostdate - (($poststart -1) * 86400)));
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend) * 86400)));
-				$where .= ' AND post_date > \''.$otherdate.'\' AND post_date <= \''.$startdate.'\'';
+				$where .= ' AND post_date > \'' . $otherdate . '\' AND post_date <= \'' . $startdate . '\'';
 			}
 		}
 		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
@@ -366,7 +364,7 @@ class ItemList extends DataObjectList
 			$limits = ' LIMIT '.$posts_per_page;
 		}
 		elseif( $what_to_show == 'paged' )
-		{	
+		{
 			// echo 'PAGED';
 			$pgstrt = '';
 			if ($paged) {
@@ -387,26 +385,26 @@ class ItemList extends DataObjectList
 		{
 			echo 'DEFAULT - NO LIMIT';
 		}*/
-	
+
 
 		/*
 		 * ----------------------------------------------------
 		 *  Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$where .= ' AND '.statuses_where_clause( $show_statuses );
+		$where .= ' AND ' . statuses_where_clause( $show_statuses );
 
 		/*
 		 * ----------------------------------------------------
 		 * Time limits:
 		 * ----------------------------------------------------
 		 */
-		if( $timestamp_min == 'now' ) 
+		if( $timestamp_min == 'now' )
 		{
 			// echo 'hide past';
 			$timestamp_min = time();
 		}
-		if( !empty($timestamp_min) ) 
+		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			// echo 'before';
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
@@ -418,21 +416,20 @@ class ItemList extends DataObjectList
 			// echo 'hide future';
 			$timestamp_max = time();
 		}
-		if( !empty($timestamp_max) ) 
+		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
 			$where .= ' AND post_date <= \''.$date_max.'\'';
 		}
 
-	
-		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, 
-																			post_content, post_title, post_trackbacks, post_category, 
-																			post_autobr, post_flags, post_wordcount, post_comments, 
-																			post_karma 
-											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) 
+		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang,
+																			post_content, post_title, post_trackbacks, post_category,
+																			post_autobr, post_flags, post_wordcount, post_comments,
+																			post_karma
+											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)
 														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
-		
+
 		if( $blog == 1 )
 		{	// Special case: we aggregate all cats from all blogs
 			$this->request .= "WHERE 1 ";
@@ -441,22 +438,22 @@ class ItemList extends DataObjectList
 		{
 			$this->request .= "WHERE cat_blog_ID = $blog ";
 		}
-	
+
 		$this->request .= $where." ORDER BY post_$orderby $limits";
 		// echo $where;
-		
+
 		if ($preview)
 		{
 			$this->request = 'SELECT 0 AS ID'; // dummy mysql query for the preview
 		}
-	
+
 		// echo $this->request;
 		$querycount++;
 		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
-	
+
 		$this->result_num_rows = mysql_num_rows($this->result);
 		// echo '<br/>rows=',$this->result_num_rows,'<br />';
-	
+
 		// Make a list of posts for future queries!
 		// Also make arrays...
 		$this->postIDlist = "";
@@ -475,9 +472,9 @@ class ItemList extends DataObjectList
 			// mysql_data_seek ($this->result, 0) or die( "Could not rewind resultset" );
 		}
 		// echo "postlist:".$this->postIDlist;
-	
+
 		// Initialize loop stuff:
-		$this->restart();	
+		$this->restart();
 	}
 
 	/*
@@ -487,7 +484,7 @@ class ItemList extends DataObjectList
 	{
 		// Set variables for future:
 		global $previousday;		// Should be a member var
-		$previousday = '';		
+		$previousday = '';
 		$this->row_num = 0;
 		$this->main_cat = '';
 		$this->group_by_cat = false;
@@ -533,16 +530,16 @@ class ItemList extends DataObjectList
 	function calc_max()
 	{
 		$nxt_request = $this->request;
-		if( $pos = strpos(strtoupper($this->request), 'LIMIT')) 
+		if( $pos = strpos(strtoupper($this->request), 'LIMIT'))
 		{	// Remove the limit form the request
 			$nxt_request = substr($this->request, 0, $pos);
 		}
 		//echo $nxt_request;
-		
+
 		$nxt_result = mysql_query($nxt_request) or mysql_oops( $nxt_request );
 		$this->total_num_posts = mysql_num_rows($nxt_result);
 		$this->max_paged = intval( ($this->total_num_posts-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
-		if( $this->max_paged < 1 ) 
+		if( $this->max_paged < 1 )
 			$this->max_paged =1;
 	}
 
@@ -569,10 +566,10 @@ class ItemList extends DataObjectList
  			$this->row_num = 1;
 			$this->get_postdata();
 		}
-		
+
 		// Memorize main cat
 		$this->main_cat = $this->row->post_category;
-		
+
 		// Go back now so that the fetch row doesn't skip one!
 		$this->row_num --;
 
@@ -603,23 +600,23 @@ class ItemList extends DataObjectList
 			// echo '<p>CAT CHANGE!</p>';
 			return false;
 		}
-		
+
 		$this->last_Item = new Item( $this->row ); // COPY !
 		return $this->last_Item;
 	}
 
 
 	/*
-	 * ItemList->get_postdata(-) 
+	 * ItemList->get_postdata(-)
 	 *
 	 * Init postdata
 	 */
-	function get_postdata() 
+	function get_postdata()
 	{
 		global $id, $postdata, $authordata, $day, $page, $pages, $multipage, $more, $numpages;
 		global $pagenow, $current_User;
 
-		if(!$this->preview) 
+		if(!$this->preview)
 		{	// This is not preview:
 			// echo 'REAL POST';
 			$row = & $this->row;
@@ -630,30 +627,30 @@ class ItemList extends DataObjectList
 			}
 			// echo 'starting ',$row->post_title;
 			$postdata = array (
-				'ID' => $row->ID, 
+				'ID' => $row->ID,
 				'Author_ID' => $row->post_author,
 				'Date' => $row->post_date,
-				'Status' => $row->post_status, 
-				'Lang' =>  $row->post_lang, 
+				'Status' => $row->post_status,
+				'Lang' =>  $row->post_lang,
 				'Content' => $row->post_content,
 				'Title' => $row->post_title,
 				'Url' => $row->post_trackbacks,
 				'Category' => $row->post_category,
-				'AutoBR' => $row->post_autobr, 
+				'AutoBR' => $row->post_autobr,
 				'Flags' => explode( ',', $row->post_flags ),
 				'Wordcount' => $row->post_wordcount,
-				'comments' => $row->post_comments, 
-				'Karma' => $row->post_karma // this isn't used yet 
+				'comments' => $row->post_comments,
+				'Karma' => $row->post_karma // this isn't used yet
 				);
-		} 
+		}
 		else
 		{	// We are in preview mode!
 			// echo 'PREVIEW';
 			// we need globals for the param function
-			global $preview_userid, $preview_date, $post_status, $post_lang, $content, 
-							$post_title, $post_url, $post_category, $post_autobr, $edit_date, 
+			global $preview_userid, $preview_date, $post_status, $post_lang, $content,
+							$post_title, $post_url, $post_category, $post_autobr, $edit_date,
 							$aa, $mm, $jj, $hh, $mn, $ss, $localtimenow;
-	
+
 			$id = 0;
 			param( 'preview_userid', 'integer', true );
 			param( 'post_status', 'string', true );
@@ -663,12 +660,12 @@ class ItemList extends DataObjectList
 			param( 'post_url', 'string', true );
 			param( 'post_category', 'integer', true );
 			param( 'post_autobr', 'integer', 0 );
-	
-			$post_title = format_to_post( $post_title, 0 ); 
-			$content = format_to_post( $content, $post_autobr ); 
+
+			$post_title = format_to_post( $post_title, 0 );
+			$content = format_to_post( $content, $post_autobr );
 
 			param( 'edit_date', 'integer', 0 );
-			if( $edit_date && $current_User->check_perm( 'edit_timestamp' )) 
+			if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 			{	// We use user date
 				param( 'aa', 'integer', 2000 );
 				param( 'mm', 'integer', 1 );
@@ -687,21 +684,21 @@ class ItemList extends DataObjectList
 				$post_date = date('Y-m-d H:i:s', $localtimenow);
 			}
 
-	
+
 			if( $errcontent = errors_display( T_('Invalid post, please correct these errors:'), '', false ) )
 			{
 				$content = $errcontent;
 			}
-			
+
 			// little funky fix for IEwin, rawk on that code
 			global $is_winIE;
-			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix))) 
+			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix)))
 			{
 				$content =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $content);
 			}
 
 			$postdata = array (
-				'ID' => 0, 
+				'ID' => 0,
 				'Author_ID' => $preview_userid,
 				'Date' => $post_date,
 				'Status' => $post_status,
@@ -727,7 +724,7 @@ class ItemList extends DataObjectList
 		if (isset($p))
 			$more=1;
 		$content = $postdata['Content'];
-		if (preg_match('/<!--nextpage-->/', $postdata['Content'])) 
+		if (preg_match('/<!--nextpage-->/', $postdata['Content']))
 		{
 			if ($page > 1)
 				$more=1;
@@ -739,7 +736,7 @@ class ItemList extends DataObjectList
 			$pages=explode('<!--nextpage-->', $content);
 			$numpages=count($pages);
 		}
-		else 
+		else
 		{
 			$pages[0]=stripslashes($postdata['Content']);
 			$multipage=0;
@@ -747,7 +744,7 @@ class ItemList extends DataObjectList
 	}
 
 
-	/** 
+	/**
 	 * Template function: Display the date if it has changed since last call
 	 *
 	 * {@internal ItemList::date_if_changed(-) }}
@@ -756,14 +753,14 @@ class ItemList extends DataObjectList
 	 * @param string string to display after the date (if changed)
 	 * @param string date/time format: leave empty to use locale default time format
 	 */
-	function date_if_changed( $before='<h2>', $after='</h2>', $format='' ) 
+	function date_if_changed( $before='<h2>', $after='</h2>', $format='' )
 	{
 		$current_item_date = $this->last_Item->get( 'date' );
-		if($format=='') 
+		if($format=='')
 		{
 			$current_item_date = mysql2date( locale_datefmt(), $current_item_date );
-		} 
-		else 
+		}
+		else
 		{
 			$current_item_date = mysql2date( $format, $current_item_date );
 		}
@@ -771,7 +768,7 @@ class ItemList extends DataObjectList
 		if( $current_item_date != $this->last_displayed_date )
 		{
 			$this->last_displayed_date = $current_item_date;
-		
+
 			echo $before;
 			echo $current_item_date;
 			echo $after;

@@ -126,7 +126,7 @@ if( empty($mode) )
 </div>
 
 <?php 
-}	// / not in special mode
+}	// not in special mode
 ?>
 	
 <h1><strong>:: <?php echo $title; ?></strong>

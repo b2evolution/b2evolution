@@ -367,12 +367,12 @@ function get_bloginfo( $show='', $this_blogparams = '' )
  * Get blog params for specified ID
  *
  * fplanque: created
- * TODO: on a heaby multiblog system, cache them one by one...
+ * TODO: on a heavy multiblog system, cache them one by one...
  */
-function get_blogparams_by_ID($blog_ID) 
+function get_blogparams_by_ID( $blog_ID )
 {
 	global $tableblogs, $cache_blogs, $use_cache, $querycount;
-	if ((empty($cache_blogs[$blog_ID])) OR (!$use_cache)) 
+	if( (empty($cache_blogs[$blog_ID])) OR (!$use_cache) )
 	{
 		blog_load_cache();
 	}

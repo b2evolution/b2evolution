@@ -10,7 +10,7 @@
  *
  * @package admin
  */
-require_once (dirname(__FILE__).'/_header.php');
+require_once( dirname(__FILE__) . '/_header.php' );
 $title = T_('Categories for blog:');
 param( 'action', 'string' );
 
@@ -25,9 +25,9 @@ function cats_display_blog_list()
 {
 	global $blog, $current_User;
 	$sep = '';
-	for( $curr_blog_ID=blog_list_start(); 
-				$curr_blog_ID!=false; 
-				 $curr_blog_ID=blog_list_next() ) 
+	for( $curr_blog_ID = blog_list_start();
+				$curr_blog_ID != false;
+				$curr_blog_ID = blog_list_next() )
 	{ 
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
 		{	// Current user is not allowed to edit cats...
@@ -280,9 +280,9 @@ switch($action)
 	
 	default:
 		// Just display cat list for this blog
-		require(dirname(__FILE__).'/_menutop.php');
+		require(dirname(__FILE__) . '/_menutop.php');
 		cats_display_blog_list();
-		require(dirname(__FILE__).'/_menutop_end.php');
+		require(dirname(__FILE__) . '/_menutop_end.php');
 
 		if( $blog == 0 )
 		{	// No blog could be selected
