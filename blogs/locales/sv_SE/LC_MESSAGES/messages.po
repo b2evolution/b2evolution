@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-04 02:40+0200\n"
+"POT-Creation-Date: 2003-09-07 19:51+0200\n"
 "PO-Revision-Date: 2003-08-10 02:45+0100\n"
 "Last-Translator: Per Åkerman <perakerman@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -326,7 +326,7 @@ msgstr "Syndikera denna blog"
 #: ..\..\..\noskin_b.php:339 ..\..\..\noskin_roll.php:339
 #: ..\..\..\skins\babyblues\_main.php:124 ..\..\..\skins\bluesky\_main.php:233
 #: ..\..\..\skins\custom\_main.php:274
-#: ..\..\..\skins\fplanque2002\_main.php:291
+#: ..\..\..\skins\fplanque2002\_main.php:293
 #: ..\..\..\skins\guadeloupe\_main.php:234
 #: ..\..\..\skins\originalb2\_main.php:180
 #, php-format
@@ -415,8 +415,7 @@ msgid "Options"
 msgstr "Valmöjligheter"
 
 #: ..\..\..\_feedback.php:186 ..\..\..\admin\b2options.php:93
-#: ..\..\..\admin\b2sidebar.php:89 ..\..\..\admin\_edit_form.php:82
-#: ..\..\..\admin\_edit_showposts.php:248
+#: ..\..\..\admin\_edit_form.php:82 ..\..\..\admin\_edit_showposts.php:248
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
@@ -513,17 +512,17 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: ..\..\..\_stats.php:16 ..\..\..\admin\b2stats.php:109
+#: ..\..\..\_stats.php:16 ..\..\..\admin\b2stats.php:200
 #, fuzzy
 msgid "Last referers"
 msgstr "Senaste "
 
-#: ..\..\..\_stats.php:26 ..\..\..\admin\b2stats.php:126
+#: ..\..\..\_stats.php:26 ..\..\..\admin\b2stats.php:217
 #, fuzzy
 msgid "Top referers"
 msgstr "Topp Referers"
 
-#: ..\..\..\_stats.php:36 ..\..\..\admin\b2stats.php:151
+#: ..\..\..\_stats.php:36 ..\..\..\admin\b2stats.php:242
 msgid "Last refering searches"
 msgstr ""
 
@@ -532,11 +531,11 @@ msgstr ""
 msgid "Top refering engines"
 msgstr "Topp Referers"
 
-#: ..\..\..\_stats.php:60 ..\..\..\admin\b2stats.php:179
+#: ..\..\..\_stats.php:60 ..\..\..\admin\b2stats.php:270
 msgid "Top Indexing Robots"
 msgstr ""
 
-#: ..\..\..\_stats.php:75 ..\..\..\admin\b2stats.php:204
+#: ..\..\..\_stats.php:75 ..\..\..\admin\b2stats.php:295
 msgid "Top Aggregators"
 msgstr ""
 
@@ -559,7 +558,7 @@ msgid "New blog"
 msgstr "Ny post i blog:"
 
 #: ..\..\..\admin\b2blogs.php:64 ..\..\..\admin\b2blogs.php:200
-#: ..\..\..\admin\edit_actions.php:168
+#: ..\..\..\admin\edit_actions.php:176
 msgid "Cannot update, please correct these errors:"
 msgstr ""
 
@@ -645,7 +644,7 @@ msgid "Writing to file..."
 msgstr ""
 
 #: ..\..\..\admin\b2blogs.php:266 ..\..\..\admin\edit_actions.php:88
-#: ..\..\..\admin\edit_actions.php:202 ..\..\..\admin\edit_actions.php:273
+#: ..\..\..\admin\edit_actions.php:209 ..\..\..\admin\edit_actions.php:280
 #: ..\..\..\b2evocore\_functions_pings.php:50
 #: ..\..\..\b2evocore\_functions_pings.php:84
 #: ..\..\..\b2evocore\_functions_pings.php:143
@@ -753,7 +752,7 @@ msgid ""
 "the same blog (smallest category number)."
 msgstr ""
 
-#: ..\..\..\admin\b2edit.php:26 ..\..\..\admin\edit_actions.php:178
+#: ..\..\..\admin\b2edit.php:26 ..\..\..\admin\edit_actions.php:158
 msgid "Oops, no post with this ID."
 msgstr ""
 
@@ -769,9 +768,8 @@ msgstr ""
 msgid "Editing comment"
 msgstr "Ändra kommentar"
 
-#: ..\..\..\admin\b2edit.php:88 ..\..\..\admin\b2sidebar.php:23
-#: ..\..\..\admin\b2upload.php:6 ..\..\..\admin\edit_actions.php:57
-#: ..\..\..\admin\edit_actions.php:314
+#: ..\..\..\admin\b2edit.php:88 ..\..\..\admin\b2upload.php:6
+#: ..\..\..\admin\edit_actions.php:57 ..\..\..\admin\edit_actions.php:321
 msgid "Cheatin' uh ?"
 msgstr ""
 
@@ -794,46 +792,46 @@ msgstr ""
 msgid "b2evo"
 msgstr ""
 
-#: ..\..\..\admin\b2login.php:16 ..\..\..\b2evocore\_functions_users.php:456
+#: ..\..\..\admin\b2login.php:16 ..\..\..\b2evocore\_functions_users.php:459
 msgid "Login..."
 msgstr "Logga in..."
 
-#: ..\..\..\admin\b2mail.php:36
+#: ..\..\..\admin\b2mail.php:33
 #, fuzzy
 msgid "Connecting to pop server..."
 msgstr "Ingen anslutning till server"
 
-#: ..\..\..\admin\b2mail.php:38
+#: ..\..\..\admin\b2mail.php:35
 #, fuzzy
 msgid "Connection failed:"
 msgstr "verifieringen misslyckades"
 
-#: ..\..\..\admin\b2mail.php:42
+#: ..\..\..\admin\b2mail.php:39
 msgid "Logging into pop server..."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:46
+#: ..\..\..\admin\b2mail.php:43
 msgid "No mail or Login Failed:"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:57
+#: ..\..\..\admin\b2mail.php:54
 #, php-format
 msgid "Getting message #%d..."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:66
+#: ..\..\..\admin\b2mail.php:63
 msgid "Processing..."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:140
+#: ..\..\..\admin\b2mail.php:139
 msgid "Too old"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:146
+#: ..\..\..\admin\b2mail.php:145
 msgid "Subject prefix does not match"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:166
+#: ..\..\..\admin\b2mail.php:165
 msgid "Raw content:"
 msgstr ""
 
@@ -842,44 +840,45 @@ msgstr ""
 msgid "Pass:"
 msgstr "Lösenord:"
 
-#: ..\..\..\admin\b2mail.php:208
+#: ..\..\..\admin\b2mail.php:205
 msgid "Wrong login or password."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:228
+#: ..\..\..\admin\b2mail.php:225
 #, fuzzy
 msgid "Category ID"
 msgstr "Kategori"
 
-#: ..\..\..\admin\b2mail.php:236 ..\..\..\admin\edit_actions.php:67
+#: ..\..\..\admin\b2mail.php:233 ..\..\..\admin\edit_actions.php:67
 msgid "Cannot post, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:250
+#: ..\..\..\admin\b2mail.php:247
 msgid "Blog ID"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:258
+#: ..\..\..\admin\b2mail.php:255
 #, fuzzy
 msgid "Posted title"
 msgstr "Postdetaljer"
 
-#: ..\..\..\admin\b2mail.php:259
+#: ..\..\..\admin\b2mail.php:256
 #, fuzzy
 msgid "Posted content"
 msgstr "Skicka kommentar"
 
-#: ..\..\..\admin\b2mail.php:269
+#: ..\..\..\admin\b2mail.php:266
 msgid "Mission complete, message deleted."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:275
+#: ..\..\..\admin\b2mail.php:272
 msgid "Level 0 users can't post."
 msgstr ""
 
 #: ..\..\..\admin\b2mail.php:294
-msgid "End."
-msgstr ""
+#, fuzzy
+msgid "OK."
+msgstr "OK"
 
 #: ..\..\..\admin\b2options.php:12 ..\..\..\admin\b2options.php:33
 msgid "You have no right to edit the options for this blog."
@@ -939,7 +938,7 @@ msgstr "Auto-BR (konverterar radbrytningar till &lt;br /&gt; taggar)"
 msgid "My Profile"
 msgstr "Min Profil"
 
-#: ..\..\..\admin\b2profile.php:16 ..\..\..\b2evocore\_functions_users.php:569
+#: ..\..\..\admin\b2profile.php:16 ..\..\..\b2evocore\_functions_users.php:572
 msgid "Edit your profile"
 msgstr ""
 
@@ -983,163 +982,139 @@ msgstr ""
 msgid "b2evo sidebar"
 msgstr ""
 
-#: ..\..\..\admin\b2sidebar.php:87
-#, fuzzy
-msgid "Post"
-msgstr "Tidigare"
-
-#: ..\..\..\admin\b2sidebar.php:92 ..\..\..\admin\_edit_form.php:91
-#, fuzzy
-msgid "Pingback"
-msgstr "1 PingBack"
-
-#: ..\..\..\admin\b2sidebar.php:98
-#, fuzzy
-msgid "SpellCheck"
-msgstr "Stavningskontroll"
-
-#: ..\..\..\admin\b2sidebar.php:102
-#, fuzzy
-msgid "<strong>Trackback</strong> an URL:"
-msgstr "<b>TrackBack</b> URL:ar (åtskilj flera URL:ar med mellanslag)"
-
-#: ..\..\..\admin\b2stats.php:4
+#: ..\..\..\admin\b2stats.php:10
 #, fuzzy
 msgid "View Stats"
 msgstr "Status"
 
-#: ..\..\..\admin\b2stats.php:16
+#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:118
+#, fuzzy
+msgid "Summary"
+msgstr "Söndag"
+
+#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:141
 #, fuzzy
 msgid "Referers"
 msgstr "Topp Referers"
 
-#: ..\..\..\admin\b2stats.php:20
+#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:142
 msgid "Refering Searches"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:24
+#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:144
 #, fuzzy
 msgid "Syndication"
 msgstr "Syndikera denna blog"
 
-#: ..\..\..\admin\b2stats.php:28
+#: ..\..\..\admin\b2stats.php:38
 #, fuzzy
 msgid "User Agents"
 msgstr "Användare"
 
-#: ..\..\..\admin\b2stats.php:32
-#, fuzzy
-msgid "Other"
-msgstr "Oktober"
+#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:145
+msgid "Direct Accesses"
+msgstr ""
 
-#: ..\..\..\admin\b2stats.php:41
+#: ..\..\..\admin\b2stats.php:51
 msgid "You have no right to view stats."
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:52
+#: ..\..\..\admin\b2stats.php:62
 #, php-format
 msgid "Changing hit #%d type to: %s"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:65
+#: ..\..\..\admin\b2stats.php:75
 #, php-format
 msgid "Deleting hit #%d..."
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:77
+#: ..\..\..\admin\b2stats.php:87
 msgid "Filter"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:80 ..\..\..\admin\b2stats.php:84
+#: ..\..\..\admin\b2stats.php:90 ..\..\..\admin\b2stats.php:94
 msgid "None"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:110
+#: ..\..\..\admin\b2stats.php:140
+#, fuzzy
+msgid "Date"
+msgstr "Utkast"
+
+#: ..\..\..\admin\b2stats.php:143
+msgid "Indexing Robots"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:146
+msgid "Total"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:201
 msgid "These are hits from external web pages refering to this blog"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:116 ..\..\..\admin\b2stats.php:158
-#: ..\..\..\admin\b2stats.php:237 ..\..\..\admin\b2stats.php:252
-#: ..\..\..\admin\b2stats.php:267
+#: ..\..\..\admin\b2stats.php:207 ..\..\..\admin\b2stats.php:249
+#: ..\..\..\admin\b2stats.php:328
 msgid "Delete this hit!"
 msgstr ""
 
 #. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:116 ..\..\..\admin\b2stats.php:158
-#: ..\..\..\admin\b2stats.php:237 ..\..\..\admin\b2stats.php:252
-#: ..\..\..\admin\b2stats.php:267
+#: ..\..\..\admin\b2stats.php:207 ..\..\..\admin\b2stats.php:249
+#: ..\..\..\admin\b2stats.php:328 ..\..\..\admin\_user_list.php:37
 #, fuzzy
 msgid "Del"
 msgstr "Radera"
 
-#: ..\..\..\admin\b2stats.php:117
+#: ..\..\..\admin\b2stats.php:208
 msgid "Log as a search instead"
 msgstr ""
 
 #. TRANS: Abbrev. for "move to searches" (stats)
-#: ..\..\..\admin\b2stats.php:117
+#: ..\..\..\admin\b2stats.php:208
 msgid "-&gt;S"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:137
+#: ..\..\..\admin\b2stats.php:228
 #, fuzzy
 msgid "Total referers"
 msgstr "Topp Referers"
 
-#: ..\..\..\admin\b2stats.php:152
+#: ..\..\..\admin\b2stats.php:243
 msgid ""
 "These are hits from people who came to this blog system through a search "
 "engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:167
+#: ..\..\..\admin\b2stats.php:258
 msgid "Top refering search engines"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:180
+#: ..\..\..\admin\b2stats.php:271
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
 "(Robots must be listed in /conf/b2evo_advanced.php)"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:205
+#: ..\..\..\admin\b2stats.php:296
 msgid ""
 "These are hits from RSS news aggregators. (Aggregators must be listed in /"
 "conf/b2evo_advanced.php)"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:216
+#: ..\..\..\admin\b2stats.php:307
 msgid "Total RSS hits"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:230
+#: ..\..\..\admin\b2stats.php:321
 msgid "Last direct accesses"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:231
+#: ..\..\..\admin\b2stats.php:322
 msgid ""
 "These are hits from people who came to this blog system by direct access "
 "(either by typing the URL directly, or using a bookmark. Invalid (too short) "
 "referers are also listed here.)"
-msgstr ""
-
-#: ..\..\..\admin\b2stats.php:245
-msgid "Last blacklisted referers"
-msgstr ""
-
-#: ..\..\..\admin\b2stats.php:246
-msgid ""
-"These are hits from people who came to this blog system through a "
-"blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. By "
-"default the blacklist includes all internal references.)"
-msgstr ""
-
-#: ..\..\..\admin\b2stats.php:260
-msgid "Last bad chars"
-msgstr ""
-
-#: ..\..\..\admin\b2stats.php:261
-msgid "These are hits with bad chars in the referer."
 msgstr ""
 
 #: ..\..\..\admin\b2team.php:3
@@ -1398,18 +1373,18 @@ msgstr "Typ"
 msgid "Close this window"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:41
+#: ..\..\..\admin\edit_actions.php:33
 msgid "Adding new post..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:63 ..\..\..\admin\edit_actions.php:164
-#: ..\..\..\admin\edit_actions.php:335 ..\..\..\htsrv\comment_post.php:45
+#: ..\..\..\admin\edit_actions.php:63 ..\..\..\admin\edit_actions.php:172
+#: ..\..\..\admin\edit_actions.php:342 ..\..\..\htsrv\comment_post.php:45
 #: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1210
 msgid "Supplied URL is invalid: "
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:68 ..\..\..\admin\edit_actions.php:169
-#: ..\..\..\admin\edit_actions.php:340
+#: ..\..\..\admin\edit_actions.php:68 ..\..\..\admin\edit_actions.php:177
+#: ..\..\..\admin\edit_actions.php:347
 msgid "Back to post editing"
 msgstr ""
 
@@ -1418,58 +1393,58 @@ msgstr ""
 msgid "Recording post..."
 msgstr "Ändra post"
 
-#: ..\..\..\admin\edit_actions.php:84 ..\..\..\admin\edit_actions.php:269
+#: ..\..\..\admin\edit_actions.php:84 ..\..\..\admin\edit_actions.php:276
 msgid "Sleeping..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:94 ..\..\..\admin\edit_actions.php:208
+#: ..\..\..\admin\edit_actions.php:94 ..\..\..\admin\edit_actions.php:215
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:224
+#: ..\..\..\admin\edit_actions.php:231
 msgid "Post had already pinged: skipping blog pings..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:236
+#: ..\..\..\admin\edit_actions.php:243
 msgid "Posting Done..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:256
+#: ..\..\..\admin\edit_actions.php:263
 msgid "Oops, no post with this ID!"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:260
+#: ..\..\..\admin\edit_actions.php:267
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:263
+#: ..\..\..\admin\edit_actions.php:270
 #, fuzzy
 msgid "Deleting post..."
 msgstr "Ändra post"
 
-#: ..\..\..\admin\edit_actions.php:278
+#: ..\..\..\admin\edit_actions.php:285
 msgid "Deleting Done..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:298
+#: ..\..\..\admin\edit_actions.php:305
 msgid "Oops, no comment with this ID."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:339
+#: ..\..\..\admin\edit_actions.php:346
 msgid "Cannot update comment, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:365
+#: ..\..\..\admin\edit_actions.php:372
 msgid "Back to posts!"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:367
+#: ..\..\..\admin\edit_actions.php:374
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:375
+#: ..\..\..\admin\edit_actions.php:382
 #, fuzzy
 msgid "New post"
 msgstr "Ny post"
@@ -1609,6 +1584,11 @@ msgstr "Link till url"
 #, fuzzy
 msgid "(converts line-breaks into &lt;br /&gt; tags)"
 msgstr "Auto-BR (konverterar radbrytningar till &lt;br /&gt; taggar)"
+
+#: ..\..\..\admin\_edit_form.php:91
+#, fuzzy
+msgid "Pingback"
+msgstr "1 PingBack"
 
 #: ..\..\..\admin\_edit_form.php:91
 #, fuzzy
@@ -2034,179 +2014,179 @@ msgstr ""
 msgid "Tag %s may not contain raw character data"
 msgstr ""
 
-#: ..\..\..\b2evocore\_class_pop3.php:80 ..\..\..\b2evocore\_class_pop3.php:88
-#: ..\..\..\b2evocore\_class_pop3.php:100
+#: ..\..\..\b2evocore\_class_pop3.php:81 ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:101
 msgid "POP3 connect:"
 msgstr "POP"
 
-#: ..\..\..\b2evocore\_class_pop3.php:80
+#: ..\..\..\b2evocore\_class_pop3.php:81
 msgid "No server specified"
 msgstr "Ingen server specificerad"
 
-#: ..\..\..\b2evocore\_class_pop3.php:88
-#: ..\..\..\b2evocore\_class_pop3.php:100
-#: ..\..\..\b2evocore\_class_pop3.php:139
-#: ..\..\..\b2evocore\_class_pop3.php:274
-#: ..\..\..\b2evocore\_class_pop3.php:328
-#: ..\..\..\b2evocore\_class_pop3.php:339
-#: ..\..\..\b2evocore\_class_pop3.php:387
-#: ..\..\..\b2evocore\_class_pop3.php:420
-#: ..\..\..\b2evocore\_class_pop3.php:453
-#: ..\..\..\b2evocore\_class_pop3.php:552
-#: ..\..\..\b2evocore\_class_pop3.php:575
+#: ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:101
+#: ..\..\..\b2evocore\_class_pop3.php:140
+#: ..\..\..\b2evocore\_class_pop3.php:275
+#: ..\..\..\b2evocore\_class_pop3.php:329
+#: ..\..\..\b2evocore\_class_pop3.php:340
+#: ..\..\..\b2evocore\_class_pop3.php:388
+#: ..\..\..\b2evocore\_class_pop3.php:421
+#: ..\..\..\b2evocore\_class_pop3.php:454
+#: ..\..\..\b2evocore\_class_pop3.php:553
+#: ..\..\..\b2evocore\_class_pop3.php:576
 msgid "Error "
 msgstr "Fel"
 
-#: ..\..\..\b2evocore\_class_pop3.php:108
+#: ..\..\..\b2evocore\_class_pop3.php:109
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
 msgstr "POP3: för tidig NOOP OK, INTE en RFC 1939 kompliant server"
 
-#: ..\..\..\b2evocore\_class_pop3.php:118
+#: ..\..\..\b2evocore\_class_pop3.php:119
 msgid "POP3 noop:"
 msgstr "POP3 noop:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:118
-#: ..\..\..\b2evocore\_class_pop3.php:184
-#: ..\..\..\b2evocore\_class_pop3.php:233
-#: ..\..\..\b2evocore\_class_pop3.php:258
-#: ..\..\..\b2evocore\_class_pop3.php:300
-#: ..\..\..\b2evocore\_class_pop3.php:374
-#: ..\..\..\b2evocore\_class_pop3.php:413
-#: ..\..\..\b2evocore\_class_pop3.php:443
-#: ..\..\..\b2evocore\_class_pop3.php:477
-#: ..\..\..\b2evocore\_class_pop3.php:540
-#: ..\..\..\b2evocore\_class_pop3.php:608
+#: ..\..\..\b2evocore\_class_pop3.php:119
+#: ..\..\..\b2evocore\_class_pop3.php:185
+#: ..\..\..\b2evocore\_class_pop3.php:234
+#: ..\..\..\b2evocore\_class_pop3.php:259
+#: ..\..\..\b2evocore\_class_pop3.php:301
+#: ..\..\..\b2evocore\_class_pop3.php:375
+#: ..\..\..\b2evocore\_class_pop3.php:414
+#: ..\..\..\b2evocore\_class_pop3.php:444
+#: ..\..\..\b2evocore\_class_pop3.php:478
+#: ..\..\..\b2evocore\_class_pop3.php:541
+#: ..\..\..\b2evocore\_class_pop3.php:609
 msgid "No connection to server"
 msgstr "Ingen anslutning till server"
 
-#: ..\..\..\b2evocore\_class_pop3.php:131
-#: ..\..\..\b2evocore\_class_pop3.php:134
-#: ..\..\..\b2evocore\_class_pop3.php:139
+#: ..\..\..\b2evocore\_class_pop3.php:132
+#: ..\..\..\b2evocore\_class_pop3.php:135
+#: ..\..\..\b2evocore\_class_pop3.php:140
 msgid "POP3 user:"
 msgstr "POP3 användare:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:131
-#: ..\..\..\b2evocore\_class_pop3.php:190
+#: ..\..\..\b2evocore\_class_pop3.php:132
+#: ..\..\..\b2evocore\_class_pop3.php:191
 msgid "No login ID submitted"
 msgstr "Inget login ID medskickat"
 
-#: ..\..\..\b2evocore\_class_pop3.php:134
-#: ..\..\..\b2evocore\_class_pop3.php:154
+#: ..\..\..\b2evocore\_class_pop3.php:135
+#: ..\..\..\b2evocore\_class_pop3.php:155
 msgid "connection not established"
 msgstr "anslutning ej etablerad"
 
-#: ..\..\..\b2evocore\_class_pop3.php:151
-#: ..\..\..\b2evocore\_class_pop3.php:154
-#: ..\..\..\b2evocore\_class_pop3.php:159
-#: ..\..\..\b2evocore\_class_pop3.php:168
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:155
+#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:169
 msgid "POP3 pass:"
 msgstr "POP3 lösenord:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:151
-#: ..\..\..\b2evocore\_class_pop3.php:193
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:194
 msgid "No password submitted"
 msgstr "Inget lösenord medskickat"
 
-#: ..\..\..\b2evocore\_class_pop3.php:159
+#: ..\..\..\b2evocore\_class_pop3.php:160
 msgid "authentication failed "
 msgstr "verifieringen misslyckades"
 
-#: ..\..\..\b2evocore\_class_pop3.php:168
-#: ..\..\..\b2evocore\_class_pop3.php:217
+#: ..\..\..\b2evocore\_class_pop3.php:169
+#: ..\..\..\b2evocore\_class_pop3.php:218
 msgid "NOOP failed. Server not RFC 1939 compliant"
 msgstr "NOOP misslyckades. Server inte RFC 1939 kompliant"
 
-#: ..\..\..\b2evocore\_class_pop3.php:184
-#: ..\..\..\b2evocore\_class_pop3.php:190
-#: ..\..\..\b2evocore\_class_pop3.php:193
-#: ..\..\..\b2evocore\_class_pop3.php:198
-#: ..\..\..\b2evocore\_class_pop3.php:208
-#: ..\..\..\b2evocore\_class_pop3.php:217
+#: ..\..\..\b2evocore\_class_pop3.php:185
+#: ..\..\..\b2evocore\_class_pop3.php:191
+#: ..\..\..\b2evocore\_class_pop3.php:194
+#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:209
+#: ..\..\..\b2evocore\_class_pop3.php:218
 msgid "POP3 apop:"
 msgstr "POP3 apop:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:198
+#: ..\..\..\b2evocore\_class_pop3.php:199
 msgid "No server banner"
 msgstr "ingen server banner"
 
-#: ..\..\..\b2evocore\_class_pop3.php:198
-#: ..\..\..\b2evocore\_class_pop3.php:208
+#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:209
 msgid "abort"
 msgstr "avbryt"
 
-#: ..\..\..\b2evocore\_class_pop3.php:208
+#: ..\..\..\b2evocore\_class_pop3.php:209
 msgid "apop authentication failed"
 msgstr "apop verifiering misslyckades"
 
-#: ..\..\..\b2evocore\_class_pop3.php:233
+#: ..\..\..\b2evocore\_class_pop3.php:234
 msgid "POP3 login:"
 msgstr "POP3 användarnamn:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:258
-#: ..\..\..\b2evocore\_class_pop3.php:274
+#: ..\..\..\b2evocore\_class_pop3.php:259
+#: ..\..\..\b2evocore\_class_pop3.php:275
 msgid "POP3 top:"
 msgstr "POP3 top:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:300
-#: ..\..\..\b2evocore\_class_pop3.php:328
-#: ..\..\..\b2evocore\_class_pop3.php:339
-#: ..\..\..\b2evocore\_class_pop3.php:351
+#: ..\..\..\b2evocore\_class_pop3.php:301
+#: ..\..\..\b2evocore\_class_pop3.php:329
+#: ..\..\..\b2evocore\_class_pop3.php:340
+#: ..\..\..\b2evocore\_class_pop3.php:352
 msgid "POP3 pop_list:"
 msgstr "POP3 pop_list:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:351
+#: ..\..\..\b2evocore\_class_pop3.php:352
 msgid "Premature end of list"
 msgstr "För tidigt slut på listan"
 
-#: ..\..\..\b2evocore\_class_pop3.php:374
-#: ..\..\..\b2evocore\_class_pop3.php:387
+#: ..\..\..\b2evocore\_class_pop3.php:375
+#: ..\..\..\b2evocore\_class_pop3.php:388
 msgid "POP3 get:"
 msgstr "POP3 get:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:413
-#: ..\..\..\b2evocore\_class_pop3.php:420
+#: ..\..\..\b2evocore\_class_pop3.php:414
+#: ..\..\..\b2evocore\_class_pop3.php:421
 msgid "POP3 last:"
 msgstr "POP3 last:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:443
-#: ..\..\..\b2evocore\_class_pop3.php:453
+#: ..\..\..\b2evocore\_class_pop3.php:444
+#: ..\..\..\b2evocore\_class_pop3.php:454
 msgid "POP3 reset:"
 msgstr "POP3 reset:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:477
-#: ..\..\..\b2evocore\_class_pop3.php:483
+#: ..\..\..\b2evocore\_class_pop3.php:478
+#: ..\..\..\b2evocore\_class_pop3.php:484
 msgid "POP3 send_cmd:"
 msgstr "POP3 send_cmd:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:483
+#: ..\..\..\b2evocore\_class_pop3.php:484
 msgid "Empty command string"
 msgstr "Tom kommandosträng"
 
-#: ..\..\..\b2evocore\_class_pop3.php:503
+#: ..\..\..\b2evocore\_class_pop3.php:504
 msgid "POP3 quit:"
 msgstr "POP3 quit:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:503
+#: ..\..\..\b2evocore\_class_pop3.php:504
 msgid "connection does not exist"
 msgstr "Anslutningen existerar inte"
 
-#: ..\..\..\b2evocore\_class_pop3.php:540
-#: ..\..\..\b2evocore\_class_pop3.php:552
-#: ..\..\..\b2evocore\_class_pop3.php:575
+#: ..\..\..\b2evocore\_class_pop3.php:541
+#: ..\..\..\b2evocore\_class_pop3.php:553
+#: ..\..\..\b2evocore\_class_pop3.php:576
 msgid "POP3 uidl:"
 msgstr "POP3 uidl:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:608
-#: ..\..\..\b2evocore\_class_pop3.php:613
-#: ..\..\..\b2evocore\_class_pop3.php:619
+#: ..\..\..\b2evocore\_class_pop3.php:609
+#: ..\..\..\b2evocore\_class_pop3.php:614
+#: ..\..\..\b2evocore\_class_pop3.php:620
 msgid "POP3 delete:"
 msgstr "POP3 delete:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:613
+#: ..\..\..\b2evocore\_class_pop3.php:614
 msgid "No msg number submitted"
 msgstr "inget meddelandenr medskickat"
 
-#: ..\..\..\b2evocore\_class_pop3.php:619
+#: ..\..\..\b2evocore\_class_pop3.php:620
 msgid "Command failed "
 msgstr "Kommandot misslyckades"
 
@@ -2236,20 +2216,20 @@ msgstr ""
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:969
+#: ..\..\..\b2evocore\_functions.php:992
 #, php-format
 msgid "Parameter %s is required!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1161
+#: ..\..\..\b2evocore\_functions.php:1191
 msgid "Invalid URL"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1167
+#: ..\..\..\b2evocore\_functions.php:1197
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1175
+#: ..\..\..\b2evocore\_functions.php:1205
 msgid "URL not allowed"
 msgstr ""
 
@@ -2328,42 +2308,42 @@ msgstr "Browsa kategori"
 msgid "bad char in User Agent"
 msgstr "Användare"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:93
-#: ..\..\..\b2evocore\_functions_hitlogs.php:104
-#: ..\..\..\b2evocore\_functions_hitlogs.php:113
-#: ..\..\..\b2evocore\_functions_hitlogs.php:129
+#: ..\..\..\b2evocore\_functions_hitlogs.php:92
+#: ..\..\..\b2evocore\_functions_hitlogs.php:109
+#: ..\..\..\b2evocore\_functions_hitlogs.php:120
+#: ..\..\..\b2evocore\_functions_hitlogs.php:133
 msgid "referer ignored"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:93
-msgid "robot"
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_hitlogs.php:104
-msgid "invalid"
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_hitlogs.php:113
+#: ..\..\..\b2evocore\_functions_hitlogs.php:92
 msgid "BlackList"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:129
+#: ..\..\..\b2evocore\_functions_hitlogs.php:109
+msgid "robot"
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:120
+msgid "invalid"
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:133
 msgid "search engine"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:140
+#: ..\..\..\b2evocore\_functions_hitlogs.php:142
 msgid "loading referering page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:159
+#: ..\..\..\b2evocore\_functions_hitlogs.php:161
 msgid "found current url in page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:410
+#: ..\..\..\b2evocore\_functions_hitlogs.php:412
 msgid "not a query - no params!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:435
+#: ..\..\..\b2evocore\_functions_hitlogs.php:437
 msgid "no query string found"
 msgstr ""
 
@@ -2558,219 +2538,219 @@ msgstr ""
 msgid "You must log in!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:457
+#: ..\..\..\b2evocore\_functions_users.php:460
 msgid "Login if you have an account..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:486
+#: ..\..\..\b2evocore\_functions_users.php:489
 msgid "Register..."
 msgstr "Registrera..."
 
-#: ..\..\..\b2evocore\_functions_users.php:487
+#: ..\..\..\b2evocore\_functions_users.php:490
 msgid "Register to open an account..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:514
+#: ..\..\..\b2evocore\_functions_users.php:517
 #, fuzzy, php-format
 msgid "Logout (%s)"
 msgstr "Logga ut"
 
-#: ..\..\..\b2evocore\_functions_users.php:515
+#: ..\..\..\b2evocore\_functions_users.php:518
 msgid "Logout from your account"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:546
+#: ..\..\..\b2evocore\_functions_users.php:549
 msgid "Admin"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:547
+#: ..\..\..\b2evocore\_functions_users.php:550
 msgid "Go to the back-office"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_users.php:568
+#: ..\..\..\b2evocore\_functions_users.php:571
 #, fuzzy, php-format
 msgid "Profile (%s)"
 msgstr "Min Profil"
 
-#: ..\..\..\b2evocore\_vars.php:104
+#: ..\..\..\b2evocore\_vars.php:105
 msgid "Sunday"
 msgstr "Söndag"
 
-#: ..\..\..\b2evocore\_vars.php:105
+#: ..\..\..\b2evocore\_vars.php:106
 msgid "Monday"
 msgstr "Måndag"
 
-#: ..\..\..\b2evocore\_vars.php:106
+#: ..\..\..\b2evocore\_vars.php:107
 msgid "Tuesday"
 msgstr "Tisdag"
 
-#: ..\..\..\b2evocore\_vars.php:107
+#: ..\..\..\b2evocore\_vars.php:108
 msgid "Wednesday"
 msgstr "Onsdag"
 
-#: ..\..\..\b2evocore\_vars.php:108
+#: ..\..\..\b2evocore\_vars.php:109
 msgid "Thursday"
 msgstr "Torsdag"
 
-#: ..\..\..\b2evocore\_vars.php:109
+#: ..\..\..\b2evocore\_vars.php:110
 msgid "Friday"
 msgstr "Fredag"
 
-#: ..\..\..\b2evocore\_vars.php:110
+#: ..\..\..\b2evocore\_vars.php:111
 msgid "Saturday"
 msgstr "Lördag"
 
 #. TRANS: abbrev. for Sunday
-#: ..\..\..\b2evocore\_vars.php:114
+#: ..\..\..\b2evocore\_vars.php:115
 #, fuzzy
 msgid "Sun"
 msgstr "Söndag"
 
 #. TRANS: abbrev. for Monday
-#: ..\..\..\b2evocore\_vars.php:116
+#: ..\..\..\b2evocore\_vars.php:117
 #, fuzzy
 msgid "Mon"
 msgstr "Måndag"
 
 #. TRANS: abbrev. for Tuesday
-#: ..\..\..\b2evocore\_vars.php:118
+#: ..\..\..\b2evocore\_vars.php:119
 msgid "Tue"
 msgstr ""
 
 #. TRANS: abbrev. for Wednesday
-#: ..\..\..\b2evocore\_vars.php:120
+#: ..\..\..\b2evocore\_vars.php:121
 msgid "Wed"
 msgstr ""
 
 #. TRANS: abbrev. for Thursday
-#: ..\..\..\b2evocore\_vars.php:122
+#: ..\..\..\b2evocore\_vars.php:123
 msgid "Thu"
 msgstr ""
 
 #. TRANS: abbrev. for Friday
-#: ..\..\..\b2evocore\_vars.php:124
+#: ..\..\..\b2evocore\_vars.php:125
 #, fuzzy
 msgid "Fri"
 msgstr "Fredag"
 
 #. TRANS: abbrev. for Saturday
-#: ..\..\..\b2evocore\_vars.php:126
+#: ..\..\..\b2evocore\_vars.php:127
 #, fuzzy
 msgid "Sat"
 msgstr "Status"
 
-#: ..\..\..\b2evocore\_vars.php:129
+#: ..\..\..\b2evocore\_vars.php:130
 msgid "January"
 msgstr "Januari"
 
-#: ..\..\..\b2evocore\_vars.php:130
+#: ..\..\..\b2evocore\_vars.php:131
 msgid "February"
 msgstr "Februari"
 
-#: ..\..\..\b2evocore\_vars.php:131
+#: ..\..\..\b2evocore\_vars.php:132
 msgid "March"
 msgstr "Mars"
 
-#: ..\..\..\b2evocore\_vars.php:132
+#: ..\..\..\b2evocore\_vars.php:133
 msgid "April"
 msgstr "April"
 
 #. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-#: ..\..\..\b2evocore\_vars.php:134
+#: ..\..\..\b2evocore\_vars.php:135
 #, fuzzy
 msgid "May "
 msgstr "Maj"
 
-#: ..\..\..\b2evocore\_vars.php:135
+#: ..\..\..\b2evocore\_vars.php:136
 msgid "June"
 msgstr "Juni"
 
-#: ..\..\..\b2evocore\_vars.php:136
+#: ..\..\..\b2evocore\_vars.php:137
 msgid "July"
 msgstr "Juli"
 
-#: ..\..\..\b2evocore\_vars.php:137
+#: ..\..\..\b2evocore\_vars.php:138
 msgid "August"
 msgstr "Augusti"
 
-#: ..\..\..\b2evocore\_vars.php:138
+#: ..\..\..\b2evocore\_vars.php:139
 msgid "September"
 msgstr "September"
 
-#: ..\..\..\b2evocore\_vars.php:139
+#: ..\..\..\b2evocore\_vars.php:140
 msgid "October"
 msgstr "Oktober"
 
-#: ..\..\..\b2evocore\_vars.php:140
+#: ..\..\..\b2evocore\_vars.php:141
 msgid "November"
 msgstr "November"
 
-#: ..\..\..\b2evocore\_vars.php:141
+#: ..\..\..\b2evocore\_vars.php:142
 msgid "December"
 msgstr "December"
 
 #. TRANS: abbrev. for January
-#: ..\..\..\b2evocore\_vars.php:145
+#: ..\..\..\b2evocore\_vars.php:146
 msgid "Jan"
 msgstr ""
 
 #. TRANS: abbrev. for February
-#: ..\..\..\b2evocore\_vars.php:147
+#: ..\..\..\b2evocore\_vars.php:148
 msgid "Feb"
 msgstr ""
 
 #. TRANS: abbrev. for March
-#: ..\..\..\b2evocore\_vars.php:149
+#: ..\..\..\b2evocore\_vars.php:150
 #, fuzzy
 msgid "Mar"
 msgstr "Mars"
 
 #. TRANS: abbrev. for April
-#: ..\..\..\b2evocore\_vars.php:151
+#: ..\..\..\b2evocore\_vars.php:152
 #, fuzzy
 msgid "Apr"
 msgstr "April"
 
 #. TRANS: abbrev. for May
-#: ..\..\..\b2evocore\_vars.php:153
+#: ..\..\..\b2evocore\_vars.php:154
 msgid "May"
 msgstr "Maj"
 
 #. TRANS: abbrev. for June
-#: ..\..\..\b2evocore\_vars.php:155
+#: ..\..\..\b2evocore\_vars.php:156
 #, fuzzy
 msgid "Jun"
 msgstr "Juni"
 
 #. TRANS: abbrev. for July
-#: ..\..\..\b2evocore\_vars.php:157
+#: ..\..\..\b2evocore\_vars.php:158
 #, fuzzy
 msgid "Jul"
 msgstr "Juli"
 
 #. TRANS: abbrev. for August
-#: ..\..\..\b2evocore\_vars.php:159
+#: ..\..\..\b2evocore\_vars.php:160
 #, fuzzy
 msgid "Aug"
 msgstr "Augusti"
 
 #. TRANS: abbrev. for September
-#: ..\..\..\b2evocore\_vars.php:161
+#: ..\..\..\b2evocore\_vars.php:162
 msgid "Sep"
 msgstr ""
 
 #. TRANS: abbrev. for October
-#: ..\..\..\b2evocore\_vars.php:163
+#: ..\..\..\b2evocore\_vars.php:164
 msgid "Oct"
 msgstr ""
 
 #. TRANS: abbrev. for November
-#: ..\..\..\b2evocore\_vars.php:165
+#: ..\..\..\b2evocore\_vars.php:166
 msgid "Nov"
 msgstr ""
 
 #. TRANS: abbrev. for December
-#: ..\..\..\b2evocore\_vars.php:167
+#: ..\..\..\b2evocore\_vars.php:168
 #, fuzzy
 msgid "Dec"
 msgstr "Radera"
@@ -3030,6 +3010,22 @@ msgstr "[...] Läs mer!"
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
 
+#, fuzzy
+#~ msgid "Post"
+#~ msgstr "Tidigare"
+
+#, fuzzy
+#~ msgid "SpellCheck"
+#~ msgstr "Stavningskontroll"
+
+#, fuzzy
+#~ msgid "<strong>Trackback</strong> an URL:"
+#~ msgstr "<b>TrackBack</b> URL:ar (åtskilj flera URL:ar med mellanslag)"
+
+#, fuzzy
+#~ msgid "Other"
+#~ msgstr "Oktober"
+
 #~ msgid "Sentence"
 #~ msgstr "Mening"
 
@@ -3047,9 +3043,6 @@ msgstr ""
 #~ msgid "Error: please fill the required fields (name & comment)"
 #~ msgstr ""
 #~ "Fel: var snäll och fyll i de obligatoriska fälten (namn & commentar)"
-
-#~ msgid "Draft"
-#~ msgstr "Utkast"
 
 #, fuzzy
 #~ msgid "Trackback (%)"

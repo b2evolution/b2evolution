@@ -34,7 +34,7 @@
 		if ($user_level >= 3)
 		{
 			?>
-			<a href="b2team.php?action=delete&id=<?php echo $user_data['ID'] ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')">X</a>
+			<a href="b2team.php?action=delete&id=<?php echo $user_data['ID'] ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 			<?php
 		}
 		echo "</td>\n";

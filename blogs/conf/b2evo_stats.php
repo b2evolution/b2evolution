@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution stats config
- * Version of this file: 0.8.3
+ * Version of this file: 0.8.5.1
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -13,6 +13,8 @@
 
 # Blacklist: domains that should not be logged for stats
 # The following substrings will be looked up in the referer http header
+# However, you should report spammers in $block_urls[] in _antispam.php, this way they'll
+# also be blocked from comments...
 $blackList = Array(
 	$baseurl.'/',
 	'localhost',
@@ -75,5 +77,28 @@ $user_agents = array(
 	array('aggregator', 'SharpReader/',	'SharpReader'),
 	array('aggregator', 'Straw ',	'Straw'),
 );
+
+
+# Do you want to check if referers really do refer to you before logging them
+# WARNING: this is very time consuming!
+$doubleCheckReferers = 0;		// Set to 1 to enable double checking
+
+
+# Do not change the following unless you know what you're doing...
+# Due to potential non-thread safety, we'd better do this early
+if( !isset( $HTTP_REFERER ) )
+{	// If this magic variable is not already set:
+	if( isset($_SERVER['HTTP_REFERER']) )
+	{	// This would be the best way to get the referrer,
+		// unfortunatly, it's not always avilable!! :[
+		// If someone has a clue about this, I'd like to hear about it ;)
+		$HTTP_REFERER = $_SERVER['HTTP_REFERER'];
+	}
+	else
+	{	// Fallback method (not thread safe :[[ )
+		$HTTP_REFERER = getenv('HTTP_REFERER');
+	}
+}
+
 
 ?>

@@ -45,7 +45,7 @@ if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	errors_add( T_('Supplied URL is invalid: ').$error );	
 }
 
-$user_ip = $REMOTE_ADDR;
+$user_ip = $_SERVER['REMOTE_ADDR'];
 $user_domain = gethostbyaddr($user_ip);
 $now = date("Y-m-d H:i:s", $localtimenow );
 

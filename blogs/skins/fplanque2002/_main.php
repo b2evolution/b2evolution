@@ -273,6 +273,8 @@
 	<p class="center">powered by<br />
 	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
+</div>
+
 <!-- InstanceEndEditable -->
 </div>
 <table cellspacing="3" class="wide">

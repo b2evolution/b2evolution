@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.5
+ * Version of this file: 0.8.5.1
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -197,10 +197,6 @@ $phoneemail_separator = ':::';
 $use_cache = 1;							// Not using this will dramatically overquery the DB !
 $sleep_after_edit = 0;			// let DB do its stuff...
 
-
-# Getting vars from web server:
-$REMOTE_ADDR=getenv('REMOTE_ADDR'); /* visitor's IP */
-$HTTP_USER_AGENT=getenv('HTTP_USER_AGENT'); /* visitor's browser */
 
 /* ## Cookies ## */
 

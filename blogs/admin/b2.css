@@ -287,7 +287,8 @@ div.large
 	margin: 0ex;
 }
 
-table.thin
+table.thin,
+table.thincols,
 {
 	border: 1px solid #ccc;
 	margin: auto;
@@ -298,7 +299,13 @@ table.thin td
 	border-bottom: 1px solid #ccc;
 	padding: .3ex 1ex;
 }
-table.thin th
+table.thincols td
+{
+	border: 1px solid #ccc;
+	padding: .3ex 1ex;
+}
+table.thin th,
+table.thincols th,
 {
 	color: #fff;
 	background-color: #ccc;
@@ -310,7 +317,8 @@ table.thin th
 table.invisible
 {
 	margin: 1ex;
-	border-collapse: collapse
+	border-collapse: collapse;
+	margin: auto;
 }
 table.invisible td
 {

@@ -43,13 +43,13 @@ require_once (dirname(__FILE__)."/../$pathcore/_functions.php" ); // db funcs
 require_once (dirname(__FILE__)."/../$pathcore/_functions_cats.php" );
 require_once (dirname(__FILE__)."/../$pathcore/_functions_bposts.php" );
 
-$new_db_version = 8020;				// next time: 8030
+$new_db_version = 8021;				// next time: 8030
 
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
 $tablepostcats, $tablehitlog;
-	global $baseurl;
+	global $baseurl, $new_db_version;
 
 	echo "<p>Creating the necessary tables in the database...</p>";
 
@@ -64,7 +64,7 @@ $tablepostcats, $tablehitlog;
 		AutoBR tinyint(1) DEFAULT '1' NOT NULL, 
 		time_format varchar(20) DEFAULT 'H:i:s' NOT NULL, 
 		date_format varchar(20) DEFAULT 'Y/m/d' NOT NULL, 
-		db_version INT DEFAULT 8000 NOT NULL, 
+		db_version INT DEFAULT $new_db_version NOT NULL, 
 		PRIMARY KEY (ID), 
 		KEY ID (ID) 
 	)";
@@ -204,7 +204,7 @@ $tablepostcats, $tablehitlog;
 		hit_blog_ID int(11) NOT NULL default '0',
 		hit_remote_addr varchar(40) default NULL,
 		hit_user_agent varchar(250) default NULL,
-		PRIMARY KEY  (visitID),
+		PRIMARY KEY (visitID),
 		KEY hit_ignore (hit_ignore),
 		KEY baseDomain (baseDomain),
 		KEY hit_blog_ID (hit_blog_ID),
@@ -505,6 +505,11 @@ switch( $action )
 
 		if( $old_db_version < 8030 )
 		{
+			echo "<p>Deleting unecessary logs... ";
+			$query = "DELETE FROM $tablehitlog
+								WHERE hit_ignore IN ('badchar', 'blacklist')";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
 			 */
@@ -563,7 +568,7 @@ switch( $action )
 		echo "<p>Copying settings... ";	
 		// forcing paged mode because this works so much better !!!
 		// You can always change it back in the options if you don't like it.
-		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, time_format, date_format, 8000 FROM $oldtablesettings";
+		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, time_format, date_format, $new_db_version FROM $oldtablesettings";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 		
@@ -580,7 +585,7 @@ switch( $action )
 		echo "OK.<br />\n";
 		
 		echo "Copying categories... ";
-		$query = "INSERT INTO $tablecategories( cat_ID, cat_parent_ID, cat_name, cat_blog_ID ) SELECT cat_ID, NULL, cat_name, 2 FROM $oldtablecategories";
+		$query = "INSERT INTO $tablecategories( cat_ID, cat_parent_ID, cat_name, cat_blog_ID ) SELECT DISTINCT cat_ID, NULL, cat_name, 2 FROM $oldtablecategories";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 

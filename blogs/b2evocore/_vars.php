@@ -32,7 +32,8 @@ $pagenow = $pagenow[0];
 
 // browser detection
 $is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
-if (!isset($HTTP_USER_AGENT)) {
+if (!isset($HTTP_USER_AGENT)) 
+{
 	$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
 }
 if(strpos($HTTP_USER_AGENT, 'Lynx') !== false)

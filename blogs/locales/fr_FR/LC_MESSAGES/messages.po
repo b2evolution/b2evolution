@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"POT-Creation-Date: 2003-09-04 02:40+0200\n"
-"PO-Revision-Date: 2003-09-06 23:00+0100\n"
+"POT-Creation-Date: 2003-09-07 19:51+0200\n"
+"PO-Revision-Date: 2003-09-07 19:53+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -402,7 +402,7 @@ msgstr "Pompez ce blog"
 #: ..\..\..\skins\babyblues\_main.php:124
 #: ..\..\..\skins\bluesky\_main.php:233
 #: ..\..\..\skins\custom\_main.php:274
-#: ..\..\..\skins\fplanque2002\_main.php:291
+#: ..\..\..\skins\fplanque2002\_main.php:293
 #: ..\..\..\skins\guadeloupe\_main.php:234
 #: ..\..\..\skins\originalb2\_main.php:180
 #, php-format
@@ -505,7 +505,6 @@ msgstr "Options"
 
 #: ..\..\..\_feedback.php:186
 #: ..\..\..\admin\b2options.php:93
-#: ..\..\..\admin\b2sidebar.php:89
 #: ..\..\..\admin\_edit_form.php:82
 #: ..\..\..\admin\_edit_showposts.php:248
 msgid "Auto-BR"
@@ -614,17 +613,17 @@ msgid "Update"
 msgstr "Mettre à jour"
 
 #: ..\..\..\_stats.php:16
-#: ..\..\..\admin\b2stats.php:109
+#: ..\..\..\admin\b2stats.php:200
 msgid "Last referers"
 msgstr "Référents récents"
 
 #: ..\..\..\_stats.php:26
-#: ..\..\..\admin\b2stats.php:126
+#: ..\..\..\admin\b2stats.php:217
 msgid "Top referers"
 msgstr "Référents les plus fréquents"
 
 #: ..\..\..\_stats.php:36
-#: ..\..\..\admin\b2stats.php:151
+#: ..\..\..\admin\b2stats.php:242
 msgid "Last refering searches"
 msgstr "Dernières recherches référentes"
 
@@ -633,12 +632,12 @@ msgid "Top refering engines"
 msgstr "Moteurs de recherche référents les plus fréquents"
 
 #: ..\..\..\_stats.php:60
-#: ..\..\..\admin\b2stats.php:179
+#: ..\..\..\admin\b2stats.php:270
 msgid "Top Indexing Robots"
 msgstr "Robots d'indexation les plus actifs"
 
 #: ..\..\..\_stats.php:75
-#: ..\..\..\admin\b2stats.php:204
+#: ..\..\..\admin\b2stats.php:295
 msgid "Top Aggregators"
 msgstr "Aggregateurs les plus fréquents"
 
@@ -664,7 +663,7 @@ msgstr "Nouveau blog"
 
 #: ..\..\..\admin\b2blogs.php:64
 #: ..\..\..\admin\b2blogs.php:200
-#: ..\..\..\admin\edit_actions.php:168
+#: ..\..\..\admin\edit_actions.php:176
 msgid "Cannot update, please correct these errors:"
 msgstr "Impossible de mettre à jour, veuillez corriger ces erreurs:"
 
@@ -749,8 +748,8 @@ msgstr "Ecriture du fichier..."
 
 #: ..\..\..\admin\b2blogs.php:266
 #: ..\..\..\admin\edit_actions.php:88
-#: ..\..\..\admin\edit_actions.php:202
-#: ..\..\..\admin\edit_actions.php:273
+#: ..\..\..\admin\edit_actions.php:209
+#: ..\..\..\admin\edit_actions.php:280
 #: ..\..\..\b2evocore\_functions_pings.php:50
 #: ..\..\..\b2evocore\_functions_pings.php:84
 #: ..\..\..\b2evocore\_functions_pings.php:143
@@ -857,7 +856,7 @@ msgid "<strong>Note:</strong> Deleting a category does not delete posts from tha
 msgstr "<strong>Note:</strong> La suppression d'une catégorie n'entraine pas la suppression des articles de cette catégorie. Ceux-ci seront simplement assignés à la catégorie parente. Si vous supprimez une catégorie de niveau 0, les articles seront assignés à la catégorie restante la plus ancienne du même blog (celle portant le plus petit numéro de catégorie)."
 
 #: ..\..\..\admin\b2edit.php:26
-#: ..\..\..\admin\edit_actions.php:178
+#: ..\..\..\admin\edit_actions.php:158
 msgid "Oops, no post with this ID."
 msgstr "Oups, aucun article avec cet Idx."
 
@@ -874,10 +873,9 @@ msgid "Editing comment"
 msgstr "Edition d'un commentaire"
 
 #: ..\..\..\admin\b2edit.php:88
-#: ..\..\..\admin\b2sidebar.php:23
 #: ..\..\..\admin\b2upload.php:6
 #: ..\..\..\admin\edit_actions.php:57
-#: ..\..\..\admin\edit_actions.php:314
+#: ..\..\..\admin\edit_actions.php:321
 msgid "Cheatin' uh ?"
 msgstr "Alors on triche, hein?"
 
@@ -901,44 +899,44 @@ msgid "b2evo"
 msgstr "b2evo"
 
 #: ..\..\..\admin\b2login.php:16
-#: ..\..\..\b2evocore\_functions_users.php:456
+#: ..\..\..\b2evocore\_functions_users.php:459
 msgid "Login..."
 msgstr "S'identifier..."
 
-#: ..\..\..\admin\b2mail.php:36
+#: ..\..\..\admin\b2mail.php:33
 msgid "Connecting to pop server..."
 msgstr "Connexion au serveur POP..."
 
-#: ..\..\..\admin\b2mail.php:38
+#: ..\..\..\admin\b2mail.php:35
 msgid "Connection failed:"
 msgstr "La connexion a échoué:"
 
-#: ..\..\..\admin\b2mail.php:42
+#: ..\..\..\admin\b2mail.php:39
 msgid "Logging into pop server..."
 msgstr "Identification auprès du serveur POP..."
 
-#: ..\..\..\admin\b2mail.php:46
+#: ..\..\..\admin\b2mail.php:43
 msgid "No mail or Login Failed:"
 msgstr "Pas de mail ou l'identification à échoué"
 
-#: ..\..\..\admin\b2mail.php:57
+#: ..\..\..\admin\b2mail.php:54
 #, php-format
 msgid "Getting message #%d..."
 msgstr "Chargement du message #%d..."
 
-#: ..\..\..\admin\b2mail.php:66
+#: ..\..\..\admin\b2mail.php:63
 msgid "Processing..."
 msgstr "Traitement en cours..."
 
-#: ..\..\..\admin\b2mail.php:140
+#: ..\..\..\admin\b2mail.php:139
 msgid "Too old"
 msgstr "Trop ancien"
 
-#: ..\..\..\admin\b2mail.php:146
+#: ..\..\..\admin\b2mail.php:145
 msgid "Subject prefix does not match"
 msgstr "Le préfixe dans le sujet ne correspond pas"
 
-#: ..\..\..\admin\b2mail.php:166
+#: ..\..\..\admin\b2mail.php:165
 msgid "Raw content:"
 msgstr "Contenu brut:"
 
@@ -946,42 +944,42 @@ msgstr "Contenu brut:"
 msgid "Pass:"
 msgstr "Mot de passe:"
 
-#: ..\..\..\admin\b2mail.php:208
+#: ..\..\..\admin\b2mail.php:205
 msgid "Wrong login or password."
 msgstr "Identifiant ou mot de passe incorrects."
 
-#: ..\..\..\admin\b2mail.php:228
+#: ..\..\..\admin\b2mail.php:225
 msgid "Category ID"
 msgstr "Idx Catégorie"
 
-#: ..\..\..\admin\b2mail.php:236
+#: ..\..\..\admin\b2mail.php:233
 #: ..\..\..\admin\edit_actions.php:67
 msgid "Cannot post, please correct these errors:"
 msgstr "Impossible d'enregistrer; veuillez corriger les erreurs suivantes:"
 
-#: ..\..\..\admin\b2mail.php:250
+#: ..\..\..\admin\b2mail.php:247
 msgid "Blog ID"
 msgstr "Idx Blog"
 
-#: ..\..\..\admin\b2mail.php:258
+#: ..\..\..\admin\b2mail.php:255
 msgid "Posted title"
 msgstr "Titre envoyé"
 
-#: ..\..\..\admin\b2mail.php:259
+#: ..\..\..\admin\b2mail.php:256
 msgid "Posted content"
 msgstr "Contenu envoyé"
 
-#: ..\..\..\admin\b2mail.php:269
+#: ..\..\..\admin\b2mail.php:266
 msgid "Mission complete, message deleted."
 msgstr "Mission achevée; message supprimé."
 
-#: ..\..\..\admin\b2mail.php:275
+#: ..\..\..\admin\b2mail.php:272
 msgid "Level 0 users can't post."
 msgstr "Les utilisateurs de niveau 0 ne peuvent pas publier."
 
 #: ..\..\..\admin\b2mail.php:294
-msgid "End."
-msgstr "Fin."
+msgid "OK."
+msgstr "OK."
 
 #: ..\..\..\admin\b2options.php:12
 #: ..\..\..\admin\b2options.php:33
@@ -1042,7 +1040,7 @@ msgid "My Profile"
 msgstr "Mon Profil"
 
 #: ..\..\..\admin\b2profile.php:16
-#: ..\..\..\b2evocore\_functions_users.php:569
+#: ..\..\..\b2evocore\_functions_users.php:572
 msgid "Edit your profile"
 msgstr "Edition de votre profil"
 
@@ -1090,147 +1088,132 @@ msgstr "Ajoutez ce lien à vos favoris:"
 msgid "b2evo sidebar"
 msgstr "Sidebar b2evo"
 
-#: ..\..\..\admin\b2sidebar.php:87
-msgid "Post"
-msgstr "Article"
-
-#: ..\..\..\admin\b2sidebar.php:92
-#: ..\..\..\admin\_edit_form.php:91
-msgid "Pingback"
-msgstr "Pingback"
-
-#: ..\..\..\admin\b2sidebar.php:98
-msgid "SpellCheck"
-msgstr "Vérifier l'orthographe"
-
-#: ..\..\..\admin\b2sidebar.php:102
-msgid "<strong>Trackback</strong> an URL:"
-msgstr "Envoyer un <strong>Trackback</strong> à l'URL:"
-
-#: ..\..\..\admin\b2stats.php:4
+#: ..\..\..\admin\b2stats.php:10
 msgid "View Stats"
 msgstr "Statistiques"
 
-#: ..\..\..\admin\b2stats.php:16
+#: ..\..\..\admin\b2stats.php:22
+#: ..\..\..\admin\b2stats.php:118
+msgid "Summary"
+msgstr "Résumé"
+
+#: ..\..\..\admin\b2stats.php:26
+#: ..\..\..\admin\b2stats.php:141
 msgid "Referers"
 msgstr "Référents"
 
-#: ..\..\..\admin\b2stats.php:20
+#: ..\..\..\admin\b2stats.php:30
+#: ..\..\..\admin\b2stats.php:142
 msgid "Refering Searches"
 msgstr "Recherches référentes"
 
-#: ..\..\..\admin\b2stats.php:24
+#: ..\..\..\admin\b2stats.php:34
+#: ..\..\..\admin\b2stats.php:144
 msgid "Syndication"
 msgstr "Diffusion XML"
 
-#: ..\..\..\admin\b2stats.php:28
+#: ..\..\..\admin\b2stats.php:38
 msgid "User Agents"
 msgstr "User Agents"
 
-#: ..\..\..\admin\b2stats.php:32
-msgid "Other"
-msgstr "Autres"
+#: ..\..\..\admin\b2stats.php:42
+#: ..\..\..\admin\b2stats.php:145
+msgid "Direct Accesses"
+msgstr "Accès directs"
 
-#: ..\..\..\admin\b2stats.php:41
+#: ..\..\..\admin\b2stats.php:51
 msgid "You have no right to view stats."
 msgstr "Vous n'avez pas le droit de consulter les statistiques."
 
-#: ..\..\..\admin\b2stats.php:52
+#: ..\..\..\admin\b2stats.php:62
 #, php-format
 msgid "Changing hit #%d type to: %s"
 msgstr "Changement du type du hit #%d en: %s"
 
-#: ..\..\..\admin\b2stats.php:65
+#: ..\..\..\admin\b2stats.php:75
 #, php-format
 msgid "Deleting hit #%d..."
 msgstr "Suppression du hit n°%d..."
 
-#: ..\..\..\admin\b2stats.php:77
+#: ..\..\..\admin\b2stats.php:87
 msgid "Filter"
 msgstr "Filtre"
 
-#: ..\..\..\admin\b2stats.php:80
-#: ..\..\..\admin\b2stats.php:84
+#: ..\..\..\admin\b2stats.php:90
+#: ..\..\..\admin\b2stats.php:94
 msgid "None"
 msgstr "Aucun"
 
-#: ..\..\..\admin\b2stats.php:110
+#: ..\..\..\admin\b2stats.php:140
+msgid "Date"
+msgstr "Date"
+
+#: ..\..\..\admin\b2stats.php:143
+msgid "Indexing Robots"
+msgstr "Robots d'indexation"
+
+#: ..\..\..\admin\b2stats.php:146
+msgid "Total"
+msgstr "Total"
+
+#: ..\..\..\admin\b2stats.php:201
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Il s'agit de hits provenant de pages web externes ayant un lien vers ce blog"
 
-#: ..\..\..\admin\b2stats.php:116
-#: ..\..\..\admin\b2stats.php:158
-#: ..\..\..\admin\b2stats.php:237
-#: ..\..\..\admin\b2stats.php:252
-#: ..\..\..\admin\b2stats.php:267
+#: ..\..\..\admin\b2stats.php:207
+#: ..\..\..\admin\b2stats.php:249
+#: ..\..\..\admin\b2stats.php:328
 msgid "Delete this hit!"
 msgstr "Supprimer ce hit!"
 
 #. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:116
-#: ..\..\..\admin\b2stats.php:158
-#: ..\..\..\admin\b2stats.php:237
-#: ..\..\..\admin\b2stats.php:252
-#: ..\..\..\admin\b2stats.php:267
+#: ..\..\..\admin\b2stats.php:207
+#: ..\..\..\admin\b2stats.php:249
+#: ..\..\..\admin\b2stats.php:328
+#: ..\..\..\admin\_user_list.php:37
 msgid "Del"
 msgstr "Suppr"
 
-#: ..\..\..\admin\b2stats.php:117
+#: ..\..\..\admin\b2stats.php:208
 msgid "Log as a search instead"
 msgstr "Enregistrer plutôt comme une recherche"
 
 #. TRANS: Abbrev. for "move to searches" (stats)
-#: ..\..\..\admin\b2stats.php:117
+#: ..\..\..\admin\b2stats.php:208
 msgid "-&gt;S"
 msgstr "-&gt;R"
 
-#: ..\..\..\admin\b2stats.php:137
+#: ..\..\..\admin\b2stats.php:228
 msgid "Total referers"
 msgstr "Total référents"
 
-#: ..\..\..\admin\b2stats.php:152
+#: ..\..\..\admin\b2stats.php:243
 msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
 msgstr "Il s'agit de hit de personnes qui sont arrivées sur ce blog à travers un moteur de recherche. (Les moteirs de recherche doivent être listés dans /conf/b2evo_advanced.php)"
 
-#: ..\..\..\admin\b2stats.php:167
+#: ..\..\..\admin\b2stats.php:258
 msgid "Top refering search engines"
 msgstr "Moteurs de recherche référents les plus fréquents"
 
-#: ..\..\..\admin\b2stats.php:180
+#: ..\..\..\admin\b2stats.php:271
 msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)"
 msgstr "Il s'agit de hits provenant de robots tels que les robots indexeurs des moteurs de recherche. (Les robots doivent être listés dans /conf/b2evo_advanced.php)"
 
-#: ..\..\..\admin\b2stats.php:205
+#: ..\..\..\admin\b2stats.php:296
 msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)"
 msgstr "Il s'agit de hits provenant d'agrégateurs RSS. (Les agrégateurs doivent être listés dans /conf/b2evo_advanced.php)"
 
-#: ..\..\..\admin\b2stats.php:216
+#: ..\..\..\admin\b2stats.php:307
 msgid "Total RSS hits"
 msgstr "Totals hits RSS"
 
-#: ..\..\..\admin\b2stats.php:230
+#: ..\..\..\admin\b2stats.php:321
 msgid "Last direct accesses"
 msgstr "Derniers accès directs"
 
-#: ..\..\..\admin\b2stats.php:231
+#: ..\..\..\admin\b2stats.php:322
 msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
 msgstr "Il s'agit de hits de personnes venues sur ce blog directement (soit en ayant tapé l'URL, soit en ayant utilisé une entrée de leurs Favoris. Les référents invalides (trop courts) sont également listés ici.)"
-
-#: ..\..\..\admin\b2stats.php:245
-msgid "Last blacklisted referers"
-msgstr "Derniers référents sur la liste noire"
-
-#: ..\..\..\admin\b2stats.php:246
-msgid "These are hits from people who came to this blog system through a blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. By default the blacklist includes all internal references.)"
-msgstr "Il s'agit de hits de personnes qui sont arrivées sur ce blog depuis une page figurant sur la liste noire. (La liste noire doit être définie dans /conf/b2evo_advanced.php.Par défaut, la liste noire inclue toutes les références internes.)"
-
-#: ..\..\..\admin\b2stats.php:260
-msgid "Last bad chars"
-msgstr "Derniers caractères invalides"
-
-#: ..\..\..\admin\b2stats.php:261
-msgid "These are hits with bad chars in the referer."
-msgstr "Il s'agit des hits ayant des caractères invalides dans la champ referer."
 
 #: ..\..\..\admin\b2team.php:3
 msgid "User management"
@@ -1476,13 +1459,13 @@ msgstr "Type"
 msgid "Close this window"
 msgstr "Fermer cette fenêtre"
 
-#: ..\..\..\admin\edit_actions.php:41
+#: ..\..\..\admin\edit_actions.php:33
 msgid "Adding new post..."
 msgstr "Ajout du nouvel article..."
 
 #: ..\..\..\admin\edit_actions.php:63
-#: ..\..\..\admin\edit_actions.php:164
-#: ..\..\..\admin\edit_actions.php:335
+#: ..\..\..\admin\edit_actions.php:172
+#: ..\..\..\admin\edit_actions.php:342
 #: ..\..\..\htsrv\comment_post.php:45
 #: ..\..\..\htsrv\trackback.php:60
 #: ..\..\..\xmlsrv\xmlrpc.php:1210
@@ -1490,8 +1473,8 @@ msgid "Supplied URL is invalid: "
 msgstr "L'URL fournie est invalide:"
 
 #: ..\..\..\admin\edit_actions.php:68
-#: ..\..\..\admin\edit_actions.php:169
-#: ..\..\..\admin\edit_actions.php:340
+#: ..\..\..\admin\edit_actions.php:177
+#: ..\..\..\admin\edit_actions.php:347
 msgid "Back to post editing"
 msgstr "Retour à l'édition de l'article"
 
@@ -1500,57 +1483,57 @@ msgid "Recording post..."
 msgstr "Enregistrement de l'article..."
 
 #: ..\..\..\admin\edit_actions.php:84
-#: ..\..\..\admin\edit_actions.php:269
+#: ..\..\..\admin\edit_actions.php:276
 msgid "Sleeping..."
 msgstr "Attente..."
 
 #: ..\..\..\admin\edit_actions.php:94
-#: ..\..\..\admin\edit_actions.php:208
+#: ..\..\..\admin\edit_actions.php:215
 msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr "Article non publié publiquement: pas de trackback, pingback ni pings..."
 
-#: ..\..\..\admin\edit_actions.php:224
+#: ..\..\..\admin\edit_actions.php:231
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Les pings concernant cet article ont déjà été envoyés: pas de pings..."
 
-#: ..\..\..\admin\edit_actions.php:236
+#: ..\..\..\admin\edit_actions.php:243
 msgid "Posting Done..."
 msgstr "Enregistrement effectué..."
 
-#: ..\..\..\admin\edit_actions.php:256
+#: ..\..\..\admin\edit_actions.php:263
 msgid "Oops, no post with this ID!"
 msgstr "Oups, aucun article avec cet Idx."
 
-#: ..\..\..\admin\edit_actions.php:260
+#: ..\..\..\admin\edit_actions.php:267
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr "Vous n'avez pas le droit d'effacer les articles de <strong>%s</strong>."
 
-#: ..\..\..\admin\edit_actions.php:263
+#: ..\..\..\admin\edit_actions.php:270
 msgid "Deleting post..."
 msgstr "Suppression de l'article..."
 
-#: ..\..\..\admin\edit_actions.php:278
+#: ..\..\..\admin\edit_actions.php:285
 msgid "Deleting Done..."
 msgstr "Suppression effectuée..."
 
-#: ..\..\..\admin\edit_actions.php:298
+#: ..\..\..\admin\edit_actions.php:305
 msgid "Oops, no comment with this ID."
 msgstr "Oups, pas de commentaire avec cet Idx."
 
-#: ..\..\..\admin\edit_actions.php:339
+#: ..\..\..\admin\edit_actions.php:346
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Impossible de mettr à jour le commentaire; veuillez corriger les erreurs suivantes:"
 
-#: ..\..\..\admin\edit_actions.php:365
+#: ..\..\..\admin\edit_actions.php:372
 msgid "Back to posts!"
 msgstr "Retour aux articles!"
 
-#: ..\..\..\admin\edit_actions.php:367
+#: ..\..\..\admin\edit_actions.php:374
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr "Peut-être voudrez vous maintenant générer des pages statiques ou voir vos blogs..."
 
-#: ..\..\..\admin\edit_actions.php:375
+#: ..\..\..\admin\edit_actions.php:382
 msgid "New post"
 msgstr "Nouvel article"
 
@@ -1674,6 +1657,10 @@ msgstr "Lien vers url"
 #: ..\..\..\admin\_edit_form.php:82
 msgid "(converts line-breaks into &lt;br /&gt; tags)"
 msgstr "(convertit les retours à la ligne en balises &lt;br /&gt;)"
+
+#: ..\..\..\admin\_edit_form.php:91
+msgid "Pingback"
+msgstr "Pingback"
 
 #: ..\..\..\admin\_edit_form.php:91
 msgid "(Send a pingback to all URLs in this post)"
@@ -2096,180 +2083,180 @@ msgstr "Trouvé URL invalide:"
 msgid "Tag %s may not contain raw character data"
 msgstr "La balise %s ne peut pas contenir de texte brut"
 
-#: ..\..\..\b2evocore\_class_pop3.php:80
-#: ..\..\..\b2evocore\_class_pop3.php:88
-#: ..\..\..\b2evocore\_class_pop3.php:100
+#: ..\..\..\b2evocore\_class_pop3.php:81
+#: ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:101
 msgid "POP3 connect:"
 msgstr "POP3 connect:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:80
+#: ..\..\..\b2evocore\_class_pop3.php:81
 msgid "No server specified"
 msgstr "Pas de serveur spécifié"
 
-#: ..\..\..\b2evocore\_class_pop3.php:88
-#: ..\..\..\b2evocore\_class_pop3.php:100
-#: ..\..\..\b2evocore\_class_pop3.php:139
-#: ..\..\..\b2evocore\_class_pop3.php:274
-#: ..\..\..\b2evocore\_class_pop3.php:328
-#: ..\..\..\b2evocore\_class_pop3.php:339
-#: ..\..\..\b2evocore\_class_pop3.php:387
-#: ..\..\..\b2evocore\_class_pop3.php:420
-#: ..\..\..\b2evocore\_class_pop3.php:453
-#: ..\..\..\b2evocore\_class_pop3.php:552
-#: ..\..\..\b2evocore\_class_pop3.php:575
+#: ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:101
+#: ..\..\..\b2evocore\_class_pop3.php:140
+#: ..\..\..\b2evocore\_class_pop3.php:275
+#: ..\..\..\b2evocore\_class_pop3.php:329
+#: ..\..\..\b2evocore\_class_pop3.php:340
+#: ..\..\..\b2evocore\_class_pop3.php:388
+#: ..\..\..\b2evocore\_class_pop3.php:421
+#: ..\..\..\b2evocore\_class_pop3.php:454
+#: ..\..\..\b2evocore\_class_pop3.php:553
+#: ..\..\..\b2evocore\_class_pop3.php:576
 msgid "Error "
 msgstr "Erreur"
 
-#: ..\..\..\b2evocore\_class_pop3.php:108
+#: ..\..\..\b2evocore\_class_pop3.php:109
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
 msgstr "POP3: NOOP OK prématuré, le serveur n'est pas conforme à la RFC 1939"
 
-#: ..\..\..\b2evocore\_class_pop3.php:118
+#: ..\..\..\b2evocore\_class_pop3.php:119
 msgid "POP3 noop:"
 msgstr "POP3 noop:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:118
-#: ..\..\..\b2evocore\_class_pop3.php:184
-#: ..\..\..\b2evocore\_class_pop3.php:233
-#: ..\..\..\b2evocore\_class_pop3.php:258
-#: ..\..\..\b2evocore\_class_pop3.php:300
-#: ..\..\..\b2evocore\_class_pop3.php:374
-#: ..\..\..\b2evocore\_class_pop3.php:413
-#: ..\..\..\b2evocore\_class_pop3.php:443
-#: ..\..\..\b2evocore\_class_pop3.php:477
-#: ..\..\..\b2evocore\_class_pop3.php:540
-#: ..\..\..\b2evocore\_class_pop3.php:608
+#: ..\..\..\b2evocore\_class_pop3.php:119
+#: ..\..\..\b2evocore\_class_pop3.php:185
+#: ..\..\..\b2evocore\_class_pop3.php:234
+#: ..\..\..\b2evocore\_class_pop3.php:259
+#: ..\..\..\b2evocore\_class_pop3.php:301
+#: ..\..\..\b2evocore\_class_pop3.php:375
+#: ..\..\..\b2evocore\_class_pop3.php:414
+#: ..\..\..\b2evocore\_class_pop3.php:444
+#: ..\..\..\b2evocore\_class_pop3.php:478
+#: ..\..\..\b2evocore\_class_pop3.php:541
+#: ..\..\..\b2evocore\_class_pop3.php:609
 msgid "No connection to server"
 msgstr "Pas de connexion au serveur"
 
-#: ..\..\..\b2evocore\_class_pop3.php:131
-#: ..\..\..\b2evocore\_class_pop3.php:134
-#: ..\..\..\b2evocore\_class_pop3.php:139
+#: ..\..\..\b2evocore\_class_pop3.php:132
+#: ..\..\..\b2evocore\_class_pop3.php:135
+#: ..\..\..\b2evocore\_class_pop3.php:140
 msgid "POP3 user:"
 msgstr "POP3 user:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:131
-#: ..\..\..\b2evocore\_class_pop3.php:190
+#: ..\..\..\b2evocore\_class_pop3.php:132
+#: ..\..\..\b2evocore\_class_pop3.php:191
 msgid "No login ID submitted"
 msgstr "Aucun identifiant n'a été soumis"
 
-#: ..\..\..\b2evocore\_class_pop3.php:134
-#: ..\..\..\b2evocore\_class_pop3.php:154
+#: ..\..\..\b2evocore\_class_pop3.php:135
+#: ..\..\..\b2evocore\_class_pop3.php:155
 msgid "connection not established"
 msgstr "connexion non établie"
 
-#: ..\..\..\b2evocore\_class_pop3.php:151
-#: ..\..\..\b2evocore\_class_pop3.php:154
-#: ..\..\..\b2evocore\_class_pop3.php:159
-#: ..\..\..\b2evocore\_class_pop3.php:168
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:155
+#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:169
 msgid "POP3 pass:"
 msgstr "POP3 pass:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:151
-#: ..\..\..\b2evocore\_class_pop3.php:193
+#: ..\..\..\b2evocore\_class_pop3.php:152
+#: ..\..\..\b2evocore\_class_pop3.php:194
 msgid "No password submitted"
 msgstr "Aucun mot de passe n'a été soumis"
 
-#: ..\..\..\b2evocore\_class_pop3.php:159
+#: ..\..\..\b2evocore\_class_pop3.php:160
 msgid "authentication failed "
 msgstr "l'autentification a échoué"
 
-#: ..\..\..\b2evocore\_class_pop3.php:168
-#: ..\..\..\b2evocore\_class_pop3.php:217
+#: ..\..\..\b2evocore\_class_pop3.php:169
+#: ..\..\..\b2evocore\_class_pop3.php:218
 msgid "NOOP failed. Server not RFC 1939 compliant"
 msgstr "NOOP à échoué. Le serveur n'est pas conforme à la RFC 1939"
 
-#: ..\..\..\b2evocore\_class_pop3.php:184
-#: ..\..\..\b2evocore\_class_pop3.php:190
-#: ..\..\..\b2evocore\_class_pop3.php:193
-#: ..\..\..\b2evocore\_class_pop3.php:198
-#: ..\..\..\b2evocore\_class_pop3.php:208
-#: ..\..\..\b2evocore\_class_pop3.php:217
+#: ..\..\..\b2evocore\_class_pop3.php:185
+#: ..\..\..\b2evocore\_class_pop3.php:191
+#: ..\..\..\b2evocore\_class_pop3.php:194
+#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:209
+#: ..\..\..\b2evocore\_class_pop3.php:218
 msgid "POP3 apop:"
 msgstr "POP3 apop:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:198
+#: ..\..\..\b2evocore\_class_pop3.php:199
 msgid "No server banner"
 msgstr "No server banner"
 
-#: ..\..\..\b2evocore\_class_pop3.php:198
-#: ..\..\..\b2evocore\_class_pop3.php:208
+#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:209
 msgid "abort"
 msgstr "abandon"
 
-#: ..\..\..\b2evocore\_class_pop3.php:208
+#: ..\..\..\b2evocore\_class_pop3.php:209
 msgid "apop authentication failed"
 msgstr "l'authentification apop a échoué"
 
-#: ..\..\..\b2evocore\_class_pop3.php:233
+#: ..\..\..\b2evocore\_class_pop3.php:234
 msgid "POP3 login:"
 msgstr "POP3 login:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:258
-#: ..\..\..\b2evocore\_class_pop3.php:274
+#: ..\..\..\b2evocore\_class_pop3.php:259
+#: ..\..\..\b2evocore\_class_pop3.php:275
 msgid "POP3 top:"
 msgstr "POP3 top:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:300
-#: ..\..\..\b2evocore\_class_pop3.php:328
-#: ..\..\..\b2evocore\_class_pop3.php:339
-#: ..\..\..\b2evocore\_class_pop3.php:351
+#: ..\..\..\b2evocore\_class_pop3.php:301
+#: ..\..\..\b2evocore\_class_pop3.php:329
+#: ..\..\..\b2evocore\_class_pop3.php:340
+#: ..\..\..\b2evocore\_class_pop3.php:352
 msgid "POP3 pop_list:"
 msgstr "POP3 pop_list:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:351
+#: ..\..\..\b2evocore\_class_pop3.php:352
 msgid "Premature end of list"
 msgstr "Fin de liste prématurée"
 
-#: ..\..\..\b2evocore\_class_pop3.php:374
-#: ..\..\..\b2evocore\_class_pop3.php:387
+#: ..\..\..\b2evocore\_class_pop3.php:375
+#: ..\..\..\b2evocore\_class_pop3.php:388
 msgid "POP3 get:"
 msgstr "POP3 get:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:413
-#: ..\..\..\b2evocore\_class_pop3.php:420
+#: ..\..\..\b2evocore\_class_pop3.php:414
+#: ..\..\..\b2evocore\_class_pop3.php:421
 msgid "POP3 last:"
 msgstr "POP3 last:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:443
-#: ..\..\..\b2evocore\_class_pop3.php:453
+#: ..\..\..\b2evocore\_class_pop3.php:444
+#: ..\..\..\b2evocore\_class_pop3.php:454
 msgid "POP3 reset:"
 msgstr "POP3 reset:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:477
-#: ..\..\..\b2evocore\_class_pop3.php:483
+#: ..\..\..\b2evocore\_class_pop3.php:478
+#: ..\..\..\b2evocore\_class_pop3.php:484
 msgid "POP3 send_cmd:"
 msgstr "POP3 send_cmd:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:483
+#: ..\..\..\b2evocore\_class_pop3.php:484
 msgid "Empty command string"
 msgstr "Chaîne de commande vide"
 
-#: ..\..\..\b2evocore\_class_pop3.php:503
+#: ..\..\..\b2evocore\_class_pop3.php:504
 msgid "POP3 quit:"
 msgstr "POP3 quit:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:503
+#: ..\..\..\b2evocore\_class_pop3.php:504
 msgid "connection does not exist"
 msgstr "la connexion n'existe pas"
 
-#: ..\..\..\b2evocore\_class_pop3.php:540
-#: ..\..\..\b2evocore\_class_pop3.php:552
-#: ..\..\..\b2evocore\_class_pop3.php:575
+#: ..\..\..\b2evocore\_class_pop3.php:541
+#: ..\..\..\b2evocore\_class_pop3.php:553
+#: ..\..\..\b2evocore\_class_pop3.php:576
 msgid "POP3 uidl:"
 msgstr "POP3 uidl:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:608
-#: ..\..\..\b2evocore\_class_pop3.php:613
-#: ..\..\..\b2evocore\_class_pop3.php:619
+#: ..\..\..\b2evocore\_class_pop3.php:609
+#: ..\..\..\b2evocore\_class_pop3.php:614
+#: ..\..\..\b2evocore\_class_pop3.php:620
 msgid "POP3 delete:"
 msgstr "POP3 delete:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:613
+#: ..\..\..\b2evocore\_class_pop3.php:614
 msgid "No msg number submitted"
 msgstr "Aucun numéro de message n'a été soumis"
 
-#: ..\..\..\b2evocore\_class_pop3.php:619
+#: ..\..\..\b2evocore\_class_pop3.php:620
 msgid "Command failed "
 msgstr "La commande a échoué"
 
@@ -2299,20 +2286,20 @@ msgstr "Redirection vers:"
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "Si rien ne se passe, cliquez <a %s>ici</a>."
 
-#: ..\..\..\b2evocore\_functions.php:969
+#: ..\..\..\b2evocore\_functions.php:992
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "La paramètre %s est requis!"
 
-#: ..\..\..\b2evocore\_functions.php:1161
+#: ..\..\..\b2evocore\_functions.php:1191
 msgid "Invalid URL"
 msgstr "URL invalide"
 
-#: ..\..\..\b2evocore\_functions.php:1167
+#: ..\..\..\b2evocore\_functions.php:1197
 msgid "URI scheme not allowed"
 msgstr "Type d'URI non autorisé"
 
-#: ..\..\..\b2evocore\_functions.php:1175
+#: ..\..\..\b2evocore\_functions.php:1205
 msgid "URL not allowed"
 msgstr "URL non autorisée"
 
@@ -2386,42 +2373,42 @@ msgstr "Afficher cette catégorie"
 msgid "bad char in User Agent"
 msgstr "Caractère invalide dans le User Agent"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:93
-#: ..\..\..\b2evocore\_functions_hitlogs.php:104
-#: ..\..\..\b2evocore\_functions_hitlogs.php:113
-#: ..\..\..\b2evocore\_functions_hitlogs.php:129
+#: ..\..\..\b2evocore\_functions_hitlogs.php:92
+#: ..\..\..\b2evocore\_functions_hitlogs.php:109
+#: ..\..\..\b2evocore\_functions_hitlogs.php:120
+#: ..\..\..\b2evocore\_functions_hitlogs.php:133
 msgid "referer ignored"
 msgstr "référent ignoré"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:93
-msgid "robot"
-msgstr "robot"
-
-#: ..\..\..\b2evocore\_functions_hitlogs.php:104
-msgid "invalid"
-msgstr "invalide"
-
-#: ..\..\..\b2evocore\_functions_hitlogs.php:113
+#: ..\..\..\b2evocore\_functions_hitlogs.php:92
 msgid "BlackList"
 msgstr "Liste Noire"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:129
+#: ..\..\..\b2evocore\_functions_hitlogs.php:109
+msgid "robot"
+msgstr "robot"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:120
+msgid "invalid"
+msgstr "invalide"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:133
 msgid "search engine"
 msgstr "moteur de recherche"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:140
+#: ..\..\..\b2evocore\_functions_hitlogs.php:142
 msgid "loading referering page"
 msgstr "chargement de la page référente"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:159
+#: ..\..\..\b2evocore\_functions_hitlogs.php:161
 msgid "found current url in page"
 msgstr "URL courante trouvée dans la page"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:410
+#: ..\..\..\b2evocore\_functions_hitlogs.php:412
 msgid "not a query - no params!"
 msgstr "pas une requête - pas de paramètres!"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:435
+#: ..\..\..\b2evocore\_functions_hitlogs.php:437
 msgid "no query string found"
 msgstr "chaîne de recherche non trouvée"
 
@@ -2605,209 +2592,209 @@ msgstr "cet identifiant/mot de passe n'est plus valide"
 msgid "You must log in!"
 msgstr "Vous devez vous identifier!"
 
-#: ..\..\..\b2evocore\_functions_users.php:457
+#: ..\..\..\b2evocore\_functions_users.php:460
 msgid "Login if you have an account..."
 msgstr "Identifiez vous si vous avez un compte..."
 
-#: ..\..\..\b2evocore\_functions_users.php:486
+#: ..\..\..\b2evocore\_functions_users.php:489
 msgid "Register..."
 msgstr "S'inscire..."
 
-#: ..\..\..\b2evocore\_functions_users.php:487
+#: ..\..\..\b2evocore\_functions_users.php:490
 msgid "Register to open an account..."
 msgstr "Inscrivez vous pour ouvrir un compte..."
 
-#: ..\..\..\b2evocore\_functions_users.php:514
+#: ..\..\..\b2evocore\_functions_users.php:517
 #, php-format
 msgid "Logout (%s)"
 msgstr "Déconnexion (%s)"
 
-#: ..\..\..\b2evocore\_functions_users.php:515
+#: ..\..\..\b2evocore\_functions_users.php:518
 msgid "Logout from your account"
 msgstr "Déconnexion de votre compte"
 
-#: ..\..\..\b2evocore\_functions_users.php:546
+#: ..\..\..\b2evocore\_functions_users.php:549
 msgid "Admin"
 msgstr "Administration"
 
-#: ..\..\..\b2evocore\_functions_users.php:547
+#: ..\..\..\b2evocore\_functions_users.php:550
 msgid "Go to the back-office"
 msgstr "Atteindre l'interface d'administration"
 
-#: ..\..\..\b2evocore\_functions_users.php:568
+#: ..\..\..\b2evocore\_functions_users.php:571
 #, php-format
 msgid "Profile (%s)"
 msgstr "Profil (%s)"
 
-#: ..\..\..\b2evocore\_vars.php:104
+#: ..\..\..\b2evocore\_vars.php:105
 msgid "Sunday"
 msgstr "Dimanche"
 
-#: ..\..\..\b2evocore\_vars.php:105
+#: ..\..\..\b2evocore\_vars.php:106
 msgid "Monday"
 msgstr "Lundi"
 
-#: ..\..\..\b2evocore\_vars.php:106
+#: ..\..\..\b2evocore\_vars.php:107
 msgid "Tuesday"
 msgstr "Mardi"
 
-#: ..\..\..\b2evocore\_vars.php:107
+#: ..\..\..\b2evocore\_vars.php:108
 msgid "Wednesday"
 msgstr "Mercredi"
 
-#: ..\..\..\b2evocore\_vars.php:108
+#: ..\..\..\b2evocore\_vars.php:109
 msgid "Thursday"
 msgstr "Jeudi"
 
-#: ..\..\..\b2evocore\_vars.php:109
+#: ..\..\..\b2evocore\_vars.php:110
 msgid "Friday"
 msgstr "Vendredi"
 
-#: ..\..\..\b2evocore\_vars.php:110
+#: ..\..\..\b2evocore\_vars.php:111
 msgid "Saturday"
 msgstr "Samedi"
 
 #. TRANS: abbrev. for Sunday
-#: ..\..\..\b2evocore\_vars.php:114
+#: ..\..\..\b2evocore\_vars.php:115
 msgid "Sun"
 msgstr "Dim"
 
 #. TRANS: abbrev. for Monday
-#: ..\..\..\b2evocore\_vars.php:116
+#: ..\..\..\b2evocore\_vars.php:117
 msgid "Mon"
 msgstr "Lun"
 
 #. TRANS: abbrev. for Tuesday
-#: ..\..\..\b2evocore\_vars.php:118
+#: ..\..\..\b2evocore\_vars.php:119
 msgid "Tue"
 msgstr "Mar"
 
 #. TRANS: abbrev. for Wednesday
-#: ..\..\..\b2evocore\_vars.php:120
+#: ..\..\..\b2evocore\_vars.php:121
 msgid "Wed"
 msgstr "Mer"
 
 #. TRANS: abbrev. for Thursday
-#: ..\..\..\b2evocore\_vars.php:122
+#: ..\..\..\b2evocore\_vars.php:123
 msgid "Thu"
 msgstr "Jeu"
 
 #. TRANS: abbrev. for Friday
-#: ..\..\..\b2evocore\_vars.php:124
+#: ..\..\..\b2evocore\_vars.php:125
 msgid "Fri"
 msgstr "Ven"
 
 #. TRANS: abbrev. for Saturday
-#: ..\..\..\b2evocore\_vars.php:126
+#: ..\..\..\b2evocore\_vars.php:127
 msgid "Sat"
 msgstr "Sam"
 
-#: ..\..\..\b2evocore\_vars.php:129
+#: ..\..\..\b2evocore\_vars.php:130
 msgid "January"
 msgstr "Janvier"
 
-#: ..\..\..\b2evocore\_vars.php:130
+#: ..\..\..\b2evocore\_vars.php:131
 msgid "February"
 msgstr "Février"
 
-#: ..\..\..\b2evocore\_vars.php:131
+#: ..\..\..\b2evocore\_vars.php:132
 msgid "March"
 msgstr "Mars"
 
-#: ..\..\..\b2evocore\_vars.php:132
+#: ..\..\..\b2evocore\_vars.php:133
 msgid "April"
 msgstr "Avril"
 
 #. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-#: ..\..\..\b2evocore\_vars.php:134
+#: ..\..\..\b2evocore\_vars.php:135
 msgid "May "
 msgstr "Mai"
 
-#: ..\..\..\b2evocore\_vars.php:135
+#: ..\..\..\b2evocore\_vars.php:136
 msgid "June"
 msgstr "Juin"
 
-#: ..\..\..\b2evocore\_vars.php:136
+#: ..\..\..\b2evocore\_vars.php:137
 msgid "July"
 msgstr "Juillet"
 
-#: ..\..\..\b2evocore\_vars.php:137
+#: ..\..\..\b2evocore\_vars.php:138
 msgid "August"
 msgstr "Août"
 
-#: ..\..\..\b2evocore\_vars.php:138
+#: ..\..\..\b2evocore\_vars.php:139
 msgid "September"
 msgstr "Septembre"
 
-#: ..\..\..\b2evocore\_vars.php:139
+#: ..\..\..\b2evocore\_vars.php:140
 msgid "October"
 msgstr "Octobre"
 
-#: ..\..\..\b2evocore\_vars.php:140
+#: ..\..\..\b2evocore\_vars.php:141
 msgid "November"
 msgstr "Novembre"
 
-#: ..\..\..\b2evocore\_vars.php:141
+#: ..\..\..\b2evocore\_vars.php:142
 msgid "December"
 msgstr "Décembre"
 
 #. TRANS: abbrev. for January
-#: ..\..\..\b2evocore\_vars.php:145
+#: ..\..\..\b2evocore\_vars.php:146
 msgid "Jan"
 msgstr "Jan"
 
 #. TRANS: abbrev. for February
-#: ..\..\..\b2evocore\_vars.php:147
+#: ..\..\..\b2evocore\_vars.php:148
 msgid "Feb"
 msgstr "Fév"
 
 #. TRANS: abbrev. for March
-#: ..\..\..\b2evocore\_vars.php:149
+#: ..\..\..\b2evocore\_vars.php:150
 msgid "Mar"
 msgstr "Mar"
 
 #. TRANS: abbrev. for April
-#: ..\..\..\b2evocore\_vars.php:151
+#: ..\..\..\b2evocore\_vars.php:152
 msgid "Apr"
 msgstr "Avr"
 
 #. TRANS: abbrev. for May
-#: ..\..\..\b2evocore\_vars.php:153
+#: ..\..\..\b2evocore\_vars.php:154
 msgid "May"
 msgstr "Mai"
 
 #. TRANS: abbrev. for June
-#: ..\..\..\b2evocore\_vars.php:155
+#: ..\..\..\b2evocore\_vars.php:156
 msgid "Jun"
 msgstr "Jun"
 
 #. TRANS: abbrev. for July
-#: ..\..\..\b2evocore\_vars.php:157
+#: ..\..\..\b2evocore\_vars.php:158
 msgid "Jul"
 msgstr "Jul"
 
 #. TRANS: abbrev. for August
-#: ..\..\..\b2evocore\_vars.php:159
+#: ..\..\..\b2evocore\_vars.php:160
 msgid "Aug"
 msgstr "Aoû"
 
 #. TRANS: abbrev. for September
-#: ..\..\..\b2evocore\_vars.php:161
+#: ..\..\..\b2evocore\_vars.php:162
 msgid "Sep"
 msgstr "Sep"
 
 #. TRANS: abbrev. for October
-#: ..\..\..\b2evocore\_vars.php:163
+#: ..\..\..\b2evocore\_vars.php:164
 msgid "Oct"
 msgstr "Oct"
 
 #. TRANS: abbrev. for November
-#: ..\..\..\b2evocore\_vars.php:165
+#: ..\..\..\b2evocore\_vars.php:166
 msgid "Nov"
 msgstr "Nov"
 
 #. TRANS: abbrev. for December
-#: ..\..\..\b2evocore\_vars.php:167
+#: ..\..\..\b2evocore\_vars.php:168
 msgid "Dec"
 msgstr "Déc"
 

@@ -7,7 +7,6 @@
  *
  * This file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
  */
-
 require_once (dirname(__FILE__)."/$pathcore_out/conf/b2evo_stats.php");
 
 //get most linked to pages on site
@@ -41,6 +40,7 @@ function dbg($string)
 function log_hit()
 {
 	global $querycount, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
+	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER;
 	
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// dbg( "current url: ".$ReqURI);
@@ -48,7 +48,7 @@ function log_hit()
 	$fullCurrentURL = "http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 	// dbg( "full current url: ".$fullCurrentURL);
 
-	$ref = getenv('HTTP_REFERER');
+	$ref = $HTTP_REFERER;
 	// dbg( "referer: ".$ref);
 
 	$RemoteAddr = $_SERVER['REMOTE_ADDR'];
@@ -67,18 +67,34 @@ function log_hit()
 
 	// dbg("Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 
-
-	// dbg("ref: ".$ref);
 	
-
-	$ignore = "no";
+	$ignore = "no";		// So far so good
+	
 	if( $ref != strip_tags($ref) )
 	{ //then they have tried something funny,
 		//putting HTML or PHP into the HTTP_REFERER
-		$ignore = "badchar";
-		dbg("bad char in referer");
+		//$ignore = 'badchar';
+		dbg('bad char in referer');
+		return;		// Hazardous
 	}
-	elseif( stristr($ReqURI, "rss") || stristr($ReqURI, "rdf") )
+	elseif( $error = validate_url( $ref, $comments_allowed_uri_scheme ) )
+	{	//if they are trying to inject javascript or a blocked (spam) URL
+		dbg($error);
+		return;		// Hazardous
+	}
+	
+	// SEARCH BLACKLIST	
+	foreach ($blackList as $site)
+	{
+		if (stristr($ref, $site))
+		{
+			// $ignore = 'blacklist';
+			dbg( T_('referer ignored'). " (". T_('BlackList'). ")");
+			return;
+		}
+	}
+			
+	if( stristr($ReqURI, 'rss') || stristr($ReqURI, 'rdf') )
 	{
 		$ignore = "rss";
 		// don't mess up the XML!! dbg("referer ignored (RSS)");
@@ -87,7 +103,7 @@ function log_hit()
 	{	// Lookup robots
 		foreach ($user_agents as $user_agent)
 		{
-			if ( ($user_agent[0]=='robot') && (strstr($UserAgent, $user_agent[1])) )
+			if( ($user_agent[0]=='robot') && (strstr($UserAgent, $user_agent[1])) )
 			{
 				$ignore = "robot";
 				dbg( T_('referer ignored'). " (". T_('robot'). ")");
@@ -99,44 +115,30 @@ function log_hit()
 	if( $ignore == 'no' )
 	{
 		if( strlen($ref) < 13 )
-		{	// minimum http://az.fr/
-			$ignore = "invalid";
+		{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
+			$ignore = 'invalid';
 			dbg( T_('referer ignored'). " (". T_('invalid'). ")");
-		}
-		else
-		{	// SEARCH BLACKLIST	
-			foreach ($blackList as $site)
-			{
-				if (stristr($ref, $site))
-				{
-					$ignore = "blacklist";
-					dbg( T_('referer ignored'). " (". T_('BlackList'). ")");
-					break;
-				}
-			}
 		}
 	}
 
 
 	if( $ignore == 'no' )
 	{	// identify search engines
-		foreach ($search_engines as $engine)
+		foreach($search_engines as $engine)
 		{
 			// dbg("engine: ".$engine);
-			if (stristr($ref, $engine))
+			if(stristr($ref, $engine))
 			{
-				$ignore = "search";
+				$ignore = 'search';
 				dbg( T_('referer ignored'). " (". T_('search engine'). ")");
 				break;
 			}
 		}
 	}	
 		
-	$doubleCheckReferers = 0;
 
 	if ($doubleCheckReferers)
 	{
-
 		dbg(T_('loading referering page'));
 
 		//this is so that the page up until the call to
@@ -145,7 +147,7 @@ function log_hit()
 		flush();
 
 		$goodReferer = 0;
-		$fp = @fopen ($ref, "r");
+		$fp = @fopen ($ref, 'r');
 		if ($fp)
 		{
 			//timeout after 5 seconds
@@ -162,10 +164,10 @@ function log_hit()
 		}
 
 		if(!$goodReferer)
-		{
+		{	// This was probably spam!
 			dbg( sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
 			$ref="";
-			//return;
+			return;
 		}
 
 	}
