@@ -319,15 +319,3 @@ msgstr ""
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr ""
 
-msgid "English (EU)"
-msgstr ""
-
-msgid "German (DE)"
-msgstr ""
-
-msgid "French (FR)"
-msgstr ""
-
-msgid "Dutch (NL)"
-msgstr ""
-

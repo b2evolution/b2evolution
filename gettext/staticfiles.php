@@ -13,8 +13,6 @@
 require( '../blogs/b2evocore/_functions.php' );
 require( '../blogs/b2evocore/_functions_forms.php' );
 require( '../blogs/conf/_config.php' );
-#require( '../blogs/conf/_locales.php' );
-#require( '../blogs/b2evocore/_functions_locale.php' );
 
 
 $pofilepath = dirname(__FILE__).'/langfiles';
@@ -49,20 +47,20 @@ if( !isset($argv) )
 		<title>b2evo :: static page generation</title>
 		<link href="../blogs/admin/admin.css" rel="stylesheet" type="text/css" />
 	</head>
-	<body class="center">
-	<div style="width:75%">
+	<body>
+	<div class="center" style="margin:auto;width:75%">
 
 	<img src="'.$img_url.'/b2evolution_logo_360.gif" /><br />
 	';
 }
 
-log_('<hr>');
+log_('<hr />');
 log_('This script maintains the static html files of the b2evolution project.');
 log_('written by <a href="http://thequod.de">daniel hahler</a>, 2004');
 
 if( isset($argv) )
 { // commandline mode
-	log_('<hr>');
+	log_('<hr />');
 	if( isset($argv[1]) && in_array($argv[1], array('extract', 'merge')) )
 	{
 		$action = $argv[1];
@@ -87,10 +85,11 @@ function htmlmenu()
 {
 	global $targets, $highlight_untranslated;
 	echo '
-	<hr>
+	<hr />
 	<br />	
+	<div style="width:75%;margin:auto">
 	<form method="get" class="fform">
-	<fieldset style="width:50%">
+	<fieldset>
 		<legend>merge</legend>
 		<input type="hidden" name="action" value="merge" />
 		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
@@ -101,7 +100,7 @@ function htmlmenu()
 	</form>
 	
 	<form method="get" class="fform">
-	<fieldset style="width:50%">
+	<fieldset>
 		<legend>extract</legend>
 		<input type="hidden" name="action" value="extract" />
 		';
@@ -110,13 +109,9 @@ function htmlmenu()
 		<input type="submit" value="extract" class="search" />
 	</fieldset>
 	</form>
+	</div>
 	<br /><br />
 	';
-
-	if( empty($action) )
-	{
-		exit;
-	}
 };
 
 /**
@@ -334,12 +329,6 @@ msgstr ""
 
 		$count = 0;
 
-		// add strings used by this script that must also be translated
-		foreach( $targets as $target )
-		{ // the available locale names
-			$this->addmsgid( $locales[$target]['name'] );
-		}
-
 		foreach( $this->msgids as $msgid => $arr )
 		{
 			if( isset($arr['source']) )
@@ -370,7 +359,7 @@ function log_( $string )
 	global $argv;
 	if( isset($argv) )
 	{ // command line mode
-		if( $string == '<hr>' )
+		if( $string == '<hr />' )
 			echo '------------------------------------------------------------------------------';
 		else
 		{ // remove tags
@@ -388,10 +377,13 @@ function log_( $string )
 
 // HERE WE GO -------------------------------
 
-log_('<div class="panelinfo"><p>action: '.$action.'</p>'
-			.( ( $highlight_untranslated && $action == 'merge' ) ? 'note: untranslated strings will get highlighted!' : '' )
-			.'</div>'
-);
+if( $action )
+{
+	log_('<div class="panelinfo"><p><strong>action: '.$action.'</strong></p>'
+				.( ( $highlight_untranslated && $action == 'merge' ) ? 'note: untranslated strings will get highlighted!' : '' )
+				.'</div>'
+			);
+}
 
 // change to /blogs folder
 chdir( CHDIR_TO_BLOGS );
@@ -402,8 +394,7 @@ foreach( glob('{*.src.html,doc/*.src.html}', GLOB_BRACE) as $filename )
 {
 	$srcfiles[] = $filename;
 }
-
-// echo '<hr>'; pre_dump( $srcfiles, 'source files' ); echo '<hr>';
+// echo '<hr />'; pre_dump( $srcfiles, 'source files' ); echo '<hr />';
 
 
 switch( $action )
@@ -492,13 +483,15 @@ switch( $action )
 					$path_to_root = '../'.$path_to_root;
 				}
 
-				// build "available translations" list
+				// --- build "available translations" list -------------
+				locale_activate( $target );  // activate locale to translate locale names
+
 				$list_avail = "\t".'<ul style="margin-left: 2ex;list-style:none;">'."\n";
 				foreach( $targets as $ttarget )
 				{
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
 					$list_avail .=
-					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/img/flags').$POFile->translate( $locales[$ttarget]['name'] ).'</a></li>'."\n";
+					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/img/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
 				}
 				$list_avail .= "\t</ul>";
 				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $list_avail, $text );
@@ -577,8 +570,9 @@ log_('Finito.');
 
 if( !isset($argv) )
 {
-	htmlmenu();
-	echo '</body></html>';
+	if( !empty($action) )
+		htmlmenu();
+	echo '</div></body></html>';
 }
 
 ?>

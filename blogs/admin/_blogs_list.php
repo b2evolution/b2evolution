@@ -27,7 +27,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			<th><?php echo T_('Blog URL') ?></th>
 			<th><?php echo T_('Static File') ?></th>
 			<th><?php echo T_('Locale') ?></th>
-			<?php if( $current_User->check_perm( 'blog_properties', 'edit', false ) )
+			<?php if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )  // this is not optimal, because when first displayed blog is not deletable by user 'Del' will be displayed anyway - but better this way as when user might delete one blog, but not all
 			{ ?>
 			<th><?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?></th>
 			<?php } ?>
