@@ -80,7 +80,7 @@ function create_b2evo_tables()
 		blog_longdesc TEXT NULL DEFAULT NULL,
 		blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 		blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php',
-		blog_siteurl varchar(120) NOT NULL default '$baseurl',
+		blog_siteurl varchar(120) NOT NULL default '',
 		blog_staticfilename varchar(30) NULL default NULL,
 		blog_stub VARCHAR(30) NULL DEFAULT 'blog.php',
 		blog_roll text,
