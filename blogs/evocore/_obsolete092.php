@@ -1161,7 +1161,64 @@ function mysql_oops( $sql_query )
 	die( $error );
 }
 
+
+function alert_error( $msg )
+{ // displays a warning box with an error message (original by KYank)
+	?>
+	<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+	<head>
+	<script language="JavaScript">
+	<!--
+	alert('<?php echo str_replace( "'", "\'", $msg ) ?>');
+	history.back();
+	//-->
+	</script>
+	</head>
+	<body>
+	<!-- this is for non-JS browsers (actually we should never reach that code, but hey, just in case...) -->
+	<?php echo $msg; ?><br />
+	<a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>"><?php echo T_('go back') ?></a>
+	</body>
+	</html>
+	<?php
+	exit;
+}
+
+
+function alert_confirm($msg)
+{ // asks a question - if the user clicks Cancel then it brings them back one page
+	?>
+	<script language="JavaScript">
+	<!--
+	if (!confirm("<?php echo $msg ?>")) {
+	history.back();
+	}
+	//-->
+	</script>
+	<?php
+}
+
+
+function redirect_js($url,$title="...") {
+	?>
+	<script language="JavaScript">
+	<!--
+	function redirect() {
+	window.location = "<?php echo $url; ?>";
+	}
+	setTimeout("redirect();", 100);
+	//-->
+	</script>
+	<p><?php echo T_('Redirecting you to:') ?> <strong><?php echo $title; ?></strong><br />
+	<br />
+	<?php printf( T_('If nothing happens, click <a %s>here</a>.'), ' href="'.$url.'"' ); ?></p>
+	<?php
+	exit();
+}
+
 // _misc.funcs.php }}}
+
+
 // globals {{{
 
 /**
@@ -1179,6 +1236,9 @@ $start_of_week = 1;
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/27 20:29:41  blueyed
+ * moved obsolete JS-generating functions
+ *
  * Revision 1.5  2005/02/23 22:47:08  blueyed
  * deprecated mysql_oops()
  *
