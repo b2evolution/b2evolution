@@ -75,7 +75,9 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			}
 			?>
 		</td>
-		<td class="center"><?php blog_list_iteminfo('locale') ?></td>
+		
+		<td class="center"><?php locale_flag( blog_list_iteminfo('locale', false) ) ?></td>
+		
 		<?php if( ($curr_blog_ID == 1) || (!$current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID )) )
 		{ // display empty cell for blog #1 and non deletable blogs
 			echo '<td></td>';

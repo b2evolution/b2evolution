@@ -90,9 +90,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 	</div>
 	<?php
 }
-else
-{
-	// Connect to DB:
+
+if( ($action != 'start') && ($action != 'default') || ($action != 'conf') )
+{	// Connect to DB:
 	$DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, false );
 	if( $DB->error )
 	{ // restart conf
@@ -100,13 +100,21 @@ else
 		$action = 'start';
 	}
 	$DB->halt_on_error = true;	// From now on, halt on errors.
+
+	// Check MySQL version
+	$mysql_version = $DB->get_var( 'SELECT VERSION()' );
+	list( $mysl_version_main, $mysl_version_minor ) = explode( '.', $mysql_version );
+	if( ($mysl_version_main * 100 + $mysl_version_main) < 323 )
+	{
+		die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '3.23', $mysql_version ).'</strong></p></div>');
+	}
 }
 
 // Check PHP version
 list( $version_main, $version_minor ) = explode( '.', phpversion() );
 if( ($version_main * 100 + $version_minor) < 401 )
 {
-	die( '<p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is PHP version %s, but you have %s!'), '4.1.0', phpversion() ).'</strong></p>');
+	die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'PHP', '4.1.0', phpversion() ).'</strong></p></div>');
 }
 
 switch( $action )

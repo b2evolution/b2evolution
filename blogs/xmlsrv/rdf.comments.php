@@ -38,7 +38,7 @@ while( $Comment = $CommentList->get_next() )
 	<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 	<link><?php $Comment->permalink() ?></link>
 	<dc:date><?php $Comment->date( 'isoZ', true ); ?></dc:date>
-	<dc:creator><?php $Comment->author( 'xml' ) ?></dc:creator>
+	<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></dc:creator>
 	<description><?php $Comment->content( 'xml' ) ?></description>
 	<content:encoded><![CDATA[<?php $Comment->content() ?>]]></content:encoded>
 </item>

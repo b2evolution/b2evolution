@@ -166,7 +166,7 @@ function antispam_source( $disp = true, $raw = false )
  */
 function b2evonet_report_abuse( $abuse_string, $display = true ) 
 {
-	$test = 0;
+	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 
 	global $baseurl;
 	if( $display )
@@ -174,19 +174,11 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>', T_('Reporting abuse to b2evolution.net...'), "</h3>\n";
 	}
-	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test ) 
-	{
+	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || ( $evonetsrv_host == 'localhost' ) ) 
+	{	// Local install can only report to local test server
 		// Construct XML-RPC client:
-		if( $test == 2 )
-		{
-		 	$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
-			// $client->debug = 1;
-		}
-		else
-		{
-			$client = new xmlrpc_client('/evonetsrv/xmlrpc.php', 'b2evolution.net', 80);
-			// $client->debug = 1;
-		}
+		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+		$client->debug = $debug;
 		
 		// Construct XML-RPC message:
 		$message = new xmlrpcmsg( 
@@ -223,9 +215,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
  */
 function b2evonet_poll_abuse( $display = true ) 
 {
-	global $Settings, $baseurl;
-	
-	$test = 0;
+	global $Settings, $baseurl, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 
 	if( $display )
 	{	
@@ -234,16 +224,8 @@ function b2evonet_poll_abuse( $display = true )
 	}
 
 	// Construct XML-RPC client:
-	if( $test == 2 )
-	{
-		$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
-		// $client->debug = 1;
-	}
-	else
-	{
-		$client = new xmlrpc_client('/evonetsrv/xmlrpc.php', 'b2evolution.net', 80);
-		// $client->debug = 1;
-	}
+	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+	$client->debug = $debug;
 	
 	// Get datetime from last update, because we only want newer stuff...
 	$m = $Settings->get( 'antispam_last_update' );

@@ -109,12 +109,12 @@
 
 					case 'trackback': // Display a trackback:
 						echo T_('Trackback from:') ?> 
-						<?php $Comment->author( 'htmlbody', true ) ?>
+						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
 						<?php break;
 
 					case 'pingback': // Display a pingback:
 						echo T_('Pingback from:') ?> 
-						<?php $Comment->author( 'htmlbody', true ) ?>
+						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
 						<?php break;
 				} 
 			?>

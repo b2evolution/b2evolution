@@ -7,9 +7,8 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package b2evocore
- * @author sThis file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
+ * @author This file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
  */
-require_once (dirname(__FILE__)."/$core_dirout/$conf_subdir/_stats.php");
 
 //get most linked to pages on site
 //select count(visitURL) as count, visitURL from b2hitlog group by visitURL order by count desc
@@ -62,7 +61,7 @@ function log_hit()
 	// debug_log( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 
 	
-	$ignore = "no";		// So far so good
+	$ignore = 'no';  // So far so good
 	
 	if( $ref != strip_tags($ref) )
 	{ //then they have tried something funny,
@@ -92,7 +91,7 @@ function log_hit()
 			|| stristr($ReqPath, 'rdf')
 			|| stristr($ReqPath, 'atom')  )
 	{
-		$ignore = "rss";
+		$ignore = 'rss';
 		// don't mess up the XML!! debug_log( 'Hit Log: referer ignored (RSS));
 	}
 	else
@@ -248,22 +247,21 @@ function hit_change_type( $hit_ID, $type )
  * Extract stats
  */
 function refererList(
-	$howMany=5,
-	$visitURL="", 
-	$disp_blog=0, 
-	$disp_uri=0, 
+	$howMany = 5,
+	$visitURL = '',
+	$disp_blog = 0,
+	$disp_uri = 0,
 	$type = "'no'",		// 'no' normal refer, 'invalid', 'badchar', 'blacklist', 'rss', 'robot', 'search'
 	$groupby = '', 	// baseDomain
-	$blog_ID ='',
+	$blog_ID = '',
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false ) // Get the user agent
 {
 	global 	$DB, $tablehitlog, $res_stats, $stats_total_hits, $ReqURI;
-	$i=2;
 
 	autoquote( $type );		// In case quotes are missing
 
-	$ret = Array();
+	$ret = array();
 
 	//if no visitURL, will show links to current page.
 	//if url given, will show links to that page.

@@ -14,7 +14,7 @@
 # Blacklist: domains that should not be logged for stats
 # The following substrings will be looked up in the referer http header
 # THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam
-$blackList = Array(
+$blackList = array(
 	$baseurl.'/',
 	'localhost',
 	'127.0.0.1',
@@ -27,7 +27,7 @@ $blackList = Array(
 
 # Search engines for statistics
 # The following substrings will be looked up in the referer http header
-$search_engines = Array(
+$search_engines = array(
 	'.google.',
 	'.hotbot.',
 	'.altavista.',
@@ -72,6 +72,7 @@ $user_agents = array(
 	// Robots:
 	array('robot', 'Googlebot/', 'Google (Googlebot)' ),
 	array('robot', 'Slurp/', 'Inktomi (Slurp)' ),
+	array('robot', 'Yahoo! Slurp;', 'Yahoo (Slurp)' ),
 	array('robot', 'Frontier/',	'Userland (Frontier)' ),
 	array('robot', 'ping.blo.gs/', 'blo.gs' ),
 	array('robot', 'organica/',	'Organica' ),

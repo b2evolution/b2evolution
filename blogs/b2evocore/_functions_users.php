@@ -432,6 +432,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 
 	if( $link_text == '' ) $link_text = T_('Admin');
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
+	if( !preg_match('/[&?]blog=/', $page) ) $page = url_add_param( $page, 'blog='.$blog );
 
 	echo $before;
 	echo '<a href="', $admin_url, '/', $page, '" title="', $link_title, '">';

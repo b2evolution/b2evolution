@@ -112,7 +112,13 @@
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
-	<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
+	<p class="center"><strong>
+		<?php posts_nav_link(); ?>
+		<?php 
+			// previous_post( '<p class="center">%</p>' );
+			// next_post( '<p class="center">%</p>' );
+		?>
+	</strong></p>
 
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )

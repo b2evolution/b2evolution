@@ -22,7 +22,7 @@
 		<title type="text/plain" mode="xml"><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 		<link rel="alternate" type="text/html" href="<?php $Comment->permalink() ?>" />
 		<author>
-			<name><?php $Comment->author( 'xml' ) ?></name>
+			<name><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></name>
 			<?php $Comment->author_url( '', '<url>', "</url>\n", false ) ?>
 		</author>
 		<id><?php $Comment->permalink() ?></id>

@@ -144,7 +144,7 @@ class User extends DataObject
 			// case 'icq':		// Dangerous: easy to forget it's not a string
 			case 'level':
 			case 'notify':
-				parent::set_param( $parname, 'int', $parvalue );
+				parent::set_param( $parname, 'number', $parvalue );
 			break;
 
 			default:
@@ -174,7 +174,7 @@ class User extends DataObject
 	{
 		$this->Group = $Group;
 
-		$this->dbchange( 'user_grp_ID', 'int', 'Group->get(\'ID\')' );
+		$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
 	}
 
 	/**

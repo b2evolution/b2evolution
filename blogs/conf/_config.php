@@ -66,5 +66,6 @@ require_once  dirname(__FILE__).'/_advanced.php';
 require_once  dirname(__FILE__).'/_locales.php';
 require_once  dirname(__FILE__).'/_formatting.php';
 require_once  dirname(__FILE__).'/_admin.php';
+require_once  dirname(__FILE__).'/_stats.php';
 @include_once dirname(__FILE__).'/_overrides_TEST.php'; // Override for testing in there
 ?>

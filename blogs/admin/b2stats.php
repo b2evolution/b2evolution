@@ -268,7 +268,10 @@ switch( $show )
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				{ ?>
 				<td><a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
+				<?php } ?>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>

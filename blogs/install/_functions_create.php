@@ -82,7 +82,7 @@ function create_b2evo_tables()
 		blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php',
 		blog_siteurl varchar(120) NOT NULL default '',
 		blog_staticfilename varchar(30) NULL default NULL,
-		blog_stub VARCHAR(30) NULL DEFAULT 'blog.php',
+		blog_stub VARCHAR(30) NOT NULL DEFAULT 'stub',
 		blog_notes TEXT NULL,
 		blog_keywords tinytext,
 		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,

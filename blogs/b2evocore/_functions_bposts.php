@@ -895,7 +895,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 {
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
-	global $tableposts, $p, $posts, $postdata, $localtimenow;
+	global $tableposts, $p, $posts, $postdata, $localtimenow, $DB;
 	if(($p) || ($posts==1))
 	{
 
@@ -930,7 +930,6 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 		if( $p_info = $DB->get_row( $sql ) )
 		{
-			$p_info = mysql_fetch_object($query);
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;
 			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$next;
@@ -1036,10 +1035,10 @@ function previous_posts_link($label='#', $page='')
 
 
 
-/*
+/**
+ * Links to previous/next page
+ *
  * posts_nav_link(-)
- *
- *
  */
 function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {

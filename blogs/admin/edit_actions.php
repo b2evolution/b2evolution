@@ -468,6 +468,7 @@ switch($action)
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
+	 	$comment_post_ID = $edited_Comment->Item->ID;
 		header ("Location: b2browse.php?blog=$blog&p=$comment_post_ID&c=1#comments"); //?a=ec");
 		exit();
 
@@ -493,7 +494,11 @@ switch($action)
 
 
 	default:
-		die( 'Unknown action!' );
+		// This can happen if we were displaying an action result, then the user logs out
+		// and logs in again: he comes back here with no action parameter set.
+		// Residrect to browse
+		header( 'Location: b2browse.php?blog=0' );
+		exit();
 }
 
 echo '<div class="panelinfo">';

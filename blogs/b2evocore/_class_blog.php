@@ -121,7 +121,7 @@ class Blog extends DataObject
 			case 'pingblodotgs':
 			case 'disp_bloglist':
 			case 'force_skin':
-				parent::set_param( $parname, 'int', $parvalue );
+				parent::set_param( $parname, 'number', $parvalue );
 				break;
 			
 			case 'access_type':

@@ -88,7 +88,7 @@ class Comment extends DataObject
 				die ('coment->Post assignement not handled');
 	
 			case 'karma':
-				parent::set_param( $parname, 'int', $parvalue );
+				parent::set_param( $parname, 'number', $parvalue );
 			break;
 			
 			default:

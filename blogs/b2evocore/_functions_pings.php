@@ -18,27 +18,20 @@
  */
 function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true ) 
 {
-	$test = 0;
-
+	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 	global $baseurl;
+
 	if( !get_bloginfo('pingb2evonet',$blogparams) ) return false;
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>', T_('Pinging b2evolution.net...'), "</h3>\n";
 	}
-	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test ) 
-	{
-		if( $test == 2)
-		{
-		 	$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
-			$client->debug = 1;
-		}
-		else
-		{
-			$client = new xmlrpc_client('/evonetsrv/xmlrpc.php', 'b2evolution.net', 80);
-			// $client->debug = 1;
-		}
+	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || ( $evonetsrv_host == 'localhost' ) ) 
+	{	// Local install can only ping to local test server
+		// Construct XML-RPC client:
+		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+		$client->debug = $debug;
 		
 		$message = new xmlrpcmsg( 'b2evo.ping', array( 
 															new xmlrpcval('id') ,			// Reserved

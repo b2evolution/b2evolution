@@ -234,7 +234,7 @@ class DataObject
 	{
 		// Set value:
 		$this->$parname = $parvalue;
-		// Remmeber change for later db update:
+		// Remember change for later db update:
 		$this->dbchange( $this->dbprefix. $parname , $fieldtype, $parname );
 	}
 

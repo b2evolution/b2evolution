@@ -58,7 +58,7 @@ class auto_p_Rendererplugin extends RendererPlugin
 		$pee = preg_replace("/(\r\n|\r)/", "\n", $pee); // cross-platform newlines
 		$pee = preg_replace("/\n\n+/", "\n\n", $pee); // take care of duplicates
 		$pee = preg_replace('/\n?(.+?)(?:\n\s*\n|\z)/s', "\t<p>$1</p>\n", $pee); // make paragraphs, including one at the end
-		$pee = preg_replace('|<p>\s*?</p>|', '', $pee); // under certain strange conditions it could create a P of entirely whitespace
+		$pee = preg_replace('|\t<p>\s*?</p>\n|', '', $pee); // under certain strange conditions it could create a P of entirely whitespace # dh: fixed creation of unnecessary <br />
 		$pee = preg_replace('!<p>\s*(</?(?:table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|h[1-6])[^>]*>)\s*</p>!', "$1", $pee); // don't pee all over a tag
 		$pee = preg_replace("|<p>(<li.+?)</p>|", "$1", $pee); // problem with nested lists
 		$pee = preg_replace('|<p><blockquote([^>]*)>|i', "<blockquote$1><p>", $pee);

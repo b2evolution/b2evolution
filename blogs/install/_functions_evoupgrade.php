@@ -220,13 +220,17 @@ function upgrade_b2evo_tables()
 	{	// upgrade to 0.9
 		
 		// Important check:
-		$stub_list = $DB->get_list( "SELECT blog_stub
+		$stub_list = $DB->get_col( "SELECT blog_stub
 																	FROM $tableblogs
 																	GROUP BY blog_stub
 																	HAVING COUNT(*) > 1" );
 		if( !empty($stub_list) )
 		{
-			echo "<div class=\"error\"><p class=\"error\">I thought this would never happen in real life, but I'm glad I checked! It appears that the following blog stub names [$stub_list] are used more than once. I can't upgrade until you make them unique. (DB field: $tableblogs.blog_stub)</p></div>";
+			echo '<div class="error"><p class="error">';
+			printf( T_("It appears that the following blog stub names are used more than once: ['%s']" ), implode( "','", $stub_list ) );
+			echo '</p><p>';
+			printf( T_("I can't upgrade until you make them unique. DB field: [%s]" ), $tableblogs.'.blog_stub' );
+			echo '</p></div>';
 			return false;
 		}
 		

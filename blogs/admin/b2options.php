@@ -17,7 +17,7 @@ param( 'tab', 'string', 'general' );
 param( 'prioup', 'string', '' );
 param( 'priodown', 'string', '' );
 param( 'delete', 'string', '' );
-param( 'notransext', 'int', 0 );
+param( 'notransext', 'integer', 0 );
 
 switch( $tab )
 {

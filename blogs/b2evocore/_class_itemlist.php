@@ -412,7 +412,7 @@ class ItemList extends DataObjectList
 		}
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
-			// echo 'before';
+			// echo 'hide before '.$timestamp_min;
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where .= ' AND post_issue_date >= \''. $date_min.'\'';
 		}

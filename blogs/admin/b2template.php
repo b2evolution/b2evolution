@@ -101,55 +101,62 @@ default:
 	<div class="panelblock">
 	<p><?php echo T_('This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom). ') ?></p>
 	<p><?php echo T_('You can edit any of the following files (provided it\'s writable by the server, e.g. CHMOD 766)') ?>:</p>
-	<ul>
 <?php
 	// Determine the edit folder:
 	if( empty($edit_folder) ) $edit_folder = get_path('skins'). '/custom';
 	//lists all files in edit directory
-	$this_dir = dir( $edit_folder );
-	while ($this_file = $this_dir->read())
+	if( !is_dir($edit_folder) )
 	{
-		if( is_file($edit_folder. '/'. $this_file) )
+		echo '<div class="panelinfo"><p>'.sprintf( T_('Directory %s not found.'), $edit_folder ).'</p></div>';
+	}
+	else
+	{ // $edit_folder exists
+		?><ul><?php
+		$this_dir = dir( $edit_folder );
+		while ($this_file = $this_dir->read())
 		{
-			?>
-			<li><a href="b2template.php?file=<?php echo $this_file; ?>"><?php echo $this_file; ?></a>
-			<?php
-			switch( $this_file )
+			if( is_file($edit_folder. '/'. $this_file) )
 			{
-				case '_archives.php':
-					echo '- ', T_('This is the template that displays the links to the archives for a blog');
-					break;
-				case '_categories.php':
-					echo '- ', T_('This is the template that displays the (recursive) list of (sub)categories');
-					break;
-				case '_feedback.php':
-					echo '- ', T_('This is the template that displays the feedback for a post');
-					break;
-				case '_lastcomments.php':
-					echo '- ', T_('This is the template that displays the last comments for a blog');
-					break;
-				case '_main.php':
-					echo '- ', T_('This is the main template. It displays the blog.');
-					break;
-				case '_stats.php':
-					echo '- ', T_('This is the template that displays stats for a blog');
-					break;
-				case 'comment_popup.php':
-					echo '- ', T_('This is the page displayed in the comment popup');
-					break;
-				case 'pingback_popup.php':
-					echo '- ', T_('This is the page displayed in the pingback popup');
-					break;
-				case 'trackback_popup.php':
-					echo '- ', T_('This is the page displayed in the trackback popup');
-					break;
-			}
-		?>
-			</li>
-		<?php }
+				?>
+				<li><a href="b2template.php?file=<?php echo $this_file; ?>"><?php echo $this_file; ?></a>
+				<?php
+				switch( $this_file )
+				{
+					case '_archives.php':
+						echo '- ', T_('This is the template that displays the links to the archives for a blog');
+						break;
+					case '_categories.php':
+						echo '- ', T_('This is the template that displays the (recursive) list of (sub)categories');
+						break;
+					case '_feedback.php':
+						echo '- ', T_('This is the template that displays the feedback for a post');
+						break;
+					case '_lastcomments.php':
+						echo '- ', T_('This is the template that displays the last comments for a blog');
+						break;
+					case '_main.php':
+						echo '- ', T_('This is the main template. It displays the blog.');
+						break;
+					case '_stats.php':
+						echo '- ', T_('This is the template that displays stats for a blog');
+						break;
+					case 'comment_popup.php':
+						echo '- ', T_('This is the page displayed in the comment popup');
+						break;
+					case 'pingback_popup.php':
+						echo '- ', T_('This is the page displayed in the pingback popup');
+						break;
+					case 'trackback_popup.php':
+						echo '- ', T_('This is the page displayed in the trackback popup');
+						break;
+				}
+			?>
+				</li>
+			<?php }
+		}
+		?></ul><?php
 	}
 ?>
-</ul>
 
 <p>	<?php echo T_('Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don\'t have access to a text editor...') ?>
 </p>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-13 20:56+0900\n"
+"PO-Revision-Date: 2004-05-15 18:03+0900\n"
 "Last-Translator: Jun MUTO <jmuto@saku2.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +45,7 @@ msgstr "b2evolution: 公式サイト"
 #: ../../doc/upgradefrom_b2.src.html:14
 #: ../../doc/upgradefrom_b2evo.src.html:14
 msgid "Multilingual multiuser multi-blog engine."
-msgstr "多言語・複数ユーザ・マルチblogエンジン。"
+msgstr "多言語・複数ユーザ・マルチブログ エンジン。"
 
 #: ../../index.src.html:15
 #: ../../doc/install_new.src.html:15
@@ -66,7 +66,7 @@ msgstr "インストール"
 #: ../../doc/upgradefrom_b2.src.html:20
 #: ../../doc/upgradefrom_b2evo.src.html:20
 msgid "Blogs"
-msgstr "Blogs"
+msgstr "ブログ"
 
 #: ../../index.src.html:21
 #: ../../doc/install_new.src.html:21
@@ -109,7 +109,7 @@ msgstr "ようこそ!"
 
 #: ../../index.src.html:34
 msgid "b2evolution is probably the most comprehensive blog engine you can find! It includes almost any feature you could expect from a blog tool, and more! Plus, it's free, it's open-source (GPL), it runs virtually anywhere (PHP/mySQL) and it's available in many languages!"
-msgstr "b2evolution は、おそらくあなたが見つけ出すことのできる最も包括的なblogエンジンです。これには、blogツールに期待するあらゆる機能と、それ以上のものがほとんど組み込まれています! 加えて、これは無償で、オープンソース (GPL) で、事実上どの環境でも (PHP と mySQL があれば) 動作し、たくさんの言語が利用可能です!"
+msgstr "b2evolution は、おそらくあなたが見つけ出すことのできる最も包括的なブログ エンジンです。これには、あなたがブログ ツールに期待するあらゆる機能と、それ以上のものがほとんど組み込まれています! 加えて、これは無償で、オープンソース (GPL) で、事実上どの環境でも (PHP と mySQL があれば) 動作し、たくさんの言語が利用可能です!"
 
 #: ../../index.src.html:35
 msgid "You will find complete information on the official <a %s>b2evolution website</a>."
@@ -180,7 +180,7 @@ msgstr "新規ユーザ用インストール説明書"
 #: ../../doc/upgradefrom_b2.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
-msgstr "始める前に、b2evolution のいくつかのネットワーク機能を利用するために、あなたには簡単な <a %s>利用規約</a> に同意していただく必要があります。"
+msgstr "始める前に、b2evolution のいくつかのネットワーク機能を利用するために、あなたには簡単な <a %s>サービス規約</a> に同意していただく必要があります。"
 
 #: ../../doc/install_new.src.html:36
 #: ../../doc/upgradefrom_b2.src.html:43
@@ -250,7 +250,7 @@ msgstr "以下のアップグレード手順は、b2 バージョン 0.6.1 と 0
 
 #: ../../doc/upgradefrom_b2.src.html:40
 msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
-msgstr "しかし、新しいもののインストールを始める前には、例のごとく、現在のウェブサイト / blog / データベース (あなたが設置しているものによります) のバックアップを行うのが賢明です。"
+msgstr "しかし、新しいもののインストールを始める前には、例のごとく、現在のウェブサイト / ブログ / データベース (あなたが設置しているものによります) のバックアップを行うのが賢明です。"
 
 #: ../../doc/upgradefrom_b2.src.html:46
 msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
@@ -295,7 +295,7 @@ msgstr "以前のバージョンの b2evolution からのアップグレード"
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
-msgstr "あなたの b2evolution のファイルを全てバックアップしてください。あなたが変更したファイル、/conf の中身やスキン、blogテンプレート、スタブファイルなどには特に注意を払ってください。"
+msgstr "あなたの b2evolution のファイルを全てバックアップしてください。あなたが変更したファイル、/conf の中身やスキン、ブログ テンプレート、スタブファイルなどには特に注意を払ってください。"
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
@@ -316,16 +316,4 @@ msgstr "インストール スクリプトをサーバ上で実行してくだ�
 #: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr "ここの時点で、以前のカスタマイズを復活させます。<a %s>WinMerge</a> のような差分/合成ツールを用意することを推奨します。これは、古い (バックアップした) ファイルと新しいファイルを (一度に全ディレクトリでも) 簡単に比較して、変更点を報告してくれます。<br /> <br /> また、特定のバージョンから特定のファイルをアップグレードする注意事項を <a %s>wiki</a> や <a %s>フォーラム</a> で確認することができます。"
-
-msgid "English (EU)"
-msgstr "英語 (EU)"
-
-msgid "German (DE)"
-msgstr "ドイツ語 (DE)"
-
-msgid "French (FR)"
-msgstr "フランス語 (FR)"
-
-msgid "Dutch (NL)"
-msgstr "オランダ語 (NL)"
 

@@ -193,7 +193,7 @@ function locale_activate( $locale )
  *
  * Find first locale matching lang
  */
-function locale_by_lang( $lang )
+function locale_by_lang( $lang, $fallback_to_default = true )
 {
 	global $locales, $default_locale;
 
@@ -206,7 +206,10 @@ function locale_by_lang( $lang )
 	}
 
 	// Not found...
+	if( $fallback_to_default )
 	return $default_locale;
+	else
+		return $lang;
 }
 
 
@@ -306,7 +309,9 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 		$iurl = $img_url.'/flags';
 	}
 	
-	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" ';
+	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="' . 
+				(isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale) .
+				'" border="1" ';
 	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
 	$r .= '/> ';

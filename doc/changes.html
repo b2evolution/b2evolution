@@ -7,34 +7,36 @@
 <body>
 	<img src="../blogs/img/b2evolution_logo_360.gif" />
 	<p>Only public releases are listed here.</p>
-
-	<h2>0.9</h2>
+<h2>0.9</h2>
 	<ul>
-		<li>Install and start using b2evo without editing a single config file. </li>
-		<li>Improved antispam</li>
-		<li>Comments RSS &amp; Atom Feeds</li>
-		<li>Comment permalinks</li>
-		<li>New template tags (object oriented) (this is the visible part of the code cleaning iceberg)</li>
-		<li>More link type options + Permalinks can use post title in the url (URL titles)</li>
-
-		<li>Protected posts are now restricted to blog members and are no longer visible by any logged in user.</li>
-		<li>Optional output buffer, which provides ETags-support and handles gzip compression.</li>
+		<li>Install and start using b2evo without editing a single config file  (fplanque) </li>
+		<li>Localized install screens (blueyed) </li>
+<li>Most settings moved to backoffice</li>
+<li>Improved antispam with full control on what you report to the centralized blacklist  (fplanque)</li>
+<li>RSS &amp; Atom Feeds for Comments (fplanque) </li>
+		<li>Comment authors are automatically identified with their profile if they are logged in (fplanque) </li>
+<li>Comment permalinks (fplanque)</li>
+		<li>New template tags (object oriented) (this is the visible part of the code cleaning iceberg ;) (fplanque) </li>
+		<li>Enhanced Calendar (counts posts, links to archive of month, browse by year...)  (blueyed)</li>
+<li>More link type options (fplanque)</li>
+<li>Search Engine Friendly Permalinks: use post title in the url (URL titles) (fplanque)</li>
+<li>Community blogs: protected posts are now restricted to blog members and are no longer visible by any logged in user. (fplanque)</li>
+		<li>Optional output buffer handling, which provides ETags-support and handles gzip compression. (blueyed)</li>
 		<li>Plug-in system, with value added plugins included:
-			<ul>
+(fplanque)
+<ul>
 				<li>Texturize plugin.</li>
 				<li>Auto-P plugin.</li>
 				<li>Textile 2.0 plugin. </li>
 			</ul>
 		</li>
-		<li>Comments closed/open/disabled.</li>
-		<li>When logged in users leave a comment, their profile is used for identification</li>
-		<li>Replaced languages with locales for blogs and posts. They can be configured in the backoffice now.</li>
-		<li>Backoffice beautified</li>
-		<li>Enhanced Calendar (counts posts, links to archive of month, ..)</li>
-		<li>More settings moved to backoffice (+new settings table layout)</li>
-		<li>b2evo will redirect on correct blog if permalinks point to wrong one</li>
-		<li>Blogrolls are called Linkblogs now</li>
-	</ul>
+		<li>Comments can be closed / open / disabled (post per post). (fplanque) </li>
+		<li>Full locale support instead of lightweight language support.</li>
+		<li>Locales can be fully administered in the backoffice now. (blueyed)</li>
+<li>b2evo will redirect to correct blog if permalinks point to wrong one (fplanque) </li>
+		<li>Blogrolls have been renamed to Linkblogs which should be a little easier to understand. </li>
+	<li>Backoffice improvements. </li>
+</ul>
 
 	<h2>0.8.9</h2>
 	<ul>
@@ -48,15 +50,15 @@
 		<li>The HTML checker now allows tables in posts by default </li>
 		<li>Made RSS 2 valid. Added icon to feedvalidator.org.</li>
 		<li>Atom 0.3 support. </li>
-		<li>Quicktags made compatible with mozilla (Ron)</li>
+		<li>Quicktags made compatible with mozilla (ron)</li>
 		<li>Automatic loading of /conf/hacks.php if this file exists </li>
 	</ul>
 
 	<h2>0.8.7</h2>
 	<ul>
 		<li>Dynamic Anti-Spam table, with one-click referer bans</li>
-		<li>Antispam deluxe: search referrer	logs and comments for newly identified spammers</li>
-		<li>Centralized blacklist management: share spam list with all b2evo users.</li>
+		<li>Antispam deluxe: search referrer	logs and comments for newly identified spammers (funky M) </li>
+		<li>Centralized blacklist management: share spam list with all b2evo users. (funky M) </li>
 		<li>Pruning of old stats</li>
 		<li>Moblogging support</li>
 		<li>Quick publishing button for drafts</li>

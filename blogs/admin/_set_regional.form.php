@@ -120,8 +120,12 @@ else
 			<th><?php echo T_('Name') ?></th>
 			<th><?php echo T_('Date fmt') ?></th>
 			<th><?php echo T_('Time fmt') ?></th>
+			<?php if( $current_User->check_perm( 'options', 'edit' ) )
+			{ ?>
 			<th><?php echo T_('Edit') ?></th>
-			<?php if( $showtranslationpercentage )
+				<?php 
+			}
+			if( $showtranslationpercentage )
 			{
 				?>
 				<th><?php echo T_('Strings') ?></th>
@@ -282,7 +286,7 @@ else
 					echo "\n\t<td style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
 				}
 
-				if( $allow_po_extraction  )
+				if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction  )
 				{ // Translator options:
 					if( is_file( $po_file ) )
 					{

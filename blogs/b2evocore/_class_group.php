@@ -95,7 +95,7 @@ class Group extends DataObject
 		switch( $parname )
 		{
 			case 'perm_templates':
-				parent::set_param( $parname, 'int', $parvalue );
+				parent::set_param( $parname, 'number', $parvalue );
 			break;
 			
 			default:
