@@ -18,7 +18,7 @@ require_once dirname(__FILE__). '/_class_comment.php';
  */
 function generic_ctp_number($post_id, $mode = 'comments')
 {
-	global $debug, $postdata, $tablecomments, $querycount, $cache_ctp_number, $use_cache, $preview;
+	global $DB, $debug, $postdata, $tablecomments, $cache_ctp_number, $use_cache, $preview;
 	if( $preview )
 	{	// we are in preview mode, no comments yet!
 		return 0;
@@ -33,10 +33,12 @@ function generic_ctp_number($post_id, $mode = 'comments')
 		{		// Initializes each post to nocount!
 				$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
 		}
-		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count FROM $tablecomments WHERE comment_post_ID IN ($postIDlist) GROUP BY comment_post_ID, comment_type";
-		$result = mysql_query($query) or mysql_oops($query);
-		$querycount++;
-		while($row = mysql_fetch_object($result))
+		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count 
+							FROM $tablecomments 
+							WHERE comment_post_ID IN ($postIDlist) 
+							GROUP BY comment_post_ID, comment_type";
+		$rows = $DB->get_results( $query );
+		if( count( $rows ) ) foreach( $rows as $row )
 		{
 			switch( $row->comment_type )
 			{
@@ -63,10 +65,12 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{	// this should be extremely rare...
 		// echo "CACHE not set for $post_id";
 		$post_id = intval($post_id);
-		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count FROM $tablecomments WHERE comment_post_ID = $post_id GROUP BY comment_post_ID, comment_type";
-		$result = mysql_query($query) or mysql_oops($query);
-		$querycount++;
-		while($row = mysql_fetch_object($result))
+		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count 
+							FROM $tablecomments 
+							WHERE comment_post_ID = $post_id 
+							GROUP BY comment_post_ID, comment_type";
+		$rows = $DB->get_results( $query );
+		if( count( $rows ) ) foreach( $rows as $row )
 		{
 			switch( $row->comment_type )
 			{
@@ -99,15 +103,14 @@ function generic_ctp_number($post_id, $mode = 'comments')
  */
 function get_commentdata($comment_ID,$no_cache=0)
 { // less flexible, but saves mysql queries
-	global $rowc,$id,$commentdata,$tablecomments,$querycount, $baseurl;
+	global $DB, $rowc,$id,$commentdata,$tablecomments, $baseurl;
 
 	if ($no_cache)
 	{
-		$query="SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
-		// fplanque TODO: add post title etc?
-		$result = mysql_query($query);
-		$querycount++;
-		$myrow = mysql_fetch_array($result);
+		$query="SELECT * 
+						FROM $tablecomments 
+						WHERE comment_ID = $comment_ID";
+		$myrow = $DB->get_rows( $query, ARRAY_A );
 	}
 	else
 	{
@@ -136,16 +139,15 @@ function get_commentdata($comment_ID,$no_cache=0)
  */
 function Comment_get_by_ID( $comment_ID )
 {
-	global $cache_Comments, $use_cache, $tablecomments, $querycount;
+	global $DB, $cache_Comments, $use_cache, $tablecomments, $querycount;
 
 	if((empty($cache_Comments[$comment_ID])) OR (!$use_cache))
 	{	// Load this entry into cache:
-		$query = "SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
-		$result = mysql_query($query);
-		$querycount++;
-		if( mysql_num_rows( $result ) )
+		$query = "SELECT * 
+							FROM $tablecomments 
+							WHERE comment_ID = $comment_ID";
+		if( $row = $DB->get_row( $query, ARRAY_A ) )
 		{
-			$row = mysql_fetch_array($result);
 			$cache_Comments[$comment_ID] = new Comment( $row ); // COPY !
 		}
 	}
