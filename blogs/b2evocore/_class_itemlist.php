@@ -517,18 +517,23 @@ class ItemList
 
 	/*
 	 * Private ItemList->calc_max(-)
+	 *
+	 * @todo use COUNT(*)
 	 */
 	function calc_max()
 	{
 		$nxt_request = $this->request;
 		if( $pos = strpos(strtoupper($this->request), 'LIMIT')) 
-		{
+		{	// Remove the limit form the request
 			$nxt_request = substr($this->request, 0, $pos);
 		}
+		//echo $nxt_request;
+		
 		$nxt_result = mysql_query($nxt_request) or mysql_oops( $nxt_request );
 		$this->total_num_posts = mysql_num_rows($nxt_result);
 		$this->max_paged = intval( ($this->total_num_posts-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
-		if( $this->max_paged < 1 ) $this->max_paged =1;
+		if( $this->max_paged < 1 ) 
+			$this->max_paged =1;
 	}
 
 

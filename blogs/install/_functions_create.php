@@ -473,6 +473,48 @@ function populate_main_tables()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, "About evoSkins... :idea:", "<p>By default, b2evolution blogs are displayed using a default skin.</p>
+
+<p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>		
+
+<p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>
+
+<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, "Skins *or* Templates ?", "<p>By default, all pre-installed blogs use skins, not templates. (More on skins in another post.)</p>
+	
+<p>That means, blogs are accessed through 'stub' files called something like '<code>blog_b.php</code>'. These files set a few parameters such as the blog to display and the default skin to use, then they pass on the display job to a skin. You can edit the stub files to change the default skin used as well as other parameters. </p>
+
+<p>Alternatively, if you wish to use plain templates instead of skins, use the provided '<code>noskin_*.php</code>' files instead of the stub files. For example, for Blog B, the template file would be '<code>noskin_b.php</code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</code>' in the blogs admin.</p>
+
+<!--more-->
+
+<p>Either way, you can rename the stub/template files (<code>blog_*.php</code> or <code>noskin_*.php</code>) to better names, including to '<code>index.php</code>' for your main blog; but once again, make sure you update the new names in the blogs admin.</p>
+
+<p>Finally, if you don't use templates, you can delete all <code>noskin_*.php</code> files if you want. Also, if you don't use skins, you can delete all <code>blog_*.php</code> files as well as the subfolders in the /skins folder. But, do not delete the whole skins folder, even templates need some files in there!</p>", $now, $cat_b2evo ) or mysql_oops( $query );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, "Multiple Blogs, new blogs, old blogs...", "<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>
+	
+<p>Some of these blogs have a special role. Read about it on the corresponding page.</p>
+
+<p>You can create additionnal blogs from the blogs admin.</p>
+
+<!--more-->
+
+<p>Some people have also asked for a feature to delete blogs. We're working on it, but we certainly do not recommend you go hacking your mySQL database by hand. It's the best way to leave a lot of junk in there. In the meantime, there are two things you can do with your old blogs:</p>
+
+<ul>
+  <li>Recycle them: delete the posts, change the name, also rename the access stub file if you wish. This is better with the database than deleting a blog and creating a new one.</li>
+	<li>Hide them: go to the blogs admin and clear the 'Stub URLname'. Your blog won't appear publicly no more. You can also remove all user permissions on that blog to hide it from backoffice users (except the admin). Finally, you can delete the stub file for this blog to make it complete ;)</li>
+</ul>", $now, $cat_b2evo ) or mysql_oops( $query );
+
+	
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, "File permissions!", "<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>
 	
 <ul>
@@ -487,19 +529,11 @@ function populate_main_tables()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, "About evoSkins... :idea:", "<p>By default, b2evolution blogs are displayed using a default skin.</p>
-
-<p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>		
-
-<p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>
-
-<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>", $now, $cat_b2evo ) or mysql_oops( $query );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, "Important information :idea:", "<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>
 	
-<p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)", $now, $cat_b2evo, array( $cat_ann_a, $cat_ann_b ) ) or mysql_oops( $query );
+<p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)</p>
+
+<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>", $now, $cat_b2evo, array( $cat_ann_a, $cat_ann_b ) ) or mysql_oops( $query );
 	
 	echo "OK.<br />\n";
 	
