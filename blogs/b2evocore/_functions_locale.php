@@ -36,28 +36,32 @@ elseif( $use_l10n == 2 )
 
 	function T_( $string, $req_locale = '' )
 	{
-		global $trans, $current_messages;
+		global $trans, $current_locale, $locales;
 		
 		// By default we use the current locale:
-		if( empty($req_locale) ) $req_locale = $current_messages;
-
+		if( empty($req_locale) ) $req_locale = $current_locale;
+		
+		$messages = $locales[$req_locale]['messages'];
+		
 		$search = str_replace( "\n", '\n', $string );
 		$search = str_replace( "\r", '', $search );
-		// echo "Translating ", $search, " to $req_locale<br />";
+		// echo "Translating ", $search, " to $messages<br />";
 		
 		#echo locale_messages($req_locale); exit;
-		if( !isset($trans[ $current_messages ] ) )
+		if( !isset($trans[ $messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
-			@include_once( dirname(__FILE__). '/../locales/'. $current_messages. '/_global.php' );
-			if( !isset($trans[ $current_messages ] ) )
+			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
+			include_once dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
+			if( !isset($trans[ $messages ] ) )
 			{	// Still not loaded... file doesn't exist, memorize that no translation are available
-				$trans[ $current_messages ] = array();
+				// echo 'file not found!'; 
+				$trans[ $messages ] = array();
 			}
 		}
 				
-		if( isset( $trans[ $current_messages ][ $search ] ) )
+		if( isset( $trans[ $messages ][ $search ] ) )
 		{	// If the string has been translated:
-			return $trans[ $current_messages ][ $search ];
+			return $trans[ $messages ][ $search ];
 		}
 		
 		// echo "Not found!";
@@ -147,24 +151,22 @@ function locale_by_lang( $lang )
 	return $default_locale;
 }
 
-/*
- * locale_lang(-)
+/**
+ * {@internal locale_lang(-)}}
  *
- * Returns the language code part of current locale
+ * Returns the current locale. (for backward compatibility)
  *
  * @param boolean true (default) if we want it to be outputted
- * @return string current language code, if $disp = false
+ * @return string current locale, if $disp = false
  */
 function locale_lang( $disp = true )
 {
 	global $current_locale;
 
-	$current_language = substr( $current_locale, 0, 2 );
-	
 	if( $disp )
-		echo $current_language;
+		echo $current_locale;
 	else
-		return $current_language;
+		return $current_locale;
 }
 
 /*
@@ -208,8 +210,9 @@ function locale_timefmt()
  *
  * @param string locale to use, '' for current
  * @param string collection name (subdir of img/flags)
+ * @param string name of class for IMG tag
  */
-function locale_flag( $locale = '', $collection = 'w16px' )
+function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag' )
 {
 	global $locales, $current_locale, $core_dirout, $img_subdir, $img_url;
 	
@@ -222,16 +225,9 @@ function locale_flag( $locale = '', $collection = 'w16px' )
 	{	// File does not exist
 		$country = 'default';
 	}
-	echo '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="';
-	if( $country == 'default')
-	{
-		echo T_('Unknown locale');
-	}
-	else
-	{
-		echo $locales[$locale]['name'];
-	}
-	echo '" border="1" /> ';
+	echo '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" ';
+	if( !empty( $class ) ) echo ' class="', $class, '"';
+	echo '/> ';
 
 }
 
