@@ -37,11 +37,13 @@
 
 
 # b2 fix. some servers have stupid warnings
-#error_reporting(0);
+# error_reporting(0);
 
-if (!function_exists('logIO')) {
-	function logIO($m="",$n="") {
-	return(true);
+if (!function_exists('logIO')) 
+{
+	function logIO($m="",$n="") 
+	{
+		return(true);
 	}
 }
 
@@ -319,8 +321,7 @@ function xmlrpc_ee($parser, $name) {
 	  $_xh[$parser]['params'][]=$_xh[$parser]['st'];
 	  break;
 	case "METHODNAME":
-	  $_xh[$parser]['method']=ereg_replace("^[\n\r\t ]+", "", 
-																				 $_xh[$parser]['ac']);
+	  $_xh[$parser]['method']=ereg_replace("^[\n\r\t ]+", "", $_xh[$parser]['ac']);
 		break;
 	case "BOOLEAN":
 		// special case here: we translate boolean 1 or 0 into PHP
@@ -358,10 +359,11 @@ function xmlrpc_cd($parser, $data)
 			// and say we've found a value
 			$_xh[$parser]['lv']=2; 
 		}
-	// replace characters that eval would
-	// do special things with
-	$_xh[$parser]['ac'].=str_replace('$', '\$',
-		str_replace('"', '\"', str_replace(chr(92),
+		// replace characters that eval would
+		// do special things with
+		if( !isset($_xh[$parser]['ac']) ) $_xh[$parser]['ac'] = '';
+		$_xh[$parser]['ac'] .= str_replace('$', '\$',
+			str_replace('"', '\"', str_replace(chr(92),
 			$xmlrpc_backslash, $data)));
 	}
 }
@@ -598,11 +600,6 @@ class xmlrpcresp {
 	}
 	$rs.="</methodResponse>";
 
-	/* begin Logging
-	$f=fopen("xmlrpc/xmlrpc.log","a+");
-	fwrite($f, date("Ymd H:i:s")."\n\nResponse:\n\n".$rs);
-	fclose($f);
-	end Logging */
 	logIO("O",$rs);
 
 	return $rs;
