@@ -377,35 +377,35 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://tin-men.net/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://tin-men.net/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://thequod.de/' ) or mysql_oops( $query );
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://thequod.de/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://www.rononline.nl/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://www.rononline.nl/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.tenderfeelings.be/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.tenderfeelings.be/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.fromthecrossroads.ws/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://fplanque.net/Blog/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' ) or mysql_oops( $query );
+	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' ) or mysql_oops( $query );
+	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' );
 
 	echo "OK.<br />\n";
 
@@ -443,20 +443,20 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>".T_("Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin.")."</strong>";
 	$blog_ID = 1;
-	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
+	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = $blog_a_short;
 	$blog_stub = $stub_a;
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
 	$blog_ID = 2;
 	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
-(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
+(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = $stub_b;
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_b.php');
 	$blog_ID = 3;
-	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
+	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = 'Blogroll';
 	$blog_stub = $stub_roll;
@@ -464,7 +464,7 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links. This is commonly referred to as a 'Blogroll'.").'</strong>';
 	$blog_ID = 4;
-	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
+	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	echo "OK.<br />\n";
 
@@ -488,24 +488,24 @@ function create_default_categories( $populate_blog_a = true )
 	if( $populate_blog_a )
 	{
 		// Create categories for blog A
-		$cat_ann_a = cat_create( "Announcements [A]", 'NULL', 2 )	 or mysql_oops( $query );
-		$cat_news = cat_create( "News", 'NULL', 2 )	 or mysql_oops( $query );
-		$cat_bg = cat_create( "Background", 'NULL', 2 )	 or mysql_oops( $query );
+		$cat_ann_a = cat_create( "Announcements [A]", 'NULL', 2 );
+		$cat_news = cat_create( "News", 'NULL', 2 );
+		$cat_bg = cat_create( "Background", 'NULL', 2 );
 	}
 
 	// Create categories for blog B
-	$cat_ann_b = cat_create( "Announcements [B]", 'NULL', 3 )	 or mysql_oops( $query );
-	$cat_fun = cat_create( "Fun", 'NULL', 3 )	 or mysql_oops( $query );
-	$cat_life = cat_create( "In real life", $cat_fun, 3 )	 or mysql_oops( $query );
-	$cat_web = cat_create( "On the web", $cat_fun, 3 )	or mysql_oops( $query );
-	$cat_sports = cat_create( "Sports", $cat_life, 3 )	or mysql_oops( $query );
-	$cat_movies = cat_create( "Movies", $cat_life, 3 )	or mysql_oops( $query );
-	$cat_music = cat_create( "Music", $cat_life, 3 )	or mysql_oops( $query );
-	$cat_b2evo = cat_create( "b2evolution Tips", 'NULL', 3 )	or mysql_oops( $query );
+	$cat_ann_b = cat_create( "Announcements [B]", 'NULL', 3 );
+	$cat_fun = cat_create( "Fun", 'NULL', 3 );
+	$cat_life = cat_create( "In real life", $cat_fun, 3 );
+	$cat_web = cat_create( "On the web", $cat_fun, 3 );
+	$cat_sports = cat_create( "Sports", $cat_life, 3 );
+	$cat_movies = cat_create( "Movies", $cat_life, 3 );
+	$cat_music = cat_create( "Music", $cat_life, 3 );
+	$cat_b2evo = cat_create( "b2evolution Tips", 'NULL', 3 );
 
 	// Create categories for blogroll
-	$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 )	or mysql_oops( $query );
-	$cat_blogroll_contrib = cat_create( "contributors", 'NULL', 4 )	 or mysql_oops( $query );
+	$cat_blogroll_b2evo = cat_create( "b2evolution", 'NULL', 4 );
+	$cat_blogroll_contrib = cat_create( "contributors", 'NULL', 4 );
 
 	echo "OK.<br />\n";
 
@@ -531,13 +531,13 @@ function create_default_contents( $populate_blog_a = true )
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Clean Permalinks! :idea:"), T_("<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>
 
-<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Options screen... (check 'use extra-path info')</p>"), $now, $cat_b2evo ) or mysql_oops( $query );
+<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Options screen... (check 'use extra-path info')</p>"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Apache optimization... :idea:"), T_("<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].</p>
 
-<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine.</p>"), $now, $cat_b2evo ) or mysql_oops( $query );
+<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine.</p>"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -547,7 +547,7 @@ function create_default_contents( $populate_blog_a = true )
 
 <p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>
 
-<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>"), $now, $cat_b2evo ) or mysql_oops( $query );
+<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -561,7 +561,7 @@ function create_default_contents( $populate_blog_a = true )
 
 <p>Either way, you can rename the stub/template files (<code>blog_*.php</code> or <code>noskin_*.php</code>) to better names, including to '<code>index.php</code>' for your main blog; but once again, make sure you update the new names in the blogs admin.</p>
 
-<p>Finally, if you don't use templates, you can delete all <code>noskin_*.php</code> files if you want. Also, if you don't use skins, you can delete all <code>blog_*.php</code> files as well as the subfolders in the /skins folder. But, do not delete the whole skins folder, even templates need some files in there!</p>"), $now, $cat_b2evo ) or mysql_oops( $query );
+<p>Finally, if you don't use templates, you can delete all <code>noskin_*.php</code> files if you want. Also, if you don't use skins, you can delete all <code>blog_*.php</code> files as well as the subfolders in the /skins folder. But, do not delete the whole skins folder, even templates need some files in there!</p>"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -578,7 +578,7 @@ function create_default_contents( $populate_blog_a = true )
 <ul>
 	<li>Recycle them: delete the posts, change the name, also rename the access stub file if you wish. This is better with the database than deleting a blog and creating a new one.</li>
 	<li>Hide them: go to the blogs admin and clear the 'Stub URLname'. Your blog won't appear publicly no more. You can also remove all user permissions on that blog to hide it from backoffice users (except the admin). Finally, you can delete the stub file for this blog to make it complete ;)</li>
-</ul>"), $now, $cat_b2evo ) or mysql_oops( $query );
+</ul>"), $now, $cat_b2evo );
 
 
 	// Insert a post:
@@ -593,7 +593,7 @@ function create_default_contents( $populate_blog_a = true )
 
 	<li>This isn't necessary but ensures your security: do a chmod 644 on all files in the <code>/blogs/conf</code> directory, so no-one can overwrite them except you. If your server is running Windows, then set the file to 'read-only'.</li>
 
-</ul>"), $now, $cat_b2evo ) or mysql_oops( $query );
+</ul>"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -601,7 +601,7 @@ function create_default_contents( $populate_blog_a = true )
 
 <p>All these entries are designed to help you so, as EdB would say: \"read them all before you start hacking away!\" ;)</p>
 
-<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>"), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_ann_a , $cat_ann_b ) : array ( $cat_ann_b ) ) ) or mysql_oops( $query );
+<p>If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read.</p>"), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_ann_a , $cat_ann_b ) : array ( $cat_ann_b ) ) );
 
 	echo "OK.<br />\n";
 
@@ -636,19 +636,19 @@ function populate_main_tables()
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_('First Post'), T_('<p>This is the first post.</p>
 
-<p>It appears on both blog A and blog B.</p>'), $now, $cat_ann_a, array( $cat_ann_b ) ) or mysql_oops( $query );
+<p>It appears on both blog A and blog B.</p>'), $now, $cat_ann_a, array( $cat_ann_b ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_('Second post'), T_('<p>This is the second post.</p>
 
-<p>It appears on blog A only but in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a, $cat_bg ) ) or mysql_oops( $query );
+<p>It appears on blog A only but in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a, $cat_bg ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_('Third post'), T_('<p>This is the third post.</p>
 
-<p>It appears on blog B only and in a single category.</p>'), $now, $cat_fun ) or mysql_oops( $query );
+<p>It appears on blog B only and in a single category.</p>'), $now, $cat_fun );
 
 	echo "OK.<br />\n";
 
