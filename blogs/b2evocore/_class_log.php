@@ -69,14 +69,15 @@ class Log
 	/**
 	 * display messages of the Log object.
 	 *
-	 * @param string header/title
-	 * @param string footer
-	 * @param boolean to display or return
-	 * @param string the level of messages to use
-	 * @param string the CSS class of the outer <div>
-	 * @param string the style to use, '<ul>' (with <li> for every message) or everything else for '<br />'
+	 * @param string header/title (default: empty)
+	 * @param string footer (default: empty)
+	 * @param boolean to display or return (default: true)
+	 * @param string the level of messages to use (default: set by constructor)
+	 * @param string the CSS class of the outer <div> (default: 'log_'.$level)
+	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
+	 * @return mixed false, if no messages; else true/output
 	 */
-	function display( $head, $foot = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
+	function display( $head = '', $foot = '', $display = true, $level = NULL, $cssclass = NULL, $style = NULL )
 	{
 		$messages = & $this->messages( $level, true );
 
@@ -102,7 +103,7 @@ class Log
 			$disp .= '<h2>'.$head.'</h2>';
 		}
 
-		if( $style == '<ul>' )
+		if( $style == NULL )
 		{
 			if( count($messages) == 1 )
 			{ // switch to <br>-style
@@ -118,6 +119,10 @@ class Log
 		if( $style == '<ul>' )
 		{
 			$disp .= '<li>'.implode( '</li><li>', $messages ).'</li>';
+		}
+		elseif( $style == '<p>' )
+		{
+			$disp .= '<p>'.implode( '</p><p>', $messages ).'</p>';
 		}
 		else
 		{
@@ -147,17 +152,20 @@ class Log
 
 
 	/**
-	 * Display messages of the Log object (conditional header/footer on message count).
+	 * Wrapper for {@link display}: use header/footer dependent on message count
+	 * (one or more).
 	 *
 	 * @param string header/title (if one message)
 	 * @param string header/title (if more than one message)
 	 * @param string footer (if one message)
 	 * @param string footer (if more than one message)
-	 * @param boolean to display or return
-	 * @param string the level of messages to use
-	 * @param string the style to use, '<ul>' (with <li> for every message) or everything else for '<br />'
+	 * @param boolean to display or return (default: true)
+	 * @param string the level of messages to use (default: set by constructor)
+	 * @param string the CSS class of the outer <div> (default: 'log_'.$level)
+	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
+	 * @return mixed false, if no messages; else true/output
 	 */
-	function display_cond( $head1, $head2, $foot1 = '', $foot2 = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
+	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
 	{
 		switch( $this->count( $level ) )
 		{

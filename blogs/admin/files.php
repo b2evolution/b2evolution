@@ -543,9 +543,9 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 	?>
 	<div class="panelinfo">
 		<?php
-		$Messages->display( '', '', true, 'error' );
+		$Messages->display(); // error
 		$Messages->display( '', '', true, 'note' );
-		$Fileman->Messages->display( '', '', true, 'error' );
+		$Fileman->Messages->display(); // error
 		$Fileman->Messages->display( '', '', true, 'note' );
 		if( isset($msg_action) )
 		{
