@@ -77,14 +77,10 @@ div.fm_query {
 
 
 
-div.image {
-	text-align:center;
-	clear:both;
-	margin:1ex;
-}
-img.image {
+img.framed {
 	border:1px dashed #d91;
-	padding:1ex;
+	padding:10px;
+	margin:10px;
 }
 .linenr {
 	background-color:#ff0;
@@ -101,4 +97,10 @@ pre.rawcontent {
 	font-family: Courier New, sans-serif;
 }
 
-
+button.image {
+	float:right;
+	border:none;
+	padding:0;
+	margin:0;
+	background:transparent;
+}

@@ -89,12 +89,12 @@ if( $action == '' && $file != '' && $curFile )
 			if( is_image( $file ) )
 			{ // display image file
 				?>
-				<div class="image">
-					<img class="image" src="<?php echo $Fileman->get_File_url( $curFile ) ?>" <?php echo $curFile->get_imgsize( 'string' ) ?> />
+				<div class="center">
+					<img class="framed" src="<?php echo $Fileman->get_File_url( $curFile ) ?>" <?php echo $curFile->get_imgsize( 'string' ) ?> />
 				</div>
 				<?php
 			}
-			elseif( $buffer = @file( $curFile->get_path( true ) ) )
+			elseif( ($buffer = @file( $curFile->get_path( true ) )) !== false )
 			{{{ // display raw file
 				param( 'showlinenrs', 'integer', 0 );
 
@@ -144,7 +144,7 @@ if( $action == '' && $file != '' && $curFile )
 					{
 						if( showlinenrs )
 						{
-							var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('show line numbers') ?>');
+							var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('show line numbers') ?>');
 							showlinenrs = false;
 							var text = document.createTextNode( '' );
 							for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
@@ -159,7 +159,7 @@ if( $action == '' && $file != '' && $curFile )
 						}
 						else
 						{
-							var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('hide line numbers') ?>');
+							var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('hide line numbers') ?>');
 							showlinenrs = true;
 							for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
 							{
@@ -180,8 +180,6 @@ if( $action == '' && $file != '' && $curFile )
 					<?php
 
 				}
-
-				// TODO: stupid thing, document.getElementsByName seems to not work with IE here, so I have to use getElementsByTagName. This could perhaps check for the nodes name though.
 				?></pre>
 
 				<?php
@@ -648,33 +646,36 @@ param( 'checkall', 'integer', NULL );  // Non-Javascript-CheckAll
 
 $i = 0;
 $Fileman->sort();
+
 while( $File = $Fileman->get_File_next() )
 { // loop through all Files
-	$i++;
-
-	$link_default_js = 'if( (typeof clickedonlink) == \'undefined\' ){ window.open(\''.$Fileman->get_link_curfile()."', 'fileman_default', 'toolbar=0,resizable=yes,";
-	if( $r = $File->get_imgsize( 'widthheight' ) )
-	{
-		$link_default_js .= 'width='.($r[0]+100).',height='.($r[1]+100);
-	}
-	$link_default_js .= "')}";
-	$link_default_js = '';  // temp. disabled
-
 	?>
-	<tr<?php if( !($i%2) ) echo ' class="odd"' ?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
+	<tr<?php if( $i%2 ) echo ' class="odd"' ?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $File->get_name(), 'formvalue' ) ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $File->get_name(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
 		<td class="icon" onclick="window.location.href = '<?php echo $Fileman->get_link_curfile() ?>'">
-			<?php /*echo $i++;*/ echo $Fileman->get_icon( 'cfile', 'imgtag' ) ?>
+			<?php echo $Fileman->get_icon( 'cfile', 'imgtag' ) ?>
 		</td>
-		<td class="filename" onclick="<?php echo $link_default_js ?>">
-			<!--<noscript type="text/javascript">--><a onclick="clickedonlink = 1;" href="<?php echo $Fileman->get_link_curfile() ?>"><!--/noscript-->
-				<?php
-					echo $File->get_name();
-					disp_cond( $File->get_imgsize(), ' (%s)' )
-				?>
-			<!--noscript type="text/javascript"--></a><!--/noscript-->
+		<td class="filename">
+			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click(); window.open('<?php echo $Fileman->get_link_curfile().( $File->is_dir() ? '&amp;mode=browseonly' : '' ) ?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php echo $i ?>'), 'toolbar=0,resizable=yes,<?php
+			if( $r = $File->get_imgsize( 'widthheight' ) )
+			{ // make the popup 42px wider/higher than the image
+				echo 'width='.($r[0]+42).',height='.($r[1]+42);
+			}
+			else
+			{ // default popup-size: 800x600
+				echo 'width=800,height=600';
+			}
+			?>');" id="button_new_<?php echo $i ?>" title="Open in new window">
+			<?php echo $Fileman->get_icon( 'window_new', 'imgtag' ) ?>
+			</button>
+			<a onclick="clickedonlink = 1;" href="<?php echo $Fileman->get_link_curfile() ?>">
+			<?php
+			echo $File->get_name();
+			disp_cond( $File->get_imgsize(), ' (%s)' )
+			?>
+			</a>
 		</td>
 		<td class="type"><?php echo $Fileman->get_File_type() ?></td>
 		<td class="size"><?php echo $File->get_nicesize() ?></td>
@@ -688,21 +689,20 @@ while( $File = $Fileman->get_File_next() )
 			?></td>
 	</tr>
 	<?php
+	$i++;
 }
 if( $i == 0 )
-{ // "the directory is empty"
+{ // Filelist errors or "directory is empty"
 	?>
 	<tr>
-	<td colspan="8" class="error">
+	<td colspan="8">
 	<?php
-	if( !$Fileman->Messages->display( '', '', true, 'fl_error' ) )
-	{
-		echo T_('The directory is empty.');
+	if( !$Fileman->Messages->count( 'fl_error' ) )
+	{ // no Filelist errors, the directory must be empty
+		$Fileman->Messages->add( T_('The directory is empty.')
+			.( $Fileman->is_filtering() ? '<br />'.T_('Filter').': ['.$Fileman->get_filter().']' : '' ), 'fl_error' );
 	}
-	if( $Fileman->is_filtering() )
-	{
-		echo '<br />'.T_('Filter').': ['.$Fileman->get_filter().']';
-	}
+	$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
 
 	?>
 	</td>
@@ -713,6 +713,29 @@ if( $i == 0 )
 if( $i != 0 )
 {{{ // Footer with "check all", "with selected: .."
 ?>
+<script type="text/javascript">
+<!--
+function openselectedfiles()
+{
+	elems = document.getElementsByName( 'selectedfiles[]' );
+	fm_popup_type = 'selected';
+	var opened = 0;
+	for( i = 0; i < elems.length; i++ )
+	{
+		if( elems[i].checked )
+		{
+			id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
+			document.getElementById( 'button_new_'+id ).click();
+			opened++;
+		}
+	}
+	if( !opened )
+	{
+		alert( '<?php echo /* TRANS: Warning this is a javascript string */ T_('Nothing selected.') ?>' );
+	}
+}
+// -->
+</script>
 <tr class="group"><td colspan="8">
 	<a id="checkallspan_0" name="hui" href="<?php
 		echo url_add_param( $Fileman->curl(), 'checkall='. ( $checkall ? '0' : '1' ) );
@@ -728,9 +751,10 @@ if( $i != 0 )
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
 	<?php echo $Fileman->form_hiddeninputs() ?>
-	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
+	<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>')" />
 	<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
 	<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
+	<input type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
 </td></tr>
 <?php
 }}}
@@ -779,13 +803,13 @@ if( $i != 0 )
 			{
 				if( showoptions )
 				{
-					var replace = document.createTextNode('<?php echo /* Warning! This is a Javascript string! */ T_('show options') ?>');
+					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('show options') ?>');
 					var display_list = 'none';
 					showoptions = false;
 				}
 				else
 				{
-					var replace = document.createTextNode('<?php echo /* Warning! This is a Javascript string! */ T_('hide options') ?>');
+					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('hide options') ?>');
 					var display_list = 'inline';
 					showoptions = true;
 				}

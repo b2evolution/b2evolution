@@ -47,6 +47,15 @@ class File
 	}
 
 
+	/**
+	 * Is the File a directory?
+	 */
+	function is_dir()
+	{
+		return ($this->type == 'dir');
+	}
+
+
 	function set_type( $type )
 	{
 		if( in_array( $type, array( 'file', 'dir' ) ) )
@@ -196,7 +205,7 @@ class File
 	 */
 	function rename( $newname )
 	{
-		if( rename( $this->get_path( true ), $this->get_path().$newname ) )
+		if( @rename( $this->get_path( true ), $this->get_path().$newname ) )
 		{
 			$this->name = $newname;
 			return true;

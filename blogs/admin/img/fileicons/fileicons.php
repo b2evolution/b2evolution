@@ -19,6 +19,7 @@ $this->fileicons_special = array(
 	'folder' => 'folder.png',    // icon for folders
 	'parent' => 'up.png',        // go to parent directory
 	'home' => 'folder_home2.png', // home folder
+	'empty' => 'empty.png',      // empty file
 
 	'ascending' => 'ascending.png',
 	'descending' => 'descending.png',
@@ -36,13 +37,19 @@ $this->fileicons_special = array(
  * These are the file icons. The extension is a regular expression that must match the end of the file.
  */
 $this->fileicons = array(
-	'.html?' => 'www.png',
 	'.(gif|png|jpe?g)' => 'image2.png',
-	'.mp3' => 'sound.png',
+	'.html?' => 'www.png',
+	'.log' => 'log.png',
+	'.(mp3|ogg|wav)' => 'sound.png',
+	'.(mpe?g|avi)' => 'video.png',
+	'.msg' => 'message.png',
+	'.pdf' => 'pdf-document.png',
+	'.php[34]?' => 'php.png',
+	'.(pgp|gpg)' => 'encrypted.png',
 	'.tar' => 'tar.png',
 	'.tgz' => 'tgz.png',
-	'.txt' => 'document.png',
-	'.zip' => 'zip.png',
+	'.te?xt' => 'document.png',
+	'.(zip|rar)' => 'pk.png',
 
 	);
 

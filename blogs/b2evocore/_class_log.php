@@ -73,32 +73,48 @@ class Log
 	 * @param string footer
 	 * @param boolean to display or return
 	 * @param string the level of messages to use
+	 * @param string the CSS class of the outer <div>
 	 * @param string the style to use, '<ul>' (with <li> for every message) or everything else for '<br />'
 	 */
-	function display( $head, $foot = '', $display = true, $level = '#', $style = '<ul>' )
+	function display( $head, $foot = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
 	{
 		$messages = & $this->messages( $level, true );
 
 		if( !count($messages) )
+		{
 			return false;
+		}
 
-		if( $level == '#' )
+		if( $level === NULL )
+		{
 			$level = $this->defaultlevel;
+		}
 
-		$class = 'log_'.$level;
+		if( $cssclass === NULL )
+		{
+			$cssclass = 'log_'.$level;
+		}
 
-		$disp = "\n<div class=\"$class\">";
+		$disp = "\n<div class=\"$cssclass\">";
 
 		if( !empty($head) )
-			$disp .= '<p class="'.$class.'">'.$head.'</p>';
+		{ // header
+			$disp .= '<h2>'.$head.'</h2>';
+		}
 
 		if( $style == '<ul>' )
 		{
 			if( count($messages) == 1 )
+			{ // switch to <br>-style
 				$style = '<br>';
-			else $disp .= '<ul class="log">';
+			}
+			else
+			{ // open list
+				$disp .= '<ul>';
+			}
 		}
 
+		// implode messages
 		if( $style == '<ul>' )
 		{
 			$disp .= '<li>'.implode( '</li><li>', $messages ).'</li>';
@@ -115,7 +131,7 @@ class Log
 
 		if( !empty($foot) )
 		{
-			$disp .= '<p class="'.$class.'">'.$foot.'</p>';
+			$disp .= '<p>'.$foot.'</p>';
 		}
 
 		$disp .= '</div>';
@@ -141,7 +157,7 @@ class Log
 	 * @param string the level of messages to use
 	 * @param string the style to use, '<ul>' (with <li> for every message) or everything else for '<br />'
 	 */
-	function display_cond( $head1, $head2, $foot1 = '', $foot2 = '', $display = true, $level = '#', $style = '<ul>' )
+	function display_cond( $head1, $head2, $foot1 = '', $foot2 = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
 	{
 		switch( $this->count( $level ) )
 		{
@@ -149,10 +165,10 @@ class Log
 				return false;
 
 			case 1:
-				return $this->display( $head1, $foot1, $display, $level, $style );
+				return $this->display( $head1, $foot1, $display, $level, $cssclass, $style );
 
 			default:
-				return $this->display( $head2, $foot2, $display, $level, $style );
+				return $this->display( $head2, $foot2, $display, $level, $cssclass, $style );
 		}
 	}
 
