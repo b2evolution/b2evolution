@@ -1074,7 +1074,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// Search for blocked URLs:
 	if( $block = antispam_url($url) )
 	{
-		if( $debug ) return 'Url contains blaclisted word: ['.$block.']';
+		if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
 		return T_('URL not allowed');
 	}
 

@@ -89,13 +89,13 @@ if( $then = $DB->get_var( $query ) )
 {
 	$time_lastcomment = mysql2date("U",$then);
 	$time_newcomment = mysql2date("U",$now);
-	if( ($time_newcomment - $time_lastcomment) < 30)
+	if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
 		$ok = 0;
 }
 if( !$ok )
 {
-	$Messages->add( T_('You can only post a new comment every 30 seconds.') );
-}
+	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ) );
+}	
 /* end flood-protection */
 
 if( $Messages->display( T_('Cannot post comment, please correct these errors:'),

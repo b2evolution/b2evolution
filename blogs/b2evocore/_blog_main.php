@@ -113,7 +113,7 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 					$tb = 1;   // Display trackbacks
 					$pb = 1;   // Display pingbacks
 
-					if( ereg( "p([0-9]+)", $path_elements[$i], $req_post ) )
+					if( preg_match( "#^p([0-9]+)$#", $path_elements[$i], $req_post ) )
 					{ // The last param is of the form p000
 						// echo 'post number';
 						$p = $req_post[1];		// Post to display

@@ -67,7 +67,8 @@ switch( $action )
 			echo '<div class="panelinfo">';
 			printf( '<h3>'.T_('Deleting comments matching [%s]...').'</h3>', $keyword );
 			$sql = "DELETE FROM T_comments
-							WHERE comment_author_url LIKE '%$dbkeyword%'";
+							WHERE comment_author_url LIKE '%$dbkeyword%'
+      				   OR comment_content LIKE '%$dbkeyword%'";
 			$DB->query($sql);
 			echo '</div>';
 		}
@@ -138,6 +139,7 @@ switch( $action )
 					$sql = "SELECT *
 									FROM T_comments
 									WHERE comment_author_url LIKE '%$dbkeyword%'
+									   OR comment_content LIKE '%$dbkeyword%'
 									ORDER BY comment_date ASC";
 					$res_affected_comments = $DB->get_results( $sql, ARRAY_A );
 					if( $DB->num_rows == 0 )

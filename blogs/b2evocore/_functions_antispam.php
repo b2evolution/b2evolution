@@ -70,10 +70,10 @@ function antispam_delete( $string_ID )
 }
 
 
-/*
- * antispam_url(-)
- *
+/**
  * Check if an URL contains abusive substrings
+ *
+ * antispam_url(-)
  */
 function antispam_url( $url )
 {
@@ -81,13 +81,13 @@ function antispam_url( $url )
 
 	if( !isset($cache_antispam))
 	{ // Cache not loaded, load now:
-		$cache_antispam = $DB->get_col( "SELECT aspm_string FROM T_antispam" );
+		$cache_antispam = $DB->get_col( 'SELECT aspm_string FROM T_antispam' );
 	}
 
 	// Check URL for abuse:
-	foreach ($cache_antispam as $block)
+	foreach( $cache_antispam as $block )
 	{
-		if( strpos($url, $block) !== false)
+		if( stristr($url, $block) !== false)
 		{
 			$Debuglog->add( 'Spam block: '.$block );
 			return $block;	// SPAM detected!
