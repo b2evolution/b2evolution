@@ -612,6 +612,7 @@ fieldset legend {
 table.fileman {
 	margin:auto;
 	width: 100%;
+	clear:both;
 	
 	/*border: 1px solid #ccc;*/
 	border-collapse: collapse;
@@ -620,6 +621,7 @@ table.fileman td {
 	border-bottom: 1px solid #ccc;
 	/*background-color: #E1DBDC;*/
 	padding: .3ex 2ex;
+	font-size: 80%;
 }
 table.fileman td.icon, td.checkbox, td.perms {
 	width:3%;
@@ -632,9 +634,11 @@ table.fileman td.type {
 table.fileman td.filename {
 	text-align: left;
 	width: 37%;
+	font-size: 100%;
 }
 table.fileman td.timestamp {
 	text-align: center;
+	white-space: nowrap;
 	width:15%;
 }
 table.fileman td.size {
@@ -657,4 +661,19 @@ table.fileman th {
 	border-left: 1px solid #FFF;
 	border-right: 1px solid #FFF;
 	padding: 1ex 1ex;
+}
+input.toolbar {
+	font-size:100%;
+}
+.toolbaritem {
+	text-align:right;
+	margin-bottom:0.5ex;
+	vertical-align:bottom;
+	display:inline;
+	float:right;
+}
+.messages {
+	border:1px dashed #d91;
+	margin-bottom:1ex;
+	padding:1ex;
 }

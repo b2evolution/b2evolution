@@ -19,68 +19,124 @@
 	if( $mode == 'sidebar' )
 	{ ?>
 	<link href="sidebar.css" rel="stylesheet" type="text/css" />
-	<?php }
-
-	// -- Inject javascript ----------------
-	if( $admin_tab == 'blogs' )
-	{
-		?>
-		<script type="text/javascript">
-		<!--
-		function checkall( the_form, id, status )
-		{
-			the_form.elements['blog_ismember_'+id].checked = -status;
-			the_form.elements['blog_perm_published_'+id].checked = -status;
-			the_form.elements['blog_perm_protected_'+id].checked = -status;
-			the_form.elements['blog_perm_private_'+id].checked = -status;
-			the_form.elements['blog_perm_draft_'+id].checked = -status;
-			the_form.elements['blog_perm_deprecated_'+id].checked = -status;
-			the_form.elements['blog_perm_delpost_'+id].checked = -status;
-			the_form.elements['blog_perm_comments_'+id].checked = -status;
-			the_form.elements['blog_perm_cats_'+id].checked = -status;
-			the_form.elements['blog_perm_properties_'+id].checked = -status;
-		}
-		//-->
-		</script>
-		<?php
+	<?php
 	}
-	
-	if( $admin_tab == 'files' )
-	{
+
+	if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
+	{ // -- Inject javascript ----------------
 		?>
 		<script type="text/javascript">
 		<!--
 		<?php
-		/**
-		 * Checks/unchecks all tables
-		 *
-		 * @param string the form name
-		 * @param string the checkboxes elements name
-		 * @param boolean whether to check or to uncheck the element
-		 *
-		 * @return boolean always true
-		 */	?>
-		function setCheckboxes(the_form, the_elements, do_check)
+		
+		switch( $admin_tab )
 		{
-			var elts = document.forms[the_form].elements[the_elements];
-			
-			var elts_cnt = (typeof(elts.length) != 'undefined')
-											? elts.length
-											: 0;
-
-			if (elts_cnt) {
-				for (var i = 0; i < elts_cnt; i++) {
-						elts[i].checked = do_check;
-				} // end for
-			} else {
-				elts.checked = do_check;
+			case 'blogs':
+			?>
+			function toggleall( the_form, id, i )
+			{
+				if( allchecked[i] )
+					allchecked[i] = false;
+				else
+					allchecked[i] = true;
+				
+				the_form.elements['blog_ismember_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_published_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_protected_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_private_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_draft_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_deprecated_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_delpost_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_comments_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_cats_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_properties_'+String(id)].checked = allchecked[i];
+				
+				setcheckallspan( i );
 			}
-			return true;
+			<?php
+			break;
+				
+			case 'files':
+			/**
+			 * Checks/unchecks all tables
+			 *
+			 * @param string the form name
+			 * @param string the checkboxes elements name
+			 * @param boolean whether to check or to uncheck the element
+			 *
+			 * @return boolean always true
+			 */	?>
+			function setCheckboxes(the_form, the_elements, do_check)
+			{
+				var elts = document.forms[the_form].elements[the_elements];
+				
+				var elts_cnt = (typeof(elts.length) != 'undefined')
+												? elts.length
+												: 0;
+	
+				if (elts_cnt) {
+					for (var i = 0; i < elts_cnt; i++) {
+							elts[i].checked = do_check;
+					} // end for
+				} else {
+					elts.checked = do_check;
+				}
+				return true;
+			}
+			
+			function toggleCheckboxes(my_form, the_elements)
+			{
+				if( !allchecked[0] )
+				{
+					setCheckboxes(my_form, the_elements, true);
+					allchecked[0] = true;
+				}
+				else
+				{
+					setCheckboxes(my_form, the_elements, false);
+					allchecked[0] = false;
+				}
+				setcheckallspan(0);
+			}
+			<?php
+			break;
 		}
-		function toggleCheckboxes(my_form, the_elements)
+		
+		// general function
+		?>
+		function setcheckallspan( nr, init )
 		{
-			if(document.forms[my_form].checkall.checked) setCheckboxes(my_form, the_elements, true);
-			else  setCheckboxes(my_form, the_elements, false);
+			if( typeof allchecked[nr] == 'undefined' )
+			{ // init
+				allchecked[ allchecked.length ] = init;
+			}
+
+			if( allchecked[nr] )
+				var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('uncheck all') ?>');
+			else					
+				var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('check all') ?>');
+						
+			//alert("set checkallspan"+String(nr));
+			document.getElementById( 'checkallspan'+String(nr) ).replaceChild(replace, document.getElementById( 'checkallspan'+String(nr) ).firstChild);
+		}
+		
+		function initcheckall()
+		{
+			// initialize array
+			allchecked = Array();
+			
+			var i = 0;
+			//alert(document.getElementById("checkallspan"+String(i)));
+			while( id = document.getElementById("checkallspan"+String(i)) )
+			{
+				//alert( typeof(document.getElementById('checkall_init'+String(i))) );
+				if( document.getElementById('checkall_init'+String(i)) )
+					setcheckallspan( i, document.getElementById('checkall_init'+String(i)).checked );
+				else setcheckallspan( i, init );
+			
+				i++;
+			}
+			
 		}
 		//-->
 		</script>
@@ -88,9 +144,13 @@
 	}
 	?>
 </head>
-<body>
+<body<?php
+if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
+{ // we want a Javascript function to be called on loading // TODO: use a general JS wrapper function?!
+	echo ' onload="initcheckall()"';
+}
+echo '>';
 
-<?php
 param( 'blog', 'integer', 0, true );	// We need this for the urls
 
 if( empty($mode) )
@@ -219,5 +279,3 @@ if( empty($mode) )
 <?php
 }	// not in special mode
 ?>
-
-
