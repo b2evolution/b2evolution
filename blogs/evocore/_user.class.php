@@ -101,7 +101,7 @@ class User extends DataObject
 	 */
 	function User( $db_row = NULL )
 	{
-		global $GroupCache, $default_locale, $Settings, $localtimenow;
+		global $GroupCache, $default_locale, $Settings, $servertimenow;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_' );
@@ -127,11 +127,18 @@ class User extends DataObject
 			$this->set( 'ip', '' );
 			$this->set( 'domain', '' );
 			$this->set( 'browser', '' );
-			#$this->datecreated = date('Y-m-d H:i:s', time());	// We don't know local time here!
-			$this->set_datecreated( $localtimenow );
 			$this->set( 'level', 0 );
 			$this->set( 'notify', 1 );
 			$this->set( 'showonline', 1 );
+			if( isset($servertimenow) )
+			{
+				$this->set_datecreated( $servertimenow );
+			}
+			else
+			{
+				// We don't know local time here!
+				$this->set_datecreated( time() );
+			}
 
 			if( isset( $GroupCache ) )
 			{ // Group for this user:
@@ -859,6 +866,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2005/03/13 19:52:14  blueyed
+ * use $servertimenow for creation of new blank user
+ *
  * Revision 1.19  2005/03/07 00:17:16  blueyed
  * use $Settings instead of $default_locale
  *
