@@ -2,7 +2,9 @@
 
 # this will select the default page to be displayed
 # if the URL is just .../blogs/b2/
-DirectoryIndex b2edit.php
+<IfModule mod_dir.c>
+	DirectoryIndex b2edit.php
+</IfModule>
 
 
 # edit_actions is performing long operations

@@ -2,7 +2,9 @@
 
 # this will select the default blog template to be displayed
 # if the URL is just .../blogs/
-DirectoryIndex index.php
+<IfModule mod_dir.c>
+	DirectoryIndex index.php
+</IfModule>
 
 
 # this will make register globals off in b2's directory

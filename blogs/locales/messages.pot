@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-18 21:58+0200\n"
+"POT-Creation-Date: 2003-09-18 22:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,7 +76,7 @@ msgstr ""
 msgid "More demos"
 msgstr ""
 
-#: ..\..\..\index.php:71
+#: ..\..\..\index.php:71 C:\www\b2evolution\blogs\index.php:72
 msgid "Custom template"
 msgstr ""
 
@@ -84,7 +84,11 @@ msgstr ""
 msgid "Multiple blogs displayed on the same page"
 msgstr ""
 
-#: ..\..\..\index.php:73
+#: ..\..\..\index.php:72
+msgid "Summary of last posts in all blogs"
+msgstr ""
+
+#: ..\..\..\index.php:74
 msgid ""
 "Please note: those demos do not make use of evoSkins, even if you enabled "
 "them during install. The only way to change their look and feel is to edit "
@@ -92,11 +96,11 @@ msgid ""
 "to inspire you for your own templates ;)"
 msgstr ""
 
-#: ..\..\..\index.php:75
+#: ..\..\..\index.php:76
 msgid "official website"
 msgstr ""
 
-#: ..\..\..\index.php:75
+#: ..\..\..\index.php:76
 msgid "GNU GPL license"
 msgstr ""
 
@@ -1031,7 +1035,7 @@ msgstr ""
 #: ..\..\..\htsrv\comment_post.php:99
 #: ..\..\..\htsrv\register.php:92
 #: ..\..\..\htsrv\_reg_complete.php:15
-#: ..\..\..\htsrv\_reg_form.php:36
+#: ..\..\..\htsrv\_reg_form.php:35
 #: ..\..\..\skins\_feedback.php:160
 #: ..\..\..\skins\_profile.php:78
 msgid "Email"
@@ -3043,7 +3047,7 @@ msgstr ""
 msgid "(twice)"
 msgstr ""
 
-#: ..\..\..\htsrv\_reg_form.php:42
+#: ..\..\..\htsrv\_reg_form.php:41
 msgid "Register!"
 msgstr ""
 

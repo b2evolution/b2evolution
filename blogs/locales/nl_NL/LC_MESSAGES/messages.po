@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-18 21:58+0200\n"
+"POT-Creation-Date: 2003-09-18 22:36+0200\n"
 "PO-Revision-Date: 2003-08-26 09:08+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,11 @@ msgstr "Aangepast skin sjabloon"
 msgid "Multiple blogs displayed on the same page"
 msgstr "Meerdere weblogs worden weergegeven op dezelfde pagina"
 
-#: ..\..\..\index.php:73
+#: ..\..\..\index.php:72
+msgid "Summary of last posts in all blogs"
+msgstr ""
+
+#: ..\..\..\index.php:74
 msgid ""
 "Please note: those demos do not make use of evoSkins, even if you enabled "
 "them during install. The only way to change their look and feel is to edit "
@@ -107,11 +111,11 @@ msgstr ""
 "veranderen is door het PHP template te wijzigen. Maar, onthou, dit is alleen "
 "een voorbeeld om je te inspireren voor je eigen sjabloon ;)"
 
-#: ..\..\..\index.php:75
+#: ..\..\..\index.php:76
 msgid "official website"
 msgstr "officiële website"
 
-#: ..\..\..\index.php:75
+#: ..\..\..\index.php:76
 msgid "GNU GPL license"
 msgstr "GNU GPL Licentie"
 
@@ -919,7 +923,7 @@ msgstr "Bijnaam"
 #: ..\..\..\admin\b2team.php:51 ..\..\..\admin\_edit_form.php:67
 #: ..\..\..\admin\_edit_showposts.php:233 ..\..\..\admin\_user_list.php:15
 #: ..\..\..\htsrv\comment_post.php:99 ..\..\..\htsrv\register.php:92
-#: ..\..\..\htsrv\_reg_complete.php:15 ..\..\..\htsrv\_reg_form.php:36
+#: ..\..\..\htsrv\_reg_complete.php:15 ..\..\..\htsrv\_reg_form.php:35
 #: ..\..\..\skins\_feedback.php:160 ..\..\..\skins\_profile.php:78
 msgid "Email"
 msgstr "E-mail"
@@ -2947,7 +2951,7 @@ msgstr "Registratie Formulier"
 msgid "(twice)"
 msgstr "(tweemaal)"
 
-#: ..\..\..\htsrv\_reg_form.php:42
+#: ..\..\..\htsrv\_reg_form.php:41
 #, fuzzy
 msgid "Register!"
 msgstr "Registreer..."

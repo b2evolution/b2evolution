@@ -69,6 +69,7 @@
 <h2><?php echo T_('More demos') ?>:</h2>
 <ul>
   <li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
+  <li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
 </ul>
 <p><?php echo T_('Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)') ?></p>
 <div id="rowfooter">

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"POT-Creation-Date: 2003-09-18 21:58+0200\n"
-"PO-Revision-Date: 2003-09-18 22:01+0100\n"
+"POT-Creation-Date: 2003-09-18 22:36+0200\n"
+"PO-Revision-Date: 2003-09-18 22:38+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -71,15 +71,19 @@ msgstr "Gabarit spécial"
 msgid "Multiple blogs displayed on the same page"
 msgstr "Plusieurs blogs affichés sur la même page"
 
-#: ..\..\..\index.php:73
+#: ..\..\..\index.php:72
+msgid "Summary of last posts in all blogs"
+msgstr "Résumé des derniers articles dans tous les blogs"
+
+#: ..\..\..\index.php:74
 msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
 msgstr "Veuillez noter: ces démos n'utilisent pas les habillages evoSkins, même si vous les avez activés pendant l'installation. La seule manière de modifier l'apparence de ces démos est d'éditer le gabarit PHP correspondant. Mais une fois encore, rappelez vous qu'il s'agit là uniquement de démos destinées à vous inspirer pour réaliser vos propres pages dynamiques ;)"
 
-#: ..\..\..\index.php:75
+#: ..\..\..\index.php:76
 msgid "official website"
 msgstr "site web officiel"
 
-#: ..\..\..\index.php:75
+#: ..\..\..\index.php:76
 msgid "GNU GPL license"
 msgstr "Licence GPL"
 
@@ -996,7 +1000,7 @@ msgstr "Surnom"
 #: ..\..\..\htsrv\comment_post.php:99
 #: ..\..\..\htsrv\register.php:92
 #: ..\..\..\htsrv\_reg_complete.php:15
-#: ..\..\..\htsrv\_reg_form.php:36
+#: ..\..\..\htsrv\_reg_form.php:35
 #: ..\..\..\skins\_feedback.php:160
 #: ..\..\..\skins\_profile.php:78
 msgid "Email"
@@ -2985,7 +2989,7 @@ msgstr "Formulaire d'inscription"
 msgid "(twice)"
 msgstr "(deux fois)"
 
-#: ..\..\..\htsrv\_reg_form.php:42
+#: ..\..\..\htsrv\_reg_form.php:41
 msgid "Register!"
 msgstr "S'inscire!"
 

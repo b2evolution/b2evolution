@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-18 21:58+0200\nPO-Revision-Date: 2003-09-18 22:01+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-18 22:36+0200\nPO-Revision-Date: 2003-09-18 22:38+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -20,6 +20,7 @@ $trans['fr_FR'] = array(
 	'More demos' => 'Démos supplémentaires',
 	'Custom template' => 'Gabarit spécial',
 	'Multiple blogs displayed on the same page' => 'Plusieurs blogs affichés sur la même page',
+	'Summary of last posts in all blogs' => 'Résumé des derniers articles dans tous les blogs',
 	'Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)' => 'Veuillez noter: ces démos n\'utilisent pas les habillages evoSkins, même si vous les avez activés pendant l\'installation. La seule manière de modifier l\'apparence de ces démos est d\'éditer le gabarit PHP correspondant. Mais une fois encore, rappelez vous qu\'il s\'agit là uniquement de démos destinées à vous inspirer pour réaliser vos propres pages dynamiques ;)',
 	'official website' => 'site web officiel',
 	'GNU GPL license' => 'Licence GPL',

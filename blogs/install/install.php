@@ -13,7 +13,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.5.3-beta</h1>
+<h1 id="version">Version: 0.8.5.5-Release Candidate</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -221,15 +221,7 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
-
-	// Insert a post into blogroll:
-	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Candle', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.candles-weblog.us/' ) or mysql_oops( $query );
-
-	// Insert a post into blogroll:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.rononline.nl/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -241,6 +233,10 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.rononline.nl/' ) or mysql_oops( $query );
+
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.tenderfeelings.be/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
@@ -249,11 +245,15 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Swirlee', 'Development', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://swirlee.org/' ) or mysql_oops( $query );
+
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Sakichan', 'Development, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://blog.sakichan.org/ja/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Swirlee', 'Development', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://swirlee.org/' ) or mysql_oops( $query );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);

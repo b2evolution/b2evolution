@@ -297,7 +297,7 @@ the_date( '', '<h2>', '</h2>' );
 </table>
 <p class="baseline"> <a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a> 
   <a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
-<?php // $blog=1;  fplanque: removed
+<?php 
 	log_hit();	// log the hit on this page
 	if ($debug==1)
 	{
