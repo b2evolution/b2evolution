@@ -151,22 +151,16 @@
 				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'status' ), false, $blog ) )
 				{
 				?>
-				<form action="b2edit.php" method="get" class="inline">
-					<input type="hidden" name="action" value="edit" />
-					<input type="hidden" name="post" value="<?php $Item->ID() ?>" />
-					<input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
-				</form>
+				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
+				<form action="b2edit.php" method="get" class="inline"><input type="hidden" name="action" value="edit" /><input type="hidden" name="post" value="<?php $Item->ID() ?>" /><input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" /></form>
 				<?php
 				}
 
 				if( $current_User->check_perm( 'blog_del_post', 'any', false, $blog ) )
 				{
 				?>
-				<form action="edit_actions.php" method="get" class="inline">
-					<input type="hidden" name="action" value="delete">
-					<input type="hidden" name="post" value="<?php $Item->ID() ?>">
-					<input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
-				</form>
+				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
+				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" /></form>
 				<?php
 				}
 
@@ -175,11 +169,8 @@
 						&& $current_User->check_perm( 'edit_timestamp' ) )
 				{
 				?>
-				<form action="edit_actions.php" method="get" class="inline">
-					<input type="hidden" name="action" value="publish">
-					<input type="hidden" name="post_ID" value="<?php $Item->ID() ?>">
-					<input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />
-				</form>
+				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
+				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" /></form>
 				<?php
 				}
 				?>
@@ -258,16 +249,11 @@
 						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 						<?php
 						if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
-						{	// If SUer has permission to edit comments:
+						{	// If User has permission to edit comments:
 						?>
-						<form action="b2edit.php" method="get" class="inline">
-							<input type="hidden" name="action" value="editcomment" />
-							<input type="hidden" name="comment" value="<?php $Comment->ID() ?>" />
-							<input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
-						</form>
-						<form action="edit_actions.php" method="get" class="inline">
-							<input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php $Comment->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" />
-						</form>
+						<!-- Do not add spaces or line breaks into the following forms. IE would display extra spacing -->
+						<form action="b2edit.php" method="get" class="inline"><input type="hidden" name="action" value="editcomment" /><input type="hidden" name="comment" value="<?php $Comment->ID() ?>" /><input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" /></form>
+						<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php $Comment->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" /></form>
 						<?php
 						}
 						?>
