@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-11 17:09+0100\n"
+"PO-Revision-Date: 2004-05-11 22:09+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -289,9 +289,6 @@ msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading y
 msgstr "Consultez le <a %s>wiki</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit b2 existant vers b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
-msgid "Upgrading from previous b2evolution"
-msgstr "Mettre à jour depuis une version précédente de b2evolution"
-
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
 msgstr "Mettre à jour depuis une version précédente de b2evolution"
