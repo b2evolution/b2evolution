@@ -73,7 +73,7 @@ class Calendar
 	 *
 	 * @var string
 	 */
-	var $navigation = 'caption';
+	var $navigation = 'tfoot';
 
 	var $tablestart;
 	var $tableend;
@@ -99,7 +99,14 @@ class Calendar
 
 	var $browseyears;
 
-	/*
+	/**
+	 * @var boolean Is today in the displayed frame?
+	 * @access protected
+	 */
+	var $todayIsVisible;
+
+
+	/**
 	 * Calendar::Calendar(-)
 	 *
 	 * Constructor
@@ -126,6 +133,8 @@ class Calendar
 			$this->year = date('Y');
 			$this->month = date('m');
 			$this->mode = 'month';
+
+			$this->todayIsVisible = true;
 		}
 		else
 		{
@@ -148,6 +157,8 @@ class Calendar
 				$this->month = substr($m, 4, 2);
 				$this->mode = 'month';
 			}
+
+			$this->todayIsVisible = ( $this->month == date('m') && $this->year == date('Y') );
 		}
 
 		// CONSTRUCT THE WHERE CLAUSE:
@@ -162,14 +173,14 @@ class Calendar
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
 		if( !empty($timestamp_min) )
-		{	// Hide posts before
+		{ // Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' '.$dbprefix.'datestart >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
-		{	// Hide posts after
+		{ // Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' '.$dbprefix.'datestart <= \''.$date_max.'\'';
 			$where_link = ' AND ';
@@ -177,7 +188,7 @@ class Calendar
 
 		// Do we need to restrict categories:
 		if( $blog > 1 )
-		{	// Blog #1 aggregates all
+		{ // Blog #1 aggregates all
 			$where .= $where_link.' cat_blog_ID = '.$blog;
 			$where_link = ' AND ';
 		}
@@ -222,7 +233,10 @@ class Calendar
 
 		$this->searchframe = 12;	// How many month will we search back for a post before we give up
 
-		$this->browseyears = ($this->mode == 'year');  // browsing years from Calendar's caption
+		if( is_null( $this->browseyears ) )
+		{
+			$this->browseyears = ($this->mode == 'year');  // browsing years from Calendar's navigation
+		}
 
 		/**#@+
 		 * Display number of posts with days/months
@@ -242,6 +256,7 @@ class Calendar
 		/**#@-*/
 	}
 
+
 	/*
 	 * Calendar->set(-)
 	 *
@@ -252,20 +267,25 @@ class Calendar
 		$this->$var = $value;
 	}
 
+
 	/**
-	 * Calendar->display(-)
+	 * Display the calendar.
 	 *
-	 * display the calendar.
+	 * @todo If a specific day (mode == month) or month (mode == year) is selected, apply another class (default to some border)
 	 *
-	 * @param string
-	 * @param string
+	 * @uses archive_link()
+	 * @param string file to use for links
+	 * @param string GET params for file
 	 */
-	function display( $file = '', $params = '' )	// Page to use for links
+	function display( $file = '', $params = '' )
 	{
 		global $DB;
 		global $weekday, $weekday_abbrev, $weekday_letter, $month, $month_abbrev;
 		global $start_of_week;
 		global $Settings;
+
+		$this->file = $file;
+		$this->params = $params;
 
 		if( $this->mode == 'month' )
 		{
@@ -277,16 +297,18 @@ class Calendar
 			for( $i = 0; $i < $this->searchframe; $i++ )
 			{
 				$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
-														DAYOFMONTH('.$this->dbprefix.'datestart) AS myday'.
-						" FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)".
-						" INNER JOIN T_categories ON postcat_cat_ID = cat_ID".
-						' WHERE MONTH('.$this->dbprefix."datestart) = '$searchmonth' AND YEAR(".$this->dbprefix."datestart) = '$searchyear' ".$this->where.
-						" GROUP BY myday".
-						' ORDER BY '.$this->dbprefix.'datestart DESC';
+														DAYOFMONTH('.$this->dbprefix.'datestart) AS myday
+										FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+											INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+										WHERE MONTH('.$this->dbprefix.'datestart) = "'.$searchmonth.'"
+											AND YEAR('.$this->dbprefix.'datestart) = "'.$searchyear.'" '
+											.$this->where.'
+										GROUP BY myday
+										ORDER BY '.$this->dbprefix.'datestart DESC';
 				$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
 				if( $DB->num_rows > 0 )
-				{	// OK we have a month with posts!
+				{ // OK we have a month with posts!
 					foreach( $arc_result as $arc_row )
 					{
 						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['COUNT(DISTINCT ID)'];
@@ -296,13 +318,14 @@ class Calendar
 					break; // Don't search any further!
 				}
 				elseif ($this->specific)
-				{	// No post, but we asked for a specific month to be displayed
+				{ // No post, but we asked for a specific month to be displayed
 					break; // Don't search any further!
 				}
 				else
-				{	// No, post, let's search in previous month!
+				{ // No, post, let's search in previous month!
 					$searchmonth = zeroise(intval($searchmonth)-1,2);
-					if ($searchmonth == '00') {
+					if ($searchmonth == '00')
+					{ // handle year change
 						$searchmonth = '12';
 						$searchyear = ''.(intval($searchyear)-1);
 					}
@@ -337,45 +360,27 @@ class Calendar
 			if ((intval(date('d', $calendarfirst)) > 1) && (intval(date('m', $calendarfirst)) == intval($this->month))) {
 				$calendarfirst = $calendarfirst - 604800;
 			}
-
-			// Create links to previous/next month
-			$previous_month_link = '<a href="'.
-				archive_link( ($this->month > 1) ? $this->year : ($this->year - 1),	($this->month > 1) ? ($this->month - 1) : 12, '', '', false, $file, $params )
-				.'" title="'.T_('previous month').'">&lt;</a>';
-
-			$next_month_link = '<a href="'.
-				archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
-				.'" title="'.T_('next month').'">&gt;</a>';
 		}
 		else
 		{ // mode is 'year'
 			// Find months with posts
-			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), MONTH('.$this->dbprefix.'datestart) AS mymonth '.
-						"FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID) ".
-						"INNER JOIN T_categories ON postcat_cat_ID = cat_ID ".
-						'WHERE YEAR('.$this->dbprefix."datestart) = '$this->year' ".$this->where.
-						" GROUP BY mymonth".
-						' ORDER BY '.$this->dbprefix.'datestart DESC';
+			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), MONTH('.$this->dbprefix.'datestart) AS mymonth
+									FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+									WHERE YEAR('.$this->dbprefix.'datestart) = "'.$this->year.'" '
+										.$this->where.'
+									GROUP BY mymonth
+									ORDER BY '.$this->dbprefix.'datestart DESC';
 
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
 			if( $DB->num_rows > 0 )
-			{	// OK we have a month with posts!
+			{ // OK we have a month with posts!
 				foreach( $arc_result as $arc_row )
 				{
 					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['COUNT(DISTINCT '.$this->dbIDname.')'];
 				}
 			}
-		}
-
-		if( $this->browseyears )
-		{ // create links to previous/next year
-			$previous_year_link = '<a href="'.
-				archive_link( $this->year - 1, ($this->mode == 'month') ? $this->month : '', '', '', false, $file, $params )
-				.'" title="'.T_('previous year').'">&lt;&lt;</a>&nbsp;&nbsp;';
-			$next_year_link = '&nbsp;&nbsp;<a href="'.
-				archive_link( $this->year + 1, ($this->mode == 'month') ? $this->month : '', '', '', false, $file, $params )
-				.'" title="'.T_('next year').'">&gt;&gt;</a>';
 		}
 
 
@@ -386,47 +391,36 @@ class Calendar
 		// CAPTION :
 
 		if( $this->displaycaption )
-		{	// caption:
+		{ // caption:
 			echo $this->monthstart;
 
 			if( $this->navigation == 'caption' )
-			{	// Link to previous year:
-				echo isset( $previous_year_link ) ? $previous_year_link : '';
+			{
+				echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
 			}
 
 			if( $this->mode == 'month' )
-			{	// MONTH CAPTION:
-
-				if( $this->navigation == 'caption' )
-				{	// Link to previous month:
-					echo $previous_month_link.'&nbsp;&nbsp;';
-				}
-
+			{ // MONTH CAPTION:
 				if( $this->linktomontharchive )
-				{	// chosen month with link to archives
-					echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'" title="'.T_('go to month\'s archive').'">';
+				{ // chosen month with link to archives
+					echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $this->file, $this->params ).'" title="'.T_('go to month\'s archive').'">';
 				}
 
 				echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
 
 				if( $this->linktomontharchive )
-				{	// close link to month archive
+				{ // close link to month archive
 					echo '</a>';
-				}
-
-				if( $this->navigation == 'caption' )
-				{	// Link to next month:
-					echo '&nbsp;&nbsp;'.$next_month_link;
 				}
 			}
 			else
-			{	// YEAR CAPTION:
+			{ // YEAR CAPTION:
 				echo date_i18n('Y', mktime(0, 0, 0, 1, 1, $this->year)); // display year
 			}
 
 			if( $this->navigation == 'caption' )
-			{	// Link to next year:
-				echo isset( $next_year_link ) ? $next_year_link : '';
+			{
+				echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
 			}
 
 			echo $this->monthend;
@@ -435,7 +429,7 @@ class Calendar
 		// HEADER :
 
 		if( !empty($this->headerdisplay) && ($this->mode == 'month') )
-		{	// Weekdays:
+		{ // Weekdays:
 			echo $this->headerrowstart;
 
 			for ($i = $start_of_week; $i < ($start_of_week + 7); $i = $i + 1)
@@ -465,18 +459,29 @@ class Calendar
 		}
 
 		if( $this->navigation == 'tfoot' )
-		{	// We want to display navigation in the table footer:
-			// TODO: YEAR MODE support
+		{ // We want to display navigation in the table footer:
 			echo "<tfoot>\n";
 			echo "<tr>\n";
-			echo '<td colspan="'.(($this->mode == 'month') ? '3' : '2' ).'" id="prev">';
-			echo isset( $previous_year_link ) ? $previous_year_link : '';
-			echo isset( $previous_month_link ) ? $previous_month_link : '';
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->todayIsVisible ).'" id="prev">';
+			echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
 			echo "</td>\n";
-			if( $this->mode == 'month' ) echo '<td class="pad">&nbsp;</td>'."\n";
-			echo '<td colspan="'.(($this->mode == 'month') ? '3' : '2' ).'" id="next">';
-			echo isset( $next_month_link ) ? $next_month_link : '';
-			echo isset( $next_year_link ) ? $next_year_link : '';
+
+			if( $this->todayIsVisible )
+			{
+				if( $this->mode == 'month' )
+				{
+					echo '<td class="pad">&nbsp;</td>'."\n";
+				}
+			}
+			else
+			{
+				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center"><a href="'
+							.archive_link( date('Y'), ( $this->mode == 'month' ? date('m') : '' ), '', '', false, $this->file, $this->params )
+							.'">'.T_('Today') // TODO: not really "Today", but where today is included.. better name? title attrib..
+							.'</a></td>';
+			}
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->todayIsVisible ).'" id="next">';
+			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
 			echo "</td>\n";
 			echo "</tr>\n";
 			echo "</tfoot>\n";
@@ -501,7 +506,7 @@ class Calendar
 						echo $this->linkpostcellstart;
 					}
 					echo '<a href="';
-					archive_link( $this->year, $i, '', '', true, $file, $params );
+					archive_link( $this->year, $i, '', '', true, $this->file, $this->params );
 					echo '"';
 					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_atitle) )
 					{ // display postcount
@@ -549,11 +554,11 @@ class Calendar
 			$k = 1;
 
 			for($i = $calendarfirst; $i < ($calendarlast + 86400); $i = $i + 86400)
-			{	// loop day by day (86400 seconds = 24 hours)
+			{ // loop day by day (86400 seconds = 24 hours)
 				if ($newrow == 1)
-				{	// We need to start a new row:
+				{ // We need to start a new row:
 					if( $k > $daysinmonth )
-					{	// Last day already displayed!
+					{ // Last day already displayed!
 						break;
 					}
 					echo $this->rowend;
@@ -562,13 +567,13 @@ class Calendar
 				}
 
 				if (date('m', $i) != $this->month)
-				{	// empty cell
+				{ // empty cell
 					echo $this->emptycellstart;
 					echo $this->emptycellcontent;
 					echo $this->emptycellend;
 				}
 				else
-				{	// This day is in this month
+				{ // This day is in this month
 					$k = $k + 1;
 					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + ($Settings->get('time_difference') * 3600))));
 
@@ -583,7 +588,7 @@ class Calendar
 							echo $this->linkpostcellstart;
 						}
 						echo '<a href="';
-						archive_link( $this->year, $this->month, date('d',$i), '', true, $file, $params );
+						archive_link( $this->year, $this->month, date('d',$i), '', true, $this->file, $this->params );
 						echo '"';
 						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_atitle) )
 						{ // display postcount
@@ -620,7 +625,7 @@ class Calendar
 				}
 				$j = $j + 1;
 				if ($j == 7)
-				{	// This was the last day of week, we need to start a new row:
+				{ // This was the last day of week, we need to start a new row:
 					$j = 0;
 					$newrow = 1;
 				}
@@ -632,10 +637,61 @@ class Calendar
 		echo $this->tableend;
 	}  // display(-)
 
+
+
+	/**
+	 * Get links to navigate between month / year.
+	 *
+	 * @param string 'prev' / 'next'
+	 * @return array
+	 */
+	function getNavLinks( $direction )
+	{
+		$r = array();
+
+		switch( $direction )
+		{
+			case 'prev':
+				if( $this->browseyears )
+				{
+					$r[] = '<a href="'
+									.archive_link( $this->year - 1, ($this->mode == 'month') ? $this->month : '', '', '', false, $this->file, $this->params )
+									.'" title="'.T_('previous year').'">&lt;&lt;</a>';
+				}
+				if( $this->mode == 'month' )
+				{
+					$r[] = '<a href="'
+									.archive_link( ($this->month > 1) ? $this->year : ($this->year - 1),	($this->month > 1) ? ($this->month - 1) : 12, '', '', false, $this->file, $this->params )
+									.'" title="'.T_('previous month').'">&lt;</a>';
+				}
+				break;
+
+			case 'next':
+				if( $this->mode == 'month' )
+				{
+					$r[] = '<a href="'
+									.archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $this->file, $this->params )
+									.'" title="'.T_('next month').'">&gt;</a>';
+				}
+				if( $this->browseyears )
+				{
+					$r[] = '<a href="'
+									.archive_link( $this->year + 1, ($this->mode == 'month') ? $this->month : '', '', '', false, $this->file, $this->params )
+									.'" title="'.T_('next year').'">&gt;&gt;</a>';
+				}
+				break;
+		}
+
+		return $r;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/12 03:58:44  blueyed
+ * default to $navigation = 'tfoot', fixed queries that find posts in month or on day, refactored navigation link generation
+ *
  * Revision 1.3  2004/12/13 21:29:58  fplanque
  * refactoring
  *
