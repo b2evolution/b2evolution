@@ -294,10 +294,14 @@ class DB
 							<?php
 							if( isset( $lStack['include_filename'] ) )
 							{
-								echo '<strong>=&gt;</strong>'.$lStack['include_filename'];
+								echo '<strong>=&gt;</strong> '.$lStack['include_filename'];
 							}
 							else
 							{
+								if( isset( $lStack['class'] ) )
+								{
+									echo $lStack['class'].'::';
+								}
 								echo $lStack['function'].'()';
 							}
 							?>
@@ -800,23 +804,14 @@ class DB
 
 /*
  * $Log$
- * Revision 1.9  2005/02/23 22:18:39  blueyed
- * output xdebug function stack on error
- *
- * Revision 1.8  2005/02/17 19:36:23  fplanque
- * no message
- *
- * Revision 1.7  2005/02/08 01:11:21  blueyed
- * stoopid parse error fixed
+ * Revision 1.10  2005/02/23 22:32:44  blueyed
+ * output xdebug function stack in case of error
  *
  * Revision 1.6  2005/02/08 00:43:15  blueyed
  * doc, whitespace, html, get_results() and get_row() now always return array, get_var() return false in case of error
  *
  * Revision 1.5  2004/11/09 00:25:11  blueyed
  * minor translation changes (+MySQL spelling :/)
- *
- * Revision 1.4  2004/11/05 00:36:43  blueyed
- * no message
  *
  * Revision 1.3  2004/10/28 11:11:09  fplanque
  * MySQL table options handling
