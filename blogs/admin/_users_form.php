@@ -14,8 +14,11 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 											|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
 ?>
 <div class="panelblock">
-	<?php if( $current_User->check_perm( 'users', 'view' ) )
-	{?>
+
+<?php
+if( $current_User->check_perm( 'users', 'view' ) )
+{
+	?>
 	<div style="float:right">
 		<?php
 		if( $user > 0 )
@@ -53,10 +56,13 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			echo ( $user != $uminmax['MAX(ID)'] ) ? '<a title="'.T_('last user').'" href="?user='.$uminmax['MAX(ID)'].'">[&gt;&gt;]</a>' : '[&gt;&gt;]';
 		}
 		?>
-		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close user profile'); ?>" class="middle" /></a>
+		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><?php
+			echo getIcon( 'close', 'imgtag', array( 'alt' => 'X', 'title' => T_('Close user profile') ) );
+			?></a>
 	</div>
-	<?php }
-	
+	<?php
+}
+
 
 $Form = & new Form( 'b2users.php', 'form' );
 
@@ -73,8 +79,8 @@ else
 $Form->hidden( 'action', 'userupdate' );
 $Form->hidden( 'edited_user_ID', $edited_User->dget('ID','formvalue') );
 $Form->hidden( 'edited_user_oldlogin', $edited_User->dget('login', 'formvalue') );
-	
-$Form->fieldset( T_('User rights') );
+
+$Form->fieldset( T_('User rights'), 'fieldset clear' );
 
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
 if( $user_profile_only )
@@ -144,7 +150,7 @@ if( $allowed_to_edit )
 
 	<?php
 	echo $Form->end_field();
-	
+
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 	$Form->text( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, 100 );
@@ -184,7 +190,7 @@ if( $allowed_to_edit )
 												 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
-$Form->fieldset( T_('User information') ); 
+$Form->fieldset( T_('User information') );
 $Form->info( T_('ID'), $edited_User->dget('ID') );
 
 

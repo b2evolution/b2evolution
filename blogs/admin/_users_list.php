@@ -47,11 +47,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 		$count = 0;
 		foreach( $userlist as $row )
-		{	// For each line (can be a user/group or just an empty group)
+		{ // For each line (can be a user/group or just an empty group)
 			$loop_grp_ID = $row->grp_ID;
 
 			if( $loop_prev_grp_ID != $loop_grp_ID )
-			{	// ---------- We just entered a new group! ----------
+			{ // ---------- We just entered a new group! ----------
 				?>
 				<tr class="group">
 					<td colspan="7">
@@ -65,7 +65,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					</td>
 					<?php
 					if( $current_User->check_perm( 'users', 'edit', false ) )
-					{	// copy ?>
+					{ // copy
+						?>
 						<td>&nbsp;</td>
 						<td>
 							<a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /></a>
@@ -88,7 +89,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			}
 
 			if( !empty( $row->ID ) )
-			{	// We have a user here: (i-e group was not empty)
+			{ // We have a user here: (i-e group was not empty)
 				$loop_User = & new User( $row );
 				if( $count%2 == 1 )
 					echo "<tr class=\"odd\">\n";
