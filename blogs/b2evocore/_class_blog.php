@@ -86,6 +86,34 @@ class Blog extends DataObject
 
 
 	/** 
+	 * Set param value
+	 *
+	 * {@internal Blog::set(-) }}
+	 *
+	 * @param string Parameter name
+	 * @return mixed Parameter value
+	 */
+	function set( $parname, $parvalue )
+	{
+		switch( $parname )
+		{
+			case 'ID':
+			case 'allowtrackbacks':
+			case 'allowpingbacks':
+			case 'pingb2evonet':
+			case 'pingtechnorati':
+			case 'pingweblogs':
+			case 'pingblodotgs':
+			case 'disp_bloglist':
+				parent::set_param( $parname, 'int', $parvalue );
+				break;
+			
+			default:
+				parent::set_param( $parname, 'string', $parvalue );
+		}
+	}
+
+	/** 
 	 * Get a param
 	 *
 	 * {@internal User::get(-)}}
@@ -168,6 +196,8 @@ class Blog extends DataObject
 				return parent::get( $parname );
 		}
 	}
+
+
 	
 	/** 
 	 * Delete a blog and dependencies from database

@@ -206,7 +206,7 @@ switch ($action)
 			$result = $DB->query( $sql );
 			
 			if( $result )
-				echo '<div class="panelinfo"><p>'.T_('User promoted.');
+				echo '<div class="panelinfo"><p>'.T_('User level changed.');
 			else
 				echo '<div class="panelinfo"><p class="error">' . sprintf( T_('Couldn\'t change %s\'s level.'), $user_data['user_login'] );
 			echo '</p></div>';
