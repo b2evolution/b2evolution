@@ -163,7 +163,7 @@ if( ereg('image/', $img1_type) )
 }
 else
 {
-	$piece_of_code = '&lt;a href=&quot;'.$fileupload_url.$img1_name.'&quot; title=&quot;'.$imgdesc.'&quot; /&gt;'.$imgdesc.'&lt;/a&gt;';
+	$piece_of_code = '&lt;a href=&quot;'.$fileupload_url.$img1_name.'&quot; title=&quot;'.$imgdesc.'&quot;&gt;'.$imgdesc.'&lt;/a&gt;';
 }
 
 ?>

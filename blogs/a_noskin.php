@@ -76,7 +76,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 		stats_title( ' - ', 'htmlhead' );
 		profile_title( ' - ', 'htmlhead' );
 	?></title>
-<!-- InstanceEndEditable -->
+<!-- InstanceEndEditable --> 
 <!-- InstanceBeginEditable name="head" -->
 <base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! ?>" />
 <meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
@@ -87,7 +87,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 <link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 <link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
-<!-- InstanceEndEditable -->
+<!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="rsc/fp02.css" type="text/css" />
 </head>
 <body>
@@ -125,7 +125,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 </div>
 
 <div class="pageHeaderEnd"></div>
-
+	  
 </div>
 </div>
 
@@ -334,21 +334,27 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 </div>
 <!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
-	<tr>
-	<td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-
+  <tr> 
+  <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
+    
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
-	</tr>
+  </tr>
 </table>
 <p class="baseline">
 
-	<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a>
-
+	<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a> 
+  
 	<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
-
+	
+	<?php if( isset($Blog) ) 
+	{ ?>
+	
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	
+	<?php } ?>
+	
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php
 	log_hit();	// log the hit on this page

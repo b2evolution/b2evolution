@@ -246,7 +246,20 @@ function create_b2evo_tables_091()
 								)");
 	echo "OK.<br />\n";
 
-
+	/*
+	
+			evo_links table: (NO PK)
+			-link_source_post_ID    INT     NOT NULL     INDEX
+			-link_dest_post_ID    INT     NULL     INDEX
+			-link_ltype_ID     INT     NOT NULL
+			-link_external_url    VARCHAR(255)     NULL
+			-link_title    TEXT   NULL
+			
+			evo_linktypes tables:
+			-ltype_ID    INT     PK
+			-ltype_desc    VARCHAR(50)
+	
+	 */
 }
 
 

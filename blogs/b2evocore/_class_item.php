@@ -390,7 +390,7 @@ class Item extends DataObject
 	 */
 	function can_comment(
 						$before_error = '<p><em>',
-						$after_error = '</p></em>',
+						$after_error = '</em></p>',
 						$non_published_msg = '#',
 						$closed_msg = '#'
 						)
