@@ -60,7 +60,7 @@
 			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('suburl') ?></a></td>
 			
 			<td>
-				<?php if( $staticfilename=blog_list_iteminfo('staticfilename',false) )
+				<?php if( ($staticfilename=blog_list_iteminfo('staticfilename',false)) && blog_list_iteminfo('filename',false) )
 				{
 				?>
 				<a href="<?php blog_list_iteminfo('staticurl') ?>"><?php echo $staticfilename ?></a>
