@@ -17,7 +17,8 @@ while ($file = readdir($handle))
 		$lines = file("./$file/LC_MESSAGES/messages.po");
 		$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
 		$all = 0;
-		$fuzzy=0;
+		$fuzzy = 0;
+		$this_fuzzy = false;
 		$untranslated=0;
 		$translated=0;
 		$status='-';
@@ -28,16 +29,23 @@ while ($file = readdir($handle))
 			if(trim($line) == '' )	
 			{	// Blank line, go back to base status:
 				if( $status == 't' )
-				{	// End of a translation:
+				{	// ** End of a translation ** :
 					if( $msgstr == '' )
 					{
 						$untranslated++;
 						// echo 'untranslated: ', $msgid, '<br />';
 					}
 					else
+					{
 						$translated++;
+					}
+					if( $msgid == '' && $this_fuzzy )
+					{	// It's OK if first line is fuzzy
+						$fuzzy--;
+					}
 					$msgid = '';
 					$msgstr = '';
+					$this_fuzzy = false;
 				}
 				$status = '-';
 			}
@@ -62,7 +70,10 @@ while ($file = readdir($handle))
 					$msgstr .= $matches[1];
 			}
 			elseif(strpos($line,'#, fuzzy') === 0) 
+			{
+				$this_fuzzy = true;
 				$fuzzy++;
+			}
 		}
 		// $all=$translated+$fuzzy+$untranslated;
 		$percent_done=round(($translated-$fuzzy/2)/$all*100,2);
