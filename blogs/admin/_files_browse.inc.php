@@ -45,14 +45,13 @@ require dirname(__FILE__).'/_submenu.inc.php';
 
 ?>
 
-<form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
-<input type="hidden" name="confirmed" value="0" />
-<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
-<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
-<?php echo $Fileman->getFormHiddenInputs(); ?>
-
 <!-- FLAT MODE: -->
-<div id="fmbar_flatmode" class="toolbaritem">
+
+<form action="files.php#FM_anchor" id="fmbar_flatmode" class="toolbaritem">
+	<?php
+	echo $Fileman->getFormHiddenInputs();
+	echo $Fileman->getFormHiddenSelectedFiles();
+	?>
 	<input name="actionArray[<?php echo $Fileman->flatmode ? 'noflatmode' : 'flatmode' ?>]"
 		class="ActionButton"
 		type="submit"
@@ -66,33 +65,59 @@ require dirname(__FILE__).'/_submenu.inc.php';
 			echo format_to_output( $Fileman->flatmode ?
 															T_('Normal mode') :
 															T_('Flat mode'), 'formvalue' ); ?>" />
-</div>
+</form>
 
 
 <!-- FILTER BOX: -->
-<div id="fmbar_filter" class="toolbaritem">
-	<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-	<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="5" />
-	<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
-		echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
-		?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
-		echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
 
-	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
+<?php
+// Title for checkbox and its label
+$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
+?>
+
+<form action="files.php#FM_anchor" id="fmbar_filter" class="toolbaritem">
+	<?php
+	echo $Fileman->getFormHiddenInputs();
+	echo $Fileman->getFormHiddenSelectedFiles();
+	?>
+	<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+	<input type="text"
+		name="filterString"
+		value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>"
+		size="7"
+		accesskey="f" />
+	<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php echo $titleRegExp; ?>"
+		value="1"<?php if( $Fileman->filterIsRegexp ) echo ' checked="checked"' ?> />
+	<label for="filterIsRegexp" title="<?php echo $titleRegExp; ?>"><?php
+		echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
+
+	<input name="actionArray[filter]"
+		class="ActionButton"
+		type="submit"
+		value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 	<?php
 	if( $Fileman->isFiltering() )
 	{ // "reset filter" form
-	?>
+		?>
 		<input title="<?php echo T_('Unset filter'); ?>"
 			type="image"
 			name="actionArray[filter_unset]"
 			class="ActionButton"
 			src="<?php echo getIcon( 'xross', 'url' ) ?>" />
-	<?php
+		<?php
 	}
 	?>
-</div>
+</form>
+
+
+<!-- THE MAIN FORM -->
+
+<form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
+<input type="hidden" name="confirmed" value="0" />
+<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
+<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
+<?php echo $Fileman->getFormHiddenInputs(); ?>
 
 
 <table class="grouped clear" cellspacing="0">
@@ -124,15 +149,16 @@ $filetable_cols = 8;
 		</div>
 
 		*/
-		?>
 
-		<?php
+
 		$rootlist = $Fileman->getRootList();
+
 		if( count($rootlist) > 1 )
 		{ // provide list of roots
 			?>
 
 			<!-- ROOT LISTS -->
+
 			<div id="fmbar_roots">
 				<select name="rootIDAndPath" onchange="this.form.submit()">
 				<?php
@@ -140,7 +166,7 @@ $filetable_cols = 8;
 				{
 					echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
 
-					if( $root == $lroot['id'] || ($root === NULL && $lroot['id'] == 'user') )
+					if( $Fileman->root == $lroot['id'] || ($Fileman->root === NULL && $lroot['id'] == 'user') )
 					{
 						echo ' selected="selected"';
 					}
@@ -222,7 +248,9 @@ $filetable_cols = 8;
 </tr>
 </thead>
 
+
 <tbody>
+
 <?php
 param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 
@@ -354,19 +382,21 @@ while( $lFile =& $Fileman->getNextFile() )
 if( $countFiles == 0 )
 { // Filelist errors or "directory is empty"
 	?>
-	<tr>
-	<td colspan="<?php echo $filetable_cols ?>">
-	<?php
-	if( !$Fileman->Messages->count( 'fl_error' ) )
-	{ // no Filelist errors, the directory must be empty
-		$Fileman->Messages->add( T_('No files found.')
-			.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->getFilter().'&raquo;' : '' ), 'fl_error' );
-	}
-	$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
 
-	?>
-	</td>
+	<tr>
+		<td colspan="<?php echo $filetable_cols ?>">
+			<?php
+			if( !$Fileman->Messages->count( 'fl_error' ) )
+			{ // no Filelist errors, the directory must be empty
+				$Fileman->Messages->add( T_('No files found.')
+					.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->getFilter().'&raquo;' : '' ), 'fl_error' );
+			}
+			$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
+
+			?>
+		</td>
 	</tr>
+
 	<?php
 }
 else
@@ -652,6 +682,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/27 21:56:07  blueyed
+ * layout..
+ *
  * Revision 1.7  2005/01/27 20:07:51  blueyed
  * rolled layout back somehow..
  *

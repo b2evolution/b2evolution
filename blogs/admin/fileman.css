@@ -88,7 +88,6 @@
 #fmbar_roots,
 #fmbar_cwd {
 	margin:.5ex 0 .5ex 1ex;
-	vertical-align:bottom;
 	padding:.5ex;
 	float:right;
 	white-space:nowrap;
@@ -96,7 +95,8 @@
 }
 #fmbar_roots,
 #fmbar_cwd {
-	margin:.5ex 1ex .5ex 0;
+	margin:.5ex;
+	padding:0;
 	float:left;
 	text-align:left;
 }
