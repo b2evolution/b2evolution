@@ -1,36 +1,56 @@
 <?php
 /**
- * This file implements the Test plugin for b2evolution
+ * This file implements the TEST plugin.
  *
- * This plugin responds to virtually all possible plugin events :P
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
  * @package plugins
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 /**
- * @package plugins
+ * TEST Plugin
+ *
+ * This plugin responds to virtually all possible plugin events :P
  */
 class test_plugin extends Plugin
 {
-	var $code = 'b2evTEST';
 	var $name = 'Test';
+	var $code = 'evo_TEST';
 	var $priority = 50;
+	var $version = 'CVS Rev: $Revision$';
+	var $author = 'François PLANQUE';
+	var $help_url = 'http://b2evolution.net/';
+	var $is_tool = true;
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;
-	var $short_desc;
-	var $long_desc;
 
-	/**
-	 * Should be toolbar be displayed?
-	 */
-	var $display = true;
 
 	/**
 	 * Constructor
@@ -47,7 +67,7 @@ class test_plugin extends Plugin
 	/**
 	 * Called when ending the admin html head section
 	 *
-	 * {@internal Plugin::AdminEndHtmlHead(-)}}
+	 * {@internal test_plugin::AdminEndHtmlHead(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
@@ -63,7 +83,7 @@ class test_plugin extends Plugin
 	/**
 	 * Called right after displaying the admin page footer
 	 *
-	 * {@internal Plugin::AdminAfterPageFooter(-)}}
+	 * {@internal test_plugin::AdminAfterPageFooter(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
@@ -100,7 +120,7 @@ class test_plugin extends Plugin
  	/**
 	 * Display an editor button
 	 *
-	 * {@internal Plugin::DisplayEditorButton(-)}}
+	 * {@internal test_plugin::DisplayEditorButton(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display ?
@@ -132,6 +152,21 @@ class test_plugin extends Plugin
 
 		$params['data'] = 'TEST['.$params['data'].']TEST';
 
+		return true;
+	}
+
+
+ 	/**
+	 * We are displaying the tool menu
+	 *
+	 * {@internal test_plugin::ToolMenu(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function ToolMenu( $params )
+	{
+	 	echo 'Hello, This is the ToolMenu for the TEST plugin.';
 		return true;
 	}
 }

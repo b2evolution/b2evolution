@@ -20,19 +20,10 @@ class spellcheck_plugin extends Plugin
 {
 	var $code = 'cafeSpell';
 	var $name = 'Spellchecker';
-	var $priority = 50;
+	var $priority = 10;
 	var $apply_when = 'never';
-	var $apply_to_html = true;
-	var $apply_to_xml = true;
-	var $short_desc;
-	var $long_desc;
 
 	var $useSpellcheckOnThisPage = false; // So far we have not requested it on this page.
-
-	/**
-	 * Should be toolbar be displayed?
-	 */
-	var $display = true;
 
 	/**
 	 * Constructor

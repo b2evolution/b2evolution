@@ -22,13 +22,6 @@ class smilies_plugin extends Plugin
 	var $apply_when = 'always';
 	var $apply_to_html = true; 
 	var $apply_to_xml = false; // Leave the smilies alone
-	var $short_desc;
-	var $long_desc;
-
-	/**
-	 * Should be toolbar be displayed?
-	 */
-	var $display = true;
 
 	/**
 	 * Text similes search array

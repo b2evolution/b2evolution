@@ -1,56 +1,140 @@
 <?php
 /**
- * This file implements the Plugin class (EXPERIMENTAL)
+ * This file implements the abstract Plugin class.
  *
- * This is the base class from which all plugins should be derived.
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
  * @package plugins
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Plugin Class
  *
- * @package plugins
  * @abstract
  */
 class Plugin
 {
 	/**
-	 * Name of the current class.
-	 *
-	 * Will be set automatically (from filename) when registering plugin.
+	 * Variables below MUST be overriden by plugin implementations,
+	 * either in the subclass declaration or in the subclass constructor.
+	 */
+
+ 	/**
+	 * Default plugin name as it will appear in Lists.
 	 *
 	 * @global string
 	 */
-	var $classname;
+	var $name = 'Unnamed plug-in';
 
-	/**
-	 * Internal (DB) ID
+
+ 	/**
+	 * Globally unique code for this plugin functionality. 8 chars. MUST BE SET.
+	 *
+	 * A common code MIGHT be shared between different plugins providing the same functionnality.
+	 * This allows to replace a given renderer with another one and keep the associations with posts.
+	 * Example: replacing a GIF smiley renderer with an SWF smiley renderer...
+	 *
+	 * @global string
+	 */
+	var $code = '';
+
+ 	/**
+	 * Default priority.
+	 *
+	 * Priority determines in which order the plugins get called.
+	 * Range: 1 to 100
 	 *
 	 * @global int
 	 */
-	var $ID = 0;		// 0 means 'NOT installed'
+ 	var $priority = 50;
 
-	var $code = '';
-	var $priority = 50;
-	var $name = 'Unnamed plug-in';
-	var $version;
-	var $author;
-	var $help_url;
-	var $short_desc;
-	var $long_desc;
+
+ 	/**
+	 * Plugin version number.
+	 *
+	 * This is for user info only.
+	 *
+	 * @global string
+	 */
+	var $version = '0';
+
+
+ 	/**
+	 * Plugin author.
+	 *
+	 * This is for user info only.
+	 *
+	 * @global string
+	 */
+	var $author = 'Unknown author';
+
+
+  /**
+	 * URL for more info about plugin, author and new versions.
+	 *
+	 * This is for user info only.
+	 * If there is no website available, a mailto: URL can be provided.
+	 *
+	 * @global string
+	 */
+	var $help_url = '';
+
+
+ 	/**
+	 * Plugin short description.
+	 *
+	 * This shoulb be no longer than a line.
+	 *
+	 * @global string
+	 */
+	var $short_desc = 'No desc available';
 
 
 	/**
-	 * Should be toolbar be displayed?
-	 * @todo get this outta here
+	 * Variables below MAY be overriden.
 	 */
-	var $display = true;
+
+ 	/**
+	 * Plugin long description.
+	 *
+	 * This should be no longer than a line.
+	 *
+	 * @global string
+	 */
+	var $long_desc = 'No description available';
+
+ 	/**
+	 * Should this plugin appear in the tools section?
+	 *
+	 * @global boolean
+	 */
+	var $is_tool = false;
 
   /**
 	 * When should this rendering plugin apply?
@@ -61,24 +145,54 @@ class Plugin
 	 * - 'opt-in'
 	 * - 'lazy'
 	 * - 'never'
+	 *
+	 * @global string
 	 * @todo get this outta here
 	 */
 	var $apply_when = 'never';	// By default, this may not be a rendering plugin
+
 	/**
 	 * Should this plugin apply to HTML?
+	 *
+	 * @global string
 	 * @todo get this outta here
 	 */
 	var $apply_to_html = true;
+
 	/**
 	 * Should this plugin apply to XML?
 	 * It should actually only apply when:
 	 * - it generates some content that is visible without HTML tags
 	 * - it removes some dirty markup when generating the tags (which will get stripped afterwards)
 	 * Note: htmlentityencoded is not considered as XML here.
+	 *
+	 * @global string
 	 * @todo get this outta here
 	 */
 	var $apply_to_xml = false;
 
+
+	/**
+	 * Variables below MUST NOT be overriden.
+	 */
+
+	/**
+	 * Name of the current class. (AUTOMATIC)
+	 *
+	 * Will be set automatically (from filename) when registering plugin.
+	 *
+	 * @global string
+	 */
+	var $classname;
+
+	/**
+	 * Internal (DB) ID. (AUTOMATIC)
+	 *
+	 * 0 means 'NOT installed'
+	 *
+	 * @global int
+	 */
+	var $ID = 0;
 
 
 	/**
@@ -276,6 +390,19 @@ class Plugin
 			default:
 				die( 'Output format ['.$format.'] not supported by Plugins.' );
 		}
+	}
+
+ 	/**
+	 * We are displaying the tool menu
+	 *
+	 * {@internal Plugin::ToolMenu(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function ToolMenu( & $params )
+	{
+		return false;		// Do nothing by default.
 	}
 
 }

@@ -18,6 +18,24 @@ $admin_tab = 'tools';
 $admin_pagetitle = T_('Tools');
 require( dirname(__FILE__).'/_menutop.php' );
 require( dirname(__FILE__).'/_menutop_end.php' );
+
+// Loop through plugins:
+$Plug->restart();
+
+while( $loop_Plugin = & $Plug->get_next() )
+{
+	if( $loop_Plugin->is_tool )
+	{	// This plugin is a tool, we must display something:
+		echo '<div class="panelblock">';
+		echo '<h2>';
+		$loop_Plugin->name();
+		echo '</h2>';
+		$loop_Plugin->ToolMenu( array() );
+		echo '</div>';
+	}
+}
+
+
 ?>
 
 <div class="panelblock">
@@ -55,40 +73,6 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 	}
 	?>
 </div>
-
-<?php
-	// Sidebar:
-	if ($is_gecko)
-	{
-		?>
-		<div class="panelblock">
-		<script type="text/javascript">
-			<!--
-			function addsidebar()
-			{
-				if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
-					window.sidebar.addPanel("<?php echo T_('Post to b2evolution') ?>","<?php echo $admin_url ?>b2sidebar.php","");
-				else
-					alert('<?php echo str_replace( "'", "\'", T_('No Sidebar found! You must use Mozilla 0.9.4 or later!')) ?>');
-			}
-			// -->
-		</script>
-		<h2><?php echo T_('SideBar') ?></h2>
-		<p><?php printf( T_('Add the <a %s>b2evo sidebar</a> !'), 'href="#" onclick="addsidebar()"' ); ?></p>
-		</div>
-		<?php
-	}
-	elseif($is_winIE || $is_macIE)
-	{
-		?>
-		<div class="panelblock">
-			<h2><?php echo T_('SideBar') ?></h2>
-			<p><?php echo T_('Add this link to your favorites:') ?><br />
-			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(_search=open('<?php echo $admin_url ?>b2sidebar.php?popuptitle='+escape(document.title)+'&amp;popupurl='+escape(location.href)+'&amp;text='+escape(Q),'_search'))"><?php echo T_('b2evo sidebar') ?></a></p>
-		</div>
-		<?php
-	}
-	?>
 
 <div class="panelblock">
 	<h2><?php echo T_('Movable Type Import') ?></h2>

@@ -19,17 +19,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class quicktags_plugin extends Plugin
 {
-	/**
-	 * Should be toolbar be displayed?
-	 */
-	var $display = true;
-
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $short_desc;
-	var $long_desc;
-
 
 	/**
 	 * Constructor
