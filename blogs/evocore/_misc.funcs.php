@@ -1713,34 +1713,34 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 
 /**
- * Get list of IP addresses of the client (HTTP_X_FORWARDED_FOR,
- * REMOTE_ADDR), in this order.
- * '' is used for REMOTE_ADDR, if it is not set (should not happen).
+ * Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR,
+ * in this order. '' is used when no IP could be detected.
  *
- * @param boolean True, to get only the first (best matching) IP
+ * @param boolean True, to get only the first IP (probably REMOTE_ADDR)
  * @return array|string Depends on first param.
  */
 function getIpList( $firstOnly = false )
 {
 	$r = array();
 
-	if( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== 'unknown' )
-	{ // Proxy
-		foreach( explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ) as $lIP )
-		{
-			if( $lIP != 'unknown' )
-			{
-				$r[] = $lIP;
-			}
-		}
-	}
-
 	if( isset( $_SERVER['REMOTE_ADDR'] ) )
 	{
 		$r[] = $_SERVER['REMOTE_ADDR'];
 	}
-	elseif( !isset( $r[0] ) )
-	{ // No other IP set yet.
+
+	if( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== 'unknown' )
+	{ // IP(s) behind Proxy
+		foreach( explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ) as $lIP )
+		{
+			if( $lIP != 'unknown' )
+			{
+				$r[] = trim($lIP);
+			}
+		}
+	}
+
+	if( !isset( $r[0] ) )
+	{ // No IP found.
 		$r[] = '';
 	}
 
@@ -1750,6 +1750,9 @@ function getIpList( $firstOnly = false )
 
 /*
  * $Log$
+ * Revision 1.39  2005/02/10 21:18:57  blueyed
+ * getIpList() fixed
+ *
  * Revision 1.38  2005/02/09 21:43:32  blueyed
  * introduced getIpList()
  *
