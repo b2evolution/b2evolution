@@ -110,7 +110,7 @@ function cat_delete( $cat_ID )
 						ORDER BY cat_ID
 						LIMIT 0, 1";
 		$remap_cat_ID = $DB->get_var( $sql );	
-		echo "remap to: $remap_cat_ID<br />";
+		// echo "remap to: $remap_cat_ID<br />";
 		// May be NULL if this was the last cat (But there are no posts inside)
 
 		if( ($remap_cat_ID == NULL) && (! empty($IDarray)) )
@@ -124,14 +124,10 @@ function cat_delete( $cat_ID )
 	// First delete assoc to this cat when it's an extra cat
 	$sql = "DELETE FROM $tablepostcats 
 						WHERE postcat_cat_ID = $cat_ID ";
-
-	// TODO: check why this block is here:
 	if( !empty($IDarray) )
 	{	
-		$IDlist = " AND postcat_post_ID NOT IN (".implode( ',', $IDarray ).") ";
+		$sql .= " AND postcat_post_ID NOT IN (".implode( ',', $IDarray ).") ";
 	}
-	else
-		$IDList = '';
  
 	$DB->query( $sql );
 
