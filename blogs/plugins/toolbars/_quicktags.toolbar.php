@@ -87,7 +87,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_par'
-																							,'&lt;p&gt;'
+																							,'p'
 																							,'<p>'
 																							,'</p>'
 																							,'p'
@@ -95,7 +95,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ul'
-																							,'&lt;ul&gt;'
+																							,'ul'
 																							,'<ul>\n'
 																							,'</ul>\n\n'
 																							,'u'
@@ -110,7 +110,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_li'
-																							,'&lt;li&gt;'
+																							,'li'
 																							,'	<li>'
 																							,'</li>\n'
 																							,'l'

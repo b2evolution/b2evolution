@@ -64,7 +64,7 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 				if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
 					window.sidebar.addPanel("<?php echo T_('Post to b2evolution') ?>","<?php echo $admin_url ?>/b2sidebar.php","");
 				else
-					alert("<?php echo T_('No Sidebar found! You must use Mozilla 0.9.4 or later!') ?>");
+					alert('<?php echo str_replace( "'", "\'", T_('No Sidebar found! You must use Mozilla 0.9.4 or later!')) ?>');
 			}
 		</script>
 		<h2><?php echo T_('SideBar') ?></h2>

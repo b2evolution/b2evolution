@@ -140,7 +140,7 @@ switch($action)
 			echo '" ';
 			if( ! blog_has_cats( $curr_blog_ID ) )
 			{	// loop blog has no categories, you cannot post to it.
-				echo 'onClick="alert(\'', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '\'); return false;" title="', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '"';
+				echo 'onClick="alert(\'', str_replace( "'", "\'", T_('Since this blog has no categories, you cannot post to it. You must create categories first.') ), '\'); return false;" title="', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '"';
 			}
 			elseif( blog_has_cats( $blog ) )
 			{	// loop blog AND current blog both have catageories, normal situation:

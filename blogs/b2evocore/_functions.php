@@ -480,7 +480,7 @@ function alert_error( $msg )
 	<head>
 	<script language="JavaScript">
 	<!--
-	alert("<?php echo $msg ?>");
+	alert('<?php echo str_replace( "'", "\'", $msg ) ?>');
 	history.back();
 	//-->
 	</script>
