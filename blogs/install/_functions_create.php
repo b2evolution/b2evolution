@@ -221,7 +221,16 @@ function create_b2evo_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
-	
+
+	echo 'Creating user preferences table... ';
+	$DB->query( "CREATE TABLE $tableuserprefs (
+							upref_user_ID INT() NOT NULL ,
+							upref_name VARCHAR( 30 ) NOT NULL,
+							upref_value VARCHAR( 255 ) NULL,
+							PRIMARY KEY ( upref_user_ID, upref_name )
+							)");
+	echo "OK.<br />\n";
+
 
 	create_antispam();
 

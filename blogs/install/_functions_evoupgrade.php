@@ -554,7 +554,6 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 		
 		echo 'Creating user preferences table... ';
-		// create new table
 		$DB->query( "CREATE TABLE $tableuserprefs (
 								upref_user_ID INT() NOT NULL ,
 								upref_name VARCHAR( 30 ) NOT NULL,
@@ -563,7 +562,6 @@ function upgrade_b2evo_tables()
 								)");
 		echo "OK.<br />\n";
 
-		
 		echo 'Altering table for Blog-User permissions... ';
 		$DB->query( "ALTER TABLE $tableblogusers
 								ADD COLUMN bloguser_perm_upload tinyint NOT NULL default 0" );
