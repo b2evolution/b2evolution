@@ -224,8 +224,8 @@ function get_userdatabylogin($user_login)
  */
 function get_userdata($userid)
 {
-	global $DB,$tableusers, $cache_userdata,$use_cache;
-	if ((empty($cache_userdata[$userid])) OR (!$use_cache))
+	global $DB,$tableusers, $cache_userdata;
+	if( empty($cache_userdata[$userid] ) )
 	{	// We do a progressive cache load beacuse there can be many many users!
 		$sql = "SELECT * 
 						FROM $tableusers 
@@ -234,13 +234,14 @@ function get_userdata($userid)
 		{
 			 $cache_userdata[$myrow['ID']] = $myrow;
 		}
-		$myrow = $cache_userdata[$userid];
 	}
-	else
+
+	if( ! isset( $cache_userdata[$userid] ) )
 	{
-		$myrow = $cache_userdata[$userid];
+		die('Requested user does not exist!');
 	}
-	return($myrow);
+
+	return $cache_userdata[$userid];
 }
 
 

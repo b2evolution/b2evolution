@@ -218,14 +218,14 @@ switch( $action )
 			to
 			<pre>$allow_evodb_reset = 1;</pre>
 			<p>Then reload this page and resetting will take place.</p>
-			<p>Back to <a href="install.php?locale=<?php $default_locale ?>">menu</a>.</p>
+			<p>Back to <a href="install.php?locale=<?php echo $default_locale ?>">menu</a>.</p>
 			<?php
 			break;
 		}
 		db_delete();
 		?>
 		<p>Reset done!</p>
-		<p>Back to <a href="install.php?locale=<?php $default_locale ?>">menu</a>.</p>
+		<p>Back to <a href="install.php?locale=<?php echo $default_locale ?>">menu</a>.</p>
 		<?php
 		break;
 

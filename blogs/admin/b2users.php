@@ -102,13 +102,21 @@ switch ($action)
 
 		param( 'id', 'integer', true );
 
+		if( $id == $current_User->ID )
+			die( 'You can\'t delete yourself!' );
+
+		if( $id == 1 )
+			die( 'You can\'t delete Uszr #1!' );
+
 		$user_data = get_userdata($id);
 		$edited_User = & new User( $user_data );
 
 		// Delete from DB:
-		$edited_User->dbdelete();
+		echo '<div class="panelinfo">
+						<h3>Deleting User...</h3>';
+		$edited_User->dbdelete( true );
+		echo '</div>';
 
-		echo '<div class="panelinfo">User deleted.</div>';
 		break;
 
 

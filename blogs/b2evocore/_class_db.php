@@ -18,6 +18,7 @@
 /*
  * Additions:
  * - query log
+ * - get_list
  */
 
 // ==================================================================
@@ -290,7 +291,7 @@ class DB
 	// ==================================================================
 	//	Function to get 1 column from the cached result set based in X index
 	// se docs for usage and info
-	function get_col( $query=NULL, $x=0 )
+	function get_col( $query = NULL, $x=0 )
 	{
 
 		// If there is a query then perform it if not then use cached results..
@@ -309,6 +310,11 @@ class DB
 		return $new_array;
 	}
 
+	function get_list( $query = NULL, $x=0 )
+	{
+		return implode( ',', $this->get_col( $query, $x=0 ) );
+	}
+	
 	// ==================================================================
 	// Return the the query as a result set - see docs for more details
 	function get_results( $query=NULL, $output = OBJECT)

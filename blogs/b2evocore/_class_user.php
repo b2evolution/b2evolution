@@ -394,32 +394,65 @@ class User extends DataObject
 	 * - comments on this users' posts
 	 * - user/blog permissions
 	 *
+	 * Includes WAY TOO MANY requests because we try to be compatible with mySQL 3.23, bleh!
+	 *
 	 * {@internal User::dbdelete(-) }}
 	 *
 	 * @todo delete comments on user's posts
+	 *
+	 * @param boolean true if you want to echo progress
 	 */
-	function dbdelete()
+	function dbdelete( $echo = false )
 	{
 		global $DB, $tablecomments, $tableposts, $tableblogusers;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
+		// Note: No need to localize the status messages...
+		if( $echo ) echo '<p>mySQL 3.23 compatibility mode!';
+
+		// Transform registered user comments to unregistered:
+		if( $echo ) echo '<br />Transforming user\'s comments to unregistered comments... ';
+		$ret = $DB->query( "UPDATE $tablecomments 
+												SET comment_author_ID = NULL,
+														comment_author = ".$DB->quote( $this->get('preferedname') ).",
+														comment_author_email = ".$DB->quote( $this->get('email') ).",
+														comment_author_url = ".$DB->quote( $this->get('url') )."
+												WHERE comment_author_ID = $this->ID" );
+		if( $echo ) printf( '(%d rows)', $ret );
+
+		// Get list of posts that are going to be deleted:
+		if( $echo ) echo '<br />Getting posts to delete... ';
+		$post_list = $DB->get_list( "SELECT ID 
+																	FROM $tableposts
+																	WHERE post_author = $this->ID" );
+
 		// Delete comments
-	/*	$sql="DELETE FROM $tablecomments INNER JOIN $tableposts
-												ON comment_post_ID = ID
-								 WHERE post_author = $this->ID";
-		 */
-
+		if( !empty( $post_list ) )
+		{
+			if( $echo ) echo '<br />Deleting comments on user\'s posts... ';
+			$ret = $DB->query( "DELETE FROM $tablecomments 
+													WHERE comment_post_ID IN ($post_list)" );
+			if( $echo ) printf( '(%d rows)', $ret );
+		}
+		
 		// Delete posts
-		$sql = "DELETE FROM $tableposts WHERE post_author = $this->ID";
-		$DB->query($sql);
+		if( $echo ) echo '<br />Deleting user\'s posts... ';
+		$ret = $DB->query(	"DELETE FROM $tableposts 
+													WHERE post_author = $this->ID" );
+			if( $echo ) printf( '(%d rows)', $ret );
 
-		// Delete userblog permission
-		$sql = "DELETE FROM $tableblogusers WHERE bloguser_user_ID = $this->ID";
-		$DB->query($sql);
+		// Delete userblog permissions
+		if( $echo ) echo '<br />Deleting user-blog permissions... ';
+		$ret = $DB->query(	"DELETE FROM $tableblogusers 
+													WHERE bloguser_user_ID = $this->ID" );
+		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Delete main object:
-		return parent::dbdelete();
+		if( $echo ) echo '<br />Deleting User... ';
+		parent::dbdelete();
+		
+		echo '<br/>Done.</p>';
 	}
 
 
