@@ -240,7 +240,7 @@ switch( $action )
 		<?php while( $row_stats = mysql_fetch_array($res_stats) ) {  ?>
 		<tr>
 			<td>
-				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Remove from blacklist') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
+				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Remove from blacklist') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 				<?php antiSpam_domain() ?>
 			</td>
 		</tr>
