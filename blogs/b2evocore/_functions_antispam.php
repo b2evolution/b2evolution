@@ -24,7 +24,7 @@ function antispam_create( $abuse_string )
 	if( antispam_url($abuse_string) ) return false;
 	
 	// Insert new string into DB:
-	$sql ="INSERT INTO $tableantispam(domain) VALUES('$abuse_string')";
+	$sql ="INSERT INTO $tableantispam(aspm_string) VALUES('$abuse_string')";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 
@@ -43,7 +43,7 @@ function antispam_delete( $string_ID )
 {
 	global $tableantispam, $querycount;
 
-	$sql ="DELETE FROM $tableantispam WHERE ID = '$string_ID'";
+	$sql ="DELETE FROM $tableantispam WHERE aspm_ID = $string_ID";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 }
@@ -60,7 +60,7 @@ function antispam_url( $url )
 
 	if( !isset($cache_antispam)) 
 	{	// Cache not loaded, load now:
-		$query = "SELECT domain FROM $tableantispam";
+		$query = "SELECT aspm_string FROM $tableantispam";
 		$querycount++;
 		$q = mysql_query( $query ) or mysql_oops( $query );
 		$cache_antispam = array();
@@ -93,7 +93,7 @@ function list_antiSpam()
 {
 	global 	$querycount, $tableantispam, $res_stats;
 
-	$sql = "SELECT * FROM $tableantispam ORDER BY domain ASC";
+	$sql = "SELECT aspm_ID, aspm_string FROM $tableantispam ORDER BY aspm_string ASC";
 	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
@@ -113,7 +113,7 @@ function antiSpam_ID()
 function antiSpam_domain()
 {
 	global $row_stats;
-	echo $row_stats['domain'];
+	echo $row_stats['aspm_string'];
 }
 
 /*
@@ -164,22 +164,11 @@ function keyword_ban( $keyword )
  *
  * find log hits that would be affected by a ban
  */
-function ban_affected_hits($banned, $type)
+function ban_affected_hits($banned)
 {
 	global  $querycount, $tablehitlog, $res_affected_hits;
 
-	switch( $type )
-	{
-		case "hit_ID":
-			$domain = get_domain_from_hit_ID($banned);
-			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain = '$domain' ORDER BY baseDomain ASC";
-			break;
-		case "keyword":
-		default:
-			// Assume it's a keyword
-			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
-			break;
-	}
+	$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
 	$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
@@ -189,22 +178,11 @@ function ban_affected_hits($banned, $type)
  *
  * find comments that would be affected by a ban
  */
-function ban_affected_comments($banned, $type)
+function ban_affected_comments($banned)
 {
 	global  $querycount, $tablecomments, $res_affected_comments;
 
-	switch( $type )
-	{
-		case "hit_ID":
-			$domain = get_domain_from_hit_ID($banned);
-			$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$domain%' ORDER BY comment_date ASC";
-			break;
-		case "keyword":
-		default:
-			// Assume it's a keyword
-			$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$banned%' ORDER BY comment_date ASC";
-			break;
-	}
+	$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$banned%' ORDER BY comment_date ASC";
 	$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }

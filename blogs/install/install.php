@@ -235,10 +235,10 @@ function create_antispam()
 	global $tableantispam;
 	
 	$query = "CREATE TABLE $tableantispam (
-		ID bigint(11) NOT NULL auto_increment,
-		domain varchar(250) NOT NULL,
-		PRIMARY KEY (ID),
-		KEY domain (domain)
+		aspm_ID bigint(11) NOT NULL auto_increment,
+		aspm_string varchar(80) NOT NULL,
+		PRIMARY KEY (aspm_ID),
+		KEY aspm_string (aspm_string)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 }
@@ -295,7 +295,7 @@ function populate_antispam()
 {
 	global $tableantispam;
 	
-	$query = "INSERT INTO $tableantispam(domain) VALUES ".
+	$query = "INSERT INTO $tableantispam(aspm_string) VALUES ".
 	"('prescriptions.md'), ('penis-enlargement'), ('online-casino'), ".
 	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
 	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
@@ -689,6 +689,7 @@ switch( $action )
 			echo '<p>The database schema is not up to date. Use regular upgrade instead.</p>';
 			break;
 		}
+		echo '</p>';
 
 		echo "Droping Antispam table...<br />\n";
 		$query = "DROP TABLE IF EXISTS $tableantispam";
