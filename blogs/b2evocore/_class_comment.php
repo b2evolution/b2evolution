@@ -104,8 +104,14 @@ class Comment extends DataObject
 		{
 			case 'post_link':
 				// Link to original post:
-				return gen_permalink( get_bloginfo( 'blogurl', $this->blogparams ), $this->post_ID, 
-															'id', 'single' );
+				return gen_permalink( get_bloginfo( 'blogurl', $this->blogparams ), 
+															$this->post_ID, 'id', 'single' );
+
+			case 'permalink':
+				// Permament link to comment:
+				$post_permalink = gen_permalink( get_bloginfo( 'blogurl', $this->blogparams ), 
+															$this->post_ID, 'id', 'single' );
+				return $post_permalink.'#c'.$this->ID;
 		}
 		// Default:		
 		return $this->$parname;	
@@ -115,22 +121,24 @@ class Comment extends DataObject
 	/** 
 	 * Template function: display link to comment author's provided URL
 	 *
-	 * {@internal Comment::author_url_link(-) }}
+	 * {@internal Comment::author_url(-) }}
 	 *
 	 * @param string String to display for link: leave empty to display URL
 	 * @param string String to display before link, if link exists
 	 * @param string String to display after link, if link exists
+	 * @param boolean false if you want NO html link
 	 */
-	function author_url_link( $linktext='', $before='', $after='' ) 
+	function author_url( $linktext='', $before='', $after='', $makelink = true ) 
 	{
 		$url = trim($this->author_url);
 		$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
 		$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 		if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url'))
 		{	// If URL exists:
-			$display = ($linktext != '') ? $linktext : $url;
 			echo $before;
-			echo '<a href="'.$url.'">'.$display.'</a>';
+			if( $makelink ) echo '<a href="'.$url.'">';
+			echo ($linktext != '') ? $linktext : $url;
+			if( $makelink ) echo '</a>';
 			echo $after;
 		}
 	}
@@ -139,20 +147,24 @@ class Comment extends DataObject
 	 * Template function: display author of comment
 	 *
 	 * {@internal Comment::author(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function author() 
+	function author( $format = 'htmlbody' ) 
 	{
-		$this->disp( 'author' );
+		$this->disp( 'author', $format );
 	}
 
 	/** 
 	 * Template function: display comment's original post's title
 	 *
 	 * {@internal Comment::post_title(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function post_title() 
+	function post_title( $format = 'htmlbody' ) 
 	{
-		$this->disp( 'post_title' );
+		$this->disp( 'post_title', $format );
 	}
 
 	/** 
@@ -166,11 +178,23 @@ class Comment extends DataObject
 	}
 
 	/** 
+	 * Template function: display permalink to this comment
+	 *
+	 * {@internal Comment::permalink(-) }}
+	 */
+	function permalink() 
+	{
+		$this->disp( 'permalink', 'raw' );
+	}
+
+	/** 
 	 * Template function: display content of comment
 	 *
 	 * {@internal Comment::content(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function content() 
+	function content( $format = 'htmlbody' ) 
 	{
 		global $use_textile;
 	
@@ -180,7 +204,7 @@ class Comment extends DataObject
 	
 		if( $use_textile ) $comment = textile( $comment );
 	
-		$comment = format_to_output( $comment, 'htmlbody' );
+		$comment = format_to_output( $comment, $format );
 		echo $comment;
 	}
 
@@ -190,13 +214,14 @@ class Comment extends DataObject
 	 * {@internal Comment::date(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
 	 */
-	function date( $d='' ) 
+	function date( $d='', $useGM = false )
 	{
 		if( empty($d) ) 
-			echo mysql2date( locale_datefmt(), $this->date );
+			echo mysql2date( locale_datefmt(), $this->date, $useGM);
 		else
-			echo mysql2date( $d, $this->date );
+			echo mysql2date( $d, $this->date, $useGM);
 	}
 
 	/** 
@@ -205,13 +230,14 @@ class Comment extends DataObject
 	 * {@internal Comment::time(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default time format
+	 * @param boolean true if you want GMT
 	 */
-	function time( $d='' ) 
+	function time( $d='', $useGM = false )
 	{
 		if( empty($d) ) 
-			echo mysql2date( locale_timefmt(), $this->date );
+			echo mysql2date( locale_timefmt(), $this->date, $useGM );
 		else
-			echo mysql2date( $d, $this->date );
+			echo mysql2date( $d, $this->date, $useGM );
 	}
 
 }

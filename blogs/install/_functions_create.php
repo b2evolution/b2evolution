@@ -477,16 +477,6 @@ function create_default_contents( $populate_blog_a = true )
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Matrix Reloaded"), T_("<p>[This is yet another sample post to demonstrate sub categories]</p>
-
-<p>Wait until the end of the super long end credits!</p>
-
-<p>If you're patient enough, you'll a get preview of the next episode...</p>
-
-<p>Though... it's just the same anyway! :>></p>"), $now, $cat_movies ) or mysql_oops( $query );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Clean Permalinks! :idea:"), T_("<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>
 
 <p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the /conf/_advanced.php file... (<code>\$use_extra_path_info = 1;</code>)</p>"), $now, $cat_b2evo ) or mysql_oops( $query );

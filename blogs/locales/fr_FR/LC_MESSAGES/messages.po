@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 0.8.6.1\n"
-"POT-Creation-Date: 2004-04-05 22:37+0200\n"
-"PO-Revision-Date: 2004-04-05 22:43+0100\n"
+"Project-Id-Version: b2evolution 0.9\n"
+"POT-Creation-Date: 2004-04-10 13:44+0200\n"
+"PO-Revision-Date: 2004-04-10 13:49+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -2223,9 +2223,6 @@ msgid "Templates"
 msgstr "Gabarits"
 
 #: ..\..\..\admin\_menutop.php:105
-#: ..\..\..\locales\puttenv.php:18
-#: ..\..\..\locales\puttenv.php:23
-#: ..\..\..\locales\puttenv.php:29
 msgid "Users"
 msgstr "Utilisateurs"
 
@@ -2882,7 +2879,6 @@ msgid "Requested category %s does not exist!"
 msgstr "La catégorie demandée %s n'existe pas"
 
 #: ..\..\..\b2evocore\_functions_cats.php:599
-#: ..\..\..\install\install.php:99
 msgid "Category"
 msgstr "Catégorie"
 
@@ -3691,16 +3687,6 @@ msgstr "(deux fois)"
 msgid "Register!"
 msgstr "S'inscire!"
 
-#: ..\..\..\install\install.php:100
-msgid ""
-"<p>This is the firstd post.</p>\n"
-"\n"
-"<p>It appears on both blog A and blog B.</p>"
-msgstr ""
-"<p>Ceci est le premier article.</p>\n"
-"\n"
-"<p>Il apparait à la fois dans le blog A et le blog B.</p>"
-
 #: ..\..\..\install\_functions_cafelogupgrade.php:34
 #, php-format
 msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"
@@ -3743,32 +3729,10 @@ msgid "However, the main purpose for this blog is to be included as a side item 
 msgstr "Cependant, la finalité principale de ce blog est d'être inclus comme complément à côté d'un autre blog, afin d'y afficher vos liens favoris/apparentés. Ceci est souvent appelé une liste 'Blogroll'."
 
 #: ..\..\..\install\_functions_create.php:480
-msgid "Matrix Reloaded"
-msgstr "Matrix Reloaded"
-
-#: ..\..\..\install\_functions_create.php:480
-msgid ""
-"<p>[This is yet another sample post to demonstrate sub categories]</p>\n"
-"\n"
-"<p>Wait until the end of the super long end credits!</p>\n"
-"\n"
-"<p>If you're patient enough, you'll a get preview of the next episode...</p>\n"
-"\n"
-"<p>Though... it's just the same anyway! :>></p>"
-msgstr ""
-"<p>[Ceci est encore un autre article d'exemple à titre de démonstration des sous catégories]</p>\n"
-"\n"
-"<p>Wait until the end of the super long end credits!</p>\n"
-"\n"
-"<p>If you're patient enough, you'll a get preview of the next episode...</p>\n"
-"\n"
-"<p>Though... it's just the same anyway! :>></p>"
-
-#: ..\..\..\install\_functions_create.php:490
 msgid "Clean Permalinks! :idea:"
 msgstr "Permaliens propres! :idea:"
 
-#: ..\..\..\install\_functions_create.php:490
+#: ..\..\..\install\_functions_create.php:480
 msgid ""
 "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>\n"
 "\n"
@@ -3778,11 +3742,11 @@ msgstr ""
 "\n"
 "<p>Toutefois, lorsque vous aurez le produit bien en main, vous devriez essayer d'activer les \"permaliens propres\" dans le fichier /conf/_advanced.php file... (<code>$use_extra_path_info = 1;</code>)</p>"
 
-#: ..\..\..\install\_functions_create.php:496
+#: ..\..\..\install\_functions_create.php:486
 msgid "Apache optimization... :idea:"
 msgstr "Optimisations pour Apache... :idea:"
 
-#: ..\..\..\install\_functions_create.php:496
+#: ..\..\..\install\_functions_create.php:486
 msgid ""
 "<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].</p>\n"
 "\n"
@@ -3792,11 +3756,11 @@ msgstr ""
 "\n"
 "<p>Ceci optimisera la manière dont votre serveur web (si vous utilisez Apache) gère les requêtes vers b2evolution. Ces fichiers ne sont pas actifs par défaut parce que certains hébergeurs ne les supportent pas et afficheraient une erreur pas forcément très explicite. Si vous obtenez une telle erreur en renommant les fichiers, supprimez les tout simplement pour faire disparaitre l'erreur.</p>"
 
-#: ..\..\..\install\_functions_create.php:502
+#: ..\..\..\install\_functions_create.php:492
 msgid "About evoSkins... :idea:"
 msgstr "A propos des habillages (evoSkins)... :idea:"
 
-#: ..\..\..\install\_functions_create.php:502
+#: ..\..\..\install\_functions_create.php:492
 msgid ""
 "<p>By default, b2evolution blogs are displayed using a default skin.</p>\n"
 "\n"
@@ -3814,11 +3778,11 @@ msgstr ""
 "\n"
 "<p>Vous pouvez restreindre les habillages disponibles en supprimant certains d'entre eux du répertoire /blogs/skins. Vous pouvez égalemenet créer de nouveaux habillages en dupliquant, renommant et personnalisant n'importe quel dossier d'habillage. Lisez le manuel sur les evoSkins!</p>"
 
-#: ..\..\..\install\_functions_create.php:512
+#: ..\..\..\install\_functions_create.php:502
 msgid "Skins *or* Templates ?"
 msgstr "Habillages *ou* Gabarits?"
 
-#: ..\..\..\install\_functions_create.php:512
+#: ..\..\..\install\_functions_create.php:502
 msgid ""
 "<p>By default, all pre-installed blogs use skins, not templates. (More on skins in another post.)</p>\n"
 "\n"
@@ -3844,11 +3808,11 @@ msgstr ""
 "\n"
 "<p>Finalement, si vous n'utilisez pas les gabarits, vous pouvez supprimer tous les fichiers <code>noskin_*.php</code> si vous le désirez. De même, si vous n'utilisez pas les habillages, vous pouvez supprimer tous les fichiers <code>blog_*.php</code> de même que les sous-répertoires du répertoire /skins. En revanche, ne supprimez pas le dossier skins en entier; en effet, même les gabarits font appels à certains fichiers qu'il contient!</p>"
 
-#: ..\..\..\install\_functions_create.php:526
+#: ..\..\..\install\_functions_create.php:516
 msgid "Multiple Blogs, new blogs, old blogs..."
 msgstr "Blogs multiples, nouveaux blogs, anciens blogs..."
 
-#: ..\..\..\install\_functions_create.php:526
+#: ..\..\..\install\_functions_create.php:516
 msgid ""
 "<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Blogroll'.</p>\n"
 "\n"
@@ -3880,11 +3844,11 @@ msgstr ""
 "  <li>Cachez les: allez dans l'administration des blogs et videz le champ 'Nom URL du fichier Stub'. Ainsi, votre blog n'apparaîtra plus publiquement. Vous pouvez aussi supprimer toutes les permissions utilisateur de ce blog afin de le cacher aux utilisateurs du backoffice (mis à part l'administrateur). Finalement, vous pouvez supprimer le fichier stub pour compléter le tout ;)</li>\n"
 "</ul>"
 
-#: ..\..\..\install\_functions_create.php:544
+#: ..\..\..\install\_functions_create.php:534
 msgid "File permissions!"
 msgstr "Permissions d'accès aux fichiers!"
 
-#: ..\..\..\install\_functions_create.php:544
+#: ..\..\..\install\_functions_create.php:534
 msgid ""
 "<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>\n"
 "\n"
@@ -3910,11 +3874,11 @@ msgstr ""
 "\n"
 "</ul>"
 
-#: ..\..\..\install\_functions_create.php:558
+#: ..\..\..\install\_functions_create.php:548
 msgid "Important information :idea:"
 msgstr "Informations importantes :idea:"
 
-#: ..\..\..\install\_functions_create.php:558
+#: ..\..\..\install\_functions_create.php:548
 msgid ""
 "<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>\n"
 "\n"
@@ -3928,11 +3892,11 @@ msgstr ""
 "\n"
 "<p>Si vous le souhaitez, vous pouvez supprimer ces articles un par un au fur et à mesure que vous les lisez. Vous pouvez également changer leur statut un 'perimé' de manière à garder une trace visuelle de ce que vous avez déjà lu.</p>"
 
-#: ..\..\..\install\_functions_create.php:593
+#: ..\..\..\install\_functions_create.php:583
 msgid "First Post"
 msgstr "Premier article"
 
-#: ..\..\..\install\_functions_create.php:593
+#: ..\..\..\install\_functions_create.php:583
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
@@ -3942,11 +3906,11 @@ msgstr ""
 "\n"
 "<p>Il apparait à la fois dans le blog A et le blog B.</p>"
 
-#: ..\..\..\install\_functions_create.php:599
+#: ..\..\..\install\_functions_create.php:589
 msgid "Second post"
 msgstr "Second article"
 
-#: ..\..\..\install\_functions_create.php:599
+#: ..\..\..\install\_functions_create.php:589
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
@@ -3956,11 +3920,11 @@ msgstr ""
 "\n"
 "<p>Il apparait uniquement dans le blog A mais dans de multiples catégories.</p>"
 
-#: ..\..\..\install\_functions_create.php:605
+#: ..\..\..\install\_functions_create.php:595
 msgid "Third post"
 msgstr "Troisième article"
 
-#: ..\..\..\install\_functions_create.php:605
+#: ..\..\..\install\_functions_create.php:595
 msgid ""
 "<p>This is the third post.</p>\n"
 "\n"
@@ -4035,11 +3999,11 @@ msgstr "(Placer des cookies pour le nom, l'email &amp; l'url)"
 msgid "No comment yet..."
 msgstr "Pas de commentaire pour l'instant..."
 
-#: ..\..\..\skins\_lastcomments.php:33
+#: ..\..\..\skins\_lastcomments.php:32
 msgid "In response to:"
 msgstr "En réponse à:"
 
-#: ..\..\..\skins\_lastcomments.php:33
+#: ..\..\..\skins\_lastcomments.php:32
 #, php-format
 msgid "Original post on %s"
 msgstr "Article original sur %s"

@@ -1,6 +1,6 @@
 <?php
   /*
-   * This template generates an Atom feed for the requested blog
+   * This template generates an Atom feed for the requested blog's latest posts
    * (http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html)
    */
   $skin = '';                   // We don't want this do be displayed in a skin !

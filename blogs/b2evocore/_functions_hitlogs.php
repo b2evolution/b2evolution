@@ -94,7 +94,7 @@ function log_hit()
 		}
 	}
 			
-	if( stristr($ReqURI, 'rss') || stristr($ReqURI, 'rdf') )
+	if( stristr($ReqURI, 'rss') || stristr($ReqURI, 'rdf') || stristr($ReqURI, 'atom')  )
 	{
 		$ignore = "rss";
 		// don't mess up the XML!! dbg("referer ignored (RSS)");

@@ -475,7 +475,6 @@ class ItemList extends DataObjectList
 		// Set variables for future:
 		global $previousday;		// Should be a member var
 		$previousday = '';		
-		$this->row = NULL;
 		$this->row_num = 0;
 		$this->main_cat = '';
 		$this->group_by_cat = false;
@@ -613,7 +612,7 @@ class ItemList extends DataObjectList
 			$id = $row->ID;
 			if( empty($id) )
 			{
-				die('No post data available!');
+				die('No post data available! 421');
 			}
 			// echo 'starting ',$row->post_title;
 			$postdata = array (

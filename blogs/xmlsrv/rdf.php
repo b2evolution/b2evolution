@@ -1,6 +1,7 @@
 <?php
   /*
-   * This template generates an RSS 1.0 (RDF) feed for the requested blog
+   * This template generates an RSS 1.0 (RDF) feed for the requested blog's latest posts
+	 * http://web.resource.org/rss/1.0/
    */
   $skin = '';                          // We don't want this do be displayed in a skin !
 	$show_statuses = array();     // Restrict to published posts
@@ -29,11 +30,14 @@
     </rdf:Seq>
   </items>
 </channel>
-<?php $MainList->restart(); while( $MainList->get_item() ) { ?>
+<?php 
+$MainList->restart(); 
+while( $MainList->get_item() ) 
+{ ?>
 <item rdf:about="<?php permalink_single() ?>">
   <title><?php the_title( '', '', false, 'xml' ) ?></title>
   <link><?php permalink_single() ?></link>
-  <dc:date><?php the_time('Y-m-d\TH:i:s',1,1); ?>Z</dc:date>
+  <dc:date><?php the_time('isoZ',1,1); ?></dc:date>
   <dc:creator><?php the_author( 'xml' ) ?></dc:creator>
   <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
   <description><?php

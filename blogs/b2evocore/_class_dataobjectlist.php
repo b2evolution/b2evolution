@@ -72,6 +72,17 @@ class DataObjectList
 	}
 
 	/**
+	 * Rewind resultset
+	 *
+	 * {@internal DataObjectList::restart(-) }}
+	 */
+	function restart()
+	{
+		mysql_data_seek ($this->result, 0) or die( 'Could not rewind resultset!' );
+	}
+	
+	
+	/**
 	 * Template function: display message if list is empty
 	 *
 	 * {@internal DataObjectList::display_if_empty(-) }}

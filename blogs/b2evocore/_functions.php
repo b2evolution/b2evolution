@@ -507,6 +507,10 @@ function mysql2date($dateformatstring, $mysqlstring, $useGM = false)
 
 	if( $useGM )
 	{ // We want a Greenwich Meridian time:
+		if( $dateformatstring == 'isoZ' )
+		{ // full ISO 8601 format
+			$dateformatstring = 'Y-m-d\TH:i:s\Z';
+		}
 		$j = gmdate($dateformatstring, $i - ($time_difference * 3600));
 	}
 	else
@@ -530,7 +534,12 @@ function date_i18n( $dateformatstring, $unixtimestamp )
 	$datemonth = date('m', $unixtimestamp);
 	$dateweekday = date('w', $unixtimestamp);
 
-	$dateformatstring = ' '.$dateformatstring;
+	if( $dateformatstring == 'isoZ' )
+	{ // full ISO 8601 format
+		$dateformatstring = 'Y-m-d\TH:i:s\Z';
+	}
+
+	$dateformatstring = ' '.$dateformatstring; // will be removed later
 
 	// echo $dateformatstring, '<br />';
 

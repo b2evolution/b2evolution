@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-05 22:37+0200\n"
+"POT-Creation-Date: 2004-04-10 13:44+0200\n"
 "PO-Revision-Date: 2004-03-06 03:15+0100\n"
 "Last-Translator: Christina Svensson <b2evo04@cs.se>\n"
 "MIME-Version: 1.0\n"
@@ -2181,8 +2181,7 @@ msgstr "Statistik"
 msgid "Templates"
 msgstr "Mallar"
 
-#: ..\..\..\admin\_menutop.php:105 ..\..\..\locales\puttenv.php:18
-#: ..\..\..\locales\puttenv.php:23 ..\..\..\locales\puttenv.php:29
+#: ..\..\..\admin\_menutop.php:105
 msgid "Users"
 msgstr "Användare"
 
@@ -2846,7 +2845,7 @@ msgstr ""
 msgid "Requested category %s does not exist!"
 msgstr "Angiven kategori existerar inte"
 
-#: ..\..\..\b2evocore\_functions_cats.php:599 ..\..\..\install\install.php:99
+#: ..\..\..\b2evocore\_functions_cats.php:599
 msgid "Category"
 msgstr "Kategori"
 
@@ -3681,13 +3680,6 @@ msgstr "(två gånger)"
 msgid "Register!"
 msgstr "Registrera!"
 
-#: ..\..\..\install\install.php:100
-msgid ""
-"<p>This is the firstd post.</p>\n"
-"\n"
-"<p>It appears on both blog A and blog B.</p>"
-msgstr ""
-
 #: ..\..\..\install\_functions_cafelogupgrade.php:34
 #, php-format
 msgid ""
@@ -3743,26 +3735,10 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\install\_functions_create.php:480
-msgid "Matrix Reloaded"
-msgstr ""
-
-#: ..\..\..\install\_functions_create.php:480
-msgid ""
-"<p>[This is yet another sample post to demonstrate sub categories]</p>\n"
-"\n"
-"<p>Wait until the end of the super long end credits!</p>\n"
-"\n"
-"<p>If you're patient enough, you'll a get preview of the next episode...</"
-"p>\n"
-"\n"
-"<p>Though... it's just the same anyway! :>></p>"
-msgstr ""
-
-#: ..\..\..\install\_functions_create.php:490
 msgid "Clean Permalinks! :idea:"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:490
+#: ..\..\..\install\_functions_create.php:480
 msgid ""
 "<p>b2evolution uses old-style permalinks and feedback links by default. This "
 "is to ensure maximum compatibility with various webserver configurations.</"
@@ -3773,11 +3749,11 @@ msgid ""
 "$use_extra_path_info = 1;</code>)</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:496
+#: ..\..\..\install\_functions_create.php:486
 msgid "Apache optimization... :idea:"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:496
+#: ..\..\..\install\_functions_create.php:486
 msgid ""
 "<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> "
 "there are two files called [<code>sample.htaccess</code>]. You should try "
@@ -3790,11 +3766,11 @@ msgid ""
 "fine.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:502
+#: ..\..\..\install\_functions_create.php:492
 msgid "About evoSkins... :idea:"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:502
+#: ..\..\..\install\_functions_create.php:492
 msgid ""
 "<p>By default, b2evolution blogs are displayed using a default skin.</p>\n"
 "\n"
@@ -3812,11 +3788,11 @@ msgid ""
 "customizing any existing skin folder. Read the manual on evoSkins!</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:512
+#: ..\..\..\install\_functions_create.php:502
 msgid "Skins *or* Templates ?"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:512
+#: ..\..\..\install\_functions_create.php:502
 msgid ""
 "<p>By default, all pre-installed blogs use skins, not templates. (More on "
 "skins in another post.)</p>\n"
@@ -3847,11 +3823,11 @@ msgid ""
 "files in there!</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:526
+#: ..\..\..\install\_functions_create.php:516
 msgid "Multiple Blogs, new blogs, old blogs..."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:526
+#: ..\..\..\install\_functions_create.php:516
 msgid ""
 "<p>By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', "
 "'Blog B' and 'Blogroll'.</p>\n"
@@ -3879,11 +3855,11 @@ msgid ""
 "</ul>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:544
+#: ..\..\..\install\_functions_create.php:534
 msgid "File permissions!"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:544
+#: ..\..\..\install\_functions_create.php:534
 msgid ""
 "<p><strong>This is pretty important. Make sure you read this in order to "
 "have a fully functionning installation!</strong></p>\n"
@@ -3910,11 +3886,11 @@ msgid ""
 "</ul>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:558
+#: ..\..\..\install\_functions_create.php:548
 msgid "Important information :idea:"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:558
+#: ..\..\..\install\_functions_create.php:548
 msgid ""
 "<p>Blog B contains a few posts in the 'b2evolution Tips' category.</p>\n"
 "\n"
@@ -3926,34 +3902,34 @@ msgid ""
 "visually keep track of what you have already read.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:593
+#: ..\..\..\install\_functions_create.php:583
 msgid "First Post"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:593
+#: ..\..\..\install\_functions_create.php:583
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
 "<p>It appears on both blog A and blog B.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:599
+#: ..\..\..\install\_functions_create.php:589
 #, fuzzy
 msgid "Second post"
 msgstr "Sparar inlägg..."
 
-#: ..\..\..\install\_functions_create.php:599
+#: ..\..\..\install\_functions_create.php:589
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
 "<p>It appears on blog A only but in multiple categories.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:605
+#: ..\..\..\install\_functions_create.php:595
 msgid "Third post"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:605
+#: ..\..\..\install\_functions_create.php:595
 msgid ""
 "<p>This is the third post.</p>\n"
 "\n"
@@ -4020,11 +3996,11 @@ msgstr "(Sätt cookie för namn, email &amp; URL)"
 msgid "No comment yet..."
 msgstr "Ännu inga kommentarer..."
 
-#: ..\..\..\skins\_lastcomments.php:33
+#: ..\..\..\skins\_lastcomments.php:32
 msgid "In response to:"
 msgstr "Som svar på:"
 
-#: ..\..\..\skins\_lastcomments.php:33
+#: ..\..\..\skins\_lastcomments.php:32
 #, php-format
 msgid "Original post on %s"
 msgstr "Orginalinlägg om %s"

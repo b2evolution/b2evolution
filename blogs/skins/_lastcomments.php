@@ -17,29 +17,29 @@
 	
 	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses );
 	
-	if( $CommentList->get_num_rows() == 0 )
-	{	// No comment has been found:
-		echo '<p>', T_('No comment yet...'), '</p>';
-	}
-	else 
-	{	// Loop through comments:
-		while($Comment = $CommentList->get_next() )
-		{	// ---------------------------- START OF COMMENTS -------------------------------
-			?>
-	
-			<a name="c<?php $Comment->disp('ID', 'raw') ?>"></a>
-			<div class="bComment">
-				<h3 class="bTitle"><?php echo T_('In response to:') ?> <a href="<?php $Comment->disp('post_link', 'raw') ?>" title="<?php printf( T_('Original post on %s'), $Comment->get('blog_name') ); ?>"><?php $Comment->disp('post_title') ?></a></h3>
-				<div class="bCommentTitle"><?php $Comment->disp('author') ?> <?php $Comment->author_url_link( '', ' &middot; ', '' ) ?></div>
-				<div class="bCommentText">
-					<?php $Comment->text() ?>
-				</div>
-				<div class="bCommentSmallPrint">
-					<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
-				</div>
+	$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
+
+	while( $Comment = $CommentList->get_next() )
+	{	// Loop through comments:	?>
+		<!-- ---------- START of a COMMENT ---------- -->
+		<a name="c<?php $Comment->ID() ?>"></a>
+		<div class="bComment">
+			<h3 class="bTitle">
+				<?php echo T_('In response to:') ?> 
+				<a href="<?php $Comment->post_link() ?>" title="<?php echo T_('Original post on:') ?> <?php  $Comment->disp( 'blog_name', 'htmlattr' ) ?>"><?php $Comment->post_title() ?></a>
+			</h3>
+			<div class="bCommentTitle">
+				<?php $Comment->author() ?>
+				<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
 			</div>
-	
-			<?php 
-		} // ---------------------------- END OF COMMENTS -------------------------------
-	}
+			<div class="bCommentText">
+				<?php $Comment->content() ?>
+			</div>
+			<div class="bCommentSmallPrint">
+				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+			</div>
+		</div>
+		<!-- ---------- END of a COMMENT ---------- -->
+		<?php 
+	}	// End of comment loop.
 ?>
