@@ -193,9 +193,26 @@ switch( $action )
 				$admin_pagetitle .= ' :: '. T_('Advanced');
 				break;
 		}
-		break;
-}
 
+	// Blog list
+	$blogListButtons = '<a href="blogs.php" class="'
+			.( 0 == $blog ? 'CurrentBlog' : 'OtherBlog' ).'">'.T_('List').'</a>';
+
+	for( $curr_blog_ID = blog_list_start();
+				$curr_blog_ID != false;
+				$curr_blog_ID = blog_list_next() )
+	{
+		if( ! $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+		{ // Current user is not allowed to edit this blog...
+			continue;
+		}
+
+		$blogListButtons .= ' <a href="blogs.php?action=edit&amp;blog='.$curr_blog_ID.'&amp;tab='.$tab.'" class="'
+			.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'">'
+			.blog_list_iteminfo( 'shortname', false ).'</a>';
+	}
+
+}
 
 require( dirname(__FILE__).'/_menutop.php' );
 
@@ -520,16 +537,22 @@ switch($action)
 		</div>
 		<?php
 		break;
+
+	default:
+		// List the blogs:
+		require( dirname(__FILE__).'/_blogs_list.php' );
+
 }
 
 
-// List the blogs:
-require( dirname(__FILE__).'/_blogs_list.php' );
 require( dirname(__FILE__).'/_footer.php' );
 
 
 /*
  * $Log$
+ * Revision 1.21  2005/01/05 17:48:54  fplanque
+ * consistent blog switcher on top
+ *
  * Revision 1.20  2004/12/06 21:45:23  jwedgeco
  * Added header info and granted Francois PLANQUE the right to relicense under the Mozilla Public License.
  *
