@@ -114,6 +114,7 @@ class AbstractSettings
 
 	/**
 	 * Constructor, does nothing.
+	 * @todo I think it would be clearer if the constructor initialized colkeynames before testing it... the derived classes can always call parent::AbstractSettings( ... )
 	 */
 	function AbstractSettings()
 	{
@@ -453,6 +454,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/30 14:29:42  fplanque
+ * comments
+ *
  * Revision 1.6  2004/12/29 02:25:55  blueyed
  * no message
  *
