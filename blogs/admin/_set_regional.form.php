@@ -43,7 +43,7 @@ if( !empty($locale) && $action != 'extract' )
 		{ // we need to remember this for updating locale
 			echo '<input type="hidden" name="oldloc_locale" value="'.$newlocale.'" />';
 		}
-		form_text( 'newloc_locale', $newlocale, 20, T_('Locale'), '', 20 );
+		form_text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
 		form_checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),
 			T_('should the locale be available?') );
 		form_text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
@@ -71,7 +71,9 @@ if( !empty($locale) && $action != 'extract' )
 		<input type="submit" name="submit" value="'.( ($locale == '_new_') ? T_('Create') : T_('Update') ).'" class="search" onClick="var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};" />	
 		<input type="reset" value="'.format_to_output(T_('Reset'), 'formvalue').'" class="search" />
 		</div>
-		<div class="panelinfo"><p>'.sprintf(T_('We\'ll use the flag out of subdirectories from <code>%s</code>, where the filename is equal to the language part of the locale (characters 4-5; file extension is gif).'), '/'.$img_subdir.'/flags/').'</p></div>
+		<div class="panelinfo">
+			<p>'.sprintf(T_('We\'ll use the flag out of subdirectories from <code>%s</code>, where the filename is equal to the language part of the locale (characters 4-5; file extension is gif).'), '/'.$img_subdir.'/flags/').'</p>
+		</div>
 		</fieldset>
 	</form>
 	';
@@ -126,10 +128,12 @@ else
 			{?>
 			<th><?php echo T_('Strings') ?></th>
 			<th><?php echo T_('Translated') ?></th>
-			<?php if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
+			<?php
+			}
+			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
 			{ ?>
 			<th><?php echo T_('Extract') ?></th>
-			<?php }
+			<?php			
 			} ?>
 			<th></th>
 		</tr>
@@ -140,14 +144,14 @@ else
 			$i++;
 			?>
 			<tr style="text-align:center">
-			<td style="text-align:left">
+			<td style="text-align:left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
 				<?php
 				echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />'
 				#.$lval['priority'].'. '
 				;
 				locale_flag( $lkey );
 				echo'
-				<strong><span title="'.T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'].'">'.$lkey.'</span></strong>
+				<strong>'.$lkey.'</strong>
 			</td>
 			<td>
 				<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
@@ -162,10 +166,10 @@ else
 				<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="6" />
 			</td>';
 	
+			// Get PO file for that locale:
+			$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 			if( $showtranslationpercentage )
 			{
-				// Get PO file for that locale:
-				$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 				if( ! is_file( $po_file ) )
 				{
 					echo '<td colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
@@ -238,15 +242,21 @@ else
 					$percent_done = round(($translated-$fuzzy/2)/$all*100);
 					$color = sprintf( '%02x%02x00', 255 - round($percent_done * 2.55), round($percent_done * 2.55) );
 					echo "\n\t<td style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
-					if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction  )
-					{ // Translator options:
-						echo "\n\t<td>", '[<a href="b2options.php?tab=regional&amp;action=extract&amp;locale='.$lkey.'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
-					}
 				}
 			} // show message file percentage/extraction
 			
 			if( $current_User->check_perm( 'options', 'edit' ) )
 			{
+				if( $allow_po_extraction  )
+				{ // Translator options:
+					echo ;
+					if( is_file( $po_file ) )
+						echo "\n\t<td>".'[<a href="b2options.php?tab=regional&amp;action=extract&amp;locale='.$lkey.'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
+					elseif( !$showtranslationpercentage )
+					{ // show only if we did not show it before
+						echo "\n\t".'<td title="'.T_('No language file...').'"> --- </td>';
+					}
+				}
 				echo '
 				<td align="left">
 				';

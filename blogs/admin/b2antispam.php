@@ -256,7 +256,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	<p class="center"><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
 	if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 	{
-		echo '</p><p class="center">'.T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
+		echo T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
 	}
 	?></p>
 	<?php list_antiSpam() ?>

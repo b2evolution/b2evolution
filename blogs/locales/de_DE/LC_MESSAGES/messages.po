@@ -2301,7 +2301,7 @@ msgstr "Ausloggen"
 
 #: ..\..\..\admin\_menutop.php:36
 msgid "Exit to blogs"
-msgstr "Zurück zu den Blogs"
+msgstr "Zu den Blogs"
 
 #: ..\..\..\admin\_menutop.php:45
 msgid "Blog time:"
@@ -2325,7 +2325,7 @@ msgstr "Betrachten/Editieren"
 
 #: ..\..\..\admin\_menutop.php:69
 msgid "Cats"
-msgstr "Kats"
+msgstr "Kategorien"
 
 #: ..\..\..\admin\_menutop.php:83
 msgid "Stats"

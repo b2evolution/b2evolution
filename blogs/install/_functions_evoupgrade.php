@@ -327,7 +327,7 @@ function upgrade_b2evo_tables()
 			'what_to_show' => array('days'),
 			'archive_mode' => array('weekly'),
 			'time_difference' => array(0),
-			'AutoBR' => array(1, 'autoBR'),
+			'AutoBR' => array(1),
 			'last_antispam_update' => array('2000-01-01 00:00:00', 'antispam_last_update'),
 			'pref_newusers_grp_ID' => array(4, 'newusers_grp_ID'),
 			'pref_newusers_level'  => array(1, 'newusers_level'),

@@ -48,7 +48,7 @@ function upgrade_cafelog_tables()
 						('what_to_show', 'paged'),
 						('archive_mode', '".$q['archive_mode']."'),
 						('time_difference', '".$q['time_difference']."'),
-						('autoBR', '".$q['AutoBR']."'),
+						('AutoBR', '".$q['AutoBR']."'),
 						('antispam_last_update', '2000-01-01 00:00:00')
 						('newusers_grp_ID', '".$Group_Users->get('ID')."' ),
 						('newusers_level', '1'),

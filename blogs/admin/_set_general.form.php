@@ -51,7 +51,7 @@
 	<fieldset>
 		<legend><?php echo T_('Link options') ?></legend>
 		<?php
-			form_checkbox( 'links_extrapath', get_settings('links_extrapath'), T_('Use extra-path info'), sprintf( T_('Recommended if your webserver supports it. Links will look like <code>stub/2003/05/20/post_title</code> instead of <code>stub?title=post_title&c=1&tb=1&pb=1&more=1</code>' ) ) );
+			form_checkbox( 'links_extrapath', get_settings('links_extrapath'), T_('Use extra-path info'), sprintf( T_('Recommended if your webserver supports it. Links will look like \'stub/2003/05/20/post_title\' instead of \'stub?title=post_title&c=1&tb=1&pb=1&more=1\'.' ) ) );
 	
 			form_radio( 'permalink_type', get_settings('permalink_type'),
 					array(  array( 'urltitle', T_('Post called up by its URL title (Recommended)') ),
