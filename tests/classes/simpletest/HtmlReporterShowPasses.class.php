@@ -1,13 +1,16 @@
 <?php
 /**
- * We extend the HtmlReporter class.
- *
+ * This file implements the extended HtmlReporter class,
+ * which shows passes.
  */
 
-require_once( SIMPLETEST_DIR.'/reporter.php' );
+/**
+ * The original reporter.
+ */
+require_once( SIMPLETEST_DIR.'reporter.php' );
 
 /**
- *
+ * The extended HtmlReporter class, which shows passes.
  */
 class HtmlReporterShowPasses extends HtmlReporter
 {
@@ -28,7 +31,9 @@ class HtmlReporterShowPasses extends HtmlReporter
 	}
 
 	function _getCss() {
-		return parent::_getCss() . ' .pass { color: green; }';
+		return parent::_getCss()
+						." .pass { color: green; } \n"
+						." .fail { font-weight:bold; font-size:1.2em; }.\n";
 	}
 
 }

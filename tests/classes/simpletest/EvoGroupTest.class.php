@@ -13,7 +13,7 @@ require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 /**
  * We use {@link retrieveFiles()}
  */
-require_once( EVODIR.'/blogs/evocore/_file.funcs.php' );
+require_once( EVODIR.'blogs/evocore/_file.funcs.php' );
 
 
 /**
@@ -47,7 +47,6 @@ class EvoGroupTest extends GroupTest
 				if( substr($lFile, -15) == '.simpletest.php' )
 				{
 					$this->addTestFile( $lFile );
-
 				}
 			}
 		}

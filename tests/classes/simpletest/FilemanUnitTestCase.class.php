@@ -1,5 +1,11 @@
 <?php
+/**
+ * This file implements the class for Filemanager unit tests.
+ */
 
+/**
+ * The class for Filemanager unit tests.
+ */
 class FilemanUnitTestCase extends EvoUnitTestCase
 {
 	var $tempFiles = array();

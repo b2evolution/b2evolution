@@ -27,7 +27,7 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 		parent::setup();
 
 		$this->MockDB =& new MockDB($this);
-		$this->TestSettings = new AbstractSettings( 'testtable', array( 'test_name' ), 'test_value' );
+		$this->TestSettings =& new AbstractSettings( 'testtable', array( 'test_name' ), 'test_value' );
 		$this->TestSettings->DB =& $this->MockDB;
 	}
 
@@ -59,6 +59,24 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 
 		$this->TestSettings->load();
 		$this->assertEqual( 'abc', $this->TestSettings->getDefault( 'default_abc' ) );
+	}
+
+
+	/**
+	 * Tests AbstractSettings::set()
+	 */
+	function testPreferExplicitSet()
+	{
+		$this->MockDB->expectOnce( 'get_results', array( new WantedPatternExpectation('/SELECT test_name, test_value FROM testtable/i') ), 'DB select ok.' );
+		$this->TestSettings->set( 'lala', 1 );
+
+		$this->MockDB->expectNever( 'get_results', false, 'Did not reload settings from DB.' );
+		$this->TestSettings->load();
+
+		$this->assertEqual( $this->TestSettings->get( 'lala' ), 1, 'Prefer setting which was set before explicit load().' );
+		$this->assertNull( $this->TestSettings->get( 'lala_notset' ), 'Return NULL for non-existing setting.' );
+
+		$this->MockDB->tally();
 	}
 }
 
