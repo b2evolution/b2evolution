@@ -211,7 +211,7 @@ msgid "Let's assume you install the contents of the blogs folder to <code>http:/
 msgstr ""
 
 #: ../../doc/install_new.src.html:45
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> and follow the instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
 msgstr ""
 
 #: ../../doc/install_new.src.html:48
@@ -277,7 +277,7 @@ msgid "Let's assume you install the contents of the blogs folder to <code>http:/
 msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:63
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> and follow the instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:68
@@ -305,7 +305,7 @@ msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> 
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:39
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> and follow the instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:44
@@ -319,5 +319,8 @@ msgid "German (DE)"
 msgstr ""
 
 msgid "French (FR)"
+msgstr ""
+
+msgid "Dutch (NL)"
 msgstr ""
 

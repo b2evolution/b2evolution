@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-07 20:45+0100\n"
+"PO-Revision-Date: 2004-05-07 21:35+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -148,21 +148,21 @@ msgid "upgrading from Cafelog/b2 version 0.6.x"
 msgstr "mettre à jour depuis Cafélog/b2 version 0.6.x"
 
 #: ../../index.src.html:45
-#: ../../doc/install_new.src.html:53
+#: ../../doc/install_new.src.html:54
 #: ../../doc/upgradefrom_b2.src.html:73
 #: ../../doc/upgradefrom_b2evo.src.html:52
 msgid "official website"
 msgstr "site officiel"
 
 #: ../../index.src.html:46
-#: ../../doc/install_new.src.html:54
+#: ../../doc/install_new.src.html:55
 #: ../../doc/upgradefrom_b2.src.html:74
 #: ../../doc/upgradefrom_b2evo.src.html:53
 msgid "GNU GPL license"
 msgstr "Licence GNU GPL"
 
 #: ../../index.src.html:47
-#: ../../doc/install_new.src.html:55
+#: ../../doc/install_new.src.html:56
 #: ../../doc/upgradefrom_b2.src.html:75
 #: ../../doc/upgradefrom_b2evo.src.html:54
 msgid "contact"
@@ -193,7 +193,7 @@ msgstr "Note:"
 
 #: ../../doc/install_new.src.html:38
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way."
-msgstr ""
+msgstr "Sauf si vous avez changé la configuration, toutes les tables créées par b2evolution sont préfixées avec evo_ . A moins que vous n'ayez une autre application utilisant le même préfixe, il est donc sûr d'installer b2evolution dans une base de données partagée avec d'autres applications. Vos tables existantes ne seront pas affectées en aucune manière."
 
 #: ../../doc/install_new.src.html:39
 #: ../../doc/upgradefrom_b2.src.html:57
@@ -202,33 +202,33 @@ msgstr "Téléchargez les fichiers de b2evolution sur votre serveur web."
 
 #: ../../doc/install_new.src.html:41
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
-msgstr ""
-
-#: ../../doc/install_new.src.html:43
-msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
-msgstr ""
+msgstr "Seuls les contenus du répertoire <code>/blogs</code> ont besoin d'être téléchargés sur votre serveur. Si vous voulez que b2evolution prenne en charge la page d'accueil de votre site, téléchargez les contenus du dossier <code>/blogs</code> à la racine de votre site web. Autrement, le mieux est de télécharger les fichies dans un sous-répertoire de votre site web. Vous pouvez conserver le nom de répertoire <code>/blogs</code>, mais vous pouvez également en choisir un autre."
 
 #: ../../doc/install_new.src.html:44
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> and follow the instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
-msgstr ""
+msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
+msgstr "Supposons que vous installiez les contenus du répertoire blogs à l'emplacement <code>http://votresite.com/votredossier</code> ..."
 
-#: ../../doc/install_new.src.html:47
+#: ../../doc/install_new.src.html:45
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
+msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossier/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
+
+#: ../../doc/install_new.src.html:48
 #: ../../doc/upgradefrom_b2.src.html:66
 #: ../../doc/upgradefrom_b2evo.src.html:42
 msgid "Check to make sure the new installation works."
 msgstr "Vérifiez que la nouvelle installation fonctionne."
 
-#: ../../doc/install_new.src.html:48
+#: ../../doc/install_new.src.html:49
 #: ../../doc/upgradefrom_b2.src.html:67
 #: ../../doc/upgradefrom_b2evo.src.html:43
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr "Sur les serveurs de production, il est recommandé de supprimer le sous répertoire <code>/install</code>."
 
-#: ../../doc/install_new.src.html:49
+#: ../../doc/install_new.src.html:50
 #: ../../doc/upgradefrom_b2.src.html:69
 #: ../../doc/upgradefrom_b2evo.src.html:48
 msgid "After basic install is done, there are a few <a %href>tricky things you may need to take care of</a> (online manual)."
-msgstr ""
+msgstr "Une fois que l'installation de base est terminée, il y a quelques <a %href>choses légèrement délicates à régler</a> (manual en ligne)."
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"
@@ -268,15 +268,15 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:59
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>"
-msgstr ""
+msgstr "Seuls les contenus du répertoire <code>/blogs</code> ont besoin d'être téléchargés sur votre serveur. Si vous voulez que b2evolution prenne en charge la page d'accueil de votre site, téléchargez les contenus du dossier <code>/blogs</code> à la racine de votre site web. Autrement, le mieux est de télécharger les fichies dans un sous-répertoire de votre site web, <code>/b2evo</code> par exemple; de cette manière <strong>votre blog Cafelog/b2 reste complètement fonctionnek pendant que vous évaluez b2evolution.</strong>"
 
 #: ../../doc/upgradefrom_b2.src.html:61
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
-msgstr ""
+msgstr "Supposons que vous installiez les contenus du répertoire blogs à l'emplacement <code>http://votresite.com/b2evo</code> ..."
 
 #: ../../doc/upgradefrom_b2.src.html:63
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> and follow the instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
-msgstr ""
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
+msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/b2evo/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés, copiera vos données b2 vers b2evolution (sans altérer b2) et configurera b2evolution pour vous."
 
 #: ../../doc/upgradefrom_b2.src.html:68
 msgid "Check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading your existing b2 template to b2evolution."
@@ -303,8 +303,8 @@ msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> 
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:39
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> and follow the instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
-msgstr ""
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
+msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
 
 #: ../../doc/upgradefrom_b2evo.src.html:44
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %href>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading specific files from a specific version to another."
@@ -318,4 +318,7 @@ msgstr "Allemand (DE)"
 
 msgid "French (FR)"
 msgstr "Français (FR)"
+
+msgid "Dutch (NL)"
+msgstr "Néerlandais (NL)"
 
