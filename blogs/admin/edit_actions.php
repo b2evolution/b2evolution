@@ -60,8 +60,8 @@ switch($action)
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
-		param( "post_autobr", 'integer', 0 );
-		param( "post_pingback", 'integer', 0 );
+		param( 'post_autobr', 'integer', 0 );
+		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
 		param( 'content', 'html' );

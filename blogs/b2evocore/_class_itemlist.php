@@ -93,7 +93,7 @@ class ItemList extends DataObjectList
 	{
 		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
-		global $cache_categories, $time_difference;
+		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 
 		// Call parent constructor:
@@ -412,7 +412,7 @@ class ItemList extends DataObjectList
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
 			// echo 'before';
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + (get_settings('time_difference') * 3600) );
 			$where .= ' AND post_issue_date >= \''. $date_min.'\'';
 		}
 
@@ -424,7 +424,7 @@ class ItemList extends DataObjectList
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			// echo 'after';
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + (get_settings('time_difference') * 3600) );
 			$where .= ' AND post_issue_date <= \''. $date_max.'\'';
 		}
 

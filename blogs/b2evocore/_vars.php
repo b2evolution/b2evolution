@@ -11,6 +11,9 @@
 
 $b2_version = '0.8.9+CVS';
 
+if( !isset($debug) ) $debug = 0;
+if( !isset($demo_mode) ) $demo_mode = 0;
+
 // Activate gettext:
 if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
 {	// We are going to use GETTEXT

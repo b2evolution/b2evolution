@@ -63,13 +63,11 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 		{
 			die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
 		}
-	
 	?>
-
 	<p>These are your settings from the config file:<br />
- (If you don't see correct settings here, <br />
-STOP before going any further, <br />
-and check your configuration.)</p>
+	(If you don't see correct settings here, <br />
+	STOP before going any further, <br />
+	and check your configuration.)</p>
 <pre>
 mySQL Host: <?php echo DB_HOST ?> &nbsp;
 mySQL Database: <?php echo DB_NAME ?> &nbsp;
@@ -82,7 +80,7 @@ mySQL Password: <?php echo ((DB_PASSWORD!='demopass' ? "(Set, but not shown for 
 		?>
 		<h2>Language/Locale</h2>
 		<p>Choose a default locale.<br />
-		 Clicking it should directly activate it.</p>
+		Clicking it should directly activate it.</p>
 		
 		<ul style="margin-left: 2ex;list-style:none;" >
 	

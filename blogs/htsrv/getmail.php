@@ -9,14 +9,14 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 $output_debugging_info = 0;		# =1 if you want to output debugging info
- 
+
 require_once(dirname(__FILE__).'/../conf/_config.php');
 require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
 
-if ($use_phoneemail) 
+if( $use_phoneemail )
 {
 	// if you're using phone email, the email will already be in your timezone
-	$time_difference = 0;
+	set_settings('time_difference', 0);
 }
 
 // error_reporting(2037);
@@ -33,7 +33,7 @@ if(!$pop3->connect($mailserver_url, $mailserver_port)) {
 
 echo T_('Logging into pop server...'), "<br />\n";
 $Count = $pop3->login($mailserver_login, $mailserver_pass);
-if((!$Count) || ($Count == -1)) 
+if((!$Count) || ($Count == -1))
 {
 	echo T_('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
 	$pop3->quit();
@@ -44,11 +44,11 @@ if((!$Count) || ($Count == -1))
 // ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT!
 //register_shutdown_function($pop3->quit());
 
-for ($iCount=1; $iCount<=$Count; $iCount++) 
+for ($iCount=1; $iCount<=$Count; $iCount++)
 {
-	printf( T_('Getting message #%d...')."<br />\n", $iCount ); 
+	printf( T_('Getting message #%d...')."<br />\n", $iCount );
 	$MsgOne = $pop3->get($iCount);
-	if((!$MsgOne) || (gettype($MsgOne) != 'array')) 
+	if((!$MsgOne) || (gettype($MsgOne) != 'array'))
 	{
 		echo $pop3->ERROR, "<br />\n";
 		$pop3->quit();
@@ -62,7 +62,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$bodysignal = 0;
 	$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
 					 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-	while ( list ( $lineNum,$line ) = each ($MsgOne) ) 
+	while ( list ( $lineNum,$line ) = each ($MsgOne) )
 	{
 		if (strlen($line) < 3) {
 			$bodysignal = 1;
@@ -76,22 +76,22 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 				$content_type = explode(';', $content_type);
 				$content_type = $content_type[0];
 			}
-			if (($content_type == 'multipart/alternative') && (preg_match('/boundary="/', $line)) && ($boundary == '')) 
+			if (($content_type == 'multipart/alternative') && (preg_match('/boundary="/', $line)) && ($boundary == ''))
 			{
 				$boundary = trim($line);
 				$boundary = explode('"', $boundary);
 				$boundary = $boundary[1];
 			}
-			if (preg_match('/Subject: /', $line)) 
+			if (preg_match('/Subject: /', $line))
 			{
 				$subject = trim($line);
 				$subject = substr($subject, 9, strlen($subject)-9);
-				if ($use_phoneemail) 
+				if ($use_phoneemail)
 				{
 					$subject = explode($phoneemail_separator, $subject);
 					$subject = trim($subject[0]);
 				}
-				if (!ereg($subjectprefix, $subject)) 
+				if (!ereg($subjectprefix, $subject))
 				{
 					continue;
 				}
@@ -105,11 +105,11 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 				}
 				$date_arr = explode(' ', $ddate);
 				$date_time = explode(':', $date_arr[3]);
-				
+
 				$ddate_H = $date_time[0];
 				$ddate_i = $date_time[1];
 				$ddate_s = $date_time[2];
-				
+
 				$ddate_m = $date_arr[1];
 				$ddate_d = $date_arr[0];
 				$ddate_Y = $date_arr[2];
@@ -119,26 +119,26 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 					}
 				}
 				$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
-				$ddate_U = $ddate_U + ($time_difference * 3600);
+				$ddate_U = $ddate_U + (get_settings('time_difference') * 3600);
 				$post_date = date('Y-m-d H:i:s', $ddate_U);
 			}
 		}
 	}
 
-	$ddate_today = time() + ($time_difference * 3600);
+	$ddate_today = time() + (get_settings('time_difference') * 3600);
 	$ddate_difference_days = ($ddate_today - $ddate_U) / 86400;
 
 
 	# starts buffering the output
 	ob_start();
 
-	if ($ddate_difference_days > 14) 
+	if ($ddate_difference_days > 14)
 	{
 		echo T_('Too old'), '<br />';
 		continue;
 	}
 
-	if( !preg_match('/'.$subjectprefix.'/', $subject)) 
+	if( !preg_match('/'.$subjectprefix.'/', $subject))
 	{
 		echo T_('Subject prefix does not match'), '<br />';
 		continue;
@@ -161,7 +161,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	echo "<p><strong>Content-type:</strong> $content_type, <strong>boundary:</strong> $boundary</p>\n";
 	echo '<p><strong>', T_('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
-	
+
 	$btpos = strpos($content, $bodyterminator);
 	if ($btpos) {
 		$content = substr($content, 0, $btpos);
@@ -171,7 +171,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$blah = explode("\n", $content);
 	$firstline = $blah[0];
 
-	if ($use_phoneemail) 
+	if ($use_phoneemail)
 	{
 		$btpos = strpos($firstline, $phoneemail_separator);
 		if ($btpos) {
@@ -198,7 +198,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
 
-	if(!user_pass_ok( $user_login, $user_pass )) 
+	if(!user_pass_ok( $user_login, $user_pass ))
 	{
 		echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
 		continue;
@@ -215,37 +215,37 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 
 	$post_category = xmlrpc_getpostcategory($content);
-	if ($post_category == '') 
+	if ($post_category == '')
 	{
 		$post_category = $default_category;
 	}
 	echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
-	
-	$blog_ID = get_catblog($post_category); 
+
+	$blog_ID = get_catblog($post_category);
 	echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 
 	// Check permission:
 	if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 	{
 		echo "\n", T_('Permission denied.'), '<br />';
-		continue;	
+		continue;
 	}
 
-	if (!$thisisforfunonly) 
+	if (!$thisisforfunonly)
 	{
-		// CHECK and FORMAT content	
-		$post_title = format_to_post(trim($post_title),0,0);
-		$content = format_to_post(trim($content),$autobr,0);
-	
+		// CHECK and FORMAT content
+		$post_title = format_to_post( trim($post_title), 0, 0 );
+		$content = format_to_post( trim($content), get_settings('AutoBR'), 0);
+
 		if( errors_display( T_('Cannot post, please correct these errors:'), '' ) )
 		{
 			continue;
 		}
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', 'en', '',	$autobr, true ) or mysql_oops($query);
+		$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', 'en', '',	get_settings('AutoBR'), true ) or mysql_oops($query);
 
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
+		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
 			sleep($sleep_after_edit);
 		}
@@ -260,29 +260,29 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
 	echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
 
-	if(!$pop3->delete($iCount)) 
+	if(!$pop3->delete($iCount))
 	{
 		echo '<p>', $pop3->ERROR, '</p></div>';
 		$pop3->reset();
 		exit;
 	}
-	else 
+	else
 	{
 		echo '<p>', T_('Mission complete, message deleted.'), '</p>';
 	}
 
 	echo '</div>';
-	if ($output_debugging_info) 
+	if ($output_debugging_info)
 	{
 		ob_end_flush();
-	} 
-	else 
+	}
+	else
 	{
 		ob_end_clean();
 	}
 }
 
-if ($output_debugging_info) 
+if ($output_debugging_info)
 {
 	ob_end_flush();
 }

@@ -183,7 +183,7 @@ function format_to_edit( $content, $autobr = false )
 /*
  * format_to_post(-)
  */
-function format_to_post($content, $autobr=0, $is_comment=0)
+function format_to_post( $content, $autobr = 0, $is_comment = 0 )
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attribues, $uri_attrs, $allowed_uri_scheme;
@@ -383,7 +383,6 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
 	global $month, $month_abbrev, $weekday, $weekday_abbrev;
-	global $time_difference;
 
 	$datemonth = date('m', $unixtimestamp);
 	$dateweekday = date('w', $unixtimestamp);
@@ -395,7 +394,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 	if( $useGM )
 	{ // We want a Greenwich Meridian time:
-		$j = gmdate($dateformatstring, $unixtimestamp - ($time_difference * 3600));
+		$j = gmdate($dateformatstring, $unixtimestamp - (get_settings('time_difference') * 3600));
 	}
 	else
 	{	// We want default timezone time:
@@ -501,6 +500,22 @@ function get_settings( $setting )
 	}
 
 	return $cache_settings->$setting;
+}
+
+
+/*
+ * overrides settings that have been read from DB
+ *
+ * @param string setting name
+ * @param mixed setting value
+ */
+function set_settings( $setting, $value )
+{
+	global $cache_settings;
+	
+	$cache_settings->$setting = $value;
+	
+	return true;
 }
 
 
@@ -1172,7 +1187,7 @@ function debug_info( $force = false )
 	
 	if( $debug || $force )
 	{
-		echo '<h2>Debug info</h2>';
+		echo '<hr /><h2>Debug info</h2>';
 		
 		echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 

@@ -88,7 +88,7 @@ function b2newpost($m)
 	if( ! user_pass_ok($username,$password) ) 
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	$userdata = get_userdatabylogin($username);
@@ -105,17 +105,16 @@ function b2newpost($m)
 				 "Permission denied.");
 	}
 
-	$time_difference = get_settings("time_difference");
 	if ($postdate != "") 
 	{
 		$now = $postdate;
 	}
 	else
 	{
-		$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
+		$now = date("Y-m-d H:i:s",(time() + (get_settings('time_difference') * 3600)));
 	}
 
-	// CHECK and FORMAT content	
+	// CHECK and FORMAT content 
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
@@ -186,8 +185,8 @@ function b2getcategories($m)
 			$cat_ID = $row->cat_ID;
 
 			$struct[$i] = new xmlrpcval(array("categoryID" => new xmlrpcval($cat_ID),
-										  "categoryName" => new xmlrpcval($cat_name)
-										  ),"struct");
+											"categoryName" => new xmlrpcval($cat_name)
+											),"struct");
 			$i = $i + 1;
 		}
 
@@ -204,7 +203,7 @@ function b2getcategories($m)
 	else
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 }
 
@@ -244,7 +243,7 @@ function b2_getPostURL($m)
 	if( ! user_pass_ok($username,$password))
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	// Check permission:
@@ -298,15 +297,15 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 blogid (string): Unique identifier of the blog the post will be added to. 
- *					  Currently ignored in b2evo, in favor of the category.
+ *						Currently ignored in b2evo, in favor of the category.
  *					2 username (string): Login for a Blogger user who has permission to post to the blog.
- *					3 password (string): Password for said username.  
- *					4 content (string): Contents of the post.  
+ *					3 password (string): Password for said username.	
+ *					4 content (string): Contents of the post.	 
  *					5 publish (boolean): If true, the blog will be published immediately after the 
- *					  post is made. (In b2evo,this means, the new post will be in 'published' state,
- *					  otherwise it would be in draft state).
+ *						post is made. (In b2evo,this means, the new post will be in 'published' state,
+ *						otherwise it would be in draft state).
  * @return xmlrpcresp XML-RPC Response
  */
 function bloggernewpost($m)
@@ -335,7 +334,7 @@ function bloggernewpost($m)
 	{
 		logIO("O","Wrong username/password combination <strong>$username / $password</strong>");
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 	
 	$userdata = get_userdatabylogin($username);
@@ -358,10 +357,9 @@ function bloggernewpost($m)
 
 	$content = xmlrpc_removepostdata( $content );
 
-	$time_difference = get_settings("time_difference");
-	$now = date("Y-m-d H:i:s",(time() + ($time_difference * 3600)));
+	$now = date('Y-m-d H:i:s', (time() + (get_settings('time_difference') * 3600)));
 
-	// CHECK and FORMAT content	
+	// CHECK and FORMAT content 
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
@@ -384,7 +382,7 @@ function bloggernewpost($m)
 	}
 
 	if( $publish )
-	{	// If post is publicly published:
+	{ // If post is publicly published:
 		logIO("O","Doing pingbacks...");
 		pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
 		logIO("O","Pinging b2evolution.net...");
@@ -426,15 +424,15 @@ $bloggereditpost_doc='Edits a post, blogger-api like';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 postid (string): Unique identifier of the post to be changed. 
  *					2 username (string): Login for a Blogger user who has permission to edit the given 
- *					  post (either the user who originally created it or an admin of the blog). 
- *					3 password (string): Password for said username.  
+ *						post (either the user who originally created it or an admin of the blog). 
+ *					3 password (string): Password for said username.	
  *					4 content (string): New content of the post. 
  *					5 publish (boolean): If true, the blog will be published immediately after the 
- *					  post is made. (In b2evo,this means, the new post will be in 'published' state,
- *					  otherwise it would be in draft state).
+ *						post is made. (In b2evo,this means, the new post will be in 'published' state,
+ *						otherwise it would be in draft state).
  * @return xmlrpcresp XML-RPC Response
  *
  * @todo check current status and permission on it
@@ -462,7 +460,7 @@ function bloggereditpost($m)
 	if( !user_pass_ok($username,$password) ) 
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	$newcontent=$m->getParam(4);
@@ -502,7 +500,7 @@ function bloggereditpost($m)
 
 	$content = xmlrpc_removepostdata($content);
 
-	// CHECK and FORMAT content	
+	// CHECK and FORMAT content 
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
@@ -514,15 +512,15 @@ function bloggereditpost($m)
 	// We need to check the previous flags...
 	$post_flags = $postdata['Flags'];
 	if( in_array( 'pingsdone', $post_flags ) )
-	{	// pings have been done before
+	{ // pings have been done before
 		$pingsdone = true;
 	}
 	elseif( !$publish )
-	{	// still not publishing
+	{ // still not publishing
 		$pingsdone = false;
 	}
 	else
-	{	// We'll be pinging now
+	{ // We'll be pinging now
 		$pingsdone = true;
 	}
 
@@ -539,15 +537,15 @@ function bloggereditpost($m)
 	}
 
 	if( $publish )
-	{	// If post is publicly published:
+	{ // If post is publicly published:
 
-		// ping ?	
+		// ping ? 
 		if( in_array( 'pingsdone', $post_flags ) )
-		{	// pings have been done before
+		{ // pings have been done before
 			logIO("O","pings have been done before...");
 		}
 		else
-		{	// We'll ping now
+		{ // We'll ping now
 			// We have less control here as in the backoffice, so we'll actually
 			// only pingback once, at the same time we do the pings!
 			logIO("O","Doing pingbacks...");
@@ -587,11 +585,11 @@ $bloggerdeletepost_doc='Deletes a post, blogger-api like';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 postid (string): Unique identifier of the post to be deleted. 
  *					2 username (string): Login for a Blogger user who has permission to edit the given 
- *					  post (either the user who originally created it or an admin of the blog). 
- *					3 password (string): Password for said username.  
+ *						post (either the user who originally created it or an admin of the blog). 
+ *					3 password (string): Password for said username.	
  * @return xmlrpcresp XML-RPC Response
  */
 function bloggerdeletepost($m) 
@@ -612,7 +610,7 @@ function bloggerdeletepost($m)
 	if (user_pass_ok($username,$password)) 
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	if(! ($postdata=get_postdata($post_ID)) )
@@ -673,10 +671,10 @@ $bloggergetusersblogs_doc='returns the user\'s blogs - this is a dummy function,
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 username (string): Login for the Blogger user who's blogs will be retrieved. 
- *					2 password (string): Password for said username.  
- *					  (currently not required by b2evo)
+ *					2 password (string): Password for said username.	
+ *						(currently not required by b2evo)
  * @return xmlrpcresp XML-RPC Response, an array of <struct>'s containing for each blog:
  *					- ID (blogid), 
  *					- name (blogName), 
@@ -694,14 +692,14 @@ function bloggergetusersblogs($m)
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
 
-	if( ! user_pass_ok($username,$password) )  
+	if( ! user_pass_ok($username,$password) )	 
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	$userdata = get_userdatabylogin( $username );
- 	$current_User = & new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	$resp_array = array();
 	// Loop through all blogs:
@@ -710,7 +708,7 @@ function bloggergetusersblogs($m)
 				 $curr_blog_ID=blog_list_next() ) 
 	{ 
 		if( ! $current_User->is_blog_member( $curr_blog_ID ) )
-		{	// Current user is not a member of this blog...
+		{ // Current user is not a member of this blog...
 			continue;
 		}
 
@@ -748,10 +746,10 @@ $bloggergetuserinfo_doc='gives the info about a user';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 username (string): Login for the Blogger user who's blogs will be retrieved. 
- *					2 password (string): Password for said username.  
- *					  (currently not required by b2evo)
+ *					2 password (string): Password for said username.	
+ *						(currently not required by b2evo)
  * @return xmlrpcresp XML-RPC Response, a <struct> containing:
  *					- userid, 
  *					- firstname,
@@ -774,18 +772,18 @@ function bloggergetuserinfo($m)
 
 	if (user_pass_ok($username,$password)) {
 		$struct = new xmlrpcval(array("nickname" => new xmlrpcval($userdata["user_nickname"]),
-									  "userid" => new xmlrpcval($userdata["ID"]),
-									  "url" => new xmlrpcval($userdata["user_url"]),
-									  "email" => new xmlrpcval($userdata["user_email"]),
-									  "lastname" => new xmlrpcval($userdata["user_lastname"]),
-									  "firstName" => new xmlrpcval($userdata["user_firstname"])
-									  ),"struct");
+										"userid" => new xmlrpcval($userdata["ID"]),
+										"url" => new xmlrpcval($userdata["user_url"]),
+										"email" => new xmlrpcval($userdata["user_email"]),
+										"lastname" => new xmlrpcval($userdata["user_lastname"]),
+										"firstName" => new xmlrpcval($userdata["user_firstname"])
+										),"struct");
 		$resp = $struct;
 		return new xmlrpcresp($resp);
 
 	} else {
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 }
 
@@ -809,11 +807,11 @@ $bloggergetpost_doc='fetches a post, blogger-api like';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 postid (string): Unique identifier of the post to be deleted. 
  *					2 username (string): Login for a Blogger user who has permission to edit the given 
- *					  post (either the user who originally created it or an admin of the blog). 
- *					3 password (string): Password for said username.  
+ *						post (either the user who originally created it or an admin of the blog). 
+ *					3 password (string): Password for said username.	
  * @return xmlrpcresp XML-RPC Response
  */
 function bloggergetpost($m) 
@@ -838,25 +836,25 @@ function bloggergetpost($m)
 			$post_date = mysql2date("U", $postdata["Date"]);
 			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
 
-			$content  = "<title>".$postdata["Title"]."</title>";
+			$content	= "<title>".$postdata["Title"]."</title>";
 			$content .= "<category>".$postdata["Category"]."</category>";
 			$content .= $postdata["Content"];
 
 			$struct = new xmlrpcval(array("userid" => new xmlrpcval($postdata["Author_ID"]),
-										  "dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
-										  "content" => new xmlrpcval($content),
-										  "postid" => new xmlrpcval($postdata["ID"])
-										  ),"struct");
+											"dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
+											"content" => new xmlrpcval($content),
+											"postid" => new xmlrpcval($postdata["ID"])
+											),"struct");
 
 			$resp = $struct;
 			return new xmlrpcresp($resp);
 		} else {
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 4
-           "No such post #$post_ID");
+					 "No such post #$post_ID");
 		}
 	} else {
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 }
 
@@ -879,11 +877,11 @@ $bloggergetrecentposts_doc='fetches X most recent posts, blogger-api like';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 blogid (string): Unique identifier of the blog the post will be added to. 
- *					  Currently ignored in b2evo, in favor of the category.
+ *						Currently ignored in b2evo, in favor of the category.
  *					2 username (string): Login for a Blogger user who has permission to edit the given 
- *					  post (either the user who originally created it or an admin of the blog). 
+ *						post (either the user who originally created it or an admin of the blog). 
  *					3 password (string): Password for said username. 
  *					4 numposts (integer): number of posts to retrieve. 
  * @return xmlrpcresp XML-RPC Response
@@ -917,7 +915,7 @@ function bloggergetrecentposts($m)
 		$result = mysql_query($sql);
 		if (!$result)
 			return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-           "For some strange yet very annoying reason, the entries couldn't be fetched.".mysql_error());
+					 "For some strange yet very annoying reason, the entries couldn't be fetched.".mysql_error());
 
 		$data = new xmlrpcval("","array");
 
@@ -935,7 +933,7 @@ function bloggergetrecentposts($m)
 			$post_date = mysql2date("U", $postdata["Date"]);
 			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
 
-			$content  = "<title>".$postdata["Title"]."</title>";
+			$content	= "<title>".$postdata["Title"]."</title>";
 			$content .= "<category>".$postdata["Category"]."</category>";
 			$content .= $postdata["Content"];
 
@@ -985,7 +983,7 @@ function bloggergetrecentposts($m)
 
 	} else {
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 }
 
@@ -1010,12 +1008,12 @@ $bloggergettemplate_doc='returns the default template file\'s code';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 blogid (string): Unique identifier of the blog who's template is to be returned. 
  *					2 username (string): Login for a Blogger who has admin permission on given blog. 
- *					3 password (string): Password for said username.  
+ *					3 password (string): Password for said username.	
  *					4 templateType (string): Determines which of the blog's templates will be returned.
- *					  Currently, either "main" or "archiveIndex". 
+ *						Currently, either "main" or "archiveIndex". 
  * @return xmlrpcresp XML-RPC Response
  */
 function bloggergettemplate($m) 
@@ -1037,7 +1035,7 @@ function bloggergettemplate($m)
 	if( !user_pass_ok($username,$password)) 
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	$userdata = get_userdatabylogin($username);
@@ -1069,7 +1067,7 @@ function bloggergettemplate($m)
 	$content = fread($f,filesize($file));
 	fclose($file);
 
-	$content = str_replace("\n","\r\n",$content);	// so it is actually editable with a windows/mac client, instead of being returned as a looooooooooong line of code
+	$content = str_replace("\n","\r\n",$content); // so it is actually editable with a windows/mac client, instead of being returned as a looooooooooong line of code
 
 	return new xmlrpcresp(new xmlrpcval("$content"));
 
@@ -1097,13 +1095,13 @@ $bloggersettemplate_doc='saves the default template file\'s code';
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
- *					  (See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .) 
  *					1 blogid (string): Unique identifier of the blog who's template is to be returned. 
  *					2 username (string): Login for a Blogger who has admin permission on given blog. 
- *					3 password (string): Password for said username.  
+ *					3 password (string): Password for said username.	
  *					4 template (string): The text for the new template (usually mostly HTML). 
  *					5 templateType (string): Determines which of the blog's templates will be returned.
- *					  Currently, either "main" or "archiveIndex". 
+ *						Currently, either "main" or "archiveIndex". 
  * @return xmlrpcresp XML-RPC Response
  */
 function bloggersettemplate($m) 
@@ -1128,7 +1126,7 @@ function bloggersettemplate($m)
 	if( !user_pass_ok($username,$password)) 
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-           'Wrong username/password combination '.$username.' / '.starify($password));
+					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
 	$userdata = get_userdatabylogin($username);
@@ -1186,7 +1184,7 @@ function strip_all_but_one_link($text, $mylink, $log)
 			debug_fwrite($log, "MATCH!\n");
 		}
 		else
-		{	// this link doesn't contain what we're looking for
+		{ // this link doesn't contain what we're looking for
 			$text = str_replace($matches[0][$i], $matches[2][$i], $text);
 		}
 	}
@@ -1246,7 +1244,7 @@ function pingback_ping($m)
 		// let's find which post is linked to
 		$urltest = parse_url($pagelinkedto);
 		if( preg_match('#/p([0-9]+)#', $urltest['path'], $match) ) 
-		{	// the path defines the post_ID (yyyy/mm/dd/pXXXX)
+		{ // the path defines the post_ID (yyyy/mm/dd/pXXXX)
 			$post_ID = $match[1];
 			$way = 'from the path (1)';
 		}
@@ -1257,7 +1255,7 @@ function pingback_ping($m)
 			$post_ID = $blah[1];
 			$way = 'from the path (2)';
 		} 
-		elseif (preg_match('#p=[0-9]+#', $urltest['query'], $match)  )
+		elseif (preg_match('#p=[0-9]+#', $urltest['query'], $match)	 )
 		{
 			// the querystring defines the post_ID (?p=XXXX)
 			$blah = explode('=', $match[0]);
@@ -1268,12 +1266,12 @@ function pingback_ping($m)
 		{
 			// an #anchor is there, it's either...
 			if (intval($urltest['fragment'])) 
-			{	// ...an integer #XXXX (simpliest case)
+			{ // ...an integer #XXXX (simpliest case)
 				$post_ID = $urltest['fragment'];
 				$way = 'from the fragment (numeric)';
 			} 
 			elseif (is_string($urltest['fragment'])) 
-			{	// ...or a string #title, a little more complicated
+			{ // ...or a string #title, a little more complicated
 				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
 				$sql = "SELECT ID FROM $tableposts WHERE post_title RLIKE '$title'";
 				$result = mysql_query($sql) or die("Query: $sql\n\nError: ".mysql_error());
@@ -1363,15 +1361,15 @@ function pingback_ping($m)
 					$original_context = $context;
 					$context = '[...] '.trim($context).' [...]';
 
-					// CHECK and FORMAT content	
+					// CHECK and FORMAT content 
 					if( $error = validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme ) )
 					{
-						errors_add( T_('Supplied URL is invalid: ').$error );	
+						errors_add( T_('Supplied URL is invalid: ').$error ); 
 					}
 					$context = format_to_post($context,1,1);
 				
 					if( ! ($message = errors_string( 'Cannot insert pingback, please correct these errors:', '' )) )
-					{	// No validation error:
+					{ // No validation error:
 						$original_pagelinkedfrom = $pagelinkedfrom;
 						$original_title = $title;
 						$title = strip_tags(trim($title));
@@ -1388,13 +1386,13 @@ function pingback_ping($m)
 						 */
 						$authordata = get_userdata($postdata['Author_ID']);
 						if( get_user_info( 'notify', $authordata ) )
-						{	// Author wants to be notified:
+						{ // Author wants to be notified:
 							$recipient = get_user_info( 'email', $authordata );
 							$subject = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] );
 							// fplanque added:
 							$comment_blogparams = get_blogparams_by_ID( $blog );
 	
-							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] )."\n";
+							$notify_message	 = sprintf( T_('New pingback on your post #%d "%s"', $default_locale), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$post_ID."&pb=1\n\n";
 							$notify_message .= T_('Website', $default_locale). ": $original_title\n";
 							$notify_message .= T_('Url', $default_locale). ": $original_pagelinkedfrom\n";
@@ -1407,7 +1405,7 @@ function pingback_ping($m)
 					}
 				} 
 				else 
-				{	// URL pattern not found - page doesn't link to us:
+				{ // URL pattern not found - page doesn't link to us:
 					debug_fwrite($log, 'The page doesn\'t link to us!'."\n");
 					$resp_message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
 
@@ -1421,7 +1419,7 @@ function pingback_ping($m)
 			$resp_message = $messages[2];
 			debug_fwrite($log, 'Post doesn\'t exist'."\n");
 		}
-	}  // / in siteurl
+	}	 // / in siteurl
 
 	// xmlrpc_debugmsg( 'Okay'.$messages[0] );
 
@@ -1433,7 +1431,7 @@ function pingback_ping($m)
 /*
  * i_whichToolkit(-)
  */
-$i_whichToolkit_doc="Returns a struct containing the following strings:  toolkitDocsUrl, toolkitName, toolkitVersion, toolkitOperatingSystem.";
+$i_whichToolkit_doc="Returns a struct containing the following strings:	 toolkitDocsUrl, toolkitName, toolkitVersion, toolkitOperatingSystem.";
 
 function i_whichToolkit($m) {
 	global $xmlrpcName, $xmlrpcVersion,$SERVER_SOFTWARE,
@@ -1455,70 +1453,70 @@ $s=new xmlrpc_server(
 							 array("function" => "bloggernewpost",
 										 "signature" => $bloggernewpost_sig,
 										 "docstring" => $bloggernewpost_doc),
-
-
+	
+	
 							 "blogger.editPost" =>
 							 array("function" => "bloggereditpost",
 										 "signature" => $bloggereditpost_sig,
 										 "docstring" => $bloggereditpost_doc),
-
-
+	
+	
 							 "blogger.deletePost" =>
 							 array("function" => "bloggerdeletepost",
 										 "signature" => $bloggerdeletepost_sig,
 										 "docstring" => $bloggerdeletepost_doc),
-
-
+	
+	
 							 "blogger.getUsersBlogs" =>
 							 array("function" => "bloggergetusersblogs",
 										 "signature" => $bloggergetusersblogs_sig,
 										 "docstring" => $bloggergetusersblogs_doc),
-
+	
 							 "blogger.getUserInfo" =>
 							 array("function" => "bloggergetuserinfo",
 										 "signature" => $bloggergetuserinfo_sig,
 										 "docstring" => $bloggergetuserinfo_doc),
-
- 							 "blogger.getPost" =>
+	
+							 "blogger.getPost" =>
 							 array("function" => "bloggergetpost",
 										 "signature" => $bloggergetpost_sig,
 										 "docstring" => $bloggergetpost_doc),
-
+	
 							 "blogger.getRecentPosts" =>
 							 array("function" => "bloggergetrecentposts",
 										 "signature" => $bloggergetrecentposts_sig,
 										 "docstring" => $bloggergetrecentposts_doc),
-
+	
 							 "blogger.getTemplate" =>
 							 array("function" => "bloggergettemplate",
 										 "signature" => $bloggergettemplate_sig,
 										 "docstring" => $bloggergettemplate_doc),
-
+	
 							 "blogger.setTemplate" =>
 							 array("function" => "bloggersettemplate",
 										 "signature" => $bloggersettemplate_sig,
 										 "docstring" => $bloggersettemplate_doc),
-
+	
 							 "b2.newPost" =>
 							 array("function" => "b2newpost",
 										 "signature" => $b2newpost_sig,
 										 "docstring" => $b2newpost_doc),
-
+	
 							 "b2.getCategories" =>
 							 array("function" => "b2getcategories",
 										 "signature" => $b2getcategories_sig,
 										 "docstring" => $b2getcategories_doc),
-
+	
 							 "pingback.ping" =>
 							 array("function" => "pingback_ping",
 										 "signature" => $pingback_ping_sig,
 										 "docstring" => $pingback_ping_doc),
-
+	
 							 "b2.getPostURL" =>
 							 array("function" => "pingback_getPostURL",
 										 "signature" => $b2_getPostURL_sig,
 										 "docstring" => $b2_getPostURL_doc),
-
+	
 							 "interopEchoTests.whichToolkit" =>
 							 array("function" => "i_whichToolkit",
 										 // no sig as no parameters

@@ -682,7 +682,7 @@ for ( $i = 0; $i < sizeof( $parts ); $i++ )
 	$type = contentTypeToString( $part->contentType );
 	if ( $ext != '.smil' )
 	{
- 		$filename = 'mms' . mktime() . $ext;
+		$filename = 'mms' . mktime() . $ext;
 		$part->writeToFile ( $fileupload_realpath . '/' . $filename );
 		$content .= '<img src="' . $fileupload_url . '/' . $filename . '" border="0" alt="" /><br />';
 	}
@@ -690,11 +690,11 @@ for ( $i = 0; $i < sizeof( $parts ); $i++ )
 // $sizeofparts = calcSize( $md ) / 1024;
 
 $post_title = format_to_post( trim( $post_title ), 0, 0 );
-$content = format_to_post( trim( $content ), $autobr, 0 );
+$content = format_to_post( trim( $content ), get_settings('AutoBR'), 0 );
 
 $post_date = date('Y-m-d H:i:s', $localtimenow);
 
-$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category, array(), 'published', 'en', '', $autobr, true ) or mysql_oops($query);
+$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category, array(), 'published', 'en', '', get_settings('AutoBR'), true ) or mysql_oops($query);
 
 if ( isset( $sleep_after_edit ) && $sleep_after_edit > 0 ) 
 {

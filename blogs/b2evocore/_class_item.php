@@ -28,7 +28,6 @@ class Item extends DataObject
 	var $flags;
 	var $comments;			// Comments status
 	var $url;					// Should move
-	var $autobr = 0;		// Should move
 	/**
 	 * @access private
 	 */

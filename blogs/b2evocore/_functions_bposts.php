@@ -55,9 +55,9 @@ function bpost_create(
 														post_comments )
 						VALUES( $author_user_ID, '".$DB->escape($post_title)."', '".$DB->escape($post_urltitle)."',
 										'".$DB->escape($post_content)."',	'".$DB->escape($post_timestamp)."',
-										'".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID, 
+										'".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID,
 										'".$DB->escape($post_status)."', '".$DB->escape($post_locale)."',
-										'".$DB->escape($post_url)."', $autobr, '".implode(',',$post_flags)."', 
+										'".$DB->escape($post_url)."', $autobr, '".implode(',',$post_flags)."',
 										".bpost_count_words($post_content).", '".$DB->escape($post_comments)."' )";
 	if( ! $DB->query( $query ) ) return 0;
 	$post_ID = $DB->insert_id;
@@ -120,20 +120,20 @@ function bpost_update(
 	// validate url title
 	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $post_ID );
 
-	$query = "UPDATE $tableposts 
-						SET post_title = '".$DB->escape($post_title)."', 
-								post_urltitle = '".$DB->escape($post_urltitle)."', 
-								post_trackbacks = '".$DB->escape($post_url)."', 
+	$query = "UPDATE $tableposts
+						SET post_title = '".$DB->escape($post_title)."',
+								post_urltitle = '".$DB->escape($post_urltitle)."',
+								post_trackbacks = '".$DB->escape($post_url)."',
 								post_content = '".$DB->escape($post_content)."',
-								post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', 
-								post_category = $main_cat_ID, 
-								post_status = '".$DB->escape($post_status)."', 
-								post_locale = '".$DB->escape($post_locale)."', 
-								post_autobr = $autobr, 
-								post_flags = '".implode(',',$post_flags)."', 
-								post_wordcount = ".bpost_count_words($post_content).", 
+								post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."',
+								post_category = $main_cat_ID,
+								post_status = '".$DB->escape($post_status)."',
+								post_locale = '".$DB->escape($post_locale)."',
+								post_autobr = $autobr,
+								post_flags = '".implode(',',$post_flags)."',
+								post_wordcount = ".bpost_count_words($post_content).",
 								post_comments = '".$DB->escape($post_comments)."' ";
-								
+
 	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp' ";
 	$query .= "WHERE ID = $post_ID";
 	if( ! $DB->query( $query ) ) return 0;
@@ -779,7 +779,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
 	global $DB, $tableposts, $id, $postdata, $siteurl, $blogfilename;
-	global $p, $posts, $posts_per_page, $s;
+	global $p, $posts, $s;
 
 	if(($p) || ($posts==1))
 	{
@@ -802,12 +802,12 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 		}
 
 		$limitprev--;
-		$sql = "SELECT ID,post_title 
-						FROM $tableposts 
-						WHERE post_issue_date < '$current_post_date' 
-							$sqlcat 
-							$sql_exclude_cats 
-						ORDER BY post_issue_date DESC 
+		$sql = "SELECT ID,post_title
+						FROM $tableposts
+						WHERE post_issue_date < '$current_post_date'
+							$sqlcat
+							$sql_exclude_cats
+						ORDER BY post_issue_date DESC
 						LIMIT $limitprev, 1";
 
 		if( $p_info = $DB->get_row( $sql ) )
@@ -859,13 +859,13 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		$now = date('Y-m-d H:i:s', $localtimenow );
 
 		$limitnext--;
-		$sql = "SELECT ID, post_title 
-						FROM $tableposts 
-						WHERE post_issue_date > '$current_post_date' 
-							AND post_issue_date < '$now' 
-							$sqlcat 
-							$sql_exclude_cats 
-						ORDER BY post_issue_date ASC 
+		$sql = "SELECT ID, post_title
+						FROM $tableposts
+						WHERE post_issue_date > '$current_post_date'
+							AND post_issue_date < '$now'
+							$sqlcat
+							$sql_exclude_cats
+						ORDER BY post_issue_date ASC
 						LIMIT $limitnext, 1";
 
 		if( $p_info = $DB->get_row( $sql ) )
@@ -893,8 +893,8 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
  */
 function next_posts($max_page = 0, $page='' )
 {
-	global $p, $paged, $what_to_show;
-	if (empty($p) && ($what_to_show == 'paged'))
+	global $p, $paged;
+	if (empty($p) && (get_settings('what_to_show') == 'paged'))
 	{
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
@@ -914,8 +914,8 @@ function next_posts($max_page = 0, $page='' )
  */
 function previous_posts( $page='' )
 {
-	global $p, $paged, $what_to_show;
-	if (empty($p) && ($what_to_show == 'paged'))
+	global $p, $paged;
+	if (empty($p) && (get_settings('what_to_show') == 'paged'))
 	{
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
@@ -933,8 +933,8 @@ function next_posts_link($label='#', $max_page=0, $page='')
 {
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
-	global $p, $paged, $result, $request, $posts_per_page, $what_to_show;
-	if ($what_to_show == 'paged')
+	global $p, $paged, $result, $request;
+	if (get_settings('what_to_show') == 'paged')
 	{
 		global $MainList;
 		if (!$max_page)	$max_page = $MainList->get_max_paged();
@@ -960,8 +960,8 @@ function previous_posts_link($label='#', $page='')
 {
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
-	global $p, $paged, $what_to_show;
-	if (empty($p)  && ($paged > 1) && ($what_to_show == 'paged'))
+	global $p, $paged;
+	if (empty($p)  && ($paged > 1) && (get_settings('what_to_show') == 'paged'))
 	{
 		echo '<a href="';
 		echo previous_posts( $page );
@@ -978,8 +978,8 @@ function previous_posts_link($label='#', $page='')
  */
 function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {
-	global $request, $p, $what_to_show;
-	if( !empty( $request ) && empty($p) && ($what_to_show == 'paged'))
+	global $request, $p;
+	if( !empty( $request ) && empty($p) && (get_settings('what_to_show') == 'paged'))
 	{
 		global $MainList;
 		$max_paged = $MainList->get_max_paged();
@@ -1323,8 +1323,8 @@ function gen_permalink(
 
 	// Defaults:
 	if (empty($use_anchor_mode)) $use_anchor_mode = 'id';
-	if (empty($use_destination)) 
-			$use_destination = ( strstr( get_settings('pref_permalink_type'), 'archive' ) !== false ) 
+	if (empty($use_destination))
+			$use_destination = ( strstr( get_settings('pref_permalink_type'), 'archive' ) !== false )
 					? 'archive' : 'single';
 	if ($use_destination=='archive') $use_destination = get_settings('archive_mode');
 
@@ -1375,7 +1375,7 @@ function gen_permalink(
 				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'#'.$anchor;
 				break;
 			case 'weekly':
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) 
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
 				{
 					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 				}

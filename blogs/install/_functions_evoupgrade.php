@@ -229,7 +229,7 @@ function upgrade_b2evo_tables()
 		{
 			global $DB, $locales, $default_locale;
 			
-			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $default_locale) )
+			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $default_locale) )
 			{ // we want a valid locale
 				$default_locale = 'en-US';
 			}
@@ -267,7 +267,7 @@ function upgrade_b2evo_tables()
 				
 				if( !$converted )
 				{ // we have nothing converted yet
-					if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $lkey) )
+					if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $lkey) )
 					{ // no valid locale in DB, setting default.
 						$DB->query( "UPDATE $table 
 														SET $columnlang = '$default_locale' 

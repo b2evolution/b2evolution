@@ -154,7 +154,7 @@ if ($use_spellchecker)
 
 	<?php // --------------------------- AUTOBR -------------------------------------- ?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-	if ($autobr) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
+	if (get_settings('AutoBR')) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
 
 	<?php
 	if($use_preview && ($action != 'editcomment') )

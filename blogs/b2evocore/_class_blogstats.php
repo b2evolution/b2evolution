@@ -52,7 +52,7 @@ class BlogStats{
 	//	Handle global calls
 		global $querycount;										// Total number of queries
 		global $tableposts, $tablepostcats, $tablecategories;	// ?
-		global $cache_categories, $time_difference;				// ?
+		global $cache_categories;				// ?
 		global $cat_array; 										// communication with recursive callback funcs
 		global $DB;
 
@@ -248,15 +248,15 @@ class BlogStats{
 			// echo 'POSTSTART-POSTEND';
 			if( $postend < $poststart )
 			{
-				$postend = $poststart + $posts_per_page - 1;
+				$postend = $poststart + get_settings('posts_per_page') - 1;
 			}
 
-			if ($what_to_show == 'posts' || $what_to_show == 'paged')
+			if (get_settings('what_to_show') == 'posts' || get_settings('what_to_show') == 'paged')
 			{
 				$posts = $postend - $poststart + 1;
 				$limits = ' LIMIT '.($poststart-1).','.$posts;
 			}
-			elseif ($what_to_show == 'days')
+			elseif (get_settings('what_to_show') == 'days')
 			{
 				$posts = $postend - $poststart + 1;
 				$lastpostdate = get_lastpostdate( $blog, $show_statuses );
@@ -272,27 +272,27 @@ class BlogStats{
 			// echo 'ARCHIVE - no limits';
 			$limits = '';
 		}
-		elseif ($what_to_show == 'posts')
+		elseif (get_settings('what_to_show') == 'posts')
 		{
 			// echo 'LIMIT POSTS';
-			$limits = ' LIMIT '.$posts_per_page;
+			$limits = ' LIMIT ' . get_settings('posts_per_page');
 		}
-		elseif( $what_to_show == 'paged' )
+		elseif( get_settings('what_to_show') == 'paged' )
 		{
 			// echo 'PAGED';
 			$pgstrt = '';
 			if ($paged) {
-				$pgstrt = (intval($paged) -1) * $posts_per_page . ', ';
+				$pgstrt = (intval($paged) -1) * get_settings('posts_per_page') . ', ';
 			}
-			$limits = 'LIMIT '.$pgstrt.$posts_per_page;
+			$limits = 'LIMIT '.$pgstrt.get_settings('posts_per_page');
 		}
-		elseif ($what_to_show == 'days')
+		elseif (get_settings('what_to_show') == 'days')
 		{
 			// echo 'LIMIT DAYS';
 			$lastpostdate = get_lastpostdate( $blog, $show_statuses );
 			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 			$lastpostdate = mysql2date('U',$lastpostdate);
-			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
+			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - ((get_settings('posts_per_page')-1) * 86400)));
 			$where .= ' AND post_issue_date > \''.$otherdate.'\'';
 		}
 
@@ -317,7 +317,7 @@ class BlogStats{
 		if( !empty($timestamp_min) )
 		{	// Hide posts before
 			// echo 'before';
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + (get_settings('time_difference') * 3600) );
 			$where .= ' AND post_issue_date >= \''.$date_min.'\'';
 		}
 
@@ -329,7 +329,7 @@ class BlogStats{
 		if( !empty($timestamp_max) )
 		{	// Hide posts after
 			// echo 'after';
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + (get_settings('time_difference') * 3600) );
 			$where .= ' AND post_issue_date <= \''.$date_max.'\'';
 		}
 

@@ -82,6 +82,7 @@ function add_filter($tag, $function_to_add)
 function single_month_title( $prefix = '#', $display = 'htmlbody' )
 {
 	global $m, $w, $month;
+	global $single_month_title_linktoyeararchive;
 
 	if( $prefix == '#' ) $prefix = ' '.T_('Archives for').': ';
 
@@ -94,7 +95,7 @@ function single_month_title( $prefix = '#', $display = 'htmlbody' )
 			$my_month = '';
 		$my_day = substr($m,6,2);
 
-		if( $display == 'htmlbody' && !empty( $my_month ) )
+		if( $display == 'htmlbody' && !empty( $my_month ) && $single_month_title_linktoyeararchive )
 		{ // display year as link to year's archive
 			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false ) . '">' . $my_year . '</a>';
 		}

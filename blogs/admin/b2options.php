@@ -96,12 +96,6 @@ if( $action == 'update' )
 				
 				// clear settings cache
 				$cache_settings = '';
-				// Get settings from db, which are not displayed here using get_settings (yet?)
-				$archive_mode = get_settings('archive_mode');
-				$time_difference = get_settings('time_difference');
-				$posts_per_page = get_settings('posts_per_page');
-				$what_to_show = get_settings('what_to_show');
-				$autobr = get_settings('AutoBR');
 				break;
 		}
 }
@@ -143,7 +137,7 @@ $current_User->check_perm( 'options', 'view', true );
 		<fieldset>
 			<legend><?php echo T_('Regional settings') ?></legend>
 
-			<?php form_text( 'newtime_difference', $time_difference, 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );?>
+			<?php form_text( 'newtime_difference', get_settings('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );?>
 
 		</fieldset>
 
@@ -162,22 +156,22 @@ $current_User->check_perm( 'options', 'view', true );
 		<fieldset>
 			<legend><?php echo T_('Display options') ?></legend>
 			<?php
-				form_radio( 'newwhat_to_show', $what_to_show,
+				form_radio( 'newwhat_to_show', get_settings('what_to_show'),
 						array(  array( 'days', T_('days') ),
 										array( 'posts', T_('posts') ),
 										array( 'paged', T_('posts paged') )
 									), T_('Display mode') );
 
-				form_text( 'newposts_per_page', $posts_per_page, 4, T_('Posts/Days per page'), '', 4 );
+				form_text( 'newposts_per_page', get_settings('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
 
-				form_radio( 'newarchive_mode', $archive_mode,
+				form_radio( 'newarchive_mode', get_settings('archive_mode'),
 						array(  array( 'monthly', T_('monthly') ),
 										array( 'weekly', T_('weekly') ),
 										array( 'daily', T_('daily') ),
 										array( 'postbypost', T_('post by post') )
 									), T_('Archive mode') );
 
-				form_checkbox( 'newautobr', $autobr, T_('Auto-BR'), sprintf( T_('Converts line-breaks into &lt;br /&gt; tags.' ) ) );
+				form_checkbox( 'newautobr', get_settings('AutoBR'), T_('Auto-BR'), sprintf( T_('Converts line-breaks into &lt;br /&gt; tags.' ) ) );
 			?>
 		</fieldset>
 

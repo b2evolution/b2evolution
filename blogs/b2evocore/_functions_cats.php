@@ -17,24 +17,24 @@
  * fplanque: created
  */
 function cat_create(
-	$cat_name, 
-	$cat_parent_ID, 
+	$cat_name,
+	$cat_parent_ID,
 	$cat_blog_ID = NULL)
 {
 	global $DB, $tablecategories;
-	
+
 	if( $cat_blog_ID == NULL )
 	{
 		if( empty($cat_parent_ID) ) die ( 'cat_create(-) missing parameters!' );
 		$parent_cat = get_the_category_by_ID($cat_parent_ID);
-		$cat_blog_ID = $parent_cat['cat_blog_ID']; 
+		$cat_blog_ID = $parent_cat['cat_blog_ID'];
 	}
 
-	$sql = "INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID) 
+	$sql = "INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID)
 					VALUES ( $cat_parent_ID, '$cat_name', $cat_blog_ID )";
 	if( ! $DB->query( $sql ) )
 		return 0;
-	
+
 	return $DB->insert_id;
 }
 
@@ -47,9 +47,9 @@ function cat_create(
  *
  * fplanque: created
  */
-function cat_update( 
+function cat_update(
 	$cat_ID,
-	$cat_name, 
+	$cat_name,
 	$cat_parent_ID = 0 )
 {
 	global $tablecategories, $query, $querycount;
@@ -79,56 +79,56 @@ function cat_delete( $cat_ID )
 	// TODO: START TRANSACTION
 
 	// check there are no subcats
-	$sql = "SELECT COUNT(*) 
-					FROM $tablecategories 
+	$sql = "SELECT COUNT(*)
+					FROM $tablecategories
 					WHERE cat_parent_ID = $cat_ID";
 	$child_count = $DB->get_var( $sql );
 	if( $child_count != 0 ) return T_("Cannot delete if there are sub-categories!");
-	
+
 	// find parent
 	$sql = "SELECT cat_parent_ID, cat_blog_ID
-					FROM $tablecategories 
+					FROM $tablecategories
 					WHERE cat_ID = $cat_ID";
 	if( ! ($row = $DB->get_row( $sql )) )
 		return 1; // Success: category already deleted!!
-	
+
 	$remap_cat_ID = $row->cat_parent_ID;
 	$cat_blog_ID = $row->cat_blog_ID;
 
 	// Get the list of posts in this category
-	$sql = "SELECT ID 
-					FROM $tableposts 
+	$sql = "SELECT ID
+					FROM $tableposts
 					WHERE post_category = $cat_ID";
 	$IDarray = $DB->get_col( $sql );
 
 	if( ! $remap_cat_ID )
 	{	// No parent, find another cat in same blog
-		$sql = "SELECT cat_ID 
-						FROM $tablecategories 
-						WHERE cat_blog_ID = $cat_blog_ID 
-							AND cat_ID != $cat_ID 
+		$sql = "SELECT cat_ID
+						FROM $tablecategories
+						WHERE cat_blog_ID = $cat_blog_ID
+							AND cat_ID != $cat_ID
 						ORDER BY cat_ID
 						LIMIT 0, 1";
-		$remap_cat_ID = $DB->get_var( $sql );	
+		$remap_cat_ID = $DB->get_var( $sql );
 		// echo "remap to: $remap_cat_ID<br />";
 		// May be NULL if this was the last cat (But there are no posts inside)
 
 		if( ($remap_cat_ID == NULL) && (! empty($IDarray)) )
 		{
 			return T_("Cannot delete last category if there are posts inside!");
-		}		
+		}
 	}
 
 	//  --------------- PROCEED WITH DELETING ------------
 
 	// First delete assoc to this cat when it's an extra cat
-	$sql = "DELETE FROM $tablepostcats 
+	$sql = "DELETE FROM $tablepostcats
 						WHERE postcat_cat_ID = $cat_ID ";
 	if( !empty($IDarray) )
-	{	
+	{
 		$sql .= " AND postcat_post_ID NOT IN (".implode( ',', $IDarray ).") ";
 	}
- 
+
 	$DB->query( $sql );
 
 
@@ -137,49 +137,49 @@ function cat_delete( $cat_ID )
 	{	// We are moving posts to parent or other category
 
 		// remap the posts to new category:
-		$sql = "UPDATE $tableposts 
-							SET post_category = $remap_cat_ID 
+		$sql = "UPDATE $tableposts
+							SET post_category = $remap_cat_ID
 							WHERE post_category = $cat_ID";
 		$DB->query( $sql );
 
 		// Before remapping the extracats we need to get rid of mappings that would become duplicates
 		// We remove every mapping to the old cat where a mapping to the new cat already exists
-		$sql = "SELECT DISTINCT postcat_post_ID 
-						FROM $tablepostcats 
+		$sql = "SELECT DISTINCT postcat_post_ID
+						FROM $tablepostcats
 						WHERE postcat_cat_ID = $remap_cat_ID";
 		$IDarray = $DB->get_col( $sql );
 
 		if( !empty($IDarray) )
 		{
 			$IDlist = implode( ',', $IDarray );
-	
-			$sql = "DELETE FROM $tablepostcats 
-							WHERE postcat_cat_ID = $cat_ID 
+
+			$sql = "DELETE FROM $tablepostcats
+							WHERE postcat_cat_ID = $cat_ID
 							AND postcat_post_ID IN ($IDlist)";
 			$DB->query( $sql );
 		}
-	
-	
+
+
 		// remap the remaining extracats
-		$sql = "UPDATE $tablepostcats 
-						SET postcat_cat_ID = $remap_cat_ID 
+		$sql = "UPDATE $tablepostcats
+						SET postcat_cat_ID = $remap_cat_ID
 						WHERE postcat_cat_ID = $cat_ID";
 		$DB->query( $sql );
 	}
-	
+
 	// do the actual deletion of the cat
-	$sql = "DELETE FROM $tablecategories 
+	$sql = "DELETE FROM $tablecategories
 					WHERE cat_ID = $cat_ID";
 	$DB->query( $sql );
 
 	// TODO: END TRANSACTION
-	
+
 	// If we had a cache we'd better forget it!
 	// TODO: reset other caches!
 	unset( $GLOBALS['cache_categories'] );
 	unset( $GLOBALS['cache_postcats'] );
 
-	
+
 	return 1; // success
 }
 
@@ -187,7 +187,7 @@ function cat_delete( $cat_ID )
 
 
 /*
- * get_the_category_by_ID(-) 
+ * get_the_category_by_ID(-)
  *
  * Get category name+blog_id for specified cat ID
  *
@@ -195,10 +195,10 @@ function cat_delete( $cat_ID )
  * fplanque: added blog ID stuff
  * TODO: move. dis is not a template tag
  */
-function get_the_category_by_ID($cat_ID) 
+function get_the_category_by_ID($cat_ID)
 {
 	global $id,$tablecategories,$querycount,$cache_categories,$use_cache;
-	if ((empty($cache_categories[$cat_ID])) OR (!$use_cache)) 
+	if ((empty($cache_categories[$cat_ID])) OR (!$use_cache))
 	{
 		cat_load_cache();
 	}
@@ -208,7 +208,7 @@ function get_the_category_by_ID($cat_ID)
 
 
 /*
- * get_the_category(-) 
+ * get_the_category(-)
  *
  * Get category name for current post
  *
@@ -216,7 +216,7 @@ function get_the_category_by_ID($cat_ID)
  *
  * @deprecated
  */
-function get_the_category() 
+function get_the_category()
 {
 	global $postdata;
 	$cat = get_the_category_by_ID( $postdata['Category'] );
@@ -276,16 +276,15 @@ function cat_load_cache()
 {
 	global $DB, $tablecategories, $tablepostcats, $tableposts, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
-	global $time_difference;
-	if( !isset($cache_categories)) 
+	if( !isset($cache_categories))
 	{
 		// echo "loading CAT cache";
 		$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
-						FROM $tablecategories 
-						ORDER BY cat_name"; 
+						FROM $tablecategories
+						ORDER BY cat_name";
 		$rows = $DB->get_results( $sql, ARRAY_A );
 		if( count( $rows ) ) foreach( $rows as $myrow )
-		{ 
+		{
 			$this_cat['cat_name'] = $myrow['cat_name'];
 			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
 			$this_cat['cat_parent_ID'] = $myrow['cat_parent_ID'];
@@ -293,7 +292,7 @@ function cat_load_cache()
 			$this_cat['cat_children'] = array();
 			$cache_categories[$myrow['cat_ID']] = $this_cat;
 			// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'], ' parent:',$cache_categories[$myrow['cat_ID']]['cat_parent_ID'],'<br />';
-		} 
+		}
 
 		// echo 'Number of cats=', count($cache_categories);
 
@@ -319,11 +318,11 @@ function cat_load_cache()
 		}
 
 		// echo 'Number of cats=', count($cache_categories);
-	
+
 		// ------------------------------
 		// Add post counts:
 		// ------------------------------
-		
+
 		// CONSTRUCT THE WHERE CLAUSE:
 
 		/*
@@ -336,33 +335,33 @@ function cat_load_cache()
 
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
-		if( !empty($timestamp_min) ) 
+		if( !empty($timestamp_min) )
 		{	// Hide posts before
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + (get_settings('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
-		if( !empty($timestamp_max) ) 
+		if( !empty($timestamp_max) )
 		{	// Hide posts after
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + (get_settings('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
-	
-		$sql = "SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount 
+
+		$sql = "SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount
 						FROM $tablepostcats INNER JOIN $tableposts ON postcat_post_ID = ID
 						$where
-						GROUP BY cat_ID"; 
+						GROUP BY cat_ID";
 		$rows = $DB->get_results( $sql, ARRAY_A );
 		if( count( $rows ) ) foreach( $rows as $myrow )
-		{ 
+		{
 			$cat_ID = $myrow['cat_ID'];
 			if( !isset($cache_categories[$cat_ID]) )
 				echo '<p>*** WARNING: There are ', $myrow['cat_postcount'], ' posts attached to inexistant category #', $cat_ID, '. You must fix the database! ***</p>';
 			// echo 'Postcount for cat #', $cat_ID, ' is ', $myrow['cat_postcount'], '<br />';
 			$cache_categories[$cat_ID]['cat_postcount'] = $myrow['cat_postcount'];
-		} 
+		}
 
 		// echo 'Number of cats=', count($cache_categories);
 
@@ -387,8 +386,8 @@ function cat_load_postcats_cache()
 	{	// already done!
 		return;
 	}
-	
-	if( $preview ) 
+
+	if( $preview )
 	{	// Preview mode
 		global $extracats, $post_category;
 		param( 'extracats', 'array', array() );
@@ -398,15 +397,15 @@ function cat_load_postcats_cache()
 		return;
 	}
 
-	if( !empty($postIDlist) ) 
+	if( !empty($postIDlist) )
 	{
-		$sql = "SELECT postcat_post_ID, postcat_cat_ID 
-						FROM $tablepostcats 
-						WHERE postcat_post_ID IN ($postIDlist) 
-						ORDER BY postcat_post_ID, postcat_cat_ID"; 
+		$sql = "SELECT postcat_post_ID, postcat_cat_ID
+						FROM $tablepostcats
+						WHERE postcat_post_ID IN ($postIDlist)
+						ORDER BY postcat_post_ID, postcat_cat_ID";
 		$rows = $DB->get_results( $sql, ARRAY_A );
 		if( count( $rows ) ) foreach( $rows as $myrow )
-		{ 
+		{
 			$postcat_post_ID = $myrow["postcat_post_ID"];
 			if( ! isset( $cache_postcats[$postcat_post_ID] ) )
 			{
@@ -414,7 +413,7 @@ function cat_load_postcats_cache()
 			}
 			$cache_postcats[$postcat_post_ID][] = $myrow["postcat_cat_ID"];
 			// echo "just cached: post=$postcat_post_ID  cat=".$myrow["postcat_cat_ID"]."<br />";
-		} 
+		}
 	}
 }
 
@@ -429,13 +428,13 @@ function cat_load_postcats_cache()
 function postcats_get_byID( $post_ID )
 {
 	global $DB, $tablepostcats;
-	
+
 	//echo "looking up cats for post $post_ID ";
 
-	$sql = "SELECT postcat_cat_ID 
-					FROM $tablepostcats 
-					WHERE postcat_post_ID = $post_ID 
-					ORDER BY postcat_cat_ID"; 
+	$sql = "SELECT postcat_cat_ID
+					FROM $tablepostcats
+					WHERE postcat_post_ID = $post_ID
+					ORDER BY postcat_cat_ID";
 	return $DB->get_col( $sql );
 }
 
@@ -448,13 +447,13 @@ function postcats_get_byID( $post_ID )
  * fplanque: created
  */
 function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
-	$blog_ID, $parent_ID, 
+	$blog_ID, $parent_ID,
 	$callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, // Callback functions
 	$level = 0 )	// Caller nesting level, just to keep track of how far we go :)
 {
 	// echo 'Number of cats=', count($ccats);
 	if( ! empty( $ccats ) ) // this can happen if there are no cats at all!
-	{	
+	{
 		$child_count = 0;
 		foreach( $ccats as $icat_ID => $i_cat )
 		{
@@ -488,13 +487,13 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 function blog_has_cats( $blog_ID )
 {
 	global $cache_categories;
-	
+
 	cat_load_cache();
 
 	foreach( $cache_categories as $icat_ID => $i_cat )
 	{
 		if( $icat_ID && $i_cat['cat_blog_ID'] == $blog_ID )
-		{ // this cat is in the blog 
+		{ // this cat is in the blog
 			return true;
 		}
 	}
@@ -514,24 +513,24 @@ function blog_has_cats( $blog_ID )
 /*
  * cat_query(-)
  *
- * Query for the cats 
- * 
+ * Query for the cats
+ *
  */
-function cat_query( ) 
+function cat_query( )
 {
-	// global $cache_categories; // $cache_blogs, 
-	
+	// global $cache_categories; // $cache_blogs,
+
 	blog_load_cache();
 	cat_load_cache();
 }
 
 
-/** 
+/**
  * Display currently filtered categories names
  *
  * This tag is out of the b2 loop.
  * It outputs the title of the category when you load the page with <code>?cat=</code>
- * When the weblog page is loaded without ?cat=, this tag doesn't display anything. 
+ * When the weblog page is loaded without ?cat=, this tag doesn't display anything.
  * Generally, you could use this as a page title.
  *
  * fplanque: multiple category support (so it's not really 'single' anymore!)
@@ -539,15 +538,15 @@ function cat_query( )
  * {@internal single_cat_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to 
+ * @param mixed Output format, see {@link format_to_output()} or false to
  *								return value instead of displaying it
  */
-function single_cat_title( $prefix = '#', $display = 'htmlbody' ) 
+function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 {
 	if( $prefix == '#' ) $prefix = ' '.T_('Category').': ';
 
 	global $cat, $cat_array;
-	if( !empty($cat_array) ) 
+	if( !empty($cat_array) )
 	{	// We have requested specific categories...
 		$cat_names = array();
 		foreach( $cat_array as $cat_ID )
@@ -558,7 +557,7 @@ function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 		$cat_names_string = implode( ", ", $cat_names );
 		if( !empty( $cat_names_string ) )
 		{
-			if( strstr($cat,'-') ) 
+			if( strstr($cat,'-') )
 			{
 				$cat_names_string = 'All but '.$cat_names_string;
 			}
@@ -573,16 +572,16 @@ function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 
 
 /**
- * the_category(-) 
+ * the_category(-)
  *
  * echoes the main category name
- * the name of the main category the post belongs to. 
- * you can as an admin add categories, and rename them if needed. 
+ * the name of the main category the post belongs to.
+ * you can as an admin add categories, and rename them if needed.
  * default category is 'General', you can rename it too.
  *
  * @deprecated deprecated by {@link Item::main_category()}
  */
-function the_category( $format = 'htmlbody' ) 
+function the_category( $format = 'htmlbody' )
 {
 	$category = get_the_category();
 	echo format_to_output($category, $format);
@@ -590,7 +589,7 @@ function the_category( $format = 'htmlbody' )
 
 
 /**
- * the_categories(-) 
+ * the_categories(-)
  *
  * lists all the category names
  *
@@ -603,14 +602,14 @@ function the_categories( $link_title = '#',				// false if you want no links
 	$before_main='<strong>', $after_main='</strong>', // 'hide' to ignore main cat
 	$before_other='', $after_other='', 								// 'hide' to ignore other cats
 	$before_external='<em>', $after_external='</em>',	// 'hide' to ignore external cats (other blogs)
-	$separator = ', ', 
-	$format_each = 'raw', 
+	$separator = ', ',
+	$format_each = 'raw',
 	$format_list = 'htmlbody'
  )
 {
 	global $id, $postdata, $blog, $blogfilename, $cache_postcats, $preview;
 
-	if( $link_title == '#' ) 
+	if( $link_title == '#' )
 	{	/* TRANS: When the categories for a specific post are displayed, the user can click
 				on these cats to browse them, this is the default href title displayed there */
 		$link_title = T_('Browse category');
@@ -620,7 +619,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 	// echo "main cat ID: $main_cat_ID<br />";
 	cat_load_postcats_cache();
 	$categoryIDs = $cache_postcats[$id];
-	
+
 	if( !isset($categoryIDs) )
 	{	// Can happen in preview mode
 		return;
@@ -631,7 +630,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 	{
 		$cat = get_the_category_by_ID($cat_ID);
 		$cat_name = format_to_output( $cat["cat_name"], $format_each );
-		
+
 		if( $link_title && !$preview)
 		{	// we want to display links
 			$curr_blogparams = get_blogparams_by_ID( $cat['cat_blog_ID'] );
@@ -674,12 +673,12 @@ function the_categories( $link_title = '#',				// false if you want no links
  * the_category_ID(-)
  *
  * echoes the main category ID for current post
- * The ID (number) of the category the post belongs to. 
+ * The ID (number) of the category the post belongs to.
  * This is static data that you can use, for example to associate a category to an image, or a css style.
  */
-function the_category_ID() 
+function the_category_ID()
 {
-	global $id,$postdata;	
+	global $id,$postdata;
 	echo $postdata['Category'];
 }
 
@@ -690,31 +689,31 @@ function the_category_ID()
  *
  * fplanque: created
  */
-function the_categories_IDs() 
+function the_categories_IDs()
 {
 	global $id, $blogfilename, $cache_postcats;
 
 	cat_load_postcats_cache();
 	$categoryIDs = $cache_postcats[$id];
-	
+
 	if( !isset($categoryIDs) )
 	{	// Can happen in preview mode
 		return;
 	}
-	
+
 	echo implode( ',', $categoryIDs );
-	
+
 }
 
 
-/* 
+/*
  * the_category_head(-)
  */
-function the_category_head($before='',$after='') 
+function the_category_head( $before='', $after='' )
 {
 	global $id, $postdata, $currentcat, $previouscat, $newday;
 	$currentcat = $postdata['Category'];
-	if ($currentcat != $previouscat) 
+	if ($currentcat != $previouscat)
 	{
 		echo $before;
 		$cat = get_the_category_by_ID($currentcat);	// fplanque

@@ -34,7 +34,6 @@ class ArchiveList extends DataObjectList
 	{
 		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
-		global $time_difference;
 	
 		$this->blog = $blog;
 		$this->archive_mode = $archive_mode;
@@ -54,14 +53,14 @@ class ArchiveList extends DataObjectList
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
 		if( !empty($timestamp_min) ) 
 		{	// Hide posts before
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + (get_settings('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) ) 
 		{	// Hide posts after
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + (get_settings('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
@@ -77,8 +76,8 @@ class ArchiveList extends DataObjectList
 		{
 			$limit = ' LIMIT 0,'.$limit;
 		}
-		
-		
+
+
 		switch( $archive_mode )
 		{
 			case 'monthly':

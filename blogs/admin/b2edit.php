@@ -15,7 +15,7 @@ param( 'action', 'string' );
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
-switch($action) 
+switch($action)
 {
 	case 'edit':
 		/*
@@ -27,25 +27,24 @@ switch($action)
 		$edited_Item = Item_get_by_ID( $post );
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
-		$blog = get_catblog($cat); 
+		$blog = get_catblog($cat);
 		$Blog = Blog_get_by_ID( $blog );
-	
+
 		$title = T_('Editing post');
 		require (dirname(__FILE__). '/_menutop.php');
-	
+
 		printf( T_('#%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
-		
+
 		require (dirname(__FILE__). '/_menutop_end.php');
-	
+
 		$post_status = $edited_Item->get( 'scope' );
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
-	
+
 		$post_title = $edited_Item->get( 'title' );
 		$post_urltitle = $edited_Item->get( 'urltitle' );
 		$post_url = $edited_Item->get( 'url' );
-		$autobr = $edited_Item->get( 'autobr' );
-		$content = format_to_edit( $edited_Item->get( 'content' ), $autobr );
+		$content = format_to_edit( $edited_Item->get( 'content' ), $edited_Item->get( 'autobr' ) );
 		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_comments = $edited_Item->get( 'comments' );
@@ -58,13 +57,13 @@ switch($action)
 		$hh = mysql2date('H', $post_issue_date  );
 		$mn = mysql2date('i', $post_issue_date  );
 		$ss = mysql2date('s', $post_issue_date  );
-	
+
 		$form_action = 'editpost';
 		require(dirname(__FILE__).'/_edit_form.php');
-	
+
 		break;
-	
-	
+
+
 	case 'editcomment':
 		/*
 		 * --------------------------------------------------------------------
@@ -72,7 +71,7 @@ switch($action)
 		 */
 		param( 'comment', 'integer', true );
 		$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
-	
+
 		$title = T_('Editing comment');
 		require (dirname(__FILE__).'/_menutop.php');
 		echo "#".$commentdata['comment_ID'];
@@ -82,10 +81,10 @@ switch($action)
 		$comment_postdata = get_postdata( $comment_post_ID );
 		$blog = get_catblog( $comment_postdata['Category'] );
 		$Blog = Blog_get_by_ID( $blog );
-	
+
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
-	
+
 		$content = $commentdata['comment_content'];
 		$content = format_to_edit($content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') );
 		$edit_date = 0;
@@ -95,12 +94,12 @@ switch($action)
 		$hh = mysql2date('H', $commentdata['comment_date']);
 		$mn = mysql2date('i', $commentdata['comment_date']);
 		$ss = mysql2date('s', $commentdata['comment_date']);
-		
+
 		$form_action = 'editedcomment';
 		require(dirname(__FILE__).'/_edit_form.php');
-	
+
 		break;
-	
+
 	default:
 		/*
 		 * --------------------------------------------------------------------
@@ -108,18 +107,18 @@ switch($action)
 		 */
 		$title = T_('New post in blog:');
 		require (dirname(__FILE__).'/_menutop.php');
-	
+
 		if( ($blog == 0) && $current_User->check_perm( 'blog_post_statuses', 'any', false, $default_to_blog ) )
 		{	// Default blog is a valid choice
 			$blog = $default_to_blog;
 		}
-	
+
 		// ---------------------------------- START OF BLOG LIST ----------------------------------
 		$sep = '';
-		for( $curr_blog_ID=blog_list_start(); 
-					$curr_blog_ID!=false; 
-					 $curr_blog_ID=blog_list_next() ) 
-		{ 
+		for( $curr_blog_ID=blog_list_start();
+					$curr_blog_ID!=false;
+					 $curr_blog_ID=blog_list_next() )
+		{
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $curr_blog_ID ) )
 			{	// Current user is not a member of this blog...
 				continue;
@@ -147,10 +146,10 @@ switch($action)
 			echo '</a>]';
 			if( $curr_blog_ID == $blog ) echo '</strong>';
 			$sep = ' | ';
-		} // --------------------------------- END OF BLOG LIST --------------------------------- 
-	
+		} // --------------------------------- END OF BLOG LIST ---------------------------------
+
 		require (dirname(__FILE__).'/_menutop_end.php');
-	
+
 		if( $blog == 0 )
 		{
 			?>
@@ -160,18 +159,18 @@ switch($action)
 			<?php
 			break;
 		}
-		
+
 		$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 		if( ! blog_has_cats( $blog ) )
 		{
 			die( T_('Since this blog has no categories, you cannot post to it. You must create categories first.') );
 		}
-	
+
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', 'any', true, $blog );
 
-		// Okay now we know we can use at least one status, 
+		// Okay now we know we can use at least one status,
 		// but we need to make sure the requested/default one is ok...
 		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
 		if( ! $current_User->check_perm( 'blog_post_statuses', $post_status, false, $blog ) )
@@ -189,15 +188,15 @@ switch($action)
 		}
 
 		$action='post';
-		
+
 		// These are bookmarklet params:
 		param( 'popuptitle', 'string', '' );
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
 		param( 'editing', 'integer', 0 );
-		param( 'post_autobr', 'integer', ($editing ? 0 : $autobr ) );	// Use real default only if we weren't already editing
-		$autobr = $post_autobr;
+		param( 'post_autobr', 'integer', ($editing ? 0 : get_settings('AutoBR') ) );	// Use real default only if we weren't already editing
+		set_settings( 'autobr', $post_autobr );
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
@@ -223,6 +222,6 @@ switch($action)
 		require(dirname(__FILE__).'/_edit_form.php');
 }
 
-require( dirname(__FILE__).'/_footer.php' ); 
+require( dirname(__FILE__).'/_footer.php' );
 
 ?>

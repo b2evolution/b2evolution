@@ -117,7 +117,7 @@ $oldtablecomments   = 'b2comments';
 $use_obhandler = 0;
 
 /**
- * gzip compression.
+ * GZip compression.
  *
  * Can actually be done either by PHP or by Apache (if your Apache has mod_gzip).
  * Set this to 1 if you want PHP to do gzip compression
@@ -136,10 +136,6 @@ $use_gzipcompression = 0;
 $use_etags = 0;
 
 
-# CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
-$sleep_after_edit = 0;			// let DB do its stuff...
-
-
 // ** Cookies **
 
 # This is the path that will be associated to cookies
@@ -147,72 +143,120 @@ $sleep_after_edit = 0;			// let DB do its stuff...
 $cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl ).'/';
 
 /**
- * Cookie domain
+ * Cookie domain.
  *
  * That means cookies set by this b2evo install won't be seen outside of this domain
  */
 $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 //echo 'domain='. $cookie_domain. ' path='. $cookie_path;
 
-# Cookie names:
+/**#@+
+ * Names for cookies.
+ */
 $cookie_user  = 'cookie'. $b2evo_name. 'user';
 $cookie_pass  = 'cookie'. $b2evo_name. 'pass';
 $cookie_state = 'cookie'. $b2evo_name. 'state';
 $cookie_name  = 'cookie'. $b2evo_name. 'name';
 $cookie_email = 'cookie'. $b2evo_name. 'email';
 $cookie_url   = 'cookie'. $b2evo_name. 'url';
+/**#@-*/
 
-# Expiration (values in seconds)
-# Set this to 0 if you wish to use non permanent cookies (erased when browser is closed)
+/**
+ * Expiration for cookies.
+ *
+ * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
+ */
 $cookie_expires = time() + 31536000;		// Default: one year from now
 
-# Expired time used to erase cookies:
+/**
+ * Expired-time used to erase cookies.
+ */
 $cookie_expired = time() - 86400;				// Default: 24 hours ago
 
 
-# Location of the b2evolution subdirectories:
-# You should only move these around if you really need to.
-# You should keep everything as subdirectories of the base folder
-# ($baseurl which is set in _config.php, default is the /blogs folder)
-# Remember you can set the baseurl to your website root.
-# NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
-# Example of a possible setting:
-# $admin_subdir = 'backoffice/b2evo';				// Subdirectory relative to base
-# $admin_dirout = '../..';									// Relative path to go back to base
+// ** Calendar settings **
 
-# Location of the backoffice (admin) folder:
+/**
+ * Should the name of current month link to archive of that month?
+ */
+$calendar_caption_linktomontharchive = 1;
+
+/**
+ * enable switching the year in Calendar caption.
+ */
+$calendar_caption_switchyears = 0;
+
+/**
+ * display link to archive of year from title of monthly archives.
+ */
+$single_month_title_linktoyeararchive = 1;
+
+
+// ** Location of the b2evolution subdirectories **
+
+/*
+	- You should only move these around if you really need to.
+	- You should keep everything as subdirectories of the base folder
+		($baseurl which is set in _config.php, default is the /blogs folder)
+	- Remember you can set the baseurl to your website root (-> _config.php).
+	
+	NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
+
+	Example of a possible setting:
+		$admin_subdir = 'backoffice/b2evo';				// Subdirectory relative to base
+		$admin_dirout = '../..';									// Relative path to go back to base
+*/
+/**
+ * Location of the backoffice (admin) folder.
+ */
 $admin_subdir = 'admin';                     // Subdirectory relative to base
 $admin_dirout = '..';                        // Relative path to go back to base
-$admin_url = $baseurl. '/'. $admin_subdir;   // You should not need to change this
-# Location of the HTml SeRVices folder:
+$admin_url = $baseurl.'/'.$admin_subdir;     // You should not need to change this
+/**
+ * Location of the HTml SeRVices folder.
+ */
 $htsrv_subdir = 'htsrv';                     // Subdirectory relative to base
 $htsrv_dirout = '..';                        // Relative path to go back to base
-$htsrv_url = $baseurl. '/'. $htsrv_subdir;   // You should not need to change this
-# Location of the XML SeRVices folder:
+$htsrv_url = $baseurl.'/'.$htsrv_subdir;     // You should not need to change this
+/**
+ * Location of the XML SeRVices folder.
+ */
 $xmlsrv_subdir = 'xmlsrv';                   // Subdirectory relative to base
 $xmlsrv_dirout = '..';                       // Relative path to go back to base
-$xmlsrv_url = $baseurl. '/'. $xmlsrv_subdir; // You should not need to change this
-# Location of the skins folder:
+$xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;   // You should not need to change this
+/**
+ * Location of the skins folder.
+ */
 $skins_subdir = 'skins';                     // Subdirectory relative to base
 $skins_dirout = '..';                        // Relative path to go back to base
-$skins_url = $baseurl. '/'. $skins_subdir;   // You should not need to change this
-# Location of the core (the "includes") files:
+$skins_url = $baseurl.'/'.$skins_subdir;     // You should not need to change this
+/**
+ * Location of the core (the "includes") files.
+ */
 $core_subdir = 'b2evocore';                  // Subdirectory relative to base
 $core_dirout = '..';                         // Relative path to go back to base
-# Location of the locales folder:
+/**
+ * Location of the locales folder.
+ */
 $locales_subdir = 'locales';                 // Subdirectory relative to base
 $locales_dirout = '..';                      // Relative path to go back to base
-# Location of the configuration files:
+/**
+ * Location of the configuration files.
+ */
 $conf_subdir = 'conf';                       // Subdirectory relative to base
 $conf_dirout = '..';                         // Relative path to go back to base
-# Location of the plug-ins:
+/**
+ * Location of the plug-ins.
+ */
 $plugins_subdir = 'plugins';                 // Subdirectory relative to base
 $plugins_subdir_dirout = '..';               // Relative path to go back to base
-# Location of the install folder:
+/**
+ * Location of the install folder.
+ */
 $install_dirout = '..';                      // Relative path to go back to base
 
 
-# CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
+// ** CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! **
 $use_cache = 1;							// Not using this will dramatically overquery the DB !
 $sleep_after_edit = 0;			// let DB do its stuff...
 

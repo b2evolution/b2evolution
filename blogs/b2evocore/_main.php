@@ -60,15 +60,8 @@ if( $use_gzipcompression && extension_loaded('zlib') )
 dbconnect();
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 
-// Getting settings from db
-$archive_mode = get_settings('archive_mode');
-$time_difference = get_settings('time_difference');
-$posts_per_page = get_settings('posts_per_page');
-$what_to_show = get_settings('what_to_show');
-$autobr = get_settings('AutoBR');
-
 $servertimenow = time();
-$localtimenow = $servertimenow + ($time_difference * 3600);
+$localtimenow = $servertimenow + (get_settings('time_difference') * 3600);
 
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
