@@ -257,7 +257,7 @@ function create_b2evo_tables()
 							hit_blog_ID int(11) UNSIGNED NOT NULL DEFAULT '0',
 							hit_remote_addr VARCHAR(40) DEFAULT NULL,
 							PRIMARY KEY (hit_ID)
-						)"; // TODO: keys!
+						)"; // TODO: indexes!
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -1003,15 +1003,21 @@ function create_b2evo_tables_092()
 
 	echo 'Creating table for Post Links... ';
 	$DB->query( "CREATE TABLE T_links (
-									link_item_ID    		int(11) unsigned NOT NULL,
-									link_dest_item_ID		int(11) unsigned NULL,
-									link_file_ID				int(11) unsigned NULL,
-									link_ltype_ID				int(11) unsigned NOT NULL default 1,
-									link_external_url   VARCHAR(255) NULL,
-									link_title          TEXT NULL,
-									INDEX link_item_ID( link_item_ID ),
-									INDEX link_dest_item_ID (link_dest_item_ID),
-									INDEX link_file_ID (link_file_ID)
+							  link_ID                 int(11) unsigned  not null AUTO_INCREMENT,
+							  link_datecreated        datetime          not null default '0000-00-00 00:00:00',
+							  link_datemodified       datetime          not null default '0000-00-00 00:00:00',
+							  link_creator_user_ID    int(11) unsigned  not null default 0,
+							  link_lastedit_user_ID   int(11) unsigned  not null default 0,
+								link_item_ID    		    int(11) unsigned  NOT NULL,
+								link_dest_item_ID		    int(11) unsigned  NULL,
+								link_file_ID				    int(11) unsigned  NULL,
+								link_ltype_ID				    int(11) unsigned  NOT NULL default 1,
+								link_external_url       VARCHAR(255)      NULL,
+								link_title          		TEXT              NULL,
+								PRIMARY KEY (link_ID),
+								INDEX link_item_ID( link_item_ID ),
+								INDEX link_dest_item_ID (link_dest_item_ ID),
+								INDEX link_file_ID (link_file_ID)
 								)" );
 	echo "OK.<br />\n";
 
