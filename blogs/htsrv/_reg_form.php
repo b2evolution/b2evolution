@@ -36,11 +36,11 @@ $Form->text( 'login', format_to_output($login, 'formvalue'), 16,  T_('Login'), '
 		<span class="notes"><?php printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') ) ?></span>
 		</div>
 	</fieldset>
-	
+
 <?php
 $Form->text( 'email', format_to_output($email, 'formvalue'), 16,  T_('Email'), '', 100, 'large' );
 
-$Form->select( 'locale', $locale, 'locale_options', T_('Locale'), T_('Preferred language') );
+$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 ?>
 
 	<fieldset>
