@@ -28,132 +28,6 @@ switch( $action )
 			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
 		}
 
-		param( 'keyword', 'string' );
-		param( 'hit_ID', 'integer' );	// With a NULL value, this field produces a warning in _functions.php on line 1030
-		param( 'type', 'string', true );	// Required!
-
-		if ( $deluxe_ban && ! $confirm )
-		{
-			// Show confirmation page:
-			?>
-			<div class="panelblock">
-				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
-				<?php
-				switch ( $type )
-				{
-					case "keyword":
-						ban_affected_comments($keyword, 'keyword'); ?>
-						<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ); ?></p>
-						<?php
-						break;
-					case "hit_ID":
-						ban_affected_comments($hit_ID, 'hit_ID'); ?>
-						<p><?php printf ( T_('Banning the domain of referer hit #%d from the statistics and comments would lead to the deletion of the following %d comments:'), $hit_ID, mysql_affected_rows() ); ?></p>
-						<?php
-						break;
-				}
-				?>
-				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
-					<tr>
-						<td><?php
-						preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
-						$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
-						echo date(locale_datefmt()." ".locale_timefmt(), $date);
-						?></td>
-						<td><?php echo $row_stats['comment_author'] ?></a></td>
-						<td><?php echo $row_stats['comment_author_url'] ?></td>
-						<td><?php
-						$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
-						if ( strlen($comment_content) > 70 )
-						{
-							// Trail off (truncate and add '...') after 70 chars
-							echo substr($comment_content, 0, 70) . "...";
-						}
-						else
-						{
-							echo $comment_content;
-						}
-						?></td>
-					</tr>
-					<?php } // End stat loop ?>
-				</table>
-				
-				<?php
-				switch ( $type )
-				{
-					case "keyword":
-						ban_affected_hits($keyword, 'keyword');
-						break;
-					case "hit_ID":
-						ban_affected_hits($hit_ID, 'hit_ID');
-						break;
-				}
-				?>
-				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
-				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
-					<tr>
-						<td><?php stats_time() ?></td>
-						<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-						<td><?php stats_blog_name() ?></td>
-						<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-					</tr>
-					<?php } // End stat loop ?>
-				</table>
-				
-				<p><?php echo T_('Are you sure you want to continue?') ?></p>
-				<form action="b2antispam.php" method="get">
-					<input type="hidden" name="confirm" value="confirm" />
-					<?php switch ( $type )
-					{
-						case "keyword":
-							echo "<input type=\"hidden\" name=\"type\" value=\"keyword\" />\n".
-							"<input type=\"hidden\" name=\"keyword\" value=\"$keyword\" />";
-							break;
-						case "hit_ID":
-							echo "<input type=\"hidden\" name=\"type\" value=\"hit_ID\" />\n".
-							"<input type=\"hidden\" name=\"hit_ID\" value=\"$hit_ID\" />";
-							break;
-					} ?>
-					<input type="hidden" name="action" value="ban" />
-					<input type="submit" value="<?php
-					switch ( $type )
-					{
-						case "keyword":
-							echo T_('Ban the keyword + delete matching hits and comments');
-							break;
-						case "hit_ID":
-							echo T_('Ban the domain + delete matching hits and comments');
-							break;
-					}
-					?>" class="search" />
-				</form>
-			</div>
-			<?php
-		}
-		else
-		{	// BAN a keyword/domain + (if requested) DELETE stats entries and comments:
-			switch ( $type )
-			{
-				case "keyword":
-					keyword_ban( $keyword );
-					break;
-				case "hit_ID":
-					$keyword = get_domain_from_hit_ID($hit_ID);
-					// echo "keyword:",$keyword;
-					keyword_ban( $keyword );
-					break;
-			}
-		}
-		break;
-
-/*	case 'bankeyword':
-		if ($user_level < 9)
-		{
-			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
-		}
-
 		param( 'keyword', 'string', true );	// Required!
 
 		if ( $deluxe_ban && ! $confirm )
@@ -163,7 +37,7 @@ switch( $action )
 			<div class="panelblock">
 				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
 				<?php ban_affected_comments($keyword, 'keyword') ?>
-				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ) ?></p>
+				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ); ?></p>
 				<table class="thin">
 					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>
@@ -206,8 +80,8 @@ switch( $action )
 				<p><?php echo T_('Are you sure you want to continue?') ?></p>
 				<form action="b2antispam.php" method="get">
 					<input type="hidden" name="confirm" value="confirm" />
-					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
-					<input type="hidden" name="action" value="bankeyword" />
+					<input type="hidden" name="keyword" value="$keyword" />
+					<input type="hidden" name="action" value="ban" />
 					<input type="submit" value="<?php echo T_('Ban the keyword + delete matching hits and comments') ?>" class="search" />
 				</form>
 			</div>
@@ -219,79 +93,6 @@ switch( $action )
 		}
 		break;
 
-	case 'banhit':
-		if ($user_level < 9)
-		{
-			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
-		}
-
-		param( 'hit_ID', 'integer', true );	// Required!
-
-		if ( $deluxe_ban && ! $confirm )
-		{
-			// Show confirmation page:
-			?>
-			<div class="panelblock">
-				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
-				<?php ban_affected_comments($hit_ID, 'hit_ID') ?>
-				<p><?php printf ( T_('Banning the domain of referer hit #%d from the statistics and comments would lead to the deletion of the following %d comments:'), $hit_ID, mysql_affected_rows() ) ?></p>
-				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
-					<tr>
-						<td><?php
-						preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
-						$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
-						echo date(locale_datefmt()." ".locale_timefmt(), $date);
-						?></td>
-						<td><?php echo $row_stats['comment_author'] ?></a></td>
-						<td><?php echo $row_stats['comment_author_url'] ?></td>
-						<td><?php
-						$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
-						if ( strlen($comment_content) > 70 )
-						{
-							// Trail off (truncate and add '...') after 70 chars
-							echo substr($comment_content, 0, 70) . "...";
-						}
-						else
-						{
-							echo $comment_content;
-						}
-						?></td>
-					</tr>
-					<?php } // End stat loop ?>
-				</table>
-				
-				<?php ban_affected_hits($hit_ID, 'hit_ID') ?>
-				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
-				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
-					<tr>
-						<td><?php stats_time() ?></td>
-						<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-						<td><?php stats_blog_name() ?></td>
-						<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-					</tr>
-					<?php } // End stat loop ?>
-				</table>
-				
-				<p><?php echo T_('Are you sure you want to continue?') ?></p>
-				<form action="b2antispam.php" method="get">
-					<input type="hidden" name="confirm" value="confirm" />
-					<input type="hidden" name="hit_ID" value="<?php echo $hit_ID ?>" />
-					<input type="hidden" name="action" value="banhit" />
-					<input type="submit" value="<?php echo T_('Ban the domain + delete matching hits and comments') ?>" class="search" />
-				</form>
-			</div>
-			<?php
-		}
-		else
-		{	// BAN a keyword + (if requested) DELETE stats entries and comments:
-			$keyword = get_domain_from_hit_ID($hit_ID);
-			// echo "keyword:",$keyword;
-			keyword_ban( $keyword );
-		}
-		break;
-*/
 		
 	case 'remove':
 		// Remove a domain from ban list:
