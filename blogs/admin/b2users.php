@@ -60,25 +60,25 @@ switch ($action)
 		param( 'prom', 'string', true );
 		param( 'id', 'integer', true );
 
-		if (empty($prom))
+		if( empty($prom) )
 		{
-			header("Location: b2users.php");
+			header('Location: b2users.php');
 		}
 
-		$user_data=get_userdata($id);
+		$user_data = get_userdata( $id );
 		$usertopromote_level = get_user_info( 'level', $user_data );
 
-		if ($prom == "up")
+		if( $prom == 'up' )
 		{
-			$sql="UPDATE $tableusers SET user_level=user_level+1 WHERE ID = $id";
+			$sql = "UPDATE $tableusers SET user_level=user_level+1 WHERE ID = $id";
 		}
-		elseif ($prom == "down")
+		elseif( $prom == 'down' )
 		{
-			$sql="UPDATE $tableusers SET user_level=user_level-1 WHERE ID = $id";
+			$sql = "UPDATE $tableusers SET user_level=user_level-1 WHERE ID = $id";
 		}
-		$result=mysql_query($sql) or die("Couldn't change $id's level.");
+		$result = mysql_query($sql) or die("Couldn't change $id's level.");
 
-		header("Location: b2users.php");
+		header('Location: b2users.php');
 		exit();
 
 	case 'delete':
@@ -90,13 +90,13 @@ switch ($action)
 
 		param( 'id', 'integer', true );
 
-		$user_data=get_userdata($id);
+		$user_data = get_userdata($id);
 		$edited_User = & new User( $user_data );
 
 		// Delete from DB:
 		$edited_User->dbdelete();
 
-		header("Location: b2users.php");
+		header('Location: b2users.php');
 		exit();
 		break;
 
@@ -109,9 +109,9 @@ switch ($action)
 
 		param( 'grp_ID', 'integer', true );
 		$edited_Group = Group_get_by_ID( $grp_ID );
-		require(dirname(__FILE__).'/_menutop.php');
-		require(dirname(__FILE__).'/_menutop_end.php');
-		require(dirname(__FILE__).'/_users_groupform.php');
+		require(dirname(__FILE__). '/_menutop.php');
+		require(dirname(__FILE__). '/_menutop_end.php');
+		require(dirname(__FILE__). '/_users_groupform.php');
 		break;
 
 
@@ -151,20 +151,20 @@ switch ($action)
 
 		$edited_Group->dbupdate();	// Commit update to the DB
 
-		header("Location: b2users.php");
+		header('Location: b2users.php');
 		exit();
 
 
 	default:
-		require( dirname(__FILE__).'/_menutop.php');
-		require( dirname(__FILE__).'/_menutop_end.php');
+		require( dirname(__FILE__). '/_menutop.php');
+		require( dirname(__FILE__). '/_menutop_end.php');
 
 		// Check permission:
 		$current_User->check_perm( 'users', 'view', true );
 }
 
 // Display user list:
-require dirname(__FILE__).'/_users_list.php';
+require( dirname(__FILE__). '/_users_list.php' );
 
-require( dirname(__FILE__).'/_footer.php' );
+require( dirname(__FILE__). '/_footer.php' );
 ?>

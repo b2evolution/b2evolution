@@ -100,5 +100,6 @@ require(dirname(__FILE__). '/_menutop_end.php');
 <?php
 
 require( dirname(__FILE__). '/_footer.php' );
+veriflog()
 
 ?>

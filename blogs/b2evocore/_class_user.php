@@ -10,7 +10,7 @@
  *
  * @package b2evocore
  */
-require_once dirname(__FILE__).'/_class_dataobject.php';
+require_once dirname(__FILE__). '/_class_dataobject.php';
 
 class User extends DataObject
 {
@@ -117,10 +117,10 @@ class User extends DataObject
 				switch( $this->idmode ) 
 				{
 					case 'namefl':
-						return parent::get('firstname').' '.parent::get('lastname');
+						return parent::get('firstname'). ' '. parent::get('lastname');
 						
 					case 'namelf':
-						return parent::get('lastname').' '.parent::get('firstname');
+						return parent::get('lastname'). ' '. parent::get('firstname');
 						
 					default:
 						return parent::get($this->idmode);
@@ -193,7 +193,7 @@ class User extends DataObject
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean 0 if permission denied
 	 */
-	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
+	
 	{
 		global $use_fileupload, $fileupload_minlevel, $fileupload_allowedusers;
 
@@ -203,7 +203,8 @@ class User extends DataObject
 		{ // What permission do we want to check?
 			case 'upload':
 				// Global permission to upload files...
-				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel) && ((ereg(" ".$this->login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==""));
+				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel)
+								&& ((ereg(' '. $this->login. ' ', $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==''));
 				break;
 		
 			case 'edit_timestamp':
@@ -245,7 +246,7 @@ class User extends DataObject
 		
 		if( !$perm && $assert )
 		{ // We can't let this go on!
-			die( T_('Permission denied!').' ('.$permname.'/'.$permlevel.')' );
+			die( T_('Permission denied!'). ' ('. $permname . '/'. $permlevel . ')' );
 		}
 		
 		return $perm;
@@ -392,11 +393,11 @@ class User extends DataObject
 		echo 'statuses=', $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )  ,'<br />';
 		echo 'statuses=', $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )  ,'<br />'; */
 		return ( $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID )
-					 || $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
-					 || $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) 
-					 || $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID ) 
-					 || $this->check_perm_blogusers( 'blog_properties', 1, $blog_ID ) 
-					 );
+					|| $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
+					|| $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) 
+					|| $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID ) 
+					|| $this->check_perm_blogusers( 'blog_properties', 1, $blog_ID ) 
+					);
 	}
 	
 	
@@ -416,10 +417,10 @@ class User extends DataObject
 	{
 		global $querycount, $tablecomments, $tableposts, $tableblogusers;
 
-		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
+		if( $this->ID == 0 ) die( T_('Non persistant object cannot be deleted!') );
 
 		// Delete comments
-	/*	$sql="DELETE FROM $tablecomments INNER JOIN $tableposts 
+	/*	$sql="DELETE FROM $tablecomments INNER JOIN $tableposts
 												ON comment_post_ID = ID
 								 WHERE post_author = $this->ID";
 		$result=mysql_query($sql) or mysql_oops( $sql );
@@ -445,7 +446,7 @@ class User extends DataObject
 	 *
 	 * {@internal User::level(-) }}
 	 */
-	function level() 
+	function level()
 	{
 		$this->disp( 'level', 'raw' );
 	}

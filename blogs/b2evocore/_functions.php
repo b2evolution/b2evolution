@@ -994,7 +994,7 @@ function remove_magic_quotes( $mixed )
  *
  * @todo add option to override what's already set.
  */
-function param(	$var, $type='',	$default='', $memorize=false )
+function param(	$var, $type = '',	$default = '', $memorize = false )
 {
 	global $$var;
 	global $global_param_list;
@@ -1003,12 +1003,12 @@ function param(	$var, $type='',	$default='', $memorize=false )
 	// WARNING: when PHP register globals is ON, COOKIES get priority og GET and POST with this!!!
 	if( !isset( $$var ) )
 	{
-		if( isset($_POST[$var]))
+		if( isset($_POST[$var]) )
 		{
-			$$var = remove_magic_quotes($_POST[$var]);
+			$$var = remove_magic_quotes( $_POST[$var] );
 			// echo "$var=".$$var." set by POST!<br/>";
 		}
-		elseif( isset($_GET["$var"]))
+		elseif( isset($_GET["$var"]) )
 		{
 			$$var = remove_magic_quotes($_GET[$var]);
 			// echo "$var=".$$var." set by GET!<br/>";
