@@ -268,7 +268,7 @@ $locales = array( // {{{
  * day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
  *
  * This is used when displaying the calendar only.
- * Weekly archives are grouped the way mySQL groups days by weeks; see mySQL documentation.
+ * Weekly archives are grouped the way MySQL groups days by weeks; see MySQL documentation.
  *
  * @global int $start_of_week
  */

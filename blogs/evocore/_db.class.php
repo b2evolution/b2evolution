@@ -2,7 +2,7 @@
 /**
  * This file implements the DB class.
  *
- * Based on ezSQL - Class to make it very easy to deal with mySQL database connections.
+ * Based on ezSQL - Class to make it very easy to deal with MySQL database connections.
  * b2evo Additions:
  * - symbolic table names
  * - query log
@@ -698,6 +698,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/09 00:25:11  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.4  2004/11/05 00:36:43  blueyed
  * no message
  *

@@ -340,7 +340,7 @@ function hit_change_type( $hit_ID, $type )
 
 	$sql = "UPDATE T_hitlog
 					SET hit_ignore = '$type',
-							visitTime = visitTime "	// prevent mySQL from updating timestamp
+							visitTime = visitTime "	// prevent MySQL from updating timestamp
 					." WHERE visitID = $hit_ID";
 	return $DB->query( $sql );
 }
@@ -653,6 +653,9 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/09 00:25:12  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

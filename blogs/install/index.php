@@ -284,11 +284,11 @@ switch( $action )
 				<fieldset>
 					<legend><?php echo T_('Database you want to install into') ?></legend>
 					<?php
-						form_text( 'conf_db_user', $conf_db_user, 16, T_('mySQL Username'), sprintf( T_('Your username to access the database' ) ), 100 );
-						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 100, '', 'password' );
-						form_text( 'conf_db_name', $conf_db_name, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 100);
-						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 120 );
-						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('mySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+						form_text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Your username to access the database' ) ), 100 );
+						form_text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Your password to access the database' ) ), 100, '', 'password' );
+						form_text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 100);
+						form_text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 120 );
+						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 					?>
 				</fieldset>
 
@@ -390,11 +390,11 @@ to
 		if( !isset($conf_db_host) ) $conf_db_host = DB_HOST;
 
 		echo '<pre>',
-		T_('mySQL Username').': '.$conf_db_user."\n".
-		T_('mySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
-		T_('mySQL Database').': '.$conf_db_name."\n".
-		T_('mySQL Host').': '.$conf_db_host."\n".
-		T_('mySQL tables prefix').': '.$tableprefix."\n\n".
+		T_('MySQL Username').': '.$conf_db_user."\n".
+		T_('MySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
+		T_('MySQL Database').': '.$conf_db_name."\n".
+		T_('MySQL Host').': '.$conf_db_host."\n".
+		T_('MySQL tables prefix').': '.$tableprefix."\n\n".
 		T_('Base URL').': '.$baseurl."\n\n".
 		T_('Admin email').': '.$admin_email.
 		'</pre>';

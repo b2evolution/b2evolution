@@ -465,7 +465,7 @@ class Blog extends DataObject
 	/**
 	 * Delete a blog and dependencies from database
 	 *
-	 * Includes WAY TOO MANY requests because we try to be compatible with mySQL 3.23, bleh!
+	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
 	 *
 	 * {@internal Blog::dbdelete(-) }}
 	 *
@@ -478,7 +478,7 @@ class Blog extends DataObject
 		global $DB, $cache_blogs;
 
 		// Note: No need to localize the status messages...
-		if( $echo ) echo '<p>mySQL 3.23 compatibility mode!';
+		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
 
 		// Get list of cats that are going to be deleted (3.23)
 		if( $echo ) echo '<br />Getting category list to delete... ';
@@ -590,6 +590,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/09 00:25:11  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *

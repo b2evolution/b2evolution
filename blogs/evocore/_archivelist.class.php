@@ -60,8 +60,8 @@ class ArchiveList extends DataObjectList
 	/**
 	 * Constructor
    *
-   * Note: Weekly archives use mySQL's week numbering and mySQL default if applicable.
-   * In mySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
+   * Note: Weekly archives use MySQL's week numbering and MySQL default if applicable.
+   * In MySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
    * Value range is 0 to 53; week 1 is the first week that starts in this year
    *
 	 * {@internal ArchiveList::ArchiveList(-)}}
@@ -234,6 +234,9 @@ class ArchiveList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/09 00:25:11  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *

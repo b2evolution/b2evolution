@@ -210,7 +210,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
-		<p class="center"><strong><?php posts_nav_link( ' | ', '< '.T_('Previous'), T_('Next').' >' ); ?></strong></p>
+		<p class="center"><strong><?php
+			posts_nav_link( ' | ',
+											/* TRANS: previous page (of posts) */ '< '.T_('Previous'),
+											/* TRANS: next page (of posts) */ T_('Next').' >' );
+			?></strong></p>
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>

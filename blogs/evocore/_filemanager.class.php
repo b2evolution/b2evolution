@@ -992,11 +992,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$this->Messages->add( sprintf( T_('File [%s] created.'), $name ), 'note' );
+				$this->Messages->add( sprintf( T_('File [%s] has been created.'), $name ), 'note' );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('Directory [%s] created.'), $name ), 'note' );
+				$this->Messages->add( sprintf( T_('Directory [%s] has been created.'), $name ), 'note' );
 			}
 		}
 		else
@@ -1219,6 +1219,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.9  2004/11/09 00:25:12  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.8  2004/11/05 15:44:31  blueyed
  * no message
  *

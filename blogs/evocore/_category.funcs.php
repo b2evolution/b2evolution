@@ -314,7 +314,7 @@ function get_catname($cat_ID)
  *
  * Load cache for category definitions.
  *
- * TODO: replace LEFT JOIN with UNION when switching to mySQL 4
+ * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
  * This will prevent empty cats from displaying "(1)" as postcount.
  * TODO: get post counts out of here!
  */
@@ -428,7 +428,7 @@ function cat_load_cache()
  *
  * fplanque: created
  *
- * TODO: put this into main post query when mySQL 4.0 commonly available
+ * TODO: put this into main post query when MySQL 4.0 commonly available
  */
 function cat_load_postcats_cache()
 {
@@ -780,6 +780,9 @@ function the_category_head( $before='', $after='' )
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/09 00:25:11  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

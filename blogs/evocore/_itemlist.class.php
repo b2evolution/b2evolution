@@ -114,8 +114,8 @@ class ItemList extends DataObjectList
 	 * @param array show_statuses
 	 * @param mixed Specific post number to display
 	 * @param mixed YearMonth(Day) to display
-	 * @param mixed Week number. Note: uses mySQL's week numbering and mySQL default if applicable.
-   * In mySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
+	 * @param mixed Week number. Note: uses MySQL's week numbering and MySQL default if applicable.
+   * In MySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
    * Value range is 0 to 53; week 1 is the first week that starts in this year
 	 * @param mixed List of cats to restrict to
 	 * @param array Array of cats to restrict to
@@ -907,6 +907,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/09 00:25:12  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

@@ -30,7 +30,7 @@
 define( 'DB_USER', 'demouser' );      // your MySQL username
 define( 'DB_PASSWORD', 'demopass' );  // ...and password
 define( 'DB_NAME', 'b2evolution' );   // the name of the database
-define( 'DB_HOST', 'localhost' );     // mySQL Server (typically 'localhost')
+define( 'DB_HOST', 'localhost' );     // MySQL Server (typically 'localhost')
 /**#@-*/
 
 

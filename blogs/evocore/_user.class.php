@@ -489,7 +489,7 @@ class User extends DataObject
 	/**
 	 * Delete user and dependencies from database
 	 *
-	 * Includes WAY TOO MANY requests because we try to be compatible with mySQL 3.23, bleh!
+	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
 	 *
 	 * {@internal User::dbdelete(-) }}
 	 *
@@ -504,7 +504,7 @@ class User extends DataObject
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
 		// Note: No need to localize the status messages...
-		if( $echo ) echo '<p>mySQL 3.23 compatibility mode!';
+		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
 
 		// Transform registered user comments to unregistered:
 		if( $echo ) echo '<br />Transforming user\'s comments to unregistered comments... ';
@@ -656,6 +656,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/09 00:25:12  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

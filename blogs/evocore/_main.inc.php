@@ -77,7 +77,7 @@ if( !$config_is_done )
 }
 elseif( !isset( $locales[$default_locale] ) )
 {
-	$error_message = 'The default locale does not exist! (see /conf/_locales.php)';
+	$error_message = 'The default locale '.var_export( $default_locale, true ).' does not exist! (see /conf/_locales.php)';
 }
 if( isset( $error_message ) )
 { // error & exit
@@ -217,6 +217,14 @@ $Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
+if( ($locale_from_get = param( 'locale', 'string', '', false, false, false ))
+		&& $locale_from_get != $default_locale
+		&& isset( $locales[$locale_from_get] ) )
+{
+	$default_locale = $locale_from_get;
+	$Debuglog->add( 'Overriding locale from REQUEST: '.$default_locale, 'locale' );
+}
+
 /**
  * Activate default locale:
  */
@@ -240,7 +248,8 @@ online_user_update();
 /**
  * User locale selection:
  */
-if( is_logged_in() && $current_User->get('locale') != $current_locale )
+if( is_logged_in() && $current_User->get('locale') != $current_locale
+		&& !$locale_from_get )
 { // change locale to users preference
 	locale_activate( $current_User->get('locale') );
 	if( $current_locale == $current_User->get('locale') )
@@ -282,6 +291,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.7  2004/11/09 00:25:12  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
  * Revision 1.6  2004/10/28 11:11:09  fplanque
  * MySQL table options handling
  *

@@ -152,7 +152,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			</fieldset>
 
 			<?php
-				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
+				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 				form_select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 				form_text( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, 100 );
 				form_checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );

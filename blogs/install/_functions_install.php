@@ -57,7 +57,7 @@ function cleanup_post_quotes()
 						 		OR post_title LIKE '%\\\\\\\\\"%'
 						 		OR post_content LIKE '%\\\\\\\\\'%'
 						 		OR post_content LIKE '%\\\\\\\\\"%' ";
-	/* FP: the above looks overkill, but mySQL is really full of surprises...
+	/* FP: the above looks overkill, but MySQL is really full of surprises...
 					tested on 4.0.14-nt */
 	// echo $query;
 	$rows = $DB->get_results( $query, ARRAY_A );
@@ -91,7 +91,7 @@ function cleanup_comment_quotes()
 							FROM T_comments
 						 WHERE comment_content LIKE '%\\\\\\\\\'%'
 						 		OR comment_content LIKE '%\\\\\\\\\"%' ";
-	/* FP: the above looks overkill, but mySQL is really full of surprises...
+	/* FP: the above looks overkill, but MySQL is really full of surprises...
 					tested on 4.0.14-nt */
 	// echo $query;
 	$rows = $DB->get_results( $query, ARRAY_A );
