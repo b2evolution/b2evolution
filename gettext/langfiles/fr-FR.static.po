@@ -3,17 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2004-05-06 01:35+0100\n"
+"Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../../index.src.html:6
@@ -25,7 +23,7 @@ msgstr ""
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:17
 msgid "b2evo package"
-msgstr ""
+msgstr "Package b2evo"
 
 #: ../../index.src.html:6
 #: ../../index.src.html:18
@@ -33,81 +31,81 @@ msgstr ""
 #: ../../doc/upgradefrom_b2.src.html:18
 #: ../../doc/upgradefrom_b2evo.src.html:18
 msgid "Start page"
-msgstr ""
+msgstr "Accueil"
 
 #: ../../index.src.html:13
 #: ../../doc/install_new.src.html:13
 #: ../../doc/upgradefrom_b2.src.html:13
 #: ../../doc/upgradefrom_b2evo.src.html:13
 msgid "b2evolution: official site"
-msgstr ""
+msgstr "b2evolution: site officiel"
 
 #: ../../index.src.html:14
 #: ../../doc/install_new.src.html:14
 #: ../../doc/upgradefrom_b2.src.html:14
 #: ../../doc/upgradefrom_b2evo.src.html:14
 msgid "Multilingual multiuser multi-blog engine."
-msgstr ""
+msgstr "Moteur Multi-blog multi-utilisateur multilingue."
 
 #: ../../index.src.html:15
 #: ../../doc/install_new.src.html:15
 #: ../../doc/upgradefrom_b2.src.html:15
 #: ../../doc/upgradefrom_b2evo.src.html:15
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 #: ../../index.src.html:19
 #: ../../doc/install_new.src.html:19
 #: ../../doc/upgradefrom_b2.src.html:19
 #: ../../doc/upgradefrom_b2evo.src.html:19
 msgid "Install"
-msgstr ""
+msgstr "Installation"
 
 #: ../../index.src.html:20
 #: ../../doc/install_new.src.html:20
 #: ../../doc/upgradefrom_b2.src.html:20
 #: ../../doc/upgradefrom_b2evo.src.html:20
 msgid "Blogs"
-msgstr ""
+msgstr "Blogs"
 
 #: ../../index.src.html:21
 #: ../../doc/install_new.src.html:21
 #: ../../doc/upgradefrom_b2.src.html:21
 #: ../../doc/upgradefrom_b2evo.src.html:21
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: ../../index.src.html:22
 #: ../../doc/install_new.src.html:22
 #: ../../doc/upgradefrom_b2.src.html:22
 #: ../../doc/upgradefrom_b2evo.src.html:22
 msgid "Online"
-msgstr ""
+msgstr "En ligne"
 
 #: ../../index.src.html:23
 #: ../../doc/install_new.src.html:23
 #: ../../doc/upgradefrom_b2.src.html:23
 #: ../../doc/upgradefrom_b2evo.src.html:23
 msgid "Manual"
-msgstr ""
+msgstr "Manuel"
 
 #: ../../index.src.html:24
 #: ../../doc/install_new.src.html:24
 #: ../../doc/upgradefrom_b2.src.html:24
 #: ../../doc/upgradefrom_b2evo.src.html:24
 msgid "Support"
-msgstr ""
+msgstr "Support"
 
 #: ../../index.src.html:28
 #: ../../doc/install_new.src.html:28
 #: ../../doc/upgradefrom_b2.src.html:28
 #: ../../doc/upgradefrom_b2evo.src.html:28
 msgid "Available translations for this page:"
-msgstr ""
+msgstr "Traductions disponibles pour cette page:"
 
 #: ../../index.src.html:32
 msgid "Welcome!"
-msgstr ""
+msgstr "Bienvenue!"
 
 #: ../../index.src.html:34
 msgid "b2evolution is probably the most comprehensive blog engine you can find! It includes almost any feature you could expect from a blog tool, and more! Plus, it's free, it's open-source (GPL), it runs virtually anywhere (PHP/mySQL) and it's available in many languages!"
@@ -119,64 +117,64 @@ msgstr ""
 
 #: ../../index.src.html:36
 msgid "Quickstart instructions:"
-msgstr ""
+msgstr "Mise en route rapide:"
 
 #: ../../index.src.html:37
 msgid "You can set up b2evolution in a just a few minutes. Just follow the instructions matching your situation:"
-msgstr ""
+msgstr "Vous pouvez installer b2evolution en quelques minutes seulement. Suivez simplement les instructions correspondant à votre situation:"
 
 #: ../../index.src.html:39
 msgid "New users:"
-msgstr ""
+msgstr "Nouveaux utilisateurs:"
 
 #: ../../index.src.html:39
 msgid "installing b2evolution from scratch"
-msgstr ""
+msgstr "installer b2evolution à partir de zéro"
 
 #: ../../index.src.html:40
 msgid "Existing b2evolution users:"
-msgstr ""
+msgstr "Utilisateurs existants de b2evolution:"
 
 #: ../../index.src.html:40
 msgid "upgrading from a previous version of b2evolution"
-msgstr ""
+msgstr "mettre à jour depuis une version précédente de b2evolution"
 
 #: ../../index.src.html:41
 msgid "Cafelog/b2 users:"
-msgstr ""
+msgstr "Utilisateurs de Cafélog/b2:"
 
 #: ../../index.src.html:41
 msgid "upgrading from Cafelog/b2 version 0.6.x"
-msgstr ""
+msgstr "mettre à jour depuis Cafélog/b2 version 0.6.x"
 
 #: ../../index.src.html:45
 #: ../../doc/install_new.src.html:80
 #: ../../doc/upgradefrom_b2.src.html:92
 #: ../../doc/upgradefrom_b2evo.src.html:47
 msgid "official website"
-msgstr ""
+msgstr "site officiel"
 
 #: ../../index.src.html:46
 #: ../../doc/install_new.src.html:81
 #: ../../doc/upgradefrom_b2.src.html:93
 #: ../../doc/upgradefrom_b2evo.src.html:48
 msgid "GNU GPL license"
-msgstr ""
+msgstr "Licence GNU GPL"
 
 #: ../../index.src.html:47
 #: ../../doc/install_new.src.html:82
 #: ../../doc/upgradefrom_b2.src.html:94
 #: ../../doc/upgradefrom_b2evo.src.html:49
 msgid "contact"
-msgstr ""
+msgstr "contact"
 
 #: ../../doc/install_new.src.html:6
 msgid "Install instructions for new users"
-msgstr ""
+msgstr "Instructions d'installation pour les nouveaux utilisateurs"
 
 #: ../../doc/install_new.src.html:32
 msgid "Installation instructions for new users"
-msgstr ""
+msgstr "Instructions d'installation pour les nouveaux utilisateurs"
 
 #: ../../doc/install_new.src.html:34
 #: ../../doc/upgradefrom_b2.src.html:42
@@ -254,11 +252,11 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"
-msgstr ""
+msgstr "Mettre à jour depuis Cafélog/b2"
 
 #: ../../doc/upgradefrom_b2.src.html:32
 msgid "Upgrading from Cafelog/b2 (the original b2)"
-msgstr ""
+msgstr "Mettre à jour depuis Cafélog/b2 (la version originale de b2)"
 
 #: ../../doc/upgradefrom_b2.src.html:34
 msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, I think versions 0.5.x should also upgrade without problems. Anyway, if you run any old version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
@@ -290,11 +288,11 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
 msgid "Upgrading from previous b2evolution"
-msgstr ""
+msgstr "Mettre à jour depuis une version précédente de b2evolution"
 
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
-msgstr ""
+msgstr "Mettre à jour depuis une version précédente de b2evolution"
 
 #: ../../doc/upgradefrom_b2evo.src.html:33
 msgid "This page will be updated. Don't waste time translating this..."
@@ -329,11 +327,11 @@ msgid "(If you had custom skins or templates, follow the online instructions abo
 msgstr ""
 
 msgid "English (EU)"
-msgstr ""
+msgstr "Anglais (EU)"
 
 msgid "German (DE)"
-msgstr ""
+msgstr "Allemand (DE)"
 
 msgid "French (FR)"
-msgstr ""
+msgstr "Français (FR)"
 
