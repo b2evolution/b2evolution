@@ -70,14 +70,11 @@ switch($action)
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-cache, must-revalidate"); // for HTTP/1.1
 		header("Pragma: no-cache");
-		if ($is_IIS)
-		{
+	//if ($is_IIS) {
 			header("Refresh:1;url=b2login.php");
-		}
-		else
-		{
-		   header("Location: b2login.php");
-		}
+	//} else {
+	//	header("Location: b2login.php");
+	//}
 		exit();
 
 	break; // case 'logout'
@@ -93,20 +90,21 @@ switch($action)
 		function login()
 		{
 			global $dbhost, $dbusername, $dbpassword, $dbname, $log, $pwd, $error, $user_ID;
-			global $tableusers, $pass_is_md5;
+			global $tableusers;
 			$user_login = $log;
-			$password = $pwd;
-			if (!$user_login) {
+			if (!$user_login) 
+			{
 				$error='<strong>'. T_('ERROR'). '</strong>: '. T_('The login field is empty');
 				return false;
 			}
 
-			if (!$password) {
+			if (!$pwd) 
+			{
 				$error='<strong>'. T_('ERROR'). '<\\1strong>: '. T_('the password field is empty');
 				return false;
 			}
 
-			$query =  "SELECT ID, user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '" . $password . "'";
+			$query =  "SELECT ID, user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '$pwd'";
 			$result = mysql_query($query) or mysql_oops( $query );
 
 			$lines = mysql_num_rows($result);
@@ -138,22 +136,11 @@ switch($action)
 		}
 		else
 		{
-			// echo 'login OK!!';
-			$user_login	= $log;
-			$user_pass	= $pwd;
 			//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
-			if( !setcookie( $cookie_user, $user_login, $cookie_expires, $cookie_path, $cookie_domain ) )
+			if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
 				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-			if ($pass_is_md5)
-			{
-				if( !setcookie( $cookie_pass, $user_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-					printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-			}
-			else
-			{
-				if( !setcookie( $cookie_pass, $user_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-					printf( T_('setcookie %s failed!').'<br />', $cookie_user );
-			}
+			if( !setcookie( $cookie_pass, $pwd, $cookie_expires, $cookie_path, $cookie_domain) )
+				printf( T_('setcookie %s failed!').'<br />', $cookie_user );
 
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -260,7 +247,6 @@ textarea,input,select {
 	<?php
 
 	break; // case 'lostpassword'
-// "
 
 	case 'retrievepassword':
 
@@ -275,30 +261,24 @@ textarea,input,select {
 			echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
 			die();
 		}
+
+		$message  = T_('Login:')." $user_login\r\n";
+		$message .= T_('Password:')." $user_pass\r\n";
+
+		// DEBUG!
+		// echo $message;
+
+		if(mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion()))
+		{
+			echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
+			echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
+			die();
+		}
 		else
 		{
-		   $random_password = substr(md5(uniqid(microtime())),0,6);
-			$query = "UPDATE $tableusers SET user_pass = '" . md5($random_password) . "' WHERE user_login = '$user_login'";
-			$result = mysql_query($query) or mysql_oops( $query );
-
-			$message  = T_('Login:')." $user_login\r\n";
-			$message .= T_('Password:')." $random_password\r\n";
-
-			// DEBUG!
-			echo $message;
-
-			if(mail($user_email, T_('your weblog\'s login/password'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion()))
-			{
-				echo '<p>', T_('The email was sent successfully to your email address.'), "<br />\n";
-				echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
-				die();
-			}
-			else
-			{
-				echo '<p>', T_('The email could not be sent.'), "<br />\n";
-				echo T_('Possible reason: your host may have disabled the mail() function...</p>');
-				die();
-			}
+			echo '<p>', T_('The email could not be sent.'), "<br />\n";
+			echo T_('Possible reason: your host may have disabled the mail() function...</p>');
+			die();
 		}
 
 	break; // case 'retrievepassword'

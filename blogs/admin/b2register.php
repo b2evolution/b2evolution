@@ -64,11 +64,10 @@ switch($action)
 			return ereg("^[a-zA-Z0-9\_-\|]+$",$value);
 		}
 
-		$user_login	= $HTTP_POST_VARS['user_login'];
-		$pass1		= $HTTP_POST_VARS['pass1'];
-		$pass2		= $HTTP_POST_VARS['pass2'];
-		$user_email = $HTTP_POST_VARS['user_email'];
-		$user_login = $HTTP_POST_VARS['user_login'];
+		param( 'user_login', 'string', '' );
+		param( 'pass1', 'string', '' );
+		param( 'pass2', 'string', '' );
+		param( 'user_email', 'string', '' );
 
 		/* declaring global fonctions */
 		// global $user_login,$pass1,$pass2,$user_firstname,$user_nickname,$user_icq,$user_email,$user_url;
@@ -78,6 +77,11 @@ switch($action)
 		{
 			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login'));
 		}
+
+		if( preg_match( '/[^A-Za-z0-9]/', $user_login ) )
+		{
+			die ('<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a valid Login (only letters and numbers are allowed)'));
+		} 
 
 		/* checking the password has been typed twice */
 		if($pass1 == '' || $pass2 == '')

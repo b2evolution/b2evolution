@@ -120,7 +120,7 @@ switch($action)
 			echo '<br />';
 		}
 
-      $newuser_firstname = addslashes($_POST['newuser_firstname']);
+      	$newuser_firstname = addslashes($_POST['newuser_firstname']);
 		$newuser_lastname  = addslashes($_POST['newuser_lastname']);
 		$newuser_nickname  = addslashes($_POST['newuser_nickname']);
 		$newuser_icq       = addslashes($_POST['newuser_icq']);

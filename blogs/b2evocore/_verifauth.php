@@ -24,6 +24,7 @@ function veriflog()
 	{
 		$user_login = $_COOKIE[$cookie_user];
 		$user_pass_md5 = $_COOKIE[$cookie_pass];
+		// echo 'pass=', $user_pass_md5;
 	}
 	else
 	{

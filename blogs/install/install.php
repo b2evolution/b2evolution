@@ -43,6 +43,8 @@ require_once (dirname(__FILE__)."/../$pathcore/_functions.php" ); // db funcs
 require_once (dirname(__FILE__)."/../$pathcore/_functions_cats.php" );
 require_once (dirname(__FILE__)."/../$pathcore/_functions_bposts.php" );
 
+$new_db_version = 8020;				// next time: 8030
+
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
@@ -62,7 +64,7 @@ $tablepostcats, $tablehitlog;
 		AutoBR tinyint(1) DEFAULT '1' NOT NULL, 
 		time_format varchar(20) DEFAULT 'H:i:s' NOT NULL, 
 		date_format varchar(20) DEFAULT 'Y/m/d' NOT NULL, 
-		db_version INT DEFAULT 8010 NOT NULL, 
+		db_version INT DEFAULT 8000 NOT NULL, 
 		PRIMARY KEY (ID), 
 		KEY ID (ID) 
 	)";
@@ -372,14 +374,13 @@ switch( $action )
 			
 		$now = date('Y-m-d H:i:s');
 		$query = "INSERT INTO $tablecomments (comment_ID, comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma)
-		VALUES
-		(1, 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '$now', 'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.', 0)";
+		VALUES (1, 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '$now', 'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.', 0)";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "comments: OK<br />\n";
 		
 		
-		
-		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', 8000)";
+		// SETTINGS!
+		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', $new_db_version)";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "settings: OK<br />\n";
 		
@@ -387,8 +388,6 @@ switch( $action )
 		
 		
 		$random_password = substr(md5(uniqid(microtime())),0,6);
-//		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '$random_password', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
-		// once md5 is active: 
 		$query = "INSERT INTO $tableusers (ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_aim, user_msn, user_yim, user_idmode) VALUES ( '1', 'admin', '".md5($random_password)."', '', '', 'admin', '0', '$admin_email', '', '127.0.0.1', '127.0.0.1', '', '00-00-0000 00:00:01', '10', '', '', '', 'nickname')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "users: OK</p>";
@@ -425,7 +424,6 @@ switch( $action )
 		$row = mysql_fetch_assoc($q);
 		if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
 		$old_db_version = $row['db_version'];
-		$new_db_version = 8010;				// next time: 8020
 		echo $old_db_version, ' : ';
 		if( $old_db_version < 8000 ) die( 'This version is too old!' );
 		if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
@@ -490,17 +488,21 @@ switch( $action )
 
 		if( $old_db_version < 8020 )
 		{
-			/* 
-			 * CONTRIBUTORS: If you need some more changes, put them here!
-			 */
-
 			echo "<p>Encoding passwords... ";
 			$query = "UPDATE $tableusers 
 								SET user_pass = MD5(user_pass)";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 		}
-		
+
+		if( $old_db_version < 8030 )
+		{
+			/* 
+			 * CONTRIBUTORS: If you need some more changes, put them here!
+			 */
+			// post_title VARCHAR(250)
+		}
+			
 		// $new_db_version = 8001; // FOR TESTING
 		echo "<p>Update DB schema version to $new_db_version... ";
 		$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
@@ -558,8 +560,6 @@ switch( $action )
 		echo "OK.<br />\n";
 		
 		echo "Copying users... ";
-		// $query = "INSERT INTO $tableusers SELECT * FROM $oldtableusers";
-		// after MD5 activation, replace with:
 		$query = "INSERT INTO $tableusers(" .
 						"ID, user_login, user_pass, user_firstname, user_lastname, user_nickname, user_icq, user_email, " .
 						"user_url, user_ip, user_domain, user_browser, dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode" .

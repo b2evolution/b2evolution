@@ -18,8 +18,6 @@
  */
 function user_create()
 {
-
-	return $post_id;
 }
 
 
