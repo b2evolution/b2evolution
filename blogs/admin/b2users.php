@@ -82,7 +82,7 @@ else switch ($action)
 		}
 		else
 		{ // we edit an existing user:
-			$edited_User = $UserCache->get_by_ID( $edited_user_ID ); // Copy !
+			$edited_User = & $UserCache->get_by_ID( $edited_user_ID ); // If we edit, why would we copy??
 		}
 
 		if( $user_profile_only && $edited_user_ID != $current_User->ID )

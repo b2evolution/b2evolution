@@ -618,7 +618,7 @@ function gen_permalink(
 			case 'weekly':
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
 				{
-					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
+					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $post_date, locale_startofweek() ) );
 				}
 				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor );
 				break;
@@ -642,7 +642,7 @@ function gen_permalink(
 			case 'weekly':
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
 				{
-					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
+					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $post_date, locale_startofweek() ) );
 				}
 				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'w'.$cacheweekly[$postdata['Date']].'/#'.$anchor;
 				break;
@@ -872,14 +872,16 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting, $cat_select_level;
+	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $creating, $allow_cross_posting, $cat_select_level;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n<tr>";
 
 	// Radio for main cat:
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 	{ // This is current blog or we allow moving posts accross blogs
-		if( ($default_main_cat == 0) && ($next_action == 'create') && ($current_blog_ID == $blog) )
+		if( ($default_main_cat == 0)
+			&& ($next_action == 'create' /* old school */ || $creating /* new school */ )
+			&& ($current_blog_ID == $blog) )
 		{ // Assign default cat for new post
 			$default_main_cat = $cat_ID;
 		}
@@ -938,6 +940,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.21  2005/03/08 20:32:07  fplanque
+ * small fixes; slightly enhanced WEEK() handling
+ *
  * Revision 1.20  2005/03/02 15:28:14  fplanque
  * minor
  *

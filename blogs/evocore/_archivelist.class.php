@@ -61,8 +61,9 @@ class ArchiveList extends Results
 	 * Constructor
    *
    * Note: Weekly archives use MySQL's week numbering and MySQL default if applicable.
-   * In MySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
+   * In MySQL < 4.0.14, WEEK() always uses mode 0: Week starts on Sunday;
    * Value range is 0 to 53; week 1 is the first week that starts in this year
+   * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
    *
 	 * {@internal ArchiveList::ArchiveList(-)}}
 	 *
@@ -160,8 +161,9 @@ class ArchiveList extends Results
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, WEEK('.$this->dbprefix.'datestart) AS week,
-																	COUNT(DISTINCT postcat_'.$this->dbprefix.'ID) AS count '
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, '.
+															$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' AS week,
+															COUNT(DISTINCT postcat_'.$this->dbprefix.'ID) AS count '
 													.$this->from
 													.$this->where.'
 													GROUP BY year, week
@@ -209,7 +211,8 @@ class ArchiveList extends Results
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), WEEK('.$this->dbprefix.'datestart) ) '
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), '
+													.$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' ) '
 													.$this->from
 													.$this->where;
 				break;
@@ -294,6 +297,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.9  2005/03/08 20:32:07  fplanque
+ * small fixes; slightly enhanced WEEK() handling
+ *
  * Revision 1.8  2005/03/07 17:36:10  fplanque
  * made more generic
  *

@@ -39,6 +39,10 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 class Widget
 {
+	/**
+	 * Title of the widget (to be displayed)
+	 */
+	var $title;
 
 	var $global_icons = array();
 

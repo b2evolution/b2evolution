@@ -229,6 +229,26 @@ class DB
 
 
 	/**
+	 * Returns the correct WEEK() function to get the week number for the given date.
+	 *
+	 * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
+	 *
+	 * @todo disable when MySQL < 4
+	 * @param string will be used as is
+	 * @param integer 0 for sunday, 1 for monday
+	 */
+	function week( $date, $startofweek )
+	{
+		if( $startofweek == 1 )
+		{	// Week starts on Monday:
+			return ' WEEK( '.$date.', 5 ) ';
+		}
+
+		// Week starts on Sunday:
+		return ' WEEK( '.$date.', 0 ) ';
+	}
+
+	/**
 	 * Returns the appropriate string to compare $val in a WHERE clause.
 	 *
 	 * @param mixed Value to create a "compare-String" for
@@ -811,6 +831,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.12  2005/03/08 20:32:07  fplanque
+ * small fixes; slightly enhanced WEEK() handling
+ *
  * Revision 1.11  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

@@ -779,6 +779,40 @@ class Item extends DataObject
 
 
 	/**
+	 * Template function: display deadline date (datetime) of Item
+	 *
+	 * {@internal Item::deadline_date(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function deadline_date( $format = '', $useGM = false )
+	{
+		if( empty($format) )
+			echo mysql2date( locale_datefmt(), $this->deadline, $useGM);
+		else
+			echo mysql2date( $format, $this->deadline, $useGM);
+	}
+
+
+	/**
+	 * Template function: display deadline time (datetime) of Item
+	 *
+	 * {@internal Item::deadline_time(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default time format
+	 * @param boolean true if you want GMT
+	 */
+	function deadline_time( $format = '', $useGM = false )
+	{
+		if( empty($format) )
+			echo mysql2date( locale_timefmt(), $this->deadline, $useGM );
+		else
+			echo mysql2date( $format, $this->deadline, $useGM );
+	}
+
+
+	/**
 	 * Template function: display issue date (datetime) of Item
 	 *
 	 * {@internal Item::issue_date(-) }}
@@ -1759,6 +1793,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2005/03/08 20:32:07  fplanque
+ * small fixes; slightly enhanced WEEK() handling
+ *
  * Revision 1.27  2005/03/07 18:27:04  fplanque
  * minor
  *

@@ -47,7 +47,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<td>&nbsp;</td>
 		<td align="right">
 			<?php
-				$Form = & new Form( 'b2browse.php', 'showXfirstlastposts', 'get', 'none' );
+				$Form = & new Form( $pagenow, 'showXfirstlastposts', 'get', 'none' );
 				$Form->begin_form( '' );
 				$Form->hidden( 'blog', $blog );
 				if( $what_to_show == 'days' )

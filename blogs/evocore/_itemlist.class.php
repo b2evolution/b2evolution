@@ -241,7 +241,7 @@ class ItemList extends DataObjectList
 		// If a week number is specified
 		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
 		{
-			$where .= ' AND WEEK('.$dbprefix.'datestart)='.intval($w);
+			$where .= ' AND '.$DB->week( $dbprefix.'datestart', locale_startofweek() ).'='.intval($w);
 		}
 
 		// if a post number is specified, load that post
@@ -966,6 +966,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.21  2005/03/08 20:32:07  fplanque
+ * small fixes; slightly enhanced WEEK() handling
+ *
  * Revision 1.20  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
