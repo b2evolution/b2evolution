@@ -27,10 +27,11 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * Vegar BERG GULDAL grants FranÃ§ois PLANQUE the right to licens
+ *
+ * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/). 
  * }}
@@ -284,6 +285,9 @@ function b2evonet_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.4  2004/10/17 20:18:37  fplanque
+ * minor changes
+ *
  * Revision 1.3  2004/10/16 15:28:51  vegarg
  * Added copyright notes to all files I can remember I have edited.
  *

@@ -1185,19 +1185,13 @@ class Item extends DataObject
 		echo $this->views;
 	}
 
-/*
- * $Log$
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- */
 }
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/17 20:18:37  fplanque
+ * minor changes
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *
