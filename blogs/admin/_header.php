@@ -2,9 +2,10 @@
 
 require_once(dirname(__FILE__)."/../conf/b2evo_config.php");
 require_once(dirname(__FILE__)."/../conf/b2evo_admin.php");
+require_once(dirname(__FILE__)."/$b2inc/_vars.php");
+require_once(dirname(__FILE__)."/$b2inc/_functions_locale.php"); // locale related functions
 require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
 require_once(dirname(__FILE__)."/$b2inc/_verifauth.php");
-require_once(dirname(__FILE__)."/$b2inc/_vars.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpc.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");

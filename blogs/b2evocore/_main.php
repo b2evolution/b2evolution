@@ -9,7 +9,6 @@
  * It is usefull when you want to do very customized templates!
  */
 require_once (dirname(__FILE__).'/../conf/b2evo_config.php');
-require_once (dirname(__FILE__).'/_functions_locale.php');
 require_once (dirname(__FILE__).'/_vars.php');					// sets various arrays and vars for use in b2
 require_once (dirname(__FILE__).'/_functions_template.php');	// function to be called from templates
 require_once (dirname(__FILE__).'/_functions.php');  

@@ -109,11 +109,11 @@ case "register":
 		$stars .= "*";
 	}
 
-	$message  = NT_('new user registration on your blog'). ":\n\n";
-	$message .= NT_('Login'). ": $user_login\n\n". NT_('Email'). ": $user_email\n\n";
-	$message .= NT_('Manage users'). ": $pathserver/b2team.php\n\n";
+	$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
+	$message .= T_('Login', $default_locale). ": $user_login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
+	$message .= T_('Manage users', $default_locale). ": $pathserver/b2team.php\n\n";
 
-	@mail( $admin_email, NT_('new user registration on your blog'), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+	@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 
 	?><html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>

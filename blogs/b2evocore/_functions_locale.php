@@ -12,23 +12,25 @@
  * T_(-)
  * 
  * TRANSLATE!
+ * Translated a text to the desired locale (b2evo localization only)
+ * or to the current locale
  */
-if(function_exists('_'))
-{
+if( ($use_l10n==1) && function_exists('_') )
+{	// We are going to use GETTEXT
 	function T_( $string, $req_locale = '' )
 	{
 		global $current_locale;
 		
 		if( empty( $req_locale ) || $req_locale == $current_locale )
-		{	// We have not asked for a different locale than the currently active
+		{	// We have not asked for a different locale than the currently active one:
 			return _($string);
 		}
 		// We have asked for a funky locale... we'll get english instead:
 		return $string;
 	}
 }
-else
-{
+elseif( $use_l10n==2 )
+{	// We are going to use b2evo localization:
 	function T_( $string, $req_locale = '' )
 	{
 		global $trans, $current_locale;
@@ -38,7 +40,11 @@ else
 
 		if( !isset($trans[$current_locale] ) )
 		{	// Translations for current locale have not yet been loaded:
-			require_once( dirname(__FILE__).'/../locales/'.$req_locale.'/_global.php' );
+			@include_once( dirname(__FILE__).'/../locales/'.$req_locale.'/_global.php' );
+			if( !isset($trans[$current_locale] ) )
+			{	// Still not loaded... file doesn't exist, memorize that no translation are available
+				$trans[$current_locale] = array();
+			}
 		}
 				
 		if( isset( $trans[$current_locale][$string] ) )
@@ -46,6 +52,13 @@ else
 			return $trans[$current_locale][$string];
 		}
 		// Return the English string:
+		return $string;
+	}
+}
+else
+{	// We are not localizing at all:
+	function T_( $string, $req_locale = '' )
+	{	
 		return $string;
 	}
 }
@@ -70,7 +83,7 @@ function NT_($string)
  */
 function locale_activate( $locale )
 {
-	global $locales, $current_locale, $current_charset, $weekday, $month;
+	global $use_l10n, $locales, $current_locale, $current_charset, $weekday, $month;
 
 	if( $locale == $current_locale )
 	{
@@ -83,8 +96,8 @@ function locale_activate( $locale )
 	$current_charset = $locales[$locale]['charset'];
 
 	// Activate translations in gettext:
-	if( function_exists( 'bindtextdomain' ) )
-	{	// Only if gettext is available ( if not, look into T_(-) ...)
+	if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )
+	{	// Only if we war eusing GETTEXT ( if not, look into T_(-) ...)
 		# Activate the locale->language in gettext:
 		putenv( 'LC_ALL='.$locale ); 
 		// Note: default of safe_mode_allowed_env_vars is "PHP_ ", 

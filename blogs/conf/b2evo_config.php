@@ -24,10 +24,10 @@ $admin_email = 'postmaster@localhost';
 
 # *** MySQL settings ***
 # fill with your database details (check carefully or nothing will work)
-$dbhost = 'localhost' ;                // mySQL Server 
-$dbname = 'b2evolution';               // the name of the database
-$dbusername = 'demouser';              // your MySQL username
-$dbpassword = 'demopass';              // ...and password
+$dbhost = 'localhost' ;       // mySQL Server 
+$dbname = 'b2evolution';      // the name of the database
+$dbusername = 'demouser';     // your MySQL username
+$dbpassword = 'demopass';     // ...and password
 
 
 # If you want to be able to reset your existing b2evolution tables and start anew

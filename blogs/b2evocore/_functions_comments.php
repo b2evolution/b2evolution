@@ -119,11 +119,11 @@ function get_commentdata($comment_ID,$no_cache=0)
 		$myrow['comment_content']=$rowc->comment_content;
 		$myrow['comment_karma']=$rowc->comment_karma;
 		$myrow['comment_type']=$rowc->comment_type;
-		$myrow['post_ID']=$rowc->ID;	
-		$myrow['post_title']=$rowc->post_title;
-		$myrow['blog_name']=$rowc->blog_name;
-		$myrow['blog_siteurl']=$rowc->blog_siteurl;
-		$myrow['blog_stub']=$rowc->blog_stub;
+		if( isset($rowc->ID) ) $myrow['post_ID']=$rowc->ID;	
+		if( isset($rowc->post_title) ) $myrow['post_title']=$rowc->post_title;
+		if( isset($rowc->blog_name) ) $myrow['blog_name']=$rowc->blog_name;
+		if( isset($rowc->blog_siteurl) ) $myrow['blog_siteurl']=$rowc->blog_siteurl;
+		if( isset($rowc->blog_stub) ) $myrow['blog_stub']=$rowc->blog_stub;
 	}
 	return($myrow);
 }

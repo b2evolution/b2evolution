@@ -1,4 +1,12 @@
 <?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * This file is based on code from the GALLERY project.
+ */
 include( dirname(__FILE__).'/../conf/b2evo_config.php' );
 include( dirname(__FILE__).'/../b2evocore/_functions.php' );
 
@@ -110,37 +118,44 @@ uasort($report, 'my_usort_function');
 <h1>Localization Status Report for b2evolution</h1>
 <table align="center" border="0" cellspacing="0" cellpadding="0">
 <tr>
-	<th>Language</th>
 	<th>Locale</th>
+	<th>Language</th>
+	<th>Charset</th>
 	<th>Status</th>
 	<th valign="bottom" style="width: 30px;">T<br/>r<br/>a<br/>n<br/>s<br/>l<br/>a<br/>t<br/>e<br/>d</th>
 	<th valign="bottom" style="width: 30px;">F<br/>u<br/>z<br/>z<br/>y</th>
 	<th valign="bottom" style="width: 30px;">U<br/>n<br/>t<br/>r<br/>a<br/>n<br/>s<br/>l<br/>a<br/>t<br/>e<br/>d</th>
 	<th valign="bottom" style="width: 30px;">T<br/>o<br/>t<br/>a<br/>l</th>
-</tr>
-
 <?php
+	if( $allow_po_extraction  )
+		echo '<th>Extract<br />strings<br />for<br />b2evo</th>';
+
+
+	echo '</tr>';
+
 $i=0;
 foreach ($report as $key => $value) {
 $i++;
 if ($i%2==0) {
-	$color="#ffffff";
+	$color="#dedede";
 	$nr=1;
 } else {
 	$color="#CECECE";
 	$nr=2;
 }
 		echo "\n<tr>";
-		echo "\n\t<td style=\"background-color:$color\">". '-' . "</td>";
-		echo "\n\t<td style=\"background-color:$color\">". $key;
-		if( $allow_po_extraction  )
-			echo ' [<a href="posplit.php?locale='.$key.'">Extract</a>]';
-		echo "</td>";
+		$lang = substr( $key, 0, 2 );
+		
+		echo "\n\t<td style=\"background-color:$color\">". $key, "</td>";
+		echo "\n\t<td style=\"background-color:$color\">". $languages[$lang] . "</td>";
+		echo "\n\t<td style=\"background-color:$color\">". $locales[$key]['charset'] . "</td>";
 		echo "\n\t<td style=\"background-color:#". $value[0] . "\">". $value[1] ."% done</td>";
 		echo "\n\t<td class=\"translated$nr\">". $value[2] ."</td>";
 		echo "\n\t<td class=\"fuzzy$nr\">". $value [3] . "</td>";
 		echo "\n\t<td class=\"untranslated$nr\">". $value[4] ."</td>";
-		echo "\n\t<td class=\"all$nr\">". $value[5] ."</td>";
+		echo "\n\t<td style=\"background-color:$color\">". $value[5] ."</td>";
+		if( $allow_po_extraction  )
+			echo "\n\t<td style=\"background-color:$color\">", '[<a href="posplit.php?locale='.$key.'">Extract</a>]</td>';
 		echo "\t</tr>";
 }
 ?>

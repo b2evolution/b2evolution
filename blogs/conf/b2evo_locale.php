@@ -5,7 +5,17 @@
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
-require_once (dirname(__FILE__)."/../$pathcore/_functions_locale.php");
+# Enable localization?
+# set to 0 to disable localization
+# set to 1 to enable gettext localization if supported (not recommended)
+# set to 2 to enable b2evo advanced localization (recommended)
+$use_l10n = 2;
+
+# To be used for m17n support:
+$dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
+
+// Load locale related functions: (ne need NT_() here)
+require_once (dirname(__FILE__)."/../$pathcore/_functions_locale.php"); 
 
 # Supported languages for posts:
 $languages = array(
@@ -17,13 +27,14 @@ $languages = array(
 	'sv' => NT_('Swedish'),
 	);
 
-# Default locale
+# Default locale used for backoffice and notification messages
 # These use an ISO 639 language code, a '_' and an ISO 3166 country code
 # This MUST BE in the list below
 $default_locale = 'en_US';
 
 
 $default_locale = 'fr_FR';			// For testing :))
+// $default_locale = 'pt_BR';			// For testing :))
 // $default_locale = 'ja_JP';			// For testing :))
 // $default_locale = 'nl_NL';			// For testing :))
 // $default_locale = 'sv_SE';			// For testing :))

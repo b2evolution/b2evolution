@@ -1,11 +1,11 @@
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Localization Status Report for b2evolution</title>
-	<link rel="stylesheet" type="text/css" href="report.css">
-</head>
-<body>
 <?php
+/*
+ * b2evolution - http://b2evolution.net/
+ *
+ * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ */
+
 include( dirname(__FILE__).'/../conf/b2evo_config.php' );
 include( dirname(__FILE__).'/../b2evocore/_functions.php' );
 
@@ -13,6 +13,17 @@ if( ! $allow_po_extraction )
 	die( 'PO extraction is currently not allowed.' );
 
 param( 'locale', 'string', true );
+
+?>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $locales[$locale]['charset'] ?>" />
+	<title>Localization Status Report for b2evolution</title>
+	<link rel="stylesheet" type="text/css" href="report.css">
+</head>
+<body>
+<?php
+
 
 $filename = $locale.'/LC_MESSAGES/messages.po';
 

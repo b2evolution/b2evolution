@@ -13,8 +13,8 @@
 $b2_version = '0.8.3-beta1';
 
 // Activate gettext:
-if( function_exists( 'bindtextdomain' ) )
-{	// Only if gettext is available
+if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )
+{	// We are going to use GETTEXT
 	// Specify location of translation tables :
 	bindtextdomain( 'messages', dirname(__FILE__).'/../locales'); 
 	// Choose domain: (name of the .mo files)

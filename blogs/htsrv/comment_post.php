@@ -111,17 +111,17 @@ if ($comments_notify)
 	$postdata = get_postdata($comment_post_ID);
 	$authordata = get_userdata($postdata["Author_ID"]);
 	$recipient = $authordata["user_email"];
-	$subject = sprintf( NT_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
+	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
 	// fplanque added:
 	$comment_blogparams = get_blogparams_by_ID( $postdata['Blog'] );
 
 	// Not translated because sent to someone else...
-	$notify_message  = sprintf( NT_('New comment on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
+	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
 	$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$comment_post_ID."&c=1\n\n";
-	$notify_message .= NT_('Author')." : $comment_author (IP: $user_ip , $user_domain)\n";
-	$notify_message .= NT_('Email')."  : $comment_author_email\n";
-	$notify_message .= NT_('Url')."    : $comment_author_url\n";
-	$notify_message .= NT_('Comment').": \n".stripslashes($original_comment)."\n";
+	$notify_message .= T_('Author', $default_locale).": $comment_author (IP: $user_ip , $user_domain)\n";
+	$notify_message .= T_('Email', $default_locale).": $comment_author_email\n";
+	$notify_message .= T_('Url', $default_locale).": $comment_author_url\n";
+	$notify_message .= T_('Comment', $default_locale).": \n".stripslashes($original_comment)."\n";
 
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
 

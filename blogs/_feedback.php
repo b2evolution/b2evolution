@@ -139,9 +139,9 @@
 	<h4>Leave a comment:</h4>
 	
 	<?php
-		$comment_author = trim($_COOKIE[$cookie_name]);
-		$comment_author_email = trim($_COOKIE[$cookie_email]);
-		$comment_author_url = trim($_COOKIE[$cookie_url]);
+		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
 	?>
 	
 	<!-- form to add a comment -->
