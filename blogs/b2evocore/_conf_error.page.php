@@ -22,7 +22,7 @@
 		<p>This is b2evolution version <?php global $b2_version; echo $b2_version ?>.</p>
 		<p><strong>You cannot use the application before you finish configuration and installation.</strong></p>
 		<p><?php echo $error_message; ?></p>
-		<p>Please go to <a href="<?php echo $core_dirout.'/'.$install_subdir.'/' ?>">/blogs/install</a> to finish your configuration/installation now.</p>
+		<p>Please go to <a href="<?php global $core_dirout, $install_subdir; echo $core_dirout.'/'.$install_subdir.'/' ?>">/blogs/install</a> to finish your configuration/installation now.</p>
 	</div>
 </body>
 </html>
