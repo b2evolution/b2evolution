@@ -29,6 +29,7 @@ $languages = array(
 	'pt' => NT_('Portuguese'),
 	'es' => NT_('Spanish'),
 	'sv' => NT_('Swedish'),
+	'zh' => NT_('Simplified Chinese'),
 	);
 
 
@@ -97,6 +98,11 @@ $locales = array(
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'y-m-d',
 									'timefmt' => 'H:i:s',	
+								),
+	'zh_CN' => array( // Simplified Chinese, CHINA
+									'charset' => 'gb2312',
+									'datefmt' => 'y-m-d',
+									'timefmt' => 'H:i:s',
 								),
 );
 
