@@ -10,7 +10,7 @@
 	require(dirname(__FILE__).'/b2evocore/_main.php');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
@@ -21,7 +21,6 @@
  <!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="skins/fplanque2002/basic.css" type="text/css" />
 <link rel="stylesheet" href="skins/fplanque2002/fpnav.css" type="text/css" />
-<!-- InstanceParam name="rub1" type="text" value="Blog" --> 
 </head>
 <body>
 <div class="pageHeader">
