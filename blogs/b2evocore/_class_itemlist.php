@@ -10,8 +10,8 @@
  *
  * @package b2evocore
  */
-require_once( dirname(__FILE__) . '/_class_dataobjectlist.php' );
-require_once( dirname(__FILE__) . '/_class_item.php' );
+require_once( dirname(__FILE__). '/_class_dataobjectlist.php' );
+require_once( dirname(__FILE__). '/_class_item.php' );
 
 function cat_req( $parent_cat_ID, $level )
 {
@@ -127,7 +127,7 @@ class ItemList extends DataObjectList
 		// THIS IS GOING TO LAST FOR MANY MANY LINES...
 
 		// if a month is specified in the querystring, load that month
-		if ($m != '')
+		if( $m != '' )
 		{
 			$m = '' . intval($m);
 			$where .= ' AND YEAR(post_date)=' . substr($m,0,4);
@@ -144,17 +144,17 @@ class ItemList extends DataObjectList
 		}
 
 		// If a week number is specified
-		if ($w != '')
+		if( $w != '' )
 		{
 			$w = '' . intval($w);
-			$where .= ' AND WEEK(post_date,1)=' . $w;
+			$where .= ' AND WEEK(post_date,1)='. $w;
 		}
 
 		// if a post number is specified, load that post
-		if (($p != '') && ($p != 'all'))
+		if( ($p != '') && ($p != 'all') )
 		{
 			$p = intval($p);
-			$where .= ' AND ID = ' . $p;
+			$where .= ' AND ID = '. $p;
 		}
 
 		/*
@@ -162,17 +162,17 @@ class ItemList extends DataObjectList
 		 * Search stuff:
 		 * ----------------------------------------------------
 		 */
-		if(!empty($s))
+		if( !empty($s) )
 		{
 			$search = ' AND (';
-			if ($exact)	// We want exact match of title or contents
+			if( $exact ) // We want exact match of title or contents
 				$n = '';
 			else // The words/sentence are/is to be included in in the title or the contents
 				$n = '%';
 			if( ($sentence == '1') or ($sentence == 'sentence') )
 			{ // Sentence search
 				$s = trim($s);
-				$search .= '(post_title LIKE \''.$n.$s.$n.'\') OR (post_content LIKE \''.$n.$s.$n.'\')';
+				$search .= '(post_title LIKE \''. $n. $s. $n. '\') OR (post_content LIKE \''. $n. $s. $n.'\')';
 			}
 			else
 			{	// Word search
@@ -190,7 +190,7 @@ class ItemList extends DataObjectList
 				$join = '';
 				for ( $i = 0; $i < count($s_array); $i++)
 				{
-					$search .= ' '.$join.' ( (post_title LIKE \''.$n.$s_array[$i].$n.'\') OR (post_content LIKE \''.$n.$s_array[$i].$n.'\') ) ';
+					$search .= ' '. $join. ' ( (post_title LIKE \''. $n. $s_array[$i]. $n. '\') OR (post_content LIKE \''. $n. $s_array[$i]. $n.'\') ) ';
 					$join = $swords;
 				}
 			}
@@ -214,7 +214,7 @@ class ItemList extends DataObjectList
 		$cat_array = array();		// this is a global var
 
 		// Check for cat string (which will be handled recursively)
-		if ( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
+		if( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
 		{	// specified a category string:
 			$cat = str_replace(',', ' ', $cat);
 			if( strstr($cat, '-') )
@@ -259,7 +259,7 @@ class ItemList extends DataObjectList
 		}
 		else
 		{
-			$whichcat .= ' AND postcat_cat_ID '.$eq.' ('.implode(",", $cat_array).') ';
+			$whichcat .= ' AND postcat_cat_ID '. $eq.' ('.implode(",", $cat_array). ') ';
 			// echo $whichcat;
 		}
 
@@ -286,13 +286,13 @@ class ItemList extends DataObjectList
 				$andor = 'OR';
 			}
 			$author_array = explode(' ', $author);
-			$whichauthor .= ' AND post_author '.$eq.' '.$author_array[0];
+			$whichauthor .= ' AND post_author '. $eq.' '. $author_array[0];
 			for ($i = 1; $i < (count($author_array)); $i = $i + 1) {
-				$whichauthor .= ' '.$andor.' post_author '.$eq.' '.$author_array[$i];
+				$whichauthor .= ' '. $andor.' post_author '. $eq.' '. $author_array[$i];
 			}
 		}
 
-		$where .= $search . $whichcat . $whichauthor;
+		$where .= $search. $whichcat . $whichauthor;
 
 
 		/*
@@ -307,17 +307,17 @@ class ItemList extends DataObjectList
 
 		if(empty($orderby))
 		{
-			$orderby='date '.$order;
+			$orderby='date '. $order;
 		}
 		else
 		{
 			$orderby_array = explode(' ',$orderby);
-			$orderby = $orderby_array[0].' '.$order;
+			$orderby = $orderby_array[0]. ' '. $order;
 			if (count($orderby_array)>1)
 			{
 				for($i = 1; $i < (count($orderby_array)); $i++)
 				{
-					$orderby .= ', post_'.$orderby_array[$i].' '.$order;
+					$orderby .= ', post_'. $orderby_array[$i]. ' '. $order;
 				}
 			}
 		}
@@ -338,7 +338,7 @@ class ItemList extends DataObjectList
 			if ($what_to_show == 'posts' || $what_to_show == 'paged')
 			{
 				$posts = $postend - $poststart + 1;
-				$limits = ' LIMIT '.($poststart-1).','.$posts;
+				$limits = ' LIMIT '. ($poststart-1). ','. $posts;
 			}
 			elseif ($what_to_show == 'days')
 			{
@@ -350,7 +350,7 @@ class ItemList extends DataObjectList
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$startdate = date('Y-m-d H:i:s', ($lastpostdate - (($poststart -1) * 86400)));
 				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend) * 86400)));
-				$where .= ' AND post_date > \'' . $otherdate . '\' AND post_date <= \'' . $startdate . '\'';
+				$where .= ' AND post_date > \''. $otherdate . '\' AND post_date <= \''. $startdate . '\'';
 			}
 		}
 		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
@@ -361,16 +361,16 @@ class ItemList extends DataObjectList
 		elseif ($what_to_show == 'posts')
 		{
 			// echo 'LIMIT POSTS!';
-			$limits = ' LIMIT '.$posts_per_page;
+			$limits = ' LIMIT '. $posts_per_page;
 		}
 		elseif( $what_to_show == 'paged' )
 		{
 			// echo 'PAGED';
 			$pgstrt = '';
 			if ($paged) {
-				$pgstrt = (intval($paged) -1) * $posts_per_page . ', ';
+				$pgstrt = (intval($paged) -1) * $posts_per_page. ', ';
 			}
-			$limits = 'LIMIT '.$pgstrt.$posts_per_page;
+			$limits = 'LIMIT '. $pgstrt.$posts_per_page;
 		}
 		elseif ($what_to_show == 'days')
 		{
@@ -379,7 +379,7 @@ class ItemList extends DataObjectList
 			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 			$lastpostdate = mysql2date('U',$lastpostdate);
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
-			$where .= ' AND post_date > \''.$otherdate.'\'';
+			$where .= ' AND post_date > \''. $otherdate.'\'';
 		}
 		/* else
 		{
@@ -408,7 +408,7 @@ class ItemList extends DataObjectList
 		{	// Hide posts before
 			// echo 'before';
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($time_difference * 3600) );
-			$where .= ' AND post_date >= \''.$date_min.'\'';
+			$where .= ' AND post_date >= \''. $date_min.'\'';
 		}
 
 		if( $timestamp_max == 'now' )
@@ -420,7 +420,7 @@ class ItemList extends DataObjectList
 		{	// Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($time_difference * 3600) );
-			$where .= ' AND post_date <= \''.$date_max.'\'';
+			$where .= ' AND post_date <= \''. $date_max.'\'';
 		}
 
 		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang,
@@ -439,7 +439,7 @@ class ItemList extends DataObjectList
 			$this->request .= "WHERE cat_blog_ID = $blog ";
 		}
 
-		$this->request .= $where." ORDER BY post_$orderby $limits";
+		$this->request .= $where. " ORDER BY post_$orderby $limits";
 		// echo $where;
 
 		if ($preview)
@@ -462,7 +462,7 @@ class ItemList extends DataObjectList
 		while( $myrow = mysql_fetch_object($this->result) )
 		{
 			$this->result_rows[] = $myrow;
-			// echo "post:".$myrow->ID."<br />";
+			// echo "post:". $myrow->ID."<br />";
 			array_unshift( $this->postIDarray, $myrow->ID );	// new row at beginning
 		}
 		if( !empty($this->postIDarray) )
@@ -471,7 +471,7 @@ class ItemList extends DataObjectList
 			// rewind resultset:
 			// mysql_data_seek ($this->result, 0) or die( "Could not rewind resultset" );
 		}
-		// echo "postlist:".$this->postIDlist;
+		// echo "postlist:". $this->postIDlist;
 
 		// Initialize loop stuff:
 		$this->restart();
@@ -591,7 +591,7 @@ class ItemList extends DataObjectList
 		}
 		$this->row = & $this->result_rows[$this->row_num];
 		$row = $this->row;
-		// echo '<p>accessing row['.$this->row_num.']:',$this->row->post_title,'</p>';
+		// echo '<p>accessing row['. $this->row_num. ']:',$this->row->post_title,'</p>';
 		$this->row_num++;
 		$this->get_postdata();
 
@@ -695,7 +695,7 @@ class ItemList extends DataObjectList
 			global $is_winIE;
 			if (($is_winIE) && (!isset($IEWin_bookmarklet_fix)))
 			{
-				$content =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $content);
+				$content =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10). ';'", $content);
 			}
 
 			$postdata = array (

@@ -7,22 +7,22 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-require_once dirname(__FILE__).'/_functions_groups.php';
-require_once dirname(__FILE__).'/_class_user.php';
+require_once dirname(__FILE__). '/_functions_groups.php';
+require_once dirname(__FILE__). '/_class_user.php';
 
 
 /*
  * veriflog(-)
  *
- * Verify if user is logged in 
- * checking login & pass in the database 
+ * Verify if user is logged in
+ * checking login & pass in the database
  */
 function veriflog( $login_required = false )
 {
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $core_dirout;
 	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
 	global $current_User;
-	
+
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
 	// Warning: unset() prevent from setting a new global value later in the func !!! :((
 	$user_login = '';
@@ -46,15 +46,15 @@ function veriflog( $login_required = false )
 		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['pwd']) : $_GET['pwd'])));
 		unset($_GET['pwd']); // password is hashed from now on
 	}
-	
+
 	if( isset($log) )
 	{	/*
 		 * ---------------------------------------------------------
 		 * User is trying to login right now
 		 * ---------------------------------------------------------
 		 */
-		// echo 'Trying to log in right now...'; 
-		 
+		// echo 'Trying to log in right now...';
+
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-cache, must-revalidate");
@@ -67,13 +67,13 @@ function veriflog( $login_required = false )
 			// echo 'login failed!!';
 			return '<strong>'. T_('ERROR'). ':</strong> '. T_('wrong login/password.');
 		}
-		
+
 		// Login succeeded:
 		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
 		if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
-			printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+			printf( T_('setcookie %s failed!'). '<br />', $cookie_user );
 		if( !setcookie( $cookie_pass, $user_pass_md5, $cookie_expires, $cookie_path, $cookie_domain) )
-			printf( T_('setcookie %s failed!').'<br />', $cookie_user );
+			printf( T_('setcookie %s failed!'). '<br />', $cookie_user );
 	}
 	elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
 	{	/*
@@ -81,7 +81,7 @@ function veriflog( $login_required = false )
 		 * User was not trying to log in, but he already was logged in: check validity
 		 * ---------------------------------------------------------
 		 */
-		// echo 'Was already logged in...'; 
+		// echo 'Was already logged in...';
 
 		$user_login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
 		$user_pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
@@ -95,10 +95,10 @@ function veriflog( $login_required = false )
 				header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 				header("Cache-Control: no-cache, must-revalidate");
 				header("Pragma: no-cache");
-	
+
 				return '<strong>'. T_('ERROR'). ':</strong> '. T_('login/password no longer valid.');
 			}
-			
+
 			return 0;	// Wrong login but we don't care.
 		}
 	}
@@ -108,7 +108,7 @@ function veriflog( $login_required = false )
 		 * User was not logged in at all
 		 * ---------------------------------------------------------
 		 */
-		// echo ' NOT logged in...'; 
+		// echo ' NOT logged in...';
 
 		if( $login_required )
 		{
@@ -116,14 +116,14 @@ function veriflog( $login_required = false )
 			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 			header("Cache-Control: no-cache, must-revalidate");
 			header("Pragma: no-cache");
-		
+
 			return T_('You must log in!');
 			exit();
 		}
-	
+
 		return 0;	// Not logged in but we don't care
 	}
-	
+
 	/*
 	 * Login info is OK, we set the global variables:
 	 */
@@ -134,8 +134,8 @@ function veriflog( $login_required = false )
 	$user_nickname = $userdata['user_nickname'];
 	$user_email	= $userdata['user_email'];
 	$user_url	= $userdata['user_url'];
-	
-	return 0;		// OK	
+
+	return 0;		// OK
 }
 
 
@@ -148,8 +148,8 @@ function logout()
 {
 	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
 	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
-	
-	// Reset all global variables 
+
+	// Reset all global variables
 	// Note: unset is bugguy on globals
 	$user_login = '';
 	$user_pass_md5 = '';
@@ -175,7 +175,7 @@ function logout()
 function is_logged_in()
 {
 	global $user_ID;
-	
+
 	return ( ! empty($user_ID) );
 }
 
@@ -184,7 +184,7 @@ function is_logged_in()
 /*
  * user_pass_ok(-)
  */
-function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false ) 
+function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
 {
 	global $cache_userdata, $use_cache;
 
@@ -201,17 +201,17 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
 /*
  * get_userdatabylogin(-)
  */
-function get_userdatabylogin($user_login) 
+function get_userdatabylogin($user_login)
 {
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) 
+	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache))
 	{
 		$sql = "SELECT * FROM $tableusers WHERE user_login = '$user_login'";
 		$result = mysql_query($sql) or mysql_oops( $sql );
 		$myrow = mysql_fetch_array($result);
 		$querycount++;
 		$cache_userdata[$user_login] = $myrow;
-	} 
+	}
 	else
 	{
 		$myrow = $cache_userdata[$user_login];
@@ -222,19 +222,19 @@ function get_userdatabylogin($user_login)
 /*
  * get_userdata(-)
  */
-function get_userdata($userid) 
+function get_userdata($userid)
 {
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata[$userid])) OR (!$use_cache)) 
+	if ((empty($cache_userdata[$userid])) OR (!$use_cache))
 	{	// We do a progressive cache load beacuse there can be many many users!
-		$sql = "SELECT * FROM $tableusers WHERE ID = $userid"; 
+		$sql = "SELECT * FROM $tableusers WHERE ID = $userid";
 		$result = mysql_query($sql) or mysql_oops( $sql );
-		$querycount++; 
-		while ($myrow = mysql_fetch_array($result)) 
-		{ 
-			 $cache_userdata[$myrow['ID']] = $myrow; 
-		} 
-		$myrow = $cache_userdata[$userid]; 
+		$querycount++;
+		while ($myrow = mysql_fetch_array($result))
+		{
+			 $cache_userdata[$myrow['ID']] = $myrow;
+		}
+		$myrow = $cache_userdata[$userid];
 	}
 	else
 	{
@@ -248,27 +248,27 @@ function get_userdata($userid)
 /*
  * get_userid(-)
  */
-function get_userid($user_login) 
+function get_userid($user_login)
 {
 	global $tableusers,$querycount,$cache_userdata,$use_cache;
-	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache)) 
+	if ((empty($cache_userdata["$user_login"])) OR (!$use_cache))
 	{
 	/*	$sql = "SELECT ID FROM $tableusers WHERE user_login = '$user_login'";
 		$result = mysql_query($sql) or die("No user with the login <i>$user_login</i>");
 		$myrow = mysql_fetch_array($result);
 		$querycount++;
 		$cache_userdata["$user_login"] = $myrow;
-	 * 
+	 *
 	 * Optimized by R. U. Serious
 	 */
-		$sql = "SELECT user_login, ID FROM $tableusers"; 
-		$result = mysql_query($sql) or mysql_oops( $sql ); 
-		$querycount++; 
-		while ($myrow = mysql_fetch_array($result)) 
-		{ 
-			 $cache_userdata[$myrow['user_login']] = $myrow['ID']; 
-		} 
-		$myrow = $cache_userdata["$user_login"]; 
+		$sql = "SELECT user_login, ID FROM $tableusers";
+		$result = mysql_query($sql) or mysql_oops( $sql );
+		$querycount++;
+		while ($myrow = mysql_fetch_array($result))
+		{
+			 $cache_userdata[$myrow['user_login']] = $myrow['ID'];
+		}
+		$myrow = $cache_userdata["$user_login"];
 	}
 	return($myrow[0]);
 }
@@ -277,7 +277,7 @@ function get_userid($user_login)
 /*
  * get_usernumposts(-)
  */
-function get_usernumposts( $userid ) 
+function get_usernumposts( $userid )
 {
 	global $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments,$querycount;
 	$sql = "SELECT count(*) AS count FROM $tableposts WHERE post_author = $userid";
@@ -300,7 +300,7 @@ function get_user_info( $show='', $this_userdata = '' )
 		 $this_userdata = & $userdata;
 	}
 
-	switch( $show ) 
+	switch( $show )
 	{
 		case 'ID':
 			$output = $this_userdata['ID'];
@@ -322,7 +322,7 @@ function get_user_info( $show='', $this_userdata = '' )
 		case 'msn':
 		case 'yim':
 		case 'notify':
-			$output = $this_userdata['user_'.$show];
+			$output = $this_userdata['user_'. $show];
 			break;
 
 		case 'login':
@@ -339,7 +339,7 @@ function get_user_info( $show='', $this_userdata = '' )
  *
  * Template tag
  */
-function user_info( $show='', $format = 'raw', $display = true ) 
+function user_info( $show='', $format = 'raw', $display = true )
 {
 	$content = get_user_info( $show );
 	$content = format_to_output( $content, $format );
@@ -364,13 +364,13 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 
 	if( $link_text == '' ) $link_text = T_('Login...');
 	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
-	
+
 	$redir = '';
-	if( !empty( $blog ) ) 
+	if( !empty( $blog ) )
 	{	// We'll want to return to this blog after login
 		$redir = '?redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
 	}
-	
+
 	echo $before;
 	echo '<a href="', $htsrv_url, '/login.php', $redir, '" title="', $link_title, '">';
 	echo $link_text;
@@ -387,16 +387,16 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 {
 	global $htsrv_url, $blog;
 
-	if( is_logged_in() || !get_settings('pref_newusers_canregister')) 
+	if( is_logged_in() || !get_settings('pref_newusers_canregister'))
 	{	// There's no need to provide this link if already logged in or if we won't let him register
 		return false;
 	}
-	
+
 	if( $link_text == '' ) $link_text = T_('Register...');
 	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
 
 	$redir = '';
-	if( !empty( $blog ) ) 
+	if( !empty( $blog ) )
 	{	// We'll want to return to this blog after login
 		$redir = '?redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
 	}
@@ -424,7 +424,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	$redir = '';
-	if( !empty( $blog ) ) 
+	if( !empty( $blog ) )
 	{	// We'll want to return to this blog after login
 		$redir = '&amp;redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
 	}
@@ -447,7 +447,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 
 	if( ! is_logged_in() ) return false;
 
-	if( $current_User->get('level') == 0 ) 
+	if( $current_User->get('level') == 0 )
 	{ // If user is NOT active:
 		return false;
 	}
@@ -486,19 +486,19 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	echo $after;
 }
 
-/** 
+/**
  * Display "User profile" title if it has been requested
  *
  * {@internal profile_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to 
+ * @param mixed Output format, see {@link format_to_output()} or false to
  *								return value instead of displaying it
  */
-function profile_title( $prefix = ' ', $display = 'htmlbody' ) 
+function profile_title( $prefix = ' ', $display = 'htmlbody' )
 {
 	global $disp;
-	
+
 	if( $disp == 'profile' )
 	{
 		$info = $prefix.T_('User profile');

@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/*
 	 * This is the template that displays the user profile form
 	 *
@@ -8,8 +8,8 @@
 	 * For example: /blogs/index.php?disp=profile
 	 * Note: don't code this URL by hand, use the template functions to generate it!
 	 */
-	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-		die("Please, do not access this page directly.");
+	if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1) == '_' )
+		die('Please, do not access this page directly.');
 
 	if( ! is_logged_in() )
 	{	// must be logged in!
@@ -23,12 +23,12 @@
 	<form action="<?php echo $htsrv_url ?>/profile_update.php" method="post" class="bComment">
 
 		<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
-	
+
 		<fieldset>
 			<div class="label"><?php echo T_('Login:') ?></div>
 			<div class="input"><?php user_info( 'login', 'htmlhead' ) ?>
 				-
-				<strong><?php echo T_('ID') ?>:</strong> 
+				<strong><?php echo T_('ID') ?>:</strong>
 				<?php user_info( 'ID', 'raw' ) ?>
 			</div>
 		</fieldset>
@@ -48,7 +48,7 @@
 			form_text( 'newuser_lastname', get_user_info( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
 			form_text( 'newuser_nickname', get_user_info( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
 		?>
-		
+
 		<fieldset>
 			<div class="label"><label for="newuser_idmode"><?php echo T_('Identity shown') ?>:</label></div>
 			<div class="input">
@@ -80,19 +80,19 @@
 			<div class="label"><label for="pass1"><?php echo T_('New password') ?>:</label></div>
 			<div class="input"><input type="password" name="pass1" id="pass1" value="" size="16" class="bComment" /></div>
 		</fieldset>
-	
+
 		<fieldset>
 			<div class="label"><label for="pass2"><?php echo T_('Confirm new password') ?>:</label></div>
 			<div class="input"><input type="password" name="pass2" id="pass2" value="" size="16" class="bComment" /></div>
-		</fieldset>		
-	
+		</fieldset>
+
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
 			</div>
 		</fieldset>
-	
+
 		<div class="clear"></div>
-	
+
 	</form>
 

@@ -48,11 +48,11 @@
 			</tr>
 			<tr>
 			<td align="right"><strong><?php echo T_('ICQ') ?>:</strong></td>
-			<td><?php if ($edited_User->disp('icq') > 0) { echo make_clickable("icq:".$edited_User->disp('icq')); } ?></td>
+			<td><?php if ($edited_User->disp('icq') > 0) { echo make_clickable('icq:'. $edited_User->disp('icq')); } ?></td>
 			</tr>
 			<tr>
 			<td align="right"><strong><?php echo T_('AIM') ?>:</strong></td>
-			<td><?php echo make_clickable("aim:".$edited_User->disp('aim')) ?></td>
+			<td><?php echo make_clickable('aim:'. $edited_User->disp('aim')) ?></td>
 			</tr>
 			<tr>
 			<td align="right"><strong><?php echo T_('MSN IM') ?>:</strong></td>

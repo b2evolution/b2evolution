@@ -62,7 +62,7 @@ class User extends DataObject
 			$this->idmode = 'login';
 			$this->email = '';
 			$this->url = '';
-			$this->icq = 0;
+			$this->icq = NULL;
 			$this->aim = '';
 			$this->msn = '';
 			$this->yim = '';

@@ -14,27 +14,26 @@
 <div class="bPosts">
 	<div class="bPost">
 	<?php
-	require_once (dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_itemlist.php');
-	require_once (dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_calendar.php');
-	require_once (dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_archivelist.php');
+	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_itemlist.php' );
+	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_calendar.php' );
+	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_archivelist.php' );
 
-	param( 'safe_mode', 'integer', 0 );		// Blogger style
-
-	param( 'p', 'integer' );							// Specific post number to display
-	param( 'm', 'integer', '', true );							// YearMonth(Day) to display
-	param( 'w', 'integer', '', true );							// Week number
-	param( 'cat', 'string', '', true );							// List of cats to restrict to
-	param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
-	param( 'author', 'integer', '', true );					// List of authors to restrict to
-	param( 'order', 'string', 'DESC', true );		// ASC or DESC
-	param( 'orderby', 'string', '', true );					// list of fields to order by
-	param( 'posts', 'integer', '', true );					// # of posts to display on the page
-	param( 'paged', 'integer', '', true );					// List page number in paged display
-	param( 'poststart', 'integer', 1, true );			// Start results at this position
-	param( 'postend', 'integer', '', true );				// End results at this position
-	param( 's', 'string', '', true );								// Search string
-	param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
-	param( 'exact', 'integer', '', true );					// Require exact match of title or contents
+	param( 'safe_mode', 'integer', 0 );         // Blogger style
+	param( 'p', 'integer' );                    // Specific post number to display
+	param( 'm', 'integer', '', true );          // YearMonth(Day) to display
+	param( 'w', 'integer', '', true );          // Week number
+	param( 'cat', 'string', '', true );         // List of cats to restrict to
+	param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+	param( 'author', 'integer', '', true );     // List of authors to restrict to
+	param( 'order', 'string', 'DESC', true );   // ASC or DESC
+	param( 'orderby', 'string', '', true );     // list of fields to order by
+	param( 'posts', 'integer', '', true );      // # of posts to display on the page
+	param( 'paged', 'integer', '', true );      // List page number in paged display
+	param( 'poststart', 'integer', 1, true );   // Start results at this position
+	param( 'postend', 'integer', '', true );    // End results at this position
+	param( 's', 'string', '', true );           // Search string
+	param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
+	param( 'exact', 'integer', '', true );      // Require exact match of title or contents
 	$preview = 0;
 	param( 'c', 'string' );
 	param( 'tb', 'integer', 0 );
@@ -71,34 +70,34 @@
 	single_post_title();
 	echo '</h2>';
 
-	if (!$posts)
+	if( !$posts )
 	{
-		if ($posts_per_page)
+		if( $posts_per_page )
 		{
-			$posts=$posts_per_page;
+			$posts = $posts_per_page;
 		}
 		else
 		{
-			$posts=10;
-			$posts_per_page=$posts;
+			$posts = 10;
+			$posts_per_page = $posts;
 		}
 	}
 
-	if(!$poststart)
+	if( !$poststart )
 	{
-		$poststart=1;
+		$poststart = 1;
 	}
 
-	if(!$postend)
+	if( !$postend )
 	{
-		$postend=$poststart+$posts-1;
+		$postend = $poststart + $posts - 1;
 	}
 
-	$nextXstart=$postend+1;
-	$nextXend=$postend+$posts;
+	$nextXstart = $postend + 1;
+	$nextXend = $postend + $posts;
 
-	$previousXstart=($poststart-$posts);
-	$previousXend=$poststart-1;
+	$previousXstart = ($poststart - $posts);
+	$previousXend = $poststart - 1;
 	if( $previousXstart < 1 )
 	{
 		$previousXstart = 1;
@@ -111,14 +110,12 @@
 	while( $Item = $MainList->get_item() )
 	{
 		?>
-  	<div class="bPost<?php $Item->scope( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+		<div class="bPost<?php $Item->scope( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 			<?php $Item->anchor(); ?>
 			<div class="bSmallHead">
 				<?php
 					echo '<strong>';
-					$Item->date();
-					echo ' @ ';
-					$Item->time();
+					$Item->date(); echo ' @ '; $Item->time();
 					echo '</strong>';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo ' ', T_('by'), ' ';
@@ -192,7 +189,7 @@
 			<?php
 
 			// comments
-			if($c)
+			if( $c )
 			{
 				$queryc = "SELECT * FROM $tablecomments WHERE comment_post_ID = $id ORDER BY comment_date";
 				$resultc = mysql_query($queryc);
