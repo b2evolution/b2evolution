@@ -530,61 +530,6 @@ function is_windows()
 }
 
 
-function alert_error( $msg )
-{ // displays a warning box with an error message (original by KYank)
-	?>
-	<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-	<head>
-	<script language="JavaScript">
-	<!--
-	alert('<?php echo str_replace( "'", "\'", $msg ) ?>');
-	history.back();
-	//-->
-	</script>
-	</head>
-	<body>
-	<!-- this is for non-JS browsers (actually we should never reach that code, but hey, just in case...) -->
-	<?php echo $msg; ?><br />
-	<a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>"><?php echo T_('go back') ?></a>
-	</body>
-	</html>
-	<?php
-	exit;
-}
-
-
-function alert_confirm($msg)
-{ // asks a question - if the user clicks Cancel then it brings them back one page
-	?>
-	<script language="JavaScript">
-	<!--
-	if (!confirm("<?php echo $msg ?>")) {
-	history.back();
-	}
-	//-->
-	</script>
-	<?php
-}
-
-
-function redirect_js($url,$title="...") {
-	?>
-	<script language="JavaScript">
-	<!--
-	function redirect() {
-	window.location = "<?php echo $url; ?>";
-	}
-	setTimeout("redirect();", 100);
-	//-->
-	</script>
-	<p><?php echo T_('Redirecting you to:') ?> <strong><?php echo $title; ?></strong><br />
-	<br />
-	<?php printf( T_('If nothing happens, click <a %s>here</a>.'), ' href="'.$url.'"' ); ?></p>
-	<?php
-	exit();
-}
-
-
 // functions to count the page generation time (from phpBB2)
 // ( or just any time between timer_start() and timer_stop() )
 
@@ -1874,8 +1819,48 @@ function header_nocache()
 }
 
 
+
+/**
+ * Sends HTTP header to redirect to the previous location (which
+ * can be given as function parameter, GET parameter (redirecto_to),
+ * is taken from {@link Hit::referrer} or {@link $baseurl})
+ *
+ * @return
+ */
+function header_redirect( $redirectTo = NULL )
+{
+	global $Hit, $baseurl;
+
+	if( is_null($redirectTo) )
+	{
+		$redirectTo = param( 'redirect_to', 'string', $Hit->referrer );
+	}
+
+	$location = empty($redirectTo) ? $baseurl : $redirectTo;
+
+	$location = str_replace('&amp;', '&', $location);
+
+	if( strpos($location, $baseurl) === 0 // we're somewhere on $baseurl
+			&& preg_match( '#^(.*?)([?&])action=\w+(&(amp;)?)?(.*)$#', $location, $match ) )
+	{ // remove "action" get param to avoid unwanted actions
+		$location = $match[1];
+
+		if( !empty($match[5]) )
+		{
+			$location .= $match[2].$match[5];
+		}
+	}
+
+	header('Refresh:0;url='.$location);
+
+	exit();
+}
+
 /*
  * $Log$
+ * Revision 1.52  2005/02/27 20:30:07  blueyed
+ * added header_redirect()
+ *
  * Revision 1.51  2005/02/24 17:02:23  blueyed
  * fixed getRandomPassword() for installation
  *
