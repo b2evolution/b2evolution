@@ -26,7 +26,7 @@
 		<div class="bComment">
 			<h3 class="bTitle">
 				<?php echo T_('In response to:') ?> 
-				<a href="<?php $Comment->Item->permalink() ?>" title="<?php echo T_('Original post on:') ?> <?php  $Comment->disp( 'blog_name', 'htmlattr' ) ?>"><?php $Comment->Item->title( '', '', false ) ?></a>
+				<a href="<?php $Comment->Item->permalink() ?>"><?php $Comment->Item->title( '', '', false ) ?></a>
 			</h3>
 			<div class="bCommentTitle">
 				<?php $Comment->author() ?>
