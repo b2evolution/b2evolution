@@ -649,7 +649,7 @@ class Item extends DataObject
 	 * @param string String to display before the link (if comments are to be displayed)
 	 * @param string String to display after the link (if comments are to be displayed)
 	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
-	 * @param boolean true to hide if no feeback ('#' for default)
+	 * @param boolean true to hide if no feedback ('#' for default)
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments
@@ -669,7 +669,7 @@ class Item extends DataObject
 			case 'feedbacks':
 				if( $hideifnone == '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display feedback / Leave a comment'); 
-				if( $zero == '#' ) $zero = T_('Send feeback');
+				if( $zero == '#' ) $zero = T_('Send feedback');
 				if( $one == '#' ) $one = T_('1 feedback');
 				if( $more == '#' ) $more = T_('% feedbacks'); 
 				break;
