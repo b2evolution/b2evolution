@@ -6,6 +6,173 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
+
+/*
+ * antispam_create(-)
+ *
+ * Insert a new abuse string into DB
+ */
+function antispam_create( $abuse_string )
+{
+	global $tableantispam, $querycount, $cache_antispam;
+	
+	// Cut the crap if the string is empty:
+	$abuse_string = trim( $abuse_string );
+	if( empty( $abuse_string ) ) return false;
+	
+	// Check if the string already is in the blacklist:
+	if( antispam_url($abuse_string) ) return false;
+	
+	// Insert new string into DB:
+	$sql ="INSERT INTO $tableantispam(domain) VALUES('$abuse_string')";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
+
+	// Insert into cache:
+	$cache_antispam[] = $abuse_string;
+
+	return true;
+}
+
+/*
+ * remove_ban(-)
+ *
+ * Remove a domain from the ban list
+ */
+function remove_ban( $string_ID )
+{
+	global $tableantispam, $querycount;
+
+	$sql ="DELETE FROM $tableantispam WHERE ID = '$string_ID'";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
+}
+
+
+/*
+ * list_antiSpam(-)
+ *
+ * Extract anti-spam
+ */
+function list_antiSpam()
+{
+	global 	$querycount, $tableantispam, $res_stats;
+
+	$sql = "SELECT * FROM $tableantispam ORDER BY domain ASC";
+	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
+	$querycount++;
+}
+
+/*
+ * antiSpam_ID(-)
+ */
+function antiSpam_ID()
+{
+	global $row_stats;
+	echo $row_stats['ID'];
+}
+
+/*
+ * antiSpam_domain(-)
+ */
+function antiSpam_domain()
+{
+	global $row_stats;
+	echo $row_stats['domain'];
+}
+
+/*
+ * keyword_ban(-)
+ *
+ * Ban any URL containing a certain keyword
+ */
+function keyword_ban( $keyword )
+{
+	global $tablehitlog, $tablecomments, $querycount, $deluxe_ban, $auto_report_abuse;
+
+	// Cut the crap if the string is empty:
+	$keyword = trim( $keyword );
+	if( empty( $keyword ) ) return false;
+
+	echo '<div class="panelinfo">';
+	printf( '<p>'.T_('Banning the keyword %s...').'</p>', $keyword);
+
+	// Insert into DB:
+	antispam_create( $keyword );
+		
+	if ( $deluxe_ban )
+	{ // Delete all banned comments and stats entries
+		echo '<p>'.T_('Removing all related comments and hits...').'</p>';
+		// Stats entries first
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
+		
+		// Then comments
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%'";	// This is quite drastic!
+		$querycount++;
+		mysql_query($sql) or mysql_oops( $sql );
+	}
+	
+	echo '</div>';
+	
+	// Report this keyword as abuse:
+	if( $auto_report_abuse )
+	{
+		b2evonet_report_abuse( $keyword );
+	}
+}
+
+
+/*
+ * ban_affected_hits(-)
+ */
+function ban_affected_hits($banned, $type)
+{
+	global  $querycount, $tablehitlog, $res_affected_hits;
+
+	switch( $type )
+	{
+		case "hit_ID":
+			$domain = get_domain_from_hit_ID($banned);
+			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain = '$domain' ORDER BY baseDomain ASC";
+			break;
+		case "keyword":
+		default:
+			// Assume it's a keyword
+			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
+			break;
+	}
+	$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
+	$querycount++;
+}
+
+/*
+ * ban_affected_comments(-)
+ */
+function ban_affected_comments($banned, $type)
+{
+	global  $querycount, $tablecomments, $res_affected_comments;
+
+	switch( $type )
+	{
+		case "hit_ID":
+			$domain = get_domain_from_hit_ID($banned);
+			$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$domain%' ORDER BY comment_date ASC";
+			break;
+		case "keyword":
+		default:
+			// Assume it's a keyword
+			$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$banned%' ORDER BY comment_date ASC";
+			break;
+	}
+	$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
+	$querycount++;
+}
+
+
+// -------------------- XML-RPC callers ---------------------------
+
 /*
  * b2evonet_report_abuse(-)
  *
