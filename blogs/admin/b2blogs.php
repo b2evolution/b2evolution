@@ -208,7 +208,11 @@ switch($action)
 				$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 				$blog_notes = format_to_post( $blog_notes, 0, 0 );
 
-				if( $DB->get_var( "SELECT COUNT(*)
+				if( empty($blog_stub) )
+				{	// Stub name is empty
+					errors_add( T_('You must provide an URL blog name / Stub name!') );
+				}
+				else if( $DB->get_var( "SELECT COUNT(*)
 														FROM $tableblogs
 														WHERE blog_stub = ".$DB->quote($blog_stub)."
 															AND blog_ID <> ".$edited_Blog->ID ) )
