@@ -110,7 +110,7 @@
 			<div class="bSmallHead">
 				<?php 
 					echo '<strong>';
-					the_time('Y-m-d @ H:i:s');
+					the_time( locale_datefmt().' @ '.locale_timefmt() );
 					echo '</strong>';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo ' ', T_('by'), ' ';
