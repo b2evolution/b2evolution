@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-13 13:54+0200\nPO-Revision-Date: 2004-05-13 14:00+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-13 17:31+0200\nPO-Revision-Date: 2004-05-13 17:35+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",
@@ -91,6 +91,7 @@ $trans['fr_FR'] = array(
 	'Permissions' => "Permissions",
 	'Advanced' => "Options avancées",
 	'Updating Blog [%s]...' => "Mise à jour du blog [%s]...",
+	'You must provide an URL blog name / Stub name!' => "Vous devez entrer un 'Nom URL du blog / fichier stub' !",
 	'Cannot update, please correct these errors:' => "Impossible de mettre à jour, veuillez corriger ces erreurs:",
 	'Delete blog [%s]?' => "Supprimer le blog [%s]?",
 	'Deleting this blog will also delete all its categories, posts and comments!' => "Supprimer ce blog supprimera également toutes ses catégories, articles et commentaires!",

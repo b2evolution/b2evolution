@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 13:58+0200\n"
+"POT-Creation-Date: 2004-05-13 17:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -482,7 +482,7 @@ msgid "Creating blog..."
 msgstr ""
 
 #: C:\www\b2evolution\blogs\admin\b2blogs.php:60
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:216
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:220
 msgid ""
 "This URL blog name / Stub name is already in use by another blog. Choose "
 "another name."
@@ -509,8 +509,8 @@ msgid "New blog"
 msgstr ""
 
 #: C:\www\b2evolution\blogs\admin\b2blogs.php:164
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:297
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:324
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:301
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:328
 #: C:\www\b2evolution\blogs\admin\b2options.php:25
 #: C:\www\b2evolution\blogs\admin\b2options.php:429
 #: C:\www\b2evolution\blogs\admin\_users_groupform.php:72
@@ -518,14 +518,14 @@ msgid "General"
 msgstr ""
 
 #: C:\www\b2evolution\blogs\admin\b2blogs.php:167
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:300
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:330
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:304
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:334
 msgid "Permissions"
 msgstr ""
 
 #: C:\www\b2evolution\blogs\admin\b2blogs.php:170
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:303
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:336
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:307
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:340
 msgid "Advanced"
 msgstr ""
 
@@ -534,75 +534,79 @@ msgstr ""
 msgid "Updating Blog [%s]..."
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:219
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:213
+msgid "You must provide an URL blog name / Stub name!"
+msgstr ""
+
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:223
 #: C:\www\b2evolution\blogs\admin\edit_actions.php:213
 msgid "Cannot update, please correct these errors:"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:412
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:416
 #, php-format
 msgid "Delete blog [%s]?"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:414
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:418
 msgid ""
 "Deleting this blog will also delete all its categories, posts and comments!"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:416
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:420
 #: C:\www\b2evolution\blogs\admin\b2users.php:323
 #: C:\www\b2evolution\blogs\admin\b2users.php:380
 msgid "THIS CANNOT BE UNDONE!"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:429
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:433
 #, php-format
 msgid "Also try to delete stub file [<strong><a %s>%s</a></strong>]"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:437
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:441
 #, php-format
 msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:443
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:447
 #: C:\www\b2evolution\blogs\admin\b2users.php:331
 #: C:\www\b2evolution\blogs\admin\b2users.php:388
 msgid "I am sure!"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:446
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:450
 #: C:\www\b2evolution\blogs\admin\b2users.php:334
 #: C:\www\b2evolution\blogs\admin\b2users.php:391
 msgid "CANCEL"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:478
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:482
 #, php-format
 msgid "Generating static page for blog [%s]"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:487
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:491
 msgid "You haven't set a static filename for this blog!"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:534
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:538
 msgid "File cannot be written!"
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:535
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:539
 #, php-format
 msgid ""
 "You should check the file permissions for [%s]. See <a %s>online manual on "
 "file permissions</a>."
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:541
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:545
 #, php-format
 msgid "Writing to file [%s]..."
 msgstr ""
 
-#: C:\www\b2evolution\blogs\admin\b2blogs.php:545
+#: C:\www\b2evolution\blogs\admin\b2blogs.php:549
 #: C:\www\b2evolution\blogs\admin\edit_actions.php:131
 #: C:\www\b2evolution\blogs\admin\edit_actions.php:248
 #: C:\www\b2evolution\blogs\admin\edit_actions.php:338

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 13:54+0200\n"
+"POT-Creation-Date: 2004-05-13 17:31+0200\n"
 "PO-Revision-Date: 2004-05-11 22:10+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: b2evolution <>\n"
@@ -320,6 +320,10 @@ msgstr "Geavanceerd"
 #, php-format
 msgid "Updating Blog [%s]..."
 msgstr "Bijwerken weblog [%s]..."
+
+#, fuzzy
+msgid "You must provide an URL blog name / Stub name!"
+msgstr "URL weblog naam / Stub naam"
 
 msgid "Cannot update, please correct these errors:"
 msgstr "Kan niet bijwerken, los deze problemen op:"

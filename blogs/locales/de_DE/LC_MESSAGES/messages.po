@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 13:54+0200\n"
+"POT-Creation-Date: 2004-05-13 17:31+0200\n"
 "PO-Revision-Date: 2004-05-13 00:01+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -322,6 +322,10 @@ msgstr "Erweitert"
 #, php-format
 msgid "Updating Blog [%s]..."
 msgstr "Aktualisiere Blog [%s]..."
+
+#, fuzzy
+msgid "You must provide an URL blog name / Stub name!"
+msgstr "URL Blog-Name / Stub-Name"
 
 msgid "Cannot update, please correct these errors:"
 msgstr "Kann nicht aktualisieren, bitte berichtige diese Fehler:"

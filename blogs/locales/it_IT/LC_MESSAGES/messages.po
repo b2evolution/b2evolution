@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-13 13:54+0200\n"
+"POT-Creation-Date: 2004-05-13 17:31+0200\n"
 "PO-Revision-Date: 2004-04-11 22:15+0100\n"
 "Last-Translator: Matteo Lenardon <freshprz@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -331,6 +331,10 @@ msgstr "Opzioni avanzate"
 #, fuzzy, php-format
 msgid "Updating Blog [%s]..."
 msgstr "Aggiornamento post..."
+
+#, fuzzy
+msgid "You must provide an URL blog name / Stub name!"
+msgstr "Devi loggarti prima!"
 
 msgid "Cannot update, please correct these errors:"
 msgstr "Impossibile aggiornare, correggi questi errori:"
