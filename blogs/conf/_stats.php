@@ -104,6 +104,7 @@ $search_engines = array(
 	'64.233.167.104',
 	'seek.3721.com',
 	'http://netscape.',
+	'http://www.netscape.',
 	'/searchresults/',
 	'/websearch?',
 	'http://results.',

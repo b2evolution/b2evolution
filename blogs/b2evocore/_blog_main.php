@@ -4,7 +4,9 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/}.
+ * Parts of this file are copyright (c)2004 by Jeff BEARER.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,7 +28,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: François PLANQUE
  * @author blueyed: Daniel HAHLER
  * @author jeffbearer: Jeff BEARER
  *
