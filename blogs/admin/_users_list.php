@@ -44,7 +44,7 @@
 		$query = "SELECT grp_ID FROM $tablegroups, $tableusers
 							WHERE user_grp_ID = grp_ID
 							GROUP BY grp_ID";
-		$usedgroups = explode(',', $DB->get_list($query));
+		$usedgroups = $DB->get_col($query);
 
 		foreach( $userlist as $row )
 		{	// For each line (can be a user/group or just an empty group)
