@@ -163,7 +163,7 @@ function filter_hit()
 function log_hit()
 {
 	global $DB, $localtimenow, $blog;
-	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI;
+	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
 	global $HTTP_USER_AGENT, $hit_type, $Debuglog;
 	global $stats_autoprune;
 
