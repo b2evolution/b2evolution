@@ -19,11 +19,12 @@ require_once (dirname(__FILE__)."/$conf_dirout/$core_subdir/_functions_locale.ph
 
 # Supported languages for posts:
 $languages = array(
+	'nl' => NT_('Dutch'),
 	'en' => NT_('English'),
 	'fr' => NT_('French'),
 	'ja' => NT_('Japanese'),
-	'nl' => NT_('Dutch'),
 	'pt' => NT_('Portuguese'),
+	'es' => NT_('Spanish'),
 	'sv' => NT_('Swedish'),
 	);
 
@@ -48,14 +49,14 @@ $locales = array(
 									'datefmt' => 'm/d/y',	
 									'timefmt' => 'h:i:s a',	
 								),
-	'fr_FR' => array( // French	
+	'es_ES' => array(	// Spanish, SPAIN
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
 								),
-	'nl_NL' => array( // Dutch
+	'fr_FR' => array( // French	
 									'charset' => 'iso-8859-1',
-									'datefmt' => 'd-m-y',
+									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',	
 								),
 	'ja_JP' => array(	// Japanese
@@ -63,9 +64,9 @@ $locales = array(
 									'datefmt' => 'Y/m/d',
 									'timefmt' => 'H:i:s',
 								),
-	'pt_BR' => array(	// Portuguese, BRAZIL
+	'nl_NL' => array( // Dutch
 									'charset' => 'iso-8859-1',
-									'datefmt' => 'd/m/y',
+									'datefmt' => 'd-m-y',
 									'timefmt' => 'H:i:s',	
 								),
 	'sv_SE' => array( // Sweedish, SWEDEN	
