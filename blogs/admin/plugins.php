@@ -37,7 +37,6 @@
  */
 require( dirname(__FILE__). '/_header.php' );
 $AdminUI->setPath( 'options', 'plugins' );
-$admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Plug-ins');
 
 param( 'action', 'string' );
 
@@ -52,7 +51,7 @@ $current_User->check_perm( 'options', 'view', true );
 $AdminUI->dispSubmenu();
 // Begin payload block:
 $AdminUI->dispPayloadBegin();
- 
+
 
 // Discover additional plugins:
 $AvailablePlugins = & new Plugins();

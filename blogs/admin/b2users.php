@@ -67,7 +67,7 @@ else switch ($action)
 		}
 		else
 		{ // we use an empty user
-			$edited_User = & new User(); // daniel, why would we remove the & here ?
+			$edited_User = & new User();
 		}
 
 		break;

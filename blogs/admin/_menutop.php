@@ -6,6 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @todo Let the {@link AdminUI_general AdminUI} object handle this.
  * @package admin
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -15,7 +16,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $app_shortname.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
+	<title><?php echo $AdminUI->getHtmlTitle(); ?></title>
 
 	<?php
 	echo $AdminUI->getHeadlines();
@@ -341,6 +342,17 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <?php
 
 // Include title, menu, etc.
-require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_body_top.php';
+echo $AdminUI->getBodyTop();
+
+
+/* TODO: move to AdminUI */
+if( $Messages->count() )
+{ // display errors
+	?>
+	<div class="panelinfo">
+	<?php $Messages->display(); ?>
+	</div>
+	<?php
+}
 
 ?>

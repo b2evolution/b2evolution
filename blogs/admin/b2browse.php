@@ -18,7 +18,7 @@ $itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_',
 $itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 
 $AdminUI->setPath( 'edit' );
-$admin_pagetitle = $admin_pagetitle_titlearea = T_('Browse blog:');
+$AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 param( 'blog', 'integer', 0 );
 
 if( $blog == 0 )
@@ -51,7 +51,7 @@ if( $blog != 0 )
 // Generate available blogs list:
 $blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?blog=%d' );
 
-require (dirname(__FILE__). '/_menutop.php');
+require( dirname(__FILE__).'/_menutop.php' );
 
 if( $blog == 0 )
 { // No blog could be selected
@@ -75,8 +75,9 @@ else
 	$dbtable = 'T_posts';
 	$dbprefix = 'post_';
 	$dbIDname = 'ID';
-	require dirname(__FILE__). '/_edit_showposts.php';
+
+	require dirname(__FILE__).'/_edit_showposts.php';
 }
 
-require( dirname(__FILE__). '/_footer.php' );
+require( dirname(__FILE__).'/_footer.php' );
 ?>

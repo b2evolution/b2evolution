@@ -6,6 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @todo Move to {@link AdminUI_general AdminUI} object.
  * @package admin
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -26,7 +27,6 @@ echo $AdminUI->getBodyBottom();
 
 <?php
 // CALL PLUGINS NOW:
-// TODO: clear terminology - AdminUI::getPageFooter() is the very last part!
 $Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
 
@@ -47,5 +47,7 @@ if( $AdminUI->getPath(0) == 'files' || $AdminUI->getPathRange(0,1) == array( 'bl
 
 debug_info();
 
-echo $AdminUI->getPageFooter();
 ?>
+
+</body>
+</html>

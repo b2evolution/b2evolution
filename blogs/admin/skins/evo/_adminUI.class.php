@@ -51,6 +51,39 @@ require_once( dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.clas
 class AdminUI extends AdminUI_general
 {
 	/**
+	 * Get the top of the HTML <body>.
+	 *
+	 * @uses getPageHead()
+	 * @return string
+	 */
+	function getBodyTop()
+	{
+		$r = '';
+
+		if( empty($mode) )
+		{ // We're not running in an special mode (bookmarklet, sidebar...)
+
+			$r .= $this->getPageHead();
+
+			// Display MAIN menu:
+			$r .= $this->getMenu().'
+
+			<div class="panelbody">
+			';
+		}
+
+		$r .= '
+
+		<div id="payload">
+		';
+
+		$r .= $this->getBloglistButtons( '<div id="TitleArea">', '</div>' );
+
+		return $r;
+	}
+
+
+	/**
 	 * Close open div(s).
 	 *
 	 * @return string

@@ -60,7 +60,7 @@ require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_hitlist.class.p
 
 
 $AdminUI->setPath( 'stats', param( 'tab', 'string', 'summary', true ) );
-$admin_pagetitle = T_('View Stats for Blog:');
+$AdminUI->title = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
 param( 'blog', 'integer', 0 );

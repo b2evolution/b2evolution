@@ -127,9 +127,11 @@ $AdminUI->addMenuEntries( NULL, // root
 																										'href' =>'fileset.php' ),
 																									'statuses' => array(
 																										'text' => T_('Post statuses'),
+																										'title' => T_('Post statuses management'),
 																										'href' => 'statuses.php'),
 																									'types' => array(
 																										'text' => T_('Post types'),
+																										'title' => T_('Post types management'),
 																										'href' => 'types.php'),
 																									'plugins' => array(
 																										'text' => T_('Plug-ins'),

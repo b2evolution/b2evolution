@@ -45,7 +45,6 @@
  */
 require( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'options', 'files' );
-$admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Files');
 
 param( 'action', 'string' );
 

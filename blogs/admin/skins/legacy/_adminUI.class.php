@@ -56,7 +56,7 @@ class AdminUI extends AdminUI_general
 	 * @param string The template name ('main', 'sub').
 	 * @return array
 	 */
-	function getMenuTemplate( $name, $depth )
+	function getMenuTemplate( $name, $depth = 0 )
 	{
 		switch( $name )
 		{
@@ -78,6 +78,67 @@ class AdminUI extends AdminUI_general
 			default: // delegate to parent
 				return parent::getMenuTemplate( $name, $depth );
 		}
+	}
+
+
+	/**
+	 * GLOBAL HEADER - APP TITLE, LOGOUT, ETC.
+	 *
+	 * @return string
+	 */
+	function getPageHead()
+	{
+		$r = '
+		<div id="header">
+			'.$this->admin_logo.'
+
+			<div id="headfunctions">
+				'.T_('Style:').'
+				<a href="#" onclick="setActiveStyleSheet(\'Variation\'); return false;" title="Variation (Default)">V</a>'
+				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Desert\'); return false;" title="Desert">D</a>'
+				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
+				.( is_file( dirname(__FILE__).'/custom.css' ) ? '&middot;<a href="#" onclick="setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
+				.'
+				&bull;
+				'.$this->exit_links.'
+			</div>
+
+			<div id="headinfo">'.$this->getHeadInfo().'</div>'
+
+			// Display MAIN menu:
+			.$this->getMenu().'
+		</div>
+		';
+
+		return $r;
+	}
+
+
+	/**
+	 *
+	 *
+	 * @return string
+	 */
+	function getBodyTop()
+	{
+		$r = '';
+
+		if( empty($mode) )
+		{ // We're not running in an special mode (bookmarklet, sidebar...)
+			$r .= $this->getPageHead();
+		}
+
+		$r .= '
+			<div id="TitleArea">
+				<h1><strong>'.$this->getTitleForTitlearea().'</strong>
+				'.$this->getBloglistButtons( '', '' ).'
+				</h1>
+			</div>
+
+			<div class="panelbody">'
+			."\n\n";
+
+		return $r;
 	}
 
 

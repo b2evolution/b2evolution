@@ -236,7 +236,7 @@ switch($action)
 		}
 
 		echo '<div class="panelblock">';
-		echo '<h2>', T_('New blog'), ':</h2>';
+		echo '<h2>'.T_('New blog').':</h2>';
 
 		$next_action = 'create';
 		require( dirname(__FILE__).'/_blogs_general.form.php' );
@@ -567,6 +567,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.32  2005/03/06 19:58:27  blueyed
+ * admin UI refactoring, part deux
+ *
  * Revision 1.31  2005/03/04 20:14:31  fplanque
  * moved blog list generation to a unique AdminUI method
  *

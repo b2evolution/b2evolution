@@ -1,7 +1,7 @@
 <?php
 /**
  * This file implements the Admin UI class.
- * Admin skins should derive from this class and override {@link getTemplate()}
+ * Admin skins should derive from this class and override {@link getMenuTemplate()}
  * for example.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
@@ -42,7 +42,13 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-// fp>>daniel: I don't think this is a widget!
+/**
+ * The general Admin UI class. It provides functions to handle the UI part of the
+ * Backoffice.
+ *
+ * Admin skins should derive from this class and override {@link getMenuTemplate()}
+ * for example.
+ */
 class AdminUI_general
 {
 	/**
@@ -62,6 +68,36 @@ class AdminUI_general
 	 */
 	var $path = array();
 
+	/**
+	 * Visual path seperator (used in html title, ..)
+	 * @var string
+	 */
+	var $pathSeperator = ' :: ';
+
+	/**
+	 * The Logo for the admin (build in constructor).
+	 * @var string
+	 */
+	var $admin_logo;
+
+	/**
+	 * The Logout/Exit-to-blogs links (build in constructor).
+	 * @var string
+	 */
+	var $exit_links;
+
+	/**
+	 * The explicit title for the page.
+	 * @var string
+	 */
+	var $title;
+
+	/**
+	 * The explicit title for the titlearea (<h1>).
+	 * @var string
+	 */
+	var $title_titlearea;
+
 
 	/**
 	 * Constructor.
@@ -71,7 +107,19 @@ class AdminUI_general
 	function AdminUI()
 	{
 		global $mode; // TODO: make it a real property
+		global $htsrv_url, $baseurl;
+
 		$this->mode = $mode;
+
+		$this->admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
+												.'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'
+												.T_("visit b2evolution's website").'" width="185" height="40" /></a>';
+		$this->exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+											&bull;
+											<a href="'.$baseurl.'">'.T_('Exit to blogs').'
+											<img src="img/close.gif" width="14" height="14" class="top" alt="" title="'
+											.T_('Exit to blogs').'" /></a><br />';
+
 
 		$this->initTemplates();
 	}
@@ -86,25 +134,116 @@ class AdminUI_general
 
 
 	/**
-	 * Displays a menu, any level.
+	 * Get the title of the page.
 	 *
-	 * @param f*g undocumented, NULL will display main menu
-	 * @param f*g undocumented {@link what?}
 	 * @return
 	 */
-	function dispMenu( $path = NULL, $template = 'main' )
+	function getTitle()
 	{
-		//echo ' dispMenu-BEGIN ';
-		echo $this->getHtmlMenuEntries( $path, $template );
-		//echo ' dispMenu-END ';
+		if( isset($this->title) )
+		{
+			return $this->title;
+		}
+
+		return implode( $this->pathSeperator,
+										$this->getPropertiesForPath( $this->path, array( 'title', 'text' ) ) );
+	}
+
+
+	/**
+	 * Get the title for the titlearea (<h1>). Falls back to {@link getTitle()}.
+	 *
+	 * @return
+	 */
+	function getTitleForTitlearea()
+	{
+		$r = $this->pathSeperator;
+
+		if( isset( $this->title_titlearea ) )
+		{
+			$r .= $this->title_titlearea;
+		}
+		else
+		{
+			$r .= $this->getTitle();
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Get the title for HTML <head>'s <title> tag.
+	 *
+	 * @return string
+	 */
+	function getHtmlTitle()
+	{
+		global $app_shortname;
+		return $app_shortname
+						.$this->pathSeperator.preg_replace( '/:$/', '', strip_tags( $this->getTitle() ) );
+	}
+
+
+	/**
+	 * Get a list of properties for a given path. The property names must be given in
+	 * $propertyByPreference, ordered by preference.
+	 *
+	 * @param string|array The path. See {@link getNode()}.
+	 * @param array Name of the property to receive, by priority.
+	 * @return array List of the properties.
+	 */
+	function getPropertiesForPath( $path, $propertyByPreference )
+	{
+		if( !is_array($path) )
+		{
+			$path = array( $path );
+		}
+		$r = array();
+
+		$prevPath = array();
+		foreach( $path as $lPath )
+		{
+			$node =& $this->getNode( array_merge( $prevPath, $lPath ) );
+
+			foreach( $propertyByPreference as $lProp )
+			{
+				if( isset($node[$lProp]) )
+				{
+					$r[] = $node[$lProp];
+					break;
+				}
+			}
+
+			$prevPath[] = $lPath;
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Displays a menu, any level.
+	 *
+	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param string The template name, see {@link getMenuTemplate()}.
+	 */
+	function getMenu( $path = NULL, $template = 'main' )
+	{
+		/* debug:
+		$r = ' dispMenu-BEGIN ';
+		$r .= $this->getHtmlMenuEntries( $path, $template );
+		$r .= ' dispMenu-END ';
+		return $r;
+		*/
+		return $this->getHtmlMenuEntries( $path, $template );
 	}
 
 
 	/**
 	 * Display a submenu (1st sublevel).
 	 *
-	 * @param array|NULL Path of the menu to display.
-	 * @return
+	 * @param NULL|string|array The path (NULL defaults to first path entry). See {@link getNode()}.
 	 */
 	function dispSubmenu( $path = NULL )
 	{
@@ -115,9 +254,9 @@ class AdminUI_general
 			$path = array( $this->getPath(0) );
 		}
 
-		$this->dispMenu( $path, 'sub' );
+		echo $this->getMenu( $path, 'sub' );
 
-  	//echo ' dispSubmenu-END ';
+		//echo ' dispSubmenu-END ';
 	}
 
 
@@ -194,7 +333,7 @@ class AdminUI_general
 
 			if( ! is_null($onclick) )
 			{	// We want to include an onclick attribute:
-				$html .= ' onclick="'.sprintf( $onclick, $curr_blog_ID ).'"';
+				$r .= ' onclick="'.sprintf( $onclick, $curr_blog_ID ).'"';
 			}
 
 			$r .= '>'.blog_list_iteminfo( 'shortname', false ).'</a> ';
@@ -211,7 +350,9 @@ class AdminUI_general
 	/**
 	 * Get the HTML for the menu entries of a specific path.
 	 *
-	 * @return string
+	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param string Template name, see {@link getMenuTemplate()}.
+	 * @return string The HTML for the menu.
 	 */
 	function getHtmlMenuEntries( $path, $template, $depth = 0 )
 	{
@@ -295,9 +436,10 @@ class AdminUI_general
 
 
 	/**
+	 * Add menu entries to a given path.
 	 *
-	 *
-	 * @return
+	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param array Menu entries to add.
 	 */
 	function addMenuEntries( $path, $entries )
 	{
@@ -314,13 +456,14 @@ class AdminUI_general
 
 
 	/**
+	 * Get menu entries for a given path.
 	 *
-	 *
-	 * @return array
+	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @return array The menu entries (may be empty).
 	 */
-	function getMenuEntries( $node )
+	function getMenuEntries( $path )
 	{
-		$node =& $this->getNode( $node );
+		$node =& $this->getNode( $path );
 
 		return isset( $node['entries'] ) ? $node['entries'] : array();
 	}
@@ -329,6 +472,7 @@ class AdminUI_general
 	/**
 	 * Get the key of a selected entry for a path.
 	 *
+	 * @param NULL|string|array The path. See {@link getNode()}.
 	 * @return string|false
 	 */
 	function getSelected( $path )
@@ -347,7 +491,9 @@ class AdminUI_general
 	/**
 	 * Get the reference of a node from the menu entries using a path.
 	 *
-	 * @param array|string|NULL The path.
+	 * @param array|string|NULL The path. NULL means root, string means child of root,
+	 *                          array means path below root.
+	 *                          (eg <code>array('options', 'general')</code>).
 	 * @return array
 	 */
 	function & getNode( $path, $createIfNotExisting = false )
@@ -391,9 +537,10 @@ class AdminUI_general
 	 * fp>>I'm not so sure about this... feels a little bloated... gotta think about it..
 	 *
 	 * @todo fp>>daniel does this work for menus only? Can we generalize it to getTemplate?
+	 * @todo daniel>>fp It was getTemplate() before, but I thought it may be better to split it into different functions (for menu, ..)
 	 *
 	 * @param string Name of the template ('main', 'sub')
-	 * @param integer nesting level (start at 0)
+	 * @param integer Nesting level (start at 0)
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
 	function getMenuTemplate( $name, $depth = 0 )
@@ -481,9 +628,7 @@ class AdminUI_general
 
 
 	/**
-	 * Set a headline for HTML head.
-	 *
-	 * @return
+	 * Add a headline for HTML <head>.
 	 */
 	function addHeadline( $headline )
 	{
@@ -492,7 +637,7 @@ class AdminUI_general
 
 
 	/**
-	 * Output the headlines.
+	 * Get the headlines for HTML <head>.
 	 */
 	function getHeadlines()
 	{
@@ -555,9 +700,9 @@ class AdminUI_general
 
 
 	/**
+	 * Set $key as the $nr'th path key.
 	 *
-	 *
-	 * @return
+	 * Also marks the parent node as selected
 	 */
 	function setPathByNr( $key, $nr = 0 )
 	{
@@ -577,8 +722,7 @@ class AdminUI_general
 
 	/**
 	 *
-	 *
-	 * @return
+	 * @uses setPathByNr()
 	 */
 	function setPathArray( $pathArray )
 	{
@@ -592,7 +736,7 @@ class AdminUI_general
 	/**
 	 *
 	 * @param string,... the keys for the path
-	 * @return
+	 * @uses setPathByNr()
 	 */
 	function setPath()
 	{
@@ -607,7 +751,18 @@ class AdminUI_general
 
 
 	/**
-	 * Close open divs, etc...
+	 * Get the top of the HTML <body>.
+	 *
+	 * @return string
+	 */
+	function getBodyTop()
+	{
+		return '';
+	}
+
+
+	/**
+	 * Get the end of the HTML <body>. Close open divs, etc...
 	 *
 	 * @return string
 	 */
@@ -618,14 +773,58 @@ class AdminUI_general
 
 
 	/**
-	 * Get the footer of the admin page.
+	 * GLOBAL HEADER - APP TITLE, LOGOUT, ETC.
+	 *
+	 * @return
+	 */
+	function getPageHead()
+	{
+		global $app_version, $current_User;
+
+		$r = '
+		<div id="header">
+			'.$this->admin_logo.'
+
+			<div id="headinfo">
+				<span id="headfunctions">
+					'.$this->exit_links.'
+				</span>
+
+				b2evo v <strong>'.$app_version.'</strong>
+				&middot; '.$this->getHeadInfo().'
+			</div>
+
+			<h1>'.$this->getTitleForTitlearea().'</h1>
+		</div>
+		';
+
+		return $r;
+	}
+
+
+	/**
+	 * Get default head info (local time, GMT, Login).
 	 *
 	 * @return string
 	 */
-	function getPageFooter()
+	function getHeadInfo()
 	{
-		return "\n\n</body>\n</html>";
+		global $obhandler_debug, $localtimenow, $servertimenow, $current_User;
+
+		$r = '';
+
+		if( !$obhandler_debug )
+		{ // don't display changing time when we want to test obhandler
+			$r .= "\n".T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
+						.' &middot; <acronym title="'.T_('Greenwich Mean Time ').'">'
+						./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
+						.' &middot; '.T_('Logged in as:').' <strong>'.$current_User->dget('login').'</strong>'
+						."\n";
+		}
+
+		return $r;
 	}
+
 }
 
 ?>

@@ -38,8 +38,8 @@ switch($action)
 		$blog = get_catblog($cat);
 		$Blog = Blog_get_by_ID( $blog );
 
-		$admin_pagetitle = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
-		$admin_pagetitle_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
+		$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
+		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 		require (dirname(__FILE__). '/_menutop.php');
 
 		$post_status = $edited_Item->get( 'status' );
@@ -71,7 +71,7 @@ switch($action)
 		param( 'comment', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment );
 
-		$admin_pagetitle = T_('Editing comment').' #'.$edited_Comment->ID;
+		$AdminUI->title = T_('Editing comment').' #'.$edited_Comment->ID;
 		require (dirname(__FILE__).'/_menutop.php');
 
 		$blog = $edited_Comment->Item->blog_ID;
@@ -92,7 +92,7 @@ switch($action)
 		 */
 		param( 'blog', 'integer', 0 );
 
-		$admin_pagetitle = $admin_pagetitle_titlearea = T_('New post in blog:');
+		$AdminUI->title = $AdminUI->title_titlearea = T_('New post in blog:');
 
 
 		if( $blog == 0 )

@@ -14,7 +14,7 @@
  */
 require_once( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'cats' );
-$admin_pagetitle = $admin_pagetitle_titlearea = T_('Categories for blog:');
+$AdminUI->title = $AdminUI->title_titlearea = T_('Categories for blog:');
 param( 'action', 'string' );
 param( 'blog', 'integer', 0 );
 
@@ -24,7 +24,6 @@ if( $action != 'addcat' && $action != 'editedcat' )
 
 	// Generate available blogs list:
 	$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
-
 
 	require(dirname(__FILE__) . '/_menutop.php');
 }

@@ -53,7 +53,6 @@ require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_antispam.funcs.php');
 
 $AdminUI->setPath( 'antispam' );
-$admin_pagetitle = T_('Antispam');
 
 param( 'action', 'string' );
 param( 'confirm', 'string' );
