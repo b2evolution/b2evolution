@@ -47,6 +47,18 @@ switch($action)
 		param( 'post_category', 'integer', true );
 		$blog = get_catblog( $post_category ); 
 		$blogparams = get_blogparams_by_ID( $blog );
+		param( 'mode', 'string', '' );
+		switch($mode)
+		{
+			case 'sidebar':
+				$location="b2sidebar.php?a=b&blog=$blog";
+				break;
+
+			default:
+				$location="b2browse.php?blog=$blog";
+				break;
+		}
+
 		$admin_pagetitle = T_('Adding new post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
@@ -91,9 +103,10 @@ switch($action)
 
 		if( errors() )
 		{
-			$status_action = errors_display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ,
-				false);
+			echo '<div class="panelinfo">';
+			errors_display( T_('Cannot post, please correct these errors:'),
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
+			echo '</div>';
 			break;
 		}
 
@@ -115,7 +128,7 @@ switch($action)
 			flush();
 			sleep($sleep_after_edit);
 		}
-		echo '<p>', T_('Done.'), "</p>\n";
+		echo '<p>', T_('Posting Done...'), "</p>\n";
 		echo "</div>\n";
 
 		if( $post_status != 'published' )
@@ -137,19 +150,6 @@ switch($action)
 			pingTechnorati($blogparams);
 		}
 
-		param( 'mode', 'string', '' );
-		switch($mode)
-		{
-			case 'sidebar':
-				$location="b2sidebar.php?a=b&blog=$blog";
-				break;
-
-			default:
-				$location="b2browse.php?blog=$blog";
-				break;
-		}
-
-		$status_action = T_('Posting Done...');
 		break;
 
 
@@ -161,6 +161,7 @@ switch($action)
 		param( 'post_category', 'integer', true );
 		$blog = get_catblog($post_category); 
 		$blogparams = get_blogparams_by_ID( $blog );
+		$location = 'b2browse.php?blog='. $blog;
 
 		$admin_pagetitle = T_('Updating post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
@@ -208,14 +209,15 @@ switch($action)
 
 		if( errors() )
 		{
-			$status_action = errors_display( T_('Cannot update, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ,
-				false);
+			echo '<div class="panelinfo">';
+			errors_display( T_('Cannot update, please correct these errors:'),
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
+			echo '</div>';
 			break;
 		}
 
 		echo "<div class=\"panelinfo\">\n";
-		echo "<h3>Updating post...</h3>\n";
+		echo '<h3>'.T_('Updating post...')."</h3>\n";
 
 		// We need to check the previous flags...
 		$post_flags = $postdata['Flags'];
@@ -234,17 +236,15 @@ switch($action)
 
 		// UPDATE POST IN DB:
 		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats,
-								 	$post_status, $post_locale, '',	$post_autobr, $pingsdone, $post_urltitle, 
+									$post_status, $post_locale, '',	$post_autobr, $pingsdone, $post_urltitle, 
 									$post_url, $post_comments, $post_renderers ) or mysql_oops($query);
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
-			echo "<p>Sleeping...</p>\n";
+			echo '<p>'.T_('Sleeping...')."</p>\n";
 			flush();
 			sleep($sleep_after_edit);
 		}
-		echo '<p>', T_('Done.'), "</p>\n";
-		echo "</div>\n";
 
 		if( $post_status != 'published' )
 		{
@@ -277,9 +277,9 @@ switch($action)
 			}
 		}
 
-		$status_action = T_('Updating done...');
+		echo '<p>', T_('Updating done...'), "</p>\n";
+		echo "</div>\n";
 
-		$location = 'b2browse.php?blog='. $blog;
 		break;
 
 
@@ -293,6 +293,7 @@ switch($action)
 		$post_cat =$postdata['Category'];
 		$blog = get_catblog($post_cat); 
 		$blogparams = get_blogparams_by_ID( $blog );
+		$location = 'b2browse.php?blog=' . $blog;
 
 		$admin_pagetitle = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
@@ -366,7 +367,6 @@ switch($action)
 
 		$status_action = T_('Updating done...');
 
-		$location = 'b2browse.php?blog=' . $blog;
 		break;
 
 
@@ -375,15 +375,20 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * DELETE a post from db
 		 */
-		param( 'post', 'integer' );
-		// echo $post;
-		$postdata = get_postdata( $post ) or die( T_('Oops, no post with this ID!') );
-		$blog = get_catblog( $postdata['Category'] );
-		$blogparams = get_blogparams_by_ID( $blog );
-
 		$admin_pagetitle = T_('Deleting post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
+
+		param( 'post', 'integer' );
+		// echo $post;
+		if( ! ($postdata = get_postdata( $post )) )
+		{
+			echo '<div class="panelinfo"><p class="error">'.( T_('Oops, no post with this ID!') ).'</p></div>';
+			break;
+		}
+		$blog = get_catblog( $postdata['Category'] );
+		$blogparams = get_blogparams_by_ID( $blog );
+		$location = 'b2browse.php?blog='.$blog;
 
 		// Check permission:
 		$current_User->check_perm( 'blog_del_post', '', true, $blog );
@@ -392,23 +397,27 @@ switch($action)
 		echo '<h3>', T_('Deleting post...'), "</h3>\n";
 
 		// DELETE POST FROM DB:
-		bpost_delete( $post );
-
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
-			echo '<p>', T_('Sleeping...'), "</p>\n";
-			flush();
-			sleep($sleep_after_edit);
+		if( bpost_delete( $post ) )
+		{
+			if( isset($sleep_after_edit) && $sleep_after_edit > 0 ){
+				echo '<p>', T_('Sleeping...'), "</p>\n";
+				flush();
+				sleep( $sleep_after_edit );
+			}
+			
+			echo '<p>'.T_('Deleting Done...')."</p>\n";
 		}
-		echo '<p>', T_('Done.'), "</p>\n";
+		else
+		{
+			echo '<p>'.T_('Error')."!</p>\n";
+		}
+
 		echo '</div>';
 		
-		$status_action = T_('Deleting Done...');
-
-		$location = 'b2browse.php?blog=' . $blog;
 		break;
 
 
-	case "editedcomment":
+	case 'editedcomment':
 		/*
 		 * --------------------------------------------------------------------
 		 * UPDATE comment in db:
@@ -488,36 +497,27 @@ switch($action)
 		die( 'Unknown action!' );
 }
 
-if( errors() )
+echo '<div class="panelinfo">';
+if( isset($location) )
 {
-	echo '<div class="panelinfo">';
-	if( isset( $status_action ) )
-	{
-		echo $status_action;
-	}
+	echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
+}
+
+if( empty( $mode ) )
+{	// Normal mode:
+	echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>';
 	echo '</div>';
+	// List the blogs:
+	require( dirname(__FILE__) . '/_blogs_list.php' );
 }
 else
-{
-	echo '<div class="panelinfo">';
-	echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
-	
-	if( empty( $mode ) )
-	{	// Normal mode:
-		echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>
-		</div>';
-		// List the blogs:
-		require( dirname(__FILE__) . '/_blogs_list.php' );
-	}
-	else
-	{	// Special mode:
-	?>
-		<p><strong>[<a href="b2edit.php?blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
-		</div>
-	<?php
-	}
-
+{	// Special mode:
+?>
+	<p><strong>[<a href="b2edit.php?blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
+<?php
 }
+
+echo '</div>';
 
 
 require( dirname(__FILE__) . '/_footer.php' );

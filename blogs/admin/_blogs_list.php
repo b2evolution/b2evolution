@@ -43,7 +43,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 			{
 				?>
-				<a href="b2blogs.php?action=edit&blog=<?php blog_list_iteminfo('ID') ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo  T_('Properties') ?>" />&nbsp;<?php blog_list_iteminfo('shortname'); ?></a>
+				<a href="b2blogs.php?action=edit&amp;blog=<?php blog_list_iteminfo('ID') ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo  T_('Properties') ?>" />&nbsp;<?php blog_list_iteminfo('shortname'); ?></a>
 				<?php
 			}
 			else

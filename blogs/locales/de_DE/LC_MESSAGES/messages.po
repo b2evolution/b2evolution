@@ -1338,7 +1338,7 @@ msgstr "Kann nicht gepostet werden, bitte korrigiere diese Fehler:"
 #: ..\..\..\admin\edit_actions.php:95 ..\..\..\admin\edit_actions.php:212
 #: ..\..\..\admin\edit_actions.php:442
 msgid "Back to post editing"
-msgstr "Zurück zum Editieren des Einträge"
+msgstr "Zurück zum Editieren des Eintrags"
 
 #: ..\..\..\admin\edit_actions.php:101
 msgid "Recording post..."

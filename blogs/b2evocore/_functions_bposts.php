@@ -211,17 +211,19 @@ function bpost_delete( $post_ID )
 
 	// TODO: START TRANSACTION
 
+
 	// delete extracats
 	$query = "DELETE FROM $tablepostcats WHERE postcat_post_ID = $post_ID";
-	if( ! $DB->query( $query ) ) return 0;
-
+	if( $DB->query( $query ) === false ) return 0;
+	
 	// delete comments
 	$query = "DELETE FROM $tablecomments WHERE comment_post_ID = $post_ID";
-	if( ! $DB->query( $query ) ) return 0;
+	if( $DB->query( $query ) === false ) return 0;
 
 	// delete post
 	$query = "DELETE FROM $tableposts WHERE ID = $post_ID";
-	if( ! $DB->query( $query ) ) return 0;
+	if( $DB->query( $query ) === false ) return 0;
+
 
 	// TODO: END TRANSACTION
 

@@ -292,7 +292,7 @@ class POP3 {
 			}
 			if(!$this->is_ok($reply))
 			{
-					$this->ERROR = T_('POP3 top:') . ' ' . T_('Error ') . "[$reply]";
+					$this->ERROR = T_('POP3 top:') . ' ' . T_('Error') . " [$reply]";
 					return false;
 			}
 
@@ -346,7 +346,7 @@ class POP3 {
 					}
 					if(!$this->is_ok($reply))
 					{
-							$this->ERROR = T_('POP3 pop_list:') . ' ' . T_('Error ') . "[$reply]";
+							$this->ERROR = T_('POP3 pop_list:') . ' ' . T_('Error') . " [$reply]";
 							return false;
 					}
 					list($junk,$num,$size) = explode(' ',$reply);

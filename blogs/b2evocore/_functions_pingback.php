@@ -37,7 +37,7 @@ function pingback(
 
 	if( ! $post_pingback )
 	{
-		if( $display ) echo '<p>', T_('No pingback to be done.'), '<p>', "\n";
+		if( $display ) echo '<p>', T_('No pingback to be done.'), '</p>', "\n";
 	}
 	else
 	{
