@@ -65,8 +65,17 @@ class DataObject
 	var $creator_field;
 	var $lasteditor_field;
 	var $dbchanges = array();
-	var $delete_restrictions = array();
 	/**#@-*/
+
+	/**
+	 * Relations that may restrict deletion.
+	 */
+ 	var $delete_restrictions = array();
+
+	/**
+	 * Relations that will cascade deletion.
+	 */
+ 	var $delete_cascades = array();
 
 	/**
 	 * Constructor
@@ -159,7 +168,7 @@ class DataObject
 						 WHERE $this->dbIDname = $this->ID";
 		//echo $sql;
 
-		$DB->query($sql);
+		$DB->query( $sql, 'DataObject::dbupdate()' );
 
 		// Reset changes in object:
 		$this->dbchanges = array();
@@ -227,7 +236,7 @@ class DataObject
 		$sql = "INSERT INTO {$this->dbtablename} (". implode( ', ', $sql_fields ). ") VALUES (". implode( ', ', $sql_values ). ")";
 		// echo $sql;
 
-		$DB->query($sql);
+		$DB->query( $sql, 'DataObject::dbinsert()' );
 
 		// store ID for newly created db record
 		$this->ID = $DB->insert_id;
@@ -260,40 +269,79 @@ class DataObject
 	 */
 	function dbdelete( )
 	{
-		global $DB;
+		global $DB, $Messages, $db_aliases;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
-		$query = "DELETE FROM $this->dbtablename
-							WHERE $this->dbIDname = $this->ID";
-		$DB->query($query);
+		if( count($this->delete_cascades ) )
+		{	// The are cascading deletes to be performed
+
+			// Start transaction:
+			$DB->begin();
+
+			foreach( $this->delete_cascades as $restriction )
+			{
+				if( !isset( $db_aliases[$restriction['table']] ) )
+				{	// We have no declaration for this table, we consider we don't deal with this table in this app:
+					continue;
+				}
+
+				$DB->query( 'DELETE FROM '.$restriction['table'].'
+											WHERE '.$restriction['fk'].' = '.$this->ID,
+										'Cascaded delete' );
+			}
+		}
+
+		// Delete this (main/parent) object:
+		$DB->query( "DELETE FROM $this->dbtablename
+									WHERE $this->dbIDname = $this->ID",
+								'Main delete' );
+
+		if( count($this->delete_cascades ) )
+		{	// The were cascading deletes
+
+			// End transaction:
+			$DB->commit();
+		}
 	}
 
 
 	/**
-	 * Check relations before deleting
-	 *
-	 * @return boolean true if no restriction prevents deletion
+	 * Check relations for restrictions or cascades
 	 */
-	function check_delete( $restrict_title )
+	function check_relations( $what )
 	{
 		global $DB, $Messages, $db_aliases;
 
-		foreach( $this->delete_restrictions as $restriction )
+		foreach( $this->$what as $restriction )
 		{
 			if( !isset( $db_aliases[$restriction['table']] ) )
 			{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 				continue;
 			}
-
 			$count = $DB->get_var( 'SELECT COUNT(*)
 																FROM '.$restriction['table'].'
-															 WHERE '.$restriction['fk'].' = '.$this->ID );
+															 WHERE '.$restriction['fk'].' = '.$this->ID,
+															0, 0, 'restriction/cascade check' );
 			if( $count )
 			{
 				$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
 			}
 		}
+	}
+
+
+	/**
+	 * Check relations for restrictions before deleting
+	 *
+	 * @return boolean true if no restriction prevents deletion
+	 */
+	function check_delete( $restrict_title )
+	{
+		global $Messages;
+
+		// Check restrictions:
+		$this->check_relations( 'delete_restrictions' );
 
 		if( $Messages->count('restrict') )
 		{	// There are restrictions:
@@ -314,9 +362,20 @@ class DataObject
 	 */
 	function confirm_delete( $confirm_title, $delete_action, $hiddens )
 	{
+		global $Messages;
+
 		// No restrictions, ask for confirmation:
 		echo '<div class="panelinfo">';
 		echo '<h2>'.$confirm_title.'</h2>';
+
+		$this->check_relations( 'delete_cascades' );
+
+		if( $Messages->count('restrict') )
+		{	// The will be cascading deletes, issue WARNING:
+			echo '<h3>'.T_('WARNING: Deleting this object will also delete:').'</h3>';
+			$Messages->display( '', '', true, 'restrict', NULL, NULL, NULL );
+		}
+
 		echo '<h3>'.T_('THIS CANNOT BE UNDONE!').'</h3>';
 
 		$Form = & new Form( '', '', 'get', '' );
@@ -465,8 +524,8 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
- * Revision 1.12  2005/02/17 19:36:23  fplanque
- * no message
+ * Revision 1.13  2005/02/18 19:16:15  fplanque
+ * started relation restriction/cascading handling
  *
  * Revision 1.11  2005/01/12 20:22:51  fplanque
  * started file/dataobject linking

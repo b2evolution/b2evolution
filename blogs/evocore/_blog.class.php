@@ -111,6 +111,17 @@ class Blog extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
 
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories') ),
+			);
+
+   	$this->delete_cascades = array(
+ 				// b2evo only:
+ 				array( 'table'=>'T_blogusers', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
+				// progidistri only: (those won't hurt)
+ 				array( 'table'=>'T_colluserrights', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
+			);
+
 		if( $db_row == NULL )
 		{
 			global $default_locale;
@@ -599,6 +610,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/18 19:16:14  fplanque
+ * started relation restriction/cascading handling
+ *
  * Revision 1.9  2005/01/06 15:45:35  blueyed
  * Fixes..
  *

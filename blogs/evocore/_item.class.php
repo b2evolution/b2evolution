@@ -155,6 +155,23 @@ class Item extends DataObject
 		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
 												$creator_field, $lasteditor_field );
 
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_links', 'fk'=>'link_item_ID', 'msg'=>T_('%d links to destination items') ),
+				array( 'table'=>'T_links', 'fk'=>'link_dest_item_ID', 'msg'=>T_('%d links to source items') ),
+ 				// b2evo only:
+ 				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
+				// progidistri only: (those won't hurt)
+				array( 'table'=>'T_tasks', 'fk'=>'tsk_parent_tsk_ID', 'msg'=>T_('%d links to child items') ),
+			);
+
+   	$this->delete_cascades = array(
+ 				// b2evo only:
+ 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
+				// progidistri only: (those won't hurt)
+ 				array( 'table'=>'T_taskcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
+				array( 'table'=>'T_tsk_tsel', 'fk'=>'tkts_tsk_ID', 'msg'=>T_('%d task selections') ),
+			);
+
 		$this->objtype = $objtype;
 		$this->typ_required = false;	// type NOT required
 		$this->st_required = false;	// extra status NOT required
@@ -1733,6 +1750,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2005/02/18 19:16:15  fplanque
+ * started relation restriction/cascading handling
+ *
  * Revision 1.19  2005/02/15 22:05:06  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *

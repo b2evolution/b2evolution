@@ -182,6 +182,10 @@ class File extends DataObject
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
 
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
+			);
+
 		$this->setName( $name );
 		$this->setDir( $dir );
 
@@ -737,6 +741,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/18 19:16:15  fplanque
+ * started relation restriction/cascading handling
+ *
  * Revision 1.20  2005/01/27 13:34:58  fplanque
  * i18n tuning
  *

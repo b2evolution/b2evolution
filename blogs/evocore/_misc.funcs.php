@@ -935,9 +935,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $default === true )
 		{
-			echo '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>';
-			if( ! $debug )
-				die();
+			die( '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>' );
 		}
 		elseif( $forceset )
 		{
@@ -1856,8 +1854,8 @@ function getBaseDomain( $url )
 
 /*
  * $Log$
- * Revision 1.41  2005/02/17 19:36:24  fplanque
- * no message
+ * Revision 1.42  2005/02/18 19:16:15  fplanque
+ * started relation restriction/cascading handling
  *
  * Revision 1.40  2005/02/15 22:05:09  blueyed
  * Started moving obsolete functions to _obsolete092.php..
