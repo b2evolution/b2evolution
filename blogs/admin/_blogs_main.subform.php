@@ -23,9 +23,10 @@
 
 	<?php
 		form_radio( 'blog_access_type', $blog_access_type,
-				array(  array( 'index.php', T_('Through index.php'), 
+				array(  array( 'default', T_('Default blog on index.php'), $baseurl.$blog_siteurl.'/index.php' ),
+								array( 'index.php', T_('Other blog through index.php'), 
 								$baseurl.$blog_siteurl.'/index.php'.( ($Settings->get('links_extrapath')) ? '/'.$blog_stub : '?blog='.$blog) ),
-								array( 'stub', T_('Through stub file'), $baseurl.$blog_siteurl.'/'.$blog_stub ),
+								array( 'stub', T_('Other blog through stub file'), $baseurl.$blog_siteurl.'/'.$blog_stub ),
 							), T_('Preferred access type'), true );
 	?>
 	
@@ -36,6 +37,6 @@
 	</fieldset>
 
 	<?php
-		form_text( 'blog_stub', $blog_stub, 30, T_('URL blog name'), T_('Used for stub file access') );
+		form_text( 'blog_stub', $blog_stub, 20, T_('URL blog name / Stub name'), T_('Used in URLs to identify this blog. This should be the stub filename if you use stub file access.'), 30 );
 	?>
 </fieldset>

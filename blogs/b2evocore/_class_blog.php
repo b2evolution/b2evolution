@@ -123,21 +123,30 @@ class Blog extends DataObject
 	 *
 	 * {@internal Blog::gen_blogurl(-)}}
 	 */
-	function gen_blogurl( )
+	function gen_blogurl( $absolute = true )
 	{
 		global $baseurl, $Settings;
 		
+		$base = $absolute ? $baseurl : '';
+		
 		switch( $this->access_type )
 		{
+			case 'default':
+				if( $Settings->get('default_blog_ID') == $this->ID )
+				{	// Safety check! We only do that kinf of linking if this is really the default blog...
+					return $base.$this->siteurl.'/index.php';
+				}
+				// ... otherwise, we add the blog ID:
+			
 			case 'index.php':
 				if( $Settings->get('links_extrapath') )
 				{
-					return $baseurl.$this->siteurl.'/index.php/'.$this->stub;
+					return $base.$this->siteurl.'/index.php/'.$this->stub;
 				}
-				return $baseurl.$this->siteurl.'/index.php?blog='.$this->ID;
+				return $base.$this->siteurl.'/index.php?blog='.$this->ID;
 			
 			case 'stub':
-				return $baseurl.$this->siteurl.'/'.$this->stub;
+				return $base.$this->siteurl.'/'.$this->stub;
 		
 			default:
 				die( 'Unhandled Blog access type ['.$this->access_type.']' );
@@ -158,6 +167,9 @@ class Blog extends DataObject
 			case 'subdir':
 				return $this->siteurl;
 	
+			case 'suburl':
+				return $this->gen_blogurl( false );
+
 			case 'blogurl':
 			case 'link':			// RSS wording
 			case 'url':

@@ -15,8 +15,8 @@
 	<tr>
 		<th><?php echo T_('Blog') ?></th>
 		<th><?php echo T_('Full Name') ?></th>
-		<th><?php echo T_('URL blog name') ?></th>
-		<th><?php echo T_('Static Filename') ?></th>
+		<th><?php echo T_('Blog URL') ?></th>
+		<th><?php echo T_('Static File') ?></th>
 		<th><?php echo T_('Locale') ?></th>
 		<?php if( $current_User->check_perm( 'blog_properties', 'edit', false ) )
 		{ ?>
@@ -46,9 +46,19 @@
 					{
 						blog_list_iteminfo('shortname');
 					} ?>
-					</strong></td>
+					</strong>
+					<?php 
+					if( $curr_blog_ID == $Settings->get('default_blog_ID') )
+					{
+						echo ' ('.T_('Default').')';
+					}
+					?>
+			</td>
+			
 			<td><?php blog_list_iteminfo('name') ?></td>
-			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('stub') ?></a></td>
+			
+			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('suburl') ?></a></td>
+			
 			<td>
 				<?php if( $staticfilename=blog_list_iteminfo('staticfilename',false) )
 				{
