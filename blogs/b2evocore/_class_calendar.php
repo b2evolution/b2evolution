@@ -149,6 +149,7 @@ class Calendar
 		$this->emptycellcontent = '&nbsp;';
 
 		$this->linkpostcellstart = '<td class="bCalendarLinkPost">';
+		$this->linkposttodaycellstart = '<td class="bCalendarLinkPostToday">';
 		$this->todaycellstart = '<td class="bCalendarToday">';
 
 		$this->searchframe = 12;	// How many month will we search back for a post before we give up
@@ -356,7 +357,14 @@ class Calendar
 			{
 				if( isset($monthswithposts[ $i ]) )
 				{
-					echo $this->linkpostcellstart;
+					if( $this->month == $i )
+					{
+						echo $this->linkposttodaycellstart;
+					}
+					else
+					{
+						echo $this->linkpostcellstart;
+					}
 					echo '<a href="';
 					archive_link( $this->year, $i, '', '', true, $file, $params );
 					echo '"';
@@ -423,7 +431,14 @@ class Calendar
 	
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
 					{
-						echo $this->linkpostcellstart;
+						if( $calendartoday )
+						{
+							echo $this->linkposttodaycellstart;
+						}
+						else
+						{
+							echo $this->linkpostcellstart;
+						}
 						echo '<a href="';
 						archive_link( $this->year, $this->month, date('d',$i), '', true, $file, $params );
 						echo '"';

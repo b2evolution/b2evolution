@@ -453,3 +453,7 @@ a.bCalendarLinkPost
 {
 	font-weight: bold;
 }
+td.bCalendarLinkPostToday
+{
+	font-weight: bold;
+}

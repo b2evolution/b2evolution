@@ -276,3 +276,7 @@ img.middle {
 	margin-top: .2ex;
 	margin-bottom: .2ex;
 }
+td.bCalendarLinkPostToday
+{
+	font-weight: bold;
+}
