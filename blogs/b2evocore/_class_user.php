@@ -38,7 +38,7 @@ class User extends DataObject
 	// Blog posts statuses permissions:
 	var $blog_post_statuses = array();
 
-	/* 
+	/*
 	 * User::User(-)
 	 *
 	 * Constructor
@@ -46,10 +46,10 @@ class User extends DataObject
 	function User( $userdata = NULL )
 	{
 		global $tableusers;
-		
+
 		// Call parent constructor:
 		parent::DataObject( $tableusers, 'user_' );
-			
+
 		if( $userdata == NULL )
 		{
 			// echo 'Creating blank user';
@@ -62,7 +62,7 @@ class User extends DataObject
 			$this->idmode = 'login';
 			$this->email = '';
 			$this->url = '';
-			$this->icq = NULL;
+			$this->icq = 0;
 			$this->aim = '';
 			$this->msn = '';
 			$this->yim = '';
@@ -97,13 +97,13 @@ class User extends DataObject
 			$this->datecreated = $userdata['dateYMDhour'];
 			$this->level = $userdata['user_level'];
 			$this->notify = $userdata['user_notify'];
-		
+
 			// Group for this user:
 			$this->Group = Group_get_by_ID( $userdata['user_grp_ID'] );
 		}
-	}	
-	
-	/** 
+	}
+
+	/**
 	 * Get a param
 	 *
 	 * {@internal User::get(-)}}
@@ -114,25 +114,25 @@ class User extends DataObject
 		{
 			case 'preferedname':
 				// Prefered name to display
-				switch( $this->idmode ) 
+				switch( $this->idmode )
 				{
 					case 'namefl':
 						return parent::get('firstname'). ' '. parent::get('lastname');
-						
+
 					case 'namelf':
 						return parent::get('lastname'). ' '. parent::get('firstname');
-						
+
 					default:
 						return parent::get($this->idmode);
 				}
-			
+
 			default:
 			// All other params:
 				return parent::get( $parname );
 		}
 	}
 
-	/* 
+	/*
 	 * User::set(-)
 	 *
 	 * Set param value
@@ -146,13 +146,13 @@ class User extends DataObject
 			case 'notify':
 				parent::set_param( $parname, 'int', $parvalue );
 			break;
-			
+
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
-	/* 
+	/*
 	 * User::set_datecreated(-)
 	 *
 	 * Set date created
@@ -165,7 +165,7 @@ class User extends DataObject
 		$this->dbchange( 'dateYMDhour' , 'string', 'datecreated' );
 	}
 
-	/* 
+	/*
 	 * User::setGroup(-)
 	 *
 	 * Set new Group
@@ -173,11 +173,11 @@ class User extends DataObject
 	function setGroup( & $Group )
 	{
 		$this->Group = $Group;
-		
+
 		$this->dbchange( 'user_grp_ID', 'int', 'Group->get(\'ID\')' );
 	}
-	
-	/** 
+
+	/**
 	 * Check permission for this user
 	 *
 	 * {@internal User::check_perm(-) }}
@@ -193,12 +193,12 @@ class User extends DataObject
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean 0 if permission denied
 	 */
-	
+	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
 		global $use_fileupload, $fileupload_minlevel, $fileupload_allowedusers;
 
 		$perm = false;
-	
+
 		switch( $permname )
 		{ // What permission do we want to check?
 			case 'upload':
@@ -206,7 +206,7 @@ class User extends DataObject
 				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel)
 								&& ((ereg(' '. $this->login. ' ', $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==''));
 				break;
-		
+
 			case 'edit_timestamp':
 				// Global permission to edit timestamps...
 				$perm = ($this->level >= 5);
@@ -216,7 +216,7 @@ class User extends DataObject
 				// Category permissions...
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
 				break;
-		
+
 			case 'blog_properties':
 				// Blog permission to edit its properties... (depending on user AND hits group)
 				// Forward request to group:
@@ -237,23 +237,23 @@ class User extends DataObject
 				// Blog permission to this or that... (depending on this user only)
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				break;
-			
+
 			default:
 				// Other global permissions (see if the group can handle them)
 				// Forward request to group:
 				$perm = $this->Group->check_perm( $permname, $permlevel );
 		}
-		
+
 		if( !$perm && $assert )
 		{ // We can't let this go on!
 			die( T_('Permission denied!'). ' ('. $permname . '/'. $permlevel . ')' );
 		}
-		
+
 		return $perm;
 	}
 
 
-	/** 
+	/**
 	 * Check permission for this user on a set of specified categories
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
@@ -301,7 +301,7 @@ class User extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Check permission for this user on a specified blog
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
@@ -324,23 +324,23 @@ class User extends DataObject
 	{
 		global $tableblogusers, $querycount;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
-		
+
 		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
 		{	// Allowed blog post statuses have not been loaded yet:
 			if( $this->ID == 0 )
 			{	// User not in DB, nothing to load!:
-				return false;	// Permission denied			
+				return false;	// Permission denied
 			}
 
 			// Load now:
 			// echo 'loading allowed statuses';
 			$query = "SELECT *
-								FROM $tableblogusers 
+								FROM $tableblogusers
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
 			// echo $query, '<br />';
-			$result = mysql_query($query) or mysql_oops( $query ); 
-			$querycount++; 
+			$result = mysql_query($query) or mysql_oops( $query );
+			$querycount++;
 			$row = mysql_fetch_array($result);
 
 			$this->blog_post_statuses[$perm_target_blog] = array();
@@ -356,7 +356,7 @@ class User extends DataObject
 			$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
 			$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
 		}
-	
+
 		// Check if permission is granted:
 		switch( $permname )
 		{
@@ -369,7 +369,7 @@ class User extends DataObject
 					// echo count($this->blog_post_statuses);
 					return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
 				}
-				
+
 				// We want a specific permission:
 				// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
 				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
@@ -379,8 +379,8 @@ class User extends DataObject
 				return $this->blog_post_statuses[$perm_target_blog][$permname];
 		}
 	}
-	
-	
+
+
 	/*
 	 * User::is_blog_member(-)
 	 *
@@ -394,14 +394,14 @@ class User extends DataObject
 		echo 'statuses=', $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )  ,'<br />'; */
 		return ( $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID )
 					|| $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
-					|| $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) 
-					|| $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID ) 
-					|| $this->check_perm_blogusers( 'blog_properties', 1, $blog_ID ) 
+					|| $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )
+					|| $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID )
+					|| $this->check_perm_blogusers( 'blog_properties', 1, $blog_ID )
 					);
 	}
-	
-	
-	/** 
+
+
+	/**
 	 * Delete user and dependencies from database
 	 *
 	 * Deleted dependencies:
@@ -430,7 +430,7 @@ class User extends DataObject
 		$sql="DELETE FROM $tableposts WHERE post_author = $this->ID";
 		$result=mysql_query($sql) or mysql_oops( $sql );
 		$querycount++;
-		
+
 		// Delete userblog permission
 		$sql="DELETE FROM $tableblogusers WHERE bloguser_user_ID = $this->ID";
 		$result=mysql_query($sql) or mysql_oops( $sql );
@@ -440,8 +440,8 @@ class User extends DataObject
 		return parent::dbdelete();
 	}
 
-	
-	/** 
+
+	/**
 	 * Template function: display user's level
 	 *
 	 * {@internal User::level(-) }}
@@ -452,32 +452,32 @@ class User extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display user's login
 	 *
 	 * {@internal User::login(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function login( $format = 'htmlbody' ) 
+	function login( $format = 'htmlbody' )
 	{
 		$this->disp( 'login', $format );
 	}
 
 
-	/** 
+	/**
 	 * Template function: display user's prefered name
 	 *
 	 * {@internal User::prefered_name(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function prefered_name( $format = 'htmlbody' ) 
+	function prefered_name( $format = 'htmlbody' )
 	{
 		$this->disp( 'preferedname', $format );
 	}
 
-	/** 
+	/**
 	 * Template function: display user's URL
 	 *
 	 * {@internal User::url(-) }}
@@ -486,7 +486,7 @@ class User extends DataObject
 	 * @param string string to display after the date (if changed)
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function url( $before = '', $after = '', $format = 'htmlbody' ) 
+	function url( $before = '', $after = '', $format = 'htmlbody' )
 	{
 		if( !empty( $this->url ) )
 		{
