@@ -91,7 +91,8 @@ function create_b2evo_tables()
 		blog_pingtechnorati tinyint(1) NOT NULL default 0,
 		blog_pingweblogs tinyint(1) NOT NULL default 0,
 		blog_pingblodotgs tinyint(1) NOT NULL default 0,
-		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'standard',
+		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
+		blog_force_skin tinyint(1) NOT NULL default 0,
 		blog_disp_bloglist tinyint NOT NULL DEFAULT 1,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	 (blog_ID)
