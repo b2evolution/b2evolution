@@ -398,12 +398,13 @@ class AbstractSettings
 				return false;
 		}
 
+		$debugMsg = get_class($this).'::set( '.implode(', ', $args ).' ): ';
+
 		if( isset($atcache->value) )
 		{
 			if( $atcache->value == $args[ $count_args-1 ] )
 			{ // already set
-				$Debuglog->add( get_class($this).'::set: ['.implode(', ', $args ).']: '
-													.'was already set to the same value.', 'settings' );
+				$Debuglog->add( $debugMsg.' Already set to the same value.', 'settings' );
 				return false;
 			}
 		}
@@ -411,7 +412,7 @@ class AbstractSettings
 		$atcache->value = $args[ $count_args-1 ];
 		$atcache->dbuptodate = false;
 
-		$Debuglog->add( get_class($this).'::set: ['.implode(', ', $args ).']', 'settings' );
+		$Debuglog->add( $debugMsg.' SET!', 'settings' );
 
 		return true;
 	}
@@ -487,6 +488,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/06 11:35:00  blueyed
+ * Debuglog changed
+ *
  * Revision 1.9  2005/01/06 05:20:14  blueyed
  * refactored (constructor), getDefaults()
  *
