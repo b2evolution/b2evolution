@@ -80,7 +80,7 @@ switch( $action )
 				<p><?php echo T_('Are you sure you want to continue?') ?></p>
 				<form action="b2antispam.php" method="get">
 					<input type="hidden" name="confirm" value="confirm" />
-					<input type="hidden" name="keyword" value="$keyword" />
+					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
 					<input type="hidden" name="action" value="ban" />
 					<input type="submit" value="<?php echo T_('Ban the keyword + delete matching hits and comments') ?>" class="search" />
 				</form>
@@ -105,7 +105,7 @@ switch( $action )
 		<div class="panelinfo">
 			<p><?php printf( T_('Removing entry #%d from the ban list...'), $hit_ID) ?></p>
 			<?php 
-			remove_ban( $hit_ID );
+			antispam_delete( $hit_ID );
 			?>
 		</div>
 		<?php

@@ -35,11 +35,11 @@ function antispam_create( $abuse_string )
 }
 
 /*
- * remove_ban(-)
+ * antispam_delete(-)
  *
- * Remove a domain from the ban list
+ * Remove an entry from the ban list
  */
-function remove_ban( $string_ID )
+function antispam_delete( $string_ID )
 {
 	global $tableantispam, $querycount;
 
@@ -161,6 +161,8 @@ function keyword_ban( $keyword )
 
 /*
  * ban_affected_hits(-)
+ *
+ * find log hits that would be affected by a ban
  */
 function ban_affected_hits($banned, $type)
 {
@@ -184,6 +186,8 @@ function ban_affected_hits($banned, $type)
 
 /*
  * ban_affected_comments(-)
+ *
+ * find comments that would be affected by a ban
  */
 function ban_affected_comments($banned, $type)
 {
@@ -287,7 +291,7 @@ function b2evonet_poll_abuse( $display = true )
 	else
 	{
 		$client = new xmlrpc_client('/evonetsrv/xmlrpc.php', 'b2evolution.net', 80);
-		$client->debug = 1;
+		// $client->debug = 1;
 	}
 	
 	// Construct XML-RPC message:
