@@ -10,10 +10,10 @@
  * @package plugins
  */
 
-global $imgurl;
+global $img_url;
 
 # the directory where your smilies are (no trailing slash)
-$this->smilies_path = $imgurl.'/img/smilies';
+$this->smilies_path = $img_url.'/img/smilies';
 
 # here's the conversion table, you can modify it if you know what you're doing
 # smilies will be displayed in their order of appearance

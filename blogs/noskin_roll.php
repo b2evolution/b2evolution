@@ -92,7 +92,7 @@
 	# This is the class of for the other blog links:
 	$blog_other_link_class = 'NavButton2';
 	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small"><img src="'. $imgurl.'/down_small.gif" width="14" height="12" border="0" alt="['.T_('Selected').']" title="" class="top" />';
+	$blog_selected_name_before = '<span class="small"><img src="'. $img_url.'/down_small.gif" width="14" height="12" border="0" alt="['.T_('Selected').']" title="" class="top" />';
 	$blog_selected_name_after = '</span>';
 	# This is additionnal markup before and after the other blog names
 	$blog_other_name_before = '<span class="small">';
@@ -303,7 +303,7 @@
 	</div>
 
 	<div class="bSideItem">
-		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $imgurl ?>/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
+		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $img_url ?>/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 
 
 			<ul>
@@ -317,7 +317,7 @@
 	</div>
 
 	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $imgurl ?>/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>
