@@ -567,6 +567,13 @@ function upgrade_b2evo_tables()
 								( "upload_minlevel", "'.(isset($fileupload_minlevel) ? $fileupload_minlevel : '1').'" )
 							';
 		$DB->query( $query );
+
+		// Replace "paged" mode with "pages":
+		$DB->query( 'UPDATE T_settings
+										SET set_value = "pages"
+									WHERE set_name = "what_to_show"
+									  AND set_value = "paged"' );
+
 		echo "OK.<br />\n";
 
 
@@ -657,9 +664,8 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8080 )
 	{
 		/*
-		 * CONTRIBUTORS: If you need some more changes, put them here!
-		 * Then create a new extension block, and increase db version numbers
-		 * everywhere where needed in this file.
+		 * CONTRIBUTORS: If you need changes and we haven't started a block for next release yet, put them here!
+		 * Then create a new extension block, and increase db version numbers everywhere where needed in this file.
 		 */
 
 	}
