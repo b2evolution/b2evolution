@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/*
 	 * This is the main template. It displays the blog.
 	 *
@@ -37,7 +37,7 @@
 <body id=standblog>
 
 <p id=prelude>
-<a title="Sauter la navigation et la recherche" href="#main">Skip to content</a> | <a title="Aller directement au menu de navigation" href="#menu">Skip to menu</a> | <a title="Aller directement au formulaire de recherche" href="#searchform">Skip to search</a> 
+<a title="Sauter la navigation et la recherche" href="#main">Skip to content</a> | <a title="Aller directement au menu de navigation" href="#menu">Skip to menu</a> | <a title="Aller directement au formulaire de recherche" href="#searchform">Skip to search</a>
 </p>
 
 <h1><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
@@ -56,7 +56,7 @@
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
-<?php	// ------------------------------------ START OF POSTS --------------------------------------
+<?php // ------------------------------------ START OF POSTS --------------------------------------
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 {
 ?>
@@ -92,7 +92,7 @@
 
 </div>
 
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
+<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )
@@ -106,7 +106,7 @@
 			// this includes the statistics if requested:
 			require( dirname(__FILE__).'/_stats.php');
 			break;
-		
+
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( dirname(__FILE__).'/_arcdir.php');
@@ -137,7 +137,7 @@
 
 
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require( dirname(__FILE__)."/_bloglist.php"); 
+	require( dirname(__FILE__)."/_bloglist.php");
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id=categories>
@@ -145,7 +145,7 @@
 <h4>Categories&nbsp;:</h4>
 <!-- ---------------------------- START OF CATEGORIES ---------------------------- -->
 <form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
-<?php	require( dirname(__FILE__)."/_categories.php"); ?>
+<?php require( dirname(__FILE__)."/_categories.php"); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 <input type="reset" value="<?php echo T_('Reset form') ?>" />
 </form>
@@ -156,17 +156,17 @@
 <form action=/index.php method=get>
 <div id=searchform>
 <ul>
-  <li><input id=rechercher size=15 name=s> 
-  <li><input type=submit value=envoyer name=submit> </li></ul></div>
+	<li><input id="rechercher" size="15" name="s" />
+	<li><input type="submit" value="envoyer" name="submit" /> </li></ul></div>
 </form>
 
 
 <form id=switcher action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method=get>
-	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label> 
+	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label>
 	<select id=set name="skin">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
-		for( skin_list_start(); skin_list_next(); ) 
-		{ 
+		for( skin_list_start(); skin_list_next(); )
+		{
 			echo '<option value="';
 			skin_list_iteminfo( 'name' );
 			echo '"';
@@ -176,20 +176,20 @@
 			echo "</option>\n";
 		} // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 	</select>
-	<input type=submit value=Ok> 
+	<input type="submit" value="Ok" />
 	</fieldset>
 </form>
 
 
 <h4><?php echo T_('Archives') ?>&nbsp;:</h4>
 <ul>
-	<?php	require( dirname(__FILE__)."/_archives.php"); ?>
+	<?php require( dirname(__FILE__).'/_archives.php'); ?>
 </ul>
 
 <?php if (! $stats) { ?>
-	
+
 	<h4><?php echo T_('Recent Referers') ?></h4>
-	<?php refererList(5,'global',0,0,'no','',($blog>1)?$blog:''); ?>
+	<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>
 	<ul>
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
@@ -210,19 +210,19 @@
 
 <h4><?php echo T_('Misc') ?></h4>
 <ul>
-	<?php 
+	<?php
 		// Administrative links:
-		user_login_link( '<li>', '</li>' ); 
-		user_register_link( '<li>', '</li>' ); 
-		user_admin_link( '<li>', '</li>' ); 
-		user_profile_link( '<li>', '</li>' ); 
-		user_logout_link( '<li>', '</li>' ); 
+		user_login_link( '<li>', '</li>' );
+		user_register_link( '<li>', '</li>' );
+		user_admin_link( '<li>', '</li>' );
+		user_profile_link( '<li>', '</li>' );
+		user_logout_link( '<li>', '</li>' );
 	?>
 	<li><a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>">RSS 0.92 (Userland)</a></li>
 	<li><a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>">RSS 1.0 (RDF)</a></li>
 	<li><a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0 (Userland)</a></li>
 	<li><a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>">Atom 0.3</a></li>
-  <li><a href="http://validator.w3.org/check/referer">XHTML valide</a> 
+	<li><a href="http://validator.w3.org/check/referer">XHTML valide</a>
 </li>
 </ul>
 
@@ -232,9 +232,9 @@ Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="
 
 <p class="baseline">
 This site works better with web standards! Original skin design courtesy of <a href="http://standblog.com/">Tristan NITOT</a>.
-<?php 
+<?php
 	log_hit();	// log the hit on this page
-	debug_info();	// output debug info if requested
+	debug_info(); // output debug info if requested
 ?>
 </p>
 </body>

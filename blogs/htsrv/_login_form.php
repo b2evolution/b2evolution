@@ -46,7 +46,7 @@ $location = $redirect_to;
 	
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Log in!') ?>" class="search">
+				<input type="submit" name="submit" value="<?php echo T_('Log in!') ?>" class="search" />
 			</div>
 		</fieldset>
 	</fieldset>

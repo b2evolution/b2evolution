@@ -283,7 +283,8 @@ function locale_options( $default = '' )
 {
 	global $locales, $default_locale;
 	
-	if( !isset( $default ) ) $default = $default_locale;
+	if( empty( $default ) ) $default = $default_locale;
+	
 	
 	foreach( $locales as $this_localekey => $this_locale )
 		if( $this_locale['enabled'] || $this_localekey == $default )
@@ -357,30 +358,21 @@ function locale_priosort( $a, $b )
 /**
  * load locales from DB into $locales array. Also sets $default_locale.
  *
- * FP: I edited this because I got PHP error notices
  */
 function locale_overwritefromDB()
 {
 	global $tablelocales, $DB, $locales, $default_locale;
 	
-	$priocounter = 0;
-	// $usedprios = array(0);  // FP: what do we need this for?
+	$usedprios = array();  // remember which priorities are used already. FP: what do we need this for?
 	
 	$query = 'SELECT
 						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, 
 						loc_messages, loc_priority, loc_enabled
-						FROM '. $tablelocales;
+						FROM '.$tablelocales.' ORDER BY loc_priority';
 	$rows = $DB->get_results( $query, ARRAY_A );
 	if( count( $rows ) ) foreach( $rows as $row )
 	{	// Loop through loaded locales:
-	
-		while( in_array($row['loc_priority'], $usedprios) )
-		{ // find next available priority
-			$priocounter++;
-			$row['loc_priority'] = $priocounter; // FP: Modifying the rowset is a BAD practice
-			// FP: why change the saved priority here? (extra processing for what value?)
-		}
-		// $usedprios[] = $row['loc_priority'];
+		$usedprios[] = $row['loc_priority'];
 				
 		$locales[ $row['loc_locale'] ] = array(
 																			'charset'  => $row[ 'loc_charset' ],
@@ -394,24 +386,23 @@ function locale_overwritefromDB()
 																		);
 	}
 	
-	// set default priorities, if nothing was set in DB
-	// newly added locales (in conf/_locale.php) will get prio 1,
-	// equal priorities will be shifted down.
+	// set default priorities, if nothing was set in DB.
+	// Missing "priority gaps" will get filled here.
 	if( count($rows) != count($locales) )
 	{ // we have locales from conf file that need a priority
-		ksort( $locales );
-		foreach( $locales as $lkey => $lval ) 
-		{	// Loop through memomry locales:
+		ksort( $locales );  // sort by key (== locale name)
+		$priocounter = 1;
+		foreach( $locales as $lkey => $lval )
+		{	// Loop through memory locales:
 			if( !isset($lval['priority']) )
 			{	// Found one that has no assigned priority
-
-				// Priocounter already has max value
-				// while( in_array( $locales[$lkey]['priority'], $usedprios ) )
-				//{
+				while( in_array( $priocounter, $usedprios ) )
+				{
 					$priocounter++;
-					$locales[$lkey]['priority'] = $priocounter;
-				//}
-				// $usedprios[] = $locales[$lkey]['priority'];
+				}
+				// Priocounter has max value
+				$locales[$lkey]['priority'] = $priocounter;
+				$usedprios[] = $priocounter;
 			}
 		}
 	}

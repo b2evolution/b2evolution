@@ -69,6 +69,7 @@ function create_b2evo_tables()
 		user_aim varchar(50) NOT NULL,
 		user_msn varchar(100) NOT NULL,
 		user_yim varchar(50) NOT NULL,
+		user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 		user_idmode varchar(20) NOT NULL DEFAULT 'login',
 		user_notify tinyint(1) NOT NULL default 1,
 		user_grp_ID int(4) NOT NULL default 1,
@@ -688,6 +689,7 @@ function populate_main_tables()
 	$User_Admin->set( 'ip', '127.0.0.1' );
 	$User_Admin->set( 'domain', 'localhost' );
 	$User_Admin->set( 'level', 10 );
+	$User_Admin->set_datecreated( time() );
 	$User_Admin->setGroup( $Group_Admins );
 	$User_Admin->dbinsert();
 
@@ -699,6 +701,7 @@ function populate_main_tables()
 	$User_Demo->set( 'ip', '127.0.0.1' );
 	$User_Demo->set( 'domain', 'localhost' );
 	$User_Demo->set( 'level', 0 );
+	$User_Demo->set_datecreated( time() );
 	$User_Demo->setGroup( $Group_Users );
 	$User_Demo->dbinsert();
 

@@ -25,7 +25,7 @@ require(dirname(__FILE__).'/_header.php');
 	
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Generate new password!') ?>" class="search">
+				<input type="submit" name="submit" value="<?php echo T_('Generate new password!') ?>" class="search" />
 			</div>
 		</fieldset>
 	</fieldset>

@@ -39,7 +39,7 @@
 						array(  array( 'none', T_('No Access') ),
 										array( 'view', T_('View only') ),
 										array( 'edit', T_('Full Access') )
-									), T_('Stats') );
+									), T_('Statistics') );
 				form_radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'), 
 						array(  array( 'none', T_('No Access') ),
 										array( 'view', T_('View only') ),
@@ -73,8 +73,8 @@
 		<fieldset>
 			<fieldset>
 				<div class="input">
-					<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
-					<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
+					<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+					<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 				</div>
 			</fieldset>
 		</fieldset>

@@ -17,6 +17,7 @@ param( 'newuser_firstname', 'string', '' );
 param( 'newuser_lastname', 'string', '' );
 param( 'newuser_nickname', 'string', '' );
 param( 'newuser_idmode', 'string', '' );
+param( 'newuser_locale', 'string', 'en-EU' );
 param( 'newuser_icq', 'string', '' );
 param( 'newuser_aim', 'string', '' );
 param( 'newuser_msn', 'string', '' );
@@ -115,6 +116,7 @@ $DB->query( "UPDATE $tableusers
 										user_msn= '".$DB->escape($newuser_msn)."',
 										user_yim= '".$DB->escape($newuser_yim)."',
 										user_idmode= '".$DB->escape($newuser_idmode)."',
+										user_locale= '".$DB->escape($newuser_locale)."',
 										user_notify= $newuser_notify
 							WHERE ID = $user_ID" );
 

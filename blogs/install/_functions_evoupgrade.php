@@ -337,7 +337,12 @@ function upgrade_b2evo_tables()
 							MODIFY COLUMN comment_author_IP varchar(23) NOT NULL default ''";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-
+		
+		echo 'Upgrading Users table... ';
+		$query = "ALTER TABLE $tableusers ADD user_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL AFTER user_yim";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+	
 	}
 
 

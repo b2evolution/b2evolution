@@ -87,18 +87,24 @@
 	}
 	?>
 </table>
-</div>
 
 <?php
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{ ?>
-		<div class="panelblock">
-			<?php
-			echo '<p><a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> ', T_('Register a new user...'), '</a></p>'; ?>
-
-			<p><?php echo T_('To delete an user, bring his/her level to zero, then click on the red cross.') ?><br />
-			<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?></p>
+if( $current_User->check_perm( 'users', 'edit' ) )
+{ ?>
+		<?php
+		#echo '<p><a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> ', T_('Register a new user...'), '</a></p>';
+		?>
+		<div class="panelinfo">
+		<p style="text-align:center">
+		<?php printf( T_('You can <strong>create</strong> a new user either by editing an existing profile and change the login name or by using a <a href="%s">blank template</a>.'), 'b2users.php?action=newtemplate');?>
+		<br />
+		<?php echo T_('To <strong>delete</strong> an user, bring his/her level to zero, then click on the red cross.') ?><br />
+		<br />
+		<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?>
+		</p>
 		</div>
-	<?php
-	}
+<?php
+}
 ?>
+</div>
+

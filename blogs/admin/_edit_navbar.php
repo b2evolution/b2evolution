@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Displays browsing navigation bar
  *
@@ -24,7 +24,7 @@
 		<?php	}
 		if($nextXstart <= $MainList->get_total_num_posts()) { ?>
 		<td>
-		
+
 			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$nextXstart,'postend='.$nextXend), $pagenow); ?>">
 				<input type="submit" name="submitnext" class="search" value="<?php printf( T_('Next %d'), $posts ) ?> >" />
 			</form>
@@ -36,10 +36,10 @@
 
 		<td align="right">
 			<form name="showXfirstlastposts" method="get">
-				<input type="hidden" name="blog" value="<?php echo $blog ?>">
-				<input type="text" name="poststart" value="<?php echo $poststart ?>" style="width:40px;" /?>
+				<input type="hidden" name="blog" value="<?php echo $blog ?>" />
+				<input type="text" name="poststart" value="<?php echo $poststart ?>" style="width:40px;" />
 				<?php /* TRANS: x TO y OF z */ echo T_(' to ') ?>
-				<input type="text" name="postend" value="<?php echo $postend ?>" style="width:40px;" /?>
+				<input type="text" name="postend" value="<?php echo $postend ?>" style="width:40px;" />
 				<?php /* TRANS: x TO y OF z */ echo T_(' of ') ?> <?php echo $MainList->get_total_num_posts() ?>
 				<select name="order">
 					<option value="DESC" <?php

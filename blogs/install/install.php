@@ -241,15 +241,15 @@ switch( $action )
 		<form action="install.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 			<p>The database tables installation can be done in different ways. Choose one:</p>
-			<p><input type="radio" name="action" value="newdb" checked="checked"> <strong>New Install</strong>: Install b2evolution database tables with sample data.</p>
-			<p><input type="radio" name="action" value="evoupgrade"> <strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!</p>
-			<p><input type="radio" name="action" value="cafelogupgrade"> <strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.</p>
+			<p><input type="radio" name="action" value="newdb" checked="checked" /> <strong>New Install</strong>: Install b2evolution database tables with sample data.</p>
+			<p><input type="radio" name="action" value="evoupgrade" /> <strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!</p>
+			<p><input type="radio" name="action" value="cafelogupgrade" /> <strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.</p>
 
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
 			?>
-			<p><input type="radio" name="action" value="deletedb"> <strong>Delete b2evolution tables</strong>: If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.</p>
+			<p><input type="radio" name="action" value="deletedb" /> <strong>Delete b2evolution tables</strong>: If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.</p>
 			<?php
 				}
 			?>

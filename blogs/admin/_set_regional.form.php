@@ -76,7 +76,7 @@ if( !$locales[$default_locale]['enabled'] )
 		<td style="text-align:left">
 			<?php
 			echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />'
-			#.$lval['priority'].'. '
+			.$lval['priority'].'. '
 			;
 			locale_flag( $lkey );
 			echo'
@@ -202,23 +202,26 @@ if( !$locales[$default_locale]['enabled'] )
 		';
 		if( isset($lval[ 'fromdb' ]) )
 		{ // allow to delete locales loaded from db
-			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" border="0" alt="X" title="'.T_('Delete from DB!').'" /></a>';
+			$l_atleastonefromdb = 1;
+			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" border="0" alt="X" title="'.T_('Delete from database!').'" /></a>';
 		}
 		echo '
 		</tr>';
 	}
 	?>
 	</table>
-	<div style="text-align:center;padding:1em;">
-	<a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" alt="X" title="<?php echo T_('Reset to defaults');?>" border="0" /></a>
-	<br /><?php echo T_('Reset to defaults');?>!
-	</div>
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
 	{
 	?>
-	<div style="text-align:center;padding-bottom:1em;">
-		<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search">
-		<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
+	<?php if( isset($l_atleastonefromdb) ){ ?>
+	<div style="text-align:center;padding-top:1em;">
+	<a href="?tab=regional<?php if( $notransext ) echo '&amp;notransext=1'?>&amp;action=reset" onClick="return confirm('<?php echo T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" alt="X" title="<?php echo T_('Reset to defaults');?>" border="0" /></a>
+	<br /><?php echo T_('Reset to defaults (delete database table)');?>!
+	</div>
+	<?php } ?>
+	<div style="text-align:center;padding:1em;">
+		<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+		<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 	</div>
 	</fieldset>
 	</form>
@@ -256,7 +259,7 @@ if( !$locales[$default_locale]['enabled'] )
 			<td><input type="text" name="newloc_datefmt" value="'.(isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : '').'" maxlength="10" size="6" /></td>
 			<td><input type="text" name="newloc_timefmt" value="'.(isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : '').'" maxlength="10" size="6" /></td>
 			<td><input type="text" name="newloc_messages" value="'.(isset($ltemplate['messages']) ? $ltemplate['messages'] : '').'" maxlength="10" size="6" /></td>
-			<td><input type="submit" name="submit" value="'.T_('Create / Edit').'" class="search" onClick="var Locales = new Array(\''.implode("', '", array_keys($locales)).'\'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};"></td>
+			<td><input type="submit" name="submit" value="'.T_('Create / Edit').'" class="search" onClick="var Locales = new Array(\''.implode("', '", array_keys($locales)).'\'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};" /></td>
 			
 			</tr>
 			</table>

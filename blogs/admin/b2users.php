@@ -25,32 +25,133 @@ require(dirname(__FILE__). '/_menutop_end.php');
 
 switch ($action)
 {
+	case 'newtemplate':
+		$edited_User = & new User();
+		
+		$query = "SELECT MAX(ID) FROM $tableusers";
+		#$edited_User->set('ID', $DB->get_var( $query ) + 1);
+	
+		break;
+
+
 	case 'userupdate':
 		/*
 		 * Update user:
 		 */
 		// Check permission:
 		$current_User->check_perm( 'users', 'edit', true );
-
+		
+		$errors = array();
+		
 		param( 'edited_user_ID', 'integer', true );
-		$edited_User = & new User( get_userdata( $edited_user_ID ) );
+		// remember, to display the form; we take care for new created users later
+		$user = $edited_user_ID;
+		param( 'edited_user_oldlogin', 'string', true );
+		param( 'edited_user_login', 'string', true );
+		
+		if( empty($edited_user_login) )
+		{
+			errors_add( T_('You must provide an unique Login!') );
+		}
+		
+		param( 'edited_user_level', 'integer', true );
+		if( $edited_user_level < 0 || $edited_user_level > 10 )
+		{
+			errors_add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ) );
+		}
+		
+		if( $edited_user_oldlogin != $edited_user_login
+				|| $edited_user_ID == 0)
+		{ // we create a new user
+			#echo 'Login changed!';
+			
+			$query = "SELECT ID FROM $tableusers WHERE user_login = '$edited_user_login'";
+			$q = $DB->get_var( $query );
+			
+			if( $q !== NULL )
+			{
+				errors_add( sprintf( T_('You renamed the Login to some already existing. Please <a href="%s">edit this login</a> instead of overwriting it this way.'), '?user='.$q ));
+			}
+			
+			$edited_User = & new User();
+			$edited_User->set( 'login', $edited_user_login );
+			$edited_User->set_datecreated( time() );
+		}
+		else
+		{
+			$edited_User = & new User( get_userdata( $edited_user_ID ) );
+		}
+		
 
+		param( 'edited_user_firstname', 'string', true );
+		$edited_User->set( 'firstname', $edited_user_firstname );
+		param( 'edited_user_lastname', 'string', true );
+		$edited_User->set( 'lastname', $edited_user_lastname );
+		param( 'edited_user_nickname', 'string', true );
+		$edited_User->set( 'nickname', $edited_user_nickname );
+		param( 'edited_user_idmode', 'string', true );
+		$edited_User->set( 'idmode', $edited_user_idmode );
+		param( 'edited_user_locale', 'string', true );
+		$edited_User->set( 'locale', $edited_user_locale );
+		param( 'edited_user_email', 'string', true );
+		$edited_User->set( 'email', $edited_user_email );
+		param( 'edited_user_url', 'string', true );
+		$edited_User->set( 'url', $edited_user_url );
+		param( 'edited_user_icq', 'string', true );
+		$edited_User->set( 'icq', $edited_user_icq );
+		param( 'edited_user_aim', 'string', true );
+		$edited_User->set( 'aim', $edited_user_aim );
+		param( 'edited_user_msn', 'string', true );
+		$edited_User->set( 'msn', $edited_user_msn );
+		param( 'edited_user_yim', 'string', true );
+		$edited_User->set( 'yim', $edited_user_yim );
+		param( 'edited_user_notify', 'integer', 0 );
+		$edited_User->set( 'notify', $edited_user_notify );
+		$edited_User->set( 'level', $edited_user_level );
+		
+		param( 'edited_user_pass1', 'string', true );
+		param( 'edited_user_pass2', 'string', true );
+		if( $edited_user_pass1 != '' )
+		{
+			if( $edited_user_pass1 != $edited_user_pass2 )
+			{
+				errors_add( T_('you typed two different passwords. Go back to correct that.') );
+			}
+			else
+			{
+				$edited_User->set( 'pass', md5( $edited_user_pass2 ) );
+			}
+		}
+		
 		param( 'edited_user_grp_ID', 'integer', true );
 		$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
 		$edited_User->setGroup( $edited_user_Group );
 		// echo 'new group = ';
 		// $edited_User->Group->disp('name');
-
-		// Commit update to the DB:
-		$edited_User->dbupdate();	
-		// Commit changes in cache:
-		// not ready: $UserCache->add( $edited_Group );
-		unset( $cache_userdata ); // until better
-
-		// remember, to display the forms
-		$user = $edited_user_ID;
 		
-		echo '<div class="panelinfo">' . T_('User updated.') . '</div>';
+		if( count($errors) )
+		{
+			echo '<div class="panelinfo">';
+			errors_display('', '');
+			echo '</div>';
+			break;	
+		}
+		
+		if( $edited_User->get('ID') != 0 )
+		{	// Commit update to the DB:
+			$edited_User->dbupdate();	
+			echo '<div class="panelinfo"><p>' . T_('User updated.') . '</p></div>';
+			// Commit changes in cache:
+			// not ready: $UserCache->add( $edited_Group );
+			unset( $cache_userdata ); // until better
+		}
+		else
+		{ // Insert user into DB
+			$edited_User->dbinsert();
+			echo '<div class="panelinfo"><p>' . T_('New user created.') . '</p></div>';
+			$user = $edited_User->get('ID');
+		}
+
 		break;
 
 
@@ -167,6 +268,7 @@ switch ($action)
 
 }
 
+
 if( $current_User->check_perm( 'users', 'view', false ) )
 {
 	if( ($group != 0) )
@@ -178,12 +280,16 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
 		
-	if( $user != 0 )
+	if( $user != 0 || $action == 'newtemplate' )
 	{ // view user
 		// Check permission:
 		$current_User->check_perm( 'users', 'view', true );
 
-		$edited_User = & new User( get_userdata($user) );
+		if( $action != 'newtemplate' )
+		{
+			$edited_User = & new User( get_userdata($user) );
+		}
+		
 		require(dirname(__FILE__). '/_users_form.php');
 	}
 }

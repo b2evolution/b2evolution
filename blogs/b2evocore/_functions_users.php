@@ -227,12 +227,12 @@ function get_userdata($userid)
 	global $DB,$tableusers, $cache_userdata;
 	if( empty($cache_userdata[$userid] ) )
 	{	// We do a progressive cache load beacuse there can be many many users!
-		$sql = "SELECT * 
-						FROM $tableusers 
+		$sql = "SELECT *
+						FROM $tableusers
 						WHERE ID = $userid";
 		if( $myrow = $DB->get_row( $sql, ARRAY_A ) )
 		{
-			 $cache_userdata[$myrow['ID']] = $myrow;
+			$cache_userdata[ $myrow['ID'] ] = $myrow;
 		}
 	}
 
@@ -245,30 +245,28 @@ function get_userdata($userid)
 }
 
 
-
-
 /*
  * get_usernumposts(-)
  */
 function get_usernumposts( $userid )
 {
 	global $DB, $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments;
-	return $DB->get_var( "SELECT count(*) 
-													FROM $tableposts 
-											   WHERE post_author = $userid" );
+	return $DB->get_var( "SELECT count(*)
+												FROM $tableposts
+												WHERE post_author = $userid" );
 }
 
 
 /*
  * get_user_info(-)
  */
-function get_user_info( $show='', $this_userdata = '' )
+function get_user_info( $show = '', $this_userdata = '' )
 {
 	global $userdata;
 
 	if( empty( $this_userdata ) )
 	{	// We want the current user
-		 $this_userdata = & $userdata;
+		$this_userdata = & $userdata;
 	}
 
 	switch( $show )
@@ -293,6 +291,7 @@ function get_user_info( $show='', $this_userdata = '' )
 		case 'msn':
 		case 'yim':
 		case 'notify':
+		case 'locale':
 			$output = $this_userdata['user_'. $show];
 			break;
 
@@ -310,7 +309,7 @@ function get_user_info( $show='', $this_userdata = '' )
  *
  * Template tag
  */
-function user_info( $show='', $format = 'raw', $display = true )
+function user_info( $show = '', $format = 'raw', $display = true )
 {
 	$content = get_user_info( $show );
 	$content = format_to_output( $content, $format );

@@ -18,6 +18,7 @@ class User extends DataObject
 	var	$lastname;
 	var	$nickname;
 	var	$idmode;
+	var	$locale;
 	var	$email;
 	var	$url;
 	var	$icq;
@@ -51,13 +52,14 @@ class User extends DataObject
 		if( $userdata == NULL )
 		{
 			// echo 'Creating blank user';
-			$this->name = T_('New user');
+			$this->name = T_('New user');  // NOTE: we don't need this really. better set firstname/lastname to some default?
 			$this->login = 'login';
 			$this->pass = 'pass';
 			$this->firstname = '';
 			$this->lastname = '';
 			$this->nickname = '';
 			$this->idmode = 'login';
+			$this->locale = 'en-EU';
 			$this->email = '';
 			$this->url = '';
 			$this->icq = 0;
@@ -83,6 +85,7 @@ class User extends DataObject
 			$this->lastname = $userdata['user_lastname'];
 			$this->nickname = $userdata['user_nickname'];
 			$this->idmode = $userdata['user_idmode'];
+			$this->locale = $userdata['user_locale'];
 			$this->email = $userdata['user_email'];
 			$this->url = $userdata['user_url'];
 			$this->icq = $userdata['user_icq'];

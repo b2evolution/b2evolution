@@ -279,7 +279,7 @@ if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
 					break;
 				
 				default:
-					// DELETE locale from DB
+					// --- DELETE locale from DB
 					if( !empty($delete) )
 					{
 						$query = "DELETE FROM $tablelocales WHERE loc_locale = '$delete'";
@@ -292,7 +292,8 @@ if( in_array( $action, array('update', 'reset', 'createnew', 'extract' ))
 						
 						$status_update[] = sprintf(T_("Deleted locale '%s' from database."), $delete);
 					}
-					// SWITCH PRIORITIES -----------------
+					
+					// --- SWITCH PRIORITIES -----------------
 					elseif( !empty($prioup) )
 					{
 						$switchcond = 'return ($lval[\'priority\'] > $i && $lval[\'priority\'] < $locales[ $prioup ][\'priority\']);';

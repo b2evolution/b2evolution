@@ -155,8 +155,8 @@
 <form action=/index.php method=get>
 <div id=searchform>
 <ul>
-  <li><input id=rechercher size=15 name=s> 
-  <li><input type=submit value=envoyer name=submit> </li></ul></div>
+	<li><input id="rechercher" size="15" name="s" />
+	<li><input type="submit" value="envoyer" name="submit" /> </li></ul></div>
 </form>
 
 
@@ -175,7 +175,7 @@
 			echo "</option>\n";
 		} // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 	</select>
-	<input type=submit value=Ok> 
+	<input type="submit" value="Ok" /> 
 	</fieldset>
 </form>
 

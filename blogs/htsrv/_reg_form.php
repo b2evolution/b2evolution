@@ -39,7 +39,7 @@ require(dirname(__FILE__).'/_header.php');
 
 	<fieldset>
 		<div class="input">
-			<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search">
+			<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search" />
 		</div>
 	</fieldset>
 </fieldset>

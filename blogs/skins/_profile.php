@@ -40,7 +40,7 @@
 
 		<fieldset>
 			<div class="label"><?php echo T_('Posts') ?>:</div>
-			<div class="input"><?php echo user_info( 'num_posts', 'raw' ) ?></div>
+			<div class="input"><?php user_info( 'num_posts', 'raw' ) ?></div>
 		</fieldset>
 
 		<?php
@@ -54,21 +54,21 @@
 			<div class="input">
 				<?php $idmode = get_user_info( 'idmode' ); ?>
 				<select name="newuser_idmode" class="bComment">
-					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php user_info( 'nickname', 'htmlhead' ) ?></option>
-					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php user_info( 'login', 'htmlhead' ) ?></option>
-					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php user_info( 'firstname', 'htmlhead' ) ?></option>
-					<option value="lastname"<?php if ( $idmode == 'lastname' ) echo ' selected="selected"'; ?>><?php user_info( 'lastname', 'htmlhead' ) ?></option>
-					<option value="namefl"<?php if ( $idmode == 'namefl' ) echo ' selected="selected"'; ?>><?php user_info( 'firstname', 'htmlhead' ); echo ' '; user_info( 'lastname', 'htmlhead' ); ?></option>
-					<option value="namelf"<?php if ( $idmode == 'namelf' ) echo ' selected="selected"'; ?>><?php user_info( 'lastname', 'htmlhead' ); echo ' '; user_info( 'firstname', 'htmlhead' ); ?></option>
+					<option value="nickname"<?php if ( $idmode == 'nickname' ) echo ' selected="selected"'; ?>><?php if( user_info( 'nickname', 'raw', false ) != '' ) user_info( 'nickname', 'htmlhead' ); else echo '['.T_('Nickname').']' ?></option>
+					<option value="login"<?php if ( $idmode == 'login' ) echo ' selected="selected"'; ?>><?php if( user_info( 'login', 'raw', false ) != '' ) user_info( 'login', 'htmlhead' ); else echo '['.T_('Login').']' ?></option>
+					<option value="firstname"<?php if ( $idmode == 'firstname' ) echo ' selected="selected"'; ?>><?php if( user_info( 'firstname', 'raw', false ) != '' ) user_info( 'firstname', 'htmlhead' ); else echo '['.T_('First name').']' ?></option>
+					<option value="lastname"<?php if ( $idmode == 'lastname' ) echo ' selected="selected"'; ?>><?php if( user_info( 'lastname', 'raw', false ) != '' ) user_info( 'lastname', 'htmlhead' ); else echo '['.T_('Last name').']' ?></option>
+					<option value="namefl"<?php if ( $idmode == 'namefl' ) echo ' selected="selected"'; ?>><?php if( user_info( 'firstname', 'raw', false ) != '' ) user_info( 'firstname', 'htmlhead' ); else echo '['.T_('First name').']';  echo ' '; if( user_info( 'lastname', 'raw', false ) != '' ) user_info( 'lastname', 'htmlhead' ); else echo '['.T_('Last name').']' ?></option>
+					<option value="namelf"<?php if ( $idmode == 'namelf' ) echo ' selected="selected"'; ?>><?php if( user_info( 'lastname', 'raw', false ) != '' ) user_info( 'lastname', 'htmlhead' ); else echo '['.T_('Last name').']';  echo ' '; if( user_info( 'firstname', 'raw', false ) != '' ) user_info( 'firstname', 'htmlhead' ); else echo '['.T_('First name').']' ?></option>
 				</select>
 		</div>
 		</fieldset>
 
-
 		<?php
+			form_select( 'newuser_locale', get_user_info( 'locale' ), 'locale_options', T_('Locale'), '', 'bComment' );
 			form_text( 'newuser_email', get_user_info( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
 			form_text( 'newuser_url', get_user_info( 'url' ), 40, T_('URL'), '', 100, 'bComment' );
-			form_text( 'newuser_icq', get_user_info( 'icq' ), 40, T_('ICQ'), '', 40, 'bComment' );
+			form_text( 'newuser_icq', get_user_info( 'icq' ), 40, T_('ICQ'), '', 10, 'bComment' );
 			form_text( 'newuser_aim', get_user_info( 'aim' ), 40, T_('AOL I.M.'), '', 50, 'bComment' );
 			form_text( 'newuser_msn', get_user_info( 'msn' ), 40, T_('MSN I.M.'), '', 100, 'bComment' );
 			form_text( 'newuser_yim', get_user_info( 'yim' ), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
@@ -89,6 +89,7 @@
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 			</div>
 		</fieldset>
 

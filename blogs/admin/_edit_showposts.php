@@ -154,8 +154,8 @@
 				{
 				?>
 				<form action="b2edit.php" method="get" class="inline">
-					<input type="hidden" name="action" value="edit">
-					<input type="hidden" name="post" value="<?php $Item->ID() ?>">
+					<input type="hidden" name="action" value="edit" />
+					<input type="hidden" name="post" value="<?php $Item->ID() ?>" />
 					<input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
 				</form>
 				<?php
@@ -258,8 +258,8 @@
 						{	// If SUer has permission to edit comments:
 						?>
 						<form action="b2edit.php" method="get" class="inline">
-							<input type="hidden" name="action" value="editcomment">
-							<input type="hidden" name="comment" value="<?php $Comment->ID() ?>">
+							<input type="hidden" name="action" value="editcomment" />
+							<input type="hidden" name="comment" value="<?php $Comment->ID() ?>" />
 							<input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
 						</form>
 						<form action="edit_actions.php" method="get" class="inline">
@@ -351,26 +351,26 @@
 		<form name="searchform" method="get" action="<?php echo $pagenow ?>">
 			<h3><span style="float:right"><input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" /></span><?php echo T_('Search') ?></h3>
 
-			<input type="hidden" name="blog" value="<?php echo $blog ?>">
+			<input type="hidden" name="blog" value="<?php echo $blog ?>" />
 
 			<fieldset title="Posts to show">
 				<legend><?php echo T_('Posts to show') ?></legend>
 				<div>
-				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" ' ?>/><label for="ts_min"><?php echo T_('Past') ?></label><br />
+				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" '?> /><label for="ts_min"><?php echo T_('Past') ?></label><br />
 
-				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo T_('Future') ?></label>
+				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" '?> /><label for="ts_max"><?php echo T_('Future') ?></label>
 				</div>
 
 				<div>
-				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_published"><?php echo T_('Published (Public)') ?></label><br/>
+				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" '?> /><label for="sh_published"><?php echo T_('Published (Public)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_protected"><?php echo T_('Protected (Members only)') ?></label><br/>
+				<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" '?> /><label for="sh_protected"><?php echo T_('Protected (Members only)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_private"><?php echo T_('Private (You only)') ?></label><br/>
+				<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" '?> /><label for="sh_private"><?php echo T_('Private (You only)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
+				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked '?> /><label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br/>
+				<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> /><label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br />
 
 
 				</div>
@@ -382,9 +382,9 @@
 				<div>
 				<input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" />
 				</div>
-				<?php echo T_('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('AND') ?></label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('OR') ?></label>
-				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label>
+				<?php echo T_('Words') ?>: <input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> /><label for="sentAND"><?php echo T_('AND') ?></label>
+				<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> /><label for="sentOR"><?php echo T_('OR') ?></label>
+				<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> /><label for="sentence"><?php echo T_('Entire phrase') ?></label>
 			</fieldset>
 
 			<fieldset title="Archives">

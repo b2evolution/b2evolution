@@ -1,6 +1,6 @@
 <?php
 /**
- * file
+ * Register a new user
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
@@ -10,8 +10,8 @@
  *
  * @package b2evolution
  */
-require_once(dirname(__FILE__).'/../conf/_config.php');
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
+require_once( dirname(__FILE__).'/../conf/_config.php' );
+require_once( dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php" );
 
 param( 'action', 'string', '' );
 param( 'login', 'string', '' );
@@ -22,7 +22,7 @@ if(!get_settings('pref_newusers_canregister'))
 	$action = 'disabled';
 }
 
-switch($action)
+switch( $action )
 {
 	case 'register':
 		/*
@@ -35,21 +35,21 @@ switch($action)
 		// checking login has been typed:
 		if($login == '')
 		{
-			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please enter a Login');
+			$error = '<strong>'.T_('ERROR').'</strong>: '.T_('please enter a Login');
 			break;
 		}
 
 		// checking the password has been typed twice
 		if($pass1 == '' || $pass2 == '')
 		{
-			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please enter your password twice');
+			$error = '<strong>'.T_('ERROR').'</strong>: '.T_('please enter your password twice');
 			break;
 		}
 
 		// checking the password has been typed twice the same:
 		if($pass1 != $pass2)
 		{
-			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please type the same password in the two password fields');
+			$error = '<strong>'.T_('ERROR').'</strong>: '.T_('please type the same password in the two password fields');
 			break;
 		}
 		$user_nickname = $login;
@@ -57,12 +57,12 @@ switch($action)
 		// checking e-mail address:
 		if($email == '')
 		{
-			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('please type your e-mail address');
+			$error = '<strong>'.T_('ERROR').'</strong>: '.T_('please type your e-mail address');
 			break;
 		}
 		elseif (!is_email($email))
 		{
-			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('the email address is invalid');
+			$error = '<strong>'.T_('ERROR').'</strong>: '.T_('the email address is invalid');
 			break;
 		}
 
@@ -89,6 +89,7 @@ switch($action)
 		$new_User->set( 'browser', isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' );
 		$new_User->set_datecreated( $localtimenow );
 		$new_User->set( 'level', get_settings('pref_newusers_level') );
+		$new_User->set( 'locale', $default_locale );
 		$pref_newusers_grp_ID = get_settings('pref_newusers_grp_ID');
 		// echo $pref_newusers_grp_ID;
 		$new_user_Group = $GroupCache->get_by_ID( $pref_newusers_grp_ID );
