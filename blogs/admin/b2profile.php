@@ -15,7 +15,7 @@ require(dirname(__FILE__).'/_menutop_end.php');
 	<div class="bPost">
 		<h2><?php echo T_('Edit your profile') ?></h2>
 		<?php
-			require(dirname(__FILE__).'/'.$admin_dirout.'/_profile.php');
+			require( get_path('skins').'/_profile.php');
 		?>
 	</div>
 </div>

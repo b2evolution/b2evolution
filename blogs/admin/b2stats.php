@@ -153,7 +153,7 @@ switch( $show )
 			{	// We just hit a new day, let's display the previous one:
 				?>
 				<tr>
-					<td><?php echo date( locale_datefmt(), $this_date ) ?></td>
+					<td><?php echo date( locale_datefmt(), $last_date ) ?></td>
 					<td class="right"><?php echo $hits['no'] ?></td>
 					<td class="right"><?php echo $hits['search'] ?></td>
 					<td class="right"><?php echo $hits['robot'] ?></td>
