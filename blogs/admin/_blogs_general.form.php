@@ -87,7 +87,7 @@ if( $action == 'edit' )
 						array( 'absolute',
 										T_('absolute URL').':',
 										'',
-										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value+\'/\' );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'.
+										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'.
 										'<span class="notes">'.T_('With trailing slash.').'</span>',
 										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
 						)
