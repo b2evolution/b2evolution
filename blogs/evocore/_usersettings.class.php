@@ -105,10 +105,32 @@ class UserSettings extends AbstractSettings
 			return parent::set( $user, $setting, $value );
 		}
 	}
+
+
+	/**
+	 * Mark a setting for deletion ({@link updateDB()} writes it to DB).
+	 *
+	 * @param string name of setting
+	 * @param integer User ID (by default $current_User->ID will be used)
+	 */
+	function delete( $setting, $user = NULL )
+	{
+		global $current_User;
+
+		if( is_null($user) )
+		{
+			$user = $current_User->ID;
+		}
+
+		return parent::delete( $user, $setting );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/22 02:30:20  blueyed
+ * overloaded delete()
+ *
  * Revision 1.3  2005/01/06 05:20:14  blueyed
  * refactored (constructor), getDefaults()
  *
