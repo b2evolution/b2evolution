@@ -80,19 +80,22 @@ function form_radio(
 	$field_name,
 	$field_value,
 	$field_options,
-	$field_label )
+	$field_label,
+	$field_lines = false )
 {
 	echo '<fieldset>';
 	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
 	echo '  <div class="input">';
 	foreach( $field_options as $loop_field_option )
 	{
+		if( $field_lines ) echo "<div>\n";
 		echo '<label class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"';
 		if( $field_value == $loop_field_option[0] )
 		{
 			echo ' checked="checked"';
 		}
 		echo '> ', $loop_field_option[1], '</label> ';
+		if( $field_lines ) echo "</div>\n";
 	}
 	echo "</fieldset>\n\n";
 }

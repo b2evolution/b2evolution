@@ -41,6 +41,8 @@ function create_b2evo_tables()
 		pref_newusers_grp_ID int unsigned DEFAULT 4 NOT NULL,
 		pref_newusers_level tinyint unsigned DEFAULT 1 NOT NULL,
 		pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL,
+		pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
+		pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle',
 		PRIMARY KEY (ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
@@ -548,7 +550,7 @@ function create_default_contents( $populate_blog_a = true )
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, T_("Clean Permalinks! :idea:"), T_("<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>
 
-<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the /conf/_advanced.php file... (<code>\$use_extra_path_info = 1;</code>)</p>"), $now, $cat_b2evo ) or mysql_oops( $query );
+<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Options screen... (check 'use extra-path info')</p>"), $now, $cat_b2evo ) or mysql_oops( $query );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);

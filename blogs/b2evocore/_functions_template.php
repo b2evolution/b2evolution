@@ -87,7 +87,10 @@ function single_month_title($prefix = '#', $display = 'htmlbody' )
 	if(!empty($m) && $display) 
 	{
 		$my_year = substr($m,0,4);
-		$my_month = T_($month[substr($m,4,2)]);
+		if( strlen($m) > 4 )
+			$my_month = T_($month[substr($m,4,2)]);
+		else
+			$my_month = '';
 		$my_day = substr($m,6,2);
 
 		$title = $prefix.$my_month.' '.$my_year;
@@ -136,14 +139,12 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
  */
 function archive_link( $year, $month, $day='', $week='', $show = true, $file='', $params='' )
 {
-	global $use_extra_path_info;
-
 	if( empty($file) ) 
 		$link = get_bloginfo('blogurl');
 	else
 		$link = $file;
 
-	if( (! $use_extra_path_info) || (!empty($params)) )
+	if( (! get_settings('pref_links_extrapath')) || (!empty($params)) )
 	{	// We reference by Query: Dirty but explicit permalinks
 		$link .= '?'.$params.'&amp;m=';
 		$separator = '';
@@ -166,7 +167,7 @@ function archive_link( $year, $month, $day='', $week='', $show = true, $file='',
 	}
 	elseif( !empty( $week ) )
 	{
-		if( ! $use_extra_path_info )
+		if( ! get_settings('pref_links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
 			$link .= '&amp;w='.$week;
 		}

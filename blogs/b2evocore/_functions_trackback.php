@@ -136,11 +136,16 @@ function trackback_response($error = 0, $error_message = '')
  *
  * @deprecated deprecated by {@link Item::trackback_url()}
  */
-function trackback_url($display = 1) {
-	global $htsrv_url, $id, $use_extra_path_info;
-	if( $use_extra_path_info ) {
+function trackback_url($display = 1) 
+{
+	global $htsrv_url, $id;
+	
+	if( get_settings('pref_links_extrapath') ) 
+	{
 		$tb_url = "$htsrv_url/trackback.php/$id";
-	} else {
+	} 
+	else 
+	{
 		$tb_url = "$htsrv_url/trackback.php?tb_id=$id";
 	}
 	if ($display) {

@@ -242,6 +242,13 @@ function upgrade_b2evo_tables()
 							CHANGE blog_lang blog_locale varchar(10) NOT NULL default 'en-US'";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
+
+		echo 'Upgrading settings table...';
+		$query = "ALTER TABLE $tablesettings
+							ADD COLUMN pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
+							ADD COLUMN pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle'";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
 		
 	}
 

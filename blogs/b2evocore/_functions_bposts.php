@@ -678,7 +678,7 @@ function the_content(
 {
 	global $use_textile;
 	global $id, $postdata, $pages, $multipage, $numpages;
-	global $preview, $use_extra_path_info;
+	global $preview;
 
 	// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
@@ -1342,38 +1342,36 @@ function permalink_anchor( $mode = 'id' )
 	}
 }
 
-/*
+/**
  * gen_permalink(-)
  *
  * generate permalink
  *
  * TODO: archives modes in clean mode
+ *
+ * @deprecated
  */
 function gen_permalink(
 	$file, 											// base URL of the blog
 	$id,												// post ID to be linked to
 	$use_anchor_mode = '', 			// Default to id
 	$use_destination = '',			// Default to config
-	$use_more = NULL,
-	$use_comments = NULL,
-	$use_trackback = NULL,
-	$use_pingback = NULL )
+	$use_more = NULL,						// DEPRECATED
+	$use_comments = NULL,	// DEPRECATED
+	$use_trackback = NULL,	// DEPRECATED
+	$use_pingback = NULL )	// DEPRECATED
 {
-	global $cacheweekly, $use_extra_path_info, $permalink_destination;
-	global $permalink_include_more, $permalink_include_comments;
-	global $permalink_include_trackback, $permalink_include_pingback;
+	global $cacheweekly;
 
 	// We're gonna need access to more postdata in several cases:
 	$postdata = get_postdata( $id );
 
 	// Defaults:
 	if (empty($use_anchor_mode)) $use_anchor_mode = 'id';
-	if (empty($use_destination)) $use_destination = $permalink_destination;
+	if (empty($use_destination)) 
+			$use_destination = ( strstr( get_settings('pref_permalink_type'), 'archive' ) !== false ) 
+					? 'archive' : 'single';
 	if ($use_destination=='archive') $use_destination = get_settings('archive_mode');
-	if (empty($use_more)) $use_more = $permalink_include_more;
-	if (empty($use_comments)) $use_comments = $permalink_include_comments;
-	if (empty($use_trackback)) $use_trackback = $permalink_include_trackback;
-	if (empty($use_pingback)) $use_pingback = $permalink_include_pingback;
 
 	// Generate anchor
 	switch(strtolower($use_anchor_mode))
@@ -1389,32 +1387,13 @@ function gen_permalink(
 			break;
 	}
 
-	if( ! $use_extra_path_info )
+	if( ! get_settings('pref_links_extrapath') )
 	{	// We reference by Query: Dirty but explicit permalinks
-
-		// Generate options
-		$options = '';
-		if( $use_more )
-		{ // permalinks to include full post text
-			$options .=  '&amp;more=1';
-		}
-		if( $use_comments )
-		{ // permalinks to include comments
-			$options .=  '&amp;c=1';
-		}
-		if( $use_trackback )
-		{ // permalinks to include trackbacks
-			$options .=  '&amp;tb=1';
-		}
-		if( $use_pingback )
-		{ // permalinks to include pingbacks
-			$options .=  '&amp;pb=1';
-		}
 
 		switch($use_destination)
 		{
 			case 'monthly':
-				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).$options.'#'.$anchor;
+				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor;
 				break;
 			case 'weekly':
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) {
@@ -1423,15 +1402,15 @@ function gen_permalink(
 					$row = mysql_fetch_row($result);
 					$cacheweekly[$postdata['Date']] = $row[0];
 				}
-				$permalink = $file.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].$options.'#'.$anchor;
+				$permalink = $file.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor;
 				break;
 			case 'daily':
-				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).$options.'#'.$anchor;
+				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor;
 				break;
 			case 'postbypost':
 			case 'single':
 			default:
-				$permalink = $file.'?p='.$id.$options;
+				$permalink = $file.'?p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1';
 				break;
 		}
 	}

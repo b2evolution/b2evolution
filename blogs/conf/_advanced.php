@@ -37,31 +37,6 @@ $b2evo_name = 'b2evo';		// MUST BE A SINGLE WORD! NO SPACES!!
 $notify_from = $b2evo_name.'@'.$basehost; // comment this line if you want to customize
 
 
-// *** Permalink control ***
-
-# DEPRECATED:
-# What do you want permalinks to link to?
-# 'single' will link to a single post
-# 'archive' will link to the post in the archives
-$permalink_destination = 'single';					// 'single' is HIGHLY RECOMMENDED !!!
-
-# These variables control what options permalinks include:
-# It is recommended to set them to 1 except if you use $permalink_destination = 'archive';
-$permalink_include_more = 1;			// Set this to 1 for permalinks to include full post text
-$permalink_include_comments = 1;	// Set this to 1 for permalinks to include comments
-$permalink_include_trackback = 1;	// Set this to 1 for permalinks to include trackbacks
-$permalink_include_pingback = 1;	// Set this to 1 for permalinks to include pingbacks
-
-# Extra path info allows really clean URLS for permalinks
-# They will look like http://localhost/b2evolution/blogs/demoa/2003/05/20/p4
-# instead of http://localhost/b2evolution/blogs/demoa.php?p=4&c=1&tb=1&pb=1&more=1
-# Your server has to suuport this. This requires apache configuration.
-# Note: OVH for example supports this by default.
-$use_extra_path_info = 0; 				// Set this to 1 to enable clean extra path info
-
-$use_extra_path_info = 1; 				// TESTING
-
-
 // ** Configuration for htsrv/getmail.php ** 
 // (skip this if you don't intend to blog via email)
 # mailserver settings

@@ -90,13 +90,10 @@ class Item extends DataObject
 	 */
 	function gen_permalink( $mode, $blogurl )
 	{
-		global $cacheweekly, $use_extra_path_info, $permalink_destination;
-		global $permalink_include_more, $permalink_include_comments;
-		global $permalink_include_trackback, $permalink_include_pingback;
-		global $use_extra_path_info;
+		global $cacheweekly;
 
 		if( empty( $mode ) )
-			$mode = 'urltitle';
+			$mode = get_settings( 'pref_permalink_type' );
 	
 		if( empty( $blogurl ) ) 
 			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
@@ -109,12 +106,14 @@ class Item extends DataObject
 				// Link to an archive page:
 				$dest_type = get_settings('archive_mode');
 				$anchor = $this->ID;
+				$urltail = 'p'.$this->ID;
 				break;
 
 			case 'archive#title':
 				// Link to an archive page:
 				$dest_type = get_settings('archive_mode');
 				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
+				$urltail = 'p'.$this->ID;
 				break;
 			
 			case 'pid':
@@ -140,32 +139,13 @@ class Item extends DataObject
 				}
 		}
 
-		if( ! $use_extra_path_info )
+		if( ! get_settings('pref_links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
-	
-			// Generate options
-			$options = '';
-			if( $permalink_include_more )
-			{ // permalinks to include full post text
-				$options .=  '&amp;more=1';
-			}
-			if( $permalink_include_comments )
-			{ // permalinks to include comments
-				$options .=  '&amp;c=1';
-			}
-			if( $permalink_include_trackback )
-			{ // permalinks to include trackbacks
-				$options .=  '&amp;tb=1';
-			}
-			if( $permalink_include_pingback )
-			{ // permalinks to include pingbacks
-				$options .=  '&amp;pb=1';
-			}
 	
 			switch( $dest_type ) 
 			{
 				case 'monthly':
-					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).$options.'#'.$anchor;
+					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).'#'.$anchor;
 					break;
 					
 				case 'weekly':
@@ -176,16 +156,16 @@ class Item extends DataObject
 						$row = mysql_fetch_row($result);
 						$cacheweekly[$post_date] = $row[0];
 					}
-					$permalink = $blogurl.'?m='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date].$options.'#'.$anchor;
+					$permalink = $blogurl.'?m='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date].'#'.$anchor;
 					break;
 					
 				case 'daily':
-					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2).$options.'#'.$anchor;
+					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2).'#'.$anchor;
 					break;
 					
 				case 'postbypost':
 				default:
-					$permalink = $blogurl.'?'.$urlparam.$options;
+					$permalink = $blogurl.'?'.$urlparam.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1';
 					break;
 			}
 		}
@@ -194,7 +174,7 @@ class Item extends DataObject
 			switch( $dest_type ) 
 			{
 				case 'monthly':
-					$permalink = $blogurl.mysql2date("/Y/m/", $post_date).'#'.$anchor;
+					$permalink = $blogurl.mysql2date("/Y/m", $post_date).'#'.$anchor;
 					break;
 					
 				case 'weekly':
@@ -205,11 +185,11 @@ class Item extends DataObject
 						$row = mysql_fetch_row($result);
 						$cacheweekly[$post_date] = $row[0];
 					}
-					$permalink = $blogurl.mysql2date("/Y/m/", $post_date).'w'.$cacheweekly[$post_date].'/#'.$anchor;
+					$permalink = $blogurl.mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date].'#'.$anchor;
 					break;
 					
 				case 'daily':
-					$permalink = $blogurl.mysql2date("/Y/m/d/", $post_date).'#'.$anchor;
+					$permalink = $blogurl.mysql2date("/Y/m/d", $post_date).'#'.$anchor;
 					break;
 					
 				case 'postbypost':
@@ -233,18 +213,28 @@ class Item extends DataObject
 	 *
 	 * @param string 'id' or 'title'
 	 */
-	function anchor( $mode = 'id' ) 
+	function anchor( $mode = '' ) 
 	{
+		if( empty( $mode ) )
+			$mode = get_settings( 'pref_permalink_type' );
+
 		switch( $mode )
 		{
-			case 'title':
+			case 'archive#title': // permalink_type
+			case 'title': // explicit choice
 				$title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
 				echo '<a name="'.$title.'"></a>';
 				break;
 				
-			default:
+			case 'archive#id': // permalink_type
+			case 'id': // explicit choice
 				echo '<a name="'.$this->ID.'"></a>';
 				break;
+
+
+			case 'pid': // permalink type where we need no ID
+			case 'urltitle': // permalink type where we need no ID
+			default:
 		}
 	}
 	
@@ -731,9 +721,9 @@ class Item extends DataObject
 	 */
 	function trackback_url() 
 	{
-		global $htsrv_url, $use_extra_path_info;
+		global $htsrv_url;
 
-		if( $use_extra_path_info ) 
+		if( get_settings('pref_links_extrapath') ) 
 		{
 			echo "$htsrv_url/trackback.php/$this->ID";
 		}

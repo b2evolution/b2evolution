@@ -26,16 +26,20 @@ switch($action)
 		param( 'pref_newusers_canregister', 'integer', 0 );
 		param( 'pref_newusers_grp_ID', 'integer', true );
 		param( 'pref_newusers_level', 'integer', true );
+		param( 'pref_links_extrapath', 'integer', 0 );
+		param( 'pref_permalink_type', 'string', true );
 		
 		$query = "UPDATE $tablesettings 
-							SET posts_per_page=$newposts_per_page, 
-									what_to_show='$newwhat_to_show', 
-									archive_mode='$newarchive_mode', 
-									time_difference=$newtime_difference, 
-									AutoBR=$newautobr, 
+							SET posts_per_page = $newposts_per_page, 
+									what_to_show = '".addslashes($newwhat_to_show)."', 
+									archive_mode = '".addslashes($newarchive_mode)."', 
+									time_difference = $newtime_difference, 
+									AutoBR = $newautobr, 
 									pref_newusers_canregister = $pref_newusers_canregister,
 									pref_newusers_level = $pref_newusers_level,
-									pref_newusers_grp_ID = $pref_newusers_grp_ID";
+									pref_newusers_grp_ID = $pref_newusers_grp_ID,
+									pref_links_extrapath = $pref_links_extrapath,
+									pref_permalink_type = '".addslashes($pref_permalink_type)."'";
 		mysql_query($query) or mysql_oops( $query );
 		$querycount++;
 		
@@ -79,7 +83,7 @@ switch($action)
 	
 		
 		<fieldset>
-			<legend><?php echo T_('Post options') ?></legend>
+			<legend><?php echo T_('Display options') ?></legend>
 			<?php
 				form_radio( 'newwhat_to_show', $what_to_show,
 						array(  array( 'days', T_('days') ),
@@ -90,13 +94,27 @@ switch($action)
 				form_text( 'newposts_per_page', $posts_per_page, 4, T_('Posts/Days per page'), '', 4 );
 
 				form_radio( 'newarchive_mode', $archive_mode,
-						array(  array( 'daily', T_('daily') ),
+						array(  array( 'monthly', T_('monthly') ),
 										array( 'weekly', T_('weekly') ),
-										array( 'monthly', T_('monthly') ),
+										array( 'daily', T_('daily') ),
 										array( 'postbypost', T_('post by post') )
 									), T_('Archive mode') );
 
 	 			form_checkbox( 'newautobr', $autobr, T_('Auto-BR'), sprintf( T_('Converts line-breaks into &lt;br /&gt; tags.' ) ) );
+			?>
+		</fieldset>
+
+		<fieldset>
+			<legend><?php echo T_('Link options') ?></legend>
+			<?php
+	 			form_checkbox( 'pref_links_extrapath', get_settings('pref_links_extrapath'), T_('Use extra-path info'), sprintf( T_('Recommended if your webserver supports it. Links will look like stub/2003/05/20/post_title instead of stub?title=post_title&c=1&tb=1&pb=1&more=1' ) ) );
+
+				form_radio( 'pref_permalink_type', get_settings('pref_permalink_type'),
+						array(  array( 'urltitle', T_('Post called up by its URL title (Recommended)') ),
+										array( 'pid', T_('Post called up by its ID') ),
+										array( 'archive#id', T_('Post on archive page, located by its ID') ),
+										array( 'archive#title', T_('Post on archive page, located by its title (for Cafelog compatibility)') )
+									), T_('Permalink type'), true );
 			?>
 		</fieldset>
 	
