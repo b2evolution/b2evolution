@@ -77,7 +77,9 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 
 		case 'formvalue':
-			$content = convert_chars($content, 'html');
+			// convert_chars() do too much at this time,
+			// so temporally commented out.
+//			$content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
 			break;
 
