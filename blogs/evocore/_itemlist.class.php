@@ -580,7 +580,9 @@ class ItemList extends DataObjectList
 
 
 	/**
-	 * dummy mysql query for the preview
+	 * Dummy mysql query for the preview
+	 *
+	 * @return string SQL query
 	 */
 	function preview_request()
 	{
@@ -629,6 +631,19 @@ class ItemList extends DataObjectList
 		{
 			$content =	preg_replace('/\%u([0-9A-F]{4,4})/e',	 "'&#'.base_convert('\\1',16,10). ';'", $content);
 		}
+
+		/*
+			TODO: new post params not recognized! (Produces notices in preview)
+
+			post form param          Add to query
+			------------------------------------------------
+			item_assigned_user_ID => (post_)assigned_user_ID
+			item_priority         => (post_)priority
+			item_deadline         => (post_)datedeadline
+
+			???                   => (post_)ptyp_ID
+			???                   => (post_)pst_ID
+		*/
 
 		return "SELECT
 										0 AS ID,
@@ -951,6 +966,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/10 23:51:43  blueyed
+ * added preview-fix todo
+ *
  * Revision 1.16  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *
