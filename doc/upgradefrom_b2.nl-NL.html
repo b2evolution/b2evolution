@@ -26,7 +26,7 @@
 		</div>
 	</div>
 	<div class="installSideBar">
-		<p>Becschikbare vertalingen voor deze pagina:</p>
+		<p>Beschikbare vertalingen voor deze pagina:</p>
 			<ul style="margin-left: 2ex;list-style:none;">
 		<li><a href="upgradefrom_b2.html"><img src="../blogs/img/flags/w16px/eu.gif" alt="English (EU)" border="1"  class="flag"/> Engels (EU)</a></li>
 		<li><a href="upgradefrom_b2.de-DE.html"><img src="../blogs/img/flags/w16px/de.gif" alt="German (DE)" border="1"  class="flag"/> Duits (DE)</a></li>
@@ -41,24 +41,24 @@
 
 <p>Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.</p>
 
-<p>The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2.
-	Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2,
-	you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it.
-	The worst you would get is an error message.</p>
+<p>De bijwerk procedure is exclusief getest met de b2 versies 0.6.1 en 0.6.2. Maar, ik denk dat versie 0.5.x ook zonder problemen kunnen worden bijgewerkt. Maargoed, als je een oude versie van b2 gebruikt kun je het zonder problemen proberen. b2evolution zal jouw data niet schaden, zelfs niet als het niet begrepen word. Het ergste wat kan gebeuren is dat je een foutmelding krijgt.</p>
 <p><em>Maar, zoals altijd, is het verstandig een backup te maken van jouw huidige website / weblog / database (afhankelijk van wat je al hebt) voordat je iets nieuws installeert.</em></p>
 
-<p>Wanneer je de b2evolution distributie hebt uitgepakt:</p>
+<p>Zodra je de b2evolution distributie hebt uitgepakt:</p>
 
 <ol class="expanded">
 <li>Op je server, vind uit wat de mysql database is die je nu al gebruikt voor Cafelog/b2. Je moet dezelfde database gebruiken om te kunnen bijwerken naar b2evolution. Maak je niet druk, b2evolution zal onder geen beding de tabellen en data van Cafelog/b2 aanpassen!<br />
 		<span class="small"><br />
-		<strong>Opmerking 1: </strong>Behalve als je de configuratie hebt verandert, zullen alle tabellen die b2evolution aanmaakt worden voorzien van het voorschrift evo_. Behalve als je al een applicatie hebt draaien met hetzelfde voorschrift, maakt dit de installatie van b2evolution een stuk veiliger in een database die word gedeeld met andere applicaties. Bijvoorbeeld, Cafelog/b2 gebruikt het voorschrift b2. Jouw bestaande tabellen zullen zo op geen enkele manier worden aangepast.<br />
+		<strong>Opmerking 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with
+		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
+		b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 .
+		Your existing tables will not be affected in any way.<br />
 		<strong>Opmerking 2:</strong> Waarom dezelfde database? Omdat het SQL proces dat we gebruiken om de data te kopieren -- die snel en veilig is -- alleen kan worden gedaan in een enkele database.</span>
 </li>
 
-<li>Upload the b2evolution files to your website.<br />
+<li>Upload de b2evolution bestanden naar je website, die gelijk is aan de URL die je net hebt geconfigureerd.<br />
   <br />
-  <span class="small"><strong>Note:</strong> Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong><br />
+  <span class="small"><strong>Opmerking:</strong> Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong><br />
   </span> <br />
 Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ...</li>
 
@@ -66,9 +66,9 @@ Let's assume you install the contents of the blogs folder to <code>http://yoursi
   	<br />
 	The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you. </li>
 <li>Check to make sure the new installation works.</li>
-<li>On production servers, it is recommended that you delete the <code>/install</code> subfolder.</li>
+<li>Op productie servers, is het aangeraden dat je de <code>/install/</code> directory verwijdert. </li>
 <li>Check the <a href="http://wiki.b2evolution.net/">wiki</a> or the <a href="http://forums.b2evolution.net/">forums</a> for notes on upgrading your existing b2 template to b2evolution.</li>
-<li>After basic install is done, there are a few <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things you may need to take care of</a> (online manual).</li>
+<li>Nadat de basis installatie is voltooid, zijn er nog wat <a ref>tricky dingen waar je rekening mee moet houden</a> (online handboek)</li>
 </ol>
 
 	<div id="rowfooter">

@@ -187,7 +187,7 @@ function cat_delete( $cat_ID )
 
 
 
-/*
+/**
  * get_the_category_by_ID(-)
  *
  * Get category name+blog_id for specified cat ID
