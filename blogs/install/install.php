@@ -45,6 +45,11 @@ require_once (dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts
 
 $new_db_version = 8040;				// next time: 8050
 
+/*
+ * create_b2evo_tables(-)
+ *
+ * Used for fresh install + upgrade from b2
+ */
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
@@ -219,6 +224,28 @@ function create_b2evo_tables()
 	echo "<p>All tables created successfully.</p>\n";
 }
 
+
+/*
+ * create_antispam(-)
+ *
+ * Used when creating full install and upgrading from earlier versions
+ */
+function create_antispam()
+{
+	global $tableantispam;
+	
+	$query = "CREATE TABLE $tableantispam (
+		ID bigint(11) NOT NULL auto_increment,
+		domain varchar(250) NOT NULL,
+		PRIMARY KEY (ID),
+		KEY domain (domain)
+	)";
+	$q = mysql_query($query) or mysql_oops( $query );
+}
+
+/*
+ * populate_blogroll(-)
+ */
 function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 {
 	global $timestamp;
@@ -261,32 +288,22 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 }
 
-function create_antispam()
-{
-	global $tableantispam;
-	
-	$query = "CREATE TABLE $tableantispam (
-		ID bigint(11) NOT NULL auto_increment,
-		domain varchar(250) NOT NULL,
-		PRIMARY KEY (ID),
-		KEY domain (domain)
-	)";
-	$q = mysql_query($query) or mysql_oops( $query );
-}
-
+/*
+ * populate_antispam(-)
+ */
 function populate_antispam()
 {
 	global $tableantispam;
 	
-	$query = "INSERT INTO $tableantispam (domain) VALUES ".
+	$query = "INSERT INTO $tableantispam(domain) VALUES ".
 	"('prescriptions.md'), ('penis-enlargement'), ('online-casino'), ".
 	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
 	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
-	"('-adult-'), ('-tits-'), ('mneuron.com)', ('buy-phentermine'), ".
+	"('-adult-'), ('-tits-'), ('mneuron.com'), ('buy-phentermine'), ".
 	"('order-cheap-pills'), ('menguma.com'), ('gdough.com'), ".
 	"('online-hgh.com'), ('pcfamily.ch'), ('nositeyet.com'), ".
 	"('boris.com'), ('mishka.com'), ('sexgine.com'), ".
-	"('pornwizzard.com'), ('zdenka.accepted.cc'), ('bigstorysite.com)', ".
+	"('pornwizzard.com'), ('zdenka.accepted.cc'), ('bigstorysite.com'), ".
 	"('girlpron.com'), ('agedwife.com'), ('pissingpleasures.com'), ".
 	"('tvojproblem.com'), ('slavebabe.com'), ('dragoonguardsband.co.uk'), ".
 	"('shop.cokecans.com'), ('bolinat.com'), ('freenudecelebrity.com'), ".
@@ -326,6 +343,30 @@ function populate_antispam()
 }
 
 
+/*
+ * check_db_version(-)
+ *
+ * Note: version number 8000 once meant 0.8.00.0, but I decided to switch to sequential 
+ * increments of 10 (in case we ever need to introduce intermediate versions for intermediate
+ * bug fixes...)
+ */
+function check_db_version()
+{
+	global $old_db_version, $new_db_version, $tablesettings;
+
+		echo "<p>Checking DB schema version... ";
+		$query = "SELECT db_version FROM $tablesettings WHERE ID = 1";
+		$q = mysql_query($query) or mysql_oops( $query );
+		$row = mysql_fetch_assoc($q);
+		if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
+		$old_db_version = $row['db_version'];
+		echo $old_db_version, ' : ';
+		if( $old_db_version < 8000 ) die( 'This version is too old!' );
+		if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
+		echo "OK.<br />\n";
+}
+ 
+ 
 dbconnect() or die( "<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>" );
 
 param( 'action', 'string' );
@@ -491,21 +532,8 @@ switch( $action )
 		// start benchmarking
 		$time_start = gettimeofday();
 
-		echo "<p>Checking DB schema version... ";
-		$query = "SELECT db_version FROM $tablesettings WHERE ID = 1";
-		$q = mysql_query($query) or mysql_oops( $query );
-		$row = mysql_fetch_assoc($q);
-		if( !isset($row['db_version'] ) ) die( 'NOT FOUND! This is not a b2evolution database.' );
-		$old_db_version = $row['db_version'];
-		echo $old_db_version, ' : ';
-		if( $old_db_version < 8000 ) die( 'This version is too old!' );
-		if( $old_db_version > $new_db_version ) die( 'This version is too recent! We cannot downgrade to it!' );
-		echo "OK.<br />\n";
-
-		// Note: version number 8000 once meant 0.8.00.0, but I decided to switch to sequential 
-		// increments of 10 (in case we ever need to introduce intermediate versions for intermediate
-		// bug fixes...)
-
+		// Check DB version:
+		check_db_version();
 		if( $old_db_version == $new_db_version )
 		{
 			echo '<p>The database schema is already up to date. There is nothing to do.</p>';
@@ -619,6 +647,8 @@ switch( $action )
 		{
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
+			 * Then create a new extension block, and increase db version numbers
+			 * everywhere where needed in this file.
 			 */
 			#	echo "<p>Creating plugin settings table... ";
 			#	create_pluginsettings();
@@ -643,6 +673,40 @@ switch( $action )
  <?php
 	break;
 
+
+	case 'redocurrentupgrade':
+		/* 
+		 * -----------------------------------------------------------------------------------
+		 * REDO the current b2evo upgrade. This is used for development only!
+		 * -----------------------------------------------------------------------------------
+		 */
+		echo '<h3>Update development base by redoing latest upgarde (', $new_db_version, ')</h3>';
+
+		// Check DB version:
+		check_db_version();
+		if( $old_db_version != $new_db_version )
+		{
+			echo '<p>The database schema is not up to date. Use regular upgrade instead.</p>';
+			break;
+		}
+
+		echo "Droping Antispam table...<br />\n";
+		$query = "DROP TABLE IF EXISTS $tableantispam";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		echo "<p>Creating Anti-Spam Ban List... ";
+		create_antispam();
+		echo "OK.<br />\n";
+		
+		echo "<p>Populating Anti-Spam table... ";
+		populate_antispam();
+		echo "OK.<br />\n";
+
+		?>
+		<p>Redo completed successfully!</p>
+		<?php
+		break;
+	
 
 	case 'upgradedb':
 		/* 
@@ -904,6 +968,8 @@ switch( $action )
 <p><input type="radio" name="action" value="newdb" checked="checked"> <strong>New Install</strong>: Install b2evolution tables with sample data.</p>
 	
 		<p><input type="radio" name="action" value="evodb"> <strong>Upgrade from a previous version of b2evolution</strong>: This will upgrade your b2evolution database in order to make it compatible with the current version!</p>
+
+		<p><input type="radio" name="action" value="redocurrentupgrade"> <strong>DEVELOPMENT ONLY</strong>: Redo the current upgrade step to match your DB with current dev base!</p>
 
   	<p><input type="radio" name="action" value="upgradedb"> <strong>Upgrade from original b2</strong>: Install b2evolution tables and copy your existing b2 data into them. </p>
 
