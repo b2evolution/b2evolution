@@ -47,6 +47,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 $app_name = 'b2evolution';
 $app_version = '0.9.2-CVS';
 $new_db_version = 8070;				// next time: 8080
+$admin_path_seprator = ' :: ';
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
 // $debug = true;
@@ -270,6 +271,9 @@ $aspm_sources = array (
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

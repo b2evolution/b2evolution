@@ -38,7 +38,7 @@
 require( dirname(__FILE__). '/_header.php' );
 $admin_tab = 'options';
 $tab = 'plugins';
-$admin_pagetitle = T_('Settings').' :: '.T_('Plug-ins');
+$admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Plug-ins');
 
 param( 'action', 'string' );
 

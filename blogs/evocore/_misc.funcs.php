@@ -909,7 +909,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 			$$var = remove_magic_quotes( $_POST[$var] );
 			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by POST', 'params' );
 		}
-		elseif( isset($_GET["$var"]) )
+		elseif( isset($_GET[$var]) )
 		{
 			$$var = remove_magic_quotes($_GET[$var]);
 			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by GET', 'params' );
@@ -921,7 +921,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 		}
 		elseif( $default === true )
 		{
-			die( '<p class="error">'.sprintf( T_('Parameter %s is required!'), $var ).'</p>' );
+			die( '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>' );
 		}
 		elseif( $forceset )
 		{
@@ -990,12 +990,12 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $global_param_list, $ReqPath, $basehost;
+	global $Debuglog, $global_param_list, $ReqPath, $basehost;
 
 	if( $ignore == '' )
 		$ignore = array( );
 	elseif( !is_array($ignore) )
-		$ignore = array( $ignore );
+		$ignore = explode( ',', $ignore );
 
 	if( $set == '' )
 		$set = array( );
@@ -1010,6 +1010,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 
 		if( in_array( $var, $ignore ) )
 		{ // we don't want to include that one
+			$Debuglog->add( 'regenerate_url(): ignoring '.$var, 'params' );
 			continue;
 		}
 
@@ -1635,6 +1636,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.12  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.11  2004/11/10 22:46:44  blueyed
  * translation adjustments
  *

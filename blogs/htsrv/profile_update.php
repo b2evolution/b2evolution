@@ -81,7 +81,7 @@ if( !empty($pass1) )
 	$updatepassword = "user_pass = '$newuser_pass', ";
 	if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
 	{
-		printf( T_('setcookie %s failed!'), $cookie_pass );
+		printf( T_('setcookie &laquo;%s&raquo; failed!'), $cookie_pass );
 	}
 }
 

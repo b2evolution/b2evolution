@@ -26,10 +26,10 @@ param( 'notransext', 'integer', 0 );
 switch( $tab )
 {
 	case 'general':
-		$admin_pagetitle .= ' :: '. T_('General');
+		$admin_pagetitle .= $admin_path_seprator.T_('General');
 		break;
 	case 'regional':
-		$admin_pagetitle .= ' :: '. T_('Regional');
+		$admin_pagetitle .= $admin_path_seprator.T_('Regional');
 		break;
 }
 
@@ -125,7 +125,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 																	WHERE loc_locale = "'.$oldloc_locale.'"' );
 							if( mysql_affected_rows() )
 							{
-								$Messages->add( sprintf(T_('Deleted settings for locale [%s] in database.'), $oldloc_locale), 'note' );
+								$Messages->add( sprintf(T_('Deleted settings for locale &laquo;%s&raquo; in database.'), $oldloc_locale), 'note' );
 							}
 						}
 					}
@@ -140,12 +140,12 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 						if( $oldlocale != $newlocale )
 						{ // disable old locale
 							$query .= ' 0)';
-							$Messages->add( sprintf(T_('Inserted (and disabled) locale [%s] into database.'), $oldloc_locale), 'note' );
+							$Messages->add( sprintf(T_('Inserted (and disabled) locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'note' );
 						}
 						else
 						{ // keep old state
 							$query .= ' '.$locales[$oldloc_locale]['enabled'].')';
-							$Messages->add( sprintf(T_('Inserted locale [%s] into database.'), $oldloc_locale), 'note' );
+							$Messages->add( sprintf(T_('Inserted locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'note' );
 						}
 						$q = $DB->query($query);
 					}
@@ -156,7 +156,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 									VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
 									'$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
 				$q = $DB->query($query);
-				$Messages->add( sprintf(T_('Saved locale [%s].'), $newloc_locale), 'note' );
+				$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'note' );
 
 				// reload locales: an existing one could have been renamed
 				unset( $locales );
@@ -329,7 +329,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					require(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
 					@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
-					$Messages->add( sprintf(T_('Deleted locale [%s] from database.'), $delete), 'note' );
+					$Messages->add( sprintf(T_('Deleted locale &laquo;%s&raquo; from database.'), $delete), 'note' );
 				}
 
 				// --- SWITCH PRIORITIES -----------------

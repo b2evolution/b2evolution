@@ -447,7 +447,7 @@ else switch ($action)
 		if( !$confirm )
 		{?>
 		<div class="panelinfo">
-			<h3><?php printf( T_('Delete group [%s]?'), $del_Group->get( 'name' ) )?></h3>
+			<h3><?php printf( T_('Delete group &laquo;%s&raquo;?'), $del_Group->get( 'name' ) )?></h3>
 
 			<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 

@@ -444,7 +444,7 @@ if( empty($mode) )
 ?>
 
 <div id="TitleArea">
-<h1><strong>:: <?php
+<h1><strong><?php echo $admin_path_seprator;
 if( isset( $admin_pagetitle_titlearea ) )
 {
 	echo $admin_pagetitle_titlearea;

@@ -229,9 +229,9 @@ class DataObject
 
 
 	/**
-	 * DataObject::dbdelete(-)
-	 *
 	 * Delete object from DB
+	 *
+	 * {@internal DataObject::dbdelete(-)}}
 	 */
 	function dbdelete( )
 	{
@@ -338,6 +338,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.2  2004/10/21 18:33:39  fplanque
  * NULL handling
  *

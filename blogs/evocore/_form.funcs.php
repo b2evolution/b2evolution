@@ -41,6 +41,32 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+
+function form_fieldstart( $field_name, $field_label )
+{
+	return "<fieldset>\n"
+			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
+			.'<div class="input">';
+}
+
+function form_fieldend()
+{
+	return "</div>\n</fieldset>\n\n";
+}
+
+function form_infostart( $field_label )
+{
+	return "<fieldset>\n".
+					'<div class="label">'.$field_label.":</div>\n".
+					'<div class="info">';
+}
+
+function form_infoend()
+{
+	return "</div>\n</fieldset>\n\n";
+}
+
+
 /**
  * builds an text (or password) input field.
  *
@@ -407,6 +433,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.4  2004/10/21 18:34:02  fplanque
  * minor changes
  *

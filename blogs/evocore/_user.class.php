@@ -199,12 +199,12 @@ class User extends DataObject
 		{
 			if( !mkdir( $userdir ) ) // defaults to 0777
 			{ // add error
-				$Messages->add( sprintf( T_("The user's directory [%s] could not be created."), $userdir ), 'error' );
+				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; could not be created."), $userdir ), 'error' );
 				return false;
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The user's directory [%s] has been created with permissions %s."), $userdir, '777' ), 'note' );
+				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), $userdir, '777' ), 'note' );
 			}
 		}
 		return $userdir;
@@ -656,6 +656,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.3  2004/11/09 00:25:12  blueyed
  * minor translation changes (+MySQL spelling :/)
  *

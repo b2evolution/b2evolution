@@ -112,9 +112,9 @@ function veriflog( $login_required = false )
 		// Login succeeded:
 		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
 		if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
-			printf( T_('setcookie %s failed!'). '<br />', $cookie_user );
+			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
 		if( !setcookie( $cookie_pass, $user_pass_md5, $cookie_expires, $cookie_path, $cookie_domain) )
-			printf( T_('setcookie %s failed!'). '<br />', $cookie_user );
+			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
 	}
 	elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
 	{ /*
@@ -631,6 +631,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.3  2004/10/15 17:51:38  fplanque
  * added user_preferedname()
  *

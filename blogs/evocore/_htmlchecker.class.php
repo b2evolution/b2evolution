@@ -182,9 +182,9 @@ class SafeHtmlChecker
 		// Is tag allowed in the current context?
 		if (!in_array($tag, explode(' ', $this->tags[$previous]))) {
 			if ($previous == 'body') {
-				$this->html_error(	sprintf( T_('Tag %s must occur inside another tag'), '<code>'.$tag.'</code>' ) );
+				$this->html_error(	sprintf( T_('Tag &lt;%s&gt; must occur inside another tag'), '<code>'.$tag.'</code>' ) );
 			} else {
-				$this->html_error(	sprintf( T_('Tag %s is not allowed within tag %s'), '<code>'.$tag.'</code>', '<code>'.$previous.'</code>') );
+				$this->html_error(	sprintf( T_('Tag &lt;%s&gt; is not allowed within tag &lt;%s&gt;'), '<code>'.$tag.'</code>', '<code>'.$previous.'</code>') );
 			}
 		}
 		// Are tag attributes valid?
@@ -192,7 +192,7 @@ class SafeHtmlChecker
 		{
 			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])))
 			{
-				$this->html_error( sprintf( T_('Tag %s may not have attribute %s'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
+				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
 			}
 			if (in_array($attr, $this->uri_attrs))
 			{ // Must this attribute be checked for URIs
@@ -223,7 +223,7 @@ class SafeHtmlChecker
 		}
 		if (trim($cdata) != '') {
 			if (!in_array('#PCDATA', explode(' ', $this->tags[$previous]))) {
-				$this->html_error(	sprintf( T_('Tag %s may not contain raw character data'), '<code>'.$previous.'</code>' ) );
+				$this->html_error(	sprintf( T_('Tag &lt;%s&gt; may not contain raw character data'), '<code>'.$previous.'</code>' ) );
 			}
 		}
 	}
@@ -258,6 +258,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.3  2004/11/15 18:57:05  fplanque
+ * cosmetics
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *
