@@ -16,7 +16,7 @@ class gmcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
-	var $priority = 41;
+	var $priority = 40;
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true; 
 	var $apply_to_xml = false; // Leave the GMcode markup
@@ -29,10 +29,11 @@ class gmcode_Rendererplugin extends RendererPlugin
 	 * @access private
 	 */
 	var $search = array(
-											'#\s\*\*(.+?)\*\*#s',		// **bold**
-											'#\s\x5c\x5c(.+?)\x5c\x5c#s',		// \\italics\\
-											'#\s\x2f\x2f(.+?)\x2f\x2f#',		// //italics//
-											'#\s__(.+?)__#s'		// __underline__
+											'#( ^ | \s ) \*\* (.+?) \*\* #sx',		// **bold**
+											'#( ^ | \s ) \x5c\x5c (.+?) \x5c\x5c #sx',		// \\italics\\
+											'#( ^ | \s ) \x2f\x2f (.+?) \x2f\x2f #x',		// //italics//
+											'#( ^ | \s ) __ (.+?) __ #sx',		// __underline__
+											'/( ^ | \s ) \#\# (.+?) \#\# /sx'		// ##code##
 											);
 	
 	/**
@@ -41,10 +42,11 @@ class gmcode_Rendererplugin extends RendererPlugin
 	 * @access private
 	 */
 	var $replace = array(
-											' <strong>$1</strong>',
-											' <em>$1</em>',
-											' <em>$1</em>',
-											' <span style="text-decoration:underline">$1</span>'
+											'$1<strong>$2</strong>',
+											'$1<em>$2</em>',
+											'$1<em>$2</em>',
+											'$1<span style="text-decoration:underline">$2</span>',
+											'$1<code>$2</code>'
 											);
 
 
@@ -56,7 +58,9 @@ class gmcode_Rendererplugin extends RendererPlugin
 	function gmcode_Rendererplugin()
 	{
 		$this->short_desc = T_('GreyMatter style formatting');
-		$this->long_desc = T_('**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with white space.');
+		$this->long_desc = T_('**bold** \\italics\\ //italics// __underline__ ##code##
+Markup must be preceeded with white space or newline.
+Take care not to run a plugin such as AutoP before this one. <p>** for example will not work.');
 	}
 
 

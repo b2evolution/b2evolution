@@ -112,16 +112,18 @@
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
+			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
-		<?php // ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
+		<?php // -------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
 		$disp_comments = 1;					// Display the comments if requested
 		$disp_comment_form = 1;			// Display the comments form if comments requested
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 		$disp_trackback_url = 1;		// Display the trackback URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		require( dirname(__FILE__).'/_feedback.php' );
-		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------------
+		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -----------------
 
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 		?>

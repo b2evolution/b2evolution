@@ -230,6 +230,39 @@ class Comment extends DataObject
 	}
 
 
+	/**
+	 * Provide link to edit a comment if user has edit rights
+	 *
+	 * {@internal Comment::edit_link(-)}}
+	 *
+	 * @param string to display before link
+	 * @param string to display after link 
+	 * @param string link text 
+	 * @param string link title 
+	 */
+	function edit_link( $before = '', $after = '', $text = '#', $title = '#' )
+	{
+		global $current_User, $admin_url;
+		
+		if( ! is_logged_in() ) return false;
+	
+		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		{	// If User has no permission to edit comments:
+			return false;
+		}
+	
+		if( $text == '#' ) $text = T_('Edit');
+		if( $title == '#' ) $title = T_('Edit this comment');
+		
+		echo $before;
+		echo '<a href="'.$admin_url.'/b2edit.php?action=editcomment&amp;comment='.$this->ID;
+		echo '" title="'.$title.'">'.$text.'</a>';
+		echo $after;
+	
+		return true;
+	}
+	
+
 	/** 
 	 * Template function: display permalink to this comment
 	 *

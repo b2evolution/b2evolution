@@ -26,12 +26,8 @@ $bloggerAPIappkey = 'testkey';
 	$client = new xmlrpc_client("/b2evolution/blogs/$xmlsrv_subdir/xmlrpc.php", 'localhost', 8088);
 	$client->debug = 1;
 
-?>
-
-<h2>blogger.getUsersBlogs</h2>
-<?php
-	
-	$message = new xmlrpcmsg( 'blogger.getUsersBlogs', array( 
+	// Get blogs:
+/*	$message = new xmlrpcmsg( 'blogger.getUsersBlogs', array( 
 														new xmlrpcval($bloggerAPIappkey),	
 														new xmlrpcval($test_user),	
 														new xmlrpcval($test_pass)
@@ -39,5 +35,26 @@ $bloggerAPIappkey = 'testkey';
 	$result = $client->send($message);
 	$ret = xmlrpc_displayresult( $result );
 
+	// Get categories:
+	$message = new xmlrpcmsg( 'b2.getCategories', array( 
+														new xmlrpcval(2),	// blog #2
+														new xmlrpcval($test_user),	
+														new xmlrpcval($test_pass)
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+*/
+
+	// edit post:
+	$message = new xmlrpcmsg( 'blogger.editPost', array( 
+														new xmlrpcval($bloggerAPIappkey),	
+														new xmlrpcval(135),	
+														new xmlrpcval($test_user),	
+														new xmlrpcval($test_pass),
+														new xmlrpcval( "content" ),
+														new xmlrpcval(true,"boolean")
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
 
 ?>

@@ -42,7 +42,8 @@ class DB
 	var $halt_on_error = true;
 	var $error = false;		// no error yet
 	var $num_queries = 0;	
-	var $last_query;
+	var $last_query;		// last query SQL string
+	var $last_error;			// last DB error string
 	var $col_info;
 	var $debug_called;
 	var $vardump_called;
@@ -124,13 +125,13 @@ class DB
 		$this->error = true;
 
 		// If no special error string then use mysql default..
-		if ( !$str ) $str = mysql_error().'(Errno='.mysql_errno().')';
+		$this->last_error = empty($str) ? ( mysql_error().'(Errno='.mysql_errno().')' ) : $str;
 		
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array 
 						(
 							"query" => $this->last_query,
-							"error_str"  => $str
+							"error_str"  => $this->last_error
 						);
 
 		// Is error output turned on or not..
@@ -139,7 +140,7 @@ class DB
 			// If there is an error then take note of it
 			echo '<div class="error">';
 			echo '<p class="error">', T_('MySQL error!'), '</p>';
-			echo '<p>', $str, '</p>';
+			echo '<p>', $this->last_error, '</p>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query:<br /><code>'. $this->last_query. '</code></p>';
 			echo '</div>';
 		}

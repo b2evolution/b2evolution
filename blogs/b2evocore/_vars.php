@@ -38,7 +38,7 @@ else
 	$ReqPath = explode( '?', $ReqURI, 2 );
 	$ReqPath = $ReqPath[0];
 }
-// FP: seems like $Debuglog doesn exist yet!.?
+// FP: seems like $Debuglog doesn exist yet!.? (bug ininstall)
 // $Debuglog->add( 'Request URI: '.$ReqURI );
 // $Debuglog->add( 'Request Path: '.$ReqPath );
 

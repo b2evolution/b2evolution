@@ -63,6 +63,8 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 <?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
+<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+
 <?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
 <?php

@@ -16,7 +16,7 @@ class bbcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
-	var $priority = 43;
+	var $priority = 50;
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;  // strip the BBcode

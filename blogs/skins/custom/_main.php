@@ -99,6 +99,8 @@
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
+			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
 			<?php // ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------

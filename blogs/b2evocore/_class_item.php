@@ -73,7 +73,7 @@ class Item extends DataObject
 			$this->views = $db_row->post_views; 
 			$this->url = $db_row->post_url;				// Should move
 			$this->autobr = $db_row->post_autobr;					// Should move
-			// Private vars
+			// Derived vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
 		}
 	}
@@ -368,6 +368,23 @@ class Item extends DataObject
 						$closed_msg = '#'
 						)
 	{
+		if( $this->comments == 'disabled'  )
+		{	// Comments are disabled on this post
+			return false;
+		}
+
+		if( $this->comments == 'closed'  )
+		{	// Comments are closed on this post
+			if( $closed_msg == '#' )
+				$closed_msg = T_( 'Comments are closed for this post.' );
+
+			echo $before_error;
+			echo $closed_msg;
+			echo $after_error;
+
+			return false;
+		}
+
 		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) )
 		{	// Post is not published
 			if( $non_published_msg == '#' )
@@ -375,18 +392,6 @@ class Item extends DataObject
 
 			echo $before_error;
 			echo $non_published_msg;
-			echo $after_error;
-
-			return false;
-		}
-
-		if( $this->comments != 'open'  )
-		{	// Comments are not open on this post
-			if( $closed_msg == '#' )
-				$closed_msg = T_( 'Comments are closed for this post.' );
-
-			echo $before_error;
-			echo $closed_msg;
 			echo $after_error;
 
 			return false;
@@ -636,9 +641,9 @@ class Item extends DataObject
 	function mod_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->mod_time, $useGM );
+			echo mysql2date( locale_timefmt(), $this->mod_date, $useGM );
 		else
-			echo mysql2date( $format, $this->mod_time, $useGM );
+			echo mysql2date( $format, $this->mod_date, $useGM );
 	}
 
 
@@ -771,6 +776,40 @@ class Item extends DataObject
 
 		echo $after;
 
+	}
+
+
+	/**
+	 * Provide link to edit a post if user has edit rights
+	 *
+	 * {@internal Item::edit_link(-)}}
+	 *
+	 * @param string to display before link
+	 * @param string to display after link 
+	 * @param string link text 
+	 * @param string link title 
+	 */
+	function edit_link( $before = '', $after = '', $text = '#', $title = '#' )
+	{
+		global $current_User, $admin_url;
+		
+		if( ! is_logged_in() ) return false;
+	
+		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false, 
+																			$this->blog_ID ) )
+		{	// User has no right to edit this post
+			return false;
+		}
+	
+		if( $text == '#' ) $text = T_('Edit');
+		if( $title == '#' ) $title = T_('Edit this post');
+		
+		echo $before;
+		echo '<a href="'.$admin_url.'/b2edit.php?action=edit&amp;post='.$this->ID;
+		echo '" title="'.$title.'">'.$text.'</a>';
+		echo $after;
+	
+		return true;
 	}
 
 	/**

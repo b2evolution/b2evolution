@@ -162,14 +162,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 										VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
 										'$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
 					$q = $DB->query($query);
-					if( mysql_affected_rows() == 1)
-					{
-						$status_update[] = sprintf(T_("Created locale '%s'."), $newloc_locale);
-					}
-					else
-					{
-						$status_update[] = sprintf(T_("Updated locale '%s'."), $newloc_locale);
-					}
+					$status_update[] = sprintf(T_("Saved locale '%s'."), $newloc_locale);
 				}
 
 				break;

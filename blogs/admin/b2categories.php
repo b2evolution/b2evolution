@@ -119,12 +119,12 @@ switch($action)
 		if( !empty($parent_cat_ID) )
 		{	// We are creating a subcat
 			// INSERT INTO DB
-			$new_cat_ID = cat_create( $cat_name, $parent_cat_ID ) or mysql_oops( $query );
+			$new_cat_ID = cat_create( $cat_name, $parent_cat_ID );
 		}
 		else
 		{ // We are creating a new base cat
 			// INSERT INTO DB
-			$new_cat_ID = cat_create( $cat_name, 'NULL', $cat_blog_ID ) or mysql_oops( $query );
+			$new_cat_ID = cat_create( $cat_name, 'NULL', $cat_blog_ID );
 		}
 		
 		header("Location: b2categories.php?blog=$cat_blog_ID");
@@ -150,7 +150,7 @@ switch($action)
 		echo '<h3>', sprintf( T_('Deleting category #%d : %s ...') ,$cat_ID, format_to_output( $cat_name, 'htmlbody') ), "</h3>\n";
 			
 		// DELETE FROM DB:
-		$result = cat_delete( $cat_ID ) or mysql_oops( $query );	
+		$result = cat_delete( $cat_ID );	
 		if( $result !== 1 )
 		{	// We got an error message!
 			echo '<p class="error">', T_('ERROR'), ': ', $result, "</p>\n";
@@ -272,7 +272,7 @@ switch($action)
 		// check permissions:
 		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
 
-		cat_update( $cat_ID, $cat_name, $cat_parent_ID ) or mysql_oops( $query );
+		cat_update( $cat_ID, $cat_name, $cat_parent_ID );
 	
 		header("Location: b2categories.php?blog=$cat_blog_ID");
 		break;

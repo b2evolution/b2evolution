@@ -24,6 +24,9 @@ class Plugin
 	var $code = '';
 	var $priority = 50;
 	var $name = 'Unnamed plug-in';
+	var $version;
+	var $author;
+	var $help_url;
 	var $short_desc;
 	var $long_desc;
 
@@ -104,7 +107,6 @@ class Plugin
 		// Set value:
 		$this->$parname = $parvalue;
 	}
-
 
 }
 ?>

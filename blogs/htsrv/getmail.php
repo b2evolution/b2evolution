@@ -215,8 +215,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 		$post_title = $subject;
 	}
 
-	$post_category = xmlrpc_getpostcategory($content);
-	if ($post_category == '')
+	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
 	{
 		$post_category = $default_category;
 	}

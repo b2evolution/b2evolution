@@ -15,8 +15,6 @@
  *
  * Create a new post
  * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
  */
 function bpost_create(
 	$author_user_ID,              // Author
@@ -96,8 +94,6 @@ function bpost_create(
  *
  * Update a post
  * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
  */
 function bpost_update(
 	$post_ID,
@@ -179,8 +175,6 @@ function bpost_update(
  *
  * Update a post's status
  * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
  */
 function bpost_update_status(
 	$post_ID,
@@ -212,8 +206,6 @@ function bpost_update_status(
  *
  * Delete a post
  * This funtion has to handle all needed DB dependencies!
- *
- * fplanque: created
  */
 function bpost_delete( $post_ID )
 {
@@ -681,6 +673,21 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 		{
 			return $disp_title;
 		}
+	}
+}
+
+/**
+ * {@internal preview_title(-)}}
+ */
+function preview_title( $string = '#', $before = ' ', $after = ''  )
+{
+	global $preview;
+	
+	if( $preview )
+	{
+		echo $before;
+		echo ($string == '#') ? T_('PREVIEW') : $string;
+		echo $after;
 	}
 }
 

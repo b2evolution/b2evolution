@@ -12,7 +12,7 @@ class auto_p_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
-	var $priority = 30;
+	var $priority = 70;
 	
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;

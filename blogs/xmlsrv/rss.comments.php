@@ -14,7 +14,13 @@
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->
 <rss version="0.92">
 	<channel>
-		<title><?php $Blog->disp( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
+		<title><?php 
+			$Blog->disp( 'name', 'xml' );
+			single_cat_title( ' - ', 'xml' ); 
+			single_month_title( ' - ', 'xml' );
+			single_post_title( ' - ', 'xml' );
+			last_comments_title( ' - ', 'xml' ) ;
+		?></title>
 		<link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
 		<description></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>

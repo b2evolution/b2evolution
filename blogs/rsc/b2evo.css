@@ -27,9 +27,9 @@
 /* For the site header: */
 h1 {
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 240%;
+	/* font-size: 240%; */
 	color: #f90;
-	margin: 0ex;
+	margin: 0;
 }
 #tagline{
 	position: relative;
@@ -54,19 +54,12 @@ h1 {
 
 
 /* Content styles: */
-h2 {
+h2,
+h3,
+h4,
+h5,
+h6 {
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 200%;
-	color: #f90;
-}
-h3 {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 140%;
-	color: #f90;
-}
-h4 {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 100%;
 	color: #f90;
 }
 blockquote {
@@ -152,10 +145,24 @@ legend
 	font-weight: bold;
 }
 
+/* Install Locale selection: */
+
 div.installSideBar {
 	float: right;
 	border: 1px dotted black;
 	padding: 1ex;
 	width: 20%;
 	margin-left: 2ex;
+}
+
+div.installSideBar h2,
+div.installSideBar p
+{
+	margin-top:0;
+}
+
+div.installSideBar ul {
+	list-style: none;
+	margin-left: 1em;
+	padding-left: 0;
 }

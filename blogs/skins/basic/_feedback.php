@@ -20,14 +20,14 @@
 		$disp_comment_form = 0;			// DO NOT Display the comments form if not requested
 	}
 	
-	if( ! $tb ) 
-	{	// Trackback not requested
+	if( (!$tb) || (!$Blog->get( 'allowtrackbacks' )) ) 
+	{	// Trackback not requested or not allowed
 		$disp_trackbacks = 0;				// DO NOT Display the trackbacks if not requested
 		$disp_trackback_url = 0;		// DO NOT Display the trackback URL if not requested
 	}
 	
-	if( ! $pb ) 
-	{	// Pingback not requested
+	if( (!$pb) || (!$Blog->get( 'allowpingbacks' )) ) 
+	{	// Pingback not requested or not allowed
 		$disp_pingbacks = 0;				// DO NOT Display the pingbacks if not requested
 	}
 
@@ -115,6 +115,8 @@
 					<?php $Comment->author( 'htmlbody', true ) ?>
 					<?php break;
 			} 
+
+			$Comment->edit_link( ' &middot; ' ) // Link to backoffice for editing
 		?>
 		</h5>
 		<blockquote>

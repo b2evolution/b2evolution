@@ -67,10 +67,10 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 {
 	?>
 	<div class="installSideBar">
-	<h2><?php echo T_('Language/Locale')?></h2>
+	<h2><?php echo T_('Language / Locale')?></h2>
 	<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
 
-	<ul style="margin-left: 2ex;list-style:none;" >
+	<ul>
 
 	<?php
 	// present available locales on first screen

@@ -29,7 +29,8 @@ $user_profile_only = 0;
 // Check permission:
 if( !$current_User->check_perm( 'users', 'edit', false ) )
 {
-	$user_profile_only = 1; // allow profile editing/viewing only
+	// allow profile editing/viewing only
+	$user_profile_only = 1;
 
 	if( ($action && $action != 'userupdate') )
 	{	// This should be prevented un the UI

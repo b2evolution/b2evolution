@@ -139,7 +139,7 @@ switch( $action )
 					{
 					?>
 						<p><strong><input type="checkbox" name="delcomments" value="1" checked="checked" />
-						<?php printf ( T_('Delete the following %d comments:'), mysql_affected_rows() ) ?>
+						<?php printf ( T_('Delete the following %d comments:'), count($res_affected_comments) ) ?>
 						</strong></p>
 						<table class="thin">
 							<?php foreach( $res_affected_comments as $row_stats )

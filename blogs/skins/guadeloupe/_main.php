@@ -79,6 +79,9 @@
 </div>
 <div class=interaction>
 	<?php $Item->feedback_link( 'feedbacks' ) // Link to comments ?>
+
+	<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+
 	<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 </div>
 

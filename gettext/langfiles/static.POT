@@ -151,47 +151,47 @@ msgstr ""
 msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr ""
 
-#: ../../index.src.html:39
+#: ../../index.src.html:40
 msgid "New users:"
 msgstr ""
 
-#: ../../index.src.html:39
+#: ../../index.src.html:40
 msgid "installing b2evolution from scratch"
 msgstr ""
 
-#: ../../index.src.html:40
+#: ../../index.src.html:42
 msgid "Existing b2evolution users:"
 msgstr ""
 
-#: ../../index.src.html:40
+#: ../../index.src.html:42
 msgid "upgrading from a previous version of b2evolution"
 msgstr ""
 
-#: ../../index.src.html:41
+#: ../../index.src.html:44
 msgid "Cafelog/b2 users:"
 msgstr ""
 
-#: ../../index.src.html:41
+#: ../../index.src.html:44
 msgid "upgrading from Cafelog/b2 version 0.6.x"
 msgstr ""
 
-#: ../../index.src.html:42
+#: ../../index.src.html:46
 msgid "Movable Type users:"
 msgstr ""
 
-#: ../../index.src.html:42
+#: ../../index.src.html:46
 msgid "upgrading from Movable Type"
 msgstr ""
 
-#: ../../index.src.html:43
+#: ../../index.src.html:48
 msgid "GeekLog users:"
 msgstr ""
 
-#: ../../index.src.html:43
+#: ../../index.src.html:48
 msgid "upgrading from GeekLog"
 msgstr ""
 
-#: ../../index.src.html:47
+#: ../../index.src.html:53
 #: ../../doc/install_new.src.html:55
 #: ../../doc/upgradefrom_b2.src.html:74
 #: ../../doc/upgradefrom_b2evo.src.html:54
@@ -200,7 +200,7 @@ msgstr ""
 msgid "official website"
 msgstr ""
 
-#: ../../index.src.html:48
+#: ../../index.src.html:54
 #: ../../doc/install_new.src.html:56
 #: ../../doc/upgradefrom_b2.src.html:75
 #: ../../doc/upgradefrom_b2evo.src.html:55
@@ -209,7 +209,7 @@ msgstr ""
 msgid "GNU GPL license"
 msgstr ""
 
-#: ../../index.src.html:49
+#: ../../index.src.html:55
 #: ../../doc/install_new.src.html:57
 #: ../../doc/upgradefrom_b2.src.html:76
 #: ../../doc/upgradefrom_b2evo.src.html:56

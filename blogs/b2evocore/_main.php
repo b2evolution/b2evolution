@@ -34,6 +34,7 @@ require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );
 require_once( dirname(__FILE__).'/_functions_xmlrpcs.php' );
 require_once( dirname(__FILE__).'/_class_blog.php' );
 require_once( dirname(__FILE__).'/_class_itemlist.php' );
+require_once( dirname(__FILE__).'/_class_itemcache.php' );
 require_once( dirname(__FILE__).'/_class_commentlist.php' );
 require_once( dirname(__FILE__).'/_class_archivelist.php' );
 require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
@@ -86,7 +87,7 @@ locale_activate( $default_locale );
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, $tablegroups, 'grp_', 'grp_ID' );
 $BlogCache = & new BlogCache();
-$ItemCache = & new DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
+$ItemCache = & new ItemCache();
 
 
 // Plug-ins init:

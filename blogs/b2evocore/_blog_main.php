@@ -131,7 +131,7 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	}
 }
 
-if( (!empty($p)) || (!empty($title)) )
+if( (!empty($p)) || (!empty($title)) || (!empty($preview)) )
 {	// We are going to display a single post
 	$disp = 'single';
 }

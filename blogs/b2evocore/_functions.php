@@ -32,8 +32,9 @@ if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.ph
  *
  * {@internal mysql_oops(-) }}
  *
- * @param string The query which led to the error
+ * @deprecated use class DB instead
  *
+ * @param string The query which led to the error
  * @return boolean success?
  */
 function mysql_oops( $sql_query )
@@ -538,30 +539,31 @@ function timer_stop($display=0,$precision=3) { //if called like timer_stop(1), w
 	}
 
 
-function xmlrpc_getposttitle($content) {
+function xmlrpc_getposttitle($content) 
+{
 	global $post_default_title;
-	if (preg_match('/<title>(.+?)<\/title>/is', $content, $matchtitle)) {
-		$post_title = $matchtitle[0];
-		$post_title = preg_replace('/<title>/si', '', $post_title);
-		$post_title = preg_replace('/<\/title>/si', '', $post_title);
-	} else {
+	if (preg_match('/<title>(.+?)<\/title>/is', $content, $matchtitle)) 
+	{
+		$post_title = $matchtitle[1];
+	} 
+	else 
+	{
 		$post_title = $post_default_title;
 	}
 	return($post_title);
 }
 
-
-function xmlrpc_getpostcategory($content) {
-	global $post_default_category;
-	if (preg_match('/<category>(.+?)<\/category>/is', $content, $matchcat)) {
-		$post_category = $matchcat[0];
-		$post_category = preg_replace('/<category>/si', '', $post_category);
-		$post_category = preg_replace('/<\/category>/si', '', $post_category);
-
-	} else {
-		$post_category = $post_default_category;
+/**
+ * Also used by post by mail
+ */
+function xmlrpc_getpostcategory($content) 
+{
+	if (preg_match('/<category>([0-9]+?)<\/category>/is', $content, $matchcat)) 
+	{
+		return $matchcat[1];
 	}
-	return($post_category);
+
+	return false;
 }
 
 /*
@@ -1314,5 +1316,4 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	
 	return @mail( $to, $subject, $message, $headerstring );
 }
-
 ?>

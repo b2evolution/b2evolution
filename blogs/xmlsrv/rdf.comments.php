@@ -14,7 +14,13 @@
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->
 <rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"					xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
 <channel rdf:about="<?php $Blog->disp( 'blogurl', 'xmlattr' ) ?>">
-	<title><?php $Blog->disp( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
+	<title><?php 
+		$Blog->disp( 'name', 'xml' );
+		single_cat_title( ' - ', 'xml' ); 
+		single_month_title( ' - ', 'xml' );
+		single_post_title( ' - ', 'xml' );
+		last_comments_title( ' - ', 'xml' ) ;
+	?></title>
 	<link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
 	<description></description>
 	<dc:language><?php $Blog->disp( 'locale', 'xml' ) ?></dc:language>

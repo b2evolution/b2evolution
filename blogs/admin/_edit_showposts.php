@@ -151,16 +151,16 @@
 			<p style="clear:both;">
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php
-				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'status' ), false, $blog ) )
-				{
+				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'status' ), false, $Item->get( 'blog_ID' ) ) )
+				{	// User has right to edit this post
 				?>
 				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
 				<form action="b2edit.php" method="get" class="inline"><input type="hidden" name="action" value="edit" /><input type="hidden" name="post" value="<?php $Item->ID() ?>" /><input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" /></form>
 				<?php
 				}
 
-				if( $current_User->check_perm( 'blog_del_post', 'any', false, $blog ) )
-				{
+				if( $current_User->check_perm( 'blog_del_post', 'any', false, $Item->get( 'blog_ID' ) ) )
+				{	// User has right to delete this post
 				?>
 				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
 				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" /></form>
@@ -168,9 +168,10 @@
 				}
 
 				if( ($postdata['Status'] != 'published')
-						&& $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog )
+						&& $current_User->check_perm( 'blog_post_statuses', 'published', false, 
+																					$Item->get( 'blog_ID' ) )
 						&& $current_User->check_perm( 'edit_timestamp' ) )
-				{
+				{	// User has right to publish this post now:
 				?>
 				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
 				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" /></form>
@@ -251,7 +252,7 @@
 						<p>
 						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 						<?php
-						if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
+						if( $current_User->check_perm( 'blog_comments', '', false, $Item->get( 'blog_ID' ) ) )
 						{	// If User has permission to edit comments:
 						?>
 						<!-- Do not add spaces or line breaks into the following forms. IE would display extra spacing -->

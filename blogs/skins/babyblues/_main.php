@@ -43,6 +43,9 @@
 			<?php $Item->feedback_link( 'comments', '', ' | ' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', '', ' | ' ) // Link to trackbacks ?>
 			<?php $Item->feedback_link( 'pingbacks', '', ' | ' ) // Link to trackbacks ?>
+
+			<?php $Item->edit_link( ' | ' ) // Link to backoffice for editing ?>
+
 			<a href="?cat=<?php the_category_ID() ?>" title="category: <?php $Item->main_category( 'htmlattr' ) ?>"><?php $Item->main_category() ?></a>
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>

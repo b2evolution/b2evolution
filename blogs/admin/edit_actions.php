@@ -120,7 +120,7 @@ switch($action)
 		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	
 															$post_extracats, $post_status, $post_locale, '',	$post_autobr, 
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
-															$post_renderers ) or mysql_oops($query);
+															$post_renderers );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
@@ -237,7 +237,7 @@ switch($action)
 		// UPDATE POST IN DB:
 		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats,
 									$post_status, $post_locale, '',	$post_autobr, $pingsdone, $post_urltitle, 
-									$post_url, $post_comments, $post_renderers ) or mysql_oops($query);
+									$post_url, $post_comments, $post_renderers );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{
@@ -327,7 +327,7 @@ switch($action)
 		}
 
 		// UPDATE POST IN DB:
-		bpost_update_status( $post_ID, $post_status, $pingsdone, $post_date ) or mysql_oops($query);
+		bpost_update_status( $post_ID, $post_status, $pingsdone, $post_date );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{

@@ -695,7 +695,7 @@ $content = format_to_post( trim( $content ), $Settings->get('AutoBR'), 0 );
 
 $post_date = date('Y-m-d H:i:s', $localtimenow);
 
-$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category, array(), 'published', $default_locale, '', $Settings->get('AutoBR'), true ) or mysql_oops($query);
+$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category, array(), 'published', $default_locale, '', $Settings->get('AutoBR'), true );
 
 if ( isset( $sleep_after_edit ) && $sleep_after_edit > 0 ) 
 {

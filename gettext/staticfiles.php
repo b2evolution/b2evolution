@@ -506,7 +506,7 @@ switch( $action )
 				// --- build "available translations" list -------------
 				locale_activate( $target );  // activate locale to translate locale names
 
-				$list_avail = "\t".'<ul style="margin-left: 2ex;list-style:none;">'."\n";
+				$list_avail = "\t".'<ul>'."\n";
 				foreach( $targets as $ttarget => $ttargetmessagefile )
 				{ // the link to the static html file for that target message file
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );

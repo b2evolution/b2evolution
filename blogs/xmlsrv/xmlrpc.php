@@ -16,12 +16,14 @@
 require_once(dirname(__FILE__).'/../conf/_config.php' );
 require_once(dirname(__FILE__)."/../$core_subdir/_main.php" );
 
+// We can't display standard error messages. We must return XMLRPC responses.
+$DB->halt_on_error = false;
+
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
 $use_cache = 1;
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
-$post_default_category = $default_category; // posts submitted via the xmlrpc interface go into that category
 
 $xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
 
@@ -65,8 +67,7 @@ $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID;
-	global $post_default_title,$post_default_category;
+	global $blog_ID, $DB;
 	global $cafelogID, $sleep_after_edit;
 	global $Settings, $Messages;
 	
@@ -125,9 +126,10 @@ function b2newpost($m)
 
 	// INSERT NEW POST INTO DB:
 	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
-	if( !$post_ID )
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-					"For some strange yet very annoying reason, your entry couldn't be posted.");
+	if( !empty($DB->last_error) )
+	{	// DB error
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+	}
 
 	if( isset($sleep_after_edit) && $sleep_after_edit > 0 )
 	{
@@ -149,8 +151,6 @@ function b2newpost($m)
 /*
  * b2getcategories(-)
  * b2.getCategories(-)
- *
- * fplanque: added multiblog support
  */
 $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 
@@ -169,37 +169,29 @@ function b2getcategories( $m )
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
 
-	$userdata = get_userdatabylogin($username);
-
-
 	if( user_pass_ok($username,$password) )
 	{
-		$sql = "SELECT * FROM $tablecategories ";
-		if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
+		$sql = "SELECT * 
+						FROM $tablecategories ";
+		if( $blogid > 1 ) 
+			$sql .= "WHERE cat_blog_ID = $blogid ";
 		$sql .= "ORDER BY cat_name ASC";
-		$rows = $DB->query( $sql );
 
-		$i = 0;
+		$rows = $DB->get_results( $sql );
+		if( !empty($DB->last_error) )
+		{	// DB error
+			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		}
+
+		$data = array();
 		foreach( $rows as $row )
 		{
-			$cat_name = $row->cat_name;
-			$cat_ID = $row->cat_ID;
-
-			$struct[$i] = new xmlrpcval(array("categoryID" => new xmlrpcval($cat_ID),
-											"categoryName" => new xmlrpcval($cat_name)
-											),"struct");
-			$i++;
+			$data[] = new xmlrpcval( array( "categoryID" => new xmlrpcval($row->cat_ID),
+																			"categoryName" => new xmlrpcval($row->cat_name)
+															),"struct");
 		}
 
-		$data = array($struct[0]);
-		for ($j = 1; $j < $i; $j++)
-		{
-			array_push($data, $struct[$j]);
-		}
-
-		$resp = new xmlrpcval($data, "array");
-
-		return new xmlrpcresp($resp);
+		return new xmlrpcresp( new xmlrpcval($data, "array") );
 
 	}
 	else
@@ -313,8 +305,7 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
 function bloggernewpost( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID;
-	global $post_default_title,$post_default_category;
+	global $blog_ID, $default_category, $DB;
 	global $cafelogID, $sleep_after_edit;
 	global $Settings, $Messages;
 	
@@ -343,7 +334,10 @@ function bloggernewpost( $m )
 	$user_ID = $userdata["ID"];
 	$current_User = & new User( $userdata );
 
-	$post_category = xmlrpc_getpostcategory($content);
+	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
+	{
+		$post_category = $default_category;
+	}
 
 	$blog_ID = get_catblog($post_category);
 	$blogparams = get_blogparams_by_ID( $blog_ID );
@@ -373,9 +367,10 @@ function bloggernewpost( $m )
 	// INSERT NEW POST INTO DB:
 	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
 
-	if (!$post_ID)
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-				"For some strange yet very annoying reason, your entry couldn't be posted.");
+	if( !empty($DB->last_error) )
+	{	// DB error
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+	}
 
 	logIO('O', "Posted ! ID: $post_ID");
 
@@ -442,14 +437,14 @@ $bloggereditpost_doc='Edits a post, blogger-api like';
  */
 function bloggereditpost($m)
 {
-
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$tableposts, $tablepostcats;
-	global $post_default_title,$post_default_category;
-	global $cafelogID, $sleep_after_edit;
+	global $blog_ID, $tableposts, $tablepostcats, $ItemCache;
+	global $cafelogID, $sleep_after_edit, $default_category, $DB;
 	global $Messages;
 
 	logIO('I','Called function: blogger.editPost');
+
+	// return new xmlrpcresp(0, $xmlrpcerruser+50, 'bloggereditpost' );
 
 	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
@@ -466,8 +461,14 @@ function bloggereditpost($m)
 				'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	if( ! ($edited_Item = $ItemCache->get_by_ID( $post_ID ) ) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+2, "No such post (#$post_ID)."); // user error 2
+	}
+
 	$newcontent = $m->getParam(4);
 	$newcontent = $newcontent->scalarval();
+	xmlrpc_debugmsg( 'New content: '.$newcontent  );
 
 	$publish = $m->getParam(5);
 	$publish = $publish->scalarval();
@@ -485,7 +486,11 @@ function bloggereditpost($m)
 	$user_ID = $userdata["ID"];
 	$current_User = & new User( $userdata );
 
-	$post_category = xmlrpc_getpostcategory($content);
+	if( ! ($post_category = xmlrpc_getpostcategory($newcontent) ) )
+	{	// No category specified
+		$post_category = $edited_Item->main_cat_ID;
+	}
+	// return new xmlrpcresp(0, $xmlrpcerruser+50, 'post_category='.$post_category );
 
 	$blog_ID = get_catblog($post_category);
 	$blogparams = get_blogparams_by_ID( $blog_ID );
@@ -528,10 +533,10 @@ function bloggereditpost($m)
 	}
 
 	// UPDATE POST IN DB:
-	if( !bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' ) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-					"For some strange yet very annoying reason, the entry couldn't be edited.");
+	bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' );
+	if( !empty($DB->last_error) )
+	{	// DB error
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0)
@@ -598,18 +603,19 @@ $bloggerdeletepost_doc='Deletes a post, blogger-api like';
 function bloggerdeletepost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$tableposts;
-	global $post_default_title,$post_default_category, $sleep_after_edit;
-	
-	$post_ID=$m->getParam(1);
-	$username=$m->getParam(2);
-	$password=$m->getParam(3);
+	global $blog_ID,$tableposts, $DB;
+	global $sleep_after_edit;
 
+	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
+
+	$username = $m->getParam(2);
 	$username = $username->scalarval();
+
+	$password = $m->getParam(3);
 	$password = $password->scalarval();
 
-	if (user_pass_ok($username,$password))
+	if( ! user_pass_ok( $username, $password ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
 					'Wrong username/password combination '.$username.' / '.starify($password));
@@ -637,9 +643,11 @@ function bloggerdeletepost($m)
 	}
 
 	// DELETE POST FROM DB:
-	if( ! bpost_delete( $post_ID ) )
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-				"For some strange yet very annoying reason, the entry couldn't be deleted.");
+	bpost_delete( $post_ID );
+	if( !empty($DB->last_error) )
+	{	// DB error
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+	}
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 	{
@@ -893,19 +901,13 @@ $bloggergetrecentposts_doc = 'fetches X most recent posts, blogger-api like';
  *					3 password (string): Password for said username.
  *					4 numposts (integer): number of posts to retrieve.
  * @return xmlrpcresp XML-RPC Response
- *
- * @todo HANDLE blogid!!!
  */
 function bloggergetrecentposts( $m )
 {
-	global $xmlrpcerruser,$tableposts;
+	global $xmlrpcerruser, $tableposts, $tablecategories, $DB;
 
-	$blogid = 1;	// we don't need that yet
-
-	$numposts = $m->getParam(4);
-	$numposts = $numposts->scalarval();
-
-	$limit = ($numposts > 0) ? " LIMIT $numposts" : ''; 
+	$blog_ID = $m->getParam(1);
+	$blog_ID = $blog_ID->scalarval();
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
@@ -913,18 +915,27 @@ function bloggergetrecentposts( $m )
 	$password = $m->getParam(3);
 	$password = $password->scalarval();
 
+	$numposts = $m->getParam(4);
+	$numposts = $numposts->scalarval();
+
 	if( user_pass_ok($username, $password) )
 	{
-		$sql = "SELECT * FROM $tableposts WHERE post_category > 0 ORDER BY post_mod_date DESC".$limit;
-		$result = mysql_query($sql);
-		if( !$result )
-			return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-					"For some strange yet very annoying reason, the entries couldn't be fetched.".mysql_error());
+		$sql = "SELECT * 
+						FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
+						WHERE cat_blog_ID = $blog_ID
+						ORDER BY post_issue_date DESC";
+		if( $numposts > 0 )
+			$sql .= " LIMIT $numposts";
+		$rows = $DB->get_results( $sql );
+		if( !empty($DB->last_error) )
+		{	// DB error
+			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		}
 
 		$data = new xmlrpcval("","array");
 
 		$i = 0;
-		while($row = mysql_fetch_object($result))
+		if( count( $rows ) ) foreach( $rows as $row )		
 		{
 			$postdata = array(
 				"ID" => $row->ID,
@@ -1214,7 +1225,7 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
 function pingback_ping( $m )
 {
 
-	global $DB, $tableposts, $tablecomments, $notify_from;
+	global $DB, $tableposts, $tablecomments, $notify_from, $xmlrpcerruser;
 	global $baseurl, $b2_version;
 	global $localtimenow, $Messages;
 
@@ -1280,9 +1291,14 @@ function pingback_ping( $m )
 			elseif (is_string($urltest['fragment']))
 			{ // ...or a string #title, a little more complicated
 				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
-				$sql = "SELECT ID FROM $tableposts WHERE post_title RLIKE '$title'";
-				$result = mysql_query($sql) or die("Query: $sql\n\nError: ".mysql_error());
-				$blah = mysql_fetch_array($result);
+				$sql = "SELECT ID 
+								FROM $tableposts 
+								WHERE post_title RLIKE '$title'";
+				$blah = $DB->get_row( $sql, ARRAY_A );
+				if( !empty($DB->last_error) )
+				{	// DB error
+					return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+				}
 				$post_ID = $blah['ID'];
 				$way = 'from the fragment (title)';
 			}
@@ -1306,10 +1322,16 @@ function pingback_ping( $m )
 
 
 		// Check that post exists
-		$sql = 'SELECT post_author FROM '.$tableposts.' WHERE ID = '.$post_ID;
-		$result = mysql_query($sql);
+		$sql = 'SELECT post_author 
+						FROM '.$tableposts.' 
+						WHERE ID = '.$post_ID;
+		$rows = $DB->get_results( $sql );
+		if( !empty($DB->last_error) )
+		{	// DB error
+			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		}
 
-		if (mysql_num_rows($result))
+		if(count($rows))
 		{
 			debug_fwrite($log, 'Post exists'."\n");
 
@@ -1318,11 +1340,15 @@ function pingback_ping( $m )
 							WHERE comment_post_ID = $post_ID
 								AND comment_author_url = '".$DB->escape(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."'
 								AND comment_type = 'pingback'";
-			$result = mysql_query($sql);
+			$rows = $DB->get_results( $sql );
+			if( !empty($DB->last_error) )
+			{	// DB error
+				return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+			}
 
-			xmlrpc_debugmsg( $sql.' Already found='.mysql_num_rows($result) );
+			xmlrpc_debugmsg( $sql.' Already found='.count($rows) );
 
-			if( ! mysql_num_rows($result))
+			if( ! count($rows) )
 			{
 				// very stupid, but gives time to the 'from' server to publish !
 				sleep(1);
@@ -1385,7 +1411,11 @@ function pingback_ping( $m )
 										VALUES( $post_ID, 'pingback', '".$DB->escape($title)."',
 														'".$DB->escape($pagelinkedfrom)."', '$now',
 														'".$DB->escape($context)."')";
-						$consulta = mysql_query($sql);
+						$DB->query( $sql );
+						if( !empty($DB->last_error) )
+						{	// DB error
+							return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+						}
 
 						/*
 						 * New pingback notification:
