@@ -117,6 +117,7 @@ class Calendar
 		$show_statuses = array(),
 		$timestamp_min = '',		// Do not show posts before this timestamp
 		$timestamp_max = 'now',	// Do not show posts after this timestamp
+		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 
@@ -124,6 +125,7 @@ class Calendar
 		global $Settings;
 
 		$this->blog = $blog;
+		$this->dbtable = $dbtable;
 		$this->dbprefix = $dbprefix;
 		$this->dbIDname = $dbIDname;
 
@@ -295,9 +297,10 @@ class Calendar
 			$searchyear = $this->year;
 			for( $i = 0; $i < $this->searchframe; $i++ )
 			{
-				$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
+				$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count,
+														YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
 														DAYOFMONTH('.$this->dbprefix.'datestart) AS myday
-										FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+										FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 											INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 										WHERE MONTH('.$this->dbprefix.'datestart) = "'.$searchmonth.'"
 											AND YEAR('.$this->dbprefix.'datestart) = "'.$searchyear.'" '
@@ -310,7 +313,7 @@ class Calendar
 				{ // OK we have a month with posts!
 					foreach( $arc_result as $arc_row )
 					{
-						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['COUNT(DISTINCT ID)'];
+						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['item_count'];
 					}
 					$this->month = $searchmonth;
 					$this->year = $searchyear;
@@ -370,7 +373,7 @@ class Calendar
 		{ // mode is 'year'
 			// Find months with posts
 			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.'), MONTH('.$this->dbprefix.'datestart) AS mymonth
-									FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 									WHERE YEAR('.$this->dbprefix.'datestart) = "'.$this->year.'" '
 										.$this->where.'
@@ -694,6 +697,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.8  2005/03/07 17:08:20  fplanque
+ * made more generic
+ *
  * Revision 1.7  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
