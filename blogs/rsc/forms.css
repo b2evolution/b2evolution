@@ -28,7 +28,7 @@ fieldset .notes {
 }
 
 fieldset div.notes {
-	margin: 1ex;
+	margin: 0 0 1ex 3ex;
 }
 
 input.large,
@@ -121,5 +121,4 @@ form.bComment fieldset div.info
 	padding-top: .5ex;
 	/* border: 1px solid #f00;*/
 }
-
 

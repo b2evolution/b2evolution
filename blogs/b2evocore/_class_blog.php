@@ -294,15 +294,15 @@ class Blog extends DataObject
 
 			case 'baseurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
-				{
-					return $this->siteurl.'/';
+				{	// We have a specific URL for this blog:
+					return $this->siteurl;
 				}
 				else
-				{
+				{	// This blog is located under b2evo's baseurl
 					$r = $baseurl;
 					if( !empty($this->siteurl) )
-					{
-						$r .= $this->siteurl.'/';
+					{	// We have a subfolder:
+						$r .= $this->siteurl;
 					}
 					return $r;
 				}

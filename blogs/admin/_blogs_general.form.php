@@ -10,42 +10,45 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-
+// Prepare last part of blog URL preview:
 switch( $edited_Blog->get( 'access_type' ) )
 {
 	case 'default': 
-		$blog_urlappend = 'index.php'; 
+		$blog_urlappend = 'index.php';
 		break;
-	case 'index.php': 
-		$blog_urlappend = 'index.php'.( $Settings->get('links_extrapath') ? '/'.$edited_Blog->get( 'stub' ) : '?blog='.$edited_Blog->ID ); 
+
+	case 'index.php':
+		$blog_urlappend = 'index.php'.( $Settings->get('links_extrapath') ? '/'.$edited_Blog->get( 'stub' ) : '?blog='.$edited_Blog->ID );
 		break;
+
 	case 'stub': 
-		$blog_urlappend = $edited_Blog->get( 'stub' ); 
+		$blog_urlappend = $edited_Blog->get( 'stub' );
 		break;
 }
 $blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escape
 ?>
 <script type="text/javascript">
-<!--
+	<!--
+	blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
+	blog_urlappend = '<?php echo $blog_urlappend ?>';
 
-blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
-blog_urlappend = '<?php echo $blog_urlappend ?>';
+	function update_urlpreview( base, append )
+	{
+		if( typeof base == 'string' ){ blog_baseurl = base; }
+		if( typeof append == 'string' ){ blog_urlappend = append; }
 
+		text = blog_baseurl + blog_urlappend;
 
-function update_urlpreview( base, append )
-{
-	if( typeof base == 'string' ){ blog_baseurl = base; }
-	if( typeof append == 'string' ){ blog_urlappend = append; }
-
-
-	text = blog_baseurl + blog_urlappend;
-
-	if( document.getElementById( 'urlpreview' ).hasChildNodes() )
-		document.getElementById( 'urlpreview' ).firstChild.data = text;
-	else
-		document.getElementById( 'urlpreview' ).appendChild( document.createTextNode( text ) );
-}
-//-->
+		if( document.getElementById( 'urlpreview' ).hasChildNodes() )
+		{
+			document.getElementById( 'urlpreview' ).firstChild.data = text;
+		}
+		else
+		{
+			document.getElementById( 'urlpreview' ).appendChild( document.createTextNode( text ) );
+		}
+	}
+	//-->
 </script>
 
 <form action="blogs.php" class="fform" method="post">
@@ -65,6 +68,27 @@ function update_urlpreview( base, append )
 		<legend><?php echo T_('Access parameters') ?></legend>
 
 		<?php
+			form_radio( 'blog_siteurl_type', $blog_siteurl_type,
+					array(
+						array( 'relative',
+										T_('relative to baseurl').':',
+										'',
+										'<span class="nobr"><code>'.$baseurl.'</code>'.
+										'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="30" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.
+										'<div class="notes">'.T_('With trailing slash. By default, leave this field empty.').'</div>',
+										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
+						),
+						array( 'absolute',
+										T_('absolute URL').':',
+										'',
+										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value+\'/\' );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'.
+										'<span class="notes">'.T_('With trailing slash.').'</span>',
+										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
+						)
+					),
+					T_('Blog Folder URL'), true );
+
+
 			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $edited_Blog->ID) )
 			{
 				if( $default_Blog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'), false) )
@@ -80,43 +104,26 @@ function update_urlpreview( base, append )
 										'onclick="update_urlpreview( false, \'index.php\' );"'
 						),
 						array( 'index.php', T_('Other blog through index.php'),
-										'',
+										T_('You might want to use extra-path info with this.'),
 										'',
 										'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') ? "/'+document.getElementById( 'blog_urlname' ).value" : '?blog='.$edited_Blog->ID."'" ).' )"'
 						),
 						array( 'stub',
-										T_('Other blog through stub file (Advanced)'),
+										T_('Other blog through stub file (Advanced)').':',
 										'',
-										'<div class="label"><label for="blog_stub">'.T_('Stub name').':</label></div>'
-											.'<div class="input"><input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$edited_Blog->dget( 'stub', 'formvalue' ).'" onkeyup="update_urlpreview( false, this.value );" onfocus="update_urlpreview( false, this.value ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" /></div>'
-											.'<div class="notes">'.T_("You MUST create a stub file for this to work or handle it accordingly on the Webserver (like Apache's mod_rewrite).").'</div>',
+										'<label for="blog_stub">'.T_('Stub name').':</label>'.
+										'<input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$edited_Blog->dget( 'stub', 'formvalue' ).'" onkeyup="update_urlpreview( false, this.value );" onfocus="update_urlpreview( false, this.value ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" />'.
+										'<div class="notes">'.T_("For this to work, you must handle it accordingly on the Webserver (e-g: create a stub file or use with mod_rewrite).").'</div>',
 										'onclick="document.getElementById( \'blog_stub\' ).focus();"'
 						),
 					), T_('Preferred access type'), true );
 
-			form_radio( 'blog_siteurl_type', $blog_siteurl_type,
-					array(
-						array( 'relative',
-										T_('relative to baseurl').':',
-										'',
-										' <span class="nobr"><code>'.$baseurl.'</code>'
-										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>',
-										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
-						),
-						array( 'absolute',
-										T_('absolute URL').':',
-										'',
-										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value+\'/\' );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value+\'/\' );" />',
-										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
-						)
-					),
-					T_('Blog Folder URL'), true, T_('No trailing slash. (If you don\'t know, leave this field empty.)') );
 
-			form_text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used in URLs to identify this blog.'), $maxlength_urlname_stub );
+			form_text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info.'), $maxlength_urlname_stub );
 		?>
 
 		<div class="label"><?php echo T_('URL preview').':' ?></div>
-		<div class="input" id="urlpreview"><?php $edited_Blog->disp( 'baseurl', 'entityencoded' ); echo $blog_urlappend; ?></div>
+		<div class="info" id="urlpreview"><?php $edited_Blog->disp( 'baseurl', 'entityencoded' ); echo $blog_urlappend; ?></div>
 	</fieldset>
 
 	<fieldset>

@@ -161,7 +161,7 @@ function form_select_object(
  * {@internal form_radio(-)}}
  * @param string the name of the radio options
  * @param string the checked option
- * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: optional [input field, ..], 4: attribs for <input tag> )
+ * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: additional HTML [input field, ..], 4: attribs for <input tag> )
  * @param string label
  * @param boolean options on seperate lines (DIVs)
  * @param string notes

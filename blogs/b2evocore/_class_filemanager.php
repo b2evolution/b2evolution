@@ -16,7 +16,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Includes
  */
-require_once( dirname(__FILE__).'/_functions_files.php' );
+// require_once( dirname(__FILE__).'/_functions_files.php' );
 
 
 /**
