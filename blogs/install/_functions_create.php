@@ -645,7 +645,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 	
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Important information :idea:"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
+	bpost_create( 1, T_("Important information"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
 
 All these entries are designed to help you so, as EdB would say: \"<em>read them all before you start hacking away!</em>\" ;)
 

@@ -33,6 +33,7 @@ switch($action)
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_longdesc', 'html', '' );
 		param( 'blog_notes', 'html', '' );
+		param( 'blog_stub', 'string', true );
 
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
@@ -40,7 +41,6 @@ switch($action)
 		param( 'blog_locale', 'string', true );
 		param( 'blog_access_type', 'string', true );
 		param( 'blog_siteurl', 'string', true );
-		param( 'blog_stub', 'string', true );
 		param( 'blog_keywords', 'string', true );
 		param( 'blog_disp_bloglist', 'integer', 0 );
 		param( 'blog_in_bloglist', 'integer', 0 );
@@ -52,6 +52,13 @@ switch($action)
 		$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
 		$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 		$blog_notes = format_to_post( $blog_notes, 0, 0 );
+
+		if( $DB->get_var( "SELECT COUNT(*)
+												FROM $tableblogs
+												WHERE blog_stub = ".$DB->quote($blog_stub) ) )
+		{	// Stub name is already in use
+			errors_add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
+		}
 
 		if( ! errors_display( T_('Cannot create, please correct these errors:' ), '') )
 		{
@@ -172,7 +179,7 @@ switch($action)
 
 		?>
 		<div class="panelinfo">
-			<p><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></p>
+			<h3><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></h3>
 		<?php
 
 		switch( $tab )
@@ -181,10 +188,33 @@ switch($action)
 				param( 'blog_tagline', 'html', '' );
 				param( 'blog_longdesc', 'html', '' );
 				param( 'blog_notes', 'html', '' );
+				param( 'blog_stub', 'string', true );
+
+				param( 'blog_name', 'string', true );
+				param( 'blog_shortname', 'string', true );
+				param( 'blog_description', 'string', true );
+				param( 'blog_locale', 'string', true );
+				param( 'blog_access_type', 'string', true );
+				param( 'blog_siteurl', 'string', true );
+				param( 'blog_keywords', 'string', true );
+				param( 'blog_disp_bloglist', 'integer', 0 );
+				param( 'blog_in_bloglist', 'integer', 0 );
+				param( 'blog_linkblog', 'integer', 0 );
+				param( 'blog_default_skin', 'string', true );
+				param( 'blog_force_skin', 'integer', 0 );
+				$blog_force_skin = 1-$blog_force_skin;
 
 				$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
 				$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 				$blog_notes = format_to_post( $blog_notes, 0, 0 );
+
+				if( $DB->get_var( "SELECT COUNT(*)
+														FROM $tableblogs
+														WHERE blog_stub = ".$DB->quote($blog_stub)."
+															AND blog_ID <> ".$edited_Blog->ID ) )
+				{	// Stub name is already in use
+					errors_add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
+				}
 
 				if ( errors_display( T_('Cannot update, please correct these errors:' ), '') )
 				{
@@ -195,46 +225,19 @@ switch($action)
 				$edited_Blog->set( 'tagline', $blog_tagline );
 				$edited_Blog->set( 'longdesc', $blog_longdesc );
 				$edited_Blog->set( 'notes', $blog_notes );
-
-				param( 'blog_name', 'string', true );
-				$edited_Blog->set( 'name', $blog_name );
-
-				param( 'blog_shortname', 'string', true );
-				$edited_Blog->set( 'shortname', $blog_shortname );
-
-				param( 'blog_description', 'string', true );
-				$edited_Blog->set( 'description', $blog_description );
-
-				param( 'blog_locale', 'string', true );
-				$edited_Blog->set( 'locale', $blog_locale );
-
-				param( 'blog_access_type', 'string', true );
-				$edited_Blog->set( 'access_type', $blog_access_type );
-
-				param( 'blog_siteurl', 'string', true );
-				$edited_Blog->set( 'siteurl', $blog_siteurl );
-
-				param( 'blog_stub', 'string', true );
 				$edited_Blog->set( 'stub', $blog_stub );
-
-				param( 'blog_keywords', 'string', true );
+				$edited_Blog->set( 'name', $blog_name );
+				$edited_Blog->set( 'shortname', $blog_shortname );
+				$edited_Blog->set( 'description', $blog_description );
+				$edited_Blog->set( 'locale', $blog_locale );
+				$edited_Blog->set( 'access_type', $blog_access_type );
+				$edited_Blog->set( 'siteurl', $blog_siteurl );
 				$edited_Blog->set( 'keywords', $blog_keywords );
-
-				param( 'blog_disp_bloglist', 'integer', 0 );
 				$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
-
-				param( 'blog_in_bloglist', 'integer', 0 );
 				$edited_Blog->set( 'in_bloglist', $blog_in_bloglist );
-
-				param( 'blog_linkblog', 'integer', 0 );
 				$edited_Blog->set( 'links_blog_ID', $blog_linkblog );
-
-				param( 'blog_default_skin', 'string', true );
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
-
-				param( 'blog_force_skin', 'integer', 0 );
-				$blog_force_skin = 1-$blog_force_skin;
-				$edited_Blog->set( 'force_skin', 1-$blog_force_skin );
+				$edited_Blog->set( 'force_skin', $blog_force_skin );
 
 				break;
 
@@ -271,13 +274,13 @@ switch($action)
 		if( !errors() )
 		{	// Commit update to the DB:
 			$edited_Blog->dbupdate();
-		}
 		
-		// Commit changes in cache:
-		$BlogCache->add( $edited_Blog );
+			// Commit changes in cache:
+			$BlogCache->add( $edited_Blog );
+		}
 
 		?>
-			</div>
+		</div>
 		<?php
 		// NOTE: no break here, we go on to edit!
 
@@ -342,22 +345,25 @@ switch($action)
 		switch( $tab )
 		{
 			case 'general':
-				$blog_name = get_bloginfo( 'name' );
-				$blog_shortname = get_bloginfo( 'shortname' );
-				$blog_tagline = get_bloginfo( 'tagline' );
-				$blog_description = get_bloginfo( 'description' );
-				$blog_longdesc = get_bloginfo( 'longdesc' );
-				$blog_locale = get_bloginfo( 'locale' );
-				$blog_access_type = $edited_Blog->get( 'access_type' );
-				$blog_siteurl = get_bloginfo( 'subdir' );
-				$blog_stub = get_bloginfo( 'stub' );
-				$blog_linkblog = get_bloginfo( 'links_blog_ID' );
-				$blog_notes = get_bloginfo( 'notes' );
-				$blog_keywords = get_bloginfo( 'keywords' );
-				$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
-				$blog_in_bloglist = get_bloginfo( 'in_bloglist' );
-				$blog_default_skin = get_bloginfo( 'default_skin' );
-				$blog_force_skin = $edited_Blog->get( 'force_skin' );
+				if( $action == 'edit' )
+				{	// we didn't end up here from a failed update:
+					$blog_name = get_bloginfo( 'name' );
+					$blog_shortname = get_bloginfo( 'shortname' );
+					$blog_tagline = get_bloginfo( 'tagline' );
+					$blog_description = get_bloginfo( 'description' );
+					$blog_longdesc = get_bloginfo( 'longdesc' );
+					$blog_locale = get_bloginfo( 'locale' );
+					$blog_access_type = $edited_Blog->get( 'access_type' );
+					$blog_siteurl = get_bloginfo( 'subdir' );
+					$blog_stub = get_bloginfo( 'stub' );
+					$blog_linkblog = get_bloginfo( 'links_blog_ID' );
+					$blog_notes = get_bloginfo( 'notes' );
+					$blog_keywords = get_bloginfo( 'keywords' );
+					$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
+					$blog_in_bloglist = get_bloginfo( 'in_bloglist' );
+					$blog_default_skin = get_bloginfo( 'default_skin' );
+					$blog_force_skin = $edited_Blog->get( 'force_skin' );
+				}
 				$next_action = 'update';
 				require( dirname(__FILE__).'/_blogs_general.form.php' );
 				break;

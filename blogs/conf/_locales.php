@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution localization & language config
- * Version of this file: 0.8.9+CVS
+ * Version of this file: 0.9
  */
 
 # Enable localization?
