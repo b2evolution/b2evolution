@@ -87,6 +87,7 @@ class Blog extends DataObject
 	var $keywords;
 	var $allowcomments = 'post_by_post';
 	var $allowtrackbacks = 0;
+	var $allowpingbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
 	var $pingb2evonet = 0;
@@ -618,6 +619,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/24 23:26:15  blueyed
+ * accidently removed class member definition
+ *
  * Revision 1.11  2005/02/24 22:17:46  edgester
  * Added a blog option to allow for a CSS file in the blog media dir to override the skin stylesheet.
  * Added a second blog option to allow for a user CSS file to  override the skin and blog stylesheets.
