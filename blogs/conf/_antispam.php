@@ -27,6 +27,9 @@ $block_urls = array(
 	'gdough.com',
 	'online-hgh.com',
 	'shop-opyt.com',
+	'pornwizzard.com',
+	'sexgine.com',
+	'zdenka.accepted.cc',
 // Light spammers:
 	'pcfamily.ch',
 	'nositeyet.com',
