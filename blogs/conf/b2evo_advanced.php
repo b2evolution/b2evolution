@@ -33,6 +33,14 @@ $oldtablecategories = 'b2categories';
 $oldtablecomments = 'b2comments';
 
 
+# gzip compression. can actually be done either by PHP or by Apache (if your apache has mod_gzip)
+# Set this to 1 if you want PHP to do gzip compression
+# Set this to 0 if you want to let Apache do the job instead of PHP
+# (Developpers: Letting apache do the compression will make PHP debugging easier)
+$use_gzipcompression = 0;		
+
+
+
 // *** Permalink control ***
 
 # What do you want permalinks to link to?
@@ -185,8 +193,7 @@ $phoneemail_separator = ':::';
 
 # CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
 $use_cache = 1;							// Not using this will dramatically overquery the DB !
-$use_gzipcompression = 1;		// Set this to 0 if you want to let Apache do the job instead of PHP
-# $sleep_after_edit = 0	// let DB do its stuff...
+$sleep_after_edit = 0;			// let DB do its stuff...
 
 
 # Getting vars from web server:
