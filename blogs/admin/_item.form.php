@@ -84,65 +84,62 @@ require dirname(__FILE__).'/_submenu.inc.php';
 $Form = & new Form( $form_action, 'post', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
 $Form->fieldend = '</span>';
+$Form->labelstart = '<strong>';
+$Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
 
 $Form->begin_form( '' );
 
+$Form->hidden( 'action', $next_action );
+$Form->hidden( 'blog', $blog );
+if( isset( $mode ) )   $Form->hidden( 'mode', $mode );
+if( isset( $post ) )   $Form->hidden( 'post_ID', $post );
+if( isset( $tsk_ID ) ) $Form->hidden( 'tsk_ID', $tsk_ID );
+
+// In case we send this to the blog for a preview :
+$Form->hidden( 'preview', 1 );
+$Form->hidden( 'more', 1 );
+$Form->hidden( 'preview_userid', $user_ID );
+
 ?>
 
 <div class="left_col">
 
 	<?php
-		$Form->hidden( 'action', $next_action );
-		$Form->hidden( 'blog', $blog );
-		if( isset( $mode ) )   $Form->hidden( 'mode', $mode );
-		if( isset( $post ) )   $Form->hidden( 'post_ID', $post );
- 		if( isset( $tsk_ID ) ) $Form->hidden( 'tsk_ID', $tsk_ID );
+	// ############################ POST CONTENTS #############################
 
-		// In case we send this to the blog for a preview :
-		$Form->hidden( 'preview', 1 );
-		$Form->hidden( 'more', 1 );
-		$Form->hidden( 'preview_userid', $user_ID );
-		
-		$Form->fieldset( T_('Post contents') );
-		
-		$Form->text( 'post_title', $post_title, 48, '<strong>'.T_('Title').'</strong>', '', 255 );
-		
-	?>
+	$Form->fieldset( T_('Post contents') );
 
-	<span class="line">
-		<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
-		<select name="post_locale" id="post_locale"><?php locale_options( $post_locale ) ?></select>
-	</span>
+	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
 
- 	<span class="line">
-		<label for="item_typ_ID"><strong><?php echo T_('Type') ?>:</strong></label>
-		<select name="item_typ_ID" id="item_typ_ID"><?php $itemTypeCache->option_list( $edited_Item->typ_ID, ! $edited_Item->typ_required ) ?></select>
-	</span>
+	$Form->select( 'post_locale', $post_locale, 'locale_options_return', T_('Language') );
 
-	<?php if( $use_post_url )
-	{ 
+	$Form->select_object( 'item_typ_ID', $post_locale, $itemTypeCache, T_('Type') );
+
+	if( $use_post_url )
+	{
 		$Form->text( 'post_url', $post_url, 40, T_('Link to url'), '', 255 );
 	}
 	else
 	{
 		$Form->hidden( 'post_url', '' );
 	}
-	?>
 
-	<div class="edit_toolbars">
-	<?php // --------------------------- TOOLBARS ------------------------------------
-		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => 'Item' ) );
-	?>
-	</div>
+	// --------------------------- TOOLBARS ------------------------------------
+	echo '<div class="edit_toolbars">';
+	// CALL PLUGINS NOW:
+	$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => 'Item' ) );
+	echo '</div>';
 
-	<?php // ---------------------------- TEXTAREA -------------------------------------
-	// Note: the pixel images are here for an IE layout bug
+	// ---------------------------- TEXTAREA -------------------------------------
+	$Form->fieldstart = '<div class="edit_area">';
+	$Form->fieldend = "</div>\n";
+  $Form->textarea( 'content', $content, 16, '', '', 40 , '' );
+	$Form->fieldstart = '<span class="line">';
+	$Form->fieldend = '</span>';
 	?>
-	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" id="content" ><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
@@ -150,14 +147,16 @@ $Form->begin_form( '' );
 		//-->
 	</script>
 
-	<div class="edit_actions">
 	<?php // ------------------------------- ACTIONS ----------------------------------
-		if( $use_preview )
-		{
-			$Form->button( array( 'button', '', T_('Preview'), '', 'open_preview(this.form);' ) );
-		}
+	echo '<div class="edit_actions">';
 
-		$Form->submit( array( '',/* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ T_('&nbsp; Save ! &nbsp;'), 'SaveButton' ) );
+	if( $use_preview )
+	{	// ---------- PREVIEW ----------
+		$Form->button( array( 'button', '', T_('Preview'), '', 'open_preview(this.form);' ) );
+	}
+
+	// ---------- SAVE ----------
+	$Form->submit( array( '',/* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ T_('&nbsp; Save ! &nbsp;'), 'SaveButton' ) );
 
 	// ---------- DELETE ----------
   if( $next_action == 'update' )
@@ -167,7 +166,7 @@ $Form->begin_form( '' );
 	}
 
 	if( $Settings->get( 'fm_enabled' ) && $Settings->get( 'upload_enabled' ) )
-	{ // ------------------------------- UPLOAD ----------------------------------
+	{ // ---------- UPLOAD ----------
 		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
 		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
 		$Fileman->dispButtonUploadPopup( T_('Files') );
@@ -176,77 +175,56 @@ $Form->begin_form( '' );
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item' ) );
 
-	?>
-	</div>
+	echo '</div>';
 
-	<?php
-		$Form->fieldset_end();
-
-		$Form->fieldset( T_('Advanced properties') );
-		
-		if( $current_User->check_perm( 'edit_timestamp' ) )
-		{	// ------------------------------------ TIME STAMP -------------------------------------
-			echo "<div>\n";
-			$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
-			$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
-		  if( $next_action == 'create' )
-		  {	// If not cjhecked, create time will be used...
-				$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
-			}
-			echo "</div>\n";
-		}
-		?>
-		
-		<div>
-		<?php
-			$Form->text( 'post_urltitle', $post_urltitle, 40, '<strong>'.T_('URL Title').'</strong>', 
-									 T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
-		?>
-		</div>
-		
-		<?php
-			$Form->fieldset_end();
-			
-			$Form->fieldset( T_('Workflow properties') );
-		?>
-
-		<div>
-			<label for="item_st_ID"><strong><?php echo T_('Task status') ?>:</strong></label>
-			<select name="item_st_ID" id="item_st_ID"><?php $itemStatusCache->option_list( $edited_Item->st_ID, ! $edited_Item->st_required ) ?></select>
-			&nbsp;
-			<label for="item_assigned_user_ID"><strong><?php echo T_('Assigned to') ?>:</strong></label>
-			<select name="item_assigned_user_ID" id="item_assigned_user_ID">
-				<?php $edited_Item->assigned_user_options() ?>
-			</select>
-		</div>
-
-		<div>
-			<label for="item_priority"><strong><?php echo T_('Priority') ?>:</strong></label>
-			<select name="item_priority" id="item_priority">
-				<?php for( $i=1; $i<=10; $i++)
-				{
-					echo '<option value="'.$i.'"';
-					if( $edited_Item->priority == $i )
-					{
-						echo ' selected="selected"';
-					}
-					echo '>'.$i.'</option>';
-				} ?>
-			</select>
-			&nbsp;
-			<?php
-			$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
-			?>
-		</div>
-
-	<?php
-	
 	$Form->fieldset_end();
-	
+
+
+	// ############################ ADVANCED #############################
+
+	$Form->fieldset( T_('Advanced properties') );
+
+	if( $current_User->check_perm( 'edit_timestamp' ) )
+	{	// ------------------------------------ TIME STAMP -------------------------------------
+		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
+		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
+	  if( $next_action == 'create' )
+	  {	// If not cjhecked, create time will be used...
+			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
+		}
+	}
+
+	$Form->text( 'post_urltitle', $post_urltitle, 40, '<strong>'.T_('URL Title').'</strong>',
+							 T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
+
+	$Form->fieldset_end();
+
+
+	// ############################ WORKFLOW #############################
+
+	$Form->fieldset( T_('Workflow properties') );
+
+	$Form->select_options( 'item_st_ID',
+												$itemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
+												 T_('Task status') );
+
+	$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
+												'', false, '', 'get_assigned_user_options' );
+
+	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'),
+												'', false, '', 'priority_options' );
+
+	$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
+
+	$Form->fieldset_end();
+
+
+	// ####################### ADDITIONAL ACTIONS #########################
+
 	if( isset( $Blog ) && ((get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks'))) )
 	{
 		$Form->fieldset( T_('Additional actions') );
-		
+
 		if( get_bloginfo('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
 			
@@ -278,250 +256,132 @@ $Form->begin_form( '' );
 <div class="right_col">
 
 	<?php
-	
+	// ################### CATEGORIES ###################
+
 	$Form->fieldset( T_('Categories'), 'extracats' );
-	
-	?>
 
-		<div class="extracats">
+	cat_select();
 
-		<p class="extracatnote"><?php echo T_('Select main category in target blog and optionally check additional categories') ?>:</p>
+	$Form->fieldset_end();
 
-	<?php
-		// ----------------------------  CATEGORIES ------------------------------
-		$default_main_cat = 0;
 
-		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query( false );	// make sure the caches are loaded
-		/**
-		 * callback to start sublist
-		 */
-		function cat_select_before_first( $parent_cat_ID, $level )
-		{	// callback to start sublist
-			echo "\n<ul>\n";
-		}
+	// ################### VISIBILITY / SHARING ###################
 
-		/**
-		 * callback to display sublist element
-		 */
-		function cat_select_before_each( $cat_ID, $level )
-		{	// callback to display sublist element
-			global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting;
-			$this_cat = get_the_category_by_ID( $cat_ID );
-			echo '<li>';
+	$Form->fieldset( T_('Visibility / Sharing') );
 
-			if( $allow_cross_posting )
-			{ // We allow cross posting, display checkbox:
-				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
-				if (($cat_ID == $edited_Item->main_cat_ID) or (in_array( $cat_ID, $post_extracats )))
-					echo ' checked="checked"';
-				echo ' />';
-			}
+	$sharing_options = array();
+	if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
+		$sharing_options[] = array( 'published', T_('Published (Public)') );
+	if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
+		$sharing_options[] = array( 'protected', T_('Protected (Members only)') );
+	if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
+		$sharing_options[] = array( 'private', T_('Private (You only)') );
+	if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
+		$sharing_options[] = array( 'draft', T_('Draft (Not published!)') );
+	if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
+		$sharing_options[] = array( 'deprecated', T_('Deprecated (Not published!)') );
 
-			// Radio for main cat:
-			if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
-			{ // This is current blog or we allow moving posts accross blogs
-				if( ($default_main_cat == 0) && ($next_action == 'create') && ($current_blog_ID == $blog) )
-				{	// Assign default cat for new post
-					$default_main_cat = $cat_ID;
-				}
-				echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
-				if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat))
-					echo ' checked="checked"';
-				echo ' />';
-			}
-			echo ' '.$this_cat['cat_name'];
-		}
-		/**
-		 * callback after each sublist element
-		 */
-		function cat_select_after_each( $cat_ID, $level )
-		{	// callback after each sublist element
-			echo "</li>\n";
-		}
-		/**
-		 * callback to end sublist
-		 */
-		function cat_select_after_last( $parent_cat_ID, $level )
-		{	// callback to end sublist
-			echo "</ul>\n";
-		}
+	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
 
-		if( $allow_cross_posting >= 2 )
-		{	// If BLOG cross posting enabled, go through all blogs with cats:
-			foreach( $cache_blogs as $i_blog )
-			{ // run recursively through the cats
-				$current_blog_ID = $i_blog->blog_ID;
-				if( ! blog_has_cats( $current_blog_ID ) ) continue;
-				if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
-				echo "<h4>".$i_blog->blog_name."</h4>\n";
-				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
-											'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-			}
+	$Form->fieldset_end();
 
-      if( $allow_cross_posting >= 3 )
-      {
-        echo '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
-      }
-      echo '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
-		}
-		else
-		{	// BLOG Cross posting is disabled. Current blog only:
-			$current_blog_ID = $blog;
-			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
-										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-			?>
-			<p class="extracatnote"><?php
-			if( $allow_cross_posting )
-				echo T_('Note: Cross posting among multiple blogs is currently disabled.');
-			else
-				echo T_('Note: Cross posting among multiple categories is currently disabled.');
-			?></p>
-			<?php
-		}
-		// ----------------- END RECURSIVE CAT LIST ----------------
+
+	// ################### COMMENT STATUS ###################
+
+	if( $Blog->allowcomments == 'post_by_post' )
+	{
+		$Form->fieldset( T_('Comments') );
+
 		?>
-		</div>
-		
+			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
+			<?php echo T_('Open') ?></label><br />
+
+			<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> />
+			<?php echo T_('Closed') ?></label><br />
+
+			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
+			<?php echo T_('Disabled') ?></label><br />
 		<?php
-		
+
 		$Form->fieldset_end();
-		
-		$Form->fieldset( T_('Visibility / Sharing') );
-		
-		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Published (Public)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Protected (Members only)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Private (You only)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Draft (Not published!)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Deprecated (Not published!)') ?></label><br />
-		<?php
-		}
-	
-		$Form->fieldset_end();
-	
-		if( $Blog->allowcomments == 'post_by_post' )
-		{	// ---------------- COMMENT STATUS -----------------
-			
-			$Form->fieldset( T_('Comments') );
-			
-			?> 
+	}
 
-				<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
-				<?php echo T_('Open') ?></label><br />
 
-				<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> />
-				<?php echo T_('Closed') ?></label><br />
+	// ################### TEXT RENDERERS ###################
 
-				<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
-				<?php echo T_('Disabled') ?></label><br />
-			
-			<?php
-			
-			$Form->fieldset_end();
+	$Form->fieldset( T_('Text Renderers') );
+
+	$Plugins->restart(); // make sure iterator is at start position
+	$atLeastOneRenderer = false;
+	while( $loop_RendererPlugin = $Plugins->get_next() )
+	{ // Go through whole list of renders
+		// echo ' ',$loop_RendererPlugin->code;
+		if( $loop_RendererPlugin->apply_when == 'stealth'
+			|| $loop_RendererPlugin->apply_when == 'never' )
+		{ // This is not an option.
+			continue;
 		}
-		
-		$Form->fieldset( T_('Text Renderers') );
-	
-		$Plugins->restart(); // make sure iterator is at start position
-		$atLeastOneRenderer = false;
-		while( $loop_RendererPlugin = $Plugins->get_next() )
-		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code;
-			if( $loop_RendererPlugin->apply_when == 'stealth'
-				|| $loop_RendererPlugin->apply_when == 'never' )
-			{ // This is not an option.
-				continue;
-			}
-			$atLeastOneRenderer = true;
-			?>
-			<div>
-				<input type="checkbox" class="checkbox" name="renderers[]"
-					value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
-					<?php
-					switch( $loop_RendererPlugin->apply_when )
-					{
-						case 'always':
-							// echo 'FORCED';
+		$atLeastOneRenderer = true;
+		?>
+		<div>
+			<input type="checkbox" class="checkbox" name="renderers[]"
+				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
+				<?php
+				switch( $loop_RendererPlugin->apply_when )
+				{
+					case 'always':
+						// echo 'FORCED';
+						echo ' checked="checked"';
+						echo ' disabled="disabled"';
+						break;
+
+					case 'opt-out':
+						if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
+							|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
+						{
+							// echo 'OPT';
 							echo ' checked="checked"';
-							echo ' disabled="disabled"';
-							break;
+						}
+						// else echo 'NO';
+						break;
 
-						case 'opt-out':
-							if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
-								|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
-							{
-								// echo 'OPT';
-								echo ' checked="checked"';
-							}
-							// else echo 'NO';
-							break;
+					case 'opt-in':
+						if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+						{
+							// echo 'OPT';
+							echo ' checked="checked"';
+						}
+						// else echo 'NO';
+						break;
 
-						case 'opt-in':
-							if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
-							{
-								// echo 'OPT';
-								echo ' checked="checked"';
-							}
-							// else echo 'NO';
-							break;
+					case 'lazy':
+						// cannot select
+						if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+						{
+							// echo 'OPT';
+							echo ' checked="checked"';
+						}
+						echo ' disabled="disabled"';
+						break;
+				}
+			?>
+			title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
+		<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><?php echo $loop_RendererPlugin->name(); ?></label>
+	</div>
+	<?php
+	}
+	if( !$atLeastOneRenderer )
+	{
+		echo T_('No renderer plugins are installed.');
+	}
 
-						case 'lazy':
-							// cannot select
-							if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
-							{
-								// echo 'OPT';
-								echo ' checked="checked"';
-							}
-							echo ' disabled="disabled"';
-							break;
-					}
-				?>
-				title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
-			<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><?php echo $loop_RendererPlugin->name(); ?></label>
-		</div>
-		<?php
-		}
-		if( !$atLeastOneRenderer )
-		{
-			echo T_('No renderer plugins are installed.');
-		}
+	$Form->fieldset_end();
 
-		$Form->fieldset_end();
-
-		?>
+	?>
 
 </div>
 
 <div class="clear"></div>
-
 
 <?php
 
@@ -534,6 +394,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.11  2005/01/20 20:38:58  fplanque
+ * refactoring
+ *
  * Revision 1.10  2005/01/13 19:53:48  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

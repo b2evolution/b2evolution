@@ -139,7 +139,7 @@ class UserCache extends DataObjectCache
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
 	 */
-	function blog_member_list( $blog_ID, $default = 0, $allow_none = false, $always_load_default = false )
+	function blog_member_list( $blog_ID, $default = 0, $allow_none = false, $always_load_default = false, $disp = true )
 	{
 		if( $blog_ID )
 		{	// Load requested blog members:
@@ -157,7 +157,14 @@ class UserCache extends DataObjectCache
 			$this->load_all();
 		}
 
-		parent::option_list( $default, $allow_none, 'prefered_name' );
+		if( $disp )
+		{
+			parent::option_list( $default, $allow_none, 'prefered_name' );
+		}
+		else
+		{
+			return parent::option_list_return( $default, $allow_none, 'prefered_name_return' );
+		}
 	}
 
 
@@ -180,6 +187,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/20 20:38:58  fplanque
+ * refactoring
+ *
  * Revision 1.4  2004/12/30 16:45:40  fplanque
  * minor changes on file manager user interface
  *

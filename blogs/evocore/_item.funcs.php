@@ -1376,8 +1376,122 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 	return $where;
 }
 
+
+/**
+ * Allow recursive category selection
+ */
+function cat_select()
+{
+	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
+					$blog, $current_blog_ID, $current_User;
+
+	echo '<div class="extracats">'
+				.'<p class="extracatnote">'
+				.T_('Select main category in target blog and optionally check additional categories')
+				.'</p>';
+
+	$default_main_cat = 0;
+
+	cat_query( false );	// make sure the caches are loaded
+
+	if( $allow_cross_posting >= 2 )
+	{	// If BLOG cross posting enabled, go through all blogs with cats:
+		foreach( $cache_blogs as $i_blog )
+		{ // run recursively through the cats
+			$current_blog_ID = $i_blog->blog_ID;
+			if( ! blog_has_cats( $current_blog_ID ) ) continue;
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
+			echo "<h4>".$i_blog->blog_name."</h4>\n";
+			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
+										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+		}
+
+    if( $allow_cross_posting >= 3 )
+    {
+      echo '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
+    }
+    echo '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
+	}
+	else
+	{	// BLOG Cross posting is disabled. Current blog only:
+		$current_blog_ID = $blog;
+		cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
+									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+		echo '<p class="extracatnote">';
+		if( $allow_cross_posting )
+			echo T_('Note: Cross posting among multiple blogs is currently disabled.');
+		else
+			echo T_('Note: Cross posting among multiple categories is currently disabled.');
+		echo '</p>';
+	}
+
+	echo '</div>';
+}
+
+/**
+ * callback to start sublist
+ */
+function cat_select_before_first( $parent_cat_ID, $level )
+{	// callback to start sublist
+	echo "\n<ul>\n";
+}
+
+/**
+ * callback to display sublist element
+ */
+function cat_select_before_each( $cat_ID, $level )
+{	// callback to display sublist element
+	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting;
+	$this_cat = get_the_category_by_ID( $cat_ID );
+	echo '<li>';
+
+	if( $allow_cross_posting )
+	{ // We allow cross posting, display checkbox:
+		echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
+		if (($cat_ID == $edited_Item->main_cat_ID) or (in_array( $cat_ID, $post_extracats )))
+			echo ' checked="checked"';
+		echo ' />';
+	}
+
+	// Radio for main cat:
+	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
+	{ // This is current blog or we allow moving posts accross blogs
+		if( ($default_main_cat == 0) && ($next_action == 'create') && ($current_blog_ID == $blog) )
+		{	// Assign default cat for new post
+			$default_main_cat = $cat_ID;
+		}
+		echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
+		if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat))
+			echo ' checked="checked"';
+		echo ' />';
+	}
+	echo ' '.$this_cat['cat_name'];
+}
+
+/**
+ * callback after each sublist element
+ */
+function cat_select_after_each( $cat_ID, $level )
+{	// callback after each sublist element
+	echo "</li>\n";
+}
+
+/**
+ * callback to end sublist
+ */
+function cat_select_after_last( $parent_cat_ID, $level )
+{	// callback to end sublist
+	echo "</ul>\n";
+}
+
+
+
+
 /*
  * $Log$
+ * Revision 1.9  2005/01/20 20:38:58  fplanque
+ * refactoring
+ *
  * Revision 1.8  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *

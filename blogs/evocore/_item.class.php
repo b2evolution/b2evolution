@@ -118,7 +118,7 @@ class Item extends DataObject
 	var $typ_ID;
 	var $st_ID;
 	var $deadline = '';
-	var $priority = 5;
+	var $priority = 3;
 
 	/**
 	 * Derived from $main_cat_ID
@@ -415,26 +415,29 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::assigned_user_options(-)}}
 	 */
-	function assigned_user_options( $disp = true )
+	function assigned_user_options()
 	{
 		global $UserCache, $object_def;
-		// echo '<option>'.$this->ID;
+
 		$UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
 						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
-						$disp );
-						
+						true );
 	}
 
 	/**
-	 * Template function: display list of assigned user options
+	 * Template function: get list of assigned user options
 	 *
-	 * {@internal Item::assigned_user_options(-)}}
+	 * {@internal Item::get_assigned_user_options(-)}}
 	 */
-	function assigned_user_options_return()
+	function get_assigned_user_options()
 	{
-		$r = $this->assigned_user_options( false );
-		return $r;
+		global $UserCache, $object_def;
+
+		return $UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
+							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
+							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
+							false );
 	}
 
 	/**
@@ -1159,6 +1162,36 @@ class Item extends DataObject
 		return true;
 	}
 
+
+	/**
+	 * Template function: display list of priority options
+	 *
+	 * {@internal Item::priority_options(-)}}
+	 */
+	function priority_options()
+	{
+		$priorities = array(	1 => T_('1 - Highest'),
+													2 => T_('2 - High'),
+													3 => T_('3 - Medium'),
+													4 => T_('4 - Low'),
+													5 => T_('5 - Lowest') );
+
+		$r = '';
+
+		foreach( $priorities as $i => $name )
+		{
+			$r .= '<option value="'.$i.'"';
+			if( $this->priority == $i )
+			{
+				$r .= ' selected="selected"';
+			}
+			$r .= '>'.$name.'</option>';
+		}
+
+		return $r;
+	}
+
+
 	/**
 	 * Template function: display status of item
 	 *
@@ -1608,6 +1641,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2005/01/20 20:38:58  fplanque
+ * refactoring
+ *
  * Revision 1.16  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *
