@@ -183,11 +183,18 @@ switch( $action )
 		<?php
 		break;
 
+
 	case 'report':
 		// Report an entry as abuse to centralized blacklist:
 		param( 'keyword', 'string', true );	// Required!
 		// Report this keyword as abuse:
 		b2evonet_report_abuse( $keyword );
+		break;
+
+
+	case 'poll':
+		// request abuse list from central blacklist:
+		b2evonet_poll_abuse( );
 		break;
 }
 ?>
@@ -207,7 +214,7 @@ switch( $action )
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
-
+	<p>[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
 </div>
 
 <div class="panelblock">

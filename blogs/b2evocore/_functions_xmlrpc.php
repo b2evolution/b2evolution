@@ -1,4 +1,5 @@
 <?php
+// doc: http://xmlrpc.usefulinc.com/doc/
 // by Edd Dumbill (C) 1999-2001
 // <edd@usefulinc.com>
 // additional fixes for case of missing xml extension file by Michel Valdrighi <m@tidakada.com>
