@@ -3,10 +3,10 @@
    * This template generates an RSS 2.0 feed for the requested blog
    * (http://backend.userland.com/rss)
    */
-  $skin = '';                         // We don't want this do be displayed in a skin !
+  $skin = '';                   // We don't want this do be displayed in a skin !
 	$show_statuses = array();     // Restrict to published posts
-	$timestamp_min = '';								// Show past
-	$timestamp_max = 'now';							// Hide future
+	$timestamp_min = '';					// Show past
+	$timestamp_max = 'now';				// Hide future
   require dirname(__FILE__)."/../b2evocore/_blog_main.php";
   header("Content-type: text/xml");
   echo "<?xml version=\"1.0\"?".">";
@@ -22,11 +22,11 @@
     <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
     <ttl>60</ttl>
     <?php while( $MainList->get_item() ) {  ?>
-    <item rdf:about="<?php permalink_single() ?>">
+    <item>
       <title><?php the_title( '', '', false, 'xml' ) ?></title>
       <link><?php permalink_single() ?></link>
       <pubDate><?php the_time('r',1,1); ?></pubDate>
-      <author><?php the_author( 'xml' ) /* Should actually be an email adress, but spam... you know... */ ?></author>
+      <?php // Disabled because of spambots: <author><php the_author_email( 'xml' ) ></author>?>
       <?php the_categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml', 'raw' ) ?>
       <guid isPermaLink="false"><?php echo $id; ?>@<?php echo $baseurl ?></guid>
       <description><?php
