@@ -27,9 +27,9 @@
 /**#@+
  * MySQL settings. Fill in your database details (check carefully or nothing will work!)
  */
-define( 'DB_USER', 'demouser' );      // your MySQL username
-define( 'DB_PASSWORD', 'demopass' );  // ...and password
-define( 'DB_NAME', 'b2evolution' );   // the name of the database
+define( 'DB_USER', 'b2evo' );      // your MySQL username
+define( 'DB_PASSWORD', 'b2cvs' );  // ...and password
+define( 'DB_NAME', 'b2evo' );   // the name of the database
 define( 'DB_HOST', 'localhost' );     // MySQL Server (typically 'localhost')
 /**#@-*/
 
@@ -51,7 +51,7 @@ $tableprefix = 'evo_';
  * IF THIS IS ON (1) AND YOU FORGET TO DELETE THE INSTALL FOLDER, ANYONE WOULD BE ABLE TO
  * ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
  */
-$allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on production servers
+$allow_evodb_reset = 1;	// Set to 1 to enable. Do not leave this on 1 on production servers
 
 
 /**
@@ -69,7 +69,7 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  *
  * @global string $baseurl
  */
-$baseurl = 'http://localhost/b2evolution/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
+$baseurl = 'http://localhost/~jwedgeco/b2evolution/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
 
 
 /**
@@ -82,7 +82,7 @@ $admin_email = 'postmaster@localhost';
 /**
  * Once you have edited this file to your settings, set the following to 1 (one):
  */
-$config_is_done = 0;
+$config_is_done = 1;
 
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder.

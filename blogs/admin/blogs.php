@@ -6,12 +6,17 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
+ * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
  * {@internal
  * The University of North Carolina at Charlotte grants François PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
+ *
+ * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
@@ -76,6 +81,8 @@ function set_edited_Blog_from_params( $for )
 
 			// checkboxes (will not get send, if unchecked)
 			$edited_Blog->set( 'force_skin',  1-param( 'blog_force_skin',    'integer', $req ? 0 : 0 ) );
+			$edited_Blog->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', $req ? 0 : 1 ) );
+			$edited_Blog->set( 'allowusercss', param( 'blog_allowusercss', 'integer', $req ? 0 : 1 ) );
 			$edited_Blog->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', $req ? 0 : 1 ) );
 			$edited_Blog->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', $req ? 0 : 1 ) );
 
@@ -560,6 +567,10 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.26  2005/02/24 22:17:45  edgester
+ * Added a blog option to allow for a CSS file in the blog media dir to override the skin stylesheet.
+ * Added a second blog option to allow for a user CSS file to  override the skin and blog stylesheets.
+ *
  * Revision 1.25  2005/02/17 19:36:23  fplanque
  * no message
  *

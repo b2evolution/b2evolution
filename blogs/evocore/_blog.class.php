@@ -7,6 +7,7 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -28,6 +29,10 @@
  * {@internal
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * 
+ * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
@@ -82,7 +87,8 @@ class Blog extends DataObject
 	var $keywords;
 	var $allowcomments = 'post_by_post';
 	var $allowtrackbacks = 0;
-	var $allowpingbacks = 0;
+	var $allowblogcss = 0;
+	var $allowusercss = 0;
 	var $pingb2evonet = 0;
 	var $pingtechnorati = 0;
 	var $pingweblogs = 1;
@@ -153,6 +159,8 @@ class Blog extends DataObject
 			$this->allowcomments = $db_row->blog_allowcomments;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowpingbacks = $db_row->blog_allowpingbacks;
+			$this->allowblogcss = $db_row->blog_allowblogcss;
+			$this->allowusercss = $db_row->blog_allowusercss;
 			$this->pingb2evonet = $db_row->blog_pingb2evonet;
 			$this->pingtechnorati = $db_row->blog_pingtechnorati;
 			$this->pingweblogs = $db_row->blog_pingweblogs;
@@ -610,6 +618,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/24 22:17:46  edgester
+ * Added a blog option to allow for a CSS file in the blog media dir to override the skin stylesheet.
+ * Added a second blog option to allow for a user CSS file to  override the skin and blog stylesheets.
+ *
  * Revision 1.10  2005/02/18 19:16:14  fplanque
  * started relation restriction/cascading handling
  *

@@ -10,6 +10,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,6 +27,10 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evoskins
@@ -34,6 +39,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
  * @author cafelog (team)
+ * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
  */
@@ -65,6 +71,33 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 <link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 <link rel="stylesheet" href="custom.css" type="text/css" />
+<?php
+/* Add the html for user and blog-specified stylesheets
+   All stylesheets will be included if the blog settings allow it
+   and the files exist. CSS rules say that the latter style sheets can
+   override earlier stylesheets.
+ */
+if ( ( $Blog->allowblogcss == 1 ) 
+     && ( file_exists( $Blog->get( "mediadir" ) . "customstyle.css" ) )
+     )
+    {
+      echo '<link rel="stylesheet" href="' 
+        . $Blog->get( "mediaurl" ) 
+        .  'customstyle.css" type="text/css" />' . "\n";
+    }
+/* check for a user-specified stylesheet */
+/* TODO Fix the following if statement
+   FIXME The if statement below doesn't work
+*/
+if ( ( $Blog->allowusercss == 1 ) 
+     && ( file_exists( $current_User->getMediaDir() . "customstyle.css" ) )
+     )
+    {
+      echo '<link rel="stylesheet" href="' 
+        . $current_User->getMediaUrl() 
+        .  'customstyle.css" type="text/css" />' . "\n";
+    }
+?>
 </head>
 <body>
 <div id="wrapper">
