@@ -25,85 +25,167 @@ switch( $action )
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
 		param( 'keyword', 'string', true );	// Required!
+		$dbkeyword = addslashes( $keyword );
+		param( 'delhits', 'integer', 0 );
+		param( 'delcomments', 'integer', 0 );
+		param( 'blacklist', 'integer', 0 );
+		param( 'report', 'integer', 0 );
 
-		// Check if the string already is in the blacklist:
-		if( antispam_url($keyword) )
-		{
+		if( $delhits && $deluxe_ban )
+		{	// Delete all banned hit-log entries
 			echo '<div class="panelinfo">';
-			printf( '<p>'.T_('The keyword %s is already handled by the blacklist!').'</p>', $keyword);
+			printf( '<h3>'.T_('Deleting log-hits matching [%s]...').'</h3>', $keyword );
+			// Stats entries first
+			$sql = "DELETE FROM $tablehitlog 
+							WHERE referingURL LIKE '%$dbkeyword%'";
+			$querycount++;
+			mysql_query($sql) or mysql_oops( $sql );
 			echo '</div>';
-			break;
+		}
+					
+		if( $delcomments && $deluxe_ban )
+		{ // Then all banned comments
+			echo '<div class="panelinfo">';
+			printf( '<h3>'.T_('Deleting comments matching [%s]...').'</h3>', $keyword );
+			$sql = "DELETE FROM $tablecomments 
+							WHERE comment_author_url LIKE '%$dbkeyword%'";	
+			$querycount++;
+			mysql_query($sql) or mysql_oops( $sql );
+			echo '</div>';
 		}
 		
-		// Check if the string is too short, it has to be a minimum of 3 characters to avoid being too generic
-		if( strlen($keyword) < 3 )
-		{
+		if( $blacklist )
+		{	// Local blacklist:
 			echo '<div class="panelinfo">';
-			printf( '<p>'.T_('The keyword %s is too short, it has to be a minimum of 3 characters!').'</p>', $keyword);
+			printf( '<h3>'.T_('Blacklisting the keyword [%s]...').'</h3>', $keyword );
+			// Insert into DB:
+			antispam_create( $keyword );
 			echo '</div>';
-			break;
 		}
-
-		if ( $deluxe_ban && ! $confirm )
-		{
-			// Show confirmation page:
+			
+		if( $report && $report_abuse )
+		{ // Report this keyword as abuse:
+			b2evonet_report_abuse( $keyword );
+		}
+		
+		if( !( $delhits || $delcomments || $blacklist || $report ) )
+		{	// Nothing to do, ask user:
 			?>
 			<div class="panelblock">
+				<form action="b2antispam.php">
+				<input type="hidden" name="confirm" value="confirm" />
+				<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
+				<input type="hidden" name="action" value="ban" />
 				<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
-				<?php ban_affected_comments($keyword) ?>
-				<p><?php printf ( T_('Banning the keyword %s from the statistics and comments would lead to the deletion of the following %d comments:'), $keyword, mysql_affected_rows() ); ?></p>
-				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
-					<tr>
-						<td><?php
-						preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
-						$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
-						echo date(locale_datefmt()." ".locale_timefmt(), $date);
-						?></td>
-						<td><?php echo $row_stats['comment_author'] ?></a></td>
-						<td><?php echo $row_stats['comment_author_url'] ?></td>
-						<td><?php
-						$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
-						if ( strlen($comment_content) > 70 )
-						{
-							// Trail off (truncate and add '...') after 70 chars
-							echo substr($comment_content, 0, 70) . "...";
-						}
-						else
-						{
-							echo $comment_content;
-						}
-						?></td>
-					</tr>
-					<?php } // End stat loop ?>
-				</table>
+
+				<p><strong><?php echo T_('Keyword') ?>: </strong><input type="text" size="30" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" /></p>
+
+				<?php
+				if( $deluxe_ban )
+				{	// We can we autodelete junk, check for junk:
+					// Check for potentially affected log hits:
+					$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL,
+												 baseDomain, hit_blog_ID, visitURL 
+												 FROM $tablehitlog 
+												 WHERE referingURL LIKE '%$dbkeyword%' 
+												 ORDER BY baseDomain ASC";
+					$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
+					$querycount++;
+					if( mysql_affected_rows() == 0 )
+					{	// No matching hits.
+						printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', $keyword );
+					}
+					else
+					{
+					?>
+						<p><strong><input type="checkbox" name="delhits" value="1" checked="checked" />
+						<?php printf ( T_('Delete the following %d referer hits:'), mysql_affected_rows() ) ?>
+						</strong></p>
+						<table class="thin">
+							<?php while($row_stats = mysql_fetch_array($res_affected_hits)) {  ?>
+							<tr>
+								<td><?php stats_time() ?></td>
+								<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+								<td><?php stats_blog_name() ?></td>
+								<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
+							</tr>
+							<?php } // End stat loop ?>
+						</table>
+					<?php
+					}
+	
+					// Check for potentially affected comments:
+					$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content 
+									FROM $tablecomments 
+									WHERE comment_author_url LIKE '%$dbkeyword%' 
+									ORDER BY comment_date ASC";
+					$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
+					$querycount++;
+					if( mysql_affected_rows() == 0 )
+					{	// No matching hits.
+						printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', $keyword );
+					}
+					else
+					{
+					?>
+						<p><strong><input type="checkbox" name="delcomments" value="1" checked="checked" />
+						<?php printf ( T_('Delete the following %d comments:'), mysql_affected_rows() ) ?>
+						</strong></p>
+						<table class="thin">
+							<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
+							<tr>
+								<td><?php
+								preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
+								$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
+								echo date(locale_datefmt()." ".locale_timefmt(), $date);
+								?></td>
+								<td><?php echo $row_stats['comment_author'] ?></a></td>
+								<td><?php echo $row_stats['comment_author_url'] ?></td>
+								<td><?php
+								$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
+								if ( strlen($comment_content) > 70 )
+								{
+									// Trail off (truncate and add '...') after 70 chars
+									echo substr($comment_content, 0, 70) . "...";
+								}
+								else
+								{
+									echo $comment_content;
+								}
+								?></td>
+							</tr>
+							<?php } // End stat loop ?>
+						</table>
+					<?php 
+					} 
+				}
+					
+				// Check if the string is already in the blacklist:
+				if( antispam_url($keyword) )
+				{ // Already there:
+					printf( '<p><strong>'.T_('The keyword [%s] is already handled by the blacklist.').'</strong></p>', $keyword );
+				}
+				else
+				{ // Not in blacklist
+				  ?>
+					<p><strong><input type="checkbox" name="blacklist" value="1" checked="checked" />
+					<?php printf ( T_('Blacklist the keyword [%s] locally.'), $keyword ) ?>
+					</strong></p>
+
+					<?php if( $report_abuse ) 
+					{ ?>
+						<p><strong><input type="checkbox" name="report" value="1" checked="checked" />
+						<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), $keyword ) ?>
+						</strong></p>					
+					<?php
+					}
+				}
+				?>				
 				
-				<?php ban_affected_hits($keyword) ?>
-				<p><?php printf ( T_('...and the following %d referer hits:'), mysql_affected_rows() ) ?></p>
-				<table class="thin">
-					<?php while($row_stats = mysql_fetch_array($res_affected_hits)){  ?>
-					<tr>
-						<td><?php stats_time() ?></td>
-						<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-						<td><?php stats_blog_name() ?></td>
-						<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-					</tr>
-					<?php } // End stat loop ?>
-				</table>
-				
-				<p><?php echo T_('Are you sure you want to continue?') ?></p>
-				<form action="b2antispam.php" method="get">
-					<input type="hidden" name="confirm" value="confirm" />
-					<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
-					<input type="hidden" name="action" value="ban" />
-					<input type="submit" value="<?php echo T_('Ban the keyword + delete matching hits and comments') ?>" class="search" />
+				<input type="submit" value="<?php echo T_('Perform selected operations') ?>" class="search" />
 				</form>
 			</div>
 			<?php
-		}
-		else
-		{	// BAN a keyword + (if requested) DELETE stats entries and comments:
-			keyword_ban( $keyword );
 		}
 		break;
 
@@ -133,6 +215,7 @@ switch( $action )
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
 		param( 'keyword', 'string', true );	// Required!
+
 		// Report this keyword as abuse:
 		b2evonet_report_abuse( $keyword );
 		break;

@@ -24,7 +24,8 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	if( antispam_url($abuse_string) ) return false;
 	
 	// Insert new string into DB:
-	$sql ="INSERT INTO $tableantispam( aspm_string, aspm_source ) VALUES( '$abuse_string', '$aspm_source' )";
+	$sql = "INSERT INTO $tableantispam( aspm_string, aspm_source ) 
+					VALUES( '".addslashes($abuse_string)."', '$aspm_source' )";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 
@@ -45,7 +46,9 @@ function antispam_update_source( $aspm_string, $aspm_source )
 {
 	global $tableantispam, $querycount;
 	
-	$sql ="UPDATE $tableantispam SET aspm_source = '$aspm_source' WHERE aspm_string = '$aspm_string'";
+	$sql = "UPDATE $tableantispam 
+					SET aspm_source = '$aspm_source' 
+					WHERE aspm_string = '".addslashes($aspm_string)."'";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 }
@@ -59,7 +62,8 @@ function antispam_delete( $string_ID )
 {
 	global $tableantispam, $querycount;
 
-	$sql ="DELETE FROM $tableantispam WHERE aspm_ID = $string_ID";
+	$sql = "DELETE FROM $tableantispam 
+					WHERE aspm_ID = $string_ID";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 }
@@ -149,78 +153,6 @@ function antispam_source( $disp = true, $raw = false )
 }
 
 
-/*
- * keyword_ban(-)
- *
- * Ban any URL containing a certain keyword
- */
-function keyword_ban( $keyword )
-{
-	global $tablehitlog, $tablecomments, $querycount, $deluxe_ban, $auto_report_abuse;
-
-	// Cut the crap if the string is empty:
-	$keyword = trim( $keyword );
-	if( empty( $keyword ) ) return false;
-
-	echo '<div class="panelinfo">';
-	printf( '<p>'.T_('Banning the keyword %s...').'</p>', $keyword);
-
-	// Insert into DB:
-	antispam_create( $keyword );
-		
-	if ( $deluxe_ban )
-	{ // Delete all banned comments and stats entries
-		echo '<p>'.T_('Removing all related comments and hits...').'</p>';
-		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%'";	// This is quite drastic!
-		$querycount++;
-		mysql_query($sql) or mysql_oops( $sql );
-		
-		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%'";	// This is quite drastic!
-		$querycount++;
-		mysql_query($sql) or mysql_oops( $sql );
-	}
-	
-	echo '</div>';
-	
-	// Report this keyword as abuse:
-	if( $auto_report_abuse )
-	{
-		b2evonet_report_abuse( $keyword );
-	}
-}
-
-
-/*
- * ban_affected_hits(-)
- *
- * find log hits that would be affected by a ban
- */
-function ban_affected_hits($banned)
-{
-	global  $querycount, $tablehitlog, $res_affected_hits;
-
-	$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL, baseDomain, hit_blog_ID, visitURL FROM $tablehitlog WHERE baseDomain LIKE '%$banned%' ORDER BY baseDomain ASC";
-	$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
-	$querycount++;
-}
-
-/*
- * ban_affected_comments(-)
- *
- * find comments that would be affected by a ban
- */
-function ban_affected_comments($banned)
-{
-	global  $querycount, $tablecomments, $res_affected_comments;
-
-	$sql = "SELECT comment_author, comment_author_url, comment_date, comment_content FROM $tablecomments WHERE comment_author_url LIKE '%$banned%' ORDER BY comment_date ASC";
-	$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
-	$querycount++;
-}
-
-
 // -------------------- XML-RPC callers ---------------------------
 
 /*
@@ -230,7 +162,7 @@ function ban_affected_comments($banned)
  */
 function b2evonet_report_abuse( $abuse_string, $display = true ) 
 {
-	$test = 1;
+	$test = 2;
 
 	global $baseurl;
 	if( $display )
@@ -287,7 +219,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
  */
 function b2evonet_poll_abuse( $display = true ) 
 {
-	$test = 1;
+	$test = 2;
 
 	global $baseurl, $tablesettings, $querycount;
 	
