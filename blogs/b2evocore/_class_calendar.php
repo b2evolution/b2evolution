@@ -201,19 +201,19 @@ class Calendar
 			// Find a month with posts
 			for( $i = 0; $i < $this->searchframe; $i++ )
 			{
-				$arc_sql = "SELECT DISTINCT COUNT(ID), YEAR(post_issue_date), MONTH(post_issue_date), DAYOFMONTH(post_issue_date) AS myday".
+				$arc_sql = "SELECT COUNT(DISTINCT ID), YEAR(post_issue_date), MONTH(post_issue_date), DAYOFMONTH(post_issue_date) AS myday".
 						" FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)".
 						" INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID".
 						" WHERE MONTH(post_issue_date) = '$this->month' AND YEAR(post_issue_date) = '$this->year' ".$this->where.
 						" GROUP BY myday".
 						" ORDER BY post_issue_date DESC";
 				$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
-	
+				
 				if( $DB->num_rows > 0 )
 				{	// OK we have a month with posts!
 					foreach( $arc_result as $arc_row )
 					{
-						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['COUNT(ID)'];
+						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['COUNT(DISTINCT ID)'];
 					}
 					break; // Don't search any further!
 				}
@@ -272,7 +272,7 @@ class Calendar
 		else
 		{ // mode is 'year'
 			// Find months with posts
-			$arc_sql = "SELECT DISTINCT COUNT(ID), MONTH(post_issue_date) AS mymonth ".
+			$arc_sql = "SELECT COUNT(DISTINCT ID), MONTH(post_issue_date) AS mymonth ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) ".
 						"INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						"WHERE YEAR(post_issue_date) = '$this->year' ".$this->where.
@@ -285,7 +285,7 @@ class Calendar
 			{	// OK we have a month with posts!
 				foreach( $arc_result as $arc_row )
 				{
-					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['COUNT(ID)'];
+					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['COUNT(DISTINCT ID)'];
 				}
 			}
 		}

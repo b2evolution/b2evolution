@@ -15,7 +15,7 @@
  * {@internal T_(-)}}
  * 
  * @param string String to translate, '' to get language file info (as in gettext spec)
- * @param strinf locale to translate to, '' to use current locale (basic gettext does only support '')
+ * @param string locale to translate to, '' to use current locale (basic gettext does only support '')
  */
 if( ($use_l10n == 1) && function_exists('_') )
 {	// We are going to use GETTEXT

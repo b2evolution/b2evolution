@@ -2013,12 +2013,12 @@ msgstr "IP Adresse"
 #: ..\..\..\admin\_edit_navbar.php:21
 #, php-format
 msgid "Previous %d"
-msgstr "Letzte %d"
+msgstr "Letzten %d"
 
 #: ..\..\..\admin\_edit_navbar.php:29
 #, php-format
 msgid "Next %d"
-msgstr "Nächste %d"
+msgstr "Nächsten %d"
 
 #. TRANS: x TO y OF z
 #: ..\..\..\admin\_edit_navbar.php:41
@@ -2069,7 +2069,7 @@ msgstr "Editieren"
 #: ..\..\..\admin\_edit_showposts.php:167
 #: ..\..\..\admin\_edit_showposts.php:233
 msgid "Delete"
-msgstr "Lösche"
+msgstr "Löschen"
 
 #: ..\..\..\admin\_edit_showposts.php:167
 msgid ""

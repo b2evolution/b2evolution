@@ -24,10 +24,11 @@ function create_b2evo_tables()
 	global $baseurl, $new_db_version;
 	global $DB;
 
+
 	create_groups();
 
 
-	echo "Creating table for Settings... ";
+	echo 'Creating table for Settings... ';
 	$query = "CREATE TABLE $tablesettings (
 		ID tinyint DEFAULT 1 NOT NULL,
 		default_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL,
@@ -49,7 +50,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Users...";
+	echo 'Creating table for Users... ';
 	$query = "CREATE TABLE $tableusers (
 		ID int(10) unsigned NOT NULL auto_increment,
 		user_login varchar(20) NOT NULL,
@@ -79,7 +80,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Blogs...";
+	echo 'Creating table for Blogs... ';
 	$query = "CREATE TABLE $tableblogs (
 		blog_ID int(4) NOT NULL auto_increment,
 		blog_shortname varchar(12) NULL default '',
@@ -109,7 +110,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Categories...";
+	echo 'Creating table for Categories... ';
 	$query="CREATE TABLE $tablecategories (
 		cat_ID int(4) NOT NULL auto_increment,
 		cat_parent_ID int(11) default NULL,
@@ -126,7 +127,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Posts...";
+	echo 'Creating table for Posts... ';
 	$query = "CREATE TABLE $tableposts (
 		ID int(10) unsigned NOT NULL auto_increment,
 		post_author int(4) NOT NULL default '0',
@@ -157,7 +158,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Categories-to-Posts relationships...";
+	echo 'Creating table for Categories-to-Posts relationships... ';
 	$query = "CREATE TABLE $tablepostcats (
 		postcat_post_ID int(11) NOT NULL default '0',
 		postcat_cat_ID int(11) NOT NULL default '0',
@@ -167,7 +168,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Comments...";
+	echo 'Creating table for Comments... ';
 	$query = "CREATE TABLE $tablecomments (
 		comment_ID int(11) unsigned NOT NULL auto_increment,
 		comment_post_ID int(11) NOT NULL default '0',
@@ -190,7 +191,7 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo "Creating table for Hit-Logs...";
+	echo 'Creating table for Hit-Logs... ';
 	$query = "CREATE TABLE $tablehitlog (
 		visitID bigint(11) NOT NULL auto_increment,
 		visitTime timestamp(14) NOT NULL,
@@ -215,6 +216,7 @@ function create_b2evo_tables()
 
 
 	create_locales();
+
 }
 
 
@@ -382,7 +384,7 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'de_DE', '', 0, true, '', 'http://thequod.de/' );
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -398,7 +400,7 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'fr_FR', '', 0, true, '', 'http://fplanque.net/Blog/' );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -626,6 +628,7 @@ function populate_main_tables()
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
 	global $DB;
+	global $default_locale;
 
 	create_default_blogs();
 
@@ -726,8 +729,8 @@ function populate_main_tables()
 	echo 'Creating default settings... ';
 
 	// SETTINGS!
-	$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update, pref_newusers_grp_ID )
-	VALUES ( 1, 5, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
+	$query = "INSERT INTO $tablesettings ( ID, default_locale, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update, pref_newusers_grp_ID )
+	VALUES ( 1, '$default_locale', 5, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
 	$DB->query( $query );
 
 	echo "OK.<br />\n";

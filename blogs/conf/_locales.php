@@ -14,7 +14,7 @@ $use_l10n = 2;
 $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 
 
-# Default locale used for backoffice, notification messages and fallback.
+# Default locale used for backoffice (when we cannot autodetect), notification messages and fallback.
 # This will be overwritten from database settings, if configured there.
 # These use an ISO 639 language code, a '-' and an ISO 3166 country code.
 # This MUST BE in the list below.

@@ -182,7 +182,7 @@ if( !$locales[$default_locale]['enabled'] )
 		';
 		if( $i > 1 )
 		{ // show "move prio up"
-			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" border="0" alt="'.T_('up').'" title="'.T_('Move priority up').'" /></a>';
+			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" border="0" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" /></a>';
 		}
 		else
 		{
@@ -191,7 +191,7 @@ if( !$locales[$default_locale]['enabled'] )
 
 		if( $i < count($locales) )
 		{ // show "move prio down"
-			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" border="0" alt="'.T_('down').'" title="'.T_('Move priority down').'" /></a>';
+			echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" border="0" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" /></a>';
 		}
 		else
 		{
@@ -256,7 +256,7 @@ if( !$locales[$default_locale]['enabled'] )
 			<td><input type="text" name="newloc_datefmt" value="'.(isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : '').'" maxlength="10" size="6" /></td>
 			<td><input type="text" name="newloc_timefmt" value="'.(isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : '').'" maxlength="10" size="6" /></td>
 			<td><input type="text" name="newloc_messages" value="'.(isset($ltemplate['messages']) ? $ltemplate['messages'] : '').'" maxlength="10" size="6" /></td>
-			<td><input type="submit" name="submit" value="'.T_('Create').'" class="search" onClick="var Locales = new Array(\''.implode("', '", array_keys($locales)).'\'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};"></td>
+			<td><input type="submit" name="submit" value="'.T_('Create / Edit').'" class="search" onClick="var Locales = new Array(\''.implode("', '", array_keys($locales)).'\'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: this is a Javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};"></td>
 			
 			</tr>
 			</table>
