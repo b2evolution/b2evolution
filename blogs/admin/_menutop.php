@@ -33,7 +33,7 @@ if( empty($mode) )
 	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
 
 	<div id="headfunctions">
-		<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout').' ['.$current_User->get('login').']' ?></a>
+		<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout') ?></a>
 		&middot;
 		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
 	</div>

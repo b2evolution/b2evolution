@@ -10,7 +10,7 @@
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.8.9+CVS';
+$b2_version = '0.9';
 $new_db_version = 8060;				// next time: 8070
 
 // Activate gettext:

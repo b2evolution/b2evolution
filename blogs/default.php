@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 <body>
 <div id="rowheader2">
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-<div id="tagline"><?php echo T_('Multilingual multiuser multiblog engine!') ?></div>
+<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 </div>
 
 <h1><?php echo T_('Welcome to b2evolution') ?></h1>

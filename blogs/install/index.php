@@ -35,28 +35,22 @@ locale_activate( $default_locale );
 
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-<!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <title>b2 evolution: Database tables installation</title>
-<!-- InstanceEndEditable --><link href="../rsc/b2evo.css" rel="stylesheet" type="text/css" />
+<link href="../rsc/b2evo.css" rel="stylesheet" type="text/css" />
  
-<!-- InstanceBeginEditable name="head" -->
-<!-- InstanceEndEditable -->
-<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
 </head>
 <body>
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-<div id="tagline">Multilingual multiuser multi-blog engine.</div>
-<h1 id="version">Version: 0.9-CVS</h1>
-<div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
+<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
+<h1 id="version"><?php echo T_('Installer for version '), $b2_version ?></h1>
+<div id="quicklinks">Current installation : <a href="index.php?locale=<?php echo $default_locale ?>">Install menu</a> &middot; <a href="../index.php">Go to Blogs</a> &middot; <a href="../admin/">Go to Admin</a> &middot; Online : <a href="http://b2evolution.net/man/supportfaq.html">Support</a></div>
 </div>
-<!-- InstanceBeginEditable name="Main" -->
 
 <h1><?php echo T_('Database tables installation')?></h1>
-
 <div class="installSideBar">
 	<p><?php echo T_('PHP version')?>: <?php echo phpversion(); ?> [<a href="phpinfo.php">PHP info</a>]</p>
 	<?php
@@ -106,7 +100,6 @@ if( empty($action) )
 }
 ?>
 </div>
-
 <?php
 
 /**
@@ -236,9 +229,9 @@ switch( $action )
 		}
 		db_delete();
 		?>
-		<p><?php echo T_('Reset done!')?></p>
-		<p><a href="install.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
-		<?php
+	  <p><?php echo T_('Reset done!')?></p>
+	  <p><a href="install.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
+	  <?php
 		break;
 
 
@@ -249,8 +242,8 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		?>
-		<h2>What do you want to install?</h2>
-		<form action="install.php" method="get">
+	  <h2>What do you want to install?</h2>
+	  <form action="index.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 
 			<p><?php echo T_('The database tables installation can be done in different ways. Choose one:')?></p>
@@ -278,8 +271,8 @@ switch( $action )
 			?>
 			
 			<p><input type="submit" value="<?php echo T_('Install Database Tables Now !')?>" /></p>
-		</form>
-		<?php
+		  </form>
+	  <?php
 		if( $allow_evodb_reset != 1 )
 		{
 			echo '<br />
@@ -294,10 +287,10 @@ switch( $action )
 		break;
 }
 ?>
-<!-- InstanceEndEditable -->
+
 <div id="rowfooter">
 <a href="http://b2evolution.net/">official website</a> &middot; <a href="http://b2evolution.net/about/license.html">GNU GPL license</a> &middot; <a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
 </div>
 
 </body>
-<!-- InstanceEnd --></html>
+</html>
