@@ -13,10 +13,7 @@ require_once dirname(__FILE__).'/../toolbar.class.php';
 class smilies_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evSmil';
-	var $name = 'Smilies';
 	var $priority = 70;
-	var $short_desc = 'One click smilies inserting';
-	var $long_desc = 'No description available';
 
 	/**
 	 * Smiley definitions
@@ -36,10 +33,14 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal smilies_Toolbarplugin::smilies_Toolbarplugin(-)}} 
+	 * {@internal smilies_Toolbarplugin::smilies_Toolbarplugin(-)}}
 	 */
 	function smilies_Toolbarplugin()
 	{
+		$this->name = T_('Smilies');
+		$this->short_desc = T_('One click smilies inserting');
+		$this->long_desc = T_('No description available');
+
 		require dirname(__FILE__). '/../_smilies.conf.php';
 	}
 
@@ -47,10 +48,10 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Display the toolbar
 	 *
-	 * {@internal smilies_Toolbarplugin::render(-)}} 
+	 * {@internal smilies_Toolbarplugin::render(-)}}
 	 */
 	function display()
-	{	
+	{
 		$grins = '';
 		$smiled = array();
 		foreach( $this->smilies as $smiley => $grin )
@@ -63,7 +64,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 									'" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
 			}
 		}
-	
+
 		print('<div>'. $grins. '</div>');
 		ob_start();
 		?>
@@ -100,7 +101,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 				myField.focus();
 			}
 		}
-		
+
 		</script>
 		<?php
 		$grins = ob_get_contents();

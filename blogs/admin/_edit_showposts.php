@@ -144,7 +144,10 @@
 				if( $safe_mode ) echo "</xmp>";
 				?>
 			</div>
-
+			
+			<?php
+			link_pages( '<p class="right">'.T_('Pages:'), '</p>' );
+			?>
 			<p style="clear:both;">
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php

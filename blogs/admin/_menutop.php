@@ -13,7 +13,7 @@
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title>b2evo :: <?php echo $admin_pagetitle; ?></title>
+	<title>b2evo :: <?php echo preg_replace( '/:$/', '', $admin_pagetitle ); ?></title>
 	<link href="admin.css" rel="stylesheet" type="text/css" />
 	<?php if( $mode == 'sidebar' )
 	{ ?>

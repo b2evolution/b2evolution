@@ -13,18 +13,29 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class autolinks_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evALnk';
-	var $name = 'Auto Links';
 	var $priority = 60;
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true; 
-	var $apply_to_xml = false; 
-	var $short_desc = 'Make URLs clickable';
-	var $long_desc = 'No description available';
+	var $apply_to_html = true;
+	var $apply_to_xml = false;
+
+
+	/**
+	 * Constructor
+	 *
+	 * {@internal autolinks_Rendererplugin::autolinks_Rendererplugin(-)}}
+	 */
+	function autolinks_Rendererplugin()
+	{
+		$this->name = T_('Auto Links');
+		$this->short_desc = T_('Make URLs clickable');
+		$this->long_desc = T_('No description available');
+	}
+
 
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal autolinks_Rendererplugin::render(-)}} 
+	 * {@internal autolinks_Rendererplugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -36,9 +47,9 @@ class autolinks_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
 		$content = make_clickable( $content );
-		
+
 		return true;
 	}
 }

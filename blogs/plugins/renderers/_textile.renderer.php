@@ -199,13 +199,10 @@ Applying Attributes:
 class textile_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2DATxtl';
-	var $name = 'Textile';
 	var $priority = 20;
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true; 
 	var $apply_to_xml = true; 	// Strip the markup
-	var $short_desc = 'Humane Web Text Generator';
-	var $long_desc = 'No description available';
 
     var $hlgn;
     var $vlgn;
@@ -218,6 +215,18 @@ class textile_Rendererplugin extends RendererPlugin
     var $s;
     var $c;
     var $pnct;
+
+	/**
+	 * Constructor
+	 *
+	 * {@internal textile_Rendererplugin::textile_Rendererplugin(-)}}
+	 */
+	function textile_Rendererplugin()
+	{
+		$this->name = T_('Textile');
+		$this->short_desc = T_('Humane Web Text Generator');
+		$this->long_desc = T_('No description available');
+	}
 
 // -------------------------------------------------------------
     function Textile()

@@ -15,13 +15,10 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class gmcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evGMco';
-	var $name = 'GM code';
 	var $priority = 41;
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true; 
+	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the GMcode markup
-	var $short_desc = 'GreyMatter style formatting';
-	var $long_desc = 'No description available';
 
 	/**
 	 * GreyMatter formatting search array
@@ -34,7 +31,7 @@ class gmcode_Rendererplugin extends RendererPlugin
 											'#\x2f\x2f(.+?)\x2f\x2f#',		// //italic//
 											'#__(.+?)__#s'		// __underline__
 											);
-	
+
 	/**
 	 * HTML replace array
 	 *
@@ -47,10 +44,24 @@ class gmcode_Rendererplugin extends RendererPlugin
 											'<span style="text-decoration:underline">$1</span>'
 											);
 
+
+	/**
+	 * Constructor
+	 *
+	 * {@internal gmcode_Rendererplugin::gmcode_Rendererplugin(-)}}
+	 */
+	function gmcode_Rendererplugin()
+	{
+		$this->name = T_('GM code');
+		$this->short_desc = T_('GreyMatter style formatting');
+		$this->long_desc = T_('No description available');
+	}
+
+
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::render(-)}} 
+	 * {@internal gmcode_Rendererplugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -62,9 +73,9 @@ class gmcode_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
 		$content = preg_replace( $this->search, $this->replace, $content );
-		
+
 		return true;
 	}
 }

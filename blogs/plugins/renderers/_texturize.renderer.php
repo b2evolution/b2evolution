@@ -12,18 +12,29 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class texturize_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPTxrz';
-	var $name = 'Texturize';
 	var $priority = 90;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true; 
-	var $apply_to_xml = true; 
-	var $short_desc = 'Smart quotes and more';
-	var $long_desc = 'No description available';
+	var $apply_to_html = true;
+	var $apply_to_xml = true;
+
+
+	/**
+	 * Constructor
+	 *
+	 * {@internal texturize_Rendererplugin::texturize_Rendererplugin(-)}}
+	 */
+	function texturize_Rendererplugin()
+	{
+		$this->name = 'Texturize';
+		$this->short_desc = 'Smart quotes and more';
+		$this->long_desc = 'No description available';
+	}
+
 
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal texturize_Rendererplugin::render(-)}} 
+	 * {@internal texturize_Rendererplugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -35,24 +46,24 @@ class texturize_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
 		$output = '';
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff
 		for ($i = 0; $i < $stop; $i++) {
 			$curl = $textarr[$i];
-	
+
 			if (strlen($curl) && '<' != $curl{0} && $next) { // If it's not a tag
 				$curl = str_replace('---', '&#8212;', $curl);
 				$curl = str_replace('--', '&#8211;', $curl);
 				$curl = str_replace("...", '&#8230;', $curl);
 				$curl = str_replace('``', '&#8220;', $curl);
-	
+
 				// This is a hack, look at this more later. It works pretty well though.
 				$cockney = array("'tain't","'twere","'twas","'tis","'twill","'til","'bout","'nuff","'round");
 				$cockneyreplace = array("&#8217;tain&#8217;t","&#8217;twere","&#8217;twas","&#8217;tis","&#8217;twill","&#8217;til","&#8217;bout","&#8217;nuff","&#8217;round");
 				$curl = str_replace($cockney, $cockneyreplace, $curl);
-	
+
 				$curl = preg_replace("/'s/", '&#8217;s', $curl);
 				$curl = preg_replace("/'(\d\d(?:&#8217;|')?s)/", "&#8217;$1", $curl);
 				$curl = preg_replace('/(\s|\A|")\'/', '$1&#8216;', $curl);
@@ -67,9 +78,9 @@ class texturize_Rendererplugin extends RendererPlugin
 				$curl = preg_replace("/\(r\)/i", '&#174;', $curl);
 				$curl = preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $curl);
 				$curl = str_replace("''", '&#8221;', $curl);
-				
+
 				$curl = preg_replace('/(d+)x(\d+)/', "$1&#215;$2", $curl);
-	
+
 			} elseif (strstr($curl, '<code') || strstr($curl, '<pre') || strstr($curl, '<kbd' || strstr($curl, '<style') || strstr($curl, '<script'))) {
 				// strstr is fast
 				$next = false;
@@ -79,7 +90,7 @@ class texturize_Rendererplugin extends RendererPlugin
 			$output .= $curl;
 		}
 		$content = $output;
-		
+
 		return true;
 	}
 }

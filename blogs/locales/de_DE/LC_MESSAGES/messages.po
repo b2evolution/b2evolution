@@ -693,7 +693,7 @@ msgstr "Kommentar editieren"
 
 #: ..\..\..\admin\b2edit.php:113
 msgid "New post in blog:"
-msgstr "Neue Einträge im Blog:"
+msgstr "Neuer Eintrag in Blog:"
 
 #: ..\..\..\admin\b2edit.php:143 ..\..\..\admin\b2edit.php:172
 msgid ""
@@ -1970,7 +1970,7 @@ msgstr "Sprache"
 
 #: ..\..\..\admin\_edit_form.php:110
 msgid "Link to url"
-msgstr "Verweis zu URL"
+msgstr "Verweis auf URL"
 
 #: ..\..\..\admin\_edit_form.php:132 ..\..\..\admin\_users_form.php:124
 #: ..\..\..\admin\_users_form.php:126 ..\..\..\admin\_users_list.php:20
