@@ -302,7 +302,7 @@ function get_domain_from_hit_ID( $hit_ID )
  */
 function domain_ban( $hit_ID )
 {
-	global $tablehitlog, $tableantispam, $querycount, $deluxe_ban;
+	global $tablehitlog, $tablecomments, $tableantispam, $querycount, $deluxe_ban;
 
 	$domain = get_domain_from_hit_ID($hit_ID);
 	$sql ="INSERT INTO $tableantispam VALUES ('', '$domain')";
@@ -313,12 +313,12 @@ function domain_ban( $hit_ID )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = \"$domain\"";	// This is quite drastic!
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = '$domain'";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 		
 		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE \"%$domain%\"";	// This is quite drastic!
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$domain%'";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 	}
@@ -332,7 +332,7 @@ function domain_ban( $hit_ID )
  */
 function keyword_ban( $keyword )
 {
-	global $tableantispam, $querycount, $deluxe_ban;
+	global $tableantispam, $tablehitlog, $tablecomments, $querycount, $deluxe_ban;
 
 	$sql ="INSERT INTO $tableantispam VALUES ('', '$keyword')";
 	$querycount++;
@@ -342,12 +342,12 @@ function keyword_ban( $keyword )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE \"%$keyword\"";	// This is quite drastic!
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain LIKE '%$keyword%'";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 		
 		// Then comments
-		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE \"%$keyword%\"";	// This is quite drastic!
+		$sql ="DELETE FROM $tablecomments WHERE comment_author_url LIKE '%$keyword%'";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 	}

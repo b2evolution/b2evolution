@@ -254,7 +254,7 @@ switch( $action )
 	<form action="b2antispam.php" method="GET">
 		<p>
 		<?php echo T_('Keyword') ?>: <input type="text" size="30" name="keyword" /> &nbsp; 
-		<input type="hidden" name="action" value="ban" />
+		<input type="hidden" name="action" value="bankeyword" />
 		<input type="submit" value="<?php echo T_(' BAN ') ?>" class="search" style="font-weight:bold;" />
 		</p>
 	</form>
