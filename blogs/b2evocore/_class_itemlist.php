@@ -666,7 +666,7 @@ class ItemList
 			}
 
 	
-			if( $errcontent = errors_display( 'Invalid post, please correct these errors:', '', false ) )
+			if( $errcontent = errors_display( T_('Invalid post, please correct these errors:'), '', false ) )
 			{
 				$content = $errcontent;
 			}

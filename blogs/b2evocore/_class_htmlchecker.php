@@ -92,7 +92,7 @@ class SafeHtmlChecker
 				$pos = xml_get_current_byte_index($this->parser);
 				$xml_error_string .= ' near <code>'.htmlspecialchars( substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
 				
-				$this->html_error(  'Parser error: '.$xml_error_string ); 
+				$this->html_error( T_('Parser error: ').$xml_error_string ); 
 			}
     }
     

@@ -43,7 +43,7 @@ $default_locale = 'fr_FR';			// For testing :))
 // $default_locale = 'de_DE';			// For testing :))
 // $default_locale = 'ja_JP';			// For testing :))
 // $default_locale = 'nl_NL';			// For testing :))
-// $default_locale = 'sv_SE';			// For testing :))
+// $default_locale = 'zh_CN';			// For testing :))
 
 
 #  and localization:

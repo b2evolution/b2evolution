@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-01-13 01:52+0100\n"
+"POT-Creation-Date: 2004-02-24 14:17+0100\n"
 "PO-Revision-Date: 2003-08-26 09:08+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -434,6 +434,114 @@ msgstr ""
 msgid "More posts..."
 msgstr "Opslaan artikel"
 
+#: ..\..\..\admin\b2antispam.php:10 ..\..\..\admin\_menutop.php:82
+msgid "Anti-Spam"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:20
+#, fuzzy
+msgid "You have no right to view the blacklist."
+msgstr "Je hebt geen rechten om de statistieken te bekijken."
+
+#: ..\..\..\admin\b2antispam.php:29 ..\..\..\admin\b2antispam.php:123
+#, fuzzy
+msgid "You have no right to ban domains."
+msgstr "Je hebt geen rechten om de statistieken te bekijken."
+
+#: ..\..\..\admin\b2antispam.php:39 ..\..\..\admin\b2antispam.php:133
+msgid "Confirm ban &amp; delete"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:41
+#, php-format
+msgid ""
+"Banning the keyword %s from the statistics and comments would lead to the "
+"deletion of the following %d comments:"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:69 ..\..\..\admin\b2antispam.php:163
+#, php-format
+msgid "...and the following %d referer hits:"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:81 ..\..\..\admin\b2antispam.php:175
+msgid "Are you sure you want to continue?"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:87 ..\..\..\admin\b2antispam.php:181
+#: ..\..\..\admin\b2antispam.php:258
+msgid " BAN "
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:98
+#, php-format
+msgid "Banning the keyword %s, and removing all related comments and hits..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:110
+#, php-format
+msgid "Banning the keyword %s..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:135
+#, php-format
+msgid ""
+"Banning the domain %s from the statistics and comments would lead to the "
+"deletion of the following %d comments:"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:192
+#, php-format
+msgid ""
+"Banning the referer of hit #%d, and removing all their comments and hits..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:205
+#, php-format
+msgid "Banning the referer of hit #%d..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:219
+#, fuzzy
+msgid "You have no right to remove domains from the ban list."
+msgstr "Je hebt geen rechten om de weblogs te bewerken."
+
+#: ..\..\..\admin\b2antispam.php:224
+#, php-format
+msgid "Removing entry #%d from the ban list..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:236
+msgid "Ban list"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:237
+msgid ""
+"Domains containing the listed keywords are banned from logging hits and "
+"commenting. To allow comments and log hits on your blogs from a banned "
+"domain, click the tick to remove it from the list."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:243
+msgid "Remove from blacklist"
+msgstr ""
+
+#. TRANS: Abbrev. for Delete (stats)
+#: ..\..\..\admin\b2antispam.php:243 ..\..\..\admin\b2stats.php:236
+#: ..\..\..\admin\b2stats.php:280 ..\..\..\admin\b2stats.php:360
+#: ..\..\..\admin\_user_list.php:45
+msgid "Del"
+msgstr "Verwijder"
+
+#: ..\..\..\admin\b2antispam.php:253
+msgid "Ban by keyword"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:256
+#, fuzzy
+msgid "Keyword"
+msgstr "Sleutelwoorden"
+
 #: ..\..\..\admin\b2blogs.php:9 ..\..\..\admin\_blogs_list.php:10
 #: ..\..\..\admin\_menutop.php:67 ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
@@ -451,7 +559,7 @@ msgid "New blog"
 msgstr "Nieuw weblog"
 
 #: ..\..\..\admin\b2blogs.php:71 ..\..\..\admin\b2blogs.php:208
-#: ..\..\..\admin\edit_actions.php:181
+#: ..\..\..\admin\edit_actions.php:182
 msgid "Cannot update, please correct these errors:"
 msgstr "Kan niet updaten, los deze problemen op:"
 
@@ -540,11 +648,12 @@ msgid "Writing to file..."
 msgstr "Schrijven naar bestand ..."
 
 #: ..\..\..\admin\b2blogs.php:269 ..\..\..\admin\edit_actions.php:97
-#: ..\..\..\admin\edit_actions.php:214 ..\..\..\admin\edit_actions.php:285
+#: ..\..\..\admin\edit_actions.php:215 ..\..\..\admin\edit_actions.php:287
 #: ..\..\..\b2evocore\_functions_pings.php:53
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:146
 #: ..\..\..\b2evocore\_functions_pings.php:191
+#: ..\..\..\b2evocore\_functions_pings.php:229
 msgid "Done."
 msgstr "Klaar"
 
@@ -668,7 +777,7 @@ msgstr ""
 "overgeplaatst naar de oudst overgebleven categorie in hetzelfde weblog "
 "(kleinste categorie nummer)."
 
-#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\edit_actions.php:163
+#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\edit_actions.php:164
 msgid "Oops, no post with this ID."
 msgstr "Oeps, geen artikel met dit ID"
 
@@ -685,7 +794,7 @@ msgid "Editing comment"
 msgstr "Bewerk reactie"
 
 #: ..\..\..\admin\b2edit.php:92 ..\..\..\admin\b2upload.php:13
-#: ..\..\..\admin\edit_actions.php:66 ..\..\..\admin\edit_actions.php:326
+#: ..\..\..\admin\edit_actions.php:66 ..\..\..\admin\edit_actions.php:328
 msgid "Cheatin' uh ?"
 msgstr "Zit je de boel te belazeren?"
 
@@ -790,7 +899,7 @@ msgstr "converteer enters naar &lt;br /&gt; tags"
 msgid "Update"
 msgstr "Update"
 
-#: ..\..\..\admin\b2profile.php:16 ..\..\..\admin\_menutop.php:82
+#: ..\..\..\admin\b2profile.php:16 ..\..\..\admin\_menutop.php:88
 msgid "My Profile"
 msgstr "Mijn Profiel"
 
@@ -855,20 +964,20 @@ msgstr ""
 msgid "View Stats"
 msgstr "Bekijk Statistieken"
 
-#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:126
+#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:143
 #, fuzzy
 msgid "Summary"
 msgstr "Zondag"
 
-#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:149
+#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:167
 msgid "Referers"
 msgstr "Referers"
 
-#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:150
+#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:168
 msgid "Refering Searches"
 msgstr "Refererende Zoekregels"
 
-#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:152
+#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:170
 msgid "Syndication"
 msgstr "Syndication"
 
@@ -876,7 +985,7 @@ msgstr "Syndication"
 msgid "User Agents"
 msgstr "Browsers"
 
-#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:153
+#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:171
 #, fuzzy
 msgid "Direct Accesses"
 msgstr "Laatste directe bezoekers"
@@ -895,7 +1004,7 @@ msgstr "Je hebt geen rechten om de weblogs te bewerken."
 msgid "Changing hit #%d type to: %s"
 msgstr "Verander hit #%s type naar: %s"
 
-#: ..\..\..\admin\b2stats.php:78
+#: ..\..\..\admin\b2stats.php:78 ..\..\..\admin\b2stats.php:95
 #, fuzzy
 msgid "You have no right to delete a hit."
 msgstr "Je hebt geen rechten om de statistieken te bekijken."
@@ -905,69 +1014,88 @@ msgstr "Je hebt geen rechten om de statistieken te bekijken."
 msgid "Deleting hit #%d..."
 msgstr "Verwijder hit #%d..."
 
-#: ..\..\..\admin\b2stats.php:95
+#: ..\..\..\admin\b2stats.php:100
+#, fuzzy, php-format
+msgid "Pruning hits from %s..."
+msgstr "Pinging %s..."
+
+#: ..\..\..\admin\b2stats.php:112
 msgid "Filter"
 msgstr "Filter"
 
-#: ..\..\..\admin\b2stats.php:98 ..\..\..\admin\b2stats.php:102
+#: ..\..\..\admin\b2stats.php:115 ..\..\..\admin\b2stats.php:119
 msgid "None"
 msgstr "Geen"
 
-#: ..\..\..\admin\b2stats.php:148
+#. TRANS: Abbrev. for Prune (stats)
+#: ..\..\..\admin\b2stats.php:165 ..\..\..\admin\b2stats.php:182
+#: ..\..\..\admin\b2stats.php:206
+#, fuzzy
+msgid "Prune"
+msgstr "Juni"
+
+#: ..\..\..\admin\b2stats.php:166
 #, fuzzy
 msgid "Date"
 msgstr "Ontwerp"
 
-#: ..\..\..\admin\b2stats.php:151
+#: ..\..\..\admin\b2stats.php:169
 #, fuzzy
 msgid "Indexing Robots"
 msgstr "Hoogste Indexeer Robots"
 
-#: ..\..\..\admin\b2stats.php:154
+#: ..\..\..\admin\b2stats.php:172
 msgid "Total"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:208 ..\..\..\skins\_stats.php:16
+#: ..\..\..\admin\b2stats.php:182 ..\..\..\admin\b2stats.php:206
+msgid "Prune this date!"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:228 ..\..\..\skins\_stats.php:16
 msgid "Last referers"
 msgstr "Laatste Referers"
 
-#: ..\..\..\admin\b2stats.php:209
+#: ..\..\..\admin\b2stats.php:229
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Dit zijn hits van externe webpagina's die refereren aan dit weblog"
 
-#: ..\..\..\admin\b2stats.php:216 ..\..\..\admin\b2stats.php:259
-#: ..\..\..\admin\b2stats.php:339
+#: ..\..\..\admin\b2stats.php:236 ..\..\..\admin\b2stats.php:280
+#: ..\..\..\admin\b2stats.php:360
 msgid "Delete this hit!"
 msgstr "Verwijder deze hit!"
 
-#. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:216 ..\..\..\admin\b2stats.php:259
-#: ..\..\..\admin\b2stats.php:339 ..\..\..\admin\_user_list.php:45
-msgid "Del"
-msgstr "Verwijder"
-
-#: ..\..\..\admin\b2stats.php:217
+#: ..\..\..\admin\b2stats.php:237
 msgid "Log as a search instead"
 msgstr "Log als een zoekregel"
 
 #. TRANS: Abbrev. for "move to searches" (stats)
-#: ..\..\..\admin\b2stats.php:217
+#: ..\..\..\admin\b2stats.php:237
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#: ..\..\..\admin\b2stats.php:226 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:242
+msgid "Ban this domain!"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:242
+#, fuzzy
+msgid "Ban"
+msgstr "Jan"
+
+#: ..\..\..\admin\b2stats.php:247 ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Hoogste Referers"
 
-#: ..\..\..\admin\b2stats.php:237
+#: ..\..\..\admin\b2stats.php:258
 msgid "Total referers"
 msgstr "Totaal Referers"
 
-#: ..\..\..\admin\b2stats.php:251 ..\..\..\skins\_stats.php:36
+#: ..\..\..\admin\b2stats.php:272 ..\..\..\skins\_stats.php:36
 msgid "Last refering searches"
 msgstr "Laatste refererende zoekregels"
 
-#: ..\..\..\admin\b2stats.php:252
+#: ..\..\..\admin\b2stats.php:273
 #, fuzzy
 msgid ""
 "These are hits from people who came to this blog system through a search "
@@ -976,15 +1104,15 @@ msgstr ""
 "Dit zijn hits van mensen die hier kwamen via een zoekmachine. (Zoekmachines "
 "moeten opgegeven zijn in /conf/b2evo_advanced.php)"
 
-#: ..\..\..\admin\b2stats.php:268
+#: ..\..\..\admin\b2stats.php:289
 msgid "Top refering search engines"
 msgstr "Hoogste refererende zoekmachines"
 
-#: ..\..\..\admin\b2stats.php:280 ..\..\..\skins\_stats.php:60
+#: ..\..\..\admin\b2stats.php:301 ..\..\..\skins\_stats.php:60
 msgid "Top Indexing Robots"
 msgstr "Hoogste Indexeer Robots"
 
-#: ..\..\..\admin\b2stats.php:281
+#: ..\..\..\admin\b2stats.php:302
 #, fuzzy
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
@@ -993,11 +1121,11 @@ msgstr ""
 "Dit zijn hits van automatische robots zoals zoekmachine indexeer robots. "
 "(Robots moeten in de lijst staan in /conf/b2evo_advanced.php)"
 
-#: ..\..\..\admin\b2stats.php:305 ..\..\..\skins\_stats.php:75
+#: ..\..\..\admin\b2stats.php:326 ..\..\..\skins\_stats.php:75
 msgid "Top Aggregators"
 msgstr "Hoogste Verzamelaars"
 
-#: ..\..\..\admin\b2stats.php:306
+#: ..\..\..\admin\b2stats.php:327
 #, fuzzy
 msgid ""
 "These are hits from RSS news aggregators. (Aggregators must be listed in /"
@@ -1006,15 +1134,15 @@ msgstr ""
 "Dit zijn hits van RSS nieuws verzamelaars. (Verzamelaars moeten opgegeven "
 "zijn in /conf/b2evo_advanced.php)"
 
-#: ..\..\..\admin\b2stats.php:317
+#: ..\..\..\admin\b2stats.php:338
 msgid "Total RSS hits"
 msgstr "Totaal RSS hits"
 
-#: ..\..\..\admin\b2stats.php:331
+#: ..\..\..\admin\b2stats.php:352
 msgid "Last direct accesses"
 msgstr "Laatste directe bezoekers"
 
-#: ..\..\..\admin\b2stats.php:332
+#: ..\..\..\admin\b2stats.php:353
 msgid ""
 "These are hits from people who came to this blog system by direct access "
 "(either by typing the URL directly, or using a bookmark. Invalid (too short) "
@@ -1024,7 +1152,7 @@ msgstr ""
 "door de URL in te typen, of gebruik makend van een bookmark. Verkeerde (te "
 "korte) refererenden staan ook hier.)"
 
-#: ..\..\..\admin\b2stats.php:359
+#: ..\..\..\admin\b2stats.php:380
 #, fuzzy
 msgid "Top User Agents"
 msgstr "Browsers"
@@ -1370,9 +1498,9 @@ msgstr "Sluit dit venster"
 msgid "Adding new post..."
 msgstr "Toevoegen nieuw artikel..."
 
-#: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:177
-#: ..\..\..\admin\edit_actions.php:347 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1202
+#: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:178
+#: ..\..\..\admin\edit_actions.php:349 ..\..\..\htsrv\comment_post.php:45
+#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1207
 #, fuzzy
 msgid "Supplied URL is invalid: "
 msgstr "Opgegeven URL is onjuist"
@@ -1381,8 +1509,8 @@ msgstr "Opgegeven URL is onjuist"
 msgid "Cannot post, please correct these errors:"
 msgstr "Kan niet plaatsen, los deze fouten op:"
 
-#: ..\..\..\admin\edit_actions.php:77 ..\..\..\admin\edit_actions.php:182
-#: ..\..\..\admin\edit_actions.php:352
+#: ..\..\..\admin\edit_actions.php:77 ..\..\..\admin\edit_actions.php:183
+#: ..\..\..\admin\edit_actions.php:354
 msgid "Back to post editing"
 msgstr "Terug naar artikelbewerking"
 
@@ -1390,67 +1518,67 @@ msgstr "Terug naar artikelbewerking"
 msgid "Recording post..."
 msgstr "Opslaan artikel"
 
-#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:281
+#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:283
 msgid "Sleeping..."
 msgstr "Slapen..."
 
-#: ..\..\..\admin\edit_actions.php:103 ..\..\..\admin\edit_actions.php:220
+#: ..\..\..\admin\edit_actions.php:103 ..\..\..\admin\edit_actions.php:221
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
 "Artikel niet publiekelijk gepubliseerd: overslaan van trackback, pingback en "
 "weblog pings..."
 
-#: ..\..\..\admin\edit_actions.php:131 ..\..\..\admin\edit_actions.php:248
+#: ..\..\..\admin\edit_actions.php:132 ..\..\..\admin\edit_actions.php:250
 #, fuzzy
 msgid "Posting Done..."
 msgstr "Verwijderen Gereed ..."
 
-#: ..\..\..\admin\edit_actions.php:142
+#: ..\..\..\admin\edit_actions.php:143
 #, fuzzy
 msgid "Updating post..."
 msgstr "Verwijderen artikel..."
 
-#: ..\..\..\admin\edit_actions.php:236
+#: ..\..\..\admin\edit_actions.php:237
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Artikel is al gepingd: overslaan van weblog pings..."
 
-#: ..\..\..\admin\edit_actions.php:259 ..\..\..\admin\edit_actions.php:275
+#: ..\..\..\admin\edit_actions.php:261 ..\..\..\admin\edit_actions.php:277
 msgid "Deleting post..."
 msgstr "Verwijderen artikel..."
 
-#: ..\..\..\admin\edit_actions.php:268
+#: ..\..\..\admin\edit_actions.php:270
 msgid "Oops, no post with this ID!"
 msgstr "Oeps, geen artikel met dit ID"
 
-#: ..\..\..\admin\edit_actions.php:272
+#: ..\..\..\admin\edit_actions.php:274
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr "Je hebt geen rechten om de artikelen van <b>%s\"</b> te verwijderen."
 
-#: ..\..\..\admin\edit_actions.php:290
+#: ..\..\..\admin\edit_actions.php:292
 msgid "Deleting Done..."
 msgstr "Verwijderen Gereed ..."
 
-#: ..\..\..\admin\edit_actions.php:310
+#: ..\..\..\admin\edit_actions.php:312
 msgid "Oops, no comment with this ID."
 msgstr "Oeps, geen reactie met dit ID."
 
-#: ..\..\..\admin\edit_actions.php:351
+#: ..\..\..\admin\edit_actions.php:353
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Kan de reactie niet plaatsen, los de volgende problemen op:"
 
-#: ..\..\..\admin\edit_actions.php:377
+#: ..\..\..\admin\edit_actions.php:379
 msgid "Back to posts!"
 msgstr "Terug naar artikelen!"
 
-#: ..\..\..\admin\edit_actions.php:379
+#: ..\..\..\admin\edit_actions.php:381
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr ""
 "Je wilt misschien ook nog statische pagina's aanmaken of je weblog "
 "bekijken..."
 
-#: ..\..\..\admin\edit_actions.php:387
+#: ..\..\..\admin\edit_actions.php:389
 #, fuzzy
 msgid "New post"
 msgstr "Nieuw Artikel"
@@ -1934,16 +2062,16 @@ msgstr "Categoriën"
 msgid "Templates"
 msgstr "Sjablonen"
 
-#: ..\..\..\admin\_menutop.php:80 ..\..\..\locales\puttenv.php:18
+#: ..\..\..\admin\_menutop.php:86 ..\..\..\locales\puttenv.php:18
 #: ..\..\..\locales\puttenv.php:23 ..\..\..\locales\puttenv.php:29
 msgid "Users"
 msgstr "Gebruikers"
 
-#: ..\..\..\admin\_menutop.php:88
+#: ..\..\..\admin\_menutop.php:94
 msgid "Exit to blogs"
 msgstr "Naar het weblog"
 
-#: ..\..\..\admin\_menutop.php:90
+#: ..\..\..\admin\_menutop.php:96
 msgid "Logout"
 msgstr "Uitloggen"
 
@@ -2029,11 +2157,15 @@ msgid ""
 "deleted too!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_blog_main.php:154
+#: ..\..\..\b2evocore\_blog_main.php:155
 #, php-format
 msgid ""
 "The default skin [%s] does not exist. It must be properly set in the blog "
 "stub file [%s]. Contact the <a %s>webmaster</a>..."
+msgstr ""
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:95
+msgid "Parser error: "
 msgstr ""
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:112
@@ -2067,6 +2199,11 @@ msgstr ""
 #, php-format
 msgid "Tag %s may not contain raw character data"
 msgstr "Tag %s mag geen ruwe karakters bevatten"
+
+#: ..\..\..\b2evocore\_class_itemlist.php:669
+#, fuzzy
+msgid "Invalid post, please correct these errors:"
+msgstr "Kan niet plaatsen, los deze fouten op:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:81 ..\..\..\b2evocore\_class_pop3.php:89
 #: ..\..\..\b2evocore\_class_pop3.php:101
@@ -2244,33 +2381,33 @@ msgstr "Geen berich nummer opgegeven"
 msgid "Command failed "
 msgstr "Commando mislukt"
 
-#: ..\..\..\b2evocore\_functions.php:36
+#: ..\..\..\b2evocore\_functions.php:35
 msgid "Can't connect to the database server. MySQL said:"
 msgstr "Kan geen verbinding maken met de database server. MySQL zei:"
 
-#: ..\..\..\b2evocore\_functions.php:38
+#: ..\..\..\b2evocore\_functions.php:37
 #, php-format
 msgid "Can't connect to the database %s. MySQL said:"
 msgstr "Kan geen verbinding maken met de database %s. MySQL zei:"
 
-#: ..\..\..\b2evocore\_functions.php:49
+#: ..\..\..\b2evocore\_functions.php:48
 msgid "Oops, MySQL error!"
 msgstr "Oeps, MySQL fout!"
 
-#: ..\..\..\b2evocore\_functions.php:644
+#: ..\..\..\b2evocore\_functions.php:643
 msgid "go back"
 msgstr "ga terug"
 
-#: ..\..\..\b2evocore\_functions.php:674
+#: ..\..\..\b2evocore\_functions.php:673
 msgid "Redirecting you to:"
 msgstr "Doorverwijzen naar:"
 
-#: ..\..\..\b2evocore\_functions.php:676
+#: ..\..\..\b2evocore\_functions.php:675
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "Als er niets gebeurt, klik <a %s>hier</a>."
 
-#: ..\..\..\b2evocore\_functions.php:993
+#: ..\..\..\b2evocore\_functions.php:992
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parameter %s is nodig!"
@@ -2284,7 +2421,7 @@ msgstr "verkeerd"
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1210
+#: ..\..\..\b2evocore\_functions.php:1218
 msgid "URL not allowed"
 msgstr ""
 
@@ -2306,27 +2443,27 @@ msgstr "Lees meer!"
 msgid "More:"
 msgstr "Meer:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:589
+#: ..\..\..\b2evocore\_functions_bposts.php:590
 msgid "Next page"
 msgstr "Volgende Pagina"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:590
+#: ..\..\..\b2evocore\_functions_bposts.php:591
 msgid "Previous page"
 msgstr "Vorige Pagina"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:633
+#: ..\..\..\b2evocore\_functions_bposts.php:634
 msgid "Previous post"
 msgstr "Vorig artikel"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:686
+#: ..\..\..\b2evocore\_functions_bposts.php:687
 msgid "Next post"
 msgstr "Volgend Artikel"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:779
+#: ..\..\..\b2evocore\_functions_bposts.php:780
 msgid "Next Page"
 msgstr "Volgende Pagina"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:806
+#: ..\..\..\b2evocore\_functions_bposts.php:807
 msgid "Previous Page"
 msgstr "Vorige Pagina"
 
@@ -2385,15 +2522,15 @@ msgstr "zoekmachine"
 msgid "loading referering page"
 msgstr "laden van de refererende pagina"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:161
+#: ..\..\..\b2evocore\_functions_hitlogs.php:163
 msgid "found current url in page"
 msgstr "huidige url in pagina gevonden"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:426
+#: ..\..\..\b2evocore\_functions_hitlogs.php:597
 msgid "not a query - no params!"
 msgstr "geen query - geen parameters!"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:451
+#: ..\..\..\b2evocore\_functions_hitlogs.php:622
 msgid "no query string found"
 msgstr "geen query string gevonden"
 
@@ -2503,6 +2640,8 @@ msgstr "Pinging b2evolution.net..."
 #: ..\..\..\b2evocore\_functions_pings.php:92
 #: ..\..\..\b2evocore\_functions_pings.php:149
 #: ..\..\..\b2evocore\_functions_pings.php:196
+#: ..\..\..\b2evocore\_functions_pings.php:226
+#: ..\..\..\b2evocore\_functions_pings.php:233
 msgid "Aborted (Running on localhost)."
 msgstr "Afgebroken (Running on localhost)."
 
@@ -2517,6 +2656,11 @@ msgstr "Pinging Cafelog.com..."
 #: ..\..\..\b2evocore\_functions_pings.php:167
 msgid "Pinging Blo.gs..."
 msgstr "Pinging Blo.gs..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:217
+#, fuzzy
+msgid "Pinging technorati.com..."
+msgstr "Pinging Weblogs.com..."
 
 #: ..\..\..\b2evocore\_functions_template.php:84
 msgid "Archives for"
@@ -2546,15 +2690,15 @@ msgstr "Verstuur trackback naar:"
 msgid "Response:"
 msgstr "Antwoord:"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:150
+#: ..\..\..\b2evocore\_functions_trackback.php:154
 msgid "Trackback (0)"
 msgstr "TrackBack (0)"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:151
+#: ..\..\..\b2evocore\_functions_trackback.php:155
 msgid "Trackback (1)"
 msgstr "TrackBack (1)"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:152
+#: ..\..\..\b2evocore\_functions_trackback.php:156
 msgid "Trackbacks (%)"
 msgstr "TrackBacks (%)"
 
@@ -2850,6 +2994,10 @@ msgstr ""
 msgid "Swedish"
 msgstr "Zweeds"
 
+#: ..\..\..\conf\_locales.php:32
+msgid "Simplified Chinese"
+msgstr ""
+
 #: ..\..\..\htsrv\comment_post.php:29
 msgid "Please fill in the name field"
 msgstr "Vult U alstublieft het naam veld in"
@@ -2884,7 +3032,7 @@ msgid "Author"
 msgstr "Auteur"
 
 #: ..\..\..\htsrv\comment_post.php:101 ..\..\..\htsrv\trackback.php:97
-#: ..\..\..\xmlsrv\xmlrpc.php:1228
+#: ..\..\..\xmlsrv\xmlrpc.php:1233
 msgid "Url"
 msgstr "Url"
 
@@ -2893,7 +3041,7 @@ msgid "Comment"
 msgstr "Reactie"
 
 #: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1230
+#: ..\..\..\xmlsrv\xmlrpc.php:1235
 #, fuzzy
 msgid "Edit/Delete"
 msgstr "Verwijder"
@@ -2951,23 +3099,23 @@ msgstr "Categorie ID"
 msgid "Blog ID"
 msgstr "Weblog ID"
 
-#: ..\..\..\htsrv\getmail.php:263
+#: ..\..\..\htsrv\getmail.php:264
 msgid "Posted title"
 msgstr "Geplaatste Titel"
 
-#: ..\..\..\htsrv\getmail.php:264
+#: ..\..\..\htsrv\getmail.php:265
 msgid "Posted content"
 msgstr "Geplaatste Inhoud"
 
-#: ..\..\..\htsrv\getmail.php:274
+#: ..\..\..\htsrv\getmail.php:275
 msgid "Mission complete, message deleted."
 msgstr "Missie voltooid, bericht verwijdert."
 
-#: ..\..\..\htsrv\getmail.php:280
+#: ..\..\..\htsrv\getmail.php:281
 msgid "Level 0 users can't post."
 msgstr "Level 0 gebruikers kunnen niet plaatsen."
 
-#: ..\..\..\htsrv\getmail.php:302
+#: ..\..\..\htsrv\getmail.php:303
 #, fuzzy
 msgid "OK."
 msgstr "OK"
@@ -3075,11 +3223,11 @@ msgstr "Beheer gebruikers"
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Nieuwe trackback op jouw artikel #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:96 ..\..\..\xmlsrv\xmlrpc.php:1227
+#: ..\..\..\htsrv\trackback.php:96 ..\..\..\xmlsrv\xmlrpc.php:1232
 msgid "Website"
 msgstr "Website"
 
-#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1229
+#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1234
 msgid "Excerpt"
 msgstr "Excerpt"
 
@@ -3281,7 +3429,7 @@ msgstr "Blader door alle artikelen van deze auteur"
 msgid "[...] Read more!"
 msgstr "[...] Lees Meer!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1221 ..\..\..\xmlsrv\xmlrpc.php:1225
+#: ..\..\..\xmlsrv\xmlrpc.php:1226 ..\..\..\xmlsrv\xmlrpc.php:1230
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""

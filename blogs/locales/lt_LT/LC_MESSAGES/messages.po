@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MG blog\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-01-13 01:52+0100\n"
-"PO-Revision-Date: 2004-01-02 12:45+0200\n"
+"POT-Creation-Date: 2004-02-24 14:17+0100\n"
+"PO-Revision-Date: 2004-01-19 21:19+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
 "MIME-Version: 1.0\n"
@@ -411,6 +411,115 @@ msgstr "Ði demonstracija rodo paskutiniø temø ið visø blogø santraukà"
 msgid "More posts..."
 msgstr "Daugiau áraðø..."
 
+#: ..\..\..\admin\b2antispam.php:10 ..\..\..\admin\_menutop.php:82
+msgid "Anti-Spam"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:20
+#, fuzzy
+msgid "You have no right to view the blacklist."
+msgstr "Jûs neturite teisës perþiûrëti statistikà."
+
+#: ..\..\..\admin\b2antispam.php:29 ..\..\..\admin\b2antispam.php:123
+#, fuzzy
+msgid "You have no right to ban domains."
+msgstr "Jûs neturite teisës perþiûrëti statistikà."
+
+#: ..\..\..\admin\b2antispam.php:39 ..\..\..\admin\b2antispam.php:133
+msgid "Confirm ban &amp; delete"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:41
+#, php-format
+msgid ""
+"Banning the keyword %s from the statistics and comments would lead to the "
+"deletion of the following %d comments:"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:69 ..\..\..\admin\b2antispam.php:163
+#, php-format
+msgid "...and the following %d referer hits:"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:81 ..\..\..\admin\b2antispam.php:175
+msgid "Are you sure you want to continue?"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:87 ..\..\..\admin\b2antispam.php:181
+#: ..\..\..\admin\b2antispam.php:258
+msgid " BAN "
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:98
+#, php-format
+msgid "Banning the keyword %s, and removing all related comments and hits..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:110
+#, php-format
+msgid "Banning the keyword %s..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:135
+#, php-format
+msgid ""
+"Banning the domain %s from the statistics and comments would lead to the "
+"deletion of the following %d comments:"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:192
+#, php-format
+msgid ""
+"Banning the referer of hit #%d, and removing all their comments and hits..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:205
+#, php-format
+msgid "Banning the referer of hit #%d..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:219
+#, fuzzy
+msgid "You have no right to remove domains from the ban list."
+msgstr "Jûs neturite teisës redaguoti blogø."
+
+#: ..\..\..\admin\b2antispam.php:224
+#, php-format
+msgid "Removing entry #%d from the ban list..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:236
+msgid "Ban list"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:237
+msgid ""
+"Domains containing the listed keywords are banned from logging hits and "
+"commenting. To allow comments and log hits on your blogs from a banned "
+"domain, click the tick to remove it from the list."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:243
+msgid "Remove from blacklist"
+msgstr ""
+
+#  TRANS: Verimas skirtas Delete (stats)
+#. TRANS: Abbrev. for Delete (stats)
+#: ..\..\..\admin\b2antispam.php:243 ..\..\..\admin\b2stats.php:236
+#: ..\..\..\admin\b2stats.php:280 ..\..\..\admin\b2stats.php:360
+#: ..\..\..\admin\_user_list.php:45
+msgid "Del"
+msgstr "Trinti"
+
+#: ..\..\..\admin\b2antispam.php:253
+msgid "Ban by keyword"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:256
+#, fuzzy
+msgid "Keyword"
+msgstr "Raktiniai þodþiai"
+
 #: ..\..\..\admin\b2blogs.php:9 ..\..\..\admin\_blogs_list.php:10
 #: ..\..\..\admin\_menutop.php:67 ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
@@ -428,7 +537,7 @@ msgid "New blog"
 msgstr "Naujas blogas"
 
 #: ..\..\..\admin\b2blogs.php:71 ..\..\..\admin\b2blogs.php:208
-#: ..\..\..\admin\edit_actions.php:181
+#: ..\..\..\admin\edit_actions.php:182
 msgid "Cannot update, please correct these errors:"
 msgstr "Negalima atnaujinti, praðome iðtaisyti ðias klaidas:"
 
@@ -437,9 +546,8 @@ msgid "Back to new blog form"
 msgstr "Atgal á naujo blogo kûrimà"
 
 #: ..\..\..\admin\b2blogs.php:80
-#, fuzzy
 msgid "Creating blog..."
-msgstr "Sukurti naujà blogà!"
+msgstr "Kuriamas blogas"
 
 #: ..\..\..\admin\b2blogs.php:91
 msgid "Trying to create stub file"
@@ -515,11 +623,12 @@ msgid "Writing to file..."
 msgstr "Raðoma á failà..."
 
 #: ..\..\..\admin\b2blogs.php:269 ..\..\..\admin\edit_actions.php:97
-#: ..\..\..\admin\edit_actions.php:214 ..\..\..\admin\edit_actions.php:285
+#: ..\..\..\admin\edit_actions.php:215 ..\..\..\admin\edit_actions.php:287
 #: ..\..\..\b2evocore\_functions_pings.php:53
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:146
 #: ..\..\..\b2evocore\_functions_pings.php:191
+#: ..\..\..\b2evocore\_functions_pings.php:229
 msgid "Done."
 msgstr "Padaryta."
 
@@ -632,7 +741,7 @@ msgid ""
 "the same blog (smallest category number)."
 msgstr "<strong>Atminkite:</strong>Iðtrinant kategorijà, jai priklausanèios temos netrinamos. Jos priskiriamos \"tëvo\" kategorijai. Trinant pagrindinæ \"root\" kategorijà, temos bus priskirtos seniausiai sukurtai egzistuojanciai kategorijai tame paèiame bloge (su maþiausiu kategorijos numeriu)."
 
-#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\edit_actions.php:163
+#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\edit_actions.php:164
 msgid "Oops, no post with this ID."
 msgstr "Uuups, su ðiuo ID temø nerasta."
 
@@ -649,7 +758,7 @@ msgid "Editing comment"
 msgstr "Redaguojamas komentaras"
 
 #: ..\..\..\admin\b2edit.php:92 ..\..\..\admin\b2upload.php:13
-#: ..\..\..\admin\edit_actions.php:66 ..\..\..\admin\edit_actions.php:326
+#: ..\..\..\admin\edit_actions.php:66 ..\..\..\admin\edit_actions.php:328
 msgid "Cheatin' uh ?"
 msgstr "Sukèiauji, a?"
 
@@ -756,7 +865,7 @@ msgstr "konvertuoti eilutës nukelimà á &lt;br /&gt; "
 msgid "Update"
 msgstr "Atnaujinti"
 
-#: ..\..\..\admin\b2profile.php:16 ..\..\..\admin\_menutop.php:82
+#: ..\..\..\admin\b2profile.php:16 ..\..\..\admin\_menutop.php:88
 msgid "My Profile"
 msgstr "Mano Profilis"
 
@@ -815,19 +924,19 @@ msgstr "Kraunamas Gramatikos Tikrinimas. Praðome palaukti"
 msgid "View Stats"
 msgstr "Perþiûrëti Statistikà"
 
-#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:126
+#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:143
 msgid "Summary"
 msgstr "Santrauka"
 
-#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:149
+#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:167
 msgid "Referers"
 msgstr "Referalai"
 
-#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:150
+#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:168
 msgid "Refering Searches"
 msgstr "Paieðkø Referalai"
 
-#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:152
+#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:170
 msgid "Syndication"
 msgstr "RSS/XML"
 
@@ -835,7 +944,7 @@ msgstr "RSS/XML"
 msgid "User Agents"
 msgstr "User Agents"
 
-#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:153
+#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:171
 msgid "Direct Accesses"
 msgstr "Tiesioginiai Apsilankymai"
 
@@ -844,133 +953,149 @@ msgid "You have no right to view stats."
 msgstr "Jûs neturite teisës perþiûrëti statistikà."
 
 #: ..\..\..\admin\b2stats.php:59
-#, fuzzy
 msgid "You have no right to change a hit type."
-msgstr "Jûs neturite teisës redaguoti blogø."
+msgstr "Jûs neturite teisës keisti apsilankymo tipo."
 
 #: ..\..\..\admin\b2stats.php:66
 #, php-format
 msgid "Changing hit #%d type to: %s"
 msgstr "Keiciamas perþiûrø #%d tipas á: %s"
 
-#: ..\..\..\admin\b2stats.php:78
-#, fuzzy
+#: ..\..\..\admin\b2stats.php:78 ..\..\..\admin\b2stats.php:95
 msgid "You have no right to delete a hit."
-msgstr "Jûs neturite teisës perþiûrëti statistikà."
+msgstr "Jûs neturite teisës iðtrinti ðio apsilankymo."
 
 #: ..\..\..\admin\b2stats.php:83
 #, php-format
 msgid "Deleting hit #%d..."
 msgstr "Trinamas apsilankymas #%d..."
 
-#: ..\..\..\admin\b2stats.php:95
+#: ..\..\..\admin\b2stats.php:100
+#, fuzzy, php-format
+msgid "Pruning hits from %s..."
+msgstr "Pinginam %s..."
+
+#: ..\..\..\admin\b2stats.php:112
 msgid "Filter"
 msgstr "Filtras"
 
-#: ..\..\..\admin\b2stats.php:98 ..\..\..\admin\b2stats.php:102
+#: ..\..\..\admin\b2stats.php:115 ..\..\..\admin\b2stats.php:119
 msgid "None"
 msgstr "Nieko"
 
-#: ..\..\..\admin\b2stats.php:148
+#. TRANS: Abbrev. for Prune (stats)
+#: ..\..\..\admin\b2stats.php:165 ..\..\..\admin\b2stats.php:182
+#: ..\..\..\admin\b2stats.php:206
+#, fuzzy
+msgid "Prune"
+msgstr "Birþelis"
+
+#: ..\..\..\admin\b2stats.php:166
 msgid "Date"
 msgstr "Data"
 
-#: ..\..\..\admin\b2stats.php:151
+#: ..\..\..\admin\b2stats.php:169
 msgid "Indexing Robots"
 msgstr "Indeksuojantys Robotai"
 
-#: ..\..\..\admin\b2stats.php:154
+#: ..\..\..\admin\b2stats.php:172
 msgid "Total"
 msgstr "Viso"
 
-#: ..\..\..\admin\b2stats.php:208 ..\..\..\skins\_stats.php:16
+#: ..\..\..\admin\b2stats.php:182 ..\..\..\admin\b2stats.php:206
+msgid "Prune this date!"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:228 ..\..\..\skins\_stats.php:16
 msgid "Last referers"
 msgstr "Naujausi referalai"
 
-#: ..\..\..\admin\b2stats.php:209
+#: ..\..\..\admin\b2stats.php:229
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Apsilankymai ið iðoriniø svetainiø, nurodanciø ðá blogà"
 
-#: ..\..\..\admin\b2stats.php:216 ..\..\..\admin\b2stats.php:259
-#: ..\..\..\admin\b2stats.php:339
+#: ..\..\..\admin\b2stats.php:236 ..\..\..\admin\b2stats.php:280
+#: ..\..\..\admin\b2stats.php:360
 msgid "Delete this hit!"
 msgstr "Trinti ðá apsilankymà!"
 
-#  TRANS: Verimas skirtas Delete (stats)
-#. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:216 ..\..\..\admin\b2stats.php:259
-#: ..\..\..\admin\b2stats.php:339 ..\..\..\admin\_user_list.php:45
-msgid "Del"
-msgstr "Trinti"
-
-#: ..\..\..\admin\b2stats.php:217
+#: ..\..\..\admin\b2stats.php:237
 msgid "Log as a search instead"
 msgstr "Loginti kaip paieðkà"
 
 #  TRANS: vertimas skirtas "move to searches" (stats)
 #. TRANS: Abbrev. for "move to searches" (stats)
-#: ..\..\..\admin\b2stats.php:217
+#: ..\..\..\admin\b2stats.php:237
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#: ..\..\..\admin\b2stats.php:226 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:242
+msgid "Ban this domain!"
+msgstr ""
+
+#: ..\..\..\admin\b2stats.php:242
+#, fuzzy
+msgid "Ban"
+msgstr "Sau"
+
+#: ..\..\..\admin\b2stats.php:247 ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Top referalai"
 
-#: ..\..\..\admin\b2stats.php:237
+#: ..\..\..\admin\b2stats.php:258
 msgid "Total referers"
 msgstr "Viso referalø"
 
-#: ..\..\..\admin\b2stats.php:251 ..\..\..\skins\_stats.php:36
+#: ..\..\..\admin\b2stats.php:272 ..\..\..\skins\_stats.php:36
 msgid "Last refering searches"
 msgstr "Naujausi paieðkø referalai"
 
-#: ..\..\..\admin\b2stats.php:252
+#: ..\..\..\admin\b2stats.php:273
 msgid ""
 "These are hits from people who came to this blog system through a search "
 "engine. (Search engines must be listed in /conf/_stats.php)"
 msgstr "Ðie þmonës atëjo per paieðkos sistemas. (Paieðkos sistemos turi bûti /conf/_stats.php faile esanèiame sàraðe)."
 
-#: ..\..\..\admin\b2stats.php:268
+#: ..\..\..\admin\b2stats.php:289
 msgid "Top refering search engines"
 msgstr "paieðkos sistemos"
 
-#: ..\..\..\admin\b2stats.php:280 ..\..\..\skins\_stats.php:60
+#: ..\..\..\admin\b2stats.php:301 ..\..\..\skins\_stats.php:60
 msgid "Top Indexing Robots"
 msgstr "Indeksuojantys Robotai"
 
-#: ..\..\..\admin\b2stats.php:281
+#: ..\..\..\admin\b2stats.php:302
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
 "(Robots must be listed in /conf/_stats.php)"
 msgstr "Ðie vizitai priklauso robotams, panaðiems á indeksuojanèius robotus. (Robotai turi buti /conf/_stats.php faile esanèiame sàraðe)."
 
-#: ..\..\..\admin\b2stats.php:305 ..\..\..\skins\_stats.php:75
+#: ..\..\..\admin\b2stats.php:326 ..\..\..\skins\_stats.php:75
 msgid "Top Aggregators"
 msgstr "Top Agregatoriai"
 
-#: ..\..\..\admin\b2stats.php:306
+#: ..\..\..\admin\b2stats.php:327
 msgid ""
 "These are hits from RSS news aggregators. (Aggregators must be listed in /"
 "conf/_stats.php)"
 msgstr "Ðie vizitai ið RSS naujienø agregatoriø.  (Agregatoriai turi bûti /conf/_stats.php faile esanèiame sàraðe)."
 
-#: ..\..\..\admin\b2stats.php:317
+#: ..\..\..\admin\b2stats.php:338
 msgid "Total RSS hits"
 msgstr "Viso RSS vizitø"
 
-#: ..\..\..\admin\b2stats.php:331
+#: ..\..\..\admin\b2stats.php:352
 msgid "Last direct accesses"
 msgstr "Paskutiniai tiesioginiai apsilankymai"
 
-#: ..\..\..\admin\b2stats.php:332
+#: ..\..\..\admin\b2stats.php:353
 msgid ""
 "These are hits from people who came to this blog system by direct access "
 "(either by typing the URL directly, or using a bookmark. Invalid (too short) "
 "referers are also listed here.)"
 msgstr "Ðie þmonës á blogà atëjo tiesiogiai. (arba áraðydami URL, arba pasinaudodami þymekliu (bookmark). Blogi (pernelyg trumpi) referalai taip pat parodyti )."
 
-#: ..\..\..\admin\b2stats.php:359
+#: ..\..\..\admin\b2stats.php:380
 msgid "Top User Agents"
 msgstr "Top User Agent'ai"
 
@@ -1294,9 +1419,9 @@ msgstr "Uþverti ðá langà"
 msgid "Adding new post..."
 msgstr "Áraðomas naujas strapsnis..."
 
-#: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:177
-#: ..\..\..\admin\edit_actions.php:347 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1202
+#: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:178
+#: ..\..\..\admin\edit_actions.php:349 ..\..\..\htsrv\comment_post.php:45
+#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1207
 msgid "Supplied URL is invalid: "
 msgstr "Pateiktas URL neteisingas:"
 
@@ -1304,8 +1429,8 @@ msgstr "Pateiktas URL neteisingas:"
 msgid "Cannot post, please correct these errors:"
 msgstr "Negalima áraðyti, praðome iðtaisyti ðias klaidas:"
 
-#: ..\..\..\admin\edit_actions.php:77 ..\..\..\admin\edit_actions.php:182
-#: ..\..\..\admin\edit_actions.php:352
+#: ..\..\..\admin\edit_actions.php:77 ..\..\..\admin\edit_actions.php:183
+#: ..\..\..\admin\edit_actions.php:354
 msgid "Back to post editing"
 msgstr "Atgal á straipsnio redagavimà"
 
@@ -1313,61 +1438,61 @@ msgstr "Atgal á straipsnio redagavimà"
 msgid "Recording post..."
 msgstr "Daromas áraðas..."
 
-#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:281
+#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:283
 msgid "Sleeping..."
 msgstr "Miegu..."
 
-#: ..\..\..\admin\edit_actions.php:103 ..\..\..\admin\edit_actions.php:220
+#: ..\..\..\admin\edit_actions.php:103 ..\..\..\admin\edit_actions.php:221
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr "Áraðas neskelbiams vieðai: atðaukiamas \"trackback\", \"pingback\" ir blogø ping'inimas..."
 
-#: ..\..\..\admin\edit_actions.php:131 ..\..\..\admin\edit_actions.php:248
+#: ..\..\..\admin\edit_actions.php:132 ..\..\..\admin\edit_actions.php:250
 msgid "Posting Done..."
 msgstr "Áraðas Padarytas..."
 
-#: ..\..\..\admin\edit_actions.php:142
+#: ..\..\..\admin\edit_actions.php:143
 msgid "Updating post..."
 msgstr "Atnaujinami áraðai..."
 
-#: ..\..\..\admin\edit_actions.php:236
+#: ..\..\..\admin\edit_actions.php:237
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Áraðas jau nusiuntë pingà: atðaukiamas blogø pinginimas..."
 
-#: ..\..\..\admin\edit_actions.php:259 ..\..\..\admin\edit_actions.php:275
+#: ..\..\..\admin\edit_actions.php:261 ..\..\..\admin\edit_actions.php:277
 msgid "Deleting post..."
 msgstr "Trinami áraðai..."
 
-#: ..\..\..\admin\edit_actions.php:268
+#: ..\..\..\admin\edit_actions.php:270
 msgid "Oops, no post with this ID!"
 msgstr "Uuups, nerasta áraðø su ðiuo ID!"
 
-#: ..\..\..\admin\edit_actions.php:272
+#: ..\..\..\admin\edit_actions.php:274
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr "Jûs neturite teisës iðtrinti <strong>%s</strong> áraðø."
 
-#: ..\..\..\admin\edit_actions.php:290
+#: ..\..\..\admin\edit_actions.php:292
 msgid "Deleting Done..."
 msgstr "Trynimas Baigtas..."
 
-#: ..\..\..\admin\edit_actions.php:310
+#: ..\..\..\admin\edit_actions.php:312
 msgid "Oops, no comment with this ID."
 msgstr "Uuups, nerasta komentarø su ðiuo ID!"
 
-#: ..\..\..\admin\edit_actions.php:351
+#: ..\..\..\admin\edit_actions.php:353
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Negaliu atnaujinti komentarø, praðome iðtaisyti ðias klaidas:"
 
-#: ..\..\..\admin\edit_actions.php:377
+#: ..\..\..\admin\edit_actions.php:379
 msgid "Back to posts!"
 msgstr "Atgal á straipsnius!"
 
-#: ..\..\..\admin\edit_actions.php:379
+#: ..\..\..\admin\edit_actions.php:381
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr "Jûs galbût norësite sugeneruoti statinius puslapius ar perþiûrëti savo blogus..."
 
-#: ..\..\..\admin\edit_actions.php:387
+#: ..\..\..\admin\edit_actions.php:389
 msgid "New post"
 msgstr "Naujas straipsnis"
 
@@ -1824,16 +1949,16 @@ msgstr "Kategorijos"
 msgid "Templates"
 msgstr "Ðablonai"
 
-#: ..\..\..\admin\_menutop.php:80 ..\..\..\locales\puttenv.php:18
+#: ..\..\..\admin\_menutop.php:86 ..\..\..\locales\puttenv.php:18
 #: ..\..\..\locales\puttenv.php:23 ..\..\..\locales\puttenv.php:29
 msgid "Users"
 msgstr "Vartotojai"
 
-#: ..\..\..\admin\_menutop.php:88
+#: ..\..\..\admin\_menutop.php:94
 msgid "Exit to blogs"
 msgstr "Persijungti á blogus"
 
-#: ..\..\..\admin\_menutop.php:90
+#: ..\..\..\admin\_menutop.php:96
 msgid "Logout"
 msgstr "Atsijungti"
 
@@ -1903,9 +2028,8 @@ msgid "no teaser [Alt-T]"
 msgstr "nëra ávado [Alt-T]"
 
 #: ..\..\..\admin\_quicktags.php:214
-#, fuzzy
 msgid "next page [Alt-Q]"
-msgstr "nëra ávado [Alt-T]"
+msgstr "kitas puslapis [Alt-Q]"
 
 #. TRANS: table header for user list
 #: ..\..\..\admin\_user_list.php:12
@@ -1919,12 +2043,16 @@ msgid ""
 "deleted too!"
 msgstr "Ar tikrai norite iðtrinti ðá vartotojà?\\nPerspëjimas: Visi jo straipsniai bus iðtrinti taip pat!"
 
-#: ..\..\..\b2evocore\_blog_main.php:154
-#, fuzzy, php-format
+#: ..\..\..\b2evocore\_blog_main.php:155
+#, php-format
 msgid ""
 "The default skin [%s] does not exist. It must be properly set in the blog "
 "stub file [%s]. Contact the <a %s>webmaster</a>..."
-msgstr "Negaliu parodyti blogo, nes [%s] ðablonas neegzistuoja. Susiekite su <a %s>administratoriumi</a>, praðau..."
+msgstr "Negaliu parodyti blogo, nes [%s] ðablonas neegzistuoja. Jis turi bûti nurodytas blogo stub faile [%s]. Susiekite su <a %s>administratoriumi</a>..."
+
+#: ..\..\..\b2evocore\_class_htmlchecker.php:95
+msgid "Parser error: "
+msgstr ""
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:112
 msgid "Tag <code>body</code> can only be used once!"
@@ -1957,6 +2085,11 @@ msgstr "Surasti neteisingi URL:"
 #, php-format
 msgid "Tag %s may not contain raw character data"
 msgstr "Plëtinyje %s nereikëtu naudoti kodavimo simboliø"
+
+#: ..\..\..\b2evocore\_class_itemlist.php:669
+#, fuzzy
+msgid "Invalid post, please correct these errors:"
+msgstr "Negalima áraðyti, praðome iðtaisyti ðias klaidas:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:81 ..\..\..\b2evocore\_class_pop3.php:89
 #: ..\..\..\b2evocore\_class_pop3.php:101
@@ -2134,33 +2267,33 @@ msgstr "Nenusiøstas praneðimo numeris"
 msgid "Command failed "
 msgstr "Komanda nepavyko"
 
-#: ..\..\..\b2evocore\_functions.php:36
+#: ..\..\..\b2evocore\_functions.php:35
 msgid "Can't connect to the database server. MySQL said:"
 msgstr "Negaliu prisijungti prie duombazës serverio. MySQL atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:38
+#: ..\..\..\b2evocore\_functions.php:37
 #, php-format
 msgid "Can't connect to the database %s. MySQL said:"
 msgstr "Negaliu prisijungti prie duomenø bazës %s. MySQL atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:49
+#: ..\..\..\b2evocore\_functions.php:48
 msgid "Oops, MySQL error!"
 msgstr "Uups, MySQL klaida!"
 
-#: ..\..\..\b2evocore\_functions.php:644
+#: ..\..\..\b2evocore\_functions.php:643
 msgid "go back"
 msgstr "atgal"
 
-#: ..\..\..\b2evocore\_functions.php:674
+#: ..\..\..\b2evocore\_functions.php:673
 msgid "Redirecting you to:"
 msgstr "Vyksta nukreipimas á:"
 
-#: ..\..\..\b2evocore\_functions.php:676
+#: ..\..\..\b2evocore\_functions.php:675
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "jei nieko nevyksta, paspauskite <a %s>èia</a>."
 
-#: ..\..\..\b2evocore\_functions.php:993
+#: ..\..\..\b2evocore\_functions.php:992
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parametras %s bûtinas!"
@@ -2173,7 +2306,7 @@ msgstr "Blogas URL"
 msgid "URI scheme not allowed"
 msgstr "URI schema neleidþiama"
 
-#: ..\..\..\b2evocore\_functions.php:1210
+#: ..\..\..\b2evocore\_functions.php:1218
 msgid "URL not allowed"
 msgstr "URL neleidþiamas"
 
@@ -2198,27 +2331,27 @@ msgstr "Daugiau !"
 msgid "More:"
 msgstr "Daugiau:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:589
-msgid "Next page"
-msgstr "Sekantis puslapis"
-
 #: ..\..\..\b2evocore\_functions_bposts.php:590
+msgid "Next page"
+msgstr "Kitas puslapis"
+
+#: ..\..\..\b2evocore\_functions_bposts.php:591
 msgid "Previous page"
 msgstr "Ankstesnis puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:633
+#: ..\..\..\b2evocore\_functions_bposts.php:634
 msgid "Previous post"
 msgstr "Ankstesnis straipsnis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:686
+#: ..\..\..\b2evocore\_functions_bposts.php:687
 msgid "Next post"
-msgstr "Sekantis straipsnis"
+msgstr "Kitas straipsnis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:779
+#: ..\..\..\b2evocore\_functions_bposts.php:780
 msgid "Next Page"
-msgstr "Sekantis Puslapis"
+msgstr "Kitas Puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:806
+#: ..\..\..\b2evocore\_functions_bposts.php:807
 msgid "Previous Page"
 msgstr "Ankstesnis Puslapis"
 
@@ -2276,15 +2409,15 @@ msgstr "paieðkos sistema"
 msgid "loading referering page"
 msgstr "kraunamas nurodantis puslapis"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:161
+#: ..\..\..\b2evocore\_functions_hitlogs.php:163
 msgid "found current url in page"
 msgstr "URL rastas puslapyje"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:426
+#: ..\..\..\b2evocore\_functions_hitlogs.php:597
 msgid "not a query - no params!"
 msgstr "ne uþklausa - nenurodyti parametrai!"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:451
+#: ..\..\..\b2evocore\_functions_hitlogs.php:622
 msgid "no query string found"
 msgstr "nerasta uþklausos duomenø"
 
@@ -2394,6 +2527,8 @@ msgstr "Pinginam b2evolution.net..."
 #: ..\..\..\b2evocore\_functions_pings.php:92
 #: ..\..\..\b2evocore\_functions_pings.php:149
 #: ..\..\..\b2evocore\_functions_pings.php:196
+#: ..\..\..\b2evocore\_functions_pings.php:226
+#: ..\..\..\b2evocore\_functions_pings.php:233
 msgid "Aborted (Running on localhost)."
 msgstr "Atðaukta ( veikiam localhost'e)."
 
@@ -2408,6 +2543,11 @@ msgstr "Pinginam Cafelog.com..."
 #: ..\..\..\b2evocore\_functions_pings.php:167
 msgid "Pinging Blo.gs..."
 msgstr "Pinginam Blo.gs..."
+
+#: ..\..\..\b2evocore\_functions_pings.php:217
+#, fuzzy
+msgid "Pinging technorati.com..."
+msgstr "Pinginam Weblogs.com..."
 
 #: ..\..\..\b2evocore\_functions_template.php:84
 msgid "Archives for"
@@ -2437,15 +2577,15 @@ msgstr "Siunèiam trackbackà á:"
 msgid "Response:"
 msgstr "Atsakymas:"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:150
+#: ..\..\..\b2evocore\_functions_trackback.php:154
 msgid "Trackback (0)"
 msgstr "Trackbackø (0)"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:151
+#: ..\..\..\b2evocore\_functions_trackback.php:155
 msgid "Trackback (1)"
 msgstr "Trackbackas (1)"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:152
+#: ..\..\..\b2evocore\_functions_trackback.php:156
 msgid "Trackbacks (%)"
 msgstr "Trackbackø (%)"
 
@@ -2737,6 +2877,10 @@ msgstr "Ispanø"
 msgid "Swedish"
 msgstr "Ðvedø"
 
+#: ..\..\..\conf\_locales.php:32
+msgid "Simplified Chinese"
+msgstr ""
+
 #: ..\..\..\htsrv\comment_post.php:29
 msgid "Please fill in the name field"
 msgstr "Praðome áraðyti Vardà"
@@ -2771,7 +2915,7 @@ msgid "Author"
 msgstr "Autorius"
 
 #: ..\..\..\htsrv\comment_post.php:101 ..\..\..\htsrv\trackback.php:97
-#: ..\..\..\xmlsrv\xmlrpc.php:1228
+#: ..\..\..\xmlsrv\xmlrpc.php:1233
 msgid "Url"
 msgstr "Url"
 
@@ -2780,7 +2924,7 @@ msgid "Comment"
 msgstr "Komentaras"
 
 #: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1230
+#: ..\..\..\xmlsrv\xmlrpc.php:1235
 msgid "Edit/Delete"
 msgstr "Redaguoti/Trinti"
 
@@ -2837,23 +2981,23 @@ msgstr "kategorijos ID"
 msgid "Blog ID"
 msgstr "Blogo ID"
 
-#: ..\..\..\htsrv\getmail.php:263
+#: ..\..\..\htsrv\getmail.php:264
 msgid "Posted title"
 msgstr "Paskelbtas pavadinimas"
 
-#: ..\..\..\htsrv\getmail.php:264
+#: ..\..\..\htsrv\getmail.php:265
 msgid "Posted content"
 msgstr "Paskelbtas turinys"
 
-#: ..\..\..\htsrv\getmail.php:274
+#: ..\..\..\htsrv\getmail.php:275
 msgid "Mission complete, message deleted."
 msgstr "Uþduotis ávykdyta; áraðas iðtrintas."
 
-#: ..\..\..\htsrv\getmail.php:280
+#: ..\..\..\htsrv\getmail.php:281
 msgid "Level 0 users can't post."
 msgstr "Vartotojai su 0 lygiu negali raðyti."
 
-#: ..\..\..\htsrv\getmail.php:302
+#: ..\..\..\htsrv\getmail.php:303
 msgid "OK."
 msgstr "OK."
 
@@ -2952,11 +3096,11 @@ msgstr "Redaguoti vartotojus"
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Naujas trackbackas straipsnyje #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:96 ..\..\..\xmlsrv\xmlrpc.php:1227
+#: ..\..\..\htsrv\trackback.php:96 ..\..\..\xmlsrv\xmlrpc.php:1232
 msgid "Website"
 msgstr "Svetainë"
 
-#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1229
+#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1234
 msgid "Excerpt"
 msgstr "Iðtrauka"
 
@@ -3143,10 +3287,7 @@ msgstr "Perþiûrëti visus ðio autoriaus áraðus"
 msgid "[...] Read more!"
 msgstr "[...] Daugiau!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1221 ..\..\..\xmlsrv\xmlrpc.php:1225
+#: ..\..\..\xmlsrv\xmlrpc.php:1226 ..\..\..\xmlsrv\xmlrpc.php:1230
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Naujas pingbackas straipsnyje #%d \"%s\""
-
-#~ msgid " (default skin)"
-#~ msgstr "(pagrindinis ðablonas)"
