@@ -405,7 +405,7 @@ $AdminUI->dispPayloadBegin();
 
 	$Form->hidden( 'blog', $blog );
 
-	$Form->fieldset( 'Posts to show' );
+	$Form->fieldset( T_('Posts to show') );
 	?>
 	<div>
 
