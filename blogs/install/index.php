@@ -56,13 +56,14 @@ $stub_roll = 'blog_roll';
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 	<h1 id="version"><?php echo T_('Installer for version '), $b2_version ?></h1>
 	<div id="quicklinks">
-		Current installation : 
-		<a href="index.php?locale=<?php echo $default_locale ?>">Install menu</a> &middot; 
-		<a href="phpinfo.php">PHP info</a> &middot; 
-		<a href="../index.php">Go to Blogs</a> &middot; 
-		<a href="../admin/">Go to Admin</a> &middot; 
-		Online : 
-		<a href="http://b2evolution.net/man/supportfaq.html">Support</a>
+		<?php echo T_('Current installation') ?>: 
+		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot; 
+		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a> &middot; 
+		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot; 
+		<a href="../admin/"><?php echo T_('Go to Admin') ?></a> &middot; 
+		<?php echo T_('Online') ?>: 
+		<a href="http://b2evolution.net/man/"><?php echo T_('Manual') ?></a> &middot; 
+		<a href="http://b2evolution.net/man/supportfaq.html"><?php echo T_('Support') ?></a> 
 	</div>
 </div>
 
@@ -180,7 +181,7 @@ switch( $action )
 				<ul>
 					<li><strong><?php echo T_('You can allow the installer to update the config file by changing its permissions:') ?></strong>
 						<ol>
-							<li><?php printf( '<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.', $conf_filepath, 'href="http://b2evolution.net/man/install/file_permissions.html" target="_blank"' ); ?></li>
+							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_filepath, 'href="http://b2evolution.net/man/install/file_permissions.html" target="_blank"' ); ?></li>
 							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
 						</ol>
 						<br />
@@ -286,9 +287,7 @@ switch( $action )
 				</fieldset>
 			
 			</form>
-				
-				
-			<a href="index.php?action=menu&amp;locale=<?php echo $default_locale ?>">Next step</a>
+
 			<?php
 			break;
 		}
@@ -334,14 +333,15 @@ switch( $action )
 	  <?php
 		if( $allow_evodb_reset != 1 )
 		{
-			echo '<br />
-			'.T_('<h2>Need to start anew?</h2>
-			<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>
-			<p>To enable it, please go to the /conf/_config.php file and change:</p>
-			<pre>$allow_evodb_reset = 0;</pre>
-			to
-			<pre>$allow_evodb_reset = 1;</pre>
-			<p>Then reload this page and a reset option will appear.</p>');
+			?>
+			<br />
+			<h2><?php echo T_('Need to start anew?') ?></h2>
+			<?php echo T_('<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>');
+			echo( '<p>To enable it, please go to the /conf/_config.php file and change:</p>
+<pre>$allow_evodb_reset = 0;</pre>
+to
+<pre>$allow_evodb_reset = 1;</pre>
+<p>Then reload this page and a reset option will appear.</p>');
 		}
 		?>
 		
@@ -424,19 +424,16 @@ switch( $action )
 		 */
 		require_once( dirname(__FILE__). '/_functions_delete.php' );
 		?>
-		<h2>Deleting b2evolution tables from the datatase</h2>
+		<h2><?php echo T_('Deleting b2evolution tables from the datatase') ?></h2>
 		<?php
 		if( $allow_evodb_reset != 1 )
 		{
-			?>
-			<?php echo T_('<p>For security reasons, the reset feature is disabled by default.</p>
-			<p>To enable it, please go back the /conf/_config.php file and change:</p>
-			<pre>$allow_evodb_reset = 0;</pre>
-			to
-			<pre>$allow_evodb_reset = 1;</pre>
-			<p>Then reload this page and resetting will take place.</p>')?>
-			<p><a href="install.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
-			<?php
+			echo T_('<p>For security reasons, the reset feature is disabled by default.</p>' );
+			echo( '<p>To enable it, please go to the /conf/_config.php file and change:</p>
+<pre>$allow_evodb_reset = 0;</pre>
+to
+<pre>$allow_evodb_reset = 1;</pre>
+<p>Then reload this page and a reset option will appear.</p>');
 			break;
 		}
 		db_delete();
@@ -449,7 +446,9 @@ switch( $action )
 ?>
 
 <div id="rowfooter">
-<a href="http://b2evolution.net/">official website</a> &middot; <a href="http://b2evolution.net/about/license.html">GNU GPL license</a> &middot; <a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
+	<a href="http://b2evolution.net/"><?php echo T_('official website') ?></a> &middot; 
+	<a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a> &middot; 
+	<a href="http://fplanque.net/About/index.html"><?php echo T_('contact') ?>: Fran&ccedil;ois PLANQUE</a>
 </div>
 
 </body>
