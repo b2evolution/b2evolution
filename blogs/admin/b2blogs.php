@@ -296,7 +296,7 @@ switch($action)
 		{	// Not confirmed
 			?>
 			<div class="panelinfo">
-				<h3><?php printf( T_('Delete Blog [%s]?'), $deleted_Blog->get( 'name' ) )?></h3>
+				<h3><?php printf( T_('Delete Blog [%s]?'), $deleted_Blog->dget( 'name' ) )?></h3>
 
 				<p><?php echo T_('Deleting this blog will also delete all its categories, posts and comments!') ?></p>
 
@@ -313,7 +313,7 @@ switch($action)
 						{
 							?>
 							<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
-							<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->get('dynurl').'"', $deleted_Blog->get('dynfilepath') ); ?></label><br />
+							<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->dget('dynurl').'"', $deleted_Blog->dget('dynfilepath') ); ?></label><br />
 							<br />
 							<?php
 						}
@@ -321,7 +321,7 @@ switch($action)
 						{ 
 							?>
 							<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
-							<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->get('staticurl').'"', $deleted_Blog->get('staticfilepath') ); ?></label><br />
+							<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$deleted_Blog->dget('staticurl').'"', $deleted_Blog->dget('staticfilepath') ); ?></label><br />
 							<br />
 							<?php
 						}
@@ -362,7 +362,7 @@ switch($action)
 			<div class="panelinfo">
 				<h3>
 				<?php 
-					printf( T_('Generating static page for blog [%s]'), $edited_Blog->get('name') );
+					printf( T_('Generating static page for blog [%s]'), $edited_Blog->dget('name') );
 				?>
 				</h3>
 		<?php

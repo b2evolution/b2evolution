@@ -188,6 +188,24 @@ class DataObject
 		return $this->$parname;
 	}
 
+
+	/**
+	 * Get a ready-to-display member param by its name
+	 *
+	 * Same as disp but don't echo
+	 *
+	 * {@internal DataObject::dget(-) }}
+	 *
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function dget( $parname, $format = 'htmlbody' )
+	{
+		// Note: we call get again because of derived objects specific handlers !
+		return format_to_output( $this->get($parname), $format );
+	}
+
+
 	/**
 	 * Display a member param by its name
 	 *

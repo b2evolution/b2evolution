@@ -148,7 +148,7 @@ if( $item_author_User->notify )
 	else
 		$mail_from = "\"$author\" <$email>";
 	
-	ini_set('sendmail_from', $mail_from); // set Return-Path for Win32
+	// DID YOU SEE ANYTHING BROKEN ??? ini_set('sendmail_from', $mail_from); // set Return-Path for Win32
 	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/" . phpversion(), "-f$mail_from");
 	locale_restore_previous();
 }
