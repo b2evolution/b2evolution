@@ -12,7 +12,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 $Form = & new Form( 'b2options.php', 'form' );
 
-$Form->begin_form( 'fform' );
+$Form->begin_form( 'fform', T_('General Settings') );
 
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'general' );
@@ -21,11 +21,11 @@ $Form->hidden( 'tab', 'general' );
 
 $Form->fieldset( T_('Default user rights') );
 
-$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
+	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
 
-form_select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
+	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
-$Form->text( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), 1 );
+	$Form->text( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), 1 );
 
 $Form->fieldset_end();
 

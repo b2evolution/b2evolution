@@ -127,7 +127,7 @@ else
 
 	$Form = & new Form( 'b2options.php?tab=regional', 'form' );
 
-	$Form->begin_form( 'fform' );
+	$Form->begin_form( 'fform',T_('Regional Settings') );
 
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
