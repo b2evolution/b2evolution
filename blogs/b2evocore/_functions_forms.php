@@ -191,4 +191,19 @@ function form_info( $field_label, $field_info )
 	echo "</fieldset>\n\n";
 }
 
+
+/*
+ * form_info_tr(-)
+ */
+function form_info_tr( $field_label, $field_info, $field_note = '' )
+{
+	echo '<tr>';
+	echo '  <td align="right"><strong>', $field_label, ':</strong></td>';
+	echo '  <td>', $field_info;
+	
+	if( !empty($field_note) )	echo '<td class="small">', $field_note, '</td>';
+	
+	echo "</td></tr>\n\n";
+}
+
 ?>

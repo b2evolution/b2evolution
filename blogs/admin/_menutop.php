@@ -103,14 +103,20 @@ if( empty($mode) )
 			echo '<a href="b2template.php">', T_('Templates'), '</a></li>';
 		}
 
+		if( $admin_tab == 'users' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		
 		if( $current_User->check_perm( 'users', 'view' ) )
 		{
-			if( $admin_tab == 'users' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
 			echo '<a href="b2users.php" >', T_('Users'), '</a></li>';
 		}
+		else
+		{
+			echo '<a href="b2users.php" >', T_('User Profile'), '</a></li>';
+		}
+
 
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{

@@ -34,8 +34,7 @@ if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl.'/', $matches ) )
 }
 else
 {
-	echo 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix. Please correct that.';
-	exit;
+	die( 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix. Please correct that.' );
 }
 
 # Short name of this system (will be used for cookies and notification emails)

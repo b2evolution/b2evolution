@@ -16,6 +16,7 @@ param( 'action', 'string' );
 param( 'user', 'integer', 0 );
 param( 'group', 'integer', 0 );
 
+
 // show the top menu
 if( $action != 'userupdate' )
 { // perhaps we'll have to set a cookie later
@@ -26,14 +27,24 @@ if( $action != 'userupdate' )
 
 $errors = array();
 
+
+$user_profile_only = 0;
 // Check permission:
 if( !$current_User->check_perm( 'users', 'edit', false ) )
 {
-	errors_add( T_('You have no permission to edit users/groups!') );
+	if( ($action && $action != 'userupdate') )
+	{
+		errors_add( T_('You have no permission to edit other users or groups!') );
+	}
+	else
+	{ // allow profile editing only
+		$user_profile_only = 1;
+	}
 }
-else
-switch ($action)
-{
+
+
+if( !errors() ) switch ($action)
+{ // actions only when editing users is allowed
 	case 'newuser':
 		param( 'template', 'integer', -1 );
 		
@@ -68,28 +79,6 @@ switch ($action)
 
 	case 'userupdate':
 		param( 'edited_user_ID', 'integer', true );
-		param( 'edited_user_oldlogin', 'string', true );
-		param( 'edited_user_login', 'string', true );
-		
-		if( empty($edited_user_login) )
-		{
-			errors_add( T_('You must provide an unique Login!') );
-		}
-		
-		param( 'edited_user_level', 'integer', true );
-		if( $edited_user_level < 0 || $edited_user_level > 10 )
-		{
-			errors_add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ) );
-		}
-		
-		$query = "SELECT ID FROM $tableusers WHERE user_login = '$edited_user_login' AND ID != $edited_user_ID";
-		$q = $DB->get_var( $query );
-		
-		if( $q !== NULL )
-		{
-			errors_add( sprintf( T_('The login already exists. Please <a %s>edit this login</a> instead of overwriting it this way.'), 'href="?user='.$q.'"' ));
-		}
-		
 		if( $edited_user_ID == 0 )
 		{ // we create a new user
 			$edited_User = & new User();
@@ -98,6 +87,57 @@ switch ($action)
 		else
 		{
 			$edited_User = & new User( get_userdata( $edited_user_ID ) );
+		}
+		
+		if( $user_profile_only && $edited_user_ID != $current_User->ID )
+		{ // user is only allowed to update him/herself
+			errors_add( T_('You are only allowed to update yourself!') );
+			
+			// display menu
+			require( dirname(__FILE__).'/_menutop.php' );
+			require( dirname(__FILE__).'/_menutop_end.php' );
+			break;
+		}
+		
+		param( 'edited_user_oldlogin', 'string', true );
+		param( 'edited_user_login', 'string', true );
+		
+		if( empty($edited_user_login) )
+		{
+			errors_add( T_('You must provide an unique Login!') );
+		}
+		
+		if( !$user_profile_only )
+		{ // allow changing level/group not for profile mode
+			param( 'edited_user_level', 'integer', true );
+			if( $edited_user_level < 0 || $edited_user_level > 10 )
+			{
+				errors_add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ) );
+			}
+			else
+			{
+				$edited_User->set( 'level', $edited_user_level );
+			}
+			
+			param( 'edited_user_grp_ID', 'integer', true );
+			if( $edited_user_grp_ID > 0 )
+			{
+				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
+			}
+			else $edited_user_Group = & new Group();
+			
+			$edited_User->setGroup( $edited_user_Group );
+			// echo 'new group = ';
+			// $edited_User->Group->disp('name');
+		}
+		
+		// check if new login already exists for another user_ID
+		$query = "SELECT ID FROM $tableusers WHERE user_login = '$edited_user_login' AND ID != $edited_user_ID";
+		$q = $DB->get_var( $query );
+		
+		if( $q !== NULL )
+		{
+			errors_add( sprintf( T_('The login already exists. Please <a %s>edit this login</a> instead of overwriting it this way.'), 'href="?user='.$q.'"' ));
 		}
 		
 		$edited_User->set( 'login', $edited_user_login );
@@ -125,11 +165,10 @@ switch ($action)
 		$edited_User->set( 'yim', $edited_user_yim );
 		param( 'edited_user_notify', 'integer', 0 );
 		$edited_User->set( 'notify', $edited_user_notify );
-		$edited_User->set( 'level', $edited_user_level );
 		
 		param( 'edited_user_pass1', 'string', true );
 		param( 'edited_user_pass2', 'string', true );
-		if( $edited_user_pass1 != '' || $edited_user_ID == 0 )
+		if( $edited_user_pass1 != '' || $edited_user_pass2 != '' || $edited_user_ID == 0 )
 		{ // update password, explicit for new users
 			if( $edited_user_pass1 != $edited_user_pass2 )
 			{
@@ -142,50 +181,55 @@ switch ($action)
 					errors_add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
 				}
 				else
-				{ // set password
+				{
 					$new_pass = md5( $edited_user_pass2 );
+					// set password
 					$edited_User->set( 'pass', $new_pass );
-					
-					if( $edited_user_ID == $current_User->get('ID') )
-					{ // set cookie
-						setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
-					}
 				}
 			}
 		}
 		
-		param( 'edited_user_grp_ID', 'integer', true );
-		if( $edited_user_grp_ID > 0 )
-		{
-			$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
+		if( !errors() )
+		{ // ---- NO UPDATE ON ERRORS
+			
+			if( $edited_User->get('ID') != 0 )
+			{	// Commit update to the DB:
+				$edited_User->dbupdate();	
+				
+				$update_status = '<div class="panelinfo"><p>' . T_('User updated.') . '</p></div>';
+				
+				// Commit changes in cache:
+				// not ready: $UserCache->add( $edited_Group );
+				unset( $cache_userdata ); // until better
+			}
+			else
+			{ // Insert user into DB
+				$edited_User->dbinsert();
+				$update_status = '<div class="panelinfo"><p>' . T_('New user created.') . '</p></div>';
+			}
+	
+			// Update cookies
+			if( $edited_user_ID == $current_User->ID )
+			{ // current user updates him/herself - we have to set cookies to keep him logged in
+				if( isset($new_pass) && $current_User->pass != $new_pass )
+				{
+					setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
+				}
+				
+				if( $current_User->login != $edited_User->login )
+				{
+					setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
+				}
+			}
 		}
-		else $edited_user_Group = & new Group();
-		
-		$edited_User->setGroup( $edited_user_Group );
-		// echo 'new group = ';
-		// $edited_User->Group->disp('name');
 		
 		// display menu
 		require( dirname(__FILE__).'/_menutop.php' );
 		require( dirname(__FILE__).'/_menutop_end.php' );
 		
-		if( count($errors) )
+		if( isset($update_status) )
 		{
-			break;	
-		}
-		
-		if( $edited_User->get('ID') != 0 )
-		{	// Commit update to the DB:
-			$edited_User->dbupdate();	
-			echo '<div class="panelinfo"><p>' . T_('User updated.') . '</p></div>';
-			// Commit changes in cache:
-			// not ready: $UserCache->add( $edited_Group );
-			unset( $cache_userdata ); // until better
-		}
-		else
-		{ // Insert user into DB
-			$edited_User->dbinsert();
-			echo '<div class="panelinfo"><p>' . T_('New user created.') . '</p></div>';
+			echo $update_status;
 		}
 
 		break;
@@ -448,22 +492,39 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 		}
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
-
-
-	if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
-	{ // display user form
-		if( !isset($edited_User) )
-		{
-			$edited_User = & new User( get_userdata($user) );
-		}
-		
-		require(dirname(__FILE__). '/_users_form.php');
+}
+else
+{ // user is not allowed to view users
+	if( $user == 0 )
+	{ // display only current user's form
+		$user = $current_User->ID;
 	}
+	elseif( $user != $current_User->ID )
+	{ // another user requested -> error
+		echo '<div class="panelinfo"><p class="error">'.T_('You are not allowed to view other users.').'</p></div>';
+		$user = $current_User->ID;
+	};
+}
 
 
-	// Display user list:
+// user form
+if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
+{
+	if( !isset($edited_User) )
+	{
+		$edited_User = & new User( get_userdata($user) );
+	}
+	
+	require(dirname(__FILE__). '/_users_form.php');
+}
+
+
+// users list
+if( $current_User->check_perm( 'users', 'view', false ) )
+{	// Display user list:
 	require( dirname(__FILE__). '/_users_list.php' );
 }
+
 
 require( dirname(__FILE__). '/_footer.php' );
 ?>
