@@ -59,7 +59,8 @@
 	}
 	else
 	{
-		echo T_('Editing group:').' '.( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ).' ('.T_('ID').' '.$edited_Group->get('ID').')';
+		echo ($current_User->check_perm( 'users', 'edit' )) ? T_('Editing group:') : T_('Viewing group:');
+		echo ' '.( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ).' ('.T_('ID').' '.$edited_Group->get('ID').')';
 	}
 	?></h2>
 

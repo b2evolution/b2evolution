@@ -9,7 +9,7 @@
  * @package admin
  */
 ?>
-<form class="fform" method="post">
+<form class="fform" method="post" name="FormPerm">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="perm" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />
@@ -196,8 +196,13 @@
 	<fieldset>
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search">
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
+				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search" <?php
+				if( $current_User->ID != 1 )
+				{	// warning if a user withdraws own permission to edit the blog's properties
+					echo 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\'' /* TRANS: Javascript string */ .T_('Warning! You are about to withdraw your permission to edit this blog!\nYou won\\\'t have access to its properties if you do that!').'\') );"';
+				}
+				?> />
+				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 			</div>
 		</fieldset>
 	</fieldset>

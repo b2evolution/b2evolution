@@ -161,7 +161,7 @@ switch($action)
 
 		?>
 		<div class="panelinfo">
-			<h3><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></h3>
+			<p><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></p>
 		<?php
 
 		switch( $tab )
@@ -175,12 +175,10 @@ switch($action)
 				$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 				$blog_roll = format_to_post( $blog_roll, 0, 0 );
 
-				if ( errors_display( T_('Cannot update, please correct these errors:' ),
-					'[<a href="javascript:history.go(-1)">' . T_('Back to blog editing') . '</a>]') )
+				if ( errors_display( T_('Cannot update, please correct these errors:' ), '') )
 				{
 					echo '</div>';
-					require( dirname(__FILE__) . '/_footer.php' );
-					exit();
+					break;
 				}
 
 				$edited_Blog->set( 'tagline', $blog_tagline );
@@ -255,8 +253,10 @@ switch($action)
 				break;
 		}
 
-		// Commit update to the DB:
-		$edited_Blog->dbupdate();
+		if( !errors() )
+		{	// Commit update to the DB:
+			$edited_Blog->dbupdate();
+		}
 		
 		// Commit changes in cache:
 		$BlogCache->add( $edited_Blog );

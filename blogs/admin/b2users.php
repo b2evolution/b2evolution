@@ -38,6 +38,7 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	if( ($action && $action != 'userupdate') )
 	{
 		errors_add( T_('You have no permission to edit other users or groups!') );
+		$action = ''; // don't show group form (we have no group ID)
 	}
 	elseif( $demo_mode && $action && $current_User->login == 'demouser' )
 	{
