@@ -340,8 +340,9 @@ function get_the_content($more_link_text='#', $stripteaser=0, $more_file='', $mo
 		if ($more) 
 		{	// Viewer has already asked for more
 			if( !empty($more_anchor) ) $output .= $before_more_link;
-			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor.$content[1];
-			if( !empty($more_anchor) )  $output .= $after_more_link;
+			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
+			if( !empty($more_anchor) ) $output .= $after_more_link;
+			$output .= $content[1];
 		} 
 		else 
 		{ // We are offering to read more
