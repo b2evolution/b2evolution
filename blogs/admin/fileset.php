@@ -58,9 +58,23 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
+		// Filemanager
+		param( 'fm_enabled', 'integer', 0 );
+		$Settings->set( 'fm_enabled', $fm_enabled );
+		param( 'fm_enable_roots_blog', 'integer', 0 );
+		$Settings->set( 'fm_enable_roots_blog', $fm_enable_roots_blog );
+		param( 'fm_enable_roots_group', 'integer', 0 );
+		$Settings->set( 'fm_enable_roots_group', $fm_enable_roots_group );
+		param( 'fm_enable_roots_user', 'integer', 0 );
+		$Settings->set( 'fm_enable_roots_user', $fm_enable_roots_user );
+		param( 'fm_enable_create_dir', 'integer', 0 );
+		$Settings->set( 'fm_enable_create_dir', $fm_enable_create_dir );
+		param( 'fm_enable_create_file', 'integer', 0 );
+		$Settings->set( 'fm_enable_create_file', $fm_enable_create_file );
+
+		// Upload
 		param( 'upload_enabled', 'integer', 0 );
 		$Settings->set( 'upload_enabled', $upload_enabled );
-
 		param( 'upload_allowedext', 'string', true );
 		$Settings->set( 'upload_allowedext', trim($upload_allowedext) );
 		param( 'upload_allowedmime', 'string', true );

@@ -54,6 +54,12 @@ class GeneralSettings extends AbstractSettings
 {
 	var $_defaults = array( 'upload_allowedext' => 'jpg gif png',
 													'upload_allowedmime' => 'image/jpeg image/gif image/png',
+													'fm_enabled' => '1',
+													'fm_enable_roots_blog' => '1',
+													'fm_enable_roots_group' => '1',
+													'fm_enable_roots_user' => '1',
+													'fm_enable_create_dir' => '1',
+													'fm_enable_create_file' => '1',
 												);
 	/**
 	 * Constructor
@@ -82,6 +88,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.6  2005/01/10 02:14:02  blueyed
+ * new settings
+ *
  * Revision 1.5  2005/01/06 05:20:14  blueyed
  * refactored (constructor), getDefaults()
  *
