@@ -1,10 +1,7 @@
 body {
-	margin-top: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	background-color: #FFFFFF;
-	color: #000000; 
+	margin: 0 0 0 0;
+	background-color: #FFF;
+	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 84%;
 }
@@ -13,7 +10,7 @@ h1 {
 	margin: 0 2ex 0;
 	padding: 1ex 0 0 0;
 	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
-	color: #BBCCDD;
+	color: #BCD;
 	font-size: 112%;
 	font-weight:normal;
 }
@@ -37,7 +34,7 @@ h4 {
 }
 
 a {
-	background-color: transparent; 
+	background-color: transparent;
 	color: #00e;
 	text-decoration: none;
 }
@@ -128,7 +125,7 @@ legend {
 }
 .tabletoprow {
 	background-color: #ffffff;
-	color: #000000; 
+	color: #000000;
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 12px;
 	font-style: italic;
@@ -151,9 +148,9 @@ xmp { /* Just in case */
 	font-family: Verdana, Geneva, Arial, Helvetica;
 	font-size: 10pt;
 }
-form { 
-	margin: 0; 
-	padding: 0; 
+form {
+	margin: 0;
+	padding: 0;
 } /* thanks #mozilla */
 form.inline {
 	margin: 0px;
@@ -200,7 +197,7 @@ input.searchfield {
 	/* Buggued in IE 6: width:100%; */
 	margin: 0ex;
 }
-input.large, 
+input.large,
 textarea.large,
 div.large {
 	width: 98%;
@@ -481,8 +478,8 @@ span.line
 div.statbloc {
 	float: left;
 	width: 44%;
-	margin-left: 2%; 
-	margin-right: 0%; 
+	margin-left: 2%;
+	margin-right: 0%;
 	margin-bottom: 2ex;
 	border: 1px solid #33BBBB;
 }
@@ -507,7 +504,7 @@ form.bComment fieldset {
 form.bComment label {
 	font-weight: bold;
 }
-input.bComment, 
+input.bComment,
 textarea.bComment {
 	background-color: #f0f0f0;
 	border-width: 1px;

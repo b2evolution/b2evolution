@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Displays user properties form
  *
@@ -63,32 +63,47 @@
 			<td><?php $edited_User->disp('yim') ?></td>
 			</tr>
 			</table>
-	
+
 		</td>
 		<td valign="top">
-	
-			<p><strong><?php echo T_('ID') ?>:</strong> <?php $edited_User->disp('ID')  ?></p>
-	
-			<p><strong><?php echo T_('Posts') ?>:</strong>	<?php $posts=get_usernumposts($user); ?></p>
-	
-			<p><strong><?php echo T_('Identity') ?>:</strong>	<?php $edited_User->disp('preferedname'); ?></p>
-	
-			<p><strong><?php echo T_('Created on:') ?></strong>	<?php $edited_User->disp('datecreated'); ?></p>
-	
-			<p><strong><?php echo T_('From IP:') ?></strong>	<?php $edited_User->disp('ip'); ?></p>
-	
-			<p><strong><?php echo T_('From Domain:') ?></strong>	<?php $edited_User->disp('domain'); ?></p>
-	
-			<p><strong><?php echo T_('With Browser:') ?></strong>	<?php $edited_User->disp('browser'); ?></p>
-	
+			<table cellpadding="5" cellspacing="0">
+			<tr>
+			<td align="right"><strong><?php echo T_('ID') ?>:</strong></td>
+			<td><?php $edited_User->disp('ID')  ?></td>
+			</tr>
+			<tr>
+			<td align="right"><strong><?php echo T_('Posts') ?>:</strong></td>
+			<td><?php $posts=get_usernumposts($user); ?></td>
+			</tr>
+			<tr>
+			<td align="right"><strong><?php echo T_('Identity') ?>:</strong></td>
+			<td><?php $edited_User->disp('preferedname'); ?></td>
+			</tr>
+			<tr>
+			<td align="right"><strong><?php echo T_('Created on:') ?></strong></td>
+			<td><?php $edited_User->disp('datecreated'); ?></td>
+			</tr>
+			<tr>
+			<td align="right"><strong><?php echo T_('From IP:') ?></strong></td>
+			<td><?php $edited_User->disp('ip'); ?></td>
+			</tr>
+			<tr>
+			<td align="right"><strong><?php echo T_('From Domain:') ?></strong></td>
+			<td><?php $edited_User->disp('domain'); ?></td>
+			</tr>
+			<tr>
+			<td align="right"><strong><?php echo T_('With Browser:') ?></strong></td>
+			<td><?php $edited_User->disp('browser'); ?></td>
+			</tr>
+			</table>
 		</td>
 		</table>
-	
+
 		<fieldset>
 			<legend><?php echo T_('User rights') ?></legend>
 			<p><strong><?php echo T_('Level') ?>:</strong> <?php $edited_User->disp('level') ?></p>
-	
-			<?php 
+
+			<?php
 				if(  $edited_User->get('ID') != 1 )
 				{
 					form_select( 'edited_user_grp_ID', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );
@@ -98,10 +113,10 @@
 					form_info(  T_('User group'), $edited_User->Group->get('name') );
 				}
 			?>
-	
+
 		</fieldset>
-	
-		<?php 
+
+		<?php
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{ ?>
 		<fieldset>
@@ -112,8 +127,8 @@
 				</div>
 			</fieldset>
 		</fieldset>
-		<?php } ?>	
-		
+		<?php } ?>
+
 		<div class="clear"></div>
 	</form>
 
