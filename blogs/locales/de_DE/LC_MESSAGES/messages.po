@@ -3690,7 +3690,7 @@ msgstr "Zeige Optionen"
 
 #: ../../../admin/files.php:1156
 msgid "Sort directories at top"
-msgstr "Zeige Verzeichnisse zuerst"
+msgstr "Sortiere Verzeichnisse nach oben"
 
 #: ../../../admin/files.php:1159
 msgid "Show hidden files"
