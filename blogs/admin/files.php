@@ -473,13 +473,18 @@ if( $Fileman->Messages->count( 'all' ) || isset( $msg_action )
 	$rootlist = $Fileman->get_roots();
 
 	if( count($rootlist) > 1 )
-	{ // provide list
+	{ // provide list of roots
 		echo '<form action="files.php" name="roots" class="toolbaritem">'
 					.$Fileman->form_hiddeninputs( false );
 		echo '<select name="root" onchange="this.form.submit()">';
 
 		foreach( $rootlist as $lroot )
 		{
+			if( !(int)$lroot['id'] )
+			{
+				$Debuglog->add( 'ID invalid for root type ['.$lroot['type'].']: '.var_export( $lroot['id'], true ), 'fileman' );
+				continue;
+			}
 			echo '<option value="'.$lroot['type'].'_'.$lroot['id'].'"';
 
 			if( $root == $lroot['type'].'_'.$lroot['id'] )

@@ -124,19 +124,20 @@ class FileManager extends Filelist
 
 		$root_A = explode( '_', $this->root );
 
-		if( $this->User->login == 'demouser' )
-		{
-			$this->root_dir = $basepath.'media_test/';
-			$this->root_url = $baseurl.'media_test/';
-		}
-		elseif( count( $root_A ) == 2 )
+		if( count($root_A) == 2 && $root_A[1] !== '' )
 		{
 			switch( $root_A[0] )
 			{
 				case 'blog':
-					$Blog = $BlogCache->get_by_ID( $root_A[1] );
-					$this->root_dir = $Blog->get( 'mediadir' );
-					$this->root_url = $Blog->get( 'mediaurl' );
+					$tBlog = $BlogCache->get_by_ID( $root_A[1] );
+					$this->root_dir = $tBlog->get( 'mediadir' );
+					$this->root_url = $tBlog->get( 'mediaurl' );
+					break;
+
+				case 'user':
+					$tUser = new User( get_userdata($root_A[1]) );
+					$this->root_dir = $tUser->get( 'fm_rootdir' );
+					$this->root_url = $tUser->get( 'fm_rooturl' );
 					break;
 			}
 		}
@@ -147,9 +148,6 @@ class FileManager extends Filelist
 				$this->root_dir = $this->User->get( 'fm_rootdir' );
 				$this->root_url = $this->User->get( 'fm_rooturl' );
 				break;
-
-			default:  // straight path
-				$this->root_dir = trailing_slash( $root );
 		}
 
 		$this->cwd = trailing_slash( $this->root_dir.$path );
@@ -353,8 +351,14 @@ class FileManager extends Filelist
 		{
 			$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
-			$r[] = array( 'type' => 'blog', 'id' => $blog_ID, 'name' => $Blog->get( 'shortname' ) );
+			$r[] = array( 'type' => 'blog',
+											'id' => $blog_ID,
+											'name' => $Blog->get( 'shortname' ) );
 		}
+
+		$r[] = array( 'type' => 'user',
+										'id' => $this->User->ID,
+										'name' => T_('user media folder') );
 
 		return $r;
 	}
@@ -898,7 +902,13 @@ class FileManager extends Filelist
 	 */
 	function create_rootdir( $path, $suggested_name, $chmod = NULL )
 	{
+		global $Debuglog;
+
 		$realname = safefilename( $suggested_name );
+		if( $realname != $suggested_name )
+		{
+			$Debuglog->add( 'Realname for dir ['.$suggested_name.']: ['.$realname.']', 'fileman' );
+		}
 		if( $this->createdir( $realname, $path, $chmod ) )
 		{
 			return $path.'/'.$realname;
@@ -923,6 +933,10 @@ class FileManager extends Filelist
 		{
 			$path = $this->cwd;
 		}
+		if( substr( $path, -1 ) != '/' )
+		{
+			$path .= '/';
+		}
 		if( $chmod == NULL )
 		{
 			$chmod = $this->default_chmod_dir;
@@ -932,7 +946,7 @@ class FileManager extends Filelist
 			$this->Messages->add( T_('Cannot create empty directory.') );
 			return false;
 		}
-		elseif( !mkdir( $path.'/'.$dirname, $chmod ) )
+		elseif( !mkdir( $path.$dirname, $chmod ) )
 		{
 			$this->Messages->add( sprintf( T_('Could not create directory [%s] in [%s].'), $dirname, $path ) );
 			return false;

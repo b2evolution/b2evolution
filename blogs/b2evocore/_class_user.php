@@ -150,7 +150,12 @@ class User extends DataObject
 				return get_usernumposts( $this->ID );
 
 			case 'fm_rootdir':
-				return $basepath.$media_subdir.'users/'.$this->login.'/';
+				$userdir = $basepath.$media_subdir.'users/'.safefilename($this->login).'/';
+				if( !is_dir( $userdir ) )
+				{
+					mkdir( $userdir ); // defaults to 0777
+				}
+				return $userdir;
 
 			case 'fm_rooturl':
 				return $baseurl.$media_subdir.'users/'.$this->login.'/';

@@ -18,7 +18,7 @@ require_once dirname(__FILE__). '/_functions_groups.php';
 require_once dirname(__FILE__). '/_class_user.php';
 
 
-/*
+/**
  * veriflog(-)
  *
  * Verify if user is logged in
@@ -43,20 +43,20 @@ function veriflog( $login_required = false )
 
 	// Check if user is trying to login right now:
 	if( isset($_POST['log'] ) && isset($_POST['pwd'] ))
-	{	// Trying to log in with a POST
+	{ // Trying to log in with a POST
 		$log = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['log']) : $_POST['log'])));
 		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_POST['pwd']) : $_POST['pwd'])));
 		unset($_POST['pwd']); // password is hashed from now on
 	}
 	elseif( isset($_GET['log'] ) && isset($_GET['pwd'] ))
-	{	// Trying to log in with a GET
+	{ // Trying to log in with a GET
 		$log = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['log']) : $_GET['log'])));
 		$user_pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_GET['pwd']) : $_GET['pwd'])));
 		unset($_GET['pwd']); // password is hashed from now on
 	}
 
 	if( isset($log) )
-	{	/*
+	{ /*
 		 * ---------------------------------------------------------
 		 * User is trying to login right now
 		 * ---------------------------------------------------------
@@ -84,7 +84,7 @@ function veriflog( $login_required = false )
 			printf( T_('setcookie %s failed!'). '<br />', $cookie_user );
 	}
 	elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
-	{	/*
+	{ /*
 		 * ---------------------------------------------------------
 		 * User was not trying to log in, but he already was logged in: check validity
 		 * ---------------------------------------------------------
@@ -96,7 +96,7 @@ function veriflog( $login_required = false )
 		// echo 'pass=', $user_pass_md5;
 
 		if( ! user_pass_ok( $user_login, $user_pass_md5, true ) )
-		{	// login is NOT OK:
+		{ // login is NOT OK:
 			if( $login_required )
 			{
 				header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -111,7 +111,7 @@ function veriflog( $login_required = false )
 		}
 	}
 	else
-	{	/*
+	{ /*
 		 * ---------------------------------------------------------
 		 * User was not logged in at all
 		 * ---------------------------------------------------------
@@ -149,10 +149,8 @@ function veriflog( $login_required = false )
 }
 
 
-/*
- * logout
- *
- * Log the user out:
+/**
+ * Log the user out
  */
 function logout()
 {
@@ -179,6 +177,7 @@ function logout()
 
 }
 
+
 /**
  * is_logged_in(-)
  */
@@ -187,13 +186,12 @@ function is_logged_in()
 	global $user_ID, $generating_static;
 
 	if( isset($generating_static) )
-	{	// When generating static page, we should always consider we are not logged in.
+	{ // When generating static page, we should always consider we are not logged in.
 		return false;
 	}
 
 	return (!empty($user_ID));
 }
-
 
 
 /*
@@ -232,14 +230,16 @@ function get_userdatabylogin( $user_login )
 	return($myrow);
 }
 
-/*
+
+/**
  * get_userdata(-)
  */
-function get_userdata($userid)
+function get_userdata( $userid )
 {
 	global $DB, $cache_userdata;
+
 	if( empty($cache_userdata[$userid] ) )
-	{	// We do a progressive cache load beacuse there can be many many users!
+	{ // We do a progressive cache load because there can be many many users!
 		$sql = "SELECT *
 						FROM T_users
 						WHERE ID = $userid";
@@ -258,7 +258,7 @@ function get_userdata($userid)
 }
 
 
-/*
+/**
  * get_usernumposts(-)
  */
 function get_usernumposts( $userid )
@@ -270,7 +270,7 @@ function get_usernumposts( $userid )
 }
 
 
-/*
+/**
  * get_user_info(-)
  */
 function get_user_info( $show = '', $this_userdata = '' )
@@ -278,7 +278,7 @@ function get_user_info( $show = '', $this_userdata = '' )
 	global $userdata;
 
 	if( empty( $this_userdata ) )
-	{	// We want the current user
+	{ // We want the current user
 		$this_userdata = & $userdata;
 	}
 
@@ -318,7 +318,7 @@ function get_user_info( $show = '', $this_userdata = '' )
 }
 
 
-/*
+/**
  * user_info(-)
  *
  * Template tag
@@ -334,8 +334,7 @@ function user_info( $show = '', $format = 'raw', $display = true )
 }
 
 
-
-/*
+/**
  * user_login_link(-)
  *
  * Template tag; Provide a link to login
@@ -350,15 +349,15 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
 
 	if( !isset($generating_static) )
-	{	// We are not generating a static page here:
+	{ // We are not generating a static page here:
 		$redirect = '?redirect_to='.urlencode( regenerate_url() );
 	}
 	elseif( isset($edited_Blog) )
-	{	// We are generating a static page
+	{ // We are generating a static page
 		$redirect = '?redirect_to='.$edited_Blog->get('dynurl');
 	}
 	else
-	{	// We are in a weird situation
+	{ // We are in a weird situation
 		$redirect = '';
 	}
 
@@ -369,7 +368,8 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	echo $after;
 }
 
-/*
+
+/**
  * user_register_link(-)
  *
  * Template tag; Provide a link to new user registration
@@ -379,7 +379,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	global $htsrv_url, $Settings, $edited_Blog, $generating_static;
 
 	if( is_logged_in() || !$Settings->get('newusers_canregister'))
-	{	// There's no need to provide this link if already logged in or if we won't let him register
+	{ // There's no need to provide this link if already logged in or if we won't let him register
 		return false;
 	}
 
@@ -387,15 +387,15 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
 
 	if( !isset($generating_static) )
-	{	// We are not generating a static page here:
+	{ // We are not generating a static page here:
 		$redirect = '?redirect_to='.urlencode( regenerate_url() );
 	}
 	elseif( isset($edited_Blog) )
-	{	// We are generating a static page
+	{ // We are generating a static page
 		$redirect = '?redirect_to='.$edited_Blog->get('dynurl');
 	}
 	else
-	{	// We are in a weird situation
+	{ // We are in a weird situation
 		$redirect = '';
 	}
 
@@ -427,6 +427,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	echo '</a>';
 	echo $after;
 }
+
 
 /*
  * user_admin_link(-)
@@ -479,6 +480,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	echo $after;
 }
 
+
 /**
  * Display "User profile" title if it has been requested
  *
@@ -486,7 +488,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
  *
  * @param string Prefix to be displayed if something is going to be displayed
  * @param mixed Output format, see {@link format_to_output()} or false to
- *								return value instead of displaying it
+ *              return value instead of displaying it
  */
 function profile_title( $prefix = ' ', $display = 'htmlbody' )
 {
@@ -501,6 +503,7 @@ function profile_title( $prefix = ' ', $display = 'htmlbody' )
 			return $info;
 	}
 }
+
 
 /**
  * Check profile parameters
@@ -573,6 +576,5 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 																$Settings->get('user_minpwdlen')) );
 		}
 	}
-
 }
 ?>

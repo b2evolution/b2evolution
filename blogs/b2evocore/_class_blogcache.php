@@ -125,8 +125,9 @@ class BlogCache extends DataObjectCache
 				$where = 'bloguser_user_ID = '.$user_ID;
 				break;
 
-			case 'browse':  // QUESTION: should this imply '.._change = 1'?
-				$where = 'bloguser_perm_media_browse = 1';
+			case 'browse':
+				$where = 'bloguser_user_ID = '.$user_ID
+									.' AND bloguser_perm_media_browse = 1';
 				break;
 		}
 
