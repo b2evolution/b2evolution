@@ -315,15 +315,12 @@ class ItemList
 		 * ----------------------------------------------------
 		 */
 		if( !empty($poststart) )
-		// fp removed && (!$m) && (!$w) && (!$whichcat) && (!$s) 
-		// fp added: when in backoffice: always page
-		{
-			// echo 'POSTSTART-POSTEND';
+		{ // fp added: when in backoffice: always page
+			// echo 'POSTSTART-POSTEND ';
 			if( $postend < $poststart )
 			{
 				$postend = $poststart + $posts_per_page - 1;
 			}
-			
 			if ($what_to_show == 'posts' || $what_to_show == 'paged')
 			{
 				$posts = $postend - $poststart + 1;
@@ -332,12 +329,14 @@ class ItemList
 			elseif ($what_to_show == 'days')
 			{
 				$posts = $postend - $poststart + 1;
+				echo 'days=',$posts;
 				$lastpostdate = get_lastpostdate( $blog, $show_statuses );
-				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
+				$lastpostdate = mysql2date('Y-m-d 23:59:59',$lastpostdate);
+				echo $lastpostdate;
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$startdate = date('Y-m-d H:i:s', ($lastpostdate - (($poststart -1) * 86400)));
-				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend -1) * 86400)));
-				$where .= ' AND post_date > \''.$otherdate.'\' AND post_date < \''.$startdate.'\'';
+				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($postend) * 86400)));
+				$where .= ' AND post_date > \''.$otherdate.'\' AND post_date <= \''.$startdate.'\'';
 			}
 		}
 		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
@@ -347,7 +346,7 @@ class ItemList
 		}
 		elseif ($what_to_show == 'posts')
 		{
-			// echo 'LIMIT POSTS';
+			// echo 'LIMIT POSTS!';
 			$limits = ' LIMIT '.$posts_per_page;
 		}
 		elseif( $what_to_show == 'paged' )
@@ -361,7 +360,7 @@ class ItemList
 		}
 		elseif ($what_to_show == 'days')
 		{
-			// echo 'LIMIT DAYS';
+			// echo 'LIMIT DAYS ';
 			$lastpostdate = get_lastpostdate( $blog, $show_statuses );
 			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 			$lastpostdate = mysql2date('U',$lastpostdate);
