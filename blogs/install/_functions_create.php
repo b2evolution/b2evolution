@@ -416,50 +416,86 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
  * {@internal create_default_blogs(-) }}
  *
  */
-function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = 'Demo Blog A', $blog_a_longdesc = '#' )
+function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $blog_a_longdesc = '#' )
 {
 	global $default_locale, $query, $timestamp;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 
-	$default_blog_longdesc = T_("This is a demo blog named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s");
-
-	$default_more_longdesc = T_("<br />
-<br />
-You can edit this file to change the default skin used for this blog. You can also rename this file to a better name; but make sure you update the new name in the blogs admin.<br />
-<br />
-If you don't want to use skins, use the provided '<code>%s</code>' file instead.");
-
+	$default_blog_longdesc = T_("This is the long description for the blog named '%s'. %s");
 
 	echo "Creating default blogs... ";
 
 	$blog_shortname = 'Blog All';
 	$blog_stub = 'all';
-	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_all.php')."<br />
+	$blog_more_longdesc = "<br />
 <br />
-<strong>".T_("Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin.")."</strong>";
-	$blog_ID = 1;
-	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 4 );
+<strong>".T_("This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin.")."</strong>";
+	$blog_all_ID =	blog_create( 
+										sprintf( T_('%s Title'), $blog_shortname ), 
+										$blog_shortname, 
+										'', 
+										$blog_stub, 
+										$blog_stub.'.html', 
+										sprintf( T_('Tagline for %s'), $blog_shortname ), 
+										sprintf( T_('Short description for %s'), $blog_shortname ), 
+										sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+										$default_locale, 
+										sprintf( T_('Notes for %s'), $blog_shortname ), 
+										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										4 );
 
 	$blog_shortname = $blog_a_short;
+	if( $blog_a_long == '#' ) $blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
 	$blog_stub = 'a';
-	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
-	$blog_ID = 2;
-	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
-(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 4 );
+	$blog_a_ID =	blog_create( 
+										$blog_a_long, 
+										$blog_shortname, 
+										'', 
+										$blog_stub, 
+										$blog_stub.'.html', 
+										sprintf( T_('Tagline for %s'), $blog_shortname ), 
+										sprintf( T_('Short description for %s'), $blog_shortname ), 
+										sprintf(
+	(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ), 
+										$default_locale, 
+										sprintf( T_('Notes for %s'), $blog_shortname ), 
+										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										4 );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
-	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_b.php');
-	$blog_ID = 3;
-	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 4 );
+	$blog_b_ID =	blog_create( 
+										sprintf( T_('%s Title'), $blog_shortname ), 
+										$blog_shortname, 
+										'', 
+										$blog_stub, 
+										$blog_stub.'.html', 
+										sprintf( T_('Tagline for %s'), $blog_shortname ), 
+										sprintf( T_('Short description for %s'), $blog_shortname ), 
+										sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+										$default_locale, 
+										sprintf( T_('Notes for %s'), $blog_shortname ), 
+										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										4 );
 
 	$blog_shortname = 'Linkblog';
 	$blog_stub = 'links';
 	$blog_more_longdesc = '<br />
 <br />
-<strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
-	$blog_ID = 4;
-	$blog_linkblog_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', 0 /* no Link blog */ );
+<strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
+	$blog_linkblog_ID = blog_create( 
+										sprintf( T_('%s Title'), $blog_shortname ), 
+										$blog_shortname, 
+										'', 
+										$blog_stub, 
+										$blog_stub.'.html', 
+										sprintf( T_('Tagline for %s'), $blog_shortname ), 
+										sprintf( T_('Short description for %s'), $blog_shortname ), 
+										sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+										$default_locale, 
+										sprintf( T_('Notes for %s'), $blog_shortname ), 
+										sprintf( T_('Keywords for %s'), $blog_shortname ), 
+										0 /* no Link blog */ );
 
 	echo "OK.<br />\n";
 
@@ -524,39 +560,41 @@ function create_default_contents( $populate_blog_a = true )
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Clean Permalinks! :idea:"), T_("<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>
+	bpost_create( 1, T_("Clean Permalinks!"), T_("b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.
 
-<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Options screen... (check 'use extra-path info')</p>"), $now, $cat_b2evo );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Apache optimization... :idea:"), T_("<p>In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].</p>
-
-<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine.</p>"), $now, $cat_b2evo );
+Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Settings screen... (check 'Use extra-path info')"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("About evoSkins... :idea:"), T_("<p>By default, b2evolution blogs are displayed using a default skin.</p>
+	bpost_create( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].
 
-<p>Readers can choose a new skin by using the skin switcher integrated in most skins.</p>
-
-<p>You can change the default skin used for any blog by editing the parameters you will find in the stub file, for example <code>blog_b.php</code>. Of course, that is unless you have switched to using templates (like <code>noskin_b.php</code>) instead of stub files (like <code>blog_b.php</code>) + skins.</p>
-
-<p>You can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder. Read the manual on evoSkins!</p>"), $now, $cat_b2evo );
+This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Skins *or* Templates ?"), T_("<p>By default, all pre-installed blogs use skins, not templates. (More on skins in another post.)</p>
+	bpost_create( 1, T_("About evoSkins..."), T_("By default, b2evolution blogs are displayed using a default skin.
 
-<p>That means, blogs are accessed through 'stub' files called something like '<code>blog_b.php</code>'. These files set a few parameters such as the blog to display and the default skin to use, then they pass on the display job to a skin. You can edit the stub files to change the default skin used as well as other parameters. </p>
+Readers can choose a new skin by using the skin switcher integrated in most skins.
 
-<p>Alternatively, if you wish to use plain templates instead of skins, use the provided '<code>noskin_*.php</code>' files instead of the stub files. For example, for Blog B, the template file would be '<code>noskin_b.php</code>'. Just replace '<code>blog_b.php</code>' with '<code>noskin_b.php</code>' in the blogs admin.</p>
+You can change the default skin used for any blog by editing the blog parameters in the admin interface. You can also force the use of the default skin for everyone.
 
-<!--more-->
+Otherwise, you can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder.
 
-<p>Either way, you can rename the stub/template files (<code>blog_*.php</code> or <code>noskin_*.php</code>) to better names, including to '<code>index.php</code>' for your main blog; but once again, make sure you update the new names in the blogs admin.</p>
+To start customizing a skin, open its '<code>_main.php</code>' file in an editor and read the comments in there. And, of course, read the manual on evoSkins!"), $now, $cat_b2evo );
 
-<p>Finally, if you don't use templates, you can delete all <code>noskin_*.php</code> files if you want. Also, if you don't use skins, you can delete all <code>blog_*.php</code> files as well as the subfolders in the /skins folder. But, do not delete the whole skins folder, even templates need some files in there!</p>"), $now, $cat_b2evo );
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, T_("Skins, Stubs and Templates..."), T_("By default, all pre-installed blogs are displayed using a skin. (More on skins in another post.)
+
+That means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.
+
+Alternatively, if you don't want to use the default DB parameters and want to, say, force a skin, a category or a specific linkblog, you can create a stub file like the provided '<code>a_stub.php</code>' and call your blog through this stub instead of index.php .
+
+Finally, if you need to do some very specific customizations to your blog, you may use plain templates instead of skins. In this case, call your blog through a full template, like the provided '<code>a_noskin.php</code>'.
+
+You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.
+
+Either way, make sure you go to the blogs admin and set the correct access method for your blog. When using a stub or a template, you must also set its filename in the 'Stub name' field. Otherwise, the permalinks will not function properly."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -567,21 +605,6 @@ function create_default_contents( $populate_blog_a = true )
 
 <p>You can create additional blogs or delete unwanted blogs from the blogs admin.</p>"), $now, $cat_b2evo );
 
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("File permissions!"), 
-								T_("<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>
-
-<ul>
-
-	<li>In order to create new blogs from the admin interface or to generate static pages for your blogs, the <code>/blogs</code> folder needs to be writable by the PHP process on the server. You may need to do a chmod on this folder. If you don't know exactly try a chmod 777. You can do this either with an FTP program, a Unix shell or a web file manager like the one built into cPanel. If your server is running Windows you probably don't need to change anything.</li>
-
-	<li>In order to use the template editor for the custom skin, your <code>/skins/custom</code> folder needs to be writable by the PHP process on the server. Same as above.</li>
-
-	<li>This isn't necessary but ensures your security: do a chmod 644 on all files in the <code>/blogs/conf</code> directory, so no-one can overwrite them except you. If your server is running Windows, then set the file to 'read-only'.</li>
-
-</ul>"), $now, $cat_b2evo );
 
 	// Create newbie posts:
 	$now = date('Y-m-d H:i:s',$timestamp++);

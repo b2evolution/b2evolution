@@ -33,8 +33,16 @@
 	<fieldset>
 		<legend><?php echo T_('Description') ?></legend>
 		<?php
-			form_text( 'blog_tagline', $blog_tagline, 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template'), 250 );
+			form_text( 'blog_tagline', $blog_tagline, 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
+		?>
+		
+		<fieldset>
+			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div>
+			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="8" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
+			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
+		</fieldset>
 
+		<?php
 			form_text( 'blog_description', $blog_description, 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
 
 			form_text( 'blog_keywords', $blog_keywords, 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
@@ -42,15 +50,9 @@
 		?>
 
 		<fieldset>
-			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div>
-			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="5" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
-			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
-		</fieldset>
-
-		<fieldset>
 			<div class="label"><label for="blog_notes" ><?php echo T_('Notes') ?>:</label></div>
-			<div class="input"><textarea name="blog_notes" id="blog_notes" rows="5" cols="50" class="large"><?php echo $blog_notes ?></textarea>
-			<span class="notes"><?php echo T_('Additional info. [we need more description here]') ?></span></div>
+			<div class="input"><textarea name="blog_notes" id="blog_notes" rows="8" cols="50" class="large"><?php echo $blog_notes ?></textarea>
+			<span class="notes"><?php echo T_('Additional info.') ?></span></div>
 		</fieldset>
 	
 	</fieldset>
