@@ -60,12 +60,12 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				'links_extrapath' => 0
 			);
 			
-			foreach( array('posts_per_page', 'what_to_show', 'archive_mode', 'autoBR',
+			foreach( array( 'default_blog_ID', 'posts_per_page', 'what_to_show', 'archive_mode', 'autoBR',
 											'newusers_canregister', 'newusers_grp_ID', 'newusers_level',
 											'links_extrapath', 'permalink_type') as $param )
 			{
 				if( param($param, 'string', '', false, false, false) !== false ) // don't force setting
-				{
+				{ // We have provided a new value
 					change_settings( $param, $$param );
 				}
 				elseif( in_array($$param, $defaults) )

@@ -88,6 +88,7 @@ function form_select_object(
 	& $field_object,
 	$field_label,
 	$field_note = '',
+	$allow_none = false,
 	$field_class = '' )
 {
 	echo '<fieldset>';
@@ -98,7 +99,7 @@ function form_select_object(
 		echo ' class="', $field_class,'"';
 	}
 	echo '/>';
-	$field_object->option_list( $field_value );
+	$field_object->option_list( $field_value, $allow_none );
 	echo '  </select>';
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";

@@ -64,7 +64,7 @@ locale_activate( get_bloginfo('locale') );
 
 // Extra path info decoding:
 $ReqURI = $_SERVER['REQUEST_URI'];
-// echo ":".$ReqURI."<br />";
+// echo "ReqURI:".$ReqURI."<br />";
 $path_string = explode( '?', $ReqURI, 2 );
 $path_elements = explode( '/', $path_string[0], 20 );						// slice it
 $stub = get_bloginfo( 'stub' );

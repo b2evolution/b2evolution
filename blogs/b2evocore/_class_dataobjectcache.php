@@ -188,13 +188,21 @@ class DataObjectCache
 	 * {@internal DataObjectCache::get_by_ID(-) }}
 	 *
 	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID 0
 	 */
-	function option_list( $default = 0 )
+	function option_list( $default = 0, $allow_none = false )
 	{
 		global $cache_Groups;
 		
 		if( ! $this->all_loaded )
 			$this->load_all();
+
+		if( $allow_none )
+		{
+			echo '<option value="0"';
+			if( 0 == $default ) echo ' selected="selected"';
+			echo '>', T_('None') ,'</option>'."\n";
+		}
 
 		foreach( $this->cache as $loop_Obj )
 		{

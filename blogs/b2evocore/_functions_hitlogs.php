@@ -35,7 +35,7 @@ if ($topRefererList)
 function log_hit()
 {
 	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
-	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page;
+	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI;
 	
 	# TODO: check for already logged?
 	

@@ -40,7 +40,7 @@ locale_activate( $default_locale );
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <title>b2 evolution: Database tables installation</title>
-<!-- InstanceEndEditable --><link href="b2evo.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable --><link href="../rsc/b2evo.css" rel="stylesheet" type="text/css" />
  
 <!-- InstanceBeginEditable name="head" -->
 <!-- InstanceEndEditable -->
