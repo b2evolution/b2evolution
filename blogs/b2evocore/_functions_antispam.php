@@ -12,7 +12,7 @@
  *
  * Insert a new abuse string into DB
  */
-function antispam_create( $abuse_string )
+function antispam_create( $abuse_string, $aspm_source = 'local' )
 {
 	global $tableantispam, $querycount, $cache_antispam;
 	
@@ -24,7 +24,7 @@ function antispam_create( $abuse_string )
 	if( antispam_url($abuse_string) ) return false;
 	
 	// Insert new string into DB:
-	$sql ="INSERT INTO $tableantispam(aspm_string) VALUES('$abuse_string')";
+	$sql ="INSERT INTO $tableantispam( aspm_string, aspm_source ) VALUES( '$abuse_string', '$aspm_source' )";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 
@@ -32,6 +32,22 @@ function antispam_create( $abuse_string )
 	$cache_antispam[] = $abuse_string;
 
 	return true;
+}
+
+
+/*
+ * antispam_update_source(-)
+ *
+ * Note: We search by string because we sometimes don't know the ID 
+ * (e-g when download already in list/cache)
+ */
+function antispam_update_source( $aspm_string, $aspm_source )
+{
+	global $tableantispam, $querycount;
+	
+	$sql ="UPDATE $tableantispam SET aspm_source = '$aspm_source' WHERE aspm_string = '$aspm_string'";
+	$querycount++;
+	mysql_query($sql) or mysql_oops( $sql );
 }
 
 /*
@@ -93,7 +109,7 @@ function list_antiSpam()
 {
 	global 	$querycount, $tableantispam, $res_stats;
 
-	$sql = "SELECT aspm_ID, aspm_string FROM $tableantispam ORDER BY aspm_string ASC";
+	$sql = "SELECT aspm_ID, aspm_string, aspm_source FROM $tableantispam ORDER BY aspm_string ASC";
 	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
@@ -115,6 +131,20 @@ function antiSpam_domain()
 	global $row_stats;
 	echo $row_stats['aspm_string'];
 }
+
+
+/*
+ * antiSpam_domain(-)
+ */
+function antispam_source( $disp = true )
+{
+	global $row_stats;
+	if( $disp )
+		echo $row_stats['aspm_source'];
+	else
+		return $row_stats['aspm_source'];
+}
+
 
 /*
  * keyword_ban(-)
@@ -197,7 +227,7 @@ function ban_affected_comments($banned)
  */
 function b2evonet_report_abuse( $abuse_string, $display = true ) 
 {
-	$test = 0;
+	$test = 1;
 
 	global $baseurl;
 	if( $display )
@@ -231,7 +261,10 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 									)  
 								);
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result );
+		if( $ret = xmlrpc_displayresult( $result ) )
+		{	// Remote operation successful:
+			antispam_update_source( $abuse_string, 'reported' );
+		}
 
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
@@ -288,11 +321,19 @@ function b2evonet_poll_abuse( $display = true )
 		$value = xmlrpc_decode($result->value());
 		if (is_array($value))
 		{	// We got an array of strings:
-			echo '<p>Adding strings to local blacklist:</p><ul>';
+			echo '<p>', T_('Adding strings to local blacklist'), ':</p><ul>';
 			foreach($value as $banned_string)
 			{
-				echo '<li>Adding: [', $banned_string, '] : ';
-				echo antispam_create( $banned_string ) ? 'OK.' : 'Not necessary! (Already handled)';
+				echo '<li>', T_('Adding:'), ' [', $banned_string, '] : ';
+				if( antispam_create( $banned_string, 'central' ) )
+				{
+					echo T_('OK.');
+				}
+				else
+				{
+					echo T_('Not necessary! (Already handled)');
+					antispam_update_source( $banned_string, 'central' );
+				}
 				echo '</li>';
 			}
 			echo '</ul>';

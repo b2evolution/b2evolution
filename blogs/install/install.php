@@ -237,8 +237,9 @@ function create_antispam()
 	$query = "CREATE TABLE $tableantispam (
 		aspm_ID bigint(11) NOT NULL auto_increment,
 		aspm_string varchar(80) NOT NULL,
+		aspm_source enum( 'local','reported','central' ) NOT NULL default 'local',
 		PRIMARY KEY (aspm_ID),
-		KEY aspm_string (aspm_string)
+		UNIQUE aspm_string (aspm_string)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 }

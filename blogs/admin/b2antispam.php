@@ -138,7 +138,15 @@ switch( $action )
 				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
 				<?php antiSpam_domain() ?>
 			</td>
-			<td>[<a href="b2antispam.php?action=report&keyword=<?php antiSpam_domain() ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>">Report</a>]</td>
+			<td>
+				<?php 
+					$aspm_source = antispam_source(false);
+					echo $aspm_source;
+					if( $aspm_source == 'local' )
+					{
+					?> [<a href="b2antispam.php?action=report&keyword=<?php antiSpam_domain() ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>">Report</a>]
+				<?php } ?>
+			</td>
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
