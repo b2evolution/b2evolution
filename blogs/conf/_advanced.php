@@ -382,5 +382,5 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
 
 $regexp_images = '/\.(jpe?g|gif|png|swf)$/i'; // match image files
-$regexp_filename = '#^[\w0-9äÄöÖüÜß\-_]+(\.[a-zA-Z0-9]+)?$#'; // match valid filename (no path allowed)
+$regexp_filename = '#^\.?[\w0-9äÄöÖüÜß\-_]+(\.[a-zA-Z0-9]+)?$#'; // match valid filename (no path allowed)
 ?>
