@@ -52,7 +52,7 @@ if( empty($mode) )
 		?>
 			<?php echo T_('Time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
 			&middot; <abbr title="<?php echo T_('Greenwich Mean Time '); ?>"><?php echo /* TRANS: short for Greenwich Mean Time */ T_('GMT:') ?></abbr> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
-			&middot; <?php echo T_('Logged in as:'), ' <strong>', $current_User->login; ?></strong>
+			&middot; <?php echo T_('Logged in as:'), ' <strong>', $current_User->disp('login'); ?></strong>
 		<?php } ?>
 		</div>
 
