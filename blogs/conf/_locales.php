@@ -108,7 +108,7 @@ $locales = array(
 										'enabled' => 1,
 									),
 	'lt-LT' => array( 'name' => NT_('Lithuanian (LT)'),
-										'charset' => 'Windows-1257',
+										'charset' => 'utf-8',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',
 										'messages' => 'lt_LT',

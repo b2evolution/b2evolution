@@ -37,7 +37,6 @@
  <!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="basic.css" type="text/css" />
 <link rel="stylesheet" href="fpnav.css" type="text/css" />
-<!-- InstanceParam name="rub1" type="text" value="Blog" --> 
 </head>
 <body>
 <div class="pageHeader">

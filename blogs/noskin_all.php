@@ -75,7 +75,6 @@
  <!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="skins/fplanque2002/basic.css" type="text/css" />
 <link rel="stylesheet" href="skins/fplanque2002/fpnav.css" type="text/css" />
-<!-- InstanceParam name="rub1" type="text" value="Blog" --> 
 </head>
 <body>
 <div class="pageHeader">
