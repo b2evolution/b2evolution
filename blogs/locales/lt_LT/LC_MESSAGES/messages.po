@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MG blog\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-03-21 01:47+0100\n"
+"POT-Creation-Date: 2004-04-03 02:29+0200\n"
 "PO-Revision-Date: 2004-03-09 13:22+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
@@ -24,8 +24,8 @@ msgid "my blogs"
 msgstr "mano blogai"
 
 #: ..\..\..\index.php:14
-msgid "A blog tool like it oughta be!"
-msgstr "Blogas toks kaip ir turi bûti!"
+msgid "Multilingual multiuser multiblog engine!"
+msgstr ""
 
 #: ..\..\..\index.php:15
 msgid "My blogs"
@@ -161,7 +161,7 @@ msgstr "Ðis ðablonas demonstruoja 3 blogus ið karto (vienà kairëje, 2 deðinëje)"
 #: ..\..\..\noskin_all.php:146 ..\..\..\noskin_all.php:162
 #: ..\..\..\noskin_b.php:146 ..\..\..\noskin_b.php:162
 #: ..\..\..\noskin_roll.php:145 ..\..\..\noskin_roll.php:161
-#: ..\..\..\summary.php:91 ..\..\..\skins\_blogroll.php:61
+#: ..\..\..\summary.php:91 ..\..\..\skins\_blogroll.php:63
 #: ..\..\..\skins\custom\_main.php:72 ..\..\..\skins\custom\_main.php:95
 #: ..\..\..\skins\fplanque2002\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:108
@@ -174,7 +174,7 @@ msgstr "Nekintanti (permanent) nuoroda á visà straipsná"
 #: ..\..\..\noskin_all.php:162 ..\..\..\noskin_b.php:146
 #: ..\..\..\noskin_b.php:162 ..\..\..\noskin_roll.php:145
 #: ..\..\..\noskin_roll.php:161 ..\..\..\admin\_edit_showposts.php:188
-#: ..\..\..\skins\_blogroll.php:61 ..\..\..\skins\custom\_main.php:95
+#: ..\..\..\skins\_blogroll.php:63 ..\..\..\skins\custom\_main.php:95
 #: ..\..\..\skins\fplanque2002\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:108
 #: ..\..\..\skins\guadeloupe\_main.php:62
@@ -185,7 +185,7 @@ msgstr "Arch. nuoroda"
 #: ..\..\..\noskin_a.php:239 ..\..\..\noskin_all.php:147
 #: ..\..\..\noskin_all.php:241 ..\..\..\noskin_b.php:147
 #: ..\..\..\noskin_b.php:250 ..\..\..\noskin_roll.php:146
-#: ..\..\..\noskin_roll.php:240 ..\..\..\admin\_edit_form.php:292
+#: ..\..\..\noskin_roll.php:240 ..\..\..\admin\_edit_form.php:303
 #: ..\..\..\admin\_edit_showposts.php:447 ..\..\..\skins\custom\_main.php:75
 #: ..\..\..\skins\custom\_main.php:173
 #: ..\..\..\skins\fplanque2002\_main.php:93
@@ -224,10 +224,10 @@ msgstr "- %d uþklausos iki ðiol"
 
 #: ..\..\..\multiblogs.php:273 ..\..\..\noskin_a.php:293
 #: ..\..\..\noskin_all.php:295 ..\..\..\noskin_b.php:304
-#: ..\..\..\noskin_roll.php:294 ..\..\..\skins\babyblues\_main.php:100
-#: ..\..\..\skins\bluesky\_main.php:206 ..\..\..\skins\custom\_main.php:238
+#: ..\..\..\noskin_roll.php:294 ..\..\..\skins\babyblues\_main.php:103
+#: ..\..\..\skins\bluesky\_main.php:203 ..\..\..\skins\custom\_main.php:238
 #: ..\..\..\skins\fplanque2002\_main.php:250
-#: ..\..\..\skins\guadeloupe\_main.php:207
+#: ..\..\..\skins\guadeloupe\_main.php:204
 msgid "Misc"
 msgstr "Ivairûs"
 
@@ -283,7 +283,7 @@ msgstr "Lankytojø statistika"
 #: ..\..\..\skins\custom\_main.php:167
 #: ..\..\..\skins\fplanque2002\_main.php:174
 #: ..\..\..\skins\fplanque2002\_main.php:180
-#: ..\..\..\skins\originalb2\_main.php:144
+#: ..\..\..\skins\originalb2\_main.php:143
 msgid "Search"
 msgstr "Paieðka"
 
@@ -325,7 +325,7 @@ msgstr "Iðvalyti"
 #: ..\..\..\skins\bluesky\_main.php:141 ..\..\..\skins\custom\_main.php:179
 #: ..\..\..\skins\fplanque2002\_main.php:192
 #: ..\..\..\skins\guadeloupe\_main.php:142
-#: ..\..\..\skins\originalb2\_main.php:136
+#: ..\..\..\skins\originalb2\_main.php:135
 msgid "Get selection"
 msgstr "Pasirinkti"
 
@@ -373,10 +373,8 @@ msgstr "Top Referalai"
 
 #: ..\..\..\noskin_a.php:286 ..\..\..\noskin_all.php:288
 #: ..\..\..\noskin_b.php:297 ..\..\..\noskin_roll.php:287
-#: ..\..\..\admin\_blogs_form.php:253 ..\..\..\skins\bluesky\_main.php:203
-#: ..\..\..\skins\custom\_main.php:231
+#: ..\..\..\admin\_blogs_form.php:253 ..\..\..\skins\custom\_main.php:231
 #: ..\..\..\skins\fplanque2002\_main.php:243
-#: ..\..\..\skins\guadeloupe\_main.php:204
 msgid "Blogroll"
 msgstr "Blogrolas"
 
@@ -389,11 +387,11 @@ msgstr "Sindikuoti ðá blogà"
 
 #: ..\..\..\noskin_a.php:344 ..\..\..\noskin_all.php:346
 #: ..\..\..\noskin_b.php:354 ..\..\..\noskin_roll.php:345
-#: ..\..\..\skins\babyblues\_main.php:124 ..\..\..\skins\bluesky\_main.php:233
+#: ..\..\..\skins\babyblues\_main.php:127 ..\..\..\skins\bluesky\_main.php:230
 #: ..\..\..\skins\custom\_main.php:278
 #: ..\..\..\skins\fplanque2002\_main.php:299
-#: ..\..\..\skins\guadeloupe\_main.php:234
-#: ..\..\..\skins\originalb2\_main.php:180
+#: ..\..\..\skins\guadeloupe\_main.php:231
+#: ..\..\..\skins\originalb2\_main.php:179
 #, php-format
 msgid "Totals: %d posts - %d queries - %01.3f seconds"
 msgstr "Viso: %d temø - %d uþklausø - %01.3f sekundþiø"
@@ -513,7 +511,7 @@ msgid "New blog"
 msgstr "Naujas blogas"
 
 #: ..\..\..\admin\b2blogs.php:93 ..\..\..\admin\b2blogs.php:251
-#: ..\..\..\admin\edit_actions.php:185
+#: ..\..\..\admin\edit_actions.php:203
 msgid "Cannot update, please correct these errors:"
 msgstr "Negalima atnaujinti, praðome iðtaisyti ðias klaidas:"
 
@@ -594,9 +592,9 @@ msgstr "Generuojamas puslapis<strong>%s</strong> á <strong>%s</strong>..."
 msgid "Writing to file..."
 msgstr "Raðoma á failà..."
 
-#: ..\..\..\admin\b2blogs.php:317 ..\..\..\admin\edit_actions.php:97
-#: ..\..\..\admin\edit_actions.php:218 ..\..\..\admin\edit_actions.php:309
-#: ..\..\..\admin\edit_actions.php:373
+#: ..\..\..\admin\b2blogs.php:317 ..\..\..\admin\edit_actions.php:113
+#: ..\..\..\admin\edit_actions.php:236 ..\..\..\admin\edit_actions.php:328
+#: ..\..\..\admin\edit_actions.php:392
 #: ..\..\..\b2evocore\_functions_antispam.php:272
 #: ..\..\..\b2evocore\_functions_antispam.php:385
 #: ..\..\..\b2evocore\_functions_pings.php:52
@@ -611,7 +609,7 @@ msgid "Browse blog:"
 msgstr "Narðyti blogà:"
 
 #: ..\..\..\admin\b2browse.php:59 ..\..\..\admin\b2categories.php:287
-#: ..\..\..\admin\b2edit.php:146
+#: ..\..\..\admin\b2edit.php:153
 #, fuzzy, php-format
 msgid ""
 "Since you're a newcomer, you'll have to wait for an admin to authorize you "
@@ -692,40 +690,40 @@ msgstr "Root (Nëra tëvo)"
 msgid "Edit category!"
 msgstr "Redaguoti kategorijà"
 
-#: ..\..\..\admin\b2edit.php:25 ..\..\..\admin\edit_actions.php:167
-#: ..\..\..\admin\edit_actions.php:264 ..\..\..\admin\edit_actions.php:397
-#: ..\..\..\admin\edit_actions.php:420
+#: ..\..\..\admin\b2edit.php:28 ..\..\..\admin\edit_actions.php:185
+#: ..\..\..\admin\edit_actions.php:282 ..\..\..\admin\edit_actions.php:416
+#: ..\..\..\admin\edit_actions.php:468
 msgid "Oops, no post with this ID."
 msgstr "Uuups, su ðiuo ID temø nerasta."
 
-#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\_menutop.php:54
+#: ..\..\..\admin\b2edit.php:33 ..\..\..\admin\_menutop.php:54
 msgid "Editing post"
 msgstr "Redaguojama tema"
 
-#: ..\..\..\admin\b2edit.php:33
+#: ..\..\..\admin\b2edit.php:36
 #, fuzzy, php-format
 msgid "#%d in blog: %s"
 msgstr "Nauja kategorija bloge: %s"
 
-#: ..\..\..\admin\b2edit.php:69
+#: ..\..\..\admin\b2edit.php:72
 msgid "Oops, no comment with this ID!"
 msgstr "Uuups, su ðiuo ID komentarø nëra!"
 
-#: ..\..\..\admin\b2edit.php:71
+#: ..\..\..\admin\b2edit.php:74
 msgid "Editing comment"
 msgstr "Redaguojamas komentaras"
 
-#: ..\..\..\admin\b2edit.php:99 ..\..\..\admin\_menutop.php:48
+#: ..\..\..\admin\b2edit.php:106 ..\..\..\admin\_menutop.php:48
 msgid "New post in blog:"
 msgstr "Nauja tema bloge:"
 
-#: ..\..\..\admin\b2edit.php:127 ..\..\..\admin\b2edit.php:159
+#: ..\..\..\admin\b2edit.php:134 ..\..\..\admin\b2edit.php:163
 msgid ""
 "Since this blog has no categories, you cannot post to it. You must create "
 "categories first."
 msgstr "Kadangi ðis blogas neturi kategorijø, jûs nagalite raðyti á já. Pirma sukurkite kategorijà."
 
-#: ..\..\..\admin\b2edit.php:131
+#: ..\..\..\admin\b2edit.php:138
 msgid "Switch to this blog (keeping your input if Javascript is active)"
 msgstr "Persijungti á ðá blogà (paraðytas tekstas iðliks, jei JavaSkript palaikymas Jûsø narðyklëje ájungtas)"
 
@@ -845,7 +843,7 @@ msgstr "áraðas po áraðo"
 msgid "Archive mode"
 msgstr "Archyvavimo bûdas"
 
-#: ..\..\..\admin\b2options.php:99 ..\..\..\admin\_edit_form.php:152
+#: ..\..\..\admin\b2options.php:99 ..\..\..\admin\_edit_form.php:163
 #: ..\..\..\admin\_edit_showposts.php:287 ..\..\..\skins\_feedback.php:195
 msgid "Auto-BR"
 msgstr "Auto-BR"
@@ -1281,7 +1279,7 @@ msgstr "Nuotraukos Detalës"
 msgid "Size"
 msgstr "Dydis"
 
-#: ..\..\..\admin\b2upload.php:222 ..\..\..\admin\_edit_form.php:397
+#: ..\..\..\admin\b2upload.php:222 ..\..\..\admin\_edit_form.php:409
 msgid "Type"
 msgstr "Tipas"
 
@@ -1293,85 +1291,85 @@ msgstr "Uþverti ðá langà"
 msgid "User management"
 msgstr "Vartotojø valdymas"
 
-#: ..\..\..\admin\edit_actions.php:40 ..\..\..\admin\_menutop.php:48
+#: ..\..\..\admin\edit_actions.php:53 ..\..\..\admin\_menutop.php:48
 msgid "Adding new post..."
 msgstr "Áraðomas naujas strapsnis..."
 
-#: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:181
-#: ..\..\..\admin\edit_actions.php:436 ..\..\..\htsrv\comment_post.php:52
-#: ..\..\..\htsrv\trackback.php:66 ..\..\..\xmlsrv\xmlrpc.php:1428
+#: ..\..\..\admin\edit_actions.php:88 ..\..\..\admin\edit_actions.php:199
+#: ..\..\..\admin\edit_actions.php:432 ..\..\..\htsrv\comment_post.php:52
+#: ..\..\..\htsrv\trackback.php:66 ..\..\..\xmlsrv\xmlrpc.php:1435
 msgid "Supplied URL is invalid: "
 msgstr "Pateiktas URL neteisingas:"
 
-#: ..\..\..\admin\edit_actions.php:76 ..\..\..\htsrv\getmail.php:250
+#: ..\..\..\admin\edit_actions.php:92 ..\..\..\htsrv\getmail.php:250
 msgid "Cannot post, please correct these errors:"
 msgstr "Negalima áraðyti, praðome iðtaisyti ðias klaidas:"
 
-#: ..\..\..\admin\edit_actions.php:77 ..\..\..\admin\edit_actions.php:186
-#: ..\..\..\admin\edit_actions.php:441
+#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:204
+#: ..\..\..\admin\edit_actions.php:437
 msgid "Back to post editing"
 msgstr "Atgal á straipsnio redagavimà"
 
-#: ..\..\..\admin\edit_actions.php:83
+#: ..\..\..\admin\edit_actions.php:99
 msgid "Recording post..."
 msgstr "Daromas áraðas..."
 
-#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:369
+#: ..\..\..\admin\edit_actions.php:109 ..\..\..\admin\edit_actions.php:388
 msgid "Sleeping..."
 msgstr "Miegu..."
 
-#: ..\..\..\admin\edit_actions.php:103 ..\..\..\admin\edit_actions.php:224
-#: ..\..\..\admin\edit_actions.php:315
+#: ..\..\..\admin\edit_actions.php:119 ..\..\..\admin\edit_actions.php:242
+#: ..\..\..\admin\edit_actions.php:334
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr "Áraðas neskelbiams vieðai: atðaukiamas \"trackback\", \"pingback\" ir blogø ping'inimas..."
 
-#: ..\..\..\admin\edit_actions.php:131
+#: ..\..\..\admin\edit_actions.php:147
 msgid "Posting Done..."
 msgstr "Áraðas Padarytas..."
 
-#: ..\..\..\admin\edit_actions.php:146 ..\..\..\admin\_menutop.php:54
+#: ..\..\..\admin\edit_actions.php:162 ..\..\..\admin\_menutop.php:54
 msgid "Updating post..."
 msgstr "Atnaujinami áraðai..."
 
-#: ..\..\..\admin\edit_actions.php:240 ..\..\..\admin\edit_actions.php:326
+#: ..\..\..\admin\edit_actions.php:258 ..\..\..\admin\edit_actions.php:345
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Áraðas jau nusiuntë pingà: atðaukiamas blogø pinginimas..."
 
-#: ..\..\..\admin\edit_actions.php:252 ..\..\..\admin\edit_actions.php:338
+#: ..\..\..\admin\edit_actions.php:270 ..\..\..\admin\edit_actions.php:357
 msgid "Updating done..."
 msgstr "Atnaujinimas padarytas..."
 
-#: ..\..\..\admin\edit_actions.php:269 ..\..\..\admin\_menutop.php:54
+#: ..\..\..\admin\edit_actions.php:287 ..\..\..\admin\_menutop.php:54
 msgid "Updating post status..."
 msgstr "Atnaujinamo áraðo bûsena..."
 
-#: ..\..\..\admin\edit_actions.php:351
+#: ..\..\..\admin\edit_actions.php:370
 msgid "Oops, no post with this ID!"
 msgstr "Uuups, nerasta áraðø su ðiuo ID!"
 
-#: ..\..\..\admin\edit_actions.php:355 ..\..\..\admin\edit_actions.php:363
+#: ..\..\..\admin\edit_actions.php:374 ..\..\..\admin\edit_actions.php:382
 #: ..\..\..\admin\_menutop.php:54
 msgid "Deleting post..."
 msgstr "Trinami áraðai..."
 
-#: ..\..\..\admin\edit_actions.php:378
+#: ..\..\..\admin\edit_actions.php:397
 msgid "Deleting Done..."
 msgstr "Trynimas Baigtas..."
 
-#: ..\..\..\admin\edit_actions.php:440
+#: ..\..\..\admin\edit_actions.php:436
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Negaliu atnaujinti komentarø, praðome iðtaisyti ðias klaidas:"
 
-#: ..\..\..\admin\edit_actions.php:471
+#: ..\..\..\admin\edit_actions.php:490
 msgid "Back to posts!"
 msgstr "Atgal á straipsnius!"
 
-#: ..\..\..\admin\edit_actions.php:473
+#: ..\..\..\admin\edit_actions.php:492
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr "Jûs galbût norësite sugeneruoti statinius puslapius ar perþiûrëti savo blogus..."
 
-#: ..\..\..\admin\edit_actions.php:481
+#: ..\..\..\admin\edit_actions.php:500
 msgid "New post"
 msgstr "Naujas straipsnis"
 
@@ -1709,7 +1707,7 @@ msgid ""
 "the same blog (smallest category number)."
 msgstr "<strong>Atminkite:</strong>Iðtrinant kategorijà, jai priklausanèios temos netrinamos. Jos priskiriamos \"tëvo\" kategorijai. Trinant pagrindinæ \"root\" kategorijà, temos bus priskirtos seniausiai sukurtai egzistuojanciai kategorijai tame paèiame bloge (su maþiausiu kategorijos numeriu)."
 
-#: ..\..\..\admin\_edit_form.php:100 ..\..\..\admin\_quicktags.php:188
+#: ..\..\..\admin\_edit_form.php:100 ..\..\..\admin\_quicktags.php:342
 msgid "Title"
 msgstr "Pavadinimas"
 
@@ -1729,155 +1727,155 @@ msgstr "Nuoroda á url"
 msgid "Email"
 msgstr "El. Paðtas"
 
-#: ..\..\..\admin\_edit_form.php:133 ..\..\..\admin\_quicktags.php:164
-#: ..\..\..\admin\_users_form.php:46 ..\..\..\admin\_users_list.php:28
-#: ..\..\..\skins\_profile.php:70
+#: ..\..\..\admin\_edit_form.php:133 ..\..\..\admin\_quicktags.php:325
+#: ..\..\..\admin\_quicktags.php:337 ..\..\..\admin\_users_form.php:46
+#: ..\..\..\admin\_users_list.php:28 ..\..\..\skins\_profile.php:70
 msgid "URL"
 msgstr "URL"
 
-#: ..\..\..\admin\_edit_form.php:152
+#: ..\..\..\admin\_edit_form.php:163
 msgid "(converts line-breaks into &lt;br /&gt; tags)"
 msgstr "(konvertuoja eilutës perkëlimà á  &lt;br /&gt;)"
 
-#: ..\..\..\admin\_edit_form.php:157
+#: ..\..\..\admin\_edit_form.php:168
 msgid "Preview"
 msgstr "Perþiûra"
 
-#: ..\..\..\admin\_edit_form.php:163
+#: ..\..\..\admin\_edit_form.php:174
 msgid "Blog this !"
 msgstr "Tinka!"
 
-#: ..\..\..\admin\_edit_form.php:164
+#: ..\..\..\admin\_edit_form.php:175
 msgid "Edit this !"
 msgstr "Redaguoti!"
 
-#: ..\..\..\admin\_edit_form.php:169
+#: ..\..\..\admin\_edit_form.php:180
 msgid "Spellcheck"
 msgstr "Tikrinti klaidas"
 
-#: ..\..\..\admin\_edit_form.php:175
+#: ..\..\..\admin\_edit_form.php:186
 msgid "Upload a file/image"
 msgstr "Atsiøsti failà/nuotraukà"
 
-#: ..\..\..\admin\_edit_form.php:180
+#: ..\..\..\admin\_edit_form.php:191
 msgid "Advanced properties"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:189
+#: ..\..\..\admin\_edit_form.php:200
 #, fuzzy
 msgid "Edit timestamp"
 msgstr "Paskutinio atnaujinimo laikas ir data"
 
-#: ..\..\..\admin\_edit_form.php:227
+#: ..\..\..\admin\_edit_form.php:238
 msgid "Pingback"
 msgstr "Pingback'ai"
 
-#: ..\..\..\admin\_edit_form.php:227
+#: ..\..\..\admin\_edit_form.php:238
 msgid "(Send a pingback to all URLs in this post)"
 msgstr "(Siøsti Pingback'us á visus ðiame straipsnyje nurodytus URL)"
 
-#: ..\..\..\admin\_edit_form.php:234
+#: ..\..\..\admin\_edit_form.php:245
 msgid "Trackback URLs"
 msgstr "Trackback'o URL"
 
-#: ..\..\..\admin\_edit_form.php:234
+#: ..\..\..\admin\_edit_form.php:245
 msgid "(Separate by space)"
 msgstr "(Atskirti tarpu)"
 
-#: ..\..\..\admin\_edit_form.php:252 ..\..\..\admin\_edit_form.php:398
+#: ..\..\..\admin\_edit_form.php:263 ..\..\..\admin\_edit_form.php:410
 #: ..\..\..\admin\_edit_showposts.php:135
 msgid "Status"
 msgstr "Statusas"
 
-#: ..\..\..\admin\_edit_form.php:258
+#: ..\..\..\admin\_edit_form.php:269
 msgid "The post will be publicly published"
 msgstr "Áraðas bus vieðai paskelbtas"
 
-#: ..\..\..\admin\_edit_form.php:258 ..\..\..\admin\_edit_showposts.php:345
+#: ..\..\..\admin\_edit_form.php:269 ..\..\..\admin\_edit_showposts.php:345
 msgid "Published (Public)"
 msgstr "Paskelbtas (Vieðas)"
 
-#: ..\..\..\admin\_edit_form.php:264
+#: ..\..\..\admin\_edit_form.php:275
 msgid "The post will be published but visible only by logged-in team members"
 msgstr ""
 "Straipsnis bus paskelbtas, bet matomas tik prisijungusiems komandos nariams."
 
-#: ..\..\..\admin\_edit_form.php:264 ..\..\..\admin\_edit_showposts.php:347
+#: ..\..\..\admin\_edit_form.php:275 ..\..\..\admin\_edit_showposts.php:347
 msgid "Protected (Members only)"
 msgstr "Ribota (Tik nariams)"
 
-#: ..\..\..\admin\_edit_form.php:270
+#: ..\..\..\admin\_edit_form.php:281
 msgid "The post will be published but visible only by yourself"
 msgstr "Straipsnis bus paskelbtas, bet matysite tik patys"
 
-#: ..\..\..\admin\_edit_form.php:270 ..\..\..\admin\_edit_showposts.php:349
+#: ..\..\..\admin\_edit_form.php:281 ..\..\..\admin\_edit_showposts.php:349
 msgid "Private (You only)"
 msgstr "Privatu (Tik jûs)"
 
-#: ..\..\..\admin\_edit_form.php:276 ..\..\..\admin\_edit_form.php:282
+#: ..\..\..\admin\_edit_form.php:287 ..\..\..\admin\_edit_form.php:293
 msgid "The post will appear only in the backoffice"
 msgstr "Straipsnis atsiras tik administracinëje dalyje"
 
-#: ..\..\..\admin\_edit_form.php:276 ..\..\..\admin\_edit_showposts.php:351
+#: ..\..\..\admin\_edit_form.php:287 ..\..\..\admin\_edit_showposts.php:351
 msgid "Draft (Not published!)"
 msgstr "Juodraðtis (Neskelbtas!)"
 
-#: ..\..\..\admin\_edit_form.php:282 ..\..\..\admin\_edit_showposts.php:353
+#: ..\..\..\admin\_edit_form.php:293 ..\..\..\admin\_edit_showposts.php:353
 msgid "Deprecated (Not published!)"
 msgstr "Atðauktas (Neskelbtas!)"
 
-#: ..\..\..\admin\_edit_form.php:296
+#: ..\..\..\admin\_edit_form.php:307
 msgid ""
 "Select main category in target blog and optionnaly check addtionnal "
 "categories"
 msgstr "Pasirinkite pagrindinæ kategorijà aktyviama bloge. Papildomai galite pasirinkti kitas kategorijas"
 
-#: ..\..\..\admin\_edit_form.php:317
+#: ..\..\..\admin\_edit_form.php:328
 msgid "Select as an additionnal category"
 msgstr "Pasirinkite kaip papildomà kategorijà"
 
-#: ..\..\..\admin\_edit_form.php:330
+#: ..\..\..\admin\_edit_form.php:341
 msgid "Select as MAIN category"
 msgstr "Pasirinkti kaip PAGRINDINÆ kategorijà"
 
-#: ..\..\..\admin\_edit_form.php:357
+#: ..\..\..\admin\_edit_form.php:369
 msgid "Note: Cross posting among multiple blogs is enabled."
 msgstr "Pastaba: Raðymas keliuose bloguose iðkart ájungtas."
 
-#: ..\..\..\admin\_edit_form.php:368
+#: ..\..\..\admin\_edit_form.php:380
 msgid "Note: Cross posting among multiple blogs is currently disabled."
 msgstr "Pastaba: Raðymas keliuose bloguose iðkart iðjungtas."
 
-#: ..\..\..\admin\_edit_form.php:370
+#: ..\..\..\admin\_edit_form.php:382
 msgid "Note: Cross posting among multiple categories is currently disabled."
 msgstr "Pastaba: Raðymas keliose kategorijose iðkart iðjungtas."
 
-#: ..\..\..\admin\_edit_form.php:380 ..\..\..\admin\_edit_showposts.php:202
+#: ..\..\..\admin\_edit_form.php:392 ..\..\..\admin\_edit_showposts.php:202
 #: ..\..\..\skins\_feedback.php:43
 msgid "Comments"
 msgstr "Komentarai"
 
-#: ..\..\..\admin\_edit_form.php:382
+#: ..\..\..\admin\_edit_form.php:394
 msgid "Visitors can leave comments on this post."
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:382
+#: ..\..\..\admin\_edit_form.php:394
 msgid "Open"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:384
+#: ..\..\..\admin\_edit_form.php:396
 msgid "Visitors can NOT leave comments on this post."
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:384
+#: ..\..\..\admin\_edit_form.php:396
 msgid "Closed"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:396
+#: ..\..\..\admin\_edit_form.php:408
 msgid "Comment info"
 msgstr "Komentaro informacija"
 
-#: ..\..\..\admin\_edit_form.php:399
+#: ..\..\..\admin\_edit_form.php:411
 msgid "IP address"
 msgstr "IP adresas"
 
@@ -2127,74 +2125,69 @@ msgstr "Ðablonai"
 msgid "Users"
 msgstr "Vartotojai"
 
-#: ..\..\..\admin\_quicktags.php:180
-msgid "ALTernate text"
-msgstr "ALTernatyvus tekstas"
-
-#. TRANS: Default title when inserting links into post
-#: ..\..\..\admin\_quicktags.php:189
-msgid "External - English"
-msgstr "Iðorinië - Anglø"
-
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:38
 msgid "INSerted [Alt-I]"
 msgstr "Áterpti [Alt-I]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:46
 msgid "DELeted [Alt-D]"
 msgstr "Iðtrinti [Alt-D]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:54
 msgid "STRong [Alt-S]"
 msgstr "Pastorinti [Alt-S]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:62
 msgid "EMphasis [Alt-E]"
 msgstr "Pakreipti (itallic) [Alt-E]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:70
 msgid "CODE [Alt-C]"
 msgstr "KODAS [Alt-C]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:78
 msgid "Paragraph [Alt-P]"
 msgstr "Paragrafas [Alt-P]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:86
 msgid "Unordered List [Alt-U]"
 msgstr "Nerûðiuotas Sàraðas [Alt-U]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:101
 msgid "List Item [Alt-L]"
 msgstr "Sàraðo Elementas [Alt-L]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:109
 msgid "BLOCKQUOTE [Alt-B]"
 msgstr "BLOCKQUOTE [Alt-B]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:117
 msgid "IMaGe [Alt-G]"
 msgstr "Nuotrauka [Alt-G]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:126
 msgid "A href [Alt-A]"
 msgstr "A href [Alt-A]"
 
-#: ..\..\..\admin\_quicktags.php:214
-msgid "Close all tags"
-msgstr "Iðjungti visus plëtinius"
-
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:142
 msgid "More [Alt-M]"
 msgstr "Daugiau [Alt-M]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:151
 msgid "no teaser [Alt-T]"
 msgstr "nëra ávado [Alt-T]"
 
-#: ..\..\..\admin\_quicktags.php:214
+#: ..\..\..\admin\_quicktags.php:160
 msgid "next page [Alt-Q]"
 msgstr "kitas puslapis [Alt-Q]"
+
+#: ..\..\..\admin\_quicktags.php:225
+msgid "Close all tags"
+msgstr "Iðjungti visus plëtinius"
+
+#: ..\..\..\admin\_quicktags.php:341
+msgid "ALTernate text"
+msgstr "ALTernatyvus tekstas"
 
 #: ..\..\..\admin\_users_form.php:16
 msgid "Profile for:"
@@ -2410,183 +2403,183 @@ msgstr "Surasti neteisingi URL:"
 msgid "Tag %s may not contain raw character data"
 msgstr "Plëtinyje %s nereikëtu naudoti kodavimo simboliø"
 
-#: ..\..\..\b2evocore\_class_itemlist.php:671
+#: ..\..\..\b2evocore\_class_itemlist.php:680
 msgid "Invalid post, please correct these errors:"
 msgstr "Negalima áraðyti, praðome iðtaisyti ðias klaidas:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:81 ..\..\..\b2evocore\_class_pop3.php:89
-#: ..\..\..\b2evocore\_class_pop3.php:101
+#: ..\..\..\b2evocore\_class_pop3.php:80 ..\..\..\b2evocore\_class_pop3.php:88
+#: ..\..\..\b2evocore\_class_pop3.php:100
 msgid "POP3 connect:"
 msgstr "POP3 prisijungimas:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:81
+#: ..\..\..\b2evocore\_class_pop3.php:80
 msgid "No server specified"
 msgstr "Nenurodytas serveris"
 
-#: ..\..\..\b2evocore\_class_pop3.php:89
-#: ..\..\..\b2evocore\_class_pop3.php:101
-#: ..\..\..\b2evocore\_class_pop3.php:140
-#: ..\..\..\b2evocore\_class_pop3.php:275
-#: ..\..\..\b2evocore\_class_pop3.php:329
-#: ..\..\..\b2evocore\_class_pop3.php:340
-#: ..\..\..\b2evocore\_class_pop3.php:388
-#: ..\..\..\b2evocore\_class_pop3.php:421
-#: ..\..\..\b2evocore\_class_pop3.php:454
-#: ..\..\..\b2evocore\_class_pop3.php:553
-#: ..\..\..\b2evocore\_class_pop3.php:576
+#: ..\..\..\b2evocore\_class_pop3.php:88
+#: ..\..\..\b2evocore\_class_pop3.php:100
+#: ..\..\..\b2evocore\_class_pop3.php:139
+#: ..\..\..\b2evocore\_class_pop3.php:274
+#: ..\..\..\b2evocore\_class_pop3.php:328
+#: ..\..\..\b2evocore\_class_pop3.php:339
+#: ..\..\..\b2evocore\_class_pop3.php:387
+#: ..\..\..\b2evocore\_class_pop3.php:420
+#: ..\..\..\b2evocore\_class_pop3.php:453
+#: ..\..\..\b2evocore\_class_pop3.php:552
+#: ..\..\..\b2evocore\_class_pop3.php:575
 msgid "Error "
 msgstr "Klaida"
 
-#: ..\..\..\b2evocore\_class_pop3.php:109
+#: ..\..\..\b2evocore\_class_pop3.php:108
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
 msgstr "POP3: Iðankstinis NOOP OK atsakymas, tai ne RFC 1939 specifikacijas atitinkantis serveris"
 
-#: ..\..\..\b2evocore\_class_pop3.php:119
+#: ..\..\..\b2evocore\_class_pop3.php:118
 msgid "POP3 noop:"
 msgstr "POP3 noop:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:119
-#: ..\..\..\b2evocore\_class_pop3.php:185
-#: ..\..\..\b2evocore\_class_pop3.php:234
-#: ..\..\..\b2evocore\_class_pop3.php:259
-#: ..\..\..\b2evocore\_class_pop3.php:301
-#: ..\..\..\b2evocore\_class_pop3.php:375
-#: ..\..\..\b2evocore\_class_pop3.php:414
-#: ..\..\..\b2evocore\_class_pop3.php:444
-#: ..\..\..\b2evocore\_class_pop3.php:478
-#: ..\..\..\b2evocore\_class_pop3.php:541
-#: ..\..\..\b2evocore\_class_pop3.php:609
+#: ..\..\..\b2evocore\_class_pop3.php:118
+#: ..\..\..\b2evocore\_class_pop3.php:184
+#: ..\..\..\b2evocore\_class_pop3.php:233
+#: ..\..\..\b2evocore\_class_pop3.php:258
+#: ..\..\..\b2evocore\_class_pop3.php:300
+#: ..\..\..\b2evocore\_class_pop3.php:374
+#: ..\..\..\b2evocore\_class_pop3.php:413
+#: ..\..\..\b2evocore\_class_pop3.php:443
+#: ..\..\..\b2evocore\_class_pop3.php:477
+#: ..\..\..\b2evocore\_class_pop3.php:540
+#: ..\..\..\b2evocore\_class_pop3.php:608
 msgid "No connection to server"
 msgstr "Nëra ryðio su serveriu"
 
-#: ..\..\..\b2evocore\_class_pop3.php:132
-#: ..\..\..\b2evocore\_class_pop3.php:135
-#: ..\..\..\b2evocore\_class_pop3.php:140
+#: ..\..\..\b2evocore\_class_pop3.php:131
+#: ..\..\..\b2evocore\_class_pop3.php:134
+#: ..\..\..\b2evocore\_class_pop3.php:139
 msgid "POP3 user:"
 msgstr "POP3 vartotojas:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:132
-#: ..\..\..\b2evocore\_class_pop3.php:191
+#: ..\..\..\b2evocore\_class_pop3.php:131
+#: ..\..\..\b2evocore\_class_pop3.php:190
 msgid "No login ID submitted"
 msgstr "Nenusiøstas prisijungimo ID"
 
-#: ..\..\..\b2evocore\_class_pop3.php:135
-#: ..\..\..\b2evocore\_class_pop3.php:155
+#: ..\..\..\b2evocore\_class_pop3.php:134
+#: ..\..\..\b2evocore\_class_pop3.php:154
 msgid "connection not established"
 msgstr "nesusijungë"
 
-#: ..\..\..\b2evocore\_class_pop3.php:152
-#: ..\..\..\b2evocore\_class_pop3.php:155
-#: ..\..\..\b2evocore\_class_pop3.php:160
-#: ..\..\..\b2evocore\_class_pop3.php:169
+#: ..\..\..\b2evocore\_class_pop3.php:151
+#: ..\..\..\b2evocore\_class_pop3.php:154
+#: ..\..\..\b2evocore\_class_pop3.php:159
+#: ..\..\..\b2evocore\_class_pop3.php:168
 msgid "POP3 pass:"
 msgstr "POP3 slaptaþodis:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:152
-#: ..\..\..\b2evocore\_class_pop3.php:194
+#: ..\..\..\b2evocore\_class_pop3.php:151
+#: ..\..\..\b2evocore\_class_pop3.php:193
 msgid "No password submitted"
 msgstr "Nepateiktas slaptaþodis"
 
-#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:159
 msgid "authentication failed "
 msgstr "Autorizacija nepavyko"
 
-#: ..\..\..\b2evocore\_class_pop3.php:169
-#: ..\..\..\b2evocore\_class_pop3.php:218
+#: ..\..\..\b2evocore\_class_pop3.php:168
+#: ..\..\..\b2evocore\_class_pop3.php:217
 msgid "NOOP failed. Server not RFC 1939 compliant"
 msgstr "NOOP nepavyko. Serveris neatitinka RFC 1939 specifikacijos"
 
-#: ..\..\..\b2evocore\_class_pop3.php:185
-#: ..\..\..\b2evocore\_class_pop3.php:191
-#: ..\..\..\b2evocore\_class_pop3.php:194
-#: ..\..\..\b2evocore\_class_pop3.php:199
-#: ..\..\..\b2evocore\_class_pop3.php:209
-#: ..\..\..\b2evocore\_class_pop3.php:218
+#: ..\..\..\b2evocore\_class_pop3.php:184
+#: ..\..\..\b2evocore\_class_pop3.php:190
+#: ..\..\..\b2evocore\_class_pop3.php:193
+#: ..\..\..\b2evocore\_class_pop3.php:198
+#: ..\..\..\b2evocore\_class_pop3.php:208
+#: ..\..\..\b2evocore\_class_pop3.php:217
 msgid "POP3 apop:"
 msgstr "POP3 apop:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:199
+#: ..\..\..\b2evocore\_class_pop3.php:198
 msgid "No server banner"
 msgstr "No server banner"
 
-#: ..\..\..\b2evocore\_class_pop3.php:199
-#: ..\..\..\b2evocore\_class_pop3.php:209
+#: ..\..\..\b2evocore\_class_pop3.php:198
+#: ..\..\..\b2evocore\_class_pop3.php:208
 msgid "abort"
 msgstr "nutraukti"
 
-#: ..\..\..\b2evocore\_class_pop3.php:209
+#: ..\..\..\b2evocore\_class_pop3.php:208
 msgid "apop authentication failed"
 msgstr "apop autorizacija nepavyko"
 
-#: ..\..\..\b2evocore\_class_pop3.php:234
+#: ..\..\..\b2evocore\_class_pop3.php:233
 msgid "POP3 login:"
 msgstr "POP3 prisijungimas:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:259
-#: ..\..\..\b2evocore\_class_pop3.php:275
+#: ..\..\..\b2evocore\_class_pop3.php:258
+#: ..\..\..\b2evocore\_class_pop3.php:274
 msgid "POP3 top:"
 msgstr "POP3 top:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:301
-#: ..\..\..\b2evocore\_class_pop3.php:329
-#: ..\..\..\b2evocore\_class_pop3.php:340
-#: ..\..\..\b2evocore\_class_pop3.php:352
+#: ..\..\..\b2evocore\_class_pop3.php:300
+#: ..\..\..\b2evocore\_class_pop3.php:328
+#: ..\..\..\b2evocore\_class_pop3.php:339
+#: ..\..\..\b2evocore\_class_pop3.php:351
 msgid "POP3 pop_list:"
 msgstr "POP3 pop_list:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:352
+#: ..\..\..\b2evocore\_class_pop3.php:351
 msgid "Premature end of list"
 msgstr "Prieðlaikinë sàraðo pabaiga"
 
-#: ..\..\..\b2evocore\_class_pop3.php:375
-#: ..\..\..\b2evocore\_class_pop3.php:388
+#: ..\..\..\b2evocore\_class_pop3.php:374
+#: ..\..\..\b2evocore\_class_pop3.php:387
 msgid "POP3 get:"
 msgstr "POP3 get:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:414
-#: ..\..\..\b2evocore\_class_pop3.php:421
+#: ..\..\..\b2evocore\_class_pop3.php:413
+#: ..\..\..\b2evocore\_class_pop3.php:420
 msgid "POP3 last:"
 msgstr "POP3 last:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:444
-#: ..\..\..\b2evocore\_class_pop3.php:454
+#: ..\..\..\b2evocore\_class_pop3.php:443
+#: ..\..\..\b2evocore\_class_pop3.php:453
 msgid "POP3 reset:"
 msgstr "POP3 reset:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:478
-#: ..\..\..\b2evocore\_class_pop3.php:484
+#: ..\..\..\b2evocore\_class_pop3.php:477
+#: ..\..\..\b2evocore\_class_pop3.php:483
 msgid "POP3 send_cmd:"
 msgstr "POP3 send_cmd:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:484
+#: ..\..\..\b2evocore\_class_pop3.php:483
 msgid "Empty command string"
 msgstr "Tuðèia komandos grandinë"
 
-#: ..\..\..\b2evocore\_class_pop3.php:504
+#: ..\..\..\b2evocore\_class_pop3.php:503
 msgid "POP3 quit:"
 msgstr "POP3 quit:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:504
+#: ..\..\..\b2evocore\_class_pop3.php:503
 msgid "connection does not exist"
 msgstr "susijungimas neegzistuoja"
 
-#: ..\..\..\b2evocore\_class_pop3.php:541
-#: ..\..\..\b2evocore\_class_pop3.php:553
-#: ..\..\..\b2evocore\_class_pop3.php:576
+#: ..\..\..\b2evocore\_class_pop3.php:540
+#: ..\..\..\b2evocore\_class_pop3.php:552
+#: ..\..\..\b2evocore\_class_pop3.php:575
 msgid "POP3 uidl:"
 msgstr "POP3 uidl:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:609
-#: ..\..\..\b2evocore\_class_pop3.php:614
-#: ..\..\..\b2evocore\_class_pop3.php:620
+#: ..\..\..\b2evocore\_class_pop3.php:608
+#: ..\..\..\b2evocore\_class_pop3.php:613
+#: ..\..\..\b2evocore\_class_pop3.php:619
 msgid "POP3 delete:"
 msgstr "POP3 delete:"
 
-#: ..\..\..\b2evocore\_class_pop3.php:614
+#: ..\..\..\b2evocore\_class_pop3.php:613
 msgid "No msg number submitted"
 msgstr "Nenusiøstas praneðimo numeris"
 
-#: ..\..\..\b2evocore\_class_pop3.php:620
+#: ..\..\..\b2evocore\_class_pop3.php:619
 msgid "Command failed "
 msgstr "Komanda nepavyko"
 
@@ -2595,63 +2588,63 @@ msgstr "Komanda nepavyko"
 msgid "New user"
 msgstr "Naujas straipsnis"
 
-#: ..\..\..\b2evocore\_class_user.php:237
+#: ..\..\..\b2evocore\_class_user.php:248
 msgid "Permission denied!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:35
+#: ..\..\..\b2evocore\_functions.php:37
 msgid "Can't connect to the database server. MySQL said:"
 msgstr "Negaliu prisijungti prie duombazës serverio. MySQL atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:37
+#: ..\..\..\b2evocore\_functions.php:39
 #, php-format
 msgid "Can't connect to the database %s. MySQL said:"
 msgstr "Negaliu prisijungti prie duomenø bazës %s. MySQL atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:48
+#: ..\..\..\b2evocore\_functions.php:56
 msgid "Oops, MySQL error!"
 msgstr "Uups, MySQL klaida!"
 
-#: ..\..\..\b2evocore\_functions.php:654
+#: ..\..\..\b2evocore\_functions.php:662
 msgid "go back"
 msgstr "atgal"
 
-#: ..\..\..\b2evocore\_functions.php:684
+#: ..\..\..\b2evocore\_functions.php:692
 msgid "Redirecting you to:"
 msgstr "Vyksta nukreipimas á:"
 
-#: ..\..\..\b2evocore\_functions.php:686
+#: ..\..\..\b2evocore\_functions.php:694
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "jei nieko nevyksta, paspauskite <a %s>èia</a>."
 
-#: ..\..\..\b2evocore\_functions.php:764
+#: ..\..\..\b2evocore\_functions.php:772
 #, fuzzy
 msgid "No response!"
 msgstr "Atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:769
+#: ..\..\..\b2evocore\_functions.php:777
 msgid "Remote error"
 msgstr "Nutolusi klaida"
 
-#: ..\..\..\b2evocore\_functions.php:784 ..\..\..\b2evocore\_functions.php:789
+#: ..\..\..\b2evocore\_functions.php:792 ..\..\..\b2evocore\_functions.php:797
 msgid "Response"
 msgstr "Atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:1016
+#: ..\..\..\b2evocore\_functions.php:1024
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parametras %s bûtinas!"
 
-#: ..\..\..\b2evocore\_functions.php:1221
+#: ..\..\..\b2evocore\_functions.php:1238
 msgid "Invalid URL"
 msgstr "Blogas URL"
 
-#: ..\..\..\b2evocore\_functions.php:1227
+#: ..\..\..\b2evocore\_functions.php:1244
 msgid "URI scheme not allowed"
 msgstr "URI schema neleidþiama"
 
-#: ..\..\..\b2evocore\_functions.php:1233
+#: ..\..\..\b2evocore\_functions.php:1250
 msgid "URL not allowed"
 msgstr "URL neleidþiamas"
 
@@ -2721,44 +2714,44 @@ msgstr "Blogas atsakymas."
 msgid "Requested blog does not exist!"
 msgstr "Nurodytas blogas neegzistuoja!"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:490
+#: ..\..\..\b2evocore\_functions_bposts.php:489
 msgid "Post details"
 msgstr "Visas áraðas"
 
 #  TRANS: this is the default text for the extended post "more" link
 #  
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_functions_bposts.php:531
+#: ..\..\..\b2evocore\_functions_bposts.php:530
 msgid "Read more!"
 msgstr "Daugiau !"
 
 #  TRANS: this is the default text displayed once the more link has been activated
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_functions_bposts.php:536
+#: ..\..\..\b2evocore\_functions_bposts.php:535
 msgid "More:"
 msgstr "Daugiau:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:633
+#: ..\..\..\b2evocore\_functions_bposts.php:632
 msgid "Next page"
 msgstr "Kitas puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:634
+#: ..\..\..\b2evocore\_functions_bposts.php:633
 msgid "Previous page"
 msgstr "Ankstesnis puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:677
+#: ..\..\..\b2evocore\_functions_bposts.php:676
 msgid "Previous post"
 msgstr "Ankstesnis straipsnis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:730
+#: ..\..\..\b2evocore\_functions_bposts.php:729
 msgid "Next post"
 msgstr "Kitas straipsnis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:823
+#: ..\..\..\b2evocore\_functions_bposts.php:822
 msgid "Next Page"
 msgstr "Kitas Puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:850
+#: ..\..\..\b2evocore\_functions_bposts.php:849
 msgid "Previous Page"
 msgstr "Ankstesnis Puslapis"
 
@@ -3241,30 +3234,34 @@ msgid "German"
 msgstr "Vokieèiø"
 
 #: ..\..\..\conf\_locales.php:26
+msgid "Italian"
+msgstr ""
+
+#: ..\..\..\conf\_locales.php:27
 msgid "Japanese"
 msgstr "Japonø"
 
-#: ..\..\..\conf\_locales.php:27
+#: ..\..\..\conf\_locales.php:28
 msgid "Lithuanian"
 msgstr "Lietuviø"
 
-#: ..\..\..\conf\_locales.php:28
+#: ..\..\..\conf\_locales.php:29
 msgid "Norwegian Bokm&aring;l"
 msgstr "Norvegø"
 
-#: ..\..\..\conf\_locales.php:29
+#: ..\..\..\conf\_locales.php:30
 msgid "Portuguese"
 msgstr "Portugalø"
 
-#: ..\..\..\conf\_locales.php:30
+#: ..\..\..\conf\_locales.php:31
 msgid "Spanish"
 msgstr "Ispanø"
 
-#: ..\..\..\conf\_locales.php:31
+#: ..\..\..\conf\_locales.php:32
 msgid "Swedish"
 msgstr "Ðvedø"
 
-#: ..\..\..\conf\_locales.php:32
+#: ..\..\..\conf\_locales.php:33
 msgid "Simplified Chinese"
 msgstr "Supaprastinta Kinø"
 
@@ -3306,7 +3303,7 @@ msgid "Author"
 msgstr "Autorius"
 
 #: ..\..\..\htsrv\comment_post.php:110 ..\..\..\htsrv\trackback.php:103
-#: ..\..\..\xmlsrv\xmlrpc.php:1455
+#: ..\..\..\xmlsrv\xmlrpc.php:1462
 msgid "Url"
 msgstr "Url"
 
@@ -3315,7 +3312,7 @@ msgid "Comment"
 msgstr "Komentaras"
 
 #: ..\..\..\htsrv\comment_post.php:112 ..\..\..\htsrv\trackback.php:105
-#: ..\..\..\xmlsrv\xmlrpc.php:1457
+#: ..\..\..\xmlsrv\xmlrpc.php:1464
 msgid "Edit/Delete"
 msgstr "Redaguoti/Trinti"
 
@@ -3488,11 +3485,11 @@ msgstr "Redaguoti vartotojus"
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Naujas trackbackas straipsnyje #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:102 ..\..\..\xmlsrv\xmlrpc.php:1454
+#: ..\..\..\htsrv\trackback.php:102 ..\..\..\xmlsrv\xmlrpc.php:1461
 msgid "Website"
 msgstr "Svetainë"
 
-#: ..\..\..\htsrv\trackback.php:104 ..\..\..\xmlsrv\xmlrpc.php:1456
+#: ..\..\..\htsrv\trackback.php:104 ..\..\..\xmlsrv\xmlrpc.php:1463
 msgid "Excerpt"
 msgstr "Iðtrauka"
 
@@ -3552,7 +3549,50 @@ msgstr "(dukart)"
 msgid "Register!"
 msgstr "Registruotis!"
 
-#: ..\..\..\skins\_blogroll.php:59
+#: ..\..\..\install\_functions_cafelogupgrade.php:34
+#, php-format
+msgid ""
+"This blog holds all your posts upgraded from Cafelog. This blog is named '%"
+"s'. It has index #%d in the database. By default it is accessed through a "
+"stub file called '<code>%s</code>'. %s"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:377
+#, php-format
+msgid ""
+"This is a demo blog named '%s'. It has index #%d in the database. By default "
+"it is accessed through a stub file called '<code>%s</code>'. %s"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:379
+#, php-format
+msgid ""
+"<br />\n"
+"<br />\n"
+"You can edit this file to change the default skin used for this blog. You "
+"can also rename this file to a better name; but make sure you update the new "
+"name in the blogs admin.<br />\n"
+"<br />\n"
+"If you don't want to use skins, use the provided '<code>%s</code>' file "
+"instead."
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:392
+msgid ""
+"Note: Blog #1 is a very special blog! It automatically aggregates all posts "
+"from all other blogs. This allows you to easily track everything that is "
+"posted on this system. You can hide this blog from the public by clearing "
+"it's 'Stub Urlname' in the blogs admin."
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:413
+msgid ""
+"However, the main purpose for this blog is to be included as a side item to "
+"other blogs where it will display your favorite/related links. This is "
+"commonly referred to as a 'Blogroll'."
+msgstr ""
+
+#: ..\..\..\skins\_blogroll.php:61
 msgid "more"
 msgstr "daugiau"
 
@@ -3659,12 +3699,12 @@ msgstr "Daugiausiai nuorodø ið"
 msgid "blogs"
 msgstr "blogai"
 
-#: ..\..\..\skins\babyblues\_main.php:85
+#: ..\..\..\skins\babyblues\_main.php:88
 msgid "skin the site"
 msgstr "Pasirinkite ðablonà"
 
-#: ..\..\..\skins\babyblues\_main.php:93
-#: ..\..\..\skins\originalb2\_main.php:147
+#: ..\..\..\skins\babyblues\_main.php:96
+#: ..\..\..\skins\originalb2\_main.php:146
 msgid "archives"
 msgstr "archyvai"
 
@@ -3695,10 +3735,16 @@ msgstr "Perþiûrëti visus ðio autoriaus áraðus"
 msgid "[...] Read more!"
 msgstr "[...] Daugiau!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1448 ..\..\..\xmlsrv\xmlrpc.php:1452
+#: ..\..\..\xmlsrv\xmlrpc.php:1455 ..\..\..\xmlsrv\xmlrpc.php:1459
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Naujas pingbackas straipsnyje #%d \"%s\""
+
+#~ msgid "A blog tool like it oughta be!"
+#~ msgstr "Blogas toks kaip ir turi bûti!"
+
+#~ msgid "External - English"
+#~ msgstr "Iðorinië - Anglø"
 
 #~ msgid "You have no right to edit the blacklist."
 #~ msgstr "Jûs neturite teisës redaguoti juodojo saraðo."
