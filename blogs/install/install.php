@@ -417,6 +417,8 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'consulmex-la.com')";
 	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'socksproxy.de')";
+	mysql_query($query) or mysql_oops( $query );
 	
 	/*
 	These sites try to set cookies with the name "url" and content being the
@@ -450,10 +452,14 @@ function populate_antispam()
 	
 }
 
+/*
+ * This is currently useless...
+ *
 function create_pluginsettings()
 {
 	global $tablepluginsettings;
 }
+ */
 
 
 dbconnect() or die( "<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>" );
