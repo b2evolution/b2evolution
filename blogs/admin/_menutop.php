@@ -15,7 +15,14 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $app_shortname.$admin_path_seprator.preg_replace( '/:$/', '', strip_tags( $admin_pagetitle ) ); ?></title>
-	<?php 
+	
+	<!-- script allowing to check and uncheck all boxes in forms -->
+	<script type="text/javascript" src="check.js"></script>
+	<script type="text/javascript" src="anchorposition.js"></script>
+	<script type="text/javascript" src="date.js"></script>
+	<script type="text/javascript" src="popupwindow.js"></script>
+	<script type="text/javascript" src="calendarpopup.js"></script>
+	<?php
 	// Include links (to CSS...)
 	require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_head_links.php';
 

@@ -56,6 +56,14 @@ class UserCache extends DataObjectCache
 		parent::DataObjectCache( 'User', false, 'T_users', 'user_', 'ID' );
 	}
 
+	/* this is for debugging only:
+	function & get_by_ID( $req_ID, $halt_on_error = true )
+	{
+		$obj = parent::get_by_ID( $req_ID, $halt_on_error );
+			pre_dump($obj);
+		return $obj;
+	}
+	*/
 
 	/**
 	 * Load members of a given blog
@@ -135,6 +143,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.1  2004/12/21 21:18:38  fplanque
  * Finished handling of assigning posts/items to users
  *

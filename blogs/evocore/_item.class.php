@@ -134,7 +134,7 @@ class Item extends DataObject
 	 */
 	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item' )
 	{
-		global $UserCache, $object_def;
+		global $UserCache, $object_def, $localtimenow;
 
 		// Call parent constructor:
 		parent::DataObject( $dbtable, $dbprefix, $dbIDname );
@@ -146,6 +146,7 @@ class Item extends DataObject
 		if( $db_row == NULL )
 		{
 			$this->ID = 0;
+			$this->issue_date = date('Y-m-d H:i:s', $localtimenow);
 			$this->flags = array();
 			$this->renderers = array();
 		}
@@ -1578,6 +1579,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.9  2004/12/21 21:18:38  fplanque
  * Finished handling of assigning posts/items to users
  *

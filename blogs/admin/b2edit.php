@@ -56,15 +56,6 @@ switch($action)
 		$post_trackbacks = '';
 		$post_comments = $edited_Item->get( 'comments' );
 		$post_extracats = postcats_get_byID( $post );
-		# $edit_date = 0;
-		$post_issue_date = $edited_Item->get( 'issue_date' );
-		$renderers = $edited_Item->get( 'renderers' );
-		$aa = mysql2date('Y', $post_issue_date  );
-		$mm = mysql2date('m', $post_issue_date  );
-		$jj = mysql2date('d', $post_issue_date  );
-		$hh = mysql2date('H', $post_issue_date  );
-		$mn = mysql2date('i', $post_issue_date  );
-		$ss = mysql2date('s', $post_issue_date  );
 
 		// Display edit form:
 		$form_action = 'edit_actions.php';
@@ -220,18 +211,15 @@ switch($action)
 		param( 'post_urltitle', 'string', '' );
 		param( 'post_url', 'string', $popupurl );
 		$post_url = format_to_edit( $post_url, false );
+		param( 'item_issue_date', 'string' );
+		param( 'item_issue_time', 'string' );
 		param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_locale', 'string', $default_locale );
 		param( 'renderers', 'array', array( 'default' ) );
 
 		param( 'edit_date', 'integer', 0 );
-		param( 'aa', 'string', date( 'Y', $localtimenow) );
-		param( 'mm', 'string', date( 'm', $localtimenow) );
-		param( 'jj', 'string', date( 'd', $localtimenow) );
-		param( 'hh', 'string', date( 'H', $localtimenow) );
-		param( 'mn', 'string', date( 'i', $localtimenow) );
-		param( 'ss', 'string', date( 's', $localtimenow) );
+
 
 		// Display edit form:
 		$form_action = 'edit_actions.php';

@@ -818,6 +818,7 @@ class ItemList extends DataObjectList
 	function get_item( )
 	{
 		global $row;
+
 		if( $this->row_num >= $this->result_num_rows )
 		{ // We would pass the end!
 			$this->row_num++;
@@ -828,7 +829,6 @@ class ItemList extends DataObjectList
 		// echo '<p>accessing row['. $this->row_num. ']:',$this->row->post_title,'</p>';
 		$this->row_num++;
 		$this->get_postdata();
-
 
 		if( $this->group_by_cat && ($this->main_cat != $this->row->post_main_cat_ID) )
 		{ // Category change
@@ -870,8 +870,6 @@ class ItemList extends DataObjectList
 				'views'      => $this->last_Item->views,
 				'comments'   => $this->last_Item->comments
 			);
-
-		// echo ' title: ',$postdata['Title'];
 		$authordata = get_userdata($postdata['Author_ID']);
 		$day = mysql2date('d.m.y',$postdata['Date']);
 		$currentmonth = mysql2date('m',$postdata['Date']);
@@ -953,6 +951,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.12  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.11  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *

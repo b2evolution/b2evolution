@@ -80,7 +80,7 @@ class ItemCache extends DataObjectCache
 	 * @param string stub of object to load
 	 * @param boolean false if you want to return false on error
 	 */
-	function get_by_urltitle( $req_urltitle, $halt_on_error = true )
+	function & get_by_urltitle( $req_urltitle, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;
 
@@ -160,6 +160,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.4  2004/12/20 19:49:24  fplanque
  * cleanup & factoring
  *

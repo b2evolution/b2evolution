@@ -85,6 +85,8 @@ switch($action)
 		param( 'post_title', 'html' );
 		param( 'post_urltitle', 'string' );
 		param( 'post_url', 'string' );
+		param( 'item_issue_date', 'string' );
+		param( 'item_issue_time', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_locale', 'string', $default_locale );
 		param( 'renderers', 'array', array() );
@@ -93,12 +95,8 @@ switch($action)
 		param( 'item_st_ID', 'integer', true );
 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-		{	// We use user date
-			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
-		}
-		else
-		{	// We use current time
-			$post_date = date('Y-m-d H:i:s', $localtimenow);
+		{	// We can use user date:
+			$edited_Item->issue_date = make_valid_date( $item_issue_date, $item_issue_time );
 		}
 
 		// CHECK and FORMAT content
@@ -126,8 +124,8 @@ switch($action)
 		$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $post_date, $post_category,
-															$post_extracats, $post_status, $post_locale, '', 0, 
+		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $edited_Item->issue_date, $post_category,
+															$post_extracats, $post_status, $post_locale, '', 0,
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
 															$post_renderers, $item_typ_ID, $item_st_ID );
 
@@ -189,6 +187,8 @@ switch($action)
 		param( 'post_title', 'html' );
 		param( 'post_urltitle', 'string' );
 		param( 'post_url', 'string' );
+		param( 'item_issue_date', 'string' );
+		param( 'item_issue_time', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_locale', 'string', $default_locale );
 		param( 'renderers', 'array', array() );
@@ -197,13 +197,9 @@ switch($action)
 		param( 'item_typ_ID', 'integer', true );
 		param( 'item_st_ID', 'integer', true );
 
-		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
+		if( $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
-			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
-		}
-		else
-		{	// We use current time
-			$post_date = $edited_Item->issue_date;
+			$edited_Item->issue_date = make_valid_date( $item_issue_date, $item_issue_time );
 		}
 
 		// CHECK and FORMAT content
@@ -242,7 +238,7 @@ switch($action)
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->update( $post_title, $content, $post_date, $post_category, $post_extracats,
+		$edited_Item->update( $post_title, $content, $edited_Item->issue_date, $post_category, $post_extracats,
 													$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle, 
 													$post_url, $post_comments, $post_renderers, $item_typ_ID, $item_st_ID );
 

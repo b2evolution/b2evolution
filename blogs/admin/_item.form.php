@@ -75,6 +75,11 @@ if( isset($Blog) )
 </script>
 <?php
 }
+
+$Form = & new Form( 'none' );
+$Form->labelstart = '<strong>';
+$Form->labelend = "</strong>\n";
+
 ?>
 <!-- ================================ START OF EDIT FORM ================================ -->
 
@@ -123,9 +128,7 @@ if( isset($Blog) )
 	}
 	else
 	{
-		?>
-		<input type="hidden" name="post_url" size="40" value="" id="post_url" />
-		<?php
+		form_hidden( 'post_url', '' );
 	}
 	?>
 
@@ -188,39 +191,14 @@ if( isset($Blog) )
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
-			?>
-			<div>
-			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp" />
-			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?>:</strong></label>
-			<span class="nobr">
-			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" />
-			<select name="mm">
-			<?php
-			for ($i = 1; $i < 13; $i = $i + 1)
-			{
-				echo "\t\t\t<option value=\"$i\"";
-				if ($i == $mm)
-				echo ' selected="selected"';
-				if ($i < 10) {
-					$ii = '0'.$i;
-				} else {
-					$ii = "$i";
-				}
-				echo ">";
-				if( $mode == 'sidebar' )
-					echo T_($month_abbrev[$ii]);
-				else
-					echo T_($month[$ii]);
-				echo "</option>\n";
+			echo "<div>\n";
+			$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
+			$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
+		  if( $next_action == 'create' )
+		  {	// If not cjhecked, create time will be used...
+				$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
 			}
-			?>
-		</select>
-		<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5"/>
-		</span>
-		<span class="nobr">@
-		<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2"/>:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" />
-		</span></div>
-		<?php
+			echo "</div>\n";
 		}
 		?>
 		<div>
@@ -520,6 +498,9 @@ if( isset($Blog) )
 <?php
 /*
  * $Log$
+ * Revision 1.6  2004/12/23 21:19:40  fplanque
+ * no message
+ *
  * Revision 1.5  2004/12/21 21:18:37  fplanque
  * Finished handling of assigning posts/items to users
  *

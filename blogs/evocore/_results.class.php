@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
- * @author fsaya: Fabrice SAYA GASNIER for PROGIDISTRI.
+ * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -71,39 +71,57 @@ class Results
  		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
+		$sql_count = $this->sql_count( $sql );
 		
 		// Count total rows:
-		$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT(*) FROM', $sql );
-	
-		if( $this->total_rows = $this->DB->get_var( $sql_count ) )
+		if( $this->total_rows = $sql_count )
 		{
 	    $this->total_pages = ceil($this->total_rows / $this->limit);
 
  			if( is_null($page) )
-			{//attribution of a page number
+			{ //attribution of a page number
 				$page = param(  $param_prefix.'page', 'integer', 1, true );
 			}
 			$this->page = min( $page, $this->total_pages ) ;
 		
 			if( is_null($order) )
-			{//attribution of an order type
+			{ //attribution of an order type
 				$order = param( $param_prefix.'order', 'string', '', true );
 			}
 			$this->order = $order;
  			
 			if( is_null($action) )
-			{//attribution of a page number
+			{ //attribution of a page number
 				$action = param(  'action', 'string', '', true );
 			}
 			$this->page = min( $page, $this->total_pages ) ;
 		}
+
 		else 
-		{// there is no page to display
+		{ //there is no page to display
 	    $this->total_pages = 0;
 	    $this->$page = 0;
 		}
 	}
 
+	/**
+	 * return the number of rows of the SQL result
+	 */
+	function sql_count( $sql )
+	{	//test of the SQL query to avoid an SQL error in case of a query on one single table
+		if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql, $matches ) ) die( 'Error' );
+
+		if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
+		{ //there was a semicolon or a JOIN clause in the FROM clause of the original query
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql );
+		}
+		else
+		{
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql );
+		}
+		return $this->DB->get_var ($sql_count );//count total rows
+	}
+		
 	/**
 	 * @return int # of rows displayed
 	 */
@@ -135,7 +153,9 @@ class Results
 					'list_end' => '</table>',
 					'footer_start' => '<div class="center">',
 					'footer_text' => ($this->total_pages > 1 ) ? 
-															'$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$' : '1 '
+															T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'
+															.'$total_pages$ Pages : $prev$ $list$ $next$ <br />'
+															.'$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') : '1 '
 															.T_('Page'),
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
@@ -157,37 +177,35 @@ class Results
 			echo $this->params['after'];
 			return 0;
 		}
-	
-		//setting of an ascending or descending order
-		$asc = ( strstr( $this->param_prefix, 'evt' ) || strstr( $this->param_prefix, 'per' ) ) ? ' DESC' : ' ASC';//the default order type is descending only
-																																																							 //for events and periods
+
+		$this->asc = ' ASC ';
 
 		if( $this->order !== '' )
 		{ //$order is not an empty string
-			$asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
+			$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
 		}
-		elseif( isset( $this->col_orders) )
-		{ 
+		elseif( isset( $this->col_orders ) )
+		{
 			$pos = $this->first_defined_order( $this->col_orders );
 			for( $i = 0; $i < $pos; $i++)
 			{
 				$this->order .= '-';
 			}
-			$this->order .= strstr( $asc, 'A' ) ? 'A' : 'D';
+			$this->order .= strstr( $this->asc, 'A' ) ? 'A' : 'D';
 		}
 	
 		if( strpos( $this->sql, 'ORDER BY') === false )
 		{ //there is no ORDER BY clause in the original SQL query
-			$this->sql.=$this->order($this->order, $asc);
+			$this->sql.=$this->order($this->order, $this->asc);
 		}
 		else
-		{//the chosen order must be inserted into an existing ORDER BY clause
+		{ //the chosen order must be inserted into an existing ORDER BY clause
 			$split = split( 'ORDER BY', $this->sql );
 			$this->sql = $split['0']
-				.( ( $this->order($this->order, $asc) !== '' ) ? $this->order($this->order, $asc).', ' : ' ORDER BY ' )
+				.( ( $this->order($this->order, $this->asc) !== '' ) ? $this->order($this->order, $this->asc).', ' : ' ORDER BY ' )
 				.$split['1'];
 		}
-	
+
 		//Execute real query
 		$this->rows = $this->DB->get_results( $this->sql.' LIMIT '.($this->page-1)*$this->limit.', '.$this->limit, ARRAY_A );
 		
@@ -195,8 +213,7 @@ class Results
 		{	// Let's create default column definitions:
 			$this->cols = array();
 
-			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
-				die( 'No SELECT clause!' );
+			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) ) die( 'No SELECT clause!' );
 
 			$select = $matches[1].',';	// Add a , to normalize list
 
@@ -236,7 +253,7 @@ class Results
 				}
 				
 				if( isset( $this->col_orders[$col_count] ) && strcasecmp( $this->col_orders[$col_count], '' ) )
-				{//the column can be ordered
+				{ //the column can be ordered
 					
 					$order_asc = '';
 					$order_desc = '';
@@ -244,9 +261,9 @@ class Results
 					$color_desc = '';
 					
 					for( $i = 0; $i < count($this->cols); $i++)
-					{//construction of the values which can be taken by $order
+					{ //construction of the values which can be taken by $order
 						if(	$i == $col_count )
-						{//link ordering the current column
+						{ //link ordering the current column
 							$order_asc.='A';
 							$order_desc.='D';
 						}
@@ -261,10 +278,10 @@ class Results
 					$color_desc = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'black' : 'grey' ; //color of the descending arrow
 					
 						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).'" title="'.T_('Ascending Order')
-								.'" ><img src="../admin/img/'.$color_asc.'_arrow_down.gif" alt="A" title="'.T_('Ascending Order')
+								.'" height="12px" width="11px" ><img src="../admin/img/'.$color_asc.'_arrow_down.gif" alt="A" title="'.T_('Ascending Order')
 								.'" ></a>' 
 								.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).'" title="'.T_('Descending Order')
-								.'" ><img src="../admin/img/'.$color_desc.'_arrow_up.gif" alt="D" title="'.T_('Descending Order')
+								.'" height="12px" width="11px" ><img src="../admin/img/'.$color_desc.'_arrow_up.gif" alt="D" title="'.T_('Descending Order')
 								.'" ></a> ';
 				}	
 				echo $col_header;
@@ -335,9 +352,9 @@ class Results
 		{ //the names of the DB columns are defined
 			$pos = max( strpos( $order, 'A' ), strpos( $order, 'D' ) );
 			$sql_order = ' ORDER BY '.$this->col_orders[$pos].' '.$asc;
-		}
 	
-		$sql_order = str_replace( ',', ' ASC, ', $sql_order );
+			$sql_order = str_replace( ',', $this->asc.', ', $sql_order );
+		}
 
 		return $sql_order;
 	}
@@ -350,9 +367,9 @@ class Results
 		$i = 0;
 		$alert = 0;
 		while( $alert != 1 )
-		{//verification of the array up to the first defined element
+		{ //verification of the array up to the first defined element
 			if( isset( $array[$i] ) )
-			{//the current element of the array is defined
+			{ //the current element of the array is defined
 				$alert = 1;
 				return $i;
 			}
@@ -404,13 +421,13 @@ class Results
 					
 				case 'prev' : 
 					//inits the link to previous page
-					return ( $this->page>1 ) ? '<a href="'.regenerate_url( 'page', 'page='.($this->page-1) ).'">'.
+					return ( $this->page>1 ) ? '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->page-1) ).'">'.
 																$this->params['prev_text'].'</a>' : $this->params['prev_text'];
 				
 				case 'next' :
 					//inits the link to next page
-					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( 'page', 'page='.($this->page+1) ).
-							  		 													   '">  '.$this->params['next_text'].'</a>' : $this->params['next_text'];
+					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( $this->param_prefix.'page',  $this->param_prefix.'page='.($this->page+1) )
+							.		'">  '.$this->params['next_text'].'</a>' : $this->params['next_text'];
 				case 'list' : 
 					//inits the page list
 					return $this->page_list($this->first(),$this->last()); 
@@ -445,15 +462,15 @@ class Results
 	function first()
 	{
 		if( $this->page <= intval( $this->params['list_span']/2 ))
-		{//the current page number is small
+		{ //the current page number is small
 			return 1;
 		}
 		elseif( $this->page > $this->total_pages-intval( $this->params['list_span']/2 ))
-		{//the current page number is big
-			return $this->total_pages-$this->params['list_span']+1;
+		{ //the current page number is big
+			return max( 1, $this->total_pages-$this->params['list_span']+1);
 		}
 		else
-		{//the current page numbe rcan be centered
+		{ //the current page number can be centered
 			return $this->page-intval($this->params['list_span']/2); 
 		}
 	}
@@ -464,12 +481,12 @@ class Results
 	function last()
 	{
 		if( $this->page > $this->total_pages-intval( $this->params['list_span']/2 ))
-		{//the current page number is big
+		{ //the current page number is big
 			return $this->total_pages;
 		}
 		else
 		{
-			return $this->first()+$this->params['list_span']-1;
+			return min( $this->total_pages, $this->first()+$this->params['list_span']-1 );
 		}
 	}
 	
@@ -479,11 +496,11 @@ class Results
 	function display_first()
 	{
 		if( $this->first() > 1 )
-		{//the list doesn't contain the first page
-			return '<a href="'.regenerate_url( 'page', 'page=1' ).'">1</a>';
+		{ //the list doesn't contain the first page
+			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page=1' ).'">1</a>';
 		}
 		else
-		{//the list already contains the first page
+		{ //the list already contains the first page
 			return NULL;
 		}
 	}
@@ -494,11 +511,11 @@ class Results
 	function display_last()
 	{
 		if( $this->last() < $this->total_pages )
-		{//the list doesn't contain the last page
-			return '<a href="'.regenerate_url( 'page', 'page='.$this->total_pages ).'">'.$this->total_pages.'</a>';
+		{	//the list doesn't contain the last page
+			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$this->total_pages ).'">'.$this->total_pages.'</a>';
 		}
 		else
-		{//the list already contains the last page
+		{	//the list already contains the last page
 			return NULL;
 		}
 	}
@@ -509,17 +526,22 @@ class Results
 	function display_prev()
 	{
 		if( $this->display_first() != NULL )
-		{//the list has to be displayed
-			return '<a href="'.regenerate_url( 'page', 'page='.($this->first()-1) ).'">'.$this->params['list_prev_text'].'</a>';
+		{	//the list has to be displayed
+			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->first()-1) ).'">'
+								.$this->params['list_prev_text'].'</a>';
 		}
 			
 	}
 	
+	/*
+	 * returns a link to next pages, if necessary
+	 */
 	function display_next()
 	{
 		if( $this->display_last() != NULL )
-		{//the list has to be displayed
-			return '<a href="'.regenerate_url( 'page', 'page='.($this->last()+1) ).'">'.$this->params['list_next_text'].'</a>';
+		{ //the list has to be displayed
+			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->last()+1) ).'">'
+								.$this->params['list_next_text'].'</a>';
 		}	
 	}
   
@@ -535,12 +557,12 @@ class Results
 		for( $i=$min; $i<=$max; $i++)
 		{
 			if( $i == $this->page )
-			{//no link for the current page
+			{ //no link for the current page
 				$list = $list.'<strong>'.$i.'</strong> ';
 			}
 			else
-			{//a link for non-current pages
-				$list = $list.'<a href="'.regenerate_url( 'page', 'page='.$i).'">'.$i.'</a> ';
+			{ //a link for non-current pages
+				$list = $list.'<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$i).'">'.$i.'</a> ';
 			}
 		}
 		return $list;
@@ -562,37 +584,38 @@ class Results
 		$range_display='';
 
 		if( $range > $this->total_pages )
-			{//the range is greater than the total number of pages, the list goes up to the number of pages
+			{ //the range is greater than the total number of pages, the list goes up to the number of pages
 				$max = $this->total_pages;
 			}
 			else
-			{//initialisation of the range
+			{ //initialisation of the range
 				$max = $range;
 			}
-		
-		$scroll ='<form class="inline" name="list" action="'.regenerate_url( 'page' ).'">'.//initialization of the form 
-				' <select name="page" size="1" onChange="parentNode.submit()">'.$this->page;//the parentNode property is defined in W3C DOM level 1 (09/29/2000)
+			
+		//initialization of the form
+		$scroll ='<form class="inline" method="post" action="'.regenerate_url( $this->param_prefix.'page' ).'"> 
+    				.<select name="'.$this->param_prefix.'page" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
 
 		while( $max <= $this->total_pages )
-		{//construction loop
-			
+		{ //construction loop
 			if( $this->page <= $max && $this->page >= $min )
-			{//display of all the pages belonging to the range where the current page is located
+			{ //display of all the pages belonging to the range where the current page is located
 				for( $i = $min ; $i <= $max ; $i++)
-				{//construction of the <option> tags
-					$selected = ($i == $this->page) ? 'selected ' : '';//the "selected" option is applied to the current page
-					$option = '<option '.$selected.'value="'.$i.'">'.$i.'</option>';
+				{ //construction of the <option> tags
+					$selected = ($i == $this->page) ? ' selected' : '';//the "selected" option is applied to the current page
+					$option = '<option'.$selected.' value="'.$i.'">'.$i.'</option>';
 					$scroll = $scroll.$option;
 				}
 			}
 			else
-			{//inits the ranges inside the list
-				$range_display = '<option value="'.$min.'">'.T_('Pages').' '.$min.' '.T_('to').' '.$max;
+			{ //inits the ranges inside the list
+				$range_display = '<option value="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$min).'">'
+													.T_('Pages').' '.$min.' '.T_('to').' '.$max;
 				$scroll = $scroll.$range_display;
 			}
 						
 			if( $max+$range > $this->total_pages && $max != $this->total_pages)
-			{//$max has to be the total number of pages
+			{ //$max has to be the total number of pages
 				$max = $this->total_pages;
 			}
 			else
@@ -602,8 +625,11 @@ class Results
 
 			$min = $min+$range;//incrementation of the minimum value by the range
 				
+			
 		}
-		$scroll = $scroll.'</select></form>';//end of the form
+		/*$input ='';
+			$input = '<input type="submit" value="submit" />';*/
+		$scroll = $scroll.'</select>'./*$input.*/'</form>';//end of the form*/
 
 		return $scroll;
 	}
@@ -614,6 +640,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.3  2004/12/17 20:39:48  fplanque
  * added sort orders and extended navigation
  *

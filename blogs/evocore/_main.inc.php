@@ -189,6 +189,7 @@ $ItemCache = & new ItemCache();
 require_once dirname(__FILE__).'/_calendar.class.php';
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
 require_once dirname(__FILE__).'/_form.funcs.php';
+require_once dirname(__FILE__).'/_form.class.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_swfcharts.php';
 
 /**
@@ -292,6 +293,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.11  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.10  2004/12/21 21:18:38  fplanque
  * Finished handling of assigning posts/items to users
  *

@@ -187,8 +187,9 @@ class DataObjectCache
 	 *
 	 * @param integer ID of object to load
 	 * @param boolean false if you want to return false on error
+	 * @return reference on cached object
 	 */
-	function get_by_ID( $req_ID, $halt_on_error = true )
+	function & get_by_ID( $req_ID, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;
 
@@ -261,6 +262,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.5  2004/12/21 21:18:38  fplanque
  * Finished handling of assigning posts/items to users
  *

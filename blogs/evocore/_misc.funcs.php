@@ -1641,8 +1641,33 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 }
 
 
+/**
+ * Validate ISO date
+ */
+function make_valid_date( $date, $time )
+{
+	global $Messages;
+
+	if( ! preg_match( '#^\d\d\d\d-\d\d-\d\d$#', $date ) )
+	{
+		$Messages->add( T_('Date is invalid'), 'error' );
+		$date = '2000-01-01';
+	}
+
+	if( ! preg_match( '#^\d\d:\d\d:\d\d$#', $time ) )
+	{
+		$Messages->add( T_('Time is invalid'), 'error' );
+		$time = '00:00:00';
+	}
+
+	return $date.' '.$time;
+}
+
 /*
  * $Log$
+ * Revision 1.18  2004/12/23 21:19:41  fplanque
+ * no message
+ *
  * Revision 1.17  2004/12/17 20:41:14  fplanque
  * cleanup
  *
