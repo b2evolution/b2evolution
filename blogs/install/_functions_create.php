@@ -933,11 +933,12 @@ function create_b2evo_tables_092()
 
 	echo 'Creating table for active sessions... ';
 	$DB->query( "CREATE TABLE T_sessions (
-									sess_ID        INT(11) UNSIGNED NOT NULL,
+									sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+									sess_key       VARCHAR(32) NOT NULL,
 									sess_lastseen  DATETIME NOT NULL,
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID   INT(10) DEFAULT NULL,
-									sess_data      TEXT NOT NULL,
+									sess_data      TEXT DEFAULT NULL,
 									PRIMARY KEY( sess_ID ),
 									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
@@ -1004,11 +1005,11 @@ function create_b2evo_tables_092()
 
 	echo 'Creating table for Post Links... ';
 	$DB->query( "CREATE TABLE T_links (
-							  link_ID                 int(11) unsigned  not null AUTO_INCREMENT,
-							  link_datecreated        datetime          not null default '0000-00-00 00:00:00',
-							  link_datemodified       datetime          not null default '0000-00-00 00:00:00',
-							  link_creator_user_ID    int(11) unsigned  not null default 0,
-							  link_lastedit_user_ID   int(11) unsigned  not null default 0,
+								link_ID                 int(11) unsigned  not null AUTO_INCREMENT,
+								link_datecreated        datetime          not null default '0000-00-00 00:00:00',
+								link_datemodified       datetime          not null default '0000-00-00 00:00:00',
+								link_creator_user_ID    int(11) unsigned  not null default 0,
+								link_lastedit_user_ID   int(11) unsigned  not null default 0,
 								link_item_ID    		    int(11) unsigned  NOT NULL,
 								link_dest_item_ID		    int(11) unsigned  NULL,
 								link_file_ID				    int(11) unsigned  NULL,
