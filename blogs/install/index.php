@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_misc.funcs.php
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_vars.inc.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_db.class.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_category.funcs.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.class.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php';
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
