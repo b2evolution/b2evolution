@@ -636,7 +636,7 @@ class User extends DataObject
 		}
 		else
 		{
-			$this->dget( 'preferedname', $format );
+			return $this->dget( 'preferedname', $format );
 		}
 	}
 	
@@ -676,6 +676,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/20 20:37:59  fplanque
+ * bugfix
+ *
  * Revision 1.7  2005/01/13 19:53:51  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *
