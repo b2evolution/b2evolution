@@ -1030,7 +1030,7 @@ function create_b2evo_tables_092()
 	$DB->query( 'CREATE TABLE T_useragents (
 								agnt_ID INT UNSIGNED NOT NULL AUTO_INCREMENT,
 								agnt_signature VARCHAR( 255 ) NOT NULL,
-								agnt_type ENUM( "rss", "robot", "browser" ) DEFAULT "browser" NOT NULL ,
+								agnt_type ENUM( "rss", "robot", "browser", "unknown" ) DEFAULT "unknown" NOT NULL ,
 								PRIMARY KEY (agnt_ID) )' );
 	echo "OK.<br />\n";
 

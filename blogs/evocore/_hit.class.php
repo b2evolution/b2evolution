@@ -88,12 +88,12 @@ class Hit
 	/**
 	 * The user agent type.
 	 *
-	 * The default setting ('browser') is taken for new entries (into T_useragents),
-	 * that are not detected as 'rss' or 'robot'.
+	 * The default setting ('unknown') is taken for new entries (into T_useragents),
+	 * that are not detected as 'rss', 'robot' or 'browser'.
 	 *
-	 * @var string 'rss'|'robot'|'browser'
+	 * @var string 'rss'|'robot'|'browser'|'unknown'
 	 */
-	var $agentType = 'browser';
+	var $agentType = 'unknown';
 
 	/**#@+
 	 * @var integer|NULL Detected browser.
@@ -303,37 +303,43 @@ class Hit
 			if(strpos($this->userAgent, 'Lynx') !== false)
 			{
 				$this->is_lynx = 1;
+				$this->agentType = 'browser';
 			}
 			elseif(strpos($this->userAgent, 'Gecko') !== false)
 			{
 				$this->is_gecko = 1;
+				$this->agentType = 'browser';
 			}
 			elseif(strpos($this->userAgent, 'MSIE') !== false && strpos($this->userAgent, 'Win') !== false)
 			{
 				$this->is_winIE = 1;
+				$this->agentType = 'browser';
 			}
 			elseif(strpos($this->userAgent, 'MSIE') !== false && strpos($this->userAgent, 'Mac') !== false)
 			{
 				$this->is_macIE = 1;
+				$this->agentType = 'browser';
 			}
 			elseif(strpos($this->userAgent, 'Opera') !== false)
 			{
 				$this->is_opera = 1;
+				$this->agentType = 'browser';
 			}
 			elseif(strpos($this->userAgent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $this->userAgent))
 			{
 				$this->is_NS4 = 1;
+				$this->agentType = 'browser';
 			}
 
 			if( $this->userAgent != strip_tags($this->userAgent) )
 			{ // then they have tried something funky, putting HTML or PHP into the user agent
 				$Debuglog->add( 'detectUseragent(): '.T_('bad char in User Agent'), 'hit');
-				$this->userAgent = T_('bad char in User Agent');
+				$this->userAgent = '';
 			}
 		}
-
 		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
-		$Debuglog->add( 'detectUseragent(): User Agent: '.$this->userAgent );
+
+		$Debuglog->add( 'detectUseragent(): User Agent: '.var_export( $this->userAgent, true ) );
 
 
 		/*
