@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-11 22:09+0100\n"
+"PO-Revision-Date: 2004-05-13 20:03+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -316,16 +316,4 @@ msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'em
 #: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr "Il est maintenant temps de réintroduire vos précédentes personnalisations. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (backupés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires. <br /> <br /> Vous pouvez également consulter le <a %s>wiki</a> ou les <a %s>forums</a> pour obtenir des informations sur l'upgrade de fichiers spécifiques d'une version spécifique à une autre."
-
-msgid "English (EU)"
-msgstr "Anglais (EU)"
-
-msgid "German (DE)"
-msgstr "Allemand (DE)"
-
-msgid "French (FR)"
-msgstr "Français (FR)"
-
-msgid "Dutch (NL)"
-msgstr "Néerlandais (NL)"
 
