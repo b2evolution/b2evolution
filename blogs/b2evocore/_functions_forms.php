@@ -57,13 +57,18 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	}
 }
 
+/**
+ *
+ *
+ *
+ */
 function form_textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '' )
 {
 	global $img_url;
 
 	echo '<fieldset>';
 	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><fieldset class="input"><img src="'.$img_url.'/blank.gif" width="1" height="1"><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
+	echo '  <div class="input"><fieldset class="input"><img src="'.$img_url.'/blank.gif" width="1" height="1" alt="" /><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
 	if( !empty($field_class) )
 	{
 		echo ' class="', $field_class,'"';
@@ -170,7 +175,7 @@ function form_radio(
 	$field_notes = '' )
 {
 	echo '<fieldset class="setting">';
-	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="label">', $field_label, ':</div>';
 	echo '  <div class="input"><fieldset class="input">';
 	foreach( $field_options as $loop_field_option )
 	{

@@ -168,7 +168,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
 
 				?>
-				<a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php $Item->ID() ?>&c=1" class="ActionButton"><?php
+				<a href="b2browse.php?blog=<?php echo $blog ?>&amp;p=<?php $Item->ID() ?>&amp;c=1" class="ActionButton"><?php
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'));
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'));
@@ -364,7 +364,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" '?> />
 				<label for="sh_private"><?php echo T_('Private (You only)') ?></label><br />
 
-				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked '?> />
+				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked="checked" '?> />
 				<label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
 
 				<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> />

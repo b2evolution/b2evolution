@@ -68,7 +68,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 
 		?>
 		<script language="JavaScript" type="text/javascript">
-		
+		<!--
 		var b2evoButtons = new Array();
 		var b2evoLinks = new Array();
 		var b2evoOpenTags = new Array();
@@ -176,7 +176,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_more'
 																							,'!M'
-																							,'<!--more-->',''
+																							,'<!-'+'-more-'+'->',''
 																							,'m'
 																							,'<?php echo T_('More [Alt-M]') ?>'
 																							,-1
@@ -184,7 +184,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
 																							,'!NT'
-																							,'<!--noteaser-->',''
+																							,'<!-'+'-noteaser-'+'->',''
 																							,'t'
 																							,'<?php echo T_('no teaser [Alt-T]') ?>'
 																							,-1
@@ -192,7 +192,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
 																							,'!NP'
-																							,'<!--nextpage-->',''
+																							,'<!-'+'-nextpage-'+'->',''
 																							,'q'
 																							,'<?php echo T_('next page [Alt-Q]') ?>'
 																							,-1
@@ -385,6 +385,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				b2evoInsertContent(myField, myValue);
 			}
 		}
+    // -->
 		</script>
 		<div class="edit_toolbar"><script language="JavaScript" type="text/javascript">b2evoToolbar();</script></div>
 		<?php		

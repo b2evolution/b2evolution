@@ -72,7 +72,7 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 			}
 		</script>
 		<h2><?php echo T_('SideBar') ?></h2>
-		<p><?php printf( T_('Add the <a %s>b2evo sidebar</a> !'), 'href="#" onClick="addsidebar()"' ); ?></p>
+		<p><?php printf( T_('Add the <a %s>b2evo sidebar</a> !'), 'href="#" onclick="addsidebar()"' ); ?></p>
 		</div>
 		<?php
 	}

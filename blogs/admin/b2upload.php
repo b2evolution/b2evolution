@@ -174,7 +174,7 @@ else
 <p><form action="b2upload.php">
 <!--<textarea cols="25" rows="3" wrap="virtual"><?php echo "&lt;img src=&quot;$fileupload_url/$img1_name&quot; border=&quot;0&quot; alt=&quot;&quot; /&gt;"; ?></textarea>-->
 <input type="text" name="imgpath" value="<?php echo $piece_of_code; ?>" size="40" class="large" /><br />
-<input type="button" name="close" value="<?php echo T_('Add the code to your post !') ?>" class="search" onClick="targetopener('<?php echo $piece_of_code; ?>')" />
+<input type="button" name="close" value="<?php echo T_('Add the code to your post !') ?>" class="search" onclick="targetopener('<?php echo $piece_of_code; ?>')" />
 </form>
 </p>
 <p><strong><?php echo T_('Image Details') ?></strong>: <br />
@@ -189,7 +189,7 @@ else
 </p>
 <p align="right">
 <form action="b2upload.php">
-<input type="button" name="close" value="<?php echo T_('Close this window') ?>" class="search" onClick="window.close()" />
+<input type="button" name="close" value="<?php echo T_('Close this window') ?>" class="search" onclick="window.close()" />
 </form>
 </p>
 </div>

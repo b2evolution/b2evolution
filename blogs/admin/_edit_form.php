@@ -105,7 +105,7 @@ if ($use_spellchecker)
 
 		<span class="line">
 		<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
-		<select name="post_locale" id="post_lang" tabindex="2"><?php locale_options( $post_locale ) ?></select>
+		<select name="post_locale" id="post_locale" tabindex="2"><?php locale_options( $post_locale ) ?></select>
 		</span>
 
 		<?php if( $use_post_url ) { ?>
@@ -152,7 +152,7 @@ if ($use_spellchecker)
 	<?php // ---------------------------- TEXTAREA ------------------------------------- 
 	// Note: the pixel images are here for an IIS layout bug
 	?>
-	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
+	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" id="content" tabindex="4"><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
@@ -164,7 +164,7 @@ if ($use_spellchecker)
 	<?php
 	if($use_preview && ($action != 'editcomment') )
 	{ // ------------------------------- PREVIEW ---------------------------------- ?>
-		<input type="button" value="<?php echo T_('Preview') ?>" onClick="open_preview(this.form);"
+		<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);"
 		tabindex="9" />
 	<?php
 	}
@@ -189,13 +189,13 @@ if ($use_spellchecker)
 	if( $use_spellchecker )
 	{ // ------------------------------- SPELL CHECKER ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Spellcheck') ?>"
-		onClick="DoSpell('post','content','');" tabindex="11" />
+		onclick="DoSpell('post','content','');" tabindex="11" />
 	<?php }
 
 	if( $current_User->check_perm( 'upload' ) )
 	{ // ------------------------------- UPLOAD ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Upload a file/image') ?>"
-		onClick="launchupload();" tabindex="12"  />
+		onclick="launchupload();" tabindex="12"  />
 		<?php 
 	} 
 
@@ -288,7 +288,7 @@ if ($use_spellchecker)
 		{	// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div>
-			<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'htmlattr' ); ?>" />
+			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'htmlattr' ); ?>" />
 		</div>
 		<?php
 		}
@@ -297,8 +297,6 @@ if ($use_spellchecker)
 	<?php			
 	}
 	?>
-
-<!-- ================================== END OF EDIT FORM =================================== -->
 
 </div>
 
@@ -315,35 +313,35 @@ if( $action != 'editcomment' )
 		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Published (Public)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Protected (Members only)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Private (You only)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Draft (Not published!)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Deprecated (Not published!)') ?></label><br />
 		<?php
 		}
@@ -388,7 +386,7 @@ if( $action != 'editcomment' )
 				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
 				if (($cat_ID == $postdata["Category"]) or (in_array( $cat_ID, $post_extracats )))
 					echo ' checked="checked"';
-				echo '>';
+				echo ' />';
 			}
 
 			// Radio for main cat:
@@ -401,7 +399,7 @@ if( $action != 'editcomment' )
 				echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
 				if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
 					echo ' checked="checked"';
-				echo '>';
+				echo ' />';
 			}
 			echo ' '.$this_cat['cat_name'];
 		}
@@ -460,13 +458,13 @@ if( $action != 'editcomment' )
 	<fieldset>
 		<legend><?php echo T_('Comments') ?></legend>
 
-		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Open') ?></label><br />
 
-		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Closed') ?></label><br />
 
-		<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?>>
+		<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
 		<?php echo T_('Disabled') ?></label><br />
 
 	</fieldset>
@@ -534,7 +532,6 @@ if( $action != 'editcomment' )
 		?>
 	</fieldset>
 
-	</div>
 <?php
 }
 
@@ -547,7 +544,6 @@ if ($action == "editcomment")
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $commentdata["comment_type"]; ?></p>
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $commentdata["comment_status"]; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $commentdata["comment_author_IP"]; ?></p>
-	</div>
 
 <?php
 }

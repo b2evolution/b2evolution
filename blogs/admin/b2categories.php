@@ -177,7 +177,6 @@ switch($action)
 		?>
 		<div class="panelblock">
 		<h2><?php echo T_('Properties for category:'), ' ', format_to_output( $cat_name, 'htmlbody' ) ?></h2>
-		<p>
 		<form name="renamecat" action="b2categories.php" method="post">
 			<?php echo T_('Name') ?>:
 			<input type="hidden" name="action" value="editedcat" />
@@ -238,15 +237,13 @@ switch($action)
   				if( (! $cat_parent_ID) && ($current_blog_ID == $blog) ) echo 'checked="checked"';
   			?>
   			/>
-  			<label for="cat_parent_none"><strong><?php echo T_('Root (No parent)') ?></strong></label>
+  			<label for="cat_parent_none_<?php echo $current_blog_ID ?>"><strong><?php echo T_('Root (No parent)') ?></strong></label>
   			<?php
   			if( (! $cat_parent_ID) && ($current_blog_ID == $blog) )
         {
           echo ' &lt;= ', T_('Old Parent');
         }
-  			echo "</li>\n";
     		// RECURSE:
-
 				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
 			}
 
@@ -255,7 +252,7 @@ switch($action)
 		else
 		{	// Moving cats between blogs is disabled
   		?>
-  		<input type="radio" id="cat_parent_none" name="cat_parent_ID" value="0_<?php echo $blog ?>"
+  		<input type="radio" id="cat_parent_none_<?php echo $blog ?>" name="cat_parent_ID" value="0_<?php echo $blog ?>"
 			<?php
 				if( ! $cat_parent_ID ) echo 'checked="checked"';
 			?>
@@ -263,7 +260,6 @@ switch($action)
 			<label for="cat_parent_none_<?php echo $blog ?>"><strong><?php echo T_('Root (No parent)') ?></strong></label>
 			<?php
 			if( ! $cat_parent_ID ) echo ' &lt;= ', T_('Old Parent');
-			echo "</li>\n";
   		// RECURSE:
 	  	cat_children( $cache_categories, $blog, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
 

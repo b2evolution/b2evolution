@@ -18,7 +18,7 @@ body {
 	margin: 0;
 	background-color: #fff;
 	color: #000;
-	font-family: Verdana, Geneva, Arial, Helvetica;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size: 84%;
 }
 
@@ -27,7 +27,7 @@ body {
 	clear: both;
 	margin: 1ex 0;
 	padding: 1ex;
-	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
+	font-family: Arial, Helvetica, sans-serif;
 	color: #9e9286;
 	font-size: 112%;
 	font-weight:normal;
@@ -166,7 +166,6 @@ input.SaveButton,
 input.ResetButton,
 div.edit_actions input,
 div.PostActionsArea input {
-	font-family: Arial, Helvetica, sans-serif;
 	padding: 2px;
 	margin: 0 1px;
 	color:#333;
@@ -390,6 +389,15 @@ ul.tabs li.current a:hover {
 }
 
 /* Sub-tabs */
+ul.hack {
+	margin:0;
+	clear: both;
+	padding: 0.1ex 1em 0;
+	list-style: none;
+}
+ul.hack li {
+	display: none;
+}
 div.pt
 {
 	margin: 0 1em;
@@ -456,7 +464,6 @@ div.bSideItem {
 }
 
 .bSmallHead {
-	font-family: Arial, Helvetica, sans-serif;
 	font-size: 85%;
 	padding: 1ex;
 	margin: 0;
@@ -676,7 +683,6 @@ div.edit_toolbar {
 	width: 98%;
 }
 div.edit_toolbar input {
-	font-family: Arial, Helvetica, sans-serif;
 	color:#333;
 	background-color: #fff;
 	background-image: url("../admin/img/desert-button-2.gif");

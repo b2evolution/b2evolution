@@ -39,7 +39,6 @@ h2 {
 	margin-bottom: 8px;
 }
 .bSmallHead {
-	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;
 	margin-top: 8px;
 	margin-bottom: 8px;
@@ -57,7 +56,6 @@ h2 {
 .bSmallPrint,
 {
 	clear: both;
-	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;
 	margin-top: 8px;
 	margin-bottom: 8px;
@@ -207,25 +205,16 @@ td.bCalendarEmptyCell
 
 body {
 	font-family: Arial, Helvetica, sans-serif;
-	background-color: #FFFFFF;
-	background-repeat: repeat-x;
+	background-color: #fff;
 	margin: 8px;
-	color: #000000;
+	color: #000;
 /*	font-size: 84%; 	poussé vers l'extérieur pour éviter des combinaisons en trop grand nombre */
 }
 div.main {
 	margin: 8px;
-	font-family: Arial, Helvetica, sans-serif;
 	font-size: 84%;
 }
-td {
-	font-family: Arial, Helvetica, sans-serif;
-}
-th {
-	font-family: Arial, Helvetica, sans-serif;
-}
 caption {
-	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
 }
 
@@ -263,7 +252,6 @@ table.wide {
 	clear: both;
 }
 td.cartouche {
-	font-family: Arial, Helvetica, sans-serif;
 	font-size: 84%;
 	color: #009999;
 	background-color: #FFFFFF;
@@ -352,7 +340,6 @@ div.pageHeaderContent {
 	padding-top: 2px;
 	padding-right: 0px;
 	padding-bottom: 0px;
-	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
 	font-size: 84%;
 	width: 90ex;
@@ -375,7 +362,6 @@ div.pageTitle {
 	width: 75ex;
 }
 h1#pageTitle {
-	font-family: Arial, Helvetica, sans-serif;
 	color: #FFFFFF;
 	font-size: 270%;
 	font-weight: bold;
@@ -383,7 +369,6 @@ h1#pageTitle {
 	margin: 0px;
 }
 div#Logo {
-	font-family: Arial, Helvetica, sans-serif;
 	color: #FFFFFF;
 	font-size: 270%;
 	font-weight: bold;
@@ -536,7 +521,6 @@ A.NavButton2Curr:hover		{
 .pageSubTitle {
 	font-size: 109%;
 	color: #009999;
-	font-family: Arial, Helvetica, sans-serif;
 	letter-spacing: 4px;
 	text-align: center;
 	vertical-align: middle;

@@ -31,11 +31,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	{	// callback to display sublist element
 		$cat = get_the_category_by_ID( $cat_ID );
 		echo '<li>';
-		echo "<a href=\"?action=Edit&cat_ID=".$cat_ID.'" title="'.T_('Edit category properties').'">';
+		echo "<a href=\"?action=Edit&amp;cat_ID=".$cat_ID.'" title="'.T_('Edit category properties').'">';
 		echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" />';
 		echo ' <strong>'.$cat['cat_name'].'</strong></a>';
-		echo " <a href=\"?action=Delete&cat_ID=", $cat_ID, 
-			'" onClick="return confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete?').'\')">';
+		echo " <a href=\"?action=Delete&amp;cat_ID=", $cat_ID,
+			'" onclick="return confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete?').'\')">';
 		echo '<img src="img/xross.gif" width="13" height="13" class="middle" alt="', /* TRANS: Abbrev. for Delete */ T_('Del'), '" />';
 		echo '</a>';
 		echo "
@@ -46,7 +46,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	 */
 	function cat_edit_after_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		echo "<li><a href=\"?action=newcat&parent_cat_ID=".$cat_ID.'">';
+		echo "<li><a href=\"?action=newcat&amp;parent_cat_ID=".$cat_ID.'">';
 		echo '<img src="img/new.gif" width="13" height="13" class="middle" alt="" /> ';
 		echo T_('New sub-category here'), "</a></li>\n";
 		echo "</ul>\n";
@@ -65,7 +65,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	// run recursively through the cats
 	echo "<ul>\n";
 	cat_children( $cache_categories, $blog, NULL, 'cat_edit_before_first', 'cat_edit_before_each', 'cat_edit_after_each', 'cat_edit_after_last', 0 );
-	echo "<li><a href=\"?action=newcat&blog=".$blog, '">';
+	echo "<li><a href=\"?action=newcat&amp;blog=".$blog, '">';
 	echo '<img src="img/new.gif" width="13" height="13" class="middle" alt="" /> ';
 	echo T_('New category here'), "</a></li>\n";
 	echo "</ul>\n";

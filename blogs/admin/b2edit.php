@@ -141,11 +141,11 @@ switch($action)
 			echo '" ';
 			if( ! blog_has_cats( $curr_blog_ID ) )
 			{	// loop blog has no categories, you cannot post to it.
-				echo 'onClick="alert(\'', str_replace( "'", "\'", T_('Since this blog has no categories, you cannot post to it. You must create categories first.') ), '\'); return false;" title="', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '"';
+				echo 'onclick="alert(\'', str_replace( "'", "\'", T_('Since this blog has no categories, you cannot post to it. You must create categories first.') ), '\'); return false;" title="', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '"';
 			}
 			elseif( blog_has_cats( $blog ) )
 			{	// loop blog AND current blog both have catageories, normal situation:
-				echo 'onClick="return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), ', $curr_blog_ID,' )" title="', T_('Switch to this blog (keeping your input if Javascript is active)'), '"';
+				echo 'onclick="return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), ', $curr_blog_ID,' )" title="', T_('Switch to this blog (keeping your input if Javascript is active)'), '"';
 			}
 
 			if( $curr_blog_ID == $blog ) 
