@@ -10,7 +10,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005 by Jason Edgecombe.
+ * Parts of this file are copyright (c)2005 by Jason EDGECOMBE.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -29,11 +29,12 @@
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Jason EDGECOMBE grants François PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
@@ -77,22 +78,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 <link rel="stylesheet" href="custom.css" type="text/css" />
 <?php
-/* Add the html for user and blog-specified stylesheets
-   All stylesheets will be included if the blog settings allow it
-   and the files exist. CSS rules say that the latter style sheets can
-   override earlier stylesheets.
-	fp>>TODO: all this code has to go into a single template tag!
- */
-if( $Blog->allowblogcss && file_exists( $Blog->get('mediadir').'customstyle.css' ) )
-{
-	echo '<link rel="stylesheet" href="'.$Blog->get( 'mediaurl' ).'customstyle.css" type="text/css" />'."\n";
-}
-/* check for a user-specified stylesheet */
-if( $Blog->allowusercss
-		&& isset( $current_User ) && file_exists( $current_User->getMediaDir().'customstyle.css' ) )
-{
-	echo '<link rel="stylesheet" href="'.$current_User->getMediaUrl().'customstyle.css" type="text/css" />'."\n";
-}
+$Blog->disp( 'blog_css', 'raw');
+$Blog->disp( 'user_css', 'raw');
 ?>
 </head>
 

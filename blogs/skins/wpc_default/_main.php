@@ -10,6 +10,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2005 by Jason EDGECOMBE.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,6 +27,10 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evoskins
@@ -35,6 +40,7 @@
  * @author wordpress (team)
  * @author cafelog (team)
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author edgester: Jason EDGECOMBE
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
@@ -74,7 +80,10 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	@import url(../../rsc/blog_elements.css);	/* Import standard blog elements styles */
 	@import url(style.css);
 </style>
-
+<?php
+$Blog->disp( 'blog_css', 'raw');
+$Blog->disp( 'user_css', 'raw');
+?>
 </head>
 <body>
 <div id="rap">

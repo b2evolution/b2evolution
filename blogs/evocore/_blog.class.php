@@ -43,6 +43,7 @@
  * @author fplanque: François PLANQUE.
  * @author gorgeb: EPISTEMA (Bertrand Gorge).
  * @author jeffbearer: Jeff BEARER
+ * @author edgester: Jason EDGECOMBE
  *
  * @version $Id$
  */
@@ -369,7 +370,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url;
+		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User;
 
 		switch( $parname )
 		{
@@ -472,6 +473,42 @@ class Blog extends DataObject
 
 			case 'admin_email':
 				return $admin_email;
+
+
+			/** Add the html for a blog-specified stylesheet
+			All stylesheets will be included if the blog settings allow it
+			and the file "style.css" exists. CSS rules say that the latter style sheets can
+			override earlier stylesheets.
+			*/
+			case 'blog_css':
+				if ( $this->allowblogcss 
+					&& file_exists( $this->get('mediadir').'style.css' ) )
+				{
+					return '<link rel="stylesheet" href="'.$this->get( 'mediaurl' ).'style.css" type="text/css" />';
+				} 
+				else
+				{
+				return '';
+				}
+
+			/** Add the html for a user blog-specified stylesheet
+			All stylesheets will be included if the blog settings allow it
+			and the file "style.css" exists. CSS rules say that the latter style sheets can
+			override earlier stylesheets. A user-specified stylesheet will
+			override a blog-specified stylesheet which will override a skin stylesheet.
+			*/
+			case 'user_css':
+				if( $this->allowusercss
+			                && isset( $current_User ) 
+					&& file_exists( $current_User->getMediaDir().'style.css' ) )
+				{
+					return '<link rel="stylesheet" href="'.$current_User->getMediaUrl().'style.css" type="text/css" />';
+				}
+				else
+				{
+					return '';
+				}
+
 
 			default:
 				// All other params:
@@ -619,6 +656,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2005/03/08 02:11:30  edgester
+ * Refactored php code in custom skin into a skiin tag as per Francois Planque.
+ * Added skin tag to all of the skins.
+ *
  * Revision 1.13  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

@@ -26,6 +26,10 @@
  * You should have received a copy of the GNU General Public License
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evoskins
@@ -34,6 +38,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
  * @author cafelog (team)
+ * @author edgester Jason EDGECOMBE
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
@@ -58,6 +63,10 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	</title>
 	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+<?php
+$Blog->disp( 'blog_css', 'raw');
+$Blog->disp( 'user_css', 'raw');
+?>
 </head>
 <body>
 
