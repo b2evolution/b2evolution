@@ -360,15 +360,33 @@ function make_clickable($text)
 
 /***** // Formatting functions *****/
 
-/*
- * mysql2date(-)
+/**
+ * Format a MYSQL date to current locale date format.
  *
- * with enhanced format string
+ * {@internal mysql2localedate(-)}}
+ *
+ * @param string MYSQL date YYYY-MM-DD HH:MM:SS
+ */
+function mysql2localedate( $mysqlstring )
+{
+	return mysql2date( locale_datefmt(), $mysqlstring );
+}
+
+
+/**
+ * Format a MYSQL date.
+ *
+ * {@internal mysql2date(-)}}
+ *
+ * @param string enhanced format string
+ * @param string MYSQL date YYYY-MM-DD HH:MM:SS
+ * @param boolean true to use GM time
  */
 function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 {
 	$m = $mysqlstring;
-	if( empty($m) )	return false;
+	if( empty($m) || ($m == '0000-00-00 00:00:00' ))
+		return false;
 
 	// Get a timestamp:
 	$unixtimestamp = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
@@ -377,10 +395,14 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 }
 
 
-/*
- * date_i18n(-)
+/**
+ * Date internationalization: same as date() formatting but with i18n support
  *
- * date internationalization: same as date() formatting but with i18n support
+ * {@internal date_i18n(-)}}
+ *
+ * @param string enhanced format string
+ * @param integer UNIX timestamp
+ * @param boolean true to use GM time
  */
 function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
@@ -1474,6 +1496,9 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
 
 /*
  * $Log$
+ * Revision 1.4  2004/10/18 18:34:51  fplanque
+ * modified date functions
+ *
  * Revision 1.3  2004/10/15 15:38:52  fplanque
  * added action_icon()
  *
