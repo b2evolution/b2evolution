@@ -25,7 +25,7 @@ define( 'CHDIR_TO_BLOGS', '..' );
 define( 'STATIC_POT', $pofilepath.'\static.POT' );
 define( 'DEFAULT_TARGET', 'en-EU' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
-define( 'HIGHLIGHT_UNTRANSLATED', '1' );
+define( 'HIGHLIGHT_UNTRANSLATED', '0' );
 
 
 // look what translations we have

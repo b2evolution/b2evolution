@@ -17,263 +17,286 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../../index.src.html:6
+#: ../../index.src.html:17
 #: ../../doc/install_new.src.html:6
-#: ../../doc/upgradefrom_0.8.0.src.html:6
-#: ../../doc/upgradefrom_0.8.6.src.html:6
+#: ../../doc/install_new.src.html:17
 #: ../../doc/upgradefrom_b2.src.html:6
-msgid "my b2evolution"
+#: ../../doc/upgradefrom_b2.src.html:17
+msgid "b2evo package"
 msgstr ""
 
 #: ../../index.src.html:6
-msgid "demo home"
+#: ../../index.src.html:18
+#: ../../doc/install_new.src.html:18
+#: ../../doc/upgradefrom_b2.src.html:18
+msgid "Start page"
+msgstr ""
+
+#: ../../index.src.html:13
+#: ../../doc/install_new.src.html:13
+#: ../../doc/upgradefrom_b2.src.html:13
+msgid "b2evolution: official site"
 msgstr ""
 
 #: ../../index.src.html:14
 #: ../../doc/install_new.src.html:14
-#: ../../doc/upgradefrom_0.8.0.src.html:14
-#: ../../doc/upgradefrom_0.8.6.src.html:14
+#: ../../doc/upgradefrom_0.8.0.src.html:15
+#: ../../doc/upgradefrom_0.8.6.src.html:15
 #: ../../doc/upgradefrom_b2.src.html:14
-msgid "Project Site"
+msgid "Multilingual multiuser multi-blog engine."
 msgstr ""
 
 #: ../../index.src.html:15
 #: ../../doc/install_new.src.html:15
-#: ../../doc/upgradefrom_0.8.0.src.html:15
-#: ../../doc/upgradefrom_0.8.6.src.html:15
-#: ../../doc/upgradefrom_b2.src.html:15
-msgid "Multilingual multiuser multi-blog engine."
-msgstr ""
-
-#: ../../index.src.html:16
-#: ../../doc/install_new.src.html:16
 #: ../../doc/upgradefrom_0.8.0.src.html:16
 #: ../../doc/upgradefrom_0.8.6.src.html:16
-#: ../../doc/upgradefrom_b2.src.html:16
+#: ../../doc/upgradefrom_b2.src.html:15
 msgid "Version"
-msgstr ""
-
-#: ../../index.src.html:18
-#: ../../doc/install_new.src.html:18
-#: ../../doc/upgradefrom_0.8.0.src.html:18
-#: ../../doc/upgradefrom_0.8.6.src.html:18
-#: ../../doc/upgradefrom_b2.src.html:18
-msgid "Setup Links:"
-msgstr ""
-
-#: ../../index.src.html:18
-#: ../../doc/install_new.src.html:18
-#: ../../doc/upgradefrom_0.8.0.src.html:18
-#: ../../doc/upgradefrom_0.8.6.src.html:18
-#: ../../doc/upgradefrom_b2.src.html:18
-msgid "My b2evo"
 msgstr ""
 
 #: ../../index.src.html:19
 #: ../../doc/install_new.src.html:19
-#: ../../doc/upgradefrom_0.8.0.src.html:19
-#: ../../doc/upgradefrom_0.8.6.src.html:19
 #: ../../doc/upgradefrom_b2.src.html:19
-msgid "Online Manual"
+msgid "Install"
 msgstr ""
 
 #: ../../index.src.html:20
 #: ../../doc/install_new.src.html:20
-#: ../../doc/upgradefrom_0.8.0.src.html:20
-#: ../../doc/upgradefrom_0.8.6.src.html:20
 #: ../../doc/upgradefrom_b2.src.html:20
-msgid "My DB Install"
+msgid "Blogs"
 msgstr ""
 
 #: ../../index.src.html:21
 #: ../../doc/install_new.src.html:21
-#: ../../doc/upgradefrom_0.8.0.src.html:21
-#: ../../doc/upgradefrom_0.8.6.src.html:21
 #: ../../doc/upgradefrom_b2.src.html:21
-msgid "My Blogs"
+msgid "Admin"
 msgstr ""
 
 #: ../../index.src.html:22
 #: ../../doc/install_new.src.html:22
-#: ../../doc/upgradefrom_0.8.0.src.html:22
-#: ../../doc/upgradefrom_0.8.6.src.html:22
 #: ../../doc/upgradefrom_b2.src.html:22
-msgid "My Back-Office"
+msgid "Online"
 msgstr ""
 
-#: ../../index.src.html:25
-#: ../../doc/install_new.src.html:25
+#: ../../index.src.html:23
+#: ../../doc/install_new.src.html:23
+#: ../../doc/upgradefrom_b2.src.html:23
+msgid "Manual"
+msgstr ""
+
+#: ../../index.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+msgid "Support"
+msgstr ""
+
+#: ../../index.src.html:28
+#: ../../doc/install_new.src.html:28
 #: ../../doc/upgradefrom_0.8.0.src.html:25
 #: ../../doc/upgradefrom_0.8.6.src.html:25
-#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:28
 msgid "Available translations for this page:"
 msgstr ""
 
-#: ../../index.src.html:29
+#: ../../index.src.html:32
 msgid "Welcome!"
 msgstr ""
 
-#: ../../index.src.html:31
-msgid "b2evolution is a PHP multilingual multiuser multiblog engine. You will find complete information on the official <a %href>b2evolution website</a>."
+#: ../../index.src.html:34
+msgid "b2evolution is probably the most comprehensive blog engine you can find! It includes almost any feature you could expect from a blog tool, and more! Plus, it's free, it's open-source (GPL), it runs virtually anywhere (PHP/mySQL) and it's available in many languages!"
 msgstr ""
 
 #: ../../index.src.html:35
-msgid "Quickstart instructions:"
+msgid "You will find complete information on the official <a %href>b2evolution website</a>."
 msgstr ""
 
 #: ../../index.src.html:36
-msgid "You can setup b2evolution in a just a few minutes. Just follow the instructions matching your situation:"
+msgid "Quickstart instructions:"
 msgstr ""
 
-#: ../../index.src.html:38
-msgid "New users:"
-msgstr ""
-
-#: ../../index.src.html:38
-msgid "installing b2evolution from scratch"
+#: ../../index.src.html:37
+msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr ""
 
 #: ../../index.src.html:39
+msgid "New users:"
+msgstr ""
+
+#: ../../index.src.html:39
+msgid "installing b2evolution from scratch"
+msgstr ""
+
+#: ../../index.src.html:40
 msgid "Existing b2evolution users:"
 msgstr ""
 
-#: ../../index.src.html:42
-#: ../../doc/upgradefrom_0.8.6.src.html:6
-#: ../../doc/upgradefrom_0.8.6.src.html:29
-msgid "Upgrading from b2evolution version 0.8.6 or later"
+#: ../../index.src.html:40
+msgid "upgrading from a previous version of b2evolution"
 msgstr ""
 
-#: ../../index.src.html:42
-#: ../../doc/upgradefrom_0.8.6.src.html:29
-msgid "prior to version 0.8.9"
-msgstr ""
-
-#: ../../index.src.html:45
-#: ../../doc/upgradefrom_0.8.0.src.html:6
-msgid "Upgrading from b2evolution version 0.8.0 or later"
-msgstr ""
-
-#: ../../index.src.html:45
-#: ../../doc/upgradefrom_0.8.0.src.html:29
-msgid "prior to version 0.8.6"
-msgstr ""
-
-#: ../../index.src.html:49
+#: ../../index.src.html:41
 msgid "Cafelog/b2 users:"
 msgstr ""
 
-#: ../../index.src.html:49
-msgid "upgrading from b2 version 0.6.x"
+#: ../../index.src.html:41
+msgid "upgrading from Cafelog/b2 version 0.6.x"
 msgstr ""
 
-#: ../../index.src.html:53
-#: ../../doc/install_new.src.html:77
+#: ../../index.src.html:45
+#: ../../doc/install_new.src.html:80
 #: ../../doc/upgradefrom_0.8.0.src.html:43
 #: ../../doc/upgradefrom_0.8.6.src.html:43
-#: ../../doc/upgradefrom_b2.src.html:89
+#: ../../doc/upgradefrom_b2.src.html:92
 msgid "official website"
 msgstr ""
 
-#: ../../index.src.html:53
-#: ../../doc/install_new.src.html:77
+#: ../../index.src.html:46
+#: ../../doc/install_new.src.html:81
 #: ../../doc/upgradefrom_0.8.0.src.html:43
 #: ../../doc/upgradefrom_0.8.6.src.html:43
-#: ../../doc/upgradefrom_b2.src.html:89
+#: ../../doc/upgradefrom_b2.src.html:93
 msgid "GNU GPL license"
 msgstr ""
 
-#: ../../index.src.html:53
-#: ../../doc/install_new.src.html:77
-#: ../../doc/upgradefrom_0.8.0.src.html:43
-#: ../../doc/upgradefrom_0.8.6.src.html:43
-#: ../../doc/upgradefrom_b2.src.html:89
-msgid "contact:"
+#: ../../index.src.html:47
+#: ../../doc/install_new.src.html:82
+#: ../../doc/upgradefrom_b2.src.html:94
+msgid "contact"
 msgstr ""
 
 #: ../../doc/install_new.src.html:6
-msgid "Installing instructions for new users"
+msgid "Install instructions for new users"
 msgstr ""
 
-#: ../../doc/install_new.src.html:29
+#: ../../doc/install_new.src.html:32
 msgid "Installation instructions for new users"
 msgstr ""
 
-#: ../../doc/install_new.src.html:31
-#: ../../doc/upgradefrom_b2.src.html:39
+#: ../../doc/install_new.src.html:34
+#: ../../doc/upgradefrom_b2.src.html:42
 msgid "Once you have unzipped the b2evolution distribution:"
 msgstr ""
 
-#: ../../doc/install_new.src.html:34
+#: ../../doc/install_new.src.html:37
 msgid "On your server, create or locate a mysql database for b2evolution. (For example, you can call it &quot;b2evolution&quot;)"
 msgstr ""
 
-#: ../../doc/install_new.src.html:35
+#: ../../doc/install_new.src.html:38
 msgid "On your computer, edit the file <strong>/blogs/conf/_config.php</strong> with a text editor and set theparameters according to your current configuration. There are basically 3 things to set:"
 msgstr ""
 
-#: ../../doc/install_new.src.html:37
-#: ../../doc/upgradefrom_b2.src.html:57
+#: ../../doc/install_new.src.html:40
+#: ../../doc/upgradefrom_b2.src.html:60
 msgid "Access information to the above-mentioned database (hostname, basename, login, password)"
 msgstr ""
 
-#: ../../doc/install_new.src.html:38
-#: ../../doc/upgradefrom_b2.src.html:58
+#: ../../doc/install_new.src.html:41
+#: ../../doc/upgradefrom_b2.src.html:61
 msgid "The URL where you are going to run b2evolution."
 msgstr ""
 
-#: ../../doc/install_new.src.html:40
-#: ../../doc/install_new.src.html:59
-#: ../../doc/upgradefrom_b2.src.html:60
+#: ../../doc/install_new.src.html:43
+#: ../../doc/install_new.src.html:62
+#: ../../doc/upgradefrom_b2.src.html:63
 msgid "Please note:"
 msgstr ""
 
-#: ../../doc/install_new.src.html:41
-#: ../../doc/upgradefrom_b2.src.html:60
+#: ../../doc/install_new.src.html:44
+#: ../../doc/upgradefrom_b2.src.html:63
 msgid "It is recommended that you do a first test installation by uploading the whole demo structure to your website, starting with the folder b2evolution. This way, your new blogs will have an URL of the form: http://www.yoursite.com/b2evolution/blogs/blog_a.php..."
 msgstr ""
 
-#: ../../doc/install_new.src.html:44
-#: ../../doc/upgradefrom_b2.src.html:66
+#: ../../doc/install_new.src.html:47
+#: ../../doc/upgradefrom_b2.src.html:69
 msgid "Of course you can change this later when you are comfortable with b2evolution. By then, you will probably want to upload just the contents of your &quot;blogs&quot; folder, so your blogs can be accessed directly through http://www.yoursite.com or http://www.yoursite.com/blog_a.php..."
 msgstr ""
 
-#: ../../doc/install_new.src.html:49
+#: ../../doc/install_new.src.html:52
 msgid "Your e-mail address (where you will receive notifications for new registrations, etc.)"
 msgstr ""
 
-#: ../../doc/install_new.src.html:52
+#: ../../doc/install_new.src.html:55
 #: ../../doc/upgradefrom_0.8.0.src.html:35
 msgid "Upload the b2evolution files to your website, according to the URL you have just configured."
 msgstr ""
 
-#: ../../doc/install_new.src.html:53
+#: ../../doc/install_new.src.html:56
 msgid "<strong>Come back to this page on your server</strong>, (should be something like http://www.yoursite.com/b2evolution/doc/install_new.html) and <a %href>run the database tables installation</a>. This will create tables for b2evo in the above-mentioned database. It will also create sample contents (please take due note of the admin password that will be given to you)."
 msgstr ""
 
-#: ../../doc/install_new.src.html:60
-#: ../../doc/upgradefrom_b2.src.html:46
+#: ../../doc/install_new.src.html:63
+#: ../../doc/upgradefrom_b2.src.html:49
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
 msgstr ""
 
-#: ../../doc/install_new.src.html:66
+#: ../../doc/install_new.src.html:69
 msgid "You are done! :)"
 msgstr ""
 
-#: ../../doc/install_new.src.html:67
+#: ../../doc/install_new.src.html:70
 msgid "You can now <a %href>read the blogs</a> or <a %href>log into the back-office</a> and start playing!"
 msgstr ""
 
-#: ../../doc/install_new.src.html:70
+#: ../../doc/install_new.src.html:73
 #: ../../doc/upgradefrom_0.8.0.src.html:37
 #: ../../doc/upgradefrom_0.8.6.src.html:38
 msgid "On production servers, it is recommended that you delete the /blogs/install/ subfolder."
 msgstr ""
 
-#: ../../doc/install_new.src.html:72
+#: ../../doc/install_new.src.html:75
 msgid "After basic install is done, there are a few <a %href>tricky things you may need to take care of</a> (online manual)."
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:6
+#: ../../doc/upgradefrom_0.8.6.src.html:6
+msgid "my b2evolution"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:6
+msgid "Upgrading from b2evolution version 0.8.0 or later"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:14
+#: ../../doc/upgradefrom_0.8.6.src.html:14
+msgid "Project Site"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:18
+#: ../../doc/upgradefrom_0.8.6.src.html:18
+msgid "Setup Links:"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:18
+#: ../../doc/upgradefrom_0.8.6.src.html:18
+msgid "My b2evo"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:19
+#: ../../doc/upgradefrom_0.8.6.src.html:19
+msgid "Online Manual"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:20
+#: ../../doc/upgradefrom_0.8.6.src.html:20
+msgid "My DB Install"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:21
+#: ../../doc/upgradefrom_0.8.6.src.html:21
+msgid "My Blogs"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:22
+#: ../../doc/upgradefrom_0.8.6.src.html:22
+msgid "My Back-Office"
 msgstr ""
 
 #: ../../doc/upgradefrom_0.8.0.src.html:29
 msgid "Upgrading from b2evolution 0.8.0 or later"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.0.src.html:29
+msgid "prior to version 0.8.6"
 msgstr ""
 
 #: ../../doc/upgradefrom_0.8.0.src.html:31
@@ -307,6 +330,20 @@ msgstr ""
 msgid "(If you had custom skins or templates, follow the online instructions about upgrading them <a %href>from version 0.8.0.x</a> or <a %href>from version 0.8.2.x</a>. (online manual)"
 msgstr ""
 
+#: ../../doc/upgradefrom_0.8.0.src.html:43
+#: ../../doc/upgradefrom_0.8.6.src.html:43
+msgid "contact:"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.6.src.html:6
+#: ../../doc/upgradefrom_0.8.6.src.html:29
+msgid "Upgrading from b2evolution version 0.8.6 or later"
+msgstr ""
+
+#: ../../doc/upgradefrom_0.8.6.src.html:29
+msgid "prior to version 0.8.9"
+msgstr ""
+
 #: ../../doc/upgradefrom_0.8.6.src.html:30
 msgid "Upgrading from version 0.8.6 is easy:"
 msgstr ""
@@ -328,38 +365,38 @@ msgid "Replace the<strong> b2evolution core files</strong>. That means the follo
 msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:6
-msgid "Upgrading from the original b2"
+msgid "Upgrading from Cafelog/b2"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:29
+#: ../../doc/upgradefrom_b2.src.html:32
 msgid "Upgrading from Cafelog/b2 (the original b2)"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:31
+#: ../../doc/upgradefrom_b2.src.html:34
 msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, I think versions 0.5.x should also upgrade without problems. Anyway, if you run any old version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:36
+#: ../../doc/upgradefrom_b2.src.html:39
 msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:42
+#: ../../doc/upgradefrom_b2.src.html:45
 msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:46
+#: ../../doc/upgradefrom_b2.src.html:49
 msgid "Note 1:"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:50
+#: ../../doc/upgradefrom_b2.src.html:53
 msgid "Note 2:"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:50
+#: ../../doc/upgradefrom_b2.src.html:53
 msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:54
+#: ../../doc/upgradefrom_b2.src.html:57
 msgid "On your computer, edit the file <strong>/blogs/conf/_config.php</strong> with a text editor and set the parameters according to your current configuration. There are basically 3 things to set:"
 msgstr ""
 
