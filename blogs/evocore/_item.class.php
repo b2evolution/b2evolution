@@ -224,7 +224,7 @@ class Item extends DataObject
 
 
 	/**
-	 * generate permalink for item
+	 * Generate the permalink for the item.
 	 *
 	 * {@internal Item::gen_permalink(-)}}
 	 *
@@ -1402,7 +1402,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Create a new Item/Post and insert it into the BD
+	 * Create a new Item/Post and insert it into the DB
 	 *
 	 * This funtion has to handle all needed DB dependencies!
 	 *
@@ -1597,6 +1597,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2005/01/05 02:51:10  blueyed
+ * doc
+ *
  * Revision 1.14  2005/01/04 12:44:41  fplanque
  * remerged
  *
