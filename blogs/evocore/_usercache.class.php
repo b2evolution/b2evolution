@@ -55,6 +55,13 @@ class UserCache extends DataObjectCache
 
 
 	/**
+	 * Remember special cache loads.
+	 * @access protected
+	 */
+	var $alreadyCached = array();
+
+
+	/**
 	 * Constructor
 	 *
 	 * {@internal UserCache::UserCache(-) }}
@@ -132,15 +139,13 @@ class UserCache extends DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		static $alreadyLoaded = array();
-		// TODO: do no use static but a member var
-		if( isset( $alreadyLoaded[$blog_ID] ) )
+		if( isset( $this->alreadyCached['blogmembers'] ) && isset( $this->alreadyCached['blogmembers'][$blog_ID] ) )
 		{
 			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
 			return false;
 		}
 
-		$alreadyLoaded[$blog_ID] = true;
+		$this->alreadyCached['blogmembers'][$blog_ID] = true;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
 
@@ -215,6 +220,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/18 00:36:08  blueyed
+ * $alreadyCached class member
+ *
  * Revision 1.12  2005/02/16 15:48:06  fplanque
  * merged with work app :p
  *
