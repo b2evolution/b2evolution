@@ -93,7 +93,7 @@ $oldtablecomments = 'b2comments';
 # Set this to 1 if you want PHP to do gzip compression
 # Set this to 0 if you want to let Apache do the job instead of PHP
 # (Developpers: Letting apache do the compression will make PHP debugging easier)
-$use_gzipcompression = 1;  // FOR TESTING ONLY		
+$use_gzipcompression = 0;
 
 
 # CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
