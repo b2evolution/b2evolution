@@ -15,6 +15,17 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 /**
+ * How many days of stats do you want to keep before auto pruning them?
+ *
+ * Set to 0 to disable auto pruning
+ *
+ * @global int $stats_autoprune
+ */
+$stats_autoprune = 30; // Default: 30 days
+
+
+
+/**
  * Blacklist: referrers that should be hidden in stats. This should typically include this
  * site as well as stat services, online email services, online aggregators, etc.
  *

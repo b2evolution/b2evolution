@@ -224,16 +224,17 @@ function log_hit()
 	$baseDomain = preg_replace("/http:\/\//i", '', $HTTP_REFERER);
 	$baseDomain = preg_replace("/^www\./i", '', $baseDomain);
 	$baseDomain = preg_replace("/\/.*/i", '', $baseDomain);
-	// Remember we have logged already:
-	$hit_type = 'already_logged';
 	// insert hit into DB table:
 	$sql = "INSERT INTO T_hitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain,
 																		hit_blog_ID, hit_remote_addr, hit_user_agent )
-					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$ignore',
+					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$hit_type',
 									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog,
 									'".$DB->escape($_SERVER['REMOTE_ADDR'])."', '".$DB->escape($HTTP_USER_AGENT)."')";
 
 	$DB->query( $sql );
+
+	// Remember we have logged already:
+	$hit_type = 'already_logged';
 
 	/*
 	 * Auto pruning of old stats
@@ -439,10 +440,13 @@ function stats_total_hit_count()
 /*
  * stats_hit_count(-)
  */
-function stats_hit_count()
+function stats_hit_count( $disp = true )
 {
 	global $row_stats;
-	echo $row_stats['totalHits'];
+	if( $disp )
+		echo $row_stats['totalHits'];
+	else
+		return $row_stats['totalHits'];
 }
 
 

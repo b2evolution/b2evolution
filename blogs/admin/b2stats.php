@@ -147,6 +147,7 @@ switch( $show )
 		?>
 		<h2><?php echo T_('Summary') ?>:</h2>
 		<?php
+
 		$sql = 'SELECT COUNT(*) AS hits, hit_ignore, YEAR(visitTime) AS year,
 										MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day 
 							FROM T_hitlog ';
@@ -155,10 +156,172 @@ switch( $show )
 			$sql .= ' WHERE hit_blog_ID = '.$blog;
 		}
 		$sql .= 'GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore
-						 ORDER BY YEAR(visitTime) DESC, MONTH(visitTime) DESC, DAYOFMONTH(visitTime) DESC';
+						 ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
 		$res_hits = $DB->get_results( $sql, ARRAY_A );
 
-		$hits = array();
+
+		/*
+		 * Chart
+		 */
+		if( count($res_hits) )
+	  {
+			$last_date = 0;
+
+			$chart [ 'chart_data' ][ 0 ][ 0 ] = "";
+			$chart [ 'chart_data' ][ 1 ][ 0 ] = T_('Direct Accesses');
+			$chart [ 'chart_data' ][ 2 ][ 0 ] = T_('Referers');
+			$chart [ 'chart_data' ][ 3 ][ 0 ] = T_('Refering Searches');
+			$chart [ 'chart_data' ][ 4 ][ 0 ] = T_('Syndication');
+			$chart [ 'chart_data' ][ 5 ][ 0 ] = T_('Indexing Robots');
+			$chart [ 'chart_data' ][ 6 ][ 0 ] = T_('Blacklisted');
+
+			$col_mapping = array(
+														'invalid' => 1,
+														'no' => 2,
+														'search' => 3,
+														'rss' => 4,
+														'robot' => 5,
+														'blacklist' => 6
+													);
+
+	 		$count = 0;
+			foreach( $res_hits as $row_stats )
+			{
+				$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
+				if( $last_date != $this_date )
+				{	// We just hit a new day, let's display the previous one:
+						$last_date = $this_date;	// that'll be the next one
+						$count ++;
+						$chart [ 'chart_data' ][ 0 ][ $count ] = date( locale_datefmt(), $last_date );
+						$chart [ 'chart_data' ][ 1 ][ $count ] = 0;
+						$chart [ 'chart_data' ][ 2 ][ $count ] = 0;
+						$chart [ 'chart_data' ][ 3 ][ $count ] = 0;
+						$chart [ 'chart_data' ][ 4 ][ $count ] = 0;
+						$chart [ 'chart_data' ][ 5 ][ $count ] = 0;
+						$chart [ 'chart_data' ][ 6 ][ $count ] = 0;
+				}
+				$col = $col_mapping[$row_stats['hit_ignore']];
+				$chart [ 'chart_data' ][$col][$count] = $row_stats['hits'];
+			}
+
+			$chart[ 'canvas_bg' ] = array (		'width'  => 780,
+																				'height' => 400,
+																				'color'  => 'efede0'
+																		);
+
+ 			$chart[ 'chart_rect' ] = array (	'x'      => 50,
+																				'y'      => 50,
+																				'width'  => 700,
+																				'height' => 250
+																		);
+
+ 			$chart[ 'legend_rect' ] = array ( 'x'      => 50,
+ 																				'y'      => 365,
+ 																				'width'  => 700,
+ 																				'height' => 8,
+ 																				'margin' => 6
+ 																		);
+
+			$chart[ 'draw_text' ] = array (
+																			array ( 'color'    => '9e9286',
+																							'alpha'    => 75,
+																							'font'     => "arial",
+																							'rotation' => 0,
+																							'bold'     => true,
+																							'size'     => 42,
+																							'x'        => 50,
+																							'y'        => 6,
+																							'width'    => 700,
+																							'height'   => 50,
+																							'text'     => T_('Access summary'),
+																							'h_align'  => "right",
+																							'v_align'  => "bottom" )
+			                        			);
+
+			$chart[ 'chart_bg' ] = array (		'positive_color' => "ffffff",
+																				// 'negative_color'  =>  string,
+																				'positive_alpha' => 20,
+																				// 'negative_alpha'  =>  int
+																		);
+
+ 			$chart [ 'legend_bg' ] = array (  'bg_color'          =>  "ffffff",
+																				'bg_alpha'          =>  20,
+																				// 'border_color'      =>  "000000",
+																				// 'border_alpha'      =>  100,
+																				// 'border_thickness'  =>  1
+			                              );
+
+			$chart [ 'legend_label' ] = array(// 'layout'  =>  "horizontal",
+			                                  // 'font'    =>  string,
+	                                      // 'bold'    =>  boolean,
+	                                      'size'    =>  10,
+	                                      // 'color'   =>  string,
+	                                      // 'alpha'   =>  int
+	                                   );
+
+			$chart[ 'chart_border' ] = array ('color'=>"000000",
+																				'top_thickness'=>1,
+																				'bottom_thickness'=>1,
+																				'left_thickness'=>1,
+																				'right_thickness'=>1
+																		);
+
+ 			$chart[ 'chart_type' ] = 'stacked column';
+
+			// $chart[ 'series_color' ] = array ( "4e627c", "c89341" );
+
+			$chart[ 'series_gap' ] = array ( 'set_gap'=>0, 'bar_gap'=>0 );
+
+
+			$chart[ 'axis_category' ] = array (
+																				'font'  =>"arial",
+																				'bold'  =>true,
+																				'size'  =>11,
+																				'color' =>'000000',
+																				'alpha' =>75,
+																				'orientation' => 'diagonal_up',
+																				// 'skip'=>2
+																			 );
+
+			$chart[ 'axis_value' ] = array (	// 'font'   =>"arial",
+																				// 'bold'   =>true,
+																				'size'   => 11,
+																				'color'  => '000000',
+																				'alpha'  => 75,
+																				'steps'  => 4,
+																				'prefix' => "",
+																				'suffix' => "",
+																				'decimals'=> 0,
+																				'separator'=> "",
+																				'show_min'=> false );
+
+			$chart [ 'chart_value' ] = array (
+																				// 'prefix'         =>  string,
+																		    // 'suffix'         =>  " views",
+																		    // 'decimals'       =>  int,
+																		    // 'separator'      =>  string,
+																		    'position'       =>  "cursor",
+																		    'hide_zero'      =>  true,
+																		    // 'as_percentage'  =>  boolean,
+																		    'font'           =>  "arial",
+																		    'bold'           =>  true,
+																		    'size'           =>  20,
+																		    'color'          =>  "ffffff",
+																		    'alpha'          =>  75
+																	 		);
+
+			echo '<div class="center">';
+			DrawChart( $chart );
+			echo '</div>';
+    }
+
+
+		/*
+		 * Table:
+		 */
+		if( count($res_hits) )
+	  {
+	  $hits = array();
 		$hits['no'] = 0;
 		$hits['invalid'] = 0;
 		// $hits['badchar'] = 0;			// Not used any longer
@@ -167,79 +330,78 @@ switch( $show )
 		$hits['robot'] = 0;
 		$hits['search'] = 0;
 		$last_date = 0;
-	if( count($res_hits) )
-  {	?>
-	<table class="grouped" cellspacing="0">
-    <tr>
-  		<th class="firstcol"><?php echo T_('Date') ?></th>
-  		<th><?php echo T_('Referers') // 'no' ?></th>
-  		<th><?php echo T_('Refering Searches') ?></th>
-  		<th><?php echo T_('Indexing Robots') ?></th>
-  		<th><?php echo T_('Syndication') ?></th>
-  		<th><?php echo T_('Direct Accesses') ?></th>
-  		<th><?php echo T_('Blacklisted') ?></th>
-  		<th><?php echo T_('Total') ?></th>
-    </tr>
-		<?php
-		$count = 0;
-		foreach( $res_hits as $row_stats )
-		{
-			$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
-			if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one
-			if( $last_date != $this_date )
-			{	// We just hit a new day, let's display the previous one:
+		?>
+		<table class="grouped" cellspacing="0">
+	    <tr>
+	  		<th class="firstcol"><?php echo T_('Date') ?></th>
+	  		<th><?php echo T_('Direct Accesses') ?></th>
+	  		<th><?php echo T_('Referers') // 'no' ?></th>
+	  		<th><?php echo T_('Refering Searches') ?></th>
+	  		<th><?php echo T_('Syndication') ?></th>
+	  		<th><?php echo T_('Indexing Robots') ?></th>
+	  		<th><?php echo T_('Blacklisted') ?></th>
+	  		<th><?php echo T_('Total') ?></th>
+	    </tr>
+			<?php
+			$count = 0;
+			foreach( $res_hits as $row_stats )
+			{
+				$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
+				if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one
+				if( $last_date != $this_date )
+				{	// We just hit a new day, let's display the previous one:
+					?>
+					<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+						<td class="firstcol"><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+							{ ?>
+								<a href="b2stats.php?action=prune&amp;date=<?php echo $last_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
+							<?php
+							}
+							echo date( locale_datefmt(), $last_date ) ?>
+						</td>
+						<td class="right"><?php echo $hits['invalid'] ?></td>
+						<td class="right"><?php echo $hits['no'] ?></td>
+						<td class="right"><?php echo $hits['search'] ?></td>
+						<td class="right"><?php echo $hits['rss'] ?></td>
+						<td class="right"><?php echo $hits['robot'] ?></td>
+						<td class="right"><?php echo $hits['blacklist'] ?></td>
+						<td class="right"><?php echo array_sum($hits) ?></td>
+					</tr>
+					<?php
+						$hits['no'] = 0;
+						$hits['invalid'] = 0;
+						$hits['blacklist'] = 0;
+						$hits['rss'] = 0;
+						$hits['robot'] = 0;
+						$hits['search'] = 0;
+						$last_date = $this_date;	// that'll be the next one
+						$count ++;
+				}
+				$hits[$row_stats['hit_ignore']] = $row_stats['hits'];
+			}
+
+			if( $last_date != 0 )
+			{	// We had a day pending:
 				?>
 				<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-					<td class="firstcol"><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+					<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 						{ ?>
-							<a href="b2stats.php?action=prune&amp;date=<?php echo $last_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
+						<a href="b2stats.php?action=prune&amp;date=<?php echo $this_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune hits for this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
 						<?php
 						}
-						echo date( locale_datefmt(), $last_date ) ?>
+						echo date( locale_datefmt(), $this_date ) ?>
 					</td>
+					<td class="right"><?php echo $hits['invalid'] ?></td>
 					<td class="right"><?php echo $hits['no'] ?></td>
 					<td class="right"><?php echo $hits['search'] ?></td>
-					<td class="right"><?php echo $hits['robot'] ?></td>
 					<td class="right"><?php echo $hits['rss'] ?></td>
-					<td class="right"><?php echo $hits['invalid'] ?></td>
+					<td class="right"><?php echo $hits['robot'] ?></td>
 					<td class="right"><?php echo $hits['blacklist'] ?></td>
 					<td class="right"><?php echo array_sum($hits) ?></td>
 				</tr>
-				<?php
-					$hits['no'] = 0;
-					$hits['invalid'] = 0;
-					$hits['blacklist'] = 0;
-					$hits['rss'] = 0;
-					$hits['robot'] = 0;
-					$hits['search'] = 0;
-					$last_date = $this_date;	// that'll be the next one
-					$count ++;
-			}
-			$hits[$row_stats['hit_ignore']] = $row_stats['hits'];
-		}
-
-		if( $last_date != 0 )
-		{	// We had a day pending:
-			?>
-			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-				<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
-					{ ?>
-					<a href="b2stats.php?action=prune&amp;date=<?php echo $this_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune hits for this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
-					<?php
-					}
-					echo date( locale_datefmt(), $this_date ) ?>
-				</td>
-				<td class="right"><?php echo $hits['no'] ?></td>
-				<td class="right"><?php echo $hits['search'] ?></td>
-				<td class="right"><?php echo $hits['robot'] ?></td>
-				<td class="right"><?php echo $hits['rss'] ?></td>
-				<td class="right"><?php echo $hits['invalid'] ?></td>
-				<td class="right"><?php echo $hits['blacklist'] ?></td>
-				<td class="right"><?php echo array_sum($hits) ?></td>
-			</tr>
-		<?php } ?>
-		</table>
-    <?php
+			<?php } ?>
+			</table>
+	    <?php
     }
 		break;
 
@@ -280,11 +442,140 @@ switch( $show )
 	<h3><?php echo T_('Top referers') ?>:</h3>
 	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true);
   if( count( $res_stats ) )
-  { ?>
+  {
+		$chart [ 'chart_data' ][ 0 ][ 0 ] = "";
+		$chart [ 'chart_data' ][ 1 ][ 0 ] = T_('Top referers');
+
+		$count = 0;
+		foreach( $res_stats as $row_stats )
+		{
+			if( $count < 8 )
+			{
+				$count++;
+				$chart [ 'chart_data' ][ 0 ][ $count ] = stats_basedomain( false );
+			}
+			else
+			{
+				$chart [ 'chart_data' ][ 0 ][ $count ] = T_('Others');
+			}
+			$chart [ 'chart_data' ][ 1 ][ $count ] = stats_hit_count( false );
+		} // End stat loop
+
+		$chart[ 'canvas_bg' ] = array (		'width'  => 780,
+																			'height' => 350,
+																			'color'  => 'efede0'
+																	);
+
+		$chart[ 'chart_rect' ] = array (	'x'      => 60,
+																			'y'      => 50,
+																			'width'  => 250,
+																			'height' => 250
+																	);
+
+		$chart[ 'legend_rect' ] = array ( 'x'      => 400,
+																			'y'      => 70,
+																			'width'  => 340,
+																			'height' => 230,
+																			'margin' => 6
+																	);
+
+		$chart[ 'draw_text' ] = array (
+																		array ( 'color'    => '9e9286',
+																						'alpha'    => 75,
+																						'font'     => "arial",
+																						'rotation' => 0,
+																						'bold'     => true,
+																						'size'     => 42,
+																						'x'        => 50,
+																						'y'        => 6,
+																						'width'    => 700,
+																						'height'   => 50,
+																						'text'     => T_('Top referers'),
+																						'h_align'  => "right",
+																						'v_align'  => "bottom" )
+		                        			);
+
+		$chart[ 'chart_bg' ] = array (		'positive_color' => "ffffff",
+																			// 'negative_color'  =>  string,
+																			'positive_alpha' => 20,
+																			// 'negative_alpha'  =>  int
+																	);
+
+		$chart [ 'legend_bg' ] = array (  'bg_color'          =>  "ffffff",
+																			'bg_alpha'          =>  20,
+																			// 'border_color'      =>  "000000",
+																			// 'border_alpha'      =>  100,
+																			// 'border_thickness'  =>  1
+		                              );
+
+		$chart [ 'legend_label' ] = array(// 'layout'  =>  "horizontal",
+		                                  // 'font'    =>  string,
+                                      // 'bold'    =>  boolean,
+                                      'size'    =>  10,
+                                      // 'color'   =>  string,
+                                      // 'alpha'   =>  int
+                                   );
+
+		/*$chart[ 'chart_border' ] = array ('color'=>"000000",
+																			'top_thickness'=>1,
+																			'bottom_thickness'=>1,
+																			'left_thickness'=>1,
+																			'right_thickness'=>1
+																	);*/
+
+		$chart[ 'chart_type' ] = 'pie';
+
+		// $chart[ 'series_color' ] = array ( "4e627c", "c89341" );
+
+		$chart [ 'series_explode' ] =  array ( 15 );
+
+		/*$chart[ 'axis_category' ] = array (
+																			'font'  =>"arial",
+																			'bold'  =>true,
+																			'size'  =>11,
+																			'color' =>'000000',
+																			'alpha' =>75,
+																			'orientation' => 'diagonal_up',
+																			// 'skip'=>2
+																		 );*/
+
+		/* $chart[ 'axis_value' ] = array (	// 'font'   =>"arial",
+																			// 'bold'   =>true,
+																			'size'   => 11,
+																			'color'  => '000000',
+																			'alpha'  => 75,
+																			'steps'  => 4,
+																			'prefix' => "",
+																			'suffix' => "",
+																			'decimals'=> 0,
+																			'separator'=> "",
+																			'show_min'=> false ); */
+
+		$chart [ 'chart_value' ] = array (
+																			// 'prefix'         =>  string,
+																	    // 'suffix'         =>  " views",
+																	    // 'decimals'       =>  int,
+																	    // 'separator'      =>  string,
+																	    'position'       =>  "outside",
+																	    'hide_zero'      =>  true,
+																	    'as_percentage'  =>  true,
+																	    'font'           =>  "arial",
+																	    'bold'           =>  true,
+																	    'size'           =>  20,
+																	    'color'          =>  "000000",
+																	    'alpha'          =>  75
+																 		);
+
+		echo '<div class="center">';
+		DrawChart( $chart );
+		echo '</div>';
+
+  ?>
 	<table class="grouped" cellspacing="0">
 		<?php
 			$count = 0;
-			foreach( $res_stats as $row_stats ) { ?>
+			foreach( $res_stats as $row_stats )
+			{ ?>
 			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 				<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
@@ -294,8 +585,8 @@ switch( $show )
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php
-		$count++;
+			<?php
+			$count++;
 		} // End stat loop ?>
 	</table>
   <?php } ?>

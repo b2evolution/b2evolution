@@ -48,16 +48,6 @@ if( !isset($default_to_blog) ) $default_to_blog = 2;
 $online_session_timeout = 300; // default: 5 minutes
 
 
-/**
- * How many days of stats do you want to keep before auto pruning them?
- *
- * Set to 0 to disable auto pruning
- *
- * @global int $stats_autoprune
- */
-$stats_autoprune = 30; // Default: 30 days
-
-
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
 if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
@@ -336,6 +326,12 @@ $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
  */
 $img_subdir = 'img/';                    // Subdirectory relative to base
 $img_url = $baseurl.$img_subdir;         // You should not need to change this
+/**
+ * Location of the RSC folder.
+ * @global string $rsc_subdir
+ */
+$rsc_subdir = 'rsc/';                    // Subdirectory relative to base
+$rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
 /**
  * Location of the skins folder.
  * @global string $skins_subdir
