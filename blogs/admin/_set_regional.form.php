@@ -102,20 +102,18 @@ else
 		<fieldset>
 		<legend><?php echo T_('Available locales'); ?></legend>
 		
-		<div style="text-align:center;padding:1em;">
-		<a href="?tab=regional<?php
+		<p class="center"><?php
 		if( !$notransext )
 		{
-			echo '&amp;notransext=1">' . T_('Hide translation percentages');
+			echo '<a href="b2options.php?tab=regional&amp;notransext=1">' . T_('Hide translation info'), '</a>';
 			$showtranslationpercentage = 1;
 		}
 		else
 		{
-			echo '">' . T_('Show translation percentages');
+			echo '<a href="b2options.php?tab=regional">' . T_('Show translation info'), '</a>';
 			$showtranslationpercentage = 0;
 		}
-		?></a>
-		</div>
+		?></p>
 		
 		<table class="thin" border="1">
 		<tr>
@@ -124,18 +122,19 @@ else
 			<th><?php echo T_('Name') ?></th>
 			<th><?php echo T_('Date fmt') ?></th>
 			<th><?php echo T_('Time fmt') ?></th>
+			<th><?php echo T_('Edit') ?></th>
 			<?php if( $showtranslationpercentage )
-			{?>
-			<th><?php echo T_('Strings') ?></th>
-			<th><?php echo T_('Translated') ?></th>
-			<?php
-			}
-			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
-			{ ?>
-			<th><?php echo T_('Extract') ?></th>
-			<?php			
+			{
+				?>
+				<th><?php echo T_('Strings') ?></th>
+				<th><?php echo T_('Translated') ?></th>
+				<?php
+				if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
+				{ ?>
+					<th><?php echo T_('Extract') ?></th>
+					<?php			
+				}
 			} ?>
-			<th></th>
 		</tr>
 		<?php
 		$i = 0; // counter to distinguish POSTed locales later
@@ -146,9 +145,7 @@ else
 			<tr style="text-align:center">
 			<td style="text-align:left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
 				<?php
-				echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />'
-				#.$lval['priority'].'. '
-				;
+				echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />';
 				locale_flag( $lkey );
 				echo'
 				<strong>'.$lkey.'</strong>
@@ -166,10 +163,43 @@ else
 				<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="6" />
 			</td>';
 	
-			// Get PO file for that locale:
-			$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				echo '<td align="left">';
+				if( $i > 1 )
+				{ // show "move prio up"
+					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" border="0" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
+				}
+				else
+				{
+					echo '<img src="img/blank.gif" width="14" border="0" />';
+				}
+		
+				if( $i < count($locales) )
+				{ // show "move prio down"
+					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" border="0" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
+				}
+				else
+				{
+					echo '<img src="img/blank.gif" width="14" border="0" />';
+				}
+				echo '
+				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale=_new_&amp;template='.$lkey.'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
+				
+				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale='.$lkey.'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
+				';
+				if( isset($lval[ 'fromdb' ]) )
+				{ // allow to delete locales loaded from db
+					$l_atleastonefromdb = 1;
+					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
+				}
+				echo '</td>';
+			}
+
 			if( $showtranslationpercentage )
 			{
+				// Get PO file for that locale:
+				$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 				if( ! is_file( $po_file ) )
 				{
 					echo '<td colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
@@ -243,53 +273,17 @@ else
 					$color = sprintf( '%02x%02x00', 255 - round($percent_done * 2.55), round($percent_done * 2.55) );
 					echo "\n\t<td style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
 				}
-			} // show message file percentage/extraction
-			
-			if( $current_User->check_perm( 'options', 'edit' ) )
-			{
+
 				if( $allow_po_extraction  )
 				{ // Translator options:
-					echo ;
 					if( is_file( $po_file ) )
+					{
 						echo "\n\t<td>".'[<a href="b2options.php?tab=regional&amp;action=extract&amp;locale='.$lkey.'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
-					elseif( !$showtranslationpercentage )
-					{ // show only if we did not show it before
-						echo "\n\t".'<td title="'.T_('No language file...').'"> --- </td>';
 					}
 				}
-				echo '
-				<td align="left">
-				';
-				if( $i > 1 )
-				{ // show "move prio up"
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" border="0" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" /></a>';
-				}
-				else
-				{
-					echo '<img src="img/blank.gif" width="14" border="0" />';
-				}
-		
-				if( $i < count($locales) )
-				{ // show "move prio down"
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;priodown='.$lkey.'"><img src="img/arrowdown.png" border="0" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" /></a>';
-				}
-				else
-				{
-					echo '<img src="img/blank.gif" width="14" border="0" />';
-				}
-				echo '
-				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale=_new_&amp;template='.$lkey.'" title="'.T_('Use as template for &quot;Create New&quot; form').'">[copy]</a>
-				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale='.$lkey.'" title="'.T_('Edit this Locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('edit').'" title="'.T_('edit this locale').'" border="0" /></a>
-				';
-				if( isset($lval[ 'fromdb' ]) )
-				{ // allow to delete locales loaded from db
-					$l_atleastonefromdb = 1;
-					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" border="0" alt="X" title="'.T_('Delete from database!').'" /></a>';
-				}
-				echo '</td>';
-			}
-			echo '
-			</tr>';
+			} // show message file percentage/extraction
+			
+			echo '</tr>';
 		}
 		?>
 		</table>
