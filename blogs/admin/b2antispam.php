@@ -41,6 +41,8 @@
  * @author fplanque: François PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
+ * @todo Allow applying / re-checking of the known data, not just after an update!
+ *
  * @version $Id$
  */
 
@@ -76,7 +78,7 @@ switch( $action )
 		$dbkeyword = $DB->escape( $keyword );
 		param( 'delhits', 'integer', 0 );
 		param( 'delcomments', 'integer', 0 );
-		param( 'blacklist', 'integer', 0 );
+		param( 'blacklist_locally', 'integer', 0 );
 		param( 'report', 'integer', 0 );
 
 		// Check if the string is too short,
@@ -111,7 +113,7 @@ switch( $action )
 			echo '</div>';
 		}
 
-		if( $blacklist )
+		if( $blacklist_locally )
 		{ // Local blacklist:
 			echo '<div class="panelinfo">';
 			printf( '<h3>'.T_('Blacklisting the keyword [%s]...').'</h3>', $keyword );
@@ -125,7 +127,7 @@ switch( $action )
 			b2evonet_report_abuse( $keyword );
 		}
 
-		if( !( $delhits || $delcomments || $blacklist || $report ) )
+		if( !( $delhits || $delcomments || $blacklist_locally || $report ) )
 		{ // Nothing to do, ask user:
 			?>
 			<div class="panelblock">
@@ -255,7 +257,7 @@ switch( $action )
 				else
 				{ // Not in blacklist
 					?>
-					<p><strong><input type="checkbox" name="blacklist" value="1" checked="checked" />
+					<p><strong><input type="checkbox" name="blacklist_locally" value="1" checked="checked" />
 					<?php printf ( T_('Blacklist the keyword [%s] locally.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 					</strong></p>
 
