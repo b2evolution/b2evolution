@@ -338,7 +338,7 @@ msgstr "拒否と削除の確認"
 #: ..\..\..\admin\b2antispam.php:111
 #, php-format
 msgid "No log-hits match the keyword [%s]."
-msgstr "キーワード [%s] に一致するログhitsはありません。"
+msgstr "キーワード [%s] に一致するログhitはありません。"
 
 #: ..\..\..\admin\b2antispam.php:117
 #, php-format
@@ -353,7 +353,7 @@ msgstr "キーワード [%s] に一致するコメントはありません。"
 #: ..\..\..\admin\b2antispam.php:151
 #, php-format
 msgid "Delete the following %d comments:"
-msgstr "以下の %d 個のリファラhitを削除:"
+msgstr "以下の %d 個のコメントを削除:"
 
 #: ..\..\..\admin\b2antispam.php:186
 #, php-format
@@ -368,7 +368,7 @@ msgstr "キーワード [%s] をローカルのブラックリストに入れる
 #: ..\..\..\admin\b2antispam.php:199
 #, php-format
 msgid "Report the keyword [%s] as abuse to b2evolution.net."
-msgstr "b2evolution.net へキーワード [%s] を迷惑行為として報告しています..."
+msgstr "b2evolution.net へキーワード [%s] を迷惑行為として報告します。"
 
 #: ..\..\..\admin\b2antispam.php:201
 #: ..\..\..\admin\b2antispam.php:284
