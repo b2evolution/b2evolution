@@ -1400,8 +1400,12 @@ function url_add_param( $url, $param )
 function url_add_tail( $url, $tail )
 {
 	$parts = explode( '?', $url );
+	if( isset($parts[1]) ) 
+	{
+		return $parts[0].$tail.'?'.$parts[1];
+	}
 
-	return $parts[0].$tail.'?'.$parts[1];
+	return $parts[0].$tail;
 }
  
 /**
