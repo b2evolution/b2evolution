@@ -24,7 +24,7 @@ class Toolbars
 	 */
 	function Toolbars()
 	{
-		global $core_dirout, $plugins_subdir, $use_textile;
+		global $core_dirout, $plugins_subdir;
 		$plugins_path = dirname(__FILE__).'/'.$core_dirout.'/'.$plugins_subdir.'/toolbars';
 		 
 		require_once $plugins_path.'/_quicktags.php';

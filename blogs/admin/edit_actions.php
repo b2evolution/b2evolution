@@ -473,13 +473,18 @@ switch($action)
 		die( 'Unkown action!' );
 }
 
-if( ! errors() )
+if( errors() )
 {
 	echo '<div class="panelblock">';
 	if( isset( $status_action ) )
 	{
 		echo $status_action;
 	}
+	echo '</div>';
+}
+else
+{
+	echo '<div class="panelblock">';
 	echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
 	
 	if( empty( $mode ) )
