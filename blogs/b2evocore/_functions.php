@@ -1153,7 +1153,7 @@ function debug_info( $force = false )
 		if( $Debuglog->count( 'all' ) )
 		{
 			echo '<h3>Debug messages</h3>';
-			foreach( $Debuglog->messages( 'all' ) as $level => $messages )
+			foreach( $Debuglog->getMessages( 'all' ) as $level => $messages )
 			{
 				echo '<h4>Level ['.$level.']</h4><ul>';
 				foreach( $messages as $message )

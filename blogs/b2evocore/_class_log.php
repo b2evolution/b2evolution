@@ -98,89 +98,94 @@ class Log
 
 
 	/**
-	 * display messages of the Log object.
+	 * Get header/footer for a specific level, used by {@link display()}
 	 *
-	 * @param string header/title (default: empty)
-	 * @param string footer (default: empty)
+	 * @param mixed head or foot (array [ level => head/foot or string [for container])
+	 * @param string the level (or container)
+	 * @param string template, where the head/foot gets used (sprintf)
+	 */
+	function getHeadFoot( $headfoot, $level, $template )
+	{
+		$r = '';
+		if( is_array($headfoot) )
+		{ // Container-Head
+			$r = isset($headfoot[$level]) ? $headfoot[$level] : '';
+		}
+		elseif( !empty($headfoot) && $level == 'container' )
+		{ // header
+			$r = $headfoot;
+		}
+		if( !empty( $r ) )
+		{
+			return sprintf( $template, $r );
+		}
+		return false;
+	}
+
+	/**
+	 * Display messages of the Log object.
+	 *
+	 * @param string header/title (default: empty), might be array ( level => msg ),
+	 *               'container' is then top
+	 * @param string footer (default: empty), might be array ( level => msg ),
+	 *               'container' is then bottom
 	 * @param boolean to display or return (default: true)
-	 * @param string the level of messages to use (default: set by constructor)
+	 * @param mixed the level of messages to use (level, 'all', or list of levels (array)
 	 * @param string the CSS class of the outer <div> (default: 'log_'.$level)
 	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
-	 * @return mixed false, if no messages; else true/output
+	 * @return boolean false, if no messages; else true (and outputs)
 	 */
 	function display( $head = '', $foot = '', $display = true, $level = NULL, $cssclass = NULL, $style = NULL )
 	{
-		static $levelAllRecurse = false;
+		if( $level === NULL )
+		{
+			$level = $this->defaultlevel;
+		}
+		$disp = '';
 
-		$messages = & $this->messages( $level ); // we get an subarray for each level (if level == 'all')
+		$messages = & $this->getMessages( $level );
 		if( !count($messages) )
 		{
 			return false;
 		}
 
-		if( $level == 'all' && count($messages) == 1 )
-		{ // only one level has messages, leave 'all' mode
-			list( $level, $messages ) = each($messages);
-		}
+		$disp .= "\n<div class=\"log_container\">";
 
-		if( $level === NULL )
-		{
-			$level = $this->defaultlevel;
-		}
+		$disp .= $this->getHeadFoot( $head, 'container', '<h2>%s</h2>' );
 
-		if( $cssclass === NULL )
+		foreach( $messages as $llevel => $lmessages )
 		{
-			$cssclass = 'log_'.$level;
-		}
+			$lcssclass = ( $cssclass === NULL ? 'log_'.$llevel : $cssclass );
+			$disp .= "\n<div class=\"$lcssclass\">";
 
-		$disp = "\n<div class=\"$cssclass\">";
-		if( !$levelAllRecurse )
-		{
-			if( !empty($head) )
-			{ // header
-				$disp .= '<h2>'.$head.'</h2>';
-			}
-		}
+			$disp .= $this->getHeadFoot( $head, $llevel, '<h2>%s</h2>' );
 
-		if( $level == 'all' )
-		{
-			$levelAllRecurse = true;
-			foreach( $messages as $llevel => $lmessages )
-			{
-				$disp .= $this->display( '', '', false, $llevel, NULL, $style );
-			}
-			$levelAllRecurse = false;
-		}
-		else
-		{
 			if( $style == NULL )
 			{ // '<br>' for a single message, '<ul>' for more
-				$style = count($messages) == 1 ? '<br>' : '<ul>';
+				$style = count($lmessages) == 1 ? '<br>' : '<ul>';
 			}
 
 			// implode messages
 			if( $style == '<ul>' )
 			{
-				$disp .= '<ul class="'.$cssclass.'"><li>'.implode( "</li>\n<li>", $messages ).'</li></ul>';
+				$disp .= '<ul class="'.$lcssclass.'"><li>'.implode( "</li>\n<li>", $lmessages ).'</li></ul>';
 			}
 			elseif( $style == '<p>' )
 			{
-				$disp .= '<p class="'.$cssclass.'">'.implode( "</p>\n<p>", $messages ).'</p>';
+				$disp .= '<p class="'.$lcssclass.'">'.implode( "</p>\n<p>", $lmessages ).'</p>';
 			}
 			else
 			{
-				$disp .= implode( '<br />', $messages );
+				$disp .= implode( '<br />', $lmessages );
 			}
+			$disp .= $this->getHeadFoot( $foot, $llevel, '<p>%s</p>' );
+			$disp .= '</div>';
 		}
 
-		if( !$levelAllRecurse )
-		{
-			if( !empty($foot) )
-			{
-				$disp .= '<p>'.$foot.'</p>';
-			}
-		}
-		$disp .= '</div>';
+		$disp .= $this->getHeadFoot( $foot, 'container', '<p>%s</p>' );
+
+		$disp .= "\n</div>";
+
 
 		if( $display )
 		{
@@ -196,15 +201,17 @@ class Log
 	 * Wrapper for {@link display}: use header/footer dependent on message count
 	 * (one or more).
 	 *
-	 * @param string header/title (if one message)
+	 * @param string header/title for one message (default: empty), might be array
+	 *               ( level => msg ), 'container' is then top
 	 * @param string header/title (if more than one message)
-	 * @param string footer (if one message)
+	 * @param string footer (if one message) (default: empty), might be array
+	 *               ( level => msg ), 'container' is then bottom
 	 * @param string footer (if more than one message)
 	 * @param boolean to display or return (default: true)
-	 * @param string the level of messages to use (default: set by constructor)
+	 * @param mixed the level of messages to use (level, 'all', or list of levels (array)
 	 * @param string the CSS class of the outer <div> (default: 'log_'.$level)
 	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
-	 * @return mixed false, if no messages; else true/output
+	 * @return boolean false, if no messages; else true (and outputs)
 	 */
 	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
 	{
@@ -230,7 +237,7 @@ class Log
 	 * @param string the level
 	 * @return string the messages, imploded. Tags stripped.
 	 */
-	function string( $head, $foot, $level = '#' )
+	function getString( $head = '', $foot = '', $level = NULL )
 	{
 		if( !$this->count( $level ) )
 		{
@@ -239,35 +246,39 @@ class Log
 
 		$r = '';
 		if( '' != $head )
+		{
 			$r .= $head.' ';
-		$r .= implode(', ', $this->messages( $level, true ));
+		}
+		$r .= implode(', ', $this->getMessages( $level, true ));
 		if( '' != $foot )
+		{
 			$r .= ' '.$foot;
+		}
 
 		return strip_tags( $r );
 	}
 
 
 	/**
-	 * counts messages of a given level
+	 * Counts messages of a given level
 	 *
 	 * @param string the level
 	 * @return number of messages
 	 */
-	function count( $level = '#' )
+	function count( $level = NULL )
 	{
-		return count( $this->messages( $level, true ) );
+		return count( $this->getMessages( $level, true ) );
 	}
 
 
 	/**
-	 * returns array of messages of that level
+	 * Returns array of messages of that level
 	 *
 	 * @param string the level
-	 * @param boolean force one dimension
-	 * @return array of messages, one-dimensional for a specific level, two-dimensional for level 'all' (depends on second param)
+	 * @param boolean if true will use subarrays for each level
+	 * @return array the messages, one or two dimensions (depends on second param)
 	 */
-	function messages( $level = NULL, $forceonedimension = false )
+	function getMessages( $level = NULL, $singleDimension = false )
 	{
 		$messages = array();
 
@@ -276,40 +287,33 @@ class Log
 			$level = $this->defaultlevel;
 		}
 
-		// sort by level ('error' above 'note')
-		$ksortedmessages = $this->messages;
-		ksort( $ksortedmessages );
-
 		if( $level == 'all' )
 		{
-			foreach( $ksortedmessages as $llevel => $lmsgs )
+			$level = array_keys( $this->messages );
+		}
+		elseif( !is_array($level) )
+		{
+			$level = array( $level );
+		}
+
+		foreach( $this->messages as $llevel => $lmsgs )
+		{
+			if( !in_array( $llevel, $level ) )
 			{
-				foreach( $lmsgs as $lmsg )
+				continue;
+			}
+			foreach( $lmsgs as $lmsg )
+			{
+				if( $singleDimension )
 				{
-					if( $forceonedimension )
-					{
-						$messages[] = $lmsg;
-					}
-					else
-					{
-						$messages[$llevel][] = $lmsg;
-					}
+					$messages[] = $lmsg;
+				}
+				else
+				{
+					$messages[$llevel][] = $lmsg;
 				}
 			}
 		}
-		else
-		{
-			if( $level == '#' )
-			{
-				$level = $this->defaultlevel;
-			}
-
-			if( isset($this->messages[$level]) )
-			{ // we have messages for this level
-				$messages = $this->messages[$level];
-			}
-		}
-
 		return $messages;
 	}
 

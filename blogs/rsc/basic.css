@@ -44,31 +44,29 @@ code {
 }
 
 
-div.log_all,
-div.log_note,
-div.log_error,
+div.log_container,
 div.error {
 	padding:1ex;
 	margin:1ex auto;
 }
-div.log_note {
+div.log_container ul,
+div.log_container ol {
+	list-style: square;
+	margin:1ex 0;
+	padding-left:3ex;
+}
+div.log_container div {
 	border:1px solid #6287c2;
 	background:#ddd;
 	color:#000;
+	margin:1ex auto;
+	padding:1ex;
 }
-div.log_error,
+div.log_container div.log_error,
 div.error {
 	border:1px solid #d99;
 	background:#fbf2ee;
 	color:#e00;
-}
-div.log_note ul,
-div.log_note ol,
-div.log_error ul,
-div.log_error ol {
-	list-style: square;
-	margin:1ex 0;
-	padding-left:3ex;
 }
 
 p.error,

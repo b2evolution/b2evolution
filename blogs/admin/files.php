@@ -634,7 +634,7 @@ require dirname(__FILE__).'/_menutop_end.php';
 
 // output errors, notes and action messages
 if( isset( $msg_action )
-		|| $Fileman->Messages->count( 'all' )
+		|| $Fileman->Messages->count( array( 'error', 'note' ) )
 		|| $Messages->count( 'all' )
 		|| $Fileman->User->Messages->count( 'all' ) )
 {
@@ -642,7 +642,7 @@ if( isset( $msg_action )
 	<div class="panelinfo">
 		<?php
 		$Messages->display( '', '', true, 'all' );
-		$Fileman->Messages->display( '', '', true, 'all' );
+		$Fileman->Messages->display( '', '', true, array( 'error', 'note' ) );
 		$Fileman->User->Messages->display( '', '', true, 'all' );
 
 		if( isset($msg_action) )

@@ -133,7 +133,7 @@ function b2newpost($m)
 	$post_title = format_to_post($post_title, 0, 0);
 	$content = format_to_post($content, 0, 0);
 
-	if( $errstring = $Messages->string( 'Cannot post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->getString( 'Cannot post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -387,7 +387,7 @@ function bloggernewpost( $m )
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
-	if( $errstring = $Messages->string( 'Cannot post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->getString( 'Cannot post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -540,7 +540,7 @@ function bloggereditpost($m)
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
-	if( $errstring = $Messages->string( 'Cannot update post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->getString( 'Cannot update post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -1369,7 +1369,7 @@ function pingback_ping( $m )
 					}
 					$context = format_to_post($context,1,1);
 
-					if( ! ($message = $Messages->string( 'Cannot insert pingback, please correct these errors:', '' )) )
+					if( ! ($message = $Messages->getString( 'Cannot insert pingback, please correct these errors:', '' )) )
 					{ // No validation error:
 						$original_pagelinkedfrom = $pagelinkedfrom;
 						$original_title = $title;
