@@ -100,22 +100,28 @@ require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
  *
  * @param string name of the file or directory
  * @param string path of the file or directory
- * @return File an {@link File object}
+ * @return File an {@link File} object
  */
 function &getFile( $name, $path = NULL )
 {
 	global $cache_File;
+	$path = trailing_slash( $path === NULL ?
+													getcwd() :
+													$path );
 
-	$path = trailing_slash( $path === NULL ? getcwd() : $path );
-	if( isset( $cache_File[$path.$name] ) )
+	$cacheindex = is_windows() ?
+								strtolower($path.$name) :
+								$path.$name;
+
+	if( isset( $cache_File[ $cacheindex ] ) )
 	{
-		#Log::display( '', '', 'File ['.$path.$name.'] returned from cache!' );
-		return $cache_File[$path.$name];
+		#Log::display( '', '', 'File ['.$cacheindex.'] returned from cache!' );
+		return $cache_File[ $cacheindex ];
 	}
 	else
 	{
 		$File =& new File( $name, $path );
-		$cache_File[$path.$name] =& $File;
+		$cache_File[$cacheindex] =& $File;
 		return $File;
 	}
 }
@@ -371,7 +377,7 @@ class File
 
 
 	/**
-	 * Rename the file
+	 * Rename the file.
 	 *
 	 * @param string new name (without path!)
 	 * @return boolean true on success, false on failure
@@ -436,6 +442,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.4  2004/10/23 23:07:16  blueyed
+ * case-insensitive for windows!
+ *
  * Revision 1.3  2004/10/21 00:14:44  blueyed
  * moved
  *
