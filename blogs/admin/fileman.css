@@ -65,7 +65,6 @@
 }
 /* }}} */
 
-
 .toolbaritem {
 	margin:0.5ex 0;
 	vertical-align:bottom;
@@ -74,15 +73,6 @@
 	white-space:nowrap;
 }
 
-div.toolbaritem_group {
-	white-space:nowrap;
-	float:right;
-}
-div.toolbaritem_group .toolbaritem {
-	padding-left: 1ex;
-	float:none;
-	display:inline;
-}
 
 div.fm_query {
 	padding-top: 2ex;

@@ -1221,8 +1221,12 @@ function debug_info( $force = false )
 		}
 
 		echo format_to_output(
-			$Debuglog->display( array( 'container' => '<h3>Debug messages</h3>',
-																	'all' => '<h4>Level [%s]:</h4>' ),
+			$Debuglog->display( array( 'container' => array(
+																		'string' => '<h3>Debug messages</h3>',
+																		'template' => false ),
+																	'all' => array(
+																		'string' => '<h4>Level [%s]:</h4>',
+																		'template' => false ) ),
 													'',
 													false,
 													array( 'error', 'all' ) ),
@@ -1631,6 +1635,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.10  2004/11/05 15:44:31  blueyed
+ * no message
+ *
  * Revision 1.9  2004/11/05 12:48:04  blueyed
  * Debug output beautified
  *

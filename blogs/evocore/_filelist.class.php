@@ -37,7 +37,6 @@
  * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
- * @todo method add() to allow specific file (outside path)
  *
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -610,6 +609,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.7  2004/11/05 15:44:31  blueyed
+ * no message
+ *
  * Revision 1.6  2004/11/05 00:36:43  blueyed
  * no message
  *

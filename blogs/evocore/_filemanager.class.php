@@ -135,6 +135,27 @@ class FileManager extends Filelist
 	 */
 	var $mode = NULL;
 
+
+	/**
+	 * Flat mode? (all files recursive without dirs)
+	 * @var boolean
+	 * @access protected
+	 */
+	var $flatmode = NULL;
+
+
+	/**
+	 * These are variables that get considered when regenerating a URL
+	 * @var array
+	 * @access private
+	 */
+	var $_internalGlobals = array(
+			'root' => NULL, 'path' => NULL, 'filterString' => NULL,
+			'filterIsRegexp' => NULL, 'order' => NULL, 'orderasc' => NULL,
+			'mode' => NULL, 'source' => NULL, 'keepsource' => NULL,
+			'flatmode' => NULL
+		);
+
 	// }}}
 
 
@@ -289,7 +310,7 @@ class FileManager extends Filelist
 		$this->debug( $this->cwd, 'cwd' );
 		$this->debug( $this->path, 'path' );
 
-		$this->flatmode = (bool)$flatmode;
+		$this->flatmode = $flatmode;
 
 
 		$this->load();
@@ -362,7 +383,7 @@ class FileManager extends Filelist
 			$title = T_('Upload a file/image');
 		}
 
-		$url = $this->getCurUrl( NULL, NULL, NULL, NULL, NULL, NULL, 'file_upload' );
+		$url = $this->getCurUrl( array( 'mode' => 'file_upload' ) );
 
 		echo '<input class="ActionButton" type="button" value="'.format_to_output( $title, 'formvalue' )
 					.'" onclick="'.$this->getJsPopupCode( $url, 'fileman_upload' )
@@ -382,10 +403,9 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$url = $this->getCurUrl( NULL, NULL, NULL, NULL, NULL, NULL, 'file_cmr',
-															urlencode( $this->curFile->getPath( true ) ),
-															(int)($mode == 'copy') // keepsource
-														);
+		$url = $this->getCurUrl( array( 'mode' => 'file_upload',
+																		'source' => urlencode( $this->curFile->getPath( true ) ),
+																		'keepsource' => (int)($mode == 'copy') ) );
 
 		echo '<a href="'.$url.'" target="fileman_copymoverename" onclick="'
 					.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
@@ -478,35 +498,24 @@ class FileManager extends Filelist
 	 * filterIsRegexp, order, orderasc).
 	 * Params can be overridden or be forced to
 	 *
-	 * @param string override root (blog_X or user_X)
-	 * @param string override path
-	 * @param string override filterString
-	 * @param string override filterIsRegexp
-	 * @param string override order
-	 * @param string override orderasc
-	 * @param string override mode
-	 * @param string override source
-	 * @param string override keepsource
-	 * @param string override flatmode
+	 * @uses $_internalGlobals
+	 * @param array override internal globals {@link $_internalGlobals}
 	 * @return string the resulting URL
 	 */
-	function getCurUrl( $root = NULL, $path = NULL, $filterString = NULL,
-											$filterIsRegexp = NULL, $order = NULL, $orderasc = NULL,
-											$mode = NULL, $source = NULL, $keepsource = NULL,
-											$flatmode = NULL )
+	function getCurUrl( $override = array() )
 	{
 		$r = $this->url;
 
-		foreach( array('root', 'path', 'filterString', 'filterIsRegexp', 'order',
-										'orderasc', 'mode', 'source', 'keepsource', 'flatmode' ) as $check )
+		$buildUpon = array_merge( $this->_internalGlobals, $override );
+		foreach( $buildUpon as $check => $checkval )
 		{
-			if( $$check === false )
+			if( $checkval === false )
 			{ // don't include
 				continue;
 			}
-			if( $$check !== NULL )
+			if( $checkval !== NULL )
 			{ // use local param
-				$r = url_add_param( $r, $check.'='.$$check );
+				$r = url_add_param( $r, $check.'='.$checkval );
 			}
 			elseif( $this->$check !== NULL )
 			{
@@ -521,13 +530,10 @@ class FileManager extends Filelist
 	/**
 	 * Generates hidden input fields for forms, based on {@link getCurUrll()}
 	 */
-	function getFormHiddenInputs( $root = NULL, $path = NULL, $filterString = NULL,
-															$filterIsRegexp = NULL, $order = NULL, $asc = NULL,
-															$mode = NULL, $source = NULL, $keepsource = NULL,
-															$flatmode = NULL )
+	function getFormHiddenInputs( $override = array() )
 	{
 		// get current Url, remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc, $mode, $source, $keepsource, $flatmode ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $override ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -577,7 +583,8 @@ class FileManager extends Filelist
 	function getLinkSort( $type, $atext )
 	{
 		$r = '<a href="'
-					.$this->getCurUrl( NULL, NULL, NULL, NULL, $type, false );
+					.$this->getCurUrl( array( 'order' => $type,
+																		'asc' => false ) );
 
 		if( $this->order == $type )
 		{ // change asc
@@ -698,11 +705,11 @@ class FileManager extends Filelist
 		}
 		if( $File->isDir() && !$folderAsParam )
 		{
-			return $this->getCurUrl( NULL, $this->getFileSubpath($File) );
+			return $this->getCurUrl( array( 'path' => $this->getFileSubpath($File) ) );
 		}
 		else
 		{
-			return $this->getCurUrl( NULL, $this->getFileSubpath($File, false) )
+			return $this->getCurUrl( array( 'path' => $this->getFileSubpath($File, false) ) )
 							.'&amp;file='.urlencode( $File->getName() );
 		}
 	}
@@ -761,7 +768,7 @@ class FileManager extends Filelist
 		{ // cannot go higher
 			return false;
 		}
-		return $this->getCurUrl( NULL, $this->path.'..' );
+		return $this->getCurUrl( array( 'path' => $this->path.'..' ) );
 	}
 
 
@@ -770,7 +777,8 @@ class FileManager extends Filelist
 	 */
 	function getLinkHome()
 	{
-		return $this->getCurUrl( 'user', false );
+		return $this->getCurUrl( array( 'root' => 'user',
+																		'path' => false ) );
 	}
 
 
@@ -1053,7 +1061,7 @@ class FileManager extends Filelist
 			{
 				$cd .= $dir.'/';
 			}
-			$r .= '<a href="'.$this->getCurUrl( NULL, $cd )
+			$r .= '<a href="'.$this->getCurUrl( array( 'path' => $cd ) )
 					.'" title="'.T_('Change to this directory').'">'.$dir.'/</a>';
 		}
 
@@ -1211,6 +1219,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.8  2004/11/05 15:44:31  blueyed
+ * no message
+ *
  * Revision 1.7  2004/11/05 00:36:43  blueyed
  * no message
  *

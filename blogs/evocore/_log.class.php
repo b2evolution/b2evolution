@@ -113,16 +113,15 @@ class Log
 	 * @static
 	 * @access private
 	 *
-	 * @param mixed head or foot (array [ level => head/foot or string [for container])
+	 * @param mixed head or foot (array [ level => head/foot, level => 'string', 'template',
+	 *              or string [for container only])
 	 * @param string the level (or container)
-	 * @param string template, where the head/foot gets used (sprintf)
+	 * @param string template, where the head/foot gets used (%s)
 	 */
 	function getHeadFoot( $headfoot, $level, $template = NULL )
 	{
-		$r = '';
-
-		if( $level == 'container' && is_string($headfoot) )
-		{ // header
+		if( is_string($headfoot) && $level == 'container' )
+		{ // container head or foot
 			$r = $headfoot;
 		}
 		elseif( is_array($headfoot) )
@@ -137,7 +136,21 @@ class Log
 			}
 			else
 			{
-				$r = false;
+				return false;
+			}
+
+			if( is_array($r) )
+			{
+				if( isset($r['template']) )
+				{
+					$template = $r['template'];
+				}
+				$r = $r['string'];
+			}
+
+			if( strstr( $r, '%s' ) )
+			{
+				$r = sprintf( $r, $level );
 			}
 		}
 
@@ -146,11 +159,8 @@ class Log
 			return false;
 		}
 
-		if( strstr( $r, '%s' ) )
-		{
-			$r = sprintf( $r, $level );
-		}
-		elseif( $template !== NULL )
+
+		if( !empty($template) )
 		{
 			$r = sprintf( $template, $r );
 		}
@@ -437,6 +447,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/05 15:44:31  blueyed
+ * no message
+ *
  * Revision 1.4  2004/11/05 00:36:43  blueyed
  * no message
  *

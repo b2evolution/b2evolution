@@ -912,7 +912,7 @@ if( isset( $msg_action )
 	?>
 
 	<form action="files.php" name="flatmode" class="toolbaritem">
-		<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false ) ?>
+		<?php echo $Fileman->getFormHiddenInputs( array( 'flatmode' => false ) ) ?>
 		<input type="hidden" name="flatmode" value="<?php echo $flatmode ? 0 : 1; ?>" />
 		<input class="ActionButton" type="submit" title="<?php
 			echo format_to_output( $flatmode ?
@@ -931,21 +931,9 @@ if( isset( $msg_action )
 		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
 
-	<div class="toolbaritem_group">
-		<?php
-		if( $Fileman->isFiltering() )
-		{ // "reset filter" form
-		?>
-		<form action="files.php" name="unfilter" class="toolbaritem">
-			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
-			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
-		</form>
-		<?php
-		}
-		?>
-
-		<form action="files.php" name="filter" class="toolbaritem">
-			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
+	<div class="toolbaritem">
+		<form action="files.php" name="filter" class="inline">
+			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
 			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
 			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
 				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
@@ -954,6 +942,19 @@ if( isset( $msg_action )
 
 			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 		</form>
+
+		<?php
+		if( $Fileman->isFiltering() )
+		{ // "reset filter" form
+		?>
+		<form action="files.php" name="unfilter" class="inline">
+			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
+		</form>
+		<?php
+		}
+		?>
+
 	</div>
 
 	<div class="clear"></div>
@@ -992,16 +993,20 @@ param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 
 $Fileman->sort();
 
-$i = 0;
+$countFiles = 0;
 while( $lFile = $Fileman->getNextFile() )
 { // loop through all Files
 	?>
 
 	<tr<?php
-		if( $i%2 ) echo ' class="odd"';
-		?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();">
+		if( $countFiles%2 ) echo ' class="odd"';
+		?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $countFiles ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('Select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+			<input title="<?php echo T_('Select this file') ?>" type="checkbox"
+				name="selectedfiles[]" value="<?php
+				echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php
+				echo $countFiles ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php
+				echo $countFiles ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
 		<td class="icon">
 			<a href="<?php
@@ -1017,15 +1022,15 @@ while( $lFile = $Fileman->getNextFile() )
 		<td class="filename">
 			<a href="<?php echo $Fileman->getLinkFile() ?>" target="fileman_default" onclick="return false;">
 			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php
-				echo $i ?>].click(); <?php
+				echo $countFiles ?>].click(); <?php
 
 				$imgsize = $lFile->getImageSize( 'widthheight' );
 				echo $Fileman->getJsPopupCode( NULL,
-					"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$i')+'",
+					"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
 					($imgsize ? $imgsize[0]+42 : NULL),
 					($imgsize ? $imgsize[1]+42 : NULL) );
 
-				?>" id="button_new_<?php echo $i ?>" title="Open in a new window">
+				?>" id="button_new_<?php echo $countFiles ?>" title="Open in a new window">
 				<?php echo getIcon( 'window_new' )
 			?></button></a>
 			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkFile() ?>">
@@ -1049,10 +1054,10 @@ while( $lFile = $Fileman->getNextFile() )
 	</tr>
 
 	<?php
-	$i++;
+	$countFiles++;
 }
 
-if( $i == 0 )
+if( $countFiles == 0 )
 { // Filelist errors or "directory is empty"
 	?>
 	<tr>
@@ -1070,41 +1075,9 @@ if( $i == 0 )
 	</tr>
 	<?php
 }
-
-if( $i != 0 )
+else
 {{{ // Footer with "check all", "with selected: .."
 ?>
-<script type="text/javascript">
-<!--
-function openselectedfiles( checkonly )
-{
-	elems = document.getElementsByName( 'selectedfiles[]' );
-	fm_popup_type = 'selected';
-	var opened = 0;
-	for( i = 0; i < elems.length; i++ )
-	{
-		if( elems[i].checked )
-		{
-			if( !checkonly )
-			{
-				id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
-				document.getElementById( 'button_new_'+id ).click();
-			}
-			opened++;
-		}
-	}
-	if( !opened )
-	{
-		alert( '<?php echo /* TRANS: Warning this is a javascript string */ T_('Nothing selected.') ?>' );
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-// -->
-</script>
 <tr class="group"><td colspan="8">
 	<a id="checkallspan_0" href="<?php
 		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
@@ -1131,8 +1104,48 @@ function openselectedfiles( checkonly )
 </table>
 </form>
 
+<?php
+if( $countFiles )
+{
+	?>
 
-<?php // {{{ bottom toolbar
+	<script type="text/javascript">
+	<!--
+	function openselectedfiles( checkonly )
+	{
+		elems = document.getElementsByName( 'selectedfiles[]' );
+		fm_popup_type = 'selected';
+		var opened = 0;
+		for( i = 0; i < elems.length; i++ )
+		{
+			if( elems[i].checked )
+			{
+				if( !checkonly )
+				{
+					id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
+					document.getElementById( 'button_new_'+id ).click();
+				}
+				opened++;
+			}
+		}
+		if( !opened )
+		{
+			alert( '<?php echo /* TRANS: Warning this is a javascript string */ T_('Nothing selected.') ?>' );
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	// -->
+	</script>
+
+	<?php
+}
+
+
+// {{{ bottom toolbar
 param( 'options_show', 'integer', 0 );
 ?>
 <form class="toolbaritem" action="files.php" method="post">
@@ -1192,9 +1205,9 @@ param( 'options_show', 'integer', 0 );
 </form>
 
 
-<div class="toolbaritem">
+<form action="" class="toolbaritem">
 	<?php $Fileman->dispButtonUpload(); ?>
-</div>
+</form>
 
 <form action="" class="toolbaritem">
 	<select name="createnew">
