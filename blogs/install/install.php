@@ -330,7 +330,7 @@ switch( $action )
 
 		echo "posts: OK<br />\n";
 		
-		
+
 			
 		$now = date('Y-m-d H:i:s');
 		$query = "INSERT INTO $tablecomments (comment_ID, comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma)
@@ -366,6 +366,46 @@ switch( $action )
 	<?php
 	break;
 
+
+	case 'evodb':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * Upgrade data from existing b2evolution database
+		 */
+		?>
+		<h3>Upgrading data in existing b2evolution database</h3>
+		<?php
+		
+		// start benchmarking
+		$time_start = gettimeofday();
+		
+		echo "<p>Generating wordcounts... ";
+		$query = "SELECT ID, post_content FROM $tableposts";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		$rows_updated = 0;
+
+		while($row = mysql_fetch_assoc($q)) {
+			$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
+			$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
+			$rows_updated++;
+		}
+
+		echo "OK. ($rows_updated rows updated)</p>\n";
+		
+		// end benchmarking
+		$time_end = gettimeofday();
+		$time_total = (float)($time_end['sec'] - $time_start['sec']) + ((float)($time_end['usec'] - $time_start['usec'])/1000000);
+		$time_total = round($time_total, 3);
+		
+		?>
+		
+		<p>Upgrade completed successfully! (<?php echo $time_total; ?> seconds)</p>
+
+		<p>Now you can <a href="../admin/b2login.php">log in</a> with your usual b2evolution username and password.</p>
+		
+ <?php
+	break;
 
 
 	case 'upgradedb':
@@ -438,12 +478,16 @@ switch( $action )
 		$query = "SELECT ID, post_content FROM $tableposts";
 		$q = mysql_query($query) or mysql_oops( $query );
 		
+		$rows_updated = 0;
+		
 		while($row = mysql_fetch_assoc($q)) {
 			$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
 			$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
+			
+			$rows_updated++;
 		}
 		
-		echo "OK.<br />\n";
+		echo "OK. ($rows_updated rows updated)<br />\n";
 
 		echo "Generating postcats... ";
  		$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_category FROM $tableposts";		
@@ -495,7 +539,7 @@ switch( $action )
 		echo "Qualifying comments... Pingback...";
  		$query = "UPDATE $tablecomments SET comment_type = 'pingback' WHERE comment_content LIKE '<pingback />%'";		
 		$q = mysql_query($query) or mysql_oops( $query );
-		echo "OK.</p>";
+		echo "OK.</p>\n";
 
 		// end benchmarking
 		$time_end = gettimeofday();
