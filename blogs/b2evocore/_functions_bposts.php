@@ -65,10 +65,8 @@ function bpost_create(
 										'".$DB->escape($post_status)."', '".$DB->escape($post_locale)."',
 										'".$DB->escape($post_url)."', $autobr, '".implode(',',$post_flags)."', 
 										".bpost_count_words($post_content).", '".$DB->escape($post_comments)."' )";
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
-	$post_ID = mysql_insert_id();
+	if( ! $DB->query( $query ) ) return 0;
+	$post_ID = $DB->insert_id;
 	//echo "post ID:".$post_ID;
 
 	// insert new extracats
@@ -79,9 +77,7 @@ function bpost_create(
 		$query .= "( $post_ID, $extra_cat_ID ),";
 	}
 	$query = substr( $query, 0, strlen( $query ) - 1 );
-	$querycount++;
-	mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// TODO: END TRANSACTION
 
@@ -149,19 +145,13 @@ function bpost_update(
 								post_wordcount = ".bpost_count_words($post_content).", 
 								post_comments = '".$DB->escape($post_comments)."' ";
 								
-	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp', ";
+	if( !empty($post_timestamp) )	$query .= ", post_issue_date = '$post_timestamp' ";
 	$query .= "WHERE ID = $post_ID";
-	// echo $query;
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// delete previous extracats
 	$query = "DELETE FROM $tablepostcats WHERE postcat_post_ID = $post_ID";
-
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// insert new extracats
 	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
@@ -171,10 +161,7 @@ function bpost_update(
 		$query .= "( $post_ID, $extra_cat_ID ),";
 	}
 	$query = substr( $query, 0, strlen( $query ) - 1 );
-
-	$querycount++;
-	mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// TODO: END TRANSACTION
 
@@ -195,7 +182,7 @@ function bpost_update_status(
 	$pingsdone = true,
 	$post_timestamp = '' )
 {
-	global $tableposts, $tablepostcats, $query, $querycount;
+	global $DB, $tableposts, $tablepostcats;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
@@ -214,12 +201,8 @@ function bpost_update_status(
 	$query .= "post_status = '$post_status', ";
 	$query .= "post_flags = '".implode(',',$post_flags)."' ";
 	$query .= "WHERE ID = $post_ID";
-	// echo $query;
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
 
-	return 1;	// success
+	return $DB->query( $query );
 }
 
 
@@ -233,27 +216,21 @@ function bpost_update_status(
  */
 function bpost_delete( $post_ID )
 {
-	global $tableposts, $tablepostcats, $tablecomments, $query, $querycount;
+	global $DB, $tableposts, $tablepostcats, $tablecomments;
 
 	// TODO: START TRANSACTION
 
 	// delete extracats
 	$query = "DELETE FROM $tablepostcats WHERE postcat_post_ID = $post_ID";
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// delete comments
 	$query = "DELETE FROM $tablecomments WHERE comment_post_ID = $post_ID";
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// delete post
 	$query = "DELETE FROM $tableposts WHERE ID = $post_ID";
-	$querycount++;
-	$result = mysql_query($query);
-	if( !$result ) return 0;
+	if( ! $DB->query( $query ) ) return 0;
 
 	// TODO: END TRANSACTION
 
@@ -303,7 +280,7 @@ function get_lastpostdate( $blog = 1, $show_statuses = '' )
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 {
-	global $tableposts, $querycount;
+	global $DB, $tableposts;
 
 	$urltitle = trim( $urltitle );
 
@@ -338,12 +315,10 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 					FROM $tableposts
 					WHERE post_urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'
 					  AND ID <> $post_ID";
-	$result = mysql_query($sql) or mysql_oops( $sql );
-	$querycount++;
-
+	$rows = $DB->get_results( $sql, ARRAY_A );
 	$exact_match = false;
 	$highest_number = 0;
-	while( $row = mysql_fetch_assoc( $result ) )
+	if( count( $rows ) ) foreach( $rows as $row )
 	{
 		$existing_urltitle = $row['post_urltitle'];
 		// echo "existing = $existing_urltitle <br />";
@@ -379,7 +354,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
  */
 function get_postdata($postid)
 {
-	global $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $querycount, $show_statuses;
+	global $DB, $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $show_statuses;
 
 	if( !empty($postdata) && $postdata['ID'] == $postid )
 	{	// We are asking for postdata of current post in memory! (we're in the b2 loop)
@@ -398,11 +373,8 @@ function get_postdata($postid)
 
 	// echo $sql;
 
-	$result = mysql_query($sql) or mysql_oops( $sql );
-	$querycount++;
-	if (mysql_num_rows($result))
+	if( $myrow = $DB->get_row( $sql ) )
 	{
-		$myrow = mysql_fetch_object($result);
 		$mypostdata = array (
 			'ID' => $myrow->ID,
 			'Author_ID' => $myrow->post_author,
@@ -442,7 +414,7 @@ function get_postdata($postid)
  */
 function Item_get_by_ID( $post_ID )
 {
-	global $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments, $querycount, $show_statuses;
+	global $DB, $postdata, $tableusers, $tablesettings, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
 
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
@@ -456,15 +428,8 @@ function Item_get_by_ID( $post_ID )
 
 	// echo $sql;
 
-	$result = mysql_query($sql) or mysql_oops( $sql );
-	$querycount++;
-
-	if( mysql_num_rows($result) == 0 )
-	{
+	if( ! ($row = $DB->get_row( $sql )) )
 		return false;
-	}
-
-	$row = mysql_fetch_object( $result );
 
 	return new Item( $row );	// COPY !
 }
@@ -837,7 +802,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 {
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
-	global $tableposts, $id, $postdata, $siteurl, $blogfilename, $querycount;
+	global $DB, $tableposts, $id, $postdata, $siteurl, $blogfilename;
 	global $p, $posts, $posts_per_page, $s;
 
 	if(($p) || ($posts==1))
@@ -861,12 +826,16 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 		}
 
 		$limitprev--;
-		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_issue_date < '$current_post_date' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_issue_date DESC LIMIT $limitprev,1";
+		$sql = "SELECT ID,post_title 
+						FROM $tableposts 
+						WHERE post_issue_date < '$current_post_date' 
+							$sqlcat 
+							$sql_exclude_cats 
+						ORDER BY post_issue_date DESC 
+						LIMIT $limitprev, 1";
 
-		$query = @mysql_query($sql);
-		$querycount++;
-		if (($query) && (mysql_num_rows($query))) {
-			$p_info = mysql_fetch_object($query);
+		if( $p_info = $DB->get_row( $sql ) )
+		{
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;
 			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$previous;
@@ -915,11 +884,17 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		$now = date('Y-m-d H:i:s', $localtimenow );
 
 		$limitnext--;
-		$sql = "SELECT ID,post_title FROM $tableposts WHERE post_issue_date > '$current_post_date' AND post_issue_date < '$now' AND post_category > 0 $sqlcat $sql_exclude_cats ORDER BY post_issue_date ASC LIMIT $limitnext,1";
+		$sql = "SELECT ID, post_title 
+						FROM $tableposts 
+						WHERE post_issue_date > '$current_post_date' 
+							AND post_issue_date < '$now' 
+							$sqlcat 
+							$sql_exclude_cats 
+						ORDER BY post_issue_date ASC 
+						LIMIT $limitnext, 1";
 
-		$query = @mysql_query($sql);
-		$querycount++;
-		if (($query) && (mysql_num_rows($query))) {
+		if( $p_info = $DB->get_row( $sql ) )
+		{
 			$p_info = mysql_fetch_object($query);
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;

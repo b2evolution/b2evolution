@@ -51,7 +51,6 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 
 	$comment = "<strong>$title</strong><br />$excerpt";
 
-	$email = '';
 	$original_comment = $comment;
 
 	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'];
@@ -71,18 +70,17 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		die();
 	}
 
-	$comment_author = $author;
-	$comment_author_email = $email;
+	$comment_author = $blog_name;
+	$comment_author_email = '';
 	$comment_author_url = $url;
 
 	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, 
 																				comment_author_email, comment_author_url, comment_author_IP,
 																				comment_date, comment_content) 
-						VALUES( $comment_post_ID, 'trackback', '".$DB->escape($author)."', 
-										'".$DB->escape($email)."', '".$DB->escape($url)."', '".$DB->escape($user_ip)."',
+						VALUES( $comment_post_ID, 'trackback', '".$DB->escape($comment_author)."', 
+										'".$DB->escape($comment_author_email)."', '".$DB->escape($comment_author_url)."', '".$DB->escape($user_ip)."',
 										'$now', '".$DB->escape($comment)."' )";
-	$result = mysql_query($query);
-	if (!$result) 
+	if( !$DB->query( $query ) ) 
 	{
 		trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok
 		die ();

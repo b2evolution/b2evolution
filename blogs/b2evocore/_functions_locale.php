@@ -270,10 +270,8 @@ return;
 $query = 'SELECT
 					loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled
 					FROM '. $tablelocales;
-$result = mysql_query( $query ) or mysql_oops( $query );
-$querycount++;
-
-while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) )
+$rows = $DB->get_results( $query, ARRAY_A );
+if( count( $rows ) ) foreach( $rows as $row )
 {
 	if( $row[ 'loc_enabled' ] ){
 		$locales[ $row['loc_locale'] ] = array(

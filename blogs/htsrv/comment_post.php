@@ -67,13 +67,12 @@ if( empty($comment) )
 }
 
 /* flood-protection */
-$query = "SELECT max(comment_date) as maxdate FROM $tablecomments WHERE comment_author_IP='$user_ip'";
-$result = mysql_query($query);
+$query = "SELECT max(comment_date)
+					  FROM $tablecomments 
+					 WHERE comment_author_IP = '$user_ip'";
 $ok = 1;
-if( mysql_num_rows($result) )
+if( $then = $DB->get_var( $query ) )
 {
-	$row = mysql_fetch_object($result);
-	$then = $row->maxdate;
 	$time_lastcomment = mysql2date("U",$then);
 	$time_newcomment = mysql2date("U",$now);
 	if( ($time_newcomment - $time_lastcomment) < 30)
@@ -97,8 +96,7 @@ $query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_aut
 					VALUES( $comment_post_ID, 'comment', '".$DB->escape($author)."','".$DB->escape($email)."',
 									'".$DB->escape($url)."','".$DB->escape($user_ip)."','$now',
 									'".$DB->escape($comment)."' )";
-$querycount++;
-$result = mysql_query($query) or mysql_oops( $query );
+$DB->query( $query );
 
 /*
  * New comment notification:

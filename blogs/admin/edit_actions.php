@@ -380,7 +380,7 @@ switch($action)
 		echo '<h3>', T_('Deleting post...'), "</h3>\n";
 
 		// DELETE POST FROM DB:
-		bpost_delete( $post ) or mysql_oops($query);
+		bpost_delete( $post );
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0) {
 			echo '<p>', T_('Sleeping...'), "</p>\n";
