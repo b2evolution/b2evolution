@@ -282,7 +282,7 @@ table.grouped tr.odd .firstcol {
 	border: 1px solid #36c;	/* force moz to display float before */
 }
 #evologo {
-	float:left;
+	float: left;
 	margin: 0 1ex;
 	border: 0;
 	/* border: 1px solid #00f; */
@@ -368,7 +368,7 @@ div.panelblock {
 	border: 1px solid #e1ddce;
 	padding: 1ex;
 	margin: 1ex 1em;
-	clear:both; // blueyed
+	clear:both; /* blueyed */
 }
 .footer {
 	text-align: center;
@@ -401,7 +401,7 @@ div.panelblock {
 	background: #f0f0f0;
 	font-weight: bold;
 }
-#mainmenu li a{ // made mainmenu links clickable in whole li (at least with Mozilla)
+#mainmenu li a{ /* made mainmenu links clickable in whole li (at least with Mozilla) */
 	display:block;
 	padding:.5ex;
 }
@@ -797,6 +797,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.8  2004/12/03 15:13:16  fplanque
+ * removed my own bugs from CSS
+ *
  * Revision 1.7  2004/12/03 11:57:17  fplanque
  * no message
  *
