@@ -217,7 +217,7 @@ switch( $action )
 				}
 				fclose($f);
 
-				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully upadted.').'</p>', $conf_filepath );
+				sprintf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
 				$config_is_done = 1;
 				$action = 'menu';
 			}

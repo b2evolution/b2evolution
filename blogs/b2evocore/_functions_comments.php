@@ -204,7 +204,7 @@ function comments_number( $zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = T_('Leave a comment');
 	if( $one == '#' ) $one = T_('1 comment');
-	if( $more == '#' ) $more = T_('% comments');
+	if( $more == '#' ) $more = T_('%d comments');
 
 	// original hack by dodo@regretless.com
 	global $id,$postdata,$tablecomments,$c,$querycount,$cache_commentsnumber,$use_cache;
@@ -215,7 +215,7 @@ function comments_number( $zero='#', $one='#', $more='#' )
 		$blah = $one;
 	} elseif ($number  > 1) {
 		$n = $number;
-		$more=str_replace('%', $n, $more);
+		$more = str_replace('%d', $n, $more);
 		$blah = $more;
 	}
 	echo $blah;

@@ -783,7 +783,7 @@ function the_content(
  */
 function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='')
 {
-	global $id,$page,$numpages, $multipage, $more;
+	global $id, $page, $numpages, $multipage, $more;
 	global $blogfilename;
 
 	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
@@ -794,29 +794,31 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 	else
 		$file = get_bloginfo('blogurl');
 
-	if(($multipage)) { // && ($more)) {
+	if( $multipage ) { // && ($more)) {
 		echo $before;
-		if ($next_or_number=='number')
+		if( $next_or_number == 'number' )
 		{
 			for ($i = 1; $i < ($numpages+1); $i = $i + 1)
 			{
-				$j=str_replace('%',"$i",$pagelink);
-				echo " ";
-				if (($i != $page) || ((!$more) && ($page==1)))
-					echo '<a href="'.$file.'?p='.$id.'&amp;more=1&amp;page='.$i.'">';
+				$j = str_replace('%', "$i", $pagelink);
+				echo ' ';
+				if( ($i != $page) || ( (!$more) && ($page==1) ))
+					echo '<a href="'.url_add_param($file, 'p='.$id.'&amp;more=1&amp;page='.$i).'">';
 				echo $j;
-				if (($i != $page) || ((!$more) && ($page==1)))
+				if( ($i != $page) || ( (!$more) && ($page==1) ))
 					echo '</a>';
 			}
 		}
 		else
 		{
-			$i=$page-1;
-			if ($i)
-				echo ' <a href="'.$file.'?p='.$id.'&amp;page='.$i.'">'.$previouspagelink.'</a>';
-			$i=$page+1;
-			if ($i<=$numpages)
-				echo ' <a href="'.$file.'?p='.$id.'&amp;page='.$i.'">'.$nextpagelink.'</a>';
+			$i = $page - 1;
+			if( $i )
+				echo ' <a href="'.url_add_param($file, 'p='.$id.'&amp;page='.$i).'">'.$previouspagelink.'</a>';
+			
+			$i = $page+1;
+			
+			if( $i <= $numpages )
+				echo ' <a href="'.url_add_param($file, 'p='.$id.'&amp;page='.$i).'">'.$nextpagelink.'</a>';
 		}
 		echo $after;
 	}
@@ -868,7 +870,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 		{
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;
-			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$previous;
+			$string = '<a href="'.url_add_param( get_bloginfo('blogurl'), 'p='.$p_id.'&amp;more=1&amp;c=1').'">'.$previous;
 			if (!($title!='yes')) {
 				$string .= $p_title;
 			}

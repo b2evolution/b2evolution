@@ -674,7 +674,7 @@ class Item extends DataObject
 				if( $title == '#' ) $title = T_('Display feedback / Leave a comment');
 				if( $zero == '#' ) $zero = T_('Send feedback');
 				if( $one == '#' ) $one = T_('1 feedback');
-				if( $more == '#' ) $more = T_('% feedbacks');
+				if( $more == '#' ) $more = T_('%d feedbacks');
 				break;
 
 			case 'comments':
@@ -690,7 +690,7 @@ class Item extends DataObject
 				if( $title == '#' ) $title = T_('Display comments / Leave a comment');
 				if( $zero == '#' ) $zero = T_('Leave a comment');
 				if( $one == '#' ) $one = T_('1 comment');
-				if( $more == '#' ) $more = T_('% comments');
+				if( $more == '#' ) $more = T_('%d comments');
 				break;
 
 			case 'trackbacks':
@@ -698,7 +698,7 @@ class Item extends DataObject
 				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
 				if( $zero == '#' ) $zero = T_('Trackback (0)');
 				if( $one == '#' ) $one = T_('Trackback (1)');
-				if( $more == '#' ) $more = T_('Trackbacks (%)');
+				if( $more == '#' ) $more = T_('Trackbacks (%d)');
 				break;
 
 			case 'pingbacks':
@@ -706,7 +706,7 @@ class Item extends DataObject
 				if( $title == '#' ) $title = T_('Display pingbacks');
 				if( $zero == '#' ) $zero = T_('Pingback (0)');
 				if( $one == '#' ) $one = T_('Pingback (1)');
-				if( $more == '#' ) $more = T_('Pingback (%)');
+				if( $more == '#' ) $more = T_('Pingback (%d)');
 				break;
 
 			default:
@@ -741,8 +741,8 @@ class Item extends DataObject
 			echo $zero;
 		elseif( $number == 1 )
 			echo $one;
-	 	elseif( $number > 1 )
-			echo str_replace( '%', $number, $more );
+		elseif( $number > 1 )
+			echo str_replace( '%d', $number, $more );
 
 		echo '</a>';
 

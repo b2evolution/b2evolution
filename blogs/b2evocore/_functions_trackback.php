@@ -171,7 +171,7 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = T_('Trackback (0)');
 	if( $one == '#' ) $one = T_('Trackback (1)');
-	if( $more == '#' ) $more = T_('Trackbacks (%)');
+	if( $more == '#' ) $more = T_('Trackbacks (%d)');
 
 	global $id, $tablecomments, $tb, $querycount, $cache_trackbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'trackbacks');
@@ -181,7 +181,7 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 		$blah = $one;
 	} elseif ($number  > 1) {
 		$n = $number;
-		$more=str_replace('%', $n, $more);
+		$more = str_replace('%d', $n, $more);
 		$blah = $more;
 	}
 	echo $blah;

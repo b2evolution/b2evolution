@@ -176,9 +176,9 @@
 				?>
 				[ <a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php $Item->ID() ?>&c=1"><?php
 				// TRANS: Link to comments for current post
-				comments_number(T_('no comment'), T_('1 comment'), T_('% comments'));
-				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('% Trackbacks'));
-				pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('% Pingbacks'));
+				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'));
+				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'));
+				pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('%d Pingbacks'));
 				?></a> ]
 			</p>
 

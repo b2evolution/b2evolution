@@ -265,7 +265,7 @@ function pingback_number($zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = T_('Pingback (0)');
 	if( $one == '#' ) $one = T_('Pingback (1)');
-	if( $more == '#' ) $more = T_('Pingbacks (%)');
+	if( $more == '#' ) $more = T_('Pingbacks (%d)');
 
 	global $id, $tablecomments, $tb, $querycount, $cache_pingbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'pingbacks');
@@ -275,7 +275,7 @@ function pingback_number($zero='#', $one='#', $more='#' )
 		$blah = $one;
 	} elseif ($number  > 1) {
 		$n = $number;
-		$more=str_replace('%', $n, $more);
+		$more = str_replace('%d', $n, $more);
 		$blah = $more;
 	}
 	echo $blah;
