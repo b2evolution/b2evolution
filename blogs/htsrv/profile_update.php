@@ -101,16 +101,16 @@ else
 
 $query = "UPDATE $tableusers ".
 	"SET " . 	$updatepassword.
-	"user_firstname = '$newuser_firstname', ".
-	"user_lastname='$newuser_lastname', ".
-	"user_nickname='$newuser_nickname', ".
-	"user_icq='$newuser_icq', ".
-	"user_email='$newuser_email', ".
-	"user_url='$newuser_url', ".
-	"user_aim='$newuser_aim', ".
-	"user_msn='$newuser_msn', ".
-	"user_yim='$newuser_yim', ".
-	"user_idmode='$newuser_idmode' ".
+	"user_firstname = '".addslashes($newuser_firstname)."', ".
+	"user_lastname='".addslashes($newuser_lastname)."', ".
+	"user_nickname='".addslashes($newuser_nickname)."', ".
+	"user_icq='".addslashes($newuser_icq)."', ".
+	"user_email='".addslashes($newuser_email)."', ".
+	"user_url='".addslashes($newuser_url)."', ".
+	"user_aim='".addslashes($newuser_aim)."', ".
+	"user_msn='".addslashes($newuser_msn)."', ".
+	"user_yim='".addslashes($newuser_yim)."', ".
+	"user_idmode='".addslashes($newuser_idmode)."' ".
 	"WHERE ID = $user_ID";
 $querycount++;
 $result = mysql_query($query) or mysql_oops( $query );

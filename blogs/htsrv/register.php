@@ -76,19 +76,15 @@ switch($action)
 		$user_domain	= isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '';
 		$user_browser	= isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-		$user_login	= addslashes($login);
-		$pass1 = md5($pass1);
-		$user_nickname = addslashes($user_nickname);
-
 		$query = "INSERT INTO $tableusers " .
 					"(user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) " .
-					"VALUES ('$user_login', '$pass1', '$user_nickname', '$email', '$user_ip', '$user_domain', '$user_browser', NOW(), '$new_users_can_blog', 'nickname')";
+					"VALUES ('".addslashes($user_login)."', '".md5($pass1)."', '".addslashes($user_nickname)."', '$email', '$user_ip', '".addslashes($user_domain)."', '".addslashes($user_browser)."', NOW(), '$new_users_can_blog', 'nickname')";
 		$result = mysql_query($query) or mysql_oops( $query );
 
 		// TODO: END TRANSACTION !!
 
 		$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
-		$message .= T_('Login', $default_locale). ": $user_login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
+		$message .= T_('Login', $default_locale). ": $login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
 		$message .= T_('Manage users', $default_locale). ": $admin_url/b2team.php\n\n";
 
 		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());

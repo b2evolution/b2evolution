@@ -177,7 +177,7 @@ define('E_FLOW_CONTENTS', E_PURE_BLOCK_CONTENTS.' '.E_PURE_INLINE_CONTENTS.' '.E
 // Allowed Attribute classes
 define('A_CORE_ATTRS', 'title');
 define('A_I18N_ATTRS', 'xml:lang lang dir');
-define('A_ATTRS', A_CORE_ATTRS.' '.A_I18N_ATTRS.' class style');
+define('A_ATTRS', A_CORE_ATTRS.' '.A_I18N_ATTRS.' class');
 define('A_IMG_ATTRS', A_ATTRS.' src alt longdesc height width border'); 
 define('A_CITE_ATTRS', A_ATTRS.' cite');
 define('A_ANCHOR_ATTRS', A_ATTRS.' href hreflang');
@@ -302,7 +302,10 @@ define('COM_A_CITE_ATTRS', COM_A_ATTRS.' cite');
 define('COM_A_ANCHOR_ATTRS', COM_A_ATTRS.' href hreflang');
 define('COM_A_LIST_ATTRS', COM_A_ATTRS.' type');
 define('COM_A_LISTITEM_ATTRS', COM_A_LIST_ATTRS.' value');
-define('COM_A_STYLE_ATTRS', 'class style');		// these should only be authorised for divs in the B/O
+define('COM_A_STYLE_ATTRS', 'class');
+# Beware of the STYLE attribute: untrusted bloggers could use something like this:
+# style="background-image:url(javascript:somethingevil())" ..
+# this cannot be checked even with the current XHTML validating checker.
 
 // Array showing what tags are allowed and what their allowed subtags are.
 $comments_allowed_tags = array
