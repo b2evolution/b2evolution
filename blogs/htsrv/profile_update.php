@@ -66,7 +66,7 @@ if (empty($newuser_email))
 }
 elseif (!is_email($newuser_email))
 {
-	die ('<strong>'. T_('ERROR'). '</strong>: '. T_('the email address isn\'t correct').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
+	die ('<strong>'. T_('ERROR'). '</strong>: '. T_('the email address is invalid').'<br />[<a href="javascript:history.go(-1)">'. T_('Back to profile'). '</a>]' );
 	return false;
 }
 	

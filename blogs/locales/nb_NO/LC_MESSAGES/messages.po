@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.6\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-10-31 18:43+0100\n"
-"PO-Revision-Date: 2003-10-18 15:35+0100\n"
+"POT-Creation-Date: 2003-11-02 21:04+0100\n"
+"PO-Revision-Date: 2003-11-02 20:07+0100\n"
 "Last-Translator: Vegar Berg Guldal <kaggesofa@sensewave.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -168,12 +168,14 @@ msgstr "Arkivkatalog"
 
 #: ..\..\..\multiblogs.php:96
 msgid "Multiblog demo"
-msgstr ""
+msgstr "Multiblog demo"
 
 #: ..\..\..\multiblogs.php:106
 msgid ""
 "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
 msgstr ""
+"Denne demonstrasjonsmalen viser 3 blogger på en gang (1 til venstre, 2 til "
+"høyre)"
 
 #: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:220
 #: ..\..\..\multiblogs.php:255 ..\..\..\noskin_a.php:161
@@ -218,24 +220,22 @@ msgstr "Kategorier"
 #: ..\..\..\noskin_all.php:155 ..\..\..\noskin_b.php:155
 #: ..\..\..\noskin_roll.php:154 ..\..\..\skins\custom\_main.php:88
 #: ..\..\..\skins\fplanque2002\_main.php:101
-#, fuzzy
 msgid "Display comments / Leave a comment"
-msgstr "Legg igjen en kommentar"
+msgstr "Vis kommentarer / Legg igjen en kommentar"
 
 #: ..\..\..\multiblogs.php:147 ..\..\..\noskin_a.php:156
 #: ..\..\..\noskin_all.php:157 ..\..\..\noskin_b.php:157
 #: ..\..\..\noskin_roll.php:156 ..\..\..\skins\custom\_main.php:90
 #: ..\..\..\skins\fplanque2002\_main.php:103
 msgid "Display trackbacks / Get trackback address for this post"
-msgstr ""
+msgstr "Vis trackbacks / Finn trackback-adresse for denne posten"
 
 #: ..\..\..\multiblogs.php:150 ..\..\..\noskin_a.php:159
 #: ..\..\..\noskin_all.php:160 ..\..\..\noskin_b.php:160
 #: ..\..\..\noskin_roll.php:159 ..\..\..\skins\custom\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:106
-#, fuzzy
 msgid "Display pingbacks"
-msgstr "% Pingbacks"
+msgstr "Vis pingbacks"
 
 #: ..\..\..\multiblogs.php:153 ..\..\..\noskin_a.php:162
 #: ..\..\..\noskin_all.php:163 ..\..\..\noskin_b.php:163
@@ -423,19 +423,18 @@ msgid "Totals: %d posts - %d queries - %01.3f seconds"
 msgstr "Totalt: %d poster - %d etterspørseler - %01.3f sekunder"
 
 #: ..\..\..\summary.php:56
-#, fuzzy
 msgid "Summary demo"
-msgstr "Sammendrag"
+msgstr "Sammendrag demo"
 
 #: ..\..\..\summary.php:66
-#, fuzzy
 msgid "This demo template displays a summary of last posts in all blogs"
-msgstr "Sammendrag av de siste postene i alle blogger"
+msgstr ""
+"Denne demonstrasjonsmalen viser et sammendrag av de siste postene i alle "
+"blogger"
 
 #: ..\..\..\summary.php:97
-#, fuzzy
 msgid "More posts..."
-msgstr "Sletter post..."
+msgstr "Flere poster..."
 
 #: ..\..\..\admin\b2blogs.php:9 ..\..\..\admin\_blogs_list.php:10
 #: ..\..\..\admin\_menutop.php:67 ..\..\..\skins\bluesky\_bloglist.php:17
@@ -582,9 +581,8 @@ msgid "New category name"
 msgstr "Nytt kategorinavn"
 
 #: ..\..\..\admin\b2categories.php:49
-#, fuzzy
 msgid "Create category"
-msgstr "Les poster i kategorien"
+msgstr "Lag kategori"
 
 #: ..\..\..\admin\b2categories.php:88
 msgid "Deleting category..."
@@ -624,13 +622,13 @@ msgid "Old Parent"
 msgstr "Gammel overkategori"
 
 #: ..\..\..\admin\b2categories.php:169
+#, fuzzy
 msgid "Root (No parent)"
-msgstr ""
+msgstr "Rot (Ingen over)"
 
 #: ..\..\..\admin\b2categories.php:180
-#, fuzzy
 msgid "Edit category!"
-msgstr "Kategori"
+msgstr "Rediger kategori!"
 
 #: ..\..\..\admin\b2categories.php:231 ..\..\..\admin\_blogs_list.php:25
 #: ..\..\..\admin\_edit_form.php:199
@@ -713,6 +711,7 @@ msgstr "Log inn..."
 msgid ""
 "In b2evolution, you do not need to point to the b2login.php page to log in."
 msgstr ""
+"I b2evolution trenger du ikke å peke til b2login.php-siden for å logge inn."
 
 #: ..\..\..\admin\b2login.php:20
 #, php-format
@@ -720,6 +719,8 @@ msgid ""
 "Simply point directly to the backoffice page you need, for example: %s or %"
 "s. b2evo will prompt you to log in if needed."
 msgstr ""
+"Pek i stedet til den administrasjonssiden du trenger, for eksempel %s eller %"
+"s. b2evo vil så be deg om å logge inn, dersom det trengs."
 
 #: ..\..\..\admin\b2options.php:11 ..\..\..\admin\_edit_showposts.php:255
 #: ..\..\..\admin\_menutop.php:72 ..\..\..\skins\_feedback.php:182
@@ -835,9 +836,14 @@ msgstr "Legg til denne lenken til dine favoritter/bokmerker:"
 msgid "b2evo sidebar"
 msgstr "b2evo sideskuff"
 
-#: ..\..\..\admin\b2spell.php:76
+#: ..\..\..\admin\b2spell.php:11
+#, fuzzy
+msgid "Spell Check"
+msgstr "Stavekontroll"
+
+#: ..\..\..\admin\b2spell.php:78
 msgid "Loading Spell Checker. Please wait"
-msgstr ""
+msgstr "Laster inn stavekontroll. Vennligst vent"
 
 #: ..\..\..\admin\b2stats.php:10
 msgid "View Stats"
@@ -861,6 +867,7 @@ msgid "Syndication"
 msgstr "Syndikasjon"
 
 # Literal translation
+# -Vegar
 #: ..\..\..\admin\b2stats.php:38
 #, fuzzy
 msgid "User Agents"
@@ -999,11 +1006,10 @@ msgstr ""
 "koblinger (enten ved å taste URLen direkte inn i adressefeltet, eller ved å "
 "følge et bokmerke. Ugyldige (for korte) referenter er også listet her.)"
 
-# Literal translation
 #: ..\..\..\admin\b2stats.php:351
 #, fuzzy
 msgid "Top User Agents"
-msgstr "Brukeragenter"
+msgstr "Topp brukeragenter"
 
 #: ..\..\..\admin\b2team.php:11
 msgid "User management"
@@ -1014,9 +1020,10 @@ msgid "Profile for:"
 msgstr "Profil for:"
 
 #: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:206
-#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\_login_form.php:37
-#: ..\..\..\htsrv\_lostpass_form.php:20 ..\..\..\htsrv\_reg_complete.php:14
-#: ..\..\..\htsrv\_reg_form.php:22 ..\..\..\skins\_profile.php:28
+#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:20
+#: ..\..\..\htsrv\_reg_complete.php:14 ..\..\..\htsrv\_reg_form.php:22
+#: ..\..\..\skins\_profile.php:28
 msgid "Login:"
 msgstr "Brukernavn:"
 
@@ -1282,7 +1289,7 @@ msgid "Duplicate File?"
 msgstr "Duplikat fil?"
 
 #: ..\..\..\admin\b2upload.php:179
-#, fuzzy, php-format
+#, php-format
 msgid "The filename \"%s\" already exists!"
 msgstr "Filnavnet \"%s\" er allerede i bruk!"
 
@@ -1359,7 +1366,7 @@ msgstr "Tilbake til postredigering"
 
 #: ..\..\..\admin\edit_actions.php:83
 msgid "Recording post..."
-msgstr ""
+msgstr "Skriver post..."
 
 #: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:281
 msgid "Sleeping..."
@@ -1448,8 +1455,9 @@ msgid "Short Description"
 msgstr "Kort beskrivelse"
 
 #: ..\..\..\admin\_blogs_form.php:43
+#, fuzzy
 msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
-msgstr ""
+msgstr "Dette brukes i metatagg-beskrivelsen og RSS-koblinger. IKKE HTML!"
 
 #: ..\..\..\admin\_blogs_form.php:47
 msgid "Keywords"
@@ -1585,9 +1593,12 @@ msgstr "Trackback-URLer"
 msgid "(Separate by space)"
 msgstr "(Adskilt med mellomrom)"
 
+# Is this a noun or a verb? Noun = forhåndsvisning, verb = forhåndsvis
+# -Vegar
 #: ..\..\..\admin\_edit_form.php:173
+#, fuzzy
 msgid "Preview"
-msgstr ""
+msgstr "Forhåndsvis"
 
 #: ..\..\..\admin\_edit_form.php:178
 msgid "Blog this !"
@@ -1635,9 +1646,8 @@ msgid "Private (You only)"
 msgstr "Privat (Bare deg)"
 
 #: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_form.php:253
-#, fuzzy
 msgid "The post will appear only in the backoffice"
-msgstr "Posten vil bare være synlig på administrasjonssiden"
+msgstr "Posten vil bare være synlig på administrasjonssidene"
 
 #: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_showposts.php:320
 msgid "Draft (Not published!)"
@@ -1822,6 +1832,7 @@ msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URLer, eposter, AIM og ICQer vil bli automatisk konvertert."
 
 # Don't you mean "Line breaks become <br />"?
+# -Vegar
 #: ..\..\..\admin\_edit_showposts.php:256
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Linjeskift blir &lt;br&gt;)"
@@ -1863,6 +1874,7 @@ msgid "Reset"
 msgstr "Tilbakestill"
 
 # forespørsler = requests
+# -Vegar
 #: ..\..\..\admin\_footer.php:14
 #, php-format
 msgid "<p>%d queries - %01.3f seconds</p>"
@@ -1933,7 +1945,7 @@ msgstr "Uthevet (STRONG) [Alt-S]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "EMphasis [Alt-E]"
-msgstr ""
+msgstr "Vektlagt (EM) [Alt-E]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "CODE [Alt-C]"
@@ -1973,7 +1985,7 @@ msgstr "Les mer [Alt-M]"
 
 #: ..\..\..\admin\_quicktags.php:214
 msgid "no teaser [Alt-T]"
-msgstr ""
+msgstr "Ikke forsmak [Alt-T]"
 
 #. TRANS: table header for user list
 #: ..\..\..\admin\_user_list.php:12
@@ -2081,7 +2093,7 @@ msgstr "Ingen login ID ble sendt"
 #: ..\..\..\b2evocore\_class_pop3.php:135
 #: ..\..\..\b2evocore\_class_pop3.php:155
 msgid "connection not established"
-msgstr ""
+msgstr "ingen kobling etablert"
 
 #: ..\..\..\b2evocore\_class_pop3.php:152
 #: ..\..\..\b2evocore\_class_pop3.php:155
@@ -2096,8 +2108,9 @@ msgid "No password submitted"
 msgstr "Intet passord oppgitt"
 
 #: ..\..\..\b2evocore\_class_pop3.php:160
+#, fuzzy
 msgid "authentication failed "
-msgstr ""
+msgstr "autentifikasjon feilet"
 
 #: ..\..\..\b2evocore\_class_pop3.php:169
 #: ..\..\..\b2evocore\_class_pop3.php:218
@@ -2114,8 +2127,9 @@ msgid "POP3 apop:"
 msgstr "POP3 apop:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:199
+#, fuzzy
 msgid "No server banner"
-msgstr ""
+msgstr "Ingen server banner"
 
 #: ..\..\..\b2evocore\_class_pop3.php:199
 #: ..\..\..\b2evocore\_class_pop3.php:209
@@ -2123,8 +2137,9 @@ msgid "abort"
 msgstr "avbryt"
 
 #: ..\..\..\b2evocore\_class_pop3.php:209
+#, fuzzy
 msgid "apop authentication failed"
-msgstr ""
+msgstr "apop-autentifikasjon feilet"
 
 #: ..\..\..\b2evocore\_class_pop3.php:234
 msgid "POP3 login:"
@@ -2168,8 +2183,9 @@ msgid "POP3 send_cmd:"
 msgstr "POP3 send_cmd:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:484
+#, fuzzy
 msgid "Empty command string"
-msgstr ""
+msgstr "Tom kommando-streng"
 
 #: ..\..\..\b2evocore\_class_pop3.php:504
 msgid "POP3 quit:"
@@ -2231,15 +2247,16 @@ msgstr "Hvis ingenting skjer, klikk <a %s>her</a>."
 msgid "Parameter %s is required!"
 msgstr "Parameter %s er nødvendig!"
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1192
 msgid "Invalid URL"
 msgstr "Ugyldig URL"
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1198
+#, fuzzy
 msgid "URI scheme not allowed"
-msgstr ""
+msgstr "URI-skjema ikke tillatt"
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1206
 msgid "URL not allowed"
 msgstr "URL ikke tillatt"
 
@@ -2309,8 +2326,9 @@ msgid "Browse category"
 msgstr "Les poster i kategorien"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:64
+#, fuzzy
 msgid "bad char in User Agent"
-msgstr ""
+msgstr "ugyldig tegn i Brukeragent"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:92
 #: ..\..\..\b2evocore\_functions_hitlogs.php:109
@@ -2346,18 +2364,21 @@ msgid "found current url in page"
 msgstr "fant nåværende URL i side"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:426
+#, fuzzy
 msgid "not a query - no params!"
-msgstr ""
+msgstr "ikke en forespørsel - ingen parametere!"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:451
+#, fuzzy
 msgid "no query string found"
-msgstr ""
+msgstr "ingen forespørselsstreng funnet"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:23
 msgid "Sending pingbacks..."
 msgstr "Sender pingbacks..."
 
 # "Ingen pingbacks å sende" = "No pingbacks to send"
+# -Vegar
 #: ..\..\..\b2evocore\_functions_pingback.php:28
 #, fuzzy
 msgid "No pingback to be done."
@@ -2372,9 +2393,9 @@ msgid "Post contents"
 msgstr "Post innhold"
 
 # Jobber = working
+# -Vegar
 #: ..\..\..\b2evocore\_functions_pingback.php:85
 #: ..\..\..\b2evocore\_functions_pingback.php:86
-#, fuzzy
 msgid "Processing:"
 msgstr "Jobber:"
 
@@ -2393,8 +2414,9 @@ msgid "Couldn't open a connection to:"
 msgstr "Kunne ikke åpne en kobling til:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:119
+#, fuzzy
 msgid "Start receiving headers and content"
-msgstr ""
+msgstr "Begynn å motta headers og innhold"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:149
 #: ..\..\..\b2evocore\_functions_pingback.php:150
@@ -2410,8 +2432,9 @@ msgstr "Pingback-server funnet i Pingback <link /> tag:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:172
 #: ..\..\..\b2evocore\_functions_pingback.php:173
+#, fuzzy
 msgid "Pingback server not found in headers and content"
-msgstr ""
+msgstr "Fant ikke pingback-server i headers eller innhold"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:178
 #: ..\..\..\b2evocore\_functions_pingback.php:179
@@ -2448,6 +2471,7 @@ msgid "Pingbacks done."
 msgstr "Ferdig med pingbacks."
 
 # Singular when 1 or -1, otherwise always plural
+# -Vegar
 #: ..\..\..\b2evocore\_functions_pingback.php:244
 msgid "Pingback (0)"
 msgstr "Pingbacks (0)"
@@ -2569,7 +2593,6 @@ msgid "Admin"
 msgstr "Admin"
 
 #: ..\..\..\b2evocore\_functions_users.php:550
-#, fuzzy
 msgid "Go to the back-office"
 msgstr "Gå til administrasjonssidene"
 
@@ -2751,28 +2774,24 @@ msgid "Dec"
 msgstr "Des"
 
 #: ..\..\..\b2evocore\_vars.php:172
-#, fuzzy
 msgid "Published"
-msgstr "Publisert (Offentlig)"
+msgstr "Publisert"
 
 #: ..\..\..\b2evocore\_vars.php:173
-#, fuzzy
 msgid "Deprecated"
-msgstr "Markerte"
+msgstr "Foreldet"
 
 #: ..\..\..\b2evocore\_vars.php:174
-#, fuzzy
 msgid "Protected"
-msgstr "Postet innhold"
+msgstr "Beskyttet"
 
 #: ..\..\..\b2evocore\_vars.php:175
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 #: ..\..\..\b2evocore\_vars.php:176
-#, fuzzy
 msgid "Draft"
-msgstr "Dato"
+msgstr "Utkast"
 
 #: ..\..\..\conf\_locales.php:22
 msgid "Dutch"
@@ -2792,7 +2811,7 @@ msgstr "Japansk"
 
 #: ..\..\..\conf\_locales.php:26
 msgid "Lithuanian"
-msgstr ""
+msgstr "Litauisk"
 
 #: ..\..\..\conf\_locales.php:27
 msgid "Norwegian Bokm&aring;l"
@@ -2854,9 +2873,8 @@ msgstr "Kommentar"
 
 #: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:101
 #: ..\..\..\xmlsrv\xmlrpc.php:1224
-#, fuzzy
 msgid "Edit/Delete"
-msgstr "Slett"
+msgstr "Rediger/Slett"
 
 #: ..\..\..\htsrv\getmail.php:38
 msgid "Connecting to pop server..."
@@ -2888,14 +2906,16 @@ msgid "Too old"
 msgstr "For gammel"
 
 # Means "subject prefix isn't right"
+# -Vegar
 #: ..\..\..\htsrv\getmail.php:150
 #, fuzzy
 msgid "Subject prefix does not match"
 msgstr "Emne-prefiks stemmer ikke"
 
 #: ..\..\..\htsrv\getmail.php:170
+#, fuzzy
 msgid "Raw content:"
-msgstr ""
+msgstr "Rått innhold:"
 
 #: ..\..\..\htsrv\getmail.php:206
 msgid "Pass:"
@@ -2989,11 +3009,9 @@ msgstr "ditt ICQ UIN kan bare være et nummer, ingen bokstaver tillatt"
 msgid "please type your e-mail address"
 msgstr "vennligst tast inn din epostadresse"
 
-# Does this mean that it's not valid, or that it's the wrong email address?
-#: ..\..\..\htsrv\profile_update.php:69
-#, fuzzy
-msgid "the email address isn't correct"
-msgstr "epostadressen er ikke korrekt"
+#: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\register.php:61
+msgid "the email address is invalid"
+msgstr "epostadressen er ugyldig"
 
 #: ..\..\..\htsrv\profile_update.php:77 ..\..\..\htsrv\profile_update.php:85
 msgid "you typed your new password only once. Go back to type it twice."
@@ -3017,10 +3035,6 @@ msgstr "vennligst tast inn ditt passord to ganger"
 msgid "please type the same password in the two password fields"
 msgstr "vennligst tast inn det samme passordet i de to passordfeltene"
 
-#: ..\..\..\htsrv\register.php:61
-msgid "the email address is invalid"
-msgstr "epostadressen er ugyldig"
-
 #: ..\..\..\htsrv\register.php:76
 msgid "this login is already registered, please choose another one"
 msgstr "dette brukernavnet er opptatt, vennligst velg et annet"
@@ -3028,12 +3042,6 @@ msgstr "dette brukernavnet er opptatt, vennligst velg et annet"
 #: ..\..\..\htsrv\register.php:91 ..\..\..\htsrv\register.php:95
 msgid "new user registration on your blog"
 msgstr "ny bruker registrert i din blog"
-
-# Either this should be "log in", in which case the translation is "logg inn", or it should be "login" (aka "username"), which translates to "brukernavn"
-#: ..\..\..\htsrv\register.php:92
-#, fuzzy
-msgid "Login"
-msgstr "Brukernavn"
 
 #: ..\..\..\htsrv\register.php:93
 msgid "Manage users"
@@ -3126,12 +3134,11 @@ msgstr "Pingbacks"
 
 #: ..\..\..\skins\_feedback.php:58
 msgid "Trackback address for this post:"
-msgstr ""
+msgstr "Trackback-adresse for denne posten:"
 
 #: ..\..\..\skins\_feedback.php:89
-#, fuzzy
 msgid "Comment from:"
-msgstr "Kommentar-info"
+msgstr "Kommentar fra:"
 
 #: ..\..\..\skins\_feedback.php:104
 msgid "Trackback from:"
@@ -3160,19 +3167,17 @@ msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Setter cookies for navn, epost &amp; URL)"
 
 #: ..\..\..\skins\_lastcomments.php:22
-#, fuzzy
 msgid "No comment yet..."
-msgstr "ingen kommentar"
+msgstr "Ingen kommentarer foreløpig..."
 
 #: ..\..\..\skins\_lastcomments.php:33
-#, fuzzy
 msgid "In response to:"
-msgstr "Respons:"
+msgstr "I respons til:"
 
 #: ..\..\..\skins\_lastcomments.php:33
-#, php-format
+#, fuzzy, php-format
 msgid "Original post on %s"
-msgstr ""
+msgstr "Opprinnelig post om %s"
 
 #: ..\..\..\skins\_profile.php:62
 msgid "Identity shown"
@@ -3203,24 +3208,23 @@ msgid "blogs"
 msgstr "blogger"
 
 #: ..\..\..\skins\babyblues\_main.php:85
+#, fuzzy
 msgid "skin the site"
-msgstr ""
+msgstr "skinn siden"
 
 #: ..\..\..\skins\babyblues\_main.php:93
 #: ..\..\..\skins\originalb2\_main.php:147
-#, fuzzy
 msgid "archives"
-msgstr "Arkiv"
+msgstr "arkiv"
 
 #: ..\..\..\skins\bluesky\_main.php:70 ..\..\..\skins\guadeloupe\_main.php:70
-#, fuzzy
 msgid "Display feedback / Leave a comment"
-msgstr "Legg igjen en kommentar"
+msgstr "Vis responser / Legg igjen en kommentar"
 
 #: ..\..\..\skins\bluesky\_main.php:157
 #: ..\..\..\skins\guadeloupe\_main.php:158
 msgid "Choose a skin"
-msgstr ""
+msgstr "Velg et skin"
 
 #: ..\..\..\skins\custom\_main.php:79
 msgid "words"
@@ -3229,7 +3233,7 @@ msgstr "ord"
 #: ..\..\..\skins\custom\_main.php:195
 #: ..\..\..\skins\fplanque2002\_main.php:207
 msgid "Choose skin"
-msgstr ""
+msgstr "Velg skin"
 
 #: ..\..\..\skins\originalb2\_main.php:44
 msgid "Browse all posts by this author"
@@ -3244,3 +3248,15 @@ msgstr "[...] Les mer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nytt pingback på din post nr. %d \"%s\""
+
+# Does this mean that it's not valid, or that it's the wrong email address?
+# -Vegar
+#, fuzzy
+#~ msgid "the email address isn't correct"
+#~ msgstr "epostadressen er ikke korrekt"
+
+# Either this should be "log in", in which case the translation is "logg inn", or it should be "login" (aka "username"), which translates to "brukernavn"
+# -Vegar
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "Brukernavn"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-10-31 18:43+0100\n"
+"POT-Creation-Date: 2003-11-02 21:04+0100\n"
 "PO-Revision-Date: 2003-08-26 09:08+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -835,7 +835,12 @@ msgstr "Voeg deze link toe aan je favorieten:"
 msgid "b2evo sidebar"
 msgstr "b2 ZijBalk"
 
-#: ..\..\..\admin\b2spell.php:76
+#: ..\..\..\admin\b2spell.php:11
+#, fuzzy
+msgid "Spell Check"
+msgstr "Spellingscontrole"
+
+#: ..\..\..\admin\b2spell.php:78
 msgid "Loading Spell Checker. Please wait"
 msgstr ""
 
@@ -1017,9 +1022,10 @@ msgid "Profile for:"
 msgstr "Profiel"
 
 #: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:206
-#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\_login_form.php:37
-#: ..\..\..\htsrv\_lostpass_form.php:20 ..\..\..\htsrv\_reg_complete.php:14
-#: ..\..\..\htsrv\_reg_form.php:22 ..\..\..\skins\_profile.php:28
+#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:20
+#: ..\..\..\htsrv\_reg_complete.php:14 ..\..\..\htsrv\_reg_form.php:22
+#: ..\..\..\skins\_profile.php:28
 msgid "Login:"
 msgstr "Inloggen"
 
@@ -2235,16 +2241,16 @@ msgstr "Als er niets gebeurt, klik <a %s>hier</a>."
 msgid "Parameter %s is required!"
 msgstr "Parameter %s is nodig!"
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1192
 #, fuzzy
 msgid "Invalid URL"
 msgstr "verkeerd"
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1198
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1206
 msgid "URL not allowed"
 msgstr ""
 
@@ -2986,8 +2992,8 @@ msgstr ""
 msgid "please type your e-mail address"
 msgstr "geef jouw email adres op"
 
-#: ..\..\..\htsrv\profile_update.php:69
-msgid "the email address isn't correct"
+#: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\register.php:61
+msgid "the email address is invalid"
 msgstr "Het email adres is niet juist"
 
 #: ..\..\..\htsrv\profile_update.php:77 ..\..\..\htsrv\profile_update.php:85
@@ -3013,10 +3019,6 @@ msgstr "geeft u a.u.b. uw wachtwoord tweemaal op"
 msgid "please type the same password in the two password fields"
 msgstr "geef hetzelfde wachtwoord in de twee wachtwoord velden"
 
-#: ..\..\..\htsrv\register.php:61
-msgid "the email address is invalid"
-msgstr "Het email adres is niet juist"
-
 #: ..\..\..\htsrv\register.php:76
 msgid "this login is already registered, please choose another one"
 msgstr "deze login is al geregistreerd, kies een andere a.u.b."
@@ -3024,10 +3026,6 @@ msgstr "deze login is al geregistreerd, kies een andere a.u.b."
 #: ..\..\..\htsrv\register.php:91 ..\..\..\htsrv\register.php:95
 msgid "new user registration on your blog"
 msgstr "nieuwe gebruikersregistratie op jouw weblog"
-
-#: ..\..\..\htsrv\register.php:92
-msgid "Login"
-msgstr "Inloggen"
 
 #: ..\..\..\htsrv\register.php:93
 msgid "Manage users"
@@ -3249,6 +3247,12 @@ msgstr "[...] Lees Meer!"
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
 
+#~ msgid "the email address isn't correct"
+#~ msgstr "Het email adres is niet juist"
+
+#~ msgid "Login"
+#~ msgstr "Inloggen"
+
 #~ msgid ""
 #~ "Type your login here and click OK. You will receive an email with your "
 #~ "password."
@@ -3264,9 +3268,6 @@ msgstr "Nieuwe pingback op jouw artikel #%d \"%s\""
 
 #~ msgid "Post"
 #~ msgstr "Plaats"
-
-#~ msgid "SpellCheck"
-#~ msgstr "Spellingscontrole"
 
 #~ msgid "<strong>Trackback</strong> an URL:"
 #~ msgstr "<strong>TrackBack</strong> een URL:"

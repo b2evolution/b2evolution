@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-10-31 18:43+0100\n"
+"POT-Creation-Date: 2003-11-02 21:04+0100\n"
 "PO-Revision-Date: 2003-09-26 10:20+0300\n"
 "Last-Translator: Arthur H. S. Zapparoli <arthurzap@pop.com.br>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -830,7 +830,11 @@ msgstr "Adicione este link para os seus favoritos:"
 msgid "b2evo sidebar"
 msgstr "b2evo sidebar"
 
-#: ..\..\..\admin\b2spell.php:76
+#: ..\..\..\admin\b2spell.php:11
+msgid "Spell Check"
+msgstr ""
+
+#: ..\..\..\admin\b2spell.php:78
 msgid "Loading Spell Checker. Please wait"
 msgstr ""
 
@@ -1004,9 +1008,10 @@ msgid "Profile for:"
 msgstr "Perfil de:"
 
 #: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:206
-#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\_login_form.php:37
-#: ..\..\..\htsrv\_lostpass_form.php:20 ..\..\..\htsrv\_reg_complete.php:14
-#: ..\..\..\htsrv\_reg_form.php:22 ..\..\..\skins\_profile.php:28
+#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:20
+#: ..\..\..\htsrv\_reg_complete.php:14 ..\..\..\htsrv\_reg_form.php:22
+#: ..\..\..\skins\_profile.php:28
 msgid "Login:"
 msgstr "Login:"
 
@@ -2180,15 +2185,15 @@ msgstr ""
 msgid "Parameter %s is required!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1192
 msgid "Invalid URL"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1198
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1206
 msgid "URL not allowed"
 msgstr ""
 
@@ -2919,8 +2924,8 @@ msgstr ""
 msgid "please type your e-mail address"
 msgstr ""
 
-#: ..\..\..\htsrv\profile_update.php:69
-msgid "the email address isn't correct"
+#: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\register.php:61
+msgid "the email address is invalid"
 msgstr ""
 
 #: ..\..\..\htsrv\profile_update.php:77 ..\..\..\htsrv\profile_update.php:85
@@ -2943,20 +2948,12 @@ msgstr ""
 msgid "please type the same password in the two password fields"
 msgstr ""
 
-#: ..\..\..\htsrv\register.php:61
-msgid "the email address is invalid"
-msgstr ""
-
 #: ..\..\..\htsrv\register.php:76
 msgid "this login is already registered, please choose another one"
 msgstr ""
 
 #: ..\..\..\htsrv\register.php:91 ..\..\..\htsrv\register.php:95
 msgid "new user registration on your blog"
-msgstr ""
-
-#: ..\..\..\htsrv\register.php:92
-msgid "Login"
 msgstr ""
 
 #: ..\..\..\htsrv\register.php:93

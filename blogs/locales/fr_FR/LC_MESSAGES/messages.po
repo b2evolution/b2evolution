@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"POT-Creation-Date: 2003-10-31 18:43+0100\n"
-"PO-Revision-Date: 2003-10-31 18:56+0100\n"
+"POT-Creation-Date: 2003-11-02 21:04+0100\n"
+"PO-Revision-Date: 2003-11-02 21:10+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -924,7 +924,11 @@ msgstr "Ajoutez ce lien à vos favoris:"
 msgid "b2evo sidebar"
 msgstr "Sidebar b2evo"
 
-#: ..\..\..\admin\b2spell.php:76
+#: ..\..\..\admin\b2spell.php:11
+msgid "Spell Check"
+msgstr "Vérification de l'orthographe"
+
+#: ..\..\..\admin\b2spell.php:78
 msgid "Loading Spell Checker. Please wait"
 msgstr "Chargement du vérificateur d'orthographe. Merci de patienter."
 
@@ -1095,6 +1099,7 @@ msgstr "Profil pour:"
 #: ..\..\..\admin\b2team.php:35
 #: ..\..\..\htsrv\getmail.php:206
 #: ..\..\..\htsrv\login.php:71
+#: ..\..\..\htsrv\register.php:92
 #: ..\..\..\htsrv\_login_form.php:37
 #: ..\..\..\htsrv\_lostpass_form.php:20
 #: ..\..\..\htsrv\_reg_complete.php:14
@@ -2286,15 +2291,15 @@ msgstr "Si rien ne se passe, cliquez <a %s>ici</a>."
 msgid "Parameter %s is required!"
 msgstr "La paramètre %s est requis!"
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1192
 msgid "Invalid URL"
 msgstr "URL invalide"
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1198
 msgid "URI scheme not allowed"
 msgstr "Type d'URI non autorisé"
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1206
 msgid "URL not allowed"
 msgstr "URL non autorisée"
 
@@ -3033,8 +3038,9 @@ msgid "please type your e-mail address"
 msgstr "Veuillez taper votre adresse email"
 
 #: ..\..\..\htsrv\profile_update.php:69
-msgid "the email address isn't correct"
-msgstr "l'adresse email n'est pas correcte"
+#: ..\..\..\htsrv\register.php:61
+msgid "the email address is invalid"
+msgstr "l'adresse email est invalide"
 
 #: ..\..\..\htsrv\profile_update.php:77
 #: ..\..\..\htsrv\profile_update.php:85
@@ -3057,10 +3063,6 @@ msgstr "Veuillez entrer votre mot de passe deux fois"
 msgid "please type the same password in the two password fields"
 msgstr "veuillez taper le même mot de passe dans les deux champs"
 
-#: ..\..\..\htsrv\register.php:61
-msgid "the email address is invalid"
-msgstr "l'adresse email est invalide"
-
 #: ..\..\..\htsrv\register.php:76
 msgid "this login is already registered, please choose another one"
 msgstr "cet identifiant est déjà utilisé, veuillez en choisir un autre"
@@ -3069,10 +3071,6 @@ msgstr "cet identifiant est déjà utilisé, veuillez en choisir un autre"
 #: ..\..\..\htsrv\register.php:95
 msgid "new user registration on your blog"
 msgstr "nouvelle inscription sur votre blog"
-
-#: ..\..\..\htsrv\register.php:92
-msgid "Login"
-msgstr "Identification"
 
 #: ..\..\..\htsrv\register.php:93
 msgid "Manage users"
