@@ -68,7 +68,7 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label, $f
 
 	echo '<fieldset>';
 	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><fieldset class="input"><img src="'.$img_url.'/blank.gif" width="1" height="1" alt="" /><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
+	echo '  <div class="input"><fieldset class="input"><img src="'.$img_url.'blank.gif" width="1" height="1" alt="" /><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
 	if( !empty($field_class) )
 	{
 		echo ' class="', $field_class,'"';

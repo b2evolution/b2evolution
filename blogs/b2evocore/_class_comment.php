@@ -263,7 +263,7 @@ class Comment extends DataObject
 		if( $title == '#' ) $title = T_('Edit this comment');
 		
 		echo $before;
-		echo '<a href="'.$admin_url.'/b2edit.php?action=editcomment&amp;comment='.$this->ID;
+		echo '<a href="'.$admin_url.'b2edit.php?action=editcomment&amp;comment='.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -299,7 +299,7 @@ class Comment extends DataObject
 		if( $text == '#' ) $text = T_('Delete');
 		if( $title == '#' ) $title = T_('Delete this comment');
 
-		$url = $admin_url.'/edit_actions.php?action=deletecomment&amp;comment_ID='.$this->ID;
+		$url = $admin_url.'edit_actions.php?action=deletecomment&amp;comment_ID='.$this->ID;
 
 		echo $before;
 		if( $button )

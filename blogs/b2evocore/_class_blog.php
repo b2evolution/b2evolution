@@ -267,7 +267,7 @@ class Blog extends DataObject
 			case 'mediaurl':
 				return ($this->media_location == 'custom')
 								? $this->media_url
-								: $media_url.'/blogs/'.$this->gen_mediadir( false ).'/';
+								: $media_url.'blogs/'.$this->gen_mediadir( false ).'/';
 
 			case 'subdir':
 				return $this->siteurl;
@@ -332,31 +332,31 @@ class Blog extends DataObject
 				break;
 
 			case 'rdf_url':
-				return $xmlsrv_url.'/rdf.php?blog='.$this->ID;
+				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
 
 			case 'rss_url':
-				return $xmlsrv_url.'/rss.php?blog='.$this->ID;
+				return $xmlsrv_url.'rss.php?blog='.$this->ID;
 
 			case 'rss2_url':
-				return $xmlsrv_url.'/rss2.php?blog='.$this->ID;
+				return $xmlsrv_url.'rss2.php?blog='.$this->ID;
 
 			case 'atom_url':
-				return $xmlsrv_url.'/atom.php?blog='.$this->ID;
+				return $xmlsrv_url.'atom.php?blog='.$this->ID;
 
 			case 'comments_rdf_url':
-				return $xmlsrv_url.'/rdf.comments.php?blog='.$this->ID;
+				return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
 
 			case 'comments_rss_url':
-				return $xmlsrv_url.'/rss.comments.php?blog='.$this->ID;
+				return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
 
 			case 'comments_rss2_url':
-				return $xmlsrv_url.'/rss2.comments.php?blog='.$this->ID;
+				return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
 
 			case 'comments_atom_url':
-				return $xmlsrv_url.'/atom.comments.php?blog='.$this->ID;
+				return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
 
 			case 'pingback_url':
-				return $xmlsrv_url.'/xmlrpc.php';
+				return $xmlsrv_url.'xmlrpc.php';
 
 			case 'admin_email':
 				return $admin_email;

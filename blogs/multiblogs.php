@@ -287,7 +287,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	</div>
 
 	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>

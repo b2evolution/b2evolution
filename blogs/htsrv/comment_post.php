@@ -142,7 +142,7 @@ if( $item_author_User->notify
 		$notify_message .= T_('Url').": $url\n";
 	}
 	$notify_message .= T_('Comment').": \n".$original_comment."\n\n";
-	$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$commented_Item->blog_ID.'&p='.$comment_post_ID."&c=1\n";
+	$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$commented_Item->blog_ID.'&p='.$comment_post_ID."&c=1\n";
 
 
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";

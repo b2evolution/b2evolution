@@ -33,7 +33,7 @@ switch( $action )
 		/*
 		 * Do the registration:
 		 */
-		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
 
@@ -118,7 +118,7 @@ switch( $action )
 
 		$message  = T_('new user registration on your blog'). ":\n\n";
 		$message .= T_('Login:'). " $login\n\n". T_('Email'). ": $email\n\n";
-		$message .= T_('Manage users'). ": $admin_url/b2users.php\n\n";
+		$message .= T_('Manage users').': '.$admin_url."b2users.php\n\n";
 
 		send_mail( $admin_email, T_('new user registration on your blog'), $message, $notify_from );
 

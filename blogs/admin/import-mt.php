@@ -1170,7 +1170,7 @@ param( 'mode', 'string', 'normal' );
 		<?php
 		if( $count_userscreated )
 		{
-			echo '<p class="note">Please note that the new users being created are not member of any blog yet. You\'ll have to setup this in the <a href="'.$admin_url.'/blogs.php">blogs admin</a>.</p>';
+			echo '<p class="note">Please note that the new users being created are not member of any blog yet. You\'ll have to setup this in the <a href="'.$admin_url.'blogs.php">blogs admin</a>.</p>';
 		}
 		?>
 		</div>

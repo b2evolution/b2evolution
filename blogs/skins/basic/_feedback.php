@@ -147,7 +147,7 @@
 		?>
 		
 		<!-- form to add a comment -->
-		<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post">
+		<form action="<?php echo $htsrv_url ?>comment_post.php" method="post">
 		
 			<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID() ?>" />
 			<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>" />

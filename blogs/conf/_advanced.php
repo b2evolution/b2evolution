@@ -270,7 +270,7 @@ $cookie_expired = time() - 86400;    // Default: 24 hours ago
 $conf_subdir = 'conf/';                  // Subdirectory relative to base
 $conf_dirout = '../';                    // Relative path to go back to base
 
-$conf_path = str_replace( '\\', '/', dirname(__FILE__).'/' );
+$conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
 $basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remove his file's subpath
 
 /**
@@ -316,7 +316,7 @@ $locales_dirout = '../';                 // Relative path to go back to base
  * Location of the plug-ins.
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
-$plugins_subdir_dirout = '../';          // Relative path to go back to base
+$plugins_dirout = '../';       				   // Relative path to go back to base
 /**
  * Location of the install folder.
  */

@@ -150,11 +150,11 @@ function trackback_url($display = 1)
 
 	if( $Settings->get('links_extrapath') )
 	{
-		$tb_url = "$htsrv_url/trackback.php/$id";
+		$tb_url = $htsrv_url.'trackback.php/'.$id;
 	}
 	else
 	{
-		$tb_url = "$htsrv_url/trackback.php?tb_id=$id";
+		$tb_url = $htsrv_url.'trackback.php?tb_id='.$id;
 	}
 	if ($display) {
 		echo $tb_url;

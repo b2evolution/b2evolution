@@ -26,7 +26,7 @@ require_once dirname(__FILE__). '/_class_user.php';
  */
 function veriflog( $login_required = false )
 {
-	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $core_dirout;
+	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error;
 	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
 	global $current_User;
 	global $DB;
@@ -363,7 +363,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	}
 
 	echo $before;
-	echo '<a href="', $htsrv_url, '/login.php'.$redirect.'" title="', $link_title, '">';
+	echo '<a href="'.$htsrv_url.'login.php'.$redirect.'" title="'.$link_title.'">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -400,7 +400,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	}
 
 	echo $before;
-	echo '<a href="', $htsrv_url, '/register.php'.$redirect.'" title="', $link_title, '">';
+	echo '<a href="'.$htsrv_url.'register.php'.$redirect.'" title="'.$link_title.'">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -422,7 +422,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	echo $before;
-	echo '<a href="', $htsrv_url, '/login.php?action=logout&amp;redirect_to='.urlencode( regenerate_url() ), '" title="', $link_title, '">';
+	echo '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.urlencode( regenerate_url() ).'" title="'.$link_title.'">';
 	printf( $link_text, $user_login );
 	echo '</a>';
 	echo $after;
@@ -450,7 +450,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 	if( !preg_match('/(&|&amp;|\?)blog=/', $page) ) $page = url_add_param( $page, 'blog='.$blog );
 
 	echo $before;
-	echo '<a href="', $admin_url, '/', $page, '" title="', $link_title, '">';
+	echo '<a href="'.$admin_url.$page.'" title="'.$link_title.'">';
 	echo $link_text ;
 	echo '</a>';
 	echo $after;

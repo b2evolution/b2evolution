@@ -206,7 +206,7 @@ if( !isset( $skin ) )
 	{ // blog's default skin does not exist
 		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
 		// we have to make this fool proof extra checking!
-		printf( T_('The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>...'), $default_skin , $Blog->dget('shortname'), 'href="'.$admin_url.'/blogs.php?action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
+		printf( T_('The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>...'), $default_skin , $Blog->dget('shortname'), 'href="'.$admin_url.'blogs.php?action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
 		die();
 	}
 

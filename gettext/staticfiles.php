@@ -74,7 +74,7 @@ if( !isset($argv) )
 	<body>
 	<div class="center" style="margin:auto;width:75%">
 
-	<img src="<?php echo $img_url ?>/b2evolution_logo_360.gif" /><br />
+	<img src="<?php echo $img_url ?>b2evolution_logo_360.gif" /><br />
 <?php
 }
 

@@ -313,7 +313,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	}
 	else
 	{
-		$iurl = $img_url.'/flags';
+		$iurl = $img_url.'flags';
 	}
 
 	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="' .

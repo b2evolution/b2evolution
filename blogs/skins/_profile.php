@@ -26,7 +26,7 @@
 ?>
 
 	<!-- form to add a comment -->
-	<?php form_formstart( $htsrv_url.'/profile_update.php', 'bComment', '', 'post' ); ?>
+	<?php form_formstart( $htsrv_url.'profile_update.php', 'bComment', '', 'post' ); ?>
 		<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
 		<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 

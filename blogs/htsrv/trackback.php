@@ -105,7 +105,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		$notify_message .= T_('Website').": $comment_author (IP: $user_ip , $user_domain)\n";
 		$notify_message .= T_('Url').": $comment_author_url\n";
 		$notify_message .= T_('Excerpt').": \n".$original_comment."\n\n";
-		$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
+		$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
 		send_mail( $recipient, $subject, $notify_message, $notify_from );
 		locale_restore_previous();

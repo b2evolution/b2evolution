@@ -47,7 +47,7 @@ switch($action)
 		/*
 		 * Lost password:
 		 */
-		param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 		// Display retrieval form:
 		require( dirname(__FILE__).'/_lostpass_form.php' );
 		exit();
@@ -60,7 +60,7 @@ switch($action)
 		 * Retrieve lost password:
 		 */
 		param( 'log', 'string', true );
-		param( 'redirect_to', 'string', $admin_url.'/' );
+		param( 'redirect_to', 'string', $admin_url );
 		// echo 'login: ', $log;
 		$user_data	= get_userdatabylogin($log);
 		$user_email	= $user_data['user_email'];
@@ -80,7 +80,7 @@ switch($action)
 
 			$message  = T_('Login:')." $log\r\n";
 			$message .= T_('New Password:')." $random_password\r\n";
-			$message .= "\r\n".T_('You can login here:')."\r\n".$htsrv_url."/login.php\r\n";
+			$message .= "\r\n".T_('You can login here:')."\r\n".$admin_url."\r\n";
 
 			// DEBUG!
 			// echo $message.' (password not set yet, only when sending email does not fail);
@@ -118,7 +118,7 @@ switch($action)
 			param( 'redirect_to', 'string', $ReqURI );
 			if( preg_match( '/login.php([&?].*)?$/', $redirect_to ) )
 			{ // avoid "endless loops"
-				$redirect_to = $admin_url.'/';
+				$redirect_to = $admin_url;
 			}
 			$error .= ' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>';
 		}

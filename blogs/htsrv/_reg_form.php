@@ -18,7 +18,7 @@ require(dirname(__FILE__).'/_header.php');
 ?>
 
 
-<form method="post" action="<?php echo $htsrv_url ?>/register.php" class="fform">
+<form method="post" action="<?php echo $htsrv_url ?>register.php" class="fform">
 <input type="hidden" name="action" value="register" />
 <input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 
@@ -54,7 +54,7 @@ require(dirname(__FILE__).'/_header.php');
 </form>
 
 <div style="text-align:right">
-	<a href="<?php echo $htsrv_url.'/login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
+	<a href="<?php echo $htsrv_url.'login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
 </div>
 
 <?php

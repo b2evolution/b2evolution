@@ -63,7 +63,7 @@
 ?>
 
 	<!-- form to send email -->
-	<form action="<?php echo $htsrv_url ?>/message_send.php" method="post" class="bComment">
+	<form action="<?php echo $htsrv_url ?>message_send.php" method="post" class="bComment">
 
 		<input type="hidden" name="blog" value="<?php echo $blog  ?>" />
 		<input type="hidden" name="recipient_id" value="<?php echo $recipient_id ?>" />

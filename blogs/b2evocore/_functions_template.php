@@ -30,7 +30,7 @@ require_once( dirname(__FILE__).'/_functions_pingback.php' );
 function imgbase()
 {
 	global $img_url;
-	echo $img_url, '/';
+	echo $img_url;
 }
 
 /**

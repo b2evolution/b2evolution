@@ -22,7 +22,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php	$Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
-	<base href="<?php echo $skins_url, '/'; // Base URL for this DIR. You need this to fix relative links! ?>" />
+	<base href="<?php echo $skins_url; // Base URL for this DIR. You need this to fix relative links! ?>" />
 	<style type="text/css" media="screen">
 		@import url( 'originalb2/layout2b.css' );
 	</style>

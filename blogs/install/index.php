@@ -150,7 +150,7 @@ switch( $action )
 		}
 		else
 		{
-			$conf_filepath = $conf_path.'/_config.php';
+			$conf_filepath = $conf_path.'_config.php';
 			// Read original:
 			$conf = file( $conf_filepath );
 			if( empty( $conf ) )
@@ -409,7 +409,7 @@ to
 		<p><?php echo T_('Installation successful!')?></p>
 		<?php
 		printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
-	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'/"', $random_password );
+	<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'"', $random_password );
 		break;
 
 
@@ -427,7 +427,7 @@ to
 		{
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'b2evolution')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
 		<?php
 		}
 		break;
@@ -447,7 +447,7 @@ to
 			upgrade_cafelog_tables();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'b2')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2')?></p>
 		<?php
 		break;
 
@@ -467,7 +467,7 @@ to
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<?php printf( T_('<p>Now you can <a %s>log in</a> with your usual Miniblog email login cropped at 20 chars. All passwords have been reset to "%s".</p>
-<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'/"', $random_password )?>
+<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'"', $random_password )?>
 		<?php
 		break;
 
@@ -486,7 +486,7 @@ to
 			upgrade_cafelog_tables();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'/"', 'WordPress')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'WordPress')?></p>
 		<?php
 		break;
 

@@ -30,7 +30,7 @@
 <div style="float:left"><a href="http://b2evolution.net/"><img src="../img/b2evolution_minilogo.png" width="231" height="50" /></a></div>
 
 <?php if( isset($page_icon) ) { ?>
-<img src="<?php echo $htsrv_url, '/img/', $page_icon ?>" width="24" height="24" style="float:right;" />
+<img src="<?php echo $htsrv_url.'img/'.$page_icon ?>" width="24" height="24" style="float:right;" />
 <?php } ?>
 <div style="float:right">
 <h1 class="logintitle"><?php echo $page_title ?></h1>

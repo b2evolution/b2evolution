@@ -837,7 +837,7 @@ class Item extends DataObject
 		if( $text == '#' ) $text = T_('Delete');
 		if( $title == '#' ) $title = T_('Delete this post');
 
-		$url = $admin_url.'/edit_actions.php?action=delete'.$glue.'post='.$this->ID;
+		$url = $admin_url.'edit_actions.php?action=delete'.$glue.'post='.$this->ID;
 
 		echo $before;
 		if( $button )
@@ -893,7 +893,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Edit this post');
 
 		echo $before;
-		echo '<a href="'.$admin_url.'/b2edit.php?action=edit'.$glue.'post='.$this->ID;
+		echo '<a href="'.$admin_url.'b2edit.php?action=edit'.$glue.'post='.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -934,7 +934,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		echo $before;
-		echo '<a href="'.$admin_url.'/edit_actions.php?action=publish'.$glue.'post_ID='.$this->ID;
+		echo '<a href="'.$admin_url.'edit_actions.php?action=publish'.$glue.'post_ID='.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -1052,11 +1052,11 @@ class Item extends DataObject
 		
 		if( $Settings->get('links_extrapath') )
 		{
-			echo "$htsrv_url/trackback.php/$this->ID";
+			echo $htsrv_url.'trackback.php/'.$this->ID;
 		}
 		else
 		{
-			echo "$htsrv_url/trackback.php?tb_id=$this->ID";
+			echo $htsrv_url.'trackback.php?tb_id='.$this->ID;
 		}
 	}
 

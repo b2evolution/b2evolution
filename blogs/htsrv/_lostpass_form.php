@@ -18,7 +18,7 @@ require(dirname(__FILE__).'/_header.php');
 ?>
 <p><?php echo T_('A new password will be generated and sent to you by email.') ?></p>
 
-<form action="<?php echo $htsrv_url ?>/login.php" method="post" class="fform">
+<form action="<?php echo $htsrv_url ?>login.php" method="post" class="fform">
 	<input type="hidden" name="action" value="retrievepassword" />
 	<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 
