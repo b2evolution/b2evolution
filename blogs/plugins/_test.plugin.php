@@ -45,26 +45,6 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
-	 *
-	 * {@internal test_plugin::DisplayToolbar(-)}}
-	 *
-   * @param array Associative array of parameters
-	 * @return boolean did we display a toolbar?
-	 */
-	function DisplayToolbar( & $params )
-	{
-		if( !$this->display )
-		{	// We don't want to show this toolbar
-			return false;
-		}
-
-		echo '<div class="edit_toolbar">This is the TEST Toolbar</div>';
-
-		return true;
-	}
-
-	/**
 	 * Called when ending the admin html head section
 	 *
 	 * {@internal Plugin::AdminEndHtmlHead(-)}}
@@ -97,21 +77,62 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Display a toolbar
+	 *
+	 * {@internal test_plugin::DisplayToolbar(-)}}
+	 *
+   * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayToolbar( & $params )
+	{
+		if( !$this->display )
+		{	// We don't want to show this toolbar
+			return false;
+		}
+
+		echo '<div class="edit_toolbar">This is the TEST Toolbar</div>';
+
+		return true;
+	}
+
+
+ 	/**
+	 * Display an editor button
+	 *
+	 * {@internal Plugin::DisplayEditorButton(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display ?
+	 */
+	function DisplayEditorButton( & $params )
+	{
+	 	?>
+		<input type="button" value="TEST" onclick="alert('Hi! This is the TEST plugin (DisplayEditorButton)!');" />
+		<?php
+		return true;
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
-	 * {@internal test_plugin::render(-)}}
+	 * {@internal test_plugin::Render(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		if( ! parent::render( $content, $format ) )
+		if( ! parent::Render( $params ) )
 		{	// We cannot render the required format
 			return false;
 		}
 
+		$params['data'] = 'TEST['.$params['data'].']TEST';
+
+		return true;
 	}
 }
 ?>

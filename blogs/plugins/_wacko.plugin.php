@@ -84,19 +84,21 @@ class wacko_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::render(-)}} 
+	 * {@internal gmcode_Rendererplugin::Render(-)}} 
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		if( ! parent::render( $content, $format ) )
+		if( ! parent::Render( $params ) )
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
+		$content = & $params['data'];
+
 		$content = preg_replace( $this->search, $this->replace, $content );
 		
 		// Find bullet lists

@@ -57,19 +57,24 @@ class linklogger_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal linklogger_plugin::render(-)}}
+	 * {@internal linklogger_plugin::Render(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @todo get rid of global
+	 *
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		global $blog;
-		if( ! parent::render( $content, $format ) )
+		if( ! parent::Render( $params ) )
 		{	// We cannot render the required format
 			return false;
 		}
+
+		$content = & $params['data'];
+
+		global $blog;
 
 		/**
 		 * this is the format of the links to be generated. %d gets replaced by the ID for that link

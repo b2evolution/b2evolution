@@ -167,15 +167,15 @@ class smilies_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal smilies_plugin::render(-)}}
+	 * {@internal smilies_plugin::Render(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		if( ! parent::render( $content, $format ) )
+		if( ! parent::render( $params ) )
 		{	// We cannot render the required format
 			return false;
 		}
@@ -206,6 +206,9 @@ class smilies_plugin extends Plugin
 
 
 		// REPLACE:  But not in code blocks.
+
+		$content = & $params['data'];
+
 		if( strpos( $content , '<code>' ) !== false )
 		{ // If there are code tags run this substitution
 			$content_parts = preg_split("/<\/?code>/", $content);

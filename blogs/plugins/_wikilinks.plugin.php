@@ -43,21 +43,25 @@ class wikilinks_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::render(-)}} 
+	 * {@internal gmcode_Rendererplugin::Render(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @todo get rid of global $blog
+	 *
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		global $ItemCache, $admin_url, $blog;
-	
-		if( ! parent::render( $content, $format ) )
+		if( ! parent::Render( $params ) )
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
+		$content = & $params['data'];
+
+		global $ItemCache, $admin_url, $blog;
+
 		// Regular links:
 		$search = array(	
 			// [[http://url]] :

@@ -39,19 +39,21 @@ class texturize_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal texturize_plugin::render(-)}}
+	 * {@internal texturize_plugin::Render(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		if( ! parent::render( $content, $format ) )
+		if( ! parent::Render( $params ) )
 		{	// We cannot render the required format
 			return false;
 		}
-	
+
+		$content = & $params['data'];
+
 		$output = '';
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff

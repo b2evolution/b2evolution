@@ -158,20 +158,32 @@ class Plugin
 	}
 
 
-  /**
-	 * Register event callbacks
+	/**
+	 * Called when ending the admin html head section
 	 *
-	 * This method is called by b2evo to ask the plugin what events it would
-	 * like to receive notifications for.
+	 * {@internal Plugin::AdminEndHtmlHead(-)}}
 	 *
-	 * {@internal Plugin::RegisterEvents(-)}}
-	 *
-	 * @return array List of event names we wish to be called back for
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-/*	function RegisterEvents()
+	function AdminEndHtmlHead( & $params )
 	{
-		return array();		// None by default.
-	} */
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Called right after displaying the admin page footer
+	 *
+	 * {@internal Plugin::AdminAfterPageFooter(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterPageFooter( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
 
 
 	/**
@@ -203,34 +215,6 @@ class Plugin
 
 
 	/**
-	 * Called when ending the admin html head section
-	 *
-	 * {@internal Plugin::AdminEndHtmlHead(-)}}
-	 *
-	 * @param array Associative array of parameters
-	 * @return boolean did we do something?
-	 */
-	function AdminEndHtmlHead( & $params )
-	{
-		return false;		// Do nothing by default.
-	}
-
-
-	/**
-	 * Called right after displaying the admin page footer
-	 *
-	 * {@internal Plugin::AdminAfterPageFooter(-)}}
-	 *
-	 * @param array Associative array of parameters
-	 * @return boolean did we do something?
-	 */
-	function AdminAfterPageFooter( & $params )
-	{
-		return false;		// Do nothing by default.
-	}
-
-
-	/**
 	 * Do an action
 	 *
 	 * {@internal Plugin::DoAction(-)}}
@@ -251,15 +235,15 @@ class Plugin
 	 * Well, this one does nothing but checking if Rendering applies to the output format.
 	 * You need to derive this function.
 	 *
-	 * {@internal Rendererplugin::render(-)}}
+	 * {@internal Plugin::Render(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Associative array of parameters
+	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content, $format )
+	function Render( & $params )
 	{
-		switch( $format )
+		switch( $params['format'] )
 		{
 			case 'raw':
 				// do nothing!
@@ -290,7 +274,7 @@ class Plugin
 				return false;
 
 			default:
-				die( 'Output format ['.$format.'] not supported by RendererPlugin.' );
+				die( 'Output format ['.$format.'] not supported by Plugins.' );
 		}
 	}
 

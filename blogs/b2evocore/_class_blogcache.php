@@ -47,7 +47,7 @@ class BlogCache extends DataObjectCache
 	 * @param boolean false if you want to return false on error
 	 * @todo use cache
 	 */
-	function get_by_url( $req_url, $halt_on_error = true )
+	function & get_by_url( $req_url, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;
 
@@ -82,7 +82,7 @@ class BlogCache extends DataObjectCache
 	 * @param boolean false if you want to return false on error
 	 * @todo use cache
 	 */
-	function get_by_urlname( $req_urlname, $halt_on_error = true )
+	function & get_by_urlname( $req_urlname, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;
 

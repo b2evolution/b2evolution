@@ -405,13 +405,19 @@ class Plug
 	 * @param string Output format, see {@link format_to_output()}
 	 * @return string rendered content
 	 */
-	function render( & $content, & $renderers, $format )
+	function render( & $content, & $renderers, $format, $type = 'ItemContent' )
 	{
 		$this->init();	// Init if not done yet.
 
 		$this->restart(); // Just in case.
 
 		// echo implode(',',$renderers);
+
+		$params = array(
+											'type'   => $type,
+											'data'   => & $content,
+											'format' => $format
+										);
 
 		while( $loop_RendererPlugin = $this->get_next() )
 		{ // Go through whole list of renders
@@ -422,7 +428,7 @@ class Plug
 				 case 'stealth':
 				 case 'always':
 					// echo 'FORCED ';
-					$loop_RendererPlugin->render( $content, $format );
+					$loop_RendererPlugin->Render( $params );
 					break;
 
 				 case 'opt-out':
@@ -431,7 +437,7 @@ class Plug
 					if( in_array( $loop_RendererPlugin->code, $renderers ) )
 					{	// Option is activated
 						// echo 'OPT ';
-						$loop_RendererPlugin->render( $content, $format );
+						$loop_RendererPlugin->Render( $params );
 					}
 					// else echo 'NOOPT ';
 					break;

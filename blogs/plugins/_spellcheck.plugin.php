@@ -21,7 +21,7 @@ class spellcheck_plugin extends Plugin
 	var $code = 'cafeSpell';
 	var $name = 'Spellchecker';
 	var $priority = 50;
-	var $apply_when = 'opt-out';
+	var $apply_when = 'never';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;
 	var $short_desc;
@@ -43,25 +43,6 @@ class spellcheck_plugin extends Plugin
 	{
 		$this->short_desc = T_('Simple Spellchecker (English only)');
 		$this->long_desc = T_('This plugins calls a simple online spellchecker.');
-	}
-
-
- 	/**
-	 * Display an editor button
-	 *
-	 * {@internal Plugin::DisplayEditorButton(-)}}
-	 *
-	 * @param array Associative array of parameters
-	 * @return boolean did we display a toolbar?
-	 */
-	function DisplayEditorButton( & $params )
-	{
-		// This means we are using the spellchecker on this page!
- 		$this->useSpellcheckOnThisPage = true;
-	 	?>
-		<input type="button" value="<?php echo T_('Spellcheck') ?>" onclick="DoSpell('post','content','');" />
-		<?php
-		return true;
 	}
 
 
@@ -134,22 +115,23 @@ class spellcheck_plugin extends Plugin
 	}
 
 
-	/**
-	 * Perform rendering
+ 	/**
+	 * Display an editor button
 	 *
-	 * {@internal spellcheck_plugin::render(-)}}
+	 * {@internal Plugin::DisplayEditorButton(-)}}
 	 *
-	 * @param string content to render (by reference) / rendered content
-	 * @param string Output format, see {@link format_to_output()}
-	 * @return boolean true if we can render something for the required output format
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
 	 */
-	function render( & $content, $format )
+	function DisplayEditorButton( & $params )
 	{
-		if( ! parent::render( $content, $format ) )
-		{	// We cannot render the required format
-			return false;
-		}
-
+		// This means we are using the spellchecker on this page!
+ 		$this->useSpellcheckOnThisPage = true;
+	 	?>
+		<input type="button" value="<?php echo T_('Spellcheck') ?>" onclick="DoSpell('post','content','');" />
+		<?php
+		return true;
 	}
+
 }
 ?>
