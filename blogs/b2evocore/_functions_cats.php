@@ -650,7 +650,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 		if( $link_title && !$preview)
 		{	// we want to display links
 			$curr_blogparams = get_blogparams_by_ID( $cat['cat_blog_ID'] );
-			$cat_name = '<a href="'.get_bloginfo('blogurl', $curr_blogparams).'?cat='.$cat_ID.'" title="'.$link_title.'">'.$cat_name.'</a>';
+			$cat_name = '<a href="'.url_add_param( get_bloginfo('blogurl', $curr_blogparams), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 		}
 
 		if( $cat_ID == $main_cat_ID )

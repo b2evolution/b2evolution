@@ -325,7 +325,7 @@ if( $action != 'editcomment' )
 
 
 
-	<fieldset title="Categories" class="extracats">
+	<fieldset title="<?php echo T_('Categories') ?>" class="extracats">
 		<legend><?php echo T_('Categories') ?></legend>
 
 		<div class="extracats">

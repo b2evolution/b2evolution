@@ -203,6 +203,6 @@ header('Pragma: no-cache');
 
 param( 'redirect_to', 'string' );
 $location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
-header('Refresh:0;url=' . $location);
+header( 'Refresh:0;url='.str_replace('&amp;', '&', $location) );
 
 ?>

@@ -249,7 +249,7 @@ function get_lastpostdate( $blog = 1, $show_statuses = '' )
 	global $localtimenow, $postdata;
 
 	// echo 'getting last post date';
-	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', 'date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
+	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', '', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
 
 	if( $LastItem = $LastPostList->get_item() )
 	{
@@ -351,7 +351,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 /*
  * get_postdata(-)
  *
- * if global $postdata was not set il will be
+ * if global $postdata was not set it will be
  */
 function get_postdata($postid)
 {
@@ -367,7 +367,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";  
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
@@ -392,6 +392,7 @@ function get_postdata($postid)
 			'AutoBR' => $myrow->post_autobr,
 			'Flags' => explode( ',', $myrow->post_flags ),
 			'Wordcount' => $myrow->post_wordcount,
+			'views' => $myrow->post_views, 
 			'comments' => $myrow->post_comments,
 			'Blog' => $myrow->cat_blog_ID,
 			);
@@ -423,8 +424,8 @@ function Item_get_by_ID( $post_ID )
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
-									post_autobr, post_flags, post_wordcount, post_comments, 
-									post_renderers, cat_blog_ID
+									post_autobr, post_flags, post_wordcount, post_comments,
+									post_renderers, post_views, cat_blog_ID
 					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:
@@ -460,7 +461,7 @@ function Item_get_by_title( $urltitle )
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
 									post_autobr, post_flags, post_wordcount, post_comments, 
-									post_renderers, cat_blog_ID
+									post_renderers, post_views, cat_blog_ID 
 					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
 					WHERE post_urltitle = ".$DB->quote($urltitle);
 
@@ -939,7 +940,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		{
 			$p_title = $p_info->post_title;
 			$p_id = $p_info->ID;
-			$string = '<a href="'.get_bloginfo('blogurl').'?p='.$p_id.'&amp;more=1&amp;c=1">'.$next;
+			$string = '<a href="'.url_add_param( get_bloginfo('blogurl'), 'p='.$p_id.'&amp;more=1&amp;c=1' ).'">'.$next;
 			if ($title=='yes') {
 				$string .= $p_title;
 			}
@@ -1422,22 +1423,22 @@ function gen_permalink(
 		switch($use_destination)
 		{
 			case 'monthly':
-				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor;
+				$permalink = add_url_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor );
 				break;
 			case 'weekly':
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
 				{
 					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 				}
-				$permalink = $file.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor;
+				$permalink = add_url_param( $file, 'm='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor );
 				break;
 			case 'daily':
-				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor;
+				$permalink = add_url_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor );
 				break;
 			case 'postbypost':
 			case 'single':
 			default:
-				$permalink = $file.'?p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1';
+				$permalink = add_url_param( $file, 'p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
 				break;
 		}
 	}

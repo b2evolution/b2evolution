@@ -19,28 +19,28 @@ if( isset( $main_init ) )
 }
 $main_init = true;
 
-require_once( dirname(__FILE__). '/../conf/_config.php');
-require_once( dirname(__FILE__). '/_functions.php');
+require_once( dirname(__FILE__).'/../conf/_config.php' );
+require_once( dirname(__FILE__).'/_functions.php' );
 
 timer_start();
 
-require_once( dirname(__FILE__). '/_vars.php');	// sets various arrays and vars for use in b2
-require_once( dirname(__FILE__). '/_class_settings.php');
-require_once( dirname(__FILE__). '/_class_db.php');
-require_once( dirname(__FILE__). '/_functions_template.php');	// function to be called from templates
-require_once( dirname(__FILE__). '/_functions_xmlrpc.php');	
-require_once( dirname(__FILE__). '/_functions_xmlrpcs.php');
-require_once( dirname(__FILE__). '/_class_blog.php');
-require_once( dirname(__FILE__). '/_class_itemlist.php');
-require_once( dirname(__FILE__). '/_class_commentlist.php');
-require_once( dirname(__FILE__). '/_class_archivelist.php');
-require_once( dirname(__FILE__). '/_class_dataobjectcache.php');
-require_once( dirname(__FILE__). '/_class_calendar.php');
-require_once( dirname(__FILE__). '/_functions_hitlogs.php'); // referer logging
-require_once( dirname(__FILE__). '/_functions_forms.php');
-require_once( dirname(__FILE__). '/_functions_forms.php');
-require_once( dirname(__FILE__). '/_class_renderer.php');
-require_once( dirname(__FILE__). '/_class_toolbars.php');
+require_once( dirname(__FILE__).'/_vars.php' );	// sets various arrays and vars for use in b2
+require_once( dirname(__FILE__).'/_class_settings.php' );
+require_once( dirname(__FILE__).'/_class_db.php' );
+require_once( dirname(__FILE__).'/_functions_template.php' );	// function to be called from templates
+require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );	
+require_once( dirname(__FILE__).'/_functions_xmlrpcs.php' );
+require_once( dirname(__FILE__).'/_class_blog.php' );
+require_once( dirname(__FILE__).'/_class_itemlist.php' );
+require_once( dirname(__FILE__).'/_class_commentlist.php' );
+require_once( dirname(__FILE__).'/_class_archivelist.php' );
+require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
+require_once( dirname(__FILE__).'/_class_calendar.php' );
+require_once( dirname(__FILE__).'/_class_hits.php' ); // referer logging
+require_once( dirname(__FILE__).'/_functions_forms.php' );
+require_once( dirname(__FILE__).'/_functions_forms.php' );
+require_once( dirname(__FILE__).'/_class_renderer.php' );
+require_once( dirname(__FILE__).'/_class_toolbars.php' );
 
 
 if( !$config_is_done )

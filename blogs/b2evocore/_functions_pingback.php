@@ -290,7 +290,7 @@ function pingback_link($file='',$c=0,$tb=0)
 	global $id;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo $file.'?p='.$id;
+	echo add_url_param( $file, 'p='.$id );
 	if( $c == 1 )
 	{	// include comments // fplanque: added
 		echo '&amp;c=1';
@@ -311,7 +311,7 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 	global $blog, $id, $b2pingbackpopupfile, $b2commentsjavascript;
 	echo '<a href="';
 	if ($b2commentsjavascript) {
-		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;pb=1';
+		echo url_add_param( get_bloginfo('blogurl'), 'template=popup&amp;p='.$id.'&amp;pb=1' );
 		echo '" onclick="b2open(this.href); return false"';
 	} else {
 		// if comments_popup_script() is not in the template, display simple comment link

@@ -46,7 +46,7 @@ if( !isset($timestamp_max) ) $timestamp_max = '';
 if( empty($disp) )
 {	// Conversion support for old params:
 	if( $c == 'last') 
-	{	// Trabslate old last comments caller
+	{	// Translate old last comments caller
 		$disp = 'comments';
 	}
 	elseif( $stats )

@@ -99,7 +99,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		$comment_blogparams = get_blogparams_by_ID( $blog );
 
 		$notify_message  = sprintf( T_('New trackback on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
-		$notify_message .= get_bloginfo('blogurl', $comment_blogparams)."?p=".$comment_post_ID."&tb=1\n\n";
+		$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$comment_post_ID&tb=1\n\n" );
 		$notify_message .= T_('Website', $default_locale).": $comment_author (IP: $user_ip , $user_domain)\n";
 		$notify_message .= T_('Url', $default_locale).": $comment_author_url\n";
 		$notify_message .= T_('Excerpt', $default_locale).": \n".$original_comment."\n\n";

@@ -36,7 +36,7 @@ switch($action)
 
 		param( 'redirect_to', 'string', $_SERVER['HTTP_REFERER'] );
 		$location = empty($redirect_to) ? $baseurl.'/' : $redirect_to;
-		header("Refresh:0;url=$location");
+		header('Refresh:0;url='.str_replace('&amp;', '&', $location));
 		exit();
 		break; // case 'logout'
 

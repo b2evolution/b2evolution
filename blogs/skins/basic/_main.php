@@ -80,6 +80,8 @@
 				echo ', ';
 				$Item->wordcount();
 				echo ' ', T_('words');
+				$Item->views();
+				echo ' ', T_('views');
 			?>
 			</small>
 		
@@ -150,7 +152,7 @@
 	
 	<div align="center">Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" align="middle" /></a> <!-- Please help us promote b2evolution and leave this link on your blog. --></div>
 	<?php 
-		log_hit();	// log the hit on this page
+		$Hits->log();	// log the hit on this page
 		debug_info();	// output debug info if requested
 	?>
 </body>

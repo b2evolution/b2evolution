@@ -343,14 +343,8 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	if( $link_text == '' ) $link_text = T_('Login...');
 	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
 
-	$redir = '';
-	if( !empty( $blog ) )
-	{	// We'll want to return to this blog after login
-		$redir = '?redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
-	}
-
 	echo $before;
-	echo '<a href="', $htsrv_url, '/login.php', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/login.php?redirect_to='.urlencode( regenerate_url() ), '" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -373,14 +367,8 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	if( $link_text == '' ) $link_text = T_('Register...');
 	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
 
-	$redir = '';
-	if( !empty( $blog ) )
-	{	// We'll want to return to this blog after login
-		$redir = '?redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
-	}
-
 	echo $before;
-	echo '<a href="',  $htsrv_url, '/register.php', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/register.php?redirect_to='.urlencode( regenerate_url() ), '" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -401,14 +389,8 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	if( $link_text == '' ) $link_text = T_('Logout (%s)');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
-	$redir = '';
-	if( !empty( $blog ) )
-	{	// We'll want to return to this blog after login
-		$redir = '&amp;redirect_to='.htmlspecialchars( get_bloginfo('blogurl') );
-	}
-
 	echo $before;
-	echo '<a href="', $htsrv_url, '/login.php?action=logout', $redir, '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/login.php?action=logout&amp;redirect_to='.urlencode( regenerate_url() ), '" title="', $link_title, '">';
 	printf( $link_text, $user_login );
 	echo '</a>';
 	echo $after;
@@ -449,7 +431,7 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
  */
 function user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $user_login, $pagenow;
+	global $user_login, $pagenow, $Blog;
 
 	if( ! is_logged_in() ) return false;
 
@@ -457,9 +439,8 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
 	echo $before;
-	echo '<a href="';
-	bloginfo( 'blogurl', 'raw' );
-	echo '?disp=profile" title="', $link_title, '">';
+	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.urlencode(regenerate_url()) )
+			.'" title="', $link_title, '">';
 	printf( $link_text, $user_login );
 	echo '</a>';
 	echo $after;

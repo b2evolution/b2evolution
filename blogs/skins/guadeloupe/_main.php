@@ -190,7 +190,7 @@
 	<?php require( dirname(__FILE__).'/_archives.php'); ?>
 </ul>
 
-<?php if (! $stats) { ?>
+<?php if ($disp != 'stats') { ?>
 
 	<h4><?php echo T_('Recent Referers') ?></h4>
 	<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>
@@ -202,7 +202,7 @@
 	</ul>
 	<br />
 	<h4><?php echo T_('Top Referers') ?></h4>
-	<?php refererList(5,'global',0,0,'no','baseDomain',($blog>1)?$blog:''); ?>
+	<?php refererList(5, 'global', 0, 0, 'no', 'baseDomain', ($blog > 1) ? $blog : ''); ?>
 	<ul>
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
@@ -237,7 +237,7 @@ Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="
 <p class="baseline">
 This site works better with web standards! Original skin design courtesy of <a href="http://standblog.com/">Tristan NITOT</a>.
 <?php
-	log_hit();	// log the hit on this page
+	$Hits->log();	// log the hit on this page
 	debug_info(); // output debug info if requested
 ?>
 </p>

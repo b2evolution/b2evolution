@@ -233,7 +233,7 @@ function comments_link($file='', $tb=0, $pb=0 )
 	global $id;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo $file. '?p='. $id. '&amp;c=1';
+	echo add_url_param( $file, 'p='. $id. '&amp;c=1' );
 	if( $tb == 1 )
 	{	// include trackback // fplanque: added
 		echo '&amp;tb=1';
@@ -296,7 +296,7 @@ function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 	echo '<a href="';
 	if($b2commentsjavascript)
 	{
-		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;c=1';
+		echo url_add_param( get_bloginfo('blogurl'), 'template=popup&amp;p='.$id.'&amp;c=1' );
 		echo '" onclick="b2open(this.href); return false"';
 	}
 	else

@@ -32,4 +32,4 @@
 	</entry>
 	<?php } // End of comment loop. ?>
 </feed>
-<?php log_hit(); // log the hit on this page ?>
+<?php $Hits->log(); // log the hit on this page ?>

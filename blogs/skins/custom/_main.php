@@ -212,12 +212,11 @@
 		</ul>
 	</div>
 
-	<?php if (! $stats)
-	{ ?>
+	<?php if ($disp != 'stats') { ?>
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Recent Referers') ?></h3>
-			<?php refererList(5,'global',0,0,'no','',($blog>1)?$blog:''); ?>
+			<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>
 			<ul>
 				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
@@ -226,7 +225,7 @@
 			</ul>
 		<br />
 		<h3><?php echo T_('Top Referers') ?></h3>
-			<?php refererList(5,'global',0,0,'no','baseDomain',($blog>1)?$blog:''); ?>
+			<?php refererList(5, 'global', 0, 0, 'no', 'baseDomain', ($blog > 1) ? $blog : ''); ?>
 			<ul>
 				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
@@ -299,7 +298,7 @@
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;
 	<?php
-		log_hit();	// log the hit on this page
+		$Hits->log();	// log the hit on this page
 		debug_info(); // output debug info if requested
 	?>
 </p>

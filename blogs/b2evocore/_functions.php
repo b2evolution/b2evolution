@@ -992,7 +992,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 
 	if( ! empty( $params ) )
 	{
-		$url .= '?'.implode( '&amp;', $params );
+		$url = url_add_param( $url, implode( '&amp;', $params ) );
 	}
 
 	return $url;
@@ -1208,7 +1208,7 @@ function obhandler( $output )
 	{  // send 304 and die
 		header( 'Content-Length: 0' );
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
-		#log_hit();  // log this somehow?
+		#$Hits->log();  // log this somehow?
 		die;
 	};
 

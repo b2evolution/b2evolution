@@ -17,12 +17,14 @@
 		return;
 	}
 	// --- //
+	param( 'redirect_to', 'string', '');
 ?>
 
 	<!-- form to add a comment -->
 	<form action="<?php echo $htsrv_url ?>/profile_update.php" method="post" class="bComment">
 
 		<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
+		<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 
 		<fieldset>
 			<div class="label"><?php echo T_('Login:') ?></div>

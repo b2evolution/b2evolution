@@ -448,6 +448,19 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8070 )
+	{	// --------------------------------------------
+		// upgrade to 0.9.1
+		// --------------------------------------------
+		
+		echo 'Upgrading posts table... ';
+		$query = "ALTER TABLE $tableposts
+							ADD post_views INT DEFAULT '0' NOT NULL AFTER post_flags";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+	}
+
+
+	if( $old_db_version < 8080 )
 	{
 		/*
 		 * CONTRIBUTORS: If you need some more changes, put them here!

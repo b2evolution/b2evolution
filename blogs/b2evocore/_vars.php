@@ -11,11 +11,11 @@
  */
 
 $b2_version = '0.9.1+CVS';
-$new_db_version = 8060;				// next time: 8070
+$new_db_version = 8070;				// next time: 8080
 
 // Activate gettext:
 if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
-{	// We are going to use GETTEXT
+{ // We are going to use GETTEXT
 	// Specify location of translation tables :
 	bindtextdomain( 'messages', dirname(__FILE__). '/../locales');
 	// Choose domain: (name of the .mo files)
@@ -29,11 +29,11 @@ if(!isset($_SERVER['REQUEST_URI']))
 	{ //ISAPI 
 		$ReqPath = $_SERVER['URL']; 
 	}
-  elseif(isset($_SERVER['PATH_INFO']))
+	elseif(isset($_SERVER['PATH_INFO']))
 	{ //CGI/FastCGI 
 		$ReqPath = $_SERVER['PATH_INFO']; 
 	}
-  
+	
 	$ReqURI = $ReqPath;
 	if (isset($_SERVER['QUERY_STRING'])) 
 	{ //Made a $_GET request 
@@ -41,7 +41,7 @@ if(!isset($_SERVER['REQUEST_URI']))
 	}
 }
 else
-{	// apache...
+{ // apache...
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
 	$ReqPath = explode( '?', $ReqURI, 2 );	
@@ -63,36 +63,47 @@ $b2commentsjavascript = false;
 
 // browser detection
 $is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
-if (!isset($HTTP_USER_AGENT))
+if( !isset($HTTP_USER_AGENT) )
 {
 	if( isset($_SERVER['HTTP_USER_AGENT']) )
 		$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
 	else
 		$HTTP_USER_AGENT = '';
 }
-if(strpos($HTTP_USER_AGENT, 'Lynx') !== false)
+if( $HTTP_USER_AGENT != '' )
 {
-	$is_lynx = 1;
-}
-elseif(strpos($HTTP_USER_AGENT, 'Gecko') !== false)
-{
-	$is_gecko = 1;
-}
-elseif(strpos($HTTP_USER_AGENT, 'MSIE') !== false && strpos($HTTP_USER_AGENT, 'Win') !== false)
-{
-	$is_winIE = 1;
-}
-elseif(strpos($HTTP_USER_AGENT, 'MSIE') !== false && strpos($HTTP_USER_AGENT, 'Mac') !== false)
-{
-	$is_macIE = 1;
-}
-elseif(strpos($HTTP_USER_AGENT, 'Opera') !== false)
-{
-	$is_opera = 1;
-}
-elseif(strpos($HTTP_USER_AGENT, 'Nav') !== false || preg_match('/Mozilla\/4\./', $HTTP_USER_AGENT))
-{
-	$is_NS4 = 1;
+	if(strpos($HTTP_USER_AGENT, 'Lynx') !== false)
+	{
+		$is_lynx = 1;
+	}
+	elseif(strpos($HTTP_USER_AGENT, 'Gecko') !== false)
+	{
+		$is_gecko = 1;
+	}
+	elseif(strpos($HTTP_USER_AGENT, 'MSIE') !== false && strpos($HTTP_USER_AGENT, 'Win') !== false)
+	{
+		$is_winIE = 1;
+	}
+	elseif(strpos($HTTP_USER_AGENT, 'MSIE') !== false && strpos($HTTP_USER_AGENT, 'Mac') !== false)
+	{
+		$is_macIE = 1;
+	}
+	elseif(strpos($HTTP_USER_AGENT, 'Opera') !== false)
+	{
+		$is_opera = 1;
+	}
+	elseif(strpos($HTTP_USER_AGENT, 'Nav') !== false || preg_match('/Mozilla\/4\./', $HTTP_USER_AGENT))
+	{
+		$is_NS4 = 1;
+	}
+
+	if ($HTTP_USER_AGENT != strip_tags($HTTP_USER_AGENT))
+	{ // then they have tried something funny,
+		// putting HTML or PHP into the HTTP_REFERER
+		debug_log( 'setting vars: '.T_('bad char in User Agent'));
+		$HTTP_USER_AGENT = T_('bad char in User Agent');
+	}
+
 }
 $is_IE = (($is_macIE) || ($is_winIE));
 
