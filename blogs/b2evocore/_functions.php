@@ -40,8 +40,13 @@ function dbconnect()
 }
 
 
-/*
- * mysql_oops(-)
+/**
+ * Report MySQL errors in detail.
+ *
+ * {@internal mysql_oops(-) }
+ *
+ * @author fplanque
+ * @param $sql_query The query which led to the error
  */
 function mysql_oops($sql_query)
 {
