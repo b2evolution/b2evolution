@@ -1729,9 +1729,9 @@ function result_input( $item_ID, $item_name )
 function bullet( $bool )
 {
 	if( $bool )
-		return getIcon( 'bullet_full', 'imgtag', array( 'alt'=>'&bull;' ) );
+		return getIcon( 'bullet_full', 'imgtag' );
 
-	return getIcon( 'bullet_empty', 'imgtag', array( 'alt'=>'&nbsp;' ) );
+	return getIcon( 'bullet_empty', 'imgtag' );
 }
 
 /**
@@ -1857,6 +1857,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.55  2005/03/02 15:31:54  fplanque
+ * minor cleanup
+ *
  * Revision 1.54  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
