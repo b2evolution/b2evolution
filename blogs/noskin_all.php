@@ -282,8 +282,14 @@ the_date( '', '<h2>', '</h2>' );
 	<div class="bSideItem">
     <h3><?php echo T_('Misc') ?></h3>
 		<ul>  
-			<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a></li>
-			<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a></li>
+			<?php 
+				// Administrative links:
+				user_login_link( '<li>', '</li>' ); 
+				user_register_link( '<li>', '</li>' ); 
+				user_admin_link( '<li>', '</li>' ); 
+				user_profile_link( '<li>', '</li>' ); 
+				user_logout_link( '<li>', '</li>' ); 
+			?>
 		</ul>	
 	</div>
 

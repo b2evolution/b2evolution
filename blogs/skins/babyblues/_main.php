@@ -74,8 +74,14 @@
 
 	<div class="sidetitle" align="center"><?php echo T_('Misc') ?></div>
 	<div class="sidebody">
-		<a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a><br />
-		<a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a>
+		<?php 
+			// Administrative links:
+			user_login_link( '', '<br />' ); 
+			user_register_link( '', '<br />' ); 
+			user_admin_link( '', '<br />' ); 
+			user_profile_link( '', '<br />' ); 
+			user_logout_link( '', '<br />' ); 
+		?>
 	</div>
 	
 	<div class="sidetitle" align="center">credits</div>

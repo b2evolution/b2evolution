@@ -133,9 +133,14 @@ Categories: <?php the_categories() ?>
 </ul>
 
 <h4>other:</h4>
-
-<a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a><br />
-<a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a><br />
+<?php 
+	// Administrative links:
+	user_login_link( '', '<br />' ); 
+	user_register_link( '', '<br />' ); 
+	user_admin_link( '', '<br />' ); 
+	user_profile_link( '', '<br />' ); 
+	user_logout_link( '', '<br />' ); 
+?>
 <br />
 
 <a href="<?php bloginfo('rss2_url'); ?>"><img src="../../img/xml.gif" alt="view this weblog as RSS !" width="36" height="14" border="0"  /></a><br />

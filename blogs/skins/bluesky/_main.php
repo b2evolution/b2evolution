@@ -188,8 +188,14 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 <h4><?php echo T_('Misc') ?></h4>
 <ul>
-	<li><a href="<?php echo $pathserver?>/b2login.php"><?php echo T_('Login...') ?></a></li>
-	<li><a href="<?php echo $pathserver?>/b2register.php"><?php echo T_('Register...') ?></a></li>
+	<?php 
+		// Administrative links:
+		user_login_link( '<li>', '</li>' ); 
+		user_register_link( '<li>', '</li>' ); 
+		user_admin_link( '<li>', '</li>' ); 
+		user_profile_link( '<li>', '</li>' ); 
+		user_logout_link( '<li>', '</li>' ); 
+	?>
   <li><a href="<?php bloginfo('rss_url'); ?>">RSS 0.92 (Userland)</a></li>
 	<li><a href="<?php bloginfo('rdf_url'); ?>">RSS 1.0 (RDF)</a></li>
 	<li><a href="<?php bloginfo('rss2_url'); ?>">RSS 2.0 (Userland)</a></li>
