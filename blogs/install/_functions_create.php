@@ -86,7 +86,7 @@ function create_b2evo_tables()
 		blog_tagline varchar(250) NULL default '',
 		blog_description varchar(250) NULL default '',
 		blog_longdesc TEXT NULL DEFAULT NULL,
-		blog_locale VARCHAR(10) NOT NULL DEFAULT 'en-US',
+		blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-US',
 		blog_siteurl varchar(120) NOT NULL default '$baseurl',
 		blog_filename varchar(30) NULL default 'blog.php',
 		blog_staticfilename varchar(30) NULL default NULL,
@@ -133,7 +133,7 @@ function create_b2evo_tables()
 		post_mod_date datetime NOT NULL default '0000-00-00 00:00:00',
 		post_status enum('published','deprecated','protected','private','draft')
 									NOT NULL default 'published',
-		post_locale VARCHAR(10) NOT NULL DEFAULT 'en-US',
+		post_locale VARCHAR(20) NOT NULL DEFAULT 'en-US',
 		post_content text NOT NULL,
 		post_title text NOT NULL,
 		post_urltitle VARCHAR(50) NULL DEFAULT NULL,

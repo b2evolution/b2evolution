@@ -229,6 +229,8 @@ function upgrade_b2evo_tables()
 		{
 			global $DB, $locales, $default_locale;
 			
+			create_locales();
+
 			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $default_locale) )
 			{ // we want a valid locale
 				$default_locale = 'en-US';
@@ -280,14 +282,12 @@ function upgrade_b2evo_tables()
 			echo "\n";
 		}  // convert_lang_to_locale(-)
 		
-		create_locales();
-		
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE $tableposts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
 										AFTER post_issue_date,
-							CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US',
+							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-US',
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
@@ -311,7 +311,7 @@ function upgrade_b2evo_tables()
 		
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE $tableblogs
-							CHANGE blog_lang blog_locale varchar(10) NOT NULL default 'en-US'";
+							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-US'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
