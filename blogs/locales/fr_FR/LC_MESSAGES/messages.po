@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2003-09-07 19:51+0200\n"
-"PO-Revision-Date: 2003-09-07 19:53+0100\n"
+"PO-Revision-Date: 2003-09-07 21:20+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -886,7 +886,7 @@ msgstr "Poster dans le blog:"
 #: ..\..\..\admin\b2edit.php:130
 #: ..\..\..\admin\b2edit.php:150
 msgid "Since this blog has no categories, you cannot post to it. You must create categories first."
-msgstr "Vous ne pouvez pas poster dans ce blog tant que vous n'y avez pas créé de catégorie."
+msgstr "Vous ne pouvez pas poster dans ce blog tant que vous n\\'y avez pas créé de catégorie."
 
 #: ..\..\..\admin\b2edit.php:134
 msgid "Switch to this blog (keeping your input if Javascript is active)"

@@ -331,7 +331,7 @@ class ItemList
 			elseif ($what_to_show == 'days')
 			{
 				$posts = $postend - $poststart + 1;
-				$lastpostdate = get_lastpostdate();
+				$lastpostdate = get_lastpostdate( $blog, $show_statuses );
 				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$startdate = date('Y-m-d H:i:s', ($lastpostdate - (($poststart -1) * 86400)));
@@ -356,7 +356,7 @@ class ItemList
 		elseif ($what_to_show == 'days')
 		{
 			// echo 'LIMIT DAYS';
-			$lastpostdate = get_lastpostdate();
+			$lastpostdate = get_lastpostdate( $blog, $show_statuses );
 			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 			$lastpostdate = mysql2date('U',$lastpostdate);
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));

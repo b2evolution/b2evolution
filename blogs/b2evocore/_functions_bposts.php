@@ -200,21 +200,25 @@ function bpost_delete( $post_ID )
 /* 
  * get_lastpostdate(-) 
  */
-function get_lastpostdate() 
+function get_lastpostdate( $blog = 1, $show_statuses = '' ) 
 {
-	global $tableposts, $cache_lastpostdate, $use_cache, $time_difference, $pagenow, $localtimenow;
-	if ((!isset($cache_lastpostdate)) OR (!$use_cache)) {
-		$now = date("Y-m-d H:i:s", $localtimenow);
-		$sql = "SELECT * FROM $tableposts WHERE post_date <= '$now' ORDER BY post_date DESC LIMIT 1";
-		$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
-		$querycount++;
-		$myrow = mysql_fetch_object($result);
-		$lastpostdate = $myrow->post_date;
-		$cache_lastpostdate = $lastpostdate;
-//		echo $lastpostdate;
-	} else {
-		$lastpostdate = $cache_lastpostdate;
+	global $localtimenow, $postdata;
+	
+	// echo 'getting last post date';
+	$LastPostList = new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', 'date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
+
+	if( $LastItem = $LastPostList->get_item() )
+	{
+		// echo 'we have a last item';
+		$last_postdata = $LastPostList->get_postdata();	// will set $postdata;
+		$lastpostdate = $postdata['Date'];
 	}
+	else
+	{
+		// echo 'we have no last item';
+		$lastpostdate = date("Y-m-d H:i:s", $localtimenow);
+	}
+	// echo $lastpostdate;
 	return($lastpostdate);
 }
 
@@ -238,14 +242,8 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	// fplanque changed: $sql = "SELECT * FROM $tableposts WHERE ID = $postid";
 	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
-
-	/*
-	 * ----------------------------------------------------
-	 *  Restrict to the statuses we want to show:
-	 * ----------------------------------------------------
-	 */
+	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	$sql .= ' AND '.statuses_where_clause( $show_statuses );
 
@@ -1293,7 +1291,7 @@ function bpost_count_words($string)
  *
  * fplanque: created
  */
-function statuses_where_clause( $show_statuses )
+function statuses_where_clause( $show_statuses = '' )
 {
 	if( empty($show_statuses) )
 		$show_statuses = array( 'published', 'protected', 'private' );

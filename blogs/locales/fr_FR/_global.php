@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-07 19:51+0200\nPO-Revision-Date: 2003-09-07 19:53+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-07 19:51+0200\nPO-Revision-Date: 2003-09-07 21:20+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -137,7 +137,7 @@ $trans['fr_FR'] = array(
 	'Editing comment' => 'Edition d\'un commentaire',
 	'Cheatin\' uh ?' => 'Alors on triche, hein?',
 	'New post in blog:' => 'Poster dans le blog:',
-	'Since this blog has no categories, you cannot post to it. You must create categories first.' => 'Vous ne pouvez pas poster dans ce blog tant que vous n\'y avez pas créé de catégorie.',
+	'Since this blog has no categories, you cannot post to it. You must create categories first.' => 'Vous ne pouvez pas poster dans ce blog tant que vous n\\\'y avez pas créé de catégorie.',
 	'Switch to this blog (keeping your input if Javascript is active)' => 'Poster dans ce blog (en conservant vos saisies si Javascript est actif)',
 	'b2evo' => 'b2evo',
 	'Login...' => 'S\'identifier...',
