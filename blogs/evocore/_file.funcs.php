@@ -45,20 +45,60 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Converts bytes to readable bytes/kb/mb/gb, like "12.45mb"
  *
- * @todo use <abbr>
  * @param integer bytes
  * @return string bytes made readable
  */
 function bytesreadable( $bytes )
 {
-	$type = array ( T_('B.'), T_('KB'), T_('MB'), T_('GB'), T_('TB') );
+	static $types = NULL;
+
+	if( !isset($types) )
+	{
+		$types = array(
+										0 => array(
+													'abbr' => T_('B.'),
+													'text' => T_('Bytes')
+												),
+										1 => array(
+													'abbr' => T_('KB'),
+													'text' => T_('Kilobytes'),
+												),
+										2 => array(
+													'abbr' => T_('MB'),
+													'text' => T_('Megabytes'),
+												),
+										3 => array(
+													'abbr' => T_('GB'),
+													'text' => T_('Gigabytes'),
+												),
+										4 => array(
+													'abbr' => T_('TB'),
+													'text' => T_('Terabytes')
+												)
+									);
+	}
 
 	for( $i = 0; $bytes > 1024; $i++ )
 	{
 		$bytes /= 1024;
 	}
 
-	return round($bytes, 2).'&nbsp;'.$type[$i];
+	$r = round($bytes, 2).'&nbsp;';
+
+	if( !isset( $types[$i]['used'] ) )
+	{
+		$r .= '<abbr title="'.$types[$i]['text'].'">';
+	}
+
+	$r .= $types[$i]['abbr'];
+
+	if( !isset( $types[$i]['used'] ) )
+	{
+		$r .= '</abbr>';
+		$types[$i]['used'] = true;
+	}
+
+	return $r;
 }
 
 
@@ -94,6 +134,7 @@ function get_dirsize_recursive( $path )
  * Deletes a dir recursive, wiping out all subdirectories!!
  *
  * @param string the dir
+ * @return
  */
 function deldir_recursive( $dir )
 {
@@ -102,7 +143,7 @@ function deldir_recursive( $dir )
 	{
 		if( is_dir( "$dir/$entryname" ) && ( $entryname != '.' && $entryname != '..') )
 		{
-			deldir( "$dir/$entryname" );
+			deldir_recursive( "$dir/$entryname" );
 		}
 		elseif( $entryname != '.' && $entryname != '..' )
 		{
@@ -320,6 +361,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/31 17:43:09  blueyed
+ * enhanced bytesreadable(), fixed deldir_recursive()
+ *
  * Revision 1.6  2004/12/30 16:45:40  fplanque
  * minor changes on file manager user interface
  *
