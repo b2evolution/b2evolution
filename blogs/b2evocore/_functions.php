@@ -7,18 +7,18 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-require_once( dirname(__FILE__) . '/_functions_cats.php' );
-require_once( dirname(__FILE__) . '/_functions_blogs.php' );
-require_once( dirname(__FILE__) . '/_functions_bposts.php' );
-require_once( dirname(__FILE__) . '/_functions_users.php' );
-require_once( dirname(__FILE__) . '/_functions_trackback.php' );
-require_once( dirname(__FILE__) . '/_functions_pingback.php' );
-require_once( dirname(__FILE__) . '/_functions_pings.php' );
-require_once( dirname(__FILE__) . '/_functions_skins.php' );
-require_once( dirname(__FILE__) . '/_functions_errors.php' );
-require_once( dirname(__FILE__) . '/_functions_antispam.php' );
+require_once( dirname(__FILE__). '/_functions_cats.php' );
+require_once( dirname(__FILE__). '/_functions_blogs.php' );
+require_once( dirname(__FILE__). '/_functions_bposts.php' );
+require_once( dirname(__FILE__). '/_functions_users.php' );
+require_once( dirname(__FILE__). '/_functions_trackback.php' );
+require_once( dirname(__FILE__). '/_functions_pingback.php' );
+require_once( dirname(__FILE__). '/_functions_pings.php' );
+require_once( dirname(__FILE__). '/_functions_skins.php' );
+require_once( dirname(__FILE__). '/_functions_errors.php' );
+require_once( dirname(__FILE__). '/_functions_antispam.php' );
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
-if( $use_html_checker ) require_once( dirname(__FILE__) . '/_class_htmlchecker.php' );
+if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.php' );
 
 
 /* functions... */
@@ -61,7 +61,7 @@ function mysql_oops($sql_query)
 /***** Formatting functions *****/
 
 
-/** 
+/**
  * Format the content for being output
  *
  * {@internal format_to_output(-) }}
@@ -77,7 +77,7 @@ function mysql_oops($sql_query)
  * - xml
  * - xmlattr
  * - entityencoded,
- * @return string formatted text 
+ * @return string formatted text
  */
 function format_to_output( $content, $format = 'htmlbody' )
 {
@@ -129,7 +129,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = convert_chars($content, 'html');
 			$content = str_replace('"', '&quot;', $content );
 			break;
-			
+
 		case 'entityencoded':
 			convert_bbcode($content);
 			convert_gmcode($content);
@@ -209,7 +209,7 @@ function format_to_post($content, $autobr=0, $is_comment=0)
 			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attribues,
 																			$comments_uri_attrs, $comments_allowed_uri_scheme );
 		}
-		
+
 		$checker->check(stripslashes($content));
 	}
 
@@ -258,7 +258,7 @@ function autobrize($content) {
 /*
  * unautobrize(-)
  */
-function unautobrize($content) 
+function unautobrize($content)
 {
 	$content = preg_replace("/<br>\n/", "\n", $content);   //for PHP versions before 4.0.5
 	$content = preg_replace("/<br \/>\n/", "\n", $content);
@@ -303,19 +303,19 @@ function convert_chars( $content, $flag='html' )
 
 	$content = strtr($content, $b2_htmltrans);
 
-	if (locale_charset(false) == 'iso-8859-1') 
+	if (locale_charset(false) == 'iso-8859-1')
 	{
  		$content = preg_replace_callback(
  			'/[\x80-\xff]/',
  			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
  			$content);
  	}
- 
- 	if ($flag == "html") 
+
+ 	if ($flag == "html")
 	{
  		$newcontent = preg_replace('/&(?!#)/', '&amp;', $content);
  	}
- 	else 
+ 	else
 	{	// unicode, xml...
  		$newcontent = preg_replace('/&(?!#)/', '&#38;', $content);
  	}
@@ -398,11 +398,11 @@ function convert_smilies( & $content)
 			$tmpsmilies = $b2smilies;
 			uksort($tmpsmilies, 'smiliescmp');
 
-			foreach($tmpsmilies as $smiley => $img) 
+			foreach($tmpsmilies as $smiley => $img)
 			{
 				$b2_smiliessearch[] = $smiley;
 				$smiley_masked = '';
-				for ($i = 0; $i < strlen($smiley); $i++ ) 
+				for ($i = 0; $i < strlen($smiley); $i++ )
 				{
 					/* fplanque: with the #160s we prevent recurrent replacing... bleh :(
 						 fplanque changed $smiley_masked .= substr($smiley, $i, 1).chr(160);
@@ -410,12 +410,12 @@ function convert_smilies( & $content)
 					*/
 					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
 				}
-				
+
 				$b2_smiliesreplace[] = "<img src='$smilies_directory/$img' border='0' alt='$smiley_masked' class='middle' />";
 			}
 		}
 
-		// REPLACE: 
+		// REPLACE:
 		$content = str_replace($b2_smiliessearch, $b2_smiliesreplace, $content);
 	}
 }
@@ -522,7 +522,7 @@ function mysql2date($dateformatstring, $mysqlstring, $useGM = false)
  *
  * date internationalization: same as date() formatting but with i18n support
  */
-function date_i18n( $dateformatstring, $unixtimestamp ) 
+function date_i18n( $dateformatstring, $unixtimestamp )
 {
 	global $month, $month_abbrev, $weekday, $weekday_abbrev;
 
@@ -585,20 +585,20 @@ function get_weekstartend($mysqlstring, $start_of_week)
 }
 
 
-function antispambot($emailaddy, $mailto=0) {
+function antispambot($emailaddy, $mailto = 0) {
 	$emailNOSPAMaddy = '';
 	srand ((float) microtime() * 1000000);
 	for ($i = 0; $i < strlen($emailaddy); $i = $i + 1) {
-		$j = floor(rand(0, 1+$mailto));
-		if ($j==0) {
-			$emailNOSPAMaddy .= '&#'.ord(substr($emailaddy,$i,1)).';';
-		} elseif ($j==1) {
-			$emailNOSPAMaddy .= substr($emailaddy,$i,1);
-		} elseif ($j==2) {
-			$emailNOSPAMaddy .= '%' . zeroise(dechex(ord(substr($emailaddy, $i, 1))), 2);
+		$j = floor(rand(0, 1 + $mailto));
+		if ($j == 0) {
+			$emailNOSPAMaddy .= '&#' . ord( substr( $emailaddy, $i, 1 ) ). ';';
+		} elseif ($j == 1) {
+			$emailNOSPAMaddy .= substr($emailaddy, $i, 1);
+		} elseif ($j == 2) {
+			$emailNOSPAMaddy .= '%' . zeroise( dechex( ord( substr( $emailaddy, $i, 1 ) ) ), 2 );
 		}
 	}
-	$emailNOSPAMaddy = str_replace('@','&#64;',$emailNOSPAMaddy);
+	$emailNOSPAMaddy = str_replace('@', '&#64;', $emailNOSPAMaddy);
 	return $emailNOSPAMaddy;
 }
 
@@ -641,7 +641,7 @@ function get_settings($setting)
 }
 
 
-function alert_error($msg) 
+function alert_error($msg)
 { // displays a warning box with an error message (original by KYank)
 	global $default_language;
 	?>
@@ -665,7 +665,7 @@ function alert_error($msg)
 }
 
 
-function alert_confirm($msg) 
+function alert_confirm($msg)
 { // asks a question - if the user clicks Cancel then it brings them back one page
 	?>
 	<script language="JavaScript">
@@ -751,7 +751,7 @@ function xmlrpc_getpostcategory($content) {
 /*
  * xmlrpc_removepostdata(-)
  */
-function xmlrpc_removepostdata($content) 
+function xmlrpc_removepostdata($content)
 {
 	$content = preg_replace('/<title>(.+?)<\/title>/si', '', $content);
 	$content = preg_replace('/<category>(.+?)<\/category>/si', '', $content);
@@ -871,7 +871,7 @@ function balanceTags($text)
 		$tagqueue = '';
 
 		// Pop or Push
-		if( substr($regex[1],0,1) == '/' ) 
+		if( substr($regex[1],0,1) == '/' )
 		{ // End Tag
 			$tag = strtolower(substr($regex[1],1));
 
@@ -900,7 +900,7 @@ function balanceTags($text)
 				$tag = '';
 			}
 		}
-		else 
+		else
 		{ // Begin Tag
 			$tag = strtolower($regex[1]);
 
@@ -947,13 +947,13 @@ function balanceTags($text)
 /*
  * remove_magic_quotes(-)
  */
-function remove_magic_quotes( $mixed ) 
+function remove_magic_quotes( $mixed )
 {
 	if( get_magic_quotes_gpc() )
 	{
-		if( is_array($mixed) ) 
+		if( is_array($mixed) )
 		{
-			foreach($mixed as $k => $v) 
+			foreach($mixed as $k => $v)
 			{
 				$mixed[$k] = remove_magic_quotes( $v );
 			}
@@ -964,13 +964,13 @@ function remove_magic_quotes( $mixed )
 		}
 	}
 	return $mixed;
-} 
+}
 
 
-/** 
+/**
  * Sets a parameter with values from the request or to provided default,
  * except if param is already set!
- * 
+ *
  * Also removes magic quotes if they are set automatically by PHP.
  * Also forces type.
  * Priority order: POST, GET, COOKIE, DEFAULT.
@@ -1000,7 +1000,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false )
 	global $global_param_list;
 
 	// Check if already set
-	// WARNING: when PHP register globals is ON, COOKIES get priority og GET and POST with this!!!
+	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
 	if( !isset( $$var ) )
 	{
 		if( isset($_POST[$var]) )
@@ -1037,7 +1037,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false )
 				foreach( $$var as $tes )
 				{
 					echo '<br>value=', $tes;
-				
+
 				}
 			} */
 	}
@@ -1068,7 +1068,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false )
 		$thisparam = array( 'var' => $var, 'type' => $type, 'default' => $default );
 		$global_param_list[] = $thisparam;
 	}
-	
+
 	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
 	return $$var;
 }
@@ -1163,11 +1163,8 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 		$url .= '?'.implode( '&amp;', $params );
 	}
 
-
 	return $url;
 }
-
-
 
 
 /*
@@ -1187,7 +1184,7 @@ function get_path( $which='' )
 			$last_pos = $pos+1;
 		}
 	}
-	
+
 	switch( $which )
 	{
 		case 'skins':
@@ -1211,7 +1208,7 @@ function autoquote( & $string )
 
 
 /**
- * Check the validity of a given URL 
+ * Check the validity of a given URL
  *
  * Checks allowed URI schemes and URL ban list
  * URL can be empty
@@ -1227,18 +1224,18 @@ function autoquote( & $string )
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
-	if( empty($url) ) 
+	if( empty($url) )
 	{	// Empty URL, no problem
-		return false;		
+		return false;
 	}
-	
+
 	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):/', $url, $matches) )
 	{	// Cannot find URI scheme
-		return T_('Invalid URL'); 
+		return T_('Invalid URL');
 	}
 
 	$scheme = strtolower($matches[1]);
-	if(!in_array( $scheme, $allowed_uri_scheme )) 
+	if(!in_array( $scheme, $allowed_uri_scheme ))
 	{	// Scheme not allowed
 		return T_('URI scheme not allowed');
 	}
@@ -1251,4 +1248,27 @@ function validate_url( $url, & $allowed_uri_scheme )
 
 	return false;		// OK
 }
+
+
+/**
+ * wrap pre around var_dump(), better debuggin'
+ *
+ * {@internal pre_dump(-) }}
+ *
+ * @param mixed variable to dump
+ * @param string title to display
+ * @return -
+ *
+ * blueyed: created 04-04-15
+ *
+ */
+function pre_dump($dump, $title = ''){
+	echo '<pre>';
+	if( $title != '' ){
+		echo $title. ': <br />';
+	}
+	var_dump($dump);
+	echo '</pre>';
+}
+
 ?>

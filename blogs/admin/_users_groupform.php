@@ -13,7 +13,7 @@
  */
 ?>
 <div class="panelblock">
-
+	<div style="float:right;">[<a title="<?php echo T_('Close group profile'); ?>" href="b2users.php">X</a>]</div>
 	<h2><?php echo T_('Editing group:'), ' ', $edited_Group->disp('name') ?></h2>
 
 	<form class="fform" method="post" action="b2users.php">

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Displays groups/users list for editing
  *
@@ -15,7 +15,7 @@
 	<h2><?php echo T_('Groups &amp; Users') ?></h2>
 	<?php
 	$request = "SELECT $tableusers.*, grp_ID, grp_name FROM $tableusers RIGHT JOIN $tablegroups ON user_grp_ID = grp_ID ORDER BY grp_name, user_login";
-	$querycount++; 
+	$querycount++;
 	$result = mysql_query($request);
 	?>
 <table class="thin">
@@ -28,7 +28,7 @@
 		<th><?php echo T_('URL') ?></th>
 		<th><?php echo T_('Level') ?></th>
 	</tr>
-	<?php 
+	<?php
 	$loop_prev_grp_ID = 0;
 	while($row = mysql_fetch_array($result) )
 	{	// For each line (can be a user/group or just an empty group)
@@ -38,7 +38,7 @@
 			?>
 			<tr class="group">
 				<td colspan="7">
-					<strong><a href="b2users.php?action=groupedit&amp;grp_ID=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></a></strong>
+					<strong><a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></a></strong>
 				</td>
 			</tr>
 			<?php
@@ -51,8 +51,8 @@
 			echo "<tr>\n";
 			$email = $loop_User->get('email');
 			$url = $loop_User->get('url');
-			echo "<td>", $loop_User->get('ID'), "</td>\n";
-			echo '<td><a href="b2users.php?action=useredit&amp;user=', $loop_User->get('ID'), '">';
+			echo '<td>', $loop_User->get('ID'), "</td>\n";
+			echo '<td><a href="b2users.php?user=', $loop_User->get('ID'), '">';
 			echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
 			echo $loop_User->get('login'), "</a></td>\n";
 			?>
@@ -67,11 +67,13 @@
 			echo "<td>".$loop_User->get('level');
 			if( ($loop_User->get('level') < 10 ) &&$current_User->check_perm( 'users', 'edit' ) )
 			{
-				echo " <a href=\"b2users.php?action=promote&id=".$loop_User->get('ID')."&prom=up\">+</a> ";
+				echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=up'.
+							( ( $user != 0 )? '&user='. $user : ''). '">+</a> ';
 			}
 			if( ($loop_User->get('level') > 0) && $current_User->check_perm( 'users', 'edit' ))
 			{
-				echo " <a href=\"b2users.php?action=promote&id=".$loop_User->get('ID')."&prom=down\">-</a> ";
+				echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=down'.
+							( ( $user != 0 )? '&user='. $user : ''). '">-</a> ';
 			}
 			if( ($loop_User->get('level') == 0) && $current_User->check_perm( 'users', 'edit' ) )
 			{
@@ -87,13 +89,13 @@
 </table>
 </div>
 
-<?php 
+<?php
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ ?>
 		<div class="panelblock">
-			<?php	
+			<?php
 			echo '<p><a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php"><img src="img/new.png" width="13" height="12" class="middle" alt="" /> ', T_('Register a new user...'), '</a></p>'; ?>
-	
+
 			<p><?php echo T_('To delete an user, bring his/her level to zero, then click on the red cross.') ?><br />
 			<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?></p>
 		</div>

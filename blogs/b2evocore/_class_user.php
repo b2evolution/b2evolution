@@ -427,13 +427,13 @@ class User extends DataObject
 		$querycount++; */
 
 		// Delete posts
-		$sql="DELETE FROM $tableposts WHERE post_author = $this->ID";
-		$result=mysql_query($sql) or mysql_oops( $sql );
+		$sql = "DELETE FROM $tableposts WHERE post_author = $this->ID";
+		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++;
 
 		// Delete userblog permission
-		$sql="DELETE FROM $tableblogusers WHERE bloguser_user_ID = $this->ID";
-		$result=mysql_query($sql) or mysql_oops( $sql );
+		$sql = "DELETE FROM $tableblogusers WHERE bloguser_user_ID = $this->ID";
+		$result = mysql_query($sql) or mysql_oops( $sql );
 		$querycount++;
 
 		// Delete main object:

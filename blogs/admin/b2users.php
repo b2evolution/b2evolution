@@ -14,22 +14,17 @@ require_once( dirname(__FILE__). '/_header.php' );
 $title = T_('User management');
 
 param( 'action', 'string' );
+param( 'user', 'int', 0 );
+param( 'group', 'int', 0 );
+
+require(dirname(__FILE__). '/_menutop.php');
+require(dirname(__FILE__). '/_menutop_end.php');
+
 
 switch ($action)
 {
-	case 'useredit':
-		/*
-		 * View user:
-		 */
-		// Check permission:
-		$current_User->check_perm( 'users', 'view', true );
-
-		param( 'user', 'integer', true );
-		$edited_User = & new User( get_userdata($user) );
-		require(dirname(__FILE__). '/_menutop.php');
-		require(dirname(__FILE__). '/_menutop_end.php');
-		require(dirname(__FILE__). '/_users_form.php');
-		break;
+	case 'useredit': // old-style
+	break;
 
 	case 'userupdate':
 		/*
@@ -49,8 +44,14 @@ switch ($action)
 
 		$edited_User->dbupdate();	// Commit update to the DB
 
-		header("Location: b2users.php");
-		exit();
+		#header('Location: b2users.php');
+		#exit();
+		
+		// remember to display the forms
+		$user = $edited_user_ID;
+		
+		echo '<div class="panelblock">User updated.</div>';
+		break;
 
 
 	case 'promote':
@@ -78,8 +79,11 @@ switch ($action)
 		}
 		$result = mysql_query($sql) or die("Couldn't change $id's level.");
 
-		header('Location: b2users.php');
-		exit();
+		#header('Location: b2users.php' . ( ( $user != 0 )? '?user='. $user : '') );
+		#exit();
+		echo '<div class="panelblock">User promoted.</div>';
+		break;
+
 
 	case 'delete':
 		/*
@@ -96,23 +100,15 @@ switch ($action)
 		// Delete from DB:
 		$edited_User->dbdelete();
 
-		header('Location: b2users.php');
-		exit();
+		#header('Location: b2users.php');
+		#exit();
+		
+		echo '<div class="panelblock">User deleted.</div>';
 		break;
 
-	case 'groupedit':
-		/*
-		 * View group:
-		 */
-		// Check permission:
-		$current_User->check_perm( 'users', 'view', true );
 
-		param( 'grp_ID', 'integer', true );
-		$edited_Group = Group_get_by_ID( $grp_ID );
-		require(dirname(__FILE__). '/_menutop.php');
-		require(dirname(__FILE__). '/_menutop_end.php');
-		require(dirname(__FILE__). '/_users_groupform.php');
-		break;
+	case 'groupedit': // old-style
+	break;
 
 
 	case 'groupupdate':
@@ -151,20 +147,55 @@ switch ($action)
 
 		$edited_Group->dbupdate();	// Commit update to the DB
 
-		header('Location: b2users.php');
-		exit();
+		// remember to display the forms
+		$group = $edited_grp_ID;
+
+		#header('Location: b2users.php');
+		#exit();
+		echo '<div class="panelblock">Group updated.</div>';
+		break;
 
 
 	default:
-		require( dirname(__FILE__). '/_menutop.php');
-		require( dirname(__FILE__). '/_menutop_end.php');
+		#require( dirname(__FILE__). '/_menutop.php');
+		#require( dirname(__FILE__). '/_menutop_end.php');
 
-		// Check permission:
-		$current_User->check_perm( 'users', 'view', true );
 }
 
-// Display user list:
-require( dirname(__FILE__). '/_users_list.php' );
+if( $current_User->check_perm( 'users', 'view', false ) )
+{
+	if( ($group != 0) ){
+		/*
+		 * View group:
+		 */
+		// Check permission:
+		$current_User->check_perm( 'users', 'view', true );
+		
+		#param( 'grp_ID', 'integer', true );
+		$edited_Group = Group_get_by_ID( $group );
+		#require(dirname(__FILE__). '/_menutop.php');
+		#require(dirname(__FILE__). '/_menutop_end.php');
+		require(dirname(__FILE__). '/_users_groupform.php');
+	}
+		
+	/*
+	 * View user, if we have a 'user' param
+	 */
+	if( $user != 0 )
+	{
+			// Check permission:
+			$current_User->check_perm( 'users', 'view', true );
+	
+			#param( 'user', 'integer', true );
+			$edited_User = & new User( get_userdata($user) );
+			require(dirname(__FILE__). '/_users_form.php');
+	}
+}
 
+// Check permission:
+if( $current_User->check_perm( 'users', 'view', false ) ){
+	// Display user list:
+	require( dirname(__FILE__). '/_users_list.php' );
+}
 require( dirname(__FILE__). '/_footer.php' );
 ?>
