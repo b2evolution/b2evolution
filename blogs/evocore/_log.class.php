@@ -333,10 +333,10 @@ class Log
 	 *
 	 * @param string header/title for one message (default: empty), might be array
 	 *               ( level => msg ), 'container' is then top
-	 * @param string header/title (if more than one message)
+	 * @param string|NULL header/title (if more than one message) - NULL means "use $head1"
 	 * @param string footer (if one message) (default: empty), might be array
 	 *               ( level => msg ), 'container' is then bottom
-	 * @param string footer (if more than one message)
+	 * @param string|NULL footer (if more than one message) - NULL means "use $foot1"
 	 * @param boolean to display or return (default: true)
 	 * @param mixed the level of messages to use (level, 'all', or list of levels (array))
 	 * @param string the CSS class of the messages div tag (default: 'log_'.$level)
@@ -349,6 +349,14 @@ class Log
 													$display = true, $level = NULL, $cssclass = NULL,
 													$style = NULL, $outerdivclass = 'log_container' )
 	{
+		if( is_null( $head2 ) )
+		{
+			$head2 = $head1;
+		}
+		if( is_null( $foot2 ) )
+		{
+			$foot2 = $foot1;
+		}
 		switch( $this->count( $level ) )
 		{
 			case 0:
@@ -472,6 +480,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/10 22:59:56  blueyed
+ * added NULL handling for 2nd parameters for display_cond()
+ *
  * Revision 1.7  2005/02/09 00:31:43  blueyed
  * dumpThis param for add()
  *
