@@ -265,6 +265,13 @@ class Plugins
 	 */
 	function & register( $classname, $ID = 0, $priority = -1 )
 	{
+		global $Debuglog;
+
+		if( !class_exists( $classname ) )
+		{ // the given class does not exist
+			$Debuglog->add( 'Plugin class for ['.$classname.'] not defined - must be same as filename.' );
+			return false;
+		}
 		$Plugin = new $classname;	// COPY !
 
 		// Tell him his ID :)
