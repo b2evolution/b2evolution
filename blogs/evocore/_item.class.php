@@ -682,9 +682,10 @@ class Item extends DataObject
 			$dispmore = $more;
 		}
 
-		/**
+		/*
 		 * Check if we want to increment view count, see {@link Hit::isNewView()}
 		 */
+		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->isNewView() );
 		if( $dispmore && !$preview && $Hit->isNewView() )
 		{ // Increment view counter
 			$this->set_param( 'views', 'number', $this->views+1 );
@@ -1753,6 +1754,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2005/03/02 17:07:34  blueyed
+ * no message
+ *
  * Revision 1.24  2005/03/02 15:27:24  fplanque
  * minor refactoring
  *

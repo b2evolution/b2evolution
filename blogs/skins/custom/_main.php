@@ -11,6 +11,7 @@
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -31,15 +32,19 @@
  * Jason EDGECOMBE grants François PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evoskins
  * @subpackage custom
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author blueyed: Daniel HAHLER
  * @author cafelog (team)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
  *
  * @version $Id$
  */
@@ -77,28 +82,20 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
    and the files exist. CSS rules say that the latter style sheets can
    override earlier stylesheets.
  */
-if ( ( $Blog->allowblogcss == 1 )
-     && ( file_exists( $Blog->get( "mediadir" ) . "customstyle.css" ) )
-     )
-    {
-      echo '<link rel="stylesheet" href="'
-        . $Blog->get( "mediaurl" )
-        .  'customstyle.css" type="text/css" />' . "\n";
-    }
+if( $Blog->allowblogcss && file_exists( $Blog->get('mediadir').'customstyle.css' ) )
+{
+	echo '<link rel="stylesheet" href="'.$Blog->get( 'mediaurl' ).'customstyle.css" type="text/css" />'."\n";
+}
 /* check for a user-specified stylesheet */
-/* TODO Fix the following if statement
-   FIXME The if statement below doesn't work
-*/
-if ( ( $Blog->allowusercss == 1 )
-     && ( file_exists( $current_User->getMediaDir() . "customstyle.css" ) )
-     )
-    {
-      echo '<link rel="stylesheet" href="'
-        . $current_User->getMediaUrl()
-        .  'customstyle.css" type="text/css" />' . "\n";
-    }
+if( $Blog->allowusercss
+		&& isset( $current_User ) && file_exists( $current_User->getMediaDir().'customstyle.css' ) )
+{
+	echo '<link rel="stylesheet" href="'.$current_User->getMediaUrl().'customstyle.css" type="text/css" />'."\n";
+}
 ?>
 </head>
+
+
 <body>
 <div id="wrapper">
 

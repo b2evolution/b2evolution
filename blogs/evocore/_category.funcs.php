@@ -812,6 +812,7 @@ function the_category_head( $before='', $after='' )
 function blog_copy_cats($srcblog, $destblog)
  {
 	global $BlogCache, $edited_Blog, $cache_categories, $cat_parents;
+
 	$edited_Blog = & $BlogCache->get_by_ID( $destblog );
 
 	// ----------------- START RECURSIVE CAT LIST ----------------
@@ -840,7 +841,7 @@ function cat_copy_before_each( $cat_ID, $level )
 	global $cat_parents, $edited_Blog;
 	$cat = get_the_category_by_ID( $cat_ID );
 	echo '<li>';
-	echo ' <strong>Copying '.$cat['cat_name'].'</strong> level: ' . $level . '</a>';
+	echo ' <strong>Copying '.$cat['cat_name'].'</strong> level: ' . $level;
 	$cat_parents[$level+1]=cat_create( $cat['cat_name'], $cat_parents[$level] , $edited_Blog->ID);
 }
 
@@ -862,6 +863,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.13  2005/03/02 17:07:33  blueyed
+ * no message
+ *
  * Revision 1.12  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

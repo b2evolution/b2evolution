@@ -92,7 +92,7 @@ class AdminUI_general extends Widget
 	 */
 	function dispMenu( $path, $template = 'main' )
 	{
-		$this->dispMenuEntries( $path, $template );
+		echo $this->getHtmlMenuEntries( $path, $template );
 	}
 
 
@@ -114,13 +114,15 @@ class AdminUI_general extends Widget
 
 
 	/**
+	 * Get the HTML for the menu entries of a specific path.
 	 *
-	 *
-	 * @return
+	 * @return string
 	 */
-	function dispMenuEntries( $path, $template, $depth = 0 )
+	function getHtmlMenuEntries( $path, $template, $depth = 0 )
 	{
 		global $current_User;
+
+		$r = '';
 
 		$templateForLevel = $this->getMenuTemplate( $template, $depth );
 
@@ -128,12 +130,12 @@ class AdminUI_general extends Widget
 		{
 			if( isset($templateForLevel['empty']) )
 			{
-				echo $templateForLevel['empty'];
+				$r .= $templateForLevel['empty'];
 			}
 		}
 		else
 		{
-			echo $templateForLevel['before'];
+			$r .= $templateForLevel['before'];
 
 			$selected = $this->getSelected($path);
 
@@ -164,34 +166,36 @@ class AdminUI_general extends Widget
 								&& ( $recursePath = array_merge( $path, $loop_tab ) )
 								&& ($this->getMenuEntries($recursePath) ) )
 						{
-							echo isset($templateForLevel['beforeEachSelWithSub'])
+							$r .= isset($templateForLevel['beforeEachSelWithSub'])
 										? $templateForLevel['beforeEachSelWithSub']
 										: $templateForLevel['beforeEachSel'];
-							echo $anchor;
+							$r .= $anchor;
 
-							$this->dispMenuEntries( $recursePath, $template, $depth+1 );
+							$r .= $this->getHtmlMenuEntries( $recursePath, $template, $depth+1 );
 
-							echo isset($templateForLevel['afterEachSelWithSub'])
+							$r .= isset($templateForLevel['afterEachSelWithSub'])
 										? $templateForLevel['afterEachSelWithSub']
 										: $templateForLevel['afterEachSel'];
 						}
 						else
 						{
-							echo $templateForLevel['beforeEachSel'];
-							echo $anchor;
-							echo $templateForLevel['afterEachSel'];
+							$r .= $templateForLevel['beforeEachSel'];
+							$r .= $anchor;
+							$r .= $templateForLevel['afterEachSel'];
 						}
 					}
 					else
 					{
-						echo $templateForLevel['beforeEach'];
-						echo $anchor;
-						echo $templateForLevel['afterEach'];
+						$r .= $templateForLevel['beforeEach'];
+						$r .= $anchor;
+						$r .= $templateForLevel['afterEach'];
 					}
 				}
 			}
-			echo $templateForLevel['after'];
+			$r .= $templateForLevel['after'];
 		}
+
+		return $r;
 	}
 
 
@@ -309,7 +313,7 @@ class AdminUI_general extends Widget
 													'beforeEachSel' => '<li class="current">',
 													'afterEachSel' => '</li>',
 													'beforeEachSelWithSub' => '<li class="parent">',
-													'afterEachSelWithSub' => '<li>',
+													'afterEachSelWithSub' => '</li>',
 													'_props' => array(
 															'recurseSelected' => true,  // recurse for subentries if an entry is selected
 														),

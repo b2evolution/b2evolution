@@ -533,24 +533,33 @@ class Plugins
 
 
 	/**
-	 * quick-render a string with a single renderer
+	 * Quick-render a string with a single plugin.
 	 *
-	 * @param string what to render
-	 * @param string renderercode
+	 * @param string Plugin code (must have render() method)
+	 * @param array data
 	 * @param string format to output, see {@link format_to_output()}
 	 */
-	function quick( $string, $renderercode, $format )
+	function quick( $pluginCode, $params )
 	{
 		$this->init();
 
-		if( isset($this->index_Plugins[ $renderercode ]) )
+		if( !is_array($params) )
 		{
-			$this->index_Plugins[ $renderercode ]->render( $string, $format );
-			return $string;
+			$params = array( 'format' => 'htmlbody', 'data' => $params );
 		}
 		else
 		{
-			return format_to_output( $string, $format );
+			$params = $params; // copy
+		}
+
+		if( isset($this->index_Plugins[ $pluginCode ]) )
+		{
+			$this->index_Plugins[ $pluginCode ]->render( $params );
+			return $params['data'];
+		}
+		else
+		{
+			return format_to_output( $params['data'], $format );
 		}
 	}
 
@@ -628,6 +637,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.8  2005/03/02 17:07:34  blueyed
+ * no message
+ *
  * Revision 1.7  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

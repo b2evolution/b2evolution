@@ -66,37 +66,52 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Get an object from cache by its url ("siteurl")
+	 * Get an object from cache by its url ("siteurl") or based on access_type == 'stub'.
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal BlogCache::get_by_url(-) }}
+	 * @todo use cache
+	 * @todo check/enhance for other domains then $baseurl
 	 *
 	 * @param string URL of object to load
 	 * @param boolean false if you want to return false on error
-	 * @todo use cache
+	 * @return Blog|false A Blog object on success, false on failure (may also halt!)
 	 */
 	function & get_by_url( $req_url, $halt_on_error = true )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Debuglog, $baseurl;
 
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache" );
+
 		$sql = "SELECT *
 						FROM $this->dbtablename
-						WHERE blog_siteurl = ".$DB->quote($req_url);
-		$row = $DB->get_row( $sql );
+						WHERE
+							( blog_siteurl = ".$DB->quote($req_url);
+
+		$parsedUrl = parse_url( $req_url );
+
+		// Match stubs like "http://base/url/STUB?param=1"
+		if( preg_match( "#^$baseurl([^/?]+)#", $req_url, $match ) )
+		{
+			$sql .= "\n OR ( blog_access_type = 'stub' AND blog_stub = '".$match[1]."' )";
+		}
+
+		$sql .= ' ) ';
+
+		$row = $DB->get_row( $sql, OBJECT, 0, 'Blog::get_by_url()' );
+
 		if( empty( $row ) )
-		{	// Requested object does not exist
+		{ // Requested object does not exist
 			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+
 			return false;
 		}
 
-		$dbIDname = $this->dbIDname;
-		$objtype = $this->objtype;
-		$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+		$Blog = new Blog( $row );
+		$this->add( $Blog );
 
-		return $this->cache[ $row->$dbIDname ];
+		return $Blog;
 	}
 
 
@@ -105,11 +120,11 @@ class BlogCache extends DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal BlogCache::get_by_urlname(-) }}
+	 * @todo use cache
 	 *
 	 * @param string URL name of object to load
 	 * @param boolean false if you want to return false on error
-	 * @todo use cache
+	 * @return Blog|false A Blog object on success, false on failure (may also halt!)
 	 */
 	function & get_by_urlname( $req_urlname, $halt_on_error = true )
 	{
@@ -122,16 +137,15 @@ class BlogCache extends DataObjectCache
 						WHERE blog_urlname = ".$DB->quote($req_urlname);
 		$row = $DB->get_row( $sql );
 		if( empty( $row ) )
-		{	// Requested object does not exist
+		{ // Requested object does not exist
 			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
 			return false;
 		}
 
-		$dbIDname = $this->dbIDname;
-		$objtype = $this->objtype;
-		$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+		$Blog = new Blog( $row );
+		$this->add( $Blog );
 
-		return $this->cache[ $row->$dbIDname ];
+		return $Blog;
 	}
 
 
@@ -169,6 +183,7 @@ class BlogCache extends DataObjectCache
 		return $bloglist;
 	}
 
+
 	/**
 	 * Display form option list with cache contents
 	 *
@@ -191,6 +206,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2005/03/02 17:07:33  blueyed
+ * no message
+ *
  * Revision 1.6  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

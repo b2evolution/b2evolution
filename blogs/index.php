@@ -24,47 +24,47 @@ param( 'blog', 'integer', '', true );
 
 if( empty($blog) )
 { // No blog requested by URL param, let's try to match something in the URL
-	$Debuglog->add( 'No blog param received, checking extra path...' );
+	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
 
 	// Construct full requested Host + Path:
 	$ReqHostPath = (isset($_SERVER['HTTPS'])?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
-	$Debuglog->add( 'full requested Host + Path: '.$ReqHostPath );
+	$Debuglog->add( 'Full requested Host + Path: '.$ReqHostPath, 'detectblog' );
 
 	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHostPath, $matches ) )
-	{	// We have an URL blog name:
-		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2] );
+	{ // We have an URL blog name:
+		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2], 'detectblog' );
 		if( (($Blog = $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
-		{	// We found a matching blog:
+		{ // We found a matching blog:
 			$blog = $Blog->ID;
 		}
 	}
 
 	if( empty($blog) )
-	{	// No blog identified by URL name, let's try to match the absolute URL
+	{ // No blog identified by URL name, let's try to match the absolute URL
 		if( preg_match( '#^(.+?)index.php#', $ReqHostPath, $matches ) )
-		{	// Remove what's not part of the absolute URL
+		{ // Remove what's not part of the absolute URL
 			$ReqAbsUrl = $matches[1];
 		}
 		else
 		{
 			$ReqAbsUrl = $ReqHostPath;
 		}
-		$Debuglog->add('Looking up absolute url : '.$ReqAbsUrl);
+		$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
 
-		if( (($Blog = $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
-		{	// We found a matching blog:
+		if( (($Blog =& $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
+		{ // We found a matching blog:
 			$blog = $Blog->ID;
 		}
-
 	}
 
 	if( empty($blog) )
-	{	// Still no blog requested, use default
+	{ // Still no blog requested, use default
 		$blog = $Settings->get('default_blog_ID');
+		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
 	}
 
 	if( empty($blog) )
-	{	// No specific blog to be displayed:
+	{ // No specific blog to be displayed:
 		// we are going to display the default page:
 		require dirname(__FILE__).'/default.php';
 		exit();

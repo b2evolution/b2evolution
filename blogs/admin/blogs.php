@@ -242,6 +242,8 @@ switch($action)
 			$edited_Blog->set( 'stub',          param( 'blog_stub',          'string', '' ) );
 			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', 'new' ) );
 			param( 'blog_siteurl_type',     'string', 'relative' );
+			param( 'blog_siteurl_relative', 'string', '' );
+			param( 'blog_siteurl_absolute', 'string', '' );
 		}
 
 		echo '<div class="panelblock">';
@@ -296,6 +298,10 @@ switch($action)
 				blog_copy_cats($blogtemplate, $edited_Blog->ID);
 			}
 			echo '</div>';
+
+			// List the blogs:
+			require( dirname(__FILE__).'/_blogs_list.php' );
+
 			break;
 		}
 
@@ -565,6 +571,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.29  2005/03/02 17:07:33  blueyed
+ * no message
+ *
  * Revision 1.28  2005/02/28 09:06:39  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

@@ -62,6 +62,13 @@ class Hit
 	var $refererType;
 
 	/**
+	 * The ID of the referer's base domain in T_basedomains
+	 *
+	 * @var integer
+	 */
+	var $refererDomainID = 0;
+
+	/**
 	 * Is this a reload?
 	 * @var boolean
 	 */
@@ -184,7 +191,8 @@ class Hit
 							AND hit_datetime > "'.date( 'Y-m-d H:i:s', $this->localtimenow - $Settings->get('reloadpage_timeout') ).'"
 							AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
 							AND agnt_ID = hit_agnt_ID
-							AND agnt_signature = '.$DB->quote($this->userAgent) ) )
+							AND agnt_signature = '.$DB->quote($this->userAgent),
+					0, 0, 'Hit: Check for reload' ) )
 		{
 			$Debuglog->add( 'Reload!', 'hit' );
 			$this->reloaded = true;  // We don't want to log this hit again
@@ -392,7 +400,7 @@ class Hit
 	 *
 	 * This function should be called at the end of the page, otherwise if the page
 	 * is displaying previous hits, it may display the current one too.
-	 * The hit will not be logged in special occasions, see {@link isNewView()}.
+	 * The hit will not be logged in special occasions, see {@link isNewView()} and {@link isGoodHit()}.
 	 */
 	function log()
 	{
@@ -406,7 +414,7 @@ class Hit
 			return false;
 		}
 
-		if( !$this->isNewView() )
+		if( !$this->isNewView() || !$this->isGoodHit() )
 		{ // We don't want to log this hit!
 			$Debuglog->add( 'log(): Hit NOT Logged ('.var_export($this->refererType, true)
 																							.', '.var_export($this->agentType, true).')', 'hit' );
@@ -522,7 +530,7 @@ class Hit
 
 
 	/**
-	 *
+	 * Get the User agent's signature.
 	 *
 	 * @return
 	 */
@@ -533,7 +541,7 @@ class Hit
 
 
 	/**
-	 * Get the remote Hostname.
+	 * Get the remote hostname.
 	 *
 	 * @return string
 	 */
@@ -556,17 +564,25 @@ class Hit
 
 
 	/**
-	 * Determine if a hit is a new view.
+	 * Determine if a hit is a new view (not reloaded, ignored or a robot).
 	 *
 	 * @return boolean
 	 */
 	function isNewView()
 	{
-		// ! in_array( $hit_type, array( 'badchar', 'reload', 'robot', 'preview', 'already_logged' ) )
-		return ( !$this->reloaded
-							&& !$this->ignore
-							&& !in_array( $this->refererType, array( 'blacklist', 'spam' ) )
-							&& $this->agentType != 'robot' );
+		#pre_dump( 'isNewView:', !$this->reloaded,  !$this->ignore,   $this->agentType != 'robot' );
+		return ( !$this->reloaded && !$this->ignore && $this->agentType != 'robot' );
+	}
+
+
+	/**
+	 * Is this a good hit? This means "no spam".
+	 *
+	 * @return boolean
+	 */
+	function isGoodHit()
+	{
+		return !in_array( $this->refererType, array( 'spam' ) );
 	}
 }
 ?>
