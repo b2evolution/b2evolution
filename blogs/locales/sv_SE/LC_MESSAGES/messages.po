@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-07 19:51+0200\n"
+"POT-Creation-Date: 2003-09-08 01:04+0200\n"
 "PO-Revision-Date: 2003-08-10 02:45+0100\n"
 "Last-Translator: Per Åkerman <perakerman@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1083,7 +1083,7 @@ msgstr "Topp Referers"
 #: ..\..\..\admin\b2stats.php:243
 msgid ""
 "These are hits from people who came to this blog system through a search "
-"engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
+"engine. (Search engines must be listed in /conf/_stats.php)"
 msgstr ""
 
 #: ..\..\..\admin\b2stats.php:258
@@ -1093,13 +1093,13 @@ msgstr ""
 #: ..\..\..\admin\b2stats.php:271
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
-"(Robots must be listed in /conf/b2evo_advanced.php)"
+"(Robots must be listed in /conf/_stats.php)"
 msgstr ""
 
 #: ..\..\..\admin\b2stats.php:296
 msgid ""
 "These are hits from RSS news aggregators. (Aggregators must be listed in /"
-"conf/b2evo_advanced.php)"
+"conf/_stats.php)"
 msgstr ""
 
 #: ..\..\..\admin\b2stats.php:307
@@ -2203,33 +2203,33 @@ msgstr ""
 msgid "Oops, MySQL error!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:650
+#: ..\..\..\b2evocore\_functions.php:649
 msgid "go back"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:680
+#: ..\..\..\b2evocore\_functions.php:679
 msgid "Redirecting you to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:682
+#: ..\..\..\b2evocore\_functions.php:681
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:992
+#: ..\..\..\b2evocore\_functions.php:991
 #, php-format
 msgid "Parameter %s is required!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1190
 msgid "Invalid URL"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1196
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1204
 msgid "URL not allowed"
 msgstr ""
 
@@ -2239,44 +2239,44 @@ msgid "Requested blog does not exist!"
 msgstr "Anslutningen existerar inte"
 
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_functions_bposts.php:312
+#: ..\..\..\b2evocore\_functions_bposts.php:310
 msgid "Read more!"
 msgstr "Läs mer!"
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_functions_bposts.php:317
+#: ..\..\..\b2evocore\_functions_bposts.php:315
 msgid "More:"
 msgstr "Mer:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:493
+#: ..\..\..\b2evocore\_functions_bposts.php:491
 msgid "Post details"
 msgstr "Postdetaljer"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:544
+#: ..\..\..\b2evocore\_functions_bposts.php:542
 #, fuzzy
 msgid "Next page"
 msgstr "Nästa Sida"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:545
+#: ..\..\..\b2evocore\_functions_bposts.php:543
 #, fuzzy
 msgid "Previous page"
 msgstr "Föregående Sida"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:586
+#: ..\..\..\b2evocore\_functions_bposts.php:584
 #, fuzzy
 msgid "Previous post"
 msgstr "Föregående %d"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:639
+#: ..\..\..\b2evocore\_functions_bposts.php:637
 #, fuzzy
 msgid "Next post"
 msgstr "Ny post"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:732
+#: ..\..\..\b2evocore\_functions_bposts.php:730
 msgid "Next Page"
 msgstr "Nästa Sida"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:759
+#: ..\..\..\b2evocore\_functions_bposts.php:757
 msgid "Previous Page"
 msgstr "Föregående Sida"
 
@@ -2755,27 +2755,27 @@ msgstr ""
 msgid "Dec"
 msgstr "Radera"
 
-#: ..\..\..\conf\b2evo_locale.php:22
+#: ..\..\..\conf\_locales.php:22
 msgid "English"
 msgstr ""
 
-#: ..\..\..\conf\b2evo_locale.php:23
+#: ..\..\..\conf\_locales.php:23
 msgid "French"
 msgstr ""
 
-#: ..\..\..\conf\b2evo_locale.php:24
+#: ..\..\..\conf\_locales.php:24
 msgid "Japanese"
 msgstr ""
 
-#: ..\..\..\conf\b2evo_locale.php:25
+#: ..\..\..\conf\_locales.php:25
 msgid "Dutch"
 msgstr ""
 
-#: ..\..\..\conf\b2evo_locale.php:26
+#: ..\..\..\conf\_locales.php:26
 msgid "Portuguese"
 msgstr ""
 
-#: ..\..\..\conf\b2evo_locale.php:27
+#: ..\..\..\conf\_locales.php:27
 msgid "Swedish"
 msgstr ""
 

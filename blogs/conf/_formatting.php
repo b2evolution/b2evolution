@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution formatting config
- * Version of this file: 0.8.5
+ * Version of this file: 0.8.5.1
  *
  * This sets how posts and comments are formatted
  *
@@ -164,7 +164,7 @@ $b2smilies = array(
 // DEFINITION of allowed XHTML code for posts (posted in the backoffice)
 
 // Allowed Entity classes
-define('E_SPECIAL_CONTENTS', 'br span bdo img');
+define('E_SPECIAL_CONTENTS', 'br hr span bdo img');
 define('E_MISC_CONTENTS', 'ins del');
 define('E_PHRASE_CONTENTS', 'em strong i b dfn code q samp kbd var cite abbr acronym sub sup');
 define('E_PURE_INLINE_CONTENTS', E_SPECIAL_CONTENTS.' '.E_PHRASE_CONTENTS.' a #PCDATA');
@@ -202,6 +202,7 @@ $allowed_tags = array
 	'dd' => E_FLOW_CONTENTS,
 	// Inline elements
 	'br' => '',
+	'hr' => '',
 	'img' => '',
 	'em' => E_INLINE_CONTENTS,
 	'strong' => E_INLINE_CONTENTS,
@@ -225,6 +226,7 @@ $allowed_tags = array
 $allowed_attribues = array
 (
 	'br' => A_CORE_ATTRS,
+	'hr' => A_CORE_ATTRS,
 	'img' => A_IMG_ATTRS,
 	'span' => A_ATTRS,
 	'bdo' => A_ATTRS,

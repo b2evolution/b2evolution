@@ -8,6 +8,7 @@
 
 # Block URLs containing the following strings:
 $block_urls = array(	
+// Real bad spammers:	
 	'penis-enlargement',
 	'online-casino',
 	'order-viagra',
@@ -16,7 +17,9 @@ $block_urls = array(
 	'order-propecia',
 	'sexy-lingerie',
 	'-porn-',
-	'-adult-'
+	'-adult-',
+// Light spammers:
+	'pcfamily.ch',
 	);
 
 ?>

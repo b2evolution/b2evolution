@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-09-07 19:51+0200\n"
+"POT-Creation-Date: 2003-09-08 01:04+0200\n"
 "PO-Revision-Date: 2003-08-26 09:08+0100\n"
 "Last-Translator: Ron <hartman@dia.eur.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1079,9 +1079,10 @@ msgid "Total referers"
 msgstr "Totaal Referers"
 
 #: ..\..\..\admin\b2stats.php:243
+#, fuzzy
 msgid ""
 "These are hits from people who came to this blog system through a search "
-"engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
+"engine. (Search engines must be listed in /conf/_stats.php)"
 msgstr ""
 "Dit zijn hits van mensen die hier kwamen via een zoekmachine. (Zoekmachines "
 "moeten opgegeven zijn in /conf/b2evo_advanced.php)"
@@ -1091,17 +1092,19 @@ msgid "Top refering search engines"
 msgstr "Hoogste refererende zoekmachines"
 
 #: ..\..\..\admin\b2stats.php:271
+#, fuzzy
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
-"(Robots must be listed in /conf/b2evo_advanced.php)"
+"(Robots must be listed in /conf/_stats.php)"
 msgstr ""
 "Dit zijn hits van automatische robots zoals zoekmachine indexeer robots. "
 "(Robots moeten in de lijst staan in /conf/b2evo_advanced.php)"
 
 #: ..\..\..\admin\b2stats.php:296
+#, fuzzy
 msgid ""
 "These are hits from RSS news aggregators. (Aggregators must be listed in /"
-"conf/b2evo_advanced.php)"
+"conf/_stats.php)"
 msgstr ""
 "Dit zijn hits van RSS nieuws verzamelaars. (Verzamelaars moeten opgegeven "
 "zijn in /conf/b2evo_advanced.php)"
@@ -2236,34 +2239,34 @@ msgstr "Kan geen verbinding maken met de database %s. MySQL zei:"
 msgid "Oops, MySQL error!"
 msgstr "Oeps, MySQL fout!"
 
-#: ..\..\..\b2evocore\_functions.php:650
+#: ..\..\..\b2evocore\_functions.php:649
 msgid "go back"
 msgstr "ga terug"
 
-#: ..\..\..\b2evocore\_functions.php:680
+#: ..\..\..\b2evocore\_functions.php:679
 msgid "Redirecting you to:"
 msgstr "Doorverwijzen naar:"
 
-#: ..\..\..\b2evocore\_functions.php:682
+#: ..\..\..\b2evocore\_functions.php:681
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "Als er niets gebeurt, klik <a %s>hier</a>."
 
-#: ..\..\..\b2evocore\_functions.php:992
+#: ..\..\..\b2evocore\_functions.php:991
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parameter %s is nodig!"
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1190
 #, fuzzy
 msgid "Invalid URL"
 msgstr "verkeerd"
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1196
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1204
 msgid "URL not allowed"
 msgstr ""
 
@@ -2272,40 +2275,40 @@ msgid "Requested blog does not exist!"
 msgstr "Opgevraagd weblog bestaat niet"
 
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_functions_bposts.php:312
+#: ..\..\..\b2evocore\_functions_bposts.php:310
 msgid "Read more!"
 msgstr "Lees meer!"
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_functions_bposts.php:317
+#: ..\..\..\b2evocore\_functions_bposts.php:315
 msgid "More:"
 msgstr "Meer:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:493
+#: ..\..\..\b2evocore\_functions_bposts.php:491
 msgid "Post details"
 msgstr "Artikel details"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:544
+#: ..\..\..\b2evocore\_functions_bposts.php:542
 msgid "Next page"
 msgstr "Volgende Pagina"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:545
+#: ..\..\..\b2evocore\_functions_bposts.php:543
 msgid "Previous page"
 msgstr "Vorige Pagina"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:586
+#: ..\..\..\b2evocore\_functions_bposts.php:584
 msgid "Previous post"
 msgstr "Vorig artikel"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:639
+#: ..\..\..\b2evocore\_functions_bposts.php:637
 msgid "Next post"
 msgstr "Volgend Artikel"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:732
+#: ..\..\..\b2evocore\_functions_bposts.php:730
 msgid "Next Page"
 msgstr "Volgende Pagina"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:759
+#: ..\..\..\b2evocore\_functions_bposts.php:757
 msgid "Previous Page"
 msgstr "Vorige Pagina"
 
@@ -2764,27 +2767,27 @@ msgstr "Nov"
 msgid "Dec"
 msgstr "Dec"
 
-#: ..\..\..\conf\b2evo_locale.php:22
+#: ..\..\..\conf\_locales.php:22
 msgid "English"
 msgstr "Engels"
 
-#: ..\..\..\conf\b2evo_locale.php:23
+#: ..\..\..\conf\_locales.php:23
 msgid "French"
 msgstr "Frans"
 
-#: ..\..\..\conf\b2evo_locale.php:24
+#: ..\..\..\conf\_locales.php:24
 msgid "Japanese"
 msgstr "Japans"
 
-#: ..\..\..\conf\b2evo_locale.php:25
+#: ..\..\..\conf\_locales.php:25
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: ..\..\..\conf\b2evo_locale.php:26
+#: ..\..\..\conf\_locales.php:26
 msgid "Portuguese"
 msgstr "Portugees"
 
-#: ..\..\..\conf\b2evo_locale.php:27
+#: ..\..\..\conf\_locales.php:27
 msgid "Swedish"
 msgstr "Zweeds"
 

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"POT-Creation-Date: 2003-09-07 19:51+0200\n"
-"PO-Revision-Date: 2003-09-07 21:20+0100\n"
+"POT-Creation-Date: 2003-09-08 01:04+0200\n"
+"PO-Revision-Date: 2003-09-08 01:07+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1188,20 +1188,20 @@ msgid "Total referers"
 msgstr "Total référents"
 
 #: ..\..\..\admin\b2stats.php:243
-msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
-msgstr "Il s'agit de hit de personnes qui sont arrivées sur ce blog à travers un moteur de recherche. (Les moteirs de recherche doivent être listés dans /conf/b2evo_advanced.php)"
+msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
+msgstr "Il s'agit de hit de personnes qui sont arrivées sur ce blog à travers un moteur de recherche. (Les moteurs de recherche doivent être listés dans /conf/_stats.php)"
 
 #: ..\..\..\admin\b2stats.php:258
 msgid "Top refering search engines"
 msgstr "Moteurs de recherche référents les plus fréquents"
 
 #: ..\..\..\admin\b2stats.php:271
-msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)"
-msgstr "Il s'agit de hits provenant de robots tels que les robots indexeurs des moteurs de recherche. (Les robots doivent être listés dans /conf/b2evo_advanced.php)"
+msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/_stats.php)"
+msgstr "Il s'agit de hits provenant de robots tels que les robots indexeurs des moteurs de recherche. (Les robots doivent être listés dans /conf/_stats.php)"
 
 #: ..\..\..\admin\b2stats.php:296
-msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)"
-msgstr "Il s'agit de hits provenant d'agrégateurs RSS. (Les agrégateurs doivent être listés dans /conf/b2evo_advanced.php)"
+msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)"
+msgstr "Il s'agit de hits provenant d'agrégateurs RSS. (Les agrégateurs doivent être listés dans /conf/_stats.php)"
 
 #: ..\..\..\admin\b2stats.php:307
 msgid "Total RSS hits"
@@ -2273,33 +2273,33 @@ msgstr "Impossible de se connecter à la base de données %s. Réponse MySQL:"
 msgid "Oops, MySQL error!"
 msgstr "Oups, erreur MySQL!"
 
-#: ..\..\..\b2evocore\_functions.php:650
+#: ..\..\..\b2evocore\_functions.php:649
 msgid "go back"
 msgstr "retour"
 
-#: ..\..\..\b2evocore\_functions.php:680
+#: ..\..\..\b2evocore\_functions.php:679
 msgid "Redirecting you to:"
 msgstr "Redirection vers:"
 
-#: ..\..\..\b2evocore\_functions.php:682
+#: ..\..\..\b2evocore\_functions.php:681
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "Si rien ne se passe, cliquez <a %s>ici</a>."
 
-#: ..\..\..\b2evocore\_functions.php:992
+#: ..\..\..\b2evocore\_functions.php:991
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "La paramètre %s est requis!"
 
-#: ..\..\..\b2evocore\_functions.php:1191
+#: ..\..\..\b2evocore\_functions.php:1190
 msgid "Invalid URL"
 msgstr "URL invalide"
 
-#: ..\..\..\b2evocore\_functions.php:1197
+#: ..\..\..\b2evocore\_functions.php:1196
 msgid "URI scheme not allowed"
 msgstr "Type d'URI non autorisé"
 
-#: ..\..\..\b2evocore\_functions.php:1205
+#: ..\..\..\b2evocore\_functions.php:1204
 msgid "URL not allowed"
 msgstr "URL non autorisée"
 
@@ -2309,40 +2309,40 @@ msgstr "Le blog demandé n'existe pas!"
 
 #  TRANS: this is the default text for the extended post "more" link
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_functions_bposts.php:312
+#: ..\..\..\b2evocore\_functions_bposts.php:310
 msgid "Read more!"
 msgstr "Lire la suite!"
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_functions_bposts.php:317
+#: ..\..\..\b2evocore\_functions_bposts.php:315
 msgid "More:"
 msgstr "Suite:"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:493
+#: ..\..\..\b2evocore\_functions_bposts.php:491
 msgid "Post details"
 msgstr "Article complet"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:544
+#: ..\..\..\b2evocore\_functions_bposts.php:542
 msgid "Next page"
 msgstr "Page suivante"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:545
+#: ..\..\..\b2evocore\_functions_bposts.php:543
 msgid "Previous page"
 msgstr "Page précédente"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:586
+#: ..\..\..\b2evocore\_functions_bposts.php:584
 msgid "Previous post"
 msgstr "Article précédent"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:639
+#: ..\..\..\b2evocore\_functions_bposts.php:637
 msgid "Next post"
 msgstr "Article suivant"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:732
+#: ..\..\..\b2evocore\_functions_bposts.php:730
 msgid "Next Page"
 msgstr "Page suivante"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:759
+#: ..\..\..\b2evocore\_functions_bposts.php:757
 msgid "Previous Page"
 msgstr "Page Précédente"
 
@@ -2798,27 +2798,27 @@ msgstr "Nov"
 msgid "Dec"
 msgstr "Déc"
 
-#: ..\..\..\conf\b2evo_locale.php:22
+#: ..\..\..\conf\_locales.php:22
 msgid "English"
 msgstr "Anglais"
 
-#: ..\..\..\conf\b2evo_locale.php:23
+#: ..\..\..\conf\_locales.php:23
 msgid "French"
 msgstr "Français"
 
-#: ..\..\..\conf\b2evo_locale.php:24
+#: ..\..\..\conf\_locales.php:24
 msgid "Japanese"
 msgstr "Japonais"
 
-#: ..\..\..\conf\b2evo_locale.php:25
+#: ..\..\..\conf\_locales.php:25
 msgid "Dutch"
 msgstr "Néerlandais"
 
-#: ..\..\..\conf\b2evo_locale.php:26
+#: ..\..\..\conf\_locales.php:26
 msgid "Portuguese"
 msgstr "Portuguais"
 
-#: ..\..\..\conf\b2evo_locale.php:27
+#: ..\..\..\conf\_locales.php:27
 msgid "Swedish"
 msgstr "Suédois"
 

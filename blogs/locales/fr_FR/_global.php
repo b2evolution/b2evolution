@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-07 19:51+0200\nPO-Revision-Date: 2003-09-07 21:20+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-09-08 01:04+0200\nPO-Revision-Date: 2003-09-08 01:07+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -205,10 +205,10 @@ $trans['fr_FR'] = array(
 	'Log as a search instead' => 'Enregistrer plutôt comme une recherche',
 	'-&gt;S' => '-&gt;R',
 	'Total referers' => 'Total référents',
-	'These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)' => 'Il s\'agit de hit de personnes qui sont arrivées sur ce blog à travers un moteur de recherche. (Les moteirs de recherche doivent être listés dans /conf/_stats.php)',
+	'These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)' => 'Il s\'agit de hit de personnes qui sont arrivées sur ce blog à travers un moteur de recherche. (Les moteurs de recherche doivent être listés dans /conf/_stats.php)',
 	'Top refering search engines' => 'Moteurs de recherche référents les plus fréquents',
-	'These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)' => 'Il s\'agit de hits provenant de robots tels que les robots indexeurs des moteurs de recherche. (Les robots doivent être listés dans /conf/b2evo_advanced.php)',
-	'These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)' => 'Il s\'agit de hits provenant d\'agrégateurs RSS. (Les agrégateurs doivent être listés dans /conf/b2evo_advanced.php)',
+	'These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)' => 'Il s\'agit de hits provenant de robots tels que les robots indexeurs des moteurs de recherche. (Les robots doivent être listés dans /conf/_stats.php)',
+	'These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)' => 'Il s\'agit de hits provenant d\'agrégateurs RSS. (Les agrégateurs doivent être listés dans /conf/_stats.php)',
 	'Total RSS hits' => 'Totals hits RSS',
 	'Last direct accesses' => 'Derniers accès directs',
 	'These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)' => 'Il s\'agit de hits de personnes venues sur ce blog directement (soit en ayant tapé l\'URL, soit en ayant utilisé une entrée de leurs Favoris. Les référents invalides (trop courts) sont également listés ici.)',

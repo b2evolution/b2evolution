@@ -18,6 +18,8 @@
 $blackList = Array(
 	$baseurl.'/',
 	'localhost',
+	// stat services
+	'sitemeter.com/',
 	// add your own...
 );
 
@@ -27,6 +29,8 @@ $blackList = Array(
 # The following substrings will be looked up in the referer http header
 $search_engines = Array(
 	'http://www.google.',
+	'http://ww.google.',
+	'feedster.com/',
 	'search.yahoo.com/',
 	'.voila.fr/',										// kw =
 	'http://www.alltheweb.com/',
@@ -46,7 +50,12 @@ $search_engines = Array(
 	'search.msn.', 	//q=
 	'http://cgi.search.biglobe.ne.jp/', 	//q=
 	'aolrecherche.aol.fr/',  //q=
+	'aolrecherches.aol.fr/',  //q=
 	'altavista.com/',		// q=
+	'aolsearch.aol.com/', // query=
+	'excite.fr/', // q=
+	'recherche.club-internet.fr/', // q=
+	'search.netscape.com/', // query
 );
 
 
