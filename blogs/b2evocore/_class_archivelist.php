@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements archive lists
+ * This file implements the ArchiveList class designed to handle Item archive lists.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Default page
+ * Default page stub. This actually redirects to another backoffice page.
  *
  * Include whatever page you'd like to use as the admin default.
  *
@@ -15,6 +15,6 @@
 /**
  * You can choose the page you want as the default below:
  */
-require( dirname(__FILE__).'/b2edit.php' );
+require dirname(__FILE__).'/b2edit.php';
 
 ?>

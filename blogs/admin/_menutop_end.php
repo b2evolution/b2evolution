@@ -1,6 +1,6 @@
-<?php 
+<?php
 /**
- * Displays second part of page menu (after the page title)
+ * This file displays the second part of page menu (after the page title).
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays the post browsing navigation bar
+ * This file displays the post browsing navigation bar.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Advanced blog properties subform
+ * This file implements the UI view for the Advanced blog properties.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

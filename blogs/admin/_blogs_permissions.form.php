@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays blog properties form
+ * This file implements the UI view (+more :/) for the blogs permission management.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -443,4 +443,3 @@ function list_users( $layout, $query )
 	}
 	//-->
 </script>
-

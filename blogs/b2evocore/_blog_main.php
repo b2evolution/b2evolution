@@ -1,15 +1,40 @@
 <?php
 /**
- * This file loads the blog!
+ * This file loads and initializes the blog to be displayed.
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
  *
  * @package evocore
  *
- * @author fplanque - François PLANQUE - {@link http://fplanque.net/}
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author blueyed: Daniel HAHLER
+ * @author jeffbearer: Jeff BEARER
+ *
+ * {@internal Below is a list of former authors whose contributions to this file have been
+ *            either removed or redesigned and rewritten anew:
+ *            - t3dworld
+ * 						- cafelog (team)
+ * }}
  *
  * @version $Id$
  */
@@ -190,7 +215,7 @@ else
 
 // Default display params:
 
-// Displaying of vlog list on templates?
+// Displaying of blog list on templates?
 if( !isset($display_blog_list) )
 { // If not already set in stub:
 	$display_blog_list = get_bloginfo('disp_bloglist');
@@ -244,15 +269,6 @@ if( !empty( $skin ) )
 		// Including config and functions files   ??
 
 		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
-		{ // This damn failed !
-			echo "<p>setcookie failed!</p>";
-		}
-		// Erase OLD versions cookies:
-		if( ! setcookie( 'b2evostate', '', $cookie_expired, $cookie_path, $cookie_domain) )
-		{ // This damn failed !
-			echo "<p>setcookie failed!</p>";
-		}
-		if( ! setcookie( 'b2evostate', '', $cookie_expired, '/') )
 		{ // This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}

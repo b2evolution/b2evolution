@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays group properties form
+ * This file implements the UI view for the user group properties.
  *
  * Called by {@link b2users.php}
  *

@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays list of blogs for editing
+ * This file implements the UI view for the blogs list on blog management screens.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

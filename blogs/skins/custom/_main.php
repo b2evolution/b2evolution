@@ -1,19 +1,47 @@
 <?php
-	/**
-	 * This is the main template. It displays the blog.
-	 *
-	 * However this file is not meant to be called directly.
-	 * It is meant to be called automagically by b2evolution.
-	 * To display a blog, you should call a stub file instead, for example:
-	 * /blogs/index.php or /blogs/blog_b.php
-	 *
-	 * b2evolution - {@link http://b2evolution.net/}
-	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
-	 *
-	 * @package evoskins
-	 * @subpackage custom
-	 */
+/**
+ * This is the main template. It displays the blog.
+ *
+ * However this file is not meant to be called directly.
+ * It is meant to be called automagically by b2evolution.
+ * To display a blog, the easiest way is to call index.php?blog=#
+ * where # is the number of your blog.
+ *
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * @package evoskins
+ * @subpackage custom
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author cafelog (team)
+ *
+ * {@internal Below is a list of former authors whose contributions to this file have been
+ *            either removed or redesigned and rewritten anew:
+ *            - (none)
+ * }}
+ *
+ * @version $Id$
+ */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

@@ -1,4 +1,4 @@
-function setActiveStyleSheet(title) 
+function setActiveStyleSheet(title)
 {
 	var i, a;
 	for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {

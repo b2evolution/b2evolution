@@ -1,12 +1,13 @@
 <?php
 /**
- * b2 File Upload
+ * This file implements the UI controller for file upload.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
+ *
  * @author original hack by shockingbird.com
  */
 

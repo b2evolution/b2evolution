@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays the files settings form
+ * This file implements the UI view for the file settings.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

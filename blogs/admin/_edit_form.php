@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays post editing form
+ * This file implements the UI view for editing a post/comment.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

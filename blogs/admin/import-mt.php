@@ -1,6 +1,6 @@
 <?php
 /**
- * This script imports Movable Type entries into b2evolution.
+ * This file implements importing of Movable Type entries into b2evolution.
  *
  * TODO:
  *  - list of all posts, editable (overkill?)

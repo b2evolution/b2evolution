@@ -1,6 +1,6 @@
 <?php
 /**
- * Spell checker
+ * This is an advanced stub for calling the spell checker.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

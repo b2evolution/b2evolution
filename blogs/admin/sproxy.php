@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is called back by the online spell checker
+ * This file is called back by the online spell checker.
  *
  * (The original SDK features a PERL script instead.)
  *

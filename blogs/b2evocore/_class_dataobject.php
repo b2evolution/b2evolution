@@ -1,6 +1,6 @@
 <?php
 /**
- * Data Object Base Class
+ * This file implements the abstract DataObject base class.
  *
  * "data objects by fplanque" :P
  *

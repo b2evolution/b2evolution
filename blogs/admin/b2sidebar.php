@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the sidebar page. It actually calls the edit page in 'sidebar' mode.
+ * This is the sidebar page stub. It actually calls the edit page in 'sidebar' mode.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

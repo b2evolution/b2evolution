@@ -1,6 +1,6 @@
 <?php
 /**
- * Editing actions
+ * This file implements the UI-Action controller for post/comment editing.
  *
  * Performs one of the following:
  * - Insert new post

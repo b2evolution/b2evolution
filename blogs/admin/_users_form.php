@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays user properties form
+ * This file implements the UI view for the user properties.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

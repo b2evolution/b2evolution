@@ -1,6 +1,6 @@
 <?php
 /**
- * Data Object Cache Class
+ * This file implements the DataObjectCache class.
  *
  * "data objects by fplanque" :P
  *

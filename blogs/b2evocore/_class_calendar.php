@@ -1,6 +1,6 @@
 <?php
 /**
- * Blog Calendar
+ * This file implements the Calendar class designed to report blog posts on a calendar.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the plugin settings form
+ * This file implements the UI view for the plugin settings.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

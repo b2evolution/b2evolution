@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays first part of the page menu (before the page title)
+ * This file displays the first part of the page menu (before the page title).
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

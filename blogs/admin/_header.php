@@ -1,6 +1,6 @@
 <?php
 /**
- * This file initializes the backoffice!
+ * This file initializes the admin/backoffice!
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

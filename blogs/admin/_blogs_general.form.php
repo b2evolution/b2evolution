@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays blog properties form
+ * This file implements the UI view for the General blog properties.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

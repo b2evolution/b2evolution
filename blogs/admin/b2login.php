@@ -1,12 +1,13 @@
 <?php
 /**
- * Placeholder for old login page
+ * This is a placeholder for the old login page.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
+ *
  * @deprecated In b2evolution, you do not need to point to the b2login.php page to log in.
  */
 

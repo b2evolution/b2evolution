@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the bookmarklet page. It actually calls the edit page in 'bookmarklet' mode.
+ * This is the bookmarklet page stub. It actually calls the edit page in 'bookmarklet' mode.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

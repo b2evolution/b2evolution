@@ -1,6 +1,6 @@
 <?php
 /**
- * Editing posts
+ * This file implements the UI controller for editing posts.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

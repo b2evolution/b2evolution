@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract class to handle settings
+ * This file implements the AbstractSettings class designed to handle all kinds of settings.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
