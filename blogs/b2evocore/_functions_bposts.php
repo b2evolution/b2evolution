@@ -580,6 +580,7 @@ function the_content(
 
 /*
  * link_pages(-)
+ * vegarg: small bug when using $more_file fixed
  */
 function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='') 
 {
@@ -592,7 +593,7 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 	if ($more_file != '') 
 		$file = $more_file;
 	else
-		$file = $blogfilename;
+		$file = get_bloginfo('blogurl');
 
 	if(($multipage)) { // && ($more)) {
 		echo $before;
@@ -603,7 +604,7 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 				$j=str_replace('%',"$i",$pagelink);
 				echo " ";
 				if (($i != $page) || ((!$more) && ($page==1)))
-					echo '<a href="'.get_bloginfo('blogurl').'?p='.$id.'&amp;more=1&amp;page='.$i.'">';
+					echo '<a href="'.$file.'?p='.$id.'&amp;more=1&amp;page='.$i.'">';
 				echo $j;
 				if (($i != $page) || ((!$more) && ($page==1)))
 					echo '</a>';
