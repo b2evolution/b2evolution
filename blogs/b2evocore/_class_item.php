@@ -561,7 +561,7 @@ class Item extends DataObject
 	 */
 	function lang() 
 	{
-		$this->disp( 'lang', 'raw' );
+		$this->disp( 'locale', 'raw' );
 	}
 
 
@@ -682,7 +682,7 @@ class Item extends DataObject
 		}
 		
 		$title = format_to_output( $title, $format );
-		
+
 		if( $add_link && (!empty($this->url)) )
 		{
 			$title = '<a href="'.$this->url.'">'.$title.'</a>';

@@ -532,7 +532,7 @@ function the_status( $raw = true )
 /*function the_lang()
 {
 	global $postdata;
-	echo $postdata['Lang'];
+	echo $postdata['Locale'];
 }*/
 
 /*
@@ -545,7 +545,7 @@ function the_status( $raw = true )
 /*function the_language()
 {
 	global $postdata, $languages;
-	$post_lang = $postdata['Lang'];
+	$post_lang = $postdata['Locale'];
 	echo $languages[ $post_lang ];
 }*/
 

@@ -17,7 +17,7 @@
     <title><?php $Blog->disp( 'name', 'xml' ) ?></title>
     <link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
     <description><?php $Blog->disp( 'shortdesc' ,'xml' ) ?></description>
-    <language><?php $Blog->disp( 'lang', 'xml' ) ?></language>
+    <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss092</docs>
     <?php while( $Item = $MainList->get_item() ) { ?>
     <item>

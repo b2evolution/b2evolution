@@ -22,6 +22,8 @@
 <body>
 
 <?php 
+param( 'blog', 'integer', 0, true );	// We need this for the urls
+
 if( empty($mode) )
 {	// We're not running in an special mode (bookmarklet, sidebar...)
 ?>

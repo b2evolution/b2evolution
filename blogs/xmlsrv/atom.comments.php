@@ -11,7 +11,7 @@
   header("Content-type: application/atom+xml");
   echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 ?>
-<feed version="0.3" xml:lang="<?php $Blog->disp( 'lang', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
+<feed version="0.3" xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
 	<title><?php $Blog->disp( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?>" />
 	<generator url="http://b2evolution.net/" version="<?php echo $b2_version ?>">b2evolution</generator>

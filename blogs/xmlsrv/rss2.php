@@ -17,7 +17,7 @@
     <title><?php $Blog->disp( 'name', 'xml' ) ?></title>
     <link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
     <description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
-    <language><?php $Blog->disp( 'lang', 'xml' ) ?></language>
+    <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss</docs>
     <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
     <ttl>60</ttl>

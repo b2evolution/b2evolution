@@ -52,6 +52,13 @@ function upgrade_cafelog_tables()
 	$q = mysql_query($query) or mysql_oops( $query );
 	echo "OK.<br />\n";
 
+	echo "Make sure user #1 is at level 10...";
+	$query = "UPDATE $tableusers
+							 SET user_level = 10
+						 WHERE ID = 1";
+	$q = mysql_query($query) or mysql_oops( $query );
+	echo "OK.<br />\n";
+
 	echo "Setting groups...";
 	$query = "UPDATE $tableusers
 							 SET user_grp_ID = ".$Group_Users->get('ID')."
@@ -62,6 +69,8 @@ function upgrade_cafelog_tables()
 							 SET user_grp_ID = ".$Group_Bloggers->get('ID')."
 						 WHERE user_level > 0 and user_level < 10 ";
 	$q = mysql_query($query) or mysql_oops( $query );
+
+  // Level 10 users get default group (1)
 
 	echo "OK.<br />\n";
 

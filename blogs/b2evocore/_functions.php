@@ -305,8 +305,8 @@ function convert_chars( $content, $flag='html' )
 
 	$content = strtr($content, $b2_htmltrans);
 
-	if (locale_charset(false) == 'iso-8859-1')
-	{
+	if (locale_charset(false) != 'utf-8')
+	{	// This is a single byte charset
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
 			create_function( '$j', 'return "&#".ord($j[0]).";";' ),

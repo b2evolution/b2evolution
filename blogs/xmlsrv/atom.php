@@ -12,7 +12,7 @@
   // header("Content-type: text/xml");
   echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 ?>
-<feed version="0.3" xml:lang="<?php $Blog->disp( 'lang', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
+<feed version="0.3" xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
 	<title><?php $Blog->disp( 'name', 'xml' ) ?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
 	<tagline><?php $Blog->disp( 'shortdesc', 'xml' ) ?></tagline>

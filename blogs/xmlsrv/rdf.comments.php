@@ -17,7 +17,7 @@
 	<title><?php $Blog->disp( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
   <link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
 	<description></description>
-  <dc:language><?php $Blog->disp( 'lang', 'xml' ) ?></dc:language>
+  <dc:language><?php $Blog->disp( 'locale', 'xml' ) ?></dc:language>
   <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
   <sy:updatePeriod>hourly</sy:updatePeriod>
   <sy:updateFrequency>1</sy:updateFrequency>

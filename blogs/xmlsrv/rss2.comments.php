@@ -17,7 +17,7 @@
     <title><?php $Blog->disp( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
     <link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
 		<description></description>
-    <language><?php $Blog->disp( 'lang', 'xml' ) ?></language>
+    <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss</docs>
     <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
     <ttl>60</ttl>

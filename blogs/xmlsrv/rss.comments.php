@@ -17,7 +17,7 @@
     <title><?php $Blog->disp( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
     <link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
 		<description></description>
-    <language><?php $Blog->disp( 'lang', 'xml' ) ?></language>
+    <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss092</docs>
     <?php while( $Comment = $CommentList->get_next() )
 		{	// Loop through comments:	?>
