@@ -56,27 +56,18 @@
 		</fieldset>
 
 		<?php
+			form_checkbox( 'newuser_showonline', get_user_info( 'showonline' ), T_('Online'), T_('Check this to be displayed as online when visiting the site.') );
 			form_select( 'newuser_locale', get_user_info( 'locale' ), 'locale_options', T_('Locale'), '', 'bComment' );
 			form_text( 'newuser_email', get_user_info( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
+			form_checkbox( 'newuser_notify', get_user_info( 'notify' ), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
 			form_text( 'newuser_url', get_user_info( 'url' ), 40, T_('URL'), '', 100, 'bComment' );
 			form_text( 'newuser_icq', get_user_info( 'icq' ), 40, T_('ICQ'), '', 10, 'bComment' );
 			form_text( 'newuser_aim', get_user_info( 'aim' ), 40, T_('AOL I.M.'), '', 50, 'bComment' );
 			form_text( 'newuser_msn', get_user_info( 'msn' ), 40, T_('MSN I.M.'), '', 100, 'bComment' );
 			form_text( 'newuser_yim', get_user_info( 'yim' ), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
-
-			form_checkbox( 'newuser_notify', get_user_info( 'notify' ), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
-			form_checkbox( 'newuser_showonline', get_user_info( 'showonline' ), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
+			form_text( 'pass1', '', 16, T_('New pass'), T_('Leave blank to leave the password unchanged.'), 40, 'bComment' );
+			form_text( 'pass2', '', 16, T_('Confirm'), T_('Confirm new password by typing it again.'), 40, 'bComment' );
  		?>
-
-		<fieldset>
-			<div class="label"><label for="pass1"><?php echo T_('New password') ?>:</label></div>
-			<div class="input"><input type="password" name="pass1" id="pass1" value="" size="16" class="bComment" /></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><label for="pass2"><?php echo T_('Confirm new password') ?>:</label></div>
-			<div class="input"><input type="password" name="pass2" id="pass2" value="" size="16" class="bComment" /></div>
-		</fieldset>
 
 		<fieldset>
 			<div class="input">

@@ -106,8 +106,31 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	<fieldset>
 		<legend><?php echo T_('User') ?></legend>
 		<?php
-			if( $allowed_to_edit )
+			$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" class="middle" /></a>';
+
+			if( ($url = $edited_User->get('url')) != '' )
 			{
+				if( !preg_match('#://#', $url) )
+				{
+					$url = 'http://'.$url;
+				}
+				$url_fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Visit the site').'" class="middle" /></a>';
+			}
+			else
+				$url_fieldnote = '';
+
+			if( $edited_User->get('icq') != 0 )
+				$icq_fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Search on ICQ.com').'" class="middle" /></a>';
+			else
+				$icq_fieldnote = '';
+
+			if( $edited_User->get('aim') != '' )
+				$aim_fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" class="middle" /></a>';
+			else
+				$aim_fieldnote = '';
+
+			if( $allowed_to_edit )
+			{	// We can edit the values:
 				form_text( 'edited_user_login', $edited_User->dget('login', 'formvalue'), 20, T_('Login'), '', 20 );
 				form_text( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 20, T_('First name'), '', 50 );
 				form_text( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 20, T_('Last name'), '', 50 );
@@ -132,7 +155,17 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			</fieldset>
 
 			<?php
+				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
 				form_select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
+				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 30, T_('Email'), $email_fieldnote, 100 );
+				form_checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
+				form_text( 'edited_user_url', $edited_User->dget('url', 'formvalue'), 30, T_('URL'), $url_fieldnote, 100 );
+				form_text( 'edited_user_icq', $edited_User->dget('icq', 'formvalue'), 30, T_('ICQ'), $icq_fieldnote, 10 );
+				form_text( 'edited_user_aim', $edited_User->dget('aim', 'formvalue'), 30, T_('AIM'), $aim_fieldnote, 50 );
+				form_text( 'edited_user_msn', $edited_User->dget('msn', 'formvalue'), 30, T_('MSN IM'), '', 100 );
+				form_text( 'edited_user_yim', $edited_User->dget('yim', 'formvalue'), 30, T_('YahooIM'), '', 50 );
+				form_text( 'edited_user_pass1', '', 20, T_('New password'), '', 50, T_('Leave empty if you don\'t want to change the password.'), 'password' );
+				form_text( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50, '', 'password' );
 
 			}
 			else
@@ -142,65 +175,15 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_info( T_('Last name'), $edited_User->dget('lastname') );
 				form_info( T_('Nickname'), $edited_User->dget('nickname') );
 				form_info( T_('Identity shown'), $edited_User->dget('preferedname') );
+				form_info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
 				form_info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-			}
-
-			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" class="middle" /></a>';
-
-			if( $allowed_to_edit )
-				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 30, T_('Email'), $fieldnote, 100 );
-			else
-				form_info( T_('Email'), $edited_User->dget('email'), $fieldnote );
-
-			if( ($url = $edited_User->get('url')) != '' )
-			{
-				if( !preg_match('#://#', $url) )
-				{
-					$url = 'http://'.$url;
-				}
-				$fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Visit the site').'" class="middle" /></a>';
-			}
-			else $fieldnote = '';
-			if( $allowed_to_edit )
-				form_text( 'edited_user_url', $edited_User->dget('url', 'formvalue'), 30, T_('URL'), $fieldnote, 100 );
-			else
-				form_info( T_('URL'), $edited_User->dget('url'), $fieldnote );
-
-			if( $edited_User->get('icq') != 0 )
-			{
-				$fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Search on ICQ.com').'" class="middle" /></a>';
-			}
-			else $fieldnote = '';
-			if( $allowed_to_edit )
-				form_text( 'edited_user_icq', $edited_User->dget('icq', 'formvalue'), 30, T_('ICQ'), $fieldnote, 10 );
-			else
-				form_info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $fieldnote );
-
-			if( $edited_User->get('aim') != '' )
-			{
-				$fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" class="middle" /></a>';
-			}
-			else $fieldnote = '';
-			if( $allowed_to_edit )
-			{
-				form_text( 'edited_user_aim', $edited_User->dget('aim', 'formvalue'), 30, T_('AIM'), $fieldnote, 50 );
-				form_text( 'edited_user_msn', $edited_User->dget('msn', 'formvalue'), 30, T_('MSN IM'), '', 100 );
-				form_text( 'edited_user_yim', $edited_User->dget('yim', 'formvalue'), 30, T_('YahooIM'), '', 50 );
-
-				form_checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
-				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
-
-				form_text( 'edited_user_pass1', '', 20, T_('New password'), '', 50, T_('Leave empty if you don\'t want to change the password.'), 'password' );
-				form_text( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50, '', 'password' );
-
-			}
-			else
-			{
-				form_info( T_('AIM'), $edited_User->dget('aim'), $fieldnote );
+				form_info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
+				form_info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
+				form_info( T_('URL'), $edited_User->dget('url'), $url_fieldnote );
+				form_info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $icq_fieldnote );
+				form_info( T_('AIM'), $edited_User->dget('aim'), $aim_fieldnote );
 				form_info( T_('MSN IM'), $edited_User->dget('msn') );
 				form_info( T_('YahooIM'), $edited_User->dget('yim') );
-				form_info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
-				form_info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
 			}?>
 	</fieldset>
 
