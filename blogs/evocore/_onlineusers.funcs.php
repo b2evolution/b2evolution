@@ -61,13 +61,13 @@ function online_user_update()
 	// Note: we also delete any anonymous user from the current IP address since it will be
 	// recreated below (REPLACE won't work properly when a column is NULL)
 	$DB->query( 'DELETE FROM T_sessions
-								WHERE sess_time < '.( $servertimenow - $online_session_timeout ).'
+		WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($servertimenow - $online_session_timeout) ).'"
 									OR ( sess_ipaddress = "'.getIpList( true ).'"
 												AND sess_user_ID is NULL )' );
 
 	// Record current session info
-	$DB->query( 'REPLACE INTO T_sessions( sess_time, sess_ipaddress, sess_user_ID )
-								VALUES( "'.$servertimenow.'",
+	$DB->query( 'REPLACE INTO T_sessions( sess_lastseen, sess_ipaddress, sess_user_ID )
+		VALUES( "'.date( 'Y-m-d H:i:s', $servertimenow ).'",
 												"'.getIpList( true ).'",
 												'.( $current_User ? 'NULL' : '"'.$current_User->ID.'"' ).')' );
 }
@@ -120,6 +120,9 @@ function online_user_display( $before = '', $after = '' )
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/23 22:48:09  blueyed
+ * T_sessions refactoring
+ *
  * Revision 1.7  2005/02/21 00:34:34  blueyed
  * check for defined DB_USER!
  *

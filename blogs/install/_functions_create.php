@@ -419,7 +419,7 @@ function create_groups()
 
 
 /**
- * {@internal populate_linkblog(-)}
+ * {@internal populate_linkblog(-)}}
  */
 function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 {
@@ -928,9 +928,10 @@ function create_b2evo_tables_091()
 
 	echo 'Creating table for active sessions... ';
 	$DB->query( "CREATE TABLE T_sessions (
-									sess_time int(10) unsigned NOT NULL default '0',
-									sess_ipaddress varchar(15) NOT NULL default '',
-									sess_user_ID int(10) default NULL,
+									sess_ID INT(11) UNSIGNED NOT NULL,
+									sess_lastseen DATETIME NOT NULL,
+									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
+									sess_user_ID INT(10) DEFAULT NULL,
 									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
 	echo "OK.<br />\n";
@@ -994,7 +995,7 @@ function create_b2evo_tables_091()
 	echo "OK.<br />\n";
 
 
- 	echo 'Creating table for Post Links... ';
+	echo 'Creating table for Post Links... ';
 	$DB->query( "CREATE TABLE T_links (
 									link_item_ID    		int(11) unsigned NOT NULL,
 									link_dest_item_ID		int(11) unsigned NULL,
@@ -1003,8 +1004,8 @@ function create_b2evo_tables_091()
 									link_external_url   VARCHAR(255) NULL,
 									link_title          TEXT NULL,
 									INDEX link_item_ID( link_item_ID ),
-								  INDEX link_dest_item_ID (link_dest_item_ID),
-								  INDEX link_file_ID (link_file_ID)
+									INDEX link_dest_item_ID (link_dest_item_ID),
+									INDEX link_file_ID (link_file_ID)
 								)" );
 	echo "OK.<br />\n";
 
