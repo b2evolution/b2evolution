@@ -130,7 +130,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 		}
 	}
 
-	$ddate_today = time() + ($Settings->get('time_difference') * 3600);
+	$ddate_today = $localtimenow;
 	$ddate_difference_days = ($ddate_today - $ddate_U) / 86400;
 
 

@@ -127,7 +127,7 @@ switch( $action )
 						$UserSettings->set( 'password_change_request',
 																serialize( array( 'requestId' => $requestId,
 																									'IP' => md5(serialize(getIpList())),
-																									'time' => time() ) ),
+																									'time' => $servertimenow ) ),
 																$ForgetfulUser->ID );
 						$UserSettings->updateDB();
 
@@ -168,7 +168,7 @@ switch( $action )
 				|| !($verifyData = unserialize($verifyData))
 				|| !is_array($verifyData)
 				|| !isset($verifyData['IP']) || $verifyData['IP'] != md5(serialize(getIpList()))
-				|| !isset($verifyData['time']) || $verifyData['time'] < ( time() - 7200 ) )
+				|| !isset($verifyData['time']) || $verifyData['time'] < ( $servertimenow - 7200 ) )
 		{
 			$Messages->add( sprintf( T_('Invalid password change request!')
 																.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ) );

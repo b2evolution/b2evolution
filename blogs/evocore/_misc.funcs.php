@@ -1266,13 +1266,14 @@ function debug_info( $force = false )
 function obhandler( $output )
 {
 	global $lastmodified, $use_gzipcompression, $use_etags;
+	global $servertimenow;
 
 	// we're sending out by default
 	$sendout = true;
 
 	if( !isset( $lastmodified ) )
 	{ // default of lastmodified is now
-		$lastmodified = time();
+		$lastmodified = $servertimenow;
 	}
 
 	// trim each line
@@ -1857,6 +1858,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.57  2005/03/13 18:50:34  blueyed
+ * use $servertimenow/$localtimenow
+ *
  * Revision 1.56  2005/03/02 16:01:00  fplanque
  * comment
  *
