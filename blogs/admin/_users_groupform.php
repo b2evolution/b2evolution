@@ -103,7 +103,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				form_checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
 
 				if( $edited_Group->get('ID') != 1 )
-				{	// Groups others than #1 can be prevented from editing users
+				{ // Groups others than #1 can be prevented from editing users
 					form_radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
 							array(  array( 'none', T_('No Access') ),
 											array( 'view', T_('View only') ),

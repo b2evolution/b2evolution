@@ -21,7 +21,24 @@
 			form_text( 'blog_staticfilename', $blog_staticfilename, 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 		?>
 	</fieldset>
-	
+
+	<fieldset>
+		<legend><?php echo T_('Media library') ?></legend>
+		<?php
+			form_radio( 'blog_media_radio', $blog_media_radio,
+									array(
+										array( 'default', T_('Default'), '', sprintf( T_('subdirectory of %s'), $basepath.'/'.$media_subdir ) ),
+										array( 'subdir', T_('Subdirectory of media folder'), '<code>'.$basepath.'/'.$media_subdir.'</code><input type="text" name="blog_media_dir_rel" />', '' ),
+										array( 'custom', T_('Custom location'), // TODO: better style!! (own div.class for such cases?)
+														'<fieldset>'
+															.'<div class="label">'.T_('directory').':</div><div class="input"><input type="text" name="blog_media_dir_abs" size="50" /></div>'
+															.'<div class="label">'.T_('URL').':</div><div class="input"><input type="text" name="blog_media_url" size="50" /></div></fielset>' )
+									), T_('Media dir location'), true
+								);
+
+		?>
+	</fieldset>
+
 	<fieldset>
 		<legend><?php echo T_('After each new post...') ?></legend>
 		<?php
@@ -31,7 +48,7 @@
 			form_checkbox( 'blog_pingblodotgs', $blog_pingblodotgs, T_('Ping blo.gs'), T_('to give notice of new post.') );
 		?>
 	</fieldset>
-	
+
 	<fieldset>
 		<legend><?php echo T_('Advanced options') ?></legend>
 		<?php

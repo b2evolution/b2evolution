@@ -36,28 +36,36 @@
 			}
 			form_radio( 'blog_access_type', $blog_access_type,
 					array(
-						array( 'default', T_('Default blog on index.php'),
+						array( 'default',
+										T_('Default blog on index.php'),
+										'',
 										$blog_baseurl.'/index.php'.( isset($defblog)
 											? '  ['. /* TRANS: current default blog */ T_('Current default is:').' '.$defblog.']'
 											: '' )
 						),
-						array( 'index.php', T_('Other blog through index.php'),
+						array( 'index.php',
+										T_('Other blog through index.php'),
+										'',
 										$blog_baseurl.'/index.php'.( $Settings->get('links_extrapath')
 											? '/'.$blog_stub
 											: '?blog='.$blog)
 						),
-						array( 'stub', T_('Other blog through stub file (Advanced)'),
-										$blog_baseurl.'/'.$blog_stub.' &nbsp; '.T_('You MUST create a stub file for this to work.')
+						array( 'stub',
+										T_('Other blog through stub file (Advanced)'),
+										'',
+										$blog_baseurl.'/'.$blog_stub.' &nbsp; <strong>'.T_('You MUST create a stub file for this to work.').'</strong>'
 						),
 					), T_('Preferred access type'), true );
 
 			form_radio( 'blog_siteurl_type', $blog_siteurl_type,
 					array(
 						array( 'relative',
-										T_('relative to baseurl').': <code>'.$baseurl.'</code><input type="text" name="blog_siteurl_relative" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'relative' ? format_to_output($blog_siteurl_relative, 'formvalue') : '' ).'" />'
+										T_('relative to baseurl').':',
+										' <code>'.$baseurl.'</code><input type="text" name="blog_siteurl_relative" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'relative' ? format_to_output($blog_siteurl_relative, 'formvalue') : '' ).'" />'
 						),
 						array( 'absolute',
-										T_('absolute URL').': <input type="text" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'absolute' ? format_to_output($blog_siteurl_absolute, 'formvalue') : '' ).'" />'
+										T_('absolute URL').':',
+										'<input type="text" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.( $blog_siteurl_type == 'absolute' ? format_to_output($blog_siteurl_absolute, 'formvalue') : '' ).'" />'
 						)
 					),
 					T_('Blog Folder URL'), true, T_('No trailing slash. (If you don\'t know, leave this field empty.)') );

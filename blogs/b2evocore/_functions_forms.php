@@ -135,7 +135,7 @@ function form_select_object(
  * {@internal form_radio(-)}}
  * @param string the name of the radio options
  * @param string the checked option
- * @param array of arrays (0: value, 1: label, 2: notes)
+ * @param array of arrays the radio options (0: value, 1: label, 2: optional [input field, ..], 2: notes )
  * @param string label
  * @param boolean options on seperate lines (DIVs)
  * @param string notes
@@ -160,8 +160,14 @@ function form_radio(
 			echo ' checked="checked"';
 		}
 		echo ' /> ', $loop_field_option[1], '</label>';
-		if( isset( $loop_field_option[2] ) )
-			echo '<span class="notes">', $loop_field_option[2], '</span>';
+		if( !empty( $loop_field_option[2] ) )
+		{ // optional text for radio option (does not connect input boxes to radio buttons label)
+			echo $loop_field_option[2];
+		}
+		if( !empty( $loop_field_option[3] ) )
+		{ // notes for radio option
+			echo '<span class="notes">', $loop_field_option[3], '</span>';
+		}
 		if( $field_lines ) echo "</div>\n";
 	}
 	if( !empty( $field_notes ) )

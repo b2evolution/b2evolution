@@ -55,6 +55,7 @@ switch($action)
 		param( 'blog_force_skin', 'integer', 0 );
 		$blog_force_skin = 1-$blog_force_skin;
 
+
 		$blog_tagline = format_to_post( $blog_tagline, 0, 0 );
 		$blog_longdesc = format_to_post( $blog_longdesc, 0, 0 );
 		$blog_notes = format_to_post( $blog_notes, 0, 0 );
@@ -64,7 +65,7 @@ switch($action)
 		{
 			if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
 			{
-				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) !') );
+				$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
 			}
 			$blog_siteurl = $blog_siteurl_absolute;
 		}
@@ -84,13 +85,13 @@ switch($action)
 		}
 
 		if( empty($blog_stub) )
-		{	// Stub name is empty
+		{ // Stub name is empty
 			$Messages->add( T_('You must provide an URL blog name / Stub name!') );
 		}
 		else if( $DB->get_var( "SELECT COUNT(*)
 												FROM $tableblogs
 												WHERE blog_stub = ".$DB->quote($blog_stub) ) )
-		{	// Stub name is already in use
+		{ // Stub name is already in use
 			$Messages->add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
 		}
 
@@ -120,6 +121,8 @@ switch($action)
 			$edited_Blog->set( 'pingweblogs', 1 );
 			$edited_Blog->set( 'allowtrackbacks', 0 );
 			$edited_Blog->set( 'allowpingbacks', 0 );
+			$edited_Blog->set( 'blog_media_dir', '' ); # \__ 'default'
+			$edited_Blog->set( 'blog_media_url', '' ); # /
 
 			// DB INSERT
 			$edited_Blog->dbinsert();
@@ -172,15 +175,14 @@ switch($action)
 			param( 'blog_notes', 'html', '' );
 			param( 'blog_description', 'string', '' );
 			param( 'blog_keywords', 'string', '' );
+			param( 'blog_linkblog', 'integer', 0 );
 			$blog_disp_bloglist = 1;
 			$blog_in_bloglist = 1;
-			param( 'blog_linkblog', 'integer', 0 );
 			$blog_force_skin = 0;
-			param( 'blog_linkblog', 'integer', 0 );
 		}
 
 		echo '<div class="panelblock">';
-		echo'<h2>', T_('New blog'), ':</h2>';
+		echo '<h2>', T_('New blog'), ':</h2>';
 		$next_action = 'create';
 		require( dirname(__FILE__).'/_blogs_general.form.php' );
 		echo '</div>';
@@ -251,7 +253,7 @@ switch($action)
 				{
 					if( !preg_match( '#^https?://#', $blog_siteurl_absolute ) )
 					{
-						$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with http:// or https:// !') );
+						$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
 					}
 					$blog_siteurl = $blog_siteurl_absolute;
 				}
@@ -271,21 +273,15 @@ switch($action)
 				}
 
 				if( empty($blog_stub) )
-				{	// Stub name is empty
+				{ // Stub name is empty
 					$Messages->add( T_('You must provide an URL blog name / Stub name!') );
 				}
 				else if( $DB->get_var( "SELECT COUNT(*)
 														FROM $tableblogs
 														WHERE blog_stub = ".$DB->quote($blog_stub)."
 															AND blog_ID <> ".$edited_Blog->ID ) )
-				{	// Stub name is already in use
+				{ // Stub name is already in use
 					$Messages->add( T_('This URL blog name / Stub name is already in use by another blog. Choose another name.') );
-				}
-
-				if ( $Messages->display( T_('Cannot update, please correct these errors:' ), '') )
-				{
-					echo '</div>';
-					break;
 				}
 
 				$edited_Blog->set( 'tagline', $blog_tagline );
@@ -334,11 +330,44 @@ switch($action)
 				param( 'blog_pingblodotgs', 'integer', 0 );
 				$edited_Blog->set( 'pingblodotgs', $blog_pingblodotgs );
 
+				param( 'blog_media_radio', 'string', true );
+				param( 'blog_media_dir_rel', 'string', '' );
+				param( 'blog_media_dir_abs', 'string', '' );
+				param( 'blog_media_url', 'string', '' );
+
+				// check params
+				switch( $blog_media_radio )
+				{
+					case 'default':
+						$blog_media_dir = '';
+						$blog_media_url = '';
+						break;
+
+					case 'subdir':
+						$blog_media_dir = $blog_media_dir_rel;
+						$blog_media_url = '';
+						break;
+
+					case 'custom':
+						$blog_media_dir = $blog_media_dir_abs;
+						if( !preg_match( '#https?://#', $blog_media_url ) )
+						{
+							$Messages->add( T_('Media dir location').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
+						}
+						break;
+				}
+				if( $blog_media_radio != 'default' && empty($blog_media_dir) )  // TODO: check for slashes
+				{
+					$Messages->add( T_('Media dir location').': '.T_('You must provide the media directory.') );
+				}
+				#$edited_Blog->set( 'media_dir', $blog_media_dir );
+				#$edited_Blog->set( 'media_url', $blog_media_url );
+
 				break;
 		}
 
-		if( !$Messages->count() )
-		{	// Commit update to the DB:
+		if( !$Messages->display( T_('Cannot update, please correct these errors:' ), '') )
+		{ // Commit update to the DB:
 			$edited_Blog->dbupdate();
 
 			// Commit changes in cache:
@@ -353,7 +382,7 @@ switch($action)
 	case 'edit':
 		// ---------- Edit blog form ----------
 		if( $action == 'edit' )
-		{	// this has not already been displayed on update:
+		{ // this has not already been displayed on update:
 			param( 'blog', 'integer', true );
 			$edited_Blog = $BlogCache->get_by_ID( $blog );
 			$admin_pagetitle .= ' :: ['.$edited_Blog->dget('shortname').']';
@@ -412,7 +441,7 @@ switch($action)
 		{
 			case 'general':
 				if( $action == 'edit' )
-				{	// we didn't end up here from a failed update:
+				{ // we didn't end up here from a failed update:
 					$blog_name = get_bloginfo( 'name' );
 					$blog_shortname = get_bloginfo( 'shortname' );
 					$blog_tagline = get_bloginfo( 'tagline' );
@@ -456,6 +485,12 @@ switch($action)
 				$blog_pingtechnorati = get_bloginfo( 'pingtechnorati' );
 				$blog_pingweblogs = get_bloginfo( 'pingweblogs' );
 				$blog_pingblodotgs = get_bloginfo( 'pingblodotgs' );
+				$blog_media_dir = get_bloginfo( 'media_dir' );
+				$blog_media_url = get_bloginfo( 'media_url' );
+				// set blog's media directoy config based on dir and url
+				$blog_media_radio = empty($blog_media_dir) ? 'default' : ( empty($blog_media_url) ? 'subdir' : 'url' );
+
+
 				require( dirname(__FILE__).'/_blogs_advanced.form.php' );
 				break;
 		}

@@ -57,9 +57,10 @@ class Blog extends DataObject
 	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
-	var $dir_media;
+	var $media_dir;
+	var $media_url;
 
-	/** 
+	/**
 	 * Constructor
 	 *
 	 * {@internal Blog::Blog(-) }}
@@ -69,10 +70,10 @@ class Blog extends DataObject
 	function Blog( $db_row = NULL )
 	{
 		global $tableblogs, $basepath, $media_subdir;
-		
+
 		// Call parent constructor:
 		parent::DataObject( $tableblogs, 'blog_', 'blog_ID' );
-	
+
 		if( $db_row == NULL )
 		{
 			global $default_locale;
@@ -116,10 +117,10 @@ class Blog extends DataObject
 			$this->in_bloglist = $db_row->blog_in_bloglist;
 			$this->UID = $db_row->blog_UID;
 		}
-	}	
+	}
 
 
-	/** 
+	/**
 	 * Set param value
 	 *
 	 * {@internal Blog::set(-) }}
@@ -130,7 +131,7 @@ class Blog extends DataObject
 	function set( $parname, $parvalue )
 	{
 		global $Settings;
-		
+
 		switch( $parname )
 		{
 			case 'ID':
@@ -144,20 +145,20 @@ class Blog extends DataObject
 			case 'force_skin':
 				parent::set_param( $parname, 'number', $parvalue );
 				break;
-			
+
 			case 'access_type':
 				if( $parvalue == 'default' )
 				{
 					$Settings->set('default_blog_ID', $this->ID);
 					$Settings->updateDB();
 				}
-				
+
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
-	/** 
+	/**
 	 * Generate blog URL
 	 *
 	 * {@internal Blog::gen_blogurl(-)}}
@@ -168,7 +169,7 @@ class Blog extends DataObject
 	function gen_blogurl( $type = 'default', $absolute = true )
 	{
 		global $baseurl, $basepath, $Settings;
-		
+
 		if( preg_match( '#^https?://#', $this->siteurl ) )
 		{
 			$base = $this->siteurl;
@@ -177,7 +178,7 @@ class Blog extends DataObject
 		{
 			$base = $absolute ? $baseurl.$this->siteurl : $this->siteurl;
 		}
-		
+
 		if( $type == 'static' )
 		{	// We want the static page, there is no access type option here:
 			if( is_file( $basepath.$this->siteurl.'/'.$this->staticfilename ) )
@@ -185,7 +186,7 @@ class Blog extends DataObject
 				return $base.'/'.$this->staticfilename;
 			}
 		}
-		
+
 		switch( $this->access_type )
 		{
 			case 'default':
@@ -195,7 +196,7 @@ class Blog extends DataObject
 					return $base.'/index.php';
 				}
 				// ... otherwise, we add the blog ID:
-			
+
 			case 'index.php':
 				// Access through index.php + blog qualifier
 				if( $Settings->get('links_extrapath') )
@@ -203,7 +204,7 @@ class Blog extends DataObject
 					return $base.'/index.php/'.$this->stub;
 				}
 				return $base.'/index.php?blog='.$this->ID;
-			
+
 			case 'stub':
 				// Access through stub file
 				$blogurl = $base.'/'.$this->stub;
@@ -212,13 +213,13 @@ class Blog extends DataObject
 					$blogurl .= '.php';
 				}
 				return $blogurl;
-		
+
 			default:
 				die( 'Unhandled Blog access type ['.$this->access_type.']' );
 		}
 	}
 
-	/** 
+	/**
 	 * Get a param
 	 *
 	 * {@internal Blog::get(-)}}
@@ -231,7 +232,7 @@ class Blog extends DataObject
 		{
 			case 'subdir':
 				return $this->siteurl;
-	
+
 			case 'suburl':
 				return $this->gen_blogurl( 'default', false );
 
@@ -239,19 +240,19 @@ class Blog extends DataObject
 			case 'link':			// RSS wording
 			case 'url':
 				return $this->gen_blogurl( 'default' );
-			
+
 			case 'dynurl':
 				return $this->gen_blogurl( 'dynamic' );
 
 			case 'staticurl':
 				return $this->gen_blogurl( 'static' );
-			
+
 			case 'dynfilepath':
 				return $basepath.$this->siteurl.'/'.$this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
 
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.'/'.$this->staticfilename;
-			
+
 			case 'baseurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{
@@ -261,69 +262,69 @@ class Blog extends DataObject
 				{
 					return $baseurl.$this->siteurl.'/';
 				}
-				
+
 			case 'cookie_domain':
 				preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $match );
 				return '.'.$match[2];
-			
+
 			case 'cookie_path':
 				return preg_replace( '#https?://[^/]+#', '', $this->get('baseurl') );
-				
+
 			case 'blogstatsurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=stats' );
-			
+
 			case 'lastcommentsurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=comments' );
-			
+
 			case 'arcdirurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=arcdir' );
 
 			case 'msgformurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=msgform' );
-			
+
 			case 'description':			// RSS wording
 			case 'shortdesc':
 					return $this->shortdesc;
 				break;
-			
+
 			case 'rdf_url':
 				return $xmlsrv_url.'/rdf.php?blog='.$this->ID;
 
 			case 'rss_url':
 				return $xmlsrv_url.'/rss.php?blog='.$this->ID;
-			
+
 			case 'rss2_url':
 				return $xmlsrv_url.'/rss2.php?blog='.$this->ID;
-			
+
 			case 'atom_url':
 				return $xmlsrv_url.'/atom.php?blog='.$this->ID;
-			
+
 			case 'comments_rdf_url':
 				return $xmlsrv_url.'/rdf.comments.php?blog='.$this->ID;
-			
+
 			case 'comments_rss_url':
 				return $xmlsrv_url.'/rss.comments.php?blog='.$this->ID;
-			
+
 			case 'comments_rss2_url':
 				return $xmlsrv_url.'/rss2.comments.php?blog='.$this->ID;
-			
+
 			case 'comments_atom_url':
 				return $xmlsrv_url.'/atom.comments.php?blog='.$this->ID;
-			
+
 			case 'pingback_url':
 				return $xmlsrv_url.'/xmlrpc.php';
-			
+
 			case 'admin_email':
 				return $admin_email;
-						
+
 			default:
 				// All other params:
 				return parent::get( $parname );
 		}
 	}
 
-	
-	/** 
+
+	/**
 	 * Delete a blog and dependencies from database
 	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with mySQL 3.23, bleh!
@@ -336,7 +337,7 @@ class Blog extends DataObject
 	 */
 	function dbdelete( $delete_stub_file = false, $delete_static_file = false, $echo = false )
 	{
-		global $DB, $tablehitlog, $tablecategories, $tablecomments, $tableposts, 
+		global $DB, $tablehitlog, $tablecategories, $tablecomments, $tableposts,
 						$tablepostcats, $tableblogusers, $cache_blogs;
 
 		// Note: No need to localize the status messages...
@@ -344,7 +345,7 @@ class Blog extends DataObject
 
 		// Get list of cats that are going to be deleted (3.23)
 		if( $echo ) echo '<br />Getting category list to delete... ';
-		$cat_list = $DB->get_list( "SELECT cat_ID 
+		$cat_list = $DB->get_list( "SELECT cat_ID
 																FROM $tablecategories
 																WHERE cat_blog_ID = $this->ID" );
 
@@ -354,42 +355,42 @@ class Blog extends DataObject
 		}
 		else
 		{	// Delete the cats & dependencies
-	
+
 			// Get list of posts that are going to be deleted (3.23)
 			if( $echo ) echo '<br />Getting post list to delete... ';
-			$post_list = $DB->get_list( "SELECT postcat_post_ID 
+			$post_list = $DB->get_list( "SELECT postcat_post_ID
 																		FROM $tablepostcats
 																		WHERE postcat_cat_ID IN ($cat_list)" );
-			
+
 			if( empty( $post_list ) )
 			{	// There are no posts to delete
 				echo 'None!';
 			}
 			else
 			{	// Delete the posts & dependencies
-			
+
 				// Delete postcats
 				if( $echo ) echo '<br />Deleting post-categories... ';
 				$ret = $DB->query(	"DELETE FROM $tablepostcats
 															WHERE postcat_cat_ID IN ($cat_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
-				
-				
+
+
 				// Delete comments
 				if( $echo ) echo '<br />Deleting comments on blog\'s posts... ';
-				$ret = $DB->query( "DELETE FROM $tablecomments 
+				$ret = $DB->query( "DELETE FROM $tablecomments
 														WHERE comment_post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
-		
-		
+
+
 				// Delete posts
 				if( $echo ) echo '<br />Deleting blog\'s posts... ';
-				$ret = $DB->query(	"DELETE FROM $tableposts 
+				$ret = $DB->query(	"DELETE FROM $tableposts
 															WHERE ID  IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 
 			} // / are there posts?
-			
+
 			// Delete categories
 			if( $echo ) echo '<br />Deleting blog\'s categories... ';
 			$ret = $DB->query( "DELETE FROM $tablecategories
@@ -397,27 +398,27 @@ class Blog extends DataObject
 			if( $echo ) printf( '(%d rows)', $ret );
 
 		} // / are there cats?
-		
-		// Delete blogusers		
+
+		// Delete blogusers
 		if( $echo ) echo '<br />Deleting user-blog permissions... ';
-		$ret = $DB->query( "DELETE FROM $tableblogusers 
+		$ret = $DB->query( "DELETE FROM $tableblogusers
 												WHERE bloguser_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
-		
+
 		// Delete hitlogs
 		if( $echo ) echo '<br />Deleting blog hitlogs... ';
-		$ret = $DB->query( "DELETE FROM $tablehitlog 
+		$ret = $DB->query( "DELETE FROM $tablehitlog
 												WHERE hit_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
-	
+
 		if( $delete_stub_file )
 		{ // Delete stub file
 			if( $echo ) echo '<br />Trying to delete stub file... ';
 			if( ! @unlink( $this->get('dynfilepath') ) )
-				if( $echo ) 
+				if( $echo )
 				{
 					echo '<span class="error">';
-					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'), 
+					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'),
 									$this->get('dynfilepath') );
 					echo '</span>';
 				}
@@ -428,25 +429,25 @@ class Blog extends DataObject
 		{ // Delete static file
 			if( $echo ) echo '<br />Trying to delete static file... ';
 			if( ! @unlink( $this->get('staticfilepath') ) )
-				if( $echo ) 
+				if( $echo )
 				{
 					echo '<span class="error">';
-					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'), 
+					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'),
 									$this->get('staticfilepath') );
 					echo '</span>';
 				}
 			else
 				if( $echo ) echo 'OK.';
 		}
-					
+
 		// Unset cache entry:
 		unset( $cache_blogs[$this->ID] );
-		
+
 		// Delete main (blog) object:
 		parent::dbdelete();
-				
+
 		echo '<br />Done.</p>';
 	}
-	
+
 }
 ?>
