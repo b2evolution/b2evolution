@@ -6,8 +6,6 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
-
-
 /*
  * T_(-)
  * 
@@ -81,11 +79,39 @@ else
 
 }
 
+/**
+ * Temporarily switch to another locale
+ *
+ * {@internal locale_temp_switch(-)}}
+ *
+ * @param string locale to activate
+ */
+function locale_temp_switch( $locale )
+{
+	global $saved_locale, $current_locale;
+	if( !isset( $saved_locale ) ) $saved_locale = array();
+	array_push( $saved_locale, $current_locale );
+	locale_activate( $locale );
+}
+
+/**
+ * Restore the locale in use before the switch
+ *
+ * {@internal locale_restore_previous(-)}}
+ */
+function locale_restore_previous()
+{
+	global $saved_locale;
+	$locale = array_pop( $saved_locale );
+	locale_activate( $locale );
+}
 
 /*
  * locale_activate(-)
  *
  * returns true if locale has been changed
+ *
+ * @param string locale to activate
  */
 function locale_activate( $locale )
 {
@@ -100,7 +126,7 @@ function locale_activate( $locale )
 	$current_locale = $locale;
 	// Memorize new charset:
 	$current_charset = $locales[ $locale ][ 'charset' ];
-	$current_messages = $locales[ $locale][ 'messages' ];
+	$current_messages = $locales[ $locale ][ 'messages' ];
 
 	// Activate translations in gettext:
 	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )

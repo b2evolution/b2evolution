@@ -19,7 +19,7 @@ class Item extends DataObject
 	var $issue_date;
 	var $mod_date;
 	var $scope;
-	var $lang;
+	var $locale;
 	var $title;
 	var $urltitle;
 	var $content;
@@ -537,7 +537,7 @@ class Item extends DataObject
 
 
 	/** 
-	 * Template function: display language code for item
+	 * Template function: display locale for item
 	 *
 	 * {@internal Item::lang(-) }}
 	 */
@@ -545,6 +545,17 @@ class Item extends DataObject
 	{
 		$this->disp( 'locale', 'raw' );
 	}
+
+	/** 
+	 * Template function: display locale for item
+	 *
+	 * {@internal Item::locale(-) }}
+	 */
+	function locale() 
+	{
+		$this->disp( 'locale', 'raw' );
+	}
+
 
 
 	/** 
@@ -556,8 +567,9 @@ class Item extends DataObject
 	 */
 	function language( $format = 'htmlbody' ) 
 	{
-		global $languages;
-		echo format_to_output( $languages[ $this->lang ], $format );
+		global $locales;
+		$locale = $locales[ $this->locale ];
+		echo format_to_output( $locale['name'], $format );
 	}
 
 
