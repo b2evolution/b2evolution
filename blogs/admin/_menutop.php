@@ -363,95 +363,75 @@ if( empty($mode) )
 
 	<ul class="tabs">
 	<?php
-		if( $admin_tab == 'new' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('Write'), '</a></li>';
+		$menu = array(
+			'new' => array( 'text'=>T_('Write'),
+											'href'=>'b2edit.php?blog='.$blog,
+											'style'=>'font-weight: bold;' ),
 
-		if( $admin_tab == 'edit'  )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Edit'), '</a></li>';
+			'edit' => array( 'text'=>T_('Edit'),
+												'href'=>'b2browse.php?blog='.$blog,
+												'style'=>'font-weight: bold;' ),
 
-		if( $admin_tab == 'cats' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2categories.php?blog=', $blog, '" >', T_('Categories'), '</a></li>';
+			'cats' => array( 'text'=>T_('Categories'),
+												'href'=>'b2categories.php?blog='.$blog ),
 
-		if( $admin_tab == 'blogs' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="blogs.php" >', T_('Blogs'), '</a></li>';
+			'blogs' => array( 'text'=>T_('Blogs'),
+												'href'=>'blogs.php' ),
 
-		if( $current_User->check_perm( 'stats', 'view' ) )
+			'stats' => array( 'text'=>T_('Stats'),
+												'href'=>'b2stats.php' ),
+
+			'antispam' => array( 'text'=>T_('Antispam'),
+														'perm_name'=>'spamblacklist',
+														'perm_level'=>'view',
+														'href'=>'b2antispam.php' ),
+
+			'templates' => array( 'text'=>T_('Templates'),
+														'perm_name'=>'templates',
+														'perm_level'=>'any',
+														'href'=>'b2template.php' ),
+
+			'users' => array( 'text'=>T_('Users'),
+												'perm_name'=>'users',
+												'perm_level'=>'view',
+												'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
+												'href'=>'b2users.php' ),
+
+			// TODO: check filemanager permission
+			'files' => array( 'text'=>T_('Files'),
+												'href'=>'files.php' ),
+
+			'options' => array( 'text'=>T_('Settings'),
+													'perm_name'=>'options',
+													'perm_level'=>'view',
+													'href'=>'b2options.php' ),
+
+ 			'tools' => array( 'text'=>T_('Tools'),
+												'href'=>'tools.php' ),
+
+			);
+
+		foreach( $menu as $loop_tab => $loop_details )
 		{
-			if( $admin_tab == 'stats' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="b2stats.php" >', T_('Stats'), '</a></li>';
+			$perm = true; // By default
+			if( (!isset($loop_details['perm_name']))
+				|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
+				|| isset($loop_details['text_noperm']) )
+			{	// If no permission requested or if perm granted or if we have an alt text, display tab:
+
+				echo (($loop_tab == $admin_tab) ? '<li class="current">' : '<li>');
+
+				echo '<a href="'.$loop_details['href'].'"';
+
+				if( isset($loop_details['style']) ) echo ' style="'.$loop_details['style'].'"';
+
+				echo '>';
+
+				echo ($perm ? $loop_details['text'] : $loop_details['text_noperm'] );
+
+				echo '</a></li>';
+			}
 		}
-
-		if( $current_User->check_perm( 'spamblacklist', 'view' ) )
-		{
-			if( $admin_tab == 'antispam' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="b2antispam.php" >', T_('Antispam'), '</a></li>';
-		}
-
-		if( $current_User->check_perm( 'templates', 'any' ) )
-		{
-			if( $admin_tab == 'templates' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="b2template.php">', T_('Templates'), '</a></li>';
-		}
-
-		if( $admin_tab == 'users' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-
-		if( $current_User->check_perm( 'users', 'view' ) )
-		{
-			echo '<a href="b2users.php" >', T_('Users'), '</a></li>';
-		}
-		else
-		{
-			echo '<a href="b2users.php" >', T_('User Profile'), '</a></li>';
-		}
-
-		if( $current_User->level >= 10 ) // TODO: check filemanager permission
-		{
-			if( $admin_tab == 'files' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="files.php">', T_('Files'), '</a></li>';
-		}
-
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{
-			if( $admin_tab == 'options' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-			echo '<a href="b2options.php" >', T_('Settings'), '</a></li>';
-		}
-
-		if( $admin_tab == 'tools' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="tools.php" >', T_('Tools'), '</a></li>';
-
 	?>
 
 	</ul>
