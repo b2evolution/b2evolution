@@ -69,8 +69,6 @@ function create_b2evo_tables()
 		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL, 
 		time_difference tinyint(4) DEFAULT '0' NOT NULL, 
 		AutoBR tinyint(1) DEFAULT '1' NOT NULL, 
-		time_format varchar(20) DEFAULT 'H:i:s' NOT NULL, 
-		date_format varchar(20) DEFAULT 'Y/m/d' NOT NULL, 
 		db_version INT DEFAULT $new_db_version NOT NULL, 
   	last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00',
 		PRIMARY KEY (ID), 
@@ -99,6 +97,7 @@ function create_b2evo_tables()
 		user_msn varchar(100) NOT NULL, 
 		user_yim varchar(50) NOT NULL, 
 		user_idmode varchar(20) NOT NULL, 
+		user_notify tinyint(1) NOT NULL default 1,
 		PRIMARY KEY (ID), 
 		UNIQUE ID (ID), 
 		UNIQUE (user_login) 
@@ -121,6 +120,8 @@ function create_b2evo_tables()
 		blog_stub VARCHAR(30) NULL DEFAULT 'blog.php',
 		blog_roll text,
 		blog_keywords tinytext,
+		blog_allowtrackbacks tinyint(1) NOT NULL default 1,
+		blog_allowpingbacks tinyint(1) NOT NULL default 1,
 		blog_pingb2evonet tinyint(1) NOT NULL default 0,
 		blog_pingtechnorati tinyint(1) NOT NULL default 0,
 		blog_pingweblogs tinyint(1) NOT NULL default 0,
@@ -467,7 +468,7 @@ switch( $action )
 
 		
 		// SETTINGS!
-		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version, last_antispam_update) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', $new_db_version, '2000-01-01 00:00:00')";
+		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "settings: OK<br />\n";
 		
@@ -625,6 +626,8 @@ switch( $action )
 		{
 			echo "<p>Upgrading blogs table... ";
 			$query = "ALTER TABLE $tableblogs
+								ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
+								ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 1,
 								ADD COLUMN blog_pingb2evonet tinyint(1) NOT NULL default 0,
 								ADD COLUMN blog_pingtechnorati tinyint(1) NOT NULL default 0,
 								ADD COLUMN blog_pingweblogs tinyint(1) NOT NULL default 0,
@@ -634,7 +637,14 @@ switch( $action )
 
 			echo "<p>Upgrading users table... ";
 			$query = "ALTER TABLE $tableusers
-								ADD COLUMN user_notify tinyint(1) NOT NULL default 0";
+								ADD COLUMN user_notify tinyint(1) NOT NULL default 1";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
+			echo "<p>Upgrading settings table... ";
+			$query = "ALTER TABLE $tablesettings
+								DROP COLUMN time_format,
+								DROP COLUMN date_format";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 		}
@@ -687,9 +697,10 @@ switch( $action )
 		}
 		echo '</p>';
 
+
 			echo "<p>Upgrading users table... ";
 			$query = "ALTER TABLE $tableusers
-								ADD COLUMN user_notify tinyint(1) NOT NULL default 0";
+								ADD COLUMN user_notify tinyint(1) NOT NULL default 1";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 
@@ -732,7 +743,7 @@ switch( $action )
 		echo "<p>Copying settings... ";	
 		// forcing paged mode because this works so much better !!!
 		// You can always change it back in the options if you don't like it.
-		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version, last_antispam_update) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, time_format, date_format, $new_db_version, '2000-01-01 00:00:00' FROM $oldtablesettings";
+		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, $new_db_version, '2000-01-01 00:00:00' FROM $oldtablesettings";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 		

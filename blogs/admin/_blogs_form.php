@@ -82,6 +82,14 @@ switch( $next_action )
 			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
 		</fieldset>
 	</fieldset>	
+
+	<fieldset>
+		<legend><?php echo T_('Advanced options') ?></legend>
+		<?php 
+			form_checkbox( 'blog_allowtrackbacks', $blog_allowtrackbacks, T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
+			form_checkbox( 'blog_allowpingbacks', $blog_allowpingbacks, T_('Allow pingbacks'), T_("Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs.") );
+		?>
+	</fieldset>
 		
 	<fieldset>
 		<fieldset>

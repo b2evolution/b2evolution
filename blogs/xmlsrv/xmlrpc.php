@@ -1061,23 +1061,14 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
  * This is the pingback receiver!
  *
  * original code by Mort (http://mort.mine.nu:8080)
- * fplanque: terrible bug found in there: if link doesn't appear in 1st 4096 bytes of referer it would not be found!
+ * fplanque: every time you come here you can correct a couple of bugs...
  */
 function pingback_ping($m) 
 {
 
 	global $tableposts, $tablecomments, $notify_from;
-	global $baseurl, $b2_version, $use_pingback;
+	global $baseurl, $b2_version;
 	global $default_locale;
-
-	if (!$use_pingback) 
-	{
-		return new xmlrpcresp(new xmlrpcval('Sorry, this weblog does not allow you to pingback its posts.'));
-	}
-
-	// return new xmlrpcresp(new xmlrpcval('hello.'));
-
-	dbconnect();
 
 	$log = debug_fopen('./xmlrpc.log', 'w');
 
@@ -1102,26 +1093,31 @@ function pingback_ping($m)
 		htmlentities("We can't find the post you are trying to link to. Please check the post's permalink.")
 	);
 
-	$message = $messages[0];
+	$resp_message = $messages[0];
 
 	// Check if the page linked to is in our site
 	// fplanque: TODO: coz we don't have a single siteurl any longer
 	$pos1 = strpos($pagelinkedto, str_replace('http://', '', str_replace('www.', '', $baseurl)));
-	if($pos1) {
-
+	if($pos1) 
+	{
 		// let's find which post is linked to
 		$urltest = parse_url($pagelinkedto);
-		if (preg_match('#/p[0-9]{1,}#', $urltest['path'], $match)) {
+		if (preg_match('#/p[0-9]{1,}#', $urltest['path'], $match)) 
+		{
 			// the path defines the post_ID (yyyy/mm/dd/pXXXX)
 			$blah = explode('p', $match[0]);
 			$post_ID = $blah[1];
 			$way = 'from the path';
-		} elseif (preg_match('#p/[0-9]{1,}#', $urltest['path'], $match)) {
+		}
+		elseif (preg_match('#p/[0-9]{1,}#', $urltest['path'], $match))
+		{
 			// the path defines the post_ID (archives/p/XXXX)
 			$blah = explode('/', $match[0]);
 			$post_ID = $blah[1];
 			$way = 'from the path';
-		} elseif (preg_match('#p=[0-9]{1,}#', $urltest['query'], $match)) {
+		} 
+		elseif (preg_match('#p=[0-9]{1,}#', $urltest['query'], $match))
+		{
 			// the querystring defines the post_ID (?p=XXXX)
 			$blah = explode('=', $match[0]);
 			$post_ID = $blah[1];
@@ -1143,12 +1139,26 @@ function pingback_ping($m)
 				$post_ID = $blah['ID'];
 				$way = 'from the fragment (title)';
 			}
-		} else {
+		} 
+		else 
+		{
 			$post_ID = -1;
 		}
 
 		debug_fwrite($log, "Found post ID $way: $post_ID\n");
 
+		$postdata = get_postdata($post_ID);
+		$blog = $postdata['Blog'];
+		xmlrpc_debugmsg( 'Blog='.$blog );
+		
+		$blogparams = get_blogparams_by_ID( $blog );
+		if( !get_bloginfo('allowpingbacks', $blogparams) ) 
+		{
+			return new xmlrpcresp(new xmlrpcval('Sorry, this weblog does not allow you to pingback its posts.'));			
+		}
+
+
+		// Check that post exists
 		$sql = 'SELECT post_author FROM '.$tableposts.' WHERE ID = '.$post_ID;
 		$result = mysql_query($sql);
 
@@ -1157,10 +1167,12 @@ function pingback_ping($m)
 			debug_fwrite($log, 'Post exists'."\n");
 
 			// Let's check that the remote site didn't already pingback this entry
-			$sql = "SELECT * FROM $tablecomments WHERE comment_post_ID = $post_ID AND comment_author_url = '.$pagelinkedfrom.' AND comment_type = 'pingback'";
+			$sql = "SELECT * FROM $tablecomments WHERE comment_post_ID = $post_ID AND comment_author_url = '".addslashes(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."' AND comment_type = 'pingback'";
 			$result = mysql_query($sql);
 
-			if (mysql_num_rows($result) || (1==1))
+			xmlrpc_debugmsg( $sql.' Already found='.mysql_num_rows($result) );
+
+			if( ! mysql_num_rows($result))
 			{
 
 				// very stupid, but gives time to the 'from' server to publish !
@@ -1224,8 +1236,6 @@ function pingback_ping($m)
 						/*
 						 * New pingback notification:
 						 */
-						$postdata = get_postdata($post_ID);
-						$blog = $postdata['Blog'];
 						$authordata = get_userdata($postdata['Author_ID']);
 						if( get_user_info( 'notify', $authordata ) )
 						{	// Author wants to be notified:
@@ -1249,20 +1259,23 @@ function pingback_ping($m)
 				else 
 				{	// URL pattern not found - page doesn't link to us:
 					debug_fwrite($log, 'The page doesn\'t link to us!'."\n");
-					$message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
+					$resp_message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
 
 				}
 			} else {
 				// We already have a Pingback from this URL
-				$message = "Sorry, you already did a pingback to $pagelinkedto from $pagelinkedfrom.";
+				$resp_message = "Sorry, you already did a pingback to $pagelinkedto from $pagelinkedfrom.";
 			}
 		} else {
 			// Post_ID not found
-			$message = $messages[2];
+			$resp_message = $messages[2];
 			debug_fwrite($log, 'Post doesn\'t exist'."\n");
 		}
 	}  // / in siteurl
-	return new xmlrpcresp(new xmlrpcval($message));
+
+	// xmlrpc_debugmsg( 'Okay'.$messages[0] );
+
+	return new xmlrpcresp(new xmlrpcval($resp_message));
 }
 
 

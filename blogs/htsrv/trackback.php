@@ -28,12 +28,15 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 {
 	@header('Content-Type: text/xml');
 
-	if (!$use_trackback) 
+	$comment_post_ID = $tb_id;
+	$postdata = get_postdata($comment_post_ID);
+	$blog = $postdata['Blog'];
+	$blogparams = get_blogparams_by_ID( $blog );
+
+	if( !get_bloginfo('allowtrackbacks', $blogparams) ) 
 	{
 		trackback_response(1, 'Sorry, this weblog does not allow you to trackback its posts.');
 	}
-
-	dbconnect();
 
 	$url = addslashes($url);
 	$title = strip_tags($title);
@@ -48,7 +51,6 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$author = addslashes($blog_name);
 	$email = '';
 	$original_comment = $comment;
-	$comment_post_ID = $tb_id;
 
 	$user_ip = $HTTP_SERVER_VARS['REMOTE_ADDR'];
 	$user_domain = gethostbyaddr($user_ip);
@@ -83,8 +85,6 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	/*
 	 * New trackback notification:
 	 */
-	$postdata = get_postdata($comment_post_ID);
-	$blog = $postdata['Blog'];
 	$authordata = get_userdata($postdata['Author_ID']);
 	if( get_user_info( 'notify', $authordata ) )
 	{	// Author wants to be notified:

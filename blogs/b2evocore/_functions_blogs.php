@@ -80,6 +80,8 @@ function blog_update(
 	$blog_roll = '',
 	$blog_keywords = '',
 	$blog_UID = '',
+	$blog_allowtrackbacks = true,
+	$blog_allowpingbacks = true,
 	$blog_pingb2evonet = false,
 	$blog_pingtechnorati = false,
 	$blog_pingweblogs = false,
@@ -102,6 +104,8 @@ function blog_update(
 	$query .= " blog_roll = '".addslashes($blog_roll)."', ";
 	$query .= " blog_keywords = '".addslashes($blog_keywords)."', ";
 	$query .= " blog_UID = '$blog_UID', ";
+	$query .= " blog_allowtrackbacks = $blog_allowtrackbacks, ";
+	$query .= " blog_allowpingbacks = $blog_allowpingbacks, ";
 	$query .= " blog_pingb2evonet = $blog_pingb2evonet, ";
 	$query .= " blog_pingtechnorati = $blog_pingtechnorati, ";
 	$query .= " blog_pingweblogs = $blog_pingweblogs, ";
@@ -190,6 +194,8 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 		case 'lang':
 		case 'shortname':
 		case 'default_skin':
+		case 'allowtrackbacks':
+		case 'allowpingbacks':
 		case 'pingb2evonet':
 		case 'pingtechnorati':
 		case 'pingweblogs':

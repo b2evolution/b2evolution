@@ -216,11 +216,11 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 				$client = new xmlrpc_client( $parsed_url['path'], $parsed_url['host'], $port);
 				// $client->setDebug(true);		// fplanque :))
 				$message = new xmlrpcmsg($method, array(new xmlrpcval($pagelinkedfrom), new xmlrpcval($pagelinkedto)));
-				printf( T_('Pinging %s...'), $host );
+				printf( T_('Pinging %s...')."<br />\n", $host );
 				$result = $client->send($message);
 
 				// Display response
-				xmlrpc_displayresult( $result, $log );
+				$ret = xmlrpc_displayresult( $result, $log );
 				@fclose($fp);
 			}
 			if( $display )	echo "</p>\n";

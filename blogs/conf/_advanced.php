@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.7
+ * Version of this file: 0.8.9
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -83,10 +83,6 @@ $use_spellchecker = 1;
 # set this to 1 to require e-mail and name, or 0 to allow comments without e-mail/name
 $require_name_email = 1;
 
-# set this to 1 to let every author be notified about comments on their posts
-# notifications will be sent to original author of the post
-$comments_notify = 1;
-
 # default email address for sending notifications
 # Set a custom address:
 // $notify_from = 'b2evolution@your_server.com'; // uncomment this if you want to customize
@@ -99,10 +95,6 @@ $use_rss = 1;
 
 
 // ** Trackback / Pingback **
-
-# set this to 0 or 1, whether you want to allow your posts to be trackback'able or not
-# note: setting it to zero would also disable sending trackbacks
-$use_trackback = 1;
 
 # set this to 0 or 1, whether you want to allow your posts to be pingback'able or not
 # note: setting it to zero would also disable sending pingbacks

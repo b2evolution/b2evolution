@@ -36,6 +36,8 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+		param( 'blog_allowtrackbacks', 'integer', 0 );
+		param( 'blog_allowpingbacks', 'integer', 0 );
 		param( 'blog_pingb2evonet', 'integer', 0 );
 		param( 'blog_pingtechnorati', 'integer', 0 );
 		param( 'blog_pingweblogs', 'integer', 0 );
@@ -67,6 +69,8 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+		param( 'blog_allowtrackbacks', 'integer', 0 );
+		param( 'blog_allowpingbacks', 'integer', 0 );
 		param( 'blog_pingb2evonet', 'integer', 0 );
 		param( 'blog_pingtechnorati', 'integer', 0 );
 		param( 'blog_pingweblogs', 'integer', 0 );
@@ -183,6 +187,8 @@ switch($action)
 		$blog_stub = get_bloginfo('stub');
 		$blog_roll = get_bloginfo('blogroll');
 		$blog_keywords = get_bloginfo('keywords');
+		$blog_allowtrackbacks = get_bloginfo('allowtrackbacks');
+		$blog_allowpingbacks = get_bloginfo('allowpingbacks');
 		$blog_pingb2evonet = get_bloginfo('pingb2evonet');
 		$blog_pingtechnorati = get_bloginfo('pingtechnorati');
 		$blog_pingweblogs = get_bloginfo('pingweblogs');
@@ -212,6 +218,8 @@ switch($action)
 		param( 'blog_roll', 'html', '' );
 		param( 'blog_keywords', 'string', '' );
 		param( 'blog_UID', 'string', '' );
+		param( 'blog_allowtrackbacks', 'integer', 0 );
+		param( 'blog_allowpingbacks', 'integer', 0 );
 		param( 'blog_pingb2evonet', 'integer', 0 );
 		param( 'blog_pingtechnorati', 'integer', 0 );
 		param( 'blog_pingweblogs', 'integer', 0 );
@@ -232,7 +240,7 @@ switch($action)
 		blog_update( $blog, $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, $blog_stub,
 									$blog_staticfilename, 
 									$blog_tagline, $blog_description, $blog_longdesc, $blog_lang, $blog_roll, 
-									$blog_keywords, $blog_UID,  
+									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
 									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs )
 								or mysql_oops( $query );
 		

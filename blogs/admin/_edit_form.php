@@ -152,7 +152,7 @@ if ($use_spellchecker)
 	<?php
 	if( $action != "editcomment")
 	{ // this is for everything but comment editing
-		if( $use_pingback )
+		if( get_bloginfo('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
 	?>
 	<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" <?php
@@ -160,7 +160,7 @@ if ($use_spellchecker)
 	<?php
 		}
 
-		if( $use_trackback )
+		if( get_bloginfo('allowtrackbacks') )
 		{	// --------------------------- TRACKBACK --------------------------------------
 	?>
 	<label for="trackback"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" tabindex="8" value="<?php echo format_to_edit( $post_trackbacks ); ?>" />
