@@ -8,8 +8,8 @@
 	$timestamp_min = '';					// Show past
 	$timestamp_max = 'now';				// Hide future
   require dirname(__FILE__)."/../b2evocore/_blog_main.php";
-  // header("Content-type: application/atom+xml");
-  header("Content-type: text/xml");
+  header("Content-type: application/atom+xml");
+  // header("Content-type: text/xml");
   echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 ?>
 <feed version="0.3" xml:lang="<?php $Blog->disp( 'lang', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
