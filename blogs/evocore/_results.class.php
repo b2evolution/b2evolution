@@ -53,8 +53,27 @@ class Results
 	var $total_pages;
 	var $rows = NULL;
 	var $cols = NULL;
+	/**
+	 * Array of headers for each column
+	 *
+	 * All defs are optional.
+	 */
 	var $col_headers = NULL;
+	/**
+	 * Array of fieldnames to sort on when clicking on each column header
+ 	 *
+	 * All defs are optional. A column with no def will be displayed as NOT sortable.
+	 */
 	var $col_orders = NULL;
+	/**
+	 * Array of column start markup for each column.
+	 *
+	 * All defs are optional. A column with no def will de diaplyed using
+	 * the default defs from Results::params, that is to say, one of these:
+	 *   - $this->params['col_start_first'];
+	 *   - $this->params['col_start_last'];
+	 *   - $this->params['col_start'];
+	 */
 	var $col_starts = NULL;
 	var $params = NULL;
 
@@ -232,19 +251,29 @@ class Results
 	 *
 	 * @return int # of rows displayed
 	 */
-	function display()
+	function display( $display_params = NULL )
 	{
-		if( is_null( $this->params ) )
+		if( !is_null($display_params) )
+		{	// Use passed params:
+			$this->params = & $display_params;
+		}
+		elseif( empty( $this->params ) )
 		{	// Set default params:
 			$this->params = array(
-				'before' => '<div>',
-					'header_start' => '',
-					'header_text' => '',
-					'header_end' => '',
+				'before' => '<div class="results">',
+					'header_start' => '<div class="results_nav">',
+					'header_text' => '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$',
+					'header_text_single' => T_('1 page'),
+					'header_end' => '</div>',
+					'title_start' => "<div>\n",
+					'title_end' => "</div>\n",
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
-						'head_start' => "<thead>\n",
+						'head_start' => "<thead><tr>\n",
+							'head_title_start' => '<th colspan="$nb_cols$">'."\n",
+							'head_title_end' => "</th></tr>\n\n<tr>\n",
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
+							'colhead_start_last' => '<th class="lastcol">',
 							'colhead_end' => "</th>\n",
 							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending Order').'" height="12" width="11" />',
 							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending Order').'" height="12" width="11" />',
@@ -253,24 +282,26 @@ class Results
 							'basic_sort_off' => '<img src="../admin/img/basic_sort_off.gif" width="16" height="16" />',
 							'basic_sort_asc' => '<img src="../admin/img/basic_sort_asc.gif" width="16" height="16" />',
 							'basic_sort_desc' => '<img src="../admin/img/basic_sort_desc.gif" width="16" height="16" />',
-						'head_end' => "</thead>\n\n",
+						'head_end' => "</tr></thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
 						'body_start' => "<tbody>\n",
 							'line_start' => "<tr>\n",
 							'line_start_odd' => '<tr class="odd">'."\n",
+							'line_start_last' => '<tr class="lastline">'."\n",
+							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
 								'col_start' => '<td>',
 								'col_start_first' => '<td class="firstcol">',
+								'col_start_last' => '<td class="lastcol">',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 						'body_end' => "</tbody>\n\n",
 					'list_end' => "</table>\n\n",
-					'footer_start' => '<div class="center">',
-					'footer_text' => ( $this->total_pages > 1 ) ? 
-															T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'
-															.'$total_pages$ Pages : $prev$ $list$ $next$ <br />'
-															.'$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') : ' 1 '
-															.T_('Page'),
+					'footer_start' => '<div class="results_nav">',
+					'footer_text' => /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
+														'<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$'
+														/* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
+					'footer_text_single' => T_('1 page'),
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'list_prev_text' => T_('...'),
@@ -285,7 +316,7 @@ class Results
 		}
 
 		echo $this->params['before'];
-		
+
 		if( $this->total_pages == 0 )
 		{	// There are no results! Nothing to display!
 			echo $this->params['no_results'];
@@ -312,41 +343,58 @@ class Results
 			for( $i=0; $i<$nb_cols; $i++ )
 			{
 			 	$col = $matches[1][$i];
-				
+
 				$this->cols[] = '$'.$col.'$';
 				echo $col;
 			}
 		}
+
+
 		echo $this->params['header_start'];
-   	
-		$this->nav_text( $this->params['header_text'] );
+		$this->nav_text( $this->params['header_text'], $this->params['header_text_single'] );
    	echo $this->params['header_end'];
+
+		/*
+		echo $this->params['title_start'];
+		echo $this->title;
+		echo $this->params['title_end'];
+		*/
 
 		echo $this->params['list_start'];
 
 		// -----------------------------
-		// HEADERS:
+		// COLUMN HEADERS:
 		// -----------------------------
 		if( !is_null( $this->col_headers ) )
 		{	// We have headers to display:
 			echo $this->params['head_start'];
 
+			if( isset($this->title) )
+			{	// A title has been defined for this result set:
+		 		echo str_replace( '$nb_cols$', count($this->cols), $this->params['head_title_start'] );
+				echo $this->title;
+				echo $this->params['head_title_end'];
+			}
+
 			$col_count = 0;
 			$col_names = array();
-		
 			foreach( $this->col_headers as $col_header )
 			{ // For each column:
 
-				if( ($col_count==0) && isset($this->params['col_start_first']) )
+				if( ($col_count==0) && isset($this->params['colhead_start_first']) )
 				{ // First column can get special formatting:
 					echo $this->params['colhead_start_first'];
+				}
+				elseif( ($col_count==count($this->cols)-1) && isset($this->params['colhead_start_last']) )
+				{ // Last column can get special formatting:
+					echo $this->params['colhead_start_last'];
 				}
 				else
 				{	// Regular columns:
 					echo $this->params['colhead_start'];
 				}
 
-				if( isset( $this->col_orders[$col_count] ) && strcasecmp( $this->col_orders[$col_count], '' ) )
+				if( !empty( $this->col_orders[$col_count] ) && strcasecmp( $this->col_orders[$col_count], '' ) )
 				{ //the column can be ordered
 
 					$order_asc = '';
@@ -396,18 +444,23 @@ class Results
 					{
 						$class = ' class="'.$style.'_sort_link" ';
 					}
+
 					if( $this->params['sort_type'] == 'single' )
-					{ // single sort mode
-						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type).'" '.$title.$class.' >'
+					{ // single sort mode:
+
+						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type)
+									.'" '.$title.$class.' >'
 									.$col_header.'</a>' 
-									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc).'" title="'.T_('Ascending Order')
+									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc)
+									.'" title="'.T_('Ascending Order')
 									.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
-									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc).'" title="'.T_('Descending Order')
+									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc)
+									.'" title="'.T_('Descending Order')
 									.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
 					}
 					elseif( $this->params['sort_type'] == 'basic' )
-					{ // basic sort mode
-					
+					{ // basic sort mode:
+
 						if( $asc_status == 'off' && $desc_status == 'off' )
 						{ // the sorting is not made on the current column 
 							$sort_item = $this->params['basic_sort_off'];
@@ -422,11 +475,12 @@ class Results
 						}
 					
 						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type).'" title="'.T_('Change Order')
-									.'" '.$class.' >'.$col_header.' '.$sort_item.'</a>';
+									.'" '.$class.' >'.$sort_item.' '.$col_header.'</a>';
 					}
 				}
-				elseif( !isset( $this->col_orders[$col_count] ) )
-				{ // the column can't be ordered
+				elseif( empty( $this->col_orders[$col_count] ) )
+				{ // the column can't be ordered:
+
 					echo $col_header ;
 				}
 				$col_count++;
@@ -448,13 +502,24 @@ class Results
 		// -----------------------------
 		// DATA ROWS:
 		// -----------------------------
+		$line_count = 0;
 		foreach( $this->rows as $row )
 		{	// For each row/line:
 
-			if( ($this->current_idx % 2) && isset($this->params['line_start_odd']) )
-				echo $this->params['line_start_odd'];
+			if( $this->current_idx % 2 )
+			{	// Odd line:
+				if( $this->current_idx == count($this->rows)-1 )
+					echo $this->params['line_start_odd_last'];
+				else
+					echo $this->params['line_start_odd'];
+			}
 			else
-				echo $this->params['line_start'];
+			{	// Even line:
+				if( $this->current_idx == count($this->rows)-1 )
+					echo $this->params['line_start_last'];
+				else
+					echo $this->params['line_start'];
+			}
 
 			$col_count = 0;
 			foreach( $this->cols as $col )
@@ -467,6 +532,10 @@ class Results
 				elseif( ($col_count==0) && isset($this->params['col_start_first']) )
 				{	// Display first column column start:
 					$output = $this->params['col_start_first'];
+				}
+				elseif( ($col_count==count($this->cols)-1) && isset($this->params['col_start_last']) )
+				{ // Last column can get special formatting:
+					$output = $this->params['col_start_last'];
 				}
 				else
 				{	// Display regular colmun start:
@@ -493,7 +562,7 @@ class Results
 		echo $this->params['list_end'];
 
    	echo $this->params['footer_start'];
-   	$this->nav_text( $this->params['footer_text'] );
+   	$this->nav_text( $this->params['footer_text'], $this->params['footer_text_single'] );
    	echo $this->params['footer_end'];
 
 		echo $this->params['after'];
@@ -530,7 +599,7 @@ class Results
 		$alert = 0;
 		while( $alert != 1 )
 		{ //verification of the array up to the first defined element
-			if( isset( $array[$i] ) )
+			if( !empty( $array[$i] ) )
 			{ //the current element of the array is defined
 				$alert = 1;
 				return $i;
@@ -544,14 +613,21 @@ class Results
 	 * Displays navigation text, based on template:
 	 *
 	 * @param string template
+	 * @param string to display if there is only one page
 	 */
-	function nav_text( $template )
+	function nav_text( $template, $single = NULL )
 	{
 		if( empty( $template ) )
 			return;
 
-		//preg_replace_callback is used to avoid calculating unecessary values
-		echo preg_replace_callback( '#\$([a-z_]+)\$#', array( $this, 'callback'), $template); 
+		if( ( $this->total_pages <= 1 ) && !is_null( $single ) )
+		{
+			echo $single;
+		}
+		else
+		{	//preg_replace_callback is used to avoid calculating unecessary values
+			echo preg_replace_callback( '#\$([a-z_]+)\$#', array( $this, 'callback'), $template);
+		}
 	}
 				
 
@@ -726,7 +802,7 @@ class Results
 		{
 			if( $i == $this->page )
 			{ //no link for the current page
-				$list = $list.'<strong>'.$i.'</strong> ';
+				$list = $list.'<strong class="current_page">'.$i.'</strong> ';
 			}
 			else
 			{ //a link for non-current pages
@@ -844,6 +920,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/20 18:45:54  fplanque
+ * cleanup
+ *
  * Revision 1.8  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *
