@@ -268,10 +268,10 @@ elseif( isset($_GET['login'] ) && isset($_GET['pwd'] ))
 	unset($_GET['pwd']); // password is hashed from now on
 }
 
-if( !empty($login) && !empty($pass_md5) )
+if( !empty($login) && !empty($pass) )
 { // User is trying to login right now
 	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
-	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass_md5) : $pass_md5);
+	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
 	$pass_md5 = md5( $pass );
 
 	// echo 'Trying to log in right now...';
@@ -419,6 +419,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/23 23:05:06  blueyed
+ * fixed login / pass/pass_md5
+ *
  * Revision 1.20  2005/02/23 20:36:15  blueyed
  * also pass raw password to LoginAttempt plugin event
  *
