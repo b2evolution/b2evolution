@@ -58,7 +58,6 @@
 require_once dirname(__FILE__).'/_header.php';
 
 $AdminUI->setPath( 'files' );
-$admin_pagetitle = T_('Filemanager').' (beta)';
 
 
 if( !$Settings->get( 'fm_enabled' ) )
@@ -470,9 +469,6 @@ if( !empty($action) )
 // Adjust page title
 switch( $Fileman->getMode() )
 {
-	case 'file_upload':
-		$admin_pagetitle = T_('Upload').$admin_path_seprator.$admin_pagetitle;
-		break;
 }
 
 
@@ -1195,6 +1191,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.79  2005/03/07 00:06:17  blueyed
+ * admin UI refactoring, part three
+ *
  * Revision 1.78  2005/02/28 09:06:39  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

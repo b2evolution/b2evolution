@@ -21,6 +21,7 @@ param( 'blog', 'integer', 0 );
 
 if( $action != 'addcat' && $action != 'editedcat' )
 { // Blog list
+	$blog = autoselect_blog( $blog, 'blog_cats', '' );
 
 	// Generate available blogs list:
 	$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
@@ -295,7 +296,7 @@ switch($action)
 
 	default:
 		// Just display cat list for this blog:
-		if( $blog == 0 || ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
+		if( $blog == 0 )
 		{ // No blog could be selected:
 			?>
 			<div class="panelinfo">

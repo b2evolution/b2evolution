@@ -13,7 +13,7 @@
  * Includes:
  */
 require( dirname(__FILE__).'/_header.php' );
-$admin_pagetitle = T_('Spell Check');
+$AdminUI->title = T_('Spell Check');
 ?>
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>

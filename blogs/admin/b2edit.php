@@ -94,39 +94,17 @@ switch($action)
 
 		$AdminUI->title = $AdminUI->title_titlearea = T_('New post in blog:');
 
-
-		if( $blog == 0 )
-		{ // No blog is selected so far...
-			if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $default_to_blog ) )
-			{ // Default blog is a valid choice
-				$blog = $default_to_blog;
-			}
-			else
-			{ // Let's try to find another one:
-				for( $curr_blog_ID = blog_list_start();
-							$curr_blog_ID != false;
-							$curr_blog_ID = blog_list_next() )
-				{
-					if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $curr_blog_ID ) )
-					{ // Current user is a member of this blog... let's select it:
-						$blog = $curr_blog_ID;
-						break;
-					}
-				}
-			}
-		}
-
-
+		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->getCollectionList( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '', 
-												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), %d )' 
+		$blogListButtons = $AdminUI->getCollectionList( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
+												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), %d )'
 												: '' /* Current blog has no cats, we can't be posting */ ) );
 		// TODO: edit_reload params handling is far from complete..
 
 		require (dirname(__FILE__).'/_menutop.php');
 
-		if( $blog == 0 )
+		if( !$blog )
 		{
 			?>
 			<div class="panelblock">

@@ -501,8 +501,53 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 }
 
 
+/**
+ *
+ *
+ * @return integer The selected blog (0 means failure).
+ */
+function autoselect_blog( $selectedBlog, $permname, $permlevel )
+{
+	global $current_User;
+	global $default_to_blog;
+
+	if( $selectedBlog )
+	{ // a blog is selected
+		if( !$current_User->check_perm( $permname, $permlevel, false, $selectedBlog ) )
+		{ // invalid blog
+			$selectedBlog = 0;
+		}
+	}
+
+	if( !$selectedBlog )
+	{ // No blog is selected so far (or selection was invalid)...
+		if( $current_User->check_perm( $permname, $permlevel, false, $default_to_blog ) )
+		{ // Default blog is a valid choice
+			$selectedBlog = $default_to_blog;
+		}
+		else
+		{ // Let's try to find another one:
+			for( $curr_blog_ID = blog_list_start();
+						$curr_blog_ID != false;
+						$curr_blog_ID = blog_list_next() )
+			{
+				if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
+				{ // Current user is a member of this blog... let's select it:
+					$selectedBlog = $curr_blog_ID;
+					break;
+				}
+			}
+		}
+	}
+
+	return $selectedBlog;
+}
+
 /*
  * $Log$
+ * Revision 1.9  2005/03/07 00:06:18  blueyed
+ * admin UI refactoring, part three
+ *
  * Revision 1.8  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

@@ -19,54 +19,27 @@ $itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'ps
 
 $AdminUI->setPath( 'edit' );
 $AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
-param( 'blog', 'integer', 0 );
 
-if( $blog == 0 )
-{ // No blog is selected so far...
-	if( $current_User->check_perm( 'blog_ismember', 1, false, $default_to_blog ) )
-	{ // Default blog is a valid choice
-		$blog = $default_to_blog;
-	}
-	else
-	{ // Let's try to find another one:
-		for( $curr_blog_ID = blog_list_start();
-					$curr_blog_ID != false;
-					$curr_blog_ID = blog_list_next() )
-		{
-			if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
-			{ // Current user is a member of this blog... let's select it:
-				$blog = $curr_blog_ID;
-				break;
-			}
-		}
-	}
-}
+$blog = autoselect_blog( param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
 
-if( $blog != 0 )
-{ // We could select a blog:
+if( $blog )
+{
 	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
-	$admin_pagetitle .= ' '.$Blog->dget( 'shortname' );
+	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
 }
+else
+{ // No blog could be selected
+	$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'. $admin_email. '?subject=b2-promotion"' ) );
+}
+
 
 // Generate available blogs list:
 $blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?blog=%d' );
 
 require( dirname(__FILE__).'/_menutop.php' );
 
-if( $blog == 0 )
-{ // No blog could be selected
-	?>
-	<div class="panelblock">
-	<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'. $admin_email. '?subject=b2-promotion"' ); ?>
-	</div>
-	<?php
-}
-else
-{ // We could select a blog:
-
-	// Check permission:
-	$current_User->check_perm( 'blog_ismember', 1, true, $blog );
-
+if( $blog )
+{ // We could select a valid blog:
 	// Show the posts:
 	$add_item_url = 'b2edit.php?blog='.$blog;
 	$edit_item_url = 'b2edit.php?action=edit&amp;post=';

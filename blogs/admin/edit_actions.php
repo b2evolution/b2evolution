@@ -63,7 +63,7 @@ switch($action)
 				break;
 		}
 
-		$admin_pagetitle = T_('Adding new post...');
+		$AdminUI->title = T_('Adding new post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 
 		param( 'post_status', 'string', 'published' );
@@ -163,7 +163,7 @@ switch($action)
 		$blogparams = get_blogparams_by_ID( $blog );
 		$location = 'b2browse.php?blog='. $blog;
 
-		$admin_pagetitle = T_('Updating post...');
+		$AdminUI->title = T_('Updating post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 
 		param( 'post_status', 'string', 'published' );
@@ -291,7 +291,7 @@ switch($action)
 		$blogparams = get_blogparams_by_ID( $blog );
 		$location = 'b2browse.php?blog=' . $blog;
 
-		$admin_pagetitle = T_('Updating post status...');
+		$AdminUI->title = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
 
 		$post_status = 'published';
@@ -369,7 +369,7 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * DELETE a post from db
 		 */
-		$admin_pagetitle = T_('Deleting post...');
+		$AdminUI->title = T_('Deleting post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 
 		param( 'post', 'integer' );

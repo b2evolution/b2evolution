@@ -25,6 +25,8 @@
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
+ * @todo (sessions) When creating a blog, provide "edit options" instead of "New" form (storing the new Blog with the session data).
+ *
  * @version $Id$
  */
 
@@ -33,9 +35,8 @@
  */
 require_once dirname(__FILE__).'/_header.php'; // this will actually load blog params for the requested blog
 
-
-$AdminUI->setPath( 'blogs', param( 'tab', 'string', 'general' ) );
-$admin_pagetitle = T_('Blogs');
+param( 'tab', 'string', 'general' );
+$AdminUI->setPath( 'blogs' );
 
 param( 'action', 'string', '' );
 param( 'blogtemplate', 'integer', -1 );
@@ -54,7 +55,6 @@ else
 {
 	$edited_Blog = & new Blog( NULL );
 }
-
 
 
 function set_edited_Blog_from_params( $for )
@@ -181,32 +181,18 @@ switch( $action )
 {
 	case 'new':
 	case 'create':
-		$admin_pagetitle .= ' :: '.T_('New');
+		$AdminUI->addPath( 'new', array( 'text' => T_('New') ) );
 		break;
 
 	case 'update':
 	case 'edit':
-		$admin_pagetitle .= ' :: ['.$edited_Blog->dget('shortname').']';
-		switch( $AdminUI->getPath(1) )
-		{
-			case 'general':
-				$admin_pagetitle .= ' :: '. T_('General');
-				break;
-			case 'perm':
-				$admin_pagetitle .= ' :: '. T_('Permissions');
-				break;
-			case 'advanced':
-				$admin_pagetitle .= ' :: '. T_('Advanced');
-				break;
-		}
+		$AdminUI->addPath( $tab );
+		$AdminUI->addPath( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
 
-
-
-	// Generate available blogs list:
-	$blogListButtons = $AdminUI->getCollectionList( 'blog_properties', 'edit',
-												'blogs.php?action=edit&amp;blog=%d&amp;tab='.$AdminUI->getPath(1),
-												T_('List'), 'blogs.php' );
-
+		// Generate available blogs list:
+		$blogListButtons = $AdminUI->getCollectionList( 'blog_properties', 'edit',
+													'blogs.php?action=edit&amp;blog=%d&amp;tab='.$AdminUI->getPath(1),
+													T_('List'), 'blogs.php' );
 }
 
 require( dirname(__FILE__).'/_menutop.php' );
@@ -567,6 +553,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.33  2005/03/07 00:06:16  blueyed
+ * admin UI refactoring, part three
+ *
  * Revision 1.32  2005/03/06 19:58:27  blueyed
  * admin UI refactoring, part deux
  *

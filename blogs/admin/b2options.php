@@ -45,21 +45,10 @@
  */
 require( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'options', param( 'tab', 'string', 'general' ) );
-$admin_pagetitle = T_('Settings');
 
 param( 'action', 'string' );
 param( 'edit_locale', 'string' );
 param( 'loc_transinfo', 'integer', 0 );
-
-switch( $AdminUI->getPath(1) )
-{
-	case 'general':
-		$admin_pagetitle .= $admin_path_seprator.T_('General');
-		break;
-	case 'regional':
-		$admin_pagetitle .= $admin_path_seprator.T_('Regional');
-		break;
-}
 
 require( dirname(__FILE__).'/_menutop.php' );
 
@@ -438,6 +427,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.89  2005/03/07 00:06:16  blueyed
+ * admin UI refactoring, part three
+ *
  * Revision 1.88  2005/03/04 18:40:26  fplanque
  * added Payload display wrappers to admin skin object
  *

@@ -97,17 +97,20 @@ $AdminUI->addMenuEntries( NULL, // root
 																									'href'=>'b2antispam.php' ),
 
 														'templates' => array( 'text'=>T_('Templates'),
+																									'title' => T_('Custom skin template editing'),
 																									'perm_name'=>'templates',
 																									'perm_level'=>'any',
 																									'href'=>'b2template.php' ),
 
 														'users' => array( 'text'=>T_('Users & Groups'),
+																							'title'=>T_('User management'),
 																							'perm_name'=>'users',
 																							'perm_level'=>'view',
 																							'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
 																							'href'=>'b2users.php' ),
 
 														'files' => array( 'text'=>T_('Files'),
+																							'title' => T_('Filemanager').' (beta)',
 																							'href'=>'files.php',
 																							'perm_eval' => 'return $current_User->level == 10;'),
 

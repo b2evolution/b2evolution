@@ -15,7 +15,6 @@
  */
 require_once( dirname(__FILE__).'/_header.php' ); // this will actually load blog params for req blog
 $AdminUI->setPath( 'tools' );
-$admin_pagetitle = T_('Tools');
 require( dirname(__FILE__).'/_menutop.php' );
 
 // Loop through plugins:

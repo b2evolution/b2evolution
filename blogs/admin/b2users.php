@@ -12,9 +12,8 @@
 /**
  * Includes:
  */
-require_once( dirname(__FILE__). '/_header.php' );
+require_once( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'users' );
-$admin_pagetitle = T_('User management');
 
 param( 'action', 'string', '' );
 param( 'user', 'integer', 0 );

@@ -65,8 +65,19 @@ class AdminUI_general
 
 	/**
 	 * The path of the selected menu.
+	 * Use {@link setPath()}, {@link setPathArray()} or
+	 * {@link setPathByNr()} to set it.
+	 * @var array
 	 */
 	var $path = array();
+
+	/**
+	 * The properties of the path entries.
+	 * Use {@link setPath()}, {@link setPathArray()} or
+	 * {@link setPathByNr()} to set it.
+	 * @var array
+	 */
+	var $pathProps = array();
 
 	/**
 	 * Visual path seperator (used in html title, ..)
@@ -138,15 +149,29 @@ class AdminUI_general
 	 *
 	 * @return
 	 */
-	function getTitle()
+	function getTitle( $reversedDefault = false )
 	{
 		if( isset($this->title) )
 		{
 			return $this->title;
 		}
-
-		return implode( $this->pathSeperator,
-										$this->getPropertiesForPath( $this->path, array( 'title', 'text' ) ) );
+		elseif( $title = $this->getPathProperty( 'last', array( 'title' ) ) )
+		{
+			return $title;
+		}
+		elseif( $title = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
+		{
+			return $title;
+		}
+		else
+		{
+			$titles = $this->getPropertiesForPath( $this->path, array( 'title', 'text' ) );
+			if( $reversedDefault )
+			{
+				$titles = array_reverse($titles);
+			}
+			return implode( $this->pathSeperator, $titles );
+		}
 	}
 
 
@@ -162,6 +187,10 @@ class AdminUI_general
 		if( isset( $this->title_titlearea ) )
 		{
 			$r .= $this->title_titlearea;
+		}
+		elseif( $titleForTitlearea = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
+		{
+			$r .= $titleForTitlearea;
 		}
 		else
 		{
@@ -180,17 +209,33 @@ class AdminUI_general
 	function getHtmlTitle()
 	{
 		global $app_shortname;
-		return $app_shortname
-						.$this->pathSeperator.preg_replace( '/:$/', '', strip_tags( $this->getTitle() ) );
+
+		$r = '';
+
+		if( $htmltitle = $this->getPropertyForNode( $this->path, array( 'htmltitle' ) ) )
+		{ // explicit htmltitle set
+			$r .= $htmltitle;
+		}
+		else
+		{
+			$r .= #preg_replace( '/:$/', '',
+						$this->getTitle( true )
+						#)
+						;
+		}
+
+		return $r.$this->pathSeperator.$app_shortname;
 	}
 
 
 	/**
-	 * Get a list of properties for a given path. The property names must be given in
-	 * $propertyByPreference, ordered by preference.
+	 * Get a list of properties for a given path for a set of property names to check.
+	 * The result is a list of properties for each node down the path.
+	 *
+	 * The property names must be given in $propertyByPreference, ordered by preference.
 	 *
 	 * @param string|array The path. See {@link getNode()}.
-	 * @param array Name of the property to receive, by priority.
+	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return array List of the properties.
 	 */
 	function getPropertiesForPath( $path, $propertyByPreference )
@@ -202,23 +247,62 @@ class AdminUI_general
 		$r = array();
 
 		$prevPath = array();
-		foreach( $path as $lPath )
+		foreach( $path as $i => $lPath )
 		{
-			$node =& $this->getNode( array_merge( $prevPath, $lPath ) );
-
-			foreach( $propertyByPreference as $lProp )
+			if( false !== ($prop = $this->getPathProperty( $i, $propertyByPreference )) )
 			{
-				if( isset($node[$lProp]) )
-				{
-					$r[] = $node[$lProp];
-					break;
-				}
+				$r[] = $prop;
 			}
 
 			$prevPath[] = $lPath;
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get a property of a node, given by path.
+	 *
+	 * @param string|array The path. See {@link getNode()}.
+	 * @param array Alternative names of the property to receive (ordered by priority).
+	 * @return mixed|false False if property is not set for the node, otherwise its value.
+	 */
+	function getPropertyForNode( $path, $propertyByPreference )
+	{
+		$node =& $this->getNode( $path );
+
+		foreach( $propertyByPreference as $lProp )
+		{
+			if( isset($node[$lProp]) )
+			{
+				return $node[$lProp];
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 *
+	 *
+	 * @return
+	 */
+	function getPathProperty( $nr, $propertyByPreference )
+	{
+		if( $pathWithProps = $this->getPath( $nr, true ) )
+		{
+			foreach( $propertyByPreference as $lProp )
+			{
+				if( isset($pathWithProps['props'][$lProp]) )
+				{
+					return $pathWithProps['props'][$lProp];
+				}
+			}
+		}
+
+		return false;
 	}
 
 
@@ -565,7 +649,10 @@ class AdminUI_general
 													'beforeEachSelWithSub' => '<li class="parent">',
 													'afterEachSelWithSub' => '</li>',
 													'_props' => array(
-															'recurseSelected' => true,  // recurse for subentries if an entry is selected
+															/**
+															 * @todo Move to new skin (recurse for subentries if an entry is selected)
+															'recurseSelected' => true,
+															*/
 														),
 												);
 
@@ -667,20 +754,43 @@ class AdminUI_general
 
 
 	/**
+	 * Get a path key by numeric key.
 	 *
-	 *
-	 * @return string|false
+	 * @param integer The numeric index of the path.
+	 * @param boolean Also return properties?
+	 * @return string|array|false (depends on $withProps)
 	 */
-	function getPath( $which )
+	function getPath( $which, $withProps = false )
 	{
-		return isset($this->path[$which]) ? $this->path[$which] : false;
+		if( $which === 'last' )
+		{
+			$which = count($this->path)-1;
+		}
+		if( !isset($this->path[$which]) )
+		{
+			return false;
+		}
+
+		if( $withProps )
+		{
+			return array(
+					'path' => $this->path[$which],
+					'props' => isset( $this->pathProps[$which] )
+											? $this->pathProps[$which]
+											: array(),
+				);
+		}
+
+		return $this->path[$which];
 	}
 
 
 	/**
+	 * Get tghe list of path keys in a given range.
 	 *
-	 *
-	 * @return array
+	 * @param integer start index
+	 * @param integer|NULL end index (NULL means same as start index)
+	 * @return array List of path keys.
 	 */
 	function getPathRange( $start, $end = NULL )
 	{
@@ -700,13 +810,21 @@ class AdminUI_general
 
 
 	/**
-	 * Set $key as the $nr'th path key.
+	 * Set $pathKey as the $nr'th path key.
 	 *
-	 * Also marks the parent node as selected
+	 * Also marks the parent node as selected.
+	 *
+	 * @param integer|NULL Numerical index of the path, NULL means 'append'.
+	 * @param array Either the key of the path or an array(keyname, propsArray).
+	 * @param array Properties for this path entry.
 	 */
-	function setPathByNr( $key, $nr = 0 )
+	function setPathByNr( $nr, $pathKey, $pathProps = array() )
 	{
-		if( $nr == 0 )
+		if( is_null($nr) )
+		{ // append
+			$nr = count($this->path);
+		}
+		if( $nr === 0 )
 		{
 			$parentNode =& $this->getNode(NULL);
 		}
@@ -714,28 +832,38 @@ class AdminUI_general
 		{
 			$parentNode =& $this->getNode($this->getPathRange( 0, $nr-1 ));
 		}
-		$parentNode['selected'] = $key;
+		$parentNode['selected'] = $pathKey;
 
-		$this->path[$nr] = $key;
+		$this->path[$nr] = $pathKey;
+		$this->pathProps[$nr] = $pathProps;
+
+		#pre_dump( 'setPathByNr: ', $nr, $pathKey, $pathProps );
 	}
 
 
 	/**
+	 * Add a path at the end of the path list.
 	 *
-	 * @uses setPathByNr()
+	 * @param string|array Either the key of the path or an array(keyname, propsArray).
 	 */
-	function setPathArray( $pathArray )
+	function addPath( $path, $pathProps = array() )
 	{
-		foreach( $pathArray as $lKey => $lPath )
+		// auto-detect path props from menu entries
+		if( $node =& $this->getNode( array_merge( $this->path, $path ) ) )
 		{
-			$this->setPathByNr( $value, $lKey );
+			$pathProps = array_merge( $pathProps, $node );
 		}
+
+		$this->setPathByNr( NULL, $path, $pathProps );
 	}
 
 
 	/**
+	 * Set the paths beginning atall the paths passed as arguments.
 	 *
-	 * @param string,... the keys for the path
+	 * This is an easy stub for {@link setPathByNr()}.
+	 *
+	 * @param string|array,... Either the key of the path or an array(keyname, propsArray).
 	 * @uses setPathByNr()
 	 */
 	function setPath()
@@ -743,9 +871,28 @@ class AdminUI_general
 		$args = func_get_args();
 
 		$i = 0;
+		$prevPath = array();
+
 		foreach( $args as $arg )
 		{
-			$this->setPathByNr( $arg, $i++ );
+			if( is_array($arg) )
+			{
+				list( $pathName, $pathProps ) = $arg;
+			}
+			else
+			{
+				$pathName = $arg;
+				$pathProps = array();
+			}
+
+			if( $node =& $this->getNode( array_merge($prevPath, $pathName) ) )
+			{
+				$pathProps = $node;
+			}
+
+			$this->setPathByNr( $i++, $pathName, $pathProps );
+
+			$prevPath[] = $pathName;
 		}
 	}
 
