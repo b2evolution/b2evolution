@@ -415,6 +415,8 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'enyamodel.com')";
 	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'consulmex-la.com')";
+	mysql_query($query) or mysql_oops( $query );
 	
 	/*
 	These sites try to set cookies with the name "url" and content being the
@@ -423,6 +425,8 @@ function populate_antispam()
 	$query = "INSERT INTO $tableantispam VALUES ('', 'binevolve.com')";
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'collegedictionary.net')";
+	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'sound-computing.com')";
 	mysql_query($query) or mysql_oops( $query );
 	
 	/*
