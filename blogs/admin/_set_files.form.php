@@ -96,7 +96,8 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	<fieldset>
 		<div class="input">
 			<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+			<input type="submit" name="submit" value="<?php echo T_('Set defaults') ?>" class="search" />
+			<input type="reset" value="<?php echo T_('Reset form') ?>" class="search" />
 		</div>
 	</fieldset>
 </fieldset>

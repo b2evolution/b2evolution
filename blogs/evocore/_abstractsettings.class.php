@@ -120,6 +120,9 @@ class AbstractSettings
 	 */
 	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
 	{
+		global $DB;
+		$this->DB =& $DB;
+
 		$this->dbTableName = $dbTableName;
 		$this->colKeyNames = $colKeyNames;
 		$this->colValueName = $colValueName;
@@ -195,48 +198,52 @@ class AbstractSettings
 		}
 
 
-		global $DB;
-		$result = $DB->get_results( 'SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
-																.' FROM '.$this->dbTableName
-																.( isset( $whereList[0] ) ?
-																		' WHERE '.implode( ' AND ', $whereList ) :
-																		'' ) );
+		$result = $this->DB->get_results(
+								'SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
+								.' FROM '.$this->dbTableName
+								.( isset( $whereList[0] ) ?
+										' WHERE '.implode( ' AND ', $whereList ) :
+										'' )
+							);
 
 		switch( $this->count_colKeyNames )
 		{
 			case 1:
 				if( !$result )
-				{
+				{ // Remember that we've tried it
 					$this->cache[ $getArgs[0] ] = NULL;
 				}
 				else foreach( $result as $loop_row )
 				{
 					$this->cache[$loop_row->{$this->colKeyNames[0]}]->value = $loop_row->{$this->colValueName};
-					$this->cache[$loop_row->{$this->colKeyNames[0]}]->dbuptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}]->dbUptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}]->dbRemove = false;
 				}
 				break;
 
 			case 2:
 				if( !$result )
-				{
+				{ // Remember that we've tried it
 					$this->cache[ $getArgs[0] ][ $getArgs[1] ] = NULL;
 				}
 				else foreach( $result as $loop_row )
 				{
 					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->value = $loop_row->{$this->colValueName};
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->dbuptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->dbUptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->dbRemove = false;
 				}
 				break;
 
 			case 3:
 				if( !$result )
-				{
+				{ // Remember that we've tried it
 					$this->cache[ $getArgs[0] ][ $getArgs[1] ][ $getArgs[2] ] = NULL;
 				}
 				else foreach( $result as $loop_row )
 				{
 					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->value = $loop_row->{$this->colValueName};
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->uptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->dbUptodate = true;
+					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->dbRemove = false;
 				}
 				break;
 		}
@@ -373,48 +380,141 @@ class AbstractSettings
 		global $Debuglog;
 
 		$args = func_get_args();
-		$this->load( $args ); // the last Arg is not meant to go to load() but it does no harm AFAICS
-
 		$count_args = func_num_args();
 
-		if( $count_args != ( $this->count_colKeyNames + 1) )
-		{
-			$Debuglog->add( 'Count of arguments for AbstractSettings::set() does not match $colkeyname + 1 (colkeyvalue).', 'error' );
-			return false;
-		}
+		$this->load( $args ); // the last Arg is not meant to go to load() but it does no harm AFAICS
+
+		$debugMsg = get_class($this).'::set( '.implode(', ', $args ).' ): ';
+
 
 		switch( $this->count_colKeyNames )
 		{
 			case 1:
-				$atcache =& $this->cache[ $args[0] ];
+				$atCache =& $this->cache[ $args[0] ];
 				break;
+
 			case 2:
-				$atcache =& $this->cache[ $args[0] ][ $args[1] ];
+				$atCache =& $this->cache[ $args[0] ][ $args[1] ];
 				break;
+
 			case 3:
-				$atcache =& $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
+				$atCache =& $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
 				break;
+
 			default:
 				return false;
 		}
 
-		$debugMsg = get_class($this).'::set( '.implode(', ', $args ).' ): ';
+		$atCache->dbRemove = false;
 
-		if( isset($atcache->value) )
+		if( isset($atCache->value) )
 		{
-			if( $atcache->value == $args[ $count_args-1 ] )
+			if( $atCache->value == $args[ $count_args-1 ] )
 			{ // already set
 				$Debuglog->add( $debugMsg.' Already set to the same value.', 'settings' );
 				return false;
 			}
 		}
 
-		$atcache->value = $args[ $count_args-1 ];
-		$atcache->dbuptodate = false;
+		$atCache->value = $args[ $count_args-1 ];
+		$atCache->dbUptodate = false;
 
 		$Debuglog->add( $debugMsg.' SET!', 'settings' );
 
 		return true;
+	}
+
+
+	/**
+	 *
+	 * @uses param()
+	 */
+	function setByParam()
+	{
+		global $Debuglog;
+
+		$args = func_get_args();
+		$paramArgs = array_slice( $args, $this->count_colKeyNames );
+
+		$param = call_user_func_array( 'param', $paramArgs );
+
+		if( $param !== NULL )
+		{
+			$setArgs = array_slice( $args, 0, $this->count_colKeyNames );
+			$setArgs[] = $param;
+
+			call_user_func_array( array( &$this, 'set' ), $setArgs );
+		}
+
+
+		$Debuglog->add( get_class($this).'::setByParam(): param( '.implode( ', ', $paramArgs ).' ): '.var_export($param, true)
+										.' => '.( is_null($param) ?
+															'NOT set!' :
+															'set!' ),
+										'note' );
+
+		return true;
+	}
+
+
+	/**
+	 * Set an array of values.
+	 *
+	 * @param array Array of parameters for {@link set()}
+	 */
+	function setArray( $array )
+	{
+		foreach( $array as $lSet )
+		{
+			call_user_func_array( array( &$this, 'set' ), $lSet );
+		}
+	}
+
+
+	/**
+	 * Remove a setting.
+	 *
+	 * @param array List of {@link $colKeyNames}
+	 */
+	function delete( $args )
+	{
+		$args = func_get_args();
+
+		switch( $this->count_colKeyNames )
+		{
+			case 1:
+				$atCache =& $this->cache[ $args[0] ];
+				break;
+
+			case 2:
+				$atCache =& $this->cache[ $args[0] ][ $args[1] ];
+				break;
+
+			case 3:
+				$atCache =& $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
+				break;
+
+			default:
+				return false;
+		}
+
+		$atCache->dbRemove = true;
+
+		return true;
+	}
+
+
+	/**
+	 * Delete an array of values.
+	 *
+	 * @param array Array of parameters for {@link delete()}
+	 */
+	function deleteArray( $array )
+	{
+		foreach( $array as $lDel )
+		{
+			call_user_func_array( array( &$this, 'delete' ), $lDel );
+		}
 	}
 
 
@@ -425,69 +525,105 @@ class AbstractSettings
 	 */
 	function updateDB()
 	{
-		global $DB;
-
-		$query_insert = array();
-
 		if( !$this->cache )
 		{
 			return false;
 		}
 
 
+		$query_insert = array();
+		$query_where_delete = array();
+
 		switch( $this->count_colKeyNames )
 		{
 			case 1:
 				foreach( $this->cache as $key => $value )
 				{
-					if( !$value->dbuptodate )
+					if( $value->dbRemove )
 					{
-						$query_insert[] = "('$key', '".$DB->escape( $value->value )."')";
+						$query_where_delete[] = "{$this->colKeyNames[0]} = '$key'";
+						unset( $this->cache[$key] );
+					}
+					elseif( isset($value->dbUptodate) && !$value->dbUptodate )
+					{
+						$query_insert[] = "('$key', '".$this->DB->escape( $value->value )."')";
+						$this->cache[$key]->dbUptodate = true;
 					}
 				}
 				break;
 
 			case 2:
 				foreach( $this->cache as $key => $value )
+				{
 					foreach( $value as $key2 => $value2 )
 					{
-						if( !$value2->dbuptodate )
+						if( $value2->dbRemove )
 						{
-							$query_insert[] = "('$key', '$key2', '".$DB->escape( $value2->value )."')";
+							$query_where_delete[] = "{$this->colKeyNames[0]} = '$key' AND {$this->colKeyNames[1]} = '$key2'";
+							unset( $this->cache[$key][$key2] );
+						}
+						elseif( isset($value2->dbUptodate) && !$value2->dbUptodate )
+						{
+							$query_insert[] = "('$key', '$key2', '".$this->DB->escape( $value2->value )."')";
+							$this->cache[$key][$key2]->dbUptodate = true;
 						}
 					}
+				}
 				break;
 
 			case 3:
 				foreach( $this->cache as $key => $value )
+				{
 					foreach( $value as $key2 => $value2 )
+					{
 						foreach( $value2 as $key3 => $value3 )
 						{
-							if( !$value3->dbuptodate )
+							if( $value3->dbRemove )
 							{
-								$query_insert[] = "('$key', '$key2', '$key3', '".$DB->escape( $value3->value )."')";
+								$query_where_delete[] = "{$this->colKeyNames[0]} = '$key' AND {$this->colKeyNames[1]} = '$key2' AND {$this->colKeyNames[2]} = '$key3'";
+								unset( $this->cache[$key][$key2][$key3] );
+							}
+							elseif( isset($value3->dbUptodate) && !$value3->dbUptodate )
+							{
+								$query_insert[] = "('$key', '$key2', '$key3', '".$this->DB->escape( $value3->value )."')";
+								$this->cache[$key][$key2][$key3]->dbUptodate = true;
 							}
 						}
+					}
+				}
 				break;
 
 			default:
 				return false;
 		}
 
+
+		$r = false;
+
+		if( isset($query_where_delete[0]) )
+		{
+			$query = 'DELETE FROM '.$this->dbTableName." WHERE\n(".implode( ")\nOR (", $query_where_delete ).')';
+			$r = (boolean)$this->DB->query( $query );
+		}
+
+
 		if( isset($query_insert[0]) )
 		{
 			$query = 'REPLACE INTO '.$this->dbTableName.' ('.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
 								.') VALUES '.implode(', ', $query_insert);
-			return (boolean)$DB->query( $query );
+			$r = $this->DB->query( $query ) || $r;
 		}
 
-		return false;
+		return $r;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.11  2005/01/10 20:29:26  blueyed
+ * Defaults / Refactored AbstractSettings
+ *
  * Revision 1.10  2005/01/06 11:35:00  blueyed
  * Debuglog changed
  *
