@@ -16,6 +16,7 @@
 <channel rdf:about="<?php bloginfo('url', 'xmlattr') ?>">
 	<title><?php bloginfo( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
   <link><?php bloginfo( 'lastcommentsurl', 'xml' ) ?></link>
+	<description></description>
   <dc:language><?php bloginfo( 'lang', 'xml' ) ?></dc:language>
   <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
   <sy:updatePeriod>hourly</sy:updatePeriod>

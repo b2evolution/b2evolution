@@ -64,10 +64,13 @@ class Comment extends DataObject
 			$this->content = $db_row['comment_content'];
 			$this->karma = $db_row['comment_karma'];
 			// Extra vars:
-			$this->post_title = $db_row['post_title'];
-			$this->blog_ID = $db_row['blog_ID'];
-			$this->blogparams = get_blogparams_by_ID($this->blog_ID);
-			$this->blog_name = $db_row['blog_name'];
+			if( isset( $db_row['blog_ID'] ) )
+			{
+				$this->blog_ID = $db_row['blog_ID'];
+				$this->post_title = $db_row['post_title'];
+				$this->blogparams = get_blogparams_by_ID($this->blog_ID);
+				$this->blog_name = $db_row['blog_name'];
+			}
 		}
 	}	
 	

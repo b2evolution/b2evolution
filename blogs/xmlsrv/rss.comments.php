@@ -16,6 +16,7 @@
   <channel>
     <title><?php bloginfo( 'name', 'xml' ); last_comments_title( ' : ', 'xml' ) ?></title>
     <link><?php bloginfo( 'lastcommentsurl', 'xml' ) ?></link>
+		<description></description>
     <language><?php bloginfo( 'lang', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss092</docs>
     <?php while( $Comment = $CommentList->get_next() )
