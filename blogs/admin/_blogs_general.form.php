@@ -13,7 +13,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 // Prepare last part of blog URL preview:
 switch( $edited_Blog->get( 'access_type' ) )
 {
-	case 'default': 
+	case 'default':
 		$blog_urlappend = 'index.php';
 		break;
 
@@ -21,16 +21,16 @@ switch( $edited_Blog->get( 'access_type' ) )
 		$blog_urlappend = 'index.php'.( $Settings->get('links_extrapath') ? '/'.$edited_Blog->get( 'stub' ) : '?blog='.$edited_Blog->ID );
 		break;
 
-	case 'stub': 
+	case 'stub':
 		$blog_urlappend = $edited_Blog->get( 'stub' );
 		break;
 }
-$blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escape
+
 ?>
 <script type="text/javascript">
 	<!--
 	blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
-	blog_urlappend = '<?php echo $blog_urlappend ?>';
+	blog_urlappend = '<?php echo str_replace( "'", "\'", $blog_urlappend ) ?>';
 
 	function update_urlpreview( base, append )
 	{
@@ -51,7 +51,13 @@ $blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escap
 	//-->
 </script>
 
-<form action="blogs.php" class="fform" method="post">
+
+<form action="blogs.php<?php
+if( $action == 'edit' )
+{ // leave the action=edit URL intact. Hidden POST-action will have priority.
+	echo '?action=edit&amp;blog='.$blog;
+}
+?>" class="fform" method="post">
 	<input type="hidden" name="action" value="<?php echo $next_action ?>" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />
 
@@ -73,16 +79,16 @@ $blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escap
 						array( 'relative',
 										T_('relative to baseurl').':',
 										'',
-										'<span class="nobr"><code>'.$baseurl.'</code>'.
-										'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="30" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.
-										'<div class="notes">'.T_('With trailing slash. By default, leave this field empty.').'</div>',
+										'<span class="nobr"><code>'.$baseurl.'</code>'
+										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="30" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'
+										.'<div class="notes">'.T_('With trailing slash. By default, leave this field empty.').'</div>',
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 						),
 						array( 'absolute',
 										T_('absolute URL').':',
 										'',
-										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value+\'/\' );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'.
-										'<span class="notes">'.T_('With trailing slash.').'</span>',
+										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'
+										.' <span class="notes">'.T_('With trailing slash.').'</span>',
 										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
 						)
 					),
@@ -120,10 +126,9 @@ $blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escap
 
 
 			form_text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info.'), $maxlength_urlname_stub );
-		?>
 
-		<div class="label"><?php echo T_('URL preview').':' ?></div>
-		<div class="info" id="urlpreview"><?php $edited_Blog->disp( 'baseurl', 'entityencoded' ); echo $blog_urlappend; ?></div>
+			form_info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend );
+		?>
 	</fieldset>
 
 	<fieldset>
@@ -160,13 +165,9 @@ $blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escap
 
 </form>
 
-<?php /*<script type="text/javascript">
-<!--
-	for( var i = 0; i < document.getElementsByName( 'blog_siteurl_type' ).length; i++ )
-	{
-		if( document.getElementsByName( 'blog_siteurl_type' )[i].checked )
-			document.getElementsByName( 'blog_siteurl_type' )[i].click();
-	}
+
+<script type="text/javascript">
+	<!--
 	document.getElementById( 'blog_name' ).focus();
-// -->
-</script> */ ?>
+	// -->
+</script>

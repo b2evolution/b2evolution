@@ -16,13 +16,13 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Includes
  */
-// require_once( dirname(__FILE__).'/_functions_files.php' );
+require_once dirname(__FILE__).'/_class_filelist.php';
 
 
 /**
  * TODO: docblock for class
  */
-class FileManager
+class FileManager extends Filelist
 {
 	/**
 	 * root (like user_X or blog_X), defaults to current user's dir (#)
@@ -67,13 +67,6 @@ class FileManager
 	 */
 	var $permlikelsl = true;
 
-	/**
-	 * User preference: recursive size of dirs?
-	 * @todo needs special permission (server load!)
-	 * @var boolean
-	 */
-	var $fulldirsize = false;
-
 	// --- going to user options ---
 	var $default_chmod_file = 0700;
 	var $default_chmod_dir = 0700;
@@ -82,28 +75,20 @@ class FileManager
 	/* ----- PRIVATE ----- */
 
 	/**
-	 * the current index of the directory items (looping)
-	 * @var integer
-	 * @access protected
-	 */
-	var $current_idx = -1;
-
-
-	/**
 	 * order files by what? (name/type/size/lastm/perms)
 	 * 'name' as default.
 	 * @var string
 	 * @access protected
 	 */
-	var $order = '#';
+	var $order = NULL;
 
 	/**
 	 * files ordered ascending?
-	 * '#' is default and means ascending for 'name', descending for the rest
+	 * NULL is default and means ascending for 'name', descending for the rest
 	 * @var boolean
 	 * @access protected
 	 */
-	var $orderasc = '#';
+	var $orderasc = NULL;
 
 	/**
 	 * relative path
@@ -117,48 +102,24 @@ class FileManager
 	 * Constructor
 	 *
 	 * @param User the current User {@link User}}
-	 * @param string the root directory ('user' => user's dir)
 	 * @param string the URL where the object is included (for generating links)
+	 * @param string the root directory ('user' => user's dir)
 	 * @param string the dir of the Filemanager object (relative to root)
 	 * @param string filter files by what?
 	 * @param boolean is the filter a regular expression (default is glob pattern)
-	 * @param string order files by what? ('#' means 'name')
-	 * @param boolean order ascending or descending? '#' means ascending for 'name', descending for other
+	 * @param string order files by what? (NULL means 'name')
+	 * @param boolean order ascending or descending? NULL means ascending for 'name', descending for other
 	 */
-	function FileManager( &$cUser, $url, $root = '#', $path = '', $filter = '#', $filter_regexp = '#', $order = '#', $asc = '#' )
+	function FileManager( &$cUser, $url, $root, $path = '', $filter = NULL, $filter_regexp = NULL, $order = NULL, $asc = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
 		global $BlogCache;
 
-		$this->entries = array();  // the directory entries
-		$this->Messages = new Log( 'error' );
-
 		$this->User =& $cUser;
-
-		$this->filter = $filter;
-		$this->filter_regexp = $filter_regexp;
-		if( $this->filter_regexp && !isRegexp( $this->filter ) )
-		{
-			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filter ) );
-			$this->filter = '.*';
-		}
-
-		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastm', 'perms' ) ) ? $order : '#' );
-		$this->orderasc = ( $asc == '#' ? '#' : (bool)$asc );
-
-		$this->loadSettings();
-
-		// base URL, used for created links
-		$this->url = $url;
-
-		// path/url for images (icons)
-		$this->imgpath = $basepath.$admin_subdir.'img/fileicons/';
-		$this->imgurl = $admin_url.'img/fileicons/';
-
-		// TODO: get user's/group's root
+		$this->Messages =& new Log( 'error' );
 
 
-		// -- get/translate root directory ----
+		// {{{ -- get/translate root directory ----
 		$this->root = $root;
 
 		$root_A = explode( '_', $this->root );
@@ -181,7 +142,7 @@ class FileManager
 		}
 		else switch( $root_A[0] )
 		{
-			case '#':
+			case NULL:
 			case 'user':
 				$this->root_dir = $this->User->get( 'fm_rootdir' );
 				$this->root_url = $this->User->get( 'fm_rooturl' );
@@ -191,44 +152,67 @@ class FileManager
 				$this->root_dir = trailing_slash( $root );
 		}
 
-		$this->debug( $this->root, 'root' );
-		$this->debug( $this->root_dir, 'root_dir' );
-		$this->debug( $this->root_url, 'root_url' );
-
 		$this->cwd = trailing_slash( $this->root_dir.$path );
-		$this->debug( $this->cwd, 'cwd' );
 
 		// get real cwd
-		$realpath = realpath($this->cwd);
-		$this->debug( $realpath, 'realpath()' );
 
-		if( !$realpath )
-		{ // does not exist
+		list( $realpath, $realpath_exists ) = str2path( $this->cwd );
+		$this->debug( $realpath, 'realpath' );
+
+
+		if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
+		{ // cwd is not below root!
+			$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
 			$this->cwd = $this->root_dir;
 		}
 		else
-		{
-			$realpath = trailing_slash( str_replace( '\\', '/', $realpath ) );
-
-			if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
-			{ // cwd is not below root!
-				$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
+		{ // allowed
+			if( !$realpath_exists )
+			{ // does not exist
+				$this->Messages->add( sprintf( T_('The directory [%s] does not exist.'), $this->cwd ) );
 				$this->cwd = $this->root_dir;
 			}
 			else
-			{ // allowed
+			{
 				$this->cwd = $realpath;
 			}
 		}
 
+
 		// get the subpath relative to root
 		$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
+		// }}}
+
+
+		$this->url = $url; // base URL, used for created links
+
+		$this->filter = $filter;
+		$this->filter_regexp = $filter_regexp;
+
+		if( $this->filter_regexp && !isRegexp( $this->filter ) )
+		{
+			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filter ) );
+			$this->filter = '.*';
+		}
+		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastm', 'perms' ) ) ? $order : NULL );
+		$this->orderasc = ( $asc === NULL  ? NULL : (bool)$asc );
+
+		$this->loadSettings();
+
+
+		// path/url for images (icons)
+		$this->imgpath = $basepath.$admin_subdir.'img/fileicons/';
+		$this->imgurl = $admin_url.'img/fileicons/';
+
+
+		$this->debug( $this->root, 'root' );
+		$this->debug( $this->root_dir, 'root_dir' );
+		$this->debug( $this->root_url, 'root_url' );
+		$this->debug( $this->cwd, 'cwd' );
 		$this->debug( $this->path, 'path' );
 
 
-		$this->loadentries();
-
-		// load file icons..
+		// load file icons
 		require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
 
 		/**
@@ -276,80 +260,26 @@ class FileManager
 			'.wri' => T_('Document'),
 			'.xml' => T_('XML file'),
 			'.zip' => T_('Zip Archive'),
-			);
+		);
 
-		$this->sort();
+		// the directory entries
+		parent::Filelist( $this->cwd, $this->filter, $this->filter_regexp, $this->order, $this->orderasc );
+		parent::load();
+		parent::restart();
 
-		$this->restart();
-
-		$this->debug( $this->entries, 'entries' );
+		$this->debug( $this->entries, 'Filelist' );
 	}
 
 
-	function loadentries()
+	/**
+	 * Sort the Filelist entries
+	 */
+	function sort()
 	{
-		if( $this->filter == '#' || $this->filter_regexp )
-		{
-			$dir = @dir( $this->cwd );
-			$diropened = (bool)$dir;
-		}
-		else
-		{
-			$oldcwd = getcwd();
-			$diropened = @chdir( $this->cwd );
-			$dir = glob( $this->filter, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
-			chdir( $oldcwd );
-		}
+		parent::sort( $this->translate_order( $this->order ),
+									$this->translate_asc( $this->orderasc, $this->translate_order( $this->order ) ),
+									$this->dirsattop );
 
-		if( !$diropened )
-		{
-			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->cwd ) );
-			return false;
-		}
-		else
-		{ // read the directory
-			if( $dir === false )
-			{ // glob-$dir is empty/false
-				return false;
-			}
-			$i = 0;
-			while( ( ($this->filter == '#' || $this->filter_regexp) && ($entry = $dir->read()) )
-						|| ($this->filter != '#' && !$this->filter_regexp && ( $entry = each( $dir ) ) && ( $entry = $entry[1] ) ) )
-			{
-				if( $entry == '.' || $entry == '..'
-						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
-						|| ( $this->filter != '#' && $this->filter_regexp && !preg_match( '#'.str_replace( '#', '\#', $this->filter ).'#', $entry ) ) // does not match the regexp filter
-					)
-				{ // don't use these
-					continue;
-				}
-
-				$i++;
-
-				$this->entries[ $i ]['name'] = $entry;
-				if( is_dir( $this->cwd.'/'.$entry ) )
-				{
-					$this->entries[ $i ]['type'] = 'dir';
-					if( $this->fulldirsize )
-						$this->entries[ $i ]['size'] = get_dirsize_recursive( $this->cwd.'/'.$entry );
-					else $this->entries[ $i ]['size'] = false;
-				}
-				else
-				{
-					$this->entries[ $i ]['type'] = 'file';
-					$this->entries[ $i ]['size'] = filesize( $this->cwd.$entry );
-				}
-
-				$this->entries[ $i ]['lastm'] = filemtime( $this->cwd.$entry );
-				$this->entries[ $i ]['perms'] = fileperms( $this->cwd.$entry );
-
-			}
-			if( $this->filter_regexp )
-			{
-				$dir->close();
-			}
-
-		}
 	}
 
 
@@ -361,7 +291,7 @@ class FileManager
 	 * @param string override order
 	 * @param integer override asc
 	 */
-	function curl( $root = '#', $path = '#', $filter = '#', $filter_regexp = '#', $order = '#', $orderasc = '#' )
+	function curl( $root = NULL, $path = NULL, $filter = NULL, $filter_regexp = NULL, $order = NULL, $orderasc = NULL )
 	{
 		$r = $this->url;
 
@@ -371,11 +301,11 @@ class FileManager
 			{ // don't include
 				continue;
 			}
-			if( $$check != '#' )
+			if( $$check !== NULL )
 			{ // use local param
 				$r = url_add_param( $r, $check.'='.$$check );
 			}
-			elseif( $this->$check != '#' )
+			elseif( $this->$check !== NULL )
 			{
 				$r = url_add_param( $r, $check.'='.$this->$check );
 			}
@@ -388,7 +318,7 @@ class FileManager
 	/**
 	 * generates hidden input fields for forms, based on {@link curl()}}
 	 */
-	function form_hiddeninputs( $root = '#', $path = '#', $filter = '#', $filter_regexp = '#', $order = '#', $asc = '#' )
+	function form_hiddeninputs( $root = NULL, $path = NULL, $filter = NULL, $filter_regexp = NULL, $order = NULL, $asc = NULL )
 	{
 		// get curl(), remove leading URL and '?'
 		$params = preg_split( '/&amp;/', substr( $this->curl( $root, $path, $filter, $filter_regexp, $order, $asc ), strlen( $this->url )+1 ) );
@@ -407,7 +337,8 @@ class FileManager
 
 
 	/**
-	 * get an array of available root directories
+	 * Get an array of available root directories.
+	 *
 	 * @return array of arrays for each root: array( type [blog/user], id, name )
 	 */
 	function get_roots()
@@ -429,87 +360,28 @@ class FileManager
 	}
 
 
-	/**
-	 * return the current filter
-	 *
-	 * @param boolean add a note when it's a regexp?
-	 * @return string the filter
-	 */
-	function get_filter( $note = true )
+	function link_sort( $type, $atext )
 	{
-		if( $this->filter == '#' )
-		{
-			return T_('no filter');
-		}
-		else
-		{
-			$r = $this->filter;
-			if( $note && $this->filter_regexp )
-			{
-				$r .= ' ('.T_('regular expression').')';
-			}
-			return $r;
-		}
-	}
-
-
-	/**
-	 * @return integer 1 for ascending sorting, 0 for descending
-	 */
-	function is_sortingasc( $type = '' )
-	{
-		if( empty($type) )
-			$type = $this->order;
-
-		if( $this->orderasc == '#' )
-		{ // default
-			return ( $type == 'name' ) ? 1 : 0;
-		}
-		else
-		{
-			return ( $this->orderasc ) ? 1 : 0;
-		}
-	}
-
-
-	/**
-	 * is a filter active?
-	 * @return boolean
-	 */
-	function is_filtering()
-	{
-		return $this->filter !== '#';
-	}
-
-
-	function sortlink( $type )
-	{
-		$r = $this->curl( '#', '#', '#', '#', $type, false );
+		$r = '<a href="'
+					.$this->curl( NULL, NULL, NULL, NULL, $type, false );
 
 		if( $this->order == $type )
 		{ // change asc
 			$r .= '&amp;asc='.(1 - $this->is_sortingasc());
 		}
 
-		return $r;
-	}
-
-
-	function link_sort( $type, $atext )
-	{
-		$r = '<a href="'.$this->sortlink( $type ).'" title="'
-		.( ($this->order == $type && !$this->is_sortingasc($type))
-				||( $this->order != $type
-						&& $this->is_sortingasc($type))
-							? T_('sort ascending by this column') : T_('sort descending by this column'))
-		.'">'.$atext.'</a>';
+		$r .= '" title="'
+					.( ($this->order == $type && !$this->is_sortingasc($type))
+						|| ( $this->order != $type && $this->is_sortingasc($type) )
+							? T_('sort ascending by this column') : T_('sort descending by this column')
+					).'">'.$atext.'</a>';
 
 		if( $this->order == $type )
-		{
+		{ // add asc/desc image
 			if( $this->is_sortingasc() )
-				$r .= ' '.$this->icon( 'ascending', 'imgtag' );
+				$r .= ' '.$this->get_icon( 'ascending', 'imgtag' );
 			else
-				$r .= ' '.$this->icon( 'descending', 'imgtag' );
+				$r .= ' '.$this->get_icon( 'descending', 'imgtag' );
 		}
 
 		return $r;
@@ -517,183 +389,130 @@ class FileManager
 
 
 	/**
-	 * translates $asc parameter, if it's '#'
-	 * @param boolean sort ascending?
-	 * @return integer 1 for ascending, 0 for descending
-	 */
-	function translate_asc( $asc, $order )
-	{
-		if( $asc != '#' )
-		{
-			return $asc;
-		}
-		elseif( $this->orderasc != '#' )
-		{
-			return $this->orderasc;
-		}
-		else
-		{
-			return ($order == 'name') ? 1 : 0;
-		}
-	}
-
-
-	/**
-	 * translates $order parameter, if it's '#'
-	 * @param string order by?
-	 * @return string order by what?
-	 */
-	function translate_order( $order )
-	{
-		if( $order != '#' )
-		{
-			return $order;
-		}
-		elseif( $this->order != '#' )
-		{
-			return $this->order;
-		}
-		else
-		{
-			return 'name';
-		}
-	}
-
-
-	/**
-	 * sorts the entries.
-	 *
-	 * @param string the entries key
-	 * @param boolean ascending (true) or descending
-	 */
-	function sort( $order = '#', $asc = '#' )
-	{
-		if( !$this->entries )
-		{
-			return false;
-		}
-
-		$order = $this->translate_order( $order );
-		$asc = $this->translate_asc( $asc, $order );
-
-		if( $order == 'size' )
-		{
-			if( $this->fulldirsize )
-			{
-				$sortfunction = '$r = ( $a[\'size\'] - $b[\'size\'] );';
-			}
-			else
-			{
-				$sortfunction = '$r = ($a[\'type\'].$b[\'type\'] == \'dirdir\') ?
-															strcasecmp( $a[\'name\'], $b[\'name\'] )
-															: ( $a[\'size\'] - $b[\'size\'] );';
-			}
-		}
-		elseif( $order == 'type' )
-		{ // stupid dirty hack: copy the whole Filemanager into global array to access filetypes // TODO: optimize
-			global $typetemp;
-			$typetemp = $this;
-			$sortfunction = 'global $typetemp; $r = strcasecmp( $typetemp->cget_file($a[\'name\'], \'type\'), $typetemp->cget_file($b[\'name\'], \'type\') );';
-		}
-		else
-			$sortfunction = '$r = strcasecmp( $a["'.$order.'"], $b["'.$order.'"] );';
-
-		if( !$asc )
-		{ // switch order
-			$sortfunction .= '$r = -$r;';
-		}
-
-		if( $this->dirsattop )
-			$sortfunction .= 'if( $a[\'type\'] == \'dir\' && $b[\'type\'] != \'dir\' )
-													$r = -1;
-												elseif( $b[\'type\'] == \'dir\' && $a[\'type\'] != \'dir\' )
-													$r = 1;';
-		$sortfunction .= 'return $r;';
-
-		#echo $sortfunction;
-		usort( $this->entries, create_function( '$a, $b', $sortfunction ) );
-	}
-
-
-	/**
-	 * go to next entry
+	 * get the next File in the Filelist
 	 *
 	 * @param string can be used to query only 'file's or 'dir's.
-	 * @return boolean true on success, false on end of list
+	 * @return boolean File object on success, false on end of list
 	 */
-	function next( $type = '' )
+	function get_File_next( $type = '' )
 	{
-		$this->current_idx++;
-		if( !$this->entries || $this->current_idx >= count( $this->entries ) )
+		$this->cur_File = parent::get_File_next( $type );
+
+		return $this->cur_File;
+	}
+
+
+	function get_File_type( $File = NULL )
+	{
+		if( $File === NULL )
 		{
-			return false;
+			$File = $this->cur_File;
 		}
 
-		if( $type != '' )
+		if( $File->get_type() == 'dir' )
 		{
-			if( $type == 'dir' && $this->entries[ $this->current_idx ]['type'] != 'dir' )
-			{ // we want a dir
-				return $this->next( 'dir' );
-			}
-			elseif( $this->entries[ $this->current_idx ]['type'] != 'file' )
-			{
-				return $this->next( 'file' );
-			}
+			return T_('directory');
 		}
 		else
 		{
-			$this->current_entry = $this->entries[ $this->current_idx ];
-			return true;
+			$filename = $File->get_name();
+			foreach( $this->filetypes as $type => $desc )
+			{
+				if( preg_match('/'.$type.'$/i', $filename) )
+				{
+					return $desc;
+				}
+			}
+			return T_('unknown');
 		}
 	}
 
 
 	/**
-	 * Displays file permissions like 'ls -l'
+	 * get the URL to access a file
 	 *
-	 * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
-	 * @todo move out of class
-	 * @param string
+	 * @param File the File object
 	 */
-	function translatePerm( $in_Perms )
+	function get_File_url( $File )
 	{
-		$sP = '';
+		if( method_exists( $File, 'get_name' ) )
+		{
+			return $this->root_url.$this->path.$File->get_name();
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-		if(($in_Perms & 0xC000) == 0xC000)		 // Socket
-			$sP = 's';
-		elseif(($in_Perms & 0xA000) == 0xA000) // Symbolic Link
-			$sP = 'l';
-		elseif(($in_Perms & 0x8000) == 0x8000) // Regular
-			$sP = '&minus;';
-		elseif(($in_Perms & 0x6000) == 0x6000) // Block special
-			$sP = 'b';
-		elseif(($in_Perms & 0x4000) == 0x4000) // Directory
-			$sP = 'd';
-		elseif(($in_Perms & 0x2000) == 0x2000) // Character special
-			$sP = 'c';
-		elseif(($in_Perms & 0x1000) == 0x1000) // FIFO pipe
-			$sP = 'p';
-		else												 // UNKNOWN
-			$sP = 'u';
 
-		// owner
-		$sP .= (($in_Perms & 0x0100) ? 'r' : '&minus;') .
-						(($in_Perms & 0x0080) ? 'w' : '&minus;') .
-						(($in_Perms & 0x0040) ? (($in_Perms & 0x0800) ? 's' : 'x' ) :
-																		(($in_Perms & 0x0800) ? 'S' : '&minus;'));
+	function get_link_curfile( $param = '' )
+	{
+		if( $this->cur_File->get_type() == 'dir' && $param != 'forcefile' )
+		{
+			return $this->curl( NULL, $this->path.$this->cur_File->get_name() );
+		}
+		else
+		{
+			return $this->curl( NULL, $this->path ).'&amp;file='.urlencode( $this->cur_File->get_name() );
+		}
+	}
 
-		// group
-		$sP .= (($in_Perms & 0x0020) ? 'r' : '&minus;') .
-						(($in_Perms & 0x0010) ? 'w' : '&minus;') .
-						(($in_Perms & 0x0008) ? (($in_Perms & 0x0400) ? 's' : 'x' ) :
-																		(($in_Perms & 0x0400) ? 'S' : '&minus;'));
 
-		// world
-		$sP .= (($in_Perms & 0x0004) ? 'r' : '&minus;') .
-						(($in_Perms & 0x0002) ? 'w' : '&minus;') .
-						(($in_Perms & 0x0001) ? (($in_Perms & 0x0200) ? 't' : 'x' ) :
-																		(($in_Perms & 0x0200) ? 'T' : '&minus;'));
-		return $sP;
+	function get_link_curfile_editperm()
+	{
+		return $this->get_link_curfile('forcefile').'&amp;action=editperm';
+	}
+
+
+	function get_link_curfile_edit()
+	{
+		if( $this->cur_File->get_type() == 'dir' )
+		{
+			return false;
+		}
+		return $this->get_link_curfile().'&amp;action=edit';
+	}
+
+
+	function get_link_curfile_copymove()
+	{
+		if( $this->cur_File->get_type() == 'dir' )
+		{
+			return false;
+		}
+		return $this->get_link_curfile().'&amp;action=copymove';
+	}
+
+
+	function get_link_curfile_rename()
+	{
+		return $this->get_link_curfile('forcefile').'&amp;action=rename';
+	}
+
+
+	function get_link_curfile_delete()
+	{
+		return $this->get_link_curfile('forcefile').'&amp;action=delete';
+	}
+
+
+	/**
+	 * get the link to the parent folder
+	 */
+	function get_link_parent()
+	{
+		// TODO: check if allowed
+		return $this->curl( NULL, $this->path.'..' );
+	}
+
+
+	/**
+	 * get the link to current's root's home directory
+	 */
+	function get_link_home()
+	{
+		return $this->curl( NULL, false );
 	}
 
 
@@ -706,119 +525,24 @@ class FileManager
 	 */
 	function cget( $what, $param = '', $displayiftrue = '' )
 	{
-		$path = isset($this->current_entry) ? $this->cwd.'/'.$this->current_entry['name'] : false;
-
-		/* // detect dying loops
-		global $owhat;
-		if( $what == $owhat )
-		{
-			pre_dump( $what, 'loop' );
-			return;
-		}
-		$owhat = $what;*/
-
-
+		echo '<p class="error">bad cget: ['.$what.']</p>';
+		return;
 		switch( $what )
 		{
-			case 'path':
-				$r = $path;
-				break;
-
-			case 'url':
-				$r = $this->root_url.$this->path.$this->current_entry['name'];
-				break;
-
-			case 'ext':  // the file extension
-				if( preg_match('/\.([^.])+$/', $this->current_entry['name'], $match) )
-					$r = $match[1];
-				else
-					$r = false;
-				break;
-
-			case 'perms':
-				if( $param != 'octal'
-						&& ($this->permlikelsl || $param == 'lsl') )
-					$r = $this->translatePerm( $this->current_entry['perms'] );
-				else
-					$r = substr( sprintf('%o', $this->current_entry['perms']), -3 );
-				break;
-
-			case 'nicesize':
-				if( $this->cisdir() && !$this->fulldirsize )
-					$r = /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
-				elseif( ($r = $this->cget('size')) !== false )
-					$r = bytesreadable( $r );
-				else
-					$r = '';
-				break;
-
-			case 'imgsize':
-				$r = imgsize( $path, $param );
-				break;
-
-			case 'link':
-				if( $param == 'parent' )
-				{ // TODO: check if allowed
-					$r = $this->curl( '#', $this->path.'..' );
-				}
-				elseif( $param == 'home' )
-				{
-					$r = $this->url;
-				}
-				elseif( $this->current_entry['type'] == 'dir' && $param != 'forcefile' )
-				{
-					$r = $this->curl( '#', $this->path.$this->current_entry['name'] );
-				}
-				else
-				{
-					$r = $this->curl( '#', $this->path ).'&amp;file='.urlencode($this->current_entry['name']);
-				}
-				break;
-
-			case 'link_edit':
-				if( $this->current_entry['type'] == 'dir' ) $r = false;
-				else $r = $this->cget('link').'&amp;action=edit';
-				break;
-
-			case 'link_copymove':
-				if( $this->current_entry['type'] == 'dir' ) $r = false;
-				else $r = $this->cget('link').'&amp;action=copymove';
-				break;
-
-			case 'link_rename':
-				$r = $this->cget('link', 'forcefile').'&amp;action=rename';
-				break;
-
-			case 'link_delete':
-				$r = $this->cget('link', 'forcefile').'&amp;action=delete';
-				break;
-
-			case 'link_editperm':
-				$r = $this->cget('link', 'forcefile').'&amp;action=editperm';
-				break;
-
-			case 'lastmod':
-				$r = date_i18n( locale_datefmt().' '.locale_timefmt(), $this->current_entry['lastm'] );
-				break;
-
 			case 'type':
 				$r = $this->type( 'cfile' );
 				break;
 
 			case 'iconfile':
-				$r = $this->icon( 'cfile', 'file' );
+				$r = $this->get_icon( 'cfile', 'file' );
 				break;
 
 			case 'iconurl':
-				$r = $this->icon( 'cfile', 'url' );
+				$r = $this->get_icon( 'cfile', 'url' );
 				break;
 
 			case 'iconsize':
-				$r = $this->icon( 'cfile', 'size', $param );
-				break;
-
-			case 'iconimg':
-				$r = $this->icon( 'cfile', 'imgtag', $param );
+				$r = $this->get_icon( 'cfile', 'size', $param );
 				break;
 
 			default:
@@ -895,20 +619,21 @@ class FileManager
 	 * @param string what to return for that icon (file, url, size {@link see imgsize()}})
 	 * @param string additional parameter (for size)
 	 */
-	function icon( $for, $what = 'imgtag', $param = '' )
+	function get_icon( $for, $what = 'imgtag', $param = '' )
 	{
 		if( $for == 'cfile' )
 		{
-			if( !isset($this->current_entry) )
+			if( !$this->cur_File )
 				$iconfile = false;
-			elseif( $this->current_entry['type'] == 'dir' )
+			elseif( $this->cur_File->get_type() == 'dir' )
 				$iconfile = $this->fileicons_special['folder'];
 			else
 			{
 				$iconfile = $this->fileicons_special['unknown'];
+				$filename = $this->cur_File->get_name();
 				foreach( $this->fileicons as $ext => $imgfile )
 				{
-					if( preg_match( '/'.$ext.'$/i', $this->current_entry['name'], $match ) )
+					if( preg_match( '/'.$ext.'$/i', $filename, $match ) )
 					{
 						$iconfile = $imgfile;
 						break;
@@ -925,7 +650,7 @@ class FileManager
 		if( !$iconfile || !file_exists( $this->imgpath.$iconfile ) )
 		{
 			#return false;
-			return '<span class="small">[no image for '.$for.'!]</small>';
+			return '<p class="error">[no image for '.$for.'!]</p>';
 		}
 
 		switch( $what )
@@ -943,12 +668,12 @@ class FileManager
 				break;
 
 			case 'imgtag':
-				$r = '<img class="middle" src="'.$this->icon( $for, 'url' ).'" '.$this->icon( $for, 'size', 'string' )
+				$r = '<img class="middle" src="'.$this->get_icon( $for, 'url' ).'" '.$this->get_icon( $for, 'size', 'string' )
 				.' alt="';
 
 				if( $for == 'cfile' )
 				{ // extension as alt-tag for cfile-icons
-					$r .= $this->cget( 'ext' );
+					$r .= $this->cur_File->get_ext();
 				}
 
 				$r .= '" title="'.$this->type( $for );
@@ -967,28 +692,7 @@ class FileManager
 
 	function type( $param )
 	{
-		if( $param == 'cfile' )
-		{
-			if( !isset($this->current_entry) )
-				$r = false;
-			elseif( $this->current_entry['type'] == 'dir' )
-				$r = T_('directory');
-			else
-			{
-				$found = false;
-				foreach( $this->filetypes as $type => $desc )
-				{
-					if( preg_match('/'.$type.'$/i', $this->current_entry['name']) )
-					{
-						$r = $desc;
-						$found = true;
-						break;
-					}
-				}
-				if( !$found ) $r = T_('unknown');
-			}
-		}
-		elseif( $param == 'parent' )
+		if( $param == 'parent' )
 			$r = T_('go to parent directory');
 		elseif( $param == 'home' )
 			$r = T_('home directory');
@@ -1010,77 +714,6 @@ class FileManager
 
 		return $r;
 	}
-
-
-	/**
-	 * loads a specific file as current file as saves current one (can be nested).
-	 *
-	 * (for restoring see {@link Fileman::restorec()})
-	 *
-	 * @param string the filename (in cwd)
-	 * @return boolean true on success, false on failure.
-	 */
-	function loadc( $file )
-	{
-		$this->save_idx[] = $this->current_idx;
-
-		if( ($this->current_idx = $this->findkey( $file )) === false )
-		{ // file could not be found
-			$this->current_idx = array_pop( $this->save_idx );
-			return false;
-		}
-		else
-		{
-			$this->current_entry = $this->entries[ $this->current_idx ];
-			return true;
-		}
-	}
-
-
-	/**
-	 * restores the previous current entry (see {@link Fileman::loadc()})
-	 * @return boolean true on success, false on failure (if there are no entries to restore on the stack)
-	 */
-	function restorec()
-	{
-		if( count($this->save_idx) )
-		{
-			$this->current_idx = array_pop( $this->save_idx );
-			if( $this->current_idx != -1 )
-			{
-				$this->current_entry = $this->entries[ $this->current_idx ];
-			}
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-
-	/**
-	 * wrapper to get properties of a specific file.
-	 *
-	 * @param string the file (in cwd)
-	 * @param string what to get
-	 * @param mixed optional parameter
-	 */
-	function cget_file( $file, $what, $param = '', $displayiftrue = '' )
-	{
-		if( $this->loadc( $file ) )
-		{
-			$r = $this->cget( $what, $param, $displayiftrue );
-		}
-		else
-		{
-			return false;
-		}
-
-		$this->restorec();
-		return $r;
-	}
-
 
 
 	/**
@@ -1109,7 +742,7 @@ class FileManager
 						{
 							clearstatcache();
 							// update current entry
-							$this->entries[ $this->current_idx ]['perms'] = fileperms( $path );
+							$this->entries[ $this->current_file_idx ]['perms'] = fileperms( $path );
 							$this->current_entry['perms'] = fileperms( $path );
 							$r = true;
 						}
@@ -1156,22 +789,6 @@ class FileManager
 
 
 	/**
-	 *
-	 */
-	function checkstatus( $path )
-	{
-	}
-
-	/**
-	 * restart
-	 */
-	function restart()
-	{
-		$this->current_idx = -1;
-	}
-
-
-	/**
 	 * get an array list of a specific type
 	 *
 	 * @param string type ('dirs' or 'files', '' means all)
@@ -1183,11 +800,11 @@ class FileManager
 		foreach( $this->entries as $entry )
 		{
 			if( $type == ''
-					|| ( $type == 'files' && $entry['type'] != 'dir' )
-					|| ( $type == 'dirs' && $entry['type'] == 'dir' )
+					|| ( $type == 'files' && $entry->get_type() != 'dir' )
+					|| ( $type == 'dirs' && $entry->get_type() == 'dir' )
 				)
 			{
-				$r[] = $entry['name'];
+				$r[] = $entry->get_name();
 			}
 		}
 		return $r;
@@ -1201,11 +818,11 @@ class FileManager
 	 * @param boolean delete subdirs of a dir?
 	 * @return boolean true on success, false on failure
 	 */
-	function delete( $file = '#', $delsubdirs = false )
+	function delete( $file = NULL, $delsubdirs = false )
 	{
 		// TODO: permission check
 
-		if( $file == '#' )
+		if( $file == NULL )
 		{ // use current entry
 			if( isset($this->current_entry) )
 			{
@@ -1279,7 +896,7 @@ class FileManager
 	 * @param integer permissions for the new directory (octal format)
 	 * @return mixed full path that has been created; false on error
 	 */
-	function create_rootdir( $path, $suggested_name, $chmod = '#' )
+	function create_rootdir( $path, $suggested_name, $chmod = NULL )
 	{
 		$realname = safefilename( $suggested_name );
 		if( $this->createdir( $realname, $path, $chmod ) )
@@ -1300,13 +917,13 @@ class FileManager
 	 * @param integer permissions for the new directory (octal format)
 	 * @return boolean true on success, false on failure
 	 */
-	function createdir( $dirname, $path = '#', $chmod = '#' )
+	function createdir( $dirname, $path = NULL, $chmod = NULL )
 	{
-		if( $path == '#' )
+		if( $path == NULL )
 		{
 			$path = $this->cwd;
 		}
-		if( $chmod == '#' )
+		if( $chmod == NULL )
 		{
 			$chmod = $this->default_chmod_dir;
 		}
@@ -1331,11 +948,11 @@ class FileManager
 	 * @param string filename
 	 * @param integer permissions for the new file (octal format)
 	 */
-	function createfile( $filename, $chmod = '#' )
+	function createfile( $filename, $chmod = NULL )
 	{
 		$path = $this->cwd.'/'.$filename;
 
-		if( $chmod == '#' )
+		if( $chmod == NULL )
 		{
 			$chmod = $this->default_chmod_file;
 		}
@@ -1375,25 +992,6 @@ class FileManager
 	}
 
 
-	/**
-	 * finds an entry ('name' field) in the entries array
-	 *
-	 * @param string needle
-	 * @return integer the key of the entries array
-	 */
-	function findkey( $find )
-	{
-		foreach( $this->entries as $key => $arr )
-		{
-			if( $arr['name'] == $find )
-			{
-				return $key;
-			}
-		}
-		return false;
-	}
-
-
 	function debug( $what, $desc, $forceoutput = 0 )
 	{
 		global $Debuglog;
@@ -1421,11 +1019,11 @@ class FileManager
 
 		$clickabledirs = explode( '/', substr( $this->cwd, $pos_lastslash+1 ) );
 
-		$cd = '/';
+		$cd = '';
 		foreach( $clickabledirs as $nr => $dir )
 		{
-			if( $nr > 0 ) $cd .= $dir.'/';
-			$r .= '/<a href="'.$this->curl( '#', $cd ).'">'.$dir.'</a>';
+			$r .= '/<a href="'.$this->curl( NULL, $cd.$dir ).'">'.$dir.'</a>';
+			$cd .= $dir.'/';
 		}
 
 		return $r;
@@ -1439,10 +1037,10 @@ class FileManager
 	{
 		global $UserSettings;
 
-		$UserSettings->get_cond( $this->dirsattop,   'fm_dirsattop',   $this->User->ID );
-		$UserSettings->get_cond( $this->permlikelsl, 'fm_permlikelsl', $this->User->ID );
-		$UserSettings->get_cond( $this->fulldirsize, 'fm_fulldirsize', $this->User->ID );
-		$UserSettings->get_cond( $this->showhidden,  'fm_showhidden',  $this->User->ID );
+		$UserSettings->get_cond( $this->dirsattop,        'fm_dirsattop',        $this->User->ID );
+		$UserSettings->get_cond( $this->permlikelsl,      'fm_permlikelsl',      $this->User->ID );
+		$UserSettings->get_cond( $this->recursivedirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
+		$UserSettings->get_cond( $this->showhidden,       'fm_showhidden',       $this->User->ID );
 	}
 
 
@@ -1467,6 +1065,50 @@ class FileManager
 		}
 	}
 
-}
 
+	/**
+	 * translates $asc parameter, if it's NULL
+	 * @param boolean sort ascending?
+	 * @return integer 1 for ascending, 0 for descending
+	 */
+	function translate_asc( $asc, $order )
+	{
+		if( $asc !== NULL )
+		{
+			return $asc;
+		}
+		elseif( $this->orderasc !== NULL )
+		{
+			return $this->orderasc;
+		}
+		else
+		{
+			return ($order == 'name') ? 1 : 0;
+		}
+	}
+
+
+	/**
+	 * translates $order parameter, if it's NULL
+	 * @param string order by?
+	 * @return string order by what?
+	 */
+	function translate_order( $order )
+	{
+		if( $order !== NULL )
+		{
+			return $order;
+		}
+		elseif( $this->order !== NULL )
+		{
+			return $this->order;
+		}
+		else
+		{
+			return 'name';
+		}
+	}
+
+
+}
 ?>

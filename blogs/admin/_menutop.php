@@ -30,7 +30,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	}
 
 	if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
-	{ // -- Inject javascript ----------------
+	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 		?>
 		<script type="text/javascript">
@@ -152,17 +152,18 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		//-->
 		</script>
 		<?php
-	}
+	}}}
 	?>
 </head>
-<body>
 
+
+<body>
 <?php
 
 param( 'blog', 'integer', 0, true );	// We need this for the urls
 
 if( empty($mode) )
-{	// We're not running in an special mode (bookmarklet, sidebar...)
+{ // We're not running in an special mode (bookmarklet, sidebar...)
 ?>
 
 <div id="header">
@@ -286,7 +287,7 @@ if( empty($mode) )
 </div>
 
 <?php
-}	// not in special mode
+} // not in special mode
 ?>
 
 <div id="TitleArea">

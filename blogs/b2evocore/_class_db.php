@@ -576,7 +576,7 @@ class DB
 		{
 			echo '<p><strong>Query: '.$query['title'].'</strong></p>';
 			echo '<code>';
-			$sql = str_replace( 'FROM', '<br />FROM', $query['sql'] );
+			$sql = str_replace( 'FROM', '<br />FROM', htmlspecialchars($query['sql']) );
 			$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
 			$sql = str_replace( 'GROUP BY', '<br />GROUP BY', $sql );
 			$sql = str_replace( 'ORDER BY', '<br />ORDER BY', $sql );
@@ -584,7 +584,7 @@ class DB
 			$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
 			$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
 			$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
-			echo htmlspecialchars( $sql );
+			echo $sql;
 			echo '</code><br />';
 			echo 'Rows: ', $query['rows'];
 		}

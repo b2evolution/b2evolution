@@ -41,7 +41,7 @@ if ($topRefererList)
  */
 function filter_hit()
 {
- 	global $Debuglog, $ReqURI, $DB, $Settings, $localtimenow, $comments_allowed_uri_scheme;
+ 	global $Debuglog, $ReqURI, $ReqPath, $DB, $Settings, $localtimenow, $comments_allowed_uri_scheme;
  	global $blackList, $search_engines, $user_agents, $HTTP_REFERER, $HTTP_USER_AGENT;
 
 	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.$_SERVER['REMOTE_ADDR'], 'hit' );
@@ -163,7 +163,7 @@ function filter_hit()
 function log_hit()
 {
 	global $DB, $localtimenow, $blog;
-	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
+	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI;
 	global $HTTP_USER_AGENT, $hit_type, $Debuglog;
 	global $stats_autoprune;
 

@@ -64,9 +64,9 @@
 	float:right;
 }
 
-.toolbaritem_group {
+div.toolbaritem_group {
 }
-.toolbaritem_group .toolbaritem {
+div.toolbaritem_group .toolbaritem {
 	padding-left: 1ex;
 }
 
@@ -74,4 +74,31 @@ div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;
 }
+
+
+
+div.image {
+	text-align:center;
+	clear:both;
+	margin:1ex;
+}
+img.image {
+	border:1px dashed #d91;
+	padding:1ex;
+}
+.linenr {
+	background-color:#ff0;
+	font-weight:bold;
+}
+div.fileheader {
+	background:#ccc;
+	border:1px solid #ddd;
+	padding:1ex;
+}
+pre.rawcontent {
+	margin:0;
+	padding:0 1ex;
+	font-family: Courier New, sans-serif;
+}
+
 

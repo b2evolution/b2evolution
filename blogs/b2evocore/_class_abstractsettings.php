@@ -143,7 +143,7 @@ class AbstractSettings
 				return false;
 		}
 
-		$Debuglog->add( 'AbstractSetting: queried setting ['.implode( '/', $args ).' not defined.' );
+		$Debuglog->add( 'AbstractSetting: queried setting ['.implode( '/', $args ).'] not defined.' );
 		return false;
 	}
 
@@ -159,11 +159,11 @@ class AbstractSettings
 	function get_cond( &$toset )
 	{
 		$args = func_get_args();
-		
+
 		array_shift( $args );
-		
+
 		$result = call_user_func_array( array( &$this, 'get' ), $args );
-		
+
 		if( $result !== false )
 		{
 			$toset = $result;
@@ -185,7 +185,7 @@ class AbstractSettings
 	function set()
 	{
 		global $Debuglog;
-		
+
 		$args = func_get_args();
 		// echo 'get: ['.implode(', ', $args ).']<br />';
 
@@ -234,7 +234,7 @@ class AbstractSettings
 		global $DB;
 
 		$query_insert = array();
-		
+
 		if( !$this->cache )
 		{
 			return false;

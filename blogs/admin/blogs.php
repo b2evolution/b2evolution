@@ -12,7 +12,7 @@
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/_header.php' ); // this will actually load blog params for req blog
+require_once dirname(__FILE__).'/_header.php'; // this will actually load blog params for the requested blog
 
 
 $admin_tab = 'blogs';
@@ -31,7 +31,6 @@ else
 {
 	$edited_Blog = & new Blog( NULL );
 }
-
 
 
 function set_edited_Blog_from_params( $for )
@@ -55,7 +54,7 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', $req ? true : 'new' ) );
 			$edited_Blog->set( 'default_skin',  param( 'blog_default_skin',  'string', $req ? true : 'basic' ) );
 
-			// checkboxes (might not get send if 0)
+			// checkboxes (will not get send, if unchecked)
 			$edited_Blog->set( 'force_skin',  1-param( 'blog_force_skin',    'integer', $req ? 0 : 0 ) );
 			$edited_Blog->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', $req ? 0 : 1 ) );
 			$edited_Blog->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', $req ? 0 : 1 ) );
@@ -150,7 +149,7 @@ function set_edited_Blog_from_params( $for )
 }}}
 
 
-// page title
+// page title {{{
 switch( $action )
 {
 	case 'new':
@@ -174,7 +173,7 @@ switch( $action )
 				break;
 		}
 		break;
-}
+} // }}}
 
 
 require( dirname(__FILE__).'/_menutop.php' );
@@ -184,6 +183,7 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 switch($action)
 {
 	case 'new':
+		// ---------- "New blog" form ---------- {{{
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -197,10 +197,12 @@ switch($action)
 
 		echo '</div>';
 
+		// }}}
 		break;
 
 
 	case 'create':
+		// ---------- Create new blog ---------- {{{
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -236,10 +238,12 @@ switch($action)
 			break;
 		}
 		echo '</div>';
+		// }}}
 		// NOTE: no break here, we go on to next form if there was an error!
 
 
-	case 'update': // ---------- Update blog in DB ----------
+	case 'update':
+		// ---------- Update blog in DB ---------- {{{
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
@@ -276,12 +280,12 @@ switch($action)
 
 		?>
 		</div>
-		<?php
+		<?php // }}}
 		// NOTE: no break here, we go on to edit!
 
 
 	case 'edit':
-		// ---------- Edit blog form ----------
+		// ---------- Edit blog form ---------- {{{
 		if( $action == 'edit' )
 		{ // permissions have not been checked on update:
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
@@ -351,12 +355,12 @@ switch($action)
 				require( dirname(__FILE__).'/_blogs_advanced.form.php' );
 				break;
 		}
-		echo '</div>';
+		echo '</div>'; // }}}
 		break;
 
 
 	case 'delete':
-		// ----------  Delete a blog from DB ----------
+		// ----------  Delete a blog from DB ---------- {{{
 		param( 'confirm', 'integer', 0 );
 
 		if( $blog == 1 )
@@ -424,11 +428,12 @@ switch($action)
 			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, true );
 			echo '</div>';
 		}
+		// }}}
 		break;
 
 
 	case 'GenStatic':
-		// ----------  Generate static homepage for blog ----------
+		// ----------  Generate static homepage for blog ---------- {{{
 		?>
 			<div class="panelinfo">
 				<h3>
@@ -505,9 +510,10 @@ switch($action)
 		?>
 		</div>
 		<?php
+		// }}}
 		break;
-
 }
+
 
 // List the blogs:
 require( dirname(__FILE__).'/_blogs_list.php' );

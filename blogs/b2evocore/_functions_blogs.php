@@ -397,7 +397,6 @@ function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams 
 }
 
 
-
 /**
  * Start blog iterator
  *

@@ -382,4 +382,7 @@ $sleep_after_edit = 0;                   // let DB do its stuff...
 $evonetsrv_host = 'b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
+
+
+$regexp_images = '/\.(jpe?g|gif|png|swf)$/i'; // match image files
 ?>
