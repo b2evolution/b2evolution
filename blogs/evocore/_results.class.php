@@ -52,9 +52,10 @@ class Results
 	var $page;
 	var $total_pages;
 	var $rows = NULL;
-	var $action;
-	var $col_headers = NULL;
 	var $cols = NULL;
+	var $col_headers = NULL;
+	var $col_orders = NULL;
+	var $col_starts = NULL;
 	var $params = NULL;
 
 	/**
@@ -73,8 +74,7 @@ class Results
 	 * Constructor
 	 *
 	 *
-	 *
-	 * @todo fsaya: WHAT IS $action ????!!
+	 * @todo we might not want to count total rows when not needed...
 	 *
 	 * @param string SQL query
 	 * @param integer number of lines displayed on one screen
@@ -82,7 +82,7 @@ class Results
 	 * @param integer current page to display
 	 * @param string ordering of columns (special syntax)
 	 */
-	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL, $action = NULL)
+	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL)
 	{
 		global $DB;
 		$this->DB = $DB;
@@ -93,34 +93,19 @@ class Results
 		// Count total rows:
 		$this->count_total_rows();
 
-		// Check (default)page number & (default)order..
-		if( $this->total_rows )
-		{
-	    $this->total_pages = ceil($this->total_rows / $this->limit);
+    $this->total_pages = ceil($this->total_rows / $this->limit);
 
- 			if( is_null($page) )
-			{ //attribution of a page number
-				$page = param(  $param_prefix.'page', 'integer', 1, true );
-			}
-			$this->page = min( $page, $this->total_pages ) ;
-
-			if( is_null($order) )
-			{ //attribution of an order type
-				$order = param( $param_prefix.'order', 'string', '', true );
-			}
-			$this->order = $order;
-
-			if( is_null($action) )
-			{ //attribution of a page number
-				$action = param(  'action', 'string', '', true );
-			}
-			$this->page = min( $page, $this->total_pages ) ;
+		if( is_null($page) )
+		{ //attribution of a page number
+			$page = param(  $param_prefix.'page', 'integer', 1, true );
 		}
-		else
-		{ //there is no page to display
-	    $this->total_pages = 0;
-	    $this->$page = 0;
+		$this->page = min( $page, $this->total_pages ) ;
+
+		if( is_null($order) )
+		{ //attribution of an order type
+			$order = param( $param_prefix.'order', 'string', '', true );
 		}
+		$this->order = $order;
 	}
 
 
@@ -177,7 +162,7 @@ class Results
 			}
 
 			// Limit to requested page
-			$sql = $this->sql.' LIMIT '.($this->page-1)*$this->limit.', '.$this->limit;
+			$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
 
 			// Execute query and store results
 			$this->rows = $this->DB->get_results( $sql );
@@ -197,20 +182,28 @@ class Results
 	 */
 	function count_total_rows()
 	{
-		//test of the SQL query to avoid an SQL error in case of a query on one single table:
-		if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $this->sql, $matches ) )
-			die( 'Error' );
-
-		if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
-		{ // there was a coma or a JOIN clause in the FROM clause of the original query,
-			// We must use field names in the COUNT
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $this->sql );
-			// Get rid of any Aliases in colmun names:
-			$sql_count = preg_replace( '#\s+ AS \s+ (.*?) (,|FROM)#six', ' $2', $sql_count );
+		if( is_null($this->sql) )
+		{	// We may want to remove this later...
+			$this->total_rows = 0;
+			return;
 		}
-		else
+
+ 		$sql_count = $this->sql;
+
+		//test of the SQL query to avoid an SQL error in case of a query on one single table:
+		if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
+			die( "Can't understand query..." );
+
+/*		if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
+		{ // there was a coma or a JOIN clause in the FROM clause of the original query,
+			// Get rid of any Aliases in colmun names:
+			$sql_count = preg_replace( '#\s+ AS \s+ ([A-Za-z_]+?) #six', ' ', $sql_count );
+			// ** We must use field names in the COUNT **
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
+		}
+		else */
 		{	// Single table request: we must NOT use field names in the count.
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $this->sql );
+			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
 		}
 		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
 	}
@@ -218,6 +211,8 @@ class Results
 
 	/**
 	 * Display paged list/table based on object parameters
+	 *
+	 * This is the meat of this class!
 	 *
 	 * @return int # of rows displayed
 	 */
@@ -230,36 +225,36 @@ class Results
 					'header_start' => '',
 					'header_text' => '',
 					'header_end' => '',
-					'list_start' => '<table class="grouped" cellspacing="0">',
-						'head_start' => '<thead>',
+					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
+						'head_start' => "<thead>\n",
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
-							'colhead_end' => '</th>',
-						'head_end' => '</thead>',
-						'tfoot_start' => '<tfoot>',
-						'tfoot_end' => '</tfoot>',
-						'body_start' => '<tbody>',
-							'line_start' => '<tr>',
-							'line_start_odd' => '<tr class="odd">',
+							'colhead_end' => "</th>\n",
+						'head_end' => "</thead>\n\n",
+						'tfoot_start' => "<tfoot>\n",
+						'tfoot_end' => "</tfoot>\n\n",
+						'body_start' => "<tbody>\n",
+							'line_start' => "<tr>\n",
+							'line_start_odd' => '<tr class="odd">'."\n",
 								'col_start' => '<td>',
 								'col_start_first' => '<td class="firstcol">',
-								'col_end' => '</td>',
-							'line_end' => '</tr>',
-						'body_end' => '</tbody>',
-					'list_end' => '</table>',
+								'col_end' => "</td>\n",
+							'line_end' => "</tr>\n\n",
+						'body_end' => "</tbody>\n\n",
+					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="center">',
 					'footer_text' => ($this->total_pages > 1 ) ? 
 															T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'
 															.'$total_pages$ Pages : $prev$ $list$ $next$ <br />'
-															.'$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') : '1 '
+															.'$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') : ' 1 '
 															.T_('Page'),
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'list_prev_text' => T_('...'),
 						'list_next_text' => T_('...'),
 						'list_span' => 11,
-						'range' => 5,																																																		 
-					'footer_end' => '</div>',
+						'scroll_list_range' => 5,
+					'footer_end' => "</div>\n\n",
 					'no_results' => T_('No results.'),
 				'after' => '</div>',
 				);
@@ -304,6 +299,9 @@ class Results
 
 		echo $this->params['list_start'];
 
+		// -----------------------------
+		// HEADERS:
+		// -----------------------------
 		if( !is_null( $this->col_headers ) )
 		{	// We have headers to display:
 			echo $this->params['head_start'];
@@ -371,7 +369,9 @@ class Results
    	echo $this->params['body_start'];
 
 
-		// Display lines!! :
+		// -----------------------------
+		// DATA ROWS:
+		// -----------------------------
 		foreach( $this->rows as $row )
 		{	// For each row/line:
 
@@ -384,13 +384,23 @@ class Results
 			foreach( $this->cols as $col )
 			{	// For each column:
 
-				if( ($col_count==0) && isset($this->params['col_start_first']) )
-				 	echo $this->params['col_start_first'];
+				if( isset($this->col_starts[$col_count] ) )
+				{ // We have a customized column start for this one:
+					$output = $this->col_starts[$col_count];
+				}
+				elseif( ($col_count==0) && isset($this->params['col_start_first']) )
+				{	// Display first column column start:
+					$output = $this->params['col_start_first'];
+				}
 				else
-					echo $this->params['col_start'];
+				{	// Display regular colmun start:
+					$output = $this->params['col_start'];
+				}
+
+				$output .= $col; 
 
 				// Make variable substitution:
-				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $col );
+				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $output );
 				// Make callback function substitution:
 				$output = preg_replace( '#% (.+?) %#ix', "'.$1.'", $output );
 
@@ -436,7 +446,7 @@ class Results
 
 
 	/**
-	 * Returns the position of first defined element of an array
+	 * Returns the position of the first defined element of an array
 	 */
 	function first_defined_order($array)
 	{
@@ -486,7 +496,7 @@ class Results
 					
 				case 'total_rows' : 
 					return ( $this->total_rows );
-					
+
 				case 'page' : 
 					//current page number
 					return ( $this->page );
@@ -499,7 +509,7 @@ class Results
 					//inits the link to previous page
 					return ( $this->page>1 ) ? '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->page-1) ).'">'.
 																$this->params['prev_text'].'</a>' : $this->params['prev_text'];
-				
+
 				case 'next' :
 					//inits the link to next page
 					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( $this->param_prefix.'page',  $this->param_prefix.'page='.($this->page+1) )
@@ -527,7 +537,7 @@ class Results
 				case 'list_next' :
 					//inits the link to next page range
 					return $this->display_next();
-					
+
 				default : return $matches[1];
 			}
 	}
@@ -650,7 +660,7 @@ class Results
 		return $list;
 	}
 
-	
+
 	/* 
 	 * Returns a scrolling page list under the table
 	 */
@@ -658,7 +668,7 @@ class Results
 	{
 		$scroll = '';
 		$i = 0;
-		$range = $this->params['range'];
+		$range = $this->params['scroll_list_range'];
 		$min = 1; 
 		$max = 1;
 		$option = '';
@@ -675,13 +685,13 @@ class Results
 			}
 			
 		//initialization of the form
-		$scroll ='<form class="inline" method="post" action="'.regenerate_url( $this->param_prefix.'page' ).'"> 
-    				.<select name="'.$this->param_prefix.'page" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
+		$scroll ='<form class="inline" method="post" action="'.regenerate_url( $this->param_prefix.'page' ).'">
+    					<select name="'.$this->param_prefix.'page" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
 
 		while( $max <= $this->total_pages )
 		{ //construction loop
 			if( $this->page <= $max && $this->page >= $min )
-			{ //display of all the pages belonging to the range where the current page is located
+			{ //display all the pages belonging to the range where the current page is located
 				for( $i = $min ; $i <= $max ; $i++)
 				{ //construction of the <option> tags
 					$selected = ($i == $this->page) ? ' selected' : '';//the "selected" option is applied to the current page
@@ -691,7 +701,7 @@ class Results
 			}
 			else
 			{ //inits the ranges inside the list
-				$range_display = '<option value="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$min).'">'
+				$range_display = '<option value="'.$min.'">'
 													.T_('Pages').' '.$min.' '.T_('to').' '.$max;
 				$scroll = $scroll.$range_display;
 			}
@@ -756,9 +766,11 @@ class Results
 }
 
 
-
 /*
  * $Log$
+ * Revision 1.6  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.5  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

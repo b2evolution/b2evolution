@@ -794,8 +794,23 @@ th.checkright {
 	font-size: 84%;
 }
 
+/* Tasks */
+
+.tskst_5 /* Finished */,
+.tskst_6 /* Canceled */ {
+	text-decoration: line-through;
+}
+
+.past_deadline {
+	color: #c00;
+	font-weight: bold;
+}
+
 /*
  * $Log$
+ * Revision 1.10  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.9  2004/12/29 03:16:00  blueyed
  * clear:both-Hack removed
  *

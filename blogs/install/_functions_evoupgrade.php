@@ -524,11 +524,15 @@ function upgrade_b2evo_tables()
 							CHANGE COLUMN post_mod_date	post_datemodified datetime NOT NULL,
 							CHANGE COLUMN post_category post_main_cat_ID int(11) unsigned NOT NULL,
 							ADD post_parent_ID				int(11) unsigned NULL AFTER ID,
-							ADD post_assigned_user_ID	int(11) unsigned NULL AFTER post_creator_user_ID,
+							ADD post_lastedit_user_ID	int(11) unsigned NULL AFTER post_creator_user_ID,
+							ADD post_assigned_user_ID	int(11) unsigned NULL AFTER post_lastedit_user_ID,
+							ADD post_datedeadline 		datetime NULL AFTER post_datestart,
+							ADD post_datecreated			datetime NULL AFTER post_datedeadline,
 							ADD post_pst_ID						int(11) unsigned NULL AFTER post_status,
 							ADD post_ptyp_ID					int(11) unsigned NULL AFTER post_pst_ID,
-							ADD post_views						INT(11) UNSIGNED NOT NULL DEFAULT 0 AFTER post_flags,
-							ADD post_commentsexpire		DATETIME DEFAULT NULL AFTER post_comments,
+							ADD post_views						int(11) unsigned NOT NULL DEFAULT 0 AFTER post_flags,
+							ADD post_commentsexpire		datetime DEFAULT NULL AFTER post_comments,
+							ADD post_priority					int(11) unsigned null,
 							ADD INDEX post_creator_user_ID( post_creator_user_ID ),
 							ADD INDEX post_parent_ID( post_parent_ID ),
 							ADD INDEX post_assigned_user_ID( post_assigned_user_ID ),
@@ -536,6 +540,13 @@ function upgrade_b2evo_tables()
 							ADD INDEX post_main_cat_ID( post_main_cat_ID ),
 							ADD INDEX post_ptyp_ID( post_ptyp_ID ),
 							ADD INDEX post_pst_ID( post_pst_ID ) ";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
+ 		echo 'Updating post data... ';
+		$query = 'UPDATE T_posts
+							SET post_lastedit_user_ID = post_creator_user_ID,
+									post_datecreated = post_datestart';
 		$DB->query( $query );
 		echo "OK.<br />\n";
 

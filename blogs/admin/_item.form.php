@@ -76,14 +76,18 @@ if( isset($Blog) )
 <?php
 }
 
-$Form = & new Form( 'none' );
+
+// Display submenu:
+require dirname(__FILE__).'/_submenu.inc.php';
+
+$Form = & new Form( $form_action, 'post', 'post', 'none' );
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
 ?>
 <!-- ================================ START OF EDIT FORM ================================ -->
 
-<form name="post" id="post" action="<?php echo $form_action ?>" target="_self" method="post">
+<form name="post" id="post" action="<?php echo $form_action ?>" method="post">
 
 <div class="left_col">
 
@@ -151,8 +155,13 @@ $Form->labelend = "</strong>\n";
 	</script>
 
 	<div class="edit_actions">
-	<?php // ------------------------------- ACTIONS ---------------------------------- ?>
-		<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);" />
+	<?php // ------------------------------- ACTIONS ----------------------------------
+		if( $use_preview )
+		{	?>
+			<input type="button" value="<?php echo T_('Preview') ?>" onclick="open_preview(this.form);" />
+			<?php
+		}
+	?>
 
 	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" />
 
@@ -181,13 +190,6 @@ $Form->labelend = "</strong>\n";
 	<fieldset>
 		<legend><?php echo T_('Advanced properties') ?></legend>
 
-		<div>
-			<label for="item_assigned_user_ID"><strong><?php echo T_('Assigned to') ?>:</strong></label>
-			<select name="item_assigned_user_ID" id="item_assigned_user_ID">
-				<?php $edited_Item->assigned_user_options() ?> 
-			</select>
-		</div>
-
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
@@ -207,6 +209,41 @@ $Form->labelend = "</strong>\n";
 			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'formvalue' ); ?>" size="40" maxlength="50" />
 			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
 			</span>
+		</div>
+
+	</fieldset>
+
+
+	<fieldset>
+		<legend><?php echo T_('Workflow properties') ?></legend>
+
+		<div>
+			<label for="item_st_ID"><strong><?php echo T_('Task status') ?>:</strong></label>
+			<select name="item_st_ID" id="item_st_ID"><?php $itemStatusCache->option_list( $edited_Item->st_ID, ! $edited_Item->st_required ) ?></select>
+			&nbsp;
+			<label for="item_assigned_user_ID"><strong><?php echo T_('Assigned to') ?>:</strong></label>
+			<select name="item_assigned_user_ID" id="item_assigned_user_ID">
+				<?php $edited_Item->assigned_user_options() ?>
+			</select>
+		</div>
+
+		<div>
+			<label for="item_priority"><strong><?php echo T_('Priority') ?>:</strong></label>
+			<select name="item_priority" id="item_priority">
+				<?php for( $i=1; $i<=10; $i++)
+				{
+					echo '<option value="'.$i.'"';
+					if( $edited_Item->priority == $i )
+					{
+						echo ' selected="selected"';
+					}
+					echo '>'.$i.'</option>';
+				} ?>
+			</select>
+			&nbsp;
+			<?php
+			$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
+			?>
 		</div>
 
 	</fieldset>
@@ -246,55 +283,6 @@ $Form->labelend = "</strong>\n";
 </div>
 
 <div class="right_col">
-
-	<fieldset>
-		<legend><?php echo T_('Status') ?></legend>
-
-		<?php
-		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Published (Public)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Protected (Members only)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Private (You only)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Draft (Not published!)') ?></label><br />
-		<?php
-		}
-		if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
-		{
-		?>
-		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?> />
-		<?php echo T_('Deprecated (Not published!)') ?></label><br />
-		<?php
-		}
-
-		// --------------- EXTRA STATUS --------------
-		?>
-		<label for="item_st_ID"><strong><?php echo T_('Extra status') ?>:</strong></label>
-		<select name="item_st_ID" id="item_st_ID"><?php $itemStatusCache->option_list( $edited_Item->st_ID, ! $edited_Item->st_required ) ?></select>
-
-	</fieldset>
-
-
 
 	<fieldset class="extracats">
 		<legend><?php echo T_('Categories') ?></legend>
@@ -399,6 +387,50 @@ $Form->labelend = "</strong>\n";
 		?>
 		</div>
 	</fieldset>
+
+	<fieldset>
+		<legend><?php echo T_('Visibility / Sharing') ?></legend>
+
+		<?php
+		if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> />
+		<?php echo T_('Published (Public)') ?></label><br />
+		<?php
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> />
+		<?php echo T_('Protected (Members only)') ?></label><br />
+		<?php
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> />
+		<?php echo T_('Private (You only)') ?></label><br />
+		<?php
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> />
+		<?php echo T_('Draft (Not published!)') ?></label><br />
+		<?php
+		}
+		if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $blog ) )
+		{
+		?>
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?> />
+		<?php echo T_('Deprecated (Not published!)') ?></label><br />
+		<?php
+		}
+	?>
+
+	</fieldset>
+
 	<?php
 		if( $Blog->allowcomments == 'post_by_post' )
 		{	// ---------------- COMMENT STATUS -----------------
@@ -418,8 +450,10 @@ $Form->labelend = "</strong>\n";
 			<?php
 		}
 	?>
+
+
 	<fieldset>
-		<legend><?php echo T_('Renderers') ?></legend>
+		<legend><?php echo T_('Text Renderers') ?></legend>
 		<?php
 		$Plugins->restart(); // make sure iterator is at start position
 		$atLeastOneRenderer = false;
@@ -496,8 +530,15 @@ $Form->labelend = "</strong>\n";
 <!-- ================================== END OF EDIT FORM ================================== -->
 
 <?php
+
+// End block:
+require dirname(__FILE__).'/_sub_end.inc.php';
+
 /*
  * $Log$
+ * Revision 1.7  2005/01/03 15:17:51  fplanque
+ * no message
+ *
  * Revision 1.6  2004/12/23 21:19:40  fplanque
  * no message
  *

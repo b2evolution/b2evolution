@@ -185,11 +185,19 @@ class DataObject
 		}
 		if( !empty($this->creator_field) )
 		{	// We want to track creator:
-			$this->set_param( $this->creator_field, 'number', $current_User->ID );
+			if( empty($this->creator_user_ID) )
+			{	// No creator assigned yet, use current user:
+				$this->creator_user_ID = $current_User->ID;
+			}
+			$this->set_param( $this->creator_field, 'number', $this->creator_user_ID );
 		}
 		if( !empty($this->lasteditor_field) )
 		{	// We want to track last editor:
-			$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
+			if( empty($this->lastedit_user_ID) )
+			{	// No editor assigned yet, use current user:
+				$this->lastedit_user_ID = $current_User->ID;
+			}
+			$this->set_param( $this->lasteditor_field, 'number', $this->lastedit_user_ID );
 		}
 
 
@@ -348,7 +356,7 @@ class DataObject
 }
 
 
-/*
+/**
  * {@internal object_history(-)}}
  */
 function object_history( $pos_lastedit_user_ID, $pos_datemodified )
@@ -368,6 +376,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.9  2004/12/21 21:18:38  fplanque
  * Finished handling of assigning posts/items to users
  *

@@ -91,6 +91,12 @@ class ArchiveList extends Results
 		$this->dbIDname = $dbIDname;
 		$this->archive_mode = $archive_mode;
 
+
+		// CONSTRUCT THE FROM CLAUSE:
+		$this->from = '	FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+																INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
+
+
 		// CONSTRUCT THE WHERE CLAUSE:
 
 		/*
@@ -132,10 +138,9 @@ class ArchiveList extends Results
 			case 'monthly':
 				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
 				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
-																	COUNT(DISTINCT postcat_post_ID) AS count
-													FROM (T_posts INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$this->where.'
+																	COUNT(DISTINCT postcat_post_ID) AS count '
+													.$this->from
+													.$this->where.'
 													GROUP BY year, month
 													ORDER BY year DESC, month DESC';
 				break;
@@ -144,10 +149,9 @@ class ArchiveList extends Results
 				// ------------------------------- DAILY ARCHIVES -------------------------------------
 				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
 																	DAYOFMONTH('.$this->dbprefix.'datestart) AS day,
-																	COUNT(DISTINCT postcat_post_ID) AS count
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$this->where.'
+																	COUNT(DISTINCT postcat_post_ID) AS count '
+													.$this->from
+													.$this->where.'
 													GROUP BY year, month, day
 													ORDER BY year DESC, month DESC, day DESC';
 				break;
@@ -155,10 +159,9 @@ class ArchiveList extends Results
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
 				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, WEEK('.$this->dbprefix.'datestart) AS week,
-																	COUNT(DISTINCT postcat_'.$this->dbprefix.'ID) AS count
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$this->where.'
+																	COUNT(DISTINCT postcat_'.$this->dbprefix.'ID) AS count '
+													.$this->from
+													.$this->where.'
 													GROUP BY year, week
 													ORDER BY year DESC, week DESC';
 				break;
@@ -166,10 +169,9 @@ class ArchiveList extends Results
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-				$sql = 'SELECT DISTINCT '.$this->dbIDname.', '.$this->dbprefix.'datestart, '.$this->dbprefix.'title
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_'.$this->dbprefix.'ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-													'.$this->where.'
+				$sql = 'SELECT DISTINCT '.$this->dbIDname.', '.$this->dbprefix.'datestart, '.$this->dbprefix.'title '
+													.$this->from
+													.$this->where.'
 													ORDER BY '.$this->dbprefix.'datestart DESC';
 		}
 
@@ -190,35 +192,31 @@ class ArchiveList extends Results
 		{
 			case 'monthly':
 				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) )
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ) '
+													.$this->from
 													.$this->where;
 				break;
 
 			case 'daily':
 				// ------------------------------- DAILY ARCHIVES -------------------------------------
 				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
-																	DAYOFMONTH('.$this->dbprefix.'datestart) )
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+																	DAYOFMONTH('.$this->dbprefix.'datestart) ) '
+													.$this->from
 													.$this->where;
 				break;
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), WEEK('.$this->dbprefix.'datestart) )
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), WEEK('.$this->dbprefix.'datestart) ) '
+													.$this->from
 													.$this->where;
 				break;
 
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT '.$this->dbIDname.' )
-													FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
-																INNER JOIN T_categories ON postcat_cat_ID = cat_ID '
+				$sql_count = 'SELECT COUNT( DISTINCT '.$this->dbIDname.' ) '
+													.$this->from
 													.$this->where;
 		}
 
@@ -294,6 +292,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.6  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.5  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

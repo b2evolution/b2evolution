@@ -170,7 +170,7 @@ function veriflog( $login_required = false )
 	// echo 'LOGGED IN';
 	// TODO: $UserCache::get_by_login()!
 	$userdata = get_userdatabylogin($user_login);
-	$current_User = $UserCache->get_by_login( $user_login ); // we cannot set a global by reference!!
+	$current_User = $UserCache->get_by_login( $user_login ); // COPY! we cannot set a global by reference!!
 	# echo $current_User->disp('login');
 
 	$user_ID = $userdata['ID'];
@@ -629,6 +629,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.7  2004/12/30 23:07:02  blueyed
  * removed obsolete $user_nickname
  *

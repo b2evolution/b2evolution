@@ -71,18 +71,22 @@ class DataObjectList extends Results
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
+	 * @param string Name of Class for objects within this list
 	 * @param string SQL query
 	 * @param integer number of lines displayed on one screen
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param integer current page to display
 	 * @param string ordering of columns (special syntax)
 	 */
-	function DataObjectList( $tablename, $prefix = '', $dbIDname = 'ID', $sql = NULL, $limit = 20,
-														$param_prefix = '',	$page = NULL, $order = NULL )
+	function DataObjectList( $tablename, $prefix = '', $dbIDname = 'ID', $objType = 'Item', $sql = NULL,
+														$limit = 20, $param_prefix = '',	$page = NULL, $order = NULL )
 	{
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
+
+		// Object type handled by this list
+		$this->objType = $objType;
 
 		if( !is_null( $sql ) )
 		{	// We have an SQL query to execute:
@@ -90,7 +94,8 @@ class DataObjectList extends Results
 		}
 		else
 		{	// TODO: do we want to autogenerate a query here???
-
+			// Temporary...
+			parent::Results( $sql, $limit, $param_prefix, $page, $order );
 		}
 	}
 
@@ -113,6 +118,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.4  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.3  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

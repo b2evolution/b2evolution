@@ -54,7 +54,10 @@ $object_def['Item'] = array( // definition of the object:
 			'db_cols' => array(	// maps properties to colums:
 										'ID'              => 'ID',
 										'creator_user_ID' => 'post_creator_user_ID',
+										'lastedit_user_ID'=> 'post_lastedit_user_ID',
 										'assigned_user_ID'=> 'post_assigned_user_ID',
+										'datecreated'			=> 'post_datecreated',
+										'deadline'        => 'post_datedeadline',
 										'datestart'       => 'post_datestart',
 										'datemodified'    => 'post_datemodified',
 										'status'          => 'post_status',
@@ -71,6 +74,7 @@ $object_def['Item'] = array( // definition of the object:
 										'renderers'       => 'post_renderers',
 										'st_ID'           => 'post_pst_ID',
 										'typ_ID'          => 'post_ptyp_ID',
+										'priority'				=> 'post_priority'
 									),
 			'allow_null' => array( // specifies column nullability:
 										'assigned_user_ID'=> true,
@@ -113,10 +117,12 @@ class Item extends DataObject
 	var $url;					// Should move
 	var $typ_ID;
 	var $st_ID;
+	var $deadline = '';
+	var $priority = 5;
 
 	/**
 	 * Derived from $main_cat_ID
-	 *
+   *
 	 * @var integer
 	 */
 	var $blog_ID;
@@ -131,17 +137,27 @@ class Item extends DataObject
 	 * @param string
 	 * @param string
 	 * @param string for derived classes
+	 * @param string datetime field name
+	 * @param string datetime field name
+	 * @param string User ID field name
+	 * @param string User ID field name
 	 */
-	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item' )
+	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item',
+ 												$datecreated_field = '', $datemodified_field = 'datemodified',
+												$creator_field = 'creator_user_ID', $lasteditor_field = '' )
 	{
 		global $UserCache, $object_def, $localtimenow;
 
+		// Dereference db cols definition for this object:
+		$db_cols =  & $object_def[$objtype]['db_cols'];
+
 		// Call parent constructor:
-		parent::DataObject( $dbtable, $dbprefix, $dbIDname );
+		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
+												$creator_field, $lasteditor_field );
 
 		$this->objtype = $objtype;
-		$this->typ_required = false;	// type NOT required
-		$this->st_required = false;	// extra status NOT required
+ 		$this->typ_required = false;	// type NOT required
+ 		$this->st_required = false;	// extra status NOT required
 
 		if( $db_row == NULL )
 		{
@@ -152,9 +168,6 @@ class Item extends DataObject
 		}
 		else
 		{
-			// Dereference db cols definition for this object:
-			$db_cols =  & $object_def[$objtype]['db_cols'];
-
 			$this->ID = $db_row->$dbIDname;
 			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] ); // NO COPY...(?)
 			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
@@ -171,6 +184,8 @@ class Item extends DataObject
 			$this->comments = $db_row->$db_cols['comments'];			// Comments status
 			$this->typ_ID = $db_row->$db_cols['typ_ID'];
 			$this->st_ID = $db_row->$db_cols['st_ID'];
+			$this->deadline = $db_row->$db_cols['deadline'];
+			$this->priority = $db_row->$db_cols['priority'];
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->$db_cols['renderers'] );
@@ -201,15 +216,15 @@ class Item extends DataObject
 			$this->AssignedUser = NULL;
 		}
 
-		if( $dbupdate )
-		{ // Record ID for DB:
+ 		if( $dbupdate )
+ 		{ // Record ID for DB:
 			$this->set_param( 'assigned_user_ID', 'number', $this->AssignedUser->ID, true );
 		}
 	}
 
 
 	/**
-	 * generate permalink for item
+ 	 * generate permalink for item
 	 *
 	 * {@internal Item::gen_permalink(-)}}
 	 *
@@ -217,8 +232,8 @@ class Item extends DataObject
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
-	 * @param boolean true to force single post on destination page
-	 * @param string glue between url params
+   * @param boolean true to force single post on destination page
+   * @param string glue between url params
 	 */
 	function gen_permalink( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
 	{
@@ -228,7 +243,7 @@ class Item extends DataObject
 			$mode = $Settings->get( 'permalink_type' );
 
 		if( $force_single && (strpos( $mode, 'archive' ) !== false) )
-		{ // Comments cannot be displayed in archive mode
+		{	// Comments cannot be displayed in archive mode
 			$mode = 'pid';
 		}
 
@@ -280,7 +295,7 @@ class Item extends DataObject
 		}
 
 		if( ! $Settings->get('links_extrapath') )
-		{ // We reference by Query: Dirty but explicit permalinks
+		{	// We reference by Query: Dirty but explicit permalinks
 
 			switch( $dest_type )
 			{
@@ -307,7 +322,7 @@ class Item extends DataObject
 			}
 		}
 		else
-		{ // We reference by path (CLEAN permalinks!)
+		{	// We reference by path (CLEAN permalinks!)
 			switch( $dest_type )
 			{
 				case 'monthly':
@@ -375,7 +390,7 @@ class Item extends DataObject
 	}
 
 
-	/**
+  /**
 	 * Template function: display asignee of item
 	 *
 	 * {@internal Item::assigned_to(-) }}
@@ -395,7 +410,7 @@ class Item extends DataObject
 	}
 
 
-	/**
+ 	/**
 	 * Template function: display list of assigned user options
 	 *
 	 * {@internal Item::assigned_user_options(-)}}
@@ -409,7 +424,6 @@ class Item extends DataObject
 						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
-
 
 	/**
 	 * Template function: list all the category names
@@ -427,18 +441,18 @@ class Item extends DataObject
 	 * @param string Output format for each cat, see {@link format_to_output()}
 	 */
 	function categories(
-			$link_title = '#',
-			$before_main='<strong>', $after_main='</strong>',
-			$before_other='', $after_other='',
-			$before_external='<em>', $after_external='</em>',
-			$separator = ', ',
-			$format = 'htmlbody'
-		)
+		$link_title = '#',
+		$before_main='<strong>', $after_main='</strong>',
+		$before_other='', $after_other='',
+		$before_external='<em>', $after_external='</em>',
+		$separator = ', ',
+		$format = 'htmlbody'
+	 )
 	{
 		global $cache_postcats;
 
 		if( $link_title == '#' )
-		{ /* TRANS: When the categories for a specific post are displayed, the user can click
+		{	/* TRANS: When the categories for a specific post are displayed, the user can click
 					on these cats to browse them, this is the default href title displayed there */
 			$link_title = T_('Browse category');
 		}
@@ -453,15 +467,15 @@ class Item extends DataObject
 			$cat_name = format_to_output( $cat["cat_name"], $format );
 
 			if( $link_title )
-			{ // we want to display links
+			{	// we want to display links
 				$curr_blogparams = get_blogparams_by_ID( $cat['cat_blog_ID'] );
 				$cat_name = '<a href="'.url_add_param( get_bloginfo('blogurl', $curr_blogparams), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 			}
 
 			if( $cat_ID == $this->main_cat_ID )
-			{ // We are displaying the main cat!
+			{	// We are displaying the main cat!
 				if( $before_main == 'hide' )
-				{ // ignore main cat !!!
+				{	// ignore main cat !!!
 					continue;
 				}
 				$cat_name = $before_main.$cat_name.$after_main;
@@ -469,15 +483,15 @@ class Item extends DataObject
 			elseif( $cat['cat_blog_ID'] == $this->blog_ID )
 			{ // We are displaying another cat in the same blog
 				if( $before_other == 'hide' )
-				{ // ignore main cat !!!
+				{	// ignore main cat !!!
 					continue;
 				}
 				$cat_name = $before_other.$cat_name.$after_other;
 			}
 			else
-			{ // We are displaying an external cat (in another blog)
+			{	// We are displaying an external cat (in another blog)
 				if( $before_external == 'hide' )
-				{ // ignore main cat !!!
+				{	// ignore main cat !!!
 					continue;
 				}
 				$cat_name = $before_external.$cat_name.$after_external;
@@ -510,13 +524,12 @@ class Item extends DataObject
 	function can_see_comments()
 	{
 		if( $this->comments == 'disabled'  )
-		{ // Comments are disabled on this post
+		{	// Comments are disabled on this post
 			return false;
 		}
 
 		return true; // OK, user can see comments
 	}
-
 
 	/**
 	 * Template function: Check if user can leave comment on this post or display error
@@ -537,12 +550,12 @@ class Item extends DataObject
 						)
 	{
 		if( $this->comments == 'disabled'  )
-		{ // Comments are disabled on this post
+		{	// Comments are disabled on this post
 			return false;
 		}
 
 		if( $this->comments == 'closed'  )
-		{ // Comments are closed on this post
+		{	// Comments are closed on this post
 			if( $closed_msg == '#' )
 				$closed_msg = T_( 'Comments are closed for this post.' );
 
@@ -554,7 +567,7 @@ class Item extends DataObject
 		}
 
 		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) )
-		{ // Post is not published
+		{	// Post is not published
 			if( $non_published_msg == '#' )
 				$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
 
@@ -613,12 +626,12 @@ class Item extends DataObject
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
-		{ // TRANS: this is the default text for the extended post "more" link
+		{	// TRANS: this is the default text for the extended post "more" link
 			$more_link_text = '=> '.T_('Read more!');
 		}
 
 		if( $more_anchor == '#' )
-		{ // TRANS: this is the default text displayed once the more link has been activated
+		{	// TRANS: this is the default text displayed once the more link has been activated
 			$more_anchor = '['.T_('More:').']';
 		}
 
@@ -647,7 +660,7 @@ class Item extends DataObject
 		$numpages = 1;
 
 		if( preg_match('/<!--nextpage-->/', $content ) )
-		{ // This is a multipage post
+		{	// This is a multipage post
 			$content = str_replace("\n<!--nextpage-->\n", '<!--nextpage-->', $content);
 			$content = str_replace("\n<!--nextpage-->", '<!--nextpage-->', $content);
 			$content = str_replace("<!--nextpage-->\n", '<!--nextpage-->', $content);
@@ -667,11 +680,11 @@ class Item extends DataObject
 		$content_parts = explode('<!--more-->', $content);
 
 		if( count($content_parts)>1 )
-		{ // This is an extended post (has a more section):
+		{	// This is an extended post (has a more section):
 			if( $dispmore )
-			{ // Viewer has already asked for more
+			{	// Viewer has already asked for more
 				if( $stripteaser || preg_match('/<!--noteaser-->/', $content ) )
-				{ // We want to strip the teaser:
+				{	// We want to strip the teaser:
 					$output = '';
 				}
 				else
@@ -710,7 +723,7 @@ class Item extends DataObject
 		$output = format_to_output( $output, $format );
 
 		if( ($format == 'xml') && $cut )
-		{ // Let's cut this down...
+		{	// Let's cut this down...
 			$blah = explode(' ', $output);
 			if (count($blah) > $cut)
 			{
@@ -741,7 +754,6 @@ class Item extends DataObject
 		else
 			echo mysql2date( $format, $this->issue_date, $useGM);
 	}
-
 
 	/**
 	 * Template function: display issue time (datetime) of Item
@@ -781,6 +793,7 @@ class Item extends DataObject
 	}
 
 
+
 	/**
 	 * Template function: display language name for item
 	 *
@@ -813,7 +826,7 @@ class Item extends DataObject
 		global $img_url;
 
 		if( empty($this->Author->email) )
-		{ // We have no email for this Author :(
+		{	// We have no email for this Author :(
 			return false;
 		}
 
@@ -848,7 +861,6 @@ class Item extends DataObject
 		else
 			echo mysql2date( $format, $this->mod_date, $useGM);
 	}
-
 
 	/**
 	 * Template function: display last mod time (datetime) of Item
@@ -933,7 +945,7 @@ class Item extends DataObject
 			case 'trackbacks':
 				$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
 				if( ! $current_Blog->get( 'allowtrackbacks' ) )
-				{ // Trackbacks not allowed on this blog:
+				{	// Trackbacks not allowed on this blog:
 					return;
 				}
 				if( $hideifnone == '#' ) $hideifnone = false;
@@ -946,7 +958,7 @@ class Item extends DataObject
 			case 'pingbacks':
 				$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
 				if( ! $current_Blog->get( 'allowpingbacks' ) )
-				{ // Pingbacks not allowed on this blog:
+				{	// Pingbacks not allowed on this blog:
 					return;
 				}
 				if( $hideifnone == '#' ) $hideifnone = true;
@@ -961,7 +973,7 @@ class Item extends DataObject
 		}
 
 		if( $use_popup == '#' )
-		{ // Use popups if javascript is included in page
+		{	// Use popups if javascript is included in page
 			$use_popup = $b2commentsjavascript;
 		}
 
@@ -998,7 +1010,7 @@ class Item extends DataObject
 	}
 
 
-	/**
+  /**
 	 * Displays button for deleting the Item if user has proper rights
 	 *
 	 * {@internal Item::delete_link(-)}}
@@ -1009,17 +1021,17 @@ class Item extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
-	 * @param string page url for the delete action
+   * @param string page url for the delete action
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
 												$button  = false, $actionurl = 'edit_actions.php?action=delete&amp;post=' )
 	{
 		global $current_User, $admin_url;
 
-		if( ! is_logged_in() ) return false;
+ 		if( ! is_logged_in() ) return false;
 
 		if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $this->blog_ID ) )
-		{ // User has right to delete this post
+		{	// User has right to delete this post
 			return false;
 		}
 
@@ -1030,7 +1042,7 @@ class Item extends DataObject
 
 		echo $before;
 		if( $button )
-		{ // Display as button
+		{	// Display as button
 			echo '<input type="button"';
 			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
 			/* TRANS: Warning this is a javascript string */
@@ -1040,7 +1052,7 @@ class Item extends DataObject
 			echo '/>';
 		}
 		else
-		{ // Display as link
+		{	// Display as link
 			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
 			/* TRANS: Warning this is a javascript string */
 			echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
@@ -1064,10 +1076,10 @@ class Item extends DataObject
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
-	 * @param string page url for the delete action
+   * @param string page url for the delete action
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-											$actionurl = 'b2edit.php?action=edit&amp;post=' )
+											$actionurl = 'edit_actions.php?action=edit&amp;post=' )
 	{
 		global $current_User, $admin_url;
 
@@ -1075,7 +1087,7 @@ class Item extends DataObject
 
 		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false,
 																			$this->blog_ID ) )
-		{ // User has no right to edit this post
+		{	// User has no right to edit this post
 			return false;
 		}
 
@@ -1105,7 +1117,7 @@ class Item extends DataObject
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
-	 * @param string glue between url params
+   * @param string glue between url params
 	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
@@ -1116,7 +1128,7 @@ class Item extends DataObject
 		if( ($this->status == 'published') // Already published!
 			|| ! ($current_User->check_perm( 'blog_post_statuses', 'published', false, $this->blog_ID ))
 			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
-		{ // User has no right to publish this post now:
+		{	// User has no right to publish this post now:
 			return false;
 		}
 
@@ -1162,7 +1174,7 @@ class Item extends DataObject
 	}
 
 
-	/**
+  /**
 	 * Template function: display extra status of item
 	 *
 	 * {@internal Item::extra_status(-) }}
@@ -1176,7 +1188,7 @@ class Item extends DataObject
 		global $itemStatusCache;
 
 		if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, false ) ) )
-		{ // No status:
+		{	// No status:
 			return;
 		}
 
@@ -1192,7 +1204,7 @@ class Item extends DataObject
 		}
 	}
 
-	/**
+  /**
 	 * Template function: display type of item
 	 *
 	 * {@internal Item::type(-) }}
@@ -1206,7 +1218,7 @@ class Item extends DataObject
 		global $itemTypeCache;
 
 		if( ! ($Element = $itemTypeCache->get_by_ID( $this->typ_ID, false) ) )
-		{ // No status:
+		{	// No status:
 			return;
 		}
 
@@ -1244,7 +1256,7 @@ class Item extends DataObject
 			$title = $this->title;
 
 		if( empty($title) )
-		{ // Nothing to display
+		{	// Nothing to display
 			return;
 		}
 
@@ -1370,7 +1382,6 @@ class Item extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'creator_user_ID':
 			case 'main_cat_ID':
 			case 'wordcount':
 				$this->set_param( $parname, 'number', $parvalue, false );
@@ -1417,7 +1428,7 @@ class Item extends DataObject
 	{
 		global $DB, $query;
 		global $localtimenow, $default_locale;
-
+	
 		if( $post_locale == '#' ) $post_locale = $default_locale;
 
 		// Handle the flags:
@@ -1435,7 +1446,8 @@ class Item extends DataObject
 
 		// echo 'INSERTING NEW POST ';
 
-		$this->set( 'creator_user_ID', $author_user_ID );
+		$this->creator_user_ID = $author_user_ID;
+		$this->lastedit_user_ID = $author_user_ID;
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
@@ -1465,11 +1477,11 @@ class Item extends DataObject
 		if( ! $DB->query( $query, 'Associate new post with extra categories' ) ) return 0;
 
 		// TODO: END TRANSACTION
-
+	
 		return $this->ID;
 	}
 
-
+	
 	/**
 	 * Update a post and save to DB
 	 *
@@ -1497,15 +1509,15 @@ class Item extends DataObject
 	{
 		global $DB, $query;
 		global $localtimenow, $default_locale;
-
+	
 		// Handle the flags:
 		$post_flags = array();
 		if( $pingsdone ) $post_flags[] = 'pingsdone';
-
+	
 		// make sure main cat is in extracat list and there are no duplicates
 		$extra_cat_IDs[] = $main_cat_ID;
 		$extra_cat_IDs = array_unique( $extra_cat_IDs );
-
+	
 		// TODO: START TRANSACTION
 
 		// validate url title
@@ -1582,6 +1594,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.12  2004/12/29 03:48:14  blueyed
  * fixed $actionurl for edit_link(); whitespace
  *

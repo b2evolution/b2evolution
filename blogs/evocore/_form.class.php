@@ -6,7 +6,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -26,16 +26,16 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
+ * PROGIDISTRI grants François PLANQUE the right to license
+ * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
+ * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -52,9 +52,18 @@ class Form
 
 	/**
 	 * Constructor
+	 * 
+	 * @param string the name of the form
+	 * @param string the action to execute when the form is submitted
+	 * @param string the method used to send data
+	 * @param string the form layout : 'fieldset', 'table' or ''
 	 */
-	function Form( $layout = 'fieldset' )
+	function Form( $form_action='', $form_name='', $form_method='post', $layout = 'fieldset' )
 	{
+		$this->form_name = $form_name;
+		$this->form_action = $form_action;
+		$this->form_method = $form_method;
+
 		switch( $layout )
 		{
 			case 'table':
@@ -87,10 +96,14 @@ class Form
 	}
 
 
-  /**
+	/**
 	 * Start an input field.
 	 *
 	 * A field is a fielset containing a label div and an input div.
+	 *
+	 * @param string the name of the field
+	 * @param string the field label
+	 * @return the generated HTML 
 	 */
 	function begin_field( $field_name, $field_label )
 	{
@@ -105,6 +118,8 @@ class Form
 	 * End an input field.
 	 *
 	 * A field is a fielset containing a label div and an input div.
+	 *
+	 * @return the generated HTML 
 	 */
 	function end_field()
 	{
@@ -114,6 +129,8 @@ class Form
 
 	/**
 	 * Builds a text (or password) input field.
+	 *
+	 * Note: please use ::password() for password fields
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value
@@ -157,6 +174,27 @@ class Form
 		{
 			return $r;
 		}
+	}
+
+	/**
+	 * Builds a password input field.
+	 *
+	 * Calls the text() method with a 'password' parameter
+	 *
+	 * @param string the name of the input field
+	 * @param string initial value
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @param integer max length of the value (if 0 field_size will be used!)
+	 * @param string the CSS class to use
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function password( $field_name, $field_value, $field_size, $field_label, $field_note = '',
+											$field_maxlength = 0 , $field_class = '' )
+	{
+		$this->text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
+											$field_maxlength = 0 , $field_class = '', 'password' );
 	}
 
 
@@ -261,7 +299,8 @@ class Form
 	 * @param boolean to output (default)  or not
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_value, $field_label, $field_note = '', $field_class = '' )
+	function checkbox( $field_name, $field_value, $field_label, $field_note = '', 
+											$field_class = '' )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
 				.'<input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
@@ -287,5 +326,218 @@ class Form
 			return $r;
 		}
 	}
-
+	
+	
+	/**
+	 * Builds the form field
+	 *
+	 * @param string the class to use for the form tag
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function begin_form( $form_class = '' )
+	{
+		$r = "\n\n".'<form name="'.$this->form_name.'" id="'.$this->form_name
+					.'" method="'.$this->form_method
+					.'" action="'.$this->form_action.'" class="'.$form_class.'" >';
+		$r .= "\n";
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	} 
+	 
+	/**
+	 * Ends the form field
+	 *
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function end_form()
+	{
+		$r = "</form>\n\n";
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+	 
+	/**
+	 * Buidls the fieldset tag
+	 *
+	 * @param string the title of the fieldset to display in the 'legend' tags
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function fieldset( $title, $class='' )
+	{
+		$r = '<fieldset ';
+		if( $class != '' )
+		{ //there is a class option to display in the fieldset tag
+			$r .= 'class="'.$class.'" ';
+		}
+		$r .= '>'."\n";
+		
+		if( $title != '' )
+		{ // there is a legend tag to display
+			$r .= '<legend>'.$title."</legend>\n";
+		}
+		
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+		
+		
+	/**
+	 * Ends the fieldset tag
+	 *
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function fieldset_end()
+	{
+		$r = "\n</fieldset>\n\n";
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	} 
+	
+	
+	/**
+	 * Ends the fieldset tag
+	 *
+	 * the two-dimension array must indicate, for each checkbox:
+	 *  - the name, 
+	 *  - the value, 
+	 *  - the comment to put between <input> and <br />
+	 *  - a boolean indicating whether the box must be checked or not
+	 *  - an optional boolean indicating whether the box is disabled or not
+	 *
+	 * @param array a two-dimension array containinj the parameters of the input tag 
+	 * @param boolean initial value
+	 * @param string name
+	 * @param string label
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function checklist( $options, $field_name, $field_label )
+	{
+		$r = $this->begin_field( $field_name, $field_label );
+		foreach( $options as $option )
+		{ //loop to construct the list of 'input' tags
+			$r .= "\t".'<input type="checkbox" name="'.$option[0].'" value="'.$option[1].'" ';
+			if( $option[3] )
+			{ //the checkbox has to be checked by default
+				$r .= ' checked="checked" ';
+			}
+			if( isset( $option[4] ) && $option[4] )
+			{ // the checkbox has to be disabled
+				$r .= ' disabled="disabled" ';
+			} 
+			$r .= ' />'.$option[2]."<br />\n";
+		}	
+		$r .= $this->end_field();
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	/**
+	 * Display a select field and populate it with a callback function.
+	 *
+	 * @param string field name
+	 * @param string default field value
+	 * @param callback callback function
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param string CSS class for select
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select(
+		$field_name,
+		$field_value,
+		$field_list_callback,
+		$field_label,
+		$field_note = '',
+		$field_class = '' )
+	{
+		$r = $this->begin_field( $field_name, $field_label )
+					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+		if( !empty($field_class) )
+		{
+			$r.= ' class="'.$field_class.'"';
+		}
+		$r .= ">\n".$field_list_callback( $field_value )
+					."</select>\n"
+					.'<span class="notes">'.$field_note.'</span></div>'
+					."</fieldset>\n\n";
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	/**
+	 * Builds a button
+	 *
+	 * @param string the type specified in the input tag
+	 * @param string the tag name
+	 * @param string the tag value
+	 * @param string the class to use
+	 * @param string optional parameter to specify an onclick action using javascript
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function button( $field_type = 'button', $field_name, $field_value, $field_class, 
+										$field_label, $onclick )
+	{
+		$r = $this->begin_field( $field_name, $field_label )
+					."\n".'<input type="'.$field_type.'" name="'.$field_name.'" value="'.$field_value
+					.'" class="'.$field_class.'" ';
+		if( isset( $onclick ) )
+		{
+			$r .= ' onclick ="'.$onclick.'" ';
+		}
+		$r .= ' />';
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
 }
+
+?>

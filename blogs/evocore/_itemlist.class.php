@@ -72,6 +72,8 @@ function cat_req_dummy() {}
  * Item List Class
  *
  * @package evocore
+ *
+ * @todo better use of Parent Class hierarchy... maybe make Results detect wether or not LIMIT is already set
  */
 class ItemList extends DataObjectList
 {
@@ -84,9 +86,6 @@ class ItemList extends DataObjectList
 	var $result_num_rows;			// Number of rows in result set
 	var $postIDlist;
 	var $postIDarray;
-
-	var $total_num_posts;			// Total number of posts
-	var $max_paged;						// Max page number for paged display
 
 	var $group_by_cat;
 
@@ -148,7 +147,7 @@ class ItemList extends DataObjectList
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
-	 * @param
+	 * @param string Name of Class for objects within this list
 	 * @param string Name of the DB table
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
@@ -188,10 +187,7 @@ class ItemList extends DataObjectList
 		global $Settings;
 
 		// Call parent constructor:
-		parent::DataObjectList( $dbtable, $dbprefix, $dbIDname );
-
-		// Object type handled by this list
-		$this->objType = $objType;
+		parent::DataObjectList( $dbtable, $dbprefix, $dbIDname, $objType );
 
 		$this->preview = $preview;
 		$this->blog = $blog;
@@ -537,29 +533,29 @@ class ItemList extends DataObjectList
 			$where .= ' AND '.$dbprefix.'datestart <= \''. $date_max.'\'';
 		}
 
-		$this->request = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType]['db_cols'] )
-										.' FROM ('.$dbtable.' INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
-														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
+		$this->sql = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType]['db_cols'] )
+								.' FROM ('.$dbtable.' INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
+												INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $blog == 1 )
 		{ // Special case: we aggregate all cats from all blogs
-			$this->request .= 'WHERE 1 ';
+			$this->sql .= 'WHERE 1 ';
 		}
 		else
 		{
-			$this->request .= 'WHERE cat_blog_ID = '. $blog;
+			$this->sql .= 'WHERE cat_blog_ID = '. $blog;
 		}
 
-		$this->request .= $where. ' ORDER BY '.$dbprefix.$orderby.' '.$limits;
+		$this->sql .= $where. ' ORDER BY '.$dbprefix.$orderby.' '.$limits;
 		// echo '<br />where=',$where;
 
 		if ($preview)
 		{	// PREVIEW MODE:
-			$this->request = $this->preview_request();
+			$this->sql = $this->preview_request();
 		}
 
-		//echo $this->request;
-		$this->result_rows = $DB->get_results( $this->request, OBJECT, 'Item List (Main|Lastpostdate) Query' );
+		//echo $this->sql;
+		$this->rows = $DB->get_results( $this->sql, OBJECT, 'Item List (Main|Lastpostdate) Query' );
 
 		$this->result_num_rows = $DB->num_rows;
 		// echo $this->result_num_rows, ' items';
@@ -568,7 +564,7 @@ class ItemList extends DataObjectList
 		// Also make arrays...
 		$this->postIDlist = "";
 		$this->postIDarray = array();
-		if( count( $this->result_rows ) ) foreach( $this->result_rows as $myrow )
+		if( count( $this->rows ) ) foreach( $this->rows as $myrow )
 		{
 			array_unshift( $this->postIDarray, $myrow->$dbIDname );	// new row at beginning
 		}
@@ -581,6 +577,8 @@ class ItemList extends DataObjectList
 		// Initialize loop stuff:
 		$this->restart();
 	}
+
+
 
 
 
@@ -655,6 +653,7 @@ class ItemList extends DataObjectList
 	}
 
 
+
 	/**
 	 * {@internal ItemList::get_lastpostdate(-)}}
 	 */
@@ -705,12 +704,12 @@ class ItemList extends DataObjectList
 	 */
 	function get_max_paged()
 	{
-		if( empty($this->max_paged) )
+		if( empty($this->total_pages) )
 		{ // Not already cached:
 			$this->calc_max();
 		}
-		//echo 'max paged= ', $this->max_paged;
-		return $this->max_paged;
+		//echo 'max paged= ', $this->total_pages;
+		return $this->total_pages;
 	}
 
 
@@ -725,7 +724,7 @@ class ItemList extends DataObjectList
 	function mod_date( $format = '', $useGM = false )
 	{
 		$mod_date_timestamp = 0;
-		foreach( $this->result_rows as $loop_row )
+		foreach( $this->rows as $loop_row )
 		{ // Go through whole list
 			$m = $loop_row->post_datemodified;
 			$loop_mod_date = mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
@@ -747,11 +746,11 @@ class ItemList extends DataObjectList
 	 */
 	function get_total_num_posts()
 	{
-		if( empty($this->total_num_posts) )
+		if( empty($this->total_rows) )
 		{ // Not already cached:
 			$this->calc_max();
 		}
-		return $this->total_num_posts;
+		return $this->total_rows;
 	}
 
 
@@ -767,18 +766,18 @@ class ItemList extends DataObjectList
 		if( $this->preview )
 			return 1;	// 1 row in preview mode
 
-		$nxt_request = $this->request;
-		if( $pos = strpos(strtoupper($this->request), 'LIMIT'))
+		$nxt_request = $this->sql;
+		if( $pos = strpos(strtoupper($this->sql), 'LIMIT'))
 		{ // Remove the limit form the request
-			$nxt_request = substr($this->request, 0, $pos);
+			$nxt_request = substr($this->sql, 0, $pos);
 		}
 		//echo $nxt_request;
 
 		$DB->query( $nxt_request );
-		$this->total_num_posts = $DB->num_rows;
-		$this->max_paged = intval( ($this->total_num_posts-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
-		if( $this->max_paged < 1 )
-			$this->max_paged =1;
+		$this->total_rows = $DB->num_rows;
+		$this->total_pages = intval( ($this->total_rows-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
+		if( $this->total_pages < 1 )
+			$this->total_pages = 1;
 	}
 
 
@@ -799,7 +798,7 @@ class ItemList extends DataObjectList
 
 		if( $this->row_num == 0 )
 		{ // We need to initialize
-			$this->row = & $this->result_rows[0];
+			$this->row = & $this->rows[0];
 			$row = $this->row;
 			$this->row_num = 1;
 			$this->get_postdata();
@@ -828,7 +827,7 @@ class ItemList extends DataObjectList
 			$this->row_num++;
 			return false;
 		}
-		$this->row = & $this->result_rows[$this->row_num];
+		$this->row = & $this->rows[$this->row_num];
 		$row = $this->row;
 		// echo '<p>accessing row['. $this->row_num. ']:',$this->row->post_title,'</p>';
 		$this->row_num++;
@@ -955,6 +954,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.14  2005/01/03 15:17:52  fplanque
+ * no message
+ *
  * Revision 1.13  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

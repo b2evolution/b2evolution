@@ -9,6 +9,9 @@
  * @package admin
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
+// Display submenu:
+require dirname(__FILE__).'/_submenu.inc.php';
 ?>
 <div class="left_col">
 	<div class="NavBar">
@@ -579,3 +582,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 </div>
 <div class="clear"></div>
+<?php
+
+// End block:
+require dirname(__FILE__).'/_sub_end.inc.php';
+
+?>
