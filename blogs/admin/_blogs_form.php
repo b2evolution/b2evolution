@@ -18,7 +18,7 @@
 	<fieldset>
 		<legend><?php echo T_('Default display options') ?></legend>
 		<?php
-			// form_select( 'blog_default_skin', $blog_default_skin, '', T_('Default skin') , T_('This is the skin that will be used until the user selects another skin (which will be saved in a cookie)') );
+			form_select( 'blog_default_skin', $blog_default_skin, 'skin_options', T_('Default skin') , T_('This is the skin that will be used until the user selects another skin (which will be saved in a cookie)') );
 
 			form_checkbox( 'blog_disp_bloglist', $blog_disp_bloglist, T_('Display blog list'), T_("Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this).") );
 		?>

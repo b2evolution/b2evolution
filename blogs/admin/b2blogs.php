@@ -227,6 +227,9 @@ switch($action)
 				param( 'blog_disp_bloglist', 'integer', 0 );
 				$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
 
+				param( 'blog_default_skin', 'string', '' );
+				$edited_Blog->set( 'default_skin', $blog_default_skin );
+
 				break;
 
 			case 'perm':
@@ -258,9 +261,6 @@ switch($action)
 
 				param( 'blog_pingblodotgs', 'integer', 0 );
 				$edited_Blog->set( 'pingblodotgs', $blog_pingblodotgs );
-
-				param( 'blog_default_skin', 'string', '' );
-				$edited_Blog->set( 'default_skin', $blog_default_skin );
 
 				break;
 		}

@@ -35,6 +35,25 @@ function skinbase()
 	}
 }
 
+/**
+ * Outputs an <option> set with default skin selected
+ *
+ * skin_options(-)
+ *
+ */
+function skin_options( $default = '' )
+{
+	for( skin_list_start(); skin_list_next(); )
+	{
+		echo '<option value="';
+		skin_list_iteminfo( 'name' );
+		echo '"';
+		if( skin_list_iteminfo( 'name',false ) == $default ) echo ' selected="selected" ';
+		echo '>';
+		skin_list_iteminfo( 'name' );
+		echo "</option>\n";
+	}
+}
 
 /** 
  * Initializes skin list iterator
