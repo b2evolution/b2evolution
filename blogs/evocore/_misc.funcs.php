@@ -406,9 +406,6 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 	global $month, $month_abbrev, $weekday, $weekday_abbrev, $weekday_letter;
 	global $Settings;
 
-	$datemonth = date('m', $unixtimestamp);
-	$dateweekday = date('w', $unixtimestamp);
-
 	if( $dateformatstring == 'isoZ' )
 	{ // full ISO 8601 format
 		$dateformatstring = 'Y-m-d\TH:i:s\Z';
@@ -416,44 +413,54 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 	if( $useGM )
 	{ // We want a Greenwich Meridian time:
-		$j = gmdate($dateformatstring, $unixtimestamp - ($Settings->get('time_difference') * 3600));
+		$r = gmdate($dateformatstring, $unixtimestamp - ($Settings->get('time_difference') * 3600));
 	}
 	else
 	{ // We want default timezone time:
-		$dateformatstring = ' '.$dateformatstring; // will be removed later
 
-		// echo $dateformatstring, '<br />';
+		/*
+		Special symbols:
+			'l': weekday
+			'D': weekday abbrev
+			'e': weekday letter
+			'F': month
+			'M': month abbrev
+		*/
 
-		// weekday:
-		$dateformatstring = preg_replace("/([^\\\])l/", '\\1@@@\\l@@@', $dateformatstring);
-		// weekday abbrev:
-		$dateformatstring = preg_replace("/([^\\\])D/", '\\1@@@\\D@@@', $dateformatstring);
-		// weekday letter:
-		$dateformatstring = preg_replace("/([^\\\])e/", '\\1@@@e@@@', $dateformatstring);
-		// month:
-		$dateformatstring = preg_replace("/([^\\\])F/", '\\1@@@\\F@@@', $dateformatstring);
-		// month abbrev:
-		$dateformatstring = preg_replace("/([^\\\])M/", '\\1@@@\\M@@@', $dateformatstring);
+		#echo $dateformatstring, '<br />';
 
-		$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
+		// protect special symbols, that date() would need proper locale set for
+		$protected_dateformatstring = preg_replace( '/(?<!\\\)([lDeFM])/',
+																								'@@@\\\$1@@@',
+																								$dateformatstring );
 
-		// echo $dateformatstring, '<br />';
+		#echo $protected_dateformatstring, '<br />';
 
-		$j = date($dateformatstring, $unixtimestamp);
+		$r = date( $protected_dateformatstring, $unixtimestamp );
 
-		// weekday:
-		$j = str_replace( '@@@l@@@', T_($weekday[$dateweekday]), $j);
-		// weekday abbrev:
-		$j = str_replace( '@@@D@@@', T_($weekday_abbrev[$dateweekday]), $j);
-		// weekday letter:
-		$j = str_replace( '@@@e@@@', T_($weekday_letter[$dateweekday]), $j);
-		// month:
-		$j = str_replace( '@@@F@@@', T_($month[$datemonth]), $j);
-		// month abbrev:
-		$j = str_replace( '@@@M@@@', T_($month_abbrev[$datemonth]), $j);
+		if( $protected_dateformatstring != $dateformatstring )
+		{ // we had special symbols, replace them
+
+			$datemonth = date('m', $unixtimestamp);
+			$dateweekday = date('w', $unixtimestamp);
+
+			// replace special symbols
+			$r = str_replace( array(  '@@@l@@@',
+																'@@@D@@@',
+																'@@@e@@@',
+																'@@@F@@@',
+																'@@@M@@@',
+															),
+												array(  T_($weekday[$dateweekday]),
+																T_($weekday_abbrev[$dateweekday]),
+																T_($weekday_letter[$dateweekday]),
+																T_($month[$datemonth]),
+																T_($month_abbrev[$datemonth]) ),
+												$r );
+		}
 	}
 
-	return $j;
+	return $r;
 }
 
 
@@ -1638,6 +1645,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.16  2004/12/15 01:01:33  blueyed
+ * improved date_i18n's performance, especially when no special strings are used
+ *
  * Revision 1.15  2004/12/14 18:32:15  fplanque
  * quick optimizations
  *
