@@ -486,4 +486,28 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	echo $after;
 }
 
+/** 
+ * Display "User profile" title if it has been requested
+ *
+ * {@internal profile_title(-) }}
+ *
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to 
+ *								return value instead of displaying it
+ */
+function profile_title( $prefix = ' ', $display = 'htmlbody' ) 
+{
+	global $disp;
+	
+	if( $disp == 'profile' )
+	{
+		$info = $prefix.T_('User profile');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
+
 ?>

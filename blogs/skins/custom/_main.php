@@ -17,12 +17,9 @@
 	single_cat_title( ' - ', 'htmlhead' );
 	single_month_title( ' - ', 'htmlhead' );
 	single_post_title( ' - ', 'htmlhead' );
-	switch( $disp )
-	{
-		case 'comments': echo ' - ', T_('Last comments'); break;
-		case 'stats': echo ' - ', T_('Statistics'); break;
-		case 'arcdir': echo ' - ', T_('Archive Directory'); break;
-	}
+	arcdir_title( ' - ', 'htmlhead' );
+	last_comments_title( ' - ', 'htmlhead' );
+	stats_title( ' - ', 'htmlhead' );
 ?>
 </title>
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
@@ -54,12 +51,10 @@
 	single_cat_title();
 	single_month_title();
 	single_post_title();
-	switch( $disp )
-	{
-		case 'comments': echo T_('Last comments'); break;
-		case 'stats': echo T_('Statistics'); break;
-		case 'arcdir': echo T_('Archive Directory'); break;
-	}
+	arcdir_title();
+	last_comments_title();
+	stats_title();
+	profile_title();
 ?></h2>
 
 <!-- =================================== START OF MAIN AREA =================================== -->

@@ -1,0 +1,454 @@
+/* Designed by François PLANQUE http://fplanque.net/ */
+
+body {
+	background-color: #FFFFFF;
+	background-repeat: repeat-x;
+	padding: 0px;
+	margin: 0px;
+	color: #000000;
+	font: 84% Arial, Helvetica, sans-serif;
+
+/*	font-size: 84%; 	poussé vers l'extérieur pour éviter des combinaisons en trop grand nombre */
+}
+td {
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+caption {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+
+h1 {
+	color: #6699CC;
+	font-size: 225%;
+}
+h2 {
+	color: #6699CC;
+	font-size: 180%;
+}
+h3 {
+	font-size: 120%;
+}
+h4 {
+	font-size: 110%;
+}
+
+table.invisible
+{
+	margin: 1ex;
+	border-collapse: collapse
+}
+table.invisible td
+{
+	padding: 0ex 1ex;
+}
+td.right
+{
+	text-align: right;
+}
+p.baseline {
+	clear: both;
+	font-size: 65%;
+	text-align: center;
+	border-top: 1px solid #ccc;
+	margin: 1ex;
+	padding: 1ex;
+}
+hr {
+	height: 0px;
+	border-top: 1px solid #6699CC;
+	border-right: 1px none #6699CC;
+	border-bottom: 1px none #6699CC;
+	border-left: 1px none #6699CC;
+
+}
+dt {
+	font-weight: bold;
+	color: #009999;
+}
+blockquote {
+	border: 2px dotted #6699CC;
+	padding: 12px 16px;
+	background-color: #eee;
+	margin: 10px;
+}
+.center
+{
+	text-align: center;
+}
+img.top {
+	vertical-align: top;
+	border: 0px;
+}
+img.middle {
+	vertical-align: middle;
+	border: 0px;
+}
+img.leftmargin {
+	float: left;
+	border: 0px;
+	margin-right: 1ex;
+	margin-top: .2ex;
+	margin-bottom: .2ex;
+}
+img.rightmargin {
+	float: right;
+	border: 0px;
+	margin-left: 1ex;
+	margin-top: .2ex;
+	margin-bottom: .2ex;
+}
+	
+acronym {
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #000000;
+	cursor: help;
+}
+abbr {
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #000000;
+	cursor: help;
+}
+del {
+	color: #999999;
+}
+ins {
+	color: #009999;
+	text-decoration: none;
+}
+
+
+div.pageHeader {
+	width: 100%;
+	padding: 1ex;
+	text-align: center;
+	background: #6699CC;
+	margin-bottom: 1ex;
+
+}
+
+h1#pageTitle {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #FFFFFF;
+	font-size: 270%;
+	font-weight: bold;
+	margin-top: .5ex;
+	margin-bottom: .1ex;
+}
+
+a.BlogButton {
+	text-decoration: none;
+	border: 1px solid #FFFFFF;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-right: 3px;
+	margin-top: 3px;
+	background: #336699;
+}
+a.BlogButtonCurr {
+	text-decoration: none;
+	border: 1px solid #FFFFFF;
+	text-align: left;
+	vertical-align: top;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-top: 3px;
+	margin-right: 3px;
+	background: #6699CC;
+}
+
+A.BlogButton:link,
+A.BlogButton:visited,	
+A.BlogButton:active,
+A.BlogButtonCurr:link,
+A.BlogButtonCurr:visited,	
+A.BlogButtonCurr:active,
+{
+	color: #FFFFFF;
+}
+A.BlogButton:hover		{
+	color: #FFFFFF;
+	background: #6699CC;
+
+	/* text-decoration: underline; */
+}
+A.BlogButtonCurr:hover		{
+	color: #336699;
+	/* text-decoration: underline; */
+}
+
+.pageSubTitle {
+	color: #FFFFFF;
+	letter-spacing: 4px;
+	text-align: center;
+	vertical-align: middle;
+	border: 0px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 4px;
+	padding-left: 6px;
+	font: 109% Arial, Helvetica, sans-serif;
+
+}
+div.stats{
+	float: right;
+	padding-right: 1px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	padding-left: 0px;
+}
+
+/* Styles for main area (left) */
+h2 {
+	margin-left: 8px;
+}
+
+/* Styles for posts */
+.bPosts {
+	vertical-align: top;
+	float: left;
+	width: 66%;
+	background: #eee;
+
+}
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin-right: 10px;
+	margin-left: 20px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px solid #6699CC;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.bSmallHead {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	color: #6699CC;
+}
+.bTitle {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bMore
+{
+	text-align: center;
+}
+.bMore a
+{
+	font-weight: bold;
+	font-size: 110%;
+}
+.bSmallPrint,
+.bCommentSmallPrint
+{
+	clear: both;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+/* Styles for comments */
+.bComment {
+	margin-right: 20px;
+	margin-left: 20px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dotted #6699CC;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.bCommentTitle {
+	margin-top: 8px;
+	margin-bottom: 8px;
+	font-weight: bold;
+}
+.bCommentText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+/* Styles for comment form */
+form.bComment fieldset
+{
+	clear: both;
+	border: none;
+	margin: 2ex 0ex;
+	padding: 0ex;
+	/* border: 1px solid #f00; */
+}
+div.label
+{
+	float: left;
+	width: 18%;
+	text-align: right;
+	font-weight: bold;
+	position: relative;
+	top: .5ex;
+	/* border: 1px solid #00f; */
+}
+form.bComment label
+{
+	font-weight: bold;
+}
+div.input
+{
+	float: right;
+	width: 80%;
+	/* border: 1px solid #00f; */
+}
+input.bComment, 
+textarea.bComment
+{
+	background-color: #fff;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 98%;
+	margin: 0ex;
+}
+select.bComment
+{
+	background-color: #fff;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 100%;
+	margin: 0ex;
+}
+fieldset .notes
+{
+	/* display: block; */
+	font-size: 80%;
+	color: #999999;
+}
+
+
+/* Styles for stats */
+div.statbloc
+{
+	float: left;
+	width: 44%;
+	margin-left: 2%; 
+	margin-right: 0%; 
+	margin-bottom: 2ex;
+	border: 1px solid #6699CC;
+}
+div.statbloc h3
+{
+	margin-top: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+	color: #FFFFFF;
+	text-align: center;
+	background: #6699CC;
+	padding: 1ex;
+}
+
+
+/* Styles for sidebar (right) */
+.bSideBar {
+	width: 33%;
+	vertical-align: top;
+	float: right;
+	background: #eee;
+
+}
+.bSideItem {
+	margin-right: 20px;
+	margin-left: 10px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px solid #6699CC;
+	padding: 8px;
+}
+.bSideItem h3 {
+	margin-top: 0px;
+	margin-bottom: 8px;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+input.SearchField
+{
+	background-color: #fff;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 96%;
+	margin: 0ex;
+}
+
+/* Styles for Calendar: */
+caption.bCalendarMonth
+{
+	border-left: solid 1px #ccc;
+	border-right: solid 1px #ccc;
+	border-top: solid 1px #ccc;
+	margin: auto;
+}
+table.bCalendarTable
+{
+	margin: auto;
+	font-size: 84%;
+	border: solid 1px #ccc;
+	background: #fff;
+}
+tr.bCalendarRow
+{
+	text-align: center;
+}
+th.bCalendarHeaderCell
+{
+	font-size: 84%;
+}
+td.bCalendarCell
+{
+}
+td.bCalendarEmptyCell
+{
+}
+a.bCalendarLinkPost
+{
+	font-weight: bold;
+}

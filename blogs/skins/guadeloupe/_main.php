@@ -13,12 +13,14 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php
-		bloginfo('name');
+		bloginfo('name', 'htmlhead');
 		single_cat_title( ' - ', 'htmlhead' );
 		single_month_title( ' - ', 'htmlhead' );
 		single_post_title( ' - ', 'htmlhead' );
-		if ($c == "last") echo ' - ', T_('Last comments');
-		if ($stats) echo ' - ', T_('Statistics');
+		arcdir_title( ' - ', 'htmlhead' );
+		last_comments_title( ' - ', 'htmlhead' );
+		stats_title( ' - ', 'htmlhead' );
+		profile_title( ' - ', 'htmlhead' );
 	?>
 	</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
@@ -46,8 +48,10 @@
 	single_cat_title();
 	single_month_title();
 	single_post_title();
-	if ($c == "last") echo T_('Last comments');
-	if ($stats) echo T_('Statistics');
+	arcdir_title();
+	last_comments_title();
+	stats_title();
+	profile_title();
 ?></h2>
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>

@@ -160,6 +160,28 @@ function Comment_get_by_ID( $comment_ID )
  * TEMPLATE functions
  */
 
+/** 
+ * Display "Last comments" title if these have been requested
+ *
+ * {@internal last_comments_title(-) }}
+ *
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to 
+ *								return value instead of displaying it
+ */
+function last_comments_title( $prefix = ' ', $display = 'htmlbody' ) 
+{
+	global $disp;
+	
+	if( $disp == 'comments' )
+	{
+		$info = $prefix.T_('Last comments');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
 
 
 

@@ -74,8 +74,8 @@ class DataObject
 	 *
 	 * {@internal DataObject::disp(-) }}
 	 *
-	 * @param mixed Name of parameter
-	 * @param mixed Output format, see {@link format_to_output()}
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function disp( $parname, $format = 'htmlbody' )
 	{

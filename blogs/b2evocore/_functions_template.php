@@ -107,6 +107,28 @@ function single_month_title($prefix = '#', $display = 'htmlbody' )
 }
 
 
+/** 
+ * Display "Archive Directory" title if it has been requested
+ *
+ * {@internal arcdir_title(-) }}
+ *
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to 
+ *								return value instead of displaying it
+ */
+function arcdir_title( $prefix = ' ', $display = 'htmlbody' ) 
+{
+	global $disp;
+	
+	if( $disp == 'arcdir' )
+	{
+		$info = $prefix.T_('Archive Directory');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
 
 
 /*

@@ -503,6 +503,30 @@ function stats_user_agent( $translate = false )
 }
 
 
+/** 
+ * Display "Statistics" title if these have been requested
+ *
+ * {@internal stats_title(-) }}
+ *
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to 
+ *								return value instead of displaying it
+ */
+function stats_title( $prefix = ' ', $display = 'htmlbody' ) 
+{
+	global $disp;
+	
+	if( $disp == 'stats' )
+	{
+		$info = $prefix.T_('Statistics');
+		if ($display)
+			echo format_to_output( $info, $display );
+		else
+			return $info;
+	}
+}
+
+
 
 /* select count(*) as nb, hit_ignore
 from b2hitlog

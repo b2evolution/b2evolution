@@ -578,19 +578,21 @@ function cat_query( )
 }
 
 
-/* 
- * single_cat_title(-)
+/** 
+ * Display currently filtered categories names
  *
- * Display currently filtered cat name
  * This tag is out of the b2 loop.
- * It outputs the title of the category when you load the page with ?cat= 
- * (see 'Usage' section for explanation).
- *  When the weblog page is loaded without ?cat=, this tag doesn't display anything. 
- * Generally, you could use it like this:
- *  <title><?php bloginfo('name') ?><?php single_cat_title() ?></title>
+ * It outputs the title of the category when you load the page with <code>?cat=</code>
+ * When the weblog page is loaded without ?cat=, this tag doesn't display anything. 
+ * Generally, you could use this as a page title.
  *
  * fplanque: multiple category support (so it's not really 'single' anymore!)
- * 0.8.3: changed defaults
+ *
+ * {@internal single_cat_title(-) }}
+ *
+ * @param string Prefix to be displayed if something is going to be displayed
+ * @param mixed Output format, see {@link format_to_output()} or false to 
+ *								return value instead of displaying it
  */
 function single_cat_title( $prefix = '#', $display = 'htmlbody' ) 
 {

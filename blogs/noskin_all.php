@@ -50,18 +50,16 @@
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title><?php
-	bloginfo('name', 'htmlhead');
-	single_cat_title( ' - ', 'htmlhead' );
-	single_month_title( ' - ', 'htmlhead' );
-	single_post_title( ' - ', 'htmlhead' );
-	switch( $disp )
-	{
-		case 'comments': echo ' - ', T_('Last comments'); break;
-		case 'stats': echo ' - ', T_('Statistics'); break;
-		case 'arcdir': echo ' - ', T_('Archive Directory'); break;
-	}
-?></title>
+	<title><?php
+		bloginfo('name', 'htmlhead');
+		single_cat_title( ' - ', 'htmlhead' );
+		single_month_title( ' - ', 'htmlhead' );
+		single_post_title( ' - ', 'htmlhead' );
+		arcdir_title( ' - ', 'htmlhead' );
+		last_comments_title( ' - ', 'htmlhead' );
+		stats_title( ' - ', 'htmlhead' );
+		profile_title( ' - ', 'htmlhead' );
+	?></title>
 <!-- InstanceEndEditable --> 
 <!-- InstanceBeginEditable name="head" -->
 <base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! ?>" />
@@ -128,12 +126,10 @@
 	single_cat_title();
 	single_month_title();
 	single_post_title();
-	switch( $disp )
-	{
-		case 'comments': echo T_('Last comments'); break;
-		case 'stats': echo T_('Statistics'); break;
-		case 'arcdir': echo T_('Archive Directory'); break;
-	}
+	arcdir_title();
+	last_comments_title();
+	stats_title();
+	profile_title();
 ?></h2>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
