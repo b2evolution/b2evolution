@@ -91,6 +91,9 @@ input.radio {
 form.fform fieldset {
 	border-color: #eee7e0;
 }
+form.fform fieldset.fieldset fieldset {
+	border:transparent;
+}
 
 legend {
 	font-weight: bold;
@@ -848,6 +851,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/23 04:49:40  blueyed
+ * no borders for fieldsets in fieldset.fieldset
+ *
  * Revision 1.15  2005/02/20 23:02:56  blueyed
  * horizontal padding for th
  *
