@@ -63,26 +63,7 @@ switch( $action )
 		logout();
 
 		header_nocache();
-
-		param( 'redirect_to', 'string', $_SERVER['HTTP_REFERER'] );
-		$location = empty($redirect_to) ? $baseurl : $redirect_to;
-
-		$location = str_replace('&amp;', '&', $location);
-
-		if( strpos($location, $baseurl) === 0
-				&& preg_match( '#^(.*?)([?&])action=\w+&?(.*)$#', $location, $match ) )
-		{ // remove "action" get param to avoid unwanted actions
-			$location = $match[1];
-
-			if( !empty($match[3]) )
-			{
-				$location .= $match[2].$match[3];
-			}
-		}
-
-		header('Refresh:0;url='.$location);
-
-		exit();
+		header_redirect(); // exits
 
 
 	case 'lostpassword': // Lost password:

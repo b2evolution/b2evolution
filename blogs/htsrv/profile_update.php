@@ -151,9 +151,6 @@ $current_User->dbupdate();
 
 
 // TODO: Redirect is confusing, as it gives no feedback to the user..
-param( 'redirect_to', 'string' );
-$location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
 header_nocache();
-header('Refresh:0;url=' . $location);
-
+header_redirect();
 ?>

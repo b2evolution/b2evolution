@@ -203,9 +203,5 @@ else
 }
 
 header_nocache();
-
-param( 'redirect_to', 'string' );
-$location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
-header( 'Refresh:0;url='.str_replace('&amp;', '&', $location) );
-
+header_redirect();
 ?>
