@@ -4,30 +4,22 @@
  */
 
 /**
- * Create it locally and define SIMPLETEST_DIR or other constants.
+ * Create it locally and define SIMPLETEST_DIR or other constants there.
  */
 @include_once( dirname(__FILE__).'/config.simpletest.OVERRIDE.php' );
+
+/**
+ * The global config file for all tests.
+ */
+ require_once( dirname(__FILE__).'/config.php' );
+
 
 if( !defined( 'SIMPLETEST_DIR' ) )
 {
 	/**
 	 * The SimpleTest directory.
 	 */
-	define( 'SIMPLETEST_DIR', dirname(__FILE__).'/simpletest/' );
-}
-if( !defined( 'EVODIR' ) )
-{
-	/**
-	 * The evo directory.
-	 */
-	define( 'EVODIR', dirname(__FILE__).'/../' );
-}
-if( !defined( 'TMPDIR' ) )
-{
-	/**
-	 * A temp directory where we can create temporary files.
-	 */
-	define( 'TMPDIR', dirname(__FILE__).'/temp/' );
+	define( 'SIMPLETEST_DIR', TESTSDIR.'simpletest/' );
 }
 
 
@@ -37,7 +29,7 @@ if( !defined( 'TMPDIR' ) )
  */
 #define( 'DB_USER', 'SIMPLETEST' );
 #require_once( dirname(__FILE__).'/../blogs/conf/_config.php' );
-require_once( dirname(__FILE__).'/../blogs/evocore/_main.inc.php' );
+require_once( EVODIR.'blogs/evocore/_main.inc.php' );
 
 
 if( !file_exists( SIMPLETEST_DIR.'unit_tester.php' ) )
@@ -62,6 +54,7 @@ require_once( SIMPLETEST_DIR.'mock_objects.php');
 require_once( dirname(__FILE__).'/classes/simpletest/EvoUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/FilemanUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/EvoGroupTest.class.php' );
+require_once( dirname(__FILE__).'/classes/simpletest/InstallUnitTestCase.class.php' );
 /**#@-*/
 
 
