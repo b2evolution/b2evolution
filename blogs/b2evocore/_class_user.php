@@ -301,7 +301,7 @@ class User extends DataObject
 				foreach( $perm_target_cats as $loop_cat_ID )
 				{
 					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
-					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br/>";
+					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br />";
 					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
 					{	// not already in list: add it:
 						$perm_target_blogs[] = $loop_cat_blog_ID;
@@ -479,7 +479,7 @@ class User extends DataObject
 		if( $echo ) echo '<br />Deleting User... ';
 		parent::dbdelete();
 		
-		echo '<br/>Done.</p>';
+		echo '<br />Done.</p>';
 	}
 
 

@@ -419,7 +419,7 @@ class Blog extends DataObject
 		// Delete main (blog) object:
 		parent::dbdelete();
 				
-		echo '<br/>Done.</p>';
+		echo '<br />Done.</p>';
 	}
 	
 }

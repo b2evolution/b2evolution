@@ -43,16 +43,5 @@ class GeneralSettings extends AbstractSettings
 		}
 	}
 
-
-	/**
-	 * temporarily sets a setting (updateDB(-) writes it to DB)
-	 *
-	 * @param string name of setting
-	 * @param mixed new value
-	 */
-	function set( $setting, $value )
-	{
-		return parent::set( array( $setting, $value ) );
-	}
 }
 ?>

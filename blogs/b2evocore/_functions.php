@@ -838,17 +838,17 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		if( isset($_POST[$var]) )
 		{
 			$$var = remove_magic_quotes( $_POST[$var] );
-			// echo "$var=".$$var." set by POST!<br/>";
+			// echo "$var=".$$var." set by POST!<br />";
 		}
 		elseif( isset($_GET["$var"]) )
 		{
 			$$var = remove_magic_quotes($_GET[$var]);
-			// echo "$var=".$$var." set by GET!<br/>";
+			// echo "$var=".$$var." set by GET!<br />";
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
 			$$var = remove_magic_quotes($_COOKIE[$var]);
-			// echo "$var=".$$var." set by COOKIE!<br/>";
+			// echo "$var=".$$var." set by COOKIE!<br />";
 		}
 		elseif( $default === true )
 		{
@@ -857,7 +857,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		elseif( $forceset )
 		{
 			$$var = $default;
-			// echo "$var=".$$var." set to default<br/>";
+			// echo "$var=".$$var." set to default<br />";
 		}
 		else
 		{ // param not found! don't set the variable.
@@ -1119,7 +1119,7 @@ function debug_info( $force = false )
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
-			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
+			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br />';
 		}
 
 		if( $Debuglog->count( 'all' ) )

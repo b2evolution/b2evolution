@@ -124,12 +124,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					echo '</td><td align="right">';
 					if( ($loop_User->get('level') > 0) )
 					{ // prom=down
-						echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=down'
+						echo ' <a href="b2users.php?action=promote&amp;id='. $loop_User->get('ID'). '&amp;prom=down'
 									.'" title="'.T_('decrease user level').'">-</a> ';
 					}
 					if( ($loop_User->get('level') < 10 ) )
 					{ // prom=up
-						echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=up'
+						echo ' <a href="b2users.php?action=promote&amp;id='. $loop_User->get('ID'). '&amp;prom=up'
 									.'" title="'.T_('increase user level').'">+</a> ';
 					}
 					
@@ -144,7 +144,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
 					{ // delete
 						?>
-						<a href="b2users.php?action=deleteuser&id=<?php echo $loop_User->get('ID') ?>" title="<?php echo T_('Delete user') ?>"  onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete user') ?>" /></a>
+						<a href="b2users.php?action=deleteuser&amp;id=<?php echo $loop_User->get('ID') ?>" title="<?php echo T_('Delete user') ?>"  onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete user') ?>" /></a>
 						<?php
 					}
 				}
