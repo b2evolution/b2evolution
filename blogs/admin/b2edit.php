@@ -32,16 +32,36 @@ case 'new':
 		}
 
 		$action='post';
+		
+		// These are bookmarklet params:
 		param( 'popuptitle', 'string', '' );
-		$edited_post_title = format_to_edit( $popuptitle );
 		param( 'popupurl', 'string', '' );
-		$post_url = format_to_edit( $popupurl );
 		param( 'text', 'html', '' );
-		$content = format_to_edit( $text );
-		$post_lang = $default_language;
-		$post_status = $default_post_status;		// 'published' or 'draft' or ...
 
-		$extracats = array();
+		param( "post_autobr", 'integer', 0 );
+		param( "post_pingback", 'integer', 0 );
+		param( 'trackback_url', 'string' );
+		$post_trackbacks = & $trackback_url;
+		param( 'content', 'html', $text );
+		$content = format_to_edit( $content );
+		param( 'post_title', 'html', $popuptitle );
+		$edited_post_title = format_to_edit( $post_title );
+		param( 'post_url', 'string', $popupurl );
+		$post_url = format_to_edit( $post_url );
+		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
+		param( 'extracats','array', array() );
+		param( 'post_lang', 'string', $default_language );
+
+		param( 'edit_date', 'integer' );
+
+		param( 'aa', 'string' );
+		param( 'mm', 'string' );
+		param( 'jj', 'string' );
+		param( 'hh', 'string' );
+		param( 'mn', 'string' );
+		param( 'ss', 'string' );
+
+
 		require(dirname(__FILE__).'/_edit_form.php');
 	} 
 	else

@@ -47,6 +47,20 @@
 			form.attributes.getNamedItem('action').value = saved_action;
 			form.target = '_self';
 		}
+		/*
+		 * edit_reload()
+		 * fplanque: created
+		 */
+		function edit_reload( form, blog ) 
+		{
+			form.attributes.getNamedItem('action').value = '<?php echo $pagenow ?>';
+			form.blog.value = blog;
+			// form.action.value = 'reload';
+			// form.post_title.value = 'demo';
+			// alert( form.action.value + ' ' + form.post_title.value );
+			form.submit();
+			return false;
+		}
 	
 		function launchupload() 
 		{
@@ -61,6 +75,10 @@
 </head>
 <body>
 
+<?php 
+if( empty($mode) )
+{	// We're not running in an special mode (bookmarklet, sidebar...)
+?>
 <img src="img/blank.gif" width="1" height="5" alt="" border="0" />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr height="15">
@@ -70,7 +88,7 @@
 <td rowspan="3" width="50" valign="top"><a href="http://b2evolution.net/"><img src="img/b2minilogo.png" width="50" height="50" border="0" alt="visit b2evolution's website" style="border-width:1px; border-color: #999999; border-style: dashed" /></a></td>
 
 <td><strong><span style="color:#333333">e</span><span style="color:#554433">v</span><span style="color:#775522">o</span><span style="color:#996622">l</span><span style="color:#bb7722">u</span><span style="color:#cc8811">t</span><span style="color:#dd9911">i</span><span style="color:#ee9900">o</span><span style="color:#ff9900">n</span></strong> <?php echo $b2_version ?></td>
-<td width="150" style="text-align: right; padding-rightt: 6px;">
+<td width="150" style="text-align: right; padding-rightt: 6px;" align="right">
 <span style="color: #b0b0b0; font-family: verdana, arial, helvetica; font-size: 10px;"><?php echo T_('logged in as:') ?> <strong><?php echo $user_login; ?></strong></span>
 </td>
 
@@ -132,5 +150,8 @@
 
 <td>&nbsp;</td>
 <td style="padding-left: 6px;" colspan="2">
+<?php 
+}	// / not in special mode
+?>
 	<span class="menutoptitle">:: <?php echo $title; ?></span>
 

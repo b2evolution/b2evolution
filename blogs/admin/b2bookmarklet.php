@@ -9,7 +9,7 @@
  */
 
 $mode = 'bookmarklet';
-$action = 'new';
+if( !isset($action) ) $action = 'new';
 require_once(dirname(__FILE__).'/b2edit.php');
 
 ?>

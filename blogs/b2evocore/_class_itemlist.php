@@ -658,6 +658,7 @@ class ItemList
 				'Category' => $post_category,
 				'AutoBR' => $post_autobr,
 				'Flags' => array(),
+				'Wordcount' => bpost_count_words( $content ),
 				'Karma' => 0 // this isn't used yet
 				);
 		}

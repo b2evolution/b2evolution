@@ -52,15 +52,15 @@ switch($action)
 
 <!-- ================================ START OF EDIT FORM ================================ -->
 
-<form name="post" action="edit_actions.php" target="_self" method="post">
+<form name="post" id="post" action="edit_actions.php" target="_self" method="post">
 
 <?php echo $admin_2col_start; ?>
 
 <div class="bPost">
 	
-	<input type="hidden" name="blog" value="<?php echo $blog ?>" />
+	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
 	<input type="hidden" name="user_ID" value="<?php echo $user_ID ?>" />
-	<input type="hidden" name="action" value="<?php echo $form_action.$form_extra ?>" />
+	<input type="hidden" id="action" name="action" value="<?php echo $form_action.$form_extra ?>" />
 
 	<!-- In case we send this to the blog for a preview : -->
 	<input type="hidden" name="preview" value="1" />
