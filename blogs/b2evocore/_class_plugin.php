@@ -198,7 +198,13 @@ class Plugin
 
 
 	/**
-	 * Constructor, should set name and description
+	 * Constructor.
+	 *
+	 * Should set name and description in a localizable fashion.
+	 * NOTE FOR PLUGIN DEVELOPPERS UNFAMILIAR WITH OBJECT ORIENTED DEV:
+	 * This function has the same name as the class, this makes it a "constructor".
+	 * This means that this function will be called automagically by PHP when this
+	 * plugin class is instanciated ("loaded").
 	 *
 	 * {@internal Plugin::Plugin(-) }}
 	 */
@@ -275,7 +281,12 @@ class Plugin
 
 
 	/**
-	 * Called when ending the admin html head section
+	 * Event handlers:
+	 */
+
+
+	/**
+	 * Event handler: Called when ending the admin html head section.
 	 *
 	 * {@internal Plugin::AdminEndHtmlHead(-)}}
 	 *
@@ -289,7 +300,7 @@ class Plugin
 
 
 	/**
-	 * Called right after displaying the admin page footer
+	 * Event handler: Called right after displaying the admin page footer.
 	 *
 	 * {@internal Plugin::AdminAfterPageFooter(-)}}
 	 *
@@ -303,7 +314,7 @@ class Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars.
 	 *
 	 * {@internal Plugin::DisplayToolbar(-)}}
 	 *
@@ -317,7 +328,7 @@ class Plugin
 
 
  	/**
-	 * Display an editor button
+	 * Event handler: Called when displaying editor buttons.
 	 *
 	 * {@internal Plugin::DisplayEditorButton(-)}}
 	 *
@@ -331,7 +342,7 @@ class Plugin
 
 
 	/**
-	 * Do an action
+	 * Event handler: Called when doing an action. (EXPERIMENTAL)
 	 *
 	 * {@internal Plugin::DoAction(-)}}
 	 *
@@ -345,8 +356,8 @@ class Plugin
 	}
 
 
-  /**
-	 * Perform rendering
+	/**
+	 * Event handler: Called when rendering text.
 	 *
 	 * Well, this one does nothing but checking if Rendering applies to the output format.
 	 * You need to derive this function.
@@ -394,8 +405,9 @@ class Plugin
 		}
 	}
 
+	
  	/**
-	 * We are displaying the tool menu
+	 * Event handler: Called when displaying the tool menu.
 	 *
 	 * {@internal Plugin::ToolMenu(-)}}
 	 *

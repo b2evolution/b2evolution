@@ -40,12 +40,19 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class test_plugin extends Plugin
 {
+	/**
+	 * Variables below MUST be overriden by plugin implementations,
+	 * either in the subclass declaration or in the subclass constructor.
+	 */
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
-	var $author = 'François PLANQUE';
+	var $author = 'The b2evo Group';
 	var $help_url = 'http://b2evolution.net/';
+	/**
+	 * Variables below MAY be overriden.
+	 */
 	var $is_tool = true;
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
@@ -53,7 +60,13 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Constructor.
+	 *
+	 * Should set name and description in a localizable fashion.
+	 * NOTE FOR PLUGIN DEVELOPPERS UNFAMILIAR WITH OBJECT ORIENTED DEV:
+	 * This function has the same name as the class, this makes it a "constructor".
+	 * This means that this function will be called automagically by PHP when this
+	 * plugin class is instanciated ("loaded").
 	 *
 	 * {@internal test_plugin::test_plugin(-)}}
 	 */
@@ -65,7 +78,13 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Called when ending the admin html head section
+	/**
+	 * Event handlers:
+	 */
+
+
+	/**
+	 * Event handler: Called when ending the admin html head section.
 	 *
 	 * {@internal test_plugin::AdminEndHtmlHead(-)}}
 	 *
@@ -81,7 +100,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Called right after displaying the admin page footer
+	 * Event handler: Called right after displaying the admin page footer.
 	 *
 	 * {@internal test_plugin::AdminAfterPageFooter(-)}}
 	 *
@@ -97,11 +116,11 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars.
 	 *
 	 * {@internal test_plugin::DisplayToolbar(-)}}
 	 *
-   * @param array Associative array of parameters
+	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function DisplayToolbar( & $params )
@@ -113,7 +132,7 @@ class test_plugin extends Plugin
 
 
  	/**
-	 * Display an editor button
+	 * Event handler: Called when displaying editor buttons.
 	 *
 	 * {@internal test_plugin::DisplayEditorButton(-)}}
 	 *
@@ -130,6 +149,9 @@ class test_plugin extends Plugin
 
 
 	/**
+	/**
+	 * Event handler: Called when rendering text.
+	 *
 	 * Perform rendering
 	 *
 	 * {@internal test_plugin::Render(-)}}
@@ -152,7 +174,7 @@ class test_plugin extends Plugin
 
 
  	/**
-	 * We are displaying the tool menu
+	 * Event handler: Called when displaying the tool menu.
 	 *
 	 * {@internal test_plugin::ToolMenu(-)}}
 	 *
