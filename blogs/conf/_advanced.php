@@ -110,11 +110,10 @@ $oldtablecomments   = 'b2comments';
  * use output buffer.
  *
  * This is required for gzip and ETags (see below).
- * Recommended to be enabled. Turn it of only if you should encounter problems.
- * Even without using gzip compression or ETags this allows to send a Content-Length, which
- * is good for large pages.
+ * Even without using gzip compression or ETags this allows to send a Content-Length.
+ * Warning: this will prevent from sending the output progressively to the webserver. 
  */
-$use_obhandler = 1;
+$use_obhandler = 0;
 
 /**
  * gzip compression.
@@ -122,8 +121,7 @@ $use_obhandler = 1;
  * Can actually be done either by PHP or by Apache (if your Apache has mod_gzip).
  * Set this to 1 if you want PHP to do gzip compression
  * Set this to 0 if you want to let Apache do the job instead of PHP (you must enable this there)
- *
- * {@internal Letting apache do the compression will make PHP debugging easier }}
+ * Letting apache do the compression will make PHP debugging easier
  */
 $use_gzipcompression = 0;
 
