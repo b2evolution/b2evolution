@@ -193,7 +193,7 @@
 					<div class="bComment">
 					<div class="bSmallHead">
 						<strong><?php comment_time('Y/m/d @ H:i:s'); ?></strong> 
-						by <strong><?php comment_author() ?> ( <?php comment_author_email_link() ?> / <?php comment_author_url_link() ?> )</strong> (IP: <?php comment_author_IP() ?>)
+						by <strong><?php comment_author() ?> ( <?php comment_author_email_link() ?> / <?php comment_author_url_link() ?> <a href="b2antispam.php?action=ban&keyword=<?php comment_author_url_basedomain() ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a> )</strong> (IP: <?php comment_author_IP() ?>)
 					</div>
 					<div class="bText">
 						<?php comment_text() ?>

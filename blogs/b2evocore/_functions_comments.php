@@ -268,7 +268,7 @@ function comment_author_email()
 /*
  * comment_author_url(-)
  */
-function comment_author_url() 
+function comment_author_url($echo=true) 
 {
 	global $commentdata;
 	$url = trim(stripslashes($commentdata['comment_author_url']));
@@ -276,8 +276,26 @@ function comment_author_url()
 	// convert & into &amp;
 	$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
 	if ($url != 'http://url') {
-		echo $url;
+		if ($echo)
+		{
+			echo $url;
+		}else{
+			return $url;
+		}
 	}
+}
+
+/*
+ * comment_author_url_basedomain(-)
+ */
+function comment_author_url_basedomain()
+{
+	global $commentdata;
+	$url = comment_author_url(false);
+	$baseDomain = preg_replace("/http:\/\//i", "", $url);
+	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
+	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
+	echo $baseDomain;
 }
 
 /*
