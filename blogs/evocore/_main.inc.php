@@ -253,31 +253,32 @@ if( !isset($login_required) )
 
 // TODO: prevent brute force attacks! (timeout - based on coming Session or Hit object?)
 
-$login = $pass_md5 = '';
+$login = $pass = $pass_md5 = '';
 
 if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
 { // Trying to log in with a POST
 	$login = $_POST['login'];
-	$pass_md5 = $_POST['pwd'];
+	$pass = $_POST['pwd'];
 	unset($_POST['pwd']); // password is hashed from now on
 }
 elseif( isset($_GET['login'] ) && isset($_GET['pwd'] ))
 { // Trying to log in with a GET
 	$login = $_GET['login'];
-	$pass_md5 = $_GET['pwd'];
+	$pass = $_GET['pwd'];
 	unset($_GET['pwd']); // password is hashed from now on
 }
 
 if( !empty($login) && !empty($pass_md5) )
 { // User is trying to login right now
-	$login = strtolower(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login)));
-	$pass_md5 = md5(trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($pass_md5) : $pass_md5)));
+	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
+	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass_md5) : $pass_md5);
+	$pass_md5 = md5( $pass );
 
 	// echo 'Trying to log in right now...';
 
 	header_nocache();
 
-	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass_md5' => $pass_md5 ) );
+	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass' => $pass, 'pass_md5' => $pass_md5 ) );
 
 	// Check login and password
 	if( !user_pass_ok( $login, $pass_md5, true ) )
@@ -335,6 +336,7 @@ elseif( $login_required )
 
 	$Messages->add( T_('You must log in!'), 'login_error' );
 }
+unset($pass);
 
 
 if( !empty($login) && !$Messages->count('login_error') )
@@ -417,6 +419,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.20  2005/02/23 20:36:15  blueyed
+ * also pass raw password to LoginAttempt plugin event
+ *
  * Revision 1.19  2005/02/22 02:42:21  blueyed
  * Login refactored (send password-change-request mail instead of new password)
  *

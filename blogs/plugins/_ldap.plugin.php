@@ -78,7 +78,7 @@ class ldap_plugin extends Plugin
 	 *
 	 * @todo Plugin settings: user group and other settings
 	 *
-	 * @param array 'login' and 'pass_md5'
+	 * @param array 'login', 'pass' and 'pass_md5'
 	 */
 	function LoginAttempt( $params )
 	{
