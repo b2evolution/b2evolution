@@ -173,4 +173,3 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 }
 ?>
 </div>
-

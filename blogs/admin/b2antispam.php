@@ -256,7 +256,7 @@ switch( $action )
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 { ?>
 	<div class="panelblock">
-		<form action="b2antispam.php" method="GET" class="fform">
+		<form action="b2antispam.php" method="get" class="fform">
 			<input type="hidden" name="action" value="ban" />
 			<input type="hidden" name="type" value="keyword" />
 			<label for="keyword"><strong><?php echo T_('Add a banned keyword') ?>:</strong></label>
@@ -293,7 +293,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			<td class="firstcol">
 				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 				{ ?>
-				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
+				<a href="b2antispam.php?action=remove&amp;hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
 				<?php }
 				antiSpam_domain( 40 );
 				?>
@@ -304,9 +304,9 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 					{
 					?>
-					[<a href="b2antispam.php?action=report&keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>"><?php echo T_('Report') ?></a>]
+					[<a href="b2antispam.php?action=report&amp;keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>"><?php echo T_('Report') ?></a>]
 				<?php } ?>
-				[<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Check hit-logs and comments for this keyword!') ?>"><?php echo T_('Re-check') ?></a>]
+				[<a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Check hit-logs and comments for this keyword!') ?>"><?php echo T_('Re-check') ?></a>]
 			</td>
 		</tr>
 		<?php

@@ -540,7 +540,7 @@ if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
 	{
 		$edited_User = & new User( get_userdata($user) );
 	}
-
+	
 	require(dirname(__FILE__). '/_users_form.php');
 }
 

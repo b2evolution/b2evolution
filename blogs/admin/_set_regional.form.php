@@ -224,7 +224,7 @@ else
 				}
 				else
 				{
-					echo '<img src="img/blank.gif" width="14" />';
+					echo '<img src="img/blank.gif" width="14" alt="" />';
 				}
 
 				if( $i < count($locales) )
@@ -233,7 +233,7 @@ else
 				}
 				else
 				{
-					echo '<img src="img/blank.gif" width="14" />';
+					echo '<img src="img/blank.gif" width="14" alt="" />';
 				}
 				echo '
 				<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;locale=_new_&amp;template='.$lkey.'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
@@ -357,7 +357,6 @@ else
 		form_submit();
 	} 
 	?>
-	</div>
 
 </form>
 <?php

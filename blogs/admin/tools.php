@@ -62,7 +62,8 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 	{
 		?>
 		<div class="panelblock">
-		<script language="JavaScript">
+		<script type="text/javascript">
+			<!--
 			function addsidebar()
 			{
 				if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
@@ -70,6 +71,7 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 				else
 					alert('<?php echo str_replace( "'", "\'", T_('No Sidebar found! You must use Mozilla 0.9.4 or later!')) ?>');
 			}
+			// -->
 		</script>
 		<h2><?php echo T_('SideBar') ?></h2>
 		<p><?php printf( T_('Add the <a %s>b2evo sidebar</a> !'), 'href="#" onclick="addsidebar()"' ); ?></p>

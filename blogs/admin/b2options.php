@@ -421,8 +421,8 @@ $current_User->check_perm( 'options', 'view', true );
 
 
 	<div class="pt" >
-		<ul class="tabs">
-			<!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display -->
+		<ul class="hack">
+			<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>
 		</ul>
 		<div class="panelblocktabs">
 			<ul class="tabs">

@@ -210,7 +210,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
 								$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
 								?>
-								<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode($baseDomain) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
+								<a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode($baseDomain) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
 								<?php 
 							} 
 							$Comment->author_email( '', ' &middot; Email: ' );
@@ -266,7 +266,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
 
 					<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID(); ?>" />
-					<input type="hidden" name="redirect_to" value="<?php echo $ReqURI; ?>" />
+					<input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($ReqURI); ?>" />
 
 					<fieldset>
 						<div class="label"><?php echo T_('User') ?>:</div>

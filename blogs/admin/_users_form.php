@@ -53,7 +53,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			echo ( $user != $uminmax['MAX(ID)'] ) ? '<a title="'.T_('last user').'" href="?user='.$uminmax['MAX(ID)'].'">[&gt;&gt;]</a>' : '[&gt;&gt;]';
 		}
 		?>
-		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close user profile'); ?>" class="middle"></a>
+		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close user profile'); ?>" class="middle" /></a>
 	</div>
 	<?php } ?>
 		
@@ -202,14 +202,13 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
 				form_info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
 			}?>
-		</table>
 	</fieldset>
 
 	<?php
 	if( $allowed_to_edit )
-	{ 
+	{
 		form_submit();
-	} 
+	}
 	?>
 
 	<fieldset>

@@ -92,8 +92,8 @@ switch( $action )
 }
 ?>
 
-<ul class="tabs">
-	<!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display -->
+<ul class="hack">
+	<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>
 </ul>
 <div class="pt">
 	<div class="panelblocktabs">
@@ -164,18 +164,21 @@ switch( $show )
 		$hits['robot'] = 0;
 		$hits['search'] = 0;
 		$last_date = 0;
-		?>
+	if( count($res_hits) )
+  {	?>
 	<table class="grouped" cellspacing="0">
-		<th class="firstcol"><?php echo T_('Date') ?></th>
-		<th><?php echo T_('Referers') // 'no' ?></th>
-		<th><?php echo T_('Refering Searches') ?></th>
-		<th><?php echo T_('Indexing Robots') ?></th>
-		<th><?php echo T_('Syndication') ?></th>
-		<th><?php echo T_('Direct Accesses') ?></th>
-		<th><?php echo T_('Total') ?></th>
+    <tr>
+  		<th class="firstcol"><?php echo T_('Date') ?></th>
+  		<th><?php echo T_('Referers') // 'no' ?></th>
+  		<th><?php echo T_('Refering Searches') ?></th>
+  		<th><?php echo T_('Indexing Robots') ?></th>
+  		<th><?php echo T_('Syndication') ?></th>
+  		<th><?php echo T_('Direct Accesses') ?></th>
+  		<th><?php echo T_('Total') ?></th>
+    </tr>
 		<?php
 		$count = 0;
-		if( count($res_hits) ) foreach( $res_hits as $row_stats )
+		foreach( $res_hits as $row_stats )
 		{
 			$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 			if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one
@@ -229,19 +232,21 @@ switch( $show )
 			</tr>
 		<?php } ?>
 		</table>
-
-<?php
+    <?php
+    }
 		break;
 
 		case 'referers':
 		?>
 	<h2><?php echo T_('Last referers') ?>:</h2>
 	<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
-	<?php refererList(40,'global',1,1,'no','',$blog); ?>
+	<?php refererList(40,'global',1,1,'no','',$blog);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 		$count = 0;
-		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		foreach( $res_stats as $row_stats ) { ?>
 		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 			<td class="firstcol"><?php stats_time() ?></td>
 			<td>
@@ -259,17 +264,20 @@ switch( $show )
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 		</tr>
-		<?php 
+		<?php
 		$count++;
 		} // End stat loop ?>
 	</table>
+  <?php } ?>
 
 	<h3><?php echo T_('Top referers') ?>:</h3>
-	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true); ?>
+	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 			$count = 0;
-			if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			foreach( $res_stats as $row_stats ) { ?>
 			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 				<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
@@ -279,24 +287,27 @@ switch( $show )
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php 
+		<?php
 		$count++;
 		} // End stat loop ?>
 	</table>
+  <?php } ?>
 	<p><?php echo T_('Total referers') ?>: <?php stats_total_hit_count() ?></p>
 
-<?php
+  <?php
 		break;
 
 		case 'refsearches':
 			?>
 	<h2><?php echo T_('Last refering searches') ?>:</h2>
 	<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
-	<?php refererList(20,'global',1,1,"'search'",'',$blog); ?>
+	<?php refererList(20,'global',1,1,"'search'",'',$blog);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 		$count = 0;
-		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		foreach( $res_stats as $row_stats ) { ?>
 		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 			<td class="firstcol"><?php stats_time() ?></td>
 			<td>
@@ -310,79 +321,90 @@ switch( $show )
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 		</tr>
-		<?php 
-		$count++;	
+		<?php
+		$count++;
 		} // End stat loop ?>
 	</table>
+  <?php } ?>
 
 	<h3><?php echo T_('Top refering search engines') ?>:</h3>
-	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blog,true); ?>
+	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blog,true);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 		$count = 0;
-		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		foreach( $res_stats as $row_stats ) { ?>
 			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 				<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php 
+		<?php
 		$count++;
 		} // End stat loop ?>
 	</table>
+  <?php } ?>
 
 	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
 	<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
-	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true); ?>
+	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 		$count = 0;
-		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		foreach( $res_stats as $row_stats ) { ?>
 			<tr>
 				<td class="firstcol"><?php stats_referer('<a href="', '">') ?><?php stats_user_agent( true ) ?><?php stats_referer('', '</a>', false) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php 
+		<?php
 		$count++;
 		} // End stat loop ?>
 	</table>
-
-<?php
+  <?php
+  }
 		break;
 
 		case 'syndication':
 			?>
 	<h2><?php echo T_('Top Aggregators') ?>:</h2>
 	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
-	<?php refererList(40, 'global', 0, 0, "'rss'", 'hit_user_agent', $blog, true, true); ?>
+	<?php refererList(40, 'global', 0, 0, "'rss'", 'hit_user_agent', $blog, true, true);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 			$count = 0;
-			if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			foreach( $res_stats as $row_stats ) { ?>
 			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 				<td class="firstcol"><?php stats_user_agent( true ) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php 
+		<?php
 		$count++;
 		} // End stat loop ?>
 	</table>
+  <?php } ?>
 	<p><?php echo T_('Total RSS hits') ?>: <?php stats_total_hit_count() ?></p>
 
-<?php
+  <?php
 		break;
 
 		case 'other':
 		?>
 	<h2><?php echo T_('Last direct accesses') ?>:</h2>
 	<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
-	<?php refererList(10,'global',1,1,"'invalid'",'',$blog); ?>
+	<?php refererList(10,'global',1,1,"'invalid'",'',$blog);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 		$count = 0;
-		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		foreach( $res_stats as $row_stats ) { ?>
 		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 			<td class="firstcol"><?php stats_time() ?></td>
 			<?php if( $current_User->check_perm( 'stats', 'edit' ) )
@@ -398,29 +420,31 @@ switch( $show )
 		$count++;
 		} // End stat loop ?>
 	</table>
-
-<?php
+  <?php
+  }
 		break;
 
 		case 'useragents':
 			?>
 	<h2><?php echo T_('Top User Agents') ?>:</h2>
-	<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'hit_user_agent',$blog,true,true); ?>
+	<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'hit_user_agent',$blog,true,true);
+  if( count( $res_stats ) )
+  { ?>
 	<table class="grouped" cellspacing="0">
-		<?php 
+		<?php
 			$count = 0;
-			if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			foreach( $res_stats as $row_stats ) { ?>
 			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 				<td class="firstcol"><?php stats_user_agent( false ) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php 
+		<?php
 		$count++;
 		} // End stat loop ?>
 	</table>
-
-<?php
+  <?php
+  }
 		break;
 }
 ?>
