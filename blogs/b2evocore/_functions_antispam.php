@@ -284,9 +284,10 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
  */
 function b2evonet_poll_abuse( $display = true ) 
 {
-	$test = 0;
+	$test = 1;
 
-	global $baseurl;
+	global $baseurl, $tablesettings, $querycount;
+	
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
@@ -305,38 +306,66 @@ function b2evonet_poll_abuse( $display = true )
 		// $client->debug = 1;
 	}
 	
+	// Get datetime from last update, because we only want newer stuff...
+	$m = get_settings( 'last_antispam_update' );
+	// Encode it in the XML-RPC format
+	echo '<p>', T_('Latest update timestamp'), ': ', $m, '</p>';
+	$startat = mysql2date( 'Ymd\TH:i:s', $m );
+	//$startat = iso8601_encode( mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4)) );
+	
 	// Construct XML-RPC message:
 	$message = new xmlrpcmsg( 
-								'b2evo.pollabuse',	 											// Function to be called
+								'b2evo.pollabuse',	 													// Function to be called
 								array( 
-									new xmlrpcval(0,'int'),										// Reserved
-									new xmlrpcval('annonymous','string'),			// Reserved
-									new xmlrpcval('nopassrequired','string')	// Reserved
+									new xmlrpcval(0,'int'),											// Reserved
+									new xmlrpcval('annonymous','string'),				// Reserved
+									new xmlrpcval('nopassrequired','string'),		// Reserved
+									new xmlrpcval($startat,'dateTime.iso8601'),	// Datetime to start at
 								)  
 							);
 	$result = $client->send($message);
 	
 	if( $ret = xmlrpc_displayresult( $result ) )
 	{	// Response is not an error, let's process it:
-		$value = xmlrpc_decode($result->value());
-		if (is_array($value))
-		{	// We got an array of strings:
-			echo '<p>', T_('Adding strings to local blacklist'), ':</p><ul>';
-			foreach($value as $banned_string)
-			{
-				echo '<li>', T_('Adding:'), ' [', $banned_string, '] : ';
-				if( antispam_create( $banned_string, 'central' ) )
-				{
-					echo T_('OK.');
-				}
-				else
-				{
-					echo T_('Not necessary! (Already handled)');
-					antispam_update_source( $banned_string, 'central' );
-				}
-				echo '</li>';
+		$response = $result->value();
+		if( $response->kindOf() == 'struct' )
+		{	// Decode struct:
+			$response = xmlrpc_decode($response);
+			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
+			{	
+				echo T_('Incomplete reponse.')."\n";
+				$ret = false;
 			}
-			echo '</ul>';
+			else
+			{	// Start registering strings: 
+				$value = $response['strings'];
+				// We got an array of strings:
+				echo '<p>', T_('Adding strings to local blacklist'), ':</p><ul>';
+				foreach($value as $banned_string)
+				{
+					echo '<li>', T_('Adding:'), ' [', $banned_string, '] : ';
+					if( antispam_create( $banned_string, 'central' ) )
+					{
+						echo T_('OK.');
+					}
+					else
+					{
+						echo T_('Not necessary! (Already handled)');
+						antispam_update_source( $banned_string, 'central' );
+					}
+					echo '</li>';
+				}
+				echo '</ul>';
+				
+				// Store latest timestamp:
+				$endedat = date('Y-m-d H:i:s', iso8601_decode($response['lasttimestamp']) );
+				echo '<p>', T_('New latest update timestamp'), ': ', $endedat, '</p>';
+				
+				$sql ="UPDATE $tablesettings SET last_antispam_update = '$endedat'";
+				$querycount++;
+				mysql_query($sql) or mysql_oops( $sql );
+
+			}
 		}
 		else
 		{

@@ -70,6 +70,7 @@ function create_b2evo_tables()
 		time_format varchar(20) DEFAULT 'H:i:s' NOT NULL, 
 		date_format varchar(20) DEFAULT 'Y/m/d' NOT NULL, 
 		db_version INT DEFAULT $new_db_version NOT NULL, 
+  	last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00',
 		PRIMARY KEY (ID), 
 		KEY ID (ID) 
 	)";
@@ -495,7 +496,7 @@ switch( $action )
 
 		
 		// SETTINGS!
-		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', $new_db_version)";
+		$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version, last_antispam_update) VALUES ( '1', 3, 'paged', 'monthly', '0', '1', 'H:i:s', 'd.m.y', $new_db_version, '2000-01-01 00:00:00')";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "settings: OK<br />\n";
 		
@@ -642,6 +643,12 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 
+			echo "<p>Upgrading Settings table... ";
+			$query = "ALTER TABLE $tablesettings
+								ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
+			$q = mysql_query($query) or mysql_oops( $query );
+			echo "OK.<br />\n";
+
 		}	               
 			
 		if( $old_db_version < 8050 )
@@ -704,6 +711,13 @@ switch( $action )
 		populate_antispam();
 		echo "OK.<br />\n";
 
+		echo "<p>Upgrading Settings table... ";
+		$query = "ALTER TABLE $tablesettings
+							DROP COLUMN last_antispam_update,
+							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
+		$q = mysql_query($query) or mysql_oops( $query );
+		echo "OK.<br />\n";
+
 		?>
 		<p>Redo completed successfully!</p>
 		<?php
@@ -743,7 +757,7 @@ switch( $action )
 		echo "<p>Copying settings... ";	
 		// forcing paged mode because this works so much better !!!
 		// You can always change it back in the options if you don't like it.
-		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, time_format, date_format, $new_db_version FROM $oldtablesettings";
+		$query = "INSERT INTO $tablesettings( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, time_format, date_format, db_version, last_antispam_update) SELECT ID, 5, 'paged', archive_mode, time_difference, AutoBR, time_format, date_format, $new_db_version, '2000-01-01 00:00:00' FROM $oldtablesettings";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 		

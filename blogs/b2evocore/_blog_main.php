@@ -38,7 +38,6 @@ param( 'more', 'integer', 0, true );
 param( 'tb', 'integer', 0, true );
 param( 'pb', 'integer', 0, true );
 param( 'disp', 'string', '', true );
-param( 'message', 'string', '' );   //Get message for mailing list
 param( 'stats', 'integer', 0 );					// deprecated
 if(!isset($timestamp_min)) $timestamp_min = '';
 if(!isset($timestamp_max)) $timestamp_max = '';

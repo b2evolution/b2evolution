@@ -30,6 +30,15 @@ switch( $action )
 
 		param( 'keyword', 'string', true );	// Required!
 
+		// Check if the string already is in the blacklist:
+		if( antispam_url($keyword) )
+		{
+			echo '<div class="panelinfo">';
+			printf( '<p>'.T_('The keyword %s is already handled by the blacklist!').'</p>', $keyword);
+			echo '</div>';
+			break;
+		}
+
 		if ( $deluxe_ban && ! $confirm )
 		{
 			// Show confirmation page:

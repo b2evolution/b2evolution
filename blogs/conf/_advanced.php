@@ -23,7 +23,6 @@ $tablecomments = 'evo_comments';
 $tableblogs = 'evo_blogs';
 $tablepostcats = 'evo_postcats';
 $tablehitlog = 'evo_hitlog';
-$tablemailinglist = 'evo_mailinglist';
 $tableantispam = 'evo_antispam';
 $tablepluginsettings = 'evo_pluginsettings';
 
