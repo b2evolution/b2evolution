@@ -63,13 +63,13 @@ $comment = format_to_post($comment, $comment_autobr, 1);
 
 if( empty($comment) )
 { // comment should not be empty!
-	errors_add( T_('Please do not post empty comment') );
+	errors_add( T_('Please do not send empty comment') );
 }
 
 /* flood-protection */
 $query = "SELECT max(comment_date)
-					  FROM $tablecomments 
-					 WHERE comment_author_IP = '$user_ip'";
+					FROM $tablecomments
+					WHERE comment_author_IP = '$user_ip'";
 $ok = 1;
 if( $then = $DB->get_var( $query ) )
 {

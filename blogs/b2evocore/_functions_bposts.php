@@ -594,9 +594,10 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
  */
 function single_post_title($prefix = '#', $display = 'htmlhead' )
 {
+	global $p, $title;
+	
 	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
 
-	global $p, $title;
 	if( intval( $p ) || (!empty( $title )) )
 	{
 		$post_data = get_postdata($p);

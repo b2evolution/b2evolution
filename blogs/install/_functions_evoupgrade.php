@@ -229,8 +229,6 @@ function upgrade_b2evo_tables()
 		{
 			global $DB, $locales, $default_locale;
 			
-			create_locales();
-
 			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $default_locale) )
 			{ // we want a valid locale
 				$default_locale = 'en-US';
@@ -325,6 +323,8 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
+		create_locales();
+
 	}
 
 

@@ -116,6 +116,7 @@ class Calendar
 		// Default styling:
 		$this->monthdisplay = 1;	// set this to 0 if you don't want to display the month name
 		$this->monthformat = 'F Y';
+		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
 		$this->tablestart = '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
@@ -142,6 +143,7 @@ class Calendar
 
 		$this->searchframe = 12;	// How many month will we search back for a post before we give up
 
+		$this->browseyears = false;  // browsing years from Calendar's caption
 	}
 
 	/*
@@ -161,10 +163,8 @@ class Calendar
 	 *
 	 * @param string
 	 * @param string
-	 * @param boolean display current month as link to archive of that month?
-	 * @param boolean display links to previous/next year in caption
 	 */
-	function display( $file = '', $params = '', $linktomontharchive = true, $switchyears = false )	// Page to use for links
+	function display( $file = '', $params = '' )	// Page to use for links
 	{
 		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
@@ -218,9 +218,9 @@ class Calendar
 		// caution: offset bug inside
 		$calendarblah = get_weekstartend($datestartofmonth, $start_of_week);
 		if (mysql2date('w', $datestartofmonth) == $start_of_week) {
-			$calendarfirst = $calendarblah['start']+1+3600;	//	adjust for daylight savings time
+			$calendarfirst = $calendarblah['start'] + 1 + 3600;     // adjust for daylight savings time
 		} else {
-			$calendarfirst = $calendarblah['end']-604799+3600;	//	adjust for daylight savings time
+			$calendarfirst = $calendarblah['end'] - 604799 + 3600;  // adjust for daylight savings time
 		}
 		//echo 'calendarfirst=', $calendarfirst;
 
@@ -250,7 +250,7 @@ class Calendar
 			archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
 			.'">&gt;</a>';
 		
-		if( $switchyears )
+		if( $this->browseyears )
 		{ // create links to previous/next year
 			$previous_year_link = '<a href="'.
 				archive_link( $this->year - 1, $this->month, '', '', false, $file, $params )
@@ -272,12 +272,12 @@ class Calendar
 			echo isset( $previous_year_link ) ? $previous_year_link : '';
 			echo $previous_month_link;
 
-			if( $linktomontharchive )
+			if( $this->linktomontharchive )
 			{	// chosen month with link to archives
 				echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'">';
 			}
 			echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
-			if( $linktomontharchive )
+			if( $this->linktomontharchive )
 			{	// close link to month archive
 				echo '</a>';
 			}
@@ -307,7 +307,7 @@ class Calendar
 		$newrow = 0;
 		$j = 0;
 		$k = 1;
-		for($i = $calendarfirst; $i<($calendarlast+86400); $i = $i + 86400)
+		for($i = $calendarfirst; $i < ($calendarlast + 86400); $i = $i + 86400)
 		{	// loop day by day (86400 seconds = 24 hours)
 
 			if ($newrow == 1)

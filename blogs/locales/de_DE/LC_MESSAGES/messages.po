@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "POT-Creation-Date: 2004-04-05 22:37+0200\n"
-"PO-Revision-Date: 2004-04-17 19:23+0100\n"
+"PO-Revision-Date: 2004-04-20 14:00+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -3739,7 +3739,7 @@ msgstr "Dies ist ein Beispiel-Blogroll-Eintrag"
 
 #: ..\..\..\install\_functions_create.php:356
 msgid "This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."
-msgstr "Dies ist ein Beispieltext, den Blogroll-Eintrag beschreibend. In den meisten Fällen wirst du dies leer lassen wollen, und nur einen Titel und URL für deine Blogroll-Einträge (favorisierte/verwandte Seiten)."
+msgstr "Dies ist ein Beispieltext, den Blogroll-Eintrag beschreibend. In den meisten Fällen wirst du dies leer lassen wollen, und nur einen Titel und URL für deine Blogroll-Einträge (favorisierte/verwandte Seiten) verwenden."
 
 #: ..\..\..\install\_functions_create.php:377
 #, php-format

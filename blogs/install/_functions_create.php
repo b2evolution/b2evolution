@@ -250,8 +250,8 @@ function create_antispam()
 	echo "OK.<br />\n";
 }
 
-/*
- * create_locales(-)
+/**
+ * create DB table for locales.
  *
  * Used when creating full install and upgrading from earlier versions
  * @author blueyed
