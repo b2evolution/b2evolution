@@ -15,9 +15,9 @@
  *
  * Translate a text to the desired locale (b2evo localization only)
  * or to the current locale
- * 
+ *
  * {@internal T_(-)}}
- * 
+ *
  * @param string String to translate, '' to get language file info (as in gettext spec)
  * @param string locale to translate to, '' to use current locale (basic gettext does only support '')
  */
@@ -27,7 +27,7 @@ if( ($use_l10n == 1) && function_exists('_') )
 	function T_( $string, $req_locale = '' )
 	{
 		global $current_messages;
-		
+
 		if( empty( $req_locale ) || $req_locale == $current_messages )
 		{	// We have not asked for a different locale than the currently active one:
 			return _($string);
@@ -46,16 +46,16 @@ elseif( $use_l10n == 2 )
 
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
-		
+
 		if( empty($req_locale) )
 			return $string;  // don't translate if we have no locale
-		
+
 		$messages = $locales[$req_locale]['messages'];
-		
+
 		$search = str_replace( "\n", '\n', $string );
 		$search = str_replace( "\r", '', $search );
 		// echo "Translating ", $search, " to $messages<br />";
-		
+
 		#echo locale_messages($req_locale); exit;
 		if( !isset($trans[ $messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
@@ -63,18 +63,18 @@ elseif( $use_l10n == 2 )
 			@include_once dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
 			if( !isset($trans[ $messages ] ) )
 			{	// Still not loaded... file doesn't exist, memorize that no translation are available
-				// echo 'file not found!'; 
+				// echo 'file not found!';
 				$trans[ $messages ] = array();
 			}
 		}
-				
+
 		if( isset( $trans[ $messages ][ $search ] ) )
 		{	// If the string has been translated:
 			return $trans[ $messages ][ $search ];
 		}
-		
+
 		// echo "Not found!";
-		
+
 		// Return the English string:
 		return $string;
 	}
@@ -84,10 +84,22 @@ else
 {	// We are not localizing at all:
 
 	function T_( $string, $req_locale = '' )
-	{	
+	{
 		return $string;
 	}
 
+}
+
+
+/*
+ * NT_(-)
+ *
+ * No Translation
+ * Nevertheless, the string will be extracted by the gettext tools
+ */
+function NT_( $string )
+{
+	return $string;
 }
 
 
@@ -146,28 +158,32 @@ function locale_activate( $locale )
 
 	// Activate translations in gettext:
 	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
-	{	// Only if we war eusing GETTEXT ( if not, look into T_(-) ...)
+	{	// Only if we are using GETTEXT ( if not, look into T_(-) ...)
 		# Activate the locale->language in gettext:
-		putenv( 'LC_ALL='. $current_messages );
-		// Note: default of safe_mode_allowed_env_vars is "PHP_ ", 
-		// so you need to add "LC_" by editing php.ini. 
 
-		
+		// Note: default of safe_mode_allowed_env_vars is "PHP_ ",
+		// so you need to add "LC_" by editing php.ini.
+		putenv('LC_ALL='.$current_messages);
+
+		// Specify location of translation tables and bind to domain
+		bindtextdomain( 'messages', dirname(__FILE__).'/../locales' );
+		textdomain('messages');
+
 		# Activate the charset for conversions in gettext:
 		if( function_exists( 'bind_textdomain_codeset' ) )
 		{	// Only if this gettext supports code conversions
 			bind_textdomain_codeset( 'messages', $current_charset );
 		}
 	}
-	
+
 	# Set locale for default language:
 	# This will influence the way numbers are displayed, etc.
 	// We are not using this right now, the default 'C' locale seems just fine
 	// setlocale( LC_ALL, $locale );
-	
-	# Use this to check locale:
+
+	# Use this to check locale: (not relevant)
 	// echo setlocale( LC_ALL, 0 );
-	
+
 	return true;
 }
 
@@ -180,7 +196,7 @@ function locale_activate( $locale )
 function locale_by_lang( $lang )
 {
 	global $locales, $default_locale;
-	
+
 	foreach( $locales as $locale => $locale_params )
 	{
 		if( substr( $locale, 0 ,2 ) == $lang )
@@ -221,7 +237,7 @@ function locale_lang( $disp = true )
 function locale_charset( $disp = true )
 {
 	global $current_charset;
-	
+
 	if( $disp )
 		echo $current_charset;
 	else
@@ -230,27 +246,27 @@ function locale_charset( $disp = true )
 
 
 /**
- * Returns the current locale's default date format 
+ * Returns the current locale's default date format
  *
  * {@internal locale_datefmt(-)}}
  */
 function locale_datefmt()
 {
 	global $locales, $current_locale;
-	
+
 	return $locales[$current_locale]['datefmt'];
 }
 
 
 /**
- * Returns the current locale's default time format 
+ * Returns the current locale's default time format
  *
  * {@internal locale_timefmt(-)}}
  */
 function locale_timefmt()
 {
 	global $locales, $current_locale;
-	
+
 	return $locales[$current_locale]['timefmt'];
 }
 
@@ -268,12 +284,12 @@ function locale_timefmt()
 function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '' )
 {
 	global $locales, $current_locale, $core_dirout, $img_subdir, $img_url;
-	
-	if( empty($locale) ) $locale = $current_locale; 
+
+	if( empty($locale) ) $locale = $current_locale;
 
 	// extract flag name:
 	$country = strtolower(substr( $locale, 3, 2 ));
-	
+
 	if( ! is_file(dirname(__FILE__).'/'.$core_dirout.'/'.$img_subdir.'/flags/'.$collection.'/'.$country.'.gif') )
 	{	// File does not exist
 		$country = 'default';
@@ -297,10 +313,10 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 function locale_options( $default = '' )
 {
 	global $locales, $default_locale;
-	
+
 	if( empty( $default ) ) $default = $default_locale;
-	
-	
+
+
 	foreach( $locales as $this_localekey => $this_locale )
 		if( $this_locale['enabled'] || $this_localekey == $default )
 		{
@@ -308,7 +324,7 @@ function locale_options( $default = '' )
 			if( $this_localekey == $default ) echo ' selected="selected"';
 			echo '>'. T_($this_locale['name']). '</option>';
 		}
-	
+
 }
 
 
@@ -330,7 +346,7 @@ function locale_from_httpaccept()
 		// pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
 		$text = array();
 		// look for each language in turn in the preferences, which we saved in $langs
-		foreach( $locales as $localekey => $locale ) 
+		foreach( $locales as $localekey => $locale )
 		{
 			if( ! $locale['enabled'] )
 			{	// We only want to use activated locales
@@ -379,7 +395,7 @@ function locale_priosort( $a, $b )
 function locale_overwritefromDB()
 {
 	global $tablelocales, $DB, $locales, $default_locale, $Settings;
-	
+
 	$usedprios = array();  // remember which priorities are used already.
 	$priocounter = 0;
 	$query = 'SELECT
@@ -387,10 +403,10 @@ function locale_overwritefromDB()
 						loc_messages, loc_priority, loc_enabled
 						FROM '.$tablelocales.' ORDER BY loc_priority';
 	$rows = $DB->get_results( $query, ARRAY_A );
-	
+
 	if( count( $rows ) ) foreach( $rows as $row )
 	{	// Loop through loaded locales:
-		
+
 		if( $row['loc_priority'] == $priocounter )
 		{ // priority conflict (the same)
 			$priocounter++;
@@ -399,10 +415,10 @@ function locale_overwritefromDB()
 		{
 			$priocounter = $row['loc_priority'];
 		}
-		
+
 		//remember that we used this
 		$usedprios[] = $priocounter;
-		
+
 		$locales[ $row['loc_locale'] ] = array(
 																			'charset'  => $row[ 'loc_charset' ],
 																			'datefmt'  => $row[ 'loc_datefmt' ],
@@ -414,7 +430,7 @@ function locale_overwritefromDB()
 																			'fromdb'   => 1
 																		);
 	}
-	
+
 	// set default priorities, if nothing was set in DB.
 	// Missing "priority gaps" will get filled here.
 	if( count($rows) != count($locales) )
@@ -434,10 +450,10 @@ function locale_overwritefromDB()
 			}
 		}
 	}
-	
+
 	// sort by priority
 	uasort( $locales, 'locale_priosort' );
-	
+
 	// overwrite default_locale from DB settings - if enabled.
 	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
 	$locale_fromdb = $Settings->get('default_locale');
@@ -463,19 +479,19 @@ function locale_overwritefromDB()
 function locale_updateDB()
 {
 	global $locales, $tablelocales, $DB;
-	
+
 	$templocales = $locales;
-			
+
 	$lnr = 0;
 	foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
 	{
 		$lfield = $matches[2];
-			
+
 		if( $matches[1] != $lnr )
 		{ // we have a new locale
 			$lnr = $matches[1];
 			$plocale = $pval;
-			
+
 			// checkboxes default to 0
 			$templocales[ $plocale ]['enabled'] = 0;
 		}
@@ -483,11 +499,11 @@ function locale_updateDB()
 		{
 			$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
 		}
-		
+
 	}
-	
+
 	$locales = $templocales;
-	
+
 	$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
 	foreach( $locales as $localekey => $lval )
 	{
@@ -508,7 +524,7 @@ function locale_updateDB()
 	}
 	$query = substr($query, 0, -2);
 	$q = $DB->query($query);
-	
+
 	return (bool)$q;
 }
 ?>
