@@ -432,30 +432,11 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
+
+// Display submenu:
+require dirname(__FILE__).'/_submenu.inc.php';
+
 ?>
-
-
-	<div class="pt" >
-		<ul class="hack">
-			<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>
-		</ul>
-		<div class="panelblocktabs">
-			<ul class="tabs">
-			<?php
-				foreach( array(
-									'general' => array( T_('General'), '' ),
-									'files' => array( T_('Files'), '' ),
-									'regional' => array( T_('Regional'), ( $notransext ? '&amp;notransext=1' : '' ) ),
-									'plugins' => array( T_('Plug-ins'), '')
-									) as $ltab => $lvalue )
-				{
-					echo $tab == $ltab ? '<li class="current">' : '<li>';
-					echo '<a href="b2options.php?tab='.$ltab.$lvalue[1].'">'.$lvalue[0].'</a></li>';
-				}
-			?>
-			</ul>
-		</div>
-	</div>
 	<div class="tabbedpanelblock">
 	<?php
 		switch( $tab )

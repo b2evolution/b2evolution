@@ -17,18 +17,18 @@ $admin_tab = 'stats';
 $admin_pagetitle = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
-param( 'show', 'string', 'referers' );
+param( 'tab', 'string', 'summary' );
 
 require(dirname(__FILE__) . '/_menutop.php');
 ?>
-<a href="b2stats.php?show=<?php echo $show ?>&amp;blog=0" class="<?php echo ( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php echo T_('None') ?></a>
+<a href="b2stats.php?show=<?php echo $tab ?>&amp;blog=0" class="<?php echo ( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php echo T_('None') ?></a>
 <?php
 for( $curr_blog_ID=blog_list_start('stub');
 			$curr_blog_ID!=false;
 			 $curr_blog_ID=blog_list_next('stub') )
 	{
 		?>
-		<a href="b2stats.php?show=<?php echo $show ?>&amp;blog=<?php echo $curr_blog_ID ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
+		<a href="b2stats.php?show=<?php echo $tab ?>&amp;blog=<?php echo $curr_blog_ID ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
 	<?php
 }
 require( dirname(__FILE__) . '/_menutop_end.php' );
@@ -90,58 +90,14 @@ switch( $action )
 		<?php
 		break;
 }
+
+// Display submenu:
+require dirname(__FILE__).'/_submenu.inc.php';
+
 ?>
-
-<ul class="hack">
-	<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>
-</ul>
-<div class="pt">
-	<div class="panelblocktabs">
-		<ul class="tabs">
-		<?php
-		if( $show == 'summary' )
-				echo '<li class="current">';
-			else
-				echo '<li>';
-		echo '<a href="b2stats.php?show=summary&amp;blog=', $blog, '">', T_('Summary'), '</a></li>';
-
-		if( $show == 'referers' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2stats.php?show=referers&amp;blog=', $blog, '">', T_('Referers'), '</a></li>';
-
-		if( $show == 'refsearches' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2stats.php?show=refsearches&amp;blog=', $blog, '">', T_('Refering Searches'), '</a></li>';
-
-		if( $show == 'syndication' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2stats.php?show=syndication&amp;blog=', $blog, '">', T_('Syndication'), '</a></li>';
-
-		if( $show == 'useragents' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2stats.php?show=useragents&amp;blog=', $blog, '">', T_('User Agents'), '</a></li>';
-
-		if( $show == 'other' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2stats.php?show=other&amp;blog=', $blog, '">', T_('Direct Accesses'), '</a></li>';
-
-		?>
-		</ul>
-	</div>
-</div>
 <div class="tabbedpanelblock">
 <?php
-switch( $show )
+switch( $tab )
 {
 	case 'summary':
 		?>

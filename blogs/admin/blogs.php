@@ -290,38 +290,12 @@ switch($action)
 		{ // permissions have not been checked on update:
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		}
+
+		// Display submenu:
+		require dirname(__FILE__).'/_submenu.inc.php';
+
 		?>
-		<div class="pt" >
-			<ul class="hack">
-				<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>
-			</ul>
-			<div class="panelblocktabs">
-				<ul class="tabs">
-				<?php
-					if( $tab == 'general' )
-						echo '<li class="current">';
-					else
-						echo '<li>';
-					echo '<a href="blogs.php?blog='.$blog.'&amp;action=edit">'. T_('General'). '</a></li>';
-
-					if( $tab == 'perm' )
-						echo '<li class="current">';
-					else
-						echo '<li>';
-					echo '<a href="blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=perm">'. T_('Permissions'). '</a></li>';
-
-					if( $tab == 'advanced' )
-						echo '<li class="current">';
-					else
-						echo '<li>';
-					echo '<a href="blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=advanced">'. T_('Advanced'). '</a></li>';
-
-				?>
-				</ul>
-			</div>
-		</div>
 		<div class="tabbedpanelblock">
-
 		<?php
 		switch( $tab )
 		{
