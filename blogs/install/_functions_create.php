@@ -24,6 +24,7 @@ function create_b2evo_tables()
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
 				$tablepostcats, $tablehitlog, $tableantispam;
 	global $baseurl, $new_db_version;
+	global $DB;
 
 	create_groups();
 
@@ -45,7 +46,7 @@ function create_b2evo_tables()
 		pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle',
 		PRIMARY KEY (ID)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -75,7 +76,7 @@ function create_b2evo_tables()
 		UNIQUE user_login (user_login),
 		KEY user_grp_ID (user_grp_ID)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -105,7 +106,7 @@ function create_b2evo_tables()
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	 (blog_ID)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -122,7 +123,7 @@ function create_b2evo_tables()
 		KEY cat_blog_ID (cat_blog_ID),
 		KEY cat_parent_ID (cat_parent_ID)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -154,7 +155,7 @@ function create_b2evo_tables()
 		INDEX post_status( post_status ),
 		UNIQUE post_urltitle( post_urltitle )
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -164,7 +165,7 @@ function create_b2evo_tables()
 		postcat_cat_ID int(11) NOT NULL default '0',
 		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID)
 	)"; // We might want to add an index on cat_ID here...
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -186,7 +187,7 @@ function create_b2evo_tables()
 		KEY comment_date (comment_date),
 		KEY comment_type (comment_type)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -207,7 +208,7 @@ function create_b2evo_tables()
 		KEY hit_blog_ID (hit_blog_ID),
 		KEY hit_user_agent (hit_user_agent)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 
@@ -226,6 +227,7 @@ function create_b2evo_tables()
 function create_antispam()
 {
 	global $tableantispam;
+	global $DB;
 
 	echo 'Creating table for Antispam Blackist... ';
 	$query = "CREATE TABLE $tableantispam (
@@ -235,7 +237,7 @@ function create_antispam()
 		PRIMARY KEY aspm_ID (aspm_ID),
 		UNIQUE aspm_string (aspm_string)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 	echo 'Creating default blacklist entries... ';
@@ -260,6 +262,7 @@ function create_antispam()
 function create_locales()
 {
 	global $tablelocales, $locales;
+	global $DB;
 	
 	echo 'Creating table for Locales... ';
 	$query = "CREATE TABLE $tablelocales (
@@ -272,7 +275,7 @@ function create_locales()
 		loc_enabled tinyint(4) NOT NULL default '1',
 		PRIMARY KEY loc_locale( loc_locale )
 	) COMMENT='saves available locales'";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 }
@@ -288,6 +291,7 @@ function create_locales()
 function create_groups()
 {
 	global $tablegroups, $tableblogusers, $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $DB;
 
 	echo 'Creating table for Groups... ';
 	$query = "CREATE TABLE $tablegroups (
@@ -301,7 +305,7 @@ function create_groups()
 		grp_perm_templates TINYINT NOT NULL DEFAULT 0,
 		PRIMARY KEY grp_ID (grp_ID)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 	echo 'Creating default groups... ';
@@ -357,7 +361,7 @@ function create_groups()
 		bloguser_perm_properties tinyint NOT NULL default 0,
 		PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 	)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 	echo "OK.<br />\n";
 
 }
@@ -620,6 +624,7 @@ function populate_main_tables()
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_roll_ID;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_blogroll_b2evo, $cat_blogroll_contrib;
+	global $DB;
 
 	create_default_blogs();
 
@@ -662,7 +667,7 @@ function populate_main_tables()
 						VALUES( 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
 									 '$now', '". 
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 0)";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "OK.<br />\n";
 
@@ -712,7 +717,7 @@ function populate_main_tables()
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
 							( $blog_a_ID, ".$User_Demo->get('ID').",
 							'draft', 0, 0, 0, 0 )";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "OK.<br />\n";
 
@@ -722,7 +727,7 @@ function populate_main_tables()
 	// SETTINGS!
 	$query = "INSERT INTO $tablesettings ( ID, posts_per_page, what_to_show, archive_mode, time_difference, AutoBR, db_version, last_antispam_update, pref_newusers_grp_ID )
 	VALUES ( 1, 5, 'paged', 'monthly', '0', '1', $new_db_version, '2000-01-01 00:00:00', ".$Group_Users->get('ID')." )";
-	$q = mysql_query($query) or mysql_oops( $query );
+	$DB->query( $query );
 
 	echo "OK.<br />\n";
 

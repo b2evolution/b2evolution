@@ -61,7 +61,6 @@ switch( $cat )
 
 if( $action == 'update' )
 {
-	case 'update':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
