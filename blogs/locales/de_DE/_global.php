@@ -5,7 +5,7 @@
  */
 
 $trans['de_DE'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9.0.x\nPOT-Creation-Date: 2004-06-26 02:33+0200\nPO-Revision-Date: 2004-06-26 17:27+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9.0.x\nPOT-Creation-Date: 2004-06-26 02:33+0200\nPO-Revision-Date: 2004-07-09 18:50+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Ausgewählt",
 	'Categories' => "Kategorien",
 	'Permanent link to full entry' => "Permanenter Link zum ganzen Eintrag",
@@ -402,7 +402,7 @@ $trans['de_DE'] = array(
 	'New sub-category here' => "Hier neue Unterkategorie",
 	'New category here' => "Hier neue Kategorie",
 	'<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).' => "<strong>Beachte:</strong> Das Löschen einer Kategorie entfernt nicht die darin enthaltenen Einträge. Sie werden der übergeordneten Kategorie zugeordnet. Wenn eine Wurzelkategorie gelöscht wird, werden die Einträge der ältesten, verbleibenden Kategorie (niedrigste Kategorienummer) desselben Blogs zugeordnet.",
-	'Post contents' => "Eintrag-Inhalt",
+	'Post contents' => "Inhalt des Eintrags",
 	'Title' => "Titel",
 	'Language' => "Sprache",
 	'Link to url' => "Verweis auf URL",

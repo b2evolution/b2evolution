@@ -12,7 +12,7 @@
  * @package evocore
  */
 if( isset( $main_init ) )
-{	// Prevent double loading since require_once won't work in all situations
+{ // Prevent double loading since require_once won't work in all situations
 	// on windows when some subfolders have caps :(
 	// (Check it out on static page generation)
 	return;
@@ -29,11 +29,11 @@ $Messages = new Log( 'error' );
 
 require_once( dirname(__FILE__).'/_functions.php' );
 timer_start();
-require_once( dirname(__FILE__).'/_vars.php' );	// sets various arrays and vars for use in b2
-require_once( dirname(__FILE__).'/_class_generalsettings.php' );
-require_once( dirname(__FILE__).'/_class_usersettings.php' );
-require_once( dirname(__FILE__).'/_class_db.php' );
-require_once( dirname(__FILE__).'/_functions_template.php' );	// function to be called from templates
+require_once( dirname(__FILE__).'/_vars.php' );                  // sets various arrays and vars for use in b2
+require_once( dirname(__FILE__).'/_class_generalsettings.php' ); // interface to general settings
+require_once( dirname(__FILE__).'/_class_usersettings.php' );    // interface to user settings
+require_once( dirname(__FILE__).'/_class_db.php' );              // DB handling class
+require_once( dirname(__FILE__).'/_functions_template.php' );    // function to be called from templates
 require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );
 require_once( dirname(__FILE__).'/_functions_xmlrpcs.php' );
 require_once( dirname(__FILE__).'/_class_blog.php' );
@@ -43,14 +43,14 @@ require_once( dirname(__FILE__).'/_class_commentlist.php' );
 require_once( dirname(__FILE__).'/_class_archivelist.php' );
 require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
 require_once( dirname(__FILE__).'/_class_calendar.php' );
-require_once( dirname(__FILE__).'/_functions_hitlogs.php' ); // referer logging
+require_once( dirname(__FILE__).'/_functions_hitlogs.php' );     // referer logging
 require_once( dirname(__FILE__).'/_functions_forms.php' );
 require_once( dirname(__FILE__).'/_class_renderer.php' );
 require_once( dirname(__FILE__).'/_class_toolbars.php' );
 
 
 if( !$config_is_done )
-{	// base config is not done.
+{ // base config is not done.
 	$error_message = 'Base configuration is not done.';
 	require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
 }
@@ -70,8 +70,8 @@ if( $use_obhandler )
 // Connecting to the db:
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
 
-$UserSettings = new UserSettings();
-$Settings = new GeneralSettings();
+$UserSettings = & new UserSettings();
+$Settings = & new GeneralSettings();
 
 $servertimenow = time();
 $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
@@ -103,7 +103,7 @@ $Toolbars = & new Toolbars();
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;
 if( $error = veriflog( $login_required ) )
-{	// Login failed:
+{ // Login failed:
 	require(dirname(__FILE__) . "/$core_dirout/$htsrv_subdir/login.php");
 }
 

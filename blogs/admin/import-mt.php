@@ -1145,9 +1145,9 @@ param( 'mode', 'string', 'normal' );
 			<a href="<?php echo $admin_dirout ?>">Have fun in your blogs</a> or <a href="<?php echo $admin_url ?>">go to admin</a> (it's fun there, too)
 		</p>
 		<?php
-		if(	$count_userscreated )
+		if( $count_userscreated )
 		{
-			echo '<p class="note">Please note that the new users being created are not member of any blog yet. You\'ll have to setup this in the <a href="'.$admin_url.'/b2blogs.php">blogs admin</a>.</p>';
+			echo '<p class="note">Please note that the new users being created are not member of any blog yet. You\'ll have to setup this in the <a href="'.$admin_url.'/blogs.php">blogs admin</a>.</p>';
 		}
 		?>
 		</div>

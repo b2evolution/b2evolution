@@ -80,13 +80,22 @@ class BlogCache extends DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		$Debuglog->add( "Loading <strong>$this->objtype(is_member)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype(criterion: $criterion)</strong> into cache" );
 
-		$this->load_all();
+		switch( $criterion )
+		{
+			case 'member':
+				$where = 'bloguser_user_ID = '.$user_ID;
+				break;
+
+			case 'browse':  // QUESTION: should this imply '.._change = 1'?
+				$where = 'bloguser_perm_media_browse = 1';
+				break;
+		}
 
 		$bloglist = $DB->get_col( 'SELECT bloguser_blog_ID
 																FROM T_blogusers
-																WHERE bloguser_user_ID = '.$user_ID );
+																WHERE '.$where );
 
 		$this->load_list( implode( ',', $bloglist ) );
 

@@ -31,12 +31,12 @@ class DataObject
 	 * @var int
 	 * @access protected
 	 */
-	var	$ID = 0;		// This will be the ID in the DB
+	var $ID = 0;  // This will be the ID in the DB
 
 	/**#@+
 	 * @access private
 	 */
-	var	$dbtablename;
+	var $dbtablename;
 	var $dbprefix;
 	var $dbIDname;
 	var $dbchanges = array();
@@ -75,7 +75,7 @@ class DataObject
 	}
 
 
-	/*
+	/**
 	 * DataObject::dbupdate(-)
 	 *
 	 * Update the DB based on previously recorded changes
@@ -117,7 +117,7 @@ class DataObject
 	}
 
 
-	/*
+	/**
 	 * DataObject::dbinsert(-)
 	 *
 	 * Insert object into DB based on previously recorded changes
@@ -161,7 +161,7 @@ class DataObject
 	}
 
 
-	/*
+	/**
 	 * DataObject::dbdelete(-)
 	 *
 	 * Delete object from DB

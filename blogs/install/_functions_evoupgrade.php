@@ -533,7 +533,9 @@ function upgrade_b2evo_tables()
 
 		echo 'Altering table for Blog-User permissions... ';
 		$DB->query( 'ALTER TABLE T_blogusers
-									ADD COLUMN bloguser_perm_upload tinyint NOT NULL default 0' );
+									ADD COLUMN bloguser_perm_media_upload tinyint NOT NULL default 0,
+									ADD COLUMN bloguser_perm_media_browse tinyint NOT NULL default 0,
+									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );
 		echo "OK.<br />\n";
 
 		// New tables:

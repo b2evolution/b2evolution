@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays first part of the page menu (before the page title) 
+ * Displays first part of the page menu (before the page title)
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -36,7 +36,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<script type="text/javascript">
 		<!--
 		<?php
-		
+
 		switch( $admin_tab )
 		{
 			case 'blogs':
@@ -47,7 +47,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					allchecked[i] = false;
 				else
 					allchecked[i] = true;
-				
+
 				the_form.elements['blog_ismember_'+String(id)].checked = allchecked[i];
 				the_form.elements['blog_perm_published_'+String(id)].checked = allchecked[i];
 				the_form.elements['blog_perm_protected_'+String(id)].checked = allchecked[i];
@@ -58,13 +58,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				the_form.elements['blog_perm_comments_'+String(id)].checked = allchecked[i];
 				the_form.elements['blog_perm_cats_'+String(id)].checked = allchecked[i];
 				the_form.elements['blog_perm_properties_'+String(id)].checked = allchecked[i];
-				the_form.elements['blog_perm_upload_'+String(id)].checked = allchecked[i];
-				
+				the_form.elements['blog_perm_media_upload_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_media_browse_'+String(id)].checked = allchecked[i];
+				the_form.elements['blog_perm_media_change_'+String(id)].checked = allchecked[i];
+
 				setcheckallspan( i );
 			}
 			<?php
 			break;
-				
+
 			case 'files':
 			/**
 			 * Toggles status of a bunch of checkboxes in a form
@@ -76,7 +78,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			{
 				if( allchecked[0] ) allchecked[0] = false;
 				else allchecked[0] = true;
-				
+
 				var elems = document.forms[the_form].elements[the_elements];
 				var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
 				if (elems_cnt)
@@ -95,7 +97,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			<?php
 			break;
 		}
-		
+
 		// --- general functions ----------------
 		/**
 		 * replaces the text of the [nr]th checkall-html-ID
@@ -114,12 +116,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('uncheck all') ?>');
 			else
 				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('check all') ?>');
-						
+
 			if( document.getElementById( idprefix+'_'+String(nr) ) )
 				document.getElementById( idprefix+'_'+String(nr) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(nr) ).firstChild);
 			//else alert('no element with id '+idprefix+'_'+String(nr));
 		}
-		
+
 		<?php
 		/**
 		 * inits the checkall functionality.
@@ -133,7 +135,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			allchecked = Array();
 			if( typeof htmlid == 'undefined' ) idprefix = 'checkallspan';
 			else idprefix = htmlid;
-			
+
 			var i = 0;
 			//alert(document.getElementById("checkallspan"+String(i)));
 			while( id = document.getElementById( idprefix+'_'+String(i)) )
@@ -142,7 +144,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				if( document.getElementById( idprefix+'_state_'+String(i)) )
 					setcheckallspan( i, document.getElementById( idprefix+'_state_'+String(i)).checked );
 				else setcheckallspan( i, init );
-			
+
 				i++;
 			}
 			//if( i == 0 ) alert('no elements with ID prefix '+idprefix+' found!');
@@ -175,7 +177,7 @@ if( empty($mode) )
 		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?> <img src="img/close.gif" width="14" height="14" class="top" alt="" title="<?php echo T_('Exit to blogs') ?>" /></a><br />
 	</div>
 
-	<?php	
+	<?php
 	if( !$obhandler_debug )
 	{ // don't display changing time when we want to test obhandler
 	?>
@@ -186,7 +188,7 @@ if( empty($mode) )
 		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
 	</div>
 	<?php } ?>
-	
+
 	<ul class="tabs">
 	<?php
 		if( $admin_tab == 'new' )
@@ -211,7 +213,7 @@ if( empty($mode) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2blogs.php" >', T_('Blogs'), '</a></li>';
+		echo '<a href="blogs.php" >', T_('Blogs'), '</a></li>';
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{
@@ -244,7 +246,7 @@ if( empty($mode) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		
+
 		if( $current_User->check_perm( 'users', 'view' ) )
 		{
 			echo '<a href="b2users.php" >', T_('Users'), '</a></li>';

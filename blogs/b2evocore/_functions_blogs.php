@@ -79,8 +79,6 @@ function blog_create(
 }
 
 
-
-
 /**
  * Update the user permissions for edited blog
  *
@@ -92,7 +90,7 @@ function blog_update_user_perms( $blog )
 {
 	global $DB;
 
-	// Delete old perms for thos blog:
+	// Delete old perms for this blog:
 	$DB->query( "DELETE FROM T_blogusers
 								WHERE bloguser_blog_ID = $blog" );
 
@@ -101,7 +99,7 @@ function blog_update_user_perms( $blog )
 
 	$inserted_values = array();
 	if( count( $user_IDs ) ) foreach( $user_IDs as $loop_user_ID )
-	{	// Check new permissions for each user:
+	{ // Check new permissions for each user:
 		// echo "getting perms for user : $loop_user_ID <br />";
 
 		$perm_post = array();
@@ -128,15 +126,20 @@ function blog_update_user_perms( $blog )
 		$perm_cats = param( 'blog_perm_cats_'.$loop_user_ID, 'integer', 0 );
 		$perm_properties = param( 'blog_perm_properties_'.$loop_user_ID, 'integer', 0 );
 
+		$perm_media_upload = param( 'blog_perm_media_upload_'.$loop_user_ID, 'integer', 0 );
+		$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_user_ID, 'integer', 0 );
+		$perm_media_change = param( 'blog_perm_media_change_'.$loop_user_ID, 'integer', 0 );
+
 		// Update those permissions in DB:
 
 		if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties )
-		{	// There are some permissions for this user:
+		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
 			$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, '".implode(',',$perm_post)."',
-																$perm_delpost, $perm_comments, $perm_cats, $perm_properties )";
+																$perm_delpost, $perm_comments, $perm_cats, $perm_properties,
+																$perm_media_upload, $perm_media_browse, $perm_media_change )";
 		}
 	}
 
@@ -145,10 +148,12 @@ function blog_update_user_perms( $blog )
 	{
 		$DB->query( "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-											bloguser_perm_cats, bloguser_perm_properties )
+											bloguser_perm_cats, bloguser_perm_properties,
+											bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change)
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 }
+
 
 /**
  * get_bloginfo(-)
@@ -175,7 +180,6 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
 }
 
 
-
 /**
  * Get blog params for specified ID
  *
@@ -199,6 +203,7 @@ function get_blogparams_by_ID( $blog_ID )
 	if( !isset( $cache_blogs[$blog_ID] ) ) die( T_('Requested blog does not exist!') );
 	return $cache_blogs[ $blog_ID ];
 }
+
 
 /**
  * Get Blog for specified ID
@@ -226,7 +231,7 @@ function Blog_get_by_ID( $blog_ID )
 }
 
 
-/*
+/**
  * blog_load_cache(-)
  */
 function blog_load_cache()
@@ -244,7 +249,6 @@ function blog_load_cache()
 		}
 	}
 }
-
 
 
 /*****
@@ -270,8 +274,7 @@ function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams 
 }
 
 
-
-/*
+/**
  * blog_list_start(-)
  *
  * Start blog iterator
@@ -300,7 +303,7 @@ function blog_list_start( $need = '' )
 }
 
 
-/*
+/**
  * blog_list_next(-)
  *
  * Next blog iteration
@@ -313,12 +316,12 @@ function blog_list_next( $need='' )
 
 	$curr_blogparams = next( $cache_blogs );
 	if( $curr_blogparams === false )
-		return false;	// No more blog!
+		return false; // No more blog!
 
 	// echo 'need: ', $need, ' info:',get_bloginfo($need, $curr_blogparams );
 
 	if( (!empty($need)) && (!get_bloginfo($need, $curr_blogparams )) )
-	{	// We need the blog to have a specific criteria that is not met, search on...
+	{ // We need the blog to have a specific criteria that is not met, search on...
 		return blog_list_next( $need );		// This can be recursive
 	}
 
@@ -328,7 +331,7 @@ function blog_list_next( $need='' )
 }
 
 
-/*
+/**
  * blog_list_iteminfo(-)
  *
  * Display info about item

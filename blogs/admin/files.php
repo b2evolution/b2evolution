@@ -433,15 +433,32 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message )
 
 ?>
 <div class="toolbar">
-	<form action="files.php" name="roots" class="toolbaritem">
-		<?php echo $Fileman->form_hiddeninputs(); ?>
+	<?php
 
-		<select name="root" onchange="this.form.submit()">
-		<?php echo $Fileman->form_optionlist_roots( $root ); ?>
-		</select>
-		<input type="submit" value="<?php echo T_('Change root') ?>" />
+	$rootlist = $Fileman->get_roots();
 
-	</form>
+	if( count($rootlist) > 1 )
+	{ // provide list
+		echo '<form action="files.php" name="roots" class="toolbaritem">'
+					.$Fileman->form_hiddeninputs();
+		echo '<select name="root" onchange="this.form.submit()">';
+
+		foreach( $rootlist as $lroot )
+		{
+			echo '<option value="'.$lroot['type'].'_'.$lroot['id'].'"';
+
+			if( $root == $lroot['type'].'_'.$lroot['id'] )
+			{
+				echo ' selected="selected"';
+			}
+
+			echo '>'.format_to_output( $lroot['name'] ).'</option>';
+		}
+		echo '</select><input type="submit" value="'.T_('Change root').'" />'
+					."</form>\n";
+	}
+	?>
+
 	<form action="files.php" name="search" class="toolbaritem">
 		<?php echo $Fileman->form_hiddeninputs() ?>
 		<input type="text" name="searchfor" value="--todo--" size="20" />

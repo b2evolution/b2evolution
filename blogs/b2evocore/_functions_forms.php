@@ -186,7 +186,7 @@ function form_radio(
 			echo ' checked="checked"';
 		}
 		if( !empty( $loop_field_option[4] ) )
-			echo $loop_field_option[4];
+			echo ' '.$loop_field_option[4];
 		echo ' /> ', $loop_field_option[1], '</label>';
 		if( !empty( $loop_field_option[2] ) )
 		{ // notes for radio option
@@ -200,7 +200,7 @@ function form_radio(
 	}
 	if( !empty( $field_notes ) )
 	{
-		echo '<div class="notes">'.$field_notes.'</div>';
+		echo '<div><span class="notes">'.$field_notes.'</span></div>';
 	}
 	echo '  </fieldset></div>';
 	echo "</fieldset>\n\n";
@@ -346,6 +346,6 @@ function form_submit( $submit_attribs = '' )
 			</div>
 		</fieldset>
 	</fieldset>
-	<?php 
+	<?php
 }
 ?>

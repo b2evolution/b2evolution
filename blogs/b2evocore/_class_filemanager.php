@@ -13,6 +13,15 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes
+ */
+require_once( dirname(__FILE__).'/_functions_files.php' );
+
+
+/**
+ * TODO: docblock for class
+ */
 class FileManager
 {
 	/**
@@ -289,7 +298,7 @@ class FileManager
 				{
 					$this->entries[ $i ]['type'] = 'dir';
 					if( $this->fulldirsize )
-						$this->entries[ $i ]['size'] = $this->get_dirsize( $this->cwd.'/'.$entry );
+						$this->entries[ $i ]['size'] = get_dirsize_recursive( $this->cwd.'/'.$entry );
 					else $this->entries[ $i ]['size'] = false;
 				}
 				else
@@ -392,27 +401,25 @@ class FileManager
 
 
 	/**
-	 * generated the option list for available root directories
-	 *
-	 * @param string the selected option (blog_X or user_X)
+	 * get an array of available root directories
+	 * @return array of arrays for each root: array( type [blog/user], id, name )
 	 */
-	function form_optionlist_roots( $selected = '' )
+	function get_roots()
 	{
 		global $BlogCache;
 
-		$bloglist = $BlogCache->load_user_blogs( 'member', $this->User->ID );
+		$bloglist = $BlogCache->load_user_blogs( 'browse', $this->User->ID );
+
+		$r = array();
 
 		foreach( $bloglist as $blog_ID )
 		{
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
-			echo '<option value="blog_'.$blog_ID.'"';
-
-			if( $selected == 'blog_'.$blog_ID )
-				echo ' selected="selected"';
-
-			echo '>'.$Blog->dget( 'shortname', 'formvalue' )."</option>\n";
+			$r[] = array( 'type' => 'blog', 'id' => $blog_ID, 'name' => $Blog->get( 'shortname' ) );
 		}
+
+		return $r;
 	}
 
 
@@ -578,6 +585,7 @@ class FileManager
 	 * Displays file permissions like 'ls -l'
 	 *
 	 * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
+	 * @todo move out of class
 	 * @param string
 	 */
 	function translatePerm( $in_Perms )
@@ -672,13 +680,13 @@ class FileManager
 				if( $this->cisdir() && !$this->fulldirsize )
 					$r = /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 				elseif( ($r = $this->cget('size')) !== false )
-					$r = $this->bytesreadable( $r );
+					$r = bytesreadable( $r );
 				else
 					$r = '';
 				break;
 
 			case 'imgsize':
-				$r = $this->imgsize( $path, $param );
+				$r = imgsize( $path, $param );
 				break;
 
 			case 'link':
@@ -816,7 +824,7 @@ class FileManager
 	 * get properties of a special icon
 	 *
 	 * @param string icon for what (special puposes or 'cfile' for current file/dir)
-	 * @param string what to return for that icon (file, url, size {@link see Fileman::imgsize()}})
+	 * @param string what to return for that icon (file, url, size {@link see imgsize()}})
 	 * @param string additional parameter (for size)
 	 */
 	function icon( $for, $what = 'imgtag', $param = '' )
@@ -863,7 +871,7 @@ class FileManager
 				break;
 
 			case 'size':
-				$r = $this->imgsize( $this->imgpath.$iconfile, $param );
+				$r = imgsize( $this->imgpath.$iconfile, $param );
 				break;
 
 			case 'imgtag':
@@ -1205,7 +1213,7 @@ class FileManager
 	 */
 	function create_rootdir( $path, $suggested_name, $chmod = '#' )
 	{
-		$realname = $this->safefilename( $suggested_name );
+		$realname = safefilename( $suggested_name );
 		if( $this->createdir( $realname, $path, $chmod ) )
 		{
 			return $path.'/'.$realname;
@@ -1294,7 +1302,7 @@ class FileManager
 	 */
 	function reloadpage()
 	{
-		header( 'Location: '.url_add_param( $this->url, 'cd='.$this->subpath ) );
+		header( 'Location: '.$this->curl() );
 		exit;
 	}
 
@@ -1318,40 +1326,6 @@ class FileManager
 	}
 
 
-	/**
-	 * create crossplatform-safe filename
-	 * @param string filename/path
-	 * @return string converted path
-	 */
-	function safefilename( $path )
-	{
-		$path = preg_replace( '/[^A-Za-z0-9]+/', '_', $path );
-
-		// remove trailing/leading '_'
-		$path = preg_replace( '/^_+/', '', $path );
-		$path = preg_replace( '/_+$/', '', $path );
-
-		return $path;
-	}
-
-
-	/**
-	 * converts bytes to readable bytes/kb/mb/gb
-	 *
-	 * @param integer bytes
-	 * @return string bytes made readable
-	 */
-	function bytesreadable( $bytes )
-	{
-		$type = array ('b', 'kb', 'mb', 'gb');
-
-		for ($i = 0; $bytes > 1024; $i++)
-			$bytes /= 1024;
-
-		return str_replace(',', '.', round($bytes, 2)) . $type[$i];
-	}
-
-
 	function debug( $what, $desc, $forceoutput = 0 )
 	{
 		global $Debuglog;
@@ -1363,95 +1337,6 @@ class FileManager
 			ob_end_flush();
 		else
 			ob_end_clean();
-	}
-
-
-	/**
-	 * deletes a dir recursive, wiping out all subdirectories!!
-	 *
-	 * @param string the dir
-	 */
-	function deldir_recursive( $dir )
-	{
-		$current_dir = opendir( $dir );
-		while( $entryname = readdir($current_dir) )
-		{
-			if( is_dir( "$dir/$entryname" ) && ( $entryname != '.' && $entryname != '..') )
-			{
-				deldir( "$dir/$entryname" );
-			}
-			elseif( $entryname != '.' && $entryname != '..' )
-			{
-				unlink( "$dir/$entryname" );
-			}
-		}
-		closedir( $current_dir );
-		return rmdir( $dir );
-	}
-
-
-	/**
-	 * get size of directory, including anything in there.
-	 *
-	 * @param string the dir's full path
-	 */
-	function get_dirsize( $path )
-	{
-		$dir = opendir( $path );
-		$total = 0;
-		while( $cur = readdir($dir) ) if( !in_array( $cur, array('.', '..')) )
-		{
-			if( is_dir($path.'/'.$cur) )
-			{
-				$total += $this->get_dirsize($path.'/'.$cur);
-			}
-			else
-			{
-				$total += filesize($path.'/'.$cur);
-			}
-		}
-	return $total;
-	}
-
-
-	/**
-	 * get the size of an image file
-	 *
-	 * @param string absolute file path
-	 * @param string 'width', 'height', 'widthheight' (array), 'type', 'string' (as for img tags), else: 'widthxheight'
-	 */
-	function imgsize( $path, $param )
-	{
-		if( !preg_match( '/\.(jpe?g|gif|png|swf)$/i', $path) )
-		{
-			return false;
-		}
-		else
-		{
-			if( !($size = @getimagesize( $path )) )
-				return false;
-			elseif( $param == 'width' )
-				return $size[0];
-			elseif( $param == 'height' )
-				return $size[1];
-			elseif( $param == 'widthheight' )
-				return array( $size[0], $size[1] );
-			elseif( $param == 'type' )
-			{
-				switch( $size[1] )
-				{
-					case 1: return 'gif';
-					case 2: return 'jpg';
-					case 3: return 'png';
-					case 4: return 'swf';
-					default: return 'unknown';
-				}
-			}
-			elseif( $param == 'string' )
-				return $size[3];
-			else
-				return $size[0].'x'.$size[1];
-		}
 	}
 
 

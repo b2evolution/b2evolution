@@ -12,10 +12,10 @@
 /**
  * Do the MAIN initializations:
  */
-require_once( dirname(__FILE__) . '/../conf/_config.php' );
+require_once( dirname(__FILE__).'/../conf/_config.php' );
 $login_required = true;
-require_once( dirname(__FILE__) . "/$admin_dirout/$core_subdir/_main.php" );
+require_once( dirname(__FILE__)."/$admin_dirout/$core_subdir/_main.php" );
 
-param( 'mode', 'string', '' );		// Sidebar, bookmarklet
+param( 'mode', 'string', '' );  // Sidebar, bookmarklet
 
 ?>

@@ -390,7 +390,9 @@ function create_groups()
 		bloguser_perm_comments tinyint NOT NULL default 0,
 		bloguser_perm_cats tinyint NOT NULL default 0,
 		bloguser_perm_properties tinyint NOT NULL default 0,
-		bloguser_perm_upload tinyint NOT NULL default 0,
+		bloguser_perm_media_upload tinyint NOT NULL default 0,
+		bloguser_perm_media_browse tinyint NOT NULL default 0,
+		bloguser_perm_media_change tinyint NOT NULL default 0,
 		PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 	)";
 	$DB->query( $query );

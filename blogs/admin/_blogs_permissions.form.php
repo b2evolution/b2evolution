@@ -10,7 +10,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
-<form action="b2blogs.php" class="fform" method="post" name="FormPerm">
+<form action="blogs.php" class="fform" method="post" name="FormPerm">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="perm" />
 	<input type="hidden" name="blog" value="<?php echo $blog; ?>" />
@@ -26,7 +26,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
 				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
 				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
-				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Upload') ?></th>
+				<th colspan="3" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Media directory') ?></th>
 				<th rowspan="2" class="checkright">&nbsp;</th>
 			</tr>
 			<tr>
@@ -35,16 +35,20 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<th class="checkright"><?php echo T_('Private') ?></th>
 				<th class="checkright"><?php echo T_('Draft') ?></th>
 				<th class="checkright"><?php echo T_('Deprecated') ?></th>
+				<th class="checkright"><?php echo T_('Upload') ?></th>
+				<th class="checkright"><?php echo T_('Read') ?></th>
+				<th class="checkright"><?php echo T_('Write') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="13">
+				<td colspan="15">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
 			<?php
 				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
-													bloguser_perm_properties, bloguser_perm_upload
+													bloguser_perm_properties, bloguser_perm_media_upload,
+													bloguser_perm_media_browse, bloguser_perm_media_change
 									FROM T_users INNER JOIN T_blogusers
 													ON ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = $blog
@@ -128,11 +132,25 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 						</td>
 						<td class="center">
-							<input type="checkbox" name="blog_perm_upload_<?php echo $loop_row['ID'] ?>"
-								<?php if( $loop_row['bloguser_perm_upload'] != 0  ) { ?>
+							<input type="checkbox" name="blog_perm_media_upload_<?php echo $loop_row['ID'] ?>"
+								<?php if( $loop_row['bloguser_perm_media_upload'] != 0  ) { ?>
 								checked="checked"
 								<?php } ?>
 								value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_media_browse_<?php echo $loop_row['ID'] ?>"
+								<?php if( $loop_row['bloguser_perm_media_browse'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_("Permission to browse blog's media folder") ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_media_change_<?php echo $loop_row['ID'] ?>"
+								<?php if( $loop_row['bloguser_perm_media_change'] != 0  ) { ?>
+								checked="checked"
+								<?php } ?>
+								value="1" title="<?php echo T_("Permission to change the blog's media folder content") ?>" />
 						</td>
 						<td class="center">
 							<a href="javascript:toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
@@ -145,7 +163,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				}
 				?>
 			<tr class="group">
-				<td colspan="13">
+				<td colspan="15">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
@@ -205,8 +223,16 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 						</td>
 						<td class="center">
-							<input type="checkbox" name="blog_perm_upload_<?php echo $loop_row['ID'] ?>"
+							<input type="checkbox" name="blog_perm_media_upload_<?php echo $loop_row['ID'] ?>"
 								value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_media_browse_<?php echo $loop_row['ID'] ?>"
+								value="1" title="<?php echo T_("Permission to browse blog's media folder") ?>" />
+						</td>
+						<td class="center">
+							<input type="checkbox" name="blog_perm_media_change_<?php echo $loop_row['ID'] ?>"
+								value="1" title="<?php echo T_("Permission to change the blog's media folder content") ?>" />
 						</td>
 						<td class="center">
 							<a href="javascript:toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);">

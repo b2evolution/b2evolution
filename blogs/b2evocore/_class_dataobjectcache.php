@@ -95,6 +95,12 @@ class DataObjectCache
 		global $DB, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
+
+		if( empty( $req_list ) )
+		{
+			return false;
+		}
+
 		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
 		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
@@ -195,7 +201,7 @@ class DataObjectCache
 	function option_list( $default = 0, $allow_none = false )
 	{
 		global $cache_Groups;
-		
+
 		if( ! $this->all_loaded )
 			$this->load_all();
 

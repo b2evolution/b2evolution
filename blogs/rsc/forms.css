@@ -1,5 +1,5 @@
-/* 
- * Default Form styles 
+/*
+ * Default Form styles
  * Feel free to override all these styles in your own skins
  */
 
@@ -22,9 +22,13 @@ fieldset.input {
 	border: 0;
 }
 
-fieldset span.notes {
+fieldset .notes {
 	font-size: 80%;
 	color: #999;
+}
+
+fieldset div.notes {
+	margin: 1ex 20px;
 }
 
 input.large,

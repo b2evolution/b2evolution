@@ -75,33 +75,33 @@ class Log
 	 * @param string the level of messages to use
 	 * @param string the style to use, '<ul>' (with <li> for every message) or everything else for '<br />'
 	 */
-	function display( $head, $foot, $display = true, $level = '#', $style = '<ul>' )
+	function display( $head, $foot = '', $display = true, $level = '#', $style = '<ul>' )
 	{
-		$messages = $this->messages( $level, true );
-		
+		$messages = & $this->messages( $level, true );
+
 		if( !count($messages) )
 			return false;
-		
+
 		if( $level == '#' )
 			$level = $this->defaultlevel;
 
 		$class = 'log_'.$level;
-			
+
 		$disp = "\n<div class=\"$class\">";
-		
+
 		if( !empty($head) )
 			$disp .= '<p class="'.$class.'">'.$head.'</p>';
-			
+
 		if( $style == '<ul>' )
 		{
 			if( count($messages) == 1 )
 				$style = '<br>';
 			else $disp .= '<ul class="log">';
 		}
-		
+
 		if( $style != '<ul>' )
 			$disp .= '<p>';
-		
+
 		foreach( $messages as $message )
 		{
 			if( $style == '<ul>' )
@@ -109,13 +109,13 @@ class Log
 			else
 				$disp .= $message.'<br />';
 		}
-		
+
 		// close list
 		$disp .= ( $style == '<ul>' ) ? '</ul>' : '</p>';
-		
+
 		if( !empty($foot) )
 			$disp .= '<p class="'.$class.'">'.$foot.'</p>';
-			
+
 		$disp .= '</div>';
 
 		if( $display )
@@ -129,27 +129,54 @@ class Log
 
 
 	/**
+	 * Display messages of the Log object (conditional header/footer on message count).
+	 *
+	 * @param string header/title (if one message)
+	 * @param string header/title (if more than one message)
+	 * @param string footer (if one message)
+	 * @param string footer (if more than one message)
+	 * @param boolean to display or return
+	 * @param string the level of messages to use
+	 * @param string the style to use, '<ul>' (with <li> for every message) or everything else for '<br />'
+	 */
+	function display_cond( $head1, $head2, $foot1 = '', $foot2 = '', $display = true, $level = '#', $style = '<ul>' )
+	{
+		switch( $this->count( $level ) )
+		{
+			case 0:
+				return false;
+
+			case 1:
+				return $this->display( $head1, $foot1, $display, $level, $style );
+
+			default:
+				return $this->display( $head2, $foot2, $display, $level, $style );
+		}
+	}
+
+
+	/**
 	 * Concatenates messages of a given level to a string
 	 *
 	 * @param string prefix of the string
 	 * @param string suffic of the string
 	 * @param string the level
 	 * @return string the messages, imploded. Tags stripped.
-	 */	
+	 */
 	function string( $head, $foot, $level = '#' )
 	{
 		if( !$this->count( $level ) )
 		{
 			return false;
 		}
-		
+
 		$r = '';
 		if( '' != $head )
 			$r .= $head.' ';
 		$r .= implode(', ', $this->messages( $level, true ));
 		if( '' != $foot )
 			$r .= ' '.$foot;
-		
+
 		return strip_tags( $r );
 	}
 
@@ -176,11 +203,11 @@ class Log
 	function messages( $level = '#', $forceonedimension = false )
 	{
 		$messages = array();
-		
+
 		// sort by level ('error' above 'note')
 		$ksortedmessages = $this->messages;
 		ksort( $ksortedmessages );
-		
+
 		if( $level == 'all' )
 		{
 			foreach( $ksortedmessages as $llevel => $lmsgs )
@@ -204,7 +231,7 @@ class Log
 			{
 				$level = $this->defaultlevel;
 			}
-	
+
 			if( isset($this->messages[$level]) )
 			{ // we have messages for this level
 				$messages = $this->messages[$level];
