@@ -163,7 +163,7 @@ class Calendar
 	 */
 	function display( $file='', $params='' )	// Page to use for links
 	{
-		global $querycount;
+		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $weekday, $weekday_abbrev;
 		global $start_of_week, $time_difference;
@@ -180,14 +180,13 @@ class Calendar
 					"WHERE MONTH(post_issue_date) = '$this->month' AND YEAR(post_issue_date) = '$this->year' ".$this->where. 
 					" ORDER BY post_issue_date DESC";
 
-			$querycount++;
-
-			$arc_result=mysql_query($arc_sql) or die($arc_sql."<br />".mysql_error());
+			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 			
-			if (mysql_num_rows($arc_result) > 0) 
+			if( $DB->num_rows > 0 ) 
 			{	// OK we have a month with posts!
 				$daysinmonthwithposts = '-';
-				while($arc_row = mysql_fetch_array($arc_result)) {
+				foreach( $arc_result as $arc_row )
+				{
 					$daysinmonthwithposts .= $arc_row["DAYOFMONTH(post_issue_date)"].'-';
 				}
 				break; // Don't search any further!

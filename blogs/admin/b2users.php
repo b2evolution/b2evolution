@@ -81,7 +81,7 @@ switch ($action)
 			{
 				$sql = "UPDATE $tableusers SET user_level=user_level-1 WHERE ID = $id";
 			}
-			$result = mysql_query($sql);
+			$result = $DB->query( $sql );
 			
 			if( $result )
 				echo '<div class="panelblock">User promoted.</div>';

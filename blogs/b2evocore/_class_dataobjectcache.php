@@ -69,7 +69,7 @@ class DataObjectCache
 		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		foreach( $rows as $row )
+		if( count($rows) ) foreach( $rows as $row )
 		{
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];
@@ -98,7 +98,7 @@ class DataObjectCache
 		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
-		foreach( $rows as $row )
+		if( count($rows) ) foreach( $rows as $row )
 		{
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			// $obj = $this->cache[ $row->$dbIDname ];

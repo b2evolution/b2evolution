@@ -93,7 +93,7 @@ class ItemList extends DataObjectList
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$title = '' )													// urltitle of post to display
 	{
-		global $querycount;
+		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $cache_categories, $time_difference;
 		global $cat_array; // communication with recursive callback funcs
@@ -456,28 +456,21 @@ class ItemList extends DataObjectList
 		}
 
 		//echo $this->request;
-		$querycount++;
-		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
+		$this->result_rows = $DB->get_results( $this->request );
 
-		$this->result_num_rows = mysql_num_rows($this->result);
-		// echo '<br/>rows=',$this->result_num_rows,'<br />';
+		$this->result_num_rows = $DB->num_rows;
 
 		// Make a list of posts for future queries!
 		// Also make arrays...
 		$this->postIDlist = "";
 		$this->postIDarray = array();
-		$this->result_rows = array();
-		while( $myrow = mysql_fetch_object($this->result) )
+		if( count( $this->result_rows ) ) foreach( $this->result_rows as $myrow )
 		{
-			$this->result_rows[] = $myrow;
-			// echo "post:". $myrow->ID."<br />";
 			array_unshift( $this->postIDarray, $myrow->ID );	// new row at beginning
 		}
 		if( !empty($this->postIDarray) )
 		{
 			$this->postIDlist = implode( ',', $this->postIDarray );
-			// rewind resultset:
-			// mysql_data_seek ($this->result, 0) or die( "Could not rewind resultset" );
 		}
 		// echo "postlist:". $this->postIDlist;
 

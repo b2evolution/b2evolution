@@ -145,7 +145,7 @@ switch( $show )
 		}
 		$sql .= ' GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
 		$querycount++;
-		$res_hits = mysql_query( $sql ) or mysql_oops( $sql );
+		$res_hits = $DB->get_results( $sql, ARRAY_A );
 		$hits = array();
 		$hits['no'] = 0;
 		$hits['invalid'] = 0;
@@ -165,7 +165,7 @@ switch( $show )
 		<th><?php echo T_('Direct Accesses') ?></th>
 		<th><?php echo T_('Total') ?></th>
 		<?php
-		while($row_stats = mysql_fetch_array($res_hits))
+		if( count($res_hits) ) foreach( $res_hits as $row_stats )
 		{
 			$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 			if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one

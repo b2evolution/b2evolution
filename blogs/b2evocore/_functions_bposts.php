@@ -1401,11 +1401,9 @@ function gen_permalink(
 				$permalink = $file.'?m='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor;
 				break;
 			case 'weekly':
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) {
-					$sql = "SELECT WEEK('".$postdata['Date']."')";
-					$result = mysql_query($sql);
-					$row = mysql_fetch_row($result);
-					$cacheweekly[$postdata['Date']] = $row[0];
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
+				{
+					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 				}
 				$permalink = $file.'?m='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor;
 				break;
@@ -1427,11 +1425,9 @@ function gen_permalink(
 				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'#'.$anchor;
 				break;
 			case 'weekly':
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) {
-					$sql = "SELECT WEEK('".$postdata['Date']."')";
-					$result = mysql_query($sql);
-					$row = mysql_fetch_row($result);
-					$cacheweekly[$postdata['Date']] = $row[0];
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']]))) 
+				{
+					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 				}
 				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'w'.$cacheweekly[$postdata['Date']].'/#'.$anchor;
 				break;

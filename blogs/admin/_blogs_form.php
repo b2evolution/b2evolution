@@ -84,7 +84,7 @@ switch( $next_action )
 									ORDER BY user_login";
 				$rows = $DB->get_results( $query, ARRAY_A );
 				$members=array();
-				foreach( $rows as $loop_row )
+				if( count($rows) ) foreach( $rows as $loop_row )
 				{	// Go through users:
 					$members[] = $loop_row['ID'];
 					$perm_post = explode( ',', $loop_row['bloguser_perm_poststatuses'] );
@@ -171,9 +171,8 @@ switch( $next_action )
 					$query .= "WHERE ID NOT IN (".implode( ',', $members ) .") ";
 				}
 				$query .= "ORDER BY user_login";
-				$result = mysql_query($query) or mysql_oops( $query );
-				$querycount++;
-				while($loop_row = mysql_fetch_array($result) )
+				$rows = $DB->get_results( $query, ARRAY_A );
+				if( count($rows) ) foreach( $rows as $loop_row )
 				{	// Go through users:
 					?>
 					<tr>

@@ -177,25 +177,26 @@ class Blog extends DataObject
 	 */
 	function dbdelete()
 	{
+		global $DB;
+		
 		// Delete comments
 		$sql="DELETE FROM $tablecomments INNER JOIN $tableposts 
 									ON comment_post_ID = ID
 					 WHERE ";
-		$result=mysql_query($sql) or mysql_oops( $sql );
-		$querycount++;
+		$result = $DB->query( $sql );
 
 		// Delete postcats
 
 		// Delete posts
 		$sql="DELETE FROM $tableposts INNER JOIN $tablecategories 
 					 WHERE post_author = ";
-		$result=mysql_query($sql) or mysql_oops( $sql );
+		$result = $DB->query( $sql );
 		$querycount++;
 		
 		// Delete categories
 		$sql="DELETE FROM  
 					 WHERE cat_blog_ID = $this->ID";
-		$result=mysql_query($sql) or mysql_oops( $sql );
+		$result = $DB->query( $sql );
 		$querycount++;
 
 		// Delete blogusers		

@@ -81,7 +81,7 @@ class DataObject
 	 */
 	function dbupdate( )
 	{
-		global $DB, $querycount;
+		global $DB;
 
 		if( $this->ID == 0 ) die( 'New object cannot be updated!' );
 
@@ -109,13 +109,10 @@ class DataObject
 		$sql = "UPDATE $this->dbtablename SET ". implode( ', ', $sql_changes ). " WHERE $this->dbIDname = $this->ID";
 		//echo $sql;
 
-		$querycount++;
-		$result = mysql_query($sql) or mysql_oops( $query );
+		$DB->query($sql);
 
 		// Reset changes in object:
 		$this->dbchanges = array();
-
-		return $result;
 	}
 
 
@@ -126,7 +123,7 @@ class DataObject
 	 */
 	function dbinsert( )
 	{
-		global $DB, $querycount;
+		global $DB;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -153,16 +150,13 @@ class DataObject
 		$sql = "INSERT INTO {$this->dbtablename} (". implode( ', ', $sql_fields ). ") VALUES (". implode( ', ', $sql_values ). ")";
 		// echo $sql;
 
-		$querycount++;
-		$result = mysql_query($sql) or mysql_oops( $query );
+		$DB->query($sql);
 
 		// store ID for newly created db record
-		$this->ID = mysql_insert_id();
+		$this->ID = $DB->insert_id;
 
 		// Reset changes in object:
 		$this->dbchanges = array();
-
-		return $result;
 	}
 
 
@@ -173,16 +167,13 @@ class DataObject
 	 */
 	function dbdelete( )
 	{
-		global $querycount;
+		global $DB;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
 		$query = "DELETE FROM $this->dbtablename
 							WHERE $this->dbIDname = $this->ID";
-		$result = mysql_query($query) or mysql_oops( $query );
-		$querycount++;
-
-		return true;
+		$DB->query($query);
 	}
 
 

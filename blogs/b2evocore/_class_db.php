@@ -14,8 +14,7 @@
 //  Please send me a mail telling me what you think of ezSQL
 //  and what your using it for!! Cheers. [ justin@visunet.ie ]
 //
-// ==================================================================
-// User Settings -- CHANGE HERE
+
 
 // ==================================================================
 //	ezSQL Constants
@@ -41,18 +40,20 @@ class DB
 	var $trace = false;      // same as $debug_all
 	var $debug_all = false;  // same as $trace
 	var $show_errors = true;
+	var $halt_on_error = true;
 	var $num_queries = 0;	
 	var $last_query;
 	var $col_info;
 	var $debug_called;
 	var $vardump_called;
-
+	var $insert_id = 0;
+	var $num_rows = 0;
+	var $rows_affected = 0;
+	
 	// ==================================================================
 	//	DB Constructor - connects to the server and selects a database
-
 	function db($dbuser, $dbpassword, $dbname, $dbhost)
 	{
-
 		$this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword);
 
 		if ( ! $this->dbh )
@@ -60,14 +61,11 @@ class DB
 			$this->print_error("<ol><b>Error establishing a database connection!</b><li>Are you sure you have the correct user/password?<li>Are you sure that you have typed the correct hostname?<li>Are you sure that the database server is running?</ol>");
 		}
 
-
 		$this->select($dbname);
-
 	}
 
 	// ==================================================================
 	//	Select a DB (if another one needs to be selected)
-
 	function select($db)
 	{
 		if ( !@mysql_select_db($db,$this->dbh))
@@ -78,7 +76,6 @@ class DB
 
 	// ====================================================================
 	//	Format a string correctly for safe insert under all PHP conditions
-	
 	function escape($str)
 	{
 		return mysql_real_escape_string($str);				
@@ -86,15 +83,13 @@ class DB
 
 	// ==================================================================
 	//	Print SQL/DB error.
-
 	function print_error($str = "")
 	{
-		
 		// All erros go to the global error array $EZSQL_ERROR..
 		global $EZSQL_ERROR;
 
 		// If no special error string then use mysql default..
-		if ( !$str ) $str = mysql_error();
+		if ( !$str ) $str = mysql_error().'(Errno='.mysql_errno().')';
 		
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array 
@@ -107,49 +102,31 @@ class DB
 		if ( $this->show_errors )
 		{
 			// If there is an error then take note of it
-			print "<blockquote><font face=arial size=2 color=ff0000>";
-			print "<b>SQL/DB Error --</b> ";
-			print "[<font color=000077>$str</font>]";
-			print "</font></blockquote>";
+			echo '<div class="error">';
+			echo '<p class="error">', T_('Oops, MySQL error!'), '</p>';
+			echo '<p>', $str, '</p>';
+			echo '<p class="error">Your query:<br /><code>'. $this->last_query. '</code></p>';
+			echo '</div>';
 		}
-		else
-		{
-			return false;	
-		}
-	}
 
-	// ==================================================================
-	//	Turn error handling on or off..
-
-	function show_errors()
-	{
-		$this->show_errors = true;
-	}
-	
-	function hide_errors()
-	{
-		$this->show_errors = false;
+		if( $this->halt_on_error ) die();
 	}
 
 	// ==================================================================
 	//	Kill cached query results
-
 	function flush()
 	{
-
 		// Get rid of these
 		$this->last_result = null;
 		$this->col_info = null;
 		$this->last_query = null;
-
+		$this->current_idx = 0;
 	}
 
 	// ==================================================================
 	//	Basic Query	- see docs for more detail
-
 	function query($query)
 	{
-		
 		// initialise return
 		$return_val = 0;
 
@@ -158,6 +135,7 @@ class DB
 
 		// Log how the function was called
 		$this->func_call = "\$db->query(\"$query\")";
+		// echo $this->func_call, '<br />';
 
 		// Keep track of the last query for debug..
 		$this->last_query = $query;
@@ -226,10 +204,8 @@ class DB
 
 	// ==================================================================
 	//	Get one variable from the DB - see docs for more detail
-
 	function get_var($query=null,$x=0,$y=0)
 	{
-
 		// Log how the function was called
 		$this->func_call = "\$db->get_var(\"$query\",$x,$y)";
 
@@ -251,12 +227,11 @@ class DB
 
 	// ==================================================================
 	//	Get one row from the DB - see docs for more detail
-
 	function get_row($query=null,$output=OBJECT,$y=0)
 	{
-
 		// Log how the function was called
 		$this->func_call = "\$db->get_row(\"$query\",$output,$y)";
+		// echo $this->func_call, '<br />';
 
 		// If there is a query then perform it if not then use cached results..
 		if ( $query )
@@ -290,7 +265,6 @@ class DB
 	// ==================================================================
 	//	Function to get 1 column from the cached result set based in X index
 	// se docs for usage and info
-
 	function get_col($query=null,$x=0)
 	{
 
@@ -311,10 +285,8 @@ class DB
 
 	// ==================================================================
 	// Return the the query as a result set - see docs for more details
-
-	function get_results($query=null, $output = OBJECT)
+	function get_results( $query=null, $output = OBJECT)
 	{
-
 		// Log how the function was called
 		$this->func_call = "\$db->get_results(\"$query\", $output)";
 
@@ -360,7 +332,6 @@ class DB
 	// ==================================================================
 	// Function to get column meta data info pertaining to the last query
 	// see docs for more info and usage
-
 	function get_col_info($info_type="name",$col_offset=-1)
 	{
 
@@ -389,7 +360,6 @@ class DB
 	// ==================================================================
 	// Dumps the contents of any input variable to screen in a nicely
 	// formatted and easy to understand way - any type: Object, Var or Array
-
 	function vardump($mixed='')
 	{
 
@@ -424,7 +394,6 @@ class DB
 	// Displays the last query string that was sent to the database & a
 	// table listing results (if there were any).
 	// (abstracted into a seperate file to save server overhead).
-
 	function debug()
 	{
 
@@ -465,7 +434,7 @@ class DB
 		{
 
 			$i=0;
-			foreach ( $this->get_results(null,ARRAY_N) as $one_row )
+			foreach( $this->get_results(null,ARRAY_N) as $one_row )
 			{
 				$i++;
 				echo "<tr bgcolor=ffffff><td bgcolor=eeeeee nowrap align=middle><font size=2 color=555599 face=arial>$i</font></td>";
@@ -492,20 +461,13 @@ class DB
 			echo "<font face=arial size=2>No Results</font>";
 		}
 
-		echo "</blockquote></blockquote>".$this->donation()."<hr noshade color=dddddd size=1>";
+		echo "</blockquote></blockquote><hr noshade color=dddddd size=1>";
 
 
 		$this->debug_called = true;
 	}
 
-	// =======================================================
-	// Naughty little function to ask for some remuniration!
-
-	function donation()
-	{
-		return "<font size=1 face=arial color=000000>If ezSQL has helped <a href=\"https://www.paypal.com/xclick/business=justin%40justinvincent.com&item_name=ezSQL&no_note=1&tax=0\" style=\"color: 0000CC;\">make a donation!?</a> &nbsp;&nbsp;[ go on! you know you want to! ]</font>";	
-	}
-
+	// b2evo will donate to JV..
 }
 
 ?>

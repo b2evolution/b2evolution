@@ -27,7 +27,6 @@
 class BlogStats{
 	var $blog;				// Blog # (1 = all blogs)
 	var $request;			// SQL query string
-	var $result;			// SQL results
 	var $total_posts;		// Number of total posts (loaded via $this->get_post_total())
 
 	function BlogStats(
@@ -55,6 +54,7 @@ class BlogStats{
 		global $tableposts, $tablepostcats, $tablecategories;	// ?
 		global $cache_categories, $time_difference;				// ?
 		global $cat_array; 										// communication with recursive callback funcs
+		global $DB;
 
 	//////
 	//	Which blog is used?
@@ -358,11 +358,7 @@ class BlogStats{
 
 		//echo $this->request;
 		$querycount++;
-		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
-
-		$row = mysql_fetch_object( $this->result );
-		$this->total_posts = $row->total_posts;
-
+		$row = $DB->get_row( $this->request );
 	}
 
 }

@@ -34,7 +34,7 @@ class ArchiveList extends DataObjectList
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$limit = '' )
 	{
-		global $querycount;
+		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $time_difference;
 	
@@ -124,12 +124,9 @@ class ArchiveList extends DataObjectList
 
 		// echo $this->request;
 		
-		$querycount++;
-
-		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
+		$this->result = $DB->get_results( $this->request, ARRAY_A );;
 	
-		$this->result_num_rows = mysql_num_rows($this->result);
-		// echo 'rows=',$this->result_num_rows,'<br />';
+		$this->result_num_rows = $DB->num_rows;
 		
 		$this->arc_w_last = '';
 	}
@@ -139,42 +136,46 @@ class ArchiveList extends DataObjectList
 	 */
 	function get_item( & $arc_year, & $arc_month, & $arc_dayofmonth, & $arc_w, & $arc_count, & $post_ID, & $post_title )
 	{
-		while($arc_row = mysql_fetch_array($this->result)) 
+		if( $this->current_idx >= $this->result_num_rows )
+		{	// No more entry
+			return false;
+		}
+
+		$arc_row = $this->result[ $this->current_idx++ ];
+
+		switch( $this->archive_mode )
 		{
-			switch( $this->archive_mode )
-			{
-				case 'monthly':
-					$arc_year  = $arc_row['year'];
-					$arc_month = $arc_row['month'];
-					$arc_count = $arc_row['count'];
+			case 'monthly':
+				$arc_year  = $arc_row['year'];
+				$arc_month = $arc_row['month'];
+				$arc_count = $arc_row['count'];
+				return true;
+	
+			case 'daily':
+				$arc_year  = $arc_row['year'];
+				$arc_month = $arc_row['month'];
+				$arc_dayofmonth = $arc_row['day'];
+				$arc_count = $arc_row['count'];
+				return true;
+	
+			case 'weekly':
+				$arc_year = $arc_row['year'];
+				$arc_month = $arc_row['month'];
+				$arc_dayofmonth = $arc_row['day'];
+				$arc_w = $arc_row['week'];
+				if ($arc_w != $this->arc_w_last) 
+				{
+					$this->arc_w_last = $arc_w;
 					return true;
-		
-				case 'daily':
-					$arc_year  = $arc_row['year'];
-					$arc_month = $arc_row['month'];
-					$arc_dayofmonth = $arc_row['day'];
-					$arc_count = $arc_row['count'];
-					return true;
-		
-				case 'weekly':
-					$arc_year = $arc_row['year'];
-					$arc_month = $arc_row['month'];
-					$arc_dayofmonth = $arc_row['day'];
-					$arc_w = $arc_row['week'];
-					if ($arc_w != $this->arc_w_last) 
-					{
-						$this->arc_w_last = $arc_w;
-						return true;
-					}
-					break;
-		
-				case 'postbypost':
-				default:
-					$post_ID = $arc_row['ID'];
-					$post_title = $arc_row['post_title'];
-					return true;
-			}
-		}						
+				}
+				break;
+	
+			case 'postbypost':
+			default:
+				$post_ID = $arc_row['ID'];
+				$post_title = $arc_row['post_title'];
+				return true;
+		}
 		return false;
 	}
 }

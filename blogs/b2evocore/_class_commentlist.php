@@ -42,7 +42,7 @@ class CommentList extends DataObjectList
 		$default_posts_per_page = '', 
 		$init_what_to_show = ''  )
 	{
-		global $querycount;
+		global $DB;
 		global $tablecomments, $tableposts, $tablecategories, $tableblogs, $tablepostcats;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
@@ -111,17 +111,15 @@ class CommentList extends DataObjectList
 		$this->request .= "ORDER BY $orderby LIMIT $this->posts_per_page";
 
 		// echo $this->request;
-		
-		$querycount++;
+			
+		$this->result = $DB->get_results( $this->request, ARRAY_A );
 	
-		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
-	
-		$this->result_num_rows = mysql_num_rows($this->result);
-		// echo 'rows=',$this->result_num_rows,'<br />';
-
-		while( $row = mysql_fetch_array( $this->result ) )
+		if( $this->result_num_rows = $DB->num_rows )
 		{
-			$this->Obj[] = & new Comment( $row );
+			foreach( $this->result as $row )
+			{
+				$this->Obj[] = & new Comment( $row );
+			}
 		}
 	}
 

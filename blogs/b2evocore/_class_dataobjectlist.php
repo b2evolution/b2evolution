@@ -34,7 +34,7 @@ class DataObjectList
 	 */
 	var $request;
 	/**
-	 * DB Result set
+	 * DB Result set (array)
 	 */
 	var $result;
 	/**

@@ -89,7 +89,7 @@ class Item extends DataObject
 	 */
 	function gen_permalink( $mode = '', $blogurl = '' )
 	{
-		global $cacheweekly;
+		global $DB, $cacheweekly;
 
 		if( empty( $mode ) )
 			$mode = get_settings( 'pref_permalink_type' );
@@ -150,10 +150,7 @@ class Item extends DataObject
 				case 'weekly':
 					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date]))) 
 					{
-						$sql = "SELECT WEEK('".$post_date."')";
-						$result = mysql_query($sql);
-						$row = mysql_fetch_row($result);
-						$cacheweekly[$post_date] = $row[0];
+						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
 					$permalink = $blogurl.'?m='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date].'#'.$anchor;
 					break;
@@ -179,10 +176,7 @@ class Item extends DataObject
 				case 'weekly':
 					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date]))) 
 					{
-						$sql = "SELECT WEEK('".$post_date."')";
-						$result = mysql_query($sql);
-						$row = mysql_fetch_row($result);
-						$cacheweekly[$post_date] = $row[0];
+						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
 					$permalink = $blogurl.mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date].'#'.$anchor;
 					break;
