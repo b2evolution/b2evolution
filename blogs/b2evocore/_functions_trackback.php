@@ -133,8 +133,12 @@ function trackback_response($error = 0, $error_message = '')
  *****/
 
 function trackback_url($display = 1) {
-	global $htsrv_url, $id;
-	$tb_url = "$htsrv_url/trackback.php/$id";
+	global $htsrv_url, $id, $use_extra_path_info;
+	if( $use_extra_path_info ) {
+		$tb_url = "$htsrv_url/trackback.php/$id";
+	} else {
+		$tb_url = "$htsrv_url/trackback.php?tb_id=$id";
+	}
 	if ($display) {
 		echo $tb_url;
 	} else {
