@@ -19,8 +19,7 @@ require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bpost
 require_once (dirname(__FILE__). '/_functions_create.php' );
 
 param( 'action', 'string' );
-// explicit set locale
-param('locale', 'string');
+param( 'locale', 'string' );
 
 if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
 {
@@ -48,17 +47,23 @@ locale_activate( $default_locale );
 </head>
 <body>
 <div id="rowheader" >
-<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-<div id="tagline">Multilingual multiuser multi-blog engine!</div>
-<h1 id="version">Version: 0.8.9+CVS</h1>
-<div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
+<h1><a href="http://b2evolution.net/" title="<?php echo T_('visit b2evolution\'s website')?>"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
+<div id="tagline"><?php echo T_('Multilingual multiuser multiblog engine!')?></div>
+<h1 id="version"><?php echo T_('Version')?>: 0.8.9+CVS</h1>
+<div id="quicklinks"><?php echo T_('Setup Links')?>:
+	<a href="../../index.html"><?php echo T_('My b2evo')?></a> &middot;
+	<a href="http://b2evolution.net/man/"><?php echo T_('Online Manual'); if( substr(locale_lang(false), 0, 2) != 'en' ) echo ' [en]';?></a> &middot;
+	<a href="install.php"><?php echo T_('My DB Install')?></a> &middot;
+	<a href="../index.php"><?php echo T_('My Blogs')?></a> &middot;
+	<a href="../admin/b2edit.php"><?php echo T_('My Back-Office')?></a>
+</div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
 
-<h1>Database tables installation</h1>
+<h1><?php echo T_('Database tables installation')?></h1>
 
-<div style="float:right;border:1px dotted black;padding:1ex;">
-	<p>PHP version: <?php echo phpversion(); ?> [<a href="phpinfo.php">PHP info</a>]</p>
+<div style="float:right;border:1px dotted black;padding:1ex;width:20%">
+	<p><?php echo T_('PHP version')?>: <?php echo phpversion(); ?> [<a href="phpinfo.php">PHP info</a>]</p>
 	<?php
 		list( $version_main, $version_minor ) = explode( '.', phpversion() );
 		if( ($version_main * 100 + $version_minor) < 401 )
@@ -66,23 +71,22 @@ locale_activate( $default_locale );
 			die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
 		}
 	?>
-	<p>These are your settings from the config file:<br />
-	(If you don't see correct settings here, <br />
-	STOP before going any further, <br />
-	and check your configuration.)</p>
+	<p><?php echo T_('These are your settings from the config file:')?>
+	<br />
+	<?php echo T_("(If you don't see correct settings here, STOP before going any further, and check your configuration.)")?>
+	</p>
 <pre>
 mySQL Host: <?php echo DB_HOST ?> &nbsp;
 mySQL Database: <?php echo DB_NAME ?> &nbsp;
 mySQL Username: <?php echo DB_USER ?> &nbsp;
-mySQL Password: <?php echo ((DB_PASSWORD!='demopass' ? "(Set, but not shown for security reasons)" : 'demopass') )?> &nbsp;
+mySQL Password: <?php echo ((DB_PASSWORD != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )?> &nbsp;
 </pre>
 	<?php
 	if( empty($action) )
 	{
 		?>
-		<h2>Language/Locale</h2>
-		<p>Choose a default locale.<br />
-		Clicking it should directly activate it.</p>
+		<h2><?php echo T_('Language/Locale')?></h2>
+		<p><?php echo T_('Choose a default locale.<br /> Clicking it should directly activate it.')?></p>
 		
 		<ul style="margin-left: 2ex;list-style:none;" >
 	
@@ -130,7 +134,7 @@ function check_db_version()
 }
 
 
-dbconnect() or die( '<p>Could not connect to database! Check you settings in /conf/b2eco_config.php!</p>' );
+dbconnect() or die( '<p class="error">'.sprintf( T_('Could not connect to database! Check you settings in <code>%s</code>!'), '/conf/b2eco_config.php').'</p>' );
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 
 
@@ -150,14 +154,14 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		?>
-		<h2>Installing b2evolution tables with sample data</h2>
+		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
 			create_b2evo_tables();
 			populate_main_tables();
 		?>
-		<p>Installation successful!</p>
-		<p>Now you can <a href="../admin/b2edit.php">log in</a> with the login "admin" and password "<?php echo $random_password; ?>".</p>
-		<p>Note that password carefully ! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the tables and re-install anew.</p>
+		<p><?php echo T_('Installation successful!')?></p>
+		<?php printf( T_('<p>Now you can <a %s>log in</a> with the login "admin" and password "%s".</p>
+		<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="../admin/b2edit.php"', $random_password) ?>
 		<?php
 		break;
 
@@ -170,12 +174,12 @@ switch( $action )
 		 */
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 		?>
-		<h2>Upgrading data in existing b2evolution database</h2>
+		<h2><?php echo T_('Upgrading data in existing b2evolution database')?></h2>
 		<?php
 			upgrade_b2evo_tables();
 		?>
-		<p>Upgrade completed successfully!</p>
-		<p>Now you can <a href="../admin/b2edit.php">log in</a> with your usual b2evolution username and password.</p>
+		<p><?php echo T_('Upgrade completed successfully!')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="../admin/b2edit.php"', 'b2evolution')?></p>
 		<?php
 		break;
 
@@ -188,13 +192,13 @@ switch( $action )
 		 */
 		require_once( dirname(__FILE__). '/_functions_cafelogupgrade.php' );
 		?>
-		<h2>Installing b2evolution tables and copying existing b2 data</h2>
+		<h2><?php echo T_('Installing b2evolution tables and copying existing b2 data')?></h2>
 		<?php
 			create_b2evo_tables();
 			upgrade_cafelog_tables();
 		?>
-		<p>Upgrade completed successfully!</p>
-		<p>Now you can <a href="../admin/b2edit.php">log in</a> with your usual b2 username and password.</p>
+		<p><?php echo T_('Upgrade completed successfully!')?></p>
+		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="../admin/b2edit.php"', 'b2')?></p>
 		<?php
 		break;
 
@@ -212,20 +216,20 @@ switch( $action )
 		if( $allow_evodb_reset != 1 )
 		{
 			?>
-			<p>For security reasons, the reset feature is disabled by default.</p>
+			<?php echo T_('<p>For security reasons, the reset feature is disabled by default.</p>
 			<p>To enable it, please go back the /conf/_config.php file and change:</p>
 			<pre>$allow_evodb_reset = 0;</pre>
 			to
 			<pre>$allow_evodb_reset = 1;</pre>
-			<p>Then reload this page and resetting will take place.</p>
-			<p>Back to <a href="install.php?locale=<?php echo $default_locale ?>">menu</a>.</p>
+			<p>Then reload this page and resetting will take place.</p>')?>
+			<p><a href="install.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
 			<?php
 			break;
 		}
 		db_delete();
 		?>
-		<p>Reset done!</p>
-		<p>Back to <a href="install.php?locale=<?php echo $default_locale ?>">menu</a>.</p>
+		<p><?php echo T_('Reset done!')?></p>
+		<p><a href="install.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
 		<?php
 		break;
 
@@ -240,35 +244,39 @@ switch( $action )
 		<h2>What do you want to install?</h2>
 		<form action="install.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
-			<p>The database tables installation can be done in different ways. Choose one:</p>
-			<p><input type="radio" name="action" value="newdb" checked="checked" /> <strong>New Install</strong>: Install b2evolution database tables with sample data.</p>
-			<p><input type="radio" name="action" value="evoupgrade" /> <strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!</p>
-			<p><input type="radio" name="action" value="cafelogupgrade" /> <strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.</p>
+			<p><?php echo T_('The database tables installation can be done in different ways. Choose one:')?></p>
+			<p><input type="radio" name="action" value="newdb" checked="checked" />
+				<?php echo T_('<strong>New Install</strong>: Install b2evolution database tables with sample data.')?></p>
+			<p><input type="radio" name="action" value="evoupgrade" />
+				<?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!')?></p>
+			<p><input type="radio" name="action" value="cafelogupgrade" />
+				<?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></p>
 
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
 			?>
-			<p><input type="radio" name="action" value="deletedb" /> <strong>Delete b2evolution tables</strong>: If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.</p>
+			<p><input type="radio" name="action" value="deletedb" /> <strong><?php echo T_('Delete b2evolution tables')?></strong>:
+			<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the
+			b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution
+			tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have
+			some, will not be touched in any way.')?></p>
 			<?php
 				}
 			?>
-			<p><input type="submit" value="Install Database Tables Now !" /></p>
+			<p><input type="submit" value="<?php echo T_('Install Database Tables Now !')?>" /></p>
 		</form>
 		<?php
 		if( $allow_evodb_reset != 1 )
 		{
-			?>
-			<br />
-
-			<h2>Need to start anew?</h2>
+			echo '<br />
+			'.T_('<h2>Need to start anew?</h2>
 			<p>If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.</p>
 			<p>To enable it, please go to the /conf/_config.php file and change:</p>
 			<pre>$allow_evodb_reset = 0;</pre>
 			to
 			<pre>$allow_evodb_reset = 1;</pre>
-			<p>Then reload this page and a reset option will appear.</p>
-			<?php
+			<p>Then reload this page and a reset option will appear.</p>');
 		}
 		break;
 }

@@ -6,6 +6,7 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
+
 /**
  * TRANSLATE!
  *
@@ -83,6 +84,7 @@ else
 
 }
 
+
 /**
  * Temporarily switch to another locale
  *
@@ -100,6 +102,7 @@ function locale_temp_switch( $locale )
 	locale_activate( $locale );
 }
 
+
 /**
  * Restore the locale in use before the switch
  *
@@ -111,6 +114,7 @@ function locale_restore_previous()
 	$locale = array_pop( $saved_locale );
 	locale_activate( $locale );
 }
+
 
 /*
  * locale_activate(-)
@@ -183,6 +187,7 @@ function locale_by_lang( $lang )
 	return $default_locale;
 }
 
+
 /**
  * Displays/Returns the current locale. (for backward compatibility)
  *
@@ -201,6 +206,7 @@ function locale_lang( $disp = true )
 		return $current_locale;
 }
 
+
 /**
  * Returns the charset of the current locale
  *
@@ -216,6 +222,7 @@ function locale_charset( $disp = true )
 		return $current_charset;
 }
 
+
 /**
  * Returns the current locale's default date format 
  *
@@ -227,6 +234,7 @@ function locale_datefmt()
 	
 	return $locales[$current_locale]['datefmt'];
 }
+
 
 /**
  * Returns the current locale's default time format 
@@ -270,6 +278,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	echo '/> ';
 
 }
+
 
 /*
  * locale_options(-)
@@ -344,6 +353,7 @@ function locale_from_httpaccept()
 	return $default_locale;
 }
 
+
 /**
  * user sort function to sort locales by priority
  *
@@ -354,6 +364,7 @@ function locale_priosort( $a, $b )
 {
 	return $a['priority'] - $b['priority'];
 }
+
 
 /**
  * load locales from DB into $locales array. Also sets $default_locale.
@@ -414,11 +425,13 @@ function locale_overwritefromDB()
 	$locale_fromdb = get_settings('default_locale');
 	if( $locale_fromdb  )
 	{
+		/*
 		if( $locales[$locale_fromdb]['enabled'] )
 			$default_locale = $locale_fromdb;
 		elseif( !$locales[$default_locale]['enabled'] )
 			$default_locale = 'en-EU';
-		
+		*/
+		$default_locale = $locale_fromdb;
 	}
 }
 

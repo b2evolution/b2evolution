@@ -25,19 +25,25 @@ require(dirname(__FILE__). '/_menutop_end.php');
 
 switch ($action)
 {
-	case 'newtemplate':
-		$edited_User = & new User();
+	case 'newuser':
+		param( 'template', 'integer', -1 );
 		
-		$query = "SELECT MAX(ID) FROM $tableusers";
+		if( $template > -1 )
+		{ // we use a template
+			$edited_User = & new User( get_userdata($template) );
+			$edited_User->set('ID', 0);
+		}
+		else
+		{ // we use an empty user
+			$edited_User = & new User();
+		}
+		#$query = "SELECT MAX(ID) FROM $tableusers";
 		#$edited_User->set('ID', $DB->get_var( $query ) + 1);
-	
+		
 		break;
 
 
 	case 'userupdate':
-		/*
-		 * Update user:
-		 */
 		// Check permission:
 		$current_User->check_perm( 'users', 'edit', true );
 		
@@ -45,7 +51,7 @@ switch ($action)
 		
 		param( 'edited_user_ID', 'integer', true );
 		// remember, to display the form; we take care for new created users later
-		$user = $edited_user_ID;
+		#$user = $edited_user_ID;
 		param( 'edited_user_oldlogin', 'string', true );
 		param( 'edited_user_login', 'string', true );
 		
@@ -60,29 +66,26 @@ switch ($action)
 			errors_add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ) );
 		}
 		
-		if( $edited_user_oldlogin != $edited_user_login
-				|| $edited_user_ID == 0)
+		$query = "SELECT ID FROM $tableusers WHERE user_login = '$edited_user_login' AND ID != $edited_user_ID";
+		$q = $DB->get_var( $query );
+		
+		if( $q !== NULL )
+		{
+			errors_add( sprintf( T_('The login already exists. Please <a href="%s">edit this login</a> instead of overwriting it this way.'), '?user='.$q ));
+		}
+		
+		if( $edited_user_ID == 0 )
 		{ // we create a new user
-			#echo 'Login changed!';
-			
-			$query = "SELECT ID FROM $tableusers WHERE user_login = '$edited_user_login'";
-			$q = $DB->get_var( $query );
-			
-			if( $q !== NULL )
-			{
-				errors_add( sprintf( T_('You renamed the Login to some already existing. Please <a href="%s">edit this login</a> instead of overwriting it this way.'), '?user='.$q ));
-			}
 			
 			$edited_User = & new User();
-			$edited_User->set( 'login', $edited_user_login );
-			$edited_User->set_datecreated( time() );
+			$edited_User->set_datecreated( $localtimenow );
 		}
 		else
 		{
 			$edited_User = & new User( get_userdata( $edited_user_ID ) );
 		}
 		
-
+		$edited_User->set( 'login', $edited_user_login );
 		param( 'edited_user_firstname', 'string', true );
 		$edited_User->set( 'firstname', $edited_user_firstname );
 		param( 'edited_user_lastname', 'string', true );
@@ -132,6 +135,7 @@ switch ($action)
 		if( count($errors) )
 		{
 			echo '<div class="panelinfo">';
+			
 			errors_display('', '');
 			echo '</div>';
 			break;	
@@ -186,9 +190,13 @@ switch ($action)
 			$result = $DB->query( $sql );
 			
 			if( $result )
-				echo '<div class="panelinfo">User promoted.</div>';
+				echo '<div class="panelinfo"><p>'.T_('User promoted.');
 			else
-				echo '<div class="panelinfo"><span class="error">' . sprintf(T_('Couldn\'t change %d\'s level.', $id));
+				echo '<div class="panelinfo"><p class="error">' . sprintf(T_('Couldn\'t change %d\'s level.', $id));
+			echo '</p></div>';
+			
+			// reset cache
+			$cache_userdata[ $id ] = '';
 			
 		}
 		break;
@@ -271,31 +279,31 @@ switch ($action)
 
 if( $current_User->check_perm( 'users', 'view', false ) )
 {
+	// get the userlist
+	$request = "SELECT $tableusers.*, grp_ID, grp_name
+							FROM $tableusers RIGHT JOIN $tablegroups ON user_grp_ID = grp_ID
+							ORDER BY grp_name, user_login";
+	$userlist = $DB->get_results( $request, ARRAY_A );
+
+
 	if( ($group != 0) )
-	{ // view group
-		// Check permission:
-		$current_User->check_perm( 'users', 'view', true );
-		
+	{ // display group form
 		$edited_Group = $GroupCache->get_by_ID( $group );
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
-		
-	if( $user != 0 || $action == 'newtemplate' )
-	{ // view user
-		// Check permission:
-		$current_User->check_perm( 'users', 'view', true );
 
-		if( $action != 'newtemplate' )
+
+	if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
+	{ // display user form
+		if( $user != 0 )
 		{
 			$edited_User = & new User( get_userdata($user) );
 		}
 		
 		require(dirname(__FILE__). '/_users_form.php');
 	}
-}
 
-// Check permission:
-if( $current_User->check_perm( 'users', 'view', false ) ){
+
 	// Display user list:
 	require( dirname(__FILE__). '/_users_list.php' );
 }

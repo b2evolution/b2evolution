@@ -12,8 +12,46 @@
  */
 ?>
 <div class="panelblock" style="vertical-align:top">
-<form class="fform" method="post" action="b2users.php">
-	<div style="float:right"><a title="<?php echo T_('Close user profile'); ?>" href="b2users.php">[ X ]</a></div>
+<form class="fform" method="post" action="b2users.php<?php if( $user != 0 ) echo '?user='.$user?>">
+	<div style="float:right">
+		<?php
+		if( $user > 0 )
+		{	// Links to next/previous user
+			
+			$prevuserid = 0;
+			$nextuserid = 0;
+			
+			$query = "SELECT MAX(ID), MIN(ID) FROM $tableusers";
+			$uminmax = $DB->get_row( $query, ARRAY_A );
+			
+			foreach( $userlist as $fuser )
+			{ // find prev/next id
+				if( $fuser['ID'] < $user )
+				{
+					if( $fuser['ID'] > $prevuserid )
+					{
+						$prevuserid = $fuser['ID'];
+						$prevuserlogin = $fuser['user_login'];
+					}
+				}
+				elseif( $fuser['ID'] > $user )
+				{
+					if( $fuser['ID'] < $nextuserid || $nextuserid == 0 )
+					{
+						$nextuserid = $fuser['ID'];
+						$nextuserlogin = $fuser['user_login'];
+					}
+				}
+			}
+			
+			echo ( $user != $uminmax['MIN(ID)'] ) ? '<a title="'.T_('first user').'" href="?user='.$uminmax['MIN(ID)'].'">[&lt;&lt;]</a>' : '[&lt;&lt;]';
+			echo ( $prevuserid ) ? '<a title="'.T_('previous user').' ('.$prevuserlogin.')" href="?user='.$prevuserid.'">[&lt;]</a>' : '[&lt;]';
+			echo ( $nextuserid ) ? '<a title="'.T_('next user').' ('.$nextuserlogin.')" href="?user='.$nextuserid.'">[&gt;]</a>' : '[&gt;]';
+			echo ( $user != $uminmax['MAX(ID)'] ) ? '<a title="'.T_('last user').'" href="?user='.$uminmax['MAX(ID)'].'">[&gt;&gt;]</a>' : '[&gt;&gt;]';
+		}
+		?>
+		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php">[ X ]</a>
+	</div>
 		
 	<h2><?php
 	if( $edited_User->get('ID') == 0 )
@@ -25,6 +63,7 @@
 		echo T_('Profile for:').' '.$edited_User->get('nickname').' ('.$edited_User->get('login').')';
 	}	
 	?></h2>
+	
 	
 	<table align="center">
 	<tr><td>
@@ -68,7 +107,12 @@
 			
 			if( $edited_User->get('url') != '' )
 			{
-				$fieldnote = '<a href="'.$edited_User->get('url').'" target="_blank"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Visit homepage').'" /></a>';
+				$url = $edited_User->get('url');
+				if( !preg_match('#://#', $url) )
+				{
+					$url = 'http://'.$url;
+				}
+				$fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Visit homepage').'" /></a>';
 			}
 			else $fieldnote = '';
 			form_text_tr( 'edited_user_url', $edited_User->get('url'), 50, T_('URL'), $fieldnote, 100 );

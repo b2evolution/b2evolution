@@ -41,7 +41,7 @@ function imgbase()
  * @param string format to output, default 'htmlbody'
  * @param boolean show the year as link to year's archive (in monthly mode)
  */
-function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyeararchive = true )
+function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyeararchive = true, $blogurl = '', $params = '' )
 {
 	global $m, $w, $month;
 
@@ -58,7 +58,7 @@ function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyearar
 
 		if( $display == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
 		{ // display year as link to year's archive
-			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false ) . '">' . $my_year . '</a>';
+			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $mode ) . '">' . $my_year . '</a>';
 		}
 
 

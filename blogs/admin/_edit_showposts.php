@@ -66,7 +66,7 @@
 
 	echo '<h2>';
 	single_cat_title();
-	single_month_title( T_(' Date range: '), 'htmlbody' );
+	single_month_title( T_(' Date range: '), 'htmlbody', true, 'b2browse.php', 'blog='.$blog );
 	single_post_title();
 	echo '</h2>';
 

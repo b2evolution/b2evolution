@@ -574,7 +574,7 @@ function create_default_contents( $populate_blog_a = true )
 
 <p>Some of these blogs have a special role. Read about it on the corresponding page.</p>
 
-<p>You can create additionnal blogs or delte unwanted blogs from the blogs admin.</p>"), $now, $cat_b2evo );
+<p>You can create additionnal blogs or delete unwanted blogs from the blogs admin.</p>"), $now, $cat_b2evo );
 
 
 	// Insert a post:
@@ -682,8 +682,7 @@ function populate_main_tables()
 	$User_Admin->set( 'ip', '127.0.0.1' );
 	$User_Admin->set( 'domain', 'localhost' );
 	$User_Admin->set( 'level', 10 );
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$User_Admin->set_datecreated( $now );	
+	$User_Admin->set_datecreated( $timestamp++ );	
 	// Note: NEVER use database time (may be out of sync + no TZ control)
 	$User_Admin->setGroup( $Group_Admins );
 	$User_Admin->dbinsert();
@@ -696,8 +695,7 @@ function populate_main_tables()
 	$User_Demo->set( 'ip', '127.0.0.1' );
 	$User_Demo->set( 'domain', 'localhost' );
 	$User_Demo->set( 'level', 0 );
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$User_Demo->set_datecreated( $now );
+	$User_Demo->set_datecreated( $timestamp++ );
 	$User_Demo->setGroup( $Group_Users );
 	$User_Demo->dbinsert();
 

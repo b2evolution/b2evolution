@@ -198,7 +198,7 @@ if( !$locales[$default_locale]['enabled'] )
 			echo '<img src="img/blank.gif" width="14" border="0" />';
 		}
 		echo '
-		<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;newtemplate='.$lkey.'#createnew"><img src="img/new.png" border="0" alt="'.T_('new').'" title="'.T_('Use as template for &quot;Create New&quot; form').'" /></a>
+		<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;newtemplate='.$lkey.'#createnew" title="'.T_('Use as template for &quot;Create New&quot; form').'">[copy]</a>
 		';
 		if( isset($lval[ 'fromdb' ]) )
 		{ // allow to delete locales loaded from db
