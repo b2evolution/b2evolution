@@ -107,13 +107,10 @@ $DB->query( "UPDATE T_users
 								user_showonline= $newuser_showonline
 					WHERE ID = $current_User->ID" );
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-header('Cache-Control: no-cache, must-revalidate');
-header('Pragma: no-cache');
 
 param( 'redirect_to', 'string' );
 $location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
+header_nocache();
 header('Refresh:0;url=' . $location);
 
 ?>
