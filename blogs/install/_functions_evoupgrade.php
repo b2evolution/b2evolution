@@ -398,7 +398,7 @@ function upgrade_b2evo_tables()
 		$query = 'SELECT * FROM T_settings';
 		$row = $DB->get_row( $query, ARRAY_A );
 
-		#pre_dump($row, 'oldrow');
+		#echo 'oldrow:<br />'; pre_dump($row);
 		$transform = array(
 			'posts_per_page' => array(7),
 			'what_to_show' => array('days'),
@@ -612,18 +612,18 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE T_comments
 									MODIFY COLUMN comment_post_ID		int(11) unsigned NOT NULL default '0'" );
 		echo "OK.<br />\n";
-			
+
 		echo 'Altering Posts to Categories table... ';
 		$DB->query( "ALTER TABLE T_postcats
 									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL,
-									MODIFY COLUMN postcat_cat_ID int(11) unsigned NOT NULL" ); 
+									MODIFY COLUMN postcat_cat_ID int(11) unsigned NOT NULL" );
 		echo "OK.<br />\n";
 
 		echo 'Altering Categories table... ';
 		$DB->query( "ALTER TABLE T_categories
-									MODIFY COLUMN cat_ID int(11) unsigned NOT NULL auto_increment, 
+									MODIFY COLUMN cat_ID int(11) unsigned NOT NULL auto_increment,
 									MODIFY COLUMN cat_parent_ID int(11) unsigned NULL,
-									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default 2" ); 
+									MODIFY COLUMN cat_blog_ID int(11) unsigned NOT NULL default 2" );
 		echo "OK.<br />\n";
 
 		// Create relations:

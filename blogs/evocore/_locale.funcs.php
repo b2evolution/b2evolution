@@ -424,7 +424,7 @@ function locale_from_httpaccept()
 	{
 		// echo $_SERVER['HTTP_ACCEPT_LANGUAGE'];
 		$accept = strtolower( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
-		// pre_dump($accept, 'http_accept_language');
+		// echo 'http_accept_language:<br />'; pre_dump($accept);
 		$selected_locale = '';
 		$selected_match_pos = 10000;
 		$selected_full_match = false;
@@ -629,6 +629,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.4  2005/01/03 06:18:31  blueyed
+ * changed pre_dump() syntax
+ *
  * Revision 1.3  2004/10/21 18:34:02  fplanque
  * minor changes
  *

@@ -1171,24 +1171,14 @@ function validate_url( $url, & $allowed_uri_scheme )
  * @param mixed variable to dump
  * @param string title to display
  */
-function pre_dump($dump, $title = '', $output = 1 )
+function pre_dump( $vars )
 {
-	$r = "\n<pre>";
-	if( $title !== '' )
+	echo '<pre>';
+	foreach( func_get_args() as $lvar )
 	{
-		$r .= $title. ': <br />';
+		echo htmlspecialchars( var_export( $lvar, true ) ).'<br />';
 	}
-	$r .= htmlspecialchars( var_export($dump, true) )
-			."</pre>\n";
-
-	if( !$output )
-	{
-		return $r;
-	}
-	else
-	{
-		echo $r;
-	}
+	echo '</pre>';
 }
 
 
@@ -1205,7 +1195,7 @@ function debug_info( $force = false )
 	global $Debuglog;
 	global $DB;
 	global $obhandler_debug;
-	global $cache_imgsize, $cache_File, $cache_fmCurUrls;
+	global $cache_imgsize, $cache_File;
 
 	if( $debug || $force )
 	{
@@ -1220,7 +1210,6 @@ function debug_info( $force = false )
 
 		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
 		$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
-		$Debuglog->add( 'Len of serialized $cache_fmCurUrls: '.strlen(serialize($cache_fmCurUrls)), 'memory' );
 
 		if( function_exists( 'memory_get_usage' ) )
 		{
@@ -1538,7 +1527,7 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
  * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
  * @param string additional parameter (for 'size' {@link imgsize()})
  */
-function getIcon( $for, $what = 'imgtag', $param = '' )
+function getIcon( $for, $what = 'imgtag' )
 {
 	global $map_iconfiles;
 	global $basepath, $admin_subdir, $baseurl;
@@ -1664,6 +1653,9 @@ function make_valid_date( $date, $time )
 
 /*
  * $Log$
+ * Revision 1.23  2005/01/03 06:18:31  blueyed
+ * changed pre_dump() syntax
+ *
  * Revision 1.22  2004/12/30 23:58:41  blueyed
  * <br> -> <br />
  *
