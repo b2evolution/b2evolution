@@ -281,204 +281,48 @@ function populate_antispam()
 {
 	global $tableantispam;
 	
-	$query = "INSERT INTO $tableantispam VALUES ('', 'prescriptions.md')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'penis-enlargement')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'online-casino')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'order-viagra')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'order-phentermine')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'order-xenical')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'order-prophecia')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'sexy-lingerie')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', '-porn-')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', '-adult-')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', '-tits-')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'mneuron.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'buy-phentermine')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'order-cheap-pills')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'menguma.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'gdough.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'online-hgh.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'pcfamily.ch')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'nositeyet.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'boris.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'mishka.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'sexgine.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'pornwizzard.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'zdenka.accepted.cc')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'bigstorysite.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'girlpron.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'agedwife.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'pissingpleasures.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'tvojproblem.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'slavebabe.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'dragoonguardsband.co.uk')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'shop.cokecans.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'bolinat.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'freenudecelebrity.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'www2.kedgy.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'buy-xenadrine.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'shatteredreality.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'paris-hilton')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'search4hardcore.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'livehomewebcams.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'findpink.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'hornyhamster.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'bobbakazoo.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'answerbus.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'blackfiles.hpg.ig.com.br')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'lodgingreservationcenter.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'payshots.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'killerdick.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'impai.org')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'toiletphoto.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'transsexualpalace.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'morganfinancialgroup.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'parishilton')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'collegecamgirls.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'adult-models.biz')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'busty2.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'agnitum.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'swedishteen.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'free.ynsbbs.com.ru')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'pimpvision.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'baltimorejewishtimes.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', '123adultsearch.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'girls.twistys.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'visitcelebrities.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'bushflash.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'buechercrawler.de')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'enyamodel.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'consulmex-la.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'socksproxy.de')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'exxxplorer.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'jahreswagen-portal.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'conzendo.de')";
-	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam (domain) VALUES ".
+	"('prescriptions.md'), ('penis-enlargement'), ('online-casino'), ".
+	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
+	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
+	"('-adult-'), ('-tits-'), ('mneuron.com)', ('buy-phentermine'), ".
+	"('order-cheap-pills'), ('menguma.com'), ('gdough.com'), ".
+	"('online-hgh.com'), ('pcfamily.ch'), ('nositeyet.com'), ".
+	"('boris.com'), ('mishka.com'), ('sexgine.com'), ".
+	"('pornwizzard.com'), ('zdenka.accepted.cc'), ('bigstorysite.com)', ".
+	"('girlpron.com'), ('agedwife.com'), ('pissingpleasures.com'), ".
+	"('tvojproblem.com'), ('slavebabe.com'), ('dragoonguardsband.co.uk'), ".
+	"('shop.cokecans.com'), ('bolinat.com'), ('freenudecelebrity.com'), ".
+	"('kedgy.com'), ('buy-xenadrine.com'), ('shatteredreality.net'), ".
+	"('paris-hilton'), ('search4hardcore.com'), ('livehomewebcams.com'), ".
+	"('findpink.com'), ('hornyhamster.com'), ('bobbakazoo.com'), ".
+	"('answerbus.com'), ('blackfiles.hpg.ig.com.br'), ('lodgingreservationcenter.com'), ".
+	"('payshots.com'), ('killerdick.com'), ('impai.org'), ".
+	"('toiletphoto.com'), ('transsexualpalace.com'), ('morganfinancialgroup.com'), ".
+	"('parishilton'), ('collegecamgirls.com'), ('adult-models.biz'), ".
+	"('busty2.com'), ('agnitum.com'), ('swedishteen.net'), ".
+	"('free.ynsbbs.com.ru'), ('pimpvision.com'), ('baltimorejewishtimes.com'), ".
+	"('123adultsearch.com'), ('girls.twistys.net'), ('visitcelebrities.com'), ".
+	"('bushflash.com'), ('buechercrawler.de'), ('enyamodel.com'), ".
+	"('consulmex-la.com'), ('socksproxy.de'), ('exxxplorer.net'), ".
+	"('jahreswagen-portal.net'), ('conzendo.de'), ".
 	/*
 	These sites try to set cookies with the name "url" and content being the
 	site you are refering from, when you go there.
 	*/
-	$query = "INSERT INTO $tableantispam VALUES ('', 'binevolve.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'collegedictionary.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'sound-computing.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'e-guana.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'crunchsoccer.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'studio-8.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'bushido-online.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'synapseiowa.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'acl02.org')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'savetheweb.org')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'ascii-art.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'leportailqc.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'sound-computing.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'drnapr.net')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'gogreenpower.org')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'an-nasr.com')";
-	mysql_query($query) or mysql_oops( $query );
-	
+	"('binevolve.com'), ('collegedictionary.net'), ('sound-computing.com'), ".
+	"('e-guana.com'), ('crunchsoccer.com'), ('studio-8.net'), ".
+	"('bushido-online.com'), ('synapseiowa.com'), ('acl02.org'), ".
+	"('savetheweb.org'), ('ascii-art.com'), ('leportailqc.com'), ".
+	"('drnapr.net'), ('gogreenpower.org'), ('an-nasr.com'), ".
 	/*
 	These may look innocent and human-made, but they are in fact clever tricks.
 	They all spammed my referer logs on the same day, in rapid succession.
 	*/
-	$query = "INSERT INTO $tableantispam VALUES ('', 'veronicabee.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'evesmith.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'jennyknicks.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'princessnina.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'tawnygirl.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'skipme.com')";
-	mysql_query($query) or mysql_oops( $query );
-	$query = "INSERT INTO $tableantispam VALUES ('', 'doctorfem.com')";
+	"('veronicabee.com'), ('evesmith.com'), ('jennyknicks.com'), ".
+	"('princessnina.com'), ('tawnygirl.com'), ('skipme.com'), ".
+	"('doctorfem.com')";
+
 	mysql_query($query) or mysql_oops( $query );
 	
 }
