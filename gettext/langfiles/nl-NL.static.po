@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-14 11:54+0100\n"
-"Last-Translator: Ron <hartman@dia.eur.nl>\n"
+"PO-Revision-Date: 2004-05-16 22:47+0100\n"
+"Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -113,7 +113,7 @@ msgstr "b2evolution is waarschijnlijk de meest uitgebreide weblog tool doe je ku
 
 #: ../../index.src.html:35
 msgid "You will find complete information on the official <a %s>b2evolution website</a>."
-msgstr "Je vind de complete informatie op de officiele <a %href>b2evolution website</a>."
+msgstr "Je vind de complete informatie op de officiele <a %s>b2evolution website</a>."
 
 #: ../../index.src.html:36
 msgid "Quickstart instructions:"
@@ -180,7 +180,7 @@ msgstr "Installatie instructies voor nieuwe gebruikers"
 #: ../../doc/upgradefrom_b2.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
-msgstr ""
+msgstr "Voordat je begint, sommige netwerk opties van b2evolution gaan er vanuit dat j ehet eens bent met onze simpele <a %s>Algemene Voorwaarden</a>."
 
 #: ../../doc/install_new.src.html:36
 #: ../../doc/upgradefrom_b2.src.html:43
@@ -199,7 +199,7 @@ msgstr "Opmerking:"
 
 #: ../../doc/install_new.src.html:39
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way."
-msgstr ""
+msgstr "Tenzij je de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. Jouw bestaande tabellen worden dan op geen enkele manier aangetast."
 
 #: ../../doc/install_new.src.html:40
 #: ../../doc/upgradefrom_b2.src.html:58
@@ -212,7 +212,7 @@ msgstr ""
 
 #: ../../doc/install_new.src.html:45
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
-msgstr ""
+msgstr "Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinstalleerd in <code>http://jouwsite.com/b2evo</code> ..."
 
 #: ../../doc/install_new.src.html:46
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
@@ -222,7 +222,7 @@ msgstr ""
 #: ../../doc/upgradefrom_b2.src.html:67
 #: ../../doc/upgradefrom_b2evo.src.html:44
 msgid "Check to make sure the new installation works."
-msgstr ""
+msgstr "Controleer of de nieuwe installatie werkt."
 
 #: ../../doc/install_new.src.html:50
 #: ../../doc/upgradefrom_b2.src.html:68
@@ -234,7 +234,7 @@ msgstr "Op productie servers, is het aangeraden dat je de <code>/install/</code>
 #: ../../doc/upgradefrom_b2.src.html:70
 #: ../../doc/upgradefrom_b2evo.src.html:50
 msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
-msgstr "Nadat de basis installatie is voltooid, zijn er nog wat <a %href>tricky dingen waar je rekening mee moet houden</a> (online handboek)"
+msgstr "Nadat de basis installatie is voltooid, zijn er nog wat <a %s>tricky dingen waar je rekening mee moet houden</a> (online handboek)"
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"
@@ -262,7 +262,7 @@ msgstr "Opmerking 1:"
 
 #: ../../doc/upgradefrom_b2.src.html:50
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
-msgstr ""
+msgstr "Tenzij je de configuratie hebt veranderd, zullen alle tabellen die door b2evolution worden aangemaakt vooraf gegaan worden door evo_. Tenzij je al een applicatie hebt met hetzelfde voorvoegsel, is dit de veiligste manier om b2evolution in een database te installeren met andere applicaties. Jouw bestaande tabellen worden dan op geen enkele manier aangetast."
 
 #: ../../doc/upgradefrom_b2.src.html:54
 msgid "Note 2:"
@@ -278,7 +278,7 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:62
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
-msgstr ""
+msgstr "Laten we er vanuit gaan dat je de inhoud van de weblogs map hebt geinstalleerd in <code>http://jouwsite.com/b2evo</code> ..."
 
 #: ../../doc/upgradefrom_b2.src.html:64
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
@@ -286,24 +286,24 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:69
 msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr ""
+msgstr "Controleer het <a %s>wiki</a> of de <a %s>forums</a> voor aanwijzingen voor het bijwerken van jouw bestaande b2 sjabloon naar b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
-msgstr ""
+msgstr "Bijwerken vanaf een vorige versie van b2evolution"
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
-msgstr ""
+msgstr "Backup al jouw b2evolution bestanden. Let speciaal op de bestanden die je hebt gewjzigd, inclusief /conf, skins, weblog sjablonen, stubbestanden, etc..."
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
-msgstr ""
+msgstr "Je zou ook een backup van de database moeten maken als je kan. Deze functie zou beschikbaar moeten zijn via jouw hosting."
 
 #: ../../doc/upgradefrom_b2evo.src.html:37
 msgid "Delete all your existing b2evolution files from your site before uploading the new ones! This will ensure you don't keep unnecessary files on your server after upgrading. It's also better for security."
-msgstr ""
+msgstr "Verwijder alle bestaande b2evolution bestanden voordat je de nieuwe upload! Dit zal er voor zorgen dat je zeker geen onnodige bestanden op jouw webserver staan na het bijwerken. Het is ook beter voor de veiligheid."
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
 msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
