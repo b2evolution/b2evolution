@@ -22,11 +22,14 @@ param( 'cat', 'integer', $default_category, true );
 if( !user_pass_ok( $login, $pass, false ) || $_SERVER['CONTENT_TYPE'] != "application/vnd.wap.mms-message" || strlen( $HTTP_RAW_POST_DATA ) == 0 ) exit;
 
 $userdata = get_userdatabylogin( $login );
-$user_level = $userdata['user_level'];
+$current_User = new User( $userdata );
 $post_author = $userdata['ID'];
 $post_category = $cat;
+$blog = get_catblog($post_category); 
 
-if ($user_level < 1) exit;
+// Check permission:
+$current_User->check_perm( 'blog_post_statuses', 'published', true, $blog );
+
 
 define( "BCC", 			0x01 );
 define( "CC", 			0x02 );
@@ -701,8 +704,7 @@ if ( isset( $sleep_after_edit ) && $sleep_after_edit > 0 )
 writeBackSendConf( $md );
 
 /* Pinging turned off for now because of causing invalid server response
-$blog_ID = get_catblog( $post_category ); 
-$blogparams = get_blogparams_by_ID( $blog_ID );
+$blogparams = get_blogparams_by_ID( $blog );
 pingback( true, $content, $post_title, '', $post_ID, $blogparams, false );
 pingb2evonet( $blogparams, $post_ID, $post_title, false );
 pingWeblogs( $blogparams, false );
