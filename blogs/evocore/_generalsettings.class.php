@@ -63,6 +63,8 @@ class GeneralSettings extends AbstractSettings
 													'fm_enable_roots_user' => '1',
 													'fm_enable_create_dir' => '1',
 													'fm_enable_create_file' => '1',
+
+													'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
 												);
 	/**
 	 * Constructor
@@ -91,6 +93,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/15 20:13:38  blueyed
+ * regexp_fileman moved to $Settings
+ *
  * Revision 1.7  2005/01/14 17:38:13  blueyed
  * defaults added
  *
