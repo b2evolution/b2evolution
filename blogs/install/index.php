@@ -104,6 +104,7 @@ else
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
 		$action = 'start';
 	}
+	$DB->halt_on_error = true;	// From now on, halt on errors.
 }
 
 // Check PHP version

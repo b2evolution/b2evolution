@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-07 19:18+0100\n"
+"PO-Revision-Date: 2004-05-07 20:45+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -280,7 +280,7 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:68
 msgid "Check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr ""
+msgstr "Consultez le <a %href>wiki</a> ou les <a %href>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit b2 existant vers b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
 msgid "Upgrading from previous b2evolution"
