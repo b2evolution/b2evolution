@@ -10,7 +10,7 @@
  */
 
 #b2 version
-$b2_version = '0.8.2';
+$b2_version = '0.8.2-dev1';
 
 
 
