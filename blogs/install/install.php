@@ -249,6 +249,14 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Sakichan', 'Development, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://blog.sakichan.org/ja/' ) or mysql_oops( $query );
+
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Swirlee', 'Development', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://swirlee.org/' ) or mysql_oops( $query );
+
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'evoSkins.org', 'get more skins!', $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://www.evoskins.org/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
