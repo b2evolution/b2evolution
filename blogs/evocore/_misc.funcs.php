@@ -1514,17 +1514,15 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
 /**
  * Create IMG tag for an action icon
  *
- * @param string IMG ALT text
  * @param string TITLE text (IMG and A link)
- * @param string IMG SRC
- * @param string HREF url
- * @param integer image width
- * @param integer image height
+ * @param string icon code {@see $$map_iconfiles}
+ * @param string icon code for {@see getIcon()}
  */
-function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
+function action_icon( $title, $icon, $url )
 {
-	return '<a href="'.$url.'" title="'.$title.'"><img src="img/'.$img.'" width="'.$width.
-						'" height="'.$height.'" class="middle" alt="'.$alt.'" title="'.$title.'" /></a> ';
+	return '<a href="'.$url.'" title="'.$title.'">'
+					.getIcon( $icon, 'imgtag', array( 'title'=>$title ) )
+					.'</a> ';
 }
 
 
@@ -1553,12 +1551,21 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 		$iconfile = false;
 	}
 
-	/** @debug quite time consuming**/
-	if( $iconfile === false || !file_exists( $basepath.$iconfile ) )
+	/** 
+	 * @debug quite time consuming
+	 * fplanque removed <div> tags because they make it even harder to debug :/
+	 */
+	if( $iconfile === false )
 	{
-		return '<div class="error">[no image for '.var_export( $iconKey, true ).'!]</div>';
+		return '[no image defined for '.var_export( $iconKey, true ).'!]';
 		return false;
 	}
+	/* Let's rely on the browser for this...
+	 elseif( !file_exists( $basepath.$iconfile ) )
+	{
+		return '<div class="error">[image '.$iconfile.' not found!]</div>';
+		return false;
+	} */
 
 	switch( $what )
 	{
@@ -1687,6 +1694,9 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 /*
  * $Log$
+ * Revision 1.34  2005/01/28 19:28:03  fplanque
+ * enhanced UI widgets
+ *
  * Revision 1.33  2005/01/15 20:20:51  blueyed
  * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to getIcon())
  *

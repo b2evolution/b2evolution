@@ -197,12 +197,12 @@ $Results->cols = array(
 					"\$$edited_table_IDcol\$",
 					'<strong><a href="?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
 						T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
-				action_icon( T_('Edit'), T_('Edit...'), 'edit.png',
-											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%', 17, 17 ).
-				action_icon( T_('Copy'), T_('Duplicate...'), 'copy.png',
-											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%', 17, 17 ).
-				action_icon( T_('Del'), T_('Delete!'), 'trash.png',
-											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%', 17, 17 ),
+				action_icon( T_('Edit...'), 'edit',
+											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
+				action_icon( T_('Duplicate...'), 'copy',
+											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
+				action_icon( T_('Delete!'), 'delete',
+											'%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
 				);
 
 if( isset( $results_params ) )

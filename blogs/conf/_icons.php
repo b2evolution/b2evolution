@@ -196,11 +196,37 @@ $map_iconfiles = array(
 		'size' => array( 16, 16 ),
 	),
 
-	'xross' => array(
-		'file' => $admin_subdir.'img/xross.gif',
-		'alt' => T_('Cross'),
+	'new' => array(
+		'file' => $admin_subdir.'img/new.gif',
+		'alt' => T_('New'),
 		'size' => array( 13, 13 ),
 	),
+	'copy' => array(
+		'file' => $admin_subdir.'img/copy.gif',
+		'alt' => T_('Copy'),
+		'size' => array( 13, 13 ),
+	),
+	'edit' => array(
+		'file' => $admin_subdir.'img/properties.png',
+		'alt' => T_('Edit'),
+		'size' => array( 18, 13 ),
+	),
+	'xross' => array(		// TODO: generic name for 'xross' should be "delete"
+		'file' => $admin_subdir.'img/xross.gif',
+		'alt' => T_('Del'),
+		'size' => array( 13, 13 ),
+	),
+	'delete' => array(		// TODO: generic name for 'xross' should be "delete"
+		'file' => $admin_subdir.'img/xross.gif',
+		'alt' => T_('Del'),
+		'size' => array( 13, 13 ),
+	),
+	'close' => array(
+		'file' => $admin_subdir.'img/close.gif',
+		'alt' => T_('Close'),
+		'size' => array( 14, 14 ),
+	),
+
 );
 
 ?>

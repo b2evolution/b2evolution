@@ -45,11 +45,15 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes:
+ */
+require_once dirname(__FILE__).'/_widget.class.php';
 
 /**
  * Form class
  */
-class Form
+class Form extends Widget
 {
 	var $output = true;
 
@@ -96,8 +100,9 @@ class Form
 		{
 			case 'table':
 				$this->formstart = '<table cellspacing="0">'."\n";
-				$this->titlestart = '<thead><tr class="formtitle"><th colspan="2"><div class="results_title">';
-				$this->titleend = '</div></td></tr></thead>'."\n";
+				$this->title_fmt = '<thead><tr class="formtitle"><th colspan="2"><div class="results_title">'
+														.'<span style="float:right">$global_icons$</span>'
+														.'$title$</div></td></tr></thead>'."\n";
 				$this->fieldstart = "<tr>\n";
 				$this->labelstart = '<td class="label">';
 				$this->labelend = "</td>\n";
@@ -112,8 +117,7 @@ class Form
 
 			case 'fieldset':
 				$this->formstart = '';
-				$this->titlestart = '';
-				$this->titleend = "\n";
+				$this->title_fmt = '$title$'."\n";
 				$this->fieldstart = "<fieldset>\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
@@ -129,8 +133,7 @@ class Form
 			default:
 				// "none" (no layout)
 				$this->formstart = '';
-				$this->titlestart = '';
-				$this->titleend = "\n";
+				$this->title_fmt = '$title$'."\n";
 				$this->fieldstart = '';
 				$this->labelstart = '';
 				$this->labelend = "\n";
@@ -496,9 +499,9 @@ class Form
 
 		if( !empty($form_title) )
 		{
-			$r .= $this->titlestart
-						.$form_title
-						.$this->titleend;
+			$this->title = $form_title;
+
+			$r .= $this->replace_vars( $this->title_fmt );
 		}
 
 		if( $this->output )

@@ -39,11 +39,18 @@
  *
  * @version $Id$
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
+/**
+ * Includes:
+ */
+require_once dirname(__FILE__).'/_widget.class.php';
+
 
 /**
  * Results class
  */
-class Results
+class Results extends Widget
 {
 	var $DB;
 	var $sql;
@@ -87,7 +94,6 @@ class Results
 	 * Current object idx in array:
 	 */
 	var $current_idx = 0;
-
 
 	/**
 	 * Constructor
@@ -269,8 +275,7 @@ class Results
 					'title_end' => "</div>\n",
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
 						'head_start' => "<thead><tr>\n",
-							'head_title_start' => '<th colspan="$nb_cols$">'."\n",
-							'head_title_end' => "</th></tr>\n\n<tr>\n",
+							'head_title' => '<th colspan="$nb_cols$">$title$</th></tr>'."\n\n<tr>\n",
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
@@ -317,13 +322,6 @@ class Results
 
 		echo $this->params['before'];
 
-		if( $this->total_pages == 0 )
-		{	// There are no results! Nothing to display!
-			echo $this->params['no_results'];
-			echo $this->params['after'];
-			return 0;
-		}
-
 
 		// Make sure query has executed and we're at the top of the resultset:
 		$this->restart();
@@ -360,6 +358,13 @@ class Results
 		echo $this->params['title_end'];
 		*/
 
+		if( $this->total_pages == 0 )
+		{	// There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results'] );
+			echo $this->params['after'];
+			return 0;
+		}
+
 		echo $this->params['list_start'];
 
 		// -----------------------------
@@ -371,9 +376,7 @@ class Results
 
 			if( isset($this->title) )
 			{	// A title has been defined for this result set:
-		 		echo str_replace( '$nb_cols$', count($this->cols), $this->params['head_title_start'] );
-				echo $this->title;
-				echo $this->params['head_title_end'];
+		 		echo $this->replace_vars( $this->params['head_title'] );
 			}
 
 			$col_count = 0;
@@ -405,7 +408,7 @@ class Results
 					for( $i = 0; $i < count($this->cols); $i++)
 					{ //construction of the values which can be taken by $order
 						if( !empty( $this->default_col ) && !strcasecmp( $this->col_orders[$col_count], $this->default_col ) )
-						{ // there is a default order 
+						{ // there is a default order
 							$order_asc.='A';
 							$order_desc.='D';
 						}
@@ -420,23 +423,23 @@ class Results
 							$order_desc.='-';
 						}
 					}
-						
+
 					$style = $this->params['sort_type'];
-					
+
 					$asc_status = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'on' : 'off' ;
 					$desc_status = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'on' : 'off' ;
 					$sort_type = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? $order_desc : $order_asc;
 					$title = strstr( $sort_type, 'A' ) ? T_('Ascending order') : T_('Descending order');
 					$title = ' title="'.$title.'" ';
-					
+
 					$pos =  strpos( $this->order, 'D');
-					
+
 					if( strstr( $this->order, 'A' ) )
 					{
 						$pos = strpos( $this->order, 'A' );
 					}
-					
-					if( $col_count == $pos ) 
+
+					if( $col_count == $pos )
 					{ //the column header must be displayed in bold
 						$class = ' class="'.$style.'_current" ';
 					}
@@ -450,7 +453,7 @@ class Results
 
 						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type)
 									.'" '.$title.$class.' >'
-									.$col_header.'</a>' 
+									.$col_header.'</a>'
 									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc)
 									.'" title="'.T_('Ascending order')
 									.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
@@ -462,18 +465,18 @@ class Results
 					{ // basic sort mode:
 
 						if( $asc_status == 'off' && $desc_status == 'off' )
-						{ // the sorting is not made on the current column 
+						{ // the sorting is not made on the current column
 							$sort_item = $this->params['basic_sort_off'];
 						}
 						elseif( $asc_status == 'on' )
-						{ // the sorting is ascending and made on the current column 
+						{ // the sorting is ascending and made on the current column
 							$sort_item = $this->params['basic_sort_asc'];
 						}
 						elseif( $desc_status == 'on' )
-						{ // the sorting is descending and made on the current column 
+						{ // the sorting is descending and made on the current column
 							$sort_item = $this->params['basic_sort_desc'];
 						}
-					
+
 						echo '<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$sort_type).'" title="'.T_('Change Order')
 									.'" '.$class.' >'.$sort_item.' '.$col_header.'</a>';
 					}
@@ -484,9 +487,9 @@ class Results
 					echo $col_header ;
 				}
 				$col_count++;
-					
+
  				echo $this->params['colhead_end'];
-	
+
 			}
 
     	echo $this->params['head_end'];
@@ -542,7 +545,7 @@ class Results
 					$output = $this->params['col_start'];
 				}
 
-				$output .= $col; 
+				$output .= $col;
 
 				// Make variable substitution:
 				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $output );
@@ -575,14 +578,14 @@ class Results
 	 * Returns the way the list/table has to be ordered
 	 */
 	function order($order, $asc)
-	{	
+	{
 		$sql_order = '';
-		
+
 		if ( isset( $this->col_orders ) )
 		{ //the names of the DB columns are defined
 			$pos = max( strpos( $order, 'A' ), strpos( $order, 'D' ) );
 			$sql_order = ' ORDER BY '.$this->col_orders[$pos].' '.$asc;
-	
+
 			$sql_order = str_replace( ',', $this->asc.', ', $sql_order );
 		}
 
@@ -606,9 +609,9 @@ class Results
 			}
 			$i++;
 		}
-	}	
-	
-	
+	}
+
+
 	/**
 	 * Displays navigation text, based on template:
 	 *
@@ -626,30 +629,33 @@ class Results
 		}
 		else
 		{	//preg_replace_callback is used to avoid calculating unecessary values
-			echo preg_replace_callback( '#\$([a-z_]+)\$#', array( $this, 'callback'), $template);
+			echo $this->replace_vars( $template );
 		}
 	}
-				
+
 
 	/**
 	 * Callback function used to replace only necessary values in template
+	 *
+	 * @param array preg matches
+	 * @return string to be substituted
 	 */
 	function callback( $matches )
 	{
 		//echo $matches[1];
 		switch( $matches[1] )
 			{
-				case 'start' : 
+				case 'start' :
 					//total number of rows in the sql query 
 					return  ( ($this->page-1)*$this->limit+1 ); 
 					
 				case 'end' : 
 					return (	min( $this->total_rows, $this->page*$this->limit ) );		
-					
+
 				case 'total_rows' : 
 					return ( $this->total_rows );
 
-				case 'page' : 
+				case 'page' :
 					//current page number
 					return ( $this->page );
 					
@@ -678,11 +684,11 @@ class Results
 					//inits the link to first page
 					return $this->display_first(); 
 					
-				case 'last' : 
+				case 'last' :
 					//inits the link to last page
 					return $this->display_last();
 					
-				case 'list_prev' : 
+				case 'list_prev' :
 					//inits the link to previous page range
 					return $this->display_prev();
 					
@@ -690,7 +696,12 @@ class Results
 					//inits the link to next page range
 					return $this->display_next();
 
-				default : return $matches[1];
+				case 'nb_cols' :
+					// Number of columns in result:
+					return count($this->cols);
+
+				default :
+					return parent::callback( $matches );
 			}
 	}
 
@@ -920,6 +931,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.12  2005/01/28 19:28:03  fplanque
+ * enhanced UI widgets
+ *
  * Revision 1.11  2005/01/26 16:47:13  fplanque
  * i18n tuning
  *
