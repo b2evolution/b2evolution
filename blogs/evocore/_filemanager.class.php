@@ -1450,31 +1450,12 @@ class FileManager extends Filelist
 			return $r;
 		}
 	}
-
-
-	/**
-	 *
-	 *
-	 * @return
-	 */
-	function getToggled( $val, $default = 0 )
-	{
-		if( is_null($val) )
-		{
-			return $default;
-		}
-		else
-		{
-			return (int)!$val;
-		}
-	}
-
 }
 
 /*
  * $Log$
- * Revision 1.23  2005/01/26 23:44:34  blueyed
- * no message
+ * Revision 1.24  2005/02/08 01:09:36  blueyed
+ * removed getToggled()
  *
  * Revision 1.22  2005/01/26 17:55:23  blueyed
  * catching up..
