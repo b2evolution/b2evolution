@@ -506,6 +506,7 @@ class Item extends DataObject
 				}
 				if( count($content_parts) > 2 )
 				{ // we have additional <!--more--> tags somewhere
+					// TODO: pop first element, then implode()
 					$output .= str_replace( array($content_parts[0], '<!--more-->'), '', $content );
 				}
 				else $output .= $content_parts[1];
