@@ -94,12 +94,12 @@ class Item extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Item( $db_row = NULL )
+	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID' )
 	{
-		global $tableposts, $UserCache;
+		global $UserCache;
 
 		// Call parent constructor:
-		parent::DataObject( $tableposts, 'post_', 'ID' );
+		parent::DataObject( $dbtable, $dbprefix, $dbIDname );
 
 		if( $db_row == NULL )
 		{
@@ -109,23 +109,41 @@ class Item extends DataObject
 		}
 		else
 		{
-			$this->ID = $db_row->ID;
-			$this->Author = & $UserCache->get_by_ID( $db_row->post_creator_user_ID ); // NO COPY...(?)
-			$this->issue_date = $db_row->post_datestart;
-			$this->mod_date = $db_row->post_datemodified;
-			$this->status = $db_row->post_status;
-			$this->locale = $db_row->post_locale;
-			$this->title = $db_row->post_title;
-			$this->urltitle = $db_row->post_urltitle;
-			$this->content = $db_row->post_content;
-			$this->wordcount = $db_row->post_wordcount;
-			$this->main_cat_ID = $db_row->post_main_cat_ID;
-			$this->flags = $db_row->post_flags;
-			$this->comments = $db_row->post_comments;			// Comments status
+			$this->ID = $db_row->$dbIDname;
+			$colname = $dbprefix.'creator_user_ID';
+			$this->Author = & $UserCache->get_by_ID( $db_row->$colname ); // NO COPY...(?)
+			$colname = $dbprefix.'datestart';
+			$this->issue_date = $db_row->$colname;
+			$colname = $dbprefix.'datemodified';
+			$this->mod_date = $db_row->$colname;
+			$colname = $dbprefix.'status';
+			$this->status = $db_row->$colname;
+			$colname = $dbprefix.'locale';
+			$this->locale = $db_row->$colname;
+			$colname = $dbprefix.'title';
+			$this->title = $db_row->$colname;
+			$colname = $dbprefix.'urltitle';
+			$this->urltitle = $db_row->$colname;
+			$colname = $dbprefix.'content';
+			$this->content = $db_row->$colname;
+			$colname = $dbprefix.'wordcount';
+			$this->wordcount = $db_row->$colname;
+			$colname = $dbprefix.'main_cat_ID';
+			$this->main_cat_ID = $db_row->$colname;
+			$colname = $dbprefix.'flags';
+			$this->flags = $db_row->$colname;
+			$colname = $dbprefix.'comments';
+			$this->comments = $db_row->$colname;			// Comments status
+
+			$colname = $dbprefix.'renderers';
 			// echo 'renderers=', $db_row->post_renderers;
-			$this->renderers = explode( '.', $db_row->post_renderers );
-			$this->views = $db_row->post_views;
-			$this->url = $db_row->post_url;				// Should move
+			$this->renderers = explode( '.', $db_row->$colname );
+
+			$colname = $dbprefix.'views';
+			$this->views = $db_row->$colname;
+			$colname = $dbprefix.'url';
+			$this->url = $db_row->$colname;				// Should move
+
 			// Derived vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
 		}
@@ -1180,10 +1198,222 @@ class Item extends DataObject
 		echo $this->views;
 	}
 
+
+	/**
+	 * Set param value
+	 *
+	 * By default, all values will be considered strings
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 */
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'creator_user_ID':
+			case 'main_cat_ID':
+			case 'wordcount':
+				$this->set_param( $parname, 'number', $parvalue, $make_null );
+				break;
+
+			default:
+				$this->set_param( $parname, 'string', $parvalue, $make_null );
+		}
+	}
+
+
+	/**
+	 * Create a new Item/Post and insert it into the BD
+	 *
+	 * This funtion has to handle all needed DB dependencies!
+	 *
+	 * {@internal Item::insert(-)}}
+	 *
+	 * @TODO: cleanup the set() calls
+	 */
+	function insert(
+		$author_user_ID,              // Author
+		$post_title,
+		$post_content,
+		$post_timestamp,              // 'Y-m-d H:i:s'
+		$main_cat_ID = 1,             // Main cat ID
+		$extra_cat_IDs = array(),     // Table of extra cats
+		$post_status = 'published',
+		$post_locale = '#',
+		$post_trackbacks = '',
+		$autobr = 0,                  // OBSOLETE
+		$pingsdone = true,
+		$post_urltitle = '',
+		$post_url = '',
+		$post_comments = 'open',
+		$post_renderers = array('default') )
+	{
+		global $DB, $query;
+		global $localtimenow, $default_locale;
+	
+		if( $post_locale == '#' ) $post_locale = $default_locale;
+
+		// Handle the flags:
+		$post_flags = array();
+		if( $pingsdone ) $post_flags[] = 'pingsdone';
+	
+		// make sure main cat is in extracat list and there are no duplicates
+		$extra_cat_IDs[] = $main_cat_ID;
+		$extra_cat_IDs = array_unique( $extra_cat_IDs );
+	
+		// TODO: START TRANSACTION
+
+		// validate url title
+		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0, false, $this->dbprefix, $this->dbIDname );
+	
+		// echo 'INSERTING NEW POST ';
+
+		$this->set( 'creator_user_ID', $author_user_ID );
+		$this->set( 'title', $post_title );
+		$this->set( 'urltitle', $post_urltitle );
+		$this->set( 'content', $post_content );
+		$this->set( 'datestart', $post_timestamp );
+		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
+		$this->set( 'main_cat_ID', $main_cat_ID );
+		$this->set( 'status', $post_status );
+		$this->set( 'locale', $post_locale );
+		$this->set( 'url', $post_url );
+		$this->set( 'flags', implode(',',$post_flags) );
+		$this->set( 'wordcount', bpost_count_words($post_content) );
+		$this->set( 'comments', $post_comments );
+		$this->set( 'renderers', implode('.',$post_renderers) );
+
+		$this->dbinsert();
+
+		// insert new extracats
+		$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+		foreach( $extra_cat_IDs as $extra_cat_ID )
+		{
+			// echo "extracat: $extra_cat_ID <br />";
+			$query .= "( $this->ID, $extra_cat_ID ),";
+		}
+		$query = substr( $query, 0, strlen( $query ) - 1 );
+		if( ! $DB->query( $query, 'Associate new post with extra categories' ) ) return 0;
+
+		// TODO: END TRANSACTION
+	
+		return $this->ID;
+	}
+
+	
+	/**
+	 * Update a post and save to DB
+	 *
+	 * This funtion has to handle all needed DB dependencies!
+	 *
+	 * {@internal Item::update(-)}}
+	 */
+	function update(
+		$post_title,
+		$post_content,
+		$post_timestamp = '',         // 'Y-m-d H:i:s'
+		$main_cat_ID = 1,             // Main cat ID
+		$extra_cat_IDs = array(),     // Table of extra cats
+		$post_status = 'published',
+		$post_locale = '#',
+		$post_trackbacks = '',
+		$autobr = 0,                  // OBSOLETE
+		$pingsdone = true,
+		$post_urltitle = '',
+		$post_url = '',
+		$post_comments = 'open',
+		$post_renderers = array() )
+	{
+		global $DB, $query, $querycount;
+		global $localtimenow, $default_locale;
+	
+		// Handle the flags:
+		$post_flags = array();
+		if( $pingsdone ) $post_flags[] = 'pingsdone';
+	
+		// make sure main cat is in extracat list and there are no duplicates
+		$extra_cat_IDs[] = $main_cat_ID;
+		$extra_cat_IDs = array_unique( $extra_cat_IDs );
+	
+		// TODO: START TRANSACTION
+	
+		// validate url title
+		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $this->ID, false, $this->dbprefix, $this->dbIDname );
+	
+		$this->set( 'title', $post_title );
+		$this->set( 'urltitle', $post_urltitle );
+		$this->set( 'url', $post_url );
+		$this->set( 'content', $post_content );
+		$this->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow ) );
+		$this->set( 'main_cat_ID', $main_cat_ID );
+		$this->set( 'status', $post_status );
+		$this->set( 'flags', implode( ',', $post_flags) );
+		$this->set( 'wordcount', bpost_count_words($post_content) );
+		$this->set( 'comments', $post_comments );
+		$this->set( 'renderers', implode('.',$post_renderers) );
+		if( $post_locale != '#' )
+		{ // only update if it was changed
+			$this->set( 'locale', $post_locale );
+		}
+		if( !empty($post_timestamp) )	
+		{ 
+			$this->set( 'datestart', $post_timestamp );
+		}
+
+		// UPDATE DB:
+		$this->dbupdate();
+	
+		// delete previous extracats
+		$query = 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID;
+		$DB->query( $query );
+	
+		// insert new extracats
+		$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+		foreach( $extra_cat_IDs as $extra_cat_ID )
+		{
+			//echo "extracat: $extracat_ID <br />";
+			$query .= "( $this->ID, $extra_cat_ID ),";
+		}
+		$query = substr( $query, 0, strlen( $query ) - 1 );
+		$DB->query( $query );
+	
+		// TODO: END TRANSACTION
+	}
+
+
+	/**
+	 * Delete object from DB
+	 *
+	 * {@internal Item::dbdelete(-)}}
+	 */
+	function dbdelete( )
+	{
+		global $DB;
+
+		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
+
+		// delete extracats
+		$DB->query( "DELETE FROM T_postcats WHERE postcat_post_ID = $this->ID" );
+	
+		// delete comments
+		$DB->query( "DELETE FROM T_comments WHERE comment_post_ID = $this->ID" );
+	
+		// delete post
+		$DB->query( "DELETE FROM $this->dbtablename WHERE $this->dbIDname = $this->ID" );
+	
+	}
+	
 }
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.5  2004/12/13 21:29:58  fplanque
  * refactoring
  *

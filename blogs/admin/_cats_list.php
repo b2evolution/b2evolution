@@ -11,11 +11,14 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <div class="panelblock">
-<h2><?php echo T_('Categories for blog:'), ' ', get_bloginfo('name'); ?></h2>
-<?php 
+<?php
+	if( isset($Blog ) )
+	{
+		echo '<h2>'.T_('Categories for blog:'), ' ', $Blog->dget('name').'</h2>';
+	}
 	
 	// ----------------- START RECURSIVE CAT LIST ----------------
-	cat_query();	// make sure the caches are loaded
+	cat_query( false );	// make sure the caches are loaded
 
 	/** 
 	 * callback to start sublist

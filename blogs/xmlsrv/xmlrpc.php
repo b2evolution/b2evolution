@@ -26,7 +26,6 @@ $DB->halt_on_error = false;
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
-$use_cache = 1;
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
 
 $xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
@@ -74,7 +73,7 @@ function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $DB, $UserCache;
-	global $cafelogID, $sleep_after_edit;
+	global $cafelogID;
 	global $Settings, $Messages;
 
 	$username = $m->getParam(2);
@@ -139,15 +138,11 @@ function b2newpost($m)
 	}
 
 	// INSERT NEW POST INTO DB:
-	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
+	$edited_Item = & new Item();
+	$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
 	if( !empty($DB->last_error) )
 	{	// DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	if( isset($sleep_after_edit) && $sleep_after_edit > 0 )
-	{
-		sleep( $sleep_after_edit );
 	}
 
 	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
@@ -327,7 +322,7 @@ function bloggernewpost( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $default_category, $DB;
-	global $cafelogID, $sleep_after_edit;
+	global $cafelogID;
 	global $Settings, $Messages, $UserCache;
 
 	logIO('I','Called function: blogger.newPost');
@@ -393,7 +388,8 @@ function bloggernewpost( $m )
 	}
 
 	// INSERT NEW POST INTO DB:
-	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
+	$edited_Item = & new Item();
+	$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
 
 	if( !empty($DB->last_error) )
 	{	// DB error
@@ -401,11 +397,6 @@ function bloggernewpost( $m )
 	}
 
 	logIO('O', "Posted ! ID: $post_ID");
-
-	if( isset($sleep_after_edit) && $sleep_after_edit > 0)
-	{
-		sleep( $sleep_after_edit );
-	}
 
 	if( $publish )
 	{ // If post is publicly published:
@@ -463,7 +454,7 @@ function bloggereditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $ItemCache;
-	global $cafelogID, $sleep_after_edit, $default_category, $DB;
+	global $cafelogID, $default_category, $DB;
 	global $Messages, $UserCache;
 
 	logIO('I','Called function: blogger.editPost');
@@ -561,15 +552,10 @@ function bloggereditpost($m)
 	}
 
 	// UPDATE POST IN DB:
-	bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' );
+	$edited_Item->update( $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' );
 	if( !empty($DB->last_error) )
 	{	// DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	if (isset($sleep_after_edit) && $sleep_after_edit > 0)
-	{
-		sleep($sleep_after_edit);
 	}
 
 	if( $publish )
@@ -627,7 +613,6 @@ function bloggerdeletepost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $DB, $UserCache;
-	global $sleep_after_edit;
 
 	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
@@ -644,19 +629,18 @@ function bloggerdeletepost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	if(! ($postdata=get_postdata($post_ID)) )
+	if( ! ($edited_Item = $ItemCache->get_by_ID( $post_ID, false ) ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post.");// user error 7
+		return new xmlrpcresp(0, $xmlrpcerruser+7, 'No such post.');	// user error 7
 	}
 
-	$post_authordata=get_userdata($postdata["Author_ID"]);
+	$post_authordata=get_userdata($postdata['Author_ID']);
 
 	$userdata = get_userdatabylogin($username);
-	$user_ID = $userdata["ID"];
+	$user_ID = $userdata['ID'];
 	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
 
-	$post_category = $postdata['Category'];
-	$blog_ID = get_catblog($post_category);
+	$blog_ID = $edited_Item->blog_ID;
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $blog_ID ) )
@@ -666,15 +650,10 @@ function bloggerdeletepost($m)
 	}
 
 	// DELETE POST FROM DB:
-	bpost_delete( $post_ID );
+	$edited_Item->dbdelete();
 	if( !empty($DB->last_error) )
 	{	// DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	if (isset($sleep_after_edit) && $sleep_after_edit > 0)
-	{
-		sleep($sleep_after_edit);
 	}
 
 	return new xmlrpcresp(new xmlrpcval(1));

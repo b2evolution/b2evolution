@@ -63,7 +63,9 @@ switch($action)
 		$mn = mysql2date('i', $post_issue_date  );
 		$ss = mysql2date('s', $post_issue_date  );
 
-		$form_action = 'editpost';
+		// Display edit form:
+		$form_action = 'edit_actions.php';
+		$next_action = 'update';
 		require(dirname(__FILE__).'/_item.form.php');
 
 		break;
@@ -226,7 +228,9 @@ switch($action)
 		param( 'mn', 'string', date( 'i', $localtimenow) );
 		param( 'ss', 'string', date( 's', $localtimenow) );
 
-		$form_action = 'post';
+		// Display edit form:
+		$form_action = 'edit_actions.php';
+		$next_action = 'create';
 		require(dirname(__FILE__).'/_item.form.php');
 }
 

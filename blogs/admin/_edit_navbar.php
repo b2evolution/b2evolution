@@ -20,7 +20,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<table cellpadding="0" cellspacing="0" border="0"><tr>
 		<?php	if($previousXend > 0) { ?>
 		<td>
-			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$previousXstart,'postend='.$previousXend), $pagenow ); ?>">
+			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$previousXstart,'postend='.$previousXend) ); ?>">
 				<input type="submit" name="submitprevious" class="search" value="&lt; <?php 
 				if( $MainList->what_to_show == 'days' )
 					printf( T_('Next %d days'), $posts );
@@ -31,7 +31,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<?php	}
 		if($nextXstart <= $MainList->get_total_num_posts()) { ?>
 		<td>
-			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$nextXstart,'postend='.$nextXend), $pagenow ); ?>">
+			<form name="nextXposts" method="post" action="<?php echo regenerate_url( array('poststart','postend'), array('poststart='.$nextXstart,'postend='.$nextXend) ); ?>">
 				<input type="submit" name="submitnext" class="search" value="<?php
 					if( $MainList->what_to_show == 'days' )
 						printf( T_('Previous %d days'), $posts );

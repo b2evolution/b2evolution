@@ -424,8 +424,6 @@ $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
-$use_cache = 1;                          // Not using this will dramatically overquery the DB !
-$sleep_after_edit = 0;                   // let DB do its stuff...
 $evonetsrv_host = 'b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';

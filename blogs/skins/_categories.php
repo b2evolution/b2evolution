@@ -35,7 +35,7 @@
 	 */
 	
 	// ----------------- START RECURSIVE CAT LIST ----------------
-	cat_query();	// make sure the caches are loaded
+	cat_query( true );	// make sure the caches are loaded
 	if( ! isset( $cat_array ) ) $cat_array = array();
 	
 	/**

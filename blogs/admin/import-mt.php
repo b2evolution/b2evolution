@@ -251,7 +251,7 @@ param( 'mode', 'string', 'normal' );
 
 	// load caches
 	blog_load_cache();
-	cat_load_cache();
+	cat_load_cache( false );
 
 	$i_user = -1;
 
@@ -1067,8 +1067,8 @@ param( 'mode', 'string', 'normal' );
 
 				if( !$simulate )
 				{
-					$post_ID =
-						bpost_create( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_catids,
+					$edited_Item = & new Item();
+					$post_ID = $edited_Item->insert( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_catids,
 													$post_status,	$post_locale,	'' /* $post_trackbacks */, $post_convert_breaks, true /* $pingsdone */,
 													'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
 				}
@@ -1264,7 +1264,7 @@ function fieldset_cats()
 		$blog = 1;
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query();	// make sure the caches are loaded
+		cat_query( false );	// make sure the caches are loaded
 		function cat_select_before_first( $parent_cat_ID, $level )
 		{	// callback to start sublist
 			echo "\n<ul>\n";

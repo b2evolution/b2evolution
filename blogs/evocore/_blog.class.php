@@ -106,10 +106,10 @@ class Blog extends DataObject
 	 */
 	function Blog( $db_row = NULL )
 	{
-		global $tableblogs, $basepath, $media_subdir;
+		global $basepath, $media_subdir;
 
 		// Call parent constructor:
-		parent::DataObject( $tableblogs, 'blog_', 'blog_ID' );
+		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
 
 		if( $db_row == NULL )
 		{
@@ -590,6 +590,11 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/15 20:50:33  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.3  2004/11/09 00:25:11  blueyed
  * minor translation changes (+MySQL spelling :/)
  *

@@ -28,6 +28,8 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author blueyed
+ * @author gorgeb
  *
  * @version $Id$
  */
@@ -76,12 +78,12 @@ if( isset($Blog) )
 ?>
 <!-- ================================ START OF EDIT FORM ================================ -->
 
-<form name="post" id="post" action="edit_actions.php" target="_self" method="post">
+<form name="post" id="post" action="<?php echo $form_action ?>" target="_self" method="post">
 
 <div class="left_col">
 
 	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
-	<input type="hidden" id="action" name="action" value="<?php echo $form_action ?>" />
+	<input type="hidden" id="action" name="action" value="<?php echo $next_action ?>" />
 	<input type="hidden" name="mode" value="<?php echo $mode ?>" />
 	<?php if( $action == 'edit' ) { ?>
 		<input type="hidden" name="post_ID" value="<?php echo $post ?>" />
@@ -313,7 +315,7 @@ if( isset($Blog) )
 		$default_main_cat = 0;
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query();	// make sure the caches are loaded
+		cat_query( false );	// make sure the caches are loaded
 		/**
 		 * callback to start sublist
 		 */
@@ -513,8 +515,20 @@ if( isset($Blog) )
 <?php
 /*
  * $Log$
+ * Revision 1.2  2004/12/15 20:50:31  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.1  2004/12/14 20:27:11  fplanque
  * splited post/comment edit forms
  *
+ * Revision : 1.64
+	Date : 2004/10/6 9:36:55
+	Author : 'gorgeb'
+	State : 'Exp'
+	Lines : +7 -2
+	Description :
+	Added allowcomments, a per blog setting taking three values : always, post_by_post, never.
  */
 ?>

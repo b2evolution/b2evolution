@@ -58,7 +58,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, '', '', $timestamp_min, $timestamp_max, '', $dbprefix, $dbIDname );
+															$preview, '', '', $timestamp_min, $timestamp_max, '', $dbtable, $dbprefix, $dbIDname );
 
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;
@@ -170,13 +170,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				// Display delete button if current user has the rights:
 				$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
 
-				?>
-				<a href="b2browse.php?blog=<?php echo $blog ?>&amp;p=<?php $Item->ID() ?>&amp;c=1" class="ActionButton"><?php
-				// TRANS: Link to comments for current post
-				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'));
-				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'));
-				pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('%d Pingbacks'));
-				?></a>
+				if( $use_comments )
+				{ ?>
+					<a href="b2browse.php?blog=<?php echo $blog ?>&amp;p=<?php $Item->ID() ?>&amp;c=1" class="ActionButton"><?php
+					// TRANS: Link to comments for current post
+					comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'));
+					trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'));
+					pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('%d Pingbacks'));
+					?></a>
+				<?php } ?>
 			</div>
 
 			<?php
@@ -495,7 +497,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 				// ----------------- START RECURSIVE CAT LIST ----------------
-				cat_query();	// make sure the caches are loaded
+				cat_query( true );	// make sure the caches are loaded
 				if( ! isset( $cat_array ) ) $cat_array = array();
 				function cat_list_before_first( $parent_cat_ID, $level )
 				{	// callback to start sublist

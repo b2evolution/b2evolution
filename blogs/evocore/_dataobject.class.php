@@ -357,11 +357,13 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.6  2004/12/14 21:01:06  fplanque
  * minor fixes
- *
- * Revision 1.5  2004/11/26 19:38:35  fplanque
- * no message
  *
  * Revision 1.4  2004/11/22 17:48:20  fplanque
  * skin cosmetics

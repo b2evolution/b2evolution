@@ -56,7 +56,7 @@ require_once dirname(__FILE__). '/_comment.class.php';
  */
 function generic_ctp_number($post_id, $mode = 'comments')
 {
-	global $DB, $debug, $postdata, $cache_ctp_number, $use_cache, $preview;
+	global $DB, $debug, $postdata, $cache_ctp_number, $preview;
 	if( $preview )
 	{	// we are in preview mode, no comments yet!
 		return 0;
@@ -65,7 +65,7 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	if( $mode == 'feedbacks' ) $mode ='ctp';
 
 	// fplanque added: load whole cache
-	if (!isset($cache_ctp_number) || (!$use_cache))
+	if( !isset($cache_ctp_number) )
 	{
 		global $postIDlist, $postIDarray;
 		// if( $debug ) echo "LOADING generic_ctp_number CACHE for posts: $postIDlist<br />";
@@ -101,7 +101,7 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{
 		echo "cache set";
 	}*/
-	if (!isset($cache_ctp_number[$post_id]) || (!$use_cache))
+	if( !isset($cache_ctp_number[$post_id]) )
 	{	// this should be extremely rare...
 		// echo "CACHE not set for $post_id";
 		$post_id = intval($post_id);
@@ -179,9 +179,9 @@ function get_commentdata($comment_ID,$no_cache=0)
  */
 function Comment_get_by_ID( $comment_ID )
 {
-	global $DB, $cache_Comments, $use_cache, $querycount;
+	global $DB, $cache_Comments, $querycount;
 
-	if((empty($cache_Comments[$comment_ID])) OR (!$use_cache))
+	if( empty($cache_Comments[$comment_ID]) )
 	{	// Load this entry into cache:
 		$query = "SELECT *
 							FROM T_comments
@@ -243,7 +243,7 @@ function comments_number( $zero='#', $one='#', $more='#' )
 	if( $more == '#' ) $more = T_('%d comments');
 
 	// original hack by dodo@regretless.com
-	global $id, $postdata, $c, $querycount, $cache_commentsnumber, $use_cache;
+	global $id, $postdata, $c, $querycount, $cache_commentsnumber;
 	$number = generic_ctp_number($id, 'comments');
 	if ($number == 0) {
 		$blah = $zero;
@@ -555,6 +555,11 @@ function comment_blog_name( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

@@ -253,12 +253,8 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 		}
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
-
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
-		{
-			sleep($sleep_after_edit);
-		}
+		$edited_Item = & new Item();
+		$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
 		$blogparams = get_blogparams_by_ID( $blog_ID );
 		pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);

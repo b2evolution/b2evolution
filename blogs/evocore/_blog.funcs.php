@@ -347,11 +347,11 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
  */
 function get_blogparams_by_ID( $blog_ID )
 {
-	global $cache_blogs, $use_cache, $querycount;
+	global $cache_blogs, $querycount;
 
 	if( $blog_ID < 1 ) die( 'No blog is selected!' );
 
-	if( (empty($cache_blogs[$blog_ID])) OR (!$use_cache) )
+	if( empty($cache_blogs[$blog_ID]) )
 	{
 		blog_load_cache();
 	}
@@ -372,11 +372,11 @@ function get_blogparams_by_ID( $blog_ID )
  */
 function Blog_get_by_ID( $blog_ID )
 {
-	global $cache_blogs, $use_cache, $querycount;
+	global $cache_blogs, $querycount;
 
 	if( $blog_ID < 1 ) die( 'No blog is selected!' );
 
-	if ((empty($cache_blogs[$blog_ID])) OR (!$use_cache))
+	if( empty($cache_blogs[$blog_ID]) )
 	{
 		blog_load_cache();
 	}
@@ -391,8 +391,8 @@ function Blog_get_by_ID( $blog_ID )
  */
 function blog_load_cache()
 {
-	global $DB, $cache_blogs, $use_cache;
-	if( empty($cache_blogs) || !$use_cache )
+	global $DB, $cache_blogs;
+	if( empty($cache_blogs) )
 	{
 		$cache_blogs = array();
 		$query = "SELECT * FROM T_blogs ORDER BY blog_ID";
@@ -506,6 +506,11 @@ function blog_list_iteminfo( $what, $show = 'raw' )
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.3  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

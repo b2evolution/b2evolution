@@ -60,9 +60,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function BlogCache()
 	{
-		global $tableblogs;
-
-		parent::DataObjectCache( 'Blog', false, $tableblogs, 'blog_', 'blog_ID' );
+		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID' );
 	}
 
 
@@ -174,6 +172,11 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.2  2004/10/14 18:31:24  blueyed
  * granting copyright
  *

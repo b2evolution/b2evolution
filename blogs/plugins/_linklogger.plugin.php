@@ -177,7 +177,8 @@ class linklogger_plugin extends Plugin
 		}
 
 		// the linklogger entry does not exist yet, so create it
-		bpost_create(
+		$edited_Item = & new Item();
+		$edited_Item->insert(
 			$current_User->ID,
 			$linklogger_title,
 			'',    // content

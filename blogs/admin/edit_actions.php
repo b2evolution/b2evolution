@@ -43,7 +43,7 @@ $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecate
 
 switch($action)
 {
-	case 'post':
+	case 'create':
 		/*
 		 * --------------------------------------------------------------------
 		 * INSERT POST & more
@@ -119,18 +119,12 @@ switch($action)
 		$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $user_ID, $post_title, $content, $post_date, $post_category,	
+		$edited_Item = & new Item();
+		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $post_date, $post_category,	
 															$post_extracats, $post_status, $post_locale, '', 0, 
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
 															$post_renderers );
 
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
-		{
-			echo '<p>', T_('Sleeping...'), "</p>\n";
-			flush();
-			sleep($sleep_after_edit);
-		}
-		echo '<p>'.T_('Done.').'</p>';
 		echo "</div>\n";
 
 		if( $post_status != 'published' )
@@ -155,7 +149,7 @@ switch($action)
 		break;
 
 
-	case 'editpost':
+	case 'update':
 		/*
 		 * --------------------------------------------------------------------
 		 * UPDATE POST
@@ -190,6 +184,7 @@ switch($action)
 		$post_renderers = $Plugins->validate_list( $renderers );
 
 		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
+		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
 			$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
@@ -235,16 +230,10 @@ switch($action)
 		}
 
 		// UPDATE POST IN DB:
-		bpost_update( $post_ID, $post_title, $content, $post_date, $post_category, $post_extracats,
-									$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle, 
-									$post_url, $post_comments, $post_renderers );
+		$edited_Item->update( $post_title, $content, $post_date, $post_category, $post_extracats,
+													$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle, 
+													$post_url, $post_comments, $post_renderers );
 
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
-		{
-			echo '<p>'.T_('Sleeping...')."</p>\n";
-			flush();
-			sleep($sleep_after_edit);
-		}
 		echo '<p>'.T_('Done.').'</p></div>';
 
 		if( $post_status != 'published' )
@@ -289,6 +278,7 @@ switch($action)
 		 */
 		param( 'post_ID', 'integer', true );
 		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
+		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
 		$post_cat =$postdata['Category'];
 		$blog = get_catblog($post_cat); 
 		$blogparams = get_blogparams_by_ID( $blog );
@@ -323,17 +313,16 @@ switch($action)
 		else
 		{	// We'll be pinging now
 			$pingsdone = true;
+			$edited_Item->set( 'flags', 'pingsdone' );
 		}
+
+		$edited_Item->set( 'datestart', $post_timestamp );
+		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
+		$edited_Item->set( 'status', $post_status );
 
 		// UPDATE POST IN DB:
-		bpost_update_status( $post_ID, $post_status, $pingsdone, $post_date );
+		$edited_Item->dbupdate();
 
-		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
-		{
-			echo "<p>Sleeping...</p>\n";
-			flush();
-			sleep($sleep_after_edit);
-		}
 		echo '<p>', T_('Done.'), "</p>\n";
 		echo "</div>\n";
 
@@ -378,13 +367,12 @@ switch($action)
 
 		param( 'post', 'integer' );
 		// echo $post;
-		if( ! ($postdata = get_postdata( $post )) )
+		if( ! ($edited_Item = $ItemCache->get_by_ID( $post, false ) ) )
 		{
 			echo '<div class="panelinfo"><p class="error">'.( T_('Oops, no post with this ID!') ).'</p></div>';
 			break;
 		}
-		$blog = get_catblog( $postdata['Category'] );
-		$blogparams = get_blogparams_by_ID( $blog );
+		$blog = $edited_Item->blog_ID;
 		$location = 'b2browse.php?blog='.$blog;
 
 		// Check permission:
@@ -394,20 +382,8 @@ switch($action)
 		echo '<h3>', T_('Deleting post...'), "</h3>\n";
 
 		// DELETE POST FROM DB:
-		if( bpost_delete( $post ) )
-		{
-			if( isset($sleep_after_edit) && $sleep_after_edit > 0 ){
-				echo '<p>', T_('Sleeping...'), "</p>\n";
-				flush();
-				sleep( $sleep_after_edit );
-			}
-			
-			echo '<p>'.T_('Deleting Done...')."</p>\n";
-		}
-		else
-		{
-			echo '<p>'.T_('Error')."!</p>\n";
-		}
+		$edited_Item->dbdelete();
+		echo '<p>'.T_('Deleting Done...')."</p>\n";
 
 		echo '</div>';
 		

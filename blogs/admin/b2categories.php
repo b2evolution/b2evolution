@@ -173,7 +173,7 @@ switch($action)
 			<h3><?php echo T_('New parent category') ?>:</h3>
 		<?php
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query();	// make sure the caches are loaded
+		cat_query( false );	// make sure the caches are loaded
 
 		function cat_move_before_first( $parent_cat_ID, $level )
 		{ // callback to start sublist

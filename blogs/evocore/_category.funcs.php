@@ -7,7 +7,8 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
+ * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
+ * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -243,10 +244,10 @@ function cat_delete( $cat_ID )
  */
 function get_the_category_by_ID( $cat_ID, $die = true )
 {
-	global $cache_categories, $use_cache;
-	if( (empty($cache_categories[$cat_ID]) ) OR (!$use_cache) )
+	global $cache_categories;
+	if( empty($cache_categories[$cat_ID]) )
 	{
-		cat_load_cache();
+		cat_load_cache( false );
 	}
 	if( !isset( $cache_categories[$cat_ID] ) )
 	{
@@ -323,13 +324,11 @@ function get_catname($cat_ID)
  *
  * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
  * This will prevent empty cats from displaying "(1)" as postcount.
- * TODO: get post counts out of here!
  */
-function cat_load_cache()
+function cat_load_cache( $cat_load_postcounts = false )
 {
 	global $DB, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
-	global $cat_postcounts_loaded, $blog;
 	global $Settings;
 
 	if( !isset($cache_categories))
@@ -376,9 +375,23 @@ function cat_load_cache()
 		// echo 'Number of cats=', count($cache_categories);
 	}
 
-	// ------------------------------
-	// Add post counts:
-	// ------------------------------
+	if( $cat_load_postcounts )
+	{
+		cat_load_postcounts();
+	}
+}
+
+
+/**
+ * Load the post counts
+ */
+function cat_load_postcounts()
+{
+	global $DB, $cache_categories;
+	global $show_statuses, $timestamp_min, $timestamp_max;
+	global $cat_postcounts_loaded, $blog;
+	global $Settings;
+
 	if( !isset($cat_postcounts_loaded) && $blog > 0 )
 	{	// Postcounts are not loaded and we have a blog for which to load the counts:
 
@@ -425,6 +438,7 @@ function cat_load_cache()
 		// echo 'Number of cats=', count($cache_categories);
 		$cat_postcounts_loaded = true;
 	}
+
 }
 
 
@@ -545,7 +559,7 @@ function blog_has_cats( $blog_ID )
 {
 	global $cache_categories;
 
-	cat_load_cache();
+	cat_load_cache( false );
 
 	if( count($cache_categories) ) foreach( $cache_categories as $icat_ID => $i_cat )
 	{
@@ -573,12 +587,12 @@ function blog_has_cats( $blog_ID )
  * Query for the cats
  *
  */
-function cat_query( )
+function cat_query( $load_postcounts = false )
 {
 	// global $cache_categories; // $cache_blogs,
 	global $blog;
 	if( $blog != 0 ) blog_load_cache();
-	cat_load_cache();
+	cat_load_cache( $load_postcounts );
 }
 
 
@@ -795,7 +809,7 @@ function blog_copy_cats($srcblog, $destblog)
 	$edited_Blog = & $BlogCache->get_by_ID( $destblog );
 
 	// ----------------- START RECURSIVE CAT LIST ----------------
-	cat_query();	// make sure the caches are loaded
+	cat_query( false );	// make sure the caches are loaded
 	$cat_parents[0]='NULL';
 
 	// run recursively through the cats
@@ -842,6 +856,11 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.6  2004/12/13 21:29:13  fplanque
  * refactoring
  *

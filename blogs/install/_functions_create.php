@@ -424,39 +424,48 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Topanga', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis Swicegood', 'Hosting', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Travis Swicegood', 'Hosting', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Welby', 'Hosting', $now, $cat_linkblog_contrib, array(), 'published',	 'en-UK', '', 0, true, '', 'http://www.wheely-bin.co.uk/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Welby', 'Hosting', $now, $cat_linkblog_contrib, array(), 'published',	 'en-UK', '', 0, true, '', 'http://www.wheely-bin.co.uk/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Graham', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Isaac', 'Support', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://isaacschlueter.com/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Isaac', 'Support', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://isaacschlueter.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'François', 'Main dev', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	echo "OK.<br />\n";
 }
@@ -616,19 +625,22 @@ function create_default_contents( $populate_blog_a = true )
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Clean Permalinks!"), T_("b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Clean Permalinks!"), T_("b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.
 
 Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Settings screen... (check 'Use extra-path info')"), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].
 
 This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("About evoSkins..."), T_("By default, b2evolution blogs are displayed using a default skin.
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About evoSkins..."), T_("By default, b2evolution blogs are displayed using a default skin.
 
 Readers can choose a new skin by using the skin switcher integrated in most skins.
 
@@ -640,7 +652,8 @@ To start customizing a skin, open its '<code>_main.php</code>' file in an editor
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Skins, Stubs and Templates..."), T_("By default, all pre-installed blogs are displayed using a skin. (More on skins in another post.)
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Skins, Stubs and Templates..."), T_("By default, all pre-installed blogs are displayed using a skin. (More on skins in another post.)
 
 That means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.
 
@@ -654,7 +667,8 @@ Either way, make sure you go to the blogs admin and set the correct access metho
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Multiple Blogs, new blogs, old blogs..."),
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Multiple Blogs, new blogs, old blogs..."),
 								T_("By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.
 
 Some of these blogs have a special role. Read about it on the corresponding page.
@@ -664,7 +678,8 @@ You can create additional blogs or delete unwanted blogs from the blogs admin.")
 
 	// Create newbie posts:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a multipage post'), T_('This is page 1 of a multipage post.
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('This is a multipage post'), T_('This is page 1 of a multipage post.
 
 You can see the other pages by cliking on the links below the text.
 
@@ -684,7 +699,8 @@ It is the last page.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , 
 
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('Extended post with no teaser'), T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.
 
 <!--more--><!--noteaser-->
 
@@ -692,7 +708,8 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('Extended post'), T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Extended post'), T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.
 
 <!--more-->
 
@@ -700,7 +717,8 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_("Important information"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Important information"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
 
 All these entries are designed to help you so, as EdB would say: \"<em>read them all before you start hacking away!</em>\" ;)
 
@@ -826,19 +844,22 @@ function populate_main_tables()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('First Post'), T_('<p>This is the first post.</p>
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('First Post'), T_('<p>This is the first post.</p>
 
 <p>It appears on both blog A and blog B.</p>'), $now, $cat_ann_a, array( $cat_ann_b ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('Second post'), T_('<p>This is the second post.</p>
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Second post'), T_('<p>This is the second post.</p>
 
 <p>It appears on blog A only but in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a, $cat_bg ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('Third post'), T_('<p>This is the third post.</p>
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Third post'), T_('<p>This is the third post.</p>
 
 <p>It appears on blog B only and in a single category.</p>'), $now, $cat_fun );
 

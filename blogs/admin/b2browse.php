@@ -69,8 +69,10 @@ for( $curr_blog_ID = blog_list_start();
 
 		// Show the posts:
 		$add_item_url = 'b2edit.php?blog='.$blog;
+		$dbtable = 'T_posts';
 		$dbprefix = 'post_';
 		$dbIDname = 'ID';
+		$use_comments = true;
 		require dirname(__FILE__). '/_edit_showposts.php';
 	}
 

@@ -136,7 +136,7 @@ while($row = mysql_fetch_assoc($result)){
 		post_content,
 		post_title,
 		post_urltitle,
-		post_category,
+		post_main_cat_ID,
 		post_flags,
 		post_wordcount
 		) VALUES (

@@ -44,231 +44,6 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Create a new post
- *
- * This funtion has to handle all needed DB dependencies!
- *
- * {@internal bpost_create(-)}}
- */
-function bpost_create(
-	$author_user_ID,              // Author
-	$post_title,
-	$post_content,
-	$post_timestamp,              // 'Y-m-d H:i:s'
-	$main_cat_ID = 1,             // Main cat ID
-	$extra_cat_IDs = array(),     // Table of extra cats
-	$post_status = 'published',
-	$post_locale = '#',
-	$post_trackbacks = '',
-	$autobr = 0,                  // OBSOLETE
-	$pingsdone = true,
-	$post_urltitle = '',
-	$post_url = '',
-	$post_comments = 'open',
-	$post_renderers = array('default') )
-{
-	global $DB, $query;
-	global $localtimenow, $default_locale;
-
-	if( $post_locale == '#' ) $post_locale = $default_locale;
-
-	// Handle the flags:
-	$post_flags = array();
-	if( $pingsdone ) $post_flags[] = 'pingsdone';
-
-	// make sure main cat is in extracat list and there are no duplicates
-	$extra_cat_IDs[] = $main_cat_ID;
-	$extra_cat_IDs = array_unique( $extra_cat_IDs );
-
-	// TODO: START TRANSACTION
-
-	// validate url title
-	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0 );
-
-	// echo 'INSERTING NEW POST ';
-
-	$query = "INSERT INTO T_posts( post_creator_user_ID, post_title, post_urltitle, post_content,
-														post_datestart, post_datemodified, post_main_cat_ID,  post_status, post_locale,
-														post_url, post_flags, post_wordcount,
-														post_comments, post_renderers )
-						VALUES( $author_user_ID, '".$DB->escape($post_title)."',
-										'".$DB->escape($post_urltitle)."',
-										'".$DB->escape($post_content)."',
-										'".$DB->escape($post_timestamp)."',
-										'".date('Y-m-d H:i:s',$localtimenow)."',
-										$main_cat_ID,
-										'".$DB->escape($post_status)."',
-										'".$DB->escape($post_locale)."',
-										'".$DB->escape($post_url)."',
-										'".$DB->escape(implode(',',$post_flags))."',
-										".bpost_count_words($post_content).",
-										'".$DB->escape($post_comments)."',
-										'".$DB->escape(implode('.',$post_renderers))."' )";
-	if( ! $DB->query( $query, 'Insert New Post' ) ) return 0;
-	$post_ID = $DB->insert_id;
-	// echo "post ID:".$post_ID;
-
-	// insert new extracats
-	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
-	foreach( $extra_cat_IDs as $extra_cat_ID )
-	{
-		// echo "extracat: $extra_cat_ID <br />";
-		$query .= "( $post_ID, $extra_cat_ID ),";
-	}
-	$query = substr( $query, 0, strlen( $query ) - 1 );
-	if( ! $DB->query( $query, 'Associate new post with extra categories' ) ) return 0;
-
-	// TODO: END TRANSACTION
-
-	return $post_ID;
-}
-
-
-/**
- * Update a post
- *
- * This funtion has to handle all needed DB dependencies!
- *
- * {@internal bpost_update(-)}}
- */
-function bpost_update(
-	$post_ID,
-	$post_title,
-	$post_content,
-	$post_timestamp = '',         // 'Y-m-d H:i:s'
-	$main_cat_ID = 1,             // Main cat ID
-	$extra_cat_IDs = array(),     // Table of extra cats
-	$post_status = 'published',
-	$post_locale = '#',
-	$post_trackbacks = '',
-	$autobr = 0,                  // OBSOLETE
-	$pingsdone = true,
-	$post_urltitle = '',
-	$post_url = '',
-	$post_comments = 'open',
-	$post_renderers = array() )
-{
-	global $DB, $query, $querycount;
-	global $localtimenow, $default_locale;
-
-	// Handle the flags:
-	$post_flags = array();
-	if( $pingsdone ) $post_flags[] = 'pingsdone';
-
-	// make sure main cat is in extracat list and there are no duplicates
-	$extra_cat_IDs[] = $main_cat_ID;
-	$extra_cat_IDs = array_unique( $extra_cat_IDs );
-
-	// TODO: START TRANSACTION
-
-	// validate url title
-	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $post_ID );
-
-	$query = "UPDATE T_posts
-						SET post_title = '".$DB->escape($post_title)."',
-								post_urltitle = '".$DB->escape($post_urltitle)."',
-								post_url = '".$DB->escape($post_url)."',
-								post_content = '".$DB->escape($post_content)."',
-								post_datemodified = '".date('Y-m-d H:i:s',$localtimenow)."',
-								post_main_cat_ID = $main_cat_ID,
-								post_status = '".$DB->escape($post_status)."',
-								post_flags = '".$DB->escape(implode(',',$post_flags))."',
-								post_wordcount = ".bpost_count_words($post_content).",
-								post_comments = '".$DB->escape($post_comments)."',
-								post_renderers = '".$DB->escape(implode('.',$post_renderers))."'";
-								if( $post_locale != '#' )
-								{ // only update if it was changed
-									$query .= ",
-								post_locale = '".$DB->escape($post_locale)."'";
-								}
-
-	if( !empty($post_timestamp) )	$query .= ", post_datestart = '$post_timestamp' ";
-	$query .= "WHERE ID = $post_ID";
-	if( ! $DB->query( $query ) ) return 0;
-
-	// delete previous extracats
-	$query = "DELETE FROM T_postcats WHERE postcat_post_ID = $post_ID";
-	if( ! $DB->query( $query ) ) return 0;
-
-	// insert new extracats
-	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
-	foreach( $extra_cat_IDs as $extra_cat_ID )
-	{
-		//echo "extracat: $extracat_ID <br />";
-		$query .= "( $post_ID, $extra_cat_ID ),";
-	}
-	$query = substr( $query, 0, strlen( $query ) - 1 );
-	if( ! $DB->query( $query ) ) return 0;
-
-	// TODO: END TRANSACTION
-
-	return 1;	// success
-}
-
-/**
- * Update a post's status
- *
- * This funtion has to handle all needed DB dependencies!
- *
- * {@internal bpost_update_status(-)}}
- */
-function bpost_update_status(
-	$post_ID,
-	$post_status = 'published',
-	$pingsdone = true,
-	$post_timestamp = '' )
-{
-	global $DB, $localtimenow, $query;
-
-	// Handle the flags:
-	$post_flags = array();
-	if( $pingsdone ) $post_flags[] = 'pingsdone';
-
-	$query = "UPDATE T_posts SET ";
-	if( !empty($post_timestamp) )	$query .= "post_datestart = '$post_timestamp', ";
-	$query .= "post_datemodified = '".date('Y-m-d H:i:s',$localtimenow)."', ";
-	$query .= "post_status = '$post_status', ";
-	$query .= "post_flags = '".implode(',',$post_flags)."' ";
-	$query .= "WHERE ID = $post_ID";
-
-	return $DB->query( $query );
-}
-
-
-/**
- * Delete a post
- *
- * This funtion has to handle all needed DB dependencies!
- *
- * {@internal bpost_delete(-)}}
- */
-function bpost_delete( $post_ID )
-{
-	global $DB;
-
-	// TODO: START TRANSACTION
-
-
-	// delete extracats
-	$query = "DELETE FROM T_postcats WHERE postcat_post_ID = $post_ID";
-	if( $DB->query( $query ) === false ) return 0;
-
-	// delete comments
-	$query = "DELETE FROM T_comments WHERE comment_post_ID = $post_ID";
-	if( $DB->query( $query ) === false ) return 0;
-
-	// delete post
-	$query = "DELETE FROM T_posts WHERE ID = $post_ID";
-	if( $DB->query( $query ) === false ) return 0;
-
-
-	// TODO: END TRANSACTION
-
-	return 1;	// success
-
-}
-
 
 /**
  * Validate URL title
@@ -282,7 +57,7 @@ function bpost_delete( $post_ID )
  * @param integer ID of post
  * @return string validated url title
  */
-function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false )
+function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false, $dbprefix = 'post_', $dbIDname = 'ID' )
 {
 	global $DB;
 
@@ -315,16 +90,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 
 	// Find all occurrences of urltitle+number in the DB:
-	$sql = "SELECT post_urltitle
+	$sql = 'SELECT '.$dbprefix.'urltitle
 					FROM T_posts
-					WHERE post_urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'
-					  AND ID <> $post_ID";
+					WHERE '.$dbprefix."urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'";
+	if( $post_ID )
+		$sql .= " AND $dbIDname <> $post_ID";
 	$rows = $DB->get_results( $sql, ARRAY_A );
 	$exact_match = false;
 	$highest_number = 0;
 	if( count( $rows ) ) foreach( $rows as $row )
 	{
-		$existing_urltitle = $row['post_urltitle'];
+		$existing_urltitle = $row[$dbprefix.'urltitle'];
 		// echo "existing = $existing_urltitle <br />";
 		if( $existing_urltitle == $urltitle )
 		{ // We have an exact match, we'll have to change the number.
@@ -1661,6 +1437,11 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.5  2004/12/14 21:01:06  fplanque
  * minor fixes
  *

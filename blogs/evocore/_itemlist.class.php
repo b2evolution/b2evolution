@@ -173,17 +173,17 @@ class ItemList extends DataObjectList
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$title = '',													// urltitle of post to display
+		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 	{
 		global $DB;
-		global $tableposts;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 		global $Settings;
 
 		// Call parent constructor:
-		parent::DataObjectList( $tableposts, $dbprefix, $dbIDname );
+		parent::DataObjectList( $dbtable, $dbprefix, $dbIDname );
 
 		// Columns to be selected:
 		$this->dbcols = array(
@@ -346,7 +346,7 @@ class ItemList extends DataObjectList
 			// Getting required sub-categories:
 			// and add everything to cat array
 			// ----------------- START RECURSIVE CAT LIST ----------------
-			cat_query();	// make sure the caches are loaded
+			cat_query( false );	// make sure the caches are loaded
 			foreach( $req_cat_array as $cat_ID )
 			{ // run recursively through the cats
 				settype( $cat_ID, 'integer' ); // make sure
@@ -549,7 +549,7 @@ class ItemList extends DataObjectList
 
 		$this->request = "SELECT DISTINCT $this->dbIDname, "
 																			.implode( ', ', $this->dbcols )
-										.' FROM (T_posts INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
+										.' FROM ('.$dbtable.' INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
 														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $blog == 1 )
@@ -581,7 +581,7 @@ class ItemList extends DataObjectList
 		$this->postIDarray = array();
 		if( count( $this->result_rows ) ) foreach( $this->result_rows as $myrow )
 		{
-			array_unshift( $this->postIDarray, $myrow->ID );	// new row at beginning
+			array_unshift( $this->postIDarray, $myrow->$dbIDname );	// new row at beginning
 		}
 		if( !empty($this->postIDarray) )
 		{
@@ -818,7 +818,7 @@ class ItemList extends DataObjectList
 		// Go back now so that the fetch row doesn't skip one!
 		$this->row_num --;
 
-		$this->last_Item = new Item( $this->row ); // COPY !
+		#already done in get_postdata: $this->last_Item = new Item( $this->row ); // COPY !
 		return $this->last_Item;
 	}
 
@@ -847,7 +847,7 @@ class ItemList extends DataObjectList
 			return false;
 		}
 
-		$this->last_Item = new Item( $this->row ); // COPY !
+		#already done in get_postdata: $this->last_Item = new Item( $this->row ); // COPY !
 		return $this->last_Item;
 	}
 
@@ -862,27 +862,24 @@ class ItemList extends DataObjectList
 		global $id, $postdata, $authordata, $day, $page, $pages, $multipage, $more, $numpages;
 		global $pagenow, $current_User;
 
-		$row = & $this->row;
-		if( empty($row->post_datestart) )
-		{
-			die('ItemList::get_postdata(-) => No post data available!');
-		}
-		$id = $row->ID;
-		// echo 'starting ',$row->post_title;
+		$this->last_Item = new Item( $this->row, $this->dbtablename, $this->dbprefix, $this->dbIDname ); // COPY!!
+
+		$id = $this->last_Item->ID;
+		// echo 'starting ',$current_Item->title;
 		$postdata = array (
-			'ID' => $row->ID,
-			'Author_ID' => $row->post_creator_user_ID,
-			'Date' => $row->post_datestart,
-			'Status' => $row->post_status,
-			'Locale' =>	 $row->post_locale,
-			'Content' => $row->post_content,
-			'Title' => $row->post_title,
-			'Url' => $row->post_url,
-			'Category' => $row->post_main_cat_ID,
-			'Flags' => explode( ',', $row->post_flags ),
-			'Wordcount' => $row->post_wordcount,
-			'views' => $row->post_views,
-			'comments' => $row->post_comments
+				'ID'         => $this->last_Item->ID,
+				'Author_ID'  => $this->last_Item->Author->ID,
+				'Date'       => $this->last_Item->issue_date,
+				'Status'     => $this->last_Item->status,
+				'Locale'     => $this->last_Item->locale,
+				'Content'    => $this->last_Item->content,
+				'Title'      => $this->last_Item->title,
+				'Url'        => $this->last_Item->url,
+				'Category'   => $this->last_Item->main_cat_ID,
+				'Flags'      => explode( ',', $this->last_Item->flags ),
+				'Wordcount'  => $this->last_Item->wordcount,
+				'views'      => $this->last_Item->views,
+				'comments'   => $this->last_Item->comments
 			);
 
 		// echo ' title: ',$postdata['Title'];
@@ -967,6 +964,11 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.9  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.8  2004/12/14 21:01:06  fplanque
  * minor fixes
  *

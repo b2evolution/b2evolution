@@ -247,8 +247,8 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
  */
 function get_userdatabylogin( $user_login )
 {
-	global $DB, $cache_userdata, $use_cache;
-	if( (empty($cache_userdata[$user_login])) OR (!$use_cache) )
+	global $DB, $cache_userdata;
+	if( empty($cache_userdata[$user_login]) )
 	{
 		$sql = "SELECT *
 						FROM T_users
@@ -631,6 +631,11 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/15 20:50:34  fplanque
+ * heavy refactoring
+ * suppressed $use_cache and $sleep_after_edit
+ * code cleanup
+ *
  * Revision 1.5  2004/12/10 19:45:55  fplanque
  * refactoring
  *
