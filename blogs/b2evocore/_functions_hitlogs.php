@@ -147,20 +147,26 @@ function log_hit()
 		flush();
 
 		$goodReferer = 0;
-		$fp = @fopen ($ref, 'r');
-		if ($fp)
+		if ( strlen($ref) > 0 )
 		{
-			//timeout after 5 seconds
-			socket_set_timeout($fp, 5);
-			while (!feof ($fp)) 
+			$fp = @fopen ($ref, 'r');
+			if ($fp)
 			{
-				$page .= trim(fgets($fp));
+				//timeout after 5 seconds
+				socket_set_timeout($fp, 5);
+				while (!feof ($fp))
+				{
+					$page .= trim(fgets($fp));
+				}
+				if (strstr($page,$fullCurrentURL))
+				{
+					dbg(T_('found current url in page'));
+					$goodReferer = 1;
+				}
 			}
-			if (strstr($page,$fullCurrentURL))
-			{
-				dbg(T_('found current url in page'));
-				$goodReferer = 1;
-			}
+		} else {
+			// Direct accesses are always good hits
+			$goodReferer = 1;
 		}
 
 		if(!$goodReferer)
