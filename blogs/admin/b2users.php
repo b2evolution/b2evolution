@@ -16,7 +16,7 @@ require_once( dirname(__FILE__). '/_header.php' );
 $admin_tab = 'users';
 $admin_pagetitle = T_('User management');
 
-param( 'action', 'string' );
+param( 'action', 'string', '' );
 param( 'user', 'integer', 0 );
 param( 'group', 'integer', 0 );
 
@@ -35,7 +35,7 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	// allow profile editing/viewing only
 	$user_profile_only = 1;
 
-	if( ($action && $action != 'userupdate') )
+	if( $action && $action != 'userupdate' )
 	{ // This should be prevented un the UI
 		$Messages->add( 'You have no permission to edit other users or groups!' );
 		$action = ''; // don't show group form (we have no group ID)
@@ -402,7 +402,7 @@ else switch ($action)
 		}
 
 		if( $edited_grp_ID == 0 )
-		{	// Insert into the DB:
+		{ // Insert into the DB:
 			$edited_Group->dbinsert();
 		}
 		else
@@ -523,7 +523,7 @@ else
 	}
 	elseif( $user != $current_User->ID )
 	{ // another user requested -> error-note
-		echo '<div class="panelinfo"><p class="error">'.T_('You are not allowed to view other users.').'</p></div>';
+		Log::display( '', '', T_('You are not allowed to view other users.'), true, 'error' );
 		$user = $current_User->ID;
 	}
 }
@@ -543,7 +543,7 @@ if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
 
 // users list
 if( $current_User->check_perm( 'users', 'view', false ) )
-{	// Display user list:
+{ // Display user list:
 	require( dirname(__FILE__). '/_users_list.php' );
 }
 
