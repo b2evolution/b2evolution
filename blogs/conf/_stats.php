@@ -35,6 +35,7 @@ $search_engines = Array(
 	'.voila.fr/',
 	'http://search',
 	'search.',
+	'search2.',
 	'http://recherche',
 	'recherche.',
 	'recherches.',
@@ -49,6 +50,19 @@ $search_engines = Array(
 	'killou.com/',
 	'buscador.terra.es',
 	'web.toile.com',
+	'metacrawler.com/', 
+	'.mamma.com/', 
+	'.dogpile.com/', 
+	'search1-1.free.fr', 
+	'search1-2.free.fr', 
+	'overture.com', 
+	'startium.com', 
+	'2020search.com', 
+	'bestsearchonearth.info', 
+	'mysearch.com', 
+	'popdex.com', 
+	'64.233.167.104', 
+	'seek.3721.com', 
 );
 
 
