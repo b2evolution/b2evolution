@@ -255,6 +255,8 @@ $locales = array(
  *
  * This is used when displaying the calendar only.
  * Weekly archives are grouped the way mySQL groups days by weeks; see mySQL documentation.
+ *
+ * @global int $start_of_week
  */
 $start_of_week = 1;
 

@@ -37,6 +37,8 @@ define( 'DB_HOST', 'localhost' );     // mySQL Server (typically 'localhost')
 /**
  * the tables prefix (gets placed before each b2evo table name),
  * use this to have multiple installations in one DB.
+ *
+ * @global string $tableprefix
  */
 $tableprefix = 'evo_';
 
@@ -64,6 +66,8 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  * For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs/ !
  * Use http://localhost/b2evolution/blogs/ instead. And log in on localhost too, not homer!
  * If you don't, login cookies will not hold.
+ *
+ * @global string $baseurl
  */
 $baseurl = 'http://localhost/b2evolution/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
 

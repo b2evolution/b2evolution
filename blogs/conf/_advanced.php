@@ -20,8 +20,17 @@ $obhandler_debug = false;
 $demo_mode = false;
 
 
-# Comments: set this to 1 to require e-mail and name, or 0 to allow comments without e-mail/name
+/**
+ * Comments: set this to 1 to require e-mail and name, or 0 to allow comments without e-mail/name
+ * @global boolean $require_name_email
+ */
 $require_name_email = 1;
+
+/**
+ * Minimum interval (in seconds) between consecutive comments from same IP
+ * @global int $minimum_comment_interval
+ */
+$minimum_comment_interval = 30;
 
 
 # Set the blog number to be used when not otherwise specified
@@ -31,9 +40,12 @@ if( !isset($default_to_blog) ) $default_to_blog = 2;
 
 /**
  * Set the length of the online session time out (in seconds).
+ *
  * This is for the Who's Online block.
+ *
+ * @global int $online_session_timeout
  */
-$online_session_timeout = 300; // 5 minutes
+$online_session_timeout = 300; // default: 5 minutes
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
@@ -217,8 +229,13 @@ $use_etags = 0;
 
 // ** Cookies **
 
-# This is the path that will be associated to cookies
-# That means cookies set by this b2evo install won't be seen outside of this path on the domain below
+/**
+ * This is the path that will be associated to cookies
+ *
+ * That means cookies set by this b2evo install won't be seen outside of this path on the domain below
+ *
+ * @global string $cookie_path
+ */
 $cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl );
 
 /**
@@ -244,11 +261,15 @@ $cookie_url   = 'cookie'. $b2evo_name. 'url';
  * Expiration for cookies.
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
+ *
+ * @global int $cookie_expires
  */
 $cookie_expires = time() + 31536000; // Default: one year from now
 
 /**
  * Expired-time used to erase cookies.
+ *
+ * @global int $cookie_expired
  */
 $cookie_expired = time() - 86400;    // Default: 24 hours ago
 
@@ -269,6 +290,7 @@ $cookie_expired = time() - 86400;    // Default: 24 hours ago
 */
 /**
  * Location of the configuration files.
+ * @global string $conf_subdir
  */
 $conf_subdir = 'conf/';                  // Subdirectory relative to base
 $conf_dirout = '../';                    // Relative path to go back to base
@@ -278,55 +300,65 @@ $basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remov
 
 /**
  * Location of the backoffice (admin) folder.
+ * @global string $admin_subdir
  */
 $admin_subdir = 'admin/';                // Subdirectory relative to base
 $admin_dirout = '../';                   // Relative path to go back to base
 $admin_url = $baseurl.$admin_subdir;     // You should not need to change this
 /**
  * Location of the HTml SeRVices folder.
+ * @global string $htsrv_subdir
  */
 $htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
 $htsrv_dirout = '../';                   // Relative path to go back to base
 $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
 /**
  * Location of the XML SeRVices folder.
+ * @global string $xmlsrv_subdir
  */
 $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_dirout = '../';                  // Relative path to go back to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 /**
  * Location of the IMG folder.
+ * @global string $img_subdir
  */
 $img_subdir = 'img/';                    // Subdirectory relative to base
 $img_url = $baseurl.$img_subdir;         // You should not need to change this
 /**
  * Location of the skins folder.
+ * @global string $skins_subdir
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_dirout = '../';                   // Relative path to go back to base
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 /**
  * Location of the core (the "includes") files.
+ * @global string $core_subdir
  */
 $core_subdir = 'b2evocore/';             // Subdirectory relative to base
 $core_dirout = '../';                    // Relative path to go back to base
 /**
  * Location of the locales folder.
+ * @global string $locales_subdir
  */
 $locales_subdir = 'locales/';            // Subdirectory relative to base
 $locales_dirout = '../';                 // Relative path to go back to base
 /**
  * Location of the plug-ins.
+ * @global string $plugins_subdir
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
 $plugins_dirout = '../';       				   // Relative path to go back to base
 /**
  * Location of the install folder.
+ * @global string $install_subdir
  */
 $install_subdir = 'install/';            // Subdirectory relative to base
 $install_dirout = '../';                 // Relative path to go back to base
 /**
  * Location of the root media folder.
+ * @global string $media_subdir
  */
 $media_subdir = 'media/';                // Subdirectory relative to base
 $media_dirout = '../';                   // Relative path to go back to base
