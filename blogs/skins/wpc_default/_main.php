@@ -24,7 +24,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar; if not, write to the Free Software
+ * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
@@ -101,11 +101,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<div class="meta"><?php echo T_('Filed under:'); ?> <?php $Item->categories(); ?> &#8212; <?php $Item->Author->prefered_name() ?> @ <?php $Item->issue_time() ?>
 		<?php $Item->edit_link( '', '', T_('Edit This') ) // Link to backoffice for editing ?>
 	</div>
-	
+
 	<div class="storycontent">
 			<?php $Item->content(); ?>
 	</div>
-	
+
 	<div class="feedback">
 			<?php link_pages() ?>
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
@@ -115,7 +115,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
-	<?php 
+	<?php
 	/**
 	 * ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 	 */
@@ -154,7 +154,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  </li>
 
  <li id="search">
-   <label for="s"><?php echo T_('Search') ?>:</label>	
+   <label for="s"><?php echo T_('Search') ?>:</label>
 	<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', 'searchform' ) ?>
 	<div>
 		<input type="text" name="s" id="s" size="15" value="<?php echo htmlspecialchars($s) ?>" /><br />
@@ -189,7 +189,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</ul>
 	</li>
 	<?php } ?>
-	
+
 	<li id="other"><?php echo T_('Other'); ?>:
 	<ul>
 		<?php
@@ -200,8 +200,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		?>
 	</ul>
  </li>
- 
- 
+
+
  <li id="meta"><?php echo T_('Meta'); ?>:
  	<ul>
 		<li><a href="<?php $Blog->disp( 'rss2_url', 'raw' ); ?>" title="<?php echo T_('Syndicate this site using RSS'); ?>"><?php echo T_('<abbr title="Really Simple Syndication">RSS</abbr> 2.0'); ?></a></li>

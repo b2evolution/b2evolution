@@ -24,7 +24,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar; if not, write to the Free Software
+ * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
@@ -71,11 +71,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<?php comments_popup_script() // Include javascript to open pop up windows ?>
 </head>
 <body>
-<?php 
+<?php
 	/**
 	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	 */
-	require( dirname(__FILE__).'/_bloglist.php' ); 
+	require( dirname(__FILE__).'/_bloglist.php' );
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id="header"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" title="<?php $Blog->disp( 'name', 'htmlattr' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></div>
@@ -107,7 +107,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <?php $Item->content(); ?>
 
 <div class="rightFlush">
-<?php link_pages() ?> 
+<?php link_pages() ?>
 
 <?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 <?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
@@ -120,7 +120,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <?php
 		// THIS is an example of how to display unmixed comments, trackbacks and pingbacks.
 		// doing it old b2 style :>>
-		
+
 		// this includes the comments and a form to add a new comment
 		$disp_comments = 1;					// Display the comments if requested
 		$disp_comment_form = 1;			// Display the comments form if comments requested
@@ -146,7 +146,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		$disp_title = "Pingbacks:";
-		require( dirname(__FILE__).'/_feedback.php' );		
+		require( dirname(__FILE__).'/_feedback.php' );
 ?>
 
 </div>
@@ -155,7 +155,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 
 <?php	locale_restore_previous();	// Restore previous locale (Blog locale) ?>
 
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
+<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )
@@ -169,7 +169,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 			// this includes the statistics if requested:
 			require( dirname(__FILE__).'/_stats.php');
 			break;
-		
+
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( dirname(__FILE__).'/_arcdir.php');
@@ -224,13 +224,13 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <?php } ?>
 
 <h4>other:</h4>
-<?php 
+<?php
 	// Administrative links:
-	user_login_link( '', '<br />' ); 
-	user_register_link( '', '<br />' ); 
-	user_admin_link( '', '<br />' ); 
-	user_profile_link( '', '<br />' ); 
-	user_logout_link( '', '<br />' ); 
+	user_login_link( '', '<br />' );
+	user_register_link( '', '<br />' );
+	user_admin_link( '', '<br />' );
+	user_profile_link( '', '<br />' );
+	user_logout_link( '', '<br />' );
 ?>
 <br />
 
@@ -238,7 +238,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 <a href="http://validator.w3.org/check/referer" title="this page validates as XHTML 1.0 Transitional"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a><br />
 <a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 </div>
-<?php 
+<?php
 	log_hit();	// log the hit on this page
 	debug_info();	// output debug info if requested
 ?>

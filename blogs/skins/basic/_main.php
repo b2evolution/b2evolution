@@ -24,7 +24,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar; if not, write to the Free Software
+ * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
@@ -83,11 +83,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<div align="center">
 		<h1><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
 		<p><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></p>
-	</div>	
+	</div>
 	<hr>
 
   <small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
-	
+
 	<hr>
 
 	<h2><?php
@@ -104,7 +104,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 		$MainList->date_if_changed();
-		$Item->anchor(); 
+		$Item->anchor();
 		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 		?>
 		<h3>
@@ -126,7 +126,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				echo ' ', T_('words');
 			?>
 			</small>
-		
+
 			<div>
 				<?php $Item->content( '#', '#', T_('Read more...') ); ?>
 				<?php link_pages() ?>
@@ -153,11 +153,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		require( dirname(__FILE__).'/_feedback.php' );
-		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------- 
+		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -----------------
 
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 		?>
-	<?php } // --------------------------------- END OF POSTS ----------------------------------- ?> 
+	<?php } // --------------------------------- END OF POSTS ----------------------------------- ?>
 
 	<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 		switch( $disp )
@@ -166,7 +166,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				// this includes the archive directory if requested
 				require( dirname(__FILE__).'/_arcdir.php');
 				break;
-	
+
 			case 'profile':
 				// this includes the profile form if requested
 				require( dirname(__FILE__).'/_profile.php');
@@ -183,19 +183,19 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Archives') ?></a>
 		</strong>
 
-		<p><?php 
-			user_login_link( ' [', '] ' ); 
-			user_register_link( ' [', '] ' ); 
-			user_admin_link( ' [', '] ' ); 
-			user_profile_link( ' [', '] ' ); 
-			user_logout_link( ' [', '] ' ); 
+		<p><?php
+			user_login_link( ' [', '] ' );
+			user_register_link( ' [', '] ' );
+			user_admin_link( ' [', '] ' );
+			user_profile_link( ' [', '] ' );
+			user_logout_link( ' [', '] ' );
 		?></p>
 	</div>
 
 	<hr>
-	
+
 	<div align="center">Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" align="middle" /></a> <!-- Please help us promote b2evolution and leave this link on your blog. --></div>
-	<?php 
+	<?php
 		log_hit();	// log the hit on this page
 		debug_info();	// output debug info if requested
 	?>

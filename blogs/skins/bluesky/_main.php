@@ -24,7 +24,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar; if not, write to the Free Software
+ * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
@@ -106,7 +106,7 @@
 <h2><?php $Item->title(); ?></h2>
 <div class=infos>
 <h3><a href="<?php $Item->permalink() ?>" title="Permalink"><?php $Item->issue_date() ?> <?php $Item->issue_time() ?></a></h3>
-&nbsp; 
+&nbsp;
 <h4><?php $Item->categories() ?></h4>
 </div>
 <div class=article>
@@ -135,7 +135,7 @@
 
 </div>
 
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
+<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )
@@ -149,7 +149,7 @@
 			// this includes the statistics if requested:
 			require( dirname(__FILE__).'/_stats.php');
 			break;
-		
+
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( dirname(__FILE__).'/_arcdir.php');
@@ -180,7 +180,7 @@
 
 
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require( dirname(__FILE__).'/_bloglist.php' ); 
+	require( dirname(__FILE__).'/_bloglist.php' );
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 <div id=categories>
@@ -202,11 +202,11 @@
 
 
 <?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'switcher' ) ?>
-	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label> 
+	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label>
 	<select id=set name="skin">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
-		for( skin_list_start(); skin_list_next(); ) 
-		{ 
+		for( skin_list_start(); skin_list_next(); )
+		{
 			echo '<option value="';
 			skin_list_iteminfo( 'name' );
 			echo '"';
@@ -216,7 +216,7 @@
 			echo "</option>\n";
 		} // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 	</select>
-	<input type="submit" value="Ok" /> 
+	<input type="submit" value="Ok" />
 	</fieldset>
 </form>
 
@@ -227,7 +227,7 @@
 </ul>
 
 <?php if ($disp != 'stats') { ?>
-	
+
 	<h4><?php echo T_('Recent Referers') ?></h4>
 	<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>
 	<ul>
@@ -250,19 +250,19 @@
 
 <h4><?php echo T_('Misc') ?></h4>
 <ul>
-	<?php 
+	<?php
 		// Administrative links:
-		user_login_link( '<li>', '</li>' ); 
-		user_register_link( '<li>', '</li>' ); 
-		user_admin_link( '<li>', '</li>' ); 
-		user_profile_link( '<li>', '</li>' ); 
-		user_logout_link( '<li>', '</li>' ); 
+		user_login_link( '<li>', '</li>' );
+		user_register_link( '<li>', '</li>' );
+		user_admin_link( '<li>', '</li>' );
+		user_profile_link( '<li>', '</li>' );
+		user_logout_link( '<li>', '</li>' );
 	?>
   <li><a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>">RSS 0.92 (Userland)</a></li>
 	<li><a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>">RSS 1.0 (RDF)</a></li>
 	<li><a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0 (Userland)</a></li>
 	<li><a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>">Atom 0.3</a></li>
-  <li><a href="http://validator.w3.org/check/referer">XHTML valide</a> 
+  <li><a href="http://validator.w3.org/check/referer">XHTML valide</a>
 </li>
 </ul>
 
@@ -272,7 +272,7 @@ Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="
 
 <p class="baseline">
 This site works better with web standards! Original skin design courtesy of <a href="http://standblog.com/">Tristan NITOT</a>.
-<?php 
+<?php
 	log_hit();	// log the hit on this page
 	debug_info();	// output debug info if requested
 ?>
