@@ -405,6 +405,8 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'free.ynsbbs.com.ru')";
 	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'pimpvision.com')";
+	mysql_query($query) or mysql_oops( $query );
 }
 
 
