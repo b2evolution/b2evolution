@@ -52,22 +52,22 @@ function online_user_display( $before = '', $after = '' )
 	global $DB, $tableusers, $tablesessions, $online_session_timeout;
 	$users = array();
 
-	$sql = "SELECT ID
-		FROM $tableusers, $tablesessions 
-		WHERE ".$tableusers.".ID=".$tablesessions.".sess_userid 
-		AND ".$tablesessions.".sess_time > '".( time() - $online_session_timeout )."'";
+	$sql = "SELECT sess_userid
+		FROM $tablesessions
+		WHERE " . $tablesessions . ".sess_time > '" . ( time() - $online_session_timeout ) . "'";
 
 	$rows = $DB->get_results( $sql, ARRAY_A );
 	$users['guests'] = 0;
 	$users['registered'] = 0;
 	if( count( $rows ) ) foreach( $rows as $row )
 	{
-		$user = get_userdata( $row['ID'] );
+		$user = get_userdata( $row['sess_userid'] );
 		$user = new User($user);
 		if( $user->showonline )
 		{
 			echo $before;
 			echo $user->get('preferedname');
+			echo ' <a href="', msgform_url($row['ID']) , '"><img src="' , imgbase() , 'envelope.gif" height="10" width="13" border="0"</a>';
 			echo $after;
 			$users['registered']++;
 		}
