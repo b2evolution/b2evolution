@@ -19,7 +19,12 @@
 	padding:0;
 }
 
-
+/**
+ * Files table {{{
+ */
+#filemanmain table.grouped caption {
+	text-align:left;
+}
 #filemanmain table.grouped td {
 	text-align:center;
 }
@@ -55,13 +60,15 @@
 #filemanmain table.grouped tr.group td {
 	text-align:left;
 }
+/* }}} */
+
 
 .toolbaritem {
-	text-align:right;
 	margin:0.5ex 0;
 	vertical-align:bottom;
 	padding-left: 3ex;
 	float:right;
+	white-space:nowrap;
 }
 
 div.toolbaritem_group {
@@ -75,6 +82,10 @@ div.fm_query {
 	border:1px solid;
 }
 
+a#options_toggle {
+	display:block;
+	text-align:right;
+}
 
 
 img.framed {
