@@ -341,6 +341,8 @@ function cat_load_cache()
 			// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'], ' parent:',$cache_categories[$myrow['cat_ID']]['cat_parent_ID'],'<br />';
 		} 
 
+		// echo 'Number of cats=', count($cache_categories);
+
 		// Reveal children:
 		if( ! empty( $cache_categories ) )
 		{
@@ -362,7 +364,8 @@ function cat_load_cache()
 			}
 		}
 
-		
+		// echo 'Number of cats=', count($cache_categories);
+	
 		// ------------------------------
 		// Add post counts:
 		// ------------------------------
@@ -401,8 +404,14 @@ function cat_load_cache()
 		$querycount++; 
 		while ( $myrow = mysql_fetch_array($result)) 
 		{ 
-			$cache_categories[$myrow['cat_ID']]['cat_postcount'] = $myrow['cat_postcount'];
+			$cat_ID = $myrow['cat_ID'];
+			if( !isset($cache_categories[$cat_ID]) )
+				echo '<p>*** WARNING: There are ', $myrow['cat_postcount'], ' posts attached to inexistant category #', $cat_ID, '. You must fix the database! ***</p>';
+			// echo 'Postcount for cat #', $cat_ID, ' is ', $myrow['cat_postcount'], '<br />';
+			$cache_categories[$cat_ID]['cat_postcount'] = $myrow['cat_postcount'];
 		} 
+
+		// echo 'Number of cats=', count($cache_categories);
 
 	}
 }
@@ -493,6 +502,7 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 	$callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, // Callback functions
 	$level = 0 )	// Caller nesting level, just to keep track of how far we go :)
 {
+	// echo 'Number of cats=', count($ccats);
 	if( ! empty( $ccats ) ) // this can happen if there are no cats at all!
 	{	
 		$child_count = 0;
