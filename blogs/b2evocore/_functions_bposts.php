@@ -52,7 +52,7 @@ function bpost_create(
 	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content,
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_url, post_autobr, post_flags, post_wordcount,
-														post_comments )
+														post_comments, post_renderers )
 						VALUES( $author_user_ID, '".$DB->escape($post_title)."', '".$DB->escape($post_urltitle)."',
 										'".$DB->escape($post_content)."',	'".$DB->escape($post_timestamp)."',
 										'".date('Y-m-d H:i:s',$localtimenow)."', $main_cat_ID,
