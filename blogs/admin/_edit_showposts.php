@@ -141,7 +141,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					$Item->views();
 					echo ' '.T_('views');
 
-					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo '<br />'.T_('Categories').': ';
 					$Item->categories( false );
 				?>

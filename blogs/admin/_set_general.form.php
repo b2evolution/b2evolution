@@ -75,7 +75,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<legend><?php echo T_('Miscellaneous options') ?></legend>
 		<?php
 			form_text( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 2,
-								T_('Reload-page timeout'), T_('Time in seconds before a request to the same URI from the same IP and useragent is considered as a new hit.'), 5 );
+								T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), 5 );
 		?>
 	</fieldset>
 

@@ -301,7 +301,7 @@ if( $selaction != '' )
 						}
 
 						$msg_action .= $Fileman->getFormHiddenInputs()."\n"
-												.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is file's name that will be send to you."), 80, '', 'text', false )."\n"
+												.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
 												.form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n"
 												.'<div class="input"><input type="submit" name="selaction" value="'.T_('Download').'" /></div>
 					</fieldset>
@@ -343,7 +343,7 @@ if( $selaction != '' )
 
 				foreach( $selectedfiles as $file )
 				{
-					$Fileman->Messages->add( sprintf(T_('Would delete [%s]'), $file).'..', 'note' );
+					$Fileman->Messages->add( sprintf('Would delete [%s]', $file).'..', 'note' );
 
 				}
 
@@ -740,7 +740,7 @@ switch( $Fileman->getMode() )
 
 						<div class="notes">
 							<?php
-							echo '<strong>'.T_('You are in copy / move / rename mode.')
+							echo '<strong>'.T_('You are in copy-move-rename mode.')
 										.'</strong><br />'.T_('Please navigate to the desired location.'); ?>
 						</div>
 
@@ -983,7 +983,7 @@ if( $Fileman->isFiltering() )
 	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions */ T_('Perms') ) ?></th>
-	<th><?php echo /* TRANS: file action, (html) view */ T_('Action') ?></th>
+	<th><?php echo /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions') ?></th>
 </tr>
 </thead>
 
@@ -1164,7 +1164,7 @@ param( 'options_show', 'integer', 0 );
 		<label for="option_permlikelsl"><?php echo T_('File permissions like &quot;ls -l&quot;') ?></label>
 		<br />
 		<input type="checkbox" id="option_getimagesizes" name="option_getimagesizes" value="1"<?php if( $UserSettings->get('fm_getimagesizes') ) echo ' checked="checked"' ?> />
-		<label for="option_getimagesizes"><?php echo T_('Display the size of image files') ?></label>
+		<label for="option_getimagesizes"><?php echo T_('Display the image size of image files') ?></label>
 		<br />
 		<input type="checkbox" id="option_recursivedirsize" name="option_recursivedirsize" value="1"<?php if( $UserSettings->get('fm_recursivedirsize') ) echo ' checked="checked"' ?> />
 		<label for="option_recursivedirsize"><?php echo T_('Recursive size of directories') ?></label>

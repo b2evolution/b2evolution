@@ -1574,7 +1574,7 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 			{ // extension as alt-tag for file icons
 				if( $for->isDir() )
 				{
-					$r .= /* TRANS short for directory */ T_('[dir]');
+					$r .= /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 				}
 				$r .= $for->getExt();
 			}
@@ -1635,6 +1635,9 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 
 /*
  * $Log$
+ * Revision 1.11  2004/11/10 22:46:44  blueyed
+ * translation adjustments
+ *
  * Revision 1.10  2004/11/05 15:44:31  blueyed
  * no message
  *
