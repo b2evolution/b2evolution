@@ -1,0 +1,241 @@
+/*  Aubergine Machine WordPress stylesheet
+    Copyright 2003-2004 Ben de Groot     
+    released under the GPL                  */
+
+
+html, body {
+	background: #335 url(aubmach.png) fixed repeat;
+	color: #eef;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
+	border: none;
+	font-family: 'Trebuchet MS', 'Bitstream Vera Sans', verdana, sans-serif;
+	}
+
+body {
+	padding: 2em 8em;
+	}
+
+#header a {
+	display: block;
+	text-decoration: none;
+	color: #bbe;
+	margin: 0;
+	padding: 0;
+	}
+
+h1 {
+	text-align: right;
+	font-size: 4em;
+	font-weight: bold;
+	font-style: italic;
+	margin: 0;
+	padding: .4em;
+	}
+
+#content {
+	margin: 2em 0;
+	padding: 0;
+	float: left;
+	width: 70%;
+	background: #446;
+	border: 1px solid #335;
+	line-height: 140%;
+	}
+
+h2 {
+	font-weight: bold;
+	font-size: 1em;
+	text-align: right;
+	margin: 1em 20px 0 20px;
+	padding: 0 0 .1em 0;
+	color: #eef;
+	border-bottom: 1px solid #99b;
+	}
+
+h3 {
+	font-weight: normal;
+	font-size: 1.8em;
+	text-align: left;
+	color: #99b;
+	margin: .3em 20px;
+	padding: 0;
+	}
+
+div.meta {
+	text-align: right;
+	font-size: .9em;
+	margin: .7em 20px;
+	}
+
+div.feedback {
+	text-align: right;
+	margin: -1em 20px 2em 20px;
+	}
+
+p {
+	margin: 20px;
+	}
+
+.post p {
+	text-align: justify;
+	}
+
+#menu {
+	margin: 2em 0;
+	padding: 0;
+	float: right;
+	width: 25%;
+	line-height: 130%;
+	}
+
+#menu ul{
+	margin: .2em 0 .2em 1.6em;
+	padding: .5em 0;
+	list-style: none;
+	}
+
+#menu ul li {
+	margin: 1em 0;
+	padding: 0;
+	font-size: 1em;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: .2em;
+	}
+
+#menu ul ul {
+	list-style: square;
+	}
+
+#menu ul ul li {
+	margin: 0;
+	padding: 0;
+	font-size: 1em;
+	font-weight: normal;
+	text-transform: none;
+	letter-spacing: normal;
+	}
+
+#menu li a {
+	margin: 0;
+	padding: 0;
+	}
+
+body>div#rap>h1#header, body>div#rap>div#content, body>div#rap>div#menu {
+	background: url(446-70.png) repeat;
+	border: 1px solid #335;
+	}
+
+* html h1#header, * html div#content, * html div#menu {
+	/* star html hack for IE, because it doesn't handle PNG transparency right */
+	background: #446;
+	background-image: none;
+	border: 1px solid #335;
+	}
+
+p.credit {
+	clear: both;
+	text-align: center;
+	color: #bbd;
+	}
+
+a {
+	color: #bbe;
+	text-decoration: none;
+	}
+
+a:hover, a:focus {
+	text-decoration: underline;
+	}
+
+abbr[title], acronym[title] {
+	cursor: help;
+	color: #eef;
+	border-bottom: 1px dotted #eef;
+	}
+
+a abbr[title], a acronym[title] {
+	color: #bbe;
+	}
+
+img {
+	border: none;
+	}
+
+input[type="submit"] {
+	margin: 0;
+	width: 25%;
+	padding: 1px;
+	background: transparent;
+	color: #eef;
+	font-family: 'Bitstream Vera Sans', verdana, sans-serif;
+	font-size: .9em;
+	border: 2px outset #99b;
+	}
+
+input[type="submit"]:hover, input[type="submit"]:focus {
+	cursor: pointer;
+	background: #668;
+	}
+
+#menu input {
+	width: 87%;
+	margin: .6em 0;
+	}
+
+#menu input[type="submit"] {
+	width: 40%;
+	margin: 0 0 0 50%;
+	}
+	
+
+td {
+	text-align: center;
+	font-weight: normal;
+	text-transform: none;
+	letter-spacing: normal;
+	}
+
+th {
+	font-weight: normal;
+	}
+	
+ul {
+	list-style: square;
+	}
+
+blockquote, pre, var {
+	font-style: normal;
+	font-family: 'Andale Mono', monospace;
+	}
+
+input {
+	width: 60%;
+	padding: .3em;
+	border: 1px solid #99b;
+	background: transparent;
+	color: #eef;
+	font-family: 'Bitstream Vera Sans', verdana, sans-serif;
+	font-size: .9em;
+	}
+
+textarea {
+	width: 95%;
+	height: 15em;
+	padding: .3em;
+	border: 1px solid #99b;
+	background: transparent;
+	color: #eef;
+	font-family: 'Bitstream Vera Sans', verdana, sans-serif;
+	font-size: .9em;
+	}
+
+.meta ul, .meta ul li {
+	display: inline;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	}

@@ -4,7 +4,7 @@
 <head>
 	
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>b2evo パッケージ: Upgrading from Movable Type</title>
+<title>b2evo パッケージ: Movable Type からのアップグレード</title>
 <link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
 		
 	 
@@ -13,7 +13,7 @@
 	<div id="rowheader" >
 		<h1><a href="http://b2evolution.net/" title="b2evolution: 公式サイト"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 		<div id="tagline">多言語・複数ユーザ・マルチブログ エンジン。</div>
-		<h1 id="version">バージョン: 0.9.0.5</h1>
+		<h1 id="version">バージョン: 0.9.0.5+CVS</h1>
 		<div id="quicklinks">
 			b2evo パッケージ: 
 			<a href="../index.ja-JP.html">スタート ページ</a> &middot; 
@@ -27,34 +27,34 @@
 	</div>
 	<div class="installSideBar">
 		<p>利用可能なこのページの翻訳:</p>
-			<ul style="margin-left: 2ex;list-style:none;">
+			<ul>
 		<li><a href="upgradefrom_mt.html"><img src="../blogs/img/flags/w16px/eu.gif" alt="English (EU)" border="1"  class="flag"/> 英語 (EU)</a></li>
 		<li><a href="upgradefrom_mt.en-UK.html"><img src="../blogs/img/flags/w16px/uk.gif" alt="English (UK)" border="1"  class="flag"/> 英語 (UK)</a></li>
 		<li><a href="upgradefrom_mt.en-US.html"><img src="../blogs/img/flags/w16px/us.gif" alt="English (US)" border="1"  class="flag"/> 英語 (US)</a></li>
-		<li><a href="upgradefrom_mt.en-CA.html"><img src="../blogs/img/flags/w16px/ca.gif" alt="English (CA)" border="1"  class="flag"/> English (CA)</a></li>
-		<li><a href="upgradefrom_mt.en-AU.html"><img src="../blogs/img/flags/w16px/au.gif" alt="English (AU)" border="1"  class="flag"/> English (AU)</a></li>
+		<li><a href="upgradefrom_mt.en-CA.html"><img src="../blogs/img/flags/w16px/ca.gif" alt="English (CA)" border="1"  class="flag"/> 英語 (CA)</a></li>
+		<li><a href="upgradefrom_mt.en-AU.html"><img src="../blogs/img/flags/w16px/au.gif" alt="English (AU)" border="1"  class="flag"/> 英語 (AU)</a></li>
 		<li><a href="upgradefrom_mt.de-DE.html"><img src="../blogs/img/flags/w16px/de.gif" alt="German (DE)" border="1"  class="flag"/> ドイツ語 (DE)</a></li>
 		<li><a href="upgradefrom_mt.fr-FR.html"><img src="../blogs/img/flags/w16px/fr.gif" alt="French (FR)" border="1"  class="flag"/> フランス語 (FR)</a></li>
-		<li><a href="upgradefrom_mt.fr-CA.html"><img src="../blogs/img/flags/w16px/ca.gif" alt="French (CA)" border="1"  class="flag"/> French (CA)</a></li>
-		<li><a href="upgradefrom_mt.fr-BE.html"><img src="../blogs/img/flags/w16px/be.gif" alt="French (BE)" border="1"  class="flag"/> French (BE)</a></li>
+		<li><a href="upgradefrom_mt.fr-CA.html"><img src="../blogs/img/flags/w16px/ca.gif" alt="French (CA)" border="1"  class="flag"/> フランス語 (CA)</a></li>
+		<li><a href="upgradefrom_mt.fr-BE.html"><img src="../blogs/img/flags/w16px/be.gif" alt="French (BE)" border="1"  class="flag"/> フランス語 (BE)</a></li>
 		<li><a href="upgradefrom_mt.ja-JP.html"><img src="../blogs/img/flags/w16px/jp.gif" alt="Japanese (JP)" border="1"  class="flag"/><strong> 日本語 (JP)</strong></a></li>
 		<li><a href="upgradefrom_mt.lt-LT.html"><img src="../blogs/img/flags/w16px/lt.gif" alt="Lithuanian (LT)" border="1"  class="flag"/> リトアニア語 (LT)</a></li>
 		<li><a href="upgradefrom_mt.nl-NL.html"><img src="../blogs/img/flags/w16px/nl.gif" alt="Dutch (NL)" border="1"  class="flag"/> ドイツ語 (NL)</a></li>
-		<li><a href="upgradefrom_mt.nl-BE.html"><img src="../blogs/img/flags/w16px/be.gif" alt="Dutch (BE)" border="1"  class="flag"/> Dutch (BE)</a></li>
-		<li><a href="upgradefrom_mt.pt-BR.html"><img src="../blogs/img/flags/w16px/br.gif" alt="Portuguese (BR)" border="1"  class="flag"/> Portuguese (BR)</a></li>
+		<li><a href="upgradefrom_mt.nl-BE.html"><img src="../blogs/img/flags/w16px/be.gif" alt="Dutch (BE)" border="1"  class="flag"/> ドイツ語 (BE)</a></li>
+		<li><a href="upgradefrom_mt.pt-BR.html"><img src="../blogs/img/flags/w16px/br.gif" alt="Portuguese (BR)" border="1"  class="flag"/> ポルトガル語 (BR)</a></li>
 	</ul>
 	</div>
 	
-<h1>Upgrading from Movable Type</h1>
+<h1>Movable Type からのアップグレード</h1>
 <p>始める前に、b2evolution のいくつかのネットワーク機能を利用する際には、あなたは我々の簡単な <a href="http://b2evolution.net/about/terms.html">サービス規約</a> に同意する必要があることに注意してください。</p>
-<p>This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway...</p>
+<p>この手順は Movable Type バージョン 2.661 でテストされていますが、他のバージョンでも機能するはずです。なんにしても、これを試みることで何らかの支障が出ることはないでしょう。</p>
 <ol class="expanded">
-	<li>Use MT's export functionnality to create a .TXT file containing your posts.</li>
-	<li><a href="install_new.ja-JP.html">Install b2evolution in the regular way.</a></li>
-	<li>Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server.</li>
-<li>In the admin, go to the Tools tab and launch the MT migration utility.</li>
-<li>Follow the instructions on screen.</li>
-<li>Import will only take a few seconds/minutes depending on how many posts you import.</li>
+	<li>MT のエクスポート機能を使って、あなたの投稿が収められた .TXT ファイルを作成してください。</li>
+	<li><a href="install_new.ja-JP.html">通常の方法で b2evolution をインストールします。</a></li>
+	<li>一度 b2evo を設置して動作させてから、エクスポートした .TXT ファイルをあなたのサーバの /blogs/admin フォルダにコピーしてください。</li>
+<li>管理画面で、ツール タブに移動して、MT 移行ユーティリティを起動してください。</li>
+<li>画面の指示に従ってください。</li>
+<li>インポートする投稿の数によって、インポートは数秒から数分かかります。</li>
 </ol>
 
 	<div id="rowfooter">

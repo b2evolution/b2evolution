@@ -7,8 +7,7 @@
 <!-- TemplateEndEditable --> 
 <!-- TemplateBeginEditable name="head" -->
 <!-- TemplateEndEditable --> 
-<link rel="stylesheet" href="../blogs/skins/fplanque2002/basic.css" type="text/css" />
-<link rel="stylesheet" href="../blogs/skins/fplanque2002/fpnav.css" type="text/css" />
+<link rel="stylesheet" href="../blogs/rsc/fp02.css" type="text/css" />
 </head>
 <body>
 <div class="pageHeader">
