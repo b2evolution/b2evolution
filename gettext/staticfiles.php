@@ -48,7 +48,7 @@ if( !isset($argv) )
 	</head>
 	<body class="center">
 	<div style="width:75%">
-	
+
 	<img src="'.$img_url.'/b2evolution_logo_360.gif" /><br />
 	';
 }
@@ -91,19 +91,18 @@ else
 	}
 };
 
-
 /**
  * a quick and dirty class for PO/POT files
  */
-class POFile
+class POFile // {{{
 {
 	var $msgids = array();
-	
+
 	function POFile($filename)
 	{
 		$this->filename = $filename;
 	}
-	
+
 	/**
 	 * adds a MSGID for a specific source file
 	 */
@@ -113,15 +112,15 @@ class POFile
 		{ // don't put those into POT file
 			return;
 		}
-		
+
 		// replace links
 		$msgid = preg_replace('/<a(\s+.*?)href=".*?"(.*?)>/', '<a$1%href$2>', $msgid);
-		
+
 		// we don't want tabs and returns in the msgid, but we must escape '"'
 		$search = array("\r", "\n", "\t", '"');
 		$replace = array('', ' ', '', '\"');
 		$msgid = str_replace($search, $replace, $msgid);
-		
+
 		if( !isset($this->msgids[ $msgid ]) )
 		{
 			$this->msgids[ $msgid ] = '';
@@ -132,7 +131,7 @@ class POFile
 		}
 		$this->msgids[ $msgid ]['trans'][] = $trans;
 	}
-	
+
 	/**
 	 * translates msgid
 	 */
@@ -142,25 +141,25 @@ class POFile
 		{	// we have to replace links
 			// remember urls
 			$urls = $matches[2];
-			
+
 			// generate clean msgid
 			$msgid = preg_replace('/<a(.*?)href="(.*?)"(,*?)>/', '<a$1%href$3>', $msgid);
 		}
-		
+
 		// we don't have formatting in the .po files, but escaped '"'
 		$msgid = str_replace( array("\r", "\n", "\t", '"'), array('', ' ', '', '\"'), $msgid);
-		
+
 		#pre_dump($msgid);
-		
+
 		if( isset($this->msgids[ $msgid ]) )
 		{
 			$trans = $this->msgids[ $msgid ]['trans'];
-			
+
 			if( isset($urls) )
 			{
 				$trans = str_replace('%href', $urls, $trans);
 			}
-			
+
 			return $trans;
 		}
 		else
@@ -168,7 +167,7 @@ class POFile
 			return TRANSTAG_OPEN.$msgid.TRANSTAG_CLOSE;
 		}
 	}
-	
+
 	/**
 	 * reads .po file
 	 *
@@ -189,10 +188,10 @@ class POFile
 		$sources = array();
 		$loc_vars = array();
 		$this->msgids = array();
-		foreach ($lines as $line) 
+		foreach ($lines as $line)
 		{
 			// echo 'LINE:', $line, '<br />';
-			if(trim($line) == '' )	
+			if(trim($line) == '' )
 			{	// Blank line, go back to base status:
 				if( $status == 't' )
 				{	// ** End of a translation **:
@@ -204,7 +203,7 @@ class POFile
 					else
 					{
 						$translated++;
-						
+
 						// Inspect where the string is used
 						$sources = array_unique( $sources );
 						// echo '<p>sources: ', implode( ', ', $sources ), '</p>';
@@ -213,14 +212,14 @@ class POFile
 							if( !isset( $loc_vars[$source]  ) ) $loc_vars[$source] = 1;
 							else $loc_vars[$source] ++;
 						}
-					
+
 						// Save the string
 						// $ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
 						// $ttrans[] = "\n\t\"$msgid\" => \"$msgstr\",";
 						#$ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
 						$this->msgids[$msgid]['trans']
 							= str_replace( array('\t', '\r', '\n', '\"'), array("\t", "\r", "\n", '"'), $msgstr);
-		
+
 					}
 				}
 				$status = '-';
@@ -228,27 +227,27 @@ class POFile
 				$msgstr = '';
 				$sources = array();
 			}
-			elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches)) 
+			elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
 			{	// Encountered an original text
 				$status = 'o';
 				$msgid = $matches[1];
 				// echo 'original: "', $msgid, '"<br />';
 				$all++;
 			}
-			elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches)) 
+			elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
 			{	// Encountered a translated text
 				$status = 't';
 				$msgstr = $matches[1];
 				// echo 'translated: "', $msgstr, '"<br />';
 			}
-			elseif( preg_match( '#^"(.*)"#', $line, $matches)) 
+			elseif( preg_match( '#^"(.*)"#', $line, $matches))
 			{	// Encountered a followup line
-				if ($status=='o') 
+				if ($status=='o')
 					$msgid .= $matches[1];
 				elseif ($status=='t')
 					$msgstr .= $matches[1];
 			}
-			elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches)) 
+			elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches))
 			{	// Encountered a source code location comment
 				// echo $matches[0],'<br />';
 				$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
@@ -260,29 +259,29 @@ class POFile
 				}
 				// echo '<br />';
 			}
-			elseif(strpos($line,'#, fuzzy') === 0) 
+			elseif(strpos($line,'#, fuzzy') === 0)
 				$fuzzy++;
 		}
-							
+
 		ksort( $loc_vars );
 		foreach( $loc_vars as $source => $c )
 		{
 			echo $source, ' = ', $c, '<br />';
 		}
-		
+
 		return( $this->msgids );
 	}
-}
-	
+} // }}}
+
 /**
  * a class build upon class POFile to provide specific POT actions (write)
  */
-class POTFile extends POFile
+class POTFile extends POFile  // {{{
 {
 	function write()
 	{
 		global $targets, $locales;
-		
+
 		log_('Writing POTFile '.$this->filename.'..');
 		$fh = fopen( $this->filename, 'w' );
 		fwrite($fh, '# SOME DESCRIPTIVE TITLE.
@@ -304,15 +303,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 ');
-		
+
 		$count = 0;
-		
+
 		// add strings used by this script that must also be translated
 		foreach( $targets as $target )
 		{ // the available locale names
 			$this->addmsgid( $locales[$target]['name'] );
 		}
-		
+
 		foreach( $this->msgids as $msgid => $arr )
 		{
 			if( isset($arr['source']) )
@@ -323,17 +322,17 @@ msgstr ""
 				}
 			}
 			fwrite( $fh, 'msgid "'.$msgid.'"'."\nmsgstr ".'""'."\n\n" );
-			
+
 			$count++;
-			
+
 		}
-		
+
 		fclose( $fh );
-		
+
 		log_($count.' msgids written.');
 	}
-	
-}
+
+} // }}}
 
 /**
  * output, respects commandline mode
@@ -361,7 +360,10 @@ function log_( $string )
 
 // HERE WE GO -------------------------------
 
-log_('<h1>action: '.$action.'</h1>');
+log_('<div class="panelinfo"><p>action: '.$action.'</p>'
+			.( ( HIGHLIGHT_UNTRANSLATED && $action == 'merge' ) ? 'note: untranslated strings will get highlighted!' : '' )
+			.'</div>'
+);
 
 // change to /blogs folder
 chdir( CHDIR_TO_BLOGS );
@@ -379,21 +381,23 @@ foreach( glob('{*.src.html,doc/*.src.html}', GLOB_BRACE) as $filename )
 switch( $action )
 {
 	case 'extract':
-		
+
 		$POTFile = new POTFile( STATIC_POT );
 
 		foreach( $srcfiles as $srcfile )
 		{
 			log_( 'Extracting '.$srcfile.'..' );
-			
+
+			// get source file content
 			$text = implode( '', file( $srcfile ) );
-			preg_match_all('/{{{(.*?)}}}/s', $text, $matches_msgids, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE);
+			// get all strings to translate
+			preg_match_all('/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/s', $text, $matches_msgids, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE);
+			// get all newlines (to assign source file line numbers to msgids later)
 			preg_match_all('/\n/', $text, $matches_line, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE);
-			
-			$lm = 0;
+
+			$lm = 0;  // represents line numer - 1
 			foreach( $matches_msgids[1] as $match )
 			{
-				#echo $lm.': '.$match[1].' / '.($matches_line[0][$lm][1]).'<br>';
 				while( $match[1] > $matches_line[0][ $lm ][1] )
 				{ // assign line numbers
 					$lm++;
@@ -402,26 +406,25 @@ switch( $action )
 				#log_(' ['.$srcfile.':'.($lm + 1).']<br />');
 			}
 		}
-		
+
 		// write POT file
 		$POTFile->write();
-		
 	break;
-	
+
 	case 'merge':
 		foreach( $targets as $target )
-		{
+		{ // loop targets/locales
 			log_('<h2 style="margin-bottom:0">TARGET: '.$target.'</h2>');
 			if( $target != DEFAULT_TARGET )
-			{
+			{ // only translate when not DEFAULT_TARGET
 				$replacesrc = '.'.$target.'.';
-			
+
 				log_( 'reading locale: '.$target );
-			
+
 				$POFile = new POFile($pofilepath.'/'.$target.'.static.po');
 				$POFile->read();
-				
-				// get charset out of first msgstr
+
+				// get charset out of .PO file header
 				if( preg_match( '/; charset=(.*?)\n/', $POFile->translate(''), $matches ) )
 				{
 					$charset = $matches[1];
@@ -445,23 +448,24 @@ switch( $action )
 				log_( 'building default files');
 				$POFile = new POFile('');
 			}
-			
+
+
 			foreach( $srcfiles as $srcfile )
-			{
+			{ // loop through sourcefiles
+				// the file to create
 				$newfilename = str_replace('.src.', $replacesrc, $srcfile);
-				
+
 				log_( 'Merging '.$srcfile.' into '.$newfilename );
 				$text = implode( '', file( $srcfile ) );
-				
-				// build "available translations" list
-				$list_avail = "\t".'<ul style="margin-left: 2ex;list-style:none;">'."\n";
-				
+
 				$flagspath = 'blogs/img/flags';
 				for($i = 1; $i < count(split('/', $srcfile)); $i++)
 				{
 					$flagspath = '../'.$flagspath;
 				}
-				
+
+				// build "available translations" list
+				$list_avail = "\t".'<ul style="margin-left: 2ex;list-style:none;">'."\n";
 				foreach( $targets as $ttarget )
 				{
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
@@ -470,17 +474,7 @@ switch( $action )
 				}
 				$list_avail .= "\t</ul>";
 				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $list_avail, $text );
-				
-				if( $target != DEFAULT_TARGET )
-				{
-					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate(stripslashes(\'$1\'))', $text );
-					
-					if( strpos( $text, TRANSTAG_OPEN ) !== false )
-					{ // there are still tags.
-						log_('<span style="color:blue">WARNING: some strings have not been translated!</span>');
-					}
-				}
-				
+
 				// standard replacements
 				$search = array(
 					// internal replacements
@@ -491,34 +485,47 @@ switch( $action )
 					$target, $charset,
 					'<!-- This file was generated automatically by /gettext/staticfiles.php - Do not edit this file manually -->'."\n".'<html'
 				);
-				// left TAGs
-				array_push( $search, TRANSTAG_OPEN, TRANSTAG_CLOSE );
+				$text = str_replace( $search, $replace, $text);
+
+
+				if( $target != DEFAULT_TARGET )
+				{ // translate everything
+					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate(stripslashes(\'$1\'))', $text );
+
+					if( strpos( $text, TRANSTAG_OPEN ) !== false )
+					{ // there are still tags.
+						log_('<span style="color:blue">WARNING: some strings have not been translated!</span>');
+					}
+				}
+
+
+				// handle left TRANSTAGs
 				if( HIGHLIGHT_UNTRANSLATED && !($target == DEFAULT_TARGET) )
 				{ // we want to highlight untranslated strings
-					array_push( $replace, '<span style="color:red" title="not translated">', '</span>' );
+					$text = str_replace( array(TRANSTAG_OPEN, TRANSTAG_CLOSE), array('<span style="color:red" title="not translated">', '</span>'), $text );
 				}
 				else
 				{ // just remove tags
-					array_push( $replace, '', '' );
+					$text = str_replace( array(TRANSTAG_OPEN, TRANSTAG_CLOSE), '', $text );
 				}
-				$text = str_replace( $search, $replace, $text);
-				
+	
+
 				// replace links
 				$text = preg_replace( '/\.src\.(html)/', $replacesrc."$1", $text );
-				
+
 				// emphasize links to the file itself
 				$text = preg_replace( ':(<a[^>]+href="'.basename($newfilename).'"[^>]*>)(.+?)(<\/a>):s', '$1<strong>$2</strong>$3', $text);
-				
+
 				// remove DW tags
 				$text = preg_replace( '/<!-- Instance(Begin|End|Param).*? -->/', '', $text );
-				
+
 				$fh = fopen( $newfilename, 'w' );
 				fwrite( $fh, $text );
 				fclose( $fh );
 			}
 			log_('');
 		}
-	
+
 	break;
 }
 

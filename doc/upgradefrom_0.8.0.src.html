@@ -28,13 +28,14 @@
 <!-- InstanceBeginEditable name="Main" -->
 <h1>{{{Upgrading from b2evolution 0.8.0 or later}}} ({{{prior to version 0.8.6}}})</h1>
 <ol class="expanded">
-	<li>{{{Backup <strong>all b2evolution files</strong>, <strong>including /conf, skins, blog templates	and stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can.}}}</li>
+	<li>{{{Backup <strong>all b2evolution files</strong>, <strong>including /conf, skins, blog templates and stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can.}}}</li>
 	<li>{{{Replace <strong>all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles </strong> with the new ones; (This is important in order to activate all security fixes!) If you have customized your blog template/skin, please use the provided demo templates/skins until the end of the upgrade process. You'll find instructions on how to upgrade your customized templates/skins at the end of this procedure.}}}</li>
-	<li>{{{Redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other	config files can be used without modification (provided you use the <strong>new </strong>ones!), however you should have look inside for fine tuning once your new version is running;}}}</li>
-	<li>{{{Upload the files to your website, according to the URL you have just configured.}}}</li>
+	<li>{{{Redo your configuration in the /conf folder as you did previously.}}}
+			{{{As always, the only requirement is to edit _config.php. The other config files can be used without modification (provided you use the <strong>new</strong> ones!), however you should have look inside for fine tuning once your new version is running.}}}</li>
+	<li>{{{Upload the b2evolution files to your website, according to the URL you have just configured.}}}</li>
 	<li>{{{Upload the new files to your server, and then <a href="../blogs/install/install.php">run the database tables upgrade</a> on your server!}}}</li>
 	<li>{{{On production servers, it is recommended that you delete the /blogs/install/ subfolder.}}}</li>
-	<li>{{{(Just in case you did not do it before, you may want to check out <a href="http://b2evolution.net/man/install/trickystuff.html">the tricky stuff</a>. (online manual)}}}</li>
+	<li>{{{Just in case you did not do it before, you may want to check out <a href="http://b2evolution.net/man/install/trickystuff.html">the tricky stuff</a>. (online manual)}}}</li>
 	<li>{{{(If you had custom skins or templates, follow the online instructions about upgrading them <a href="http://b2evolution.net/man/install/upgradefrom_0.8.0.html#templates">from version 0.8.0.x</a> or <a href="http://b2evolution.net/man/install/upgradefrom_0.8.2.html#templates">from version 0.8.2.x</a>. (online manual)}}}</li>
 </ol>
 <!-- InstanceEndEditable -->

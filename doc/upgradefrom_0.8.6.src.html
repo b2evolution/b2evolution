@@ -26,11 +26,13 @@
 	{{{trans_available}}}
 </div>
 <!-- InstanceBeginEditable name="Main" -->
-<h1>{{{Upgrading from b2evolution version 0.8.6 or later}}} (prior to 0.8.9)</h1>
+<h1>{{{Upgrading from b2evolution version 0.8.6 or later}}} ({{{prior to version 0.8.9}}})</h1>
 <p>{{{Upgrading from version 0.8.6 is easy:}}}</p>
 <ol class="expanded">
 	<li>{{{You can keep your<strong> skins, blog templates and stubfiles for your blogs</strong>. However, now may be a good time to back them up ;) You should also backup your database if you can.}}}</li>
-	<li>{{{Backup your <strong>/conf</strong> folder, copy the new conf files and redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other	 config files can be used without modification (provided you use the <strong>new </strong>ones!), however you should have look inside for fine tuning once your new version is running. Please note: there is no _antispam.php config file no longer. Antispam processing has been moved to the database.}}}</li>
+	<li>{{{Backup your <strong>/conf</strong> folder, copy the new conf files and redo your configuration in the /conf folder as you did previously.}}}
+			{{{As always, the only requirement is to edit _config.php. The other config files can be used without modification (provided you use the <strong>new</strong> ones!), however you should have look inside for fine tuning once your new version is running.}}}
+			{{{Please note: there is no _antispam.php config file no longer. Antispam processing has been moved to the database.}}}</li>
 	<li>{{{Replace the<strong> b2evolution core files</strong>. That means the following folders: /admin, /b2evocore, /htsrv, /locales, /xmlsrv. You also need to temporarily copy the <strong>/install</strong> folder to your site.}}}</li>
 	<li>{{{Upload the new files to your server, and then <a href="../blogs/install/install.php">run the database tables upgrade</a> on your server!}}}</li>
 <li>{{{On production servers, it is recommended that you delete the /blogs/install/ subfolder.}}}</li>
