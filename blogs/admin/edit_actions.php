@@ -68,7 +68,7 @@ switch($action)
 		param( 'post_title', 'html' );
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-		param( 'post_lang', 'string', $default_language );
+		param( 'post_lang', 'string', $default_locale );
 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{	// We use user date
@@ -176,7 +176,7 @@ switch($action)
 		param( 'post_title', 'html' );
 		param( 'post_url', 'string' );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-		param( 'post_lang', 'string', $default_language );
+		param( 'post_lang', 'string', $default_locale );
 
 		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
@@ -256,16 +256,16 @@ switch($action)
 			}
 			else
 			{	// We'll ping now
-				pingb2evonet( $blogparams, $post_ID, $post_title);
-				pingWeblogs($blogparams);
-				pingBlogs($blogparams);
-				pingTechnorati($blogparams);
+				pingb2evonet( $blogparams, $post_ID, $post_title );
+				pingWeblogs( $blogparams );
+				pingBlogs( $blogparams );
+				pingTechnorati( $blogparams );
 			}
 		}
 
 		echo '<p>', T_('Updating done...'), '</p>';
 
-		$location="b2browse.php?blog=$blog";
+		$location = 'b2browse.php?blog='. $blog;
 		break;
 
 
@@ -479,6 +479,8 @@ if( ! errors() )
 		<p><strong>[<a href="<?php echo $location ?>"><?php echo T_('Back to posts!') ?></a>]</strong></p>
 
 		<p><?php echo T_('You may also want to generate static pages or view your blogs...') ?></p>
+
+		</div>
 		<?php
 		// List the blogs:
 		require( dirname(__FILE__) . '/_blogs_list.php' );

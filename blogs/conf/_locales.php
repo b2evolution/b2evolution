@@ -13,10 +13,7 @@ $use_l10n = 2;
 # To be used for m17n support:
 $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 
-// Load locale related functions: (ne need NT_() here)
-require_once (dirname(__FILE__)."/$conf_dirout/$core_subdir/_functions_locale.php"); 
-
-# Supported languages for posts:
+/* # Supported languages for posts:
 $languages = array(
 	'cs' => NT_('Czech'),
 	'nl' => NT_('Dutch'),
@@ -26,13 +23,14 @@ $languages = array(
 	'it' => NT_('Italian'),
 	'ja' => NT_('Japanese'),
 	'lt' => NT_('Lithuanian'),
-	'nb' => NT_('Norwegian Bokm&aring;l'), 
+	'nb' => NT_('Norwegian Bokm&aring;l'),
 	'pt' => NT_('Portuguese'),
 	'es' => NT_('Spanish'),
 	'sv' => NT_('Swedish'),
 	'zh' => NT_('Simplified Chinese'),
 //	'zh' => NT_('Traditional Chinese'),
 	);
+*/
 
 
 # Default locale used for backoffice and notification messages
@@ -40,85 +38,119 @@ $languages = array(
 # This MUST BE in the list below
 $default_locale = 'en_US';
 
-$default_locale = 'fr_FR';		// for testing :))
+$default_locale = 'fr_FR';  // for testing :))
 
 
-#  and localization:
+// we need this here, because we include _functions_locale after defining locales
+// This is temporary.
+/*
+ * NT_(-)
+ * 
+ * No Translation
+ * Nevertheless, the string will be extracted by the gettext tools
+ */
+function NT_($string)
+{
+	return $string;
+}
+
+
+//{{{ defining the locales:
 # Add what you need and comment what you don't need
 $locales = array(
 	'cs_CZ' => array( // Czech, CZECH REPUBLIC
 									'charset' => 'utf-8',
 									'datefmt' => 'd. m. y',
 									'timefmt' => 'H.i:s',
+									'language' => NT_('Czech'),
 								),
 	'de_DE' => array( // German, Germany
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
+									'language' => NT_('German'),
 								),
 	'en_US' => array( // English, USA
 									'charset' => 'iso-8859-1',	// gettext will convert to this
-									'datefmt' => 'm/d/y',	
-									'timefmt' => 'h:i:s a',	
+									'datefmt' => 'm/d/y',
+									'timefmt' => 'h:i:s a',
+									'language' => NT_('English'),
 								),
 	'es_ES' => array(	// Spanish, SPAIN
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',	
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Spanish'),
 								),
-	'fr_FR' => array( // French, FRANCE	
+	'fr_FR' => array( // French, FRANCE
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',	
+									'timefmt' => 'H:i:s',
+									'language' => NT_('French'),
 								),
 	'it_IT' => array( // Italian, Italy
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
 									'timefmt' => 'H:i:s',
+									'language' => NT_('Italian'),
 								),
 	'ja_JP' => array(	// Japanese, JAPAN
 									'charset' => 'utf-8',
 									'datefmt' => 'Y/m/d',
 									'timefmt' => 'H:i:s',
+									'language' => NT_('Japanese'),
 								),
-	'lt_LT' => array( // Lithuanian	
+	'lt_LT' => array( // Lithuanian
 									'charset' => 'Windows-1257',
 									'datefmt' => 'Y-m-d',
 									'timefmt' => 'H:i:s',
-										),
-	'nb_NO' => array( // Bokmål, NORWAY    
-									'charset' => 'iso-8859-1', 
-									'datefmt' => 'd.m.y', 
-									'timefmt' => 'H:i:s',    
-                ), 
+									'language' => NT_('Lithuanian'),
+								),
+	'nb_NO' => array( // Bokmål, NORWAY
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Norwegian Bokm&aring;l'),
+								),
 	'nl_NL' => array( // Dutch, NETHERLANDS
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd-m-y',
-									'timefmt' => 'H:i:s',	
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Dutch'),
 								),
-	'pt_BR' => array( // Portuguese, BRAZIL	
+	'pt_BR' => array( // Portuguese, BRAZIL
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd.m.y',
-									'timefmt' => 'H:i:s',	
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Portuguese'),
 								),
-	'sv_SE' => array( // Sweedish, SWEDEN	
+	'sv_SE' => array( // Sweedish, SWEDEN
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'y-m-d',
-									'timefmt' => 'H:i:s',	
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Swedish'),
 								),
 	'zh_CN' => array( // Simplified Chinese, CHINA
 									'charset' => 'gb2312',
 									'datefmt' => 'y-m-d',
 									'timefmt' => 'H:i:s',
+									'language' => NT_('Simplified Chinese'),
 								),
 	'zh_TW' => array( // Traditional Chinese, TAIWAN
 									'charset' => 'utf-8',
 									'datefmt' => 'Y-m-d',
-									'timefmt' => 'H:i:s'
+									'timefmt' => 'H:i:s',
+									'language' => NT_('Traditional Chinese'),
 								),
 );
+//}}}
 
-/* How to format the dates and times:
+
+// Load locale related functions: (ne need NT_() here)
+require_once (dirname(__FILE__)."/$conf_dirout/$core_subdir/_functions_locale.php"); 
+
+
+/*{{{ How to format the dates and times:
 The following characters are recognized in the format string:
 a - "am" or "pm"
 A - "AM" or "PM"
@@ -150,18 +182,20 @@ y - year, 2 digits; i.e. "99"
 z - day of the year; i.e. "0" to "365"
 Z - timezone offset in seconds (i.e. "-43200" to "43200"). The offset for timezones west of UTC is always negative, and for those east of UTC is always positive.
 
-Unrecognized characters in the format string will be printed as-is. 
- */
+Unrecognized characters in the format string will be printed as-is.
+
+}}}*/
 
 # Default language (ISO code)
 # We get this one from the default locale above
-$default_language = substr( $default_locale, 0, 2 );
+#$default_language = substr( $default_locale, 0, 2 );
 
 # day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
 $start_of_week = 1;
 
-# Set this to 1 if you are a translator and wish to use the .po extraction script in 
+# Set this to 1 if you are a translator and wish to use the .po extraction script in
 # the /locales folder. Do not allow this on production servers as people could harm
 # your operations by continuously recomputing your language files.
 $allow_po_extraction = 1;
+
 ?>

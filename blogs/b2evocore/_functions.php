@@ -32,9 +32,11 @@ function dbconnect()
 {
 	global $connexion, $dbhost, $dbusername, $dbpassword, $dbname;
 
-	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword) or die( T_('Can\'t connect to the database server. MySQL said:').'<br />'.mysql_error());
+	$connexion = mysql_connect($dbhost,$dbusername,$dbpassword)
+		or die( T_('Can\'t connect to the database server. MySQL said:'). '<br />'. mysql_error());
 
-	$connexionbase = mysql_select_db( $dbname ) or die( sprintf(T_('Can\'t connect to the database %s. MySQL said:'), $base).'<br />'.mysql_error());
+	$connexionbase = mysql_select_db( $dbname )
+		or die( sprintf(T_('Can\'t connect to the database %s. MySQL said:'), $dbname). '<br />'. mysql_error());
 
 	return(($connexion && $connexionbase));
 }
@@ -51,9 +53,9 @@ function dbconnect()
  */
 function mysql_oops($sql_query)
 {
-	$error  = '<p class="error">'.T_('Oops, MySQL error!').'</p>';
-	$error .= '<p>Your query:<br /><code>' . $sql_query . '</code></p>';
-	$error .= '<p>MySQL said:<br /><code>' . mysql_error() . '</code></p>';
+	$error  = '<p class="error">'. T_('Oops, MySQL error!'). '</p>'
+		. '<p>Your query:<br /><code>'. $sql_query. '</code></p>'
+		. '<p>MySQL said:<br /><code>'. mysql_error(). '</code></p>';
 	die($error);
 }
 
@@ -305,20 +307,20 @@ function convert_chars( $content, $flag='html' )
 
 	if (locale_charset(false) == 'iso-8859-1')
 	{
- 		$content = preg_replace_callback(
- 			'/[\x80-\xff]/',
- 			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
- 			$content);
- 	}
+		$content = preg_replace_callback(
+			'/[\x80-\xff]/',
+			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
+			$content);
+	}
 
- 	if ($flag == "html")
+	if ($flag == "html")
 	{
- 		$newcontent = preg_replace('/&(?!#)/', '&amp;', $content);
- 	}
- 	else
+		$newcontent = preg_replace('/&(?!#)/', '&amp;', $content);
+	}
+	else
 	{	// unicode, xml...
- 		$newcontent = preg_replace('/&(?!#)/', '&#38;', $content);
- 	}
+		$newcontent = preg_replace('/&(?!#)/', '&#38;', $content);
+	}
 
 	// now converting: Windows CP1252 => Unicode (valid HTML)
 	// (if you've ever pasted text from MSWord, you'll understand)
@@ -345,16 +347,16 @@ function convert_bbcode( & $content)
 
 function convert_bbcode_email($content)
 {
-	$bbcode_email["in"] = array(
+	$bbcode_email['in'] = array(
 		'#\[email](.+?)\[/email]#eis',
 		'#\[email=(.+?)](.+?)\[/email]#eis'
 	);
-	$bbcode_email["out"] = array(
+	$bbcode_email['out'] = array(
 		"'<a href=\"mailto:'.antispambot('\\1').'\">'.antispambot('\\1').'</a>'",		// E-mail
 		"'<a href=\"mailto:'.antispambot('\\1').'\">\\2</a>'"
 	);
 
-	$content = preg_replace($bbcode_email["in"], $bbcode_email["out"], $content);
+	$content = preg_replace($bbcode_email['in'], $bbcode_email['out'], $content);
 	return ($content);
 }
 
@@ -436,7 +438,7 @@ function make_clickable($text)
 		return $text;
 	}
 
-	$ret = " " . $text;
+	$ret = ' '. $text;
 
 	$ret = preg_replace("#([\n ])(http|mailto)://([^, <>{}\n\r]+)#i", "\\1<a href=\"\\2://\\3\">\\2://\\3</a>", $ret);
 
@@ -463,20 +465,20 @@ function phpcurlme( & $string, $language = 'en')
 	global $use_smartquotes;
 	if( $use_smartquotes )
 	{
-    // This should take care of the single quotes
+		// This should take care of the single quotes
 		$string = preg_replace("/'([dmst])([ .,?!\)\/<])/i", "&#8217;$1$2", $string);
 		$string = preg_replace("/'([lrv])([el])([ .,?!\)\/<])/i", "&#8217;$1$2$3", $string);
 		$string = preg_replace("/([^=])(\s+)'([^ >])?(.*?)([^=])'(\s*)([^>&])/S", "$1$2&#8216;$3$4$5&#8217;$6$7", $string);
 
-    // time for the doubles
+		// time for the doubles
 		$string = preg_replace('/([^=])(\s+)"([^ >])?(.*?)([^=])"(\s*)([^>&])/S', "$1$2&#8220;$3$4$5&#8221;$6$7", $string);
-    // multi-paragraph
+		// multi-paragraph
 		$string = preg_replace('/<p>"(.*)<\/p>/U', "<p>&#8220;$1</p>", $string);
 
-    // not a quote, but whatever
+		// not a quote, but whatever
 		$string = str_replace('---', '&#8212;', $string);
 		$string = str_replace('--', '&#8211;', $string);
-  }
+	}
 }
 
 
@@ -559,20 +561,21 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 function get_weekstartend($mysqlstring, $start_of_week)
 {
-	$my = substr($mysqlstring,0,4);
-	$mm = substr($mysqlstring,8,2);
-	$md = substr($mysqlstring,5,2);
-	$day = mktime(0,0,0, $md, $mm, $my);
-	$weekday = date('w',$day);
+	$my = substr($mysqlstring, 0, 4);
+	$mm = substr($mysqlstring, 8, 2);
+	$md = substr($mysqlstring, 5, 2);
+	$day = mktime(0, 0, 0, $md, $mm, $my);
+	$weekday = date('w', $day);
 	$i = 86400;
-	while ($weekday > $start_of_week) {
-		$weekday = date('w',$day);
+	while( $weekday > $start_of_week )
+	{
+		$weekday = date('w', $day);
 		$day = $day - 86400;
 		$i = 0;
 	}
 	$week['start'] = $day + 86400 - $i;
 	$week['end']   = $day + 691199;
-	return ($week);
+	return( $week );
 }
 
 
@@ -632,9 +635,8 @@ function get_settings($setting)
 }
 
 
-function alert_error($msg)
+function alert_error( $msg )
 { // displays a warning box with an error message (original by KYank)
-	global $default_language;
 	?>
 	<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<head>

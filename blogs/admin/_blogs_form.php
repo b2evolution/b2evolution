@@ -30,7 +30,7 @@ switch( $next_action )
 		<?php 
 			form_text( 'blog_name', $blog_name, 50, T_('Full Name') );
 			form_text( 'blog_shortname', $blog_shortname, 12, T_('Short Name') );
-			form_select( 'blog_lang', $blog_lang, 'lang_options', T_('Main Language') );
+			form_select( 'blog_lang', $blog_lang, 'locale_options', T_('Main Language') );
 		?>
 	</fieldset>
 

@@ -134,30 +134,34 @@ uasort($report, 'my_usort_function');
 
 	echo '</tr>';
 
-$i=0;
-foreach ($report as $key => $value) {
-$i++;
-if ($i%2==0) {
-	$color="#dedede";
-	$nr=1;
-} else {
-	$color="#CECECE";
-	$nr=2;
-}
-		echo "\n<tr>";
-		$lang = substr( $key, 0, 2 );
+	$i = 0;
+	foreach ($report as $key => $value) {
+	$i++;
+	if( $i % 2 == 0 )
+	{
+		$color = '#dedede';
+		$nr = 1;
+	}
+	else
+	{
+		$color = '#CECECE';
+		$nr = 2;
+	}
 		
-		echo "\n\t<td style=\"background-color:$color\">". $key, "</td>";
-		echo "\n\t<td style=\"background-color:$color\">". $languages[$lang] . "</td>";
-		echo "\n\t<td style=\"background-color:$color\">". $locales[$key]['charset'] . "</td>";
-		echo "\n\t<td style=\"background-color:#". $value[0] . "\">". $value[1] ."% done</td>";
-		echo "\n\t<td class=\"translated$nr\">". $value[2] ."</td>";
-		echo "\n\t<td class=\"fuzzy$nr\">". $value [3] . "</td>";
-		echo "\n\t<td class=\"untranslated$nr\">". $value[4] ."</td>";
-		echo "\n\t<td style=\"background-color:$color\">". $value[5] ."</td>";
-		if( $allow_po_extraction  )
-			echo "\n\t<td style=\"background-color:$color\">", '[<a href="posplit.php?locale='.$key.'">Extract</a>]</td>';
-		echo "\t</tr>";
+	echo "\n<tr>";
+	$lang = substr( $key, 0, 2 );
+	
+	echo "\n\t<td style=\"background-color:$color\">". $key, "</td>";
+	echo "\n\t<td style=\"background-color:$color\">". $locales[$key]['language'] . "</td>";
+	echo "\n\t<td style=\"background-color:$color\">". $locales[$key]['charset'] . "</td>";
+	echo "\n\t<td style=\"background-color:#". $value[0] . "\">". $value[1] ."% done</td>";
+	echo "\n\t<td class=\"translated$nr\">". $value[2] ."</td>";
+	echo "\n\t<td class=\"fuzzy$nr\">". $value [3] . "</td>";
+	echo "\n\t<td class=\"untranslated$nr\">". $value[4] ."</td>";
+	echo "\n\t<td style=\"background-color:$color\">". $value[5] ."</td>";
+	if( $allow_po_extraction  )
+		echo "\n\t<td style=\"background-color:$color\">", '[<a href="posplit.php?locale='.$key.'">Extract</a>]</td>';
+	echo "\t</tr>";
 }
 ?>
 </table>

@@ -103,7 +103,7 @@ if ($use_spellchecker)
 
 		<span class="line">
 		<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
-		<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select>
+		<select name="post_lang" id="post_lang" tabindex="2"><?php locale_options( $post_lang ) ?></select>
 		</span>
 
 		<?php if( $use_post_url ) { ?>

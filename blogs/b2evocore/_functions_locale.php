@@ -15,7 +15,7 @@
  * Translated a text to the desired locale (b2evo localization only)
  * or to the current locale
  */
-if( ($use_l10n==1) && function_exists('_') )
+if( ($use_l10n == 1) && function_exists('_') )
 {	// We are going to use GETTEXT
 	function T_( $string, $req_locale = '' )
 	{
@@ -29,7 +29,7 @@ if( ($use_l10n==1) && function_exists('_') )
 		return $string;
 	}
 }
-elseif( $use_l10n==2 )
+elseif( $use_l10n == 2 )
 {	// We are going to use b2evo localization:
 	function T_( $string, $req_locale = '' )
 	{
@@ -68,18 +68,6 @@ else
 	{	
 		return $string;
 	}
-}
-
-
-/*
- * NT_(-)
- * 
- * No Translation
- * Nevertheless, the string will be extracted by the gettext tools
- */
-function NT_($string)
-{
-	return $string;
 }
 
 
@@ -205,20 +193,58 @@ function locale_timefmt()
 
 
 /*
- * lang_options(-)
+ * locale_options(-)
+ *
+ *	Outputs a <option> set with default locale selected
+ *
+ * was: lang_options(-)
+ *
  */
-function lang_options( $default = '' )
+function locale_options( $default = '' )
 {
-	global $languages, $default_language;
+	global $locales, $default_locale;
 	
-	if( !isset( $default ) ) $default = $default_language;
+	if( !isset( $default ) ) $default = $default_locale;
 	
-	foreach( $languages as $this_lang => $this_lang_name )
+	foreach( $locales as $this_localekey => $this_locale )
 	{
-		echo '<option value="'.$this_lang.'"';
-		if( $this_lang == $default ) echo ' selected="selected"';
-		echo '>'.T_($this_lang_name).'</option>';
+		echo '<option value="'. $this_localekey. '"';
+		if( $this_localekey == $default ) echo ' selected="selected"';
+		echo '>'. T_($this_locale['language']). '</option>';
 	}
+}
+
+
+/*
+ * locale_from_httpaccept(-)
+ *
+ *	@return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
+ *
+ */
+function locale_from_httpaccept()
+{
+	global $locales, $default_locale;
+	if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+	{
+		#pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
+		// look for each language in turn in the preferences, which we saved in $langs
+		foreach( $locales as $localekey => $v ) {
+			#echo 'checking '. $localekey;
+			$checklang = substr($localekey, 0, 2);
+			$pos = strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], $checklang);
+			if( $pos !== false )
+			{
+				$text[] = str_pad($pos, 3, '0', STR_PAD_LEFT). '-'. $checklang. '-'. $localekey;
+			}
+		}
+		if( sizeof($text) != 0 ) sort( $text );
+		
+		#var_dump($matches);
+		// the preferred locale/language should be in $text[0]
+		if( preg_match('/\d\d\d\-([a-z]{2})\-(.*)/', $text[0], $matches) )
+			return $matches[2];
+	}
+	return $default_locale;
 }
 
 ?>

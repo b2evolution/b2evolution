@@ -33,7 +33,7 @@ switch($action)
 		param( 'blog_tagline', 'html', '' );
 		param( 'blog_description', 'string', '' );
 		param( 'blog_longdesc', 'html', '' );
-		param( 'blog_lang', 'string', $default_language );
+		param( 'blog_lang', 'string', $default_locale );
 		param( 'blog_siteurl', 'string', '' );
 		param( 'blog_filename', 'string', 'new_file.php' );
 		param( 'blog_staticfilename', 'string', '' );

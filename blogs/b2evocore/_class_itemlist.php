@@ -433,11 +433,11 @@ class ItemList extends DataObjectList
 
 		if( $blog == 1 )
 		{	// Special case: we aggregate all cats from all blogs
-			$this->request .= "WHERE 1 ";
+			$this->request .= 'WHERE 1 ';
 		}
 		else
 		{
-			$this->request .= "WHERE cat_blog_ID = $blog ";
+			$this->request .= 'WHERE cat_blog_ID = '. $blog;
 		}
 
 		$this->request .= $where. " ORDER BY post_$orderby $limits";
@@ -448,7 +448,7 @@ class ItemList extends DataObjectList
 			$this->request = 'SELECT 0 AS ID'; // dummy mysql query for the preview
 		}
 
-		// echo $this->request;
+		//echo $this->request;
 		$querycount++;
 		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
 
@@ -588,9 +588,9 @@ class ItemList extends DataObjectList
 
 		if( $this->row_num == 0 )
 		{	// We need to initialize
- 			$this->row = & $this->result_rows[0];
+			$this->row = & $this->result_rows[0];
 			$row = $this->row;
- 			$this->row_num = 1;
+			$this->row_num = 1;
 			$this->get_postdata();
 		}
 

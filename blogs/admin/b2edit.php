@@ -206,7 +206,7 @@ switch($action)
 		$post_url = format_to_edit( $post_url, false );
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
-		param( 'post_lang', 'string', $default_language );
+		param( 'post_lang', 'string', $default_locale );
 
 		param( 'edit_date', 'integer', 0 );
 		param( 'aa', 'string', date( 'Y', $localtimenow) );

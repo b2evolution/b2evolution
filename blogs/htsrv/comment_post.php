@@ -83,14 +83,13 @@ if( !$ok )
 {
 	errors_add( T_('You can only post a new comment every 30 seconds.') );
 }
+/* end flood-protection */
 
-if( errors_display( T_('Cannot post comment, please correct these errors:'), 
-	'[<a href="javascript:history.go(-1)">' . T_('Back to comment editing') . '</a>]' ) )
+if( errors_display( T_('Cannot post comment, please correct these errors:'),
+	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ) )
 {
 	exit();
 }
-
-/* end flood-protection */
 
 $query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content)  VALUES( $comment_post_ID, 'comment', '".addslashes($author)."','".addslashes($email)."','".addslashes($url)."','$user_ip','$now','".addslashes($comment)."' )";
 $querycount++;

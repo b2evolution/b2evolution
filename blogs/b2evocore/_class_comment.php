@@ -10,7 +10,7 @@
  *
  * @package b2evocore
  */
-require_once dirname(__FILE__).'/_class_dataobject.php';
+require_once dirname(__FILE__). '/_class_dataobject.php';
 
 /**
  * Comment Class
@@ -47,7 +47,7 @@ class Comment extends DataObject
 	
 		if( $db_row == NULL )
 		{
-			echo "null comment";
+			echo 'null comment';
 		}
 		else
 		{

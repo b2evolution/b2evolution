@@ -9,37 +9,37 @@
  */
 
 // Initialize everything:
-require_once (dirname(__FILE__).'/_main.php');
+require_once (dirname(__FILE__). '/_main.php');
 
 // Getting GET or POST parameters:
 param( 'blog', 'integer', $default_to_blog, true );
-param( 'p', 'integer', '', true );							// Specific post number to display
-param( 'm', 'integer', '', true );							// YearMonth(Day) to display
-param( 'w', 'integer', '', true );							// Week number
-param( 'cat', 'string', '', true );							// List of cats to restrict to
-param( 'catsel', 'array', array(), true );	// Array of cats to restrict to
-param( 'author', 'integer', '', true );					// List of authors to restrict to
-param( 'order', 'string', 'DESC', true );		// ASC or DESC
-param( 'orderby', 'string', '', true );					// list of fields to order by
-param( 'posts', 'integer', '', true );					// # of posts to display on the page
-param( 'paged', 'integer', '', true );					// List page number in paged display
-param( 'poststart', 'integer', '', true );			// Start results at this position
-param( 'postend', 'integer', '', true );				// End results at this position
-// param( 'search', 'string' );				// obsolete (dangerous!)
-param( 's', 'string', '', true );								// Search string
-param( 'sentence', 'string', 'AND', true );				// Search for sentence or for words
-param( 'exact', 'integer', '', true );					// Require exact match of title or contents
-param( 'preview', 'integer', 0, true );				// Is this preview ?
-param( 'calendar', 'string', '', true );				// Display a specific month in the calendar
-param( 'c', 'string', '', true );				// deprecated
+param( 'p', 'integer', '', true );              // Specific post number to display
+param( 'm', 'integer', '', true );              // YearMonth(Day) to display
+param( 'w', 'integer', '', true );              // Week number
+param( 'cat', 'string', '', true );             // List of cats to restrict to
+param( 'catsel', 'array', array(), true );      // Array of cats to restrict to
+param( 'author', 'integer', '', true );         // List of authors to restrict to
+param( 'order', 'string', 'DESC', true );       // ASC or DESC
+param( 'orderby', 'string', '', true );         // list of fields to order by
+param( 'posts', 'integer', '', true );          // # of posts to display on the page
+param( 'paged', 'integer', '', true );          // List page number in paged display
+param( 'poststart', 'integer', '', true );      // Start results at this position
+param( 'postend', 'integer', '', true );        // End results at this position
+// param( 'search', 'string' );                 // obsolete (dangerous!)
+param( 's', 'string', '', true );               // Search string
+param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
+param( 'exact', 'integer', '', true );          // Require exact match of title or contents
+param( 'preview', 'integer', 0, true );         // Is this preview ?
+param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
+param( 'c', 'string', '', true );               // deprecated
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
 param( 'tb', 'integer', 0, true );
 param( 'pb', 'integer', 0, true );
 param( 'disp', 'string', '', true );
-param( 'stats', 'integer', 0 );					// deprecated
-if(!isset($timestamp_min)) $timestamp_min = '';
-if(!isset($timestamp_max)) $timestamp_max = '';
+param( 'stats', 'integer', 0 );                 // deprecated
+if( !isset($timestamp_min) ) $timestamp_min = '';
+if( !isset($timestamp_max) ) $timestamp_max = '';
 
 if( empty($disp) )
 {	// Conversion support for old params:

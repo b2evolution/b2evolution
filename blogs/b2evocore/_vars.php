@@ -15,7 +15,7 @@ $b2_version = '0.8.9+CVS';
 if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )
 {	// We are going to use GETTEXT
 	// Specify location of translation tables :
-	bindtextdomain( 'messages', dirname(__FILE__).'/../locales'); 
+	bindtextdomain( 'messages', dirname(__FILE__). '/../locales');
 	// Choose domain: (name of the .mo files)
 	textdomain( 'messages' );
 }
@@ -32,7 +32,7 @@ $pagenow = $pagenow[0];
 
 // browser detection
 $is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
-if (!isset($HTTP_USER_AGENT)) 
+if (!isset($HTTP_USER_AGENT))
 {
 	if( isset($_SERVER['HTTP_USER_AGENT']) )
 		$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];

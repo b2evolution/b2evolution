@@ -7,16 +7,16 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-require_once dirname(__FILE__).'/_class_comment.php';
+require_once dirname(__FILE__). '/_class_comment.php';
 
 /*
- * generic_ctp_number(-) 
+ * generic_ctp_number(-)
  *
  * generic comments/trackbacks/pingbacks numbering
  *
  * fplanque: added stuff to load all number for this page at ounce
  */
-function generic_ctp_number($post_id, $mode = 'comments') 
+function generic_ctp_number($post_id, $mode = 'comments')
 {
 	global $debug, $postdata, $tablecomments, $querycount, $cache_ctp_number, $use_cache, $preview;
 	if( $preview )
@@ -36,18 +36,18 @@ function generic_ctp_number($post_id, $mode = 'comments')
 		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count FROM $tablecomments WHERE comment_post_ID IN ($postIDlist) GROUP BY comment_post_ID, comment_type";
 		$result = mysql_query($query) or mysql_oops($query);
 		$querycount++;
-		while($row = mysql_fetch_object($result)) 
+		while($row = mysql_fetch_object($result))
 		{
 			switch( $row->comment_type )
 			{
 				case 'comment';
 					$cache_ctp_number[$row->comment_post_ID]['comments'] = $row->type_count;
 					break;
-					
+
 				case 'trackback';
 					$cache_ctp_number[$row->comment_post_ID]['trackbacks'] = $row->type_count;
 					break;
-					
+
 				case 'pingback';
 					$cache_ctp_number[$row->comment_post_ID]['pingbacks'] = $row->type_count;
 					break;
@@ -59,25 +59,25 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{
 		echo "cache set";
 	}*/
-	if (!isset($cache_ctp_number[$post_id]) || (!$use_cache)) 
+	if (!isset($cache_ctp_number[$post_id]) || (!$use_cache))
 	{	// this should be extremely rare...
 		// echo "CACHE not set for $post_id";
 		$post_id = intval($post_id);
 		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count FROM $tablecomments WHERE comment_post_ID = $post_id GROUP BY comment_post_ID, comment_type";
 		$result = mysql_query($query) or mysql_oops($query);
 		$querycount++;
-		while($row = mysql_fetch_object($result)) 
+		while($row = mysql_fetch_object($result))
 		{
 			switch( $row->comment_type )
 			{
 				case 'comment';
 					$cache_ctp_number[$row->comment_post_ID]['comments'] = $row->type_count;
 					break;
-					
+
 				case 'trackback';
 					$cache_ctp_number[$row->comment_post_ID]['trackbacks'] = $row->type_count;
 					break;
-					
+
 				case 'pingback';
 					$cache_ctp_number[$row->comment_post_ID]['pingbacks'] = $row->type_count;
 					break;
@@ -97,35 +97,35 @@ function generic_ctp_number($post_id, $mode = 'comments')
 /*
  * get_commentdata(-)
  */
-function get_commentdata($comment_ID,$no_cache=0) 
+function get_commentdata($comment_ID,$no_cache=0)
 { // less flexible, but saves mysql queries
 	global $rowc,$id,$commentdata,$tablecomments,$querycount, $baseurl;
 
-	if ($no_cache) 
+	if ($no_cache)
 	{
 		$query="SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
 		// fplanque TODO: add post title etc?
-		$result=mysql_query($query);
+		$result = mysql_query($query);
 		$querycount++;
 		$myrow = mysql_fetch_array($result);
-	} 
+	}
 	else
 	{
-		$myrow['comment_ID']=$rowc->comment_ID;
-		$myrow['comment_post_ID']=$rowc->comment_post_ID;
-		$myrow['comment_author']=$rowc->comment_author;
-		$myrow['comment_author_email']=$rowc->comment_author_email;
-		$myrow['comment_author_url']=$rowc->comment_author_url;
-		$myrow['comment_author_IP']=$rowc->comment_author_IP;
-		$myrow['comment_date']=$rowc->comment_date;
-		$myrow['comment_content']=$rowc->comment_content;
-		$myrow['comment_karma']=$rowc->comment_karma;
-		$myrow['comment_type']=$rowc->comment_type;
-		if( isset($rowc->ID) ) $myrow['post_ID']=$rowc->ID;	
-		if( isset($rowc->post_title) ) $myrow['post_title']=$rowc->post_title;
-		if( isset($rowc->blog_name) ) $myrow['blog_name']=$rowc->blog_name;
-		if( isset($rowc->blog_siteurl) ) $myrow['blog_siteurl']=$baseurl.$rowc->blog_siteurl;
-		if( isset($rowc->blog_stub) ) $myrow['blog_stub']=$rowc->blog_stub;
+		$myrow['comment_ID'] = $rowc->comment_ID;
+		$myrow['comment_post_ID'] = $rowc->comment_post_ID;
+		$myrow['comment_author'] = $rowc->comment_author;
+		$myrow['comment_author_email'] = $rowc->comment_author_email;
+		$myrow['comment_author_url'] = $rowc->comment_author_url;
+		$myrow['comment_author_IP'] = $rowc->comment_author_IP;
+		$myrow['comment_date'] = $rowc->comment_date;
+		$myrow['comment_content'] = $rowc->comment_content;
+		$myrow['comment_karma'] = $rowc->comment_karma;
+		$myrow['comment_type'] = $rowc->comment_type;
+		if( isset($rowc->ID) ) $myrow['post_ID'] = $rowc->ID;
+		if( isset($rowc->post_title) ) $myrow['post_title'] = $rowc->post_title;
+		if( isset($rowc->blog_name) ) $myrow['blog_name'] = $rowc->blog_name;
+		if( isset($rowc->blog_siteurl) ) $myrow['blog_siteurl'] = $baseurl.$rowc->blog_siteurl;
+		if( isset($rowc->blog_stub) ) $myrow['blog_stub'] = $rowc->blog_stub;
 	}
 	return($myrow);
 }
@@ -134,11 +134,11 @@ function get_commentdata($comment_ID,$no_cache=0)
 /*
  * Comment_get_by_ID(-)
  */
-function Comment_get_by_ID( $comment_ID ) 
+function Comment_get_by_ID( $comment_ID )
 {
 	global $cache_Comments, $use_cache, $tablecomments, $querycount;
-	
-	if((empty($cache_Comments[$comment_ID])) OR (!$use_cache)) 
+
+	if((empty($cache_Comments[$comment_ID])) OR (!$use_cache))
 	{	// Load this entry into cache:
 		$query = "SELECT * FROM $tablecomments WHERE comment_ID = $comment_ID";
 		$result = mysql_query($query);
@@ -156,23 +156,23 @@ function Comment_get_by_ID( $comment_ID )
 }
 
 
-/* 
+/*
  * TEMPLATE functions
  */
 
-/** 
+/**
  * Display "Last comments" title if these have been requested
  *
  * {@internal last_comments_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to 
+ * @param mixed Output format, see {@link format_to_output()} or false to
  *								return value instead of displaying it
  */
-function last_comments_title( $prefix = ' ', $display = 'htmlbody' ) 
+function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
 {
 	global $disp;
-	
+
 	if( $disp == 'comments' )
 	{
 		$info = $prefix.T_('Last comments');
@@ -192,7 +192,7 @@ function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
 /*
  * comments_number(-)
  */
-function comments_number( $zero='#', $one='#', $more='#' ) 
+function comments_number( $zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = T_('Leave a comment');
 	if( $one == '#' ) $one = T_('1 comment');
@@ -218,12 +218,12 @@ function comments_number( $zero='#', $one='#', $more='#' )
  *
  * Displays link to comments page
  */
-function comments_link($file='', $tb=0, $pb=0 ) 
+function comments_link($file='', $tb=0, $pb=0 )
 {
 	global $id;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo $file.'?p='.$id.'&amp;c=1';
+	echo $file. '?p='. $id. '&amp;c=1';
 	if( $tb == 1 )
 	{	// include trackback // fplanque: added
 		echo '&amp;tb=1';
@@ -244,7 +244,7 @@ You should put this tag before the </head> tag in your template.
  *
  * fplanque: added resizable !!!
  */
-function comments_popup_script($width=560, $height=400, $file='comment_popup.php', $trackbackfile='trackback_popup.php', $pingbackfile='pingback_popup.php') 
+function comments_popup_script($width=560, $height=400, $file='comment_popup.php', $trackbackfile='trackback_popup.php', $pingbackfile='pingback_popup.php')
 {
 	global $b2commentspopupfile, $b2trackbackpopupfile, $b2pingbackpopupfile, $b2commentsjavascript;
 	$b2commentspopupfile = $file;
@@ -254,7 +254,7 @@ function comments_popup_script($width=560, $height=400, $file='comment_popup.php
 ?>
 	<script language="javascript" type="text/javascript">
 	<!--
-		function b2open( url ) 
+		function b2open( url )
 		{
 			window.open( url, '_blank', 'width=<?php echo $width; ?>,height=<?php echo $height; ?>,scrollbars,status,resizable');
 		}
@@ -263,11 +263,11 @@ function comments_popup_script($width=560, $height=400, $file='comment_popup.php
 <?php }
 
 
-/* 
+/*
  * comments_popup_link(-)
  *
  */
-function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='') 
+function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 {
 	global $blog, $id, $b2commentspopupfile, $b2commentsjavascript;
 	echo '<a href="';
@@ -275,8 +275,8 @@ function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 	{
 		echo get_bloginfo('blogurl').'?template=popup&amp;p='.$id.'&amp;c=1';
 		echo '" onclick="b2open(this.href); return false"';
-	} 
-	else 
+	}
+	else
 	{	// if comments_popup_script() is not in the template, display simple comment link
 		comments_link();
 		echo '"';
@@ -294,7 +294,7 @@ function comments_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
  *
  * @deprecated deprecated by {@link DataObject::ID()}
  */
-function comment_ID() 
+function comment_ID()
 {
 	global $commentdata;	echo $commentdata['comment_ID'];
 }
@@ -304,9 +304,9 @@ function comment_ID()
  *
  * @deprecated deprecated by {@link Comment::author()}
  */
-function comment_author() 
+function comment_author()
 {
-	global $commentdata;	
+	global $commentdata;
 	echo stripslashes($commentdata['comment_author']);
 }
 
@@ -315,7 +315,7 @@ function comment_author()
  *
  * @deprecated deprecated by {@link Comment::author_email()}
  */
-function comment_author_email() 
+function comment_author_email()
 {
 	global $commentdata;	echo antispambot(stripslashes($commentdata['comment_author_email']));
 }
@@ -325,7 +325,7 @@ function comment_author_email()
  *
  * @deprecated deprecated by {@link Comment::author_url()}
  */
-function comment_author_url($echo=true) 
+function comment_author_url($echo=true)
 {
 	global $commentdata;
 	$url = trim(stripslashes($commentdata['comment_author_url']));
@@ -365,7 +365,7 @@ function comment_author_url_basedomain( $disp = true )
  *
  * @deprecated deprecated by {@link Comment::author_email()}
  */
-function comment_author_email_link($linktext='', $before='', $after='') 
+function comment_author_email_link($linktext='', $before='', $after='')
 {
 	global $commentdata;
 	$email=$commentdata['comment_author_email'];
@@ -383,7 +383,7 @@ function comment_author_email_link($linktext='', $before='', $after='')
  *
  * @deprecated deprecated by {@link $Comment->author_url()}
  */
-function comment_author_url_link($linktext='', $before='', $after='') 
+function comment_author_url_link($linktext='', $before='', $after='')
 {
 	global $commentdata;
 	$url = trim(stripslashes($commentdata['comment_author_url']));
@@ -412,7 +412,7 @@ function comment_author_IP() {
  *
  * @deprecated deprecated by {@link $Comment::content()}
  */
-function comment_text() 
+function comment_text()
 {
 	global $commentdata;
 	global $use_textile;
@@ -434,11 +434,10 @@ function comment_text()
  */
 function comment_date($d='') {
 	global $commentdata;
-	if ($d == '') {
+	if( $d == '' )
 		echo mysql2date( locale_datefmt(), $commentdata['comment_date']);
-	} else {
+	else
 		echo mysql2date($d, $commentdata['comment_date']);
-	}
 }
 
 /**
@@ -446,13 +445,13 @@ function comment_date($d='') {
  *
  * @deprecated deprecated by {@link $Comment::time()}
  */
-function comment_time($d='') {
+function comment_time( $d = '' )
+{
 	global $commentdata;
-	if ($d == '') {
+	if( $d == '' )
 		echo mysql2date( locale_timefmt(), $commentdata['comment_date']);
-	} else {
+	else
 		echo mysql2date($d, $commentdata['comment_date']);
-	}
 }
 
 /**
@@ -461,7 +460,7 @@ function comment_time($d='') {
  *
  * @deprecated deprecated by {@link $Comment::post_title()}
  */
-function comment_post_title() 
+function comment_post_title()
 {
 	global $commentdata;
 	$title = $commentdata['post_title'];
@@ -474,10 +473,10 @@ function comment_post_title()
  *
  * @deprecated deprecated by {@link $Comment::post_link()}
  */
-function comment_post_link() 
+function comment_post_link()
 {
 	global $commentdata;
-	echo gen_permalink( $commentdata['blog_siteurl'].'/'.$commentdata['blog_stub'], $commentdata['post_ID'],	'id', 'single' );
+	echo gen_permalink( $commentdata['blog_siteurl']. '/'. $commentdata['blog_stub'], $commentdata['post_ID'],	'id', 'single' );
 }
 
 
@@ -487,7 +486,7 @@ function comment_post_link()
  *
  * @deprecated 
  */
-function comment_blog_name( $disp = true ) 
+function comment_blog_name( $disp = true )
 {
 	global $commentdata;
 	$blog_name = stripslashes($commentdata['blog_name']);
@@ -497,7 +496,7 @@ function comment_blog_name( $disp = true )
 }
 
 /*****
- * /Comment tags 
+ * /Comment tags
  *****/
 
 
