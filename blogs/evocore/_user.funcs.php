@@ -303,6 +303,8 @@ function get_usernumposts( $userid )
 
 /**
  * get_user_info(-)
+ *
+ * @deprecated by UserCache
  */
 function get_user_info( $show = '', $this_userdata = '' )
 {
@@ -629,6 +631,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/08 03:06:26  blueyed
+ * marked get_user_info() as deprecated
+ *
  * Revision 1.9  2005/01/03 19:15:15  fplanque
  * no message
  *
