@@ -81,12 +81,12 @@ class Sessions extends Widget
 			return true;
 		}
 
-		global $DB, $UserCache, $localtimenow, $online_session_timeout;
+		global $DB, $UserCache, $servertimenow, $online_session_timeout;
 
 		$this->_countGuests = 0;
 
 		foreach( $DB->get_results( 'SELECT sess_user_ID FROM T_sessions
-																WHERE sess_lastseen > "'.date( 'Y-m-d H:i:s', ($localtimenow - $online_session_timeout) ).'"' )
+																WHERE sess_lastseen > "'.date( 'Y-m-d H:i:s', ($servertimenow - $online_session_timeout) ).'"' )
 							as $row )
 		{
 			if( !empty( $row->sess_user_ID )
