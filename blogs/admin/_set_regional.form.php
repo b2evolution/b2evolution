@@ -52,7 +52,7 @@ if( $action == 'edit' )
 		$Form->text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'), T_('Must match the lang file charset.'), 15 );
 		$Form->text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'), T_('See below.'), 10 );
 		$Form->text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'), T_('See below.'), 10 );
-		$Form->text( 'newloc_startofweek', (isset($ltemplate['startofweek']) ? $ltemplate['startofweek'] : ''), 1, T_('Start of week'), T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc'), 1 );
+		$Form->dayOfWeek( 'newloc_startofweek', (isset($ltemplate['startofweek']) ? $ltemplate['startofweek'] : 0), T_('Start of week'), T_('Day at the start of the week.') );
 		$Form->text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
 			T_('the lang file to use, from the <code>locales</code> subdirectory'), 20 );
 		$Form->text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
@@ -222,7 +222,16 @@ else
 				<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="10" size="6" />
 			</td>
 			<td>
-				<input type="text" name="loc_'.$i.'_startofweek" value="'.$locales[$lkey]['startofweek'].'" maxlength="1" size="1" />
+				';
+				// bad hack to avoid fieldstart/fieldend
+				$old_fieldstart = $Form->fieldstart;
+				$old_fieldend = $Form->fieldend;
+				$Form->fieldstart = '';
+				$Form->fieldend = '';
+				$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locales[$lkey]['startofweek'], '', '' );
+				$Form->fieldstart = $old_fieldstart;
+				$Form->fieldend = $old_fieldend;
+				echo '
 			</td>';
 
 			if( $current_User->check_perm( 'options', 'edit' ) )
