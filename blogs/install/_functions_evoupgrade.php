@@ -312,10 +312,12 @@ function upgrade_b2evo_tables()
 		
 		echo 'Upgrading settings table... ';
 		$query = "ALTER TABLE $tablesettings
+							ADD COLUMN default_locale VARCHAR( 20 ) DEFAULT 'en-US' NOT NULL AFTER ID,
 							ADD COLUMN pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
 							ADD COLUMN pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
+
 
 	}
 

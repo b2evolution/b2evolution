@@ -45,6 +45,7 @@ switch($action)
 		$post_urltitle = $edited_Item->get( 'urltitle' );
 		$post_url = $edited_Item->get( 'url' );
 		$content = format_to_edit( $edited_Item->get( 'content' ), $edited_Item->get( 'autobr' ) );
+		$post_autobr = $edited_Item->get( 'autobr' );
 		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_comments = $edited_Item->get( 'comments' );
@@ -87,6 +88,7 @@ switch($action)
 
 		$content = $commentdata['comment_content'];
 		$content = format_to_edit($content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') );
+		$post_autobr = ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out');
 		$edit_date = 0;
 		$aa = mysql2date('Y', $commentdata['comment_date']);
 		$mm = mysql2date('m', $commentdata['comment_date']);
@@ -116,9 +118,9 @@ switch($action)
 
 		// ---------------------------------- START OF BLOG LIST ----------------------------------
 		$sep = '';
-		for( $curr_blog_ID=blog_list_start();
-					$curr_blog_ID!=false;
-					 $curr_blog_ID=blog_list_next() )
+		for( $curr_blog_ID = blog_list_start();
+					$curr_blog_ID != false;
+					$curr_blog_ID = blog_list_next() )
 		{
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $curr_blog_ID ) )
 			{	// Current user is not a member of this blog...
@@ -188,16 +190,19 @@ switch($action)
 				$post_status = 'deprecated';
 		}
 
-		$action='post';
+		$action = 'post';
 
 		// These are bookmarklet params:
 		param( 'popuptitle', 'string', '' );
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		param( 'editing', 'integer', 0 );
-		param( 'post_autobr', 'integer', ($editing ? 0 : get_settings('AutoBR') ) );	// Use real default only if we weren't already editing
-		set_settings( 'autobr', $post_autobr );
+		/*   // DH to FP: $editing not used anywhere else. remove it?
+		#param( 'editing', 'integer', 0 );
+		#pre_dump( $editing, 'autobr-b2edit-default' );
+		#param( 'post_autobr', 'integer', ($editing ? 0 : get_settings('AutoBR') ) );	// Use real default only if we weren't already editing
+		*/
+		param( 'post_autobr', 'integer', get_settings('AutoBR') );  // Use default if nothing provided
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;

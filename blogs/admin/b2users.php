@@ -50,7 +50,7 @@ switch ($action)
 		// remember, to display the forms
 		$user = $edited_user_ID;
 		
-		echo '<div class="panelblock">' . T_('User updated.') . '</div>';
+		echo '<div class="panelinfo">' . T_('User updated.') . '</div>';
 		break;
 
 
@@ -69,7 +69,7 @@ switch ($action)
 				|| ($prom == 'down' && $usertopromote_level < 1)
 			)
 		{
-			echo '<div class="panelblock"><span class="error">' . T_('Invalid promotion.') . '</span></div>';
+			echo '<div class="panelinfo"><span class="error">' . T_('Invalid promotion.') . '</span></div>';
 		}
 		else
 		{
@@ -85,9 +85,9 @@ switch ($action)
 			$result = $DB->query( $sql );
 			
 			if( $result )
-				echo '<div class="panelblock">User promoted.</div>';
+				echo '<div class="panelinfo">User promoted.</div>';
 			else
-				echo '<div class="panelblock"><span class="error">' . sprintf(T_('Couldn\'t change %d\'s level.', $id));
+				echo '<div class="panelinfo"><span class="error">' . sprintf(T_('Couldn\'t change %d\'s level.', $id));
 			
 		}
 		break;
@@ -108,7 +108,7 @@ switch ($action)
 		// Delete from DB:
 		$edited_User->dbdelete();
 
-		echo '<div class="panelblock">User deleted.</div>';
+		echo '<div class="panelinfo">User deleted.</div>';
 		break;
 
 
@@ -154,16 +154,15 @@ switch ($action)
 		// remember to display the forms
 		$group = $edited_grp_ID;
 
-		echo '<div class="panelblock">' . T_('Group updated.') . '</div>';
+		echo '<div class="panelinfo">' . T_('Group updated.') . '</div>';
 		break;
 
 }
 
 if( $current_User->check_perm( 'users', 'view', false ) )
 {
-	// view group
 	if( ($group != 0) )
-	{
+	{ // view group
 		// Check permission:
 		$current_User->check_perm( 'users', 'view', true );
 		
@@ -171,14 +170,13 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
 		
-	// view user
 	if( $user != 0 )
-	{
-			// Check permission:
-			$current_User->check_perm( 'users', 'view', true );
-	
-			$edited_User = & new User( get_userdata($user) );
-			require(dirname(__FILE__). '/_users_form.php');
+	{ // view user
+		// Check permission:
+		$current_User->check_perm( 'users', 'view', true );
+
+		$edited_User = & new User( get_userdata($user) );
+		require(dirname(__FILE__). '/_users_form.php');
 	}
 }
 

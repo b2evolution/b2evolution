@@ -217,11 +217,13 @@ function locale_options( $default = '' )
 	if( !isset( $default ) ) $default = $default_locale;
 	
 	foreach( $locales as $this_localekey => $this_locale )
-	{
-		echo '<option value="'. $this_localekey. '"';
-		if( $this_localekey == $default ) echo ' selected="selected"';
-		echo '>'. T_($this_locale['name']). '</option>';
-	}
+		if( $this_locale['enabled'] || $this_localekey == $default )
+		{
+			echo '<option value="'. $this_localekey. '"';
+			if( $this_localekey == $default ) echo ' selected="selected"';
+			echo '>'. T_($this_locale['name']). '</option>';
+		}
+	
 }
 
 
@@ -263,29 +265,41 @@ function locale_from_httpaccept()
 	return $default_locale;
 }
 
-
-return;
-
-// load locales from DB into $locales array
-$query = 'SELECT
-					loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled
-					FROM '. $tablelocales;
-$rows = $DB->get_results( $query, ARRAY_A );
-if( count( $rows ) ) foreach( $rows as $row )
+/**
+ * load locales from DB into $locales array. Also sets $default_locale.
+ *
+ */
+function locale_overwritefromDB()
 {
-	if( $row[ 'loc_enabled' ] ){
-		$locales[ $row['loc_locale'] ] = array(
-			'charset'  => $row[ 'loc_charset' ],
-			'dateftm'  => $row[ 'loc_datefmt' ],
-			'timeftm'  => $row[ 'loc_timefmt' ],
-			'name'     => $row[ 'loc_name' ],
-			'messages' => $row[ 'loc_messages' ],
-		);
-	}
-	else
+	global $tablelocales, $DB, $locales, $default_locale;
+	$query = 'SELECT
+						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled
+						FROM '. $tablelocales;
+	$rows = $DB->get_results( $query, ARRAY_A );
+	if( count( $rows ) ) foreach( $rows as $row )
 	{
-		unset( $locales[ $row['loc_locale'] ] );
+			$locales[ $row['loc_locale'] ] = array(
+				'charset'  => $row[ 'loc_charset' ],
+				'datefmt'  => $row[ 'loc_datefmt' ],
+				'timefmt'  => $row[ 'loc_timefmt' ],
+				'name'     => $row[ 'loc_name' ],
+				'messages' => $row[ 'loc_messages' ],
+				'enabled'  => $row[ 'loc_enabled' ]		
+			);
+	}
+	
+	// overwrite default_locale from DB settings - if enabled.
+	// Checks also if previous $default_locale is enabled. Defaults to en-US, even if not enabled.
+	$locale_fromdb = get_settings('default_locale');
+	if( $locale_fromdb  )
+	{
+		if( $locales[$locale_fromdb]['enabled'] )
+			$default_locale = $locale_fromdb;
+		elseif( !$locales[$default_locale]['enabled'] )
+			$default_locale = 'en-US';
+		
 	}
 }
+
 
 ?>

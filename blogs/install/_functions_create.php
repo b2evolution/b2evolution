@@ -30,6 +30,7 @@ function create_b2evo_tables()
 	echo "Creating table for Settings... ";
 	$query = "CREATE TABLE $tablesettings (
 		ID tinyint DEFAULT 1 NOT NULL,
+		default_locale VARCHAR( 20 ) DEFAULT 'en-US' NOT NULL,
 		posts_per_page int unsigned DEFAULT 7 NOT NULL,
 		what_to_show varchar(10) DEFAULT 'days' NOT NULL,
 		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL,
@@ -259,7 +260,7 @@ function create_antispam()
  */
 function create_locales()
 {
-	global $tablelocales, $locales;
+	global $tablelocales;
 	global $DB;
 	
 	echo 'Creating table for Locales... ';

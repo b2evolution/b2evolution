@@ -59,7 +59,7 @@ function form_select(
 	$field_class = '' )
 {
 	echo '<fieldset>';
-	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="label"><label for="', $field_name, '">', $field_label, (($field_label != '') ? ':' : ''), '</label></div>';
 	echo '  <div class="input"><select name="', $field_name, '" id="', $field_name, '"';
 	if( !empty($field_class) )
 	{

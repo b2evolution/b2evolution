@@ -204,7 +204,7 @@ function blog_update_user_perms( $blog )
 /*
  * get_bloginfo(-)
  */
-function get_bloginfo( $show='', $this_blogparams = '' )
+function get_bloginfo( $show = '', $this_blogparams = '' )
 {
 	global $blog, $xmlsrv_url, $admin_email, $baseurl;
 

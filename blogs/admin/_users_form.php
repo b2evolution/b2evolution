@@ -111,6 +111,7 @@
 				}
 				else
 				{
+					echo '<input type="hidden" name="edited_user_grp_ID" value="1" />';
 					form_info(  T_('User group'), $edited_User->Group->get('name') );
 				}
 			?>

@@ -1,6 +1,6 @@
 <?php
 /*
- * Display urrent user's profile:
+ * Display current user's profile:
  *
  * b2evolution - http://b2evolution.net/
  *
@@ -9,11 +9,11 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-require_once (dirname(__FILE__). '/_header.php'); // this will actually load blog params for req blog
+require_once( dirname(__FILE__).'/_header.php' ); // this will actually load blog params for req blog
 $admin_tab = 'profile';
 $admin_pagetitle = T_('My Profile');
-require(dirname(__FILE__). '/_menutop.php');
-require(dirname(__FILE__). '/_menutop_end.php');
+require( dirname(__FILE__).'/_menutop.php' );
+require( dirname(__FILE__).'/_menutop_end.php' );
 ?>
 
 <div class="bPosts">

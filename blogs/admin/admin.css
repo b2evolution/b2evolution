@@ -85,6 +85,7 @@ div.panelblocktabs
 {
 	clear: both;
 	margin-top: 1ex;
+	margin-bottom: -1px;
 	float:left;
 	width:100%;
 	background: url("img/tabs_bg.gif") repeat-x bottom;
@@ -95,7 +96,7 @@ div.tabbedpanelblock {
 	clear: both;
 	border: 1px solid #765;
 	background-color: #fbfaf9;
-	border-top: none;
+	/*border-top: none;*/
 	padding: 1ex 2ex 2ex 2ex;
 	margin: 0 3ex 2ex 3ex;
 }
@@ -571,6 +572,7 @@ caption.bCalendarMonth {
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 	border-top: solid 1px #ccc;
+	white-space: nowrap;
 }
 table.bCalendarTable {
 	margin: auto;

@@ -110,7 +110,7 @@ function get_commentdata($comment_ID,$no_cache=0)
 		$query="SELECT * 
 						FROM $tablecomments 
 						WHERE comment_ID = $comment_ID";
-		$myrow = $DB->get_rows( $query, ARRAY_A );
+		$myrow = $DB->get_row( $query, ARRAY_A );
 	}
 	else
 	{

@@ -31,7 +31,7 @@ param( 'sentence', 'string', 'AND', true );     // Search for sentence or for wo
 param( 'exact', 'integer', '', true );          // Require exact match of title or contents
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
-param( 'c', 'string', '', true );            
+param( 'c', 'string', '', true );
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
 param( 'title', 'string', '', true );						// urtitle of post to display
@@ -58,7 +58,7 @@ if( empty($disp) )
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 // Activate matching locale:
-locale_activate( locale_by_lang( get_bloginfo('locale') ) );
+locale_activate( get_bloginfo('locale') );
 
 // Extra path info decoding:
 $ReqURI = $_SERVER['REQUEST_URI'];

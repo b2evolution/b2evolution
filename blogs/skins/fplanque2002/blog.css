@@ -224,6 +224,7 @@ caption.bCalendarMonth
 	border-right: solid 1px #ccc;
 	border-top: solid 1px #ccc;
 	margin: auto;
+	white-space: nowrap;
 }
 table.bCalendarTable
 {

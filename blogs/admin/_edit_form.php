@@ -153,9 +153,9 @@ if ($use_spellchecker)
 		//-->
 	</script>
 
-	<?php // --------------------------- AUTOBR -------------------------------------- ?>
+	<?php // --------------------------- AUTOBR -------------------------------------- 	?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-	if (get_settings('AutoBR')) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
+	if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('(converts line-breaks into &lt;br /&gt; tags)') ?></span></label><br />
 
 	<?php
 	if($use_preview && ($action != 'editcomment') )
@@ -197,13 +197,13 @@ if ($use_spellchecker)
 			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
 			<select name="mm" tabindex="15">
 			<?php
-			for ($i=1; $i < 13; $i=$i+1)
+			for ($i = 1; $i < 13; $i = $i + 1)
 			{
 				echo "\t\t\t<option value=\"$i\"";
 				if ($i == $mm)
 				echo ' selected="selected"';
 				if ($i < 10) {
-					$ii = "0".$i;
+					$ii = '0'.$i;
 				} else {
 					$ii = "$i";
 				}

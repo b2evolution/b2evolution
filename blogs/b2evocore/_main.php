@@ -60,6 +60,11 @@ if( $use_gzipcompression && extension_loaded('zlib') )
 dbconnect();
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 
+locale_overwritefromDB();
+
+debug_log('default_locale from _main.php: '.$default_locale);
+
+
 $servertimenow = time();
 $localtimenow = $servertimenow + (get_settings('time_difference') * 3600);
 

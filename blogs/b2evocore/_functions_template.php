@@ -145,10 +145,19 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
 }
 
 
-/*
- * archive_link(-)
+/**
+ * Create a link to archive
+ *
+ * {@internal archive_link(-)}}
+ * @param string year
+ * @param string month
+ * @param string day
+ * @param string week
+ * @param boolean show or return
+ * @param string link, instead of blogurl
+ * @param string GET params for 'file'
  */
-function archive_link( $year, $month, $day='', $week='', $show = true, $file='', $params='' )
+function archive_link( $year, $month, $day = '', $week = '', $show = true, $file = '', $params = '' )
 {
 	if( empty($file) )
 		$link = get_bloginfo('blogurl');

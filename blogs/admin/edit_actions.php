@@ -476,7 +476,7 @@ switch($action)
 
 if( errors() )
 {
-	echo '<div class="panelblock">';
+	echo '<div class="panelinfo">';
 	if( isset( $status_action ) )
 	{
 		echo $status_action;
@@ -485,7 +485,7 @@ if( errors() )
 }
 else
 {
-	echo '<div class="panelblock">';
+	echo '<div class="panelinfo">';
 	echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
 	
 	if( empty( $mode ) )

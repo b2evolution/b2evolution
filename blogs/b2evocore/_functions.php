@@ -100,7 +100,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = $Renderer->render( $content, 'content' );
 			$content = convert_chars($content, 'html');
 			break;
-			
+
 		case 'htmlrendered':
 			// content displayed in HTML page body: apply renders and allow full HTML
 			$content = $Renderer->render( $content, 'other' );
@@ -113,7 +113,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = convert_chars($content, 'html');
 			$content = htmlspecialchars( $content );
 			break;
-			
+
 		case 'htmlbody':
 			// display in HTML page body: allow full HTML
 			$content = convert_chars($content, 'html');
@@ -272,11 +272,11 @@ function unautobrize($content)
 /*
  * zeroise(-)
  */
-function zeroise($number,$threshold) 
+function zeroise($number, $threshold)
 { // function to add leading zeros when necessary
-	$l=strlen($number);
-	if ($l<$threshold)
-		for ($i=0; $i<($threshold-$l); $i=$i+1) { $number='0'.$number;	}
+	$l = strlen($number);
+	if ($l < $threshold)
+		for ($i = 0; $i < ($threshold - $l); $i = $i + 1) { $number='0'.$number;	}
 	return($number);
 }
 
@@ -399,9 +399,9 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 	else
 	{	// We want default timezone time:
 		$dateformatstring = ' '.$dateformatstring; // will be removed later
-	
+
 		// echo $dateformatstring, '<br />';
-	
+
 		// weekday:
 		$dateformatstring = preg_replace("/([^\\\])l/", '\\1@@@\\l@@@', $dateformatstring);
 		// weekday abbrev:
@@ -410,13 +410,13 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		$dateformatstring = preg_replace("/([^\\\])F/", '\\1@@@\\F@@@', $dateformatstring);
 		// month abbrev:
 		$dateformatstring = preg_replace("/([^\\\])M/", '\\1@@@\\M@@@', $dateformatstring);
-	
+
 		$dateformatstring = substr($dateformatstring, 1, strlen($dateformatstring)-1);
-	
+
 		// echo $dateformatstring, '<br />';
-	
+
 		$j = date($dateformatstring, $unixtimestamp);
-	
+
 		// weekday:
 		$j = str_replace( '@@@l@@@', T_($weekday[$dateweekday]), $j);
 		// weekday abbrev:
@@ -426,7 +426,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		// month abbrev:
 		$j = str_replace( '@@@M@@@', T_($month_abbrev[$datemonth]), $j);
 	}
-	
+
 	return $j;
 }
 
@@ -491,14 +491,13 @@ function is_email($user_email) {
 function get_settings( $setting )
 {
 	global $DB, $tablesettings, $cache_settings;
-	
+
 	if( empty($cache_settings) )
 	{
-		$sql = "SELECT * 
+		$sql = "SELECT *
 						FROM $tablesettings";
 		$cache_settings = $DB->get_row( $sql );
 	}
-
 	return $cache_settings->$setting;
 }
 
@@ -512,9 +511,9 @@ function get_settings( $setting )
 function set_settings( $setting, $value )
 {
 	global $cache_settings;
-	
+
 	$cache_settings->$setting = $value;
-	
+
 	return true;
 }
 
@@ -1106,7 +1105,7 @@ function autoquote( & $string )
 function validate_url( $url, & $allowed_uri_scheme )
 {
 	global $debug;
-	
+
 	if( empty($url) )
 	{	// Empty URL, no problem
 		return false;
@@ -1157,7 +1156,7 @@ function pre_dump($dump, $title = '')
 
 
 $debug_messages = array();
-/** 
+/**
  * Log a debug string to be displayed later. (Typically at the end of the page)
  *
  * {@internal debug_log(-) }}
@@ -1167,11 +1166,11 @@ $debug_messages = array();
 function debug_log( $message )
 {
 	global $debug_messages;
-	
+
 	$debug_messages[] = $message;
 }
 
-/** 
+/**
  * Outputs debug info. (Typically at the end of the page)
  *
  * {@internal debug_info(-) }}
@@ -1184,11 +1183,11 @@ function debug_info( $force = false )
 	global $querycount;
 	global $debug_messages;
 	global $DB;
-	
+
 	if( $debug || $force )
 	{
 		echo '<hr /><h2>Debug info</h2>';
-		
+
 		echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 
 		if( count( $debug_messages ) )
@@ -1202,7 +1201,7 @@ function debug_info( $force = false )
 		}
 
 		echo '<h3>DB</h3>';
-		
+
 		echo 'Old style queries: ', $querycount, '<br />';
 		echo 'DB queries: ', $DB->num_queries, '<br />';
 
@@ -1228,7 +1227,7 @@ function obhandler( $output )
 
 	// we're sending out by default
 	$sendout = true;
-	
+
 	if( !isset( $lastmodified ) )
 	{ // default of lastmodified is now
 		$lastmodified = time();
@@ -1244,15 +1243,15 @@ function obhandler( $output )
 
 	if( isset( $use_etags ) )
 	{	// Generating ETAG
-	
+
 		// prefix with PUB or AUT.
 		if( is_logged_in() )
 			$ETag = 'AUT';    // A private page
 		else $ETag = 'PUB'; // and public one
-		
+
 		$ETag .= md5( $out );
 		header( 'ETag: '. $ETag );
-	
+
 		// decide to send out or not
 		if( isset($_SERVER['HTTP_IF_NONE_MATCH'])
 				&& $_SERVER['HTTP_IF_NONE_MATCH'] === $ETag )
@@ -1266,14 +1265,14 @@ function obhandler( $output )
 	{  // send 304 and die
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
 		#log_hit();  // log this somehow?
-		die;	
+		die;
 	};
 
 
 	// Send Last-Modified -----------------
 	// We should perhaps make this the central point for this.
 	// Also handle Cache-Control and Pragma here (with global vars).
-	
+
 	// header( 'Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastmodified) );
 
 
@@ -1289,31 +1288,31 @@ function obhandler( $output )
 
 	header( 'Content-Length: '. strlen($out) );
 	return $out;
-	
+
 	/* {{{ additional things we could do in this handler
 		- We could have a global $lastmodified that would be checked against according
 			header and throw a 304 then, too.
 		- global var that reflects "No caching!", if set
-		
-		
+
+
 		code excerpts below:
-		
-		header ("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1 
-		header ("Pragma: no-cache"); // HTTP/1.0 
-		
-		header('Cache-Control: max-age=3600, must-revalidate');	
-			
+
+		header ("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+		header ("Pragma: no-cache"); // HTTP/1.0
+
+		header('Cache-Control: max-age=3600, must-revalidate');
+
 		# get LastModified from db entries
 		if ($site->subMenu[0] == 'links'){
-			$sql = 'SELECT UNIX_TIMESTAMP(dt) FROM tq_links WHERE submenu="links&' . 
+			$sql = 'SELECT UNIX_TIMESTAMP(dt) FROM tq_links WHERE submenu="links&' .
 								$site->subMenu[1] . '" AND unix_timestamp(dt)-' . $lastModified . '>0 ORDER BY dt DESC';
 			$result = $site->dbquery($sql, 'get_lm_linkdb', true);
 			if (mysql_numrows($result) > 0) $lastModified = mysql_result($result, 0);
 		}
-			
+
 		# check and react on "If-Modified-Since" header
 		if(isset($headers["If-Modified-Since"]) && $_SERVER['REQUEST_METHOD'] != 'POST') {
-			$arraySince = explode(";", $headers["If-Modified-Since"]); 
+			$arraySince = explode(";", $headers["If-Modified-Since"]);
 			$since = strtotime($arraySince[0]);
 			if ($since >= $lastModified) $refresh = false;
 		}

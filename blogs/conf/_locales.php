@@ -14,23 +14,25 @@ $use_l10n = 2;
 $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 
 
-# Default locale used for backoffice and notification messages
-# These use an ISO 639 language code, a '_' and an ISO 3166 country code
-# This MUST BE in the list below
+# Default locale used for backoffice, notification messages and fallback.
+# This will be overwritten from database settings, if configured there.
+# These use an ISO 639 language code, a '-' and an ISO 3166 country code.
+# This MUST BE in the list below.
 $default_locale = 'en-US';
 
 
-// we need this here, because we include _functions_locale after defining locales
-// This is temporary.
-/*
- * NT_(-)
- *
- * No Translation
- * Nevertheless, the string will be extracted by the gettext tools
- */
-function NT_($string)
-{
-	return $string;
+if( !function_exists('NT_') )
+{ // we want to be able to reload this file.
+	/*
+	 * NT_(-)
+	 *
+	 * No Translation
+	 * Nevertheless, the string will be extracted by the gettext tools
+	 */
+	function NT_( $string )
+	{
+		return $string;
+	}
 }
 
 

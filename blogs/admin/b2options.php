@@ -68,8 +68,10 @@ if( $action == 'update' )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		switch( $tab )
-		{
+		// clear settings cache
+		$cache_settings = '';
+		
+		switch( $tab ){
 			case 'general':
 				// UPDATE general settings:
 				param( 'newposts_per_page', 'integer', true );
@@ -97,8 +99,6 @@ if( $action == 'update' )
 				
 				$dbupdatesuccess = $DB->query( $query );
 				
-				// clear settings cache
-				$cache_settings = '';
 				?>
 				<div class="panelinfo">
 					<p><?php echo T_('Options updated.') ?></p>
@@ -109,6 +109,71 @@ if( $action == 'update' )
 
 			case 'locales':
 				// UPDATE locales:
+				param( 'newdefault_locale', 'string', true);
+				#pre_dump( $_POST );
+				
+				$templocales = $locales;
+				
+				$lnr = 0;
+				foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
+				{
+					$lfield = $matches[2];
+					
+					if( $matches[1] != $lnr )
+					{ // we have a new locale
+						$lnr = $matches[1];
+						$plocale = $pval;
+						
+						// checkboxes default to 0
+						$templocales[ $plocale ]['enabled'] = 0;
+					}
+					elseif( $lnr != 0 )  // be sure to have catched a locale before
+					{
+						$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
+					}
+					
+				}
+				
+				if( $locales != $templocales )
+				{
+					#echo 'CHANGED!';
+					$locales = $templocales;
+				}
+				
+				$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled ) VALUES ";
+				foreach( $locales as $localekey => $lval )
+				{
+					if( !isset($lval['messages']) )
+					{ // if not explicit messages file is given we'll translate the locale
+						$lval['messages'] = strtr($localekey, '-', '_');
+					}
+					$query .= "(
+					'$localekey',
+					'{$lval['charset']}',
+					'{$lval['datefmt']}',
+					'{$lval['timefmt']}',
+					'{$lval['name']}',
+					'{$lval['messages']}',
+					'{$lval['enabled']}'
+					), ";
+				}
+				$query = substr($query, 0, -2);
+				$q = $DB->query($query);
+				
+				if( !$locales[$newdefault_locale]['enabled'] )
+				{
+					echo '<div class="panelinfo"><p class="error">' . T_('Default locale should be enabled.') . '</p></div>';
+				}
+				elseif( $newdefault_locale != $default_locale )
+				{
+					// set default locale
+					$query = "UPDATE $tablesettings	SET default_locale = '$newdefault_locale'";
+					$q = $DB->query($query);
+					echo '<div class="panelinfo"><p>'.T_('New default locale set.').'</p></div>';
+				}
+				
+				echo '<div class="panelinfo"><p>'.T_('Locales updated.').'</p></div>';
+			
 				break;
 
 
@@ -117,6 +182,23 @@ if( $action == 'update' )
 				break;
 			
 		}
+}
+elseif( $action == 'reset' && $tab == 'locales' )
+{
+	unset( $locales );
+	include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
+	
+	// delete everything from locales table
+	$query = "DELETE FROM $tablelocales WHERE 1";
+	$q = $DB->query($query);
+	echo '<div class="panelinfo"><p>'.T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.').'</p></div>';
+	
+	// reset default_locale
+	$query = "UPDATE $tablesettings SET default_locale = '$default_locale'";
+	$q = $DB->query($query);
+	
+	// clear settings cache
+	$cache_settings = '';
 }
 	
 	
@@ -155,15 +237,38 @@ $current_User->check_perm( 'options', 'view', true );
 	</div>
 	<div class="tabbedpanelblock">
 
-	<form class="fform" name="form" action="b2options.php" method="post">
-	<input type="hidden" name="action" value="update" />
-	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
+		<form class="fform" name="form" action="b2options.php" method="post">
+		<input type="hidden" name="action" value="update" />
+		<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
 
-	<?php
-	switch( $tab )
-	{
-		case 'general':
+		<?php
+		switch( $tab )
+		{
 			// ---------- GENERAL OPTIONS ----------
+			case 'general':?>
+		<fieldset>
+			<legend><?php echo T_('Regional settings') ?></legend>
+
+			<?php form_text( 'newtime_difference', get_settings('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
+			
+			# alternative to locales menu, update only works for locales menu,
+			# so you probably want to simply remove this here:
+			# form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', T_('Default locale'), T_('Default locale used for backoffice and notification messages.'));
+			?>
+			
+		</fieldset>
+			
+		</fieldset>
+
+		<fieldset>
+			<legend><?php echo T_('Default user rights') ?></legend>
+			<?php
+
+			form_checkbox( 'pref_newusers_canregister', get_settings('pref_newusers_canregister'), T_('New users can register'), sprintf( T_('Check to allow new users to register themselves.' ) ) );
+
+			form_select_object( 'pref_newusers_grp_ID', get_settings('pref_newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
+
+			form_text( 'pref_newusers_level', get_settings('pref_newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
 			?>
 			<fieldset>
 				<legend><?php echo T_('Regional settings') ?></legend>
@@ -223,12 +328,56 @@ $current_User->check_perm( 'options', 'view', true );
 				<?php
 				break;
 			
-			case 'locales':
-				// ---------- LOCALE OPTIONS ----------
-				?>
-				Locales options go here.
-				<?php
-				break;
+			// ---------- LOCALE OPTIONS ----------
+			case 'locales':?>
+			
+			<fieldset>
+			<legend><?php echo T_('Default locale'); ?></legend>
+			<?php form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', '', T_('Default locale used for backoffice and notification messages.'));?>
+			</fieldset>			
+			
+			<fieldset>
+			<legend><?php echo T_('Available locales'); ?></legend>
+			<table class="thin" border="1"><tr>
+			<?php echo '<th>' . T_('locale') . '</th><th>' . T_('enabled')
+				. '</th><th>' . T_('name') . '</th><th>' . T_('charset')
+				. '</th><th>' . T_('date format') . '</th><th>' . T_('time<br /> format')
+				. '</th><th>' . T_('messages') . '</th>
+				</tr>';
+			$i = 0; // counter to distinguish POSTed locales later, array trick (name="loc_enabled[]") fails for unchecked boxes
+			foreach( $locales as $lkey => $lval )
+			{
+				$i++;
+				echo '<tr>
+				<td style="text-align:center"><input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />
+				<strong>'.$lkey.'</strong>
+				</td><td style="text-align:center">
+				<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
+				'#<input type="text" name="loc_'.$i.'_locale" value="'.$lkey.'" />
+				.'
+				</td><td>
+				<input type="text" name="loc_'.$i.'_name" value="'.$locales[$lkey]['name'].'" maxlength="40" />
+				</td><td>
+				<input type="text" name="loc_'.$i.'_charset" value="'.$locales[$lkey]['charset'].'" maxlength="15" />
+				</td><td>
+				<input type="text" name="loc_'.$i.'_datefmt" value="'.$locales[$lkey]['datefmt'].'" maxlength="10" size="10" />
+				</td><td>
+				<input type="text" name="loc_'.$i.'_timefmt" value="'.$locales[$lkey]['timefmt'].'" maxlength="10" size="10" />
+				</td><td>
+				<input type="text" name="loc_'.$i.'_messages" value="'.$locales[$lkey]['messages'].'" maxlength="10" size="10" />
+				</td>
+				';
+				#form_text( 'loc_'.$key.'[]', $value, 20, $key, sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
+				echo '</td></tr>';
+			}
+			echo '</table>
+			<br />
+			<div align="center">
+			<a href="?tab=locales&amp;action=reset"><img src="img/xross.gif" height="13" width="13" alt="'.T_('Reset to defaults').'" title="'.T_('Reset to defaults').'" border="0" /></a>
+			'.T_('Reset to defaults').'
+			</div>';
+			
+			break;
 			
 			case 'plugins':
 				// ---------- PLUGIN OPTIONS ----------
