@@ -310,13 +310,12 @@ switch($action)
 
 
 	default:
-		// Just display cat list for this blog
+		// Just display cat list for this blog:
 		if( $blog == 0 || ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
-		{ // No blog could be selected
+		{ // No blog could be selected:
 			?>
 			<div class="panelinfo">
-			<p>
-			<?php echo T_('Sorry, you have no permission to edit/view any category\'s properties.' ) ?></p>
+			<p><?php echo T_('Sorry, you have no permission to edit/view any category\'s properties.' ) ?></p>
 			</div>
 			<?php
 			break;
