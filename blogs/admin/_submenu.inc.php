@@ -69,7 +69,9 @@ switch( $admin_tab )
 		break;
 
 	default:
-		die( 'Cannot display submenu for this page' );
+		// NO SUBMENU!
+		echo '<div class="panelblock">';
+		return;
 }
 ?>
 <div class="pt" >

@@ -85,7 +85,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		}
 		else
 		{
-			form_text( 'edited_user_level', $edited_User->dget('level', 'formvalue'), 2, T_('Level'), $field_note, 2 );
+			form_text( 'edited_user_level', $edited_User->level, 2, T_('Level'), $field_note, 2 );
 		}
 		if( $edited_User->get('ID') != 1 && !$user_profile_only )
 		{
@@ -128,10 +128,10 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 
 			if( $allowed_to_edit )
 			{ // We can edit the values:
-				form_text( 'edited_user_login', $edited_User->dget('login', 'formvalue'), 20, T_('Login'), '', 20 );
-				form_text( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 20, T_('First name'), '', 50 );
-				form_text( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 20, T_('Last name'), '', 50 );
-				form_text( 'edited_user_nickname', $edited_User->dget('nickname', 'formvalue'), 20, T_('Nickname'), '', 50 );
+				form_text( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', 20 );
+				form_text( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', 50 );
+				form_text( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', 50 );
+				form_text( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', 50 );
 			?>
 
 			<fieldset>
@@ -154,13 +154,13 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			<?php
 				form_checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when using the site.') );
 				form_select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
-				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 30, T_('Email'), $email_fieldnote, 100 );
+				form_text( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, 100 );
 				form_checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
-				form_text( 'edited_user_url', $edited_User->dget('url', 'formvalue'), 30, T_('URL'), $url_fieldnote, 100 );
-				form_text( 'edited_user_icq', $edited_User->dget('icq', 'formvalue'), 30, T_('ICQ'), $icq_fieldnote, 10 );
-				form_text( 'edited_user_aim', $edited_User->dget('aim', 'formvalue'), 30, T_('AIM'), $aim_fieldnote, 50 );
-				form_text( 'edited_user_msn', $edited_User->dget('msn', 'formvalue'), 30, T_('MSN IM'), '', 100 );
-				form_text( 'edited_user_yim', $edited_User->dget('yim', 'formvalue'), 30, T_('YahooIM'), '', 50 );
+				form_text( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, 100 );
+				form_text( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), $icq_fieldnote, 10 );
+				form_text( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, 50 );
+				form_text( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), '', 100 );
+				form_text( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), '', 50 );
 				form_text( 'edited_user_pass1', '', 20, T_('New password'), '', 50, T_('Leave empty if you don\'t want to change the password.'), 'password' );
 				form_text( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50, '', 'password' );
 

@@ -34,7 +34,7 @@
  * }}
  *
  * {@internal
- * Vegar BERG GULDAL grants Fran√ois PLANQUE the right to license
+ * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
