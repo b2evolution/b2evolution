@@ -36,15 +36,17 @@ if( empty($mode) )
 		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
 	</div>
 
-	<?php /* FOR TESTING ONLY - OBHANDLERTEST
+	<?php	
+	if( !isset( $obhandler_debug ) )
+	{ // don't display changing time when we want to test obhandler
+	?>
 	<div id="headinfo">
 		b2evo v <strong><?php echo $b2_version ?></strong>
 		&middot; <?php echo T_('Blog time:') ?> <strong><?php echo date_i18n( locale_timefmt(), $localtimenow ) ?></strong>
 		&middot; <?php echo T_('GMT:') ?> <strong><?php echo gmdate( locale_timefmt(), $servertimenow); ?></strong>
 		&middot; <?php echo T_('Logged in as:'), ' <strong>', $user_login; ?></strong>
 	</div>
-	FOR TESTING ONLY - OBHANDLERTEST */ ?>
-	
+	<?php } ?>
 	
 	<ul>
 	<?php

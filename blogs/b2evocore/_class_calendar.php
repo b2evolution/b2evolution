@@ -239,16 +239,16 @@ class Calendar
 		
 		
 		// Create links to previous/next month
-		$previous_month = ($this->month>1) ? ($this->month-1) : 12;
-		$previous_year = ($this->month>1) ? $this->year : ($this->year-1);
+		$previous_month = ($this->month > 1) ? ($this->month - 1) : 12;
+		$previous_year = ($this->month > 1) ? $this->year : ($this->year - 1);
 		$previous_month_link = '<a href="'.archive_link( $previous_year, $previous_month, '', '', false, $file, $params ).'">&lt;</a>&nbsp;&nbsp;';
 		
-		$next_month = ($this->month<12) ? ($this->month+1) : 1;
-		$next_year = ($this->month<12) ? $this->year : ($this->year+1);
+		$next_month = ($this->month < 12) ? ($this->month + 1) : 1;
+		$next_year = ($this->month < 12) ? $this->year : ($this->year + 1);
 		$next_month_link = '&nbsp;&nbsp;<a href="'.archive_link( $next_year, $next_month, '', '', false, $file, $params ).'">&gt;</a>';
 
 		
-		// displays everything
+		// ** display everything **
 		
 		echo $this->tablestart;
 		
@@ -256,7 +256,10 @@ class Calendar
 		{	// caption:
 			echo $this->monthstart;
 			echo $previous_month_link;
-			echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
+			// chosen month with link to archives
+			echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'">'
+						.date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year))
+						.'</a>';
 			echo $next_month_link;
 			echo $this->monthend;
 		}

@@ -93,7 +93,7 @@ class DB
 	//	Print SQL/DB error.
 	function print_error($str = "")
 	{
-		// All erros go to the global error array $EZSQL_ERROR..
+		// All errors go to the global error array $EZSQL_ERROR..
 		global $EZSQL_ERROR;
 
 		// If no special error string then use mysql default..

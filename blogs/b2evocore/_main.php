@@ -39,14 +39,20 @@ require_once( dirname(__FILE__). '/_functions_forms.php');
 require_once( dirname(__FILE__). '/_class_renderer.php');
 
 
-// register output buffer handler
-//$debug = 0; // FOR TESTING ONLY - OBHANDLERTEST
-//ob_start( 'obhandler' );
-// PLEASE DON'T COMMIT TEST CODE INTO CVS :/
+if( !function_exists( 'gzencode' ) )
+{ // when there is no function to gzip, we won't do it
+	$use_gzipcompression = false;
+}
+
+if( $use_obhandler )
+{ // register output buffer handler
+	ob_start( 'obhandler' );
+}
+/* @outforrelease
 if( $use_gzipcompression && extension_loaded('zlib') )
 {	// gzipping the output of the script
 	ob_start( 'ob_gzhandler' );
-}
+}*/
 
 
 // Connecting to the db:

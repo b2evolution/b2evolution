@@ -19,11 +19,11 @@ require_once (dirname(__FILE__)."/_functions_pingback.php");
 /*
  * apply_filters(-)
  */
-function apply_filters($tag, $string) 
+function apply_filters($tag, $string)
 {
 	global $b2_filter;
 
-	if (isset($b2_filter['all'])) 
+	if (isset($b2_filter['all']))
 	{	// We have filters defined to be applied for everything!
 		// Make sure it's an array:
 		// $b2_filter['all'] = (is_string($b2_filter['all'])) ? array($b2_filter['all']) : $b2_filter['all'];
@@ -33,19 +33,19 @@ function apply_filters($tag, $string)
 		$b2_filter[$tag] = array_unique($b2_filter[$tag]);
 	}
 
-	if (isset($b2_filter[$tag])) 
+	if (isset($b2_filter[$tag]))
 	{	// We have filters to be applied for this specific tag
 		// Make sure it's an array:
 		// $b2_filter[$tags] = (is_string($b2_filter[$tag])) ? array($b2_filter[$tag]) : $b2_filter[$tag];
 
 		// Apply the stuff:
 		$functions = $b2_filter[$tag];
-		foreach($functions as $function) 
+		foreach($functions as $function)
 		{
 			$string = $function($string);
 		}
 	}
-	
+
 	return $string;
 }
 
@@ -54,11 +54,11 @@ function apply_filters($tag, $string)
  *
  * fplanque: simplied to the max
  */
-function add_filter($tag, $function_to_add) 
+function add_filter($tag, $function_to_add)
 {
 	global $b2_filter;
 
-	if( !isset($b2_filter[$tag]) ) 
+	if( !isset($b2_filter[$tag]) )
 		$b2_filter[$tag] = array();
 
 	if( !in_array( $function_to_add, $b2_filter[$tag] ) )
@@ -79,12 +79,13 @@ function add_filter($tag, $function_to_add)
  *
  * fplanque: 0.8.3: changed defaults
  */
-function single_month_title($prefix = '#', $display = 'htmlbody' ) 
+function single_month_title( $prefix = '#', $display = 'htmlbody' )
 {
+	global $m, $w, $month;
+
 	if( $prefix == '#' ) $prefix = ' '.T_('Archives for').': ';
 
-	global $m, $w, $month;
-	if(!empty($m) && $display) 
+	if( !empty($m) && $display )
 	{
 		$my_year = substr($m,0,4);
 		if( strlen($m) > 4 )
@@ -93,13 +94,19 @@ function single_month_title($prefix = '#', $display = 'htmlbody' )
 			$my_month = '';
 		$my_day = substr($m,6,2);
 
+		if( $display == 'htmlbody' && !empty( $my_month ) )
+		{ // display year as link to year's archive
+			$my_year = '<a href="' . archive_link( $my_year, '', '', '', false ) . '">' . $my_year . '</a>';
+		}
+
+
 		$title = $prefix.$my_month.' '.$my_year;
 
 		if( !empty( $my_day ) )
 		{	// We also want to display a day
 			$title .= ", $my_day";
 		}
-		
+
 		if( !empty( $w ) )
 		{	// We also want to display a week number
 			$title .= ", week $w";
@@ -110,19 +117,19 @@ function single_month_title($prefix = '#', $display = 'htmlbody' )
 }
 
 
-/** 
+/**
  * Display "Archive Directory" title if it has been requested
  *
  * {@internal arcdir_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to 
+ * @param mixed Output format, see {@link format_to_output()} or false to
  *								return value instead of displaying it
  */
-function arcdir_title( $prefix = ' ', $display = 'htmlbody' ) 
+function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
 {
 	global $disp;
-	
+
 	if( $disp == 'arcdir' )
 	{
 		$info = $prefix.T_('Archive Directory');
@@ -139,7 +146,7 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
  */
 function archive_link( $year, $month, $day='', $week='', $show = true, $file='', $params='' )
 {
-	if( empty($file) ) 
+	if( empty($file) )
 		$link = get_bloginfo('blogurl');
 	else
 		$link = $file;
@@ -154,9 +161,9 @@ function archive_link( $year, $month, $day='', $week='', $show = true, $file='',
 		$link .= '/';
 		$separator = '/';
 	}
-	
+
 	$link .= $year;
-	
+
 	if( !empty( $month ) )
 	{
 		$link .= $separator.zeroise($month,2);
@@ -176,7 +183,7 @@ function archive_link( $year, $month, $day='', $week='', $show = true, $file='',
 			$link .= '/w'.zeroise($week,2);
 		}
 	}
-	
+
 	$link .= $separator;
 
 	if( $show )

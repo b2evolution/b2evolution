@@ -836,7 +836,6 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
 	global $tableposts, $p, $posts, $id, $postdata, $siteurl, $blogfilename, $querycount, $localtimenow;
-	global $time_difference;
 	if(($p) || ($posts==1))
 	{
 

@@ -88,13 +88,15 @@ switch($action)
 		}
 		$content = format_to_post($content,$post_autobr,0);
 
-		if( errors_display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
+		if( errors() )
 		{
+			$status_action = errors_display( T_('Cannot post, please correct these errors:'),
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ,
+				false);
 			break;
 		}
 
-		echo "<div class=\"panelinfo\">\n";
+		echo '<div class="panelinfo">'."\n";
 		echo '<h3>', T_('Recording post...'), "</h3>\n";
 
 		// Are we going to do the pings or not?
@@ -134,7 +136,7 @@ switch($action)
 		param( 'mode', 'string', '' );
 		switch($mode)
 		{
-			case "sidebar":
+			case 'sidebar':
 				$location="b2sidebar.php?a=b&blog=$blog";
 				break;
 
@@ -143,7 +145,7 @@ switch($action)
 				break;
 		}
 
-		echo '<p>', T_('Posting Done...'), '</p>';
+		$status_action = T_('Posting Done...');
 		break;
 
 
@@ -152,7 +154,7 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * UPDATE POST
 		 */
-		param( "post_category", 'integer', true );
+		param( 'post_category', 'integer', true );
 		$blog = get_catblog($post_category); 
 		$blogparams = get_blogparams_by_ID( $blog );
 
@@ -198,9 +200,11 @@ switch($action)
 		}
 		$content = format_to_post($content,$post_autobr,0);
 
-		if( errors_display( T_('Cannot update, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
+		if( errors() )
 		{
+			$status_action = errors_display( T_('Cannot update, please correct these errors:'),
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ,
+				false);
 			break;
 		}
 
@@ -265,7 +269,7 @@ switch($action)
 			}
 		}
 
-		echo '<p>', T_('Updating done...'), '</p>';
+		$status_action = T_('Updating done...');
 
 		$location = 'b2browse.php?blog='. $blog;
 		break;
@@ -352,7 +356,7 @@ switch($action)
 			}
 		}
 
-		echo '<p>', T_('Updating done...'), '</p>';
+		$status_action = T_('Updating done...');
 
 		$location = 'b2browse.php?blog=' . $blog;
 		break;
@@ -388,7 +392,9 @@ switch($action)
 			sleep($sleep_after_edit);
 		}
 		echo '<p>', T_('Done.'), "</p>\n";
-		echo '</div><p>' . T_('Deleting Done...') . '</p>';
+		echo '</div>';
+		
+		$status_action = T_('Deleting Done...');
 
 		$location = 'b2browse.php?blog=' . $blog;
 		break;
@@ -469,15 +475,17 @@ switch($action)
 
 if( ! errors() )
 {
+	echo '<div class="panelblock">';
+	if( isset( $status_action ) )
+	{
+		echo $status_action;
+	}
+	echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
+	
 	if( empty( $mode ) )
 	{	// Normal mode:
-		?>
-		<p><strong>[<a href="<?php echo $location ?>"><?php echo T_('Back to posts!') ?></a>]</strong></p>
-
-		<p><?php echo T_('You may also want to generate static pages or view your blogs...') ?></p>
-
-		</div>
-		<?php
+		echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>
+		</div>';
 		// List the blogs:
 		require( dirname(__FILE__) . '/_blogs_list.php' );
 	}
@@ -485,8 +493,10 @@ if( ! errors() )
 	{	// Special mode:
 	?>
 		<p><strong>[<a href="b2edit.php?blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
+		</div>
 	<?php
 	}
+
 }
 
 

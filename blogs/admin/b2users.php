@@ -14,8 +14,8 @@ require_once( dirname(__FILE__). '/_header.php' );
 $title = T_('User management');
 
 param( 'action', 'string' );
-param( 'user', 'int', 0 );
-param( 'group', 'int', 0 );
+param( 'user', 'integer', 0 );
+param( 'group', 'integer', 0 );
 
 // show the top menu
 require(dirname(__FILE__). '/_menutop.php');
@@ -136,7 +136,7 @@ switch ($action)
 		param( 'edited_grp_perm_options', 'string', true );
 		$edited_Group->set( 'perm_options', $edited_grp_perm_options );
 
-		param( 'edited_grp_perm_templates', 'int', 0 );
+		param( 'edited_grp_perm_templates', 'integer', 0 );
 		$edited_Group->set( 'perm_templates', $edited_grp_perm_templates );
 
 		if( $edited_grp_ID != 1 )

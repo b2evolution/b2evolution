@@ -16,7 +16,7 @@ $require_name_email = 1;
 if( !isset($default_to_blog) ) $default_to_blog = 2;
 
 
-// Get hostname out of baseurl 
+// Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
 preg_match( '#https?://([^:/]+)#', $baseurl, $matches );
 $basehost = $matches[1];
@@ -37,7 +37,7 @@ $b2evo_name = 'b2evo';		// MUST BE A SINGLE WORD! NO SPACES!!
 $notify_from = $b2evo_name.'@'.$basehost; // comment this line if you want to customize
 
 
-// ** Configuration for htsrv/getmail.php ** 
+// ** Configuration for htsrv/getmail.php **
 // (skip this if you don't intend to blog via email)
 # mailserver settings
 $mailserver_url = 'mail.example.com';
@@ -65,40 +65,70 @@ $phoneemail_separator = ':::';
 $use_rss = 1;
 
 
-# database tables' names (change them if you want to have multiple b2's in a single database)
-$tableposts = 'evo_posts';
-$tableusers = 'evo_users';
-$tablesettings = 'evo_settings';
+// ** DB table names **
+
+/**#@+
+ * database tables' names
+ *
+ * (change them if you want to have multiple b2's in a single database)
+ */
+$tableposts      = 'evo_posts';
+$tableusers      = 'evo_users';
+$tablesettings   = 'evo_settings';
 $tablecategories = 'evo_categories';
-$tablecomments = 'evo_comments';
-$tableblogs = 'evo_blogs';
-$tablepostcats = 'evo_postcats';
-$tablehitlog = 'evo_hitlog';
-$tableantispam = 'evo_antispam';
-$tablegroups = 'evo_groups';
-$tableblogusers = 'evo_blogusers';
-$tablelocales = 'evo_locales';
+$tablecomments   = 'evo_comments';
+$tableblogs      = 'evo_blogs';
+$tablepostcats   = 'evo_postcats';
+$tablehitlog     = 'evo_hitlog';
+$tableantispam   = 'evo_antispam';
+$tablegroups     = 'evo_groups';
+$tableblogusers  = 'evo_blogusers';
+$tablelocales    = 'evo_locales';
+/**#@-*/
 
-
-# old b2 tables used exclusively by the upgrade mode of the install script
-# you can delete or ignore those if you're not planning to upgrade from an original b2 database
-$oldtableposts = 'b2posts';
-$oldtableusers = 'b2users';
-$oldtablesettings = 'b2settings';
+/**#@+
+ * Old b2 tables used exclusively by the upgrade mode of the install script
+ *
+ * You can ignore those if you're not planning to upgrade from an original b2 database.
+ */
+$oldtableposts      = 'b2posts';
+$oldtableusers      = 'b2users';
+$oldtablesettings   = 'b2settings';
 $oldtablecategories = 'b2categories';
-$oldtablecomments = 'b2comments';
+$oldtablecomments   = 'b2comments';
 
 
-# gzip compression. can actually be done either by PHP or by Apache (if your apache has mod_gzip)
-# Set this to 1 if you want PHP to do gzip compression
-# Set this to 0 if you want to let Apache do the job instead of PHP
-# (Developpers: Letting apache do the compression will make PHP debugging easier)
+// ** Saving bandwidth **
+
+/**
+ * use output buffer.
+ *
+ * This is required for gzip and ETags (see below).
+ * Recommended to be enabled. Turn it of only if you should encounter problems.
+ * Even without using gzip compression or ETags this allows to send a Content-Length, which
+ * is good for large pages.
+ */
+$use_obhandler = 1;
+
+/**
+ * gzip compression.
+ *
+ * Can actually be done either by PHP or by Apache (if your Apache has mod_gzip).
+ * Set this to 1 if you want PHP to do gzip compression
+ * Set this to 0 if you want to let Apache do the job instead of PHP (you must enable this there)
+ *
+ * {@internal Letting apache do the compression will make PHP debugging easier }}
+ */
 $use_gzipcompression = 0;
 
-
-# CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
-$use_cache = 1;							// Not using this will dramatically overquery the DB !
-$sleep_after_edit = 0;			// let DB do its stuff...
+/**
+ * ETags support.
+ *
+ * This will send an ETag with every page, so we can say "Not Modified." if exactly the same
+ * page had been sent before.
+ * Etags don't work right in some versions of IE. You won't be able to force refreshment of a page.
+ */
+$use_etags = 0;
 
 
 // ** Cookies **
@@ -107,26 +137,25 @@ $sleep_after_edit = 0;			// let DB do its stuff...
 # That means cookies set by this b2evo install won't be seen outside of this path on the domain below
 $cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl ).'/';
 
-
-# This is the cookie domain
-# That means cookies set by this b2evo install won't be seen outside of this domain
-$cookie_domain = ($basehost=='localhost') ? '' : '.'.$basehost;
-//echo 'domain=',$cookie_domain,' path=',$cookie_path;
-
+/**
+ * Cookie domain
+ *
+ * That means cookies set by this b2evo install won't be seen outside of this domain
+ */
+$cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
+//echo 'domain='. $cookie_domain. ' path='. $cookie_path;
 
 # Cookie names:
-$cookie_user = 'cookie'.$b2evo_name.'user';
-$cookie_pass = 'cookie'.$b2evo_name.'pass';
-$cookie_state = 'cookie'.$b2evo_name.'state';
-$cookie_name = 'cookie'.$b2evo_name.'name';
-$cookie_email = 'cookie'.$b2evo_name.'email';
-$cookie_url = 'cookie'.$b2evo_name.'url';
-
+$cookie_user  = 'cookie'. $b2evo_name. 'user';
+$cookie_pass  = 'cookie'. $b2evo_name. 'pass';
+$cookie_state = 'cookie'. $b2evo_name. 'state';
+$cookie_name  = 'cookie'. $b2evo_name. 'name';
+$cookie_email = 'cookie'. $b2evo_name. 'email';
+$cookie_url   = 'cookie'. $b2evo_name. 'url';
 
 # Expiration (values in seconds)
 # Set this to 0 if you wish to use non permanent cookies (erased when browser is closed)
 $cookie_expires = time() + 31536000;		// Default: one year from now
-
 
 # Expired time used to erase cookies:
 $cookie_expired = time() - 86400;				// Default: 24 hours ago
@@ -134,7 +163,7 @@ $cookie_expired = time() - 86400;				// Default: 24 hours ago
 
 # Location of the b2evolution subdirectories:
 # You should only move these around if you really need to.
-# You should keep everything as subdirectories of the base folder 
+# You should keep everything as subdirectories of the base folder
 # ($baseurl which is set in _config.php, default is the /blogs folder)
 # Remember you can set the baseurl to your website root.
 # NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
@@ -143,31 +172,36 @@ $cookie_expired = time() - 86400;				// Default: 24 hours ago
 # $admin_dirout = '../..';									// Relative path to go back to base
 
 # Location of the backoffice (admin) folder:
-$admin_subdir = 'admin';										// Subdirectory relative to base
-$admin_dirout = '..';												// Relative path to go back to base
-$admin_url = $baseurl.'/'.$admin_subdir;		// You should not need to change this
+$admin_subdir = 'admin';                     // Subdirectory relative to base
+$admin_dirout = '..';                        // Relative path to go back to base
+$admin_url = $baseurl. '/'. $admin_subdir;   // You should not need to change this
 # Location of the HTml SeRVices folder:
-$htsrv_subdir = 'htsrv';										// Subdirectory relative to base
-$htsrv_dirout = '..';												// Relative path to go back to base
-$htsrv_url = $baseurl.'/'.$htsrv_subdir;		// You should not need to change this
+$htsrv_subdir = 'htsrv';                     // Subdirectory relative to base
+$htsrv_dirout = '..';                        // Relative path to go back to base
+$htsrv_url = $baseurl. '/'. $htsrv_subdir;   // You should not need to change this
 # Location of the XML SeRVices folder:
-$xmlsrv_subdir = 'xmlsrv'; 									// Subdirectory relative to base
-$xmlsrv_dirout = '..';											// Relative path to go back to base
-$xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;	// You should not need to change this
+$xmlsrv_subdir = 'xmlsrv';                   // Subdirectory relative to base
+$xmlsrv_dirout = '..';                       // Relative path to go back to base
+$xmlsrv_url = $baseurl. '/'. $xmlsrv_subdir; // You should not need to change this
 # Location of the skins folder:
-$skins_subdir = 'skins'; 										// Subdirectory relative to base
-$skins_dirout = '..';												// Relative path to go back to base
-$skins_url = $baseurl.'/'.$skins_subdir;		// You should not need to change this
+$skins_subdir = 'skins';                     // Subdirectory relative to base
+$skins_dirout = '..';                        // Relative path to go back to base
+$skins_url = $baseurl. '/'. $skins_subdir;   // You should not need to change this
 # Location of the core (the "includes") files:
-$core_subdir = 'b2evocore'; 								// Subdirectory relative to base
-$core_dirout = '..';												// Relative path to go back to base
+$core_subdir = 'b2evocore';                 // Subdirectory relative to base
+$core_dirout = '..';                        // Relative path to go back to base
 # Location of the locales folder:
-$locales_subdir = 'locales';								// Subdirectory relative to base
-$locales_dirout = '..';											// Relative path to go back to base
+$locales_subdir = 'locales';                // Subdirectory relative to base
+$locales_dirout = '..';                     // Relative path to go back to base
 # Location of the configuration files:
-$conf_subdir = 'conf';											// Subdirectory relative to base
-$conf_dirout = '..';												// Relative path to go back to base
+$conf_subdir = 'conf';                      // Subdirectory relative to base
+$conf_dirout = '..';                        // Relative path to go back to base
 # Location of the install folder:
-$install_dirout = '..';											// Relative path to go back to base
+$install_dirout = '..';                     // Relative path to go back to base
+
+
+# CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING!
+$use_cache = 1;							// Not using this will dramatically overquery the DB !
+$sleep_after_edit = 0;			// let DB do its stuff...
 
 ?>
