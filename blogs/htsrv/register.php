@@ -78,7 +78,7 @@ switch($action)
 
 		$query = "INSERT INTO $tableusers " .
 					"(user_login, user_pass, user_nickname, user_email, user_ip, user_domain, user_browser, dateYMDhour, user_level, user_idmode) " .
-					"VALUES ('".addslashes($user_login)."', '".md5($pass1)."', '".addslashes($user_nickname)."', '$email', '$user_ip', '".addslashes($user_domain)."', '".addslashes($user_browser)."', NOW(), '$new_users_can_blog', 'nickname')";
+					"VALUES ('".addslashes($login)."', '".md5($pass1)."', '".addslashes($user_nickname)."', '$email', '$user_ip', '".addslashes($user_domain)."', '".addslashes($user_browser)."', NOW(), '$new_users_can_blog', 'nickname')";
 		$result = mysql_query($query) or mysql_oops( $query );
 
 		// TODO: END TRANSACTION !!

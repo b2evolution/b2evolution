@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution formatting config
- * Version of this file: 0.8.5.1
+ * Version of this file: 0.8.5.3
  *
  * This sets how posts and comments are formatted
  *
