@@ -139,7 +139,7 @@ case "editpost":
 	 * --------------------------------------------------------------------
 	 * UPDATE POST 
 	 */
-	$title = "Updating post...";
+	$title = T_('Updating post...');
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 	
@@ -256,7 +256,7 @@ case "delete":
 	 * --------------------------------------------------------------------
 	 * DELETE a post from db
 	 */
-	$title = "Deleting post...";
+	$title = T_('Deleting post...');
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MG blog\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-11-02 21:04+0100\n"
-"PO-Revision-Date: 2003-10-19 23:40+0200\n"
-"Last-Translator:  <>\n"
+"POT-Creation-Date: 2003-12-16 01:24+0100\n"
+"PO-Revision-Date: 2003-11-09 23:15+0200\n"
+"Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=windows-1257\n"
@@ -149,12 +149,12 @@ msgstr "Archyvas"
 
 #: ..\..\..\multiblogs.php:96
 msgid "Multiblog demo"
-msgstr ""
+msgstr "Multibloginimo galimybiø demonstracija"
 
 #: ..\..\..\multiblogs.php:106
 msgid ""
 "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
-msgstr ""
+msgstr "Ðis ðablonas demonstruoja 3 blogus iðkarto (vienà kairëje, 2 deðinëje)"
 
 #: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:220
 #: ..\..\..\multiblogs.php:255 ..\..\..\noskin_a.php:161
@@ -165,16 +165,15 @@ msgstr ""
 #: ..\..\..\skins\custom\_main.php:72 ..\..\..\skins\custom\_main.php:95
 #: ..\..\..\skins\fplanque2002\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:108
-#, fuzzy
 msgid "Permanent link to full entry"
-msgstr "Nekintanti (permament) nuoroda á ðá straipsná"
+msgstr "Nekintanti (permament) nuoroda á visà straipsná"
 
 #: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:152
 #: ..\..\..\multiblogs.php:220 ..\..\..\multiblogs.php:255
 #: ..\..\..\noskin_a.php:161 ..\..\..\noskin_all.php:146
 #: ..\..\..\noskin_all.php:162 ..\..\..\noskin_b.php:146
 #: ..\..\..\noskin_b.php:162 ..\..\..\noskin_roll.php:145
-#: ..\..\..\noskin_roll.php:161 ..\..\..\admin\_edit_showposts.php:161
+#: ..\..\..\noskin_roll.php:161 ..\..\..\admin\_edit_showposts.php:163
 #: ..\..\..\skins\_blogroll.php:61 ..\..\..\skins\custom\_main.php:95
 #: ..\..\..\skins\fplanque2002\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:108
@@ -188,7 +187,7 @@ msgstr "Permalink'as"
 #: ..\..\..\noskin_b.php:250 ..\..\..\noskin_roll.php:146
 #: ..\..\..\noskin_roll.php:240 ..\..\..\admin\b2categories.php:9
 #: ..\..\..\admin\b2categories.php:218 ..\..\..\admin\_edit_form.php:258
-#: ..\..\..\admin\_edit_showposts.php:416 ..\..\..\skins\custom\_main.php:75
+#: ..\..\..\admin\_edit_showposts.php:418 ..\..\..\skins\custom\_main.php:75
 #: ..\..\..\skins\custom\_main.php:173
 #: ..\..\..\skins\fplanque2002\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:186
@@ -199,24 +198,22 @@ msgstr "Kategorijos"
 #: ..\..\..\noskin_all.php:155 ..\..\..\noskin_b.php:155
 #: ..\..\..\noskin_roll.php:154 ..\..\..\skins\custom\_main.php:88
 #: ..\..\..\skins\fplanque2002\_main.php:101
-#, fuzzy
 msgid "Display comments / Leave a comment"
-msgstr "Komentuoti"
+msgstr "Rodyti komentarus / Komentuoti"
 
 #: ..\..\..\multiblogs.php:147 ..\..\..\noskin_a.php:156
 #: ..\..\..\noskin_all.php:157 ..\..\..\noskin_b.php:157
 #: ..\..\..\noskin_roll.php:156 ..\..\..\skins\custom\_main.php:90
 #: ..\..\..\skins\fplanque2002\_main.php:103
 msgid "Display trackbacks / Get trackback address for this post"
-msgstr ""
+msgstr "Parodyti trackback'us / Ðio áraðo trackback'o adresas"
 
 #: ..\..\..\multiblogs.php:150 ..\..\..\noskin_a.php:159
 #: ..\..\..\noskin_all.php:160 ..\..\..\noskin_b.php:160
 #: ..\..\..\noskin_roll.php:159 ..\..\..\skins\custom\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:106
-#, fuzzy
 msgid "Display pingbacks"
-msgstr "Pingback'ø %"
+msgstr "Pingback'ai"
 
 #: ..\..\..\multiblogs.php:153 ..\..\..\noskin_a.php:162
 #: ..\..\..\noskin_all.php:163 ..\..\..\noskin_b.php:163
@@ -282,8 +279,8 @@ msgstr "Lankytojø statistika"
 #: ..\..\..\noskin_all.php:229 ..\..\..\noskin_all.php:235
 #: ..\..\..\noskin_b.php:238 ..\..\..\noskin_b.php:244
 #: ..\..\..\noskin_roll.php:228 ..\..\..\noskin_roll.php:234
-#: ..\..\..\admin\_edit_showposts.php:301
-#: ..\..\..\admin\_edit_showposts.php:491 ..\..\..\skins\custom\_main.php:161
+#: ..\..\..\admin\_edit_showposts.php:303
+#: ..\..\..\admin\_edit_showposts.php:493 ..\..\..\skins\custom\_main.php:161
 #: ..\..\..\skins\custom\_main.php:167
 #: ..\..\..\skins\fplanque2002\_main.php:174
 #: ..\..\..\skins\fplanque2002\_main.php:180
@@ -307,7 +304,7 @@ msgstr "Atskiri Þodþiai"
 
 #: ..\..\..\noskin_a.php:232 ..\..\..\noskin_all.php:234
 #: ..\..\..\noskin_b.php:243 ..\..\..\noskin_roll.php:233
-#: ..\..\..\admin\_edit_showposts.php:336 ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\admin\_edit_showposts.php:338 ..\..\..\skins\custom\_main.php:166
 #: ..\..\..\skins\fplanque2002\_main.php:179
 msgid "Entire phrase"
 msgstr "Frazë"
@@ -335,7 +332,7 @@ msgstr "Pasirinkti"
 
 #: ..\..\..\noskin_a.php:251 ..\..\..\noskin_all.php:253
 #: ..\..\..\noskin_b.php:262 ..\..\..\noskin_roll.php:252
-#: ..\..\..\admin\_edit_showposts.php:340 ..\..\..\skins\bluesky\_main.php:176
+#: ..\..\..\admin\_edit_showposts.php:342 ..\..\..\skins\bluesky\_main.php:176
 #: ..\..\..\skins\custom\_main.php:185
 #: ..\..\..\skins\fplanque2002\_main.php:198
 #: ..\..\..\skins\guadeloupe\_main.php:177
@@ -403,19 +400,16 @@ msgid "Totals: %d posts - %d queries - %01.3f seconds"
 msgstr "Viso: %d temø - %d uþklausø - %01.3f sekundþiø"
 
 #: ..\..\..\summary.php:56
-#, fuzzy
 msgid "Summary demo"
-msgstr "Santrauka"
+msgstr "Santraukos demonstracija"
 
 #: ..\..\..\summary.php:66
-#, fuzzy
 msgid "This demo template displays a summary of last posts in all blogs"
-msgstr "Paskutiniø temø ið visø blogø santrauka"
+msgstr "Ði demonstracija rodo paskutiniø temø ið visø blogø santraukà"
 
 #: ..\..\..\summary.php:97
-#, fuzzy
 msgid "More posts..."
-msgstr "Áraðomas straisnis..."
+msgstr "Daugiau áraðø..."
 
 #: ..\..\..\admin\b2blogs.php:9 ..\..\..\admin\_blogs_list.php:10
 #: ..\..\..\admin\_menutop.php:67 ..\..\..\skins\bluesky\_bloglist.php:17
@@ -557,9 +551,8 @@ msgid "New category name"
 msgstr "Naujos kategorijos pavadinimas"
 
 #: ..\..\..\admin\b2categories.php:49
-#, fuzzy
 msgid "Create category"
-msgstr "Narðyti kategorijà"
+msgstr "Sukurti kategorijà"
 
 #: ..\..\..\admin\b2categories.php:88
 msgid "Deleting category..."
@@ -600,20 +593,19 @@ msgstr "Senas \"tëvas\""
 
 #: ..\..\..\admin\b2categories.php:169
 msgid "Root (No parent)"
-msgstr ""
+msgstr "Root (Nëra tëvo)"
 
 #: ..\..\..\admin\b2categories.php:180
-#, fuzzy
 msgid "Edit category!"
-msgstr "Kategorija"
+msgstr "Redaguoti kategorijà"
 
 #: ..\..\..\admin\b2categories.php:231 ..\..\..\admin\_blogs_list.php:25
 #: ..\..\..\admin\_edit_form.php:199
 msgid "Edit"
 msgstr "Redaguoti"
 
-#: ..\..\..\admin\b2categories.php:233 ..\..\..\admin\_edit_showposts.php:152
-#: ..\..\..\admin\_edit_showposts.php:202
+#: ..\..\..\admin\b2categories.php:233 ..\..\..\admin\_edit_showposts.php:154
+#: ..\..\..\admin\_edit_showposts.php:204
 msgid "Delete"
 msgstr "Trinti"
 
@@ -681,15 +673,17 @@ msgstr "Prisijungti..."
 msgid ""
 "In b2evolution, you do not need to point to the b2login.php page to log in."
 msgstr ""
+"Norint prisijungti b2evolution sistemoje, jums nereikia nurodyti b2login.php "
+"puslapio."
 
 #: ..\..\..\admin\b2login.php:20
 #, php-format
 msgid ""
 "Simply point directly to the backoffice page you need, for example: %s or %"
 "s. b2evo will prompt you to log in if needed."
-msgstr ""
+msgstr "Paprasèiausiai nurodykite norimà Adminstracinës dalies puslapá, pvz.: %s arba %s. b2evo papraðys prisijungti, jei reikia."
 
-#: ..\..\..\admin\b2options.php:11 ..\..\..\admin\_edit_showposts.php:255
+#: ..\..\..\admin\b2options.php:11 ..\..\..\admin\_edit_showposts.php:257
 #: ..\..\..\admin\_menutop.php:72 ..\..\..\skins\_feedback.php:182
 msgid "Options"
 msgstr "Opcijos"
@@ -716,7 +710,7 @@ msgstr "puslapiai straipsniø "
 
 #: ..\..\..\admin\b2options.php:72
 msgid "Archive mode"
-msgstr "Archyvavimo bûsena"
+msgstr "Archyvavimo bûdas"
 
 #: ..\..\..\admin\b2options.php:79
 msgid "daily"
@@ -743,7 +737,7 @@ msgid "if you're not on the timezone of your server"
 msgstr "jeigu jûsø laiko juosta nesutampa su serverio vietos laiko juosta"
 
 #: ..\..\..\admin\b2options.php:101 ..\..\..\admin\_edit_form.php:150
-#: ..\..\..\admin\_edit_showposts.php:256 ..\..\..\skins\_feedback.php:186
+#: ..\..\..\admin\_edit_showposts.php:258 ..\..\..\skins\_feedback.php:186
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
@@ -803,13 +797,12 @@ msgid "b2evo sidebar"
 msgstr "b2evo sidebar'as"
 
 #: ..\..\..\admin\b2spell.php:11
-#, fuzzy
 msgid "Spell Check"
-msgstr "Tikrinti klaidas"
+msgstr "Klaidø Tikrinimas"
 
 #: ..\..\..\admin\b2spell.php:78
 msgid "Loading Spell Checker. Please wait"
-msgstr ""
+msgstr "Kraunamas Gramatikos Tikrinimas. Praðome palaukti"
 
 #: ..\..\..\admin\b2stats.php:10
 msgid "View Stats"
@@ -961,9 +954,8 @@ msgid ""
 msgstr "Ðie þmonës á blogà atëjo tiesiogiai. (arba áraðydami URL, arba pasinaudodami þymekliu (bookmark). Blogi (pernelyg trumpi) referalai taip pat parodyti )."
 
 #: ..\..\..\admin\b2stats.php:351
-#, fuzzy
 msgid "Top User Agents"
-msgstr "User Agents"
+msgstr "Top User Agent'ai"
 
 #: ..\..\..\admin\b2team.php:11
 msgid "User management"
@@ -974,12 +966,12 @@ msgid "Profile for:"
 msgstr "Profilis:"
 
 #: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:206
-#: ..\..\..\htsrv\login.php:71 ..\..\..\htsrv\register.php:92
-#: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:20
+#: ..\..\..\htsrv\login.php:74 ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:21
 #: ..\..\..\htsrv\_reg_complete.php:14 ..\..\..\htsrv\_reg_form.php:22
 #: ..\..\..\skins\_profile.php:28
 msgid "Login:"
-msgstr "Prisijungimas:"
+msgstr "Vartotojas:"
 
 #: ..\..\..\admin\b2team.php:39 ..\..\..\skins\_profile.php:47
 msgid "First name"
@@ -995,12 +987,12 @@ msgid "Nickname"
 msgstr "Slapyvardis"
 
 #: ..\..\..\admin\b2team.php:51 ..\..\..\admin\_edit_form.php:127
-#: ..\..\..\admin\_edit_showposts.php:233 ..\..\..\admin\_user_list.php:15
+#: ..\..\..\admin\_edit_showposts.php:235 ..\..\..\admin\_user_list.php:15
 #: ..\..\..\htsrv\comment_post.php:100 ..\..\..\htsrv\register.php:92
 #: ..\..\..\htsrv\_reg_complete.php:15 ..\..\..\htsrv\_reg_form.php:35
 #: ..\..\..\skins\_feedback.php:160 ..\..\..\skins\_profile.php:78
 msgid "Email"
-msgstr "Emailas"
+msgstr "El. Paðtas"
 
 #: ..\..\..\admin\b2team.php:55 ..\..\..\admin\_edit_form.php:131
 #: ..\..\..\admin\_quicktags.php:164 ..\..\..\admin\_user_list.php:16
@@ -1062,11 +1054,11 @@ msgstr "Negalima iðtrinti vartotojo #%d straipsniø."
 
 #: ..\..\..\admin\b2team.php:192
 msgid "Click on an user's login name to see his/her complete Profile."
-msgstr "Norëdami pamatyti vartotojo pilnà profilá, paspauskite ant jo prisijungimo vardo."
+msgstr "Norëdami pamatyti vartotojo pilnà profilá, paspauskite ant jo slapyvardþio."
 
 #: ..\..\..\admin\b2team.php:193
 msgid "To edit your Profile, click on your login name."
-msgstr "Noredami redaguoti savo Profilá, paspauskite ant savo prisijungimo vardo."
+msgstr "Noredami redaguoti savo Profilá, paspauskite ant savo slapyvardþio."
 
 #: ..\..\..\admin\b2team.php:200
 msgid "Active users"
@@ -1264,7 +1256,7 @@ msgid "Image Details"
 msgstr "Nuotraukos Detalës"
 
 #: ..\..\..\admin\b2upload.php:231 ..\..\..\admin\_edit_form.php:123
-#: ..\..\..\admin\_edit_showposts.php:227 ..\..\..\admin\_user_list.php:14
+#: ..\..\..\admin\_edit_showposts.php:229 ..\..\..\admin\_user_list.php:14
 #: ..\..\..\skins\_feedback.php:154
 msgid "Name"
 msgstr "Vardas"
@@ -1287,7 +1279,7 @@ msgstr "Áraðomas naujas strapsnis..."
 
 #: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:177
 #: ..\..\..\admin\edit_actions.php:347 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1196
+#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1197
 msgid "Supplied URL is invalid: "
 msgstr "Pateiktas URL neteisingas:"
 
@@ -1317,9 +1309,18 @@ msgstr "Áraðas neskelbiams vieðai: atðaukiamas \"trackback\", \"pingback\" ir bl
 msgid "Posting Done..."
 msgstr "Áraðas Padarytas..."
 
+#: ..\..\..\admin\edit_actions.php:142
+#, fuzzy
+msgid "Updating post..."
+msgstr "Trinami áraðai..."
+
 #: ..\..\..\admin\edit_actions.php:236
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Áraðas jau nusiuntë ping'à: atðaukiamas blogø ping'inimas..."
+
+#: ..\..\..\admin\edit_actions.php:259 ..\..\..\admin\edit_actions.php:275
+msgid "Deleting post..."
+msgstr "Trinami áraðai..."
 
 #: ..\..\..\admin\edit_actions.php:268
 msgid "Oops, no post with this ID!"
@@ -1329,10 +1330,6 @@ msgstr "Uuups, nerasta áraðø su ðiuo ID!"
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr "Jûs neturite teisës iðtrinti <strong>%s</strong> áraðø."
-
-#: ..\..\..\admin\edit_actions.php:275
-msgid "Deleting post..."
-msgstr "Trinami áraðai..."
 
 #: ..\..\..\admin\edit_actions.php:290
 msgid "Deleting Done..."
@@ -1508,7 +1505,7 @@ msgstr "(Atskirti tarpu)"
 
 #: ..\..\..\admin\_edit_form.php:173
 msgid "Preview"
-msgstr ""
+msgstr "Perþiûra"
 
 #: ..\..\..\admin\_edit_form.php:178
 msgid "Blog this !"
@@ -1527,7 +1524,7 @@ msgid "Upload a file/image"
 msgstr "Atsiøsti failà/nuotraukà"
 
 #: ..\..\..\admin\_edit_form.php:243 ..\..\..\admin\_edit_form.php:355
-#: ..\..\..\admin\_edit_showposts.php:126
+#: ..\..\..\admin\_edit_showposts.php:128
 msgid "Status"
 msgstr "Statusas"
 
@@ -1535,16 +1532,16 @@ msgstr "Statusas"
 msgid "The post will be publicly published"
 msgstr "Straipsnis bus vieðai paskelbtas"
 
-#: ..\..\..\admin\_edit_form.php:245 ..\..\..\admin\_edit_showposts.php:314
+#: ..\..\..\admin\_edit_form.php:245 ..\..\..\admin\_edit_showposts.php:316
 msgid "Published (Public)"
-msgstr "Paskelbtas (Public)"
+msgstr "Paskelbtas (Vieðas)"
 
 #: ..\..\..\admin\_edit_form.php:247
 msgid "The post will be published but visible only by logged-in team members"
 msgstr ""
 "Straipsnis bus paskelbtas, bet matomas tik prisijungusiems komandos nariams."
 
-#: ..\..\..\admin\_edit_form.php:247 ..\..\..\admin\_edit_showposts.php:316
+#: ..\..\..\admin\_edit_form.php:247 ..\..\..\admin\_edit_showposts.php:318
 msgid "Protected (Members only)"
 msgstr "Ribota (Tik nariams)"
 
@@ -1552,7 +1549,7 @@ msgstr "Ribota (Tik nariams)"
 msgid "The post will be published but visible only by yourself"
 msgstr "Straipsnis bus paskelbtas, bet matysite tik pats"
 
-#: ..\..\..\admin\_edit_form.php:249 ..\..\..\admin\_edit_showposts.php:318
+#: ..\..\..\admin\_edit_form.php:249 ..\..\..\admin\_edit_showposts.php:320
 msgid "Private (You only)"
 msgstr "Privatu (Tik jûs)"
 
@@ -1560,11 +1557,11 @@ msgstr "Privatu (Tik jûs)"
 msgid "The post will appear only in the backoffice"
 msgstr "Straipsnis atsiras tik administracinëje dalyje"
 
-#: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_showposts.php:320
+#: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_showposts.php:322
 msgid "Draft (Not published!)"
 msgstr "Juodraðtis (Neskelbtas!)"
 
-#: ..\..\..\admin\_edit_form.php:253 ..\..\..\admin\_edit_showposts.php:322
+#: ..\..\..\admin\_edit_form.php:253 ..\..\..\admin\_edit_showposts.php:324
 msgid "Deprecated (Not published!)"
 msgstr "Atðauktas (Neskelbtas!)"
 
@@ -1641,140 +1638,140 @@ msgid " Date range: "
 msgstr "Laikotarpis: "
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-#: ..\..\..\admin\_edit_showposts.php:116
+#: ..\..\..\admin\_edit_showposts.php:118
 msgid "by"
-msgstr "autorius"
+msgstr "Autorius:"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-#: ..\..\..\admin\_edit_showposts.php:122
+#: ..\..\..\admin\_edit_showposts.php:124
 msgid "in"
-msgstr "esantys"
+msgstr "Esantis:"
 
 #. TRANS: Edit button text (&nbsp; for extra space)
-#: ..\..\..\admin\_edit_showposts.php:149
-#: ..\..\..\admin\_edit_showposts.php:199
+#: ..\..\..\admin\_edit_showposts.php:151
+#: ..\..\..\admin\_edit_showposts.php:201
 msgid "&nbsp; Edit &nbsp;"
 msgstr "&nbsp; Redaguoti &nbsp;"
 
-#: ..\..\..\admin\_edit_showposts.php:152
+#: ..\..\..\admin\_edit_showposts.php:154
 msgid ""
 "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
 msgstr "Jûs ruoðiatës iðtrinti ðá straipsná!\\n\\'Atðaukti\\'jei persigalvojote, \\'OK\\' norint iðtrinti."
 
 #. TRANS: Link to comments for current post
-#: ..\..\..\admin\_edit_showposts.php:157
+#: ..\..\..\admin\_edit_showposts.php:159
 msgid "no comment"
 msgstr "komentarø nëra"
 
-#: ..\..\..\admin\_edit_showposts.php:157
+#: ..\..\..\admin\_edit_showposts.php:159
 #: ..\..\..\b2evocore\_functions_comments.php:150
 msgid "1 comment"
 msgstr "1 komentaras"
 
-#: ..\..\..\admin\_edit_showposts.php:157
+#: ..\..\..\admin\_edit_showposts.php:159
 #: ..\..\..\b2evocore\_functions_comments.php:151
 #, fuzzy, php-format
 msgid "% comments"
 msgstr "komentarø: %"
 
-#: ..\..\..\admin\_edit_showposts.php:158
+#: ..\..\..\admin\_edit_showposts.php:160
 msgid "1 Trackback"
 msgstr "1 Trackback'as"
 
-#: ..\..\..\admin\_edit_showposts.php:158
+#: ..\..\..\admin\_edit_showposts.php:160
 msgid "% Trackbacks"
 msgstr "Trackback'ø %"
 
-#: ..\..\..\admin\_edit_showposts.php:159
+#: ..\..\..\admin\_edit_showposts.php:161
 msgid "1 Pingback"
 msgstr "1 Pingback'as"
 
-#: ..\..\..\admin\_edit_showposts.php:159
+#: ..\..\..\admin\_edit_showposts.php:161
 msgid "% Pingbacks"
 msgstr "Pingback'ø %"
 
-#: ..\..\..\admin\_edit_showposts.php:161
+#: ..\..\..\admin\_edit_showposts.php:163
 msgid "Permanent link to this post"
 msgstr "Nekintanti (permament) nuoroda á ðá straipsná"
 
-#: ..\..\..\admin\_edit_showposts.php:175 ..\..\..\skins\_feedback.php:43
+#: ..\..\..\admin\_edit_showposts.php:177 ..\..\..\skins\_feedback.php:43
 msgid "Comments"
 msgstr "Komentarai"
 
-#: ..\..\..\admin\_edit_showposts.php:202
+#: ..\..\..\admin\_edit_showposts.php:204
 msgid ""
 "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
 msgstr "Jûs ruoðiatës iðtrinti ðá komentarà!\\n\\'Atðaukti\\' jei persigalvojote, \\'OK\\' norint iðtrinti."
 
-#: ..\..\..\admin\_edit_showposts.php:218
+#: ..\..\..\admin\_edit_showposts.php:220
 #: ..\..\..\b2evocore\_functions_comments.php:149
 #: ..\..\..\skins\_feedback.php:139
 msgid "Leave a comment"
 msgstr "Komentuoti"
 
-#: ..\..\..\admin\_edit_showposts.php:235 ..\..\..\skins\_feedback.php:162
+#: ..\..\..\admin\_edit_showposts.php:237 ..\..\..\skins\_feedback.php:162
 msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr "Jûsø emailas <strong>nebus</strong> pavieðintas svetainëje."
+msgstr "Jûsø elektroninio paðto adresas <strong>nebus</strong> pavieðintas svetainëje."
 
-#: ..\..\..\admin\_edit_showposts.php:240 ..\..\..\skins\_feedback.php:167
+#: ..\..\..\admin\_edit_showposts.php:242 ..\..\..\skins\_feedback.php:167
 msgid "Site/Url"
 msgstr "Svetainë/Url"
 
-#: ..\..\..\admin\_edit_showposts.php:242 ..\..\..\skins\_feedback.php:169
+#: ..\..\..\admin\_edit_showposts.php:244 ..\..\..\skins\_feedback.php:169
 msgid "Your URL will be displayed."
 msgstr "Jûsø URL bus parodytas."
 
-#: ..\..\..\admin\_edit_showposts.php:247 ..\..\..\skins\_feedback.php:174
+#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:174
 msgid "Comment text"
-msgstr "Komentarø tekstas"
+msgstr "Komentaras"
 
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:176
+#: ..\..\..\admin\_edit_showposts.php:251 ..\..\..\skins\_feedback.php:176
 msgid "Allowed XHTML tags"
 msgstr "Leidþiama XHTML sintaksë"
 
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:177
+#: ..\..\..\admin\_edit_showposts.php:251 ..\..\..\skins\_feedback.php:177
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URLai, emailai, AIM ir ICQ bus konvertuoti automatiðkai."
 
-#: ..\..\..\admin\_edit_showposts.php:256
+#: ..\..\..\admin\_edit_showposts.php:258
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Eiluèiø perkëlimai taps  &lt;br /&gt;)"
 
-#: ..\..\..\admin\_edit_showposts.php:263 ..\..\..\skins\_feedback.php:195
+#: ..\..\..\admin\_edit_showposts.php:265 ..\..\..\skins\_feedback.php:195
 msgid "Send comment"
 msgstr "Komentuoti"
 
-#: ..\..\..\admin\_edit_showposts.php:306
+#: ..\..\..\admin\_edit_showposts.php:308
 msgid "Posts to show"
 msgstr "Parodyti straipsnius"
 
-#: ..\..\..\admin\_edit_showposts.php:308
+#: ..\..\..\admin\_edit_showposts.php:310
 msgid "Past"
 msgstr "Praeitis"
 
-#: ..\..\..\admin\_edit_showposts.php:310
+#: ..\..\..\admin\_edit_showposts.php:312
 msgid "Future"
 msgstr "Ateitis"
 
-#: ..\..\..\admin\_edit_showposts.php:330
+#: ..\..\..\admin\_edit_showposts.php:332
 msgid "Title / Text contains"
 msgstr "Pavadinime/Tekste yra"
 
-#: ..\..\..\admin\_edit_showposts.php:334
+#: ..\..\..\admin\_edit_showposts.php:336
 msgid "Words"
 msgstr "Þodþiai"
 
-#: ..\..\..\admin\_edit_showposts.php:334
+#: ..\..\..\admin\_edit_showposts.php:336
 msgid "AND"
 msgstr "IR"
 
-#: ..\..\..\admin\_edit_showposts.php:335
+#: ..\..\..\admin\_edit_showposts.php:337
 msgid "OR"
 msgstr "AR"
 
-#: ..\..\..\admin\_edit_showposts.php:492
+#: ..\..\..\admin\_edit_showposts.php:494
 msgid "Reset"
 msgstr "Iðvalyti"
 
@@ -1801,7 +1798,7 @@ msgstr "Narðyti/Redaguoti"
 
 #: ..\..\..\admin\_menutop.php:57
 msgid "Stats"
-msgstr "Stats"
+msgstr "Statistika"
 
 #: ..\..\..\admin\_menutop.php:62
 msgid "Cats"
@@ -1900,6 +1897,17 @@ msgid ""
 "Are you sure you want to delete this user?\\nWarning: all his posts will be "
 "deleted too!"
 msgstr "Ar tikrai norite iðtrinti ðá vartotojà?\\nPerspëjimas: Visi jo straipsniai bus iðtrinti taip pat!"
+
+#: ..\..\..\b2evocore\_blog_main.php:181
+msgid " (default skin)"
+msgstr ""
+
+#: ..\..\..\b2evocore\_blog_main.php:182
+#, php-format
+msgid ""
+"The requested skin [%s] does not exist. The blog cannot be displayed. "
+"Contact the <a %s>webmaster</a>..."
+msgstr ""
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:112
 msgid "Tag <code>body</code> can only be used once!"
@@ -2140,15 +2148,15 @@ msgstr "jei nieko nevyksta, paspauskite <a %s>èia</a>."
 msgid "Parameter %s is required!"
 msgstr "Parametras %s bûtinas!"
 
-#: ..\..\..\b2evocore\_functions.php:1192
+#: ..\..\..\b2evocore\_functions.php:1193
 msgid "Invalid URL"
 msgstr "Kvailas URL"
 
-#: ..\..\..\b2evocore\_functions.php:1198
+#: ..\..\..\b2evocore\_functions.php:1199
 msgid "URI scheme not allowed"
 msgstr "URI schema neleidþiama"
 
-#: ..\..\..\b2evocore\_functions.php:1206
+#: ..\..\..\b2evocore\_functions.php:1207
 msgid "URL not allowed"
 msgstr "URL neleidþiamas"
 
@@ -2171,7 +2179,7 @@ msgstr "Daugiau:"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:507
 msgid "Post details"
-msgstr "Straipsnio detalës"
+msgstr "Visas straipsnis"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:563
 msgid "Next page"
@@ -2523,17 +2531,17 @@ msgstr "Ant"
 #. TRANS: abbrev. for Wednesday
 #: ..\..\..\b2evocore\_vars.php:121
 msgid "Wed"
-msgstr "Trè"
+msgstr "Tre"
 
 #. TRANS: abbrev. for Thursday
 #: ..\..\..\b2evocore\_vars.php:123
 msgid "Thu"
-msgstr "Ktv"
+msgstr "Ket"
 
 #. TRANS: abbrev. for Friday
 #: ..\..\..\b2evocore\_vars.php:125
 msgid "Fri"
-msgstr "Pkt"
+msgstr "Pen"
 
 #. TRANS: abbrev. for Saturday
 #: ..\..\..\b2evocore\_vars.php:127
@@ -2647,31 +2655,30 @@ msgstr "Lap"
 #. TRANS: abbrev. for December
 #: ..\..\..\b2evocore\_vars.php:168
 msgid "Dec"
-msgstr "Grd"
+msgstr "Gruo"
 
+# Posto statusas (administracinëje dalyje)
 #: ..\..\..\b2evocore\_vars.php:172
-#, fuzzy
 msgid "Published"
-msgstr "Paskelbtas (Public)"
+msgstr "Paskelbtas"
 
+# Posto statusas (administracinëje dalyje)
 #: ..\..\..\b2evocore\_vars.php:173
-#, fuzzy
 msgid "Deprecated"
-msgstr "Pasirinkta"
+msgstr "Atmestas"
 
+# Posto statusas (administracinëje dalyje)
 #: ..\..\..\b2evocore\_vars.php:174
-#, fuzzy
 msgid "Protected"
-msgstr "Paskelbtas turinys"
+msgstr "Apsaugotas"
 
 #: ..\..\..\b2evocore\_vars.php:175
 msgid "Private"
-msgstr ""
+msgstr "Privatu"
 
 #: ..\..\..\b2evocore\_vars.php:176
-#, fuzzy
 msgid "Draft"
-msgstr "Data"
+msgstr "Juodraðtis"
 
 #: ..\..\..\conf\_locales.php:22
 msgid "Dutch"
@@ -2683,30 +2690,34 @@ msgstr "Anglø"
 
 #: ..\..\..\conf\_locales.php:24
 msgid "French"
-msgstr "Prancûsø"
+msgstr "Prancûzø"
 
 #: ..\..\..\conf\_locales.php:25
+#, fuzzy
+msgid "German"
+msgstr "Permalink'as"
+
+#: ..\..\..\conf\_locales.php:26
 msgid "Japanese"
 msgstr "Japonø"
 
-#: ..\..\..\conf\_locales.php:26
-#, fuzzy
+#: ..\..\..\conf\_locales.php:27
 msgid "Lithuanian"
 msgstr "Lietuviø"
 
-#: ..\..\..\conf\_locales.php:27
-msgid "Norwegian Bokm&aring;l"
-msgstr ""
-
 #: ..\..\..\conf\_locales.php:28
+msgid "Norwegian Bokm&aring;l"
+msgstr "Norvegø"
+
+#: ..\..\..\conf\_locales.php:29
 msgid "Portuguese"
 msgstr "Portugalø"
 
-#: ..\..\..\conf\_locales.php:29
+#: ..\..\..\conf\_locales.php:30
 msgid "Spanish"
 msgstr "Ispanø"
 
-#: ..\..\..\conf\_locales.php:30
+#: ..\..\..\conf\_locales.php:31
 msgid "Swedish"
 msgstr "Ðvedø"
 
@@ -2720,7 +2731,7 @@ msgstr "Praðome áraðyti emailà"
 
 #: ..\..\..\htsrv\comment_post.php:37
 msgid "Supplied email address is invalid"
-msgstr "Pateiktas emailas neteisingas"
+msgstr "Pateiktas elektroninio paðto adresas neteisingas"
 
 #: ..\..\..\htsrv\comment_post.php:72
 msgid "You can only post a new comment every 30 seconds."
@@ -2744,7 +2755,7 @@ msgid "Author"
 msgstr "Autorius"
 
 #: ..\..\..\htsrv\comment_post.php:101 ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1222
+#: ..\..\..\xmlsrv\xmlrpc.php:1223
 msgid "Url"
 msgstr "Url"
 
@@ -2753,10 +2764,9 @@ msgid "Comment"
 msgstr "Komentaras"
 
 #: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:101
-#: ..\..\..\xmlsrv\xmlrpc.php:1224
-#, fuzzy
+#: ..\..\..\xmlsrv\xmlrpc.php:1225
 msgid "Edit/Delete"
-msgstr "Trinti"
+msgstr "Redaguoti/Trinti"
 
 #: ..\..\..\htsrv\getmail.php:38
 msgid "Connecting to pop server..."
@@ -2831,31 +2841,31 @@ msgstr "Vartotojai su 0 lygiu negali raðyti."
 msgid "OK."
 msgstr "OK."
 
-#: ..\..\..\htsrv\login.php:62 ..\..\..\htsrv\login.php:84
+#: ..\..\..\htsrv\login.php:65 ..\..\..\htsrv\login.php:87
 msgid "The email was sent successfully to your email address."
-msgstr "Emailas sëkmingai nusiøstas jûsø nurodytu adresu."
+msgstr "Priminimo laiðkas sëkmingai nusiøstas jûsø nurodytu adresu."
 
-#: ..\..\..\htsrv\login.php:63 ..\..\..\htsrv\login.php:85
+#: ..\..\..\htsrv\login.php:66 ..\..\..\htsrv\login.php:88
 msgid "Click here to login !"
 msgstr "Norëdami prisijungti paspauskite èia !"
 
-#: ..\..\..\htsrv\login.php:72
+#: ..\..\..\htsrv\login.php:75
 msgid "New Password:"
 msgstr "Naujas Slaptaþodis:"
 
-#: ..\..\..\htsrv\login.php:77
+#: ..\..\..\htsrv\login.php:80
 msgid "your weblog's login/password"
 msgstr "jûsø weblogo id/slaptaþodis"
 
-#: ..\..\..\htsrv\login.php:79
+#: ..\..\..\htsrv\login.php:82
 msgid "The email could not be sent."
 msgstr "Slaptaþodis negali bûti iðsøstas."
 
-#: ..\..\..\htsrv\login.php:80
+#: ..\..\..\htsrv\login.php:83
 msgid "Possible reason: your host may have disabled the mail() function...</p>"
 msgstr "Galima prieþastis: jûsø serveryje iðjungta PHP mail() funkcija...</p>"
 
-#: ..\..\..\htsrv\login.php:96
+#: ..\..\..\htsrv\login.php:99
 msgid "Note: You are already logged in!"
 msgstr "Pastaba: Jûs jau prisijungæ!"
 
@@ -2887,7 +2897,7 @@ msgstr "Praðome áraðyti savo emailà"
 
 #: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\register.php:61
 msgid "the email address is invalid"
-msgstr "Emailas neteisingas"
+msgstr "Elektroninis paðto adresas neteisingas"
 
 #: ..\..\..\htsrv\profile_update.php:77 ..\..\..\htsrv\profile_update.php:85
 msgid "you typed your new password only once. Go back to type it twice."
@@ -2926,11 +2936,11 @@ msgstr "Redaguoti vartotojus"
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Naujas trackback'as straipsnyje #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1221
+#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1222
 msgid "Website"
 msgstr "Svetainë"
 
-#: ..\..\..\htsrv\trackback.php:100 ..\..\..\xmlsrv\xmlrpc.php:1223
+#: ..\..\..\htsrv\trackback.php:100 ..\..\..\xmlsrv\xmlrpc.php:1224
 msgid "Excerpt"
 msgstr "Iðtrauka"
 
@@ -2962,7 +2972,7 @@ msgstr "Pamirðote slaptaþodá ?"
 msgid "A new password will be generated and sent to you by email."
 msgstr "Naujas slaptaþodis bus sugeneruotas ir iðsiøstas jums emailu."
 
-#: ..\..\..\htsrv\_lostpass_form.php:26
+#: ..\..\..\htsrv\_lostpass_form.php:27
 msgid "Generate new password!"
 msgstr "Generuoti naujà slaptaþodá!"
 
@@ -3008,12 +3018,11 @@ msgstr "Pingback'ai"
 
 #: ..\..\..\skins\_feedback.php:58
 msgid "Trackback address for this post:"
-msgstr ""
+msgstr "Ðio straipsnio trackback'o URL:"
 
 #: ..\..\..\skins\_feedback.php:89
-#, fuzzy
 msgid "Comment from:"
-msgstr "Komentaro informacija"
+msgstr "Komentaro autorius"
 
 #: ..\..\..\skins\_feedback.php:104
 msgid "Trackback from:"
@@ -3025,9 +3034,9 @@ msgstr "Pingback'as ið:"
 
 #. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #: ..\..\..\skins\_feedback.php:134
-#, php-format
+#, fuzzy, php-format
 msgid "No %s for this post yet..."
-msgstr "%s ðiam straipsniui nëra..."
+msgstr "Komentarø/Trackback'ø/Pingback'ø ðiam straipsniui nëra..."
 
 #: ..\..\..\skins\_feedback.php:186
 msgid "Line breaks become &lt;br /&gt;"
@@ -3042,19 +3051,17 @@ msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Iðsaugoti sausainiukà vardui, emailui ir url)"
 
 #: ..\..\..\skins\_lastcomments.php:22
-#, fuzzy
 msgid "No comment yet..."
-msgstr "komentarø nëra"
+msgstr "Komentarø nëra..."
 
 #: ..\..\..\skins\_lastcomments.php:33
-#, fuzzy
 msgid "In response to:"
-msgstr "Atsakymas:"
+msgstr "Atsakant á:"
 
 #: ..\..\..\skins\_lastcomments.php:33
 #, php-format
 msgid "Original post on %s"
-msgstr ""
+msgstr "Originalus straipsnis %s kategorijoje"
 
 #: ..\..\..\skins\_profile.php:62
 msgid "Identity shown"
@@ -3086,32 +3093,30 @@ msgstr "blogai"
 
 #: ..\..\..\skins\babyblues\_main.php:85
 msgid "skin the site"
-msgstr ""
+msgstr "Pasirinkite ðablonà"
 
 #: ..\..\..\skins\babyblues\_main.php:93
 #: ..\..\..\skins\originalb2\_main.php:147
-#, fuzzy
 msgid "archives"
-msgstr "Archyvai"
+msgstr "archyvai"
 
 #: ..\..\..\skins\bluesky\_main.php:70 ..\..\..\skins\guadeloupe\_main.php:70
-#, fuzzy
 msgid "Display feedback / Leave a comment"
-msgstr "Komentuoti"
+msgstr "Rodyti atsiliepimus / Komentuoti"
 
 #: ..\..\..\skins\bluesky\_main.php:157
 #: ..\..\..\skins\guadeloupe\_main.php:158
 msgid "Choose a skin"
-msgstr ""
+msgstr "Pasirinkite ðablonà"
 
 #: ..\..\..\skins\custom\_main.php:79
 msgid "words"
-msgstr "þodþiø"
+msgstr "þodþiai"
 
 #: ..\..\..\skins\custom\_main.php:195
 #: ..\..\..\skins\fplanque2002\_main.php:207
 msgid "Choose skin"
-msgstr ""
+msgstr "Pasirinkite ðablonà"
 
 #: ..\..\..\skins\originalb2\_main.php:44
 msgid "Browse all posts by this author"
@@ -3122,13 +3127,7 @@ msgstr "Perþiûrëti visus ðio autoriaus áraðus"
 msgid "[...] Read more!"
 msgstr "[...] Daugiau!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1215 ..\..\..\xmlsrv\xmlrpc.php:1219
+#: ..\..\..\xmlsrv\xmlrpc.php:1216 ..\..\..\xmlsrv\xmlrpc.php:1220
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Naujas pingback'as straipsnyje #%d \"%s\""
-
-#~ msgid "the email address isn't correct"
-#~ msgstr "Emailas neteisingas"
-
-#~ msgid "Login"
-#~ msgstr "Prisijungimo Vardas"

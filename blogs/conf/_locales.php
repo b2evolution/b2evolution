@@ -22,6 +22,7 @@ $languages = array(
 	'nl' => NT_('Dutch'),
 	'en' => NT_('English'),
 	'fr' => NT_('French'),
+	'de' => NT_('German'),
 	'ja' => NT_('Japanese'),
 	'lt' => NT_('Lithuanian'),
 	'nb' => NT_('Norwegian Bokm&aring;l'), 
@@ -38,7 +39,7 @@ $default_locale = 'en_US';
 
 
 $default_locale = 'fr_FR';			// For testing :))
-// $default_locale = 'pt_BR';			// For testing :))
+$default_locale = 'de_DE';			// For testing :))
 // $default_locale = 'ja_JP';			// For testing :))
 // $default_locale = 'nl_NL';			// For testing :))
 // $default_locale = 'sv_SE';			// For testing :))
@@ -47,6 +48,11 @@ $default_locale = 'fr_FR';			// For testing :))
 #  and localization:
 # Add what you need and comment what you don't need
 $locales = array(
+	'de_DE' => array( // German, Germany
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'd.m.y',
+									'timefmt' => 'H:i:s',
+								),
 	'en_US' => array( // English, USA
 									'charset' => 'iso-8859-1',	// gettext will convert to this
 									'datefmt' => 'm/d/y',	

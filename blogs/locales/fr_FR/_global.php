@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => 'Project-Id-Version: b2evolution 0.8.3-alpha1\nPOT-Creation-Date: 2003-11-02 21:04+0100\nPO-Revision-Date: 2003-11-02 21:10+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: b2evolution 0.8.6.1\nPOT-Creation-Date: 2003-12-16 01:24+0100\nPO-Revision-Date: 2003-12-16 01:27+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mon b2evoltution',
 	'my blogs' => 'mes blogs',
 	'A blog tool like it oughta be!' => 'Un outil de blog tel qu\'il devrait être!',
@@ -255,10 +255,11 @@ $trans['fr_FR'] = array(
 	'Sleeping...' => 'Attente...',
 	'Post not publicly published: skipping trackback, pingback and blog pings...' => 'Article non publié publiquement: pas de trackback, pingback ni pings...',
 	'Posting Done...' => 'Enregistrement effectué...',
+	'Updating post...' => 'Mise à jour de l\'article...',
 	'Post had already pinged: skipping blog pings...' => 'Les pings concernant cet article ont déjà été envoyés: pas de pings...',
+	'Deleting post...' => 'Suppression de l\'article...',
 	'Oops, no post with this ID!' => 'Oups, aucun article avec cet Idx.',
 	'You don\'t have the right to delete <strong>%s</strong>\'s posts.' => 'Vous n\'avez pas le droit d\'effacer les articles de <strong>%s</strong>.',
-	'Deleting post...' => 'Suppression de l\'article...',
 	'Deleting Done...' => 'Suppression effectuée...',
 	'Oops, no comment with this ID.' => 'Oups, pas de commentaire avec cet Idx.',
 	'Cannot update comment, please correct these errors:' => 'Impossible de mettr à jour le commentaire; veuillez corriger les erreurs suivantes:',
@@ -389,6 +390,8 @@ $trans['fr_FR'] = array(
 	'no teaser [Alt-T]' => 'pas de teaser [Alt-T]',
 	'Login ' => 'Identifiant ',
 	'Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!' => 'Etes vous sûr de vouloir supprimer cet utilisateur?\\nAttention: tous ses articles seront supprimés également!',
+	' (default skin)' => ' (Habillage par défaut)',
+	'The requested skin [%s] does not exist. The blog cannot be displayed. Contact the <a %s>webmaster</a>...' => 'L\'habillage demandé [%s] n\'existe pas. Le blog ne peut pas être affiché. Contactez le <a %s>webmaster</a>...',
 	'Tag <code>body</code> can only be used once!' => 'La balise <code>body</code> ne peut être utilisée qu\'une seule fois!',
 	'Illegal tag' => 'Balise interdite',
 	'Tag %s must occur inside another tag' => 'La balise %s doit se trouver à l\'intérieur d\'une autre balise',
@@ -558,6 +561,7 @@ $trans['fr_FR'] = array(
 	'Dutch' => 'Néerlandais',
 	'English' => 'Anglais',
 	'French' => 'Français',
+	'German' => 'Allemand',
 	'Japanese' => 'Japonais',
 	'Lithuanian' => 'Lituanien',
 	'Norwegian Bokm&aring;l' => 'norvégien',
