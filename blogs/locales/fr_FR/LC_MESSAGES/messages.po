@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-05-12 20:23+0200\n"
-"PO-Revision-Date: 2004-05-12 20:30+0100\n"
+"PO-Revision-Date: 2004-05-13 00:28+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1751,7 +1751,7 @@ msgstr "Gen!"
 
 #  TRANS: Warning this is a javascript string
 #  TRANS: Warning this is a javascript string
-#. TRANS: Warning this is a javascript string
+#  TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_blogs_list.php:88
 #, php-format
 msgid ""
@@ -1767,7 +1767,7 @@ msgstr ""
 "ATTENTION: Ceci va supprimer TOUS LES ARTICLES, COMMENTAIRES,\\n"
 "CATEGORIES et autres données liées à ce blog!\\n"
 "\\n"
-"Cette opération n'est PAS réversible!"
+"Cette opération n\'est PAS réversible!"
 
 #: ..\..\..\admin\_blogs_list.php:88
 msgid "Delete this blog!"

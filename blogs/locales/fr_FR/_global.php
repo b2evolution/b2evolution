@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-12 20:23+0200\nPO-Revision-Date: 2004-05-12 20:30+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-05-12 20:23+0200\nPO-Revision-Date: 2004-05-13 00:28+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",
@@ -352,7 +352,7 @@ $trans['fr_FR'] = array(
 	'Properties' => "Propriétés",
 	'Default' => "Par défaut",
 	'Gen!' => "Gen!",
-	'Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!' => "Etes vous sûr de vouloir supprimer le blog #n°%d ?\\n\\nATTENTION: Ceci va supprimer TOUS LES ARTICLES, COMMENTAIRES,\\nCATEGORIES et autres données liées à ce blog!\\n\\nCette opération n'est PAS réversible!",
+	'Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!' => "Etes vous sûr de vouloir supprimer le blog #n°%d ?\\n\\nATTENTION: Ceci va supprimer TOUS LES ARTICLES, COMMENTAIRES,\\nCATEGORIES et autres données liées à ce blog!\\n\\nCette opération n\'est PAS réversible!",
 	'Delete this blog!' => "Supprimer ce blog!",
 	'Copy this blog!' => "Copier ce blog!",
 	'Copy' => "Copier",

@@ -187,7 +187,6 @@
 			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
 			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label>
 			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
-			<input type="reset" value="<?php echo T_('Reset form') ?>" />
 		</form>
 	</div>
 
@@ -291,7 +290,7 @@
 					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 			</ul>
-			<a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
+    <a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English"><?php echo T_('What is RSS?') ?></a>
 	</div>
 
 	<p class="center">powered by<br />

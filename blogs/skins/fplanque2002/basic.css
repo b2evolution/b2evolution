@@ -109,6 +109,7 @@ p.baseline {
 }
 hr {
 	height: 0px;
+	width: 50%;
 	border-top: 1px solid #33CCCC;
 	border-right: 1px none #33CCCC;
 	border-bottom: 1px none #33CCCC;
