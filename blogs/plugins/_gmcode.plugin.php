@@ -15,7 +15,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class gmcode_Rendererplugin extends Plugin
+class gmcode_plugin extends Plugin
 {
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
@@ -63,9 +63,9 @@ class gmcode_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal gmcode_Rendererplugin::gmcode_Rendererplugin(-)}}
+	 * {@internal gmcode_plugin::gmcode_plugin(-)}}
 	 */
-	function gmcode_Rendererplugin()
+	function gmcode_plugin()
 	{
 		$this->short_desc = T_('GreyMatter style formatting');
 		$this->long_desc = T_('**bold** \\italics\\ //italics// __underline__ ##tt## %%codeblock%%');
@@ -75,7 +75,7 @@ class gmcode_Rendererplugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::render(-)}} 
+	 * {@internal gmcode_plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -93,8 +93,4 @@ class gmcode_Rendererplugin extends Plugin
 		return true;
 	}
 }
-
-// Register the plugin:
-$this->register( new gmcode_Rendererplugin() );
-
 ?>

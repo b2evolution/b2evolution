@@ -12,7 +12,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class texturize_Rendererplugin extends Plugin
+class texturize_plugin extends Plugin
 {
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
@@ -27,9 +27,9 @@ class texturize_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal texturize_Rendererplugin::texturize_Rendererplugin(-)}}
+	 * {@internal texturize_plugin::texturize_plugin(-)}}
 	 */
-	function texturize_Rendererplugin()
+	function texturize_plugin()
 	{
 		$this->short_desc = 'Smart quotes and more';
 		$this->long_desc = 'No description available';
@@ -39,7 +39,7 @@ class texturize_Rendererplugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal texturize_Rendererplugin::render(-)}} 
+	 * {@internal texturize_plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -99,8 +99,5 @@ class texturize_Rendererplugin extends Plugin
 		return true;
 	}
 }
-
-// Register the plugin:
-$this->register( new texturize_Rendererplugin() );
 
 ?>

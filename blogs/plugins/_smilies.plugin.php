@@ -14,7 +14,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class Smilies_Plugin extends Plugin
+class smilies_plugin extends Plugin
 {
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
@@ -62,9 +62,9 @@ class Smilies_Plugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal Smilies_Plugin::Smilies_Plugin(-)}}
+	 * {@internal smilies_plugin::smilies_plugin(-)}}
 	 */
-	function Smilies_Plugin()
+	function smilies_plugin()
 	{
 		$this->short_desc = T_('Graphical smileys');
 		$this->long_desc = T_('One click smilies inserting + Convert text smilies to icons');
@@ -92,7 +92,7 @@ class Smilies_Plugin extends Plugin
 	/**
 	 * Display a toolbar
 	 *
-	 * {@internal Smilies_Plugin::DisplayToolbar(-)}}
+	 * {@internal smilies_plugin::DisplayToolbar(-)}}
 	 *
    * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -167,7 +167,7 @@ class Smilies_Plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal Smilies_Plugin::render(-)}}
+	 * {@internal smilies_plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -243,10 +243,4 @@ function smiliescmp($a, $b)
 	}
 	return $diff;
 }
-
-
-
-// Register the plugin:
-$this->register( new Smilies_Plugin() );
-
 ?>

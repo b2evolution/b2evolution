@@ -195,7 +195,7 @@ class DB
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
-	 * @return mixed # of rows or false if error
+	 * @return mixed # of rows affected or false if error
 	 */
 	function query( $query, $title = '' )
 	{

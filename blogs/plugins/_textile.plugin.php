@@ -199,7 +199,7 @@ Applying Attributes:
 /**
  * @package plugins
  */
-class textile_Rendererplugin extends Plugin
+class textile_plugin extends Plugin
 {
 	var $code = 'b2DATxtl';
 	var $name = 'Textile (beta)';
@@ -225,9 +225,9 @@ class textile_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal textile_Rendererplugin::textile_Rendererplugin(-)}}
+	 * {@internal textile_plugin::textile_plugin(-)}}
 	 */
-	function textile_Rendererplugin()
+	function textile_plugin()
 	{
 		$this->short_desc = T_('Humane Web Text Generator 2.0 beta');
 		$this->long_desc = T_('No description available');
@@ -988,9 +988,5 @@ function refs($m)
 
 
 } // end class
-
-
-// Register the plugin:
-$this->register( new textile_Rendererplugin() );
 
 ?>

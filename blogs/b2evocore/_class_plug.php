@@ -70,23 +70,65 @@ class Plug
 	/**
 	 * Initialize Plug if it has not been done before.
 	 *
-	 * Load the plugins.
+	 * Load the installed plugins.
 	 *
 	 * {@internal Plug::init(-)}}
 	 */
 	function init( )
 	{
+		global $DB, $Debuglog;
+
 		if( ! $this->initialized )
 		{
+			$Debuglog->add( 'Loading plugins...' );
+			$rows = $DB->get_results( 'SELECT *
+																	 FROM T_plugins
+																	ORDER BY plug_priority', ARRAY_A );
+			if( count($rows) ) foreach( $rows as $row )
+			{	// Loop through installed plugins:
+				$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $row['plug_classname'] ).'.php';
+				if( ! is_file( $filename ) )
+				{	// Plugin not found!
+					$Debuglog->add( 'Plugin not found: '.$filename );
+					continue;
+				}
+				// Load the plugin:
+				$Debuglog->add( 'Loading plugin: '.$row['plug_classname'] );
+				require_once $filename;
+				// Register the plugin:
+				$this->register( $row['plug_classname'], $row['plug_ID'] );
+			}
+
+			$this->initialized = true;
+		}
+	}
+
+
+	/**
+	 * Discover and load all available plugins plugins.
+	 *
+	 * {@internal Plug::discover(-)}}
+	 */
+	function discover()
+	{
+		global $Debuglog;
+
+		if( ! $this->initialized )
+		{
+			$Debuglog->add( 'Discovering plugins...' );
+
 			// Go through directory:
 			$this_dir = dir( $this->plugins_path );
 			while( $this_file = $this_dir->read())
 			{
-				if( preg_match( '/^_.+\.plugin\.php$/', $this_file ) && is_file( $this->plugins_path. '/'. $this_file ) )
+				if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $matches ) && is_file( $this->plugins_path. '/'. $this_file ) )
 				{	// Valid plugin file name:
-					// echo 'Loading ', $this_file, '...<br />';
+	        $Debuglog->add( 'Loading plugin: '.$this_file );
 					// Load the plugin:
-					require $this->plugins_path. '/'. $this_file;
+					require_once $this->plugins_path.$this_file;
+					// Register the plugin:
+					$classname = $matches[1].'_plugin';
+					$this->register( $classname, 0 );
 				}
 			}
 
@@ -99,16 +141,112 @@ class Plug
 
 
 	/**
+	 * Install a plugin
+	 *
+	 * Records it in the database
+	 *
+	 * {@internal Plug::install(-)}}
+	 */
+	function install( $plugin_name )
+	{
+		global $DB, $Debuglog;
+
+		$this->init();	// Init if not done yet.
+
+		// Load the plugin:
+		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $plugin_name ).'.php';
+		require_once $filename;
+
+		// Register the plugin:
+		$Plugin = & $this->register( $plugin_name, 0 );	// ID will be set a few lines below
+
+		// Sort array by priority:
+		usort( $this->Plugins, 'sort_Plugin' );
+
+		// Record into DB
+		//$DB->begin();
+
+		//$max_order = $DB->get_var( 'SELECT MAX(plug_order) FROM T_plugin' );
+
+		$DB->query( "INSERT INTO T_plugins( plug_classname, plug_priority )
+									VALUES( '$plugin_name', $Plugin->priority ) " );
+
+		//$DB->commit();
+
+		$Plugin->ID = $DB->insert_id;
+		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID );
+
+	}
+
+
+	/**
+	 * Uninstall a plugin
+	 *
+	 * Removes it from the database
+	 *
+	 * {@internal Plug::uninstall(-)}}
+	 *
+	 * @return boolean success
+	 */
+	function uninstall( $plugin_ID )
+	{
+		global $DB, $Debuglog;
+
+		$this->init();	// Init if not done yet.
+
+		// Delete from DB
+		if( ! $DB->query( "DELETE FROM T_plugins
+												WHERE plug_ID = $plugin_ID" ) )
+		{	// Nothing removed!?
+			return false;
+		}
+
+		// for( $i = 0; $i < count( $this->Plugins ); $i++ )
+		$move_by = 0;
+		$items = count($this->Plugins);
+		foreach( $this->Plugins as $key => $Plugin )
+		{	// Go through plugins:
+			if( $Plugin->ID == $plugin_ID )
+			{	// This one must be unregistered...
+				unset( $this->index_Plugins[ $Plugin->code ] );
+				$move_by--;
+			}
+			elseif($move_by)
+			{	// This is a normal one but must be moved up
+				$this->Plugins[$key+$move_by] = & $this->Plugins[$key];
+			}
+
+			if( $key >= $items+$move_by )
+			{	// We are reaching the end of the array, we should unset
+				unset($this->Plugins[$key]);
+			}
+		}
+		// unset( $this->Plugins[ $key ] );
+		return true;
+	}
+
+
+	/**
 	 * Register a plugin.
 	 *
 	 * Will be called by plugin includes when they are called by init()
 	 *
 	 * {@internal Plug::register(-)}}
 	 *
+	 * @param string name of plugin class to instanciate & register
+	 * @param int ID in database (0 if not installed)
+	 * @return Plugin ref to newly created plugin
 	 * @access private
 	 */
-	function register( & $Plugin )
+	function & register( $classname, $ID = 0 )
 	{
+		$Plugin = new $classname;	// COPY !
+
+		// Tell him his ID :)
+		$Plugin->ID = $ID;
+		// Tell him his name :)
+		$Plugin->classname = $classname;
+
 		// Memorizes Plugin in sequential array:
 	 	$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
@@ -117,6 +255,30 @@ class Plug
 		// Request event callback registrations:
 		// events = $Plugin->RegisterEvents();
 
+		return $Plugin;
+	}
+
+
+  /**
+	 * Count # of registrations of same plugin
+	 *
+	 * {@internal Plug::count_regs(-)}}
+	 *
+	 * @param string class name
+	 * @return int # of regs
+	 */
+	function count_regs( $classname )
+	{
+		$count = 0;
+
+ 		foreach( $this->Plugins as $Plugin )
+		{
+			if( $Plugin->classname == $classname )
+			{
+				$count++;
+			}
+		}
+		return $count;
 	}
 
 
@@ -308,7 +470,9 @@ class Plug
 }
 
 
-
+/**
+ * Callback function to sort plugins by priority
+ */
 function sort_Plugin( & $a, & $b )
 {
 	return $a->priority - $b->priority;

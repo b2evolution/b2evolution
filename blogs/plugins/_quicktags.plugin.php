@@ -17,7 +17,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class Quicktags_Plugin extends Plugin
+class quicktags_plugin extends Plugin
 {
 	/**
 	 * Should be toolbar be displayed?
@@ -34,9 +34,9 @@ class Quicktags_Plugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal Quicktags_Plugin::Quicktags_Plugin(-)}}
+	 * {@internal quicktags_plugin::quicktags_plugin(-)}}
 	 */
-	function Quicktags_Plugin()
+	function quicktags_plugin()
 	{
 		$this->short_desc = T_('Easy HTML tags inserting');
 		$this->long_desc = T_('No description available');
@@ -46,7 +46,7 @@ class Quicktags_Plugin extends Plugin
 	/**
 	 * Display a toolbar
 	 *
-	 * {@internal Quicktags_Plugin::DisplayToolbar(-)}}
+	 * {@internal quicktags_plugin::DisplayToolbar(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -391,8 +391,4 @@ class Quicktags_Plugin extends Plugin
 		return true;
 	}
 }
-
-// Register the plugin:
-$this->register( new Quicktags_Plugin() );
-
 ?>

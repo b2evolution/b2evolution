@@ -43,7 +43,7 @@ require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
 
-if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract' ))
+if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract', 'install', 'uninstall' ))
 		|| !empty($prioup) || !empty($priodown) || !empty($delete)
 	)
 { // We have an action to do..
@@ -90,6 +90,31 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$status_update[] = T_('General settings updated.');
 			}
 
+			break;
+
+
+		case 'plugins':
+			// UPDATE plug-ins:
+			switch( $action )
+			{
+				case 'install':
+					// Install plugin:
+					param( 'plugin', 'string', true );
+					echo '<div class="panelinfo">';
+					echo '<h3>Installing '.$plugin.'...</h3>';
+					$Plug->install( $plugin );
+					echo '</div>';
+					break;
+
+				case 'uninstall':
+					// Uninstall plugin:
+					param( 'plugin_ID', 'int', true );
+					echo '<div class="panelinfo">';
+					echo '<h3>Uninstalling plgin #'.$plugin_ID.'...</h3>';
+					$Plug->uninstall( $plugin_ID );
+					echo '</div>';
+					break;
+			}
 			break;
 
 
@@ -399,9 +424,6 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			break;
 
 
-		case 'plugins':
-			// UPDATE plug-ins:
-			break;
 
 	}
 

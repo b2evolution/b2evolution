@@ -17,7 +17,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class wikilinks_Rendererplugin extends Plugin
+class wikilinks_plugin extends Plugin
 {
 	var $code = 'b2evWcko';
 	var $name = 'Wiki Links';
@@ -33,7 +33,7 @@ class wikilinks_Rendererplugin extends Plugin
 	 *
 	 * {@internal gmcode_Rendererplugin::gmcode_Rendererplugin(-)}}
 	 */
-	function wikilinks_Rendererplugin()
+	function wikilinks_plugin()
 	{
 		$this->short_desc = T_('Wiki Links converter');
 		$this->long_desc = T_('WikiWord links ((link)) [[link ]]');
@@ -257,8 +257,5 @@ class wikilinks_Rendererplugin extends Plugin
 		return true;
 	}
 }
-
-// Register the plugin:
-$this->register( new wikilinks_Rendererplugin() );
 
 ?>

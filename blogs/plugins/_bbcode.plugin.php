@@ -16,7 +16,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class bbcode_Rendererplugin extends Plugin
+class bbcode_plugin extends Plugin
 {
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
@@ -73,9 +73,9 @@ class bbcode_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal bbcode_Rendererplugin::bbcode_Rendererplugin(-)}}
+	 * {@internal bbcode_plugin::bbcode_plugin(-)}}
 	 */
-	function bbcode_Rendererplugin()
+	function bbcode_plugin()
 	{
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
 		$this->long_desc = T_('No description available');
@@ -104,8 +104,4 @@ class bbcode_Rendererplugin extends Plugin
 	}
 
 }
-
-// Register the plugin:
-$this->register( new bbcode_Rendererplugin() );
-
 ?>

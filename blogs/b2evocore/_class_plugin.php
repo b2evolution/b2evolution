@@ -20,6 +20,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class Plugin
 {
+	/**
+	 * Name of the current class.
+	 *
+	 * Will be set automatically (from filename) when registering plugin.
+	 *
+	 * @global string
+	 */
+	var $classname;
+
+	/**
+	 * Internal (DB) ID
+	 *
+	 * @global int
+	 */
+	var $ID = 0;		// 0 means 'NOT installed'
+
 	var $code = '';
 	var $priority = 50;
 	var $name = 'Unnamed plug-in';
@@ -28,6 +44,7 @@ class Plugin
 	var $help_url;
 	var $short_desc;
 	var $long_desc;
+
 
 	/**
 	 * Should be toolbar be displayed?

@@ -219,46 +219,6 @@ function create_b2evo_tables()
 }
 
 
-/**
- * Create new tables for version 0.9.1
- */
-function create_b2evo_tables_091()
-{
-	global $DB;
-
-	echo 'Creating table for active sessions... ';
-	$DB->query( "CREATE TABLE T_sessions (
-								  sess_time int(10) unsigned NOT NULL default '0',
-								  sess_ipaddress varchar(15) NOT NULL default '',
-								  sess_user_ID int(10) default NULL,
-								  UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
-								)" );
-	echo "OK.<br />\n";
-
-	echo 'Creating user settings table... ';
-	$DB->query( "CREATE TABLE T_usersettings (
-									uset_user_ID INT(10) NOT NULL ,
-									uset_name VARCHAR( 30 ) NOT NULL,
-									uset_value VARCHAR( 255 ) NULL,
-									PRIMARY KEY ( uset_user_ID, uset_name )
-								)");
-	echo "OK.<br />\n";
-
-	/*
-	
-			evo_links table: (NO PK)
-			-link_source_post_ID    INT     NOT NULL     INDEX
-			-link_dest_post_ID    INT     NULL     INDEX
-			-link_ltype_ID     INT     NOT NULL
-			-link_external_url    VARCHAR(255)     NULL
-			-link_title    TEXT   NULL
-			
-			evo_linktypes tables:
-			-ltype_ID    INT     PK
-			-ltype_desc    VARCHAR(50)
-	
-	 */
-}
 
 
 /*
@@ -858,6 +818,58 @@ function populate_main_tables()
 
 	echo "OK.<br />\n";
 
+}
+
+
+/**
+ * Create new tables for version 0.9.1
+ */
+function create_b2evo_tables_091()
+{
+	global $DB;
+
+	echo 'Creating table for active sessions... ';
+	$DB->query( "CREATE TABLE T_sessions (
+								  sess_time int(10) unsigned NOT NULL default '0',
+								  sess_ipaddress varchar(15) NOT NULL default '',
+								  sess_user_ID int(10) default NULL,
+								  UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
+								)" );
+	echo "OK.<br />\n";
+
+	echo 'Creating user settings table... ';
+	$DB->query( "CREATE TABLE T_usersettings (
+									uset_user_ID INT(10) NOT NULL ,
+									uset_name VARCHAR( 30 ) NOT NULL,
+									uset_value VARCHAR( 255 ) NULL,
+									PRIMARY KEY ( uset_user_ID, uset_name )
+								)");
+	echo "OK.<br />\n";
+
+	echo 'Creating plugins table... ';
+	$DB->query('"CREATE TABLE T_plugins (
+							  plug_ID int NOT NULL auto_increment,
+							  plug_priority int NOT NULL default 50,
+							  plug_classname varchar(40) NOT NULL default '',
+							  PRIMARY KEY (plug_ID)
+								)');
+	echo "OK.<br />\n";
+
+
+	/*
+
+			evo_links table: (NO PK)
+			-link_source_post_ID    INT     NOT NULL     INDEX
+			-link_dest_post_ID    INT     NULL     INDEX
+			-link_ltype_ID     INT     NOT NULL
+			-link_external_url    VARCHAR(255)     NULL
+			-link_title    TEXT   NULL
+
+			evo_linktypes tables:
+			-ltype_ID    INT     PK
+			-ltype_desc    VARCHAR(50)
+
+	 */
 }
 
 ?>

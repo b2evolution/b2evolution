@@ -14,7 +14,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class autolinks_Rendererplugin extends Plugin
+class autolinks_plugin extends Plugin
 {
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
@@ -30,9 +30,9 @@ class autolinks_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal autolinks_Rendererplugin::autolinks_Rendererplugin(-)}}
+	 * {@internal autolinks_plugin::autolinks_plugin(-)}}
 	 */
-	function autolinks_Rendererplugin()
+	function autolinks_plugin()
 	{
 		$this->short_desc = T_('Make URLs clickable');
 		$this->long_desc = T_('No description available');
@@ -42,7 +42,7 @@ class autolinks_Rendererplugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal autolinks_Rendererplugin::render(-)}} 
+	 * {@internal autolinks_plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -60,8 +60,4 @@ class autolinks_Rendererplugin extends Plugin
 		return true;
 	}
 }
-
-// Register the plugin:
-$this->register( new autolinks_Rendererplugin() );
-
 ?>

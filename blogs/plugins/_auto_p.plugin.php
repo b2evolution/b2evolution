@@ -12,7 +12,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class auto_p_Rendererplugin extends Plugin
+class auto_p_plugin extends Plugin
 {
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
@@ -30,9 +30,9 @@ class auto_p_Rendererplugin extends Plugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal auto_p_Rendererplugin::auto_p_Rendererplugin(-)}}
+	 * {@internal auto_p_plugin::auto_p_plugin(-)}}
 	 */
-	function auto_p_Rendererplugin()
+	function auto_p_plugin()
 	{
 		$this->short_desc = T_('Automatic &lt;P&gt; and &lt;BR&gt; tags');
 		$this->long_desc = T_('No description available');
@@ -42,7 +42,7 @@ class auto_p_Rendererplugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal auto_p_Rendererplugin::render(-)}} 
+	 * {@internal auto_p_plugin::render(-)}}
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -122,8 +122,4 @@ class auto_p_Rendererplugin extends Plugin
 		return $pee;
 	}
 }
-
-// Register the plugin:
-$this->register( new auto_p_Rendererplugin() );
-
 ?>

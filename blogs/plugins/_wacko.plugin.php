@@ -17,7 +17,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * @package plugins
  */
-class wacko_Rendererplugin extends Plugin
+class wacko_plugin extends Plugin
 {
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
@@ -70,7 +70,7 @@ class wacko_Rendererplugin extends Plugin
 	 *
 	 * {@internal gmcode_Rendererplugin::gmcode_Rendererplugin(-)}}
 	 */
-	function wacko_Rendererplugin()
+	function wacko_plugin()
 	{
 		$this->short_desc = T_('Wacko style formatting');
 		$this->long_desc = T_('== h2 ==
@@ -172,8 +172,4 @@ class wacko_Rendererplugin extends Plugin
 		return true;
 	}
 }
-
-// Register the plugin:
-$this->register( new wacko_Rendererplugin() );
-
 ?>

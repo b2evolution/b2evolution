@@ -154,6 +154,7 @@ $db_aliases = array(
 		'T_locales'      => $tablelocales     ,
 		'T_sessions'     => $tablesessions    ,
 		'T_usersettings' => $tableusersettings,
+		'T_plugins'      => $tableprefix.'plugins',
 	);
 
 /**#@+
