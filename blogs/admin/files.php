@@ -63,8 +63,8 @@ param( 'selaction', 'string', '' );  // action for selected files/dirs
 param( 'file', 'string', '' );       // selected file
 param( 'order', 'string', NULL );
 param( 'asc', '', NULL );
-param( 'filter', '', NULL );
-param( 'filter_regexp', 'integer', NULL );
+param( 'filterString', '', NULL );
+param( 'filterIsRegexp', 'integer', NULL );
 param( 'flatmode', '', NULL );
 
 param( 'root', 'string', NULL );     // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
@@ -95,7 +95,7 @@ if( $action == 'update_settings' )
  * Filemanager object to work with
  */
 $Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $asc,
-														$filter, $filter_regexp, $flatmode );
+														$filterString, $filterIsRegexp, $flatmode );
 
 
 if( !empty($file) )
@@ -912,7 +912,7 @@ if( isset( $msg_action )
 	?>
 
 	<form action="files.php" name="flatmode" class="toolbaritem">
-		<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
+		<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false ) ?>
 		<input type="hidden" name="flatmode" value="<?php echo $flatmode ? 0 : 1; ?>" />
 		<input class="ActionButton" type="submit" title="<?php
 			echo format_to_output( $flatmode ?
@@ -946,11 +946,11 @@ if( isset( $msg_action )
 
 		<form action="files.php" name="filter" class="toolbaritem">
 			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
-			<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
-			<input type="checkbox" name="filter_regexp" title="<?php
+			<input type="text" name="filterString" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
+			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
 				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
-				?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> /><?php
-				echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?>
+				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
+				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
 
 			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 		</form>
