@@ -174,8 +174,12 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
 				// delete everything from locales table
-				$query = 'DELETE FROM T_locales WHERE 1';
-				$q = $DB->query($query);
+				$q = $DB->query( 'DELETE FROM T_locales WHERE 1' );
+
+				if( !isset( $locales[$current_locale] ) )
+				{ // activate default locale
+					locale_activate( $default_locale );
+				}
 
 				// reset default_locale
 				$Settings->set( 'default_locale', $default_locale );

@@ -15,21 +15,32 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-# Enable localization?
-# set to 0 to disable localization
-# set to 1 to enable gettext localization if supported (not recommended)
-#		note: you will have to compile the .po files with msgfmt before this will work.
-# set to 2 to enable b2evo advanced localization (recommended)
+/**
+ * Enable localization?
+ *
+ * Set to 0 to disable localization.
+ * Set to 1 to enable gettext localization if supported (not recommended).
+ *    Note: you will have to compile the .po files with msgfmt before this will work.
+ * Set to 2 to enable b2evo advanced localization (recommended).
+ */
 $use_l10n = 2;
 
-# To be used for m17n support:
-$dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
+
+/**
+ * To be used for m17n support.
+ *
+ * If you don't know, don't change this setting.
+ */
+$dbcharset = 'iso-8859-1';
 
 
-# Default locale used for backoffice (when we cannot autodetect) and fallback.
-# This will be overwritten from database settings, if configured there.
-# These use an ISO 639 language code, a '-' and an ISO 3166 country code.
-# This MUST BE in the list below.
+/**
+ * Default locale used for backoffice (when we cannot autodetect) and fallback.
+ * This will be overwritten from database settings, if configured there.
+ * These use an ISO 639 language code, a '-' and an ISO 3166 country code.
+ *
+ * This MUST BE in the list below.
+ */
 $default_locale = 'en-EU';
 
 
@@ -39,14 +50,16 @@ $default_locale = 'en-EU';
 require_once dirname(__FILE__).'/'.$conf_dirout.$core_subdir.'_functions_locale.php';
 
 
-//{{{ defining the locales:
-# These are the default settings.
-# This array will be overwritten from DB if locales are set there,
-# that is when they get updated from the Backoffice.
-# They are also used as fallback, if we have no access to the DB yet.
-# Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
-# IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
-$locales = array(
+/**
+ * Defining the locales:
+ * These are the default settings.
+ * This array will be overwritten from DB if locales are set there,
+ * that is when they get updated from the Backoffice.
+ * They are also used as fallback, if we have no access to the DB yet.
+ * Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
+ * IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
+ */
+$locales = array( // {{{
 	'cs-CZ' => array( 'name' => NT_('Czech (CZ)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'd. m. y',
@@ -246,9 +259,6 @@ $locales = array(
 );
 //}}}
 
-# Default language (ISO code)
-# We get this one from the default locale above
-#$default_language = substr( $default_locale, 0, 2 );
 
 /**
  * day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
@@ -260,9 +270,12 @@ $locales = array(
  */
 $start_of_week = 1;
 
-# Set this to 1 if you are a translator and wish to extract strings from your .po file
-# Warning: do *not* extract .PO files you have not edited yourself.
-# Shipped .PO files contain automatic translations that have *not* been reviewed.
+
+/**
+ * Set this to 1 if you are a translator and wish to extract strings from your .po file.
+ * Warning: do *not* extract .PO files you have not edited yourself.
+ * Shipped .PO files contain automatic translations that have *not* been reviewed.
+ */
 $allow_po_extraction = 0;
 
 ?>

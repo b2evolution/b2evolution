@@ -132,7 +132,7 @@ else
 
 			<?php
 			form_text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
-			form_select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), T_('Overriden by browser config, user locale or blog locale (in this order).'));
+			form_select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 			?>
 
 		</fieldset>

@@ -61,10 +61,19 @@ $main_init = true;
 require_once( dirname(__FILE__).'/../conf/_config.php' );
 if( !$config_is_done )
 { // base config is not done!
-	$error_message = 'Base configuration is not done.';
+	$error_message = 'Base configuration is not done! (see /conf/_config.php)';
+}
+elseif( !isset( $locales[$default_locale] ) )
+{
+	$error_message = 'The default locale does not exist! (see /conf/_locales.php)';
+}
+if( isset( $error_message ) )
+{
 	require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
 }
-/*
+
+
+/**
  * Check conf...
  */
 if( !function_exists( 'gzencode' ) )
@@ -96,7 +105,10 @@ require_once( dirname(__FILE__).'/_functions.php' );
 
 timer_start();
 
-require_once( dirname(__FILE__).'/_vars.php' );                  // sets various arrays and vars for use in b2
+/**
+ * Sets various arrays and vars
+ */
+require_once( dirname(__FILE__).'/_vars.php' );
 
 
 /**
@@ -182,15 +194,17 @@ if( $use_obhandler )
 /**
  * Locale selection:
  */
-$Debuglog->add('default_locale from conf: '.$default_locale);
+$Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
 
 locale_overwritefromDB();
-$Debuglog->add('default_locale from DB: '.$default_locale);
+$Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
 
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
-$Debuglog->add('default_locale from HTTP_ACCEPT: '.$default_locale);
+$Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
-// Activate default locale:
+/**
+ * Activate default locale:
+ */
 locale_activate( $default_locale );
 
 
@@ -211,11 +225,18 @@ online_user_update();
 /**
  * User locale selection:
  */
-if( is_logged_in() && $current_User->get('locale') != $default_locale )
+if( is_logged_in() && $current_User->get('locale') != $current_locale )
 { // change locale to users preference
-	$default_locale = $current_User->get('locale');
-	locale_activate( $default_locale );
-	$Debuglog->add('default_locale from user profile: '.$default_locale);
+	locale_activate( $current_User->get('locale') );
+	if( $current_locale == $current_User->get('locale') )
+	{
+		$default_locale = $current_locale;
+		$Debuglog->add( 'default_locale from user profile: '.$default_locale, 'locale' );
+	}
+	else
+	{
+		$Debuglog->add( 'locale from user profile could not be activated: '.$current_User->get('locale'), 'locale' );
+	}
 }
 
 

@@ -46,13 +46,21 @@ elseif( $use_l10n == 2 )
 	 */
 	function T_( $string, $req_locale = '' )
 	{
-		global $trans, $current_locale, $locales;
+		global $trans, $current_locale, $locales, $Debuglog;
 
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
 
 		if( empty($req_locale) )
+		{
 			return $string;  // don't translate if we have no locale
+		}
+		if( !isset( $locales[$req_locale]['messages'] ) )
+		{
+			$Debuglog->add( 'No messages file path for locale. $locales["'
+											.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
+			$locales[$req_locale]['messages'] = false;
+		}
 
 		$messages = $locales[$req_locale]['messages'];
 
@@ -64,11 +72,18 @@ elseif( $use_l10n == 2 )
 		if( !isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
-			@include_once dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
+			@include_once dirname(__FILE__). '/../locales/'.$messages.'/_global.php';
 			if( !isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translation are available
 				// echo 'file not found!';
 				$trans[ $messages ] = array();
+
+				/*
+				May be an english locale without translation.
+				TODO: when refactoring locales, assign a key for 'original english'.
+				$Debuglog->add( 'No messages found for locale ['.$req_locale.'],
+												message file [/locales/'.$messages.'/_global.php]', 'locale' );*/
+
 			}
 		}
 
@@ -147,12 +162,16 @@ function locale_restore_previous()
  * returns true if locale has been changed
  *
  * @param string locale to activate
+ * @param mixed locale string on success, false on failure
  */
 function locale_activate( $locale )
 {
 	global $use_l10n, $locales, $current_locale, $current_messages, $current_charset, $weekday, $month;
 
-	if( $locale == $current_locale || empty( $locale ) )
+
+	if( $locale == $current_locale
+			|| empty( $locale )
+			|| !isset( $locales[$locale] ) )
 	{
 		return false;
 	}
@@ -438,10 +457,11 @@ function locale_priosort( $a, $b )
 /**
  * load locales from DB into $locales array. Also sets $default_locale.
  *
+ * @return mixed new default locale on succes, false on failure
  */
 function locale_overwritefromDB()
 {
-	global $DB, $locales, $default_locale, $Settings;
+	global $DB, $locales, $default_locale, $Settings, $Debuglog;
 
 	$usedprios = array();  // remember which priorities are used already.
 	$priocounter = 0;
@@ -505,15 +525,18 @@ function locale_overwritefromDB()
 	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
 	$locale_fromdb = $Settings->get('default_locale');
 
-	if( $locale_fromdb  )
+	if( $locale_fromdb )
 	{
-		/*
-		if( $locales[$locale_fromdb]['enabled'] )
+		if( !isset( $locales[$locale_fromdb] ) )
+		{
+			$Debuglog->add( 'Default locale ['.$locale_fromdb.'] from general settings is not available.', 'locale' );
+			return false;
+		}
+		else
+		{
 			$default_locale = $locale_fromdb;
-		elseif( !$locales[$default_locale]['enabled'] )
-			$default_locale = 'en-EU';
-		*/
-		$default_locale = $locale_fromdb;
+			return $default_locale;
+		}
 	}
 }
 

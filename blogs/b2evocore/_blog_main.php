@@ -99,7 +99,7 @@ if( empty($disp) )
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 // Activate matching locale:
-$Debuglog->add('Activating blog locale: '.$Blog->get('locale'));
+$Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
 locale_activate( $Blog->get('locale') );
 
 // -------------------------

@@ -375,7 +375,7 @@ switch( $action ) // {{{ (we catched empty action before)
 		}
 		break;
 
-	case 'rename':
+	case 'rename': // TODO: catch renaming to same filename (and deleting existing one)
 		if( !$curFile )
 		{
 			break;
@@ -783,7 +783,7 @@ while( $lFile = $Fileman->getNextFile() )
 				echo $i ?>].click(); window.open('<?php
 				echo $Fileman->getLinkCurfile().( $lFile->isDir() ? '&amp;mode=browseonly' : '' );
 				?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php
-				echo $i ?>'), 'toolbar=0,resizable=yes,<?php
+				echo $i ?>'), 'toolbar=0,resizable=yes,scrollbars=yes,<?php
 				if( $r = $lFile->get_imgsize( 'widthheight' ) )
 				{ // make the popup 42px wider/higher than the image
 					echo 'width='.($r[0]+42).',height='.($r[1]+42);
