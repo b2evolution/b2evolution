@@ -46,7 +46,7 @@
 	$blogroll_cat = '';
 	while( $BlogRollList->get_category_group() )
 	{
-		// Open new cat;
+		// Open new cat:
 		echo $blogroll_catname_before;
 		the_category();
 		echo $blogroll_catname_after;

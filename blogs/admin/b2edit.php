@@ -26,7 +26,7 @@ case "edit":
 	 * --------------------------------------------------------------------
 	 * Display post editing form
 	 */
-	param( "post", 'integer', true );
+	param( 'post', 'integer', true );
 	$postdata = get_postdata($post) or die( T_('Oops, no post with this ID.') );
 	$post_lang = $postdata['Lang'];
 	$cat = $postdata['Category'];
@@ -124,7 +124,7 @@ default:
 	for( $curr_blog_ID=blog_list_start('stub'); 
 				$curr_blog_ID!=false; 
 				 $curr_blog_ID=blog_list_next('stub') ) 
-		{ 
+	{ 
 		echo $sep;
 		if( $curr_blog_ID == $blog ) echo '<strong>';
 		// This is for when Javascript is not available:

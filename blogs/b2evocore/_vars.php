@@ -168,7 +168,7 @@ $month_abbrev['11'] = NT_('Nov');
 $month_abbrev['12'] = NT_('Dec');
 
 // the post statuses:
-$post_status = array (
+$post_statuses = array (
 	'published' => NT_('Published'),
 	'deprecated' => NT_('Deprecated'),
 	'protected' => NT_('Protected'),

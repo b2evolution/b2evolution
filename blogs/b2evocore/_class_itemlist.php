@@ -494,6 +494,7 @@ class ItemList
 		return $this->max_paged;
 	}
 
+
 	/*
 	 * ItemList->get_total_num_posts(-)
 	 *
@@ -535,8 +536,9 @@ class ItemList
 		
 		$this->group_by_cat = true;
 
-		if( $this->row_num == $this->result_num_rows )
+		if( $this->row_num > $this->result_num_rows )
 		{	// We are at the the end!
+			// echo 'END';
 			return false;
 		}
 
@@ -557,6 +559,7 @@ class ItemList
 		return $this->row;
 	}
 
+
 	/*
 	 * ItemList->get_item(-)
 	 */
@@ -565,17 +568,19 @@ class ItemList
 		global $row;
 		if( $this->row_num >= $this->result_num_rows )
 		{	// We would pass the end!
+			$this->row_num++;
 			return false;
 		}
 		$this->row = & $this->result_rows[$this->row_num];
 		$row = $this->row;
-		// echo 'accessing row['.$this->row_num.']:',$this->row->post_title;
+		// echo '<p>accessing row['.$this->row_num.']:',$this->row->post_title,'</p>';
 		$this->row_num++;
 		$this->get_postdata();
 
 
 		if(	$this->group_by_cat && ($this->main_cat != $this->row->post_category) )
 		{	// Category change
+			// echo '<p>CAT CHANGE!</p>';
 			return false;
 		}
 		

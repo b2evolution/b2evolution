@@ -387,12 +387,12 @@ function the_ID()
  */
 function the_status( $raw = true ) 
 {
-	global $post_status, $postdata;
+	global $post_statuses, $postdata;
 	$status = $postdata['Status'];
 	if( $raw )
 		echo $status;
 	else
-		echo T_($post_status[$status]);
+		echo T_($post_statuses[$status]);
 }
 
 

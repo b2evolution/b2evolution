@@ -1019,6 +1019,7 @@ function param(
 				break;
 
 			case 'string':
+				// echo $var, '=', $$var, '<br>';
 				$$var = trim( strip_tags($$var) );
 				break;
 
