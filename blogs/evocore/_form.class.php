@@ -251,6 +251,20 @@ class Form
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
+		if( $this->_count_fieldsets )
+		{
+			if( $field_name == $this->_fieldsets[$this->_count_fieldsets]['disableBy'] )
+			{
+				$r .= '%disableByOnclick%';
+			}
+			else
+			{
+				$this->_fieldsets[$this->_count_fieldsets]['disableTags'][] = $field_name;
+				// Enable controlling checkbox
+				$r .= ' onclick="'.$this->form_name.'.'.$this->_fieldsets[$this->_count_fieldsets]['disableBy'].'.checked = true;"';
+			}
+		}
+
 		$r .= " />\n";
 
 		if( !empty( $field_note ) )
@@ -667,23 +681,28 @@ class Form
 	function button( $field_type = 'button', $field_name, $field_value, $field_class,
 										$field_label, $onclick )
 	{
-		$r = $this->begin_field( $field_name, $field_label )
-					."\n".'<input type="'.$field_type.'" name="'.$field_name.'" value="'.$field_value
-					.'" class="'.$field_class.'" ';
+		$r = "\n".'<input type="'.$field_type
+							.'" name="'.$field_name
+							.'" value="'.format_to_output($field_value)
+							.'" class="'.$field_class.'" ';
 		if( isset( $onclick ) )
 		{
 			$r .= ' onclick ="'.$onclick.'" ';
 		}
 		$r .= ' />';
-		if( $this->output )
+
+		if( isset($this) && get_class( $this ) == 'form' )
 		{
-			echo $r;
-			return true;
+			$r = $this->begin_field( $field_name, $field_label ).$r;
+
+			if( $this->output )
+			{
+				echo $r;
+				return true;
+			}
 		}
-		else
-		{
-			return $r;
-		}
+
+		return $r;
 	}
 
 }
