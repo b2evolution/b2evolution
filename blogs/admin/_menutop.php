@@ -76,11 +76,6 @@ if( empty($mode) )
 		echo " | \n";
 		echo '<a href="b2template.php" class="menutop">', T_('Templates'), '</a>';
 	}
-	if($user_level >= 8)
-	{
-	        echo " | \n";
-	        echo '<a href="b2mailinglist.php" class="menutop">', T_('Mailing List'), '</a>';
-	}
 	if($user_level >= 9 || $demo_mode)
 	{
 		echo " | \n";
