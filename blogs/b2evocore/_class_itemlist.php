@@ -631,6 +631,9 @@ class ItemList extends DataObjectList
 	{
 		global $DB;
 
+		if( $this->preview )
+			return 1;	// 1 row in preview mode
+
 		$nxt_request = $this->request;
 		if( $pos = strpos(strtoupper($this->request), 'LIMIT'))
 		{ // Remove the limit form the request

@@ -88,6 +88,7 @@ if ($use_spellchecker)
 
 	<!-- In case we send this to the blog for a preview : -->
 	<input type="hidden" name="preview" value="1" />
+	<input type="hidden" name="more" value="1" />
 	<input type="hidden" name="preview_userid" value="<?php echo $user_ID ?>" />
 
 	<?php
