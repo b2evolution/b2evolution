@@ -12,6 +12,8 @@
  *
  * @package plugins
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/../toolbar.class.php';
 
 class quicktags_Toolbarplugin extends ToolbarPlugin

@@ -8,6 +8,7 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <form action="b2blogs.php" class="fform" method="post" name="FormPerm">
 	<input type="hidden" name="action" value="update" />

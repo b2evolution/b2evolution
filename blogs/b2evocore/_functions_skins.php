@@ -1,23 +1,24 @@
 <?php
 /**
  * evoSkins support functions
- *
+ * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package b2evocore
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Template function: output base URL to current skin
+ * Template function: output base URL to current skin 
  *
  * {@internal skinbase(-)}}
  */
 function skinbase()
 {
 	global $baseurl, $skins_subdir, $skin, $blog;
-
+	
 	if( !empty( $skin ) )
 	{
 		echo "$baseurl/$skins_subdir/$skin/";
@@ -69,7 +70,7 @@ function skin_options( $default = '' )
 	}
 }
 
-/**
+/** 
  * Initializes skin list iterator
  *
  * lists all folders in skin directory
@@ -85,7 +86,7 @@ function skin_list_start()
 }
 
 
-/**
+/** 
  * Get next skin
  *
  * lists all folders in skin directory
@@ -112,7 +113,7 @@ function skin_list_next()
 
 /**
  * skin_list_iteminfo(-)
- *
+ * 
  * Display info about item
  *
  * fplanque: created
@@ -125,14 +126,14 @@ function skin_list_iteminfo( $what='', $display = true )
 	{
 		case 'path':
 			$info = $skin_path.'/'.$skin_name;
-
+		
 		case 'name':
 		default:
 			$info = $skin_name;
 	}
-
+	
 	if( $display ) echo $skin_name;
-
+	
 	return $skin_name;
 }
 

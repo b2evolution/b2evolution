@@ -8,6 +8,8 @@
  *
  * @package plugins
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/../renderer.class.php';
 
 class autolinks_Rendererplugin extends RendererPlugin
@@ -17,8 +19,8 @@ class autolinks_Rendererplugin extends RendererPlugin
 	var $priority = 60;
 
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true;
-	var $apply_to_xml = false;
+	var $apply_to_html = true; 
+	var $apply_to_xml = false; 
 	var $short_desc;
 	var $long_desc;
 
@@ -38,7 +40,7 @@ class autolinks_Rendererplugin extends RendererPlugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal autolinks_Rendererplugin::render(-)}}
+	 * {@internal autolinks_Rendererplugin::render(-)}} 
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -50,9 +52,9 @@ class autolinks_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-
+	
 		$content = make_clickable( $content );
-
+		
 		return true;
 	}
 }

@@ -82,7 +82,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 <link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 <link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
- <!-- InstanceEndEditable -->
+<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/fp02.css" type="text/css" />
 </head>
 <body>

@@ -8,6 +8,7 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <div class="panelblock">
 <h2><?php echo T_('Categories for blog:'), ' ', get_bloginfo('name'); ?></h2>

@@ -8,6 +8,7 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 param( 'locale', 'string', '' );
 

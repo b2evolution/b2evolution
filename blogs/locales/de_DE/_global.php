@@ -5,7 +5,7 @@
  */
 
 $trans['de_DE'] = array(
-	'' => "Project-Id-Version: b2evolution 0.8.9\nPOT-Creation-Date: 2004-05-28 23:31+0200\nPO-Revision-Date: 2004-05-29 03:43+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9.0.x\nPOT-Creation-Date: 2004-05-30 02:15+0200\nPO-Revision-Date: 2004-06-12 17:12+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Ausgewählt",
 	'Categories' => "Kategorien",
 	'Permanent link to full entry' => "Permanenter Link zum ganzen Eintrag",
@@ -534,6 +534,7 @@ $trans['de_DE'] = array(
 	'Use extra-path info' => "Benutze Extra-Path Info",
 	'Recommended if your webserver supports it. Links will look like \'stub/2003/05/20/post_title\' instead of \'stub?title=post_title&c=1&tb=1&pb=1&more=1\'.' => "Empfohlen, falls dein Webserver es unterstützt. Links werden wie 'stub/2003/05/20/beitrag_titel' aussehen, anstelle von 'stub?title=beitrag_title&c=1&tb=1&pb=1&more=1'.",
 	'Post called up by its URL title (Recommended)' => "Eintrag wird durch URL-Titel aufgerufen (Empfohlen)",
+	'Fallback to ID when no URL title available.' => "Benutze ID, wenn kein URL-Titel verfügbar.",
 	'Post called up by its ID' => "Eintrag wird durch seine ID aufgerufen",
 	'Post on archive page, located by its ID' => "Eintrag auf der Archiv-Seite, durch ID ausfindig gemacht",
 	'Post on archive page, located by its title (for Cafelog compatibility)' => "Eintrag auf der Archivseite, ausfindig gemacht durch seinen Titel (Cafelog-kompatibel)",

@@ -8,6 +8,8 @@
  *
  * @package b2evocore
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once( dirname(__FILE__). '/_class_dataobjectlist.php' );
 require_once( dirname(__FILE__). '/_class_item.php' );
 
@@ -45,7 +47,7 @@ class ItemList extends DataObjectList
 	var $max_paged;						// Max page number for paged display
 
 	var $group_by_cat;
-	
+
 	var $limitdate_start;     // UNIX timestamp
 	var $limitdate_end;       // UNIX timestamp
 
@@ -106,7 +108,7 @@ class ItemList extends DataObjectList
 		$this->preview = $preview;
 		$this->blog = $blog;
 		$this->p = $p;
-		
+
 		if( !empty($posts) )
 			$posts_per_page = $posts;
 		elseif( !empty($default_posts_per_page) )
@@ -353,7 +355,7 @@ class ItemList extends DataObjectList
 			{
 				$posts = $postend - $poststart + 1;
 				// echo 'days=',$posts;
-				$lastpostdate = get_lastpostdate( $blog, $show_statuses );
+				$lastpostdate = get_lastpostdate( $blog, $show_statuses, $cat, $catsel,	$timestamp_min, $timestamp_max );
 				$lastpostdate = mysql2date('Y-m-d 23:59:59',$lastpostdate);
 				// echo $lastpostdate;
 				$lastpostdate = mysql2date('U',$lastpostdate);
@@ -364,8 +366,8 @@ class ItemList extends DataObjectList
 				
 			}
 		}
-		elseif( ($m) || ($p) ) // fp rem || ($w) || ($s) || ($whichcat) || ($author)
-		{ // (no restriction if we request a month... some permalinks may point to the archive!)
+		elseif( !empty($m) ) 
+		{ // no restriction if we request a month... some permalinks may point to the archive!
 			// echo 'ARCHIVE - no limits';
 			$limits = '';
 		}
@@ -387,11 +389,18 @@ class ItemList extends DataObjectList
 		elseif( $what_to_show == 'days' )
 		{
 			// echo 'LIMIT DAYS ';
-			$lastpostdate = get_lastpostdate( $blog, $show_statuses, $cat, $catsel );
-			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
-			$lastpostdate = mysql2date('U',$lastpostdate);
-			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
-			$where .= ' AND post_issue_date > \''. $otherdate.'\'';
+			if( !empty($p) || !empty($title) || !empty($s) || !empty($cat) || !empty($author) )
+			{ // We are in DAYS mode but we can't restrict on these!
+				$limits = '';
+			}
+			else
+			{
+				$lastpostdate = get_lastpostdate( $blog, $show_statuses, $cat, $catsel,	$timestamp_min, $timestamp_max );
+				$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
+				$lastpostdate = mysql2date('U',$lastpostdate);
+				$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
+				$where .= ' AND post_issue_date > \''. $otherdate.'\'';
+			}
 		}
 		/* else
 		{
@@ -460,7 +469,7 @@ class ItemList extends DataObjectList
 		}
 
 		//echo $this->request;
-		$this->result_rows = $DB->get_results( $this->request );
+		$this->result_rows = $DB->get_results( $this->request, OBJECT, 'Item List (Main|Lastpostdate) Query' );
 
 		$this->result_num_rows = $DB->num_rows;
 		// echo $this->result_num_rows, ' items';

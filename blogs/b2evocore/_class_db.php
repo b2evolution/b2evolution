@@ -14,6 +14,7 @@
  * @author Justin Vincent (justin@visunet.ie), {@link http://php.justinvincent.com}
  * @todo PLEASE NOTE: this class isn't exactly as reliable as I'd like to. I am doing some transformations. (fplanque)
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 // ==================================================================
 //	ezSQL Constants
@@ -42,8 +43,8 @@ class DB
 	var $halt_on_error = true;
 	var $error = false;		// no error yet
 	var $num_queries = 0;	
-	var $last_query;		// last query SQL string
-	var $last_error;			// last DB error string
+	var $last_query = '';		// last query SQL string
+	var $last_error = '';			// last DB error string
 	var $col_info;
 	var $debug_called;
 	var $vardump_called;
@@ -159,9 +160,17 @@ class DB
 		$this->current_idx = 0;
 	}
 
-	// ==================================================================
-	//	Basic Query	- see docs for more detail
-	function query($query)
+
+	/** 
+	 * Basic Query
+	 *
+	 * {@internal DB::query(-) }}
+	 *
+	 * @param string SQL query
+	 * @param string title for debugging
+	 * @return mixed # of rows or false if error
+	 */
+	function query( $query, $title = '' )
 	{
 		// initialise return
 		$return_val = 0;
@@ -177,8 +186,12 @@ class DB
 		$this->last_query = $query;
 
 		// Perform the query via std mysql_query function..
-		$this->queries[] = $query;
 		$this->num_queries++;
+		$this->queries[ $this->num_queries - 1 ] = array(
+																									'title' => $title,
+																									'sql' => $query,
+																									'rows' => -1 );
+		
 		$this->result = @mysql_query($query,$this->dbh);
 			
 		// If there is an error then take note of it..
@@ -187,11 +200,14 @@ class DB
 			$this->print_error();
 			return false;
 		}
+
+		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query) )
+		{	// Query was an insert, delete, update, replace:
+
+			// echo 'insert, delete, update, replace';
 		
-		// Query was an insert, delete, update, replace
-		if ( preg_match("/^\\s*(insert|delete|update|replace) /i",$query) )
-		{
 			$this->rows_affected = mysql_affected_rows();
+			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
 			
 			// Take note of the insert_id
 			if ( preg_match("/^\\s*(insert|replace) /i",$query) )
@@ -202,10 +218,11 @@ class DB
 			// Return number fo rows affected
 			$return_val = $this->rows_affected;
 		}
-		// Query was an select
 		else
-		{
-			
+		{	// Query was a select:
+
+			// echo 'select';
+
 			// Take note of column info	
 			$i=0;
 			while ($i < @mysql_num_fields($this->result))
@@ -227,7 +244,8 @@ class DB
 
 			// Log number of rows the query returned
 			$this->num_rows = $num_rows;
-			
+			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->num_rows;
+
 			// Return number of rows selected
 			$return_val = $this->num_rows;
 		}
@@ -241,7 +259,7 @@ class DB
 
 	// ==================================================================
 	//	Get one variable from the DB - see docs for more detail
-	function get_var( $query=NULL, $x=0, $y=0 )
+	function get_var( $query=NULL, $x=0, $y=0, $title = '' )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_var(\"$query\",$x,$y)";
@@ -249,7 +267,7 @@ class DB
 		// If there is a query then perform it if not then use cached results..
 		if ( $query )
 		{
-			$this->query($query);
+			$this->query($query, $title);
 		}
 
 		// Extract var out of cached results based x,y vals
@@ -264,7 +282,7 @@ class DB
 
 	// ==================================================================
 	//	Get one row from the DB - see docs for more detail
-	function get_row($query=NULL,$output=OBJECT,$y=0)
+	function get_row($query=NULL,$output=OBJECT,$y=0, $title = '' )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_row(\"$query\",$output,$y)";
@@ -273,7 +291,7 @@ class DB
 		// If there is a query then perform it if not then use cached results..
 		if ( $query )
 		{
-			$this->query($query);
+			$this->query($query, $title);
 		}
 
 		// If the output is an object then return object using the row offset..
@@ -302,13 +320,13 @@ class DB
 	// ==================================================================
 	//	Function to get 1 column from the cached result set based in X index
 	// se docs for usage and info
-	function get_col( $query = NULL, $x=0 )
+	function get_col( $query = NULL, $x=0, $title = '' )
 	{
 
 		// If there is a query then perform it if not then use cached results..
 		if ( $query )
 		{
-			$this->query($query);
+			$this->query($query, $title);
 		}
 
 		// Extract the column values
@@ -328,7 +346,7 @@ class DB
 	
 	// ==================================================================
 	// Return the the query as a result set - see docs for more details
-	function get_results( $query=NULL, $output = OBJECT)
+	function get_results( $query=NULL, $output = OBJECT, $title = '' )
 	{
 		// Log how the function was called
 		$this->func_call = "\$db->get_results(\"$query\", $output)";
@@ -336,7 +354,7 @@ class DB
 		// If there is a query then perform it if not then use cached results..
 		if ( $query )
 		{
-			$this->query($query);
+			$this->query($query, $title);
 		}
 
 		// Send back array of objects. Each row is an object
@@ -517,19 +535,21 @@ class DB
 	 */
 	function dump_queries()
 	{
-		foreach( $this->queries as $sql )
+		foreach( $this->queries as $query )
 		{
-			echo '<p><strong>Query:</strong></p>';
+			echo '<p><strong>Query: '.$query['title'].'</strong></p>';
 			echo '<code>';
-			$sql = str_replace( 'FROM', '<br />FROM', $sql );
+			$sql = str_replace( 'FROM', '<br />FROM', $query['sql'] );
 			$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
 			$sql = str_replace( 'GROUP BY', '<br />GROUP BY', $sql );
 			$sql = str_replace( 'ORDER BY', '<br />ORDER BY', $sql );
 			$sql = str_replace( 'LIMIT', '<br />LIMIT', $sql );
 			$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
 			$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
+			$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
 			echo $sql;
-			echo '<br /></code>';
+			echo '</code><br />';
+			echo 'Rows: ', $query['rows'];
 		}
 	}
 

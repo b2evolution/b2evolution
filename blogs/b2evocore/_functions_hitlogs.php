@@ -9,6 +9,7 @@
  * @package b2evocore
  * @author This file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 //get most linked to pages on site
 //select count(visitURL) as count, visitURL from b2hitlog group by visitURL order by count desc

@@ -38,6 +38,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 # b2 fix. some servers have stupid warnings
 # error_reporting(0);
@@ -61,7 +62,8 @@ elseif( !(bool)ini_get('enable_dl') || (bool)ini_get('safe_mode'))
 }
 elseif($WINDIR) 
 {	// Win 32 fix. From: "Leo West" <lwest@imaginet.fr>
-	if (@dl("php3_xml.dll")) {
+	if (@dl("php3_xml.dll")) 
+	{
 		define("CANUSEXMLRPC", 1);
 	} else {
 		define("CANUSEXMLRPC", 0);
@@ -648,7 +650,10 @@ class xmlrpcmsg
 
   function xml_header() 
 	{
-	return "<?xml version=\"1.0\"?".">\n<methodCall>\n";
+		// TODO: handle encoding
+		// return "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?".">\n<methodCall>\n";
+
+		return "<?xml version=\"1.0\"?".">\n<methodCall>\n";
   }
 
   function xml_footer() 
@@ -797,7 +802,8 @@ class xmlrpcmsg
 	  if ($_xh[$parser]['isf']) {
 		$f=$v->structmem("faultCode");
 		$fs=$v->structmem("faultString");
-		$r=new xmlrpcresp($v, $f->scalarval(), 
+		$r=new xmlrpcresp($v, 
+							$f->scalarval(), 
 						  $fs->scalarval());
 	  } else {
 		$r=new xmlrpcresp($v);
@@ -934,7 +940,9 @@ class xmlrpcval
 		$rs="";
 		global $xmlrpcTypes, $xmlrpcBase64, $xmlrpcString,
 			$xmlrpcBoolean;
-		switch($xmlrpcTypes[$typ]) {
+
+		switch($xmlrpcTypes[$typ]) 
+		{
 		case 3:
 			// struct
 			$rs.="<struct>\n";

@@ -8,6 +8,8 @@
  *
  * @package plugins
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/../renderer.class.php';
 
 class smilies_Rendererplugin extends RendererPlugin
@@ -16,7 +18,7 @@ class smilies_Rendererplugin extends RendererPlugin
 	var $name = 'Smilies';
 	var $priority = 80;
 	var $apply_when = 'always';
-	var $apply_to_html = true;
+	var $apply_to_html = true; 
 	var $apply_to_xml = false; // Leave the smilies alone
 	var $short_desc;
 	var $long_desc;
@@ -27,7 +29,7 @@ class smilies_Rendererplugin extends RendererPlugin
 	 * @access private
 	 */
 	var $search;
-
+	
 	/**
 	 * IMG replace array
 	 *
@@ -53,7 +55,7 @@ class smilies_Rendererplugin extends RendererPlugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal smilies_Rendererplugin::smilies_Rendererplugin(-)}}
+	 * {@internal smilies_Rendererplugin::smilies_Rendererplugin(-)}} 
 	 */
 	function smilies_Rendererplugin()
 	{
@@ -67,7 +69,7 @@ class smilies_Rendererplugin extends RendererPlugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal smilies_Rendererplugin::render(-)}}
+	 * {@internal smilies_Rendererplugin::render(-)}} 
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -79,7 +81,7 @@ class smilies_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-
+	
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
@@ -87,7 +89,7 @@ class smilies_Rendererplugin extends RendererPlugin
 
 			$tmpsmilies = $this->smilies;
 			uksort($tmpsmilies, 'smiliescmp');
-
+	
 			foreach($tmpsmilies as $smiley => $img)
 			{
 				$this->search[] = $smiley;
@@ -96,7 +98,7 @@ class smilies_Rendererplugin extends RendererPlugin
 				{
 					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
 				}
-
+	
 				$this->replace[] = "<img src='$this->smilies_path/$img' border='0' alt='$smiley_masked' class='middle' />";
 			}
 		}

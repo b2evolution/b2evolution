@@ -9,6 +9,8 @@
  * @package b2evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once( dirname(__FILE__). '/_functions_cats.php' );
 require_once( dirname(__FILE__). '/_functions_blogs.php' );
 require_once( dirname(__FILE__). '/_functions_bposts.php' );
@@ -266,9 +268,6 @@ function zeroise($number, $threshold)
 function convert_chars( $content, $flag='html' )
 {
 	global $b2_htmltrans, $b2_htmltranswinuni;
-
-	// $content = preg_replace("/<title>(.+?)<\/title>/","",$content);
-	// $content = preg_replace("/<category>(.+?)<\/category>/","",$content);
 
 	// Convert highbyte non ASCII/UTF-8 chars to urefs:
 	if (locale_charset(false) != 'utf-8')
@@ -572,8 +571,8 @@ function xmlrpc_getpostcategory($content)
  */
 function xmlrpc_removepostdata($content)
 {
-	$content = preg_replace('/<title>(.+?)<\/title>/si', '', $content);
-	$content = preg_replace('/<category>(.+?)<\/category>/si', '', $content);
+	$content = preg_replace('/<title>(.*?)<\/title>/si', '', $content);
+	$content = preg_replace('/<category>(.*?)<\/category>/si', '', $content);
 	$content = trim($content);
 	return($content);
 }
@@ -787,6 +786,7 @@ function remove_magic_quotes( $mixed )
 		}
 		else
 		{
+			// echo 'Removing slashes ';
 			$mixed = stripslashes( $mixed );
 		}
 	}

@@ -8,6 +8,7 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -67,7 +68,7 @@
 			{
 				if( allchecked[0] ) allchecked[0] = false;
 				else allchecked[0] = true;
-
+				
 				var elems = document.forms[the_form].elements[the_elements];
 				var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
 				if (elems_cnt)
@@ -140,7 +141,7 @@
 		}
 		//-->
 		</script>
-	<?php
+		<?php
 	}
 	?>
 </head>

@@ -5,7 +5,7 @@
  */
 
 $trans['ja_JP'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2003-08-22 19:52+0200\nPO-Revision-Date: 2004-05-31 20:45+0900\nLast-Translator: Jun MUTO <jmuto@saku2.com>\nLanguage-Team: LANGUAGE <LL@li.org>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2003-08-22 19:52+0200\nPO-Revision-Date: 2004-06-12 22:54+0900\nLast-Translator: Jun MUTO <jmuto@saku2.com>\nLanguage-Team: LANGUAGE <LL@li.org>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "選択",
 	'Categories' => "カテゴリ",
 	'Permanent link to full entry' => "全文への永続的リンク",
@@ -163,7 +163,7 @@ $trans['ja_JP'] = array(
 	'User Agents' => "User Agents",
 	'Direct Accesses' => "直接アクセス",
 	'Date' => "日付",
-	'Indexing Robots' => "Indexing Robots",
+	'Indexing Robots' => "インデックス作成ロボット",
 	'Total' => "総計",
 	'Prune this date!' => "この日付を除去!",
 	'Prune' => "除去",
@@ -179,7 +179,7 @@ $trans['ja_JP'] = array(
 	'Top referers' => "最多のリファラ",
 	'Total referers' => "全リファラ",
 	'Last refering searches' => "最近の検索エンジン経由の参照",
-	'These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)' => "以下は検索エンジンのインデックスロボットのような自動ロボットからのhitです。(ロボットは /conf/_stats.php にリストされている必要があります)",
+	'These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)' => "以下は検索エンジンを経由してこのブログ システムに来た人々からのhitです。(検索エンジンは /conf/_stats.php にリストされている必要があります)",
 	'Top refering search engines' => "最多の経由した検索エンジン",
 	'Top Indexing Robots' => "最多のインデックス作成ロボット",
 	'These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)' => "以下は検索エンジンのインデックスロボットのような自動ロボットからのhitです。(ロボットは /conf/_stats.php にリストされている必要があります)",

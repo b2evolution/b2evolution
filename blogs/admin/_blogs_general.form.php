@@ -1,13 +1,14 @@
 <?php
-/**
- * Displays blog properties form
- *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @package admin
- */
+	/**
+	 * Displays blog properties form
+	 *
+	 * b2evolution - {@link http://b2evolution.net/}
+	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 *
+	 * @package admin
+	 */
+	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <form action="b2blogs.php" class="fform" method="post">
 	<input type="hidden" name="action" value="<?php echo $next_action ?>" />

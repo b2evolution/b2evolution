@@ -5,6 +5,7 @@
  *
  * This sets how the back-office works
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 # Cross posting:
 # set this to 0 if you want users to post to a single category only

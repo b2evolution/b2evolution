@@ -3,6 +3,7 @@
  * b2evolution localization & language config
  * Version of this file: 0.9.0.5
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 # Enable localization?
 # set to 0 to disable localization

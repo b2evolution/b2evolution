@@ -25,6 +25,7 @@
  *	Last Modified
  *		12/12/03 - Travis Swicegood: Created file.
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 class BlogStats{
 	var $blog;				// Blog # (1 = all blogs)

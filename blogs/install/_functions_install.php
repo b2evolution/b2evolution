@@ -8,9 +8,7 @@
  *
  * @package install
  */
-if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
-	die( 'Please, do not access this page directly.' );
-
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
  * check_db_version(-)

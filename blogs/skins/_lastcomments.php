@@ -7,8 +7,7 @@
 	 * To display a feedback, you should call a stub AND pass the right parameters
 	 * For example: /blogs/index.php?disp=comments
 	 */
-	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-		die("Please, do not access this page directly.");
+	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	if( $disp != 'comments' ) 
 	{	// We have not asked for comments to be displayed...

@@ -8,6 +8,7 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <div class="bPosts">
 	<div class="bPost">
@@ -144,7 +145,7 @@
 				if( $safe_mode ) echo "</xmp>";
 				?>
 			</div>
-			
+
 			<?php
 			link_pages( '<p class="right">'.T_('Pages:'), '</p>' );
 			?>

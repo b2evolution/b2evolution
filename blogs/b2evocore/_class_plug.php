@@ -10,6 +10,8 @@
  *
  * @package b2evocore
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__)."/$core_dirout/$plugins_subdir/plugin.class.php";
 
 /**

@@ -5,6 +5,7 @@
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 /*

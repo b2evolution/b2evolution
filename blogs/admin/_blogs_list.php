@@ -8,6 +8,8 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = blog_list_next() )
 {
 	if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )

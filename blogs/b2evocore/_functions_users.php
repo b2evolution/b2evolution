@@ -9,6 +9,8 @@
  * @package b2evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__). '/_functions_groups.php';
 require_once dirname(__FILE__). '/_class_user.php';
 
@@ -70,7 +72,7 @@ function veriflog( $login_required = false )
 			// echo 'login failed!!';
 			return '<strong>'. T_('ERROR'). ':</strong> '. T_('wrong login/password.');
 		}
-		
+
 		// Login succeeded:
 		//echo $user_login, $pass_is_md5, $user_pass,  $cookie_domain;
 		if( !setcookie( $cookie_user, $log, $cookie_expires, $cookie_path, $cookie_domain ) )
@@ -337,15 +339,28 @@ function user_info( $show = '', $format = 'raw', $display = true )
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $blog;
+	global $htsrv_url, $edited_Blog, $generating_static;
 
 	if( is_logged_in() ) return false;
 
 	if( $link_text == '' ) $link_text = T_('Login...');
 	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
-
+		
+	if( !isset($generating_static) )
+	{	// We are not generating a static page here:
+		$redirect = '?redirect_to='.urlencode( regenerate_url() );
+	}
+	elseif( isset($edited_Blog) )
+	{	// We are generating a static page
+		$redirect = '?redirect_to='.$edited_Blog->get('dynurl');
+	}
+	else
+	{	// We are in a weird situation
+		$redirect = '';
+	}
+		
 	echo $before;
-	echo '<a href="', $htsrv_url, '/login.php?redirect_to='.urlencode( regenerate_url() ), '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/login.php'.$redirect.'" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;
@@ -358,7 +373,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $blog, $Settings;
+	global $htsrv_url, $Settings, $edited_Blog, $generating_static;
 
 	if( is_logged_in() || !$Settings->get('newusers_canregister'))
 	{	// There's no need to provide this link if already logged in or if we won't let him register
@@ -368,8 +383,21 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	if( $link_text == '' ) $link_text = T_('Register...');
 	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
 
+	if( !isset($generating_static) )
+	{	// We are not generating a static page here:
+		$redirect = '?redirect_to='.urlencode( regenerate_url() );
+	}
+	elseif( isset($edited_Blog) )
+	{	// We are generating a static page
+		$redirect = '?redirect_to='.$edited_Blog->get('dynurl');
+	}
+	else
+	{	// We are in a weird situation
+		$redirect = '';
+	}
+		
 	echo $before;
-	echo '<a href="', $htsrv_url, '/register.php?redirect_to='.urlencode( regenerate_url() ), '" title="', $link_title, '">';
+	echo '<a href="', $htsrv_url, '/register.php'.$redirect.'" title="', $link_title, '">';
 	echo $link_text;
 	echo '</a>';
 	echo $after;

@@ -8,6 +8,8 @@
  *
  * @package b2evocore
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/_class_blogcache.php';
 
 /*

@@ -11,6 +11,8 @@
  * @package b2evocore
  * @author Simon Willison, 23rd Feb 2003, modified by fplanque, sakichan
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 class SafeHtmlChecker 
 {
     var $tags;    		// Array showing allowed attributes for tags
@@ -125,7 +127,7 @@ class SafeHtmlChecker
         }
         // Is tag a legal tag?
         if (!in_array($tag, array_keys($this->tags))) {
-            $this->html_error(  T_('Illegal tag'). ": <code>$tag</code>" );
+            $this->html_error( T_('Illegal tag'). ": <code>$tag</code>" );
             $this->stack[] = $tag;
             return;
         }

@@ -4,7 +4,7 @@
 <head>
 	
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>b2evo Paket: Upgrading from Manywhere Miniblog</title>
+<title>b2evo Paket: Upgraden von Manywhere Miniblog</title>
 <link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
 	
 	 
@@ -13,7 +13,7 @@
 	<div id="rowheader" >
 		<h1><a href="http://b2evolution.net/" title="b2evolution: offizielle Webseite"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 		<div id="tagline">Multilinguale Multiuser Multiblog Maschine.</div>
-		<h1 id="version">Version: 0.9.0.5+CVS</h1>
+		<h1 id="version">Version: 0.9.1-CVS</h1>
 		<div id="quicklinks">
 			b2evo Paket: 
 			<a href="../index.de-DE.html">Startseite</a> &middot; 
@@ -45,35 +45,27 @@
 	</ul>
 	</div>
 	
-<h1>Upgrading from Manywhere Miniblog</h1>
+<h1>Upgraden von Manywhere Miniblog</h1>
 
 <p>Bevor du anfängst beachte bitte, dass einige Netzwerk-Funktionen von b2evolution voraussetzen, dass du den einfachen <a href="http://b2evolution.net/about/terms.html">Servicebedingungen</a> zustimmst.</p>
 
-<p><em>As always, it is wise to do a backup of your current website / blog / database
-(depending on what you already have) before starting to install something new.</em></p>
+<p><em>Es ist natürlich weise, ein Backup deiner jetzigen Webseite / Blog / Datenbank (je nachdem was du schon hast) zu machen, bevor du etwas neues installierst.</em></p>
 
 <p>Sobald du die b2evolution Distribution entpackt hast:</p>
 
 <ol class="expanded">
-<li>On your server, locate the mysql database you are already using for Manywhere Miniblog.
-	You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will
-	not alter your Miniblog tables and data in any way!<br />
+<li>Finde die Datenbank auf deinem Server die du schon für Maywhere Miniblog benutzt. Du musst die gleiche Datenbank für b2evolution benutzen, um upgraden zu können. Keine Angst, b2evolution wird deine Miniblog Tabellen und Daten nicht verändern!<br />
 		<span class="small"><br />
-		<strong>Anmerkung 1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with
-		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
-		b2evolution in a database shared with other applications. For example, Miniblog uses two tables named <code>miniblog</code> and <code>user</code>.
-		Your existing tables will not be affected in any way.<br />
+		<strong>Anmerkung 1: </strong>Sofern du nicht die Konfiguration geändert hast, beginnen alle Tabellen, die von b2evolution erstellt werden mit evo_ . Solange du keine andere Anwendung hast, die das gleiche Prefix benutzt, ist es sicher b2evolution in eine Datenbank zu installieren, die es sich mit anderen Anwendungen teilt. Miniblog beispielsweise benutzt zwei Tabellen namens <code>Miniblog</code> und <code>user</code>. Deine vorhandenen Tabellen werden in keinster Weise verändert.<br />
 		<strong>Anmerkung 2:</strong> Warum dieselbe Datenbank? Weil der (schnelle und sichere) SQL-Prozess den wir benutzen um die Daten zu kopieren nur innerhalb einer Datenbank ausgeführt werden kann.</span></li>
 
 <li>Lade die b2evolution Dateien auf deine Webseite hoch.<br />
   <br />
-  <span class="small"><strong>Anmerkung:</strong> Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Miniblog remains fully functional while you check out b2evolution.</strong><br />
+  <span class="small"><strong>Anmerkung:</strong> Nur der Inhalt des <code>/blogs</code> Verzeichnisses muss auf deine Seite hochgeladen werden. Falls du möchtest, dass b2evolution zur Homepage deiner Seite wird, uploade den Inhalt des <code>/blogs</code> Ordners ins Root (Wurzelverzeichnis) deiner Webseite. Du könntest aber genauso gut die Dateien in ein neues Unterverzeichnis hochladen, zB <code>/b2evo</code>; so <strong>bleibt dein existierendes Miniblog weiterhin komplett funktionsfähig, während du b2evolution ausprobierst.</strong><br />
   </span> <br />
 Nehmen wir an, du installierst den Inhalt des blogs-Ordners nach <code>http://deineseite.de/b2evo</code> ...</li>
 
-<li>Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />
-  	<br />
-	The installer will ask you a few questions, create required database tables, copy your Miniblog data to b2evo (without affecting Miniblog) and configure b2evolution for you. </li>
+<li>Starte das Installations-Skript auf deinem Server. Es befindet sich in <code>http://deineseite.de/b2evo/install</code>. Dann folge einfach den Anweisungen dort.<br /> <br /> Der Installer wird dir ein paar Fragen stellen, die notwendigen Datenbank-Tabellen erstellen, deine Miniblog-Daten nach b2evo kopieren (ohne Miniblog zu beeinträchtigen) und b2evolution für dich konfigurieren. </li>
 <li>Überprüfe, ob die neue Installation funktioniert.</li>
 <li>Auf Produktionsservern ist es empfehlenswert, den <code>/install</code> Unterordner zu löschen.</li>
 <li>Nach der Grundinstallation gibt es noch ein paar <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things die du beachten solltest</a> (Online Anleitung).</li>

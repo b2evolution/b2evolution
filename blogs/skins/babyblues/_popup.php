@@ -1,4 +1,6 @@
 <?php
+	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 	while( $Item = $MainList->get_item() ) {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

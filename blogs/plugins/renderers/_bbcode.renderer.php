@@ -10,6 +10,8 @@
  *
  * @package plugins
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/../renderer.class.php';
 
 class bbcode_Rendererplugin extends RendererPlugin
@@ -18,7 +20,7 @@ class bbcode_Rendererplugin extends RendererPlugin
 	var $name = 'BB code';
 	var $priority = 50;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true;
+	var $apply_to_html = true; 
 	var $apply_to_xml = true;  // strip the BBcode
 	var $short_desc;
 	var $long_desc;
@@ -43,7 +45,7 @@ class bbcode_Rendererplugin extends RendererPlugin
 									//	'#\[email](.+?)\[/email]#eis',		// E-mail
 									//	'#\[email=(.+?)](.+?)\[/email]#eis'
 									);
-
+	
 	/**
 	 * HTML replace array
 	 *
@@ -80,7 +82,7 @@ class bbcode_Rendererplugin extends RendererPlugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal BBcode::render(-)}}
+	 * {@internal BBcode::render(-)}} 
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -92,9 +94,9 @@ class bbcode_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-
+	
 		$content = preg_replace( $this->search, $this->replace, $content );
-
+		
 		return true;
 	}
 }

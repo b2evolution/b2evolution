@@ -8,6 +8,8 @@
  *
  * @package plugins
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/../toolbar.class.php';
 
 class smilies_Toolbarplugin extends ToolbarPlugin
@@ -36,7 +38,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal smilies_Toolbarplugin::smilies_Toolbarplugin(-)}}
+	 * {@internal smilies_Toolbarplugin::smilies_Toolbarplugin(-)}} 
 	 */
 	function smilies_Toolbarplugin()
 	{
@@ -50,10 +52,10 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Display the toolbar
 	 *
-	 * {@internal smilies_Toolbarplugin::render(-)}}
+	 * {@internal smilies_Toolbarplugin::render(-)}} 
 	 */
 	function display()
-	{
+	{	
 		$grins = '';
 		$smiled = array();
 		foreach( $this->smilies as $smiley => $grin )
@@ -66,7 +68,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 									'" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
 			}
 		}
-
+	
 		print('<div>'. $grins. '</div>');
 		ob_start();
 		?>
@@ -103,7 +105,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 				myField.focus();
 			}
 		}
-
+		
 		</script>
 		<?php
 		$grins = ob_get_contents();

@@ -5,6 +5,7 @@
  *
  * This file includes advanced settings for b2evolution
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 # General params:
 # (these must be forced to prevent URL overrides).
@@ -181,7 +182,7 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
  */
 $cookie_user  = 'cookie'. $b2evo_name. 'user';
 $cookie_pass  = 'cookie'. $b2evo_name. 'pass';
-$cookie_state 	= 'cookie'. $b2evo_name. 'state';
+$cookie_state = 'cookie'. $b2evo_name. 'state';
 $cookie_name  = 'cookie'. $b2evo_name. 'name';
 $cookie_email = 'cookie'. $b2evo_name. 'email';
 $cookie_url   = 'cookie'. $b2evo_name. 'url';

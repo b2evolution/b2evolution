@@ -8,11 +8,11 @@
  * Reminder: every line starting with # or // is a comment, multiline comments are
  *           surrounded by '/*' and '* /' (without space).
  *
- * IMPORTANT: Take special care not to erase quotes (') around text parameters
- * and semicolums (;) at the end of the lines. Otherwise you'll get some
+ * IMPORTANT: Take special care not to erase quotes (') around text parameters 
+ * and semicolums (;) at the end of the lines. Otherwise you'll get some 
  * "unexpected T_STRING" parse errors!
  *
- * Contributors: you should override this file by creating a file named _config_TEST.php
+ * Contributors: you should override this file by creating a file named _config_TEST.php 
  * (see end of this file)
  */
 

@@ -5,7 +5,7 @@
  *
  * This sets how posts and comments are formatted
  */
-
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 // ** Formatting **
 
@@ -46,34 +46,57 @@ $use_security_checker = 0;
  * The params are defined twice: once for the posts and once for the comments.
  * Typically you'll be more restrictive on comments.
  *
- * Adapted from XHTML 1.0 Strict by fplanque
+ * Adapted from XHTML-1.0-Transitional/Strict by fplanque
  * http://www.w3.org/TR/2002/REC-xhtml1-20020801/dtds.html#a_dtd_XHTML-1.0-Strict
  */
 
 // DEFINITION of allowed XHTML code for POSTS (posted in the backoffice)
 
 // Allowed Entity classes
-define('E_special_pre', 'br span bdo');
-define('E_special', E_special_pre.' img');
-define('E_fontstyle', 'tt i b big small');
-define('E_phrase', 'em strong dfn code q samp kbd var cite abbr acronym sub sup');
+
+// define('E_special_pre', 'br span bdo');			// Strict
+// define('E_special', E_special_pre.' img');		// Strict
+define('E_special_extra', 'img' );							// Transitional
+define('E_special_basic', 'br span bdo' );			// Transitional
+define('E_special', E_special_basic.' '.E_special_extra );	// Transitional
+
+// define('E_fontstyle', 'tt i b big small');				// Strict
+define('E_fontstyle_extra', 'big small font' );			// Transitional
+define('E_fontstyle_basic', 'tt i b u s strike' );	// Transitional
+define('E_fontstyle', E_fontstyle_basic.' '.E_fontstyle_extra );	// Transitional
+
+// define('E_phrase', 'em strong dfn code q samp kbd var cite abbr acronym sub sup'); // Strict
+define('E_phrase_extra', 'sub sup'); 																							// Transitional
+define('E_phrase_basic', 'em strong dfn code q samp kbd var cite abbr acronym');	// Transitional
+define('E_phrase', E_phrase_basic.' '.E_phrase_extra ); 													// Transitional
+
 define('E_misc_inline', 'ins del');
 define('E_misc', E_misc_inline);
 define('E_inline', 'a '.E_special.' '.E_fontstyle.' '.E_phrase );
 define('E_Iinline', '#PCDATA '.E_inline.' '.E_misc_inline );
 define('E_heading', 'h1 h2 h3 h4 h5 h6');
-define('E_list', 'ul ol dl');
-define('E_blocktext', 'pre hr blockquote address');
+
+// define('E_list', 'ul ol dl');				// Strict
+define('E_list', 'ul ol dl menu dir');	// Transitional
+
+// define('E_blocktext', 'pre hr blockquote address');			// Strict
+define('E_blocktext', 'pre hr blockquote address center');	// Transitional
+
 define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table');
-define('E_Bblock', E_block.' '.E_misc );
+
+// define('E_Bblock', E_block.' '.E_misc );			// Strict only
+
 define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc );
 define('E_a_content', '#PCDATA '.E_special.' '.E_fontstyle.' '.E_phrase.' '.E_misc_inline );
-define('E_pre_content', '#PCDATA a '.E_fontstyle.' '.E_phrase.' '.E_special_pre.' '.E_misc_inline );
 
+// define('E_pre_content', '#PCDATA a '.E_fontstyle.' '.E_phrase.' '.E_special_pre.' '.E_misc_inline ); // Strict
+define('E_pre_content', '#PCDATA a '.E_special_basic.' '.E_fontstyle_basic.' '.E_phrase_basic.' '.E_misc_inline ); // Transitional
+			 
 // Allowed Attribute classes
 define('A_coreattrs', 'class title');
 define('A_i18n', 'lang xml:lang dir');
 define('A_attrs', A_coreattrs.' '.A_i18n);
+define('A_TextAlign', 'align');									// Transitional only
 define('A_cellhalign', 'align char charoff');
 define('A_cellvalign', 'valign');
 
@@ -91,14 +114,24 @@ $allowed_tags = array
 	'h6' => E_Iinline,
 	'ul' => 'li',
 	'ol' => 'li',
+	'menu' => 'li',		// Transitional only
+	'dir' => 'li',		// Transitional only
 	'li' => E_Flow,
 	'dl' => 'dt dd',
 	'dt' => E_Iinline,
 	'dd' => E_Flow,
-	'address' => E_Iinline,
+	
+	// 'address' => E_Iinline,														// Strict
+	'address' => '#PCDATA '.E_inline.' '.E_misc_inline,		// Transitional
+	
 	'hr' => '',
 	'pre' => E_pre_content,
-	'blockquote' => E_Bblock,
+
+	// 'blockquote' => E_Bblock,		// Strict
+	'blockquote' => E_Flow,					// Transitional
+
+	'center' => E_Flow,					// Transitional only
+	
 	'ins' => E_Flow,
 	'del' => E_Flow,
 	'a' => E_a_content,
@@ -123,6 +156,12 @@ $allowed_tags = array
 	'b' => E_Iinline,
 	'big' => E_Iinline,
 	'small' => E_Iinline,
+
+	'u' => E_Iinline,						// Transitional only
+	's' => E_Iinline,						// Transitional only
+	'strike' => E_Iinline,			// Transitional only
+	'font' => E_Iinline,				// Transitional only
+
 	'img' => '',
 	'fieldset' => '#PCDATA legend '.E_block.' '.E_inline.' '.E_misc,
 	'legend' => E_Iinline,
@@ -140,30 +179,67 @@ $allowed_tags = array
 // Array showing allowed attributes for tags
 $allowed_attribues = array
 (
-	'div' => A_attrs,
-	'p' => A_attrs,
-	'h1' => A_attrs,
-	'h2' => A_attrs,
-	'h3' => A_attrs,
-	'h4' => A_attrs,
-	'h5' => A_attrs,
-	'h6' => A_attrs,
-	'ul' => A_attrs,
-	'ol' => A_attrs,
-	'li' => A_attrs,
-	'dl' => A_attrs,
+	// 'div' => A_attrs,								// Strict
+	'div' => A_attrs.' '.A_TextAlign,		// Transitional
+
+	// 'p' => A_attrs,								// Strict
+	'p' => A_attrs.' '.A_TextAlign,		// Transitional
+
+	// 'h1' => A_attrs,								// Strict
+	'h1' => A_attrs.' '.A_TextAlign,		// Transitional
+	// 'h2' => A_attrs,								// Strict
+	'h2' => A_attrs.' '.A_TextAlign,		// Transitional
+	// 'h3' => A_attrs,								// Strict
+	'h3' => A_attrs.' '.A_TextAlign,		// Transitional
+	// 'h4' => A_attrs,								// Strict
+	'h4' => A_attrs.' '.A_TextAlign,		// Transitional
+	// 'h5' => A_attrs,								// Strict
+	'h5' => A_attrs.' '.A_TextAlign,		// Transitional
+	// 'h6' => A_attrs,								// Strict
+	'h6' => A_attrs.' '.A_TextAlign,		// Transitional
+
+	// 'ul' => A_attrs,	// Strict
+	'ul' => A_attrs.' type compact',	// Transitional
+
+	// 'ol' => A_attrs,	// Strict
+	'ol' => A_attrs.' type compact start',	// Transitional
+
+	'menu' => A_attrs.' compact',	// Transitional only
+	'dir' => A_attrs.' compact',	// Transitional only
+
+	// 'li' => A_attrs,							// Strict
+	'li' => A_attrs.' type value',	// Transitional
+
+	// 'dl' => A_attrs,					// Strict
+	'dl' => A_attrs.' compact',	// Transitional 
+
 	'dt' => A_attrs,
 	'dd' => A_attrs,
+
 	'address' => A_attrs,
-	'hr' => A_attrs,
-	'pre' => A_attrs.' xml:space',
+
+	// 'hr' => A_attrs,															// Strict
+	'hr' => A_attrs.' align noshade size width',		// Transitional
+
+	// 'pre' => A_attrs.' xml:space',								// Strict
+	'pre' => A_attrs.' width xml:space',						// Transitional
+
 	'blockquote' => A_attrs.' cite',
+
+	'center' => A_attrs,					// Transitional only
+
 	'ins' => A_attrs.' cite datetime',
 	'del' => A_attrs.' cite datetime',
-	'a' => A_attrs.' charset type href hreflang rel rev shape coords',
+
+	// 'a' => A_attrs.' charset type href hreflang rel rev shape coords',			// Strict
+	'a' => A_attrs.' charset type href hreflang rel rev shape coords target',	// Transitional
+
 	'span' => A_attrs,
 	'bdo' => A_coreattrs.' lang xml:lang dir',
-	'br' => A_coreattrs,
+
+	// 'br' => A_coreattrs,				// Strict
+	'br' => A_coreattrs.' clear',	// Transitional
+
 	'em' => A_attrs,
 	'strong' => A_attrs,
 	'dfn' => A_attrs,
@@ -182,19 +258,40 @@ $allowed_attribues = array
 	'b' => A_attrs,
 	'big' => A_attrs,
 	'small' => A_attrs,
-	'img' => A_attrs.' src alt longdesc height width usemap ismap',
+
+	'u' => A_attrs,						// Transitional only
+	's' => A_attrs,						// Transitional only
+	'strike' => A_attrs,			// Transitional only
+	'font' => A_coreattrs.' '.A_i18n.' size color face',	// Transitional only
+
+	// 'img' => A_attrs.' src alt longdesc height width usemap ismap',	// Strict
+	'img' => A_attrs.' src alt name longdesc height width usemap ismap align border hspace vspace',	// Transitional
+
 	'fieldset' => A_attrs,
-	'legend' => A_attrs,
-	'table' => A_attrs.' summary width border frame rules cellspacing cellpadding',
-	'caption' => A_attrs,
+
+	//'legend' => A_attrs,							// Strict
+	'legend' => A_attrs.' align',				// Transitional
+
+	// 'table' => A_attrs.' summary width border frame rules cellspacing cellpadding',  // Strict
+	'table' => A_attrs.' summary width border frame rules cellspacing cellpadding align bgcolor', // Transitional
+
+	// 'caption' => A_attrs,						// Strict
+	'caption' => A_attrs.' align',			// Transitional
+
 	'colgroup' => A_attrs.' span width cellhalign cellvalign',
 	'col' => A_attrs.' span width cellhalign cellvalign',
 	'thead' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
 	'tfoot' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
 	'tbody' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
-	'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
-	'th' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,
-	'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,
+
+	// 'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,	// Strict
+	'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign.' bgcolor',	// Transitional 
+
+	// 'th' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,	// Strict
+	'th' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
+
+	// 'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,	// Strict
+	'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
 );
 
 $allowed_uri_scheme = array
@@ -256,7 +353,8 @@ $comments_allowed_tags = array
 	'dd' => C_E_Flow,
 	'address' => C_E_Iinline,
 	'hr' => '',
-	'blockquote' => C_E_Bblock,
+//	'blockquote' => C_E_Bblock,		// XHTML-1.0-Strict
+	'blockquote' => C_E_Flow,				// XHTML-1.0-Transitional
 	'ins' => C_E_Flow,
 	'del' => C_E_Flow,
 	'a' => C_E_a_content,

@@ -10,6 +10,8 @@
  *
  * @package pop3
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 class POP3 {
 	var $ERROR			= '';				//	Error string.
 
@@ -98,7 +100,7 @@ class POP3 {
 			return false;
 		}
 
-		$fp = fsockopen($server, $port, &$errno, &$errstr);
+		$fp = fsockopen($server, $port, $errno, $errstr);
 
 		if( !$fp )
 		{

@@ -1,12 +1,13 @@
 <?php
-	/*
-	 * This is the main template. It displays the blog.
-	 *
-	 * However this file is not meant to be called directly.
-	 * It is meant to be called automagically by b2evolution.
-	 * To display a blog, you should call a stub file instead, for example:
-	 * /blogs/index.php or /blogs/blog_b.php
-	 */
+/*
+ * This is the main template. It displays the blog.
+ *
+ * However this file is not meant to be called directly.
+ * It is meant to be called automagically by b2evolution.
+ * To display a blog, you should call a stub file instead, for example:
+ * /blogs/index.php or /blogs/blog_b.php
+ */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">

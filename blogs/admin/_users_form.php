@@ -8,6 +8,7 @@
  *
  * @package admin
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 											|| ($user_profile_only && $edited_User->ID == $current_User->ID) );

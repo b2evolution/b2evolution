@@ -7,6 +7,7 @@
  * To display a blog, you should call a stub file instead, for example:
  * /blogs/index.php or /blogs/blog_b.php
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <html>
 <head>

@@ -37,6 +37,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 // XML RPC Server class
 // requires: xmlrpc.php
 
@@ -188,6 +190,7 @@ class xmlrpc_server
 	function service() 
 	{
 		$r=$this->parseRequest();
+		// TODO: charset:  encoding=\"iso-8859-1\"
 		$payload="<?xml version=\"1.0\"?>\n" . 
 			$this->serializeDebug() .							// Include debug info as comments
 			$r->serialize();
@@ -227,6 +230,14 @@ class xmlrpc_server
 		return array(0, "Wanted $wanted, got $got at param $pno)");
 	}
 
+	/** 
+	 * 
+	 *
+	 * {@internal parseRequest(-) }}
+	 *
+	 * @param 
+	 * @return
+	 */
   function parseRequest($data="") 
 	{
 		global $_xh,$HTTP_RAW_POST_DATA;
@@ -249,8 +260,7 @@ class xmlrpc_server
 		$_xh[$parser]['params']=array();
 		$_xh[$parser]['method']="";
 	
-		// decompose incoming XML into request structure
-	
+		// decompose incoming XML into request structure:
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
 		xml_set_element_handler($parser, "xmlrpc_se", "xmlrpc_ee");
 		xml_set_character_data_handler($parser, "xmlrpc_cd");
@@ -264,7 +274,9 @@ class xmlrpc_server
 						xml_error_string(xml_get_error_code($parser)),
 						xml_get_current_line_number($parser)));
 			xml_parser_free($parser);
-		} else {
+		} 
+		else
+		{	// XML parsing succeeded:
 			xml_parser_free($parser);
 			$m=new xmlrpcmsg($_xh[$parser]['method']);
 			// now add parameters in
@@ -276,9 +288,13 @@ class xmlrpc_server
 			}
 			// uncomment this to really see what the server's getting!
 			// xmlrpc_debugmsg($plist);
-			// now to deal with the method
-			$methName=$_xh[$parser]['method'];
-			if (ereg("^system\.", $methName)) {
+			
+			// now to deal with the method:
+			$methName = $_xh[$parser]['method'];
+			logIO( 'I', 'Called method:'.$methName );
+
+			if (ereg("^system\.", $methName)) 
+			{
 				$dmap=$_xmlrpcs_dmap; $sysCall=1;
 			} else {
 				$dmap=$this->dmap; $sysCall=0;
@@ -314,7 +330,8 @@ class xmlrpc_server
 		return $r;
   }
 
-  function echoInput() {
+  function echoInput()
+	{
 	global $HTTP_RAW_POST_DATA;
 
 	// a debugging routine: just echos back the input

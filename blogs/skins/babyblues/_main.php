@@ -1,12 +1,13 @@
 <?php
-	/*
-	 * This is the main template. It displays the blog.
-	 *
-	 * However this file is not meant to be called directly.
-	 * It is meant to be called automagically by b2evolution.
-	 * To display a blog, you should call a stub file instead, for example:
-	 * /blogs/index.php or /blogs/blog_b.php
-	 */
+/*
+ * This is the main template. It displays the blog.
+ *
+ * However this file is not meant to be called directly.
+ * It is meant to be called automagically by b2evolution.
+ * To display a blog, you should call a stub file instead, for example:
+ * /blogs/index.php or /blogs/blog_b.php
+ */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <html lang="<?php locale_lang() ?>">
 <head>
@@ -108,7 +109,7 @@
 		<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
 		</div>
 	<?php } ?>
-
+	
 		<div class="sidetitle" align="center"><?php echo T_('archives') ?></div>
 		<div class="sidebody">
 		<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------

@@ -9,7 +9,7 @@
  * @package b2evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
-
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /*
  * trackbacks(-)

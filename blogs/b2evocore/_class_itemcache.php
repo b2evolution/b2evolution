@@ -8,6 +8,8 @@
  *
  * @package b2evocore
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/_class_dataobjectcache.php';
 
 /**
@@ -70,7 +72,7 @@ class ItemCache extends DataObjectCache
 		{
 			debug_log( "Retrieving <strong>$this->objtype($req_urltitle)</strong> from cache" );
 		}
-
+		
 		return $this->urltitle_index[$req_urltitle];
 	}
 

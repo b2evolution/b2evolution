@@ -1,13 +1,15 @@
 <?php
 /**
  * This file implements the renderer (EXPERIMENTAL)
- *
+ * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package b2evocore
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 require_once dirname(__FILE__).'/_class_plug.php';
 
 /**
@@ -25,9 +27,9 @@ class Renderer extends Plug
 	{
 		// Call parent constructor:
 		parent::Plug( 'renderer' );
-	}
-
-
+	}	
+	
+	
 	/**
 	 * Validate renderer list
 	 *
@@ -39,11 +41,11 @@ class Renderer extends Plug
 	function validate_list( $renderers = array('default') )
 	{
 		$this->init();	// Init if not done yet.
-
+		
 		$this->restart(); // Just in case.
-
+		
 		$validated_renderers = array();
-
+		
 		while( $loop_RendererPlugin = $this->get_next() )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
@@ -55,7 +57,7 @@ class Renderer extends Plug
 					// echo 'FORCED';
 					$validated_renderers[] = $loop_RendererPlugin->code;
 					break;
-
+				 
 				case 'opt-out':
 					if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
 						|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
@@ -75,15 +77,15 @@ class Renderer extends Plug
 					}
 					// else echo 'NO';
 					break;
-
+									 
 				case 'never':
 					// echo 'NEVER';
 					continue;	// STOP, don't render, go to next renderer
-			}
+			}		
 		}
 		// echo count( $validated_renderers );
-		return $validated_renderers;
-	}
+		return $validated_renderers; 
+	}	
 
 
 	/**
@@ -99,26 +101,26 @@ class Renderer extends Plug
 	function render( & $content, & $renderers, $format )
 	{
 		$this->init();	// Init if not done yet.
-
+		
 		$this->restart(); // Just in case.
-
+		
 		// echo implode(',',$renderers);
-
+		
 		while( $loop_RendererPlugin = $this->get_next() )
 		{ // Go through whole list of renders
 			//echo ' ',$loop_RendererPlugin->code, ':';
 
 			switch( $loop_RendererPlugin->apply_when )
 			{
-				case 'stealth':
-				case 'always':
+				 case 'stealth':
+				 case 'always':
 					// echo 'FORCED ';
 					$loop_RendererPlugin->render( $content, $format );
 					break;
-
-				case 'opt-out':
-				case 'opt-in':
-				case 'lazy':
+				 
+				 case 'opt-out':
+				 case 'opt-in':
+				 case 'lazy':
 					if( in_array( $loop_RendererPlugin->code, $renderers ) )
 					{	// Option is activated
 						// echo 'OPT ';
@@ -126,11 +128,11 @@ class Renderer extends Plug
 					}
 					// else echo 'NOOPT ';
 					break;
-
-				case 'never':
+									 
+				 case 'never':
 					// echo 'NEVER ';
 					break;	// STOP, don't render, go to next renderer
-			}
+			}		
 		}
 
 		return $content;

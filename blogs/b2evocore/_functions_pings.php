@@ -9,7 +9,7 @@
  * @package b2evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
-
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /*
  * pingb2evonet(-)
@@ -135,8 +135,8 @@ function pingBlogs( & $blogparams, $display = true )
 	// echo 'ping Blo.gs';
 	if( $display ) 
 	{
-	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>", T_('Pinging Blo.gs...'), "</h3>\n";
+		echo "<div class=\"panelinfo\">\n";
+		echo "<h3>", T_('Pinging Blo.gs...'), "</h3>\n";
 	}
 	if( !preg_match( '#^http://localhost[/:]#',$baseurl) ) 
 	{
@@ -183,33 +183,33 @@ function pingBlogs( & $blogparams, $display = true )
 */
 function pingTechnorati(& $blogparams, $display = true ) 
 {
-   global $baseurl, $blogfilename;
+	global $baseurl, $blogfilename;
 
-   if( !get_bloginfo('pingtechnorati', $blogparams) ) return false;
+	if( !get_bloginfo('pingtechnorati', $blogparams) ) return false;
 	// echo 'ping technorati';
 
-   if( $display ) 
-	 {
-      echo "<div class=\"panelinfo\">\n";
-      echo '<h3>', T_('Pinging technorati.com...'), "</h3>\n";
-   }
-	 
-   if( !preg_match( '#^http://localhost[/:]#', $baseurl) ) 
-	 {
-      $client = new xmlrpc_client("/rpc/ping", "rpc.technorati.com", 80);
-      $message = new xmlrpcmsg("weblogUpdates.ping", 
-											array(new xmlrpcval(get_bloginfo('name', $blogparams)),
-                      			new xmlrpcval(get_bloginfo('blogurl', $blogparams)) ));
-      $result = $client->send($message);
+	if( $display ) 
+	{
+		echo "<div class=\"panelinfo\">\n";
+		echo '<h3>', T_('Pinging technorati.com...'), "</h3>\n";
+	}
+	
+	if( !preg_match( '#^http://localhost[/:]#', $baseurl) ) 
+	{
+		$client = new xmlrpc_client("/rpc/ping", "rpc.technorati.com", 80);
+		$message = new xmlrpcmsg("weblogUpdates.ping", 
+										array(new xmlrpcval(get_bloginfo('name', $blogparams)),
+													new xmlrpcval(get_bloginfo('blogurl', $blogparams)) ));
+		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result, '', $display );
-      if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
-      return(true);
-   } 
-	 else 
-	 {
-      if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
-      return(false);
-   }
+		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
+		return(true);
+	} 
+	else 
+	{
+		if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
+		return(false);
+	}
 }
 
 ?>

@@ -8,10 +8,7 @@
  *
  * @package install
  */
-if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1) == '_' )
-	die( 'Please, do not access this page directly.' );
-
-
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /*
  * upgrade_cafelog_tables(-)
@@ -145,11 +142,42 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 	
 	echo 'Copying Miniblog comments... ';
-	$query = "INSERT INTO $tablecomments( comment_ID, comment_post_ID, comment_type, comment_date, comment_content ) 
-						SELECT id, parentId, 'comment', created, content
+	$query = "SELECT id, parentId, created, content
 						FROM miniblog
 						WHERE parentId > 1";
-	$DB->query( $query );
+	$rows = $DB->get_results( $query );
+	foreach( $rows as $row )
+	{
+		$matches = array();
+
+		// Extract author's name:
+		if( preg_match( '#<p class="posted">Posted by (<a .*?>)?(.*?)<#', $row->content, $matches ) )
+			$author = $matches[2];
+		else
+			$author = '';
+
+		// Extract author's email:
+		if( preg_match( '#<p class="posted">Posted by <a href="mailto:(.*?)"#', $row->content, $matches ) )
+			$author_email = $matches[1];
+		else
+			$author_email = '';
+
+		// Extract author's url:
+		if( preg_match( '# class="postedLink">(http://.*?)</a>#', $row->content, $matches ) )
+			$author_url = $matches[1];
+		else
+			$author_url = '';
+			
+		// Trim the content:
+		if( preg_match( '#^(.*?)<p class="posted">Posted by#s', $row->content, $matches ) )
+			$content = $matches[1];
+		else
+			$content = $row->content;
+		
+		$query = "INSERT INTO $tablecomments( comment_ID, comment_post_ID, comment_type, comment_date, comment_content, comment_author, comment_author_email, comment_author_url ) 
+							VALUES ( $row->id, $row->parentId, 'comment', ".$DB->quote($row->created).", ".$DB->quote($content).", ".$DB->quote($author).", ".$DB->quote($author_email).", ".$DB->quote($author_url)." )";
+		$DB->query( $query );
+	}
 	echo "OK.<br />\n";
 	
 		

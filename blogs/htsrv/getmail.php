@@ -184,7 +184,9 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 			}
 		}
 		$contentfirstline = $blah[1];
-	} else {
+	}
+	else
+	{
 		$userpassstring = $firstline;
 		$contentfirstline = '';
 	}

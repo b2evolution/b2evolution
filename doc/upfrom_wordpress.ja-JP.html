@@ -4,7 +4,7 @@
 <head>
 	
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>b2evo パッケージ: Upgrading from WordPress</title>
+<title>b2evo パッケージ: WordPress からのアップグレード</title>
 <link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
 	
 	 
@@ -13,7 +13,7 @@
 	<div id="rowheader" >
 		<h1><a href="http://b2evolution.net/" title="b2evolution: 公式サイト"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 		<div id="tagline">多言語・複数ユーザ・マルチブログ エンジン。</div>
-		<h1 id="version">バージョン: 0.9.0.5+CVS</h1>
+		<h1 id="version">バージョン: 0.9.1-CVS</h1>
 		<div id="quicklinks">
 			b2evo パッケージ: 
 			<a href="../index.ja-JP.html">スタート ページ</a> &middot; 
@@ -45,43 +45,33 @@
 	</ul>
 	</div>
 	
-<h1>Upgrading from WordPress</h1>
+<h1>WordPress からのアップグレード</h1>
 
 <p>始める前に、b2evolution のいくつかのネットワーク機能を利用する際には、あなたは我々の簡単な <a href="http://b2evolution.net/about/terms.html">サービス規約</a> に同意する必要があることに注意してください。</p>
 
-<p>The upgrade procedure below has been tested exclusively with WordPress version 1.2.
-	Though it may not work with other versions,
-	you can still give it a try quite safely. b2evolution will not harm your data, even if it can't understand it.
-	The worst you would get is an error message.</p>
+<p>以下のアップグレード手順は、WordPress バージョン 1.2 でのみテストされています。その他のバージョンでは動作しないかもしれませんが、まったく安全にアップグレードを試してみることができます。b2evolution はあなたのデータを解釈できなくても、データを傷つけることはありません。最悪の場合で、エラーメッセージが表示されるだけです。</p>
 <p><em>しかし、新しいもののインストールを始める前には、例のごとく、現在のウェブサイト / ブログ / データベース (あなたが設置しているものによります) のバックアップを行うのが賢明です。</em></p>
 
 <p>b2evolution 配布 .zip アーカイブを展開した後:</p>
 
 <ol class="expanded">
-<li>On your server, locate the mysql database you are already using for WordPress.
-	You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will
-	not alter your WordPress tables and data in any way!<br />
+<li>サーバ上で、WordPress 用にあなたが現在使用している MySQL データベースを確認してください。アップグレードを可能にするために、b2evolution 用にも同じデータベースを使用しなければなりません。安心してください、b2evolution はあなたの WordPress のテーブルやデータを変更することはありません!<br />
 		<span class="small"><br />
-		<strong>注意1: </strong>Unless you changed the config, all tables created by b2evolution are prefixed with
-		evo_ . Unless you already have an application using the same prefix, this makes it safe to install
-		b2evolution in a database shared with other applications. For example, WordPress used tables prefixed with wp_ by default.
-		Your existing tables will not be affected in any way.<br />
+		<strong>注意1: </strong>設定を変更しなかった場合は、b2evolution によって作られる全てのテーブルには evo_ と接頭辞が付きます。同じ接頭辞を用いるアプリケーションをすでに使用しているのでなければ、これによって安全に他のアプリケーションと一つのデータベースを共有することができます。例えば、WordPress はデフォルトでは wp_ という接頭辞のついたテーブルを使用します。既存のテーブルが影響を受けることはないはずです。<br />
 		<strong>注意2:</strong> なぜ同じデータベースなのか? データをコピーするのに使用している SQL プロセス -- これは早くて安全です -- が、一つのデータベース内でしか行えないからです。</span></li>
 
 <li>b2evolution のファイル群をあなたのウェブサイトにアップロードしてください。<br />
   <br />
-  <span class="small"><strong>注意:</strong> Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing WordPress blog remains fully functional while you check out b2evolution.</strong><br />
+  <span class="small"><strong>注意:</strong> あなたのサイトにアップロードする必要があるのは <code>/blogs</code> ディレクトリの中身だけです。b2evolution をあなたのサイトのホームページとして扱いたい場合は、<code>/blogs</code> フォルダの中身をあなたのウェブサイトのルートにアップロードしてください。しかし、新しいサブディレクトリ、例えば <code>/b2evo</code> に、ファイル群をアップロードすることもできます。この方法では、<strong>あなたが b2evolution を試してみている間、既存の WordPress ブログが完全に機能し続けます。</strong><br />
   </span> <br />
 あなたが blogs フォルダの中身を <code>http://yoursite.com/b2evo</code> にインストールすると仮定しましょう...</li>
 
-<li>Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />
-  	<br />
-	The installer will ask you a few questions, create required database tables, copy your WordPress data to b2evo (without affecting WordPress) and configure b2evolution for you. </li>
+<li>インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/b2evo/install</code> に配置されています。それから、画面の指示に従ってください。<br />   <br /> インストーラは、あなたに数個の質問をして、必要なデータベース テーブルを作り、WordPress のデータを b2evo にコピーし (WordPress に影響を及ぼしません)、あなたの b2evolution の設定を行います。 </li>
 <li>新しくインストールされたものが動作していることを確認してください。</li>
 <li>公開サーバでは、<code>/install</code> サブフォルダを削除することを推奨します。</li>
-<li>Check the <a href="http://wiki.b2evolution.net/">wiki</a> or the <a href="http://forums.b2evolution.net/">forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution.<br />
+<li>既存の WordPress テンプレートとスキンを b2evolution にアップグレードする注意事項を <a href="http://wiki.b2evolution.net/">wiki</a> や <a href="http://forums.b2evolution.net/">フォーラム</a> で確認してください。<br />
 <br />
-<span class="small"><strong>注意:</strong> You can reuse your current WordPress CSS design in a snap by copying your style.css file into any b2evolution skin folder which name starts with wpc_ (which stands for WordPress CSS compatible)</span></li>
+<span class="small"><strong>注意:</strong> 名称が wpc_ で始まる(これは Wordpress CSS 互換であることを表わします) b2evolution スキン フォルダにあなたの WordPress の style.css ファイルをコピーすることで、あなたが現在使っている WordPress の CSSデザインを、すぐに再利用することができます。</span></li>
 <li>基本的なインストールが終わった後で、いくつかの <a href="http://b2evolution.net/man/install/trickystuff.html">処理する必要がある注意を要する事柄</a> (オンライン マニュアル) があります。</li>
 </ol>
 

@@ -13,7 +13,7 @@
 	<div id="rowheader" >
 		<h1><a href="http://b2evolution.net/" title="b2evolution: 公式サイト"><img src="../blogs/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 		<div id="tagline">多言語・複数ユーザ・マルチブログ エンジン。</div>
-		<h1 id="version">バージョン: 0.9.0.5+CVS</h1>
+		<h1 id="version">バージョン: 0.9.1-CVS</h1>
 		<div id="quicklinks">
 			b2evo パッケージ: 
 			<a href="../index.ja-JP.html">スタート ページ</a> &middot; 
@@ -55,15 +55,15 @@
 <p>b2evolution 配布 .zip アーカイブを展開した後:</p>
 
 <ol class="expanded">
-<li>サーバ上で、Cafelog/b2 用にあなたが現在使用している mySQL データベースを確認してください。アップグレードを可能にするために、b2evolution 用にも同じデータベースを使用しなければなりません。安心してください、b2evolution はあなたの Cafelog/b2 のテーブルやデータを変更することはありません!<br />
+<li>サーバ上で、Cafelog/b2 用にあなたが現在使用している MySQL データベースを確認してください。アップグレードを可能にするために、b2evolution 用にも同じデータベースを使用しなければなりません。安心してください、b2evolution はあなたの Cafelog/b2 のテーブルやデータを変更することはありません!<br />
 		<span class="small"><br />
-		<strong>注意1: </strong>設定を変更しなかった場合は、b2evolution によって作られる全てのテーブルには evo_ と接頭辞が付きます。同じ接頭辞を用いるアプリケーションをすでに使用しているのでなければ、これによって安全に他のアプリケーションと一つのデータベースを共有することができます。例えば、Cafelog/b2 は b2 をいう接頭辞のついたテーブルを使用します。既存のテーブルが影響を受けることはないはずです。<br />
+		<strong>注意1: </strong>設定を変更しなかった場合は、b2evolution によって作られる全てのテーブルには evo_ と接頭辞が付きます。同じ接頭辞を用いるアプリケーションをすでに使用しているのでなければ、これによって安全に他のアプリケーションと一つのデータベースを共有することができます。例えば、Cafelog/b2 は b2 という接頭辞のついたテーブルを使用します。既存のテーブルが影響を受けることはないはずです。<br />
 		<strong>注意2:</strong> なぜ同じデータベースなのか? データをコピーするのに使用している SQL プロセス -- これは早くて安全です -- が、一つのデータベース内でしか行えないからです。</span>
 </li>
 
 <li>b2evolution のファイル群をあなたのウェブサイトにアップロードしてください。<br />
   <br />
-  <span class="small"><strong>注意:</strong> あなたのサイトにアップロードする必要があるのは <code>/blogs</code> ディレクトリの中身だけです。b2evolution をあなたのサイトのホームページとして扱いたい場合は、<code>/blogs</code> フォルダの中身をあなたのウェブサイトのルートにアップロードしてください。しかし、新しいサブディレクトリ、例えば <code>/b2evo</code> に、ファイル群をアップロードすることもできます。この方法では、<strong>あなたが b2evolution を試してみている間、既存の Cafelog/b2 blog が完全に機能し続けます。</strong><br />
+  <span class="small"><strong>注意:</strong> あなたのサイトにアップロードする必要があるのは <code>/blogs</code> ディレクトリの中身だけです。b2evolution をあなたのサイトのホームページとして扱いたい場合は、<code>/blogs</code> フォルダの中身をあなたのウェブサイトのルートにアップロードしてください。しかし、新しいサブディレクトリ、例えば <code>/b2evo</code> に、ファイル群をアップロードすることもできます。この方法では、<strong>あなたが b2evolution を試してみている間、既存の Cafelog/b2 ブログが完全に機能し続けます。</strong><br />
   </span> <br />
 あなたが blogs フォルダの中身を <code>http://yoursite.com/b2evo</code> にインストールすると仮定しましょう...</li>
 

@@ -151,8 +151,8 @@ default:
 						break;
 				}
 			?>
-				</li>
-			<?php }
+			</li>
+		<?php }
 		}
 		?></ul><?php
 	}

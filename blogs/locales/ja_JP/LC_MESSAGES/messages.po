@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2003-08-22 19:52+0200\n"
-"PO-Revision-Date: 2004-05-31 20:45+0900\n"
+"PO-Revision-Date: 2004-06-12 22:54+0900\n"
 "Last-Translator: Jun MUTO <jmuto@saku2.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -899,7 +899,7 @@ msgstr "日付"
 
 #: ..\..\..\admin\b2stats.php:176
 msgid "Indexing Robots"
-msgstr "Indexing Robots"
+msgstr "インデックス作成ロボット"
 
 #: ..\..\..\admin\b2stats.php:179
 msgid "Total"
@@ -985,7 +985,7 @@ msgstr "最近の検索エンジン経由の参照"
 
 #: ..\..\..\admin\b2stats.php:288
 msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
-msgstr "以下は検索エンジンのインデックスロボットのような自動ロボットからのhitです。(ロボットは /conf/_stats.php にリストされている必要があります)"
+msgstr "以下は検索エンジンを経由してこのブログ システムに来た人々からのhitです。(検索エンジンは /conf/_stats.php にリストされている必要があります)"
 
 #: ..\..\..\admin\b2stats.php:308
 msgid "Top refering search engines"

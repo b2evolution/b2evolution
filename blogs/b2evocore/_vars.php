@@ -1,7 +1,7 @@
 <?php
 /**
  * This file sets various arrays and variables for use in b2evolution
- *
+ * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -9,6 +9,7 @@
  * @package b2evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 $b2_version = '0.9.1-CVS';
 $new_db_version = 8070;				// next time: 8080
@@ -34,6 +35,7 @@ if( !isset($_SERVER['REQUEST_URI']) )
 	}
 	else
 	{
+		$ReqPath = false;
 		?>
 		<p><span class="error">Warning: $ReqPath could not be set. Probably an odd IIS problem.</span><br />
 		Go to your <a href="<?php echo $baseurl.'/'.$install_subdir ?>/phpinfo.php">phpinfo page</a>,
@@ -49,7 +51,7 @@ if( !isset($_SERVER['REQUEST_URI']) )
 		</p>
 		<?php
 	}
-
+		 
 	$ReqURI = $ReqPath;
 	if( isset($_SERVER['QUERY_STRING']) )
 	{ //Made a $_GET request

@@ -1,12 +1,11 @@
 <?php
-/**
- * This is the template that displays the linkblog
- *
- * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
- */
-	if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
-		die( 'Please, do not access this page directly.' );
+	/**
+	 * This is the template that displays the linkblog
+	 *
+	 * This file is not meant to be called directly.
+	 * It is meant to be called by an include in the _main.php template.
+	 */
+	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	
 	if( !isset( $linkblog ) )
 	{	// No link blog explicitely specified, we use default:

@@ -9,6 +9,7 @@
  * @package b2evocore
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /*
  * bpost_create(-)
@@ -51,6 +52,8 @@ function bpost_create(
 	// validate url title
 	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0 );
 
+	// echo 'INSERTING NEW POST ';
+
 	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content,
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_url, post_autobr, post_flags, post_wordcount,
@@ -69,19 +72,19 @@ function bpost_create(
 										".bpost_count_words($post_content).", 
 										'".$DB->escape($post_comments)."',
 										'".$DB->escape(implode('.',$post_renderers))."' )";
-	if( ! $DB->query( $query ) ) return 0;
+	if( ! $DB->query( $query, 'Insert New Post' ) ) return 0;
 	$post_ID = $DB->insert_id;
-	//echo "post ID:".$post_ID;
+	// echo "post ID:".$post_ID;
 
 	// insert new extracats
 	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
 	foreach( $extra_cat_IDs as $extra_cat_ID )
 	{
-		//echo "extracat: $extra_cat_ID <br />";
+		// echo "extracat: $extra_cat_ID <br />";
 		$query .= "( $post_ID, $extra_cat_ID ),";
 	}
 	$query = substr( $query, 0, strlen( $query ) - 1 );
-	if( ! $DB->query( $query ) ) return 0;
+	if( ! $DB->query( $query, 'Associate new post with extra categories' ) ) return 0;
 
 	// TODO: END TRANSACTION
 
@@ -238,12 +241,19 @@ function bpost_delete( $post_ID )
 /*
  * get_lastpostdate(-)
  */
-function get_lastpostdate( $blog = 1, $show_statuses = array(), $cat = '', $catsel = array() )
+function get_lastpostdate( 
+		$blog = 1, 
+		$show_statuses = array(), 
+		$cat = '', 
+		$catsel = array(),
+		$timestamp_min = '',								// Do not show posts before this timestamp
+		$timestamp_max = 'now'							// Do not show posts after this timestamp
+ )
 {
 	global $localtimenow, $postdata;
 
 	// echo 'getting last post date';
-	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', $cat, $catsel, '', 'DESC', 'issue_date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
+	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', $cat, $catsel, '', 'DESC', 'issue_date', 1, '','', '', '', '', '', '', 1, 'posts', $timestamp_min, $timestamp_max );
 
 	if( $LastItem = $LastPostList->get_item() )
 	{
@@ -968,13 +978,10 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 /*
  * next_posts(-)
- *
- * original by cfactor at cooltux.org
- * fplanque: removed relying on querystring.
  */
 function next_posts($max_page = 0, $page='' )
 {
-	global $p, $paged, $Settings;
+	global $p, $paged, $Settings, $edited_Blog, $generating_static;
 
 	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
@@ -982,7 +989,15 @@ function next_posts($max_page = 0, $page='' )
 		$nextpage = intval($paged) + 1;
 		if (!$max_page || $max_page >= $nextpage)
 		{
-			echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
+			if( !isset($generating_static) )
+			{	// We are not generating a static page here:
+				echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
+			}
+			elseif( isset($edited_Blog) )
+			{	// We are generating a static page
+				echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage  );
+			}
+			// else...should not happen
 		}
 	}
 }
@@ -991,23 +1006,29 @@ function next_posts($max_page = 0, $page='' )
 
 /*
  * previous_posts(-)
- *
- * fplanque: reduced to the max!
  */
 function previous_posts( $page='' )
 {
-	global $p, $paged, $Settings;
+	global $p, $paged, $Settings, $edited_Blog, $generating_static;
 	
 	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
-		echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
+		if( !isset($generating_static) )
+		{	// We are not generating a static page here:
+			echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
+		}
+		elseif( isset($edited_Blog) )
+		{	// We are generating a static page
+			echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage  );
+		}
+		// else...should not happen
 	}
 }
 
 
-/*
+/**
  * next_posts_link(-)
  *
  *
@@ -1035,7 +1056,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
 
 
 
-/*
+/**
  * previous_posts_link(-)
  *
  *
