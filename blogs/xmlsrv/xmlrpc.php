@@ -18,7 +18,7 @@
  * Initialize everything:
  */
 require_once(dirname(__FILE__).'/../conf/_config.php' );
-require_once(dirname(__FILE__)."/../$core_subdir/_main.php" );
+require_once(dirname(__FILE__).'/../'.$core_subdir.'_main.php' );
 
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
@@ -1045,15 +1045,15 @@ function bloggergettemplate($m)
 	global $xmlsrv_subdir;
 
 	// Determine the edit folder:
-	$edit_folder = get_path('skins').'/custom';
+	$edit_folder = get_path('skins').'custom/';
 
 	if ($templateType == "main")
 	{
-		$file = $edit_folder.'/_main.php';
+		$file = $edit_folder.'_main.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
-		$file = $edit_folder.'/_archives.php';
+		$file = $edit_folder.'_archives.php';
 	}
 	else return; // TODO: handle this cleanly
 
@@ -1131,15 +1131,15 @@ function bloggersettemplate( $m )
 
 	global $xmlsrv_subdir;
 	// Determine the edit folder:
-	$edit_folder = get_path('skins').'/custom';
+	$edit_folder = get_path('skins').'custom/';
 
 	if( $templateType == 'main' )
 	{
-		$file = $edit_folder.'/_main.php';
+		$file = $edit_folder.'_main.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
-		$file = $edit_folder.'/_archives.php';
+		$file = $edit_folder.'_archives.php';
 	}
 	else return; // TODO: handle this cleanly
 
@@ -1229,8 +1229,8 @@ function pingback_ping( $m )
 
 	// Check if the page linked to is in our site
 	// fplanque: TODO: coz we don't have a single siteurl any longer
-	$pos1 = strpos($pagelinkedto, str_replace('http://', '', str_replace('www.', '', $baseurl)));
-	if($pos1)
+	$pos1 = strpos( $pagelinkedto, preg_replace( array('#^http://(www\.)?#'), '', $baseurl ));
+	if( $pos1 !== false )
 	{
 		// let's find which post is linked to
 		$urltest = parse_url($pagelinkedto);

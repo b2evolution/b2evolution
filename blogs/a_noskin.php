@@ -107,13 +107,13 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	# This is the class of for the other blog links:
 	$blog_other_link_class = 'NavButton2';
 	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small"><img src="'. $img_url.'/down_small.gif" width="14" height="12" alt="['.T_('Selected').']" title="" class="top" />';
+	$blog_selected_name_before = '<span class="small"><img src="'. $img_url.'down_small.gif" width="14" height="12" alt="['.T_('Selected').']" title="" class="top" />';
 	$blog_selected_name_after = '</span>';
 	# This is additionnal markup before and after the other blog names
 	$blog_other_name_before = '<span class="small">';
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	require( get_path('skins').'/_bloglist.php');
+	require( get_path('skins').'_bloglist.php');
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
@@ -175,12 +175,12 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
 		</div>
 		<?php // ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
-		$disp_comments = 1;					// Display the comments if requested
-		$disp_comment_form = 1;			// Display the comments form if comments requested
-		$disp_trackbacks = 1;				// Display the trackbacks if requested
-		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( get_path('skins').'/_feedback.php');
+		$disp_comments = 1;         // Display the comments if requested
+		$disp_comment_form = 1;     // Display the comments form if comments requested
+		$disp_trackbacks = 1;       // Display the trackbacks if requested
+		$disp_trackback_url = 1;    // Display the trackbal URL if trackbacks requested
+		$disp_pingbacks = 1;        // Display the pingbacks if requested
+		require( get_path('skins').'_feedback.php');
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
@@ -192,22 +192,22 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	{
 		case 'comments':
 			// this includes the last comments if requested:
-			require( get_path('skins').'/_lastcomments.php' );
+			require( get_path('skins').'_lastcomments.php' );
 			break;
 
 		case 'stats':
 			// this includes the statistics if requested:
-			require( get_path('skins').'/_stats.php');
+			require( get_path('skins').'_stats.php');
 			break;
 
 		case 'arcdir':
 			// this includes the archive directory if requested
-			require( get_path('skins').'/_arcdir.php');
+			require( get_path('skins').'_arcdir.php');
 			break;
 
 		case 'profile':
 			// this includes the profile form if requested
-			require( get_path('skins').'/_profile.php');
+			require( get_path('skins').'_profile.php');
 			break;
 	}
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
@@ -228,7 +228,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
 		</ul>
 		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			require( get_path('skins').'/_calendar.php');
+			require( get_path('skins').'_calendar.php');
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
@@ -252,7 +252,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 		<h3><?php echo T_('Categories') ?></h3>
 		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			require( get_path('skins').'/_categories.php');
+			require( get_path('skins').'_categories.php');
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
 		<input type="submit" value="<?php echo T_('Get selection') ?>" />
@@ -264,7 +264,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 		<h3><?php echo T_('Archives') ?></h3>
 		<ul>
 			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( get_path('skins').'/_archives.php');
+				require( get_path('skins').'_archives.php');
 				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 		</ul>
@@ -296,7 +296,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
 
 	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
-		require( get_path('skins').'/_linkblog.php' );
+		require( get_path('skins').'_linkblog.php' );
 		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
 
 
@@ -315,7 +315,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	</div>
 
 	<div class="bSideItem">
-		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $img_url ?>/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
+		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $img_url ?>xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 
 
 			<ul>
@@ -329,7 +329,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	</div>
 
 	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>

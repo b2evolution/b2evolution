@@ -23,9 +23,9 @@ if ($use_spellchecker)
 		document.SPELLDATA.messagebodyname.value=body
 		document.SPELLDATA.companyID.value="custom\\http://cafelog.com"
 		document.SPELLDATA.language.value=1033
-		document.SPELLDATA.opener.value="<?php echo $admin_url ?>/sproxy.php"
+		document.SPELLDATA.opener.value="<?php echo $admin_url ?>sproxy.php"
 		document.SPELLDATA.formaction.value="http://www.spellchecker.com/spell/startspelling.asp "
-		window.open("<?php echo $admin_url ?>/b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
+		window.open("<?php echo $admin_url ?>b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
 	}
 <?php
 }
@@ -111,10 +111,10 @@ if ($use_spellchecker)
 		<?php if( $use_post_url ) { ?>
 		<span class="line">
 		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-		<input type="text" name="post_url"  size="40" value="<?php echo format_to_output( $post_url, 'htmlattr' ) ?>" id="post_url" tabindex="3" />
+		<input type="text" name="post_url" size="40" value="<?php echo format_to_output( $post_url, 'htmlattr' ) ?>" id="post_url" tabindex="3" />
 		</span>
 		<?php } else { ?>
-		<input type="hidden" name="post_url"  size="40" value="" id="post_url" />
+		<input type="hidden" name="post_url" size="40" value="" id="post_url" />
 		<?php
 		}
 	}

@@ -22,7 +22,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 # The following substrings will be looked up in the referer http header
 # THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam
 $blackList = array(
-	$baseurl.'/',
+	$baseurl,
 	'localhost',
 	'127.0.0.1',
 	// stat services
@@ -57,19 +57,19 @@ $search_engines = array(
 	'killou.com/',
 	'buscador.terra.es',
 	'web.toile.com',
-	'metacrawler.com/', 
-	'.mamma.com/', 
-	'.dogpile.com/', 
-	'search1-1.free.fr', 
-	'search1-2.free.fr', 
-	'overture.com', 
-	'startium.com', 
-	'2020search.com', 
-	'bestsearchonearth.info', 
-	'mysearch.com', 
-	'popdex.com', 
-	'64.233.167.104', 
-	'seek.3721.com', 
+	'metacrawler.com/',
+	'.mamma.com/',
+	'.dogpile.com/',
+	'search1-1.free.fr',
+	'search1-2.free.fr',
+	'overture.com',
+	'startium.com',
+	'2020search.com',
+	'bestsearchonearth.info',
+	'mysearch.com',
+	'popdex.com',
+	'64.233.167.104',
+	'seek.3721.com',
 );
 
 

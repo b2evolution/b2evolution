@@ -15,10 +15,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<?php
 	/**
 	 * Includes:
-	 */	
-	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_itemlist.php' );
-	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_calendar.php' );
-	require_once( dirname(__FILE__). '/'. $admin_dirout. '/'. $core_subdir. '/_class_archivelist.php' );
+	 */
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_itemlist.php' );
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_calendar.php' );
+	require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_archivelist.php' );
 
 	param( 'safe_mode', 'integer', 0 );         // Blogger style
 	param( 'p', 'integer' );                    // Specific post number to display
@@ -113,7 +113,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	{
 		?>
 		<div class="bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
-			<?php 
+			<?php
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			$Item->anchor(); ?>
 			<div class="bSmallHead">
@@ -138,7 +138,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					echo ', ', T_('level:');
 					$Item->Author->level();
 					echo ')';
-					
+
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo '<br />'.T_('Categories').': ';
 					$Item->categories( false );
@@ -185,16 +185,16 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<a name="comments"></a>
 				<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
 				<?php
-			
+
 				$CommentList = & new CommentList( 0, "'comment','trackback','pingback'", $show_statuses, $Item->ID, '', 'ASC' );
-				
-				$CommentList->display_if_empty( 
-											'<div class="bComment"><p>' . 
-											T_('No feedback for this post yet...') . 
+
+				$CommentList->display_if_empty(
+											'<div class="bComment"><p>' .
+											T_('No feedback for this post yet...') .
 											'</p></div>' );
-			
+
 				while( $Comment = $CommentList->get_next() )
-				{	// Loop through comments:	
+				{	// Loop through comments:
 					?>
 					<!-- ========== START of a COMMENT/TB/PB ========== -->
 					<div class="bComment">
@@ -211,8 +211,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
 								?>
 								<a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode($baseDomain) ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
-								<?php 
-							} 
+								<?php
+							}
 							$Comment->author_email( '', ' &middot; Email: ' );
 							$Comment->author_ip( ' &middot; IP: ' );
 						 ?>
@@ -222,18 +222,18 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 						<?php
 							switch( $Comment->get( 'type' ) )
 							{
-								case 'comment': // Display a comment: 
-									echo T_('Comment from:') ?> 
+								case 'comment': // Display a comment:
+									echo T_('Comment from:') ?>
 									<?php break;
-			
+
 								case 'trackback': // Display a trackback:
-									echo T_('Trackback from:') ?> 
+									echo T_('Trackback from:') ?>
 									<?php break;
-			
+
 								case 'pingback': // Display a pingback:
-									echo T_('Pingback from:') ?> 
+									echo T_('Pingback from:') ?>
 									<?php break;
-							} 
+							}
 						?>
 						<?php $Comment->author() ?>
 						</div>
@@ -251,7 +251,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 							$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
 						?>
 						</div>
-	
+
 					</div>
 					<!-- ========== END of a COMMENT/TB/PB ========== -->
 					<?php //end of the loop, don't delete
@@ -263,7 +263,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<!-- ========== FORM to add a comment ========== -->
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
-				<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
+				<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" class="bComment">
 
 					<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID(); ?>" />
 					<input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($ReqURI); ?>" />
@@ -276,7 +276,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 							</div>
 					</fieldset>
 
-					<?php 
+					<?php
 						form_textarea( 'comment', '', 12, T_('Comment text'), T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)).'<br />'.T_('URLs, email, AIM and ICQs will be converted automatically.'), 40, 'bComment' );
 					 ?>
 
@@ -308,7 +308,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	</div>
 	<?php
 	}
-	
+
 	if( $MainList->get_total_num_posts() )
 	{ // don't display navbar twice if we have no post
 	?>
@@ -330,7 +330,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		// ---------- CALENDAR ----------
 		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '', $timestamp_min, $timestamp_max );
 		$Calendar->set( 'browseyears', 1 );  // allow browsing years in the calendar's caption
-		$Calendar->set( 'navigation', 'tfoot' );  
+		$Calendar->set( 'navigation', 'tfoot' );
 		$Calendar->display( $pagenow, 'blog='. $blog );
 		?>
 		<h3><?php echo T_('Notes') ?></h3>

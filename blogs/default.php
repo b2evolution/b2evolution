@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<base href="<?php echo $baseurl ?>/" />
+	<base href="<?php echo $baseurl ?>" />
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('Default page for b2evolution') ?></title>
 	<link href="rsc/b2evo.css" rel="stylesheet" type="text/css" />
@@ -42,9 +42,9 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 <h2><?php echo T_('Individual blogs on this system') ?>:</h2>
 <ul>
 <?php // --------------------------- BLOG LIST -----------------------------
-	for( $curr_blog_ID=blog_list_start('stub'); 
-				$curr_blog_ID!=false; 
-				 $curr_blog_ID=blog_list_next('stub') ) 
+	for( $curr_blog_ID=blog_list_start('stub');
+				$curr_blog_ID!=false;
+				 $curr_blog_ID=blog_list_next('stub') )
 	{ # by uncommenting the following lines you can hide some blogs
 		if( $curr_blog_ID == 1 ) continue; // Hide blog 1...
 		// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
@@ -63,8 +63,8 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 	}
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 </ul>
-<?php 
-// Select Blog #1: 
+<?php
+// Select Blog #1:
 $blog = 1;
 $Blog_all = Blog_get_by_ID( 1 );
 if( $Blog_all->get( 'stub' ) != '' )
@@ -73,7 +73,7 @@ if( $Blog_all->get( 'stub' ) != '' )
 	<ul>
 	<li><strong><?php echo T_('Blog #1') ?>: <a href="<?php $Blog_all->disp( 'blogurl', 'raw' ); ?>"><?php echo T_('This is a special blog that aggregates all messages from all other blogs!') ?></a></strong> &nbsp; (<?php $Blog_all->disp( 'stub', 'raw' ); ?>)</li>
 	</ul>
-	<?php 
+	<?php
 }
 ?>
 <p><?php echo T_('Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office.') ?></p>

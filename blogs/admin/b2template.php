@@ -13,7 +13,7 @@
 /**
  * Includes:
  */
-require_once(dirname(__FILE__). '/_header.php');
+require_once(dirname(__FILE__).'/_header.php');
 $admin_tab = 'templates';
 $admin_pagetitle = T_('Custom skin template editing');
 
@@ -29,12 +29,12 @@ param( 'a', 'string' );
 switch($action)
 {
 
-case "update":
+case 'update':
 	// Determine the edit folder:
-	$edit_folder = get_path('skins'). '/custom';
+	$edit_folder = get_path('skins').'custom/';
 
 	param( 'newcontent', 'html' );
-	$f = fopen( $edit_folder. '/'. $file, "w+" );
+	$f = fopen( $edit_folder.$file, "w+" );
 	fwrite($f,$newcontent);
 	fclose($f);
 
@@ -44,32 +44,32 @@ case "update":
 	break;
 
 default:
-	require(dirname(__FILE__). '/_menutop.php');
-	require(dirname(__FILE__). '/_menutop_end.php');
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
 
 	// Determine the edit folder:
-	$edit_folder = get_path('skins'). '/custom';
+	$edit_folder = get_path('skins').'custom/';
 
 	$file = trim($file);
 	if( !empty($file))
 	{
 		echo '<div class="panelblock">';
 
-		echo T_('Listing:'), ' <strong>', $edit_folder, '/', $file, '</strong>';
+		echo T_('Listing:').' <strong>'.$edit_folder.$file.'</strong>';
 
 		if( ereg( '([^-A-Za-z0-9._]|\.\.)', $file ) )
 		{
 			echo '<p>', T_('Invalid filename!'), '</p>';
 		}
-		elseif( !is_file($edit_folder. '/'. $file) )
+		elseif( !is_file($edit_folder.$file) )
 		{
 				echo '<p>', T_('Oops, no such file !'), '</p>';
 		}
 		else
 		{
 
-			$f = fopen( $edit_folder. '/'. $file, 'r');
-			$content = fread($f,filesize($edit_folder. '/'. $file));
+			$f = fopen( $edit_folder.$file, 'r');
+			$content = fread($f,filesize($edit_folder.$file));
 			//	$content = template_simplify($content);
 			$content = htmlspecialchars($content);
 			//	$content = str_replace("</textarea","&lt;/textarea",$content);
@@ -85,7 +85,7 @@ default:
 				<input type="hidden" name="file" value="<?php echo $file ?>" />
 				<br />
 				<?php
-				if( is_writable($edit_folder. '/'. $file) )
+				if( is_writable($edit_folder.$file) )
 				{
 					echo '<input type="submit" name="submit" class="SaveButton" value="', T_('&nbsp; Save ! &nbsp;'), '" tabindex="2" />';
 				}
@@ -107,7 +107,7 @@ default:
 	<p><?php echo T_('You can edit any of the following files (provided it\'s writable by the server, e.g. CHMOD 766)') ?>:</p>
 <?php
 	// Determine the edit folder:
-	if( empty($edit_folder) ) $edit_folder = get_path('skins'). '/custom';
+	if( empty($edit_folder) ) $edit_folder = get_path('skins').'custom/';
 	//lists all files in edit directory
 	if( !is_dir($edit_folder) )
 	{
@@ -119,7 +119,7 @@ default:
 		$this_dir = dir( $edit_folder );
 		while ($this_file = $this_dir->read())
 		{
-			if( is_file($edit_folder. '/'. $this_file) )
+			if( is_file($edit_folder.$this_file) )
 			{
 				?>
 				<li><a href="b2template.php?file=<?php echo $this_file; ?>"><?php echo $this_file; ?></a>

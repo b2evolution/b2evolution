@@ -184,10 +184,10 @@ class Blog extends DataObject
 		}
 
 		if( $type == 'static' )
-		{	// We want the static page, there is no access type option here:
-			if( is_file( $basepath.$this->siteurl.'/'.$this->staticfilename ) )
+		{ // We want the static page, there is no access type option here:
+			if( is_file( $basepath.$this->siteurl.$this->staticfilename ) )
 			{ // If static page exists:
-				return $base.'/'.$this->staticfilename;
+				return $base.$this->staticfilename;
 			}
 		}
 
@@ -197,7 +197,7 @@ class Blog extends DataObject
 				// Access through index.php as default blog
 				if( $Settings->get('default_blog_ID') == $this->ID )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
-					return $base.'/index.php';
+					return $base.'index.php';
 				}
 				// ... otherwise, we add the blog ID:
 
@@ -205,16 +205,16 @@ class Blog extends DataObject
 				// Access through index.php + blog qualifier
 				if( $Settings->get('links_extrapath') )
 				{
-					return $base.'/index.php/'.$this->stub;
+					return $base.'index.php/'.$this->stub;
 				}
-				return $base.'/index.php?blog='.$this->ID;
+				return $base.'index.php?blog='.$this->ID;
 
 			case 'stub':
 				// Access through stub file
 				$blogurl = $base;
 				if( !empty($this->stub) )
 				{
-					$blogurl .= '/'.$this->stub;
+					$blogurl .= $this->stub;
 				}
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
 				{ // We want to force the dynamic page but the URL is not explicitely dynamic
@@ -232,7 +232,7 @@ class Blog extends DataObject
 	 * generate the blog's media directory
 	 *
 	 * @todo create if necessary
-	 * @param boolean absolute path or relative to $basepath.'/'.$media_subdir.'/' ?
+	 * @param boolean absolute path or relative to $basepath.$media_subdir ?
 	 */
 	function gen_mediadir( $absolute = true )
 	{
@@ -241,11 +241,11 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'default':
-				return $absolute ? $basepath.'/'.$media_subdir.'/blogs/'.$this->urlname : $this->urlname;
+				return $absolute ? $basepath.$media_subdir.'blogs/'.$this->urlname : $this->urlname;
 			case 'subdir':
-				return $absolute ? $basepath.'/'.$media_subdir.'/blogs/'.$this->media_subdir : $this->media_subdir;
+				return $absolute ? $basepath.$media_subdir.'blogs/'.$this->media_subdir : $this->media_subdir;
 			case 'custom':
-				return $absolute ? $this->media_fullpath : preg_replace( '#^'.$basepath.'/'.$media_subdir.'/blogs/#', '', $this->media_fullpath );
+				return $absolute ? $this->media_fullpath : preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $this->media_fullpath );
 		}
 	}
 
@@ -287,10 +287,10 @@ class Blog extends DataObject
 				return $this->gen_blogurl( 'static' );
 
 			case 'dynfilepath':
-				return $basepath.$this->siteurl.'/'.$this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
+				return $basepath.$this->siteurl.$this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
 
 			case 'staticfilepath':
-				return $basepath.$this->siteurl.'/'.$this->staticfilename;
+				return $basepath.$this->siteurl.$this->staticfilename;
 
 			case 'baseurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
@@ -299,7 +299,7 @@ class Blog extends DataObject
 				}
 				else
 				{
-					$r = $baseurl.'/';
+					$r = $baseurl;
 					if( !empty($this->siteurl) )
 					{
 						$r .= $this->siteurl.'/';

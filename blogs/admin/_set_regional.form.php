@@ -70,7 +70,7 @@ if( !empty($locale) && $action != 'extract' )
 		?>
 		<div class="panelinfo">
 			<h3><?php echo T_('Flags') ?></h3>
-			<p><?php printf(T_('The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'/flags/'); ?></p>
+			<p><?php printf(T_('The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'flags/'); ?></p>
 			<h3><?php echo T_('Date/Time Formats') ?></h3>
 			<p><?php echo T_('The following characters are recognized in the format strings:') ?></p>
 			<p>
@@ -163,7 +163,7 @@ else
 			<?php if( $current_User->check_perm( 'options', 'edit' ) )
 			{ ?>
 				<th><?php echo T_('Edit') ?></th>
-				<?php 
+				<?php
 			}
 			if( $showtranslationpercentage )
 			{
@@ -251,7 +251,7 @@ else
 			if( $showtranslationpercentage )
 			{
 				// Get PO file for that locale:
-				$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
+				$po_file = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 				if( ! is_file( $po_file ) )
 				{
 					echo '<td class="center" colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
@@ -353,9 +353,9 @@ else
 	</fieldset>
 
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ 
+	{
 		form_submit();
-	} 
+	}
 	?>
 
 </form>

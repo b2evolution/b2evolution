@@ -36,7 +36,7 @@ $default_locale = 'en-EU';
 /**
  * Load locale related functions: (we need NT_(-) here)
  */
-require_once( dirname(__FILE__). "/$conf_dirout/$core_subdir/_functions_locale.php" );
+require_once( dirname(__FILE__).'/'.$conf_dirout.$core_subdir.'_functions_locale.php' );
 
 
 //{{{ defining the locales:
@@ -240,7 +240,7 @@ $locales = array(
 $start_of_week = 1;
 
 # Set this to 1 if you are a translator and wish to extract strings from your .po file
-# Warning: do *not* extract .PO files you have not edited yourself. 
+# Warning: do *not* extract .PO files you have not edited yourself.
 # Shipped .PO files contain automatic translations that have *not* been reviewed.
 $allow_po_extraction = 0;
 

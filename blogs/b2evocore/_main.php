@@ -104,7 +104,7 @@ $Toolbars = & new Toolbars();
 if( !isset($login_required) ) $login_required = false;
 if( $error = veriflog( $login_required ) )
 { // Login failed:
-	require(dirname(__FILE__) . "/$core_dirout/$htsrv_subdir/login.php");
+	require( dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php' );
 }
 
 if( is_logged_in() && $current_User->get('locale') != $default_locale )

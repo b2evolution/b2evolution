@@ -93,8 +93,8 @@ function update_urlpreview( base, append )
 						array( 'relative',
 										T_('relative to baseurl').':',
 										'',
-										' <span class="nobr"><code>'.$baseurl.'/</code>'
-										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'/\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'/\'+this.value );" /></span>',
+										' <span class="nobr"><code>'.$baseurl.'</code>'
+										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>',
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 						),
 						array( 'absolute',

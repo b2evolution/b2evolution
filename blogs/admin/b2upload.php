@@ -59,7 +59,7 @@ if (!isset($_POST['submit']))
 
 	<p><?php echo T_('Description') ?>:<br />
 	<input type="text" name="imgdesc" size="30" class="uploadform" /></p>
-	
+
 	<input type="submit" name="submit" value="<?php echo T_('Upload !') ?>" class="search" />
 	</form>
 </div>
@@ -114,9 +114,9 @@ if (!empty($HTTP_POST_VARS)) { //$img1_name != "") {
 	if (file_exists($pathtofile) && !strlen($imgalt)) {
 		$i = explode(" ",$fileupload_allowedtypes);
 		$i = implode(", ",array_slice($i, 1, count($i)-2));
-		move_uploaded_file($img1, $pathtofile2) 
+		move_uploaded_file($img1, $pathtofile2)
 		 or die( T_('Couldn\'t upload your file to:').' '.$pathtofile2);
-	
+
 	// duplicate-renaming function contributed by Gary Lawrence Murphy
 	?>
 	<p><strong><?php echo T_('Duplicate File?') ?></strong></p>
@@ -154,7 +154,7 @@ if (!empty($HTTP_POST_VARS)) { //$img1_name != "") {
 
 if( ereg('image/', $img1_type) )
 { // uploaded file is an image
-	$piece_of_code = "&lt;img src=&quot;$fileupload_url/$img1_name&quot;";
+	$piece_of_code = '&lt;img src=&quot;'.$fileupload_url.$img1_name.'&quot;';
 	if( $img_dimensions = getimagesize( $pathtofile ) )
 	{ // add 'width="xx" height="xx"
 		$piece_of_code .= ' width=&quot;'.$img_dimensions[0].'&quot; height=&quot;'.$img_dimensions[1].'&quot;';
@@ -163,7 +163,7 @@ if( ereg('image/', $img1_type) )
 }
 else
 {
-	$piece_of_code = "&lt;a href=&quot;$fileupload_url/$img1_name&quot; title=&quot;$imgdesc&quot; /&gt;$imgdesc&lt;/a&gt;"; 
+	$piece_of_code = '&lt;a href=&quot;'.$fileupload_url.$img1_name.'&quot; title=&quot;'.$imgdesc.'&quot; /&gt;'.$imgdesc.'&lt;/a&gt;';
 }
 
 ?>
@@ -172,19 +172,19 @@ else
 <p><?php printf( T_('Your file <strong>"%s"</strong> was uploaded successfully !'), $img1_name ); ?></p>
 <p><?php echo T_('Here\'s the code to display it:') ?></p>
 <p><form action="b2upload.php">
-<!--<textarea cols="25" rows="3" wrap="virtual"><?php echo "&lt;img src=&quot;$fileupload_url/$img1_name&quot; border=&quot;0&quot; alt=&quot;&quot; /&gt;"; ?></textarea>-->
+<!--<textarea cols="25" rows="3" wrap="virtual"><?php echo '&lt;img src=&quot;'.$fileupload_url.$img1_name.'&quot; alt=&quot;&quot; /&gt;'; ?></textarea>-->
 <input type="text" name="imgpath" value="<?php echo $piece_of_code; ?>" size="40" class="large" /><br />
 <input type="button" name="close" value="<?php echo T_('Add the code to your post !') ?>" class="search" onclick="targetopener('<?php echo $piece_of_code; ?>')" />
 </form>
 </p>
 <p><strong><?php echo T_('Image Details') ?></strong>: <br />
-<?php echo T_('Name') ?>: 
+<?php echo T_('Name') ?>:
 <?php echo "$img1_name"; ?>
 <br />
-<?php echo T_('Size') ?>: 
+<?php echo T_('Size') ?>:
 <?php echo round($img1_size/1024,2); ?> KB
 <br />
-<?php echo T_('Type') ?>: 
+<?php echo T_('Type') ?>:
 <?php echo "$img1_type"; ?>
 </p>
 <p align="right">

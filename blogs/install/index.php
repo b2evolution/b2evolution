@@ -13,15 +13,15 @@
  * include config and default functions:
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_class_log.php" );
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_class_log.php' );
 $Debuglog = new Log( 'note' );
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions.php" ); // db funcs
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_vars.php" );
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_class_db.php" );
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions.php" ); // db funcs
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_cats.php" );
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_bposts.php" );
-require_once( dirname(__FILE__)."/$install_dirout/$core_subdir/_functions_forms.php" );
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions.php' ); // db funcs
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_vars.php' );
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_class_db.php' );
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions.php' ); // db funcs
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_cats.php' );
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_bposts.php' );
+require_once( dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_forms.php' );
 require_once( dirname(__FILE__).'/_functions_install.php' );
 require_once( dirname(__FILE__).'/_functions_create.php' );
 
@@ -83,7 +83,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 		echo '<li>';
 		if( $default_locale == $lkey ) echo '<strong>';
 		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
-		locale_flag( $lkey, 'w16px', 'flag', '', true, "$install_dirout/$img_subdir/flags" );
+		locale_flag( $lkey, 'w16px', 'flag', '', true, $install_dirout.$img_subdir.'flags' );
 		echo T_( $lvalue['name'] );
 		echo '</a></li>';
 
@@ -260,7 +260,7 @@ switch( $action )
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
 				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
-			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath );
+			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
 			param( 'conf_baseurl', 'string', $baseurl );
 			param( 'conf_admin_email', 'string', $admin_email );
 

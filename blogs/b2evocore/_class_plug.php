@@ -3,7 +3,7 @@
  * This file implements the Plug class (EXPERIMENTAL)
  *
  * This is where you can plug-in some plug-ins :)
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -15,7 +15,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Includes:
  */
-require_once dirname(__FILE__)."/$core_dirout/$plugins_subdir/plugin.class.php";
+require_once dirname(__FILE__).'/'.$core_dirout.$plugins_subdir.'plugin.class.php';
 
 /**
  * Plug Class
@@ -45,15 +45,15 @@ class Plug
 	 * Has the plug initialized? (plugins loaded?)
 	 */
 	var $initialized = false;
-	
+
 	/**
 	 * Current object idx in array:
 	 */
 	var $current_idx = 0;
-	
+
 	/**#@-*/
-	
-	/* 
+
+	/**
 	 * Constructor
 	 *
 	 * {@internal Plug::Plug(-)}}
@@ -63,14 +63,14 @@ class Plug
 	function Plug( $collection )
 	{
 		global $core_dirout, $plugins_subdir;
-		
+
 		$this->collection = $collection;
 		// Set plugin path for this collection:
-		$this->plugins_path = dirname(__FILE__).'/'.$core_dirout.'/'.$plugins_subdir.'/'.$collection.'s';
-		 
-	}	
+		$this->plugins_path = dirname(__FILE__).'/'.$core_dirout.$plugins_subdir.$collection.'s';
 
-	/* 
+	}
+
+	/**
 	 * Initialize Plug if it has not been done before.
 	 *
 	 * Load the plugins.
@@ -92,15 +92,15 @@ class Plug
 					require $this->plugins_path. '/'. $this_file;
 				}
 			}
-		
+
 			// Sort array by priority:
 			usort( $this->Plugins, 'sort_Plugin' );
-		
+
 			$this->initialized = true;
 		}
 	}
 
-	/* 
+	/**
 	 * Register a plugin.
 	 *
 	 * Will be called by plugin includes when they are called by init()
@@ -114,9 +114,9 @@ class Plug
 		$this->Plugins[] = & $Plugin;
 		$this->index_Plugins[ $Plugin->code ] = & $Plugin;
 	}
-	
-		
-	/* 
+
+
+	/**
 	 * Get next plugin in list:
 	 *
 	 * {@internal Plug::get_next(-)}}
@@ -131,7 +131,7 @@ class Plug
 		{
 			return false;
 		}
-		
+
 		return $this->Plugins[ $this->current_idx++ ];
 	}
 
@@ -144,7 +144,7 @@ class Plug
 	{
 		$this->current_idx = 0;
 	}
-	
+
 }
 
 function sort_Plugin( & $a, & $b )

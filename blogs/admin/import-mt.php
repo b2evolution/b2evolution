@@ -115,10 +115,10 @@ if( !file_exists('../conf/_config.php') )
 require( '../conf/_config.php' );
 if( (!isset($config_is_done) || !$config_is_done) )
 {
-	if( file_exists(dirname(__FILE__)."/$admin_dirout/$core_subdir/_conf_error_page.php") )
+	if( file_exists(dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_conf_error_page.php') )
 	{
 		$error_message = '';
-		require( dirname(__FILE__)."/$admin_dirout/$core_subdir/_conf_error_page.php" );
+		require( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_conf_error_page.php' );
 	}
 	dieerror( 'b2evolution configuration is not done yet.', $head );
 }
@@ -133,7 +133,7 @@ if( !is_logged_in() || $current_User->Group->ID != 1 )
 	echo $head;
 	$error = 'You must login with an administrator (group #1) account.';
 	$redirect_to = $ReqURI;
-	require( dirname(__FILE__) . "/$admin_dirout/$htsrv_subdir/login.php" );
+	require( dirname(__FILE__).'/'.$admin_dirout.$htsrv_subdir.'login.php' );
 }
 
 echo $head;

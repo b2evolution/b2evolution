@@ -34,6 +34,6 @@
 	 * We now call the default categories handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_categories.php';
+	require get_path('skins').'_categories.php';
 
 ?>

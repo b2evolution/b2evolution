@@ -73,7 +73,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			 *
 			 * @param string the form name
 			 * @param string the checkbox(es) element(s) name
-			 */	?>
+			 */ ?>
 			function toggleCheckboxes(the_form, the_elements)
 			{
 				if( allchecked[0] ) allchecked[0] = false;
@@ -172,7 +172,7 @@ if( empty($mode) )
 		<?php echo T_('Style:') ?>
 		<a href="#" onclick="setActiveStyleSheet('Variation'); return false;" title="Variation (Default)">V</a>&middot;<a href="#" onclick="setActiveStyleSheet('Desert'); return false;" title="Desert">D</a>&middot;<a href="#" onclick="setActiveStyleSheet('Legacy'); return false;" title="Legacy">L</a><?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>&middot;<a href="#" onclick="setActiveStyleSheet('Custom'); return false;" title="Custom">C</a><?php } ?>
 		&bull;
-		<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout') ?></a>
+		<a href="<?php echo $htsrv_url ?>login.php?action=logout"><?php echo T_('Logout') ?></a>
 		&bull;
 		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?> <img src="img/close.gif" width="14" height="14" class="top" alt="" title="<?php echo T_('Exit to blogs') ?>" /></a><br />
 	</div>

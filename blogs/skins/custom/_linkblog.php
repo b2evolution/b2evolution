@@ -13,7 +13,7 @@
 	 * @subpackage custom
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
-		
+
 	# maximum number of linkblog entries to display:
 	if(!isset($linkblog_limit)) $linkblog_limit = 20;
 	# global linkblog delimiters:
@@ -33,6 +33,6 @@
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 * all we want to do here, is call the default linkblog handler.
 	 */
-	require get_path('skins').'/_linkblog.php';
+	require get_path('skins').'_linkblog.php';
 
 ?>

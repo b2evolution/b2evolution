@@ -20,5 +20,5 @@
 	 * We now call the default last comments handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_lastcomments.php';
+	require get_path('skins').'_lastcomments.php';
 ?>

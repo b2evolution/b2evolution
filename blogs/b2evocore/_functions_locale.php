@@ -302,7 +302,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	// extract flag name:
 	$country = strtolower(substr( $locale, 3, 2 ));
 
-	if( ! is_file(dirname(__FILE__).'/'.$core_dirout.'/'.$img_subdir.'/flags/'.$collection.'/'.$country.'.gif') )
+	if( ! is_file(dirname(__FILE__).'/'.$core_dirout.$img_subdir.'flags/'.$collection.'/'.$country.'.gif') )
 	{ // File does not exist
 		$country = 'default';
 	}

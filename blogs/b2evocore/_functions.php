@@ -1009,15 +1009,14 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 /**
  * get_path(-)
  */
-function get_path( $which='' )
+function get_path( $which = '' )
 {
 	global $core_subdir, $skins_subdir, $basepath;
 
 	switch( $which )
 	{
 		case 'skins':
-			return $basepath.'/'.$skins_subdir;
-
+			return $basepath.$skins_subdir;
 	}
 
 	return $basepath;

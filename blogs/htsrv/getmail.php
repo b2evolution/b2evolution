@@ -15,9 +15,9 @@ $output_debugging_info = 0;		# =1 if you want to output debugging info
 /**
  * Initialize:
  */
-require_once(dirname(__FILE__).'/../conf/_config.php');
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
-require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_class_pop3.php");
+require_once( dirname(__FILE__).'/../conf/_config.php' );
+require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.php' );
+require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_class_pop3.php' );
 
 if( $use_phoneemail )
 { // if you're using phone email, the email will already be in your timezone
@@ -66,7 +66,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 	$boundary = '';
 	$bodysignal = 0;
 	$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-	
+
 	while( list( $lineNum, $line ) = each ($MsgOne) )
 	{
 		if( strlen($line) < 3 ) {
@@ -228,7 +228,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 	echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
 
 	$content = xmlrpc_removepostdata( $content );
-	
+
 	$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
 	echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 

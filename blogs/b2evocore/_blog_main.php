@@ -46,13 +46,13 @@ if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
 
 if( empty($disp) )
-{	// Conversion support for old params:
+{ // Conversion support for old params:
 	if( $c == 'last')
-	{	// Translate old last comments caller
+	{ // Translate old last comments caller
 		$disp = 'comments';
 	}
 	elseif( $stats )
-	{	// Translate old stats caller
+	{ // Translate old stats caller
 		$disp = 'stats';
 	}
 }
@@ -77,7 +77,7 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 { // note: $pos will typically be 0
 	$path_string = substr( $ReqPath, $pos+strlen( $blog_baseurl ) );
 	// echo "path=$path_string <br>";
-	$path_elements = explode( '/', $path_string, 20 );						// slice it
+	$path_elements = explode( '/', $path_string, 20 );  // slice it
 	$i=0;
 	// echo $path_elements[$i];
 	if( isset( $path_elements[$i] ) && $path_elements[$i] == 'index.php' )
@@ -127,19 +127,19 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 			}
 		}
 		elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
-		{	// We consider this a week number
+		{ // We consider this a week number
 			$w = substr( $path_elements[$i], 1, 2 );
 		}
 	}
 }
 
 if( (!empty($p)) || (!empty($title)) || (!empty($preview)) )
-{	// We are going to display a single post
+{ // We are going to display a single post
 	$disp = 'single';
 }
 
 if( empty( $disp ) )
-{	// defualt display:
+{ // default display:
 	$disp = 'posts';
 }
 
@@ -148,14 +148,14 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 	// On single post requests, check if we're on the right blog!
 	if( $redirect_to_postblog && ( $disp == 'single' ) )
-	{	// Yes we need to check.
+	{ // Yes we need to check.
 		if( !empty($p) )
 			$Item = Item_get_by_ID( $p );	// TODO: use cache
 		else
 			$Item = Item_get_by_title( $title );	// TODO: use cache
 
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
-		{	// We're on the wrong blog (probably an old permalink) let's redirect
+		{ // We're on the wrong blog (probably an old permalink) let's redirect
 			$new_permalink = $Item->gen_permalink( '', '', false, '&' );
       # echo $new_permalink;
 			header ("Location: $new_permalink");
@@ -177,7 +177,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	$postIDarray = & $MainList->postIDarray;
 }
 else
-{	// we are not trying to display posts:
+{ // we are not trying to display posts:
 	$result_num_rows = 0;
 }
 
@@ -185,7 +185,7 @@ else
 
 // Displaying of vlog list on templates?
 if( !isset($display_blog_list) )
-{	// If not already set in stub:
+{ // If not already set in stub:
 	$display_blog_list = get_bloginfo('disp_bloglist');
 }
 
@@ -198,7 +198,7 @@ if( !isset( $skin ) )
 	// We're going to need a default skin:
 	if(  ( !isset( $default_skin ) ) 					// No default skin forced in stub
 		|| ( !skin_exists( $default_skin ) ) )	// Or the forced default does not exist
-	{	// Use default from the datatabse
+	{ // Use default from the datatabse
 		$default_skin = $Blog->get('default_skin');
 	}
 
@@ -211,11 +211,11 @@ if( !isset( $skin ) )
 	}
 
 	if( $Blog->get('force_skin') )
-	{	// Blog params tell us to force the use of default skin
+	{ // Blog params tell us to force the use of default skin
 		$skin = $default_skin;
 	}
 	else
-	{	// Get the saved skin in cookie or default:
+	{ // Get the saved skin in cookie or default:
 		param( $cookie_state, 'string', $default_skin );
 		// Get skin by params or default to cookie
 		// (if cookie was not set, the $$cookie_state contains default skin!)
@@ -229,24 +229,24 @@ if( !isset( $skin ) )
 param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
-{	// We want to display now:
+{ // We want to display now:
 
 	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
-	{	// We have just asked for the skin explicitely
+	{ // We have just asked for the skin explicitely
 		// Set a cookie to remember it:
 		// Including config and functions files   ??
 
 		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
-		{	// This damn failed !
+		{ // This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}
 		// Erase OLD versions cookies:
 		if( ! setcookie( 'b2evostate', '', $cookie_expired, $cookie_path, $cookie_domain) )
-		{	// This damn failed !
+		{ // This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}
 		if( ! setcookie( 'b2evostate', '', $cookie_expired, '/') )
-		{	// This damn failed !
+		{ // This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}
 	}
@@ -263,19 +263,19 @@ if( !empty( $skin ) )
 	}
 
 	if( $template == 'popup' )
-	{	// Do the popup display
-		require get_path( 'skins' )."/$skin/_popup.php";
+	{ // Do the popup display
+		require( get_path( 'skins' ).$skin.'/_popup.php' );
 	}
 	else
-	{	// Do the main display
-		require get_path( 'skins' )."/$skin/_main.php";
+	{ // Do the main display
+		require( get_path( 'skins' ).$skin.'/_main.php' );
 	}
 }
 else
-{	// we don't want to use a skin
+{ // we don't want to use a skin
 	if( $template == 'popup' )
-	{	// Do the popup display
-		require get_path( 'skins' ).'/_popup.php';
+	{ // Do the popup display
+		require( get_path( 'skins' ).'_popup.php' );
 		exit();
 	}
 	// If we end up here the blog file should be a full template, not just a stub...

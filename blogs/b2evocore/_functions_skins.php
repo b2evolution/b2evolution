@@ -21,17 +21,17 @@ function skinbase()
 
 	if( !empty( $skin ) )
 	{
-		echo "$baseurl/$skins_subdir/$skin/";
+		echo $baseurl.$skins_subdir.$skin.'/';
 	}
 	else
-	{	// No skin used:
+	{ // No skin used:
 		if( isset( $blog ) && $blog > 0 )
 		{
 			bloginfo( 'baseurl', 'raw' );
 		}
 		else
 		{
-			echo "$baseurl/";
+			echo $baseurl;
 		}
 	}
 }
@@ -47,7 +47,7 @@ function skinbase()
  */
 function skin_exists( $name )
 {
-	return is_dir(get_path( 'skins' ).'/'.$name);
+	return is_dir( get_path( 'skins' ).$name );
 }
 
 

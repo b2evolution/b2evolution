@@ -65,22 +65,22 @@ $report_abuse = 1;
 
 // ** Image upload **
 
-# set this to 0 to disable file upload, or 1 to enable it
+# Set this to 0 to disable file upload, or 1 to enable it
 $use_fileupload = 1;
-# enter the real path of the directory where you'll upload the pictures
-#   if you're unsure about what your real path is, please ask your host's support staff
-#   note that the  directory must be writable by the webserver (ChMod 766)
-#   note for windows-servers users: use forwardslashes instead of backslashes
-# $fileupload_realpath = '/home/example/public_html/media';
+# Enter the real path of the directory where you'll upload the pictures.
+#   If you're unsure about what your real path is, please ask your host's support staff.
+#   Note that the  directory must be writable by the webserver (ChMod 766).
+#   Note for windows-servers users: use forwardslashes instead of backslashes
+# $fileupload_realpath = '/home/example/public_html/media/';
 # Alternatively you may want to use this form:
-$fileupload_realpath = $basepath.'/media';
-# enter the URL of that directory (it's used to generate the links to the pictures)
-# $fileupload_url = 'http://example.com/media';
+$fileupload_realpath = $basepath.'media/';
+# Enter the URL of that directory (it's used to generate the links to the pictures).
+# $fileupload_url = 'http://example.com/media/';
 # Alternatively you may want to use this form:
-$fileupload_url = $baseurl.'/media';
-# accepted file types, you can add to that list if you want
-#   note: add a space before and after each file type
-#   example: $fileupload_allowedtypes = ' jpg gif png ';
+$fileupload_url = $baseurl.'media/';
+# Accepted file types, you can add to that list if you want.
+#   Note: add a space before and after each file type.
+#   Example: $fileupload_allowedtypes = ' jpg gif png ';
 $fileupload_allowedtypes = ' jpg gif png ';
 # by default, most servers limit the size of uploads to 2048 KB
 #   if you want to set it to a lower value, here it is (you cannot set a higher value)

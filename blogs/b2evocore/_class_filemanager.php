@@ -142,12 +142,12 @@ class FileManager
 		$this->url = $url;
 
 		// path/url for images (icons)
-		$this->imgpath = $basepath.'/'.$admin_subdir.'/img/fileicons/';
-		$this->imgurl = $admin_url.'/img/fileicons/';
+		$this->imgpath = $basepath.$admin_subdir.'img/fileicons/';
+		$this->imgurl = $admin_url.'img/fileicons/';
 
 		// TODO: get user's/group's root
 		#$this->root_dir = $media_dir;
-		#$this->root_url = $baseurl.'/'.$media_subdir;
+		#$this->root_url = $baseurl.$media_subdir;
 
 		// get root directory
 		$this->root = $root;
@@ -156,8 +156,8 @@ class FileManager
 
 		if( $this->User->login == 'demouser' )
 		{
-			$this->root_dir = $basepath.'/media_test';
-			$this->root_url = $baseurl.'/media_test';
+			$this->root_dir = $basepath.'media_test';
+			$this->root_url = $baseurl.'media_test';
 		}
 		elseif( count( $root_A ) == 2 )
 		{
@@ -174,8 +174,8 @@ class FileManager
 		{
 			case '#':
 			case 'user':
-				$this->root_dir = $basepath.'/'.$media_subdir.'/users/'.$this->User->login;
-				$this->root_url = $baseurl.'/'.$media_subdir.'/users/'.$this->User->login;
+				$this->root_dir = $basepath.$media_subdir.'users/'.$this->User->login;
+				$this->root_url = $baseurl.$media_subdir.'users/'.$this->User->login;
 				break;
 
 			default:  // straight path
@@ -216,7 +216,7 @@ class FileManager
 		$this->loadentries();
 
 		// load file icons..
-		require( $core_dirout.'/'.$admin_subdir.'/img/fileicons/fileicons.php' );
+		require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
 
 		/**
 		 * These are the filetypes. The extension is a regular expression that must match the end of the file.
@@ -855,7 +855,7 @@ class FileManager
 		}
 		else $iconfile = false;
 
-		if( !$iconfile || !file_exists( $this->imgpath.'/'.$iconfile ) )
+		if( !$iconfile || !file_exists( $this->imgpath.$iconfile ) )
 		{
 			#return false;
 			return '<span class="small">[no image for '.$for.'!]</small>';
@@ -868,7 +868,7 @@ class FileManager
 				break;
 
 			case 'url':
-				$r = $this->imgurl.'/'.$iconfile;
+				$r = $this->imgurl.$iconfile;
 				break;
 
 			case 'size':

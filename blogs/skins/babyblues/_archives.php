@@ -17,8 +17,8 @@
 	# number of archive entries to display:
 	if(!isset($archive_limit)) $archive_limit = 12;
 	# this is what will separate your archive links
-	if(!isset($archive_line_start)) $archive_line_start = '';				
-	if(!isset($archive_line_end)) $archive_line_end = '<br />';				
+	if(!isset($archive_line_start)) $archive_line_start = '';
+	if(!isset($archive_line_end)) $archive_line_end = '<br />';
 	# this is what will separate dates on weekly archive links
 	if(!isset($archive_week_separator)) $archive_week_separator = ' - ';
 	# override general date format ? 0 = no: use the date format set in Options, 1 = yes: override
@@ -28,11 +28,11 @@
 	# options for weekly archive (only if you override the general date format)
 	if(!isset($archive_week_start_date_format)) $archive_week_start_date_format = 'Y/m/d';
 	if(!isset($archive_week_end_date_format)) $archive_week_end_date_format   = 'Y/m/d';
-	
+
 	/*
 	 * We now call the default archives handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_archives.php';
+	require get_path('skins').'_archives.php';
 
 ?>

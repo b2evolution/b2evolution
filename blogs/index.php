@@ -11,7 +11,7 @@
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package main
- * Note: we need at least one file in the main package	
+ * Note: we need at least one file in the main package
  */
 
 /**
@@ -23,14 +23,14 @@ require_once dirname(__FILE__).'/b2evocore/_main.php';
 param( 'blog', 'integer', '', true );
 
 if( empty($blog) )
-{	// No blog requested, by URL param, let's check extrapath
-  # echo 'Checking extra path...<br />';
+{ // No blog requested, by URL param, let's check extrapath
+	# echo 'Checking extra path...<br />';
 	// Check and Remove current page url:
-	$index_url = substr( $baseurl, strlen( $baseurlroot ) ) . '/index.php';
-  # echo 'Seeking ['.$index_url.'] in ['.$ReqPath.']...<br />';
+	$index_url = substr( $baseurl, strlen( $baseurlroot ) ) . 'index.php';
+	# echo 'Seeking ['.$index_url.'] in ['.$ReqPath.']...<br />';
 	if( ($pos = strpos( $ReqPath, $index_url )) !== false )
 	{ // note: $pos will typically be 0
-    # echo 'Matched index.php path...<br />';
+		# echo 'Matched index.php path...<br />';
 		$path_string = substr( $ReqPath, $pos+strlen( $index_url ) );
 		// echo "path=$path_string <br>";
 		$path_elements = explode( '/', $path_string, 20 );						// slice it
@@ -85,6 +85,6 @@ $timestamp_max = 'now';
 # $order = 'ASC'; // This for example would display the blog in chronological order...
 
 // That's it, now let b2evolution do the rest! :)
-require dirname(__FILE__)."/$core_subdir/_blog_main.php";
+require( dirname(__FILE__).'/'.$core_subdir.'_blog_main.php' );
 
 ?>

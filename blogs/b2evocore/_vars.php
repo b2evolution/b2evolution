@@ -55,10 +55,10 @@ else
 	$ReqURI = false;
 	?>
 	<p><span class="error">Warning: $ReqPath could not be set. Probably an odd IIS problem.</span><br />
-	Go to your <a href="<?php echo $baseurl.'/'.$install_subdir ?>/phpinfo.php">phpinfo page</a>,
+	Go to your <a href="<?php echo $baseurl.$install_subdir ?>phpinfo.php">phpinfo page</a>,
 	look for occurences of <code><?php
 	// take the baseurlroot out..
-	echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.'/'.$install_subdir )
+	echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.$install_subdir )
 	?>/phpinfo.php</code> and copy all lines
 	containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
 	you're running on.

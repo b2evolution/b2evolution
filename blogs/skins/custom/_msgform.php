@@ -15,5 +15,5 @@
 	 * We now call the default message email handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_msgform.php';
+	require get_path('skins').'_msgform.php';
 ?>

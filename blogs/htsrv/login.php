@@ -13,7 +13,7 @@
  * Includes:
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php" );
+require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.php' );
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
@@ -37,7 +37,7 @@ switch($action)
 		header("Pragma: no-cache");
 
 		param( 'redirect_to', 'string', $_SERVER['HTTP_REFERER'] );
-		$location = empty($redirect_to) ? $baseurl.'/' : $redirect_to;
+		$location = empty($redirect_to) ? $baseurl : $redirect_to;
 		header('Refresh:0;url='.str_replace('&amp;', '&', $location));
 		exit();
 		break; // case 'logout'

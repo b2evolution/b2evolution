@@ -9,11 +9,11 @@
  * Reminder: every line starting with # or // is a comment, multiline comments are
  *           surrounded by '/*' and '* /' (without space).
  *
- * IMPORTANT: Take special care not to erase quotes (') around text parameters 
- * and semicolums (;) at the end of the lines. Otherwise you'll get some 
+ * IMPORTANT: Take special care not to erase quotes (') around text parameters
+ * and semicolums (;) at the end of the lines. Otherwise you'll get some
  * "unexpected T_STRING" parse errors!
  *
- * Contributors: you should override this file by creating a file named _config_TEST.php 
+ * Contributors: you should override this file by creating a file named _config_TEST.php
  * (see end of this file)
  *
  * b2evolution - {@link http://b2evolution.net/}
@@ -61,11 +61,11 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  *
  * IMPORTANT: If you want to test b2evolution on your local machine, do NOT use that machine's
  * name in the $baseurl!
- * For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs !
- * Use http://localhost/b2evolution/blogs instead. And log in on localhost too, not homer!
+ * For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs/ !
+ * Use http://localhost/b2evolution/blogs/ instead. And log in on localhost too, not homer!
  * If you don't, login cookies will not hold.
  */
-$baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
+$baseurl = 'http://localhost/b2evolution/blogs/';  // with ending slash!
 
 
 /**

@@ -34,7 +34,7 @@ $online_session_timeout = 300;  // TODO: into backoffice?
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl.'/', $matches ) )
+if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1];
 	// echo "baseurlroot=$baseurlroot <br />";
@@ -216,7 +216,7 @@ $use_etags = 0;
 
 # This is the path that will be associated to cookies
 # That means cookies set by this b2evo install won't be seen outside of this path on the domain below
-$cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl ).'/';
+$cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl );
 
 /**
  * Cookie domain.
@@ -242,12 +242,12 @@ $cookie_url   = 'cookie'. $b2evo_name. 'url';
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
  */
-$cookie_expires = time() + 31536000;		// Default: one year from now
+$cookie_expires = time() + 31536000; // Default: one year from now
 
 /**
  * Expired-time used to erase cookies.
  */
-$cookie_expired = time() - 86400;				// Default: 24 hours ago
+$cookie_expired = time() - 86400;    // Default: 24 hours ago
 
 
 // ** Location of the b2evolution subdirectories **
@@ -255,84 +255,84 @@ $cookie_expired = time() - 86400;				// Default: 24 hours ago
 /*
 	- You should only move these around if you really need to.
 	- You should keep everything as subdirectories of the base folder
-		($baseurl which is set in _config.php, default is the /blogs folder)
+		($baseurl which is set in _config.php, default is the /blogs/ folder)
 	- Remember you can set the baseurl to your website root (-> _config.php).
 
 	NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
 
 	Example of a possible setting:
-		$admin_subdir = 'backoffice/b2evo';				// Subdirectory relative to base
-		$admin_dirout = '../..';									// Relative path to go back to base
+		$admin_subdir = 'backoffice/b2evo/'; // Subdirectory relative to base
+		$admin_dirout = '../../';            // Relative path to go back to base
 */
 /**
  * Location of the configuration files.
  */
-$conf_subdir = 'conf';                       // Subdirectory relative to base
-$conf_dirout = '..';                         // Relative path to go back to base
+$conf_subdir = 'conf/';                  // Subdirectory relative to base
+$conf_dirout = '../';                    // Relative path to go back to base
 
-$conf_path = str_replace( '\\', '/', dirname(__FILE__) );
-$basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path );	// Remove his file's subpath
+$conf_path = str_replace( '\\', '/', dirname(__FILE__).'/' );
+$basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remove his file's subpath
 
 /**
  * Location of the backoffice (admin) folder.
  */
-$admin_subdir = 'admin';                     // Subdirectory relative to base
-$admin_dirout = '..';                        // Relative path to go back to base
-$admin_url = $baseurl.'/'.$admin_subdir;     // You should not need to change this
+$admin_subdir = 'admin/';                // Subdirectory relative to base
+$admin_dirout = '../';                   // Relative path to go back to base
+$admin_url = $baseurl.$admin_subdir;     // You should not need to change this
 /**
  * Location of the HTml SeRVices folder.
  */
-$htsrv_subdir = 'htsrv';                     // Subdirectory relative to base
-$htsrv_dirout = '..';                        // Relative path to go back to base
-$htsrv_url = $baseurl.'/'.$htsrv_subdir;     // You should not need to change this
+$htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
+$htsrv_dirout = '../';                   // Relative path to go back to base
+$htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
 /**
  * Location of the XML SeRVices folder.
  */
-$xmlsrv_subdir = 'xmlsrv';                   // Subdirectory relative to base
-$xmlsrv_dirout = '..';                       // Relative path to go back to base
-$xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;   // You should not need to change this
+$xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
+$xmlsrv_dirout = '../';                  // Relative path to go back to base
+$xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 /**
  * Location of the IMG folder.
  */
-$img_subdir = 'img';                     // Subdirectory relative to base
-$img_url = $baseurl.'/'.$img_subdir;     // You should not need to change this
+$img_subdir = 'img/';                    // Subdirectory relative to base
+$img_url = $baseurl.$img_subdir;         // You should not need to change this
 /**
  * Location of the skins folder.
  */
-$skins_subdir = 'skins';                     // Subdirectory relative to base
-$skins_dirout = '..';                        // Relative path to go back to base
-$skins_url = $baseurl.'/'.$skins_subdir;     // You should not need to change this
+$skins_subdir = 'skins/';                // Subdirectory relative to base
+$skins_dirout = '../';                   // Relative path to go back to base
+$skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 /**
  * Location of the core (the "includes") files.
  */
-$core_subdir = 'b2evocore';                  // Subdirectory relative to base
-$core_dirout = '..';                         // Relative path to go back to base
+$core_subdir = 'b2evocore/';             // Subdirectory relative to base
+$core_dirout = '../';                    // Relative path to go back to base
 /**
  * Location of the locales folder.
  */
-$locales_subdir = 'locales';                 // Subdirectory relative to base
-$locales_dirout = '..';                      // Relative path to go back to base
+$locales_subdir = 'locales/';            // Subdirectory relative to base
+$locales_dirout = '../';                 // Relative path to go back to base
 /**
  * Location of the plug-ins.
  */
-$plugins_subdir = 'plugins';                 // Subdirectory relative to base
-$plugins_subdir_dirout = '..';               // Relative path to go back to base
+$plugins_subdir = 'plugins/';            // Subdirectory relative to base
+$plugins_subdir_dirout = '../';          // Relative path to go back to base
 /**
  * Location of the install folder.
  */
-$install_subdir = 'install';                 // Subdirectory relative to base
-$install_dirout = '..';                      // Relative path to go back to base
+$install_subdir = 'install/';            // Subdirectory relative to base
+$install_dirout = '../';                 // Relative path to go back to base
 /**
  * Location of the root media folder.
  */
-$media_subdir = 'media';                     // Subdirectory relative to base
-$media_dirout = '..';                        // Relative path to go back to base
-$media_url = $baseurl.'/'.$media_subdir;     // You should not need to change this
+$media_subdir = 'media/';                // Subdirectory relative to base
+$media_dirout = '../';                   // Relative path to go back to base
+$media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 
-// ** CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! **
-$use_cache = 1;							// Not using this will dramatically overquery the DB !
-$sleep_after_edit = 0;			// let DB do its stuff...
+// ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
+$use_cache = 1;                          // Not using this will dramatically overquery the DB !
+$sleep_after_edit = 0;                   // let DB do its stuff...
 $evonetsrv_host = 'b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';

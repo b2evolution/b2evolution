@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the template that displays stats for a blog
 	 *
@@ -20,5 +20,5 @@
 	 * We now call the default stats handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_stats.php';
+	require get_path('skins').'_stats.php';
 ?>

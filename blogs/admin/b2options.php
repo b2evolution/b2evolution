@@ -198,8 +198,8 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			case 'reset':
 				// reload locales
 				unset( $locales );
-				include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
-				@include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_overrides_TEST.php' );
+				include(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
+				@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
 				// delete everything from locales table
 				$query = 'DELETE FROM T_locales WHERE 1';
@@ -219,10 +219,10 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				// Get PO file for that locale:
 				echo '<div class="panelinfo">';
 				echo '<h3>Extracting language file for ', $locale, '...</h3>';
-				$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po';
+				$po_file = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po';
 				if( ! is_file( $po_file ) )
 				{
-					echo '<p class="error">'.sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po').'</p>';
+					echo '<p class="error">'.sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.$locales[$locale]['messages'].'/LC_MESSAGES/messages.po').'</p>';
 				}
 				else
 				{	// File exists:
@@ -317,7 +317,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 						echo $source, ' = ', $c, '<br />';
 					}
 
-					$outfile = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$locale]['messages'].'/_global.php';
+					$outfile = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$locale]['messages'].'/_global.php';
 					$fp = fopen( $outfile, 'w+' );
 					fwrite( $fp, "<?php\n" );
 					fwrite( $fp, "/*\n" );
@@ -348,8 +348,8 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 					// reload locales
 					unset( $locales );
-					require( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_locales.php' );
-					@include( dirname(__FILE__).'/'.$admin_dirout.'/'.$conf_subdir.'/_overrides_TEST.php' );
+					require(  dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_locales.php' );
+					@include( dirname(__FILE__).'/'.$admin_dirout.$conf_subdir.'_overrides_TEST.php' );
 
 					$status_update[] = sprintf(T_("Deleted locale '%s' from database."), $delete);
 				}

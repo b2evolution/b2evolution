@@ -175,20 +175,20 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 		echo '<h3>', T_('Reporting abuse to b2evolution.net...'), "</h3>\n";
 	}
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || ( $evonetsrv_host == 'localhost' ) )
-	{	// Local install can only report to local test server
+	{ // Local install can only report to local test server
 		// Construct XML-RPC client:
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
 		$client->debug = $debug;
 
 		// Construct XML-RPC message:
 		$message = new xmlrpcmsg(
-									'b2evo.reportabuse',	 											// Function to be called
+									'b2evo.reportabuse',                        // Function to be called
 									array(
-										new xmlrpcval(0,'int'),										// Reserved
-										new xmlrpcval('annonymous','string'),			// Reserved
-										new xmlrpcval('nopassrequired','string'),	// Reserved
-										new xmlrpcval($abuse_string,'string'),		// The abusive string to report
-										new xmlrpcval($baseurl,'string'),					// The base URL of this b2evo
+										new xmlrpcval(0,'int'),                   // Reserved
+										new xmlrpcval('annonymous','string'),     // Reserved
+										new xmlrpcval('nopassrequired','string'), // Reserved
+										new xmlrpcval($abuse_string,'string'),    // The abusive string to report
+										new xmlrpcval($baseurl,'string'),         // The base URL of this b2evo
 									)
 								);
 		$result = $client->send($message);

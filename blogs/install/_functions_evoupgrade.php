@@ -201,13 +201,13 @@ function upgrade_b2evo_tables()
 			$blog_ID = $row['blog_ID'];
 			$blog_siteurl = $row['blog_siteurl'];
 			// echo $blog_siteurl;
-			if( strpos( $blog_siteurl, $baseurl ) !== 0 )
-			{	// If not found at position 0
+			if( strpos( $blog_siteurl.'/', $baseurl ) !== 0 )
+			{ // If not found at position 0
 				echo ' <strong>WARNING: please check blog #', $blog_ID, ' manually.</strong><br /> ';
 				continue;
 			}
 			// crop off the baseurl:
-			$blog_siteurl = substr( $blog_siteurl, strlen( $baseurl) );
+			$blog_siteurl = substr( $blog_siteurl.'/', strlen( $baseurl) );
 			// echo ' -> ', $blog_siteurl,'<br />';
 
 			$query_update_blog = "UPDATE T_blogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";

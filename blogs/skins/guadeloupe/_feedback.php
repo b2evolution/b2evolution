@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the template that displays the feedback for a post
 	 * (comments, trackbak, pingback...)
@@ -22,5 +22,5 @@
 	 * We now call the default feedback handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_feedback.php';
+	require get_path('skins').'_feedback.php';
 ?>
