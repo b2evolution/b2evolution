@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution formatting config
- * Version of this file: 0.8.2
+ * Version of this file: 0.8.3
  *
  * This sets how posts and comments are formatted
  *
@@ -129,6 +129,7 @@ $b2smiliestrans = array( // fplanque: heavy editing ;)
 		'|-|'				=> 'icon_wth.gif',
 		'~`'				=> 'qm_open.gif',
 		'\'~'				=> 'qm_close.gif',
+		'=>'				=> 'icon_arrow.gif',
 //		'8|'				=> 'icon_eek.gif',
 //		'>:-('			=> 'graymad.gif',
 //		':b'				=> 'grayrazz.gif',
@@ -136,7 +137,6 @@ $b2smiliestrans = array( // fplanque: heavy editing ;)
 //		'>:-['			=> 'icon_evil.gif',
 //		':!:'				=> 'icon_exclaim.gif',
 //		':?:'				=> 'icon_question.gif',
-//		'=>'				=> 'icon_arrow.gif',
 //		':yes:'			=> 'grayyes.gif',
 //		':no:'			=> 'grayno.gif',
 //		'U-('				=> 'grayuhoh.gif',
