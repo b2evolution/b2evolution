@@ -33,14 +33,13 @@ function bpost_create(
 	$post_comments = 'open' )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $use_bbcode, $use_smartquotes, $use_smilies;
+	global $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
-	if( $use_bbcode ) $post_flags[] = 'bbcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
@@ -108,14 +107,13 @@ function bpost_update(
 	$post_comments = 'open' )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $use_bbcode, $use_smartquotes, $use_smilies;
+	global $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
-	if( $use_bbcode ) $post_flags[] = 'bbcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
@@ -180,14 +178,13 @@ function bpost_update_status(
 	$post_timestamp = '' )
 {
 	global $DB, $tableposts, $tablepostcats;
-	global $use_bbcode, $use_smartquotes, $use_smilies;
+	global $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
-	if( $use_bbcode ) $post_flags[] = 'bbcode';
 	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
 	if( $use_smilies ) $post_flags[] = 'smileys';
 

@@ -13,8 +13,6 @@
 # 0 to disable
 # 1 to ensable
 $use_textile = 0;				// 0,1 use textile, see http://www.textism.com/tools/textile/
-$use_gmcode = 1;        // 0,1 use GreyMatter-styles: **bold** \italic\ __underline__
-$use_bbcode = 0;        // 0,1 use BBCode, like [b]bold[/b]
 $use_smartquotes = 0;		// 0,1 convert quotes into smart/curly quotes
 $use_autolink = 1;			// 0,1 automatically make web, mail, aim and icq addresses clickable
 $use_balanceTags = 1;		// 0,1 automatically balance unmatched tags in posts and comments. 
@@ -43,54 +41,6 @@ $use_html_checker = 1;
 # and for CSS in comments. However, this may be a bit harsh on your posts :]
 $use_security_checker = 0;		
 # WARNING: disabling both $use_html_checker and $use_security_checker is suicidal !
-
-
-#GreyMatter formatting search and replace arrays
-$b2_gmcode['in'] = array(
-													'#\*\*(.+?)\*\*#',		// **bold**
-													'#\x5c\x5c(.+?)\x5c\x5c#',		// \\italic\\
-													'#//(.+?)//#',		// //italic//
-													'#__(.+?)__#'		// __underline__
-												);
-$b2_gmcode['out'] = array(
-													'<strong>$1</strong>',
-													'<em>$1</em>',
-													'<em>$1</em>',
-													'<span style="text-decoration:underline">$1</span>'
-												);
-
-
-
-// # BBcode search and replace arrays #
-
-$b2_bbcode['in'] = array(
-	'#\[b](.+?)\[/b]#is',		// Formatting tags
-	'#\[i](.+?)\[/i]#is',
-	'#\[u](.+?)\[/u]#is',
-	'#\[s](.+?)\[/s]#is',
-	'#\[color=(.+?)](.+?)\[/color]#is',
-	'#\[size=(.+?)](.+?)\[/size]#is',
-	'#\[font=(.+?)](.+?)\[/font]#is',
-	'#\[img](.+?)\[/img]#is',		// Image
-	'#\[url](.+?)\[/url]#is',		// URL
-	'#\[url=(.+?)](.+?)\[/url]#is',
-#	'#\[email](.+?)\[/email]#eis',		// E-mail
-#	'#\[email=(.+?)](.+?)\[/email]#eis'
-);
-$b2_bbcode['out'] = array(
-	'<strong>$1</strong>',		// Formatting tags
-	'<em>$1</em>',
-	'<span style="text-decoration:underline">$1</span>',
-	'<span style="text-decoration:line-through">$1</span>',
-	'<span style="color:$1">$2</span>',
-	'<span style="font-size:$1px">$2</span>',
-	'<span style="font-family:$1">$2</span>',
-	'<img src="$1" alt="" />',		// Image
-	'<a href="$1">$1</a>',		// URL
-	'<a href="$1" title="$2">$2</a>',
-#	"'<a href=\"mailto:'.antispambot('\\1').'\">'.antispambot('\\1').'</a>'",		// E-mail
-#	'<a href="mailto:$1">$2</a>'
-);
 
 
 // ** Smilies options **

@@ -330,44 +330,8 @@ function convert_chars( $content, $flag='html' )
 	return( $content );
 }
 
-/*
- * convert_bbcode(-)
- */
-function convert_bbcode( & $content)
-{
-	global $b2_bbcode, $use_bbcode;
-	if ($use_bbcode) {
-		$content = preg_replace($b2_bbcode["in"], $b2_bbcode["out"], $content);
-	}
-	$content = convert_bbcode_email($content);
-}
 
-function convert_bbcode_email($content)
-{
-	$bbcode_email['in'] = array(
-		'#\[email](.+?)\[/email]#eis',
-		'#\[email=(.+?)](.+?)\[/email]#eis'
-	);
-	$bbcode_email['out'] = array(
-		"'<a href=\"mailto:'.antispambot('\\1').'\">'.antispambot('\\1').'</a>'",		// E-mail
-		"'<a href=\"mailto:'.antispambot('\\1').'\">\\2</a>'"
-	);
 
-	$content = preg_replace($bbcode_email['in'], $bbcode_email['out'], $content);
-	return ($content);
-}
-
-/*
- * convert_gmcode(-)
- */
-function convert_gmcode( & $content)
-{
-	global $b2_gmcode, $use_gmcode;
-	if ($use_gmcode) 
-	{
-		$content = preg_replace($b2_gmcode["in"], $b2_gmcode["out"], $content);
-	}
-}
 
 
 

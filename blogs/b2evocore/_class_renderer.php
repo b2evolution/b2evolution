@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the renderer
+ * This file implements the renderer (EXPERIMENTAL)
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
@@ -8,10 +8,11 @@
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package b2evocore
+ * @package plugins
  */
-// require_once dirname(__FILE__). '/_class_dataobject.php';
 if( $use_textile ) require_once( dirname(__FILE__). '/_functions_textile.php' );
+require_once dirname(__FILE__). '/../plugins/renderers/_gmcode.php';
+require_once dirname(__FILE__). '/../plugins/renderers/_bbcode.php';
 
 
 /**
@@ -46,8 +47,8 @@ class Renderer
 		{
 			case 'content':
 				if( $use_textile ) $comment = textile( $comment );
-				convert_bbcode($content);
 				convert_gmcode($content);
+				// convert_bbcode($content);
 				$content = make_clickable($content);
 				convert_smilies($content);
 				phpcurlme( $content );
@@ -55,8 +56,8 @@ class Renderer
 				
 			case 'other':
 				// if( $use_textile ) $comment = textile( $comment );
-				convert_bbcode($content);
 				convert_gmcode($content);
+				// convert_bbcode($content);
 				// $content = make_clickable($content);
 				convert_smilies($content);
 				// phpcurlme( $content );
