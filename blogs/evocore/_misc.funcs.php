@@ -967,7 +967,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 			case 'string':
 				// echo $var, '=', $$var, '<br />';
-				$$var = trim( strip_tags((string)$$var) );
+				$$var = trim( strip_tags($$var) );
 				break;
 
 			default:
@@ -1889,6 +1889,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.46  2005/02/22 02:53:02  blueyed
+ * typecasting also gives a notice.. better to have it anyway
+ *
  * Revision 1.45  2005/02/22 02:44:50  blueyed
  * E_NOTICE fix for param()
  *
