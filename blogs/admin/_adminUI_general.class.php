@@ -629,9 +629,6 @@ class AdminUI_general
 	 * This is a method (and not a member array) to allow dynamic generation.
 	 * fp>>I'm not so sure about this... feels a little bloated... gotta think about it..
 	 *
-	 * @todo fp>>daniel does this work for menus only? Can we generalize it to getTemplate?
-	 * @todo daniel>>fp It was getTemplate() before, but I thought it may be better to split it into different functions (for menu, ..)
-	 *
 	 * @param string Name of the template ('main', 'sub')
 	 * @param integer Nesting level (start at 0)
 	 * @return array Associative array which defines layout and optionally properties.
@@ -985,6 +982,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.14  2005/03/16 16:05:09  fplanque
+ * $app_footer_text
+ *
  * Revision 1.13  2005/03/13 19:46:53  blueyed
  * application config layer
  *
