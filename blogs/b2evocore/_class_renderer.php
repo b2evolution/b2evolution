@@ -102,15 +102,17 @@ class Renderer extends Plug
 		
 		$this->restart(); // Just in case.
 		
+		// echo implode(',',$renderers);
+		
 		while( $loop_RendererPlugin = $this->get_next() )
 		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code;
+			//echo ' ',$loop_RendererPlugin->code, ':';
 
 			switch( $loop_RendererPlugin->apply_when )
 			{
 				 case 'stealth':
 				 case 'always':
-					// echo 'FORCED';
+					// echo 'FORCED ';
 					$loop_RendererPlugin->render( $content, $format );
 					break;
 				 
@@ -119,14 +121,14 @@ class Renderer extends Plug
 				 case 'lazy':
 					if( in_array( $loop_RendererPlugin->code, $renderers ) )
 					{	// Option is activated
-						// echo 'OPT';
+						// echo 'OPT ';
 						$loop_RendererPlugin->render( $content, $format );
 					}
-					// echo 'NO';
+					// else echo 'NOOPT ';
 					break;
 									 
 				 case 'never':
-					// echo 'NEVER';
+					// echo 'NEVER ';
 					break;	// STOP, don't render, go to next renderer
 			}		
 		}

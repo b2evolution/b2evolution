@@ -371,11 +371,7 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/' );
-
-	// Insert a post into blogroll:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/' );
+	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -383,11 +379,15 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/' );
+	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/' );
+
+	// Insert a post into blogroll:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -432,33 +432,33 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 	echo "Creating default blogs... ";
 
 	$blog_shortname = 'Blog All';
-	$blog_stub = $stub_all;
+	$blog_stub = 'all';
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_all.php')."<br />
 <br />
 <strong>".T_("Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin.")."</strong>";
 	$blog_ID = 1;
-	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = $blog_a_short;
-	$blog_stub = $stub_a;
+	$blog_stub = 'a';
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
 	$blog_ID = 2;
-	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
+	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
 (($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = 'Blog B';
-	$blog_stub = $stub_b;
+	$blog_stub = 'b';
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_b.php');
 	$blog_ID = 3;
-	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
-	$blog_shortname = 'Blogroll';
-	$blog_stub = $stub_roll;
+	$blog_shortname = 'Linkblog';
+	$blog_stub = 'links';
 	$blog_more_longdesc = '<br />
 <br />
-<strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links. This is commonly referred to as a 'Blogroll'.").'</strong>';
+<strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_ID = 4;
-	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub, $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	echo "OK.<br />\n";
 

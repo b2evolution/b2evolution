@@ -38,11 +38,6 @@ locale_activate( $default_locale );
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
-$stub_all = 'blog_all';
-$stub_a = 'blog_a';
-$stub_b = 'blog_b';
-$stub_roll = 'blog_roll';
-
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
@@ -318,8 +313,9 @@ switch( $action )
 				if( $allow_evodb_reset == 1 )
 				{
 					?>
-					<p><input type="radio" name="action" id="deletedb" value="deletedb" /> <strong><?php echo T_('Delete b2evolution tables')?></strong>:
-					<label for="deletedb"><?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the
+					<p><input type="radio" name="action" id="deletedb" value="deletedb" /> 
+					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables')?></strong>:
+					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the
 					b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution
 					tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have
 					some, will not be touched in any way.')?></label></p>

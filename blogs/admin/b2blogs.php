@@ -472,6 +472,7 @@ switch($action)
 			case 'index.php':
 				// Access through index.php
 				// We need to set required variables
+				$blog = $edited_Blog->ID;
 				# This setting retricts posts to those published, thus hiding drafts.
 				$show_statuses = array();
 				# This is the blog to be used as a blogroll (set to 0 if you don't want to use this feature)
@@ -485,7 +486,7 @@ switch($action)
 				# Here you can set a limit after which posts will be ignored
 				$timestamp_max = 'now';
 				// That's it, now let b2evolution do the rest! :)
-				require $basepath.'/$core_subdir/_blog_main.php';
+				require $basepath.'/'.$core_subdir.'/_blog_main.php';
 				break;
 			
 			case 'stub':
@@ -500,9 +501,8 @@ switch($action)
 		locale_activate( $static_gen_saved_locale);
 
 		$staticfilename = $edited_Blog->get('staticfilepath');
-		printf( '<p>'.T_('Writing to file [%s]...').'</p>', $staticfilename );
 
-		if( ! ($fp = fopen( $staticfilename, 'w' )) )
+		if( ! ($fp = @fopen( $staticfilename, 'w' )) )
 		{	// could not open file
 			?>
 			<div class="error">
@@ -513,6 +513,7 @@ switch($action)
 		}
 		else
 		{	// file writing OK
+			printf( '<p>'.T_('Writing to file [%s]...').'</p>', $staticfilename );
 			fwrite( $fp, $page );
 			fclose( $fp );
 	

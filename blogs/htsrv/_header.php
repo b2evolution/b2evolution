@@ -34,7 +34,7 @@
 <?php
 if( !empty($error) )
 {
-	echo '<div class="error">'.$error.'</div>';
+	echo '<div class="error"><p class="error">'.$error.'</p></div>';
 }
 if( !empty($notes) )
 {
