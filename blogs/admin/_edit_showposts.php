@@ -240,10 +240,9 @@
 				<?php //end of the loop, don't delete
 				}
 
-				if( $postdata['Status'] != 'draft' && $postdata['Status'] != 'deprecated' )
-				{	// Can't leave a comment for non published posts
+				if( $Item->can_comment() )
+				{ // User can leave a comment
 				?>
-
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
 				<!-- form to add a comment -->

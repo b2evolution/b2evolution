@@ -190,6 +190,52 @@ class Item extends DataObject
 
 
 	/** 
+	 * Template function: Check if user can leave comment on this post
+	 *
+	 * {@internal Item::can_comment(-) }}
+	 *
+	 * @param string string to display before any error message
+	 * @param string string to display after any error message
+	 * @param string error message for non published posts, '#' for default
+	 * @param string error message for closed comments posts, '#' for default
+	 * @return boolean true if user can post
+	 */
+	function can_comment( 
+						$before_error = '<p><em>', 
+						$after_error = '</p></em>', 
+						$non_published_msg = '#',
+						$closed_msg = '#'
+						) 
+	{
+		if( ($this->scope == 'draft') || ($this->scope == 'deprecated' ) )
+		{	// Post is not published
+			if( $non_published_msg == '#' )
+				$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
+		
+			echo $before_error;
+			echo $non_published_msg;
+			echo $after_error;
+
+			return false;
+		}
+
+		if( $this->comments != 'open'  )
+		{	// Comments are not open on this post
+			if( $closed_msg == '#' )
+				$closed_msg = T_( 'Comments are closed for this post.' );
+		
+			echo $before_error;
+			echo $closed_msg;
+			echo $after_error;
+
+			return false;
+		}
+
+		return true; // OK, user can comment!
+	}
+
+
+	/** 
 	 * Template function: display content of item
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-04-13 15:20+0200\n"
-"PO-Revision-Date: 2004-04-13 22:11+0100\n"
+"PO-Revision-Date: 2004-04-15 13:57+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -4020,7 +4020,7 @@ msgstr "Cet article n'a pas de %s pour le moment..."
 #: ..\..\..\skins\_feedback.php:143
 #: ..\..\..\skins\basic\_feedback.php:131
 msgid "Comments are closed for this post."
-msgstr "Les commentaires sont ferrmés pour cet article."
+msgstr "Les commentaires sont fermés pour cet article."
 
 #: ..\..\..\skins\_feedback.php:195
 #: ..\..\..\skins\basic\_feedback.php:183

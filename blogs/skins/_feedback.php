@@ -118,12 +118,8 @@
 	
 	if( $disp_comment_form ) 
 	{	// We want to display the comments form: 
-		if( $postdata['comments'] != 'open' )
-		{ ?>
-		<p><em><?php echo  T_('Comments are closed for this post.') ?></em></p>
-		<?php }
-		else
-		{
+		if( $Item->can_comment() )
+		{ // User can leave a comment
 		?>
 		<h4><?php echo T_('Leave a comment') ?>:</h4>
 		
@@ -188,7 +184,7 @@
 			<div class="clear"></div>
 		
 		</form>
-	<?php 
+		<?php 
 		} 
 	}
 	?>

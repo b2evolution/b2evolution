@@ -62,7 +62,7 @@ for( $curr_blog_ID = blog_list_start();
 	}
 	else
 	{	// We could select a blog:
-		$blogparams = get_blogparams_by_ID( $blog );
+		$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 		if( ! $current_User->is_blog_member( $blog ) )
 		{
