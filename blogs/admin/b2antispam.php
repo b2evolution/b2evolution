@@ -346,6 +346,12 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 															T_('Source')
 														);
 
+	// Set sort orders:
+	$Results->col_orders = array(
+															'aspm_string',
+															'aspm_source'
+														);
+
 	// Set columns:
   function antispam_source2( & $row )
 	{
