@@ -8,6 +8,12 @@ a.permalink_right {
 	border: 0px;
 }
 
+span.bIcons
+{
+	float: right;
+	border: 0px;
+}
+
 span.NonExistentWikiWord {
 	border-bottom: 1px dotted #ccc;
 }
