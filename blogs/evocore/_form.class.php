@@ -55,12 +55,14 @@ class Form
 
 	/**
 	 * CSS class of the form, used as default for {@link end_form()}
+	 * This is weird!!
 	 */
 	var $form_class = '';
 
 	/**
 	 * Number of fieldsets currently defined.
 	 * If greater then 0, output will be buffered.
+	 * @todo Why don't we explicitely request buffering if we need it ? :/
 	 * @see begin_fieldset()
 	 * @see end_fieldset()
 	 * @var integer
@@ -225,7 +227,7 @@ class Form
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use {@link password()} for password fields
+	 * Note: please use {@link Form::password()} for password fields
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value
@@ -289,7 +291,6 @@ class Form
 			return $r;
 		}
 	}
-
 
 	/**
 	 * Builds a password input field.
@@ -508,17 +509,28 @@ class Form
 		{
 			return $r;
 		}
-	}
-
-
+	} 
+	 
 	/**
 	 * Ends the form field
 	 *
+	 * @param array optional array to display the buttons before the end of the form
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function end_form()
+	function end_form( $buttons = array() )
 	{
-		$r = "</form>\n\n";
+		$r = '';
+		if( !empty( $buttons ) )
+		{
+			$output = $this->output;
+			$this->output = 0;
+		
+			$r .= $this->buttons( $buttons );
+			
+			$this->output = $output;
+		}
+		$r .= "\n</form>\n\n";
+		
 		if( $this->output )
 		{
 			echo $r;
@@ -531,7 +543,7 @@ class Form
 	}
 
 	/**
-	 * Buidls the fieldset tag
+	 * Builds the fieldset tag
 	 *
 	 * @param string the title of the fieldset to display in the 'legend' tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -569,7 +581,7 @@ class Form
 	 */
 	function fieldset_end()
 	{
-		$r = "\n</fieldset>\n\n";
+		$r = $this->fieldend;
 		if( $this->output )
 		{
 			echo $r;
@@ -583,7 +595,7 @@ class Form
 
 
 	/**
-	 * Ends the fieldset tag
+	 * Builds a checkbox list
 	 *
 	 * the two-dimension array must indicate, for each checkbox:
 	 *  - the name,
@@ -664,47 +676,400 @@ class Form
 		else
 		{
 			return $r;
-		}
+		}	
 	}
-
-
-	/**
-	 * Builds a button
+	
+	/** 
+	 * Build a text area.
 	 *
-	 * @param string the type specified in the input tag
-	 * @param string the tag name
-	 * @param string the tag value
-	 * @param string the class to use
-	 * @param string optional parameter to specify an onclick action using javascript
-	 * @return mixed true (if output) or the generated HTML if not outputting
+	 * @param string
+	 * @param string
+	 * @param integer
+	 * @param string
+	 * @param string
+	 * @param integer
+	 * @param string
 	 */
-	function button( $field_type = 'button', $field_name, $field_value, $field_class,
-										$field_label, $onclick )
+	function textarea( $field_name, $field_value, $field_rows, $field_label,
+												$field_note = '', $field_cols = 50 , $field_class = '' )
 	{
-		$r = "\n".'<input type="'.$field_type
-							.'" name="'.$field_name
-							.'" value="'.format_to_output($field_value)
-							.'" class="'.$field_class.'" ';
-		if( isset( $onclick ) )
+		global $img_url;
+
+		$r = $this->begin_field( $field_name, $field_label );
+
+		$r .= '<fieldset class="input">'."\n";
+		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
+		$r .= '<textarea name="'.$field_name.'" id="'.$field_name.'" rows="'.$field_rows
+					.'"  cols="'.$field_cols.'"';
+		if( !empty($field_class) )
 		{
-			$r .= ' onclick ="'.$onclick.'" ';
+			$r .= ' class="'.$field_class.'"';
 		}
-		$r .= ' />';
-
-		if( isset($this) && get_class( $this ) == 'form' )
+		$r .= '>'.$field_value.'</textarea></fieldset>';
+		$r .= '  <span class="notes">'.$field_note.'</span></div>';
+		$r .= "</fieldset>\n\n";
+		
+		if( $this->output )
 		{
-			$r = $this->begin_field( $field_name, $field_label ).$r;
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	/**
+	 * Builds an info field.
+	 *
+	 * @param string the field label
+	 * @param string the field info
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 * An info field is a fieldset containing a label div and an info div.
+	 */
+	function info( $field_label, $field_info )
+	{
+		$r = "<fieldset>\n".
+				 '<div class="label">'.$field_label.":</div>\n".
+				 '<div class="info">'.$field_info."</div>\n".
+				 "</fieldset>\n\n";
 
-			if( $this->output )
+		if( $this->output )
 			{
 				echo $r;
 				return true;
 			}
-		}
-
-		return $r;
+			else
+			{
+				return $r;
+			}	
 	}
-
+	
+	/**
+	 * Builds a button list
+	 *
+	 * the two-dimension array must contain : 
+	 *  - the button type
+	 *  - the name (optional)
+	 *  - the value (optional)
+	 *  - the class (optional)
+	 *  - the onclick attribute (optional)
+	 *
+	 * @param array a two-dimension array containing the elements of the input tags
+	 * @param boolean to select or not the default display
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function buttons( $options='' )
+	{
+		$r = "\n";
+		$hidden = 1; // boolean that tests if the buttons are all hidden
+		
+		// possible header to display if there are not only hidden buttons 
+		$header = '<fieldset class="submit">'."\n";
+		$header .= "\t<fieldset>\n";
+		$header .= "\t\t".'<div class="input">';
+		
+		if( !empty( $options ) )
+		{
+			foreach( $options as $options )
+			{
+				if( !strcasecmp( $options[0], 'hidden' ) )
+				{ //test if the current button is hidden and sets $hidden to 0 if not
+					$hidden = 0;
+				}
+				$output = $this->output;
+				$this->output = 0;
+				$r .= $this->button( $options ); //call to the button method to build input tags
+				$this->output = $output;
+			}
+		}
+		/*
+		else
+		{
+			$r .= "\t\t\t".'<input type="submit" value="'.T_('Save !').'" class="SaveButton"/>'."\n";
+			$r .= "\t\t\t".'<input type="reset" value="'.T_('Reset').'" class="ResetButton"/>'."\n";
+		}*/
+		
+		// possible footer to display if there are not only hidden buttons
+		$footer = "\t\t</div>\n";
+		$footer .= "\t</fieldset>\n";
+		$footer .= "</fieldset>\n\n";
+			
+		if( $hidden )
+		{	// there are not only hidden buttons : additional tags 
+			$r = $header.$r.$footer;
+		}
+				
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	/**
+	 * Builds a button
+	 *
+	 * the array must contain : 
+	 *  - the button type
+	 *  - the name (optional)
+	 *  - the value (optional)
+	 *  - the class (optional)
+	 *  - the onclick attribute (optional) 
+	 *  - the style (optional) 
+	 *
+	 * @param array a two-dimension array containing the elements of the input tags
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function button( $options )
+	{
+		
+		$r = "\t\t\t".'<input type="';
+			
+		if( !empty($options[0]) )
+		{ //a type has been specified
+			$r .= $options[0].'" ';
+		}
+		else
+		{ //set default type
+			$r .= 'submit" ';
+		}
+			
+		if( !empty($options[1]) )
+		{ //a name has been specified 
+			$r .= ' name="'.$options[1].'" ';
+		}
+		else
+		{
+			$r .= ' name="submit" ';
+		}
+			
+		if( !empty($options[2]) )
+		{ //a value has been specified
+			$r .= ' value="'.$options[2].'" ';
+		}
+			
+		if( !empty($options[3]) )
+		{ //a class has been specified
+			$r .= ' class="'.$options[3].'" ';
+		}
+			
+		if( !empty($options[4]) )
+		{ //an onclick action has been specified
+			$r .= ' onclick="'.$options[4].'" ';
+		}
+		
+		if( !empty($options[5]) )
+		{ //a name has been specified 
+			$r .= ' style="'.$options[5].'" ';
+		}
+		else
+		{
+			$r .= ' name="submit" ';
+		}
+		$r .= " />\n";
+		
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	/**
+	 * Builds an hidden input tag
+	 * 
+	 * the array must contain : 
+	 *  - the name (optional)
+	 *  - the value (optional)
+	 *  - the class (optional)
+	 *  - the onclick attribute (optional) 
+	 *  - the style (optional) 
+	 *
+	 * @param array an array containing the elements of the input tags
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function hidden( $field_name, $field_value )
+	{
+		$r = '<input type="hidden" name="'.$field_name.'" value="'.$field_value.'" />';
+		
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+	
+	/**
+	 * Builds a submit input tag
+	 * 
+	 * the array must contain : 
+	 *  - the name (optional)
+	 *  - the value (optional)
+	 *  - the class (optional)
+	 *  - the onclick attribute (optional)
+	 *  - the style (optional) 
+	 *
+	 * @param array an array containing the elements of the input tags
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function submit( $options )
+	{
+		$hidden_fields = array();
+		$i = 1;
+		$r = '';
+		
+		$submit_fields[0] = '';
+		
+		foreach( $options as $option )
+		{// construction of the option array for the button method
+			$submit_fields[$i] = $option;
+			$i++;
+		}
+		
+		$output = $this->output;
+		$this->output = 0;
+		$r .= $this->button( $submit_fields ); //call to the button method to build input tags
+		$this->output = $output;
+		
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
+	}
+		
+		
+	 
+	
+	/**
+	 * Generate set of radio options.
+	 *
+	 * {@internal form_radio(-)}}
+	 * @param string the name of the radio options
+	 * @param string the checked option
+	 * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: additional HTML [input field, ..], 4: attribs for <input tag> )
+	 * @param string label
+	 * @param boolean options on seperate lines (DIVs)
+	 * @param string notes
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function radio(
+		$field_name,
+		$field_value,
+		$field_options,
+		$field_label,
+		$field_lines = false,
+		$field_notes = '' )
+	{
+		$r = '';
+		$r .= '<fieldset class="setting">'."\n";
+		$r .= '  <div class="label">'.format_to_output($field_label).":</div>\n";
+		$r .= '  <div class="input"><fieldset class="input">'."\n";
+		foreach( $field_options as $loop_field_option )
+		{
+			if( $field_lines ) $r .= "<div>\n";
+			$r .= '<label class="radiooption"><input type="radio" class="radio" name="'.$field_name.'" value="'.format_to_output( $loop_field_option[0], 'formvalue' ).'"';
+			if( $field_value == $loop_field_option[0] )
+			{
+				$r .= ' checked="checked"';
+			}
+			if( !empty( $loop_field_option[4] ) )
+				$r .= ' '.$loop_field_option[4];
+			$r .= ' /> '.$loop_field_option[1].'</label>';
+			if( !empty( $loop_field_option[2] ) )
+			{ // notes for radio option
+				$r .= '<span class="notes">'.$loop_field_option[2].'</span>';
+			}
+			if( !empty( $loop_field_option[3] ) )
+			{ // optional text for radio option (like additional fieldsets or input boxes)
+				$r .= $loop_field_option[3];
+			}
+			if( $field_lines ) $r .= "</div>\n";
+		}
+		if( !empty( $field_notes ) )
+		{
+			$r .= '<div><span class="notes">'.$field_notes.'</span></div>';
+		}
+		$r .= '  </fieldset></div>';
+		$r .= "</fieldset>\n\n";
+		
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	/**
+	 * Display a select field and populate it with a cache object.
+	 *
+	 * @param string field name
+	 * @param string default field value
+	 * @param DataObjectCache Cache containing values for list
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param boolean allow to select [none] in list
+	 * @param string CSS class for select
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_object(
+		$field_name,
+		$field_value,
+		& $field_object,
+		$field_label,
+		$field_note = '',
+		$allow_none = false,
+		$field_class = '' )
+	{
+		$r = "\n";
+		$r .= '<fieldset>';
+		$r .= '  <div class="label"><label for="'.$field_name.'">'.$field_label.':</label></div>';
+		$r.= '  <div class="input"><select name="'.$field_name.'" id="'.$field_name.'"';
+		if( !empty($field_class) )
+		{
+			$r .= ' class="'.$field_class.'"';
+		}
+		$r .= '>';
+		$r .= $field_object->option_list_return( $field_value, $allow_none, 'name_return' );
+		$r .= '  </select>';
+		$r .= '  <span class="notes">'.$field_note.'</span></div>';
+		$r .= "</fieldset>\n\n";
+	
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}	
+	}
+	
+	
+	
 }
 
 ?>
