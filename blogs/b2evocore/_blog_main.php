@@ -2,11 +2,16 @@
 /**
  * This file loads the blog!
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
  * @package evocore
+ *
+ * @author fplanque - François PLANQUE - {@link http://fplanque.net/}
+ *
+ * @version $Id$
  */
 
 /**
