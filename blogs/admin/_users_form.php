@@ -69,25 +69,27 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	?></h2>
 	
 	<table align="center">
-	<tr><td>
-	<fieldset>
-
+	<tr>
+	<td>
 	<form class="fform" method="post" action="b2users.php<?php if( $user != 0 ) echo '?user='.$user?>">
 		<input type="hidden" name="action" value="userupdate" />
 		<input type="hidden" name="edited_user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
 		<input type="hidden" name="edited_user_oldlogin" value="<?php
-		echo ( isset($edited_user_oldlogin) ? format_to_output($edited_user_oldlogin, 'formvalue')
-																				: $edited_User->dget('login', 'formvalue') )
+			echo ( isset($edited_user_oldlogin) ? format_to_output($edited_user_oldlogin, 'formvalue')
+																					: $edited_User->dget('login', 'formvalue') )
 		?>" />
 		
+	<fieldset>
+		<legend><?php echo T_('User') ?></legend>
+
 		<table cellpadding="5" cellspacing="0">
 			<?php
 			if( $allowed_to_edit )
 			{
-				form_text_tr( 'edited_user_login', $edited_User->dget('login', 'formvalue'), 50, T_('Login'), '', 20 );
-				form_text_tr( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 50, T_('First name'), '', 50 );
-				form_text_tr( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 50, T_('Last name'), '', 50 );
-				form_text_tr( 'edited_user_nickname', $edited_User->dget('nickname', 'formvalue'), 50, T_('Nickname'), '', 50 );
+				form_text_tr( 'edited_user_login', $edited_User->dget('login', 'formvalue'), 20, T_('Login'), '', 20 );
+				form_text_tr( 'edited_user_firstname', $edited_User->dget('firstname', 'formvalue'), 30, T_('First name'), '', 50 );
+				form_text_tr( 'edited_user_lastname', $edited_User->dget('lastname', 'formvalue'), 30, T_('Last name'), '', 50 );
+				form_text_tr( 'edited_user_nickname', $edited_User->dget('nickname', 'formvalue'), 30, T_('Nickname'), '', 50 );
 			?>
 			<tr>
 			<td align="right"><strong><?php echo T_('Identity shown') ?>:</strong></td>
@@ -166,16 +168,16 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			<tr>
 				<td align="right"><label for="edited_user_notify"><strong><?php echo T_('Notifications') ?>:</strong></td>
 				<td><input type="checkbox" name="edited_user_notify" id="edited_user_notify" value="1"<?php if($edited_User->get('notify')) echo ' checked="checked"'?> />
-				<!--<span class="notes"><?php echo T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.')?></span>-->
+				<span class="notes"><?php echo T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.')?></span>
 				</td>
 			</tr>
 			<tr>
 				<td align="right"><label for="edited_user_pass1"><strong><?php echo T_('New password') ?>:</strong></td>
-				<td><input type="password" name="edited_user_pass1" id="edited_user_pass1" value="" size="50" /></td>
+				<td><input type="password" name="edited_user_pass1" id="edited_user_pass1" value="" size="20" /></td>
 			</tr>
 			<tr>
 				<td align="right"><label for="edited_user_pass2"><strong><?php echo T_('Confirm new password') ?>:</strong></td>
-				<td><input type="password" name="edited_user_pass2" id="edited_user_pass2" value="" size="50" /></td>
+				<td><input type="password" name="edited_user_pass2" id="edited_user_pass2" value="" size="20" /></td>
 			</tr>
 			<?php
 			}
@@ -225,23 +227,25 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			form_info( T_('User group'), $edited_User->Group->dget('name') );
 		}
 		?>
-	</fieldset>
+		</fieldset>
+		<?php
+		if( $allowed_to_edit )
+		{ ?>
+			<tr><td colspan="2" class="center">
+			<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
+			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+			</td></tr>
+			<?php 
+		} 
+		?>
+	</form>
 	</td>
 	</tr>
-	<?php
-	if( $allowed_to_edit )
-	{ ?>
-		<tr><td colspan="2" class="center">
-		<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
-		<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-		</td></tr>
-	<?php } ?>
 	
 
 	</table>
 	
 	<div class="clear"></div>
 
-</form>
 
 </div>
