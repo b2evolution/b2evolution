@@ -81,7 +81,7 @@ switch($action)
 			break;
 		}
 
-		$new_User = new User();
+		$new_User = & new User();
 		$new_User->set( 'login', $login );
 		$new_User->set( 'pass', md5($pass1) ); // encrypted
 		$new_User->set( 'nickname', $user_nickname );

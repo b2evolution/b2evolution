@@ -215,7 +215,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 
 	$userdata = get_userdatabylogin($user_login);
-	$loop_User = new User( $userdata );
+	$loop_User = & new User( $userdata );
 	$post_author = $userdata['ID'];
 
 	$post_title = xmlrpc_getposttitle($content);

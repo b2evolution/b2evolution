@@ -128,7 +128,7 @@ function veriflog( $login_required = false )
 	 * Login info is OK, we set the global variables:
 	 */
 	$userdata	= get_userdatabylogin($user_login);
-	$current_User = new User( $userdata );
+	$current_User = new User( $userdata );	// COPY!
 
 	$user_ID = $userdata['ID'];
 	$user_nickname = $userdata['user_nickname'];

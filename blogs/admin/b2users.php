@@ -25,7 +25,7 @@ switch ($action)
 		$current_User->check_perm( 'users', 'view', true );
 	
 		param( 'user', 'integer', true );
-		$edited_User = new User( get_userdata($user) );
+		$edited_User = & new User( get_userdata($user) );
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
 		require(dirname(__FILE__).'/_users_form.php');
@@ -39,7 +39,7 @@ switch ($action)
 		$current_User->check_perm( 'users', 'edit', true );
 	
 		param( 'edited_user_ID', 'integer', true );
-		$edited_User = new User( get_userdata( $edited_user_ID ) );
+		$edited_User = & new User( get_userdata( $edited_user_ID ) );
 	
 		param( 'edited_user_grp_ID', 'integer', true );
 		$edited_user_Group = Group_get_by_ID( $edited_user_grp_ID );
@@ -91,7 +91,7 @@ switch ($action)
 		param( 'id', 'integer', true );
 	
 		$user_data=get_userdata($id);
-		$edited_User = new User( $user_data );
+		$edited_User = & new User( $user_data );
 	
 		// Delete from DB:
 		$edited_User->dbdelete();

@@ -47,7 +47,7 @@
 
 		if( !empty( $row['ID'] ) )
 		{	// We have a user here: (i-e group was not empty)
-			$loop_User = new User( $row );
+			$loop_User = & new User( $row );
 			echo "<tr>\n";
 			$email = $loop_User->get('email');
 			$url = $loop_User->get('url');

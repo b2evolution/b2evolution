@@ -146,7 +146,7 @@ function Comment_get_by_ID( $comment_ID )
 		if( mysql_num_rows( $result ) )
 		{
 			$row = mysql_fetch_array($result);
-			$cache_Comments[$comment_ID] = new Comment( $row );
+			$cache_Comments[$comment_ID] = new Comment( $row ); // COPY !
 		}
 	}
 
@@ -365,12 +365,14 @@ function comment_author_email_link($linktext='', $before='', $after='')
 /*
  * comment_author_url_link(-)
  */
-function comment_author_url_link($linktext='', $before='', $after='') {
+function comment_author_url_link($linktext='', $before='', $after='') 
+{
 	global $commentdata;
 	$url = trim(stripslashes($commentdata['comment_author_url']));
 	$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
 	$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
-	if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url')) {
+	if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url'))
+	{
 		$display = ($linktext != '') ? $linktext : stripslashes($url);
 		echo $before;
 		echo '<a href="'.stripslashes($url).'">'.$display.'</a>';

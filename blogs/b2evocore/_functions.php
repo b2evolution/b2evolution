@@ -205,12 +205,12 @@ function format_to_post($content, $autobr=0, $is_comment=0)
 	{	// Check the code:
 		if( ! $is_comment )
 		{
-			$checker = new SafeHtmlChecker( $allowed_tags, $allowed_attribues,
+			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attribues,
 																			$uri_attrs, $allowed_uri_scheme );
 		}
 		else
 		{
-			$checker = new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attribues,
+			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attribues,
 																			$comments_uri_attrs, $comments_allowed_uri_scheme );
 		}
 		

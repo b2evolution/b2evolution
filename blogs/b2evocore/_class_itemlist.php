@@ -410,9 +410,9 @@ class ItemList
 		}
 
 	
-		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_karma ";
-	
-		$this->request .= "FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
+		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_karma 
+											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) 
+														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 		
 		if( $blog == 1 )
 		{	// Special case: we aggregate all cats from all blogs

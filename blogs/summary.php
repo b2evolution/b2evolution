@@ -81,7 +81,7 @@
 <h3><a href="<?php blog_list_iteminfo('blogurl', 'raw'); ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
 		<ul>
 		<?php	// Get the 3 last posts for each blog:
-			$BlogBList = new ItemList( $blog,  '', '', '', '', '', array(), '', 'DESC', '', '', '', '', '', '', '', '', '', '3', 'posts' );
+			$BlogBList = & new ItemList( $blog,  '', '', '', '', '', array(), '', 'DESC', '', '', '', '', '', '', '', '', '', '3', 'posts' );
 
 			while( $BlogBList->get_item() )
 			{

@@ -24,48 +24,43 @@ function skinbase()
 }
 
 
-/*
- * skin_list_start(-)
- * 
- * Start list iterator
+/** 
+ * Initializes skin list iterator
+ *
  * lists all folders in skin directory
  *
- * fplanque: created
+ * {@internal skin_list_start(-) }}
  */
 function skin_list_start()
 {
-	global $skin_path, $skin_dir, $skin_name;
+	global $skin_path, $skin_dir;
 
 	$skin_path = get_path( 'skins' );
-	
 	$skin_dir = dir( $skin_path );
-	do
-	{
-		if( !($skin_name = $skin_dir->read()) )
-			return false;		// No subfolder
-	} while( !( is_dir($skin_path.'/'.$skin_name) ) || ($skin_name=='..') );
-	
-	return $skin_name;
 }
 
 
-/*
- * skin_list_next(-)
- * 
- * Next skin iteration
+/** 
+ * Get next skin
  *
- * fplanque: created
+ * lists all folders in skin directory
+ *
+ * {@internal skin_list_start(-) }}
+ *
+ * @return string skin name
  */
 function skin_list_next()
 {
 	global $skin_path, $skin_dir, $skin_name;
 
 	do
-	{
+	{ // Find next subfolder:
 		if( !($skin_name = $skin_dir->read()) )
-			return false;		// No subfolder
-	} while( !( is_dir($skin_path.'/'.$skin_name) ) || ($skin_name=='..') );
-	
+			return false;		// No more subfolder
+	} while( ( ! is_dir($skin_path.'/'.$skin_name) )	// skip regular files
+						|| ($skin_name[0] == '.')								// skip hidden files/dirs
+						|| ($skin_name == 'CVS' ) );						// Skip CVS directory
+	// echo 'ret=',  $skin_name;
 	return $skin_name;
 }
 

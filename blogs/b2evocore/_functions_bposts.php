@@ -247,7 +247,7 @@ function get_lastpostdate( $blog = 1, $show_statuses = '' )
 	global $localtimenow, $postdata;
 	
 	// echo 'getting last post date';
-	$LastPostList = new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', 'date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
+	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', 'date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
 
 	if( $LastItem = $LastPostList->get_item() )
 	{

@@ -55,7 +55,7 @@
 	get_blogparams();
 
 	// Get the posts to display:
-	$MainList = new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
+	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
 	
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;
@@ -321,7 +321,7 @@
 	<div class="bSideItem">
 	  <h3><?php bloginfo('name') ?></h3>
 		<?php 
-		$Calendar = new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '', $timestamp_min, $timestamp_max );
+		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '', $timestamp_min, $timestamp_max );
 		
 		$Calendar->display( $pagenow, 'blog='.$blog );
 		?>
@@ -384,7 +384,7 @@
 
 				$arc_link_start = $pagenow.'?blog='.$blog.'&amp;';
 
-				$ArchiveList = new ArchiveList( $blog, $archive_mode, $show_statuses,	$timestamp_min, $timestamp_max, 36 );
+				$ArchiveList = & new ArchiveList( $blog, $archive_mode, $show_statuses,	$timestamp_min, $timestamp_max, 36 );
 				
 				while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 				{

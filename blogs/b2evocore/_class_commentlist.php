@@ -53,12 +53,12 @@ class CommentList
 			$posts_per_page = get_settings('posts_per_page');
 		$this->posts_per_page = $posts_per_page;
 
-		$this->request = "SELECT DISTINCT comment_ID, comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma, comment_type, ID, post_title, blog_name, blog_siteurl, blog_stub ";
-		
-		$this->request .= "FROM (((($tablecomments INNER JOIN $tableposts ON comment_post_ID = ID) ";
+		$this->request = "SELECT DISTINCT comment_ID, comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma, comment_type, comment_status, ID, post_title, blog_ID, blog_name, blog_siteurl, blog_stub 
+											FROM (((($tablecomments INNER JOIN $tableposts ON comment_post_ID = ID) ";
 		
 		// Find main blog for each related post  TODO: use get_blogaprams_by_ID
-		$this->request .= "INNER JOIN $tablecategories maincat ON post_category = maincat.cat_ID) INNER JOIN $tableblogs ON maincat.cat_blog_ID = blog_ID) ";
+		$this->request .= "INNER JOIN $tablecategories maincat ON post_category = maincat.cat_ID) 
+												INNER JOIN $tableblogs ON maincat.cat_blog_ID = blog_ID) ";
 		
 		// Restrict to viewable posts/cats on current blog
 		if( $blog > 1 )
@@ -118,13 +118,30 @@ class CommentList
 	}
 
 	/*
-	 * ItemList->get_num_rows(-)
+	 * CommentList->get_num_rows(-)
 	 */
 	function get_num_rows()
 	{
 		return $this->result_num_rows;
 	}
 	
+	/** 
+	 * Get next comment in list
+	 *
+	 * {@internal CommentList::get_next(-) }}
+	 *
+	 * @param 
+	 * @return
+	 */
+	function get_next()
+	{
+		if( !( $row = mysql_fetch_array( $this->result ) ) )
+		{	// No more comment in list
+			return false;
+		}
+		return new Comment( $row ); // COPY !
+	}
+
 }
 
 ?>

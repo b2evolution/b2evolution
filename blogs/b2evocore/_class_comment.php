@@ -24,6 +24,11 @@ class Comment extends DataObject
 	var	$date;
 	var	$content;
 	var	$karma;
+	// Extra vars:
+	var $post_title;
+	var $blog_ID;
+	var $blogparams;
+	var $blog_name;
 
 	/* 
 	 * Comment::Comment(-)
@@ -55,6 +60,11 @@ class Comment extends DataObject
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
 			$this->karma = $db_row['comment_karma'];
+			// Extra vars:
+			$this->post_title = $db_row['post_title'];
+			$this->blog_ID = $db_row['blog_ID'];
+			$this->blogparams = get_blogparams_by_ID($this->blog_ID);
+			$this->blog_name = $db_row['blog_name'];
 		}
 	}	
 	
@@ -77,6 +87,72 @@ class Comment extends DataObject
 		}
 	}
 
+	/** 
+	 * Get a member param by its name
+	 *
+	 * {@internal Comment::get(-) }}
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'post_link':
+				// Link to original post:
+				return gen_permalink( get_bloginfo( 'blogurl', $this->blogparams ), $this->post_ID, 
+															'id', 'single' );
+		}
+		// Default:		
+		return $this->$parname;	
+	}
+
+	// TEMP:
+	function author_url_link($linktext='', $before='', $after='') 
+	{
+		$url = trim($this->author_url);
+		$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
+		$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
+		if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url'))
+		{
+			$display = ($linktext != '') ? $linktext : stripslashes($url);
+			echo $before;
+			echo '<a href="'.stripslashes($url).'">'.$display.'</a>';
+			echo $after;
+		}
+	}
+
+	// TEMP:
+	function text() 
+	{
+		global $use_textile;
 	
+		$comment = $this->content;
+		$comment = str_replace('<trackback />', '', $comment);
+		$comment = str_replace('<pingback />', '', $comment);
+	
+		if( $use_textile ) $comment = textile( $comment );
+	
+		$comment = format_to_output( $comment, 'htmlbody' );
+		echo $comment;
+	}
+
+	function date($d='') 
+	{
+		if ($d == '') 
+			echo mysql2date( locale_datefmt(), $this->date );
+		else
+			echo mysql2date( $d, $this->date );
+	}
+
+	function time($d='') 
+	{
+		if ($d == '')
+			echo mysql2date( locale_timefmt(), $this->date );
+		else
+			echo mysql2date( $d, $this->date );
+	}
+
 }
 ?>

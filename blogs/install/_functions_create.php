@@ -261,7 +261,7 @@ function create_groups()
 	echo "OK.<br />\n";
 	
 	echo 'Creating default groups... ';
-	$Group_Admins = new Group();
+	$Group_Admins = new Group(); // COPY !
 	$Group_Admins->set( 'name', 'Administrators' );
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
@@ -271,7 +271,7 @@ function create_groups()
 	$Group_Admins->set( 'perm_users', 'edit' );
 	$Group_Admins->dbinsert();
 
-	$Group_Priviledged = new Group();
+	$Group_Priviledged = new Group(); // COPY !
 	$Group_Priviledged->set( 'name', 'Priviledged Bloggers' );
 	$Group_Priviledged->set( 'perm_blogs', 'viewall' );
 	$Group_Priviledged->set( 'perm_stats', 'view' );
@@ -281,7 +281,7 @@ function create_groups()
 	$Group_Priviledged->set( 'perm_users', 'view' );
 	$Group_Priviledged->dbinsert();
 
-	$Group_Bloggers = new Group();
+	$Group_Bloggers = new Group(); // COPY !
 	$Group_Bloggers->set( 'name', 'Bloggers' );
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
@@ -291,7 +291,7 @@ function create_groups()
 	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->dbinsert();
 
-	$Group_Users = new Group();
+	$Group_Users = new Group(); // COPY !
 	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'name', 'Basic Users' );
 	$Group_Users->set( 'perm_stats', 'none' );
@@ -626,7 +626,7 @@ function populate_main_tables()
 	echo 'Creating default users... ';
 	
 	// USERS !
-	$User_Admin = new User();
+	$User_Admin = & new User();
 	$User_Admin->set( 'login', 'admin' );
 	$random_password = substr(md5(uniqid(microtime())),0,6);
 	$User_Admin->set( 'pass', md5($random_password) );	// random
@@ -638,7 +638,7 @@ function populate_main_tables()
 	$User_Admin->setGroup( $Group_Admins );
 	$User_Admin->dbinsert();
 
-	$User_Demo = new User();
+	$User_Demo = & new User();
 	$User_Demo->set( 'login', 'demouser' );
 	$User_Demo->set( 'pass', md5($random_password) );	// random
 	$User_Demo->set( 'nickname', 'Mr. Demo' );

@@ -35,7 +35,7 @@
 		$archive_week_end_date_format   = $dateformat;
 	}
 		
-	$ArchiveList = new ArchiveList( $blog, $archive_mode, $show_statuses,	$timestamp_min, $timestamp_max, $archive_limit );
+	$ArchiveList = & new ArchiveList( $blog, $archive_mode, $show_statuses,	$timestamp_min, $timestamp_max, $archive_limit );
 	
 	while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 	{

@@ -99,7 +99,7 @@ function b2newpost($m)
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	$blog_ID = get_catblog($category);
 	$blogparams = get_blogparams_by_ID( $blog_ID );
@@ -246,7 +246,7 @@ function b2_getPostURL($m)
 	$post_ID = intval($post_ID->scalarval());
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	// Check permission:
 	if( ! $current_User->is_blog_member( $blog_ID ) )
@@ -390,7 +390,7 @@ function bloggernewpost($m)
 	
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	$post_category = xmlrpc_getpostcategory($content);
 
@@ -534,7 +534,7 @@ function bloggereditpost($m)
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	$post_category = xmlrpc_getpostcategory($content);
 
@@ -678,7 +678,7 @@ function bloggerdeletepost($m)
 
 	$userdata = get_userdatabylogin($username);
 	$user_ID = $userdata["ID"];
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	$post_category = $postdata['Category'];
 	$blog_ID = get_catblog($post_category);
@@ -755,7 +755,7 @@ function bloggergetusersblogs($m)
 	}
 
 	$userdata = get_userdatabylogin( $username );
- 	$current_User = new User( $userdata );
+ 	$current_User = & new User( $userdata );
 
 	$resp_array = array();
 	// Loop through all blogs:
@@ -1106,7 +1106,7 @@ function bloggergettemplate($m)
 	}
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'templates' ) )
@@ -1200,7 +1200,7 @@ function bloggersettemplate($m)
 	}
 
 	$userdata = get_userdatabylogin($username);
-	$current_User = new User( $userdata );
+	$current_User = & new User( $userdata );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'templates' ) )

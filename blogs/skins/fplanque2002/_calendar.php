@@ -8,7 +8,7 @@
 	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
 		die("Please, do not access this page directly.");
 	
-	$Calendar = new Calendar( $blog, (empty($calendar)?$m:$calendar), $show_statuses, $timestamp_min, $timestamp_max );
+	$Calendar = & new Calendar( $blog, (empty($calendar)?$m:$calendar), $show_statuses, $timestamp_min, $timestamp_max );
 	
 	# You can customize the following as you wish.
 	# Uncomment the lines you need

@@ -115,7 +115,7 @@ if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 if ( empty( $disp ) )
 { // If we are going to display posts and not something special...
 
-	$MainList = new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
+	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
 	
 	$posts_per_page = $MainList->posts_per_page;
 	$what_to_show = $MainList->what_to_show;

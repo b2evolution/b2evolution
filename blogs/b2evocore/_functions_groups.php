@@ -28,7 +28,7 @@ function groups_load_cache()
 		$querycount++;
 		while( $row = mysql_fetch_object($result) )
 		{
-			$cache_Groups[$row->grp_ID] = new Group( $row );
+			$cache_Groups[$row->grp_ID] = new Group( $row ); // COPY!
 		}
 	}
 }

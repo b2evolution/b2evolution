@@ -15,7 +15,7 @@
 		return false;		// Nothing to do here!
 	}
 	
-	$CommentList = new CommentList( $blog, "'comment'", $show_statuses );
+	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses );
 	
 	if( $CommentList->get_num_rows() == 0 )
 	{	// No comment has been found:
@@ -23,20 +23,19 @@
 	}
 	else 
 	{	// Loop through comments:
-		while($rowc = mysql_fetch_object($CommentList->result))
+		while($Comment = $CommentList->get_next() )
 		{	// ---------------------------- START OF COMMENTS -------------------------------
-			$commentdata = get_commentdata($rowc->comment_ID); 
 			?>
 	
-			<a name="c<?php comment_ID() ?>"></a>
+			<a name="c<?php $Comment->disp('ID', 'raw') ?>"></a>
 			<div class="bComment">
-				<h3 class="bTitle"><?php echo T_('In response to:') ?> <a href="<?php comment_post_link() ?>" title="<?php printf( T_('Original post on %s'), comment_blog_name( false ) ); ?>"><?php comment_post_title(); ?></a></h3>
-				<div class="bCommentTitle"><?php comment_author() ?> <?php comment_author_url_link("", " &middot; ", "") ?></div>
+				<h3 class="bTitle"><?php echo T_('In response to:') ?> <a href="<?php $Comment->disp('post_link', 'raw') ?>" title="<?php printf( T_('Original post on %s'), $Comment->get('blog_name') ); ?>"><?php $Comment->disp('post_title') ?></a></h3>
+				<div class="bCommentTitle"><?php $Comment->disp('author') ?> <?php $Comment->author_url_link( '', ' &middot; ', '' ) ?></div>
 				<div class="bCommentText">
-					<?php comment_text() ?>
+					<?php $Comment->text() ?>
 				</div>
 				<div class="bCommentSmallPrint">
-					<?php comment_date() ?> @ <?php comment_time("H:i") ?>
+					<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 				</div>
 			</div>
 	
