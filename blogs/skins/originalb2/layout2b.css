@@ -5,6 +5,8 @@ used as default layout for b2, with permission from Dean Peters,
 who first adapted it ( http://www.deanpeters.com/b2 )
 */
 
+@import url(../../rsc/img.css);	/* Import standard image styles */
+
 body {
 	margin:0px;
 	padding:0px;

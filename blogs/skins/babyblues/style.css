@@ -21,7 +21,9 @@ a:hover{background:#40B4C3;
          top:300px;
          left:10px;
          width:495px;
-         padding:5px;}
+         padding:5px;
+				 background-color:#FFFFFF;
+				 }
 .posted{font:10px;
         padding-left:10px;}
 .title{font-weight:bold;

@@ -1,3 +1,6 @@
+
+@import url(../rsc/img.css);	/* Import standard image styles */
+
 /* Global page layout */
 #rowheader {
 	text-align: center;
@@ -118,29 +121,6 @@ hr {
 	border: 1px solid #ccc;
 }
 
-img.top {
-	vertical-align: top;
-	border: 0px;
-}
-img.middle {
-	vertical-align: middle;
-	border: 0px;
-	margin: 0px;
-}
-.leftmargin {
-	float: left;
-	border: 0px;
-	margin-right: 1ex;
-	margin-top: .2ex;
-	margin-bottom: .2ex;
-}
-.rightmargin {
-	float: right;
-	border: 0px;
-	margin-left: 1ex;
-	margin-top: .2ex;
-	margin-bottom: .2ex;
-}
 	
 .right{
 	text-align: right;

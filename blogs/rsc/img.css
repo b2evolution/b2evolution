@@ -1,0 +1,32 @@
+/* Image styles */
+
+img.top {
+	vertical-align: top;
+	border: 0px;
+}
+
+img.middle {
+	vertical-align: middle;
+	border: 0px;
+}
+
+img.leftmargin {
+	float: left;
+	border: 0px;
+	margin-right: 1ex;
+	margin-top: .2ex;
+	margin-bottom: .2ex;
+}
+
+img.rightmargin {
+	float: right;
+	border: 0px;
+	margin-left: 1ex;
+	margin-top: .2ex;
+	margin-bottom: .2ex;
+}
+
+img.flag {
+	vertical-align: middle;
+	border: 1px;
+}

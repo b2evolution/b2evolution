@@ -1,0 +1,6 @@
+/* Standard Blog elements styles */
+
+a.permalink_right {
+	float: right;
+	border: 0px;
+}

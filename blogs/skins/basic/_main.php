@@ -58,13 +58,15 @@
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 		$MainList->date_if_changed();
+		$Item->anchor(); 
+		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 		?>
-
-		<?php $Item->anchor(); ?>
 		<h3 class="bTitle">
 			<?php $Item->issue_time(); ?>
 			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
 			<?php $Item->title(); ?>
+			&nbsp;
+			<?php locale_flag( $Item->locale, 'h10px', '', 'middle' ); // Display flag for post locale ?>
 		</h3>
 
 		<blockquote>
@@ -105,8 +107,10 @@
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		require( dirname(__FILE__)."/_feedback.php");
-		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------- ?>
+		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------- 
 
+		locale_restore_previous();	// Restore previous locale (Blog locale)
+		?>
 	<?php } // --------------------------------- END OF POSTS ----------------------------------- ?> 
 
 	<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------

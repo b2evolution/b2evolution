@@ -1,4 +1,7 @@
-/* Designed by François PLANQUE http://fplanque.net/ */
+/* Designed by François PLANQUE - http://fplanque.net/ */
+
+@import url(../../rsc/img.css);	/* Import standard image styles */
+@import url(../../rsc/blog_elements.css);	/* Import standard blog elements styles */
 
 body {
 	background-color: #FFFFFF;
@@ -78,14 +81,6 @@ blockquote {
 .center
 {
 	text-align: center;
-}
-img.top {
-	vertical-align: top;
-	border: 0px;
-}
-img.middle {
-	vertical-align: middle;
-	border: 0px;
 }
 .leftmargin {
 	float: left;

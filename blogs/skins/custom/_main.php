@@ -65,7 +65,10 @@
 		$MainList->date_if_changed();
 	?>
 	<div class="bPost" lang="<?php $Item->lang() ?>">
-		<?php $Item->anchor(); ?>
+		<?php 
+			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
+			$Item->anchor(); // Anchor for permalinks to refer to
+		?>
 		<div class="bSmallHead">
 		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
 		<?php
@@ -74,7 +77,8 @@
 			$Item->categories();
 			echo ', ';
 			$Item->wordcount();
-			echo ' ', T_('words');
+			echo ' ', T_('words'), ' &nbsp; ';
+			locale_flag( $Item->locale, 'h10px' );
 		?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -83,7 +87,7 @@
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="rightmargin"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
 		-
 		<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
@@ -99,7 +103,10 @@
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		require( dirname(__FILE__)."/_feedback.php");
-		// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ---------------- ?>
+		// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ---------------- 
+		
+		locale_restore_previous();	// Restore previous locale (Blog locale)
+		?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
 

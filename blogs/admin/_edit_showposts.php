@@ -111,7 +111,9 @@
 	{
 		?>
 		<div class="bPost<?php $Item->scope( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
-			<?php $Item->anchor(); ?>
+			<?php 
+			// We don't switch locales in the backoffice, since we use the user pref anyway
+			$Item->anchor(); ?>
 			<div class="bSmallHead">
 				<?php
 					echo '<strong>';
@@ -129,7 +131,7 @@
 					echo T_('in'), ' ';
 					$Item->categories( false );
 					echo ' - ';
-					$Item->language();
+					locale_flag( $Item->locale, 'h10px' );
 					echo ' - ', T_('Scope'), ': ';
 					$Item->scope();
 				?>
@@ -146,7 +148,7 @@
 			</div>
 
 			<p style="clear:both;">
-				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="rightmargin"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php
 				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'scope' ), false, $blog ) )
 				{
@@ -250,7 +252,7 @@
 							<?php $Comment->content() ?>
 						</div>
 						<p>
-						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment')	?>" class="rightmargin"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permamnent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 						<?php
 						if( $current_User->check_perm( 'blog_comments', '', false, $blog ) )
 						{	// If SUer has permission to edit comments:

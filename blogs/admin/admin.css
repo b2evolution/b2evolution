@@ -1,3 +1,7 @@
+
+@import url(../rsc/img.css);	/* Import standard image styles */
+@import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
+
 body {
 	margin: 0 0 0 0;
 	background-color: #FFF;
@@ -262,28 +266,7 @@ blockquote {
 .center {
 	text-align: center;
 }
-img.top {
-	vertical-align: top;
-	border: 0px;
-}
-img.middle {
-	vertical-align: middle;
-	border: 0px;
-}
-.leftmargin {
-	float: left;
-	border: 0px;
-	margin-right: 1ex;
-	margin-top: .2ex;
-	margin-bottom: .2ex;
-}
-.rightmargin {
-	float: right;
-	border: 0px;
-	margin-left: 1ex;
-	margin-top: .2ex;
-	margin-bottom: .2ex;
-}
+
 acronym {
 	border-bottom-width: 1px;
 	border-bottom-style: dotted;

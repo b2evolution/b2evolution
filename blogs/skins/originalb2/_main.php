@@ -37,13 +37,18 @@
 if( isset($MainList) ) while( $Item = $MainList->get_item() )
 {
 	$MainList->date_if_changed();
-	$Item->anchor(); 
+	locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 ?>
-<div class="storyTitle"><?php $Item->title(); ?>
-&nbsp;-&nbsp;
-Categories: <?php $Item->categories() ?>
-&nbsp;-&nbsp;
-<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->Author->prefered_name() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a>
+<div class="storyTitle">
+	<?php $Item->anchor(); ?>
+	<?php locale_flag( $Item->locale, 'h10px' ); // Display flag for post locale ?>
+	&nbsp;
+	<?php $Item->title(); ?>
+	&nbsp;-&nbsp;
+	Categories: <?php $Item->categories() ?>
+	&nbsp;-&nbsp;
+	<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->Author->prefered_name() ?></a></span>
+	@ <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a>
 </div>
 
 <div class="storyContent">
@@ -86,12 +91,14 @@ Categories: <?php $Item->categories() ?>
 		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		$disp_title = "Pingbacks:";
-		require( dirname(__FILE__)."/_feedback.php");
+		require( dirname(__FILE__)."/_feedback.php");		
 ?>
 
 </div>
 
 </div>
+
+<?php	locale_restore_previous();	// Restore previous locale (Blog locale) ?>
 
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?> 
 
