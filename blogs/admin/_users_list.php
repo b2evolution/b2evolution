@@ -7,7 +7,7 @@
  */
 ?>
 <div class="panelblock">
-	<h2><?php echo T_('Users') ?></h2>
+	<h2><?php echo T_('Groups &amp; Users') ?></h2>
 	<?php
 	$request = "SELECT $tableusers.*, grp_ID, grp_name FROM $tableusers RIGHT JOIN $tablegroups ON user_grp_ID = grp_ID ORDER BY grp_name, user_login";
 	$querycount++; 
@@ -26,14 +26,14 @@
 	<?php 
 	$loop_prev_grp_ID = 0;
 	while($row = mysql_fetch_array($result) )
-	{
+	{	// For each line (can be a user/group or just an empty group)
 		$loop_grp_ID = $row['grp_ID'];
 		if( $loop_prev_grp_ID != $loop_grp_ID )
 		{	// We just entered a new group!
 			?>
-			<tr>
+			<tr class="group">
 				<td colspan="7">
-					<strong><?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></strong>
+					<strong><a href="b2users.php?action=groupedit&amp;grp_ID=<?php echo $loop_grp_ID ?>"><?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></a></strong>
 				</td>
 			</tr>
 			<?php
@@ -41,13 +41,13 @@
 		}
 
 		if( !empty( $row['ID'] ) )
-		{	// We have a user here:
+		{	// We have a user here: (i-e group was not empty)
 			$loop_User = new User( $row );
 			echo "<tr>\n";
 			$email = $loop_User->get('email');
 			$url = $loop_User->get('url');
 			echo "<td>", $loop_User->get('ID'), "</td>\n";
-			echo '<td><a href="b2users.php?action=view&amp;user=', $loop_User->get('ID'), '">', $loop_User->get('login'), "</a></td>\n";
+			echo '<td><a href="b2users.php?action=useredit&amp;user=', $loop_User->get('ID'), '">', $loop_User->get('login'), "</a></td>\n";
 			?>
 			<td><?php $loop_User->disp('nickname') ?></td>
 			<?php
@@ -76,4 +76,16 @@
 </table>
 </div>
 
-
+<?php 
+	if ($user_level >= 3) 
+	{ ?>
+		<div class="panelblock">
+			<?php	
+			echo '<p>[<a href="', $htsrv_url, '/register.php?redirect_to=', $admin_url, '/b2users.php">', T_('Register a new user...'), '</a>]</p>'; ?>
+	
+			<p><?php echo T_('To delete an user, bring his/her level to zero, then click on the red cross.') ?><br />
+			<strong><?php echo T_('Warning') ?>:</strong> <?php echo T_('deleting an user also deletes all posts made by this user.') ?></p>
+		</div>
+	<?php
+	}
+?>

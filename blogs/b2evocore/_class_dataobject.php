@@ -15,6 +15,7 @@ class DataObject
 {
 	var	$dbtablename;
 	var $dbprefix;
+	var $dbIDname;
 	var $dbchanges = array();
 	var	$ID = 0;		// This will be the ID in the DB
 
@@ -23,10 +24,11 @@ class DataObject
 	 *
 	 * Constructor
 	 */
-	function DataObject( $tablename, $prefix = '' )
+	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID' )
 	{
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
+		$this->dbIDname = $dbIDname;
 	}	
 	
 	/* 
@@ -52,11 +54,11 @@ class DataObject
 
 
 	/* 
-	 * User::set(-)
+	 * User::set_param(-)
 	 *
 	 * Set param value
 	 */
-	function set( $parname, $fieldtype, $parvalue )
+	function set_param( $parname, $fieldtype, $parvalue )
 	{
 		// Set value:
 		$this->$parname = $parvalue;
@@ -108,7 +110,7 @@ class DataObject
 		}
 
 		// Prepare full statement:
-		$sql = "UPDATE $this->dbtablename SET ".implode( ', ', $sql_changes )." WHERE ID = $this->ID";
+		$sql = "UPDATE $this->dbtablename SET ".implode( ', ', $sql_changes )." WHERE $this->dbIDname = $this->ID";
 		//echo $sql;
 
 		$querycount++;

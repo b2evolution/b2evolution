@@ -23,7 +23,7 @@ class Group extends DataObject
 		global $tablegroups;
 		
 		// Call parent constructor:
-		parent::DataObject( $tablegroups, 'grp_' );
+		parent::DataObject( $tablegroups, 'grp_', 'grp_ID' );
 	
 		if( $db_row == NULL )
 		{
@@ -42,6 +42,23 @@ class Group extends DataObject
 		}
 	}	
 	
+	/* 
+	 * Group::set(-)
+	 *
+	 * Set param value
+	 */
+	function set( $parname, $parvalue )
+	{
+		switch( $parname )
+		{
+			case 'noparamyet':
+				parent::set_param( $parname, 'int', $parvalue );
+			break;
+			
+			default:
+				parent::set_param( $parname, 'string', $parvalue );
+		}
+	}
 	
 }
 ?>

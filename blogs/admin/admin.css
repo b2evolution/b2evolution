@@ -669,3 +669,12 @@ td.bCalendarEmptyCell {
 a.bCalendarLinkPost {
 	font-weight: bold;
 }
+
+tr.group {
+	font-weight: bold;
+	background-color: #eee;
+}
+label.radiooption {
+	white-space: nowrap;
+	margin-right: 1em;
+}

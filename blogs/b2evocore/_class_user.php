@@ -136,11 +136,11 @@ class User extends DataObject
 			// case 'icq':		// Dangerous: easy to forget it's not a string
 			case 'level':
 			case 'notify':
-				parent::set( $parname, 'string', $parvalue );
+				parent::set_param( $parname, 'int', $parvalue );
 			break;
 			
 			default:
-				parent::set( $parname, 'string', $parvalue );
+				parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 

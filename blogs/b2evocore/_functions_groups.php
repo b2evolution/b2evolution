@@ -35,10 +35,13 @@ function Group_get_by_ID( $grp_ID )
 {
 	global $cache_Groups, $use_cache;
 	
-	if ((empty($cache_Groups)) OR (!$use_cache)) 
+	if((empty($cache_Groups)) OR (!$use_cache)) 
 	{
 		groups_load_cache();
 	}
+
+	if( empty( $cache_Groups[ $grp_ID ] ) ) die('Requested group does not exist!');
+
 	return $cache_Groups[ $grp_ID ];
 }
 

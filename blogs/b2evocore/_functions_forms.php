@@ -54,6 +54,30 @@ function form_select(
 
 
 /*
+ * form_radio(-)
+ */
+function form_radio( 
+	$field_name, 
+	$field_value, 
+	$field_options, 
+	$field_label )
+{
+	echo '<fieldset>';
+	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="input">';
+	foreach( $field_options as $loop_field_option )
+	{
+		echo '<label class="radiooption"><input type="radio" name="', $field_name, '" value="', $loop_field_option[0], '"'; 
+		if( $field_value == $loop_field_option[0] )
+		{
+			echo ' checked="checked"'; 
+		}
+		echo '> ', $loop_field_option[1], '</label> ';
+	} 
+	echo "</fieldset>\n\n";
+}
+
+/*
  * form_checkbox(-)
  */
 function form_checkbox( $field_name, $field_value, $field_label, $field_note = '', $field_class = '' )
