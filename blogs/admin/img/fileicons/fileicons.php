@@ -22,6 +22,11 @@ $this->fileicons_special = array(
 	
 	'ascending' => 'ascending.png',
 	'descending' => 'descending.png',
+	
+	'edit' => 'edit.png',
+	'copymove' => 'editcopy.png',
+	'rename' => 'item_rename.png',
+	'delete' => 'editdelete.png',
 	);
 
 

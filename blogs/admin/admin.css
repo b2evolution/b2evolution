@@ -637,7 +637,7 @@ table.fileman td.type {
 }
 table.fileman td.filename {
 	text-align: left;
-	width: 37%;
+	width: 50%;
 	font-size: 100%;
 }
 table.fileman td.timestamp {
@@ -648,12 +648,15 @@ table.fileman td.timestamp {
 }
 table.fileman td.size {
 	text-align: right;
-	width:8%;
+	width:10%;
 }
 table.fileman td.actions {
 	text-align: right;
 	white-space: nowrap;
-	width:25%;
+	width:10%;
+}
+table.fileman td.actions img {
+	margin-left:5px;
 }
 table.fileman tr.toprow, tr.bottomrow td input {
 	font-size: 84%;

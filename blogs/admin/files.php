@@ -189,7 +189,7 @@ if( $selaction != '' )
 		
 		case T_('Download'):
 			param( 'zipname', 'string', '' );
-			param( 'recursesd', 'integer', 1 );
+			param( 'exclude_sd', 'integer', 0 );
 			
 			if( empty($zipname) )
 			{
@@ -226,7 +226,7 @@ if( $selaction != '' )
 					<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
 					<?php
 					form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.') );
-					form_checkbox( 'recursesb', $recursesd, T_('Recurse subdirectories'), T_('This will include subdirectories of directories.') );
+					form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.') );
 					?>
 					<div class="input"><input type="submit" name="selaction" value="<?php echo T_('Download') ?>" class="search" /></div>
 				</fielset>
@@ -242,7 +242,7 @@ if( $selaction != '' )
 				$options = array (
 					'basedir' => $Fileman->cwd,
 					'inmemory' => 1,
-					'recurse' => $recursesd,
+					'recurse' => 1-$exclude_sd,
 				);
 					
 				$zipfile = new zip_file( $zipname );
@@ -378,9 +378,9 @@ if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
 
 <tr>
 	<th colspan="2" style="white-space:nowrap;">
-		<a href="<?php $Fileman->cdisp('link', 'home') ?>"><?php echo $Fileman->icon('home', 'imgtag') ?></a>
+		<a href="<?php $Fileman->cdisp('link', 'home') ?>"><?php echo $Fileman->icon( 'home', 'imgtag' ) ?></a>
 		&nbsp;
-		<a href="<?php $Fileman->cdisp('link', 'parent') ?>"><?php $Fileman->cdisp('iconimg', 'parent') ?></a>
+		<a href="<?php $Fileman->cdisp('link', 'parent') ?>"><?php echo $Fileman->icon( 'parent', 'imgtag' ) ?></a>
 	</th>
 	<th><?php echo $Fileman->link_sort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->link_sort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
@@ -409,7 +409,7 @@ while( $Fileman->next() )
 	?>
 	<tr style="background:<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>" onmouseout="this.style.background='<?php echo ( $i%2 ) ? '#fff' : '#eee' ?>'" onmouseover="this.style.background='#ddd'" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $Fileman->cdisp('name'), 'formvalue' ) ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $Fileman->cget('name'), 'formvalue' ) ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i-1 ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
 		<td class="icon" onclick="window.location.href = '<?php $Fileman->cdisp('link') ?>'">
 			<?php /*echo $i++;*/ $Fileman->cdisp('iconimg') ?>
@@ -431,10 +431,10 @@ while( $Fileman->next() )
 		<td class="timestamp"><?php $Fileman->cdisp('lastmod') ?></td>
 		<td class="perms"><?php $Fileman->cdisp( 'link_editperm', '', '<a href="%s">'.$Fileman->cget('perms', 'octal').'</a>' ) ?></td>
 		<td class="actions"><?php
-			$Fileman->cdisp( 'link_edit', '', '<a href="%s">['./* TRANS: edit file */ T_('Edit').']</a>' );
-			$Fileman->cdisp( 'link_copymove', '', '<a href="%s">['./* TRANS: file copy/move */ T_('Copy / Move').']</a>' );
-			$Fileman->cdisp( 'link_rename', '', '<a href="%s">['./* TRANS: file rename */ T_('Rename').']</a>' );
-			$Fileman->cdisp( 'link_delete', '', '<a href="%s">['./* TRANS: delete file */ T_('Delete').']</a>' );
+			$Fileman->cdisp( 'link_edit', '', '<a href="%s">'.$Fileman->icon( 'edit', 'imgtag' ).'</a>' );
+			$Fileman->cdisp( 'link_copymove', '', '<a href="%s">'.$Fileman->icon( 'copymove', 'imgtag' ).'</a>' );
+			$Fileman->cdisp( 'link_rename', '', '<a href="%s">'.$Fileman->icon( 'rename', 'imgtag' ).'</a>' );
+			$Fileman->cdisp( 'link_delete', '', '<a href="%s">'.$Fileman->icon( 'delete', 'imgtag' ).'</a>' );
 			// TODO: action link
 			?></td>
 	</tr>
@@ -450,11 +450,15 @@ if( $i == 0 )
 	</tr>
 	<?php
 }
-else
+
+?>
+<tr class="bottomrow">
+
+<td colspan="4">
+<?php
+if( $i != 0 )
 {
 	?>
-	<tr class="bottomrow">
-	<td colspan="6">
 		<script type="text/javascript">
 		<!--
 		document.write('<a href="#" onclick="toggleCheckboxes(\'FilesForm\', \'selectedfiles[]\');" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>"><span id="checkallspan_0"><?php echo T_('(un)check all')?></span></a>');
@@ -472,22 +476,21 @@ else
 		<input type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return confirm('<?php echo /* This is a Javascript string! */ T_('Do you really want to delete the selected files?') ?>')" />
 		<input type="submit" name="selaction" value="<?php echo T_('Download') ?>" />
 		<input type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" />
-	</td>
-	
-	<td colspan="2" style="text-align:right">
-		<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
-		<select name="createnew">
-			<option value="file"><?php echo T_('file') ?></option> 
-			<option value="dir"><?php echo T_('directory') ?></option> 
-		</select>
-		<input type="text" name="createname" value="" size="20" /> 
-		<input type="submit" name="action" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
-	</td>
-	
-	</tr>
-	<?php
+<?php
 }
 ?>
+</td>
+<td colspan="4" style="text-align:right">
+	<input type="hidden" name="cd" value="<?php echo format_to_output( $cd, 'formvalue' ) ?>" />
+	<select name="createnew">
+		<option value="file"><?php echo T_('file') ?></option> 
+		<option value="dir"><?php echo T_('directory') ?></option> 
+	</select>
+	<input type="text" name="createname" value="" size="20" /> 
+	<input type="submit" name="action" value="<?php echo format_to_output( T_('Create new'), 'formvalue' ) ?>" />
+</td>
+
+</tr>
 </table>
 </form>
 

@@ -21,13 +21,11 @@ class FileManager
 	var $orderasc = '#'; // '#' is default and means ascending for 'name', descending for the rest
 
 
+	// --- going to user options ---
 	var $showhidden = true;
 	var $permlikelsl = true; // show permissions like "ls -l" or octal?
-
-
 	var $default_chmod_file = 0700;
 	var $default_chmod_dir = 0700;
-
 	var $dirsattop = true;
 	var $fulldirsize = false;
 
@@ -540,7 +538,7 @@ class FileManager
 				break;
 
 			case 'iconimg':
-				$r = $this->icon( $param, 'imgtag', $param );	
+				$r = $this->icon( 'cfile', 'imgtag', $param );	
 				break;
 
 			default:
@@ -646,7 +644,8 @@ class FileManager
 
 		if( !$iconfile || !file_exists( $this->imgpath.'/'.$iconfile ) )
 		{
-			return false;
+			#return false;
+			return '<span class="small">[no image for '.$for.'!]</small>';
 		}
 
 		switch( $what )
@@ -717,6 +716,14 @@ class FileManager
 			$r = T_('descending');
 		elseif( $param == 'ascending' )
 			$r = T_('ascending');
+		elseif( $param == 'edit' )
+			$r = T_('Edit');
+		elseif( $param == 'copymove' )
+			$r = T_('Copy/Move');
+		elseif( $param == 'rename' )
+			$r = T_('Rename');
+		elseif( $param == 'delete' )
+			$r = T_('Delete');
 		else $r = false;
 		
 		return $r;
