@@ -388,6 +388,14 @@ div.panelblock {
 	margin: 1px;
 	padding: .5ex;
 }
+#mainmenu li.current {
+	background: #fff;
+	font-weight: bold;
+}
+#mainmenu li:hover{
+	background: #cde;
+	font-weight: bold;
+}
 ul.tabs {
 	margin:0;
 	/* clear: both; */

@@ -67,7 +67,7 @@
 	}
 ?>
 </ul>
-<p><?php echo $app_shortname; ?> v <strong><?php echo $app_version ?></strong></p>
+<p class="center"><?php echo $app_shortname; ?> v <strong><?php echo $app_version ?></strong></p>
 </div>
 
 <div class="panelbody">
@@ -82,4 +82,3 @@
 		echo '</div>';
 	}
 ?>
-
