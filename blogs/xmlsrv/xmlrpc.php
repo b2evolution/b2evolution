@@ -1229,7 +1229,7 @@ function pingback_ping( $m )
 
 	// Check if the page linked to is in our site
 	// fplanque: TODO: coz we don't have a single siteurl any longer
-	$pos1 = strpos( $pagelinkedto, preg_replace( array('#^http://(www\.)?#'), '', $baseurl ));
+	$pos1 = strpos( $pagelinkedto, preg_replace( '#^https?://(www\.)?#', '', $baseurl ));
 	if( $pos1 !== false )
 	{
 		// let's find which post is linked to

@@ -231,7 +231,7 @@ function blogperms_get_easy( $perms )
 }
 
 
-function blogperms_from_easy( $easy_group, &$default = array() )
+function blogperms_from_easy( $easy_group )
 {
 	$r = array(
 		'bloguser_ismember' => 0,

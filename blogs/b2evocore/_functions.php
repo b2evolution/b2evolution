@@ -1112,8 +1112,6 @@ function pre_dump($dump, $title = '', $output = 1 )
 	}
 }
 
-}
-
 
 /**
  * Outputs debug info. (Typically at the end of the page)
