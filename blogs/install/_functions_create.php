@@ -716,21 +716,20 @@ function populate_main_tables()
 
 	echo 'Creating default settings... ';
 	// SETTINGS!
-	$query = "REPLACE INTO $tablesettings ( set_name, set_value ) VALUES
-						( 'db_version', '$new_db_version' ),
-						( 'default_locale', '$default_locale' ),
-						( 'posts_per_page', '5' ),
-						( 'what_to_show', 'paged' ),
-						( 'archive_mode', 'monthly' ),
-						( 'time_difference', '0' ),
-						( 'autoBR', '1' ),
-						( 'antispam_last_update', '2000-01-01 00:00:00' ),
-						( 'newusers_grp_ID', '".$Group_Users->get('ID')."' ),
-						
-						( 'newusers_level', '1' ),
-						( 'newusers_canregister', '0' ),
-						( 'links_extrapath', '0' ),
-						( 'permalink_type', 'urltitle' )";
+	$query = "INSERT INTO $tablesettings ( set_name, set_value ) 
+						VALUES ( 'db_version', '$new_db_version' ),
+										( 'default_locale', '$default_locale' ),
+										( 'posts_per_page', '5' ),
+										( 'what_to_show', 'paged' ),
+										( 'archive_mode', 'monthly' ),
+										( 'time_difference', '0' ),
+										( 'autoBR', '1' ),
+										( 'antispam_last_update', '2000-01-01 00:00:00' ),
+										( 'newusers_grp_ID', '".$Group_Users->get('ID')."' ),
+										( 'newusers_level', '1' ),
+										( 'newusers_canregister', '0' ),
+										( 'links_extrapath', '0' ),
+										( 'permalink_type', 'urltitle' )";
 	$DB->query( $query );
 
 	echo "OK.<br />\n";
