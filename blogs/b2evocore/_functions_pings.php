@@ -80,7 +80,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 	}
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test ) 
 	{
-		if( $test )
+		if( $test == 2 )
 		{
 		 	$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
 			$client->debug = 1;
@@ -96,7 +96,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 															new xmlrpcval('user'),		// Reserved
 															new xmlrpcval('pass'),		// Reserved
 															new xmlrpcval($abuse_string), 
-															new xmlrpcval($baseurl),
+															new xmlrpcval($baseurl)
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );

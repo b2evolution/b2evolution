@@ -160,7 +160,9 @@ switch( $action )
 		}
 		else
 		{	// BAN a keyword + (if requested) DELETE stats entries and comments:
-			keyword_ban( get_domain_from_hit_ID($hit_ID) );
+			$keyword = get_domain_from_hit_ID($hit_ID);
+			// echo "keyword:",$keyword;
+			keyword_ban( $keyword );
 		}
 		break;
 		
@@ -180,6 +182,13 @@ switch( $action )
 		</div>
 		<?php
 		break;
+
+	case 'report':
+		// Report an entry as abuse to centralized blacklist:
+		param( 'keyword', 'string', true );	// Required!
+		// Report this keyword as abuse:
+		b2evonet_report_abuse( $keyword );
+		break;
 }
 ?>
 
@@ -194,6 +203,7 @@ switch( $action )
 				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
 				<?php antiSpam_domain() ?>
 			</td>
+			<td>[<a href="b2antispam.php?action=report&keyword=<?php antiSpam_domain() ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>">Report</a>]</td>
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
