@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Displays group properties form
  * Called by {@link b2users.php}
@@ -13,7 +13,46 @@
  */
 ?>
 <div class="panelblock">
-	<div style="float:right;"><a title="<?php echo T_('Close group profile'); ?>" href="b2users.php">[ X ]</a></div>
+	<div style="float:right;">
+	<?php
+		if( $group > 0 )
+		{	// Links to next/previous group
+
+			$prevgroupid = 0;
+			$nextgroupid = 0;
+
+			$query = "SELECT MAX(grp_ID), MIN(grp_ID) FROM $tablegroups";
+			$gminmax = $DB->get_row( $query, ARRAY_A );
+
+			foreach( $GroupCache->cache as $fgroup )
+			{ // find prev/next id
+				#pre_dump( $fgroup->ID );
+				if( $fgroup->ID < $group )
+				{
+					if( $fgroup->ID > $prevgroupid )
+					{
+						$prevgroupid = $fgroup->ID;
+						$prevgroupname = $fgroup->name;
+					}
+				}
+				elseif( $fgroup->ID > $group )
+				{
+					if( $fgroup->ID < $nextgroupid || $nextgroupid == 0 )
+					{
+						$nextgroupid = $fgroup->ID;
+						$nextgroupname = $fgroup->name;
+					}
+				}
+			}
+
+			echo ( $group != $gminmax['MIN(grp_ID)'] ) ? '<a title="'.T_('first group').'" href="?group='.$gminmax['MIN(grp_ID)'].'">[&lt;&lt;]</a>' : '[&lt;&lt;]';
+			echo ( $prevgroupid ) ? '<a title="'.T_('previous group').' ('.$prevgroupname.')" href="?group='.$prevgroupid.'">[&lt;]</a>' : '[&lt;]';
+			echo ( $nextgroupid ) ? '<a title="'.T_('next group').' ('.$nextgroupname.')" href="?group='.$nextgroupid.'">[&gt;]</a>' : '[&gt;]';
+			echo ( $group != $gminmax['MAX(grp_ID)'] ) ? '<a title="'.T_('last group').'" href="?group='.$gminmax['MAX(grp_ID)'].'">[&gt;&gt;]</a>' : '[&gt;&gt;]';
+		}
+		?>
+
+	<a title="<?php echo T_('Close group profile'); ?>" href="b2users.php">[ X ]</a></div>
 	<h2><?php
 	if( $edited_Group->get('ID') == 0 )
 	{
@@ -21,36 +60,36 @@
 	}
 	else
 	{
-		echo T_('Editing group:').' '.( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') );
+		echo T_('Editing group:').' '.( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ).' ('.T_('ID').' '.$edited_Group->get('ID').')';
 	}
 	?></h2>
 
 	<form class="fform" method="post" action="b2users.php">
 		<input type="hidden" name="action" value="groupupdate" />
 		<input type="hidden" name="edited_grp_ID" value="<?php $edited_Group->disp('ID','formvalue') ?>" />
-	
+
 		<fieldset>
 			<legend><?php echo T_('General') ?></legend>
 			<input type="hidden" name="edited_grp_oldname" value="<?php echo ( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ) ?>" />
-			<?php 
+			<?php
 				form_text( 'edited_grp_name', $edited_Group->get('name'), 50, T_('Name'), '', 50, 'large' );
 			?>
 		</fieldset>
 
 		<fieldset>
 			<legend><?php echo T_('Permissons for members of this group') ?></legend>
-			<?php 
-				form_radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'), 
+			<?php
+				form_radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 						array(  array( 'user', T_('User permissions') ),
 										array( 'viewall', T_('View all') ),
 										array( 'editall', T_('Full Access') )
 									), T_('Blogs') );
-				form_radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'), 
+				form_radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 						array(  array( 'none', T_('No Access') ),
 										array( 'view', T_('View only') ),
 										array( 'edit', T_('Full Access') )
 									), T_('Statistics') );
-				form_radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'), 
+				form_radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
 						array(  array( 'none', T_('No Access') ),
 										array( 'view', T_('View only') ),
 										array( 'edit', T_('Full Access') )
@@ -76,8 +115,8 @@
 				}
 			?>
 		</fieldset>
-	
-		<?php 
+
+		<?php
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{ ?>
 		<fieldset>
@@ -88,8 +127,8 @@
 				</div>
 			</fieldset>
 		</fieldset>
-		<?php } ?>	
-		
+		<?php } ?>
+
 		<div class="clear"></div>
 	</form>
 

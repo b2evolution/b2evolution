@@ -12,7 +12,6 @@
  */
 ?>
 <div class="panelblock" style="vertical-align:top">
-<form class="fform" method="post" action="b2users.php<?php if( $user != 0 ) echo '?user='.$user?>">
 	<div style="float:right">
 		<?php
 		if( $user > 0 )
@@ -65,11 +64,11 @@
 	}	
 	?></h2>
 	
-	
 	<table align="center">
 	<tr><td>
 	<fieldset>
 
+	<form class="fform" method="post" action="b2users.php<?php if( $user != 0 ) echo '?user='.$user?>">
 		<input type="hidden" name="action" value="userupdate" />
 		<input type="hidden" name="edited_user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
 		<input type="hidden" name="edited_user_oldlogin" value="<?php echo ( isset($edited_user_oldlogin)? $edited_user_oldlogin : $edited_User->get('login') ) ?>" />
