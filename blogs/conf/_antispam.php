@@ -26,6 +26,7 @@ $block_urls = array(
 	'menguma.com',
 	'gdough.com',
 	'online-hgh.com',
+	'shop-opyt.com',
 // Light spammers:
 	'pcfamily.ch',
 	'nositeyet.com',

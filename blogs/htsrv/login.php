@@ -31,7 +31,7 @@ switch($action)
 		header("Pragma: no-cache");
 
 		param( 'redirect_to', 'string', $_SERVER['HTTP_REFERER'] );
-		$location = isset($redirect_to) ? $redirect_to : $baseurl.'/' ;
+		$location = empty($redirect_to) ? $baseurl.'/' : $redirect_to;
 		header("Refresh:0;url=$location");
 		exit();
 		break; // case 'logout'
