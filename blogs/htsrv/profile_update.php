@@ -17,7 +17,7 @@ param( 'newuser_firstname', 'string', '' );
 param( 'newuser_lastname', 'string', '' );
 param( 'newuser_nickname', 'string', '' );
 param( 'newuser_idmode', 'string', '' );
-param( 'newuser_locale', 'string', 'en-EU' );
+param( 'newuser_locale', 'string', $default_locale );
 param( 'newuser_icq', 'string', '' );
 param( 'newuser_aim', 'string', '' );
 param( 'newuser_msn', 'string', '' );
