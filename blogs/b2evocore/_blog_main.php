@@ -205,9 +205,9 @@ if( !isset($skin) ) // Check if this has been forced in stub
 	else
 	{
 		// Get the saved skin in cookie or default:
-		param( $cookie_skin, 'string', $default_skin );
+		param( $cookie_state, 'string', $default_skin );
 		// Get skin by params or default to cookie
-		param( 'skin', 'string', $$cookie_skin );
+		param( 'skin', 'string', $$cookie_state );
 	}
 }
 
@@ -232,7 +232,7 @@ if( !empty( $skin ) )
 	{	// We have just asked for the skin explicitely
 		// Set a cookie to remember it:
 		// Including config and functions files
-		if( ! setcookie( $cookie_skin, $skin, $cookie_expires, $cookie_path, $cookie_domain) )
+		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $cookie_path, $cookie_domain) )
 		{	// This damn failed !
 			echo "<p>setcookie failed!</p>";
 		}
