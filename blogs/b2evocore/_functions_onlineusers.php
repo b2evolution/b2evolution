@@ -54,7 +54,8 @@ function online_user_display( $before = '', $after = '' )
 
 	$sql = "SELECT sess_userid
 		FROM $tablesessions
-		WHERE " . $tablesessions . ".sess_time > '" . ( time() - $online_session_timeout ) . "'";
+		WHERE sess_userid != 0 
+		AND " . $tablesessions . ".sess_time > '" . ( time() - $online_session_timeout ) . "'";
 
 	$rows = $DB->get_results( $sql, ARRAY_A );
 	$users['guests'] = 0;
@@ -79,7 +80,7 @@ function online_user_display( $before = '', $after = '' )
 
 	$users['guests'] += $DB->get_var( "SELECT count(*)
 						FROM $tablesessions 
-						WHERE sess_userid=''");
+						WHERE sess_userid='0'");
 
 	// Return the number of registered users and the number of guests
 	return $users;
