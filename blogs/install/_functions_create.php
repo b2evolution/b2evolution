@@ -268,7 +268,7 @@ function create_b2evo_tables()
 	// Additionnal tables:
 	create_antispam();
 	create_locales();
-	create_b2evo_tables_091();
+	create_b2evo_tables_092();
 
 
 	// Create relations:
@@ -928,9 +928,9 @@ function populate_main_tables()
 
 
 /**
- * Create new tables for version 0.9.1
+ * Create new tables for version 0.9.2
  */
-function create_b2evo_tables_091()
+function create_b2evo_tables_092()
 {
 	global $DB;
 

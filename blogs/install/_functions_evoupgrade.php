@@ -488,10 +488,10 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8070 )
-	{ // ---------------------------------- upgrade to 0.9.1
+	{ // ---------------------------------- upgrade to 0.9.2
 
 		// New tables:
-		create_b2evo_tables_091();
+		create_b2evo_tables_092();
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
@@ -643,6 +643,9 @@ function upgrade_b2evo_tables()
 		$DB->query( 'ALTER TABLE T_locales
 									ADD loc_startofweek TINYINT UNSIGNED NOT NULL AFTER loc_timefmt' );
 		echo "OK.<br />\n";
+
+
+		// TODO: alter T_hitlog!
 
 
 		// Create relations:

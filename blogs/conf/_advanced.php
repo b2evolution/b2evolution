@@ -205,6 +205,8 @@ $db_aliases = array(
 		'T_plugins'      => $tableprefix.'plugins',
 		'T_files'        => $tableprefix.'files',
 		'T_links'        => $tableprefix.'links',
+		'T_basedomains'  => $tableprefix.'basedomains',
+		'T_useragents'   => $tableprefix.'useragents',
 	);
 
 

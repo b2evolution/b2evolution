@@ -1,6 +1,8 @@
 <?php
 /**
- * This is b2evolution's stats config file
+ * This is b2evolution's stats config file.
+ *
+ * @deprecated TODO: It holds now just things that should be move around due to hitlog refactoring.
  *
  * This file sets how b2evolution will log hits and stats
  * Last significant changes to this file: version 0.9.1
@@ -18,6 +20,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * How many days of stats do you want to keep before auto pruning them?
  *
  * Set to 0 to disable auto pruning
+ *
+ * @todo Use $Settings
  *
  * @global int $stats_autoprune
  */
@@ -37,6 +41,8 @@ $stats_autoprune = 30; // Default: 30 days
  * WARNING: you should *NOT* use a slash at the end of simple domain names, as
  * older Netscape browsers will not send these. For example you should list
  * http://www.example.com instead of http://www.example.com/ .
+ *
+ * @todo Use T_basedomains..
  *
  * TODO: handle multiple blog roots.
  *
@@ -64,6 +70,8 @@ $blackList = array(
  *
  * The following substrings will be looked up in the referer http header
  * in order to identify search engines
+ *
+ * @todo Use T_useragents..
  *
  * @global array $search_engines
  */
@@ -120,6 +128,8 @@ $search_engines = array(
  *
  * The following substrings will be looked up in the user_agent http header
  *
+ * @todo Use T_useragents..
+ *
  * @global array $user_agents
  */
 $user_agents = array(
@@ -155,23 +165,26 @@ $user_agents = array(
  *
  * WARNING: this is very time consuming!
  *
+ * @todo use $Settings
+ *
  * @global boolean $doubleCheckReferers
  */
 $doubleCheckReferers = 0;		// Set to 1 to enable double checking
 
 
+// TODO: move to Hit object members
 # Do not change the following unless you know what you're doing...
 # Due to potential non-thread safety, we'd better do this early
 if( !isset( $HTTP_REFERER ) )
-{	// If this magic variable is not already set:
+{ // If this magic variable is not already set:
 	if( isset($_SERVER['HTTP_REFERER']) )
-	{	// This would be the best way to get the referrer,
+	{ // This would be the best way to get the referrer,
 		// unfortunatly, it's not always avilable!! :[
 		// If someone has a clue about this, I'd like to hear about it ;)
 		$HTTP_REFERER = $_SERVER['HTTP_REFERER'];
 	}
 	else
-	{	// Fallback method (not thread safe :[[ )
+	{ // Fallback method (not thread safe :[[ )
 		$HTTP_REFERER = getenv('HTTP_REFERER');
 	}
 }

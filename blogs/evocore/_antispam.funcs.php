@@ -33,7 +33,7 @@
  *
  * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/). 
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
@@ -115,6 +115,9 @@ function antispam_delete( $string_ID )
 function antispam_url( $url )
 {
 	global $DB, $cache_antispam, $Debuglog;
+
+	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
+	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
 
 	if( !isset($cache_antispam))
 	{ // Cache not loaded, load now:
@@ -285,6 +288,9 @@ function b2evonet_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/25 02:26:37  blueyed
+ * start of hitlog refactoring
+ *
  * Revision 1.4  2004/10/17 20:18:37  fplanque
  * minor changes
  *
