@@ -98,11 +98,11 @@ if ($use_spellchecker)
 
 		<span class="line">
 		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="45" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
+		<input type="text" name="post_title" size="50" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
 		</span>
 
 		<span class="line">
-		<label for="post_locale"><strong><?php echo T_('Lang/Locale') ?>:</strong></label>
+		<label for="post_locale"><strong><?php echo T_('Language') ?>:</strong></label>
 		<select name="post_locale" id="post_lang" tabindex="2"><?php locale_options( $post_locale ) ?></select>
 		</span>
 

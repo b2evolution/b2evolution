@@ -17,6 +17,7 @@
  */
 if( ($use_l10n == 1) && function_exists('_') )
 {	// We are going to use GETTEXT
+
 	function T_( $string, $req_locale = '' )
 	{
 		global $current_messages;
@@ -28,9 +29,11 @@ if( ($use_l10n == 1) && function_exists('_') )
 		// We have asked for a funky locale... we'll get english instead:
 		return $string;
 	}
+
 }
 elseif( $use_l10n == 2 )
 {	// We are going to use b2evo localization:
+
 	function T_( $string, $req_locale = '' )
 	{
 		global $trans, $current_messages;
@@ -45,7 +48,7 @@ elseif( $use_l10n == 2 )
 		#echo locale_messages($req_locale); exit;
 		if( !isset($trans[ $current_messages ] ) )
 		{	// Translations for current locale have not yet been loaded:
-			@include_once( dirname(__FILE__). '/../locales/'. $locales[ $req_locale ][ 'messages' ]. '/_global.php' );
+			@include_once( dirname(__FILE__). '/../locales/'. $current_messages. '/_global.php' );
 			if( !isset($trans[ $current_messages ] ) )
 			{	// Still not loaded... file doesn't exist, memorize that no translation are available
 				$trans[ $current_messages ] = array();
@@ -62,13 +65,16 @@ elseif( $use_l10n == 2 )
 		// Return the English string:
 		return $string;
 	}
+
 }
 else
 {	// We are not localizing at all:
+
 	function T_( $string, $req_locale = '' )
 	{	
 		return $string;
 	}
+
 }
 
 
@@ -89,7 +95,6 @@ function locale_activate( $locale )
 	// Memorize new locale:
 	$current_locale = $locale;
 	// Memorize new charset:
-	#$current_charset = $locales[ $locale ][ 'charset' ];
 	$current_charset = $locales[ $locale ][ 'charset' ];
 	$current_messages = $locales[ $locale][ 'messages' ];
 
