@@ -231,7 +231,7 @@ function get_userid($user_login)
 /*
  * get_usernumposts(-)
  */
-function get_usernumposts($userid) 
+function get_usernumposts( $userid ) 
 {
 	global $tableusers,$tablesettings,$tablecategories,$tableposts,$tablecomments,$querycount;
 	$sql = "SELECT count(*) AS count FROM $tableposts WHERE post_author = $userid";
@@ -256,6 +256,18 @@ function get_user_info( $show='', $this_userdata = '' )
 
 	switch( $show ) 
 	{
+		case 'ID':
+			$output = $this_userdata['ID'];
+			break;
+
+		case 'level':
+			$output = $this_userdata['user_level'];
+			break;
+
+		case 'num_posts':
+			$output = get_usernumposts( $this_userdata['ID'] );
+			break;
+
 		case 'firstname':
 			$output = $this_userdata['user_firstname'];
 			break;
@@ -263,6 +275,40 @@ function get_user_info( $show='', $this_userdata = '' )
 		case 'lastname':
 			$output = $this_userdata['user_lastname'];
 			break;
+
+		case 'nickname':
+			$output = $this_userdata['user_nickname'];
+			break;
+
+		case 'idmide':
+			$output = $this_userdata['user_idmode'];
+			break;
+
+		case 'email':
+			$output = $this_userdata['user_email'];
+			break;
+
+		case 'url':
+			$output = $this_userdata['user_url'];
+			break;
+
+		case 'icq':
+			$output = $this_userdata['user_icq'];
+			break;
+
+		case 'aim':
+			$output = $this_userdata['user_aim'];
+			break;
+
+		case 'msn':
+			$output = $this_userdata['user_msn'];
+			break;
+
+		case 'yim':
+			$output = $this_userdata['user_yim'];
+			break;
+
+
 
 			
 		case 'login':
