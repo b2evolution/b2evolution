@@ -174,7 +174,8 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$blah = explode("\n", $content);
 	$firstline = $blah[0];
 
-	if ($use_phoneemail) {
+	if ($use_phoneemail) 
+	{
 		$btpos = strpos($firstline, $phoneemail_separator);
 		if ($btpos) {
 			$userpassstring = trim(substr($firstline, 0, $btpos));
@@ -200,10 +201,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
 
-	$sql = "SELECT ID, user_level FROM $tableusers WHERE user_login='$user_login' AND user_pass='$user_pass' ORDER BY ID DESC LIMIT 1";
-	$result = mysql_query($sql);
-
-	if (!mysql_num_rows($result)) 
+	if(!user_pass_ok($user_login,$user_pass)) 
 	{
 		echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
 		continue;
