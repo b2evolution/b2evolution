@@ -102,7 +102,7 @@ switch( $action )
 				{	// We can we autodelete junk, check for junk:
 					// Check for potentially affected log hits:
 					$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL,
-												 baseDomain, hit_blog_ID, visitURL
+												 baseDomain, hit_blog_ID, visitURL, hit_remote_addr
 												 FROM T_hitlog
 												 WHERE referingURL LIKE '%$dbkeyword%'
 												 ORDER BY baseDomain ASC";
@@ -118,6 +118,16 @@ switch( $action )
 						<?php printf ( T_('Delete the following %d referer hits:'), $DB->num_rows ) ?>
 						</strong></p>
 						<table class="grouped" cellspacing="0">
+							<thead>
+							<tr>
+								<th><?php echo T_('Date') ?></th>
+								<th><?php echo T_('Referer') ?></th>
+								<th><?php echo T_('Ref. IP') ?></th>
+								<th><?php echo T_('Target Blog') ?></th>
+								<th><?php echo T_('Target URL') ?></th>
+							</tr>
+							</thead>
+							<tbody>
 							<?php
 							$count = 0;
 							foreach( $res_affected_hits as $row_stats )
@@ -125,18 +135,21 @@ switch( $action )
            		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
 								<td class="firstcol"><?php stats_time() ?></td>
 								<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+								<td><?php stats_hit_remote_addr() ?></td>
 								<td><?php stats_blog_name() ?></td>
 								<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 							</tr>
 							<?php
               $count++;
               } // End stat loop ?>
+              </tbody>
 						</table>
 					<?php
 					}
 
 					// Check for potentially affected comments:
-					$sql = "SELECT *
+					$sql = "SELECT comment_ID, comment_date, comment_author, comment_author_url,
+													comment_author_IP, comment_content
 									FROM T_comments
 									WHERE comment_author_url LIKE '%$dbkeyword%'
 									   OR comment_content LIKE '%$dbkeyword%'
@@ -153,6 +166,16 @@ switch( $action )
 						<?php printf ( T_('Delete the following %d comments:'), count($res_affected_comments) ) ?>
 						</strong></p>
 						<table class="grouped" cellspacing="0">
+							<thead>
+							<tr>
+								<th><?php echo T_('Date') ?></th>
+								<th><?php echo T_('Author') ?></th>
+								<th><?php echo T_('Auth. URL') ?></th>
+								<th><?php echo T_('Auth. IP') ?></th>
+								<th><?php echo T_('Content starts with...') ?></th>
+							</tr>
+							</thead>
+							<tbody>
 							<?php
 							$count = 0;
               foreach( $res_affected_comments as $row_stats )
@@ -161,6 +184,7 @@ switch( $action )
 								<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 								<td><?php echo $row_stats['comment_author'] ?></a></td>
 								<td><?php echo $row_stats['comment_author_url'] ?></td>
+								<td><?php echo $row_stats['comment_author_IP'] ?></td>
 								<td><?php
 								$comment_content = strip_tags( $row_stats['comment_content'] );
 								if ( strlen($comment_content) > 70 )
@@ -177,6 +201,7 @@ switch( $action )
 							<?php
               $count++;
               } // End stat loop ?>
+							</tbody>
 						</table>
 					<?php
 					}

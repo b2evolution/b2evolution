@@ -335,6 +335,14 @@ function stats_hit_ID()
 	echo $row_stats['visitID'];
 }
 
+/*
+ * stats_hit_remote_addr(-)
+ */
+function stats_hit_remote_addr()
+{
+	global $row_stats;
+	echo $row_stats['hit_remote_addr'];
+}
 
 /*
  * stats_time(-)
