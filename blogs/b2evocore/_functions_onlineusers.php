@@ -47,22 +47,24 @@ function online_user_update()
  * @param string
  * @param string
  */
-
 function online_user_display( $before = '', $after = '' )
 {
 	global $DB, $tableusers, $tablesessions, $online_session_timeout;
 	$users = array();
 
-	$sql = "SELECT ID,user_login,user_firstname,user_lastname,user_nickname,user_showonline,user_idmode,user_grp_ID
+	$sql = "SELECT ID
 		FROM $tableusers, $tablesessions 
 		WHERE ".$tableusers.".ID=".$tablesessions.".sess_userid 
 		AND ".$tablesessions.".sess_time > '".( time() - $online_session_timeout )."'";
 
 	$rows = $DB->get_results( $sql, ARRAY_A );
-        if( count( $rows ) ) foreach( $rows as $row )
+	$users['guests'] = 0;
+	$users['registered'] = 0;
+	if( count( $rows ) ) foreach( $rows as $row )
 	{
-		$user = new User($row);
-		if( $row[user_showonline] == 1 )
+		$user = get_userdata( $row['ID'] );
+		$user = new User($user);
+		if( $user->showonline )
 		{
 			echo $before;
 			echo $user->get('preferedname');
@@ -75,7 +77,7 @@ function online_user_display( $before = '', $after = '' )
 		}
 	}
 
-        $users['guests'] += $DB->get_var( "SELECT count(*) 
+	$users['guests'] += $DB->get_var( "SELECT count(*)
 						FROM $tablesessions 
 						WHERE sess_userid=''");
 

@@ -494,9 +494,16 @@ function upgrade_b2evo_tables()
 		// upgrade to 0.9.1
 		// --------------------------------------------
 		
+		echo 'Upgrading blogs table... ';
+		$query = "ALTER TABLE $tableblogs
+							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+		
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE $tableposts
-							ADD post_views INT NOT NULL DEFAULT '0' AFTER post_flags";
+							ADD post_views INT(4) NOT NULL DEFAULT '0' AFTER post_flags,
+							ADD post_commentsexpire DATETIME DEFAULT NULL AFTER post_comments";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		

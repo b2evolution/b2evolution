@@ -20,7 +20,7 @@ if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-				$tablepostcats, $tablehitlog, $tableantispam;
+				$tablepostcats, $tablehitlog, $tableantispam, $tablesessions;
 	global $baseurl, $new_db_version;
 	global $DB;
 
@@ -97,6 +97,7 @@ function create_b2evo_tables()
 		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
+		blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	blog_ID (blog_ID),
 	  UNIQUE KEY blog_stub (blog_stub)
@@ -142,7 +143,8 @@ function create_b2evo_tables()
 		post_karma int(11) NOT NULL default '0',
 		post_wordcount int(11) default NULL,
 		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-		post_renderers VARCHAR(179) NOT NULL default 'default', 
+		post_commentsexpire DATETIME DEFAULT NULL,
+		post_renderers VARCHAR(179) NOT NULL default 'default',
 		PRIMARY KEY post_ID( ID ),
 		INDEX post_issue_date( post_issue_date ),
 		INDEX post_category( post_category ),
@@ -212,7 +214,7 @@ function create_b2evo_tables()
 	$query = "CREATE TABLE $tablesessions (
 		sess_time int(10) unsigned NOT NULL,
 		sess_ipaddress varchar(15) NOT NULL,
-		sess_userid mediumint(8) NOT NULL default '0'',
+		sess_userid mediumint(8) NOT NULL default '0',
 		KEY start_time (sess_time),
 		KEY remote_ip (sess_ipaddress)
 	)";

@@ -118,7 +118,7 @@
 
 	<p class="center"><strong>
 		<?php posts_nav_link(); ?>
-		<?php 
+		<?php
 			// previous_post( '<p class="center">%</p>' );
 			// next_post( '<p class="center">%</p>' );
 		?>
@@ -248,9 +248,11 @@
 
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online') ?></h3>
-		<?$count = online_user_display('','<br />');?>
-		<? echo T_('Guest Users:') . $count['guests']; ?>
-        </div>
+		<?php
+			$count = online_user_display('', '<br />');
+			echo T_('Guest Users:').' '.$count['guests'];
+		?>
+	</div>
 
 
 	<div class="bSideItem">
