@@ -304,8 +304,8 @@ function populate_antispam()
 	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
 	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
 	"('-adult-'), ('-tits-'), ('buy-phentermine'), ".
-	"('order-cheap-pills'), 'buy-xenadrine'),  ('xxx'), ".
-	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models') ";
+	"('order-cheap-pills'), ('buy-xenadrine'),  ('xxx'), ".
+	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
 
 	mysql_query($query) or mysql_oops( $query );
 	
