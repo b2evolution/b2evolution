@@ -724,13 +724,13 @@ function debug_fclose($fp)
 
 
 
-/*
+/**
  balanceTags
 
  Balances Tags of string using a modified stack.
 
- @param text      Text to be balanced
- @return          Returns balanced text
+ @param string    Text to be balanced
+ @return string   Returns balanced text
  @author          Leonard Lin (leonard@acm.org)
  @version         v1.1
  @date            November 4, 2001
@@ -938,7 +938,7 @@ function param( $var, $type = '', $default = '', $memorize = false, $override = 
 	{ // Variable was already set but we need to remove the auto quotes
 		$$var = remove_magic_quotes($$var);
 
-		$Debuglog->add( 'param(-): '.$var.' already set! '.pre_dump($$var, '', false), 'params' );
+		$Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($$var, true).']!', 'params' );
 	}
 
 	// type will be forced even if it was set before and not overriden
@@ -1506,7 +1506,7 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
 
 
 /**
- * Get properties of an icon
+ * Get properties of an icon.
  *
  * @param string|File icon for what (special purpose or File object)
  * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
@@ -1514,16 +1514,12 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
  */
 function getIcon( $for, $what = 'imgtag', $param = '' )
 {
-	global $fm_fileicons, $map_iconfiles;
-	global $basepath, $admin_subdir, $admin_url;
+	global $map_iconfiles;
+	global $basepath, $admin_subdir, $baseurl;
 
 	if( is_a( $for, 'file' ) )
 	{
-		$iconfile = $for->getIconFileName();
-		if( $iconfile )
-		{
-			$iconfile = 'fileicons/'.$iconfile;
-		}
+		$iconfile = $for->getIconPath();
 	}
 	elseif( isset( $map_iconfiles[$for] ) && isset( $map_iconfiles[$for]['file'] ) )
 	{
@@ -1534,7 +1530,8 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 		$iconfile = false;
 	}
 
-	if( $iconfile === false || !file_exists( $basepath.$admin_subdir.'img/'.$iconfile ) )
+	/** @debug quite time consuming**/
+	if( $iconfile === false || !file_exists( $basepath.$iconfile ) )
 	{
 		return '<div class="error">[no image for '.var_export( $for, true ).'!]</div>';
 		return false;
@@ -1545,16 +1542,9 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 		case 'file':
 			return $iconfile;
 
-		case 'size':
-			if( $what == 'size' )
-			{
-				$iconsize = imgsize( $admin_url.'img/'.$iconfile, $param );
-				return $iconsize;
-			}
-
 		case 'imgtag':
 		case 'url':
-			$iconurl = $admin_url.'img/'.$iconfile;
+			$iconurl = $baseurl.$iconfile;
 			if( $what == 'url' )
 			{
 				return $iconurl;
@@ -1562,7 +1552,8 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 
 		case 'imgtag':
 			$r = '<img class="middle" src="'.$iconurl.'" '
-					.imgsize( $admin_url.'img/'.$iconfile, 'string' )
+					.getIconSize( $iconfile, 'string' )
+					#.imgsize( $admin_url.'img/'.$iconfile, 'string' ) // time consuming!
 					.' alt="';
 
 			if( is_a( $for, 'file' ) )
@@ -1593,8 +1584,44 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 }
 
 
+/**
+ * Get image size for an icon.
+ *
+ * @uses $map_iconsizes, $map_iconfiles
+ * @param string Icon path relative to {@link $basepath}
+ * @param string what property/format to get: 'width', 'height', 'widthxheight',
+ *               'string' (as for img tags), else 'widthheight' (array)
+ */
+function getIconSize( $iconpath, $param = 'widthheight' )
+{
+	global $basepath, $map_iconsizes, $Debuglog;
+
+	if( isset( $map_iconsizes[ $iconpath ] ) )
+	{
+		switch( $param )
+		{
+			case 'width': return $map_iconsizes[$iconpath][0];
+			case 'height': return $map_iconsizes[$iconpath][1];
+			case 'widthxheight': return $map_iconsizes[$iconpath][0].'x'.$map_iconsizes[$iconpath][1];
+			case 'width': return $map_iconsizes[$iconpath][0];
+			case 'string': return 'width="'.$map_iconsizes[$iconpath][0]
+														.'" height="'.$map_iconsizes[$iconpath][1].'"';
+			default: return $map_iconsizes[$iconpath];
+		}
+	}
+	else
+	{
+		$Debuglog->add( 'No iconsize for ['.$iconpath.']', 'icons' );
+		return imgsize( $basepath.$iconpath, $param );
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.7  2004/11/03 00:58:02  blueyed
+ * update
+ *
  * Revision 1.6  2004/11/02 10:46:58  fplanque
  * no message
  *

@@ -106,7 +106,7 @@ class FileManager extends Filelist
 
 	/* ----- PRIVATE ----- */
 	/**
-	 * order files by what? (name/type/size/lastm/perms)
+	 * order files by what? (name/type/size/lastmod/perms)
 	 * 'name' as default.
 	 * @var string
 	 * @access protected
@@ -275,7 +275,7 @@ class FileManager extends Filelist
 			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filterString ) );
 			$this->filterString = '.*';
 		}
-		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastm', 'perms' ) ) ? $order : NULL );
+		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
 		$this->orderasc = ( $asc === NULL  ? NULL : (bool)$asc );
 
 		$this->loadSettings();
@@ -442,6 +442,17 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Get the path of the Filemanager, relative to root.
+	 *
+	 * @return string the path
+	 */
+	function getPath()
+	{
+		return $this->path;
+	}
+
+
+	/**
 	 * Get current mode.
 	 *
 	 * @return string|false 'file_copy', 'file_move', 'file_rename'
@@ -568,10 +579,9 @@ class FileManager extends Filelist
 
 		if( $this->order == $type )
 		{ // add asc/desc image
-			if( $this->isSortingAsc() )
-				$r .= ' '.$this->getIcon( 'ascending' );
-			else
-				$r .= ' '.$this->getIcon( 'descending' );
+			$r .= ' '.( $this->isSortingAsc() ?
+										getIcon( 'ascending' ) :
+										getIcon( 'descending' ) );
 		}
 
 		return $r.'</a>';
@@ -593,12 +603,16 @@ class FileManager extends Filelist
 
 
 	/**
-	 * get the URL to access a file
+	 * Get the URL to access a file.
 	 *
 	 * @param File the File object
 	 */
-	function getFileUrl( $File )
+	function getFileUrl( $File = NULL )
 	{
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
 		if( method_exists( $File, 'getName' ) )
 		{
 			return $this->root_url.$this->path.$File->getName();
@@ -607,6 +621,23 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
+	}
+
+
+	function getFileImageSize( $param = 'widthxheight', $File = NULL )
+	{
+		if( !$this->getImageSizes )
+		{
+			return false;
+		}
+
+		if( $File === NULL )
+		{
+			$File =& $this->curFile;
+		}
+
+		return $File->getImageSize( $param );
+
 	}
 
 
@@ -1013,8 +1044,14 @@ class FileManager extends Filelist
 			$r .= "height=$height,";
 		}
 
-		return substr( $r, 0, -1 ) // cut last commata
-						."'); opened.focus(); return false;";
+		$r = substr( $r, 0, -1 ) // cut last commata
+					."'); opened.focus();"
+					."if( typeof(openedWindows) == 'undefined' )"
+					."{ openedWindows = new Array(opened); }"
+					."else"
+					."{ openedWindows.push(opened); }"
+					."return false;";
+		return $r;
 	}
 
 
@@ -1027,6 +1064,7 @@ class FileManager extends Filelist
 
 		$UserSettings->get_cond( $this->dirsnotattop,     'fm_dirsnotattop',     $this->User->ID );
 		$UserSettings->get_cond( $this->permlikelsl,      'fm_permlikelsl',      $this->User->ID );
+		$UserSettings->get_cond( $this->getImageSizes,    'fm_getimagesizes',    $this->User->ID );
 		$UserSettings->get_cond( $this->recursivedirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
 		$UserSettings->get_cond( $this->showhidden,       'fm_showhidden',       $this->User->ID );
 	}
@@ -1129,6 +1167,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.6  2004/11/03 00:58:02  blueyed
+ * update
+ *
  * Revision 1.5  2004/10/24 22:55:12  blueyed
  * upload, fixes, ..
  *

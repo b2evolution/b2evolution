@@ -108,6 +108,14 @@ class Filelist
 
 
 	/**
+	 * Get size (width, height) for images?
+	 *
+	 * @var boolean
+	 */
+	var $getImageSizes = false;
+
+
+	/**
 	 * User preference: recursive size of dirs?
 	 *
 	 * The load() method uses this.
@@ -348,7 +356,7 @@ class Filelist
 			$type = $this->order;
 		}
 
-		if( $this->orderasc == '#' )
+		if( $this->orderasc === NULL )
 		{ // default
 			return ( $type == 'name' ) ? 1 : 0;
 		}
@@ -554,10 +562,25 @@ class Filelist
 		return true;
 	}
 
+
+	/**
+	 * Get a MD5 checksum over the entries.
+	 * Used to identify a unique filelist.
+	 *
+	 * @return string md5 hash
+	 */
+	function toMD5()
+	{
+		return md5( serialize( $this->entries ) );
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/03 00:58:02  blueyed
+ * update
+ *
  * Revision 1.4  2004/10/24 22:55:12  blueyed
  * upload, fixes, ..
  *

@@ -90,10 +90,6 @@ $fm_filetypes = array( // {{{
 ); // }}}
 
 
-// load file icons
-require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
-
-
 /**
  * Creates an object of the {@link File} class, while providing caching
  * and making sure that only one reference to a file exists.
@@ -306,9 +302,18 @@ class File
 	}
 
 
-	function getIconFileName()
+	/**
+	 * Get the path of the respective icon file for this file (relative to
+	 * {@link $basepath}, looks at file's extension).
+	 * 'file_unknown' map entry is used if no match was found, or 'folder' if
+	 * the file is a directory.
+	 *
+	 * {@uses $map_iconfiles}
+	 * @return string Path to the iconfile (relative to {@link $baseurl})
+	 */
+	function getIconPath()
 	{
-		global $map_iconfiles, $fm_fileicons;
+		global $map_iconfiles;
 		if( $this->_iconfilename !== NULL )
 		{ // cached
 			return $this->_iconfilename;
@@ -321,11 +326,12 @@ class File
 		else
 		{
 			$iconfilename = $map_iconfiles['file_unknown']['file'];
-			foreach( $fm_fileicons as $ext => $imgfile )
+			foreach( $map_iconfiles as $lIconfile )
 			{
-				if( preg_match( '/'.$ext.'$/i', $this->_name, $match ) )
+				if( isset( $lIconfile['ext'] )
+						&& preg_match( '/'.$lIconfile['ext'].'$/i', $this->_name, $match ) )
 				{
-					$iconfilename = $imgfile;
+					$iconfilename = $lIconfile['file'];
 					break;
 				}
 			}
@@ -473,6 +479,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.6  2004/11/03 00:58:02  blueyed
+ * update
+ *
  * Revision 1.5  2004/10/24 22:55:12  blueyed
  * upload, fixes, ..
  *
