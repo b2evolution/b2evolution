@@ -129,6 +129,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 					param( 'newloc_charset', 'string', true);
 					param( 'newloc_datefmt', 'string', true);
 					param( 'newloc_timefmt', 'string', true);
+					param( 'newloc_startofweek', 'integer', true);
 					param( 'newloc_messages', 'string', true);
 
 					if( $action == 'updatelocale' )
@@ -151,11 +152,12 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 						else
 						{ // old locale is not in DB yet. Insert it.
 							$query = "INSERT INTO T_locales
-												( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
+												( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_enabled )
 												VALUES ( '$oldloc_locale',
 												'{$locales[$oldloc_locale]['charset']}', '{$locales[$oldloc_locale]['datefmt']}',
-												'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['name']}',
-												'{$locales[$oldloc_locale]['messages']}', '{$locales[$oldloc_locale]['priority']}',";
+												'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['startofweek']}',
+												'{$locales[$oldloc_locale]['name']}', '{$locales[$oldloc_locale]['messages']}',
+												'{$locales[$oldloc_locale]['priority']}',";
 							if( $oldloc_locale != $newloc_locale )
 							{ // disable old locale
 								$query .= ' 0)';
@@ -171,9 +173,9 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 					}
 
 					$query = "REPLACE INTO T_locales
-										( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled )
+										( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_enabled )
 										VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
-										'$newloc_timefmt', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
+										'$newloc_timefmt', '$newloc_startofweek', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
 					$q = $DB->query($query);
 					$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'note' );
 
@@ -425,6 +427,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.85  2005/02/23 21:58:10  blueyed
+ * fixed updating of locales
+ *
  * Revision 1.84  2005/02/23 04:26:21  blueyed
  * moved global $start_of_week into $locales properties
  *
