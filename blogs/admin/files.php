@@ -94,6 +94,10 @@ if( !empty($file) )
 		$Fileman->Messages->add( sprintf( T_('File [%s] could not be accessed!'), $file ) );
 	}
 }
+else
+{
+	$curFile = false;
+}
 
 
 if( $action == '' && $file != '' && $curFile )
@@ -658,6 +662,34 @@ require dirname(__FILE__).'/_menutop_end.php';
 <div id="filemanmain">
 <?php
 
+if( $mode == 'copymove' )
+{
+	?>
+
+	<div class="panelinfo">
+		<p>
+			<?php
+			printf( T_('You are moving or copying [%s].'), $Fileman->source );
+			?>
+		</p>
+		<form action="">
+			<input type="radio" name="action" id="fm_copy" value="copy" onclick="this.form.elements.submit.value='<?php
+			echo format_to_output( T_('Copy'), 'formvalue' );
+			?>';" />
+			<label for="fm_copy"><?php echo T_('Copy') ?></label>
+			<input type="radio" name="action" id="fm_move" value="move" onclick="this.form.elements.submit.value='<?php
+			echo format_to_output( T_('Move'), 'formvalue' );
+			?>';" />
+			<label for="fm_move"><?php echo T_('Move') ?></label>
+			<br />
+			<input type="submit" name="submit" value="<?php echo T_('Copy / Move!') ?>" />
+		</form>
+
+	</div>
+	<?php
+
+}
+
 // output errors, notes and action messages
 if( isset( $msg_action )
 		|| $Fileman->Messages->count( array( 'error', 'note' ) )
@@ -806,19 +838,15 @@ while( $lFile = $Fileman->getNextFile() )
 		<td class="filename">
 			<a href="<?php echo $Fileman->getLinkCurfile() ?>" target="fileman_default" onclick="return false;">
 			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php
-				echo $i ?>].click(); window.open('<?php
-				echo $Fileman->getLinkCurfile().( $lFile->isDir() ? '&amp;mode=browseonly' : '' );
-				?>', ( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_<?php
-				echo $i ?>'), 'toolbar=0,resizable=yes,scrollbars=yes,<?php
-				if( $r = $lFile->getImageSize( 'widthheight' ) )
-				{ // make the popup 42px wider/higher than the image
-					echo 'width='.($r[0]+42).',height='.($r[1]+42);
-				}
-				else
-				{ // default popup-size: 800x600
-					echo 'width=800,height=600';
-				}
-				?>');" id="button_new_<?php echo $i ?>" title="Open in new window">
+				echo $i ?>].click(); <?php
+
+				$imgsize = $lFile->getImageSize( 'widthheight' );
+				echo $Fileman->getJsPopupCode( NULL,
+					"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$i')+'",
+					($imgsize ? $imgsize[0]+42 : NULL),
+					($imgsize ? $imgsize[1]+42 : NULL) );
+
+				?>" id="button_new_<?php echo $i ?>" title="Open in new window">
 				<?php echo $Fileman->getIcon( 'window_new', 'imgtag' )
 			?></button></a>
 			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkCurfile() ?>">
@@ -836,13 +864,18 @@ while( $lFile = $Fileman->getNextFile() )
 									'<a href="%s">'.$lFile->getPerms( $Fileman->permlikelsl ? 'lsl' : '' ).'</a>' ) ?></td>
 		<td class="actions"><?php
 			disp_cond( $Fileman->getLinkCurfile_edit(), '<a href="%s">'.$Fileman->getIcon( 'edit', 'imgtag' ).'</a>' );
-			disp_cond( $Fileman->getLinkCurfile_copymove(), '<a href="%s">'.$Fileman->getIcon( 'copymove', 'imgtag' ).'</a>' );
+			?><a href="<?php
+				echo $Fileman->getLinkCurfile_copymove()
+				?>" target="fileman_copymove" onclick="<?php
+				echo $Fileman->getJsPopupCode( $Fileman->getLinkCurfile_copymove(), 'fileman_copymove' );
+				?>"><?php echo $Fileman->getIcon( 'copymove', 'imgtag' ) ?></a><?php
 			disp_cond( $Fileman->getLinkCurfile_rename(), '<a href="%s">'.$Fileman->getIcon( 'rename', 'imgtag' ).'</a>' );
 			disp_cond( $Fileman->getLinkCurfile_delete(), '<a href="%s" onclick="return confirm(\''
 				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete [%s]?'),
 				format_to_output( $lFile->getName(), 'formvalue' ) ).'\');">'.$Fileman->getIcon( 'delete', 'imgtag' ).'</a>' );
 			?></td>
 	</tr>
+
 	<?php
 	$i++;
 }

@@ -126,6 +126,11 @@ class FileManager extends Filelist
 	 */
 	var $path = '';
 
+	/**
+	 * Remember the mode we're in ('copymove')
+	 */
+	var $mode = NULL;
+
 
 	/**#@+
 	 * "Constants"
@@ -151,6 +156,7 @@ class FileManager extends Filelist
 	function FileManager( &$cUser, $url, $root, $path = '', $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $asc = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
+		global $mode;
 		global $BlogCache, $UserCache;
 
 		$this->User =& $cUser;
@@ -236,6 +242,9 @@ class FileManager extends Filelist
 
 
 		$this->url = $url; // base URL, used for created links
+		$this->mode = empty($mode) ? NULL : $mode; // from global
+
+		$this->source = urldecode( param( 'source', 'string', '' ) );
 
 		$this->filterString = $filterString;
 		$this->filterIsRegexp = $filterIsRegexp;
@@ -290,16 +299,22 @@ class FileManager extends Filelist
 	 * Params can be overridden or be forced to
 	 *
 	 * @param string override root (blog_X or user_X)
-	 * @param string override cd
+	 * @param string override path
+	 * @param string override filterString
+	 * @param string override filterIsRegexp
 	 * @param string override order
-	 * @param integer override asc
+	 * @param string override orderasc
+	 * @param string override mode
+	 * @return string the resulting URL
 	 */
 	function getCurUrl( $root = NULL, $path = NULL, $filterString = NULL,
-											$filterIsRegexp = NULL, $order = NULL, $orderasc = NULL )
+											$filterIsRegexp = NULL, $order = NULL, $orderasc = NULL,
+											$mode = NULL, $source = NULL )
 	{
 		$r = $this->url;
 
-		foreach( array('root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc') as $check )
+		foreach( array('root', 'path', 'filterString', 'filterIsRegexp', 'order',
+										'orderasc', 'mode', 'source' ) as $check )
 		{
 			if( $$check === false )
 			{ // don't include
@@ -323,10 +338,11 @@ class FileManager extends Filelist
 	 * Generates hidden input fields for forms, based on {@link getCurUrll()}
 	 */
 	function getFormHiddenInputs( $root = NULL, $path = NULL, $filterString = NULL,
-															$filterIsRegexp = NULL, $order = NULL, $asc = NULL )
+															$filterIsRegexp = NULL, $order = NULL, $asc = NULL,
+															$mode = NULL, $source = NULL )
 	{
 		// get current Url, remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc, $mode, $source ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -409,9 +425,9 @@ class FileManager extends Filelist
 	 */
 	function getNextFile( $type = '' )
 	{
-		$this->cur_File = parent::getNextFile( $type );
+		$this->curFile = parent::getNextFile( $type );
 
-		return $this->cur_File;
+		return $this->curFile;
 	}
 
 
@@ -419,7 +435,7 @@ class FileManager extends Filelist
 	{
 		if( $File === NULL )
 		{
-			$File = $this->cur_File;
+			$File = $this->curFile;
 		}
 		elseif( is_string( $File ) )
 		{{{ // special names
@@ -471,13 +487,13 @@ class FileManager extends Filelist
 
 	function getLinkCurfile( $param = '' )
 	{
-		if( $this->cur_File->isDir() && $param != 'forcefile' )
+		if( $this->curFile->isDir() && $param != 'forcefile' )
 		{
-			return $this->getCurUrl( NULL, $this->path.$this->cur_File->getName() );
+			return $this->getCurUrl( NULL, $this->path.$this->curFile->getName() );
 		}
 		else
 		{
-			return $this->getCurUrl( NULL, $this->path ).'&amp;file='.urlencode( $this->cur_File->getName() );
+			return $this->getCurUrl( NULL, $this->path ).'&amp;file='.urlencode( $this->curFile->getName() );
 		}
 	}
 
@@ -490,7 +506,7 @@ class FileManager extends Filelist
 
 	function getLinkCurfile_edit()
 	{
-		if( $this->cur_File->isDir() )
+		if( $this->curFile->isDir() )
 		{
 			return false;
 		}
@@ -498,13 +514,15 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Get the link to a mode where we choose the destination of the file/dir
+	 *
+	 * @return string the link
+	 */
 	function getLinkCurfile_copymove()
 	{
-		if( $this->cur_File->isDir() )
-		{
-			return false;
-		}
-		return $this->getLinkCurfile().'&amp;action=copymove';
+		return $this->getCurUrl( NULL, NULL, NULL, NULL, NULL, NULL, 'copymove',
+															urlencode( $this->curFile->getPath( true ) ) );
 	}
 
 
@@ -565,18 +583,18 @@ class FileManager extends Filelist
 
 		if( is_a( $for, 'file' ) )
 		{
-			if( !$this->cur_File )
+			if( !$this->curFile )
 			{
 				$iconfile = false;
 			}
-			elseif( $this->cur_File->isDir() )
+			elseif( $this->curFile->isDir() )
 			{
 				$iconfile = $fm_fileicons_special['folder'];
 			}
 			else
 			{
 				$iconfile = $fm_fileicons_special['unknown'];
-				$filename = $this->cur_File->getName();
+				$filename = $this->curFile->getName();
 				foreach( $fm_fileicons as $ext => $imgfile )
 				{
 					if( preg_match( '/'.$ext.'$/i', $filename, $match ) )
@@ -954,6 +972,38 @@ class FileManager extends Filelist
 	}
 
 
+	function getJsPopupCode( $href = NULL, $target = 'fileman_default',
+														$width = NULL, $height = NULL )
+	{
+		if( $href === NULL )
+		{
+			$href = $this->getLinkCurfile().'&amp;mode=browse';
+		}
+		if( $width === NULL )
+		{
+			$width = 800;
+		}
+		if( $height === NULL )
+		{
+			$height = 800;
+		}
+
+		$r = "opened = window.open('$href','$target','status=yes,toolbar=1,resizable=yes,scrollbars=yes,";
+
+		if( $width )
+		{
+			$r .= "width=$width,";
+		}
+		if( $height )
+		{
+			$r .= "height=$height,";
+		}
+
+		return substr( $r, 0, -1 ) // cut last commata
+						."'); opened.focus(); return false;";
+	}
+
+
 	/**
 	 * get prefs from user's Settings
 	 */
@@ -1038,6 +1088,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.37  2004/10/12 22:32:49  blueyed
+ * started 'copymove' mode
+ *
  * Revision 1.36  2004/10/12 10:27:18  fplanque
  * Edited code documentation.
  *
