@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.6\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-11 20:41+0200\n"
+"POT-Creation-Date: 2004-05-12 01:53+0200\n"
 "PO-Revision-Date: 2004-03-08 19:15+0100\n"
 "Last-Translator: Vegar Berg Guldal <mail@funky-m.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -273,7 +273,7 @@ msgstr "Gå til administrasjonssidene"
 msgid "Official website"
 msgstr "offisiell webside"
 
-#: ..\..\..\default.php:91 ..\..\..\install\index.php:447
+#: ..\..\..\default.php:91 ..\..\..\install\index.php:449
 msgid "GNU GPL license"
 msgstr "GNU GPL lisens"
 
@@ -447,122 +447,135 @@ msgstr ""
 msgid "Re-check"
 msgstr "Stavekontroll"
 
-#: ..\..\..\admin\b2blogs.php:13 ..\..\..\admin\_blogs_list.php:13
+#: ..\..\..\admin\b2blogs.php:13 ..\..\..\admin\_blogs_list.php:22
 #: ..\..\..\admin\_menutop.php:77 ..\..\..\admin\_users_groupform.php:86
 #: ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
 msgid "Blogs"
 msgstr "Blogger"
 
-#: ..\..\..\admin\b2blogs.php:21
+#: ..\..\..\admin\b2blogs.php:21 ..\..\..\admin\b2blogs.php:120
 msgid "New"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:53
+#: ..\..\..\admin\b2blogs.php:30
 msgid "Creating blog..."
 msgstr "Lager blog..."
 
-#: ..\..\..\admin\b2blogs.php:65
+#: ..\..\..\admin\b2blogs.php:60 ..\..\..\admin\b2blogs.php:216
+#, fuzzy
+msgid ""
+"This URL blog name / Stub name is already in use by another blog. Choose "
+"another name."
+msgstr "dette brukernavnet er allerede i bruk, vennligst velg et annet"
+
+#: ..\..\..\admin\b2blogs.php:63
 #, fuzzy
 msgid "Cannot create, please correct these errors:"
 msgstr "Kan ikke oppdatere, vennligst korriger disse feilene:"
 
-#: ..\..\..\admin\b2blogs.php:66
-msgid "Back to new blog form"
-msgstr "Tilbake til &quot;ny blog&quot;-skjema"
-
-#: ..\..\..\admin\b2blogs.php:89
+#: ..\..\..\admin\b2blogs.php:106
 #, fuzzy, php-format
 msgid "You should <a %s>create categories</a> for this blog now!"
 msgstr "Du burde <a href=\"%s\">lage kategorier</a> for denne bloggen nå!"
 
-#: ..\..\..\admin\b2blogs.php:105 ..\..\..\admin\b2blogs.php:241
-#: ..\..\..\admin\b2blogs.php:268 ..\..\..\admin\b2options.php:25
+#: ..\..\..\admin\b2blogs.php:127 ..\..\..\b2evocore\_class_blog.php:64
+#, fuzzy
+msgid "New weblog"
+msgstr "Ny blog"
+
+#: ..\..\..\admin\b2blogs.php:128 ..\..\..\admin\b2blogs.php:147
+#: ..\..\..\b2evocore\_class_blog.php:63
+msgid "New blog"
+msgstr "Ny blog"
+
+#: ..\..\..\admin\b2blogs.php:164 ..\..\..\admin\b2blogs.php:297
+#: ..\..\..\admin\b2blogs.php:324 ..\..\..\admin\b2options.php:25
 #: ..\..\..\admin\b2options.php:428 ..\..\..\admin\_users_groupform.php:72
 #, fuzzy
 msgid "General"
 msgstr "Sentral"
 
-#: ..\..\..\admin\b2blogs.php:108 ..\..\..\admin\b2blogs.php:244
-#: ..\..\..\admin\b2blogs.php:274
+#: ..\..\..\admin\b2blogs.php:167 ..\..\..\admin\b2blogs.php:300
+#: ..\..\..\admin\b2blogs.php:330
 msgid "Permissions"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:111 ..\..\..\admin\b2blogs.php:247
-#: ..\..\..\admin\b2blogs.php:280
+#: ..\..\..\admin\b2blogs.php:170 ..\..\..\admin\b2blogs.php:303
+#: ..\..\..\admin\b2blogs.php:336
 msgid "Advanced"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:123
+#: ..\..\..\admin\b2blogs.php:182
 #, fuzzy, php-format
 msgid "Updating Blog [%s]..."
 msgstr "Oppdaterer post..."
 
-#: ..\..\..\admin\b2blogs.php:137 ..\..\..\admin\edit_actions.php:211
+#: ..\..\..\admin\b2blogs.php:219 ..\..\..\admin\edit_actions.php:211
 msgid "Cannot update, please correct these errors:"
 msgstr "Kan ikke oppdatere, vennligst korriger disse feilene:"
 
-#: ..\..\..\admin\b2blogs.php:352
+#: ..\..\..\admin\b2blogs.php:412
 #, fuzzy, php-format
 msgid "Delete blog [%s]?"
 msgstr "Slett dette treffet!"
 
-#: ..\..\..\admin\b2blogs.php:354
+#: ..\..\..\admin\b2blogs.php:414
 msgid ""
 "Deleting this blog will also delete all its categories, posts and comments!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:356 ..\..\..\admin\b2users.php:323
+#: ..\..\..\admin\b2blogs.php:416 ..\..\..\admin\b2users.php:323
 #: ..\..\..\admin\b2users.php:380
 msgid "THIS CANNOT BE UNDONE!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:369
+#: ..\..\..\admin\b2blogs.php:429
 #, php-format
 msgid "Also try to delete stub file [<strong><a %s>%s</a></strong>]"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:377
+#: ..\..\..\admin\b2blogs.php:437
 #, php-format
 msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:383 ..\..\..\admin\b2users.php:331
+#: ..\..\..\admin\b2blogs.php:443 ..\..\..\admin\b2users.php:331
 #: ..\..\..\admin\b2users.php:388
 msgid "I am sure!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:386 ..\..\..\admin\b2users.php:334
+#: ..\..\..\admin\b2blogs.php:446 ..\..\..\admin\b2users.php:334
 #: ..\..\..\admin\b2users.php:391
 msgid "CANCEL"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:418
+#: ..\..\..\admin\b2blogs.php:478
 #, php-format
 msgid "Generating static page for blog [%s]"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:427
+#: ..\..\..\admin\b2blogs.php:487
 msgid "You haven't set a static filename for this blog!"
 msgstr "Du har ikke valgt et statisk filnavn for denne bloggen!"
 
-#: ..\..\..\admin\b2blogs.php:474
+#: ..\..\..\admin\b2blogs.php:534
 msgid "File cannot be written!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:475
+#: ..\..\..\admin\b2blogs.php:535
 #, php-format
 msgid ""
 "You should check the file permissions for [%s]. See <a %s>online manual on "
 "file permissions</a>."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:481
+#: ..\..\..\admin\b2blogs.php:541
 #, fuzzy, php-format
 msgid "Writing to file [%s]..."
 msgstr "Skriver til fil..."
 
-#: ..\..\..\admin\b2blogs.php:485 ..\..\..\admin\edit_actions.php:118
+#: ..\..\..\admin\b2blogs.php:545 ..\..\..\admin\edit_actions.php:118
 #: ..\..\..\admin\edit_actions.php:246 ..\..\..\admin\edit_actions.php:338
 #: ..\..\..\admin\edit_actions.php:402
 #: ..\..\..\b2evocore\_functions_antispam.php:208
@@ -578,8 +591,7 @@ msgstr "Ferdig."
 msgid "Browse blog:"
 msgstr "Lese blog:"
 
-#: ..\..\..\admin\b2browse.php:56 ..\..\..\admin\b2categories.php:290
-#: ..\..\..\admin\b2edit.php:162
+#: ..\..\..\admin\b2browse.php:56 ..\..\..\admin\b2edit.php:162
 #, fuzzy, php-format
 msgid ""
 "Since you're a newcomer, you'll have to wait for an admin to authorize you "
@@ -665,6 +677,11 @@ msgstr "Rot (Ingen over)"
 #: ..\..\..\admin\b2categories.php:246
 msgid "Edit category!"
 msgstr "Rediger kategori!"
+
+#: ..\..\..\admin\b2categories.php:291
+#, fuzzy
+msgid "Sorry, you have no permission to edit/view any category's properties."
+msgstr "Du har ikke rettigheter nok til å redigere bloggene."
 
 #: ..\..\..\admin\b2edit.php:26 ..\..\..\admin\edit_actions.php:191
 #: ..\..\..\admin\edit_actions.php:292
@@ -895,8 +912,8 @@ msgstr "Slett dette treffet!"
 
 #. TRANS: Abbrev. for Delete (stats)
 #: ..\..\..\admin\b2stats.php:250 ..\..\..\admin\b2stats.php:294
-#: ..\..\..\admin\b2stats.php:364 ..\..\..\admin\_blogs_list.php:23
-#: ..\..\..\admin\_blogs_list.php:81 ..\..\..\admin\_cats_list.php:31
+#: ..\..\..\admin\b2stats.php:364 ..\..\..\admin\_blogs_list.php:32
+#: ..\..\..\admin\_blogs_list.php:88 ..\..\..\admin\_cats_list.php:31
 #: ..\..\..\admin\_users_list.php:76 ..\..\..\admin\_users_list.php:143
 msgid "Del"
 msgstr "Slett"
@@ -1115,7 +1132,8 @@ msgid "Maximum allowed file size: %d KB"
 msgstr "Maksimal tillatt filstørrelse: %d KB"
 
 #: ..\..\..\admin\b2upload.php:109 ..\..\..\admin\b2upload.php:180
-#: ..\..\..\admin\_blogs_form.php:34 ..\..\..\admin\_set_plugins.form.php:23
+#: ..\..\..\admin\_blogs_general.form.php:73
+#: ..\..\..\admin\_set_plugins.form.php:23
 #: ..\..\..\admin\_set_plugins.form.php:46
 msgid "Description"
 msgstr "Beskrivelse"
@@ -1542,13 +1560,13 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\admin\_blogs_advanced.form.php:45
-#: ..\..\..\admin\_blogs_form.php:63
+#: ..\..\..\admin\_blogs_general.form.php:102
 #: ..\..\..\admin\_blogs_permissions.form.php:199
 msgid "Update blog!"
 msgstr "Oppdater blog!"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:46
-#: ..\..\..\admin\_blogs_form.php:64 ..\..\..\admin\_blogs_new.form.php:24
+#: ..\..\..\admin\_blogs_general.form.php:103
 #: ..\..\..\admin\_blogs_permissions.form.php:205
 #: ..\..\..\admin\_edit_showposts.php:532
 #: ..\..\..\admin\_set_general.form.php:79
@@ -1561,122 +1579,195 @@ msgstr "Oppdater blog!"
 msgid "Reset"
 msgstr "Tilbakestill"
 
-#: ..\..\..\admin\_blogs_form.php:19
+#: ..\..\..\admin\_blogs_general.form.php:17
+msgid "General parameters"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:19 ..\..\..\admin\_blogs_list.php:26
+msgid "Full Name"
+msgstr "Fullt navn"
+
+#: ..\..\..\admin\_blogs_general.form.php:19
+#, fuzzy
+msgid "Will be displayed on top of the blog."
+msgstr "Dette vises på blog-malen"
+
+#: ..\..\..\admin\_blogs_general.form.php:20
+msgid "Short Name"
+msgstr "Kortnavn"
+
+#: ..\..\..\admin\_blogs_general.form.php:20
+msgid "Will be used in selection menus and throughout the admin interface."
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:21
+#, fuzzy
+msgid "Main Locale"
+msgstr "Hovedspråk"
+
+#: ..\..\..\admin\_blogs_general.form.php:21
+msgid "Determines the language of the navigation links on the blog."
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:26
+msgid "Access parameters"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:35 ..\..\..\admin\_blogs_list.php:57
+msgid "Default blog on index.php"
+msgstr ""
+
+#. TRANS: current default blog
+#: ..\..\..\admin\_blogs_general.form.php:37
+msgid "Current default is:"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:38
+msgid "Other blog through index.php"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:41
+msgid "Other blog through stub file"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:42
+msgid "Preferred access type"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:46
+msgid "Blog Folder URL"
+msgstr "Blog mappe URL"
+
+#: ..\..\..\admin\_blogs_general.form.php:48
+msgid "No trailing slash. (If you don't know, leave this field empty.)"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:53
+msgid "URL blog name / Stub name"
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:53
+msgid ""
+"Used in URLs to identify this blog. This should be the stub filename if you "
+"use stub file access."
+msgstr ""
+
+#: ..\..\..\admin\_blogs_general.form.php:58
 msgid "Default display options"
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:21
+#: ..\..\..\admin\_blogs_general.form.php:60
 msgid "Default skin"
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:21
+#: ..\..\..\admin\_blogs_general.form.php:60
 #, fuzzy
 msgid "This is the default skin that will be used to display this blog."
 msgstr "Dette er hovedmalen. Den viser selve bloggen."
 
-#: ..\..\..\admin\_blogs_form.php:23
+#: ..\..\..\admin\_blogs_general.form.php:62
 msgid "Allow skin switching"
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:23
+#: ..\..\..\admin\_blogs_general.form.php:62
 msgid ""
 "Users will be able to select another skin to view the blog (and their "
 "prefered skin will be saved in a cookie)."
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:25
+#: ..\..\..\admin\_blogs_general.form.php:64
 #, fuzzy
 msgid "Display public blog list"
 msgstr "Vis pingbacks"
 
-#: ..\..\..\admin\_blogs_form.php:25
+#: ..\..\..\admin\_blogs_general.form.php:64
 msgid ""
 "Check this if you want to display the list of all blogs on your blog page "
 "(if your skin supports this)."
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:27
+#: ..\..\..\admin\_blogs_general.form.php:66
 msgid "Include in public blog list"
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:27
+#: ..\..\..\admin\_blogs_general.form.php:66
 msgid ""
 "Check this if you want to this blog to be displayed in the list of all "
 "public blogs."
 msgstr ""
 
-#: ..\..\..\admin\_blogs_form.php:29
+#: ..\..\..\admin\_blogs_general.form.php:68
 #, fuzzy
 msgid "Default linkblog"
 msgstr "Slett"
 
-#: ..\..\..\admin\_blogs_form.php:29
+#: ..\..\..\admin\_blogs_general.form.php:68
 #, fuzzy
 msgid "Will be displayed next to this blog (if your skin supports this)."
 msgstr "Dette vises på blog-malen"
 
-#: ..\..\..\admin\_blogs_form.php:36
+#: ..\..\..\admin\_blogs_general.form.php:75
 msgid "Tagline"
 msgstr "Undertittel"
 
-#: ..\..\..\admin\_blogs_form.php:36
+#: ..\..\..\admin\_blogs_general.form.php:75
 #, fuzzy
 msgid "This is diplayed under the blog name on the blog template."
 msgstr "Dette vises under blognavnet på blog-malen"
 
-#: ..\..\..\admin\_blogs_form.php:40
+#: ..\..\..\admin\_blogs_general.form.php:79
 msgid "Long Description"
 msgstr "Lang beskrivelse"
 
-#: ..\..\..\admin\_blogs_form.php:42
+#: ..\..\..\admin\_blogs_general.form.php:81
 msgid "This is displayed on the blog template."
 msgstr "Dette vises på blog-malen"
 
-#: ..\..\..\admin\_blogs_form.php:46
+#: ..\..\..\admin\_blogs_general.form.php:85
 msgid "Short Description"
 msgstr "Kort beskrivelse"
 
-#: ..\..\..\admin\_blogs_form.php:46
+#: ..\..\..\admin\_blogs_general.form.php:85
 #, fuzzy
 msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
 msgstr "Dette brukes i metatagg-beskrivelsen og RSS-koblinger. IKKE HTML!"
 
-#: ..\..\..\admin\_blogs_form.php:48
+#: ..\..\..\admin\_blogs_general.form.php:87
 msgid "Keywords"
 msgstr "Nøkkelord"
 
-#: ..\..\..\admin\_blogs_form.php:48
+#: ..\..\..\admin\_blogs_general.form.php:87
 msgid "This is is used in meta tag keywords. NO HTML!"
 msgstr "Dette brukes som meta-tag nøkkelord. IKKE HTML!"
 
-#: ..\..\..\admin\_blogs_form.php:53
+#: ..\..\..\admin\_blogs_general.form.php:92
 #, fuzzy
 msgid "Notes"
 msgstr "Ingen"
 
-#: ..\..\..\admin\_blogs_form.php:55
+#: ..\..\..\admin\_blogs_general.form.php:94
 msgid "Additional info."
 msgstr ""
 
-#: ..\..\..\admin\_blogs_list.php:16
+#: ..\..\..\admin\_blogs_general.form.php:102
+msgid "Create new blog!"
+msgstr "Lag ny blog!"
+
+#: ..\..\..\admin\_blogs_list.php:25
 msgid "Blog"
 msgstr "Blog"
 
-#: ..\..\..\admin\_blogs_list.php:17 ..\..\..\admin\_blogs_main.subform.php:15
-msgid "Full Name"
-msgstr "Fullt navn"
-
-#: ..\..\..\admin\_blogs_list.php:18
+#: ..\..\..\admin\_blogs_list.php:27
 #, fuzzy
 msgid "Blog URL"
 msgstr "Blog mappe URL"
 
-#: ..\..\..\admin\_blogs_list.php:19
+#: ..\..\..\admin\_blogs_list.php:28
 #, fuzzy
 msgid "Static File"
 msgstr "Statisk filnavn"
 
-#: ..\..\..\admin\_blogs_list.php:20 ..\..\..\admin\_set_regional.form.php:46
+#: ..\..\..\admin\_blogs_list.php:29 ..\..\..\admin\_set_regional.form.php:46
 #: ..\..\..\admin\_set_regional.form.php:118
 #: ..\..\..\admin\_users_form.php:118 ..\..\..\htsrv\_reg_form.php:42
 #: ..\..\..\skins\_profile.php:68
@@ -1684,28 +1775,24 @@ msgstr "Statisk filnavn"
 msgid "Locale"
 msgstr "Lokal"
 
-#: ..\..\..\admin\_blogs_list.php:42 ..\..\..\admin\_cats_list.php:27
+#: ..\..\..\admin\_blogs_list.php:46 ..\..\..\admin\_cats_list.php:27
 #: ..\..\..\admin\_users_list.php:56 ..\..\..\admin\_users_list.php:95
 #, fuzzy
 msgid "Properties"
 msgstr "Beskyttet"
 
-#: ..\..\..\admin\_blogs_list.php:53 ..\..\..\admin\_blogs_main.subform.php:31
-msgid "Default blog on index.php"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_list.php:53
+#: ..\..\..\admin\_blogs_list.php:57
 #, fuzzy
 msgid "Default"
 msgstr "Slett"
 
 #. TRANS: abbrev. for "generate !"
-#: ..\..\..\admin\_blogs_list.php:70
+#: ..\..\..\admin\_blogs_list.php:74
 msgid "Gen!"
 msgstr "Lag!"
 
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_blogs_list.php:81
+#: ..\..\..\admin\_blogs_list.php:88
 #, php-format
 msgid ""
 "Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete "
@@ -1713,99 +1800,31 @@ msgid ""
 "\\nThis CANNOT be undone!"
 msgstr ""
 
-#: ..\..\..\admin\_blogs_list.php:81
+#: ..\..\..\admin\_blogs_list.php:88
 #, fuzzy
 msgid "Delete this blog!"
 msgstr "Slett dette treffet!"
 
-#: ..\..\..\admin\_blogs_list.php:82
+#: ..\..\..\admin\_blogs_list.php:89
 #, fuzzy
 msgid "Copy this blog!"
 msgstr "Syndiker denne bloggen"
 
 #. TRANS: Abbrev. for Copy
-#: ..\..\..\admin\_blogs_list.php:82 ..\..\..\admin\_set_regional.form.php:195
+#: ..\..\..\admin\_blogs_list.php:89 ..\..\..\admin\_set_regional.form.php:195
 #: ..\..\..\admin\_users_list.php:69 ..\..\..\admin\_users_list.php:137
 msgid "Copy"
 msgstr ""
 
-#: ..\..\..\admin\_blogs_list.php:92
+#: ..\..\..\admin\_blogs_list.php:100
+#, fuzzy
+msgid "Sorry, you have no permission to edit/view any blog's properties."
+msgstr "Du har ikke rettigheter nok til å redigere bloggene."
+
+#: ..\..\..\admin\_blogs_list.php:111
 #, fuzzy
 msgid "New blog..."
 msgstr "Ny blog"
-
-#: ..\..\..\admin\_blogs_main.subform.php:13
-msgid "General parameters"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:15
-#, fuzzy
-msgid "Will be displayed on top of the blog."
-msgstr "Dette vises på blog-malen"
-
-#: ..\..\..\admin\_blogs_main.subform.php:16
-msgid "Short Name"
-msgstr "Kortnavn"
-
-#: ..\..\..\admin\_blogs_main.subform.php:16
-msgid "Will be used in selection menus and throughout the admin interface."
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:17
-#, fuzzy
-msgid "Main Locale"
-msgstr "Hovedspråk"
-
-#: ..\..\..\admin\_blogs_main.subform.php:17
-msgid "Determines the language of the navigation links on the blog."
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:22
-msgid "Access parameters"
-msgstr ""
-
-#. TRANS: current default blog
-#: ..\..\..\admin\_blogs_main.subform.php:31
-msgid "Current default is:"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:32
-msgid "Other blog through index.php"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:34
-msgid "Other blog through stub file"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:35
-msgid "Preferred access type"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:39
-msgid "Blog Folder URL"
-msgstr "Blog mappe URL"
-
-#: ..\..\..\admin\_blogs_main.subform.php:41
-msgid "No trailing slash. (If you don't know, leave this field empty.)"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:46
-msgid "URL blog name / Stub name"
-msgstr ""
-
-#: ..\..\..\admin\_blogs_main.subform.php:46
-msgid ""
-"Used in URLs to identify this blog. This should be the stub filename if you "
-"use stub file access."
-msgstr ""
-
-#: ..\..\..\admin\_blogs_new.form.php:13
-msgid "New blog"
-msgstr "Ny blog"
-
-#: ..\..\..\admin\_blogs_new.form.php:23
-msgid "Create new blog!"
-msgstr "Lag ny blog!"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:18
 #: ..\..\..\admin\_users_groupform.php:83
@@ -3209,8 +3228,8 @@ msgstr ""
 "Det ønskede skinnet [%s] eksisterer ikke. Det må innstilles riktig i "
 "bloggens stubb fil [%s]. Kontakt <a %s>vevmesteren</a>..."
 
-#: ..\..\..\b2evocore\_class_blog.php:368
-#: ..\..\..\b2evocore\_class_blog.php:382
+#: ..\..\..\b2evocore\_class_blog.php:375
+#: ..\..\..\b2evocore\_class_blog.php:389
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
@@ -3375,43 +3394,43 @@ msgstr "% Pingbacks"
 msgid "Display comments / Leave a comment"
 msgstr "Vis kommentarer / Legg igjen en kommentar"
 
-#: ..\..\..\b2evocore\_class_item.php:701
+#: ..\..\..\b2evocore\_class_item.php:706
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Vis trackbacks / Finn trackback-adresse for denne posten"
 
-#: ..\..\..\b2evocore\_class_item.php:702
+#: ..\..\..\b2evocore\_class_item.php:707
 #: ..\..\..\b2evocore\_functions_trackback.php:172
 msgid "Trackback (0)"
 msgstr "Trackbacks (0)"
 
-#: ..\..\..\b2evocore\_class_item.php:703
+#: ..\..\..\b2evocore\_class_item.php:708
 #: ..\..\..\b2evocore\_functions_trackback.php:173
 msgid "Trackback (1)"
 msgstr "Trackback (1)"
 
-#: ..\..\..\b2evocore\_class_item.php:704
+#: ..\..\..\b2evocore\_class_item.php:709
 #: ..\..\..\b2evocore\_functions_trackback.php:174
 #, fuzzy, php-format
 msgid "Trackbacks (%d)"
 msgstr "Trackbacks (%)"
 
-#: ..\..\..\b2evocore\_class_item.php:709
+#: ..\..\..\b2evocore\_class_item.php:719
 msgid "Display pingbacks"
 msgstr "Vis pingbacks"
 
 # Singular when 1 or -1, otherwise always plural
 # -Vegar
-#: ..\..\..\b2evocore\_class_item.php:710
+#: ..\..\..\b2evocore\_class_item.php:720
 #: ..\..\..\b2evocore\_functions_pingback.php:266
 msgid "Pingback (0)"
 msgstr "Pingbacks (0)"
 
-#: ..\..\..\b2evocore\_class_item.php:711
+#: ..\..\..\b2evocore\_class_item.php:721
 #: ..\..\..\b2evocore\_functions_pingback.php:267
 msgid "Pingback (1)"
 msgstr "Pingback (1)"
 
-#: ..\..\..\b2evocore\_class_item.php:712
+#: ..\..\..\b2evocore\_class_item.php:722
 #: ..\..\..\b2evocore\_functions_pingback.php:268
 #, fuzzy, php-format
 msgid "Pingbacks (%d)"
@@ -4945,44 +4964,45 @@ msgstr ""
 msgid "Upgrading data in existing b2evolution database"
 msgstr ""
 
-#: ..\..\..\install\index.php:391 ..\..\..\install\index.php:410
+#: ..\..\..\install\index.php:392 ..\..\..\install\index.php:412
 msgid "Upgrade completed successfully!"
 msgstr ""
 
-#: ..\..\..\install\index.php:392 ..\..\..\install\index.php:411
+#: ..\..\..\install\index.php:393 ..\..\..\install\index.php:413
+#: ..\..\..\install\_functions_evoupgrade.php:34
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr ""
 
-#: ..\..\..\install\index.php:405
+#: ..\..\..\install\index.php:407
 msgid "Installing b2evolution tables and copying existing b2 data"
 msgstr ""
 
-#: ..\..\..\install\index.php:424
+#: ..\..\..\install\index.php:426
 #, fuzzy
 msgid "Deleting b2evolution tables from the datatase"
 msgstr "min b2evolution"
 
-#: ..\..\..\install\index.php:428
+#: ..\..\..\install\index.php:430
 msgid "For security reasons, the reset feature is disabled by default."
 msgstr ""
 
-#: ..\..\..\install\index.php:438
+#: ..\..\..\install\index.php:440
 #, fuzzy
 msgid "Reset done!"
 msgstr "Tilbakestill"
 
-#: ..\..\..\install\index.php:439
+#: ..\..\..\install\index.php:441
 #, fuzzy
 msgid "Back to menu"
 msgstr "Tilbake til profil"
 
-#: ..\..\..\install\index.php:446
+#: ..\..\..\install\index.php:448
 #, fuzzy
 msgid "official website"
 msgstr "offisiell webside"
 
-#: ..\..\..\install\index.php:448
+#: ..\..\..\install\index.php:450
 msgid "contact"
 msgstr ""
 
@@ -4994,23 +5014,23 @@ msgid ""
 "stub file called '<code>%s</code>'. %s"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:404
+#: ..\..\..\install\_functions_create.php:405
 msgid "This is a sample linkblog entry"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:404
+#: ..\..\..\install\_functions_create.php:405
 msgid ""
 "This is sample text describing the linkblog entry. In most cases however, "
 "you'll want to leave this blank, providing just a Title and an Url for your "
 "linkblog entries (favorite/related sites)."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:424
+#: ..\..\..\install\_functions_create.php:425
 #, php-format
 msgid "This is the long description for the blog named '%s'. %s"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:432
+#: ..\..\..\install\_functions_create.php:433
 msgid ""
 "This blog (blog #1) is actually a very special blog! It automatically "
 "aggregates all posts from all other blogs. This allows you to easily track "
@@ -5018,58 +5038,58 @@ msgid ""
 "public by unchecking 'Include in public blog list' in the blogs admin."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:434
-#: ..\..\..\install\_functions_create.php:448
-#: ..\..\..\install\_functions_create.php:468
-#: ..\..\..\install\_functions_create.php:487
+#: ..\..\..\install\_functions_create.php:435
+#: ..\..\..\install\_functions_create.php:449
+#: ..\..\..\install\_functions_create.php:469
+#: ..\..\..\install\_functions_create.php:488
 #, fuzzy, php-format
 msgid "%s Title"
 msgstr "Tittel"
-
-#: ..\..\..\install\_functions_create.php:439
-#: ..\..\..\install\_functions_create.php:456
-#: ..\..\..\install\_functions_create.php:473
-#: ..\..\..\install\_functions_create.php:492
-#, fuzzy, php-format
-msgid "Tagline for %s"
-msgstr "Undertittel"
 
 #: ..\..\..\install\_functions_create.php:440
 #: ..\..\..\install\_functions_create.php:457
 #: ..\..\..\install\_functions_create.php:474
 #: ..\..\..\install\_functions_create.php:493
 #, fuzzy, php-format
+msgid "Tagline for %s"
+msgstr "Undertittel"
+
+#: ..\..\..\install\_functions_create.php:441
+#: ..\..\..\install\_functions_create.php:458
+#: ..\..\..\install\_functions_create.php:475
+#: ..\..\..\install\_functions_create.php:494
+#, fuzzy, php-format
 msgid "Short description for %s"
 msgstr "Kort beskrivelse"
-
-#: ..\..\..\install\_functions_create.php:443
-#: ..\..\..\install\_functions_create.php:461
-#: ..\..\..\install\_functions_create.php:477
-#: ..\..\..\install\_functions_create.php:496
-#, php-format
-msgid "Notes for %s"
-msgstr ""
 
 #: ..\..\..\install\_functions_create.php:444
 #: ..\..\..\install\_functions_create.php:462
 #: ..\..\..\install\_functions_create.php:478
 #: ..\..\..\install\_functions_create.php:497
+#, php-format
+msgid "Notes for %s"
+msgstr ""
+
+#: ..\..\..\install\_functions_create.php:445
+#: ..\..\..\install\_functions_create.php:463
+#: ..\..\..\install\_functions_create.php:479
+#: ..\..\..\install\_functions_create.php:498
 #, fuzzy, php-format
 msgid "Keywords for %s"
 msgstr "Nøkkelord"
 
-#: ..\..\..\install\_functions_create.php:485
+#: ..\..\..\install\_functions_create.php:486
 msgid ""
 "The main purpose for this blog is to be included as a side item to other "
 "blogs where it will display your favorite/related links."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:563
+#: ..\..\..\install\_functions_create.php:564
 #, fuzzy
 msgid "Clean Permalinks!"
 msgstr "Permalenke"
 
-#: ..\..\..\install\_functions_create.php:563
+#: ..\..\..\install\_functions_create.php:564
 msgid ""
 "b2evolution uses old-style permalinks and feedback links by default. This is "
 "to ensure maximum compatibility with various webserver configurations.\n"
@@ -5079,11 +5099,11 @@ msgid ""
 "info')"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:569
+#: ..\..\..\install\_functions_create.php:570
 msgid "Apache optimization..."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:569
+#: ..\..\..\install\_functions_create.php:570
 msgid ""
 "In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> "
 "there are two files called [<code>sample.htaccess</code>]. You should try "
@@ -5095,11 +5115,11 @@ msgid ""
 "to you when you rename the files, just remove them and you'll be fine."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:575
+#: ..\..\..\install\_functions_create.php:576
 msgid "About evoSkins..."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:575
+#: ..\..\..\install\_functions_create.php:576
 msgid ""
 "By default, b2evolution blogs are displayed using a default skin.\n"
 "\n"
@@ -5119,11 +5139,11 @@ msgid ""
 "evoSkins!"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:587
+#: ..\..\..\install\_functions_create.php:588
 msgid "Skins, Stubs and Templates..."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:587
+#: ..\..\..\install\_functions_create.php:588
 msgid ""
 "By default, all pre-installed blogs are displayed using a skin. (More on "
 "skins in another post.)\n"
@@ -5150,11 +5170,11 @@ msgid ""
 "function properly."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:601
+#: ..\..\..\install\_functions_create.php:602
 msgid "Multiple Blogs, new blogs, old blogs..."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:602
+#: ..\..\..\install\_functions_create.php:603
 msgid ""
 "By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', "
 "'Blog B' and 'Linkblog'.\n"
@@ -5166,11 +5186,11 @@ msgid ""
 "admin."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:611
+#: ..\..\..\install\_functions_create.php:612
 msgid "This is a multipage post"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:611
+#: ..\..\..\install\_functions_create.php:612
 msgid ""
 "This is page 1 of a multipage post.\n"
 "\n"
@@ -5191,11 +5211,11 @@ msgid ""
 "It is the last page."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:631
+#: ..\..\..\install\_functions_create.php:632
 msgid "Extended post with no teaser"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:631
+#: ..\..\..\install\_functions_create.php:632
 msgid ""
 "This is an extended post with no teaser. This means that you won't see this "
 "teaser any more when you click the \"more\" link.\n"
@@ -5206,12 +5226,12 @@ msgid ""
 "\" link."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:639
+#: ..\..\..\install\_functions_create.php:640
 #, fuzzy
 msgid "Extended post"
 msgstr "Lagrer post..."
 
-#: ..\..\..\install\_functions_create.php:639
+#: ..\..\..\install\_functions_create.php:640
 msgid ""
 "This is an extended post. This means you only see this small teaser by "
 "default and you must click on the link below to see more.\n"
@@ -5222,11 +5242,11 @@ msgid ""
 "\" link."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:647
-msgid "Important information :idea:"
+#: ..\..\..\install\_functions_create.php:648
+msgid "Important information"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:647
+#: ..\..\..\install\_functions_create.php:648
 msgid ""
 "Blog B contains a few posts in the 'b2evolution Tips' category.\n"
 "\n"
@@ -5238,44 +5258,48 @@ msgid ""
 "track of what you have already read."
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:685
+#: ..\..\..\install\_functions_create.php:686
 msgid "First Post"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:685
+#: ..\..\..\install\_functions_create.php:686
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
 "<p>It appears on both blog A and blog B.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:691
+#: ..\..\..\install\_functions_create.php:692
 #, fuzzy
 msgid "Second post"
 msgstr "Lagrer post..."
 
-#: ..\..\..\install\_functions_create.php:691
+#: ..\..\..\install\_functions_create.php:692
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
 "<p>It appears on blog A only but in multiple categories.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:697
+#: ..\..\..\install\_functions_create.php:698
 msgid "Third post"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:697
+#: ..\..\..\install\_functions_create.php:698
 msgid ""
 "<p>This is the third post.</p>\n"
 "\n"
 "<p>It appears on blog B only and in a single category.</p>"
 msgstr ""
 
-#: ..\..\..\install\_functions_create.php:719
+#: ..\..\..\install\_functions_create.php:720
 msgid ""
 "Hi, this is a comment.<br />To delete a comment, just log in, and view the "
 "posts' comments, there you will have the option to edit or delete them."
+msgstr ""
+
+#: ..\..\..\install\_functions_evoupgrade.php:33
+msgid "The database schema is already up to date. There is nothing to do."
 msgstr ""
 
 #: ..\..\..\install\_functions_install.php:26
@@ -5479,13 +5503,12 @@ msgstr "[...] Les mer!"
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nytt pingback på din post nr. %d \"%s\""
 
+#~ msgid "Back to new blog form"
+#~ msgstr "Tilbake til &quot;ny blog&quot;-skjema"
+
 #, fuzzy
 #~ msgid "Portuguese (BR)"
 #~ msgstr "Portugisisk"
-
-#, fuzzy
-#~ msgid "You have no permission to edit other users or groups!"
-#~ msgstr "Du har ikke rettigheter nok til å redigere bloggene."
 
 #, fuzzy
 #~ msgid "Create new Locale"
