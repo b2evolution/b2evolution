@@ -48,7 +48,7 @@ $new_db_version = 8030;				// next time: 8030
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-        $tablepostcats, $tablehitlog, $tablemailinglist, $tableantispam;
+        $tablepostcats, $tablehitlog, $tablemailinglist, $tableantispam, $tablepluginsettings;
 	global $baseurl, $new_db_version;
 
 	echo "<p>Creating the necessary tables in the database...</p>";
@@ -224,6 +224,9 @@ function create_b2evo_tables()
 	
 	echo "Creating table for Anti-Spam Ban List...</p>\n";
 	create_antispam();
+
+	echo "Creating table for Plugin Settings...<br />\n"
+	create_pluginsettings();
 
 	echo "<p>All tables created successfully.</p>\n";
 }
@@ -415,6 +418,11 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'visitcelebrities.com')";
 	mysql_query($query) or mysql_oops( $query );
+}
+
+function create_pluginsettings()
+{
+	global $tablepluginsettings;
 }
 
 
@@ -640,6 +648,14 @@ switch( $action )
 			create_antispam();
 			echo "OK.<br />\n";
 
+			echo "<p>Populating anti-spam table... ";
+			populate_antispam();
+			echo "OK.<br />\n";
+
+			echo "<p>Creating plugin settings table... ";
+			create_pluginsettings();
+			echo "OK.<br />\n";
+
 			echo "<p>Generating wordcounts... ";
 			$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
 			$q = mysql_query($query) or mysql_oops( $query );
@@ -668,6 +684,10 @@ switch( $action )
 
 			echo "<p>Populating anti-spam table... ";
 			populate_antispam();
+			echo "OK.<br />\n";
+			
+			echo "<p>Creating plugin settings table... ";
+			create_pluginsettings();
 			echo "OK.<br />\n";
 		}
 
@@ -712,12 +732,16 @@ switch( $action )
 			populate_antispam();
 			echo "OK.<br />\n";
 
+			echo "<p>Creating plugin settings table... ";
+			create_pluginsettings();
+			echo "OK.<br />\n";
+
 		}
 	
 		if( $old_db_version < 8040 )
 		{
 			global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-                        $tablepostcats, $tablehitlog, $tablemailinglist;
+                        $tablepostcats, $tablehitlog, $tablemailinglist, $tableantispam, $tablepluginsettings;
 	                global $baseurl, $new_db_version;
 			
 			echo "Creating table for Mailing List...</p>\n";
@@ -736,8 +760,11 @@ switch( $action )
 			echo "<p>Populating Anti-Spam table... ";
 			populate_antispam();
 			echo "OK.<br />\n";
+
+			echo "<p>Creating plugin settings table... ";
+			create_pluginsettings();
+			echo "OK.<br />\n";
 			
-	               
 			
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
@@ -911,6 +938,10 @@ switch( $action )
 		echo "Populating Anti-Spam table...";
 		populate_antispam();
 		echo "OK.<br />\n";
+		echo "<p>Creating plugin settings table... ";
+		create_pluginsettings();
+		echo "OK.<br />\n";
+		
 
 		// end benchmarking
 		$time_end = gettimeofday();
@@ -952,6 +983,10 @@ switch( $action )
 			break;	
 		}
 		
+		echo "Droping Plugin Settings table...<br />\n";
+		$query = "DROP TABLE IF EXISTS $tablepluginsettings";
+		$q = mysql_query($query) or mysql_oops( $query );
+
 		echo "Droping Anti-Spam table...<br />\n";
 		$query = "DROP TABLE IF EXISTS $tableantispam";
 		$q = mysql_query($query) or mysql_oops( $query );
