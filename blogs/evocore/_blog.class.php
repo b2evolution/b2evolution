@@ -304,7 +304,7 @@ class Blog extends DataObject
 	/**
 	 * Generate the blog's media directory (and create it if necessary).
 	 *
-	 * @param boolean absolute path or relative to $basepath.$media_subdir ?
+	 * @param boolean absolute path or relative to $basepath.$media_subdir.'blogs/' ?
 	 */
 	function gen_mediadir( $absolute = true )
 	{
@@ -313,7 +313,7 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'default':
-				$mediadir = $basepath.$media_subdir.'blogs/'.$this->urlname;
+				$mediadir = $basepath.$media_subdir.'blogs/'.$this->urlname.'/';
 				break;
 			case 'subdir':
 				$mediadir = $basepath.$media_subdir.'blogs/'.$this->media_subdir;
@@ -338,8 +338,7 @@ class Blog extends DataObject
 
 		return $absolute ?
 						$mediadir :
-						preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $this->media_fullpath );
-
+						preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $mediadir );
 	}
 
 
@@ -600,6 +599,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2005/01/05 03:23:02  blueyed
+ * fixed gen_mediadir()
+ *
  * Revision 1.6  2005/01/05 02:50:45  blueyed
  * Message changed
  *
