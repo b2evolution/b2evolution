@@ -72,7 +72,7 @@ switch($action)
 		}
 
 		// DB INSERT
-		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, '',
+		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl,
 									$blog_stub, '', '', '', '', $blog_locale, '', '', '', 0 );
 
 		// Set default user permissions for this blog
@@ -228,9 +228,6 @@ switch($action)
 				break;
 
 			case 'advanced':
-				param( 'blog_filename', 'string', '' );
-				$edited_Blog->set( 'filename', $blog_filename );
-
 				param( 'blog_staticfilename', 'string', '' );
 				$edited_Blog->set( 'staticfilename', $blog_staticfilename );
 
@@ -349,7 +346,6 @@ switch($action)
 				break;
 				
 			case 'advanced':
-				$blog_filename = get_bloginfo( 'filename' );
 				$blog_staticfilename = get_bloginfo( 'staticfilename' );
 				$blog_allowtrackbacks = get_bloginfo( 'allowtrackbacks' );
 				$blog_allowpingbacks = get_bloginfo( 'allowpingbacks' );
@@ -461,38 +457,70 @@ switch($action)
 		$staticfilename = get_bloginfo('staticfilename');
 		if( empty( $staticfilename ) )
 		{
-			echo '<p>', T_('You haven\'t set a static filename for this blog!'), "</p>\n</div>\n";
+			echo '<p class="error">', T_('You haven\'t set a static filename for this blog!'), "</p>\n</div>\n";
 			break;
 		}
 
-		// Determine the edit folder:
-		$filename = $edited_Blog->get('dynfilepath');
-		$staticfilename = $edited_Blog->get('staticfilepath');
-
-		printf( '<p>'.T_('Generating page from <strong>%s</strong> to <strong>%s</strong>...'), $filename, $staticfilename );
-		echo "<br />\n";
+		// GENERATION!
+		$static_gen_saved_locale = $current_locale;
+		$generating_static = true;
 		flush();
-
 		ob_start();
-		require $filename;
+		switch( $edited_Blog->access_type )
+		{
+			case 'default':
+			case 'index.php':
+				// Access through index.php
+				// We need to set required variables
+				# This setting retricts posts to those published, thus hiding drafts.
+				$show_statuses = array();
+				# This is the blog to be used as a blogroll (set to 0 if you don't want to use this feature)
+				$blogroll_blog = 4;
+				# This is the list of categories to restrict the blogroll to (cats will be displayed recursively)
+				$blogroll_cat = '';
+				# This is the array if categories to restrict the blogroll to (non recursive)
+				$blogroll_catsel = array( );
+				# Here you can set a limit before which posts will be ignored
+				$timestamp_min = '';
+				# Here you can set a limit after which posts will be ignored
+				$timestamp_max = 'now';
+				// That's it, now let b2evolution do the rest! :)
+				require $basepath.'/$core_subdir/_blog_main.php';
+				break;
+			
+			case 'stub':
+				// Access through stub file
+				require $edited_Blog->get('dynfilepath');
+		}
 		$page = ob_get_contents();
 		ob_end_clean();
+		unset( $generating_static );
 
-		// Switching back to default locale (the blog page may have changed it):
-		locale_activate( $default_locale );
+		// Switch back to saved locale (the blog page may have changed it):
+		locale_activate( $static_gen_saved_locale);
 
-		echo T_('Writing to file...'), '<br />', "\n";
+		$staticfilename = $edited_Blog->get('staticfilepath');
+		printf( '<p>'.T_('Writing to file [%s]...').'</p>', $staticfilename );
 
-		$fp = fopen ( $staticfilename, 'w');
-		fwrite($fp, $page);
-		fclose($fp);
-
-		echo T_('Done.');
-	?>
-		</p>
+		if( ! ($fp = fopen( $staticfilename, 'w' )) )
+		{	// could not open file
+			?>
+			<div class="error">
+				<p class="error"><?php echo T_('File cannot be written!') ?></p>			
+				<p><?php printf( '<p>'.T_('You sould check the permission for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ); ?></p>
+			</div>
+			<?php
+		}
+		else
+		{	// file writing OK
+			fwrite( $fp, $page );
+			fclose( $fp );
+	
+			echo '<p>'.T_('Done.').'</p>';
+		}
+		?>
 		</div>
-	<?php
-
+		<?php
 		break;
 
 

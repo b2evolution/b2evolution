@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-07 22:09+0100\n"
+"PO-Revision-Date: 2004-05-08 01:05+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -112,8 +112,8 @@ msgid "b2evolution is probably the most comprehensive blog engine you can find! 
 msgstr "b2evolution est probablement le moteur de blogs le plus complet que vous puissiez trouver! Il inclue pratiquement n'importe quelle fonctionnalité que vous pourriez attendre d'un outil de gestion de blogs, et plus encore! b2evolution est un logiciel libre, gratuit, open-source (GPL), qui peut fonctionner pratiquement n'importe où (PHP/mySQL) et disponible dans de nombreuses langues!"
 
 #: ../../index.src.html:35
-msgid "You will find complete information on the official <a %href>b2evolution website</a>."
-msgstr "Vous trouverez des informations complètes sur le <a %href>site web officiel</a>."
+msgid "You will find complete information on the official <a %s>b2evolution website</a>."
+msgstr "Vous trouverez des informations complètes sur le <a %s>site web officiel</a>."
 
 #: ../../index.src.html:36
 msgid "Quickstart instructions:"
@@ -227,8 +227,8 @@ msgstr "Sur les serveurs de production, il est recommandé de supprimer le sous r
 #: ../../doc/install_new.src.html:50
 #: ../../doc/upgradefrom_b2.src.html:69
 #: ../../doc/upgradefrom_b2evo.src.html:48
-msgid "After basic install is done, there are a few <a %href>tricky things you may need to take care of</a> (online manual)."
-msgstr "Une fois que l'installation de base est terminée, il y a quelques <a %href>choses légèrement délicates à régler</a> (manual en ligne)."
+msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
+msgstr "Une fois que l'installation de base est terminée, il y a quelques <a %s>choses légèrement délicates à régler</a> (manual en ligne)."
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"
@@ -279,8 +279,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/b2evo/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés, copiera vos données b2 vers b2evolution (sans altérer b2) et configurera b2evolution pour vous."
 
 #: ../../doc/upgradefrom_b2.src.html:68
-msgid "Check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr "Consultez le <a %href>wiki</a> ou les <a %href>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit b2 existant vers b2evolution."
+msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "Consultez le <a %s>wiki</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit b2 existant vers b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
 msgid "Upgrading from previous b2evolution"
@@ -292,7 +292,7 @@ msgstr "Mettre à jour depuis une version précédente de b2evolution"
 
 #: ../../doc/upgradefrom_b2evo.src.html:34
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
-msgstr ""
+msgstr "Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris /conf, les habillages (skins), les gabarits de blogs, les fichiers stub, etc..."
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
@@ -307,7 +307,7 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
 
 #: ../../doc/upgradefrom_b2evo.src.html:44
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %href>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %href>wiki</a> or the <a %href>forums</a> for notes on upgrading specific files from a specific version to another."
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr ""
 
 msgid "English (EU)"

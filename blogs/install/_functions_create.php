@@ -81,7 +81,6 @@ function create_b2evo_tables()
 		blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 		blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php',
 		blog_siteurl varchar(120) NOT NULL default '$baseurl',
-		blog_filename varchar(30) NULL default 'blog.php',
 		blog_staticfilename varchar(30) NULL default NULL,
 		blog_stub VARCHAR(30) NULL DEFAULT 'blog.php',
 		blog_roll text,
@@ -438,20 +437,20 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>".T_("Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin.")."</strong>";
 	$blog_ID = 1;
-	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = $blog_a_short;
 	$blog_stub = $stub_a;
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
 	$blog_ID = 2;
-	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
+	$blog_a_ID =	blog_create( $blog_a_long, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf(
 (($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = $stub_b;
 	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_b.php');
 	$blog_ID = 3;
-	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	$blog_shortname = 'Blogroll';
 	$blog_stub = $stub_roll;
@@ -459,7 +458,7 @@ If you don't want to use skins, use the provided '<code>%s</code>' file instead.
 <br />
 <strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links. This is commonly referred to as a 'Blogroll'.").'</strong>';
 	$blog_ID = 4;
-	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
+	$blog_roll_ID = blog_create( 'Demo '.$blog_shortname, $blog_shortname, $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_locale, '', $blog_shortname.' keywords', '' );
 
 	echo "OK.<br />\n";
 

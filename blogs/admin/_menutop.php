@@ -68,7 +68,7 @@ if( empty($mode) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2categories.php?blog=', $blog, '" >', T_('Cats'), '</a></li>';
+		echo '<a href="b2categories.php?blog=', $blog, '" >', T_('Categories'), '</a></li>';
 
 		if( $admin_tab == 'blogs' )
 			echo '<li class="current">';

@@ -32,7 +32,7 @@ param( 'sentence', 'string', 'AND', true );     // Search for sentence or for wo
 param( 'exact', 'integer', '', true );          // Require exact match of title or contents
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
-param( 'c', 'string', '', true );
+param( 'c', 'string', '', true );								
 param( 'page', 'integer', '', true );
 param( 'more', 'integer', 0, true );
 param( 'title', 'string', '', true );						// urtitle of post to display
@@ -78,13 +78,9 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	{ // Ignore index.html
 		$i++;
 	}
-	elseif( isset( $path_elements[$i] ) && $path_elements[$i] == $Blog->get( 'filename' ) )
-	{ // Ignore stub file (complete form)
-		$i++;
-	}
 	
-	if( isset( $path_elements[$i] ) && $path_elements[$i] == $Blog->get( 'stub' ) )
-	{ // Ignore stub file (url form)
+	if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'(\.php)?$#', $path_elements[$i] )  )
+	{ // Ignore stub file
 		$i++;
 	}
 
@@ -124,18 +120,28 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 				}
 			}
 		}
-		elseif( substr( $path_elements[$i], 0, 1 ) == 'w' )
+		elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
 		{	// We consider this a week number
 			$w = substr( $path_elements[$i], 1, 2 );
 		}
 	}
 }
 
-if ( empty( $disp ) )
+if( (!empty($p)) || (!empty($title)) )
+{	// We are going to display a single post
+	$disp = 'single';
+}
+
+if( empty( $disp ) )
+{	// defualt display:
+	$disp = 'posts';
+}
+
+if( ($disp == 'posts') || ($disp == 'single') )
 { // If we are going to display posts and not something special...
 
 	// On single post requests, check if we're on the right blog!
-	if( $redirect_to_postblog && ( (!empty($p)) || (!empty($title)) ) )
+	if( $redirect_to_postblog && ( $disp == 'post' ) )
 	{	// Yes we need to check.
 		if( !empty($p) )
 			$Item = Item_get_by_ID( $p );

@@ -173,14 +173,19 @@ function logout()
 
 }
 
-/*
+/**
  * is_logged_in(-)
  */
 function is_logged_in()
 {
-	global $user_ID;
+	global $user_ID, $generating_static;
 
-	return ( ! empty($user_ID) );
+	if( isset($generating_static) )
+	{	// When generating static page, we shoudl always consider we are not logged in.
+		return false;
+	}
+
+	return (!empty($user_ID));
 }
 
 

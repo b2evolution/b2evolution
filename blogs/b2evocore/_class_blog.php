@@ -25,7 +25,6 @@ class Blog extends DataObject
 	var $locale;
 	var $access_type = 'index.php';
 	var $siteurl;
-	var $filename;
 	var $staticfilename;
 	var $stub;
 	var $blogroll;
@@ -70,7 +69,6 @@ class Blog extends DataObject
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
 			$this->siteurl = $db_row->blog_siteurl;
-			$this->filename = $db_row->blog_filename;
 			$this->staticfilename = $db_row->blog_staticfilename;
 			$this->stub = $db_row->blog_stub;
 			$this->blogroll = $db_row->blog_roll;
@@ -122,23 +120,36 @@ class Blog extends DataObject
 	 * Generate blog URL
 	 *
 	 * {@internal Blog::gen_blogurl(-)}}
+	 *
+	 * @type string default|dynamic|static
+	 * @param boolean should this be an absolute URL? (otherwise: relative to $baseurl)
 	 */
-	function gen_blogurl( $absolute = true )
+	function gen_blogurl( $type = 'default', $absolute = true )
 	{
-		global $baseurl, $Settings;
+		global $baseurl, $basepath, $Settings;
 		
 		$base = $absolute ? $baseurl : '';
+
+		if( $type == 'static' )
+		{	// We want the static page, there is no acces type option here:
+			if( is_file( $basepath.$this->siteurl.'/'.$this->staticfilename ) )
+			{ // If static page exists:
+				return $base.$this->siteurl.'/'.$this->staticfilename;
+			}
+		}
 		
 		switch( $this->access_type )
 		{
 			case 'default':
+				// Access through index.php as default blog
 				if( $Settings->get('default_blog_ID') == $this->ID )
-				{	// Safety check! We only do that kinf of linking if this is really the default blog...
+				{	// Safety check! We only do that kind of linking if this is really the default blog...
 					return $base.$this->siteurl.'/index.php';
 				}
 				// ... otherwise, we add the blog ID:
 			
 			case 'index.php':
+				// Access through index.php + blog qualifier
 				if( $Settings->get('links_extrapath') )
 				{
 					return $base.$this->siteurl.'/index.php/'.$this->stub;
@@ -146,7 +157,13 @@ class Blog extends DataObject
 				return $base.$this->siteurl.'/index.php?blog='.$this->ID;
 			
 			case 'stub':
-				return $base.$this->siteurl.'/'.$this->stub;
+				// Access through stub file
+				$blogurl = $base.$this->siteurl.'/'.$this->stub;
+				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
+				{	// We want to force the dynamic page but the URL is not explicitely dynamic
+					$blogurl .= '.php';
+				}
+				return $blogurl;
 		
 			default:
 				die( 'Unhandled Blog access type ['.$this->access_type.']' );
@@ -160,7 +177,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl;
+		global $xmlsrv_url, $admin_email, $baseurl, $basepath;
 
 		switch( $parname )
 		{
@@ -168,36 +185,36 @@ class Blog extends DataObject
 				return $this->siteurl;
 	
 			case 'suburl':
-				return $this->gen_blogurl( false );
+				return $this->gen_blogurl( 'default', false );
 
 			case 'blogurl':
 			case 'link':			// RSS wording
 			case 'url':
-				return $this->gen_blogurl();
+				return $this->gen_blogurl( 'default' );
 			
 			case 'dynurl':
-				return $baseurl.$this->siteurl.'/'.$this->filename;
-			
-			case 'dynfilepath':
-				return get_path( 'base' ).$this->siteurl.'/'.$this->filename;
+				return $this->gen_blogurl( 'dynamic' );
 
 			case 'staticurl':
-				return $baseurl.$this->siteurl.'/'.$this->staticfilename;
+				return $this->gen_blogurl( 'static' );
+			
+			case 'dynfilepath':
+				return $basepath.$this->siteurl.'/'.$this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
 
 			case 'staticfilepath':
-				return get_path( 'base' ).$this->siteurl.'/'.$this->staticfilename;
+				return $basepath.$this->siteurl.'/'.$this->staticfilename;
 			
 			case 'baseurl':
 				return $baseurl.$this->siteurl.'/';
 			
 			case 'blogstatsurl':
-				return $baseurl.$this->siteurl.'/'.$this->stub.'?disp=stats';
+				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=stats' );
 			
 			case 'lastcommentsurl':
-				return $baseurl.$this->siteurl.'/'.$this->stub.'?disp=comments';
+				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=comments' );
 			
 			case 'arcdirurl':
-				return $baseurl.$this->siteurl.'/'.$this->stub.'?disp=arcdir';
+				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=arcdir' );
 			
 			case 'description':			// RSS wording
 			case 'shortdesc':
@@ -239,7 +256,6 @@ class Blog extends DataObject
 				return parent::get( $parname );
 		}
 	}
-
 
 	
 	/** 

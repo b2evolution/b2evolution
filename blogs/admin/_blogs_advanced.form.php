@@ -17,8 +17,6 @@
 	<fieldset>
 		<legend><?php echo T_('Static file generation') ?></legend>
 		<?php
-			form_text( 'blog_filename', $blog_filename, 30, T_('Source Stub Filename'), T_('This is the .php file that will be executed to generate a static version of the blog homepage. This should typically be a stub file.') );
-	
 			form_text( 'blog_staticfilename', $blog_staticfilename, 30, T_('Destination Static Filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 		?>
 	</fieldset>

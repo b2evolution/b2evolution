@@ -22,7 +22,6 @@ function blog_create(
 	$blog_name,
 	$blog_shortname,
 	$blog_siteurl,
-	$blog_filename,
 	$blog_stub,
 	$blog_staticfilename = '',
 	$blog_tagline = '',
@@ -45,7 +44,7 @@ function blog_create(
 
 	if( $blog_locale == '#' ) $blog_locale = $default_locale;
 
-	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl, blog_filename, ".
+	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl, ".
 						"blog_stub, blog_staticfilename, ".
 						"blog_tagline, blog_description, blog_longdesc, blog_locale, blog_roll, blog_keywords,".
 						"blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
@@ -54,7 +53,6 @@ function blog_create(
 	$query .= "'".$DB->escape($blog_name)."', ";
 	$query .= "'".$DB->escape($blog_shortname)."', ";
 	$query .= "'".$DB->escape($blog_siteurl)."', ";
-	$query .= "'".$DB->escape($blog_filename)."', ";
 	$query .= "'".$DB->escape($blog_stub)."', ";
 	$query .= "'".$DB->escape($blog_staticfilename)."', ";
 	$query .= "'".$DB->escape($blog_tagline)."', ";

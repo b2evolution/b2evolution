@@ -60,12 +60,12 @@
 			<td><a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('suburl') ?></a></td>
 			
 			<td>
-				<?php if( ($staticfilename=blog_list_iteminfo('staticfilename',false)) && blog_list_iteminfo('filename',false) )
-				{
+				<?php if( ($staticfilename=blog_list_iteminfo('staticfilename',false)) )
+				{ // It is possible to generate a static page
 				?>
 				<a href="<?php blog_list_iteminfo('staticurl') ?>"><?php echo $staticfilename ?></a>
 				<?php if( $current_User->check_perm( 'blog_genstatic', 'any', false, $curr_blog_ID ) )
-					{ // It is possible to generate a static page ?>
+					{ // Permission to generate a static page ?>
 						[<a href="b2blogs.php?action=GenStatic&amp;blog=<?php blog_list_iteminfo('ID') ?>"><?php
 							/* TRANS: abbrev. for "generate !" */ echo T_('Gen!') ?></a>]
 						<?php
