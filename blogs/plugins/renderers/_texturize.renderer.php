@@ -12,15 +12,14 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class texturize_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPTxrz';
-	var $priority = 90;
 	var $name = 'Texturize';
-	var $short_desc;
-	var $long_desc;
-	
+	var $priority = 90;
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;
-
+	var $short_desc;
+	var $long_desc;
+	
 
 	/**
 	 * Constructor

@@ -11,14 +11,14 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class auto_p_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2WPAutP';
-	var $priority = 30;
 	var $name = 'Auto P';
-	var $short_desc;
-	var $long_desc;
+	var $priority = 30;
 	
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
 	var $apply_to_xml = false;
+	var $short_desc;
+	var $long_desc;
 
 	var $br = true; 	// optionally make line breaks
 

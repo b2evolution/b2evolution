@@ -13,8 +13,8 @@ require_once dirname(__FILE__).'/../toolbar.class.php';
 class smilies_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evSmil';
-	var $priority = 70;
 	var $name = 'Smilies';
+	var $priority = 70;
 	var $short_desc;
 	var $long_desc;
 

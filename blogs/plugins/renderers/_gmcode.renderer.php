@@ -15,14 +15,13 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class gmcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evGMco';
-	var $priority = 41;
 	var $name = 'GM code';
-	var $short_desc;
-	var $long_desc;
-	
+	var $priority = 41;
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the GMcode markup
+	var $short_desc;
+	var $long_desc;
 
 	/**
 	 * GreyMatter formatting search array

@@ -13,14 +13,13 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class smilies_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evSmil';
-	var $priority = 80;
 	var $name = 'Smilies';
-	var $short_desc;
-	var $long_desc;
-	
+	var $priority = 80;
 	var $apply_when = 'always';
 	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the smilies alone
+	var $short_desc;
+	var $long_desc;
 
 	/**
 	 * Text similes search array

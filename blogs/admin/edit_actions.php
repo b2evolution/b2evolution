@@ -51,7 +51,7 @@ switch($action)
 		switch($mode)
 		{
 			case 'sidebar':
-				$location="b2sidebar.php?a=b&blog=$blog";
+				$location="b2sidebar.php?blog=$blog";
 				break;
 
 			default:
@@ -149,7 +149,6 @@ switch($action)
 			pingBlogs($blogparams);
 			pingTechnorati($blogparams);
 		}
-
 		break;
 
 
@@ -279,7 +278,6 @@ switch($action)
 
 		echo '<p>', T_('Updating done...'), "</p>\n";
 		echo "</div>\n";
-
 		break;
 
 

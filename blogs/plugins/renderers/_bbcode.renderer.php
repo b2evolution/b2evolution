@@ -15,14 +15,13 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class bbcode_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evBBco';
-	var $priority = 43;
 	var $name = 'BB code';
-	var $short_desc;
-	var $long_desc;
-	
+	var $priority = 43;
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true;
 	var $apply_to_xml = true;  // strip the BBcode
+	var $short_desc;
+	var $long_desc;
 
 	/**
 	 * BBcode formatting search array

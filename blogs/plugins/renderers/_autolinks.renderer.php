@@ -13,14 +13,14 @@ require_once dirname(__FILE__).'/../renderer.class.php';
 class autolinks_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2evALnk';
-	var $priority = 60;
 	var $name = 'Auto Links';
-	var $short_desc;
-	var $long_desc;
-	
+	var $priority = 60;
+
 	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
 	var $apply_to_xml = false;
+	var $short_desc;
+	var $long_desc;
 
 
 	/**

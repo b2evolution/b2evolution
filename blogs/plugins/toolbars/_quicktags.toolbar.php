@@ -17,8 +17,8 @@ require_once dirname(__FILE__).'/../toolbar.class.php';
 class quicktags_Toolbarplugin extends ToolbarPlugin
 {
 	var $code = 'b2evQTag';
-	var $priority = 30;
 	var $name = 'Quick Tags';
+	var $priority = 30;
 	var $short_desc;
 	var $long_desc;
 

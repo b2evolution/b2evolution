@@ -199,14 +199,13 @@ Applying Attributes:
 class textile_Rendererplugin extends RendererPlugin
 {
 	var $code = 'b2DATxtl';
-	var $priority = 20;
 	var $name = 'Textile';
-	var $short_desc;
-	var $long_desc;
-	
+	var $priority = 20;
 	var $apply_when = 'opt-in';
 	var $apply_to_html = true; 
 	var $apply_to_xml = true; 	// Strip the markup
+	var $short_desc;
+	var $long_desc;
 
     var $hlgn;
     var $vlgn;
