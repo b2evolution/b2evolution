@@ -397,12 +397,11 @@ function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams 
 }
 
 
+
 /**
- * blog_list_start(-)
- *
  * Start blog iterator
  *
- * fplanque: created
+ * blog_list_start(-)
  */
 function blog_list_start( $need = '' )
 {
@@ -417,7 +416,7 @@ function blog_list_start( $need = '' )
 
 	if( (!empty($need)) && (!get_bloginfo($need, $curr_blogparams )) )
 	{	// We need the blog to have a specific criteria that is not met, search on...
-		return blog_list_next();		// This can be recursive
+		return blog_list_next( $need );		// This can be recursive
 	}
 
 	$curr_blog_ID = $curr_blogparams->blog_ID;
@@ -427,11 +426,9 @@ function blog_list_start( $need = '' )
 
 
 /**
- * blog_list_next(-)
- *
  * Next blog iteration
  *
- * fplanque: created
+ * blog_list_next(-)
  */
 function blog_list_next( $need='' )
 {

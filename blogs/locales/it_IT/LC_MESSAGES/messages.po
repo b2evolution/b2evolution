@@ -122,7 +122,7 @@ msgstr "Cerca"
 #: ..\..\..\a_noskin.php:243
 #: ..\..\..\skins\custom\_main.php:188
 msgid "All Words"
-msgstr "Tutti le parole"
+msgstr "Tutte le parole"
 
 #: ..\..\..\a_noskin.php:244
 #: ..\..\..\skins\custom\_main.php:189
@@ -142,7 +142,7 @@ msgstr "Frase intera"
 #: ..\..\..\skins\custom\_main.php:204
 #: ..\..\..\skins\guadeloupe\_main.php:165
 msgid "Reset form"
-msgstr "Svuota modulo"
+msgstr "Svuota"
 
 #: ..\..\..\a_noskin.php:258
 #: ..\..\..\skins\bluesky\_main.php:162

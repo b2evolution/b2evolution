@@ -5,7 +5,7 @@
  */
 
 $trans['de_DE'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9.0.x\nPOT-Creation-Date: 2004-06-26 02:33+0200\nPO-Revision-Date: 2004-07-09 18:50+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+	'' => "Project-Id-Version: b2evolution 0.9.0.x\nPOT-Creation-Date: 2004-06-26 02:33+0200\nPO-Revision-Date: 2004-07-09 18:51+0100\nLast-Translator: dAniel hAhler <daniel@thequod.de>\nLanguage-Team: dAniel hAhler <daniel@thequod.de>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'Selected' => "Ausgewählt",
 	'Categories' => "Kategorien",
 	'Permanent link to full entry' => "Permanenter Link zum ganzen Eintrag",
