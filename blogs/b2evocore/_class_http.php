@@ -1,6 +1,6 @@
 <?
  /**
- * This classfile implements http gets and posts
+ * This classfile implements http gets and posts via both sockets and curl. with wget soon
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -15,7 +15,7 @@
  * Class Http
  *
  * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
- */
+ **/
 class http {
 
   function socket_post($server, $port, $url, $vars) {
@@ -33,12 +33,19 @@ class http {
         while (list($key,$value) = each($vars))
 		$urlencoded.= urlencode($key) . "=" . urlencode($value) . "&";
 	//lets trim it
-        $urlencoded = substr($urlencoded,0,-1);	
+        $urlencoded = substr($urlencoded,0,-1);
 	//set the content length
         $content_length = strlen($urlencoded);
         //what headers do we need?
-        // changed this so its using \n, as some servers will send out \r\n (fscking iis BURN IT)
-	$headers = "POST $url HTTP/1.1\nAccept: */*\nAccept-Language: en\nContent-Type: application/x-www-form-urlencoded\nUser-Agent: $user_agent\nHost: $server\nConnection: Keep-Alive\nCache-Control: no-cache\nContent-Length: $content_length\n\n";
+        $headers = "POST $url HTTP/1.1"
+        ."\r\nAccept: */*\r\n"
+        ."Accept-Language: en\r\n"
+        ."Content-Type: application/x-www-form-urlencoded\r\n"
+        ."User-Agent: $user_agent\r\n"
+        ."Host: $server\r\n"
+        ."Connection: Keep-Alive\r\n"
+        ."Cache-Control: no-cache\r\n"
+        ."Content-Length: $content_length\r\n\r\n";
 	// lets open a socket for the post, 
 	$post = fsockopen($server, $port);
 	//could we create the socket ?
@@ -70,23 +77,28 @@ class http {
    *   $url    = "/facecake.php"
    *   $vars   = array("who" => "am three", "face" => cake")
    */
-   
+
         // lets make our ua something unique to b2evo ...
 	$user_agent = "b2evolution";
-        
+
 	$urlencoded = "";
 	//lets encode the url
         while (list($key,$value) = each($vars))
 		$urlencoded.= urlencode($key) . "=" . urlencode($value) . "&";
 	//lets trim it
-        $urlencoded = substr($urlencoded,0,-1);	
+        $urlencoded = substr($urlencoded,0,-1);
 	//set the content length
         $content_length = strlen($urlencoded);
         //lets make geturl, be $url and $urlencoded
         $geturl = $url . "?" . $urlencoded;
         //what headers do we need?
-        // changed this so its using \n, as some servers will send out \r\n (fscking iis BURN IT)
-	$headers = "GET $geturl HTTP/1.1\nAccept: */*\nUser-Agent: $user_agent\nHost: $server\nConnection: Keep-Alive\nCache-Control: no-cache\nContent-Length: $content_length\n\n";
+        $headers = "GET $geturl HTTP/1.1\r\n"
+        ."Accept: */*\r\n"
+        ."User-Agent: $user_agent\r\n"
+        ."Host: $server\r\n"
+        ."Connection: Keep-Alive\r\n"
+        ."Cache-Control: no-cache\r\n"
+        ."Content-Length: $content_length\r\n\r\n";
 
 	// lets open a socket for the post, 
 	$get = fsockopen($server, $port);
@@ -109,7 +121,53 @@ class http {
 
   }
 
+  function curl_post($server, $port, $url, $vars) {
+  /*
+   *   $server = "www.wheely-bin.co.uk"
+   *   $port   = 80
+   *   $url    = "/facecake.php"
+   *   $vars   = array("who" => "am three", "face" => cake")
+   */
+
+        // lets make our ua something unique to b2evo ...
+	$user_agent = "b2evolution";
+
+        //lets set the port to 80 is its not already set
+        if (is_null($port)){
+           $port = 80;
+        };
+
+        //lets make the url
+        $url = "http://" . $server . ":" . $port . $url
+        // lets start the hair curling
+        $ch = curl_init($url);
+        // lets set our ua to $user_agent
+        curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
+        // lets be verbose for now
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        // lets have the headers
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        // lets follow any redirects
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        // get the post feilds  into curl
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $vars);
+
+        // perform post
+        $ret=curl_exec($ch);
+        //hair curlings done :P ITS A PERM!
+        curl_close($ch);
+        // return the output
+	return $ret;
+
+  }
 };
+
+
+
+
+
+
 
 
 
