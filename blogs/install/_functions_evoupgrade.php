@@ -205,8 +205,7 @@ function upgrade_b2evo_tables()
 							DROP COLUMN date_format,
 							ADD COLUMN pref_newusers_grp_ID int unsigned DEFAULT 4 NOT NULL,
 							ADD COLUMN pref_newusers_level tinyint unsigned DEFAULT 1 NOT NULL,
-							ADD COLUMN pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL,
-							DROP KEY ID";
+							ADD COLUMN pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 		echo "OK.<br />\n";
 	}

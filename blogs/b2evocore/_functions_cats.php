@@ -153,7 +153,7 @@ function cat_delete( $cat_ID )
 	//  --------------- PROCEED WITH DELETING ------------
 
 	// First delete assoc to this cat when it's an extra cat
-	$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID ".$IDlist;
+	$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID ";
 
 	if( !empty($IDarray) )
 	{	

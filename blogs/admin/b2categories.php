@@ -97,7 +97,7 @@ switch($action)
 		</div>
 		<?php
 		// List the cats:
-		require( dirname(__FILE__).'/_blogs_list.php' ); 
+		require( dirname(__FILE__).'/_cats_list.php' ); 
 		break;
 	
 	
@@ -145,8 +145,10 @@ switch($action)
 		// check permissions:
 		$current_User->check_perm( 'blog_cats', '', true, $blog );
 	
+		$cat_name = get_catname($cat_ID);
+
 		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', T_('Deleting category...'), "</h3>\n";
+		echo '<h3>', sprintf( T_('Deleting category #%d : %s ...') ,$cat_ID, format_to_output( $cat_name, 'htmlbody') ), "</h3>\n";
 			
 		// DELETE FROM DB:
 		$result = cat_delete( $cat_ID ) or mysql_oops( $query );	
@@ -160,7 +162,7 @@ switch($action)
 		}
 		echo "</div>\n";
 		// List the cats:
-		require( dirname(__FILE__).'/_blogs_list.php' ); 
+		require( dirname(__FILE__).'/_cats_list.php' ); 
 	
 		break;
 		
@@ -178,17 +180,16 @@ switch($action)
 		$current_User->check_perm( 'blog_cats', '', true, $blog );
 	
 		$cat_name = get_catname($cat_ID);
-		$cat_name = addslashes($cat_name);
 		$cat_parent_ID = get_catparent($cat_ID);
 		?>
 		<div class="panelblock">
-		<h2><?php echo T_('Properties for category:'), ' ', $cat_name ?></h2>
+		<h2><?php echo T_('Properties for category:'), ' ', format_to_output( $cat_name, 'htmlbody' ) ?></h2>
 		<p>
 		<form name="renamecat" action="b2categories.php" method="post">
 			<?php echo T_('Name') ?>:
 			<input type="hidden" name="action" value="editedcat" />
 			<input type="hidden" name="cat_ID" value="<?php echo $cat_ID ?>" />
-			<input type="text" name="cat_name" value="<?php echo $cat_name ?>" />
+			<input type="text" name="cat_name" value="<?php echo format_to_output( $cat_name, 'formvalue' ) ?>" />
 			<h3><?php echo T_('New parent category') ?>:</h3>
 		<?php		
 		// ----------------- START RECURSIVE CAT LIST ----------------
@@ -208,7 +209,7 @@ switch($action)
 			}
 			$cat = get_the_category_by_ID( $curr_cat_ID );
 			echo "<li>"; ?>
-			<input type="radio" id="cat_parent_ID<?php echo $curr_cat_ID; ?>" name="cat_parent_ID" value="<?php echo $curr_cat_ID; ?>" 
+			<input type="radio" id="cat_parent_ID<?php echo $curr_cat_ID; ?>" name="cat_parent_ID" value="<?php echo $curr_cat_ID ?>" 
 			<?php 
 				if( $cat_parent_ID == $curr_cat_ID ) echo 'checked="checked"';
 			?>
@@ -249,7 +250,7 @@ switch($action)
 	
 		<?php
 		// List the cats:
-		require( dirname(__FILE__).'/_blogs_list.php' ); 
+		require( dirname(__FILE__).'/_cats_list.php' ); 
 		break;
 	
 	
@@ -258,14 +259,17 @@ switch($action)
 		param( 'cat_name', 'string', true );
 		param( 'cat_parent_ID', 'integer', true );
 		param( 'cat_ID', 'integer', true );
-			
+		//echo $cat_ID; 
 		$cat_blog_ID = get_catblog($cat_ID);
-		$parent_cat_blog_ID = get_catblog($cat_parent_ID);
-		if( $cat_blog_ID != $parent_cat_blog_ID )
-		{
-			die( 'Cat and parent must be in the same blog!' );
+		if( $cat_parent_ID != 0 )
+		{	// Check that parent is in same blog
+			$parent_cat_blog_ID = get_catblog($cat_parent_ID);
+			if( $cat_blog_ID != $parent_cat_blog_ID )
+			{
+				die( 'Cat and parent must be in the same blog!' );
+			}
 		}
-
+		
 		// check permissions:
 		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
 
