@@ -2,11 +2,13 @@
 /**
  * This file implements User Groups
  *
- * @package b2evolution {@link http://b2evolution.net}
- *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/ }
+ * b2evolution - {@link http://b2evolution.net/}
  *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 require_once dirname(__FILE__).'/_class_dataobject.php';
 
@@ -111,9 +113,10 @@ class Group extends DataObject
 	 *									- spamblacklist
 	 *									- options
 	 *									- users
+	 * @param string Permission level
 	 * @return strind Permission value
 	 */
-	function check_perm( $permname, $permrequested )
+	function check_perm( $permname, $permlevel )
 	{
 		eval( '$permvalue = $this->perm_'.$permname.';' );
 		// echo $permvalue;
@@ -137,7 +140,7 @@ class Group extends DataObject
 						
 					case 'view':
 						// User can only ask for view perm
-						if( $permrequested == 'view' )
+						if( $permlevel == 'view' )
 							return true;	// Permission granted
 						break;	
 				}

@@ -2,11 +2,13 @@
 /**
  * This file implements "data objects by fplanque" :P
  *
- * @package b2evolution {@link http://b2evolution.net}
- *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/ }
+ * b2evolution - {@link http://b2evolution.net/}
  *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 
 /**

@@ -224,8 +224,9 @@ function cat_delete( $cat_ID )
 	
 	// If we had a cache we'd better forget it!
 	// TODO: reset other caches!
-	unset( $cache_categories );
-	unset( $cache_postcats );
+	unset( $GLOBALS['cache_categories'] );
+	unset( $GLOBALS['cache_postcats'] );
+
 	
 	return 1; // success
 }
@@ -324,6 +325,7 @@ function cat_load_cache()
 	global $time_difference;
 	if( !isset($cache_categories)) 
 	{
+		// echo "loading CAT cache";
 		$query="SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID ".
 				"FROM $tablecategories ".
 				"ORDER BY cat_name"; 

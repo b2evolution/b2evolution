@@ -1,9 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements comments
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 require_once dirname(__FILE__).'/_class_dataobject.php';
 

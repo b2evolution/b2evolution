@@ -1,9 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Editing the categories
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 require_once (dirname(__FILE__).'/_header.php');
 $title = T_('Categories for blog:');
@@ -24,7 +29,7 @@ function cats_display_blog_list()
 				$curr_blog_ID!=false; 
 				 $curr_blog_ID=blog_list_next() ) 
 	{ 
-		if( ! $current_User->check_perm_blogusers( 'blog_cats', 'any', $curr_blog_ID ) )
+		if( ! $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
 		{	// Current user is not allowed to edit cats...
 			continue;
 		}
@@ -50,7 +55,7 @@ function cats_display_blog_list()
 switch($action) 
 {
 	case 'newcat':
-		// Create new category:
+		// New category form:
 		param( 'parent_cat_ID', 'integer' );
 		if( !empty($parent_cat_ID) )
 		{
@@ -61,10 +66,8 @@ switch($action)
 		cats_display_blog_list();
 		require(dirname(__FILE__).'/_menutop_end.php');
 	
-		if( $user_level < 3 ) 
-		{
-			die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
-		}
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
 	
 		echo "<div class=\"panelblock\">\n";
 	
@@ -93,27 +96,31 @@ switch($action)
 		</form>
 		</div>
 		<?php
+		// List the cats:
+		require( dirname(__FILE__).'/_blogs_list.php' ); 
 		break;
 	
 	
 	case 'addcat':
-		/*
-		 * INSERT new cat into db
-		 */
-		if( $user_level < 3 ) 
-		{
-			die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
-		}
-		
-		param( 'cat_name', 'string' );
+		// INSERT new cat into db
+		param( 'cat_name', 'string', true );
 		param( 'parent_cat_ID', 'integer' );
-		param( 'cat_blog_ID', 'integer' );
+		if( !empty($parent_cat_ID) )
+		{	// We are creating a subcat
+			$cat_blog_ID = get_catblog($parent_cat_ID);
+		}
+		else
+		{
+			param( 'cat_blog_ID', 'integer', true );
+		}
+
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
 	
 		if( !empty($parent_cat_ID) )
 		{	// We are creating a subcat
 			// INSERT INTO DB
 			$new_cat_ID = cat_create( $cat_name, $parent_cat_ID ) or mysql_oops( $query );
-			$cat_blog_ID = get_catblog($parent_cat_ID);
 		}
 		else
 		{ // We are creating a new base cat
@@ -126,7 +133,8 @@ switch($action)
 		break;
 	
 	
-	case "Delete":
+	case 'Delete':
+		// Delete cat from DB:
 		param( 'cat_ID', 'integer' );
 		$blog = get_catblog($cat_ID);
 
@@ -134,10 +142,8 @@ switch($action)
 		cats_display_blog_list();
 		require(dirname(__FILE__).'/_menutop_end.php');
 	
-		if( $user_level < 3 ) 
-		{
-			die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
-		}
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
 	
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>', T_('Deleting category...'), "</h3>\n";
@@ -153,11 +159,14 @@ switch($action)
 			echo T_('Category deleted.');
 		}
 		echo "</div>\n";
+		// List the cats:
+		require( dirname(__FILE__).'/_blogs_list.php' ); 
 	
 		break;
 		
 		
 	case 'Edit':
+		// Cat edit form:
 		param( 'cat_ID', 'integer' );
 		$blog = get_catblog($cat_ID);
 
@@ -165,10 +174,8 @@ switch($action)
 		cats_display_blog_list();
 		require(dirname(__FILE__).'/_menutop_end.php');
 	
-		if( $user_level < 3 ) 
-		{
-			die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
-		}
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
 	
 		$cat_name = get_catname($cat_ID);
 		$cat_name = addslashes($cat_name);
@@ -241,87 +248,55 @@ switch($action)
 		</div>
 	
 		<?php
-	
+		// List the cats:
+		require( dirname(__FILE__).'/_blogs_list.php' ); 
 		break;
 	
 	
 	case 'editedcat':
-		if( $user_level < 3 ) 
+		// Update cat in db:
+		param( 'cat_name', 'string', true );
+		param( 'cat_parent_ID', 'integer', true );
+		param( 'cat_ID', 'integer', true );
+			
+		$cat_blog_ID = get_catblog($cat_ID);
+		$parent_cat_blog_ID = get_catblog($cat_parent_ID);
+		if( $cat_blog_ID != $parent_cat_blog_ID )
 		{
-			die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
+			die( 'Cat and parent must be in the same blog!' );
 		}
-		
-		param( 'cat_name', 'string' );
-		param( 'cat_parent_ID', 'integer' );
-		param( 'cat_ID', 'integer' );
-	
+
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
+
 		cat_update( $cat_ID, $cat_name, $cat_parent_ID ) or mysql_oops( $query );
 	
-		header("Location: b2categories.php");
+		header("Location: b2categories.php?blog=$cat_blog_ID");
 		break;
 	
 	default:
+		// Just display cat list for this blog
 		require(dirname(__FILE__).'/_menutop.php');
 		cats_display_blog_list();
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if( $user_level < 3 && ! $demo_mode ) 
-		{
-			die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
+
+		if( $blog == 0 )
+		{	// No blog could be selected
+			?>
+			<div class="panelblock">
+			<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion"' ); ?>
+			</div>
+			<?php
+			break;
 		}
+
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
+
+		// List the cats:
+		require( dirname(__FILE__).'/_blogs_list.php' ); 
 }
+
+require( dirname(__FILE__).'/_footer.php' ); 
+
 ?>
-
-<div class="panelblock">
-<h2><?php echo T_('Categories for blog:'), ' ', get_bloginfo('name'); ?></h2>
-<?php 
-	
-	// ----------------- START RECURSIVE CAT LIST ----------------
-	cat_query();	// make sure the caches are loaded
-	function cat_edit_before_first( $parent_cat_ID, $level )
-	{	// callback to start sublist
-		
-	}
-	function cat_edit_before_each( $cat_ID, $level )
-	{	// callback to display sublist element
-		$cat = get_the_category_by_ID( $cat_ID );
-		echo '<li>';
-		echo "<a href=\"?action=Edit&cat_ID=".$cat_ID.'">';
-		echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" />';
-		echo '</a> <strong>'.$cat['cat_name'].'</strong>';
-		echo " <a href=\"?action=Delete&cat_ID=", $cat_ID, 
-			'" onClick="return confirm(\'Are you sure you want to delete?\')">';
-		echo '<img src="img/xross.gif" width="13" height="13" class="middle" alt="', /* TRANS: Abbrev. for Delete */ T_('Del'), '" />';
-		echo '</a>';
-		echo "
-<ul>\n";
-	}
-	function cat_edit_after_each( $cat_ID, $level )
-	{	// callback to display sublist element
-		echo "<li><a href=\"?action=newcat&parent_cat_ID=".$cat_ID.'">';
-		echo '<img src="img/new.png" width="13" height="12" class="middle" alt="', T_('Create'), '" /> ';
-		echo T_('New sub-category here'), "</a></li>\n";
-		echo "</ul>\n";
-		echo "</li>\n";
-	}
-	function cat_edit_after_last( $parent_cat_ID, $level )
-	{	// callback to end sublist
-		if( $level > 0 )
-		{
-		}
-	}
-
-	// run recursively through the cats
-	echo "<ul>\n";
-	cat_children( $cache_categories, $blog, NULL, 'cat_edit_before_first', 'cat_edit_before_each', 'cat_edit_after_each', 'cat_edit_after_last', 0 );
-	echo "<li><a href=\"?action=newcat&blog=".$blog, '">';
-	echo '<img src="img/new.png" width="13" height="12" class="middle" alt="', T_('Create'), '" /> ';
-	echo T_('New category here'), "</a></li>\n";
-	echo "</ul>\n";
-	// ----------------- END RECURSIVE CAT LIST ----------------
-?>
-	<p><?php echo T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).') ?></p>
-</div>
-
-
-<?php require( dirname(__FILE__).'/_footer.php' ); 
- ?>

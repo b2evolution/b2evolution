@@ -1,11 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Browsing posts for editing
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
- * Display posts for editing
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 require_once (dirname(__FILE__).'/_header.php');
 
@@ -47,14 +50,25 @@ for( $curr_blog_ID=blog_list_start();
 
 	require (dirname(__FILE__).'/_menutop_end.php');
 
-	get_blogparams();
-	
-	if( ($user_level == 0) || ! $current_User->is_blog_member( $blog ) )
-	{	
-		die( 'Permission denied.');
+	if( $blog == 0 )
+	{	// No blog could be selected
+		?>
+		<div class="panelblock">
+		<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.admin_email.'?subject=b2-promotion"' ); ?>
+		</div>
+		<?php
 	}
-
-	require dirname(__FILE__).'/_edit_showposts.php';
+	else
+	{	// We could select a blog:
+		get_blogparams();
+		
+		if( ($user_level == 0) || ! $current_User->is_blog_member( $blog ) )
+		{	
+			die( 'Permission denied.');
+		}
+	
+		require dirname(__FILE__).'/_edit_showposts.php';
+	}
 
 	require( dirname(__FILE__).'/_footer.php' ); 
 

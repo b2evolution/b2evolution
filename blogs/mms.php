@@ -1,27 +1,18 @@
 <?php
-/****************************************************************************
- *  b2evolution - http://b2evolution.net/
+/**
+ * MMS Server - injecting mms messages from a mobile phone into a blog
  *
- *  MMS Server - injecting mms messages from a mobile phone into a blog
+ * b2evolution - {@link http://b2evolution.net/}
  *
- *  This file built upon code from original Peffisaur - Stefan Hellkvist - http://hellkvist.org
- *  Copyright (c) 2004 by Hans Reinders - http://hansreinders.com
+ * This file built upon code from original Peffisaur - 
+ * Stefan Hellkvist - {@link http://hellkvist.org}
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * @copyright (c)2004 by Hans Reinders - {@link http://hansreinders.com}
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *****************************************************************************/
-
+ * @package mms
+ */
 require_once( dirname(__FILE__).'/b2evocore/_main.php' );
 
 param( 'login', 'string', '', true );

@@ -1,9 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements Users
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 require_once dirname(__FILE__).'/_class_dataobject.php';
 
@@ -172,10 +177,18 @@ class User extends DataObject
 		$this->dbchange( 'user_grp_ID', 'int', 'Group->get(\'ID\')' );
 	}
 	
-	/*
-	 * User::check_perm(-)
+	/** 
+	 * Check permission for this user
 	 *
-	 * Check permission
+	 * {@internal User::check_perm(-) }
+	 *
+	 * @param string Permission name, can be one of:
+	 *								- either group permission names, see {@link Group::check_perm()}
+	 *								- either blogusers permission names, see {@link User::check_perm_blogusers()}
+	 * @param string Permission level
+	 * @param boolean Execution will halt if this is !0 and permission is denied
+	 * @param integer Permission target blog ID
+	 * @return boolean 0 if permission denied
 	 */
 	function check_perm( $permname, $permlevel, $assert = false, $perm_target = NULL )
 	{
@@ -186,6 +199,7 @@ class User extends DataObject
 			case 'blog_post_statuses':
 			case 'blog_del_post':
 			case 'blog_comments':
+			case 'blog_cats':
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				break;
 			
@@ -202,10 +216,22 @@ class User extends DataObject
 		return $perm;
 	}
 
-	/*
-	 * User::check_perm_blogusers(-)
+	/** 
+	 * Check permission for this user on a specified blog
 	 *
-	 * Check permission on specified blog
+	 * This is not for direct use, please call {@link User::check_perm()) instead
+	 *
+	 * {@internal User::check_perm_blogusers(-) }
+	 *
+	 * @see User::check_perm()
+	 * @param string Permission name, can be one of the following:
+	 *									- blog_post_statuses
+	 *									- blog_del_post
+	 *									- blog_comments
+	 *									- blog_cats
+	 * @param string Permission level
+	 * @param integer Permission target blog ID
+	 * @return boolean 0 if permission denied
 	 */
 	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
 	{
@@ -276,7 +302,9 @@ class User extends DataObject
 		echo 'statuses=', $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )  ,'<br />'; */
 		return ( $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID )
 					 || $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
-					 || $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) );
+					 || $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID ) 
+					 || $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID ) 
+					 );
 	}
 	
 	

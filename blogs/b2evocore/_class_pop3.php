@@ -1,5 +1,5 @@
 <?php 
- /*
+ /**
 	* @package pop3
 	*
 	* @copyright
