@@ -130,6 +130,11 @@ $use_blodotgsping = 0;
 # Use extended ping to RSS?
 $use_rss = 1;
 
+# Listing on http://technorati.com
+# set this to 1 if you want your site to be listed on http://technorati.com when you add a new post
+# ATTENTION: Please do only enable this AFTER you have done all your blog setup tests and when
+# your blog url is definitive. This way you avoid leaving broken URLs out on the net.
+$use_technoratiping = 0;
 
 
 // ** Trackback / Pingback **

@@ -124,6 +124,7 @@ function b2newpost($m)
 		pingWeblogs($blogparams, false );
 		pingBlogs($blogparams);
 		pingCafelog($cafelogID, $post_title, $post_ID);
+		pingTechnorati($blogparams);
 
 		return new xmlrpcresp(new xmlrpcval("$post_ID"));
 
@@ -388,6 +389,8 @@ function bloggernewpost($m)
 			pingBlogs($blogparams);
 			logIO("O","Pinging Cafelog...");
 			pingCafelog($cafelogID, $post_title, $post_ID);
+			logIO("O","Pinging Technorati...");
+			pingTechnorati($blogparams);
 		}
 		
 		logIO("O","All done.");
@@ -534,6 +537,8 @@ function bloggereditpost($m)
 				pingBlogs($blogparams);
 				logIO("O","Pinging Cafelog...");
 				pingCafelog($cafelogID, $post_title, $post_ID);
+				logIO("O","Pinging Technorati...");
+				pingTechnorati($blogparams);
 			}
 
 		}

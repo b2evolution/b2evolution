@@ -198,4 +198,41 @@ function pingBlogs( & $blogparams )
 	}
 }
 
+/*
+* pingTechnorati(-)
+*
+* pings technorati.com
+*
+* Code by Isaac Schlueter http://isaac.beigetower.org
+* Adapted from the b2 ping instructions listed at
+* http://developers.technorati.com/wiki/pingConfigurations
+*
+*/
+function pingTechnorati(& $blogparams, $display = true ) {
+   global $use_technoratiping, $blogfilename;
+
+   if(!$use_technoratiping) return false;
+   if( $display ) {
+      echo "<div class=\"panelinfo\">\n";
+      echo '<h3>', T_('Pinging technorati.com...'), "</h3>\n";
+   }
+   if( !preg_match( '#^http://localhost[/:]#', $baseurl) ) {
+      $client = new xmlrpc_client("/rpc/ping", "rpc.technorati.com", 80);
+      $message = new xmlrpcmsg("weblogUpdates.ping", array(new xmlrpcval(get_bloginfo('name', $blogparams)),
+                                                           new xmlrpcval(get_bloginfo('blogurl', $blogparams)."/")));
+      $result = $client->send($message);
+      $ret = xmlrpc_displayresult( $result );
+      if (!$result || $result->faultCode()) {
+         if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
+         return(false);
+      } else {
+         if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
+         return(true);
+      }
+   } else {
+      if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
+      return(false);
+   }
+}
+
 ?>

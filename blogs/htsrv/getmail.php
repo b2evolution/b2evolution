@@ -259,6 +259,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
 			pingCafelog($cafelogID, $post_title, $post_ID);
+			pingTechnorati($blogparams);
 		}
 		echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
 		echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
