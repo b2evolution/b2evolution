@@ -425,11 +425,11 @@ class Plugin
 	 *
 	 * {@internal Plugin::Render(-)}}
 	 *
-	 * @param array Associative array of parameters
+	 * @param array Associative array of parameters (by reference!)
 	 *              (Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function Render( $params )
+	function Render( & $params )
 	{
 		switch( $params['format'] )
 		{
@@ -488,6 +488,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/22 03:00:57  blueyed
+ * fixed Render() again
+ *
  * Revision 1.2  2005/02/20 22:34:40  blueyed
  * doc, help_link(), don't pass $param as reference
  *
