@@ -22,18 +22,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <span class="nobr">&copy;2003-2004 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a></span>
 </p>
 
-<!-- this is for the spellchecker -->
-<form action="" name="SPELLDATA"><div>
-<input name="formname" type="hidden" value="" />
-<input name="messagebodyname" type="hidden" value="" />
-<input name="subjectname" type="hidden" value="" />
-<input name="companyID" type="hidden" value="" />
-<input name="language" type="hidden" value="" />
-<input name="opener" type="hidden" value="" />
-<input name="formaction" type="hidden" value="" />
-</div></form>
-
 <?php
+// CALL PLUGINS NOW:
+$Plug->call_plugins( 'AdminAfterPageFooter', array() );
+
+
 if( $admin_tab == 'files' || ($admin_tab == 'blogs' && $tab == 'perm') )
 { // init checkall JS functions
 ?>

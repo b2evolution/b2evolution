@@ -12,26 +12,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <script type="text/javascript" language="javascript">
 	<!--
-<?php
-if ($use_spellchecker)
-{ // --------------------------- SPELL CHECKER -------------------------------
-	?>
-	function DoSpell(formname, subject, body)
-	{
-		document.SPELLDATA.formname.value=formname
-		document.SPELLDATA.subjectname.value=subject
-		document.SPELLDATA.messagebodyname.value=body
-		document.SPELLDATA.companyID.value="custom\\http://cafelog.com"
-		document.SPELLDATA.language.value=1033
-		document.SPELLDATA.opener.value="<?php echo $admin_url ?>sproxy.php"
-		document.SPELLDATA.formaction.value="http://www.spellchecker.com/spell/startspelling.asp "
-		window.open("<?php echo $admin_url ?>b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
-	}
-<?php
-}
-
-// --------------------------- PREVIEW -------------------------------
-?>
 	/*
 	 * open_preview()
 	 * fplanque: created
@@ -147,6 +127,7 @@ if ($use_spellchecker)
 
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
+		// CALL PLUGINS NOW:
 		$Plug->call_plugins( 'DisplayToolbar', array( 'target_type' => $target_type ) );
 	?>
 	</div>
@@ -187,19 +168,15 @@ if ($use_spellchecker)
 		$edited_Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
 
-
-	if( $use_spellchecker )
-	{ // ------------------------------- SPELL CHECKER ---------------------------------- ?>
-		<input type="button" value="<?php echo T_('Spellcheck') ?>"
-		onclick="DoSpell('post','content','');" tabindex="11" />
-	<?php }
-
 	if( $current_User->check_perm( 'upload' ) )
 	{ // ------------------------------- UPLOAD ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Upload a file/image') ?>"
 		onclick="launchupload();" tabindex="12"  />
 		<?php
 	}
+
+	// CALL PLUGINS NOW:
+	$Plug->call_plugins( 'DisplayEditorButton', array( 'target_type' => $target_type ) );
 
 	?>
 	</div>

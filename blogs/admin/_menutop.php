@@ -29,6 +29,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<?php
 	}
 
+	$Debuglog->add( 'Admin_tab='.$admin_tab );
+
 	if( $admin_tab == 'files'
 			|| ($admin_tab == 'blogs' && $tab == 'perm') )
 	{{{ // -- Inject javascript ----------------
@@ -319,6 +321,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</script>
 		<?php
 	}}}
+
+	// CALL PLUGINS NOW:
+	$Plug->call_plugins( 'AdminEndHtmlHead', array() );
 	?>
 </head>
 

@@ -179,10 +179,52 @@ class Plugin
 	 *
 	 * {@internal Plugin::DisplayToolbar(-)}}
 	 *
-	 * @return boolean did we display a toolbar?
 	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
 	 */
 	function DisplayToolbar( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+ 	/**
+	 * Display an editor button
+	 *
+	 * {@internal Plugin::DisplayEditorButton(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEditorButton( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Called when ending the admin html head section
+	 *
+	 * {@internal Plugin::AdminEndHtmlHead(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminEndHtmlHead( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Called right after displaying the admin page footer
+	 *
+	 * {@internal Plugin::AdminAfterPageFooter(-)}}
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterPageFooter( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -193,10 +235,10 @@ class Plugin
 	 *
 	 * {@internal Plugin::DoAction(-)}}
 	 *
-	 * @param string Action name
+	 * @param array Associative array of parameters
 	 * @return boolean success?
 	 */
-	function DoAction( $action )
+	function DoAction( & $params )
 	{
 	 	echo T_('No such action!');
 		return false;		// Action failed!

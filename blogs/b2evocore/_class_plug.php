@@ -289,7 +289,7 @@ class Plug
 	 *
 	 * @return Plugin (false if no more plugin).
 	 */
-	function get_next()
+	function & get_next()
 	{
 		$this->init();	// Init if not done yet.
 
@@ -327,7 +327,7 @@ class Plug
 
 		$this->restart(); // Just in case.
 
-		while( $loop_Plugin = $this->get_next() )
+		while( $loop_Plugin = & $this->get_next() )
 		{ // Go through whole list of plugins
 			//echo ' ',$loop_Plugin->code, ':';
 

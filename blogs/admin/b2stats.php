@@ -155,8 +155,8 @@ switch( $show )
 		{
 			$sql .= ' WHERE hit_blog_ID = '.$blog;
 		}
-		$sql .= 'GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore
-						 ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
+		$sql .= ' GROUP BY YEAR(visitTime), MONTH(visitTime),  DAYOFMONTH(visitTime), hit_ignore
+						  ORDER BY YEAR(visitTime), MONTH(visitTime), DAYOFMONTH(visitTime)';
 		$res_hits = $DB->get_results( $sql, ARRAY_A );
 
 

@@ -55,13 +55,6 @@ $use_preview = 1;
 
 
 /**
- * set this to 0 to disable the spell checker, or 1 to enable it
- * @global boolean $use_spellchecker
- */
-$use_spellchecker = 1;
-
-
-/**
  * Do you want to be able to link each post to an URL ?
  * @global boolean $use_post_url
  */
