@@ -4,7 +4,7 @@
    * (http://backend.userland.com/rss092)
    */
   $skin = '';                         // We don't want this do be displayed in a skin !
-	$show_statuses = "'published'";     // Restrict to published posts
+	$show_statuses = array();     // Restrict to published posts
 	$timestamp_min = '';								// Show past
 	$timestamp_max = 'now';							// Hide future
   require dirname(__FILE__)."/../b2evocore/_blog_main.php";

@@ -15,7 +15,7 @@
 	
 	# This setting retricts posts to those published, thus hiding drafts.
 	# You should not have to change this.
-	$show_statuses = "'published'";
+	$show_statuses = array();
 
 	# Here you can set a limit before which posts will be ignored
 	# You can use a unix timestamp value or 'now' which will hide all posts in the past

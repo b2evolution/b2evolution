@@ -245,10 +245,14 @@ function get_postdata($postid)
 	// We have to load the post
 	// fplanque changed: $sql = "SELECT * FROM $tableposts WHERE ID = $postid";
 	$sql = "SELECT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";
-	if( ! empty( $show_statuses ) )
-	{
-		$sql .= " AND post_status IN ($show_statuses) ";
-	}
+
+	/*
+	 * ----------------------------------------------------
+	 *  Restrict to the statuses we want to show:
+	 * ----------------------------------------------------
+	 */
+	$sql .= ' AND '.statuses_where_clause( $show_statuses );
+
 	//echo $sql;
 
 	$result = mysql_query($sql) or die("Your SQL query: <br />$sql<br /><br />MySQL said:<br />".mysql_error());
@@ -1284,6 +1288,54 @@ function bpost_count_words($string)
 	$string = count(explode(" ", $string));
 
 	return $string;
+}
+
+/*
+ * statuses_where_clause(-)
+ *
+ * Construct the where clause to limit post statuses
+ *
+ * fplanque: created
+ */
+function statuses_where_clause( $show_statuses )
+{
+	if( empty($show_statuses) )
+		$show_statuses = array( 'published', 'protected', 'private' );
+
+	$where = ' ( ';
+	$or = '';
+
+	if( $key = array_search( 'private', $show_statuses ) )
+	{	// Special handling for Private status:
+		unset( $show_statuses[$key] );
+		if( is_loggued_in() )
+		{	// We need to be loggued in to have a chance to see this:
+			global $user_ID;
+			$where .= $or." ( post_status = 'private' AND post_author = $user_ID ) ";
+			$or = ' OR ';
+		}
+	}
+
+	if( $key = array_search( 'protected', $show_statuses ) )
+	{	// Special handling for Private status:
+		if( ! is_loggued_in() )
+		{ // we are not allowed to see this if we are not loggued in:
+			unset( $show_statuses[$key] );
+		}
+	}
+	
+	// Remaining statuses:
+	$other_statuses = '';
+	$sep = '';
+	foreach( $show_statuses as $other_status )
+	{
+		$other_statuses .= $sep.'\''.$other_status.'\'';
+		$sep = ',';
+	}				
+	$where .= $or.'post_status IN ('. $other_statuses .') ) ';
+
+	// echo $where;
+	return $where;
 }
 
 ?>

@@ -48,7 +48,10 @@ class Calendar
 	 *
 	 * Constructor
 	 */
-	function Calendar( $blog = 1, $m= '', $show_statuses = "'published'",
+	function Calendar( 
+		$blog = 1, 
+		$m= '', 
+		$show_statuses = array(),
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now'  )							// Do not show posts after this timestamp
 	{
@@ -76,15 +79,15 @@ class Calendar
 		} 
 
 		// CONSTRUCT THE WHERE CLAUSE:
-		$where = '';
+
+		/*
+		 * ----------------------------------------------------
+		 *  Restrict to the statuses we want to show:
+		 * ----------------------------------------------------
+		 */
+		$where = ' AND '.statuses_where_clause( $show_statuses );
 		$where_link = ' AND ';
-			
-		// Restrict to the statuses we want to show :
-		if( ! empty( $show_statuses ) )
-		{
-			$where .= $where_link.' post_status IN ('.$show_statuses.') ';
-			$where_link = ' AND ';
-		}
+
 
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();

@@ -22,7 +22,7 @@ class CommentList
 	function CommentList( 
 		$blog = 1, 
 		$comment_types = "'comment'",
-		$show_statuses = 'published',					// Not used yet					
+		$show_statuses = array(),							// Not used yet					
 		$p = '',															// Not used yet
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC

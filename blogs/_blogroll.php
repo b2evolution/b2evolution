@@ -33,7 +33,7 @@
 	
 	
 	// Load the blogroll blog:
-	$BlogRollList = new ItemList( $blogroll_blog, "'published'", '', '', '', $blogroll_cat, $blogroll_catsel, '', 'ASC', 'category title', '', '', '', '', '', '', '', '', $blogroll_limit, 'posts', $timestamp_min, $timestamp_max );
+	$BlogRollList = new ItemList( $blogroll_blog, array(), '', '', '', $blogroll_cat, $blogroll_catsel, '', 'ASC', 'category title', '', '', '', '', '', '', '', '', $blogroll_limit, 'posts', $timestamp_min, $timestamp_max );
 	
 	// Dirty trick until we get everything into objects:
 	$saved_blog = $blog;  

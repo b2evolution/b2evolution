@@ -5,6 +5,24 @@ div.main {
 	margin-left: 0px;
 }
 
+.bPostprotected {
+	clear: both;
+	padding: 2ex;
+	margin: 3ex;
+	margin-right: 0ex;
+	border: 1px solid #e9f;
+	background-color: #f8f0ff;
+}
+
+.bPostprivate {
+	clear: both;
+	padding: 2ex;
+	margin: 3ex;
+	margin-right: 0ex;
+	border: 1px solid #f99;
+	background-color: #fff0f0;
+}
+
 .bPostdraft {
 	clear: both;
 	padding: 2ex;
@@ -12,6 +30,16 @@ div.main {
 	margin-right: 0ex;
 	border: 1px dashed #CCCCCC;
 	background-color: #EEEEEE;
+}
+
+.bPostdeprecated {
+	clear: both;
+	padding: 2ex;
+	margin: 3ex;
+	margin-right: 0ex;
+	border: 1px dashed #aaa;
+	background-color: #ddd;
+	color: #999;
 }
 
 .bTitle {

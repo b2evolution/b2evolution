@@ -358,15 +358,14 @@ function cat_load_cache()
 		// ------------------------------
 		
 		// CONSTRUCT THE WHERE CLAUSE:
-		$where = '';
-		$where_link = ' WHERE ';
-			
-		// Restrict to the statuses we want to show :
-		if( ! empty( $show_statuses ) )
-		{
-			$where .= $where_link.' post_status IN ('.$show_statuses.') ';
-			$where_link = ' AND ';
-		}
+
+		/*
+		 * ----------------------------------------------------
+		 *  Restrict to the statuses we want to show:
+		 * ----------------------------------------------------
+		 */
+		$where = ' WHERE '.statuses_where_clause( $show_statuses );
+		$where_link = ' AND ';
 
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
@@ -764,8 +763,8 @@ function dropdown_cats($optionall = 1, $all = 'All')
 	$query="SELECT * FROM $tablecategories";
 	$result=mysql_query($query);
 	$querycount++;
-	echo '<select name="cat" class="postform"', ',',">\n";
-	if (intval($optionall) == 1) 
+	echo '<select name="cat" class="postform">';
+	if( $optionall ) 
 	{
 		echo "\t<option value=\"all\">$all</option>\n";
 	}

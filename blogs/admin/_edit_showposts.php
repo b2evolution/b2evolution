@@ -26,15 +26,8 @@
 	set_param( 'c', 'string' );
 	set_param( 'tb', 'integer', 0 );
 	set_param( 'pb', 'integer', 0 );
-	set_param( 'show_status', 'array', array( 'draft', 'published'), true );	// Array of cats to restrict to
-	$show_statuses = '';
-	$status_sep = '';
-	foreach( $show_status as $this_status )
-	{
-		$show_statuses .= $status_sep."'".$this_status."'";
-		$status_sep = ',';
-	}
-
+	set_param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
+	$show_statuses = $show_status;
 	set_param( 'show_past', 'integer', '0', true ); 
 	set_param( 'show_future', 'integer', '0', true ); 
 	if( ($show_past == 0) && ( $show_future == 0 ) )
@@ -312,12 +305,22 @@
 				<legend><?php echo T_('Posts to show') ?></legend>
 				<div>
 				<input type="checkbox" name="show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" ' ?>/><label for="ts_min"><?php echo T_('Past') ?></label><br />
+
 				<input type="checkbox" name="show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo T_('Future') ?></label>
 				</div>
 				
 				<div>
-				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="ts_min"><?php echo T_('Draft') ?></label><br />
-				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" ' ?>/><label for="ts_max"><?php echo T_('Published') ?></label>
+				<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_published"><?php echo T_('Published (Public)') ?></label><br/>
+
+				<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_protected"><?php echo T_('Protected (Members only)') ?></label><br/>
+
+				<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_private"><?php echo T_('Private (You only)') ?></label><br/>
+
+				<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked ' ?>/><label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
+
+				<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" ' ?>/><label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br/>
+
+
 				</div>
 				
 			</fieldset>

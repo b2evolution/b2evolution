@@ -65,7 +65,7 @@ case 'new':
 
 		$action='post';
 		$post_lang = $default_language;
-		$post_status = $default_post_status;		// 'published' or 'draft'
+		$post_status = $default_post_status;		// 'published' or 'draft' or ...
 		$post_url = '';
 
 		$extracats = array();
@@ -105,7 +105,7 @@ case "edit":
 	{
 		$authordata = get_userdata($postdata["Author_ID"]);
 		if ($user_level < $authordata[13])
-			die ("You don't have the right to edit <strong>".$authordata[1]."</strong>'s posts.");
+			die("You don't have the right to edit <strong>".$authordata[1]."</strong>'s posts.");
 
 		$content = $postdata["Content"];
 		$autobr = $postdata["AutoBR"];

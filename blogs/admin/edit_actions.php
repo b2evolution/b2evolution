@@ -83,7 +83,7 @@ case 'post':
 	echo "<div class=\"panelinfo\">\n";
 	echo '<h3>', T_('Recording post...'), "</h3>\n";
 
-	// Are we going to do the pings one not?
+	// Are we going to do the pings or not?
 	$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 	// INSERT NEW POST INTO DB:

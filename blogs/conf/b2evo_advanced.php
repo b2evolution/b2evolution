@@ -64,7 +64,7 @@ $use_extra_path_info = 0; 				// Set this to 1 to enable clean extra path info
 
 
 # Default status for new posts:
-$default_post_status = 'published';		// 'published' or 'draft'
+$default_post_status = 'published';		// 'published', 'deprecated', 'protected', 'private', 'draft'
 
 
 # set this to 1 if you want to use the 'preview' function

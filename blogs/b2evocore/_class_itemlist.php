@@ -57,7 +57,7 @@ class ItemList
 	 */
 	function ItemList( 
 		$blog = 1, 
-		$show_statuses = 'published',					
+		$show_statuses = array(),					
 		$p = '',															// Specific post number to display
 		$m = '',															// YearMonth(Day) to display
 		$w = '',															// Week number
@@ -371,11 +371,13 @@ class ItemList
 			echo 'DEFAULT - NO LIMIT';
 		}
 */	
-		// Restrict to the statuses we want to show 
-		if( ! empty( $show_statuses ) )
-		{
-			$where .= " AND post_status IN ($show_statuses) ";
-		}
+
+		/*
+		 * ----------------------------------------------------
+		 *  Restrict to the statuses we want to show:
+		 * ----------------------------------------------------
+		 */
+		$where .= ' AND '.statuses_where_clause( $show_statuses );
 
 		/*
 		 * ----------------------------------------------------

@@ -191,8 +191,15 @@ if( $action != 'editcomment' )
 	<fieldset title="Status">
 		<legend><?php echo T_('Status') ?></legend>
 
-		<label><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Draft (Not published!)') ?></label><br />
-		<label><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Published') ?></label><br />
+		<label title="<?php echo T_('The post will be publicly published') ?>"><input type="radio" name="post_status" value="published" class="checkbox" <?php if( $post_status == 'published' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Published (Public)') ?></label><br />
+
+		<label title="<?php echo T_('The post will be published but visible only by loggued-in team members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Protected (Members only)') ?></label><br />
+
+		<label title="<?php echo T_('The post will be published but visible only by yourself') ?>"><input type="radio" name="post_status" value="private" class="checkbox" <?php if( $post_status == 'private' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Private (You only)') ?></label><br />
+
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="draft" class="checkbox" <?php if( $post_status == 'draft' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Draft (Not published!)') ?></label><br />
+
+		<label title="<?php echo T_('The post will appear only in the backoffice') ?>"><input type="radio" name="post_status" value="deprecated" class="checkbox" <?php if( $post_status == 'deprecated' ) echo 'checked="checked"'; ?> tabindex="20"><?php echo T_('Deprecated (Not published!)') ?></label><br />
 
 	</fieldset>
 	

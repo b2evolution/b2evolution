@@ -23,7 +23,7 @@ class ArchiveList
 	function ArchiveList( 
 		$blog = 1, 
 		$archive_mode = 'monthly',
-		$show_statuses = "'published'",					
+		$show_statuses = array(),					
 		$timestamp_min = '',									// Do not show posts before this timestamp
 		$timestamp_max = 'now',								// Do not show posts after this timestamp
 		$limit = '' )
@@ -36,15 +36,15 @@ class ArchiveList
 		$this->archive_mode = $archive_mode;
 
 		// CONSTRUCT THE WHERE CLAUSE:
-		$where = '';
-		$where_link = ' WHERE ';
-			
-		// Restrict to the statuses we want to show :
-		if( ! empty( $show_statuses ) )
-		{
-			$where .= $where_link.' post_status IN ('.$show_statuses.') ';
-			$where_link = ' AND ';
-		}
+
+		/*
+		 * ----------------------------------------------------
+		 *  Restrict to the statuses we want to show:
+		 * ----------------------------------------------------
+		 */
+		$where = ' WHERE '.statuses_where_clause( $show_statuses );
+		$where_link = ' AND ';
+		
 
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
