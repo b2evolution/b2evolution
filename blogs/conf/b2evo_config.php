@@ -54,8 +54,14 @@ $baseurl = 'http://localhost:8088/b2evolution/blogs';		// FOR TESTING
 # set this to 1 if you want to allow users to register on your blog.
 $users_can_register = 0;
 
+$users_can_register = 1;		// FOR TESTING
+
+
 # set this to 1 if you want new users to be able to post entries once they registered
 $new_users_can_blog = 0;
+
+$new_users_can_blog = 1;		// FOR TESTING
+
 
 # set this to 1 if you want to display the blog list on blog templates
 $display_blog_list = 0;

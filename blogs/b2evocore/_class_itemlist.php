@@ -258,7 +258,7 @@ class ItemList
 		 * Author stuff:
 		 * ----------------------------------------------------
 		 */
-		if ((!empty($author)) || ($author == 'all') || ($cat == '0')) 
+		if((empty($author)) || ($author == 'all')) 
 		{
 			$whichauthor='';
 		} 
@@ -281,9 +281,9 @@ class ItemList
 				$whichauthor .= ' '.$andor.' post_author '.$eq.' '.$author_array[$i];
 			}
 		}
-	
+
 		$where .= $search.$whichcat.$whichauthor;
-	
+
 	
 		/*
 		 * ----------------------------------------------------
