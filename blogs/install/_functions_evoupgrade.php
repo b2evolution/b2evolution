@@ -174,7 +174,6 @@ function upgrade_b2evo_tables()
 
 		echo "Upgrading users table... ";
 		$query = "ALTER TABLE $tableusers
-							DROP KEY ID,
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
 							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login', 
