@@ -108,6 +108,7 @@ a.PublishButton:hover {
 }
 
 input.search,
+input.ActionButton,
 input.SaveButton,
 input.ResetButton,
 input.DeleteButton,
@@ -120,6 +121,7 @@ div.PostActionsArea input {
 
 }
 input.search:hover,
+input.ActionButton:hover,
 input.CancelButton:hover,
 div.edit_actions input:hover,
 div.PostActionsArea input:hover {

@@ -7,7 +7,7 @@
  *
  * @package admin
  */
- 
+
 @import url(desert.css);	/* This is based on desert.css */
 
 /* Titles */
@@ -47,6 +47,7 @@ fieldset.submit input.SaveButton:hover,
 fieldset.submit input.ResetButton:hover,
 input.search,
 input.search:hover,
+input.ActionButton:hover,
 input.DeleteButton:hover,
 input.CancelButton:hover
 {

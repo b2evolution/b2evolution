@@ -167,6 +167,7 @@ a.PublishButton:hover {
 }
 
 input.search,
+input.ActionButton,
 input.SaveButton,
 input.DeleteButton,
 input.CancelButton,
@@ -185,6 +186,7 @@ div.PostActionsArea input {
 	margin: 1px 1px;
 }
 input.search:hover,
+input.ActionButton:hover,
 input.DeleteButton:hover,
 input.CancelButton:hover,
 div.edit_actions input:hover,
