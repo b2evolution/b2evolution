@@ -4,8 +4,8 @@
  * This file was generated automatically from messages.po
  */
 
-$trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-04-13 15:20+0200\nPO-Revision-Date: 2004-04-13 22:11+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
+$trans['fr-FR'] = array(
+	'' => "Project-Id-Version: b2evolution 0.9\nPOT-Creation-Date: 2004-04-13 15:20+0200\nPO-Revision-Date: 2004-04-15 13:57+0100\nLast-Translator: François PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n",
 	'my b2evolution' => "mon b2evoltution",
 	'my blogs' => "mes blogs",
 	'Multilingual multiuser multiblog engine!' => "Multilingual multiuser multiblog engine!",
@@ -793,7 +793,7 @@ $trans['fr_FR'] = array(
 	'Trackback from:' => "Trackback de:",
 	'Pingback from:' => "Pingback de:",
 	'No %s for this post yet...' => "Cet article n'a pas de %s pour le moment...",
-	'Comments are closed for this post.' => "Les commentaires sont ferrmés pour cet article.",
+	'Comments are closed for this post.' => "Les commentaires sont fermés pour cet article.",
 	'Line breaks become &lt;br /&gt;' => "Les retours à la ligne deviennent des  &lt;br /&gt;",
 	'Remember me' => "Se rappeler de moi",
 	'(Set cookies for name, email &amp; url)' => "(Placer des cookies pour le nom, l'email &amp; l'url)",

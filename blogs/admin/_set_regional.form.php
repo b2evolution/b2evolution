@@ -35,6 +35,12 @@
 		<th><?php echo  T_('Date fmt') ?></th>
 		<th><?php echo  T_('Time fmt') ?></th>
 		<th><?php echo  T_('Lang file') ?></th>
+		<th><?php echo  T_('Strings') ?></th>
+		<th><?php echo  T_('Translated') ?></th>
+		<?php if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
+		{ ?>
+		<th><?php echo  T_('Extract') ?></th>
+		<?php } ?>
 	</tr>
 	<?php
 	$i = 0; // counter to distinguish POSTed locales later, array trick (name="loc_enabled[]") fails for unchecked boxes
@@ -69,8 +75,90 @@
 		</td>
 		<td>
 			<input type="text" name="loc_'.$i.'_messages" value="'.$locales[$lkey]['messages'].'" maxlength="10" size="6" />
-		</td>
-		</tr>';
+		</td>';
+
+		// Get PO file for that locale:
+		$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
+		if( ! is_file( $po_file ) )
+		{
+			?>
+				<td colspan="3">No language file...</td>
+			<?php
+		}
+		else
+		{	// File exists:
+			$lines = file( $po_file );
+			$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
+			$all = 0;
+			$fuzzy = 0;
+			$this_fuzzy = false;
+			$untranslated=0;
+			$translated=0;
+			$status='-';
+			$matches = array();
+			foreach ($lines as $line) 
+			{
+				// echo 'LINE:', $line, '<br />';
+				if(trim($line) == '' )	
+				{	// Blank line, go back to base status:
+					if( $status == 't' )
+					{	// ** End of a translation ** :
+						if( $msgstr == '' )
+						{
+							$untranslated++;
+							// echo 'untranslated: ', $msgid, '<br />';
+						}
+						else
+						{
+							$translated++;
+						}
+						if( $msgid == '' && $this_fuzzy )
+						{	// It's OK if first line is fuzzy
+							$fuzzy--;
+						}
+						$msgid = '';
+						$msgstr = '';
+						$this_fuzzy = false;
+					}
+					$status = '-';
+				}
+				elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches)) 
+				{	// Encountered an original text
+					$status = 'o';
+					$msgid = $matches[1];
+					// echo 'original: "', $msgid, '"<br />';
+					$all++;
+				}
+				elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches)) 
+				{	// Encountered a translated text
+					$status = 't';
+					$msgstr = $matches[1];
+					// echo 'translated: "', $msgstr, '"<br />';
+				}
+				elseif( preg_match( '#^"(.*)"#', $line, $matches)) 
+				{	// Encountered a followup line
+					if ($status=='o') 
+						$msgid .= $matches[1];
+					elseif ($status=='t')
+						$msgstr .= $matches[1];
+				}
+				elseif(strpos($line,'#, fuzzy') === 0) 
+				{
+					$this_fuzzy = true;
+					$fuzzy++;
+				}
+			}
+			// $all=$translated+$fuzzy+$untranslated;
+			echo "\n\t<td>". $all ."</td>";
+			$percent_done = round(($translated-$fuzzy/2)/$all*100);
+			$color = sprintf( '%02x%02x00', 255-round($percent_done*2.55), round($percent_done*2.55) );
+			echo "\n\t<td style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
+			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction  )
+			{ // Translator options:
+				echo "\n\t<td>", '[<a href="b2options.php?tab=regional&amp;action=extract&amp;locale='.$lkey.'">Extract</a>]</td>';
+			}
+		}
+		echo '</tr>';
 	}
 	echo '</table>
 	<br />

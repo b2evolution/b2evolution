@@ -61,7 +61,7 @@ $locales = array(
 	'en-UK' => array( 'name' => NT_('English (UK)'),
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'd/m/y',
-										'timefmt' => 'H:i:s',
+										'timefmt' => 'h:i:s a',
 										'messages' => 'en_UK',
 										'enabled' => 1,
 									),
@@ -200,9 +200,9 @@ Unrecognized characters in the format string will be printed as-is.
 # day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc
 $start_of_week = 1;
 
-# Set this to 1 if you are a translator and wish to use the .po extraction script in
-# the /locales folder. Do not allow this on production servers as people could harm
-# your operations by continuously recomputing your language files.
-$allow_po_extraction = 1;
+# Set this to 1 if you are a translator and wish to extract strings from your .po file
+# Warning: do *not* extract .PO files you have not edited yourself. 
+# Shipped .PO files contain automatic translations that have *not* been reviewed.
+$allow_po_extraction = 0;
 
 ?>
