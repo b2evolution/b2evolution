@@ -267,6 +267,7 @@ case 'publish':
 
 	param( "post_ID", 'integer', true );
 	$post_status = 'published';
+	$post_date = date('Y-m-d H:i:s', $localtimenow);
 	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 	$blog = get_catblog($postdata['Category']); 
 	$post_title = $postdata['Title'];
@@ -291,7 +292,7 @@ case 'publish':
 	}
 
 	// UPDATE POST IN DB:
-	bpost_update_status( $post_ID, $post_status, $pingsdone ) or mysql_oops($query);
+	bpost_update_status( $post_ID, $post_status, $pingsdone, $post_date ) or mysql_oops($query);
 
 	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
 	{

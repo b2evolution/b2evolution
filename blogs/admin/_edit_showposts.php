@@ -157,7 +157,7 @@
 				if( $postdata['Status'] != 'published' )
 				{
 				?>
-				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Publish!') ?>" class="search" />
+				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />
 				</form>
 			<?php
 				}

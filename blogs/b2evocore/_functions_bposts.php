@@ -168,7 +168,8 @@ function bpost_update(
 function bpost_update_status( 
 	$post_ID,
 	$post_status = 'published',
-	$pingsdone = true )
+	$pingsdone = true,
+	$post_timestamp = '' )
 {
 	global $tableposts, $tablepostcats, $query, $querycount;
 	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
@@ -183,6 +184,7 @@ function bpost_update_status(
 	if( $use_smilies ) $post_flags[] = 'smileys';
 
 	$query = "UPDATE $tableposts SET ";
+	if( !empty($post_timestamp) )	$query .= "post_date = '$post_timestamp', ";
 	$query .= "post_status = '$post_status', ";
 	$query .= "post_flags = '".implode(',',$post_flags)."' ";
 	$query .= "WHERE ID = $post_ID";
