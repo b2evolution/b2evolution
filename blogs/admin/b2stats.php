@@ -410,6 +410,8 @@ switch( $tab )
                             			(empty($blog) ? '' : "AND hit_blog_ID = $blog ").
                            "ORDER BY visitID DESC" );
 
+	$Results->title = T_('Last referers');
+
   function stats_blog_name2( $blog_ID )
   {
 		global $BlogCache;
@@ -471,6 +473,9 @@ switch( $tab )
 	$Results->col_headers[] = T_('Requested URI');
 	$Results->cols[] = '<a href="$visitURL$">$visitURL$</a>';
 
+
+	if( isset($results_params) )
+		$Results->params = & $results_params;
 
 	// Display results:
 	$Results->display();
