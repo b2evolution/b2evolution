@@ -206,7 +206,7 @@ class File
 		}
 
 		// for files and dirs
-		$this->_lastm = @filemtime( $this->_dir.$this->_name );
+		$this->_lastMod = @filemtime( $this->_dir.$this->_name );
 		$this->_perms = @fileperms( $this->_dir.$this->_name );
 	}
 
@@ -335,7 +335,7 @@ class File
 
 	function getLastMod()
 	{
-		return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->_lastm );
+		return date_i18n( locale_datefmt().' '.locale_timefmt(), $this->_lastMod );
 	}
 
 
@@ -529,6 +529,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.11  2005/01/06 11:31:45  blueyed
+ * bugfixes
+ *
  * Revision 1.10  2005/01/05 03:04:00  blueyed
  * refactored
  *

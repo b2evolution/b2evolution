@@ -810,6 +810,19 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Get the path (and name) of a {@link File} relative to the {@link $root_dir root dir}.
+	 *
+	 * @param File the File object
+	 * @param boolean appended with name? (folders will get an ending slash)
+	 * @return string path (and optionally name)
+	 */
+	function getFileSubpath( &$File, $withName = true )
+	{
+		return parent::getFileSubpath( $File, $withName, $this->root_dir );
+	}
+
+
+	/**
 	 * Get the link to access a file or folder.
 	 *
 	 * @param File file object
@@ -970,6 +983,7 @@ class FileManager extends Filelist
 		$Nodelist = new Filelist( $path );
 		$Nodelist->load();
 
+
 		$rootIDAndPath = format_to_output( serialize( array( 'id' => $rootID, 'path' => $rootSubpath ) ), 'formvalue' );
 		$id_path = md5( $path );
 
@@ -999,8 +1013,7 @@ class FileManager extends Filelist
 		}
 		else
 		{ // Process subdirs
-			$r['string'] .= '<img ' // Gets activated by JS and makes only sense with JS
-											.' src="'.getIcon( 'collapse', 'url' ).'"'
+			$r['string'] .= '<img src="'.getIcon( 'collapse', 'url' ).'"'
 											.' onclick="toggle_clickopen(\''.$id_path.'\');"'
 											.' id="clickimg_'.$id_path.'" alt="+ / -" />
 										'.$label.'
@@ -1010,7 +1023,7 @@ class FileManager extends Filelist
 
 			while( $lFile =& $Nodelist->getNextFile( 'dir' ) )
 			{
-				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->getPath(), $Nodelist->getFileSubpath( $lFile ) );
+				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->getPath(), $rootSubpath.$Nodelist->getFileSubpath( $lFile ) );
 
 				if( $rSub['opened'] )
 				{
@@ -1373,6 +1386,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.15  2005/01/06 11:31:45  blueyed
+ * bugfixes
+ *
  * Revision 1.14  2005/01/06 10:15:45  blueyed
  * FM upload and refactoring
  *

@@ -1440,7 +1440,12 @@ while( $lFile =& $Fileman->getNextFile() )
 			{
 				?>
 				<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-				echo $Fileman->getFileSubpath( $lFile, false );
+				$subPath = $Fileman->getFileSubpath( $lFile, false );
+				if( empty( $subPath ) )
+				{
+					$subPath = './';
+				}
+				echo $subPath;
 				?>
 				</div>
 				<?php
@@ -1758,6 +1763,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.59  2005/01/06 11:31:46  blueyed
+ * bugfixes
+ *
  * Revision 1.58  2005/01/06 10:15:46  blueyed
  * FM upload and refactoring
  *

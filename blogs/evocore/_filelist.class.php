@@ -382,6 +382,10 @@ class Filelist
 			$sortfunction = '$r = strcasecmp( $a->getDir(), $b->getDir() );'
 											.'if( $r == 0 ) { $r = strcasecmp( $a->getName(), $b->getName() ); }';
 		}
+		elseif( $order == 'lastmod' )
+		{
+			$sortfunction = '$r = $a->_lastMod - $b->_lastMod;';
+		}
 		else
 		{
 			$sortfunction = '$r = strcasecmp( $a->get'.$order.'(), $b->get'.$order.'() );';
@@ -698,12 +702,15 @@ class Filelist
 	 * @param boolean appended with name? (folders will get an ending slash)
 	 * @return string path (and optionally name)
 	 */
-	function getFileSubpath( &$File, $withname = true )
+	function getFileSubpath( &$File, $withName = true, $rootDir = NULL )
 	{
-		#pre_dump( $File->getDir(), $this->listpath );
-		$path = substr( $File->getDir(), strlen( $this->listpath ) );
+		if( $rootDir === NULL )
+		{
+			$rootDir = $this->listpath;
+		}
+		$path = substr( $File->getDir(), strlen($rootDir) );
 
-		if( $withname )
+		if( $withName )
 		{
 			$path .= $File->getName();
 			if( $File->isDir() )
@@ -747,6 +754,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.13  2005/01/06 11:31:45  blueyed
+ * bugfixes
+ *
  * Revision 1.12  2005/01/06 10:15:45  blueyed
  * FM upload and refactoring
  *
