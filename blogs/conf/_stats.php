@@ -14,15 +14,15 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
-/*
- * Stat filters:
- */
-
 /**
- * Blacklist: domains that should not be logged for stats
+ * Blacklist: referrers that should be hidden in stats. This should typically include this
+ * site as well as stat services, online email services, online aggregators, etc.
  *
  * The following substrings will be looked up in the referer http header
- * THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam
+ * in order to identify referers to hide in the logs
+ *
+ * THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam!
+ *
  * WARNING: you should *NOT* use a slash at the end of simple domain names, as
  * older Netscape browsers will not send these. For example you should list
  * http://www.example.com instead of http://www.example.com/ .
@@ -33,19 +33,31 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 $blackList = array(
 	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash
-	'localhost',
-	'127.0.0.1',
+	'http://localhost',
+	'http://127.0.0.1',
 	// stat services
 	'sitemeter.com/',
+	// aggregators
+	'bloglines.com/',
+	// caches
+	'/search?q=cache:',		// Google cache
+	// redirectors
+	'googlealert.com/',
 	// add your own...
 );
 
 
 
-# Search engines for statistics
-# The following substrings will be looked up in the referer http header
+/**
+ * Search engines for statistics
+ *
+ * The following substrings will be looked up in the referer http header
+ * in order to identify search engines
+ *
+ * @global array $search_engines
+ */
 $search_engines = array(
-	'.google.',
+	'google.',
 	'.hotbot.',
 	'.altavista.',
 	'.excite.',
@@ -80,11 +92,24 @@ $search_engines = array(
 	'popdex.com',
 	'64.233.167.104',
 	'seek.3721.com',
+	'http://netscape.',
+	'/searchresults/',
+	'/websearch?',
+	'http://results.',
+	'baidu.com/',
+	'reacteur.com/',
+	'http://www.lmi.fr/',
+	'kartoo.com/',
 );
 
 
-# UserAgent identifiers for statistics
-# The following substrings will be looked up in the user_agent http header
+/**
+ * UserAgent identifiers for logging/statistics
+ *
+ * The following substrings will be looked up in the user_agent http header
+ *
+ * @global array $user_agents
+ */
 $user_agents = array(
 	// Robots:
 	array('robot', 'Googlebot/', 'Google (Googlebot)' ),
@@ -113,8 +138,13 @@ $user_agents = array(
 );
 
 
-# Do you want to check if referers really do refer to you before logging them
-# WARNING: this is very time consuming!
+/**
+ * Do you want to check if referers really do refer to you before logging them
+ *
+ * WARNING: this is very time consuming!
+ *
+ * @global boolean $doubleCheckReferers
+ */
 $doubleCheckReferers = 0;		// Set to 1 to enable double checking
 
 
