@@ -1,12 +1,17 @@
 <?php
 /*
  * b2evolution anti spam config
- * Version of this file: 0.8.6
+ * Version of this file: 0.8.6.2
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
 
+//
+// !! REMOVE THIS FILE !!
+//
+
 # Block URLs containing the following strings:
+/*
 $block_urls = array(
 // Real bad spammers:
 	'prescriptions.md',	
@@ -48,5 +53,6 @@ $block_urls = array(
 	'boris.com',
 	'mishka.com',
 	);
+*/
 
 ?>
