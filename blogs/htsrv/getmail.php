@@ -8,32 +8,32 @@
  * pop3-2-b2 mail to blog
  * This file built upon code from original b2 - http://cafelog.com/
  */
-$output_debugging_info = 0;		# =1 if you want to output debugging info
+$output_debugging_info = 1;		# =1 if you want to output debugging info
 
 require_once(dirname(__FILE__).'/../conf/_config.php');
-require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_main.php");
+require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_class_pop3.php");
 
 if( $use_phoneemail )
-{
-	// if you're using phone email, the email will already be in your timezone
+{ // if you're using phone email, the email will already be in your timezone
 	set_settings('time_difference', 0);
 }
 
-// error_reporting(2037);
-
+// error_reporting( E_ALL );
 
 
 $pop3 = new POP3();
 
 echo T_('Connecting to pop server...'), "<br />\n";
-if(!$pop3->connect($mailserver_url, $mailserver_port)) {
-	echo T_('Connection failed:'), " $pop3->ERROR <br />\n";
+if( !$pop3->connect($mailserver_url, $mailserver_port) )
+{
+	echo T_('Connection failed: ').$pop3->ERROR." <br />\n";
 	exit;
 }
 
 echo T_('Logging into pop server...'), "<br />\n";
-$Count = $pop3->login($mailserver_login, $mailserver_pass);
-if((!$Count) || ($Count == -1))
+$Count = $pop3->login( $mailserver_login, $mailserver_pass );
+if( (!$Count) || ($Count == -1) )
 {
 	echo T_('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
 	$pop3->quit();
@@ -41,10 +41,10 @@ if((!$Count) || ($Count == -1))
 }
 
 
-// ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT!
-//register_shutdown_function($pop3->quit());
+// ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT! (PHP >= 3.0.4)
+#register_shutdown_function( $pop3->quit() );
 
-for ($iCount=1; $iCount<=$Count; $iCount++)
+for( $iCount = 1; $iCount <= $Count; $iCount++)
 {
 	printf( T_('Getting message #%d...')."<br />\n", $iCount );
 	$MsgOne = $pop3->get($iCount);
@@ -60,11 +60,11 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$content_type = '';
 	$boundary = '';
 	$bodysignal = 0;
-	$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-					 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-	while ( list ( $lineNum,$line ) = each ($MsgOne) )
+	$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+	
+	while( list( $lineNum, $line ) = each ($MsgOne) )
 	{
-		if (strlen($line) < 3) {
+		if( strlen($line) < 3 ) {
 			$bodysignal = 1;
 		}
 		if ($bodysignal) {
@@ -140,7 +140,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	if( !preg_match('/'.$subjectprefix.'/', $subject))
 	{
-		echo T_('Subject prefix does not match'), '<br />';
+		echo T_('Subject prefix does not match').'.<br />';
 		continue;
 	}
 
@@ -191,14 +191,14 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 	$blah = explode(':', $userpassstring);
 	$user_login = trim($blah[0]);
-	$user_pass = trim($blah[1]);
+	$user_pass = @trim($blah[1]);
 
 	$content = $contentfirstline.str_replace($firstline, '', $content);
 	$content = trim($content);
 
 	echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
 
-	if(!user_pass_ok( $user_login, $user_pass ))
+	if( !user_pass_ok( $user_login, $user_pass ) )
 	{
 		echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
 		continue;
@@ -208,6 +208,7 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	$loop_User = & new User( $userdata );
 	$post_author = $userdata['ID'];
 
+	// --- get infos from content -----------
 	$post_title = xmlrpc_getposttitle($content);
 	if ($post_title == '')
 	{
@@ -221,7 +222,9 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	}
 	echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
 
-	$blog_ID = get_catblog($post_category);
+	$content = xmlrpc_removepostdata( $content );
+	
+	$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
 	echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 
 	// Check permission:
@@ -239,6 +242,8 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 
 		if( errors_display( T_('Cannot post, please correct these errors:'), '' ) )
 		{
+			$errors = array();
+			echo '</div>';
 			continue;
 		}
 
@@ -280,15 +285,6 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 	{
 		ob_end_clean();
 	}
-}
-
-if ($output_debugging_info)
-{
-	ob_end_flush();
-}
-else
-{
-	ob_end_clean();
 }
 
 echo T_('OK.'), "<br />\n";

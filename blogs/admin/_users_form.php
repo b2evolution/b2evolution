@@ -61,7 +61,7 @@
 	else
 	{
 		echo T_('Profile for:').' '.$edited_User->get('firstname').' '.$edited_User->get('lastname')
-					.' ['.$edited_User->get('login').']';
+					.' ['.( isset($edited_user_oldlogin)? $edited_user_oldlogin : $edited_User->get('login') ).']';
 	}	
 	?></h2>
 	
@@ -72,7 +72,7 @@
 
 		<input type="hidden" name="action" value="userupdate" />
 		<input type="hidden" name="edited_user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
-		<input type="hidden" name="edited_user_oldlogin" value="<?php $edited_User->disp('login','formvalue') ?>" />
+		<input type="hidden" name="edited_user_oldlogin" value="<?php echo ( isset($edited_user_oldlogin)? $edited_user_oldlogin : $edited_User->get('login') ) ?>" />
 		
 		<table cellpadding="5" cellspacing="0">
 			<?php

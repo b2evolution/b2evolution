@@ -21,7 +21,7 @@
 	}
 	else
 	{
-		echo T_('Editing group:').' '.$edited_Group->get('name');
+		echo T_('Editing group:').' '.( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') );
 	}
 	?></h2>
 
@@ -31,6 +31,7 @@
 	
 		<fieldset>
 			<legend><?php echo T_('General') ?></legend>
+			<input type="hidden" name="edited_grp_oldname" value="<?php echo ( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->get('name') ) ?>" />
 			<?php 
 				form_text( 'edited_grp_name', $edited_Group->get('name'), 50, T_('Name'), '', 50, 'large' );
 			?>

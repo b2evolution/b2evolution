@@ -253,13 +253,13 @@ switch( $next_action )
 
 		<fieldset>
 			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div>
-			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="3" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
+			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="5" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
 			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
 		</fieldset>
 
 		<fieldset>
 			<div class="label"><label for="blog_roll" ><?php echo T_('Blogroll') ?>:</label></div>
-			<div class="input"><textarea name="blog_roll" id="blog_roll" rows="3" cols="50" class="large"><?php echo $blog_roll ?></textarea>
+			<div class="input"><textarea name="blog_roll" id="blog_roll" rows="5" cols="50" class="large"><?php echo $blog_roll ?></textarea>
 			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
 		</fieldset>
 	</fieldset>
