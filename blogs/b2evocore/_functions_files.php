@@ -248,6 +248,7 @@ function str2path( $path )
 	}
 }
 
+
 /**
  * Check a filename if it has an image extension
  *
@@ -261,4 +262,16 @@ function is_image( $filename )
 	return (boolean)preg_match( $regexp_images, $filename );
 }
 
+
+/**
+ * Check for valid filename (no path allowed)
+ *
+ * @param string filename to test
+ */
+function is_filename( $filename )
+{
+	global $regexp_filename;
+
+	return (boolean)preg_match( $regexp_filename, $filename );
+}
 ?>
