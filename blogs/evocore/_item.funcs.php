@@ -146,7 +146,7 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title, 
+	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title,
 											post_url, post_main_cat_ID, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
 					FROM T_posts
 					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
@@ -1378,7 +1378,10 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 
 
 /**
- * Allow recursive category selection
+ * Allow recursive category selection.
+ *
+ * @todo Allow to use a dropdown (select) to switch between blogs ( CSS / JS onchange - no submit.. )
+ *
  */
 function cat_select( $display_info = true )
 {
@@ -1528,6 +1531,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/08 00:59:16  blueyed
+ * added @todo
+ *
  * Revision 1.10  2005/01/25 14:41:33  fplanque
  * changed echo to return in recursive cat list
  *
