@@ -42,12 +42,12 @@ if ($topRefererList)
 function filter_hit()
 {
  	global $Debuglog, $ReqURI, $DB, $Settings, $localtimenow, $comments_allowed_uri_scheme;
- 	global $HTTP_REFERER, $HTTP_USER_AGENT;
+ 	global $blackList, $search_engines, $user_agents, $HTTP_REFERER, $HTTP_USER_AGENT;
 
-	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.$_SERVER['REMOTE_ADDR'] );
-	$Debuglog->add( 'filter_hit: HTTP_REFERER: '.$HTTP_REFERER );
-	// $Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'] );
-	$Debuglog->add( 'filter_hit: HTTP_USER_AGENT: '.$HTTP_USER_AGENT );
+	$Debuglog->add( 'filter_hit: REMOTE_ADDR: '.$_SERVER['REMOTE_ADDR'], 'hit' );
+	$Debuglog->add( 'filter_hit: HTTP_REFERER: '.$HTTP_REFERER, 'hit' );
+	// $Debuglog->add( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'], 'hit' );
+	$Debuglog->add( 'filter_hit: HTTP_USER_AGENT: '.$HTTP_USER_AGENT, 'hit' );
 
 	/*
 	 * Check if the referer is clean:
@@ -56,18 +56,19 @@ function filter_hit()
 	{ // then they have tried something funny,
 		// putting HTML or PHP into the HTTP_REFERER
 		// $ignore = 'badchar';
-		$Debuglog->add( 'filter_hit: bad char in referer');
-		return false;		// Hazardous
+		$Debuglog->add( 'filter_hit: bad char in referer', 'hit');
+		return 'badchar';		// Hazardous
 	}
 	elseif( $error = validate_url( $HTTP_REFERER, $comments_allowed_uri_scheme ) )
 	{	// if they are trying to inject javascript or a blocked (spam) URL
-		$Debuglog->add( 'filter_hit: '. $error);
-		return false;		// Hazardous
+		$Debuglog->add( 'filter_hit: '. $error, 'hit');
+		return 'badchar';		// Hazardous
 	}
 
 
 	/*
-	 * Check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
+	 * Check for reloads (if the URI has been requested from same IP/useragent
+	 * in past reloadpage_timeout seconds.)
 	 */
 	if( $DB->get_var(
 				'SELECT visitID FROM T_hitlog
@@ -76,16 +77,79 @@ function filter_hit()
 						AND hit_remote_addr = '.$DB->quote($_SERVER['REMOTE_ADDR']).'
 						AND hit_user_agent = '.$DB->quote($HTTP_USER_AGENT) ) )
 	{
-	 	$Debuglog->add( 'filter_hit: URI-reload!' );
-	 	return false; // We don't want to log this hit
+	 	$Debuglog->add( 'filter_hit: URI-reload!', 'hit' );
+	 	return 'reload'; 		// We don't want to log this hit
 	}
 
 
+	/*
+	 * Lookup robots
+	 */
+	foreach( $user_agents as $user_agent )
+	{
+		if( ($user_agent[0] == 'robot') && (strstr($HTTP_USER_AGENT, $user_agent[1])) )
+		{
+			$Debuglog->add( 'filter_hit: robot', 'hit' );
+			return 'robot';
+		}
+	}
+
 
  	/*
- 	 * Everything okay...
+	 * Check blacklist, see {@link $blackList}
+	 * fplanque: we log these again, because if we didn't we woudln't detect
+	 * reloads on these... and that would be a problem!
+	 */
+	foreach( $blackList as $site )
+	{
+		if( strpos( $HTTP_REFERER, $site ) !== false )
+		{
+			$Debuglog->add( 'filter_hit: referer will be hidden (BlackList)', 'hit' );
+			return 'blacklist';
+		}
+	}
+
+
+	/*
+	 * Check for XML feeds
+	 */
+	if( stristr($ReqPath, 'rss')
+			|| stristr($ReqPath, 'rdf')
+			|| stristr($ReqPath, 'atom') )
+	{
+		$Debuglog->add( 'filter_hit: RSS', 'hit' );
+		return 'rss';
+	}
+
+
+	/*
+	 * Check if we have a valid referer:
+	 * minimum length: http://az.fr/
+	 */
+	if( strlen($HTTP_REFERER) < 13 )
+	{	// this will be considered direct access (although it could be https: ??)
+		$Debuglog->add( 'filter_hit: invalid referer / direct access?', 'hit' );
+		return 'invalid';
+	}
+
+
+	/*
+	 * Is the referer a search engine?
+	 */
+	foreach($search_engines as $engine)
+	{
+		if( stristr($HTTP_REFERER, $engine) )
+		{
+			$Debuglog->add( 'filter_hit: search engine ('.$engine.')', 'hit' );
+			return 'search';
+		}
+	}
+
+
+ 	/*
+ 	 * We have a valid referer
  	 */
- 	return true;
+ 	return 'no';		// Hit type: normal (previous meaning: no ignore)
 }
 
 
@@ -94,97 +158,28 @@ function filter_hit()
  *
  * This function should be called at the end of the page, otherwise if the page
  * is displaying previous hits, it may display the current one too.
- * The hit will not be logged if it is a page reload or on blaclisted referers,
- * see {@link $log_this_hit}
+ * The hit will not be logged in special occasions, see {@link $hit_type}
  */
 function log_hit()
 {
-	global $DB, $localtimenow, $blog, $blackList, $search_engines, $user_agents;
+	global $DB, $localtimenow, $blog;
 	global $doubleCheckReferers, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
-	global $HTTP_USER_AGENT;
-	global $log_this_hit, $Debuglog;
+	global $HTTP_USER_AGENT, $hit_type, $Debuglog;
 
-	if( ! $log_this_hit )
-	{	// We don't want to log this hit... may be a reload, or a design choice...
-  	$Debuglog->add( 'log_hit: Hit NOT Logged (maybe it is already?).' );
+	/**
+	 * Make sure we want to log this hit, see {@link $hit_type}
+	 */
+	if( in_array( $hit_type, array( 'badchar', 'reload', 'preview', 'already_logged' ) ) )
+	{	// We don't want to log this hit!
+  	$Debuglog->add( 'log_hit: Hit NOT Logged ('.$hit_type.')', 'hit' );
 		return false;
-	}
-	$log_this_hit = false;	// We won't want to log again later
-
-
-	$ignore = 'no';  // So far so good
-
-
-	/*
-	 * Check blacklist - which includes the referers we don't want to log, although they are not spam
-	 * this includes the current site and maybe webmails or stat services...
-	 */
-	foreach( $blackList as $site )
-	{
-		if( strpos( $HTTP_REFERER, $site ) !== false )
-		{
-			$ignore = 'blacklist';
-			$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');
-			// fplanque: we log these again, because if we didn't
-			// we woudln't detect reloads on these... and that would be a problem!
-		}
-	}
-
-	/*
-	 * Check for XML feeds
-	 */
-	if( ($ignore == 'no') &&
-			( stristr($ReqPath, 'rss')
-			|| stristr($ReqPath, 'rdf')
-			|| stristr($ReqPath, 'atom') ) )
-	{
-		$ignore = 'rss';
-		$Debuglog->add( 'Hit Log: referer ignored (RSS)' );
-	}
-
-
-	/*
-	 * Lookup robots
-	 */
-	if( $ignore == 'no' )
-	{
-		foreach ($user_agents as $user_agent)
-		{
-			if( ($user_agent[0] == 'robot') && (strstr($HTTP_USER_AGENT, $user_agent[1])) )
-			{
-				$ignore = 'robot';
-				$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('robot'). ')');
-				break;
-			}
-		}
-	}
-
-	if( ($ignore == 'no') && (strlen($HTTP_REFERER) < 13) )
-	{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
-		$ignore = 'invalid';
-		$Debuglog->add( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
-	}
-
-	if( $ignore == 'no' )
-	{	// identify search engines
-		foreach($search_engines as $engine)
-		{
-			// $Debuglog->add( 'Hit Log: '."engine: ".$engine);
-			if( stristr($HTTP_REFERER, $engine) )
-			{
-				$ignore = 'search';
-				$Debuglog->add( 'Hit Log: '. T_('referer ignored'). " (". T_('search engine'). ")");
-				break;
-			}
-		}
 	}
 
 	if( $doubleCheckReferers )
 	{
-		$Debuglog->add( 'Hit Log: '. T_('loading referering page') );
+		$Debuglog->add( 'log_hit: double check: loading referering page', 'hit' );
 
-		// this is so that the page up until the call to
-		// logReferer will get shown before it tries to check
+		// flush now, so that the meat of the page will get shown before it tries to check
 		// back against the refering URL.
 		flush();
 
@@ -192,7 +187,7 @@ function log_hit()
 		if( strlen($HTTP_REFERER) > 0 )
 		{
 			$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $ReqURI;
-			// $Debuglog->add( 'Hit Log: '. "full current url: ".$fullCurrentURL);
+			// $Debuglog->add( 'Hit Log: '. "full current url: ".$fullCurrentURL, 'hit');
 
 			$fp = @fopen( $HTTP_REFERER, 'r' );
 			if( $fp )
@@ -205,15 +200,15 @@ function log_hit()
 				}
 				if (strstr($page,$fullCurrentURL))
 				{
-					$Debuglog->add( 'Hit Log: '. T_('found current url in page') );
+					$Debuglog->add( 'log_hit: found current url in page', 'hit' );
 					$goodReferer = 1;
 				}
 			}
 
 			if( !$goodReferer )
 			{	// This was probably spam!
-				$Debuglog->add( 'Hit Log: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
-				return;
+				$Debuglog->add( 'log_hit: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ), 'hit' );
+				return false;
 			}
 		}
 		else
@@ -222,11 +217,15 @@ function log_hit()
 		}
 	}
 
+	/*
+	 * Record the hit:
+	 */
 	$baseDomain = preg_replace("/http:\/\//i", '', $HTTP_REFERER);
 	$baseDomain = preg_replace("/^www\./i", '', $baseDomain);
 	$baseDomain = preg_replace("/\/.*/i", '', $baseDomain);
-
-	// insert hit into DB table
+	// Remember we have logged already:
+	$hit_type = 'already_logged';
+	// insert hit into DB table:
 	$sql = "INSERT INTO T_hitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain,
 																		hit_blog_ID, hit_remote_addr, hit_user_agent )
 					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$ignore',

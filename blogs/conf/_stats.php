@@ -28,6 +28,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  * http://www.example.com instead of http://www.example.com/ .
  *
  * TODO: handle multiple blog roots.
+ *
+ * @global array $blackList
  */
 $blackList = array(
 	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash

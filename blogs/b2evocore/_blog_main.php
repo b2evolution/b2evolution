@@ -45,6 +45,12 @@ param( 'stats', 'integer', 0 );                 // deprecated
 if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
 
+if( !empty($preview) )
+{	// Preview is a special hit type:
+	$Debuglog->add( 'filter_hit sequel: preview', 'hit' );
+	$hit_type = 'preview';
+}
+
 if( empty($disp) )
 { // Conversion support for old params:
 	if( $c == 'last')

@@ -432,7 +432,7 @@ class Item extends DataObject
 	 * Template function: display content of item
 	 *
 	 * Calling this with "MORE" (i-e displaying full content) will increase
-	 * the view counter, except on reloads or blacklists, see {@link $log_this_hit}
+	 * the view counter, except on special occasions, see {@link $hit_type}
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
 	 *
@@ -463,7 +463,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Renderer, $log_this_hit, $more, $preview;
+		global $Renderer, $hit_type, $more, $preview;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -487,7 +487,11 @@ class Item extends DataObject
 			$dispmore = $more;
 		}
 		
-		if( $dispmore && !$preview && $log_this_hit )
+		/**
+		 * Check if we want to increment view count, see {@link $hit_type}
+		 */
+		if( $dispmore && !$preview &&
+				! in_array( $hit_type, array( 'badchar', 'reload', 'robot', 'preview', 'already_logged' ) ) )
 		{ // Increment view counter
 			$this->set_param( 'views', 'number', $this->views+1 );
 			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
@@ -1134,7 +1138,7 @@ class Item extends DataObject
 	 *
 	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
 	 * (i-e full content), see {@link Item::content()}
-	 * Viewcount is NOT incremented on page reloads or blacklisted referers, see {@link $log_this_hit}
+	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link $hit_type}
 	 *
 	 * {@internal Item::views(-) }}
 	 */

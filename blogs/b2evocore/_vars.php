@@ -19,7 +19,7 @@ $new_db_version = 8070;				// next time: 8080
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 {	// Warning: on some IIS installs it it set but empty!
 	// Besides, use of explode is not very efficient so other methods are preferred.
-	$Debuglog->add( "Getting ReqURI from 'REQUEST_URI'" );
+	$Debuglog->add( 'vars: Getting ReqURI from REQUEST_URI', 'hit' );
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
 	$ReqPath = explode( '?', $ReqURI, 2 );
@@ -27,25 +27,25 @@ if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 }
 elseif( isset($_SERVER['URL']) )
 { // ISAPI
-	$Debuglog->add( "Getting ReqPath from 'URL'" );
+	$Debuglog->add( 'vars: Getting ReqPath from URL', 'hit' );
 	$ReqPath = $_SERVER['URL'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
-	$Debuglog->add( "Getting ReqPath from 'PATH_INFO'" );
+	$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO', 'hit' );
 	$ReqPath = $_SERVER['PATH_INFO'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['SCRIPT_NAME']) )
 { // Some Odd Win2k Stuff
-	$Debuglog->add( "Getting ReqPath from 'SCRIPT_NAME'" );
+	$Debuglog->add( 'vars: Getting ReqPath from SCRIPT_NAME', 'hit' );
 	$ReqPath = $_SERVER['SCRIPT_NAME'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PHP_SELF']) )
 { // The Old Stand-By
-	$Debuglog->add( "Getting ReqPath from 'PHP_SELF'" );
+	$Debuglog->add( 'vars: Getting ReqPath from PHP_SELF', 'hit' );
 	$ReqPath = $_SERVER['PHP_SELF'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
@@ -69,9 +69,9 @@ else
 	<?php
 }
 
-$Debuglog->add( 'HTTP Host: '.$_SERVER['HTTP_HOST'] );
-$Debuglog->add( 'Request URI: '.$ReqURI );
-$Debuglog->add( 'Request Path: '.$ReqPath );
+$Debuglog->add( 'vars: HTTP Host: '.$_SERVER['HTTP_HOST'], 'hit' );
+$Debuglog->add( 'vars: Request URI: '.$ReqURI, 'hit' );
+$Debuglog->add( 'vars: Request Path: '.$ReqPath, 'hit' );
 
 
 // on which page are we ?
@@ -122,7 +122,7 @@ if( $HTTP_USER_AGENT != '' )
 	if ($HTTP_USER_AGENT != strip_tags($HTTP_USER_AGENT))
 	{ // then they have tried something funky,
 		// putting HTML or PHP into the HTTP_USER_AGENT
-		$Debuglog->add( 'setting vars: '.T_('bad char in User Agent'));
+		$Debuglog->add( 'setting vars: '.T_('bad char in User Agent'), 'hit');
 		$HTTP_USER_AGENT = T_('bad char in User Agent');
 	}
 

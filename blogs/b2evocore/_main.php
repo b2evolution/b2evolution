@@ -180,15 +180,24 @@ if( is_logged_in() && $current_User->get('locale') != $default_locale )
 }
 
 
-
 /**
- * If nothing special happens, this hit can be logged
+ * Hit type - determines if hit will be logged and/or increase view count for Items
  *
- * The hit won't be logged if the URI is reloaded for example...
+ * Possible values are:
+ * - 'badchar' : referer contains junk or spam : no logging, no counting
+ * - 'reload' : page is reloaded : no logging, no counting
+ * - 'robot' : page is loaded by a robot: log but don't count view
+ * - 'blacklist' (should be 'hidden') : we want to hide the referer, but we count the hit : log & count
+ * - 'rss' : RSS feed : log & count
+ * - 'invalid' : normal without a referer : log & count
+ * - 'search' : referer is a search engine : log & count
+ * - 'no' : normal with referer (default) : log & count
+ * - 'preview' : preview mode : no logging, no counting
+ * - 'already_logged' : this hit has already been logged : no relogging, no recounting
  *
- * @global boolean $log_this_hit
+ * @global string $hit_type
  */
-$log_this_hit = filter_hit();
+$hit_type = filter_hit();
 
 
 /**
