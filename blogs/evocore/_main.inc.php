@@ -58,13 +58,13 @@
  * @version $Id$
  */
 
-if( isset( $main_init ) )
+if( defined( 'B2_MAIN_INIT' ) )
 { // Prevent double loading since require_once won't work in all situations
 	// on windows when some subfolders have caps :(
 	// (Check it out on static page generation)
 	return;
 }
-$main_init = true;
+define( 'B2_MAIN_INIT', true );
 
 
 /**
@@ -86,15 +86,6 @@ if( isset( $error_message ) )
 
 
 /**
- * Check conf...
- */
-if( !function_exists( 'gzencode' ) )
-{ // when there is no function to gzip, we won't do it
-	$use_gzipcompression = false;
-}
-
-
-/**
  * Load logging class
  */
 require_once( dirname(__FILE__).'/_log.class.php' );
@@ -111,6 +102,16 @@ $Messages = new Log( 'error' );
 
 
 /**
+ * Check conf...
+ */
+if( !function_exists( 'gzencode' ) )
+{ // when there is no function to gzip, we won't do it
+	$Debuglog->add( '$use_gzipcompression is true, but the function gzencode() does not exist. Disabling gzip compression.' );
+	$use_gzipcompression = false;
+}
+
+
+/**
  * Includes:
  */
 require_once( dirname(__FILE__).'/_misc.funcs.php' );
@@ -123,6 +124,9 @@ timer_start();
 require_once( dirname(__FILE__).'/_vars.inc.php' );
 
 
+/**
+ * DB class
+ */
 require_once( dirname(__FILE__).'/_db.class.php' );
 /**
  * Database connection (connection opened here)
@@ -305,6 +309,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/10 23:00:31  blueyed
+ * small enhancements
+ *
  * Revision 1.14  2005/02/08 23:57:20  blueyed
  * moved Debugmessage, ..
  *
