@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MG blog\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-10 13:44+0200\n"
+"POT-Creation-Date: 2004-04-13 15:20+0200\n"
 "PO-Revision-Date: 2004-04-04 23:18+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
@@ -355,8 +355,8 @@ msgstr "Sindikuoti ðá blogà"
 
 #: ..\..\..\noskin_a.php:345 ..\..\..\noskin_all.php:347
 #: ..\..\..\noskin_b.php:355 ..\..\..\noskin_roll.php:346
-#: ..\..\..\skins\bluesky\_main.php:238 ..\..\..\skins\custom\_main.php:279
-#: ..\..\..\skins\fplanque2002\_main.php:299
+#: ..\..\..\skins\bluesky\_main.php:238 ..\..\..\skins\custom\_main.php:294
+#: ..\..\..\skins\fplanque2002\_main.php:315
 #: ..\..\..\skins\guadeloupe\_main.php:239
 #: ..\..\..\skins\originalb2\_main.php:182
 #, php-format
@@ -380,86 +380,131 @@ msgstr "Daugiau áraðø..."
 msgid "Antispam"
 msgstr "Antispam"
 
-#: ..\..\..\admin\b2antispam.php:33
-#, php-format
-msgid "The keyword %s is already handled by the blacklist!"
-msgstr "Raktaþodis %s jau átrauktas á juodà sàraðà!"
-
-#: ..\..\..\admin\b2antispam.php:42
-#, php-format
-msgid "The keyword %s is too short, it has to be a minimum of 3 characters!"
+#: ..\..\..\admin\b2antispam.php:40
+#, fuzzy, php-format
+msgid "The keyword [%s] is too short, it has to be a minimum of 5 characters!"
 msgstr "Raktaþodis %s yra per trumpas, jis turi bûti bent trijø simboliø!"
 
-#: ..\..\..\admin\b2antispam.php:52
+#: ..\..\..\admin\b2antispam.php:48
+#, fuzzy, php-format
+msgid "Deleting log-hits matching [%s]..."
+msgstr "Trinamas apsilankymas #%d..."
+
+#: ..\..\..\admin\b2antispam.php:60
+#, fuzzy, php-format
+msgid "Deleting comments matching [%s]..."
+msgstr "Trinamas apsilankymas #%d..."
+
+#: ..\..\..\admin\b2antispam.php:71
+#, fuzzy, php-format
+msgid "Blacklisting the keyword [%s]..."
+msgstr "Blokuojamas raktaþodis %s..."
+
+#: ..\..\..\admin\b2antispam.php:90
 msgid "Confirm ban &amp; delete"
 msgstr "Patvirtinti blokavimà ir iðtrinti"
 
-#: ..\..\..\admin\b2antispam.php:54
-#, php-format
-msgid ""
-"Banning the keyword %s from the statistics and comments would lead to the "
-"deletion of the following %d comments:"
-msgstr "Uþblokavus raktaþodá %s statistikoje ir komentaruose, bus iðtrinti ðie %d komentarai:"
+#: ..\..\..\admin\b2antispam.php:92 ..\..\..\admin\b2antispam.php:291
+msgid "Keyword"
+msgstr "Raktaþodis"
 
-#: ..\..\..\admin\b2antispam.php:82
+#: ..\..\..\admin\b2antispam.php:107
 #, php-format
-msgid "...and the following %d referer hits:"
+msgid "No log-hits match the keyword [%s]."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:113
+#, fuzzy, php-format
+msgid "Delete the following %d referer hits:"
 msgstr "... ir ðie %d referalai:"
 
-#: ..\..\..\admin\b2antispam.php:94
-msgid "Are you sure you want to continue?"
-msgstr "Ar norite tæsti?"
+#: ..\..\..\admin\b2antispam.php:137
+#, php-format
+msgid "No comments match the keyword [%s]."
+msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:99
-msgid "Ban the keyword + delete matching hits and comments"
-msgstr "Blokuoti raktaþodá + iðtrinti atitinkamus apsilankymus ir komentarus"
+#: ..\..\..\admin\b2antispam.php:143
+#, fuzzy, php-format
+msgid "Delete the following %d comments:"
+msgstr "... ir ðie %d referalai:"
 
-#: ..\..\..\admin\b2antispam.php:120
+#: ..\..\..\admin\b2antispam.php:177
+#, fuzzy, php-format
+msgid "The keyword [%s] is already handled by the blacklist."
+msgstr "Raktaþodis %s jau átrauktas á juodà sàraðà!"
+
+#: ..\..\..\admin\b2antispam.php:183
+#, fuzzy, php-format
+msgid "Blacklist the keyword [%s] locally."
+msgstr "Blokuojamas raktaþodis %s..."
+
+#: ..\..\..\admin\b2antispam.php:189
+#, fuzzy, php-format
+msgid "Report the keyword [%s] as abuse to b2evolution.net."
+msgstr "Siunèiam paþeidimà á b2evolution.net..."
+
+#: ..\..\..\admin\b2antispam.php:196
+#, fuzzy
+msgid "Perform selected operations"
+msgstr "Temos nustatymai"
+
+#: ..\..\..\admin\b2antispam.php:213
 #, php-format
 msgid "Removing entry #%d from the ban list..."
 msgstr "Trinamas áraðas #%d ið blokuojamø sàraðo..."
 
-#: ..\..\..\admin\b2antispam.php:153
+#: ..\..\..\admin\b2antispam.php:247
 msgid "Banned domains blacklist"
 msgstr "Juodasis sàraðas"
 
-#: ..\..\..\admin\b2antispam.php:154
+#: ..\..\..\admin\b2antispam.php:248
 msgid ""
 "Any URL containing one of the following keywords will be banned from posts, "
 "comments and logs."
 msgstr "Bet koks URL, turintis vienà ið ðiø raktaþodþiø bus blokuojamas temose, komentaruose ir statistikoje. "
 
-#: ..\..\..\admin\b2antispam.php:157
+#: ..\..\..\admin\b2antispam.php:251
 msgid ""
 "If a keyword restricts legitimate domains, click on the green tick to stop "
 "banning with this keyword."
 msgstr "Jei raktaþodis susijæs su patikimu domenu, paspauskite ant þalios varnelës ir domenas su ðiuo raktaþodþiu bus atblokuotas."
 
-#: ..\..\..\admin\b2antispam.php:167
+#: ..\..\..\admin\b2antispam.php:261
 msgid "Allow keyword back (Remove it from the blacklist)"
 msgstr "Graþinti raktaþodá (Paðalinti ið juodojo sàraðo)"
 
-#: ..\..\..\admin\b2antispam.php:167
+#: ..\..\..\admin\b2antispam.php:261
 msgid "Allow Back"
 msgstr "Gràþinti"
 
-#: ..\..\..\admin\b2antispam.php:177
+#: ..\..\..\admin\b2antispam.php:272
 msgid "Report abuse to centralized ban blacklist!"
 msgstr "Praneðkite apie paþeidimus á centralizuotà blokavimø sàraðà!"
 
-#: ..\..\..\admin\b2antispam.php:185
+# Posto statusas (administracinëje dalyje)
+#: ..\..\..\admin\b2antispam.php:272
+#, fuzzy
+msgid "Report"
+msgstr "Praneðtas"
+
+#: ..\..\..\admin\b2antispam.php:274
+msgid "Check hit-logs and comments for this keyword!"
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:274
+#, fuzzy
+msgid "Re-check"
+msgstr "Tikrinti klaidas"
+
+#: ..\..\..\admin\b2antispam.php:281
 msgid "Request abuse update from centralized blacklist."
 msgstr "Atnaujinti ið centralizuoto juodojo sàraðo."
 
-#: ..\..\..\admin\b2antispam.php:192
+#: ..\..\..\admin\b2antispam.php:288
 msgid "Add a banned keyword"
 msgstr "Átraukti naujà raktaþodá"
 
-#: ..\..\..\admin\b2antispam.php:195
-msgid "Keyword"
-msgstr "Raktaþodis"
-
-#: ..\..\..\admin\b2antispam.php:198
+#: ..\..\..\admin\b2antispam.php:294
 msgid "Ban this keyword!"
 msgstr "Blokuoti ðá raktaþodá!"
 
@@ -560,8 +605,8 @@ msgstr "Raðoma á failà..."
 #: ..\..\..\admin\b2blogs.php:317 ..\..\..\admin\edit_actions.php:113
 #: ..\..\..\admin\edit_actions.php:236 ..\..\..\admin\edit_actions.php:328
 #: ..\..\..\admin\edit_actions.php:392
-#: ..\..\..\b2evocore\_functions_antispam.php:272
-#: ..\..\..\b2evocore\_functions_antispam.php:385
+#: ..\..\..\b2evocore\_functions_antispam.php:212
+#: ..\..\..\b2evocore\_functions_antispam.php:325
 #: ..\..\..\b2evocore\_functions_pings.php:52
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:162
@@ -992,17 +1037,19 @@ msgstr "Loginti kaip paieðkà"
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\_edit_showposts.php:215
+#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\b2stats.php:263
+#: ..\..\..\admin\_edit_showposts.php:215
 msgid "Ban this domain!"
 msgstr "Blokuoti ðá domenà!"
 
 #  TRANS: Abbrev.
 #. TRANS: Abbrev.
-#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\_edit_showposts.php:215
+#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\b2stats.php:263
+#: ..\..\..\admin\_edit_showposts.php:215
 msgid "Ban"
 msgstr "Blokuoti"
 
-#: ..\..\..\admin\b2stats.php:258 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:257 ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Top referalai"
 
@@ -1658,7 +1705,7 @@ msgid ""
 "the same blog (smallest category number)."
 msgstr "<strong>Atminkite:</strong>Iðtrinant kategorijà, jai priklausanèios temos netrinamos. Jos priskiriamos \"tëvo\" kategorijai. Trinant pagrindinæ \"root\" kategorijà, temos bus priskirtos seniausiai sukurtai egzistuojanciai kategorijai tame paèiame bloge (su maþiausiu kategorijos numeriu)."
 
-#: ..\..\..\admin\_edit_form.php:100 ..\..\..\admin\_quicktags.php:342
+#: ..\..\..\admin\_edit_form.php:100 ..\..\..\admin\_quicktags.php:346
 msgid "Title"
 msgstr "Pavadinimas"
 
@@ -1679,8 +1726,8 @@ msgstr "Nuoroda á url"
 msgid "Email"
 msgstr "El. Paðtas"
 
-#: ..\..\..\admin\_edit_form.php:133 ..\..\..\admin\_quicktags.php:325
-#: ..\..\..\admin\_quicktags.php:337 ..\..\..\admin\_users_form.php:46
+#: ..\..\..\admin\_edit_form.php:133 ..\..\..\admin\_quicktags.php:329
+#: ..\..\..\admin\_quicktags.php:341 ..\..\..\admin\_users_form.php:46
 #: ..\..\..\admin\_users_list.php:28 ..\..\..\skins\_profile.php:70
 #: ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
@@ -2136,11 +2183,11 @@ msgstr "nëra ávado [Alt-T]"
 msgid "next page [Alt-Q]"
 msgstr "kitas puslapis [Alt-Q]"
 
-#: ..\..\..\admin\_quicktags.php:225
+#: ..\..\..\admin\_quicktags.php:229
 msgid "Close all tags"
 msgstr "Iðjungti visus plëtinius"
 
-#: ..\..\..\admin\_quicktags.php:341
+#: ..\..\..\admin\_quicktags.php:345
 msgid "ALTernate text"
 msgstr "ALTernatyvus tekstas"
 
@@ -2314,6 +2361,11 @@ msgid ""
 "stub file [%s]. Contact the <a %s>webmaster</a>..."
 msgstr "Negaliu parodyti blogo, nes [%s] ðablonas neegzistuoja. Jis turi bûti nurodytas blogo stub faile [%s]. Susiekite su <a %s>administratoriumi</a>..."
 
+#: ..\..\..\b2evocore\_class_commentlist.php:154
+#: ..\..\..\skins\_lastcomments.php:20
+msgid "No comment yet..."
+msgstr "Komentarø nëra..."
+
 #: ..\..\..\b2evocore\_class_group.php:65
 msgid "New group"
 msgstr "Nauja grupë"
@@ -2354,7 +2406,7 @@ msgstr "Surasti neteisingi URL:"
 msgid "Tag %s may not contain raw character data"
 msgstr "Plëtinyje %s nereikëtu naudoti kodavimo simboliø"
 
-#: ..\..\..\b2evocore\_class_itemlist.php:680
+#: ..\..\..\b2evocore\_class_itemlist.php:677
 msgid "Invalid post, please correct these errors:"
 msgstr "Negalima áraðyti, praðome iðtaisyti ðias klaidas:"
 
@@ -2555,62 +2607,53 @@ msgstr "Negaliu prisijungti prie duomenø bazës %s. MySQL atsakymas:"
 msgid "Oops, MySQL error!"
 msgstr "Uups, MySQL klaida!"
 
-#: ..\..\..\b2evocore\_functions.php:662
+#: ..\..\..\b2evocore\_functions.php:671
 msgid "go back"
 msgstr "atgal"
 
-#: ..\..\..\b2evocore\_functions.php:692
+#: ..\..\..\b2evocore\_functions.php:701
 msgid "Redirecting you to:"
 msgstr "Vyksta nukreipimas á:"
 
-#: ..\..\..\b2evocore\_functions.php:694
+#: ..\..\..\b2evocore\_functions.php:703
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "jei nieko nevyksta, paspauskite <a %s>èia</a>."
 
-#: ..\..\..\b2evocore\_functions.php:772
+#: ..\..\..\b2evocore\_functions.php:781
 msgid "No response!"
 msgstr "Nëra atsakymo!"
 
-#: ..\..\..\b2evocore\_functions.php:777
+#: ..\..\..\b2evocore\_functions.php:786
 msgid "Remote error"
 msgstr "Nutolusi klaida"
 
-#: ..\..\..\b2evocore\_functions.php:792 ..\..\..\b2evocore\_functions.php:797
+#: ..\..\..\b2evocore\_functions.php:801 ..\..\..\b2evocore\_functions.php:806
 msgid "Response"
 msgstr "Atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:1024
+#: ..\..\..\b2evocore\_functions.php:1033
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parametras %s bûtinas!"
 
-#: ..\..\..\b2evocore\_functions.php:1238
+#: ..\..\..\b2evocore\_functions.php:1247
 msgid "Invalid URL"
 msgstr "Blogas URL"
 
-#: ..\..\..\b2evocore\_functions.php:1244
+#: ..\..\..\b2evocore\_functions.php:1253
 msgid "URI scheme not allowed"
 msgstr "URI schema neleidþiama"
 
-#: ..\..\..\b2evocore\_functions.php:1250
+#: ..\..\..\b2evocore\_functions.php:1259
 msgid "URL not allowed"
 msgstr "URL neleidþiamas"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:166
-#, php-format
-msgid "Banning the keyword %s..."
-msgstr "Blokuojamas raktaþodis %s..."
-
-#: ..\..\..\b2evocore\_functions_antispam.php:173
-msgid "Removing all related comments and hits..."
-msgstr "Ðalinami visi susijæ komentarai ir apsilankymai..."
-
-#: ..\..\..\b2evocore\_functions_antispam.php:239
+#: ..\..\..\b2evocore\_functions_antispam.php:179
 msgid "Reporting abuse to b2evolution.net..."
 msgstr "Siunèiam paþeidimà á b2evolution.net..."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:277
+#: ..\..\..\b2evocore\_functions_antispam.php:217
 #: ..\..\..\b2evocore\_functions_pings.php:57
 #: ..\..\..\b2evocore\_functions_pings.php:92
 #: ..\..\..\b2evocore\_functions_pings.php:167
@@ -2618,48 +2661,48 @@ msgstr "Siunèiam paþeidimà á b2evolution.net..."
 msgid "Aborted (Running on localhost)."
 msgstr "Atðaukta ( veikiam localhost'e)."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:297
+#: ..\..\..\b2evocore\_functions_antispam.php:237
 msgid "Requesting abuse list from b2evolution.net..."
 msgstr "Praðome paþeidëjø sàraðo ið b2evolution.net..."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:315
+#: ..\..\..\b2evocore\_functions_antispam.php:255
 msgid "Latest update timestamp"
 msgstr "Paskutinio atnaujinimo laikas ir data"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:340
+#: ..\..\..\b2evocore\_functions_antispam.php:280
 msgid "Incomplete reponse."
 msgstr "Neuþbaigtas atsakymas."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:348
+#: ..\..\..\b2evocore\_functions_antispam.php:288
 msgid "No new blacklisted strings are available."
 msgstr "Naujø blokuojamø áraðø nëra."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:352
+#: ..\..\..\b2evocore\_functions_antispam.php:292
 msgid "Adding strings to local blacklist"
 msgstr "Papildomi áraðai vietiniame juodajame sàraðe"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:355
+#: ..\..\..\b2evocore\_functions_antispam.php:295
 msgid "Adding:"
 msgstr "Pridedam:"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:358
+#: ..\..\..\b2evocore\_functions_antispam.php:298
 #: ..\..\..\htsrv\getmail.php:304
 msgid "OK."
 msgstr "OK."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:362
+#: ..\..\..\b2evocore\_functions_antispam.php:302
 msgid "Not necessary! (Already handled)"
 msgstr "Nereikalinga! (Jau pasirûpinta)"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:370
+#: ..\..\..\b2evocore\_functions_antispam.php:310
 msgid "New latest update timestamp"
 msgstr "Naujas vëliausio atnaujinimo laikas ir data"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:380
+#: ..\..\..\b2evocore\_functions_antispam.php:320
 msgid "Invalid reponse."
 msgstr "Blogas atsakymas."
 
-#: ..\..\..\b2evocore\_functions_blogs.php:355
+#: ..\..\..\b2evocore\_functions_blogs.php:379
 msgid "Requested blog does not exist!"
 msgstr "Nurodytas blogas neegzistuoja!"
 
@@ -2762,15 +2805,15 @@ msgstr "kraunamas nurodantis puslapis"
 msgid "found current url in page"
 msgstr "URL rastas puslapyje"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:447
+#: ..\..\..\b2evocore\_functions_hitlogs.php:450
 msgid "not a query - no params!"
 msgstr "ne uþklausa - nenurodyti parametrai!"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:472
+#: ..\..\..\b2evocore\_functions_hitlogs.php:475
 msgid "no query string found"
 msgstr "nerasta uþklausos duomenø"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:521
+#: ..\..\..\b2evocore\_functions_hitlogs.php:524
 msgid "Statistics"
 msgstr "Statistika"
 
@@ -3819,17 +3862,15 @@ msgstr "Prisiminti mane"
 msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Iðsaugoti sausainiukà vardui, emailui ir url)"
 
-#: ..\..\..\skins\_lastcomments.php:22
-msgid "No comment yet..."
-msgstr "Komentarø nëra..."
-
-#: ..\..\..\skins\_lastcomments.php:32
+#: ..\..\..\skins\_lastcomments.php:28 ..\..\..\xmlsrv\atom.comments.php:22
+#: ..\..\..\xmlsrv\rdf.comments.php:38 ..\..\..\xmlsrv\rss.comments.php:25
+#: ..\..\..\xmlsrv\rss2.comments.php:27
 msgid "In response to:"
 msgstr "Komentaras:"
 
-#: ..\..\..\skins\_lastcomments.php:32
-#, php-format
-msgid "Original post on %s"
+#: ..\..\..\skins\_lastcomments.php:29
+#, fuzzy
+msgid "Original post on:"
 msgstr "Originali tema %s kategorijoje"
 
 #: ..\..\..\skins\_profile.php:53 ..\..\..\skins\basic\_profile.php:55
@@ -3920,7 +3961,7 @@ msgstr "Pasirinkite ðablonà"
 msgid "Browse all posts by this author"
 msgstr "Perþiûrëti visus ðio autoriaus áraðus"
 
-#: ..\..\..\xmlsrv\rdf.php:41 ..\..\..\xmlsrv\rss.php:27
+#: ..\..\..\xmlsrv\rdf.php:45 ..\..\..\xmlsrv\rss.php:27
 #: ..\..\..\xmlsrv\rss2.php:34
 msgid "[...] Read more!"
 msgstr "[...] Daugiau!"
@@ -3929,6 +3970,20 @@ msgstr "[...] Daugiau!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Naujas pingbakas temoje #%d \"%s\""
+
+#~ msgid ""
+#~ "Banning the keyword %s from the statistics and comments would lead to the "
+#~ "deletion of the following %d comments:"
+#~ msgstr "Uþblokavus raktaþodá %s statistikoje ir komentaruose, bus iðtrinti ðie %d komentarai:"
+
+#~ msgid "Are you sure you want to continue?"
+#~ msgstr "Ar norite tæsti?"
+
+#~ msgid "Ban the keyword + delete matching hits and comments"
+#~ msgstr "Blokuoti raktaþodá + iðtrinti atitinkamus apsilankymus ir komentarus"
+
+#~ msgid "Removing all related comments and hits..."
+#~ msgstr "Ðalinami visi susijæ komentarai ir apsilankymai..."
 
 #~ msgid "A blog tool like it oughta be!"
 #~ msgstr "Blogas toks kaip ir turi bûti!"

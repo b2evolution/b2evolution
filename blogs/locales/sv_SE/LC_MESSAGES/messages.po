@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-10 13:44+0200\n"
+"POT-Creation-Date: 2004-04-13 15:24+0200\n"
 "PO-Revision-Date: 2004-03-06 03:15+0100\n"
 "Last-Translator: Christina Svensson <b2evo04@cs.se>\n"
 "MIME-Version: 1.0\n"
@@ -17,31 +17,31 @@ msgstr ""
 
 #: ..\..\..\index.php:7
 msgid "my b2evolution"
-msgstr "Mitt b2evolution"
+msgstr "mitt b2evolution"
 
 #: ..\..\..\index.php:7
-#, fuzzy
 msgid "my blogs"
-msgstr "mina bloggar:"
+msgstr "mina bloggar"
 
 #: ..\..\..\index.php:14
 msgid "Multilingual multiuser multiblog engine!"
-msgstr ""
+msgstr "MÂnga bloggar i mÂnga sprÂk fˆr mÂnga anv‰ndare = allt i b2evolution!"
 
 #: ..\..\..\index.php:15 ..\..\..\index.php:32
-#, fuzzy
 msgid "My blogs"
-msgstr "Mina bloggar:"
+msgstr "Mina bloggar"
 
 #: ..\..\..\index.php:27
 msgid "My Back-Office"
-msgstr "Mitt Back-Office"
+msgstr "Administration"
 
 #: ..\..\..\index.php:30
 msgid ""
 "This page is a placeholder providing links to your blogs and additionnal "
 "demos of what you can do with b2evolution."
 msgstr ""
+"Denna sida ‰r en utfyllnadssida med l‰nkar till dina bloggar, och fler "
+"exempel pÂ vad du hur du kan s‰tta upp b2evolution."
 
 #: ..\..\..\index.php:31
 msgid ""
@@ -51,20 +51,28 @@ msgid ""
 "forget to update that blog settings in the back office, so the moved blog "
 "knows its new filename/URL! ;)."
 msgstr ""
+"Sj‰lvklart vill du inte ha allt detta pÂ din hemsida. V‰lj bara ut det du "
+"behˆver, och radera resten. Du kommer fˆrmodligen ocksÂ att vilja radera "
+"denna sida, och byta nanm pÂ en av dina bloggar till index.php. (N‰r du "
+"gjort det, fÂr du inte glˆmma att uppdatera inst‰llningarna pÂ "
+"administrationssidan, sÂ att den omdˆpta bloggen vet vad dess nyea filnamn/"
+"URL ‰r! ;).)"
 
 #: ..\..\..\index.php:42
 #, php-format
 msgid "Blog #%d"
-msgstr ""
+msgstr "Blogg #%d"
 
 #: ..\..\..\index.php:63
 msgid "Blog #1"
-msgstr ""
+msgstr "Blogg #1"
 
 #: ..\..\..\index.php:63
 msgid ""
 "This is a special blog that aggregates all messages from all other blogs!"
 msgstr ""
+"Det h‰r ‰r en specialblogg d‰r alla postningar frÂn alla bloggar finns "
+"samlade."
 
 #: ..\..\..\index.php:68
 msgid ""
@@ -72,23 +80,25 @@ msgid ""
 "and includes only the blogs that have a &quot;stub url name&quot;. You can "
 "set this in the blog configuration in the back-office."
 msgstr ""
+"OBS: Listan (och menyn) ovan genereras automatiskt, och innehÂller bara de "
+"bloggar som har ett &quot;stub-namn&quot;. Du kan ‰ndra detta i blogg-"
+"innst‰llngarna pÂ administrationssidan."
 
 #: ..\..\..\index.php:69
 msgid "More demos"
-msgstr ""
+msgstr "Fler exempel"
 
 #: ..\..\..\index.php:71 ..\..\..\index.php:72
-#, fuzzy
 msgid "Custom template"
 msgstr "Anpassningsbar sidmall"
 
 #: ..\..\..\index.php:71
 msgid "Multiple blogs displayed on the same page"
-msgstr ""
+msgstr "Flera bloggar pÂ samma sida"
 
 #: ..\..\..\index.php:72
 msgid "Summary of last posts in all blogs"
-msgstr ""
+msgstr "Summering med de senaste inl‰ggen frÂn alla bloggar"
 
 #: ..\..\..\index.php:74
 msgid ""
@@ -97,23 +107,28 @@ msgid ""
 "their PHP template. But once, again, rememner these are just demos destined "
 "to inspire you for your own templates ;)"
 msgstr ""
+"OBS: Dessa bloggar anv‰nder inte evoSkins teman, ‰ven om du valt evoSkins "
+"n‰r du installerade. Det enda s‰ttet att ‰ndra utseendet pÂ dem ‰r att ‰ndra "
+"i deras PHP-mall. Men, Âterigen, glˆm inte att dessa exempel bara ‰r ‰mnade "
+"att inspirera dig till att gˆra egna mallar. ;)"
 
 #: ..\..\..\index.php:76
 msgid "official website"
-msgstr ""
+msgstr "offeciell hemsida"
 
 #: ..\..\..\index.php:76
 msgid "GNU GPL license"
-msgstr ""
+msgstr "GNU GPL-licens"
 
 #: ..\..\..\multiblogs.php:97
 msgid "Multiblog demo"
-msgstr "Multiblog-demo"
+msgstr "Multiblogg-demo"
 
 #: ..\..\..\multiblogs.php:107
 msgid ""
 "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
 msgstr ""
+"Denna mall visar tre bloggar pÂ en gÂng (1 till v‰nster, tvÂ till hˆger)"
 
 #: ..\..\..\multiblogs.php:135 ..\..\..\multiblogs.php:219
 #: ..\..\..\multiblogs.php:254 ..\..\..\noskin_a.php:160
@@ -125,7 +140,6 @@ msgstr ""
 #: ..\..\..\skins\custom\_main.php:70 ..\..\..\skins\custom\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:90
 #: ..\..\..\skins\fplanque2002\_main.php:106
-#, fuzzy
 msgid "Permanent link to full entry"
 msgstr "Permanent l‰nk till hela inl‰gget"
 
@@ -140,7 +154,7 @@ msgstr "Permanent l‰nk till hela inl‰gget"
 #: ..\..\..\skins\fplanque2002\_main.php:106
 #: ..\..\..\skins\guadeloupe\_main.php:69
 msgid "Permalink"
-msgstr "Permanent l‰nk"
+msgstr "Permal‰nk"
 
 #: ..\..\..\multiblogs.php:136 ..\..\..\noskin_a.php:145
 #: ..\..\..\noskin_a.php:238 ..\..\..\noskin_all.php:146
@@ -158,9 +172,8 @@ msgstr "Kategorier"
 #: ..\..\..\noskin_all.php:154 ..\..\..\noskin_b.php:154
 #: ..\..\..\noskin_roll.php:153 ..\..\..\skins\basic\_main.php:88
 #: ..\..\..\skins\custom\_main.php:86 ..\..\..\skins\fplanque2002\_main.php:99
-#, fuzzy
 msgid "Display comments / Leave a comment"
-msgstr "Visa kommentarer / L‰mna en kommentar"
+msgstr "Visa kommentarer / Kommentera"
 
 #: ..\..\..\multiblogs.php:146 ..\..\..\noskin_a.php:155
 #: ..\..\..\noskin_all.php:156 ..\..\..\noskin_b.php:156
@@ -175,7 +188,6 @@ msgstr "Visa trackbacks / Visa trackback-address fˆr detta inl‰gg"
 #: ..\..\..\noskin_roll.php:158 ..\..\..\skins\basic\_main.php:93
 #: ..\..\..\skins\custom\_main.php:91
 #: ..\..\..\skins\fplanque2002\_main.php:104
-#, fuzzy
 msgid "Display pingbacks"
 msgstr "Visa pingbacks"
 
@@ -194,12 +206,11 @@ msgstr "- %d sˆkningar hittills"
 #: ..\..\..\skins\fplanque2002\_main.php:248
 #: ..\..\..\skins\guadeloupe\_main.php:211
 msgid "Misc"
-msgstr "Adm"
+msgstr "Diverse"
 
 #: ..\..\..\noskin_a.php:96 ..\..\..\noskin_all.php:97
 #: ..\..\..\noskin_b.php:97 ..\..\..\noskin_roll.php:96
 #: ..\..\..\skins\fplanque2002\_bloglist.php:27
-#, fuzzy
 msgid "Selected"
 msgstr "Valda"
 
@@ -246,7 +257,7 @@ msgstr "Senaste kommentarerna"
 #: ..\..\..\skins\custom\_main.php:154
 #: ..\..\..\skins\fplanque2002\_main.php:167
 msgid "Some viewing statistics"
-msgstr "Se statistik"
+msgstr "Visningsstatistik"
 
 #: ..\..\..\noskin_a.php:226 ..\..\..\noskin_a.php:232
 #: ..\..\..\noskin_all.php:228 ..\..\..\noskin_all.php:234
@@ -350,19 +361,19 @@ msgstr "Flest referenser"
 #: ..\..\..\admin\_blogs_form.php:253 ..\..\..\skins\custom\_main.php:229
 #: ..\..\..\skins\fplanque2002\_main.php:241
 msgid "Blogroll"
-msgstr "Blogrulle"
+msgstr "Bloggrulle"
 
 #: ..\..\..\noskin_a.php:306 ..\..\..\noskin_all.php:308
 #: ..\..\..\noskin_b.php:317 ..\..\..\noskin_roll.php:307
 #: ..\..\..\skins\custom\_main.php:249
 #: ..\..\..\skins\fplanque2002\_main.php:262
 msgid "Syndicate this blog"
-msgstr "Syndikera denna blog"
+msgstr "Syndikera denna blogg"
 
 #: ..\..\..\noskin_a.php:345 ..\..\..\noskin_all.php:347
 #: ..\..\..\noskin_b.php:355 ..\..\..\noskin_roll.php:346
-#: ..\..\..\skins\bluesky\_main.php:238 ..\..\..\skins\custom\_main.php:279
-#: ..\..\..\skins\fplanque2002\_main.php:299
+#: ..\..\..\skins\bluesky\_main.php:238 ..\..\..\skins\custom\_main.php:294
+#: ..\..\..\skins\fplanque2002\_main.php:315
 #: ..\..\..\skins\guadeloupe\_main.php:239
 #: ..\..\..\skins\originalb2\_main.php:182
 #, php-format
@@ -370,109 +381,153 @@ msgid "Totals: %d posts - %d queries - %01.3f seconds"
 msgstr "Totalt: %d inl‰gg - %d sˆkningar - %0.3f sekunder"
 
 #: ..\..\..\summary.php:56
-#, fuzzy
 msgid "Summary demo"
-msgstr "Summereringsdemo"
+msgstr "Summereringsexempel"
 
 #: ..\..\..\summary.php:66
-#, fuzzy
 msgid "This demo template displays a summary of last posts in all blogs"
 msgstr ""
 "Denna mall visar en sammanst‰llning av de senaste inl‰ggen i alla bloggar"
 
 #: ..\..\..\summary.php:97
-#, fuzzy
 msgid "More posts..."
 msgstr "Fler inl‰gg..."
 
 #: ..\..\..\admin\b2antispam.php:10 ..\..\..\admin\_menutop.php:83
 #: ..\..\..\admin\_menutop.php:87 ..\..\..\admin\_users_groupform.php:47
 msgid "Antispam"
-msgstr ""
+msgstr "Antispam"
 
-#: ..\..\..\admin\b2antispam.php:33
-#, php-format
-msgid "The keyword %s is already handled by the blacklist!"
-msgstr ""
+#: ..\..\..\admin\b2antispam.php:40
+#, fuzzy, php-format
+msgid "The keyword [%s] is too short, it has to be a minimum of 5 characters!"
+msgstr "Ordet %s ‰r fˆr kort, det mÂste innehÂlla minst tre tecken."
 
-#: ..\..\..\admin\b2antispam.php:42
-#, php-format
-msgid "The keyword %s is too short, it has to be a minimum of 3 characters!"
-msgstr ""
+#: ..\..\..\admin\b2antispam.php:48
+#, fuzzy, php-format
+msgid "Deleting log-hits matching [%s]..."
+msgstr "Radera tr‰ff #%d..."
 
-#: ..\..\..\admin\b2antispam.php:52
+#: ..\..\..\admin\b2antispam.php:60
+#, fuzzy, php-format
+msgid "Deleting comments matching [%s]..."
+msgstr "Radera tr‰ff #%d..."
+
+#: ..\..\..\admin\b2antispam.php:71
+#, fuzzy, php-format
+msgid "Blacklisting the keyword [%s]..."
+msgstr "Svartlistar nyckelorden %s..."
+
+#: ..\..\..\admin\b2antispam.php:90
 msgid "Confirm ban &amp; delete"
-msgstr ""
+msgstr "Bekr‰fta svartlistning och radering"
 
-#: ..\..\..\admin\b2antispam.php:54
+#: ..\..\..\admin\b2antispam.php:92 ..\..\..\admin\b2antispam.php:291
+msgid "Keyword"
+msgstr "Nyckelord"
+
+#: ..\..\..\admin\b2antispam.php:107
 #, php-format
-msgid ""
-"Banning the keyword %s from the statistics and comments would lead to the "
-"deletion of the following %d comments:"
+msgid "No log-hits match the keyword [%s]."
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:82
+#: ..\..\..\admin\b2antispam.php:113
+#, fuzzy, php-format
+msgid "Delete the following %d referer hits:"
+msgstr "...och fˆljande %d referenser:"
+
+#: ..\..\..\admin\b2antispam.php:137
 #, php-format
-msgid "...and the following %d referer hits:"
+msgid "No comments match the keyword [%s]."
 msgstr ""
 
-#: ..\..\..\admin\b2antispam.php:94
-msgid "Are you sure you want to continue?"
-msgstr ""
+#: ..\..\..\admin\b2antispam.php:143
+#, fuzzy, php-format
+msgid "Delete the following %d comments:"
+msgstr "...och fˆljande %d referenser:"
 
-#: ..\..\..\admin\b2antispam.php:99
-msgid "Ban the keyword + delete matching hits and comments"
-msgstr ""
+#: ..\..\..\admin\b2antispam.php:177
+#, fuzzy, php-format
+msgid "The keyword [%s] is already handled by the blacklist."
+msgstr "Ordet %s finns redan med pÂ svarta listan."
 
-#: ..\..\..\admin\b2antispam.php:120
+#: ..\..\..\admin\b2antispam.php:183
+#, fuzzy, php-format
+msgid "Blacklist the keyword [%s] locally."
+msgstr "Svartlistar nyckelorden %s..."
+
+#: ..\..\..\admin\b2antispam.php:189
+#, fuzzy, php-format
+msgid "Report the keyword [%s] as abuse to b2evolution.net."
+msgstr "Rapportera missbruk till b2evolution.net"
+
+#: ..\..\..\admin\b2antispam.php:196
+#, fuzzy
+msgid "Perform selected operations"
+msgstr "Inl‰ggets inst‰llningar"
+
+#: ..\..\..\admin\b2antispam.php:213
 #, php-format
 msgid "Removing entry #%d from the ban list..."
-msgstr ""
+msgstr "Tar bort inl‰gg #%d frÂn den svarta listan"
 
-#: ..\..\..\admin\b2antispam.php:153
+#: ..\..\..\admin\b2antispam.php:247
 msgid "Banned domains blacklist"
-msgstr ""
+msgstr "Bannlysta dom‰ners svarta lista"
 
-#: ..\..\..\admin\b2antispam.php:154
+#: ..\..\..\admin\b2antispam.php:248
 msgid ""
 "Any URL containing one of the following keywords will be banned from posts, "
 "comments and logs."
 msgstr ""
+"RL:ar som innehÂller fˆljande ord kommer att svartlistas frÂn inl‰gg, "
+"kommentarer och loggar."
 
-#: ..\..\..\admin\b2antispam.php:157
+#: ..\..\..\admin\b2antispam.php:251
 msgid ""
 "If a keyword restricts legitimate domains, click on the green tick to stop "
 "banning with this keyword."
 msgstr ""
+"Om ett ord st‰nger ute dom‰ner som borde finnas med, klicka pÂ den grˆna "
+"haken fˆr att ta bort svartlistningen av dessa ord."
 
-#: ..\..\..\admin\b2antispam.php:167
+#: ..\..\..\admin\b2antispam.php:261
 msgid "Allow keyword back (Remove it from the blacklist)"
-msgstr ""
+msgstr "Återta ord (Ta bort det frÂn svarta listan)"
 
-#: ..\..\..\admin\b2antispam.php:167
+#: ..\..\..\admin\b2antispam.php:261
 msgid "Allow Back"
-msgstr ""
+msgstr "Återta"
 
-#: ..\..\..\admin\b2antispam.php:177
+#: ..\..\..\admin\b2antispam.php:272
 msgid "Report abuse to centralized ban blacklist!"
-msgstr ""
+msgstr "Rapportera missbruk till den centrala svara listan."
 
-#: ..\..\..\admin\b2antispam.php:185
-msgid "Request abuse update from centralized blacklist."
-msgstr ""
-
-#: ..\..\..\admin\b2antispam.php:192
-msgid "Add a banned keyword"
-msgstr ""
-
-#: ..\..\..\admin\b2antispam.php:195
+#: ..\..\..\admin\b2antispam.php:272
 #, fuzzy
-msgid "Keyword"
-msgstr "Nyckelord"
+msgid "Report"
+msgstr "Rapporterad"
 
-#: ..\..\..\admin\b2antispam.php:198
-msgid "Ban this keyword!"
+#: ..\..\..\admin\b2antispam.php:274
+msgid "Check hit-logs and comments for this keyword!"
 msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:274
+#, fuzzy
+msgid "Re-check"
+msgstr "Stavningskontroll"
+
+#: ..\..\..\admin\b2antispam.php:281
+msgid "Request abuse update from centralized blacklist."
+msgstr "Beg‰r uppdatering av listan frÂn den centrala svarta listan."
+
+#: ..\..\..\admin\b2antispam.php:288
+msgid "Add a banned keyword"
+msgstr "L‰gg till ett svartlistat nyckelord"
+
+#: ..\..\..\admin\b2antispam.php:294
+msgid "Ban this keyword!"
+msgstr "Svartlista nyckelordet!"
 
 #: ..\..\..\admin\b2blogs.php:14 ..\..\..\admin\_blogs_list.php:15
 #: ..\..\..\admin\_menutop.php:66 ..\..\..\admin\_menutop.php:70
@@ -484,7 +539,7 @@ msgstr "Bloggar"
 
 #: ..\..\..\admin\b2blogs.php:28
 msgid "New blog"
-msgstr "Ny blog:"
+msgstr "Ny blogg"
 
 #: ..\..\..\admin\b2blogs.php:93 ..\..\..\admin\b2blogs.php:251
 #: ..\..\..\admin\edit_actions.php:203
@@ -493,16 +548,15 @@ msgstr "Kan inte uppdatera, var sn‰ll och r‰tta till fˆljande fel:"
 
 #: ..\..\..\admin\b2blogs.php:94
 msgid "Back to new blog form"
-msgstr ""
+msgstr "Tillbaka till formul‰ret"
 
 #: ..\..\..\admin\b2blogs.php:102
-#, fuzzy
 msgid "Creating blog..."
-msgstr "Skapar blog..."
+msgstr "Skapar blogg..."
 
 #: ..\..\..\admin\b2blogs.php:115
 msgid "Trying to create stub file"
-msgstr "Fˆrsˆker skapa en stubfil"
+msgstr "Fˆrsˆker skapa en stubbfil"
 
 #: ..\..\..\admin\b2blogs.php:126
 msgid "Loading"
@@ -510,7 +564,7 @@ msgstr "Laddar"
 
 #: ..\..\..\admin\b2blogs.php:130
 msgid "Could not load stub model."
-msgstr "Kunde inte ladda stubmodellen."
+msgstr "Kunde inte ladda stubbmodellen."
 
 #: ..\..\..\admin\b2blogs.php:135
 msgid "Creating"
@@ -546,16 +600,15 @@ msgstr "Du bˆr <a href=\"%s\">skapa kategorier</a> fˆr den h‰r bloggen nu!"
 
 #: ..\..\..\admin\b2blogs.php:190
 msgid "Blog params for:"
-msgstr "Blogparameterar fˆr:"
+msgstr "Bloggparameterar fˆr:"
 
 #: ..\..\..\admin\b2blogs.php:252
-#, fuzzy
 msgid "Back to blog editing"
-msgstr "Tillbaka till redigering av inl‰gg."
+msgstr "Tillbaka till redigering av inl‰gg"
 
 #: ..\..\..\admin\b2blogs.php:283 ..\..\..\admin\_blogs_list.php:18
 msgid "Blog"
-msgstr ""
+msgstr "Blogg"
 
 #: ..\..\..\admin\b2blogs.php:290
 msgid "You haven't set a static filename for this blog!"
@@ -573,14 +626,14 @@ msgstr "Skriver till fil..."
 #: ..\..\..\admin\b2blogs.php:317 ..\..\..\admin\edit_actions.php:113
 #: ..\..\..\admin\edit_actions.php:236 ..\..\..\admin\edit_actions.php:328
 #: ..\..\..\admin\edit_actions.php:392
-#: ..\..\..\b2evocore\_functions_antispam.php:272
-#: ..\..\..\b2evocore\_functions_antispam.php:385
+#: ..\..\..\b2evocore\_functions_antispam.php:212
+#: ..\..\..\b2evocore\_functions_antispam.php:325
 #: ..\..\..\b2evocore\_functions_pings.php:52
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:162
 #: ..\..\..\b2evocore\_functions_pings.php:202
 msgid "Done."
-msgstr "Klar."
+msgstr "Klart."
 
 #: ..\..\..\admin\b2browse.php:22 ..\..\..\admin\_menutop.php:54
 msgid "Browse blog:"
@@ -594,16 +647,15 @@ msgid ""
 "to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. "
 "When you're promoted, just reload this page and you'll be able to blog. :)"
 msgstr ""
-"Eftersom du ‰r nykomling mÂste du v‰nta pÂ att en administratˆr hˆjer din "
-"nivÂ till 1, fˆr att du skall kunna posta.\tDu kan ocksÂ <a %s>e-maila "
-"administratˆren</a> och be om ˆkad behˆrighet. N‰r du fått det kan du ladda "
-"om denna sida och bˆrja skriva inl‰gg. :)"
+"Eftersom du ‰r nykomling mÂste du v‰nta pÂ att en administratˆr ger dig "
+"behˆrighet att posta.\tDu kan ocksÂ <a %s>e-posta administratˆren</a> och be "
+"om ˆkad behˆrighet. N‰r du fÂtt det kan du ladda om denna sida och bˆrja "
+"skriva inl‰gg. :)"
 
 #: ..\..\..\admin\b2categories.php:14 ..\..\..\admin\_cats_list.php:15
 #: ..\..\..\admin\_menutop.php:60
-#, fuzzy
 msgid "Categories for blog:"
-msgstr "Kategorier"
+msgstr "Kategorier fˆr blogg:"
 
 #: ..\..\..\admin\b2categories.php:78
 #, php-format
@@ -613,21 +665,20 @@ msgstr "Ny underkategori i kategori: %s"
 #: ..\..\..\admin\b2categories.php:87
 #, php-format
 msgid "New category in blog: %s"
-msgstr "Ny kategori i blog:"
+msgstr "Ny kategori i blogg: %s"
 
 #: ..\..\..\admin\b2categories.php:94
 msgid "New category name"
 msgstr "Nytt kategorinamn"
 
 #: ..\..\..\admin\b2categories.php:95
-#, fuzzy
 msgid "Create category"
 msgstr "Skapa kategori"
 
 #: ..\..\..\admin\b2categories.php:151
-#, fuzzy, php-format
+#, php-format
 msgid "Deleting category #%d : %s ..."
-msgstr "Raderar kategori..."
+msgstr "Raderar kategori #%d : %s ..."
 
 #: ..\..\..\admin\b2categories.php:157
 #: ..\..\..\b2evocore\_functions_users.php:68
@@ -640,16 +691,15 @@ msgstr "Raderar kategori..."
 #: ..\..\..\htsrv\register.php:60 ..\..\..\htsrv\register.php:65
 #: ..\..\..\htsrv\register.php:80
 msgid "ERROR"
-msgstr ""
+msgstr "FEL"
 
 #: ..\..\..\admin\b2categories.php:161
 msgid "Category deleted."
 msgstr "Kategorin raderad."
 
 #: ..\..\..\admin\b2categories.php:186
-#, fuzzy
 msgid "Properties for category:"
-msgstr "Skapa kategori"
+msgstr "Kategorins egenskaper:"
 
 #: ..\..\..\admin\b2categories.php:189 ..\..\..\admin\b2upload.php:216
 #: ..\..\..\admin\_edit_form.php:125 ..\..\..\admin\_edit_showposts.php:258
@@ -671,9 +721,8 @@ msgid "Root (No parent)"
 msgstr "Huvudkategori (ingen ovanfˆr)"
 
 #: ..\..\..\admin\b2categories.php:247
-#, fuzzy
 msgid "Edit category!"
-msgstr "ƒndra kategori"
+msgstr "Redigera kategori"
 
 #: ..\..\..\admin\b2edit.php:28 ..\..\..\admin\edit_actions.php:185
 #: ..\..\..\admin\edit_actions.php:282 ..\..\..\admin\edit_actions.php:416
@@ -686,9 +735,9 @@ msgid "Editing post"
 msgstr "Redigera inl‰gg"
 
 #: ..\..\..\admin\b2edit.php:36
-#, fuzzy, php-format
+#, php-format
 msgid "#%d in blog: %s"
-msgstr "Ny kategori i blog:"
+msgstr "#%d i blogg: %s"
 
 #: ..\..\..\admin\b2edit.php:72
 msgid "Oops, no comment with this ID!"
@@ -700,7 +749,7 @@ msgstr "Redigera kommentar"
 
 #: ..\..\..\admin\b2edit.php:106 ..\..\..\admin\_menutop.php:48
 msgid "New post in blog:"
-msgstr "Nytt inl‰gg i blog:"
+msgstr "Nytt inl‰gg i blogg:"
 
 #: ..\..\..\admin\b2edit.php:134 ..\..\..\admin\b2edit.php:163
 msgid ""
@@ -708,11 +757,13 @@ msgid ""
 "categories first."
 msgstr ""
 "Eftersom denna blog inte har nÂgra kategorier kan du inte posta till den. Du "
-"mÂste skapa kategorier fˆrst. "
+"mÂste skapa kategorier fˆrst."
 
 #: ..\..\..\admin\b2edit.php:138
 msgid "Switch to this blog (keeping your input if Javascript is active)"
 msgstr ""
+"V‰xla ˆver till denna blogg (om javascript ‰r pÂ kommer innehÂllet att "
+"bevaras)"
 
 #: ..\..\..\admin\b2login.php:20 ..\..\..\admin\b2upload.php:18
 #: ..\..\..\htsrv\_header.php:14
@@ -727,6 +778,7 @@ msgstr "Logga in..."
 msgid ""
 "In b2evolution, you do not need to point to the b2login.php page to log in."
 msgstr ""
+"I b2evolution behˆver du inte gÂ till sidan b2login.php fˆr att logga in."
 
 #: ..\..\..\admin\b2login.php:24
 #, php-format
@@ -734,59 +786,62 @@ msgid ""
 "Simply point directly to the backoffice page you need, for example: %s or %"
 "s. b2evo will prompt you to log in if needed."
 msgstr ""
+"Peka bara direkt pÂ den administrationssida du beˆver, till exempel %s eller "
+"%s. b2evo kommer att be dig logga in om det behˆvs."
 
 #: ..\..\..\admin\b2options.php:11 ..\..\..\admin\_edit_showposts.php:286
 #: ..\..\..\admin\_menutop.php:110 ..\..\..\admin\_menutop.php:114
 #: ..\..\..\skins\_feedback.php:191 ..\..\..\skins\basic\_feedback.php:179
 msgid "Options"
-msgstr "Valmˆjligheter"
+msgstr "Inst‰llningar"
 
 #: ..\..\..\admin\b2options.php:60
 msgid "Regional settings"
-msgstr ""
+msgstr "Regionala inst‰llningar"
 
 #: ..\..\..\admin\b2options.php:62
 msgid "Time difference"
-msgstr "tidsskillnad"
+msgstr "Tidsskillnad"
 
 #: ..\..\..\admin\b2options.php:62
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "If you're not on the timezone of your server. Current server time is: %s."
-msgstr "om du inte ‰r i samma tidszon som din server"
+msgstr ""
+"Om du inte ‰r i samma tidszon som din server. Serverns tidist‰llning ‰r just "
+"nu: %s."
 
 #: ..\..\..\admin\b2options.php:69
 msgid "Default user rights"
-msgstr ""
+msgstr "Fˆrvalda anv‰ndarr‰ttigheter"
 
 #: ..\..\..\admin\b2options.php:72
 msgid "New users can register"
-msgstr ""
+msgstr "Nya anv‰ndare kan registrera sig"
 
 #: ..\..\..\admin\b2options.php:72
 msgid "Check to allow new users to register themselves."
-msgstr ""
+msgstr "Kryssa i fˆr att tillÂta nya anv‰ndare att registrera sig."
 
 #: ..\..\..\admin\b2options.php:74
 msgid "Group for new users"
-msgstr ""
+msgstr "Grupp fˆr nya anv‰ndare"
 
 #: ..\..\..\admin\b2options.php:74
 msgid "Groups determine user roles and permissions."
-msgstr ""
+msgstr "Gruppen avgˆr vilka roller och r‰ttigheter anv‰ndarna har."
 
 #: ..\..\..\admin\b2options.php:76
 msgid "Level for new users"
-msgstr ""
+msgstr "NivÂ fˆr nya anv‰ndare"
 
 #: ..\..\..\admin\b2options.php:76
 msgid "Levels determine hierarchy of users in blogs."
-msgstr ""
+msgstr "NivÂn avgˆr vart anv‰ndaren befinner sig i hierarkin."
 
 #: ..\..\..\admin\b2options.php:82
-#, fuzzy
 msgid "Post options"
-msgstr "Inl‰ggets innehÂll"
+msgstr "Inl‰ggets inst‰llningar"
 
 #: ..\..\..\admin\b2options.php:85
 msgid "days"
@@ -802,11 +857,11 @@ msgstr "inl‰gg per sida"
 
 #: ..\..\..\admin\b2options.php:88
 msgid "Display mode"
-msgstr ""
+msgstr "Visningsl‰ge"
 
 #: ..\..\..\admin\b2options.php:90
 msgid "Posts/Days per page"
-msgstr ""
+msgstr "Inl‰gg/dagar per sida"
 
 #: ..\..\..\admin\b2options.php:93
 msgid "daily"
@@ -832,10 +887,9 @@ msgstr "Arkivl‰ge"
 #: ..\..\..\admin\_edit_showposts.php:287 ..\..\..\skins\_feedback.php:195
 #: ..\..\..\skins\basic\_feedback.php:183
 msgid "Auto-BR"
-msgstr ""
+msgstr "Automatisk radbrytning"
 
 #: ..\..\..\admin\b2options.php:99
-#, fuzzy
 msgid "Converts line-breaks into &lt;br /&gt; tags."
 msgstr "konverterar radbrytningar till &lt;br /&gt; taggar"
 
@@ -858,7 +912,7 @@ msgstr "Min profil"
 
 #: ..\..\..\admin\b2profile.php:24 ..\..\..\b2evocore\_functions_users.php:478
 msgid "Edit your profile"
-msgstr "ƒndra din profil"
+msgstr "Redigera din profil"
 
 #: ..\..\..\admin\b2profile.php:35
 msgid "Bookmarklet"
@@ -867,11 +921,10 @@ msgstr "Bokm‰rke"
 #: ..\..\..\admin\b2profile.php:41 ..\..\..\admin\b2profile.php:48
 #: ..\..\..\admin\b2profile.php:56 ..\..\..\admin\b2profile.php:63
 msgid "Add this link to your Favorites/Bookmarks:"
-msgstr "L‰gg till denna l‰nk till dina Favoriter/Bokm‰rken:"
+msgstr "L‰gg denna l‰nk till dina Favoriter/Bokm‰rken:"
 
 #: ..\..\..\admin\b2profile.php:42 ..\..\..\admin\b2profile.php:49
 #: ..\..\..\admin\b2profile.php:57 ..\..\..\admin\b2profile.php:64
-#, fuzzy
 msgid "b2evo bookmarklet"
 msgstr "b2evo-bokm‰rke"
 
@@ -880,30 +933,27 @@ msgid "Post to b2evolution"
 msgstr "Posta till b2evolution"
 
 #: ..\..\..\admin\b2profile.php:79
-#, fuzzy
 msgid "No Sidebar found! You must use Mozilla 0.9.4 or later!"
-msgstr "Hittar ingen Sidebar! Du mÂste anv‰nda Mozilla 0.9.4 eller senare!"
+msgstr "Hittar ingen Sidebar! Du mÂste anv‰nda Mozilla 0.9.4 eller nyare!"
 
 #: ..\..\..\admin\b2profile.php:83 ..\..\..\admin\b2profile.php:91
 msgid "SideBar"
 msgstr ""
 
 #: ..\..\..\admin\b2profile.php:84
-#, fuzzy, php-format
+#, php-format
 msgid "Add the <a %s>b2evo sidebar</a> !"
-msgstr "L‰gg till <a %s>b2 Sidebar</a> !"
+msgstr "L‰gg till <a %s>b2evo sidebar</a> !"
 
 #: ..\..\..\admin\b2profile.php:92
 msgid "Add this link to your favorites:"
-msgstr "L‰gg till denna l‰nk bland dina favoriter:"
+msgstr "L‰gg denna l‰nk till dina favoriter:"
 
 #: ..\..\..\admin\b2profile.php:93
-#, fuzzy
 msgid "b2evo sidebar"
-msgstr "b2evo Sidebar"
+msgstr ""
 
 #: ..\..\..\admin\b2spell.php:11
-#, fuzzy
 msgid "Spell Check"
 msgstr "Stavningskontroll"
 
@@ -916,7 +966,6 @@ msgid "View Stats"
 msgstr "Se statistik"
 
 #: ..\..\..\admin\b2stats.php:21 ..\..\..\admin\b2stats.php:138
-#, fuzzy
 msgid "Summary"
 msgstr "Summering"
 
@@ -937,24 +986,23 @@ msgid "User Agents"
 msgstr "Program"
 
 #: ..\..\..\admin\b2stats.php:41 ..\..\..\admin\b2stats.php:165
-#, fuzzy
 msgid "Direct Accesses"
-msgstr "Senaste direkttr‰ffar"
+msgstr "Direkttr‰ffar"
 
 #: ..\..\..\admin\b2stats.php:61
-#, fuzzy, php-format
+#, php-format
 msgid "Changing hit #%d type to: %s"
-msgstr "ƒndra tr‰ff #%ds typ till: %s"
+msgstr "ƒndra typ pÂ tr‰ff #%d till: %s"
 
 #: ..\..\..\admin\b2stats.php:78
 #, php-format
 msgid "Deleting hit #%d..."
-msgstr "Tar bort tr‰ff #%d..."
+msgstr "Radera tr‰ff #%d..."
 
 #: ..\..\..\admin\b2stats.php:95
-#, php-format
+#, fuzzy, php-format
 msgid "Pruning hits for %s..."
-msgstr ""
+msgstr "Stryk tr‰ffar pÂ %s..."
 
 #: ..\..\..\admin\b2stats.php:107
 msgid "Filter"
@@ -965,12 +1013,10 @@ msgid "None"
 msgstr "Ingen"
 
 #: ..\..\..\admin\b2stats.php:160
-#, fuzzy
 msgid "Date"
 msgstr "Datum"
 
 #: ..\..\..\admin\b2stats.php:163
-#, fuzzy
 msgid "Indexing Robots"
 msgstr "Sˆkrobotar"
 
@@ -980,17 +1026,18 @@ msgstr "Totalt"
 
 #: ..\..\..\admin\b2stats.php:178
 msgid "Prune this date!"
-msgstr ""
+msgstr "Stryk detta datum"
 
 #. TRANS: Abbrev. for Prune (stats)
 #: ..\..\..\admin\b2stats.php:178 ..\..\..\admin\b2stats.php:207
 #, fuzzy
 msgid "Prune"
-msgstr "Juni"
+msgstr "Stryk"
 
 #: ..\..\..\admin\b2stats.php:178 ..\..\..\admin\b2stats.php:207
+#, fuzzy
 msgid "Prune hits for this date!"
-msgstr ""
+msgstr "Stryk tr‰ffar fˆr detta datum!"
 
 #: ..\..\..\admin\b2stats.php:232 ..\..\..\skins\_stats.php:16
 msgid "Last referers"
@@ -998,12 +1045,12 @@ msgstr "Senaste referenser"
 
 #: ..\..\..\admin\b2stats.php:233
 msgid "These are hits from external web pages refering to this blog"
-msgstr "Detta ‰r tr‰ffar from externa webbsidor som refererar till denna blog"
+msgstr "Detta ‰r tr‰ffar from externa webbsidor som refererar till denna blogg"
 
 #: ..\..\..\admin\b2stats.php:242 ..\..\..\admin\b2stats.php:293
 #: ..\..\..\admin\b2stats.php:377
 msgid "Delete this hit!"
-msgstr "Ta bort denna tr‰ff"
+msgstr "Radera denna tr‰ff"
 
 #. TRANS: Abbrev. for Delete (stats)
 #: ..\..\..\admin\b2stats.php:242 ..\..\..\admin\b2stats.php:293
@@ -1020,19 +1067,20 @@ msgstr "Logga som en sˆkning ist‰llet"
 #. TRANS: Abbrev. for "move to searches" (stats)
 #: ..\..\..\admin\b2stats.php:243
 msgid "-&gt;S"
-msgstr "-&gt;S"
+msgstr "-&gt;Sˆk"
 
-#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\_edit_showposts.php:215
+#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\b2stats.php:263
+#: ..\..\..\admin\_edit_showposts.php:215
 msgid "Ban this domain!"
-msgstr ""
+msgstr "Svartlista denna dom‰n"
 
 #. TRANS: Abbrev.
-#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\_edit_showposts.php:215
-#, fuzzy
+#: ..\..\..\admin\b2stats.php:249 ..\..\..\admin\b2stats.php:263
+#: ..\..\..\admin\_edit_showposts.php:215
 msgid "Ban"
-msgstr "Jan"
+msgstr "Svartlista"
 
-#: ..\..\..\admin\b2stats.php:258 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:257 ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Flest referenser"
 
@@ -1067,7 +1115,7 @@ msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
 "(Robots must be listed in /conf/_stats.php)"
 msgstr ""
-"Detta ‰r tr‰ffar frÂn automatiska robotar som t ex sˆkmotorers "
+"Detta ‰r tr‰ffar frÂn automatiska robotar som t ex sˆkmotorernas "
 "indexeringsrobotar. (Robotar mÂste vara listade i /conf/b2evo_advanced.php)"
 
 #: ..\..\..\admin\b2stats.php:341 ..\..\..\skins\_stats.php:75
@@ -1081,7 +1129,7 @@ msgid ""
 "conf/_stats.php)"
 msgstr ""
 "Detta ‰r tr‰ffar frÂn RSS nyhetsinsamlare. (Insamlarna mÂste vara listade i /"
-"conf/b2evo_advanced.php)"
+"conf/_stats.php)"
 
 #: ..\..\..\admin\b2stats.php:353
 msgid "Total RSS hits"
@@ -1097,14 +1145,14 @@ msgid ""
 "(either by typing the URL directly, or using a bookmark. Invalid (too short) "
 "referers are also listed here.)"
 msgstr ""
-"Detta ‰r tr‰ffar frÂn besˆkare som kom till denna blog direkt (antingen "
+"Detta ‰r tr‰ffar frÂn besˆkare som kom till denna blogg direkt (antingen "
 "genom att skriva in URL:en direkt, eller genom att anv‰nda ett bokm‰rke. "
 "Felaktiga (fˆr korta) referenser listas ocksÂ h‰r.)"
 
 #: ..\..\..\admin\b2stats.php:398
 #, fuzzy
 msgid "Top User Agents"
-msgstr "Mest anv‰nda program"
+msgstr "Mest anv‰nda webbl‰sare"
 
 #: ..\..\..\admin\b2template.php:11 ..\..\..\admin\_menutop.php:92
 msgid "Custom skin template editing"
@@ -1120,7 +1168,7 @@ msgstr "Felaktigt filnamn!"
 
 #: ..\..\..\admin\b2template.php:59
 msgid "Oops, no such file !"
-msgstr "Oops, finns ingen fil med detta namn!"
+msgstr "Oops, finns ingen sÂdan fil!"
 
 #: ..\..\..\admin\b2template.php:70
 msgid "File edited!"
@@ -1134,7 +1182,7 @@ msgid ""
 msgstr ""
 "Var fˆrsiktig med vad du gˆr, att ‰ndra denna fil kan fˆrstˆra din mall! "
 "ƒndra inte det som finns mellan <code>&lt;?php</code> och <code>?&gt;</code> "
-"om du inte vet vad du gˆr!"
+"om du inte vet exakt vad du hÂller pÂ med!"
 
 #: ..\..\..\admin\b2template.php:83
 msgid "update template !"
@@ -1145,7 +1193,7 @@ msgid ""
 "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
 msgstr ""
 "(Du kan inte uppdatera den filen/mallen: du mÂste gˆra den skrivbar, genom "
-"att s‰tta CHMOD 766)"
+"att s‰tta CHMOD 766 pÂ den)"
 
 #: ..\..\..\admin\b2template.php:99
 msgid ""
@@ -1160,12 +1208,12 @@ msgid ""
 "You can edit any of the following files (provided it's writable by the "
 "server, e.g. CHMOD 766)"
 msgstr ""
-"Du kan ‰ndra fˆljande filer (under fˆruts‰ttning att de ‰r skrivbara, med "
-"CHMOD 766)"
+"Du kan ‰ndra fˆljande filer (fˆruts‰ttsatt att de ‰r skrivbara pÂ servern, "
+"med CHMOD 766)"
 
 #: ..\..\..\admin\b2template.php:117
 msgid "This is the template that displays the links to the archives for a blog"
-msgstr "Detta ‰r mallen som visar l‰nkarna till arkiven fˆr en blog"
+msgstr "Detta ‰r mallen som visar l‰nkarna till arkiven fˆr en blogg"
 
 #: ..\..\..\admin\b2template.php:120
 msgid ""
@@ -1174,13 +1222,12 @@ msgstr "Detta ‰r mallen som visar den (rekursiva) listan av (under)kategorier"
 
 #: ..\..\..\admin\b2template.php:123
 msgid "This is the template that displays the feedback for a post"
-msgstr "Detta ‰r mallen som visar feedback pÂ ett inl‰gg."
+msgstr "Detta ‰r mallen som visar respons pÂ ett inl‰gg."
 
 #: ..\..\..\admin\b2template.php:126
 #, fuzzy
 msgid "This is the template that displays the last comments for a blog"
-msgstr ""
-"Detta ‰r mallen som visar l‰nkarna till de senaste kommentarerna fˆr en blog"
+msgstr "Detta ‰r mallen som visar en bloggs senaste kommentarer"
 
 #: ..\..\..\admin\b2template.php:129
 msgid "This is the main template. It displays the blog."
@@ -1188,11 +1235,11 @@ msgstr "Detta ‰r huvudmallen. Den visar bloggen."
 
 #: ..\..\..\admin\b2template.php:132
 msgid "This is the template that displays stats for a blog"
-msgstr "Detta ‰r mallen som visar statistik fˆr en blog"
+msgstr "Detta ‰r mallen som visar statistik fˆr en blogg"
 
 #: ..\..\..\admin\b2template.php:135
 msgid "This is the page displayed in the comment popup"
-msgstr "Detta ‰r sidan som visas i kommentarspopupen"
+msgstr "Detta ‰r sidan som visas kommentarspopupen"
 
 #: ..\..\..\admin\b2template.php:138
 msgid "This is the page displayed in the pingback popup"
@@ -1208,14 +1255,13 @@ msgid ""
 "and upload them. This online editor is only meant to be used when you don't "
 "have access to a text editor..."
 msgstr ""
-"Notera: Du kan givetvis ‰ndra filerna/mallarna i en textredigerare och ladda "
-"upp dem. Denna onlineredigerare ‰r bara menad att anv‰ndas n‰r du inte har "
-"mˆjlighet att anv‰nda en textredigerare..."
+"OBS: Du kan givetvis ‰ndra filerna/mallarna i en textredigerare och ladda "
+"upp dem pÂ servern. Denna onlineredigerare ‰r bara t‰nkt att anv‰ndas n‰r du "
+"inte har mˆjlighet att anv‰nda en textredigerare..."
 
 #: ..\..\..\admin\b2upload.php:18
-#, fuzzy
 msgid "upload images/files"
-msgstr "Ladda upp filer/bilder"
+msgstr "ladda upp filer/bilder"
 
 #: ..\..\..\admin\b2upload.php:100
 msgid "File upload"
@@ -1247,7 +1293,7 @@ msgstr "Fil %s: typ %s ‰r inte tillÂten."
 #: ..\..\..\admin\b2upload.php:163 ..\..\..\admin\b2upload.php:189
 #: ..\..\..\admin\b2upload.php:192
 msgid "Couldn't upload your file to:"
-msgstr "Kunde inte ladda upp filen till:"
+msgstr "Kunde inte ladda upp din fil till:"
 
 #: ..\..\..\admin\b2upload.php:167
 msgid "Duplicate File?"
@@ -1261,23 +1307,21 @@ msgstr "Filnamnet \"%s\" existerar redan!"
 #: ..\..\..\admin\b2upload.php:169
 #, php-format
 msgid "Filename \"%s\" moved to \"%s\""
-msgstr "Filenamnet \"%s\" flyttad till \"%s\""
+msgstr "Filenamnet \"%s\" ‰r flyttad till \"%s\""
 
 #: ..\..\..\admin\b2upload.php:170
 msgid "Confirm or rename:"
 msgstr "Bekr‰fta eller byt namn:"
 
 #: ..\..\..\admin\b2upload.php:176
-#, fuzzy
 msgid "Alternate name"
 msgstr "Alternativt namn"
 
 #: ..\..\..\admin\b2upload.php:180
 msgid "Confirm !"
-msgstr "Bekr‰fta"
+msgstr "Bekr‰fta!"
 
 #: ..\..\..\admin\b2upload.php:206
-#, fuzzy
 msgid "File uploaded !"
 msgstr "Filen har laddats upp!"
 
@@ -1288,12 +1332,12 @@ msgstr "Din fil <strong>\"%s\"</strong> har laddats upp!"
 
 #: ..\..\..\admin\b2upload.php:208
 msgid "Here's the code to display it:"
-msgstr "H‰r ‰r koden fˆr att visa den"
+msgstr "H‰r ‰r koden fˆr att visa den:"
 
 #: ..\..\..\admin\b2upload.php:212
 #, fuzzy
 msgid "Add the code to your post !"
-msgstr "L‰gg till denna l‰nk bland dina favoriter:"
+msgstr "L‰gg till koden i ditt inl‰gg!"
 
 #: ..\..\..\admin\b2upload.php:215
 msgid "Image Details"
@@ -1317,14 +1361,13 @@ msgstr "Anv‰ndaradministration"
 
 #: ..\..\..\admin\edit_actions.php:53 ..\..\..\admin\_menutop.php:48
 msgid "Adding new post..."
-msgstr "L‰gger till ett nytt inl‰gg..."
+msgstr "L‰gger till nytt inl‰gg..."
 
 #: ..\..\..\admin\edit_actions.php:88 ..\..\..\admin\edit_actions.php:199
 #: ..\..\..\admin\edit_actions.php:432 ..\..\..\htsrv\comment_post.php:52
 #: ..\..\..\htsrv\trackback.php:66 ..\..\..\xmlsrv\xmlrpc.php:1435
-#, fuzzy
 msgid "Supplied URL is invalid: "
-msgstr "Medskickad URL ‰r felaktig."
+msgstr "Denna URL ‰r felaktig: "
 
 #: ..\..\..\admin\edit_actions.php:92 ..\..\..\htsrv\getmail.php:250
 msgid "Cannot post, please correct these errors:"
@@ -1333,7 +1376,7 @@ msgstr "Kan inte posta inl‰gget, var sn‰ll och r‰tta till fˆljande fel:"
 #: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:204
 #: ..\..\..\admin\edit_actions.php:437
 msgid "Back to post editing"
-msgstr "Tillbaka till redigering av inl‰gg."
+msgstr "Tillbaka till redigering av inl‰gg"
 
 #: ..\..\..\admin\edit_actions.php:99
 msgid "Recording post..."
@@ -1348,32 +1391,28 @@ msgstr "Sover..."
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
-"Inl‰gget ‰r inte publikt publicerad: hoppar ˆver trackback, pingback och "
-"blogpings..."
+"Inl‰gget ‰r inte postat offentligt: hoppar ˆver trackback, pingback och "
+"bloggpings..."
 
 #: ..\..\..\admin\edit_actions.php:147
-#, fuzzy
 msgid "Posting Done..."
 msgstr "Postningen klar..."
 
 #: ..\..\..\admin\edit_actions.php:162 ..\..\..\admin\_menutop.php:54
-#, fuzzy
 msgid "Updating post..."
 msgstr "Uppdaterar inl‰gg..."
 
 #: ..\..\..\admin\edit_actions.php:258 ..\..\..\admin\edit_actions.php:345
 msgid "Post had already pinged: skipping blog pings..."
-msgstr "Inl‰gget har redan pingat: hoppar ˆver blogpings..."
+msgstr "Inl‰gget har redan pingat: hoppar ˆver bloggpings..."
 
 #: ..\..\..\admin\edit_actions.php:270 ..\..\..\admin\edit_actions.php:357
-#, fuzzy
 msgid "Updating done..."
-msgstr "Uppdaterar inl‰gg..."
+msgstr "Uppdatering klar..."
 
 #: ..\..\..\admin\edit_actions.php:287 ..\..\..\admin\_menutop.php:54
-#, fuzzy
 msgid "Updating post status..."
-msgstr "Uppdaterar inl‰gg..."
+msgstr "Uppdaterar inl‰ggets status..."
 
 #: ..\..\..\admin\edit_actions.php:370
 msgid "Oops, no post with this ID!"
@@ -1394,38 +1433,35 @@ msgstr "Kan inte uppdatera kommentaren, var sn‰ll och r‰tta till fˆljande fel:"
 
 #: ..\..\..\admin\edit_actions.php:490
 msgid "Back to posts!"
-msgstr "Tillbaka till inl‰gg!"
+msgstr "Tillbaka till inl‰ggen!"
 
 #: ..\..\..\admin\edit_actions.php:492
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr "Du kanske ocksÂ vill generera statiska sidor eller se dina bloggar..."
 
 #: ..\..\..\admin\edit_actions.php:500
-#, fuzzy
 msgid "New post"
 msgstr "Nytt inl‰gg"
 
 #: ..\..\..\admin\_blogs_form.php:16
 msgid "Create new blog!"
-msgstr "Skapa ny blog!"
+msgstr "Skapa en ny blogg!"
 
 #: ..\..\..\admin\_blogs_form.php:20
-#, fuzzy
 msgid "Update blog!"
-msgstr "Uppdatera blog!"
+msgstr "Uppdatera blogg!"
 
 #: ..\..\..\admin\_blogs_form.php:29
 msgid "General parameters"
-msgstr ""
+msgstr "Generella parametrar"
 
 #: ..\..\..\admin\_blogs_form.php:31 ..\..\..\admin\_blogs_list.php:19
-#, fuzzy
 msgid "Full Name"
 msgstr "Fullst‰ndigt namn"
 
 #: ..\..\..\admin\_blogs_form.php:32
 msgid "Short Name"
-msgstr "Namn"
+msgstr "Anv‰ndarnamn"
 
 #: ..\..\..\admin\_blogs_form.php:33
 #, fuzzy
@@ -1433,12 +1469,13 @@ msgid "Main Language"
 msgstr "HuvudsprÂk"
 
 #: ..\..\..\admin\_blogs_form.php:38
+#, fuzzy
 msgid "Access parameters"
-msgstr ""
+msgstr "Tillg‰nglighetsparametrar"
 
 #: ..\..\..\admin\_blogs_form.php:40
 msgid "Blog Folder URL"
-msgstr "URL till blogmappen"
+msgstr "Bloggmappens URL"
 
 #: ..\..\..\admin\_blogs_form.php:42
 msgid ""
@@ -1446,10 +1483,13 @@ msgid ""
 "<em>Static filename</em> files live. No trailing slash. (If you don't know, "
 "leave this field empty.)"
 msgstr ""
+"Detta ‰r URLen till mappen d‰r <em>stubbfilen</em> och <em>den statiska "
+"filen</em> bor. Inget avslutande snedstreck. (L‰mna detta f‰lt tomt om du ‰r "
+"os‰ker.)"
 
 #: ..\..\..\admin\_blogs_form.php:46 ..\..\..\admin\_blogs_list.php:20
 msgid "Stub Filename"
-msgstr ""
+msgstr "Stubbfilsnamn"
 
 #: ..\..\..\admin\_blogs_form.php:46
 msgid ""
@@ -1457,10 +1497,13 @@ msgid ""
 "used to display this blog. This is used mainly for static page generation, "
 "but setting this incorrectly may also cause navigation to fail."
 msgstr ""
+"Detta ‰r <strong>fil</strong>namnet til huvudfilen (t ex: blog_b.php) som "
+"anv‰nds fˆr att visa denna blogg. Det anv‰nds fr‰mst fˆr att generera "
+"statiska sidor, men om det s‰tts fel kan det ocksÂ pÂverka navigeringen."
 
 #: ..\..\..\admin\_blogs_form.php:48
 msgid "Stub Urlname"
-msgstr ""
+msgstr "Stubbfilens URL"
 
 #: ..\..\..\admin\_blogs_form.php:48
 msgid ""
@@ -1471,60 +1514,65 @@ msgid ""
 "strong> This is used by permalinks, trackback, pingback, etc. Setting this "
 "incorrectly may cause these to fail."
 msgstr ""
+"Detta ‰r <strong>URL:en</strong> till huvudfilen (t ex: blog_b.php) som "
+"anv‰nds fˆr att visa denna blogg. Normalt anges det som filnamnet utan "
+"avslutande .php, om din webbserver stˆder detta. <strong>Om du ‰r os‰ker "
+"anv‰nder du stubbfilsnamnet.</strong> Det anv‰nds av permal‰nkar, "
+"trackbacks, pingbacks, osv. Om du skriver fel h‰r, kan det leda till att "
+"dessa inte kommer att fungera."
 
 #: ..\..\..\admin\_blogs_form.php:50 ..\..\..\admin\_blogs_list.php:22
-#, fuzzy
 msgid "Static Filename"
-msgstr "Statiskt filnamn!"
+msgstr "Statiskt filnamn"
 
 #: ..\..\..\admin\_blogs_form.php:50
 msgid ""
 "This is the filename that will be used when you generate a static (.html) "
 "version of the blog homepage."
 msgstr ""
+"Det h‰r ‰r det filnamn som kommer att anv‰ndas n‰r du skapar en statisk (."
+"html) version av bloggens hemsida."
 
 #: ..\..\..\admin\_blogs_form.php:55 ..\..\..\admin\_users_groupform.php:34
 msgid "User permissions"
-msgstr ""
+msgstr "Anv‰ndarr‰ttigheter"
 
 #. TRANS: table header for user list
 #: ..\..\..\admin\_blogs_form.php:58 ..\..\..\admin\_users_list.php:24
 msgid "Login "
-msgstr "Logga in"
+msgstr "Anv‰ndarnamn"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:59
+#, fuzzy
 msgid "Can post/edit with following statuses:"
-msgstr ""
+msgstr "Kan posta/redigera med fˆljande status:"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:60
-#, fuzzy
 msgid "Delete<br />posts"
-msgstr "Raderar inl‰gg..."
+msgstr "Radera<br />inl‰gg"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:61
 msgid "Edit<br />comts"
-msgstr ""
+msgstr "Ändra<br />komm."
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:62
 msgid "Edit<br />cats"
-msgstr ""
+msgstr "Ändra<br />kat."
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_form.php:63
 msgid "Edit<br />blog"
-msgstr ""
+msgstr "Ändra<br />blogg"
 
 #: ..\..\..\admin\_blogs_form.php:66 ..\..\..\b2evocore\_vars.php:175
-#, fuzzy
 msgid "Published"
 msgstr "Publicerad"
 
 #: ..\..\..\admin\_blogs_form.php:67 ..\..\..\b2evocore\_vars.php:177
-#, fuzzy
 msgid "Protected"
 msgstr "Skyddad"
 
@@ -1533,68 +1581,61 @@ msgid "Private"
 msgstr "Privat"
 
 #: ..\..\..\admin\_blogs_form.php:69 ..\..\..\b2evocore\_vars.php:179
-#, fuzzy
 msgid "Draft"
 msgstr "Utkast"
 
 #: ..\..\..\admin\_blogs_form.php:70 ..\..\..\b2evocore\_vars.php:176
-#, fuzzy
 msgid "Deprecated"
 msgstr "Nedskriven"
 
 #: ..\..\..\admin\_blogs_form.php:74
-#, fuzzy
 msgid "Members"
-msgstr "November"
+msgstr "Medlemmar"
 
 #: ..\..\..\admin\_blogs_form.php:100 ..\..\..\admin\_blogs_form.php:114
 #: ..\..\..\admin\_blogs_form.php:184 ..\..\..\admin\_blogs_form.php:192
 msgid "Permission to post into this blog with private status"
-msgstr ""
+msgstr "Befogenhet att posta i denna blogg med privat status"
 
 #: ..\..\..\admin\_blogs_form.php:107 ..\..\..\admin\_blogs_form.php:188
 msgid "Permission to post into this blog with protected status"
-msgstr ""
+msgstr "Befogenhet att posta i denna blogg med skyddad status"
 
 #: ..\..\..\admin\_blogs_form.php:121 ..\..\..\admin\_blogs_form.php:196
 msgid "Permission to post into this blog with draft status"
-msgstr ""
+msgstr "Befogenhet att posta i denna blogg med utkast som status"
 
 #: ..\..\..\admin\_blogs_form.php:128 ..\..\..\admin\_blogs_form.php:200
 msgid "Permission to post into this blog with deprecated status"
-msgstr ""
+msgstr "Befogenhet att posta i denna blogg med nedskriven status"
 
 #: ..\..\..\admin\_blogs_form.php:135 ..\..\..\admin\_blogs_form.php:204
 msgid "Permission to delete posts in this blog"
-msgstr ""
+msgstr "Befogenhet att radera inl‰gg i denna blogg"
 
 #: ..\..\..\admin\_blogs_form.php:142 ..\..\..\admin\_blogs_form.php:208
 msgid "Permission to edit comments in this blog"
-msgstr ""
+msgstr "Befogenhet att redigera kommentarer i denna blogg"
 
 #: ..\..\..\admin\_blogs_form.php:149 ..\..\..\admin\_blogs_form.php:211
-#, fuzzy
 msgid "Permission to edit categories for this blog"
-msgstr "Du har inte r‰tt att ‰ndra i den h‰r bloggens inst‰llningar."
+msgstr "Befogenhet att redigera kategorier fˆr denna blogg"
 
 #: ..\..\..\admin\_blogs_form.php:156 ..\..\..\admin\_blogs_form.php:215
 msgid "Permission to edit blog properties"
-msgstr ""
+msgstr "Befogenhet att redigera bloggens egenskaper"
 
 #: ..\..\..\admin\_blogs_form.php:164
-#, fuzzy
 msgid "Non members"
-msgstr "November"
+msgstr "Icke medlemmar"
 
 #: ..\..\..\admin\_blogs_form.php:226
-#, fuzzy
 msgid "After each new post..."
-msgstr "L‰gger till ett nytt inl‰gg..."
+msgstr "Efter varje nytt inl‰gg..."
 
 #: ..\..\..\admin\_blogs_form.php:228
-#, fuzzy
 msgid "Ping b2evolution.net"
-msgstr "Mitt b2evolution"
+msgstr "Pinga b2evolution.net"
 
 #: ..\..\..\admin\_blogs_form.php:228
 msgid ""
@@ -1605,32 +1646,38 @@ msgid ""
 "(Latin-1) charset, otherwise we cannot display it on b2evolution.net. You "
 "can use HTML entities (e-g &amp;Kappa;) for non latin chars."
 msgstr ""
+"om du vill vara med i listan 'nyligen uppdaterade'. OBSERVERA: Om du tagit "
+"bort b2evolution-knappen och l‰nken till b2evolution frÂn din blogg behˆver "
+"du inte ens bry dig. Du kommer *inte* att accepteras, och din blogg kommer "
+"att svartlistas. Din bloggs hela namn mÂste ocksÂ vara skrivet med ISO 8859-"
+"1 (Latin-1) charset, annars kan det inte visas pÂ b2evolution.net. Anv‰nd "
+"HTML-enheter (som &auml; &aring, &ouml; etc) om du har svenska, eller andra "
+"tecken som inte ‰r Latin-1, i namnet."
 
 #: ..\..\..\admin\_blogs_form.php:229
 msgid "Ping technorati.com"
-msgstr ""
+msgstr "Pinga technorati.com"
 
 #: ..\..\..\admin\_blogs_form.php:229 ..\..\..\admin\_blogs_form.php:230
 #: ..\..\..\admin\_blogs_form.php:231
 msgid "to give notice of new post."
-msgstr ""
+msgstr "fˆr att annonsera nya inl‰gg."
 
 #: ..\..\..\admin\_blogs_form.php:230
 msgid "Ping weblogs.com"
-msgstr ""
+msgstr "Pinga weblogs.com"
 
 #: ..\..\..\admin\_blogs_form.php:231
-#, fuzzy
 msgid "Ping blo.gs"
-msgstr "mina bloggar:"
+msgstr "Pinga blo.gs"
 
 #: ..\..\..\admin\_blogs_form.php:238
 msgid "Tagline"
-msgstr "Signatur"
+msgstr "Undertitel"
 
 #: ..\..\..\admin\_blogs_form.php:238
 msgid "This is diplayed under the blog name on the blog template"
-msgstr "Detta visas under bloggens namn i blogmallen"
+msgstr "Detta visas under bloggens namn i bloggmallen"
 
 #: ..\..\..\admin\_blogs_form.php:240
 msgid "Short Description"
@@ -1639,78 +1686,82 @@ msgstr "Kort beskrivning"
 #: ..\..\..\admin\_blogs_form.php:240
 msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
 msgstr ""
+"Detta anv‰nds fˆr meta-taggens beskrivnign och i RSS-matningen. INGET HTML!"
 
 #: ..\..\..\admin\_blogs_form.php:242
-#, fuzzy
 msgid "Keywords"
 msgstr "Nyckelord"
 
 #: ..\..\..\admin\_blogs_form.php:242
 msgid "This is is used in meta tag keywords. NO HTML!"
-msgstr ""
+msgstr "Detta anv‰nds fˆr meta-taggens nyckelord. INGET HTML!"
 
 #: ..\..\..\admin\_blogs_form.php:247
 msgid "Long Description"
 msgstr "LÂng beskrivning"
 
 #: ..\..\..\admin\_blogs_form.php:249 ..\..\..\admin\_blogs_form.php:255
-#, fuzzy
 msgid "This is displayed on the blog template."
-msgstr "Detta visas i blogmallen"
+msgstr "Detta visas i bloggmallen"
 
 #: ..\..\..\admin\_blogs_form.php:260
 msgid "Default display options"
-msgstr ""
+msgstr "Fˆrvalda visningsinst‰llningar"
 
 #: ..\..\..\admin\_blogs_form.php:264
 msgid "Display blog list"
-msgstr ""
+msgstr "Visa blogglista"
 
 #: ..\..\..\admin\_blogs_form.php:264
 msgid ""
 "Check this if you want to display the list of all blogs on your blog page "
 "(if your skin or template supports this)."
 msgstr ""
+"Kryssa i h‰r om du vill visa listan pÂ alla bloggar pÂ din bloggsida (om "
+"ditt tema eller din mall stˆdjer detta)."
 
 #: ..\..\..\admin\_blogs_form.php:269
 msgid "Advanced options"
-msgstr ""
+msgstr "Avancerade inst‰llningar"
 
 #: ..\..\..\admin\_blogs_form.php:271
 msgid "Allow trackbacks"
-msgstr ""
+msgstr "TillÂt trackbacks"
 
 #: ..\..\..\admin\_blogs_form.php:271
 msgid ""
 "Allow other bloggers to send trackbacks to this blog, letting you know when "
 "they refer to it. This will also let you send trackbacks to other blogs."
 msgstr ""
+"TillÂt andra bloggare att skicka trackbacks till denna blogg, sÂ att du fÂr "
+"veta om de refererar till den. Detta inneb‰r att du ocksÂ kan skicka "
+"trackbacks till andra bloggar."
 
 #: ..\..\..\admin\_blogs_form.php:272
-#, fuzzy
 msgid "Allow pingbacks"
-msgstr "Visa pingbacks"
+msgstr "TillÂt pingbacks"
 
 #: ..\..\..\admin\_blogs_form.php:272
 msgid ""
 "Allow other bloggers to send pingbacks to this blog, letting you know when "
 "they refer to it. This will also let you send pingbacks to other blogs."
 msgstr ""
+"TillÂt andra bloggare att skicka pingbacks till denna blogg, sÂ att du fÂr "
+"veta om de refererar till den. Detta inneb‰r att du ocksÂ kan skicka "
+"pingbacks till andra bloggar."
 
 #: ..\..\..\admin\_blogs_list.php:21
 msgid "Stub URLname"
-msgstr ""
+msgstr "Stubbfilens URL"
 
 #: ..\..\..\admin\_blogs_list.php:23
-#, fuzzy
 msgid "Lang"
 msgstr "SprÂk"
 
 #: ..\..\..\admin\_blogs_list.php:41 ..\..\..\admin\_cats_list.php:29
 #: ..\..\..\admin\_users_list.php:41 ..\..\..\admin\_users_list.php:56
-#, fuzzy
 msgid "Properties"
-msgstr "Skyddad"
+msgstr "Egenskaper"
 
 #. TRANS: abbrev. for "generate !"
 #: ..\..\..\admin\_blogs_list.php:60
@@ -1719,12 +1770,11 @@ msgstr "Skapa!"
 
 #: ..\..\..\admin\_blogs_list.php:74
 msgid "Create new blog !"
-msgstr "Skapa ny blog!"
+msgstr "Skapa ny blogg!"
 
 #: ..\..\..\admin\_cats_list.php:41 ..\..\..\admin\_cats_list.php:57
-#, fuzzy
 msgid "Create"
-msgstr "Skapar"
+msgstr "Skapa"
 
 #: ..\..\..\admin\_cats_list.php:42
 msgid "New sub-category here"
@@ -1742,12 +1792,12 @@ msgid ""
 "root category, posts will be assigned to the oldest remaining category in "
 "the same blog (smallest category number)."
 msgstr ""
-"<strong>Notera:</strong>\tAtt ta bort en kategori raderar inte kategorins "
+"<strong>Notera:</strong> Att ta bort en kategori raderar inte kategorins "
 "inl‰gg. De kommer bara att flyttas till kategorin ovanfˆr. N‰r du raderar en "
 "huvudkategori kommer inl‰ggen att hamna under den ‰ldsta kvarvarande "
-"kategorin i samma blog (minsta kategorinumret)."
+"kategorin i samma blogg (minsta kategorinumret)."
 
-#: ..\..\..\admin\_edit_form.php:100 ..\..\..\admin\_quicktags.php:342
+#: ..\..\..\admin\_edit_form.php:100 ..\..\..\admin\_quicktags.php:346
 msgid "Title"
 msgstr "Titel"
 
@@ -1766,17 +1816,16 @@ msgstr "L‰nk till URL"
 #: ..\..\..\skins\_feedback.php:169 ..\..\..\skins\_profile.php:69
 #: ..\..\..\skins\basic\_feedback.php:157 ..\..\..\skins\basic\_profile.php:71
 msgid "Email"
-msgstr ""
+msgstr "E-post"
 
-#: ..\..\..\admin\_edit_form.php:133 ..\..\..\admin\_quicktags.php:325
-#: ..\..\..\admin\_quicktags.php:337 ..\..\..\admin\_users_form.php:46
+#: ..\..\..\admin\_edit_form.php:133 ..\..\..\admin\_quicktags.php:329
+#: ..\..\..\admin\_quicktags.php:341 ..\..\..\admin\_users_form.php:46
 #: ..\..\..\admin\_users_list.php:28 ..\..\..\skins\_profile.php:70
 #: ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
 msgstr ""
 
 #: ..\..\..\admin\_edit_form.php:163
-#, fuzzy
 msgid "(converts line-breaks into &lt;br /&gt; tags)"
 msgstr "(konverterar radbrytningar till &lt;br /&gt; taggar)"
 
@@ -1802,26 +1851,23 @@ msgstr "Ladda upp en fil/bild"
 
 #: ..\..\..\admin\_edit_form.php:191
 msgid "Advanced properties"
-msgstr ""
+msgstr "Avancerade egenskaper"
 
 #: ..\..\..\admin\_edit_form.php:200
-#, fuzzy
 msgid "Edit timestamp"
-msgstr "ƒndra detta!"
+msgstr "ƒndra tidsst‰mpel"
 
 #: ..\..\..\admin\_edit_form.php:238
 msgid "Pingback"
 msgstr ""
 
 #: ..\..\..\admin\_edit_form.php:238
-#, fuzzy
 msgid "(Send a pingback to all URLs in this post)"
 msgstr "(Pinga alla URL:ar i detta inl‰gg)"
 
 #: ..\..\..\admin\_edit_form.php:245
-#, fuzzy
 msgid "Trackback URLs"
-msgstr "TrackBack-URL:ar"
+msgstr "Trackback-URL:ar"
 
 #: ..\..\..\admin\_edit_form.php:245
 msgid "(Separate by space)"
@@ -1830,21 +1876,21 @@ msgstr "(Separera med mellanslag)"
 #: ..\..\..\admin\_edit_form.php:263 ..\..\..\admin\_edit_form.php:410
 #: ..\..\..\admin\_edit_showposts.php:135
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: ..\..\..\admin\_edit_form.php:269
 msgid "The post will be publicly published"
-msgstr "Denna post kommer att publiceras publikt"
+msgstr "Detta inl‰gg kommer att publiceras offentligt"
 
 #: ..\..\..\admin\_edit_form.php:269 ..\..\..\admin\_edit_showposts.php:345
-#, fuzzy
 msgid "Published (Public)"
-msgstr "Publicerad (publikt)"
+msgstr "Publicerad (offentlig)"
 
 #: ..\..\..\admin\_edit_form.php:275
 msgid "The post will be published but visible only by logged-in team members"
 msgstr ""
-"Denna post kommer att publiceras, men ‰r bara synlig fˆr inloggade medlemmar"
+"Detta inl‰gg kommer att publiceras, men ‰r bara synlig fˆr inloggade "
+"medlemmar"
 
 #: ..\..\..\admin\_edit_form.php:275 ..\..\..\admin\_edit_showposts.php:347
 msgid "Protected (Members only)"
@@ -1852,7 +1898,7 @@ msgstr "Skyddad (endast fˆr medlemmar)"
 
 #: ..\..\..\admin\_edit_form.php:281
 msgid "The post will be published but visible only by yourself"
-msgstr "Denna post kommer att publiceras, men ‰r bara synlig fˆr dig sj‰lv"
+msgstr "Detta inl‰gg kommer att publiceras, men ‰r bara synlig fˆr dig sj‰lv"
 
 #: ..\..\..\admin\_edit_form.php:281 ..\..\..\admin\_edit_showposts.php:349
 msgid "Private (You only)"
@@ -1860,27 +1906,27 @@ msgstr "Privat (endast du)"
 
 #: ..\..\..\admin\_edit_form.php:287 ..\..\..\admin\_edit_form.php:293
 msgid "The post will appear only in the backoffice"
-msgstr ""
+msgstr "Detta inl‰gg kommer enbart att visas h‰r i administrationen"
 
 #: ..\..\..\admin\_edit_form.php:287 ..\..\..\admin\_edit_showposts.php:351
 msgid "Draft (Not published!)"
-msgstr "Utdrag (Ej Pubilicerat)"
+msgstr "Ukast (ej publicerat)"
 
 #: ..\..\..\admin\_edit_form.php:293 ..\..\..\admin\_edit_showposts.php:353
-#, fuzzy
 msgid "Deprecated (Not published!)"
-msgstr "Utdrag (ej pubilicerat)"
+msgstr "Nedskrivet (ej publicerat)"
 
 #: ..\..\..\admin\_edit_form.php:307
 msgid ""
 "Select main category in target blog and optionnaly check addtionnal "
 "categories"
 msgstr ""
-"V‰lj huvudkategori i mÂlbloggen och v‰lj eventuella ytterligare kategorier"
+"Ange huvudkategori i mÂlbloggen och ange eventuellt ocksÂ ytterligare "
+"kategorier"
 
 #: ..\..\..\admin\_edit_form.php:328
 msgid "Select as an additionnal category"
-msgstr "V‰lj som ytterligare kategori"
+msgstr "Ange som ytterligare kategori"
 
 #: ..\..\..\admin\_edit_form.php:341
 msgid "Select as MAIN category"
@@ -1888,15 +1934,15 @@ msgstr "V‰lj som HUVUDkategori"
 
 #: ..\..\..\admin\_edit_form.php:369
 msgid "Note: Cross posting among multiple blogs is enabled."
-msgstr ""
+msgstr "OBS: Funktionen fˆr korspostning mellan olika bloggar ‰r pÂ."
 
 #: ..\..\..\admin\_edit_form.php:380
 msgid "Note: Cross posting among multiple blogs is currently disabled."
-msgstr ""
+msgstr "OBS: Funktionen fˆr korspostning mellan olika bloggar ‰r avst‰ngd."
 
 #: ..\..\..\admin\_edit_form.php:382
 msgid "Note: Cross posting among multiple categories is currently disabled."
-msgstr ""
+msgstr "OBS: Funktionen fˆr korspostning mellan olika kategorier ‰r avst‰ngd."
 
 #: ..\..\..\admin\_edit_form.php:392 ..\..\..\admin\_edit_showposts.php:202
 #: ..\..\..\skins\_feedback.php:43 ..\..\..\skins\basic\_feedback.php:43
@@ -1905,19 +1951,19 @@ msgstr "Kommentarer"
 
 #: ..\..\..\admin\_edit_form.php:394
 msgid "Visitors can leave comments on this post."
-msgstr ""
+msgstr "Besˆkare kan kommentera detta inl‰gg."
 
 #: ..\..\..\admin\_edit_form.php:394
 msgid "Open"
-msgstr ""
+msgstr "Öppen"
 
 #: ..\..\..\admin\_edit_form.php:396
 msgid "Visitors can NOT leave comments on this post."
-msgstr ""
+msgstr "Besˆkare kan INTE kommentera detta inl‰gg."
 
 #: ..\..\..\admin\_edit_form.php:396
 msgid "Closed"
-msgstr ""
+msgstr "St‰ngd"
 
 #: ..\..\..\admin\_edit_form.php:408
 msgid "Comment info"
@@ -1961,7 +2007,7 @@ msgstr ""
 
 #: ..\..\..\admin\_edit_showposts.php:71
 msgid " Date range: "
-msgstr " OmfÂng datum: "
+msgstr " Datumintervall: "
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\admin\_edit_showposts.php:123
@@ -1969,9 +2015,8 @@ msgid "by"
 msgstr "av"
 
 #: ..\..\..\admin\_edit_showposts.php:127
-#, fuzzy
 msgid "level:"
-msgstr "NivÂ"
+msgstr "nivÂ"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\admin\_edit_showposts.php:131
@@ -1982,7 +2027,7 @@ msgstr "i"
 #: ..\..\..\admin\_edit_showposts.php:158
 #: ..\..\..\admin\_edit_showposts.php:230
 msgid "&nbsp; Edit &nbsp;"
-msgstr "&nbsp; ƒndra &nbsp;"
+msgstr "&nbsp; Redigera &nbsp;"
 
 #: ..\..\..\admin\_edit_showposts.php:167
 #: ..\..\..\admin\_edit_showposts.php:233
@@ -1995,17 +2040,16 @@ msgid ""
 "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
 msgstr ""
-"Du hÂller pÂ att radera detta inl‰gg \\'%s\\'\\n\\'Avbryt\\' fˆr att "
-"avbryta, \\'OK\\' fˆr att radera."
+"Du hÂller pÂ att radera detta inl‰gg\\n\\'Avbryt\\' fˆr att avbryta, \\'OK"
+"\\' fˆr att radera."
 
 #: ..\..\..\admin\_edit_showposts.php:177
-#, fuzzy
 msgid "Publish NOW!"
-msgstr "Publicerad"
+msgstr "Publicera NU!"
 
 #: ..\..\..\admin\_edit_showposts.php:177
 msgid "Publish now using current date and time."
-msgstr ""
+msgstr "Publicera nu, med nuvarande dag och tid."
 
 #. TRANS: Link to comments for current post
 #: ..\..\..\admin\_edit_showposts.php:184
@@ -2049,19 +2093,20 @@ msgid ""
 "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
 msgstr ""
-"Du kommer att radera denna kommentar\\n\\'Avbryt\\' fˆr att avbryta, \\'OK"
+"Du hÂller pÂ att radera denna kommentar\\n\\'Avbryt\\' fˆr att avbryta, \\'OK"
 "\\' to att radera."
 
 #: ..\..\..\admin\_edit_showposts.php:249
 #: ..\..\..\b2evocore\_functions_comments.php:197
 #: ..\..\..\skins\_feedback.php:148 ..\..\..\skins\basic\_feedback.php:136
 msgid "Leave a comment"
-msgstr "L‰mna en kommentar"
+msgstr "Kommentera"
 
 #: ..\..\..\admin\_edit_showposts.php:266 ..\..\..\skins\_feedback.php:171
 #: ..\..\..\skins\basic\_feedback.php:159
 msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr "Din email-adress kommer <strong>inte</strong> att visas pÂ sidan."
+msgstr ""
+"Din e-post-adress kommer <strong>inte</strong> att visas pÂ denna webbplats."
 
 #: ..\..\..\admin\_edit_showposts.php:271 ..\..\..\skins\_feedback.php:176
 #: ..\..\..\skins\basic\_feedback.php:164
@@ -2086,7 +2131,7 @@ msgstr "TillÂtna XHTML-taggar"
 #: ..\..\..\admin\_edit_showposts.php:280 ..\..\..\skins\_feedback.php:186
 #: ..\..\..\skins\basic\_feedback.php:174
 msgid "URLs, email, AIM and ICQs will be converted automatically."
-msgstr "URL:ar, email, AIM och ICQ-nummer kommer att konverteras automatiskt."
+msgstr "URL:ar, e-post, AIM och ICQ-nummer kommer att konverteras automatiskt."
 
 #: ..\..\..\admin\_edit_showposts.php:287
 msgid "(Line breaks become &lt;br&gt;)"
@@ -2135,9 +2180,8 @@ msgid "GPL License"
 msgstr "GPL Licens"
 
 #: ..\..\..\admin\_menutop.php:30
-#, fuzzy
 msgid "visit b2evolution's website"
-msgstr "Posta till b2evolution"
+msgstr "besˆk b2evolution:s webbplats"
 
 #: ..\..\..\admin\_menutop.php:33
 msgid "Logout"
@@ -2145,21 +2189,19 @@ msgstr "Logga ut"
 
 #: ..\..\..\admin\_menutop.php:34
 msgid "Exit to blogs"
-msgstr "GÂ ut till bloggar"
+msgstr "Ut till bloggarna"
 
 #: ..\..\..\admin\_menutop.php:39
-#, fuzzy
 msgid "Blog time:"
-msgstr "Publicera detta!"
+msgstr "Bloggtid:"
 
 #: ..\..\..\admin\_menutop.php:40
 msgid "GMT:"
 msgstr ""
 
 #: ..\..\..\admin\_menutop.php:41
-#, fuzzy
 msgid "Logged in as:"
-msgstr "inloggad som:"
+msgstr "Inloggad som:"
 
 #: ..\..\..\admin\_menutop.php:52
 msgid "New Post"
@@ -2187,72 +2229,69 @@ msgstr "Anv‰ndare"
 
 #: ..\..\..\admin\_quicktags.php:38
 msgid "INSerted [Alt-I]"
-msgstr ""
+msgstr "Insjutet [Alt-I]"
 
 #: ..\..\..\admin\_quicktags.php:46
 msgid "DELeted [Alt-D]"
-msgstr ""
+msgstr "raDerad [Alt-D]"
 
 #: ..\..\..\admin\_quicktags.php:54
 msgid "STRong [Alt-S]"
-msgstr ""
+msgstr "stark"
 
 #: ..\..\..\admin\_quicktags.php:62
 msgid "EMphasis [Alt-E]"
-msgstr ""
+msgstr "bEtonad [Alt-E]"
 
 #: ..\..\..\admin\_quicktags.php:70
 msgid "CODE [Alt-C]"
-msgstr ""
+msgstr "kod [Alt-C]"
 
 #: ..\..\..\admin\_quicktags.php:78
 msgid "Paragraph [Alt-P]"
-msgstr ""
+msgstr "nytt stycke [Alt-P]"
 
 #: ..\..\..\admin\_quicktags.php:86
 msgid "Unordered List [Alt-U]"
-msgstr ""
+msgstr "oordnad lista [Alt-U]"
 
 #: ..\..\..\admin\_quicktags.php:101
 msgid "List Item [Alt-L]"
-msgstr ""
+msgstr "Listpost [Alt-L]"
 
 #: ..\..\..\admin\_quicktags.php:109
 msgid "BLOCKQUOTE [Alt-B]"
-msgstr ""
+msgstr "citatstycke [Alt-B]"
 
 #: ..\..\..\admin\_quicktags.php:117
 msgid "IMaGe [Alt-G]"
-msgstr ""
+msgstr "bild [Alt-G]"
 
 #: ..\..\..\admin\_quicktags.php:126
 msgid "A href [Alt-A]"
-msgstr ""
+msgstr "A href [Alt-A]"
 
 #: ..\..\..\admin\_quicktags.php:142
 msgid "More [Alt-M]"
-msgstr ""
+msgstr "Mer [Alt-M]"
 
 #: ..\..\..\admin\_quicktags.php:151
 msgid "no teaser [Alt-T]"
-msgstr ""
+msgstr "ingen lockText [Alt-T]"
 
 #: ..\..\..\admin\_quicktags.php:160
-#, fuzzy
 msgid "next page [Alt-Q]"
-msgstr "N‰sta Sida"
+msgstr "n‰sta sida [Alt-Q]"
 
-#: ..\..\..\admin\_quicktags.php:225
+#: ..\..\..\admin\_quicktags.php:229
 msgid "Close all tags"
-msgstr ""
+msgstr "St‰ng alla taggar"
 
-#: ..\..\..\admin\_quicktags.php:341
-#, fuzzy
+#: ..\..\..\admin\_quicktags.php:345
 msgid "ALTernate text"
 msgstr "Alternativ text"
 
 #: ..\..\..\admin\_users_form.php:16
-#, fuzzy
 msgid "Profile for:"
 msgstr "Profil fˆr:"
 
@@ -2277,7 +2316,7 @@ msgstr "Efternamn"
 #: ..\..\..\admin\_users_form.php:38 ..\..\..\admin\_users_list.php:25
 #: ..\..\..\skins\_profile.php:49 ..\..\..\skins\basic\_profile.php:51
 msgid "Nickname"
-msgstr "Nick"
+msgstr "Smeknamn"
 
 #: ..\..\..\admin\_users_form.php:50 ..\..\..\skins\_profile.php:71
 #: ..\..\..\skins\basic\_profile.php:73
@@ -2311,26 +2350,24 @@ msgid "Identity"
 msgstr "Identitet"
 
 #: ..\..\..\admin\_users_form.php:76
-#, fuzzy
 msgid "Created on:"
-msgstr "Skapar"
+msgstr "Skapad den:"
 
 #: ..\..\..\admin\_users_form.php:78
 msgid "From IP:"
-msgstr ""
+msgstr "FrÂn IP:"
 
 #: ..\..\..\admin\_users_form.php:80
 msgid "From Domain:"
-msgstr ""
+msgstr "FrÂn dom‰n:"
 
 #: ..\..\..\admin\_users_form.php:82
 msgid "With Browser:"
-msgstr ""
+msgstr "Med webbl‰sare:"
 
 #: ..\..\..\admin\_users_form.php:88
-#, fuzzy
 msgid "User rights"
-msgstr "Program"
+msgstr "Anv‰ndarens r‰ttigheter"
 
 #: ..\..\..\admin\_users_form.php:89 ..\..\..\admin\_users_list.php:29
 #: ..\..\..\skins\_profile.php:37 ..\..\..\skins\basic\_profile.php:39
@@ -2339,26 +2376,23 @@ msgstr "NivÂ"
 
 #: ..\..\..\admin\_users_form.php:94 ..\..\..\admin\_users_form.php:98
 msgid "User group"
-msgstr ""
+msgstr "Anv‰ndargrupp"
 
 #: ..\..\..\admin\_users_groupform.php:17
-#, fuzzy
 msgid "Editing group:"
-msgstr "Redigera inl‰gg"
+msgstr "Redigera grupp:"
 
 #: ..\..\..\admin\_users_groupform.php:24
-#, fuzzy
 msgid "General"
-msgstr "Tyska"
+msgstr "Allm‰n"
 
 #: ..\..\..\admin\_users_groupform.php:31
 msgid "Permissons for members of this group"
-msgstr ""
+msgstr "R‰ttigheter fˆr medlemmar i denna grupp"
 
 #: ..\..\..\admin\_users_groupform.php:35
-#, fuzzy
 msgid "View all"
-msgstr "Se statistik"
+msgstr "Se alla"
 
 #: ..\..\..\admin\_users_groupform.php:36
 #: ..\..\..\admin\_users_groupform.php:41
@@ -2367,40 +2401,38 @@ msgstr "Se statistik"
 #: ..\..\..\admin\_users_groupform.php:60
 #: ..\..\..\admin\_users_groupform.php:65
 msgid "Full Access"
-msgstr ""
+msgstr "Full tillgÂng"
 
 #: ..\..\..\admin\_users_groupform.php:39
 #: ..\..\..\admin\_users_groupform.php:44
 #: ..\..\..\admin\_users_groupform.php:49
 #: ..\..\..\admin\_users_groupform.php:58
 msgid "No Access"
-msgstr ""
+msgstr "Ingen tillgÂng"
 
 #: ..\..\..\admin\_users_groupform.php:40
 #: ..\..\..\admin\_users_groupform.php:45
 #: ..\..\..\admin\_users_groupform.php:50
 #: ..\..\..\admin\_users_groupform.php:59
 msgid "View only"
-msgstr ""
+msgstr "Se endast"
 
 #: ..\..\..\admin\_users_groupform.php:52
 msgid "Global options"
-msgstr ""
+msgstr "Globala inst‰llningar"
 
 #: ..\..\..\admin\_users_groupform.php:53
-#, fuzzy
 msgid "Check to allow template editing."
-msgstr "Anpassa dina egna temamallar (skins)"
+msgstr "Kryssa fˆr att tillÂta redigering av mallar"
 
 #: ..\..\..\admin\_users_groupform.php:61
 #: ..\..\..\admin\_users_groupform.php:65
-#, fuzzy
 msgid "User/Group Management"
-msgstr "Anv‰ndaradministration"
+msgstr "Administration av anv‰ndare/grupper"
 
 #: ..\..\..\admin\_users_list.php:15
 msgid "Groups &amp; Users"
-msgstr ""
+msgstr "Grupper och anv‰ndare"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_users_list.php:79
@@ -2408,11 +2440,12 @@ msgid ""
 "Are you sure you want to delete this user?\\nWarning: all his posts will be "
 "deleted too!"
 msgstr ""
+"Är du s‰ker pÂ att du vill radera denna anv‰ndare?\\nVarning: Alla hans/"
+"hennes inl‰gg kommer att raderas ocksÂ!"
 
 #: ..\..\..\admin\_users_list.php:95
-#, fuzzy
 msgid "Register a new user..."
-msgstr "Registrera..."
+msgstr "Registrera en ny anv‰ndare..."
 
 #: ..\..\..\admin\_users_list.php:97
 msgid ""
@@ -2433,51 +2466,58 @@ msgid ""
 "The default skin [%s] does not exist. It must be properly set in the blog "
 "stub file [%s]. Contact the <a %s>webmaster</a>..."
 msgstr ""
+"Det fˆrvalda temat [%s] saknas. Det mÂste anges i bloggens stubbfil [%s]. "
+"Kontakta <a %s>webbm‰staren/webbm‰starinnan</a>..."
+
+#: ..\..\..\b2evocore\_class_commentlist.php:154
+#: ..\..\..\skins\_lastcomments.php:20
+#, fuzzy
+msgid "No comment yet..."
+msgstr "ƒnnu inga kommentarer..."
 
 #: ..\..\..\b2evocore\_class_group.php:65
 msgid "New group"
-msgstr ""
+msgstr "Ny grupp"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:95
 msgid "Parser error: "
-msgstr ""
+msgstr "Tolkningsfel:"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:112
 msgid "Tag <code>body</code> can only be used once!"
-msgstr ""
+msgstr "Taggen <code>body</code> kan bara anv‰ndas en gÂng!"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:125
 msgid "Illegal tag"
-msgstr ""
+msgstr "OtillÂten tagg"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:132
 #, php-format
 msgid "Tag %s must occur inside another tag"
-msgstr ""
+msgstr "Taggen %s mÂste ligga innuti en annan tagg"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:134
 #, php-format
 msgid "Tag %s is not allowed within tag %s"
-msgstr ""
+msgstr "Taggen %s ‰r inte tillÂten innuti tagg %s"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:142
 #, php-format
 msgid "Tag %s may not have attribute %s"
-msgstr ""
+msgstr "Taggen %s verkar sakna attributet %s"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:150
 msgid "Found invalid URL: "
-msgstr ""
+msgstr "Ogiltig URL funnen:"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:173
 #, php-format
 msgid "Tag %s may not contain raw character data"
-msgstr ""
+msgstr "Taggen %s kan inte innehÂlla rÂa teckendata"
 
-#: ..\..\..\b2evocore\_class_itemlist.php:680
-#, fuzzy
+#: ..\..\..\b2evocore\_class_itemlist.php:677
 msgid "Invalid post, please correct these errors:"
-msgstr "Kan inte posta inl‰gget, var sn‰ll och r‰tta till fˆljande fel:"
+msgstr "Ogiltigt inl‰gg, var sn‰ll och r‰tta till fˆljande fel:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:80 ..\..\..\b2evocore\_class_pop3.php:88
 #: ..\..\..\b2evocore\_class_pop3.php:100
@@ -2504,7 +2544,7 @@ msgstr "Fel"
 
 #: ..\..\..\b2evocore\_class_pop3.php:108
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
-msgstr "POP3: fˆr tidig NOOP OK, INTE en RFC 1939 kompliant server"
+msgstr "POP3: fˆr tidig NOOP OK, servern fˆljer INTE RFC 1939"
 
 #: ..\..\..\b2evocore\_class_pop3.php:118
 msgid "POP3 noop:"
@@ -2559,7 +2599,7 @@ msgstr "verifieringen misslyckades"
 #: ..\..\..\b2evocore\_class_pop3.php:168
 #: ..\..\..\b2evocore\_class_pop3.php:217
 msgid "NOOP failed. Server not RFC 1939 compliant"
-msgstr "NOOP misslyckades. Servern ‰r inte RFC 1939 kompliant"
+msgstr "NOOP misslyckades. Servern fˆljer inte RFC 1939"
 
 #: ..\..\..\b2evocore\_class_pop3.php:184
 #: ..\..\..\b2evocore\_class_pop3.php:190
@@ -2597,7 +2637,7 @@ msgstr ""
 #: ..\..\..\b2evocore\_class_pop3.php:339
 #: ..\..\..\b2evocore\_class_pop3.php:351
 msgid "POP3 pop_list:"
-msgstr ""
+msgstr "POP3 pop_lista:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:351
 msgid "Premature end of list"
@@ -2645,154 +2685,141 @@ msgstr ""
 #: ..\..\..\b2evocore\_class_pop3.php:613
 #: ..\..\..\b2evocore\_class_pop3.php:619
 msgid "POP3 delete:"
-msgstr "POP3 raderas:"
+msgstr "POP3 radera:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:613
 msgid "No msg number submitted"
-msgstr "inget meddelandenr medskickat"
+msgstr "Inget meddelandenummer medskickat"
 
 #: ..\..\..\b2evocore\_class_pop3.php:619
 msgid "Command failed "
-msgstr "Kommandot misslyckades"
+msgstr "Kommandot misslyckades "
 
 #: ..\..\..\b2evocore\_class_user.php:56
-#, fuzzy
 msgid "New user"
-msgstr "Nytt inl‰gg"
+msgstr "Ny anv‰ndare"
 
 #: ..\..\..\b2evocore\_class_user.php:248
 msgid "Permission denied!"
-msgstr ""
+msgstr "TillstÂnd nekat!"
 
 #: ..\..\..\b2evocore\_functions.php:37
 msgid "Can't connect to the database server. MySQL said:"
-msgstr ""
+msgstr "Kan inte ansluta till databasservern. MySQL sa:"
 
 #: ..\..\..\b2evocore\_functions.php:39
 #, php-format
 msgid "Can't connect to the database %s. MySQL said:"
-msgstr ""
+msgstr "Kan inte ansluta till databasen %s. MySQL sa:"
 
 #: ..\..\..\b2evocore\_functions.php:56
 msgid "Oops, MySQL error!"
-msgstr ""
+msgstr "Ojsan dÂ. MySQL-fel!"
 
-#: ..\..\..\b2evocore\_functions.php:662
+#: ..\..\..\b2evocore\_functions.php:671
 msgid "go back"
 msgstr "gÂ tillbaka"
 
-#: ..\..\..\b2evocore\_functions.php:692
+#: ..\..\..\b2evocore\_functions.php:701
 msgid "Redirecting you to:"
-msgstr ""
+msgstr "Flyttar dig vidare till:"
 
-#: ..\..\..\b2evocore\_functions.php:694
+#: ..\..\..\b2evocore\_functions.php:703
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
-msgstr ""
+msgstr "Om inget h‰nder, klicka <a %s>here</a>."
 
-#: ..\..\..\b2evocore\_functions.php:772
-#, fuzzy
+#: ..\..\..\b2evocore\_functions.php:781
 msgid "No response!"
-msgstr "Som svar pÂ:"
+msgstr "Inget svar!"
 
-#: ..\..\..\b2evocore\_functions.php:777
+#: ..\..\..\b2evocore\_functions.php:786
+#, fuzzy
 msgid "Remote error"
-msgstr ""
+msgstr "Fj‰rrfel"
 
-#: ..\..\..\b2evocore\_functions.php:792 ..\..\..\b2evocore\_functions.php:797
+#: ..\..\..\b2evocore\_functions.php:801 ..\..\..\b2evocore\_functions.php:806
 #, fuzzy
 msgid "Response"
-msgstr "Nollst‰ll"
+msgstr "Svar"
 
-#: ..\..\..\b2evocore\_functions.php:1024
+#: ..\..\..\b2evocore\_functions.php:1033
 #, php-format
 msgid "Parameter %s is required!"
-msgstr ""
+msgstr "Parametern %s behˆvs!"
 
-#: ..\..\..\b2evocore\_functions.php:1238
+#: ..\..\..\b2evocore\_functions.php:1247
 msgid "Invalid URL"
 msgstr "Felaktig URL"
 
-#: ..\..\..\b2evocore\_functions.php:1244
+#: ..\..\..\b2evocore\_functions.php:1253
 msgid "URI scheme not allowed"
-msgstr ""
+msgstr "URI-schema ‰r ej tillÂtet"
 
-#: ..\..\..\b2evocore\_functions.php:1250
+#: ..\..\..\b2evocore\_functions.php:1259
 msgid "URL not allowed"
 msgstr "URL ej tillÂten"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:166
-#, php-format
-msgid "Banning the keyword %s..."
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_antispam.php:173
-msgid "Removing all related comments and hits..."
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_antispam.php:239
-#, fuzzy
+#: ..\..\..\b2evocore\_functions_antispam.php:179
 msgid "Reporting abuse to b2evolution.net..."
-msgstr "Posta till b2evolution"
+msgstr "Rapportera missbruk till b2evolution.net"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:277
+#: ..\..\..\b2evocore\_functions_antispam.php:217
 #: ..\..\..\b2evocore\_functions_pings.php:57
 #: ..\..\..\b2evocore\_functions_pings.php:92
 #: ..\..\..\b2evocore\_functions_pings.php:167
 #: ..\..\..\b2evocore\_functions_pings.php:207
 msgid "Aborted (Running on localhost)."
-msgstr ""
+msgstr "Avbruten (kˆr pÂ localhost)"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:297
+#: ..\..\..\b2evocore\_functions_antispam.php:237
 msgid "Requesting abuse list from b2evolution.net..."
-msgstr ""
+msgstr "H‰mta svarta listan frÂn b2evolution.net..."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:315
+#: ..\..\..\b2evocore\_functions_antispam.php:255
 msgid "Latest update timestamp"
-msgstr ""
+msgstr "Tidsst‰mpel fˆr senaste uppdateringen"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:340
+#: ..\..\..\b2evocore\_functions_antispam.php:280
 msgid "Incomplete reponse."
-msgstr ""
+msgstr "Offullst‰ndigt svar"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:348
+#: ..\..\..\b2evocore\_functions_antispam.php:288
 msgid "No new blacklisted strings are available."
-msgstr ""
+msgstr "Inga nya svartlistningar finns tillg‰ngliga."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:352
+#: ..\..\..\b2evocore\_functions_antispam.php:292
 msgid "Adding strings to local blacklist"
-msgstr ""
+msgstr "L‰gg till sˆkstr‰ngar till lokal svart lista"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:355
+#: ..\..\..\b2evocore\_functions_antispam.php:295
 msgid "Adding:"
-msgstr ""
+msgstr "L‰gg till:"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:358
+#: ..\..\..\b2evocore\_functions_antispam.php:298
 #: ..\..\..\htsrv\getmail.php:304
 msgid "OK."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_antispam.php:362
+#: ..\..\..\b2evocore\_functions_antispam.php:302
 msgid "Not necessary! (Already handled)"
-msgstr ""
+msgstr "Behˆvs inte! (redan gjort)"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:370
+#: ..\..\..\b2evocore\_functions_antispam.php:310
 msgid "New latest update timestamp"
-msgstr ""
+msgstr "Ny tidsst‰mpel fˆr sista uppdateringen"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:380
-#, fuzzy
+#: ..\..\..\b2evocore\_functions_antispam.php:320
 msgid "Invalid reponse."
-msgstr "Felaktigt filnamn!"
+msgstr "Felaktigt svar."
 
-#: ..\..\..\b2evocore\_functions_blogs.php:355
-#, fuzzy
+#: ..\..\..\b2evocore\_functions_blogs.php:379
 msgid "Requested blog does not exist!"
-msgstr "Angiven blog existerar inte!"
+msgstr "Angiven blogg existerar inte!"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:489
 msgid "Post details"
-msgstr "Allt om inl‰gg"
+msgstr "Allt om detta inl‰gg"
 
 #. TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\b2evocore\_functions_bposts.php:530
@@ -2805,24 +2832,21 @@ msgid "More:"
 msgstr "Mer:"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:632
-#, fuzzy
 msgid "Next page"
-msgstr "N‰sta Sida"
+msgstr "N‰sta sida"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:633
-#, fuzzy
 msgid "Previous page"
-msgstr "FˆregÂende Sida"
+msgstr "FˆregÂende sida"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:676
-#, fuzzy
 msgid "Previous post"
-msgstr "FˆregÂende post"
+msgstr "&lt;&lt; FˆregÂende"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:729
 #, fuzzy
 msgid "Next post"
-msgstr "N‰sta inl‰gg"
+msgstr "N‰sta &gt;&gt;"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:822
 msgid "Next Page"
@@ -2834,16 +2858,16 @@ msgstr "FˆregÂende sida"
 
 #: ..\..\..\b2evocore\_functions_cats.php:97
 msgid "Cannot delete if there are sub-categories!"
-msgstr ""
+msgstr "Kan inte radera om det finns underkategorier!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:148
 msgid "Cannot delete last category if there are posts inside!"
-msgstr ""
+msgstr "Kan inte radera sista kategorin om den innehÂller inl‰gg!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:254
-#, fuzzy, php-format
+#, php-format
 msgid "Requested category %s does not exist!"
-msgstr "Angiven kategori existerar inte"
+msgstr "Angiven kategori %s existerar inte"
 
 #: ..\..\..\b2evocore\_functions_cats.php:599
 msgid "Category"
@@ -2856,15 +2880,16 @@ msgid "Browse category"
 msgstr "Bl‰ddra i kategori"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:64
+#, fuzzy
 msgid "bad char in User Agent"
-msgstr ""
+msgstr "ogiltigt tecken i l‰saren"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:92
 #: ..\..\..\b2evocore\_functions_hitlogs.php:109
 #: ..\..\..\b2evocore\_functions_hitlogs.php:120
 #: ..\..\..\b2evocore\_functions_hitlogs.php:133
 msgid "referer ignored"
-msgstr ""
+msgstr "referensen ignorerad"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:92
 msgid "BlackList"
@@ -2876,113 +2901,109 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:120
 msgid "invalid"
-msgstr ""
+msgstr "ogiltig"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:133
-#, fuzzy
 msgid "search engine"
 msgstr "sˆkmotor"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:142
 msgid "loading referering page"
-msgstr ""
+msgstr "laddar referererande sida"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:163
 msgid "found current url in page"
-msgstr ""
+msgstr "hittade den h‰r URL:en i sidan"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:447
+#: ..\..\..\b2evocore\_functions_hitlogs.php:450
 msgid "not a query - no params!"
-msgstr ""
+msgstr "inte en frÂga - inga parametrar"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:472
+#: ..\..\..\b2evocore\_functions_hitlogs.php:475
 msgid "no query string found"
-msgstr ""
+msgstr "ingen frÂgestr‰ng hittad"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:521
+#: ..\..\..\b2evocore\_functions_hitlogs.php:524
 msgid "Statistics"
 msgstr "Statistik"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:23
 msgid "Sending pingbacks..."
-msgstr ""
+msgstr "Skickar pingbacks..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:28
 msgid "No pingback to be done."
-msgstr ""
+msgstr "Inga pingbacks att skicka."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:34
 msgid "BEGIN"
-msgstr ""
+msgstr "BÖRJA"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:65
-#, fuzzy
 msgid "Post contents"
 msgstr "Inl‰ggets innehÂll"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:96
 #: ..\..\..\b2evocore\_functions_pingback.php:97
-#, fuzzy
 msgid "Processing:"
 msgstr "Arbetar:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:101
 #: ..\..\..\b2evocore\_functions_pingback.php:102
 msgid "Couldn't find a hostname for:"
-msgstr ""
+msgstr "Kunde inte hitta v‰rdnamn fˆr:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:116
-#, fuzzy
 msgid "Connect to server at:"
-msgstr "Ingen anslutning till server:"
+msgstr "Anslut till server:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:120
 #: ..\..\..\b2evocore\_functions_pingback.php:121
 msgid "Couldn't open a connection to:"
-msgstr ""
+msgstr "Kunde inte ˆppna anslutning till:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:132
 msgid "Start receiving headers and content"
-msgstr ""
+msgstr "Bˆrja ta emot headers och innehÂll"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:166
 #: ..\..\..\b2evocore\_functions_pingback.php:167
 msgid "Pingback server found from X-Pingback header:"
-msgstr ""
+msgstr "Pingback-server hittad i X-Pingback header:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:180
 #: ..\..\..\b2evocore\_functions_pingback.php:181
 msgid "Pingback server found from Pingback <link /> tag:"
-msgstr ""
+msgstr "Pingback-server hittad i Pingback <link /> tagg:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:189
 #: ..\..\..\b2evocore\_functions_pingback.php:190
 msgid "Pingback server not found in headers and content"
-msgstr ""
+msgstr "Pingback-server hittades inte i header eller innehÂll"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:195
 #: ..\..\..\b2evocore\_functions_pingback.php:196
 msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
-msgstr ""
+msgstr "Pingback-serverns URL ‰r tom (kan vara internt PHP-fel)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:201
 msgid "Pingback server data"
-msgstr ""
+msgstr "Pingback-serverns data"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:211
 #: ..\..\..\b2evocore\_functions_pingback.php:212
 msgid "Page Linked To:"
-msgstr ""
+msgstr "Sidan ‰r l‰nkad till:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:213
 #: ..\..\..\b2evocore\_functions_pingback.php:214
 msgid "Page Linked From:"
-msgstr ""
+msgstr "Sidan ‰r l‰nkad frÂn:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:219
 #, php-format
 msgid "Pinging %s..."
-msgstr ""
+msgstr "Pingar %s..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:229
 #, fuzzy
@@ -2991,7 +3012,7 @@ msgstr "SLUT"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:231
 msgid "Pingbacks done."
-msgstr ""
+msgstr "Pingbacks f‰rdiga."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:253
 msgid "Pingback (0)"
@@ -3007,19 +3028,19 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_pings.php:26
 msgid "Pinging b2evolution.net..."
-msgstr ""
+msgstr "Pingar b2evolution.net..."
 
 #: ..\..\..\b2evocore\_functions_pings.php:77
 msgid "Pinging Weblogs.com..."
-msgstr ""
+msgstr "Pingar weblogs.com"
 
 #: ..\..\..\b2evocore\_functions_pings.php:138
 msgid "Pinging Blo.gs..."
-msgstr ""
+msgstr "Pingar blo.gs"
 
 #: ..\..\..\b2evocore\_functions_pings.php:191
 msgid "Pinging technorati.com..."
-msgstr ""
+msgstr "Pingar technorati.com"
 
 #: ..\..\..\b2evocore\_functions_template.php:84
 msgid "Archives for"
@@ -3031,48 +3052,43 @@ msgstr "Arkivkatalog"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:22
 msgid "Sending trackbacks..."
-msgstr ""
+msgstr "Skickar trackbacks..."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:25
 msgid "No trackback to be sent."
-msgstr ""
+msgstr "Det finns inga trackbacks att skicka."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:31
 msgid "Excerpt to be sent:"
-msgstr ""
+msgstr "Utdrag att skicka:"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:39
-#, fuzzy
 msgid "Trackbacks done."
-msgstr "TrackBacks (%)"
+msgstr "TrackBacks ‰r gjorda."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:53
 msgid "Sending trackback to:"
-msgstr ""
+msgstr "Skickar trackback till:"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:110
 msgid "Response:"
-msgstr ""
+msgstr "Svar:"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:154
-#, fuzzy
 msgid "Trackback (0)"
-msgstr "TrackBack (0)"
+msgstr ""
 
 #: ..\..\..\b2evocore\_functions_trackback.php:155
-#, fuzzy
 msgid "Trackback (1)"
-msgstr "TrackBack (1)"
+msgstr ""
 
 #: ..\..\..\b2evocore\_functions_trackback.php:156
-#, fuzzy
 msgid "Trackbacks (%)"
-msgstr "TrackBacks (%)"
+msgstr ""
 
 #: ..\..\..\b2evocore\_functions_users.php:68
-#, fuzzy
 msgid "wrong login/password."
-msgstr "Fel anv‰ndarnamn eller lˆsenord"
+msgstr "Fel anv‰ndarnamn/lˆsenord"
 
 #: ..\..\..\b2evocore\_functions_users.php:74
 #: ..\..\..\b2evocore\_functions_users.php:76
@@ -3083,15 +3099,15 @@ msgstr "setcookie %s misslyckades!"
 
 #: ..\..\..\b2evocore\_functions_users.php:99
 msgid "login/password no longer valid."
-msgstr ""
+msgstr "login/lˆsenord ‰r inte l‰ngre giltigt."
 
 #: ..\..\..\b2evocore\_functions_users.php:120
 msgid "You must log in!"
-msgstr ""
+msgstr "Du mÂste logga in!"
 
 #: ..\..\..\b2evocore\_functions_users.php:366
 msgid "Login if you have an account..."
-msgstr ""
+msgstr "Logga in om du har ett konto..."
 
 #: ..\..\..\b2evocore\_functions_users.php:395
 msgid "Register..."
@@ -3099,16 +3115,16 @@ msgstr "Registrera..."
 
 #: ..\..\..\b2evocore\_functions_users.php:396
 msgid "Register to open an account..."
-msgstr ""
+msgstr "Registrera dig fˆr att skapa ett konto..."
 
 #: ..\..\..\b2evocore\_functions_users.php:423
-#, fuzzy, php-format
+#, php-format
 msgid "Logout (%s)"
-msgstr "Logga ut"
+msgstr "Logga ut (%s)"
 
 #: ..\..\..\b2evocore\_functions_users.php:424
 msgid "Logout from your account"
-msgstr ""
+msgstr "Logga ut frÂn ditt konto"
 
 #: ..\..\..\b2evocore\_functions_users.php:455
 msgid "Admin"
@@ -3116,17 +3132,16 @@ msgstr ""
 
 #: ..\..\..\b2evocore\_functions_users.php:456
 msgid "Go to the back-office"
-msgstr ""
+msgstr "GÂ till administrationsavdelningen"
 
 #: ..\..\..\b2evocore\_functions_users.php:477
-#, fuzzy, php-format
+#, php-format
 msgid "Profile (%s)"
-msgstr "Profil"
+msgstr "Profil (%s)"
 
 #: ..\..\..\b2evocore\_functions_users.php:504
-#, fuzzy
 msgid "User profile"
-msgstr "Min profil"
+msgstr "Anv‰ndarprofil"
 
 #: ..\..\..\b2evocore\_vars.php:108
 msgid "Sunday"
@@ -3158,13 +3173,11 @@ msgstr "Lˆrdag"
 
 #. TRANS: abbrev. for Sunday
 #: ..\..\..\b2evocore\_vars.php:118
-#, fuzzy
 msgid "Sun"
 msgstr "Sˆn"
 
 #. TRANS: abbrev. for Monday
 #: ..\..\..\b2evocore\_vars.php:120
-#, fuzzy
 msgid "Mon"
 msgstr "MÂn"
 
@@ -3191,7 +3204,6 @@ msgstr "Fre"
 
 #. TRANS: abbrev. for Saturday
 #: ..\..\..\b2evocore\_vars.php:130
-#, fuzzy
 msgid "Sat"
 msgstr "Lˆr"
 
@@ -3213,7 +3225,6 @@ msgstr "April"
 
 #. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
 #: ..\..\..\b2evocore\_vars.php:138
-#, fuzzy
 msgid "May "
 msgstr "Maj"
 
@@ -3257,13 +3268,11 @@ msgstr "Feb"
 
 #. TRANS: abbrev. for March
 #: ..\..\..\b2evocore\_vars.php:153
-#, fuzzy
 msgid "Mar"
 msgstr "Mar"
 
 #. TRANS: abbrev. for April
 #: ..\..\..\b2evocore\_vars.php:155
-#, fuzzy
 msgid "Apr"
 msgstr "Apr"
 
@@ -3274,19 +3283,16 @@ msgstr "Maj"
 
 #. TRANS: abbrev. for June
 #: ..\..\..\b2evocore\_vars.php:159
-#, fuzzy
 msgid "Jun"
 msgstr "Jun"
 
 #. TRANS: abbrev. for July
 #: ..\..\..\b2evocore\_vars.php:161
-#, fuzzy
 msgid "Jul"
 msgstr "Jul"
 
 #. TRANS: abbrev. for August
 #: ..\..\..\b2evocore\_vars.php:163
-#, fuzzy
 msgid "Aug"
 msgstr "Aug"
 
@@ -3307,26 +3313,24 @@ msgstr "Nov"
 
 #. TRANS: abbrev. for December
 #: ..\..\..\b2evocore\_vars.php:171
-#, fuzzy
 msgid "Dec"
 msgstr "Dec"
 
 #: ..\..\..\b2evocore\_vars.php:184
 msgid "Local"
-msgstr ""
+msgstr "Lokal"
 
 #: ..\..\..\b2evocore\_vars.php:185
-#, fuzzy
 msgid "Reported"
-msgstr "Nedskriven"
+msgstr "Rapporterad"
 
 #: ..\..\..\b2evocore\_vars.php:186
 msgid "Central"
-msgstr ""
+msgstr "Central"
 
 #: ..\..\..\conf\_locales.php:21
 msgid "Czech"
-msgstr ""
+msgstr "Tjeckiska"
 
 #: ..\..\..\conf\_locales.php:22
 msgid "Dutch"
@@ -3341,7 +3345,6 @@ msgid "French"
 msgstr "Franska"
 
 #: ..\..\..\conf\_locales.php:25
-#, fuzzy
 msgid "German"
 msgstr "Tyska"
 
@@ -3375,46 +3378,42 @@ msgstr "Svenska"
 
 #: ..\..\..\conf\_locales.php:33
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Enkel kinesiska"
 
 #: ..\..\..\htsrv\comment_post.php:23
 msgid "Sorry but comments are now closed for this post."
-msgstr ""
+msgstr "Detta inl‰gg kan inte kommenteras l‰ngre."
 
 #: ..\..\..\htsrv\comment_post.php:36
 msgid "Please fill in the name field"
-msgstr ""
+msgstr "Var sn‰ll och uppge ditt namn"
 
 #: ..\..\..\htsrv\comment_post.php:40
 msgid "Please fill in the email field"
-msgstr ""
+msgstr "Var sn‰ll och ange din e-postadress"
 
 #: ..\..\..\htsrv\comment_post.php:44
-#, fuzzy
 msgid "Supplied email address is invalid"
-msgstr "Angiven email-adress ‰r felaktig"
+msgstr "Angiven e-postadress ‰r felaktig"
 
 #: ..\..\..\htsrv\comment_post.php:79
 msgid "You can only post a new comment every 30 seconds."
-msgstr ""
+msgstr "Du kan bara posta en kommentar en gÂng var 30:e sekund."
 
 #: ..\..\..\htsrv\comment_post.php:82
-#, fuzzy
 msgid "Cannot post comment, please correct these errors:"
 msgstr "Kan inte posta kommentar, var sn‰ll och r‰tta till fˆljande fel:"
 
 #: ..\..\..\htsrv\comment_post.php:83
-#, fuzzy
 msgid "Back to comment editing"
-msgstr "Tillbaka till redigering av inl‰gg."
+msgstr "Tillbaka till redigering av kommentar"
 
 #: ..\..\..\htsrv\comment_post.php:102 ..\..\..\htsrv\comment_post.php:106
 #, php-format
 msgid "New comment on your post #%d \"%s\""
-msgstr ""
+msgstr "Ny kommentar pÂ ditt inl‰gg #%d \"%s\""
 
 #: ..\..\..\htsrv\comment_post.php:108
-#, fuzzy
 msgid "Author"
 msgstr "Skribent"
 
@@ -3424,13 +3423,11 @@ msgid "Url"
 msgstr "URL"
 
 #: ..\..\..\htsrv\comment_post.php:111
-#, fuzzy
 msgid "Comment"
 msgstr "Kommentar"
 
 #: ..\..\..\htsrv\comment_post.php:112 ..\..\..\htsrv\trackback.php:105
 #: ..\..\..\xmlsrv\xmlrpc.php:1464
-#, fuzzy
 msgid "Edit/Delete"
 msgstr "Redigera/Radera"
 
@@ -3440,7 +3437,7 @@ msgstr "Ansluter till pop-server..."
 
 #: ..\..\..\htsrv\getmail.php:40
 msgid "Connection failed:"
-msgstr "uppkopplingen misslyckades"
+msgstr "Anslutningen misslyckades:"
 
 #: ..\..\..\htsrv\getmail.php:44
 msgid "Logging into pop server..."
@@ -3448,12 +3445,12 @@ msgstr "Loggar in pÂ pop-servern..."
 
 #: ..\..\..\htsrv\getmail.php:48
 msgid "No mail or Login Failed:"
-msgstr "Ingen mail eller inloggningen misslyckades"
+msgstr "Ingen e-post eller inloggningen misslyckades"
 
 #: ..\..\..\htsrv\getmail.php:59
 #, fuzzy, php-format
 msgid "Getting message #%d..."
-msgstr "\"Mottar meddelande #%d..."
+msgstr "H‰mtar meddelande #%d..."
 
 #: ..\..\..\htsrv\getmail.php:68
 msgid "Processing..."
@@ -3465,14 +3462,13 @@ msgstr "Fˆr gammal"
 
 #: ..\..\..\htsrv\getmail.php:153
 msgid "Subject prefix does not match"
-msgstr "Subjektprefix matchar inte"
+msgstr "Ämnesradens prefix matchar inte"
 
 #: ..\..\..\htsrv\getmail.php:173
 msgid "Raw content:"
 msgstr "Oformatterat innehÂll:"
 
 #: ..\..\..\htsrv\getmail.php:209
-#, fuzzy
 msgid "Pass:"
 msgstr "Lˆsenord:"
 
@@ -3486,40 +3482,39 @@ msgstr "Kategori-ID"
 
 #: ..\..\..\htsrv\getmail.php:235
 msgid "Blog ID"
-msgstr "Blog-ID"
+msgstr "Blogg-ID"
 
 #: ..\..\..\htsrv\getmail.php:240
 msgid "Permission denied."
-msgstr ""
+msgstr "TillstÂnd nekat."
 
 #: ..\..\..\htsrv\getmail.php:270
 msgid "Posted title"
-msgstr "Titel på inl‰gg"
+msgstr "Postad titel"
 
 #: ..\..\..\htsrv\getmail.php:271
 msgid "Posted content"
-msgstr "Inl‰ggets innehÂll"
+msgstr "Postat innehÂll"
 
 #: ..\..\..\htsrv\getmail.php:281
 msgid "Mission complete, message deleted."
-msgstr "Uppdraget avklarat, meddelandet ‰r borttaget."
+msgstr "Uppdraget avklarat, meddelandet ‰r raderat."
 
 #: ..\..\..\htsrv\login.php:69 ..\..\..\htsrv\login.php:91
 msgid "The email was sent successfully to your email address."
-msgstr "Mailet skickades till din email-adress."
+msgstr "Mailet ‰r skickat till din e-postadress."
 
 #: ..\..\..\htsrv\login.php:70 ..\..\..\htsrv\login.php:92
 msgid "Click here to login !"
-msgstr "Klicka h‰r fˆr att logga in !"
+msgstr "Klicka h‰r fˆr att logga in!"
 
 #: ..\..\..\htsrv\login.php:79
-#, fuzzy
 msgid "New Password:"
 msgstr "Nytt lˆsenord:"
 
 #: ..\..\..\htsrv\login.php:84
 msgid "your weblog's login/password"
-msgstr "anv‰ndarnamn/lˆsenord fˆr din weblog"
+msgstr "anv‰ndarnamn/lˆsenord fˆr din webblogg"
 
 #: ..\..\..\htsrv\login.php:86
 msgid "The email could not be sent."
@@ -3534,9 +3529,8 @@ msgid "Note: You are already logged in!"
 msgstr "Notera: Du ‰r redan inloggad!"
 
 #: ..\..\..\htsrv\login.php:106
-#, fuzzy
 msgid "Continue..."
-msgstr "Logga in..."
+msgstr "Forts‰tt..."
 
 #: ..\..\..\htsrv\profile_update.php:32 ..\..\..\skins\_profile.php:16
 #: ..\..\..\skins\basic\_profile.php:16
@@ -3545,18 +3539,17 @@ msgstr "Du ‰r inte inloggad."
 
 #: ..\..\..\htsrv\profile_update.php:37
 msgid "You are not logged in under the same account you are trying to modify."
-msgstr ""
+msgstr "Du ‰r inte inloggad pÂ det konto du fˆrsˆker gˆra ‰ndringar i."
 
 #: ..\..\..\htsrv\profile_update.php:42 ..\..\..\htsrv\profile_update.php:48
 #: ..\..\..\htsrv\profile_update.php:57 ..\..\..\htsrv\profile_update.php:65
 #: ..\..\..\htsrv\profile_update.php:70
-#, fuzzy
 msgid "Back to profile"
 msgstr "Tillbaka till profilen"
 
 #: ..\..\..\htsrv\profile_update.php:48
 msgid "please enter your nickname (can be the same as your login)"
-msgstr "var sn‰ll och skriv ditt nick (kan vara samma som anv‰ndarnamnet)"
+msgstr "var sn‰ll och skriv ditt smeknamn (kan vara samma som anv‰ndarnamnet)"
 
 #: ..\..\..\htsrv\profile_update.php:57
 msgid "your ICQ UIN can only be a number, no letters allowed"
@@ -3564,12 +3557,11 @@ msgstr "Ditt ICQ-nummer kan bara vara siffror. Inga bokst‰ver accepteras."
 
 #: ..\..\..\htsrv\profile_update.php:65 ..\..\..\htsrv\register.php:60
 msgid "please type your e-mail address"
-msgstr "var sn‰ll och skriv in din emailadress."
+msgstr "var sn‰ll och skriv in din e-postadress."
 
 #: ..\..\..\htsrv\profile_update.php:70 ..\..\..\htsrv\register.php:65
-#, fuzzy
 msgid "the email address is invalid"
-msgstr "emailadressen st‰mmer inte"
+msgstr "e-postadressen ‰r felaktig"
 
 #: ..\..\..\htsrv\profile_update.php:78 ..\..\..\htsrv\profile_update.php:86
 msgid "you typed your new password only once. Go back to type it twice."
@@ -3579,49 +3571,48 @@ msgstr ""
 
 #: ..\..\..\htsrv\profile_update.php:90
 msgid "you typed two different passwords. Go back to correct that."
-msgstr "du skrev tvÂ olika lˆsenord. GÂ tillbaka och r‰tta till detta."
+msgstr "du skrev tvÂ olika lˆsenord. Gˆr om, gˆr r‰tt."
 
 #: ..\..\..\htsrv\register.php:38
 msgid "please enter a Login"
-msgstr ""
+msgstr "var sn‰ll och ange ett anv‰ndarnamn"
 
 #: ..\..\..\htsrv\register.php:45
-#, fuzzy
 msgid "please enter your password twice"
-msgstr "fˆrlorat ditt lˆsenord ?"
+msgstr "var sn‰ll och ange ditt lˆsenord tvÂ gÂnger"
 
 #: ..\..\..\htsrv\register.php:52
 msgid "please type the same password in the two password fields"
-msgstr "var sn‰ll och skriv in samma lˆsenord i de tvÂ lˆsenrodsf‰lten"
+msgstr "var sn‰ll och skriv in samma lˆsenord i bÂda lˆsenrodsf‰lten"
 
 #: ..\..\..\htsrv\register.php:80
 msgid "this login is already registered, please choose another one"
-msgstr ""
+msgstr "detta anv‰ndarnamn finns redan. Var sn‰ll och v‰lj ett annat"
 
 #: ..\..\..\htsrv\register.php:105 ..\..\..\htsrv\register.php:109
 msgid "new user registration on your blog"
-msgstr ""
+msgstr "ny anv‰ndarregistrering i din blogg"
 
 #: ..\..\..\htsrv\register.php:107
 msgid "Manage users"
-msgstr ""
+msgstr "Administrera anv‰ndare"
 
 #: ..\..\..\htsrv\trackback.php:96 ..\..\..\htsrv\trackback.php:100
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
-msgstr ""
+msgstr "Ny trackback pÂ ditt inl‰gg #%d \"%s\""
 
 #: ..\..\..\htsrv\trackback.php:102 ..\..\..\xmlsrv\xmlrpc.php:1461
 msgid "Website"
-msgstr ""
+msgstr "Webbplats"
 
 #: ..\..\..\htsrv\trackback.php:104 ..\..\..\xmlsrv\xmlrpc.php:1463
 msgid "Excerpt"
-msgstr ""
+msgstr "Utdrag"
 
 #: ..\..\..\htsrv\_login_form.php:10
 msgid "Login form"
-msgstr "Login-formul‰r"
+msgstr "Inloggninsformul‰r"
 
 #: ..\..\..\htsrv\_login_form.php:43 ..\..\..\htsrv\_reg_form.php:28
 msgid "Password:"
@@ -3633,50 +3624,46 @@ msgid "Log in!"
 msgstr "Logga in"
 
 #: ..\..\..\htsrv\_login_form.php:57
-#, fuzzy
 msgid "Lost your password ?"
-msgstr "fˆrlorat ditt lˆsenord?"
+msgstr "Har du tappat bort ditt lˆsenord?"
 
 #: ..\..\..\htsrv\_lostpass_form.php:10
 msgid "Lost password ?"
-msgstr "Fˆrlorat lˆsenordet?"
+msgstr "Tappat bort lˆsenordet?"
 
 #: ..\..\..\htsrv\_lostpass_form.php:14
 msgid "A new password will be generated and sent to you by email."
-msgstr ""
+msgstr "Ett nytt lˆsenord kommer att skickas till dig med e-post."
 
 #: ..\..\..\htsrv\_lostpass_form.php:28
-#, fuzzy
 msgid "Generate new password!"
 msgstr "Skapa nytt lˆsenord!"
 
 #: ..\..\..\htsrv\_reg_complete.php:10
 msgid "Registration complete"
-msgstr ""
+msgstr "Registreringen ‰r f‰rdig"
 
 #: ..\..\..\htsrv\_reg_disabled.php:11
 msgid "Registration Currently Disabled"
-msgstr ""
+msgstr "Registreringen ‰r fˆr n‰rvarande st‰ngd"
 
 #: ..\..\..\htsrv\_reg_disabled.php:14
 msgid "User registration is currently not allowed."
-msgstr ""
+msgstr "Registrering av nya anv‰ndare ‰r fˆr n‰rvarande inte tillÂtet"
 
 #: ..\..\..\htsrv\_reg_disabled.php:15
 msgid "Home"
-msgstr ""
+msgstr "Hem"
 
 #: ..\..\..\htsrv\_reg_form.php:11
-#, fuzzy
 msgid "Register form"
-msgstr "Nollst‰ll formul‰r"
+msgstr "Registreringsformul‰r"
 
 #: ..\..\..\htsrv\_reg_form.php:28
 msgid "(twice)"
 msgstr "(tvÂ gÂnger)"
 
 #: ..\..\..\htsrv\_reg_form.php:42
-#, fuzzy
 msgid "Register!"
 msgstr "Registrera!"
 
@@ -3687,10 +3674,13 @@ msgid ""
 "s'. It has index #%d in the database. By default it is accessed through a "
 "stub file called '<code>%s</code>'. %s"
 msgstr ""
+"Denna blogg innehÂller alla dina inl‰gg frÂn Cafelog. Denna blogg heter '%"
+"s'. Den har index #%d i databasen. Den fˆrvalda stubbfilen heter '<code>%s</"
+"code>'. %s"
 
 #: ..\..\..\install\_functions_create.php:356
 msgid "This is a sample blogroll entry"
-msgstr ""
+msgstr "Det h‰r ‰r ett exempel pÂ inl‰gg i bloggrullen"
 
 #: ..\..\..\install\_functions_create.php:356
 msgid ""
@@ -3698,6 +3688,9 @@ msgid ""
 "you'll want to leave this blank, providing just a Title and an Url for your "
 "blogroll entries (favorite/related sites)."
 msgstr ""
+"Det ‰r ett exempel pÂ beskrivande text om ett inl‰gg i bloggrullen. Fˆr det "
+"mesta kommer du dock att l‰mna detta tomt, och bara ange en titel och en URL "
+"till dina inl‰gg i bloggrullen (favoriter/relaterade l‰nkar)."
 
 #: ..\..\..\install\_functions_create.php:377
 #, php-format
@@ -3705,6 +3698,8 @@ msgid ""
 "This is a demo blog named '%s'. It has index #%d in the database. By default "
 "it is accessed through a stub file called '<code>%s</code>'. %s"
 msgstr ""
+"Det ‰r ‰r en exempelblogg kallad '%s'. Den har index #%d i databasen. Den "
+"fˆrvalda stubbfilen heter '<code>%s</code>'. %s"
 
 #: ..\..\..\install\_functions_create.php:379
 #, php-format
@@ -3718,6 +3713,14 @@ msgid ""
 "If you don't want to use skins, use the provided '<code>%s</code>' file "
 "instead."
 msgstr ""
+"<br />\n"
+"<br />\n"
+"Du kan redigera denna fil fˆr att ‰ndra det fˆrvalda temat fˆr bloggen. Du "
+"kan ocksÂ dˆpa om filen till ett b‰ttre namn; men var noga med att ocksÂ "
+"skriva in det nya namnet i bloggens administration.<br />\n"
+"<br />\n"
+"Om du inte vill anv‰nda teman, anv‰nd dÂ den tillhandahÂllna '<code>%s</"
+"code>'-filen ist‰llet."
 
 #: ..\..\..\install\_functions_create.php:392
 msgid ""
@@ -3726,6 +3729,10 @@ msgid ""
 "posted on this system. You can hide this blog from the public by clearing "
 "it's 'Stub Urlname' in the blogs admin."
 msgstr ""
+"Notera: Blogg #1 ‰r en v‰ldigt speciell blogg! Den samlar automatiskt alla "
+"inl‰gg frÂn alla bloggar. Det gˆr det mˆjligt fˆr dig att pÂ ett enkelt s‰tt "
+"fˆlja allt som postas i systemet. Du kan gˆmma denna blogg fˆr allm‰nheten "
+"genom att ta bort bloggens 'Stubbfils-URL' pÂ administrationssidan."
 
 #: ..\..\..\install\_functions_create.php:413
 msgid ""
@@ -3733,10 +3740,13 @@ msgid ""
 "other blogs where it will display your favorite/related links. This is "
 "commonly referred to as a 'Blogroll'."
 msgstr ""
+"Syftet med den h‰r bloggen ‰r fr‰mst att visas som ett sido-objekt i en "
+"annan blogg, d‰r den visar dina favorit-, eller relaterade l‰nkar. Det "
+"kallas vanligtvis en bloggrulle."
 
 #: ..\..\..\install\_functions_create.php:480
 msgid "Clean Permalinks! :idea:"
-msgstr ""
+msgstr "Rena permanenta l‰nkar! :idÈ:"
 
 #: ..\..\..\install\_functions_create.php:480
 msgid ""
@@ -3748,10 +3758,17 @@ msgid ""
 "activating clean permalinks in the /conf/_advanced.php file... (<code>"
 "$use_extra_path_info = 1;</code>)</p>"
 msgstr ""
+"<p>b2evolution anv‰nder gammaldags permal‰nkar och kommentarsl‰nkar som "
+"fˆrval. Detta fˆr att vara s‰ker pÂ stˆrsta mˆjliga kompatibilitet med olika "
+"webbservrar.</p>\n"
+"\n"
+"<p>Hur som helst, n‰r du k‰nner dig trygg med b2evolution, bˆr du aktivera "
+"alternativet fˆr rena permal‰nkar i filen /conf/_advanced.php... (<code>"
+"$use_extra_path_info = 1;</code>)</p>"
 
 #: ..\..\..\install\_functions_create.php:486
 msgid "Apache optimization... :idea:"
-msgstr ""
+msgstr "Optimera Apache... :idÈ:"
 
 #: ..\..\..\install\_functions_create.php:486
 msgid ""
@@ -3768,7 +3785,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:492
 msgid "About evoSkins... :idea:"
-msgstr ""
+msgstr "Om evoSkins (teman)... :ide:"
 
 #: ..\..\..\install\_functions_create.php:492
 msgid ""
@@ -3790,7 +3807,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:502
 msgid "Skins *or* Templates ?"
-msgstr ""
+msgstr "Teman *eller* mallar?"
 
 #: ..\..\..\install\_functions_create.php:502
 msgid ""
@@ -3825,7 +3842,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:516
 msgid "Multiple Blogs, new blogs, old blogs..."
-msgstr ""
+msgstr "Multipla bloggar, nya bloggar, gamla bloggar..."
 
 #: ..\..\..\install\_functions_create.php:516
 msgid ""
@@ -3888,7 +3905,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:548
 msgid "Important information :idea:"
-msgstr ""
+msgstr "Viktig information :idÈ:"
 
 #: ..\..\..\install\_functions_create.php:548
 msgid ""
@@ -3904,7 +3921,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:583
 msgid "First Post"
-msgstr ""
+msgstr "Fˆrsta inl‰gget"
 
 #: ..\..\..\install\_functions_create.php:583
 msgid ""
@@ -3927,7 +3944,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:595
 msgid "Third post"
-msgstr ""
+msgstr "Tredje posten"
 
 #: ..\..\..\install\_functions_create.php:595
 msgid ""
@@ -3975,15 +3992,13 @@ msgstr "Inga %s pÂ denna post ‰nnu..."
 
 #: ..\..\..\skins\_feedback.php:143 ..\..\..\skins\basic\_feedback.php:131
 msgid "Comments are closed for this post."
-msgstr ""
+msgstr "Denna post ‰r st‰ngd fˆr kommentarer."
 
 #: ..\..\..\skins\_feedback.php:195 ..\..\..\skins\basic\_feedback.php:183
-#, fuzzy
 msgid "Line breaks become &lt;br /&gt;"
 msgstr "Radbrytningar blir &lt;br&gt;"
 
 #: ..\..\..\skins\_feedback.php:198 ..\..\..\skins\basic\_feedback.php:186
-#, fuzzy
 msgid "Remember me"
 msgstr "Minns mig!"
 
@@ -3991,18 +4006,15 @@ msgstr "Minns mig!"
 msgid "(Set cookies for name, email &amp; url)"
 msgstr "(S‰tt cookie fˆr namn, email &amp; URL)"
 
-#: ..\..\..\skins\_lastcomments.php:22
-#, fuzzy
-msgid "No comment yet..."
-msgstr "ƒnnu inga kommentarer..."
-
-#: ..\..\..\skins\_lastcomments.php:32
+#: ..\..\..\skins\_lastcomments.php:28 ..\..\..\xmlsrv\atom.comments.php:22
+#: ..\..\..\xmlsrv\rdf.comments.php:38 ..\..\..\xmlsrv\rss.comments.php:25
+#: ..\..\..\xmlsrv\rss2.comments.php:27
 msgid "In response to:"
 msgstr "Som svar pÂ:"
 
-#: ..\..\..\skins\_lastcomments.php:32
-#, php-format
-msgid "Original post on %s"
+#: ..\..\..\skins\_lastcomments.php:29
+#, fuzzy
+msgid "Original post on:"
 msgstr "Orginalinl‰gg om %s"
 
 #: ..\..\..\skins\_profile.php:53 ..\..\..\skins\basic\_profile.php:55
@@ -4099,7 +4111,7 @@ msgstr "V‰lj tema"
 msgid "Browse all posts by this author"
 msgstr "Visa alla inl‰gg av denna skribent"
 
-#: ..\..\..\xmlsrv\rdf.php:41 ..\..\..\xmlsrv\rss.php:27
+#: ..\..\..\xmlsrv\rdf.php:45 ..\..\..\xmlsrv\rss.php:27
 #: ..\..\..\xmlsrv\rss2.php:34
 msgid "[...] Read more!"
 msgstr "[...] L‰s mer!"
@@ -4109,13 +4121,28 @@ msgstr "[...] L‰s mer!"
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 
+#~ msgid ""
+#~ "Banning the keyword %s from the statistics and comments would lead to the "
+#~ "deletion of the following %d comments:"
+#~ msgstr ""
+#~ "Om du svartlistar ordet %s frÂn statistik och kommentarer kommer fˆljande "
+#~ "%d kommentarer att raderas:"
+
+#~ msgid "Are you sure you want to continue?"
+#~ msgstr "Är du s‰ker pÂ att du vill forts‰tta?"
+
+#~ msgid "Ban the keyword + delete matching hits and comments"
+#~ msgstr "Svartlista ordet + radera matchande tr‰ffar och kommentarer"
+
+#~ msgid "Removing all related comments and hits..."
+#~ msgstr "Tar bort alla relaterade kommentarer och tr‰ffar..."
+
 #~ msgid "A blog tool like it oughta be!"
-#~ msgstr "Ett blogverktyg precis så som det borde vara"
+#~ msgstr "Ett bloggverktyg precis sÂ som det borde vara"
 
 #~ msgid "You have no right to edit the blogs."
 #~ msgstr "Du har inte r‰tt att ‰ndra i bloggarna."
 
-#, fuzzy
 #~ msgid "You have no right to generate static pages."
 #~ msgstr "Du har inte r‰tt att skapa statiska sidor."
 
@@ -4215,7 +4242,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "href=\"mailto:%s\">blog admin</a> :)"
 #~ msgstr ""
 #~ "Du har inte r‰tt att ‰ndra i bloggarna. <br />Be din <a href=\"mailto:%s"
-#~ "\">blogadministratˆr</a> om ˆkad befogenhet :)"
+#~ "\">bloggadministratˆr</a> om ˆkad befogenhet :)"
 
 #~ msgid "bookmarklet"
 #~ msgstr "bokm‰rke"
@@ -4228,7 +4255,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "your <a href=\"mailto:%s\">blog admin</a> :)"
 #~ msgstr ""
 #~ "Du har inte r‰tt att ‰ndra kategorierna. <br />Be din <a href=\"mailto:%s"
-#~ "\">blogadministratˆr</a> om ˆkad befogenhet :)"
+#~ "\">bloggadministratˆr</a> om ˆkad befogenhet :)"
 
 #~ msgid "The login field is empty"
 #~ msgstr "Inloggnings-f‰ltet ‰r tomt"
@@ -4244,7 +4271,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "promotion to your <a href=\"mailto:%s\">blog admin</a> :)"
 #~ msgstr ""
 #~ "Du har inte r‰tt att ‰ndra i den h‰r bloggens inst‰llningar. <br />Be din "
-#~ "<a href=\"mailto:%s\">blogadministratˆr</a> om ˆkad befogenhet :)"
+#~ "<a href=\"mailto:%s\">bloggadministratˆr</a> om ˆkad befogenhet :)"
 
 #~ msgid "echo( \"setcookie %s failed!"
 #~ msgstr "echo( \"setcookie %s misslyckades!"
@@ -4280,7 +4307,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "fˆr att bokm‰rket skall visa sig :)"
 
 #~ msgid "<strong>Identity</strong> on the blog"
-#~ msgstr "<strong>Identitet</strong> i denna blog"
+#~ msgstr "<strong>Identitet</strong> i denna blogg"
 
 #~ msgid "New <strong>password</strong> (twice):"
 #~ msgstr "Nytt <strong>lˆsenord</strong> (tvÂ gÂnger):"
@@ -4302,7 +4329,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "\"mailto:%s\">blog admin</a> :)"
 #~ msgstr ""
 #~ "Du har inte r‰tt att se statistiken. <br />Be din <a href=\"mailto:%s"
-#~ "\">blogadministratˆr</a> om ˆkad befogenhet :)"
+#~ "\">bloggadministratˆr</a> om ˆkad befogenhet :)"
 
 #~ msgid "Last blacklisted referers"
 #~ msgstr "Senaste svartlistade referers"
@@ -4312,7 +4339,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. "
 #~ "By default the blacklist includes all internal references.)"
 #~ msgstr ""
-#~ "Detta ‰r tr‰ffar frÂn besˆkare som kom till dena blog genom en "
+#~ "Detta ‰r tr‰ffar frÂn besˆkare som kom till dena blogg genom en "
 #~ "svartlistad sida. (Svartlistan mÂste vara definerad i /conf/"
 #~ "b2evo_advanced.php. Alla interna referenser ‰r svartlistade redan frÂn "
 #~ "bˆrjan.)"
@@ -4331,7 +4358,7 @@ msgstr "Ny pingback pÂ ditt inl‰gg #%d \"%s\""
 #~ "<a href=\"mailto:%s\">blog admin</a> :)"
 #~ msgstr ""
 #~ "Du har inte r‰tt att ‰ndra mallarna. <br />Be din <a href=\"mailto:%s"
-#~ "\">blogadministratˆr</a> om ˆkad befogenhet :)"
+#~ "\">bloggadministratˆr</a> om ˆkad befogenhet :)"
 
 #~ msgid "Auto-BR (converts line-breaks into &lt;br /&gt; tags)"
 #~ msgstr "Auto-BR (konverterar radbrytningar till &lt;br /&gt; taggar)"
