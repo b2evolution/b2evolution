@@ -1,17 +1,18 @@
-# b2evolution - French language file
-# Copyright (C) 2003 Fran�ois PLANQUE
-# This file is distributed under the same license as the b2evolution package.
-# Fran�ois PLANQUE <http://fplanque.net/>, 2003
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois PLANQUE
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 0.8.3-alpha1\n"
-"POT-Creation-Date: 2003-08-18 23:00+0200\n"
-"PO-Revision-Date: 2003-08-18 23:07+0100\n"
-"Last-Translator: Fran�ois PLANQUE <http://fplanque.net/>\n"
-"Language-Team: Fran�ois PLANQUE <http://fplanque.net/>\n"
+"Project-Id-Version: b2evolution 0.8.3-alpha\n"
+"POT-Creation-Date: 2003-08-16 23:00+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: SAKIYAMA Nobuo <sakichan@sakichan.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ..\..\..\index.php:47
@@ -41,7 +42,7 @@ msgstr ""
 #: ..\..\..\skins\guadeloupe\_main.php:46
 #: ..\..\..\skins\guadeloupe\_main.php:110
 msgid "Last comments"
-msgstr "Derniers commentaires"
+msgstr "最近のコメント"
 
 #: ..\..\..\index.php:48
 #: ..\..\..\index.php:114
@@ -62,7 +63,7 @@ msgstr "Derniers commentaires"
 #: ..\..\..\skins\guadeloupe\_main.php:21
 #: ..\..\..\skins\guadeloupe\_main.php:47
 msgid "Statistics"
-msgstr "Statistiques"
+msgstr "統計"
 
 #: ..\..\..\index.php:49
 #: ..\..\..\index.php:115
@@ -79,7 +80,7 @@ msgstr "Statistiques"
 #: ..\..\..\skins\fplanque2002\_main.php:25
 #: ..\..\..\skins\fplanque2002\_main.php:90
 msgid "Archive Directory"
-msgstr "Liste des Archives"
+msgstr "アーカイブ ディレクトリ"
 
 #: ..\..\..\index.php:129
 #: ..\..\..\noskin_a.php:141
@@ -98,7 +99,7 @@ msgstr "Liste des Archives"
 #: ..\..\..\skins\fplanque2002\_main.php:105
 #: ..\..\..\skins\fplanque2002\_main.php:186
 msgid "Categories"
-msgstr "Cat�gories"
+msgstr "カテゴリ"
 
 #: ..\..\..\index.php:145
 #: ..\..\..\noskin_a.php:157
@@ -109,7 +110,7 @@ msgstr "Cat�gories"
 #: ..\..\..\skins\fplanque2002\_main.php:121
 #, php-format
 msgid "- %d queries so far"
-msgstr "- %d requ�tes jusqu'ici"
+msgstr "%d 回の問い合わせ"
 
 #: ..\..\..\index.php:253
 #: ..\..\..\noskin_a.php:276
@@ -119,10 +120,10 @@ msgstr "- %d requ�tes jusqu'ici"
 #: ..\..\..\skins\babyblues\_main.php:86
 #: ..\..\..\skins\bluesky\_main.php:201
 #: ..\..\..\skins\custom\_main.php:229
-#: ..\..\..\skins\fplanque2002\_main.php:250
+#: ..\..\..\skins\fplanque2002\_main.php:251
 #: ..\..\..\skins\guadeloupe\_main.php:201
 msgid "Misc"
-msgstr "Divers"
+msgstr "いろいろ"
 
 #: ..\..\..\index.php:255
 #: ..\..\..\noskin_a.php:278
@@ -132,11 +133,11 @@ msgstr "Divers"
 #: ..\..\..\skins\babyblues\_main.php:88
 #: ..\..\..\skins\bluesky\_main.php:203
 #: ..\..\..\skins\custom\_main.php:231
-#: ..\..\..\skins\fplanque2002\_main.php:252
+#: ..\..\..\skins\fplanque2002\_main.php:253
 #: ..\..\..\skins\guadeloupe\_main.php:203
 #: ..\..\..\skins\originalb2\_main.php:146
 msgid "Login..."
-msgstr "S'identifier..."
+msgstr "ログイン..."
 
 #: ..\..\..\index.php:256
 #: ..\..\..\noskin_a.php:279
@@ -146,11 +147,11 @@ msgstr "S'identifier..."
 #: ..\..\..\skins\babyblues\_main.php:89
 #: ..\..\..\skins\bluesky\_main.php:204
 #: ..\..\..\skins\custom\_main.php:232
-#: ..\..\..\skins\fplanque2002\_main.php:253
+#: ..\..\..\skins\fplanque2002\_main.php:254
 #: ..\..\..\skins\guadeloupe\_main.php:204
 #: ..\..\..\skins\originalb2\_main.php:147
 msgid "Register..."
-msgstr "S'inscire..."
+msgstr "登録..."
 
 #: ..\..\..\noskin_a.php:197
 #: ..\..\..\noskin_a.php:198
@@ -169,7 +170,7 @@ msgstr "S'inscire..."
 #: ..\..\..\skins\guadeloupe\_main.php:106
 #: ..\..\..\skins\guadeloupe\_main.php:107
 msgid "Recently"
-msgstr "R�cemment"
+msgstr "最新"
 
 #: ..\..\..\noskin_a.php:197
 #: ..\..\..\noskin_all.php:199
@@ -180,7 +181,7 @@ msgstr "R�cemment"
 #: ..\..\..\skins\fplanque2002\_main.php:161
 #: ..\..\..\skins\guadeloupe\_main.php:106
 msgid "(cached)"
-msgstr "(en cache)"
+msgstr "(キャッシュ)"
 
 #: ..\..\..\noskin_a.php:198
 #: ..\..\..\noskin_all.php:200
@@ -191,9 +192,8 @@ msgstr "(en cache)"
 #: ..\..\..\skins\fplanque2002\_main.php:162
 #: ..\..\..\skins\guadeloupe\_main.php:107
 msgid "(no cache)"
-msgstr "(sans cache)"
+msgstr "(キャッシュされない)"
 
-# attention � la longueur
 #: ..\..\..\noskin_a.php:205
 #: ..\..\..\noskin_all.php:207
 #: ..\..\..\noskin_b.php:206
@@ -201,7 +201,7 @@ msgstr "(sans cache)"
 #: ..\..\..\skins\custom\_main.php:147
 #: ..\..\..\skins\fplanque2002\_main.php:169
 msgid "Some viewing statistics"
-msgstr "Quelques statistiques"
+msgstr "閲覧状況の統計"
 
 #: ..\..\..\noskin_a.php:210
 #: ..\..\..\noskin_a.php:216
@@ -219,7 +219,7 @@ msgstr "Quelques statistiques"
 #: ..\..\..\skins\fplanque2002\_main.php:180
 #: ..\..\..\skins\originalb2\_main.php:128
 msgid "Search"
-msgstr "Rechercher"
+msgstr "検索"
 
 #: ..\..\..\noskin_a.php:213
 #: ..\..\..\noskin_all.php:215
@@ -228,7 +228,7 @@ msgstr "Rechercher"
 #: ..\..\..\skins\custom\_main.php:155
 #: ..\..\..\skins\fplanque2002\_main.php:177
 msgid "All Words"
-msgstr "Tous les mots"
+msgstr "全ての語"
 
 #: ..\..\..\noskin_a.php:214
 #: ..\..\..\noskin_all.php:216
@@ -237,7 +237,7 @@ msgstr "Tous les mots"
 #: ..\..\..\skins\custom\_main.php:156
 #: ..\..\..\skins\fplanque2002\_main.php:178
 msgid "Some Word"
-msgstr "N'importe quel mot"
+msgstr "いずれかの語"
 
 #: ..\..\..\noskin_a.php:215
 #: ..\..\..\noskin_all.php:217
@@ -247,7 +247,7 @@ msgstr "N'importe quel mot"
 #: ..\..\..\skins\custom\_main.php:157
 #: ..\..\..\skins\fplanque2002\_main.php:179
 msgid "Sentence"
-msgstr "Phrase compl�te"
+msgstr "文"
 
 #: ..\..\..\noskin_a.php:217
 #: ..\..\..\noskin_a.php:229
@@ -264,7 +264,7 @@ msgstr "Phrase compl�te"
 #: ..\..\..\skins\fplanque2002\_main.php:193
 #: ..\..\..\skins\guadeloupe\_main.php:137
 msgid "Reset form"
-msgstr "Valeurs par d�faut"
+msgstr "フォームのリセット"
 
 #: ..\..\..\noskin_a.php:228
 #: ..\..\..\noskin_all.php:230
@@ -276,7 +276,7 @@ msgstr "Valeurs par d�faut"
 #: ..\..\..\skins\guadeloupe\_main.php:136
 #: ..\..\..\skins\originalb2\_main.php:120
 msgid "Get selection"
-msgstr "Obtenir s�lection"
+msgstr "選択"
 
 #: ..\..\..\noskin_a.php:239
 #: ..\..\..\noskin_a.php:252
@@ -296,12 +296,12 @@ msgstr "Obtenir s�lection"
 #: ..\..\..\skins\custom\_main.php:205
 #: ..\..\..\skins\custom\_main.php:214
 #: ..\..\..\skins\fplanque2002\_main.php:203
-#: ..\..\..\skins\fplanque2002\_main.php:226
-#: ..\..\..\skins\fplanque2002\_main.php:235
+#: ..\..\..\skins\fplanque2002\_main.php:227
+#: ..\..\..\skins\fplanque2002\_main.php:236
 #: ..\..\..\skins\guadeloupe\_main.php:184
 #: ..\..\..\skins\guadeloupe\_main.php:193
 msgid "more..."
-msgstr "suite..."
+msgstr "さらに..."
 
 #: ..\..\..\noskin_a.php:246
 #: ..\..\..\noskin_all.php:248
@@ -309,10 +309,10 @@ msgstr "suite..."
 #: ..\..\..\noskin_roll.php:246
 #: ..\..\..\skins\bluesky\_main.php:178
 #: ..\..\..\skins\custom\_main.php:199
-#: ..\..\..\skins\fplanque2002\_main.php:220
+#: ..\..\..\skins\fplanque2002\_main.php:221
 #: ..\..\..\skins\guadeloupe\_main.php:178
 msgid "Recent Referers"
-msgstr "R�f�rents r�cents"
+msgstr "最近のリファラ"
 
 #: ..\..\..\noskin_a.php:255
 #: ..\..\..\noskin_all.php:257
@@ -320,10 +320,10 @@ msgstr "R�f�rents r�cents"
 #: ..\..\..\noskin_roll.php:255
 #: ..\..\..\skins\bluesky\_main.php:187
 #: ..\..\..\skins\custom\_main.php:208
-#: ..\..\..\skins\fplanque2002\_main.php:229
+#: ..\..\..\skins\fplanque2002\_main.php:230
 #: ..\..\..\skins\guadeloupe\_main.php:187
 msgid "Top Referers"
-msgstr "R�f�rents les plus fr�quents"
+msgstr "最多のリファラ"
 
 #: ..\..\..\noskin_a.php:269
 #: ..\..\..\noskin_all.php:271
@@ -332,19 +332,19 @@ msgstr "R�f�rents les plus fr�quents"
 #: ..\..\..\b2evocore\_blogs_form.php:52
 #: ..\..\..\skins\bluesky\_main.php:198
 #: ..\..\..\skins\custom\_main.php:222
-#: ..\..\..\skins\fplanque2002\_main.php:243
+#: ..\..\..\skins\fplanque2002\_main.php:244
 #: ..\..\..\skins\guadeloupe\_main.php:198
 msgid "Blogroll"
-msgstr "Blogs � lire"
+msgstr "Blogroll"
 
 #: ..\..\..\noskin_a.php:284
 #: ..\..\..\noskin_all.php:286
 #: ..\..\..\noskin_b.php:285
 #: ..\..\..\noskin_roll.php:284
 #: ..\..\..\skins\custom\_main.php:237
-#: ..\..\..\skins\fplanque2002\_main.php:258
+#: ..\..\..\skins\fplanque2002\_main.php:259
 msgid "Syndicate this blog"
-msgstr "Pompez ce blog"
+msgstr "このblogの配信"
 
 #: ..\..\..\noskin_a.php:315
 #: ..\..\..\noskin_all.php:317
@@ -353,48 +353,48 @@ msgstr "Pompez ce blog"
 #: ..\..\..\skins\babyblues\_main.php:104
 #: ..\..\..\skins\bluesky\_main.php:222
 #: ..\..\..\skins\custom\_main.php:260
-#: ..\..\..\skins\fplanque2002\_main.php:285
+#: ..\..\..\skins\fplanque2002\_main.php:288
 #: ..\..\..\skins\guadeloupe\_main.php:222
 #: ..\..\..\skins\originalb2\_main.php:159
 #, php-format
 msgid "Totals: %d posts - %d queries - %01.3f seconds"
-msgstr "Totaux: %d articles - %d requ�tes - %01.3f secondes"
+msgstr "合計: %d の投稿 - %d 回の問い合わせ - %01.3f 秒"
 
 #: ..\..\..\noskin_b.php:235
 #: ..\..\..\b2evocore\_edit_showposts.php:336
 msgid "Archives"
-msgstr "Archives"
+msgstr "アーカイブ"
 
 #: ..\..\..\_blogroll.php:59
 msgid "more"
-msgstr "suite"
+msgstr "さらに"
 
 #: ..\..\..\_feedback.php:43
 #: ..\..\..\b2evocore\_edit_showposts.php:180
 msgid "Comments"
-msgstr "Commentaires"
+msgstr "コメント"
 
 #: ..\..\..\_feedback.php:48
 msgid "Trackbacks"
-msgstr "Trackbacks"
+msgstr "トラックバック"
 
 #: ..\..\..\_feedback.php:53
 msgid "Pingbacks"
-msgstr "Pingbacks"
+msgstr "ピングバック"
 
 #: ..\..\..\_feedback.php:104
 msgid "Trackback from:"
-msgstr "Trackback de:"
+msgstr "トラックバックを以下から:"
 
 #: ..\..\..\_feedback.php:119
 msgid "Pingback from:"
-msgstr "Pingback de:"
+msgstr "ピングバックを以下から:"
 
 #. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #: ..\..\..\_feedback.php:134
 #, php-format
 msgid "No %s for this post yet..."
-msgstr "Cet article n'a pas de %s pour le moment..."
+msgstr "この投稿への %s はまだありません..."
 
 #: ..\..\..\_feedback.php:154
 #: ..\..\..\admin\b2team.php:101
@@ -403,11 +403,11 @@ msgstr "Cet article n'a pas de %s pour le moment..."
 #: ..\..\..\b2evocore\_edit_form.php:88
 #: ..\..\..\b2evocore\_edit_showposts.php:232
 msgid "Name"
-msgstr "Nom"
+msgstr "名前"
 
 #: ..\..\..\_feedback.php:160
-#: ..\..\..\admin\b2profile.php:155
-#: ..\..\..\admin\b2profile.php:315
+#: ..\..\..\admin\b2profile.php:159
+#: ..\..\..\admin\b2profile.php:317
 #: ..\..\..\admin\b2register.php:113
 #: ..\..\..\admin\b2register.php:163
 #: ..\..\..\admin\b2register.php:309
@@ -417,44 +417,44 @@ msgstr "Nom"
 #: ..\..\..\b2evocore\_edit_showposts.php:238
 #: ..\..\..\htsrv\comment_post.php:122
 msgid "Email"
-msgstr "Email"
+msgstr "メール"
 
 #: ..\..\..\_feedback.php:162
 #: ..\..\..\b2evocore\_edit_showposts.php:240
 msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr "Votre adresse email ne sera <strong>pas</strong> affich�e sur ce site."
+msgstr "頂いたメールアドレスはこのサイトに表示され<strong>ません</strong>。"
 
 #: ..\..\..\_feedback.php:167
 #: ..\..\..\b2evocore\_edit_showposts.php:245
 msgid "Site/Url"
-msgstr "Site/Url"
+msgstr "サイト/URL"
 
 #: ..\..\..\_feedback.php:169
 #: ..\..\..\b2evocore\_edit_showposts.php:247
 msgid "Your URL will be displayed."
-msgstr "Votre URL sera affich�e."
+msgstr "頂いたURLは表示されます。"
 
 #: ..\..\..\_feedback.php:174
 #: ..\..\..\b2evocore\_edit_showposts.php:252
 msgid "Comment text"
-msgstr "Texte du commentaire"
+msgstr "コメント文"
 
 #: ..\..\..\_feedback.php:176
 #: ..\..\..\b2evocore\_edit_showposts.php:254
 msgid "Allowed XHTML tags"
-msgstr "Balises XHTML autoris�es"
+msgstr "許可される XHTML タグ"
 
 #: ..\..\..\_feedback.php:177
 #: ..\..\..\b2evocore\_edit_showposts.php:254
 msgid "URLs, email, AIM and ICQs will be converted automatically."
-msgstr "Les URLs, adresses email, AIM et ICQ seront converties automatiquement."
+msgstr "URLや メールアドレス、AIM や ICQ のアドレスは自動変換されます。"
 
 #: ..\..\..\_feedback.php:182
 #: ..\..\..\admin\b2options.php:2
 #: ..\..\..\b2evocore\_edit_showposts.php:260
 #: ..\..\..\b2evocore\_menutop.php:121
 msgid "Options"
-msgstr "Options"
+msgstr "オプション"
 
 #: ..\..\..\_feedback.php:186
 #: ..\..\..\admin\b2bookmarklet.php:195
@@ -462,183 +462,157 @@ msgstr "Options"
 #: ..\..\..\admin\b2sidebar.php:84
 #: ..\..\..\b2evocore\_edit_showposts.php:261
 msgid "Auto-BR"
-msgstr "Auto-BR"
+msgstr "自動-BR"
 
 #: ..\..\..\_feedback.php:186
 msgid "Line breaks become &lt;br /&gt;"
-msgstr "Les retours � la ligne deviennent des  &lt;br /&gt;"
+msgstr "改行が自動で &lt;br&gt; になります"
 
 #: ..\..\..\_feedback.php:189
 msgid "Remember me"
-msgstr "Se rappeler de moi"
+msgstr "名前を記憶"
 
 #: ..\..\..\_feedback.php:189
 msgid "(Set cookies for name, email &amp; url)"
-msgstr "(Placer des coohies pour le nom, l'email &amp; l'url)"
+msgstr "(名前、メールアドレス、URLを cookie に記憶させます)"
 
 #: ..\..\..\_stats.php:16
 #: ..\..\..\admin\b2stats.php:110
 msgid "Last referers"
-msgstr "R�f�rents r�cents"
+msgstr "最近のリファラ"
 
 #: ..\..\..\_stats.php:26
 #: ..\..\..\admin\b2stats.php:127
 msgid "Top referers"
-msgstr "R�f�rents les plus fr�quents"
+msgstr "最多のリファラ"
 
 #: ..\..\..\_stats.php:36
 #: ..\..\..\admin\b2stats.php:152
 msgid "Last refering searches"
-msgstr "Derni�res recherches r�f�rentes"
+msgstr "最近の検索エンジン経由の参照"
 
 #: ..\..\..\_stats.php:46
 msgid "Top refering engines"
-msgstr "Moteurs de recherche r�f�rents les plus fr�quents"
+msgstr "最多の経由した検索エンジン"
 
 #: ..\..\..\_stats.php:60
 #: ..\..\..\admin\b2stats.php:180
 msgid "Top Indexing Robots"
-msgstr "Robots d'indexation les plus actifs"
+msgstr "最多のインデックス作成ロボット"
 
 #: ..\..\..\_stats.php:75
 #: ..\..\..\admin\b2stats.php:205
 msgid "Top Aggregators"
-msgstr "Aggregateurs les plus fr�quents"
+msgstr "最多のアグリゲータ"
 
 #: ..\..\..\admin\b2blogs.php:2
-#: ..\..\..\admin\CVS\Base\b2blogs.php:2
 #: ..\..\..\b2evocore\_blogs_list.php:2
 #: ..\..\..\b2evocore\_menutop.php:116
 msgid "Blogs"
 msgstr "Blogs"
 
-#: ..\..\..\admin\b2blogs.php:15
-#: ..\..\..\admin\b2blogs.php:44
-#: ..\..\..\admin\b2blogs.php:139
-#: ..\..\..\admin\b2blogs.php:166
-#: ..\..\..\admin\b2blogs.php:254
-#: ..\..\..\admin\CVS\Base\b2blogs.php:15
-#: ..\..\..\admin\CVS\Base\b2blogs.php:44
-#: ..\..\..\admin\CVS\Base\b2blogs.php:139
-#: ..\..\..\admin\CVS\Base\b2blogs.php:166
-#: ..\..\..\admin\CVS\Base\b2blogs.php:254
+#: ..\..\..\admin\b2blogs.php:14
+#: ..\..\..\admin\b2blogs.php:43
+#: ..\..\..\admin\b2blogs.php:138
+#: ..\..\..\admin\b2blogs.php:165
+#: ..\..\..\admin\b2blogs.php:253
 msgid "You have no right to edit the blogs."
-msgstr "Vous n'avez pas le droit d'�diter les blogs."
+msgstr "blogを編集する権限がありません"
 
-#: ..\..\..\admin\b2blogs.php:18
-#: ..\..\..\admin\CVS\Base\b2blogs.php:18
+#: ..\..\..\admin\b2blogs.php:17
 msgid "New blog"
-msgstr "Nouveau blog"
+msgstr "新しいblog"
 
-#: ..\..\..\admin\b2blogs.php:72
-#: ..\..\..\admin\CVS\Base\b2blogs.php:72
+#: ..\..\..\admin\b2blogs.php:71
 msgid "Trying to create stub file"
-msgstr "Tentative de cr�ation du fichier stub"
+msgstr "スタブファイルを作成中です"
 
-#: ..\..\..\admin\b2blogs.php:83
-#: ..\..\..\admin\CVS\Base\b2blogs.php:83
+#: ..\..\..\admin\b2blogs.php:82
 msgid "Loading"
-msgstr "Chargement de"
+msgstr "ロード中"
 
-#: ..\..\..\admin\b2blogs.php:87
-#: ..\..\..\admin\CVS\Base\b2blogs.php:87
+#: ..\..\..\admin\b2blogs.php:86
 msgid "Could not load stub model."
-msgstr "Impossible de charger le mod�le de fichier stub."
+msgstr "スタブのモデルをロードできませんでした"
 
-#: ..\..\..\admin\b2blogs.php:92
-#: ..\..\..\admin\CVS\Base\b2blogs.php:92
+#: ..\..\..\admin\b2blogs.php:91
 msgid "Creating"
-msgstr "Cr�ation de"
+msgstr "作成中"
 
-#: ..\..\..\admin\b2blogs.php:111
-#: ..\..\..\admin\CVS\Base\b2blogs.php:111
+#: ..\..\..\admin\b2blogs.php:110
 #, php-format
 msgid "<p>Changing mod to %o</p>"
-msgstr "<p>Changement du mod en %o</p>"
+msgstr "<p>mod を %o に変更しています</p>"
 
-#: ..\..\..\admin\b2blogs.php:114
-#: ..\..\..\admin\b2blogs.php:123
+#: ..\..\..\admin\b2blogs.php:113
+#: ..\..\..\admin\b2blogs.php:122
 #: ..\..\..\admin\b2team.php:204
-#: ..\..\..\admin\CVS\Base\b2blogs.php:114
-#: ..\..\..\admin\CVS\Base\b2blogs.php:123
 msgid "Warning"
-msgstr "Attention"
+msgstr "警告"
 
-#: ..\..\..\admin\b2blogs.php:114
-#: ..\..\..\admin\CVS\Base\b2blogs.php:114
+#: ..\..\..\admin\b2blogs.php:113
 msgid "chmod failed!"
-msgstr "chmod a �chou�"
+msgstr "chmodが失敗しました"
 
-#: ..\..\..\admin\b2blogs.php:120
-#: ..\..\..\admin\CVS\Base\b2blogs.php:120
+#: ..\..\..\admin\b2blogs.php:119
 #, php-format
 msgid "<p>Changing owner to %s</p>"
-msgstr "<p>Changement du owner en %s</p>"
+msgstr "<p>所有者を %s に変更しています</p>"
 
-#: ..\..\..\admin\b2blogs.php:123
-#: ..\..\..\admin\CVS\Base\b2blogs.php:123
+#: ..\..\..\admin\b2blogs.php:122
 msgid "chown failed!"
-msgstr "chown a �chou�"
+msgstr "chownが失敗しました!"
 
-#: ..\..\..\admin\b2blogs.php:130
-#: ..\..\..\admin\CVS\Base\b2blogs.php:130
+#: ..\..\..\admin\b2blogs.php:129
 #, php-format
 msgid "You should <a href=\"%s\">create categories</a> for this blog now!"
-msgstr "Vous devriez maintenant <a href=\"%s\">cr�er des cat�gories</a> pour ce blog!"
+msgstr "このblogについて<a href=\"%s\">カテゴリ作成</a>を今行ってください!"
 
-#: ..\..\..\admin\b2blogs.php:142
-#: ..\..\..\admin\CVS\Base\b2blogs.php:142
+#: ..\..\..\admin\b2blogs.php:141
 msgid "Blog params for:"
-msgstr "Param�tres du blog:"
+msgstr "Blog パラメータ:"
 
-#: ..\..\..\admin\b2blogs.php:201
-#: ..\..\..\admin\CVS\Base\b2blogs.php:201
+#: ..\..\..\admin\b2blogs.php:200
 #: ..\..\..\b2evocore\_blogs_list.php:5
 msgid "Blog"
 msgstr "Blog"
 
-#: ..\..\..\admin\b2blogs.php:205
-#: ..\..\..\admin\CVS\Base\b2blogs.php:205
+#: ..\..\..\admin\b2blogs.php:204
 msgid "You have no right to generate static pages."
-msgstr "Vous n'avez pas le droit de g�n�rer des pages statiques."
+msgstr "静的ページを作成する権限がありません。"
 
-#: ..\..\..\admin\b2blogs.php:211
-#: ..\..\..\admin\CVS\Base\b2blogs.php:211
+#: ..\..\..\admin\b2blogs.php:210
 msgid "You haven't set a static filename for this blog!"
-msgstr "Vous n'avez pas sp�cifi� de nom de fichier statique pour ce blog!"
+msgstr "このblogの静的ファイル名が設定されていません！"
 
-#: ..\..\..\admin\b2blogs.php:227
-#: ..\..\..\admin\CVS\Base\b2blogs.php:227
+#: ..\..\..\admin\b2blogs.php:226
 #, php-format
 msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
-msgstr "G�n�ration de la page <strong>%2$s</strong> � partir de la page <strong>%1$s</strong>..."
+msgstr "ページを <strong>%s</strong> から <strong>%s</strong> へ作成しています..."
 
-#: ..\..\..\admin\b2blogs.php:236
-#: ..\..\..\admin\CVS\Base\b2blogs.php:236
+#: ..\..\..\admin\b2blogs.php:235
 msgid "Writing to file..."
-msgstr "Ecriture du fichier..."
+msgstr "ファイルへ書き込みます..."
 
-#: ..\..\..\admin\b2blogs.php:242
+#: ..\..\..\admin\b2blogs.php:241
 #: ..\..\..\admin\edit_actions.php:100
-#: ..\..\..\admin\edit_actions.php:231
-#: ..\..\..\admin\edit_actions.php:301
-#: ..\..\..\admin\CVS\Base\b2blogs.php:242
+#: ..\..\..\admin\edit_actions.php:228
+#: ..\..\..\admin\edit_actions.php:297
 #: ..\..\..\b2evocore\_functions_pings.php:35
-#: ..\..\..\b2evocore\_functions_pings.php:68
-#: ..\..\..\b2evocore\_functions_pings.php:97
-#: ..\..\..\b2evocore\_functions_pings.php:124
-#: ..\..\..\b2evocore\_functions_pings.php:166
+#: ..\..\..\b2evocore\_functions_pings.php:62
+#: ..\..\..\b2evocore\_functions_pings.php:89
+#: ..\..\..\b2evocore\_functions_pings.php:131
 msgid "Done."
-msgstr "Ok."
+msgstr "完了しました。"
 
 #: ..\..\..\admin\b2bookmarklet.php:10
 #: ..\..\..\admin\b2edit.php:154
 #: ..\..\..\admin\b2sidebar.php:18
 #: ..\..\..\admin\b2upload.php:8
 #: ..\..\..\admin\edit_actions.php:54
-#: ..\..\..\admin\edit_actions.php:343
+#: ..\..\..\admin\edit_actions.php:339
 msgid "Cheatin' uh ?"
-msgstr "Alors on triche, hein?"
+msgstr "不正操作？"
 
 #: ..\..\..\admin\b2bookmarklet.php:31
 #: ..\..\..\admin\b2login.php:200
@@ -657,54 +631,54 @@ msgstr "bookmarklet"
 #: ..\..\..\admin\b2bookmarklet.php:163
 #: ..\..\..\b2evocore\_functions_cats.php:551
 msgid "Category"
-msgstr "Cat�gorie"
+msgstr "カテゴリ"
 
 #: ..\..\..\admin\b2bookmarklet.php:199
 #: ..\..\..\admin\b2sidebar.php:87
 msgid "Pingback"
-msgstr "Pingback"
+msgstr "ピングバック"
 
 #: ..\..\..\admin\b2bookmarklet.php:208
 #: ..\..\..\b2evocore\_edit_form.php:9
 msgid "Blog this !"
-msgstr "Blogguer ceci !"
+msgstr "これをblogしよう!"
 
 #: ..\..\..\admin\b2bookmarklet.php:212
 #: ..\..\..\b2evocore\_edit_form.php:136
 msgid "Spellcheck"
-msgstr "V�rifier l'orthographe"
+msgstr "スペルチェック"
 
 #: ..\..\..\admin\b2bookmarklet.php:217
 msgid "upload a file/image"
-msgstr "charger un fichier/image"
+msgstr "ファイルや画像のアップロード"
 
 #: ..\..\..\admin\b2bookmarklet.php:232
 #: ..\..\..\admin\b2sidebar.php:97
 msgid "<strong>Trackback</strong> an URL:"
-msgstr "Envoyer un <strong>Trackback</strong> � l'URL:"
+msgstr "<strong>Trackback</strong>する URL:"
 
 #: ..\..\..\admin\b2categories.php:47
 #: ..\..\..\admin\b2categories.php:245
 msgid "You have no right to edit the categories."
-msgstr "Vous n'avez pas le droit d'�diter les cat�gories."
+msgstr "カテゴリを編集する権限がありません"
 
 #: ..\..\..\admin\b2categories.php:57
 #, php-format
 msgid "New sub-category in category: %s"
-msgstr "Nouvelle sous-cat�gorie dans la cat�gorie: %s"
+msgstr "新規サブカテゴリをカテゴリ %s のなかに"
 
 #: ..\..\..\admin\b2categories.php:67
 #, php-format
 msgid "New category in blog: %s"
-msgstr "Nouvelle cat�gorie dans le blog:: %s"
+msgstr "新規カテゴリを blog %s に"
 
 #: ..\..\..\admin\b2categories.php:74
 msgid "New category name"
-msgstr "Nouveau nom de cat�gorie"
+msgstr "新規カテゴリの名称"
 
 #: ..\..\..\admin\b2categories.php:118
 msgid "Deleting category..."
-msgstr "Suppression de la cat�gorie..."
+msgstr "カテゴリを削除中..."
 
 #: ..\..\..\admin\b2categories.php:128
 #: ..\..\..\admin\b2login.php:89
@@ -712,13 +686,13 @@ msgstr "Suppression de la cat�gorie..."
 #: ..\..\..\admin\b2login.php:111
 #: ..\..\..\admin\b2login.php:123
 #: ..\..\..\admin\b2login.php:318
-#: ..\..\..\admin\b2profile.php:54
-#: ..\..\..\admin\b2profile.php:61
-#: ..\..\..\admin\b2profile.php:68
-#: ..\..\..\admin\b2profile.php:71
-#: ..\..\..\admin\b2profile.php:77
+#: ..\..\..\admin\b2profile.php:58
+#: ..\..\..\admin\b2profile.php:65
+#: ..\..\..\admin\b2profile.php:72
+#: ..\..\..\admin\b2profile.php:75
 #: ..\..\..\admin\b2profile.php:81
-#: ..\..\..\admin\b2profile.php:83
+#: ..\..\..\admin\b2profile.php:85
+#: ..\..\..\admin\b2profile.php:87
 #: ..\..\..\admin\b2register.php:63
 #: ..\..\..\admin\b2register.php:68
 #: ..\..\..\admin\b2register.php:73
@@ -728,120 +702,140 @@ msgstr "Suppression de la cat�gorie..."
 #: ..\..\..\b2evocore\_verifauth.php:45
 #: ..\..\..\b2evocore\_verifauth.php:55
 msgid "ERROR"
-msgstr "ERREUR"
+msgstr "エラー"
 
 #: ..\..\..\admin\b2categories.php:132
 msgid "Category deleted."
-msgstr "Cat�gorie supprim�e."
+msgstr "カテゴリーを削除しました。"
 
 #: ..\..\..\admin\b2categories.php:151
 msgid "<strong>Old</strong> name"
-msgstr "<strong>Ancien</strong> nom"
+msgstr "<strong>今までの</strong> 名称"
 
 #: ..\..\..\admin\b2categories.php:154
 msgid "<strong>New</strong> name"
-msgstr "<strong>Nouveau</strong> nom"
+msgstr "<strong>新しい</strong> 名称"
 
 #: ..\..\..\admin\b2categories.php:158
 msgid "New parent category"
-msgstr "Nouvelle cat�gorie parente"
+msgstr "新しい親カテゴリ"
 
 #: ..\..\..\admin\b2categories.php:184
 #: ..\..\..\admin\b2categories.php:203
 msgid "Old Parent"
-msgstr "Ancien parent"
+msgstr "今までの親"
 
 #: ..\..\..\admin\b2categories.php:266
 #: ..\..\..\b2evocore\_blogs_list.php:17
 #: ..\..\..\b2evocore\_edit_form.php:156
 msgid "Edit"
-msgstr "Editer"
+msgstr "編集"
 
 #: ..\..\..\admin\b2categories.php:268
 #: ..\..\..\b2evocore\_edit_showposts.php:157
 #: ..\..\..\b2evocore\_edit_showposts.php:207
 msgid "Delete"
-msgstr "Supprimer"
+msgstr "削除"
 
 #: ..\..\..\admin\b2categories.php:273
 msgid "New sub-category here"
-msgstr "Nouvelle sous-cat�gorie ici"
+msgstr "新規サブカテゴリをここに"
 
 #: ..\..\..\admin\b2categories.php:288
 msgid "New category here"
-msgstr "Nouvelle cat�gorie ici"
+msgstr "新規カテゴリをここに"
 
 #: ..\..\..\admin\b2categories.php:293
-msgid "<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number)."
-msgstr "<strong>Note:</strong> La suppression d'une cat�gorie n'entraine pas la suppression des articles de cette cat�gorie. Ceux-ci seront simplement assign�s � la cat�gorie parente. Si vous supprimez une cat�gorie de niveau 0, les articles seront assign�s � la cat�gorie restante la plus ancienne du m�me blog (celle portant le plus petit num�ro de cat�gorie)."
+msgid ""
+"<strong>Note:</strong> Deleting a category does not delete posts from that "
+"category. It will just assign them to the parent category. When deleting a "
+"root category, posts will be assigned to the oldest remaining category in "
+"the same blog (smallest category number)."
+msgstr ""
+"<strong>注意:</strong> カテゴリを削除しても、そのカテゴリにある投稿を"
+"削除することにはなりません。投稿は親カテゴリに再割り当てされます。"
+"ルートのカテゴリを削除すると、投稿は同じ blog のなかで最も古くからある"
+"カテゴリ (カテゴリ番号最小のもの)に再割り当てされます。"
 
 #: ..\..\..\admin\b2edit.php:57
 msgid "New post in blog:"
-msgstr "Poster dans le blog:"
+msgstr "blog に新規投稿:"
 
 #: ..\..\..\admin\b2edit.php:79
 #: ..\..\..\admin\b2edit.php:127
 #: ..\..\..\admin\b2edit.php:190
 #, php-format
-msgid "Since you're a newcomer, you'll have to wait for an admin to raise your level to 1, in order to be authorized to post.\tYou can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
-msgstr "Etant donn� que vous �tes nouveau, vous allez devoir attendre qu'un administrateur monte votre niveau � 1 avant de pouvoir poster des articles. Vous pouvez aussi <a %s>envoyer un mail � l'administrateur</a> pour lui demander une promotion. Lorsque vous serez promu, rechargez simplement cette page et vous pourrez poster. :)"
+msgid ""
+"Since you're a newcomer, you'll have to wait for an admin to raise your "
+"level to 1, in order to be authorized to post.\tYou can also <a %s>e-mail "
+"the admin</a> to ask for a promotion. When you're promoted, just reload this "
+"page and you'll be able to blog. :)"
+msgstr ""
+"あなたは新規登録者なので, 管理者が投稿許可を出すためにあなたのレベルを"
+"1に上げるのをまたなければなりません。\tあなたは<a %s>管理者にメール</a>"
+"して昇級を要請することもできます。昇級したら、このページを"
+"リロードするだけで、あなたは blog できるようになります。:)"
 
 #: ..\..\..\admin\b2edit.php:97
-#: ..\..\..\admin\edit_actions.php:207
+#: ..\..\..\admin\edit_actions.php:205
 msgid "Oops, no post with this ID."
-msgstr "Oups, aucun article avec cet Idx."
+msgstr "あれ、このIDの投稿はありません。"
 
 #: ..\..\..\admin\b2edit.php:102
 msgid "Editing post"
-msgstr "Edition d'un article"
+msgstr "投稿を編集"
 
 #: ..\..\..\admin\b2edit.php:141
 msgid "Oops, no comment with this ID!"
-msgstr "Oups, aucun commentaire avec cet Idx!"
+msgstr "あれ、このIDのコメントはありません！"
 
 #: ..\..\..\admin\b2edit.php:143
 msgid "Editing comment"
-msgstr "Edition d'un commentaire"
+msgstr "コメントを編集"
 
 #: ..\..\..\admin\b2edit.php:173
 msgid "Browse blog:"
-msgstr "Parcourir le blog:"
+msgstr "blog を閲覧:"
 
 #: ..\..\..\admin\b2login.php:89
 msgid "The login field is empty"
-msgstr "Le champ identifiant est vide"
+msgstr "login フィールドが空です"
 
 #: ..\..\..\admin\b2login.php:94
 msgid "the password field is empty"
-msgstr "le champ mot de passe est vide"
+msgstr "password フィールドが空です"
 
 #: ..\..\..\admin\b2login.php:111
 #: ..\..\..\admin\b2login.php:123
 #: ..\..\..\admin\b2login.php:318
 msgid "Wrong login or password"
-msgstr "Identifiant ou mot de passe incorrect"
+msgstr "login か password かいずれか間違っています"
 
 #: ..\..\..\admin\b2login.php:152
 #: ..\..\..\admin\b2login.php:156
 #: ..\..\..\admin\b2login.php:161
-#: ..\..\..\admin\b2profile.php:87
+#: ..\..\..\admin\b2profile.php:91
 #, php-format
 msgid "setcookie %s failed!"
-msgstr "Le cookie %s n'a pas pu �tre d�pos�!"
+msgstr "setcookie %s が失敗しました!"
 
 #: ..\..\..\admin\b2login.php:200
 msgid "Lost password ?"
-msgstr "Mot de passe perdu?"
+msgstr "password を忘れましたか？"
 
 #: ..\..\..\admin\b2login.php:237
-msgid "Type your login here and click OK. You will receive an email with your password."
-msgstr "Entrez votre identifiant et cliquez sur OK. Vous allez recevoir un email contenant votre mot de passe."
+msgid ""
+"Type your login here and click OK. You will receive an email with your "
+"password."
+msgstr ""
+"あなたのlogin名をタイプしてOK をクリックしてください。"
+"あなたの password の書かれたメールを受け取ることになります。"
 
 #: ..\..\..\admin\b2login.php:245
 #: ..\..\..\admin\b2register.php:113
 #: ..\..\..\admin\b2register.php:161
 msgid "Login"
-msgstr "Identification"
+msgstr "Login"
 
 #: ..\..\..\admin\b2login.php:248
 #: ..\..\..\b2evocore\_edit_navbar.php:43
@@ -851,250 +845,250 @@ msgstr "OK"
 #: ..\..\..\admin\b2login.php:274
 #: ..\..\..\admin\b2login.php:385
 #: ..\..\..\admin\b2mail.php:201
-#: ..\..\..\admin\b2profile.php:139
-#: ..\..\..\admin\b2profile.php:299
+#: ..\..\..\admin\b2profile.php:143
+#: ..\..\..\admin\b2profile.php:301
 #: ..\..\..\admin\b2register.php:295
 msgid "Login:"
-msgstr "Identifiant:"
+msgstr "Login:"
 
 #: ..\..\..\admin\b2login.php:275
 #: ..\..\..\admin\b2login.php:387
 #: ..\..\..\admin\b2register.php:301
 msgid "Password:"
-msgstr "Mot de passe:"
+msgstr "Password:"
 
 #: ..\..\..\admin\b2login.php:277
 msgid "your weblog's login/password"
-msgstr "identifiant et mot de passe pour votre blog"
+msgstr "あなたのweblog の login/password"
 
 #: ..\..\..\admin\b2login.php:280
 msgid "The email could not be sent."
-msgstr "L'email n'a pas pu �tre envoy�."
+msgstr "メールが送れませんでした。"
 
 #: ..\..\..\admin\b2login.php:281
 msgid "Possible reason: your host may have disabled the mail() function...</p>"
-msgstr "Cause possible: vous avez peut �tre d�sactiv� la fonction mail()...</p>"
+msgstr "ありうる理由: あなたの host が mail()関数を禁止したのかもしれません...</p>"
 
 #: ..\..\..\admin\b2login.php:284
 msgid "The email was sent successfully to your email address."
-msgstr "L'email a bien �t� envoy� � votre adresse email."
+msgstr "メールは無事あなたのメールアドレスに送られました。"
 
 #: ..\..\..\admin\b2login.php:285
 msgid "Click here to login !"
-msgstr "Cliquez ici pour vous identifier !"
+msgstr "ここをクリックしてlogin!"
 
 #: ..\..\..\admin\b2login.php:331
 msgid "Login form"
-msgstr "Identification"
+msgstr "Loginフォーム"
 
 #: ..\..\..\admin\b2login.php:364
 msgid "register ?"
-msgstr "s'inscire ?"
+msgstr "登録しますか？"
 
 #: ..\..\..\admin\b2login.php:365
 msgid "lost your password ?"
-msgstr "Mot de passe perdu?"
+msgstr "password を忘れましたか？"
 
 #: ..\..\..\admin\b2mail.php:36
 msgid "Connecting to pop server..."
-msgstr "Connexion au serveur POP..."
+msgstr "POPサーバに接続します..."
 
 #: ..\..\..\admin\b2mail.php:38
 msgid "Connection failed:"
-msgstr "La connexion a �chou�:"
+msgstr "接続が拒否されました:"
 
 #: ..\..\..\admin\b2mail.php:42
 msgid "Logging into pop server..."
-msgstr "Identification aupr�s du serveur POP..."
+msgstr "POPサーバにloginします..."
 
 #: ..\..\..\admin\b2mail.php:46
 msgid "No mail or Login Failed:"
-msgstr "Pas de mail ou l'identification � �chou�"
+msgstr "メールがないかlogin に失敗しました:"
 
 #: ..\..\..\admin\b2mail.php:57
 #, php-format
 msgid "Getting message #%d..."
-msgstr "Chargement du message #%d..."
+msgstr "メッセージ#%d を取得..."
 
 #: ..\..\..\admin\b2mail.php:66
 msgid "Processing..."
-msgstr "Traitement en cours..."
+msgstr "処理中..."
 
 #: ..\..\..\admin\b2mail.php:140
 msgid "Too old"
-msgstr "Trop ancien"
+msgstr "古過ぎます"
 
 #: ..\..\..\admin\b2mail.php:146
 msgid "Subject prefix does not match"
-msgstr "Le pr�fixe dans le sujet ne correspond pas"
+msgstr "Subject のprefix が一致しません"
 
 #: ..\..\..\admin\b2mail.php:166
 msgid "Raw content:"
-msgstr "Contenu brut:"
+msgstr "生の内容:"
 
 #: ..\..\..\admin\b2mail.php:201
 msgid "Pass:"
-msgstr "Mot de passe:"
+msgstr "Pass:"
 
 #: ..\..\..\admin\b2mail.php:208
 msgid "Wrong login or password."
-msgstr "Identifiant ou mot de passe incorrects."
+msgstr "login か password が間違っています"
 
 #: ..\..\..\admin\b2mail.php:228
 msgid "Category ID"
-msgstr "Idx Cat�gorie"
+msgstr "カテゴリID"
 
 #: ..\..\..\admin\b2mail.php:236
 #: ..\..\..\admin\edit_actions.php:79
 msgid "Cannot post, please correct these errors:"
-msgstr "Impossible d'enregistrer; veuillez corriger les erreurs suivantes:"
+msgstr "投稿できません、以下のエラーを修正してください:"
 
 #: ..\..\..\admin\b2mail.php:250
 msgid "Blog ID"
-msgstr "Idx Blog"
+msgstr "Blog ID"
+
+#: ..\..\..\admin\b2mail.php:257
+msgid "Posted title"
+msgstr "投稿されたタイトル"
 
 #: ..\..\..\admin\b2mail.php:258
-msgid "Posted title"
-msgstr "Titre envoy�"
-
-#: ..\..\..\admin\b2mail.php:259
 msgid "Posted content"
-msgstr "Contenu envoy�"
+msgstr "投稿された内容"
 
-#: ..\..\..\admin\b2mail.php:269
+#: ..\..\..\admin\b2mail.php:268
 msgid "Mission complete, message deleted."
-msgstr "Mission achev�e; message supprim�."
+msgstr "処理完了、メッセージを削除しました。"
 
-#: ..\..\..\admin\b2mail.php:275
+#: ..\..\..\admin\b2mail.php:274
 msgid "Level 0 users can't post."
-msgstr "Les utilisateur de niveau 0 ne peuvent pas publier."
+msgstr "Level 0 のユーザは 投稿できません。"
 
-#: ..\..\..\admin\b2mail.php:294
+#: ..\..\..\admin\b2mail.php:293
 msgid "End."
-msgstr "Fin."
+msgstr "終了。"
 
 #: ..\..\..\admin\b2options.php:46
 #: ..\..\..\admin\b2options.php:68
 msgid "You have no right to edit the options for this blog."
-msgstr "Vous n'avez pas le droit d'�diter les options pour ce blog."
+msgstr "このblog のオプションを編集する権限がありません"
 
 #: ..\..\..\admin\b2options.php:79
 msgid "Show"
-msgstr "Montrer"
+msgstr "表示"
 
 #: ..\..\..\admin\b2options.php:86
 msgid "days"
-msgstr "jours"
+msgstr "日"
 
 #: ..\..\..\admin\b2options.php:90
 msgid "posts"
-msgstr "articles"
+msgstr "投稿"
 
 #: ..\..\..\admin\b2options.php:94
 msgid "posts paged"
-msgstr "articles pagin�s"
+msgstr "投稿／ページ"
 
 #: ..\..\..\admin\b2options.php:99
 msgid "Archive mode"
-msgstr "Mode d'archivage"
+msgstr "アーカイブモード"
 
 #: ..\..\..\admin\b2options.php:106
 msgid "daily"
-msgstr "quotidien"
+msgstr "日単位"
 
 #: ..\..\..\admin\b2options.php:110
 msgid "weekly"
-msgstr "hebdomadaire"
+msgstr "週単位"
 
 #: ..\..\..\admin\b2options.php:114
 msgid "monthly"
-msgstr "mensuel"
+msgstr "月単位"
 
 #: ..\..\..\admin\b2options.php:118
 msgid "post by post"
-msgstr "article par article"
+msgstr "投稿ごと"
 
 #: ..\..\..\admin\b2options.php:122
 msgid "Time difference"
-msgstr "D�calage horaire"
+msgstr "時差"
 
 #: ..\..\..\admin\b2options.php:124
 msgid "if you're not on the timezone of your server"
-msgstr "si vous n'�tes pas dans le m�me fuseau horaire que le serveur"
+msgstr "サーバのタイムゾーンと異なる場所にいる場合に設定"
 
 #: ..\..\..\admin\b2options.php:139
 msgid "converts line-breaks into &lt;br /&gt; tags"
-msgstr "convertit les retours � la ligne en balises &lt;br /&gt;"
+msgstr "改行を&lt;br /&gt; タグに変換"
 
 #: ..\..\..\admin\b2options.php:145
 msgid "Update"
-msgstr "Mettre � jour"
+msgstr "更新"
 
-#: ..\..\..\admin\b2profile.php:4
+#: ..\..\..\admin\b2profile.php:1
 msgid "Profile"
-msgstr "Profil"
+msgstr "プロフィール"
 
-#: ..\..\..\admin\b2profile.php:49
-#: ..\..\..\admin\b2profile.php:54
-#: ..\..\..\admin\b2profile.php:61
-#: ..\..\..\admin\b2profile.php:68
-#: ..\..\..\admin\b2profile.php:71
+#: ..\..\..\admin\b2profile.php:53
+#: ..\..\..\admin\b2profile.php:58
+#: ..\..\..\admin\b2profile.php:65
+#: ..\..\..\admin\b2profile.php:72
+#: ..\..\..\admin\b2profile.php:75
 msgid "Back to profile"
-msgstr "Retour au profil"
+msgstr "プロフィールに戻る"
 
-#: ..\..\..\admin\b2profile.php:54
+#: ..\..\..\admin\b2profile.php:58
 msgid "please enter your nickname (can be the same as your login)"
-msgstr "Veuillez entrer votre pseudonyme (peut �tre identique � l'identifiant)"
+msgstr "ニックネームを入れてください(login と同じでいいです)"
 
-#: ..\..\..\admin\b2profile.php:61
+#: ..\..\..\admin\b2profile.php:65
 msgid "your ICQ UIN can only be a number, no letters allowed"
-msgstr "Votre num�ro ICQ doit �tre compos� uniquement de chiffres; les lettres ne sont pas autoris�es"
+msgstr "ICQ UIN は番号だけです、他の文字は許されません"
 
-#: ..\..\..\admin\b2profile.php:68
+#: ..\..\..\admin\b2profile.php:72
 #: ..\..\..\admin\b2register.php:79
 msgid "please type your e-mail address"
-msgstr "Veuillez taper votre adresse email"
+msgstr "メールアドレスをタイプして下さい"
 
-#: ..\..\..\admin\b2profile.php:71
+#: ..\..\..\admin\b2profile.php:75
 msgid "the email address isn't correct"
-msgstr "l'adresse email n'est pas correcte"
+msgstr "メールアドレスが正しくありません"
 
-#: ..\..\..\admin\b2profile.php:77
 #: ..\..\..\admin\b2profile.php:81
+#: ..\..\..\admin\b2profile.php:85
 msgid "you typed your new password only once. Go back to type it twice."
-msgstr "vous n'avez tap� votre nouveau mot de passe qu'une seule fois. Retournez � la page pr�c�dente pour le taper deux fois."
+msgstr "新規パスワードが一度しかタイプされていません。戻って2度タイプしてください。"
 
-#: ..\..\..\admin\b2profile.php:83
+#: ..\..\..\admin\b2profile.php:87
 msgid "you typed two different passwords. Go back to correct that."
-msgstr "vous avez tap� deux mots de passe diff�rents. Retournez � la page pr�c�dente pour corriger cel�."
+msgstr "2つの異なるパスワードがタイプされました。戻って修正してください。"
 
-#: ..\..\..\admin\b2profile.php:108
+#: ..\..\..\admin\b2profile.php:112
 msgid "Profile updated!"
-msgstr "Profil mis � jour!"
+msgstr "プロフィールが更新されました!"
 
-#: ..\..\..\admin\b2profile.php:109
+#: ..\..\..\admin\b2profile.php:113
 msgid "If that window doesn't close itself, close it yourself :p"
-msgstr "Si cette fen�tre ne se ferme pas d'elle m�me, fermez la vous m�me :p"
-
-#: ..\..\..\admin\b2profile.php:143
-#: ..\..\..\admin\b2profile.php:303
-msgid "First name"
-msgstr "Pr�nom"
+msgstr "もしウィンドウが自動で閉じなかったら、自分で閉じてください:p"
 
 #: ..\..\..\admin\b2profile.php:147
-#: ..\..\..\admin\b2profile.php:307
-msgid "Last name"
-msgstr "Nom"
+#: ..\..\..\admin\b2profile.php:305
+msgid "First name"
+msgstr "名"
 
 #: ..\..\..\admin\b2profile.php:151
-#: ..\..\..\admin\b2profile.php:311
+#: ..\..\..\admin\b2profile.php:309
+msgid "Last name"
+msgstr "姓"
+
+#: ..\..\..\admin\b2profile.php:155
+#: ..\..\..\admin\b2profile.php:313
 #: ..\..\..\admin\b2team.php:100
 #: ..\..\..\admin\b2team.php:154
 msgid "Nickname"
-msgstr "Surnom"
+msgstr "ニックネーム"
 
-#: ..\..\..\admin\b2profile.php:159
-#: ..\..\..\admin\b2profile.php:319
+#: ..\..\..\admin\b2profile.php:163
+#: ..\..\..\admin\b2profile.php:321
 #: ..\..\..\admin\b2team.php:103
 #: ..\..\..\admin\b2team.php:157
 #: ..\..\..\b2evocore\_edit_form.php:92
@@ -1102,208 +1096,220 @@ msgstr "Surnom"
 msgid "URL"
 msgstr "URL"
 
-#: ..\..\..\admin\b2profile.php:163
-#: ..\..\..\admin\b2profile.php:323
+#: ..\..\..\admin\b2profile.php:167
+#: ..\..\..\admin\b2profile.php:325
 msgid "ICQ"
 msgstr "ICQ"
 
-#: ..\..\..\admin\b2profile.php:167
-#: ..\..\..\admin\b2profile.php:327
+#: ..\..\..\admin\b2profile.php:171
+#: ..\..\..\admin\b2profile.php:329
 msgid "AIM"
 msgstr "AIM"
 
-#: ..\..\..\admin\b2profile.php:171
-#: ..\..\..\admin\b2profile.php:331
+#: ..\..\..\admin\b2profile.php:175
+#: ..\..\..\admin\b2profile.php:333
 msgid "MSN IM"
 msgstr "MSN IM"
 
-#: ..\..\..\admin\b2profile.php:175
-#: ..\..\..\admin\b2profile.php:335
+#: ..\..\..\admin\b2profile.php:179
+#: ..\..\..\admin\b2profile.php:337
 msgid "YahooIM"
 msgstr "YahooIM"
 
-#: ..\..\..\admin\b2profile.php:186
-#: ..\..\..\admin\b2profile.php:346
+#: ..\..\..\admin\b2profile.php:190
+#: ..\..\..\admin\b2profile.php:348
 #: ..\..\..\admin\b2team.php:99
 #: ..\..\..\admin\b2team.php:153
 msgid "ID"
-msgstr "Idx"
+msgstr "ID"
 
-#: ..\..\..\admin\b2profile.php:190
-#: ..\..\..\admin\b2profile.php:350
+#: ..\..\..\admin\b2profile.php:194
+#: ..\..\..\admin\b2profile.php:352
 #: ..\..\..\admin\b2team.php:104
 #: ..\..\..\admin\b2team.php:158
 msgid "Level"
-msgstr "Niveau"
+msgstr "レベル"
 
-#: ..\..\..\admin\b2profile.php:195
-#: ..\..\..\admin\b2profile.php:355
+#: ..\..\..\admin\b2profile.php:199
+#: ..\..\..\admin\b2profile.php:357
 msgid "Posts"
-msgstr "Articles"
+msgstr "投稿数"
 
-#: ..\..\..\admin\b2profile.php:204
+#: ..\..\..\admin\b2profile.php:208
 msgid "Identity"
-msgstr "Identit�"
+msgstr "アイデンティティ"
 
-#: ..\..\..\admin\b2profile.php:253
+#: ..\..\..\admin\b2profile.php:256
 msgid "IE one-click bookmarklet"
-msgstr "IE one-click bookmarklet"
+msgstr "IE 用ワンクリック bookmarklet"
 
-#: ..\..\..\admin\b2profile.php:258
-msgid "To have a one-click bookmarklet, just copy and paste this into a new text file:"
-msgstr "Pour avoir une one-click bookmarklet, copiez et collez simplement ceci dans un nouveau fichier texte:"
+#: ..\..\..\admin\b2profile.php:261
+msgid ""
+"To have a one-click bookmarklet, just copy and paste this into a new text "
+"file:"
+msgstr ""
+"ワンクリックbookmarklet を得るには,これを新しいテキストファイルに"
+"copy &amp; paste するだけです。"
 
-#: ..\..\..\admin\b2profile.php:263
-msgid "Save it as b2.reg, and double-click on this file in an Explorer window. Answer Yes to the question, and restart Internet Explorer."
-msgstr "Sauvez ce fichier sous b2.reg et double-cliquez sur ce fichier dans une fen�tre de l'explorateur Windows. R�pondez Oui � la question puis red�marrez Internet Explorer."
+#: ..\..\..\admin\b2profile.php:266
+msgid ""
+"Save it as b2.reg, and double-click on this file in an Explorer window. "
+"Answer Yes to the question, and restart Internet Explorer."
+msgstr ""
+"b2.reg としてセーブして, このファイルを Explorer のウィンドウでダブルクリックします。"
+"質問にYesと答えて、Internet Explorer を再起動します。"
 
-#: ..\..\..\admin\b2profile.php:264
-msgid "That's it, you can now right-click in an IE window and select 'Post to b2' to make the bookmarklet appear :)"
-msgstr "C'est tout! Vous pouvez maintenant faire un click droit dans une fen�tre IE et s�lectionner 'Post to b2' afin de faire apparaitre le bookmarklet :)"
+#: ..\..\..\admin\b2profile.php:267
+msgid ""
+"That's it, you can now right-click in an IE window and select 'Post to b2' "
+"to make the bookmarklet appear :)"
+msgstr ""
+"さぁ、今や bookmarklet を表示するのにIEのウィンドウで右クリックして"
+" 'Post to b2' を選ぶことができます。"
 
-#: ..\..\..\admin\b2profile.php:268
+#: ..\..\..\admin\b2profile.php:271
 #: ..\..\..\admin\b2upload.php:237
 msgid "Close this window"
-msgstr "Fermer cette fen�tre"
+msgstr "このウィンドウを閉じる"
 
-#: ..\..\..\admin\b2profile.php:364
+#: ..\..\..\admin\b2profile.php:366
 msgid "<strong>Identity</strong> on the blog"
-msgstr "<strong>Identit�</strong> sur le blog"
+msgstr "blog上の<strong>アイデンティティ</strong>"
 
-#: ..\..\..\admin\b2profile.php:390
+#: ..\..\..\admin\b2profile.php:392
 msgid "New <strong>password</strong> (twice):"
-msgstr "Nouveau <strong>mot de passe</strong> (deux fois):"
+msgstr "新規 <strong>password</strong> (2回):"
 
-#: ..\..\..\admin\b2profile.php:398
+#: ..\..\..\admin\b2profile.php:400
 msgid "Bookmarklet"
 msgstr "Bookmarklet"
 
-#: ..\..\..\admin\b2profile.php:399
+#: ..\..\..\admin\b2profile.php:401
 msgid "Add this link to your Favorites/Bookmarks:"
-msgstr "Ajoutez ce lien � vos Favoris:"
+msgstr "このリンクを「お気に入り」やブックマークに加えてください"
 
-#: ..\..\..\admin\b2profile.php:403
-#: ..\..\..\admin\b2profile.php:407
-#: ..\..\..\admin\b2profile.php:424
-#: ..\..\..\admin\b2profile.php:428
+#: ..\..\..\admin\b2profile.php:405
+#: ..\..\..\admin\b2profile.php:409
+#: ..\..\..\admin\b2profile.php:426
+#: ..\..\..\admin\b2profile.php:430
 msgid "b2 - bookmarklet"
 msgstr "b2 - bookmarklet"
 
-#: ..\..\..\admin\b2profile.php:418
+#: ..\..\..\admin\b2profile.php:420
 msgid "One-click bookmarklet:"
-msgstr "One-click bookmarklet:"
+msgstr "ワンクリック bookmarklet"
 
-#: ..\..\..\admin\b2profile.php:419
+#: ..\..\..\admin\b2profile.php:421
 msgid "Click here"
-msgstr "Cliquez ici"
+msgstr "ここをクリック"
 
-#: ..\..\..\admin\b2profile.php:439
+#: ..\..\..\admin\b2profile.php:441
 msgid "No Sidebar found!  You must use Mozilla 0.9.4 or later!"
-msgstr "Impossible de trouver la Sidebar! Vous devez utiliser Mozilla 0.9.4 ou sup�rieur!"
+msgstr "サイドバーが見あたりません! Mozilla 0.9.4 以上を使う必要があります!"
 
-#: ..\..\..\admin\b2profile.php:442
-#: ..\..\..\admin\b2profile.php:446
+#: ..\..\..\admin\b2profile.php:444
+#: ..\..\..\admin\b2profile.php:448
 msgid "SideBar"
-msgstr "SideBar"
+msgstr "サイドバー"
 
-#: ..\..\..\admin\b2profile.php:443
+#: ..\..\..\admin\b2profile.php:445
 #, php-format
 msgid "Add the <a %s>b2 Sidebar</a> !"
-msgstr "Ajoutez la <a %s>Sidebar b2</a> !"
+msgstr "<a %s>b2 サイドバー</a>を追加!"
 
-#: ..\..\..\admin\b2profile.php:447
+#: ..\..\..\admin\b2profile.php:449
 msgid "Add this link to your favorites:"
-msgstr "Ajoutez ce lien � vos favoris:"
+msgstr "このリンクを「お気に入り」に追加"
 
-#: ..\..\..\admin\b2profile.php:447
+#: ..\..\..\admin\b2profile.php:449
 msgid "b2 Sidebar"
-msgstr "b2 Sidebar"
+msgstr "b2 サイドバー"
 
-#: ..\..\..\admin\b2profile.php:456
+#: ..\..\..\admin\b2profile.php:458
 msgid "Note: closes the popup window."
-msgstr "Note: ferme la fen�tre popup."
+msgstr "注意: ポップアップウィンドウを閉じます"
 
 #: ..\..\..\admin\b2register.php:63
 msgid "please enter a Login"
-msgstr "Veuillez entrer un identifiant"
+msgstr "login 名を入力して下さい"
 
 #: ..\..\..\admin\b2register.php:68
 msgid "please enter your password twice"
-msgstr "Veuillez entrer votre mot de passe deux fois"
+msgstr "password を2度入力して下さい"
 
 #: ..\..\..\admin\b2register.php:73
 msgid "please type the same password in the two password fields"
-msgstr "veuillez taper le m�me mot de passe dans les deux champs"
+msgstr "2つのpasswordフィールドには同じパスワードをタイプして下さい"
 
 #: ..\..\..\admin\b2register.php:81
 msgid "the email address is invalid"
-msgstr "l'adresse email est invalide"
+msgstr "メールアドレスが無効です"
 
 #: ..\..\..\admin\b2register.php:93
 msgid "this login is already registered, please choose another one"
-msgstr "cet identifiant est d�j� utilis�, veuillez en choisir un autre"
+msgstr "このlogin名はすでに登録されています。別のものを選んで下さい"
 
 #: ..\..\..\admin\b2register.php:112
 #: ..\..\..\admin\b2register.php:116
 msgid "new user registration on your blog"
-msgstr "nouvelle inscription sur votre blog"
+msgstr "あなたのblogの新規ユーザ登録"
 
 #: ..\..\..\admin\b2register.php:114
 msgid "Manage users"
-msgstr "G�rer les utilisateurs"
+msgstr "ユーザ管理"
 
 #: ..\..\..\admin\b2register.php:121
 #: ..\..\..\admin\b2register.php:154
 msgid "Registration complete"
-msgstr "Inscription effectu�e"
+msgstr "登録完了"
 
 #: ..\..\..\admin\b2register.php:162
 msgid "Password"
-msgstr "Mot de passe"
+msgstr "Password"
 
 #: ..\..\..\admin\b2register.php:189
 msgid "Registration Currently Disabled"
-msgstr "Inscription actuellement interdite"
+msgstr "登録は現在無効となっています"
 
 #: ..\..\..\admin\b2register.php:230
 msgid "User registration is currently not allowed."
-msgstr "L'inscription de nouveaux utilisateurs n'est pas autoris�e actuellement."
+msgstr "ユーザ登録はいま許可されていません"
 
 #: ..\..\..\admin\b2register.php:231
 msgid "Home"
-msgstr "Page d'accueil"
+msgstr "Home"
 
 #: ..\..\..\admin\b2register.php:251
 msgid "Register form"
-msgstr "Formulaire d'inscription"
+msgstr "登録フォーム"
 
 #: ..\..\..\admin\b2register.php:301
 msgid "(twice)"
-msgstr "(deux fois)"
+msgstr "(2度)"
 
 #: ..\..\..\admin\b2sidebar.php:82
 msgid "Post"
-msgstr "Article"
+msgstr "投稿"
 
 #: ..\..\..\admin\b2sidebar.php:93
 msgid "SpellCheck"
-msgstr "V�rifier l'orthographe"
+msgstr "スペルチェック"
 
 #: ..\..\..\admin\b2stats.php:2
 msgid "View Stats"
-msgstr "Statistiques"
+msgstr "統計を見る"
 
 #: ..\..\..\admin\b2stats.php:17
 msgid "Referers"
-msgstr "R�f�rents"
+msgstr "リファラ"
 
 #: ..\..\..\admin\b2stats.php:21
 msgid "Refering Searches"
-msgstr "Recherches r�f�rentes"
+msgstr "検索エンジン経由の参照"
 
 #: ..\..\..\admin\b2stats.php:25
 msgid "Syndication"
-msgstr "Diffusion XML"
+msgstr "配信"
 
 #: ..\..\..\admin\b2stats.php:29
 msgid "User Agents"
@@ -1311,34 +1317,34 @@ msgstr "User Agents"
 
 #: ..\..\..\admin\b2stats.php:33
 msgid "Other"
-msgstr "Autres"
+msgstr "その他"
 
 #: ..\..\..\admin\b2stats.php:42
 msgid "You have no right to view stats."
-msgstr "Vous n'avez pas le droit de consulter les statistiques."
+msgstr "統計を見る権限がありません"
 
 #: ..\..\..\admin\b2stats.php:53
 #, php-format
 msgid "Changing hit #%d type to: %s"
-msgstr "Changement du type du hit #%d en: %s"
+msgstr "hit #%d のタイプを %s に変更"
 
 #: ..\..\..\admin\b2stats.php:66
 #, php-format
 msgid "Deleting hit #%d..."
-msgstr "Suppression du hit n�%d..."
+msgstr "hid #%d を削除しています..."
 
 #: ..\..\..\admin\b2stats.php:78
 msgid "Filter"
-msgstr "Filtre"
+msgstr "フィルタ"
 
 #: ..\..\..\admin\b2stats.php:81
 #: ..\..\..\admin\b2stats.php:85
 msgid "None"
-msgstr "Aucun"
+msgstr "なし"
 
 #: ..\..\..\admin\b2stats.php:111
 msgid "These are hits from external web pages refering to this blog"
-msgstr "Il s'agit de hits provenant de pages web externe ayant un lien vers ce blog"
+msgstr "以下はこのblogを参照する外のwebページからのhitです "
 
 #: ..\..\..\admin\b2stats.php:117
 #: ..\..\..\admin\b2stats.php:159
@@ -1346,7 +1352,7 @@ msgstr "Il s'agit de hits provenant de pages web externe ayant un lien vers ce b
 #: ..\..\..\admin\b2stats.php:253
 #: ..\..\..\admin\b2stats.php:268
 msgid "Delete this hit!"
-msgstr "Supprimer ce hit!"
+msgstr "このhitを削除する!"
 
 #. TRANS: Abbrev. for Delete (stats)
 #: ..\..\..\admin\b2stats.php:117
@@ -1355,504 +1361,584 @@ msgstr "Supprimer ce hit!"
 #: ..\..\..\admin\b2stats.php:253
 #: ..\..\..\admin\b2stats.php:268
 msgid "Del"
-msgstr "Suppr"
+msgstr "削除"
 
 #: ..\..\..\admin\b2stats.php:118
 msgid "Log as a search instead"
-msgstr "Enregistrer plut�t comme une recherche"
+msgstr "かわりに検索エンジンとしてlogをとる"
 
 #. TRANS: Abbrev. for "move to searches" (stats)
 #: ..\..\..\admin\b2stats.php:118
 msgid "-&gt;S"
-msgstr "-&gt;R"
+msgstr "-&gt;S"
 
 #: ..\..\..\admin\b2stats.php:138
 msgid "Total referers"
-msgstr "Total r�f�rents"
+msgstr "全リファラ"
 
 #: ..\..\..\admin\b2stats.php:153
-msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
-msgstr "Il s'agit de hit de personnes qui sont arriv�es sur ce blog � travers un moteur de recherche. (Les moteirs de recherche doivent �tre list�s dans /conf/b2evo_advanced.php)"
+msgid ""
+"These are hits from people who came to this blog system through a search "
+"engine. (Search engines must be listed in /conf/b2evo_advanced.php)"
+msgstr ""
+"以下は 検索エンジン経由でこのblog システムに来た人々のhitです。"
+"(検索エンジンは /conf/b2evo_advanced.php にリストされている必要があります)"
 
 #: ..\..\..\admin\b2stats.php:168
 msgid "Top refering search engines"
-msgstr "Moteurs de recherche r�f�rents les plus fr�quents"
+msgstr "最多の経由した検索エンジン"
 
 #: ..\..\..\admin\b2stats.php:181
-msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/b2evo_advanced.php)"
-msgstr "Il s'agit de hits provenant de robots tels que les robots indexeurs des moteurs de recherche. (Les robots doivent �tre list�s dans /conf/b2evo_advanced.php)"
+msgid ""
+"These are hits from automated robots like search engines' indexing robots. "
+"(Robots must be listed in /conf/b2evo_advanced.php)"
+msgstr ""
+"以下は検索エンジンのインデックスロボットのような自動ロボットからのhitです。"
+"(ロボットは /conf/b2evo_advanced.php にリストされている必要があります)"
 
 #: ..\..\..\admin\b2stats.php:206
-msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/b2evo_advanced.php)"
-msgstr "Il s'agit de hits provenant d'agr�gateurs RSS. (Les agr�gateurs doivent �tre list�s dans /conf/b2evo_advanced.php)"
+msgid ""
+"These are hits from RSS news aggregators. (Aggregators must be listed in /"
+"conf/b2evo_advanced.php)"
+msgstr ""
+"以下は RSS ニュースアグリゲータからの hit です"
+"(アグリゲータは /conf/b2evo_advanced.php にリストされている必要があります)。"
 
 #: ..\..\..\admin\b2stats.php:217
 msgid "Total RSS hits"
-msgstr "Totals hits RSS"
+msgstr "RSS hit 合計"
 
 #: ..\..\..\admin\b2stats.php:231
 msgid "Last direct accesses"
-msgstr "Derniers acc�s directs"
+msgstr "最近の直接アクセス"
 
 #: ..\..\..\admin\b2stats.php:232
-msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
-msgstr "Il s'agit de hits de personnes venues sur ce blog directement (soit en ayant tap� l'URL, soit en ayant utilis� une entr�e de leurs Favoris. Les r�f�rents invalides (trop courts) sont �galement list�s ici.)"
+msgid ""
+"These are hits from people who came to this blog system by direct access "
+"(either by typing the URL directly, or using a bookmark. Invalid (too short) "
+"referers are also listed here.)"
+msgstr ""
+"以下はこのblogに直接アクセスで来た人々の hit です"
+"(URL を直接タイプしたか、ブックマークを使ったかです。"
+"無効の(短か過ぎる)リファラもここにリストされます)。"
 
 #: ..\..\..\admin\b2stats.php:246
 msgid "Last blacklisted referers"
-msgstr "Derniers r�f�rents sur la liste noire"
+msgstr "最近のブラックリスト扱いリファラ"
 
 #: ..\..\..\admin\b2stats.php:247
-msgid "These are hits from people who came to this blog system through a blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. By default the blacklist includes all internal references.)"
-msgstr "Il s'agit de hits de personnes qui sont arriv�es sur ce blog depuis une page figurant sur la liste noire. (La liste noire doit �tre d�finie dans /conf/b2evo_advanced.php.Par d�faut, la liste noire inclue toutes les r�f�rences internes.)"
+msgid ""
+"These are hits from people who came to this blog system through a "
+"blacklisted page. (Blacklist must be defined in /conf/b2evo_advanced.php. By "
+"default the blacklist includes all internal references.)"
+msgstr ""
+"ブラックリストに載ったページ経由でこのシステムに来た人々の hit です"
+"(ブラックリストは/conf/b2evo_advanced.php にリストされている必要があります。"
+"デフォルトではブラックリストには全ての内部参照が含まれています)。"
 
 #: ..\..\..\admin\b2stats.php:261
 msgid "Last bad chars"
-msgstr "Derniers caract�res invalides"
+msgstr "最新の不正キャラクタ"
 
 #: ..\..\..\admin\b2stats.php:262
 msgid "These are hits with bad chars in the referer."
-msgstr "Il s'agit des hits ayant des caract�res invalides dans la champ referer."
+msgstr "以下はリファラに不正キャラクタを含む hit です。"
 
 #: ..\..\..\admin\b2team.php:2
 msgid "User management"
-msgstr "Gestion des utilisateurs"
+msgstr "ユーザ管理"
 
 #: ..\..\..\admin\b2team.php:39
 msgid "Can't change the level of an user whose level is higher than yours."
-msgstr "Impossible de changer le niveau d'un utilisateur dont le niveau est plus �lev� que le votre."
+msgstr "あなたより上位のレベルをもつユーザのレベルを変更することはできません。"
 
 #: ..\..\..\admin\b2team.php:68
 msgid "Can't delete an user whose level is higher than yours."
-msgstr "Impossible de supprimer un utilisateur dont le niveau est sup�rieur au votre."
+msgstr "あなたより上位のレベルをもつユーザを削除することはできません。"
 
 #: ..\..\..\admin\b2team.php:71
 #, php-format
 msgid "Couldn't delete user #%d."
-msgstr "Impossible de supprimer l'utilisateur n�%d."
+msgstr "ユーザ #%d を削除できませんでした。"
 
 #: ..\..\..\admin\b2team.php:75
 #, php-format
 msgid "Couldn't delete user #%d's posts."
-msgstr "Impossible de supprimer les articles de l'utilisateur n�%d."
+msgstr "ユーザ #%d の投稿を削除できませんでした。"
 
 #: ..\..\..\admin\b2team.php:89
 msgid "Click on an user's login name to see his/her complete Profile."
-msgstr "Cliquez sur l'identifiant d'un utilisateur pour consulter son profil complet."
+msgstr "完全なプロフィールをみるにはユーザのlogin 名をクリックして下さい。"
 
 #: ..\..\..\admin\b2team.php:90
 msgid "To edit your Profile, click on your login name."
-msgstr "Pour �diter votre profil, cliquez sur votre identifiant."
+msgstr "あなたのプロフィールを変更するには、あなたのlogin名をクリックして下さい。"
 
 #. TRANS: table header for user list
 #: ..\..\..\admin\b2team.php:106
 #: ..\..\..\admin\b2team.php:160
 msgid "Login "
-msgstr "Identifiant "
+msgstr "Login"
 
 #: ..\..\..\admin\b2team.php:203
-msgid "To delete an user, bring his/her level to zero, then click on the red cross."
-msgstr "Pour supprimer un utilisateur, descendez son niveau � 0 puis cliquez sur la croix rouge."
+msgid ""
+"To delete an user, bring his/her level to zero, then click on the red cross."
+msgstr ""
+"ユーザを削除するには、そのユーザのレベルをゼロにして、それから赤い十字をクリックして下さい。"
 
 #: ..\..\..\admin\b2team.php:204
 msgid "deleting an user also deletes all posts made by this user."
-msgstr "supprimer un utilisateur supprime �galement tous les articles de cet utilisateur."
+msgstr "ユーザを削除するとそのユーザによる投稿も全て削除されます。"
 
 #: ..\..\..\admin\b2template.php:5
 msgid "Custom skin template editing"
-msgstr "Edition des gabarits de l'habillage \"custom\""
+msgstr "Custom スキンのテンプレートの編集"
 
 #: ..\..\..\admin\b2template.php:56
 #: ..\..\..\admin\b2template.php:78
 msgid "You have no right to edit the templates."
-msgstr "Vous n'avez pas le droit d'�diter les gabarits."
+msgstr "テンプレートを編集する権限がありません"
 
 #: ..\..\..\admin\b2template.php:89
 msgid "Listing:"
-msgstr "Listing:"
+msgstr "リスト:"
 
 #: ..\..\..\admin\b2template.php:93
 msgid "Invalid filename!"
-msgstr "Nom de fichier invalide!"
+msgstr "無効なファイル名!"
 
 #: ..\..\..\admin\b2template.php:97
 msgid "Oops, no such file !"
-msgstr "Oups, ce fichier n'existe pas!"
+msgstr "あれ、そんなファイルはありません!"
 
 #: ..\..\..\admin\b2template.php:108
 msgid "File edited!"
-msgstr "Fichier modifi�."
+msgstr "ファイルを編集しました!"
 
 #: ..\..\..\admin\b2template.php:112
-msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
-msgstr "Attention: en �ditant cet fichier vous pouvez rendre votre gabarit inutilisable! N'�ditez pas ce qui se trouve entre <code>&lt;?php</code> et <code>?&gt;</code> si vous ne savez pas pr�cis�ment ce que vous faites!"
+msgid ""
+"Be careful what you do, editing this file could break your template! Do not "
+"edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you "
+"don't know what you're doing!"
+msgstr ""
+"何をしているか注意しましょう。このファイルを編集するとテンプレートが壊れる可能性があります!"
+"何をしているのか分らなければ、<code>&lt;?php</code> と <code>?&gt;</code> の間のものは編集しないで!"
 
 #: ..\..\..\admin\b2template.php:121
 msgid "update template !"
-msgstr "mise � jour du gabarit !"
+msgstr "テンプレートを更新!"
 
 #: ..\..\..\admin\b2template.php:125
-msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
-msgstr "(vousne pouvez pas mettre � jour ce fichier/gabarit: vous devez autoriser l'acc�d en �criture, avec un chmod 766 mar exemple)"
+msgid ""
+"(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
+msgstr ""
+"(指定のファイルやテンプレートは更新できません。例えば CHMOD 766 するなどして書きこみ可能にする必要があります)"
 
 #: ..\..\..\admin\b2template.php:137
-msgid "This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom)."
-msgstr "Cette page vous permet d'�diter l'habillage <strong>custom<strong> (il se trouve dans le r�pertoire /skins/custom)."
+msgid ""
+"This screen allows you to edit the <strong>custom skin</strong> (located "
+"under /skins/custom)."
+msgstr ""
+"この画面で <strong>custom skin</strong> ( /skins/custom の下にあります)を"
+"編集することができます。"
 
 #: ..\..\..\admin\b2template.php:138
-msgid "You can edit any of the following files (provided it's writable by the server, e.g. CHMOD 766)"
-msgstr "Vous pouvez �diter le fichier de votre choix parmi les suivants (pourvu qu'il soit autoris� � l'�criture, chmod 766 par exemple)"
+msgid ""
+"You can edit any of the following files (provided it's writable by the "
+"server, e.g. CHMOD 766)"
+msgstr ""
+"以下のファイルをどれでも (サーバで例えば CHMOD 766 するなどして"
+"書きこみ可能で提供されているものについて)編集できます。"
 
 #: ..\..\..\admin\b2template.php:155
 msgid "This is the template that displays the links to the archives for a blog"
-msgstr "Affiche les liens vers les archives d'un blog"
+msgstr "これはblogのアーカイブへのリンクを表示するテンプレートです"
 
 #: ..\..\..\admin\b2template.php:158
-msgid "This is the template that displays the (recursive) list of (sub)categories"
-msgstr "Affiche la liste (r�cursive) des (sous-)cat�gories."
+msgid ""
+"This is the template that displays the (recursive) list of (sub)categories"
+msgstr ""
+"これは(サブ)カテゴリの(再帰)リストを表示するテンプレートです"
 
 #: ..\..\..\admin\b2template.php:161
 msgid "This is the template that displays the feedback for a post"
-msgstr "Affiche les retours (commentaires, trackbacks, etc...) pour un article"
+msgstr "これは投稿へのフィードバックを表示するテンプレートです"
 
 #: ..\..\..\admin\b2template.php:164
 msgid "This is the template that displays the last comments for a blog"
-msgstr "Affiche les derniers commentaires d'un blog"
+msgstr "これはblogへの最近のコメントを表示するテンプレートです"
 
 #: ..\..\..\admin\b2template.php:167
 msgid "This is the main template. It displays the blog."
-msgstr "Il s'agit du gabarit principal. Il affiche le blog."
+msgstr "これはメインのテンプレートです。blogを表示します"
 
 #: ..\..\..\admin\b2template.php:170
 msgid "This is the template that displays stats for a blog"
-msgstr "Affiche les statistiques d'un blog"
+msgstr "これはblog の統計を表示するテンプレートです"
 
 #: ..\..\..\admin\b2template.php:173
 msgid "This is the page displayed in the comment popup"
-msgstr "Il s'agit de la page affich� dans la fen�tre popup de commentaire."
+msgstr "これはコメントのポップアップで表示されるページです"
 
 #: ..\..\..\admin\b2template.php:176
 msgid "This is the page displayed in the pingback popup"
-msgstr "Il s'agit de la page affich�e dans la fen�tre popup de pingback."
+msgstr "これはピングバックのポップアップで表示されるページです"
 
 #: ..\..\..\admin\b2template.php:179
 msgid "This is the page displayed in the trackback popup"
-msgstr "Il s'agit de la page affich�e dans la fen�tre popup de trackback."
+msgstr "これはトラックバックのポップアップで表示されるページです"
 
 #: ..\..\..\admin\b2template.php:189
-msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
-msgstr "Note: bien �videmment, vous pouvez �galement �diter les fichiers/gabarits dans votre �diteur de texte habituel et les charher ensuite sur le serveur. Cet �diteur en ligne est l� pour pallier au cas o� vous n'avez pas acc�s � un �diteur de texte..."
+msgid ""
+"Note: of course, you can also edit the files/templates in your text editor "
+"and upload them. This online editor is only meant to be used when you don't "
+"have access to a text editor..."
+msgstr ""
+"注意: もちろん、あなたはテキストエディタでファイルやテンプレートを編集して"
+"アップロードすることもできます. このオンラインエディタはあなたが"
+"テキストエディタにアクセスできないときに用いることを"
+"意図しているにすぎません。..."
 
 #: ..\..\..\admin\b2upload.php:11
 msgid "The admin disabled this function"
-msgstr "L'administrateur a d�sactiv� cette fonction."
+msgstr "管理者がこの機能を無効に設定しています"
 
 #: ..\..\..\admin\b2upload.php:16
 msgid "upload images/files"
-msgstr "charger des fichiers/images"
+msgstr "画像/ファイルの アップロード"
 
 #: ..\..\..\admin\b2upload.php:102
 msgid "File upload"
-msgstr "Chargement d'un fichier"
+msgstr "ファイルのアップロード"
 
 #: ..\..\..\admin\b2upload.php:103
 msgid "Allowed file types:"
-msgstr "Types de fichiers autoris�s:"
+msgstr "許可されるファイルのタイプ:"
 
 #: ..\..\..\admin\b2upload.php:104
 #, php-format
 msgid "Maximum allowed file size: %d KB"
-msgstr "Taille de fichier maximale autoris�e: %d Ko."
+msgstr "許可される最大ファイルサイズ: %d KB"
 
 #: ..\..\..\admin\b2upload.php:109
 #: ..\..\..\admin\b2upload.php:184
 msgid "Description"
-msgstr "Description"
+msgstr "説明"
 
 #: ..\..\..\admin\b2upload.php:112
 msgid "Upload !"
-msgstr "Charger !"
+msgstr "アップロード!"
 
 #: ..\..\..\admin\b2upload.php:140
 #, php-format
 msgid "File %s: type %s is not allowed."
-msgstr "Fichier %s: le type %s n'est pas autoris�."
+msgstr "ファイル %s: タイプ %s は許可されていません。"
 
 #: ..\..\..\admin\b2upload.php:169
 #: ..\..\..\admin\b2upload.php:199
 #: ..\..\..\admin\b2upload.php:202
 msgid "Couldn't upload your file to:"
-msgstr "Impossible de charger votre fichier dans:"
+msgstr "ファイルを次のところにアップロードできませんでした:"
 
 #: ..\..\..\admin\b2upload.php:173
 msgid "Duplicate File?"
-msgstr "Fichier en double?"
+msgstr "ファイルの重複？"
 
 #: ..\..\..\admin\b2upload.php:174
 #, php-format
 msgid "The filename \"%s\" already exists!"
-msgstr "Le nom de fichier \"%s\" existe d�j�!"
+msgstr "ファイル名 \"%s\" はすでに存在しています!"
 
 #: ..\..\..\admin\b2upload.php:175
 #, php-format
 msgid "Filename \"%s\" moved to \"%s\""
-msgstr "Fichier \"%s\" d�plac� vers \"%s\""
+msgstr "ファイル名 \"%s\" を\"%s\" に移動します"
 
 #: ..\..\..\admin\b2upload.php:176
 msgid "Confirm or rename:"
-msgstr "Confirmer ou renommer:"
+msgstr "確認かリネーム"
 
 #: ..\..\..\admin\b2upload.php:182
 msgid "Alternate name"
-msgstr "Nom alternatif"
+msgstr "代わりの名前"
 
 #: ..\..\..\admin\b2upload.php:186
 msgid "Confirm !"
-msgstr "Confirmer !"
+msgstr "確認 !"
 
 #: ..\..\..\admin\b2upload.php:216
 msgid "File uploaded !"
-msgstr "Fichier charg� !"
+msgstr "ファイルをアップロードしました!"
 
 #: ..\..\..\admin\b2upload.php:217
 #, php-format
 msgid "Your file <strong>\"%s\"</strong> was uploaded successfully !"
-msgstr "Votre fichier <strong>\"%s\"</strong> a �t� charg� avec succ�s !"
+msgstr "あなたのファイル <strong>\"%s\"</strong>は 無事アップロードされました!"
 
 #: ..\..\..\admin\b2upload.php:218
 msgid "Here's the code to display it:"
-msgstr "Voici le code pour l'afficher:"
+msgstr "これがそれを表示するコードです:"
 
 #: ..\..\..\admin\b2upload.php:225
 msgid "Image Details"
-msgstr "Caract�ristiques de l'image"
+msgstr "画像の詳細"
 
 #: ..\..\..\admin\b2upload.php:229
 msgid "Size"
-msgstr "Taille"
+msgstr "サイズ"
 
 #: ..\..\..\admin\b2upload.php:232
 #: ..\..\..\b2evocore\_edit_form.php:270
 msgid "Type"
-msgstr "Type"
+msgstr "タイプ"
 
 #: ..\..\..\admin\edit_actions.php:38
 msgid "Adding new post..."
-msgstr "Ajout du nouvel article..."
+msgstr "新規投稿の追加..."
 
 #: ..\..\..\admin\edit_actions.php:76
-#: ..\..\..\admin\edit_actions.php:194
-#: ..\..\..\admin\edit_actions.php:372
+#: ..\..\..\admin\edit_actions.php:192
+#: ..\..\..\admin\edit_actions.php:368
 msgid "Supplied URL is invalid."
-msgstr "L'URL fournie est invalide."
+msgstr "提供されたURLは無効です"
 
 #: ..\..\..\admin\edit_actions.php:80
-#: ..\..\..\admin\edit_actions.php:198
-#: ..\..\..\admin\edit_actions.php:376
+#: ..\..\..\admin\edit_actions.php:196
+#: ..\..\..\admin\edit_actions.php:372
 msgid "Back to post editing"
-msgstr "Retour � l'�dition de l'article"
+msgstr "投稿の編集に戻る"
 
 #: ..\..\..\admin\edit_actions.php:86
 msgid "Recording post..."
-msgstr "Enregistrement de l'article..."
+msgstr "投稿を記録しています..."
 
 #: ..\..\..\admin\edit_actions.php:96
-#: ..\..\..\admin\edit_actions.php:297
+#: ..\..\..\admin\edit_actions.php:293
 msgid "Sleeping..."
-msgstr "Attente..."
+msgstr "スリープ中..."
 
 #: ..\..\..\admin\edit_actions.php:106
-#: ..\..\..\admin\edit_actions.php:237
-msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
-msgstr "Article non publi� publiquement: pas de trackback, pingback ni pings..."
+#: ..\..\..\admin\edit_actions.php:234
+msgid ""
+"Post not publicly published: skipping trackback, pingback and blog pings..."
+msgstr ""
+"投稿は公開されていません: トラックバック、ピングバック、blog ping をスキップします..."
 
-#: ..\..\..\admin\edit_actions.php:197
+#: ..\..\..\admin\edit_actions.php:195
 msgid "Cannot update, please correct these errors:"
-msgstr "Impossible de mettre � jour, veuillez corriger ces erreurs:"
+msgstr "更新できません。以下のエラーを修正してください:"
 
-#: ..\..\..\admin\edit_actions.php:251
+#: ..\..\..\admin\edit_actions.php:248
 msgid "Post had already pinged: skipping blog pings..."
-msgstr "Les pings concernant cet article ont d�j� �t� envoy�s: pas de pings..."
+msgstr "投稿はすでにping がうたれています。blog ping をスキップします..."
+
+#: ..\..\..\admin\edit_actions.php:280
+msgid "Oops, no post with this ID!"
+msgstr "あれ、このIDの投稿はありません。"
 
 #: ..\..\..\admin\edit_actions.php:284
-msgid "Oops, no post with this ID!"
-msgstr "Oups, aucun article avec cet Idx."
-
-#: ..\..\..\admin\edit_actions.php:288
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
-msgstr "Vous n'avez pas le droit d'effacer les articles de <strong>%s</strong>."
+msgstr "<strong>%s</strong> の投稿を削除する権限がありません。"
 
-#: ..\..\..\admin\edit_actions.php:291
+#: ..\..\..\admin\edit_actions.php:287
 msgid "Deleting post..."
-msgstr "Suppression de l'article..."
+msgstr "投稿を削除しています..."
 
-#: ..\..\..\admin\edit_actions.php:306
+#: ..\..\..\admin\edit_actions.php:302
 msgid "Deleting Done..."
-msgstr "Suppression effectu�e..."
+msgstr "削除が完了しました..."
 
-#: ..\..\..\admin\edit_actions.php:327
+#: ..\..\..\admin\edit_actions.php:323
 msgid "Oops, no comment with this ID."
-msgstr "Oups, pas de commentaire avec cet Idx."
+msgstr "あれ、このIDのコメントはありません。"
 
-#: ..\..\..\admin\edit_actions.php:375
+#: ..\..\..\admin\edit_actions.php:371
 msgid "Cannot update comment, please correct these errors:"
-msgstr "Impossible de mettr � jour le commentaire; veuillez corriger les erreurs suivantes:"
+msgstr "コメントを更新できません。以下のエラーを修正してください。"
 
-#: ..\..\..\admin\edit_actions.php:399
+#: ..\..\..\admin\edit_actions.php:395
 msgid "Back to posts!"
-msgstr "Retour aux articles!"
+msgstr "投稿に戻る!"
 
-#: ..\..\..\admin\edit_actions.php:401
+#: ..\..\..\admin\edit_actions.php:397
 msgid "You may also want to generate static pages or view your blogs..."
-msgstr "Peut-�tre voudrez vous maintenant g�n�rer des pages statiques ou voir vos blogs..."
+msgstr "静的ページを作成するか blog を見るかしたいかもしれません。"
 
 #: ..\..\..\b2evocore\_blogs_form.php:5
 msgid "Create new blog!"
-msgstr "Cr�er le nouveau blog!"
+msgstr "新しいblog を作成する!"
 
 #: ..\..\..\b2evocore\_blogs_form.php:9
 msgid "Update blog!"
-msgstr "Mettre � jour le blog!"
+msgstr "blog を更新する!"
 
 #: ..\..\..\b2evocore\_blogs_form.php:18
 #: ..\..\..\b2evocore\_blogs_list.php:6
 msgid "Full Name"
-msgstr "Nom Complet"
+msgstr "フルネーム"
 
 #: ..\..\..\b2evocore\_blogs_form.php:23
 msgid "Short Name"
-msgstr "Nom Court"
+msgstr "短い名称"
 
 #: ..\..\..\b2evocore\_blogs_form.php:28
 msgid "Tagline"
-msgstr "Signature"
+msgstr "タグ行"
 
 #: ..\..\..\b2evocore\_blogs_form.php:30
 msgid "This is diplayed under the blog name on the blog template"
-msgstr "Affich�e sous le nom du blog sur le gabarit principal."
+msgstr "これはblogテンプレートでblog 名の下に表示されます"
 
 #: ..\..\..\b2evocore\_blogs_form.php:34
 msgid "Short Description"
-msgstr "Description courte"
+msgstr "短い説明"
 
 #: ..\..\..\b2evocore\_blogs_form.php:36
 msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
-msgstr "Utilis�e dans la balise meta de description et dans les flux RSS. PAS DE HTML!"
+msgstr "これは metaタグでのdescription や RSS フィードで使われます。HTML タグは書かないで! "
 
 #: ..\..\..\b2evocore\_blogs_form.php:40
 msgid "Keywords"
-msgstr "Mots clef"
+msgstr "キーワード"
 
 #: ..\..\..\b2evocore\_blogs_form.php:42
 msgid "This is is used in meta tag keywords. NO HTML!"
-msgstr "Utilis�e dans la balise meta de mots clefs. PAS DE HTML!"
+msgstr "これは metaタグでのキーワードに使われます。HTMLタグは書かないで!"
 
 #: ..\..\..\b2evocore\_blogs_form.php:46
 msgid "Long Description"
-msgstr "Description longue"
+msgstr "長い説明"
 
 #: ..\..\..\b2evocore\_blogs_form.php:48
 #: ..\..\..\b2evocore\_blogs_form.php:54
 msgid "This is displayed on the blog template."
-msgstr "Affich�e sur le gabarit principal."
+msgstr "これは blog テンプレートで表示されます。"
 
 #: ..\..\..\b2evocore\_blogs_form.php:58
 msgid "Main Language"
-msgstr "Langue Principale"
+msgstr "メインの言語"
 
 #: ..\..\..\b2evocore\_blogs_form.php:63
 msgid "Site URL"
-msgstr "URL du Site"
+msgstr "サイト URL"
 
 #: ..\..\..\b2evocore\_blogs_form.php:65
-msgid "This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live."
-msgstr "URL du r�pertoire dans lequel on trouve le <em>fichier Stub</em> et le <em>fichier Statique</em>."
+msgid ""
+"This is the URL to the directory where the <em>Stub filename</em> and "
+"<em>Static filename</em> files live."
+msgstr ""
+"これは <em>スタブ ファイル名</em>と<em>静的 ファイル名</em>のある"
+"ディレクトリへのURLです。" 
 
 #: ..\..\..\b2evocore\_blogs_form.php:69
 #: ..\..\..\b2evocore\_blogs_list.php:7
 msgid "Stub Filename"
-msgstr "Nom du fichier Stub"
+msgstr "スタブ ファイル名"
 
 #: ..\..\..\b2evocore\_blogs_form.php:71
-msgid "This is the <strong>file</strong>name of the main file (e-g: blog_b.php) used to display this blog. This is used mainly for static page generation, but setting this incorrectly may also cause navigation to fail."
-msgstr "Nom du <strong>fichier</strong> du fichier principal (par exemple: blog_b.php) servant � afficher ce blog. Ce nom de fichier est utilis� principalement pour la g�n�ration de la page statique, mais un mauvaus r�glage ici peut �galement entra�ner des erreurs dans la navigation."
+msgid ""
+"This is the <strong>file</strong>name of the main file (e-g: blog_b.php) "
+"used to display this blog. This is used mainly for static page generation, "
+"but setting this incorrectly may also cause navigation to fail."
+msgstr ""
+"これは、このblogを表示するのに用いられる メインファイル(例: blog_b.php)の"
+"<strong>ファイル</strong>名 です。"
+"これはおもに静的ページの生成におもに用いられますが、これを間違って設定すると"
+"ナビゲーションがうまくいかなくなるでしょう。"
 
 #: ..\..\..\b2evocore\_blogs_form.php:75
 msgid "Stub Urlname"
-msgstr "Nom du fichier Stub"
+msgstr "スタブ URL名"
 
 #: ..\..\..\b2evocore\_blogs_form.php:77
-msgid "This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used to display this blog. A typical setting would be setting this to your Filename without the .php extension, if your webserver supports this. <strong>If you are not sure how to set this, use the same as Stub Filename.</strong> This is used by permalinks, trackback, pingback, etc. Setting this incorrectly may cause these to fail."
-msgstr "Il s'agit du nom <strong>URL</strong> pour le fichier principal (par exemple: blog_b.php) utilis� pour afficher ce blog. Un param�trage typique consiste � entrer ici le nom du fichier principal sans l'extension .php, si votre serveur web sait g�rer cel�. <strong>Si vous n'�tes pas s�r de quoi entrer ici, entrez la m�me chose que dans le champ Nom dy fichier Stub.</strong>. Ce param�tre est utilis� pour les permaliens, les trackbacks, pingbacks, etc. Un mauvais param�trage emp�chera ces fonctions de fonctionner correctement."
+msgid ""
+"This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used "
+"to display this blog. A typical setting would be setting this to your "
+"Filename without the .php extension, if your webserver supports this. "
+"<strong>If you are not sure how to set this, use the same as Stub Filename.</"
+"strong> This is used by permalinks, trackback, pingback, etc. Setting this "
+"incorrectly may cause these to fail."
+msgstr ""
+"これは、このblogを表示するのに用いられる メインファイル(例: blog_b.php)の"
+"<strong>URL</strong>名 です。"
+"よくある設定では、Webサーバがサポートしていれば、"
+"ファイル名から .php 拡張子を除いたものへの設定となるでしょう。"
+"<strong>よくわからない場合はスタブファイル名と同じものを用いましょう。</strong>"
+"これは permalinkや、トラックバックやピングバックなどに用いられます。"
+"これを間違って設定すると今挙げたものがうまく機能しなくなるでしょう。"
 
 #: ..\..\..\b2evocore\_blogs_form.php:83
-msgid "This is the filename that will be used when you generate a static (.html) version of the blog homepage."
-msgstr "Il s'agit du nom du fichier qui sera utilis� lorsque vous g�n�rerez une version statique (.html) de la page d'accueil de votre blog."
+msgid ""
+"This is the filename that will be used when you generate a static (.html) "
+"version of the blog homepage."
+msgstr ""
+"これは静的(.htmlの)バージョンのblogホームページを生成するときに用いられる"
+"ファイル名です。"
 
 #: ..\..\..\b2evocore\_blogs_list.php:8
 msgid "Stub URLname"
-msgstr "Nom URL du fichier Stub"
+msgstr "スタブ URL名"
 
 #: ..\..\..\b2evocore\_blogs_list.php:9
 msgid "Static Filename"
-msgstr "Nom du fichier Statique"
+msgstr "静的ファイル名"
 
 #: ..\..\..\b2evocore\_blogs_list.php:10
 msgid "Lang"
-msgstr "Lang"
+msgstr "言語"
 
 #. TRANS: abbrev. for "generate !"
 #: ..\..\..\b2evocore\_blogs_list.php:25
 msgid "Gen!"
-msgstr "Gen!"
+msgstr "生成!"
 
 #: ..\..\..\b2evocore\_blogs_list.php:36
 msgid "Create new blog !"
-msgstr "Cr�er un nouveau blog !"
+msgstr "新規blogを作成!"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:113
 msgid "Tag <code>body</code> can only be used once!"
-msgstr "La balise <code>body</code> ne peut �tre utilis�e qu'une seule fois!"
+msgstr "タグ <code>body</code> は1度しか使えません!"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:126
 msgid "Illegal tag"
-msgstr "Balise interdite"
+msgstr "不正タグ"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:133
 #, php-format
 msgid "Tag %s must occur inside another tag"
-msgstr "La balise %s doit se trouver � l'int�rieur d'une autre balise"
+msgstr "タグ %s は別のタグ %s の内側に現れる必要があります"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:135
 #, php-format
 msgid "Tag %s is not allowed within tag %s"
-msgstr "La balise %s n'est pas autoris�e � l'int�rieur de la balise %s"
+msgstr "タグ %s は タグ %s の中では許されません"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:142
 #, php-format
 msgid "Tag %s may not have attribute %s"
-msgstr "La balise %s ne peut pas avoir d'attribut %s"
+msgstr "タグ %s は 属性 %s を持てません"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:150
 #, php-format
 msgid "%s attributes may not contain the %s protocol"
-msgstr "Le protocole %2$s n'est pas autoris� dans l'attibut %1$s"
+msgstr "%s 属性は %s プロトコルを含んではなりません"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:173
 #, php-format
 msgid "Tag %s may not contain raw character data"
-msgstr "La balise %s ne peut pas contenir de texte brut"
+msgstr "タグ %s は生の文字データを含んではなりません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:80
 #: ..\..\..\b2evocore\_class_pop3.php:88
 #: ..\..\..\b2evocore\_class_pop3.php:100
 msgid "POP3 connect:"
-msgstr "POP3 connect:"
+msgstr "POP3 接続:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:80
 msgid "No server specified"
-msgstr "Pas de serveur sp�cifi�"
+msgstr "サーバが指定されていません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:88
 #: ..\..\..\b2evocore\_class_pop3.php:100
@@ -1866,11 +1952,11 @@ msgstr "Pas de serveur sp�cifi�"
 #: ..\..\..\b2evocore\_class_pop3.php:552
 #: ..\..\..\b2evocore\_class_pop3.php:575
 msgid "Error "
-msgstr "Erreur"
+msgstr "エラー "
 
 #: ..\..\..\b2evocore\_class_pop3.php:108
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
-msgstr "POP3: NOOP OK pr�matur�, le serveur n'est pas conforme � la RFC 1939"
+msgstr "POP3: 早過ぎるNOOP OK、RFC1939に適合するサーバではありません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:118
 msgid "POP3 noop:"
@@ -1888,7 +1974,7 @@ msgstr "POP3 noop:"
 #: ..\..\..\b2evocore\_class_pop3.php:540
 #: ..\..\..\b2evocore\_class_pop3.php:608
 msgid "No connection to server"
-msgstr "Pas de connexion au serveur"
+msgstr "サーバへの接続がありません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:131
 #: ..\..\..\b2evocore\_class_pop3.php:134
@@ -1899,12 +1985,12 @@ msgstr "POP3 user:"
 #: ..\..\..\b2evocore\_class_pop3.php:131
 #: ..\..\..\b2evocore\_class_pop3.php:190
 msgid "No login ID submitted"
-msgstr "Aucun identifiant n'a �t� soumis"
+msgstr "login ID が送られていません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:134
 #: ..\..\..\b2evocore\_class_pop3.php:154
 msgid "connection not established"
-msgstr "connexion non �tablie"
+msgstr "接続が確立していません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:151
 #: ..\..\..\b2evocore\_class_pop3.php:154
@@ -1916,16 +2002,16 @@ msgstr "POP3 pass:"
 #: ..\..\..\b2evocore\_class_pop3.php:151
 #: ..\..\..\b2evocore\_class_pop3.php:193
 msgid "No password submitted"
-msgstr "Aucun mot de passe n'a �t� soumis"
+msgstr "パスワードが送られていません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:159
 msgid "authentication failed "
-msgstr "l'autentification a �chou�"
+msgstr "認証が失敗しました"
 
 #: ..\..\..\b2evocore\_class_pop3.php:168
 #: ..\..\..\b2evocore\_class_pop3.php:217
 msgid "NOOP failed. Server not RFC 1939 compliant"
-msgstr "NOOP � �chou�. Le serveur n'est pas conforme � la RFC 1939"
+msgstr "NOOP が失敗しました。サーバは RFC 1939 適合でありません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:184
 #: ..\..\..\b2evocore\_class_pop3.php:190
@@ -1937,18 +2023,17 @@ msgid "POP3 apop:"
 msgstr "POP3 apop:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:198
-#, fuzzy
 msgid "No server banner"
-msgstr "No server banner"
+msgstr "サーバーのバナーがありません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:198
 #: ..\..\..\b2evocore\_class_pop3.php:208
 msgid "abort"
-msgstr "abandon"
+msgstr "中断"
 
 #: ..\..\..\b2evocore\_class_pop3.php:208
 msgid "apop authentication failed"
-msgstr "l'authentification apop a �chou�"
+msgstr "apop 認証が失敗しました"
 
 #: ..\..\..\b2evocore\_class_pop3.php:233
 msgid "POP3 login:"
@@ -1968,7 +2053,7 @@ msgstr "POP3 pop_list:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:351
 msgid "Premature end of list"
-msgstr "Fin de liste pr�matur�e"
+msgstr "リストの中途で途切れました"
 
 #: ..\..\..\b2evocore\_class_pop3.php:374
 #: ..\..\..\b2evocore\_class_pop3.php:387
@@ -1992,7 +2077,7 @@ msgstr "POP3 send_cmd:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:483
 msgid "Empty command string"
-msgstr "Cha�ne de commande vide"
+msgstr "空のコマンド文字列"
 
 #: ..\..\..\b2evocore\_class_pop3.php:503
 msgid "POP3 quit:"
@@ -2000,7 +2085,7 @@ msgstr "POP3 quit:"
 
 #: ..\..\..\b2evocore\_class_pop3.php:503
 msgid "connection does not exist"
-msgstr "la connexion n'existe pas"
+msgstr "接続が存在しません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:540
 #: ..\..\..\b2evocore\_class_pop3.php:552
@@ -2014,622 +2099,608 @@ msgstr "POP3 uidl:"
 msgid "POP3 delete:"
 msgstr "POP3 delete:"
 
+
 #: ..\..\..\b2evocore\_class_pop3.php:613
 msgid "No msg number submitted"
-msgstr "Aucun num�ro de message n'a �t� soumis"
+msgstr "メッセージ番号が送られていません"
 
 #: ..\..\..\b2evocore\_class_pop3.php:619
 msgid "Command failed "
-msgstr "La commande a �chou�"
+msgstr "コマンドが失敗しました"
 
 #: ..\..\..\b2evocore\_edit_form.php:25
 #: ..\..\..\b2evocore\_edit_form.php:41
 msgid "Edit this !"
-msgstr "Enregistrer !"
+msgstr "これを編集!"
 
 #: ..\..\..\b2evocore\_edit_form.php:76
 #: ..\..\..\b2evocore\_quicktags.php:173
 msgid "Title"
-msgstr "Titre"
+msgstr "タイトル"
 
 #: ..\..\..\b2evocore\_edit_form.php:78
 msgid "Language"
-msgstr "Langue"
+msgstr "言語"
 
 #: ..\..\..\b2evocore\_edit_form.php:81
 msgid "Link to url"
-msgstr "Lien vers url"
+msgstr "URLへリンク"
 
 #: ..\..\..\b2evocore\_edit_form.php:103
 msgid "Auto-BR (converts line-breaks into &lt;br /&gt; tags)"
-msgstr "Auto-BR (convertit les retours � la ligne en balises &lt;br /&gt;)"
+msgstr "自動-BR (改行を&lt;br /&gt; タグへ変換)"
 
 #: ..\..\..\b2evocore\_edit_form.php:111
 msgid "Pingback the URLs in this post"
-msgstr "Envoyer un Pingback aux URLs contenues dans cet article"
+msgstr "このポスト中のURLにピングバックする"
 
 #: ..\..\..\b2evocore\_edit_form.php:118
 msgid "<strong>Trackback</strong> URLs (separate multiple URLs with space)"
-msgstr "Envoyer un <b>Trackback</b> aux URLs suivantes (separ�es par un espace)"
+msgstr "<strong>トラックバック</strong> URL (複数のURLは空白でわける）"
 
 #: ..\..\..\b2evocore\_edit_form.php:141
 msgid "Upload a file/image"
-msgstr "Charger un fichier/image"
+msgstr "ファイル/画像をアップロードする"
 
 #: ..\..\..\b2evocore\_edit_form.php:192
 #: ..\..\..\b2evocore\_edit_form.php:271
 #: ..\..\..\b2evocore\_edit_showposts.php:129
 msgid "Status"
-msgstr "Statut"
+msgstr "状態"
 
 #: ..\..\..\b2evocore\_edit_form.php:194
 msgid "Draft (Not published!)"
-msgstr "Brouillon (Non publi�!)"
+msgstr "ドラフト (公開されていません!)"
 
 #: ..\..\..\b2evocore\_edit_form.php:195
 #: ..\..\..\b2evocore\_edit_showposts.php:320
 msgid "Published"
-msgstr "Publi�"
+msgstr "公開"
 
 #: ..\..\..\b2evocore\_edit_form.php:204
-msgid "Select main category in target blog and optionnaly check addtionnal categories"
-msgstr "S�lectionnez la cat�gorie principale dans le blog cible; cochez �ventuellement des cat�gories additionnelles"
+msgid ""
+"Select main category in target blog and optionnaly check addtionnal "
+"categories"
+msgstr ""
+"ターゲットのblogでのメインのカテゴリを選んで、オプションで付加カテゴリを"
+"チェックしてください"
 
 #: ..\..\..\b2evocore\_edit_form.php:224
 msgid "Select as an additionnal category"
-msgstr "S�lectionner en tant que cat�gorie additionnelle"
+msgstr "付加カテゴリとして選択する"
 
 #: ..\..\..\b2evocore\_edit_form.php:236
 msgid "Select as MAIN category"
-msgstr "S�lectionner en tant que cat�gorie PRINCIPALE"
+msgstr "メインカテゴリとして選択する"
 
 #: ..\..\..\b2evocore\_edit_form.php:269
 msgid "Comment info"
-msgstr "Information sur ce commentaire"
+msgstr "コメント情報"
 
 #: ..\..\..\b2evocore\_edit_form.php:272
 msgid "IP address"
-msgstr "Adresse IP"
+msgstr "IPアドレス"
 
 #: ..\..\..\b2evocore\_edit_navbar.php:9
 #, php-format
 msgid "Previous %d"
-msgstr "%d pr�c�dents"
+msgstr "前の %d つ"
 
 #: ..\..\..\b2evocore\_edit_navbar.php:17
 #, php-format
 msgid "Next %d"
-msgstr "%d suivants"
+msgstr "次の %d つ"
 
 #. TRANS: x TO y OF z
 #: ..\..\..\b2evocore\_edit_navbar.php:29
 msgid " to "
-msgstr " � "
+msgstr " から "
 
 #. TRANS: x TO y OF z
 #: ..\..\..\b2evocore\_edit_navbar.php:31
 msgid " of "
-msgstr " parmi "
+msgstr " 全体は "
 
 #: ..\..\..\b2evocore\_edit_navbar.php:37
 msgid "from the end"
-msgstr "� partir de la fin"
+msgstr "おわりから"
 
 #: ..\..\..\b2evocore\_edit_navbar.php:41
 msgid "from the start"
-msgstr "� partir du d�but"
+msgstr "はじめから"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:69
 msgid " Date range: "
-msgstr " Plage de dates: "
+msgstr " 日付の範囲: "
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\b2evocore\_edit_showposts.php:119
 msgid "by"
-msgstr "par"
+msgstr "著者:"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\b2evocore\_edit_showposts.php:125
 msgid "in"
-msgstr "dans"
+msgstr "カテゴリ:"
 
 #. TRANS: Edit button text (&nbsp; for extra space)
 #: ..\..\..\b2evocore\_edit_showposts.php:154
 #: ..\..\..\b2evocore\_edit_showposts.php:204
 msgid "&nbsp; Edit &nbsp;"
-msgstr "&nbsp; Editer &nbsp;"
+msgstr "&nbsp; 編集 &nbsp;"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:157
 msgid ""
-"You are about to delete this post!\\n"
-"\\'Cancel\\' to stop, \\'OK\\' to delete."
+"You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
+"delete."
 msgstr ""
-"Vous �tes sur le point de supprimer cet article!\\n"
-"\\'Annuler\\' pour arr�ter, \\'OK\\' pour supprimer."
+"この投稿を削除しようとしています!中止する場合は \\n\\'キャンセル\\' を。"
+"削除の場合は \\'OK\\' を。"
 
 #. TRANS: Link to comments for current post
 #: ..\..\..\b2evocore\_edit_showposts.php:162
 msgid "no comment"
-msgstr "pas de commentaire"
+msgstr "コメントがありません"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:162
+#: ..\..\..\b2evocore\_functions_trackback.php:150
 msgid "1 comment"
-msgstr "1 commentaire"
+msgstr "1 コメント"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:162
+#: ..\..\..\b2evocore\_functions_trackback.php:151
 #, php-format
 msgid "% comments"
-msgstr "% commentaires"
+msgstr "% コメント"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:163
 msgid "1 Trackback"
-msgstr "1 Trackback"
+msgstr "1 トラックバック"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:163
 msgid "% Trackbacks"
-msgstr "% Trackbacks"
+msgstr "% トラックバック"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:164
 msgid "1 Pingback"
-msgstr "1 Pingback"
+msgstr "1 ピングバック"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:164
 msgid "% Pingbacks"
-msgstr "% Pingbacks"
+msgstr "% ピングバック"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:166
 msgid "Permanent link to this post"
-msgstr "Lien permanent vers cet article"
+msgstr "この投稿への永続的リンク"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:166
 msgid "Permalink"
-msgstr "Permalien"
+msgstr "Permalink"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:207
 msgid ""
-"You are about to delete this comment!\\n"
-"\\'Cancel\\' to stop, \\'OK\\' to delete."
+"You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
+"delete."
 msgstr ""
-"Vous �tes sur le point de supprimer ce commentaire!\\n"
-"\\'Annuler\\' pour arr�ter, \\'OK\\' pour supprimer."
+"このコメントを削除しようとしています!中止する場合は \\n\\'キャンセル\\' を。"
+"削除の場合は \\'OK\\' を。"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:220
 msgid "Error: please fill the required fields (name & comment)"
-msgstr "Erreur: veuillez remplir les champs obligatoires (nom & commentaire)"
+msgstr "エラー: 必要なフィールド(名前とコメント)を埋めてください"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:223
 msgid "Leave a comment"
-msgstr "Laisser un commentaire"
+msgstr "コメントを残す"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:261
 msgid "(Line breaks become &lt;br&gt;)"
-msgstr "(Les retours � la ligne deviennent des  &lt;br /&gt;)"
+msgstr "（改行は &lt;br&gt; になります)"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:268
 msgid "Send comment"
-msgstr "Envoyer commentaire"
+msgstr "コメントを送る"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:312
 msgid "Posts to show"
-msgstr "Voir les articles"
+msgstr "見る投稿"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:314
 msgid "Past"
-msgstr "Pass�"
+msgstr "過去"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:315
 msgid "Future"
-msgstr "Futur"
+msgstr "未来"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:319
 msgid "Draft"
-msgstr "Brouillon"
+msgstr "ドラフト"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:326
 msgid "Title / Text contains"
-msgstr "Mots du titre ou du texte"
+msgstr "タイトル／テキスト が含んでいる"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:330
 msgid "Words"
-msgstr "Mots"
+msgstr "語"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:330
 msgid "AND"
-msgstr "ET"
+msgstr "AND"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:331
 msgid "OR"
-msgstr "OU"
+msgstr "OR"
 
 #: ..\..\..\b2evocore\_edit_showposts.php:489
 msgid "Reset"
-msgstr "R.A.Z."
+msgstr "リセット"
 
 #: ..\..\..\b2evocore\_footer.php:6
 #, php-format
 msgid "<p>%d queries - %01.3f seconds</p>"
-msgstr "<p>%d requ�tes - %01.3f secondes</p>"
+msgstr "<p>%d 回の問い合わせ - %01.3f 秒</p>"
 
 #: ..\..\..\b2evocore\_footer.php:10
 msgid "GPL License"
-msgstr "Licence GPL"
+msgstr "GPL ライセンス"
 
 #: ..\..\..\b2evocore\_functions.php:36
 msgid "Can't connect to the database server. MySQL said:"
-msgstr "Impossible de se connecter au SGBD. R�ponse MySQL:"
+msgstr ""
 
 #: ..\..\..\b2evocore\_functions.php:38
 #, php-format
 msgid "Can't connect to the database %s. MySQL said:"
-msgstr "Impossible de se connecter � la base de donn�es %s. R�ponse MySQL:"
+msgstr "データベース %s に接続できません。MySQL によると:"
 
 #: ..\..\..\b2evocore\_functions.php:49
 msgid "Oops, MySQL error!"
-msgstr "Oups, erreur MySQL!"
+msgstr "あれ、MySQL エラー!"
 
-#: ..\..\..\b2evocore\_functions.php:578
+#: ..\..\..\b2evocore\_functions.php:594
 msgid "go back"
-msgstr "retour"
+msgstr "戻る"
 
-#: ..\..\..\b2evocore\_functions.php:608
+#: ..\..\..\b2evocore\_functions.php:624
 msgid "Redirecting you to:"
-msgstr "Redirection vers:"
+msgstr "次のところへリダイレクト:"
 
-#: ..\..\..\b2evocore\_functions.php:610
+#: ..\..\..\b2evocore\_functions.php:626
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
-msgstr "Si rien ne se passe, cliquez <a %s>ici</a>."
+msgstr "もし何もおきなければ、<a %s>ここ</a> をクリック。"
 
-#: ..\..\..\b2evocore\_functions.php:896
-#: ..\..\..\b2evocore\_functions.php:976
+#: ..\..\..\b2evocore\_functions.php:912
 #, php-format
 msgid "Parameter %s is required!"
-msgstr "La param�tre %s est requis!"
+msgstr "パラメータ %s が必要です"
 
 #: ..\..\..\b2evocore\_functions_blogs.php:241
 msgid "Requested blog does not exist!"
-msgstr "Le blog demand� n'existe pas!"
+msgstr "要求された blog が存在しません!"
 
-#  TRANS: this is the default text for the extended post "more" link
 #. TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\b2evocore\_functions_bposts.php:310
 msgid "Read more!"
-msgstr "Lire la suite!"
+msgstr "もっと読む!"
 
 #. TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\b2evocore\_functions_bposts.php:315
 msgid "More:"
-msgstr "Suite:"
+msgstr "さらに:"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:480
 msgid "Post details"
-msgstr "Article complet"
+msgstr "投稿の詳細"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:531
 msgid "Next page"
-msgstr "Page suivante"
+msgstr "次のページ"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:532
 msgid "Previous page"
-msgstr "Page pr�c�dente"
+msgstr "前のページ"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:573
 msgid "Previous post"
-msgstr "Article pr�c�dent"
+msgstr "前の投稿"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:626
 msgid "Next post"
-msgstr "Article suivant"
+msgstr "次の投稿"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:719
 msgid "Next Page"
-msgstr "Page suivante"
+msgstr "次のページ"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:746
 msgid "Previous Page"
-msgstr "Page Pr�c�dente"
+msgstr "前のページ"
 
 #: ..\..\..\b2evocore\_functions_cats.php:95
 msgid "Cannot delete if there are sub-categories!"
-msgstr "Impossible de supprimer s'il y a des sous-cat�gories!"
+msgstr "サブカテゴリがあると削除できません"
 
 #: ..\..\..\b2evocore\_functions_cats.php:146
 msgid "Cannot delete last category if there are posts inside!"
-msgstr "Impossible de supprimer la derni�re cat�gorie si elle contient des articles!"
+msgstr "投稿があると最後のカテゴリは削除できません"
 
 #: ..\..\..\b2evocore\_functions_cats.php:252
 #, php-format
 msgid "Requested category %s does not exist!"
-msgstr "La cat�gorie demand�e %s n'existe pas"
+msgstr "要求されたカテゴリ %s は存在しません"
 
 #. TRANS: When the categories for a specific post are displayed, the user can click
 #. on these cats to browse them, this is the default href title displayed there
 #: ..\..\..\b2evocore\_functions_cats.php:616
 msgid "Browse category"
-msgstr "Afficher cette cat�gorie"
+msgstr "カテゴリを見る"
 
 #: ..\..\..\b2evocore\_functions_comments.php:149
-#: ..\..\..\b2evocore\_functions_trackback.php:149
 msgid "Trackback (0)"
-msgstr "Trackback (0)"
+msgstr "トラックバック (0)"
 
 #: ..\..\..\b2evocore\_functions_comments.php:150
-#: ..\..\..\b2evocore\_functions_trackback.php:150
 msgid "Trackback (1)"
-msgstr "Trackback (1)"
+msgstr "トラックバック (1)"
 
 #: ..\..\..\b2evocore\_functions_comments.php:151
 msgid "Trackbacks (%)"
-msgstr "Trackbacks (%)"
+msgstr "トラックバック (%)"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:64
 msgid "bad char in User Agent"
-msgstr "Caract�re invalide dans le User Agent"
+msgstr "User Agent に不正文字"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:93
 #: ..\..\..\b2evocore\_functions_hitlogs.php:104
 #: ..\..\..\b2evocore\_functions_hitlogs.php:113
 #: ..\..\..\b2evocore\_functions_hitlogs.php:129
 msgid "referer ignored"
-msgstr "r�f�rent ignor�"
+msgstr "リファラを無視"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:93
 msgid "robot"
-msgstr "robot"
+msgstr "ロボット"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:104
 msgid "invalid"
-msgstr "invalide"
+msgstr "無効"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:113
 msgid "BlackList"
-msgstr "Liste Noire"
+msgstr "ブラックリスト"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:129
 msgid "search engine"
-msgstr "moteur de recherche"
+msgstr "検索エンジン"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:140
 msgid "loading referering page"
-msgstr "chargement de la page r�f�rente"
+msgstr "参照しているページをロードします"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:159
 msgid "found current url in page"
-msgstr "URL courante trouv�e dans la page"
+msgstr "ページ中に今のURLをみつけました"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:410
 msgid "not a query - no params!"
-msgstr "pas une requ�te - pas de param�tres!"
+msgstr "問い合わせでない - パラメータがありません"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:435
 msgid "no query string found"
-msgstr "cha�ne de recherche non trouv�e"
+msgstr "問い合わせ文字列がみつかりません"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:23
 msgid "Sending pingbacks..."
-msgstr "Envoi des pingbacks..."
+msgstr "ピングバックを送信中..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:28
 msgid "No pingback to be done."
-msgstr "Pas de pingbacks � envoyer."
+msgstr "送信すべきピングバックがありません。"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:34
 msgid "BEGIN"
-msgstr "DEBUT"
+msgstr "BEGIN"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:61
 msgid "Post contents"
-msgstr "Contenu de l'article"
+msgstr "コンテンツを投稿"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:85
 #: ..\..\..\b2evocore\_functions_pingback.php:86
 msgid "Processing:"
-msgstr "Traitement en cours:"
+msgstr "処理中:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:90
 #: ..\..\..\b2evocore\_functions_pingback.php:91
 msgid "Couldn't find a hostname for:"
-msgstr "Impossible de trouver un nom de machine pour:"
+msgstr "ホスト名がみつかりませんでした:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:105
 msgid "Connect to server at:"
-msgstr "Connexion au serveur:"
+msgstr "サーバに接続:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:108
 #: ..\..\..\b2evocore\_functions_pingback.php:109
 msgid "Couldn't open a connection to:"
-msgstr "Impossible d'ouvrir une connexion vers:"
+msgstr "接続を開くことができませんでした"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:119
 msgid "Start receiving headers and content"
-msgstr "D�but de la r�ception des ent�tes et du contenu"
+msgstr "ヘッダとコンテンツの受信を開始"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:149
 #: ..\..\..\b2evocore\_functions_pingback.php:150
 msgid "Pingback server found from X-Pingback header:"
-msgstr "Serveur de pingback trouv� dans l'ent�te X-Pingback:"
+msgstr "ピングバックサーバが X-Pingback ヘッダからみつかりました:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:163
 #: ..\..\..\b2evocore\_functions_pingback.php:164
 msgid "Pingback server found from Pingback <link /> tag:"
-msgstr "Serveur de pingback trouv� dans balise <link />:"
+msgstr "ピングバックサーバが <link />タグからみつかりました"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:172
 #: ..\..\..\b2evocore\_functions_pingback.php:173
 msgid "Pingback server not found in headers and content"
-msgstr "Serveur de pingback introuvable dans les ent�tes et le contenu"
+msgstr "ピングバックサーバがヘッダからもコンテンツからもみつかりませんでした"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:178
 #: ..\..\..\b2evocore\_functions_pingback.php:179
 msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
-msgstr "L'URL du serveur de pingback est vide (peut �tre une erreur fgets interne � PHP)"
+msgstr "ピングバックサーバURLが空です(PHPの fgets について内部エラーかもしれません)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:184
 msgid "Pingback server data"
-msgstr "Donn�es du serveur de pingback"
+msgstr "ピングバックサーバデータ"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:202
 #: ..\..\..\b2evocore\_functions_pingback.php:203
 msgid "Page Linked To:"
-msgstr "Lien vers la page:"
+msgstr "ページのリンク先:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:204
 #: ..\..\..\b2evocore\_functions_pingback.php:205
 msgid "Page Linked From:"
-msgstr "Lien depuis la page:"
+msgstr "ページのリンク元:"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:210
 #, php-format
 msgid "Pinging %s..."
-msgstr "Ping de %s..."
+msgstr "%s へピング..."
 
 #: ..\..\..\b2evocore\_functions_pingback.php:220
 msgid "END"
-msgstr "FIN"
+msgstr "END"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:222
 msgid "Pingbacks done."
-msgstr "Pingbacks effectu�s."
+msgstr "ピングバック完了。"
 
-#: ..\..\..\b2evocore\_functions_pingback.php:244
-msgid "Pingback (0)"
-msgstr "Pingback (0)"
-
-#: ..\..\..\b2evocore\_functions_pingback.php:245
-msgid "Pingback (1)"
-msgstr "Pingback (1)"
-
-#: ..\..\..\b2evocore\_functions_pingback.php:246
-msgid "Pingback (%)"
-msgstr "Pingbacks (%)"
-
-#: ..\..\..\b2evocore\_functions_pings.php:24
-msgid "Pinging b2evolution.net..."
-msgstr "Ping de b2evolution.net..."
-
-#: ..\..\..\b2evocore\_functions_pings.php:40
-#: ..\..\..\b2evocore\_functions_pings.php:73
-#: ..\..\..\b2evocore\_functions_pings.php:100
-#: ..\..\..\b2evocore\_functions_pings.php:127
-#: ..\..\..\b2evocore\_functions_pings.php:171
-msgid "Aborted (Running on localhost)."
-msgstr "Abandon (le serveur tourne sur localhost)."
-
-#: ..\..\..\b2evocore\_functions_pings.php:59
+#: ..\..\..\b2evocore\_functions_pings.php:26
 msgid "Pinging Weblogs.com..."
-msgstr "Ping de Weblogs.com..."
+msgstr "Weblogs.com へ ping中..."
 
-#: ..\..\..\b2evocore\_functions_pings.php:89
+#: ..\..\..\b2evocore\_functions_pings.php:38
+#: ..\..\..\b2evocore\_functions_pings.php:65
+#: ..\..\..\b2evocore\_functions_pings.php:92
+#: ..\..\..\b2evocore\_functions_pings.php:136
+msgid "Aborted (Running on localhost)."
+msgstr "中断しました（localhost で動作)。"
+
+#: ..\..\..\b2evocore\_functions_pings.php:54
 msgid "Pinging Weblogs.com/rssUpdates..."
-msgstr "Ping de Weblogs.com/rssUpdates..."
+msgstr "Weblogs.com/rssUpdates へ ping中..."
 
-#: ..\..\..\b2evocore\_functions_pings.php:116
+#: ..\..\..\b2evocore\_functions_pings.php:81
 msgid "Pinging Cafelog.com..."
-msgstr "Ping de Cafelog.com..."
+msgstr "Cafelog.com へ ping中..."
 
-#: ..\..\..\b2evocore\_functions_pings.php:145
+#: ..\..\..\b2evocore\_functions_pings.php:110
 msgid "Pinging Blo.gs..."
-msgstr "Ping de Blo.gs..."
+msgstr "Blo.gs へ ping中..."
 
 #: ..\..\..\b2evocore\_functions_template.php:84
 msgid "Archives for"
-msgstr "Archives pour"
+msgstr "アーカイブ"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:22
 msgid "Sending trackbacks..."
-msgstr "Envoi des trackbacks..."
+msgstr "トラックバックを送信中..."
 
 #: ..\..\..\b2evocore\_functions_trackback.php:25
 msgid "No trackback to be sent."
-msgstr "Pas de trackback � envoyer."
+msgstr "送信すべきトラックバックはありません"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:31
 msgid "Excerpt to be sent:"
-msgstr "Extrait � envoyer:"
+msgstr "送信する抜粋"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:39
 msgid "Trackbacks done."
-msgstr "Trackbacks effectu�s."
+msgstr "トラックバック完了。"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:53
 msgid "Sending trackback to:"
-msgstr "Envoi d'un trackaback �:"
+msgstr "トラックバックを次のところに送ります"
 
 #: ..\..\..\b2evocore\_functions_trackback.php:109
 msgid "Response:"
-msgstr "R�ponse:"
+msgstr "応答:"
 
-#: ..\..\..\b2evocore\_functions_trackback.php:151
-msgid "Trackback (%)"
-msgstr "Trackbacks (%)"
+#: ..\..\..\b2evocore\_functions_trackback.php:149
+msgid "Leave a comment..."
+msgstr "コメントを残す..."
 
 #: ..\..\..\b2evocore\_menutop.php:87
 msgid "logged in as:"
-msgstr "Connect� sous:"
+msgstr "次のユーザ名でlogin:"
 
 #: ..\..\..\b2evocore\_menutop.php:100
 msgid "New Post"
-msgstr "Poster"
+msgstr "新規投稿"
 
 #: ..\..\..\b2evocore\_menutop.php:102
 msgid "Browse/Edit"
-msgstr "Parcourir"
+msgstr "閲覧/編集"
 
 #: ..\..\..\b2evocore\_menutop.php:106
 msgid "Stats"
-msgstr "Stats"
+msgstr "統計"
 
 #: ..\..\..\b2evocore\_menutop.php:111
 msgid "Cats"
-msgstr "Cats"
+msgstr "カテゴリ"
 
 #: ..\..\..\b2evocore\_menutop.php:126
 msgid "Templates"
-msgstr "Gabarits"
+msgstr "テンプレート"
 
 #: ..\..\..\b2evocore\_menutop.php:129
 #: ..\..\..\locales\puttenv.php:18
 #: ..\..\..\locales\puttenv.php:23
 #: ..\..\..\locales\puttenv.php:29
 msgid "Users"
-msgstr "Utilisateurs"
+msgstr "ユーザ"
 
 #: ..\..\..\b2evocore\_menutop.php:131
 msgid "My Profile"
-msgstr "Mon Profil"
+msgstr "プロフィール"
 
 #: ..\..\..\b2evocore\_menutop.php:137
 msgid "Exit to blogs"
-msgstr "Retour aux blogs"
+msgstr "blogに抜ける"
 
 #: ..\..\..\b2evocore\_menutop.php:139
 msgid "Logout"
-msgstr "D�connexion"
+msgstr "ログアウト"
 
 #: ..\..\..\b2evocore\_quicktags.php:165
 msgid "ALTernate text"
-msgstr "Texte ALTernatif"
+msgstr "代わりのテキスト"
 
 #. TRANS: Default title when inserting links into post
 #: ..\..\..\b2evocore\_quicktags.php:174
 msgid "External - English"
-msgstr "Externe - Anglais"
+msgstr "外部 - 日本語"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "INSerted [Alt-I]"
-msgstr "Texte rajout� [Alt-I]"
+msgstr "INSerted [Alt-I]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "DELeted [Alt-D]"
-msgstr "Texte retir� [Alt-D]"
+msgstr "DELeted [Alt-D]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "STRong [Alt-S]"
-msgstr "Marquage Fort [Alt-S]"
+msgstr "STRong [Alt-S]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "EMphasis [Alt-E]"
-msgstr "Marquage (italique) [Alt-E]"
+msgstr "EMphasis [Alt-E]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "CODE [Alt-C]"
@@ -2637,19 +2708,19 @@ msgstr "CODE [Alt-C]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "Paragraph [Alt-P]"
-msgstr "Paragraphe [Alt-P]"
+msgstr "Paragraph [Alt-P]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "Unordered List [Alt-U]"
-msgstr "Liste non ordonn�e [Alt-U]"
+msgstr "Unordered List [Alt-U]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "List Item [Alt-L]"
-msgstr "Element de Liste [Alt-L]"
+msgstr "List Item [Alt-L]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "BLOCKQUOTE [Alt-B]"
-msgstr "Bloc Citation [Alt-B]"
+msgstr "BLOCKQUOTE [Alt-B]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "IMaGe [Alt-G]"
@@ -2661,201 +2732,196 @@ msgstr "A href [Alt-A]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "Close all tags"
-msgstr "Fermer toutes les balises"
+msgstr "Close all tags"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "More [Alt-M]"
-msgstr "Suite [Alt-M]"
+msgstr "More [Alt-M]"
 
 #: ..\..\..\b2evocore\_quicktags.php:195
 msgid "no teaser [Alt-T]"
-msgstr "pas de teaser [Alt-T]"
+msgstr "no teaser [Alt-T]"
 
 #: ..\..\..\b2evocore\_vars.php:123
 msgid "Sunday"
-msgstr "Dimanche"
+msgstr "日曜日"
 
 #: ..\..\..\b2evocore\_vars.php:124
 msgid "Monday"
-msgstr "Lundi"
+msgstr "月曜日"
 
 #: ..\..\..\b2evocore\_vars.php:125
 msgid "Tuesday"
-msgstr "Mardi"
+msgstr "火曜日"
 
 #: ..\..\..\b2evocore\_vars.php:126
 msgid "Wednesday"
-msgstr "Mercredi"
+msgstr "水曜日"
 
 #: ..\..\..\b2evocore\_vars.php:127
 msgid "Thursday"
-msgstr "Jeudi"
+msgstr "木曜日"
 
 #: ..\..\..\b2evocore\_vars.php:128
 msgid "Friday"
-msgstr "Vendredi"
+msgstr "金曜日"
 
 #: ..\..\..\b2evocore\_vars.php:129
 msgid "Saturday"
-msgstr "Samedi"
+msgstr "土曜日"
 
 #: ..\..\..\b2evocore\_vars.php:132
 msgid "January"
-msgstr "Janvier"
+msgstr "1月"
 
 #: ..\..\..\b2evocore\_vars.php:133
 msgid "February"
-msgstr "F�vrier"
+msgstr "2月"
 
 #: ..\..\..\b2evocore\_vars.php:134
 msgid "March"
-msgstr "Mars"
+msgstr "3月"
 
 #: ..\..\..\b2evocore\_vars.php:135
 msgid "April"
-msgstr "Avril"
+msgstr "4月"
 
 #: ..\..\..\b2evocore\_vars.php:136
 msgid "May"
-msgstr "Mai"
+msgstr "5月"
 
 #: ..\..\..\b2evocore\_vars.php:137
 msgid "June"
-msgstr "Juin"
+msgstr "6月"
 
 #: ..\..\..\b2evocore\_vars.php:138
 msgid "July"
-msgstr "Juillet"
+msgstr "7月"
 
 #: ..\..\..\b2evocore\_vars.php:139
 msgid "August"
-msgstr "Ao�t"
+msgstr "8月"
 
 #: ..\..\..\b2evocore\_vars.php:140
 msgid "September"
-msgstr "Septembre"
+msgstr "9月"
 
 #: ..\..\..\b2evocore\_vars.php:141
 msgid "October"
-msgstr "Octobre"
+msgstr "10月"
 
 #: ..\..\..\b2evocore\_vars.php:142
 msgid "November"
-msgstr "Novembre"
+msgstr "11月"
 
 #: ..\..\..\b2evocore\_vars.php:143
 msgid "December"
-msgstr "D�cembre"
+msgstr "12月"
 
 #: ..\..\..\b2evocore\_verifauth.php:30
 msgid "You must log in!"
-msgstr "Vous devez vous identifier!"
+msgstr "ログインしていないとだめです!"
 
 #: ..\..\..\b2evocore\_verifauth.php:45
 msgid "login no longer exists"
-msgstr "Ce login n'existe plus"
+msgstr "login 名はもう存在していません"
 
 #: ..\..\..\b2evocore\_verifauth.php:55
 msgid "login/password no longer valid"
-msgstr "Ce login/mot de passe n'est plus valide"
+msgstr "login 名/password がもう有効ではありません"
 
 #: ..\..\..\conf\b2evo_locale.php:12
 msgid "English"
-msgstr "Anglais"
+msgstr "英語"
 
 #: ..\..\..\conf\b2evo_locale.php:13
 msgid "French"
-msgstr "Fran�ais"
+msgstr "フランス語"
 
 #: ..\..\..\conf\b2evo_locale.php:14
-msgid "Japanese"
-msgstr "Japonais"
+msgid "Dutch"
+msgstr "ドイツ語"
 
 #: ..\..\..\conf\b2evo_locale.php:15
-msgid "Dutch"
-msgstr "N�erlandais"
-
-#: ..\..\..\conf\b2evo_locale.php:16
-msgid "Portuguese"
-msgstr "Portuguais"
-
-#: ..\..\..\conf\b2evo_locale.php:17
 msgid "Swedish"
-msgstr "Su�dois"
+msgstr "スウェーデン語"
+
+#
+msgid "Japanese"
+msgstr "日本語"
 
 #: ..\..\..\htsrv\comment_post.php:40
 msgid "Please fill in the name field"
-msgstr "Veuillez remplir le champ nom"
+msgstr "名前のフィールドを埋めてください"
 
 #: ..\..\..\htsrv\comment_post.php:44
 msgid "Please fill in the email field"
-msgstr "Veuillez remplir le champ email"
+msgstr "メールのフィールドを埋めてください"
 
 #: ..\..\..\htsrv\comment_post.php:48
 msgid "Supplied email address is invalid"
-msgstr "L'adresse email fournie n'est pas valide"
+msgstr "頂いたメールアドレスは無効です"
 
 #: ..\..\..\htsrv\comment_post.php:56
 msgid "Supplied URL is invalid"
-msgstr "L'URL fournie est invalide"
+msgstr "頂いたURLは無効です"
 
 #: ..\..\..\htsrv\comment_post.php:95
 msgid "You can only post a new comment every 30 seconds."
-msgstr "Vous ne pouvez soumettre un nouveau commentaire qu'une fois toutes les 30 secondes."
+msgstr "30秒ごとにしか新しいコメントは投稿できません。"
 
 #: ..\..\..\htsrv\comment_post.php:98
 msgid "Cannot post comment, please correct these errors:"
-msgstr "Impossible d'enregistrer ce commentaire; veuillez corriger les erreurs suivantes:"
+msgstr "コメント投稿できません。以下のエラーを修正して下さい:"
 
 #: ..\..\..\htsrv\comment_post.php:99
 msgid "Back to comment editing"
-msgstr "Retour � l'�dition du commentaire"
+msgstr "コメント編集に戻る"
 
 #: ..\..\..\htsrv\comment_post.php:114
 #: ..\..\..\htsrv\comment_post.php:119
 #, php-format
 msgid "New comment on your post #%d \"%s\""
-msgstr "Nouveau commentaire sur votre article n�%d \"%s\""
+msgstr "あなたの投稿 #%d \"%s\" に新しいコメントです"
 
 #: ..\..\..\htsrv\comment_post.php:121
 msgid "Author"
-msgstr "Auteur"
+msgstr "著者"
 
 #: ..\..\..\htsrv\comment_post.php:123
 #: ..\..\..\htsrv\trackback.php:90
-#: ..\..\..\xmlsrv\xmlrpc.php:1232
+#: ..\..\..\xmlsrv\xmlrpc.php:1163
 msgid "Url"
-msgstr "Url"
+msgstr "URL"
 
 #: ..\..\..\htsrv\comment_post.php:124
 msgid "Comment"
-msgstr "Commentaire"
+msgstr "コメント"
 
 #: ..\..\..\htsrv\trackback.php:83
 #: ..\..\..\htsrv\trackback.php:87
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
-msgstr "Nouveau trackback sur votre article n�%d \"%s\""
+msgstr "あなたの投稿 #%d \"%s\" に新しいトラックバックです"
 
 #: ..\..\..\htsrv\trackback.php:89
-#: ..\..\..\xmlsrv\xmlrpc.php:1231
+#: ..\..\..\xmlsrv\xmlrpc.php:1162
 msgid "Website"
-msgstr "Site web"
+msgstr "Webサイト"
 
 #: ..\..\..\htsrv\trackback.php:91
-#: ..\..\..\xmlsrv\xmlrpc.php:1233
+#: ..\..\..\xmlsrv\xmlrpc.php:1164
 msgid "Excerpt"
-msgstr "Extrait"
+msgstr "抜粋"
 
 #: ..\..\..\xmlsrv\rdf.php:42
 #: ..\..\..\xmlsrv\rss.php:28
 #: ..\..\..\xmlsrv\rss2.php:35
 msgid "[...] Read more!"
-msgstr "[...] Lire la suite!"
+msgstr "[...] Read more!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1225
-#: ..\..\..\xmlsrv\xmlrpc.php:1229
+#: ..\..\..\xmlsrv\xmlrpc.php:1156
+#: ..\..\..\xmlsrv\xmlrpc.php:1160
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
-msgstr "Nouveau pingback sur votre article n�%d \"%s\""
-
+msgstr "あなたの投稿 #%d \"%s\" に新しいピングバックです"

@@ -11,7 +11,9 @@ require_once (dirname(__FILE__)."/../$pathcore/_functions_locale.php");
 $languages = array(
 	'en' => N_('English'),
 	'fr' => N_('French'),
+	'ja' => N_('Japanese'),
 	'nl' => N_('Dutch'),
+	'pt' => N_('Portuguese'),
 	'sv' => N_('Swedish'),
 	);
 
@@ -39,14 +41,19 @@ $locales = array(
 									'datefmt' => 'd-m-y',
 									'timefmt' => 'H:i:s',	
 								),
-	'sv_SE' => array( // Sweedish, SWEDEN	
-									'charset' => 'iso-8859-1',
-									'datefmt' => 'y-m-d',
-									'timefmt' => 'H:i:s',	
+	'ja_JP' => array(	// Japanese
+									'charset' => 'utf-8',
+									'datefmt' => 'Y/m/d',
+									'timefmt' => 'H:i:s',
 								),
 	'pt_BR' => array(	// Portuguese, BRAZIL
 									'charset' => 'iso-8859-1',
 									'datefmt' => 'd/m/y',
+									'timefmt' => 'H:i:s',	
+								),
+	'sv_SE' => array( // Sweedish, SWEDEN	
+									'charset' => 'iso-8859-1',
+									'datefmt' => 'y-m-d',
 									'timefmt' => 'H:i:s',	
 								),
 );
