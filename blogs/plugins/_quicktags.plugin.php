@@ -47,11 +47,6 @@ class quicktags_plugin extends Plugin
 	{
 		global $is_lynx;
 
-		if( !$this->display )
-		{	// We don't want to show this toolbar
-			return false;
-		}
-
 		if($is_lynx)	
 		{	// let's deactivate quicktags on Lynx, because they don't work there.
 			return false;

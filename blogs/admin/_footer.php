@@ -24,7 +24,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 <?php
 // CALL PLUGINS NOW:
-$Plug->call_plugins( 'AdminAfterPageFooter', array() );
+$Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
 
 if( $admin_tab == 'files' || ($admin_tab == 'blogs' && $tab == 'perm') )

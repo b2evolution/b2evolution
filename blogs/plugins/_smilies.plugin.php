@@ -92,11 +92,6 @@ class smilies_plugin extends Plugin
 	 */
 	function DisplayToolbar( & $params )
 	{
-		if( !$this->display )
-		{	// We don't want to show this toolbar
-			return false;
-		}
-
 		$grins = '';
 		$smiled = array();
 		foreach( $this->smilies as $smiley => $grin )

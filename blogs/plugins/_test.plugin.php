@@ -43,7 +43,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = 'CVS Rev: $Revision$';
+	var $version = 'CVS $Revision$';
 	var $author = 'François PLANQUE';
 	var $help_url = 'http://b2evolution.net/';
 	var $is_tool = true;
@@ -106,11 +106,6 @@ class test_plugin extends Plugin
 	 */
 	function DisplayToolbar( & $params )
 	{
-		if( !$this->display )
-		{	// We don't want to show this toolbar
-			return false;
-		}
-
 		echo '<div class="edit_toolbar">This is the TEST Toolbar</div>';
 
 		return true;

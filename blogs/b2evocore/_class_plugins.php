@@ -1,14 +1,36 @@
 <?php
 /**
- * This file implements the Plug class. (EXPERIMENTAL)
+ * This file implements the PluginS class.
  *
- * This is where you can plug-in some plug-ins :)
+ * This is where you can plug-in some plugins :D
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
  * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ *
+ * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
@@ -18,11 +40,13 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 require_once dirname(__FILE__).'/_class_plugin.php';
 
 /**
- * Plug Class
+ * Plugins Class
+ *
+ * This is where you can plug-in some plugins :D
  *
  * @package evocore
  */
-class Plug
+class Plugins
 {
 	/**#@+
 	 * @access private
@@ -54,10 +78,10 @@ class Plug
 	/**
 	 * Constructor
 	 *
-	 * {@internal Plug::Plug(-)}}
+	 * {@internal Plugins::Plugins(-)}}
 	 *
 	 */
-	function Plug( )
+	function Plugins( )
 	{
 		global $core_dirout, $plugins_subdir;
 
@@ -72,7 +96,7 @@ class Plug
 	 *
 	 * Load the installed plugins.
 	 *
-	 * {@internal Plug::init(-)}}
+	 * {@internal Plugins::init(-)}}
 	 */
 	function init( )
 	{
@@ -96,7 +120,7 @@ class Plug
 				$Debuglog->add( 'Loading plugin: '.$row['plug_classname'] );
 				require_once $filename;
 				// Register the plugin:
-				$this->register( $row['plug_classname'], $row['plug_ID'] );
+				$this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'] );
 			}
 
 			$this->initialized = true;
@@ -107,7 +131,7 @@ class Plug
 	/**
 	 * Discover and load all available plugins plugins.
 	 *
-	 * {@internal Plug::discover(-)}}
+	 * {@internal Plugins::discover(-)}}
 	 */
 	function discover()
 	{
@@ -145,7 +169,7 @@ class Plug
 	 *
 	 * Records it in the database
 	 *
-	 * {@internal Plug::install(-)}}
+	 * {@internal Plugins::install(-)}}
 	 */
 	function install( $plugin_name )
 	{
@@ -184,7 +208,7 @@ class Plug
 	 *
 	 * Removes it from the database
 	 *
-	 * {@internal Plug::uninstall(-)}}
+	 * {@internal Plugins::uninstall(-)}}
 	 *
 	 * @return boolean success
 	 */
@@ -231,14 +255,15 @@ class Plug
 	 *
 	 * Will be called by plugin includes when they are called by init()
 	 *
-	 * {@internal Plug::register(-)}}
+	 * {@internal Plugins::register(-)}}
 	 *
 	 * @param string name of plugin class to instanciate & register
 	 * @param int ID in database (0 if not installed)
+	 * @param int Priority in database (-1 to keep default)
 	 * @return Plugin ref to newly created plugin
 	 * @access private
 	 */
-	function & register( $classname, $ID = 0 )
+	function & register( $classname, $ID = 0, $priority = -1 )
 	{
 		$Plugin = new $classname;	// COPY !
 
@@ -246,6 +271,8 @@ class Plug
 		$Plugin->ID = $ID;
 		// Tell him his name :)
 		$Plugin->classname = $classname;
+		// Tell him his priority:
+		if( $priority > -1 ) $Plugin->priority = $priority;
 
 		// Memorizes Plugin in sequential array:
 	 	$this->Plugins[] = & $Plugin;
@@ -262,7 +289,7 @@ class Plug
   /**
 	 * Count # of registrations of same plugin
 	 *
-	 * {@internal Plug::count_regs(-)}}
+	 * {@internal Plugins::count_regs(-)}}
 	 *
 	 * @param string class name
 	 * @return int # of regs
@@ -285,7 +312,7 @@ class Plug
 	/**
 	 * Get next plugin in list:
 	 *
-	 * {@internal Plug::get_next(-)}}
+	 * {@internal Plugins::get_next(-)}}
 	 *
 	 * @return Plugin (false if no more plugin).
 	 */
@@ -305,7 +332,7 @@ class Plug
 	/**
 	 * Rewind iterator
 	 *
-	 * {@internal Plug::restart(-) }}
+	 * {@internal Plugins::restart(-) }}
 	 */
 	function restart()
 	{
@@ -314,14 +341,14 @@ class Plug
 
 
 	/**
-	 * Call the plugins for a given event
+	 * Call all plugins for a given event
 	 *
-	 * {@internal Plug::call_plugins(-)}}
+	 * {@internal Plugins::trigger_event(-)}}
 	 *
 	 * @param string event name, see {@link Plugin}
 	 * @param array Associative array of parameters
 	 */
-	function call_plugins( $event, $params )
+	function trigger_event( $event, $params )
 	{
 		$this->init();	// Init if not done yet.
 
@@ -340,7 +367,7 @@ class Plug
 	/**
 	 * Validate renderer list
 	 *
-	 * {@internal Renderer::validate_list(-)}}
+	 * {@internal Plugins::validate_list(-)}}
 	 *
 	 * @param array renderer codes
 	 * @return array validated array
@@ -398,7 +425,7 @@ class Plug
 	/**
 	 * Render the content
 	 *
-	 * {@internal Renderer::render(-)}}
+	 * {@internal Plugins::render(-)}}
 	 *
 	 * @param string content to render
 	 * @param array renderer codes

@@ -323,7 +323,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	}}}
 
 	// CALL PLUGINS NOW:
-	$Plug->call_plugins( 'AdminEndHtmlHead', array() );
+	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
 	?>
 </head>
 

@@ -20,9 +20,9 @@ require( dirname(__FILE__).'/_menutop.php' );
 require( dirname(__FILE__).'/_menutop_end.php' );
 
 // Loop through plugins:
-$Plug->restart();
+$Plugins->restart();
 
-while( $loop_Plugin = & $Plug->get_next() )
+while( $loop_Plugin = & $Plugins->get_next() )
 {
 	if( $loop_Plugin->is_tool )
 	{	// This plugin is a tool, we must display something:
@@ -37,42 +37,6 @@ while( $loop_Plugin = & $Plug->get_next() )
 
 
 ?>
-
-<div class="panelblock">
-	<h2><?php echo T_('Bookmarklet') ?></h2>
-
-	<?php
-	if($is_NS4 || $is_gecko)
-	{
-		?>
-		<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-		<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $admin_url ?>b2bookmarklet.php?text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
-		<?php
-	}
-	elseif ($is_winIE)
-	{
-		?>
-		<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-		<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $admin_url ?>b2bookmarklet.php?text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a>
-		</p>
-		<?php
-	}
-	elseif($is_opera)
-	{
-		?>
-		<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-		<a href="javascript:void(window.open('<?php echo $admin_url ?>b2bookmarklet.php?popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
-		<?php
-	}
-	elseif($is_macIE)
-	{
-		?>
-		<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-		<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $admin_url ?>b2bookmarklet.php?text='+escape(document.getSelection())+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a></p>
-		<?php
-	}
-	?>
-</div>
 
 <div class="panelblock">
 	<h2><?php echo T_('Movable Type Import') ?></h2>

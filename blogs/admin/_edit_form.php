@@ -128,7 +128,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		// CALL PLUGINS NOW:
-		$Plug->call_plugins( 'DisplayToolbar', array( 'target_type' => $target_type ) );
+		$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => $target_type ) );
 	?>
 	</div>
 
@@ -176,7 +176,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plug->call_plugins( 'DisplayEditorButton', array( 'target_type' => $target_type ) );
+	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => $target_type ) );
 
 	?>
 	</div>
@@ -451,8 +451,8 @@ if( $action != 'editcomment' )
 	<fieldset>
 		<legend><?php echo T_('Renderers') ?></legend>
 		<?php
-		$Plug->restart();	 // make sure iterator is at start position
-		while( $loop_RendererPlugin = $Plug->get_next() )
+		$Plugins->restart();	 // make sure iterator is at start position
+		while( $loop_RendererPlugin = $Plugins->get_next() )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 			if( $loop_RendererPlugin->apply_when == 'stealth'

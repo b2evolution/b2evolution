@@ -44,7 +44,7 @@ class sidebar_plugin extends Plugin
 	var $name = 'SideBar';
 	var $code = 'cafeSidB';
 	var $priority = 95;
-	var $version = 'CVS Rev: $Revision$';
+	var $version = 'CVS $Revision$';
 	var $author = 'Cafelog team';
 	var $help_url = 'http://b2evolution.net/';
 	var $is_tool = true;
@@ -74,7 +74,7 @@ class sidebar_plugin extends Plugin
 	 */
 	function ToolMenu( $params )
 	{
-		global $is_gecko, $is_winIE, $is_macIE;
+		global $is_gecko, $is_winIE, $is_macIE, $admin_url;
 
 		if($is_gecko)
 		{

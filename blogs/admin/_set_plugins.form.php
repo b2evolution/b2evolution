@@ -29,8 +29,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			</thead>
 			<tbody>
 			<?php
-			$Plug->restart();	 // make sure iterator is at start position
-			while( $loop_Plugin = $Plug->get_next() )
+			$Plugins->restart();	 // make sure iterator is at start position
+			while( $loop_Plugin = $Plugins->get_next() )
 			{
 			?>
 			<tr>
@@ -49,7 +49,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<?php
 
 	// Discover additional plugins.
-	$AvailablePlugins = & new Plug();
+	$AvailablePlugins = & new Plugins();
 	$AvailablePlugins->discover();
 
 	?>
@@ -71,7 +71,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<td class="firstcol"><?php	$loop_Plugin->name(); ?></td>
 				<td>[<a href="b2options.php?tab=plugins&amp;action=install&amp;plugin=<?php echo urlencode($loop_Plugin->classname) ?>"><?php
 						 echo T_('Install');
-						 if( $registrations = $Plug->count_regs($loop_Plugin->classname) )
+						 if( $registrations = $Plugins->count_regs($loop_Plugin->classname) )
 						 {	// This plugin is already installed
 								echo ' #'.($registrations+1);
 						 }

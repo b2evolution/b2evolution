@@ -463,7 +463,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Plug, $hit_type, $more, $preview;
+		global $Plugins, $hit_type, $more, $preview;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -557,8 +557,8 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		$post_renderers = $Plug->validate_list( $this->renderers );
-		$output = $Plug->render( $output, $post_renderers, $format );
+		$post_renderers = $Plugins->validate_list( $this->renderers );
+		$output = $Plugins->render( $output, $post_renderers, $format );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );

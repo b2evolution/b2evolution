@@ -75,7 +75,7 @@ function mysql_oops( $sql_query )
  */
 function format_to_output( $content, $format = 'htmlbody' )
 {
-	global $Plug;
+	global $Plugins;
 
 	switch( $format )
 	{

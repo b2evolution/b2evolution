@@ -102,7 +102,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					param( 'plugin', 'string', true );
 					echo '<div class="panelinfo">';
 					echo '<h3>Installing '.$plugin.'...</h3>';
-					$Plug->install( $plugin );
+					$Plugins->install( $plugin );
 					echo '</div>';
 					break;
 
@@ -111,7 +111,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 					param( 'plugin_ID', 'int', true );
 					echo '<div class="panelinfo">';
 					echo '<h3>Uninstalling plgin #'.$plugin_ID.'...</h3>';
-					$Plug->uninstall( $plugin_ID );
+					$Plugins->uninstall( $plugin_ID );
 					echo '</div>';
 					break;
 			}

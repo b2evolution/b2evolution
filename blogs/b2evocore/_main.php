@@ -128,8 +128,8 @@ require_once dirname(__FILE__).'/lib/_swfcharts.php';
 /**
  * Plug-ins init:
  */
-require_once( dirname(__FILE__).'/_class_plug.php' );
-$Plug = & new Plug();
+require_once( dirname(__FILE__).'/_class_plugins.php' );
+$Plugins = & new Plugins();
 
 
 /**

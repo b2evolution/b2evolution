@@ -97,7 +97,7 @@ switch($action)
 		}
 
 		// CHECK and FORMAT content
-		$post_renderers = $Plug->validate_list( $renderers );
+		$post_renderers = $Plugins->validate_list( $renderers );
 		$post_title = format_to_post($post_title,0,0);
 		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
 		{
@@ -191,7 +191,7 @@ switch($action)
 		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
 		param( 'post_locale', 'string', $default_locale );
 		param( 'renderers', 'array', array() );
-		$post_renderers = $Plug->validate_list( $renderers );
+		$post_renderers = $Plugins->validate_list( $renderers );
 
 		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
