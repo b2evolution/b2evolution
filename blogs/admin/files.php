@@ -87,7 +87,7 @@ param( 'filterIsRegexp', 'integer', NULL );
 param( 'flatmode', '', NULL );
 
 param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
-if( !$action )
+if( empty($action) )
 { // check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
 	$action = array_pop( array_keys( param( 'actionArray', 'array', array() ) ) );
 }
@@ -531,10 +531,10 @@ switch( $Fileman->getMode() )
 					continue;
 				}
 				elseif( !empty($allowedMimeTypes)
-								&& !empty( $_FILES['uploadfile']['type'] ) // browser provided type
+								&& !empty( $_FILES['uploadfile']['type'][$lKey] ) // browser provided type
 								&& !preg_match( '#\.'.preg_replace( array( '#\s+#', '/#/' ), array( '|', '\#' ), $allowedMimeTypes ).'$#', $newName  ) )
 				{
-					$LogUpload->add( sprintf( T_('The file type (MIME) of &laquo;%s&raquo; is not allowed.'), $newName ) );
+					$LogUpload->add( sprintf( T_('The file type (MIME) &laquo;%s&raquo; of &laquo;%s&raquo; is not allowed.'), $_FILES['uploadfile']['type'][$lKey], $newName ) );
 					continue;
 				}
 
@@ -1006,7 +1006,7 @@ switch( $Fileman->getMode() )
 <?php
 
 // "Display/hide Filemanager" and "Leave mode" buttons
-if( $Fileman->getMode() == 'file_upload' ) // TODO: generalize
+if( !empty($mode) )
 {
 	?>
 
@@ -1079,7 +1079,7 @@ if( isset($action_msg) )
 // }}}
 
 
-if( !$Fileman->forceFM && $Fileman->getMode() == 'file_upload' ) // TODO: generalize
+if( !empty($mode) && !$Fileman->forceFM )
 { // what a pity..
 	?>
 	</div>
@@ -1099,14 +1099,14 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.67  2005/01/13 20:27:42  blueyed
+ * $mode
+ *
  * Revision 1.66  2005/01/12 20:22:51  fplanque
  * started file/dataobject linking
  *
  * Revision 1.65  2005/01/12 17:55:51  fplanque
  * extracted browsing interface into separate file to make code more readable
- *
- * Revision 1.64  2005/01/10 02:17:40  blueyed
- * no message
  *
  * Revision 1.63  2005/01/09 05:36:39  blueyed
  * fileupload
