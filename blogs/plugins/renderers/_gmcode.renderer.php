@@ -18,7 +18,7 @@ class gmcode_Rendererplugin extends RendererPlugin
 	var $name = 'GM code';
 	var $priority = 41;
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true;
+	var $apply_to_html = true; 
 	var $apply_to_xml = false; // Leave the GMcode markup
 	var $short_desc;
 	var $long_desc;
@@ -29,22 +29,22 @@ class gmcode_Rendererplugin extends RendererPlugin
 	 * @access private
 	 */
 	var $search = array(
-											'#\*\*(.+?)\*\*#s',		// **bold**
-											'#\x5c\x5c(.+?)\x5c\x5c#s',		// \\italic\\
-											'#\x2f\x2f(.+?)\x2f\x2f#',		// //italic//
-											'#__(.+?)__#s'		// __underline__
+											'#\s\*\*(.+?)\*\*#s',		// **bold**
+											'#\s\x5c\x5c(.+?)\x5c\x5c#s',		// \\italics\\
+											'#\s\x2f\x2f(.+?)\x2f\x2f#',		// //italics//
+											'#\s__(.+?)__#s'		// __underline__
 											);
-
+	
 	/**
 	 * HTML replace array
 	 *
 	 * @access private
 	 */
 	var $replace = array(
-											'<strong>$1</strong>',
-											'<em>$1</em>',
-											'<em>$1</em>',
-											'<span style="text-decoration:underline">$1</span>'
+											' <strong>$1</strong>',
+											' <em>$1</em>',
+											' <em>$1</em>',
+											' <span style="text-decoration:underline">$1</span>'
 											);
 
 
@@ -56,14 +56,14 @@ class gmcode_Rendererplugin extends RendererPlugin
 	function gmcode_Rendererplugin()
 	{
 		$this->short_desc = T_('GreyMatter style formatting');
-		$this->long_desc = T_('No description available');
+		$this->long_desc = T_('**bold** \\italics\\ //italics// __underline__ Markup must be preceeded with white space.');
 	}
 
 
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::render(-)}}
+	 * {@internal gmcode_Rendererplugin::render(-)}} 
 	 *
 	 * @param string content to render (by reference) / rendered content
 	 * @param string Output format, see {@link format_to_output()}
@@ -75,9 +75,9 @@ class gmcode_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-
+	
 		$content = preg_replace( $this->search, $this->replace, $content );
-
+		
 		return true;
 	}
 }
