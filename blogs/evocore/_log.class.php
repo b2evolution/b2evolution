@@ -101,8 +101,9 @@ class Log
 	 *
 	 * @param string the message
 	 * @param string the level, default is to use the object's default level
+	 * @param boolean Dump (echo) this directly?
 	 */
-	function add( $message, $level = NULL )
+	function add( $message, $level = NULL, $dumpThis = false )
 	{
 		if( $level === NULL )
 		{ // By default, we use the default level:
@@ -112,7 +113,7 @@ class Log
 		$this->messages[ $level ][] = $message;
 
 
-		if( $this->dumpAdds )
+		if( $this->dumpAdds || $dumpThis )
 		{
 			Log::display( '', '', $message, $level );
 		}
@@ -471,6 +472,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/09 00:31:43  blueyed
+ * dumpThis param for add()
+ *
  * Revision 1.6  2005/01/02 19:16:44  blueyed
  * $implodeBy added to getString(), $dumpAdds added
  *
