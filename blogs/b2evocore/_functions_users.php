@@ -299,6 +299,7 @@ function get_user_info( $show = '', $this_userdata = '' )
 		case 'msn':
 		case 'yim':
 		case 'notify':
+		case 'showonline':
 		case 'locale':
 			$output = $this_userdata['user_'. $show];
 			break;
