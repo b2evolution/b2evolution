@@ -1,9 +1,12 @@
 <?php 
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * backoffice page footer
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 ?>
 </div>

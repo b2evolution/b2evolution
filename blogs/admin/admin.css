@@ -1,4 +1,13 @@
-
+/**
+ * Backoffice main Cascading Style Sheets definitions
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+ 
 @import url(../rsc/img.css);	/* Import standard image styles */
 @import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
 @import url(../rsc/forms.css);	/* Import default form styles */

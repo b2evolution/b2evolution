@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the general settings form
+ * Displays the general settings form
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

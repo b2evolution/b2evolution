@@ -2,8 +2,11 @@
 /*
  * b2evolution - http://b2evolution.net/
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 require_once( dirname(__FILE__) . '/_header.php' );
 require_once( dirname(__FILE__) . '/' . $admin_dirout . '/' . $core_subdir . '/_functions_hitlogs.php' ); // referer logging

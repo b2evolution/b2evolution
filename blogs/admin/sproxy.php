@@ -1,12 +1,14 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file is called back by the online spell checker
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
- * This file is called back by th eonline spell checker
  * (The original SDK features a PERL script instead.)
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
  */
 	//	print_r($_POST);
 	foreach( $_POST as $key => $val )

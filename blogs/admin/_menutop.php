@@ -1,11 +1,12 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Displays first part of the page menu (before the page title) 
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * This file built upon code from original b2 - http://cafelog.com/
+ * @package admin
  */
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

@@ -3,7 +3,6 @@
  * This file implements the settings page
  *
  * b2evolution - {@link http://b2evolution.net/}
- * This file built upon code from original b2 - {@link http://cafelog.com/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *

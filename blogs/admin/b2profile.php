@@ -2,12 +2,12 @@
 /*
  * Display current user's profile:
  *
- * b2evolution - http://b2evolution.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
- * This file built upon code from original b2 - http://cafelog.com/
+ * @package admin
+ * @author This file built upon code from original b2 - http://cafelog.com/
  */
 require_once( dirname(__FILE__).'/_header.php' ); // this will actually load blog params for req blog
 $admin_tab = 'profile';

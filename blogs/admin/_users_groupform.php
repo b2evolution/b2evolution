@@ -1,12 +1,11 @@
 <?php
 /**
  * Displays group properties form
+ *
  * Called by {@link b2users.php}
  *
  * b2evolution - {@link http://b2evolution.net/}
- *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
