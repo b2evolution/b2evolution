@@ -1,6 +1,6 @@
 <?php
 /**
- * Data Object List Base Class
+ * This file implements the abstract DataObjectList base class.
  * 
  * "data objects by fplanque" :P
  *

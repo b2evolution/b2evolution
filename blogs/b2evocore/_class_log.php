@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements Logging of notes and errors.
+ * This file implements the Log class, which logs notes and errors.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

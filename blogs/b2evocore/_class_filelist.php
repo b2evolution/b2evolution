@@ -1,6 +1,6 @@
 <?php
 /**
- * A class for filelists.
+ * This file implements the Filelist class.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

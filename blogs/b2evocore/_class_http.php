@@ -1,6 +1,8 @@
 <?
- /**
- * This classfile implements http gets and posts via both sockets and curl. with wget soon
+/**
+ * This file implements the Http class, which gets and posts via both sockets and curl.
+ *
+ * with wget soon
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -22,7 +24,7 @@ if(ereg('_class', $_SERVER['SCRIPT_NAME']))
 }
 
 
-class http {
+class Http {
 
   function socket_post($server, $port, $url, $vars) {
    /*

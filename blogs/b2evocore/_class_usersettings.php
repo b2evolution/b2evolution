@@ -1,6 +1,6 @@
 <?php
 /**
- * Class to handle the user settings/preferences
+ * This file implements the UserSettings class, to handle user/name/value triplets.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

@@ -1,6 +1,7 @@
 <?
- /**
- * This classfile implements file downloads
+/**
+ * This file implements the Download class.
+ *
  * (and posibly uploads at a later date)
  *
  *
@@ -12,10 +13,7 @@
  *
  * @package evocore
  */
-if(ereg('_class', $_SERVER['SCRIPT_NAME']))
-{
-    die("You have too many shoes");
-}
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
  //dirname(__FILE__).'/
 require_once( '_class_http.php');
@@ -28,7 +26,7 @@ require_once( '_class_http.php');
 class download
 {
 
-      	function saveToFile ($url, $type, $destination)
+ 	function saveToFile ($url, $type, $destination)
 	{
          /*
          *   $url = "http://www.wheely-bin.co.uk/facecake.php"

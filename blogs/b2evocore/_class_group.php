@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements User Groups
+ * This file implements the Group class, which manages user groups.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

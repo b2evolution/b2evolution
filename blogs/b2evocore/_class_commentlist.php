@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements comment lists
+ * This file implements the CommentList class.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -16,7 +16,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 require_once dirname(__FILE__).'/_class_dataobjectlist.php';
 
 /**
- * Comment List Class
+ * CommentList Class
  *
  * @package evocore
  */

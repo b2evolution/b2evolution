@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Plug class (EXPERIMENTAL)
+ * This file implements the Plug class. (EXPERIMENTAL)
  *
  * This is where you can plug-in some plug-ins :)
  *

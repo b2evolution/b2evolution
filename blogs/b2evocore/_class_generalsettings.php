@@ -1,6 +1,6 @@
 <?php
 /**
- * Class to handle the global settings
+ * This file implements the GeneralSettings class, which handles Name/Value pairs.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements Users
+ * This file implements the User class.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

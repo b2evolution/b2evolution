@@ -1,6 +1,6 @@
 <?php
 /**
- * SafeHtmlChecker
+ * This file implements the SafeHtmlChecker class.
  *
  * checks HTML against a subset of elements to ensure safety and XHTML validation.
  *
