@@ -380,12 +380,13 @@ switch( $action )
 		$time_start = gettimeofday();
 		
 		echo "<p>Generating wordcounts... ";
-		$query = "SELECT ID, post_content FROM $tableposts";
+		$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
 		$q = mysql_query($query) or mysql_oops( $query );
 
 		$rows_updated = 0;
 
-		while($row = mysql_fetch_assoc($q)) {
+		while($row = mysql_fetch_assoc($q)) 
+		{
 			$query_update_wordcount = "UPDATE $tableposts SET post_wordcount = " . bpost_count_words($row['post_content']) . " WHERE ID = " . $row['ID'];
 			$q_update_wordcount = mysql_query($query_update_wordcount) or mysql_oops( $query_update_wordcount );
 			$rows_updated++;
