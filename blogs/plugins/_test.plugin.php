@@ -4,7 +4,8 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -23,10 +24,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -42,7 +50,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 class test_plugin extends Plugin
 {
-	/**
+	/*
 	 * Variables below MUST be overriden by plugin implementations,
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
@@ -52,8 +60,9 @@ class test_plugin extends Plugin
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
 	var $help_url = 'http://b2evolution.net/';
-	/**
-	 * Variables below MAY be overriden.
+
+	/*
+	 * These variables MAY be overriden.
 	 */
 	var $is_tool = true;
 	var $apply_when = 'opt-out';
@@ -83,7 +92,6 @@ class test_plugin extends Plugin
 	/**
 	 * Event handlers:
 	 */
-
 
 	/**
 	 * Event handler: Called when ending the admin html head section.
@@ -143,14 +151,13 @@ class test_plugin extends Plugin
 	 */
 	function DisplayEditorButton( & $params )
 	{
-	 	?>
+		?>
 		<input type="button" value="TEST" onclick="alert('Hi! This is the TEST plugin (DisplayEditorButton)!');" />
 		<?php
 		return true;
 	}
 
 
-	/**
 	/**
 	 * Event handler: Called when rendering text.
 	 *
@@ -159,13 +166,13 @@ class test_plugin extends Plugin
 	 * {@internal test_plugin::Render(-)}}
 	 *
 	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
+	 *              (Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
 	function Render( & $params )
 	{
 		if( ! parent::Render( $params ) )
-		{	// We cannot render the required format
+		{ // We cannot render the required format
 			return false;
 		}
 
@@ -175,7 +182,7 @@ class test_plugin extends Plugin
 	}
 
 
- 	/**
+	/**
 	 * Event handler: Called when displaying the tool menu.
 	 *
 	 * {@internal test_plugin::ToolMenu(-)}}
@@ -185,7 +192,7 @@ class test_plugin extends Plugin
 	 */
 	function ToolMenu( $params )
 	{
-	 	echo 'Hello, This is the ToolMenu for the TEST plugin.';
+		echo 'Hello, This is the ToolMenu for the TEST plugin.';
 		return true;
 	}
 }
