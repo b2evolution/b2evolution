@@ -22,8 +22,8 @@ require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
 $use_cache = 1;
-$post_default_title = ""; // posts submitted via the xmlrpc interface get that title
-$post_default_category = 1; // posts submitted via the xmlrpc interface go into that category
+$post_default_title = ''; // posts submitted via the xmlrpc interface get that title
+$post_default_category = $default_category; // posts submitted via the xmlrpc interface go into that category
 
 $xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
 
