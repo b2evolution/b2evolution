@@ -1,0 +1,23 @@
+Hi.. :)
+
+If you want to run the SimpleTest cases in /tests, you'll have to get the
+simpletest framework. Of course.
+
+You can download it either from
+http://sourceforge.net/project/showfiles.php?group_id=76550
+
+or get it straight from CVS (password is empty):
+
+cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/simpletest login
+cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/simpletest co simpletest
+
+Put it into this directory (not in a subdirectory simpletest).
+
+If you already have it somewhere, just create a /tests/config.simpletest.php file
+and define the constant SIMPLETEST_DIR, e.g.:
+
+<?php
+define( 'SIMPLETEST_DIR', '/your/path/with/trailing/slash/' );
+?>
+
+Happy testing..
