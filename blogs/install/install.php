@@ -300,47 +300,12 @@ function populate_antispam()
 	global $tableantispam;
 	
 	$query = "INSERT INTO $tableantispam(aspm_string) VALUES ".
-	"('prescriptions.md'), ('penis-enlargement'), ('online-casino'), ".
+	"('penis-enlargement'), ('online-casino'), ".
 	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
 	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
-	"('-adult-'), ('-tits-'), ('mneuron.com'), ('buy-phentermine'), ".
-	"('order-cheap-pills'), ('menguma.com'), ('gdough.com'), ".
-	"('online-hgh.com'), ('pcfamily.ch'), ('nositeyet.com'), ".
-	"('boris.com'), ('mishka.com'), ('sexgine.com'), ".
-	"('pornwizzard.com'), ('zdenka.accepted.cc'), ('bigstorysite.com'), ".
-	"('girlpron.com'), ('agedwife.com'), ('pissingpleasures.com'), ".
-	"('tvojproblem.com'), ('slavebabe.com'), ('dragoonguardsband.co.uk'), ".
-	"('shop.cokecans.com'), ('bolinat.com'), ('freenudecelebrity.com'), ".
-	"('kedgy.com'), ('buy-xenadrine.com'), ('shatteredreality.net'), ".
-	"('paris-hilton'), ('search4hardcore.com'), ('livehomewebcams.com'), ".
-	"('findpink.com'), ('hornyhamster.com'), ('bobbakazoo.com'), ".
-	"('answerbus.com'), ('blackfiles.hpg.ig.com.br'), ('lodgingreservationcenter.com'), ".
-	"('payshots.com'), ('killerdick.com'), ('impai.org'), ".
-	"('toiletphoto.com'), ('transsexualpalace.com'), ('morganfinancialgroup.com'), ".
-	"('parishilton'), ('collegecamgirls.com'), ('adult-models.biz'), ".
-	"('busty2.com'), ('agnitum.com'), ('swedishteen.net'), ".
-	"('free.ynsbbs.com.ru'), ('pimpvision.com'), ('baltimorejewishtimes.com'), ".
-	"('123adultsearch.com'), ('girls.twistys.net'), ('visitcelebrities.com'), ".
-	"('bushflash.com'), ('buechercrawler.de'), ('enyamodel.com'), ".
-	"('consulmex-la.com'), ('socksproxy.de'), ('xxx'), ".
-	"('jahreswagen-portal.net'), ('conzendo.de'), ".
-	/*
-	These sites try to set cookies with the name "url" and content being the
-	site you are refering from, when you go there.
-	*/
-	"('binevolve.com'), ('collegedictionary.net'), ('sound-computing.com'), ".
-	"('e-guana.com'), ('crunchsoccer.com'), ('studio-8.net'), ".
-	"('bushido-online.com'), ('synapseiowa.com'), ('acl02.org'), ".
-	"('savetheweb.org'), ('ascii-art.com'), ('leportailqc.com'), ".
-	"('drnapr.net'), ('gogreenpower.org'), ('an-nasr.com'), ".
-	"('opennetcoalition.org'), ('csir.org'), ('internationalcenternewhaven.org'), ".
-	/*
-	These may look innocent and human-made, but they are in fact clever tricks.
-	They all spammed my referer logs on the same day, in rapid succession.
-	*/
-	"('veronicabee.com'), ('evesmith.com'), ('jennyknicks.com'), ".
-	"('princessnina.com'), ('tawnygirl.com'), ('skipme.com'), ".
-	"('doctorfem.com')";
+	"('-adult-'), ('-tits-'), ('buy-phentermine'), ".
+	"('order-cheap-pills'), 'buy-xenadrine'),  ('xxx'), ".
+	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models') ";
 
 	mysql_query($query) or mysql_oops( $query );
 	
