@@ -36,6 +36,10 @@ body {
 	border: 1px solid #e1ddce;
 }
 h1.logintitle {
+	padding:0;
+	margin:0;
+}
+h2.logintitle {
 	color: #000;
 	font-size: 120%;
 	padding: 0;
@@ -217,6 +221,7 @@ table.grouped tr {
 table.grouped tr:hover,
 table.grouped tr.odd:hover {
 	background-color:#e3dfd0;
+	 cursor: default;
 }
 
 table.grouped td {

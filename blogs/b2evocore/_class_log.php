@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Log class, which logs notes and errors. {{{
+ * This file implements the Log class, which logs notes and errors.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -40,6 +40,11 @@
  *
  */
 
+/**
+ * Log class
+ *
+ * logs notes and errors.
+ */
 class Log
 {
 	var $messages;
@@ -135,7 +140,8 @@ class Log
 	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
 	 * @return boolean false, if no messages; else true (and outputs)
 	 */
-	function display( $head = '', $foot = '', $display = true, $level = NULL, $cssclass = NULL, $style = NULL )
+	function display( $head = '', $foot = '', $display = true, $level = NULL, $cssclass = NULL,
+										$style = NULL )
 	{
 		if( $level === NULL )
 		{
@@ -213,7 +219,8 @@ class Log
 	 * @param string the style to use, '<ul>', '<p>', '<br>' (default: <br> for single message, <ul> for more)
 	 * @return boolean false, if no messages; else true (and outputs)
 	 */
-	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '', $display = true, $level = NULL, $cssclass = NULL, $style = '<ul>' )
+	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '', $display = true,
+													$level = NULL, $cssclass = NULL, $style = '<ul>' )
 	{
 		switch( $this->count( $level ) )
 		{

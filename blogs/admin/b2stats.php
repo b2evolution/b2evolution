@@ -134,7 +134,7 @@ switch( $tab )
 		<?php
 
 		$sql = 'SELECT COUNT(*) AS hits, hit_ignore, YEAR(visitTime) AS year,
-										MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day 
+										MONTH(visitTime) AS month, DAYOFMONTH(visitTime) AS day
 							FROM T_hitlog ';
 		if( $blog > 0 )
 		{
@@ -390,6 +390,7 @@ switch( $tab )
     }
 		break;
 
+
 		case 'referers':
 		?>
 	<h2><?php echo T_('Last referers') ?>:</h2>
@@ -406,12 +407,22 @@ switch( $tab )
   function stats_blog_name2( $blog_ID )
   {
 		global $BlogCache;
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
-		echo format_to_output( $Blog->name );
+		if( !empty($blog_ID) )
+		{
+			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			echo format_to_output( $Blog->name );
+		}
+		else
+		{
+			echo T_('None');
+		}
 	}
 
+	// datetime:
 	$Results->col_headers[] = T_('Date Time');
 	$Results->cols[] = '%date_i18n( locale_datefmt().\' \'.locale_timefmt(), \'$visitTime$\' )%';
+
+	// Referer:
 	$Results->col_headers[] = T_('Referer');
 	if( $current_User->check_perm( 'stats', 'edit' ) )
 	{
@@ -434,6 +445,7 @@ switch( $tab )
 		$Results->cols[] = '<a href="$referingURL$">$baseDomain$</a>';
 	}
 
+	// Antispam:
 	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	{
 		$Results->col_headers[] = /* TRANS: Abbrev. for Spam */ T_('S');
@@ -442,14 +454,17 @@ switch( $tab )
 												/* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>';
 	}
 
+	// Target Blog:
 	if( empty($blog) )
 	{
 		$Results->col_headers[] = T_('Target Blog');
 	 	$Results->cols[] = '%stats_blog_name2( \'$hit_blog_ID$\' )%';
 	}
 
+	// Requested URI:
 	$Results->col_headers[] = T_('Requested URI');
 	$Results->cols[] = '<a href="$visitURL$">$visitURL$</a>';
+
 
 	// Display results:
 	$Results->display();

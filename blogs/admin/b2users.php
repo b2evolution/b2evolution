@@ -58,6 +58,7 @@ if( $Messages->count() )
 }
 else switch ($action)
 { // actions only when editing users is allowed
+
 	case 'newuser':
 		param( 'template', 'integer', -1 );
 
@@ -75,6 +76,7 @@ else switch ($action)
 
 
 	case 'userupdate':
+		// Update existing use OR create new user:
 		param( 'edited_user_ID', 'integer', true );
 		if( $edited_user_ID == 0 )
 		{ // we create a new user

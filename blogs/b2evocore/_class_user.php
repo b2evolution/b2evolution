@@ -201,6 +201,8 @@ class User extends DataObject
 	/**
 	 * Set param value
 	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
 	 */
 	function set( $parname, $parvalue )
 	{

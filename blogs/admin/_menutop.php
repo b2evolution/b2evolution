@@ -379,6 +379,8 @@ if( empty($mode) )
 												'href'=>'blogs.php' ),
 
 			'stats' => array( 'text'=>T_('Stats'),
+												'perm_name'=>'stats',
+												'perm_level'=>'view',
 												'href'=>'b2stats.php' ),
 
 			'antispam' => array( 'text'=>T_('Antispam'),

@@ -39,6 +39,10 @@ class DataObject
 	var $dbtablename;
 	var $dbprefix;
 	var $dbIDname;
+	var $datecreated_field;
+	var $datemodified_field;
+	var $creator_field;
+	var $lasteditor_field;
 	var $dbchanges = array();
 	/**#@-*/
 
@@ -50,12 +54,22 @@ class DataObject
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
+	 * @param string datetime field name
+	 * @param string datetime field name
+	 * @param string User ID field name
+	 * @param string User ID field name
 	 */
-	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID' )
+	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID',
+												$datecreated_field = '', $datemodified_field = '',
+												$creator_field = '', $lasteditor_field = '' )
 	{
-		$this->dbtablename = $tablename;
-		$this->dbprefix = $prefix;
-		$this->dbIDname = $dbIDname;
+		$this->dbtablename        = $tablename;
+		$this->dbprefix           = $prefix;
+		$this->dbIDname           = $dbIDname;
+		$this->datecreated_field  = $datecreated_field;
+		$this->datemodified_field = $datemodified_field;
+		$this->creator_field      = $creator_field;
+		$this->lasteditor_field   = $lasteditor_field;
 	}
 
 	/**
@@ -82,12 +96,22 @@ class DataObject
 	 */
 	function dbupdate( )
 	{
-		global $DB;
+		global $DB, $localtimenow, $current_User;
 
 		if( $this->ID == 0 ) die( 'New object cannot be updated!' );
 
 		if( count( $this->dbchanges ) == 0 )
 			return;	// No changes!
+
+		if( !empty($this->datemodified_field) )
+		{	// We want to track modification date:
+			$this->set_param( $this->datemodified_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
+		}
+		if( !empty($this->lasteditor_field) )
+		{	// We want to track last editor:
+			$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
+		}
+
 
 		$sql_changes = array();
 		foreach( $this->dbchanges as $loop_dbfieldname => $loop_dbchange )
@@ -97,6 +121,7 @@ class DataObject
 			// Prepare matching statement:
 			switch( $loop_dbchange['type'] )
 			{
+				case 'date':
 				case 'string':
 					$sql_changes[] = $loop_dbfieldname. " = '". $DB->escape( $loop_value ). "' ";
 					break;
@@ -107,7 +132,8 @@ class DataObject
 		}
 
 		// Prepare full statement:
-		$sql = "UPDATE $this->dbtablename SET ". implode( ', ', $sql_changes ). " WHERE $this->dbIDname = $this->ID";
+		$sql = "UPDATE $this->dbtablename SET ". implode( ', ', $sql_changes ). "
+						 WHERE $this->dbIDname = $this->ID";
 		//echo $sql;
 
 		$DB->query($sql);
@@ -124,9 +150,27 @@ class DataObject
 	 */
 	function dbinsert( )
 	{
-		global $DB;
+		global $DB, $localtimenow, $current_User;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
+
+		if( !empty($this->datecreated_field) )
+		{	// We want to track creation date:
+			$this->set_param( $this->datecreated_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
+		}
+		if( !empty($this->datemodified_field) )
+		{	// We want to track modification date:
+			$this->set_param( $this->datemodified_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
+		}
+		if( !empty($this->creator_field) )
+		{	// We want to track creator:
+			$this->set_param( $this->creator_field, 'number', $current_User->ID );
+		}
+		if( !empty($this->lasteditor_field) )
+		{	// We want to track last editor:
+			$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
+		}
+
 
 		$sql_fields = array();
 		$sql_values = array();
@@ -138,6 +182,7 @@ class DataObject
 			$sql_fields[] = $loop_dbfieldname;
 			switch( $loop_dbchange['type'] )
 			{
+				case 'date':
 				case 'string':
 					$sql_values[] = $DB->quote( $loop_value );
 					break;
@@ -221,6 +266,19 @@ class DataObject
 	{
 		// Note: we call get again because of derived objects specific handlers !
 		echo format_to_output( $this->get($parname), $format );
+	}
+
+	/**
+	 * Set param value
+	 *
+	 * By default, all values will be considered strings
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 */
+	function set( $parname, $parvalue )
+	{
+		$this->set_param( $parname, 'string', $parvalue );
 	}
 
 	/**

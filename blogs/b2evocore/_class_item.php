@@ -63,6 +63,8 @@ class Item extends DataObject
 	 * Constructor
 	 *
 	 * {@internal Item::Item(-)}}
+	 *
+	 * @param table Database row
 	 */
 	function Item( $db_row = NULL )
 	{
