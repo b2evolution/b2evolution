@@ -34,7 +34,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author bgorge
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author blueyed: Daniel HAHLER
  *
  * @package admin
