@@ -58,8 +58,10 @@ case 'post':
 
 	// CHECK and FORMAT content
 	$post_title = format_to_post($post_title,0,0);
-	if( !validate_url( $post_url, $allowed_uri_scheme ) )
-		errors_add( T_('Supplied URL is invalid.') );	
+	if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
+	{
+		errors_add( T_('Supplied URL is invalid: ').$error );	
+	}
 	$content = format_to_post($content,$post_autobr,0);
 
 	if( errors_display( T_('Cannot post, please correct these errors:'), 
@@ -157,8 +159,10 @@ case "editpost":
 
 	// CHECK and FORMAT content	
 	$post_title = format_to_post($post_title,0,0);
-	if( !validate_url( $post_url, $allowed_uri_scheme ) )
-		errors_add( T_('Supplied URL is invalid.') );	
+	if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
+	{
+		errors_add( T_('Supplied URL is invalid: ').$error );	
+	}
 	$content = format_to_post($content,$post_autobr,0);
 
 	if( errors_display( T_('Cannot update, please correct these errors:'), 
@@ -328,8 +332,10 @@ case "editedcomment":
 	}
 
 	// CHECK and FORMAT content	
-	if( !validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
-		errors_add( T_('Supplied URL is invalid.') );	
+	if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
+	{
+		errors_add( T_('Supplied URL is invalid: ').$error );	
+	}
 	$content = format_to_post($content,$post_autobr,0); // We are faking this NOT to be a comment
 
 	if( errors_display( T_('Cannot update comment, please correct these errors:'), 

@@ -55,9 +55,9 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$now = date('Y-m-d H:i:s', $localtimenow );
 
 	// CHECK and FORMAT content	
-	if( ! validate_url( $url, $comments_allowed_uri_scheme) )
+	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		errors_add( 'Supplied URL is invalid' );
+		errors_add( T_('Supplied URL is invalid: ').$error );	
 	}
 	$comment = format_to_post($comment,1,1);
 

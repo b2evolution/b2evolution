@@ -8,6 +8,7 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
+require_once dirname(__FILE__)."/$pathcore_out/$dir_conf/_antispam.php";
 require_once (dirname(__FILE__)."/_functions_cats.php");
 require_once (dirname(__FILE__)."/_functions_blogs.php");
 require_once (dirname(__FILE__)."/_functions_bposts.php");
@@ -1105,21 +1106,38 @@ function autoquote( & $string )
 
 /*
  * validate_url(-)
+ *
+ * fplanque: 0.8.5: changed return values
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
+	global $block_urls;
+
 	if( empty($url) ) 
-		return true;
+	{	// Empty URL, no problem
+		return false;		
+	}
 	
 	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):/', $url, $matches) )
-		return false; 
-
-	$scheme = strtolower($matches[1]);
-	if (!in_array($scheme, $allowed_uri_scheme)) 
-	{
-		return false;
+	{	// Cannot find URI scheme
+		return T_('Invalid URL'); 
 	}
 
-	return true;
+	$scheme = strtolower($matches[1]);
+	if(!in_array( $scheme, $allowed_uri_scheme )) 
+	{	// Scheme not allowed
+		return T_('URI scheme not allowed');
+	}
+
+	// Search for blocked URLs:
+	foreach ($block_urls as $block)
+	{
+		if( strpos($url, $block) !== false)
+		{
+			return T_('URL not allowed');
+		}
+	}
+
+	return false;		// OK
 }
 ?>

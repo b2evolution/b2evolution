@@ -1205,9 +1205,9 @@ function pingback_ping($m) {
 					$context = '[...] '.addslashes(trim($context)) .' [...]';
 
 					// CHECK and FORMAT content	
-					if( ! validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme) )
+					if( $error = validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme ) )
 					{
-						errors_add( 'Supplied URL is invalid' );
+						errors_add( T_('Supplied URL is invalid: ').$error );	
 					}
 					$context = format_to_post($context,1,1);
 				

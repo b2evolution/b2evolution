@@ -40,9 +40,9 @@ $url = ((!stristr($url, '://')) && ($url != '')) ? 'http://'.$url : $url;
 if (strlen($url) < 7) {
 	$url = '';
 }
-if( ! validate_url( $url, $comments_allowed_uri_scheme) )
+if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 {
-	errors_add( T_('Supplied URL is invalid') );
+	errors_add( T_('Supplied URL is invalid: ').$error );	
 }
 
 $user_ip = $REMOTE_ADDR;

@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.3
+ * Version of this file: 0.8.5
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -254,6 +254,7 @@ $pathcore_out = '..';
 $pathhtsrv = "htsrv";
 $htsrvurl = $baseurl.'/'.$pathhtsrv;
 $pathhtsrv_out = "..";
+$dir_conf = 'conf';
 # END OF SUBDIRECTORY CONFIGURATION
 
 ?>

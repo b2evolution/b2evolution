@@ -8,7 +8,6 @@
 	 Modified by Francois PLANQUE (June 2003) for b2evoltion - http://b2evolution.net/
 	 Modified by SAKIYAMA Nobuo (July 2003) : extended DTD and attributes
 */
-
 class SafeHtmlChecker 
 {
     var $tags;    		// Array showing allowed attributes for tags
@@ -138,18 +137,19 @@ class SafeHtmlChecker
         // Are tag attributes valid?
         foreach ($attrs as $attr => $value) 
 				{
-            if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag]))) {
-                $this->html_error( sprintf( T_('Tag %s may not have attribute %s'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
-            }
-						if (in_array($attr, $this->uri_attrs)) 
-						{	// Must this attribute be checked for URIs
-							$matches = array();
-							$value = trim($value);
-							if( !validate_url( $value, $this->allowed_uri_scheme ) )
-							{
-								$this->html_error( sprintf( T_('%s attributes may not contain the %s protocol'), '<code>'.$attr.'</code>', '<code>'.$scheme.':</code>') );
-							}
+					if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag]))) 
+					{
+							$this->html_error( sprintf( T_('Tag %s may not have attribute %s'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
+					}
+					if (in_array($attr, $this->uri_attrs)) 
+					{	// Must this attribute be checked for URIs
+						$matches = array();
+						$value = trim($value);
+						if( $error = validate_url( $value, $this->allowed_uri_scheme ) )
+						{
+							$this->html_error( T_('Found invalid URL: ').$error );	
 						}
+					}
         }
         // Set previous, used for checking nesting context rules
         $this->stack[] = $tag;
