@@ -21,12 +21,20 @@ function online_user_update()
 	global $DB, $user_ID, $online_session_timeout;
 
 	// Prepare the statement to remove old session info
-	$sql = "DELETE FROM T_sessions
-		WHERE sess_time < ".( time() - $online_session_timeout )."
-		OR sess_ipaddress='$_SERVER[REMOTE_ADDR]'";
 	if( is_logged_in() )
 	{
-		$sql .= " OR sess_user_ID='$user_ID'";
+		$sql = "DELETE FROM T_sessions
+	                WHERE sess_user_ID='$user_ID'
+			OR  sess_time < ".( time() - $online_session_timeout );
+	}
+	else
+	{
+		$sql = "DELETE FROM T_sessions
+			WHERE sess_time < ".( time() - $online_session_timeout )."
+			OR ( 
+				sess_ipaddress='$_SERVER[REMOTE_ADDR]'
+				AND sess_user_ID is NULL
+			)";
 	}
 	$DB->query( $sql );
 
