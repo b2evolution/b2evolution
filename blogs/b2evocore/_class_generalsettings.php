@@ -45,16 +45,6 @@ class GeneralSettings extends AbstractSettings
 
 
 	/**
-	 * get a setting from the DB settings table
-	 * @param string name of setting
-	 */
-	function get( $setting )
-	{
-		return parent::get( $setting );
-	}
-
-
-	/**
 	 * temporarily sets a setting (updateDB(-) writes it to DB)
 	 *
 	 * @param string name of setting
@@ -64,15 +54,5 @@ class GeneralSettings extends AbstractSettings
 	{
 		return parent::set( array( $setting, $value ) );
 	}
-
-
-	/**
-	 * commits changed settings to DB
-	 */
-	function updateDB()
-	{
-		return parent::updateDB();
-	}
-
 }
 ?>

@@ -85,7 +85,7 @@ class AbstractSettings
 				break;
 
 			default:
-				die( 'Settings keycount not supported' )
+				die( 'Settings keycount not supported' );
 
 		}
 
@@ -154,6 +154,8 @@ class AbstractSettings
 	 */
 	function set()
 	{
+		global $Debuglog;
+		
 		$args = func_get_args();
 		// echo 'get: ['.implode(', ', $args ).']<br />';
 
@@ -202,6 +204,11 @@ class AbstractSettings
 		global $DB;
 
 		$query_insert = array();
+		
+		if( !$this->cache )
+		{
+			return false;
+		}
 
 		#pre_dump( $this->cache, 'update' );
 

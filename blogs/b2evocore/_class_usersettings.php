@@ -30,11 +30,11 @@ class UserSettings extends AbstractSettings
 	 */
 	function UserSettings()
 	{ // constructor
-		global $new_db_version, $tableuserprefs;
+		global $new_db_version, $tableusersettings;
 
-		$this->dbtablename = $tableuserprefs;
-		$this->colkeynames = array( 'upref_user_ID', 'upref_name' );
-		$this->colvaluename = 'upref_value';
+		$this->dbtablename = $tableusersettings;
+		$this->colkeynames = array( 'uset_user_ID', 'uset_name' );
+		$this->colvaluename = 'uset_value';
 		
 		parent::AbstractSettings();
 	}
@@ -66,19 +66,9 @@ class UserSettings extends AbstractSettings
 	{
 		global $current_User;
 		if( $user == '#' )
-			return parent::set( array( $current_User->ID, $setting, $value ) );
+			return parent::set( $current_User->ID, $setting, $value );
 		else
-			return parent::set( array( $user, $setting, $value ) );
+			return parent::set( $user, $setting, $value );
 	}
-
-
-	/**
-	 * commits changed settings to DB
-	 */
-	function updateDB()
-	{
-		return parent::updateDB();
-	}
-
 }
 ?>
