@@ -11,8 +11,9 @@
 	# maximum number of linkblog entries to display:
 	if(!isset($linkblog_limit)) $linkblog_limit = 20;
 	# global linkblog delimiters:
-	if(!isset($linkblog_main_start)) $linkblog_main_start = '';
-	if(!isset($linkblog_main_end)) $linkblog_main_end = '';
+	if(!isset($linkblog_main_start)) $linkblog_main_start = '<div class="bSideItem"><h3>'.
+																														T_('Linkblog').'</h3>';
+	if(!isset($linkblog_main_end)) $linkblog_main_end = '</div>';
 	# Category delimiters:
 	if(!isset($linkblog_catname_before)) $linkblog_catname_before = '<h4>';
 	if(!isset($linkblog_catname_after)) $linkblog_catname_after = '</h4><ul>';

@@ -232,12 +232,10 @@
 	<?php } ?>
 
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Linkblog') ?></h3>
-		<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
-			require( dirname(__FILE__).'/_linkblog.php' );
-			// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
-	</div>
+	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
+		require( dirname(__FILE__).'/_linkblog.php' );
+		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
+
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>

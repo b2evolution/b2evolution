@@ -215,10 +215,10 @@
 	<div class="bSideItem">
 		<h3><?php echo T_('Choose skin') ?></h3>
 		<ul>
-			<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
+			<?php // ---------- START OF SKIN LIST ----------
 			for( skin_list_start(); skin_list_next(); ) { ?>
 				<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a></li>
-			<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
+			<?php } // ---------- END OF SKIN LIST ---------- ?>
 		</ul>
 	</div>
 
@@ -247,13 +247,11 @@
 
 	<?php } ?>
 
-
-	<div class="bSideItem">
-		<h3><?php echo T_('Linkblog') ?></h3>
-		<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
-			require( dirname(__FILE__).'/_linkblog.php' );
-			// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
-	</div>
+	
+	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
+		require( dirname(__FILE__).'/_linkblog.php' );
+		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
+	
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>

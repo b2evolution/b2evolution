@@ -56,8 +56,8 @@ if( empty($blog) )
 # You should not have to change this.
 $show_statuses = array();
 
-# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
-$linkblog_blog = 4;
+# You could *force* a specific link blog here with this setting: (otherwise, default will be used)
+# $linkblog = 4;
 
 # This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
 # Example: $linkblog_cat = '4,6,7';

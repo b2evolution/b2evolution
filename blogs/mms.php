@@ -12,6 +12,7 @@
  * @copyright (c)2004 by Hans Reinders - {@link http://hansreinders.com}
  *
  * @package mms
+ * @todo MOVE THIS FILE TO /htsrv
  */
 require_once( dirname(__FILE__).'/b2evocore/_main.php' );
 

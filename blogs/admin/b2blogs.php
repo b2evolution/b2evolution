@@ -442,8 +442,6 @@ switch($action)
 				$blog = $edited_Blog->ID;
 				# This setting retricts posts to those published, thus hiding drafts.
 				$show_statuses = array();
-				# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
-				$linkblog_blog = 4;
 				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
 				$linkblog_cat = '';
 				# This is the array if categories to restrict the linkblog to (non recursive)

@@ -20,15 +20,15 @@
 # You can also create new blogs over there. If you do, you may duplicate this file for the new blog.
 $blog = 2;   	// 2 is for "demo blog A" or your upgraded blog (depends on your install)
 
-# You could *force* a specific skin here with this setting:
+# You could *force* a specific skin here with this setting: (otherwise, default will be used)
 # $skin = 'basic';
 
 # This setting retricts posts to those published, thus hiding drafts.
 # You should not have to change this.
 $show_statuses = array();
 
-# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
-$linkblog_blog = 4;
+# You could *force* a specific link blog here with this setting: (otherwise, default will be used)
+# $linkblog = 4;
 
 # This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
 # Example: $linkblog_cat = '4,6,7';
