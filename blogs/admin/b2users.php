@@ -106,7 +106,7 @@ switch ($action)
 			die( 'You can\'t delete yourself!' );
 
 		if( $id == 1 )
-			die( 'You can\'t delete Uszr #1!' );
+			die( 'You can\'t delete User #1!' );
 
 		$user_data = get_userdata($id);
 		$edited_User = & new User( $user_data );

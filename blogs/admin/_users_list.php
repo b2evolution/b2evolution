@@ -74,7 +74,8 @@
 				echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=down'.
 							( ( $user != 0 )? '&user='. $user : ''). '">-</a> ';
 			}
-			if( ($loop_User->get('level') == 0) && $current_User->check_perm( 'users', 'edit' ) )
+			if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID)
+					&& ($loop_User->get('level') == 0) && $current_User->check_perm( 'users', 'edit' ) )
 			{
 				?>
 				<a href="b2users.php?action=delete&id=<?php echo $loop_User->get('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" /></a>

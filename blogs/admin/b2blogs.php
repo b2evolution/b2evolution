@@ -277,6 +277,29 @@ switch($action)
 		break;
 
 
+	case 'delete':
+		// Delete a blog (Heavy deleting coming up...)
+		param( 'blog', 'integer', true );
+		require( dirname(__FILE__). '/_menutop.php' );
+		require( dirname(__FILE__). '/_menutop_end.php' );
+
+		if( $blog == 1 )
+			die( 'You can\'t delete Blog #1!' );
+
+		// Check permissions:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
+		$deleted_Blog = Blog_get_by_ID( $blog );
+
+		// Delete from DB:
+		echo '<div class="panelinfo">
+						<h3>Deleting Blog [';
+		$deleted_Blog->disp( 'name' );
+		echo ']...</h3>';
+		$deleted_Blog->dbdelete( true );
+		echo '</div>';
+
+		break;
 
 	case 'GenStatic':
 		param( 'blog', 'integer', true );

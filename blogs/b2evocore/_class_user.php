@@ -223,8 +223,10 @@ class User extends DataObject
 					$perm = true;
 					break;
 				}
-				// Check user perm for this blog
-				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
+				if( $perm_target > 0 )
+				{ // Check user perm for this blog
+					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
+				}
 				break;
 
 			case 'blog_ismember':
@@ -389,11 +391,6 @@ class User extends DataObject
 	/**
 	 * Delete user and dependencies from database
 	 *
-	 * Deleted dependencies:
-	 * - users's posts
-	 * - comments on this users' posts
-	 * - user/blog permissions
-	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with mySQL 3.23, bleh!
 	 *
 	 * {@internal User::dbdelete(-) }}
@@ -404,7 +401,7 @@ class User extends DataObject
 	 */
 	function dbdelete( $echo = false )
 	{
-		global $DB, $tablecomments, $tableposts, $tableblogusers;
+		global $DB, $tablecomments, $tableposts, $tablepostcats, $tableblogusers;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
@@ -421,27 +418,37 @@ class User extends DataObject
 												WHERE comment_author_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 
-		// Get list of posts that are going to be deleted:
-		if( $echo ) echo '<br />Getting posts to delete... ';
+		// Get list of posts that are going to be deleted (3.23)
+		if( $echo ) echo '<br />Getting post list to delete... ';
 		$post_list = $DB->get_list( "SELECT ID 
 																	FROM $tableposts
 																	WHERE post_author = $this->ID" );
 
-		// Delete comments
-		if( !empty( $post_list ) )
+		if( empty( $post_list ) )
 		{
+			echo 'None!';
+		}
+		else
+		{
+			// Delete comments
 			if( $echo ) echo '<br />Deleting comments on user\'s posts... ';
 			$ret = $DB->query( "DELETE FROM $tablecomments 
 													WHERE comment_post_ID IN ($post_list)" );
 			if( $echo ) printf( '(%d rows)', $ret );
-		}
-		
-		// Delete posts
-		if( $echo ) echo '<br />Deleting user\'s posts... ';
-		$ret = $DB->query(	"DELETE FROM $tableposts 
-													WHERE post_author = $this->ID" );
+
+			// Delete post extracats
+			if( $echo ) echo '<br />Deleting user\'s posts\' extracats... ';
+			$ret = $DB->query(	"DELETE FROM $tablepostcats
+													WHERE postcat_post_ID IN ($post_list)" );
 			if( $echo ) printf( '(%d rows)', $ret );
 
+			// Delete posts
+			if( $echo ) echo '<br />Deleting user\'s posts... ';
+			$ret = $DB->query(	"DELETE FROM $tableposts 
+														WHERE post_author = $this->ID" );
+			if( $echo ) printf( '(%d rows)', $ret );
+		} // no posts
+		
 		// Delete userblog permissions
 		if( $echo ) echo '<br />Deleting user-blog permissions... ';
 		$ret = $DB->query(	"DELETE FROM $tableblogusers 

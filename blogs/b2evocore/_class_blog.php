@@ -166,45 +166,95 @@ class Blog extends DataObject
 	/** 
 	 * Delete a blog and dependencies from database
 	 *
-	 * Deleted dependencies:
-	 *		- Categories
-	 *		- Posts
-	 *		- Comments
+	 * Includes WAY TOO MANY requests because we try to be compatible with mySQL 3.23, bleh!
 	 *
 	 * {@internal Blog::dbdelete(-) }}
 	 *
-	 * @todo unfinished!
+	 * @param boolean true if you want to echo progress
 	 */
-	function dbdelete()
+	function dbdelete( $echo = false )
 	{
-		global $DB;
+		global $DB, $tablehitlog, $tablecategories, $tablecomments, $tableposts, 
+						$tablepostcats, $tableblogusers, $cache_blogs;
+
+		// Note: No need to localize the status messages...
+		if( $echo ) echo '<p>mySQL 3.23 compatibility mode!';
+
+		// Get list of cats that are going to be deleted (3.23)
+		if( $echo ) echo '<br />Getting category list to delete... ';
+		$cat_list = $DB->get_list( "SELECT cat_ID 
+																FROM $tablecategories
+																WHERE cat_blog_ID = $this->ID" );
+
+		if( empty( $cat_list ) )
+		{	// There are no cats to delete
+			echo 'None!';
+		}
+		else
+		{	// Delete the cats & dependencies
+	
+			// Get list of posts that are going to be deleted (3.23)
+			if( $echo ) echo '<br />Getting post list to delete... ';
+			$post_list = $DB->get_list( "SELECT postcat_post_ID 
+																		FROM $tablepostcats
+																		WHERE postcat_cat_ID IN ($cat_list)" );
+			
+			if( empty( $post_list ) )
+			{	// There are no posts to delete
+				echo 'None!';
+			}
+			else
+			{	// Delete the posts & dependencies
+			
+				// Delete postcats
+				if( $echo ) echo '<br />Deleting post-categories... ';
+				$ret = $DB->query(	"DELETE FROM $tablepostcats
+															WHERE postcat_cat_ID IN ($cat_list)" );
+				if( $echo ) printf( '(%d rows)', $ret );
+				
+				
+				// Delete comments
+				if( $echo ) echo '<br />Deleting comments on blog\'s posts... ';
+				$ret = $DB->query( "DELETE FROM $tablecomments 
+														WHERE comment_post_ID IN ($post_list)" );
+				if( $echo ) printf( '(%d rows)', $ret );
 		
-		// Delete comments
-		$sql="DELETE FROM $tablecomments INNER JOIN $tableposts 
-									ON comment_post_ID = ID
-					 WHERE ";
-		$result = $DB->query( $sql );
-
-		// Delete postcats
-
-		// Delete posts
-		$sql="DELETE FROM $tableposts INNER JOIN $tablecategories 
-					 WHERE post_author = ";
-		$result = $DB->query( $sql );
-		$querycount++;
 		
-		// Delete categories
-		$sql="DELETE FROM  
-					 WHERE cat_blog_ID = $this->ID";
-		$result = $DB->query( $sql );
-		$querycount++;
+				// Delete posts
+				if( $echo ) echo '<br />Deleting blog\'s posts... ';
+				$ret = $DB->query(	"DELETE FROM $tableposts 
+															WHERE ID  IN ($post_list)" );
+				if( $echo ) printf( '(%d rows)', $ret );
 
+			} // / are there posts?
+			
+			// Delete categories
+			if( $echo ) echo '<br />Deleting blog\'s categories... ';
+			$ret = $DB->query( "DELETE FROM $tablecategories
+													WHERE cat_blog_ID = $this->ID" );
+			if( $echo ) printf( '(%d rows)', $ret );
+
+		} // / are there cats?
+		
 		// Delete blogusers		
+		if( $echo ) echo '<br />Deleting user-blog permissions... ';
+		$ret = $DB->query( "DELETE FROM $tableblogusers 
+												WHERE bloguser_blog_ID = $this->ID" );
+		if( $echo ) printf( '(%d rows)', $ret );
 		
 		// Delete hitlogs
+		if( $echo ) echo '<br />Deleting blog hitlogs... ';
+		$ret = $DB->query( "DELETE FROM $tablehitlog 
+												WHERE hit_blog_ID = $this->ID" );
+		if( $echo ) printf( '(%d rows)', $ret );
 	
-		// Delete main object:
-		return parent::dbdelete();
+		// Unset cache entry:
+		unset( $cache_blogs[$this->ID] );
+		
+		// Delete main (blog) object:
+		parent::dbdelete();
+				
+		echo '<br/>Done.</p>';
 	}
 	
 }

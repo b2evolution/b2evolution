@@ -21,6 +21,10 @@
 		<th><?php echo T_('Stub URLname') ?></th>
 		<th><?php echo T_('Static Filename') ?></th>
 		<th><?php echo T_('Locale') ?></th>
+		<?php if( $current_User->check_perm( 'blog_properties', 'edit', false ) )
+		{ ?>
+		<th><?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?></th>
+		<?php } ?>
 	</tr>
 	<?php
 	for( $curr_blog_ID=blog_list_start(); $curr_blog_ID!=false; $curr_blog_ID=blog_list_next() )
@@ -63,7 +67,12 @@
 				}
 				?>
 			</td>
-			<td><?php blog_list_iteminfo('locale') ?></td>
+			<td class="center"><?php blog_list_iteminfo('locale') ?></td>
+			<?php if( $curr_blog_ID == 1 ) { echo '<td></td>'; }
+			elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+			{ ?>
+			<td class="center"><a href="b2blogs.php?action=delete&blog=<?php blog_list_iteminfo('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php printf( /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" /></a></td>
+			<?php } ?>
 		</tr>
 		<?php
 	}
