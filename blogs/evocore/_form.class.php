@@ -1148,8 +1148,8 @@ class Form extends Widget
 		$field_name,
 		& $field_options,
 		$field_label,
-		$field_note = '',
-		$field_class = '' )
+		$field_note = NULL,
+		$field_class = NULL )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
 					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
@@ -1160,8 +1160,12 @@ class Form extends Widget
 		}
 		$r .= '>'
 					.$field_options
-			 		."</select>\n"
-					.'<span class="notes">'.$field_note.'</span>';
+					."</select>\n";
+
+		if( !empty( $field_note ) )
+		{
+			$r .= ' <span class="notes">'.$field_note.'</span>';
+		}
 
 		$r .= $this->end_field();
 
