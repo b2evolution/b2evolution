@@ -252,7 +252,7 @@ switch( $action )
 		 * Start of install procedure:
 		 * -----------------------------------------------------------------------------------
 		 */
-		if( ($action == 'start') || (!$config_is_done) )
+		if( (($action == 'start') && ($allow_evodb_reset == 1)) || (!$config_is_done) )
 		{
 			// Set default params if not provided otherwise:
 			param( 'conf_db_user', 'string', DB_USER );
