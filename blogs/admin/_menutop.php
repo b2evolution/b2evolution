@@ -408,7 +408,7 @@ if( empty($mode) )
 													'perm_level'=>'view',
 													'href'=>'b2options.php' ),
 
- 			'tools' => array( 'text'=>T_('Tools'),
+			'tools' => array( 'text'=>T_('Tools'),
 												'href'=>'tools.php' ),
 
 			);
@@ -419,7 +419,7 @@ if( empty($mode) )
 			if( (!isset($loop_details['perm_name']))
 				|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
 				|| isset($loop_details['text_noperm']) )
-			{	// If no permission requested or if perm granted or if we have an alt text, display tab:
+			{ // If no permission requested or if perm granted or if we have an alt text, display tab:
 
 				echo (($loop_tab == $admin_tab) ? '<li class="current">' : '<li>');
 
@@ -444,4 +444,13 @@ if( empty($mode) )
 ?>
 
 <div id="TitleArea">
-<h1><strong>:: <?php echo $admin_pagetitle; ?></strong>
+<h1><strong>:: <?php
+if( isset( $admin_pagetitle_titlearea ) )
+{
+	echo $admin_pagetitle_titlearea;
+}
+else
+{
+	echo $admin_pagetitle;
+}
+?></strong>

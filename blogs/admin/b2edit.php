@@ -34,7 +34,8 @@ switch($action)
 		$blog = get_catblog($cat);
 		$Blog = Blog_get_by_ID( $blog );
 
-		$admin_pagetitle = T_('Editing post');
+		$admin_pagetitle = $admin_pagetitle_titlearea = T_('Editing post');
+		$admin_pagetitle .= ': '.$edited_Item->get( 'title' );
 		require (dirname(__FILE__). '/_menutop.php');
 
 		printf( T_('#%d in blog: %s'), $edited_Item->ID, get_bloginfo( 'name' ) );
@@ -79,9 +80,8 @@ switch($action)
 		$commentdata = get_commentdata($comment,1) or die( T_('Oops, no comment with this ID!') );
 		$edited_Comment = Comment_get_by_ID( $comment );
 
-		$admin_pagetitle = T_('Editing comment');
+		$admin_pagetitle = T_('Editing comment').' #'.$commentdata['comment_ID'];
 		require (dirname(__FILE__).'/_menutop.php');
-		echo "#".$commentdata['comment_ID'];
 		require (dirname(__FILE__).'/_menutop_end.php');
 
 		$comment_post_ID = $commentdata['comment_post_ID'];
@@ -110,53 +110,67 @@ switch($action)
 
 
 	default:
+		param( 'blog', 'integer', 0 );
 		/*
 		 * --------------------------------------------------------------------
 		 * New post form  (can be a bookmarklet form if mode == bookmarklet )
 		 */
-		$admin_pagetitle = T_('New post in blog:');
-		require (dirname(__FILE__).'/_menutop.php');
+		$admin_pagetitle = $admin_pagetitle_titlearea = T_('New post in blog:');
+
 
 		if( ($blog == 0) && $current_User->check_perm( 'blog_post_statuses', 'any', false, $default_to_blog ) )
-		{	// Default blog is a valid choice
+		{ // Default blog is a valid choice
 			$blog = $default_to_blog;
 		}
 
 		// ---------------------------------- START OF BLOG LIST ----------------------------------
+		$blogListButtons = '';
 		for( $curr_blog_ID = blog_list_start();
 					$curr_blog_ID != false;
 					$curr_blog_ID = blog_list_next() )
 		{
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $curr_blog_ID ) )
-			{	// Current user is not a member of this blog...
+			{ // Current user is not a member of this blog...
 				continue;
 			}
 			if( $blog == 0 )
-			{	// If no selected blog yet, select this one:
+			{ // If no selected blog yet, select this one:
 				$blog = $curr_blog_ID;
 			}
 			// This is for when Javascript is not available:
-			echo '<a href="b2edit.php?blog=', $curr_blog_ID;
-			if( !empty( $mode ) ) echo '&amp;mode=', $mode;
-			echo '" ';
+			$blogListButtons .= '<a href="b2edit.php?blog='.$curr_blog_ID;
+			if( !empty( $mode ) )
+			{ // stay in mode
+				$blogListButtons .= '&amp;mode='.$mode;
+			}
+			$blogListButtons .= '" ';
 			if( ! blog_has_cats( $curr_blog_ID ) )
-			{	// loop blog has no categories, you cannot post to it.
-				echo 'onclick="alert(\'', str_replace( "'", "\'", T_('Since this blog has no categories, you cannot post to it. You must create categories first.') ), '\'); return false;" title="', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), '"';
+			{ // loop blog has no categories, you cannot post to it.
+				$blogListButtons .= 'onclick="alert(\''
+													.format_to_output( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'formvalue' )
+													.'\'); return false;" title="'.format_to_output( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'formvalue' ).'"';
 			}
 			elseif( blog_has_cats( $blog ) )
-			{	// loop blog AND current blog both have catageories, normal situation:
-				echo 'onclick="return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), ', $curr_blog_ID,' )" title="', T_('Switch to this blog (keeping your input if Javascript is active)'), '"';
+			{ // loop blog AND current blog both have catageories, normal situation:
+				$blogListButtons .= 'onclick="return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), '
+														.$curr_blog_ID.' )" title="'.T_('Switch to this blog (keeping your input if Javascript is active)').'"';
 			}
 
-			if( $curr_blog_ID == $blog ) 
-				echo ' class="CurrentBlog"';
+			if( $curr_blog_ID == $blog )
+			{
+				$blogListButtons .= ' class="CurrentBlog"';
+				$admin_pagetitle .= ' '.blog_list_iteminfo('shortname', false);
+			}
 			else
-				echo ' class="OtherBlog"';
-			echo '>';
-			blog_list_iteminfo('shortname');
-			echo '</a> ';
+			{
+				$blogListButtons .= ' class="OtherBlog"';
+			}
+			$blogListButtons .= '>'.blog_list_iteminfo('shortname', false).'</a> ';
 		} // --------------------------------- END OF BLOG LIST ---------------------------------
 
+
+		require (dirname(__FILE__).'/_menutop.php');
+		echo $blogListButtons;
 		require (dirname(__FILE__).'/_menutop_end.php');
 
 		if( $blog == 0 )
