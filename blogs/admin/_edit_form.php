@@ -41,7 +41,7 @@ if ($use_spellchecker)
 	{
 		// Stupid thing: having a field called action !
 		var saved_action =  form.attributes.getNamedItem('action').value;
-		form.attributes.getNamedItem('action').value = '<?php bloginfo('dynurl') ?>';
+		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
 		form.target = 'b2evo_preview';
 		form.submit();
 		preview_window = window.open( '', 'b2evo_preview' );

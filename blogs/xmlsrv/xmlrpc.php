@@ -259,7 +259,7 @@ function b2_getPostURL($m)
 	{
 
 		// Getting current blog info (fplanque: added)
-		get_blogparams();
+		$blogparams = get_blogparams_by_ID( $blog_ID );
 		$blog_URL = get_bloginfo('blogurl');
 
 		$postdata = get_postdata($post_ID);
@@ -268,7 +268,7 @@ function b2_getPostURL($m)
 		{
 			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
 
-			// this code is blatantly derived from permalink_link()
+			// this code is blatantly derived from gen_permalink()
 			$archive_mode = get_settings('archive_mode');
 			switch($archive_mode)
 			{
@@ -1122,7 +1122,6 @@ function bloggergettemplate($m)
 
 	if ($templateType == "main")
 	{
-		// $blogparams = get_blogparams_by_ID($blog_ID);
 		$file = $edit_folder.'/_main.php';
 	}
 	elseif ($templateType == "archiveIndex")
@@ -1216,7 +1215,6 @@ function bloggersettemplate($m)
 
 	if ($templateType == "main")
 	{
-		// $blogparams = get_blogparams_by_ID($blog_ID);
 		$file = $edit_folder.'/_main.php';
 	}
 	elseif ($templateType == "archiveIndex")

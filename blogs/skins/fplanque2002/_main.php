@@ -14,7 +14,7 @@
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <title><?php
-	bloginfo('name', 'htmlhead');
+	$Blog->disp('name', 'htmlhead');
 	single_cat_title( ' - ', 'htmlhead' );
 	single_month_title( ' - ', 'htmlhead' );
 	single_post_title( ' - ', 'htmlhead' );
@@ -25,14 +25,14 @@
 <!-- InstanceEndEditable --> 
 <!-- InstanceBeginEditable name="head" -->
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-<meta name="description" content="<?php bloginfo('shortdesc', 'htmlattr'); ?>" />
-<meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
+<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
+<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 <meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
-<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
-<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss_url', 'raw'); ?>" />
-<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
-<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php bloginfo('atom_url', 'raw'); ?>" />
-<link rel="pingback" href="<?php bloginfo('pingback_url', 'raw'); ?>" />
+<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
+<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
+<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
+<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
+<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 <link href="blog.css" rel="stylesheet" type="text/css" />
  <!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="basic.css" type="text/css" />
@@ -52,7 +52,7 @@
 <div class="NavBar">
 <div id="Logo">&nbsp;</div>
 <div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php bloginfo('name', 'htmlbody') ?><!-- InstanceEndEditable --></h1>
+<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php $Blog->disp( 'name', 'htmlbody' ) ?><!-- InstanceEndEditable --></h1>
 </div>
 </div>
 
@@ -62,7 +62,7 @@
 </div>
 
 
-<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php bloginfo('tagline', 'htmlbody') ?><!-- InstanceEndEditable --></div>
+<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php $Blog->disp( 'tagline', 'htmlbody' ) ?><!-- InstanceEndEditable --></div>
 
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
@@ -87,7 +87,7 @@
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
-		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
+		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 		<?php $Item->time();  echo ', ', T_('Categories'), ': ';  $Item->categories() ?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -96,14 +96,14 @@
 		  <?php link_pages("<br />Pages: ","<br />","number") ?>
 		</div>
 		<div class="bSmallPrint">
-		<a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
+		<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
 		-
-		<a href="<?php permalink_link() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
+		<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
 		<?php trackback_rdf() // trackback autodiscovery information ?>
 		-
-		<a href="<?php permalink_link() ?>#pingbacks" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
+		<a href="<?php $Item->permalink() ?>#pingbacks" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
 		-
-		<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
+		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
 		<?php if( $debug==1 ) printf( T_('- %d queries so far'), $querycount); ?>
 		</div>
 		<?php	// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
@@ -150,27 +150,27 @@
 <div class="bSideBar">
 
 	<div class="bSideItem">
-	  <h3><?php bloginfo('name', 'htmlbody') ?></h3>
-	  <p><?php bloginfo('longdesc', 'htmlbody'); ?></p>
+	  <h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
+	  <p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 		<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>
-	  	<li><a href="<?php bloginfo('staticurl', 'raw') ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
-	  	<li><a href="<?php bloginfo('dynurl', 'raw') ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
+	  	<li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
+	  	<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
 		</ul>
 		<?php	// -------------------------- CALENDAR INCLUDED HERE -----------------------------
 			require( dirname(__FILE__)."/_calendar.php"); 
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
-	  	<li><a href="<?php bloginfo('lastcommentsurl') ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
-	  	<li><a href="<?php bloginfo('blogstatsurl') ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
+	  	<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
+	  	<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
 		</ul>
 	</div>
 	
 	<div class="bSideItem">
     <h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
-		<form name="SearchForm" method="get" class="search" action="<?php bloginfo('blogurl') ?>">
+		<form name="SearchForm" method="get" class="search" action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>">
 			<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
 			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
 			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
@@ -182,7 +182,7 @@
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Categories') ?></h3>
-		<form action="<?php bloginfo('blogurl', 'raw') ?>" method="get">
+		<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
 		<?php	// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 			require( dirname(__FILE__)."/_categories.php"); 
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
@@ -198,7 +198,7 @@
 			<?php	// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 				require( dirname(__FILE__)."/_archives.php"); 
 				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-				<li><a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo T_('more...') ?></a></li>
+				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 	  </ul>
   </div>
 	<div class="bSideItem">
@@ -221,7 +221,7 @@
 				<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 				<?php } // End stat loop ?>
-				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo T_('more...') ?></a></li>
+				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 			</ul>
 		<br />
 		<h3><?php echo T_('Top Referers') ?></h3>
@@ -230,7 +230,7 @@
 				<?php while($row_stats = mysql_fetch_array($res_stats)){  ?>
 					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
 				<?php } // End stat loop ?>
-				<li><a href="<?php bloginfo('blogstatsurl') ?>"><?php echo T_('more...') ?></a></li>
+				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 			</ul>
 	</div>
 
@@ -263,23 +263,23 @@
       <ul>
         <li>
 					RSS 0.92 (Userland): 
-					<a href="<?php bloginfo('rss_url', 'raw'); ?>">Posts</a>,
-					<a href="<?php bloginfo('comments_rss_url', 'raw'); ?>">Comments</a>
+					<a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>">Posts</a>,
+					<a href="<?php $Blog->disp( 'comments_rss_url', 'raw' ) ?>">Comments</a>
 				</li>
         <li>
 					RSS 1.0 (RDF): 
-					<a href="<?php bloginfo('rdf_url', 'raw'); ?>">Posts</a>,
-					<a href="<?php bloginfo('comments_rdf_url', 'raw'); ?>">Comments</a>
+					<a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>">Posts</a>,
+					<a href="<?php $Blog->disp( 'comments_rdf_url', 'raw' ) ?>">Comments</a>
 				</li>
         <li>
 					RSS 2.0 (Userland):
-					<a href="<?php bloginfo('rss2_url', 'raw'); ?>">Posts</a>,
-					<a href="<?php bloginfo('comments_rss2_url', 'raw'); ?>">Comments</a>
+					<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">Posts</a>,
+					<a href="<?php $Blog->disp( 'comments_rss2_url', 'raw' ) ?>">Comments</a>
 				</li>
         <li>
 					Atom 0.3:
-					<a href="<?php bloginfo('atom_url', 'raw'); ?>">Posts</a>,
-					<a href="<?php bloginfo('comments_atom_url', 'raw'); ?>">Comments</a>
+					<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>">Posts</a>,
+					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>">Comments</a>
 				</li>
       </ul>
       <a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
@@ -304,9 +304,9 @@
   
 	<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
 	
-	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('rss2_url', 'raw'); ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
-	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('atom_url', 'raw'); ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php
 	log_hit();	// log the hit on this page

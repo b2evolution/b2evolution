@@ -7,17 +7,17 @@
 	$show_statuses = array();     // Restrict to published posts
 	$timestamp_min = '';					// Show past
 	$timestamp_max = 'now';				// Hide future
-  require dirname(__FILE__)."/../b2evocore/_blog_main.php";
+  require dirname(__FILE__).'/../b2evocore/_blog_main.php';
   header("Content-type: text/xml");
   echo "<?xml version=\"1.0\"?".">";
 ?>
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->
 <rss version="0.92">
   <channel>
-    <title><?php bloginfo( 'name', 'xml' ) ?></title>
-    <link><?php bloginfo( 'link', 'xml' ) ?></link>
-    <description><?php bloginfo( 'description' ,'xml') ?></description>
-    <language><?php bloginfo( 'lang', 'xml' ) ?></language>
+    <title><?php $Blog->disp( 'name', 'xml' ) ?></title>
+    <link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
+    <description><?php $Blog->disp( 'shortdesc' ,'xml' ) ?></description>
+    <language><?php $Blog->disp( 'lang', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss092</docs>
     <?php while( $Item = $MainList->get_item() ) { ?>
     <item>

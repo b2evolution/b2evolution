@@ -54,16 +54,17 @@
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 </ul>
 <?php 
-	// Select Blog #1: 
-	$blog = 1;
-	if( get_bloginfo( 'stub' ) != '' )
-	{	// Only display if the stub is set:
-?>
-<ul>
-<li><strong><?php echo T_('Blog #1') ?>: <a href="<?php bloginfo( 'blogurl' ); ?>"><?php echo T_('This is a special blog that aggregates all messages from all other blogs!') ?></a></strong> &nbsp; (<?php bloginfo( 'stub' ); ?>)</li>
-</ul>
-<?php 
-	}
+// Select Blog #1: 
+$blog = 1;
+$Blog_all = Blog_get_by_ID( 1 );
+if( $Blog_all->get( 'stub' ) != '' )
+{	// Only display if the stub is set:
+	?>
+	<ul>
+	<li><strong><?php echo T_('Blog #1') ?>: <a href="<?php $Blog_all->disp( 'blogurl', 'raw' ); ?>"><?php echo T_('This is a special blog that aggregates all messages from all other blogs!') ?></a></strong> &nbsp; (<?php $Blog_all->disp( 'stub', 'raw' ); ?>)</li>
+	</ul>
+	<?php 
+}
 ?>
 <p><?php echo T_('Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office.') ?></p>
 <h2><?php echo T_('More demos') ?>:</h2>

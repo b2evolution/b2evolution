@@ -75,7 +75,7 @@
 	
 			case 'postbypost':
 			default:
-				// --------------------------------- POSY BY POST ARCHIVES ---------------------------------------
+				// ------------------------------ POSY BY POST ARCHIVES --------------------------------
 				echo '<a href="';
 				permalink_link( '', 'id', $post_ID );
 				echo '">';

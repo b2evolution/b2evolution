@@ -14,10 +14,10 @@
 <!-- generator="b2evolution/<?php echo $b2_version ?>" -->
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://webns.net/mvcb/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title><?php bloginfo( 'name', 'xml' ) ?></title>
-    <link><?php bloginfo( 'link', 'xml' ) ?></link>
-    <description><?php bloginfo( 'description', 'xml' ) ?></description>
-    <language><?php bloginfo( 'lang', 'xml' ) ?></language>
+    <title><?php $Blog->disp( 'name', 'xml' ) ?></title>
+    <link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
+    <description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
+    <language><?php $Blog->disp( 'lang', 'xml' ) ?></language>
     <docs>http://backend.userland.com/rss</docs>
     <admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $b2_version ?>"/>
     <ttl>60</ttl>

@@ -82,7 +82,7 @@ switch($action)
 		}
 		else
 		{ // We are creating a new base cat
-			$blogparams = get_blogparams_by_ID($blog);
+			$blogparams = get_blogparams_by_ID( $blog );
 			?>
 		<h2><?php printf( T_('New category in blog: %s'), $blogparams->blog_name ); ?></h2>
 		<form name="addcat" action="b2categories.php" method="post">

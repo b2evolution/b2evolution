@@ -370,6 +370,22 @@ class Item extends DataObject
 
 
 	/** 
+	 * Template function: display permalink for item
+	 *
+	 * {@internal Item::permalink(-) }}
+	 *
+	 * @param string 'id' or 'title'
+	 * @param string filename to use
+	 */
+	function permalink( $mode = 'id', $file='' )
+	{
+		if( empty($file) ) 
+			$file = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
+		echo gen_permalink( $file, $this->ID, $mode );
+	}
+
+
+	/** 
 	 * Template function: display scope of item
 	 *
 	 * Scopes:

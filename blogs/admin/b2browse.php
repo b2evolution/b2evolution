@@ -62,13 +62,13 @@ for( $curr_blog_ID = blog_list_start();
 	}
 	else
 	{	// We could select a blog:
-		get_blogparams();
+		$blogparams = get_blogparams_by_ID( $blog );
 		
 		if( ! $current_User->is_blog_member( $blog ) )
 		{	
 			die( 'Permission denied.');
 		}
-	
+		// Show the posts:	
 		require dirname(__FILE__).'/_edit_showposts.php';
 	}
 

@@ -1324,10 +1324,12 @@ function gen_permalink(
 }
 
 
-/*
+/**
  * permalink_link(-)
  *
  * Display permalink
+ *
+ * @deprecated deprecated by {@link (Item::permalink())} but still used by _archives.php
  */
 function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
 {

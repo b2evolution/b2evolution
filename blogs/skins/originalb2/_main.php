@@ -4,24 +4,23 @@
 <!-- layout credits goto http://bluerobot.com/web/layouts/layout2.html -->
 
 <head xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-	<title><?php bloginfo('name') ?><?php single_post_title(' :: ', 'htmlhead') ?><?php single_cat_title(' :: ', 'htmlhead') ?><?php single_month_title(' :: ', 'htmlhead') ?></title>
+	<title><?php $Blog->disp( 'name', 'htmlbody' ) ?><?php single_post_title(' :: ', 'htmlhead') ?><?php single_cat_title(' :: ', 'htmlhead') ?><?php single_month_title(' :: ', 'htmlhead') ?></title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<meta http-equiv="reply-to" content="<?php bloginfo('admin_email'); ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
-	<meta name="description" content="<?php bloginfo('shortdesc', 'htmlattr'); ?>" />
-	<meta name="keywords" content="<?php bloginfo('keywords', 'htmlattr'); ?>" />
+	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
+	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<style type="text/css" media="screen">
 	@import url(layout2b.css);
 	</style>
 	<link rel="stylesheet" type="text/css" media="print" href="print.css" />
 	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
-	<link rel="alternate" type="text/xml" title="RDF" href="<?php bloginfo('rdf_url', 'raw'); ?>" />
-	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss_url', 'raw'); ?>" />
-	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php bloginfo('rss2_url', 'raw'); ?>" />
-	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php bloginfo('atom_url', 'raw'); ?>" />
-	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
+	<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
+	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
+	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
+	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
+	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 	<?php comments_popup_script() // Included javascript to open pop up windows ?>
 </head>
 <body>
@@ -29,7 +28,7 @@
 	require( dirname(__FILE__)."/_bloglist.php"); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
-<div id="header"><a href="<?php bloginfo('blogurl'); ?>" title="<?php bloginfo('name'); ?>"><?php bloginfo('name'); ?></a></div>
+<div id="header"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" title="<?php $Blog->disp( 'name', 'htmlattr' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></div>
 
 <div id="content">
 
@@ -38,13 +37,13 @@
 if( isset($MainList) ) while( $Item = $MainList->get_item() )
 {
 	$MainList->date_if_changed();
-	$Item->_anchor(); 
+	$Item->anchor(); 
 ?>
 <div class="storyTitle"><?php $Item->title(); ?>
 &nbsp;-&nbsp;
 Categories: <?php $Item->categories() ?>
 &nbsp;-&nbsp;
-<span class="storyAuthor"><a href="<?php bloginfo('blogurl'); ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php permalink_link() ?>"><?php $Item->time() ?></a>
+<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php the_author_ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php the_author() ?></a> - <?php the_author_email() ?></span> @ <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a>
 </div>
 
 <div class="storyContent">
@@ -130,10 +129,10 @@ Categories: <?php $Item->categories() ?>
 
 <div id="menu">
 
-<p><?php bloginfo('longdesc', 'htmlbody'); ?></p>
+<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 
 <h4>categories:</h4>
-<form action="<?php bloginfo('blogurl') ?>" method="get">
+<form action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method="get">
 <?php	require( dirname(__FILE__)."/_categories.php"); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 </form>
@@ -141,7 +140,7 @@ Categories: <?php $Item->categories() ?>
 
 <h4>search:</h4>
 
-<form name="searchform" method="get" action="<?php bloginfo('blogurl') ?>">
+<form name="searchform" method="get" action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>">
 	<input type="text" name="s" size="15" style="width: 100%" />
 	<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
 </form>
@@ -170,9 +169,9 @@ Categories: <?php $Item->categories() ?>
 ?>
 <br />
 
-<a href="<?php bloginfo('rss2_url'); ?>"><img src="../../img/xml.gif" alt="view this weblog as RSS !" width="36" height="14" border="0"  /></a><br />
+<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/xml.gif" alt="view this weblog as RSS !" width="36" height="14" border="0"  /></a><br />
 <a href="http://validator.w3.org/check/referer" title="this page validates as XHTML 1.0 Transitional"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" border="0" /></a><br />
-<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('rss2_url', 'raw'); ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
+<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 </div>
 
 <?php

@@ -29,6 +29,8 @@
 
 <!-- InstanceBeginEditable name="NavBar2" -->
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	$display_blog_list = 1; // forced
+	
 	# this is what will start and end your blog links
 	$blog_list_start = '<div class="NavBar">';				
 	$blog_list_end = '</div>';				
@@ -78,7 +80,7 @@
 	{ # by uncommenting the following lines you can hide some blogs
 		// if( $blog == 1 ) continue; // Hide blog 1...
 		?>
-<h3><a href="<?php blog_list_iteminfo('blogurl', 'raw'); ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
+<h3><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
 		<ul>
 		<?php	// Get the 3 last posts for each blog:
 			$BlogBList = & new ItemList( $blog,  '', '', '', '', '', array(), '', 'DESC', '', '', '', '', '', '', '', '', '', '3', 'posts' );
@@ -88,13 +90,13 @@
 			?>
 			<li lang="<?php $Item->lang() ?>">
 				<?php $Item->date() ?>:
-				<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php $Item->title( '', '', false ); ?></a>
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php $Item->title( '', '', false ); ?></a>
 				<span class="small">[<?php $Item->lang() ?>]</span>
 			</li>
 			<?php
 			}
 			?>
-			<li><a href="<?php blog_list_iteminfo('blogurl', 'raw'); ?>"><?php echo T_('More posts...') ?></a></li>
+			<li><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>"><?php echo T_('More posts...') ?></a></li>
 		</ul>
 		<?php
 	}
@@ -113,9 +115,9 @@
   
 	<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
 	
-	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('rss2_url', 'raw'); ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
-	<a href="http://feedvalidator.org/check.cgi?url=<?php bloginfo('atom_url', 'raw'); ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
 <?php 
 	if ($debug==1)

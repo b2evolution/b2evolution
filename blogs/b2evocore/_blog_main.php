@@ -54,7 +54,7 @@ if( empty($disp) )
 }
 
 // Getting current blog info:
-get_blogparams();
+$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 // Activate matching locale:
 locale_activate( locale_by_lang( get_bloginfo('lang') ) );

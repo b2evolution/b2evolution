@@ -217,19 +217,6 @@ function blog_update_user_perms( $blog )
 }
 
 /*
- * get_blogparams(-)
- *
- * Get current blog info
- * fplanque: added
- */
-function get_blogparams()
-{	
-	global $blog, $blogparams;
-	if( !isset($blog) ) die("No blog set!");
-	$blogparams = get_blogparams_by_ID( $blog );
-}
-
-/*
  * get_bloginfo(-)
  */
 function get_bloginfo( $show='', $this_blogparams = '' )
@@ -323,10 +310,6 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			$output = $xmlsrv_url.'/atom.php?blog='.$this_blogparams->blog_ID;
 			break;
 			
-		case 'rdf_url':
-			$output = $xmlsrv_url.'/rdf.php?blog='.$this_blogparams->blog_ID;
-			break;
-			
 		case 'comments_rdf_url':
 			$output = $xmlsrv_url.'/rdf.comments.php?blog='.$this_blogparams->blog_ID;
 			break;
@@ -361,23 +344,52 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 
 
 
-/*
- * get_blogparams_by_ID(-) 
- *
+/**
  * Get blog params for specified ID
  *
- * fplanque: created
- * TODO: on a heavy multiblog system, cache them one by one...
+ * {@internal get_blogparams_by_ID(-)}}
+ *
+ * @todo on a heavy multiblog system, cache them one by one...
+ * @deprecated deprecated by {@link Blog_get_by_ID()}
+ *
+ * @param integer Blog ID
  */
-function get_blogparams_by_ID( $blog_ID )
+function get_blogparams_by_ID( $blog_ID ) 
 {
 	global $tableblogs, $cache_blogs, $use_cache, $querycount;
+
+	if( $blog_ID < 1 ) die( 'No blog is selected!' );
+
 	if( (empty($cache_blogs[$blog_ID])) OR (!$use_cache) )
 	{
 		blog_load_cache();
 	}
 	if( !isset( $cache_blogs[$blog_ID] ) ) die( T_('Requested blog does not exist!') );
 	return $cache_blogs[$blog_ID];
+}
+
+/**
+ * Get Blog for specified ID
+ *
+ * {@internal Blog_get_by_ID(-)}}
+ *
+ * @todo on a heavy multiblog system, cache them one by one...
+ *
+ * @param integer ID of Blog we want
+ */
+function Blog_get_by_ID( $blog_ID ) 
+{
+	global $tableblogs, $cache_blogs, $use_cache, $querycount;
+
+	if( $blog_ID < 1 ) die( 'No blog is selected!' );
+
+	if ((empty($cache_blogs[$blog_ID])) OR (!$use_cache)) 
+	{
+		blog_load_cache();
+	}
+	if( !isset( $cache_blogs[$blog_ID] ) ) die( T_('Requested blog does not exist!') );
+
+	return new Blog( $cache_blogs[$blog_ID] ); // COPY !
 }
 
 
@@ -408,10 +420,12 @@ function blog_load_cache()
  * Note: these tags go anywhere in the template 
  *****/
 
-/*
+/**
  * bloginfo(-)
  *
  * Template tag
+ *
+ * @deprecated deprecated by {@link Blog:disp()}
  */
 function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams = '' ) 
 {

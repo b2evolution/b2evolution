@@ -11,7 +11,7 @@
 <html lang="<?php locale_lang() ?>">
 <head>
 	<title><?php
-		bloginfo('name', 'htmlhead');
+		$Blog->disp('name', 'htmlhead');
 		single_cat_title( ' - ', 'htmlhead' );
 		single_month_title( ' - ', 'htmlhead' );
 		single_post_title( ' - ', 'htmlhead' );
@@ -37,7 +37,7 @@
 		<?php $Item->content(); ?>
 		 <?php link_pages("<br />Pages: ","<br />","number") ?>
 	
-		 <div class="posted">by <?php the_author() ?> at <a href="<?php permalink_link() ?>"><?php $Item->time() ?></a><br />
+		 <div class="posted">by <?php the_author() ?> at <a href="<?php $Item->permalink() ?>"><?php $Item->time() ?></a><br />
 		<?php comments_popup_link("Comments (0)", "Comments (1)", "Comments (%)") ?> |
 	<?php trackback_popup_link("Trackback (0)", "Trackback (1)", "Trackback (%)") ?> |
 	<?php pingback_popup_link("Pingback (0)", "Pingback (1)", "Pingback (%)") ?> |
@@ -84,7 +84,7 @@
 	</div>
 	<div id="side">
 	
-		<div class="sidebody"><?php bloginfo('longdesc', 'htmlbody'); ?></div>
+		<div class="sidebody"><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></div>
 	
 		<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 			require( dirname(__FILE__)."/_bloglist.php"); 

@@ -52,7 +52,7 @@
 	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
 	// Getting current blog info:
-	get_blogparams();
+	$blogparams = get_blogparams_by_ID( $blog );
 
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order, $orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact, $preview, '', '', $timestamp_min, $timestamp_max );
@@ -320,7 +320,7 @@
 <div class="bSideBar">
 
 	<div class="bSideItem">
-	  <h3><?php bloginfo('name') ?></h3>
+	  <h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<?php 
 		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '', $timestamp_min, $timestamp_max );
 		

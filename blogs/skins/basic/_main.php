@@ -12,7 +12,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php
-		bloginfo('name', 'htmlhead');
+		$Blog->disp('name', 'htmlhead');
 		single_cat_title( ' - ', 'htmlhead' );
 		single_month_title( ' - ', 'htmlhead' );
 		single_post_title( ' - ', 'htmlhead' );
@@ -37,12 +37,12 @@
 
 	<hr>
 	<div align="center">
-		<h1><?php bloginfo('name', 'htmlbody') ?></h1>
-		<p><?php bloginfo('tagline', 'htmlbody') ?></p>
+		<h1><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
+		<p><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></p>
 	</div>	
 	<hr>
 
-  <small><?php bloginfo('longdesc', 'htmlbody'); ?></small>
+  <small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
 	
 	<hr>
 
@@ -63,7 +63,7 @@
 		<?php $Item->anchor(); ?>
 		<h3 class="bTitle">
 			<?php $Item->time(); ?>
-			<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
+			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
 			<?php $Item->title(); ?>
 		</h3>
 
@@ -85,14 +85,14 @@
 			</div>
 
 			<small>
-			<a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
+			<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display comments / Leave a comment') ?>"><?php comments_number() ?></a>
 			-
-			<a href="<?php permalink_link() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
+			<a href="<?php $Item->permalink() ?>#trackbacks" title="<?php echo T_('Display trackbacks / Get trackback address for this post') ?>"><?php trackback_number() ?></a>
 			<?php trackback_rdf() // trackback autodiscovery information ?>
 			-
-			<a href="<?php permalink_link() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
+			<a href="<?php $Item->permalink() ?>#comments" title="<?php echo T_('Display pingbacks') ?>"><?php pingback_number() ?></a>
 			-
-			<a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
+			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
 			</small>
 
 		</blockquote>
@@ -130,7 +130,7 @@
 		<strong>
 		<?php posts_nav_link(); ?>
 		::
-		<a href="<?php bloginfo('blogurl') ?>?disp=arcdir"><?php echo T_('Archives') ?></a>
+		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Archives') ?></a>
 		</strong>
 
 		<p><?php 

@@ -46,9 +46,8 @@ switch($action)
 		 * INSERT POST & more
 		 */
 		param( 'post_category', 'integer', true );
-		$blog = get_catblog($post_category);
-		get_blogparams();
-
+		$blog = get_catblog( $post_category ); 
+		$blogparams = get_blogparams_by_ID( $blog );
 		$title = T_('Adding new post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 		require( dirname(__FILE__) . '/_menutop_end.php' );
@@ -153,8 +152,8 @@ switch($action)
 		 * UPDATE POST
 		 */
 		param( "post_category", 'integer', true );
-		$blog = get_catblog($post_category);
-		get_blogparams();
+		$blog = get_catblog($post_category); 
+		$blogparams = get_blogparams_by_ID( $blog );
 
 		$title = T_('Updating post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
@@ -278,8 +277,8 @@ switch($action)
 		param( 'post_ID', 'integer', true );
 		$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
 		$post_cat =$postdata['Category'];
-		$blog = get_catblog($post_cat);
-		get_blogparams();
+		$blog = get_catblog($post_cat); 
+		$blogparams = get_blogparams_by_ID( $blog );
 
 		$title = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
@@ -366,7 +365,7 @@ switch($action)
 		// echo $post;
 		$postdata = get_postdata( $post ) or die( T_('Oops, no post with this ID!') );
 		$blog = get_catblog( $postdata['Category'] );
-		get_blogparams();
+		$blogparams = get_blogparams_by_ID( $blog );
 
 		$title = T_('Deleting post...');
 		require( dirname(__FILE__) . '/_menutop.php' );

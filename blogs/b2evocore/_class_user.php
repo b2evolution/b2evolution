@@ -103,10 +103,10 @@ class User extends DataObject
 		}
 	}	
 	
-	/* 
-	 * User::get(-)
-	 *
+	/** 
 	 * Get a param
+	 *
+	 * {@internal User::get(-)}}
 	 */
 	function get( $parname )
 	{

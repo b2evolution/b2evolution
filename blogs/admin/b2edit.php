@@ -156,7 +156,7 @@ switch($action)
 			break;
 		}
 		
-		get_blogparams();
+		$blogparams = get_blogparams_by_ID( $blog );
 
 		if( ! blog_has_cats( $blog ) )
 		{
