@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * This is the main public interface file!
  *
@@ -94,6 +94,6 @@ if( $Blog_all->get( 'stub' ) != '' )
 <div id="rowfooter">
 <a href="http://b2evolution.net/"><?php echo T_('Official website') ?></a> &middot; <a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a>
 </div>
-
+<?php debug_info(); // output debug info if requested ?>
 </body>
 </html>

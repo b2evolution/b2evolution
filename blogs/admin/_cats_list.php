@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Displays list of cats for editing
  *
@@ -71,5 +71,5 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	echo "</ul>\n";
 	// ----------------- END RECURSIVE CAT LIST ----------------
 ?>
-	<p><?php echo T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).') ?></p>
+	<p class="note"><?php echo T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number).') ?></p>
 </div>

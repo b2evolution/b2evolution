@@ -153,7 +153,7 @@ else
 		}
 		?></p>
 
-		<table class="thin" border="1">
+		<table class="grouped" cellspacing="0">
 		<tr>
 			<th><?php echo T_('Locale') ?></th>
 			<th><?php echo T_('Enabled') ?></th>
@@ -184,8 +184,8 @@ else
 		{
 			$i++;
 			?>
-			<tr style="text-align:center">
-			<td style="text-align:left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
+			<tr <?php if($i%2 == 1) echo 'class="odd"' ?>>
+			<td class="left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
 				<?php
 				echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />';
 				locale_flag( $lkey );
@@ -202,7 +202,7 @@ else
 				}
 				echo '</strong>
 			</td>
-			<td>
+			<td class="center">
 				<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
 			</td>
 			<td>
@@ -217,7 +217,7 @@ else
 
 			if( $current_User->check_perm( 'options', 'edit' ) )
 			{
-				echo '<td align="left">';
+				echo '<td class="left">';
 				if( $i > 1 )
 				{ // show "move prio up"
 					echo '<a href="?tab=regional'.($notransext ? '&amp;notransext=1' : '').'&amp;prioup='.$lkey.'"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
@@ -254,7 +254,7 @@ else
 				$po_file = dirname(__FILE__).'/'.$core_dirout.'/'.$locales_subdir.'/'.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 				if( ! is_file( $po_file ) )
 				{
-					echo '<td colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
+					echo '<td class="center" colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
 				}
 				else
 				{	// File exists:
@@ -320,10 +320,10 @@ else
 						}
 					}
 					// $all=$translated+$fuzzy+$untranslated;
-					echo "\n\t<td>". $all ."</td>";
+					echo "\n\t<td class=\"center\">". $all ."</td>";
 					$percent_done = round(($translated-$fuzzy/2)/$all*100);
 					$color = sprintf( '%02x%02x00', 255 - round($percent_done * 2.55), round($percent_done * 2.55) );
-					echo "\n\t<td style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
+					echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
 				}
 
 				if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction  )
@@ -353,16 +353,10 @@ else
 	</fieldset>
 
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ ?>
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php } ?>
+	{ 
+		form_submit();
+	} 
+	?>
 	</div>
 
 </form>

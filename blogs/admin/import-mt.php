@@ -7,6 +7,13 @@
  *  - assign comment_author_ID to comments if user exist?!
  *
  * CHANGES:
+ *  0.9.0.9:
+ *	 + Simulate the import before performing it for real
+ *   + Redesign of output and parsing
+ *   - Fixes
+ *     - Post status is now compared case insensitive
+ *     - Format of imported pings (trackbacks)
+ *     - some small ones, for sure.
  *  0.9.0.6:
  *   - Fixes..
  *   - Auto-P more flexible.
@@ -37,10 +44,10 @@
  *  0.1:
  *   - first release
  *
- * Credits go to the WordPress team (http://wordpress.org), where I got the basic 
+ * Credits go to the WordPress team (http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
  *
- * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS) 
+ * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS)
  * and Movable Type 2.64 and 2.661.
  * It should work quite alright with b2evo 0.9 though.
  *
@@ -71,64 +78,73 @@ $output_debug_dump = 0;  // set to true to get a lot of <pre>'d var_dumps
 
 set_magic_quotes_runtime( 0 );  // be clear on this
 
-?>
+$head = <<<EOB
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>b2evolution &rsaquo; Import from Movable Type</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<link href="../admin/admin.css" rel="stylesheet" type="text/css" />
+	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+EOB;
+if( is_file( dirname(__FILE__).'/custom.css' ) )
+{
+	$head .= '<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+}
+$head .= <<<EOB
+	<script type="text/javascript" src="styleswitcher.js"></script>
 </head>
 <body>
 <div id="header">
 	<a href="http://b2evolution.net"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 	<div id="headinfo">
-	<br /><span style="font-size:150%; font-weight:bold">import Movable Type into b2evolution - v0.9.0.5a</span>
+		<br /><span style="font-size:150%; font-weight:bold">import Movable Type into b2evolution - version 0.9.0.9pre</span>
 	</div>
+</div>
+EOB;
 
-	<?php
-
-	if( !file_exists('../conf/_config.php') )
+if( !file_exists('../conf/_config.php') )
+{
+	dieerror( "There doesn't seem to be a conf/_config.php file. You must install b2evolution before you can import any entries.", $head );
+}
+require( '../conf/_config.php' );
+if( (!isset($config_is_done) || !$config_is_done) )
+{
+	if( file_exists(dirname(__FILE__)."/$admin_dirout/$core_subdir/_conf_error_page.php") )
 	{
-		dieerror( "There doesn't seem to be a conf/_config.php file. You must install b2evolution before you can import any entries." );
+		$error_message = '';
+		require( dirname(__FILE__)."/$admin_dirout/$core_subdir/_conf_error_page.php" );
 	}
-	require( '../conf/_config.php' );
-	if( (!isset($config_is_done) || !$config_is_done) )
+	dieerror( 'b2evolution configuration is not done yet.', $head );
+}
+
+
+$use_obhandler = 0;  // no output buffering!
+require( '../b2evocore/_main.php' );
+
+// Check if user is logged in and is in group #1 (admins)
+if( !is_logged_in() || $current_User->Group->ID != 1 )
+{	// login failed
+	echo $head;
+	$error = 'You must login with an administrator (group #1) account.';
+	$redirect_to = $ReqURI;
+	require( dirname(__FILE__) . "/$admin_dirout/$htsrv_subdir/login.php" );
+}
+
+echo $head;
+
+param( 'exportedfile', 'string', '' );
+param( 'mode', 'string', 'normal' );
+
+/*** mode-tabs ***/ ?>
+<ul class="tabs"><?php
+	foreach( array( 'easy', 'normal', 'expert' ) as $tab )
 	{
-		if( file_exists(dirname(__FILE__)."/$admin_dirout/$core_subdir/_conf_error_page.php") )
-		{
-			$error_message = '';
-			require( dirname(__FILE__)."/$admin_dirout/$core_subdir/_conf_error_page.php" );
-		}
-		dieerror( 'b2evolution configuration is not done yet.' );
+		echo ( $tab == $mode ) ? '<li class="current">' : '<li>';
+		echo '<a href="import-mt.php?mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
 	}
-
-
-	$use_obhandler = 0;  // no output buffering!
-	require( '../b2evocore/_main.php' );
-
-	// Check if user is logged in and is in group #1 (admins)
-	if( veriflog( $login_required ) )
-	{	// login failed
-		$error = 'You must login with an administrator (group #1) account.';
-		require(dirname(__FILE__) . "/$admin_dirout/$htsrv_subdir/login.php");
-	}
-	elseif( $current_User->Group->ID != 1 )
-	{ // not in admin group
-		dieerror( 'You must <a href="'.$htsrv_url.'/login.php">login</a> with an administrator (group #1) account.' );
-	}
-
-	param( 'exportedfile', 'string', '' );
-	param( 'mode', 'string', 'normal' );
-	
-	/*** mode-tabs ***/ ?>
-	<ul class="tabs"><?php
-		foreach( array( 'easy', 'normal', 'expert' ) as $tab )
-		{
-			echo ( $tab == $mode ) ? '<li class="current">' : '<li>';
-			echo '<a href="import-mt.php?mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
-		}
-	?></ul></div>
+?></ul></div>
 
 <div style="padding-top:1em;clear:both;">
 <?php
@@ -164,6 +180,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 	}
 
 	// get the params
+	param( 'simulate', 'integer', 0 );
 	param( 'default_password', 'string', 'changeme' );
 	param( 'default_password2', 'string', 'changeme' );
 
@@ -200,33 +217,30 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 		<p>We are about to import <?php
 			echo '['.$exportedfile.'].';
 			if( '' == MTEXPORT )
-			{	
+			{
 				?> [<a href="import-mt.php?mode=<?php echo $mode ?>">choose another export-file</a>]<?php
 			} ?></p>
-			
+
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
 
 		<p>We'll import into b2evolution's database &quot;<?php echo DB_NAME ?>&quot;.</p>
 		</div>
 		<div class="panelinfo">
 			<p>Before importing, you should check the URLs of any &lt;img&gt; tags you may have in <?php echo $exportedfile ?>. Will these URLs still be valid after the migration? If not, we advise you do a search and replace on <?php echo $exportedfile ?> before continuing.</p>
-			
+
 			<p>Preferred location for inline images is [<?php echo $fileupload_realpath ?>]<br />
 			If you decide to use this location, your IMG SRC urls should point to [<?php echo $fileupload_url ?>]</p>
-			
+
 			<p>You can also handle the images later, but it might be easier now :)</p>
 		</div>
 
-	<div class="panelinfo">
-	<p>The importer is smart enough not to import duplicates, so you can run this procedure multiple times without worrying if &#8212; for whatever reason &#8212; it doesn't finish (script timeout for example).</p>
+		<div class="panelinfo">
+			<p>The importer is smart enough not to import duplicates, so you can run this procedure multiple times without worrying if &#8212; for whatever reason &#8212; it doesn't finish (script timeout for example).</p>
 		</div>
 
 
-		</div>
-
-
+		<div class="panelblock">
 		<form class="fform" action="import-mt.php" method="post">
-			<input type="hidden" name="tab" value="import" />
 			<input type="hidden" name="action" value="import" />
 		<?php
 		if( !empty($exportedfile) )
@@ -234,10 +248,9 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			?><input type="hidden" name="exportedfile" value="<?php echo format_to_output( $exportedfile, 'formvalue' ) ?>" />
 			<?php
 		}
-		
+
 		?>
 
-		<div class="panelblock">
 		<?php
 		switch( $mode )
 		{
@@ -378,7 +391,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				<div class="input"><?php renderer_list() ?></div>
 			<?php } ?>
 		</fieldset>
-		
+
 		<?php /*<fieldset style="padding-left:1ex"><legend>&lt;img&gt;-URL mapping</legend>
 			<a name="imgurls"><p class="notes">This lets you map found image urls (their basename) to another basename.
 			You probably want to put the images that you had on your MT installation into b2evo's media (fileupload) folder.<br />
@@ -386,20 +399,20 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			You can leave this empty, of course and nothing will be replaced, but then you'll have probably broken images.</p></a>
 			<?php
 			preg_match_all( '#<img .*?src="([^"]*)/.*?"#is', $importdata, $matches );
-		
+
 			foreach( $matches[1] as $imgurl )
 			{
 				if( !isset($imgurlscount[ $imgurl ]) )
 					$imgurlscount[ $imgurl ] = 1;
 				else $imgurlscount[ $imgurl ]++;
 			}
-			
+
 			asort( $imgurlscount );
 			$imgurlscount = array_reverse( $imgurlscount );
-			
+
 			param( 'singleimgurls', 'integer', 0 );
 			$i = 0;
-			foreach( $imgurlscount as $imgurl => $counter ) if( $counter > 1 || $singleimgurls ) 
+			foreach( $imgurlscount as $imgurl => $counter ) if( $counter > 1 || $singleimgurls )
 			{
 				?><input type="hidden" name="url_search[<?php echo $i ?>]" value="<?php echo format_to_output( $imgurl, 'formvalue' ) ?>" />
 				<strong><?php echo $imgurl ?></strong>:<br />
@@ -409,16 +422,20 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				<?php
 				$i++;
 			}
-		
+
 			echo '<p class="center"><a name="imgurls" href="import-mt.php?tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
 			if( !empty($exportedfile) ) echo '&amp;exportedfile='.$exportedfile;
 			echo '">'.( $singleimgurls ? 'hide img urls only used once' : 'show also img urls only used once').'</a></p>';
-			
+
 		?>
 		</fieldset>
 		*/ ?>
 
-		
+		<fieldset><legend>other settings</legend>
+			<?php
+			form_checkbox( 'simulate', $simulate, 'Simulate: do not import really', 'Use this to test importing, without really changing the target database.' );
+		?>
+		</fieldset>
 		<p>Please note:</p>
 		<ul>
 			<li>b2evolution does not support excerpts yet.
@@ -426,12 +443,15 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			but only if there is no extended body for the post. In that case we'll use the extended body appended with the &lt;!--more--&gt; tag to the body - excerpts are lost then (but you'll get a note about it).
 			</li>
 		</ul>
-		</div>
 
-		<div class="input">
-			<input type="hidden" name="mode" value="<?php echo $mode ?>" />
-			<input class="search" type="submit" value=" Import! " />
-			<input class="search" type="reset" value="Reset form" />
+		<fieldset class="submit">
+			<div class="input">
+				<input type="hidden" name="mode" value="<?php echo $mode ?>" />
+				<input class="search" type="submit" value=" Import! " />
+				<input class="search" type="reset" value="Reset form" />
+			</div>
+		</fieldset>
+
 		</div>
 
 		</form>
@@ -447,7 +467,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 	{
 		?>
 		<div class="panelinfo">
-		<h4>Importing..</h4>
+		<h4>Importing from [<?php echo $exportedfile ?>]..<?php if( $simulate ) echo ' (simulating)' ?></h4>
 
 		<?php
 		if( function_exists( 'set_time_limit' ) )
@@ -536,7 +556,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			}
 			else
 			{
-				dieerror('this should never happen @catmapping. please report it! (cat='.$cat.' / ');
+				dieerror('This should never happen @catmapping. Please report it! (cat='.$cat.' / ');
 			}
 
 		}
@@ -575,7 +595,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				$default_renderers = array();
 			}
 			else $default_renderers = $_POST['renderers'];
-			
+
 			// the special Auto-P renderer
 			param( 'autop', 'string', true );
 			if( $autop === '1' )
@@ -586,9 +606,10 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 		else
 		{
 			$default_renderers = $Renderer->validate_list( array('default') );
+			$autop = 1;
 		}
 
-		
+
 		/*
 		// get image s&r
 		$urlsearch = array();
@@ -640,70 +661,22 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 		debug_dump( $usersmapped, 'usersmapped' );
 
 
-		/**
-		 * function to check the authorname and do the mapping
-		 */
-		function checkauthor( $author )
+		if( $simulate )
 		{
-			global $DB, $tableusers, $usersmapped;
-			global $default_password, $default_userlevel, $default_usergroup;
-			global $GroupCache, $count_userscreated, $Settings;
-
-			switch( $usersmapped[ $author ][0] )
-			{
-				case 'ignore':
-					?><span style="color:blue">User ignored!</span><?php
-					return -1;
-
-				case 'b2evo':
-					return $usersmapped[ $author ][1];
-
-				case 'createnew':
-					// check if the user already exists
-					$user_data = get_userdatabylogin( $author );
-					if( $user_data )
-					{
-						return $user_data['ID'];
-					}
-					else
-					{
-						$new_user = new User();
-						$new_user->set('login', strtolower($usersmapped[ $author ][1]));
-						$new_user->set('nickname', $usersmapped[ $author ][1]);
-						$new_user->set('pass', md5( $default_password ));
-						$new_user->set('level', $default_userlevel);
-						$new_user_Group = $GroupCache->get_by_ID( $default_usergroup );
-						$new_user->setGroup( $new_user_Group );
-						$new_user->set_datecreated( time() + ($Settings->get('time_difference') * 3600) );
-
-						$new_user->dbinsert();
-
-						?><span class="notes"> [user <?php echo $usersmapped[ $author ][1] ?> created!] </span><?php
-						$count_userscreated++;
-
-						return $new_user->ID;
-					}
-				default:
-					?><p class="error">unknown type in checkauthor (<?php echo $usersmapped[ $author ][0] ?>). this should never ever happen. Please report it.</p><?php
-			}
+			$simulate_cat_id = $DB->get_var( 'SELECT MAX( cat_ID )+1 FROM EVO_categories' );
 		}
 
-
 		$i = -1;
-
 		echo "\n<ol>";
 		foreach ($posts as $post)
 		{
 			++$i;
-			echo "\n<li>Processing post ";
 
-			preg_match( '/(AUTHOR: )?(.*?)\n/s', $post, $match );
-			$post_author = $match[2];
-			
-			$post = preg_replace("|^.*?\n|s", '', $post);
-			
-			echo 'from '.format_to_output( $post_author, 'entityencoded' ).' ';
-			
+			// first line is author of post
+			$post_author = trim( substr( $post, 0, strpos( $post, "\n", 1 ) ) );
+			$post = preg_replace( '/^.*\n/', '', $post );
+			$message = "\n<li>Post from ".format_to_output( $post_author, 'entityencoded' ).' <ul>';
+
 			$post_catids = array();
 			$post_renderers = $default_renderers;
 
@@ -741,8 +714,8 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			{ // we'll use body and extended body
 				if( !empty($excerpt) )
 				{
-					?><p style="color:red">Excerpt discarded because of existing extended body:</p>
-					<blockquote><?php echo htmlspecialchars($excerpt) ?></blockquote><br /><?php
+					$message .=	'<li><span style="color:red">Excerpt discarded because of existing extended body:</span>
+					<blockquote>'.htmlspecialchars($excerpt).'</blockquote></li>';
 				}
 				$post_content = $body."\n<!--more-->\n".$extended;
 			}
@@ -759,7 +732,11 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 
 				$post_locale = $default_locale;
 
-				preg_match("/^(.*?):(.*)/", $line, $token);
+				if( !preg_match("/^(.*?):(.*)/", $line, $token) )
+				{
+					$message .= "<li class=\"notes\">Unknown meta-data: [$line] (ignoring)</li>";
+					continue;
+				}
 				$key = trim( $token[1] );
 				$value = trim( $token[2] );
 
@@ -767,17 +744,17 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				switch($key)
 				{
 					case 'TITLE':
-						echo '<em>'.strip_tags($value).'</em>... ';
+						$message .= '<li>title: '.strip_tags($value).'</li>';
 						$post_title = $value;
 						break;
 					case 'STATUS':
-						if( $value == 'Publish' )
+						if( strtolower($value) == 'publish' )
 							$post_status = 'published';
-						elseif( $value == 'Draft' )
+						elseif( strtolower($value) == 'draft' )
 							$post_status = 'draft';
 						else
 						{
-							echo '<p class="error">Unknown post status ['.$value.'], using "draft".';
+							$message .= '<li>Unknown post status ['.$value.'], using "draft".</li>';
 							$post_status = 'draft';
 						}
 						break;
@@ -788,13 +765,15 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 							case 1: $comment_status = 'open'; break;
 							case 2: $comment_status = 'closed'; break;
 							default:
-								echo '<p class="error">Unknown comment status ['.$value.'], using "closed".';
+								$message .= '<li>Unknown comment status ['.$value.'], using "closed".</li>';
 								$comment_status = 'closed';
 						}
 						break;
 					case 'CONVERT BREAKS':
 						if( $value == '__default__' || empty($value) )
+						{
 							$post_convert_breaks = $default_convert_breaks;
+						}
 						elseif( $value == 'textile_2'	&& array_search( 'b2DATxtl', $post_renderers ) === false )
 						{ // add the textile 2 renderer to the post's renderers
 							$post_renderers[] = 'b2DATxtl';
@@ -806,15 +785,15 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 						}
 						else
 						{
-							echo '<p class="error">Unknown CONVERT BREAKS value, using default ('.$default_convert_breaks.')..';
+							$message .= '<li>Unknown CONVERT BREAKS value, using default ('.$default_convert_breaks.')..</li>';
 							$post_convert_breaks = $default_convert_breaks;
 						}
-						
+
 						if( $autop == 'depends' && $post_convert_breaks && array_search( 'b2WPAutP', $post_renderers ) === false  )
 						{ // add the Auto-P renderer
 							$post_renderers[] = 'b2WPAutP';
 						}
-						
+
 						break;
 					case 'ALLOW PINGS':
 						if( $value == 1)
@@ -843,7 +822,7 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 						$post_date = date('Y-m-d H:i:s', $post_date);
 						break;
 					default:
-						echo "\n<p class=\"notes\">Unknown key [$key]: $value";
+						$message .= "\n<li>Unknown key [$key] in metadata:\nvalue: $value\n</li>";
 						break;
 				}
 			} // End foreach (metadata)
@@ -865,20 +844,64 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 
 			// Let's check to see if it's in already
 			if( $post_ID = $DB->get_var("SELECT ID FROM $tableposts WHERE post_title = ".$DB->quote($post_title)." AND post_issue_date = '$post_date'")) {
-				echo '<span style="color:#09c">Post already imported.</span>';
+				$message .= '<li style="color:blue">Post already imported.</li>';
 			}
 			else
 			{ // insert post
-				$post_author = checkauthor($post_author);//just so that if a post already exists, new users are not created by checkauthor
 
-				if( $post_author == -1 )
-					continue;  // user ignored
+				// check&map author
+				switch( $usersmapped[ $post_author ][0] )
+				{
+					case 'ignore':
+						$message .= '<li style="color:blue">User ignored!</li>';
+						echo $message.'</ul>';
+						continue;  // next post
+
+					case 'b2evo':
+						$post_author = $usersmapped[ $post_author ][1];
+						break;
+
+					case 'createnew':
+						// check if the user already exists
+						$user_data = get_userdatabylogin( $post_author );
+						if( $user_data )
+						{
+							$post_author = $user_data['ID'];
+						}
+						else
+						{
+							$new_user = new User();
+							$new_user->set('login', strtolower($usersmapped[ $post_author ][1]));
+							$new_user->set('nickname', $usersmapped[ $post_author ][1]);
+							$new_user->set('pass', md5( $default_password ));
+							$new_user->set('level', $default_userlevel);
+							$new_user_Group = $GroupCache->get_by_ID( $default_usergroup );
+							$new_user->setGroup( $new_user_Group );
+							$new_user->set_datecreated( time() + ($Settings->get('time_difference') * 3600) );
+
+							if( !$simulate )
+							{
+								$new_user->dbinsert();
+							}
+
+							$message .= '<li style="color:orange">user '.$usersmapped[ $post_author ][1].' created</li>';
+							$count_userscreated++;
+
+							$post_author = $new_user->ID;
+						}
+						break;
+					default:
+						$message .= '<li style="color:red">unknown type in checkauthor ('.$usersmapped[ $author ][0].'). This should never ever happen. Post ignored. Please report it.</li>';
+						echo $message.'</ul>';
+						continue;  // next post
+				}
 
 
 				debug_dump( $post_categories, 'cats to check' );
 
 				// Check categories
 				$i_cat = -1;
+				$message_ignored = '';
 				foreach( $post_categories as $catname => $checkcat )
 				{
 					$i_cat++;
@@ -888,32 +911,32 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 							array_shift($checkcat);
 							while( $cat_id = array_shift($checkcat) )
 								$post_catids[] = $cat_id; // get all catids
-						continue;
+							continue;
 
 						case 'ignore': // category is ignored
-							?>
-							<span style="color:blue">
-							<?php
 							if( $i_cat == 0 )
 							{ // main category ignored, don't import post
 								$dontimport = 1;
-								?>
-								<br />Main Category &quot;<?php echo $catname ?>&quot; ignored! - no import</span>
-								<?php
+								$message_ignored .= '<li>Main Category &quot;'.$catname.'&quot; ignored! - no import</li>';
 								break;
 							}
 							else
 							{ // ignored category in extracats, remove it there
-								?>
-								<br />Extra category <?php echo $catname ?> ignored.</span>
-								<?php
+								$message_ignored .= '<li>Extra category '.$catname.' ignored.</li>';
 								unset( $post_categories[ $catname ] );
 							}
 							break;
 
 						case 'blogid': // category has to be created
 							// create it and remember ID
-							$cat_id = cat_create( $checkcat[2], 'NULL', $checkcat[1] );
+							if( $simulate )
+							{
+								$cat_id = ++$simulate_cat_id;
+							}
+							else
+							{
+								$cat_id = cat_create( $checkcat[2], 'NULL', $checkcat[1] );
+							}
 							$catsmapped[ $catname ] = array( 'catid', $cat_id ); // use ID from now on.
 
 							if( !isset($cache_categories[ $cat_id ] ) )
@@ -927,18 +950,22 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 								);
 							}
 							$post_catids[] = $cat_id;
-							?><span class="notes"> [category <?php echo $checkcat[2].' [ID '.$cat_id.']' ?> created!] </span><?php
+							$message .= '<li style="color:orange">category '.$checkcat[2].' [ID '.$cat_id.'] created</li>';
 							break;
 
-						default: ?><p class="error">This should never ever happen @check_cats. Please report it! (checkcat[0]: <?php echo $checkcat[0] ?>)</p><?php
+						default:
+							$message .= '<li style="color:red">This should never ever happen @check_cats. Please report it! (checkcat[0]: '.$checkcat[0].')</li>';
 
 					}
 				}
+				if( !empty($message_ignored) )
+					$message .= '<li style="color:blue">Categories ignored: <ul>'.$message_ignored.'</ul></li>';
 
 				debug_dump( $dontimport, 'dontimport' );
 				if( $dontimport )
 				{ // see var name :)
-					continue;
+					echo $message;
+					continue;  // next post
 				}
 
 				if( $convert_html_tags )
@@ -948,11 +975,11 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 					$post_content = preg_replace( array('/<(br)>/', '/<(hr\s?.*?)>/', '/<(img\s.*?)>/'), '<\\1 />', remove_magic_quotes($post_content) );
 					if( $post_content != $old_content )
 					{
-						echo '<p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>
-						html-converted to: <p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($post_content).'</p>';
+						$message .= '<li><p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>
+						html-converted to: <p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($post_content).'</p></li>';
 					}
 				}
-				
+
 				/*if( count($urlreplace) )
 				{
 					$old_content = $post_content;
@@ -973,123 +1000,114 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 				debug_dump( $post_categories, 'post_categories' );
 				debug_dump( $post_author, 'post_author' );
 
-				$post_ID =
-					bpost_create( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_catids,
-												$post_status,	$post_locale,	'' /* $post_trackbacks */, $post_convert_breaks, true /* $pingsdone */,
-												'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
+				if( !$simulate )
+				{
+					$post_ID =
+						bpost_create( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_catids,
+													$post_status,	$post_locale,	'' /* $post_trackbacks */, $post_convert_breaks, true /* $pingsdone */,
+													'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
+				}
 
-				echo ' <span style="color:green">Post imported successfully (maincat: '.get_catname( $post_category );
+				$message .= '<li><span style="color:green">Imported successfully</span><ul><li>main category: <span style="color:#09c">'.get_catname( $post_category ).'</span></li>';
 				if( count($post_catids) )
-					echo ', extra cats: '.preg_replace( '/(\d+)/e', "get_catname('\\1')", implode( ', ', $post_catids ) );
-				echo ')</span>';
+					$message .= '<li>extra categories: <span style="color:#09c">'.preg_replace( '/(\d+)/e', "get_catname('\\1')", implode( ', ', $post_catids ) ).'</span></li>';
+				$message .= '</ul></li>';
 				$count_postscreated++;
 
-
 			}
+			echo $message.'</ul>';
+
 
 			if( count($comments) )
 			{ // comments
+				$message = '';
+
 				$comments = explode("-----\nCOMMENT:", $comments[0]);
-				foreach ($comments as $comment)	if( '' != trim($comment) )
+				foreach ($comments as $comment)
 				{
-					// Author
-					preg_match("|AUTHOR:(.*)|", $comment, $comment_author);
-					$comment_author = trim($comment_author[1]);
-					$comment = preg_replace('|(\n?AUTHOR:.*)|', '', $comment);
+					$comment = trim($comment);
+					if( empty($comment) ) continue;
 
-					preg_match("|EMAIL:(.*)|", $comment, $comment_email);
-					$comment_email = trim($comment_email[1]);
-					$comment = preg_replace('|(\n?EMAIL:.*)|', '', $comment);
+					$comment_author = ripline( 'AUTHOR:', $comment );
+					$comment_email = ripline( 'EMAIL:', $comment );
+					$comment_ip = ripline( 'IP:', $comment );
+					$comment_url = ripline( 'URL:', $comment );
+					$comment_date = date('Y-m-d H:i:s', strtotime( ripline( 'DATE:', $comment )));
 
-					preg_match("|IP:(.*)|", $comment, $comment_ip);
-					$comment_ip = trim($comment_ip[1]);
-					$comment = preg_replace('|(\n?IP:.*)|', '', $comment);
+					$comment_content = preg_replace("/\n*-----$/", '', $comment);
 
-					preg_match("|URL:(.*)|", $comment, $comment_url);
-					$comment_url = trim($comment_url[1]);
-					$comment = preg_replace('|(\n?URL:.*)|', '', $comment);
-
-					preg_match("|DATE:(.*)|", $comment, $comment_date);
-					$comment_date = trim($comment_date[1]);
-					$comment_date = date('Y-m-d H:i:s', strtotime($comment_date));
-					$comment = preg_replace('|(\n?DATE:.*)|', '', $comment);
-
-					$comment_content = trim($comment);
-					$comment_content = str_replace('-----', '', $comment_content);
-
-					// Check if it's already there
+					// Check if it's already in there
 					if( !$DB->get_row("SELECT * FROM $tablecomments WHERE comment_date = '$comment_date' AND comment_content = ".$DB->quote( $comment_content )) )
 					{
-						$DB->query( "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author,
-																									comment_author_email, comment_author_url, comment_author_IP,
-																									comment_date, comment_content)
-											VALUES( $post_ID, 'comment', 'NULL', ".$DB->quote($comment_author).",
-															".$DB->quote($comment_email).",	".$DB->quote($comment_url).",
-															".$DB->quote($comment_ip).", '$comment_date', ".$DB->quote($comment_content)." )" );
+						if( !$simulate )
+						{
+							$DB->query( "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author,
+																										comment_author_email, comment_author_url, comment_author_IP,
+																										comment_date, comment_content)
+												VALUES( $post_ID, 'comment', 'NULL', ".$DB->quote($comment_author).",
+																".$DB->quote($comment_email).",	".$DB->quote($comment_url).",
+																".$DB->quote($comment_ip).", '$comment_date', ".$DB->quote($comment_content)." )" );
+						}
 
-						echo ' Comment added.';
+						$message .= '<li>Comment from '.$comment_author.' added.</li>';
 						$count_commentscreated++;
 					}
 				}
+				if( !empty($message) )
+				{
+					echo '<ul>'.$message.'</ul>';
+				}
+
 			}
 
 			// Finally the pings
 			// fix the double newline on the first one
 			if( count($pings) )
 			{
+				$message = '';
 				$pings[0] = str_replace("-----\n\n", "-----\n", $pings[0]);
 				$pings = explode("-----\nPING:", $pings[0]);
-				foreach ($pings as $ping) if ('' != trim($ping))
+				foreach( $pings as $ping )
 				{
-					// 'Author'
-					preg_match("|BLOG NAME:(.*)|", $ping, $comment_author);
-					$comment_author = trim($comment_author[1]);
-					$ping = preg_replace('|(\n?BLOG NAME:.*)|', '', $ping);
+					$ping = trim($ping);
+					if( empty($ping) ) continue;
 
+					$comment_author = ripline( 'BLOG NAME:', $ping );
 					$comment_email = '';
+					$comment_ip = ripline( 'IP:', $ping );
+					$comment_url = ripline( 'URL:', $ping );
+					$comment_date = date('Y-m-d H:i:s', strtotime( ripline( 'DATE:', $ping )));
+					$ping_title = ripline( 'TITLE:', $ping );
 
-					preg_match("|IP:(.*)|", $ping, $comment_ip);
-					$comment_ip = trim($comment_ip[1]);
-					$ping = preg_replace('|(\n?IP:.*)|', '', $ping);
+					$comment_content = preg_replace("/\n*-----$/", '', $ping);
 
-					preg_match("|URL:(.*)|", $ping, $comment_url);
-					$comment_url = trim($comment_url[1]);
-					$ping = preg_replace('|(\n?URL:.*)|', '', $ping);
-
-					preg_match("|DATE:(.*)|", $ping, $comment_date);
-					$comment_date = trim($comment_date[1]);
-					$comment_date = date('Y-m-d H:i:s', strtotime($comment_date));
-					$ping = preg_replace('|(\n?DATE:.*)|', '', $ping);
-
-					preg_match("|TITLE:(.*)|", $ping, $ping_title);
-					$ping_title = trim($ping_title[1]);
-					$ping = preg_replace('|(\n?TITLE:.*)|', '', $ping);
-
-					$comment_content = trim($ping);
-					$comment_content = str_replace('-----', '', $comment_content);
-
-					$comment_content = "<trackback /><strong>$ping_title</strong>\n$comment_content";
+					$comment_content = "<strong>$ping_title</strong><br />$comment_content";
 
 					// Check if it's already there
 					if (!$DB->get_row("SELECT * FROM $tablecomments WHERE comment_date = '$comment_date' AND comment_type = 'trackback' AND comment_content = ".$DB->quote($comment_content)))
 					{
-						$DB->query("INSERT INTO $tablecomments
-						(comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url,
-						comment_author_IP, comment_date, comment_content )
-						VALUES
-						($post_ID, 'trackback', ".$DB->quote($comment_author).", ".$DB->quote($comment_email).", ".$DB->quote($comment_url).",
-						".$DB->quote($comment_ip).", ".$DB->quote($comment_date).", ".$DB->quote($comment_content)." )");
-						echo ' Trackback added.';
+						if( !$simulate )
+						{
+							$DB->query( "INSERT INTO $tablecomments
+								(comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url,
+								comment_author_IP, comment_date, comment_content )
+								VALUES
+								($post_ID, 'trackback', ".$DB->quote($comment_author).", ".$DB->quote($comment_email).", ".$DB->quote($comment_url).",
+								".$DB->quote($comment_ip).", ".$DB->quote($comment_date).", ".$DB->quote($comment_content)." )" );
+						}
+						$message .= '<li>Trackback from '.$comment_url.' added.</li>';
 						$count_trackbackscreated++;
 					}
 				}
+				echo $message;
 			}
-			echo "</li>";
+
+			echo "</li>\n";
 			flush();
 		}
 		?>
 		</ol>
-		<h4>All done.</h4>
+		<h4>All done.<?php if( $simulate ) echo ' (simulated - no real import!)' ?></h4>
 		<ul>
 			<li><?php echo $count_postscreated ?> post(s) imported.</li>
 			<li><?php echo $count_userscreated ?> user(s) created.</li>
@@ -1097,7 +1115,37 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 			<li><?php echo $count_trackbackscreated ?> trackback(s) imported.</li>
 			<li>in <?php echo number_format(timer_stop(), 3) ?> seconds.</li>
 		</ul>
-		<a href="<?php echo $admin_dirout ?>">Have fun in your blogs</a> or <a href="<?php echo $admin_url ?>">go to admin</a> (it's fun there, too)</h3>
+		<?php
+		if( $simulate )
+		{
+			echo '
+			<form action="import-mt.php" method="post">
+			<p>
+			<strong>This was only simulated..</strong>
+			';
+			foreach( $_POST as $key => $value )
+			{
+				if( $key != 'simulate' )
+				{
+					if( is_array( $value ) )
+					{
+						foreach( $value as $key2 => $value2 )
+						{
+							echo '<input type="hidden" name="'.$key.'['.$key2.']" value="'.format_to_output( $value2, 'formvalue' ).'" />';
+						}
+					}
+					else
+					{
+						echo '<input type="hidden" name="'.$key.'" value="'.format_to_output( $value, 'formvalue' ).'" />';
+					}
+				}
+			}
+			echo '<input type="submit" value="Do it for real now!" /></p></form>'."\n";
+		}
+		?>
+		<p>
+			<a href="<?php echo $admin_dirout ?>">Have fun in your blogs</a> or <a href="<?php echo $admin_url ?>">go to admin</a> (it's fun there, too)
+		</p>
 		<?php
 		if(	$count_userscreated )
 		{
@@ -1121,16 +1169,29 @@ set_magic_quotes_runtime( 0 );  // be clear on this
 </div>
 </body>
 </html>
-
-
 <?php
+
+/* ------ FUNCTIONS ------ */
+
 function fieldset_cats()
 {
 	global $cache_blogs, $cache_categories;
+
 	?>
 	<fieldset title="default categories set" style="background-color:#fafafa; border:1px solid #ccc; padding: 1em; display:inline; float:right; white-space:nowrap;">
 		<legend>Default categories set (only needed if you want to map categories to this)</legend>
-		<p class="extracatnote"><?php echo T_('Select main category in target blog and optionally check additional categories') ?>:</p>
+		<p class="extracatnote">
+		<?php
+			if( count( $cache_categories ) )
+			{
+				echo T_('Select main category in target blog and optionally check additional categories').':';
+			}
+			else
+			{
+				echo 'No categories in your blogs..';
+			}
+		?>
+		</p>
 
 		<?php
 		// ----------------------------  CATEGORIES ------------------------------
@@ -1201,19 +1262,46 @@ function fieldset_cats()
 */
 function cats_optionslist( $forcat )
 {
-	global $cache_categories, $cache_blogs;
+	global $cache_categories, $cache_blogs, $cache_optionslist;
 
-	foreach( $cache_blogs as $i_blog )
+	if( !isset($cache_optionslist) )
 	{
-		echo '<option value="#NEW#'.$i_blog->blog_ID.'">[-- create in blog '.$i_blog->blog_shortname.' --]:</option>';
-		cat_children2( $forcat, $cache_categories, $i_blog->blog_ID, NULL, 1 );
+		$cache_optionslist = '';
+		foreach( $cache_blogs as $i_blog )
+		{
+			$cache_optionslist .= '<option value="#NEW#'.$i_blog->blog_ID.'">[-- create in blog '.$i_blog->blog_shortname.' --]:</option>';
+			cat_children2( $cache_categories, $i_blog->blog_ID, NULL, 1 );
+		}
+	}
+
+	$cat_id = false;
+	foreach( $cache_categories as $key => $value )
+	{
+		if( $value['cat_name'] == $forcat )
+		{
+			$cat_id = $key;
+			break;
+		}
+	}
+
+	if( is_int($cat_id) )
+	{
+		echo str_replace( '<option value="'.$cat_id.'">', '<option value="'.$cat_id.'" selected="selected">', $cache_optionslist );
+	}
+	else
+	{
+		echo $cache_optionslist;
 	}
 }
 
-function cat_children2( $forcat, $ccats, 	// PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
-	$blog_ID, $parent_ID,
+function cat_children2(
+	$ccats, 	// PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
+	$blog_ID,
+	$parent_ID,
 	$level = 0 )	// Caller nesting level, just to keep track of how far we go :)
 {
+	global $cache_optionslist;
+
 	// echo 'Number of cats=', count($ccats);
 	if( ! empty( $ccats ) ) // this can happen if there are no cats at all!
 	{
@@ -1224,18 +1312,16 @@ function cat_children2( $forcat, $ccats, 	// PHP requires this stupid cloning of
 			{ // this cat is in the blog and is a child of the parent
 				$child_count++;
 
-				echo '<option value="'.$icat_ID.'"';
-				if( $ccats[ $icat_ID ]['cat_name'] == $forcat ) echo ' selected="selected"';
-				echo '>';
+				$cache_optionslist .= '<option value="'.$icat_ID.'">';
 
 				for( $i = 0; $i < $level; $i++ )
 				{
-					echo '-';
+					$cache_optionslist .= '-';
 				}
 
-				echo '&gt; '.format_to_output( $ccats[ $icat_ID ]['cat_name'], 'entityencoded' ).'</option>';
+				$cache_optionslist .= '&gt; '.format_to_output( $ccats[ $icat_ID ]['cat_name'], 'entityencoded' ).'</option>';
 
-				cat_children2( $forcat, $ccats, $blog_ID, $icat_ID, $level+1 );
+				cat_children2( $ccats, $blog_ID, $icat_ID, $level+1 );
 			}
 		}
 	}
@@ -1251,18 +1337,18 @@ function import_data_extract_authors_cats()
 	global $exportedfile;
 	global $categories_countprim;
 	global $importdata;
+	global $mode;
 
 	$fp = fopen( $exportedfile, 'rb');
 	$buffer = fread($fp, filesize( $exportedfile ));
 	fclose($fp);
-	if( strpos( $buffer, 'AUTHOR: ' ) === false )
+	if( !preg_match( '/^AUTHOR: /', $buffer ) )
 	{
-		dieerror("The file [$exportedfile] does not seem to be a MT exported file..");
+		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="import-mt.php?mode='.$mode.'">choose another export-file</a>]');
 	}
 
-	$importdata = preg_replace("/\r?\n|\r/", "\n", $buffer);
-	$posts = preg_split( '/--------\nAUTHOR: /', $importdata ); 
-	#$posts = explode('--------', $importdata);
+	$importdata = preg_replace( "/\r?\n|\r/", "\n", $buffer );
+	$posts = preg_split( '/(^|--------\n)AUTHOR: /', $importdata );
 
 	$authors = array(); $tempauthors = array();
 	$categories = array(); $tempcategories = array();
@@ -1271,30 +1357,30 @@ function import_data_extract_authors_cats()
 	{
 		if ('' != trim($post))
 		{
-			preg_match("|(AUTHOR: )?(.*)\n|", $post, $thematch);
-			array_push($tempauthors, trim($thematch[2])); //store the extracted author names in a temporary array
-			
-			if( !preg_match( '/(PRIMARY )?CATEGORY: (.*?)\n/', $post, $match ) || empty($match[2]) )
+			// first line is author of post
+			$tempauthors[] = trim( substr( $post, 0, strpos( $post, "\n", 1 ) ) );
+
+			$oldcatcount = count( $tempcategories );
+
+			if( preg_match_all( "/^(PRIMARY )?CATEGORY: (.*)/m", $post, $matches ) )
+			{
+				for( $i = 1; $i < count( $matches[2] ); $i++ )
+				{
+					$cat = trim( $matches[2][$i] );
+					if( !empty( $cat ) ) $tempcategories[] = $cat;
+				}
+
+				// main category last (-> counter)
+				if( !empty($matches[2][0]) ) $tempcategories[] = $matches[2][0];
+			}
+
+			if( $oldcatcount == count( $tempcategories ) )
 			{
 				$tempcategories[] = '[no category assigned]';
 			}
-			else
-			{
-				if( preg_match_all( '/CATEGORY: (.*?)\n/m', $post, $matches ) )
-				{
-					array_shift( $matches[1] );
-					foreach( $matches[1] as $cat )
-					{
-						$cat = trim($cat);
-						if( !empty($cat) ) $tempcategories[] = $cat;
-					}
-				}
 
-				$tempcategories[] = trim($match[2]);
-			}
 			// remember how many times used as primary category
-			@$categories_countprim[ $tempcategories[ count($tempcategories)-1 ] ]++;
-
+			@$categories_countprim[ $tempcategories[ count( $tempcategories )-1 ] ]++;
 		}
 		else
 		{
@@ -1305,15 +1391,17 @@ function import_data_extract_authors_cats()
 	// we need to find unique values of author names, while preserving the order, so this function emulates the unique_value(); php function, without the sorting.
 	$authors[0] = array_shift($tempauthors);
 	$y = count($tempauthors) + 1;
-	for ($x = 1; $x < $y; $x++) {
+	for ($x = 1; $x < $y; $x++)
+	{
 		$next = array_shift($tempauthors);
-		if( !(in_array($next,$authors)) ) array_push($authors, "$next");
+		if( !(in_array($next,$authors)) ) $authors[] = $next;
 	}
 	$categories[0] = array_shift( $tempcategories );
 	$y = count($tempcategories) + 1;
-	for ($x = 1; $x < $y; $x++) {
+	for ($x = 1; $x < $y; $x++)
+	{
 		$next = array_shift($tempcategories);
-		if( !(in_array($next, $categories)) ) array_push($categories, "$next");
+		if( !(in_array($next, $categories)) ) $categories[] = $next;
 	}
 }
 
@@ -1343,7 +1431,7 @@ function renderer_list()
 				<input type="radio" name="autop" value="0" class="checkbox" /> no (never)<br>
 				<input type="radio" name="autop" value="depends" class="checkbox" /> depends on CONVERT BREAKS
 				<span class="notes"> ..that means it will apply if convert breaks results to true (set to either 1, textile_2 or __DEFAULT__ (and &quot;Convert-breaks default&quot; checked above)</span>
-				
+
 				</div>
 			</div>
 			<?php
@@ -1400,14 +1488,17 @@ function renderer_list()
 }
 
 
-function dieerror( $message )
+function dieerror( $message, $before = '' )
 {
-	die( '<div class="error"><p class="center">'.$message.'</p></div>
+	if( !empty($before) )
+		echo $before;
+
+	die( '<div class="error"><p class="error">'.$message.'</p></div>
 	</div></body></html>' );
 }
 
 
-function debug_dump( $var, $title = '')
+function debug_dump( $var, $title = '' )
 {
 	global $output_debug_dump;
 
@@ -1424,7 +1515,7 @@ function chooseexportfile()
 	// Go through directory:
 	$this_dir = dir( dirname(__FILE__) );
 	$r = '';
-	while( $this_file = $this_dir->read())
+	while( $this_file = $this_dir->read() )
 	{
 		if( preg_match( '/^.+\.txt$/', $this_file ) )
 		{
@@ -1456,6 +1547,17 @@ function chooseexportfile()
 		</div>
 		<?php
 	}
+}
+
+
+function ripline( $prefix, &$haystack )
+{
+	if( preg_match( '|^'.$prefix.'(.*)|m', $haystack, $match ) )
+	{
+		$haystack = preg_replace('|^'.$prefix.".*\n?|m", '', $haystack );
+		return trim( $match[1] );
+	}
+	else return false;
 }
 
 

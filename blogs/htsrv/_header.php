@@ -14,7 +14,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('b2evo') ?> &gt; <?php echo $page_title ?></title>
 	<base href="<?php echo $htsrv_url; ?>/">
-	<link rel="stylesheet" href="<?php echo $admin_url ?>/admin.css" type="text/css">
+	<link href="<?php echo $admin_url ?>/variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="<?php echo $admin_url ?>/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="<?php echo $admin_url ?>/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<?php if( is_file( dirname(__FILE__)."/$htsrv_dirout/$admin_subdir/custom.css" ) ) { ?>
+	<link href="<?php echo $admin_url ?>/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
+	<?php } ?>
+	<script type="text/javascript" src="styleswitcher.js"></script>
 </head>
 <body>
 

@@ -43,7 +43,10 @@
 	// $Calendar->set( 'emptycellend', '</td>' );
 	// $Calendar->set( 'emptycellcontent', '&nbsp;' );
 	
-	// $Calendar->set( 'browseyears', 1 );  // uncomment to allow browsing years in the calendar's caption (month must be displayed)
+	$Calendar->set( 'browseyears', 1 );  // allow browsing years in the calendar's caption (month must be displayed)
+
+	$Calendar->set( 'navigation', 'tfoot' );
+
 	// $Calendar->set( 'linktomontharchive', 0 );  // uncomment to display month not as link to archive of month
 
 	// -- Display number of posts with days/months ---

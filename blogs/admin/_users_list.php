@@ -11,10 +11,10 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 <div class="panelblock">
-	<h2><?php echo T_('Groups &amp; Users') ?></h2>
-<table class="thin">
+<h2><?php echo T_('Groups &amp; Users') ?></h2>
+<table class="grouped" cellspacing="0">
 	<tr>
-		<th><?php echo T_('ID') ?></th>
+		<th class="firstcol"><?php echo T_('ID') ?></th>
 		<th><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
 		<th><?php echo T_('Nickname') ?></th>
 		<th><?php echo T_('Name') ?></th>
@@ -45,6 +45,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 							GROUP BY grp_ID";
 		$usedgroups = $DB->get_col($query);
 
+		$count = 0;
 		foreach( $userlist as $row )
 		{	// For each line (can be a user/group or just an empty group)
 			$loop_grp_ID = $row['grp_ID'];
@@ -65,7 +66,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					<?php
 					if( $current_User->check_perm( 'users', 'edit', false ) )
 					{	// copy ?>
-						<td></td>
+						<td>&nbsp;</td>
 						<td>
 							<a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /></a>
 							
@@ -89,10 +90,13 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			if( !empty( $row['ID'] ) )
 			{	// We have a user here: (i-e group was not empty)
 				$loop_User = & new User( $row );
-				echo "<tr>\n";
+				if( $count%2 == 1 )
+					echo "<tr class=\"odd\">\n";
+				else
+					echo "<tr>\n";
 				$email = $loop_User->get('email');
 				$url = $loop_User->get('url');
-				echo '<td>', $loop_User->get('ID'), "</td>\n";
+				echo '<td class="firstcol">', $loop_User->get('ID'), "</td>\n";
 				echo '<td><a href="b2users.php?user=', $loop_User->get('ID'), '">';
 				echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
 				echo $loop_User->get('login'), "</a></td>\n";
@@ -150,6 +154,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				}
 				echo "</td>\n";
 				echo "</tr>\n";
+				$count++;
 			}
 		}
 

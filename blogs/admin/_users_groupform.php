@@ -52,7 +52,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		}
 		?>
 
-	<a title="<?php echo T_('Close group profile'); ?>" href="b2users.php">[ X ]</a></div>
+	<a title="<?php echo T_('Close group profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close group profile'); ?>" class="middle"></a></div>
 	<h2><?php
 	if( $edited_Group->get('ID') == 0 )
 	{
@@ -119,16 +119,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 		<?php
 		if( $current_User->check_perm( 'users', 'edit' ) )
-		{ ?>
-		<fieldset class="submit">
-			<fieldset>
-				<div class="input">
-					<input type="submit" name="submit" value="<?php if( $edited_Group->get('ID') == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
-					<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-				</div>
-			</fieldset>
-		</fieldset>
-		<?php } ?>
+		{ 
+			form_submit();
+		} ?>
 
 		<div class="clear"></div>
 	</form>

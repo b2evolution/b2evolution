@@ -20,6 +20,11 @@ require_once dirname(__FILE__).'/../toolbar.class.php';
  */
 class smilies_Toolbarplugin extends ToolbarPlugin
 {
+	/**
+	 * Should be toolbar be displayed?
+	 */
+	var $display = false;
+
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 70;
@@ -62,6 +67,11 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	 */
 	function display()
 	{	
+		if( !$this->display )
+		{	// We don't want to show this toolbar
+			return false;
+		}
+
 		$grins = '';
 		$smiled = array();
 		foreach( $this->smilies as $smiley => $grin )
@@ -71,11 +81,11 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 				$smiled[] = $grin;
 				$smiley = str_replace(' ', '', $smiley);
 				$grins .= '<img src="'. $this->smilies_path. '/'. $grin. '" alt="'. $smiley.
-									'" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
+									'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
 			}
 		}
 	
-		print('<div>'. $grins. '</div>');
+		print('<div class="edit_toolbar">'. $grins. '</div>');
 		ob_start();
 		?>
 		<script type="text/javascript">

@@ -11,9 +11,26 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * converts languages in a given table into according locales
+ * Create a DB version checkpoint
  *
- * {@internal convert_lang_to_locale(-)}}
+ * This is useful when the next operation might timeout or fail!
+ * The checkpoint will allow to restart the script and continue where it stopped
+ *
+ * @param string version of DB at checkpoint
+ */
+function set_upgrade_checkpoint( $version )
+{
+ 	global $DB;
+
+	echo "Creating DB schema version checkpoint at $version... ";
+	$DB->query( "UPDATE EVO_settings
+									SET set_value = '$version'
+								WHERE set_name = 'db_version'" );
+	echo "OK.<br />\n";
+}
+
+/**
+ * converts languages in a given table into according locales
  *
  * @author blueyed
  * @param string name of the table
@@ -140,7 +157,7 @@ function upgrade_b2evo_tables()
 		$q = $DB->get_results( $query, ARRAY_A );
 		if( count( $q ) ) foreach( $q as $row )
 		{
-			$query_update_wordcount = "UPDATE $tableposts
+			$query_update_wordcount = "UPDATE $tableposts 
 																SET post_wordcount = " . bpost_count_words($row['post_content']) . "
 																WHERE ID = " . $row['ID'];
 			$DB->query($query_update_wordcount);
@@ -280,6 +297,8 @@ function upgrade_b2evo_tables()
 							ADD COLUMN pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL";
 		$DB->query( $query );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '8050' );
 	}
 
 
@@ -287,7 +306,7 @@ function upgrade_b2evo_tables()
 	{	// --------------------------------------------
 		// upgrade to 0.9
 		// --------------------------------------------
-
+		
 		// Important check:
 		$stub_list = $DB->get_col( "SELECT blog_stub
 																	FROM $tableblogs
@@ -302,9 +321,10 @@ function upgrade_b2evo_tables()
 			echo '</p></div>';
 			return false;
 		}
-
-		// Create locales
+		
+		// Create locales 
 		create_locales();
+
 
 		echo 'Upgrading posts table... ';
 		$query = "UPDATE $tableposts
@@ -313,7 +333,7 @@ function upgrade_b2evo_tables()
 
 		$query = "ALTER TABLE $tableposts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
-							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00'
+							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
 										AFTER post_issue_date,
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
@@ -324,7 +344,7 @@ function upgrade_b2evo_tables()
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
 		$DB->query( $query );
-
+		
 		$query = "UPDATE $tableposts
 							SET post_mod_date = post_issue_date";
 		$DB->query( $query );
@@ -332,9 +352,9 @@ function upgrade_b2evo_tables()
 
 		// convert given languages to locales
 		convert_lang_to_locale( $tableposts, 'post_locale', 'ID' );
-
+		
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE $tableblogs
+		$query = "ALTER TABLE $tableblogs 
 							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-EU',
 							CHANGE blog_roll blog_notes TEXT NULL,
 							MODIFY COLUMN blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
@@ -357,11 +377,12 @@ function upgrade_b2evo_tables()
 		convert_lang_to_locale( $tableblogs, 'blog_locale', 'blog_ID' );
 
 		echo 'Converting settings table... ';
-
+		
 		// get old settings
 		$query = "SELECT * FROM $tablesettings";
 		$row = $DB->get_row( $query, ARRAY_A );
-
+				
+		#pre_dump($row, 'oldrow');
 		$transform = array(
 			'posts_per_page' => array(7),
 			'what_to_show' => array('days'),
@@ -373,9 +394,9 @@ function upgrade_b2evo_tables()
 			'pref_newusers_level'  => array(1, 'newusers_level'),
 			'pref_newusers_canregister' => array(0, 'newusers_canregister'),
 		);
-
+		
 		$query = "INSERT INTO $tablesettings (set_name, set_value) VALUES ";
-
+		
 		foreach( $transform as $oldkey => $newarr )
 		{
 			$newname = (isset($newarr[1])) ? $newarr[1] : $oldkey;
@@ -389,7 +410,7 @@ function upgrade_b2evo_tables()
 				$trans[ $newname ] = $row[$oldkey];
 			}
 		}
-
+		
 		$query .= "
 			( 'db_version', '$new_db_version' ),
 			( 'default_locale', 'en-EU' ),
@@ -397,15 +418,15 @@ function upgrade_b2evo_tables()
 			( 'permalink_type', 'urltitle' ),
 			( 'user_minpwdlen', '5' )
 			";
-
+		
 		foreach( $trans as $name => $value )
 		{
 			$query .= ", ('$name', '".$DB->escape($value)."')";
 		}
-
+		
 		// drop old table
 		$DB->query( "DROP TABLE IF EXISTS $tablesettings");
-
+		
 		// create new table
 		$DB->query( "CREATE TABLE $tablesettings (
 								set_name VARCHAR( 30 ) NOT NULL ,
@@ -414,6 +435,7 @@ function upgrade_b2evo_tables()
 								)");
 
 		// write new settings
+		#echo $query;
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -440,94 +462,36 @@ function upgrade_b2evo_tables()
 							MODIFY COLUMN comment_author_IP varchar(23) NOT NULL default ''";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-
+		
 		echo 'Upgrading Users table... ';
 		$query = "ALTER TABLE $tableusers ADD user_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL AFTER user_yim";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
-		echo "Creating DB schema version checkpoint at 8060... ";
-		// This is because the next operation might timeout!
-		// The checkpoint will allow to restart the script and continue where it stopped
-		$DB->query( "UPDATE $tablesettings
-										SET set_value = '8060'
-									WHERE set_name = 'db_version'" );
-		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '8060' );
 	}
 
 	if( $old_db_version < 8062 )
-	{ // --------------------------------------------
+	{	// --------------------------------------------
 		// upgrade to 0.9.0.4
 		// --------------------------------------------
-		echo "Checking for extra quote escaping in posts... ";
-		$query = "SELECT ID, post_title, post_content
-								FROM $tableposts
-							 WHERE post_title LIKE '%\\\\\\\\\'%'
-							 		OR post_title LIKE '%\\\\\\\\\"%'
-							 		OR post_content LIKE '%\\\\\\\\\'%'
-							 		OR post_content LIKE '%\\\\\\\\\"%' ";
-		/* FP: the above looks overkill, but mySQL is really full of surprises...
-						tested on 4.0.14-nt */
-		// echo $query;
-		$rows = $DB->get_results( $query, ARRAY_A );
-		if( $DB->num_rows )
-		{
-			echo 'Updating '.$DB->num_rows.' posts... ';
-			foreach( $rows as $row )
-			{
-				// echo '<br />'.$row['post_title'];
-				$query = "UPDATE $tableposts
-									SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
-											post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
-									WHERE ID = ".$row['ID'];
-				// echo '<br />'.$query;
-				$DB->query( $query );
-			}
-		}
-		echo "OK.<br />\n";
+    cleanup_post_quotes();
 
-		echo "Creating DB schema version checkpoint at 8062... ";
-		// This is because the next operation might timeout!
-		// The checkpoint will allow to restart the script and continue where it stopped
-		$DB->query( "UPDATE $tablesettings
-										SET set_value = '8062'
-									WHERE set_name = 'db_version'" );
-		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '8062' );
 	}
 
 	if( $old_db_version < 8064 )
-	{ // --------------------------------------------
+	{	// --------------------------------------------
 		// upgrade to 0.9.0.6
 		// --------------------------------------------
-		echo "Checking for extra quote escaping in comments... ";
-		$query = "SELECT comment_ID, comment_content
-								FROM $tablecomments
-							 WHERE comment_content LIKE '%\\\\\\\\\'%'
-							 		OR comment_content LIKE '%\\\\\\\\\"%' ";
-		/* FP: the above looks overkill, but mySQL is really full of surprises...
-						tested on 4.0.14-nt */
-		// echo $query;
-		$rows = $DB->get_results( $query, ARRAY_A );
-		if( $DB->num_rows )
-		{
-			echo 'Updating '.$DB->num_rows.' comments... ';
-			foreach( $rows as $row )
-			{
-				$query = "UPDATE $tablecomments
-									SET comment_content = ".$DB->quote( stripslashes( $row['comment_content'] ) )."
-									WHERE comment_ID = ".$row['comment_ID'];
-				// echo '<br />'.$query;
-				$DB->query( $query );
-			}
-		}
-		echo "OK.<br />\n";
+		cleanup_comment_quotes();
 	}
 
 	if( $old_db_version < 8070 )
-	{ // --------------------------------------------
+	{	// --------------------------------------------
 		// upgrade to 0.9.1
 		// --------------------------------------------
-
+		
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE EVO_blogs
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
@@ -585,14 +549,11 @@ function upgrade_b2evo_tables()
 		 * Then create a new extension block, and increase db version numbers
 		 * everywhere where needed in this file.
 		 */
-
+		
 	}
-
-	echo "Update DB schema version to $new_db_version... ";
-	$DB->query( "UPDATE $tablesettings
-									SET set_value = '$new_db_version'
-								WHERE set_name = 'db_version'" );
-	echo "OK.<br />\n";
+	
+	// Update DB schema version to $new_db_version
+	set_upgrade_checkpoint( $new_db_version );
 
 	return true;
 }

@@ -53,7 +53,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			echo ( $user != $uminmax['MAX(ID)'] ) ? '<a title="'.T_('last user').'" href="?user='.$uminmax['MAX(ID)'].'">[&gt;&gt;]</a>' : '[&gt;&gt;]';
 		}
 		?>
-		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php">[ X ]</a>
+		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close user profile'); ?>" class="middle"></a>
 	</div>
 	<?php } ?>
 		
@@ -77,7 +77,33 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 																					: $edited_User->dget('login', 'formvalue') )
 		?>" />
 		
-	<fieldset class="left60">
+
+	<fieldset>
+		<legend><?php echo T_('User rights') ?></legend>
+		<?php
+		$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
+		if( $user_profile_only )
+		{
+			form_info( T_('Level'), $edited_User->dget('level'), $field_note );
+		}
+		else
+		{
+			form_text( 'edited_user_level', $edited_User->dget('level', 'formvalue'), 2, T_('Level'), $field_note, 2 );
+		}
+		if( $edited_User->get('ID') != 1 && !$user_profile_only )
+		{
+			$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
+			form_select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
+		}
+		else
+		{
+			echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->ID.'" />';
+			form_info( T_('User group'), $edited_User->Group->dget('name') );
+		}
+		?>
+	</fieldset>
+
+	<fieldset>
 		<legend><?php echo T_('User') ?></legend>
 		<?php
 			if( $allowed_to_edit )
@@ -179,34 +205,12 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		</table>
 	</fieldset>
 
-	<fieldset>
-		<legend><?php echo T_('User rights') ?></legend>
-		<?php
-		$field_note = array(
-			'level' => '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' ),
-			'upload' => '' );
-		if( $user_profile_only )
-		{
-			form_info( T_('Level'), $edited_User->dget('level'), $field_note['level'] );
-			form_info( T_('Upload'), $edited_User->dget('upload_ufolder'), $field_note['upload'] );
-		}
-		else
-		{
-			form_text( 'edited_user_level', $edited_User->dget('level', 'formvalue'), 2, T_('Level'), $field_note['level'], 2 );
-			form_checkbox( 'edited_user_upload_ufolder', $edited_User->dget('upload_ufolder', 'formvalue'), T_('Upload into userfolder'), $field_note['upload'] );
-		}
-		if( $edited_User->get('ID') != 1 && !$user_profile_only )
-		{
-			$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
-			form_select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
-		}
-		else
-		{
-			echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->ID.'" />';
-			form_info( T_('User group'), $edited_User->Group->dget('name') );
-		}
-		?>
-	</fieldset>
+	<?php
+	if( $allowed_to_edit )
+	{ 
+		form_submit();
+	} 
+	?>
 
 	<fieldset>
 		<legend><?php echo T_('User information') ?></legend>
@@ -219,21 +223,6 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			form_info( T_('With Browser'), $edited_User->dget('browser') );
 		?>
 	</fieldset>
-
-	<?php
-	if( $allowed_to_edit )
-	{ ?>
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
-			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php 
-	} 
-	?>
 
 	</form>
 	

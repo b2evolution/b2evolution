@@ -371,7 +371,7 @@ function stats_hit_count()
 /*
  * stats_hit_percent(-)
  */
-function stats_hit_percent(
+function stats_hit_percent( 
 	$decimals = 1, 
 	$dec_point = ',' )
 {
@@ -450,7 +450,7 @@ function stats_search_keywords()
 	foreach( $ref_params as $ref_param )
 	{
 		$param_parts = explode( '=', $ref_param );
-		if( $param_parts[0] == 'q' or $param_parts[0] == 'query' or $param_parts[0] == 'p' or $param_parts[0] == 'kw')
+		if( $param_parts[0] == 'q' or $param_parts[0] == 'query' or $param_parts[0] == 'p' or $param_parts[0] == 'kw' or $param_parts[0] == 'qs' )
 		{ // found "q" query parameter
 			$q = urldecode($param_parts[1]);
 			if( strpos( $q, 'Ã' ) !== false )
@@ -460,7 +460,7 @@ function stats_search_keywords()
 			}
 			$qwords = explode( ' ', $q );
 			foreach( $qwords as $qw )
-			{
+			{	
 				if( strlen( $qw ) > 30 ) $qw = substr( $qw, 0, 30 )."...";	// word too long, crop it
 				$kwout .= $qw.' ';
 			}
@@ -512,12 +512,13 @@ function stats_user_agent( $translate = false )
  * {@internal stats_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to return value instead of displaying it
+ * @param mixed Output format, see {@link format_to_output()} or false to 
+ *								return value instead of displaying it
  */
-function stats_title( $prefix = ' ', $display = 'htmlbody' )
+function stats_title( $prefix = ' ', $display = 'htmlbody' ) 
 {
 	global $disp;
-
+	
 	if( $disp == 'stats' )
 	{
 		$info = $prefix. T_('Statistics');
@@ -529,14 +530,15 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 }
 
 
+
 /* select count(*) as nb, hit_ignore
 from b2hitlog
 group by hit_ignore
-order by nb desc
+order by nb desc 
 
 
 update b2hitlog
-set hit_ignore ='robot'
+set hit_ignore ='robot' 
 where `hit_ignore` LIKE 'invalid' AND `hit_user_agent` LIKE 'FAST-WebCrawler/%'  
 
 

@@ -24,7 +24,6 @@ if( ($blog == 0) && $current_User->check_perm( 'blog_ismember', 1, false, $defau
 require (dirname(__FILE__). '/_menutop.php');
 
 // ---------------------------------- START OF BLOG LIST ----------------------------------
-$sep = '';
 for( $curr_blog_ID = blog_list_start();
 			$curr_blog_ID != false;
 			$curr_blog_ID = blog_list_next() )
@@ -37,18 +36,16 @@ for( $curr_blog_ID = blog_list_start();
 		{	// If no selected blog yet, select this one:
 			$blog = $curr_blog_ID;
 		}
-		echo $sep;
 		if( $curr_blog_ID == $blog )
 		{ // This is the blog being displayed on this page ?>
-		<strong>[<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
+		<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>" class="CurrentBlog"><?php blog_list_iteminfo('shortname') ?></a>
 		<?php
 		}
 		else
 		{ // This is another blog ?>
-		<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
+		<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>" class="OtherBlog"><?php blog_list_iteminfo('shortname') ?></a>
 		<?php
 		}
-		$sep = ' | ';
 	} // --------------------------------- END OF BLOG LIST ---------------------------------
 
 	require (dirname(__FILE__). '/_menutop_end.php');

@@ -14,7 +14,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
-<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<table cellpadding="0" cellspacing="0" border="0">
 	<tr>
 		<td>
 		<table cellpadding="0" cellspacing="0" border="0"><tr>
@@ -57,9 +57,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				}
 				else
 				{ ?>
-				<input type="text" name="poststart" value="<?php echo $poststart ?>" style="width:40px;" />
+				<input type="text" name="poststart" value="<?php echo $poststart ?>" size="4" maxlength="10" />
 				<?php /* TRANS: x TO y OF z */ echo T_(' to ') ?>
-				<input type="text" name="postend" value="<?php echo $postend ?>" style="width:40px;" />
+				<input type="text" name="postend" value="<?php echo $postend ?>" size="4" maxlength="10" />
 				<?php /* TRANS: x TO y OF z */ echo T_(' of ') ?> <?php echo $MainList->get_total_num_posts() ?>
 				<?php } ?>
 				

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-06-05 23:35+0100\n"
+"PO-Revision-Date: 2004-06-24 02:37+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -401,8 +401,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/b2evo/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés, copiera vos données WordPress vers b2evolution (sans altérer WordPress) et configurera b2evolution pour vous."
 
 #: ../../doc/upfrom_wordpress.src.html:68
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
-msgstr "Consultez le <a %s>wiki</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit &amp; habillage WordPress existants vers b2evolution."
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
+msgstr "Consultez le <a %s>manuel</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit &amp; habillage WordPress existants vers b2evolution."
 
 #: ../../doc/upfrom_wordpress.src.html:70
 msgid "You can reuse your current WordPress CSS design in a snap by copying your style.css file into any b2evolution skin folder which name starts with wpc_ (which stands for WordPress CSS compatible)"
@@ -437,8 +437,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/b2evo/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés, copiera vos données b2 vers b2evolution (sans altérer b2) et configurera b2evolution pour vous."
 
 #: ../../doc/upgradefrom_b2.src.html:69
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr "Consultez le <a %s>wiki</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit b2 existant vers b2evolution."
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "Consultez le <a %s>manuel</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit &amp; habillage WordPress existants vers b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
@@ -461,8 +461,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
-msgstr "Il est maintenant temps de réintroduire vos précédentes personnalisations. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (backupés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires. <br /> <br /> Vous pouvez également consulter le <a %s>wiki</a> ou les <a %s>forums</a> pour obtenir des informations sur l'upgrade de fichiers spécifiques d'une version spécifique à une autre."
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgstr "Il est maintenant temps de réintroduire vos précédentes personnalisations. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (backupés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires. <br /> <br /> Vous pouvez également consulter le <a %s>manuel</a> ou les <a %s>forums</a> pour obtenir des informations sur l'upgrade de fichiers spécifiques d'une version spécifique à une autre."
 
 #: ../../doc/upgradefrom_gl.src.html:6
 #: ../../doc/upgradefrom_gl.src.html:32

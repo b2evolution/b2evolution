@@ -86,7 +86,10 @@
 
 	<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
-	<?php // ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+	<?php 
+	/**
+	 * ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+	 */
 	$disp_comments = 1;					// Display the comments if requested
 	$disp_comment_form = 1;			// Display the comments form if comments requested
 	$disp_trackbacks = 1;				// Display the trackbacks if requested

@@ -119,7 +119,8 @@ a:hover
 hr {
 	height: 0px;
 	width: 100%;
-	border: 1px solid #ccc;
+	border: 0;
+	border-top: 1px solid #ccc;
 }
 
 	
@@ -153,6 +154,7 @@ div.installSideBar {
 	padding: 1ex;
 	width: 20%;
 	margin-left: 2ex;
+	background-color: #fff;
 }
 
 div.installSideBar h2,

@@ -43,11 +43,16 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <link rel="stylesheet" href="custom.css" type="text/css" />
 </head>
 <body>
-<div class="pageHeader">
+<div id="wrapper">
 
-<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+<?php 
+	/**
+	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	 */
 	require( dirname(__FILE__).'/_bloglist.php' );
-	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+	// ----------------------------- END OF BLOG LIST ---------------------------- ?>
+
+<div class="pageHeader">
 
 <h1 id="pageTitle"><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
 
@@ -133,7 +138,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<p class="center"><strong>
 		<?php posts_nav_link(); ?>
-		<?php
+		<?php 
 			// previous_post( '<p class="center">%</p>' );
 			// next_post( '<p class="center">%</p>' );
 		?>
@@ -176,7 +181,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
-		<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
+		<p class="center"><strong><?php posts_nav_link( ' | ', '< '.T_('Previous'), T_('Next').' >' ); ?></strong></p>
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>
@@ -195,12 +200,11 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
 		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'SearchForm' ) ?>
-			<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
-			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
-			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label>
-			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
-			<input type="reset" value="<?php echo T_('Reset form') ?>" />
+			<p><input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
+			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label><br />
+			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label><br />
+			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label></p>
+			<input type="submit" name="submit" class="submit" value="<?php echo T_('Search') ?>" />
 		</form>
 	</div>
 
@@ -211,8 +215,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			require( dirname(__FILE__).'/_categories.php' );
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
-		<input type="submit" value="<?php echo T_('Get selection') ?>" />
-		<input type="reset" value="<?php echo T_('Reset form') ?>" />
+		<input type="submit" class="submit" value="<?php echo T_('Get selection') ?>" />
 		</form>
 	</div>
 
@@ -228,17 +231,17 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<?php if( ! $Blog->get('force_skin') )
 	{	// Skin switching is allowed for this blog: ?>
-	<div class="bSideItem">
-		<h3><?php echo T_('Choose skin') ?></h3>
-		<ul>
-			<?php // ------------------------------- START OF SKIN LIST -------------------------------
-			for( skin_list_start(); skin_list_next(); ) { ?>
-				<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a></li>
-			<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
-		</ul>
-	</div>
+		<div class="bSideItem">
+			<h3><?php echo T_('Choose skin') ?></h3>
+			<ul>
+				<?php // ------------------------------- START OF SKIN LIST -------------------------------
+				for( skin_list_start(); skin_list_next(); ) { ?>
+					<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a></li>
+				<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
+			</ul>
+		</div>
 	<?php } ?>
-
+	
 	<?php if ($disp != 'stats') 
 	{ ?>
 	<div class="bSideItem">
@@ -295,22 +298,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<h3><?php echo T_('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 			<ul>
 				<li>
-					RSS 0.92 (Userland):
+					RSS 0.92:
 					<a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
 					<a href="<?php $Blog->disp( 'comments_rss_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 				<li>
-					RSS 1.0 (RDF):
+					RSS 1.0:
 					<a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
 					<a href="<?php $Blog->disp( 'comments_rdf_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 				<li>
-					RSS 2.0 (Userland):
+					RSS 2.0:
 					<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
 					<a href="<?php $Blog->disp( 'comments_rss2_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 				<li>
-					Atom 0.3:
+					Atom:
 					<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
 					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
@@ -318,25 +321,29 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			<a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
 
 	</div>
-
-	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></p>
+<p class="center">powered by<br />
+<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
-
-<p class="baseline">
-	<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a>
-
-	<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
-
-	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
-
-	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
-	&nbsp;
+<div id="pageFooter">
+	<p class="baseline">
+		Original template design by <a href="http://fplanque.net/">François PLANQUE</a>.
+	</p>
+	<div class="center">
+		<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a>
+	
+		<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
+	
+		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	
+		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	</div>
+	
 	<?php
 		log_hit();	// log the hit on this page
 		debug_info(); // output debug info if requested
 	?>
-</p>
+</div>
+</div>
 </body>
 </html>

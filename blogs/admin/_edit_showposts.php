@@ -10,8 +10,8 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
-<div class="bPosts">
-	<div class="bPost">
+<div class="left_col">
+	<div class="NavBar">
 	<?php
 	/**
 	 * Includes:
@@ -117,6 +117,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			$Item->anchor(); ?>
 			<div class="bSmallHead">
+				<div class="bSmallHeadRight">
+					<?php
+					locale_flag( $Item->locale, 'h10px' );
+
+					echo '<br />'.T_('Status').': <span class="Status">';
+					$Item->status();
+					echo '</span>';
+					?>
+				</div>
 				<?php
 					echo '<strong>';
 					$Item->issue_date(); echo ' @ '; $Item->issue_time();
@@ -128,74 +137,51 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					$Item->Author->login();
 					echo ', ', T_('level:');
 					$Item->Author->level();
-					echo '), ';
+					echo ')';
+					
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-					echo T_('in'), ' ';
+					echo '<br />'.T_('Categories').': ';
 					$Item->categories( false );
-					echo ' - ';
-					locale_flag( $Item->locale, 'h10px' );
-					echo ' - ', T_('Status'), ': ';
-					$Item->status();
 				?>
 			</div>
 
-			<h3 class="bTitle"><?php $Item->title() ?></h3>
-
-			<div class="bText">
-				<?php
-				if( $safe_mode ) echo "<xmp>";
-				$Item->content();
-				if( $safe_mode ) echo "</xmp>";
-				?>
+			<div class="bContent">
+				<h3 class="bTitle"><?php $Item->title() ?></h3>
+				<div class="bText">
+					<?php
+						$Item->content();
+						link_pages( '<p class="right">'.T_('Pages:'), '</p>' );
+					?>
+				</div>
 			</div>
 
-			<?php
-			link_pages( '<p class="right">'.T_('Pages:'), '</p>' );
-			?>
-			<p style="clear:both;">
+			<div class="PostActionsArea">
 				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php
-				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'status' ), false, $Item->get( 'blog_ID' ) ) )
-				{	// User has right to edit this post
-				?>
-				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
-				<form action="b2edit.php" method="get" class="inline"><input type="hidden" name="action" value="edit" /><input type="hidden" name="post" value="<?php $Item->ID() ?>" /><input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" /></form>
-				<?php
-				}
+ 				// Display edit button if current user has the rights:
+				$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton');
 
-				if( $current_User->check_perm( 'blog_del_post', 'any', false, $Item->get( 'blog_ID' ) ) )
-				{	// User has right to delete this post
-				?>
-				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
-				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" /></form>
-				<?php
-				}
+				// Display publish NOW button if current user has the rights:
+				$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
 
-				if( ($postdata['Status'] != 'published')
-						&& $current_User->check_perm( 'blog_post_statuses', 'published', false, 
-																					$Item->get( 'blog_ID' ) )
-						&& $current_User->check_perm( 'edit_timestamp' ) )
-				{	// User has right to publish this post now:
+				// Display delete button if current user has the rights:
+				$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
+
 				?>
-				<!-- Do not add spaces or line breaks into the following form. IE would display extra spacing -->
-				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" /></form>
-				<?php
-				}
-				?>
-				[ <a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php $Item->ID() ?>&c=1"><?php
+				<a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php $Item->ID() ?>&c=1" class="ActionButton"><?php
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'));
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'));
 				pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('%d Pingbacks'));
-				?></a> ]
-			</p>
+				?></a>
+			</div>
 
 			<?php
-
-			// comments
+			// ---------- comments ----------
 			if( $c )
 			{ // We have request display of comments
 				?>
+   			<div class="bFeedback">
 				<a name="comments"></a>
 				<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
 				<?php
@@ -231,6 +217,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 							$Comment->author_ip( ' &middot; IP: ' );
 						 ?>
 						</div>
+						<div class="bCommentContent">
 						<div class="bCommentTitle">
 						<?php
 							switch( $Comment->get( 'type' ) )
@@ -248,24 +235,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 									<?php break;
 							} 
 						?>
-						<?php $Comment->author() ?> 
+						<?php $Comment->author() ?>
 						</div>
 						<div class="bCommentText">
 							<?php $Comment->content() ?>
 						</div>
-						<p>
+						</div>
+						<div class="CommentActionsArea">
 						<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 						<?php
-						if( $current_User->check_perm( 'blog_comments', '', false, $Item->get( 'blog_ID' ) ) )
-						{	// If User has permission to edit comments:
+			 				// Display edit button if current user has the rights:
+							$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+
+							// Display delete button if current user has the rights:
+							$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
 						?>
-						<!-- Do not add spaces or line breaks into the following forms. IE would display extra spacing -->
-						<form action="b2edit.php" method="get" class="inline"><input type="hidden" name="action" value="editcomment" /><input type="hidden" name="comment" value="<?php $Comment->ID() ?>" /><input type="submit" name="submit" value="<?php echo T_('&nbsp; Edit &nbsp;') ?>" class="search" /></form>
-						<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="deletecomment"><input type="hidden" name="comment_ID" value="<?php $Comment->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php printf( /* TRANS: Warning this is a javascript string */ T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.'), $row->post_title ) ?>')" /></form>
-						<?php
-						}
-						?>
-						</p>
+						</div>
 	
 					</div>
 					<!-- ========== END of a COMMENT/TB/PB ========== -->
@@ -291,24 +276,21 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 							</div>
 					</fieldset>
 
-					<fieldset>
-						<div class="label"><label for="comment"><?php echo T_('Comment text') ?>:</label></div>
-						<div class="input"><textarea cols="40" rows="12" name="comment" id="comment" class="bComment"></textarea><br />
-							<span class="notes"><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), '<br />', T_('URLs, email, AIM and ICQs will be converted automatically.'); ?></span>
-						</div>
-					</fieldset>
+					<?php 
+						form_textarea( 'comment', '', 12, T_('Comment text'), T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)).'<br />'.T_('URLs, email, AIM and ICQs will be converted automatically.'), 40, 'bComment' );
+					 ?>
 
 					<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
 					<fieldset>
 						<div class="label"><label><?php echo T_('Options') ?>:</label></div>
-						<div class="input"><input type="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes"><?php echo T_('(Line breaks become &lt;br&gt;)') ?></span>
+						<div class="input"><input type="checkbox" class="checkbox" name="comment_autobr" value="1" <?php if ($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes"><?php echo T_('(Line breaks become &lt;br&gt;)') ?></span>
 						</div>
 					</fieldset>
 					<?php } ?>
 
 					<fieldset>
 						<div class="input">
-							<input type="submit" name="submit" value="<?php echo T_('Send comment') ?>" class="search" />
+							<input type="submit" name="submit" value="<?php echo T_('Send comment') ?>" class="SaveButton" />
 						</div>
 					</fieldset>
 
@@ -318,6 +300,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<!-- ========== END of FORM to add a comment ========== -->
 				<?php
 				} // / can comment
+			?>
+			</div>
+			<?php
 		} // / comments requested
 	?>
 	</div>
@@ -327,7 +312,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	if( $MainList->get_total_num_posts() )
 	{ // don't display navbar twice if we have no post
 	?>
-	<div class="bPost">
+	<div class="NavBar">
 		<?php require dirname(__FILE__). '/_edit_navbar.php'; ?>
 	</div>
 	<?php } ?>
@@ -337,20 +322,25 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 <!-- ================================== START OF SIDEBAR ================================== -->
 
-<div class="bSideBar">
+<div class="right_col">
 
 	<div class="bSideItem">
-		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
+		<h2><?php $Blog->disp( 'name', 'htmlbody' ) ?></h2>
 		<?php
+		// ---------- CALENDAR ----------
 		$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '', $timestamp_min, $timestamp_max );
-
+		$Calendar->set( 'browseyears', 1 );  // allow browsing years in the calendar's caption
+		$Calendar->set( 'navigation', 'tfoot' );  
 		$Calendar->display( $pagenow, 'blog='. $blog );
 		?>
+		<h3><?php echo T_('Notes') ?></h3>
+		<?php $Blog->disp( 'notes', 'htmlbody' ) ?>
 	</div>
 
 	<div class="bSideItem">
-		<form name="searchform" method="get" action="<?php echo $pagenow ?>">
-			<h3><span style="float:right"><input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" /></span><?php echo T_('Search') ?></h3>
+		<form id="searchform" method="get" action="<?php echo $pagenow ?>">
+			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" style="float:right" />
+			<h3><?php echo T_('Search') ?></h3>
 
 			<input type="hidden" name="blog" value="<?php echo $blog ?>" />
 
@@ -551,10 +541,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			</fieldset>
 
 			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" class="search" />
-			[<a href="<?php echo $pagenow,'?blog=',$blog ?>"><?php echo T_('Reset') ?></a>]
+			<input type="button" value="<?php echo T_('Reset') ?>" onclick="document.location.href='<?php echo $pagenow,'?blog=',$blog ?>';" class="search" />
 		</form>
 
 	</div>
 
 </div>
-<div style="clear:both;"></div>
+<div class="clear"></div>

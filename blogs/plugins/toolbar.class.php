@@ -24,5 +24,10 @@ require_once dirname(__FILE__).'/plugin.class.php';
  */
 class ToolbarPlugin extends Plugin
 {
+	/**
+	 * Should be toolbar be displayed?
+	 */
+	var $display = true;
+
 }
 ?>

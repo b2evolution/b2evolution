@@ -244,10 +244,11 @@ class Comment extends DataObject
 	 *
 	 * @param string to display before link
 	 * @param string to display after link 
-	 * @param string link text 
-	 * @param string link title 
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
 	 */
-	function edit_link( $before = '', $after = '', $text = '#', $title = '#' )
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
 		global $current_User, $admin_url;
 		
@@ -263,12 +264,68 @@ class Comment extends DataObject
 		
 		echo $before;
 		echo '<a href="'.$admin_url.'/b2edit.php?action=editcomment&amp;comment='.$this->ID;
-		echo '" title="'.$title.'">'.$text.'</a>';
+		echo '" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
 		echo $after;
 	
 		return true;
 	}
-	
+
+
+	/**
+	 * Displays button for deleeing the Comment if user has proper rights
+	 *
+	 * {@internal Comment::delete_link(-)}}
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param boolean true to make this a button instead of a link
+	 */
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button  = false )
+	{
+		global $current_User, $admin_url;
+
+ 		if( ! is_logged_in() ) return false;
+
+	 	if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		{	// If User has permission to edit comments:
+			return false;
+		}
+
+		if( $text == '#' ) $text = T_('Delete');
+		if( $title == '#' ) $title = T_('Delete this comment');
+
+		$url = $admin_url.'/edit_actions.php?action=deletecomment&amp;comment_ID='.$this->ID;
+
+		echo $before;
+		if( $button )
+		{	// Display as button
+			echo '<input type="button"';
+			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
+			/* TRANS: Warning this is a javascript string */
+			echo T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
+			echo '\') ) { document.location.href=\''.$url.'\' }"';
+			if( !empty( $class ) ) echo ' class="'.$class.'"';
+			echo '/>';
+		}
+		else
+		{	// Display as link
+			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
+			/* TRANS: Warning this is a javascript string */
+			echo T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
+			echo '\')"';
+			if( !empty( $class ) ) echo ' class="'.$class.'"';
+			echo '>'.$text.'</a>';
+		}
+		echo $after;
+
+		return true;
+	}
+
 
 	/** 
 	 * Template function: display permalink to this comment

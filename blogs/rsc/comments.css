@@ -7,27 +7,21 @@
 div.bComment, /* Entire comment block */
 form.bComment /* New comment form */
 { 
-	margin-right: 20px;
-	margin-left: 20px;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	border: 1px dotted #6699CC;
-	padding-right: 8px;
-	padding-left: 8px;
+	margin: 1ex 2ex;
+	padding: 0 1ex;
+	border: 1px dotted #999;
 }
 div.bCommentTitle {
-	margin-top: 8px;
-	margin-bottom: 8px;
+	margin: 1ex 0;
 	font-weight: bold;
 }
 div.bCommentText {
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 div.bCommentSmallPrint {
 	clear: both;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;
-	margin-top: 8px;
-	margin-bottom: 8px;
+	margin: 1ex 0;
 }

@@ -13,7 +13,7 @@
  * Includes:
  */
 require_once (dirname(__FILE__). '/_header.php');
-$admin_tab = 'edit';	// Exception to this below (new post)
+$admin_tab = 'new';
 param( 'action', 'string' );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
@@ -108,12 +108,12 @@ switch($action)
 
 		break;
 
+
 	default:
 		/*
 		 * --------------------------------------------------------------------
 		 * New post form  (can be a bookmarklet form if mode == bookmarklet )
 		 */
-		$admin_tab = 'new';
 		$admin_pagetitle = T_('New post in blog:');
 		require (dirname(__FILE__).'/_menutop.php');
 
@@ -123,7 +123,6 @@ switch($action)
 		}
 
 		// ---------------------------------- START OF BLOG LIST ----------------------------------
-		$sep = '';
 		for( $curr_blog_ID = blog_list_start();
 					$curr_blog_ID != false;
 					$curr_blog_ID = blog_list_next() )
@@ -136,10 +135,8 @@ switch($action)
 			{	// If no selected blog yet, select this one:
 				$blog = $curr_blog_ID;
 			}
-			echo $sep;
-			if( $curr_blog_ID == $blog ) echo '<strong>';
 			// This is for when Javascript is not available:
-			echo '[<a href="b2edit.php?blog=', $curr_blog_ID;
+			echo '<a href="b2edit.php?blog=', $curr_blog_ID;
 			if( !empty( $mode ) ) echo '&amp;mode=', $mode;
 			echo '" ';
 			if( ! blog_has_cats( $curr_blog_ID ) )
@@ -150,11 +147,14 @@ switch($action)
 			{	// loop blog AND current blog both have catageories, normal situation:
 				echo 'onClick="return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), ', $curr_blog_ID,' )" title="', T_('Switch to this blog (keeping your input if Javascript is active)'), '"';
 			}
+
+			if( $curr_blog_ID == $blog ) 
+				echo ' class="CurrentBlog"';
+			else
+				echo ' class="OtherBlog"';
 			echo '>';
 			blog_list_iteminfo('shortname');
-			echo '</a>]';
-			if( $curr_blog_ID == $blog ) echo '</strong>';
-			$sep = ' | ';
+			echo '</a> ';
 		} // --------------------------------- END OF BLOG LIST ---------------------------------
 
 		require (dirname(__FILE__).'/_menutop_end.php');

@@ -10,6 +10,7 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
+$count = 0;
 for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = blog_list_next() )
 {
 	if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )
@@ -23,9 +24,9 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		?>
 		<div class="panelblock">
 		<h2><?php echo T_('Blogs') ?>:</h2>
-		<table class="thin">
+		<table class="grouped" cellspacing="0">
 		<tr>
-			<th><?php echo T_('Blog') ?></th>
+			<th class="firstcol"><?php echo T_('Blog') ?></th>
 			<th><?php echo T_('Full Name') ?></th>
 			<th><?php echo T_('Blog URL') ?></th>
 			<th><?php echo T_('Static File') ?></th>
@@ -35,8 +36,8 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		<?php
 	}
 	?>
-	<tr>
-		<td><strong>
+	<tr <?php if( $count % 2 == 1 ) echo 'class="odd"' ?>>
+		<td class="firstcol"><strong>
 			<?php
 			blog_list_iteminfo('ID');
 			echo '&nbsp;';
@@ -93,7 +94,8 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		<?php
 		} ?>
 	</tr>
-<?php
+	<?php
+	$count++;
 }
 
 if( !isset( $atleastoneshown ) )

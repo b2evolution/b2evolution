@@ -26,31 +26,17 @@
 ?>
 
 	<!-- form to add a comment -->
-	<form action="<?php echo $htsrv_url ?>/profile_update.php" method="post" class="bComment">
-
+	<?php form_formstart( $htsrv_url.'/profile_update.php', 'bComment', '', 'post' ); ?>
 		<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
 		<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 
-		<fieldset>
-			<div class="label"><?php echo T_('Login:') ?></div>
-			<div class="input"><?php user_info( 'login', 'htmlhead' ) ?>
-				-
-				<strong><?php echo T_('ID') ?>:</strong>
-				<?php user_info( 'ID', 'raw' ) ?>
-			</div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><?php echo T_('Level') ?>:</div>
-			<div class="input"><?php echo user_info( 'level', 'raw' ) ?></div>
-		</fieldset>
-
-		<fieldset>
-			<div class="label"><?php echo T_('Posts') ?>:</div>
-			<div class="input"><?php user_info( 'num_posts', 'raw' ) ?></div>
-		</fieldset>
-
 		<?php
+			form_info( T_('Login'), $current_User->dget('login'), T_('ID').': '.$current_User->ID );
+
+			form_info( T_('Level'), $current_User->dget('level') );
+
+			form_info( T_('Posts'), $current_User->dget('num_posts') );
+		
 			form_text( 'newuser_firstname', get_user_info( 'firstname' ), 40, T_('First name'), '', 50, 'bComment' );
 			form_text( 'newuser_lastname', get_user_info( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
 			form_text( 'newuser_nickname', get_user_info( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
@@ -96,8 +82,8 @@
 
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+				<input type="submit" class="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+				<input type="reset" class="reset" value="<?php echo T_('Reset') ?>" class="search" />
 			</div>
 		</fieldset>
 

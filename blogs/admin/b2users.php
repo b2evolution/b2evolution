@@ -35,7 +35,7 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 {
 	// allow profile editing/viewing only
 	$user_profile_only = 1;
-
+	
 	if( ($action && $action != 'userupdate') )
 	{	// This should be prevented un the UI
 		$Messages->add( 'You have no permission to edit other users or groups!' );
@@ -60,7 +60,7 @@ else switch ($action)
 { // actions only when editing users is allowed
 	case 'newuser':
 		param( 'template', 'integer', -1 );
-
+		
 		if( $template > -1 )
 		{ // we use a template
 			$edited_User = & new User( get_userdata($template) );
@@ -85,7 +85,7 @@ else switch ($action)
 		{
 			$edited_User = & new User( get_userdata( $edited_user_ID ) );
 		}
-
+		
 		if( $user_profile_only && $edited_user_ID != $current_User->ID )
 		{ // user is only allowed to update him/herself
 			$Messages->add( T_('You are only allowed to update your own profile!') );
@@ -95,16 +95,16 @@ else switch ($action)
 			require( dirname(__FILE__).'/_menutop_end.php' );
 			break;
 		}
-
+		
 		param( 'edited_user_oldlogin', 'string', true );
 		param( 'edited_user_login', 'string', true );
 		$edited_user_login = strtolower( $edited_user_login );
-
+		
 		if( empty($edited_user_login) )
 		{
 			$Messages->add( T_('You must provide an unique login!') );
 		}
-
+		
 		if( !$user_profile_only )
 		{ // allow changing level/group not for profile mode
 			param( 'edited_user_level', 'integer', true );
@@ -116,28 +116,28 @@ else switch ($action)
 			{
 				$edited_User->set( 'level', $edited_user_level );
 			}
-
+			
 			param( 'edited_user_grp_ID', 'integer', true );
 			if( $edited_user_grp_ID > 0 )
 			{
 				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
 			}
 			else $edited_user_Group = & new Group();
-
+			
 			$edited_User->setGroup( $edited_user_Group );
 			// echo 'new group = ';
 			// $edited_User->Group->disp('name');
 		}
-
+		
 		// check if new login already exists for another user_ID
 		$query = "SELECT ID FROM $tableusers WHERE user_login = '$edited_user_login' AND ID != $edited_user_ID";
 		$q = $DB->get_var( $query );
-
+		
 		if( $q !== NULL )
 		{
 			$Messages->add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ));
 		}
-
+		
 		$edited_User->set( 'login', $edited_user_login );
 		param( 'edited_user_firstname', 'string', true );
 		$edited_User->set( 'firstname', $edited_user_firstname );
@@ -192,7 +192,7 @@ else switch ($action)
 
 		if( !$Messages->count() )
 		{ // ---- NO UPDATE ON ERRORS
-
+			
 			if( $edited_User->get('ID') != 0 )
 			{	// Commit update to the DB:
 				$edited_User->dbupdate();
@@ -208,7 +208,7 @@ else switch ($action)
 				$edited_User->dbinsert();
 				$Messages->add( T_('New user created.'), 'note' );
 			}
-
+	
 			// Update cookies
 			if( $edited_user_ID == $current_User->ID )
 			{ // current user updates him/herself - we have to set cookies to keep him logged in
@@ -216,14 +216,14 @@ else switch ($action)
 				{
 					setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
 				}
-
+				
 				if( $current_User->login != $edited_User->login )
 				{
 					setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
 				}
 			}
 		}
-
+		
 		// display menu
 		require( dirname(__FILE__).'/_menutop.php' );
 		require( dirname(__FILE__).'/_menutop_end.php' );
@@ -535,7 +535,7 @@ else
 
 // user form
 if( $user != 0 || in_array($action, array( 'newuser', 'userupdate' )) )
-{
+{ // Display user form
 	if( !isset($edited_User) )
 	{
 		$edited_User = & new User( get_userdata($user) );

@@ -92,7 +92,7 @@ $use_rss = 1;
 # do you want to automatically redirect to the right blog?
 # This is overly usefull if you move posts or categories from one blog to another
 # If this is disabled, the post will be displayed in the wrong blog template.
-$redirect_to_postblog = 1;
+$redirect_to_postblog = false;
 
 
 // ** DB table names **

@@ -22,16 +22,15 @@ param( 'action', 'string' );
  *
  * {@internal cats_display_blog_list(-) }}
  *
- * @access private 
+ * @access private
  */
 function cats_display_blog_list()
 {
 	global $blog, $current_User;
-	$sep = '';
 	for( $curr_blog_ID = blog_list_start();
 				$curr_blog_ID != false;
 				$curr_blog_ID = blog_list_next() )
-	{ 
+	{
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
 		{	// Current user is not allowed to edit cats...
 			continue;
@@ -40,18 +39,9 @@ function cats_display_blog_list()
 		{	// If no selected blog yet, select this one:
 			$blog = $curr_blog_ID;
 		}
-		echo $sep;
-		if( $curr_blog_ID == $blog ) 
-		{ // This is the blog being displayed on this page ?>
-		<strong>[<a href="b2categories.php?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
-		<?php 
-		} 
-		else 
-		{ // This is another blog ?>
-		<a href="b2categories.php?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
-		<?php 
-		} 
-		$sep = ' | ';
+		?>
+		<a href="b2categories.php?blog=<?php echo $curr_blog_ID ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
+		<?php
 	}
 }
 
@@ -152,7 +142,7 @@ switch($action)
 
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>', sprintf( T_('Deleting category #%d : %s ...') ,$cat_ID, format_to_output( $cat_name, 'htmlbody') ), "</h3>\n";
-			
+
 		// DELETE FROM DB:
 		$result = cat_delete( $cat_ID );	
 		if( $result !== 1 )
@@ -171,7 +161,7 @@ switch($action)
 		
 		
 	case 'Edit':
-		// Cat edit form:
+		// ---------- Cat edit form: ----------
 		param( 'cat_ID', 'integer' );
 		$blog = get_catblog($cat_ID);
 
@@ -181,7 +171,7 @@ switch($action)
 	
 		// check permissions:
 		$current_User->check_perm( 'blog_cats', '', true, $blog );
-	
+
 		$cat_name = get_catname($cat_ID);
 		$cat_parent_ID = get_catparent($cat_ID);
 		?>
@@ -197,10 +187,12 @@ switch($action)
 		<?php		
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query();	// make sure the caches are loaded
+
 		function cat_move_before_first( $parent_cat_ID, $level )
 		{	// callback to start sublist
 			echo "\n<ul>\n";
 		}
+
 		function cat_move_before_each( $curr_cat_ID, $level )
 		{	// callback to display sublist element
 			global $cat_ID;	// This is the category being currently edited !!
@@ -221,30 +213,63 @@ switch($action)
 			<?php	
 			if( $cat_parent_ID == $curr_cat_ID ) echo ' &lt;= ', T_('Old Parent');
 		}
+
 		function cat_move_after_each( $curr_cat_ID, $level )
 		{	// callback after each sublist element
 			echo "</li>\n";
 		}
+
 		function cat_move_after_last( $parent_cat_ID, $level )
 		{	// callback to end sublist
 			echo "</ul>\n";
 		}
 	
-		?>
-		<input type="radio" id="cat_parent_none" name="cat_parent_ID" value="0" 
-			<?php 
+		if( $allow_moving_chapters )
+		{	// If moving cats between blogs is allowed:
+			foreach( $cache_blogs as $i_blog )
+			{ // run recursively through the cats of each blog
+				$current_blog_ID = $i_blog->blog_ID;
+				if( ! $current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) ) continue;
+				echo "<h4>".$i_blog->blog_name."</h4>\n";
+
+    		?>
+    		<input type="radio" id="cat_parent_none_<?php echo $current_blog_ID ?>" name="cat_parent_ID" value="0_<?php echo $current_blog_ID ?>"
+  			<?php
+  				if( (! $cat_parent_ID) && ($current_blog_ID == $blog) ) echo 'checked="checked"';
+  			?>
+  			/>
+  			<label for="cat_parent_none"><strong><?php echo T_('Root (No parent)') ?></strong></label>
+  			<?php
+  			if( (! $cat_parent_ID) && ($current_blog_ID == $blog) )
+        {
+          echo ' &lt;= ', T_('Old Parent');
+        }
+  			echo "</li>\n";
+    		// RECURSE:
+
+				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
+			}
+
+      echo '<p class="extracatnote">'.T_('Note: Moving categories across blogs is enabled. Use with caution.').'</p> ';
+		}
+		else
+		{	// Moving cats between blogs is disabled
+  		?>
+  		<input type="radio" id="cat_parent_none" name="cat_parent_ID" value="0_<?php echo $blog ?>"
+			<?php
 				if( ! $cat_parent_ID ) echo 'checked="checked"';
 			?>
 			/>
-			<label for="cat_parent_none"><strong><?php echo T_('Root (No parent)') ?></strong></label>
-			<?php	
+			<label for="cat_parent_none_<?php echo $blog ?>"><strong><?php echo T_('Root (No parent)') ?></strong></label>
+			<?php
 			if( ! $cat_parent_ID ) echo ' &lt;= ', T_('Old Parent');
 			echo "</li>\n";
-	
-	
-		// RECURSE:
-		cat_children( $cache_categories, $blog, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
-	
+  		// RECURSE:
+	  	cat_children( $cache_categories, $blog, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
+
+       echo '<p class="extracatnote">'.T_('Note: Moving categories across blogs is disabled.').'</p> ';
+    }
+
 		// ----------------- END RECURSIVE CAT LIST ----------------
 	?>		
 			<input type="submit" name="submit" value="<?php echo T_('Edit category!') ?>" class="search" />
@@ -258,29 +283,48 @@ switch($action)
 	
 	
 	case 'editedcat':
+    //
 		// Update cat in db:
+    //
 		param( 'cat_name', 'string', true );
-		param( 'cat_parent_ID', 'integer', true );
+
 		param( 'cat_ID', 'integer', true );
-		//echo $cat_ID; 
+		//echo $cat_ID;
 		$cat_blog_ID = get_catblog($cat_ID);
+
+ 		param( 'cat_parent_ID', 'string', true );
+    $cat_parent_ID_parts = explode( '_', $cat_parent_ID );
+    $cat_parent_ID = $cat_parent_ID_parts[0];
+    settype( $cat_parent_ID, 'integer' );
 		if( $cat_parent_ID != 0 )
-		{	// Check that parent is in same blog
+		{ // We have a new parent cat
 			$parent_cat_blog_ID = get_catblog($cat_parent_ID);
-			if( $cat_blog_ID != $parent_cat_blog_ID )
-			{
-				die( 'Cat and parent must be in the same blog!' );
-			}
 		}
-		
-		// check permissions:
+    else
+    { // We are moving to a blog root
+      $parent_cat_blog_ID = $cat_parent_ID_parts[1];
+      settype( $parent_cat_blog_ID, 'integer' );
+    }
+
+		// check permissions on source:
 		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
 
-		cat_update( $cat_ID, $cat_name, $cat_parent_ID );
+		if( $cat_blog_ID != $parent_cat_blog_ID )
+    { // We are moving to a different blog
+      if( ! $allow_moving_chapters )
+      {
+  			die( 'Moving chapters between blogs is disabled. Cat and parent must be in the same blog!' );
+      }
+  		// check permissions on destination:
+  		$current_User->check_perm( 'blog_cats', '', true, $parent_cat_blog_ID );
+		}
+
+		cat_update( $cat_ID, $cat_name, $cat_parent_ID, $parent_cat_blog_ID );
 	
 		header("Location: b2categories.php?blog=$cat_blog_ID");
 		break;
-	
+
+
 	default:
 		// Just display cat list for this blog
 		require(dirname(__FILE__) . '/_menutop.php');

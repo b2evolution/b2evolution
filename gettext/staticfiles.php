@@ -60,18 +60,22 @@ foreach( $pofiles as $po )
 
 if( !isset($argv) )
 { // html head
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xml:lang="en" lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title>b2evo :: static page generation</title>
-		<link href="../blogs/admin/admin.css" rel="stylesheet" type="text/css" />
+		<link href="../blogs/admin/desert.css" rel="stylesheet" type="text/css" title="Desert" />
+		<link href="../blogs/admin/variation.css" rel="alternate stylesheet" type="text/css" title="Variation" />
+		<link href="../blogs/admin/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+		<script type="text/javascript" src="../blogs/admin/styleswitcher.js"></script>
 	</head>
 	<body>
 	<div class="center" style="margin:auto;width:75%">
 
-	<img src="'.$img_url.'/b2evolution_logo_360.gif" /><br />
-	';
+	<img src="<?php echo $img_url ?>/b2evolution_logo_360.gif" /><br />
+<?php
 }
 
 log_('<hr />');

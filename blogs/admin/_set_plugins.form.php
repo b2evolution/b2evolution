@@ -17,9 +17,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	
 	<fieldset>
 		<legend><?php echo T_('Rendering plug-ins') ?></legend>
-		<table class="thin">
+		<table class="grouped" cellspacing="0">
 			<tr>
-				<th><?php echo T_('Plug-in') ?></th>
+				<th class="firstcol"><?php echo T_('Plug-in') ?></th>
 				<th><?php echo T_('Apply') ?></th>
 				<th><?php echo T_('Description') ?></th>
 			</tr>
@@ -29,7 +29,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			{
 			?>
 			<tr>
-				<td><?php	$loop_RendererPlugin->name(); ?></td>
+				<td class="firstcol"><?php	$loop_RendererPlugin->name(); ?></td>
 				<td><?php	echo $loop_RendererPlugin->apply_when; ?></td>
 				<td><?php	$loop_RendererPlugin->short_desc(); ?></td>
 			</tr>
@@ -41,9 +41,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<fieldset>
 		<legend><?php echo T_('Toolbar plug-ins') ?></legend>
-		<table class="thin">
+		<table class="grouped" cellspacing="0">
 			<tr>
-				<th><?php echo T_('Plug-in') ?></th>
+				<th class="firstcol"><?php echo T_('Plug-in') ?></th>
 				<th><?php echo T_('Description') ?></th>
 			</tr>
 			<?php
@@ -52,7 +52,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			{
 			?>
 			<tr>
-				<td><?php	$loop_ToolbarPlugin->name(); ?></td>
+				<td class="firstcol"><?php	$loop_ToolbarPlugin->name(); ?></td>
 				<td><?php	$loop_ToolbarPlugin->short_desc(); ?></td>
 			</tr>
 			<?php
@@ -62,15 +62,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	</fieldset>
 	
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ ?>
-	<fieldset class="submit">
-		<fieldset>
-			<div <?php echo ( $tab == 'regional' ) ? 'style="text-align:center"' : 'class="input"'?>>
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php } ?>
+	{ 
+		form_submit();
+	} 
+	?>
 
 </form>

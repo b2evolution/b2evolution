@@ -80,7 +80,9 @@ class ItemList extends DataObjectList
 	 * @param array show_statuses
 	 * @param mixed Specific post number to display
 	 * @param mixed YearMonth(Day) to display
-	 * @param mixed Week number
+	 * @param mixed Week number. Note: uses mySQL's week numbering and mySQL default if applicable.
+   * In mySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
+   * Value range is 0 to 53; week 1 is the first week that starts in this year
 	 * @param mixed List of cats to restrict to
 	 * @param array Array of cats to restrict to
 	 * @param mixed List of authors to restrict to
@@ -107,7 +109,7 @@ class ItemList extends DataObjectList
 		$show_statuses = array(),
 		$p = '',															// Specific post number to display
 		$m = '',															// YearMonth(Day) to display
-		$w = '',															// Week number
+		$w = -1,															// Week number
 		$cat = '',														// List of cats to restrict to
 		$catsel = array(),										// Array of cats to restrict to
 		$author = '',													// List of authors to restrict to
@@ -180,10 +182,9 @@ class ItemList extends DataObjectList
 		}
 
 		// If a week number is specified
-		if( $w != '' )
+		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
 		{
-			$w = '' . intval($w);
-			$where .= ' AND WEEK(post_issue_date,1)='. $w;
+			$where .= ' AND WEEK(post_issue_date)='.intval($w);
 		}
 
 		// if a post number is specified, load that post

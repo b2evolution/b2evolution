@@ -20,24 +20,16 @@ param( 'action', 'string' );
 param( 'show', 'string', 'referers' );
 
 require(dirname(__FILE__) . '/_menutop.php');
-if( $blog == 0 )
-{ // This is the blog being displayed on this page
-	echo '<strong>[<a href="b2stats.php?show=', $show, '&amp;blog=0">', T_('None'), '</a>]</strong>';
-}
-else
-{ // This is another blog
-	echo '<a href="b2stats.php?show=', $show, '&amp;blog=0">', T_('None'), '</a>';
-}
+?>
+<a href="b2stats.php?show=<?php echo $show ?>&amp;blog=0" class="<?php echo ( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php echo T_('None') ?></a>
+<?php
 for( $curr_blog_ID=blog_list_start('stub');
 			$curr_blog_ID!=false;
 			 $curr_blog_ID=blog_list_next('stub') )
 	{
-	if( $curr_blog_ID == $blog ) { // This is the blog being displayed on this page ?>
-		| <strong>[<a href="b2stats.php?show=<?php echo $show ?>&amp;blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
-<?php } else { // This is another blog ?>
-		| <a href="b2stats.php?show=<?php echo $show ?>&amp;blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
-<?php
-	}
+		?>
+		<a href="b2stats.php?show=<?php echo $show ?>&amp;blog=<?php echo $curr_blog_ID ?>" class="<?php echo ( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog' ?>"><?php blog_list_iteminfo('shortname') ?></a>
+	<?php
 }
 require( dirname(__FILE__) . '/_menutop_end.php' );
 
@@ -153,7 +145,7 @@ switch( $show )
 {
 	case 'summary':
 		?>
-		<h3><?php echo T_('Summary') ?>:</h3>
+		<h2><?php echo T_('Summary') ?>:</h2>
 		<?php
 		$sql = "SELECT COUNT(*)AS hits, hit_ignore, YEAR(visitTime) AS year, MONTH(visitTime) AS month,  DAYOFMONTH(visitTime) AS day FROM $tablehitlog ";
 		if( $blog > 0 )
@@ -173,8 +165,8 @@ switch( $show )
 		$hits['search'] = 0;
 		$last_date = 0;
 		?>
-	<table class="thincols">
-		<th><?php echo T_('Date') ?></th>
+	<table class="grouped" cellspacing="0">
+		<th class="firstcol"><?php echo T_('Date') ?></th>
 		<th><?php echo T_('Referers') // 'no' ?></th>
 		<th><?php echo T_('Refering Searches') ?></th>
 		<th><?php echo T_('Indexing Robots') ?></th>
@@ -182,6 +174,7 @@ switch( $show )
 		<th><?php echo T_('Direct Accesses') ?></th>
 		<th><?php echo T_('Total') ?></th>
 		<?php
+		$count = 0;
 		if( count($res_hits) ) foreach( $res_hits as $row_stats )
 		{
 			$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
@@ -189,8 +182,8 @@ switch( $show )
 			if( $last_date != $this_date )
 			{	// We just hit a new day, let's display the previous one:
 				?>
-				<tr>
-					<td><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+					<td class="firstcol"><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ ?>
 							<a href="b2stats.php?action=prune&amp;date=<?php echo $last_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
 						<?php
@@ -211,6 +204,7 @@ switch( $show )
 					$hits['robot'] = 0;
 					$hits['search'] = 0;
 					$last_date = $this_date;	// that'll be the next one
+					$count ++;
 			}
 			$hits[$row_stats['hit_ignore']] = $row_stats['hits'];
 		}
@@ -218,8 +212,8 @@ switch( $show )
 		if( $last_date != 0 )
 		{	// We had a day pending:
 			?>
-			<tr>
-				<td><?php if( $current_User->check_perm( 'stats', 'edit' ) )
+			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+				<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 					{ ?>
 					<a href="b2stats.php?action=prune&amp;date=<?php echo $this_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune hits for this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
 					<?php
@@ -241,13 +235,15 @@ switch( $show )
 
 		case 'referers':
 		?>
-	<h3><?php echo T_('Last referers') ?>:</h3>
+	<h2><?php echo T_('Last referers') ?>:</h2>
 	<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
 	<?php refererList(40,'global',1,1,'no','',$blog); ?>
-	<table class='thin'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-		<tr>
-			<td><?php stats_time() ?></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+		$count = 0;
+		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+			<td class="firstcol"><?php stats_time() ?></td>
 			<td>
 				<?php if( $current_User->check_perm( 'stats', 'edit' ) )
 					{ ?>
@@ -263,15 +259,19 @@ switch( $show )
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 		</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;
+		} // End stat loop ?>
 	</table>
 
 	<h3><?php echo T_('Top referers') ?>:</h3>
 	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true); ?>
-	<table class='invisible'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-			<tr>
-				<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+			$count = 0;
+			if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+				<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 				{ ?>
 				<td><a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
@@ -279,7 +279,9 @@ switch( $show )
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;
+		} // End stat loop ?>
 	</table>
 	<p><?php echo T_('Total referers') ?>: <?php stats_total_hit_count() ?></p>
 
@@ -288,13 +290,15 @@ switch( $show )
 
 		case 'refsearches':
 			?>
-	<h3><?php echo T_('Last refering searches') ?>:</h3>
+	<h2><?php echo T_('Last refering searches') ?>:</h2>
 	<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',1,1,"'search'",'',$blog); ?>
-	<table class='thin'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-		<tr>
-			<td><?php stats_time() ?></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+		$count = 0;
+		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+			<td class="firstcol"><?php stats_time() ?></td>
 			<td>
 				<?php if( $current_User->check_perm( 'stats', 'edit' ) )
 				{ ?>
@@ -306,32 +310,42 @@ switch( $show )
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 		</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;	
+		} // End stat loop ?>
 	</table>
 
 	<h3><?php echo T_('Top refering search engines') ?>:</h3>
 	<?php refererList(20,'global',0,0,"'search'",'baseDomain',$blog,true); ?>
-	<table class='invisible'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-			<tr>
-				<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+		$count = 0;
+		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+				<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;
+		} // End stat loop ?>
 	</table>
 
 	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
 	<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(20,'global',0,0,"'robot'",'hit_user_agent',$blog,true,true); ?>
-	<table class='invisible'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+	<table class="grouped" cellspacing="0">
+		<?php 
+		$count = 0;
+		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>
-				<td><?php stats_referer('<a href="', '">') ?><?php stats_user_agent( true ) ?><?php stats_referer('', '</a>', false) ?></td>
+				<td class="firstcol"><?php stats_referer('<a href="', '">') ?><?php stats_user_agent( true ) ?><?php stats_referer('', '</a>', false) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;
+		} // End stat loop ?>
 	</table>
 
 <?php
@@ -339,17 +353,21 @@ switch( $show )
 
 		case 'syndication':
 			?>
-	<h3><?php echo T_('Top Aggregators') ?>:</h3>
+	<h2><?php echo T_('Top Aggregators') ?>:</h2>
 	<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
 	<?php refererList(40, 'global', 0, 0, "'rss'", 'hit_user_agent', $blog, true, true); ?>
-	<table class='invisible'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-			<tr>
-				<td><?php stats_user_agent( true ) ?></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+			$count = 0;
+			if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+				<td class="firstcol"><?php stats_user_agent( true ) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;
+		} // End stat loop ?>
 	</table>
 	<p><?php echo T_('Total RSS hits') ?>: <?php stats_total_hit_count() ?></p>
 
@@ -358,13 +376,15 @@ switch( $show )
 
 		case 'other':
 		?>
-	<h3><?php echo T_('Last direct accesses') ?>:</h3>
+	<h2><?php echo T_('Last direct accesses') ?>:</h2>
 	<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 	<?php refererList(10,'global',1,1,"'invalid'",'',$blog); ?>
-	<table class='thin'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-		<tr>
-			<td><?php stats_time() ?></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+		$count = 0;
+		if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+			<td class="firstcol"><?php stats_time() ?></td>
 			<?php if( $current_User->check_perm( 'stats', 'edit' ) )
 			{ ?>
 			<td>
@@ -374,7 +394,9 @@ switch( $show )
 			<td><?php stats_blog_name() ?></td>
 			<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 		</tr>
-		<?php } // End stat loop ?>
+		<?php
+		$count++;
+		} // End stat loop ?>
 	</table>
 
 <?php
@@ -382,16 +404,20 @@ switch( $show )
 
 		case 'useragents':
 			?>
-	<h3><?php echo T_('Top User Agents') ?>:</h3>
+	<h2><?php echo T_('Top User Agents') ?>:</h2>
 	<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'hit_user_agent',$blog,true,true); ?>
-	<table class='invisible'>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-			<tr>
-				<td><?php stats_user_agent( false ) ?></td>
+	<table class="grouped" cellspacing="0">
+		<?php 
+			$count = 0;
+			if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
+			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+				<td class="firstcol"><?php stats_user_agent( false ) ?></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
 			</tr>
-		<?php } // End stat loop ?>
+		<?php 
+		$count++;
+		} // End stat loop ?>
 	</table>
 
 <?php

@@ -7,28 +7,32 @@
  *
  * @package admin
  */
-
-.bPosts,
-.bSideBar
+#TitleArea {
+	margin: 1ex;
+	padding: 0;
+}
+div.panelinfo {
+	margin: 1ex;
+}
+.left_col,
+.right_col
  {
-	vertical-align: top;
 	float: none;
 	width: 100%;
 	clear: none;
 	overflow: visible;
-	/* border:  1px solid #f00; */
-	margin: 0ex;
-	padding: 0ex;
+	margin: 0;
+	padding: 0;
 }
-.bPost,
-.bSideItem2
-{
-	border: none;
-	padding: 0ex;
+.left_col fieldset,
+.right_col fieldset {
 	margin: 1ex;
+	padding: 0 1ex 1ex 1ex;
 }
-.bSideItem2 fieldset
-{
+fieldset.extracats {
+	padding: 0 0 0 1ex;
+	margin: 1ex;
+	overflow: visible;
 }
 div.extracats
 {
@@ -37,9 +41,11 @@ div.extracats
 	padding: 0ex 1ex;
 	margin: 0ex;
 }
-.notes
+.notes,
+.extracatnote
 {
 	display: none;
+	color: #f00;
 }
 span.line
 {
@@ -49,15 +55,5 @@ span.line
 }
 span.line input
 {
-	width: 95%;
-}
-input.large, 
-textarea.large,
-div.large
-{
-	width: 95%;
-	margin: 0ex;
-}
-div.panelinfo{
-	width: 80%;
+	width: 98%;
 }

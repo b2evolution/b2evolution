@@ -26,10 +26,23 @@ class ArchiveList extends DataObjectList
 	var $archive_mode;
 	var $arc_w_last;
 	
-	/* 
-	 * ArchiveList::ArchiveList(-)
-	 *
+	/**
+
+
 	 * Constructor
+   *
+   * Note: Weekly archives use mySQL's week numbering and mySQL default if applicable.
+   * In mySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
+   * Value range is 0 to 53; week 1 is the first week that starts in this year
+   *
+	 * {@internal ArchiveList::ArchiveList(-)}}
+	 *
+   * @param integer
+   * @param string
+   * @param array
+   * @param mixed
+   * @param mixed
+   * @param integer
 	 */
 	function ArchiveList( 
 		$blog = 1, 
@@ -89,7 +102,7 @@ class ArchiveList extends DataObjectList
 		switch( $archive_mode )
 		{
 			case 'monthly':
-				// --------------------------------- MONTHLY ARCHIVES ---------------------------------------
+				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
 				$this->request="SELECT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month, COUNT(DISTINCT postcat_post_ID) AS count ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
@@ -99,7 +112,7 @@ class ArchiveList extends DataObjectList
 			break;
 
 			case 'daily':
-				// --------------------------------- DAILY ARCHIVES ---------------------------------------
+				// ------------------------------- DAILY ARCHIVES -------------------------------------
 				$this->request="SELECT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month, DAYOFMONTH(post_issue_date) AS day, COUNT(*) AS count ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
@@ -109,7 +122,7 @@ class ArchiveList extends DataObjectList
 			break;
 
 			case 'weekly':
-				// --------------------------------- WEEKLY ARCHIVES ---------------------------------------
+				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
 				$this->request="SELECT DISTINCT YEAR(post_issue_date) AS year, MONTH(post_issue_date) AS month, DAYOFMONTH(post_issue_date) AS day, WEEK(post_issue_date) AS week ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.
@@ -119,7 +132,7 @@ class ArchiveList extends DataObjectList
 
 			case 'postbypost':
 			default:
-				// ------------------------------- POSY BY POST ARCHIVES ----------------------------------
+				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
 				$this->request="SELECT DISTINCT ID, post_issue_date, post_title ".
 						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
 						$where.

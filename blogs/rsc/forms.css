@@ -1,5 +1,5 @@
-/*
- * Default Form styles
+/* 
+ * Default Form styles 
  * Feel free to override all these styles in your own skins
  */
 
@@ -16,13 +16,26 @@ form.inline {
 	display: inline;
 }
 
-fieldset span.notes {
-	/* display: block; */
-	font-size: 80%;
-	color: #999999;
+fieldset.input {
+	margin: 0;
+	padding: 0;
+	border: 0;
 }
-form.bComment label {
-	font-weight: bold;
+
+fieldset span.notes {
+	font-size: 80%;
+	color: #999;
+}
+
+input.large,
+textarea.large {
+	width: 97%;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+label.radiooption {
+	margin-right: 1em;
 }
 
 /* 24/75% forms - Fast Forms */
@@ -30,81 +43,71 @@ form.fform fieldset {
 	border: 1px solid #ddd;
 	margin-bottom: 1ex;
 	background-color: #fff;
-	padding: 0 0 1ex 0;
+	padding: .5ex 1ex;
 }
 form.fform fieldset fieldset {
-	clear: both;
 	border: none;
 	margin: 1ex;
 	padding: 0;
-	/* border: 1px solid #000; */
-}
-form.fform fieldset.submit fieldset {
-	background: transparent;
+	/* border: 1px solid #00f; */
 }
 form.fform div.label {
 	float: left;
 	width: 24%;
 	text-align: right;
-	padding-top: .6ex;
 	font-weight:bold;
+	margin: 0;
+	padding-top: .5ex;
+	/* border: 1px solid #f00; */
 }
 form.fform div.input {
-	float: right;
-	width: 75%;
+	margin: 0 0 0 25%;
+	/* border: 1px solid #f00; */
 }
-form.fform fieldset.submit {
-	border:0;
-	background:transparent;
-	clear:both;
+form.fform fieldset.input{
+	margin: 0;
+	/* border: 1px solid #0f0; */
 }
-form.fform fieldset fieldset fieldset div.label {
-	font-weight:normal;
-	width:20%;
-}
-form.fform fieldset fieldset fieldset div.input {
-	width:79%;
-}
-form.fform fieldset.left60 {
-	width:60%;
-	float:left;
-}
-form.fform div.input input[type=checkbox],
-form.fform div.input input[type=radio]
-{
-	margin-top: 5px;
+form.fform div.info {
+	margin: 0 0 0 25%;
+	padding-top: .5ex;
+	/* border: 1px solid #f00; */
 }
 
-
-/* 18/80% forms */
+/* 18/80% forms: comments and profile */
 form.bComment fieldset
 {	/* one form line */
-	clear: both;
 	border: none;
 	margin: 2ex 0ex;
 	padding: 0ex;
+	/* border: 1px solid #00f; */
+}
+form.bComment fieldset label {
+	font-weight: bold;
 }
 form.bComment fieldset div.label
 { /* label of form line */
 	float: left;
 	width: 18%;
 	text-align: right;
+	padding-top: .5ex;
 	font-weight: bold;
-	margin-top: .5ex;
-	/* border: 1px solid #00f; */
+	/* border: 1px solid #f00; */
 }
 form.bComment fieldset div.input
 { /* input zone of form line */
-	float: right;
-	width: 80%;
-	/* border: 1px solid #00f; */
+	margin: 0 0 0 20%;
+	/* border: 1px solid #f00; */
+}
+form.bComment fieldset.input{
+	margin: 0;
+	/* border: 1px solid #0f0; */
 }
 form.bComment fieldset div.info
 { /* info zone of form line */
-	float: right;
-	width: 80%;
-	margin-top: .5ex;
-	/* border: 1px solid #00f; */
+	margin: 0 0 0 20%;
+	padding-top: .5ex;
+	/* border: 1px solid #f00;*/
 }
 
 

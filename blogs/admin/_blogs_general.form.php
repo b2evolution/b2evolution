@@ -47,15 +47,17 @@ function update_IDs( ids, text, notrailingslash )
 			form_select( 'blog_locale', $blog_locale, 'locale_options', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 		?>
 	</fieldset>
-
+	
 	<fieldset>
 		<legend><?php echo T_('Access parameters') ?></legend>
-
+	
 		<?php
 			if( $Settings->get('default_blog_ID') && ($Settings->get('default_blog_ID') != $blog) )
 			{
-				$defblog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'));
-				$defblog = $defblog->dget('shortname');
+				if( $default_Blog = $BlogCache->get_by_ID($Settings->get('default_blog_ID'), false) )
+        { // Default blog exists
+  				$defblog = $default_Blog->dget('shortname');
+        }
 			}
 			form_radio( 'blog_access_type', $blog_access_type,
 					array(
@@ -125,37 +127,19 @@ function update_IDs( ids, text, notrailingslash )
 			form_text( 'blog_tagline', $blog_tagline, 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
 		?>
 
-		<fieldset>
-			<div class="label"><label for="blog_longdesc" ><?php echo T_('Long Description') ?>:</label></div>
-			<div class="input"><textarea name="blog_longdesc" id="blog_longdesc" rows="8" cols="50" class="large"><?php echo $blog_longdesc ?></textarea>
-			<span class="notes"><?php echo T_('This is displayed on the blog template.') ?></span></div>
-		</fieldset>
+			form_textarea( 'blog_longdesc', $blog_longdesc, 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
 
-		<?php
 			form_text( 'blog_description', $blog_description, 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
 
 			form_text( 'blog_keywords', $blog_keywords, 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 
+			form_textarea( 'blog_notes', $blog_notes, 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
+
 		?>
-
-		<fieldset>
-			<div class="label"><label for="blog_notes" ><?php echo T_('Notes') ?>:</label></div>
-			<div class="input"><textarea name="blog_notes" id="blog_notes" rows="8" cols="50" class="large"><?php echo $blog_notes ?></textarea>
-			<span class="notes"><?php echo T_('Additional info.') ?></span></div>
-		</fieldset>
-
 	</fieldset>
 
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo ($next_action == 'create') ? T_('Create new blog!') : T_('Update blog!') ?>" class="search" />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
+	<?php form_submit(); ?>	
 
-	<div class="clear"></div>
 </form>
 
 <script type="text/javascript">

@@ -90,7 +90,8 @@ function skin_list_start()
 /** 
  * Get next skin
  *
- * lists all folders in skin directory
+ * Lists all folders in skin directory,
+ * except the ones starting with a . (UNIX style) or a _ (FrontPage style)
  *
  * {@internal skin_list_start(-) }}
  *
@@ -105,7 +106,8 @@ function skin_list_next()
 		if( !($skin_name = $skin_dir->read()) )
 			return false;		// No more subfolder
 	} while( ( ! is_dir($skin_path.'/'.$skin_name) )	// skip regular files
-						|| ($skin_name[0] == '.')								// skip hidden files/dirs
+						|| ($skin_name[0] == '.')								// skip UNIX hidden files/dirs
+						|| ($skin_name[0] == '_')								// skip FRONTPAGE hidden files/dirs
 						|| ($skin_name == 'CVS' ) );						// Skip CVS directory
 	// echo 'ret=',  $skin_name;
 	return $skin_name;

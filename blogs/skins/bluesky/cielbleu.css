@@ -159,19 +159,13 @@ img.logo
 	margin-right: 33ex;
 }
 /* Styles for comment form */
-div.input
-{
-	float: right;
-	width: 80%;
-	/* border: 1px solid #00f; */
-}
 input.bComment, 
 textarea.bComment
 {
 	border-width: 1px;
 	border-color: #000;
 	border-style: solid;
-	padding: .5ex;
+	padding: 1px;
 	width: 98%;
 	margin: 0ex;
 }
@@ -180,8 +174,7 @@ select.bComment
 	border-width: 1px;
 	border-color: #000;
 	border-style: solid;
-	padding: .5ex;
-	width: 100%;
+	padding: 1px;
 	margin: 0ex;
 }
 

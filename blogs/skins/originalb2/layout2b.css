@@ -5,6 +5,7 @@ used as default layout for b2, with permission from Dean Peters,
 who first adapted it ( http://www.deanpeters.com/b2 )
 */
 
+@import url(../../rsc/basic.css);	/* Import basic styles */
 @import url(../../rsc/img.css);	/* Import standard image styles */
 @import url(../../rsc/forms.css);	/* Import default form styles */
 @import url(../../rsc/comments.css);	/* Import default comment styles */
@@ -167,10 +168,6 @@ body>#menu {width:150px;}
 #chaff a:visited { color: #fff; }
 #chaff a:hover { background-color:#fff; }
 
-.centerP {
-    text-align: center; 
-}
-
 #contentcomments input, #content input, #menu input {
 	margin: 1px;
 	padding: 1px 1px 4px 1px;
@@ -241,13 +238,6 @@ form.bComment {
 	font-size: 84%; /* override */
 }
 
-div.input
-{
-	float: right;
-	width: 80%;
-	/* border: 1px solid #00f; */
-	font-size: 84%;
-}
 input.bComment, 
 textarea.bComment
 {
@@ -255,7 +245,7 @@ textarea.bComment
 	border-width: 1px;
 	border-color: #cccccc;
 	border-style: solid;
-	padding: .5ex;
+	padding: 1px;
 	width: 98%;
 	margin: 0ex;
 }
@@ -265,7 +255,6 @@ select.bComment
 	border-width: 1px;
 	border-color: #cccccc;
 	border-style: solid;
-	padding: .5ex;
-	width: 99%;
+	padding: 1px;
 	margin: 0ex;
 }

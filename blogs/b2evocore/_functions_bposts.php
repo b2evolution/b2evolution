@@ -1,7 +1,7 @@
 <?php
 /**
  * Post handling functions
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -59,18 +59,18 @@ function bpost_create(
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_url, post_autobr, post_flags, post_wordcount,
 														post_comments, post_renderers )
-						VALUES( $author_user_ID, '".$DB->escape($post_title)."', 
+						VALUES( $author_user_ID, '".$DB->escape($post_title)."',
 										'".$DB->escape($post_urltitle)."',
-										'".$DB->escape($post_content)."',	
+										'".$DB->escape($post_content)."',
 										'".$DB->escape($post_timestamp)."',
-										'".date('Y-m-d H:i:s',$localtimenow)."', 
+										'".date('Y-m-d H:i:s',$localtimenow)."',
 										$main_cat_ID,
-										'".$DB->escape($post_status)."', 
+										'".$DB->escape($post_status)."',
 										'".$DB->escape($post_locale)."',
-										'".$DB->escape($post_url)."', 
-										$autobr, 
+										'".$DB->escape($post_url)."',
+										'".(integer)$autobr."',
 										'".$DB->escape(implode(',',$post_flags))."',
-										".bpost_count_words($post_content).", 
+										".bpost_count_words($post_content).",
 										'".$DB->escape($post_comments)."',
 										'".$DB->escape(implode('.',$post_renderers))."' )";
 	if( ! $DB->query( $query, 'Insert New Post' ) ) return 0;
@@ -245,10 +245,10 @@ function bpost_delete( $post_ID )
 /**
  * {@internal get_lastpostdate(-)}}
  */
-function get_lastpostdate( 
-		$blog = 1, 
-		$show_statuses = array(), 
-		$cat = '', 
+function get_lastpostdate(
+		$blog = 1,
+		$show_statuses = array(),
+		$cat = '',
 		$catsel = array(),
 		$timestamp_min = '',								// Do not show posts before this timestamp
 		$timestamp_max = 'now'							// Do not show posts after this timestamp
@@ -656,11 +656,11 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
 function single_post_title( $prefix = '#', $display = 'htmlhead' )
 {
 	global $p, $title, $preview;
-	
+
 	$disp_title = '';
-	
+
 	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
-	
+
 	if( $preview )
 	{
 		if( $prefix == '#' ) $prefix = ' ';
@@ -676,7 +676,7 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 		$Item = Item_get_by_title( $title ); // TODO: use cache
 		$disp_title = $Item->get('title');
 	}
-	
+
 	if( !empty( $disp_title ) )
 	{
 		if ($display)
@@ -696,7 +696,7 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 function preview_title( $string = '#', $before = ' ', $after = ''  )
 {
 	global $preview;
-	
+
 	if( $preview )
 	{
 		echo $before;
@@ -854,9 +854,9 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 			$i = $page - 1;
 			if( $i )
 				echo ' <a href="'.url_add_param($file, 'p='.$id.'&amp;page='.$i).'">'.$previouspagelink.'</a>';
-			
+
 			$i = $page+1;
-			
+
 			if( $i <= $numpages )
 				echo ' <a href="'.url_add_param($file, 'p='.$id.'&amp;page='.$i).'">'.$nextpagelink.'</a>';
 		}
@@ -1014,7 +1014,7 @@ function next_posts($max_page = 0, $page='' )
 function previous_posts( $page='' )
 {
 	global $p, $paged, $Settings, $edited_Blog, $generating_static;
-	
+
 	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		$nextpage = intval($paged) - 1;
@@ -1040,7 +1040,7 @@ function previous_posts( $page='' )
 function next_posts_link($label='#', $max_page=0, $page='')
 {
 	global $p, $paged, $result, $request, $Settings;
-	
+
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
 	if ($Settings->get('what_to_show') == 'paged')
@@ -1068,7 +1068,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
 function previous_posts_link($label='#', $page='')
 {
 	global $Settings;
-	
+
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
 	global $p, $paged;
@@ -1091,7 +1091,7 @@ function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {
 	global $request, $p;
 	global $Settings;
-	
+
 	if( !empty( $request ) && empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		global $MainList;
@@ -1541,7 +1541,7 @@ function permalink_single($file='')
 }
 
 
-/** 
+/**
  * {@internal the_permalink(-) }}
  *
  * @deprecated deprecated by {@link $Item::permalink()}

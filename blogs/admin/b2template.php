@@ -80,14 +80,14 @@ default:
 			?>
 			<p><?php echo T_('Be careful what you do, editing this file could break your template! Do not edit what\'s between <code>&lt;?php</code> and <code>?&gt;</code> if you don\'t know what you\'re doing!') ?></p>
 			<form name="template" action="b2template.php" method="post">
-				<textarea cols="80" rows="20" style="width:100%" name="newcontent" tabindex="1"><?php echo $content ?></textarea>
+				<fieldset class="input"><img src="img/blank.gif" alt="" width="1" height="1" /><textarea cols="80" rows="20" class="large" name="newcontent" tabindex="1"><?php echo $content ?></textarea></fieldset>
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="file" value="<?php echo $file ?>" />
 				<br />
 				<?php
 				if( is_writable($edit_folder. '/'. $file) )
 				{
-					echo '<input type="submit" name="submit" class="search" value="', T_('update template !'), '" tabindex="2" />';
+					echo '<input type="submit" name="submit" class="SaveButton" value="', T_('&nbsp; Save ! &nbsp;'), '" tabindex="2" />';
 				}
 				else
 				{

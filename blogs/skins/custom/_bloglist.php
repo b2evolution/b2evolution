@@ -20,11 +20,11 @@
 	}
 
 	# this is what will start and end your blog links
-	if(!isset($blog_list_start)) $blog_list_start = '';				
-	if(!isset($blog_list_end)) $blog_list_end = '';				
+	if(!isset($blog_list_start)) $blog_list_start = '<ul id="bloglist">';				
+	if(!isset($blog_list_end)) $blog_list_end = '</ul>';				
 	# this is what will separate your blog links
-	if(!isset($blog_item_start)) $blog_item_start = '';				
-	if(!isset($blog_item_end)) $blog_item_end = '';
+	if(!isset($blog_item_start)) $blog_item_start = '<li>';				
+	if(!isset($blog_item_end)) $blog_item_end = "</li>\n";
 	# This is the class of for the selected blog link:
 	if(!isset($blog_selected_link_class)) $blog_selected_link_class = 'BlogButtonCurr';
 	# This is the class of for the other blog links:

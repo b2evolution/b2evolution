@@ -10,8 +10,8 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package evoskins
- * @subpackage noskin
+ * @package main
+ * Note: we need at leats one file in the main package	
  */
 
 /**
@@ -24,10 +24,13 @@ param( 'blog', 'integer', '', true );
 
 if( empty($blog) )
 {	// No blog requested, by URL param, let's check extrapath
+  # echo 'Checking extra path...<br />';
 	// Check and Remove current page url:
 	$index_url = substr( $baseurl, strlen( $baseurlroot ) ) . '/index.php';
+  # echo 'Seeking ['.$index_url.'] in ['.$ReqPath.']...<br />';
 	if( ($pos = strpos( $ReqPath, $index_url )) !== false )
 	{ // note: $pos will typically be 0
+    # echo 'Matched index.php path...<br />';
 		$path_string = substr( $ReqPath, $pos+strlen( $index_url ) );
 		// echo "path=$path_string <br>";
 		$path_elements = explode( '/', $path_string, 20 );						// slice it

@@ -17,24 +17,24 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<fieldset>
 		<legend><?php echo T_('User permissions') ?></legend>
-		<table class="thin">
+		<table class="grouped" cellspacing="0">
 			<tr>
 				<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
-				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Is<br />member') ?></th>
-				<th colspan="5"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Can post/edit with following statuses:') ?></th>
-				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Delete<br />posts') ?></th>
-				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
-				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
-				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
-				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Upload') ?></th>
-				<th rowspan="2"></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Is<br />member') ?></th>
+				<th colspan="5" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Can post/edit with following statuses:') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Delete<br />posts') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />cats') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />blog') ?></th>
+				<th rowspan="2" class="checkright"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Upload') ?></th>
+				<th rowspan="2" class="checkright">&nbsp;</th>
 			</tr>
 			<tr>
-				<th><?php echo T_('Published') ?></th>
-				<th><?php echo T_('Protected') ?></th>
-				<th><?php echo T_('Private') ?></th>
-				<th><?php echo T_('Draft') ?></th>
-				<th><?php echo T_('Deprecated') ?></th>
+				<th class="checkright"><?php echo T_('Published') ?></th>
+				<th class="checkright"><?php echo T_('Protected') ?></th>
+				<th class="checkright"><?php echo T_('Private') ?></th>
+				<th class="checkright"><?php echo T_('Draft') ?></th>
+				<th class="checkright"><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
 				<td colspan="13">
@@ -57,7 +57,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					$members[] = $loop_row['ID'];
 					$perm_post = explode( ',', $loop_row['bloguser_perm_poststatuses'] );
 					?>
-					<tr>
+					<tr <?php if( $i%2 == 1) echo 'class="odd"'; ?>>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
 							<input id="checkallspan_state_<?php echo $i ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
@@ -161,7 +161,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				if( count($rows) ) foreach( $rows as $loop_row )
 				{	// Go through users:
 					?>
-					<tr>
+					<tr <?php if( $i%2 == 1) echo 'class="odd"'; ?>>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
 							<input id="checkallspan_state_<?php echo $i ?>" type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
@@ -222,19 +222,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<br />
 	</fieldset>
 
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search" <?php
-				if( $current_User->ID != 1 )
-				{	// warning if a user withdraws own permission to edit the blog's properties
-					echo 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"';
-				}
-				?> />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
+	<?php 
+		// warning if a user withdraws own permission to edit the blog's properties
+		form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"' : '' )
+	?>
 
-	<div class="clear"></div>
 </form>

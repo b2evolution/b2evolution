@@ -72,7 +72,7 @@ function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyearar
 			$title .= ", $my_day";
 		}
 
-		if( !empty( $w ) )
+		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
 		{	// We also want to display a week number
 			$title .= ", week $w";
 		}
@@ -110,6 +110,7 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
  * Create a link to archive
  *
  * {@internal archive_link(-)}}
+ *
  * @param string year
  * @param string month
  * @param string day
@@ -149,7 +150,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 			$link .= $separator.zeroise($day,2);
 		}
 	}
-	elseif( !empty( $week ) )
+	elseif( $week !== '' )  // Note: week # can be 0 !
 	{
 		if( ! $Settings->get('links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks

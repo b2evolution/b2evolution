@@ -116,16 +116,20 @@ switch( $action )
 						<p><strong><input type="checkbox" name="delhits" value="1" checked="checked" />
 						<?php printf ( T_('Delete the following %d referer hits:'), $DB->num_rows ) ?>
 						</strong></p>
-						<table class="thin">
-							<?php foreach( $res_affected_hits as $row_stats ) 
+						<table class="grouped" cellspacing="0">
+							<?php
+							$count = 0;
+							foreach( $res_affected_hits as $row_stats )
 							{  ?>
-							<tr>
-								<td><?php stats_time() ?></td>
+           		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+								<td class="firstcol"><?php stats_time() ?></td>
 								<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 								<td><?php stats_blog_name() ?></td>
 								<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 							</tr>
-							<?php } // End stat loop ?>
+							<?php
+              $count++;
+              } // End stat loop ?>
 						</table>
 					<?php
 					}
@@ -146,11 +150,13 @@ switch( $action )
 						<p><strong><input type="checkbox" name="delcomments" value="1" checked="checked" />
 						<?php printf ( T_('Delete the following %d comments:'), count($res_affected_comments) ) ?>
 						</strong></p>
-						<table class="thin">
-							<?php foreach( $res_affected_comments as $row_stats )
+						<table class="grouped" cellspacing="0">
+							<?php
+							$count = 0;
+              foreach( $res_affected_comments as $row_stats )
 							{ // TODO: new Comment( $row_stats ) ?>
-							<tr>
-								<td><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
+           		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+								<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 								<td><?php echo $row_stats['comment_author'] ?></a></td>
 								<td><?php echo $row_stats['comment_author_url'] ?></td>
 								<td><?php
@@ -166,12 +172,14 @@ switch( $action )
 								}
 								?></td>
 							</tr>
-							<?php } // End stat loop ?>
+							<?php
+              $count++;
+              } // End stat loop ?>
 						</table>
-					<?php 
-					} 
+					<?php
+					}
 				}
-					
+
 				// Check if the string is already in the blacklist:
 				if( antispam_url($keyword) )
 				{ // Already there:
@@ -276,12 +284,14 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 		</p>
 	<?php } ?>
-	<table class='thin'>
-		<?php if( count($res_stats) ) foreach( $res_stats as $row_stats )
+	<table class="grouped" cellspacing="0">
+		<?php
+		$count = 0;
+    if( count($res_stats) ) foreach( $res_stats as $row_stats )
 		{  ?>
-		<tr>
-			<td>
-				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+		<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+			<td class="firstcol">
+				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 				{ ?>
 				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
 				<?php }
@@ -290,8 +300,8 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			</td>
 			<td><?php antispam_source(); ?></td>
 			<td><?php
-					if( (antispam_source(false,true) == 'local') 
-						&& $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+					if( (antispam_source(false,true) == 'local')
+						&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 					{
 					?>
 					[<a href="b2antispam.php?action=report&keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>"><?php echo T_('Report') ?></a>]
@@ -299,9 +309,11 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 				[<a href="b2antispam.php?action=ban&keyword=<?php echo urlencode( antiSpam_domain(false) ) ?>" title="<?php echo T_('Check hit-logs and comments for this keyword!') ?>"><?php echo T_('Re-check') ?></a>]
 			</td>
 		</tr>
-		<?php } // End stat loop ?>
+		<?php
+    $count++;
+    } // End stat loop ?>
 	</table>
 </div>
 <?php
-require( dirname(__FILE__).'/_footer.php' ); 
+require( dirname(__FILE__).'/_footer.php' );
 ?>

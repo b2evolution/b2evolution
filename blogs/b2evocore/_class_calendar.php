@@ -19,13 +19,13 @@ class Calendar
 {
 	var $blog;
 	var $year, $month;
-	var $specific;			// WE ASKED FOR A SPECIFIC MONTH
+	var $specific;					// WE ASKED FOR A SPECIFIC MONTH
 	
-	var $mode;  // 'month' or 'year'
+	var $mode;  						// 'month' or 'year'
 	
 	var $where;
-	var $request;			// SQL query string
-	var $result;			// Result set
+	var $request;						// SQL query string
+	var $result;						// Result set
 	var $result_num_rows;		// Number of rows in result set
 
 	var $displaycaption;
@@ -33,7 +33,14 @@ class Calendar
 	var $monthstart;
 	var $monthend;
 	var $linktomontharchive;
-	var $navigation;	
+	/**
+	 * Where to do the navigation
+	 * 
+	 * 'caption' or 'tfoot';
+	 *
+	 * @var string
+	 */
+	var $navigation = 'caption';	
 
 	var $tablestart;
 	var $tableend;
@@ -145,9 +152,7 @@ class Calendar
 		$this->monthformat = 'F Y';
 		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
-		$this->navigation = 'caption';	// Do the nav in the caption
-
-		$this->tablestart = '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">'."\n";
+		$this->tablestart = '<table class="bCalendarTable" cellspacing="0" summary="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
 		$this->monthstart = '<caption class="bCalendarCaption">';
@@ -363,7 +368,9 @@ class Calendar
 				{	// chosen month with link to archives
 					echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'" title="'.T_('go to month\'s archive').'">';
 				}
+
 				echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
+
 				if( $this->linktomontharchive )
 				{	// close link to month archive
 					echo '</a>';
@@ -417,6 +424,24 @@ class Calendar
 			}
 			
 			echo $this->headerrowend;
+		}
+
+		if( $this->navigation == 'tfoot' )
+		{	// We want to display navigation in the table footer:
+			// TODO: YEAR MODE support
+			echo "<tfoot>\n";
+			echo "<tr>\n";
+			echo '<td colspan="'.(($this->mode == 'month') ? '3' : '2' ).'" id="prev">';
+			echo isset( $previous_year_link ) ? $previous_year_link : '';
+			echo isset( $previous_month_link ) ? $previous_month_link : '';
+			echo "</td>\n";
+			if( $this->mode == 'month' ) echo '<td class="pad">&nbsp;</td>'."\n";
+			echo '<td colspan="'.(($this->mode == 'month') ? '3' : '2' ).'" id="next">';
+			echo isset( $next_month_link ) ? $next_month_link : '';
+			echo isset( $next_year_link ) ? $next_year_link : '';
+			echo "</td>\n";
+			echo "</tr>\n";
+			echo "</tfoot>\n";
 		}
 
 		// REAL TABLE DATA :
@@ -565,22 +590,6 @@ class Calendar
 		} // mode == 'month'
 		
 		echo $this->rowend;
-		
-		if( $this->navigation == 'tfoot' )
-		{	// We want to display navigation in the table footer:
-			// TODO: YEAR MODE support
-			echo "<tfoot>\n";
-			echo "<tr>\n";
-			echo '<td colspan="3" id="prev">';
-			echo $previous_month_link;
-			echo "</td>\n";
-			echo '<td class="pad">&nbsp;</td>'."\n";
-			echo '<td colspan="3" id="next">';
-			echo $next_month_link;
-			echo "</td>\n";
-			echo "</tr>\n";
-			echo "</tfoot>\n";
-		}
 		
 		echo $this->tableend;
 	}  // display(-)

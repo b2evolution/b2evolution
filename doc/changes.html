@@ -7,15 +7,24 @@
 <body>
 	<img src="../blogs/img/b2evolution_logo_360.gif" alt="b2evolution" />
 	<p>Only public releases are listed here.</p>
-
-	<h2>0.9.1-CVS</h2>
+	<h2>0.9.0.9+CVS</h2>
 	<ul>
-		<li>Counting number of views for each item (template tag $Item->views()) (jeffbearer, blueyed)</li>
-	
-		<li>&quot;poplog&quot; (change name) plugin (blueyed)</li>
-		<li>Who's online (jeffbearer) </li>
+		<li>Allow moving of categories between blogs ( conf/_admin : $allow_moving_chapters = true; )</li>
+		<li>Allow moving of posts between blogs ( conf/_admin : $allow_cross_posting = 3; )</li>
+    <li>Allow redirecting to main blog if post is permalinked through wrong blog ( conf/_advanced : $redirect_to_postblog = true; )</li>
+  </ul>
+	<h2>0.9.0.9 &quot;Madrid&quot;</h2>
+	<ul>
+		<li>Updated locales (Lucas, Walter, Mago, Jun and the others... ;) </li>
+		<li>New default style for the backoffice (fplanque)</li>
+		<li>Style switcher for the back-office (fplanque). You can add your own style into /blogs/admin, simply by naming it custom.css . The style switcher will recognize it automatically.</li>
+		<li>Extended IIS compatibility (isaac, blueyed, fplanque)</li>
+		<li>Weekly archives offset fixed</li>
+		<li>Minor bug fixes</li>
+		<li>Additional code documentation (fplanque)</li>
+		<li>Movable Type import script improved</li>
+		<li>Smiley toolbar is disabled by default (to enable it, open /plugins/toolbars/_smilies.toolbar.php and change <code>var $display = false;</code> to <code>var $display = true;</code>)</li>
 	</ul>
-	
 	<h2>0.9.0.8 &quot;Oslo&quot;</h2>
 	<ul>
 		<li>Upgrade procedure will fix /' and /&quot; in older comments (fplanque) </li>
@@ -58,14 +67,14 @@
 				<li>Texturize plugin.</li>
 				<li>Auto-P plugin.</li>
 				<li>Textile 2.0 plugin. </li>
-			</ul>
+		</ul>
 		</li>
 		<li>Comments can be closed / open / disabled (post per post). (fplanque) </li>
 		<li>Full locale support instead of lightweight language support.</li>
 		<li>Locales can be fully administered in the backoffice now. (blueyed)</li>
 		<li>b2evo will redirect to correct blog if permalinks point to wrong one (fplanque) </li>
 		<li>Blogrolls have been renamed to Linkblogs which should be a little easier to understand. </li>
-		<li>Backoffice improvements. </li>
+	<li>Backoffice improvements. </li>
 	</ul>
 
 	<h2>0.8.9</h2>

@@ -3,7 +3,7 @@
  * This is b2evolution's admin config file
  *
  * This sets how the back-office works
- * Last significant changes to this file: version 0.9.0.0
+ * Last significant changes to this file: version 0.9.0.10
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -13,15 +13,32 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-# Cross posting:
-# set this to 0 if you want users to post to a single category only
-# set this to 1 if you want to be able to cross-post among multiple categories
-# set this to 2 if you want to be able to cross-post among multiple blogs/categories
+
+/**
+ * Cross posting
+ *
+ * Possble values:
+ *   - 0 if you want users to post to a single category only
+ *   - 1 if you want to be able to cross-post among multiple categories
+ *   - 2 if you want to be able to cross-post among multiple blogs/categories
+ *   - 3 if you want to be able to change main cat among blogs (which will move the
+ *       posts from one blog to another; use with caution)
+ */
 $allow_cross_posting = 1;
 
 
-# Default status for new posts:
-$default_post_status = 'published';  // 'published', 'deprecated', 'protected', 'private', 'draft'
+/**
+ * Moving chapters between blogs?
+ */
+$allow_moving_chapters = false;
+
+
+/**
+ * Default status for new posts:
+ *
+ * Possible values: 'published', 'deprecated', 'protected', 'private', 'draft'
+ */
+$default_post_status = 'published';
 
 
 # set this to 1 if you want to use the 'preview' function
@@ -33,7 +50,7 @@ $use_spellchecker = 1;
 
 
 # Do you want to be able to link each post to an URL ?
-$use_post_url = 1;  // 1 to enable, 0 to disable
+$use_post_url = 1;			// 1 to enable, 0 to disable
 
 
 # When banning referrers/comment URLs, do you want to remove
@@ -80,16 +97,5 @@ $fileupload_allowedusers = '';
  * max length for blog_urlname and blog_stub values (this gets checked when editing/creating blogs).
  */
 $maxlength_urlname_stub = 30;
-
-
-# Do not edit the following unless you known what you're doing...
-# Backoffice two colum display:
-$admin_2col_start = '<div class="bPosts">';
-$admin_2col_nextcol = '</div><div class="bSideBar">';
-$admin_2col_end = '</div><div style="clear:both;"></div>';
-# If you run into troubles with the backoffice two colum display, you can use the alternative below:
-# $admin_2col_start = '<table cellspacing="0"><tr><td class="bPosts">';
-# $admin_2col_nextcol = '</td><td class="bSideBar">';
-# $admin_2col_end = '</td></tr></table>';
 
 ?>

@@ -1,43 +1,40 @@
 /* Designed by François PLANQUE - http://fplanque.net/ */
 
+@import url(../../rsc/basic.css);	/* Import basic styles */
 @import url(../../rsc/img.css);	/* Import standard image styles */
 @import url(../../rsc/blog_elements.css);	/* Import standard blog elements styles */
 @import url(../../rsc/forms.css);	/* Import default form styles */
 @import url(../../rsc/comments.css);	/* Import default comment styles */
 
 body {
-	background-color: #FFFFFF;
-	background-repeat: repeat-x;
+	background: #fff url(img/bg.png) repeat-y 50% 0;
 	padding: 0px;
 	margin: 0px;
-	color: #000000;
+	color: #000;
 	font: 84% Arial, Helvetica, sans-serif;
-
-/*	font-size: 84%; 	poussé vers l'extérieur pour éviter des combinaisons en trop grand nombre */
-}
-td {
-	font-family: Arial, Helvetica, sans-serif;
-}
-th {
-	font-family: Arial, Helvetica, sans-serif;
-}
-caption {
-	font-family: Arial, Helvetica, sans-serif;
-	font-weight: bold;
 }
 
-h1 {
-	color: #6699CC;
-	font-size: 225%;
+a {
+	color: #569;
 }
+a:visited {
+	color: #000;
+}
+a:hover {
+	color: #9ae;
+}
+
 h2 {
-	color: #6699CC;
+	color: #78a;
 	font-size: 180%;
+	margin: 0;
 }
 h3 {
+	color: #78a;
 	font-size: 120%;
 }
 h4 {
+	color: #78a;
 	font-size: 110%;
 }
 
@@ -54,139 +51,89 @@ td.right
 {
 	text-align: right;
 }
-p.baseline {
+div#pageFooter {
 	clear: both;
-	font-size: 65%;
+	background-color: #fff;
+	width: 738px;
+	margin: 0 auto;
+	padding: 0 0 1ex 0;
+}
+p.baseline {
+	border-top: 1px solid #ddd;
 	text-align: center;
-	border-top: 1px solid #ccc;
-	margin: 1ex;
+	font-size: 74%;
+	color: #999;
 	padding: 1ex;
+	margin: 0;
 }
 hr {
-	height: 0px;
-	border-top: 1px solid #6699CC;
-	border-right: 1px none #6699CC;
-	border-bottom: 1px none #6699CC;
-	border-left: 1px none #6699CC;
-
-}
-dt {
-	font-weight: bold;
-	color: #009999;
-}
-blockquote {
-	border: 2px dotted #6699CC;
-	padding: 12px 16px;
-	background-color: #eee;
-	margin: 10px;
-}
-.center
-{
-	text-align: center;
-}
-.leftmargin {
-	float: left;
-	border: 0px;
-	margin-right: 1ex;
-	margin-top: .2ex;
-	margin-bottom: .2ex;
-}
-.rightmargin {
-	float: right;
-	border: 0px;
-	margin-left: 1ex;
-	margin-top: .2ex;
-	margin-bottom: .2ex;
-}
-	
-acronym {
-	border-bottom-width: 1px;
-	border-bottom-style: dotted;
-	border-bottom-color: #000000;
-	cursor: help;
-}
-abbr {
-	border-bottom-width: 1px;
-	border-bottom-style: dotted;
-	border-bottom-color: #000000;
-	cursor: help;
-}
-del {
-	color: #999999;
-}
-ins {
-	color: #009999;
-	text-decoration: none;
+	height: 0;
+	border: 0;
+	border-top: 1px solid #78a;
 }
 
+div#wrapper {
+	background: #fff url(img/bg_content.gif) repeat-y 0 0;
+	width: 740px;
+	margin: 0 auto;
+	padding: 0;
+}
 
 div.pageHeader {
-	width: 100%;
 	padding: 1ex;
+	margin: 0 1px 1ex 1px;
+	border-bottom: 1px solid #ddd;
 	text-align: center;
-	background: #6699CC;
-	margin-bottom: 1ex;
-
+	background: #78a;
 }
 
 h1#pageTitle {
 	font-family: Arial, Helvetica, sans-serif;
-	color: #FFFFFF;
+	color: #fff;
 	font-size: 270%;
 	font-weight: bold;
-	margin-top: .5ex;
-	margin-bottom: .1ex;
+	margin: 0;
+	padding: 0;
 }
 
-a.BlogButton {
-	text-decoration: none;
-	border: 1px solid #FFFFFF;
-	padding-top: 2px;
-	padding-right: 4px;
-	padding-bottom: 2px;
-	padding-left: 4px;
-	white-space: nowrap;
-	margin-right: 3px;
-	margin-top: 3px;
-	background: #336699;
+ul#bloglist {
+	background-color: #fff;
+	border-bottom: 1px solid #000;
+	margin: 0 1px;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
 }
+ul#bloglist li {
+	border-right: 1px solid #000;
+	display: inline;
+	padding: .5ex 1em;
+}
+
+a.BlogButton,
 a.BlogButtonCurr {
+	font-weight: bold;
 	text-decoration: none;
-	border: 1px solid #FFFFFF;
-	text-align: left;
-	vertical-align: top;
-	padding-top: 2px;
-	padding-right: 4px;
-	padding-bottom: 2px;
-	padding-left: 4px;
-	white-space: nowrap;
-	margin-top: 3px;
-	margin-right: 3px;
-	background: #6699CC;
+}
+a.BlogButton {
+	color: #000;
+}
+a.BlogButton:hover {
+	text-decoration: underline;
+	color: #9ae;
+}
+a.BlogButtonCurr,
+a.BlogButtonCurr:visited {
+	color: #78a;
+}
+a.BlogButtonCurr:hover {
+	text-decoration: underline;
+	color: #9ae;
 }
 
-a.BlogButton:link,
-a.BlogButton:visited,	
-a.BlogButton:active,
-a.BlogButtonCurr:link,
-a.BlogButtonCurr:visited,	
-a.BlogButtonCurr:active
-{
-	color: #FFFFFF;
-}
-a.BlogButton:hover		{
-	color: #FFFFFF;
-	background: #6699CC;
-
-	/* text-decoration: underline; */
-}
-a.BlogButtonCurr:hover		{
-	color: #336699;
-	/* text-decoration: underline; */
-}
 
 .pageSubTitle {
-	color: #FFFFFF;
+	color: #fff;
 	letter-spacing: 4px;
 	text-align: center;
 	vertical-align: middle;
@@ -208,82 +155,62 @@ div.stats{
 
 /* Styles for main area (left) */
 h2 {
-	margin-left: 8px;
+	margin: 1ex;
+	border-bottom: 1px solid #78a;
 }
 
 /* Styles for posts */
 .bPosts {
-	vertical-align: top;
 	float: left;
-	width: 66%;
-	background: #eee;
-
+	width: 480px;
+	overflow: hidden;
+	/* background: #090;*/
 }
 .bPost, .bPostpublished
 {
 	clear: both;
-	margin-right: 10px;
-	margin-left: 20px;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	border: 1px solid #6699CC;
-	padding-right: 8px;
-	padding-left: 8px;
+	margin: 0 2.5ex;
+	padding: 0;
+	border-bottom: 1px solid #ddd;
+	/* border: 1px solid #78a; */
 }
 .bSmallHead {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	color: #6699CC;
+	color: #999;
+	margin: 2ex 0 1ex 0;
 }
 .bTitle {
-	margin-top: 8px;
-	margin-bottom: 8px;
+	color: #78a;
+	margin: 1ex 0;
 }
 .bText {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
-.bMore
-{
-	text-align: center;
-}
-.bMore a
-{
-	font-weight: bold;
-	font-size: 110%;
-}
 .bSmallPrint
 {
 	clear: both;
+	color: #999;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;
-	margin-top: 8px;
-	margin-bottom: 8px;
+	margin: 1ex 0 2ex 0;
 }
-
-
 
 input.bComment, 
 textarea.bComment
 {
-	background-color: #fff;
-	border-width: 1px;
-	border-color: #cccccc;
-	border-style: solid;
-	padding: .5ex;
-	width: 98%;
+	background-color: #eee;
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
 	margin: 0ex;
 }
-select.bComment
+select.bComment		/* Used by the profile form */
 {
-	background-color: #fff;
-	border-width: 1px;
-	border-color: #cccccc;
-	border-style: solid;
-	padding: .5ex;
-	width: 100%;
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
 	margin: 0ex;
 }
 
@@ -293,10 +220,8 @@ div.statbloc
 {
 	float: left;
 	width: 44%;
-	margin-left: 2%; 
-	margin-right: 0%; 
-	margin-bottom: 2ex;
-	border: 1px solid #6699CC;
+	margin: 0 0 2ex 1.5ex; 
+	border: 1px solid #78a;
 }
 div.statbloc h3
 {
@@ -305,36 +230,42 @@ div.statbloc h3
 	margin-right: 0px;
 	color: #FFFFFF;
 	text-align: center;
-	background: #6699CC;
+	background: #78a;
 	padding: 1ex;
 }
 
+input.submit,
+input.reset {
+	background-color: #ddd;
+	color: #78a;
+	border: 1px solid #000;
+	font-weight: bold;
+	padding: 1px;
+}
+
+input.submit:hover {
+	color: #000;
+	text-decoration: underline;
+}
 
 /* Styles for sidebar (right) */
 .bSideBar {
-	width: 33%;
-	vertical-align: top;
+	width: 259px;	
 	float: right;
-	background: #eee;
-
+	overflow: hidden;
+	/* background: #900; */
 }
 .bSideItem {
-	margin-right: 20px;
-	margin-left: 10px;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	border: 1px solid #6699CC;
-	padding: 8px;
-}
-.bSideItem h3 {
-	margin-top: 0px;
-	margin-bottom: 8px;
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+	border-bottom: 1px solid #ddd;
 }
 .bSideItem ul {
 	margin-left: 8px;
 	padding-left: 8px;
 	margin-top: 8px;
 	margin-bottom: 8px;
+	list-style-type:square;
 }
 .bSideItem ul ul{
 	margin-left: 8px;
@@ -353,49 +284,37 @@ div.statbloc h3
 }
 input.SearchField
 {
-	background-color: #fff;
-	border-width: 1px;
-	border-color: #cccccc;
-	border-style: solid;
+	background-color: #eee;
+	border: 1px solid #ccc;
 	padding: .5ex;
 	width: 96%;
 	margin: 0ex;
 }
 
-/* Styles for Calendar: */
-caption.bCalendarCaption
-{
-	border-left: solid 1px #ccc;
-	border-right: solid 1px #ccc;
-	border-top: solid 1px #ccc;
-	margin: auto;
-	white-space: nowrap;
+/* Calendar: */
+caption.bCalendarCaption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
 }
-table.bCalendarTable
-{
-	margin: auto;
-	font-size: 84%;
+table.bCalendarTable {
 	border: solid 1px #ccc;
-	background: #fff;
+	border-collapse: separate; 
 }
-tr.bCalendarRow
-{
-	text-align: center;
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
 }
-th.bCalendarHeaderCell
-{
-	font-size: 84%;
+table.bCalendarTable tfoot a {
+	text-decoration: none;
 }
-td.bCalendarCell
-{
+table.bCalendarTable tfoot a:hover {
+	background-color: #78a;
+	color: #fff;
 }
-td.bCalendarEmptyCell
-{
-}
-.bCalendarLinkPost
-{
-	font-weight: bold;
+th.bCalendarHeaderCell {
+	color: #abc;
 }
 #bCalendarToday {
-	background-color: #DEF;
+	background-color: #bce;
 }

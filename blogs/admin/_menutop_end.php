@@ -10,5 +10,6 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?></h1>
+</div>
 
 <div class="panelbody">

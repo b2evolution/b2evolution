@@ -80,15 +80,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	</fieldset>
 
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ ?>
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php } ?>
+	{ 
+		form_submit();
+	} 
+	?>
 
 </form>

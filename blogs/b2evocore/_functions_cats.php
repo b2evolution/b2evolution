@@ -52,7 +52,8 @@ function cat_create(
 function cat_update(
 	$cat_ID,
 	$cat_name,
-	$cat_parent_ID = 0 )
+	$cat_parent_ID = 0,
+  $cat_blog_ID = '' )
 {
 	global $tablecategories, $DB;
 
@@ -60,7 +61,8 @@ function cat_update(
 
 	return $DB->query( "UPDATE $tablecategories 
 												SET cat_name = ".$DB->quote($cat_name).",
-														cat_parent_ID = $cat_parent_ID
+														cat_parent_ID = $cat_parent_ID ".
+                      (!empty($cat_blog_ID) ? ", cat_blog_ID = $cat_blog_ID" : '')."
 											WHERE cat_ID = $cat_ID" );
 }
 

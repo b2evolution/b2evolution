@@ -42,4 +42,74 @@ function check_db_version()
 	echo "OK.<br />\n";
 }
 
+
+/**
+ * Clean up extra quotes in posts
+ */
+function cleanup_post_quotes()
+{
+  global $DB;
+
+	echo "Checking for extra quote escaping in posts... ";
+	$query = "SELECT ID, post_title, post_content
+							FROM EVO_posts
+						 WHERE post_title LIKE '%\\\\\\\\\'%'
+						 		OR post_title LIKE '%\\\\\\\\\"%'
+						 		OR post_content LIKE '%\\\\\\\\\'%'
+						 		OR post_content LIKE '%\\\\\\\\\"%' ";
+	/* FP: the above looks overkill, but mySQL is really full of surprises...
+					tested on 4.0.14-nt */
+	// echo $query;
+	$rows = $DB->get_results( $query, ARRAY_A );
+	if( $DB->num_rows )
+	{
+		echo 'Updating '.$DB->num_rows.' posts... ';
+		foreach( $rows as $row )
+		{
+			// echo '<br />'.$row['post_title'];
+			$query = "UPDATE EVO_posts
+								SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
+										post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
+								WHERE ID = ".$row['ID'];
+			// echo '<br />'.$query;
+			$DB->query( $query );
+		}
+	}
+	echo "OK.<br />\n";
+
+}
+
+/**
+ * Clean up extra quotes in comments
+ */
+function cleanup_comment_quotes()
+{
+  global $DB;
+
+	echo "Checking for extra quote escaping in comments... ";
+	$query = "SELECT comment_ID, comment_content
+							FROM EVO_comments
+						 WHERE comment_content LIKE '%\\\\\\\\\'%'
+						 		OR comment_content LIKE '%\\\\\\\\\"%' ";
+	/* FP: the above looks overkill, but mySQL is really full of surprises...
+					tested on 4.0.14-nt */
+	// echo $query;
+	$rows = $DB->get_results( $query, ARRAY_A );
+	if( $DB->num_rows )
+	{
+		echo 'Updating '.$DB->num_rows.' comments... ';
+		foreach( $rows as $row )
+		{
+			$query = "UPDATE EVO_comments
+								SET comment_content = ".$DB->quote( stripslashes( $row['comment_content'] ) )."
+								WHERE comment_ID = ".$row['comment_ID'];
+			// echo '<br />'.$query;
+			$DB->query( $query );
+		}
+	}
+	echo "OK.<br />\n";
+
+}
+
+
 ?>

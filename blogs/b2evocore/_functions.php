@@ -1,7 +1,7 @@
 <?php
 /**
  * General purpose functions
- *
+ * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -542,14 +542,14 @@ function timer_stop($display=0,$precision=3) { //if called like timer_stop(1), w
 	}
 
 
-function xmlrpc_getposttitle($content)
+function xmlrpc_getposttitle($content) 
 {
 	global $post_default_title;
-	if (preg_match('/<title>(.+?)<\/title>/is', $content, $matchtitle))
+	if (preg_match('/<title>(.+?)<\/title>/is', $content, $matchtitle)) 
 	{
 		$post_title = $matchtitle[1];
-	}
-	else
+	} 
+	else 
 	{
 		$post_title = $post_default_title;
 	}
@@ -559,9 +559,9 @@ function xmlrpc_getposttitle($content)
 /**
  * Also used by post by mail
  */
-function xmlrpc_getpostcategory($content)
+function xmlrpc_getpostcategory($content) 
 {
-	if (preg_match('/<category>([0-9]+?)<\/category>/is', $content, $matchcat))
+	if (preg_match('/<category>([0-9]+?)<\/category>/is', $content, $matchcat)) 
 	{
 		return $matchcat[1];
 	}
@@ -634,19 +634,19 @@ function debug_fopen($filename, $mode) {
 	}
 }
 
-function debug_fwrite($fp, $string)
+function debug_fwrite($fp, $string) 
 {
 	global $debug;
-	if( $debug && $fp )
+	if( $debug && $fp ) 
 	{
 		fwrite($fp, $string);
 	}
 }
 
-function debug_fclose($fp)
+function debug_fclose($fp) 
 {
 	global $debug;
-	if( $debug && $fp )
+	if( $debug && $fp ) 
 	{
 		fclose($fp);
 	}
@@ -838,17 +838,17 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		if( isset($_POST[$var]) )
 		{
 			$$var = remove_magic_quotes( $_POST[$var] );
-			// echo "$var=".$$var." set by POST!<br />";
+			// echo "$var=".$$var." set by POST!<br/>";
 		}
 		elseif( isset($_GET["$var"]) )
 		{
 			$$var = remove_magic_quotes($_GET[$var]);
-			// echo "$var=".$$var." set by GET!<br />";
+			// echo "$var=".$$var." set by GET!<br/>";
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
 			$$var = remove_magic_quotes($_COOKIE[$var]);
-			// echo "$var=".$$var." set by COOKIE!<br />";
+			// echo "$var=".$$var." set by COOKIE!<br/>";
 		}
 		elseif( $default === true )
 		{
@@ -857,11 +857,11 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		elseif( $forceset )
 		{
 			$$var = $default;
-			// echo "$var=".$$var." set to default<br />";
+			// echo "$var=".$$var." set to default<br/>";
 		}
 		else
 		{ // param not found! don't set the variable.
-			// Won't be memorized nor type-forced!
+			// Won't be memorized nor type-forced! 
 			return false;
 		}
 	}
@@ -894,7 +894,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 
 	if( $memorize )
 	{	// Memorize this parameter
-		if( !isset($global_param_list) )
+		if( !isset($global_param_list) ) 
 		{ // Init list if necessary:
 			$global_param_list = array();
 		}
@@ -997,6 +997,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		$url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].( substr( $url, 0, 1 ) == '/' ? '' : '/' ).$url;
 	}
 
+
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -1055,29 +1056,29 @@ function validate_url( $url, & $allowed_uri_scheme )
 	global $debug;
 
 	if( empty($url) )
-	{ // Empty URL, no problem
+	{	// Empty URL, no problem
 		return false;
 	}
 
 	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):[0-9]*/', $url, $matches) )
-	{ // Cannot find URI scheme
+	{	// Cannot find URI scheme
 		return T_('Invalid URL');
 	}
 
 	$scheme = strtolower($matches[1]);
 	if(!in_array( $scheme, $allowed_uri_scheme ))
-	{ // Scheme not allowed
+	{	// Scheme not allowed
 		return T_('URI scheme not allowed');
 	}
 
 	// Search for blocked URLs:
 	if( $block = antispam_url($url) )
 	{
-		if( $debug ) return 'Url contains blacklisted word: ['.$block.']';
+		if( $debug ) return 'Url contains blaclisted word: ['.$block.']';
 		return T_('URL not allowed');
 	}
 
-	return false; // OK
+	return false;		// OK
 }
 
 
@@ -1124,7 +1125,7 @@ function debug_info( $force = false )
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
-			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br />';
+			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 		}
 
 		if( $Debuglog->count( 'all' ) )
@@ -1268,7 +1269,7 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 function url_add_tail( $url, $tail )
 {
 	$parts = explode( '?', $url );
-	if( isset($parts[1]) )
+	if( isset($parts[1]) ) 
 	{
 		return $parts[0].$tail.'?'.$parts[1];
 	}

@@ -154,7 +154,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 
 </div>
-<p class="centerP"><?php timer_stop(1); ?>
+<p class="center">
 	powered by<br />
 	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" alt="b2evolution" /></a>
 </p>

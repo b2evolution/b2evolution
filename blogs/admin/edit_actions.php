@@ -485,6 +485,7 @@ switch($action)
 		param( 'comment_ID', 'integer', true );
 		// echo $comment_ID;
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
+    $comment_post_ID = $edited_Comment->Item->ID;
 		$blog = $edited_Comment->Item->get( 'blog_ID' );
 
 		// Check permission:
@@ -506,13 +507,12 @@ switch($action)
 }
 
 echo '<div class="panelinfo">';
-if( isset($location) )
-{
-	echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
-}
-
 if( empty( $mode ) )
 {	// Normal mode:
+	if( isset($location) )
+	{
+		echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
+	}
 	echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>';
 	echo '</div>';
 	// List the blogs:

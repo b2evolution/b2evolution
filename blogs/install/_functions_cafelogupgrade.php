@@ -153,8 +153,8 @@ function upgrade_cafelog_tables()
 	$query = "UPDATE $tablecomments SET comment_type = 'pingback' WHERE comment_content LIKE '<pingback />%'";		
 	$DB->query( $query );
 	echo "OK.<br />\n";	
-	
-	
+
+
 	create_default_categories( false /* not for A */ );
 
 	// POPULATE THE LINKBLOG:
@@ -162,6 +162,11 @@ function upgrade_cafelog_tables()
 
 	// Create other default contents:
 	create_default_contents( false /* not for A */ );
+
+
+  // Cleanup extra quotes in comments:
+  cleanup_post_quotes();
+	cleanup_comment_quotes();
 
 }
 

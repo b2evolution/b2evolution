@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-06-09 17:51+0900\n"
+"PO-Revision-Date: 2004-06-24 16:43+0900\n"
 "Last-Translator: Jun MUTO <jmuto@saku2.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -401,8 +401,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/b2evo/install</code> に配置されています。それから、画面の指示に従ってください。<br />   <br /> インストーラは、あなたに数個の質問をして、必要なデータベース テーブルを作り、WordPress のデータを b2evo にコピーし (WordPress に影響を及ぼしません)、あなたの b2evolution の設定を行います。"
 
 #: ../../doc/upfrom_wordpress.src.html:68
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
-msgstr "既存の WordPress テンプレートとスキンを b2evolution にアップグレードする注意事項を <a %s>wiki</a> や <a %s>フォーラム</a> で確認してください。"
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
+msgstr "既存の WordPress テンプレートとスキンを b2evolution にアップグレードする注意事項を <a %s>マニュアル</a> や <a %s>フォーラム</a> で確認してください。"
 
 #: ../../doc/upfrom_wordpress.src.html:70
 msgid "You can reuse your current WordPress CSS design in a snap by copying your style.css file into any b2evolution skin folder which name starts with wpc_ (which stands for WordPress CSS compatible)"
@@ -437,8 +437,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/b2evo/install</code> に配置されています。それから、画面の指示に従ってください。<br /> <br /> インストーラは、あなたに数個の質問をして、必要なデータベース テーブルを作り、b2 のデータを b2evo にコピーし (b2 に影響を及ぼしません)、あなたの b2evolution の設定を行います。"
 
 #: ../../doc/upgradefrom_b2.src.html:69
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr "既存の b2 テンプレートを b2evolution にアップグレードする注意事項を <a %s>wiki</a> や <a %s>フォーラム</a> で確認してください。"
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "既存の b2 テンプレートを b2evolution にアップグレードする注意事項を <a %s>マニュアル</a> や <a %s>フォーラム</a> で確認してください。"
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
@@ -461,8 +461,8 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/yourfolder/install</code> に配置されています。それから、画面の指示に従ってください。<br /> <br /> インストーラは、あなたに基本設定の質問をします (あなたがアップロードする前に /conf/_config.php を更新しておいていない場合)。その後で、どの b2evoluiton からでも、新しいバージョンにデータベースのアップグレードを行えるようにします。"
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
-msgstr "ここの時点で、以前のカスタマイズを復活させます。<a %s>WinMerge</a> のような差分/合成ツールを用意することを推奨します。これは、古い (バックアップした) ファイルと新しいファイルを (一度に全ディレクトリでも) 簡単に比較して、変更点を報告してくれます。<br /> <br /> また、特定のバージョンから特定のファイルをアップグレードする注意事項を <a %s>wiki</a> や <a %s>フォーラム</a> で確認することができます。"
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgstr "ここの時点で、以前のカスタマイズを復活させます。<a %s>WinMerge</a> のような差分/合成ツールを用意することを推奨します。これは、古い (バックアップした) ファイルと新しいファイルを (一度に全ディレクトリでも) 簡単に比較して、変更点を報告してくれます。<br /> <br /> また、特定のバージョンから特定のファイルをアップグレードする注意事項を <a %s>マニュアル</a> や <a %s>フォーラム</a> で確認することができます。"
 
 #: ../../doc/upgradefrom_gl.src.html:6
 #: ../../doc/upgradefrom_gl.src.html:32

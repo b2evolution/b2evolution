@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the main template. It displays the blog.
 	 *
@@ -33,20 +33,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 </head>
 <body>
 
-	<?php 
-		/**
-		 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-		 */
-		require( dirname(__FILE__).'/_bloglist.php' ); 
-		// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+<?php
+	/**
+	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	 */
+	require( dirname(__FILE__).'/_bloglist.php' );
+	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
 	<?php // ------------------------------- START OF SKIN LIST -------------------------------
 	if( ! $Blog->get('force_skin') )
-	{	// Skin switching is allowed for this blog: ?>
-	echo T_( 'Select skin:' ), ' ';
-	for( skin_list_start(); skin_list_next(); ) { ?>
+	{	// Skin switching is allowed for this blog:
+		echo T_( 'Select skin:' ), ' ';
+		for( skin_list_start(); skin_list_next(); )
+		{ ?>
 		[<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a>]
-	<?php }
+		<?php
+		}
 	} // ------------------------------ END OF SKIN LIST ------------------------------ ?>
 
 	<hr>

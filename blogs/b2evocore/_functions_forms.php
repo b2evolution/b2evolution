@@ -57,6 +57,22 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	}
 }
 
+function form_textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '' )
+{
+	global $img_url;
+
+	echo '<fieldset>';
+	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="input"><fieldset class="input"><img src="'.$img_url.'/blank.gif" width="1" height="1"><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
+	if( !empty($field_class) )
+	{
+		echo ' class="', $field_class,'"';
+	}
+	echo '>'.$field_value.'</textarea></fieldset>';
+	echo '  <span class="notes">', $field_note, '</span></div>';
+	echo "</fieldset>\n\n";
+}
+
 
 /*
  * form_text_tr(-)
@@ -153,9 +169,9 @@ function form_radio(
 	$field_lines = false,
 	$field_notes = '' )
 {
-	echo "\n".'<fieldset class="setting">';
-	echo "\n".'  <div class="label"><label>', $field_label, ':</label></div>';
-	echo "\n".'  <div class="input"><fieldset class="input">';
+	echo '<fieldset class="setting">';
+	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="input"><fieldset class="input">';
 	foreach( $field_options as $loop_field_option )
 	{
 		if( $field_lines ) echo "<div>\n";
@@ -181,7 +197,8 @@ function form_radio(
 	{
 		echo '<div class="notes">'.$field_notes.'</div>';
 	}
-	echo "\n  </fieldset></div>\n</fieldset>\n";
+	echo '  </fieldset></div>';
+	echo "</fieldset>\n\n";
 }
 
 
@@ -199,7 +216,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 {
 	$r = "<fieldset>\n"
 			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
-			.'<div class="input"><input type="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
+			.'<div class="input"><input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
 	if( $field_value )
 	{
 		$r .= ' checked="checked"';
@@ -313,7 +330,6 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 	}
 }
 
-
 function form_submit( $submit_attribs = '' )
 {
 	?>
@@ -325,6 +341,6 @@ function form_submit( $submit_attribs = '' )
 			</div>
 		</fieldset>
 	</fieldset>
-	<?php
+	<?php 
 }
 ?>

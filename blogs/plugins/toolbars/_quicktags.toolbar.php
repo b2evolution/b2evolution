@@ -24,6 +24,11 @@ require_once dirname(__FILE__).'/../toolbar.class.php';
  */
 class quicktags_Toolbarplugin extends ToolbarPlugin
 {
+	/**
+	 * Should be toolbar be displayed?
+	 */
+	var $display = true;
+
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
@@ -50,7 +55,12 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 	function display()
 	{	
 		global $is_lynx;
-		
+
+		if( !$this->display )
+		{	// We don't want to show this toolbar
+			return false;
+		}
+
 		if($is_lynx)	
 		{	// let's deactivate quicktags on Lynx, because they don't work there.
 			return;
@@ -75,87 +85,76 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ins'
 																							,'ins'
-																							,'<ins>'
-																							,'</ins>'
+																							,'<ins>','</ins>'
 																							,'i'
 																							,'<?php echo T_('INSerted [Alt-I]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_del'
 																							,'del'
-																							,'<del>'
-																							,'</del>'
+																							,'<del>','</del>'
 																							,'d'
 																							,'<?php echo T_('DELeted [Alt-D]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_strong'
 																							,'str'
-																							,'<strong>'
-																							,'</strong>'
+																							,'<strong>','</strong>'
 																							,'s'
 																							,'<?php echo T_('STRong [Alt-S]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_em'
 																							,'em'
-																							,'<em>'
-																							,'</em>'
+																							,'<em>','</em>'
 																							,'e'
 																							,'<?php echo T_('EMphasis [Alt-E]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_code'
 																							,'code'
-																							,'<code>'
-																							,'</code>'
+																							,'<code>','</code>'
 																							,'c'
 																							,'<?php echo T_('CODE [Alt-C]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_par'
 																							,'p'
-																							,'<p>'
-																							,'</p>'
+																							,'<p>','</p>'
 																							,'p'
 																							,'<?php echo T_('Paragraph [Alt-P]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ul'
 																							,'ul'
-																							,'<ul>\n'
-																							,'</ul>\n\n'
+																							,'<ul>\n','</ul>\n\n'
 																							,'u'
 																							,'<?php echo T_('Unordered List [Alt-U]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ol'
 																							,'ol'
-																							,'<ol>\n'
-																							,'</ol>\n\n'
+																							,'<ol>\n','</ol>\n\n'
 																							,'o'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_li'
 																							,'li'
-																							,'	<li>'
-																							,'</li>\n'
+																							,'  <li>','</li>\n'
 																							,'l'
 																							,'<?php echo T_('List Item [Alt-L]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_block'
 																							,'block'
-																							,'<blockquote>'
-																							,'</blockquote>'
+																							,'<blockquote>','</blockquote>'
 																							,'b'
 																							,'<?php echo T_('BLOCKQUOTE [Alt-B]') ?>'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_img'
 																							,'img'
-																							,''
-																							,''
+																							,'',''
 																							,'g'
 																							,'<?php echo T_('IMaGe [Alt-G]') ?>'
 																							,-1
@@ -163,24 +162,21 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_link'
 																							,'link'
-																							,''
-																							,'</a>'
+																							,'','</a>'
 																							,'a'
 																							,'<?php echo T_('A href [Alt-A]') ?>'
 																							); // special case
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_pre'
 																							,'pre'
-																							,'<pre>'
-																							,'</pre>'
+																							,'<pre>','</pre>'
 																							,'r'
 																							,'[Alt-R]'
 																							);
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_more'
 																							,'!M'
-																							,'<!--more-->'
-																							,''
+																							,'<!--more-->',''
 																							,'m'
 																							,'<?php echo T_('More [Alt-M]') ?>'
 																							,-1
@@ -188,8 +184,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
 																							,'!NT'
-																							,'<!--noteaser-->'
-																							,''
+																							,'<!--noteaser-->',''
 																							,'t'
 																							,'<?php echo T_('no teaser [Alt-T]') ?>'
 																							,-1
@@ -197,8 +192,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
 																							,'!NP'
-																							,'<!--nextpage-->'
-																							,''
+																							,'<!--nextpage-->',''
 																							,'q'
 																							,'<?php echo T_('next page [Alt-Q]') ?>'
 																							,-1
@@ -392,7 +386,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 			}
 		}
 		</script>
-		<div><script language="JavaScript" type="text/javascript">b2evoToolbar();</script></div>
+		<div class="edit_toolbar"><script language="JavaScript" type="text/javascript">b2evoToolbar();</script></div>
 		<?php		
 	}
 }

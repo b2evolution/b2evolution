@@ -3,11 +3,55 @@
  * Feel free to override all these styles in your own skins
  */
 
-a.permalink_right {
-	float: right;
-	border: 0px;
+.bMore {
+	text-align: center;
+}
+.bMore a {
+	font-weight: bold;
+	font-size: 110%;
 }
 
+.FigZone {
+	text-align: center;
+	margin: 8px;
+}
+.FigCent240 {
+	width: 240px;
+	color: #FFFFFF;
+	background-color: #000000;
+	padding: 12px;
+	margin: 0ex auto;
+	border: 1px solid #FFFFFF;
+	text-align: center;
+}
+.FigCent320 {
+	width: 320px;
+	color: #FFFFFF;
+	background-color: #000000;
+	padding: 12px;
+	margin: 0ex auto;
+	border: 1px solid #FFFFFF;
+	text-align: center;
+}
+.FigZone img{
+	border: none;
+	margin-bottom: 8px;
+}
+.FigZone a {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.FigZone a:link {
+	color: #FFFFFF;
+}
+.FigZone a:visited {
+	color: #FFFFFF;
+}
+.FigZone a:active {
+	color: #FFFFFF;
+}
+
+a.permalink_right,
 span.bIcons
 {
 	float: right;
@@ -29,4 +73,51 @@ div.codeblock {
 
 div.codeblock pre {
 	margin: 0;
+}
+
+
+/* Calendar: */
+caption.bCalendarCaption {
+	font-size: 105%;
+	font-weight: bold;
+	margin: auto;
+	padding: .5ex 0;
+	white-space: nowrap;
+}
+table.bCalendarTable {
+	margin: 0 auto 1em auto;
+	font-size: 77%;
+	border-collapse: separate; 
+	border-spacing: 0px;	
+}
+tr.bCalendarRow {
+	text-align: center;
+}
+th.bCalendarHeaderCell {
+	font-size: 84%;
+	width: 4ex;
+}
+td.bCalendarCell {
+	width: 4ex;
+	height: 3.5ex;
+}
+.bCalendarLinkPost {
+	font-weight: bold;
+}
+td#prev,
+td#next {
+	font-weight: bold;
+	font-size: 105%;
+	padding: .5ex;
+	white-space: nowrap;
+}
+td#prev a,
+td#next a {
+	padding: 0 .5ex;
+}
+td#prev {
+	text-align: left;
+}
+td#next {
+	text-align: right;
 }

@@ -15,16 +15,23 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title>b2evo :: <?php echo preg_replace( '/:$/', '', $admin_pagetitle ); ?></title>
-	<link href="admin.css" rel="stylesheet" type="text/css" />
+	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
+	<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
+	<?php } ?>
+	<script type="text/javascript" src="styleswitcher.js"></script>
 	<?php
 	if( $mode == 'sidebar' )
-	{ ?>
-	<link href="sidebar.css" rel="stylesheet" type="text/css" />
+	{ // Include CSS overrides for sidebar: ?>
+		<link href="sidebar.css" rel="stylesheet" type="text/css" />
 	<?php
 	}
 
 	if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
 	{ // -- Inject javascript ----------------
+		// gets initialized in _footer.php
 		?>
 		<script type="text/javascript">
 		<!--
@@ -104,9 +111,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			}
 
 			if( allchecked[nr] )
-				var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('uncheck all') ?>');
-			else					
-				var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('check all') ?>');
+				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('uncheck all') ?>');
+			else
+				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('check all') ?>');
 						
 			if( document.getElementById( idprefix+'_'+String(nr) ) )
 				document.getElementById( idprefix+'_'+String(nr) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(nr) ).firstChild);
@@ -146,12 +153,9 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	}
 	?>
 </head>
-<body<?php
-if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
-{ // we want a Javascript function to be called on loading // TODO: use a general JS wrapper function?!
-	echo ' onload="initcheckall()"';
-}
-echo '>';
+<body>
+
+<?php
 
 param( 'blog', 'integer', 0, true );	// We need this for the urls
 
@@ -163,9 +167,12 @@ if( empty($mode) )
 	<a href="http://b2evolution.net/" title="<?php echo T_("visit b2evolution's website") ?>"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="<?php echo T_("visit b2evolution's website") ?>" width="185" height="40" /></a>
 
 	<div id="headfunctions">
+		<?php echo T_('Style:') ?>
+		<a href="#" onclick="setActiveStyleSheet('Variation'); return false;" title="Variation (Default)">V</a>&middot;<a href="#" onclick="setActiveStyleSheet('Desert'); return false;" title="Desert">D</a>&middot;<a href="#" onclick="setActiveStyleSheet('Legacy'); return false;" title="Legacy">L</a><?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>&middot;<a href="#" onclick="setActiveStyleSheet('Custom'); return false;" title="Custom">C</a><?php } ?>
+		&bull;
 		<a href="<?php echo $htsrv_url ?>/login.php?action=logout"><?php echo T_('Logout') ?></a>
-		&middot;
-		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?></a><br />
+		&bull;
+		<a href="<?php echo $baseurl ?>"><?php echo T_('Exit to blogs') ?> <img src="img/close.gif" width="14" height="14" class="top" alt="" title="<?php echo T_('Exit to blogs') ?>" /></a><br />
 	</div>
 
 	<?php	
@@ -186,13 +193,13 @@ if( empty($mode) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('New Post'), '</a></li>';
+		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('Write'), '</a></li>';
 
 		if( $admin_tab == 'edit'  )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Browse/Edit'), '</a></li>';
+		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Edit'), '</a></li>';
 
 		if( $admin_tab == 'cats' )
 			echo '<li class="current">';
@@ -276,8 +283,9 @@ if( empty($mode) )
 	</ul>
 </div>
 
-<h1><strong>:: <?php echo $admin_pagetitle; ?></strong>
-
 <?php
 }	// not in special mode
 ?>
+
+<div id="TitleArea">
+<h1><strong>:: <?php echo $admin_pagetitle; ?></strong>

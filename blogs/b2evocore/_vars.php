@@ -11,59 +11,62 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-$b2_version = '0.9.1-CVS';
+$b2_version = '0.9.2-CVS';
 $new_db_version = 8070;				// next time: 8080
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
-if( !isset($_SERVER['REQUEST_URI']) )
-{ // IIS
-	if( isset($_SERVER['URL']) )
-	{ // ISAPI
-		$ReqPath = $_SERVER['URL'];
-	}
-	elseif( isset($_SERVER['PATH_INFO']) )
-	{ // CGI/FastCGI
-		$ReqPath = $_SERVER['PATH_INFO'];
-	}
-	elseif( isset($_SERVER['SCRIPT_NAME']) )
-	{ // Some Odd Win2k Stuff
-		$ReqPath = $_SERVER['SCRIPT_NAME'];
-	}
-	elseif( isset($_SERVER['PHP_SELF']) )
-	{ // The Old Stand-By
-		$ReqPath = $_SERVER['PHP_SELF'];
-	}
-	else
-	{
-		$ReqPath = false;
-		?>
-		<p><span class="error">Warning: $ReqPath could not be set. Probably an odd IIS problem.</span><br />
-		Go to your <a href="<?php echo $baseurl.'/'.$install_subdir ?>/phpinfo.php">phpinfo page</a>,
-		look for occurences of <code><?php
-		// take the baseurlroot out..
-		echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.'/'.$install_subdir )
-		?>/phpinfo.php</code> and copy all lines
-		containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
-		you're running on.
-		<br />
-		(If you have deleted your install folder &ndash; what is recommened after successful setup &ndash;
-		you have to upload it again before doing this).
-		</p>
-		<?php
-	}
-
-	$ReqURI = $ReqPath;
-	if( isset($_SERVER['QUERY_STRING']) )
-	{ //Made a $_GET request
-		$ReqURI .= '?' . $_SERVER['QUERY_STRING'];
-	}
-}
-else
-{	// apache...
+// $debug = true;
+if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
+{	// Warning: on some IIS installs it it set but empty!
+	// Besides, use of explode is not very efficient so other methods are preferred.
+	debug_log( "Getting ReqURI from 'REQUEST_URI'" );
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
 	$ReqPath = explode( '?', $ReqURI, 2 );
 	$ReqPath = $ReqPath[0];
+}
+elseif( isset($_SERVER['URL']) )
+{ // ISAPI
+	debug_log( "Getting ReqPath from 'URL'" );
+	$ReqPath = $_SERVER['URL'];
+	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+}
+elseif( isset($_SERVER['PATH_INFO']) )
+{ // CGI/FastCGI
+	debug_log( "Getting ReqPath from 'PATH_INFO'" );
+	$ReqPath = $_SERVER['PATH_INFO'];
+	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+}
+elseif( isset($_SERVER['SCRIPT_NAME']) )
+{ // Some Odd Win2k Stuff
+	debug_log( "Getting ReqPath from 'SCRIPT_NAME'" );
+	$ReqPath = $_SERVER['SCRIPT_NAME'];
+	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+}
+elseif( isset($_SERVER['PHP_SELF']) )
+{ // The Old Stand-By
+	debug_log( "Getting ReqPath from 'PHP_SELF'" );
+	$ReqPath = $_SERVER['PHP_SELF'];
+	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+}
+else
+{
+	$ReqPath = false;
+	$ReqURI = false;
+	?>
+	<p><span class="error">Warning: $ReqPath could not be set. Probably an odd IIS problem.</span><br />
+	Go to your <a href="<?php echo $baseurl.'/'.$install_subdir ?>/phpinfo.php">phpinfo page</a>,
+	look for occurences of <code><?php
+	// take the baseurlroot out..
+	echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.'/'.$install_subdir )
+	?>/phpinfo.php</code> and copy all lines
+	containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
+	you're running on.
+	<br />
+	(If you have deleted your install folder &ndash; what is recommened after successful setup &ndash;
+	you have to upload it again before doing this).
+	</p>
+	<?php
 }
 
 $Debuglog->add( 'HTTP Host: '.$_SERVER['HTTP_HOST'] );

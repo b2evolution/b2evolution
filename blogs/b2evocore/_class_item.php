@@ -113,8 +113,10 @@ class Item extends DataObject
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
+   * @param boolean true to force single post on destination page
+   * @param string glue between url params
 	 */
-	function gen_permalink( $mode = '', $blogurl = '', $force_single = false )
+	function gen_permalink( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
 	{
 		global $DB, $BlogCache, $cacheweekly, $Settings;
 
@@ -179,7 +181,7 @@ class Item extends DataObject
 			switch( $dest_type )
 			{
 				case 'monthly':
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2) ).'#'.$anchor;
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2), $glue ).'#'.$anchor;
 					break;
 
 				case 'weekly':
@@ -187,16 +189,16 @@ class Item extends DataObject
 					{
 						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date] ).'#'.$anchor;
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).$glue.'w='.$cacheweekly[$post_date], $glue ).'#'.$anchor;
 					break;
 
 				case 'daily':
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2) ).'#'.$anchor;
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2), $glue ).'#'.$anchor;
 					break;
 
 				case 'postbypost':
 				default:
-					$permalink = url_add_param( $blogurl, $urlparam.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
+					$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
 					break;
 			}
 		}
@@ -702,6 +704,7 @@ class Item extends DataObject
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
+	 * @param string Link title
 	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
 	 * @param boolean true to hide if no feedback ('#' for default)
 	 * @param string 'pid' or 'title'
@@ -709,8 +712,7 @@ class Item extends DataObject
 	 */
 	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
 													$zero='#', $one='#', $more='#', $title='#',
-													$use_popup = '#',
-													$hideifnone = '#', $mode = '', $blogurl='' )
+													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl='' )
 	{
 		global $b2commentsjavascript, $BlogCache;
 
@@ -791,7 +793,7 @@ class Item extends DataObject
 		echo '<a href="', $url;
 		echo '#', $type, '" ';	// Position on feedback
 		echo 'title="', $title, '"';
-		if( $use_popup ) echo '" onclick="b2open(this.href); return false"';
+		if( $use_popup ) echo ' onclick="b2open(this.href); return false"';
 		echo '>';
 
 		if( $number == 0 )
@@ -808,36 +810,136 @@ class Item extends DataObject
 	}
 
 
+  /**
+	 * Displays button for deleting the Item if user has proper rights
+	 *
+	 * {@internal Item::delete_link(-)}}
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param boolean true to make this a button instead of a link
+   * @param string glue between url params
+	 */
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button  = false, $glue = '&amp;' )
+	{
+		global $current_User, $admin_url;
+
+ 		if( ! is_logged_in() ) return false;
+
+		if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $this->blog_ID ) )
+		{	// User has right to delete this post
+			return false;
+		}
+
+		if( $text == '#' ) $text = T_('Delete');
+		if( $title == '#' ) $title = T_('Delete this post');
+
+		$url = $admin_url.'/edit_actions.php?action=delete'.$glue.'post='.$this->ID;
+
+		echo $before;
+		if( $button )
+		{	// Display as button
+			echo '<input type="button"';
+			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
+			/* TRANS: Warning this is a javascript string */
+			echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
+			echo '\') ) { document.location.href=\''.$url.'\' }"';
+			if( !empty( $class ) ) echo ' class="'.$class.'"';
+			echo '/>';
+		}
+		else
+		{	// Display as link
+			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
+			/* TRANS: Warning this is a javascript string */
+			echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
+			echo '\')"';
+			if( !empty( $class ) ) echo ' class="'.$class.'"';
+			echo '>'.$text.'</a>';
+		}
+		echo $after;
+
+		return true;
+	}
+
+
 	/**
 	 * Provide link to edit a post if user has edit rights
 	 *
 	 * {@internal Item::edit_link(-)}}
 	 *
 	 * @param string to display before link
-	 * @param string to display after link 
-	 * @param string link text 
-	 * @param string link title 
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+   * @param string glue between url params
 	 */
-	function edit_link( $before = '', $after = '', $text = '#', $title = '#' )
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
 		global $current_User, $admin_url;
 		
 		if( ! is_logged_in() ) return false;
-	
-		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false, 
+
+		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false,
 																			$this->blog_ID ) )
 		{	// User has no right to edit this post
 			return false;
 		}
-	
+
 		if( $text == '#' ) $text = T_('Edit');
 		if( $title == '#' ) $title = T_('Edit this post');
-		
+
 		echo $before;
-		echo '<a href="'.$admin_url.'/b2edit.php?action=edit&amp;post='.$this->ID;
-		echo '" title="'.$title.'">'.$text.'</a>';
+		echo '<a href="'.$admin_url.'/b2edit.php?action=edit'.$glue.'post='.$this->ID;
+		echo '" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
 		echo $after;
-	
+
+		return true;
+	}
+
+
+	/**
+	 * Provide link to publish a post if user has edit rights
+	 *
+	 * Note: publishing date will be updated
+	 *
+	 * {@internal Item::publish_link(-)}}
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+   * @param string glue between url params
+	 */
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() ) return false;
+
+		if( ($this->status == 'published') // Already published!
+			|| ! ($current_User->check_perm( 'blog_post_statuses', 'published', false, $this->blog_ID ))
+			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
+		{	// User has no right to publish this post now:
+			return false;
+		}
+
+		if( $text == '#' ) $text = T_('Publish NOW!');
+		if( $title == '#' ) $title = T_('Publish now using current date and time.');
+
+		echo $before;
+		echo '<a href="'.$admin_url.'/edit_actions.php?action=publish'.$glue.'post_ID='.$this->ID;
+		echo '" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
+		echo $after;
+
 		return true;
 	}
 

@@ -1,9 +1,37 @@
 /* Basic styles */
 
+blockquote {
+	border: 2px dotted #ccc;
+	background-color: #eee;
+	margin: 1em 2em;
+	padding: 0 1ex;
+}
+
+acronym,
+abbr {
+	border-bottom: 1px dotted #000;
+	cursor: help;
+}
+
+del {
+	color: #999999;
+}
+ins {
+	color: #009999;
+	text-decoration: none;
+}
+code {
+	font-size: 107%;
+}
+
+
 .nobr,
 .line
 {
 	white-space: nowrap;
+}
+.center {
+	text-align: center;
 }
 .right{
 	text-align: right;
@@ -16,19 +44,25 @@
 }
 div.error,
 div.log_error {
-	padding: 0 2ex;
+	padding: 0 1ex;
 	margin: 1ex auto;
-	border: 1px solid #fed;
-	background: #fff5ee;
-	color: #FF0000;
+	border: 1px solid #d99;
+	background: #fbf2ee;
+	color: #e00;
 }
-
+div.error ul,
+div.error ol,
+div.log_error ul,
+div.log_error ol {
+	margin-bottom: 0ex;
+}
 ul.log {
 	list-style: square;
 }
 
 p.error,
 span.error {
-	color: #FF0000;
+	margin: 1ex;
+	color: #e00;
 	font-weight:bold;
 }

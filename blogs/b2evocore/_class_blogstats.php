@@ -42,7 +42,7 @@ class BlogStats{
 		$show_statuses = array(),			// What status to display?
 //		$p = '',							// Specific post number to display
 		$m = '',							// YearMonth(Day) to display
-		$w = '',							// Week number
+		$w = -1,							// Week number
 		$cat = '',							// Category(s): 1,2,3
 		$catsel = array(),					// Same as above except array
 		$author = '',						// List of authors to restrict to
@@ -99,10 +99,9 @@ class BlogStats{
 		}
 
 		// If a week number is specified
-		if ($w != '')
+		if( !empty($w) && ($w>=0) )
 		{
-			$w = ''.intval($w);
-			$where .= ' AND WEEK(post_issue_date,1)='.$w;
+			$where .= ' AND WEEK(post_issue_date,1)='.intval($w);
 		}
 
 		/*

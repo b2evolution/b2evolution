@@ -64,14 +64,5 @@
 		?>
 	</fieldset>
 
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search">
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
-			</div>
-		</fieldset>
-	</fieldset>
-
-	<div class="clear"></div>
+	<?php form_submit(); ?>	
 </form>

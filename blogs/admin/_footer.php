@@ -33,7 +33,18 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <input name="formaction" type="hidden" value="" />
 </div></form>
 
-<?php debug_info(); ?>
+<?php
+if( $admin_tab == 'files'	|| ($admin_tab == 'blogs' && $tab == 'perm') )
+{ // init checkall JS functions
+?>	
+<script type="text/javascript">
+	initcheckall();
+</script>
+<?php
+}
+
+debug_info();
+?>
 
 </body>
 </html>

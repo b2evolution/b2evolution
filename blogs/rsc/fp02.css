@@ -53,15 +53,7 @@ h2 {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
-.bMore
-{
-	text-align: center;
-}
-.bMore a
-{
-	font-weight: bold;
-	font-size: 110%;
-}
+
 .bSmallPrint,
 {
 	clear: both;
@@ -332,67 +324,9 @@ dt {
 }
 blockquote {
 	border: 2px dotted #33CCCC;
-	padding: 12px 16px;
 	background-color: #DDEEEE;
-	margin: 10px;
-}
-.center
-{
-	text-align: center;
 }
 
-.FigZone {
-	text-align: center;
-	margin: 8px;
-}
-
-.FigCent240 {
-	width: 240px;
-	color: #FFFFFF;
-	background-color: #000000;
-	padding: 12px;
-	margin: 0ex auto;
-	border: 1px solid #FFFFFF;
-	text-align: center;
-}
-.FigCent320 {
-	width: 320px;
-	color: #FFFFFF;
-	background-color: #000000;
-	padding: 12px;
-	margin: 0ex auto;
-	border: 1px solid #FFFFFF;
-	text-align: center;
-}
-.FigZone img{
-	border: none;
-	margin-bottom: 8px;
-}
-.FigZone a{
-	color: #FFFFFF;
-	text-decoration: none;
-}
-.FigZone a:link{
-	color: #FFFFFF;
-}
-.FigZone a:visited{
-	color: #FFFFFF;
-}
-.FigZone a:active{
-	color: #FFFFFF;
-}
-acronym {
-	border-bottom-width: 1px;
-	border-bottom-style: dotted;
-	border-bottom-color: #000000;
-	cursor: help;
-}
-abbr {
-	border-bottom-width: 1px;
-	border-bottom-style: dotted;
-	border-bottom-color: #000000;
-	cursor: help;
-}
 del {
 	color: #999999;
 }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Soldier's world\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2004-05-11 22:42+0200\n"
+"PO-Revision-Date: 2004-06-25 10:44+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: muchio <marius@gricius.net>\n"
 "MIME-Version: 1.0\n"
@@ -13,88 +13,140 @@ msgstr ""
 #: ../../index.src.html:17
 #: ../../doc/install_new.src.html:6
 #: ../../doc/install_new.src.html:17
+#: ../../doc/upfrom_miniblog.src.html:6
+#: ../../doc/upfrom_miniblog.src.html:17
+#: ../../doc/upfrom_wordpress.src.html:6
+#: ../../doc/upfrom_wordpress.src.html:17
 #: ../../doc/upgradefrom_b2.src.html:6
 #: ../../doc/upgradefrom_b2.src.html:17
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:17
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:17
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:17
 msgid "b2evo package"
 msgstr "b2evo paketas"
 
 #: ../../index.src.html:6
 #: ../../index.src.html:18
 #: ../../doc/install_new.src.html:18
+#: ../../doc/upfrom_miniblog.src.html:18
+#: ../../doc/upfrom_wordpress.src.html:18
 #: ../../doc/upgradefrom_b2.src.html:18
 #: ../../doc/upgradefrom_b2evo.src.html:18
+#: ../../doc/upgradefrom_gl.src.html:18
+#: ../../doc/upgradefrom_mt.src.html:18
 msgid "Start page"
 msgstr "Pradinis puslapis"
 
 #: ../../index.src.html:13
 #: ../../doc/install_new.src.html:13
+#: ../../doc/upfrom_miniblog.src.html:13
+#: ../../doc/upfrom_wordpress.src.html:13
 #: ../../doc/upgradefrom_b2.src.html:13
 #: ../../doc/upgradefrom_b2evo.src.html:13
+#: ../../doc/upgradefrom_gl.src.html:13
+#: ../../doc/upgradefrom_mt.src.html:13
 msgid "b2evolution: official site"
 msgstr "b2evolution: oficiali svetainė"
 
 #: ../../index.src.html:14
 #: ../../doc/install_new.src.html:14
+#: ../../doc/upfrom_miniblog.src.html:14
+#: ../../doc/upfrom_wordpress.src.html:14
 #: ../../doc/upgradefrom_b2.src.html:14
 #: ../../doc/upgradefrom_b2evo.src.html:14
+#: ../../doc/upgradefrom_gl.src.html:14
+#: ../../doc/upgradefrom_mt.src.html:14
 msgid "Multilingual multiuser multi-blog engine."
 msgstr "Dagiakalbė daugiavartotojiška universali dienoraščio sistema"
 
 #: ../../index.src.html:15
 #: ../../doc/install_new.src.html:15
+#: ../../doc/upfrom_miniblog.src.html:15
+#: ../../doc/upfrom_wordpress.src.html:15
 #: ../../doc/upgradefrom_b2.src.html:15
 #: ../../doc/upgradefrom_b2evo.src.html:15
+#: ../../doc/upgradefrom_gl.src.html:15
+#: ../../doc/upgradefrom_mt.src.html:15
 msgid "Version"
 msgstr "Versija"
 
 #: ../../index.src.html:19
 #: ../../doc/install_new.src.html:19
+#: ../../doc/upfrom_miniblog.src.html:19
+#: ../../doc/upfrom_wordpress.src.html:19
 #: ../../doc/upgradefrom_b2.src.html:19
 #: ../../doc/upgradefrom_b2evo.src.html:19
+#: ../../doc/upgradefrom_gl.src.html:19
+#: ../../doc/upgradefrom_mt.src.html:19
 msgid "Install"
 msgstr "Instaliavimas"
 
 #: ../../index.src.html:20
 #: ../../doc/install_new.src.html:20
+#: ../../doc/upfrom_miniblog.src.html:20
+#: ../../doc/upfrom_wordpress.src.html:20
 #: ../../doc/upgradefrom_b2.src.html:20
 #: ../../doc/upgradefrom_b2evo.src.html:20
+#: ../../doc/upgradefrom_gl.src.html:20
+#: ../../doc/upgradefrom_mt.src.html:20
 msgid "Blogs"
 msgstr "Blogai"
 
 #: ../../index.src.html:21
 #: ../../doc/install_new.src.html:21
+#: ../../doc/upfrom_miniblog.src.html:21
+#: ../../doc/upfrom_wordpress.src.html:21
 #: ../../doc/upgradefrom_b2.src.html:21
 #: ../../doc/upgradefrom_b2evo.src.html:21
+#: ../../doc/upgradefrom_gl.src.html:21
+#: ../../doc/upgradefrom_mt.src.html:21
 msgid "Admin"
 msgstr "Administracija"
 
 #: ../../index.src.html:22
 #: ../../doc/install_new.src.html:22
+#: ../../doc/upfrom_miniblog.src.html:22
+#: ../../doc/upfrom_wordpress.src.html:22
 #: ../../doc/upgradefrom_b2.src.html:22
 #: ../../doc/upgradefrom_b2evo.src.html:22
+#: ../../doc/upgradefrom_gl.src.html:22
+#: ../../doc/upgradefrom_mt.src.html:22
 msgid "Online"
 msgstr "Online"
 
 #: ../../index.src.html:23
 #: ../../doc/install_new.src.html:23
+#: ../../doc/upfrom_miniblog.src.html:23
+#: ../../doc/upfrom_wordpress.src.html:23
 #: ../../doc/upgradefrom_b2.src.html:23
 #: ../../doc/upgradefrom_b2evo.src.html:23
+#: ../../doc/upgradefrom_gl.src.html:23
+#: ../../doc/upgradefrom_mt.src.html:23
 msgid "Manual"
 msgstr "Žinynas"
 
 #: ../../index.src.html:24
 #: ../../doc/install_new.src.html:24
+#: ../../doc/upfrom_miniblog.src.html:24
+#: ../../doc/upfrom_wordpress.src.html:24
 #: ../../doc/upgradefrom_b2.src.html:24
 #: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_gl.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
 msgid "Support"
 msgstr "Pagalba"
 
 #: ../../index.src.html:28
 #: ../../doc/install_new.src.html:28
+#: ../../doc/upfrom_miniblog.src.html:28
+#: ../../doc/upfrom_wordpress.src.html:28
 #: ../../doc/upgradefrom_b2.src.html:28
 #: ../../doc/upgradefrom_b2evo.src.html:28
+#: ../../doc/upgradefrom_gl.src.html:28
+#: ../../doc/upgradefrom_mt.src.html:28
 msgid "Available translations for this page:"
 msgstr "Galimos šio puslapio kalbos:"
 
@@ -118,112 +170,238 @@ msgstr "Instrukcija greitai pradžiai:"
 msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr "Jūs galite instaliuoti b2evolution per keletą minučių. Paprasčiausiai sekite instrukcijas, kurios atitinka jūsų situaciją:"
 
-#: ../../index.src.html:39
-msgid "New users:"
-msgstr "Nauji vartotojai:"
-
-#: ../../index.src.html:39
-msgid "installing b2evolution from scratch"
+#: ../../index.src.html:40
+#: ../../doc/install_new.src.html:6
+#: ../../doc/install_new.src.html:32
+msgid "Installing b2evolution from scratch"
 msgstr "b2evolution instaliavimas nuo pradžių"
 
-#: ../../index.src.html:40
-msgid "Existing b2evolution users:"
-msgstr "Esami b2evolution vartotojai:"
+#: ../../index.src.html:42
+#: ../../doc/upgradefrom_b2evo.src.html:6
+#: ../../doc/upgradefrom_b2evo.src.html:32
+msgid "Upgrading from a previous version of b2evolution"
+msgstr "Atnaujinimas iš ankstesnės b2evolution versijos"
 
-#: ../../index.src.html:40
-msgid "upgrading from a previous version of b2evolution"
-msgstr "B2evolution atnaujinimas iš ankstesnės versijos"
+#: ../../index.src.html:44
+msgid "Upgrading from other blog software:"
+msgstr "Atnaujinimas iš kitų dienoraščių:"
 
-#: ../../index.src.html:41
-msgid "Cafelog/b2 users:"
-msgstr "Cafelog/b2 vartotojai:"
+#: ../../index.src.html:46
+msgid "Cafelog/b2"
+msgstr "Cafelog/b2:"
 
-#: ../../index.src.html:41
-msgid "upgrading from Cafelog/b2 version 0.6.x"
-msgstr "Atnaujinimas iš Cafelog/b2 versijos 0.6.x"
+#: ../../index.src.html:47
+msgid "GeekLog"
+msgstr "GeekLog"
 
-#: ../../index.src.html:45
-#: ../../doc/install_new.src.html:54
-#: ../../doc/upgradefrom_b2.src.html:73
-#: ../../doc/upgradefrom_b2evo.src.html:52
+#: ../../index.src.html:48
+msgid "Manywhere Miniblog"
+msgstr "Manywhere Miniblog"
+
+#: ../../index.src.html:49
+msgid "Movable Type"
+msgstr "Movable Type"
+
+#: ../../index.src.html:50
+msgid "WordPress"
+msgstr "WordPress"
+
+#: ../../index.src.html:56
+#: ../../doc/install_new.src.html:55
+#: ../../doc/upfrom_miniblog.src.html:68
+#: ../../doc/upfrom_wordpress.src.html:75
+#: ../../doc/upgradefrom_b2.src.html:74
+#: ../../doc/upgradefrom_b2evo.src.html:54
+#: ../../doc/upgradefrom_gl.src.html:40
+#: ../../doc/upgradefrom_mt.src.html:45
 msgid "official website"
 msgstr "oficiali svetainė"
 
-#: ../../index.src.html:46
-#: ../../doc/install_new.src.html:55
-#: ../../doc/upgradefrom_b2.src.html:74
-#: ../../doc/upgradefrom_b2evo.src.html:53
+#: ../../index.src.html:57
+#: ../../doc/install_new.src.html:56
+#: ../../doc/upfrom_miniblog.src.html:69
+#: ../../doc/upfrom_wordpress.src.html:76
+#: ../../doc/upgradefrom_b2.src.html:75
+#: ../../doc/upgradefrom_b2evo.src.html:55
+#: ../../doc/upgradefrom_gl.src.html:41
+#: ../../doc/upgradefrom_mt.src.html:46
 msgid "GNU GPL license"
 msgstr "GNU GPL licensija"
 
-#: ../../index.src.html:47
-#: ../../doc/install_new.src.html:56
-#: ../../doc/upgradefrom_b2.src.html:75
-#: ../../doc/upgradefrom_b2evo.src.html:54
+#: ../../index.src.html:58
+#: ../../doc/install_new.src.html:57
+#: ../../doc/upfrom_miniblog.src.html:70
+#: ../../doc/upfrom_wordpress.src.html:77
+#: ../../doc/upgradefrom_b2.src.html:76
+#: ../../doc/upgradefrom_b2evo.src.html:56
+#: ../../doc/upgradefrom_gl.src.html:42
+#: ../../doc/upgradefrom_mt.src.html:47
 msgid "contact"
 msgstr "susisiekti"
 
-#: ../../doc/install_new.src.html:6
-msgid "Install instructions for new users"
-msgstr "Instaliavimo instrukcijos naujiems vartotojams"
-
-#: ../../doc/install_new.src.html:32
-msgid "Installation instructions for new users"
-msgstr "Instaliavimo instrukcijos naujiems vartotojams"
-
 #: ../../doc/install_new.src.html:34
-#: ../../doc/upgradefrom_b2.src.html:42
+#: ../../doc/upfrom_miniblog.src.html:34
+#: ../../doc/upfrom_wordpress.src.html:34
+#: ../../doc/upgradefrom_b2.src.html:34
+#: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/upgradefrom_gl.src.html:33
+#: ../../doc/upgradefrom_mt.src.html:33
+msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
+msgstr "Prieš pradedant, atsiminkite, kad kai kurios  b2evolution savybės, reikalauja, kad susipažintumėt ir sutiktumėt su <a %s>Naudojimosi sąlygomis</a>."
+
+#: ../../doc/install_new.src.html:36
+#: ../../doc/upfrom_miniblog.src.html:39
+#: ../../doc/upfrom_wordpress.src.html:43
+#: ../../doc/upgradefrom_b2.src.html:43
 msgid "Once you have unzipped the b2evolution distribution:"
 msgstr "Kai tik išarchyvavote b2evolution archyvą:"
 
-#: ../../doc/install_new.src.html:36
+#: ../../doc/install_new.src.html:37
 msgid "On your server, create or locate a mysql database for b2evolution. (For example, you can call it \"b2evolution\")"
 msgstr "Savo serveryje sukurkite arba panaudokite jau sukurtą duomenų bazę, skirtą b2evolution. (Pvz., galite ją pavadinti \"b2evolution\")"
 
-#: ../../doc/install_new.src.html:38
-#: ../../doc/install_new.src.html:41
-#: ../../doc/upgradefrom_b2.src.html:59
+#: ../../doc/install_new.src.html:39
+#: ../../doc/install_new.src.html:42
+#: ../../doc/upfrom_miniblog.src.html:55
+#: ../../doc/upfrom_wordpress.src.html:59
+#: ../../doc/upfrom_wordpress.src.html:70
+#: ../../doc/upgradefrom_b2.src.html:60
 msgid "Note:"
 msgstr "Pastaba:"
 
-#: ../../doc/install_new.src.html:38
+#: ../../doc/install_new.src.html:39
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way."
 msgstr "Jei jūs nekeitėte konfigūravimo failo, b2evolution lentelės bus su priešdėliu evo_ . Jūs be baimės galite naudoti jau egzistuojančią duomenų bazę, nebent jau turite instaliavę programą, naudojančią lenteles su tokiu pat priešdėliu."
 
-#: ../../doc/install_new.src.html:39
-#: ../../doc/upgradefrom_b2.src.html:57
+#: ../../doc/install_new.src.html:40
+#: ../../doc/upfrom_miniblog.src.html:53
+#: ../../doc/upfrom_wordpress.src.html:57
+#: ../../doc/upgradefrom_b2.src.html:58
 msgid "Upload the b2evolution files to your website."
 msgstr "Nusiųskite b2evolution failus į savo serverį."
 
-#: ../../doc/install_new.src.html:41
+#: ../../doc/install_new.src.html:42
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
 msgstr "Reikia siųsti tik katalogo <code>/blogs</code> turinį. Jei norite, kad b2evolution būtų kaip jūsų svetainės pagrindinė valdymo sistema, nusiųskite <code>/blogs</code> ktaloge esančius failus į savo svetainės pagrindinį katalogą. Kitu atveju, geriausia siųsti failus į pakatalogį, pvz. <code>/blogs</code>. Be kita ko, jūs galite jį pavadinti pagal saqvo norą."
 
-#: ../../doc/install_new.src.html:44
+#: ../../doc/install_new.src.html:45
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
 msgstr "Įsivaizduokime, kad jūs instaliavote savo dienoraštį kataloge <code>http://yoursite.com/yourfolder</code> ..."
 
-#: ../../doc/install_new.src.html:45
+#: ../../doc/install_new.src.html:46
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
 msgstr "Paleiskite instaliavimo programą serveryje. Ji yra <code>http://yoursite.com/yourfolder/install</code> kataloge. Tada, paprasčiausiai sekite instrukcijas.<br /> <br /> Instaliavimo programa paklaus jūsų keletos klausimų, sukurs reikalingas duomenų bazės lenteles ir sukonfiguruos b2evolution."
 
-#: ../../doc/install_new.src.html:48
-#: ../../doc/upgradefrom_b2.src.html:66
-#: ../../doc/upgradefrom_b2evo.src.html:42
+#: ../../doc/install_new.src.html:49
+#: ../../doc/upfrom_miniblog.src.html:62
+#: ../../doc/upfrom_wordpress.src.html:66
+#: ../../doc/upgradefrom_b2.src.html:67
+#: ../../doc/upgradefrom_b2evo.src.html:44
 msgid "Check to make sure the new installation works."
 msgstr "Patikrinkite, kad įsitikintumėt, jog instaliacija pavyko."
 
-#: ../../doc/install_new.src.html:49
-#: ../../doc/upgradefrom_b2.src.html:67
-#: ../../doc/upgradefrom_b2evo.src.html:43
+#: ../../doc/install_new.src.html:50
+#: ../../doc/upfrom_miniblog.src.html:63
+#: ../../doc/upfrom_wordpress.src.html:67
+#: ../../doc/upgradefrom_b2.src.html:68
+#: ../../doc/upgradefrom_b2evo.src.html:45
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr "Viešame serveryje (internete) rekomenduojame, kad jūs ištrintumėte <code>/install</code> katalogą."
 
-#: ../../doc/install_new.src.html:50
-#: ../../doc/upgradefrom_b2.src.html:69
-#: ../../doc/upgradefrom_b2evo.src.html:48
+#: ../../doc/install_new.src.html:51
+#: ../../doc/upfrom_miniblog.src.html:64
+#: ../../doc/upfrom_wordpress.src.html:71
+#: ../../doc/upgradefrom_b2.src.html:70
+#: ../../doc/upgradefrom_b2evo.src.html:50
 msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
 msgstr "Po instaliacijos galbūt jūs norėtumėte, kad mes  susipažindintume jus su <a %s>keleto keblių klausimų sprendimais</a> (online žinynas)."
+
+#: ../../doc/upfrom_miniblog.src.html:6
+#: ../../doc/upfrom_miniblog.src.html:32
+msgid "Upgrading from Manywhere Miniblog"
+msgstr "Atnaujinimas iš Manywhere Miniblog"
+
+#: ../../doc/upfrom_miniblog.src.html:36
+msgid "As always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+msgstr "Kaip visada, būtų protingiau, kad jūs prieš pradėdami kažką instaliuoti, išsaugotumėt savo svetainės /blogo/ duomenų bazės kopiją (atsižvelgiant į tai, kas padaryta)."
+
+#: ../../doc/upfrom_miniblog.src.html:42
+msgid "On your server, locate the mysql database you are already using for Manywhere Miniblog. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Miniblog tables and data in any way!"
+msgstr "Savo serveryje suraskite Manywhere Miniblog priklausančią mysql duomenų bazę. Norėdami atnaujinti, privalote naudoti tą pačią ir b2evolution programai. Neišsigąskite, b2evolution nesugadins jūsų Manywhere Miniblog lentelių ir duomenų jokiu būdu!"
+
+#: ../../doc/upfrom_miniblog.src.html:46
+#: ../../doc/upfrom_wordpress.src.html:50
+#: ../../doc/upgradefrom_b2.src.html:50
+msgid "Note 1:"
+msgstr "Pastaba Nr.1:"
+
+#: ../../doc/upfrom_miniblog.src.html:46
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Miniblog uses two tables named <code>miniblog</code> and <code>user</code>. Your existing tables will not be affected in any way."
+msgstr "Jei jūs nekeitėte konfigūravimo failo, b2evolution lentelės bus su priešdėliu evo_ . Jūs be baimės galite naudoti jau egzistuojančią duomenų bazę, nebent jau turite instaliavę programą, naudojančią lenteles su tokiu pat priešdėliu. Pvz., Miniblog naudoja lenteles su priešdėliu <code>miniblog</code> ir <code>user</code>. Jūsų egzistuojančios lentelės nebus paliestos."
+
+#: ../../doc/upfrom_miniblog.src.html:50
+#: ../../doc/upfrom_wordpress.src.html:54
+#: ../../doc/upgradefrom_b2.src.html:54
+msgid "Note 2:"
+msgstr "Pastaba Nr.2:"
+
+#: ../../doc/upfrom_miniblog.src.html:50
+#: ../../doc/upfrom_wordpress.src.html:54
+#: ../../doc/upgradefrom_b2.src.html:54
+msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
+msgstr "Kodėl ta pati duomenų bazė? Todėl, kad mes naudojame greitą ir saugų SQL procesą duomenų kopijavimui, tačiau jis gali būti vykdomas tik vienoje duomenų bazėje."
+
+#: ../../doc/upfrom_miniblog.src.html:55
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Miniblog remains fully functional while you check out b2evolution.</strong>"
+msgstr "Reikia siųsti tik katalogo <code>/blogs</code> turinį. Jei norite, kad b2evolution būtų kaip jūsų svetainės pagrindinė valdymo sistema, nusiųskite <code>/blogs</code> ktaloge esančius failus į savo svetainės pagrindinį katalogą. Kitu atveju, geriausia siųsti failus į pakatalogį, pvz. <code>/b2evo</code>, tam, kad kol geriau susipažinsite su b2evolution sistema,<strong> jūsų egzistuojantis Miniblog dienoraštis veiktų be sutrikimų.</strong>"
+
+#: ../../doc/upfrom_miniblog.src.html:57
+#: ../../doc/upfrom_wordpress.src.html:61
+#: ../../doc/upgradefrom_b2.src.html:62
+msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
+msgstr "tarkim, kad jūs perkelėte failus iš katalogo blogs į <code>http://yoursite.com/b2evo</code> ..."
+
+#: ../../doc/upfrom_miniblog.src.html:59
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your Miniblog data to b2evo (without affecting Miniblog) and configure b2evolution for you."
+msgstr "Paleiskite instaliavimo programą serveryje. Ji yra <code>http://yoursite.com/b2evo/install</code> kataloge. Tada, paprasčiausiai sekite instrukcijas.<br /> <br /> Instaliavimo programa paklaus jūsų keletos klausimų, sukurs reikalingas duomenų bazės lenteles, nukopijuos duomenis iš Miniblog į b2evo lenteles ir sukonfiguruos b2evolution."
+
+#: ../../doc/upfrom_wordpress.src.html:6
+#: ../../doc/upfrom_wordpress.src.html:32
+msgid "Upgrading from WordPress"
+msgstr "Atnaujinimas iš WordPress"
+
+#: ../../doc/upfrom_wordpress.src.html:36
+msgid "The upgrade procedure below has been tested exclusively with WordPress version 1.2. Though it may not work with other versions, you can still give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
+msgstr "Atnaujinimo procesas buvo išbandytas išskirtinai su WordPress 1.2 versija. Tačiau, mes tikime, kad jūs galite pamėginti ir su kitomis be problemų. Blogiausia kas gali atsitikti, tai, kad atnaujinimo programa, nesupratusi jūsų duomenų, praneš apie klaidą, nesugadindama duomenų."
+
+#: ../../doc/upfrom_wordpress.src.html:40
+#: ../../doc/upgradefrom_b2.src.html:40
+msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+msgstr "Tačiau kaip visada, būtų protingiau, kad jūs prieš pradėdami atnaujinimą, išsaugotumėt savo svetainės duomenų bazės kopiją."
+
+#: ../../doc/upfrom_wordpress.src.html:46
+msgid "On your server, locate the mysql database you are already using for WordPress. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your WordPress tables and data in any way!"
+msgstr "Savo serveryje suraskite WordPress priklausančią mysql duomenų bazę. Norėdami atnaujinti, privalote naudoti tą pačią ir b2evolution programai.. Neišsigąskite, b2evolution nesugadins jūsų WordPress lentelių ir duomenų jokiu būdu!"
+
+#: ../../doc/upfrom_wordpress.src.html:50
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, WordPress used tables prefixed with wp_ by default. Your existing tables will not be affected in any way."
+msgstr "Jei jūs nekeitėte konfigūravimo failo, b2evolution lentelės bus su priešdėliu evo_ . Jūs be baimės galite naudoti jau egzistuojančią duomenų bazę, nebent jau turite instaliavę programą, naudojančią lenteles su tokiu pat priešdėliu. Pvz., WordPress naudoja lenteles su priešdėliu wp_. Jūsų egzistuojančios lentelės nebus paliestos."
+
+#: ../../doc/upfrom_wordpress.src.html:59
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing WordPress blog remains fully functional while you check out b2evolution.</strong>"
+msgstr "Reikia siųsti tik katalogo <code>/blogs</code> turinį. Jei norite, kad b2evolution būtų kaip jūsų svetainės pagrindinė valdymo sistema, nusiųskite <code>/blogs</code> ktaloge esančius failus į savo svetainės pagrindinį katalogą. Kitu atveju, geriausia siųsti failus į pakatalogį, pvz. <code>/b2evo</code>, tam, kad kol geriau susipažinsite su b2evolution sistema,<strong> jūsų egzistuojantis WordPress dienoraštis veiktų be sutrikimų.</strong>"
+
+#: ../../doc/upfrom_wordpress.src.html:63
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your WordPress data to b2evo (without affecting WordPress) and configure b2evolution for you."
+msgstr "Paleiskite instaliavimo programą serveryje. Ji yra <code>http://yoursite.com/b2evo/install</code> kataloge. Tada, paprasčiausiai sekite instrukcijas.<br /> <br /> Instaliavimo programa paklaus jūsų keletos klausimų, sukurs reikalingas duomenų bazės lenteles, nukopijuos duomenis iš WordPress į b2evo lenteles ir sukonfiguruos b2evolution."
+
+#: ../../doc/upfrom_wordpress.src.html:68
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing WordPress template &amp; skin to b2evolution."
+msgstr "Peržiūrėkite <a %s>žinyną</a> ar <a %s>forumus</a> ir rasite informacijos apie WordPress šablono konvertavimą į b2evolution formatą."
+
+#: ../../doc/upfrom_wordpress.src.html:70
+msgid "You can reuse your current WordPress CSS design in a snap by copying your style.css file into any b2evolution skin folder which name starts with wpc_ (which stands for WordPress CSS compatible)"
+msgstr "Jūs galite palikti dabartnį WordPress CSS stilių nukopijuodami style.css failą į bet kurį b2evolution skin katalogą, kurio pavadinimas prasideda wpc_ (atitinka \"suderintas su WordPress CSS\")"
 
 #: ../../doc/upgradefrom_b2.src.html:6
 msgid "Upgrading from Cafelog/b2"
@@ -233,87 +411,94 @@ msgstr "Atnaujinimas iš Cafelog/b2"
 msgid "Upgrading from Cafelog/b2 (the original b2)"
 msgstr "Atnaujinimas iš Cafelog/b2 (originali b2)"
 
-#: ../../doc/upgradefrom_b2.src.html:34
+#: ../../doc/upgradefrom_b2.src.html:36
 msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
 msgstr "Atnaujinimo procesas buvo išbandytas su b2 versijomis 0.6.1 ir 0.6.2. Tačiau, mes tikime, kad  versijos 0.5.x gali būti atnaujintos be problemų. Taigu, jei jūs naudojate senesnę b2 versiją, galite bandyti atnaujinimą be baimės. Blogiausia kas gali atsitikti, tai, kad atnaujinimo programa, nesupratusi jūsų duomenų, praneš apie klaidą, nesugadindama duomenų."
 
-#: ../../doc/upgradefrom_b2.src.html:39
-msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
-msgstr "Tačiau kaip visada, būtų protingiau, kad jūs prieš pradėdami atnaujinimą, išsaugotumėt savo svetainės duomenų bazės kopiją."
-
-#: ../../doc/upgradefrom_b2.src.html:45
+#: ../../doc/upgradefrom_b2.src.html:46
 msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
 msgstr "Savo serveryje suraskite Cafelog/b2 priklausančią mysql duomenų bazę. Norėdami atnaujinti, privalote naudoti tą pačią ir b2evolution programai.. Neišsigąskite, b2evolution nesugadins jūsų Cafelog/b2 lentelų ir duomenų jokiu būdu!"
 
-#: ../../doc/upgradefrom_b2.src.html:49
-msgid "Note 1:"
-msgstr "Pastaba Nr.1:"
-
-#: ../../doc/upgradefrom_b2.src.html:49
+#: ../../doc/upgradefrom_b2.src.html:50
 msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
 msgstr "Jei jūs nekeitėte konfigūravimo failo, b2evolution lentelės bus su priešdėliu evo_ . Jūs be baimės galite naudoti jau egzistuojančią duomenų bazę, nebent jau turite instaliavę programą, naudojančią lenteles su tokiu pat priešdėliu. Pvz., Cafelog/b2 naudoja lenteles su priešdėliu b2. Jūsų egzistuojančios lentelės nebus paliestos."
 
-#: ../../doc/upgradefrom_b2.src.html:53
-msgid "Note 2:"
-msgstr "Pastaba Nr.2:"
-
-#: ../../doc/upgradefrom_b2.src.html:53
-msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
-msgstr "Kodėl ta pati duomenų bazė? Todėl, kad mes naudojame greitą ir saugų SQL procesą duomenų kopijavimui, tačiau jis gali būti vykdomas tik vienoje duomenų bazėje."
-
-#: ../../doc/upgradefrom_b2.src.html:59
+#: ../../doc/upgradefrom_b2.src.html:60
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>"
 msgstr "Reikia siųsti tik katalogo <code>/blogs</code> turinį. Jei norite, kad b2evolution būtų kaip jūsų svetainės pagrindinė valdymo sistema, nusiųskite <code>/blogs</code> ktaloge esančius failus į savo svetainės pagrindinį katalogą. Kitu atveju, geriausia siųsti failus į pakatalogį, pvz. <code>/b2evo</code>, tam, kad kol geriau susipažinsite su b2evolution sistema,<strong> jūsų egzistuojantis Cafelog/b2 dienoraštis veiktų be sutrikimų.</strong>"
 
-#: ../../doc/upgradefrom_b2.src.html:61
-msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
-msgstr "tarkim, kad jūs perkelėte failus iš katalogo blogs į <code>http://yoursite.com/b2evo</code> ..."
-
-#: ../../doc/upgradefrom_b2.src.html:63
+#: ../../doc/upgradefrom_b2.src.html:64
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
 msgstr "Paleiskite instaliavimo programą serveryje. Ji yra <code>http://yoursite.com/b2evo/install</code> kataloge. Tada, paprasčiausiai sekite instrukcijas.<br /> <br /> Instaliavimo programa paklaus jūsų keletos klausimų, sukurs reikalingas duomenų bazės lenteles, nukopijuos duomenis iš b2 į b2evo lentelę ir sukonfiguruos b2evolution."
 
-#: ../../doc/upgradefrom_b2.src.html:68
-msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
-msgstr "Peržiūrėkite <a %s>wiki</a> ar <a %s>forumus</a> ir rasite informacijos apie b2 šablono konvertavimą į b2evolution formatą."
+#: ../../doc/upgradefrom_b2.src.html:69
+msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "Peržiūrėkite <a %s>žinyną</a> ar <a %s>forumus</a> ir rasite informacijos apie b2 šablono konvertavimą į b2evolution formatą."
 
-#: ../../doc/upgradefrom_b2evo.src.html:6
-msgid "Upgrading from previous b2evolution"
-msgstr "Atnaujinimas iš ankstesnės b2evolution versijos"
-
-#: ../../doc/upgradefrom_b2evo.src.html:32
-msgid "Upgrading from a previous version of b2evolution"
-msgstr "Atnaujinimas iš ankstesnės b2evolution versijos"
-
-#: ../../doc/upgradefrom_b2evo.src.html:34
+#: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
 msgstr "Išsaugokite b2evolution failų kopijas. Ypač tuos failus, kuriuos keitėte, įskaitant /conf, odas, blogų šablonus, stubfailus ir t.t..."
 
-#: ../../doc/upgradefrom_b2evo.src.html:35
+#: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
 msgstr "Be abejo, padarykite atsarginę duomenų bazės kopiją."
 
-#: ../../doc/upgradefrom_b2evo.src.html:36
-msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you also need to replace your customized files, including  /conf, skins, blog templates, stubfiles, etc...<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to reuse them once the upgrade process is done. See step 7 below."
-msgstr "Sudėkite <strong>visus naujus b2evolution failus iš /blogs katalogo</strong> į savo svetainę. Įsidėmėkite: <strong>VISUS FAILUS</strong>! Ir tai reiškia, kad jūs turėsite pakeisti jūsų modifikuotus failus naujais, įskaitant /conf, odas, blogų šablonus, stubfailus, t.t....<br /> <br /> O tai reiškia, kad jums teks tuos failus keisti pagal save iš naujo. Mes labai atsiprašome dėl to, bet dėl naujų galimybių diegimo ir kūrimo prigimties, mes negalime garantuoti, kad viskas veiks normaliai, jei jūs paliksite senus failus vietoje. <strong>tačiau</strong>, kadangi jūs išsaugojote senų failų kopijas pirmame žingsnyje, jūs galite bandyti juos įdėti atgal, po to, kai baigsite atnaujinimą. Žiūrėkite 7 žingsnį žemiau."
+#: ../../doc/upgradefrom_b2evo.src.html:37
+msgid "Delete all your existing b2evolution files from your site before uploading the new ones! This will ensure you don't keep unnecessary files on your server after upgrading. It's also better for security."
+msgstr "Prieš atsiųsdami naujus, ištrinkite visus senus b2evolution failus iš serverio! Tai užtikrins, kad nepaliksite nereikalingų failų po atnaujinimo. Taip netgi saugiau."
 
-#: ../../doc/upgradefrom_b2evo.src.html:39
+#: ../../doc/upgradefrom_b2evo.src.html:38
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
+msgstr "Sudėkite <strong>visus naujus b2evolution failus iš /blogs katalogo</strong> į savo svetainę. Įsidėmėkite: <strong>VISUS FAILUS</strong>! Ir tai reiškia, kad jūs turėsite pakeisti jūsų modifikuotus failus naujais, įskaitant /conf, odas, blogų šablonus, stubfailus, t.t....<br /> <br /> O tai reiškia, kad jums teks tuos failus keisti pagal save iš naujo. Mes labai atsiprašome dėl to, bet dėl naujų galimybių diegimo ir kūrimo prigimties, mes negalime garantuoti, kad viskas veiks normaliai, jei jūs paliksite senus failus vietoje. <strong>tačiau</strong>, kadangi jūs išsaugojote senų failų kopijas pirmame žingsnyje, jūs galite bandyti iš dalies juos įdėti atgal, po to, kai baigsite atnaujinimą. Žiūrėkite 8 žingsnį žemiau."
+
+#: ../../doc/upgradefrom_b2evo.src.html:41
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
 msgstr "Paleiskite instaliavimo programą serveryje. Ji yra <code>http://yoursite.com/yourblogsfolder/install</code> kataloge. Tada, paprasčiausiai sekite instrukcijas.<br /> <br /> Instaliavimo programa paklaus jūsų keletos klausimų, (nebent jūs pakeitėte /conf/_config.php prieš atsiųsdami jį į serverį), tada leis jums vykdyti b2evolution versijos atnaujinimą."
 
-#: ../../doc/upgradefrom_b2evo.src.html:44
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
-msgstr "Dabar laikas grąžinti visus jūsų darytus pakeitimus į vietas. Mes rekomenduojame naudoti diff/merge įrankį, pvz. <a %s>WinMerge</a>. Šis įrankis leis jums be vargo palyginti jūsų senus failus (atsargines kopijas) su naujais (netgi visą katalogą iškart) ir praneš apie pasikeitimus.<br /> <br /> Jūs taip pat galite apsilankyti <a %s>wiki</a> ar <a %s>forumuose</a>, norėdami gauti informacijos apie specifinių failų atnaujinimą."
+#: ../../doc/upgradefrom_b2evo.src.html:46
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgstr "Dabar laikas grąžinti visus jūsų darytus pakeitimus į vietas. Mes rekomenduojame naudoti diff/merge įrankį, pvz. <a %s>WinMerge</a>. Šis įrankis leis jums be vargo palyginti jūsų senus failus (atsargines kopijas) su naujais (netgi visą katalogą iškart) ir praneš apie pasikeitimus.<br /> <br /> Jūs taip pat galite apsilankyti <a %s>žinyne</a> ar <a %s>forumuose</a>, norėdami gauti informacijos apie specifinių failų atnaujinimą."
 
-msgid "English (EU)"
-msgstr "Anglų (EU)"
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:32
+msgid "Upgrading from GeekLog"
+msgstr "Atnaujinimas iš GeekLog"
 
-msgid "German (DE)"
-msgstr "Vokiečių (DE)"
+#: ../../doc/upgradefrom_gl.src.html:35
+#: ../../doc/upgradefrom_mt.src.html:37
+msgid "<a %s>Install b2evolution in the regular way.</a>"
+msgstr "<a %s>Instaliuoti b2evolution.</a>"
 
-msgid "French (FR)"
-msgstr "Prancūzų (FR)"
+#: ../../doc/upgradefrom_gl.src.html:36
+msgid "Follow the specific instructions in <a %s>/extras/geeklog/README.txt</a>"
+msgstr "susipažinti su specialiomis instrukcijomis <a %s>/extras/geeklog/README.txt</a>"
 
-msgid "Dutch (NL)"
-msgstr "Olandų (NL)"
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:32
+msgid "Upgrading from Movable Type"
+msgstr "Atnaujinimas iš Movable Type"
+
+#: ../../doc/upgradefrom_mt.src.html:34
+msgid "This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway..."
+msgstr "Ši procedūra buvi išbandyta su  Movable Type version 2.661, bet turėtų veikti ir su kitomis versijomis. Pamėgindami jūs nieko nesugadinsite..."
+
+#: ../../doc/upgradefrom_mt.src.html:36
+msgid "Use MT's export functionnality to create a .TXT file containing your posts."
+msgstr "Panaudokite MT eksportavimo galimybė tam, kad sukurtumėte .TXT failą su jūsų įrašais."
+
+#: ../../doc/upgradefrom_mt.src.html:38
+msgid "Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server."
+msgstr "Kai tik b2evo pasileis, nukopijuokite sueksportuotą .TXT failą į /blogs/admin katalogą savo serveryje."
+
+#: ../../doc/upgradefrom_mt.src.html:39
+msgid "In the admin, go to the Tools tab and launch the MT migration utility."
+msgstr "Administracinėje dalyje eikite į Įrankiai meniu dalį ir pasileiskite migracijos iš MT įrankį."
+
+#: ../../doc/upgradefrom_mt.src.html:40
+msgid "Follow the instructions on screen."
+msgstr "Instaliavimo instrukcijos."
+
+#: ../../doc/upgradefrom_mt.src.html:41
+msgid "Import will only take a few seconds/minutes depending on how many posts you import."
+msgstr "Priklausomai nuo įrašų skaičiaus, importavimas užtrunka keletą sekundžių/minučių."
 

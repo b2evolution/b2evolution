@@ -13,8 +13,11 @@
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	
-	$Calendar = & new Calendar( $blog, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
-	
+	if( ! isset( $calendar ) )
+	{
+	 	$Calendar = & new Calendar( $blog, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
+	}
+
 	# You can customize the following as you wish.
 	# Uncomment the lines you need
 
@@ -45,7 +48,7 @@
 	// $Calendar->set( 'todaycellstart', '<td class="bCalendarToday">' );
 
 	// $Calendar->set( 'searchframe', 12 );	// How many month will we search back for a post before we give up
-	
+
 	// $Calendar->set( 'browseyears', 1 );  // uncomment to allow browsing years in the calendar's caption (month must be displayed)
 	// $Calendar->set( 'linktomontharchive', 0 );  // uncomment to display month not as link to archive of month
 	

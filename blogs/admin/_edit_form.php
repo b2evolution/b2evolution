@@ -75,9 +75,7 @@ if ($use_spellchecker)
 
 <form name="post" id="post" action="edit_actions.php" target="_self" method="post">
 
-<?php echo $admin_2col_start;  ?>
-
-<div class="bPost">
+<div class="left_col">
 
 	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
 	<input type="hidden" id="action" name="action" value="<?php echo $form_action ?>" />
@@ -91,6 +89,9 @@ if ($use_spellchecker)
 	<input type="hidden" name="more" value="1" />
 	<input type="hidden" name="preview_userid" value="<?php echo $user_ID ?>" />
 
+	<fieldset>
+		<legend><?php echo T_('Post contents') ?></legend>
+
 	<?php
 
 	if ($action != 'editcomment')
@@ -99,7 +100,7 @@ if ($use_spellchecker)
 
 		<span class="line">
 		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-		<input type="text" name="post_title" size="49" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
+		<input type="text" name="post_title" size="48" value="<?php echo format_to_output( $post_title, 'htmlattr') ?>" id="post_title" tabindex="1" />
 		</span>
 
 		<span class="line">
@@ -142,14 +143,16 @@ if ($use_spellchecker)
 	}
 	?>
 
-	<div class="center">
+	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		$Toolbars->display();
 	?>
 	</div>
 
-	<?php // ---------------------------- TEXTAREA ------------------------------------- ?>
-	<div style="width:100%"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="18" cols="40" class="large" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea></div>
+	<?php // ---------------------------- TEXTAREA ------------------------------------- 
+	// Note: the pixel images are here for an IIS layout bug
+	?>
+	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" wrap="virtual" id="content" tabindex="4"><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
@@ -157,38 +160,52 @@ if ($use_spellchecker)
 		//-->
 	</script>
 
-	<?php // --------------------------- AUTOBR -------------------------------------- 	?>
-	<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-	if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
-	<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
-
+	<div class="edit_actions">
 	<?php
 	if($use_preview && ($action != 'editcomment') )
 	{ // ------------------------------- PREVIEW ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Preview') ?>" onClick="open_preview(this.form);"
-		class="search" tabindex="9" />
+		tabindex="9" />
 	<?php
 	}
 
-	// ------------------------------- BLOG THIS ! ---------------------------------- ?>
-	<input type="submit" value="<?php echo ($action == 'post') ? T_('Blog this !') :
-		T_('Edit this !'); ?>" class="search" style="font-weight: bold;" tabindex="10" />
+	// ------------------------------- SAVE ---------------------------------- ?>
+	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" tabindex="10" />
+
+	<?php
+	// ---------- DELETE ----------
+  if( $action == 'edit' )
+	{	// Editing post
+		// Display delete button if current user has the rights:
+		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
+	}
+	elseif( $action == 'editcomment' )
+	{	// Editing comment
+		// Display delete button if user has permission to:
+		$edited_Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
+	}
 
 
-	<?php if( $use_spellchecker )
+	if( $use_spellchecker )
 	{ // ------------------------------- SPELL CHECKER ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Spellcheck') ?>"
-		onClick="DoSpell('post','content','');" class="search" tabindex="11" />
+		onClick="DoSpell('post','content','');" tabindex="11" />
 	<?php }
 
 	if( $current_User->check_perm( 'upload' ) )
 	{ // ------------------------------- UPLOAD ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Upload a file/image') ?>"
-		onClick="launchupload();" class="search" tabindex="12"  />
-	<?php } ?>
+		onClick="launchupload();" tabindex="12"  />
+		<?php 
+	} 
+
+	?>
+	</div>
+	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Advanced properties') ?></legend>
+		
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
@@ -227,17 +244,26 @@ if ($use_spellchecker)
 		</span></div>
 		<?php
 		}
+		
 		if( $action != 'editcomment' )
 		{ // this is for everything but comment editing
 		?>
 		<div>
+			<span class="line">
 			<label for="post_urltitle"><strong><?php echo T_('URL Title') ?>:</strong></label>
 			<input type="text" name="post_urltitle" id="post_urltitle" value="<?php echo format_to_output( $post_urltitle, 'htmlattr' ); ?>" size="40" maxlength="50" tabindex="20" />
 			<span class="notes"><?php echo T_('(to be used in permalinks)') ?></span>
+			</span>
 		</div>
+
 		<?php
 		}
-		?>
+
+		// --------------------------- AUTOBR -------------------------------------- 	?>
+		<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
+		if( $post_autobr ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
+		<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
+
 	</fieldset>
 			
 	<?php
@@ -271,18 +297,18 @@ if ($use_spellchecker)
 	<?php			
 	}
 	?>
-</div>
 
 <!-- ================================== END OF EDIT FORM =================================== -->
 
+</div>
+
+<div class="right_col">
+
 <?php
-echo $admin_2col_nextcol;
 
 if( $action != 'editcomment' )
 { // ------------------------------- POST STATUS ---------------------------------- ?>
-	<div class="bSideItem2">
-
-	<fieldset title="Status">
+	<fieldset>
 		<legend><?php echo T_('Status') ?></legend>
 
 		<?php
@@ -327,7 +353,7 @@ if( $action != 'editcomment' )
 
 
 
-	<fieldset title="<?php echo T_('Categories') ?>" class="extracats">
+	<fieldset class="extracats">
 		<legend><?php echo T_('Categories') ?></legend>
 
 		<div class="extracats">
@@ -366,9 +392,9 @@ if( $action != 'editcomment' )
 			}
 
 			// Radio for main cat:
-			if( $current_blog_ID == $blog )
-			{
-				if( ($default_main_cat == 0) && ($action == 'post') )
+			if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
+			{ // This is current blog or we allow moving posts accross blogs
+				if( ($default_main_cat == 0) && ($action == 'post') && ($current_blog_ID == $blog) )
 				{	// Assign default cat for new post
 					$default_main_cat = $cat_ID;
 				}
@@ -394,7 +420,7 @@ if( $action != 'editcomment' )
 			echo "</ul>\n";
 		}
 
-		if( $allow_cross_posting == 2 )
+		if( $allow_cross_posting >= 2 )
 		{	// If BLOG cross posting enabled, go through all blogs with cats:
 			foreach( $cache_blogs as $i_blog )
 			{ // run recursively through the cats
@@ -405,9 +431,12 @@ if( $action != 'editcomment' )
 				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 											'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
 			}
-			?>
-			<p class="notes"><?php echo T_('Note: Cross posting among multiple blogs is enabled.') ?></p>
-			<?php
+
+      if( $allow_cross_posting >= 3 )
+      {
+        echo '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
+      }
+      echo '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
 		}
 		else
 		{	// BLOG Cross posting is disabled. Current blog only:
@@ -415,7 +444,7 @@ if( $action != 'editcomment' )
 			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
 			?>
-			<p class="notes"><?php
+			<p class="extracatnote"><?php
 			if( $allow_cross_posting )
 				echo T_('Note: Cross posting among multiple blogs is currently disabled.');
 			else
@@ -428,7 +457,7 @@ if( $action != 'editcomment' )
 		</div>
 	</fieldset>
 
-	<fieldset title="Status">
+	<fieldset>
 		<legend><?php echo T_('Comments') ?></legend>
 
 		<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?>>
@@ -498,7 +527,7 @@ if( $action != 'editcomment' )
 					}		
 				?>  
 				title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
-			<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name(); ?></strong></label>
+			<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><?php echo $loop_RendererPlugin->name(); ?></label>
 		</div>
 		<?php
 		}
@@ -512,8 +541,8 @@ if( $action != 'editcomment' )
 if ($action == "editcomment")
 {
 ?>
-	<div class="bSideItem">
-		<h3><?php echo T_('Comment info') ?></h3>
+	<fieldset>
+		<legend><?php echo T_('Comment info') ?></legend>
 		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $commentdata["comment_type"]; ?></p>
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $commentdata["comment_status"]; ?></p>
@@ -527,9 +556,11 @@ if ($action == "editcomment")
 // 		<p><strong>Pings:</strong> <?php echo in_array( 'pingsdone', $postdata["Flags"] ) ? 'Done':'Not done yet';
 }*/
 
-echo $admin_2col_end;
-
 ?>
+
+</div>
+
+<div class="clear"></div>
 
 </form>
 <!-- ================================== END OF EDIT FORM ================================== -->

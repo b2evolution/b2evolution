@@ -5,7 +5,7 @@
  * This file sets the default configuration for locales.
  * IMPORTANT: Most of these settings can be overriden in the admin (regional settings) and will then
  * be saved to the database. The database settings superseede settings in this file.
- * Last significant changes to this file: version 0.9.0.5
+ * Last significant changes to this file: version 0.9.0.10
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -96,6 +96,13 @@ $locales = array(
 										'messages' => 'en_AU',
 										'enabled' => 1,
 									),
+	'en-IL' => array( 'name' => NT_('English (IL)'),
+										'charset' => 'iso-8859-1',
+										'datefmt' => 'Y-m-d',
+										'timefmt' => 'H:i:s',
+										'messages' => 'en_IL',
+										'enabled' => 1,
+									),
 	'es-ES' => array(	'name' => NT_('Spanish (ES)'),
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'd.m.y',
@@ -122,6 +129,13 @@ $locales = array(
 										'datefmt' => 'd/m/y',
 										'timefmt' => 'H:i:s',
 										'messages' => 'fr_FR',
+										'enabled' => 1,
+									),
+  'hu-HU' => array(	'name' => NT_('Hungarian (HU)'),
+										'charset' => 'iso-8859-2',
+                    'datefmt' => 'Y. M. d.',
+                    'timefmt' => 'H:i:s',
+										'messages' => 'hu_HU',
 										'enabled' => 1,
 									),
 	'it-IT' => array(	'name' => NT_('Italian (IT)'),
@@ -180,11 +194,18 @@ $locales = array(
 										'messages' => 'sv_SE',
 										'enabled' => 1,
 									),
-	'zh-CN' => array( 'name' => NT_('Simpl. Chinese (CN)'),
+	'zh-CN' => array( 'name' => NT_('Chinese(S) gb2312 (CN)'),
 										'charset' => 'gb2312',
 										'datefmt' => 'y-m-d',
 										'timefmt' => 'H:i:s',
 										'messages' => 'zh_CN',
+										'enabled' => 1,
+									),
+	'zh-CN-utf-8' => array( 'name' => NT_('Chinese(S) utf-8 (CN)'),
+										'charset' => 'utf-8',
+										'datefmt' => 'y-m-d',
+										'timefmt' => 'H:i:s',
+										'messages' => 'zh_CN_utf-8',
 										'enabled' => 1,
 									),
 	'zh-TW' => array(	'name' => NT_('Trad. Chinese (TW)'),

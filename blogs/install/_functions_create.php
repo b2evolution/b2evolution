@@ -417,15 +417,19 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_linkblog_contrib, array(), 'published',	'nl-NL', '', 0, true, '', 'http://www.rononline.nl/', 'disabled', array() );
+	bpost_create( 1, 'Travis Swicegood', 'Hosting', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_linkblog_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/', 'disabled', array() );
+	bpost_create( 1, 'Welby', 'Hosting', $now, $cat_linkblog_contrib, array(), 'published',	 'en-UK', '', 0, true, '', 'http://www.wheely-bin.co.uk/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	bpost_create( 1, 'Graham', 'Testing', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/', 'disabled', array() );
+
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Isaac', 'Support', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://isaacschlueter.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
