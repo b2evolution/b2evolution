@@ -164,7 +164,8 @@ class Calendar
 		 */
 		$this->postcount_month_cell = '';                            // in table cell (behind day)
 		$this->postcount_month_atitle = T_('%d posts on this day');  // in archive links title tag
-		$this->postcount_year_cell = ' (%d)';                        // in table cell (behind abbr of month)
+		#$this->postcount_year_cell = ' (%d)';                        // in table cell (behind abbr of month)
+		$this->postcount_year_cell = '';
 		$this->postcount_year_atitle = T_('%d posts in this month'); // in archive links title tag
 		/**#@-*/
 	}

@@ -363,10 +363,10 @@ function locale_overwritefromDB()
 {
 	global $tablelocales, $DB, $locales, $default_locale;
 	
-	$usedprios = array();  // remember which priorities are used already. FP: what do we need this for?
+	$usedprios = array();  // remember which priorities are used already.
 	
 	$query = 'SELECT
-						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, 
+						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name,
 						loc_messages, loc_priority, loc_enabled
 						FROM '.$tablelocales.' ORDER BY loc_priority';
 	$rows = $DB->get_results( $query, ARRAY_A );
@@ -390,7 +390,6 @@ function locale_overwritefromDB()
 	// Missing "priority gaps" will get filled here.
 	if( count($rows) != count($locales) )
 	{ // we have locales from conf file that need a priority
-		ksort( $locales );  // sort by key (== locale name)
 		$priocounter = 1;
 		foreach( $locales as $lkey => $lval )
 		{	// Loop through memory locales:
