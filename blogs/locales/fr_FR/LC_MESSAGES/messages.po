@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "POT-Creation-Date: 2004-05-11 19:24+0200\n"
-"PO-Revision-Date: 2004-05-11 19:27+0100\n"
+"PO-Revision-Date: 2004-05-11 19:31+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -3128,11 +3128,11 @@ msgstr "Supprimer le groupe"
 
 #: ..\..\..\admin\_users_list.php:126
 msgid "decrease user level"
-msgstr ""
+msgstr "Descendre le niveau de l'utilisateur"
 
 #: ..\..\..\admin\_users_list.php:131
 msgid "increase user level"
-msgstr ""
+msgstr "Monter le niveau de l'utilisateur"
 
 #: ..\..\..\admin\_users_list.php:142
 #: ..\..\..\admin\_users_list.php:143
@@ -3165,12 +3165,12 @@ msgstr "L'habillage par défaut [%s] n'existe pas. Il doit être correctement conf
 #: ..\..\..\b2evocore\_class_blog.php:382
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
-msgstr ""
+msgstr "ERREUR! Impossible de supprimer! Vous devrez supprimer le fichier [%s] à la main."
 
 #: ..\..\..\b2evocore\_class_calendar.php:178
 #, php-format
 msgid "%d posts on this day"
-msgstr ""
+msgstr "%d articles postés ce jour"
 
 #: ..\..\..\b2evocore\_class_calendar.php:179
 msgid "one post on this day"
@@ -3179,7 +3179,7 @@ msgstr "un article ce jour"
 #: ..\..\..\b2evocore\_class_calendar.php:183
 #, php-format
 msgid "%d posts in this month"
-msgstr ""
+msgstr "%d article postés ce mois"
 
 #: ..\..\..\b2evocore\_class_calendar.php:184
 msgid "one post in this month"
@@ -3203,7 +3203,7 @@ msgstr "année suivante"
 
 #: ..\..\..\b2evocore\_class_calendar.php:337
 msgid "go to month's archive"
-msgstr ""
+msgstr "aller à l'archive de ce mois"
 
 #: ..\..\..\b2evocore\_class_comment.php:128
 msgid "Member"
@@ -3220,12 +3220,12 @@ msgstr "Pas de commentaire pour l'instant..."
 
 #: ..\..\..\b2evocore\_class_dataobjectlist.php:117
 msgid "Sorry, there is nothing to display..."
-msgstr ""
+msgstr "Désolé, il n'y a rien à afficher..."
 
 #: ..\..\..\b2evocore\_class_db.php:86
 #, php-format
 msgid "Error selecting database [%s]!"
-msgstr ""
+msgstr "Impossible de sélectionner la base de données [%s]!"
 
 #: ..\..\..\b2evocore\_class_db.php:141
 msgid "MySQL error!"
@@ -3280,7 +3280,7 @@ msgstr "Afficher cette catégorie"
 
 #: ..\..\..\b2evocore\_class_item.php:372
 msgid "This post is not published. You cannot leave comments."
-msgstr ""
+msgstr "Cet article n'est pas publié. Vous ne pouvez pas laisser de commentaire."
 
 #: ..\..\..\b2evocore\_class_item.php:384
 msgid "Comments are closed for this post."
@@ -3366,7 +3366,7 @@ msgstr "Article invalide; veuillez corriger les erreurs suivantes:"
 
 #: ..\..\..\b2evocore\_class_itemlist.php:817
 msgid "Sorry, there is no post to display..."
-msgstr ""
+msgstr "Désolé, il n'y a pas d'article à afficher..."
 
 #: ..\..\..\b2evocore\_class_pop3.php:96
 #: ..\..\..\b2evocore\_class_pop3.php:105
@@ -4223,7 +4223,7 @@ msgstr "L'adresse email fournie n'est pas valide"
 
 #: ..\..\..\htsrv\comment_post.php:77
 msgid "Please do not send empty comment"
-msgstr ""
+msgstr "Merci de ne pas envoyer de commentaire vide"
 
 #: ..\..\..\htsrv\comment_post.php:94
 msgid "You can only post a new comment every 30 seconds."
