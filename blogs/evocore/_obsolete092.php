@@ -1,6 +1,12 @@
 <?php
 /**
- * This file implements creation of DB tables
+ * This file implements functions that got obsolete with version 0.9.2.
+ *
+ * For performance reasons you should delete (or rename) this file, but if you use some
+ * of these functions in your skin or hack you'll have to leave it for obvious compatibility
+ * reasons.
+ * Of course, this file will not be (automatically) included at some point, so please
+ * upgrade your skins and hacks.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -1082,4 +1088,12 @@ function comment_post_link()
 
 // _comment.funcs.php }}}
 
+
+
+/*
+ * $Log$
+ * Revision 1.2  2005/02/15 22:35:49  blueyed
+ * doc
+ *
+ */
 ?>
