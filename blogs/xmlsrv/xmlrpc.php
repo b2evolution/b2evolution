@@ -1020,15 +1020,22 @@ function bloggersettemplate($m) {
 
 function strip_all_but_one_link($text, $mylink, $log)
 {
-	debug_fwrite($log, 'Analyzing text block #####'.$text."####\n\n");
+	debug_fwrite($log, 'Searching '.$mylink.' in text block #####'.$text."####\n\n");
 
 	$match_link = '#(<a.+?href.+?'.'>)(.+?)(</a>)#';
 	preg_match_all($match_link, $text, $matches);
 	$count = count($matches[0]);
-	for ($i=0; $i<$count; $i++) {
-		debug_fwrite($log, 'Analyzing link : '.$matches[0][$i]."\n\n");
+	for ($i=0; $i<$count; $i++) 
+	{
+		$thislink = $matches[0][$i];
+		debug_fwrite($log, 'Analyzing link : '.$thislink."\n");
 
-		if (!strstr($matches[0][$i], $mylink)) {
+		if(strstr($thislink, $mylink)) 
+		{
+			debug_fwrite($log, "MATCH!\n");
+		}
+		else
+		{	// this link doesn't contain what we're looking for
 			$text = str_replace($matches[0][$i], $matches[2][$i], $text);
 		}
 	}
@@ -1052,7 +1059,7 @@ function pingback_ping($m) {
 	//
 	global $tableposts, $tablecomments, $comments_notify, $notify_from;
 	global $baseurl, $b2_version, $use_pingback;
-	global $HTTP_SERVER_VARS;
+	global $default_locale;
 
 	if (!$use_pingback) 
 	{
@@ -1110,7 +1117,9 @@ function pingback_ping($m) {
 			$blah = explode('=', $match[0]);
 			$post_ID = $blah[1];
 			$way = 'from the querystring';
-		} elseif (isset($urltest['fragment'])) {
+		}
+		elseif (isset($urltest['fragment'])) 
+		{
 			// an #anchor is there, it's either...
 			if (intval($urltest['fragment'])) {
 				// ...an integer #XXXX (simpliest case)
@@ -1134,8 +1143,8 @@ function pingback_ping($m) {
 		$sql = 'SELECT post_author FROM '.$tableposts.' WHERE ID = '.$post_ID;
 		$result = mysql_query($sql);
 
-		if (mysql_num_rows($result)) {
-
+		if (mysql_num_rows($result)) 
+		{
 			debug_fwrite($log, 'Post exists'."\n");
 
 			// Let's check that the remote site didn't already pingback this entry
@@ -1157,15 +1166,20 @@ function pingback_ping($m) {
 				{ // fplanque: dis is da place where da bug was >:[
 					$linea .= $fbuffer;		// dis is da fix!
 				}
-				$linea = strip_tags($linea, '<title><a>');
+				fclose($fp);
+				$linea = strip_tags($linea, '<a><title>');
+
+				preg_match('|<title>([^<]*?)</title>|is', $linea, $matchtitle);
+
+				$linea = convert_chars( $linea, 'html' );		// warning: this also removes title!
+
+				$pagelinkedto = convert_chars( $pagelinkedto, 'html' );
 				$linea = strip_all_but_one_link($linea, $pagelinkedto, $log);
-				$linea = preg_replace('#&([^amp\;])#is', '&amp;$1', $linea);
-				if (empty($matchtitle))
-				{
-					preg_match('|<title>([^<]*?)</title>|is', $linea, $matchtitle);
-				}
-				$pos2 = strpos($linea, $pagelinkedto);
-				$pos3 = strpos($linea, str_replace('http://www.', 'http://', $pagelinkedto));
+				// fplanque: removed $linea = preg_replace('#&([^amp\;])#is', '&amp;$1', $linea);
+				
+				debug_fwrite($log, 'SECOND SEARCH '.convert_chars($pagelinkedto).' in text block #####'.$linea."####\n\n");
+				$pos2 = strpos($linea, convert_chars($pagelinkedto));
+				$pos3 = strpos($linea, str_replace('http://www.', 'http://', convert_chars($pagelinkedto)));
 				if (is_integer($pos2) || is_integer($pos3))
 				{
 					debug_fwrite($log, 'The page really links to us :)'."\n");
@@ -1174,22 +1188,13 @@ function pingback_ping($m) {
 					$context = substr($linea, $start, 250);
 					$context = str_replace("\n", ' ', $context);
 					$context = str_replace('&amp;', '&', $context);
-				}
-				else
-				{
-					debug_fwrite($log, 'The page doesn\'t link to us, here\'s an excerpt :'."\n\n".$linea."\n\n");
-				}
-				debug_fwrite($log, '*****'."\n\n");
-				fclose($fp);
 
-				if (!empty($context))
-				{
 					global $admin_url, $comments_allowed_uri_scheme;
 				
 					$pagelinkedfrom = preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom);
 					$title = (!strlen($matchtitle[1])) ? $pagelinkedfrom : $matchtitle[1];
 					$original_context = $context;
-					$context = '[...] '.addslashes(trim($context)) .' [...]';
+					$context = '[...] '.trim($context).' [...]';
 
 					// CHECK and FORMAT content	
 					if( $error = validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme ) )
@@ -1204,7 +1209,7 @@ function pingback_ping($m) {
 						$pagelinkedfrom = addslashes($pagelinkedfrom);
 						$original_title = $title;
 						$title = addslashes(strip_tags(trim($title)));
-						$sql = "INSERT INTO $tablecomments(comment_post_ID, comment_type,comment_author, comment_author_url, comment_date, comment_content) VALUES ($post_ID, 'pingback', '$title', '$pagelinkedfrom', NOW(), '$context')";
+						$sql = "INSERT INTO $tablecomments(comment_post_ID, comment_type, comment_author, comment_author_url, comment_date, comment_content) VALUES ($post_ID, 'pingback', '$title', '$pagelinkedfrom', NOW(), '".addslashes($context)."')";
 						$consulta = mysql_query($sql);
 	
 						if ($comments_notify)
@@ -1222,15 +1227,18 @@ function pingback_ping($m) {
 							$notify_message .= T_('Website', $default_locale). ": $original_title\n";
 							$notify_message .= T_('Url', $default_locale). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt', $default_locale). ": \n[...] $original_context [...]\n\n";
-							$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
+							$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$post_ID."&c=1\n\n";
 	
 							@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
 	
 						}
 					}
-				} else {
-					// URL pattern not found
-					$message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\nContext: $context\n\n".$messages[1];
+				} 
+				else 
+				{	// URL pattern not found - page doesn't link to us:
+					debug_fwrite($log, 'The page doesn\'t link to us!'."\n");
+					$message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
+
 				}
 			} else {
 				// We already have a Pingback from this URL

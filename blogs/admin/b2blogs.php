@@ -18,7 +18,7 @@ switch($action)
 		require(dirname(__FILE__).'/_menutop_end.php');
 		if ($user_level < 9) 
 		{
-			die( T_('You have no right to edit the blogs.') );
+			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
 		}
 		echo "<div class=\"panelblock\">\n";
 		echo '<h2>', T_('New blog'), ":</h2>\n";
@@ -46,10 +46,10 @@ switch($action)
 	case 'create':
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9) {
-			die( T_('You have no right to edit the blogs.') );
+		if ($user_level < 9) 
+		{
+			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
 		}
-	
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
 		param( 'blog_tagline', 'html', '' );
@@ -77,7 +77,7 @@ switch($action)
 		}
 
 	
-		echo "<p>Creating blog...</p>";
+		echo '<p>'.T_('Creating blog...').'</p>';
 		
 		$blog_ID = blog_create( $blog_name, $blog_shortname, $blog_siteurl, $blog_filename, 
 									$blog_stub,  $blog_staticfilename, 
@@ -137,7 +137,7 @@ switch($action)
 				if( isset($default_stub_owner) ) 
 				{
 					printf( T_('<p>Changing owner to %s</p>'), $default_stub_owner );
-					if( ! chmod( $new_stub_file, $default_stub_owner ) )
+					if( ! chown( $new_stub_file, $default_stub_owner ) )
 					{
 						echo '<p class="error">', T_('Warning'), ': ', T_('chown failed!'), '</p>';
 					}
@@ -156,8 +156,9 @@ switch($action)
 	case 'edit':
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9) {
-			die( T_('You have no right to edit the blogs.') );
+		if ($user_level < 9) 
+		{
+			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
 		}
 		echo "<div class=\"panelblock\">\n";
 		echo '<h2>', T_('Blog params for:'), ' ', get_bloginfo('name'), "</h2>\n";
@@ -180,13 +181,11 @@ switch($action)
 		break;
 		
 		
-		
-		
 	case 'update':
-		if ($user_level < 9) {
-			die( T_('You have no right to edit the blogs.') );
+		if ($user_level < 9) 
+		{
+			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
 		}
-	
 		param( 'blog', 'integer', true );
 		param( 'blog_name', 'string', true );
 		param( 'blog_shortname', 'string', true );
@@ -234,7 +233,7 @@ switch($action)
 	<?php
 		if ($user_level < 2) 
 		{
-			die( T_('You have no right to generate static pages.') );
+			die( '<p>'.T_('You have no right to generate static pages.').'</p>' );
 		}
 	
 		$staticfilename = get_bloginfo('staticfilename');
@@ -278,8 +277,9 @@ switch($action)
 	default:
 		require(dirname(__FILE__).'/_menutop.php');
 		require(dirname(__FILE__).'/_menutop_end.php');
-		if ($user_level < 9) {
-			die( T_('You have no right to edit the blogs.') );
+		if ($user_level < 9 && ! $demo_mode) 
+		{
+			die( '<p>'.T_('You have no right to edit the blogs.').'</p>' );
 		}
 		
 }

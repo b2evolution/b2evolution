@@ -20,9 +20,9 @@ switch($action)
 {
 
 case "update":
-	if ($user_level < 3) 
+	if( $user_level < 3 ) 
 	{
-		die( T_('You have no right to edit the templates.') );
+		die( '<p>'.T_('You have no right to edit the templates.').'</p>' );
 	}
 
 	// Determine the edit folder:
@@ -42,9 +42,9 @@ default:
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
-	if ($user_level <= 3) 
+	if( $user_level < 3 && ! $demo_mode ) 
 	{
-		die( T_('You have no right to edit the templates.') );
+		die( '<p>'.T_('You have no right to edit the templates.').'</p>' );
 	}
 
 	// Determine the edit folder:

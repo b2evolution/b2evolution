@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__).'/conf/b2evo_config.php');
-require_once(dirname(__FILE__)."/$pathcore/_functions.php");  
+require_once(dirname(__FILE__).'/conf/_config.php');
+require_once(dirname(__FILE__)."/$core_subdir/_functions.php");  
 // Connecting to the db:
 dbconnect();
 

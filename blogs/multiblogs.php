@@ -219,7 +219,7 @@ the_date( '', '<h2>', '</h2>' );
 	
 			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
 			<div class="bText">
-				<?php the_content(); ?>
+				<?php the_content( '#', 0, '', '#', '', '', 'htmlbody', 0, 0, 1 ); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>
 			</div>
 		</div>
@@ -254,7 +254,7 @@ the_date( '', '<h2>', '</h2>' );
 	
 			<h3 class="bTitle"><a href="<?php permalink_link() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php the_title(); ?></h3>
 			<div class="bText">
-				<?php the_content(); ?>
+				<?php the_content( '#', 0, '', '#', '', '', 'htmlbody', 0, 0, 1 ); ?>
 				<?php link_pages("<br />Pages: ","<br />","number") ?>
 			</div>
 		</div>

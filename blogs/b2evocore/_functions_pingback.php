@@ -55,8 +55,12 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 		// Parsing the post, external links (if any) are stored in the $post_links array
 		// This regexp comes straigth from phpfreaks.com
 		// http://www.phpfreaks.com/quickcode/Extract_All_URLs_on_a_Page/15.php
-		preg_match_all("{\b http : [$any] +? (?= [$punc] * [^$any] | $)}x", $content, $post_links_temp);
-	
+		// preg_match_all("{\b http : [$any] +? (?= [$punc] * [^$any] | $)}x", $content, $post_links_temp);
+		// fplanque: \b is for word boundary
+		// trailing x is to ignore whitespace
+		// we need to simplify and allow ; in the URL
+		 preg_match_all("{\b http:// [0-9A-Za-z:/_~+\-%.?&=;]+}x", $content, $post_links_temp);
+		 
 		// Debug
 		debug_fwrite($log, T_('Post contents').':');
 		debug_fwrite($log, $content."\n");
@@ -72,11 +76,18 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 	
 		foreach($post_links_temp[0] as $link_test)
 		{
+			//echo "testing: $link_test <br />";
 			$test = parse_url($link_test);
-			if (isset($test['query'])) {
-				$post_links[] = $link_test;
-			} elseif(($test['path'] != '/') && ($test['path'] != '')) {
-				$post_links[] = $link_test;
+			if( $test['scheme'] == 'http' )
+			{
+				if (isset($test['query'])) 
+				{
+					$post_links[] = $link_test;
+				}
+				elseif(($test['path'] != '/') && ($test['path'] != '')) 
+				{
+					$post_links[] = $link_test;
+				}
 			}
 		}
 	
@@ -104,11 +115,13 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 			// Try to connect to the server at $host
 			if( $display ) echo T_('Connect to server at:'), ' ',$host;
 			$fp = fsockopen($host, $port, $errno, $errstr, 30);
-			if (!$fp) {
+			if (!$fp) 
+			{
 				if( $display ) echo T_('Couldn\'t open a connection to:'), ' ', $pagelinkedto, "<br />\n";
 				debug_fwrite($log, T_('Couldn\'t open a connection to:').' '.$host."\n\n");
 				continue;
 			}
+			echo "<br />\n";
 	
 			// Send the GET request
 			$request = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: b2evolution/$b2_version PHP/" . phpversion() . "\r\n\r\n";
@@ -121,13 +134,17 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 			$headers = '';
 			$gettingHeaders = true;
 			$found_pingback_server = 0;
-			while (!feof($fp)) {
+			while (!feof($fp)) 
+			{
 				$line = fgets($fp, 4096);
 				// echo "line (".strlen($line)."): [",htmlspecialchars($line),"] <br />\n";
 				if (trim($line) == '')  // ligne blanche = fin des headers
 				{
 					$gettingHeaders = false;
 				}
+				$pingback_link_offset_dquote = 0;
+				$pingback_link_offset_squote = 0;
+				$x_pingback_header_offset = 0;
 				if (!$gettingHeaders) 
 				{
 					// echo 'CONTENT';
@@ -151,7 +168,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 					$found_pingback_server = 1;
 					break;
 				}	
-				if ($pingback_link_offset_dquote || $pingback_link_offset_squote) 
+				if( $pingback_link_offset_dquote || $pingback_link_offset_squote ) 
 				{	// on a trouvé dans les données
 					$quote = ($pingback_link_offset_dquote) ? '"' : '\'';
 					$pingback_link_offset = ($quote=='"') ? $pingback_link_offset_dquote : $pingback_link_offset_squote;
@@ -182,20 +199,12 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 			else 
 			{
 				debug_fwrite($log,"\n\n". T_('Pingback server data'). "\n");
-				// Assuming there's a "http://" bit, let's get rid of it
-				$host_clear = substr($pingback_server_url, 7);
-	
-				//  the trailing slash marks the end of the server name
-				$host_end = strpos($host_clear, '/');
-	
-				// Another clear cut
-				$host_len = $host_end-$host_start;
-				$host = substr($host_clear, 0, $host_len);
-				debug_fwrite($log, 'host: '.$host."\n");
-	
-				// If we got the server name right, the rest of the string is the server path
-				$path = substr($host_clear,$host_end);
-				debug_fwrite($log, 'path: '.$path."\n\n");
+				
+				$parsed_url = parse_url( $pingback_server_url );
+				debug_fwrite($log, 'host: '.$parsed_url['host']."\n");
+				$port = isset($parsed_url['port']) ? $parsed_url['port'] : 80;
+				debug_fwrite($log, 'port: '.$port."\n");
+				debug_fwrite($log, 'path: '.$parsed_url['path']."\n\n");
 	
 				 // Now, the RPC call
 				$method = 'pingback.ping';
@@ -204,7 +213,7 @@ function pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, &
 				if( $display )	echo T_('Page Linked From:'), " $pagelinkedfrom<br />\n";
 				debug_fwrite($log, T_('Page Linked From:').' '.$pagelinkedfrom."\n");
 
-				$client = new xmlrpc_client($path, $host, 80);
+				$client = new xmlrpc_client( $parsed_url['path'], $parsed_url['host'], $port);
 				// $client->setDebug(true);		// fplanque :))
 				$message = new xmlrpcmsg($method, array(new xmlrpcval($pagelinkedfrom), new xmlrpcval($pagelinkedto)));
 				printf( T_('Pinging %s...'), $host );

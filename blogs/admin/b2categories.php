@@ -16,9 +16,9 @@ case 'newcat':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
-	if ($user_level < 3) 
+	if( $user_level < 3 ) 
 	{
-		die( T_('You have no right to edit the categories.') );
+		die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
 	}
 
 	echo "<div class=\"panelblock\">\n";
@@ -57,8 +57,10 @@ case 'addcat':
 	/*
 	 * INSERT new cat into db
 	 */
-	if ($user_level < 3)
-	die ("Cheatin' uh ?");
+	if( $user_level < 3 ) 
+	{
+		die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
+	}
 	
 	param( 'cat_name', 'string' );
 	param( 'parent_cat_ID', 'integer' );
@@ -84,13 +86,16 @@ case "Delete":
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
 
+	if( $user_level < 3 ) 
+	{
+		die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
+	}
+
 	echo "<div class=\"panelinfo\">\n";
 	echo '<h3>', T_('Deleting category...'), "</h3>\n";
 	
 	param( 'cat_ID', 'integer' );
 
-	if ($user_level < 3) die ('Cheatin\' uh ?');
-	
 	// DELETE FROM DB:
 	$result = cat_delete( $cat_ID ) or mysql_oops( $query );	
 	if( $result !== 1 )
@@ -109,6 +114,12 @@ case "Delete":
 case 'Edit':
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
+
+	if( $user_level < 3 ) 
+	{
+		die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
+	}
+
 	param( 'cat_ID', 'integer' );
 	$cat_name = get_catname($cat_ID);
 	$cat_name = addslashes($cat_name);
@@ -187,8 +198,10 @@ case 'Edit':
 
 
 case 'editedcat':
-	if ($user_level < 3)
-	die ("Cheatin' uh ?");
+	if( $user_level < 3 ) 
+	{
+		die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
+	}
 	
 	param( 'cat_name', 'string' );
 	param( 'parent_cat_ID', 'integer' );
@@ -204,10 +217,9 @@ default:
 
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
-	if ($user_level < 3) 
+	if( $user_level < 3 && ! $demo_mode ) 
 	{
-		die( 
-		T_('You have no right to edit the categories.') );
+		die( '<p>'.T_('You have no right to edit the categories.').'</p>' );
 	}
 
 break;

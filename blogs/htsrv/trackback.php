@@ -71,9 +71,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$comment_author_email = $email;
 	$comment_author_url = $url;
 
-	$author = addslashes($author);
-
-	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content) VALUES ( $comment_post_ID,'trackback','$author','$email','$url','$user_ip','$now','$comment' )";
+	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content) VALUES ( $comment_post_ID, 'trackback', '".addslashes($author)."', '".addslashes($email)."', '".addslashes($url)."', '$user_ip', '$now', '".addslashes($comment)."' )";
 	$result = mysql_query($query);
 	if (!$result) 
 	{

@@ -81,6 +81,7 @@ function trackback($trackback_url, $title, $excerpt,
 	{
 		echo '[post]';
 		$trackback_url = parse_url($trackback_url);
+		$port = isset($trackback_url['port']) ? $trackback_url['port'] : 80;
 		$http_request  = 'POST '.$trackback_url['path']." HTTP/1.0\r\n";
 		$http_request .= 'Host: '.$trackback_url['host']."\r\n";
 		$http_request .= 'Content-Type: application/x-www-form-urlencoded'."\r\n";
@@ -88,7 +89,7 @@ function trackback($trackback_url, $title, $excerpt,
 		$http_request .= "\r\n";
 		$http_request .= $query_string;
 		flush();
-		$fs = fsockopen($trackback_url['host'], 80);
+		$fs = fsockopen($trackback_url['host'], $port);
 		fputs($fs, $http_request);
 		$result = '';
 		while(!feof($fs)) {

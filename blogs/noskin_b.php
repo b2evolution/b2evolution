@@ -323,9 +323,7 @@ the_date( '', '<h2>', '</h2>' );
         <li><a href="<?php bloginfo('rdf_url', 'raw'); ?>">RSS 1.0 (RDF)</a></li>
         <li><a href="<?php bloginfo('rss2_url', 'raw'); ?>">RSS 2.0 (Userland)</a></li>
       </ul>
-      <p><a href="http://www.xml.com/pub/a/2002/12/18/dive-into-xml.html" title="xml.com - External - English">What
-        is RSS?</a> by Mark Pilgrim</p>
-
+      <a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
 	</div>
 
 	<p class="center">powered by<br />

@@ -86,15 +86,18 @@ for ($iCount=1; $iCount<=$Count; $iCount++)
 				$content_type = explode(';', $content_type);
 				$content_type = $content_type[0];
 			}
-			if (($content_type == 'multipart/alternative') && (preg_match('/boundary="/', $line)) && ($boundary == '')) {
+			if (($content_type == 'multipart/alternative') && (preg_match('/boundary="/', $line)) && ($boundary == '')) 
+			{
 				$boundary = trim($line);
 				$boundary = explode('"', $boundary);
 				$boundary = $boundary[1];
 			}
-			if (preg_match('/Subject: /', $line)) {
+			if (preg_match('/Subject: /', $line)) 
+			{
 				$subject = trim($line);
 				$subject = substr($subject, 9, strlen($subject)-9);
-				if ($use_phoneemail) {
+				if ($use_phoneemail) 
+				{
 					$subject = explode($phoneemail_separator, $subject);
 					$subject = trim($subject[0]);
 				}

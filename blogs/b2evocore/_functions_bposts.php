@@ -297,66 +297,6 @@ function get_the_title()
 
 
 
-/*  
- * get_the_content(-)
- *
- * fplanque: modified read more!
- * added $more_anchor
- * 0.8.3: $more_anchor now surrounded the before & after link.
- */
-function get_the_content($more_link_text='#', $stripteaser=0, $more_file='', $more_anchor='#', $before_more_link = '<p class="bMore">', $after_more_link = '</p>' )
-{
-	if( $more_link_text == '#' ) 
-	{	// TRANS: this is the default text for the extended post "more" link
-		$more_link_text = '=> '.T_('Read more!');
-	}
-
-	if( $more_anchor == '#' ) 
-	{	// TRANS: this is the default text displayed once the more link has been activated
-		$more_anchor = '['.T_('More:').']';
-	}
-
-	global $id,$postdata,$more,$c,$withcomments,$page,$pages,$multipage,$numpages;
-	global $preview, $use_extra_path_info;
-	$output = '';
-	if ($more_file != '') {
-		$file=$more_file;
-	} else {
-		$file=get_bloginfo('blogurl');
-	}
-	$content=$pages[$page-1];
-	$content=explode('<!--more-->', $content);
-
-	if ((preg_match('/<!--noteaser-->/', $postdata['Content']) && ((!$multipage) || ($page==1))))
-		$stripteaser=1;
-	$teaser=$content[0];
-	if (($more) && ($stripteaser))
-	{	// We don't want to repeat the teaser:
-		$teaser='';
-	}
-	$output .= $teaser;
-
-	if (count($content)>1) 
-	{
-		if ($more) 
-		{	// Viewer has already asked for more
-			if( !empty($more_anchor) ) $output .= $before_more_link;
-			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
-			if( !empty($more_anchor) ) $output .= $after_more_link;
-			$output .= $content[1];
-		} 
-		else 
-		{ // We are offering to read more
-			$more_link = gen_permalink( $file, $id, 'id', 'single', 1 );
-			$output .= $before_more_link.'<a href="'.$more_link.'#more'.$id.'">'.$more_link_text.'</a>'.$after_more_link;
-		}
-	}
-	if ($preview) { // preview fix for javascript bug with foreign languages
-		$output =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
-	}
-	return($output);
-}
-
 
 /* 
  * TEMPLATE FUNCTIONS
@@ -525,11 +465,96 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
 /*
  * the_content(-)
  */
-function the_content( $more_link_text='#', $stripteaser=0, $more_file='', $more_anchor='#', $before_more_link = '<p class="bMore">', $after_more_link = '</p>', $format = 'htmlbody', $cut = 0) 
+function the_content( 
+	$more_link_text='#', 
+	$stripteaser=0, 
+	$more_file='', 
+	$more_anchor='#', 
+	$before_more_link = '#', 
+	$after_more_link = '#', 
+	$format = 'htmlbody', 
+	$cut = 0,
+	$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
+	$disppage = '#' ) // page number to display specific page, # for url parameter
 {
 	global $use_textile;
+	global $id, $postdata, $pages, $multipage, $numpages;
+	global $preview, $use_extra_path_info;
+	
+	// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
+	
+	if( $more_link_text == '#' ) 
+	{	// TRANS: this is the default text for the extended post "more" link
+		$more_link_text = '=> '.T_('Read more!');
+	}
 
-	$content = get_the_content($more_link_text,$stripteaser,$more_file,$more_anchor,$before_more_link, $after_more_link);
+	if( $more_anchor == '#' ) 
+	{	// TRANS: this is the default text displayed once the more link has been activated
+		$more_anchor = '['.T_('More:').']';
+	}
+
+	if( $before_more_link == '#' ) 
+		$before_more_link = '<p class="bMore">';
+
+	if( $after_more_link == '#' ) 
+		$after_more_link = '</p>';
+	
+	if( $dispmore === '#' )
+	{
+		global $more;
+		$dispmore = $more;
+	}
+
+	if( $disppage === '#' )
+	{
+		global $page;
+		$disppage = $page;
+	}
+	if( $disppage > $numpages ) $disppage = $numpages;	
+	// echo 'Using: dmore=', $dispmore, ' dpage=', $disppage;
+
+	$output = '';
+	if ($more_file != '') 
+		$file = $more_file;
+	else
+		$file = get_bloginfo('blogurl');
+
+	$content = $pages[$disppage-1];
+	$content = explode('<!--more-->', $content);
+
+	if ((preg_match('/<!--noteaser-->/', $postdata['Content']) && ((!$multipage) || ($disppage==1))))
+		$stripteaser=1;
+	$teaser=$content[0];
+	if (($dispmore) && ($stripteaser))
+	{	// We don't want to repeat the teaser:
+		$teaser='';
+	}
+	$output .= $teaser;
+
+	if (count($content)>1) 
+	{
+		if ($dispmore) 
+		{	// Viewer has already asked for more
+			if( !empty($more_anchor) ) $output .= $before_more_link;
+			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
+			if( !empty($more_anchor) ) $output .= $after_more_link;
+			$output .= $content[1];
+		} 
+		else 
+		{ // We are offering to read more
+			$more_link = gen_permalink( $file, $id, 'id', 'single', 1 );
+			$output .= $before_more_link.'<a href="'.$more_link.'#more'.$id.'">'.$more_link_text.'</a>'.$after_more_link;
+		}
+	}
+	if ($preview) 
+	{ // preview fix for javascript bug with foreign languages
+		$output =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
+	}
+
+
+	$content = $output;
+
+
 
 	if( $use_textile ) $content = textile( $content );
 
@@ -555,25 +580,26 @@ function the_content( $more_link_text='#', $stripteaser=0, $more_file='', $more_
 
 /*
  * link_pages(-)
- *
- *
  */
 function link_pages($before='<br />', $after='<br />', $next_or_number='number', $nextpagelink='#', $previouspagelink='#', $pagelink='%', $more_file='') 
 {
+	global $id,$page,$numpages, $multipage, $more;
+	global $blogfilename;
+
 	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
 	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
 
-	global $id,$page,$numpages,$multipage,$more;
-	global $blogfilename;
-	if ($more_file != '') {
+	if ($more_file != '') 
 		$file = $more_file;
-	} else {
+	else
 		$file = $blogfilename;
-	}
-	if (($multipage)) { // && ($more)) {
+
+	if(($multipage)) { // && ($more)) {
 		echo $before;
-		if ($next_or_number=='number') {
-			for ($i = 1; $i < ($numpages+1); $i = $i + 1) {
+		if ($next_or_number=='number') 
+		{
+			for ($i = 1; $i < ($numpages+1); $i = $i + 1) 
+			{
 				$j=str_replace('%',"$i",$pagelink);
 				echo " ";
 				if (($i != $page) || ((!$more) && ($page==1)))
@@ -582,7 +608,9 @@ function link_pages($before='<br />', $after='<br />', $next_or_number='number',
 				if (($i != $page) || ((!$more) && ($page==1)))
 					echo '</a>';
 			}
-		} else {
+		} 
+		else
+		{
 			$i=$page-1;
 			if ($i)
 				echo ' <a href="'.$file.'?p='.$id.'&amp;page='.$i.'">'.$previouspagelink.'</a>';

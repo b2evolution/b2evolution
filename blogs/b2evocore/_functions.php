@@ -842,7 +842,7 @@ function balanceTags($text)
 	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
 
 
-	while (preg_match("/<(\/?\w*)\s*([^>]*)>/",$text,$regex))
+	while( preg_match("/<(\/?\w*)\s*([^>]*)>/", $text, $regex) )
 	{
 		$newtext = $newtext . $tagqueue;
 
@@ -853,7 +853,8 @@ function balanceTags($text)
 		$tagqueue = '';
 
 		// Pop or Push
-		if ($regex[1][0] == "/") { // End Tag
+		if( substr($regex[1],0,1) == '/' ) 
+		{ // End Tag
 			$tag = strtolower(substr($regex[1],1));
 
 			// if too many closing tags
@@ -880,7 +881,9 @@ function balanceTags($text)
 				}
 				$tag = '';
 			}
-		} else { // Begin Tag
+		}
+		else 
+		{ // Begin Tag
 			$tag = strtolower($regex[1]);
 
 			// Tag Cleaning

@@ -24,7 +24,7 @@
       <title><?php the_title( '', '', false, 'xml' ) ?></title>
       <description><?php
         the_link( '', ' ', 'xml' );
-        the_content(T_('[...] Read more!'), 0, '', '', '', '', 'entityencoded' );
+        the_content(T_('[...] Read more!'), 0, '', '', '', '', 'entityencoded', 0, 0, 1 );
       ?></description>
       <link><?php permalink_single() ?></link>
     </item>

@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.8.5.7
+ * Version of this file: 0.8.6.2
  *
  * Reminder: everything that starts with #, /* or // is a comment
  */
@@ -73,7 +73,7 @@ $use_preview = 1;
 
 
 # set this to 0 to disable the spell checker, or 1 to enable it
-$use_spellchecker = 0;
+$use_spellchecker = 1;
 
 
 
@@ -94,23 +94,38 @@ $notify_from = $b2evo_name.'@'.$basehost; // comment this if you want to customi
 
 
 
-# set this to 1 if you want your site to be listed on http://b2evolution.net when you add a new post
-$use_b2evonetping = 1;
+# Listing on http://b2evolution.net
+# set this to 1 if you want your site to be listed on b2evolution.net when you add a new post
+# ATTENTION: Please do only enable this AFTER you have done all your blog setup tests and when
+# your blog url is definitive. This way you avoid leaving broken URLs out on the net.
+# PLEASE NOTE: If you removed the b2evolution button and the link to b2evolution from your blog,
+# don't even bother enabling this. You will *not* be approved and your blog will be blacklisted.
+# Also, the Full Name of your blog must be written in ISO 8859-1 (Latin-1) charset, otherwise we
+# cannot display it on b2evolution.net. You can use HTML entities (e-g &Kappa;) for non latin chars.
+$use_b2evonetping = 0;
 
-# fill these only if you have a Cafelog ID,
-# this enables your blog to be in the Recently Updated b2 blogs list.
-# to obtain this ID, e-mail update@tidakada.com with these details:
-#  name of the weblog, weblog's URL, your e-mail address, and a password
-# in the future, the password will allow you to change these details online
-$cafelogID = '';
+# Listing on http://cafelog.com
+# set this to 1 if you want your site to be listed on cafelog.com when you add a new post
+# ATTENTION: Please do only enable this AFTER you have done all your blog setup tests and when
+# your blog url is definitive. This way you avoid leaving broken URLs out on the net.
+# Fill these only if you obtained a Cafelog ID when b2/cafelog was active. 
+$cafelogID = '';				 # Fill in your Cafelog ID here
 $use_cafelogping = 0;    # set this to 1 if you do have a Cafelog ID
 
-# set this to 1 if you want your site to be listed on http://weblogs.com when you add a new post
-$use_weblogsping = 1;
+# Listing on http://weblogs.com
+# set this to 1 if you want your site to be listed on weblogs.com when you add a new post
+# ATTENTION: Please do only enable this AFTER you have done all your blog setup tests and when
+# your blog url is definitive. This way you avoid leaving broken URLs out on the net.
+$use_weblogsping = 1;		 # This default is 1 for all those guys who'll never read this file! :P
+												 # this way they'll have at least one ping up and running. 
+												 # weblogs.com will automatically discard test pings after a while.
 
+# Listing on http://blo.gs
 # set this to 1 if you want your site to be listed on http://blo.gs when you add a new post
-$use_blodotgsping = 1;
-# Use etended ping to RSS?
+# ATTENTION: Please do only enable this AFTER you have done all your blog setup tests and when
+# your blog url is definitive. This way you avoid leaving broken URLs out on the net.
+$use_blodotgsping = 0;
+# Use extended ping to RSS?
 $use_rss = 1;
 
 

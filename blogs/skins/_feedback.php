@@ -14,7 +14,7 @@
 
 	// --- //
 
-	if( ! ( $withcomments || $c ) ) 
+	if( ! $c ) 
 	{	// Comments not requested
 		$disp_comments = 0;					// DO NOT Display the comments if not requested
 		$disp_comment_form = 0;			// DO NOT Display the comments form if not requested

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-12-16 01:24+0100\n"
+"POT-Creation-Date: 2004-01-13 01:52+0100\n"
 "PO-Revision-Date: 2003-09-26 10:20+0300\n"
 "Last-Translator: Arthur H. S. Zapparoli <arthurzap@pop.com.br>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -204,7 +204,7 @@ msgstr ""
 #: ..\..\..\noskin_all.php:241 ..\..\..\noskin_b.php:147
 #: ..\..\..\noskin_b.php:250 ..\..\..\noskin_roll.php:146
 #: ..\..\..\noskin_roll.php:240 ..\..\..\admin\b2categories.php:9
-#: ..\..\..\admin\b2categories.php:218 ..\..\..\admin\_edit_form.php:258
+#: ..\..\..\admin\b2categories.php:230 ..\..\..\admin\_edit_form.php:254
 #: ..\..\..\admin\_edit_showposts.php:418 ..\..\..\skins\custom\_main.php:75
 #: ..\..\..\skins\custom\_main.php:173
 #: ..\..\..\skins\fplanque2002\_main.php:93
@@ -405,10 +405,10 @@ msgstr "Bolgroll"
 msgid "Syndicate this blog"
 msgstr "Syndicate este blog"
 
-#: ..\..\..\noskin_a.php:338 ..\..\..\noskin_all.php:340
-#: ..\..\..\noskin_b.php:349 ..\..\..\noskin_roll.php:339
+#: ..\..\..\noskin_a.php:337 ..\..\..\noskin_all.php:339
+#: ..\..\..\noskin_b.php:347 ..\..\..\noskin_roll.php:338
 #: ..\..\..\skins\babyblues\_main.php:124 ..\..\..\skins\bluesky\_main.php:233
-#: ..\..\..\skins\custom\_main.php:274
+#: ..\..\..\skins\custom\_main.php:273
 #: ..\..\..\skins\fplanque2002\_main.php:293
 #: ..\..\..\skins\guadeloupe\_main.php:234
 #: ..\..\..\skins\originalb2\_main.php:180
@@ -437,8 +437,8 @@ msgstr "Mais demos"
 msgid "Blogs"
 msgstr "Blogs"
 
-#: ..\..\..\admin\b2blogs.php:21 ..\..\..\admin\b2blogs.php:50
-#: ..\..\..\admin\b2blogs.php:160 ..\..\..\admin\b2blogs.php:187
+#: ..\..\..\admin\b2blogs.php:21 ..\..\..\admin\b2blogs.php:51
+#: ..\..\..\admin\b2blogs.php:161 ..\..\..\admin\b2blogs.php:187
 #: ..\..\..\admin\b2blogs.php:282
 msgid "You have no right to edit the blogs."
 msgstr "Você não tem permissões para editar os blogs."
@@ -447,7 +447,7 @@ msgstr "Você não tem permissões para editar os blogs."
 msgid "New blog"
 msgstr "Novo blog"
 
-#: ..\..\..\admin\b2blogs.php:71 ..\..\..\admin\b2blogs.php:209
+#: ..\..\..\admin\b2blogs.php:71 ..\..\..\admin\b2blogs.php:208
 #: ..\..\..\admin\edit_actions.php:181
 msgid "Cannot update, please correct these errors:"
 msgstr "Não foi possível atualizar, por favos corrija estes erros:"
@@ -455,6 +455,11 @@ msgstr "Não foi possível atualizar, por favos corrija estes erros:"
 #: ..\..\..\admin\b2blogs.php:72
 msgid "Back to new blog form"
 msgstr "Voltar para o formulário de novo blog"
+
+#: ..\..\..\admin\b2blogs.php:80
+#, fuzzy
+msgid "Creating blog..."
+msgstr "Criando"
 
 #: ..\..\..\admin\b2blogs.php:91
 msgid "Trying to create stub file"
@@ -501,36 +506,36 @@ msgid "You should <a href=\"%s\">create categories</a> for this blog now!"
 msgstr ""
 "Você precisa <a href=\"%s\">criar as categorias</a> para este blog agora!"
 
-#: ..\..\..\admin\b2blogs.php:163
+#: ..\..\..\admin\b2blogs.php:164
 msgid "Blog params for:"
 msgstr "Parâmetros do blog para:"
 
-#: ..\..\..\admin\b2blogs.php:210
+#: ..\..\..\admin\b2blogs.php:209
 msgid "Back to blog editing"
 msgstr "Voltar para a edição de blogs"
 
-#: ..\..\..\admin\b2blogs.php:233 ..\..\..\admin\_blogs_list.php:13
+#: ..\..\..\admin\b2blogs.php:232 ..\..\..\admin\_blogs_list.php:13
 msgid "Blog"
 msgstr "Blog"
 
-#: ..\..\..\admin\b2blogs.php:237
+#: ..\..\..\admin\b2blogs.php:236
 msgid "You have no right to generate static pages."
 msgstr "Você não tem permissão para gerar páginas estáticas."
 
-#: ..\..\..\admin\b2blogs.php:243
+#: ..\..\..\admin\b2blogs.php:242
 msgid "You haven't set a static filename for this blog!"
 msgstr "Você não configurou um nome de arquivo estático para este blog!"
 
-#: ..\..\..\admin\b2blogs.php:252
+#: ..\..\..\admin\b2blogs.php:251
 #, php-format
 msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
 msgstr "Gerando página de <strong>%s</strong> para <strong>%s</strong>..."
 
-#: ..\..\..\admin\b2blogs.php:264
+#: ..\..\..\admin\b2blogs.php:263
 msgid "Writing to file..."
 msgstr "Escrevendo no arquivo..."
 
-#: ..\..\..\admin\b2blogs.php:270 ..\..\..\admin\edit_actions.php:97
+#: ..\..\..\admin\b2blogs.php:269 ..\..\..\admin\edit_actions.php:97
 #: ..\..\..\admin\edit_actions.php:214 ..\..\..\admin\edit_actions.php:285
 #: ..\..\..\b2evocore\_functions_pings.php:53
 #: ..\..\..\b2evocore\_functions_pings.php:87
@@ -558,7 +563,9 @@ msgstr ""
 "Quando você for promovido, apenas atualize esta página e você poderá "
 "blogar. :)"
 
-#: ..\..\..\admin\b2categories.php:21 ..\..\..\admin\b2categories.php:210
+#: ..\..\..\admin\b2categories.php:21 ..\..\..\admin\b2categories.php:62
+#: ..\..\..\admin\b2categories.php:91 ..\..\..\admin\b2categories.php:120
+#: ..\..\..\admin\b2categories.php:203 ..\..\..\admin\b2categories.php:222
 msgid "You have no right to edit the categories."
 msgstr "Você não tem permissão para editar categorias."
 
@@ -581,11 +588,11 @@ msgstr "Novo nome da categoria"
 msgid "Create category"
 msgstr "Nova categoria pai"
 
-#: ..\..\..\admin\b2categories.php:88
+#: ..\..\..\admin\b2categories.php:95
 msgid "Deleting category..."
 msgstr "Deletando categoria..."
 
-#: ..\..\..\admin\b2categories.php:98
+#: ..\..\..\admin\b2categories.php:103
 #: ..\..\..\b2evocore\_functions_users.php:107
 #: ..\..\..\b2evocore\_functions_users.php:138
 #: ..\..\..\htsrv\profile_update.php:47 ..\..\..\htsrv\profile_update.php:56
@@ -598,54 +605,54 @@ msgstr "Deletando categoria..."
 msgid "ERROR"
 msgstr "ERRO"
 
-#: ..\..\..\admin\b2categories.php:102
+#: ..\..\..\admin\b2categories.php:107
 msgid "Category deleted."
 msgstr "Categoria deletada."
 
-#: ..\..\..\admin\b2categories.php:119
+#: ..\..\..\admin\b2categories.php:130
 msgid "<strong>Old</strong> name"
 msgstr "Nome <strong>antigo</strong>"
 
-#: ..\..\..\admin\b2categories.php:122
+#: ..\..\..\admin\b2categories.php:133
 msgid "<strong>New</strong> name"
 msgstr "Nome <strong>novo</strong>"
 
-#: ..\..\..\admin\b2categories.php:126
+#: ..\..\..\admin\b2categories.php:137
 msgid "New parent category"
 msgstr "Nova categoria pai"
 
-#: ..\..\..\admin\b2categories.php:152 ..\..\..\admin\b2categories.php:171
+#: ..\..\..\admin\b2categories.php:163 ..\..\..\admin\b2categories.php:182
 msgid "Old Parent"
 msgstr "Pai antigo"
 
-#: ..\..\..\admin\b2categories.php:169
+#: ..\..\..\admin\b2categories.php:180
 msgid "Root (No parent)"
 msgstr ""
 
-#: ..\..\..\admin\b2categories.php:180
+#: ..\..\..\admin\b2categories.php:191
 #, fuzzy
 msgid "Edit category!"
 msgstr "Nova categoria pai"
 
-#: ..\..\..\admin\b2categories.php:231 ..\..\..\admin\_blogs_list.php:25
-#: ..\..\..\admin\_edit_form.php:199
+#: ..\..\..\admin\b2categories.php:243 ..\..\..\admin\_blogs_list.php:25
+#: ..\..\..\admin\_edit_form.php:195
 msgid "Edit"
 msgstr "Editar"
 
-#: ..\..\..\admin\b2categories.php:233 ..\..\..\admin\_edit_showposts.php:154
+#: ..\..\..\admin\b2categories.php:245 ..\..\..\admin\_edit_showposts.php:154
 #: ..\..\..\admin\_edit_showposts.php:204
 msgid "Delete"
 msgstr "Deletar"
 
-#: ..\..\..\admin\b2categories.php:238
+#: ..\..\..\admin\b2categories.php:250
 msgid "New sub-category here"
 msgstr "Nova sub-categoria aqui"
 
-#: ..\..\..\admin\b2categories.php:253
+#: ..\..\..\admin\b2categories.php:265
 msgid "New category here"
 msgstr "Nova categoria aqui"
 
-#: ..\..\..\admin\b2categories.php:258
+#: ..\..\..\admin\b2categories.php:270
 msgid ""
 "<strong>Note:</strong> Deleting a category does not delete posts from that "
 "category. It will just assign them to the parent category. When deleting a "
@@ -842,19 +849,19 @@ msgstr ""
 msgid "View Stats"
 msgstr "Visualizar Estatísticas"
 
-#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:118
+#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:126
 msgid "Summary"
 msgstr "Sumário"
 
-#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:141
+#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:149
 msgid "Referers"
 msgstr "Referências"
 
-#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:142
+#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:150
 msgid "Refering Searches"
 msgstr "Referências de Busca"
 
-#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:144
+#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:152
 msgid "Syndication"
 msgstr "Syndication"
 
@@ -862,7 +869,7 @@ msgstr "Syndication"
 msgid "User Agents"
 msgstr "Agentes do usuário"
 
-#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:145
+#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:153
 msgid "Direct Accesses"
 msgstr "Acessos diretos"
 
@@ -870,77 +877,87 @@ msgstr "Acessos diretos"
 msgid "You have no right to view stats."
 msgstr "Você não tem permissão para visualizar es estatísticas"
 
-#: ..\..\..\admin\b2stats.php:62
+#: ..\..\..\admin\b2stats.php:59
+#, fuzzy
+msgid "You have no right to change a hit type."
+msgstr "Você não tem permissões para editar os blogs."
+
+#: ..\..\..\admin\b2stats.php:66
 #, php-format
 msgid "Changing hit #%d type to: %s"
 msgstr "Alterando hit #%d tipo para: %s"
 
-#: ..\..\..\admin\b2stats.php:75
+#: ..\..\..\admin\b2stats.php:78
+#, fuzzy
+msgid "You have no right to delete a hit."
+msgstr "Você não tem permissão para visualizar es estatísticas"
+
+#: ..\..\..\admin\b2stats.php:83
 #, php-format
 msgid "Deleting hit #%d..."
 msgstr "Deletando hit #%d..."
 
-#: ..\..\..\admin\b2stats.php:87
+#: ..\..\..\admin\b2stats.php:95
 msgid "Filter"
 msgstr "Filtro"
 
-#: ..\..\..\admin\b2stats.php:90 ..\..\..\admin\b2stats.php:94
+#: ..\..\..\admin\b2stats.php:98 ..\..\..\admin\b2stats.php:102
 msgid "None"
 msgstr "Nenhum"
 
-#: ..\..\..\admin\b2stats.php:140
+#: ..\..\..\admin\b2stats.php:148
 msgid "Date"
 msgstr "Data"
 
-#: ..\..\..\admin\b2stats.php:143
+#: ..\..\..\admin\b2stats.php:151
 msgid "Indexing Robots"
 msgstr "Indexando Robôs"
 
-#: ..\..\..\admin\b2stats.php:146
+#: ..\..\..\admin\b2stats.php:154
 msgid "Total"
 msgstr "Total"
 
-#: ..\..\..\admin\b2stats.php:200 ..\..\..\skins\_stats.php:16
+#: ..\..\..\admin\b2stats.php:208 ..\..\..\skins\_stats.php:16
 msgid "Last referers"
 msgstr "Últimas referências"
 
-#: ..\..\..\admin\b2stats.php:201
+#: ..\..\..\admin\b2stats.php:209
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Estes são os hits de páginas externas referenciando este blog"
 
-#: ..\..\..\admin\b2stats.php:208 ..\..\..\admin\b2stats.php:251
-#: ..\..\..\admin\b2stats.php:331
+#: ..\..\..\admin\b2stats.php:216 ..\..\..\admin\b2stats.php:259
+#: ..\..\..\admin\b2stats.php:339
 msgid "Delete this hit!"
 msgstr "Delete este hit!"
 
 #. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:208 ..\..\..\admin\b2stats.php:251
-#: ..\..\..\admin\b2stats.php:331 ..\..\..\admin\_user_list.php:45
+#: ..\..\..\admin\b2stats.php:216 ..\..\..\admin\b2stats.php:259
+#: ..\..\..\admin\b2stats.php:339 ..\..\..\admin\_user_list.php:45
 msgid "Del"
 msgstr "Del"
 
-#: ..\..\..\admin\b2stats.php:209
+#: ..\..\..\admin\b2stats.php:217
 msgid "Log as a search instead"
 msgstr "Registrar como busca"
 
 #. TRANS: Abbrev. for "move to searches" (stats)
-#: ..\..\..\admin\b2stats.php:209
+#: ..\..\..\admin\b2stats.php:217
 msgid "-&gt;S"
 msgstr "-&gt;B"
 
-#: ..\..\..\admin\b2stats.php:218 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:226 ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Top Referentes"
 
-#: ..\..\..\admin\b2stats.php:229
+#: ..\..\..\admin\b2stats.php:237
 msgid "Total referers"
 msgstr "Total de referências"
 
-#: ..\..\..\admin\b2stats.php:243 ..\..\..\skins\_stats.php:36
+#: ..\..\..\admin\b2stats.php:251 ..\..\..\skins\_stats.php:36
 msgid "Last refering searches"
 msgstr "Últimas referências de busca"
 
-#: ..\..\..\admin\b2stats.php:244
+#: ..\..\..\admin\b2stats.php:252
 msgid ""
 "These are hits from people who came to this blog system through a search "
 "engine. (Search engines must be listed in /conf/_stats.php)"
@@ -948,15 +965,15 @@ msgstr ""
 "Estes são os hits das pessoas que vêm até este blog através de um sistema de "
 "busca. (Sistemas de busca devem ser lkistados em /conf/_stats.php)"
 
-#: ..\..\..\admin\b2stats.php:260
+#: ..\..\..\admin\b2stats.php:268
 msgid "Top refering search engines"
 msgstr "Top Sistemas de busca referentes"
 
-#: ..\..\..\admin\b2stats.php:272 ..\..\..\skins\_stats.php:60
+#: ..\..\..\admin\b2stats.php:280 ..\..\..\skins\_stats.php:60
 msgid "Top Indexing Robots"
 msgstr "Top Indexamento de Robôs"
 
-#: ..\..\..\admin\b2stats.php:273
+#: ..\..\..\admin\b2stats.php:281
 msgid ""
 "These are hits from automated robots like search engines' indexing robots. "
 "(Robots must be listed in /conf/_stats.php)"
@@ -964,11 +981,11 @@ msgstr ""
 "Estes são os hits de robês automaticos como sistemas de busca com "
 "indexamento por robôs. (Robôs precisam ser listados em /conf/_stats.php)"
 
-#: ..\..\..\admin\b2stats.php:297 ..\..\..\skins\_stats.php:75
+#: ..\..\..\admin\b2stats.php:305 ..\..\..\skins\_stats.php:75
 msgid "Top Aggregators"
 msgstr "Top Agregadores"
 
-#: ..\..\..\admin\b2stats.php:298
+#: ..\..\..\admin\b2stats.php:306
 msgid ""
 "These are hits from RSS news aggregators. (Aggregators must be listed in /"
 "conf/_stats.php)"
@@ -976,15 +993,15 @@ msgstr ""
 "Estes são os hits de agregadores RSS. (Agregadores precisas ser listados em /"
 "conf/_stats.php)"
 
-#: ..\..\..\admin\b2stats.php:309
+#: ..\..\..\admin\b2stats.php:317
 msgid "Total RSS hits"
 msgstr "Total hits de RSS"
 
-#: ..\..\..\admin\b2stats.php:323
+#: ..\..\..\admin\b2stats.php:331
 msgid "Last direct accesses"
 msgstr "Últimos acessos diretos"
 
-#: ..\..\..\admin\b2stats.php:324
+#: ..\..\..\admin\b2stats.php:332
 msgid ""
 "These are hits from people who came to this blog system by direct access "
 "(either by typing the URL directly, or using a bookmark. Invalid (too short) "
@@ -994,7 +1011,7 @@ msgstr ""
 "escrevendo a URL diretamente ou usando o bookmark. Referências inválidas "
 "(muito curtas) também são listadas aqui.)"
 
-#: ..\..\..\admin\b2stats.php:351
+#: ..\..\..\admin\b2stats.php:359
 #, fuzzy
 msgid "Top User Agents"
 msgstr "Agentes do usuário"
@@ -1007,7 +1024,7 @@ msgstr "Administração de usuários"
 msgid "Profile for:"
 msgstr "Perfil de:"
 
-#: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:206
+#: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:209
 #: ..\..\..\htsrv\login.php:74 ..\..\..\htsrv\register.php:92
 #: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:21
 #: ..\..\..\htsrv\_reg_complete.php:14 ..\..\..\htsrv\_reg_form.php:22
@@ -1322,7 +1339,7 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
-#: ..\..\..\admin\b2upload.php:237 ..\..\..\admin\_edit_form.php:354
+#: ..\..\..\admin\b2upload.php:237 ..\..\..\admin\_edit_form.php:350
 msgid "Type"
 msgstr ""
 
@@ -1336,11 +1353,11 @@ msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:177
 #: ..\..\..\admin\edit_actions.php:347 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1197
+#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1202
 msgid "Supplied URL is invalid: "
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:76 ..\..\..\htsrv\getmail.php:238
+#: ..\..\..\admin\edit_actions.php:76 ..\..\..\htsrv\getmail.php:241
 msgid "Cannot post, please correct these errors:"
 msgstr ""
 
@@ -1571,86 +1588,86 @@ msgstr ""
 msgid "Edit this !"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:185
+#: ..\..\..\admin\_edit_form.php:183
 msgid "Spellcheck"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:192
+#: ..\..\..\admin\_edit_form.php:188
 msgid "Upload a file/image"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:243 ..\..\..\admin\_edit_form.php:355
+#: ..\..\..\admin\_edit_form.php:239 ..\..\..\admin\_edit_form.php:351
 #: ..\..\..\admin\_edit_showposts.php:128
 msgid "Status"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:245
+#: ..\..\..\admin\_edit_form.php:241
 msgid "The post will be publicly published"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:245 ..\..\..\admin\_edit_showposts.php:316
+#: ..\..\..\admin\_edit_form.php:241 ..\..\..\admin\_edit_showposts.php:316
 msgid "Published (Public)"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:247
+#: ..\..\..\admin\_edit_form.php:243
 msgid "The post will be published but visible only by logged-in team members"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:247 ..\..\..\admin\_edit_showposts.php:318
+#: ..\..\..\admin\_edit_form.php:243 ..\..\..\admin\_edit_showposts.php:318
 msgid "Protected (Members only)"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:249
+#: ..\..\..\admin\_edit_form.php:245
 msgid "The post will be published but visible only by yourself"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:249 ..\..\..\admin\_edit_showposts.php:320
+#: ..\..\..\admin\_edit_form.php:245 ..\..\..\admin\_edit_showposts.php:320
 msgid "Private (You only)"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_form.php:247 ..\..\..\admin\_edit_form.php:249
 msgid "The post will appear only in the backoffice"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_showposts.php:322
+#: ..\..\..\admin\_edit_form.php:247 ..\..\..\admin\_edit_showposts.php:322
 msgid "Draft (Not published!)"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:253 ..\..\..\admin\_edit_showposts.php:324
+#: ..\..\..\admin\_edit_form.php:249 ..\..\..\admin\_edit_showposts.php:324
 msgid "Deprecated (Not published!)"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:262
+#: ..\..\..\admin\_edit_form.php:258
 msgid ""
 "Select main category in target blog and optionnaly check addtionnal "
 "categories"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:284
+#: ..\..\..\admin\_edit_form.php:280
 msgid "Select as an additionnal category"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:297
+#: ..\..\..\admin\_edit_form.php:293
 msgid "Select as MAIN category"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:324
+#: ..\..\..\admin\_edit_form.php:320
 msgid "Note: Cross posting among multiple blogs is enabled."
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:335
+#: ..\..\..\admin\_edit_form.php:331
 msgid "Note: Cross posting among multiple blogs is currently disabled."
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:337
+#: ..\..\..\admin\_edit_form.php:333
 msgid "Note: Cross posting among multiple categories is currently disabled."
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:353
+#: ..\..\..\admin\_edit_form.php:349
 msgid "Comment info"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:356
+#: ..\..\..\admin\_edit_form.php:352
 msgid "IP address"
 msgstr ""
 
@@ -1939,6 +1956,10 @@ msgstr ""
 msgid "no teaser [Alt-T]"
 msgstr ""
 
+#: ..\..\..\admin\_quicktags.php:214
+msgid "next page [Alt-Q]"
+msgstr ""
+
 #. TRANS: table header for user list
 #: ..\..\..\admin\_user_list.php:12
 msgid "Login "
@@ -1951,15 +1972,11 @@ msgid ""
 "deleted too!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_blog_main.php:181
-msgid " (default skin)"
-msgstr ""
-
-#: ..\..\..\b2evocore\_blog_main.php:182
+#: ..\..\..\b2evocore\_blog_main.php:154
 #, php-format
 msgid ""
-"The requested skin [%s] does not exist. The blog cannot be displayed. "
-"Contact the <a %s>webmaster</a>..."
+"The default skin [%s] does not exist. It must be properly set in the blog "
+"stub file [%s]. Contact the <a %s>webmaster</a>..."
 msgstr ""
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:112
@@ -2196,20 +2213,20 @@ msgstr ""
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:990
+#: ..\..\..\b2evocore\_functions.php:993
 #, php-format
 msgid "Parameter %s is required!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1193
+#: ..\..\..\b2evocore\_functions.php:1196
 msgid "Invalid URL"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1199
+#: ..\..\..\b2evocore\_functions.php:1202
 msgid "URI scheme not allowed"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:1207
+#: ..\..\..\b2evocore\_functions.php:1210
 msgid "URL not allowed"
 msgstr ""
 
@@ -2217,41 +2234,41 @@ msgstr ""
 msgid "Requested blog does not exist!"
 msgstr ""
 
+#: ..\..\..\b2evocore\_functions_bposts.php:447
+msgid "Post details"
+msgstr ""
+
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_functions_bposts.php:311
+#: ..\..\..\b2evocore\_functions_bposts.php:488
 msgid "Read more!"
 msgstr ""
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_functions_bposts.php:316
+#: ..\..\..\b2evocore\_functions_bposts.php:493
 msgid "More:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:507
-msgid "Post details"
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_bposts.php:563
+#: ..\..\..\b2evocore\_functions_bposts.php:589
 msgid "Next page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:564
+#: ..\..\..\b2evocore\_functions_bposts.php:590
 msgid "Previous page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:605
+#: ..\..\..\b2evocore\_functions_bposts.php:633
 msgid "Previous post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:658
+#: ..\..\..\b2evocore\_functions_bposts.php:686
 msgid "Next post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:751
+#: ..\..\..\b2evocore\_functions_bposts.php:779
 msgid "Next Page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:778
+#: ..\..\..\b2evocore\_functions_bposts.php:806
 msgid "Previous Page"
 msgstr ""
 
@@ -2333,89 +2350,89 @@ msgstr ""
 msgid "BEGIN"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:61
+#: ..\..\..\b2evocore\_functions_pingback.php:65
 msgid "Post contents"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:85
-#: ..\..\..\b2evocore\_functions_pingback.php:86
+#: ..\..\..\b2evocore\_functions_pingback.php:96
+#: ..\..\..\b2evocore\_functions_pingback.php:97
 msgid "Processing:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:90
-#: ..\..\..\b2evocore\_functions_pingback.php:91
+#: ..\..\..\b2evocore\_functions_pingback.php:101
+#: ..\..\..\b2evocore\_functions_pingback.php:102
 msgid "Couldn't find a hostname for:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:105
+#: ..\..\..\b2evocore\_functions_pingback.php:116
 msgid "Connect to server at:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:108
-#: ..\..\..\b2evocore\_functions_pingback.php:109
+#: ..\..\..\b2evocore\_functions_pingback.php:120
+#: ..\..\..\b2evocore\_functions_pingback.php:121
 msgid "Couldn't open a connection to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:119
+#: ..\..\..\b2evocore\_functions_pingback.php:132
 msgid "Start receiving headers and content"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:149
-#: ..\..\..\b2evocore\_functions_pingback.php:150
+#: ..\..\..\b2evocore\_functions_pingback.php:166
+#: ..\..\..\b2evocore\_functions_pingback.php:167
 msgid "Pingback server found from X-Pingback header:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:163
-#: ..\..\..\b2evocore\_functions_pingback.php:164
+#: ..\..\..\b2evocore\_functions_pingback.php:180
+#: ..\..\..\b2evocore\_functions_pingback.php:181
 msgid "Pingback server found from Pingback <link /> tag:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:172
-#: ..\..\..\b2evocore\_functions_pingback.php:173
+#: ..\..\..\b2evocore\_functions_pingback.php:189
+#: ..\..\..\b2evocore\_functions_pingback.php:190
 msgid "Pingback server not found in headers and content"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:178
-#: ..\..\..\b2evocore\_functions_pingback.php:179
+#: ..\..\..\b2evocore\_functions_pingback.php:195
+#: ..\..\..\b2evocore\_functions_pingback.php:196
 msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:184
+#: ..\..\..\b2evocore\_functions_pingback.php:201
 msgid "Pingback server data"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:202
-#: ..\..\..\b2evocore\_functions_pingback.php:203
+#: ..\..\..\b2evocore\_functions_pingback.php:211
+#: ..\..\..\b2evocore\_functions_pingback.php:212
 msgid "Page Linked To:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:204
-#: ..\..\..\b2evocore\_functions_pingback.php:205
+#: ..\..\..\b2evocore\_functions_pingback.php:213
+#: ..\..\..\b2evocore\_functions_pingback.php:214
 msgid "Page Linked From:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:210
+#: ..\..\..\b2evocore\_functions_pingback.php:219
 #, php-format
 msgid "Pinging %s..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:220
+#: ..\..\..\b2evocore\_functions_pingback.php:229
 msgid "END"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:222
+#: ..\..\..\b2evocore\_functions_pingback.php:231
 msgid "Pingbacks done."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:244
+#: ..\..\..\b2evocore\_functions_pingback.php:253
 msgid "Pingback (0)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:245
+#: ..\..\..\b2evocore\_functions_pingback.php:254
 msgid "Pingback (1)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pingback.php:246
+#: ..\..\..\b2evocore\_functions_pingback.php:255
 msgid "Pingbacks (%)"
 msgstr ""
 
@@ -2466,19 +2483,19 @@ msgstr ""
 msgid "Sending trackback to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:109
+#: ..\..\..\b2evocore\_functions_trackback.php:110
 msgid "Response:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:149
+#: ..\..\..\b2evocore\_functions_trackback.php:150
 msgid "Trackback (0)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:150
+#: ..\..\..\b2evocore\_functions_trackback.php:151
 msgid "Trackback (1)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:151
+#: ..\..\..\b2evocore\_functions_trackback.php:152
 msgid "Trackbacks (%)"
 msgstr ""
 
@@ -2535,196 +2552,196 @@ msgstr ""
 msgid "Profile (%s)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:105
+#: ..\..\..\b2evocore\_vars.php:108
 msgid "Sunday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:106
+#: ..\..\..\b2evocore\_vars.php:109
 msgid "Monday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:107
+#: ..\..\..\b2evocore\_vars.php:110
 msgid "Tuesday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:108
+#: ..\..\..\b2evocore\_vars.php:111
 msgid "Wednesday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:109
+#: ..\..\..\b2evocore\_vars.php:112
 msgid "Thursday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:110
+#: ..\..\..\b2evocore\_vars.php:113
 msgid "Friday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:111
+#: ..\..\..\b2evocore\_vars.php:114
 msgid "Saturday"
 msgstr ""
 
 #. TRANS: abbrev. for Sunday
-#: ..\..\..\b2evocore\_vars.php:115
+#: ..\..\..\b2evocore\_vars.php:118
 msgid "Sun"
 msgstr ""
 
 #. TRANS: abbrev. for Monday
-#: ..\..\..\b2evocore\_vars.php:117
+#: ..\..\..\b2evocore\_vars.php:120
 msgid "Mon"
 msgstr ""
 
 #. TRANS: abbrev. for Tuesday
-#: ..\..\..\b2evocore\_vars.php:119
+#: ..\..\..\b2evocore\_vars.php:122
 msgid "Tue"
 msgstr ""
 
 #. TRANS: abbrev. for Wednesday
-#: ..\..\..\b2evocore\_vars.php:121
+#: ..\..\..\b2evocore\_vars.php:124
 msgid "Wed"
 msgstr ""
 
 #. TRANS: abbrev. for Thursday
-#: ..\..\..\b2evocore\_vars.php:123
+#: ..\..\..\b2evocore\_vars.php:126
 msgid "Thu"
 msgstr ""
 
 #. TRANS: abbrev. for Friday
-#: ..\..\..\b2evocore\_vars.php:125
+#: ..\..\..\b2evocore\_vars.php:128
 msgid "Fri"
 msgstr ""
 
 #. TRANS: abbrev. for Saturday
-#: ..\..\..\b2evocore\_vars.php:127
+#: ..\..\..\b2evocore\_vars.php:130
 msgid "Sat"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:130
+#: ..\..\..\b2evocore\_vars.php:133
 msgid "January"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:131
+#: ..\..\..\b2evocore\_vars.php:134
 msgid "February"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:132
+#: ..\..\..\b2evocore\_vars.php:135
 msgid "March"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:133
+#: ..\..\..\b2evocore\_vars.php:136
 msgid "April"
 msgstr ""
 
 #. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-#: ..\..\..\b2evocore\_vars.php:135
+#: ..\..\..\b2evocore\_vars.php:138
 msgid "May "
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:136
+#: ..\..\..\b2evocore\_vars.php:139
 msgid "June"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:137
+#: ..\..\..\b2evocore\_vars.php:140
 msgid "July"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:138
+#: ..\..\..\b2evocore\_vars.php:141
 msgid "August"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:139
+#: ..\..\..\b2evocore\_vars.php:142
 msgid "September"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:140
+#: ..\..\..\b2evocore\_vars.php:143
 msgid "October"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:141
+#: ..\..\..\b2evocore\_vars.php:144
 msgid "November"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:142
+#: ..\..\..\b2evocore\_vars.php:145
 msgid "December"
 msgstr ""
 
 #. TRANS: abbrev. for January
-#: ..\..\..\b2evocore\_vars.php:146
+#: ..\..\..\b2evocore\_vars.php:149
 msgid "Jan"
 msgstr ""
 
 #. TRANS: abbrev. for February
-#: ..\..\..\b2evocore\_vars.php:148
+#: ..\..\..\b2evocore\_vars.php:151
 msgid "Feb"
 msgstr ""
 
 #. TRANS: abbrev. for March
-#: ..\..\..\b2evocore\_vars.php:150
+#: ..\..\..\b2evocore\_vars.php:153
 msgid "Mar"
 msgstr ""
 
 #. TRANS: abbrev. for April
-#: ..\..\..\b2evocore\_vars.php:152
+#: ..\..\..\b2evocore\_vars.php:155
 msgid "Apr"
 msgstr ""
 
 #. TRANS: abbrev. for May
-#: ..\..\..\b2evocore\_vars.php:154
+#: ..\..\..\b2evocore\_vars.php:157
 msgid "May"
 msgstr ""
 
 #. TRANS: abbrev. for June
-#: ..\..\..\b2evocore\_vars.php:156
+#: ..\..\..\b2evocore\_vars.php:159
 msgid "Jun"
 msgstr ""
 
 #. TRANS: abbrev. for July
-#: ..\..\..\b2evocore\_vars.php:158
+#: ..\..\..\b2evocore\_vars.php:161
 msgid "Jul"
 msgstr ""
 
 #. TRANS: abbrev. for August
-#: ..\..\..\b2evocore\_vars.php:160
+#: ..\..\..\b2evocore\_vars.php:163
 msgid "Aug"
 msgstr ""
 
 #. TRANS: abbrev. for September
-#: ..\..\..\b2evocore\_vars.php:162
+#: ..\..\..\b2evocore\_vars.php:165
 msgid "Sep"
 msgstr ""
 
 #. TRANS: abbrev. for October
-#: ..\..\..\b2evocore\_vars.php:164
+#: ..\..\..\b2evocore\_vars.php:167
 msgid "Oct"
 msgstr ""
 
 #. TRANS: abbrev. for November
-#: ..\..\..\b2evocore\_vars.php:166
+#: ..\..\..\b2evocore\_vars.php:169
 msgid "Nov"
 msgstr ""
 
 #. TRANS: abbrev. for December
-#: ..\..\..\b2evocore\_vars.php:168
+#: ..\..\..\b2evocore\_vars.php:171
 msgid "Dec"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:172
+#: ..\..\..\b2evocore\_vars.php:175
 msgid "Published"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:173
+#: ..\..\..\b2evocore\_vars.php:176
 #, fuzzy
 msgid "Deprecated"
 msgstr "Selecionado"
 
-#: ..\..\..\b2evocore\_vars.php:174
+#: ..\..\..\b2evocore\_vars.php:177
 msgid "Protected"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:175
+#: ..\..\..\b2evocore\_vars.php:178
 msgid "Private"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:176
+#: ..\..\..\b2evocore\_vars.php:179
 #, fuzzy
 msgid "Draft"
 msgstr "Data"
@@ -2802,8 +2819,8 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:101 ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1223
+#: ..\..\..\htsrv\comment_post.php:101 ..\..\..\htsrv\trackback.php:97
+#: ..\..\..\xmlsrv\xmlrpc.php:1228
 msgid "Url"
 msgstr ""
 
@@ -2811,8 +2828,8 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-#: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:101
-#: ..\..\..\xmlsrv\xmlrpc.php:1225
+#: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:99
+#: ..\..\..\xmlsrv\xmlrpc.php:1230
 #, fuzzy
 msgid "Edit/Delete"
 msgstr "Deletar"
@@ -2842,51 +2859,51 @@ msgstr ""
 msgid "Processing..."
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:144
+#: ..\..\..\htsrv\getmail.php:147
 msgid "Too old"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:150
+#: ..\..\..\htsrv\getmail.php:153
 msgid "Subject prefix does not match"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:170
+#: ..\..\..\htsrv\getmail.php:173
 msgid "Raw content:"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:206
+#: ..\..\..\htsrv\getmail.php:209
 msgid "Pass:"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:210
+#: ..\..\..\htsrv\getmail.php:213
 msgid "Wrong login or password."
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:230
+#: ..\..\..\htsrv\getmail.php:233
 msgid "Category ID"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:252
+#: ..\..\..\htsrv\getmail.php:255
 msgid "Blog ID"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:260
+#: ..\..\..\htsrv\getmail.php:263
 msgid "Posted title"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:261
+#: ..\..\..\htsrv\getmail.php:264
 msgid "Posted content"
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:271
+#: ..\..\..\htsrv\getmail.php:274
 msgid "Mission complete, message deleted."
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:277
+#: ..\..\..\htsrv\getmail.php:280
 msgid "Level 0 users can't post."
 msgstr ""
 
-#: ..\..\..\htsrv\getmail.php:299
+#: ..\..\..\htsrv\getmail.php:302
 msgid "OK."
 msgstr ""
 
@@ -2980,16 +2997,16 @@ msgstr ""
 msgid "Manage users"
 msgstr ""
 
-#: ..\..\..\htsrv\trackback.php:92 ..\..\..\htsrv\trackback.php:96
+#: ..\..\..\htsrv\trackback.php:90 ..\..\..\htsrv\trackback.php:94
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
 msgstr ""
 
-#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1222
+#: ..\..\..\htsrv\trackback.php:96 ..\..\..\xmlsrv\xmlrpc.php:1227
 msgid "Website"
 msgstr ""
 
-#: ..\..\..\htsrv\trackback.php:100 ..\..\..\xmlsrv\xmlrpc.php:1224
+#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1229
 msgid "Excerpt"
 msgstr ""
 
@@ -3177,7 +3194,7 @@ msgstr ""
 msgid "[...] Read more!"
 msgstr ""
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1216 ..\..\..\xmlsrv\xmlrpc.php:1220
+#: ..\..\..\xmlsrv\xmlrpc.php:1221 ..\..\..\xmlsrv\xmlrpc.php:1225
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""

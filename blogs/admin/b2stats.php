@@ -46,14 +46,18 @@ require(dirname(__FILE__).'/_menutop.php');
 <?php
 require(dirname(__FILE__).'/_menutop_end.php');
 
-if ($user_level < 9) 
+if ($user_level < 9 && ! $demo_mode) 
 {
-		die( T_('You have no right to view stats.') );
+		die( '<p>'.T_('You have no right to view stats.').'</p>' );
 }
 
 switch( $action )
 {
 	case 'changetype':
+		if ($user_level < 9) 
+		{
+				die( '<p>'.T_('You have no right to change a hit type.').'</p>' );
+		}
 		// Change the type of a hit:
 		param( 'hit_ID', 'integer', true );	// Required!
 		param( 'hit_type', 'string', true );	// Required!
@@ -69,6 +73,10 @@ switch( $action )
 
 	case 'delete':
 		// DELETE A HIT:
+		if ($user_level < 9) 
+		{
+				die( '<p>'.T_('You have no right to delete a hit.').'</p>' );
+		}
 		param( 'hit_ID', 'integer', true );	// Required!
 		?>
 		<div class="panelinfo">

@@ -9,7 +9,7 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.8.6.1';
+$b2_version = '0.8.6.2';
 
 // Activate gettext:
 if( ($use_l10n==1) && function_exists( 'bindtextdomain' ) )
@@ -34,7 +34,10 @@ $pagenow = $pagenow[0];
 $is_lynx = 0; $is_gecko = 0; $is_winIE = 0; $is_macIE = 0; $is_opera = 0; $is_NS4 = 0;
 if (!isset($HTTP_USER_AGENT)) 
 {
-	$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
+	if( isset($_SERVER['HTTP_USER_AGENT']) )
+		$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
+	else
+		$HTTP_USER_AGENT = '';
 }
 if(strpos($HTTP_USER_AGENT, 'Lynx') !== false)
 {

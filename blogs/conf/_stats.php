@@ -28,34 +28,27 @@ $blackList = Array(
 # Search engines for statistics
 # The following substrings will be looked up in the referer http header
 $search_engines = Array(
-	'http://www.google.',
-	'http://ww.google.',
+	'.google.',
+	'.hotbot.',
+	'.altavista.',
+	'.excite.',
+	'.voila.fr/',
+	'http://search',
+	'search.',
+	'http://recherche',
+	'recherche.',
+	'recherches.',
+	'vachercher.',
 	'feedster.com/',
-	'search.yahoo.com/',
-	'.voila.fr/',										// kw =
-	'http://www.alltheweb.com/',
-	'http://www.daypop.com/',
-	'http://www.feedster.com/',
-	'http://www.technorati.com/',
-	'http://www.weblogs.com/',
-	'http://vachercher.lycos.fr/',
-	'http://search.lycos.',
-	'http://search.sli.sympatico.ca/',
-	'http://buscador.terra.es/',			// query =
-	'http://search1-1.free.fr/',
-	'http://search1-2.free.fr/',
-	'http://www.hotbot.com/',
-	'http://search.canoe.ca/', 				// q =
-	'http://recherche.globetrotter.net/',	//q=
-	'search.msn.', 	//q=
-	'http://cgi.search.biglobe.ne.jp/', 	//q=
-	'aolrecherche.aol.fr/',  //q=
-	'aolrecherches.aol.fr/',  //q=
-	'altavista.com/',		// q=
-	'aolsearch.aol.com/', // query=
-	'excite.fr/', // q=
-	'recherche.club-internet.fr/', // q=
-	'search.netscape.com/', // query
+	'alltheweb.com/',
+	'daypop.com/',
+	'feedster.com/',
+	'technorati.com/',
+	'weblogs.com/',
+	'exalead.com/',
+	'killou.com/',
+	'buscador.terra.es',
+	'web.toile.com',
 );
 
 

@@ -166,7 +166,7 @@
 			<?php
 
 			// comments
-			if (($withcomments) or ($c)) 
+			if($c) 
 			{
 				$queryc = "SELECT * FROM $tablecomments WHERE comment_post_ID = $id ORDER BY comment_date";
 				$resultc = mysql_query($queryc);

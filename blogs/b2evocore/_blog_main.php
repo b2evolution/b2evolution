@@ -146,17 +146,17 @@ param( 'template', 'string', 'main', true );
 if( $skin != '' )
 {	// We want to display now:
 	$skin_folder = get_path( 'skins' );
-	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
+	
+	// Check that the default skin exists:
+	// Bacause a lot of bloggers will set themseleves a cookie and delete the default skin,
+	// we have to make this fool proof extra checking!
+	if( !is_dir($skin_folder.'/'.$default_skin) )
 	{
-		// echo ("<p>Invalid skin name!</p>");
-		$skin = $default_skin;
+		printf( T_('The default skin [%s] does not exist. It must be properly set in the blog stub file [%s]. Contact the <a %s>webmaster</a>...'), $default_skin, $pagenow, 'href="mailto:'.$admin_email.'"');
+		die();	
 	}
-	elseif( !is_dir($skin_folder.'/'.$skin) )
-	{
-		// echo "<p>Oops, no such skin!</p>";
-		$skin = $default_skin;
-	}
-	elseif( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
+	
+	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
 	{	// We have just asked for the skin explicitely
 		// Set a cookie to remember it:
 		// Including config and functions files
@@ -175,13 +175,15 @@ if( $skin != '' )
 		}
 	}
 
-	// Check that requested skin exists
-	if( !is_dir($skin_folder.'/'.$skin) )
+	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
 	{
-		if( $skin == $default_skin )
-			$skin .= T_(' (default skin)');
-		printf( T_('The requested skin [%s] does not exist. The blog cannot be displayed. Contact the <a %s>webmaster</a>...'), $skin, 'href="mailto:'.$admin_email.'"');
-		die();	
+		// echo ("<p>Invalid skin name!</p>");
+		$skin = $default_skin;
+	}
+	elseif( !is_dir($skin_folder.'/'.$skin) )
+	{
+		// echo "<p>Oops, no such skin!</p>";
+		$skin = $default_skin;
 	}
 
 	if( $template == 'popup' )

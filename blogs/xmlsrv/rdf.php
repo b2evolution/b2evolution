@@ -33,12 +33,12 @@
 <item rdf:about="<?php permalink_single() ?>">
   <title><?php the_title( '', '', false, 'xml' ) ?></title>
   <link><?php permalink_single() ?></link>
-  <dc:date><?php the_time('Y-m-d\TH:i:s',1,1); ?></dc:date>
+  <dc:date><?php the_time('Y-m-d\TH:i:s',1,1); ?>Z</dc:date>
   <dc:creator><?php the_author( 'xml' ) ?></dc:creator>
   <dc:subject><?php the_category( 'xml' ) ?></dc:subject>
   <description><?php
     the_link( '', ' ', 'xml' );
-    the_content(T_('[...] Read more!'), 0, '', '', '', '', 'xml',$rss_excerpt_length );
+    the_content(T_('[...] Read more!'), 0, '', '', '', '', 'xml', $rss_excerpt_length, 0, 1 );
   ?></description>
   <content:encoded><![CDATA[<?php
     the_link( '<p>', '</p>' );

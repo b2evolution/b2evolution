@@ -28,6 +28,10 @@ h2 {
 	padding-right: 8px;
 	padding-left: 8px;
 }
+.bPostSide
+{
+	margin-bottom: 8px;
+}
 .bSmallHead {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 80%;

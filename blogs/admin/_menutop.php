@@ -51,17 +51,17 @@ if( empty($mode) )
 	echo '<a href="b2edit.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('New Post'), '</a>';
 	echo " | \n";
 	echo '<a href="b2browse.php?blog=', $blog, '" class="menutop" style="font-weight: bold;">', T_('Browse/Edit'), '</a>';
-	if($user_level >= 9) 
+	if($user_level >= 9 || $demo_mode) 
 	{
 		echo " | \n";
 		echo '<a href="b2stats.php" class="menutop">', T_('Stats'), '</a>';
 	}
-	if($user_level >= 3) 
+	if($user_level >= 3 || $demo_mode) 
 	{
 		echo " | \n";
 		echo '<a href="b2categories.php" class="menutop">', T_('Cats'), '</a>';
 	}
-	if($user_level >= 9) 
+	if($user_level >= 9 || $demo_mode) 
 	{
 		echo " | \n";
 		echo '<a href="b2blogs.php" class="menutop">', T_('Blogs'), '</a>';
@@ -71,7 +71,7 @@ if( empty($mode) )
 		echo " | \n";
 		echo '<a href="b2options.php" class="menutop">', T_('Options'), '</a>';
 	}
-	if($user_level >= 3) 
+	if($user_level >= 3 || $demo_mode) 
 	{
 		echo " | \n";
 		echo '<a href="b2template.php" class="menutop">', T_('Templates'), '</a>';

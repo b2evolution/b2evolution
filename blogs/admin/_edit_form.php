@@ -19,7 +19,7 @@ if ($use_spellchecker)
 		document.SPELLDATA.messagebodyname.value=body
 		document.SPELLDATA.companyID.value="custom\\http://cafelog.com"
 		document.SPELLDATA.language.value=1033
-		document.SPELLDATA.opener.value="<?php echo $admin_url ?>/sproxy.pl"
+		document.SPELLDATA.opener.value="<?php echo $admin_url ?>/sproxy.php"
 		document.SPELLDATA.formaction.value="http://www.spellchecker.com/spell/startspelling.asp "
 		window.open("<?php echo $admin_url ?>/b2spell.php","Spell","toolbar=no,directories=no,location=yes,resizable=yes,width=620,height=400,top=100,left=100")
 	}
@@ -178,17 +178,13 @@ if ($use_spellchecker)
 	<input type="submit" value="<?php echo ($action == 'post') ? T_('Blog this !') : T_('Edit this !'); ?>" class="search" style="font-weight: bold;" tabindex="10" /> 
 	
 	
-	<?php
-	 if ($use_spellchecker) 
+	<?php if ($use_spellchecker) 
 	{ // ------------------------------- SPELL CHECKER ---------------------------------- ?>
-	<!--<input type = "button" value = "Spell Check" onclick="var f=document.forms[0]; doSpell( 'en', f.post_content, '<?php echo $spellchecker_url ?>/sproxy.cgi', true);" class="search" />-->
-	<input type="button" value="<?php echo T_('Spellcheck') ?>" onClick="DoSpell
+		<input type="button" value="<?php echo T_('Spellcheck') ?>" onClick="DoSpell
 	('post','content','');" class="search" tabindex="11" />
-	<?php } ?>
+	<?php } 
 	
-	
-	
-	<?php if ( ($use_fileupload) && ($user_level >= $fileupload_minlevel) && ((ereg(" ".$user_login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)=="")) ) { ?>
+	if ( ($use_fileupload) && ($user_level >= $fileupload_minlevel) && ((ereg(" ".$user_login." ", $fileupload_allowedusers)) || (trim($fileupload_allowedusers)=="")) ) { ?>
 	<input type="button" value="<?php echo T_('Upload a file/image') ?>" onClick="launchupload();" class="search" tabindex="12"  />
 	<?php }
 	
