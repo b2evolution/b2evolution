@@ -251,7 +251,7 @@ table.grouped th {
 	color: #9e9286;
 	background-color: #efede0;
 	font-weight: normal;
-	padding: 0;
+	padding:0 1ex;
 }
 
 table.grouped th a.basic_current,
@@ -848,6 +848,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/20 23:02:56  blueyed
+ * horizontal padding for th
+ *
  * Revision 1.14  2005/02/10 22:59:00  blueyed
  * start of CSS refactoring
  *
