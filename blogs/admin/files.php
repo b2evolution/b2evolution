@@ -466,11 +466,6 @@ if( !empty($action) )
 }
 
 
-// Adjust page title
-switch( $Fileman->getMode() )
-{
-}
-
 
 /**#@+
  * The top menu
@@ -1191,6 +1186,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.80  2005/03/08 15:23:52  fplanque
+ * no message
+ *
  * Revision 1.79  2005/03/07 00:06:17  blueyed
  * admin UI refactoring, part three
  *
