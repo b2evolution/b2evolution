@@ -6,7 +6,8 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -25,10 +26,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -71,15 +79,18 @@ class Plugins
 
 	/**
 	 * Has the plug initialized? (plugins loaded?)
+	 * @var boolean
 	 */
 	var $initialized = false;
 
 	/**
 	 * Current object idx in array:
+	 * @var integer
 	 */
 	var $current_idx = 0;
 
 	/**#@-*/
+
 
 	/**
 	 * Constructor
@@ -93,7 +104,6 @@ class Plugins
 
 		// Set plugin path:
 		$this->plugins_path = dirname(__FILE__).'/'.$core_dirout.$plugins_subdir;
-
 	}
 
 
@@ -104,7 +114,7 @@ class Plugins
 	 *
 	 * {@internal Plugins::init(-)}}
 	 */
-	function init( )
+	function init()
 	{
 		global $DB, $Debuglog;
 
@@ -117,11 +127,12 @@ class Plugins
 				$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $row['plug_classname'] ).'.php';
 				if( ! is_file( $filename ) )
 				{ // Plugin not found!
-					$Debuglog->add( 'Plugin not found: '.$filename );
+					$Debuglog->add( 'Plugin not found: '.$filename, 'plugins' );
+					// TODO: Automatically remove? Display note on admin/plugins.php?
 					continue;
 				}
 				// Load the plugin:
-				$Debuglog->add( 'Loading plugin: '.$row['plug_classname'] );
+				$Debuglog->add( 'Loading plugin: '.$row['plug_classname'], 'plugins' );
 				require_once $filename;
 				// Register the plugin:
 				$this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'] );
@@ -147,11 +158,11 @@ class Plugins
 
 			// Go through directory:
 			$this_dir = dir( $this->plugins_path );
-			while( $this_file = $this_dir->read())
+			while( $this_file = $this_dir->read() )
 			{
 				if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $matches ) && is_file( $this->plugins_path. '/'. $this_file ) )
-				{	// Valid plugin file name:
-	        $Debuglog->add( 'Loading plugin: '.$this_file );
+				{ // Valid plugin file name:
+					$Debuglog->add( 'Loading plugin: '.$this_file, 'plugins' );
 					// Load the plugin:
 					require_once $this->plugins_path.$this_file;
 					// Register the plugin:
@@ -160,10 +171,29 @@ class Plugins
 				}
 			}
 
-			// Sort array by priority:
-			usort( $this->Plugins, 'sort_Plugin' );
+			$this->sort( 'priority' );
 
 			$this->initialized = true;
+		}
+	}
+
+
+	/**
+	 * Sort the list of {@link Plugins}.
+	 *
+	 * @param string Order: 'priority' (default), 'name'
+	 */
+	function sort( $order = 'priority' )
+	{
+		switch( $order )
+		{
+			case 'name':
+				usort( $this->Plugins, 'sort_Plugin_name' );
+				break;
+
+			default:
+				// Sort array by priority:
+				usort( $this->Plugins, 'sort_Plugin_priority' );
 		}
 	}
 
@@ -179,7 +209,7 @@ class Plugins
 	{
 		global $DB, $Debuglog;
 
-		$this->init();	// Init if not done yet.
+		$this->init();  // Init if not done yet.
 
 		// Load the plugin:
 		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $plugin_name ).'.php';
@@ -188,8 +218,7 @@ class Plugins
 		// Register the plugin:
 		$Plugin = & $this->register( $plugin_name, 0 );	// ID will be set a few lines below
 
-		// Sort array by priority:
-		usort( $this->Plugins, 'sort_Plugin' );
+		$this->sort( 'priority' );
 
 		// Record into DB
 		//$DB->begin();
@@ -202,8 +231,7 @@ class Plugins
 		//$DB->commit();
 
 		$Plugin->ID = $DB->insert_id;
-		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID );
-
+		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
 	}
 
 
@@ -220,12 +248,12 @@ class Plugins
 	{
 		global $DB, $Debuglog;
 
-		$this->init();	// Init if not done yet.
+		$this->init();  // Init if not done yet.
 
 		// Delete from DB
 		if( ! $DB->query( "DELETE FROM T_plugins
 												WHERE plug_ID = $plugin_ID" ) )
-		{	// Nothing removed!?
+		{ // Nothing removed!?
 			return false;
 		}
 
@@ -233,20 +261,20 @@ class Plugins
 		$move_by = 0;
 		$items = count($this->Plugins);
 		foreach( $this->Plugins as $key => $Plugin )
-		{	// Go through plugins:
+		{ // Go through plugins:
 			if( $Plugin->ID == $plugin_ID )
-			{	// This one must be unregistered...
+			{ // This one must be unregistered...
 				unset( $this->index_Plugins[ $Plugin->code ] );
 				unset( $this->index_name_Plugins[ $Plugin->classname ] );
 				$move_by--;
 			}
 			elseif($move_by)
-			{	// This is a normal one but must be moved up
+			{ // This is a normal one but must be moved up
 				$this->Plugins[$key+$move_by] = & $this->Plugins[$key];
 			}
 
 			if( $key >= $items+$move_by )
-			{	// We are reaching the end of the array, we should unset
+			{ // We are reaching the end of the array, we should unset
 				unset($this->Plugins[$key]);
 			}
 		}
@@ -274,7 +302,7 @@ class Plugins
 
 		if( !class_exists( $classname ) )
 		{ // the given class does not exist
-			$Debuglog->add( 'Plugin class for ['.$classname.'] not defined - must match the filename.' );
+			$Debuglog->add( 'ERROR: Plugin class for ['.$classname.'] not defined - must match the filename.', 'plugins' );
 			return false;
 		}
 		$Plugin = new $classname;	// COPY !
@@ -287,7 +315,7 @@ class Plugins
 		if( $priority > -1 ) $Plugin->priority = $priority;
 
 		// Memorizes Plugin in sequential array:
-	 	$this->Plugins[] = & $Plugin;
+		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
 		$this->index_Plugins[ $Plugin->code ] = & $Plugin;
 		$this->index_name_Plugins[ $Plugin->classname ] = & $Plugin;
@@ -299,7 +327,7 @@ class Plugins
 	}
 
 
-  /**
+	/**
 	 * Count # of registrations of same plugin
 	 *
 	 * {@internal Plugins::count_regs(-)}}
@@ -311,7 +339,7 @@ class Plugins
 	{
 		$count = 0;
 
- 		foreach( $this->Plugins as $Plugin )
+		foreach( $this->Plugins as $Plugin )
 		{
 			if( $Plugin->classname == $classname )
 			{
@@ -331,7 +359,7 @@ class Plugins
 	 */
 	function & get_next()
 	{
-		$this->init();	// Init if not done yet.
+		$this->init();  // Init if not done yet.
 
 		if( $this->current_idx >= count( $this->Plugins ) )
 		{
@@ -361,17 +389,32 @@ class Plugins
 	 * @param string event name, see {@link Plugin}
 	 * @param array Associative array of parameters
 	 */
-	function trigger_event( $event, $params )
+	function trigger_event( $event, $params = NULL )
 	{
-		$this->init();	// Init if not done yet.
+		global $Debuglog;
+
+		$this->init();  // Init if not done yet.
 
 		$this->restart(); // Just in case.
+
+		if( is_null($params) )
+		{
+			$params = array();
+		}
+
+		$Debuglog->add( 'Trigger event '.$event, 'plugins' );
 
 		while( $loop_Plugin = & $this->get_next() )
 		{ // Go through whole list of plugins
 			//echo ' ',$loop_Plugin->code, ':';
 
-			$loop_Plugin->$event( $params );
+			if( method_exists( $loop_Plugin, $event ) )
+			{
+				$Debuglog->add( 'Calling '.get_class($loop_Plugin).'->'.$event.'( '.var_export( $params, true ).' )', 'plugins' );
+				$loop_Plugin->$event( $params );
+			}
+		}
+	}
 
 		}
 	}
@@ -387,7 +430,7 @@ class Plugins
 	 */
 	function validate_list( $renderers = array('default') )
 	{
-		$this->init();	// Init if not done yet.
+		$this->init();  // Init if not done yet.
 
 		$this->restart(); // Just in case.
 
@@ -447,7 +490,7 @@ class Plugins
 	 */
 	function render( & $content, & $renderers, $format, $type = 'ItemContent' )
 	{
-		$this->init();	// Init if not done yet.
+		$this->init();  // Init if not done yet.
 
 		$this->restart(); // Just in case.
 
@@ -465,24 +508,24 @@ class Plugins
 
 			switch( $loop_RendererPlugin->apply_when )
 			{
-				 case 'stealth':
-				 case 'always':
+				case 'stealth':
+				case 'always':
 					// echo 'FORCED ';
 					$loop_RendererPlugin->Render( $params );
 					break;
 
-				 case 'opt-out':
-				 case 'opt-in':
-				 case 'lazy':
+				case 'opt-out':
+				case 'opt-in':
+				case 'lazy':
 					if( in_array( $loop_RendererPlugin->code, $renderers ) )
-					{	// Option is activated
+					{ // Option is activated
 						// echo 'OPT ';
 						$loop_RendererPlugin->Render( $params );
 					}
 					// else echo 'NOOPT ';
 					break;
 
-				 case 'never':
+				case 'never':
 					// echo 'NEVER ';
 					break;	// STOP, don't render, go to next renderer
 			}
@@ -502,6 +545,7 @@ class Plugins
 	function quick( $string, $renderercode, $format )
 	{
 		$this->init();
+
 		if( isset($this->index_Plugins[ $renderercode ]) )
 		{
 			$this->index_Plugins[ $renderercode ]->render( $string, $format );
@@ -523,16 +567,17 @@ class Plugins
 	 *
 	 * @param string plugin code
 	 * @param array Associative array of parameters
+	 * @return boolean
 	 */
 	function call_by_code( $code, $params )
 	{
-	 	global $Debuglog;
+		global $Debuglog;
 
 		$this->init();
 
 		if( ! isset($this->index_Plugins[ $code ]) )
-		{	// Plugins is not registered
-			$Debuglog->add( 'Requested plugin ['.$code.'] is not registered!' );
+		{ // Plugins is not registered
+			$Debuglog->add( 'Requested plugin ['.$code.'] is not registered!', 'plugins' );
 			return false;
 		}
 
@@ -548,15 +593,16 @@ class Plugins
 	 *
 	 * @param string plugin name
 	 * @param Plugin or false
+	 * @return Plugin|false
 	 */
 	function & get_by_name( $plugin_name )
 	{
-	 	global $Debuglog;
+		global $Debuglog;
 
 		$this->init();
 		if( ! isset($this->index_name_Plugins[ $plugin_name ]) )
-		{	// Plugins is not registered
-			$Debuglog->add( 'Requested plugin ['.$plugin_name.'] not found!' );
+		{ // Plugins is not registered
+			$Debuglog->add( 'Requested plugin ['.$plugin_name.'] not found!', 'plugins' );
 			return false;
 		}
 
@@ -569,13 +615,24 @@ class Plugins
 /**
  * Callback function to sort plugins by priority
  */
-function sort_Plugin( & $a, & $b )
+function sort_Plugin_priority( & $a, & $b )
 {
 	return $a->priority - $b->priority;
 }
 
+/**
+ * Callback function to sort plugins by priority
+ */
+function sort_Plugin_name( & $a, & $b )
+{
+	return strcasecmp( $a->name, $b->name );
+}
+
 /*
  * $Log$
+ * Revision 1.5  2005/02/20 22:41:44  blueyed
+ * sort(), use method_exists() for trigger_event, sort_Plugin_name() added, doc, whitespace
+ *
  * Revision 1.4  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *
