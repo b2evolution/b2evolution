@@ -35,11 +35,6 @@
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
  * @author cafelog (team)
  *
- * {@internal Below is a list of former authors whose contributions to this file have been
- *            either removed or redesigned and rewritten anew:
- *            - (none)
- * }}
- *
  * @version $Id$
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -255,12 +250,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Archives') ?></h3>
-		<ul>
-			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( dirname(__FILE__).'/_archives.php' );
-				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-		</ul>
+		<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+			// Call the Archives plugin:
+			$Plugins->call_by_code( 'evo_Arch', array() );
+			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 	</div>
 
 	<?php if( ! $Blog->get('force_skin') )

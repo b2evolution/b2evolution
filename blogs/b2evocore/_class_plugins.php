@@ -499,7 +499,34 @@ class Plugins
 			return format_to_output( $string, $format );
 		}
 	}
-	
+
+
+	/**
+	 * Call a specific plugin by its code.
+	 *
+	 * This will call the SkinTag event handler.
+	 *
+	 * {@internal Plugins::call_by_code(-)}}
+	 *
+	 * @param string plugin code
+	 * @param array Associative array of parameters
+	 */
+	function call_by_code( $code, $params )
+	{
+	 	global $Debuglog;
+
+		$this->init();
+		if( ! isset($this->index_Plugins[ $code ]) )
+		{	// Plugins is not registered
+			$Debuglog->add( 'Requested plugin ['.$code.'] is not registered!' );
+			return false;
+		}
+
+		$this->index_Plugins[ $code ]->SkinTag( $params );
+
+		return true;
+	}
+
 }
 
 

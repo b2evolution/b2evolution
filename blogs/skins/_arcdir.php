@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the template that displays the archive directory for a blog
 	 *
@@ -17,21 +17,8 @@
 
 	if( $disp == 'arcdir' )  
 	{ // We have asked to display full archives:
-	?>
-	<ul>
-	<?php
-		/*
-		 * This file is basically just a trick where we set the number of entries to display
-		 * to "no limit"...
-		 */
-		$archive_limit = '';
-		/**
-		 * And then... call the default archive include.
-		 */
-		require dirname(__FILE__).'/_archives.php';
-		unset( $archive_limit );
-	?>
-	</ul>
-	<?php	
-	} 
+
+		// Call the Archives plugin WITH NO LIMIT & NO MORE LINK:
+		$Plugins->call_by_code( 'evo_Arch', array( 'limit'=>'', 'more_link'=>'' ) );
+	}
 ?>

@@ -161,11 +161,13 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  </li>
 
 	<li><?php echo T_('Archives') ?>:
-		<ul>
-			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( dirname(__FILE__).'/_archives.php' );
-				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-		</ul>
+		<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+			// Call the Archives plugin:
+			$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
+					'limit'=>'',                           // No limit
+					'more_link'=>'',                       // No more link
+				)	);
+			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 	</li>
 
 	<li id="calendar">

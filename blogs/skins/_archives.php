@@ -1,96 +1,67 @@
 <?php
-	/**
-	 * This is the template that displays the links to the archives for a blog
-	 *
-	 * This file is not meant to be called directly.
-	 * It is meant to be called by an include in the _main.php template.
-	 *
-	 * b2evolution - {@link http://b2evolution.net/}
-	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
-	 *
-	 * @package evoskins
-	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+/**
+ * This file displays the archives.
+ *
+ * THIS FILE IS DEPRECATED. IT IS LEFT AS A STUB FOR OLDER SKINS COMPATIBILITY.
+ *
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
+ *
+ * @package evoskins
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ *
+ * @deprecated Deprecated by {@link archives_plugin}
+ *
+ * @version $Id$
+ */
+if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-	# number of archive entries to display:
-	if(!isset($archive_limit)) $archive_limit = 12;
-	# this is what will separate your archive links
-	if(!isset($archive_line_start)) $archive_line_start = '<li>';				
-	if(!isset($archive_line_end)) $archive_line_end = '</li>';				
-	# this is what will separate dates on weekly archive links
-	if(!isset($archive_week_separator)) $archive_week_separator = ' - ';
-	# override general date format ? 0 = no: use the date format set in Options, 1 = yes: override
-	if(!isset($archive_date_format_over_ride)) $archive_date_format_over_ride = 0;
-	# options for daily archive (only if you override the general date format)
-	if(!isset($archive_day_date_format)) $archive_day_date_format = 'Y/m/d';
-	# options for weekly archive (only if you override the general date format)
-	if(!isset($archive_week_start_date_format)) $archive_week_start_date_format = 'Y/m/d';
-	if(!isset($archive_week_end_date_format)) $archive_week_end_date_format   = 'Y/m/d';
+
+$Debuglog->add( 'Call to deprecated skin helper _archives.php', 'deprecated' );
 
 
-	// --- //
-	
-	$dateformat = locale_datefmt();
-	
-	if (!$archive_date_format_over_ride) 
-	{
-		$archive_day_date_format = $dateformat;
-		$archive_week_start_date_format = $dateformat;
-		$archive_week_end_date_format   = $dateformat;
-	}
-		
-	$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,
-																		$timestamp_min, $timestamp_max, $archive_limit );
-	
-	while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
-	{
-		echo $archive_line_start;
-		switch( $Settings->get('archive_mode') )
-		{
-			case 'monthly':
-				// --------------------------------- MONTHLY ARCHIVES ---------------------------------------
-				echo '<a href="';
-				archive_link( $arc_year, $arc_month );
-				echo '">';
-				echo T_($month[zeroise($arc_month,2)]),' ',$arc_year;
-				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
-				break;
-	
-			case 'daily':
-				// --------------------------------- DAILY ARCHIVES ---------------------------------------
-				echo '<a href="';
-				archive_link( $arc_year, $arc_month, $arc_dayofmonth );
-				echo '">';
-				echo mysql2date($archive_day_date_format, $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
-				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
-				break;
+# number of archive entries to display:
+if(!isset($archive_limit)) $archive_limit = 12;
+# this is what will separate your archive links
+if(!isset($archive_line_start)) $archive_line_start = '<li>';
+if(!isset($archive_line_end)) $archive_line_end = '</li>';
+# this is what will separate dates on weekly archive links
+if(!isset($archive_week_separator)) $archive_week_separator = ' - ';
+# override general date format ? 0 = no: use the date format set in Options, 1 = yes: override
+if(!isset($archive_date_format_over_ride)) $archive_date_format_over_ride = 0;
+# options for daily archive (only if you override the general date format)
+if(!isset($archive_day_date_format)) $archive_day_date_format = 'Y/m/d';
 
-			case 'weekly':
-				// --------------------------------- WEEKLY ARCHIVES ---------------------------------------
-				echo '<a href="';
-				archive_link( $arc_year, '', '', $arc_w );
-				echo '">';
-				echo $arc_year.', '.T_('week').' '.$arc_w;
-				echo '</a> <span class="dimmed">('.$arc_count.')</span>';
-				break;
-	
-			case 'postbypost':
-			default:
-				// ------------------------------ POSY BY POST ARCHIVES --------------------------------
-				echo '<a href="';
-				permalink_link( '', 'id', $post_ID );
-				echo '">';
-				if ($post_title) {
-					echo strip_tags($post_title);
-				} else {
-					echo $post_ID;
-				}
-				echo '</a>';
-		}
-	
-		echo $archive_line_end."\n";
-	}
 
+// Call the Archives plugin WITH NO MORE LINK AND NO LIST DELIMITERS:
+$Plugins->call_by_code( 'evo_Arch', array(
+                'limit'=>$archive_limit,
+								'more_link'=>'',
+								'list_start'=>'',
+								'list_end'=>'',
+                'line_start'=>$archive_line_start,
+                'line_end'=>$archive_line_end,
+                'day_date_format'=>($archive_date_format_over_ride ? $archive_day_date_format : ''),
+							 ) );
 
 ?>

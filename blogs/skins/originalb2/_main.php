@@ -207,10 +207,17 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
 </form>
 
+
 <h4><?php echo T_('archives') ?>:</h4>
-<ul class="compress">
-<?php	require( dirname(__FILE__).'/_archives.php' ); ?>
-</ul>
+	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
+				'limit'=>'',                           // No limit
+				'more_link'=>'',                       // No more link
+				'list_start'=>'<ul class="compress">', // Special list start
+			)	);
+		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+
 
 <?php if( ! $Blog->get('force_skin') )
 {	// Skin switching is allowed for this blog: ?>

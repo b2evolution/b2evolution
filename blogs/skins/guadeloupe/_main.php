@@ -224,9 +224,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 <h4><?php echo T_('Archives') ?>&nbsp;:</h4>
-<ul>
-	<?php require( dirname(__FILE__).'/_archives.php'); ?>
-</ul>
+	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array() );
+		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 
 <?php if ($disp != 'stats') { ?>
 
