@@ -41,9 +41,13 @@
 	foreach( $locales as $lkey => $lval )
 	{
 		$i++;
-		echo '<tr style="text-align:center">
+		?>
+		<tr style="text-align:center">
 		<td style="text-align:left">
 			<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />
+			<?php 
+			locale_flag( $lkey );
+			echo'
 			<strong>'.$lkey.'</strong>
 		</td>
 		<td>

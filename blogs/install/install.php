@@ -88,19 +88,10 @@ mySQL Password: <?php echo ((DB_PASSWORD!='demopass' ? "(Set, but not shown for 
 		// present available locales on first screen
 		foreach( $locales as $lkey => $lvalue )
 		{
-			// extract flag name:
-			$lflag = substr( $lkey, strpos($lkey, '-') + 1, 2 );
-			// FP: I will work on flags later
-			
 			echo '<li>';
 			if( $default_locale == $lkey ) echo '<strong>';	
 			echo ' <a href="?locale='. $lkey. '">';
-			
-			if( is_file(dirname(__FILE__). "/$install_dirout/img/flags/10px/$lflag.gif") )
-			{  // we have a flag for that locale
-				echo '<img src="'. $install_dirout. '/img/flags/10px/'. $lflag. '.gif" alt="'. $lvalue['name']. '" border="0" /> ';
-			}
-			#echo T_($localevalue['language']);
+			locale_flag( $lkey );
 			echo $lvalue['name'];
 			echo '</a>';
 			echo '</li>';

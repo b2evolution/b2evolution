@@ -59,7 +59,7 @@ $locales = array(
 									),
 	'en-UK' => array( 'name' => NT_('English (UK)'),
 										'charset' => 'iso-8859-1',
-										'datefmt' => 'd.m.y',
+										'datefmt' => 'd/m/y',
 										'timefmt' => 'H:i:s',
 										'messages' => 'en_UK',
 										'enabled' => 1,

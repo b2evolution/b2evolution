@@ -207,6 +207,11 @@ $xmlsrv_subdir = 'xmlsrv';                   // Subdirectory relative to base
 $xmlsrv_dirout = '..';                       // Relative path to go back to base
 $xmlsrv_url = $baseurl.'/'.$xmlsrv_subdir;   // You should not need to change this
 /**
+ * Location of the IMG folder.
+ */
+$img_subdir = 'img';                     // Subdirectory relative to base
+$img_url = $baseurl.'/'.$img_subdir;     // You should not need to change this
+/**
  * Location of the skins folder.
  */
 $skins_subdir = 'skins';                     // Subdirectory relative to base

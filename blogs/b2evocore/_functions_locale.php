@@ -201,6 +201,30 @@ function locale_timefmt()
 }
 
 
+/**
+ * Display locale flag
+ *
+ * {@internal locale_flag(-)}}
+ *
+ * @param string locale to use, '' for current
+ * @param string collection name (subdir of img/flags)
+ */
+function locale_flag( $locale = '', $collection = 'h10px' )
+{
+	global $locales, $current_locale, $core_dirout, $img_subdir, $img_url;
+	
+	if( empty($locale) ) $locale = $current_locale; 
+
+	// extract flag name:
+	$country = substr( $locale, 3, 2 );
+	
+	if( ! is_file(dirname(__FILE__).'/'.$core_dirout.'/'.$img_subdir.'/flags/'.$collection.'/'.$country.'.gif') )
+	{	// File does not exist
+		$country = 'default';
+	}
+	echo '<img src="'.$img_url.'/flags/'.$collection.'/'.$country.'.gif" alt="'. $locales[$locale]['name']. '" border="1" /> ';
+
+}
 
 /*
  * locale_options(-)
