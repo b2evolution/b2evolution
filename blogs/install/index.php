@@ -2,6 +2,10 @@
 /**
  * This is the main install menu
  *
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
+ * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
+ * OR YOUR HOSTING COMPANY.
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -22,8 +26,8 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions.php'
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_cats.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_bposts.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_functions_forms.php';
-require_once dirname(__FILE__).'/_functions_install.php' );
-require_once dirname(__FILE__).'/_functions_create.php' );
+require_once dirname(__FILE__).'/_functions_install.php';
+require_once dirname(__FILE__).'/_functions_create.php';
 
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
