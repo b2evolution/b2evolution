@@ -33,15 +33,12 @@ function bpost_create(
 	$post_comments = 'open' )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
-	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
-	if( $use_smilies ) $post_flags[] = 'smileys';
 
 	// make sure main cat is in extracat list and there are no duplicates
 	$extra_cat_IDs[] = $main_cat_ID;
@@ -107,15 +104,12 @@ function bpost_update(
 	$post_comments = 'open' )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
-	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
-	if( $use_smilies ) $post_flags[] = 'smileys';
 
 	// make sure main cat is in extracat list and there are no duplicates
 	$extra_cat_IDs[] = $main_cat_ID;
@@ -178,15 +172,12 @@ function bpost_update_status(
 	$post_timestamp = '' )
 {
 	global $DB, $tableposts, $tablepostcats;
-	global $use_smartquotes, $use_smilies;
 	global $localtimenow;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 	$post_flags[] = 'html';
-	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
-	if( $use_smilies ) $post_flags[] = 'smileys';
 
 	$query = "UPDATE $tableposts SET ";
 	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";

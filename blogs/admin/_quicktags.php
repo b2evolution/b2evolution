@@ -357,67 +357,6 @@ if( $use_quicktags )
 <?php
 }
 
-function b2evo_grins() {
-	global $smilies_directory, $b2smilies;
-	$grins = '';
-	$smiled = array();
-	foreach ($b2smilies as $smiley => $grin)
-	{
-		if (!in_array($grin, $smiled))
-		{
-			$smiled[] = $grin;
-			$smiley = str_replace(' ', '', $smiley);
-			$grins .= '<img src="'. $smilies_directory. '/'. $grin. '" alt="'. $smiley.
-								'" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
-		}
-	}
-
-	print('<div>'. $grins. '</div>');
-	ob_start();
-?>
-<script type="text/javascript">
-function grin(tag)
-{
-	var myField;
-	if (document.getElementById('content') && document.getElementById('content').type == 'textarea') {
-		myField = document.getElementById('content');
-	}
-	else {
-		return false;
-	}
-	if (document.selection) {
-		myField.focus();
-		sel = document.selection.createRange();
-		sel.text = tag;
-		myField.focus();
-	}
-	else if (myField.selectionStart || myField.selectionStart == '0') {
-		var startPos = myField.selectionStart;
-		var endPos = myField.selectionEnd;
-		var cursorPos = endPos;
-		myField.value = myField.value.substring(0, startPos)
-					  + tag
-					  + myField.value.substring(endPos, myField.value.length);
-		cursorPos += tag.length;
-		myField.focus();
-		myField.selectionStart = cursorPos;
-		myField.selectionEnd = cursorPos;
-	}
-	else {
-		myField.value += tag;
-		myField.focus();
-	}
-}
-
-</script>
-<?php
-	$grins = ob_get_contents();
-	ob_end_clean();
-	print($grins);
-}
-?>
-
-<?php
 if( $use_smilies )
 {
 	b2evo_grins();

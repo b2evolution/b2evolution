@@ -13,6 +13,8 @@
 if( $use_textile ) require_once( dirname(__FILE__). '/_functions_textile.php' );
 require_once dirname(__FILE__). '/../plugins/renderers/_gmcode.php';
 require_once dirname(__FILE__). '/../plugins/renderers/_bbcode.php';
+require_once dirname(__FILE__). '/../plugins/renderers/_autolinks.php';
+require_once dirname(__FILE__). '/../plugins/renderers/_smilies.php';
 
 
 /**
@@ -48,8 +50,8 @@ class Renderer
 			case 'content':
 				if( $use_textile ) $comment = textile( $comment );
 				convert_gmcode($content);
-				// convert_bbcode($content);
-				$content = make_clickable($content);
+				convert_bbcode($content);
+				autolinks($content);
 				convert_smilies($content);
 				phpcurlme( $content );
 				break;
@@ -58,7 +60,7 @@ class Renderer
 				// if( $use_textile ) $comment = textile( $comment );
 				convert_gmcode($content);
 				// convert_bbcode($content);
-				// $content = make_clickable($content);
+				// autolinks($content);
 				convert_smilies($content);
 				// phpcurlme( $content );
 				break;

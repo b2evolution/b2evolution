@@ -14,7 +14,6 @@
 # 1 to ensable
 $use_textile = 0;				// 0,1 use textile, see http://www.textism.com/tools/textile/
 $use_smartquotes = 0;		// 0,1 convert quotes into smart/curly quotes
-$use_autolink = 1;			// 0,1 automatically make web, mail, aim and icq addresses clickable
 $use_balanceTags = 1;		// 0,1 automatically balance unmatched tags in posts and comments. 
 
 

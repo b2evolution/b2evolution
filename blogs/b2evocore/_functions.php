@@ -347,42 +347,6 @@ function smiliescmp($a, $b)
 	return $diff;
 }
 
-/*
- * convert_smilies(-)
- */
-function convert_smilies( & $content)
-{
-	global $smilies_directory, $use_smilies;
-	global $b2smilies, $b2_smiliessearch, $b2_smiliesreplace;
-	if ($use_smilies)
-	{
-		if( ! isset( $b2_smiliessearch ) )
-		{	// We haven't prepared the smilies yet
-			$b2_smiliessearch = array();
-			$tmpsmilies = $b2smilies;
-			uksort($tmpsmilies, 'smiliescmp');
-
-			foreach($tmpsmilies as $smiley => $img)
-			{
-				$b2_smiliessearch[] = $smiley;
-				$smiley_masked = '';
-				for ($i = 0; $i < strlen($smiley); $i++ )
-				{
-					/* fplanque: with the #160s we prevent recurrent replacing... bleh :(
-						 fplanque changed $smiley_masked .= substr($smiley, $i, 1).chr(160);
-						 better way: (added benefit: handles ' and " escaping for alt attribute!... needed in :') )
-					*/
-					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
-				}
-
-				$b2_smiliesreplace[] = "<img src='$smilies_directory/$img' border='0' alt='$smiley_masked' class='middle' />";
-			}
-		}
-
-		// REPLACE:
-		$content = str_replace($b2_smiliessearch, $b2_smiliesreplace, $content);
-	}
-}
 
 
 /*
@@ -393,13 +357,6 @@ function convert_smilies( & $content)
  */
 function make_clickable($text)
 {
-	global $use_autolink;
-
-	if( ! $use_autolink )
-	{
-		return $text;
-	}
-
 	$ret = ' '. $text;
 
 	$ret = preg_replace("#([\n ])(http|mailto)://([^, <>{}\n\r]+)#i", "\\1<a href=\"\\2://\\3\">\\2://\\3</a>", $ret);
