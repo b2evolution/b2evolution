@@ -73,24 +73,30 @@ if( empty($mode) )
 
 	<div id="mainmenu">
 	<ul>
-	<?php 	// GLOBAL MENU :
+	<?php
+		// GLOBAL MENU :
 		foreach( $menu as $loop_tab => $loop_details )
 		{
 			$perm = true; // By default
-			if( (!isset($loop_details['perm_name']))
-				|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
-				|| isset($loop_details['text_noperm']) )
+			if( !isset($loop_details['perm_name'])
+					|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) )
+					|| isset($loop_details['text_noperm']) )
 			{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-
-				echo (($loop_tab == $admin_tab) ? '<li class="current">' : '<li>');
+				echo $loop_tab == $admin_tab
+							? '<li class="current">'
+							: '<li>';
 
 				echo '<a href="'.$loop_details['href'].'"';
-
-				if( isset($loop_details['style']) ) echo ' style="'.$loop_details['style'].'"';
+				if( isset($loop_details['style']) )
+				{
+					echo ' style="'.$loop_details['style'].'"';
+				}
 
 				echo '>';
 
-				echo ($perm ? $loop_details['text'] : $loop_details['text_noperm'] );
+				echo $perm
+							? $loop_details['text']
+							: $loop_details['text_noperm'];
 
 				echo "</a></li>\n";
 			}
@@ -107,11 +113,12 @@ if( empty($mode) )
 
 <div id="payload">
 
-<?php // OPTIONAL BLOG SELECTION...
-	if( isset($blogListButtons) )
-	{	// We have blog selection buttons to display:
-		echo '<div id="TitleArea">';
-		echo $blogListButtons;
-		echo '</div>';
-	}
+<?php
+// OPTIONAL BLOG SELECTION...
+if( isset($blogListButtons) )
+{ // We have blog selection buttons to display:
+	echo '<div id="TitleArea">';
+	echo $blogListButtons;
+	echo '</div>';
+}
 ?>
