@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-08-18 23:00+0200\n"
+"POT-Creation-Date: 2003-08-20 18:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -621,14 +621,13 @@ msgstr ""
 
 #: ..\..\..\admin\b2blogs.php:242
 #: ..\..\..\admin\edit_actions.php:100
-#: ..\..\..\admin\edit_actions.php:231
-#: ..\..\..\admin\edit_actions.php:301
+#: ..\..\..\admin\edit_actions.php:232
+#: ..\..\..\admin\edit_actions.php:304
 #: ..\..\..\admin\CVS\Base\b2blogs.php:242
-#: ..\..\..\b2evocore\_functions_pings.php:35
-#: ..\..\..\b2evocore\_functions_pings.php:68
-#: ..\..\..\b2evocore\_functions_pings.php:97
-#: ..\..\..\b2evocore\_functions_pings.php:124
-#: ..\..\..\b2evocore\_functions_pings.php:166
+#: ..\..\..\b2evocore\_functions_pings.php:50
+#: ..\..\..\b2evocore\_functions_pings.php:84
+#: ..\..\..\b2evocore\_functions_pings.php:143
+#: ..\..\..\b2evocore\_functions_pings.php:188
 msgid "Done."
 msgstr ""
 
@@ -637,7 +636,7 @@ msgstr ""
 #: ..\..\..\admin\b2sidebar.php:18
 #: ..\..\..\admin\b2upload.php:8
 #: ..\..\..\admin\edit_actions.php:54
-#: ..\..\..\admin\edit_actions.php:343
+#: ..\..\..\admin\edit_actions.php:346
 msgid "Cheatin' uh ?"
 msgstr ""
 
@@ -796,7 +795,7 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\admin\b2edit.php:97
-#: ..\..\..\admin\edit_actions.php:207
+#: ..\..\..\admin\edit_actions.php:208
 msgid "Oops, no post with this ID."
 msgstr ""
 
@@ -1683,14 +1682,14 @@ msgid "Adding new post..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:76
-#: ..\..\..\admin\edit_actions.php:194
-#: ..\..\..\admin\edit_actions.php:372
+#: ..\..\..\admin\edit_actions.php:195
+#: ..\..\..\admin\edit_actions.php:375
 msgid "Supplied URL is invalid."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:80
-#: ..\..\..\admin\edit_actions.php:198
-#: ..\..\..\admin\edit_actions.php:376
+#: ..\..\..\admin\edit_actions.php:199
+#: ..\..\..\admin\edit_actions.php:379
 msgid "Back to post editing"
 msgstr ""
 
@@ -1699,54 +1698,54 @@ msgid "Recording post..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:96
-#: ..\..\..\admin\edit_actions.php:297
+#: ..\..\..\admin\edit_actions.php:300
 msgid "Sleeping..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:106
-#: ..\..\..\admin\edit_actions.php:237
+#: ..\..\..\admin\edit_actions.php:238
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:197
+#: ..\..\..\admin\edit_actions.php:198
 msgid "Cannot update, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:251
+#: ..\..\..\admin\edit_actions.php:254
 msgid "Post had already pinged: skipping blog pings..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:284
+#: ..\..\..\admin\edit_actions.php:287
 msgid "Oops, no post with this ID!"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:288
+#: ..\..\..\admin\edit_actions.php:291
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:291
+#: ..\..\..\admin\edit_actions.php:294
 msgid "Deleting post..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:306
+#: ..\..\..\admin\edit_actions.php:309
 msgid "Deleting Done..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:327
+#: ..\..\..\admin\edit_actions.php:330
 msgid "Oops, no comment with this ID."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:375
+#: ..\..\..\admin\edit_actions.php:378
 msgid "Cannot update comment, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:399
+#: ..\..\..\admin\edit_actions.php:402
 msgid "Back to posts!"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:401
+#: ..\..\..\admin\edit_actions.php:404
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr ""
 
@@ -2208,10 +2207,12 @@ msgid "no comment"
 msgstr ""
 
 #: ..\..\..\b2evocore\_edit_showposts.php:162
+#: ..\..\..\b2evocore\_functions_comments.php:150
 msgid "1 comment"
 msgstr ""
 
 #: ..\..\..\b2evocore\_edit_showposts.php:162
+#: ..\..\..\b2evocore\_functions_comments.php:151
 #, php-format
 msgid "% comments"
 msgstr ""
@@ -2251,6 +2252,7 @@ msgid "Error: please fill the required fields (name & comment)"
 msgstr ""
 
 #: ..\..\..\b2evocore\_edit_showposts.php:223
+#: ..\..\..\b2evocore\_functions_comments.php:149
 msgid "Leave a comment"
 msgstr ""
 
@@ -2320,21 +2322,21 @@ msgstr ""
 msgid "Oops, MySQL error!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:578
+#: ..\..\..\b2evocore\_functions.php:593
 msgid "go back"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:608
+#: ..\..\..\b2evocore\_functions.php:623
 msgid "Redirecting you to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:610
+#: ..\..\..\b2evocore\_functions.php:625
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:896
-#: ..\..\..\b2evocore\_functions.php:976
+#: ..\..\..\b2evocore\_functions.php:911
+#: ..\..\..\b2evocore\_functions.php:991
 #, php-format
 msgid "Parameter %s is required!"
 msgstr ""
@@ -2353,31 +2355,31 @@ msgstr ""
 msgid "More:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:480
+#: ..\..\..\b2evocore\_functions_bposts.php:481
 msgid "Post details"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:531
+#: ..\..\..\b2evocore\_functions_bposts.php:532
 msgid "Next page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:532
+#: ..\..\..\b2evocore\_functions_bposts.php:533
 msgid "Previous page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:573
+#: ..\..\..\b2evocore\_functions_bposts.php:574
 msgid "Previous post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:626
+#: ..\..\..\b2evocore\_functions_bposts.php:627
 msgid "Next post"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:719
+#: ..\..\..\b2evocore\_functions_bposts.php:720
 msgid "Next Page"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:746
+#: ..\..\..\b2evocore\_functions_bposts.php:747
 msgid "Previous Page"
 msgstr ""
 
@@ -2398,20 +2400,6 @@ msgstr ""
 #. on these cats to browse them, this is the default href title displayed there
 #: ..\..\..\b2evocore\_functions_cats.php:616
 msgid "Browse category"
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_comments.php:149
-#: ..\..\..\b2evocore\_functions_trackback.php:149
-msgid "Trackback (0)"
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_comments.php:150
-#: ..\..\..\b2evocore\_functions_trackback.php:150
-msgid "Trackback (1)"
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_comments.php:151
-msgid "Trackbacks (%)"
 msgstr ""
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:64
@@ -2552,34 +2540,29 @@ msgid "Pingback (1)"
 msgstr ""
 
 #: ..\..\..\b2evocore\_functions_pingback.php:246
-msgid "Pingback (%)"
+msgid "Pingbacks (%)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:24
+#: ..\..\..\b2evocore\_functions_pings.php:27
 msgid "Pinging b2evolution.net..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:40
-#: ..\..\..\b2evocore\_functions_pings.php:73
-#: ..\..\..\b2evocore\_functions_pings.php:100
-#: ..\..\..\b2evocore\_functions_pings.php:127
-#: ..\..\..\b2evocore\_functions_pings.php:171
+#: ..\..\..\b2evocore\_functions_pings.php:55
+#: ..\..\..\b2evocore\_functions_pings.php:89
+#: ..\..\..\b2evocore\_functions_pings.php:146
+#: ..\..\..\b2evocore\_functions_pings.php:193
 msgid "Aborted (Running on localhost)."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:59
+#: ..\..\..\b2evocore\_functions_pings.php:74
 msgid "Pinging Weblogs.com..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:89
-msgid "Pinging Weblogs.com/rssUpdates..."
-msgstr ""
-
-#: ..\..\..\b2evocore\_functions_pings.php:116
+#: ..\..\..\b2evocore\_functions_pings.php:132
 msgid "Pinging Cafelog.com..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:145
+#: ..\..\..\b2evocore\_functions_pings.php:164
 msgid "Pinging Blo.gs..."
 msgstr ""
 
@@ -2611,8 +2594,16 @@ msgstr ""
 msgid "Response:"
 msgstr ""
 
+#: ..\..\..\b2evocore\_functions_trackback.php:149
+msgid "Trackback (0)"
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_trackback.php:150
+msgid "Trackback (1)"
+msgstr ""
+
 #: ..\..\..\b2evocore\_functions_trackback.php:151
-msgid "Trackback (%)"
+msgid "Trackbacks (%)"
 msgstr ""
 
 #: ..\..\..\b2evocore\_menutop.php:87
@@ -2751,52 +2742,148 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:132
+#. TRANS: abbrev. for Sunday
+#: ..\..\..\b2evocore\_vars.php:133
+msgid "Sun"
+msgstr ""
+
+#. TRANS: abbrev. for Monday
+#: ..\..\..\b2evocore\_vars.php:135
+msgid "Mon"
+msgstr ""
+
+#. TRANS: abbrev. for Tuesday
+#: ..\..\..\b2evocore\_vars.php:137
+msgid "Tue"
+msgstr ""
+
+#. TRANS: abbrev. for Wednesday
+#: ..\..\..\b2evocore\_vars.php:139
+msgid "Wed"
+msgstr ""
+
+#. TRANS: abbrev. for Thursday
+#: ..\..\..\b2evocore\_vars.php:141
+msgid "Thu"
+msgstr ""
+
+#. TRANS: abbrev. for Friday
+#: ..\..\..\b2evocore\_vars.php:143
+msgid "Fri"
+msgstr ""
+
+#. TRANS: abbrev. for Saturday
+#: ..\..\..\b2evocore\_vars.php:145
+msgid "Sat"
+msgstr ""
+
+#: ..\..\..\b2evocore\_vars.php:148
 msgid "January"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:133
+#: ..\..\..\b2evocore\_vars.php:149
 msgid "February"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:134
+#: ..\..\..\b2evocore\_vars.php:150
 msgid "March"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:135
+#: ..\..\..\b2evocore\_vars.php:151
 msgid "April"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:136
-msgid "May"
+#. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
+#: ..\..\..\b2evocore\_vars.php:153
+msgid "May "
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:137
+#: ..\..\..\b2evocore\_vars.php:154
 msgid "June"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:138
+#: ..\..\..\b2evocore\_vars.php:155
 msgid "July"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:139
+#: ..\..\..\b2evocore\_vars.php:156
 msgid "August"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:140
+#: ..\..\..\b2evocore\_vars.php:157
 msgid "September"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:141
+#: ..\..\..\b2evocore\_vars.php:158
 msgid "October"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:142
+#: ..\..\..\b2evocore\_vars.php:159
 msgid "November"
 msgstr ""
 
-#: ..\..\..\b2evocore\_vars.php:143
+#: ..\..\..\b2evocore\_vars.php:160
 msgid "December"
+msgstr ""
+
+#. TRANS: abbrev. for January
+#: ..\..\..\b2evocore\_vars.php:164
+msgid "Jan"
+msgstr ""
+
+#. TRANS: abbrev. for February
+#: ..\..\..\b2evocore\_vars.php:166
+msgid "Feb"
+msgstr ""
+
+#. TRANS: abbrev. for March
+#: ..\..\..\b2evocore\_vars.php:168
+msgid "Mar"
+msgstr ""
+
+#. TRANS: abbrev. for April
+#: ..\..\..\b2evocore\_vars.php:170
+msgid "Apr"
+msgstr ""
+
+#. TRANS: abbrev. for May
+#: ..\..\..\b2evocore\_vars.php:172
+msgid "May"
+msgstr ""
+
+#. TRANS: abbrev. for June
+#: ..\..\..\b2evocore\_vars.php:174
+msgid "Jun"
+msgstr ""
+
+#. TRANS: abbrev. for July
+#: ..\..\..\b2evocore\_vars.php:176
+msgid "Jul"
+msgstr ""
+
+#. TRANS: abbrev. for August
+#: ..\..\..\b2evocore\_vars.php:178
+msgid "Aug"
+msgstr ""
+
+#. TRANS: abbrev. for September
+#: ..\..\..\b2evocore\_vars.php:180
+msgid "Sep"
+msgstr ""
+
+#. TRANS: abbrev. for October
+#: ..\..\..\b2evocore\_vars.php:182
+msgid "Oct"
+msgstr ""
+
+#. TRANS: abbrev. for November
+#: ..\..\..\b2evocore\_vars.php:184
+msgid "Nov"
+msgstr ""
+
+#. TRANS: abbrev. for December
+#: ..\..\..\b2evocore\_vars.php:186
+msgid "Dec"
 msgstr ""
 
 #: ..\..\..\b2evocore\_verifauth.php:30
@@ -2875,7 +2962,7 @@ msgstr ""
 
 #: ..\..\..\htsrv\comment_post.php:123
 #: ..\..\..\htsrv\trackback.php:90
-#: ..\..\..\xmlsrv\xmlrpc.php:1232
+#: ..\..\..\xmlsrv\xmlrpc.php:1235
 msgid "Url"
 msgstr ""
 
@@ -2890,12 +2977,12 @@ msgid "New trackback on your post #%d \"%s\""
 msgstr ""
 
 #: ..\..\..\htsrv\trackback.php:89
-#: ..\..\..\xmlsrv\xmlrpc.php:1231
+#: ..\..\..\xmlsrv\xmlrpc.php:1234
 msgid "Website"
 msgstr ""
 
 #: ..\..\..\htsrv\trackback.php:91
-#: ..\..\..\xmlsrv\xmlrpc.php:1233
+#: ..\..\..\xmlsrv\xmlrpc.php:1236
 msgid "Excerpt"
 msgstr ""
 
@@ -2905,8 +2992,8 @@ msgstr ""
 msgid "[...] Read more!"
 msgstr ""
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1225
-#: ..\..\..\xmlsrv\xmlrpc.php:1229
+#: ..\..\..\xmlsrv\xmlrpc.php:1228
+#: ..\..\..\xmlsrv\xmlrpc.php:1232
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
