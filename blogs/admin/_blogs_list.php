@@ -21,20 +21,20 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 	{
 		$atleastoneshown = true;
 		?>
-<h2><?php echo T_('Blogs') ?>:</h2>
-	<table class="thin">
-	<tr>
-		<th><?php echo T_('Blog') ?></th>
-		<th><?php echo T_('Full Name') ?></th>
-		<th><?php echo T_('Blog URL') ?></th>
-		<th><?php echo T_('Static File') ?></th>
-		<th><?php echo T_('Locale') ?></th>
-		<?php if( $current_User->check_perm( 'blog_properties', 'edit', false ) )
-		{ ?>
-		<th><?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?></th>
-		<?php } ?>
-	</tr>
-	<?php
+		<h2><?php echo T_('Blogs') ?>:</h2>
+		<table class="thin">
+		<tr>
+			<th><?php echo T_('Blog') ?></th>
+			<th><?php echo T_('Full Name') ?></th>
+			<th><?php echo T_('Blog URL') ?></th>
+			<th><?php echo T_('Static File') ?></th>
+			<th><?php echo T_('Locale') ?></th>
+			<?php if( $current_User->check_perm( 'blog_properties', 'edit', false ) )
+			{ ?>
+			<th><?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?></th>
+			<?php } ?>
+		</tr>
+		<?php
 	}
 	?>
 	<tr>
@@ -98,7 +98,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 
 if( !isset( $atleastoneshown ) )
 { // no blog was listed because user has no rights
-	printf( T_('Sorry, you have no permission to edit/view any blog\'s properties.' ) );
+	echo '<P>'.T_('Sorry, you have no permission to edit/view any blog\'s properties.' ).'</p>';
 }
 else
 { // close table
