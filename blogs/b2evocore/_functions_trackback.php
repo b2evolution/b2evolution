@@ -53,12 +53,15 @@ function trackback(
 	$excerpt,
 	$ID) // post ID 
 {	
+	global $ItemCache;
+
 	echo "<p>", T_('Sending trackback to:'), " $trackback_url ...\n";
 
 	$title = urlencode($title);
 	$excerpt = urlencode(stripslashes($excerpt));
 	$blog_name = urlencode(get_bloginfo('name'));
-	$url = gen_permalink( get_bloginfo('blogurl'), $ID );
+	$Item = $ItemCache->get_by_ID( $ID );
+	$url = $Item->gen_permalink();
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";

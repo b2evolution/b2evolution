@@ -25,7 +25,7 @@ function pingback(
 	& $blogparams, 
 	$display = true) 
 {
-	global $b2_version, $debug;
+	global $b2_version, $debug, $ItemCache;
 
 	if( $display )
 	{
@@ -53,8 +53,8 @@ function pingback(
 		$x_pingback_str = 'x-pingback: ';
 		$pingback_href_original_pos = 27;
 	
-		$blogurl = get_bloginfo('blogurl', $blogparams );
-		$pagelinkedfrom = gen_permalink( $blogurl, $post_ID );
+		$Item = $ItemCache->get_by_ID( $post_ID );
+		$pagelinkedfrom = $Item->gen_permalink();
 
 		if( !empty($post_url) )
 		{

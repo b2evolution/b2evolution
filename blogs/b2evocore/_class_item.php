@@ -77,7 +77,6 @@ class Item extends DataObject
 	}	
 
 
-
 	/**
  	 * generate permalink for item
 	 *
@@ -88,7 +87,7 @@ class Item extends DataObject
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function gen_permalink( $mode, $blogurl )
+	function gen_permalink( $mode = '', $blogurl = '' )
 	{
 		global $cacheweekly;
 

@@ -402,10 +402,7 @@ switch($action)
 		param( 'comment_ID', 'integer', true );
 		// echo $comment_ID;
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
-		$comment_post_ID = $edited_Comment->get('post_ID');
-		// echo $comment_post_ID;
-		$postdata = get_postdata($comment_post_ID) or die(T_('Oops, no post with this ID.'));
-		$blog = get_catblog($postdata['Category']);
+		$blog = $edited_Comment->Item->get( 'blog_ID' );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', '', true, $blog );
@@ -454,10 +451,7 @@ switch($action)
 		param( 'comment_ID', 'integer', true );
 		// echo $comment_ID;
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
-		$comment_post_ID = $edited_Comment->get('post_ID');
-		// echo $comment_post_ID;
-		$postdata = get_postdata($comment_post_ID) or die(T_('Oops, no post with this ID.'));
-		$blog = get_catblog($postdata['Category']);
+		$blog = $edited_Comment->Item->get( 'blog_ID' );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', '', true, $blog );

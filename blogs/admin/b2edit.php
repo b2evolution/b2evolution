@@ -83,6 +83,7 @@ switch($action)
 		$comment_post_ID = $commentdata['comment_post_ID'];
 		$comment_postdata = get_postdata( $comment_post_ID );
 		$blog = get_catblog( $comment_postdata['Category'] );
+		$Blog = Blog_get_by_ID( $blog );
 	
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
