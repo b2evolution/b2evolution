@@ -319,6 +319,26 @@ function get_bloginfo( $show='', $this_blogparams = '' )
 			$output = $xmlsrv_url.'/atom.php?blog='.$this_blogparams->blog_ID;
 			break;
 			
+		case 'rdf_url':
+			$output = $xmlsrv_url.'/rdf.php?blog='.$this_blogparams->blog_ID;
+			break;
+			
+		case 'comments_rdf_url':
+			$output = $xmlsrv_url.'/rdf.comments.php?blog='.$this_blogparams->blog_ID;
+			break;
+			
+		case 'comments_rss_url':
+			$output = $xmlsrv_url.'/rss.comments.php?blog='.$this_blogparams->blog_ID;
+			break;
+			
+		case 'comments_rss2_url':
+			$output = $xmlsrv_url.'/rss2.comments.php?blog='.$this_blogparams->blog_ID;
+			break;
+			
+		case 'comments_atom_url':
+			$output = $xmlsrv_url.'/atom.comments.php?blog='.$this_blogparams->blog_ID;
+			break;
+			
 		case 'pingback_url':
 			$output = $xmlsrv_url.'/xmlrpc.php';
 			break;

@@ -247,12 +247,27 @@
 
 	<div class="bSideItem">
     <h3><?php echo T_('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
-
       <ul>
-        <li><a href="<?php bloginfo('rss_url', 'raw'); ?>">RSS 0.92 (Userland)</a></li>
-        <li><a href="<?php bloginfo('rdf_url', 'raw'); ?>">RSS 1.0 (RDF)</a></li>
-        <li><a href="<?php bloginfo('rss2_url', 'raw'); ?>">RSS 2.0 (Userland)</a></li>
-        <li><a href="<?php bloginfo('atom_url', 'raw'); ?>">Atom 0.3</a></li>
+        <li>
+					RSS 0.92 (Userland): 
+					<a href="<?php bloginfo('rss_url', 'raw'); ?>">Posts</a>,
+					<a href="<?php bloginfo('comments_rss_url', 'raw'); ?>">Comments</a>
+				</li>
+        <li>
+					RSS 1.0 (RDF): 
+					<a href="<?php bloginfo('rdf_url', 'raw'); ?>">Posts</a>,
+					<a href="<?php bloginfo('comments_rdf_url', 'raw'); ?>">Comments</a>
+				</li>
+        <li>
+					RSS 2.0 (Userland):
+					<a href="<?php bloginfo('rss2_url', 'raw'); ?>">Posts</a>,
+					<a href="<?php bloginfo('comments_rss2_url', 'raw'); ?>">Comments</a>
+				</li>
+        <li>
+					Atom 0.3:
+					<a href="<?php bloginfo('atom_url', 'raw'); ?>">Posts</a>,
+					<a href="<?php bloginfo('comments_atom_url', 'raw'); ?>">Comments</a>
+				</li>
       </ul>
       <a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
 
