@@ -109,69 +109,68 @@ class User extends DataObject
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank user';
-			$this->set( 'login', 'login' );
-			$this->set( 'pass', md5('pass') );
-			$this->set( 'firstname', '' );
-			$this->set( 'lastname', '' );
-			$this->set( 'nickname', '' );
-			$this->set( 'idmode', 'login' );
-			$this->set( 'locale', isset( $Settings )
-															? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
-															: $default_locale );
-			$this->set( 'email', '' );
-			$this->set( 'url', '' );
-			$this->set( 'icq', 0 );
-			$this->set( 'aim', '' );
-			$this->set( 'msn', '' );
-			$this->set( 'yim', '' );
-			$this->set( 'ip', '' );
-			$this->set( 'domain', '' );
-			$this->set( 'browser', '' );
-			$this->set( 'level', 0 );
-			$this->set( 'notify', 1 );
-			$this->set( 'showonline', 1 );
+			$this->login = 'login';
+			$this->pass = md5('pass');
+			$this->firstname = '';
+			$this->lastname = '';
+			$this->nickname = '';
+			$this->idmode = 'login';
+			$this->locale = (isset( $Settings )
+											? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
+											: $default_locale );
+			$this->email = '';
+			$this->url = '';
+			$this->icq = 0;
+			$this->aim = '';
+			$this->msn = '';
+			$this->yim = '';
+			$this->ip = '';
+			$this->domain = '';
+			$this->browser = '';
+			$this->level = 0;
+			$this->notify = 1 ;
+			$this->showonline = 1;
 			if( isset($servertimenow) )
 			{
-				$this->set_datecreated( $servertimenow );
+				$this->datecreated = date('Y-m-d H:i:s', $servertimenow );
 			}
 			else
-			{
-				// We don't know local time here!
-				$this->set_datecreated( time() );
+			{ // We don't know local time here!
+				$this->datecreated = date('Y-m-d H:i:s', time() );
 			}
 
 			if( isset( $GroupCache ) )
 			{ // Group for this user:
-				$this->setGroup( $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') ) );
+				$this->Group = $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') );
 			}
 		}
 		else
 		{
 			// echo 'Instanciating existing user';
 			$this->ID = $db_row->ID;
-			$this->set( 'login', $db_row->user_login );
-			$this->set( 'pass', $db_row->user_pass );
-			$this->set( 'firstname', $db_row->user_firstname );
-			$this->set( 'lastname', $db_row->user_lastname );
-			$this->set( 'nickname', $db_row->user_nickname );
-			$this->set( 'idmode', $db_row->user_idmode );
-			$this->set( 'locale', $db_row->user_locale );
-			$this->set( 'email', $db_row->user_email );
-			$this->set( 'url', $db_row->user_url );
-			$this->set( 'icq', $db_row->user_icq );
-			$this->set( 'aim', $db_row->user_aim );
-			$this->set( 'msn', $db_row->user_msn );
-			$this->set( 'yim', $db_row->user_yim );
-			$this->set( 'ip', $db_row->user_ip );
-			$this->set( 'domain', $db_row->user_domain );
-			$this->set( 'browser', $db_row->user_browser );
-			$this->set_datecreated( $db_row->dateYMDhour, true );
-			$this->set( 'level', $db_row->user_level );
-			$this->set( 'notify', $db_row->user_notify );
-			$this->set( 'showonline', $db_row->user_showonline );
+			$this->login =$db_row->user_login;
+			$this->pass = $db_row->user_pass;
+			$this->firstname = $db_row->user_firstname;
+			$this->lastname = $db_row->user_lastname;
+			$this->nickname = $db_row->user_nickname;
+			$this->idmode = $db_row->user_idmode;
+			$this->locale = $db_row->user_locale;
+			$this->email = $db_row->user_email;
+			$this->url = $db_row->user_url;
+			$this->icq = $db_row->user_icq;
+			$this->aim = $db_row->user_aim;
+			$this->msn = $db_row->user_msn;
+			$this->yim = $db_row->user_yim;
+			$this->ip = $db_row->user_ip;
+			$this->domain = $db_row->user_domain;
+			$this->browser = $db_row->user_browser;
+			$this->datecreated = $db_row->dateYMDhour;
+			$this->level = $db_row->user_level;
+			$this->notify = $db_row->user_notify;
+			$this->showonline = $db_row->user_showonline;
 
 			// Group for this user:
-			$this->setGroup( $GroupCache->get_by_ID( $db_row->user_grp_ID ) );
+			$this->Group = $GroupCache->get_by_ID( $db_row->user_grp_ID );
 		}
 	}
 
@@ -304,7 +303,7 @@ class User extends DataObject
 	/**
 	 * Set date created.
 	 *
-	 * @param integer seconds since Unix Epoche.
+	 * @param integer seconds since Unix Epoch.
 	 */
 	function set_datecreated( $datecreated, $isYMDhour = false )
 	{
@@ -326,7 +325,7 @@ class User extends DataObject
 	 */
 	function setGroup( & $Group )
 	{
-		$this->Group =& $Group;
+		$this->Group = & $Group;
 
 		$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
 	}
@@ -866,6 +865,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2005/03/22 19:17:27  fplanque
+ * cleaned up some nonsense...
+ *
  * Revision 1.21  2005/03/15 19:19:48  fplanque
  * minor, moved/centralized some includes
  *

@@ -396,25 +396,6 @@ else
 			break;
 
 
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// onGSB ONLY!
-	 	case 'link_contact':
-			// Link a contact..:
-			if( isset( $edited_Contact ) )
-			{	// Let's link the contact:
-
-				$Messages->add( T_('Not implemented: Contact linked to user.'), 'note' );
-				$action = 'edit';
-			}
-			else
-			{	// No requested contact so far, we'll present a list...
-				// TODO: make this comaptible with AdminUI
-				$admin_pagetitle .= $admin_path_seprator.T_('Link a contact...');
-			}
-			break;
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 		// ---- GROUPS --------------------------------------------------------------------------------------
 
 		case 'new_group':
@@ -629,14 +610,22 @@ else
 			// fplanque>> note: we don't want this (potentially very long) list to be displayed again and again)
 			if( $current_User->check_perm( 'users', 'view', false ) )
 			{ // Display user list:
+				// Begin payload block:
+				$AdminUI->dispPayloadBegin();
 				require dirname(__FILE__).'/_users_list.php';
+				// End payload block:
+				$AdminUI->dispPayloadEnd();
 			}
 	}
 }
 
 require dirname(__FILE__).'/_footer.php';
+
 /*
  * $Log$
+ * Revision 1.85  2005/03/22 19:17:31  fplanque
+ * cleaned up some nonsense...
+ *
  * Revision 1.84  2005/03/22 16:36:01  fplanque
  * refactoring, standardization
  * fixed group creation bug

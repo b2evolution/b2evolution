@@ -39,7 +39,6 @@ $request = "SELECT T_users.*, grp_ID, grp_name
 						ORDER BY grp_name, user_login";
 $userlist = $DB->get_results( $request );
 ?>
-<div class="panelblock">
 <h2><?php echo T_('Groups &amp; Users') ?></h2>
 <table class="grouped" cellspacing="0">
 	<tr>
@@ -214,5 +213,11 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 	</p>
 	<?php
 }
+
+/*
+ * $Log$
+ * Revision 1.38  2005/03/22 19:17:30  fplanque
+ * cleaned up some nonsense...
+ *
+ */
 ?>
-</div>
