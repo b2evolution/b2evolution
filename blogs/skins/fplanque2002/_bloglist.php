@@ -38,6 +38,6 @@
 	 * We now call the default bloglist handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require dirname(__FILE__).'/../../_bloglist.php';
+	require get_path('skins').'/_bloglist.php';
 
 ?>

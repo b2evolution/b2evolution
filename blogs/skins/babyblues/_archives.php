@@ -27,6 +27,6 @@
 	 * We now call the default archives handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require dirname(__FILE__).'/../../_archives.php';
+	require get_path('skins').'/_archives.php';
 
 ?>

@@ -16,5 +16,5 @@
 	 * We now call the default feedback handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require dirname(__FILE__).'/../../_feedback.php';
+	require get_path('skins').'/_feedback.php';
 ?>

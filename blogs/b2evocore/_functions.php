@@ -1138,17 +1138,19 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
  */
 function get_path( $which='' )
 {
-	global $core_subdir, $skins_subdir;
+	global $core_subdir, $skins_subdir, $basepath;
 
-	// Determine the edit folder:
-	$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
-	$last_pos = 0;
-	while( $pos = strpos( $current_folder, $core_subdir, $last_pos ) )
-	{	// make sure we use the last occurrence
-		$basepath = substr( $current_folder, 0, $pos-1 );
-		$last_pos = $pos+1;
+	if( !isset($basepath) )
+	{	// Determine the basepath:
+		$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
+		$last_pos = 0;
+		while( $pos = strpos( $current_folder, $core_subdir, $last_pos ) )
+		{	// make sure we use the last occurrence
+			$basepath = substr( $current_folder, 0, $pos-1 );
+			$last_pos = $pos+1;
+		}
 	}
-
+	
 	switch( $which )
 	{
 		case 'skins':

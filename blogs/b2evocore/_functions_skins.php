@@ -19,7 +19,7 @@ function skinbase()
 	}
 	else
 	{	// No skin used:
-		echo '/';
+		echo "$baseurl/";
 	}
 }
 

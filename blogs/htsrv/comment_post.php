@@ -54,14 +54,6 @@ $now = date("Y-m-d H:i:s", $localtimenow );
 $comment = strip_tags($comment, $comment_allowed_tags);
 $comment = format_to_post($comment, $comment_autobr, 1);
 
-$comment_author = $author;
-$comment_author_email = $email;
-$comment_author_url = $url;
-
-$author = addslashes($author);
-$email = addslashes($email);
-$url = addslashes($url);
-
 /* flood-protection */
 $query = "SELECT max(comment_date) as maxdate FROM $tablecomments WHERE comment_author_IP='$user_ip'";
 $result = mysql_query($query);
@@ -88,7 +80,7 @@ if( errors_display( T_('Cannot post comment, please correct these errors:'),
 
 /* end flood-protection */
 
-$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content)  VALUES( $comment_post_ID, 'comment', '$author','$email','$url','$user_ip','$now','$comment' )";
+$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content)  VALUES( $comment_post_ID, 'comment', '".addslashes($author)."','".addslashes($email)."','".addslashes($url)."','$user_ip','$now','".addslashes($comment)."' )";
 $querycount++;
 $result = mysql_query($query) or mysql_oops( $query );
 
@@ -103,17 +95,17 @@ if ($comments_notify)
 	// Not translated because sent to someone else...
 	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
 	$notify_message .= $comment_blogparams->blog_siteurl."/".$comment_blogparams->blog_filename."?p=".$comment_post_ID."&c=1\n\n";
-	$notify_message .= T_('Author', $default_locale).": $comment_author (IP: $user_ip , $user_domain)\n";
-	$notify_message .= T_('Email', $default_locale).": $comment_author_email\n";
-	$notify_message .= T_('Url', $default_locale).": $comment_author_url\n";
+	$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip , $user_domain)\n";
+	$notify_message .= T_('Email', $default_locale).": $email\n";
+	$notify_message .= T_('Url', $default_locale).": $url\n";
 	$notify_message .= T_('Comment', $default_locale).": \n".stripslashes($original_comment)."\n";
 
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
 
-	if( empty( $comment_author_email ) )
+	if( empty( $email ) )
 		$mail_from = $notify_from;
 	else
-		$mail_from = "\"$comment_author\" <$comment_author_email>";
+		$mail_from = "\"$author\" <$email>";
 
 	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 }

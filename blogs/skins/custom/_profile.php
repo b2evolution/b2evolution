@@ -14,5 +14,5 @@
 	 * We now call the default user profile form handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require dirname(__FILE__).'/../../_profile.php';
+	require get_path('skins').'/_profile.php';
 ?>

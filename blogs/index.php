@@ -22,7 +22,7 @@
 	$blog_item_start = '';				
 	$blog_item_end = ' &middot; ';
 	// Include the bloglist
-	require( dirname(__FILE__)."/_bloglist.php"); 
+	require( get_path('skins').'/_bloglist.php'); 
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 	<a href="admin/b2edit.php"><?php echo T_('My Back-Office') ?></a>
 </div>
