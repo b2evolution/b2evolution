@@ -34,6 +34,12 @@
 										array( 'view', T_('View only') ),
 										array( 'edit', T_('Full Access') )
 									), T_('Antispam') );
+				form_radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
+						array(  array( 'none', T_('No Access') ),
+										array( 'view', T_('View only') ),
+										array( 'edit', T_('Full Access') )
+									), T_('Global options') );
+				form_checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
 			?>
 		</fieldset>
 	

@@ -127,6 +127,12 @@ case 'groupupdate':
 
 	param( 'edited_grp_perm_spamblacklist', 'string', true );
 	$edited_Group->set( 'perm_spamblacklist', $edited_grp_perm_spamblacklist );
+
+	param( 'edited_grp_perm_options', 'string', true );
+	$edited_Group->set( 'perm_options', $edited_grp_perm_options );
+	
+	param( 'edited_grp_perm_templates', 'int', 0 );
+	$edited_Group->set( 'perm_templates', $edited_grp_perm_templates );
 	
 	$edited_Group->dbupdate();	// Commit update to the DB
 	

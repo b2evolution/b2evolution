@@ -168,5 +168,24 @@ class User extends DataObject
 		
 		$this->dbchange( 'user_grp_ID', 'int', 'Group->get(\'ID\')' );
 	}
+	
+	/*
+	 * User::check_perm(-)
+	 *
+	 * Check permission
+	 */
+	function check_perm( $permname, $permlevel, $assert = false )
+	{
+		// Forward request to group:
+		$perm = $this->Group->check_perm( $permname, $permlevel );
+		
+		if( !$perm && $assert )
+		{ // We can't let this go on!
+			die( T_('Permission denied!') );
+		}
+		
+		return $perm;
+	}
+	
 }
 ?>

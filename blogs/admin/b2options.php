@@ -15,10 +15,8 @@ param( 'action', 'string' );
 switch($action) {
 
 case 'update':
-	if ($user_level <= 3) 
-	{
-		die( T_('You have no right to edit the options for this blog.') );
-	}
+	// Check permission:
+	$current_User->check_perm( 'options', 'edit', true );
 
 	param( 'newposts_per_page', 'integer', true );
 	param( 'newwhat_to_show', 'string', true );
@@ -37,10 +35,9 @@ break;
 default:
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
-	if ($user_level <= 3) 
-	{
-		die( T_('You have no right to edit the options for this blog.') );
-	}
+
+	// Check permission:
+	$current_User->check_perm( 'options', 'view', true );
 	?>
 	
 		<div class="panelblock">
@@ -126,6 +123,8 @@ default:
 			</table>
 	</fieldset>
 
+	<?php if( $current_User->check_perm( 'options', 'edit' ) ) 
+	{ ?>
 	<fieldset>
 		<fieldset>
 			<div class="input">
@@ -134,6 +133,7 @@ default:
 			</div>
 		</fieldset>
 	</fieldset>
+	<?php } ?>
 
 		</form>
 	</div>

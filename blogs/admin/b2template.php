@@ -10,6 +10,9 @@
 require_once(dirname(__FILE__).'/_header.php');
 $title = T_('Custom skin template editing');
 
+// Check permission:
+$current_User->check_perm( 'templates', '', true );
+
 param( 'action', 'string' );
 param( 'error', 'string' );
 param( 'file', 'string' );
@@ -20,11 +23,6 @@ switch($action)
 {
 
 case "update":
-	if( $user_level < 3 ) 
-	{
-		die( '<p>'.T_('You have no right to edit the templates.').'</p>' );
-	}
-
 	// Determine the edit folder:
 	$edit_folder = get_path('skins').'/custom';
 
@@ -41,11 +39,6 @@ case "update":
 default:
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
-
-	if( $user_level < 3 && ! $demo_mode ) 
-	{
-		die( '<p>'.T_('You have no right to edit the templates.').'</p>' );
-	}
 
 	// Determine the edit folder:
 	$edit_folder = get_path('skins').'/custom';

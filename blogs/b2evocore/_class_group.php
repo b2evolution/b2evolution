@@ -12,6 +12,8 @@ class Group extends DataObject
 	var	$name;
 	var	$perm_stats;
 	var	$perm_spamblacklist;
+	var	$perm_options;
+	var	$perm_templates;
 
 	/* 
 	 * Group::Group(-)
@@ -31,6 +33,8 @@ class Group extends DataObject
 			$this->name = T_('New group');
 			$this->perm_stats = 'none';
 			$this->perm_spamblacklist = 'none';
+			$this->perm_options = 'none';
+			$this->perm_templates = 0;
 		}
 		else
 		{
@@ -39,6 +43,8 @@ class Group extends DataObject
 			$this->name = $db_row->grp_name;
 			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
+			$this->perm_options = $db_row->grp_perm_options;
+			$this->perm_templates = $db_row->grp_perm_templates;
 		}
 	}	
 	
@@ -51,13 +57,49 @@ class Group extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'noparamyet':
+			case 'perm_templates':
 				parent::set_param( $parname, 'int', $parvalue );
 			break;
 			
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
+	}
+
+	/*
+	 * Group::check_perm(-)
+	 *
+	 * Check permission
+	 */
+	function check_perm( $permname, $permrequested )
+	{
+		eval( '$permvalue = $this->perm_'.$permname.';' );
+		// echo $permvalue;
+
+		switch( $permname )
+		{
+			case 'templates':
+				if( $permvalue )
+					return true;	// Permission granted
+				break;
+				
+			case 'stats':
+			case 'spamblacklist':
+			case 'options':
+				switch( $permvalue )
+				{
+					case 'edit':
+						// All permissions granted
+						return true;	// Permission granted
+						
+					case 'view':
+						// User can only ask for view perm
+						if( $permrequested == 'view' )
+							return true;	// Permission granted
+						break;	
+				}
+		}		
+		return false;	// Permission denied!
 	}
 	
 }

@@ -232,6 +232,8 @@ function create_groups()
   	grp_name varchar(50) NOT NULL default '',
   	grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
   	grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
+  	grp_perm_options enum('none','view','edit') NOT NULL default 'none',
+		grp_perm_templates TINYINT NOT NULL DEFAULT 0,
 	  PRIMARY KEY (grp_ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
@@ -239,21 +241,35 @@ function create_groups()
 	echo 'Populating...';
 
 	$Group_Admins = new Group();
-	$Group_Admins->set( 'name', 'string', 'Administrators' );
-	$Group_Admins->set( 'perm_stats', 'string', 'edit' );
-	$Group_Admins->set( 'perm_spamblacklist', 'string', 'edit' );
+	$Group_Admins->set( 'name', 'Administrators' );
+	$Group_Admins->set( 'perm_stats', 'edit' );
+	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+	$Group_Admins->set( 'perm_options', 'edit' );
+	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->dbinsert();
 
+	$Group_Priviledged = new Group();
+	$Group_Priviledged->set( 'name', 'Priviledged Bloggers' );
+	$Group_Priviledged->set( 'perm_stats', 'view' );
+	$Group_Priviledged->set( 'perm_spamblacklist', 'edit' );
+	$Group_Priviledged->set( 'perm_options', 'view' );
+	$Group_Priviledged->set( 'perm_templates', 0 );
+	$Group_Priviledged->dbinsert();
+
 	$Group_Bloggers = new Group();
-	$Group_Bloggers->set( 'name', 'string', 'Bloggers' );
-	$Group_Bloggers->set( 'perm_stats', 'string', 'view' );
-	$Group_Bloggers->set( 'perm_spamblacklist', 'string', 'view' );
+	$Group_Bloggers->set( 'name', 'Bloggers' );
+	$Group_Bloggers->set( 'perm_stats', 'none' );
+	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+	$Group_Bloggers->set( 'perm_options', 'none' );
+	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group();
-	$Group_Users->set( 'name', 'string', 'New Users' );
-	$Group_Users->set( 'perm_stats', 'string', 'view' );
-	$Group_Users->set( 'perm_spamblacklist', 'string', 'view' );
+	$Group_Users->set( 'name', 'Basic Users' );
+	$Group_Users->set( 'perm_stats', 'none' );
+	$Group_Users->set( 'perm_spamblacklist', 'none' );
+	$Group_Users->set( 'perm_options', 'none' );
+	$Group_Users->set( 'perm_templates', 0 );
 	$Group_Users->dbinsert();
 
 }

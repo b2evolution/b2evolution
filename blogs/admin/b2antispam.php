@@ -15,18 +15,14 @@ param( 'confirm', 'string' );
 require(dirname(__FILE__).'/_menutop.php');
 require(dirname(__FILE__).'/_menutop_end.php');
 
-if ($user_level < 9 && ! $demo_mode) 
-{
-		die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
-}
+// Check permission:
+$current_User->check_perm( 'spamblacklist', 'view', true );
 
 switch( $action )
 {
 	case 'ban':
-		if ($user_level < 9)
-		{
-			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
-		}
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
 
 		param( 'keyword', 'string', true );	// Required!
 
@@ -114,10 +110,10 @@ switch( $action )
 		
 	case 'remove':
 		// Remove a domain from ban list:
-		if ($user_level < 9)
-		{
-			die( '<p>'.T_('You have no right to edit the blacklist.').'</p>' );
-		}
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
 		param( 'hit_ID', 'integer', true );	// Required!
 		?>
 		<div class="panelinfo">
@@ -132,6 +128,10 @@ switch( $action )
 
 	case 'report':
 		// Report an entry as abuse to centralized blacklist:
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
 		param( 'keyword', 'string', true );	// Required!
 		// Report this keyword as abuse:
 		b2evonet_report_abuse( $keyword );
@@ -140,6 +140,10 @@ switch( $action )
 
 	case 'poll':
 		// request abuse list from central blacklist:
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
 		b2evonet_poll_abuse( );
 		break;
 }
@@ -147,19 +151,28 @@ switch( $action )
 
 <div class="panelblock">
 	<h2><?php echo T_('Banned domains blacklist') ?></h2>
-	<p><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs. If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.') ?></p>
+	<p><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
+	if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+	{
+		echo T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
+	}
+	?></p>
 	<?php list_antiSpam() ?>
 	<table class='thin'>
 		<?php while( $row_stats = mysql_fetch_array($res_stats) ) {  ?>
 		<tr>
 			<td>
+				<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+				{ ?>
 				<a href="b2antispam.php?action=remove&hit_ID=<?php antiSpam_ID() ?>" title="<?php echo T_('Allow keyword back (Remove it from the blacklist)') ?>"><img src="img/tick.gif" width="13" height="13" class="middle" alt="<?php echo T_('Allow Back') ?>" /></a>
-				<?php antiSpam_domain() ?>
+				<?php }
+				antiSpam_domain();
+				?>
 			</td>
 			<td>
 				<?php 
 					antispam_source();
-					if( antispam_source(false,true) == 'local' )
+					if( (antispam_source(false,true) == 'local') && $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
 					{
 					?> [<a href="b2antispam.php?action=report&keyword=<?php antiSpam_domain() ?>" title="<?php echo T_('Report abuse to centralized ban blacklist!') ?>">Report</a>]
 				<?php } ?>
@@ -167,9 +180,14 @@ switch( $action )
 		</tr>
 		<?php } // End stat loop ?>
 	</table>
-	<p>[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
+	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+	{ ?>
+		<p>[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist.') ?></a>]</p>
+	<?php } ?>
 </div>
 
+<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+{ ?>
 <div class="panelblock">
 	<h2><?php echo T_('Add a banned keyword') ?></h2>
 	<form action="b2antispam.php" method="GET">
@@ -182,6 +200,6 @@ switch( $action )
 	</form>
 </div>
 <?php
-
+}
 require( dirname(__FILE__).'/_footer.php' ); 
 ?>

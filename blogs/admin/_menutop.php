@@ -57,7 +57,7 @@ if( empty($mode) )
 			echo '<li>';
 		echo '<a href="b2browse.php?blog=', $blog, '" style="font-weight: bold;">', T_('Browse/Edit'), '</a></li>';
 	
-		if($user_level >= 9 || $demo_mode) 
+		if( $current_User->check_perm( 'stats', 'view' ) )
 		{
 			if( $title == T_('View Stats') )
 				echo '<li class="current">';
@@ -66,7 +66,7 @@ if( empty($mode) )
 			echo '<a href="b2stats.php" >', T_('Stats'), '</a></li>';
 		}
 	
-		if($user_level >= 9 || $demo_mode)
+		if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{
 			if( $title == T_('Antispam') )
 				echo '<li class="current">';
@@ -93,7 +93,7 @@ if( empty($mode) )
 			echo '<a href="b2blogs.php" >', T_('Blogs'), '</a></li>';
 		}
 	
-		if($user_level >= 9) 
+		if( $current_User->check_perm( 'options', 'view' ) )
 		{
 			if( $title == T_('Options') )
 				echo '<li class="current">';
@@ -102,7 +102,7 @@ if( empty($mode) )
 			echo '<a href="b2options.php" >', T_('Options'), '</a></li>';
 		}
 	
-		if($user_level >= 3 || $demo_mode) 
+		if( $current_User->check_perm( 'templates', '' ) )
 		{
 			if( $title == T_('Custom skin template editing') )
 				echo '<li class="current">';

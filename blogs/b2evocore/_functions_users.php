@@ -21,6 +21,7 @@ function veriflog( $login_required = false )
 {
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $core_dirout;
 	global $user_login, $user_pass_md5, $userdata, $user_level, $user_ID, $user_nickname, $user_email, $user_url;
+	global $current_User;
 	
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
 	// Warning: unset() prevent from setting a new global value later in the func !!! :((
@@ -128,6 +129,8 @@ function veriflog( $login_required = false )
 	 * Login info is OK, we set the global variables:
 	 */
 	$userdata	= get_userdatabylogin($user_login);
+	$current_User = new User( $userdata );
+
 	$user_level	= $userdata['user_level'];
 	// echo 'user level = ', $user_level;
 	$user_ID = $userdata['ID'];
