@@ -184,12 +184,19 @@ class DataObjectCache
 	 * {@internal DataObjectCache::get_by_ID(-) }}
 	 *
 	 * @param integer ID of object to load
-	 * @param boolean false if you want to return false on error
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
 	 * @return reference on cached object
 	 */
-	function & get_by_ID( $req_ID, $halt_on_error = true )
+	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true )
 	{
 		global $DB, $Debuglog;
+
+		if( empty($req_ID) )
+		{
+			if($halt_on_empty) die( "Requested $this->objtype without ID!" );
+			return NULL;
+		}
 
 		if( !empty( $this->cache[ $req_ID ] ) )
 		{ // Already in cache
@@ -205,11 +212,15 @@ class DataObjectCache
 			else
 			{ // Load just the requested object:
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
-				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = '$req_ID'";
+				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
 
-				if( $row = $DB->get_row( $sql ) )
+				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
-					$this->add( new $this->objtype( $row ) );
+					//$Debuglog->add( 'success' );
+					if( ! $this->add( new $this->objtype( $row ) ) )
+					{
+						$Debuglog->add( 'Could not add() object to cache!' );
+					}
 				}
 				else
 				{
@@ -220,6 +231,7 @@ class DataObjectCache
 
 		if( empty( $this->cache[ $req_ID ] ) )
 		{ // Requested object does not exist
+			// $Debuglog->add( 'failure' );
 			if( $halt_on_error )
 			{
 				die( "Requested $this->objtype does not exist!" );
@@ -307,6 +319,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2005/03/02 15:24:29  fplanque
+ * allow get_by_ID(NULL) in some situations
+ *
  * Revision 1.13  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
