@@ -52,7 +52,8 @@ $posts_per_page = get_settings('posts_per_page');
 $what_to_show = get_settings('what_to_show');
 $autobr = get_settings('AutoBR');
 
-$localtimenow = time() + ($time_difference * 3600);
+$servertimenow = time();
+$localtimenow = $servertimenow + ($time_difference * 3600);
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;
