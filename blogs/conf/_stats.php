@@ -13,8 +13,7 @@
 
 # Blacklist: domains that should not be logged for stats
 # The following substrings will be looked up in the referer http header
-# However, you should report spammers in $block_urls[] in _antispam.php, this way they'll
-# also be blocked from comments...
+# THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam
 $blackList = Array(
 	$baseurl.'/',
 	'localhost',

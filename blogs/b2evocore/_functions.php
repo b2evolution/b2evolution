@@ -17,6 +17,7 @@ require_once (dirname(__FILE__)."/_functions_pingback.php");
 require_once (dirname(__FILE__)."/_functions_pings.php");
 require_once (dirname(__FILE__)."/_functions_skins.php");
 require_once (dirname(__FILE__).'/_functions_errors.php');
+require_once (dirname(__FILE__).'/_functions_antispam.php');
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
 if( $use_html_checker ) require_once (dirname(__FILE__).'/_class_htmlchecker.php');
 
@@ -767,7 +768,7 @@ function xmlrpc_displayresult( $result, $log = '' )
 		$value_arr = '';
 		foreach($value as $blah)
 		{
-			$value_arr .= $blah.' |||| ';
+			$value_arr .= ' ['.$blah.'] ';
 		}
 		echo T_('Response'), ': ', $value_arr, "<br />\n";
 		debug_fwrite($log, $value_arr);
@@ -1184,8 +1185,6 @@ function autoquote( & $string )
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
-	global $tableantispam, $querycount;
-
 	if( empty($url) ) 
 	{	// Empty URL, no problem
 		return false;		
@@ -1203,20 +1202,9 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// Search for blocked URLs:
-	$query = "SELECT * FROM $tableantispam";
-	$querycount++;
-	$q = mysql_query( $query ) or mysql_oops( $query );
-	$block_urls = array();
-	while( list($id,$tmp) = mysql_fetch_row($q) )
+	if( antispam_url($url) )
 	{
-		$block_urls[] = $tmp;
-	}
-	foreach ($block_urls as $block)
-	{
-		if( strpos($url, $block) !== false)
-		{
-			return T_('URL not allowed');
-		}
+		return T_('URL not allowed');
 	}
 
 	return false;		// OK

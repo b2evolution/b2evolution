@@ -9,11 +9,7 @@
 $debug = 0;
 
 require_once(dirname(__FILE__)."/../conf/_config.php");
-require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions_xmlrpc.php");
-require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions_xmlrpcs.php");
-require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions_template.php");
-require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_functions.php");
-require_once(dirname(__FILE__)."/$xmlsrv_dirout/$core_subdir/_vars.php");
+require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
 
 $use_cache = 1;
 $post_autobr = 1;

@@ -50,6 +50,41 @@ function remove_ban( $string_ID )
 
 
 /*
+ * antispam_url(-)
+ *
+ * Check if an URL contains abusive substrings
+ */
+function antispam_url( $url )
+{
+	global $tableantispam, $querycount, $cache_antispam;
+
+	if( !isset($cache_antispam)) 
+	{	// Cache not loaded, load now:
+		$query = "SELECT domain FROM $tableantispam";
+		$querycount++;
+		$q = mysql_query( $query ) or mysql_oops( $query );
+		$cache_antispam = array();
+		while( list($tmp) = mysql_fetch_row($q) )
+		{
+			$cache_antispam[] = $tmp;
+		}
+	}
+	
+	// Check URL for abuse:
+	foreach ($cache_antispam as $block)
+	{
+		if( strpos($url, $block) !== false)
+		{
+			return true;	// SPAM detected!
+		}
+	}
+
+	return false;	// no problem.
+
+}
+
+
+/*
  * list_antiSpam(-)
  *
  * Extract anti-spam

@@ -6,7 +6,7 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 require_once (dirname(__FILE__).'/_header.php');
-require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_hitlogs.php');	// referer logging
+require_once (dirname(__FILE__).'/'.$admin_dirout.'/'.$core_subdir.'/_functions_antispam.php');
 $title = T_('Antispam');
 
 param( 'action', 'string' );
